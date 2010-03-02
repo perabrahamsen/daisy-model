@@ -1,0 +1,28 @@
+Chikrii Softlab pseudoTeX 2.0 report.
+http://www.chikrii.com, mailto: support@chikrii.com
+
+MSTStuff_english_2convert2word.tex (Ln 3) Syntax Error: \input doesn't works, can't open file (report)
+MSTStuff_english_2convert2word.tex (Ln 6) Syntax Error: \input doesn't works, can't open file (natbibDK)
+MSTStuff_english_2convert2word.tex (Ln 13) Syntax Error: \input doesn't works, can't open file (fontenc)
+MSTStuff_english_2convert2word.tex (Ln 42) Syntax Error: Undefined control sequence (\chapter)
+MSTStuff_english_2convert2word.tex (Ln 46) Syntax Error: Undefined control sequence (\chapter)
+MSTStuff_english_2convert2word.tex (Ln 143) Syntax Error: Undefined control sequence (\chapter)
+MSTStuff_english_2convert2word.tex (Ln 169) Syntax Error: Undefined control sequence (\caption)
+MSTStuff_english_2convert2word.tex (Ln 175) Syntax Error: Undefined control sequence (\caption)
+MSTStuff_english_2convert2word.tex (Ln 181) Syntax Error: Undefined control sequence (\caption)
+MSTStuff_english_2convert2word.tex (Ln 203) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english_2convert2word.tex (Ln 203) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english_2convert2word.tex (Ln 203) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english_2convert2word.tex (Ln 203) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english_2convert2word.tex (Ln 237) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english_2convert2word.tex (Ln 247) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english_2convert2word.tex (Ln 276) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english_2convert2word.tex (Ln 276) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english_2convert2word.tex (Ln 276) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english_2convert2word.tex (Ln 346) Syntax Error: Undefined control sequence (\caption)
+MSTStuff_english_2convert2word.tex (Ln 357) Syntax Error: Undefined control sequence (\caption)
+MSTStuff_english_2convert2word.tex (Ln 763) Syntax Error: Undefined control sequence (\text)
+MSTStuff_english_2convert2word.tex (Ln 794) Syntax Error: Undefined control sequence (\text)
+MSTStuff_english_2convert2word.tex (Ln 815) Syntax Error: Undefined control sequence (\caption)
+MSTStuff_english_2convert2word.tex (Ln 824) Syntax Error: Undefined control sequence (\caption)
+MSTStuff_english_2convert2word.tex (Ln 843) Syntax Error: Undefined control sequence (\caption)

@@ -1,0 +1,103 @@
+\begin{thebibliography}{17}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+
+\bibitem[{Abbott et~al.(1986)Abbott, Bathurst, Cunge, O'Connell, and
+  Rasmussen}]{Abbott}
+Abbott, M.~B., Bathurst, J.~C., Cunge, J.~A., O'Connell, P.~E., Rasmussen, J.,
+  1986. An introduction to the european hydrological system -- systeme
+  hydrologique europeen, "{SHE}", 2: Structure of a physically-based,
+  distributed modelling system. Journal of Hydrology 87~(1--2), 61--77.
+
+\bibitem[{Abrahamsen and Hansen(2000)}]{Abrahamsen}
+Abrahamsen, P., Hansen, S., 2000. Daisy: an open soil-crop-atmosphere system
+  model. Environmental Modelling and Software 15~(3), 313--330.
+
+\bibitem[{Boegh et~al.(2004)Boegh, Thorsen, Butts, Hansen, Christiansen,
+  Abrahamsen, Hasager, Jensen, van~der Keur, Refsgaard, Schelde, Soegaard, and
+  Thomsen}]{Boegh}
+Boegh, E., Thorsen, M., Butts, M.~B., Hansen, S., Christiansen, J.~S.,
+  Abrahamsen, P., Hasager, C.~B., Jensen, N.~O., van~der Keur, P., Refsgaard,
+  J.~C., Schelde, K., Soegaard, H., Thomsen, A., 2004. Incorporating remote
+  sensing data in physically based distributed agro-hydrological modelling.
+  Journal of Hydrology 287~(1--4), 279--299.
+
+\bibitem[{Fipps et~al.(1986)Fipps, Skaggs, and Nieber}]{Fipps}
+Fipps, G., Skaggs, R.~W., Nieber, J.~L., 1986. Drains as a boundary condition
+  in finite elements. Water Resources Research 22~(11), 1613--1621.
+
+\bibitem[{Hansen et~al.(2007)Hansen, Refsgaard, Hansen, and
+  Ernstsen}]{HansenRolmer}
+Hansen, J.~R., Refsgaard, J.~C., Hansen, S., Ernstsen, V., 2007. Problems with
+  heterogeneity in physically based agricultural catchment models. Journal of
+  Hydrology 342~(1--2), 1--16.
+
+\bibitem[{Hansen et~al.(1991)Hansen, Jensen, Nielsen, and Svendsen}]{Hansen}
+Hansen, S., Jensen, H.~E., Nielsen, N.~E., Svendsen, H., 1991. Simulation of
+  nitrogen dynamics and biomass production in winter wheat using the {D}anish
+  simulation model {DAISY}. Fertilizer Research 27, 245--259.
+
+\bibitem[{Hooghoudt(1940)}]{Hooghoudt}
+Hooghoudt, S.~B., 1940. Algemene beschouwing van het probleem van de
+  detailontwatering en de infiltratie door middel van parallel loopende drains,
+  greppels, slooten en kanalen. Bijdragen tot de kennis van eenige
+  natuurkundige grootheden van den grond~7, Rijksuitgeverij Dienst van de
+  Nderlandse Staatscourant. 's-Gravenhage, Algemeene Landsdrukkerij.
+
+\bibitem[{Loague and Green(1991)}]{Loague}
+Loague, K., Green, R.~E., 1991. Statistical and graphical methods for
+  evaluating solute transport models: overview and application. Journal of
+  Contaminant Hydrology 7, 51--73.
+
+\bibitem[{Millington and Quirk(1961)}]{Millington}
+Millington, R.~J., Quirk, J.~P., 1961. Permeability of porous solids. Trans.
+  Faraday Soc. 57, 1200--1207.
+
+\bibitem[{Mualem(1976)}]{Mualem}
+Mualem, Y., June 1976. A new model for predicting the hydraulic conductivity of
+  unsaturated porous media. Water Resources Research 12~(3), 513--522.
+
+\bibitem[{Refsgaard et~al.(1999)Refsgaard, Thorsen, Jensen, Kleeschulte, and
+  Hansen}]{Refsgaard}
+Refsgaard, J.~C., Thorsen, M., Jensen, J.~B., Kleeschulte, S., Hansen, S.,
+  1999. Large scale modelling of groundwater contamination from nitrate
+  leaching. Journal of Hydrology 221~(3--4), 117--140.
+
+\bibitem[{Styczen et~al.(2006)Styczen, Hansen, Jensen, Svendsen, Abrahamsen,
+  B{\o}rgesen, Thirup, and {\O}stergaard}]{DAISYstandard}
+Styczen, M., Hansen, S., Jensen, L.~S., Svendsen, H., Abrahamsen, P.,
+  B{\o}rgesen, C.~D., Thirup, C., {\O}stergaard, H.~S., April 2006.
+  Standardopstillinger til daisy-modellen. vejledning og baggrund. Tech. Rep.
+  Version 1.2, DHI Institut for Vand og Milj{\o}.
+
+\bibitem[{Styczen and Strorm(1993)}]{Styczen2}
+Styczen, M., Strorm, B., 1993. Modelleing of {N}-movements on catchment scale -
+  a tool for analysis and decision making. 2. {A} case study. Fertilizer
+  Research 36, 7--17.
+
+\bibitem[{Thorsen et~al.(2001)Thorsen, Refsgaard, Hansen, Pebesma, Jensen, and
+  Kleeschulte}]{Thorsen}
+Thorsen, M., Refsgaard, J.~C., Hansen, S., Pebesma, E., Jensen, J.~B.,
+  Kleeschulte, S., 2001. Assessment of uncertainty in simulation of nitrate
+  leaching to aquifers at catchment scale. Journal of Hydrology 242~(3--4"),
+  210--227.
+
+\bibitem[{van~der Keur et~al.(2008)van~der Keur, Hansen, Hansen, and
+  Refsgaard}]{vanderKeur}
+van~der Keur, P., Hansen, J.~R., Hansen, S., Refsgaard, J.~C., 2008.
+  Uncertainty in simulations of {N}itrate leaching at fiels and catchment scale
+  within the odense river basin. Vadose Zone Journal 7~(1), 10--21.
+
+\bibitem[{van~der Molen and Wesseling(1991)}]{vanderMolen}
+van~der Molen, W.~H., Wesseling, J., 1991. A solution in closed form and a
+  series solution to replace the tables for the thickness of the equivalent
+  layer in hooghoudt's drain spacing formula. Agricultural Water Management
+  19~(1), 1991.
+
+\bibitem[{van Genuchten(1980)}]{vanGenuchten}
+van Genuchten, M.~T., 1980. A closed-form equation for predicting the hydraulic
+  conductivity of unsaturated soils. Soil Science 44, 892--898.
+
+\end{thebibliography}

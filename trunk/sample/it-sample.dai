@@ -1,0 +1,30 @@
+;;; it-sample.dai -- Sample Italian setup file.
+;;
+;; This is from the CER institute, near Bologna.
+;; The original parameterization was by 
+;;  "A. Battilani" <battilani@consorziocer.it>
+;; Some modification has been made by Per Abrahamsen <abraham@dina.kvl.dk>.
+;;
+;; Permission for redistribution is granted as long as the original
+;; author is mentioned.
+
+(input file "fertilizer.dai")
+(input file "crop.dai")
+(input file "tillage.dai")
+(input file "it-soil.dai")
+(input file "it-management.dai")
+
+(defprogram "WP1 IT CER 2005" Daisy
+  "Italian WP1 data for 2005."
+  (time 1996 1 1 0)
+  (stop  2005 6 1 0)
+  (column "WP1 IT CER 2005")
+  (output harvest)
+  (manager "WP1 IT 2005 warmup")
+  (weather default "it-bologna.dwf"
+           (missing_years ((2005 2006) (2004 2005)))))
+
+(run "WP1 IT CER 2005")
+
+;;; it-sample.dai ends here.
+

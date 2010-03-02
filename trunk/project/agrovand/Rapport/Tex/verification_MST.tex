@@ -1,0 +1,530 @@
+\chapter{Verification}\index{verification}
+
+The purpose of the present chapter is to verify that the numerical
+schemes for solving Richard's equation and the advection-dispersion
+equation solve the equations properly. The numerical solution of
+Richard's equations is tested against a quasi-analytical solution by
+Philip. The quasi-analytical solution describes the vertical
+one-dimensional flow in a semi-infinite column with pre-described
+pressure as upper boundary condition. The advection dispersion
+equation is verified for 1D flow with both adsorption, zero and
+first order chemical reactions. The implementation of a point source is
+tested by radial (semi-2D) flow in a situation with diffusion and
+no advection. Finally, the numerical model is tested for ``more
+real'' 2D flow in an aquifer. The FEM-solution is compared with a
+model in which the concentration is described with integrals which
+have to be evaluated numerically. All the tests of the FEM solution of
+the advection-dispersion equation used here, have unfortunately in
+common, that the analytical models for the advection-dispersion
+equation all presuppose a steady-state, uniform water movement. It
+would have been desirable to make a test where the terms with the time
+derivative of the water content in equation \ref{eq:solutemovement}
+are nonzero.
+
+
+
+\section{Solute movement}\index{verification!solute movement}
+
+A lot of analytical solutions for the 1D advection-dispersion equation
+have been developed, see for example \cite{Genuchtenanalytical}. The
+equations are developed for situations where the diffusion is constant
+and the water flow is at a steady state. These conditions are seldom
+fulfilled in ``real life'' where both the water content and the flux
+are time-dependent. For testing the solute transport model, situations
+with steady state water movement are simulated. Both for one and
+two-dimensional flows.
+
+
+
+\subsection{One-dimensional flow with retardation, production and
+  degradation}
+
+In \cite{Genuchtenanalytical} cases of degradation of both zero
+and first order are considered. The governing differential equation can
+then be expressed as:
+
+\begin{equation}
+R\frac{\partial C}{\partial t}=D\frac{\partial^2C}{\partial
+  x^2}-v\frac{\partial C}{\partial x}-\mu C +\gamma
+\end{equation}
+
+where $\mu$ is the rate constant of first order decay in the liquid
+and $\gamma$ represents the similar rate constant for zero-order
+production in the liquid phase. The initial and boundary conditions
+are :
+
+\begin{equation}
+C(x,0)=C_i
+\end{equation}
+
+\begin{equation}
+(-D\frac{\partial c}{\partial x}+vc)|_{x=0}=\begin{cases} vC_0 &
+  0<t\leq t_0 \\ 0 & t>t_0 \end{cases}
+\end{equation}
+
+The solution can be written as:
+
+\begin{equation}
+\begin{small}
+C=\begin{cases}\frac{\gamma}{\mu}+ (C_i-\frac{\gamma}{\mu})A(x,t)+(C_0-\frac{\gamma}{\mu})B(x,t), 0<t\leq t_0 \\
+\frac{\gamma}{\mu} + (C_i-\frac{\gamma}{\mu})A(x,t)+(C_0-\frac{\gamma}{\mu})B(x,t)-C_0B(x,t-t_0), t>t_0
+\end{cases}
+\end{small}
+\end{equation}
+
+where:
+
+
+\begin{equation}
+\begin{split}
+A(x,t) & =\exp(-\mu t/R)\cdot \\
+& \{ 1-\frac{1}{2}\erfc\left[\frac{Rx-vt}{2(DRt)^{1/2}}\right]
+-\left(\frac{v^2t}{\pi
+    DR}\right)^{1/2}\exp\left[-\frac{(Rx-vt)^2}{4DRt}\right] \\ &
++\frac{1}{2}\left(1+\frac{vx}{D}+\frac{v^2t}{DR}\right)\exp(vx/D)\erfc\left[\frac{Rx+vt}{2(DRt)^{1/2}}\right]
+\}
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+B(x,t)=&\frac{v}{v+u}\exp\left[\frac{(v-u)x}{2D}\right]\erfc\left[\frac{Rx-ut}{2(DRt)^{1/2}}\right]
++\\
+&
+\frac{v}{v-u}\exp\left[\frac{(v+u)x}{2D}\right]\erfc\left[\frac{Rx+ut}{2(DRt)^{1/2}}\right]
++\\ &
+ \frac{v^2}{2\mu D}\exp\left[\frac{vx}{D}-\frac{\mu
+     t}{R}\right]\erfc\left[\frac{Rx+vt}{2(DRt)^{1/2}}\right]
+\end{split}
+\end{equation}
+
+where:
+
+\begin{equation}
+u=v \sqrt{1+\frac{4\mu D}{v^2}}
+\end{equation}
+
+For comparing the analytical solution with the FEM-solution is chosen
+a scenario with $R$=2, $v$=10 $\text{cm\,day}^{-1}$, $D=5
+\text{m}^2\text{day}^{-1}$, $\gamma=0.2 \, \text{day}^{-1}$ and
+$\mu=0.5\, \text{day}^{-1}$. \\
+\\
+
+For the FEM-modeling a 100 cm long soil column with a width
+of 1 cm is used. On the geometry a regular mesh consisting
+of 200 elements is generated. For computing the FEM-solution of the
+advection-dispersion equation, a Non-linear solver is used with
+constant size of the time-steps, $\Delta t$ on 1/10 day. The matrices
+are chosen to be consistent and $\omega=1/2$ (Crank-Nicolson) has been
+used. Setting $\mu$ and $\gamma$ to the above mentioned values is
+equivalent to setting $\mu_l=-0.5C+0.2$ in the FEM-model. For lower
+boundary condition, the solute flux is set to be equal $qC$. In
+figure \ref{fig:solanalyt}, the FEM-solution is compared with the
+analytical solution. As it can be seen, the two solutions almost
+coincide.
+
+
+%\begin{figure}[h!]  %here-top-bottom-page
+%\begin{center}
+%\epsffile{solanalyt.eps}
+%%\epsfig{file=solanalyt,width=12cm,height=5.9cm}
+%\figcap{Comparison between analytical and FEM-simulation of a
+%process with adsorption, zero order production and first order
+%degradation.}
+%\label{fig:solanalyt}
+%\end{center}
+%\end{figure}
+
+
+
+\subsection{Radial flow from continuous point
+  source}\index{point source!verification}
+
+The equation for heat flow by conduction is equivalent to the
+equation for solute movement by diffusion. In \cite{Carslaw} an
+analytical solution is given for the continuous line source in a
+three-dimensional space where heat is liberated at the rate $J$
+parallel to the $z$-axis. In a 2D space it is equivalent to a point
+source. If solute is liberated at a rate of $J$ at the origin, and
+the concentration initially in the infinitely large space is 0, the
+solution is:
+
+
+\begin{equation}
+C=\frac{J}{4\pi D}E_1\left(\frac{r^2}{4Dt}\right)
+\end{equation}
+
+where $r^2=x^2+y^2$ is the distance from point source squared. The
+equation is only valid as long as the water flow is zero (no
+advection). The exponential integral, $E_1(x)$ is in \cite{Abramowitz}
+defined as:
+
+
+\begin{equation}
+E_1(x)=\int_{x}^{\infty}\frac{e^{-u}}{u}\, du
+\end{equation}
+
+The situation is modeled on a circular domain with a radius of 10
+m. The boundary condition is no flux. This is of course not the same
+as an infinitely large circle which the equation covers, but as long
+as the concentrations near the boundary are ``small'' the
+approximation should be acceptable. For the simulation
+$D=1\,\text{m}^2/\text{s}$ . Figure \ref{fig:pointmesh} shows the mesh
+used for the simulation which consists of 1281 elements and 2464 nodal
+points.
+
+
+%\begin{figure}[H]  %here-top-bottom-page
+%\begin{center}
+%%\epsffile{pointmesh.eps}
+%\epsfig{file=pointmesh,width=10cm}
+%\figcap{Mesh used for test of a continuous point source}
+%\label{fig:pointmesh}
+%\end{center}
+%\end{figure}
+
+
+In figure \ref{fig:pointsubplot_3d}, both the FEM and the
+analytical solution are given for three different times ($t$=60, 120 and
+180 hours). The scale for the concentration is between 0 and 1.2 even
+though the concentrations near the centre in the analytical
+solution are higher. The peak near the centre is very steep in the
+analytical solution - the actual concentration in the centre is
+infinite for $t>0$. The used plot routine cannot plot the value of
+infinity, so the plot does not show the peak placed in the centre.\\
+\\
+In figure \ref{fig:pointerrsubplot}, both the absolute and the
+relative error of the FEM-solution are given at the same three times as
+used in figure \ref{fig:pointsubplot_3d}. It can be seen that the
+observed absolute errors generally are very small and that the largest
+absolute errors at the three times are concentrated near the
+centre. The relative errors are generally low except near the centre
+and the boundary. It should be mentioned that that very small insignificant
+absolute errors can give large relative errors. The negative relative
+errors At $t$=120 and 180 hours around the border can be explained
+with the boundary condition used for the FEM-simulations which
+prevents that the contaminant flows out from the domain.
+
+
+%\begin{figure}[H]  %here-top-bottom-page
+%\begin{center}
+%\epsffile{pointsubplot_3d.eps}
+%\figcap{FEM and analytical solutions for continuous point source in
+%  the origin at 3 different times. FEM-solutions to the left and the
+%  analytical solutions to the right.}
+%\label{fig:pointsubplot_3d}
+%\end{center}
+%\end{figure}
+
+
+%%\begin{figure}[h!]  %here-top-bottom-page
+%%\begin{center}
+%%\epsffile{pointerrsubplot_3d.eps}
+%%\tabcap{Absolute and relative errors for FEM model at 3
+%%  different times.}
+%%\label{fig:pointerrsubplot}
+%%\end{center}
+%%\end{figure}
+
+%\begin{figure}[H]  %here-top-bottom-page
+%\begin{center}
+%\epsffile{pointerrsubplot.eps}
+%\figcap{Absolute and relative errors for the FEM-simulations at 3
+%  different times, seen from above.}
+%\label{fig:pointerrsubplot}
+%\end{center}
+%\end{figure}
+
+It can be concluded that the point source is implemented in the proper
+way. An instantaneous point source has also been tested by liberating a
+given mass of solute in a single time-step. Analytical solutions for
+this situation are for example given in \cite{Spitz}. Also here the
+results are excellent.
+
+
+\subsection{Two-dimensional flow}
+
+Numerous model for 2D solute movement in an aquifer\index{aquifer,
+  flow in} has
+been developed. The analytical expressions often contains parts witch in practical use must be
+evaluated numerically or by use of (large) mathematical tables. Here,
+the FEM-model is  compared with a rather complicated analytical
+solution found by \cite{Shan}. The expressions here contains some
+integrals which are evaluated numerically. \\
+\\
+\cite{Shan} have developed analytical solutions for modeling the solute
+transport in a vertical section of a homogeneous, isotropic aquifer,
+see figure \ref{fig:Shanfig1}.
+
+
+%\begin{figure}[H]  %here-top-bottom-page
+%\begin{center}
+%\epsffile{Shanfig1.eps}
+%\figcap{Schematic diagram of the section. After figure in \cite{Shan}}
+%\label{fig:Shanfig1}
+%\end{center}
+%\end{figure}
+
+
+The flow is horizontal and uniform with an average pore velocity,
+$v$. The contaminant is applied along a width of $l$ with constant
+flux, $j$ at the upper boundary (the water table). The chosen
+coordinate system has the $x$-axis placed at the water table in the
+top of the aquifer parallel with the streamlines for the water flow,
+and the $z$-axis is vertically downward, see figure \ref{fig:Shanfig1}
+where the aquifer also is divided into three regions. The flow
+situation described here is maybe not completely coincident with the
+flow region which this thesis deals with (the topsoil). But similar
+situations with nearly horizontal water movement can for example be
+found near rivers. Under all circumstances, such a flow situation is a
+good way to verify the numerical model. \\
+\\
+The aquifer in the expressions shown here is assumed to be infinite
+both in depth and length. %The concentration gradient, $\partial
+%C/\partial z$ through the water table is assumed to be zero, i.e there
+%is no flux across the upper boundary.\\
+%\\
+\cite{Shan} have used dimensionless variables, here marked with $'$:
+
+\begin{equation}
+\begin{split}
+&C'=C/C_0, \ \ x'=\frac{x}{l},\ \ z'=\frac{z}{l}, \ \ t'=\frac{vt}{Rl}\\
+&\alpha'_x=\frac{\alpha_x}{l}, \ \ \alpha'_z=\frac{\alpha_z}{l}, \ \
+j'=\frac{j}{v}, \ \ \lambda'=\frac{Rl\lambda}{v}
+\end{split}
+\end{equation}
+
+The dimensionless equation for all the three regions can be written as:
+
+\begin{equation}
+\frac{\partial C'}{\partial t'}+\lambda C'+\frac{\partial C'}{\partial
+  x'}-\alpha'_{x}\frac{\partial^2 C'}{\partial
+  {x'}^2}-\alpha'_z\frac{\partial^2 C'}{\partial {z'}^2}=0
+\end{equation}
+
+The original equation can by backward calculation be expressed as:
+
+\begin{equation}
+R \frac{\partial C}{\partial t}+R\lambda C
+-\alpha_xv\frac{\partial^2 C}{\partial x^2}-\alpha_z\frac{\partial^2
+  C}{\partial z^2}=0
+\label{eq:advdispShan}
+\end{equation}
+
+This is a little different from the advection-dispersion equation used in
+TopFEM (and other places) because the degradation term includes a $R$,
+else it is the same.\\
+\\
+
+The solution to the dimensionless equation in the 3 regions is
+according to \cite{Shan}:
+
+\begin{equation}
+\begin{split}
+C'_1=& C'_{\lambda}-\frac{j'}{2\sqrt{\pi\alpha'_z}} \cdot \\
+& \int_{0}^{t'} e^{-z^2/(4\alpha'_z\tau)-\lambda'
+  \tau} \left[\erfc\left(\frac{\tau-x'}{2\sqrt{\alpha'_x\tau}}\right)+\erfc\left(\frac{x'+1-\tau}{2\sqrt{\alpha'_x\tau}}\right)\right]\frac{d
+  \tau}{\sqrt{\tau}}
+\end{split}
+\label{eq:Cint_1}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+C'_2=&\frac{j'}{2\sqrt{\pi\alpha'_z}} \cdot \\ &
+\int_{0}^{t'}e^{{-z'}^2/(4\alpha'_z\tau)-\lambda'
+  \tau}\left[\erfc\left(\frac{x'-\tau}{2\sqrt{\alpha'_x\tau}}\right)-\erfc\left(\frac{x'+1-\tau}{2\sqrt{\alpha'_x\tau}}\right)\right]\frac{d
+  \tau}{\sqrt{\tau}}
+\end{split}
+\label{eq:Cint_2}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+C'_3= & \frac{j'}{2\sqrt{\pi\alpha'_z}} \cdot \\ &
+\int_{0}^{t'}e^{{-z'}^2/(4\alpha'_z\tau)-\lambda'
+  \tau}\left[\erfc\left(\frac{\tau-x'-1}{2\sqrt{\alpha'_x\tau}}\right)-\erfc\left(\frac{\tau-x}{2\sqrt{\alpha'_x\tau}}\right)\right]\frac{d
+  \tau}{\sqrt{\tau}}
+\end{split}
+\label{eq:Cint_3}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+C'_{\lambda}= & \frac{j'}{2\sqrt{\lambda' \alpha'_z}}\cdot
+\left[e^{-z'\sqrt{\lambda /\alpha'_z}}
+\erfc\left(\frac{z'}{2\sqrt{\alpha'_xt'}}-\sqrt{\lambda'
+    t'}\right)\right] - \\ &  \frac{j'}{2\sqrt{\lambda' \alpha'_z}}\cdot \left[
+e^{z'\sqrt{\lambda/\alpha'_z}}\erfc\left(\frac{z'}{2\sqrt{\alpha'_z
+    t'}}+\sqrt{\lambda' t'}\right)\right]
+\end{split}
+\label{eq:C_lambda}
+\end{equation}
+
+for $\lambda \neq 0$. For $\lambda=0$:
+
+\begin{equation}
+C'_{\lambda}=\frac{j' }{\sqrt{\alpha'_z}}
+\left(\frac{2\sqrt{t'}}{\sqrt{\pi}}e^{{-z'}^2/(4\alpha'_zt')}-\frac{z'}{\sqrt{\alpha'_z}}\erfc\left(\frac{z'}{2\sqrt{\alpha'_zt'}}\right)\right)
+\label{eq:C_lambda0}
+\end{equation}
+
+For evaluation of the integrals is used the MATLAB5 built-in function,
+\textsf{quad8}\index{quad8@\textsf{quad8}}. \textsf{quad8},
+\cite{MATLABfuncref} uses an adaptive recursive Newton-Cotes 8 panel
+rule, and is not set up to handle integrable singularities such as:
+
+
+\begin{equation}
+\int_{0}^{1}\frac{1}{\sqrt{x}}\, dx
+\end{equation}
+
+In equation \ref{eq:Cint_1}-\ref{eq:Cint_3} there can be singularities
+for $\tau \rightarrow 0$ since $1/\sqrt{\tau} \rightarrow \infty$. The
+complementary error-function, $\erfc$ is always bounded between 0 and
+2. If $z=0$, $exp(-z^2/(4\alpha_z\tau)-\lambda\tau)=exp(-\lambda
+\tau)$ else the exponential function dominates $1/\sqrt{\tau}$
+and then there are no singularities under the integration signs.\\
+\\
+For $z=0$ there are integrable singularities, and the value of the
+integration in the region near the singularity cannot be computed by
+\textsf{quad8}. Instead, a very rough approximation is used close to
+the singularity:
+
+\begin{equation}
+\int_{0}^{\Delta}\frac{f(u)}{\sqrt{u}}\, du\approx
+=\frac{1}{2}(f(0)+f(\Delta))\int_{0}^{\Delta}\frac{f(u)}{\sqrt{u}}\,
+du\approx=(f(0)+f(\Delta))\sqrt{\Delta}
+\end{equation}
+
+where $\frac{1}{2}(f(0)+f(\Delta))$ is an approximation to the mean
+value of $f$ in the interval from 0 to $\Delta$. \\
+\\
+In the simulation in TopFEM the domain, $\Omega$ must be limited, i.e
+the lower horizontal boundary can not be placed at infinity. But as
+long as the solute concentrations are zero or very low near the chosen
+lower boundary it should not give rise to discrepancies between the
+solutions.\\
+\\
+The situation with horizontal steady, uniform water flow in the
+direction of the $x$-axis can easily be achieved by introducing a
+negative horizontal pressure gradient on $\partial \psi/\partial x=-1$
+and make sure that the soil is saturated in the whole domain. Actually,
+it is impossible to ensure both a horizontal water table (with
+$\psi=0$) and a steady state uniform vertical flow at the same
+time - i.e the assumptions for using the theory by \cite{Shan} can not
+be fulfilled!. Here the matric pressure potential at the upper
+boundary is not equal to zero. The velocity should be (and is) equal to the
+saturated hydraulic conductivity, $K_s$ which for the simulations is
+chosen to be equal to 1 m/day.  \\
+\\
+The boundary conditions for the advection-dispersion equation in the
+FEM simulations are no flux on all the boundaries, except the upper
+boundary of region 1 where the flux is $-j$, and the vertical right
+boundary where it is $qC$ (the flux is defined positive outwards in
+the numerical model). The mesh generated with FEMLAB is shown in
+figure \ref{fig:Shanmesh_rough}. The mesh consists of 1008 elements
+and 549 nodal points. \\
+\\
+In the simulations the retardation factor, $R$  equal to 2 and
+$\lambda=0.01$ ($\lambda$ as used in \ref{eq:advdispShan}) which
+corresponds to $\mu_l=-0.02C$ in the FEM-model. An iterative
+Crank-Nicolson procedure ($\omega=0.5$) without streamline
+diffusion. $\Delta t$ is chosen to 1/24 day and $\epsilon=0.001$ has
+been used. Consistent matrices (no lumping) have been used.
+
+
+%\begin{figure}[H]  %here-top-bottom-page
+%\begin{center}
+%\epsffile{Shanmesh_rough.eps}
+%\figcap{Mesh used for 2D solute movement calculations in an aquifer.}
+%\label{fig:Shanmesh_rough}
+%\end{center}
+%\end{figure}
+
+In figure \ref{fig:Shansubplot_rough}, both the FEM-solutions and the
+analytical solutions are shown for $t$=300, 600 and 900 hours. It can be
+seen that there is no evident difference between the FEM-solution and the
+analytical solution.
+
+%\begin{figure}[H]  %here-top-bottom-page
+%\begin{center}
+%%\epsffile{Shansubplot_rough.eps}
+%\epsfig{file=Shansubplot_rough.eps,width=13.5cm}
+%\figcap{FEM-simulation of 2D solute movement (left) compared with the
+%  analytical solutions (right).}
+%\label{fig:Shansubplot_rough}
+%\end{center}
+%\end{figure}
+
+In figure \ref{fig:Shansuberrplot_rough}, both the
+absolute and the relative error is given for the same times. Here the
+semi-analytical by \cite{Shan} is assumed to provide results very close
+to the true solution, even numerical errors can occur
+here. Under the computation of the integrals, very fine error
+tolerances are used, but some errors can occur close to the singularities
+since the approximation in these intervals are very rough. As it can be
+seen, the absolute errors are small and have highest density (absolute
+values) in region 1 (see figure \ref{fig:Shanfig1}) where also the solute
+concentration is high. At $t$=900 hours some absolute errors at
+the vertical right boundary can also be seen. This can be explained
+by the fact that the the solute only can be transported through the
+vertical boundary by advection in the FEM-model. The problem could
+probably have been avoided by choosing a boundary more to the
+right. By comparing figure \ref{fig:Shansubplot_rough} with figure
+\ref{fig:Shansuberrplot_rough}, it can be seen that the relative
+errors are only high where the concentrations are very low.
+
+
+%\begin{figure}[H]  %here-top-bottom-page
+%\begin{center}
+%%\epsffile{Shansuberrplot_rough.eps}
+%\epsfig{file=Shansuberrplot_rough.eps,width=13.5cm}
+%\figcap{Absolute (left) and relative (right) errors of the
+%  FEM-simulation of solute movement. The errors are shown at 3
+%  different times.}
+%\label{fig:Shansuberrplot_rough}
+%\end{center}
+%\end{figure}
+
+The simulations have also been conducted with a very fine mesh, see
+figure \ref{fig:Shanmesh_fine}. The mesh consists of 2105 nodal points
+and 4032 elements, i.e. 4 times as many elements as in the previous
+simulations. Each element in the previous mesh is divided
+into 4 new triangles (elements).
+
+%\newpage
+
+
+%\begin{figure}[H]  %here-top-bottom-page
+%\begin{center}
+%\epsffile{Shanmesh_fine.eps}
+%\figcap{Mesh used for calculation of 2D solute movement in an
+%  aquifer. The mesh consists of 4 times (4032) as many elements as the
+%  mesh in figure \ref{fig:Shanmesh_rough}.}
+%\label{fig:Shanmesh_fine}
+%\end{center}
+%\end{figure}
+
+At first the concentrations look similar to the results obtained with
+the rough mesh. But figure \ref{fig:Shansuberrplot_fine} shows that
+both the absolute and relative errors are smaller than for the rougher
+mesh. \\
+\\
+It can be concluded that the verification has shown that the
+implemented FEM-model in all the cases has been able to calculate the
+2D solute movement satisfactorily.
+
+
+%\begin{figure}[H]  %here-top-bottom-page
+%\begin{center}
+%%\epsffile{Shansuberrplot_fine.eps}
+%\epsfig{file=Shansuberrplot_fine.eps,width=13.5cm}
+%\figcap{Absolute (left) and relative (right) errors of FEM-simulation
+%  of solute movement. A very fine mesh has been used. The figure can be
+% compared with figure \ref{fig:Shansuberrplot_rough} where the errors
+% for an equivalent simulation with a rougher mesh (1/4 so many
+% elements) are shown. The errors are shown at 3 different times.}
+%\label{fig:Shansuberrplot_fine}
+%\end{center}
+%\end{figure}

@@ -1,0 +1,437 @@
+%%January 20- 2002
+%\documentclass[wrr]{agu2001}
+\documentclass{report}
+
+
+\usepackage{natbibDK}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[dvips]{graphicx}
+
+
+
+\begin{document}
+
+%% ------------------------------------------------------------------------ %%
+%
+%  TITLE
+%
+%% ------------------------------------------------------------------------ %%
+
+
+\title{Formler til Milj\ostyrrelsen}
+
+%% ------------------------------------------------------------------------ %%
+%
+%  AUTHORS AND AFFILIATIONS
+%
+%% ------------------------------------------------------------------------ %%
+
+\author{Mikkel Mollerup}
+
+
+
+
+
+\chapter{Introduction}
+
+
+
+\chapter{Theory}
+
+
+\section{Richard's Equation}
+
+The water flow in porous media can be described with the formula
+of Richard. The equation is here derived. The water flux density
+vector, $\mathbf{q}$ can be calculated by the Darcy´s law. For a
+two-dimensional vertical transect it yields:
+\begin{equation}
+\mathbf{q}=-\mathbf{K}(\psi)\nabla(\psi + z) \label{eq:darcy}
+\end{equation}
+where $\mathbf{K}(\psi)$ is the hydraulic conductivity tensor,
+$\psi$ is the potential head. The x-axis is chosen in horizontal
+direction and the z-axis is positive upwards. The conductivity
+tensor can be expressed as:
+\begin{equation}
+\mathbf{K}=\begin{bmatrix} K_{xx} & K_{xz} \\ K_{zx} & K_{zz}
+ \end{bmatrix}
+\end{equation}
+\begin{equation}
+\mathbf{K}=\begin{bmatrix} K_{xx} & 0 \\ 0 & K_{zz}
+ \end{bmatrix}
+\end{equation}
+The mass balance for the system gives
+\begin{equation}
+\frac{\partial \theta}{\partial t}=-\nabla \cdot \mathbf{q}
+-\Gamma \label{eq:continuity}
+\end{equation}
+where $\theta$ is the water content and $\Gamma$ is the sink term.
+The partial differential equation can be developed by combining
+Darcy´s law, equation \ref{eq:darcy} and the mass balance,
+equation \ref{eq:continuity}, thus
+\begin{equation}
+\frac{\partial \theta}{\partial t}=\nabla \cdot
+\left(\mathbf{K}(\psi)\nabla (\psi + z)\right) - \Gamma
+\label{eq:richards}
+\end{equation}
+This is known as Richard's equation. For the modelling it is
+assumed that the soil-water retention is without hysteresis, i.e.
+there is a unique relation between the matric pressure potential
+and the water content.
+
+In order to describe Richard equation in $\psi$ the specific water
+capacity, $C=\partial \theta/\partial\psi$ has applied. To solve
+Richard's equation it is necessary to specify initial and boundary
+conditions. The boundary conditions specify a combination of
+$\psi$ and its derivative on the boundary. In TopFEM it is
+possible to use different forms of flux (Neumann) and predescribed
+pressure (Dirichlet) boundary conditions. The problem to be solved
+for determining the water movement can be summarized to
+\begin{equation}
+\begin{cases}
+C \cdot \frac{\partial \psi}{\partial t}=\nabla \cdot
+\left(\mathbf{K}(\psi)\nabla (\psi + z) \right)-\Gamma & \text{in}\  \Omega \\
+\mathbf{\bar{n}} \cdot \left(\mathbf{K}(\psi)\nabla (\psi + z)
+\right)=
+-q & \text{on}\ \partial \Omega_1 \\
+\psi=\psi_0 & \text{on}\ \partial \Omega_{2}
+\end{cases}
+\label{eq:watermovement}
+\end{equation}
+where $\mathbf{\bar{n}}$ is the outward unit normal, and $q$ is
+the size of the size of the outward flow from the domain. $\psi_0$
+is the predescribed pressure at the boundary. $\partial\Omega_1$
+and $\partial\Omega_2$ are part of the boundary with Neumann and
+Dirichlet boundaries, respectively. Each of $\partial\Omega_1$ and
+$\partial\Omega_2$ are not necessarily one continuous curve piece.
+For lower boundary condition is a special case of the Neumann
+boundary conditions often applied. It here assumed that the flow
+it is only driven by the gravity (gravity boundary condition),
+i.e. $\partial \psi/
+\partial x= \partial \psi/ \partial y=0$ which gives
+\begin{equation}
+q=\mathbf{\bar{n}} \cdot \begin{bmatrix}0 \\ K_{zz}
+\end{bmatrix}
+\end{equation}
+Another often used boundary condition is the seepage boundary
+  condition where we for $\psi>0$ have specified pressure
+  corresponding to the depth of the overlaying water. For $\psi \leq0$
+  have specified flow to be equal to 0, i.e. a Dirichlet boundary
+  condition for $\psi>0$ and a Neumann boundary condition for $\psi
+  \leq 0$.
+
+
+\chapter{2 Dimensional Model}
+
+\section{FVM Model}
+
+
+Richards ligning, integration over kontrol-volumen (celle) og Gauss-Green divergens teorem:
+
+
+\begin{equation}
+\int_{Q_i} \frac{\partial \theta}{\partial t} d\mathbf{x} =
+\int_{\partial Q_i} \left(\mathbf{K}(\psi)\nabla (\psi + z) \right)\cdot \mathbf{\bar{n}} dl
+- \int_{Q_i} \Gamma d\mathbf{x}
+\label{eq:integratet}
+\end{equation}
+
+
+Sammenfattes til:
+
+\begin{equation}
+|Q_{i}|\frac{d \theta_i}{dt} = \sum_{j \in \sigma_i} D_{ij}(\boldsymbol{\psi})
+ + \sum_{j \in \sigma_i} G_{ij}(\boldsymbol{\psi})
+ + \sum_{j' \in \sigma_i} B_{ij'}(\boldsymbol{\psi})
+ + S_{i}(\boldsymbol{\psi})
+\end{equation}
+
+hvor:
+
+$D_{ij}(\boldsymbol{\psi})$ diffusiv transport mellem interne kanter\\
+$G_{ij}(\boldsymbol{\psi})$ gravitation transport mellem interne kanter  \\
+$B_{ij'}(\boldsymbol{\psi})$ rand kanter $j'\in \sigma_{i}'$ \\
+$S_{i}(\boldsymbol{\psi})$ er kildeledet, der både kan inkludere punkt- og fladekilder i cellen. \\
+
+
+\begin{equation}
+D_{ij}(\boldsymbol{\psi})=|e_{ij}|(\mathbf{K}(\boldsymbol{\psi})\cdot (\nabla \psi)_{ij})\cdot \mathbf{\bar{n}}_{ij}
+\end{equation}
+
+\begin{equation}
+G_{ij}(\boldsymbol{\psi})=|e_{ij}|(\mathbf{K}(\boldsymbol{\psi})\cdot([0\ 1]^T))\cdot \mathbf{\bar{n}}_{ij}
+\end{equation}
+
+
+
+
+\subsection{Rektangulære celler}
+
+Taylorudvikling...
+
+\begin{equation}
+\psi_E = \psi(x+\delta x^+)=\sum_{k=0}^{m}  \frac{1}{k!} \left(\frac{d^k \psi}{dx^k}\right)_f (\delta x^+)^k  + R^+
+\end{equation}
+
+hvor $m$ er Taylorudviklingens orden og $R^+$ er Lagranges restled. Tilsvarende fås
+
+\begin{equation}
+\psi_i = \psi(x-\delta x^-)=\sum_{k=0}^{m}  \frac{1}{k!} \left(\frac{d^k \psi}{dx^k}\right)_f (-\delta x^-)^k  + R^-
+\end{equation}
+
+$R^+ - (-1)^{m+1}R^- \approx 0$ Hvis der vælges en første ordens Taylorudvikling ($m=1$) fås
+
+\begin{equation}
+\left( \frac{d \psi}{dx} \right)_f (\delta x^+ +\delta x^-)\approx \psi_E-\psi_i
+\end{equation}
+
+Såfremt der vælges en højere ordens Taylorudvikling fås:
+
+\begin{equation}
+\left( \frac{d \psi}{dx} \right)_f (\delta x^+ +\delta x^-)\approx \psi_E-\psi_i - \epsilon_{Ei}
+\end{equation}
+
+hvor korrektionsledet kan beregnes som
+
+\begin{equation}
+\epsilon_{Ei} \approx \sum_{k=2}^{m}  \frac{1}{k!} \left(\frac{d^n \psi}{dx^n}\right)_f
+\left[ (\delta x^+)^n - (-\delta x^-)^n \right]
+\end{equation}
+
+
+Det kan indses at der opnås anden ordens præcision med $m=1$ såfremt $\delta x^+=\delta x^-$
+
+
+\begin{equation}
+\sum_{j \in \sigma_i} D_{ij}(\boldsymbol{\psi})=
+\end{equation}
+
+
+\begin{equation}
+\sum_{j \in \sigma_i} D_{ij}(\boldsymbol{\psi})=
+\end{equation}
+
+\subsubsection{Dirichlet randbetingelser}
+
+Simplest ville det være......  Her benyttes dog
+
+
+
+
+\subsection{Trapezoide celler}
+
+
+\subsubsection{Line{\ae}r rekonstruktion}
+
+
+\begin{equation}
+\hat{\psi}(\mathbf{x},t)=\psi_i(t)+\eta_i(\boldsymbol{\psi})\cdot(\mathbf{x}-\mathbf{x}_i), \ \ \mathbf{x} \in Q_i, \ t>0
+\end{equation}
+
+Divergens teoremet:
+
+Trekanter:
+\begin{equation}
+\overline{\nabla \psi} \approx \sum \psi_j \mathbf{n}_j A_j \approx
+\frac{1}{2|T_i|}\mathbf{R}\left[\psi_{\alpha}(\mathbf{x}_{\beta}-\mathbf{x}_{\gamma})
++\psi_{\beta}(\mathbf{x}_{\gamma}-\mathbf{x}_{\alpha})
++\psi_{\gamma}(\mathbf{x}_{\alpha}-\mathbf{x}_{\beta})\right]
+\end{equation}
+
+Firkanter:
+\begin{equation}
+\overline{\nabla \psi} \approx \sum \psi_j \mathbf{n}_j A_j \approx
+\frac{1}{2|Q_i|}\mathbf{R}\left[(\psi_{\alpha}-\psi_{\gamma})(\mathbf{x}_{\beta}-\mathbf{x}_{\delta})
++(\psi_{\beta}-\psi_{\delta})(\mathbf{x}_{\gamma}-\mathbf{x}_{\alpha})\right]
+\end{equation}
+
+hvor
+
+\begin{equation}
+\mathbf{R}=\begin{bmatrix} 0 & 1 \\ -1 & 0 \end{bmatrix}
+\end{equation}
+
+
+
+Harmonisk gennemsnit:
+
+\begin{equation}
+\frac{1}{K_{ij}} = \frac{1}{2}\left[
+\frac{1}{K(\psi_i)}+\frac{1}{K(\psi_j)}\right]
+\end{equation}
+
+
+
+
+\subsection{Iterations skema}
+
+\begin{equation}
+Matrix ligning
+\end{equation}
+
+\begin{equation}
+tidlig dikretisering med picard iterationer
+\end{equation}
+
+massconservative \citet{Celia}
+
+
+The $\psi$-based formulation have the disadvantage that it doesn't
+conserve the mass and can give erroneous estimate of infiltration
+depths, \linebreak  \cite{Celia}. In the mixed formulation is the
+water content at time step $n+1$ and iteration step $m+1$
+appromximated by a Taylor expansion:
+
+\begin{equation}\begin{split}
+\theta^{n+1,m+1}&=\theta^{n+1,m}
++\frac{d\theta}{d\psi}\mid^{n+1,m}(\psi^{n+1,m+1}-\psi^{n+1,m})\\
+&=\theta^{n+1,m} +C^{n+1,m}(\psi^{n+1,m+1}-\psi^{n+1,m})
+\label{eq:taylor}
+\end{split}\end{equation}
+
+The time derivative of $\theta$ can then be approximated as:
+
+\begin{equation}\begin{split}
+\frac{\partial \theta}{\partial t}&\approx
+\frac{\theta_{n+1,m+1}-\theta_{n}}{\Delta
+  t}=\frac{\theta_{n+1,m+1}-\theta_{n+1,m}}{\Delta
+  t}+\frac{\theta_{n+1,m}-\theta_{n}}{\Delta t}\\ & \approx C_{n+1,m}
+\frac{\psi_{n+1,m+1}-\psi_{n+1,m}}{\Delta
+  t}+\frac{\theta_{n+1,m}-\theta_{n}}{\Delta t}
+\end{split}\end{equation}
+
+
+
+\begin{equation}
+Massekonservativt skema
+\end{equation}
+
+
+
+\subsection{Løsning af matrixligning}
+
+blabre blabre
+
+\subsection{Hydrauliske modeller}
+
+In numerical models for the unsaturated zone the soil-water model
+by \citet{vanGenuchten} is widely used:
+\begin{equation}
+\theta=\begin{cases} \theta_{r} +
+\frac{\theta_s-\theta_r}{[1+|\alpha \psi|^n]^m} & \text{for
+  $\psi<0$}\\
+\theta_{s} &\text{for $\psi \geq 0 $} \end{cases}
+\end{equation}
+where $\alpha$, $n$ and $m$ are empirical parameters, $\theta_s$
+and $\theta_r$ are the saturated and the residual water content,
+respectively. By combination with the hydraulic conductivity model
+by \citet{Mualem} and choosing $m=1-1/n$, the hydraulic
+conductivity can be calculated as
+\begin{equation}
+K=K_sS_{e}^{1/2}[1-(1-S_{e}^{1/m})^m]^2
+\end{equation}
+where $K_s$ is the hydraulic conductivity at saturation and $S_e$
+is the effective saturation defined as
+\begin{equation}
+S_e=\frac{\theta-\theta_r}{\theta_s-\theta_r}
+\end{equation}
+The retention model by van Genuchten have been adopted to a large
+class of soils.
+
+
+
+\subsection{Ridge}
+
+For describing the geometry and producing the finite element mesh
+is the general FEM-code, \citet{FEMLAB} used. In the actual case
+the two-dimensional geometry described using a so called geometry
+m-file. Of geometrical reasons only the half of a ridge is
+described. The soil profile is divided into 7 strata or subdomains
+with different soil properties which are described elsewhere in
+the paper. The ridge with the different subdomains is plotted in
+figure XXX. The ridge height can be described with a sine
+function:
+\begin{equation}
+f(x)=A \left[ 1+sin\left(-\frac{\pi}{2}+2\frac{\pi x}{W}\right)
+\right], \ \ \ 0 \leq x \leq W/2
+\end{equation}
+where $W$ is the width of the ridge and $A$ is the amplitude of
+the sine wave which is the same as half of the ridge height. The
+curve only describes half a ridge that will be used for the
+modelling.
+
+
+
+
+
+
+
+\section{Verifikation}
+
+Her skal der stå lidt Philipssjov
+
+
+
+\subsection{Philips Infiltration Model}
+
+
+\citet{Philip} showed that the infiltration depth as function of
+time and saturation can be written as a power series in
+$t^{\frac{1}{2}}$. The coefficients are then functions of soil
+water content, $\theta$. From the expression for the infiltration
+depth, as function of water content and time it is relatively easy
+to derive the cumulative infiltration, also written as a power
+series in $t^{\frac{1}{2}}$. The assumptions for the theory is an
+1-dimensional vertical flow into a homogenous soil semi-infinite
+soil column, initially with uniform water content. The upper
+boundary condition is a constantly held water content or pressure
+(Neumann boundary condition).
+
+Results from infiltration experiments
+\citep[e.g.,][]{Austin,Mbagwu1,Mbagwu2,Maheshwari,Valiantzas} are
+often fitted to a infiltrations equation only consisting of the
+first 2 terms of the power series solution
+
+\begin{equation}
+I=S\sqrt{t}+At \label{eq:Philip}
+\end{equation}
+
+where $S$ is the often refereed sorptivity as defined in
+\citet{PhilipAdv}. For some of the experiments, the geometry,
+initial and boundary condition does not corresponds to the
+assumptions Philip made for using the power series as a solution
+to Richards equation. The appliance of the Philip infiltration
+model is here more of empirical than mechanistic nature.
+
+
+
+
+\section{Referencer}
+
+
+
+Liste med referencer:\\
+\\
+
+\begin{itemize}
+\item \citep{Mollerupphd}\\
+\item \cite{Philip} \\
+\item \cite{PhilipTrans,PhilipAus}
+\end{itemize}
+
+
+
+
+% ------------------------------------------------------------------------ %%
+%
+%  REFERENCE LIST AND TEXT CITATIONS
+%
+%% ------------------------------------------------------------------------ %%
+
+
+\bibliographystyle{natbibDK}
+\bibliography{MST}
+
+
+\end{document}

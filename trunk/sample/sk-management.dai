@@ -1,0 +1,202 @@
+;;; sk-management.dai -- Sample Slavakian management, from FertOrgaNic project.
+;;
+;; The original parameterization was by 
+;;  "Jozef Takac" <takac@hmsp.sk>
+;; Some modification has been made by Per Abrahamsen <abraham@dina.kvl.dk>.
+
+(defcrop "Maize_SK" "Maize" 
+  (Devel original (EmrTSum 200) (DSRate1  0.019) (DSRate2  0.017))
+  (CrpN (PtLeafCnc (0.000 0.038)(0.500 0.038) (1.00 0.030) (1.500 0.018)(1.800 0.015) (2.00 0.013))
+  	(CrLeafCnc (0.000 0.010) (0.367 0.010) (0.500 0.009) (1.00 0.008) (2.00 0.008)))
+)
+(defcrop "Spring Barley_SK" "Spring Barley"
+  (Devel original (DSRate1  0.035) (DSRate2  0.025))
+  (CrpN (PtLeafCnc (0.000 0.040) (1.00 0.040) (2.00 0.030)))
+)  
+(defcrop "Winter Wheat_SK" "Winter Wheat"
+  (Devel original (EmrTSum  150) (DSRate1  0.017)(DSRate2 0.025))
+  (CrpN (PtLeafCnc (0.000 0.050) (0.50 0.035) (1.28 0.033) (1.52 0.025) (2.00 0.012))
+  	(CrLeafCnc (0.000 0.021) (0.50 0.021) (1.28 0.021) (1.52 0.015) (2.00 0.010)))
+)  
+
+;;; Warmup
+;; sugar beet 1993
+(defaction SBeet_management activity
+  (wait_mm_dd 3 18)
+  (fertilize ("cattle_manure" (weight 40 [T w.w./ha]))(to -5 [cm]))
+  (wait_mm_dd 3 21)
+  (seed_bed_preparation)
+  (sow "Sugar Beet")
+    (wait_mm_dd 5 12)    (irrigate_overhead 2 [mm/h] (hours 10))
+    (wait_mm_dd 5 20)    (irrigate_overhead 2 [mm/h] (hours 10))
+    (wait_mm_dd 6 1)     (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 7 3)     (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 8 10)    (irrigate_overhead 2 [mm/h] (hours 10))
+    (wait_mm_dd 8 12)    (irrigate_overhead 2 [mm/h] (hours 10))
+    (wait_mm_dd 8 15)    (irrigate_overhead 2 [mm/h] (hours 10))
+    (wait_mm_dd 8 18)    (irrigate_overhead 2 [mm/h] (hours 10))
+  (wait (or (crop_ds_after "Sugar Beet" 2.0) (mm_dd 10 31))) 
+  (harvest "Sugar Beet" (leaf 0.00 []))
+  (disk_harrowing)
+  (wait_days 2) (plowing)
+)
+;; Spring Barley 1994
+(defaction SBarley_94 activity
+    (wait_mm_dd 3 29) 
+    (fertilize (AmmoniumNitrate (weight 70 [kg N/ha])))
+  (seed_bed_preparation)
+  (sow "Spring Barley_SK")
+    (wait_mm_dd 5 31)  (irrigate_overhead 2 [mm/h] (hours 15))
+    (wait_mm_dd 6 8)  (irrigate_overhead 2 [mm/h] (hours 15))
+    (wait_mm_dd 6 15)  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (or (crop_ds_after "Spring Barley_SK" 2.0) (mm_dd 8 15))) 
+  (harvest "Spring Barley_SK"
+            (stub 8 [cm]) (stem 0.00 []) (leaf 0.00 []))
+     (stubble_cultivation)
+)
+;; Winter Wheat 1995
+(defaction WWheat_95 activity
+  (wait_mm_dd 8 21) (rotavation)
+  (wait_mm_dd 10 1) (fertilize (AmmoniumNitrate (weight 40 [kg N/ha])))
+  (seed_bed_preparation)
+  (sow "Winter Wheat_SK")  (wait_mm_dd 3 1)
+  (wait trafficable) (fertilize (AmmoniumNitrate (weight 50 [kg N/ha])))
+  (wait_mm_dd 5 2)   (fertilize (AmmoniumNitrate (weight 30 [kg N/ha])))
+  (wait_mm_dd 5 22)  (irrigate_overhead 2 [mm/h] (hours 10))
+  (wait (or (crop_ds_after "Winter Wheat_SK" 2.0) (mm_dd 8 31))) 
+  (harvest "Winter Wheat_SK"
+            (stub 8 [cm]) (stem 0.00 []) (leaf 0.00 []))
+    (stubble_cultivation)
+    (wait_mm_dd 10 1)(plowing)
+)
+;; Maize 1996
+(defaction Maize_1996 activity
+ (wait_mm_dd 4 20) (fertilize (AmmoniumNitrate (weight 120 [kg N/ha])))
+  (seed_bed_preparation)
+ (sow "Maize_SK")
+    (wait_mm_dd 6 2)  (irrigate_overhead 2 [mm/h] (hours 15))
+    (wait_mm_dd 6 10) (irrigate_overhead 2 [mm/h] (hours 20))
+    (wait_mm_dd 7 17) (irrigate_overhead 2 [mm/h] (hours 15))
+    (wait_mm_dd 7 21) (irrigate_overhead 2 [mm/h] (hours 15))
+    (wait (or (crop_ds_after "Maize_SK" 2.0) (mm_dd 10 10))) 
+  (harvest "Maize_SK"
+            (stub 8 [cm]) (stem 0.00 []) (leaf 0.00 []))
+   (stubble_cultivation)
+    (wait_mm_dd 10 15)
+    (fertilize ("cattle_manure" (weight 40 [T w.w./ha]))(to -5 [cm]))
+)
+;; Maize 1997
+(defaction Maize_1997 activity
+  (wait_mm_dd 4 21) (fertilize (AmmoniumNitrate (weight 80 [kg N/ha])))
+  (seed_bed_preparation)
+  (sow "Maize_SK")
+   (wait_mm_dd 5 12)  (fertilize (AmmoniumNitrate (weight 40 [kg N/ha])))
+   (wait_mm_dd 6 1)  (irrigate_overhead 3 [mm/h] (hours 10))
+   (wait_mm_dd 6 10) (irrigate_overhead 3 [mm/h] (hours 10))
+   (wait_mm_dd 6 25) (irrigate_overhead 3 [mm/h] (hours 10))
+   (wait_mm_dd 8 7)  (irrigate_overhead 2 [mm/h] (hours 10))
+   (wait_mm_dd 8 8)  (irrigate_overhead 2 [mm/h] (hours 10))
+   (wait_mm_dd 8 14) (irrigate_overhead 2 [mm/h] (hours 10))
+   (wait_mm_dd 8 16) (irrigate_overhead 2 [mm/h] (hours 10))
+    (wait (or (crop_ds_after "Maize_SK" 2.0) (mm_dd 10 5))) 
+  (harvest "Maize_SK"
+            (stub 8 [cm]) (stem 0.00 []) (leaf 0.00 []))
+    (wait_mm_dd 10 6) (fertilize (AmmoniumNitrate (weight 40 [kg N/ha])))
+  (stubble_cultivation)
+    (wait_days 2) (rotavation)
+)
+;; Spring Barley 1998
+(defaction SBarley_98 activity
+  (wait_mm_dd 3 31) (fertilize (AmmoniumNitrate (weight 60 [kg N/ha])))
+  (seed_bed_preparation)
+  (sow "Spring Barley_SK")
+    (wait_mm_dd 5 5) (irrigate_overhead 2 [mm/h] (hours 10))
+    (wait_mm_dd 5 11) (irrigate_overhead 2 [mm/h] (hours 10))
+    (wait_mm_dd 5 21) (irrigate_overhead 2 [mm/h] (hours 10))
+    (wait_mm_dd 5 28) (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 6 5)  (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 6 20)  (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait (or (crop_ds_after "Spring Barley_SK" 2.0) (mm_dd 8 15))) 
+  (harvest "Spring Barley_SK"
+            (stub 8 [cm]) (stem 0.00 []) (leaf 0.00 []))
+  (stubble_cultivation)
+  (wait_mm_dd 10 1) (rotavation)
+)
+;; Soybean 1999
+(defaction Pea_99 activity
+  (wait_mm_dd 3 15) (fertilize (AmmoniumNitrate (weight 30 [kg N/ha])))
+    (seed_bed_preparation)
+  (sow "Pea")
+    (wait_mm_dd 5 6) (irrigate_overhead 2 [mm/h] (hours 12))
+      (wait_mm_dd 5 24) (irrigate_overhead 2 [mm/h] (hours 10))
+      (wait_mm_dd 5 30)  (irrigate_overhead 2 [mm/h] (hours 10))
+      (wait (or (crop_ds_after "Pea" 2.0) (mm_dd 8 15))) 
+    (harvest "Pea"
+              (stub 8 [cm]) (stem 0.00 []) (leaf 0.00 []))
+    (stubble_cultivation)
+    (wait_mm_dd 10 15)
+    (fertilize ("cattle_manure" (weight 40 [T w.w./ha]))(to -5 [cm]))
+    )
+
+;; Maize 2000
+(defaction Maize_2000 activity
+ (wait_mm_dd 4 21)  (fertilize (AmmoniumNitrate (weight 120 [kg N/ha])))
+  (seed_bed_preparation)
+  (sow "Maize_SK")
+    (wait_mm_dd 5 10) (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 6 2)  (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 6 12) (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 6 20) (irrigate_overhead 3 [mm/h] (hours 10))  
+    (wait_mm_dd 7 1)  (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 7 9 ) (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 7 20) (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 8 10) (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 8 18) (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 8 25) (irrigate_overhead 3 [mm/h] (hours 10))
+  (wait (or (crop_ds_after "Maize_SK" 2.0) (mm_dd 10 01))) 
+  (harvest "Maize_SK"
+            (stub 8 [cm]) (stem 0.00 []) (leaf 0.00 []))
+  (stubble_cultivation)
+)
+
+;; Spring Barley 2001
+(defaction S_Barley_01 activity
+  (wait_mm_dd 3 15) (fertilize (AmmoniumNitrate (weight 50 [kg N/ha])))
+  (seed_bed_preparation)
+  (sow "Spring Barley_SK")
+    (wait_mm_dd 4 30) (fertilize (AmmoniumNitrate (weight 30 [kg N/ha])))
+    (wait_mm_dd 5 10) (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 5 21) (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 6 3)  (irrigate_overhead 3 [mm/h](hours 10))
+    (wait_mm_dd 6 12) (irrigate_overhead 3 [mm/h] (hours 10))
+  (wait (or (crop_ds_after "Spring Barley_SK" 2.0) (mm_dd 8 31))) 
+  (harvest "Spring Barley_SK"
+            (stub 8 [cm]) (stem 1.00 []) (leaf 1.00 []))
+  (stubble_cultivation)
+)
+;; Winter Wheat 2002
+(defaction W_Wheat_02 activity
+  (wait_mm_dd 8 21) (rotavation)
+  (wait_mm_dd 10 1) (fertilize (AmmoniumNitrate (weight 30 [kg N/ha])))
+  (seed_bed_preparation)
+  (sow "Winter Wheat_SK")  (wait_mm_dd 3 15)
+   (wait trafficable) (fertilize (AmmoniumNitrate (weight 60 [kg N/ha])))
+   (wait_mm_dd 5 10)   (fertilize (AmmoniumNitrate (weight 30 [kg N/ha])))
+    (wait_mm_dd 5 12) (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 5 22) (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 5 31)  (irrigate_overhead 3 [mm/h] (hours 10))
+    (wait_mm_dd 6 20)  (irrigate_overhead 3 [mm/h] (hours 10))
+  (wait (or (crop_ds_after "Winter Wheat_SK" 2.0)  (mm_dd 8 31))) 
+  (harvest "Winter Wheat_SK"
+            (stub 8 [cm]) (stem 1.00 []) (leaf 1.00 []))
+    (stubble_cultivation)
+    (wait_mm_dd 10 1) (plowing)
+)
+
+;; WarmUp period Rotation setup for potato field 2003
+(defaction "WP1 SK 2003 warmup" activity
+  SBeet_management 
+  SBarley_94 WWheat_95 Maize_1996 Maize_1997 SBarley_98
+  Pea_99 Maize_2000 S_Barley_01 W_Wheat_02)
+
+;;; sk-management.dai ends here.

@@ -1,0 +1,2940 @@
+\mchapter{Finite Element Method}
+
+\section{Why FEM?}\index{FEM}\index{Finite Element Method}
+
+A large number of numerical hydrological models has been developed to
+solve both Richard's equation and the advection-dispersion
+equation. The most commonly used types of numerical models are the
+Finite Difference Method\index{Finite Difference Method}
+(FDM)\index{FDM} and the Finite Element Method (FEM). The FEM has some
+advantages over the FDM. One such advantage is its capability to
+handle complex geometries which for example can occur with material
+(here the soil) properties with a high level of heterogeneity. An
+example is the heterogeneity of the hydraulic properties in a ridged
+soil. This case will be considered later. \\ 
+\\
+Another advantage is the possibility of building in an adaptive
+mesh generator if required. An adaptive mesh generator makes it
+possible to regenerate the mesh on the way, for example, to make the
+net finer where the uncertainties are large. \\
+\\
+However, there are also some disadvantages associated with the FEM. The
+calculation costs are normally higher, in comparison with the FDM, for
+simple geometries. The FEM is also much more mathematically
+complicated as well as less intuitive than the finite difference
+technique.\\
+\\
+This chapter describes the solving of the 2-dimensionally, vertical and
+time dependent equation of Richard's and the advection-dispersion
+equation using the FEM. 
+
+
+\section{General description of the PDEs}
+
+The physical explanations for Richard큦 equation and the
+advection-dispersion equation, respectively, are very different, whereas
+the two PDEs look almost alike. Both equations are covered by the more
+general expression: 
+
+
+\begin{equation}
+a\frac{\partial \phi}{\partial t}-\nabla \cdot 
+\left(\mathbf{b}\nabla \phi - \mathbf{c}\phi+\mathbf{d} \right) +
+e\phi+f=0 
+\label{eq:general}
+\end{equation}
+
+where $\phi$ is the dependent variable. $a$, $e$ and $f$ are
+scalars. $\mathbf{b}$ is a 2-by-2 matrix or a scalar. $\mathbf{c}$ and
+$\mathbf{d}$ are vectors. Both $a$, $\mathbf{b}$, $\mathbf{c}$,
+$\mathbf{d}$, $e$ and $f$ can be dependent on $\phi$.\\
+\\
+The working process in the development of TopFEM has been first
+to develop a water movement model without thinking (too much) of the
+later developed solute movement model. The solute movement model is
+later built on the same skeleton as the water movement model with some
+changes and expansions. \\ 
+\\
+The mathematical theories behind the solution of water and solute
+movement equations have a lot of similarities. The solution of the
+more general equation, equation \ref{eq:general} is treated
+first. Later the actual specialties for the solution process of
+the water movement and solute movement problems, respectively, are
+discussed in their own sections. \\
+\\
+Actually, equation \ref{eq:general} covers a lot of different areas in
+both physics\index{physics} and chemistry\index{chemistry}, but can
+also be used to describe the pricing of stock options, as done in the
+Black-Scholes model, \cite{Black-Scholes}\index{Black-Scholes} (which
+only is 1D in space). Work behind the model gave in 1997 the Nobel
+Price\index{Nobel Price} in economics\index{economics} to
+Scholes\index{Scholes} and Merton\index{Merton}, \cite{Nobel}. \\ 
+\\
+Table \ref{tab:difcoeff} shows the coefficients of equation
+\ref{eq:general} shown for Richard's equation and the
+advection-dispersion equation, respectively. The coefficients are
+obtained if $\phi$ is replaced with $\psi$ and $C$ in the water and
+solute movement equations, respectively. According to classification
+rules for PDEs in two variables (space and time),
+\cite{Asmar,Trottenberg} both Richard큦 equation and the
+advection-dispersion equation are of parabolic type.  The PDEs are
+\textit{quasi-linear} since the coefficients in general depend on
+$\phi$. It should be noticed that it is assumed that the solution for
+the water movement simulations, i.e. $\mathbf q$ and $\theta$ is known
+when solving the solute movement equation.\\
+\\
+
+
+\begin{table}[h]
+\tabcap{Coefficients for water and solute movement}
+\label{tab:difcoeff}
+\begin{tabular}{p{2.5cm}|p{4.95cm}|p{4.95cm}} \hline
+\textbf{Coefficient} & \textbf{Value, water movement} & \textbf{Value,
+  solute movement} \\ \hline
+$a$ & $C_w$ & $\theta R$ \\ \hline
+$\mathbf{b}$ & $K$\ or\ $\begin{bmatrix} K & 0 \\ 0 & K
+  \end{bmatrix}$ & $\theta \begin{bmatrix} D_{xx} & D_{xy} \\ D_{yx}
+  & D_{yy} \end{bmatrix}$ \\ \hline 
+$\mathbf{c}$ & $\begin{bmatrix}0 \\ 0 \end{bmatrix}$ &
+$\begin{bmatrix} q_x \\ q_y \end{bmatrix}$ 
+\\ \hline
+$\mathbf{d}$ & $\begin{bmatrix} 0 \\ K \end{bmatrix}$ &
+$\begin{bmatrix} 0 \\ 0 \end{bmatrix}$ \\ \hline
+$e$ & $0$ & $\frac{\partial \theta}{\partial t}$ \\ \hline
+$f$ & $\Gamma$ &
+$C_{sink}\Gamma-\theta\mu_l-\rho_b\mu_s$ \\ \hline
+\end{tabular}
+\end{table}
+
+
+To solve the equation \ref{eq:general}, it is necessary to specify
+initial\index{initial condition} and boundary
+conditions\index{boundary condition}. The boundary conditions specify
+a combination of $\phi$ and its derivative on the boundary:
+
+%\begin{equation}
+%\begin{cases}
+%& \mathbf{\bar{n}} \cdot (\mathbf{b}\nabla \phi -
+%\mathbf{c}\phi+\mathbf{d}) + r\phi =h \\
+%& \phi=\phi_0 
+%\end{cases}
+%\end{equation}
+
+\begin{equation}
+\mathbf{\bar{n}} \cdot (\mathbf{b}\nabla \phi -
+\mathbf{c}\phi+\mathbf{d}) + r\phi =h
+\end{equation}
+
+\begin{equation}
+\phi=\phi_0
+\end{equation}
+
+
+where $\mathbf{\bar{n}}$ is the outward unit normal. The first type is
+known as the \textit{Robin boundary condition}\index{Robin boundary
+  condition}\index{boundary condition!Robin} and the second is known
+as the \textit{Dirichlet boundary condition}\index{boundary
+  condition!Dirichlet}\index{Dirichlet boundary condition}. The
+Dirichlet conditions can be approximated by Robin boundary conditions
+by setting $h=rd$ and then letting $r\rightarrow \infty$. Division
+with a large $r$ cancels the derivative term. The \textit{Neumann
+  boundary condition}\index{Neumann boundary condition}\index{boundary
+  condition!Neumann} is obtained by setting $r=0$:
+
+\begin{equation}
+\mathbf{\bar{n}} \cdot (\mathbf{b}\nabla \phi - \mathbf{c}\phi+\mathbf{d}) = 
+\mathbf{\bar{n}}\cdot(-\mathbf{q})=-q
+\label{eq:Neumann}
+\end{equation}
+
+where $\mathbf{q}$ is the flux vector and $q$ is the size of the
+outward flux. Only Dirichlet and the Neumann boundary conditions
+are considered here.
+
+
+\section{Method of weighted residual}\index{weighted residual}
+ 
+The solution to \ref{eq:general}, $\phi$ is approximated with a
+trial function. The residual is then defined as:
+
+\begin{equation}
+R=a\frac{\partial \phi}{\partial t}-\nabla \cdot 
+\left(\mathbf{b}\nabla \phi -
+  \mathbf{c}\phi+\mathbf{d} \right) + e\phi+f\neq 0
+\end{equation}
+
+The residual cannot generally be expected to be equal to zero in the
+domain. A weight\index{weight function} or simply test
+function\index{test function}, $v$ is chosen and the weighted average
+over the domain is set to zero:
+
+
+\begin{equation}
+\begin{split}
+& R_W=\int_{\Omega} R v \, dxdy = \\ & \int_{\Omega} \left( a\frac{\partial
+  \phi}{\partial t}-\nabla \cdot  \left(\mathbf{b}\nabla
+  \phi - \mathbf{c}\phi+\mathbf{d} \right) + e\phi+f
+  \right)v\, dxdy =0
+\label{eq:resweight}
+\end{split}
+\end{equation}
+
+
+The approximation function for $\phi$ can contain one or more unknown
+constants, $a_i$ that have to be determined so equation
+\ref{eq:resweight} is fulfilled. In order to find the constants
+unambiguous, the number of independent equations should be the same as
+the number of constants. The different equations can simply be obtained
+using different testfunctions. Commonly used methods are:
+
+
+
+
+%Many different test functions can be chosen - for not to mention the
+%approximation function\index{approximation function} that approximates
+%$\phi$). The approximation functio n should contain one or more unknown
+%constants, $a_i$ that have to be determined so equation
+%\ref{eq:resweight} is fullfilled. 
+%
+%
+%But the number of test functions should be
+%the same as the number of unknown constants in the approximating
+%function in order to find the coefficients. Commonly used methods are:
+
+
+\begin{itemize}
+\item \textit{Collocation Method}\index{collocation method}. For
+  obtaining the unknown coefficients, $a_1, a_2, \dots a_n$ the
+  residual is set equal to zeros at $n$ distinct points in the solution
+  domain. Using the weighted residual equation it is the same as
+  setting $v_i=\delta(x-x_i)\delta(y-y_i)$ where $\delta$ is the Dirac
+  delta function. The fixed points $(x_i,y_i),  i=1,2,\dots n$ are
+  called the collocation points.  
+\item \textit{Least Squares Method}\index{least squares method}. The
+  square of the residual is minimized with respect to the
+  parameters. It can be derived that this is equal
+  to setting $v_i=\frac{d R}{d a_i}$. 
+\item \textit{Galerkin큦 Method}\index{Galerkin큦 method}. In the
+  Galerkin method, the test function is  $v_i=\frac{d \phi}{d a_i}$.
+\end{itemize}
+
+Often, either the Least Squares or especially the Galerkin method are
+ used. These methods give in general small errors. The Galerkin
+ Method is chosen here. As approximating functions (and test
+ functions) piecewise linear polynomials are used - much more about
+ them later!
+
+
+\section{Weak formulation}\index{weak formulation}
+
+Since $\phi$ will be approximated by a function whose first-order
+derivative has jump discontinuities at the nodes, it would be
+necessary to reformulate the problem so as to remove the second-order
+derivative in \ref{eq:resweight}. For that purpose Gauss divergence
+theorem\index{Gauss divergence theorem}, \cite{HEJ} is excellent:
+
+
+\begin{equation}
+\int_{\Omega}\nabla \cdot\mathbf{V} \, d\Omega=\int_{\partial \Omega}
+\mathbf{\bar{n}}\cdot \mathbf{V} \, dS
+\label{eq:gauss}
+\end{equation}
+
+or in words: the total divergence of the vector field,  $\mathbf{V}$ in
+the volume $\Omega$ is equal to the net flux through the surface of
+$\Omega$, $\partial \Omega$. In a 2D domain, the words volume and
+surface should be replaced by area and boundary, respectively. Another
+useful rule from the vector calculus, \cite{HEJ} is:
+
+
+\begin{equation}
+\nabla \cdot (f\mathbf{V})=(\nabla f)\cdot \mathbf{V}+ (\nabla \cdot
+\mathbf{V})f 
+\label{eq:vectorthing}
+\end{equation}
+
+where $f$ is a $C^1$-function (continuous and 1 time
+differentiable). Applying equations \ref{eq:gauss} and
+\ref{eq:vectorthing} in the second term in the weighted residual
+equation gives: 
+
+\begin{equation}
+\begin{split}
+&\int_{\Omega} \nabla \cdot (\mathbf{b}\nabla \phi - \mathbf{c}\phi
++\mathbf{d} )v \, dxdy = \\
+&\int_{\Omega} \nabla \cdot \left( (\mathbf{b}\nabla \phi - \mathbf{c}\phi
++\mathbf{d} )v \right) \, dxdy - \int_{\Omega}(\nabla v)\cdot(\mathbf{b} \nabla \phi-
+  \mathbf{c}\phi+\mathbf{d})\, dxdy = \\
+& \int_{\partial \Omega} \mathbf{\bar{n}}
+  \cdot (\mathbf{b}\nabla \phi-\mathbf{c}\phi +  \mathbf{d})v \, dS -
+\int_{\Omega}(\nabla v)\cdot(\mathbf{b} \nabla \phi-
+  \mathbf{c}\phi+\mathbf{d})\, dxdy
+\end{split}
+\end{equation}
+
+The weighted residual equation can now be written without second order
+derivatives:
+
+\begin{equation}
+\begin{split}
+& \int_{\Omega} a\frac{\partial
+  \phi}{\partial t} v\,  dxdy -\int_{\partial \Omega} \mathbf{\bar{n}}
+  \cdot (\mathbf{b}\nabla \phi-\mathbf{c}\phi +  \mathbf{d})v \, dS +
+  \\ &\int_{\Omega}(\nabla v)\cdot(\mathbf{b} \nabla \phi-
+  \mathbf{c}\phi+\mathbf{d})\, dxdy+ \int_{\Omega} e\phi v \, dxdy
+  +\int_{\Omega} fv \, dxdy =0 
+\end{split}
+\label{eq:weak1}
+\end{equation}
+
+This equation is known as the variational, or weak form of the
+differential equation. Obviously, any solution of the differential
+equation is also a solution of the variational problem. If $v$ is
+sufficiently smooth, one can also show the converse. A discussion of
+how smooth $v$ should be is outside the scope of this report, but
+piecewise linear polynomials are here considered to be smooth
+enough. \\ 
+\\
+The boundary of $\Omega$, $\partial \Omega$ can be divided into
+parts, $\partial \Omega_{1}$ and $\partial \Omega_{2}$ with a
+Neumann\index{Neumann boundary condition}\index{boundary
+  condition!Neumann} and a Dirichlet boundary
+condition\index{Dirichlet boundary condition}\index{boundary
+  condition!Dirichlet}, respectively. The terms in the parenthesis in
+the boundary integral in equation \ref{eq:weak1} can be replaced with
+the right hand side of \ref{eq:Neumann} on $\partial \Omega_{1}$. We
+have previously seen how a Dirichlet boundary condition can be
+approximated with a Robin boundary condition. But this is numerically
+a bad solution because it can produce ill-conditioned
+matrix-systems. The Dirichlet boundary is implemented by simply
+forcing $\phi$ to be equal to the wanted value on $\partial
+\Omega_{2}$. The procedure is described later. We now have to solve:
+
+
+\begin{equation}
+\begin{cases}
+R_W=\int_{\Omega} a\frac{\partial \phi}{\partial t} v \, dxdy
+ + \int_{\Omega}(\nabla
+v)\cdot(\mathbf{b} \nabla \phi- \mathbf{c}\phi+\mathbf{d})\, dxdy  \\+ 
+ \int_{\Omega} e\phi v \, dxdy + \int_{\Omega}fv \, dxdy +\int_{\partial \Omega_1} qv \, dS=0 &
+ \text{in} \ \Omega \\ \phi=\phi_0 & \text{on} \ \partial \Omega_2 
+ \end{cases}
+\label{eq:weak2}
+\end{equation}
+
+
+\section{Finite Element basis functions}\index{basis function}
+
+We want to solve the PDEs in a 2 -dimensional domain. 
+Figure \ref{fig:mesh} shows an example of a 2D domain, $\Omega$.  A
+finite element mesh of triangular elements are generated on
+$\Omega$. As mentioned above it is the intention to use piecewise
+linear polynomials to approximate $\phi$. To describe a linear
+polynomium it is necessary to know the value in three points. The
+unknowns are here defined as the vertices of the triangular mesh. This
+is also called a \textit{vertex centered location of the unknowns},
+\cite{Trottenberg}. \\
+\\
+Since the boundary, $\partial\Omega$ of $\Omega$ in the figure is
+curved, the mesh cannot coincide with $\partial \Omega$. But if the
+mesh is refined sufficiently an arbitrary good approximation can be
+obtained. The situation is comparable with the situation for a Roman
+architect who wants to build an arch, but only has simple building
+blocks. If the result is not close enough to the perfect arch, he can
+use smaller building blocks.\\
+\\
+The nodes are placed at the vertices and have the numbers
+$i=1,2\ldots NP$. For every element we need to assign local node
+numbers $(1,2,3)$. The local node numbers are placed in counter
+clockwise order in each triangle. For each node $(x_{i},y_{i})$ we
+introduce a global finite element basis function\index{basis
+  function!global} $N_{i}(x,y)$ defined on $\Omega$ as follows:
+
+\begin{itemize}
+\item $N_{i}(x,y)$ is continuous on the entire mesh and linear on each
+  element.
+\item $N_{i}(x_{j},y_{j})=\delta_{ij}$
+\end{itemize}
+
+where $\delta_{ij}$ is Kronecker큦 delta function which is equal to
+one for $i=j$ and zero for $i\neq j$. Figure \ref{fig:global} shows a
+picture of a global basis function. Instead of viewing the entire
+mesh, a single element can be considered for many purposes. On a
+triangle (or element) with the nodal points $i$, $j$, $k$, there are only
+three nonzero basis functions, the local basis functions\index{basis
+  function!local}, $N_{1}$, $N_{2}$ and $N_{3}$. The local basis
+functions can on the triangles be expressed as:
+
+ 
+\begin{figure}[h]  %here-top-bottom-page
+\begin{center}
+\epsffile{mesh.eps}
+\figcap{Mesh fitted to a domain where part of the boundary is curved.}
+\label{fig:mesh}
+\end{center}
+\end{figure}
+
+
+\begin{equation} \begin{split}
+&N_{1}=a_{1}+b_{1}x+c_{1}y\\
+&N_{2}=a_{2}+b_{2}x+c_{2}y\\
+&N_{3}=a_{3}+b_{3}x+c_{3}y
+\end {split} \end{equation}
+
+\begin{figure}[htbp]  %here-top-bottom-page
+\begin{center}
+\epsffile{global.eps}
+\figcap{Global basis function, $N_{20}$ related to node no. 20.}
+\label{fig:global}
+\end{center}
+\end{figure}
+
+The local basis functions must fulfil:
+
+\begin{equation} 
+\begin{split} 
+&N_{1}(x_{1},y_{1})=1 \\  &N_{1}(x_{2},y_{2})=0 \\  &N_{1}(x_{3},y_{3})=0 
+\end{split}
+\begin{split}
+\quad &N_{2}(x_{1},y_{1})=0 \\ \quad &N_{2}(x_{2},y_{2})=1 \\ \quad &N_{2}(x_{3},y_{3})=0 
+\end{split}
+\begin{split}
+\quad &N_{3}(x_{1},y_{1})=0 \\ \quad &N_{3}(x_{2},y_{2})=0 \\ \quad &N_{3}(x_{3},y_{3})=1 
+\end{split} \end{equation}
+
+This gives a linear systems of 9 equations with 9 unknowns. But it is
+only $b_i$ and $c_i$ , $i=1,2,3$ which are interesting for later
+purpose (they describe the slope of the basis functions). The solution
+according to \cite{Segerlind} is :
+
+\begin{equation} 
+\begin{split}
+& \quad b_{1}=\frac{1}{2A}(y_{2}-y_{3})\\ 
+& \quad c_{1}=\frac{1}{2A}(x_{3}-x_{2})
+\end{split}
+\begin{split} 
+& \quad b_{2}=\frac{1}{2A}(y_{3}-y_{1})\\ 
+& \quad c_{2}=\frac{1}{2A}(x_{1}-x_{3}) 
+\end{split}
+\begin{split}
+& \quad b_{3}=\frac{1}{2A}(y_{1}-y_{2})\\
+& \quad c_{3}=\frac{1}{2A}(x_{2}-x_{1})
+\end{split}  
+\end{equation}
+
+Where A is the area\index{element!area} of the triangles if the nodal
+points on the triangles are counted counter clockwise. Since the local
+nodes are placed counter clockwise, the area can be calculated as,
+\cite{Segerlind}:
+
+
+\begin{equation}
+A=\frac{1}{2}(x_{1}y_{2}+y_{1}x_{3}+x_{2}y_{3}-x_{3}y_{2}-y_{3}x_{1}-x_{2}y_{1})
+\label{eq:area}
+\end{equation}
+
+The derivatives of the local basis functions\index{basis
+  function!derivative} are easily calculated to: 
+
+\begin{equation} 
+\begin{split}
+&\frac{\partial N_{1}}{\partial x}=b_{1}\\ 
+&\frac{\partial N_{1}}{\partial y}=c_{1}
+\end{split}
+\begin{split}
+& \quad \frac{\partial N_{2}}{\partial x}=b_{2}\\
+& \quad \frac{\partial N_{2}}{\partial y}=c_{2}
+\end{split}
+\begin{split}
+& \quad \frac{\partial N_{3}}{\partial x}=b_{3}\\
+& \quad \frac{\partial N_{3}}{\partial y}=c_{3}
+\end{split} 
+\label{eq:abc}
+\end{equation}
+
+If we want to integrate\index{basis function!integration} the product
+of some of the basis functions over the area of a triangle, the general
+formula from \cite{Segerlind} can be used.
+
+\begin{equation}
+\int_{A}N_{1}^{a}N_{2}^{b}N_{3}^{c} \, dxdy=2A\frac{a!b!c!}{(a+b+c+2)!}
+\label{eq:areaint}
+\end{equation}
+
+where the powers, $a$, $b$ and $c$ are integers. A similar formula is
+given for integration over a one-dimensional element with local
+element basis functions $M_1$ and $M_2$:
+
+
+\begin{equation}
+\int_{l}M_{1}^{a}M_{2}^{b}ds=L\frac{a!b!}{(a+b+1)!}
+\label{eq:boundaryint}
+\end{equation}
+
+where $L$ is the length of the edge. This is important because
+integration over a one-dimensional element is the same as integration
+over the border of the 2-dimensional element since a basis function
+in a triangular element varies linearly along the sides between its
+nodes and the other two nodes. At the side opposite its nonzero node
+the 2 dimensional basis function is zero.\\
+\\
+It is in \cite{Barker} shown that a given function $f(x,y)$ in
+$\Omega$ can be approximated with $f_{I}(x,y)$ where:
+
+\begin{equation}
+f_{I}=\sum_{j=1}^{NP}f(x_{j},y_{j})N_{j}(x,y)
+\label{eq:approx}
+\end{equation}
+
+Because each $N_{i}(x,y)$ is continuous and piecewise linear, 
+$f_{I}$ is also continuous and piecewise linear. It is also easy to
+see that $f_{I}(x_{i},y_{i})=f(x_{i},y_{i})$. Figure \ref{fig:approx}
+shows an approximation of a function on the same domain as in
+figures \ref{fig:mesh} and \ref{fig:global}. The mesh in figure
+\ref{fig:approx} is just refined. Under the assumption that the second
+order derivatives of $f$ are bound and that the mesh coincides with
+$\partial \Omega$, a constant, $C$ in each element, $e_N$ exists
+according to \cite{Barker}:
+
+\begin{equation}
+|f_I(x,y)-f(x,y)|\leq Ch_n^2\ \ , \ \ \ (x,y)\in e_n
+\end{equation}
+
+where $h_n$ is the largest element side, i.e a constant, $C$ exists so
+the size of the largest error in $\Omega$ is below $Ch_{max}^2$ where
+$h_{max}$ is the largest element side in the entire mesh.
+
+\begin{figure}[h]  %here-top-bottom-page
+\begin{center}
+\epsffile{approx.eps}
+\figcap{Approximation of a function on a triangular mesh.}
+\label{fig:approx}
+\end{center}
+\end{figure}
+
+
+\section{Mesh
+  generation}\index{grid generation}\index{mesh!generation}
+
+
+Today meshes used for FEM analysis can consist of thousands or even
+millions of elements. Previously, the much smaller meshes were often
+generated by hand. Today the meshes are normally generated by meshing
+algorithms for example included in the CAE tool or as independent
+software. \\ 
+\\
+The fineness of the meshes is of course just a question of sufficient
+computational power. But as the speed of computers has increased, also
+the tasks and complexity of the problems have increased
+correspondingly. \\
+\\
+The necessary size of the elements depends naturally of the physical
+problems, but also of where the solution is of interest. Sharp
+gradients of the solution demand fine meshes. Also boundaries with
+high curvature small elements have to be described properly. The size of
+the elements in a single mesh can often vary strongly. \\
+\\
+Some finite element codes have even adaptive meshing algorithms where
+the mesh dynamically during the computation process is adopted. If
+the mesh refinement is controlled by an \textit{adaption
+  criterion}\index{adaption criterion} the adaption approach
+is \textit{self-adaptive}, \cite{Trottenberg}. When the solution changes
+rapidly due to for example shocks, adaptive meshes can be an advantage. In
+hydrology for example, sharp wetting fronts that occur in connection
+with infiltration or the movement of contaminants. \\
+\\
+Another possibility is using multigrid\index{multigrid} solvers,
+\cite{Silvester,Trottenberg}. Multigrid solvers use at least 2
+levels of grid size. When solving the PDE, we end up with a linear
+system of the form $\mathbf{A}\mathbf{x}=\mathbf{b}$ which has to be solved at
+least 1 time for each timestep (see later). Multigrid works together
+with iterative solvers for the (sparse) linear equation system, typically
+\textit{Richardson} \textit{Gauss-Seidel} and \textit{Jacobi}
+iterations. The multigrid approach is very efficient to PDEs of elliptic
+type, where the mathematical theory also is quite well known,
+\cite{Trottenberg}. Using a multigrid approach for the governing
+equation for either the water or the solute movement (or
+for equation \ref{eq:general}) would be a very comprehensive task. But
+for example a multigrid program exists for solving compressible
+RANS (Reynolds-Averaged Navier-Stokes equations), \cite{Trottenberg}.
+Neither the rather complicated adaptive grids nor the multigrid
+approach (or combinations) are used in TopFEM. \\
+\\
+The algorithms for generation of a non-regular triangular mesh are not
+discussed in this report. But many 2D grid generators produce triangular
+grids which fulfil the \textit{Delaunay criterion}. All the unregular
+meshes used for the simulations described in the thesis are generated
+with such an algorithm.
+
+
+\subsection{Delaunay criterion}\index{Delaunay}
+
+In a 3D space, the \textit{Delaunay
+  criterion}\index{Delaunay!criterion} according to \cite{Owen} is:
+  \textit{``Any node must not be contained within the circumsphere of
+  any tetrahedra within the mesh''}. A circumsphere can be defined as
+  the sphere passing through all four vertices of a tetrahedron. The
+  similar two-dimensional rule is:
+
+
+\begin{itemize}
+\item Any node must not be contained within the circumcircle of any
+  triangle within the mesh.
+\end{itemize}
+
+In figure \ref{fig:Delaunay} the criterion is illustrated with 2
+simple two-element meshes representing the same domain. It should be
+noted that the Delaunay criterion is not an algorithm, just a
+rule!. The advanced algorithm, which FEMLAB uses, is only roughly
+described in \cite{FEMLAB}. All meshes presented in this dissertation
+are produced using FEMLAB\index{FEMLAB}.
+
+
+\begin{figure}[H]  %here-top-bottom-page
+\begin{center}
+\epsfig{file=delaunayfig.eps,width=9cm}
+%\epsffile{delaunayfig.eps}
+\figcap{Illustration of the Delaunay criterion. (A) fulfills the
+  criterion, (B) does not.}
+\label{fig:Delaunay}
+\end{center}
+\end{figure}
+
+
+\subsection{Mesh quality}\index{mesh!quality}
+
+\cite{Segerlind} has analyzed the heat transfer equation with linear
+coefficients and found the statement: \textit{No interior angle of the
+  triangle should exceed 90 degrees}. Similar statements that no
+angel in the elements must be too large or too small (which is
+the same) are given in many other places as for example in
+\cite{Bank}.\\
+\\
+In order to describe the quality of the meshes, especially the
+quality indicator by Bank\index{Bank}, \cite{Bank} is often used:
+
+\begin{equation}
+q=\frac{\sqrt{3}A}{l_1^2+l_2^2+l_3^2}
+\end{equation}
+
+where $l_1$, $l_2$ and $l_3$ are the side lengths of
+the triangle. $A$ is the area. $q$ is a number between 0 and 1. The
+quality is good when $q$ is high and  $q$ is equal to one for an
+equilateral triangle. The indicator is independent of the
+element size. Another indicator is the indicator by
+Berzins\index{Berzins}, \cite{Berzins}:
+
+\begin{equation}
+q=\frac{l_1^2+l_2^2+l_3^2+(l_1+l_2+l_3)^2}{16\sqrt{3}A}
+\end{equation}
+
+The fundamental assumption made here, is that the real solution is
+quadratic and that the approximation is based on piecewise linear basis
+functions. $q$ has the value one for an equilateral triangle and
+tends $\infty$ if one of the side lengths are constant and the area
+tends to zero. Other mesh quality indicators also exist as for
+example the one made by Weatherill as described in \cite{Berzins}.  
+
+
+\subsection{Element size}\index{element!size}
+
+In the description of the solute movement the mesh dependent P\'{e}clet
+$P_e$\index{P\'{e}clet Number} and Courant, $C_r$ numbers\index{Courant
+  number} are introduced, and it is discussed how the size of the
+elements can influence the computed solution. Techniques to avoid some
+of the problems are also presented there.
+
+
+\newpage
+
+\section{Galerkin큦 method}\index{Galerkin큦 method}
+
+Here it is explained how the Galerkins method works on the general
+equation, \ref{eq:general}. Some details are omitted but explained
+in detail in subsections for the water and the solute movement,
+respectively. The solution, $\phi$ is approximated with piecewise
+linear functions: 
+
+
+\begin{equation} 
+\phi(x,y,t)\approx
+\sum_{j=1}^{NP}\phi_{j}(t)N_{j}(x,y)=\sum_{j=1}^{NP}\phi_{j}N_{j}
+\label{eq:sum}
+\end{equation}
+
+where $\phi_{j}$ is the value for $\phi$ in the nodal point
+no. $j$. $NP$ is the total number of nodal points. The task is for a
+given time to find the vector $\boldsymbol{\phi}$ containing the
+values for $\phi$ in the nodal points
+($\phi_1,\phi_2,\ldots,\phi_{NP})$. \\
+\\
+The idea in the Galerkin큦 method is to use the same functions, for
+the interpolation functions as for the test function and apply it in
+the weak form of the differential equation, \ref{eq:weak2}. If we set
+$v=v_{i}=N_{i}$ for $i=1,2,\ldots ,NP$ in equation \ref{eq:weak2}, we
+will get $NP$ equations (and unknowns). In other words, a weighted
+residual\index{weighted residual} equation for each nodal point:
+
+\begin{equation}
+\begin{bmatrix}
+R_{W,1} \\
+R_{W,2} \\
+\vdots  \\
+R_{W,NP} 
+\end{bmatrix}=\begin{bmatrix}
+0 \\
+0 \\ 
+\vdots \\
+0 \end{bmatrix}
+\label{eq:residualvec}
+\end{equation}
+
+where $R_{W,i}$ is the weighted residual equation as defined in equation
+\ref{eq:weak2}. By inserting the approximation for $\phi$, equation
+\ref{eq:sum} and the test function it can be written as:
+
+\begin{equation}
+\begin{split}
+& R_{W,i}=\int_{\Omega} a \sum_{j=1}^{NP}\dot{\phi_{j}}N_{j} N_{i} \, dxdy
+ + \\
+& \int_{\Omega}(\nabla N_{i})\cdot \left( \mathbf{b} \nabla \left(
+ \sum_{j=1}^{NP}\phi_{j}N_{j}\right) - \mathbf{c}
+ \sum_{j=1}^{NP}\phi_{j}N_{j} +\mathbf{d} \right) \, dxdy  + \\ & \int_{\Omega}
+ e\sum_{j=1}^{NP}\phi_{j}N_{j} N_{i} \, dxdy + \int_{\Omega}f
+ N_{i} \, dxdy  +\int_{\partial  \Omega_1} q N_{i} \, dS=0  
+\end{split}
+\label{eq:residuali}
+\end{equation}
+
+The only unknown in equation \ref{eq:residuali} are $\phi$ and
+$\dot{\phi}$ in all the nodal points. Equation \ref{eq:residualvec}
+and \ref{eq:residuali} can in combination be written on matrix form:
+
+\begin{equation}
+\mathbf{A}\dot{\boldsymbol{\phi}}+(\mathbf{B}-\mathbf{C}+\mathbf{E})\boldsymbol{\phi}+\mathbf{D}+\mathbf{F}+\mathbf{Q}=0
+\label{eq:matrix}
+\end{equation}
+
+Where each term in equation \ref{eq:matrix} corresponds to a term in
+equation \ref{eq:residuali}. $\boldsymbol{\phi}$ and
+$\boldsymbol{\dot{\phi}}$ are vectors that contain $\phi$ and the time
+derivatives in the nodal points. This equation is a first order
+\textit{ordinary differential equation} (ODE)\index{ODE}.\\ 
+\\
+It shall be noted that $N_{i}$ only is nonzero in the triangles with
+nodal point $i$, i.e. there are only few elements witch have nonzero
+contributions to equation \ref{eq:residuali} for each test
+function. This fact has the positive effect that the matrices in
+\ref{eq:matrix} are sparse. \\ 
+\\
+Instead of looking at node $i$ (test function $N_{i}$) and then
+calculating the contributions to equation \ref{eq:weak2} from all the
+neighboring triangles, it is of computational reasons more convenient first
+to look at a given triangle in the mesh and then evaluate the
+integrals for the 3 nonzero test functions in the element. The
+contributions to the system of $NP$ equations from each triangle is
+collected in a system of so called local matrices\index{local
+  matrices} and vectors\index{local vectors}. \\
+\\
+In an element, the local nodes 1, 2 and 3 (with basis functions $N_1$,
+$N_2$ and $N_3$) correspond to the global node numbers $i$, $j$ and
+$k$. In each element, there are only three nonzero test functions, $v_1$, $
+v_2$ and $v_3$ (local numbers). The contributions to the rows $i$, $j$
+and $k$ in \ref{eq:matrix} from each element are calculated and placed
+in the local matrices:
+$\mathbf{(A}\boldsymbol{\dot{\phi}}\mathbf{)_e}$ ,
+$\mathbf{(B}\boldsymbol{\phi}\mathbf{)_e}$,
+$\mathbf{(C}\boldsymbol{\phi}\mathbf{)_e}$,
+$\mathbf{(E}\boldsymbol{\phi}\mathbf{)_e}$,
+$\mathbf{D_e}$,
+$\mathbf{F_e}$ and 
+$\mathbf{Q_e}$. Subscript $\mathbf{_e}$ means that it is the
+contribution from a single element. To calculate the matrices the
+integration formula from \cite{Segerlind}, equations \ref{eq:areaint}
+and \ref{eq:boundaryint} are used. \\
+\\
+After calculation of the local matrices/vectors, the
+assembling\index{assembling} process starts where the contributions
+from the local matrices are assembled in the global matrices of
+equation \ref{eq:matrix}. 
+
+
+
+\subsection{Local matrices and vectors }\index{local
+  matrices}\index{local vectors}
+
+The element contributions to equation \ref{eq:matrix} are collected in
+the local matrices and vectors. The local matrices and vectors are
+simply calculated by inserting the approximations and test functions
+on element base into the parts of equation \ref{eq:weak2}. The three
+nonzero test functions (basis functions) are placed in a vector,
+i.e. $\mathbf{v}=[v_1 \ v_2 \ v_3]^T=[N_1 \ N_2 \
+N_3]^T=\mathbf{N}^T$. A given function, $f$ which is linear over an
+element, can on an element be written as:
+
+
+\begin{equation}
+f_{e}=\begin{bmatrix} N_{1}\ N_{2}\ N_{3} \end{bmatrix} \begin{bmatrix}
+f_{1} \\
+f_{2} \\
+f_{3} \end{bmatrix}=\mathbf{N}\boldsymbol{f_{e}}
+\label{eq:linapprox}
+\end{equation}
+
+where $\mathbf{f_{e}}$ is a vector containing the values of $f$ in the
+nodal points. In an element the approximation for $\phi$, expressed by
+\ref{eq:sum} can be written as: 
+
+\begin{equation}
+\phi_{e}=\mathbf{N}\boldsymbol{\phi_{e}}
+\end{equation}
+
+where $\boldsymbol{\phi_{e}}$ is a vector containing the
+values of $\phi$ in the nodal points (vertices of the triangles). The
+time-derivative of $\phi$ can on an element be described analogically. \\
+\\
+The contribution to $\mathbf{A}$ from an element can be calculated as:
+
+
+\begin{equation} 
+\begin{split}
+&\boldsymbol{(A\dot{\psi})_e}=\int_{A}a\frac{\partial \phi}{\partial
+  t}\mathbf{N}^T \,dxdy \approx \int_{A} a \mathbf{N}
+\boldsymbol{\dot{\phi}_e} \mathbf{N}^T \,dxdy
+  =\mathbf{A_e}\boldsymbol{\dot{\phi}_e}, \\
+&\mathbf{A_e}=\int_{A} a \begin{tiny}
+  \begin{bmatrix}
+ N_1^2 & N_1N_2 & N_1N_3 \\
+N_2N_1 & N_2^2  & N_2N_3 \\
+N_3N_1 & N_3N_2 & N_3^2 \end{bmatrix} \end{tiny} \, dxdy
+\end{split}
+\label{eq:localA}
+\end{equation}
+
+$(\nabla V)\cdot \mathbf{B}\nabla \phi $ appearing in equation
+\ref{eq:weak2} can be rewritten as:
+
+\begin{equation}
+(\nabla v)\cdot (\mathbf{B}\nabla \phi) =\frac{\partial v}{\partial
+  x}\left(b_{xx}\frac{\partial \phi}{\partial x}+b_{xy}\frac{\partial
+  \phi}{\partial y}\right)+\frac{\partial v}{\partial
+  y}\left(b_{yx}\frac{\partial \phi}{\partial
+  x}+b_{yy}\frac{\partial \phi}{\partial y}\right)
+\end{equation}
+
+The contribution to $\mathbf{B}\boldsymbol{\phi}$ from a single
+element is:
+
+\begin{equation}
+\begin{split}
+&\boldsymbol{(B\phi)_e}=\int_{A}\frac{\partial \mathbf{N}^T}{\partial
+  x}\left(b_{xx}\frac{\partial
+  \mathbf{N}}{\partial x}\mathbf{\phi_e}+b_{xy}\frac{\partial
+  \mathbf{N}}{\partial y}\mathbf{\phi_e}\right) \, dxdy + \\
+& \int_{A} \frac{\partial \mathbf{N}^T}{\partial
+  y}\left(b_{yx}\frac{\partial \mathbf{N}}{\partial
+  x}\mathbf{\phi_e}+b_{yy}\frac{\partial \mathbf{N}}{\partial
+  y}\mathbf{\phi_e}\right)\,dxdy =\\
+& \int_{A} b_{xx}\frac{\partial \mathbf{N}^T}{\partial
+  x}\frac{\partial \mathbf{N}}{\partial x}+b_{xy}\frac{\partial
+  \mathbf{N}^T}{\partial x}\frac{\partial \mathbf{N}}{\partial y}
+  \,dxdy \boldsymbol{\phi_e}  + \\ 
+& \int_{A} b_{yx} \frac{\partial \mathbf{N}^T}{\partial
+  y}\frac{\partial \mathbf{N}}{\partial x}+ b_{yy}\frac{\partial
+  \mathbf{N}^T}{\partial y}\frac{\partial \mathbf{N}}{\partial y} \,
+  dxdy \boldsymbol{\phi_e}=\mathbf{B_e}\boldsymbol{\phi_e}
+\end{split}
+\end{equation}
+
+where:
+
+\begin{equation} \begin{split}
+& \mathbf{B_e}= \begin{tiny}
+\begin{bmatrix} (\frac{\partial
+  N_{1}}{\partial x})^{2}
+ &\frac{\partial N_{1}}{\partial x}\frac{\partial N_{2}}{\partial x}
+&\frac{\partial N_{1}}{\partial x}\frac{\partial N_{3}}{\partial x}\\ 
+\frac{\partial N_{2}}{\partial x}\frac{\partial N_{1}}{\partial x}
+&(\frac{\partial N_{2}}{\partial x})^{2}
+&\frac{\partial N_{2}}{\partial x}\frac{\partial N_{3}}{\partial x}\\ 
+\frac{\partial N_{3}}{\partial x}\frac{\partial N_{1}}{\partial x}
+&\frac{\partial N_{3}}{\partial x}\frac{\partial N_{2}}{\partial x}  
+&(\frac{\partial N_{3}}{\partial x})^{2}
+\end{bmatrix} \end{tiny} \int_{A}b_{xx} \, dxdy + \\
+&\begin{tiny} \begin{bmatrix} 
+\frac{\partial N_{1}}{\partial y}\frac{\partial N_{1}}{\partial x}
+&\frac{\partial N_{1}}{\partial y}\frac{\partial N_{2}}{\partial x}
+&\frac{\partial N_{1}}{\partial y}\frac{\partial N_{3}}{\partial x}\\ 
+\frac{\partial N_{2}}{\partial y}\frac{\partial N_{1}}{\partial x}
+&\frac{\partial N_{2}}{\partial y}\frac{\partial N_{2}}{\partial x}
+&\frac{\partial N_{2}}{\partial y}\frac{\partial N_{3}}{\partial x}\\ 
+\frac{\partial N_{3}}{\partial y}\frac{\partial N_{1}}{\partial x}
+&\frac{\partial N_{3}}{\partial y}\frac{\partial N_{2}}{\partial x}  
+&\frac{\partial N_{3}}{\partial y}\frac{\partial N_{3}}{\partial x}
+\end{bmatrix} \end{tiny} \int_{A}b_{xy} \, dxdy + \\
+& \begin{tiny} \begin{bmatrix} 
+\frac{\partial N_{1}}{\partial x}\frac{\partial N_{1}}{\partial y}
+&\frac{\partial N_{1}}{\partial x}\frac{\partial N_{2}}{\partial y}
+&\frac{\partial N_{1}}{\partial x}\frac{\partial N_{3}}{\partial y}\\ 
+\frac{\partial N_{2}}{\partial x}\frac{\partial N_{1}}{\partial y}
+&\frac{\partial N_{2}}{\partial x}\frac{\partial N_{2}}{\partial y}
+&\frac{\partial N_{2}}{\partial x}\frac{\partial N_{3}}{\partial y}\\ 
+\frac{\partial N_{3}}{\partial x}\frac{\partial N_{1}}{\partial y}
+&\frac{\partial N_{3}}{\partial x}\frac{\partial N_{2}}{\partial y}  
+&\frac{\partial N_{3}}{\partial x}\frac{\partial N_{3}}{\partial y}
+\end{bmatrix} \end{tiny}  \int_{A}b_{yx} \, dxdy + \\
+& \begin{tiny} 
+\begin{bmatrix} (\frac{\partial N_{1}}{\partial y})^{2}
+ &\frac{\partial N_{1}}{\partial y}\frac{\partial N_{2}}{\partial y}
+&\frac{\partial N_{1}}{\partial y}\frac{\partial N_{3}}{\partial y}\\ 
+\frac{\partial N_{2}}{\partial y}\frac{\partial N_{1}}{\partial y}
+&(\frac{\partial N_{2}}{\partial y})^{2}
+&\frac{\partial N_{2}}{\partial y}\frac{\partial N_{3}}{\partial y}\\ 
+\frac{\partial N_{3}}{\partial y}\frac{\partial N_{1}}{\partial y}
+&\frac{\partial N_{3}}{\partial y}\frac{\partial N_{2}}{\partial y}  
+&(\frac{\partial N_{3}}{\partial y})^{2}
+\end{bmatrix} \end{tiny} \int_{A}b_{yy} \, dxdy  
+ \end{split} 
+\label{eq:localB}
+\end{equation}
+
+$(\nabla V)\cdot \mathbf{C} \phi $ from equation \ref{eq:weak2} can be
+written as:
+
+\begin{equation}
+(\nabla v) \cdot (\mathbf{C} \phi) =\frac{\partial v}{\partial
+  x} c_{x}\phi  +\frac{\partial v}{\partial
+  y} c_{y}\phi 
+\end{equation}
+
+$\boldsymbol{(C\phi)_e}$ can then on local element basis be written
+as:
+
+\begin{equation}
+\begin{split}
+& \boldsymbol{(C\phi)_e}=\int_{A} c_x
+\frac{\mathbf{N}^T}{\partial x}(\mathbf{N}\boldsymbol{\phi_e})+c_y
+\frac{\mathbf{N}^T}{\partial y}(\mathbf{N}\boldsymbol{\phi_e}) \, dxdy
+\\ & \int_{A} c_x \frac{\mathbf{N}^T}{\partial
+  x}\mathbf{N}+c_y \frac{\mathbf{N}^T}{\partial
+  y}\mathbf{N} \, dxdy
+\boldsymbol{\phi_e}=\mathbf{C_e}\boldsymbol{\phi_e}
+\end{split}
+\end{equation}
+
+where:
+
+\begin{equation}
+\begin{split} 
+& \mathbf{C_e}=\int_{A} c_{x}  \begin{tiny}
+\begin{bmatrix}
+N_1\frac{\partial N_1}{\partial x} &
+N_2\frac{\partial N_1}{\partial x} & 
+N_3\frac{\partial N_1}{\partial x} \\
+N_1\frac{\partial N_2}{\partial x} &
+N_2\frac{\partial N_2}{\partial x} & 
+N_3\frac{\partial N_2}{\partial x} \\
+N_1\frac{\partial N_3}{\partial x} &
+N_2\frac{\partial N_3}{\partial x} & 
+N_3\frac{\partial N_3}{\partial x} \end{bmatrix}
+\end{tiny} \, dxdy + \\
+&\int_{A} c_{y}  \begin{tiny}
+\begin{bmatrix}
+N_1\frac{\partial N_1}{\partial y} &
+N_2\frac{\partial N_1}{\partial y} & 
+N_3\frac{\partial N_1}{\partial y} \\
+N_1\frac{\partial N_2}{\partial y} &
+N_2\frac{\partial N_2}{\partial y} & 
+N_3\frac{\partial N_2}{\partial y} \\
+N_1\frac{\partial N_3}{\partial y} &
+N_2\frac{\partial N_3}{\partial y} & 
+N_3\frac{\partial N_3}{\partial y} \end{bmatrix}
+\end{tiny} \, dxdy 
+\end{split}
+\label{eq:localC}
+\end{equation}
+
+$(\nabla v) \cdot \mathbf{D}$ can be expressed as:
+
+\begin{equation}
+(\nabla v) \cdot \mathbf{D} =\frac{\partial v}{\partial
+  x} d_{x}  +\frac{\partial v}{\partial
+  y} d_{y} 
+\end{equation}
+
+The $\mathbf{D}$-vector is on local element base:
+
+\begin{equation}
+\begin{split} 
+&\boldsymbol{D_e}=\int_A  \frac{\partial \mathbf{N}^T}{\partial
+  x} d_{x}  +\frac{\partial \mathbf{N}^T}{\partial y} d_{y} \, dxdy =
+  \\ & \begin{tiny}\begin{bmatrix}\frac{\partial N_{1}}{\partial x}\\
+  \frac{\partial N_{2}}{\partial x}\\ \frac{\partial N_{3}}{\partial
+    x}\end{bmatrix}\end{tiny}\int_{A} D_x \, dxdy + \begin{tiny}\begin{bmatrix}\frac{\partial N_{1}}{\partial y}\\ \frac{\partial
+    N_{2}}{\partial y}\\ \frac{\partial N_{3}}{\partial
+    y}\end{bmatrix} \end{tiny} \int_{A} D_y \, dxdy
+\end{split}
+\label{eq:localD}
+\end{equation}
+
+The expression for $\boldsymbol{(E\phi)_e}$ yields:
+
+\begin{equation} \begin{split}
+& \boldsymbol{(E\phi)_e} = \int_{A} e \phi \mathbf{N}^T \,dxdy 
+\approx \int_{A} e  \mathbf{N} \boldsymbol{\phi_e} \mathbf{N}^T \,
+dxdy, = \int_{A} e \mathbf{N}^T  \mathbf{N} \, dxdy
+\boldsymbol{\phi_e} = \\
+& \mathbf{E_e}\boldsymbol{\phi_e}, \ \ \ \ \ \ \
+\boldsymbol{E_e}=\int_{A} e  \begin{tiny}
+\begin{bmatrix}
+ N_1^2 & N_1N_2 & N_1N_3 \\
+N_2N_1 & N_2^2  & N_2N_3 \\
+N_3N_1 & N_3N_2 & N_3^2 \end{bmatrix}\end{tiny} \, dxdy
+\end{split}
+\label{eq:localE}
+\end{equation}
+
+The element contribution to the $\mathbf{F}$-vector is:
+
+\begin{equation}
+\mathbf{F_{e}}=\int_{A} f \mathbf{N}^T \, dxdy = \int_{A} f
+\begin{tiny} \begin{bmatrix} N_1 \\ N_2 \\ N_3 \end{bmatrix}\end{tiny}
+\, dxdy
+\label{eq:localF}
+\end{equation}
+
+For fulfilment of the necessary integration in equations
+\ref{eq:localA}, \ref{eq:localB}, \ref{eq:localC}, \ref{eq:localD},
+\ref{eq:localE} and \ref{eq:localF}, the analytical
+integration formula, equation \ref{eq:areaint} is used. The
+integration round the element of boundary flux term gives:
+
+\begin{equation}
+\begin{split}
+&\mathbf{Q_{e}}=\int_{l}q\mathbf{N}^{T}ds= \int_{l}q  \begin{tiny}
+  \begin{bmatrix} N_1 \\ N_2 \\ N_3 \end{bmatrix}\end{tiny} \, ds = \\
+& \begin{tiny} \frac{q_{1-2}l_{1-2}}{2}\begin{bmatrix}
+    1 \\ 1 \\ 0 \end{bmatrix} +\frac{q_{1-3}l_{1-3}}{2}\begin{bmatrix}
+    1 \\ 0 \\ 1 \end{bmatrix} +\frac{q_{2-3}l_{2-3}}{2}\begin{bmatrix}
+    0 \\ 1 \\ 1 \end{bmatrix} \end{tiny}
+\label{eq:localQ}
+\end{split}
+\end{equation}
+
+where the flow was approximated to be constant through an element side
+The integration shall only be done on element edges with Neumann
+boundary conditions. For fulfilling the integration equation
+\ref{eq:boundaryint} has been used. $l_{1-2}$, $l_{1-3}$ and $l_{2-3}$
+are the side lengths and $q_{1-2}$, $q_{1-3}$ and $q_{2-3}$ are the
+fluxes through sides with Neumann boundary conditions. \\
+\\
+After calculation of all the local element matrices, all the element
+contributions are added (assembled) to equation \ref{eq:matrix}. The
+task is now to solve the ODE.
+
+
+\subsubsection{Example}
+
+An example of construction of the $\mathbf{B}$-matrix occurring in
+equation \ref{eq:matrix} and originating from the term that includes
+$\mathbf{b}$ in the general PDE, equation \ref{eq:general}, is given
+here. The geometry, consisting of 2 elements is shown in figure
+\ref{fig:assembling}. \\
+\\
+For constructing $\mathbf{B}$ it is necessary first to calculate the
+local $\mathbf{B_e}$-matrices as given by equation
+\ref{eq:localB}. For the simplicity the value of $\mathbf{b}$ is 1 in
+the whole domain, i.e. an isotropic situation equivalent with:
+
+\begin{equation}
+\mathbf{b}=\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}
+\end{equation}
+
+
+\begin{figure}[h]  %here-top-bottom-page
+\begin{center}
+\epsffile{assembling.eps}
+%\epsfig{file=assembling.eps,width=9cm}
+\figcap{Geometry used for assembling example. Nodes and elements are
+  numbered. Local node numbering in ().}
+\label{fig:assembling}
+\end{center}
+\end{figure}
+
+
+Inserting the actual $\mathbf{b}$ in equation \ref{eq:localB} followed
+by integration gives:
+
+\begin{equation}
+\mathbf{B_e}= A \begin{tiny}
+\begin{bmatrix} (\frac{\partial
+  N_{1}}{\partial x})^{2}+(\frac{\partial N_{1}}{\partial y})^{2}
+ &\frac{\partial N_{1}}{\partial x}\frac{\partial N_{2}}{\partial x}+ \frac{\partial N_{1}}{\partial y}\frac{\partial N_{2}}{\partial y}
+&\frac{\partial N_{1}}{\partial x}\frac{\partial N_{3}}{\partial x}+
+ \frac{\partial N_{1}}{\partial y}\frac{\partial N_{3}}{\partial y} \\ 
+\frac{\partial N_{2}}{\partial x}\frac{\partial N_{1}}{\partial
+ x}+\frac{\partial N_{2}}{\partial y}\frac{\partial N_{1}}{\partial y}
+&(\frac{\partial N_{2}}{\partial x})^{2}+ (\frac{\partial
+ N_{2}}{\partial y})^{2} &\frac{\partial N_{2}}{\partial
+ x}\frac{\partial N_{3}}{\partial x}+\frac{\partial N_{2}}{\partial
+ y}\frac{\partial N_{3}}{\partial y}\\ \frac{\partial N_{3}}{\partial
+ x}\frac{\partial N_{1}}{\partial x}+\frac{\partial N_{3}}{\partial
+ y}\frac{\partial N_{1}}{\partial y} 
+&\frac{\partial N_{3}}{\partial x}\frac{\partial N_{2}}{\partial x}  +
+ \frac{\partial N_{3}}{\partial y}\frac{\partial N_{2}}{\partial y}
+&(\frac{\partial N_{3}}{\partial x})^{2}+ (\frac{\partial
+ N_{3}}{\partial y})^{2}
+\end{bmatrix} \end{tiny}
+\end{equation}
+
+The area of each of the elements, $A$ is 1. The partial derivatives of
+the basis functions are shown in table \ref{tab:partderiv}. 
+
+
+\begin{table}[H]
+\centering
+\sbox{\mybox}{\begin{tabular}{p{2cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}}\hline
+\textbf{Element} & $\frac{\partial N_1}{\partial x}$ & $\frac{\partial
+  N_2}{\partial x}$ & $\frac{\partial N_3}{\partial x}$ &
+$\frac{\partial N_1}{\partial y}$ & $\frac{\partial N_2}{\partial y}$
+& $\frac{\partial N_3}{\partial y}$ \\ \hline
+1 & -0.5 & 0.5 & 0 & 0 & -1 & 1 \\ \hline
+2 & 0 & 0.5 & -0.5 & -1 & 0 & 1 \\ \hline 
+\end{tabular}}
+\settowidth{\mylength}{\usebox{\mybox}}
+\setcaptionwidth{\mylength}
+\tabcap{Partial derivatives of the basis functions}
+\label{tab:partderiv}
+\usebox{\mybox}
+\end{table}
+
+The local matrices are then:
+
+\begin{equation}
+\mathbf{B_1}=
+\begin{bmatrix} 0.25 & -0.25 & 0 \\ 
+-0.25 & 1.25 & -1 \\
+0 & -1 & 1 
+\end{bmatrix}, \quad 
+\mathbf{B_2}= 
+\begin{bmatrix}
+1 & 0 & -1 \\
+0 & 0.25 & -0.25 \\
+-1 & -0.25 & 1.25 
+\end{bmatrix}
+\end{equation}
+
+The global $\mathbf{B}$-matrix is a 4-by-4 matric since the mesh have
+4 nodal points. The connectivity between the elements retrieved from figure
+\ref{fig:assembling} is summarized in table \ref{tab:connectivity}.
+
+\begin{table}[H]
+\centering 
+\sbox{\mybox}{\begin{tabular}{p{2.0cm}|p{1.6cm}|p{1.6cm}|p{1.6cm}} \hline
+\textbf{Element} & local 1 & local 2 & local 3 \\ \hline
+1 & 1 & 2 & 4 \\ \hline 
+2 & 1 & 4 & 3 \\ \hline 
+\end{tabular}}
+\settowidth{\mylength}{\usebox{\mybox}}
+\setcaptionwidth{\mylength}
+\tabcap{Global node numbering}
+\label{tab:connectivity}
+\usebox{\mybox}
+\end{table}
+
+Using the table it is possible to calculate the contribution to
+$\mathbf{B}$ from element 1 and 2:
+
+
+\begin{equation}
+\begin{bmatrix}
+0.25 & -0.25 & 0 & 0 \\
+-0.25 & 1.25 & 0 & -1 \\
+0 & 0 & 0 & 0 \\
+0 & -1 & 0 & 1 
+\end{bmatrix} \quad \text{and} \quad
+\begin{bmatrix}
+1 & 0 & -1 & 0 \\
+0 & 0 & 0 & 0 \\
+-1 & 0 & 1.25 & -0.25 \\
+0 & 0 & -0.25 & 0.25 
+\end{bmatrix}
+\end{equation}
+
+The $\mathbf{B}$ is the sum of the contributions from each element:
+
+\begin{equation}
+\mathbf{B}=
+\begin{bmatrix}
+1.25 & -0.25 & -1 & 0 \\
+-0.25 & 1.25 & 0 & -1 \\
+-1 & 0 & 1.25 & -0.25 \\
+0 & -1 & -0.25 & 1.25
+\end{bmatrix}
+\end{equation}
+
+Node 1 and 4 have contributions from both elements, whereas the
+remaining elements have contribution from only one element.
+
+\section{Time stepping procedure}\index{time stepping}
+
+There are several more or less sophisticated methods to solve
+ODEs\index{ODE}. Methods as Euler and the trapezoidal rule are widely
+used. Both the trapezoidal rule\index{trapezoidal rule} and the Euler
+method are included in the $\theta$-method as described by
+\cite{Iserles}. Instead of using $\theta$ as the parameter, $\omega$
+is here used to prevent confusing misunderstandings with the water
+content. If the \textit{initial value problem} (IVP)\index{IVP} can be
+expressed as:
+
+
+\begin{equation}
+\boldsymbol{\dot{\phi}}=\mathbf{f}(t,\boldsymbol{\phi}),\ \ \ \ \ \ t
+\geq t_{0}, \ \ \ \ \ \boldsymbol{\phi}(t_{0})=\boldsymbol{\phi}_{0}
+\label{eq:IVP}
+\end{equation}
+
+where $\boldsymbol{\phi}$ is a vector and
+$\mathbf{f}(t,\boldsymbol{\phi})$ is a vector function, a numerical
+procedure to solve the IVP can be written as: 
+
+\begin{equation} \begin{split}
+\boldsymbol{\phi}(t_{n+1}) &=\boldsymbol{\phi}(t_{n})+ \omega \Delta t
+\mathbf{f}(t_{n},\boldsymbol{\phi}_{n})+(1-\omega) \Delta t\mathbf{f}(t_{n+1}, 
+\boldsymbol{\phi}(t_{n+1}))  
+ \\ &+(\omega-\frac{1}{2})\Delta
+t^2\boldsymbol{\phi}''(t_{n})+(\frac{1}{2}\omega-\frac{1}{3}) \Delta
+t^3\boldsymbol{\phi}'''(t_{n})+O(\Delta t^4) \\
+& \approx \boldsymbol{\phi}(t_{n})+ \omega \Delta t
+\mathbf{f}(t_{n},\boldsymbol{\phi}_{n})+(1-\omega) \Delta t\mathbf{f}(t_{n+1}, 
+\boldsymbol{\phi}(t_{n+1})) 
+\label{eq:diffsol}
+\end{split} \end{equation}
+
+where $n$ and $n+1$ are numbers of the time levels and $\Delta t$ is
+the length of the timestep. The timeweighting parameter\footnote{Many
+  places, for instance \cite{Quarteroni} the timeweighting parameter,
+  $\omega$ is associated with timestep $n+1$ and $(\omega-1)$ with
+  timestep $n$, i.e the reverse.}, $\omega$ is restricted to the interval,
+$0 \leq \omega \leq 1$. $\omega$ decides how the weighting in time
+shall be for $\mathbf{f}$. For $\omega=\frac{1}{2}$ it can be seen
+that the method is of order 2. For other values it is order 1. For
+$\omega=\frac{2}{3}$ we see the $O(\Delta t^3)$ term in
+\ref{eq:diffsol} vanishes while the $O(\Delta t^2)$ remains. In very
+special cases this can be an advantage, \cite{Iserles}. The method is
+according to definition in \cite{Quarteroni} a \textit{one-step
+method}\index{one-step method}\index{method!one-step}. For
+$\omega=1$ is it \textit{explicit}\index{explicit
+  method}\index{method!explicit}, oherwise method is
+\textit{implicit}\index{implicit method}\index{method!implicit}.
+
+
+
+The method has
+names for some special values of $\omega$: 
+
+\begin{itemize}
+\item $\omega=0$ \textit{backward difference}\index{backward
+    difference} or \textit{backward Euler}\index{backward Euler}
+\item $\omega=\frac{1}{2}$ \textit{central difference}\index{central
+    difference}, \textit{trapezoidal rule}\index{trapezoidal rule} or
+  \textit{Crank-Nicolson}\index{Crank-Nicolson}
+\item $\omega=1$ \textit{forward difference}\index{forward difference}
+  or \textit{forward Euler}\index{forward Euler}
+\end{itemize}
+
+The backward Euler method is widely used in models of unsaturated
+flow. For the advection-dispersion equation the Crank-Nicolson 
+scheme is often used.\\
+\\
+
+The actual IVP can by applying equation \ref{eq:matrix} be written as:
+
+\begin{equation} 
+\boldsymbol{\dot{\phi}}=\mathbf{A^{-1}}(\mathbf{G}-\mathbf{H}\boldsymbol{\phi})
+, \ \ \ \ \ t\geq t_0, \ \ \ \ \
+\boldsymbol{\phi}(t_0)=\boldsymbol{\phi}_0
+\label{eq:IVPdef}
+\end{equation}
+
+where $\mathbf{G}=-(\mathbf{D}+\mathbf{F}+\mathbf{Q})$ and
+$\mathbf{H}=\mathbf{B}-\mathbf{C}+\mathbf{E}$.  It is very important
+to note that $\mathbf{A}$ shall be regular. How this is fulfilled
+will be described later. By applying \ref{eq:diffsol} we get:
+
+\begin{equation} \begin{split}
+\boldsymbol{\phi}_{n+1}=& \boldsymbol{\phi}_{n}+ \omega \Delta t
+\mathbf{A}_{n}^{-1}(\mathbf{G}_{n}-\mathbf{H}_{n}\boldsymbol{\phi}_n)
++\\ &
+(1-\omega) \Delta t
+\mathbf{A}_{n+1}^{-1}(\mathbf{G}_{n+1}-\mathbf{H}_{n+1}\boldsymbol{\phi}_{n+1})
+\label{eq:gentheta}
+\end{split} \end{equation}
+
+Equation \ref{eq:gentheta} can be written so we get the unknown,
+$\boldsymbol{\phi}_{n+1}$ on the left hand side:
+
+\begin{equation} \begin{split} 
+(\mathbf{A}_{n+1} + &\Delta t(1-\omega)\mathbf{H}_{n+1})\boldsymbol{\phi}_{n+1} =\mathbf{A}_{n+1}\boldsymbol{\phi}_{n} +\\ &\Delta t \omega
+\mathbf{A}_{n+1}\mathbf{A}^{-1}_{n}(\mathbf{G}_{n}-\mathbf{H}_{n}\boldsymbol{\phi}_{n}) + \\  &\Delta
+t(1-\omega)\mathbf{G}_{n+1}
+\end{split} \end{equation}
+
+But both $\mathbf{A}$, $\mathbf{H}$ and $\mathbf{G}$ are 
+  functions of $\boldsymbol{\phi}$. For solving the equations, the
+  \textit{Picard iterations}\index{Picard iterations} can be used. The unknown
+  $\boldsymbol{\phi}_{n+1}$ is estimated by using the latest estimate
+  of $\mathbf{A}_{n+1}$, $\mathbf{G}_{n+1}$ and
+  $\mathbf{H}_{n+1}$. The iteration scheme can be written as:
+
+
+\begin{equation} \begin{split}
+(\mathbf{A}_{n+1,m}+&\Delta
+t(1-\omega)\mathbf{H}_{n+1,m})\boldsymbol{\phi}_{n+1,m+1} = \\
+&\mathbf{A}_{n+1,m}\boldsymbol{\phi}_{n}+\Delta t \omega
+\mathbf{A}_{n+1}(\mathbf{A}_{n})^{-1}(\mathbf{G}_{n}-\mathbf{H}_{n}\boldsymbol{\phi}_{n})+
+\\ &\Delta t(1-\omega)\mathbf{G}_{n+1,m}  
+\end{split}
+\label{eq:Picard}
+\end{equation}
+
+where $m$ and $m+1$ denote the iteration levels. The iteration
+procedure stops when a chosen norm, for example the $\infty$-norm of
+the change in $\boldsymbol{\phi}$ between to iterations is below a
+certain chosen value, $\epsilon$.\\
+\\
+It can bee seen that many advantages are obtained by choosing $\omega$
+to be $0$ because no time is spent on the rather time consuming
+process to calculate $\mathbf{A}^{-1}$.  But in the general case where
+the $\mathbf{A}$ has to be inverted, it can save a lot of time if
+$\mathbf{A}$ is a diagonal, i.e. if it is lumped. The choice of
+$\omega=0$ is also for stability reasons a good choice,
+\cite{Iserles}. Later it is discussed how the size of $\Delta t$ is
+controlled.
+
+ 
+
+
+\subsection{Lumping}\index{lumping}
+
+The former expressed form of the local $\mathbf{A}$-matrix is called
+the \textit{consistent}\index{consistent form} or
+\textit{distributed}\index{distributed} form. The matrix is not a diagonal matrix since the local matrices are non-diagonal. Except for
+$\omega=0$ the matrix has to be inverted for each timestep. The
+invertion\index{matrix!invertion} is a quite time consuming
+task. The invertion could be much faster if $A$ was a diagonal matrix
+- often called a \textit{lumped} matrix. The lumped matrices are often
+produced by using different basis functions for the derivative
+compared to the other terms in the weak formulation - i.e there is not
+consistence. \\
+\\
+Also in structural mechanics\index{structural mechanics} it is normal
+to use lumped mass matrices, see for example \cite{Bang,Bathe}. Here the unknown is often the displacement and the
+differential equation of second order according to Newton큦 second
+law. The term before the second order time derivative is then the
+mass. The physical explanation of a lumped mass matrix is that all the
+mass is placed in the nodal points. The similar physical explanation
+in for example the water movement equation is that all water capacity
+is placed in the nodal points, which may not seem to be physically
+reasonable at first. \\
+\\
+\cite{Segerlind} has theoretically examined the (linear) heat
+flow\index{heat flow equation} equation (which is not so different
+from Richards equation) and came to the conclusion that lumping also
+prevents oscillations. \cite{Celia} came to the conclusion that a
+lumped capacity matrix ($\mathbf{A}$) can prevent numerical
+oscillations\index{numerical oscillations} and slow
+convergence\index{convergence} for the solution of Richard's
+equation. Both \cite{Neuman} and \cite{SWMS} use a lumped formulation
+of the time derivative in the water movement models. \cite{SWMS} also
+use lumped formulation of the time derivative in the
+advection-dispersion equation. The conclusions by \cite{Wood} is
+somewhat different. \cite{Wood} examined the flow in a hill slope with
+rainfall and recommend the use of a distributed matrix instead of a
+lumped one. The discharge predictions were more precise and the
+calculation times only slightly higher.\\
+\\
+TopFEM makes it up to the user to decide whether the consistent or a
+lumped formulation shall be used for the time derivatives.\\
+\\
+There are different ways to construct the lumped matrix. But the basic 
+idea is as explained before, that the $\mathbf{A}$ matrix and then also
+the  $\mathbf{A_e}$-matrices are diagonal matrices. \cite{Segerlind}
+divides each element into three equally large areas as shown in figure
+\ref{fig:Segerlindlumping}. The local element basis functions are
+defined so that $N_{i}^{*}=1$ for $(x,y) \in A_i$ and $N_{i}^{*}=0$
+for $(x,y)\notin A_i$. This leads to:
+
+\begin{equation}
+\begin{split}
+&\boldsymbol{(A\dot{\phi})_e}=\int_{A} a
+\boldsymbol{\dot{\phi}_e}\mathbf{N^*}^{T}dA=\mathbf{A^*_e}\boldsymbol{\dot{\phi}_{e}}, \\
+& \mathbf{A^{*}_{e}}=\int_A a 
+\begin{tiny} \begin{bmatrix}
+(N_1^*)^2 & 0 & 0 \\
+0 & (N_2^*)^2 & 0 \\ 
+0 & 0 & (N_3^*)^2 
+\end{bmatrix} \end{tiny} \,dxdy
+\end{split}
+\end{equation}
+
+where $\mathbf{N^*}=[N_1^* \ N_2^*\ N_3^*]$.
+
+\begin{figure}[h]  %here-top-bottom-page
+\begin{center}
+\begin{picture}(160,120)(-20,-20)
+\thicklines
+\put(0,0) {\line(1,0){120}}
+\put(120,0){\line(-2,3){60}}
+\put(60,90){\line(-2,-3){60}}
+\thinlines
+\put(60,0){\line(0,1){30}}
+\put(30,45){\line(2,-1){30}}
+\put(90,45){\line(-2,-1){30}}
+\put(0,0){\circle*{3}}
+\put(120,0){\circle*{3}}
+\put(60,90){\circle*{3}}
+\put(-15,-15){P1}
+\put(130,-10){P2}
+\put(60,95){P3}
+\put(20,15){A1}
+\put(75,15){A2}
+\put(60,50){A3}
+\end{picture}
+\figcap{Division of an element into three equally large areas for
+  definition of $N^*$ used by \cite{Segerlind}.}
+\label{fig:Segerlindlumping}
+\end{center}
+\end{figure}
+
+A second way to diagonalize $\mathbf{A}$ is to do as
+\cite{Neuman,SWMS}\index{Neuman}\index{SWMS2D@{SWMS\_2D}} where the
+time derivative of $\phi$ in nodal point $n$, $\partial \phi_n
+/\partial t$ is defined as a weighted average of $\partial \phi/
+\partial t$ over the flow region (or simply just where the test
+function is nonzero):
+
+
+
+\begin{equation}
+\frac{\partial \phi_n}{\partial t} \equiv \frac{\int_{ \Omega}a
+  \frac{\partial \phi}{\partial t}v_n \, d\Omega} {\int_{
+  \Omega}av_{n}\, d\Omega} \Leftrightarrow \int_{ \Omega}a
+  \frac{\partial \phi}{\partial t}v_n \, d\Omega=\frac{\partial
+  \phi_n}{\partial t}\int_{\Omega}av_{n}\, d\Omega
+\end{equation}
+
+This is equivalent to moving the off-diagonal of the consistent
+matrix onto the diagonal. This can on local element basis be written
+as:
+
+\begin{equation}
+\begin{split}
+&\boldsymbol{(A\dot{\phi})_e}=\int_{A}a \begin{tiny}
+\begin{bmatrix}
+  N_1 & 0 & 0 \\ 
+0 & N_2 & 0 \\
+0 & 0 & N_3 \end{bmatrix}\end{tiny} \,dxdy \begin{tiny} \begin{bmatrix} \dot{\phi}_1 \\ \dot{\phi}_2 \\
+\dot{\phi}_3 \end{bmatrix}\end{tiny}
+=\mathbf{A_{e}}\boldsymbol{\dot{\phi}}_{e},  \\
+& \mathbf{A_e}=\int_{A}a \begin{tiny} \begin{bmatrix}
+  N_1 & 0 & 0 \\ 
+0 & N_2 & 0 \\
+0 & 0 & N_3 \end{bmatrix}\end{tiny}\,dxdy
+\end{split}
+\end{equation}
+
+\cite{Istok} uses the following interpolation functions for the time
+derivative of $\phi$ at each node and for the weighting
+function:
+
+\begin{equation}
+ N_{i}^{*}N_{j}^{*}=\begin{cases} \frac{1}{3} & \text{if
+        $i=j$}\\
+0 & \text{otherwise} \end{cases}
+\end{equation}
+
+On local element basis it is:
+
+
+\begin{equation}\begin{split}
+& \boldsymbol{(A\dot{\phi})_e}=\int_{A} a
+\phi_{e}\mathbf{N^*}^{T} \, dA=\mathbf{A_e} \boldsymbol{\dot{\phi}_e}\\ 
+& \mathbf{A_e}=\frac{1}{3}\int_{A} a \begin{tiny}\begin{bmatrix} 1 &
+    0 &  0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}\end{tiny} \,dxdy
+\end{split} \end{equation}
+
+We can see that generally the different lumping techniques lead to
+different numerical schemes. The following question is then: Does the
+different schemes have significant influence of the obtained solution
+and rate of convergence?  
+
+
+\section{Dirichlet boundary conditions}\index{boundary
+  condition!Dirichlet}
+
+
+Both in the timestepping iterations for the general PDE according to
+ equation \ref{eq:Picard} and for the mixed formulation used for water
+ movement simulations, the iteration from step $m$ to $m+1$ forms a
+ matrix equation of the form: 
+
+\begin{equation}
+\mathbf{A}_m\boldsymbol{\phi}_{m+1}=\mathbf{b}_{m}
+\label{eq:Axb}
+\end{equation}
+
+Not to be confused with $\mathbf{A}$ used earlier in for example in
+equation \ref{eq:matrix}. The Dirichlet boundary conditions are directly
+implemented in equation \ref{eq:Axb}. If node no. $i$ is placed at a
+Dirichlet boundary, the value of element $a(i,i)$ is set to 1 and the
+values of $a(i,j), \ j=1,2 \dots NP,  j \neq i$ are replaced
+with zeros. $b(i)$ is set to the specified $\phi$ (pressure
+or concentration). \\ 
+\\
+$\mathbf{A}$ from water movement equations is symmetric (see later), i.e
+$\mathbf{A}=\mathbf{A}^T$. Solution of symmetric matrix equations is
+often cheaper (less CPU-costs) than the solution of non-symmetric
+matrices. To keep a symmetric $\mathbf{A}$ matrix symmetric after
+implementation of the Dirichlet boundary conditions, some extra row
+operations are done. Columns $i$ are replaced with zeros except at the
+diagonal, by the row operation: $Row \ j = Row\ j -a(j,i) *Row\ i$ for
+$j=1\dots NP, \ j\neq i$. The here described operations have to be
+done for every Dirichlet node.  \\ 
+\\
+Figure \ref{fig:sparsea} is an example of the $\mathbf{A}$-matrix from
+water movement simulations before implementation of the Dirichlet
+boundary conditions. Figure \ref{fig:sparsechange} shows the elements in
+$\mathbf{A}$, which after implementation of a (little) boundary with
+Dirichlet conditions have been changed to zero. \\
+\\
+
+\begin{figure}[h]  %htbp=here-top-bottom-page
+\begin{center}
+\epsffile{sparsea.eps}
+%\epsfig{file=sparsea.eps,width=9cm}
+\figcap{Example of the $\mathbf{A}$-matrix before implementation of
+  the Dirichlet boundary conditions. The 3443 dots are the nonzero
+  elements in $\mathbf{A}$. $\mathbf{A}$ is symmetric.}
+\label{fig:sparsea}
+\end{center}
+\end{figure}
+
+\begin{figure}[h]  %htbp=here-top-bottom-page
+\begin{center}
+\epsffile{sparsechange.eps}
+%\epsfig{file=sparsechange.eps,width=9cm}
+\figcap{Example of the change in the $\mathbf{A}$-matrix after
+  implementation of the Dirichlet boundary conditions. The 84 dots are
+  elements which have changed to zero in $\mathbf{A}$ after
+  implementation of the Dirichlet boundary conditions. The matrix is
+  symmetric so $\mathbf{A}$ is still symmetric.}
+\label{fig:sparsechange}
+\end{center}
+\end{figure}
+
+If $\mathbf{A}_{m,dir}$ and $\mathbf{b}_{m,dir}$ are the $\mathbf{A}_m$
+and $\mathbf{b}_m$-matrices after implementation of the Dirichlet
+boundary conditions, the new equation which have to be solved is: 
+
+\begin{equation}
+\mathbf{A}_{m,dir}\boldsymbol{\phi}_{m+1}=\mathbf{b}_{m,dir}
+\label{eq:Axbdir}
+\end{equation}
+
+The method described here is relatively easy to implement. But another
+method to implement the Dirichlet boundary conditions is using
+\textit{Lagrange multipliers} as for example in FEMLAB,
+\cite{FEMLAB}. \\ 
+\\
+After implementation of the Dirichlet boundary conditions, the natural
+subsequent question for the hydrologist is, what is the size of the
+flow through these boundaries?
+
+
+\subsection{Boundary fluxes}\index{boundary flux}
+
+During the simulations, the flow through the boundaries with
+Dirichlet boundaries are evaluated by calculating backwards after the
+implementation of the Dirichlet boundary conditions to see what
+Neumann boundaries it will correspond to. \\
+\\
+The procedure is simply to calculate a new right side using
+$\mathbf{A}$ before the implementation and the solution,
+$\boldsymbol{\phi}$ obtained after implementation of the Dirichlet
+boundary conditions. The difference between the new right side and the
+old one is simply due to the changes from the Dirichlet boundary
+conditions:
+
+\begin{equation}
+\Delta \mathbf{b}=\mathbf{b}_{m}-\mathbf{A}_m\boldsymbol{\phi_{m+1}}
+\end{equation}
+
+The change in $\mathbf{b}$ is because the Dirichlet boundaries now are
+expressed as Neumann boundaries. Using equation \ref{eq:Picard} it can
+be realized that:
+
+\begin{equation}
+\mathbf{Q_{dir}}=-\frac{1}{\Delta t}\Delta \mathbf{b}
+\end{equation}
+
+where $\mathbf{Q_{dir}}$ is a vector similar to $\mathbf{Q}$ - but here
+  due the flow out of Dirichlet boundaries. The task is now simply to
+  calculate backwards to evaluate the flux through the element sides,
+  according to equation \ref{eq:localQ}. It is of course also possible to
+  calculate boundary fluxes using the solution and the equation for
+  the flux (for example Darcys equation to determine the
+  water flow). Tests have shown that this method gives occasion to
+  rather bad mass balances, even if the solution is good. It is in
+  general a hard job to evaluate the fluxes at the nodal points (or
+  along element edges) as the derivative of the approximation to the
+  solution has jump-discontinuities here. In, the Solute movement
+  section, it is described how water fluxes are evaluated at nodal
+  points, but the information is not used for evaluating the boundary
+  fluxes.
+
+
+
+
+\section{Matrix solution technique}\index{matrix!solution}
+
+When solving the ODE defined by equation \ref{eq:matrix} it is when
+$\omega\neq 0$ also necessary to use the inverse of a matrix, for that
+purpose the built-in function \textsf{inv} is used. The computational
+costs for a non-diagonal matrix is very high so the lumped (diagonal)
+versions can be used with advantage. \\
+\\
+For solving the large matrix system of the type
+$\mathbf{Ax}=\mathbf{b}$, the MATLAB backslash
+operator\index{MATLAB!backslash operator} (also called
+leftdivision) is used. By using the backslash operator, MATLAB makes
+some tests and finds an appropriate direct method for solving the
+equation. MATLAB (and then also TopFEM) gives warning messages for
+badly scaled (or singular) matrices (where the solution maybe have
+large errors). It is an (often made) mistake to use \textsf{inv} to
+solve the system of equations by
+$\mathbf{x}=\mathbf{A}^{-1}\mathbf{b}$, the computational costs are 2-3
+times larger than using the backslash operator and the accuracy is much
+smaller according to MATLAB. \\ 
+\\
+The calculation costs of physical entities, such as water capacity
+(water movement simulations) and water fluxes (solute movement
+simulations) all more or less proportional with the number of nodal
+points, $\text{NP}$, whereas the solution of the matrix is strongly
+dependent on the dimension of $\mathbf{A}$. When using the backslash
+operator (also denoted leftdivision) MATLAB uses a direct method for
+solving the linear equations. For large systems, the number of
+floating point operations in Gauss elimination are proportional to
+$\text{NP}^3$. The actual number of floating point operations are
+probably lower since $\mathbf{A}$ has low density and MATLAB has
+special algorithms for sparse matrices.\\
+\\
+If $\mathbf{A}$ is symmetric, MATLAB attempts to use a Cholesky
+factorization\index{Cholesky factorization} of $\mathbf{A}$:
+
+\begin{equation}
+\mathbf{A}=\mathbf{L}^T\mathbf{L}
+\end{equation}
+
+Where $\mathbf{L}$ is a lower triangular matrix. The solution is
+simply first to solve $\mathbf{L}^T\mathbf{z}=\mathbf{b}$ and then solve
+$\mathbf{L}\mathbf{x}=\mathbf{z}$. The Cholesky factorization can be
+used with success if $\mathbf{A}$ is positive definite. The Cholesky
+factorization requires according to MATLAB less than half the
+computational time of a general factorization. Similar results are
+given in \cite{Atkinson,Numerisk}. If $\mathbf{A}$ is not
+symmetric or the Cholesky factorization fails, other factorization
+methods as for example LU-factorization\index{LU factorization} with
+pivoting (a kind of Gauss elimination) are used:
+
+
+\begin{equation}
+\mathbf{A}=\mathbf{L}\mathbf{U}
+\end{equation}
+
+where $\mathbf{L}$ is a lower triangular matrix and $\mathbf{U}$ is an 
+upper triangular matrix. The solution method is first to solve
+$\mathbf{L}\mathbf{z}=\mathbf{b}$ and
+$\mathbf{U}\mathbf{x}=\mathbf{z}$ by using forward and backward
+substitution. \\
+\\
+For larger especially sparse systems it is often an advantage to use
+iterative methods. Jacobi\index{Jacobi} and
+Gauss-Seidel\index{Gauss-Seidel} and SOR\index{SOR} (Successive Over
+Relaxation) are often used. MATLAB has build-in solvers for GMRES and
+PCG (only for symmetric matrices). All the here mentioned iterative
+methods are discussed in \cite{DCAM}.
+
+
+\section{Water movement}
+
+In this section special features of the solution of Richard's
+equation are discussed. One of these is the mixed formulation where
+the solution strategy is different from the general one described by
+equation \ref{eq:matrix}. The local matrices and the assumptions for
+calculating them are also explained.
+
+
+
+\subsection{Mixed formulation}\index{mixed
+  formulation}\index{formulation!mixed}
+
+
+The $\psi$-based formulation\index{pressure
+  formulation}\index{formulation!pressure} has the disadvantage that
+  it does not conserve the mass and can give erroneous estimates of
+  infiltration depths, \cite{Celia}. In the mixed
+  formulation the time derivative part of Richard큦 equation is
+  approximated in another way as in the $\psi$-based
+  formulation. Picard iterations are still applied. In the mixed
+  formulation proposed by \cite{Celia}, the water content is at time
+  step $n+1$ and iteration step $m+1$ approximated by:
+
+\begin{equation}\begin{split}
+\theta_{n+1,m+1}&=\theta_{n+1,m}+\frac{d\theta}{d\psi}\mid_{n+1,m}(\psi_{n+1,m+
+  1}-\psi_{n+1,m})\\
+&=\theta_{n+1,m} +C_{w,n+1,m}(\psi_{n+1,m+1}-\psi_{n+1,m}) 
+\label{eq:taylor}
+\end{split}
+\end{equation}
+
+This is simply a Taylor expansion. The time derivative of $\theta$ can
+then be approximated as:
+
+\begin{equation}\begin{split}
+\frac{\partial \theta}{\partial t}&\approx
+\frac{\theta_{n+1,m+1}-\theta_{n}}{\Delta
+  t}=\frac{\theta_{n+1,m+1}-\theta_{n+1,m}}{\Delta
+  t}+\frac{\theta_{n+1,m}-\theta_{n}}{\Delta t}\\ & \approx C_{w,n+1,m}
+\frac{\psi_{n+1,m+1}-\psi_{n+1,m}}{\Delta
+  t}+\frac{\theta_{n+1,m}-\theta_{n}}{\Delta t}
+\end{split}\end{equation}
+
+The Taylor expansion cancels the unknown water content at step $m+1$
+and replaces it with the pressure. So the terms with $\theta$ are at
+previous iteration steps, i.e they are known. \\
+\\
+The time derivative term in the weak formulation, equation
+\ref{eq:weak2} can on local element basis now be evaluated as: 
+
+\begin{equation}
+\begin{split}
+& \left(\int_A \frac{\partial \theta}{\partial t}
+  \mathbf{N}^T\,dxdy\right)_{\mathbf{e}} \approx  \frac{1}{\Delta t} \int_A
+(\theta_{n+1,m}-\theta_n)\mathbf{N}^T \,dxdy
+ + \\ & \frac{1}{\Delta t} \int_A C_{w,n+1,m}
+  \mathbf{N}(\boldsymbol{\psi_e}_{n+1,m+1}-\boldsymbol{\psi_e}_{n+1,m})\mathbf{N}^T\,dxdy = \\ &  \frac{1}{\Delta
+  t}(\mathbf{W_e}_{n+1,m}-\mathbf{W_e}_n)+ \frac{1}{\Delta t}\mathbf{A_e}_{n+1,m}(\boldsymbol{\psi_e}_{n+1,m+1}-\boldsymbol{\psi_e}_{n+1,m})
+\end{split}
+\label{eq:mixedmass}
+\end{equation}
+
+where:
+
+\begin{equation}
+\mathbf{W_e}=\int_A \theta \mathbf{N}^T \, dxdy = \int_A \theta
+\begin{tiny} \begin{bmatrix} N_1 \\ N_2 \\ N_3 \end{bmatrix}
+\end{tiny} \, dxdy
+\end{equation}
+
+Instead of using the consistent formulation, both $\mathbf{A}$ and
+$\mathbf{W}$ can be lumped. Different lumping procedures for $\mathbf{A}$
+have been described in the previous chapter. Similar ones can be used
+for $\mathbf{W}$. \\
+\\
+The local terms $\mathbf{W_e}$ are assembled to the vector
+$\mathbf{W}$. Almost the same numerical scheme as for solving
+\ref{eq:IVPdef} can be used:
+
+\begin{equation}
+\frac{1}{\Delta
+  t}\mathbf{A}_{n+1,m}(\boldsymbol{\psi}_{n+1,m+1}-\boldsymbol{\psi}_{n+1,m})+\frac{1}{\Delta
+  t}(\mathbf{W}_{n+1,m}-\mathbf{W}_n)
+  =\mathbf{G}-\mathbf{H}\boldsymbol{\psi} 
+\end{equation}
+
+$\mathbf{G}$ and $\boldsymbol{H\psi}$ kan still be weighted between
+timestep $n$ and $n+1$. The unknown $\boldsymbol{\psi}_{n+1}$ and
+$\boldsymbol{\theta}$ are estimated using the latest estimate of
+$\mathbf{A}_{n+1}$, $\mathbf{G}_{n+1}$ and $\mathbf{H}_{n+1}$:
+
+\begin{equation}
+\begin{split}
+(\mathbf{A}_{n+1,m}&+\Delta
+t(1-\omega)\mathbf{H}_{n+1,m})\boldsymbol{\psi}_{n+1,m+1}\\ &=
+\omega \Delta t(\mathbf{G}_{n}-\mathbf{H}_{n}\boldsymbol{\psi}_{n}) +
+(1-\omega)\Delta t \mathbf{G}_{n+1,m} \\ &+\mathbf{W}_n -\mathbf{W}_{n+1,m+1} + \mathbf{A}_{n+1,m}\boldsymbol{\psi}_{n+1,m}
+\end{split}
+\label{eq:Picard_mixed}
+\end{equation}
+
+It is worth to mention that $\mathbf{A}$ not have to be inverted in
+this model, independent of the chosen $\omega$. 
+
+
+\subsection{Local Matrices}\index{local matrices}
+
+Both the hydraulic conductivity\index{hydraulic conductivity}, the
+specific water capacity\index{specific water capacity} function
+and for the mixed formulation also the water content\index{water
+  content} are approximated by linear functions in each element, i.e.:
+
+
+\begin{equation}
+\begin{split}
+& C_w(\psi)_e \approx \mathbf{N}\mathbf{C_{w,e}} \\
+& K(\psi)_e \approx \mathbf{N}\mathbf{K_e} \\
+& \theta(\psi)_e \approx \mathbf{N}\boldsymbol{\theta_e} 
+\end{split}
+\label{eq:approxwat}
+\end{equation}
+
+It is worth to mention that $C_w$, $K$ and $\theta$ in contrast to
+$\psi$ are not generally assumed to have continuity. Possible 
+discontinuities exist between subdomains with different soil
+properties. The subdomain borders are here always coincident with
+element edges. \\
+\\
+The local element matrices and vectors are calculated by using
+equations \ref{eq:areaint}, \ref{eq:boundaryint}, and the approximation
+by equation \ref{eq:approxwat} applied in equations \ref{eq:localA} to
+\ref{eq:localQ}. The results are given in table
+\ref{tab:localmatwat}. $\bar{K}_e$ means the mean value of the hydraulic
+conductivity in the element, i.e. $\frac{1}{3}(K_1+K_2+K_3)$. \\
+\\
+ 
+\begin{table}[h]
+\tabcap{Local matrices, water movement}
+\begin{tabular}{p{1.5cm}|p{11.4cm}} \hline
+\textbf{Matrix} & \textbf{Value} \\ \hline
+$\mathbf{A_e}$ & $\begin{tiny}
+\frac{A}{60}\begin{bmatrix}
+6C_{w,1}+2C_{w,2}+2C_{w,3} & 2C_{w,1}+2C_{w,2}+C_{w,3}  &
+2C_{w,1}+C_{w,2}+2C_{w,3} \\
+2C_{w,1}+2C_{w,2}+C_{w,3}  & 2C_{w,1}+6C_{w,2}+2C_{w,3} &
+C_{w,1}+2C_{w,2}+2C_{w,3} \\ 
+2C_{w,1}+C_{w,2}+2C_{w,3}  & C_{w,1}+2C_{w,2}+2C_{w,3}  &
+2C_{w,1}+2C_{w,2}+6C_{w,3} \end{bmatrix} \end{tiny}$ \\ \hline
+$\mathbf{B_e}$ & $\begin{tiny} A \bar{K}_{e} \begin{bmatrix} (\frac{\partial
+  N_{1}}{\partial  x})^{2}+(\frac{\partial N_{1}}{\partial y})^{2}
+  &\frac{\partial  N_{1}}{\partial x}\frac{\partial N_{2}}{\partial
+  x}+ \frac{\partial N_{1}}{\partial y}\frac{\partial N_{2}}{\partial
+  y} &\frac{\partial N_{1}}{\partial x}\frac{\partial N_{3}}{\partial
+  x}+ \frac{\partial N_{1}}{\partial y}\frac{\partial N_{3}}{\partial
+  y}\\  \frac{\partial N_{2}}{\partial x}\frac{\partial
+  N_{1}}{\partial x}+ \frac{\partial N_{2}}{\partial y}\frac{\partial
+  N_{1}}{\partial y}  &(\frac{\partial N_{2}}{\partial
+  x})^{2}+(\frac{\partial N_{2}}{\partial y})^{2}  &\frac{\partial
+  N_{2}}{\partial x}\frac{\partial N_{3}}{\partial x}+  \frac{\partial
+  N_{2}}{\partial y}\frac{\partial N_{3}}{\partial y}\\
+  \frac{\partial N_{3}}{\partial x}\frac{\partial N_{1}}{\partial x}+
+  \frac{\partial N_{3}}{\partial y}\frac{\partial N_{1}}{\partial y}
+  &\frac{\partial N_{3}}{\partial x}\frac{\partial N_{2}}{\partial x}+
+  \frac{\partial N_{3}}{\partial y}\frac{\partial N_{2}}{\partial y}
+  &(\frac{\partial N_{3}}{\partial x})^{3}+(\frac{\partial 
+N_{3}}{\partial y})^{3} \end{bmatrix} \end{tiny}$  \\ \hline 
+$\mathbf{C_e}$ & $\begin{tiny}\begin{bmatrix} 0 & 0 \\ 0 & 0
+  \end{bmatrix}\end{tiny}$ \\ \hline
+$\mathbf{D_e}$ & $A\bar{K}_{e}\begin{tiny}\begin{bmatrix}\frac{\partial
+ N_{1}}{\partial y}\\ \frac{\partial N_{2}}{\partial y}\\
+  \frac{\partial N_{3}}{\partial y}\end{bmatrix}\end{tiny}$  \\ \hline 
+$\mathbf{E_e}$ & $\begin{tiny}\begin{bmatrix} 0 & 0 \\ 0 & 0
+  \end{bmatrix}\end{tiny}$ \\ \hline
+$\mathbf{F_e}$ & $ \frac{A}{12} \begin{tiny} \begin{bmatrix}
+2\Gamma_{1}+\Gamma_{2}+\Gamma_{3} \\
+\Gamma_{1}+2\Gamma_{2}+\Gamma_{3} \\
+\Gamma_{1}+\Gamma_{2}+2\Gamma_{3}\end{bmatrix}\end{tiny}$\\ \hline
+$\mathbf{Q_e}$ & $\begin{tiny} \frac{q_{1-2}l_{1-2}}{2}\begin{bmatrix}
+    1 \\ 1 \\ 0 \end{bmatrix} +\frac{q_{1-3}l_{1-3}}{2}\begin{bmatrix}
+    1 \\ 0 \\ 1 \end{bmatrix} +\frac{q_{2-3}l_{2-3}}{2}\begin{bmatrix}
+    0 \\ 1 \\ 1 \end{bmatrix} \end{tiny} $ \\ \hline
+$\mathbf{W_e}$ & $\frac{A}{12}\begin{tiny}\begin{bmatrix} 2\theta_1 &
+    \theta_2 & \theta_3 \\ \theta_1 & 2\theta_2 & \theta_3 \\ \theta_1
+    & \theta_2 & 2\theta_3 \end{bmatrix}\end{tiny}$ \\ \hline
+\end{tabular}
+\label{tab:localmatwat}
+\end{table}
+
+Table \ref{tab:watlump} gives the values of both the consistent and the
+different lumped versions of $\mathbf{A}$ and $\mathbf{W}$. The
+construction of the lumped matrices with the methods proposed by
+Neuman\index{Neuman} and Istok\index{Istok} is straightforward. For
+approximation of the specific water capacity function and the water
+content in the element are used linear polynomials, $C_e \approx
+\mathbf{NC_e}$ and $\theta_e \approx \boldsymbol{N
+  \theta_e}$. \cite{Segerlind} only considers a situation where the
+capacity function (here for heatflux) is constant in the domain. This
+led us to the problem of how to express the specific water capacity
+function. Here, the water capacity and the water content are
+approximated with the basisfunction $\mathbf{N^{*}}$. I.e. $C_e
+\approx \mathbf{N^{*}C_e}$ and $\theta_e \approx
+\boldsymbol{N^*\theta_e}$.
+
+
+\begin{table}[h]
+\tabcap{Lumping, water movement}
+\begin{tabular}{p{2cm}|p{10.9cm}} \hline
+\textbf{Method} & \textbf{Value} \\ \hline
+Consistent & $\mathbf{A_e}=\begin{tiny}
+\frac{A}{60}\begin{bmatrix}
+6C_{w,1}+2C_{w,2}+2C_{w,3} & 2C_{w,1}+2C_{w,2}+C_{w,3}  &
+2C_{w,1}+C_{w,2}+2C_{w,3} \\
+2C_{w,1}+2C_{w,2}+C_{w,3}  & 2C_{w,1}+6C_{w,2}+2C_{w,3} &
+C_{w,1}+2C_{w,2}+2C_{w,3} \\ 
+2C_{w,1}+C_{w,2}+2C_{w,3}  & C_{w,1}+2C_{w,2}+2C_{w,3}  &
+2C_{w,1}+2C_{w,2}+6C_{w,3}  \end{bmatrix} \end{tiny}$ \\ 
+& $\mathbf{W_e}=\frac{A}{12}\begin{tiny}\begin{bmatrix} 2\theta_1 &
+    \theta_2 & \theta_3 \\ \theta_1 & 2\theta_2 & \theta_3 \\ \theta_1
+    & \theta_2 & 2\theta_3 \end{bmatrix}\end{tiny}$ \\ \hline
+Segerlind & $\mathbf{A_{e}}=\frac{A}{3}\begin{tiny} \begin{bmatrix}
+C_{w,1} & 0 & 0 \\
+0 & C_{w,2} & 0 \\ 
+0 & 0 & C_{w,3} 
+\end{bmatrix} \end{tiny}$ \\ 
+& $\mathbf{W_e}=\frac{A}{3}\begin{tiny}\begin{bmatrix} \theta_1 &
+    0 & 0 \\ 0 & \theta_2 & 0 \\ 0
+    & 0 & \theta_3 \end{bmatrix}\end{tiny}$ \\ \hline
+Istok & $\mathbf{A_{e}}=\frac{A \bar{C}_e}{3} \begin{tiny}\begin{bmatrix}1 & 0 & 0 \\ 0 & 1 & 0 \\ 0
+  & 0 & 1 \end{bmatrix} \end{tiny}$ \\ 
+& $\mathbf{W_e}=\frac{A}{3}\begin{tiny}\begin{bmatrix} \theta_1 &
+    0 & 0 \\ 0 & \theta_2 & 0 \\ 0
+    & 0 & \theta_3 \end{bmatrix}\end{tiny}$ \\ \hline
+Neuman & $\mathbf{A_{e}}=\frac{A}{12}\begin{tiny}\begin{bmatrix}
+2C_{w,1}+C_{w,2}+C_{w,3} & 0  & 0 \\
+0 & C_{w,1}+2C_{w,2}+C_{w,3} & 0 \\ 
+0 & 0 & C_{w,1}+C_{w,2}+2C_{w,3} 
+\end{bmatrix}\end{tiny}$ \\ 
+& $\mathbf{W_e}=\frac{A}{12}\begin{tiny}\begin{bmatrix} 2\theta_1 +
+    \theta_2 + \theta_3 & 0 & 0\\ 0 & \theta_1 + 2\theta_2 + \theta_3
+    & 0 \\ 0 & 0 & \theta_1  + \theta_2 + 2\theta_3
+    \end{bmatrix}\end{tiny}$ \\ \hline
+\end{tabular}
+\label{tab:watlump}
+\end{table}
+
+
+\subsection{Size of the timesteps}\index{timesteps, size of}
+
+For water movement simulations it is possible either to choose a
+constant size of the time steps, $\Delta t$ or to choose timesteps
+which dynamically changes the size, dependent on how easy a
+sufficiently good solution is obtained in the Picard
+iterations\index{Picard iterations}. \\ 
+\\
+For the constant size of the timesteps a new timestep starts if either
+the iteration criterion is fulfilled or if the number of Picard
+iterations have reached a chosen maximum, $m_{max}$.\\
+\\
+For dynamically changing size of the timesteps the maximum number of
+Picard iterations $m_{max}$ should also be chosen. Also a minimum and
+maximum size to the timesteps, $\Delta t_{min}$ and $\Delta t_{max}$
+must be specified. The procedure is:
+
+
+\begin{enumerate}
+\item if $m\leq 4$ then $\Delta t_{n+1} = 1.1\Delta t_n$ but not larger than
+  $\Delta t_{max}$
+\item if $m=5$ then $\Delta t_{n+1}=\Delta t_n$ 
+\item if $6 \leq m\leq 7$ then $\Delta t_{n+1}=0.8 \Delta t_n$ but not lower
+  than $\Delta t_{min}$
+\item if $m>7$ then $\Delta t_{n+1}=0.3\Delta t_n$ but not lower than $\Delta
+   t_{min}$
+\item if $m=m_{max}$ then the time is only updated if $\Delta t_{n+1}=\Delta
+  t_{min}$ else it tries again with smaller timesteps  $\Delta t_n=
+  0.3\Delta t_n$ but not smaller than $\Delta t_{min}$
+\end{enumerate}
+
+\newpage
+
+\subsection{Mass balance}\index{mass balance!water}
+
+For a fast validation of simulations, a water balance index is
+calculated. It is here defined as:
+
+\begin{equation}
+\text{water balance index}=\frac{\Delta W+Q+S}{\frac{1}{3}(|\Delta
+  W|+|Q|+|S|)} 
+\label{eq:watbal}
+\end{equation}
+
+where $\Delta W$ is total change in the water storage. $Q$ is the
+total flux out of the domain, $S$ is the total amount of water removed
+from $\Omega$ by sinks (sources are negative sinks). \\
+\\
+The water balance index shall for most simulations ideally be
+zero. But if it is 0, it is not necessarily a correct solution. The
+water balance for $\Omega$ can be fulfilled in many ways. The
+water balance for the domain does not say anything about the internal
+distribution of the water. There can for example be oscillations
+(wiggles) around the real solution. The absolute value of the water
+balance index can rise (up to 3) for redistribution cases without
+water interchanging with the surrounding environment even if the
+calculations are acceptable.
+
+
+
+
+\section{Solute movement}
+
+In this section special features of the solution of the
+advection-dispersion equation are discussed. First of all, it is
+discussed how information from the water movement module is treated. The
+assumptions for the development of the local matrices are
+discussed. The numerical instabilities which occur in advection
+dominated problems and how to decide the size of the next timestep are
+finally discussed.
+
+
+\subsection{Coupling water and solute movement models}
+
+The water and solute movement represented by equations
+\ref{eq:watermovement} and \ref{eq:solutemovement} are coupled in a
+sense that the solute movement are dependent of the water movement,
+but not the reverse. The used solution process is to calculate the
+water movement first. The results (the matric pressure potential and
+the boundary fluxes) are stored at pre-described times, subsequently the
+concentration is calculated. Meanwhile the water content, the time
+derivative of the water content and fluxes are estimated using the
+stored values from the water movement simulations. Another possibility
+is to calculate both the water and solute movement in one
+run. The advantage is that time is not spent on unnecessary
+recalculations. The disadvantage is that maybe the timesteps
+necessary for fast convergence in the water and the solute
+calculations, respectively, are of different magnitude, so that
+unnecessary small timesteps are used in one of the models. By dividing
+the models into two modules, it is also possible to simulate
+different solute movement scenarios with the same water flow as
+background without repeating the calculation for solving Richard's
+equation.\\
+\\
+Estimating the water flux\index{water flow!estimation} in the nodal
+points is connected with problems since both the conductivities and
+the derivative of the pressure, $\psi$ can have discontinuities
+between elements edges. The spatial derivatives of $\psi$ can in each
+element be calculated as:
+
+
+\begin{equation}
+\begin{split}
+& \left(\frac{\partial \psi}{\partial x} \right)_e=\begin{bmatrix} \partial N_1/\partial
+  x & \partial N_2/\partial x & \partial N_3/\partial x \end{bmatrix}
+  \begin{bmatrix} \psi_1 \\ \psi_2 \\ \psi_3 \end{bmatrix} \\
+& \left(\frac{\partial \psi}{\partial y} \right)_e=\begin{bmatrix} \partial N_1/\partial
+  y & \partial N_2/\partial y & \partial N_3/\partial y \end{bmatrix}
+  \begin{bmatrix} \psi_1 \\ \psi_2 \\ \psi_3 \end{bmatrix}
+\end{split}
+\end{equation}
+
+The fluxes in the nodal points are estimated using mean values of
+estimated fluxes in the surrounding elements. Two different methods
+can be used. In the first, the mean hydraulic conductivity,
+$\bar{K}_e$ in each of the surrounding elements is used:
+
+\begin{equation}
+\begin{split}
+& q_x=-\frac{1}{\text{NEP}}\sum_{e=1}^{\text{NEP}} \bar{K_e} \left(\frac{\partial \psi}{\partial x}\right)_e
+\\
+& q_y=-\frac{1}{\text{NEP}}\sum_{e=1}^{\text{NEP}} \bar{K_e}\left(\frac{\partial \psi}{\partial y}+1\right)_e
+\end{split}
+\end{equation}
+
+where $\text{NEP}$ is the number of elements surrounding the current
+nodal point. In the second method, only the conductivities, $K_{e,p}$
+in the current point are used, subscript $e$ and $p$ refer to the 
+element and nodal number, respectively.
+
+\begin{equation}
+\begin{split}
+& q_x=-\frac{1}{\text{NEP}}\sum_{e=1}^{\text{NEP}} K_{e,p} \left(
+  \frac{\partial \psi}{\partial x} \right)_e
+\\
+& q_y=-\frac{1}{\text{NEP}}\sum_{e=1}^{\text{NEP}}
+  K_{e,p}\left(\frac{\partial \psi}{\partial y}+1\right)_e
+\end{split}
+\end{equation}
+
+Method number 1 is preferred as there is more consistence between the
+points for evaluation of conductivity and the derivative. 
+
+
+\subsubsection{Example}
+
+As an example are the Darcy velocity calculated for nodal point no. 4
+in a Finite Element mesh. The nodal point and its surrounding points
+are shown in figure \ref{fig:velotri}. The situation is that $\psi$ is
+constant in the area considered i.e $\partial \psi/\partial
+x=\partial \psi/\partial y=0$ a situation that ideally occurs if the
+water movement only is driven by gravity in a simulation. The node
+numbering refers here to the global numbering.
+
+
+\begin{figure}[h]  %here-top-bottom-page
+\epsfig{file=velonode.eps,width=6.5cm} \hspace{.5cm}
+\epsfig{file=velotri.eps,width=6.5cm}
+\figcap{Node and triangle numbering for calculation of Darcy flux}
+\label{fig:velotri}
+\end{figure}
+
+Method 1:
+
+\begin{equation}
+\begin{split}
+& q_x=0 \\
+& q_y=- \frac{1}{6} ( 
+  \frac{1}{3}(K_{1,4}+K_{1,6}+K_{1,3})+\frac{1}{3}
+    (K_{2,4}+K_{2,1}+K_{2,2})+ \\ 
+& \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \cdots +
+    \frac{1}{3}(K_{6,4})+K_{6,7}+K_{6,6}) )   
+\end{split} 
+\end{equation}
+
+
+Method 2:
+
+\begin{equation}
+\begin{split}
+& q_x=0 \\
+& q_y=- \frac{1}{6}\left(
+  K_{1,4}+K_{2,4}+K_{3,4}+K_{4,4}+K_{5,4}+K_{6,4} \right)
+\end{split}
+\end{equation}
+
+The difference between the two methods is obvious. 
+
+
+\subsection{Local matrices}\index{local matrices}\index{matrix!local}
+
+Before calculating the local matrices given by equation
+\ref{eq:localA}-\ref{eq:localQ}, it is necessary to decide how the
+entities occurring in the weak form of the PDE, shall be approximated
+in the elements. Recapitulated, the weak form of the
+advection-dispersion is:
+
+
+\begin{equation}
+\begin{split}
+& R_W=\int_{\Omega} \theta R \frac{\partial C}{\partial t} v \, dxdy
+ +  \\ & \int_{\Omega} (\nabla
+v)\cdot \left(\theta \begin{bmatrix} D_{xx} & D_{xy} \\ D_{yx}
+  & D_{yy} \end{bmatrix} \nabla C- \begin{bmatrix} q_x \\ q_y
+ \end{bmatrix} C \right) \, dxdy + 
+ \int_{\Omega} \frac{\partial \theta}{\partial t}  C v \, dxdy + \\ &
+ \int_{\Omega}(C_{sink}\Gamma-\theta\mu_l-\rho_b\mu_s) v \, dxdy
+ +\int_{\partial \Omega_1} j v \, dS=0 
+\label{eq:weaksolute}
+\end{split}
+\end{equation}
+
+
+The approximations of the water flow, $q_x$ and $q_y$ and the
+concentration are piecewise linear and continuous in $\Omega$. Many of
+the other terms in equation \ref{eq:weaksolute} can not be expected to
+be continuous between element sides which also are subdomain
+borders, but can be approximated to variate linearly in each
+element. The linear approximations can be expressed by equation
+\ref{eq:linapprox}. The made linear approximations for the
+coefficients in equation \ref{eq:weaksolute} are placed in table
+\ref{tab:advdisplin}.
+
+\begin{table}[H]
+\tabcap{Approximations for solute movement}
+\label{tab:advdisplin}
+\begin{tabular}{p{4cm}|p{8.9cm}} \hline
+\textbf{Coefficient} & \textbf{Approximation} \\ \hline
+$\theta R$ &  
+$\theta_e \approx \boldsymbol{N\theta_e}$ \newline $R_e \approx
+\mathbf{NR_e}$  \\ \hline
+$\theta \begin{bmatrix} D_{xx} & D_{xy} \\ D_{yx} & D_{yy}
+\end{bmatrix}$ &  $\begin{matrix} 
+(\theta D_{xx})_e \approx \boldsymbol{N(\theta
+  D_{xx})_e} \\ (\theta D_{yy})_e \approx \boldsymbol{N(\theta
+  D_{yy})_e} \\ (\theta D_{xy})_e \approx \boldsymbol{N(\theta
+  D_{xy})_e} \\ (\theta D_{yx})_e \approx \boldsymbol{N(\theta
+  D_{yx})_e}  
+\end{matrix}$
+\\ \hline 
+$\begin{bmatrix} q_x \\ q_y \end{bmatrix}$ & $\begin{matrix} q_{x,e} \approx \mathbf{Nq_{x,e}} \\ q_{y,e} \approx \mathbf{Nq_{y,e}}
+  \end{matrix}$ 
+\\ \hline  
+$\frac{\partial \theta}{\partial t}$ & $\dot{\theta}_e \approx
+\boldsymbol{N\dot{\theta}_e}$ \\ \hline
+$C_{sink}\Gamma$ & $C_{sink,e} \approx
+  \mathbf{NC_{sink,e}}$ \newline $\Gamma_e \approx
+  \boldsymbol{N\Gamma_e}$ \\ \hline
+$\theta\mu_l$ & $\boldsymbol{N\theta_e}$ \newline $\mu_{l,e} \approx
+\boldsymbol{N\mu_{l,e}}$  \\ \hline
+$\rho_b\mu_s$ & $\boldsymbol{N\mu_{c,e}}$ \\ \hline
+\end{tabular}
+\end{table}
+
+The bulk density, $\rho_b$ is treated as constant in each subdomain.
+For calculating $\mathbf{Q_e}$, the flux through the specified Neumann
+boundaries  $j_{1-2}$, $j_{1-3}$ and $j_{2-3}$ is regarded as constant
+on the sides of a single element. The hereby obtained local matrices are
+shown i table \ref{tab:localmatsol}. ${\bar{\theta D_{xx}}}$, $\bar{\theta
+  D_{xy}}$ and $\bar{\theta D_{yy}}$ denotes mean values which can be
+calculated as one third of the sum of the values in the vertices.\\
+\\
+It is also here possible to use the lumped formulation using
+the techniques described before. The resulting matrices are given in
+table \ref{tab:sollump}. Only the time derivatives of the solution
+component, $C$ and not the part containing the time derivative of
+$\theta$ are lumped. For the lumping method by
+Segerlind\index{Segerlind}, $\mathbf{N^*}$ is used to describe both
+the retardation factor and the water content.
+
+
+
+
+
+\begin{table}[H]
+\tabcap{Local matrices, solute movement}
+\begin{tabular}{p{1.5cm}|p{11.4cm}} \hline
+\textbf{Matrix} &  \textbf{Value} \\ \hline
+$\mathbf{A_e}$ & $\frac{A}{180}\begin{bmatrix}
+\mathbf{A_{e,column1}} & \mathbf{A_{e,column2}} & \mathbf{A_{e,column3}}
+\end{bmatrix},$ \\ 
+& $\mathbf{A_{e,column1}}= \begin{tiny} \begin{bmatrix}
+  R_1(12\theta_{1}+3\theta_{2}+3\theta_{3}) +
+  R_2(3\theta_{1}+2\theta_{2}+\theta_{3}) +
+  R_3(3\theta_{1}+\theta_{2}+2\theta_{3}) \\
+  R_1(3\theta_{1}+2\theta_{2}+\theta_{3}) +
+  R_2(2\theta_{1}+3\theta_{2}+\theta_{3}) +
+  R_3(\theta_{1}+\theta_{2}+\theta_{3}) \\
+  R_1(3\theta_{1}+\theta_{2}+2\theta_{3}) +
+  R_2(\theta_{1}+\theta_{2}+\theta_{3}) +
+  R_3(2\theta_{1}+\theta_{2}+3\theta_{3}) \end{bmatrix} \end{tiny}$ \\
+& $\mathbf{A_{e,column2}}= \begin{tiny} \begin{bmatrix}
+  R_1(3\theta_{1}+2\theta_{2}+\theta_{3}) +
+  R_2(2\theta_{1}+3\theta_{2}+\theta_{3}) +
+  R_3(\theta_{1}+\theta_{2}+\theta_{3}) \\
+  R_1(2\theta_{1}+3\theta_{2}+\theta_{3}) +
+  R_2(3\theta_{1}+12\theta_{2}+3\theta_{3}) +
+  R_3(\theta_{1}+3\theta_{2}+2\theta_{3}) \\
+  R_1(\theta_{1}+\theta_{2}+\theta_{3}) +
+  R_2(\theta_{1}+3\theta_{2}+2\theta_{3}) +
+  R_3(\theta_{1}+2\theta_{2}+3\theta_{3}) \end{bmatrix} \end{tiny}$ \\ 
+& $\mathbf{A_{e,column3}}= \begin{tiny} \begin{bmatrix}
+  R_1(3\theta_{1}+\theta_{2}+2\theta_{3}) +
+  R_2(\theta_{1}+\theta_{2}+\theta_{3}) +
+  R_3(2\theta_{1}+\theta_{2}+3\theta_{3}) \\
+  R_1(\theta_{1}+\theta_{2}+\theta_{3}) +
+  R_2(\theta_{1}+3\theta_{2}+2\theta_{3}) +
+  R_3(\theta_{1}+2\theta_{2}+3\theta_{3}) \\
+  R_1(2\theta_{1}+\theta_{2}+3\theta_{3}) +
+  R_2(\theta_{1}+2\theta_{2}+3\theta_{3}) +
+  R_3(3\theta_{1}+3\theta_{2}+12\theta_{3}) 
+\end{bmatrix} \end{tiny}$ \\ \hline
+$\mathbf{B_e}$ &$\begin{tiny}
+  A \overline{\theta D}_{xx} \begin{bmatrix} (\frac{\partial
+  N_{1}}{\partial x})^{2}
+ &\frac{\partial N_{1}}{\partial x}\frac{\partial N_{2}}{\partial x}
+&\frac{\partial N_{1}}{\partial x}\frac{\partial N_{3}}{\partial x}\\ 
+\frac{\partial N_{2}}{\partial x}\frac{\partial N_{1}}{\partial x}
+&(\frac{\partial N_{2}}{\partial x})^{2}
+&\frac{\partial N_{2}}{\partial x}\frac{\partial N_{3}}{\partial x}\\ 
+\frac{\partial N_{3}}{\partial x}\frac{\partial N_{1}}{\partial x}
+&\frac{\partial N_{3}}{\partial x}\frac{\partial N_{2}}{\partial x}  
+&(\frac{\partial N_{3}}{\partial x})^{2}
+\end{bmatrix} \end{tiny} +$ \\
+& $\begin{tiny}
+  A\overline{\theta D}_{xy} \begin{bmatrix} 
+\frac{\partial N_{1}}{\partial y}\frac{\partial N_{1}}{\partial x}
+&\frac{\partial N_{1}}{\partial y}\frac{\partial N_{2}}{\partial x}
+&\frac{\partial N_{1}}{\partial y}\frac{\partial N_{3}}{\partial x}\\ 
+\frac{\partial N_{2}}{\partial y}\frac{\partial N_{1}}{\partial x}
+&\frac{\partial N_{2}}{\partial y}\frac{\partial N_{2}}{\partial x}
+&\frac{\partial N_{2}}{\partial y}\frac{\partial N_{3}}{\partial x}\\ 
+\frac{\partial N_{3}}{\partial y}\frac{\partial N_{1}}{\partial x}
+&\frac{\partial N_{3}}{\partial y}\frac{\partial N_{2}}{\partial x}  
+&\frac{\partial N_{3}}{\partial y}\frac{\partial N_{3}}{\partial x}
+\end{bmatrix} \end{tiny} +$ \\
+& $\begin{tiny}
+  A \overline{\theta D}_{xy} \begin{bmatrix} 
+\frac{\partial N_{1}}{\partial x}\frac{\partial N_{1}}{\partial y}
+&\frac{\partial N_{1}}{\partial x}\frac{\partial N_{2}}{\partial y}
+&\frac{\partial N_{1}}{\partial x}\frac{\partial N_{3}}{\partial y}\\ 
+\frac{\partial N_{2}}{\partial x}\frac{\partial N_{1}}{\partial y}
+&\frac{\partial N_{2}}{\partial x}\frac{\partial N_{2}}{\partial y}
+&\frac{\partial N_{2}}{\partial x}\frac{\partial N_{3}}{\partial y}\\ 
+\frac{\partial N_{3}}{\partial x}\frac{\partial N_{1}}{\partial y}
+&\frac{\partial N_{3}}{\partial x}\frac{\partial N_{2}}{\partial y}  
+&\frac{\partial N_{3}}{\partial x}\frac{\partial N_{3}}{\partial y}
+\end{bmatrix} \end{tiny} +$ \\
+& $\begin{tiny}
+A \overline{\theta D}_{yy}  
+\begin{bmatrix} (\frac{\partial N_{1}}{\partial y})^{2}
+ &\frac{\partial N_{1}}{\partial y}\frac{\partial N_{2}}{\partial y}
+&\frac{\partial N_{1}}{\partial y}\frac{\partial N_{3}}{\partial y}\\ 
+\frac{\partial N_{2}}{\partial y}\frac{\partial N_{1}}{\partial y}
+&(\frac{\partial N_{2}}{\partial y})^{2}
+&\frac{\partial N_{2}}{\partial y}\frac{\partial N_{3}}{\partial y}\\ 
+\frac{\partial N_{3}}{\partial y}\frac{\partial N_{1}}{\partial y}
+&\frac{\partial N_{3}}{\partial y}\frac{\partial N_{2}}{\partial y}  
+&(\frac{\partial N_{3}}{\partial y})^{2}
+\end{bmatrix} \end{tiny}$ \\ \hline 
+$\mathbf{C_e}$ & $\begin{tiny}
+\frac{A}{12}
+\begin{bmatrix}
+(2q_{x,1}+q_{x,2}+q_{x,3})\frac{\partial N_1}{\partial x} &
+(q_{x,1}+2q_{x,2}+q_{x,3})\frac{\partial N_1}{\partial x} & 
+(q_{x,1}+q_{x,2}+2q_{x,3})\frac{\partial N_1}{\partial x} \\
+(2q_{x,1}+q_{x,2}+q_{x,3})\frac{\partial N_2}{\partial x} &
+(q_{x,1}+2q_{x,2}+q_{x,3})\frac{\partial N_2}{\partial x} & 
+(q_{x,1}+q_{x,2}+2q_{x,3})\frac{\partial N_2}{\partial x} \\
+(2q_{x,1}+q_{x,2}+q_{x,3})\frac{\partial N_3}{\partial x} &
+(q_{x,1}+2q_{x,2}+q_{x,3})\frac{\partial N_3}{\partial x} & 
+(q_{x,1}+q_{x,2}+2q_{x,3})\frac{\partial N_3}{\partial x} 
+\end{bmatrix}
+\end{tiny}+$ \\ 
+& $\begin{tiny}
+\frac{A}{12}
+\begin{bmatrix}
+(2q_{y,1}+q_{y,2}+q_{y,3})\frac{\partial N_1}{\partial y} &
+(q_{y,1}+2q_{y,2}+q_{y,3})\frac{\partial N_1}{\partial y} & 
+(q_{y,1}+q_{y,2}+2q_{y,3})\frac{\partial N_1}{\partial y} \\
+(2q_{y,1}+q_{y,2}+q_{y,3})\frac{\partial N_2}{\partial y} &
+(q_{y,1}+2q_{y,2}+q_{y,3})\frac{\partial N_2}{\partial y} & 
+(q_{y,1}+q_{y,2}+2q_{y,3})\frac{\partial N_2}{\partial y} \\
+(2q_{y,1}+q_{y,2}+q_{y,3})\frac{\partial N_3}{\partial y} &
+(q_{y,1}+2q_{y,2}+q_{y,3})\frac{\partial N_3}{\partial y} & 
+(q_{y,1}+q_{y,2}+2q_{y,3})\frac{\partial N_3}{\partial y} 
+\end{bmatrix} \end{tiny}$ \\ \hline
+$\mathbf{D_e}$ &  $\begin{tiny}\begin{bmatrix} 0 \\ 0 
+  \end{bmatrix}\end{tiny}$ \\ \hline 
+$\mathbf{E_e}$ &  $\frac{A}{60}\begin{tiny}\begin{bmatrix}
+  6\dot{\theta}_{1}+2\dot{\theta}_{2}+2\dot{\theta}_{3} &
+  2\dot{\theta}_{1}+2\dot{\theta}_{2}+\dot{\theta}_{3} &
+  2\dot{\theta}_{1}+\dot{\theta}_{2}+2\dot{\theta}_{3} \\
+  2\dot{\theta}_{1}+2\dot{\theta}_{2}+\dot{\theta}_{3} &
+  2\dot{\theta}_{1}+6\dot{\theta}_{2}+2\dot{\theta}_{3} &
+  \dot{\theta}_{1}+2\dot{\theta}_{2}+2\dot{\theta}_{3} \\
+  2\dot{\theta}_{1}+\dot{\theta}_{2}+2\dot{\theta}_{3} &
+  \dot{\theta}_{1}+2\dot{\theta}_{2}+2\dot{\theta}_{3} &
+  2\dot{\theta}_{1}+2\dot{\theta}_{2}+6\dot{\theta}_{3} 
+\end{bmatrix}\end{tiny}$ \\ \hline
+$\mathbf{F_e}$ &  $\begin{tiny}
+\frac{A}{60}\begin{bmatrix}
+C_{sink,1}(6\Gamma_1 + 2\Gamma_2 + 2\Gamma_3) + 
+C_{sink,2}(2\Gamma_1 + 2\Gamma_2 + \Gamma_3) + 
+C_{sink,3}(2\Gamma_1 + \Gamma_2 + 2\Gamma_3)\\
+C_{sink,1}(2\Gamma_1 + 2\Gamma_2 + \Gamma_3) + 
+C_{sink,2}(2\Gamma_1 + 6\Gamma_2 + 2\Gamma_3) + 
+C_{sink,3}(\Gamma_1 + 2\Gamma_2 + 2\Gamma_3)\\
+C_{sink,1}(2\Gamma_1 + \Gamma_2 + 2\Gamma_3) + 
+C_{sink,2}(\Gamma_1 + 2\Gamma_2 + 2\Gamma_3) + 
+C_{sink,3}(2\Gamma_1 + 2\Gamma_2 + 6\Gamma_3)
+\end{bmatrix} \end{tiny}  +$\\
+& $\begin{tiny}
+\frac{A}{60}\begin{bmatrix}
+\mu_{l,1}(6\theta_1 + 2\theta_2 + 2\theta_3) + 
+\mu_{l,2}(2\theta_1 + 2\theta_2 + \theta_3) + 
+\mu_{l,3}(2\theta_1 + \theta_2 + 2\theta_3)\\
+\mu_{l,1}(2\theta_1 + 2\theta_2 + \theta_3) + 
+\mu_{l,2}(2\theta_1 + 6\theta_2 + 2\theta_3) + 
+\mu_{l,3}(\theta_1 + 2\theta_2 + 2\theta_3)\\
+\mu_{l,1}(2\theta_1 + \theta_2 + 2\theta_3) + 
+\mu_{l,2}(\theta_1 + 2\theta_2 + 2\theta_3) + 
+\mu_{l,3}(2\theta_1 + 2\theta_2 + 6\theta_3)
+\end{bmatrix} \end{tiny} +$
+\\ & $\frac{\rho_b A}{12}
+\begin{tiny}
+\begin{bmatrix}
+2\mu_{s,1}+\mu_{s,2} +\mu_{s,3} \\
+\mu_{s,1} +2\mu_{s,2} +\mu_{s,3} \\
+\mu_{s,1} +\mu_{s,2} +2\mu_{s,3} 
+ \end{bmatrix}
+\end{tiny}$ \\ \hline
+$\mathbf{Q_e}$ & $\begin{tiny}\frac{j_{1-2}l_{1-2}}{2}\begin{bmatrix} 1 \\ 1 \\ 0
+\end{bmatrix} +\frac{j_{1-3}l_{1-3}}{2}\begin{bmatrix} 1 \\ 0 \\ 1
+\end{bmatrix} +\frac{j_{2-3}l_{2-3}}{2}\begin{bmatrix} 0 \\ 1 \\ 1
+\end{bmatrix} \end{tiny}$  \\ \hline
+\end{tabular}
+\label{tab:localmatsol}
+%\end{center}
+%\end{sidewaystable}
+\end{table}
+
+
+%It is also here possible to use the lumped formulation using
+%the techniques described before. The resulting matrices are given in
+%table \ref{tab:sollump}. Only the time derivatives of the solution
+%component, $C$ and not the part containing the time derivative of
+%$\theta$ are lumped. For the lumping method by
+%Segerlind\index{Segerlind}, $\mathbf{N^*}$ is used to describe both
+%the retardation factor and the water content.
+ 
+
+\begin{table}[H]
+\tabcap{Lumping, solute movement}
+\begin{tabular}{p{2cm}|p{10.9cm}} \hline
+\textbf{Method} & \textbf{Value} \\ \hline
+Consistent &   $\mathbf{A_e}=\frac{A}{180}\begin{bmatrix}
+\mathbf{A_{e,column1}} & \mathbf{A_{e,column2}} & \mathbf{A_{e,column3}}
+\end{bmatrix},$ \\ 
+& $\mathbf{A_{e,column1}}= \begin{tiny} \begin{bmatrix}
+  R_1(12\theta_{1}+3\theta_{2}+3\theta_{3}) +
+  R_2(3\theta_{1}+2\theta_{2}+\theta_{3}) +
+  R_3(3\theta_{1}+\theta_{2}+2\theta_{3}) \\
+  R_1(3\theta_{1}+2\theta_{2}+\theta_{3}) +
+  R_2(2\theta_{1}+3\theta_{2}+\theta_{3}) +
+  R_3(\theta_{1}+\theta_{2}+\theta_{3}) \\
+  R_1(3\theta_{1}+\theta_{2}+2\theta_{3}) +
+  R_2(\theta_{1}+\theta_{2}+\theta_{3}) +
+  R_3(2\theta_{1}+\theta_{2}+3\theta_{3}) \end{bmatrix} \end{tiny}$ \\
+& $\mathbf{A_{e,column2}}= \begin{tiny} \begin{bmatrix}
+  R_1(3\theta_{1}+2\theta_{2}+\theta_{3}) +
+  R_2(2\theta_{1}+3\theta_{2}+\theta_{3}) +
+  R_3(\theta_{1}+\theta_{2}+\theta_{3}) \\
+  R_1(2\theta_{1}+3\theta_{2}+\theta_{3}) +
+  R_2(3\theta_{1}+12\theta_{2}+3\theta_{3}) +
+  R_3(\theta_{1}+3\theta_{2}+2\theta_{3}) \\
+  R_1(\theta_{1}+\theta_{2}+\theta_{3}) +
+  R_2(\theta_{1}+3\theta_{2}+2\theta_{3}) +
+  R_3(\theta_{1}+2\theta_{2}+3\theta_{3}) \end{bmatrix} \end{tiny}$ \\ 
+& $\mathbf{A_{e,column3}}= \begin{tiny} \begin{bmatrix}
+  R_1(3\theta_{1}+\theta_{2}+2\theta_{3}) +
+  R_2(\theta_{1}+\theta_{2}+\theta_{3}) +
+  R_3(2\theta_{1}+\theta_{2}+3\theta_{3}) \\
+  R_1(\theta_{1}+\theta_{2}+\theta_{3}) +
+  R_2(\theta_{1}+3\theta_{2}+2\theta_{3}) +
+  R_3(\theta_{1}+2\theta_{2}+3\theta_{3}) \\
+  R_1(2\theta_{1}+\theta_{2}+3\theta_{3}) +
+  R_2(\theta_{1}+2\theta_{2}+3\theta_{3}) +
+  R_3(3\theta_{1}+3\theta_{2}+12\theta_{3}) 
+\end{bmatrix} \end{tiny}$ \\ \hline
+Segerlind  &  $\mathbf{A_e}=\begin{tiny}
+\frac{A}{3}\begin{bmatrix}
+R_1\theta_1 & 0 & \\
+0 & R_2\theta_2 & 0 \\
+0 & 0 & R_3\theta_3 \\
+\end{bmatrix} \end{tiny}$ \\ \hline
+Istok      &  $\mathbf{A_e}=
+\frac{A}{36}\begin{small}(R_1(2\theta_1+\theta_2+\theta_3)+R_2(\theta_1+2\theta_2+\theta_3)+R_3(\theta_1+\theta_2+2\theta_3))\end{small}\mathbf{I}$
+\\ \hline
+Neuman     &  $\mathbf{A_e}=\frac{A}{60}\mathbf{I}
+\begin{tiny}\begin{bmatrix}
+R_1(6\theta_1+2\theta_2+2\theta_3) +
+R_2(2\theta_1 2\theta_2+ \theta_3) +
+R_3(2\theta_1 +\theta_2 +2\theta_3)\\
+R_1(2\theta_1+2\theta_2+\theta_3) +
+R_2(2\theta_1 6\theta_2+ 2\theta_3) +
+R_3(\theta_1 +2\theta_2 +2\theta_3)\\
+R_1(2\theta_1+\theta_2+2\theta_3) +
+R_2(\theta_1 2\theta_2+ 2\theta_3) +
+R_3(2\theta_1 +2\theta_2 +6\theta_3) \end{bmatrix} \end{tiny}$ \\ \hline 
+\end{tabular}
+\label{tab:sollump}
+\end{table}
+
+
+\subsection{Point source}\index{point source!implementation}
+
+
+In \cite{Segerlind} it is described how a point source (or sink) can
+be implemented. The point source can simply be described using Diracs
+delta function:
+
+\begin{equation}
+\begin{split}
+& \mathbf{F_e,p}=\int_A q_p \delta(x-x_p)\delta(y-y_p)\mathbf{N}^T \,dxdy
+= \\ & q_p \int_A  \delta(x-x_p)\delta(y-y_p) \begin{tiny}
+  \begin{bmatrix} N_1 \\ N_2 \\ N_3 \end{bmatrix} \end{tiny} \,dxdy  
+\end{split}
+\end{equation}
+
+where $x_p,y_p$ are the coordinates of the point sink. The best
+location of a sink is at a node. In the program it is only
+possible to place the sink at a node. The sink is not implemented by
+first calculating the contribution from each element for subsequently
+assembling the element contributions to the $\mathbf{F}$ in
+\ref{eq:matrix}. Instead, the point sources are implemented more
+directly. It is easy to realize that integration of a point source
+inside $\Omega$ is equal $q_p$. The point source is then simply
+implemented by adding $q_p$ to the row $p$ in $\mathbf{F}$:
+
+\begin{equation}
+\mathbf{F_p}=q_p
+\label{eq:fpoint}
+\end{equation}
+
+It is important to note that the node shall be placed in the interior
+of $\Omega$ for using equation \ref{eq:fpoint}, if this is not the
+case then the integration of the Dirac delta function is not equal to
+1!
+
+
+
+\subsection{Advection dominated problems}\index{stability}
+
+
+Several numerical problems can be involved with the solving of
+the advection-diffusion problem, especially when the problems are
+dominated by advection. The numerical solutions have often unexpected
+oscillations in that situation. A lot of more or less complicated
+methods to reduce the problems have been developed. Two of the methods
+are \textit{upstream weighting}\index{upstream weighting} and
+\textit{streamline diffusion}\index{streamline diffusion} - both in
+many variants. 
+
+
+\subsection{$P_e$ and $C_r$ numbers}\index{P\'{e}clet
+  number}\index{Courant number}
+
+There are two different dimensionless numbers which are important for
+the stability. The \textit{P\'{e}clet number}, which in 1D is:
+
+\begin{equation}
+P_e=v\Delta x/D 
+\end{equation}
+
+where $v$ is the velocity, $\Delta x$ is the space increment and
+$D$ is the dispersion. In other words a ratio between the convective
+and the dispersive terms. The \textit{Courant number} is here defined
+as:
+
+\begin{equation}
+C_r=v\Delta t/(R\Delta x)
+\end{equation}
+ 
+where $R$ is the retardation factor. In other places, even for models
+with adsorption it may be defined as $C_r=v\Delta t/(\Delta x)$. The
+Courant number describes the ratio between the movement of a particle
+by advection in one time increment and the grid spacing. Theoretical
+stability investigations are rather complicated, especially in a two
+or three dimensional space with heterogenous soils. Most of the
+theoretical considerations for stability are done for one dimensional
+flow with uniform velocity. \cite{Perrochet} investigated the
+advection-dispersion equation without any chemical processes and found
+that The classical Crank-Nicolson-Galerkin scheme is stable for
+$P_e\leq 2$ and $C_r \leq 1$, \cite{Perrochet}. The analysis was done
+without considering  adsorption. By using the same theory, it can
+easily be shown that stability for the advection-dispersion model is
+insured for the same constraints with the Courant number which is used
+here. \\
+\\
+It can be concluded that keeping the Courant number lower than one
+is just a question of sufficiently small timesteps. But is it possible
+to make a mesh which under all circumstances prevents that the P\'{e}clet
+number exceeds 2?.  The sidelengths of the elements that coincide
+with the boundaries are not calculated in TopFEM. Instead all triangle
+areas are computed. The characteristic length of the elements,
+$\Delta x$  can be approximated as $\Delta x=2\sqrt{A}$,
+where $A$ is the area of the element (triangle). $\sqrt{2} \cdot
+\sqrt{2A} = 2 \sqrt{A}$  is the length of the diagonal in a square
+which is made of two isoscele right-angled triangles (elements) with
+the area $A$. This is a good measure of the sidelength in the real
+elements, where the 3 side lengths in an element for stability reasons
+should have almost equal lengths, \cite{FEMLAB,Segerlind}. 
+\\
+\\
+The P\'{e}clet number for the flow in the x-direction can be calculated as:
+
+\begin{equation}
+\begin{split}
+P_{e,x}&=\frac{q_x 2\sqrt{A}}{\theta D_{xx}}=\frac{2q_x\sqrt{A}}{\alpha_L
+  \frac{q_xq_x}{|\mathbf{q}|}+\alpha_T\frac{q_yq_y}{|\mathbf{q}|}+D_0\frac{\theta^{10/3}}{\theta_s}}\\
+& <\frac{2q_x\sqrt{A}}{\alpha_T\frac{q_xq_x+q_yq_y}{|\mathbf{q}|}}
+  = \frac{2q_x\sqrt{A}}{\alpha_T |\mathbf{q}|} \leq \frac{2\sqrt{A}}{\alpha_T}
+\end{split}
+\label{eq:pex}
+\end{equation}
+
+where it is assumed that $\alpha_L \geq  \alpha_T$. The same procedure
+can of course be used to evaluate $P_{e,y}$. It can then be concluded
+that the maximum P\'{e}clet number in the x and y-direction is under
+$2\sqrt{A}/\alpha_T$. If the longitudinal dispersivity is 5 cm and the
+transversal is 1/10 of the longitudinal dispersion and the maximum
+allowed $P_e$ is 2 it can be concluded that the maximum sidelength of
+the elements will be approximately 1/2 cm. This will result in a very
+fine mesh. In practise the judgments made in equation \ref{eq:pex} are
+so rough that somewhat larger elements probably can be used without
+stability problems.\\
+\\
+In the present code it is possible to choose between 2 stabilizing
+methods\index{stabilizing methods}:
+
+\begin{enumerate}
+\item Varying the size of $\Delta t$ so $P_eC_r \leq \gamma$.
+\item Introducing extra diffusion in the streamline direction so
+  $P_eC_r\leq\gamma$ is fulfilled. $\gamma$ is called the
+  \textit{performance index}\index{performance index}.  
+\end{enumerate}
+
+It is of course also possible to not choosing any stabilizing
+methods. Put into practice there is often stability as long as
+$P_eC_r\leq \gamma$  where $2\leq \gamma \leq 10$, \cite{Perrochet}
+which under any circumstances is less restrictive than keeping both
+$P_e\leq 2$ and $C_r\leq 1$. 
+
+
+
+\subsection{Varying the size of the timesteps}
+
+The calculation of the P\'{e}clet and Courant numbers are of computational
+reasons a little different in the two stabilizing methods. For the
+method where the size of the timesteps are varied in order to fulfill
+the stability criterion, requirements are 
+
+
+\begin{equation}
+\begin{split}
+& (P_eC_r)_x=\frac{|v_x|\Delta x}{D}\cdot \frac{|v_x|\Delta t}{R \Delta
+  x}=\frac{\theta v_x^2\Delta t}{R(\theta D_{xx})} \\
+& (P_eC_r)_y=\frac{|v_y|\Delta x}{D} \cdot \frac{|v_y|\Delta t}{R\Delta
+  x}=\frac{\theta v_y^2\Delta t}{R(\theta D_{yy})}
+\end{split}
+\end{equation}
+
+$\Delta t$ is chosen so both $(P_eC_r)_x$ and $(P_eC_r)_y$ are less
+than $\gamma$:
+
+
+\begin{equation}
+\Delta t=min \left( \frac{R(\theta D_{xx})\gamma}{\theta
+    v_x^2},\frac{R(\theta D_{yy})\gamma}{\theta v_y^2} \right) 
+\end{equation}
+
+In the program, it is possible to set a minimum and maximum value of
+$\Delta t$, $\Delta t_{min}$ and $\Delta t_{max}$. The minimum value, to
+prevent the timesteps to get too small (and the CPU-time too large). The
+maximum value can be chosen to take into account possible changes in
+time dependent boundary conditions or sink terms.
+
+
+
+\subsection{Streamline diffusion}\index{streamline diffusion}
+
+$P_eC_r$ are here evaluated as:
+
+\begin{equation}
+P_eC_r=\frac{|\mathbf{v}|\Delta
+  x}{D^*+\alpha_L|\mathbf{v}|}\frac{|\mathbf{v}| \Delta t}{R \Delta
+  x}=\frac{|\mathbf{v}|^2\Delta
+  t}{R(D^*+\alpha_L|\mathbf{v}|)}=\frac{|\mathbf{q}|^2\Delta t}{\theta
+  R(\theta D^*+\alpha_L|\mathbf{q}|)}
+\end{equation}
+
+In the streamline diffusion method, according to \cite{Perrochet}
+is some additional longitudinal dispersion added to prevent that
+$P_eC_r$ exceeds the chosen performance index. The additional
+longitudinal dispersion, $\bar{\alpha_L}$ can be calculated as:
+
+
+\begin{equation}
+\bar{\alpha_L}=\begin{cases} \frac{|\mathbf{q}|\Delta
+    t}{\theta R\gamma}-\alpha_L-\frac{\theta D^*}{|\mathbf{q}|}, & \text{for}
+    \ \alpha_L + \frac{\theta D^*}{|\mathbf{q}|} < \frac{|\mathbf{q}|\Delta
+    t}{\theta R\gamma}
+ \\ 0, & \text{for} \ \alpha_L +
+    \frac{\theta D^*}{|\mathbf{q}|} \geq \frac{|\mathbf{q}|\Delta
+    t}{\theta R\gamma}\end{cases}
+\end{equation}
+
+\subsection{Stability tests}
+
+To investigate the stability of the numerical model a simple system
+ has been modeled. The situation here is a one dimensional column,
+ horizontal column with steady-state water flow with pore velocity
+ $v$. And a given diffusion, $D$ (both molecular diffusion and
+ hydrodynamic dispersion) and retardation factor, $R$. The
+ advection-dispersion equation in one dimension can be written as:
+
+
+\begin{equation}
+R\frac{\partial C}{\partial t}=D\frac{\partial^2C}{\partial
+  x^2}-v\frac{\partial C}{\partial x}
+\end{equation}
+
+where $v=q/\theta$. The initial condition is that the concentration is
+uniformly distributed in the column:
+
+\begin{equation}
+C(x,0)=C_i
+\end{equation}
+
+At the left boundary the solute flux is:
+
+\begin{equation}
+(-D\frac{\partial C}{\partial x}+vC)|_{x=0}=\begin{cases} vC_0 &
+  0<t\leq t_0 \\ 0 & t>t_0 \end{cases}
+\end{equation}
+
+The solution can then according to \cite{Genuchtenanalytical} be
+written as:
+
+\begin{equation}
+C(x,t)=\begin{cases}C_i+(C_0-C_i)A(x,t) & 0<t\leq t_0 \\
+  C_i+(C_0-C_i)A(x,t)-C_0A(x,t) & t>t_0 \end{cases}
+\end{equation}
+
+where:
+
+\begin{equation}
+\begin{split}
+A(x,t)=&\frac{1}{2} \erfc\left
+  [\frac{Rx-vt}{2(DRt)^{1/2}}\right]+\left(\frac{v^2t}{\pi
+  DR}\right)\exp\left[-\frac{(Rx-vt)^2}{4DRt}\right ] \\
+&-\frac{1}{2}(1+\frac{vx}{D}+\frac{v^2t}{DR})\exp(vx/D)\erfc\left[\frac{Rx+vt}{2(DRt)^{1/2}}\right]
+\end{split}
+\end{equation}
+
+For the simulations, a waterflow situation is made with steady state
+flow with the chosen porewater velocity, $v$=10 cm/day. The solute is
+injected at the left border from $t=0$ to $t=t_0$. $t_0$ is chosen to
+be 2 days. $C_0$ is for the simplicity chosen to 1. For the FEM
+simulations the virtual soil column is 1/2 cm high and 50 cm wide. On
+the domain a regular mesh is generated with 100 equally large
+elements, each  with characteristic lengths of $\Delta x$=1 cm. The
+numerical parameter, $\omega$ is set to 1/2, i.e. a Crank-Nicolson
+scheme.\\ 
+\\
+Figure \ref{fig:soltest1_sub} shows simulation results for 
+$C_r=1$ and different $P_e$-numbers. The low courant number insures
+according to \cite{Perrochet} that the time increments are sufficiently
+low. The different P\'{e}clet numbers are obtained by varying the
+diffusion. i.e the simulations are not representing the same physical
+situation. As it can be seen, there are  saw-tooth instabilities also
+called wiggles\index{wiggles}, \cite{Abbott} for the high P\'{e}clet
+numbers. As expected, no instabilities are observed for P\'{e}clet
+numbers below 2. For $P_e=5$ and $P_e=10$ the wiggles are
+significant.
+
+\begin{figure}[H]  %here-top-bottom-page
+\begin{center}
+%\epsffile{soltest1_sub.eps}
+\epsfig{file=soltest1_sub.eps,width=12cm,height=7.2cm}
+\figcap{FEM solutions shown as concentration as function of x after
+3 days(upper) and as function of time for x=10 cm (lower). Different
+$P_e$-numbers have been used. The Courant number,
+$C_r$ is 1. There are wiggles for large $P_e$-numbers}
+\label{fig:soltest1_sub}
+\end{center}
+\end{figure}
+
+Figure \ref{fig:soltest2_sub} provides graphs for situations with
+constant P\'{e}clet number, $P_e=2$ and varying Courant number. The
+simulations represent the same physical situation. For Courant numbers,
+below, less, or equal to 1 practically the same solution is obtained. For
+$C_r=2$ which in this case corresponds to timesteps of 1/5 of a day,
+the results are somewhat different and unstable. Very large
+oscillations on the graph that shows the concentration as function of
+$x$ can be seen for $x \geq 43$ cm. The simulations with $C_r=2$ are
+maybe also critical as the timesteps are too large compared with the
+time (2 days) for the injection of solute at the left boundary.\\ 
+\\
+Figure \ref{fig:soltest3_sub} shows results for different combinations
+of $P_e$ and $C_r$, but restricted so $P_eC_r=10$. For all the
+simulations, wiggles can be observed, but there is for example no
+simple relationship between the P\'{e}clet number and the size of the
+saw-tooths. The wiggles stretch over longer time and space for
+$C_r=2$ compared with the other simulations. The reasons for that can
+simply be that it takes a number of timesteps before the wiggles are
+eliminated. \\
+\\
+Figure \ref{fig:soltest4_sub} shows a case with a P\'{e}clet number of
+20. The Courant number is 1. One of the graphs shows the simulations
+without any stabilization. Here the wiggles are significant. By
+comparing with the analytical solution it is  evaluated that there is
+some additional dispersion (numerical
+dispersion)\index{dispersion!numerical}. Another graph shows the same
+simulation with streamline diffusion with $\gamma=5$. The additional
+dispersion is significant but the wiggles have also
+disappeared. Another graph shows simulation with the stabilizing
+method where the size of $\Delta t$ is changed so
+$P_eC_r\leq\gamma$. $\gamma=5$ is used which is the same as reducing
+the $C_r$-number to 1/4, i.e. 4 times as many timesteps (or
+approximately 4 times longer CPU-time). The last results are close to
+the analytical solution. In practical use it is difficult to choose
+the stabilizing method - what is good in one situation may be
+applicable in another. In the 1D simulations provided here there are
+no problems with increasing the space or time discretization - the
+CPU-time is under all circumstances limited.
+
+
+%\begin{figure}[H]  %here-top-bottom-page
+%\begin{center}
+%%\epsffile{soltest1_sub.eps}
+%\epsfig{file=soltest1_sub.eps,width=12cm,height=7cm}
+%\figcap{FEM solutions shown as concentration as function of x after
+%3 days(upper) and as function of time for x=10 cm (lower). Different
+%$P_e$-numbers have been used. The Courant number,
+%$C_r$ is 1. There are wiggles for large $P_e$-numbers}
+%\label{fig:soltest1_sub}
+%\end{center}
+%\end{figure}
+
+
+
+\begin{figure}[H]  %here-top-bottom-page
+\begin{center}
+%\epsffile{soltest2_sub.eps}
+\epsfig{file=soltest2_sub.eps,width=12cm,height=7.2cm}
+\figcap{FEM solutions shown both as concentration as function of x
+for time=3 days (upper) and as function of time with x=10 cm
+(lower). Different $C_r$-numbers have been used. The P\'{e}clet
+number, $P_e$ is 2 for all the simulations.  It can be seen that the
+simulation with $C_r=2$ is unstable (very large wiggles for $x\geq
+43$).} 
+\label{fig:soltest2_sub}
+\end{center}
+\end{figure}
+
+ 
+
+\begin{figure}[H]  %here-top-bottom-page
+\begin{center}
+%\epsffile{soltest3_sub.eps}
+\epsfig{file=soltest3_sub.eps,width=12cm,height=7.2cm}
+\figcap{FEM solutions shown both as concentration as function of x,
+  time=3 days (upper) and as function of time with x=10 cm
+  (lower). Different $P_e$ and $C_r$-numbers have been used, but
+  $P_eC_r$ is equal to 10 for all the figures.}
+\label{fig:soltest3_sub}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]  %here-top-bottom-page
+\begin{center}
+%\epsffile{soltest4_sub.eps}
+\epsfig{file=soltest4_sub.eps,width=12cm,height=7.2cm}
+\figcap{Analytical and FEM solutions shown both as concentration as
+  function of x, time=3 days (upper) and as function of time with x=10 cm
+(lower). For the FEM-simulations 3 different strategies are used. One
+without stabilization. One with streamline diffusion, $\gamma=5$ and
+lastly one with changing $\Delta t$ so $P_eC_r\leq \gamma$,
+$\gamma=5$.}
+\label{fig:soltest4_sub}
+\end{center}
+\end{figure}
+
+
+%\subsubsection{Solution strategies}
+
+%For some simulations of solute movement it is not necessary to use a
+%Picard iteration loop as specified by equation \ref{eq:Picard}. These
+%situations occur if none of the matrices  $\mathbf{A}$, $\mathbf{G}$
+%and $\mathbf{H}$ are dependent of the solution (i.e the
+%concentration). The ODE is then linear. \\
+%\\
+%In many cases $\mathbf{A}$, $\mathbf{G}$ or $\mathbf{H}$ matrices are
+%dependent of the concentration. These situations occur if the sink
+%term, chemical processes, retardation factor or boundary conditions
+%are concentration dependent. 
+
+
+%\begin{table}[H]
+%\tabcap{Different solution strategies}
+%\label{tab:solstrat}
+%\begin{tabular}{p{5cm}|p{0.4cm}|p{0.4cm}|p{0.4cm}|p{0.4cm}|p{0.4cm}|p{0.4cm}|p{0.4cm}}\hline
+%Solver & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\ \hline
+%Non-linear &  &  &  & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$  \\ \hline
+%Linear & $\bullet$ & $\bullet$ & $\bullet$ &  &  &  &   \\ \hline
+%Streamline diffusion &  & $\bullet$ &  &  & $\bullet$ &  & $\bullet$  \\ \hline
+%$\Delta t$ is constant & $\bullet$ & $\bullet$ &  & $\bullet$ & $\bullet$ &
+%&   \\ \hline
+%$\Delta t_{m+1}=f(m_n)$ &  &  &  &  &  & $\bullet$ & $\bullet$  \\ \hline
+%$\Delta t$ so $P_eC_r\leq \gamma$ &  &  & $\bullet$ &  &  &  &  \\ \hline
+%\end{tabular}
+%\end{table}
+
+\subsection{Size of the timesteps}\index{timesteps, size of}
+
+Like in the water movement model it is possible to choose between
+solution strategies, but here it is combined with different methods to
+avoid instabilities like the streamline diffusion method. The
+different combinations which TopFEM can handle are given in table
+\ref{tab:solstrat}.
+
+\begin{table}[H]
+%\tabcap{Different solution strategies}
+%\label{tab:solstrat}
+\centering 
+\sbox{\mybox}{\begin{tabular}{p{5cm}|p{0.4cm}|p{0.4cm}|p{0.4cm}|p{0.4cm}|p{0.4cm}|p{0.4cm}|p{0.4cm}}\hline
+Solver & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\ \hline
+Non-linear &  &  &  & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$  \\ \hline
+Linear & $\bullet$ & $\bullet$ & $\bullet$ &  &  &  &   \\ \hline
+Streamline diffusion &  & $\bullet$ &  &  & $\bullet$ &  & $\bullet$  \\ \hline
+$\Delta t$ is constant & $\bullet$ & $\bullet$ &  & $\bullet$ & $\bullet$ &
+&   \\ \hline
+$\Delta t_{m+1}=f(m_n)$ &  &  &  &  &  & $\bullet$ & $\bullet$  \\ \hline
+$\Delta t$ so $P_eC_r\leq \gamma$ &  &  & $\bullet$ &  &  &  &  \\ \hline
+\end{tabular}}
+\settowidth{\mylength}{\usebox{\mybox}}
+\setcaptionwidth{\mylength}
+\tabcap{Different solution strategies}
+\usebox{\mybox}
+\label{tab:solstrat}
+\end{table}
+
+For some simulations of solute movement it is not necessary to use a
+Picard iteration loop as specified by equation \ref{eq:Picard}. These
+situations occur if none of the matrices  $\mathbf{A}$, $\mathbf{G}$
+and $\mathbf{H}$ are dependent of the solution (i.e the
+concentration). The ODE is then linear. \\
+\\
+In many cases $\mathbf{A}$, $\mathbf{G}$ or $\mathbf{H}$ matrices are
+dependent of the concentration. These situations occur if the sink
+term, chemical processes, retardation factor or boundary conditions
+are concentration dependent. For the non-linear solvers with varying
+size of the timesteps, i.e. solver 6 and 7 in table
+\ref{tab:solstrat}, $\Delta t_{n+1}=f(m_n)$ means that the size of the
+timesteps is dependent on the number of Picard iterations in the previous
+timestep. The iteration procedure is then almost similar to the one
+from the water movement simulations:
+
+\begin{enumerate}
+\item if $m\leq 4$ then $\Delta t_{n+1} = 1.1\Delta t_n$ but not larger than
+  $\Delta t_{max}$
+\item if $m=5$ then $\Delta t_{n+1}=\Delta t_n$ 
+\item if $6 \leq m\leq 7$ then $\Delta t_{n+1}=0.5 \Delta t_n$ but not lower
+  than $\Delta t_{min}$
+\item if $m>7$ then $\Delta t_{n+1}=0.1\Delta t_n$ but not lower than $\Delta
+   t_{min}$
+\item if $m=m_{max}$, the time is only updated if $\Delta t_{n+1}=\Delta
+  t_{min}$ else it tries again with smaller timesteps  $\Delta t_n=
+  0.1\Delta t_n$ but not smaller than $\Delta t_{min}$
+\end{enumerate}
+
+
+\subsection{Mass balance}\index{mass balance!solute}
+
+The mass balance for solute can be defined as:
+
+
+\begin{equation}
+\begin{split}
+\text{solute balance} & = \text{Change in stored amount of solute} \\
+& + \text{Total flux out of borders} \\
+& + \text{Solute removed by physical sinks} \\
+& - \text{Solute produced by chemical processes}
+\end{split}
+\label{eq:solbal}
+\end{equation}
+
+With physical sinks is meant that the solute follows with the water
+as for example some kinds of root extraction. Degradation processes
+are in the mass balance calculations treated as negative
+production. The solute balance index is defined as the right hand side
+of equation \ref{eq:solbal} divided by 1/4 of the sum of the absolute
+value of each of the terms. Ideally it is zero, except for redistribution
+cases where both the numerator and the denominator equals zero. TopFEM
+calculates the solute balance index after each simulation, and it is
+easy to calculate the mass balance.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

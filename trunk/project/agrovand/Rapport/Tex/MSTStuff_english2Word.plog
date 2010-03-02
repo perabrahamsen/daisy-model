@@ -1,0 +1,40 @@
+Chikrii Softlab pseudoTeX 2.0 report.
+http://www.chikrii.com, mailto: support@chikrii.com
+
+MSTStuff_english2Word.tex (Ln 3) Syntax Error: \input doesn't works, can't open file (report)
+MSTStuff_english2Word.tex (Ln 6) Syntax Error: \input doesn't works, can't open file (natbibDK)
+MSTStuff_english2Word.tex (Ln 12) Syntax Error: \input doesn't works, can't open file (fontenc)
+MSTStuff_english2Word.tex (Ln 41) Syntax Error: Undefined control sequence (\chapter)
+MSTStuff_english2Word.tex (Ln 45) Syntax Error: Undefined control sequence (\chapter)
+MSTStuff_english2Word.tex (Ln 99) Syntax Error: Missing $ inserted
+MSTStuff_english2Word.tex (Ln 99) Syntax Error: Extra \right
+MSTStuff_english2Word.tex (Ln 106) Syntax Error: Extra }, or forgotten $
+MSTStuff_english2Word.tex (Ln 109) Syntax Error: Missing $ inserted
+MSTStuff_english2Word.tex (Ln 109) Syntax Error: Extra }, or forgotten $
+MSTStuff_english2Word.tex (Ln 122) Syntax Error: Missing $ inserted
+MSTStuff_english2Word.tex (Ln 122) Syntax Error: Extra }, or forgotten $
+MSTStuff_english2Word.tex (Ln 126) Syntax Error: Missing $ inserted
+MSTStuff_english2Word.tex (Ln 133) Syntax Error: Undefined control sequence (\chapter)
+MSTStuff_english2Word.tex (Ln 159) Syntax Error: Undefined control sequence (\caption)
+MSTStuff_english2Word.tex (Ln 165) Syntax Error: Undefined control sequence (\caption)
+MSTStuff_english2Word.tex (Ln 171) Syntax Error: Undefined control sequence (\caption)
+MSTStuff_english2Word.tex (Ln 193) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english2Word.tex (Ln 193) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english2Word.tex (Ln 193) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english2Word.tex (Ln 193) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english2Word.tex (Ln 227) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english2Word.tex (Ln 237) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english2Word.tex (Ln 266) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english2Word.tex (Ln 266) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english2Word.tex (Ln 266) Warning: You can use \mathaccent only with \mathchar in pseudoTeX
+MSTStuff_english2Word.tex (Ln 338) Syntax Error: Undefined control sequence (\caption)
+MSTStuff_english2Word.tex (Ln 349) Syntax Error: Undefined control sequence (\caption)
+MSTStuff_english2Word.tex (Ln 602) Syntax Error: Missing $ inserted
+MSTStuff_english2Word.tex (Ln 602) Syntax Error: Extra \right
+MSTStuff_english2Word.tex (Ln 605) Syntax Error: Extra }, or forgotten $
+MSTStuff_english2Word.tex (Ln 607) Syntax Error: Missing $ inserted
+MSTStuff_english2Word.tex (Ln 754) Syntax Error: Undefined control sequence (\text)
+MSTStuff_english2Word.tex (Ln 786) Syntax Error: Undefined control sequence (\text)
+MSTStuff_english2Word.tex (Ln 807) Syntax Error: Undefined control sequence (\caption)
+MSTStuff_english2Word.tex (Ln 816) Syntax Error: Undefined control sequence (\caption)
+MSTStuff_english2Word.tex (Ln 835) Syntax Error: Undefined control sequence (\caption)
