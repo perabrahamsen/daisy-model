@@ -332,7 +332,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       daisy_assert (Theta[i] <= Theta_sat + 1e-10);
       total_old += geo.dz (i) * Theta_old[i];
       total_new += geo.dz (i) * Theta[i];
-      total_S += geo.dz (i) * S[i] * dt;
+      total_S += geo.dz (i) * S[i];
     }
   daisy_balance (total_old, total_new, (-q_up + q_down - total_S) * dt);
 }

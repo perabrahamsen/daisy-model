@@ -292,7 +292,13 @@ Block::number (const symbol key) const
 
 double 
 Block::number (const symbol key, double default_value) const
-{ return check (key) ?  number (key) : default_value; }
+{ 
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
+    return number (expand_reference (key), default_value);
+
+  return frame.number (key, default_value); 
+}
 
 symbol
 Block::name (const symbol key) const
@@ -306,7 +312,13 @@ Block::name (const symbol key) const
 
 symbol
 Block::name (const symbol key, const symbol default_value) const
-{ return check (key) ? name (key) : default_value; }
+{ 
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
+    return name (expand_reference (key), default_value);
+
+  return expand_string (frame.name (key, default_value)); 
+}
 
 bool 
 Block::flag (const symbol key) const
@@ -320,7 +332,13 @@ Block::flag (const symbol key) const
 
 bool 
 Block::flag (const symbol key, bool default_value) const
-{ return check (key) ? flag (key) : default_value; }
+{ 
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
+    return flag (expand_reference (key), default_value);
+
+  return frame.flag (key, default_value); 
+}
 
 const PLF& 
 Block::plf (const symbol key) const
@@ -364,7 +382,14 @@ Block::integer (const symbol key) const
 
 int 
 Block::integer (const symbol key, int default_value) const
-{ return check (key) ? integer (key) : default_value; }
+{ 
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
+    return integer (expand_reference (key), default_value);
+
+  return frame.integer (key, default_value); 
+}
+
 
 const std::vector<double>& 
 Block::number_sequence (const symbol key) const

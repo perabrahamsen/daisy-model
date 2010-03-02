@@ -1,3 +1,13 @@
+2010-03-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.79 released.
+
+2010-03-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* block.C: Expand references even when having a default value.
+
+	* uzlr.C (tick): Multiplied with dt twice.
+
 2010-03-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* weather_std.C (PAverage): Don't allow zero.

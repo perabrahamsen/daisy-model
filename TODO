@@ -2,17 +2,7 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * hunter
 
-** Bruger ikke længere PC.
-
-** Køb KVM
-
 ** Linux
-
-* omdøb organic_matter to organic
-
-* Osvaldo
-
-** Setup med parametre
 
 * VAP 
 
@@ -20,25 +10,25 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 *** NE
 
-2D No Drain point, sim stop at 2000-8-1, Only Bromide
+Prøv med convection alene
 
+*** NW 
 
+drænpunkt, drænbioporer kun til -50 cm
 
-** Få Silstrup glyphosat nogenlunde på plads
+*** SW
 
-** Installer KVM switch med gammel stationær
+større drænnode
 
-** Ryd op i gammel stationær
+*** SE
 
-** Installer ny stationær
+større drænnode + mindre tidsskridt
 
-** Installer Ubuntu
+* omdøb organic_matter to organic
 
-** Installer Daisy
+* Osvaldo
 
-** 2D Silstrup
-
-** Diskuter med SH og CPE
+** Setup med parametre
 
 * Standard log
 
