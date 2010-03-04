@@ -48,7 +48,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Geometry1D& geo,
-                     const Soil& soil, unsigned int first, unsigned int last,
+                     const Soil& soil, size_t first, size_t last,
 		     Surface& surface,
 		     const std::vector<double>& h_ice,
 		     const std::vector<double>& h,

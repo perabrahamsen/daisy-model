@@ -54,7 +54,7 @@ struct MacroStandard : public Macro
 
   // Simulation.
   void tick (const Geometry1D& geo,
-             const Soil& soil, unsigned int first, unsigned int last,
+             const Soil& soil, size_t first, size_t last,
              Surface& surface,
              const std::vector<double>& h_ice,
              const std::vector<double>& h,
@@ -104,7 +104,7 @@ MacroStandard::default_pond_max = 0.5;
 void 
 MacroStandard::tick (const Geometry1D& geo,
                      const Soil& soil, 
-                     const unsigned int first, const unsigned int last,
+                     const size_t first, const size_t last,
                      Surface& surface,
                      const std::vector<double>& h_ice,
                      const std::vector<double>& h,
@@ -130,10 +130,10 @@ MacroStandard::tick (const Geometry1D& geo,
   const double soil_end = geo.zplus (geo.cell_size () - 1);
 
   // Start and end of macro intervals.
-  const unsigned int from 
+  const size_t from 
     = std::max (double2int (geo.interval_plus (height_start)) - 1,
                 /* not unsigned, or -1 fails */ double2int (first));
-  const unsigned int to 
+  const size_t to 
     = std::min (geo.interval_plus (std::max (height_end, soil_end)), last);
 
   // Check if macropores reach surface, and there is ponding there.

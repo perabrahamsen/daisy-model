@@ -1,3 +1,7 @@
+2010-03-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* macro_std.C (tick): 64bit fix.
+
 2010-03-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.79 released.

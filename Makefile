@@ -25,23 +25,21 @@ ifeq ($(OS),Windows_NT)
 #	HOSTTYPE = cygwin
 	HOSTTYPE = mingw
 #	HOSTTYPE = win32
+else
+	HOSTTYPE = x86_64
 endif
 
 # HOSTTYPE .
 #
-ifeq ($(HOSTTYPE),i486-linux)
-	HOSTTYPE = i386-linux
-endif
-
 # Some non-local files and directories.
 
-ifeq ($(HOSTTYPE),i386-linux)
+ifeq ($(HOSTTYPE),x86_64)
 SRCDIR = $(HOME)/daisy
-OBJHOME = /usr/local/daisy
-NATIVEHOME = $(OBJHOME)/$(HOSTTYPE)
+OBJHOME =  $(SRCDIR)/obj
+NATIVEHOME = $(OBJHOME)
 NATIVEEXE = daisy
 USE_GUI = none
-BOOSTINC = -isystem $(HOME)/boost/include/boost-1_35/
+BOOSTINC = #-isystem $(HOME)/boost/include/boost-1_35/
 else
 SRCDIR = ..
 OBJHOME = obj
@@ -83,7 +81,9 @@ ifeq ($(HOSTTYPE),sun4)
 endif
 ifeq ($(HOSTTYPE),i386-linux)
 	COMPILER = gcc
-#	COMPILER = sun	
+endif
+ifeq ($(HOSTTYPE),x86_64)
+	COMPILER = gcc
 endif
 ifeq ($(HOSTTYPE),hp)
 	COMPILER = gcc
@@ -147,6 +147,9 @@ ifeq ($(USE_OPTIMIZE),true)
 		ifeq ($(HOSTTYPE),i386-linux)
 		  OPTIMIZE = -O3 -ffast-math -mtune=generic -march=pentium
 	        endif
+		ifeq ($(HOSTTYPE),x86_64)
+		  OPTIMIZE = -O3 -ffast-math -mtune=native  -march=native
+	        endif
 		ifeq ($(HOSTTYPE),cygwin)
 		  OPTIMIZE = -O3 -ffast-math -mtune=pentium-m -march=pentium
 		endif
@@ -166,6 +169,9 @@ endif
 # Do we want to create a dynamic library?
 #
 ifeq ($(HOSTTYPE),i386-linux)
+	USE_DYNLIB = false
+endif
+ifeq ($(HOSTTYPE),x86_64)
 	USE_DYNLIB = false
 endif
 ifeq ($(HOSTTYPE),sun4)
@@ -205,6 +211,10 @@ ifeq ($(COMPILER),gcc)
 		OSFLAGS = 
 		DEBUG = -g
 	endif
+	ifeq ($(HOSTTYPE),x86_64)
+		OSFLAGS = 
+		DEBUG = -g
+	endif
 	ifeq ($(HOSTTYPE),cygwin)
 		OSFLAGS =
 		DEBUG = -g
@@ -215,7 +225,7 @@ ifeq ($(COMPILER),gcc)
 		DEBUG = -g
 	endif
 	WARNING = -Wall -Wno-uninitialized \
-		  -Wconversion -Woverloaded-virtual \
+		  -Woverloaded-virtual \
 		  -Wsign-promo -Wundef -Wpointer-arith -Wwrite-strings \
                   -Wno-sign-compare  -Wundef -Wendif-labels \
 		  -Wcast-qual -Wcast-align -Wmissing-format-attribute \
@@ -227,6 +237,7 @@ ifeq ($(COMPILER),gcc)
 #  -Wuninitialized: triggered in 3.4 in initializations!
 #  -Wunreachable-code: triggered by header files
 #  -Wextra: Triggers dllexport/inline: -Wno-attributes is not in GCC 3
+#  -Wconversion: Triggers calling int functions with size_t in 4.4
 	COMPILE = $(GCC) -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
 	CCOMPILE = $(COMPILE)
 	CPPLIB = -lstdc++
@@ -272,6 +283,9 @@ ifeq ($(HOSTTYPE),hp)
 	MATHLIB = -lM
 endif
 ifeq ($(HOSTTYPE),i386-linux)
+	MATHLIB =
+endif
+ifeq ($(HOSTTYPE),x86_64)
 	MATHLIB =
 endif
 ifeq ($(HOSTTYPE),win32)
@@ -625,11 +639,16 @@ daisyw.exe:	$(GUIOBJECTS) daisy.dll
 	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) -Wl,--enable-runtime-pseudo-reloc -mwindows
 
 daisy:	main${OBJ} $(GUIOBJECTS) $(LIBOBJ)
-	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB)
+	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB)  $(CXSPARSELIB)
 
 exp:	
 	(cd $(OBJHOME)/exp \
          && $(MAKE) VPATH=$(SRCDIR) USE_PROFILE=true -f $(SRCDIR)/Makefile daisy)
+
+linux:	
+	(mkdir -p $(NATIVEHOME) \
+	 && cd $(NATIVEHOME) \
+         && time $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile $(NATIVEEXE))
 
 native:	
 	(cd OpenMI && time $(MAKE) all ) \

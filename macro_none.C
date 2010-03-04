@@ -33,7 +33,7 @@ struct MacroNone : public Macro
   // Simulation.
   void tick (const Geometry1D&,
              const Soil& /* soil */, 
-	     unsigned int /* first */, unsigned int /* last */,
+	     const size_t /* first */, const size_t /* last */,
 	     Surface& /* surface */,
 	     const std::vector<double>& /* h_ice */,
 	     const std::vector<double>& /* h */,

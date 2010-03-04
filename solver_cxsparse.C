@@ -36,7 +36,7 @@ struct SolverCXSparse : public Solver
   void solve (Matrix& A, const Vector& b, Vector& x) const // Solve Ax=b
   {
     // declare variable (T=double, size_type=unsigned int)
-    CS::cxsparse_type_traits<double, unsigned int>::lu_type     cs_lu;
+    CS::cxsparse_type_traits<double, unsigned long>::lu_type     cs_lu;
 
     // decompose
     cs_lu = CS::cs_ul_decompose (A, 1.0);

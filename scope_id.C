@@ -64,7 +64,7 @@ ScopeID::set_dimension (symbol, symbol d)
 
 ScopeID::ScopeID (const symbol name, const symbol d)
   : tag (name),
-    value (NOT_A_NUMBER),
+    value (NAN),
     dim (d)
 { }
 
