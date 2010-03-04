@@ -12,11 +12,66 @@
 
 \begin{document}
 
-\title{ABA in Daisy}
+\title{Stomata models and ABA signalling in Daisy}
 \author{Per Abrahamsen}
 \maketitle
 
-\section{Introduction}
+\section{Stomata models}
+\label{sec:stomata}
+
+Stomata conductivity ($g_s$) is an improtant factor for both
+transpiration and photosyntheis.  Daisy implements several models for
+calculating $g_s$.
+
+\subsection{Ball-Berry model adjusted with draught stress}
+
+The Ball-Berry equation adjusted for draught stress, both based on
+physical signalling (root crown potential, $\psi_c$) and chemical
+signalling (ABA) is supported (Eq.~\ref{eq:gs}).
+\begin{equation}
+  g_s = m A_n \frac{h_s}{c_s} e^{-\beta \aba{xylem}} e^{-\delta |\psi_c|} + g_{s0}
+  \label{eq:gs}
+\end{equation}
+With $\delta = 0$ is becomes equal to the equation proposed by
+\citet{gs2002}, and with both $\delta = 0$ and $\beta = 0$ it becomes
+equavalent to the unadjusted Ball-Berry model \citep{bb87}.
+
+\subsection{Leuning model adjusted with draught stress}
+
+The model described in \citet{leuning95} has been adjusted for draught
+stress as in the previous section (Eq.~\ref{eq:leuning}).
+
+\begin{equation}
+  g_s = \frac{m A_n}{(c_s-\gamma)(1 + \frac{D_s}{D_0})} e^{-\beta \aba{xylem}} e^{-\delta |\psi_c|} + g_{s0}
+  \label{eq:leuning}
+\end{equation}
+
+\subsection{Ahmadi models}
+
+Two of the models introduced in \citet{Ahmadi20091541} have been
+implemented in Daisy.  Eq.~\ref{eq:sha12}, corresponding to equation 12
+in the original artcile, and Eq.~\ref{eq:sha14}, corresponding to
+equation 14 in the original artcile
+\begin{equation}
+  g_s = m {A_n}^\lambda \frac{{h_s}^\alpha}{c_s} e^{-\beta \aba{xylem}} e^{-\delta |\psi_c|}
+  \label{eq:sha12}
+\end{equation}
+\begin{equation}
+  g_s = \frac{m}{c_s} e^{\lambda A_n} e^{\alpha h_s} e^{-\beta
+    \aba{xylem}} e^{-\delta |\psi_c|}
+  \label{eq:sha14}
+\end{equation}
+
+\subsection{Andersen model}
+
+The model depicted in Eq.~\ref{eq:mna} is not documented.
+\begin{equation}
+  g_s = \frac{m}{c_s} e^{\lambda / A_n} e^{\alpha h_s} e^{-\beta
+    \aba{xylem}} e^{-\delta |\psi_c|} + g_{s0}
+  \label{eq:mna}
+\end{equation}
+
+\section{ABA}
 
 ABA is a plant hormom which regulates, among other things, the closing
 of stomata.  By triggering the production of ABA in crops it is
@@ -35,7 +90,7 @@ ABA also has other effects, such as on root growth and plant
 phenology, but these are not implemented in Daisy and outside the
 scope of this paper.
 
-\section{ABA production in soil}
+\subsection{ABA production in soil}
 
 Let $V$ represent the soil volume we are simulating.  The soil volume
 should as minimum include the entire root zone.  For every point in
@@ -45,7 +100,7 @@ $S$, the root density $l$, and the water potential $h$.
 Based on these values, we have several models for estimating ABA in
 the stem (\aba{xylem}) from the conditions in the soil.
 
-\subsection{Based on uptake location}
+\subsubsection{Based on uptake location}
 
 The first model is based directly on pot experiments where both
 \aba{xylem} and the water potential ($h$) is measured.  The pots are
@@ -63,7 +118,7 @@ get~\eqref{eq:aba_uptake}.
 
 The function $\aba{uptake}(h)$ must be supplied by the user.
 
-\subsection{Based on production in roots}
+\subsubsection{Based on production in roots}
 
 ABA is produced in the roots with a rate that depends in the water
 potential ($\aba{root}(h)$).  If we assume all the ABA produced ends up in
@@ -77,7 +132,7 @@ in~\eqref{eq:aba_root}.
 
 The function $\aba{root}(h)$ must be supplied by the user.
 
-\subsection{Based on production in soil}
+\subsubsection{Based on production in soil}
 
 Both $S \aba{uptake}(h)$ and $l \aba{root}(h)$ are special cases of
 calculating the ABA contribution from the soil water potential, root
@@ -96,7 +151,7 @@ We get \eqref{eq:aba_uptake} by setting $\aba{soil}(S,l,h) = S \:
 
 The function $\aba{soil}(S,l,h)$ must be supplied by the user.
 
-\subsection{No ABA production}
+\subsubsection{No ABA production}
 
 The simplest model for ABA production is to assume no ABA is produced,
 which also gives the simlest equation (\eqref{eq:aba_none}).
@@ -106,20 +161,12 @@ which also gives the simlest equation (\eqref{eq:aba_none}).
   \label{eq:aba_none}
 \end{equation}
 
-\section{ABA effect in canopy}
+\subsection{ABA effect in canopy}
 
-\subsection{ABA effect on photosynthesis}
+\subsubsection{ABA effect on photosynthesis}
 
-The ABA effect on photosynthesis is through a factor (\aba{cond})
-which is multiplied to the stomata conductance.  The factor is
-calculated as decribed in \eqref{eq:aba-cond}.
-
-\begin{equation}
-  \aba{cond} = e^{-k \aba{xylem}}
-  \label{eq:aba-cond}
-\end{equation}
-
-\subsection{ABA effect on transpiration}
+The ABA effect on photosynthesis is through the stomata conductance,
+as described in section~\ref{sec:stomata}.
 
 The sun shade open canopy (ssoc) soil vegetation atmosphere (svat)
 model will use the calculated stomata conductance as part of an energy
@@ -156,5 +203,8 @@ stomata conductance.
   $V$    & cm$^3$ \textsc{soil}
     & Soil volume\\
 \end{tabular}
+
+\bibliographystyle{elsart-harv}
+\bibliography{daisy}
 
 \end{document}
