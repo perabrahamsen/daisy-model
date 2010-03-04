@@ -600,9 +600,10 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = stomatacon_Leuning.C stomatacon_BB.C 
+REMOVE = none
 
-REMOVED = select_pF.C avalue.C alist.C avalue.h alist.h syntax.h syntax.C \
+REMOVED = stomatacon_Leuning.C stomatacon_BB.C \
+	select_pF.C avalue.C alist.C avalue.h alist.h syntax.h syntax.C \
 	msoltranrect_2x1.C msoltranrect_forward.C\
 	select_soil.C adsorption_none.C adsorption_full.C ABAprod_expr.C \
 	solute.C solute.h pedo.C pedo.h pedo_arit.C pedo_const.C \
