@@ -1,4 +1,21 @@
+2010-03-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C (decompose_CO2_factor, decompose_lag_increment): Fix dimension.
+
+	* bioclimate_std.C (WaterDistribution): Forgot to multiply with dt.
+
+	* snow.C (tick): Pond is not a flux.
+	(q_s, EvapSnowPack): Fix dimension.
+
+2010-03-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* solver_cxsparse.C (solve): 64bit fix.
+
 2010-03-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* mathlib.h (NAN): Renamed from NOT_A_NUMBER, use empty string
+	instead of 0.
+	* scope_id.C (ScopeID): Update caller.
 
 	* macro_std.C (tick): 64bit fix.
 

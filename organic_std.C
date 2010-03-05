@@ -3009,14 +3009,14 @@ This is a negative number.");
                "Total organic C in the soil layer.");
     frame.declare ("total_N", "g N/cm^3", Attribute::LogOnly, Attribute::SoilCells,
                "Total organic N in the soil layer.");
-    frame.declare ("CO2", "g CO_2-C/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
+    frame.declare ("CO2", "g CO2-C/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                "CO2 evolution in soil from all pools.");
-    frame.declare ("CO2_fast", "g CO_2-C/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
+    frame.declare ("CO2_fast", "g CO2-C/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                "CO2 evolution in soil from pools faster than 'CO2_threshold'.");
     frame.declare ("CO2_threshold", "h^-1", Check::fraction (), Attribute::Const, "\
 Turnover rate above which pools will contribute to 'CO2_fast'.");
     frame.set ("CO2_threshold", 1e-4); // SMB2 and default AOM pools.
-    frame.declare ("top_CO2", "g CO_2-C/cm^2/h", Attribute::LogOnly,
+    frame.declare ("top_CO2", "g CO2-C/cm^2/h", Attribute::LogOnly,
                    "CO2 evolution at surface.");
     frame.declare ("top_DM", "kg DM/m^2", Attribute::LogOnly,
                    "Added organic dry matter on top of surface.");

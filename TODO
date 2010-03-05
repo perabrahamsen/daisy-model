@@ -2,33 +2,41 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * hunter
 
-** Linux
+** Print?
 
 * VAP 
 
-** Kørsel
+** linux fuld kørsel, omdøb filer.
 
-*** NE
+** daisy i små tidsskridt?
 
-Prøv med convection alene
+Mindsker fejlen...
 
-*** NW 
+** drain i små tidsskridt?
 
-drænpunkt, drænbioporer kun til -50 cm
-
-*** SW
-
-større drænnode
-
-*** SE
-
-større drænnode + mindre tidsskridt
+** convection domain 2?
 
 * omdøb organic_matter to organic
 
 * Osvaldo
 
-** Setup med parametre
+** DONE Setup med parametre 
+
+** "Smart output"?
+
+Ingen headers, kun relevante tal.
+
+kig på hans data
+
+** Cambell Theta_fc, Theta_sat (Theta_wp, K_sat, K_fc, K_wp)
+
+*** COMPONENT: wiltingpoint
+
+explicit, pedo
+
+*** COMPONENT: porosity
+
+(hypres)
 
 * Standard log
 

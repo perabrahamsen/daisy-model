@@ -6,6 +6,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.80
+
+** Ported to Linux/AMD64/GCC4.4
+
 * 4.79
 
 ** Potential evaporation changes.

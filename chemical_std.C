@@ -1704,27 +1704,24 @@ You must specify it with either 'decompose_rate' or 'decompose_halftime'.");
                    Attribute::Const,
                    "Water potential factor on decomposition.");
     frame.set ("decompose_water_factor", PLF::empty ());
-    frame.declare ("decompose_CO2_factor", "g CO2-C/cm^3", Attribute::None (),
+    frame.declare ("decompose_CO2_factor", "g CO2-C/cm^3/h", Attribute::None (),
                    Attribute::Const,
                    "CO2 development factor on decomposition.");
-    PLF no_factor;
-    no_factor.add (0.0, 1.0);
-    no_factor.add (1.0, 1.0);
-    frame.set ("decompose_CO2_factor", no_factor);
+    frame.set ("decompose_CO2_factor", PLF::always_1 ());
     frame.declare ("decompose_conc_factor", "g/cm^3 H2O", Attribute::None (),
                    Attribute::Const,
                    "Concentration development factor on decomposition.");
-    frame.set ("decompose_conc_factor", no_factor);
+    frame.set ("decompose_conc_factor", PLF::always_1 ());
     frame.declare ("decompose_depth_factor", "cm", Attribute::None (),
                    Attribute::Const,
                    "Depth influence on decomposition.");
-    frame.set ("decompose_depth_factor", no_factor);
+    frame.set ("decompose_depth_factor", PLF::always_1 ());
     frame.declare ("decompose_lag_increment", 
-                   "g/cm^3/h", Attribute::Fraction (), Attribute::Const,
+                   "g/cm^3", "h^-1", Attribute::Const,
                    "Increment lag with the value of this PLF for the current\n\
 concentration each hour.  When lag in any cell reaches 1.0,\n\
 decomposition begins.  It can never be more than 1.0 or less than 0.0.");
-    frame.set ("decompose_lag_increment", no_factor);
+    frame.set ("decompose_lag_increment", PLF::always_1 ());
     frame.declare_object ("C_below", Number::component, 
                           Attribute::Const, Attribute::Singleton, "\
 Concentration below the layer of soil being examined.\n\

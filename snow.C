@@ -37,8 +37,8 @@
 struct Snow::Implementation
 { 
   // Flux variables.
-  double EvapSnowPack;			// Evaporation from snowpack [mm]
-  double q_s;			// Leaking water [mm]
+  double EvapSnowPack;			// Evaporation from snowpack [mm/h]
+  double q_s;			// Leaking water [mm/h]
   double temperature;		// temperature of leaking water [dg C]
 
   // State variables.
@@ -264,8 +264,8 @@ Snow::Implementation::tick (Treelog& msg,
 	  const double dZc = Ssnow_old / (f * rho_c) + dZp;
 
 	  // Factor in collapsing from passing melting water.
-	  if (q_s > Pond)
-	    dZs = dZc * Ssnow_new / (Ssnow_new + (q_s - Pond) * dt);
+	  if (q_s * dt > Pond)
+	    dZs = dZc * Ssnow_new / (Ssnow_new - Pond + q_s * dt);
 	  else
 	    dZs = dZc;
 
@@ -307,7 +307,7 @@ Snow::Implementation::tick (Treelog& msg,
     } 
   temperature = T;
 
-  q_s -= Pond;
+  q_s -= Pond / dt;
 }
   
 void 
@@ -364,9 +364,9 @@ Snow::load_syntax (Frame& frame)
 
   static const double hours_per_day = 24.0; // [h/d]
 
-  frame.declare ("EvapSnowPack", "mm", Attribute::LogOnly, 
+  frame.declare ("EvapSnowPack", "mm/h", Attribute::LogOnly, 
 	      "Evaporation from snowpack.");
-  frame.declare ("q_s", "mm", Attribute::LogOnly,
+  frame.declare ("q_s", "mm/h", Attribute::LogOnly,
 	      "Leaking water.");
   frame.declare ("Ssnow", "mm", Attribute::State,
 	      "Snow storage expressed as water.");

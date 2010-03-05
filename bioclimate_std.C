@@ -702,8 +702,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
   snow_water_out = snow.percolation ();
   if (snow_water_out < 0.0)
     {
-      daisy_assert (snow_water_out + surface.ponding () >= 0.0);
-      surface.put_ponding (snow_water_out + surface.ponding ());
+      daisy_assert (snow_water_out * dt + surface.ponding () >= 0.0);
+      surface.put_ponding (snow_water_out * dt + surface.ponding ());
       snow_water_out = 0.0;
     }
   snow_water_out_temperature = snow.temperature ();
