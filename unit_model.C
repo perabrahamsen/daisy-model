@@ -296,7 +296,7 @@ Connvert to SI base units by multiplying with a factor.")
          "Gram per kilogram.");
     add ("m^3/cm^3", 1.0 / p_c_3, 0, 0, 0, 0, 0, 0, 0,
          "Kilo.");
-    add ("mg N/kg dry soil", p_u / p_k, 0, 0, 0, 0, 0, 0, 0,
+    add ("mg N/kg dry soil", p_m / p_k, 0, 0, 0, 0, 0, 0, 0,
          "Nitrogen concentration in dry soil.");
     add ("cm^3/cm^3", p_c_3 / p_c_3,
          0, 0, 0, 0, 0, 0, 0,

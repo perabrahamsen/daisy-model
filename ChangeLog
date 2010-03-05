@@ -1,4 +1,6 @@
-2010-03-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* unit_model.C ([mg N/kg dry soil]): Fix unit.
 
 	* chemical_std.C (decompose_CO2_factor, decompose_lag_increment): Fix dimension.
 
