@@ -1,4 +1,4 @@
-// organic_matter.h
+// organic.h
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -21,8 +21,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef ORGANIC_MATTER_H
-#define ORGANIC_MATTER_H
+#ifndef ORGANIC_H
+#define ORGANIC_H
 
 #include "model_derived.h"
 #include <vector>
@@ -105,4 +105,4 @@ public:
   ~OrganicMatter ();
 };
 
-#endif // ORGANIC_MATTER_H
+#endif // ORGANIC_H

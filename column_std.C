@@ -36,7 +36,7 @@
 #include "weather.h"
 #include "chemistry.h"
 #include "chemical.h"
-#include "organic_matter.h"
+#include "organic.h"
 #include "im.h"
 #include "am.h"
 #include "dom.h"

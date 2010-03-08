@@ -21,7 +21,7 @@
 
 #define BUILD_DLL
 #include "chemical.h"
-#include "organic_matter.h"
+#include "organic.h"
 #include "soil_heat.h"
 #include "soil_water.h"
 #include "soil.h"

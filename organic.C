@@ -1,4 +1,4 @@
-// organic_matter.C -- Soil organic matter.
+// organic.C -- Soil organic matter.
 // 
 // Copyright 2006 Per Abrahamsen and KVL.
 //
@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 
-#include "organic_matter.h"
+#include "organic.h"
 #include "block_model.h"
 #include "librarian.h"
 
@@ -47,3 +47,5 @@ static struct OrganicInit : public DeclareComponent
 Turnover of organic matter in the soil.")
   { }
 } Organic_init;
+
+// organic.C ends here.

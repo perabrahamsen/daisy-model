@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #define BUILD_DLL
-#include "organic_matter.h"
+#include "organic.h"
 #include "geometry.h"
 #include "librarian.h"
 #include "frame.h"

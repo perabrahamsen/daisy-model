@@ -24,7 +24,7 @@
 #include "production.h"
 #include "crpn.h"
 #include "partition.h"
-#include "organic_matter.h"
+#include "organic.h"
 #include "geometry.h"
 #include "am.h"
 #include "log.h"

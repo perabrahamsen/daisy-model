@@ -1,3 +1,8 @@
+2010-03-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* organic.h, organic.C: Renamed from 'organic_matter'.
+	* all: update users.
+
 2010-03-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* unit_model.C ([mg N/kg dry soil]): Fix unit.

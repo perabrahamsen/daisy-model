@@ -32,7 +32,7 @@
 #include "crop.h"
 #include "am.h"
 #include "aom.h"
-#include "organic_matter.h"
+#include "organic.h"
 #include "submodeler.h"
 #include "check.h"
 #include "librarian.h"

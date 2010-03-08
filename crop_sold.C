@@ -29,7 +29,7 @@
 #include "soil_water.h"
 #include "soil.h"
 #include "geometry.h"
-#include "organic_matter.h"
+#include "organic.h"
 #include "aom.h"
 #include "soil_heat.h"
 #include "chemistry.h"

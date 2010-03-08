@@ -41,7 +41,7 @@
 #include "soil_water.h"
 #include "geometry.h"
 #include "soil.h"
-#include "organic_matter.h"
+#include "organic.h"
 #include "soil_heat.h"
 #include "am.h"
 #include "submodeler.h"

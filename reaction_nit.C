@@ -27,7 +27,7 @@
 #include "soil_heat.h"
 #include "chemistry.h"
 #include "chemical.h"
-#include "organic_matter.h"
+#include "organic.h"
 #include "log.h"
 #include "assertion.h"
 #include "librarian.h"

@@ -32,7 +32,7 @@
 #include "geometry.h"
 #include "soil.h"
 #include "aom.h"
-#include "organic_matter.h"
+#include "organic.h"
 #include "soil_heat.h"
 #include "am.h"
 #include "harvest.h"

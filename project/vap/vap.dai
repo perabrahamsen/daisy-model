@@ -39,8 +39,8 @@
 
 ;;(run batch (run Silstrup-1C-Drain plotzoom))
 ;; (run batch (run plotfull))
-(run batch (run Silstrup-2D (plotall (graph Silstrup))))
-;;(run batch (run Estrup-2D Silstrup-2D plotall))
+;;(run batch (run Silstrup-2D (plotall (graph Silstrup))))
+(run batch (run Estrup-2D Silstrup-2D plotall))
 
 ;;(run batch (run Estrup-2C Silstrup-2C plotall))
 ;;(run batch (run Silstrup-2C plotall))

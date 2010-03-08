@@ -30,7 +30,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
-#include "organic_matter.h"
+#include "organic.h"
 #include "chemistry.h"
 #include "chemical.h"
 #include "plf.h"

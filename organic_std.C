@@ -22,7 +22,7 @@
 
 #define BUILD_DLL
 
-#include "organic_matter.h"
+#include "organic.h"
 #include "frame_submodel.h"
 #include "frame_model.h"
 #include "submodeler.h"

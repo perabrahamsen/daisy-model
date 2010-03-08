@@ -22,7 +22,7 @@
 #define BUILD_DLL
 #include "vegetation.h"
 #include "crop.h"
-#include "organic_matter.h"
+#include "organic.h"
 #include "geometry.h"
 #include "soil.h"
 #include "plf.h"
