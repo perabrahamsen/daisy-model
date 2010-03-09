@@ -395,7 +395,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
   "Simulation for the Estrup PLAP station."
   (station "Estrup")
   (manager Estrup)
-  (weather default "dk-estrup-hourly.dwf"
+  (weather default "dk-Estrup-hourly.dwf"
            (PrecipScale 1.41 1.42 1.35 1.24 1.13 1.11
                         1.10 1.10 1.11 1.14 1.23 1.37 []))
   
