@@ -65,11 +65,19 @@ DLF::start (std::ostream& out, const symbol name,
 void
 DLF::parameter (std::ostream& out, 
                 const symbol name, const symbol value) const
-{ out << name << ": " << value << "\n"; }
+{
+  if (this->value == DLF::None)
+    return;
+  out << name << ": " << value << "\n"; 
+}
 
 void
 DLF::interval (std::ostream& out, const Volume& volume) const
-{ out << "INTERVAL: " << volume.one_line_description () << "\n"; }
+{
+  if (value == DLF::None)
+    return;
+  out << "INTERVAL: " << volume.one_line_description () << "\n"; 
+}
 
 void
 DLF::log_description (std::ostream& out, const symbol description_s) const

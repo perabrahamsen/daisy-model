@@ -316,4 +316,4 @@ Debug level, 0 means no debug information.");
   }
 } ProgramCPEData_syntax;
 
-// rootdens_cpedata.C ends here.
+// program_cpedata.C ends here.

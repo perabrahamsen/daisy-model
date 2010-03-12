@@ -10,6 +10,8 @@ release.
 
 ** Ported to Linux/AMD64/GCC4.4
 
+** Bug fixes.
+
 * 4.79
 
 ** Potential evaporation changes.
