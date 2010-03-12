@@ -415,7 +415,7 @@ MODELS = program_osvaldo.C vegetation_permanent.C  litter.C drain_lateral.C \
 	reaction_std.C chemistry_std.C \
 	groundwater_extern.C \
 	transport_none.C uzrect_Mollerup.C groundwater_flux.C \
-	ABAeffect_exp.C rubiscoNdist_uniform.C \
+	rubiscoNdist_uniform.C \
 	uzrect_2x1.C select_flow.C \
 	select_volume.C uz1d_none.C condition_walltime.C uz1d_richard.C \
 	rubiscoNdist_DPF.C raddist_DPF.C raddist_std.C difrad_DPF.C \
@@ -475,7 +475,7 @@ COMPONENTS = drain.C \
 	draineqd.C condedge.C rainergy.C ponddamp.C scope_model.C seed.C \
 	stomatacon.C tertiary.C biopore.C secondary.C heatrect.C unit_model.C \
 	ABAprod.C solver.C element.C ui.C reaction.C scopesel.C \
-	ABAeffect.C transport.C uzrect.C bound.C volume.C uz1d.C \
+	transport.C uzrect.C bound.C volume.C uz1d.C \
 	rubiscoNdist.C raddist.C difrad.C organic.C movement.C integer.C\
 	xysource.C gnuplot.C boolean.C stringer.C source.C photo.C \
 	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
@@ -602,7 +602,8 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 #
 REMOVE = none
 
-REMOVED = stomatacon_Leuning.C stomatacon_BB.C \
+REMOVED = ABAeffect_exp.C ABAeffect.C ABAeffect.h \
+	stomatacon_Leuning.C stomatacon_BB.C \
 	select_pF.C avalue.C alist.C avalue.h alist.h syntax.h syntax.C \
 	msoltranrect_2x1.C msoltranrect_forward.C\
 	select_soil.C adsorption_none.C adsorption_full.C ABAprod_expr.C \
@@ -1064,9 +1065,6 @@ scopesel${OBJ}: scopesel.C scopesel.h model.h symbol.h scope.h attribute.h \
   assertion.h output.h condition.h model_framed.h model_logable.h \
   memutils.h time.h block_model.h block_nested.h block.h treelog.h \
   frame_model.h frame.h librarian.h
-ABAeffect${OBJ}: ABAeffect.C ABAeffect.h model_logable.h model.h symbol.h \
-  mathlib.h assertion.h block_model.h block_nested.h block.h scope.h \
-  attribute.h treelog.h frame_model.h frame.h librarian.h
 transport${OBJ}: transport.C transport.h model.h symbol.h chemical.h \
   model_framed.h model_logable.h doe.h geometry.h attribute.h \
   adsorption.h model_derived.h block_model.h block_nested.h block.h \
@@ -1870,11 +1868,11 @@ uzrect_const${OBJ}: uzrect_const.C uzrect.h model_framed.h model_logable.h \
 photo_FCC3${OBJ}: photo_FCC3.C photo_Farquhar.h photo.h model_derived.h \
   model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
   scope.h attribute.h treelog.h frame_model.h frame.h rubiscoNdist.h \
-  ABAeffect.h bioclimate.h model_framed.h canopy_std.h canopy_simple.h \
+  bioclimate.h model_framed.h canopy_std.h canopy_simple.h \
   plf.h phenology.h log.h time.h border.h mathlib.h assertion.h check.h \
   librarian.h
 photo_FCC4${OBJ}: photo_FCC4.C photo_Farquhar.h photo.h model_derived.h \
-  model_logable.h model.h symbol.h rubiscoNdist.h ABAeffect.h \
+  model_logable.h model.h symbol.h rubiscoNdist.h \
   bioclimate.h model_framed.h canopy_std.h canopy_simple.h plf.h \
   phenology.h log.h time.h border.h frame.h scope.h attribute.h \
   block_model.h block_nested.h block.h treelog.h frame_model.h mathlib.h \
@@ -1909,9 +1907,6 @@ uzrect_Mollerup${OBJ}: uzrect_Mollerup.C uzrect.h model_framed.h \
 groundwater_flux${OBJ}: groundwater_flux.C groundwater.h model_derived.h \
   model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
   scope.h attribute.h treelog.h frame_model.h frame.h check.h librarian.h
-ABAeffect_exp${OBJ}: ABAeffect_exp.C ABAeffect.h model_logable.h model.h \
-  symbol.h mathlib.h assertion.h check.h block_model.h block_nested.h \
-  block.h scope.h attribute.h treelog.h frame_model.h frame.h librarian.h
 rubiscoNdist_uniform${OBJ}: rubiscoNdist_uniform.C rubiscoNdist.h \
   model_logable.h model.h symbol.h mathlib.h assertion.h check.h \
   block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
