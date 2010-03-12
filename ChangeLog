@@ -1,5 +1,9 @@
 2010-03-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.80 released.
+
+2010-03-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* program_osvaldo.C: New model.
 	* Makefile (MODELS): Add it.
 
