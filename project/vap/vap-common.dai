@@ -48,11 +48,13 @@
 
 (defmovement Rorrende-2D rectangle
   (matrix_solute Mollerup convection none)
-  (matrix_water (Mollerup (max_time_step_reductions 6)
-                          (max_number_of_small_time_steps 100000)
+  (matrix_water (Mollerup (max_time_step_reductions 7)
+                          (max_number_of_small_time_steps 1000000)
                           ;; (K_average pressure (h_lim -5 [cm]))
                           )
-                (v+h))
+                (v+h (vertical (richards (max_time_step_reductions 6)
+                                         (max_iterations 50))
+                               lr)))
   ;; (drainpoints (-110 [cm] 1 [cm]))
   )
 

@@ -1,28 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* danida 
-
-** wp1
-
-Raunsø tilføjer salt.
-
-** wp2
-
-Finn's dokument som template
-
-Brug afirma som udgansgpunkt, ekspander referencer (Schaefer), specielt OM.
-
-Kig efter salt review artikel
-
-* hunter
-
-** Print?
-
 * VAP 
-
-** linux fuld kørsel (med omdøbte filer)
-
-Commit hvis det virker.
 
 ** daisy i små tidsskridt?
 
@@ -31,8 +9,6 @@ Mindsker fejlen...
 ** drain i små tidsskridt?
 
 ** convection domain 2?
-
-* omdøb organic_matter to organic
 
 * Osvaldo
 
@@ -45,6 +21,12 @@ Ingen headers, kun relevante tal.
 kig på hans data
 
 ** Cambell Theta_fc, Theta_sat (Theta_wp, K_sat, K_fc, K_wp)
+
+Th = Th_s (h_b/h)^(1/b)
+Th^b = Th_s^b (h_b/h)
+h_b = (Th/Th_s)^b h 
+
+Th_fc = Th_s ((Th_wp/Th_s)^b h_wp/h_fc)^(1/b)
 
 *** COMPONENT: wiltingpoint
 
@@ -61,18 +43,6 @@ explicit, pedo
 Samme med Field nitrogen?
 
 ** Skeln mellen sink og source for bioporer.
-
-* Agrovand
-
-** Prøv uden dræncelle, overlad til drænbioporer.
-
-** Evt prøv med drænbioporer der ikke når ned i dræncellen.
-
-*** DONE for subsoil.
-
-*** We need sorbtion and generate log for surface
-
-*** New balances
 
 * biopore log
 
