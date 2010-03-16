@@ -99,8 +99,13 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic,
 
   // Did we specify 'dry_bulk_density'?  Else calculate it now.
   if (dry_bulk_density < 0.0)
-    dry_bulk_density = texture.rho_soil_particles () 
-      * (1.0 - hydraulic.porosity ());
+    {
+      dry_bulk_density = texture.rho_soil_particles () 
+        * (1.0 - hydraulic.porosity ());
+      std::ostringstream tmp;
+      tmp << "(dry_bulk_density " << dry_bulk_density << " [g/cm^3])";
+      msg.debug (tmp.str ());
+    }
 
   hor_heat.initialize (hydraulic, texture, quarts, msg);
 }
