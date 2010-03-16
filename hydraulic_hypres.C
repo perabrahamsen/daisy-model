@@ -322,11 +322,11 @@ static struct HydraulicHypresSyntax : public DeclareModel
   HydraulicHypresSyntax ()
     : DeclareModel (Hydraulic::component, "hypres", 
 	       "van Genuchten retention curve model with Mualem theory.\n\
-Parameters specified by the HYPRES transfer function.\n\
-See <http://www.macaulay.ac.uk/hypres/>.")
+Parameters specified by the HYPRES transfer function.")
   { }
   void load_frame (Frame& frame) const
   { 
+    frame.set_strings ("cite", "hypres");
     frame.add_check (check_alist);
     Hydraulic::load_K_sat_optional (frame);
     frame.declare_boolean ("topsoil", Attribute::OptionalConst, "\

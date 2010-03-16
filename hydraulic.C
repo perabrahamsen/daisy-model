@@ -23,21 +23,22 @@
 
 #include "hydraulic.h"
 #include "library.h"
-#include "block_model.h"
 #include "plf.h"
 #include "log.h"
 #include "check_range.h"
-#include "frame_submodel.h"
 #include "block_model.h"
+#include "block_submodel.h"
+#include "submodeler.h"
 #include "treelog.h"
 #include "mathlib.h"
 #include "program.h"
 #include "vcheck.h"
 #include "librarian.h"
 #include "frame.h"
-#include "block_model.h"
 #include <memory>
 #include <sstream>
+
+// The 'hydraulic' component.
 
 const char *const Hydraulic::component = "hydraulic";
 
@@ -63,7 +64,7 @@ struct Hydraulic::K_at_h
 		"Water conductivity.");
     frame.order ("h", "K");
   }
-  K_at_h (const FrameSubmodel& al)
+  K_at_h (const BlockSubmodel& al)
     : h (al.number ("h")),
       K (al.number ("K"))
   { }
@@ -222,7 +223,7 @@ Hydraulic::check (Treelog& msg) const
 Hydraulic::Hydraulic (const BlockModel& al)
   : ModelDerived (al.type_name ()),
     K_init (al.check ("K_at_h")
-	    ? new K_at_h (al.submodel ("K_at_h"))
+	    ? submodel<K_at_h> (al, "K_at_h")
 	    : NULL),
     Theta_sat (al.number ("Theta_sat", -42.42e42)),
     Theta_res (al.number ("Theta_res", 0.0)),
@@ -239,6 +240,20 @@ Hydraulic::Hydraulic (const symbol name_, const double K_sat_)
 
 Hydraulic::~Hydraulic ()
 { }
+
+static struct HydraulicInit : public DeclareComponent 
+{
+  HydraulicInit ()
+    : DeclareComponent (Hydraulic::component, "\
+This component is responsible for specifying the soils hydraulic\n\
+properties.")
+  { }
+  void load_frame (Frame& frame) const
+  { Model::load_model (frame); }
+} Hydraulic_init;
+
+
+// The 'hydraulic' program model.
 
 struct ProgramHydraulic_table : public Program
 {
@@ -295,16 +310,5 @@ Number of intervals in the table.");
     frame.order ("hydraulic");
   }
 } ProgramHydraulic_table_syntax;
-
-static struct HydraulicInit : public DeclareComponent 
-{
-  HydraulicInit ()
-    : DeclareComponent (Hydraulic::component, "\
-This component is responsible for specifying the soils hydraulic\n\
-properties.")
-  { }
-  void load_frame (Frame& frame) const
-  { Model::load_model (frame); }
-} Hydraulic_init;
 
 // hydraulic.C ends here.

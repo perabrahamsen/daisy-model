@@ -392,7 +392,8 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C
-MODELS = program_osvaldo.C vegetation_permanent.C  litter.C drain_lateral.C \
+MODELS = hydraulic_B_C_inverse.C \
+	program_osvaldo.C vegetation_permanent.C  litter.C drain_lateral.C \
 	hydraulic_MACRO.C program_cpedata.C \
 	reaction_boundrel.C log_regress.C reaction_Morgan98.C \
 	reaction_Styczen88.C program_GP2D.C svat_ssoc.C reaction_Jarvis99.C \

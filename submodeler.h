@@ -82,7 +82,7 @@ submodel_value (const Block& parent, const std::string& key)
 
 template <class T> 
 T*
-submodel_block (const Block& nested)
+submodel_block (const BlockSubmodel& nested)
 { 
   try
     { return new T (nested); }

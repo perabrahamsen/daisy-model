@@ -6,6 +6,29 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.81
+
+** New hydraulic model 'B_C_inverse'.
+
+This is an version of the Burdine/Campbell model where the 'b' and
+'h_b' parameters are found from the soil wilting point and field
+capacity.
+
+The 'b' and 'h_b' parameter values will be written to the daisy.log
+file.
+
+(defhorizon Ap FAO3
+  "Andeby top soil."
+  (clay 8.0 [%]) (silt 10.5 [%]) (sand 81.5 [%])
+  (humus 1.12 [%]) (dry_bulk_density 1.5 [g/cm^3])
+  (C_per_N 11.0 [g C/g N])
+  (hydraulic B_C_inverse 
+             (K_at_h -100.0 [cm] 1e-6 [m/s])       
+             (Theta_wp 0.03 [])
+             (Theta_fc 0.2 [])
+             (Theta_sat 0.4 [])))
+
+
 * 4.80
 
 ** Ported to Linux/AMD64/GCC4.4

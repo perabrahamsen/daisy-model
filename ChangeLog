@@ -1,3 +1,8 @@
+2010-03-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic_B_C_inverse.C: New model.
+	* Makefile (MODELS): Add it.
+
 2010-03-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.80 released.

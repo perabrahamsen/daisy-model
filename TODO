@@ -1,5 +1,13 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Variable tidsskridt
+
+** Log skal kunne klare variable tidsskridt
+
+** Omsætning skal være uafhængig af tidsskridt.
+
+** Movement skal bestemme tidsskridt fra S termer.
+
 * Osvaldo 
 
 ** Cambell Theta_fc, Theta_sat, Theta_wp, K_fc
