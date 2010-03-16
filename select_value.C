@@ -32,36 +32,34 @@ SelectValue::add_result (double result)
 {
   result *= relative_weight;
 
-  
-
-    if (count == 0)
-      {
-        if (handle == Handle::geometric)
-          value = std::log (result);
-        else
-          value = result;
-      }
-    else switch (handle)
-      {
-      case Handle::min:
-        value = std::min (value, result);
-        break;
-      case Handle::max:
-        value = std::max (value, result);
-        break;
-      case Handle::current:    
-        // We may have count > 0 && Handle::current when selecting
-        // multiple items with "*", e.g. multiple SOM pools.  
-        // In that case, we use the sum.
-      case Handle::average:
-      case Handle::sum:
-        value += result;
-        break;
-      case Handle::geometric:
-        value += std::log (result);
-        break;
-      }
-    count++;
+  if (count == 0)
+    {
+      if (handle == Handle::geometric)
+        value = std::log (result);
+      else
+        value = result;
+    }
+  else switch (handle)
+         {
+         case Handle::min:
+           value = std::min (value, result);
+           break;
+         case Handle::max:
+           value = std::max (value, result);
+           break;
+         case Handle::current:    
+           // We may have count > 0 && Handle::current when selecting
+           // multiple items with "*", e.g. multiple SOM pools.  
+           // In that case, we use the sum.
+         case Handle::average:
+         case Handle::sum:
+           value += result;
+           break;
+         case Handle::geometric:
+           value += std::log (result);
+           break;
+         }
+  count++;
 }
 
 

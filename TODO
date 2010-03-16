@@ -8,18 +8,6 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** Movement skal bestemme tidsskridt fra S termer.
 
-* Osvaldo 
-
-** Cambell Theta_fc, Theta_sat, Theta_wp, K_fc
-
-*** COMPONENT: wiltingpoint?
-
-explicit, pedo
-
-*** COMPONENT: porosity?
-
-(hypres)
-
 * VAP 
 
 ** daisy i små tidsskridt?

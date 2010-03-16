@@ -281,15 +281,15 @@ set style data lines\n";
 	daisy_assert (axis[i] == 0);
       out << " with ";	
       const int style = source[i]->style ();
-      out << with;
+      out << with << " ls ";
       if (with == "points" || with == "errorbars")
-	out << " " << (style < 0 ? ++points : ((style == 0) ? points : style));
+	out << (style < 0 ? ++points : ((style == 0) ? points : style));
       else if (with == "lines")
-	out << " " << (style < 0 ? ++lines :  ((style == 0) ? lines : style));
+	out << (style < 0 ? ++lines :  ((style == 0) ? lines : style));
       else 
 	{
 	  if (style >= 0)
-	    out << " " << style;
+	    out  << style;
 	}
     }
   out << "\n";
