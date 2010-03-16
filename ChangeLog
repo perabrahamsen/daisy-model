@@ -1,3 +1,11 @@
+2010-03-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* frame.h, frame.C, type.h, type.C: Parameters can now have
+	citations.
+	* hydraulic_B_C_inverse.C: Use it.
+
+	* hydraulic_B_C.C, hydraulic_M_C.C: Add citations.
+
 2010-03-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* hydraulic_B_C_inverse.C: New model.
