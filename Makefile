@@ -1215,10 +1215,11 @@ uzmodel${OBJ}: uzmodel.C uzmodel.h model.h symbol.h block_model.h \
   block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
   frame.h librarian.h
 hydraulic${OBJ}: hydraulic.C hydraulic.h model_derived.h model_logable.h \
-  model.h symbol.h library.h block_model.h block_nested.h block.h scope.h \
-  attribute.h treelog.h frame_model.h frame.h plf.h log.h time.h border.h \
-  model_framed.h check_range.h check.h frame_submodel.h mathlib.h \
-  assertion.h program.h run.h vcheck.h librarian.h
+  model.h symbol.h library.h plf.h log.h time.h border.h model_framed.h \
+  check_range.h check.h block_model.h block_nested.h block.h scope.h \
+  attribute.h treelog.h frame_model.h frame.h block_submodel.h \
+  frame_submodel.h submodeler.h mathlib.h assertion.h program.h run.h \
+  vcheck.h librarian.h
 bioclimate${OBJ}: bioclimate.C bioclimate.h model_framed.h model_logable.h \
   model.h symbol.h weather.h model_derived.h im.h attribute.h \
   block_model.h block_nested.h block.h scope.h treelog.h frame_model.h \
@@ -1625,6 +1626,10 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
   version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+hydraulic_B_C_inverse${OBJ}: hydraulic_B_C_inverse.C hydraulic.h \
+  model_derived.h model_logable.h model.h symbol.h block_model.h \
+  block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
+  frame.h check.h mathlib.h assertion.h librarian.h
 program_osvaldo${OBJ}: program_osvaldo.C program.h model.h symbol.h run.h \
   librarian.h block_model.h block_nested.h block.h scope.h attribute.h \
   treelog.h frame_model.h frame.h mathlib.h assertion.h path.h
@@ -1869,15 +1874,15 @@ uzrect_const${OBJ}: uzrect_const.C uzrect.h model_framed.h model_logable.h \
 photo_FCC3${OBJ}: photo_FCC3.C photo_Farquhar.h photo.h model_derived.h \
   model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
   scope.h attribute.h treelog.h frame_model.h frame.h rubiscoNdist.h \
-  bioclimate.h model_framed.h canopy_std.h canopy_simple.h \
-  plf.h phenology.h log.h time.h border.h mathlib.h assertion.h check.h \
+  bioclimate.h model_framed.h canopy_std.h canopy_simple.h plf.h \
+  phenology.h log.h time.h border.h mathlib.h assertion.h check.h \
   librarian.h
 photo_FCC4${OBJ}: photo_FCC4.C photo_Farquhar.h photo.h model_derived.h \
-  model_logable.h model.h symbol.h rubiscoNdist.h \
-  bioclimate.h model_framed.h canopy_std.h canopy_simple.h plf.h \
-  phenology.h log.h time.h border.h frame.h scope.h attribute.h \
-  block_model.h block_nested.h block.h treelog.h frame_model.h mathlib.h \
-  assertion.h check.h librarian.h resistance.h
+  model_logable.h model.h symbol.h rubiscoNdist.h bioclimate.h \
+  model_framed.h canopy_std.h canopy_simple.h plf.h phenology.h log.h \
+  time.h border.h frame.h scope.h attribute.h block_model.h \
+  block_nested.h block.h treelog.h frame_model.h mathlib.h assertion.h \
+  check.h librarian.h resistance.h
 reaction_std${OBJ}: reaction_std.C reaction.h model_framed.h model_logable.h \
   model.h symbol.h block_model.h block_nested.h block.h scope.h \
   attribute.h treelog.h frame_model.h frame.h transform.h chemistry.h \
