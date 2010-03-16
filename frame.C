@@ -650,6 +650,18 @@ Frame::description (const symbol key) const
   daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
+const std::vector<symbol>& 
+Frame::type_cite (const symbol key) const
+{
+  if (impl->has_type (key))
+    return impl->get_type (key).cite ();
+  if (parent () )
+    return parent ()->type_cite (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
+}
+
+
 const FrameSubmodel& 
 Frame::default_frame (const symbol key) const
 {
@@ -750,6 +762,33 @@ Frame::declare_fraction (const symbol key,
                                            Check::fraction (), description));
 }
 
+
+void 
+Frame::declare_number_cited (symbol key, // Number.
+                             symbol dim,
+                             const Check& check,
+                             Attribute::category cat,
+                             int size,
+                             symbol description,
+                             const std::vector<symbol>& citations)
+{
+  impl->declare_type (key, new TypeNumberCite (cat, size, dim, 
+                                               check, description, citations));
+  
+}
+void 
+Frame::declare_number_cited (symbol key, // Number.
+                             symbol dim,
+                             const Check& check,
+                             Attribute::category cat,
+                             int size,
+                             symbol description,
+                             symbol citation)
+{
+  std::vector<symbol> citations;
+  citations.push_back (citation);
+  declare_number_cited (key, dim, check, cat, size, description, citations);
+}
 
 void 
 Frame::declare (const symbol key, // PLF.

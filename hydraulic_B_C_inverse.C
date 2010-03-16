@@ -27,13 +27,18 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "frame.h"
+#include "texture.h"
 #include <sstream>
 
 struct HydraulicB_C_inverse : public Hydraulic
 {
-  // Content.
-  const double b;
-  const double h_b;
+  // Known points.
+  /* const */ double Theta_wp;
+  const double Theta_fc;
+
+  // Cambell parameters.
+  /* const */ double b;
+  /* const */ double h_b;
 
   // Utilities.
   double Sr (const double h) const
@@ -70,24 +75,20 @@ struct HydraulicB_C_inverse : public Hydraulic
   }
   
   // Create and Destroy.
-  static double find_b (const BlockModel& al)
+  static double find_b (const double Theta_wp, const double Theta_fc)
   {
     const double h_fc = -100.0;
     const double h_wp = -15000.0;
-    const double Theta_fc = al.number ("Theta_fc");
-    const double Theta_wp = al.number ("Theta_wp");
     daisy_assert (Theta_fc > Theta_wp);
     const double b = std::log (h_wp / h_fc) / std::log (Theta_fc / Theta_wp);
     return b;
   }
-  static double find_h_b (const BlockModel& al, const double b)
+  static double find_h_b (const double Theta_wp, const double Theta_fc,
+                          const double Theta_sat, const double b)
   {
-    const double Theta_sat = al.number ("Theta_sat");
     const double h_fc = -100.0;
-    const double Theta_fc = al.number ("Theta_fc");
     daisy_assert (Theta_fc < Theta_sat);
     const double h_b_fc = h_fc * std::pow (Theta_fc / Theta_sat, b);
-    const double Theta_wp = al.number ("Theta_wp");
     daisy_assert (Theta_wp < Theta_sat);
     const double h_wp = -15000.0;
     const double h_b_wp = h_wp * std::pow (Theta_wp / Theta_sat, b);
@@ -95,11 +96,53 @@ struct HydraulicB_C_inverse : public Hydraulic
     return h_b_fc;
   }
   void initialize (const Texture& texture,
-                   const double rho_b, bool const top_soil, Treelog& msg)
+                   double rho_b, const bool top_soil, Treelog& msg)
   {
     TREELOG_MODEL (msg);
     Hydraulic::initialize (texture, rho_b, top_soil, msg);
     std::ostringstream tmp;
+
+    // Find Theta_sat.
+    if (Theta_sat < 0.0)
+      {
+        if (rho_b < 0.0)
+          {
+            msg.error ("You must specify either dry bulk density or porosity");
+            rho_b = 1.5;
+            tmp << "Forcing rho_b = "  << rho_b << " g/cm^3\n";
+          }
+        Theta_sat = 1.0 - rho_b / texture.rho_soil_particles ();
+        tmp << "(Theta_sat " << Theta_sat << " [])\n";
+        daisy_assert (Theta_sat < 1.0);
+      }
+    if (Theta_sat <= Theta_fc)
+      {
+        msg.error ("Field capacity must be below saturation point");
+        Theta_sat = (1.0 + 4.0 * Theta_fc) / 5.0;
+        tmp << "Forcing Theta_sat = " << Theta_sat << " []\n";
+      }
+
+    // Find Theta_wp.
+    if (Theta_wp < 0.0)
+      {
+        const double clay_lim // USDA Clay
+          = texture.fraction_of_minerals_smaller_than ( 2.0 /* [um] */);
+        const double silt_lim // USDA Silt 
+          = texture.fraction_of_minerals_smaller_than (50.0 /* [um] */);
+        daisy_assert (clay_lim >= 0.0);
+        daisy_assert (silt_lim >= clay_lim);
+        daisy_assert (silt_lim <= 1.0);
+        const double mineral = texture.mineral ();
+        const double clay = mineral * clay_lim * 100 /* [%] */;
+        const double silt = mineral * (silt_lim - clay_lim) * 100 /* [%] */;
+        const double humus = texture.humus * 100 /* [%] */;
+        // Madsen and Platou (1983).
+        Theta_wp = 0.758 * humus + 0.520 * clay + 0.075 * silt + 0.42;
+        Theta_wp /= 100.0;      // [%] -> []
+      }
+
+    b = find_b (Theta_wp, Theta_fc);
+    h_b = find_h_b (Theta_wp, Theta_fc, Theta_sat, b);
     tmp << "(b " << b << " [])\n"
         << "(h_b " << h_b << " [cm])";
     msg.debug (tmp.str ());
@@ -107,8 +150,8 @@ struct HydraulicB_C_inverse : public Hydraulic
                            
   HydraulicB_C_inverse (const BlockModel& al)
     : Hydraulic (al),
-      b (find_b (al)),
-      h_b (find_h_b (al, b))
+      Theta_wp (al.number ("Theta_wp", -42.42e42)),
+      Theta_fc (al.number ("Theta_fc"))
   { }
   ~HydraulicB_C_inverse ()
   { }
@@ -136,12 +179,12 @@ the condutivity curve is fully specified by a single point.")
 
     bool ok = true;
 
-    if (Theta_wp >= Theta_fc)
+    if (Theta_wp >= 0.0 && Theta_wp >= Theta_fc)
       {
         msg.error ("Wilting point should be below field capacity");
         ok = false;
       }
-    if (Theta_fc >= Theta_sat)
+    if (Theta_sat >= 0.0 && Theta_fc >= Theta_sat)
       {
         msg.error ("Field capacity should be below saturation point");
         ok = false;
@@ -151,15 +194,23 @@ the condutivity curve is fully specified by a single point.")
   
   void load_frame (Frame& frame) const
   { 
+    frame.set_strings ("cite", "campbell1974simple", "burdine1953");
     frame.add_check (check_alist);
     Hydraulic::load_Theta_sat (frame);
     Hydraulic::load_K_sat_optional (frame);
-    frame.declare_fraction ("Theta_sat",  Attribute::Const, "\
-Saturation point.");
+    frame.declare_fraction ("Theta_sat",  Attribute::OptionalState, "\
+Saturation point.\n\
+By default, this will be estimated from soil composition and\n\
+dry bulk density.");
     frame.declare_fraction ("Theta_fc",  Attribute::Const, " \
 Field capacity."); 
-    frame.declare_fraction ("Theta_wp",  Attribute::Const, "\
-Wilting point."); 
+    frame.declare_number_cited ("Theta_wp",  Attribute::Fraction (), 
+                                Check::fraction (), 
+                                Attribute::OptionalConst,
+                                Attribute::Singleton, "\
+Wilting point.\n\
+By default, this value will be estimated from texture.", 
+                                "madsen1983land"); 
   }
 } hydraulicB_C_inverse_syntax;
 

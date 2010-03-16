@@ -1065,6 +1065,7 @@ ProgramDocument::print_submodel_entry (const symbol name, int level,
       format->text (description);
       format->soft_linebreak ();
     }
+  format->cite (frame.type_cite (name));
 
   // print submodel entries, if applicable
   print_entry_submodel (name, level + 1, frame, aref);

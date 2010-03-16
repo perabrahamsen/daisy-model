@@ -104,6 +104,7 @@ class EXPORT Frame : public WScope
   symbol domain (symbol) const;
   symbol range (symbol) const;
   symbol description (symbol) const;
+  const std::vector<symbol>& type_cite (symbol key) const;
   const FrameSubmodel& default_frame (symbol) const;
   symbol submodel_name (symbol) const;
 
@@ -165,6 +166,20 @@ class EXPORT Frame : public WScope
   void declare_fraction (symbol key, 
                          Attribute::category cat,
                          symbol description);
+  void declare_number_cited (symbol key, // Number.
+                             symbol dim,
+                             const Check& check,
+                             Attribute::category cat,
+                             int size,
+                             symbol description,
+                             const std::vector<symbol>& citations);
+  void declare_number_cited (symbol key, // Number.
+                             symbol dim,
+                             const Check& check,
+                             Attribute::category cat,
+                             int size,
+                             symbol description,
+                             symbol citation);
 
   void declare (symbol key, // PLF.
                 symbol domain,

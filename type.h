@@ -28,6 +28,7 @@
 #include "symbol.h"
 #include "frame.h"
 #include <boost/noncopyable.hpp>
+#include <vector>
 
 class Check;
 
@@ -48,6 +49,7 @@ public:
   bool is_state () const;
   int size () const;
   symbol description () const;
+  virtual const std::vector<symbol>& cite () const;
   virtual symbol dimension () const;
   virtual bool verify (double value, Treelog&) const;
   virtual Frame::load_syntax_t  load_syntax () const;
@@ -72,6 +74,16 @@ class TypeNumber : public Type
 public:
   TypeNumber (const Attribute::category c, const int s, const symbol dim, 
               const Check&, const symbol desc);
+};
+
+class TypeNumberCite : public TypeNumber
+{
+  const std::vector<symbol> citations;
+  const std::vector<symbol>& cite () const;
+public:
+  TypeNumberCite (const Attribute::category c, const int s, const symbol dim, 
+                  const Check&, const symbol desc, 
+                  const std::vector<symbol>& cites);
 };
 
 class TypeSubmodel : public Type

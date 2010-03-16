@@ -124,6 +124,7 @@ static struct HydraulicM_CSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   { 
+    frame.set_strings ("cite", "campbell1974simple", "mualem1976");
     Hydraulic::load_Theta_sat (frame);
     Hydraulic::load_K_sat (frame);
     frame.declare ("h_b", "cm", Check::negative (), Attribute::Const,

@@ -59,6 +59,13 @@ symbol
 Type::description () const
 { return description_ ; }
   
+const std::vector<symbol>& 
+Type::cite () const
+{ 
+  static const std::vector<symbol> empty;
+  return empty;
+}
+
 symbol 
 Type::dimension () const
 { daisy_notreached (); }
@@ -104,12 +111,24 @@ bool
 TypeNumber::verify (const double value, Treelog& msg) const
 { return check.verify (value, msg); }
 
-TypeNumber::TypeNumber (const Attribute::category c, const int s, const symbol dim, 
-                        const Check& chk,
+TypeNumber::TypeNumber (const Attribute::category c, const int s,
+                        const symbol dim, const Check& chk,
                         const symbol desc)
   : Type (c, s, desc),
     dimension_ (dim),
     check (chk)
+{ }
+
+const std::vector<symbol>& 
+TypeNumberCite::cite () const
+{ return citations; }
+
+TypeNumberCite::TypeNumberCite (const Attribute::category c, const int s,
+                                const symbol dim, const Check& chk,
+                                const symbol desc,
+                                const std::vector<symbol>& cites)
+  : TypeNumber (c, s, dim, chk, desc),
+    citations (cites)
 { }
 
 Attribute::type 

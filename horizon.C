@@ -103,7 +103,8 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic,
       dry_bulk_density = texture.rho_soil_particles () 
         * (1.0 - hydraulic.porosity ());
       std::ostringstream tmp;
-      tmp << "(dry_bulk_density " << dry_bulk_density << " [g/cm^3])";
+      tmp << "(dry_bulk_density " << dry_bulk_density 
+          << " [g/cm^3]) ; Estimated from porosity and texture.";
       msg.debug (tmp.str ());
     }
 
