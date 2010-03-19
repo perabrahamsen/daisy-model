@@ -1,7 +1,25 @@
+2010-03-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* all: Avoid creating symbol within inner loops.
+
+	* chemical_std.C (has_lag): Don't calculate lag if none is specified.
+
+	* secondary.C (cracks::use_secondary): New parameter.
+
+2010-03-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* reaction_sorption.C: New model.
+
+2010-03-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* treelog_text.C, treelog_text.h, treelog_store.C, treelog_store.h:
+	* treelog.C, treelog.h: Don't create unnecessary symbols.
+
+	* oldunits.C (multiply): Speed up.
+
 2010-03-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* gnuplot_xy.C (plot): Include "ls" for required by gnuplot 4.4.
-	* gnuplot_time.C (plot): Ditto.
+	* gnuplot_time.C, gnuplot_xy.C (plot): Include "ls" required by gnuplot 4.4.
 
 	* frame.h, frame.C, type.h, type.C: Parameters can now have
 	citations.

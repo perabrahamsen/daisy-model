@@ -116,11 +116,13 @@ IM::output (Log& log) const
        i != content.end ();
        i++)
     {
+      static const symbol chemlib (Chemical::component);
+
       const symbol name = (*i).first;
-      if (!log.check_entry (name, Chemical::component))
+      if (!log.check_entry (name, chemlib))
 	continue;
 
-      Log::Shallow named (log, name, Chemical::component);
+      Log::Shallow named (log, name, chemlib);
       output_variable (name, log);
       const double value = (*i).second;
       output_variable (value, log);

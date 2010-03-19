@@ -41,29 +41,6 @@ BD_convert::valid (double value) const
   return in.valid (value) && out.valid (in (value) / bulk);
 }
 
-void
-BD_convert::set_bulk (const Geometry& geo,
-                      const Soil& soil, const Volume& volume,
-                      const bool density_z, const bool density_x,
-                      const bool density_y)
-{
-  bulk = 0.0;
-
-  const size_t cell_size = geo.cell_size ();
-  for (size_t i = 0; i < cell_size; i++)
-    {
-      const double f = geo.fraction_in_volume (i, volume);
-      if (f > 1e-10)
-        bulk += soil.dry_bulk_density (i) * geo.cell_volume (i) * f;
-    }
-  if (density_z)
-    bulk /= volume.height (geo.bottom (), geo.top ()); 
-  if (density_x)
-    bulk /= volume.width (geo.left (), geo.right ()); 
-  if (density_y)
-    bulk /= volume.depth (geo.front (), geo.back ()); 
-}
-
 BD_convert::BD_convert (const Units& units, const symbol has, const symbol want,
                         const symbol bulk_unit)
   : in (units.get_convertion (has, bulk_unit)),

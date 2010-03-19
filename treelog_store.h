@@ -35,7 +35,7 @@ private:
 
   // Nesting.
 public:
-  void open (symbol name);
+  void open (const std::string&);
   void close ();
 
   // Use.

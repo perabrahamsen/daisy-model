@@ -27,7 +27,6 @@
 #include "check.h"
 #include "geometry.h"
 #include "soil.h"
-#include "soil_heat.h"
 #include "anystate.h"
 #include "chemical.h"
 #include "groundwater.h"
@@ -74,12 +73,12 @@ struct BioporeDrain : public Biopore
                                double K_xx, double h) const;
   void update_matrix_sink (const Geometry& geo,    
                            const Soil& soil,  
-                           const SoilHeat& soil_heat, 
                            const std::vector<bool>& active,
+                           const std::vector<double>& K,
                            const double h_barrier,
-                           const double pressure_initiate,
                            const double pressure_limit,
-                           const std::vector<double>& h, const double dt);
+                           const std::vector<double>& h,
+                           const double dt);
   void update_water ()
   { }
   void add_to_sink (std::vector<double>&,
@@ -168,32 +167,17 @@ BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo,
 void
 BioporeDrain::update_matrix_sink (const Geometry& geo,    
                                   const Soil& soil,  
-                                  const SoilHeat& soil_heat, 
                                   const std::vector<bool>& active,
+                                  const std::vector<double>& K, 
                                   const double h_barrier,
-                                  const double pressure_initiate,
                                   const double pressure_limit,
                                   const std::vector<double>& h, 
                                   const double /* dt */)
 {
   const size_t cell_size = geo.cell_size ();
   for (size_t c = 0; c < cell_size; c++)
-    {
-      //----Pers model ----
-     const double h_cond = std::min(pressure_initiate, h[c]);
-      // ---End, pers model ----
-
-      //----Mikkels model ------
-     // const double h_cond = h[c];
-      //---End, Mikkels model ----
-
-      const double T = soil_heat.T (c);
-      const double h_ice = 0.0;    //ice ignored 
-      const double K_zz = soil.K (c, h_cond, h_ice, T);
-      const double K_xx = K_zz * soil.anisotropy_cell (c);
-      S[c] = matrix_biopore_drain (c, geo, soil, active[c], h_barrier, 
-                                   pressure_limit, K_xx, h[c]);
-    }
+    S[c] = matrix_biopore_drain (c, geo, soil, active[c], h_barrier, 
+                                 pressure_limit, K[c], h[c]);
 }
 
 BioporeDrain::BioporeDrain (const BlockModel& al)

@@ -154,6 +154,7 @@ struct ChemicalStandard : public Chemical
   double C_secondary (size_t) const;
   double C_primary (size_t) const;
   double M_primary (size_t) const;
+  double M_secondary (size_t) const;
   double M_total (size_t) const;
   double total_surface (const Geometry&, 
                         double from, double to) const; // [g/cm^2]
@@ -308,19 +309,23 @@ ChemicalStandard::C_below () const
 { return C_below_value; }
 
 double 
-ChemicalStandard::C_secondary (size_t i) const
+ChemicalStandard::C_secondary (const size_t i) const
 { return C_secondary_[i]; }
 
 double 
-ChemicalStandard::C_primary (size_t i) const
+ChemicalStandard::C_primary (const size_t i) const
 { return C_primary_[i]; }
 
 double 
-ChemicalStandard::M_primary (size_t i) const
+ChemicalStandard::M_primary (const size_t i) const
 { return M_primary_[i]; }
 
 double 
-ChemicalStandard::M_total (size_t i) const
+ChemicalStandard::M_secondary (const size_t i) const
+{ return M_total (i) - M_primary (i); }
+
+double 
+ChemicalStandard::M_total (const size_t i) const
 { return M_total_[i]; }
 
 double
@@ -835,9 +840,10 @@ ChemicalStandard::tick_surface (const double pond /* [cm] */,
     }
 
   // Check that full and no adsorption is calculated right.
+  static const symbol none ("none");
   if (adsorption_->full ())
     daisy_approximate (surface_storage, surface_immobile);
-  else if (adsorption_->name == "none")
+  else if (adsorption_->name == none)
     daisy_approximate (surface_storage, surface_solute);
 }
 
@@ -1041,23 +1047,26 @@ ChemicalStandard::decompose (const Geometry& geo,
   std::vector<double> decomposed (cell_size, 0.0);
 
   // Update lag time.
-  bool found = false;
-  for (size_t c = 0; c < cell_size; c++)
+  if (decompose_lag_increment.size () > 0)
     {
-      lag[c] += this->decompose_lag_increment (C_primary_[c]) * dt;
-      
-      if (lag[c] >= 1.0)
+      bool found = false;
+      for (size_t c = 0; c < cell_size; c++)
         {
-          lag[c] = 1.0;
-          found = true;
-        }
-      else if (lag[c] < 0.0)
-        lag[c] = 0.0;
-    }
+          lag[c] += this->decompose_lag_increment (C_primary_[c]) * dt;
 
-  // No decomposition.
-  if (!found)
-    return;
+          if (lag[c] >= 1.0)
+            {
+              lag[c] = 1.0;
+              found = true;
+            }
+          else if (lag[c] < 0.0)
+            lag[c] = 0.0;
+        }
+
+      // No decomposition.
+      if (!found)
+        return;
+    }
 
   for (size_t c = 0; c < cell_size; c++)
     {
@@ -1720,8 +1729,9 @@ You must specify it with either 'decompose_rate' or 'decompose_halftime'.");
                    "g/cm^3", "h^-1", Attribute::Const,
                    "Increment lag with the value of this PLF for the current\n\
 concentration each hour.  When lag in any cell reaches 1.0,\n\
-decomposition begins.  It can never be more than 1.0 or less than 0.0.");
-    frame.set ("decompose_lag_increment", PLF::always_1 ());
+decomposition begins.  It can never be more than 1.0 or less than 0.0.\n\
+By default, there is no lag.");
+    frame.set ("decompose_lag_increment", PLF::empty ());
     frame.declare_object ("C_below", Number::component, 
                           Attribute::Const, Attribute::Singleton, "\
 Concentration below the layer of soil being examined.\n\

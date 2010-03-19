@@ -477,6 +477,14 @@ If true, assume the line after the tags contain dimensions.\n\
 By default this will be true iff 'original' is not specified.");
 }
 
+static std::vector<std::string> s2s_v (const std::vector<symbol>& syms)
+{
+  std::vector<std::string> result;
+  for (size_t i = 0; i < syms.size (); i++)
+    result.push_back (syms[i].name ());
+  return result;
+}
+
 LexerTable::LexerTable (const BlockModel& al)
   : path (al.path ()),
     filename (al.name ("file")),
@@ -484,7 +492,7 @@ LexerTable::LexerTable (const BlockModel& al)
     lex (NULL),
     field_sep ("UNINITIALIZED"),
     type_ ("UNINITIALIZED"),
-    missing (al.name_sequence ("missing")),
+    missing (s2s_v (al.name_sequence ("missing"))),
     filter (map_submodel_const<Filter> (al, "filter")),
     year_c (-42),
     month_c (-42),

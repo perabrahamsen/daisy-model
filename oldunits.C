@@ -355,51 +355,66 @@ Oldunits::multiply (const symbol one, const symbol two)
   if (one == Attribute::Unknown () || two == Attribute::Unknown ())
     return Attribute::Unknown ();
 
-  static const struct multiply_table
-  { 
-    const char* one;
-    const char* two;
-    const char* result;
-  } table[] = { 
-    // select_interval.C
-    { "h^-1", "cm", "cm/h" },
-    { "cm^3/cm^3", "cm", "cm" },
-    { "cm^3/cm^3/h", "cm", "cm/h" },
-    { "g/cm^3", "cm", "g/cm^2" },
-    { "g C/cm^3", "cm", "g C/cm^2" },
-    { "g N/cm^3", "cm", "g N/cm^2" },
-    { "g/cm^3/h", "cm", "g/cm^2/h" },
-    { "g C/cm^3/h", "cm", "g C/cm^2/h" },
-    { "g N/cm^3/h", "cm", "g N/cm^2/h" }, 
-    { "g CO_2-C/cm^3/h", "cm", "g CO_2-C/cm^2/h"},
-    // select_flow.C
-    { "cm/h", "cm^2", "cm^3/h" },
-    { "g/cm^2/h", "cm^2", "g/h" },   
-    // select_volume.C
-    { "h^-1", "cm^3", "cm^3/h" },
-    { "cm^3/cm^3", "cm^3", "cm^3" },
-    { "cm^3/cm^3/h", "cm^3", "cm^3/h" },
-    { "g/cm^3", "cm^3", "g" },
-    { "g C/cm^3", "cm^3", "g C" },
-    { "g N/cm^3", "cm^3", "g N" },
-    { "g/cm^3/h", "cm^3", "g/h" },
-    { "g C/cm^3/h", "cm^3", "g C/h" },
-    { "g N/cm^3/h", "cm^3", "g N/h" }, 
-    { "g CO_2-C/cm^3/h", "cm^3", "g CO_2-C/h"},
-    // im.C
-    { "g/cm^2/mm", "mm/h", "g/cm^2/h"},
-    { "g/cm^2/mm", "mm", "g/cm^2"},
-    { "g/cm^2/h", "h", "g/cm^2"},
-    { "g", "cm^-2", "g/cm^2"},
-    { "mg/m^2", "mm^-1", "ppm"},
-    { "g/cm^2", "h^-1", "g/cm^2/h"},    
-  };
-  
-  for (unsigned int i = 0; i < sizeof (table) / sizeof (multiply_table); i++)
-    if ((one == table[i].one && two == table[i].two)
-	|| (two == table[i].one && one == table[i].two))
-      return table[i].result;
+  static const struct MulTable : public std::map<symbol, std::map<symbol, symbol> /**/>
+  {
+    MulTable ()
+    {
+      static const struct multiply_table
+      { 
+        const symbol one;
+        const symbol two;
+        const symbol result;
+      } table[] = { 
+        // select_interval.C
+        { "h^-1", "cm", "cm/h" },
+        { "cm^3/cm^3", "cm", "cm" },
+        { "cm^3/cm^3/h", "cm", "cm/h" },
+        { "g/cm^3", "cm", "g/cm^2" },
+        { "g C/cm^3", "cm", "g C/cm^2" },
+        { "g N/cm^3", "cm", "g N/cm^2" },
+        { "g/cm^3/h", "cm", "g/cm^2/h" },
+        { "g C/cm^3/h", "cm", "g C/cm^2/h" },
+        { "g N/cm^3/h", "cm", "g N/cm^2/h" }, 
+        { "g CO_2-C/cm^3/h", "cm", "g CO_2-C/cm^2/h"},
+        // select_flow.C
+        { "cm/h", "cm^2", "cm^3/h" },
+        { "g/cm^2/h", "cm^2", "g/h" },   
+        // select_volume.C
+        { "h^-1", "cm^3", "cm^3/h" },
+        { "cm^3/cm^3", "cm^3", "cm^3" },
+        { "cm^3/cm^3/h", "cm^3", "cm^3/h" },
+        { "g/cm^3", "cm^3", "g" },
+        { "g C/cm^3", "cm^3", "g C" },
+        { "g N/cm^3", "cm^3", "g N" },
+        { "g/cm^3/h", "cm^3", "g/h" },
+        { "g C/cm^3/h", "cm^3", "g C/h" },
+        { "g N/cm^3/h", "cm^3", "g N/h" }, 
+        { "g CO_2-C/cm^3/h", "cm^3", "g CO_2-C/h"},
+        // im.C
+        { "g/cm^2/mm", "mm/h", "g/cm^2/h"},
+        { "g/cm^2/mm", "mm", "g/cm^2"},
+        { "g/cm^2/h", "h", "g/cm^2"},
+        { "g", "cm^-2", "g/cm^2"},
+        { "mg/m^2", "mm^-1", "ppm"},
+        { "g/cm^2", "h^-1", "g/cm^2/h"},    
+      };
+      for (unsigned int i = 0; i < sizeof (table) / sizeof (multiply_table); i++)
+        {
+          (*this)[table[i].one][table[i].two] = table[i].result;
+          (*this)[table[i].two][table[i].one] = table[i].result;
+        }
+    }
+  } mul_table;
 
+  const MulTable::const_iterator i = mul_table.find (one);
+  if (i != mul_table.end ())
+    {
+      const std::map<symbol, symbol> res_table = (*i).second;
+      const std::map<symbol, symbol>::const_iterator j = res_table.find (two);
+      if (j != res_table.end ())
+        return (*j).second;
+    }
+  
   const std::string inv = "^-1";
   if (one.name () == two + inv || one + inv == two.name ())
     return Attribute::None ();

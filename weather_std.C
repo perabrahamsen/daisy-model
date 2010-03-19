@@ -98,7 +98,7 @@ struct WeatherStandard : public WeatherBase
   struct keyword_description_type
   {
     const char* name;
-    const char* dim;
+    const symbol dim;
     double WeatherStandard::* value;
     double min;
     double max;
@@ -125,7 +125,7 @@ struct WeatherStandard : public WeatherBase
   struct data_description_type
   {
     const char* name;
-    const char* dim;
+    const symbol dim;
     double WeatherStandard::* value;
     symbol WeatherStandard::* read;
     double min;

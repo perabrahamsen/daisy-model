@@ -127,9 +127,9 @@ private:
     propagate (nest, text);
   }
 public:
-  void open (const symbol name)
+  void open (const std::string& name)
   { 
-    add (level, name.name ()); 
+    add (level, name); 
     level++;
   }
   void close ()
@@ -168,7 +168,7 @@ public:
 };
 
 void 
-TreelogStore::open (const symbol name)
+TreelogStore::open (const std::string& name)
 { impl->open (name); }
 
 void 

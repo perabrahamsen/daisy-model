@@ -45,9 +45,6 @@ struct SelectVolume : public SelectValue
   const bool density_y;
   int dimensions () const;
   std::auto_ptr<Volume> volume;
-  const Column* last_column;
-  std::vector<int> cells;
-  std::vector<double> weight;
   const double min_root_density;
   const symbol min_root_crop;
 
@@ -55,6 +52,17 @@ struct SelectVolume : public SelectValue
   std::auto_ptr<BD_convert> bd_convert;
   const Convert* special_convert (const Units&, 
                                   const symbol has, const symbol want);
+
+  // Column cache.
+  struct colweight
+  {
+    double bulk;                // Average bulk density in volume.
+    std::vector<size_t> cell;   // Cells at height.
+    std::vector<double> weight; // Relative volume for cell.
+  };
+  typedef std::map<const Column*, colweight> colcache_t;
+  colcache_t colcache;
+  colcache_t::const_iterator active;
 
   // Output routines.
   void set_column (const Column&, Treelog&);
@@ -92,81 +100,118 @@ SelectVolume::special_convert (const Units& units,
 void 
 SelectVolume::set_column (const Column& column, Treelog& msg)
 { 
-  if (&column != last_column)
-    {
-      last_column = &column;
-      
-      const Geometry& geo = column.get_geometry ();
-      const Soil& soil = column.get_soil ();
-      
-      if (bd_convert.get ())
-        bd_convert->set_bulk (geo, soil, *volume, 
-                              density_z, density_x, density_y);
+  // Same as old?
+  if (&column == active->first)
+    // Do nothing.
+    return;
 
-      const size_t cell_size = geo.cell_size ();
-      cells.clear ();
-      weight.clear ();
-      double total_volume = 0.0;
-      for (size_t n = 0; n < cell_size; n++)
-        {
-          const double f 
-            = geo.fraction_in_volume (n, *volume);
-          if (f > 1e-10)
-            {
-              cells.push_back (n);
-              const double vol = geo.cell_volume (n) * f;
-              weight.push_back (vol);
-              total_volume += vol;
-            }
-        }
-      if (iszero (total_volume))
-        daisy_assert (weight.size () == 0);
-      else 
-        {
-          if (dimensions () > 0)
-            {
-              if (!density_z)
-                total_volume /= volume->height (geo.bottom (), geo.top ());
-              if (!density_x)
-                total_volume /= volume->width (geo.left (), geo.right ());
-              if (!density_y)
-                total_volume /= volume->depth (geo.front (), geo.back ());
-              for (size_t i = 0; i < cells.size (); i++)
-                weight[i] /= total_volume;
-            }
-        }
-      daisy_assert (cells.size () == weight.size ());
+  // Already created?
+  const colcache_t::const_iterator look = colcache.find (&column);
+  if (look != colcache.end ())
+    {
+      // Make it active.
+      active = look;
+      if (bd_convert.get ())
+        bd_convert->set_bulk (active->second.bulk);
+      return;
     }
+
+  // Create a new entry.
+  colweight entry;
+  double& bulk = entry.bulk;
+  std::vector<size_t>& cell = entry.cell; 
+  std::vector<double>& weight = entry.weight;    
+
+  const Geometry& geo = column.get_geometry ();
+  const Soil& soil = column.get_soil ();
+  const size_t cell_size = geo.cell_size ();
+  double total_volume = 0.0;
+  bulk = 0.0;
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double f = geo.fraction_in_volume (c, *volume);
+      if (f > 1e-10)
+        {
+          cell.push_back (c);
+          const double vol = geo.cell_volume (c) * f;
+          weight.push_back (vol);
+          total_volume += vol;
+          bulk += soil.dry_bulk_density (c) * vol;
+        }
+    }
+  if (iszero (total_volume))
+    {
+      daisy_assert (weight.size () == 0);
+      daisy_assert (iszero (bulk));
+      bulk = -42.42e42;               // Avoid 0/0.
+    }
+  else 
+    {
+      if (dimensions () > 0)
+        {
+          if (!density_z)
+            total_volume /= volume->height (geo.bottom (), geo.top ());
+          if (!density_x)
+            total_volume /= volume->width (geo.left (), geo.right ());
+          if (!density_y)
+            total_volume /= volume->depth (geo.front (), geo.back ());
+          for (size_t i = 0; i < cell.size (); i++)
+            weight[i] /= total_volume;
+        }
+      if (bd_convert.get ())
+        {
+          if (density_z)
+            bulk /= volume->height (geo.bottom (), geo.top ()); 
+          if (density_x)
+            bulk /= volume->width (geo.left (), geo.right ()); 
+          if (density_y)
+            bulk /= volume->depth (geo.front (), geo.back ()); 
+          bd_convert->set_bulk (bulk);
+        }
+    }
+  daisy_assert (cell.size () == weight.size ());
+
+  // Make it official.
+  colcache[&column] = entry;
+  active = colcache.find (&column);
+  if (bd_convert.get ())
+    bd_convert->set_bulk (bulk);
+  daisy_assert (active != colcache.end ());
 }
 
 void 
 SelectVolume::output_array (const std::vector<double>& array)
 {
-  if (!last_column)
+  if (active == colcache.end ())
     throw "Needs soil to log volume";
+
+  const colweight& entry = active->second;
+  const std::vector<size_t>& cell = entry.cell; 
+  const std::vector<double>& weight = entry.weight;    
 
   double sum = 0.0;
 
   if (min_root_density > 0.0)
     {
-      daisy_assert (last_column);
-      const Vegetation& vegetation = last_column->get_vegetation ();
+      const Column *const column = active->first;
+      daisy_assert (column);
+      const Vegetation& vegetation = column->get_vegetation ();
       const std::vector<double>& root_density 
 	= (min_root_crop == wildcard)
 	? vegetation.root_density ()
 	: vegetation.root_density (min_root_crop);
-
-      for (size_t i = 0; i < cells.size (); i++)
+      
+      for (size_t i = 0; i < cell.size (); i++)
 	{
-	  const size_t cell = cells[i];
+	  const size_t c = cell[i];
 
-	  if (root_density.size () > cell)
+	  if (root_density.size () > c)
 	    {
-	      const double density = root_density[cell];
+	      const double density = root_density[c];
 
 	      if (density > 0.0)
 		{
-		  const double value = array[cell] * weight[i];
+		  const double value = array[c] * weight[i];
 
 		  if (density < min_root_density)
 		    sum += value * density / min_root_density;
@@ -177,8 +222,8 @@ SelectVolume::output_array (const std::vector<double>& array)
 	}
     }
   else
-    for (size_t i = 0; i < cells.size (); i++)
-      sum += array[cells[i]] * weight[i];
+    for (size_t i = 0; i < cell.size (); i++)
+      sum += array[cell[i]] * weight[i];
 
   add_result (sum);
 }
@@ -229,10 +274,10 @@ SelectVolume::SelectVolume (const BlockModel& al)
     density_x (al.flag ("density") || al.flag ("density_x")),
     density_y (al.flag ("density") || al.flag ("density_y")),
     volume (Volume::build_obsolete (al)),
-    last_column (NULL),
     min_root_density (al.number ("min_root_density")),
     min_root_crop (al.name ("min_root_crop")),
-    bd_convert (NULL)
+    bd_convert (NULL),
+    active (colcache.end ())
 { }
   
 SelectVolume::~SelectVolume ()
@@ -326,30 +371,56 @@ OBSOLETE: Use (volume box (bottom TO)) instead.");
 // Here follows a hack to log the water content at fixed pressure.
 
 struct SelectWater : public SelectVolume
-{
-  std::vector<double> water;
+{ 
   const double h;
   const double h_ice;
 
+  typedef std::map<const Column*, std::vector<double>/**/> watercache_t;
+  watercache_t watercache;
+  watercache_t::const_iterator active_water;
+
+
   void set_column (const Column& column, Treelog& msg)
   {
-    if (&column != last_column)
+    // Same as old?
+    if (&column == active->first)
+      // Do nothing.
+      return;
+
+    SelectVolume::set_column (column, msg);
+    
+    // Already in cache?
+    const watercache_t::const_iterator look = watercache.find (&column);
+    if (look != watercache.end ())
       {
-        SelectVolume::set_column (column, msg);
-        const Soil& soil = column.get_soil ();
-        
-	water.clear ();
-	while (water.size () < soil.size ())
-	  water.push_back (soil.Theta (water.size (), h, h_ice));
+        // Make it active.
+        active_water = look;
+        return;
       }
+
+    // Create it.
+    const Soil& soil = column.get_soil ();
+    const size_t cell_size = soil.size ();
+    std::vector<double> water (cell_size);
+    for (size_t c = 0; c < cell_size; c++)
+      water[c] = soil.Theta (c, h, h_ice);
+
+    // Make it official.
+    watercache[&column] = water;
+    active_water = watercache.find (&column);
+    daisy_assert (active_water != watercache.end ());
   }
   void output_array (const std::vector<double>&)
-  { SelectVolume::output_array (water); }
+  { 
+    daisy_assert (active_water != watercache.end ());
+    SelectVolume::output_array (active_water->second); 
+  }
 
   SelectWater (const BlockModel& al)
     : SelectVolume (al),
       h (al.number ("h")),
-      h_ice (al.number ("h_ice"))
+      h_ice (al.number ("h_ice")),
+      active_water (watercache.end ())
   { }
 };
 

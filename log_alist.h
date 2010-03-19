@@ -32,8 +32,8 @@ class Frame;
 struct LogSubmodel : public Log
 {
   // Filter functions.
-  bool check_entry (symbol, const char* component) const;
-  bool check_derived (symbol, symbol, const char* component) const;
+  bool check_entry (symbol, const symbol component) const;
+  bool check_derived (symbol, symbol, const symbol component) const;
 
   // Content.
   bool is_active;		// ... store the answer here.
@@ -79,13 +79,13 @@ struct LogSubmodel : public Log
   void close_alist ();
 
   void open_derived (symbol field, // Model singletons.
-		     symbol type, const char* library); 
+		     symbol type, const symbol library); 
   void close_derived ();
   void open_object (symbol field, // Model singletons with alist.
-		    symbol type, const Frame&, const char* library); 
+		    symbol type, const Frame&, const symbol library); 
   void close_object ();
   void open_entry (symbol type,   // Items in an Model sequence.
-		   const Frame& frame, const char *const library);
+		   const Frame& frame, const symbol library);
   void close_entry ();
   void open_named_entry (symbol name,   // Named items in an Obj seq.
 			 symbol type, 
@@ -93,7 +93,7 @@ struct LogSubmodel : public Log
   void close_named_entry ();
 
   void open_shallow (symbol type, // Object names.
-                     const char* library);
+                     const symbol library);
   void close_shallow ();
 
   // Logging.

@@ -623,7 +623,8 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
   // Fully adsorbed primary transport.
   if (chemical.adsorption ().full ())
     {
-      Treelog::Open nest (msg, "solid " + matrix_solid->library_id ());
+      static const symbol solid_name ("immobile transport");
+      Treelog::Open nest (msg, solid_name);
       if (!iszero (J_above))
         {
           std::ostringstream tmp;
@@ -640,7 +641,8 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
   for (size_t i = 0; i < matrix_solute.size (); i++)
     {
       solute_attempt (i);
-      Treelog::Open nest (msg, "solute", i, matrix_solute[i]->library_id ());
+      static const symbol solute_name ("solute");
+      Treelog::Open nest (msg, solute_name, i, matrix_solute[i]->library_id ());
       try
         {
           primary_transport (geometry (), soil, soil_water, 

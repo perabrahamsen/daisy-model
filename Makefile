@@ -67,8 +67,8 @@ USE_OPTIMIZE = true
 
 # Set USE_PROFILE if you want to profile the executable
 #
-#USE_PROFILE = true
-USE_PROFILE = false
+USE_PROFILE = true
+#USE_PROFILE = false
 
 # Set COMPILER according to which compiler you use.
 #	sun		Use the unbundled sun compiler.
@@ -392,7 +392,7 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C
-MODELS = hydraulic_B_C_inverse.C \
+MODELS = reaction_sorption.C hydraulic_B_C_inverse.C \
 	program_osvaldo.C vegetation_permanent.C  litter.C drain_lateral.C \
 	hydraulic_MACRO.C program_cpedata.C \
 	reaction_boundrel.C log_regress.C reaction_Morgan98.C \
@@ -1603,6 +1603,11 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+reaction_sorption${OBJ}: reaction_sorption.C reaction.h model_framed.h \
+ model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
+ scope.h attribute.h treelog.h frame_model.h frame.h chemistry.h \
+ chemical.h geometry.h soil.h soil_water.h surface.h uzmodel.h log.h \
+ time.h border.h assertion.h librarian.h mathlib.h check.h
 hydraulic_B_C_inverse${OBJ}: hydraulic_B_C_inverse.C hydraulic.h \
  model_derived.h model_logable.h model.h symbol.h block_model.h \
  block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
@@ -1694,8 +1699,8 @@ biopore_drain${OBJ}: biopore_drain.C biopore.h model_framed.h model_logable.h \
  model.h symbol.h number.h im.h attribute.h block_model.h block_nested.h \
  block.h scope.h treelog.h frame_model.h frame.h vcheck.h librarian.h \
  submodeler.h block_submodel.h frame_submodel.h check.h geometry.h soil.h \
- soil_heat.h anystate.h chemical.h groundwater.h model_derived.h \
- assertion.h mathlib.h
+ anystate.h chemical.h groundwater.h model_derived.h assertion.h \
+ mathlib.h
 tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model_derived.h \
  model_logable.h model.h symbol.h tertsmall.h biopore.h model_framed.h \
  number.h im.h attribute.h memutils.h librarian.h block_model.h \
@@ -1707,9 +1712,9 @@ biopore_matrix${OBJ}: biopore_matrix.C biopore.h model_framed.h \
  model_logable.h model.h symbol.h number.h im.h attribute.h imvec.h \
  block_model.h block_nested.h block.h scope.h treelog.h frame_model.h \
  frame.h vcheck.h librarian.h submodeler.h block_submodel.h \
- frame_submodel.h geometry.h soil.h soil_heat.h volume_box.h volume.h \
- log.h time.h border.h check.h anystate.h chemical.h groundwater.h \
- model_derived.h mathlib.h assertion.h
+ frame_submodel.h geometry.h soil.h volume_box.h volume.h log.h time.h \
+ border.h check.h anystate.h chemical.h groundwater.h model_derived.h \
+ mathlib.h assertion.h
 transport_Mollerup${OBJ}: transport_Mollerup.C transport.h model.h symbol.h \
  geometry_rect.h geometry_vert.h geometry.h attribute.h soil.h solver.h \
  log.h time.h border.h model_framed.h model_logable.h frame.h scope.h \

@@ -42,9 +42,18 @@ private:
   
   const bool density;
   std::auto_ptr<Volume> volume;
+
+  // Column cache.
+  struct colweight
+  {
+    std::vector<size_t> edges;
+    std::vector<double> weight;
+  };
+  typedef std::map<const Column*, colweight> colcache_t;
+  colcache_t colcache;
+  colcache_t::const_iterator active;
+
   const Column* last_column;
-  std::vector<size_t> edges;
-  std::vector<double> weight;
 
   // Use.
 protected:
@@ -99,70 +108,93 @@ SelectFlow::check_border (const Border& border, const Volume& default_volume,
 void
 SelectFlow::set_column (const Column& column, Treelog& msg)
 {
-  if (&column != last_column)
-    {
-      last_column = &column;
-      Treelog::Open nest (msg, name);
-      const Geometry& geo = column.get_geometry ();
-      const size_t size = geo.edge_size ();
-      edges.clear ();
-      weight.clear ();
-      double total_area = 0.0;
-      for (size_t e = 0; e < size; e++)
-        {
-          const int from = geo.edge_from (e);
-          const bool from_inside = geo.cell_center_in_volume (from, *volume);
-          const int to = geo.edge_to (e);
-          const bool to_inside = geo.cell_center_in_volume (to, *volume);
-          if (from_inside)
-            {
-              if (to_inside)
-                // Both inside volume, don't use.
-                continue;
-              if (!use_edge (geo, to, from))
-                continue;
-            }
-          else
-            {
-              if (!to_inside)
-                // Both outside volume, don't use.
-                continue;
-              if (!use_edge (geo, from, to))
-                continue;
-            }
-          edges.push_back (e);
-          double area = geo.edge_area (e);
-          total_area += area;
-          if (from_inside)
-            // Positive inwards.
-            area *= -1;
-          weight.push_back (area);
-        }
-      if (weight.size () ==0)
-        msg.warning ("No edges found");
-      else
-        daisy_assert (std::isnormal (total_area));
+  // Same as old?
+  if (&column == active->first)
+    // Do nothing.
+    return;
 
-      if (density)
-        for (size_t i = 0; i < weight.size (); i++)
-          weight[i] /= total_area;
-#ifdef DEBUG_EDGES
-      std::ostringstream tmp;
-      tmp << "Total area: " << total_area << ", density = " << density
-          << ", #edges = " << edges.size ();
-      for (size_t i = 0; i < edges.size (); i++)
-        tmp << "\n" << geo.edge_name (edges[i]) << ": weigth " << weight[i];
-      msg.message (tmp.str ());
-#endif
-      daisy_assert (edges.size () == weight.size ());
+  // Already created?
+  const colcache_t::const_iterator look = colcache.find (&column);
+  if (look != colcache.end ())
+    {
+      // Make it active.
+      active = look;
+      return;
     }
+
+  // Create a new entry.
+  colweight entry;
+  std::vector<size_t>& edges = entry.edges; 
+  std::vector<double>& weight = entry.weight;    
+
+  Treelog::Open nest (msg, name);
+
+  const Geometry& geo = column.get_geometry ();
+  const size_t size = geo.edge_size ();
+  double total_area = 0.0;
+  for (size_t e = 0; e < size; e++)
+    {
+      const int from = geo.edge_from (e);
+      const bool from_inside = geo.cell_center_in_volume (from, *volume);
+      const int to = geo.edge_to (e);
+      const bool to_inside = geo.cell_center_in_volume (to, *volume);
+      if (from_inside)
+        {
+          if (to_inside)
+            // Both inside volume, don't use.
+            continue;
+          if (!use_edge (geo, to, from))
+            continue;
+        }
+      else
+        {
+          if (!to_inside)
+            // Both outside volume, don't use.
+            continue;
+          if (!use_edge (geo, from, to))
+            continue;
+        }
+      edges.push_back (e);
+      double area = geo.edge_area (e);
+      total_area += area;
+      if (from_inside)
+        // Positive inwards.
+        area *= -1;
+      weight.push_back (area);
+    }
+  if (weight.size () == 0)
+    msg.warning ("No edges found");
+  else
+    daisy_assert (std::isnormal (total_area));
+
+  if (density)
+    for (size_t i = 0; i < weight.size (); i++)
+      weight[i] /= total_area;
+#ifdef DEBUG_EDGES
+  std::ostringstream tmp;
+  tmp << "Total area: " << total_area << ", density = " << density
+      << ", #edges = " << edges.size ();
+  for (size_t i = 0; i < edges.size (); i++)
+    tmp << "\n" << geo.edge_name (edges[i]) << ": weigth " << weight[i];
+  msg.message (tmp.str ());
+#endif
+  daisy_assert (edges.size () == weight.size ());
+
+  // Make it official.
+  colcache[&column] = entry;
+  active = colcache.find (&column);
+  daisy_assert (active != colcache.end ());
 }
 
 void
 SelectFlow::output_array (const std::vector<double>& array)
 { 
-  if (!last_column)
+  if (active == colcache.end ())
     throw "Needs soil to log flow";
+  
+  const colweight& entry = active->second;
+  const std::vector<size_t>& edges = entry.edges; 
+  const std::vector<double>& weight = entry.weight;    
   
   daisy_assert (edges.size () <= array.size ());
   double sum = 0.0;
@@ -176,7 +208,7 @@ SelectFlow::SelectFlow (const BlockModel& al)
   : SelectValue (al),
     density (al.flag ("density")),
     volume (Volume::build_obsolete (al)),
-    last_column (NULL)
+    active (colcache.end ())
 { }
 
 static struct SelectFlowSyntax : public DeclareBase

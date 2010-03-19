@@ -58,7 +58,7 @@ struct EXPORT LogSelect : public Log
   // Filter functions.
   bool check_leaf (symbol) const;
   bool check_interior (symbol) const;
-  bool check_derived (symbol field, symbol name, const char* component) const;
+  bool check_derived (symbol field, symbol name, symbol component) const;
 
   // Checking to see if we should log this time step.
   bool match (const Daisy& daisy, Treelog&);
@@ -71,7 +71,7 @@ struct EXPORT LogSelect : public Log
 		     const Daisy&, Treelog&);
 
   // Open a derived type (for LogAll to overwrite).
-  virtual void open_derived_type (symbol type, const char* library);
+  virtual void open_derived_type (symbol type, const symbol library);
 
   // Open normal items.
   void open (symbol name);
@@ -90,16 +90,16 @@ struct EXPORT LogSelect : public Log
   void close_unnamed ();
 
   // Derived items.
-  void open_derived (symbol field, symbol type, const char* library);
+  void open_derived (symbol field, symbol type, const symbol library);
   void close_derived ();
 
   // Model singletons with alist.
   void open_object (symbol field, symbol type, const Frame&,
-		    const char* library); 
+		    symbol library); 
   void close_object ();
 
   // Derived items in a list.
-  void open_entry (symbol type, const Frame&, const char* library);
+  void open_entry (symbol type, const Frame&, symbol library);
   void close_entry ();
 
   // Named derived items in a list.
@@ -108,7 +108,7 @@ struct EXPORT LogSelect : public Log
   void close_named_entry ();
 
   // Object names.
-  void open_shallow (symbol type, const char* library);
+  void open_shallow (symbol type, const symbol library);
   void close_shallow ();
 
   void output_entry (symbol name, bool);

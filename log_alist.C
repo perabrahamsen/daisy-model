@@ -32,11 +32,11 @@
 #include <sstream>
 
 bool
-LogSubmodel::check_entry (symbol, const char*) const
+LogSubmodel::check_entry (symbol, const symbol) const
 { return is_active; }
 
 bool
-LogSubmodel::check_derived (symbol, symbol, const char*) const
+LogSubmodel::check_derived (symbol, symbol, const symbol) const
 { return is_active; }
 
 symbol
@@ -370,7 +370,7 @@ LogSubmodel::close_alist ()
 }
 void
 LogSubmodel::open_derived (const symbol field, const symbol type, 
-                           const char *const library)
+                           const symbol library)
 { 
   if (frame_entry ().is_log (field))
     open_ignore ();
@@ -391,7 +391,7 @@ LogSubmodel::close_derived ()
 
 void
 LogSubmodel::open_object (symbol field, symbol type, 
-                       const Frame& f, const char* lib)
+                       const Frame& f, const symbol lib)
 { 
   if (is_active)
     {
@@ -426,7 +426,7 @@ LogSubmodel::close_object ()
 }
 
 void
-LogSubmodel::open_entry (symbol type, const Frame& frame, const char*)
+LogSubmodel::open_entry (symbol type, const Frame& frame, const symbol)
 {
   if (is_active)
     push (type, frame);
@@ -457,7 +457,7 @@ LogSubmodel::close_named_entry ()
 { close_entry (); }
 
 void
-LogSubmodel::open_shallow (const symbol, const char *const)
+LogSubmodel::open_shallow (const symbol, const symbol)
 { open_unnamed (); }
 
 void

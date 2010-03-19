@@ -59,10 +59,10 @@ Log::metalib () const
 }
 
 bool
-Log::check_entry (symbol name, const char *const component) const
+Log::check_entry (symbol name, const symbol component) const
 {
   bool looking = true;
-  const Library& library = metalib ().library (symbol (component));
+  const Library& library = metalib ().library (component);
 
   // TODO: We should have check_interior use Library::ancestors for speed.
   while (looking && !check_interior (name))

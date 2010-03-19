@@ -41,7 +41,7 @@ struct LogHarvest : public Log
   { return false; }
   bool check_interior (symbol) const
   { return false; }
-  bool check_derived (symbol, symbol, const char*) const
+  bool check_derived (symbol, symbol, const symbol) const
   { return false; }
 
   // Content.
@@ -135,19 +135,19 @@ struct LogHarvest : public Log
   { daisy_notreached (); }
 
   // Derived items.
-  void open_derived (symbol, symbol, const char *const)
+  void open_derived (symbol, symbol, const symbol)
   { daisy_notreached (); }
   void close_derived ()
   { daisy_notreached (); }
 
   // Derived items with their own alist
-  void open_object (symbol, symbol, const Frame&, const char *const)
+  void open_object (symbol, symbol, const Frame&, const symbol)
   { daisy_notreached (); }
   void close_object ()
   { daisy_notreached (); }
 
   // Derived items in a list.
-  void open_entry (symbol, const Frame&, const char*)
+  void open_entry (symbol, const Frame&, const symbol)
   { daisy_notreached (); }
   void close_entry ()
   { daisy_notreached (); }
@@ -159,7 +159,7 @@ struct LogHarvest : public Log
   { daisy_notreached (); }
 
   // Named object
-  void open_shallow (symbol, const char *const)
+  void open_shallow (symbol, const symbol)
   { daisy_notreached (); }
   void close_shallow ()
   { daisy_notreached (); }

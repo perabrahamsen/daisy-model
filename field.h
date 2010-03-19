@@ -137,7 +137,7 @@ public:
                  size_t, const Time&, double dt, const Weather*,
 		 const Scope&, Treelog&);
   void output (Log&) const;
-  double relative_weight (const Metalib&, const Column&, const Select&) const;
+  double relative_weight (const Column&, const Select&) const;
 
   // Find a specific column.
   const Column* find (symbol name) const;

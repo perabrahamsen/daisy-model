@@ -341,9 +341,11 @@ ChemistryStandard::clear ()
 void 
 ChemistryStandard::output (Log& log) const
 {
+  static const symbol chemical_lib (Chemical::component);
+  static const symbol reaction_lib (Reaction::component);
   Chemistry::output (log);
-  output_list (chemicals, "trace", log, Chemical::component);
-  output_list (reactions, "reaction", log, Reaction::component);
+  output_list (chemicals, "trace", log, chemical_lib);
+  output_list (reactions, "reaction", log, reaction_lib);
 }
 
 void 

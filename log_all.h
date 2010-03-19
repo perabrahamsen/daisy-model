@@ -53,7 +53,7 @@ public:
 		     const Daisy&, Treelog&);
 
   // Open a derived type.
-  void open_derived_type (symbol type, const char* library);
+  void open_derived_type (symbol type, symbol library);
 
   // Open normal items.
   void open (symbol name);

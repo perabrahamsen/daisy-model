@@ -8,6 +8,8 @@ release.
 
 * 4.81
 
+** Many speedups.
+
 ** New hydraulic model 'B_C_inverse'.
 
 This is an version of the Burdine/Campbell model where the 'b' and
@@ -28,6 +30,19 @@ file.
              (Theta_fc 0.2 [])
              (Theta_sat 0.4 [])))
 
+** New 'sorption' reaction model.
+
+Faster than 'equilibrium', more flexible than 'adsorption'
+
+** The 'aperture' secondary model take new 'use_secondary' parameter.
+
+Set this to false to make 'aperture' only affect hydraulic
+conductivity, without introducing a secondary domain for solute
+transport.
+
+** Fix gnuplot output for gnuplot 4.4.
+
+** Bug fixes.
 
 * 4.80
 

@@ -32,7 +32,6 @@
 class BlockModel;
 class Geometry;
 class Soil;
-class SoilHeat;
 class Log;
 class Anystate;
 class Chemical;
@@ -95,10 +94,9 @@ public:
   void clear ();
   virtual void update_matrix_sink (const Geometry& geo,    
                                    const Soil& soil,  
-                                   const SoilHeat& soil_heat, 
                                    const std::vector<bool>& active,
+                                   const std::vector<double>& K, 
                                    const double h_barrier,
-                                   const double pressure_initiate,
                                    const double pressure_limit,
                                    const std::vector<double>& h, 
                                    const double dt) = 0;

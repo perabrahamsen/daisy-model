@@ -358,9 +358,11 @@ ChemistryMulti::clear ()
 void 
 ChemistryMulti::output (Log& log) const
 {
+  static const symbol chemistry_lib (Chemistry::component);
+  static const symbol chemical_lib (Chemical::component);
   Chemistry::output (log);
-  output_list (combine, "combine", log, Chemistry::component);
-  output_list (chemicals, "trace", log, Chemical::component);
+  output_list (combine, "combine", log, chemistry_lib);
+  output_list (chemicals, "trace", log, chemical_lib);
 
   // We can't log identifier_sequence yet.
 #if 0

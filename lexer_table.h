@@ -46,7 +46,7 @@ private:
   std::auto_ptr<LexerData> lex;
   std::string field_sep;
   std::string type_;
-  const std::vector<symbol> missing;
+  const std::vector<std::string> missing;
   std::vector<symbol> tag_names;
   std::map<symbol,int> tag_pos;
   std::vector<size_t> fil_col;

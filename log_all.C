@@ -156,7 +156,7 @@ LogAll::initial_done (const std::vector<Time::component_t>& time_columns,
 }
 
 void 
-LogAll::open_derived_type (const symbol key, const char *const component)
+LogAll::open_derived_type (const symbol key, const symbol component)
 { 
   daisy_assert (is_active);
 
@@ -237,7 +237,8 @@ LogAll::close ()
 void 
 LogAll::open_column (const Column& column, const Field& field)
 {
-  const Library& library = metalib ().library (Column::component);
+  static const symbol collib (Column::component);
+  const Library& library = metalib ().library (collib);
   const std::set<symbol>& ancestors = library.ancestors (column.name);
   
   const std::vector<Select*>& interiors = active_interiors.top ();
@@ -249,8 +250,7 @@ LogAll::open_column (const Column& column, const Field& field)
       if (!select.valid (ancestors))
         continue;
       select.set_column (column, *msg);
-      select.relative_weight
-        = field.relative_weight (metalib (), column, select);
+      select.relative_weight = field.relative_weight (column, select);
 #if 0
       std::ostringstream tmp;
       tmp << "Column " << column.name << " matched by " 

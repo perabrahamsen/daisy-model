@@ -74,6 +74,7 @@ public:
   virtual double C_secondary (size_t i) const = 0;
   virtual double C_primary (size_t i) const = 0;
   virtual double M_primary (size_t i) const = 0;
+  virtual double M_secondary (size_t i) const = 0;
   virtual double M_total (size_t i) const = 0;
   virtual double total_surface (const Geometry&, 
   				double from, double to) const = 0; // [g/cm^2]

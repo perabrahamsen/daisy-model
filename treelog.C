@@ -24,7 +24,15 @@
 #include "treelog.h"
 #include <sstream>
 
+Treelog::Open::Open (Treelog& l, const std::string& name)
+  : log (l)
+{ log.open (name); }
+
 Treelog::Open::Open (Treelog& l, const symbol name)
+  : log (l)
+{ log.open (name.name ()); }
+
+Treelog::Open::Open (Treelog& l, const char *const name)
   : log (l)
 { log.open (name); }
 
@@ -39,10 +47,6 @@ Treelog::Open::Open (Treelog& l, const symbol parameter,
 
 Treelog::Open::~Open ()
 { log.close (); }
-
-void
-Treelog::open (const symbol name)
-{ open (name.name ()); }
 
 void
 Treelog::message (const std::string& str)
@@ -60,7 +64,7 @@ class TreelogNull : public Treelog
 {
   // Nesting.
 public:
-  void open (const symbol)
+  void open (const std::string&)
   { }
   void close ()
   { }

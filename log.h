@@ -64,9 +64,9 @@ public:
 public:
   virtual bool check_leaf (symbol) const = 0;
   virtual bool check_interior (symbol) const = 0;
-  virtual bool check_entry (symbol, const char* library) const;
+  virtual bool check_entry (symbol, symbol library) const;
   virtual bool check_derived (symbol field, symbol name, 
-			      const char* library) const = 0;
+			      symbol library) const = 0;
 
   // Use.  
 public:
@@ -182,7 +182,7 @@ public:
     Log& ll;
   public:
     Derived (Log& l, const symbol field, const symbol type, 
-	     const char *const library)
+	     const symbol library)
       : ll (l)
     { ll.open_derived (field, type, library); }
     ~Derived ()
@@ -190,7 +190,7 @@ public:
   };
 private:
   virtual void open_derived (symbol field, symbol type, 
-			     const char* library) = 0;
+			     const symbol library) = 0;
   virtual void close_derived () = 0;
   friend struct Log::Derived;
 
@@ -202,7 +202,7 @@ public:
     Log& ll;
   public:
     Model (Log& l, const symbol field, const symbol type, 
-            const Frame& alist, const char *const library)
+            const Frame& alist, const symbol library)
       : ll (l)
     { ll.open_object (field, type, alist, library); }
     ~Model ()
@@ -211,7 +211,7 @@ public:
 private:
   virtual void open_object (symbol field, symbol type, 
 			    const Frame& alist, 
-			    const char* library) = 0;
+			    const symbol library) = 0;
   virtual void close_object () = 0;
   friend struct Log::Model;
 
@@ -223,7 +223,7 @@ public:
     Log& ll;
   public:
     Entry (Log& l, const symbol type,
-	   const Frame& alist, const char *const library)
+	   const Frame& alist, const symbol library)
       : ll (l)
     { ll.open_entry (type, alist, library); }
     ~Entry ()
@@ -231,7 +231,7 @@ public:
   };
 private:
   virtual void open_entry (symbol type, const Frame&, 
-			   const char* library) = 0;
+			   symbol library) = 0;
   virtual void close_entry () = 0;
   friend struct Log::Entry;
 
@@ -262,14 +262,14 @@ public:
   private:
     Log& ll;
   public:
-    Shallow (Log& l, const symbol type, const char *const library)
+    Shallow (Log& l, const symbol type, const symbol library)
       : ll (l)
     { ll.open_shallow (type, library); }
     ~Shallow ()
     { ll.close_shallow (); }
   };
 private:
-  virtual void open_shallow (symbol type, const char* library) = 0;
+  virtual void open_shallow (symbol type, const symbol library) = 0;
   virtual void close_shallow () = 0;
   friend struct Log::Shallow;
 
@@ -375,7 +375,7 @@ do { \
 
 template <class T> void
 output_list_ (T const& items, const symbol name, Log& log,
-              const char *const library)
+              const symbol library)
 {
   if (log.check_interior (name))
     {

@@ -48,8 +48,8 @@ LogSelect::check_interior (symbol) const
 { daisy_notreached (); }
 
 bool 
-LogSelect::check_derived (symbol field, symbol /* name */,
-			  const char *const /* component */) const
+LogSelect::check_derived (symbol field, const symbol /* name */,
+			  const symbol /* component */) const
 { return check_interior (field); }
 
 bool 
@@ -97,7 +97,7 @@ LogSelect::initial_done (const std::vector<Time::component_t>& time_columns,
 { }
 
 void 
-LogSelect::open_derived_type (const symbol type, const char *const)
+LogSelect::open_derived_type (const symbol type, const symbol)
 { open (type); }
 
 void 
@@ -135,7 +135,7 @@ LogSelect::close_ordered ()
 { close (); }
 
 void 
-LogSelect::open_derived (symbol field, symbol type, const char *const library)
+LogSelect::open_derived (symbol field, symbol type, const symbol library)
 { open (field); open_derived_type (type, library); }
 
 void 
@@ -143,8 +143,8 @@ LogSelect::close_derived ()
 { close (); close (); }
 
 void 
-LogSelect::open_object (symbol field, symbol type, const Frame&,
-			const char *const library)
+LogSelect::open_object (const symbol field, const symbol type, const Frame&,
+			const symbol library)
 { open_derived (field, type, library); }
 
 void 
@@ -152,8 +152,8 @@ LogSelect::close_object ()
 { close_derived (); }
 
 void 
-LogSelect::open_entry (symbol type, const Frame&, 
-		       const char *const library)
+LogSelect::open_entry (const symbol type, const Frame&, 
+		       const symbol library)
 { open_derived_type (type, library); }
 
 void 
@@ -170,7 +170,7 @@ LogSelect::close_named_entry ()
 { close (); }
 
 void 
-LogSelect::open_shallow (symbol type, const char* library)
+LogSelect::open_shallow (symbol type, const symbol library)
 { open_derived_type (type, library); }
 
 void 

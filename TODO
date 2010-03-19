@@ -1,5 +1,12 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Test ny og gammel equilibrium mod hinanden.
+
+Skyldes forskellen af ligevægt i sekundært domæne nu følger indholdi
+sekundært domæne, i styedet fro indhold i primært domæne?
+
+* Massebalancefejl?
+
 * Variable tidsskridt
 
 ** Log skal kunne klare variable tidsskridt

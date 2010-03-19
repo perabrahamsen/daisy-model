@@ -415,10 +415,22 @@ TertiaryBiopores::update_biopores (const Geometry& geo,
                                    const std::vector<double>& h,
                                    const double dt) 
 {
+  // Find conductivity.
+  const size_t cell_size = geo.cell_size ();
+  std::vector<double> K (cell_size);
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double h_cond = std::min(pressure_initiate, h[c]);
+      const double T = soil_heat.T (c);
+      const double h_ice = 0.0;    //ice ignored 
+      const double K_zz = soil.K (c, h_cond, h_ice, T);
+      const double K_xx = K_zz * soil.anisotropy_cell (c);
+      K[c] = K_xx;
+    }
+  
   for (size_t b = 0; b < classes.size (); b++)
-    classes[b]->update_matrix_sink (geo, soil, soil_heat, active, 
+    classes[b]->update_matrix_sink (geo, soil, active, K, 
                                     pressure_barrier, 
-                                    pressure_initiate, 
                                     pressure_limit, h, dt);
 }
 

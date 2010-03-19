@@ -40,10 +40,6 @@ struct BD_convert : public Convert
   // Use.
   double operator()(double value) const;
   bool valid (double value) const;
-  void set_bulk (const Geometry& geo,
-                 const Soil& soil, const Volume& volume,
-                 const bool density_z, const bool density_x,
-                 const bool density_y);
   void set_bulk (const double new_bulk)
   { bulk = new_bulk; }
 

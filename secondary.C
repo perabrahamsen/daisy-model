@@ -195,12 +195,14 @@ struct SecondaryCracks : public SecondaryAlpha
   const double density;         // [m^-1]
   const double K_crack;              // [cm/h]
   const double h_crack;              // [cm]
+  const bool use_secondary;          // Enable secondary domain.
 
   double h_lim () const 
-  { return h_crack; }
+  { return use_secondary ? h_crack : 0.0; }
+
   double K (const double h) const
   { 
-    if (h < h_lim ())
+    if (h < h_crack)
       return 0.0;
     else
       return K_crack; 
@@ -251,7 +253,8 @@ struct SecondaryCracks : public SecondaryAlpha
       aperture (al.number ("aperture")),
       density (al.number ("density")),
       K_crack (find_K (aperture, density)),
-      h_crack (find_h_lim (aperture))
+      h_crack (find_h_lim (aperture)),
+      use_secondary (al.flag ("use_secondary"))
   { 
     Treelog& msg = al.msg ();
     TREELOG_MODEL (msg);
@@ -289,6 +292,10 @@ Secondary domain specified by aperture and density of soil cracks.")
 Average distance between walls in cracks.");
     frame.declare ("density", "m^-1", Check::positive (), Attribute::Const, "\
 Density of cracks.");
+    frame.declare_boolean ("use_secondary", Attribute::Const, "\
+Divide soil matrix into two domains for solute transport.\n\
+Set this to false to make cracks affect only the conductivity curve.");
+    frame.set ("use_secondary", true);
   }
 } SecondaryCracks_syntax;
 
