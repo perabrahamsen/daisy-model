@@ -316,8 +316,9 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
     }
   update_water ();
 
-  // Update soil water.
+  // Update soil and surface water.
   soil_water.set_tertiary_flux (q_tertiary);
+  surface.update_pond_average (geo);
 
   // We might want to handle matrix interaction is small timesteps.
   log_ddt = false;

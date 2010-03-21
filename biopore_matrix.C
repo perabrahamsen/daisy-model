@@ -798,6 +798,8 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
         = column_water (col) + water_left[col];
       daisy_assert (total_water >= 0.0);
       const double M = solute->get_value (chem, col); // [g]
+      if (M <= 0.0)
+        continue;
       const double C = M / total_water; // [g/cm^3 W]
       sink_chem[c] = water_sink * C; // [g/cm^3 S/h]
     }

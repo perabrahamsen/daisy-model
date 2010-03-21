@@ -1,6 +1,11 @@
+2010-03-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* biopore_matrix.C (matrix_solute): Don't remove negative amounts
+	from negative storage.
+
 2010-03-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* all: Avoid creating symbol within inner loops.
+	* all: Avoid creating symbols within inner loops.
 
 	* chemical_std.C (has_lag): Don't calculate lag if none is specified.
 

@@ -677,7 +677,7 @@ ColumnStandard::tick (const Metalib& metalib, const Time& time, const double dt,
   // Tillage time.
   const size_t cell_size = geometry.cell_size ();
   for (size_t i = 0; i < cell_size; i++)
-    tillage_age[i] += 1.0/24.0;
+    tillage_age[i] += dt/24.0;
 
   // Turnover.
   organic_matter->tick (geometry, *soil_water, *soil_heat, tillage_age,
