@@ -38,11 +38,12 @@ struct LogDLF : public LogSelect
   const symbol file;       // Filename.
   std::ofstream out;            // Output stream.
   const bool flush;             // Flush after each time step.
-  const symbol record_separator; // String to print on records (time steps).
-  const symbol field_separator; // String to print between fields.
-  const symbol error_string; // String to print on errors.
-  const symbol missing_value; // String to print for missing values.
-  const symbol array_separator; // String to print between array entries.
+  // char* faster than symbol for output.
+  const char *const record_separator; // String to print on records (time steps)
+  const char *const field_separator; // String to print between fields.
+  const char *const error_string; // String to print on errors.
+  const char *const missing_value; // String to print for missing values.
+  const char *const array_separator; // String to print between array entries.
   DLF print_header;             // How much header should be printed?
   std::vector<std::pair<symbol, symbol>/**/> parameters;      // Par vals.
   bool print_tags;              // Set if tags should be printed.

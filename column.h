@@ -126,7 +126,7 @@ public:
                     const Time&, double dt, Treelog&) = 0;
   virtual void swap (const Metalib&, double from, double middle, double to, 
                      const Time&,  double dt, Treelog&) = 0;
-  virtual void set_porosity (double at, double Theta) = 0;
+  virtual void set_porosity (double at, double Theta, double dt, Treelog&) = 0;
   virtual void set_heat_source (double at, double value) = 0; // [W/m^2]
   virtual void spray (symbol chemical, double amount, 
                       double dt, Treelog&) = 0; // [g/ha]

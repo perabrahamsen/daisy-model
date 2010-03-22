@@ -91,7 +91,8 @@ struct Field::Implementation
   void swap (const Metalib& metalib, 
              double from, double middle, double to, 
              const Time&, double dt, Treelog&);
-  void set_porosity (double at, double Theta);
+  void set_porosity (double at, double Theta, 
+                     const double dt, Treelog& msg);
   void set_heat_source (double at, double value);
   void spray (symbol chemical, double amount, double dt, Treelog&); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
@@ -459,14 +460,15 @@ Field::Implementation::swap (const Metalib& metalib,
 }
 
 void 
-Field::Implementation::set_porosity (double at, double Theta)
+Field::Implementation::set_porosity (const double at, const double Theta, 
+                                     const double dt, Treelog& msg)
 {
   if (selected)
-    selected->set_porosity (at, Theta);
+    selected->set_porosity (at, Theta, dt, msg);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->set_porosity (at, Theta);
+         (*i)->set_porosity (at, Theta, dt, msg);
 }
 
 void 
@@ -962,8 +964,9 @@ Field::swap (const Metalib& metalib,
 { impl->swap (metalib, from, middle, to, time, dt, msg); }
 
 void 
-Field::set_porosity (double at, double Theta)
-{ impl->set_porosity (at, Theta); }
+Field::set_porosity (const double at, const double Theta, 
+                     const double dt, Treelog& msg)
+{ impl->set_porosity (at, Theta, dt, msg); }
 
 void 
 Field::set_heat_source (double at, double value)

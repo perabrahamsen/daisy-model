@@ -496,7 +496,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
           std::vector<double> h_std_new (cell_size);
           std::copy(h.begin (), h.end (), h_std_new.begin ());
-          tertiary.update_active (h_std_new); 
+          tertiary.update_active (geo, h_std_new, msg); 
 
 	  // Update remaining_water.
 	  for (size_t i = 0; i < edge_above.size (); i++)

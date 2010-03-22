@@ -30,6 +30,7 @@ class Geometry;
 class Soil;
 class SoilHeat;
 class Anystate;
+class Treelog;
 
 class Tertsmall : private boost::noncopyable
 {
@@ -44,7 +45,9 @@ public:
                                     const SoilHeat& soil_heat, 
                                     const std::vector<double>& h,
                                     const double dt) = 0;
-  virtual void update_active (const std::vector<double>& h_matrix) = 0;
+  virtual void update_active (const Geometry&,
+                              const std::vector<double>& h_matrix,
+                              Treelog&) = 0;
 
   // Create and Destroy.
 public:

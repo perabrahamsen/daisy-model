@@ -59,6 +59,7 @@ public:
   virtual const std::vector<Chemical*>& all () const = 0;
 
 public:
+  virtual void update_C (const Soil&, const SoilWater&) = 0;
   void deposit (const IM& im, double dt /* [h] */, Treelog&);
   virtual void deposit (symbol chem, double amount /* [g/m^2] */,
 			double dt /* [h] */, Treelog&) = 0;

@@ -57,8 +57,8 @@ struct ChemicalStandard : public Chemical
   const double surface_decompose_rate;
   const double diffusion_coefficient_; 
   const double decompose_rate;
-  const PLF decompose_heat_factor_;
-  const PLF decompose_water_factor_;
+  const PLF decompose_heat_factor;
+  const PLF decompose_water_factor;
   const PLF decompose_CO2_factor;
   const PLF decompose_conc_factor;
   const PLF decompose_depth_factor;
@@ -136,9 +136,8 @@ struct ChemicalStandard : public Chemical
   std::vector<double> tillage;         // Changes during tillage.
   std::vector<double> lag;
 
-  // Utilities.
-  double decompose_heat_factor (const double T) const;
-  double decompose_water_factor (const double h) const;
+  // Cache.
+  std::vector<double> static_decompose_rate; // Depth adusted decompose rate.
 
   // Solute.
   const Adsorption& adsorption () const;
@@ -259,24 +258,6 @@ ChemicalStandard::Product::Product (const Block& al)
   : fraction (al.number ("fraction")),
     chemical (al.name ("chemical"))
 { }
-
-double
-ChemicalStandard::decompose_heat_factor (const double T) const
-{
-  if (decompose_heat_factor_.size () < 1)
-    return Abiotic::f_T0 (T);
-  else
-    return decompose_heat_factor_ (T);
-}
-double 
-
-ChemicalStandard::decompose_water_factor (const double h) const
-{
-  if (decompose_water_factor_.size () < 1)
-    return Abiotic::f_h (h);
-  else
-    return decompose_water_factor_ (h);
-}
 
 const Adsorption&
 ChemicalStandard::adsorption () const
@@ -1068,24 +1049,37 @@ ChemicalStandard::decompose (const Geometry& geo,
         return;
     }
 
+  // Basic decompose rate.
+  daisy_assert (static_decompose_rate.size () == cell_size);
   for (size_t c = 0; c < cell_size; c++)
-    {
-      const double heat_factor 
-        = this->decompose_heat_factor (soil_heat.T (c));
-      const double water_factor 
-        = this->decompose_water_factor (soil_water.h (c));
-      const double CO2_factor 
-        = this->decompose_CO2_factor (organic_matter.CO2 (c));
-      const double conc_factor
-        = this->decompose_conc_factor (C_primary_[c]);
-      const double depth_factor
-        = this->decompose_depth_factor (geo.cell_z (c));
-      const double rate
-        = decompose_rate * heat_factor * water_factor * CO2_factor
-        * conc_factor * depth_factor;
-      decomposed[c] = M_primary (c) * rate;
-    }
+    decomposed[c] = M_primary (c) * static_decompose_rate[c];
+  
+  // Adjust for heat.
+  if (decompose_heat_factor.size () < 1)
+    for (size_t c = 0; c < cell_size; c++)
+      decomposed[c] *= Abiotic::f_T0 (soil_heat.T (c));
+  else
+    for (size_t c = 0; c < cell_size; c++)
+      decomposed[c] *= decompose_heat_factor (soil_heat.T (c));
 
+  // Adjust for moisture.
+  if (decompose_water_factor.size () < 1)
+    for (size_t c = 0; c < cell_size; c++)
+      decomposed[c] *= Abiotic::f_h (soil_water.h (c));
+  else
+    for (size_t c = 0; c < cell_size; c++)
+      decomposed[c] *= decompose_water_factor (soil_water.h (c));
+
+  // Adjust for biological activity.
+  if (decompose_CO2_factor.size () > 0)
+    for (size_t c = 0; c < cell_size; c++)
+      decomposed[c] *= decompose_CO2_factor (organic_matter.CO2 (c));
+
+  // Adjust for concentration.
+  if (decompose_conc_factor.size () > 0)
+    for (size_t c = 0; c < cell_size; c++)
+      decomposed[c] *= decompose_conc_factor (C_primary_[c]);
+  
   this->add_to_decompose_sink (decomposed);
 
   for (size_t i = 0; i < product.size (); i++)
@@ -1422,6 +1416,11 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
   tillage.insert (tillage.begin (), cell_size, 0.0);
   daisy_assert (tillage.size () == cell_size);
   lag.insert (lag.end (), cell_size - lag.size (), 0.0);
+
+  for (size_t c = 0; c < cell_size; c++)
+    static_decompose_rate.push_back (decompose_rate 
+                                     * decompose_depth_factor (geo.cell_z (c)));
+  daisy_assert (static_decompose_rate.size () == cell_size);
 }
 
 double
@@ -1453,8 +1452,8 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
     decompose_rate (al.check ("decompose_rate")
                     ? al.number ("decompose_rate")
                     : halftime_to_rate (al.number ("decompose_halftime"))),
-    decompose_heat_factor_ (al.plf ("decompose_heat_factor")),
-    decompose_water_factor_ (al.plf ("decompose_water_factor")),
+    decompose_heat_factor (al.plf ("decompose_heat_factor")),
+    decompose_water_factor (al.plf ("decompose_water_factor")),
     decompose_CO2_factor (al.plf ("decompose_CO2_factor")),
     decompose_conc_factor (al.plf ("decompose_conc_factor")),
     decompose_depth_factor (al.plf ("decompose_depth_factor")),
@@ -1716,11 +1715,11 @@ You must specify it with either 'decompose_rate' or 'decompose_halftime'.");
     frame.declare ("decompose_CO2_factor", "g CO2-C/cm^3/h", Attribute::None (),
                    Attribute::Const,
                    "CO2 development factor on decomposition.");
-    frame.set ("decompose_CO2_factor", PLF::always_1 ());
+    frame.set ("decompose_CO2_factor", PLF::empty ());
     frame.declare ("decompose_conc_factor", "g/cm^3 H2O", Attribute::None (),
                    Attribute::Const,
                    "Concentration development factor on decomposition.");
-    frame.set ("decompose_conc_factor", PLF::always_1 ());
+    frame.set ("decompose_conc_factor", PLF::empty ());
     frame.declare ("decompose_depth_factor", "cm", Attribute::None (),
                    Attribute::Const,
                    "Depth influence on decomposition.");

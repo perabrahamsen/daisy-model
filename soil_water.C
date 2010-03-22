@@ -482,46 +482,49 @@ SoilWater::incorporate (const Geometry& geo, const double amount,
 
 { geo.add_surface (S_incorp_, volume, -amount); }
 
-void
+double
 SoilWater::mix (const Geometry& geo, const Soil& soil, 
                 const SoilHeat& soil_heat, const double from, 
                 const double to, const double dt, Treelog& msg)
 {
   geo.mix (Theta_, from, to, tillage_, dt);
-  for (size_t i = 0; i < soil.size(); i++)
-    {
-      const double new_h = soil.h (i, Theta_[i]);
-      if (h_[i] < 0.0 || new_h < 0)
-        h_[i] = new_h;
-    }
-  
-  tick_after (geo, soil,  soil_heat, false, msg);
+  return overflow (geo, soil, soil_heat, dt, msg);
 }
 
-void
+double
 SoilWater::swap (const Geometry& geo, const Soil& soil, 
                  const SoilHeat& soil_heat, const double from, 
                  const double middle, const double to,
                  const double dt, Treelog& msg)
 {
   geo.swap (Theta_, from, middle, to, tillage_, dt);
+  return overflow (geo, soil, soil_heat, dt, msg);
+}
 
-  for (size_t i = 0; i < soil.size(); i++)
+double
+SoilWater::overflow (const Geometry& geo, 
+                     const Soil& soil, const SoilHeat& soil_heat, 
+                     const double dt, Treelog& msg)
+{
+  const size_t cell_size = geo.cell_size ();
+  double extra = 0.0;           // [cm^3]
+  for (size_t c = 0; c < cell_size; c++)
     {
-      const double Theta_sat = soil.Theta (i, 0.0, 0.0);
-      if (Theta_[i] > Theta_sat)
-        {
-          std::ostringstream tmp;
-          tmp << "BUG: Theta[" << i << "] (" << Theta_[i]
-              << ") > Theta_sat (" << Theta_sat << ")";
-          msg.error (tmp.str ());
-          Theta_[i] = Theta_sat;
-        }
-      const double new_h = soil.h (i, Theta_[i]);
-      if (h_[i] < 0.0 || new_h < 0)
-        h_[i] = new_h;
+      const double h_sat = 0.0;
+      const double Theta_sat = soil.Theta (c, h_sat, h_ice (c));
+      const double Theta_extra = std::max (Theta_[c] - Theta_sat, 0.0);
+      Theta_[c] -= Theta_extra;
+      tillage_[c] -= Theta_extra / dt;
+      extra += Theta_extra * geo.cell_volume (c);
+      const double new_h = soil.h (c, Theta_[c]);
+      if (h_[c] < 0.0 || new_h < 0)
+        h_[c] = new_h;
     }
-  tick_after (geo, soil,  soil_heat, false, msg);
+  tick_after (geo, soil, soil_heat, false, msg);
+
+  extra *= geo.surface_area (); // [cm]
+  extra *= 10.0;                // [mm]
+  return extra;
 }
 
 void 

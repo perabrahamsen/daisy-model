@@ -149,10 +149,12 @@ public:
   void mass_balance (const Geometry& geo, double dt, Treelog& msg);
   void incorporate (const Geometry&, double amount, double from, double to);
   void incorporate (const Geometry&, double amount, const Volume&);
-  void mix (const Geometry& geo, const Soil&, const SoilHeat&, double from, 
-            double to, double dt, Treelog&);
-  void swap (const Geometry& geo, const Soil&, const SoilHeat&, 
-             double from, double middle, double to, double dt, Treelog&);
+  double mix (const Geometry& geo, const Soil&, const SoilHeat&, double from, 
+              double to, double dt, Treelog&);
+  double swap (const Geometry& geo, const Soil&, const SoilHeat&, 
+               double from, double middle, double to, double dt, Treelog&);
+  double overflow (const Geometry&, const Soil&, const SoilHeat&, double dt, 
+                   Treelog& msg);
   bool check (size_t n, Treelog& err) const;
   void output (Log& log) const;
 

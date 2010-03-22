@@ -3340,7 +3340,7 @@ contains no water."
   "Above ground water balance."
   (precision 1)
   (require_top true)
-  (input "Precipitation" "Overhead irrigation" "Surface irrigation")
+  (input "Precipitation" "Overhead irrigation" "Surface irrigation" "Tillage")
   (output "Snow evaporation" "Canopy evaporation" "Litter evaporation" 
           "Surface evaporation" "Matrix infiltration" "Tertiary infiltration"
           "Runoff")
@@ -3360,16 +3360,23 @@ Amount of water entering the system as rain and snow.")
                    (dimension "mm/&"))
            (number (tag "Overhead irrigation")
 		   (documentation "\
-Amount of water added to the system from overhead irrigation.")
+Amount of water added by overhead irrigation.")
                    (path column "${column}" Bioclimate "*" irrigation_overhead)
                    (spec bioclimate default irrigation_surface)
                    (handle sum)
                    (dimension "mm/&"))
            (number (tag "Surface irrigation")
 		   (documentation "\
-Amount of water added to the system from overhead irrigation.")
+Amount of water added by surface irrigation.")
                    (path column "${column}" Bioclimate "*" irrigation_surface)
                    (spec bioclimate default irrigation_surface)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (tag "Tillage")
+		   (documentation "\
+Amount of soil water added by tillage operations.")
+                   (path column "${column}" Bioclimate "*" tillage_water)
+                   (spec bioclimate default tillage_water)
                    (handle sum)
                    (dimension "mm/&"))
            (number (tag "Snow evaporation")

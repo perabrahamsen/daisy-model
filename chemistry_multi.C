@@ -49,6 +49,7 @@ struct ChemistryMulti : public Chemistry
   
   // Management.
   void check_ignore (const symbol chem, Treelog& msg);
+  void update_C (const Soil&, const SoilWater&);
   void deposit (symbol chem, double amount, double dt, Treelog&);
   void spray (symbol chem, double amount, double dt, Treelog&);
   void dissipate (symbol chem, double amount, double dt, Treelog&);
@@ -150,6 +151,13 @@ ChemistryMulti::check_ignore (const symbol chem, Treelog& msg)
   
   msg.message ("Fate of '" + chem.name () + "' will not be traced");
   ignore.push_back (chem);
+}
+
+void 
+ChemistryMulti::update_C (const Soil& soil, const SoilWater& soil_water)
+{
+  for (size_t c = 0; c < combine.size (); c++)
+    combine[c]->update_C (soil, soil_water); 
 }
 
 void 

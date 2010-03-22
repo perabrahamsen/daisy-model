@@ -1,4 +1,24 @@
+2010-03-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* tertiary_biopores.C (active_msg): New parameter.
+	(update_active): Use it.
+	(tick): Update caller.
+	* tertsmall.h, tertsmall.C (update_active): Update prototype.
+	* uzrect_Mollerup.C (tick): Update caller.
+
+	* bioclimate_std.C (tillage_water): New log variable.
+	(add_tillage_water): New function.
+	* soil_water.C (overflow): Handle overflow of water when porosity
+	is changed.
+	* column_std.C (overflow): Handle water content higher than porosity.
+	* column_std.C, column_std.h  (set_porosity, mix, flow): Use it.
+	* field.C, field.h (set_porosity): Use it.
+
 2010-03-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* log_dlf.C, log_dlf.h: Use char* for output symbols for speed.
+
+	* chemical_std.C (decompose): Speed up.
 
 	* biopore_matrix.C (matrix_solute): Don't remove negative amounts
 	from negative storage.

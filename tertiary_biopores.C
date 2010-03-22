@@ -27,6 +27,7 @@
 #include "librarian.h"
 #include "block_model.h"
 #include "check.h"
+#include "vcheck.h"
 #include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
@@ -54,6 +55,7 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   const double pressure_barrier; // Pressure difference requires for S [cm]
   const double pond_max;	 // Pond height before activating pref.flow [cm]
   const bool use_small_timesteps_; // True, iff we want to calculate S in R.E.
+  const enum active_msg_t { msg_cell, msg_range, msg_none } active_msg;
 
   // Helper.
   std::auto_ptr<Scalar> per_surface_area;
@@ -121,7 +123,7 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
                             const SoilHeat& soil_heat, 
                             const std::vector<double>& h,
                             const double dt);
-  void update_active (const std::vector<double>& h);
+  void update_active (const Geometry&, const std::vector<double>& h, Treelog&);
 
   // - For use in Movement::solute.
   void solute (const Geometry&, const SoilWater&,
@@ -343,7 +345,7 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   std::vector<double> h;
   for (size_t c = 0; c < cell_size; c++)
     h.push_back (soil_water.h (c));
-  update_active (h);
+  update_active (geo, h, msg);
   
   // Find an implicit solution.
   ddt = dt;
@@ -469,8 +471,15 @@ TertiaryBiopores::find_implicit_water (const Anystate& old_state,
 }
 
 void
-TertiaryBiopores::update_active (const std::vector<double>& h)
+TertiaryBiopores::update_active (const Geometry& geo,
+                                 const std::vector<double>& h,
+                                 Treelog& msg)
 {
+  double top_act = geo.bottom () - 1.0;
+  double bottom_act = geo.top () + 1.0;
+  double top_dea = geo.bottom () - 1.0;
+  double bottom_dea = geo.top () + 1.0;
+  
   for (size_t c = 0; c < active.size (); c++)
     {
       if (active[c])    // Biopore is active 
@@ -478,9 +487,14 @@ TertiaryBiopores::update_active (const std::vector<double>& h)
           if (h[c] < pressure_end)
             {
               active[c] = false;
-              std::ostringstream tmp;
-              tmp << "h[" << c << "] = " << h[c] << ", deactivated";
-              Assertion::message (tmp.str ());
+              bottom_act = std::min (geo.cell_bottom (c), bottom_act);
+              top_act = std::max (geo.cell_top (c), top_act);
+              if (active_msg == msg_cell)
+                {
+                  std::ostringstream tmp;
+                  tmp << "h[" << c << "] = " << h[c] << ", activated";
+                  msg.message (tmp.str ());
+                }
             }
         }
       else              // Biopore is not active 
@@ -488,11 +502,29 @@ TertiaryBiopores::update_active (const std::vector<double>& h)
           if (h[c] > pressure_initiate)
             {
               active[c] = true;
-              std::ostringstream tmp;
-              tmp << "h[" << c << "] = " << h[c] << ", activated";
-              Assertion::message (tmp.str ());
+              bottom_dea = std::min (geo.cell_bottom (c), bottom_dea);
+              top_dea = std::max (geo.cell_top (c), top_dea);
+              if (active_msg == msg_cell)
+                {
+                  std::ostringstream tmp;
+                  tmp << "h[" << c << "] = " << h[c] << ", deactivated";
+                  msg.message (tmp.str ());
+                }
             }
         }
+    }
+  if (active_msg == msg_range 
+      && (top_act > bottom_act || top_dea > bottom_dea))
+    {
+      std::ostringstream tmp;
+      tmp << "Biopores";
+      if (top_act > bottom_act)
+        tmp << " " << top_act << " cm to " << bottom_act 
+            << " cm activated";
+      if (top_dea > bottom_dea)
+        tmp << " " << top_dea << " cm to " << bottom_dea 
+            << " cm deactivated";
+      msg.message (tmp.str ());  
     }
 }
 
@@ -645,6 +677,10 @@ TertiaryBiopores::TertiaryBiopores (const BlockModel& al)
     pressure_barrier (al.number ("pressure_barrier")),
     pond_max (al.number ("pond_max")),
     use_small_timesteps_ (al.flag ("use_small_timesteps")),
+    active_msg (al.name ("active_msg") == "cell"
+                ? msg_cell
+                : ((al.name ("active_msg") == "range")
+                   ? msg_range : msg_none)),
     active (al.check ("active")
             ? al.flag_sequence ("active")
             : std::vector<bool> ()),
@@ -706,6 +742,17 @@ After macropores are activated pond will have this height.");
                 "True iff the sink is allowed to change within a timestep.\n\
 This is only supported by the 'Mollerup' model.");
     frame.set ("use_small_timesteps", false);
+    frame.declare_string ("active_msg", Attribute::Const, "\
+Control biopore activation and deactivation reports.\n\
+\n\
+Possible values:\n\
+  cell: Report for each cell.\n\
+  range: Report for vertical range.\n\
+  none: No reports.");
+    static VCheck::Enum active_check ("cell", "range", "none");
+    frame.set_check ("active_msg", active_check);
+    frame.set ("active_msg", "range");
+
     frame.declare_boolean ("active", Attribute::OptionalState,
                 Attribute::SoilCells, "Active biopores in cells.");
     frame.declare ("water_volume", "cm^3", Attribute::LogOnly, "Water volume.");    

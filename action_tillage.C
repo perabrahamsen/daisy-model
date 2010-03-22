@@ -153,10 +153,10 @@ struct ActionSetPorosity : public Action
   const double depth;
 
   // Simulation.
-  void doIt (Daisy& daisy, const Scope&, Treelog& out)
+  void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   {
-    out.message ("Adjusting porosity");
-    daisy.field->set_porosity (depth, porosity);
+    msg.message ("Adjusting porosity");
+    daisy.field->set_porosity (depth, porosity, daisy.dt, msg);
   }
 
   void tick (const Daisy&, const Scope&, Treelog&)

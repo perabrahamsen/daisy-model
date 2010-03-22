@@ -49,6 +49,7 @@ struct ChemistryStandard : public Chemistry
   const std::vector<Chemical*>& all () const;
  
   // Management.
+  void update_C (const Soil& soil, const SoilWater& soil_water);
   void deposit (symbol chem, double amount, double dt, Treelog&);
   void spray (symbol chem, double amount, double dt, Treelog&);
   void dissipate (symbol chem, double amount  /* [g/m^2] */,
@@ -133,6 +134,13 @@ ChemistryStandard::find (symbol chem)
 const std::vector<Chemical*>& 
 ChemistryStandard::all () const
 { return chemicals; }
+
+void 
+ChemistryStandard::update_C (const Soil& soil, const SoilWater& soil_water)
+{
+  for (size_t c = 0; c < chemicals.size (); c++)
+    chemicals[c]->update_C (soil, soil_water); 
+}
 
 void 
 ChemistryStandard::deposit (const symbol chem, 

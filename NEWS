@@ -10,6 +10,11 @@ release.
 
 ** Many speedups.
 
+** New biopores tertiary model parameter 'active_msg'
+
+Set this to 'cell' (old style), 'range' (new default) or 'none' to control
+message when biopores are activated or deactivated.
+
 ** New hydraulic model 'B_C_inverse'.
 
 This is an version of the Burdine/Campbell model where the 'b' and

@@ -84,6 +84,8 @@ struct BioclimateStandard : public Bioclimate
   double irrigation_subsoil;    // Irrigation incorporated in soil.
   double irrigation_subsoil_old; // Old value for logging.
   double irrigation_subsoil_permanent;  // Irrigation incorporated in soil.
+  double tillage_water;    // Water added to surface due to tillage [mm/h]
+  double tillage_water_old;    // Old value for logging
 
   // Water in snowpack.
   Snow snow;
@@ -289,6 +291,7 @@ struct BioclimateStandard : public Bioclimate
   void irrigate_surface (double flux);
   void irrigate_subsoil (double flux);
   void set_subsoil_irrigation (double flux);
+  void add_tillage_water (double flux);
 
   // Communication with svat and external model.
   double total_ep () const // [mm/h]
@@ -443,6 +446,8 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     irrigation_subsoil (0.0),
     irrigation_subsoil_old (0.0),
     irrigation_subsoil_permanent (al.number ("irrigation_subsoil_permanent")),
+    tillage_water (0.0),
+    tillage_water_old (0.0),
     snow (al.submodel ("Snow")),
     snow_ep (0.0),
     snow_ea_ (0.0),
@@ -781,12 +786,13 @@ BioclimateStandard::WaterDistribution (const Units& units,
     }
 
   const double water_below_canopy
-    = canopy_water_out + canopy_water_bypass + irrigation_surface; 
+    = canopy_water_out + canopy_water_bypass + irrigation_surface + tillage_water; 
   const double water_below_canopy_temperature 
     = water_below_canopy > 0.01
     ? ((canopy_water_bypass * snow_water_out_temperature
         + canopy_water_out * canopy_water_temperature
-        + irrigation_surface * irrigation_surface_temperature)
+        + irrigation_surface * irrigation_surface_temperature
+        + tillage_water * air_temperature)
        / water_below_canopy)
     : air_temperature;
   litter_water_in = water_below_canopy * litter_cover;
@@ -1036,7 +1042,9 @@ BioclimateStandard::WaterDistribution (const Units& units,
   irrigation_surface = 0.0;
   irrigation_subsoil_old = irrigation_subsoil;
   irrigation_subsoil = 0.0;
-  
+  tillage_water_old = tillage_water;
+  tillage_water = 0.0;
+
   // Check
   // Note: total_ea can be larger than total_ep, as PMSW uses a
   // different method for calculating PET.
@@ -1138,6 +1146,7 @@ BioclimateStandard::output (Log& log) const
   output_value (irrigation_subsoil_old  + irrigation_subsoil_permanent
                 + irrigation_surface_old + irrigation_overhead_old, 
                 "irrigation_total", log);
+  output_value (tillage_water_old, "tillage_water", log);
   output_submodule (snow, "Snow", log);
   output_variable (snow_ep, log);
   output_value (snow_ea_, "snow_ea", log);
@@ -1241,6 +1250,10 @@ void
 BioclimateStandard::set_subsoil_irrigation (double flux)
 { irrigation_subsoil_permanent = flux; }
 
+void
+BioclimateStandard::add_tillage_water (double flux)
+{ tillage_water += flux; }
+
 static struct BioclimateStandardSyntax : DeclareModel
 {
   Model* make (const BlockModel& al) const
@@ -1305,6 +1318,8 @@ The intended use is colloid generation.");
     frame.set ("irrigation_subsoil_permanent", 0.0);
     frame.declare ("irrigation_total", "mm/h", Attribute::LogOnly,
                    "Total irrigation above of below the soil surface.");
+    frame.declare ("tillage_water", "mm/h", Attribute::LogOnly,
+                   "Water added to surface due to tillage operations.");
 
     // Water in snowpack.
     frame.declare_submodule ("Snow", Attribute::State, 

@@ -107,6 +107,7 @@ public:
 
   // Management.
 public:
+  virtual void update_C (const Soil&, const SoilWater&) = 0;
   virtual void deposit (double amount /* [g/m^2] */, double dt /* [h] */) = 0;
   virtual void spray (double amount /* [g/m^2] */, double dt /* [h] */) = 0;
   virtual void dissipate (double amount /* [g/m^2] */, double dt /* [h] */) = 0;

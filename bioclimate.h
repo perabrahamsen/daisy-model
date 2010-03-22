@@ -106,7 +106,8 @@ public:
   virtual void irrigate_surface (double flux) = 0;
   virtual void irrigate_subsoil (double flux) = 0;
   virtual void set_subsoil_irrigation (double flux) = 0;
-		       
+  virtual void add_tillage_water (double flux) = 0;
+
   // Communication with SVAT.
   virtual double total_ep () const = 0; // [mm/h]
   virtual double total_ea () const = 0; // [mm/h]

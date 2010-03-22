@@ -43,7 +43,7 @@ Tertsmall::none ()
                               const std::vector<double>& h,
                               const double dt)
     { return; }
-    void update_active (const std::vector<double>& h_matrix)
+    void update_active (const Geometry&, const std::vector<double>&, Treelog&)
     { }
   };
 
