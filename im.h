@@ -54,10 +54,6 @@ public:
     : unit_ (u),
       val (v)
   { }
-  Scalar (const Scalar& s)
-    : unit_ (s.unit_),
-      val (s.val)
-  { }
 };
 
 class IM

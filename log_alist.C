@@ -450,7 +450,7 @@ LogSubmodel::close_entry ()
 void
 LogSubmodel::open_named_entry (const symbol, const symbol type,
 			    const Frame& frame)
-{ open_entry (type, frame, NULL); }
+{ open_entry (type, frame, Attribute::None ()); }
 
 void
 LogSubmodel::close_named_entry ()

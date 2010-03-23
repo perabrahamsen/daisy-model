@@ -29,7 +29,7 @@
 class Treelog;
 
 template<class T>
-const double
+double
 bisection (double min_x, double max_x, T& f, std::ostream *const dbg = NULL)
 {
   // Initial range.

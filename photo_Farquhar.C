@@ -56,10 +56,10 @@ void
 PhotoFarquhar::crop_Vmax_total (const std::vector<double>& rubisco_Ndist /* [mol/m²leaf] */,  
 				std::vector<double>& cropVm) const
 {
-  const int No = cropVm.size ();
+  const size_t No = cropVm.size ();
   daisy_assert (rubisco_Ndist.size () == No);
   // Fill photosynthetic capacity Vm for each canopy layer in vector
-  for (int i = 0; i < No; i++)
+  for (size_t i = 0; i < No; i++)
      cropVm[i] = Xn * rubisco_Ndist[i]; //[mol/m² leaf/s]
 }
 

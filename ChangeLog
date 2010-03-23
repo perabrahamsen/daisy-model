@@ -1,3 +1,8 @@
+2010-03-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* secondary.C, secondary.h (initialize): New function.
+	* horizon.C (initialize_base): Call it. Note secondary domain water.
+
 2010-03-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* tertiary_biopores.C (active_msg): New parameter.

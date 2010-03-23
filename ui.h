@@ -27,6 +27,14 @@
 class BlockModel;
 class Toplevel;
 
+#ifdef __GNUC__
+#define NORETURN __attribute__ ((noreturn))
+#elif defined (_MSC_VER)
+#define NORETURN __declspec(noreturn)
+#else
+#define NORETURN
+#endif
+
 class EXPORT UI : public Model
 {
   // Content.
@@ -60,7 +68,7 @@ class UIProgress : public UI
   // Use.
 public:
   void attach (Toplevel&);
-  void run (Toplevel&);
+  NORETURN void run (Toplevel&);
   void failure (Toplevel&);
 
   // Control.

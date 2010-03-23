@@ -207,7 +207,7 @@ LogSelect::check (const Border& border, Treelog& err) const
   bool ok = true;
 
   if (!volume->check_border (border, err))
-    /* ok = false */;
+    { /* ok = false */ }
 
   for (unsigned int i = 0; i < entries.size (); i++)
     {
@@ -217,7 +217,7 @@ LogSelect::check (const Border& border, Treelog& err) const
       if (!entries[i]->check (err))
         ok = false;
       if (!entries[i]->check_border (border, *volume, err))
-        /* ok = false */;
+        { /* ok = false */ }
     }
   return ok; 
 }

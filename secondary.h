@@ -27,6 +27,7 @@
 #include <memory>
 
 class BlockModel;
+class Treelog;
 
 class Secondary : public Model
 {
@@ -45,6 +46,8 @@ public:
   virtual double alpha () const = 0; // Solute exchange between 1 & 2 domain.
 
   // Create and Destroy.
+public:
+  virtual void initialize (Treelog& msg) = 0;
 protected:
   explicit Secondary (const BlockModel& al);
   explicit Secondary (const symbol name);

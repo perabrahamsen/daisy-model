@@ -59,8 +59,8 @@ Resistance::gbf_heat (const double Cl/*[]*/, const double T_a /*[dg C]*/,
                       const double T_l_sun /*[dg C]*/, 
                       const double w_l /* leaf width [m]*/) 
 {
-  daisy_assert (Cl != 0.0);
-  daisy_assert (w_l != 0.0);
+  daisy_assert (std::isnormal (Cl));
+  daisy_assert (std::isnormal (w_l));
  double gbf_heat;
  if (T_l_sun - T_a <= 0)
    gbf_heat = 0.0;
@@ -336,7 +336,7 @@ Resistance::U_c (const double z_r /* reference height above canopy [m]*/,
     {
       L_mo = - (r_a * pow(u,3.) * (T_a + TK)) / (g * k * (T_0 - T_a));
       daisy_assert (T_0 > T_a);
-      daisy_assert (L_mo != 0.0);
+      daisy_assert (std::isnormal (L_mo));
 
       const double y = pow(1. - 16. * (z_r - d)/L_mo,-0.25); // []
       const double psi = log(sqr((1. + y)/ 2.) * (1. + sqr(y))/2.) 

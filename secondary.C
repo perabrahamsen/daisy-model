@@ -84,7 +84,8 @@ struct SecondaryNone : public Secondary
   { return 0.0; }
   double alpha () const         // Exchange rate between domain [h^-1]
   { return 0.0; }
-
+  void initialize (Treelog&)
+  { }
   explicit SecondaryNone (const BlockModel& al)
     : Secondary (al)
   {}
@@ -157,6 +158,8 @@ struct SecondaryPressure : public SecondaryAlpha
     else
       return K_; 
   }
+  void initialize (Treelog&)
+  { }
   SecondaryPressure (const BlockModel& al)
     : SecondaryAlpha (al),
       h_lim_ (al.number ("h_lim")),
@@ -207,7 +210,14 @@ struct SecondaryCracks : public SecondaryAlpha
     else
       return K_crack; 
   }
-
+  void initialize (Treelog& msg)
+  { 
+    TREELOG_MODEL (msg);
+    std::ostringstream tmp;
+    tmp << "K = " << K_crack << " [cm/h]\n"
+        << "h = " << h_crack << " [cm]";
+    msg.debug (tmp.str ());
+  }
   static double find_K (const double aperture, const double density)
   { 
     const double a = aperture;  // [m]
@@ -255,14 +265,7 @@ struct SecondaryCracks : public SecondaryAlpha
       K_crack (find_K (aperture, density)),
       h_crack (find_h_lim (aperture)),
       use_secondary (al.flag ("use_secondary"))
-  { 
-    Treelog& msg = al.msg ();
-    TREELOG_MODEL (msg);
-    std::ostringstream tmp;
-    tmp << "K = " << K_crack << " [cm/h]\n"
-        << "h = " << h_crack << " [cm]";
-    msg.debug (tmp.str ());
-  }
+  { }
 };
 
 static struct SecondaryCracksSyntax : public DeclareModel

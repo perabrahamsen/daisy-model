@@ -348,8 +348,21 @@ Horizon::initialize_base (bool top_soil,
   hydraulic->initialize (texture, impl->dry_bulk_density, top_soil, msg);
   impl->initialize (*hydraulic, texture, quartz () * texture.mineral (),
                     som_size, msg); 
+  impl->secondary->initialize (msg);
 
   std::ostringstream tmp;
+  const double h_lim = secondary_domain ().h_lim ();
+  if (h_lim < 0.0)
+    {
+      const double h_sat = 0.0;
+      const double Theta_sat = hydraulic->Theta (h_sat);
+      const double h_wp = -15000.0;
+      const double Theta_wp = hydraulic->Theta (h_wp);
+      const double Theta_lim =  hydraulic->Theta (h_lim);
+      tmp << "A saturated secondary domain contain " 
+          << 100.0 * (Theta_sat - Theta_lim) / (Theta_sat - Theta_wp)
+          << " % of plant available water";
+    }
   tmp << "h\th\tTheta\tK\n"
       << "cm\tpF\t\tcm/h\n";
   const double h_Sat = 0;

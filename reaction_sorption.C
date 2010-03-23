@@ -115,8 +115,8 @@ struct ReactionSorption : public Reaction
               {
                 const double rho_b 
                   = colloid->M_secondary (c)  * soil_enrichment_factor;
-                const double C = solute.M_primary (c) / Theta;
-                const double A = sorbed.M_primary (c);
+                const double C = solute.M_secondary (c) / Theta;
+                const double A = sorbed.M_secondary (c);
                 const double S = find_rate (rho_b, clay, humus, Theta, A, C);
                 S_sorption_secondary[c] = S;
                 S_sorption[c] += S;
@@ -260,7 +260,7 @@ struct ReactionSorption : public Reaction
       K_clay (al.number ("K_clay", 0.0)),
       K_humus (al.number ("K_OC", K_clay) * c_fraction_in_humus),
       k_sorption (al.number ("k_sorption")),
-      k_desorption (al.number ("k_desorption", k_desorption)),
+      k_desorption (al.number ("k_desorption", k_sorption)),
       name_colloid (al.name ("colloid", Attribute::None ())),
       soil_enrichment_factor (al.number ("soil_enrichment_factor")),
       surface_sorption (0.0)

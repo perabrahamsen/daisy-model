@@ -214,7 +214,7 @@ RootSystem::water_uptake (const Units& units, double Ept_,
     // [g/cm^3 W] = [g/cm^2 A] * [mm/cm] / [mm/h]
     ABAConc = geo.total_surface (ABAExtraction) * mm_per_cm / H2OUpt;
   else
-    /* Use old value */;
+    { /* Use old value */ }
   daisy_assert (std::isfinite (ABAConc));
 
   // Result.

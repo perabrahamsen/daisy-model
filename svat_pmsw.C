@@ -46,6 +46,8 @@
 #endif
 # include "assertion.h"
 
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+
 # define NRANSI // from xgaussj
 #define vector _my_vector
 # include "nrutil.h"  // from Num Rec
@@ -313,11 +315,12 @@ int RAASTAB_1 (double z_ref, double u, double tair, double tcan_prev, double h,
 
 // Dolman (1993) and Zhang et al. (1995)
 // stressed conditions
-int RAASTAB_2 (double z_ref,
-	       double u, double tair, double tcan_prev, double h, double LAI,
-               double ndif, double c_d, double z_0s, double z0_def, double &rd,
-               double &rz0, double &ru_f, double &ry, double &rL, double &rR_i,
-               double &rr_aa)
+static int 
+RAASTAB_2 (double z_ref,
+           double u, double tair, double tcan_prev, double h, double LAI,
+           double ndif, double c_d, double z_0s, double z0_def, double &rd,
+           double &rz0, double &ru_f, double &ry, double &rL, double &rR_i,
+           double &rr_aa)
 {
   double Kh;
   double psi_m,psi_mm,psi_h,psi_hm; // stability correction functions
@@ -384,10 +387,11 @@ int RAASTAB_2 (double z_ref,
 // leaf boundary-layer resistance between leaves and canopy air space as
 // formulated in Daamen (1997) p.212 (r_b) based on Choudhury & Monteith (1988)
 // and Jones (1983)
-int RAC(double z_ref, 
-	double u, double h, double LAI, double c_d, double w, double z_0s,
-        double alpha_u, double arac, double &rd, double &rX, double &rz_0,
-        double &ru_h, double &rr_ac)
+static int 
+RAC (double z_ref, 
+     double u, double h, double LAI, double c_d, double w, double z_0s,
+     double alpha_u, double arac, double &rd, double &rX, double &rz_0,
+     double &ru_h, double &rr_ac)
 {
   daisy_assert (std::isfinite (u));
   daisy_assert (u >= 0.0);
@@ -587,14 +591,15 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
 }
 
 // Modified *****************************************************************
-int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_20,
-             double esta, double theta_w, double theta_c, double /*rcmin*/,
-             double rcmax, double /*zeta*/, double f3const, double tref, double spar,
-             double tmin, double tmax, double nu_1, double nu_2, double nu_3,
-             double crop_ea_w,double crop_ep_w,double canopy_ea,double r_sc,
-             double lel, double &rf1_dolman,double &rf_def,double &rf_3,
-             double &renv_lai_factor, double &rf_etep, double &rrcmin_star,
-             double &rpstress, double &rr_sc_js)
+static int 
+RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_20,
+         double esta, double theta_w, double theta_c, double /*rcmin*/,
+         double rcmax, double /*zeta*/, double f3const, double tref, double spar,
+         double tmin, double tmax, double nu_1, double nu_2, double nu_3,
+         double crop_ea_w,double crop_ep_w,double canopy_ea,double r_sc,
+         double lel, double &rf1_dolman,double &rf_def,double &rf_3,
+         double &renv_lai_factor, double &rf_etep, double &rrcmin_star,
+         double &rpstress, double &rr_sc_js)
 {
   daisy_assert (LAI > 0.0);
   double tairk,def;
@@ -1056,13 +1061,15 @@ int EBAL_DT(double tair, double e_pa, double netrad_brunt, double esta,
   return 0;
 }
 
+#if 0
 // Newton-Raphson method: solves for dt (=tsurf-tair)
-double RTSAFE_DT(void (*funcd)(double tsurf,double tair,double e_pa,double srad,
-                               double relsun,double kh,double r_aa,double r_ac,double temp_0,
-                               double z_sz,double LAI,double &rrsc_pm,double *, double *), double tair,
-                 double e_pa,double srad,double relsun,double kh,double r_aa,double r_ac,
-                 double temp_0,double z_sz,double LAI,double &rrsc_pm, double x1,
-                 double x2, double xacc)
+static double 
+RTSAFE_DT(void (*funcd)(double tsurf,double tair,double e_pa,double srad,
+                        double relsun,double kh,double r_aa,double r_ac,double temp_0,
+                        double z_sz,double LAI,double &rrsc_pm,double *, double *), double tair,
+          double e_pa,double srad,double relsun,double kh,double r_aa,double r_ac,
+          double temp_0,double z_sz,double LAI,double &rrsc_pm, double x1,
+          double x2, double xacc)
 
   // Uses a combination of Newton-Raphson and bisection, find the root of a
   // function bracketed between x1 and x2. The root, returned as a function
@@ -1128,6 +1135,7 @@ double RTSAFE_DT(void (*funcd)(double tsurf,double tair,double e_pa,double srad,
   return 0.0;
 
 } // end rtsafe function
+#endif
 
 int EBAL_PM(double tair,double tsurf_pm,double srad,double e_pa,double relsun,
             double kh,double temp_0,double z_sz,double r_aa,double r_ac,

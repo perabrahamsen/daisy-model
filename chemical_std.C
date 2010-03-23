@@ -804,7 +804,7 @@ ChemicalStandard::tick_surface (const double pond /* [cm] */,
     }
   
   // Convert solute back to surface dimensions.
-  daisy_assert (total_area == geo.surface_area ());
+  daisy_assert (approximate (total_area, geo.surface_area ()));
   const double surface_area = geo.surface_area () * m2_per_cm2; // [m^2]
   daisy_assert (surface_solute >= 0.0);
   surface_solute *= z_mixing;   // [g]

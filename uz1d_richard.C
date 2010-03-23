@@ -226,7 +226,7 @@ UZ1DRichard::tick (SMM1D& smm, const double gravity, const double dt,
   smm.update (h, Theta, q);
 }
 
-static const double min (const double a, const double b, const double c)
+static double min (const double a, const double b, const double c)
 { return std::min (std::min (a, b), c); }
 
 void 

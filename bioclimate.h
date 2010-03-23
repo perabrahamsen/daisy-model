@@ -122,13 +122,13 @@ public:
 
   // Utilities.
 public:
-  static void radiation_distribution (const int No, const double LAI,
+  static void radiation_distribution (const size_t No, const double LAI,
                                       const double Ref,
                                       const double Si,
                                       const double Ext,
                                       std::vector <double>& Rad);
 private:
-  static void intensity_distribution (int No, double LAI,
+  static void intensity_distribution (size_t No, double LAI,
                                       double Rad0, double Ext, 
                                       std::vector <double>& Rad);
 

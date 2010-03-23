@@ -64,7 +64,7 @@ Attribute::type_name (type t)
   return names[t];
 }
 
-Attribute::type operator++ (Attribute::type& t)
+static Attribute::type operator++ (Attribute::type& t)
 { 
   t = static_cast<Attribute::type> (static_cast<int> (t) + 1);
   return t;

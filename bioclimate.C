@@ -45,7 +45,7 @@ Bioclimate::day_fraction (const double dt) const
 }
 
 void
-Bioclimate::radiation_distribution (const int No, const double LAI,
+Bioclimate::radiation_distribution (const size_t No, const double LAI,
                                     const double Ref,
                                     const double Si,
                                     const double Ext,
@@ -60,15 +60,15 @@ Bioclimate::radiation_distribution (const int No, const double LAI,
 }
 
 void
-Bioclimate::intensity_distribution (const int No, const double LAI,
+Bioclimate::intensity_distribution (const size_t No, const double LAI,
                                     const double Rad0,
                                     const double Ext,
                                     std::vector <double>& Rad)
 {
   daisy_assert (Rad.size () == No + 1);
-  const double dLAI = (LAI / No);
+  const double dLAI = (LAI / (No + 0.0));
     
-  for (int i = 0; i <= No; i++)
+  for (size_t i = 0; i <= No; i++)
     Rad[i] = Rad0 * exp (- Ext * dLAI * i);
 }
 

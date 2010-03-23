@@ -206,7 +206,7 @@ struct MV_Crop : public Model
       i++;
     return i;
   }
-  const double A (const double T_sum) const
+  double A (const double T_sum) const
   {
     const size_t i = phase (T_sum);
     return (A_F.size () > i) ? A_F[i] : 1.0;
@@ -526,7 +526,7 @@ ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& msg)
   const double E_pe = E_p * cover; // Soil surface E_p. [mm]
   const double E_pc = E_p - E_pe; // Crop E_p. [mm]
   const double E_pcg = E_p - (1.0 - green_cover); // Green leaves E_p [mm]
-  const double E_pcy = E_pc - E_pcy; // Yellow leaves E_p [mm]
+  const double E_pcy = E_pc - E_pcg; // Yellow leaves E_p [mm]
 
   // Root zone capacities.
   const double z_r = crop	// Effective rooting depth. [mm]

@@ -6,6 +6,7 @@
 (input file "chemistry.dai")
 (input file "log.dai")
 
+;;(input file "colloid-bound-slow.dai")
 (input file "colloid-bound.dai")
 (input file "biopores.dai")
 

@@ -6,6 +6,9 @@
 #define NR_END 1
 #define FREE_ARG char*
 
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wmissing-declarations"
+
 void nrerror(const char error_text[])
 /* Numerical Recipes standard error handler */
 {

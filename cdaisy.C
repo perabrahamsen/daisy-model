@@ -49,6 +49,8 @@
 #include <string>
 #include <typeinfo>
 
+#pragma GCC diagnostic ignored "-Wmissing-declarations"
+
 #ifdef MINGW
 #ifdef __unix
 #error "Unix?"
@@ -697,7 +699,7 @@ daisy_scope_number_name (const Scope *const scope, const unsigned int index)
   daisy_notreached ();
 }
 
-extern "C" const int EXPORT	// check if NAME is defined in SCOPE.
+extern "C" int EXPORT	// check if NAME is defined in SCOPE.
 daisy_scope_has_number (const Scope* scope, const char* name)
 { 
   if (scope->lookup (name) == Attribute::Number 
@@ -708,7 +710,7 @@ daisy_scope_has_number (const Scope* scope, const char* name)
     return 0; 
 }
 
-extern "C" const double EXPORT	// Return numeric value of NAME in SCOPE.
+extern "C" double EXPORT	// Return numeric value of NAME in SCOPE.
 daisy_scope_number (const Scope* scope, const char* name)
 { 
   return (scope->number (symbol (name)));
@@ -720,7 +722,7 @@ daisy_scope_dimension (const Scope* scope, const char* name)
   return scope->dimension (symbol (name)).name ().c_str ();
 }
 
-extern "C" const int EXPORT	// check if NAME is defined in SCOPE.
+extern "C" int EXPORT	// check if NAME is defined in SCOPE.
 daisy_scope_has_string (const Scope* scope, const char* name)
 { 
   if (scope->lookup (name) == Attribute::String 

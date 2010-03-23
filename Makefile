@@ -224,20 +224,23 @@ ifeq ($(COMPILER),gcc)
 #		          -I/home/mingw/include -L/home/mingw/lib
 		DEBUG = -g
 	endif
-	WARNING = -Wall -Wno-uninitialized \
+	WARNING = -Wall \
 		  -Woverloaded-virtual \
-		  -Wsign-promo -Wundef -Wpointer-arith -Wwrite-strings \
-                  -Wno-sign-compare  -Wundef -Wendif-labels \
+		  -Wundef -Wpointer-arith -Wwrite-strings \
 		  -Wcast-qual -Wcast-align -Wmissing-format-attribute \
-		  -Wold-style-cast 
-# -Wfloat-equal
-#  : triggered by header files for 2.95/woody
-#  -Wmissing-noreturn: triggered by some virtual functions.
-#  -Wmissing-prototypes -Wstrict-prototypes: Not C++ flags.
-#  -Wuninitialized: triggered in 3.4 in initializations!
-#  -Wunreachable-code: triggered by header files
-#  -Wextra: Triggers dllexport/inline: -Wno-attributes is not in GCC 3
-#  -Wconversion: Triggers calling int functions with size_t in 4.4
+		  -Wold-style-cast \
+                  -Wextra -Wformat=2 -Winit-self \
+		  -Wlogical-op -Wstrict-null-sentinel -Wfloat-equal \
+		  -Wmissing-declarations  -Wsign-promo \
+		  -Wredundant-decls -Wvariadic-macros -Wvla \
+		  -Wno-unused-parameter -Wno-sign-compare \
+
+# I use these a lot:
+#   -Wconversion -Wsign-compare -Wno-unused-parameter
+#   -Wmissing-noreturn
+# This one doesn't work (gcc 4.4 linux/amd64):
+#   -Wunreachable-code: triggered by constructors?
+
 	COMPILE = $(GCC) -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
 	CCOMPILE = $(COMPILE)
 	CPPLIB = -lstdc++

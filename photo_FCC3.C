@@ -163,19 +163,19 @@ PhotoFCC3::CxModel (const double CO2_atm,
     const double Gamma, Vm, Jm, Ko, Kc, Kcl;
     const double gtc, rbw, rsw,Ile, beta, J, rd, CO2_atm, Ptot;
     
-    const double find_wc (const double ci)
+    double find_wc (const double ci)
     {// Gross CO2 uptake limited by Rubisco
       daisy_assert ((ci + Kcl) > 0.0); 
       const double wc = Vm * ( ci - Gamma)/( ci + Kcl);//Rubisco limited,[mol/m²leaf/s]
      return wc;
     }
-    const double find_we (const double ci)
+    double find_we (const double ci)
     { // Gross CO2 uptake limited by RuBP
       daisy_assert ((ci + 2.0 * Gamma) > 0.0);
       const double we = J * (ci - Gamma)/(ci + 2. * Gamma);//[mol/m² leaf/s]
       return we; 
     }
-    const double find_p (const double ci) //[mol/m² leaf/s]
+    double find_p (const double ci) //[mol/m² leaf/s]
     {
        // Gross CO2 uptake limited by Rubisco and RuBP.
       daisy_assert (Gamma >= 0.0);
@@ -189,7 +189,7 @@ PhotoFCC3::CxModel (const double CO2_atm,
       return p;
     }
 
-    const double find_p_derived (const double ci) // [mol/m² leaf/s]
+    double find_p_derived (const double ci) // [mol/m² leaf/s]
     { 
       const double we = find_we(ci); //[mol/m² leaf/s]
       const double wc = find_wc(ci); //[mol/m² leaf/s]
@@ -202,17 +202,17 @@ PhotoFCC3::CxModel (const double CO2_atm,
       return dp;
     }
     
-    const double find_ci (const double p) // [Pa]
+    double find_ci (const double p) // [Pa]
     { 
       // Net CO2 uptake
       const double pn = p - rd; // [mol/m² leaf/s] 
       return CO2_atm - (pn/gtc) * Ptot; 
     }
-    const double find_ci_derived ()
+    double find_ci_derived ()
     { return - Ptot / gtc; }
-    const double function (const double ci)
+    double function (const double ci)
     { return find_ci (find_p (ci)) - ci; }
-    const double derived (const double ci)
+    double derived (const double ci)
     { return find_ci_derived () * find_p_derived (ci)  - 1.0; }
 
     double next_value (const double prev_value)

@@ -30,7 +30,7 @@
 
 namespace Assertion
 {
-  std::vector<Treelog*>& logs ()
+  static std::vector<Treelog*>& logs ()
   {
     static std::vector<Treelog*> logs;
     return logs;

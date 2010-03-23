@@ -610,7 +610,7 @@ Field::Implementation::crop_ds (symbol crop) const
     {
       const double area = (*i)->area;
       const double this_DS = (*i)->crop_ds (crop);
-      if (this_DS != Crop::DSremove)
+      if (!approximate (this_DS, Crop::DSremove))
         {
           total_area += area;
           DS += this_DS;

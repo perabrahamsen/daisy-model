@@ -37,6 +37,36 @@
   (trace colloid)
   (reaction colloid-filter colloid-generation))
 
+;; Colloid bound 
+
+(defnumber K_equilibrium identity
+  "Ratio between sorbed and solute matter at equilibrium."
+
+  ;; Parameters.
+  (declare K_clay Number [cm^3/g]
+           "Clay dependent distribution parameter.
+It is multiplied with the soil clay fraction to get the clay part of
+the 'K' factor.")
+  (K_clay 0.0 [cm^3/g])
+  (declare K_OC Number [cm^3/g]
+           "Humus dependent distribution parameter.
+It is multiplied with the soil organic carbon fraction to get the
+carbon part of the 'K' factor.")
+  (K_OC 0.0 [cm^3/g])
+  (declare soil_enrichment_factor Number []
+           "Relative preference for sorption to colloids.")
+  (soil_enrichment_factor 1.0 [])
+  (declare c_fraction_in_humus Number [] "Carbon fraction of humus.")
+  (c_fraction_in_humus 0.587 [])
+  (declare Kd number "Sorption parameter.")
+  (Kd (+ (* K_clay clay) (* K_OC c_fraction_in_humus humus)))
+
+  (declare ratio number "Ration between per volume matter.")
+  (ratio (/ (* Kd rho_b soil_enrichment_factor) Theta))
+  ;; Value.
+  (value ratio)
+  (dimension []))
+
 ;;; Fenpropimorph
 
 (defchemical Fenpropimorph-base herbicide
@@ -52,13 +82,19 @@
   "Fenpropimorph sorbed to immobile soil."
   (adsorption full))
 
-(defreaction Fenpropimorph-immobile-sorption sorption
-  "Sorption equilibrium between dissolved and immobile Fenpropimorph."
-  (sorbed Fenpropimorph-immobile)
-  (solute Fenpropimorph)
+(defnumber K_Fenpropimorph K_equilibrium
+  "Adsorption for Fenpropimorph to immobile soil."
   (cite lindhardt2001)
-  (K_OC 3700 [l/kg])  
-  (k_sorption 0.05 [h^-1]))
+  (K_OC 3700 [l/kg]))
+
+(defreaction Fenpropimorph-immobile-sorption equilibrium
+  "Sorption equilibrium between dissolved and immobile Fenpropimorph."
+  (surface true)
+  (A Fenpropimorph-immobile)
+  (B Fenpropimorph)
+  (equilibrium linear (K K_Fenpropimorph))
+  (k_AB 0.05 [h^-1])                   ;Desorption rate.
+  (k_BA 0.05 [h^-1]))                  ;Sorption rate.
 
 (defchemical Fenpropimorph-colloid Fenpropimorph-base
   "Fenpropimorph sorbed to colloids."
@@ -69,9 +105,13 @@
 (defreaction Fenpropimorph-colloid-sorption Fenpropimorph-immobile-sorption
   "Sorption equilibrium between dissolved and colloid-bound Fenpropimorph."
   (colloid colloid)
-  (soil_enrichment_factor 10000 [])
-  (sorbed Fenpropimorph-colloid)
-  (k_sorption 0.05 [h^-1]))
+  (primary true)
+  (secondary true)
+  (surface true)
+  (A Fenpropimorph-colloid)
+  (k_AB 0.05 [h^-1])                   ;Desorption rate.
+  (k_BA 0.05 [h^-1])                   ;Sorption rate.
+  (equilibrium linear (K (K_Fenpropimorph (soil_enrichment_factor 10000 [])))))
 
 (defreaction Fenpropimorph-filter colloid-filter
   "Filtration of colloid-bound fenpropimorph in the soil matrix."
@@ -108,13 +148,19 @@
   "Dimethoate sorbed to immobile soil."
   (adsorption full))
 
-(defreaction Dimethoate-immobile-sorption sorption
-  "Sorption equilibrium between dissolved and immobile Dimethoate."
-  (sorbed Dimethoate-immobile)
-  (solute Dimethoate)
+(defnumber K_Dimethoate K_equilibrium
+  "Adsorption for Dimethoate to immobile soil."
   (cite lindhardt2001)
-  (K_OC 30 [l/kg])
-  (k_sorption 0.05 [h^-1]))                  ;Sorption rate.
+  (K_OC 30 [l/kg]))
+
+(defreaction Dimethoate-immobile-sorption equilibrium
+  "Sorption equilibrium between dissolved and immobile Dimethoate."
+  (surface true)
+  (A Dimethoate-immobile)
+  (B Dimethoate)
+  (equilibrium linear (K K_Dimethoate))
+  (k_AB 0.05 [h^-1])                   ;Desorption rate.
+  (k_BA 0.05 [h^-1]))                  ;Sorption rate.
 
 (defchemical Dimethoate-colloid Dimethoate-base
   "Dimethoate sorbed to colloids."
@@ -125,9 +171,13 @@
 (defreaction Dimethoate-colloid-sorption Dimethoate-immobile-sorption
   "Sorption equilibrium between dissolved and colloid-bound Dimethoate."
   (colloid colloid)
-  (soil_enrichment_factor 10000 [])
-  (sorbed Dimethoate-colloid)
-  (k_sorption 0.05 [h^-1]))
+  (primary true)
+  (secondary true)
+  (surface true)
+  (A Dimethoate-colloid)
+  (k_AB 0.05 [h^-1])                   ;Desorption rate.
+  (k_BA 0.05 [h^-1])                   ;Sorption rate.
+  (equilibrium linear (K (K_Dimethoate (soil_enrichment_factor 10000 [])))))
 
 (defreaction Dimethoate-filter colloid-filter
   "Filtration of colloid-bound dimethoate in the soil matrix."
@@ -167,21 +217,34 @@
 (defchemical Glyphosate-immobile-strong Glyphosate-immobile)
 (defchemical Glyphosate-immobile-weak Glyphosate-immobile)
 
-(defreaction Glyphosate-immobile-sorption sorption
-  "Sorption equilibrium between dissolved and immobile Glyphosate."
+(defnumber K_Glyphosate K_equilibrium
+  "Adsorption for Glyphosate to immobile soil."
   (cite gjettermann2009)
-  (K_d 503 [l/kg])
-  (solute Glyphosate))
+  ;; (K_clay 4192 [l/kg])
+  (Kd 503 [l/kg]))
+
+(defnumber K_Glyphosate-strong K_Glyphosate
+  (Kd 463 [l/kg]))
+
+(defnumber K_Glyphosate-weak K_Glyphosate
+  (Kd 40 [l/kg]))
+
+(defreaction Glyphosate-immobile-sorption equilibrium
+  "Sorption equilibrium between dissolved and immobile Glyphosate."
+  (surface true)
+  (B Glyphosate))
 
 (defreaction Glyphosate-immobile-sorption-strong Glyphosate-immobile-sorption
-  (sorbed Glyphosate-immobile-strong)
-  (K_d 463 [l/kg])
-  (k_sorption 0.005 [h^-1]))
+  (A Glyphosate-immobile-strong)
+  (equilibrium linear (K K_Glyphosate-strong))
+  (k_AB 0.005 [h^-1])                   ;Desorption rate.
+  (k_BA 0.005 [h^-1]))                  ;Sorption rate.
 
 (defreaction Glyphosate-immobile-sorption-weak Glyphosate-immobile-sorption
-  (sorbed Glyphosate-immobile-weak)
-  (K_d 40 [l/kg])
-  (k_sorption 0.05 [h^-1]))
+  (A Glyphosate-immobile-weak)
+  (equilibrium linear (K K_Glyphosate-weak))
+  (k_AB 0.05 [h^-1])                   ;Desorption rate.
+  (k_BA 0.05 [h^-1]))                  ;Sorption rate.
 
 (defchemical Glyphosate-colloid Glyphosate-base
   "Glyphosate sorbed to colloids."
@@ -192,9 +255,13 @@
 (defreaction Glyphosate-colloid-sorption Glyphosate-immobile-sorption-weak
   "Sorption equilibrium between dissolved and colloid-bound Glyphosate."
   (colloid colloid)
-  (soil_enrichment_factor 10000 [])
-  (sorbed Glyphosate-colloid)
-  (k_sorption 0.05 [h^-1]))
+  (primary true)
+  (secondary true)
+  (surface true)
+  (A Glyphosate-colloid)
+  (k_AB 0.05 [h^-1])                   ;Desorption rate.
+  (k_BA 0.05 [h^-1])                   ;Sorption rate.
+  (equilibrium linear (K (K_Glyphosate (soil_enrichment_factor 10000 [])))))
 
 (defreaction Glyphosate-filter colloid-filter
   "Filtration of colloid-bound glyphosate in the soil matrix."
@@ -239,13 +306,19 @@
   "Metamitron sorbed to immobile soil."
   (adsorption full))
 
-(defreaction Metamitron-immobile-sorption sorption
-  "Sorption equilibrium between dissolved and immobile Metamitron."
-  (sorbed Metamitron-immobile)
-  (solute Metamitron)
+(defnumber K_Metamitron K_equilibrium
+  "Adsorption for Metamitron to immobile soil."
   (cite lindhardt2001)
-  (K_OC 207 [l/kg])
-  (k_sorption 0.05 [h^-1]))
+  (K_OC 207 [l/kg]))
+
+(defreaction Metamitron-immobile-sorption equilibrium
+  "Sorption equilibrium between dissolved and immobile Metamitron."
+  (surface true)
+  (A Metamitron-immobile)
+  (B Metamitron)
+  (equilibrium linear (K K_Metamitron))
+  (k_AB 0.05 [h^-1])                   ;Desorption rate.
+  (k_BA 0.05 [h^-1]))                  ;Sorption rate.
 
 (defchemical Metamitron-colloid Metamitron-base
   "Metamitron sorbed to colloids."
@@ -256,9 +329,13 @@
 (defreaction Metamitron-colloid-sorption Metamitron-immobile-sorption
   "Sorption equilibrium between dissolved and colloid-bound Metamitron."
   (colloid colloid)
-  (soil_enrichment_factor 10000 [])
-  (sorbed Metamitron-colloid)
-  (k_sorption 0.05 [h^-1]))
+  (primary true)
+  (secondary true)
+  (surface true)
+  (A Metamitron-colloid)
+  (k_AB 0.05 [h^-1])                   ;Desorption rate.
+  (k_BA 0.05 [h^-1])                   ;Sorption rate.
+  (equilibrium linear (K (K_Metamitron (soil_enrichment_factor 10000 [])))))
 
 (defreaction Metamitron-filter colloid-filter
   "Filtration of colloid-bound metamitron in the soil matrix."
@@ -410,20 +487,20 @@
                      (path column "${column}" 
                            Chemistry multi combine "${chemistry}"
                            reaction "${chemical}-immobile-sorption"
-                           S_sorption)
+                           S_AB)
                      (handle sum)
                      (negate true)
                      (dimension "${unit}/&")
-                     (spec reaction sorption S_sorption))
+                     (spec reaction equilibrium S_AB))
            (interval (tag "Colloid-Sorption")
                      (path column "${column}" 
                            Chemistry multi combine "${chemistry}"
                            reaction "${chemical}-colloid-sorption"
-                           S_sorption)
+                           S_AB)
                      (handle sum)
                      (negate true)
                      (dimension "${unit}/&")
-                     (spec reaction sorption S_sorption))
+                     (spec reaction equilibrium S_AB))
            (interval (tag "Colloid-Filter-Primary")
                      (path column "${column}" 
                            Chemistry multi combine "${chemistry}"

@@ -109,7 +109,7 @@ IMvec::add_syntax (Frame& frame,
   frame.order ("name", "value");
 }
 
-const Unit&
+static const Unit&
 find_unit (const BlockModel& parent, const char* key)
 {
   const Units& units = parent.units ();
