@@ -30,6 +30,68 @@ double cbrt (double x)
 { return pow (x, 1.0/3.0); }
 #endif
 
+void 
+first_order_change (const double old_storage /* [M] */,
+                    const double absolute_input_rate /* [M/T] */,
+                    const double relative_loss_rate /* [T^-1] */,
+                    const double dt /* [T] */,
+                    double& new_storage /* [S] */,
+                    double& absolute_loss_rate /* [S] */)
+{
+  // S (t) = storage
+
+  const double I = absolute_input_rate;
+  const double L = relative_loss_rate;
+  const double S0 = old_storage; // [M]
+  
+  if (std::fabs (L) < 1e-99)
+    {
+      const double S1 = S0 + I * dt;
+      new_storage = S1;
+      absolute_loss_rate = 0.0;
+      return;
+    }
+  
+  // The equation for the system is
+  //
+  //    dS/dt = I - S L
+  //
+  // The solution is
+  // 
+  //    S (t) = c1 exp (-L t) + I/L
+  // 
+  // We insert S (0) in order to find c1.
+  //
+  //    S (0) = c1 + I/L => c1 = S (0) - I/L
+
+  const double c1 = S0 - I/L;   // [M]
+  
+  // Knowing c1, we can find the content at the end of the timestep.
+  
+  const double S1 = c1 * std::exp (-L * dt) + I/L; // [M]
+  
+  // We can find the loss by integrating S (t) L from 0 to dt
+  const double loss = -c1 * std::exp (-L * dt) + c1 + I * dt;
+
+  // The gain is simply the constant input multiplied with the timestep.
+  const double gain = I * dt;
+
+  // Now we can check mass balance
+  daisy_approximate (S1 - S0, gain - loss);
+
+  if (S1 >= 0)
+    {
+      new_storage = S1;
+      absolute_loss_rate = loss / dt;
+    }
+  else
+    {
+      // Decrease loss to get a non-negative solution.
+      new_storage = 0.0;
+      absolute_loss_rate = (loss + S1) / dt;
+    }
+}
+
 // See _Computational_Techniques_for_Differential_Equations page 616.
 void
 tridia (int from,

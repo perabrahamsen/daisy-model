@@ -522,7 +522,7 @@ SoilWater::overflow (const Geometry& geo,
     }
   tick_after (geo, soil, soil_heat, false, msg);
 
-  extra *= geo.surface_area (); // [cm]
+  extra /= geo.surface_area (); // [cm]
   extra *= 10.0;                // [mm]
   return extra;
 }

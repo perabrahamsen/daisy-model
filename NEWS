@@ -47,6 +47,8 @@ transport.
 
 ** Fix gnuplot output for gnuplot 4.4.
 
+** Chemicals may now decompose when part of the litter pack.
+
 ** Bug fixes.
 
 * 4.80

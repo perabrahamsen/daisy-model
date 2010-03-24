@@ -44,8 +44,8 @@
 ;;(run batch (run Estrup-2D Silstrup-2D plotall))
 
 ;;(run batch (run Silstrup-2C))
-(run batch (run Estrup-2C Silstrup-2C plotall))
-;;(run batch (run Silstrup-2C (plotall (graph Silstrup))))
+;;(run batch (run Estrup-2C Silstrup-2C plotall))
+(run batch (run Silstrup-2C (plotall (graph Silstrup))))
 ;;(run (Silstrup (column (Silstrup-1C-Center))))
 
 ;; (run batch (run Estrup-1C-Drain Silstrup-1C-Drain plotall))

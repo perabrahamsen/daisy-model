@@ -50,6 +50,14 @@ inline bool isequal (const double a, const double b)
 #define NAN	(nan (""))
 #endif
 
+void 
+first_order_change (const double old_storage /* [M] */,
+                    const double absolute_input_rate /* [M/T] */,
+                    const double relative_loss_rate /* [T^-1] */,
+                    const double dt /* [T] */,
+                    double& new_storage /* [S] */,
+                    double& absolute_loss_rate /* [S] */);
+
 void
 tridia (int from,
 	unsigned int size,

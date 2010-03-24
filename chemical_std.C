@@ -99,6 +99,7 @@ struct ChemicalStandard : public Chemical
 
   double litter_storage;
   double litter_in;
+  double litter_decompose;
   double litter_out;
 
   double surface_storage;
@@ -203,6 +204,9 @@ struct ChemicalStandard : public Chemical
              double from, double middle, double to, double dt);
   
   // Simulation.
+  static void divide_loss (const double absolute_loss_rate, 
+                           const double first_rate, const double second_rate,
+                           double& first, double& second);
   void tick_top (const double snow_leak_rate, // [h^-1]
                  const double canopy_cover, // [],
                  const double canopy_leak_rate, // [h^-1]
@@ -661,6 +665,29 @@ ChemicalStandard::swap (const Geometry& geo,
   update_C (soil, soil_water);
 }
 
+void
+ChemicalStandard::divide_loss (const double absolute_loss_rate, 
+                               const double first_rate, 
+                               const double second_rate,
+                               double& first, double& second)
+{
+  const double relative_loss_rate = first_rate + second_rate;
+  if (std::isnormal (relative_loss_rate))
+    {
+      const double X // Representative storage.
+        = absolute_loss_rate / relative_loss_rate;
+      first = X * first_rate;
+      second = X * second_rate;
+      daisy_approximate (absolute_loss_rate, first + second);
+    }
+  else
+    {
+      first = 0.0;
+      second = 0.0;
+      daisy_assert (iszero (absolute_loss_rate));
+    }
+}
+
 void 
 ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
                             const double canopy_cover, // [],
@@ -677,32 +704,30 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
 
   // Snow pack
   snow_in = spray_ + deposit_;
-  snow_storage += snow_in * dt;
-
-  snow_out = snow_storage * snow_leak_rate;
-  snow_storage -= snow_out * dt;
+  const double old_snow_storage = snow_storage;
+  first_order_change (old_snow_storage, snow_in, snow_leak_rate, dt,
+                      snow_storage, snow_out);
 
   // Canopy.
   canopy_in = snow_out * canopy_cover;
   const double canopy_bypass = snow_out - canopy_in;
   canopy_harvest = harvest_;
-  canopy_storage += (canopy_in - canopy_harvest - residuals) * dt;
 
-  const double old_canopy = canopy_storage;
-  const double washoff_rate 
+  const double old_canopy_storage = canopy_storage;
+  const double canopy_absolute_input_rate 
+    = canopy_in - canopy_harvest - residuals;
+  const double canopy_washoff_rate 
     = canopy_washoff_coefficient * canopy_leak_rate;
-  canopy_storage // Implicit solution: new = old - new * rate =>
-    = old_canopy / (1.0 + dt * (canopy_dissipation_rate + washoff_rate));
-  canopy_dissipate = canopy_dissipation_rate * canopy_storage;
-  canopy_out = canopy_storage * washoff_rate + residuals;
-  daisy_balance (old_canopy, canopy_storage, 
-                 - dt * (canopy_out - residuals + canopy_dissipate));
-
-  if (canopy_storage < 1e-18)
-    {
-      canopy_out += canopy_storage / dt;
-      canopy_storage = 0.0;
-    }
+  double canopy_absolute_loss_rate;
+  double canopy_washoff;
+  first_order_change (old_canopy_storage, 
+                      canopy_absolute_input_rate, 
+                      canopy_dissipation_rate + canopy_washoff_rate, dt,
+                      canopy_storage, canopy_absolute_loss_rate);
+  divide_loss (canopy_absolute_loss_rate, 
+               canopy_washoff_rate, canopy_dissipation_rate,
+               canopy_washoff, canopy_dissipate);
+  canopy_out = canopy_washoff + residuals;
 
   // Volatilization bypasses the system.
   spray_ += dissipate_;
@@ -716,35 +741,32 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   litter_in = (canopy_out - residuals + canopy_bypass) * litter_cover
     + residuals;
   const double litter_bypass = below_canopy - litter_in;
-  litter_storage += litter_in * dt;
-  litter_out = litter_storage * litter_leak_rate;
-  litter_storage -= litter_out * dt;
 
+  const double old_litter_storage = litter_storage;
+  double litter_absolute_loss_rate;
+  first_order_change (old_litter_storage, litter_in,
+                      litter_leak_rate + surface_decompose_rate, dt,
+                      litter_storage, litter_absolute_loss_rate);
+  divide_loss (litter_absolute_loss_rate, 
+               surface_decompose_rate, litter_leak_rate,
+               litter_decompose, litter_out);
+ 
   // Surface
   surface_in = litter_out + litter_bypass;
-  surface_runoff = surface_storage * surface_runoff_rate; 
-  surface_decompose = surface_storage * surface_decompose_rate; 
-  surface_storage += (surface_in + surface_transform 
-                      - surface_runoff - surface_decompose) * dt;
-  if (surface_storage < 0.0)
-    {
-      std::ostringstream tmp;
-      tmp << "Storage: " << surface_storage 
-          << "; In: " << surface_in * dt 
-          << "; Transform (source): " << surface_transform * dt
-          << "; Runoff: " << surface_runoff * dt 
-          << "; Decompose:" << surface_decompose * dt << "\n";
-      surface_decompose += surface_storage / dt;
-      surface_storage = 0.0;
-      tmp << "Adjusted decompose = " << surface_decompose * dt
-          << "; Storage = 0";
-      msg.warning (tmp.str ());
-    }
+  const double old_surface_storage = surface_storage;
+  double surface_absolute_loss_rate;
+  first_order_change (old_surface_storage, surface_in + surface_transform, 
+                      surface_runoff_rate + surface_decompose_rate, dt,
+                      surface_storage, surface_absolute_loss_rate);
+  divide_loss (surface_absolute_loss_rate,
+               surface_decompose_rate, surface_runoff_rate,
+               surface_decompose, surface_runoff);
 
   // Mass balance.
   const double new_storage = snow_storage + canopy_storage + litter_storage;
   const double input = spray_ + deposit_;
-  const double output = surface_in + canopy_harvest + canopy_dissipate;
+  const double output = surface_in + canopy_harvest + canopy_dissipate 
+    + litter_decompose;
   if (!approximate (new_storage, old_storage + (input - output) * dt)
       && !approximate (new_storage - old_storage, (input - output) * dt)
       && !approximate (new_storage + output * dt, old_storage + input * dt))
@@ -1120,6 +1142,7 @@ ChemicalStandard::output (Log& log) const
   output_variable (canopy_out, log);
   output_variable (litter_storage, log);
   output_variable (litter_in, log);
+  output_variable (litter_decompose, log);
   output_variable (litter_out, log);
   output_variable (surface_storage, log);
   output_variable (surface_solute, log);
@@ -1134,8 +1157,8 @@ ChemicalStandard::output (Log& log) const
   output_value (snow_storage + canopy_storage 
                 + litter_storage + surface_storage,
                 "top_storage", log);
-  output_value (canopy_dissipate + canopy_harvest + surface_runoff 
-                + surface_decompose - surface_transform,
+  output_value (canopy_dissipate + canopy_harvest + litter_decompose
+                + surface_runoff + surface_decompose - surface_transform,
                 "top_loss", log);
   output_value (C_avg_, "C", log);
   output_value (C_secondary_, "C_secondary", log);
@@ -1480,6 +1503,7 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
     canopy_out (0.0),
     litter_storage (al.number ("litter_storage")),
     litter_in (0.0),
+    litter_decompose (0.0),
     litter_out (0.0),
     surface_storage (al.number ("surface_storage")),
     surface_solute (0.0),
@@ -1790,6 +1814,8 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
     frame.set ("litter_storage", 0.0);
     frame.declare ("litter_in", "g/m^2/h", Attribute::LogOnly, 
                    "Entering litter .");
+    frame.declare ("litter_decompose", "g/m^2/h", Attribute::LogOnly, 
+                   "Decomposed from the litter.");
     frame.declare ("litter_out", "g/m^2/h", Attribute::LogOnly, 
                    "Leaking from litter.");
 

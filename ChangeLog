@@ -1,3 +1,13 @@
+2010-03-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* mathlib.C, mathlib.h (first_order_change): New function.
+	* chemical_std.C (divide_loss): New function.
+	(tick_top): use them.
+
+	* chemical_std.C (litter_decompose): New log variable.
+	* lib/log-std.dai ("Field chemical"): Add it.
+	* lib/log.dai ("Surface Chemicals"): Ditto.
+
 2010-03-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* secondary.C, secondary.h (initialize): New function.

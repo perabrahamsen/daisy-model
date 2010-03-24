@@ -1286,7 +1286,7 @@ sum of all chemicals will be logged."
   (summary (balance (precision 3)
                     (input spray deposit surface_transform)
                     (output canopy_harvest canopy_dissipate
-			    surface_decompose 
+			    litter_decompose surface_decompose 
                             surface_runoff surface_out surface_mixture 
                             litter_tillage surface_tillage)
                     (content snow_storage canopy_storage litter_storage
@@ -1398,6 +1398,11 @@ sum of all chemicals will be logged."
                    (handle sum)
                    (dimension "g/ha/&")
                    (spec chemical default surface_transform))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         litter_decompose)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default litter_decompose))
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
                          surface_decompose)
                    (handle sum)

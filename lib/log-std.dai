@@ -962,7 +962,8 @@ This is usually zero.")
   (summary (balance (precision 3)
                     (input "Spray" "Deposit" "External" "Surface Transform" 
                            "Soil Transform")
-                    (output "Harvest" "Dissipate" "Surface Decompose" "Runoff"
+                    (output "Harvest" "Dissipate" "Litter Decompose"
+                            "Surface Decompose" "Runoff"
                             "Soil Decompose" "Leak-Matrix"
                             "Surface-Drain" "Soil-Drain" "Uptake")
                     (content "Snow" "Canopy" "Litter" "Surface"
@@ -1017,6 +1018,14 @@ Some chemicals evaporate or decompose when stored on the canopy.")
                    (handle sum)
                    (dimension "${unit}/&")
                    (spec chemical default canopy_dissipate))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         litter_decompose)
+                   (documentation "\
+Decomposed while stored in the litter pack.")
+                   (tag "Litter Decompose")
+                   (handle sum)
+                   (dimension "${unit}/&")
+                   (spec chemical default litter_decompose))
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
                          surface_decompose)
                    (documentation "\
