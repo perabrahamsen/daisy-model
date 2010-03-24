@@ -3,6 +3,7 @@
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
 // Copyright 2006, 2008 Per Abrahamsen and KVL.
+// Copyright 2010 KU
 //
 // This file is part of Daisy.
 // 
@@ -37,6 +38,9 @@ struct SelectArray : public Select
   { return original_size (); }
 
   // Content.
+  bool found;                      // Value found since last print.
+  std::vector<double> small_value; // Value in small timestep.
+  double dt;                    // Time passed since last print [h]
   std::vector<double> value;		// Total array.
   std::vector<double> result;        // For logging (needs to be persistent!).
   std::vector<double> bulk;     // Soil dry bulk density.
@@ -77,127 +81,151 @@ struct SelectArray : public Select
 
   void output_array (const std::vector<double>& array)
   { 
-    if (array.size () > value.size ())
-      value.insert (value.end (), 
-		    array.size () - value.size (),
-		    0.0);
-    if (count == 0)
+    if (array.size () > small_value.size ())
+      small_value.insert (small_value.end (), 
+                          array.size () - small_value.size (),
+                          0.0);
+
+    switch (multi)
       {
-        if (handle == Handle::geometric)
-          for (unsigned int i = 0; i < array.size (); i++)
-            value[i] = log (array[i] * relative_weight);
+      case Multi::min:
+        if (first_result)
+          for (size_t i = 0; i < array.size (); i++)
+            small_value[i] = array[i];
         else
-          for (unsigned int i = 0; i < array.size (); i++)
-            value[i] = array[i] * relative_weight;
+          for (size_t i = 0; i < array.size (); i++)
+            small_value[i] = std::min (small_value[i], array[i]);
+        break;
+      case Multi::max:
+        if (first_result)
+          for (size_t i = 0; i < array.size (); i++)
+            small_value[i] = array[i];
+        else
+          for (size_t i = 0; i < array.size (); i++)
+            small_value[i] = std::max (small_value[i], array[i]);
+        break;
+      case Multi::sum:
+        for (size_t i = 0; i < array.size (); i++)
+          small_value[i] += array[i] * relative_weight;
+        break;
       }
-    else switch (handle)
+    
+    first_result = false;
+  }
+
+  void done_small (const double ddt)
+  {
+    dt += ddt;
+    if (first_result)
+      return;
+
+    if (small_value.size () > value.size ())
+      value.insert (value.end (), 
+		    small_value.size () - value.size (),
+		    0.0);
+
+    switch (handle)
       {
-      case Handle::min:
-        for (unsigned int i = 0; i < array.size (); i++)
-          value[i] = std::min (value[i], array[i] * relative_weight);
-        break;
-      case Handle::max:
-        for (unsigned int i = 0; i < array.size (); i++)
-          value[i] = std::max (value[i], array[i] * relative_weight);
-        break;
-      case Handle::current:    
-        // We may have count > 0 && Handle::current when selecting
-        // multiple items with "*", e.g. multiple SOM pools.  
-        // In that case, we use the sum.
       case Handle::average:
       case Handle::sum:
-        for (unsigned int i = 0; i < array.size (); i++)
-          value[i] += array[i] * relative_weight;
+        for (size_t i = 0; i < small_value.size (); i++)
+          value[i] += small_value[i] * ddt;
         break;
-      case Handle::geometric:
-        for (unsigned int i = 0; i < array.size (); i++)
-          value[i] += log (array[i] * relative_weight);
+      case Handle::min:
+        if (first_small)
+          value = small_value;
+        else 
+          for (size_t i = 0; i < small_value.size (); i++)
+            value[i] = std::min (value[i], small_value[i]);
+        break;
+      case Handle::max:
+        if (first_small)
+          value = small_value;
+        else
+          for (size_t i = 0; i < small_value.size (); i++)
+            value[i] = std::max (value[i], small_value[i]);
+        break;
+      case Handle::current:
+        value = small_value;
         break;
       }
-    count++;
+    
+    std::fill (small_value.begin (), small_value.end (), 0.0);
+    first_small = false;
+    first_result = true;
   }
 
   // Print result at end of time step.
-  void done (const double dt)
+  void done_print ()
   {
-    if (count == 0)
-      dest.missing ();
-    else 
+    // Missing value.
+    if (first_small)
       {
-        // Make sure result has the right size.
-        if (result.size () != value.size ())
-          result = value;
+        dest.missing ();
+        return;
+      }
 
-        if (bd_convert.get ())  // Bulk density convertion.
+    // Make sure result has the right size.
+    if (result.size () != value.size ())
+      result = value;
+
+    if (bd_convert.get ())  // Bulk density convertion.
+      {
+        if (bulk.size () < value.size ())
+          throw "\
+The 'array' select model only handle bulk density for soil sized variables";
+
+        switch (handle)
           {
-            if (bulk.size () < value.size ())
-              throw "The 'array' select model only handle bulk density for soil sized variables";
-
-            switch (handle)
+          case Handle::average:
+            if (dt > 0.0)
               {
-              case Handle::average:
                 for (size_t i = 0; i < value.size (); i++)
                   {
                     bd_convert->set_bulk (bulk[i]);
-                    result[i] = convert (value[i] / count);
+                    result[i] = convert (value[i] / dt);
                   }
-                dest.add (result);
                 break;
-              case Handle::geometric:
-                for (size_t i = 0; i < value.size (); i++)
-                  {
-                    bd_convert->set_bulk (bulk[i]);
-                    result[i] = convert (exp (value[i] / count));
-                  }
-                dest.add (result);
-                break;
-              case Handle::sum:
-                for (size_t i = 0; i < value.size (); i++)
-                  {
-                    bd_convert->set_bulk (bulk[i]);
-                    result[i] = convert (value[i] * dt);
-                  }
-                dest.add (result);
-                break;
-              default:
-                for (size_t i = 0; i < value.size (); i++)
-                  {
-                    bd_convert->set_bulk (bulk[i]);
-                    result[i] = convert (value[i]);
-                  }
-                dest.add (result);
+              }
+            dest.missing ();
+            return;
+          default:
+            for (size_t i = 0; i < value.size (); i++)
+              {
+                bd_convert->set_bulk (bulk[i]);
+                result[i] = convert (value[i]);
               }
           }
-        else                    // No bd_convert.
-          switch (handle)
-            {
-            case Handle::average:
-              for (size_t i = 0; i < value.size (); i++)
-                result[i] = convert (value[i] / count);
-              dest.add (result);
-              break;
-            case Handle::geometric:
-              for (size_t i = 0; i < value.size (); i++)
-                result[i] = convert (exp (value[i] / count));
-              dest.add (result);
-              break;
-            case Handle::sum:
-              for (size_t i = 0; i < value.size (); i++)
-                result[i] = convert (value[i] * dt);
-              dest.add (result);
-              break;
-            default:
-              for (size_t i = 0; i < value.size (); i++)
-                result[i] = convert (value[i]);
-              dest.add (result);
-            }
       }
+    else                    // No bd_convert.
+      switch (handle)
+        {
+        case Handle::average:
+          if (dt > 0.0)
+            {
+              for (size_t i = 0; i < value.size (); i++)
+                result[i] = convert (value[i] / dt);
+              break;
+            }
+          dest.missing ();
+          return;
+        default:
+          for (size_t i = 0; i < value.size (); i++)
+            result[i] = convert (value[i]);
+        }
+    dest.add (result);
+
+    // Clear for next.
     if (!accumulate)
-      count = 0;
+      {
+        dt = 0.0;
+        std::fill (value.begin (), value.end (), 0.0);
+        first_small = true;
+      }
   }
 
   bool prevent_printing ()
-  { return count == 0; }
+  { return first_small; }
 
   const Geometry* geometry () const
   { 
@@ -212,7 +240,8 @@ struct SelectArray : public Select
   // Create and Destroy.
   SelectArray (const BlockModel& al)
     : Select (al),
-      value (al.number_sequence ("value")),
+      found (false),
+      dt (0.0),
       last_column (NULL),
       bd_convert (NULL)
   { }
@@ -226,12 +255,7 @@ static struct SelectArraySyntax : public DeclareModel
     : DeclareModel (Select::component, "array", "Log all members of an array.")
   { }
   void load_frame (Frame& frame) const
-  { 
-    frame.declare ("value", Attribute::Unknown (), Attribute::State, Attribute::Variable,
-		"The current accumulated value.");
-    std::vector<double> empty;
-    frame.set ("value", empty);
-  }
+  { }
 } SelectArray_syntax;
 
 // select_array.C ends here.

@@ -30,14 +30,16 @@ class SelectValue : public Select
 private:
   int type_size () const
   { return Attribute::Singleton; }
-
+  
+  double small_value;           // Value in small timestep.
 protected:
   double value;	
   void add_result (double result);
 
   // Output routines.
 public:
-  void done (double dt);
+  void done_small (double ddt);
+  void done_print ();
 
   // Create and Destroy.
 public:

@@ -37,6 +37,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame_model.h"
+#include "daisy.h"
 #include <sstream>
 
 bool 
@@ -70,8 +71,14 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
 
 void
 LogSelect::done (const std::vector<Time::component_t>& time_columns,
-		 const Daisy&, Treelog&)
-{ }
+		 const Daisy& daisy, Treelog&)
+{ 
+  const double dt = daisy.dt;
+  for (std::vector<Select*>::const_iterator i = entries.begin (); 
+       i < entries.end (); 
+       i++)
+    (*i)->done_small (dt);
+}
 
 bool
 LogSelect::initial_match (const Daisy& daisy, Treelog&)
@@ -94,7 +101,12 @@ LogSelect::initial_match (const Daisy& daisy, Treelog&)
 void
 LogSelect::initial_done (const std::vector<Time::component_t>& time_columns,
 			 const Daisy&, Treelog&)
-{ }
+{
+  for (std::vector<Select*>::const_iterator i = entries.begin (); 
+       i < entries.end (); 
+       i++)
+    (*i)->done_small (0.0);
+}
 
 void 
 LogSelect::open_derived_type (const symbol type, const symbol)

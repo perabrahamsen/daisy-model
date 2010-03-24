@@ -44,9 +44,8 @@ LogExtern::done (const std::vector<Time::component_t>& time_columns,
 
   for (size_t i = 0; i < LogSelect::entries.size (); i++)
     {
-      const double dt = daisy.dt;
       last_done = LogSelect::entries[i]->tag ();
-      LogSelect::entries[i]->done (dt);
+      LogSelect::entries[i]->done_print ();
     }
 }
 

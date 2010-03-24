@@ -150,7 +150,7 @@ Fetch::initialize (std::vector<Select*>& select, Treelog& msg)
             {	
               select[j]->add_dest (this);
               this->select_dimension = select[j]->dimension ();
-              this->type = ((select[j]->handle != Handle::current)
+              this->type = ((select[j]->handle != Select::Handle::current)
                                 && !select[j]->accumulate)
                 ? Fetch::Flux 
                 : Fetch::NewContent;

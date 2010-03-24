@@ -2,6 +2,7 @@
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
+// Copyright 2010 KU
 //
 // This file is part of Daisy.
 // 
@@ -25,80 +26,113 @@
 #include "block_model.h"
 #include "frame.h"
 #include "librarian.h"
-#include "mathlib.h"
+#include "check.h"
+#include <cmath>
 
 void 
 SelectValue::add_result (double result)
 {
-  result *= relative_weight;
-
-  if (count == 0)
+  switch (multi)
     {
-      if (handle == Handle::geometric)
-        value = std::log (result);
+    case Multi::min:
+      if (first_result)
+        small_value = result;
       else
-        value = result;
+        small_value = std::min (small_value, result);
+      break;
+    case Multi::max:
+      if (first_result)
+        small_value = result;
+      else
+        small_value = std::max (small_value, result);
+      break;
+    case Multi::sum:
+      small_value += result * relative_weight;
+      break;
     }
-  else switch (handle)
-         {
-         case Handle::min:
-           value = std::min (value, result);
-           break;
-         case Handle::max:
-           value = std::max (value, result);
-           break;
-         case Handle::current:    
-           // We may have count > 0 && Handle::current when selecting
-           // multiple items with "*", e.g. multiple SOM pools.  
-           // In that case, we use the sum.
-         case Handle::average:
-         case Handle::sum:
-           value += result;
-           break;
-         case Handle::geometric:
-           value += std::log (result);
-           break;
-         }
-  count++;
+  first_result = false;
 }
 
-
-// Print result at end of time step.
 void 
-SelectValue::done (const double dt)
+SelectValue::done_small (const double ddt)
 {
-  if (count == 0)
-    dest.missing ();
-  else 
+  dt += ddt;
+  if (first_result)
+    return;
+
+  switch (handle)
     {
-      double result = value;
-      switch (handle)
-        {
-        case Handle::average:
-          result /= (count + 0.0);
-          break;
-        case Handle::geometric:
-          result /= (count + 0.0);
-          result = exp (result);
-          break;
-	case Handle::sum:
-          result *= dt;
-          break;
-	case Handle::min:
-	case Handle::max:
-	case Handle::current:
-	  break;
-        }
-      dest.add (convert (result));
+    case Handle::average:
+    case Handle::sum:
+      value += small_value * ddt;
+      break;
+    case Handle::min:
+      if (first_small)
+        value = small_value;
+      else
+        value = std::min (value, small_value);
+      break;
+    case Handle::max:
+      if (first_small)
+        value = small_value;
+      else
+        value = std::max (value, small_value);
+       break;
+     case Handle::current:
+       value = small_value;
+       break;
+     }
+
+  small_value = 0.0;
+  first_small = false;
+  first_result = true;
+ }
+
+ void 
+ SelectValue::done_print ()
+ {
+   // Missing value.
+   if (first_small)
+     {
+       dest.missing ();
+       return;
+     }
+
+   // Use it.
+   double result = value;
+   switch (handle)
+     {
+     case Handle::average:
+       if (dt > 0.0)
+         result /= dt;
+       else
+         {
+           dest.missing ();
+           return;
+         }
+       break;
+     case Handle::sum:
+     case Handle::min:
+     case Handle::max:
+     case Handle::current:
+       break;
+     }
+   dest.add (convert (result));
+   
+   // Clear for next.
+   if (!accumulate)
+     {
+       dt = 0.0;
+       value = 0.0;
+       first_small = true;
     }
-  if (!accumulate)
-    count = 0;
-}
+ }
 
 // Create and Destroy.
 SelectValue::SelectValue (const BlockModel& al)
   : Select (al),
-    value (al.number ("value"))
+    small_value (0.0),
+    value (0.0)
 { }
 
 static struct SelectValueSyntax : public DeclareBase
@@ -108,11 +142,7 @@ static struct SelectValueSyntax : public DeclareBase
 Log a single numeric value.")
   { }
   void load_frame (Frame& frame) const
-  {
-    frame.declare ("value", Attribute::Unknown (), Attribute::State,
-                   "The current accumulated value.");
-    frame.set ("value", 0.0);
-  }
+  { }
 } SelectValue_syntax;
 
 // select_value.C ends here.

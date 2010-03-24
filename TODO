@@ -2,7 +2,15 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Variable tidsskridt
 
-** Log skal kunne klare variable tidsskridt
+** Split Select::done up i to
+
+*** En for lille tidsskridt
+
+ddt
+
+*** En for stort tidsskridt
+
+dt = summen af små tidsskridt
 
 ** Omsætning skal være uafhængig af tidsskridt.
 

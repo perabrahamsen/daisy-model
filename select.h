@@ -43,26 +43,46 @@ class Border;
 class Volume;
 class BlockModel;
 
-struct Handle
-{
-  // Enum in a namespace.
-  enum handle_t { min, max, average, geometric, sum, current };
-private:
-  handle_t value;
-  static handle_t symbol2handle (symbol s);
-public:
-  operator handle_t ()
-  { return value; }
-  Handle (handle_t v)
-    : value (v)
-  { }
-  Handle (symbol s)
-    : value (symbol2handle (s))
-  { }
-};
-
 class Select : public Model 
 {
+  // Types.
+public:
+  struct Handle
+  {
+    // Enum in a namespace.
+    enum handle_t { min, max, average, sum, current };
+  private:
+    handle_t value;
+    static handle_t symbol2handle (symbol s);
+  public:
+    operator handle_t ()
+    { return value; }
+    Handle (handle_t v)
+      : value (v)
+    { }
+    Handle (symbol s)
+      : value (symbol2handle (s))
+    { }
+  };
+protected:
+  struct Multi
+  {
+    // Enum in a namespace.
+    enum handle_t { min, max, sum };
+  private:
+    handle_t value;
+    static handle_t symbol2handle (symbol s);
+  public:
+    operator handle_t ()
+    { return value; }
+    Multi (handle_t v)
+      : value (v)
+    { }
+    Multi (symbol s)
+      : value (symbol2handle (s))
+    { }
+  };
+
   // Content.
 public:
   const symbol name;
@@ -74,10 +94,13 @@ protected:
 public:
   const bool accumulate;	// Accumulate numbers over time.
   Handle handle;
+  Multi multi;
 protected:
   const bool interesting_content; // Is this worth an initial line?
   double convert (double) const; // Convert value.
-  int count;			// Number of accumulated values.
+  bool first_result;             // First match in small time step.
+  bool first_small;              // First match since last print.
+  double dt;                    // Time passed since last print [h]
 public:
   static const char *const description;
   static const char *const component;
@@ -157,7 +180,8 @@ public:
     return is_active;
   }
   // Print result at end of time step.
-  virtual void done (double dt) = 0;
+  virtual void done_small (double ddt) = 0;
+  virtual void done_print () = 0;
   virtual bool prevent_printing ();
 
   // Create and Destroy.

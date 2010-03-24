@@ -1,5 +1,14 @@
 2010-03-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* select.C, select.h (multi): New parameter.
+	* select.C, select.h, select_value.C, select_array.C (geometric):
+	Removed handle.
+	(done_small, done_print): Split from 'done'.
+	* log_select.C (initial_done, done): Call them.
+	* log_dlf.C (common_done): Update caller.
+	* log_extern.C (done): Ditto.
+	* fetch.C (initialize): Update caller.
+
 	* mathlib.C, mathlib.h (first_order_change): New function.
 	* chemical_std.C (divide_loss): New function.
 	(tick_top): use them.

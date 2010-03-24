@@ -143,13 +143,12 @@ LogDLF::common_done (const std::vector<Time::component_t>& time_columns,
     for (size_t i = 0; i < time_columns.size (); i++)
       out << time.component_value (time_columns[i]) << field_separator;
 
-  const double dt = daisy.dt;
   for (size_t i = 0; i < entries.size (); i++)
     {
       if (i != 0)
         out << field_separator;
       
-      entries[i]->done (dt);
+      entries[i]->done_print ();
 
       process_entry (i);
     }
@@ -204,9 +203,8 @@ LogDLF::initial_done (const std::vector<Time::component_t>& time_columns,
 
   if (prevent_printing)
     {
-      const double dt = daisy.dt;
       for (unsigned int i = 0; i < entries.size (); i++)
-        entries[i]->done (dt);
+        entries[i]->done_print ();
       return;
     }
       

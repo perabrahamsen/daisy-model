@@ -43,8 +43,8 @@
 #include <numeric>
 #include <map>
 
-Handle::handle_t
-Handle::symbol2handle (symbol s)
+Select::Handle::handle_t
+Select::Handle::symbol2handle (symbol s)
 {
   static struct sym_set_t : std::map<symbol, handle_t>
   {
@@ -56,12 +56,30 @@ Handle::symbol2handle (symbol s)
       insert (std::pair<symbol,handle_t> (max_symbol, max));
       static symbol average_symbol ("average");
       insert (std::pair<symbol,handle_t> (average_symbol, average));
-      static symbol geometric_symbol ("geometric");
-      insert (std::pair<symbol,handle_t> (geometric_symbol, geometric));
       static symbol sum_symbol ("sum");
       insert (std::pair<symbol,handle_t> (sum_symbol, sum));
       static symbol current_symbol ("current");
       insert (std::pair<symbol,handle_t> (current_symbol, current));
+    } 
+  } sym_set;
+  sym_set_t::const_iterator i = sym_set.find (s);
+  daisy_assert (i != sym_set.end ());
+  return (*i).second;
+}  
+
+Select::Multi::handle_t
+Select::Multi::symbol2handle (symbol s)
+{
+  static struct sym_set_t : std::map<symbol, handle_t>
+  {
+    sym_set_t ()
+    {
+      static symbol min_symbol ("min");
+      insert (std::pair<symbol,handle_t> (min_symbol, min));
+      static symbol max_symbol ("max");
+      insert (std::pair<symbol,handle_t> (max_symbol, max));
+      static symbol sum_symbol ("sum");
+      insert (std::pair<symbol,handle_t> (sum_symbol, sum));
     } 
   } sym_set;
   sym_set_t::const_iterator i = sym_set.find (s);
@@ -682,8 +700,11 @@ Select::Select (const BlockModel& al)
                        ||  (al.check ("flux")
                             && al.flag ("flux")))
                       ? Handle::sum : Handle::current)),
+    multi (al.name ("multi")),
     interesting_content (al.flag ("interesting_content")),
-    count (al.integer ("count")),
+    first_result (true),
+    first_small (true),
+    dt (0.0),
     path (al.name_sequence ("path")),
     last_index (path.size () - 1),
     current_name (path[0]),
@@ -803,18 +824,27 @@ average: Log the arithmetic average value seen since last time the\n\
 variable was logged.\n\
 If 'accumulate' is true, use the average of all values.\n\
 \n\
-geometric: Log the geometic average value seen since last time the\n\
-variable was logged.\n\
-If 'accumulate' is true, use the average of all values.\n\
-\n\
 sum: Accumulate value since last time the variable was logged.\n\
 If 'accumulate' is true, accumulate since the start of the log.\n\
 \n\
 current: Log the current value for the variable.\n\
-If 'accumulate' is true, the printed values will be accumulated..");
-    static VCheck::Enum handle_check ("min", "max", "average", "geometric", 
+If 'accumulate' is true, the printed values will be accumulated.");
+    static VCheck::Enum handle_check ("min", "max", "average", 
                                       "sum", "current");
     frame.set_check ("handle", handle_check);
+    frame.declare_string ("multi", Attribute::OptionalConst, "\
+This option determine how to handle mutiple matches within a timestep.\n\
+This could be two crops on the same column, or one crop on two columns.\n \
+\n\
+min: Use smallest value\n\
+\n\
+max: Use largest value\n\
+\n\
+sum: Use the sum of all matches, weighted by relative column area if\n\
+the matches are from different columns.");
+    static VCheck::Enum multi_check ("min", "max", "sum");
+    frame.set_check ("multi", multi_check);
+    frame.set ("multi", "sum");
     frame.declare_boolean ("interesting_content", Attribute::Const, "\
 True if the content of this column is interesting enough to warrent an\n\
 initial line in the log file.  This only affects non-flux variables.");
@@ -838,9 +868,6 @@ Switch sign of value.  I.e. upward fluxes become downward fluxes.");
     frame.declare_boolean ("accumulate", Attribute::Const,
                    "Log accumulated values.");
     frame.set ("accumulate", false);
-    frame.declare_integer ("count", Attribute::State, "\
-Number of times the path has matched a variable since the last log entry.");
-    frame.set ("count", 0);
   }
 } Select_init;
 
