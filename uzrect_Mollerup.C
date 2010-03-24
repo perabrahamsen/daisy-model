@@ -35,7 +35,6 @@
 #include "mathlib.h"
 #include "assertion.h"
 #include "librarian.h"
-#include "tertsmall.h"
 #include "anystate.h"
 #include "condedge.h"
 #include "treelog.h"
@@ -78,7 +77,7 @@ struct UZRectMollerup : public UZRect
   // Interface.
   void tick (const GeometryRect&, std::vector<size_t>& drain_cell,
 	     const Soil&, SoilWater&, const SoilHeat&, 
-             const Surface&, const Groundwater&, Tertsmall& tertiary, 
+             const Surface&, const Groundwater&, 
              double dt, Treelog&);
   void output (Log&) const;
   
@@ -166,7 +165,6 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
                 const Soil& soil, 
                 SoilWater& soil_water, const SoilHeat& soil_heat,
                 const Surface& surface, const Groundwater& groundwater,
-                Tertsmall& tertiary, 
                 const double dt, Treelog& msg)
 
 {
@@ -284,7 +282,6 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       int iterations_used = 0;
       h_previous = h;
       Theta_previous = Theta;
-      const Anystate h3_previous = tertiary.get_state ();
 
       if (debug == 5)
 	{
@@ -368,11 +365,6 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
           //ublas vector -> std vector 
           std::copy(h.begin (), h.end (), h_std.begin ());
 
-
-          tertiary.find_implicit_water (h3_previous, 
-                                        geo, soil, soil_heat, h_std, ddt);
-          tertiary.matrix_sink (S_matrix, S_drain);
-          
           for (size_t cell = 0; cell != cell_size ; ++cell) 
             {				
               S_macro (cell) = (S_matrix[cell] + S_drain[cell]) 
@@ -464,7 +456,6 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  ddt /= time_step_reduction;
 	  h = h_previous;
 	  Theta = Theta_previous;
-          tertiary.set_state (h3_previous);
 	}
       else
 	{
@@ -496,7 +487,6 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
           std::vector<double> h_std_new (cell_size);
           std::copy(h.begin (), h.end (), h_std_new.begin ());
-          tertiary.update_active (geo, h_std_new, msg); 
 
 	  // Update remaining_water.
 	  for (size_t i = 0; i < edge_above.size (); i++)

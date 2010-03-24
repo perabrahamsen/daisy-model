@@ -21,7 +21,6 @@
 #define BUILD_DLL
 
 #include "tertiary.h"
-#include "tertsmall.h"
 #include "biopore.h"
 #include "memutils.h"
 #include "librarian.h"
@@ -45,7 +44,7 @@
 #include "frame.h"
 #include <sstream>
 
-struct TertiaryBiopores : public Tertiary, public Tertsmall
+struct TertiaryBiopores : public Tertiary
 {
   // Parameters.
   const auto_vector<Biopore*> classes; // List of biopore classes.
@@ -54,7 +53,6 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   const double pressure_limit;   // Limit to biopore sucktion [cm]
   const double pressure_barrier; // Pressure difference requires for S [cm]
   const double pond_max;	 // Pond height before activating pref.flow [cm]
-  const bool use_small_timesteps_; // True, iff we want to calculate S in R.E.
   const enum active_msg_t { msg_cell, msg_range, msg_none } active_msg;
 
   // Helper.
@@ -95,10 +93,6 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   void infiltrate (const Geometry&, size_t e, double amount, double dt);
   void clear ();
 
-  // Simulation.
-  bool use_small_timesteps () const
-  { return use_small_timesteps_; }
-
   // - For use by column.
   void deactivate (const int steps)
   { deactivate_steps += steps; }
@@ -107,7 +101,6 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
              SoilWater& soil_water, Surface& surface, Treelog& msg);
 
   // - For use in Richard's Equation.
-  Tertsmall& implicit ();
   void matrix_sink (std::vector<double>& S_matrix,
                     std::vector<double>& S_drain) const;
   
@@ -329,8 +322,6 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
       deactivate_steps--;
       return;
     }
-  if (use_small_timesteps ())
-    return;
   log_ddt = true;
   
   // Soil matrix exchange.
@@ -390,15 +381,6 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   // Make it official.
   soil_water.add_tertiary_sink (S_matrix);
   soil_water.drain (S_drain);
-}
-
-Tertsmall& 
-TertiaryBiopores::implicit ()
-{
-  if (use_small_timesteps ())
-    return *this;
-
-  return Tertsmall::none ();
 }
 
 void 
@@ -676,7 +658,6 @@ TertiaryBiopores::TertiaryBiopores (const BlockModel& al)
     pressure_limit (al.number ("pressure_limit", pressure_end)),
     pressure_barrier (al.number ("pressure_barrier")),
     pond_max (al.number ("pond_max")),
-    use_small_timesteps_ (al.flag ("use_small_timesteps")),
     active_msg (al.name ("active_msg") == "cell"
                 ? msg_cell
                 : ((al.name ("active_msg") == "range")
@@ -738,10 +719,6 @@ a too small value for this parameter, the solution may be unstable.");
 Maximum height of ponding before spilling into biopores.\n\
 After macropores are activated pond will have this height.");
     frame.set ("pond_max", 0.05);
-    frame.declare_boolean ("use_small_timesteps", Attribute::Const,
-                "True iff the sink is allowed to change within a timestep.\n\
-This is only supported by the 'Mollerup' model.");
-    frame.set ("use_small_timesteps", false);
     frame.declare_string ("active_msg", Attribute::Const, "\
 Control biopore activation and deactivation reports.\n\
 \n\
@@ -763,8 +740,7 @@ Total amount of solutes in biopores.", load_mass);
     frame.declare_submodule_sequence ("solute_storage", Attribute::LogOnly, "\
 Total amount of solutes in biopores divided by surface area.", load_storage);
     frame.declare ("ddt", "h", Attribute::LogOnly, "Emulated timestep.\n\
-Timestep scaled for available water.\n\
-Only relevant if 'use_small_timesteps' is false.");    
+Timestep scaled for available water.");    
     frame.declare_integer ("deactivate_steps", Attribute::State, 
                 "No matrix exchange for this number of timesteps.\n\
 Automatically set when matrix pressure is in a disarray, such as after\n\

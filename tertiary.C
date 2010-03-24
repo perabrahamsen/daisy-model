@@ -21,7 +21,6 @@
 #define BUILD_DLL
 
 #include "tertiary.h"
-#include "tertsmall.h"
 #include "geometry.h"
 #include "soil_water.h"
 #include "block_model.h"
@@ -68,8 +67,6 @@ class TertiaryNone : public Tertiary
   void tick (const Units&, const Geometry&, const Soil&, const SoilHeat&,
              const double dt, SoilWater&, Surface&, Treelog&)
   { }
-  Tertsmall& implicit ()
-  { return Tertsmall::none (); }
   void solute (const Geometry&, const SoilWater&, 
                const std::map<size_t, double>& J_tertiary,
                const double /* dt */,

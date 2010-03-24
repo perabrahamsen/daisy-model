@@ -21,7 +21,6 @@
 #define BUILD_DLL
 
 #include "tertiary.h"
-#include "tertsmall.h"
 #include "geometry1d.h"
 #include "soil.h"
 #include "soil_water.h"
@@ -51,8 +50,6 @@ struct TertiaryOld : public Tertiary
   void tick (const Units&, const Geometry& geo, const Soil& soil, 
              const SoilHeat& soil_heat, const double dt, 
              SoilWater& soil_water, Surface& surface, Treelog& msg);
-  Tertsmall& implicit ()
-  { return Tertsmall::none (); }
   void tick_water (const Geometry&, const Soil&, const SoilWater&, 
                    const SoilHeat&, 
                    const double dt,

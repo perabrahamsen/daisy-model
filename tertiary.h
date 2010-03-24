@@ -36,7 +36,6 @@ class Chemical;
 class Scope;
 class Treelog;
 class Log;
-class Tertsmall;
 class Units;
 class Groundwater;
 
@@ -58,9 +57,6 @@ public:
                      Surface&, Treelog&) = 0;
 
 public:
-  // - For use inside Richard's Equation.
-  virtual Tertsmall& implicit () = 0;
-
   // - For use in Movement::solute
   virtual void solute (const Geometry&, const SoilWater&, 
                        const std::map<size_t, double>& J_tertiary,

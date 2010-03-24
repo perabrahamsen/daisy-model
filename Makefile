@@ -519,7 +519,7 @@ OTHER = iterative.C \
 	value.C type.C model_derived.C model_logable.C model_framed.C \
 	printer.C printer_file.C filepos.C frame_submodel.C \
 	frame_model.C scope.C attribute.C unit.C border.C resistance.C \
-	convert.C units.C tertsmall.C anystate.C imvec.C im.C frame.C \
+	convert.C units.C anystate.C imvec.C im.C frame.C \
 	bdconv.C abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
 	intrinsics.C metalib.C model.C output.C scope_block.C librarian.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
@@ -1015,7 +1015,7 @@ stomatacon${OBJ}: stomatacon.C stomatacon.h model_logable.h model.h symbol.h \
  mathlib.h assertion.h block_model.h block_nested.h block.h scope.h \
  attribute.h treelog.h frame_model.h frame.h librarian.h check.h
 tertiary${OBJ}: tertiary.C tertiary.h model_derived.h model_logable.h model.h \
- symbol.h tertsmall.h geometry.h attribute.h soil_water.h block_model.h \
+ symbol.h geometry.h attribute.h soil_water.h block_model.h \
  block_nested.h block.h scope.h treelog.h frame_model.h frame.h \
  librarian.h
 biopore${OBJ}: biopore.C biopore.h model_framed.h model_logable.h model.h \
@@ -1495,7 +1495,6 @@ convert${OBJ}: convert.C convert.h
 units${OBJ}: units.C units.h memutils.h symbol.h unit_model.h unit.h model.h \
  convert.h oldunits.h treelog.h assertion.h librarian.h metalib.h frame.h \
  scope.h attribute.h library.h frame_model.h
-tertsmall${OBJ}: tertsmall.C tertsmall.h anystate.h
 anystate${OBJ}: anystate.C anystate.h assertion.h
 imvec${OBJ}: imvec.C imvec.h symbol.h attribute.h assertion.h log.h time.h \
  border.h model_framed.h model_logable.h model.h chemical.h check.h \
@@ -1694,10 +1693,10 @@ stomatacon_SHA${OBJ}: stomatacon_SHA.C stomatacon.h model_logable.h model.h \
  symbol.h mathlib.h assertion.h check.h block_model.h block_nested.h \
  block.h scope.h attribute.h treelog.h frame_model.h frame.h librarian.h
 tertiary_old${OBJ}: tertiary_old.C tertiary.h model_derived.h model_logable.h \
- model.h symbol.h tertsmall.h geometry1d.h geometry_vert.h geometry.h \
- attribute.h soil.h soil_water.h chemical.h model_framed.h macro.h \
- mactrans.h librarian.h block_model.h block_nested.h block.h scope.h \
- treelog.h frame_model.h frame.h surface.h uzmodel.h groundwater.h
+ model.h symbol.h geometry1d.h geometry_vert.h geometry.h attribute.h \
+ soil.h soil_water.h chemical.h model_framed.h macro.h mactrans.h \
+ librarian.h block_model.h block_nested.h block.h scope.h treelog.h \
+ frame_model.h frame.h surface.h uzmodel.h groundwater.h
 biopore_drain${OBJ}: biopore_drain.C biopore.h model_framed.h model_logable.h \
  model.h symbol.h number.h im.h attribute.h block_model.h block_nested.h \
  block.h scope.h treelog.h frame_model.h frame.h vcheck.h librarian.h \
@@ -1705,12 +1704,12 @@ biopore_drain${OBJ}: biopore_drain.C biopore.h model_framed.h model_logable.h \
  anystate.h chemical.h groundwater.h model_derived.h assertion.h \
  mathlib.h
 tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model_derived.h \
- model_logable.h model.h symbol.h tertsmall.h biopore.h model_framed.h \
- number.h im.h attribute.h memutils.h librarian.h block_model.h \
- block_nested.h block.h scope.h treelog.h frame_model.h frame.h check.h \
- geometry.h soil.h soil_water.h soil_heat.h log.h time.h border.h \
- anystate.h surface.h uzmodel.h chemical.h groundwater.h units.h \
- assertion.h mathlib.h
+ model_logable.h model.h symbol.h biopore.h model_framed.h number.h im.h \
+ attribute.h memutils.h librarian.h block_model.h block_nested.h block.h \
+ scope.h treelog.h frame_model.h frame.h check.h vcheck.h geometry.h \
+ soil.h soil_water.h soil_heat.h log.h time.h border.h anystate.h \
+ surface.h uzmodel.h chemical.h groundwater.h units.h assertion.h \
+ mathlib.h
 biopore_matrix${OBJ}: biopore_matrix.C biopore.h model_framed.h \
  model_logable.h model.h symbol.h number.h im.h attribute.h imvec.h \
  block_model.h block_nested.h block.h scope.h treelog.h frame_model.h \
@@ -1782,8 +1781,8 @@ movement_rect${OBJ}: movement_rect.C movement_solute.h movement.h \
  groundwater.h surface.h uzmodel.h weather.h im.h uzrect.h adsorption.h \
  log.h time.h border.h check.h frame_submodel.h frame.h scope.h \
  submodeler.h block_submodel.h block_nested.h block.h treelog.h \
- tertiary.h librarian.h anystate.h tertsmall.h mathlib.h assertion.h \
- block_model.h frame_model.h
+ tertiary.h librarian.h anystate.h mathlib.h assertion.h block_model.h \
+ frame_model.h
 chemistry_multi${OBJ}: chemistry_multi.C chemistry.h model_framed.h \
  model_logable.h model.h symbol.h chemical.h log.h time.h border.h \
  block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
@@ -1892,8 +1891,7 @@ uzrect_Mollerup${OBJ}: uzrect_Mollerup.C uzrect.h model_framed.h \
  geometry.h attribute.h soil.h soil_water.h soil_heat.h groundwater.h \
  model_derived.h surface.h uzmodel.h solver.h log.h time.h border.h \
  frame.h scope.h block_model.h block_nested.h block.h treelog.h \
- frame_model.h mathlib.h assertion.h librarian.h tertsmall.h anystate.h \
- condedge.h
+ frame_model.h mathlib.h assertion.h librarian.h anystate.h condedge.h
 groundwater_flux${OBJ}: groundwater_flux.C groundwater.h model_derived.h \
  model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h check.h librarian.h

@@ -39,7 +39,6 @@
 #include "tertiary.h"
 #include "librarian.h"
 #include "anystate.h"
-#include "tertsmall.h"
 #include "treelog.h"
 #include "mathlib.h"
 #include "block_model.h"
@@ -260,12 +259,10 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
     {
       water_attempt (i);
       Treelog::Open nest (msg, matrix_water[i]->name);
-      Anystate old_tertiary = tertiary->implicit ().get_state ();
       try
         {
           matrix_water[i]->tick (*geo, drain_cell, soil, soil_water, soil_heat,
-                                 surface, groundwater, tertiary->implicit (),
-                                 dt, msg);
+                                 surface, groundwater, dt, msg);
 	  const bool obey_surface = matrix_water[i]->obey_surface ();
 
           for (size_t edge = 0; edge < edge_size; edge++)
@@ -295,7 +292,6 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
       catch (const std::string& error)
         { report (error, msg); }
 
-      tertiary->implicit ().set_state (old_tertiary); // For small timesteps.
       tertiary->deactivate (3); // Don't try tertiary right after reserve.
       water_failure (i);
     }

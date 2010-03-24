@@ -39,7 +39,7 @@ struct UZRectConst : public UZRect
   { return false; }
   void tick (const GeometryRect&, std::vector<size_t>& drain_cell,
 	     const Soil&, SoilWater&, const SoilHeat&, 
-             const Surface&, const Groundwater&, Tertsmall&, 
+             const Surface&, const Groundwater&,
              double dt, Treelog&);
   void output (Log&) const;
   
@@ -58,7 +58,7 @@ void
 UZRectConst::tick (const GeometryRect& geo, std::vector<size_t>&,
                    const Soil&, 
                    SoilWater& soil_water, const SoilHeat&,
-                   const Surface&, const Groundwater&, Tertsmall&, 
+                   const Surface&, const Groundwater&, 
                    const double, Treelog&)
 
 {
