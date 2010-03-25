@@ -49,6 +49,14 @@ transport.
 
 ** Chemicals may now decompose when part of the litter pack.
 
+** The FAO_PM reference evapotranpiration model used actual albedo.
+
+Not it used the reference value.
+
+** New EpFacWet canopy parameter.
+
+Specifies K_c for wet surface.  By default it is identical to EpFac.
+
 ** Bug fixes.
 
 * 4.80

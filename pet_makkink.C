@@ -32,7 +32,8 @@ struct PetMakkink : public Pet
 {
   // State.
   double reference_evapotranspiration;
-  double potential_evapotranspiration;
+  double potential_evapotranspiration_dry;
+  double potential_evapotranspiration_wet;
 
   // Simulation.
   void tick (const Time&, const Weather& weather, const double, const Vegetation& crops,
@@ -43,9 +44,12 @@ struct PetMakkink : public Pet
       reference_evapotranspiration 
 	= FAO::Makkink (weather.air_temperature (),
 			weather.global_radiation ());
-      potential_evapotranspiration 
-	= reference_to_potential (crops, surface, 
-				  reference_evapotranspiration);
+      potential_evapotranspiration_dry 
+	= reference_to_potential_dry (crops, surface, 
+                                      reference_evapotranspiration);
+      potential_evapotranspiration_wet 
+	= reference_to_potential_wet (crops, surface, 
+                                      reference_evapotranspiration);
     }
 
   void output (Log& log) const
@@ -55,8 +59,10 @@ struct PetMakkink : public Pet
 		  "reference_evapotranspiration", log);
     }
 
+  double dry () const
+  { return potential_evapotranspiration_dry; }
   double wet () const
-    { return potential_evapotranspiration; }
+  { return potential_evapotranspiration_wet; }
 
   // Create.
   PetMakkink (const BlockModel& al)

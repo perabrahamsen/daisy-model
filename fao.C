@@ -22,7 +22,6 @@
 #define BUILD_DLL
 
 #include "fao.h"
-#include "net_radiation.h"
 #include "assertion.h"
 #include "treelog.h"
 #include "mathlib.h"
@@ -133,25 +132,6 @@ FAO::CloudinessFactor_Humid (double Si, double rad)
   const double cfh = (a * std::min (1.0, x) + 1 - a);
   return cfh;
 }
-
-#if 0
-double
-FAO::RefNetRadiation (double Si, double rad,
-		      double Temp, double ea, Treelog& out)
-{
-  static std::auto_ptr<NetRadiation> net_radiation;
-  if (!net_radiation.get ())
-    {
-      net_radiation.reset (Librarian::build_free<NetRadiation>
-                           (out, NetRadiation::default_model (), "net_radiation"));
-    }
-
-  const double albedo = 0.23;
-  net_radiation->tick (CloudinessFactor_Arid (Si, rad),
-		       Temp, ea, Si, albedo, out);
-  return net_radiation->net_radiation ();
-}
-#endif
 
 double
 FAO::Makkink (double air_temperature /* dg C */,

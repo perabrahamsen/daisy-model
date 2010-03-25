@@ -65,7 +65,8 @@ Vegetation::output (Log& log) const
   output_value (ACRef_NIR (), "ACRef_NIR", log);
   output_value (ARExt (), "ARExt", log);
   output_value (ARExt (), "ARExt", log);
-  output_value (EpFactor (), "EpFactor", log);
+  output_value (EpFactorDry (), "EpFactorDry", log);
+  output_value (EpFactorWet (), "EpFactorWet", log);
   output_value (albedo (), "albedo", log);
   output_value (interception_capacity (), "interception_capacity", log);
   output_value (shadow_stomata_conductance (), 
@@ -114,7 +115,9 @@ Height in which there is a given LAI below in total canopy");
     frame.declare ("ARExt", Attribute::None (), Attribute::LogOnly,
                 "Radiation Extinction coefficient\
 \n(like ACExt, but for all radiation, not just light)");
-    frame.declare ("EpFactor", Attribute::None (), Attribute::LogOnly,
+    frame.declare ("EpFactorDry", Attribute::None (), Attribute::LogOnly,
+                "Reference to potential evapotranspiration");
+    frame.declare ("EpFactorWet", Attribute::None (), Attribute::LogOnly,
                 "Reference to potential evapotranspiration");
     frame.declare_fraction ("EpInterchange", Attribute::Const, "\
 Canopy adsorbtion fraction of unreached potential soil evaporation.");

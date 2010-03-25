@@ -73,7 +73,8 @@ public:
   virtual double NIRref () const = 0;
   virtual double EPext () const = 0;
   virtual double IntcpCap () const = 0; // Interception Capacity.
-  virtual double EpFac () const = 0; // Convertion to potential evapotransp.
+  virtual double EpFacDry () const = 0; // Convertion to potential evapotransp.
+  virtual double EpFacWet () const = 0; // Convertion to potential evapotransp.
   virtual double albedo () const;
   virtual void CanopyStructure () = 0;
   virtual double ActualWaterUptake (const Units&,

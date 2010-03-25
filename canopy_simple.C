@@ -27,8 +27,12 @@
 #include "librarian.h"
 
 double
-CanopySimple::EpFactor (double DS) const
-{ return EpFac * EpFacDS (DS); }
+CanopySimple::EpFactorDry (double DS) const
+{ return EpFacDry * EpFacDS (DS); }
+
+double
+CanopySimple::EpFactorWet (double DS) const
+{ return EpFacWet * EpFacDS (DS); }
 
 void
 CanopySimple::output (Log& log) const
@@ -69,7 +73,9 @@ See figure 4 in the cited paper.\n\
 \n\
 With a bare soil factor of 0.6 a combined Kc of 1.15 is reached at LAI=5.",
                    "kjaersgaard2008crop");
-
+  frame.declare ("EpFacWet", Attribute::None (), Attribute::OptionalConst, "\
+Potential evapotranspiration factor for wet surface.\n\
+By default this is identical to EpFac.");
   frame.declare ("EpFacDS", "DS", Attribute::None (), Attribute::Const,
 	      "DS dependent potential evapotranspiration factor.");
   frame.set ("EpFacDS", PLF::always_1 ());
@@ -100,7 +106,8 @@ CanopySimple::CanopySimple (const FrameSubmodel& vl)
     NIRext (vl.number ("NIRext")),
     EPext (vl.number ("EPext")),
     IntcpCap (vl.number ("IntcpCap")),
-    EpFac (vl.number ("EpFac")),
+    EpFacDry (vl.number ("EpFac")),
+    EpFacWet (vl.number ("EpFacWet", EpFacDry)),
     EpFacDS (vl.plf ("EpFacDS")),
     rs_max (vl.number ("rs_max")),
     rs_min (vl.number ("rs_min")),

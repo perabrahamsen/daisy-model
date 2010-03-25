@@ -33,12 +33,14 @@
 #include "librarian.h"
 #include "frame.h"
 #include "block_model.h"
+#include "net_radiation.h"
 #include <sstream>
 #include <memory>
 
 class PetFAO_PM : public Pet
 {
   // Parameters.
+  std::auto_ptr<NetRadiation> net_radiation;
   const bool use_wet;
   const double rb;
 
@@ -80,6 +82,9 @@ public:
   // Create & Destroy.
   PetFAO_PM (const BlockModel& al)
     : Pet (al),
+      net_radiation (Librarian::build_stock<NetRadiation> (al.metalib (),
+                                                           al.msg (),
+                                                           "brunt", name)),
       use_wet (al.flag ("use_wet")),
       rb (al.number ("rb"))
   { }
@@ -88,22 +93,28 @@ public:
 };
 
 void
-PetFAO_PM::tick (const Time&, const Weather& weather, const double Rn,
+PetFAO_PM::tick (const Time&, const Weather& weather, const double /* Rn */,
 		 const Vegetation& crops,
                  const Surface& surface, const Geometry& geo, const Soil& soil,
                  const SoilHeat& soil_heat, const SoilWater& soil_water,
-                 Treelog&)
+                 Treelog& msg)
 {
   // Weather.
   const double Temp = weather.air_temperature ();
   const double VaporPressure = weather.vapor_pressure ();
   const double U2 = weather.wind ();
   const double elevation = weather.elevation ();
+  const double Cloudiness = weather.cloudiness ();
   const double AtmPressure = FAO::AtmosphericPressure (elevation);
+  const double Si = weather.global_radiation ();
 
   // Ground heat flux.
   const double G = soil_heat.top_flux (geo, soil, soil_water);
 
+  // Reference net radiation.
+  const double ref_albedo = 0.23; // Reference crop.
+  net_radiation->tick (Cloudiness, Temp, VaporPressure, Si, ref_albedo, msg);
+  const double Rn = net_radiation->net_radiation ();
 
   reference_evapotranspiration_dry
     = FAO::RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2,
@@ -111,16 +122,16 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const double Rn,
     * 3600;
 
   potential_evapotranspiration_dry
-    = reference_to_potential (crops, surface, 
-                              reference_evapotranspiration_dry);
+    = reference_to_potential_dry (crops, surface, 
+                                  reference_evapotranspiration_dry);
 
   reference_evapotranspiration_wet
     = FAO::RefPenmanMonteithWet (Rn, G, Temp, VaporPressure, U2,
                                  AtmPressure, rb)
     * 3600;
   potential_evapotranspiration_wet
-     = reference_to_potential (crops, surface,
-                               reference_evapotranspiration_wet);
+     = reference_to_potential_wet (crops, surface,
+                                   reference_evapotranspiration_wet);
  }
 
  static struct PetFAO_PMSyntax : public DeclareModel

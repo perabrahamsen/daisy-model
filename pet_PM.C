@@ -31,11 +31,16 @@
 #include "log.h"
 #include "librarian.h"
 #include "frame.h"
+#include "net_radiation.h"
+#include "block_model.h"
 #include <sstream>
 #include <memory>
 
 class PetPM : public Pet
 {
+  std::auto_ptr<NetRadiation> net_radiation;
+  const double rb;
+
 public:
   // State.
   double reference_evapotranspiration_wet;
@@ -69,7 +74,11 @@ public:
 
   // Create & Destroy.
   PetPM (const BlockModel& al)
-    : Pet (al)
+    : Pet (al),
+      net_radiation (Librarian::build_stock<NetRadiation> (al.metalib (),
+                                                           al.msg (),
+                                                           "brunt", name)),
+      rb (al.number ("rb"))
     { }
   ~PetPM ()
     { }
@@ -81,7 +90,7 @@ PetPM::tick (const Time&, const Weather& weather, const double Rn,
 	     const Surface& surface, const Geometry& geo,
              const Soil& soil,
 	     const SoilHeat& soil_heat, const SoilWater& soil_water,
-	     Treelog&)
+	     Treelog& msg)
 {
   // Weather.
 
@@ -90,7 +99,8 @@ PetPM::tick (const Time&, const Weather& weather, const double Rn,
   const double U2 = weather.wind ();
   const double elevation = weather.elevation ();
   const double AtmPressure = FAO::AtmosphericPressure (elevation);
-
+  const double Cloudiness = weather.cloudiness ();
+  
   // Ground heat flux.
   const double G = soil_heat.top_flux (geo, soil, soil_water);
 
@@ -119,22 +129,30 @@ PetPM::tick (const Time&, const Weather& weather, const double Rn,
     }
   else
     {
+      const double Si = weather.global_radiation ();
+
+      // Use reference crop as fallback for bare soil.
+      const double ref_albedo = 0.23;
+      net_radiation->tick (Cloudiness, Temp, VaporPressure, Si, ref_albedo, 
+                           msg);
+      const double ref_Rn = net_radiation->net_radiation ();
+      
       reference_evapotranspiration_dry
-	= FAO::RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2,
+	= FAO::RefPenmanMonteith (ref_Rn, G, Temp, VaporPressure, U2,
 				  AtmPressure)
 	* 3600;
 
       potential_evapotranspiration_dry
-	= reference_to_potential (crops, surface,
-				  reference_evapotranspiration_dry);
+	= reference_to_potential_dry (crops, surface,
+                                      reference_evapotranspiration_dry);
 
       reference_evapotranspiration_wet
-	= FAO::RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2,
-				  AtmPressure)
+	= FAO::RefPenmanMonteithWet (ref_Rn, G, Temp, VaporPressure, U2,
+                                     AtmPressure, rb)
 	* 3600;
       potential_evapotranspiration_wet
-	= reference_to_potential (crops, surface,
-				  reference_evapotranspiration_wet);
+	= reference_to_potential_wet (crops, surface,
+                                      reference_evapotranspiration_wet);
     }
 }
 
@@ -146,6 +164,11 @@ static struct PetPMSyntax : public DeclareModel
     : DeclareModel (Pet::component, "PM",
 	       "Potential evopotranspiration using Penman-Monteith.")
   { }
-  void load_frame (Frame&) const
-  { }
+  void load_frame (Frame& frame) const
+  {
+     frame.declare ("rb", "s/m", Attribute::Const, 
+                    "Boundary layer resistance for wet surface.\n\
+used for bare soil only.");
+     frame.set ("rb", 20.0);
+  }
 } PetPM_syntax;

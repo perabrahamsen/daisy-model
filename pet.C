@@ -39,19 +39,26 @@ Pet::library_id () const
 }
 
 double
-Pet::reference_to_potential (const Vegetation& crops, 
-			     const Surface& surface,
-			     double ref)
+Pet::reference_to_potential_dry (const Vegetation& crops, 
+                                 const Surface& surface,
+                                 double ref)
 {
   const double cover = crops.cover ();
-  const double EpFactor = cover * crops.EpFactor ()
+  const double EpFactor = cover * crops.EpFactorDry ()
     + (1.0 - cover) * surface.EpFactor ();
   return EpFactor * std::max (0.0, ref);
 }
 
 double
-Pet::dry () const 
-{ return wet (); }
+Pet::reference_to_potential_wet (const Vegetation& crops, 
+                                 const Surface& surface,
+                                 double ref)
+{
+  const double cover = crops.cover ();
+  const double EpFactor = cover * crops.EpFactorWet ()
+    + (1.0 - cover) * surface.EpFactor ();
+  return EpFactor * std::max (0.0, ref);
+}
 
 void
 Pet::output (Log& log) const

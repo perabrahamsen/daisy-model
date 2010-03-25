@@ -32,7 +32,8 @@ struct PetHargreaves : public Pet
 {
   // State.
   double reference_evapotranspiration;
-  double potential_evapotranspiration;
+  double potential_evapotranspiration_dry;
+  double potential_evapotranspiration_wet;
 
   // Simulation.
   void tick (const Time& time, const Weather& weather, const double, const Vegetation& crops,
@@ -59,9 +60,12 @@ struct PetHargreaves : public Pet
       reference_evapotranspiration 
         = K_hs * (T_avg + 17.8) * sqrt (T_diff) * Ra;
 
-      potential_evapotranspiration 
-	= reference_to_potential (crops, surface, 
-				  reference_evapotranspiration);
+      potential_evapotranspiration_dry
+	= reference_to_potential_dry (crops, surface, 
+                                      reference_evapotranspiration);
+      potential_evapotranspiration_wet 
+	= reference_to_potential_wet (crops, surface, 
+                                      reference_evapotranspiration);
     }
 
   void output (Log& log) const
@@ -71,8 +75,10 @@ struct PetHargreaves : public Pet
 		  "reference_evapotranspiration", log);
     }
 
+  double dry () const
+  { return potential_evapotranspiration_dry; }
   double wet () const
-    { return potential_evapotranspiration; }
+  { return potential_evapotranspiration_wet; }
 
   // Create.
   PetHargreaves (const BlockModel& al)

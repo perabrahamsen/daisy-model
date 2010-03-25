@@ -52,14 +52,6 @@ namespace FAO
 				double rad /* [W/m2] */);
   double CloudinessFactor_Humid (double Si /* [W/m2] */, 
 				 double rad /* [W/m2] */);
-
-#if 0
-  double RefNetRadiation (double Si /* [W/m2] */, 
-			  double rad /* [W/m2] */,
-			  double Temp /* [dg C] */,
-			  double ea /* [Pa] */,
-			  Treelog&);// [W/m2]
-#endif
   double Makkink (double air_temperature /* [dg C] */,
 		  double global_radiation /* [W/m^2] */); /* [mm/h] */
 

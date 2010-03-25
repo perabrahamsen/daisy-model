@@ -125,6 +125,7 @@ NetRadiationParent::output (Log& log) const
 
 // Model classes.
 
+
 struct NetRadiationBrunt : public NetRadiationParent
 {
   const double a;

@@ -124,8 +124,10 @@ struct CropStandard : public Crop
   { return canopy.EPext; }
   double IntcpCap () const	// Interception Capacity.
   { return canopy.IntcpCap; }
-  double EpFac () const		// Convertion to potential evapotransp.
-  { return canopy.EpFactor (DS ()); }
+  double EpFacDry () const		// Convertion to potential evapotransp.
+  { return canopy.EpFactorDry (DS ()); }
+  double EpFacWet () const		// Convertion to potential evapotransp.
+  { return canopy.EpFactorWet (DS ()); }
   void CanopyStructure ()
   { canopy.CanopyStructure (development->DS); }
   double ActualWaterUptake (const Units& units, double Ept, 

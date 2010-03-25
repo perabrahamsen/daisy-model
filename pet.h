@@ -46,8 +46,10 @@ public:
 
   // Utilities.
 public:
-  static double reference_to_potential (const Vegetation&, const Surface&, 
-					double ref);
+  static double reference_to_potential_dry (const Vegetation&, const Surface&, 
+                                            double ref);
+  static double reference_to_potential_wet (const Vegetation&, const Surface&, 
+                                            double ref);
 
   // Simulation.
 public:
@@ -56,7 +58,7 @@ public:
                      const Soil&, const SoilHeat&, 
 		     const SoilWater&, Treelog&) = 0;
   virtual double wet () const = 0; // [mm/h]
-  virtual double dry () const; // [mm/h]
+  virtual double dry () const = 0; // [mm/h]
   virtual void output (Log&) const;
 
   // Create and Destroy.

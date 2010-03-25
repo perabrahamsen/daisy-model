@@ -114,8 +114,10 @@ struct VegetationPermanent : public Vegetation
   { return canopy.PARref; }
   double ARExt () const
   { return canopy.EPext; }
-  double EpFactor () const
-  { return canopy.EpFactor (1.0 /* arbitrary */); }
+  double EpFactorDry () const
+  { return canopy.EpFactorDry (1.0 /* arbitrary */); }
+  double EpFactorWet () const
+  { return canopy.EpFactorWet (1.0 /* arbitrary */); }
   double albedo () const
   { return albedo_; }
   double interception_capacity () const

@@ -73,7 +73,8 @@ public:
   virtual double ACExt_NIR () const = 0; // Canopy extinction coefficient of NIR
   virtual double ACRef_NIR () const = 0; // Canopy reflection coefficient of NIR
   virtual double ARExt () const = 0;	  // Radiation Extinction coefficient
-  virtual double EpFactor () const = 0;   // Reference to pot. evapotransp
+  virtual double EpFactorDry () const = 0;   // Reference to pot. evapotransp
+  virtual double EpFactorWet () const = 0;   // Reference to pot. evapotransp
   double EpInterchange () const;          // Soil to canopy exchange rate.
   virtual double albedo () const = 0;	  // Another reflection factor
   virtual double interception_capacity () const = 0;// Canopy water cap. [mm]

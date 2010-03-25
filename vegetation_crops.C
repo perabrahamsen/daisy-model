@@ -78,7 +78,8 @@ struct VegetationCrops : public Vegetation
   double ACRef_NIR_;		// Canopy reflection coefficient of NIR
   double ARExt_;		// Radiation Extinction coefficient
   // (like ACExt, but for all radiation, not just light).
-  double EpFactor_;		// Reference to potential evapotranspiration.
+  double EpFactorDry_;		// Reference to potential evapotranspiration.
+  double EpFactorWet_;		// Reference to potential evapotranspiration.
   double albedo_;		// Another reflection factor.
 
   // Water.
@@ -123,8 +124,10 @@ struct VegetationCrops : public Vegetation
   { return ACRef_NIR_; }
   double ARExt () const
   { return ARExt_; }
-  double EpFactor () const
-  { return EpFactor_; }
+  double EpFactorDry () const
+  { return EpFactorDry_; }
+  double EpFactorWet () const
+  { return EpFactorWet_; }
   double albedo () const
   { return albedo_; }
   double interception_capacity () const
@@ -557,7 +560,8 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
           ACExt_NIR_ = CanopyAverage (&Crop::NIRext);
 	  ACRef_NIR_ =  CanopyAverage (&Crop::NIRref);
 	  ARExt_ = CanopyAverage (&Crop::EPext);
-	  EpFactor_ = CanopyAverage (&Crop::EpFac);
+	  EpFactorDry_ = CanopyAverage (&Crop::EpFacDry);
+	  EpFactorWet_ = CanopyAverage (&Crop::EpFacWet);
 	  albedo_ = CanopyAverage (&Crop::albedo);
 	  interception_capacity_ = CanopySum (&Crop::IntcpCap);
 	  return;
@@ -572,7 +576,8 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
   ACExt_NIR_ = 0.0;
   ACRef_NIR_ = 0.0;
   ARExt_ = 0.0;
-  EpFactor_ = 0.0;
+  EpFactorDry_ = 0.0;
+  EpFactorWet_ = 0.0;
   albedo_ = 0.0;
   interception_capacity_ = 0.0;
 }
@@ -932,7 +937,8 @@ VegetationCrops::VegetationCrops (const BlockModel& al)
     ACExt_NIR_ (0.0),
     ACRef_NIR_ (0.0),
     ARExt_ (0.0),
-    EpFactor_ (0.0),
+    EpFactorDry_ (0.0),
+    EpFactorWet_ (0.0),
     albedo_ (0.0),
     interception_capacity_ (0.0),
     shadow_stomata_conductance_ (0.0),
