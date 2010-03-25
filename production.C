@@ -56,7 +56,7 @@ Production::remobilization (const double DS, const double dt)
 {
   if (DS < ReMobilDS)
     {
-      StemRes = 0.0;
+      StemRes = 0.0;            // [g DM/m^2]
       return 0.0;
     }
   else if (StemRes < 1.0e-9)
@@ -159,13 +159,14 @@ Production::tick (const double AirT, const double SoilT,
   CH2OPool += seed_CH2O;
 
   // Remobilization
-  const double ReMobil = remobilization (DS, dt);
-  const double CH2OReMobil = ReMobil * DM_to_C_factor (E_Stem) * 30.0/12.0;
-  const double ReMobilResp = CH2OReMobil - ReMobil;
+  const double ReMobil = remobilization (DS, dt); // [g DM/m^2/h]
+  const double CH2OReMobil                        // [g CH2O/m^2/h]
+    = ReMobil * DM_to_C_factor (E_Stem) * 30.0/12.0;
+  const double ReMobilResp = CH2OReMobil - ReMobil; // [g CH2O/m^2/h]
   // Note:  We used to have "CH2OPool += Remobil", but that does not
   // give C balance.  ReMobilResp was invented, and gets it's strange
   // value, to get the same result but with a mass balance.  
-  CH2OPool += CH2OReMobil * dt;
+  CH2OPool += CH2OReMobil * dt; // [g CH2O/m^2]
 
   // Release of root reserves
   bool ReleaseOfRootReserves = false;
@@ -226,8 +227,7 @@ Production::tick (const double AirT, const double SoilT,
     {
       // We have enough assimilate to cover respiration.
       CH2OPool -= RM * dt;
-      const double AssG         // [g CH2O/m^2/h]
-        = std::min (1.0, dt * CH2OReleaseRate) * CH2OPool;
+      const double AssG = CH2OReleaseRate * CH2OPool;  // [g CH2O/m^2/h]
       CH2OPool -= AssG * dt;
 
       // Partition growth.
@@ -241,10 +241,10 @@ Production::tick (const double AirT, const double SoilT,
           f_Root = 0.0;
         }
 
-      IncWLeaf = E_Leaf * f_Leaf * AssG;
-      IncWStem = E_Stem * f_Stem * AssG - ReMobil;
-      IncWSOrg = E_SOrg * f_SOrg * AssG;
-      IncWRoot = E_Root * f_Root * AssG;
+      IncWLeaf = E_Leaf * f_Leaf * AssG; // [g DM/m^2/h]
+      IncWStem = E_Stem * f_Stem * AssG - ReMobil; // [g DM/m^2/h]
+      IncWSOrg = E_SOrg * f_SOrg * AssG; // [g DM/m^2/h]
+      IncWRoot = E_Root * f_Root * AssG; // [g DM/m^2/h]
 
       GrowthRespiration         // [g CH2O/m^2/h]
         = LeafGrowthRespCoef * f_Leaf * AssG

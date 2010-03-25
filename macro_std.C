@@ -283,18 +283,18 @@ MacroStandard::tick (const Geometry1D& geo,
   // Check that we got all the extra water stored somewhere.
   if (std::isnormal (extra_water))
     {
-      surface.accept_top (extra_water * dt, geo, 0U, dt, msg);
+      surface.accept_top (extra_water, geo, 0U, dt, msg);
       surface.update_pond_average (geo);
     }
 
   // Check that the sink terms add up.
-  if (fabs (geo.total_surface (S_p) - q_top - extra_water * dt) > 1.0e-11)
+  if (fabs (geo.total_surface (S_p) - q_top * dt - extra_water) > 1.0e-11)
     {
       std::ostringstream tmp;
       tmp << __FILE__ << ":" <<  __LINE__
           << ": BUG: Total S_p = " << geo.total_surface (S_p) 
           << ", q_top = " 
-          << q_top << ", extra_water = " << extra_water;
+          << q_top << ", extra_water = " << extra_water << ", dt = " << dt;
       msg.error (tmp.str ());
     }
 }

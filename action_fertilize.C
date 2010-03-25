@@ -328,19 +328,19 @@ ActionFertilizeSurface::doIt (Daisy& daisy, const Scope&, Treelog& msg)
   if (to < from)
     {
       daisy.field->fertilize (daisy.metalib, *am, from, to, 
-                              daisy.time, daisy.dt, msg);
+                              daisy.time, daisy.dt (), msg);
       if (water > 0.0)
         daisy.field->irrigate_subsoil (water,
                                        IM (units.get_unit (IM::solute_unit ())),
-                                       from, to, daisy.dt, msg);
+                                       from, to, daisy.dt (), msg);
     }
   else
     {
-      daisy.field->fertilize (daisy.metalib, *am, daisy.time, daisy.dt, msg);
+      daisy.field->fertilize (daisy.metalib, *am, daisy.time, daisy.dt (), msg);
       if (water > 0.0)
         daisy.field->irrigate_surface (water, 
                                        IM (units.get_unit (IM::solute_unit ())),
-                                       daisy.dt, msg);
+                                       daisy.dt (), msg);
     }
 }
 
@@ -414,12 +414,12 @@ ActionFertilizeIncorporate::doIt (Daisy& daisy, const Scope&, Treelog& msg)
   common_doIt (daisy, water, msg);
 
   daisy.field->fertilize (daisy.metalib, *am, *volume,
-                          daisy.time, daisy.dt, msg);
+                          daisy.time, daisy.dt (), msg);
   if (water > 0.0)
     daisy.field->irrigate_subsoil (water,
                                    IM (daisy.units ()
                                        .get_unit (IM::solute_unit ())),
-                                   *volume, daisy.dt, msg);
+                                   *volume, daisy.dt (), msg);
 }
 
 static struct ActionFertilizeIncorporateSyntax : public DeclareModel

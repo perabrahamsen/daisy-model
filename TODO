@@ -2,6 +2,8 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Variable tidsskridt
 
+** Management skal være uafhængig af tidsskridt.
+
 ** Omsætning skal være uafhængig af tidsskridt.
 
 ** Movement skal bestemme tidsskridt fra S termer.

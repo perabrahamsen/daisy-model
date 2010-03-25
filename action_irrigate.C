@@ -110,7 +110,7 @@ struct ActionIrrigate : public Action
 			  
         msg.message (tmp.str ());      
       }
-    const double dt = daisy.dt;
+    const double dt = daisy.dt ();
     double this_flux = flux;
     if (remaining_time < dt * 1.001)
       {
@@ -124,13 +124,13 @@ struct ActionIrrigate : public Action
       remaining_time -= dt;
     daisy_assert (std::isfinite (this_flux));
     daisy_assert (this_flux >= 0.0);
-    irrigate (*daisy.field, this_flux, temp, sm, daisy.dt, msg);
+    irrigate (*daisy.field, this_flux, temp, sm, daisy.dt (), msg);
   }
 
   bool done (const Daisy& daisy, const Scope&, Treelog&) const
   {
     daisy_assert (activated);
-    return remaining_time < daisy.dt * 0.0001; 
+    return remaining_time < daisy.dt () * 0.0001; 
   }
 
   ActionIrrigate (const BlockModel& al)

@@ -56,6 +56,10 @@ const Units&
 Daisy::units () const
 { return metalib.units (); }
 
+double
+Daisy::dt () const
+{ return current_dt; }
+
 void 
 Daisy::attach_ui (Run* run, const std::vector<Log*>& logs)
 { 
@@ -128,12 +132,12 @@ Daisy::tick_before (Treelog& msg)
 
 void
 Daisy::tick_columns (Treelog& msg)
-{ field->tick_all (metalib, time, dt, 
+{ field->tick_all (metalib, time, dt (), 
                    weather.get (), *extern_scope, msg); }
 
 void
 Daisy::tick_column (const size_t col, Treelog& msg)
-{ field->tick_one (metalib, col, time, dt,
+{ field->tick_one (metalib, col, time, dt (),
                    weather.get (), *extern_scope, msg); }
 
 void
@@ -170,6 +174,7 @@ Daisy::tick_after (Treelog& msg)
 void
 Daisy::output (Log& log) const
 {
+  output_value (current_dt, "dt", log);
   output_submodule (*field, "column", log);
   if (weather.get ())
     output_derived (weather, "weather", log);
@@ -202,11 +207,11 @@ Daisy::check (Treelog& msg)
   bool ok = true;
   const Scope& scope = extern_scope ? *extern_scope : Scope::null ();
 
-  if (!approximate (dt, 1.0))
+  if (!approximate (max_dt, 1.0))
     {
       std::ostringstream tmp;
       tmp << "Daisy only works with a timestep of 1 hour, you specified " 
-          << dt << " hours";
+          << max_dt << " hours";
       msg.warning (tmp.str ());
     }
 
@@ -256,7 +261,8 @@ Daisy::Daisy (const BlockModel& al)
     timestep (al.check ("timestep") 
               ? submodel_value<Timestep> (al, "timestep")
               : Timestep::hour ()),
-    dt (timestep.total_hours ()),
+    max_dt (timestep.total_hours ()),
+    current_dt (max_dt),
     stop (al.check ("stop")
 	  ? Time (al.submodel ("stop")) 
 	  : Time (9999, 1, 1, 1)),
@@ -299,6 +305,8 @@ the simulation.");
 The default value is 1 hour, anything else is unlikely to work.",
                         Timestep::load_syntax);
   frame.set_check ("timestep", Timestep::positive ());
+  frame.declare ("dt", "h", Attribute::LogOnly, "\
+Current timestep used by simulation.");
   frame.declare_submodule ("stop", Attribute::OptionalConst,
 			"Latest time where the simulation stops.\n\
 By default, the simulation will run until the manager request it to stop.",

@@ -173,7 +173,7 @@ struct ActionExternFertigation : public Action
   void doIt (Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   { 
     Field& field = *daisy.field;
-    const double dt = daisy.dt;
+    const double dt = daisy.dt ();
 
     daisy_assert (extern_scope);
     ScopeMulti multi (*extern_scope, parent_scope);
@@ -391,7 +391,7 @@ struct ActionExternSubsoil : public Action
     if (flux < 1e-100)
       return;
 
-    daisy.field->irrigate_subsoil (flux, sm, *volume, daisy.dt, msg); 
+    daisy.field->irrigate_subsoil (flux, sm, *volume, daisy.dt (), msg); 
   }
 
   bool done (const Daisy&, const Scope&, Treelog&) const

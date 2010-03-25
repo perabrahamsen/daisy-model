@@ -130,7 +130,7 @@ ReactionDenit::tick_soil (const Units&, const Geometry& geo,
       const double rate_fast = w_factor_fast * pot_fast;
 
       const double M 
-        = std::min (rate, K * NO3) + std::min (rate_fast, K_fast * NO3);
+        = (std::min (rate, K * NO3) + std::min (rate_fast, K_fast * NO3)) * dt;
       if (redox_height <= 0 && height < redox_height)
         {
           converted[i] = NO3 / dt;

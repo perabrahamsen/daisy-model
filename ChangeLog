@@ -1,3 +1,9 @@
+2010-03-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* production.C, column_std.C, mactrans_std.C, macro_std.C (tick):
+	Handle dt != 1.0.
+	* reaction_denit.C (tick_soil): Ditto.
+
 2010-03-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* select.C, select.h (multi): New parameter.

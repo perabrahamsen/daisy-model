@@ -42,7 +42,7 @@ struct ActionSpray : public Action
     std::ostringstream tmp;
     tmp << "Spraying " << amount << " g " << chemical << "/ha";
     msg.message (tmp.str ());
-    daisy.field->spray (chemical, amount, daisy.dt, msg); 
+    daisy.field->spray (chemical, amount, daisy.dt (), msg); 
   }
 
   void tick (const Daisy&, const Scope&, Treelog&)

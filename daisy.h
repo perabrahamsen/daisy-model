@@ -66,7 +66,11 @@ private:
 public:
   Time time;
   const Timestep timestep;
-  const double dt;
+private:
+  const double max_dt;
+  double current_dt;
+public:
+  double dt () const;
 private:
   const Time stop;
   int duration;

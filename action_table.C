@@ -176,7 +176,8 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
           IM im = AM::get_IM (metalib, u_mg_per_square_m, fert);
 	  daisy_assert (std::isnormal (value));
 	  im.multiply_assign (Scalar (1.0 / value, u_per_mm), u_ppm);
-          daisy.field->irrigate_subsoil (value, im, -5.0, -25.0, daisy.dt, msg);
+          daisy.field->irrigate_subsoil (value, im, -5.0, -25.0, 
+                                         daisy.dt (), msg);
           tmp << "Fertigating " << value << " mm, with";
 	  for (IM::const_iterator i = im.begin (); i != im.end (); i++)
 	    {
@@ -210,9 +211,10 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
             tmp << "Fertilizing " << fert.type_name ();
           msg.message (tmp.str ());
           daisy.field->fertilize (daisy.metalib, fert, 
-                                  daisy.time, daisy.dt, msg);
+                                  daisy.time, daisy.dt (), msg);
           if (water > 0.0)
-            daisy.field->irrigate_surface (water, IM (u_solute), daisy.dt, msg);
+            daisy.field->irrigate_surface (water, IM (u_solute),
+                                           daisy.dt (), msg);
         }
     }
   else if (irrigate_events.find (daisy.time) != irrigate_events.end ())
@@ -220,7 +222,7 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
       const double value = irrigate_events[daisy.time];
       std::ostringstream tmp;
       IM im;
-      daisy.field->irrigate_overhead (value, im, daisy.dt, msg); 
+      daisy.field->irrigate_overhead (value, im, daisy.dt (), msg); 
       tmp << "Irrigating " << value << " mm";
       msg.message (tmp.str ());
     }

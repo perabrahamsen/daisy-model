@@ -64,19 +64,19 @@ MactransStandard::tick (const Geometry1D& geo, const SoilWater& soil_water,
 			std::vector<double>& J_p, const double dt, 
                         Treelog& out)
 { 
-  double max_delta_matter = 0.0; // [g/cm^2]
+  double max_delta_matter = 0.0; // [g/cm^2/h]
 
   for (size_t i = 0; i < geo.cell_size (); i++)
     {
       const double dz = geo.dz (i);
 
       // Amount of water entering this layer through macropores.
-      const double water_in_above = -soil_water.q_tertiary (i); // [cm]
-      const double water_out_below = -soil_water.q_tertiary (i+1); // [cm]
-      const double delta_water = water_in_above - water_out_below; // [cm]
+      const double water_in_above = -soil_water.q_tertiary (i); // [cm/h]
+      const double water_out_below = -soil_water.q_tertiary (i+1); // [cm/h]
+      const double delta_water = water_in_above - water_out_below; // [cm/h]
       
       // Amount of matter entering this layer through macropores.
-      const double matter_in_above = -J_p[i]; // [g/cm^2]
+      const double matter_in_above = -J_p[i]; // [g/cm^2/h]
       if (matter_in_above < 0.0)
         {
           std::ostringstream tmp;
@@ -85,7 +85,7 @@ MactransStandard::tick (const Geometry1D& geo, const SoilWater& soil_water,
                  << " [g/ha/h].  Strange";
           out.warning (tmp.str ());
         }
-      double delta_matter;	// [g/cm^2]
+      double delta_matter;	// [g/cm^2/h]
 
       if (water_out_below < 1.0e-60)
 	{
@@ -97,7 +97,7 @@ MactransStandard::tick (const Geometry1D& geo, const SoilWater& soil_water,
 	  // More is going out below of the pore than comming in above.  
 	  // Water enter here from the matrix with the local concentration.
 	  delta_matter = std::min (-C[i] * delta_water,
-                                   (M[i] + S_m[i] * dt) * dz - 1e-16);
+                                   (M[i] / dt + S_m[i]) * dz - 1e-16);
 	  if (delta_matter < 0.0)
 	    delta_matter = 0.0;
 	}
@@ -156,14 +156,14 @@ MactransStandard::tick (const Geometry1D& geo, const SoilWater& soil_water,
 	  // Everything go to the layer.
 	  J_p[i+1] = 0.0;
 	  // daisy_assert (matter_in_above > 0.0);
-	  S_p[i] = matter_in_above / dz / dt;
+	  S_p[i] = matter_in_above / dz;
 	}
       else
 	{
 	  // We split between layer and bottom.
 	  J_p[i+1] = -(matter_in_above + delta_matter);
 	  // daisy_assert (J_p[i+1] < 0.0);
-	  S_p[i] = -delta_matter / dz / dt;
+	  S_p[i] = -delta_matter / dz;
 	}
       S_m[i] += S_p[i];
     }

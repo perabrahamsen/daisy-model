@@ -656,6 +656,26 @@ ColumnStandard::tick (const Metalib& metalib, const Time& time, const double dt,
                       const Weather* global_weather, const Scope& parent_scope,
                       Treelog& msg)
 {
+  // Put on timestep on management results for output.
+  harvest_DM /= dt;
+  harvest_N /= dt;
+  harvest_C /= dt;
+  residuals_DM /= dt;
+  residuals_N_top /= dt;
+  residuals_C_top /= dt;
+  for (size_t c = 0; c < residuals_N_soil.size (); c++)
+    residuals_N_soil[c] /= dt;
+  for (size_t c = 0; c < residuals_C_soil.size (); c++)
+    residuals_C_soil[c] /= dt;
+
+#if 0
+  seed_N = 0.0;
+  seed_C = 0.0;
+  applied_DM = 0.0;
+  first_year_utilization = 0.0;
+#endif
+
+  // Scope.
   daisy_assert (extern_scope);
   ScopeMulti scope (*extern_scope, parent_scope);
 
