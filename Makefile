@@ -224,16 +224,17 @@ ifeq ($(COMPILER),gcc)
 #		          -I/home/mingw/include -L/home/mingw/lib
 		DEBUG = -g
 	endif
-	WARNING = -Wall \
-		  -Woverloaded-virtual \
-		  -Wundef -Wpointer-arith -Wwrite-strings \
+
+	WAR4    = -Wlogical-op -Wstrict-null-sentinel -Wvariadic-macros -Wvla \
+		  -Wmissing-declarations -Wfloat-equal 
+	WAR3	= -Wno-uninitialized
+	WARNING = -Wall -Wextra $(WAR3) \
+		  -Woverloaded-virtual -Wundef -Wpointer-arith -Wwrite-strings \
 		  -Wcast-qual -Wcast-align -Wmissing-format-attribute \
-		  -Wold-style-cast \
-                  -Wextra -Wformat=2 -Winit-self \
-		  -Wlogical-op -Wstrict-null-sentinel -Wfloat-equal \
-		  -Wmissing-declarations  -Wsign-promo \
-		  -Wredundant-decls -Wvariadic-macros -Wvla \
-		  -Wno-unused-parameter -Wno-sign-compare \
+		  -Wold-style-cast -Wformat=2 -Winit-self \
+		  -Wsign-promo -Wredundant-decls \
+		  -Wno-unused-parameter -Wno-sign-compare 
+
 
 # I use these a lot:
 #   -Wconversion -Wsign-compare -Wno-unused-parameter

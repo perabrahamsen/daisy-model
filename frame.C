@@ -1634,7 +1634,8 @@ Frame::set_cited (symbol key, double value, symbol desc,
 }
 
 Frame::Frame (const Frame& old)
-  : impl (new Implementation (*old.impl))
+  : WScope (),
+    impl (new Implementation (*old.impl))
 { }
 
 Frame::Frame ()

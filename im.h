@@ -33,7 +33,7 @@ class Frame;
 class BlockModel;
 class Unit;
 
-class Scalar : public boost::noncopyable
+class Scalar 
 {
   // Content.
 private:
@@ -49,7 +49,13 @@ public:
   { return val; }
 
   // Create and Destroy.
+private:
+  const Scalar& operator= (const Scalar&);
 public:
+  Scalar (const Scalar& old)
+    : unit_ (old.unit_),
+      val (old.val)
+  { }
   Scalar (const double v, const Unit& u)
     : unit_ (u),
       val (v)

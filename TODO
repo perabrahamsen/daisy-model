@@ -18,6 +18,14 @@ Mindsker fejlen...
 
 ** convection domain 2?
 
+* Optimize
+
+** reserver space for coordinate matrix
+
+Måske også for andre?  Og mellem tidsskridt?  Nulstil efter brug?
+
+Hvis vi sætter hvert element til 0 bør strukturen bevares.
+
 * Standard log
 
 ** Field water skal have "interne" strømme med

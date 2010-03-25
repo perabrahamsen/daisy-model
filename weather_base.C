@@ -100,7 +100,7 @@ WeatherBase::tick_after (const Time& time, Treelog&)
   const Unit& u_precip = units.get_unit (Units::mm_per_h ());
   const IM dry (u_flux, DryDeposit);
   const IM solute (u_solute, WetDeposit);
-  const IM wet = solute.multiply (Scalar (Precipitation, u_precip), u_flux);
+  const IM wet (solute.multiply (Scalar (Precipitation, u_precip), u_flux));
   deposit_ = dry + wet;
 }
 

@@ -73,7 +73,7 @@ void
 LogSelect::done (const std::vector<Time::component_t>& time_columns,
 		 const Daisy& daisy, Treelog&)
 { 
-  const double dt = daisy.dt;
+  const double dt = daisy.dt ();
   for (std::vector<Select*>::const_iterator i = entries.begin (); 
        i < entries.end (); 
        i++)
