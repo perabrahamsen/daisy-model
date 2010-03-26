@@ -228,7 +228,7 @@ ifeq ($(COMPILER),gcc)
 	WAR4    = -Wlogical-op -Wstrict-null-sentinel -Wvariadic-macros -Wvla \
 		  -Wmissing-declarations -Wfloat-equal 
 	WAR3	= -Wno-uninitialized
-	WARNING = -Wall -Wextra $(WAR4) \
+	WARNING = -Wall -Wextra $(WAR3) \
 		  -Woverloaded-virtual -Wundef -Wpointer-arith -Wwrite-strings \
 		  -Wcast-qual -Wcast-align -Wmissing-format-attribute \
 		  -Wold-style-cast -Wformat=2 -Winit-self \
