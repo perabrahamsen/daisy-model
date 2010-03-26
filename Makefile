@@ -67,8 +67,8 @@ USE_OPTIMIZE = true
 
 # Set USE_PROFILE if you want to profile the executable
 #
-#USE_PROFILE = true
-USE_PROFILE = false
+USE_PROFILE = true
+#USE_PROFILE = false
 
 # Set COMPILER according to which compiler you use.
 #	sun		Use the unbundled sun compiler.
@@ -228,7 +228,7 @@ ifeq ($(COMPILER),gcc)
 	WAR4    = -Wlogical-op -Wstrict-null-sentinel -Wvariadic-macros -Wvla \
 		  -Wmissing-declarations -Wfloat-equal 
 	WAR3	= -Wno-uninitialized
-	WARNING = -Wall -Wextra $(WAR3) \
+	WARNING = -Wall -Wextra $(WAR4) \
 		  -Woverloaded-virtual -Wundef -Wpointer-arith -Wwrite-strings \
 		  -Wcast-qual -Wcast-align -Wmissing-format-attribute \
 		  -Wold-style-cast -Wformat=2 -Winit-self \

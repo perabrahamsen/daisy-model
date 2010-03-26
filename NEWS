@@ -10,6 +10,28 @@ release.
 
 ** Many speedups.
 
+** The default weather model will now distribute daily rain better.
+
+Rain intensity below the value of 'minimum_precipitation' parameter
+will be applied at the beginning of the day at the rate specified by
+the parameter, followed dry weather for the rest of the day.
+
+The default value (0.83 mm/h) is the average hourly rain intensity at
+the Taastrup agrometeorological station.
+
+The effect of is that transpiration and soil evaporation increase, and
+evaporation from ponded and intercepted water decreases.
+
+** The FAO_PM reference evapotranpiration model used actual albedo.
+
+Not it used the reference value.
+
+** New EpFacWet canopy parameter.
+
+Specifies K_c for wet surface.  By default it is identical to EpFac.
+
+** The FAO_PM model will now use wet surface reference.
+
 ** New biopores tertiary model parameter 'active_msg'
 
 Set this to 'cell' (old style), 'range' (new default) or 'none' to control
@@ -48,14 +70,6 @@ transport.
 ** Fix gnuplot output for gnuplot 4.4.
 
 ** Chemicals may now decompose when part of the litter pack.
-
-** The FAO_PM reference evapotranpiration model used actual albedo.
-
-Not it used the reference value.
-
-** New EpFacWet canopy parameter.
-
-Specifies K_c for wet surface.  By default it is identical to EpFac.
 
 ** Bug fixes.
 

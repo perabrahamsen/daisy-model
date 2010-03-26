@@ -69,7 +69,10 @@ public:
   // Simulation.
   void output (Log&) const;
   void update_pond_average (const Geometry& geo);
-  void tick (Treelog&, double PotSoilEvaporation, double flux_in /* [mm/h] */,
+  void tick (Treelog&, 
+             double PotSoilEvaporationWet, 
+             double PotSoilEvaporationDry, 
+             double flux_in /* [mm/h] */,
              double temp /* [dg C] */, const Geometry& geo,
              const Soil&, const SoilWater&,
              double soil_T /* [dg C] */, double dt /* [h] */);

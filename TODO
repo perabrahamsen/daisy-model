@@ -4,6 +4,16 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** Management skal være uafhængig af tidsskridt.
 
+** Fjern Daisy::dt
+
+** Split "tick" op i en uden dt, og en med
+
+tick_turnover, tick_movement
+
+** Ny parameter variable_timestep (default false)
+
+** En funktion til at finde dt
+
 ** Omsætning skal være uafhængig af tidsskridt.
 
 ** Movement skal bestemme tidsskridt fra S termer.

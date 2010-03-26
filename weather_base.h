@@ -89,6 +89,7 @@ public:
   bool has_min_max_temperature () const;
   bool has_diffuse_radiation () const;
   bool has_relative_humidity () const;
+  double timestep () const;
 
   // Light distribution.
 public:

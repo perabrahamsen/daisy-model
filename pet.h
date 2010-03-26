@@ -62,6 +62,10 @@ public:
   virtual void output (Log&) const;
 
   // Create and Destroy.
+public:
+  virtual bool check (const Weather&, Treelog&) const;
+  virtual void initialize (const Weather&);
+
 protected:
   Pet (const BlockModel&);
 public:

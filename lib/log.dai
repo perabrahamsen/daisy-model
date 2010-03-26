@@ -276,18 +276,27 @@ flow to drain pipes, and subsoil irrigation."
 (defsummary "Evapotranspiration" simple
   "Summary of evapotranspiration."
   (precision 1)
-  (fetch ("RefEvapotranspiration"
+  (fetch ("Reference evapotranspiration (dry)"
           (name "Evapotranspiration, reference, dry"))
-         ("Potential Evapotranspiration"
+         ("Reference evapotranspiration (wet)"
+          (name "Evapotranspiration, reference, wet"))
+         ("Potential evapotranspiration (dry)"
+          (name "Evapotranspiration, potential, dry"))
+         ("Potential evapotranspiration (wet)"
           (name "Evapotranspiration, potential, wet"))
+         ("Potential evapotranspiration"
+          (name "Evapotranspiration, potential"))
          ("Actual Evapotranspiration"
           (name "Evapotranspiration, actual"))
+         ("Potential transpiration"
+          (name "Transpiration, potential"))
+         ("Actual transpiration" 
+          (name "Transpiration, actual"))
          ("Evaporation from snow")
          ("Evaporation from canopy")
          ("Evaporation from litter")
          ("Evaporation from ponded water")
-         ("Evaporation of soil water")
-         ("Actual transpiration" (name "Transpiration")))
+         ("Evaporation of soil water"))
   (print_sum false))
 
 (deflog "Surface Water Balance" column
@@ -303,25 +312,45 @@ flow to drain pipes, and subsoil irrigation."
                    (handle sum)
                    (dimension "mm/&"))
            (number (path column "${column}" Bioclimate "*" irrigation_overhead)
-                   (tag "Overhead Irrigation")
+                   (tag "Overhead irrigation")
                    (handle sum)
                    (dimension "mm/&"))
            (number (path column "${column}" Bioclimate "*" irrigation_surface)
-                   (tag "Surface Irrigation")
+                   (tag "Surface irrigation")
                   (handle sum)
                    (dimension "mm/&"))
-           (number (path column "${column}" Bioclimate "*" pet "*" reference_evapotranspiration)
-                   (tag "RefEvapotranspiration")
+           (number (path column "${column}" Bioclimate default pet component
+                         reference_evapotranspiration)
+                   (tag "Reference evapotranspiration (dry)")
                    (handle sum)
-                   (dimension "mm/&"))
+                   (spec pet component reference_evapotranspiration))
+           (number (path column "${column}" Bioclimate default pet component
+                         reference_evapotranspiration_wet)
+                   (tag "Reference evapotranspiration (wet)")
+                   (handle sum)
+                   (spec pet FAO_PM reference_evapotranspiration_wet))
+           (number (path column "${column}" Bioclimate default pet component
+                         wet)
+                   (tag "Potential evapotranspiration (wet)")
+                   (handle sum)
+                   (spec pet component wet))
+           (number (path column "${column}" Bioclimate default pet component
+                         dry)
+                   (tag "Potential evapotranspiration (dry)")
+                   (handle sum)
+                   (spec pet component dry))
            (number (path column "${column}" Bioclimate "*" total_ep)
-                   (tag "Potential Evapotranspiration")            
+                   (tag "Potential evapotranspiration")            
                    (handle sum)
                    (dimension "mm/&"))
            (number (path column "${column}" Bioclimate "*" total_ea)
                    (tag "Actual Evapotranspiration")            
                    (handle sum)
                    (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" crop_ep)
+                   (tag "Potential transpiration")            
+                   (handle sum)
+                   (spec bioclimate default crop_ep))
            (number (path column "${column}" Bioclimate "*" crop_ea)
                    (tag "Actual transpiration")            
                    (handle sum)
@@ -347,27 +376,27 @@ flow to drain pipes, and subsoil irrigation."
                    (handle sum)
                    (dimension "mm/&"))
            (flux_top (path column "${column}" SoilWater q)
-                     (tag "Matrix Infiltration")
+                     (tag "Matrix infiltration")
                      (handle sum)
                      (dimension "mm/&")
                      (factor -10))      ;cm -> mm
            (flux_top (path column "${column}" SoilWater q_p)
-                     (tag "Macropore Infiltration")
+                     (tag "Macropore infiltration")
                      (handle sum)
                      (dimension "mm/&")
                      (factor -10))      ;cm -> mm
            (number (path column "${column}" Surface pond)
-                   (tag "Surface Ponding")            
+                   (tag "Surface ponding")            
                    (dimension "mm"))
            (number (path column "${column}" Surface runoff)
-                   (tag "Surface Runoff")            
+                   (tag "Surface runoff")            
                    (handle sum)
                    (dimension "mm/&"))
            (number (path column "${column}" Bioclimate "*" canopy_water_storage)
-                   (tag "Interception Storage")            
+                   (tag "Interception storage")            
                    (dimension "mm"))
            (number (path column "${column}" Bioclimate "*" Snow Ssnow)
-                   (tag "Snow Storage")
+                   (tag "Snow storage")
                    (dimension "mm"))
            (number (path column "${column}" Bioclimate "*" production_stress))))
 

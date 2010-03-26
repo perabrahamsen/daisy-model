@@ -45,11 +45,13 @@ class PetFAO_PM : public Pet
   const double rb;
 
 public:
-  // State.
+  // LogOnly.
   double reference_evapotranspiration_wet;
   double reference_evapotranspiration_dry;
   double potential_evapotranspiration_wet;
   double potential_evapotranspiration_dry;
+  double Rn;
+  double G;
 
   // Simulation.
   void tick (const Time&, const Weather& weather, const double Rn,
@@ -66,6 +68,9 @@ public:
     output_variable (reference_evapotranspiration_wet, log);
     output_variable (potential_evapotranspiration_dry, log);
     output_variable (potential_evapotranspiration_wet, log);
+    if (Rn >= 0.0)
+      output_variable (Rn, log);
+    output_variable (G, log);
   }
 
   double wet () const
@@ -80,13 +85,22 @@ public:
   { return potential_evapotranspiration_dry; }
 
   // Create & Destroy.
+  bool check (const Weather& weather, Treelog& msg) const
+  {
+    bool ok = true;
+    return ok;
+  }
+  void initialize (const Weather& weather)
+  { }
+
   PetFAO_PM (const BlockModel& al)
     : Pet (al),
       net_radiation (Librarian::build_stock<NetRadiation> (al.metalib (),
                                                            al.msg (),
                                                            "brunt", name)),
       use_wet (al.flag ("use_wet")),
-      rb (al.number ("rb"))
+      rb (al.number ("rb")),
+      Rn (-42.42e42)
   { }
   ~PetFAO_PM ()
   { }
@@ -103,18 +117,17 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const double /* Rn */,
   const double Temp = weather.air_temperature ();
   const double VaporPressure = weather.vapor_pressure ();
   const double U2 = weather.wind ();
-  const double elevation = weather.elevation ();
   const double Cloudiness = weather.cloudiness ();
-  const double AtmPressure = FAO::AtmosphericPressure (elevation);
+  const double AtmPressure = weather.air_pressure ();
   const double Si = weather.global_radiation ();
 
   // Ground heat flux.
-  const double G = soil_heat.top_flux (geo, soil, soil_water);
+  G = soil_heat.top_flux (geo, soil, soil_water);
 
   // Reference net radiation.
   const double ref_albedo = 0.23; // Reference crop.
   net_radiation->tick (Cloudiness, Temp, VaporPressure, Si, ref_albedo, msg);
-  const double Rn = net_radiation->net_radiation ();
+  Rn = net_radiation->net_radiation ();
 
   reference_evapotranspiration_dry
     = FAO::RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2,
@@ -154,11 +167,17 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const double /* Rn */,
                     "mm/h", Attribute::LogOnly, 
                     "Potential evapotranspiration for a dry system.");
      frame.declare_boolean ("use_wet", Attribute::Const,
-                            "Use PM for wet surface.");
-     frame.set ("use_wet", false);
+                            "Use PM for wet surface.\n\
+\n\
+This flag is for compatibility with older version of Daisy, which always\n\
+used dry PM.");
      frame.declare ("rb", "s/m", Attribute::Const, 
                     "Boundary layer resistance for wet surface.");
      frame.set ("rb", 20.0);
+     frame.declare ("Rn", "W/m^2", Attribute::LogOnly, 
+                    "Reference net radiation.");
+     frame.declare ("G", "W/m^2", Attribute::LogOnly, 
+                    "Soil heat flux.");
    }
 } PetFAO_PM_syntax;
 

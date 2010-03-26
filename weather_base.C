@@ -124,6 +124,7 @@ WeatherBase::output (Log& log) const
   output_value (cloudiness (), "cloudiness", log);
   output_value (daily_cloudiness (), "daily_cloudiness", log);
   output_value (vapor_pressure (), "vapor_pressure", log);
+  output_value (air_pressure (), "air_pressure", log);
   output_value (diffuse_radiation (), "diffuse_radiation", log);
   output_value (relative_humidity (), "relative_humidity", log);
   output_value (wind (), "wind", log);
@@ -181,6 +182,10 @@ WeatherBase::has_relative_humidity () const
 bool 
 WeatherBase::has_wind () const
 { return false; }
+
+double 
+WeatherBase::timestep () const
+{ return -42.42e42; }
 
 bool 
 WeatherBase::has_min_max_temperature () const
@@ -380,6 +385,7 @@ This is not a model, but a list of parameters shared by all weather models.")
     frame.declare_fraction ("daily_cloudiness", Attribute::LogOnly,
                 "Fraction of sky covered by clouds [0-1].");
     frame.declare ("vapor_pressure", "Pa", Attribute::LogOnly, "Humidity.");
+    frame.declare ("air_pressure", "Pa", Attribute::LogOnly, "Air pressure.");
     frame.declare ("relative_humidity", Attribute::Fraction (), Attribute::LogOnly,
                 "Relative humidity.");
     frame.declare ("wind", "m/s", Attribute::LogOnly, "Wind speed.");

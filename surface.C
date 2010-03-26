@@ -71,7 +71,9 @@ struct Surface::Implementation
   void exfiltrate (const Geometry& geo, size_t edge,
                    double water, double dt, Treelog&);
   void update_pond_average (const Geometry& geo);
-  void tick (Treelog&, double PotSoilEvaporation, double water, double temp,
+  void tick (Treelog&, double PotSoilEvaporationWet,
+             double PotSoilEvaporationDry,
+             double water, double temp,
 	     const Geometry&, const Soil&, const SoilWater&,
              double T, double dt);
   double albedo (const Geometry&, const Soil&, const SoilWater&) const;
@@ -256,13 +258,15 @@ Surface::temperature () const
 
 void
 Surface::tick (Treelog& msg,
-	       const double PotSoilEvaporation, 
+	       const double PotSoilEvaporationWet, 
+	       const double PotSoilEvaporationDry, 
                const double flux_in, const double temp,
 	       const Geometry& geo,
                const Soil& soil, const SoilWater& soil_water, 
                const double soil_T,
                const double dt)
-{ impl->tick (msg, PotSoilEvaporation, flux_in, temp, geo, 
+{ impl->tick (msg, PotSoilEvaporationWet, PotSoilEvaporationDry,
+              flux_in, temp, geo, 
              soil, soil_water, soil_T, dt); }
 
 void
@@ -291,7 +295,8 @@ Surface::Implementation::update_pond_average (const Geometry& geo)
 
 void
 Surface::Implementation::tick (Treelog& msg,
-			       const double PotSoilEvaporation,
+			       const double PotSoilEvaporationWet,
+			       const double PotSoilEvaporationDry,
 			       const double flux_in, const double temp,
                                const Geometry& geo,
                                const Soil& soil, const SoilWater& soil_water,
@@ -318,7 +323,7 @@ Surface::Implementation::tick (Treelog& msg,
     (*i).second = pond_average;
   
   // Remember potential evaopration
-  Eps = PotSoilEvaporation;
+  Eps = PotSoilEvaporationWet;
 
   double EvapSoilTotal = 0.0;   // [mm cm^2/h]
 
@@ -332,7 +337,9 @@ Surface::Implementation::tick (Treelog& msg,
 
       // Exfiltration.
       const double MaxExfiltration // [mm/h]
-        = soil_water.MaxExfiltration (geo, edge, soil, soil_T) * 10.0; 
+        = bound (0.0, 
+                 soil_water.MaxExfiltration (geo, edge, soil, soil_T) * 10.0,
+                 PotSoilEvaporationDry); 
 
       const double epond = pond_edge[edge]; // [mm]
       if (epond < 0.0)

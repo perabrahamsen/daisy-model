@@ -106,7 +106,7 @@ struct WeatherStandard : public WeatherBase
   };
   static keyword_description_type keyword_description[];
   static const int keyword_description_size;
-  int timestep;
+  int my_timestep;
   Time begin;
   Time end;
   std::vector<double> precipitation_correction;
@@ -115,6 +115,7 @@ struct WeatherStandard : public WeatherBase
   std::vector<double> precipitation_scale;
   std::vector<double> temperature_scale;
   std::vector<double> temperature_offset;
+  const double minimum_precipitation;
 
   // Overwrite keywords.
   double CO2_;
@@ -172,6 +173,7 @@ struct WeatherStandard : public WeatherBase
   double last_max_air_temperature;
   double last_global_radiation;
   double last_precipitation;
+  double precipitation_left;
   double last_vapor_pressure;
   double last_diffuse_radiation;
   double last_relative_humidity;
@@ -223,8 +225,6 @@ struct WeatherStandard : public WeatherBase
 
   // Simulation.
   void tick (const Time& time, Treelog&);
-  void output (Log& log) const
-  { WeatherBase::output (log); }
   void read_line ();
   void read_new_day (const Time&, Treelog&);
 
@@ -317,6 +317,14 @@ struct WeatherStandard : public WeatherBase
 
   bool has_min_max_temperature () const
   { return has_min_temperature && has_max_temperature; }
+
+  double timestep () const
+  { 
+    if (my_timestep > 0)
+      return my_timestep; 
+    else
+      return -42.42e42;
+  }
 
   // Create and Destroy.
   bool initialize (const Time& time, Treelog& err);
@@ -607,8 +615,8 @@ WeatherStandard::read_line ()
 	}
       
       // Update time.
-      if (timestep > 0)
-	next_time.tick_hour (timestep);
+      if (my_timestep > 0)
+	next_time.tick_hour (my_timestep);
       if (has_date)
 	{
 	  const int year = double2int (next_year);
@@ -625,7 +633,7 @@ WeatherStandard::read_line ()
 	    }
 	  if (next_time != Time (year, month, mday, hour))
 	    {
-              if (timestep > 0)
+              if (my_timestep > 0)
                 lex->warning ("Bad timestep");
 	      next_time = Time (year, month, mday, hour);
 	    }
@@ -710,8 +718,8 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
       initialized = true;
       lex->seek (end_of_header);
       next_time = begin;
-      if (timestep > 0)
-        next_time.tick_hour (-timestep);
+      if (my_timestep > 0)
+        next_time.tick_hour (-my_timestep);
       else
         next_time.tick_hour (-24);
       read_line ();
@@ -758,6 +766,10 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 
       const int hours = Time::hours_between (last_time, next_time);
       long_timestep = (hours > 12);
+    
+      precipitation_left = last_precipitation * hours;
+      const bool high_precipitation 
+        = minimum_precipitation <= last_precipitation;
       for (;now < end; now.tick_hour ())
 	{
 	  int hour = now.hour ();
@@ -801,7 +813,19 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	  else 
 	    diffuse_radiation_[hour] = 0.0;
 	    
-	  precipitation_[hour] = last_precipitation;
+          const double weather_dt = 1.0;
+          if (high_precipitation)
+            precipitation_[hour] = last_precipitation;
+	  else if (precipitation_left < minimum_precipitation * weather_dt)
+            {
+              precipitation_[hour] = precipitation_left;
+              precipitation_left = 0.0;
+            }
+          else
+            {
+              precipitation_[hour] = minimum_precipitation;
+              precipitation_left -= minimum_precipitation * weather_dt;
+            }
 	  if (has_vapor_pressure_)
 	    vapor_pressure_[hour] = last_vapor_pressure;
 	  else if (has_relative_humidity_)
@@ -815,24 +839,8 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	  if (has_relative_humidity_)
 	    relative_humidity_[hour] = last_relative_humidity;
           else if (has_vapor_pressure_)
-	    {
-	      relative_humidity_[hour] = last_vapor_pressure / 
-		FAO::SaturationVapourPressure (air_temperature_[hour]);
-#if 0
-	      if (relative_humidity_[hour] < 0.0 
-		  ||relative_humidity_[hour] > 1.0)
-		{
-		  std::ostringstream tmp;
-		  tmp << "RelHum[" << hour << "] = " << relative_humidity_[hour] 
-		      << " [] because VapPres = " << last_vapor_pressure
-		      << " [Pa] and T = " << air_temperature_[hour]
-		      << " [dg C], giving Sat. VapPres = " 
-		      << FAO::SaturationVapourPressure (air_temperature_[hour])
-		      << " [Pa]";
-		  lex->warning (tmp.str ());
-		}
-#endif
-	    }
+            relative_humidity_[hour] = last_vapor_pressure / 
+              FAO::SaturationVapourPressure (air_temperature_[hour]);
 	  if (has_reference_evapotranspiration_)
 	    {
 	      reference_evapotranspiration_[hour] 
@@ -1108,8 +1116,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 		val = units.convert (dim, hours_unit (), val);
 	      else
 		lex->error ("Unknown dimension");
-	      timestep = double2int (val);
-	      if (!approximate (timestep, val) || timestep < 0.0)
+	      my_timestep = double2int (val);
+	      if (!approximate (my_timestep, val) || my_timestep < 0)
 		lex->error ("Timestep should be a cardinal number");
 	    }
 	  else
@@ -1250,19 +1258,19 @@ NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (), u_dpu)
 		    || has_data ("Month")
 		    || has_data ("Day")))
     lex->error ("You should specify all of Year, Month and Day, or none");
-  if (timestep < 1 && !has_date)
+  if (my_timestep < 1 && !has_date)
     lex->error ("You must specify either a timestep or date");
   has_temperature = has_data ("AirTemp");
   has_min_temperature = has_data ("T_min");
   has_max_temperature = has_data ("T_max");
   has_vapor_pressure_ = has_data ("VapPres");
   has_diffuse_radiation_ = has_data ("DiffRad");
-  if (has_diffuse_radiation_ && timestep > 3)
+  if (has_diffuse_radiation_ && my_timestep > 3)
     lex->warning ("You should not specify DiffRad with long timesteps");
   has_relative_humidity_ = has_data ("RelHum");
   if (has_relative_humidity_ && has_vapor_pressure_)
     lex->error ("You should only specify one of VapPres or RelHum");
-  if (has_relative_humidity_ && timestep > 6)
+  if (has_relative_humidity_ && my_timestep > 6)
     lex->warning ("You should not specify RelHum with long timesteps");
   has_wind_speed = has_data ("Wind");
   has_reference_evapotranspiration_ = has_data ("RefEvap");
@@ -1305,13 +1313,14 @@ WeatherStandard::WeatherStandard (const BlockModel& al)
     T_snow (al.number ("T_snow")),
     missing_years (map_submodel_const<YearMap> (al, "missing_years")),
     active_map (-1),
-    timestep (0),
+    my_timestep (0),
     begin (1900, 1, 1, 0),
     end (2100, 1, 1, 0),
     precipitation_correction (std::vector<double> (12, 1.0)),
     precipitation_scale (al.number_sequence ("PrecipScale")),
     temperature_scale (al.number_sequence ("TempScale")),
     temperature_offset (al.number_sequence ("TempOffset")),
+    minimum_precipitation (al.number ("minimum_precipitation")),
     CO2_ (al.number ("CO2")),
     has_date (false),
     has_hour (false),
@@ -1333,6 +1342,7 @@ WeatherStandard::WeatherStandard (const BlockModel& al)
     last_max_air_temperature (-42.42e42),
     last_global_radiation (-42.42e42),
     last_precipitation (-42.42e42),
+    precipitation_left (-42.42e42),
     last_vapor_pressure (-42.42e42),
     last_diffuse_radiation (-42.42e42),
     last_relative_humidity (-42.42e42),
@@ -1510,10 +1520,16 @@ the file before it is used in the simulation, depending on the\n\
 month.  The first number corresponds to January, the second to\n\
 February, etc.");
     frame.set ("TempOffset", std::vector<double> (12, 0.0));
+    frame.declare ("minimum_precipitation", "mm/h", Attribute::Const, "\
+Lowest precipitation rate when using long timesteps.\n\
+If the precipitation is lower than this value, precipitation will be\n\
+concentrated at the beginning of the long timeset.");
+    frame.set_described ("minimum_precipitation", 0.83, "\
+Average hourly precipitation for Taastrup 1996-2001 (both inclusive).");
 
     // C02
     frame.declare ("CO2", "Pa", Attribute::Const, 
-                "Atmostpheric CO2 lavel at station.");
+                "Atmostpheric CO2 level at station.");
     frame.set ("CO2", 35.0);
 
   }

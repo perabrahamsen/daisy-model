@@ -1,3 +1,16 @@
+2010-03-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* weather_std.C (minimum_precipitation): New parameter.
+
+	* bioclimate_std.C (WaterDistribution): Let dry ep limit
+	transpiration and exfiltration, as determined by cover.
+
+	* weather_base.C (air_pressure): Made it logable.
+
+	* pet.h, pet.C (initialize, check): New virtual member functions.
+	* pet_FAO_PM.C (G, N): New log variable.
+	(use_wet, initialize, check): Made default value depend on weather.
+
 2010-03-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* production.C, column_std.C, mactrans_std.C, macro_std.C (tick):

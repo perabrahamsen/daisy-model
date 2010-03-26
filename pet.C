@@ -67,6 +67,17 @@ Pet::output (Log& log) const
   output_value (dry (), "dry", log);
 }
 
+bool 
+Pet::check (const Weather&, Treelog&) const
+{ 
+  const bool ok = true;
+  return ok;
+}
+
+void
+Pet::initialize (const Weather&)
+{ }
+
 Pet::Pet (const BlockModel& al)
   : ModelFramed (al)
 { }

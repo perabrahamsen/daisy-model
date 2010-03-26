@@ -67,7 +67,6 @@ CanopySimple::load_syntax (Frame& frame)
   frame.set ("IntcpCap", 0.5);
   frame.declare ("EpFac", Attribute::None (), Attribute::Const,
 	      "Potential evapotranspiration factor.");
-  frame.set ("EpFac", 1.15);
   frame.set_cited ("EpFac", 1.20, "\
 See figure 4 in the cited paper.\n\
 \n\
