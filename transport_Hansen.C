@@ -160,7 +160,7 @@ TransportHansen::flow (const Geometry& geo_base,
     {
       daisy_assert (std::isfinite (q_primary[0]));
       daisy_assert (std::isfinite (J_in));
-      if (q_primary[0] < 1e-9)
+      if (q_primary[0] < -1e-9)
 	// Normal condition, stuff is in solute.
 	if (J_in < 0.0)
           {
