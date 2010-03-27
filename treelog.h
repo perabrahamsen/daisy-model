@@ -62,6 +62,7 @@ public:
   virtual void message (const std::string&);
   virtual void warning (const std::string&);
   virtual void error (const std::string&);
+  virtual void bug (const std::string&);
   virtual void touch () = 0;
   virtual void flush () = 0;
 

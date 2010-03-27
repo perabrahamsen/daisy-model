@@ -51,7 +51,7 @@ struct Field::Implementation
   // Actions.
   void sow (const Metalib&, const FrameModel& crop, 
             double row_width, double row_pos, double seed,
-            const Time& time, double dt, Treelog&);
+            const Time& time, Treelog&);
   void ridge (const FrameSubmodel& ridge);
   void irrigate_overhead (double flux, double temp, const IM&, double dt, 
 			  Treelog& msg);
@@ -165,12 +165,12 @@ void
 Field::Implementation::sow (const Metalib& metalib, const FrameModel& crop, 
                             const double row_width, const double row_pos,
                             const double seed,
-                            const Time& time, const double dt, Treelog& msg)
+                            const Time& time, Treelog& msg)
 {
   if (selected)
     {
       Treelog::Open nest (msg, selected->name);
-      selected->sow (metalib, crop, row_width, row_pos, seed, time, dt, msg);
+      selected->sow (metalib, crop, row_width, row_pos, seed, time, msg);
     }
   else 
     {
@@ -179,7 +179,7 @@ Field::Implementation::sow (const Metalib& metalib, const FrameModel& crop,
 	   i++)
 	{
 	  Treelog::Open nest (msg, (*i)->name);
-	  (*i)->sow (metalib, crop, row_width, row_pos, seed, time, dt, msg);
+	  (*i)->sow (metalib, crop, row_width, row_pos, seed, time, msg);
 	}
     }
 }
@@ -865,8 +865,8 @@ Field::Restrict::~Restrict ()
 void 
 Field::sow (const Metalib& metalib, const FrameModel& crop,
             const double row_width, const double row_pos, const double seed,
-            const Time& time, const double dt, Treelog& msg)
-{ impl->sow (metalib, crop, row_width, row_pos, seed, time, dt, msg); }
+            const Time& time, Treelog& msg)
+{ impl->sow (metalib, crop, row_width, row_pos, seed, time, msg); }
 
 void 
 Field::ridge (const FrameSubmodel& al)

@@ -33,6 +33,7 @@ struct TreelogStore::Implementation
   static const int is_plain = -3;
   static const int is_warning = -4;
   static const int is_error = -5;
+  static const int is_bug = -6;
   static const int is_close = -7;
   static const int is_touch = -8;
   static const int is_flush = -9;
@@ -63,6 +64,9 @@ struct TreelogStore::Implementation
         break;
       case is_error:
         msg.error (text);
+        break;
+      case is_bug:
+        msg.bug (text);
         break;
       case is_close:
         msg.close ();
@@ -148,6 +152,8 @@ public:
   { add (is_warning, text); }
   void error (const std::string& text)
   { add (is_error, text); }
+  void bug (const std::string& text)
+  { add (is_bug, text); }
   void touch ()
   { add (is_touch, ""); }
   void flush ()
@@ -194,6 +200,10 @@ TreelogStore::warning (const std::string& text)
 void 
 TreelogStore::error (const std::string& text)
 { impl->error (text); }
+
+void 
+TreelogStore::bug (const std::string& text)
+{ impl->bug (text); }
 
 void 
 TreelogStore::touch ()

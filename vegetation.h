@@ -158,7 +158,7 @@ public:
                     double SoilLimit /* [cm] */,
                     double& seed_N /* [kg N/ha/h] */,
                     double& seed_C /* [kg C/ha/h] */,
-                    const Time&, double dt, Treelog& msg) = 0;
+                    const Time&, Treelog& msg) = 0;
   virtual void output (Log&) const;
   
   // Create and Destroy.

@@ -213,7 +213,7 @@ struct VegetationCrops : public Vegetation
             const Geometry&, OrganicMatter&, 
             double SoilLimit,
             double& seed_N /* kg/ha/h */, double& seed_C /* kg/ha/h */,
-            const Time&, double dt, Treelog&);
+            const Time&, Treelog&);
   void output (Log&) const;
 
   // Create and destroy.
@@ -847,7 +847,6 @@ VegetationCrops::sow (const Metalib& metalib, const FrameModel& al,
 		      OrganicMatter& organic_matter, 
                       const double SoilLimit,
                       double& seed_N, double& seed_C, const Time& time, 
-                      const double dt,
                       Treelog& msg)
 {
   Crop *const crop = Librarian::build_frame<Crop> (metalib, msg, al, "sow");
@@ -873,8 +872,8 @@ If you want two " + name + " you should rename one of them");
       return;
     }
   crops.push_back (crop);
-  seed_N += crop->total_N () / dt;
-  seed_C += crop->total_C () / dt;
+  seed_N += crop->total_N ();
+  seed_C += crop->total_C ();
   reset_canopy_structure (msg);
 }
 

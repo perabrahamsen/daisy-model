@@ -1,3 +1,14 @@
+2010-03-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* movement_solute.C (divide_top_incomming): Avoid division with
+	small number.
+	* transport_Hansen.C (flow): Ditto.
+
+	* vegetation_crops.C, vegetation_permanent.C, vegetation.h:
+	* column_std.C, column.h, field.C, field.h (sow): Remove dt.
+	* column_std.C (tick): Fluxify dt.
+	* action_sow.C, action_crop.C (doIt): Update callers.
+
 2010-03-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* weather_std.C (minimum_precipitation): New parameter.

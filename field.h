@@ -68,7 +68,7 @@ public:
 public:
   void sow (const Metalib&, const FrameModel& crop, 
             double row_width, double row_pos, double seed,
-            const Time&, double dt, Treelog&);
+            const Time&, Treelog&);
   void ridge (const FrameSubmodel& ridge);
   void irrigate_overhead (double water, double temp, const IM&, double dt,
 			  Treelog& msg);

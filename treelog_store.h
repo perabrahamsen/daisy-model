@@ -45,6 +45,7 @@ public:
   void message (const std::string&);
   void warning (const std::string&);
   void error (const std::string&);
+  void bug (const std::string&);
   void touch ();
   void flush ();
 

@@ -293,7 +293,7 @@ ActionCrop::Sow::doIt (Daisy& daisy, const Scope&, Treelog& msg)
     {
       msg.message ("Sowing " + crop->type_name ());      
       daisy.field->sow (daisy.metalib, *crop, 0.0, 0.0, -42.42e42,
-                        daisy.time, daisy.dt (), msg); 
+                        daisy.time, msg); 
       done = true;
     }
 }

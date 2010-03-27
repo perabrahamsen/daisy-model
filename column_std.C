@@ -107,7 +107,7 @@ public:
   // Actions.
   void sow (const Metalib&, const FrameModel&, 
             double row_width, double row_pos, double seed,
-            const Time&, double dt, Treelog&);
+            const Time&, Treelog&);
   void ridge (const FrameSubmodel& al);
   void irrigate_overhead (double flux, double temp, const IM&, double dt,
                           Treelog& msg);
@@ -202,10 +202,10 @@ void
 ColumnStandard::sow (const Metalib& metalib, const FrameModel& al, 
                      const double row_width, const double row_pos,
                      const double seed,
-                     const Time& time, const double dt, Treelog& msg)
+                     const Time& time, Treelog& msg)
 { vegetation->sow (metalib, al, row_width, row_pos, seed,
                    geometry, *organic_matter, -soil->MaxRootingHeight (),
-                   seed_N, seed_C, time, dt, msg); }
+                   seed_N, seed_C, time, msg); }
 
 
 void 
@@ -667,10 +667,10 @@ ColumnStandard::tick (const Metalib& metalib, const Time& time, const double dt,
     residuals_N_soil[c] /= dt;
   for (size_t c = 0; c < residuals_C_soil.size (); c++)
     residuals_C_soil[c] /= dt;
+  seed_N /= dt;
+  seed_C /= dt;
 
 #if 0
-  seed_N = 0.0;
-  seed_C = 0.0;
   applied_DM = 0.0;
   first_year_utilization = 0.0;
 #endif

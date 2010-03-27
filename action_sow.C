@@ -42,7 +42,7 @@ struct ActionSow : public Action
   { 
     msg.message ("Sowing " + crop->type_name ());      
     daisy.field->sow (daisy.metalib, *crop, row_width, row_pos, seed, 
-                      daisy.time, daisy.dt (), msg); 
+                      daisy.time, msg); 
   }
 
   void tick (const Daisy&, const Scope&, Treelog&)

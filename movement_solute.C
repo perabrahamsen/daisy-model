@@ -393,6 +393,7 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
 
       // Tertiary domain.
       const double q_tertiary = soil_water.q_tertiary (edge);
+      daisy_assert (std::isfinite (q_tertiary));
       const double tertiary_in = q_tertiary * in_sign; // [cm^3 W/cm^2 S/h]
       if (tertiary_in > 0)
         {
@@ -427,11 +428,12 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
     }
   daisy_approximate (total_area, geo.surface_area ());
 
-  if (total_water_in > 0.0)
+  if (total_water_in > 1e-9 * total_area)
     // Scale with incomming solute.
     {
       // [g/cm^3 W] = [g/cm^2 S/h] * [cm^2 S] / [cm^3 W/h] 
       const double C_above = -J_above * total_area / total_water_in;
+      daisy_assert (std::isfinite (C_above));
       for (size_t i = 0; i < edge_above_size; i++)
         {
           const size_t edge = edge_above[i];
@@ -443,7 +445,7 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
     }
   else
     {
-      daisy_assert (iszero (total_water_in));
+      daisy_assert (total_water_in >= 0.0);
       for (size_t i = 0; i < edge_above_size; i++)
         {
           const size_t edge = edge_above[i];
@@ -589,8 +591,20 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
         const double J_edge       // [g/cm^2 S/h]
           = J_tertiary[edge] + J_secondary[edge] + J_primary[edge];
         J_sum += in_sign * J_edge * area; // [g/h]
-        daisy_assert (in_sign * J_tertiary[edge] >= 0.0);
-        daisy_assert (in_sign * J_secondary[edge] >= 0.0);
+        if (in_sign * J_tertiary[edge] < 0.0)
+          {
+            std::ostringstream tmp;
+            tmp << "J_tertiary[" << edge << "] = " << J_tertiary[edge]
+                << ", in_sign = " << in_sign << ", J_above = " << J_above;
+            msg.bug (tmp.str ());
+          }
+        if (in_sign * J_secondary[edge] < 0.0)
+          {
+            std::ostringstream tmp;
+            tmp << "J_secondary[" << edge << "] = " << J_secondary[edge]
+                << ", in_sign = " << in_sign << ", J_above = " << J_above;
+            msg.bug (tmp.str ());
+          }
       }
     J_sum /= geometry ().surface_area (); // [g/cm^2 S/h]
     daisy_approximate (-J_above, J_sum);

@@ -158,10 +158,16 @@ TransportHansen::flow (const Geometry& geo_base,
 
   if (std::isnormal (J_in))
     {
-      if (q_primary[0] < 0.0)
+      daisy_assert (std::isfinite (q_primary[0]));
+      daisy_assert (std::isfinite (J_in));
+      if (q_primary[0] < 1e-9)
 	// Normal condition, stuff is in solute.
 	if (J_in < 0.0)
-	  C_top = J_in / q_primary[0];
+          {
+            daisy_assert (std::isnormal (q_primary[0]));
+            C_top = J_in / q_primary[0];
+            daisy_assert (std::isfinite (C_top));
+          }
 	else
 	  {
 	    S_top = -J_in / geo.dz (0);
@@ -169,7 +175,6 @@ TransportHansen::flow (const Geometry& geo_base,
 	  }
       else
 	{
-	  // This should only happen if Surface::total_matter_flux.
 	  S_top = -J_in / geo.dz (0);
 	  J_in = 0.0;
 	}

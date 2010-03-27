@@ -60,6 +60,10 @@ void
 Treelog::error (const std::string& str)
 { entry (str + " (error)"); }
 
+void
+Treelog::bug (const std::string& str)
+{ entry (str + " (bug)"); }
+
 class TreelogNull : public Treelog
 {
   // Nesting.
