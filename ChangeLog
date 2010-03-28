@@ -1,3 +1,8 @@
+2010-03-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_std.C (tick, fertilize): Fluxify applied_DM and
+	first_year_utilization in tick.
+
 2010-03-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* movement_solute.C (divide_top_incomming): Avoid division with

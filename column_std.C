@@ -315,12 +315,13 @@ ColumnStandard::fertilize (const Metalib& metalib, const FrameModel& al,
   chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
 
   // Add inorganic matter.
-  fertilize (AM::get_IM (metalib, units.get_unit (IM::storage_unit ()), al), dt, msg);
+  fertilize (AM::get_IM (metalib, units.get_unit (IM::storage_unit ()), al),
+             dt, msg);
 
   // Add organic matter, if any.
   if (!AM::is_mineral (metalib, al))
     organic_matter->fertilize (metalib, al, geometry, now, dt, msg);
-  applied_DM += AM::get_DM (metalib, al) / dt;
+  applied_DM += AM::get_DM (metalib, al);
 }
 
 void 
@@ -341,7 +342,7 @@ ColumnStandard::fertilize (const Metalib& metalib, const FrameModel& al,
   // Add inorganic matter.
   const IM im = AM::get_IM (metalib, units.get_unit (IM::storage_unit ()), al);
   chemistry->incorporate (geometry, im, from, to, dt, msg);
-  applied_DM += AM::get_DM (metalib, al) / dt;
+  applied_DM += AM::get_DM (metalib, al);
 
   // Add organic matter, if any.
   if (!AM::is_mineral (metalib, al))
@@ -364,7 +365,7 @@ ColumnStandard::fertilize (const Metalib& metalib, const FrameModel& al,
   // Add inorganic matter.
   const IM im = AM::get_IM (metalib, units.get_unit (IM::storage_unit ()), al);
   chemistry->incorporate (geometry, im, volume, dt, msg);
-  applied_DM += AM::get_DM (metalib, al) / dt;
+  applied_DM += AM::get_DM (metalib, al);
 
   // Add organic matter, if any.
   if (!AM::is_mineral (metalib, al))
@@ -669,11 +670,8 @@ ColumnStandard::tick (const Metalib& metalib, const Time& time, const double dt,
     residuals_C_soil[c] /= dt;
   seed_N /= dt;
   seed_C /= dt;
-
-#if 0
-  applied_DM = 0.0;
-  first_year_utilization = 0.0;
-#endif
+  applied_DM /= dt;
+  first_year_utilization /= dt;
 
   // Scope.
   daisy_assert (extern_scope);

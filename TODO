@@ -1,12 +1,22 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Makefile
-
-Cygwin skal optimize til generic af hensyn til setup (og WAR3)
-
 * Variable tidsskridt
 
 ** Management skal være uafhængig af tidsskridt.
+
+*** irrigation?
+
+Liste af aktive irrigation/fertigation events?
+
+Skal dt tilpasses disse events?
+
+Eller skal vi ignorere dem?  Det er input.  Men de kan fylde jorden op med vand.
+
+*** spray?
+
+Fluxify hvornår? i starten af chemical::tick?
+
+Det er input, så det behøver ikke påvirke dt.
 
 ** Fjern Daisy::dt
 
