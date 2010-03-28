@@ -1,5 +1,9 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Prøv 2D med MACRO hydraulics
+
+Specielt pressure secondary domain.  MACRO har mere vand i det domæne.
+
 * Variable tidsskridt
 
 ** Management skal være uafhængig af tidsskridt.
