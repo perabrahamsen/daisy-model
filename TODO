@@ -2,7 +2,7 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Makefile
 
-Cywin skal optimize til generic (og WAR3)
+Cygwin skal optimize til generic af hensyn til setup (og WAR3)
 
 * Variable tidsskridt
 
