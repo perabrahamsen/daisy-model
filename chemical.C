@@ -53,9 +53,16 @@ Chemical::NH4 ()
 }
 
 const symbol
-Chemical::spray_unit ()
+Chemical::surface_storage_unit ()
 {
   static const symbol unit ("g/m^2");
+  return unit;
+}
+
+const symbol
+Chemical::surface_flux_unit ()
+{
+  static const symbol unit ("g/m^2/h");
   return unit;
 }
 

@@ -50,11 +50,10 @@ struct ChemistryStandard : public Chemistry
  
   // Management.
   void update_C (const Soil& soil, const SoilWater& soil_water);
-  void deposit (symbol chem, double amount, double dt, Treelog&);
-  void spray (symbol chem, double amount, double dt, Treelog&);
-  void dissipate (symbol chem, double amount  /* [g/m^2] */,
-		  double dt /* [h] */, Treelog&);
-  void harvest (double removed, double surface, double dt);
+  void deposit (symbol chem, double flux, Treelog&);
+  void spray (symbol chem, double amount, Treelog&);
+  void dissipate (symbol chem, double amount  /* [g/m^2] */, Treelog&);
+  void harvest (double removed, double surface);
   void mix (const Geometry&, const Soil&, const SoilWater&, 
             double from, double to, double penetration, double dt);
   void swap (const Geometry&, const Soil&, const SoilWater&,
@@ -62,10 +61,10 @@ struct ChemistryStandard : public Chemistry
   void incorporate (const Geometry& geo,
 		    const symbol chem, const double amount,
 		    const double from, const double to, 
-		    const double dt, Treelog& msg);
+		    Treelog& msg);
   void incorporate (const Geometry& geo,
 		    const symbol chem, const double amount,
-                    const Volume&, const double dt, Treelog& msg);
+                    const Volume&, Treelog& msg);
   
   // Simulation.
   void tick_top (const Units&, const Geometry&, const Soil&, 
@@ -143,13 +142,12 @@ ChemistryStandard::update_C (const Soil& soil, const SoilWater& soil_water)
 }
 
 void 
-ChemistryStandard::deposit (const symbol chem, 
-			    const double amount, const double dt, Treelog& msg)
+ChemistryStandard::deposit (const symbol chem, const double flux, Treelog& msg)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
     if (chemicals[c]->name == chem)
       {
-        chemicals[c]->deposit (amount, dt);
+        chemicals[c]->deposit (flux);
         return;
       }
   msg.warning ("Unknwon chemical '" + chem + "' ignored");
@@ -157,12 +155,12 @@ ChemistryStandard::deposit (const symbol chem,
 
 void 
 ChemistryStandard::spray (const symbol chem, 
-                          const double amount, const double dt, Treelog& msg)
+                          const double amount, Treelog& msg)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
     if (chemicals[c]->name == chem)
       {
-        chemicals[c]->spray (amount, dt);
+        chemicals[c]->spray (amount);
         return;
       }
   msg.warning ("Unknwon chemical '" + chem + "' ignored");
@@ -170,23 +168,22 @@ ChemistryStandard::spray (const symbol chem,
 
 void 
 ChemistryStandard::dissipate (const symbol chem, const double amount,
-			      const double dt, Treelog& msg)
+			      Treelog& msg)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
     if (chemicals[c]->name == chem)
       {
-        chemicals[c]->dissipate (amount, dt);
+        chemicals[c]->dissipate (amount);
         return;
       }
   msg.warning ("Unknwon chemical '" + chem + "' ignored");
 }
 
 void
-ChemistryStandard::harvest (const double removed, const double surface, 
-                            const double dt)
+ChemistryStandard::harvest (const double removed, const double surface)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
-    chemicals[c]->harvest (removed, surface, dt);
+    chemicals[c]->harvest (removed, surface);
 }
 
 void 
@@ -213,12 +210,12 @@ void
 ChemistryStandard::incorporate (const Geometry& geo,
 				const symbol chem, const double amount,
 				const double from, const double to, 
-				const double dt, Treelog& msg)
+				Treelog& msg)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
     if (chemicals[c]->name == chem)
       {
-        chemicals[c]->incorporate (geo, amount, from, to, dt);
+        chemicals[c]->incorporate (geo, amount, from, to);
         return;
       }
   msg.warning ("Unknwon chemical '" + chem + "' ignored");
@@ -227,13 +224,12 @@ ChemistryStandard::incorporate (const Geometry& geo,
 void 
 ChemistryStandard::incorporate (const Geometry& geo,
 				const symbol chem, const double amount,
-                                const Volume& volume,
-				const double dt, Treelog& msg)
+                                const Volume& volume, Treelog& msg)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
     if (chemicals[c]->name == chem)
       {
-        chemicals[c]->incorporate (geo, amount, volume, dt);
+        chemicals[c]->incorporate (geo, amount, volume);
         return;
       }
   msg.warning ("Unknwon chemical '" + chem + "' ignored");

@@ -190,14 +190,12 @@ struct ChemicalStandard : public Chemical
 
   // Management.
   void update_C (const Soil&, const SoilWater&);
-  void deposit (const double amount, const double dt); // [g/m^2]
-  void spray (const double amount, const double dt); // [g/m^2]
-  void dissipate (const double amount, const double dt); // [g/m^2]
-  void harvest (const double removed, const double surface, const double dt);
-  void incorporate (const Geometry&, double amount, 
-                    double from, double to, double dt);
-  void incorporate (const Geometry&, double amount, 
-                    const Volume&, double dt);
+  void deposit (const double flux); // [g/m^2/h]
+  void spray (const double amount); // [g/m^2]
+  void dissipate (const double amount); // [g/m^2]
+  void harvest (const double removed, const double surface);
+  void incorporate (const Geometry&, double amount, double from, double to);
+  void incorporate (const Geometry&, double amount, const Volume&);
   void mix (const Geometry& geo, const Soil&, const SoilWater&,
             double from, double to, double penetration, double dt);
   void swap (const Geometry& geo, const Soil&, const SoilWater&,
@@ -578,48 +576,45 @@ ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
 }
   
 void 
-ChemicalStandard::deposit (const double amount, const double dt) // [g/m^2]
-{ deposit_ += amount / dt; }
+ChemicalStandard::deposit (const double flux) // [g/m^2/h]
+{ deposit_ += flux; }
 
 void 
-ChemicalStandard::spray (const double amount, const double dt) // [g/m^2]
-{ spray_ += amount / dt; }
+ChemicalStandard::spray (const double amount) // [g/m^2]
+{ spray_ += amount; }
 
 void 
-ChemicalStandard::dissipate (const double amount, const double dt) // [g/m^2]
-{ dissipate_ += amount / dt; }
+ChemicalStandard::dissipate (const double amount) // [g/m^2]
+{ dissipate_ += amount; }
 
 void 
-ChemicalStandard::harvest (const double removed, const double surface,
-                           const double dt)
+ChemicalStandard::harvest (const double removed, const double surface)
 { 
   const double new_storage 
-    = canopy_storage 
-    + (spray_ + deposit_ - harvest_ - residuals) * dt;
-  const double gone_rate = new_storage * removed / dt;
-  harvest_ += gone_rate * (1.0 - surface); 
-  residuals += gone_rate * surface;
+    = canopy_storage + spray_ - harvest_ - residuals;
+  const double gone = new_storage * removed;
+  harvest_ += gone * (1.0 - surface); 
+  residuals += gone * surface;
 }
 
 void 
 ChemicalStandard::incorporate (const Geometry& geo, const double amount,
-                               const double from, const double to,
-                               const double dt)
+                               const double from, const double to)
 { 
   daisy_assert (amount >= 0.0);
   daisy_assert (from <= 0.0);
   daisy_assert (to <= from);
   const double m2_per_cm2 = 0.01 * 0.01;
-  geo.add_surface (S_external, from, to, m2_per_cm2 * amount / dt);
+  geo.add_surface (S_external, from, to, m2_per_cm2 * amount);
 }
 
 void 
 ChemicalStandard::incorporate (const Geometry& geo, const double amount,
-                               const Volume& volume, const double dt)
+                               const Volume& volume)
 { 
   daisy_assert (amount >= 0.0);
   const double m2_per_cm2 = 0.01 * 0.01;
-  geo.add_surface (S_external, volume, m2_per_cm2 * amount / dt);
+  geo.add_surface (S_external, volume, m2_per_cm2 * amount);
 }
 
 void 
@@ -699,6 +694,13 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
                             Treelog& msg)
 {
   TREELOG_MODEL (msg);
+
+  // Fluxify management operations.
+  spray_ /= dt;
+  dissipate_ /= dt;
+  harvest_ /= dt;
+  residuals /= dt;
+
 
   const double old_storage = snow_storage + canopy_storage + litter_storage;
 
@@ -870,6 +872,10 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
   // Initialize.
   std::fill (S_tertiary_.begin (), S_tertiary_.end (), 0.0);
   std::fill (J_tertiary.begin (), J_tertiary.end (), 0.0);
+
+  // Fluxify management operations.
+  for (size_t c = 0; c < cell_size; c++)
+    S_external[c] /= dt;;
 
   // Permanent source.
   for (size_t c = 0; c < cell_size; c++)

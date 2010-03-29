@@ -39,54 +39,53 @@ Chemistry::library_id () const
 }
 
 void 
-Chemistry::deposit (const IM& im, double dt, Treelog& msg)
+Chemistry::deposit (const IM& im, Treelog& msg)
 { 
+  const Unit& unit = units.get_unit (Chemical::surface_flux_unit ());
   for (IM::const_iterator i = im.begin (); i != im.end (); i++)
     {
       const symbol chem = *i;
-      const double amount 
-        = im.get_value (chem, units.get_unit (Chemical::spray_unit ()));
-      deposit (chem, amount, dt, msg);
+      const double flux = im.get_value (chem, unit);
+      deposit (chem, flux, msg);
     }
 }
 
 void 
-Chemistry::spray (const IM& im, double dt, Treelog& msg)
+Chemistry::spray (const IM& im, Treelog& msg)
 { 
+  const Unit& unit = units.get_unit (Chemical::surface_storage_unit ());
   for (IM::const_iterator i = im.begin (); i != im.end (); i++)
     {
       const symbol chem = *i;
-      const double amount 
-        = im.get_value (chem, units.get_unit (Chemical::spray_unit ()));
-      spray (chem, amount, dt, msg);
+      const double amount = im.get_value (chem, unit);
+      spray (chem, amount, msg);
     }
 }
 
 void 
 Chemistry::incorporate (const Geometry& geo, const IM& im, 
 			const double from, const double to,
-			const double dt, Treelog& msg)
+			Treelog& msg)
 {
+  const Unit& unit = units.get_unit (Chemical::surface_storage_unit ());
   for (IM::const_iterator i = im.begin (); i != im.end (); i++)
     {
       const symbol chem = *i;
-      const double amount 
-        = im.get_value (chem, units.get_unit (Chemical::spray_unit ()));
-      incorporate (geo, chem, amount, from, to, dt, msg);
+      const double amount = im.get_value (chem, unit);
+      incorporate (geo, chem, amount, from, to, msg);
     }
 }
 
 void 
 Chemistry::incorporate (const Geometry& geo, const IM& im, 
-			const Volume& volume,
-			const double dt, Treelog& msg)
+			const Volume& volume, Treelog& msg)
 {
+  const Unit& unit = units.get_unit (Chemical::surface_storage_unit ());
   for (IM::const_iterator i = im.begin (); i != im.end (); i++)
     {
       const symbol chem = *i;
-      const double amount 
-        = im.get_value (chem, units.get_unit (Chemical::spray_unit ()));
-      incorporate (geo, chem, amount, volume, dt, msg);
+      const double amount = im.get_value (chem, unit);
+      incorporate (geo, chem, amount, volume, msg);
     }
 }
 

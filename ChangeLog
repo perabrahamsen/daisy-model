@@ -1,3 +1,14 @@
+2010-03-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemistry_std.C, chemistry_multi.h, chemistry.h:
+	* chemical_std.C, chemical.h (deposit): Use flux.
+	* bioclimate_std.C (tick): Update caller.
+
+	* chemistry_std.C, chemistry_multi.h, chemistry.h:
+	* chemical_std.C, chemical.h:
+	(incorporate, spray, dissipate, harvest): Remove dt.
+	* chemical_std.C (tick_soil, tick_top): Fluxify.
+
 2010-03-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* column_std.C (tick, fertilize): Fluxify applied_DM and

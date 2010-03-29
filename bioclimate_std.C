@@ -1081,10 +1081,7 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   air_pressure_ = weather.air_pressure ();
 
   // Add deposition. 
-  const Unit& u_h = units.get_unit (Units::h ());
-  const Unit& u_storage = units.get_unit (IM::storage_unit ());
-  const IM im = weather.deposit ().multiply (Scalar (dt, u_h), u_storage);
-  chemistry.deposit (im, dt, msg);
+  chemistry.deposit (weather.deposit (), msg);
 
   // Update canopy structure.
   CanopyStructure (vegetation);

@@ -56,7 +56,8 @@ public:
 
   // And standard units.
 public:
-  static const symbol spray_unit (); // [g/m^2]
+  static const symbol surface_storage_unit (); // [g/m^2]
+  static const symbol surface_flux_unit (); // [g/m^2/h]
 
   // Soil.
 public:
@@ -108,14 +109,14 @@ public:
   // Management.
 public:
   virtual void update_C (const Soil&, const SoilWater&) = 0;
-  virtual void deposit (double amount /* [g/m^2] */, double dt /* [h] */) = 0;
-  virtual void spray (double amount /* [g/m^2] */, double dt /* [h] */) = 0;
-  virtual void dissipate (double amount /* [g/m^2] */, double dt /* [h] */) = 0;
-  virtual void harvest (double removed, double surface, double dt) = 0;
+  virtual void deposit (double flux /* [g/m^2/h] */) = 0;
+  virtual void spray (double amount /* [g/m^2] */) = 0;
+  virtual void dissipate (double amount /* [g/m^2] */) = 0;
+  virtual void harvest (double removed, double surface) = 0;
   virtual void incorporate (const Geometry&, double amount /* [g/m^2] */, 
-			    double from, double to, double dt) = 0;
+			    double from, double to) = 0;
   virtual void incorporate (const Geometry&, double amount /* [g/m^2] */, 
-			    const Volume& volume, double dt) = 0;
+			    const Volume& volume) = 0;
   virtual void mix (const Geometry& geo, const Soil&, const SoilWater&,
 		    double from, double to, double penetration, double dt) = 0;
   virtual void swap (const Geometry& geo, const Soil&, const SoilWater&,

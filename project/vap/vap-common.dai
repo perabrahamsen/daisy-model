@@ -20,9 +20,11 @@
   (C_in_humus 0.587 [])
   (value (/ C C_in_humus)))
 
-(defsecondary vap_nocracks pressure 
-  (h_lim 1.2 [pF])
+(defsecondary vap_pressure pressure 
   (alpha 0.01 [h^-1]))
+
+(defsecondary vap_nocracks vap_pressure 
+  (h_lim 1.2 [pF]))
 
 (defhorizon VAP_Ap FAO3
   (secondary_domain vap_nocracks))

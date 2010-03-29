@@ -50,22 +50,20 @@ struct ChemistryMulti : public Chemistry
   // Management.
   void check_ignore (const symbol chem, Treelog& msg);
   void update_C (const Soil&, const SoilWater&);
-  void deposit (symbol chem, double amount, double dt, Treelog&);
-  void spray (symbol chem, double amount, double dt, Treelog&);
-  void dissipate (symbol chem, double amount, double dt, Treelog&);
-  void harvest (double removed, double surface, double dt);
+  void deposit (symbol chem, double flux, Treelog&);
+  void spray (symbol chem, double amount, Treelog&);
+  void dissipate (symbol chem, double amount, Treelog&);
+  void harvest (double removed, double surface);
   void mix (const Geometry&, const Soil&, const SoilWater&, 
             double from, double to, double penetration, double dt);
   void swap (const Geometry&, const Soil&, const SoilWater&,
 	     double from, double middle, double to, double dt);
   void incorporate (const Geometry& geo,
 		    const symbol chem, const double amount,
-		    const double from, const double to, 
-		    const double dt, Treelog& msg);
+		    const double from, const double to, Treelog& msg);
   void incorporate (const Geometry& geo,
 		    const symbol chem, const double amount,
-                    const Volume&,
-		    const double dt, Treelog& msg);
+                    const Volume&, Treelog& msg);
   
   // Simulation.
   void tick_top (const Units&, const Geometry&, const Soil&, 
@@ -161,8 +159,7 @@ ChemistryMulti::update_C (const Soil& soil, const SoilWater& soil_water)
 }
 
 void 
-ChemistryMulti::deposit (const symbol chem, 
-			 const double amount, const double dt, Treelog& msg)
+ChemistryMulti::deposit (const symbol chem, const double flux, Treelog& msg)
 {
   bool found = false;
 
@@ -173,7 +170,7 @@ ChemistryMulti::deposit (const symbol chem,
 	  msg.error ("Duplicate chemical '" + chem + "' detected");
 
 	Chemical& chemical = combine[c]->find (chem);
-        chemical.deposit (amount, dt);
+        chemical.deposit (flux);
 	found = true;
       }
   
@@ -184,8 +181,7 @@ ChemistryMulti::deposit (const symbol chem,
 }
 
 void 
-ChemistryMulti::spray (const symbol chem, 
-		       const double amount, const double dt, Treelog& msg)
+ChemistryMulti::spray (const symbol chem, const double amount, Treelog& msg)
 {
   bool found = false;
 
@@ -196,7 +192,7 @@ ChemistryMulti::spray (const symbol chem,
 	  msg.error ("Duplicate chemical '" + chem + "' detected");
 
 	Chemical& chemical = combine[c]->find (chem);
-        chemical.spray (amount, dt);
+        chemical.spray (amount);
 	found = true;
       }
   
@@ -207,8 +203,7 @@ ChemistryMulti::spray (const symbol chem,
 }
 
 void 
-ChemistryMulti::dissipate (const symbol chem, 
-			   const double amount, const double dt, Treelog& msg)
+ChemistryMulti::dissipate (const symbol chem, const double amount, Treelog& msg)
 {
   bool found = false;
 
@@ -219,7 +214,7 @@ ChemistryMulti::dissipate (const symbol chem,
 	  msg.error ("Duplicate chemical '" + chem + "' detected");
 
 	Chemical& chemical = combine[c]->find (chem);
-        chemical.dissipate (amount, dt);
+        chemical.dissipate (amount);
 	found = true;
       }
   
@@ -230,11 +225,10 @@ ChemistryMulti::dissipate (const symbol chem,
 }
 
 void
-ChemistryMulti::harvest (const double removed, const double surface, 
-			 const double dt)
+ChemistryMulti::harvest (const double removed, const double surface)
 {
   for (size_t c = 0; c < combine.size (); c++)
-    combine[c]->harvest (removed, surface, dt);
+    combine[c]->harvest (removed, surface);
 }
 
 void 
@@ -261,7 +255,7 @@ void
 ChemistryMulti::incorporate (const Geometry& geo,
 			     const symbol chem, const double amount,
 			     const double from, const double to, 
-			     const double dt, Treelog& msg)
+			     Treelog& msg)
 {
   bool found = false;
 
@@ -272,7 +266,7 @@ ChemistryMulti::incorporate (const Geometry& geo,
 	  msg.error ("Duplicate chemical '" + chem + "' detected");
 
 	Chemical& chemical = combine[c]->find (chem);
-        chemical.incorporate (geo, amount, from, to, dt);
+        chemical.incorporate (geo, amount, from, to);
 	found = true;
       }
   
@@ -286,7 +280,7 @@ void
 ChemistryMulti::incorporate (const Geometry& geo,
 			     const symbol chem, const double amount,
                              const Volume& volume,
-			     const double dt, Treelog& msg)
+			     Treelog& msg)
 {
   bool found = false;
 
@@ -297,7 +291,7 @@ ChemistryMulti::incorporate (const Geometry& geo,
 	  msg.error ("Duplicate chemical '" + chem + "' detected");
 
 	Chemical& chemical = combine[c]->find (chem);
-        chemical.incorporate (geo, amount, volume, dt);
+        chemical.incorporate (geo, amount, volume);
 	found = true;
       }
   

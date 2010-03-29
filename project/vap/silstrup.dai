@@ -30,7 +30,7 @@
   (hydraulic hypres) (secondary_domain none))
 
 (defhorizon Silstrup_Ap_MACRO Silstrup_Ap_base
-  (secondary_domain none))
+  (secondary_domain vap_pressure (h_lim -10 [cm])))
 
 (defhorizon Silstrup_Ap_surface Silstrup_Ap
   (hydraulic M_vG_compact
@@ -61,7 +61,7 @@
   (hydraulic hypres) (secondary_domain none))
 
 (defhorizon Silstrup_B_MACRO Silstrup_B_base
-  (secondary_domain none))
+  (secondary_domain vap_pressure (h_lim -10 [cm])))
 
 (defhorizon Silstrup_B_plow_pan Silstrup_B
   ;; 10% of original.
@@ -86,7 +86,7 @@
   (hydraulic hypres) (secondary_domain none))
 
 (defhorizon Silstrup_C_MACRO Silstrup_C_base
-  (secondary_domain none))
+  (secondary_domain vap_pressure (h_lim -10 [cm])))
 
 (defhorizon Silstrup_C_Nocracks Silstrup_C
   (secondary_domain vap_nocracks))
@@ -125,6 +125,15 @@
                              -50 -75 -100 -113 
                              -120 -150 -200 -275 -350 -425 -500 [cm])
                       (xplus 10 25 50 100 150 200 300 400 600 900 [cm]))))
+
+(defcolumn Silstrup-2D-MACRO Silstrup-2D
+  (Soil (horizons (  -3.00 [cm] Silstrup_Ap_surface)
+                  ( -31.00 [cm] Silstrup_Ap_MACRO)
+                  ( -39.00 [cm] Silstrup_B_plow_pan)
+                  (-113.00 [cm] Silstrup_B_MACRO)
+                  (-350.00 [cm] Silstrup_C_MACRO)
+                  (-500.00 [cm] Silstrup_C_Nocracks))
+        (MaxRootingDepth 50 [cm])))
 
 (defcolumn Silstrup-1C-Drain Silstrup
   (area 20 [cm^2])

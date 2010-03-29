@@ -43,7 +43,8 @@
 ;;(run batch (run Silstrup-2D (plotall (graph Silstrup))))
 ;;(run batch (run Estrup-2D Silstrup-2D plotall))
 
-(run batch (run (Silstrup-2D (column (Silstrup-2D (Chemistry N))) (stop 1999 10 1 1))))
+(run batch (run (Silstrup-2D (column (Silstrup-2D-MACRO (Chemistry multi (combine Bromide)))))
+                (plotall (graph Silstrup))))
 ;;(run batch (run Estrup-2C Silstrup-2C plotall))
 ;;(run batch (run Silstrup-2C (plotall (graph Silstrup))))
 ;;(run (Silstrup (column (Silstrup-1C-Center))))

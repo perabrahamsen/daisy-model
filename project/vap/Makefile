@@ -4,6 +4,10 @@ sim:	fig log
 	  ../../daisy/obj/daisy.exe vap.dai )
 	gnuplot daisy.gnuplot
 
+linux:	fig log
+	( export DAISYHOME=home/abraham/daisy; ../../daisy/obj/daisy vap.dai )
+	gnuplot daisy.gnuplot
+
 fig:
 	mkdir fig
 

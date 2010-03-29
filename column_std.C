@@ -119,7 +119,7 @@ public:
                          double from, double to, double dt, Treelog& msg);
   void irrigate_subsoil (double flux, const IM& sm, 
                          const Volume& volume, double dt, Treelog& msg);
-  void fertilize (const IM&, double dt, Treelog& msg);
+  void fertilize (const IM&, Treelog& msg);
   void fertilize (const Metalib&, const FrameModel&,
                   const Time&, double dt, Treelog& msg);
   void fertilize (const Metalib&, const FrameModel&, double from, double to, 
@@ -223,7 +223,7 @@ ColumnStandard::irrigate_overhead (const double flux, const double temp,
   const Unit& u_storage = units.get_unit (IM::storage_unit ());
   IM im (u_solute_per_mm, sm);
   im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
-  fertilize (im, dt, msg);
+  fertilize (im, msg);
 }
 
 void 
@@ -237,7 +237,7 @@ ColumnStandard::irrigate_surface (const double flux, const double temp,
   const Unit& u_storage = units.get_unit (IM::storage_unit ());
   IM im (u_solute_per_mm, sm);
   im.multiply_assign (Scalar (flux * dt, u_mm ), u_storage);
-  fertilize (im, dt, msg);
+  fertilize (im, msg);
 }
 
 void 
@@ -251,7 +251,7 @@ ColumnStandard::irrigate_overhead (const double flux,
   const Unit& u_storage = units.get_unit (IM::storage_unit ());
   IM im (u_solute_per_mm, sm);
   im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
-  fertilize (im, dt, msg);
+  fertilize (im, msg);
 }
 
 void 
@@ -265,7 +265,7 @@ ColumnStandard::irrigate_surface (const double flux,
   const Unit& u_storage = units.get_unit (IM::storage_unit ());
   IM im (u_solute_per_mm, sm);
   im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
-  fertilize (im, dt, msg);
+  fertilize (im, msg);
 }
 
 void
@@ -280,7 +280,7 @@ ColumnStandard::irrigate_subsoil (const double flux, const IM& sm,
   const Unit& u_storage = units.get_unit (IM::storage_unit ());
   IM im (u_solute_per_mm, sm);
   im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
-  chemistry->incorporate (geometry, im, from, to, dt, msg);
+  chemistry->incorporate (geometry, im, from, to, msg);
 }
 
 void
@@ -295,12 +295,12 @@ ColumnStandard::irrigate_subsoil (const double flux, const IM& sm,
   const Unit& u_storage = units.get_unit (IM::storage_unit ());
   IM im (u_solute_per_mm, sm);
   im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
-  chemistry->incorporate (geometry, im, volume, dt, msg);
+  chemistry->incorporate (geometry, im, volume, msg);
 }
 
 void
-ColumnStandard::fertilize (const IM& im, const double dt, Treelog& msg)
-{ chemistry->spray (im, dt, msg); }
+ColumnStandard::fertilize (const IM& im, Treelog& msg)
+{ chemistry->spray (im, msg); }
 
 void
 ColumnStandard::fertilize (const Metalib& metalib, const FrameModel& al, 
@@ -312,11 +312,11 @@ ColumnStandard::fertilize (const Metalib& metalib, const FrameModel& al,
 
   // Volatilization.
   const double lost_NH4 = AM::get_volatilization (metalib, al);
-  chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
+  chemistry->dissipate (Chemical::NH4 (), lost_NH4, msg);
 
   // Add inorganic matter.
   fertilize (AM::get_IM (metalib, units.get_unit (IM::storage_unit ()), al),
-             dt, msg);
+             msg);
 
   // Add organic matter, if any.
   if (!AM::is_mineral (metalib, al))
@@ -337,11 +337,11 @@ ColumnStandard::fertilize (const Metalib& metalib, const FrameModel& al,
 
   // Volatilization.
   const double lost_NH4 = AM::get_volatilization (metalib, al);
-  chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
+  chemistry->dissipate (Chemical::NH4 (), lost_NH4, msg);
 
   // Add inorganic matter.
   const IM im = AM::get_IM (metalib, units.get_unit (IM::storage_unit ()), al);
-  chemistry->incorporate (geometry, im, from, to, dt, msg);
+  chemistry->incorporate (geometry, im, from, to, msg);
   applied_DM += AM::get_DM (metalib, al);
 
   // Add organic matter, if any.
@@ -360,11 +360,11 @@ ColumnStandard::fertilize (const Metalib& metalib, const FrameModel& al,
 
   // Volatilization.
   const double lost_NH4 = AM::get_volatilization (metalib, al);
-  chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
+  chemistry->dissipate (Chemical::NH4 (), lost_NH4, msg);
 
   // Add inorganic matter.
   const IM im = AM::get_IM (metalib, units.get_unit (IM::storage_unit ()), al);
-  chemistry->incorporate (geometry, im, volume, dt, msg);
+  chemistry->incorporate (geometry, im, volume, msg);
   applied_DM += AM::get_DM (metalib, al);
 
   // Add organic matter, if any.
@@ -407,12 +407,13 @@ ColumnStandard::harvest (const Metalib& metalib, const Time& time, const double 
 
   // Chemicals removed by harvest.  BUG: We assume chemicals are above stub.
   const double new_LAI = vegetation->LAI ();
+  const double to_surface = 1.0 - leaf_harvest;
   if (new_LAI < 1e-5)
-    chemistry->harvest (1.0, 1.0 - leaf_harvest, dt);
+    chemistry->harvest (1.0, to_surface);
   else if (new_LAI < old_LAI)
     {
       const double removed_fraction = (old_LAI - new_LAI) / old_LAI;
-      chemistry->harvest (removed_fraction, 1.0 - leaf_harvest, dt);
+      chemistry->harvest (removed_fraction, to_surface);
     }
 }
 
@@ -436,12 +437,13 @@ ColumnStandard::pluck (const Metalib& metalib,
 
   // Chemicals removed by harvest.  BUG: We assume chemicals are above stub.
   const double new_LAI = vegetation->LAI ();
+  const double to_surface = 0.0;
   if (new_LAI < 1e-5)
-    chemistry->harvest (1.0, 0.0, dt);
+    chemistry->harvest (1.0, to_surface);
   else if (new_LAI < old_LAI)
     {
       const double removed_fraction = (old_LAI - new_LAI) / old_LAI;
-      chemistry->harvest (removed_fraction, 0.0, dt);
+      chemistry->harvest (removed_fraction, to_surface);
     }
 }
 
@@ -552,8 +554,7 @@ ColumnStandard::spray (const symbol chemical,
                        const double amount /* [g/ha] */,
                        const double dt, Treelog& msg)
 {
-  chemistry->spray (chemical, amount / (100.0 * 100.0 /* ha->m^2 */),
-                    dt, msg); 
+  chemistry->spray (chemical, amount / (100.0 * 100.0 /* ha->m^2 */), msg); 
 }
 
 void 

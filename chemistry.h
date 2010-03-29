@@ -60,31 +60,30 @@ public:
 
 public:
   virtual void update_C (const Soil&, const SoilWater&) = 0;
-  void deposit (const IM& im, double dt /* [h] */, Treelog&);
-  virtual void deposit (symbol chem, double amount /* [g/m^2] */,
-			double dt /* [h] */, Treelog&) = 0;
-  void spray (const IM& im, double dt /* [h] */, Treelog&);
+  void deposit (const IM& im, Treelog&);
+  virtual void deposit (symbol chem, double flux /* [g/m^2/h] */,
+			Treelog&) = 0;
+  void spray (const IM& im, Treelog&);
   virtual void spray (symbol chem, double amount /* [g/m^2] */,
-		      double dt /* [h] */, Treelog&) = 0;
-  virtual void dissipate (symbol chem, double amount /* [g/m^2] */,
-			  double dt /* [h] */, Treelog&) = 0;
-  virtual void harvest (double removed, double surface, double dt) = 0;
+		      Treelog&) = 0;
+  virtual void dissipate (symbol chem, double amount /* [g/m^2] */, 
+                          Treelog&) = 0;
+  virtual void harvest (double removed, double surface) = 0;
   virtual void mix (const Geometry&, const Soil&, const SoilWater&, 
                     double from, double to, double penetration, double dt) = 0;
   virtual void swap (const Geometry&, const Soil&, const SoilWater&,
                      double from, double middle, double to, double dt) = 0;
   void incorporate (const Geometry& geo, const IM& im, 
-		    const double from, const double to,
-		    const double dt, Treelog& msg);
+		    const double from, const double to, Treelog& msg);
   void incorporate (const Geometry& geo, const IM& im, const Volume&, 
-		    const double dt, Treelog& msg);
+                    Treelog& msg);
   virtual void incorporate (const Geometry& geo,
 			    const symbol chem, const double amount,
 			    const double from, const double to, 
-			    const double dt, Treelog& msg) = 0;
+			    Treelog& msg) = 0;
   virtual void incorporate (const Geometry& geo,
 			    const symbol chem, const double amount,
-			    const Volume&, const double dt, Treelog& msg) = 0;
+			    const Volume&, Treelog& msg) = 0;
 
   // Simulation.
 public:

@@ -203,6 +203,12 @@ STRIP = strip
 CROSSSTRIP = "$(TARGETTYPE)-strip"
 
 ifeq ($(COMPILER),gcc)
+#	New warning flags in GCC 4.4
+	WAR4    = -Wlogical-op -Wstrict-null-sentinel -Wvariadic-macros -Wvla \
+		  -Wmissing-declarations -Wfloat-equal 
+#	GCC 3 had gave uninitialized warnings during initialization.
+	WAR3	= -Wno-uninitialized
+
 	ifeq ($(HOSTTYPE),sun4)
 		OSFLAGS = 
 		DEBUG = -g
@@ -212,6 +218,7 @@ ifeq ($(COMPILER),gcc)
 		DEBUG = -g
 	endif
 	ifeq ($(HOSTTYPE),x86_64)
+		WAREXTRA = $(WAR4)
 		OSFLAGS = 
 		DEBUG = -g
 	endif
@@ -220,15 +227,13 @@ ifeq ($(COMPILER),gcc)
 		DEBUG = -g
 	endif
 	ifeq ($(HOSTTYPE),mingw)
+		WAREXTRA = $(WAR3)
 		OSFLAGS = -DMINGW -mno-cygwin
 #		          -I/home/mingw/include -L/home/mingw/lib
 		DEBUG = -g
 	endif
 
-	WAR4    = -Wlogical-op -Wstrict-null-sentinel -Wvariadic-macros -Wvla \
-		  -Wmissing-declarations -Wfloat-equal 
-	WAR3	= -Wno-uninitialized
-	WARNING = -Wall -Wextra $(WAR3) \
+	WARNING = -Wall -Wextra $(WAREXTRA) \
 		  -Woverloaded-virtual -Wundef -Wpointer-arith -Wwrite-strings \
 		  -Wcast-qual -Wcast-align -Wmissing-format-attribute \
 		  -Wold-style-cast -Wformat=2 -Winit-self \
