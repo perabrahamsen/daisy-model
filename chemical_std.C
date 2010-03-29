@@ -628,14 +628,14 @@ ChemicalStandard::mix (const Geometry& geo,
   daisy_assert (penetration <= 1.0);
   daisy_assert (penetration >= 0.0);
   const double surface_removed = surface_storage * penetration;
-  surface_tillage += surface_removed / dt;
+  surface_tillage += surface_removed;
   surface_storage -= surface_removed;
   daisy_assert (surface_storage >= 0.0);
   surface_solute *= (1.0 - penetration);
   surface_immobile *= (1.0 - penetration);
   daisy_approximate (surface_storage, surface_solute + surface_immobile);
   const double litter_removed = litter_storage * penetration;
-  litter_tillage += litter_removed / dt;
+  litter_tillage += litter_removed;
   litter_storage -= litter_removed;
   const double removed = surface_removed + litter_removed;
 
@@ -643,10 +643,10 @@ ChemicalStandard::mix (const Geometry& geo,
   const double m2_per_cm2 = 0.01 * 0.01;
   const double penetrated = removed * m2_per_cm2;
   geo.add_surface (M_total_, from, to, penetrated);
-  geo.add_surface (tillage, from, to, penetrated / dt);
+  geo.add_surface (tillage, from, to, penetrated);
 
   // Mix.
-  geo.mix (M_total_, from, to, tillage, dt);
+  geo.mix (M_total_, from, to, tillage, 1.0);
   update_C (soil, soil_water);
 }
 
@@ -656,7 +656,7 @@ ChemicalStandard::swap (const Geometry& geo,
                         const double from, const double middle, const double to,
                         const double dt)
 { 
-  geo.swap (M_total_, from, middle, to, tillage, dt);
+  geo.swap (M_total_, from, middle, to, tillage, 1.0);
   update_C (soil, soil_water);
 }
 
@@ -700,6 +700,9 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   dissipate_ /= dt;
   harvest_ /= dt;
   residuals /= dt;
+  surface_tillage /= dt;
+  litter_tillage /= dt;
+
 
 
   const double old_storage = snow_storage + canopy_storage + litter_storage;
@@ -874,8 +877,13 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
   std::fill (J_tertiary.begin (), J_tertiary.end (), 0.0);
 
   // Fluxify management operations.
+  daisy_assert (S_external.size () == cell_size);
+  daisy_assert (tillage.size () == cell_size);
   for (size_t c = 0; c < cell_size; c++)
-    S_external[c] /= dt;;
+    {
+      S_external[c] /= dt;
+      tillage[c] /= dt;
+    }
 
   // Permanent source.
   for (size_t c = 0; c < cell_size; c++)
