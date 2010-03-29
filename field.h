@@ -105,7 +105,7 @@ public:
   void swap (const Metalib& metalib, 
              double from, double middle, double to, 
              const Time&, double dt, Treelog&);
-  void set_porosity (double at, double Theta, double dt, Treelog& msg);
+  void set_porosity (double at, double Theta, Treelog& msg);
   void set_heat_source (double at, double value); // [W/m^2]
   void spray (symbol chemical, double amount, double dt, Treelog&); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]

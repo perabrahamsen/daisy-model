@@ -55,9 +55,9 @@ struct ChemistryStandard : public Chemistry
   void dissipate (symbol chem, double amount  /* [g/m^2] */, Treelog&);
   void harvest (double removed, double surface);
   void mix (const Geometry&, const Soil&, const SoilWater&, 
-            double from, double to, double penetration, double dt);
+            double from, double to, double penetration);
   void swap (const Geometry&, const Soil&, const SoilWater&,
-	     double from, double middle, double to, double dt);
+	     double from, double middle, double to);
   void incorporate (const Geometry& geo,
 		    const symbol chem, const double amount,
 		    const double from, const double to, 
@@ -190,20 +190,20 @@ void
 ChemistryStandard::mix (const Geometry& geo, const Soil& soil, 
                         const SoilWater& soil_water,
                         const double from, const double to,
-                        const double penetration, const double dt)
+                        const double penetration)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
-    chemicals[c]->mix (geo, soil, soil_water, from, to, penetration, dt); 
+    chemicals[c]->mix (geo, soil, soil_water, from, to, penetration); 
 }
 
 void 
 ChemistryStandard::swap (const Geometry& geo,
                          const Soil& soil, const SoilWater& soil_water,
-                         const double from, const double middle,
-                         const double to, const double dt)
+                         const double from, const double middle, 
+                         const double to)
 { 
   for (size_t c = 0; c < chemicals.size (); c++)
-    chemicals[c]->swap (geo, soil, soil_water, from, middle, to, dt); 
+    chemicals[c]->swap (geo, soil, soil_water, from, middle, to); 
 }
 
 void 

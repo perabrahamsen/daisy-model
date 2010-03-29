@@ -241,6 +241,11 @@ SoilWater::tick_before (const Geometry& geo, const Soil& soil,
 
   const size_t cell_size = geo.cell_size ();
 
+  // Fluxify management operations.
+  daisy_assert (tillage_.size () == cell_size);
+  for (size_t i = 0; i < cell_size; i++)
+    tillage_[i] /= dt;
+
   // Ice first.
   for (size_t i = 0; i < cell_size; i++)
     {
@@ -485,26 +490,26 @@ SoilWater::incorporate (const Geometry& geo, const double amount,
 double
 SoilWater::mix (const Geometry& geo, const Soil& soil, 
                 const SoilHeat& soil_heat, const double from, 
-                const double to, const double dt, Treelog& msg)
+                const double to, Treelog& msg)
 {
-  geo.mix (Theta_, from, to, tillage_, dt);
-  return overflow (geo, soil, soil_heat, dt, msg);
+  geo.mix (Theta_, from, to, tillage_, 1.0);
+  return overflow (geo, soil, soil_heat, msg);
 }
 
 double
 SoilWater::swap (const Geometry& geo, const Soil& soil, 
                  const SoilHeat& soil_heat, const double from, 
                  const double middle, const double to,
-                 const double dt, Treelog& msg)
+                 Treelog& msg)
 {
-  geo.swap (Theta_, from, middle, to, tillage_, dt);
-  return overflow (geo, soil, soil_heat, dt, msg);
+  geo.swap (Theta_, from, middle, to, tillage_, 1.0);
+  return overflow (geo, soil, soil_heat, msg);
 }
 
 double
 SoilWater::overflow (const Geometry& geo, 
                      const Soil& soil, const SoilHeat& soil_heat, 
-                     const double dt, Treelog& msg)
+                     Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
   double extra = 0.0;           // [cm^3]
@@ -514,7 +519,7 @@ SoilWater::overflow (const Geometry& geo,
       const double Theta_sat = soil.Theta (c, h_sat, h_ice (c));
       const double Theta_extra = std::max (Theta_[c] - Theta_sat, 0.0);
       Theta_[c] -= Theta_extra;
-      tillage_[c] -= Theta_extra / dt;
+      tillage_[c] -= Theta_extra;
       extra += Theta_extra * geo.cell_volume (c);
       const double new_h = soil.h (c, Theta_[c]);
       if (h_[c] < 0.0 || new_h < 0)

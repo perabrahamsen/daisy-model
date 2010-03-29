@@ -6,8 +6,6 @@ Specielt pressure secondary domain.  MACRO har mere vand i det domæne.
 
 * Variable tidsskridt
 
-** chem: mix, swap, deposit skal undvære dt
-
 ** Management skal være uafhængig af tidsskridt.
 
 *** irrigation?

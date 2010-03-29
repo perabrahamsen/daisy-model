@@ -1,13 +1,32 @@
 2010-03-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* soil_water.C (tick_before): Fluxify.
+	* soil_water.C, soil_water.h (mix, swap, overflow): Remove dt.
+	* bioclimate.h, bioclimate_std.C (add_tillage_water): Take amount
+	instead of flux.
+	* bioclimate_std.C (WaterDistribution): Defluxify.
+	* column_std.C (overflow): Update caller.  Don't take dt.
+	(mix, swap): Update caller.
+	* column_std.C, column.h, field.C, field.h (set_porosity): Update
+	caller.  Don't take dt.
+	* action_tillage.C (ActionSetPorosity::doIt): Update caller.
+
+	* bioclimate.h, bioclimate_std.C (clear): New function.
+	* column_std.C (clear): Call it.
+	* bioclimate_std.C (irrigate_subsoil_old, irrigate_overhead_old)
+	(irrigate_surface_old, tillage_water_old): Remove.
+	* bioclimate.C (output): Update.
+
 	* chemistry_std.C, chemistry_multi.h, chemistry.h:
 	* chemical_std.C, chemical.h (deposit): Use flux.
 	* bioclimate_std.C (tick): Update caller.
 
 	* chemistry_std.C, chemistry_multi.h, chemistry.h:
 	* chemical_std.C, chemical.h:
-	(incorporate, spray, dissipate, harvest): Remove dt.
+	(incorporate, spray, dissipate, harvest, swap, mix): Remove dt.
 	* chemical_std.C (tick_soil, tick_top): Fluxify.
+	* column_std.C (mix, swap, irrigate_subsoil, fertilize, harvest)
+	(pluck, spray): Update callers.
 
 2010-03-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 

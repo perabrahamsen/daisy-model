@@ -197,9 +197,9 @@ struct ChemicalStandard : public Chemical
   void incorporate (const Geometry&, double amount, double from, double to);
   void incorporate (const Geometry&, double amount, const Volume&);
   void mix (const Geometry& geo, const Soil&, const SoilWater&,
-            double from, double to, double penetration, double dt);
+            double from, double to, double penetration);
   void swap (const Geometry& geo, const Soil&, const SoilWater&,
-             double from, double middle, double to, double dt);
+             double from, double middle, double to);
   
   // Simulation.
   static void divide_loss (const double absolute_loss_rate, 
@@ -621,7 +621,7 @@ void
 ChemicalStandard::mix (const Geometry& geo,
                        const Soil& soil, const SoilWater& soil_water, 
                        const double from, const double to,
-                       const double penetration, const double dt)
+                       const double penetration)
 { 
   // Removed from surface.
   daisy_approximate (surface_storage, surface_solute + surface_immobile);
@@ -653,8 +653,7 @@ ChemicalStandard::mix (const Geometry& geo,
 void 
 ChemicalStandard::swap (const Geometry& geo,
                         const Soil& soil, const SoilWater& soil_water,
-                        const double from, const double middle, const double to,
-                        const double dt)
+                        const double from, const double middle, const double to)
 { 
   geo.swap (M_total_, from, middle, to, tillage, 1.0);
   update_C (soil, soil_water);
@@ -1016,7 +1015,13 @@ ChemicalStandard::infiltrate (const double rate, const double dt)
   daisy_assert (surface_storage >= 0.0);
   daisy_assert (surface_solute >= 0.0);
   daisy_assert (surface_immobile >= 0.0);
-  daisy_assert (surface_storage >= surface_solute);
+  if (surface_storage < surface_solute)
+    {
+      std::ostringstream tmp;
+      tmp << "surface_storage = " << surface_storage 
+          << ", surface_solute = " << surface_solute;
+      daisy_bug (tmp.str ());
+    }
   daisy_assert (rate * dt <= 1.0);
 
   surface_out = surface_solute * rate;

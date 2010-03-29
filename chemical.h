@@ -118,9 +118,9 @@ public:
   virtual void incorporate (const Geometry&, double amount /* [g/m^2] */, 
 			    const Volume& volume) = 0;
   virtual void mix (const Geometry& geo, const Soil&, const SoilWater&,
-		    double from, double to, double penetration, double dt) = 0;
+		    double from, double to, double penetration) = 0;
   virtual void swap (const Geometry& geo, const Soil&, const SoilWater&,
-		     double from, double middle, double to, double dt) = 0;
+		     double from, double middle, double to) = 0;
 
   // Simulation.
 public:

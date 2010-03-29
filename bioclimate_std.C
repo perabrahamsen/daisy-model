@@ -76,16 +76,12 @@ struct BioclimateStandard : public Bioclimate
   double total_ea_;             // Actual evapotranspiration [mm/h]
   double direct_rain_;          // Rain hitting soil directly [mm/h]
   double irrigation_overhead;   // Irrigation above canopy [mm/h]
-  double irrigation_overhead_old;       // Old value for logging.
   double irrigation_overhead_temperature; // Water temperature [dg C]
   double irrigation_surface;    // Irrigation below canopy [mm/h]
-  double irrigation_surface_old; // Old value for logging.
   double irrigation_surface_temperature; // Water temperature [dg C]
   double irrigation_subsoil;    // Irrigation incorporated in soil.
-  double irrigation_subsoil_old; // Old value for logging.
   double irrigation_subsoil_permanent;  // Irrigation incorporated in soil.
   double tillage_water;    // Water added to surface due to tillage [mm/h]
-  double tillage_water_old;    // Old value for logging
 
   // Water in snowpack.
   Snow snow;
@@ -196,6 +192,7 @@ struct BioclimateStandard : public Bioclimate
              const Movement&, const Geometry&,
              const Soil&, SoilWater&, const SoilHeat&, Chemistry&, 
              double dt, Treelog&);
+  void clear ();
   void output (Log&) const;
 
   // Canopy.
@@ -291,7 +288,7 @@ struct BioclimateStandard : public Bioclimate
   void irrigate_surface (double flux);
   void irrigate_subsoil (double flux);
   void set_subsoil_irrigation (double flux);
-  void add_tillage_water (double flux);
+  void add_tillage_water (double amount);
 
   // Communication with svat and external model.
   double total_ep () const // [mm/h]
@@ -439,16 +436,12 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     total_ea_ (0.0),
     direct_rain_ (0.0),
     irrigation_overhead (0.0),
-    irrigation_overhead_old (0.0),
     irrigation_overhead_temperature (0.0),
     irrigation_surface (0.0),
-    irrigation_surface_old (0.0),
     irrigation_surface_temperature (0.0),
     irrigation_subsoil (0.0),
-    irrigation_subsoil_old (0.0),
     irrigation_subsoil_permanent (al.number ("irrigation_subsoil_permanent")),
     tillage_water (0.0),
-    tillage_water_old (0.0),
     snow (al.submodel ("Snow")),
     snow_ep (0.0),
     snow_ea_ (0.0),
@@ -667,9 +660,9 @@ BioclimateStandard::WaterDistribution (const Units& units,
                        msg);
   const double Rn = net_radiation->net_radiation ();
 
-  // 1.1 Irrigation
-  //
-  // Already set by manager.
+  // 1.1 Fluxify management operations.
+
+  tillage_water /= dt;
 
   // 1.2 Weather.
   const double rain = weather.rain ();
@@ -1041,16 +1034,6 @@ BioclimateStandard::WaterDistribution (const Units& units,
     // We want to ignore irrigation and melting snow here.
     direct_rain_ = canopy_water_bypass * (rain / snow_water_out);
 
-  // Reset irrigation
-  irrigation_overhead_old = irrigation_overhead;
-  irrigation_overhead = 0.0;
-  irrigation_surface_old = irrigation_surface;
-  irrigation_surface = 0.0;
-  irrigation_subsoil_old = irrigation_subsoil;
-  irrigation_subsoil = 0.0;
-  tillage_water_old = tillage_water;
-  tillage_water = 0.0;
-
   // Check
   // Note: total_ea can be larger than total_ep, as PMSW uses a
   // different method for calculating PET.
@@ -1126,6 +1109,15 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   daisy_assert (wind_speed_field_ >= 0.0);
 }
 
+void
+BioclimateStandard::clear () 
+{
+  irrigation_overhead = 0.0;
+  irrigation_surface = 0.0;
+  irrigation_subsoil = 0.0;
+  tillage_water = 0.0;
+}
+
 void 
 BioclimateStandard::output (Log& log) const
 {
@@ -1137,19 +1129,19 @@ BioclimateStandard::output (Log& log) const
   output_value (total_ep_, "total_ep", log);
   output_value (total_ea_, "total_ea", log);
   output_value (direct_rain_, "direct_rain", log);
-  output_value (irrigation_overhead_old, "irrigation_overhead", log);
+  output_variable (irrigation_overhead, log);
   output_value (irrigation_overhead_temperature, 
                 "irrigation_overhead_temperature", log);
-  output_value (irrigation_surface_old, "irrigation_surface", log);
+  output_variable (irrigation_surface, log);
   output_value (irrigation_surface_temperature,
                 "irrigation_surface_temperature", log);
-  output_value (irrigation_subsoil_old + irrigation_subsoil_permanent,
+  output_value (irrigation_subsoil + irrigation_subsoil_permanent,
                 "irrigation_subsoil", log);
   output_variable (irrigation_subsoil_permanent, log);
-  output_value (irrigation_subsoil_old  + irrigation_subsoil_permanent
-                + irrigation_surface_old + irrigation_overhead_old, 
+  output_value (irrigation_subsoil  + irrigation_subsoil_permanent
+                + irrigation_surface + irrigation_overhead, 
                 "irrigation_total", log);
-  output_value (tillage_water_old, "tillage_water", log);
+  output_variable (tillage_water, log);
   output_submodule (snow, "Snow", log);
   output_variable (snow_ep, log);
   output_value (snow_ea_, "snow_ea", log);
@@ -1254,8 +1246,8 @@ BioclimateStandard::set_subsoil_irrigation (double flux)
 { irrigation_subsoil_permanent = flux; }
 
 void
-BioclimateStandard::add_tillage_water (double flux)
-{ tillage_water += flux; }
+BioclimateStandard::add_tillage_water (double amount)
+{ tillage_water += amount; }
 
 static struct BioclimateStandardSyntax : DeclareModel
 {
@@ -1272,8 +1264,10 @@ The default bioclimate model.")
     frame.declare_integer ("NoOfIntervals", Attribute::Const, "\
 Number of vertical intervals in which we partition the canopy.");
     frame.set ("NoOfIntervals", 30);
-    frame.declare ("Height", "cm", Attribute::LogOnly, Attribute::CanopyEdges, "\
-End points of canopy layers, first entry is top of canopy, last is soil surface.");
+    frame.declare ("Height", "cm",
+                   Attribute::LogOnly, Attribute::CanopyEdges, "\
+End points of canopy layers.\n                                  \
+First entry is top of canopy, last is soil surface.");
     // External water sources and sinks.
     frame.declare_object ("net_radiation", NetRadiation::component,
                           "Net radiation.");

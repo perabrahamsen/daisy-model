@@ -156,7 +156,7 @@ struct ActionSetPorosity : public Action
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   {
     msg.message ("Adjusting porosity");
-    daisy.field->set_porosity (depth, porosity, daisy.dt (), msg);
+    daisy.field->set_porosity (depth, porosity, msg);
   }
 
   void tick (const Daisy&, const Scope&, Treelog&)

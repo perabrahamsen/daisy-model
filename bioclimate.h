@@ -57,6 +57,7 @@ public:
                      const Litter& litter, const Movement&, const Geometry&,
 		     const Soil&, SoilWater&, const SoilHeat&, 
 		     Chemistry&, double dt, Treelog&) = 0;
+  virtual void clear () = 0;
   virtual double get_intercepted_water () const = 0; // [mm]
   virtual double get_snow_storage () const = 0; // [mm]
   virtual double snow_leak_rate (double dt) const = 0; // [h^-1]
@@ -106,7 +107,7 @@ public:
   virtual void irrigate_surface (double flux) = 0;
   virtual void irrigate_subsoil (double flux) = 0;
   virtual void set_subsoil_irrigation (double flux) = 0;
-  virtual void add_tillage_water (double flux) = 0;
+  virtual void add_tillage_water (double amount) = 0;
 
   // Communication with SVAT.
   virtual double total_ep () const = 0; // [mm/h]

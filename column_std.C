@@ -144,8 +144,8 @@ public:
             const Time&, double dt, Treelog&);
   void swap (const Metalib&, double from, double middle, double to, 
              const Time&, double dt, Treelog&);
-  void set_porosity (double at, double Theta, double dt, Treelog& msg);
-  void overflow (const double extra, const double dt, Treelog& msg);
+  void set_porosity (double at, double Theta, Treelog& msg);
+  void overflow (const double extra, Treelog& msg);
   void set_heat_source (double at, double value); // [W/m^2]
   void spray (symbol chemical, double amount, double dt, Treelog&); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
@@ -472,11 +472,11 @@ ColumnStandard::mix (const Metalib& metalib, const double from, const double to,
   const double energy 
     = soil_heat->energy (geometry, *soil, *soil_water, from, to);
   const double extra 
-    = soil_water->mix (geometry, *soil, *soil_heat, from, to, dt, msg);
-  overflow (extra, dt, msg);
+    = soil_water->mix (geometry, *soil, *soil_heat, from, to, msg);
+  overflow (extra, msg);
   movement->deactivate_tertiary (2);
   soil_heat->set_energy (geometry, *soil, *soil_water, from, to, energy);
-  chemistry->mix (geometry, *soil, *soil_water, from, to, penetration, dt);
+  chemistry->mix (geometry, *soil, *soil_water, from, to, penetration);
   surface.unridge ();
   organic_matter->mix (geometry, *soil, *soil_water, from, to, penetration, 
                        time, dt);
@@ -498,38 +498,35 @@ ColumnStandard::swap (const Metalib& metalib,
   mix (metalib, from, middle, 1.0, time, dt, msg);
   mix (metalib, middle, to, 0.0, time, dt, msg);
   const double extra 
-    = soil_water->swap (geometry, *soil, *soil_heat, from, middle, to, dt, msg);
-  overflow (extra, dt, msg);
+    = soil_water->swap (geometry, *soil, *soil_heat, from, middle, to, msg);
+  overflow (extra, msg);
   soil_heat->swap (geometry, from, middle, to);
-  chemistry->swap (geometry, *soil, *soil_water, from, middle, to, dt);
+  chemistry->swap (geometry, *soil, *soil_water, from, middle, to);
   organic_matter->swap (geometry, *soil, *soil_water, from, middle, to, 
                         time, dt);
 }
 
 void 
-ColumnStandard::set_porosity (const double at, const double Theta,
-                              const double dt, Treelog& msg)
+ColumnStandard::set_porosity (const double at, const double Theta, Treelog& msg)
 { 
   const size_t cell_size = geometry.cell_size ();
   for (size_t i = 0; i < cell_size; i++)
     if (geometry.contain_z (i, at))
       soil->set_porosity (i, Theta); 
-  const double extra = soil_water->overflow (geometry, *soil, *soil_heat, 
-                                             dt, msg);
-  overflow (extra, dt, msg);
+  const double extra = soil_water->overflow (geometry, *soil, *soil_heat, msg);
+  overflow (extra, msg);
   chemistry->update_C (*soil, *soil_water);
 }
 
 void
-ColumnStandard::overflow (const double extra, const double dt, Treelog& msg)
+ColumnStandard::overflow (const double extra, Treelog& msg)
 {
   if (extra > 0.0)
     {
       std::ostringstream tmp;
       tmp << "Adding " << extra << " [mm] overflow to surface";
       msg.message (tmp.str ());
-      const double flux = extra / dt;
-      bioclimate->add_tillage_water (flux);
+      bioclimate->add_tillage_water (extra);
     }
 }
 
@@ -633,6 +630,7 @@ void
 ColumnStandard::clear ()
 { 
   movement->clear ();
+  bioclimate->clear ();
   soil_water->clear ();
   chemistry->clear ();
 

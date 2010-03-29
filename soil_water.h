@@ -150,10 +150,10 @@ public:
   void incorporate (const Geometry&, double amount, double from, double to);
   void incorporate (const Geometry&, double amount, const Volume&);
   double mix (const Geometry& geo, const Soil&, const SoilHeat&, double from, 
-              double to, double dt, Treelog&);
+              double to, Treelog&);
   double swap (const Geometry& geo, const Soil&, const SoilHeat&, 
-               double from, double middle, double to, double dt, Treelog&);
-  double overflow (const Geometry&, const Soil&, const SoilHeat&, double dt, 
+               double from, double middle, double to, Treelog&);
+  double overflow (const Geometry&, const Soil&, const SoilHeat&, 
                    Treelog& msg);
   bool check (size_t n, Treelog& err) const;
   void output (Log& log) const;
