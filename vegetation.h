@@ -156,8 +156,8 @@ public:
                     double seed /* kg w.w./ha */,
                     const Geometry&, OrganicMatter&, 
                     double SoilLimit /* [cm] */,
-                    double& seed_N /* [kg N/ha/h] */,
-                    double& seed_C /* [kg C/ha/h] */,
+                    double& seed_N /* [kg N/ha] */,
+                    double& seed_C /* [kg C/ha] */,
                     const Time&, Treelog& msg) = 0;
   virtual void output (Log&) const;
   

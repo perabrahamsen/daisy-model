@@ -212,7 +212,7 @@ struct VegetationCrops : public Vegetation
             const double seed /* [kg w.w./ha] */,
             const Geometry&, OrganicMatter&, 
             double SoilLimit,
-            double& seed_N /* kg/ha/h */, double& seed_C /* kg/ha/h */,
+            double& seed_N /* kg/ha */, double& seed_C /* kg/ha */,
             const Time&, Treelog&);
   void output (Log&) const;
 
