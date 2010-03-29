@@ -375,7 +375,7 @@ Geometry::mix (std::vector<double>& v, const Volume& volume) const
 
 void
 Geometry::mix (std::vector<double>& v, const double from, const double to, 
-               std::vector<double>& change, const double dt) const
+               std::vector<double>& change) const
 {
   const size_t cell_size = this->cell_size ();
   daisy_assert (v.size () == cell_size);
@@ -384,12 +384,12 @@ Geometry::mix (std::vector<double>& v, const double from, const double to,
   const std::vector<double> old = v;
   mix (v, from, to);
   for (size_t i = 0; i < cell_size; i++)
-    change[i] += (v[i] - old[i]) / dt;
+    change[i] += (v[i] - old[i]);
 }
 
 void
 Geometry::mix (std::vector<double>& v, const Volume& volume, 
-               std::vector<double>& change, const double dt) const
+               std::vector<double>& change) const
 {
   const size_t cell_size = this->cell_size ();
   daisy_assert (v.size () == cell_size);
@@ -398,7 +398,7 @@ Geometry::mix (std::vector<double>& v, const Volume& volume,
   const std::vector<double> old = v;
   mix (v, volume);
   for (size_t i = 0; i < cell_size; i++)
-    change[i] += (v[i] - old[i]) / dt;
+    change[i] += (v[i] - old[i]);
 }
 
 void
@@ -613,7 +613,7 @@ Geometry::swap (std::vector<double>& v,
 void
 Geometry::swap (std::vector<double>& v, 
                 const double from,  const double middle, const double to, 
-                std::vector<double>& change, const double dt) const
+                std::vector<double>& change) const
 {
   const size_t cell_size = this->cell_size ();
   daisy_assert (v.size () == cell_size);
@@ -622,7 +622,7 @@ Geometry::swap (std::vector<double>& v,
   const std::vector<double> old = v;
   swap (v, from, middle, to);
   for (size_t i = 0; i < v.size (); i++)
-    change[i] += (v[i] - old[i]) / dt;
+    change[i] += (v[i] - old[i]);
 }
 
 double

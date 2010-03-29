@@ -82,32 +82,32 @@ public:
                          double dt, Treelog& msg);
   void fertilize (const Metalib&, const FrameModel&,
                   double from, double to, 
-                  const Time&, double dt, Treelog& msg); // Organic.
+                  const Time&, Treelog& msg); // Organic.
   void fertilize (const Metalib&, const FrameModel&, const Volume&,
-                  const Time&, double dt, Treelog&); // Organic.
+                  const Time&, Treelog&); // Organic.
   void fertilize (const Metalib&, const FrameModel&,
-                  const Time&, double dt, Treelog& msg);
+                  const Time&, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (symbol crop, Treelog&);
   void harvest (const Metalib& metalib, 
-                const Time&, double dt, symbol name,
+                const Time&, symbol name,
 		double stub_length, 
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
                 bool combine,
 		std::vector<const Harvest*>&, Treelog&);
   void pluck (const Metalib& metalib, 
-              const Time&, double dt, symbol name,
+              const Time&, symbol name,
               double stem_harvest, double leaf_harvest, double sorg_harvest,
               std::vector<const Harvest*>&, Treelog&);
   void mix (const Metalib& metalib, 
             double from, double to, double penetration, 
-            const Time&, double dt, Treelog&);
+            const Time&, Treelog&);
   void swap (const Metalib& metalib, 
              double from, double middle, double to, 
-             const Time&, double dt, Treelog&);
+             const Time&, Treelog&);
   void set_porosity (double at, double Theta, Treelog& msg);
   void set_heat_source (double at, double value); // [W/m^2]
-  void spray (symbol chemical, double amount, double dt, Treelog&); // [g/ha]
+  void spray (symbol chemical, double amount, Treelog&); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
 
   // Conditions.

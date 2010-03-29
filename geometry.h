@@ -250,9 +250,9 @@ public:
   void mix (std::vector<double>& v, double from, double to) const;
   void mix (std::vector<double>& v, const Volume&) const;
   void mix (std::vector<double>& v, double from, double to, 
-            std::vector<double>& change, double dt) const;
+            std::vector<double>& change) const;
   void mix (std::vector<double>& v, const Volume&,
-            std::vector<double>& change, double dt) const;
+            std::vector<double>& change) const;
   void add_soil (std::vector<double>& v,
                  double from, double to, double amount) const;
   void add_soil (std::vector<double>& v, const Volume&, double amount) const;
@@ -280,7 +280,7 @@ public:
              double from, double middle, double to) const;
   void swap (std::vector<double>& v, 
              double from, double middle, double to, 
-             std::vector<double>& change, double dt) const;
+             std::vector<double>& change) const;
   double total_soil (const std::vector<double>& v) const;
   double total_soil (const std::vector<double>& v, 
                      double from, double to) const;

@@ -241,10 +241,10 @@ struct OrganicStandard : public OrganicMatter
   double CO2_fast (size_t i) const;	// [g C/cm³]
   void mix (const Geometry&, const Soil&, const SoilWater&,
 	    double from, double to, double penetration,
-	    const Time& time, double dt);
+	    const Time& time);
   void swap (const Geometry&, const Soil&, const SoilWater&, 
 	     double from, double middle, double to,
-	     const Time& time, double dt);
+	     const Time& time);
 
   // Communication with external model.
   double get_smb_c_at (size_t i) const; // [g C/cm³]
@@ -257,11 +257,11 @@ struct OrganicStandard : public OrganicMatter
   bool check_am (const FrameModel& am, Treelog& err) const;
   void add (AM&);
   void fertilize (const Metalib&, const FrameModel&, const Geometry&, 
-                  const Time&, double dt, Treelog&);
+                  const Time&, Treelog&);
   void fertilize (const Metalib&, const FrameModel&, const Geometry&,
-                  double from, double to, const Time&, double dt, Treelog&);
+                  double from, double to, const Time&, Treelog&);
   void fertilize (const Metalib&, const FrameModel&, const Geometry&, 
-                  const Volume&, const Time&, double dt, Treelog&);
+                  const Volume&, const Time&, Treelog&);
   AM* find_am (symbol sort, symbol part) const;
   void initialize (const Metalib&, 
                    const Units&, const Frame&, const Geometry& geo,
@@ -881,11 +881,11 @@ OrganicStandard::add (AM& om)
 void 
 OrganicStandard::fertilize (const Metalib& metalib, const FrameModel& frame, 
                             const Geometry& geo, 
-                            const Time& now, const double dt, Treelog& msg)
+                            const Time& now, Treelog& msg)
 { 
   AM& om = AM::create (metalib, frame, geo, now, msg);
-  fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
-  fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
+  fertilized_N += om.total_N (geo) / geo.surface_area (); 
+  fertilized_C += om.total_C (geo) / geo.surface_area ();
   add (om);
 }
 
@@ -893,28 +893,28 @@ void
 OrganicStandard::fertilize (const Metalib& metalib, const FrameModel& frame,
                             const Geometry& geo,
                             const double from, const double to,
-                            const Time& now, const double dt, Treelog& msg)
+                            const Time& now, Treelog& msg)
 { 
   AM& om = AM::create (metalib, frame, geo, now, msg);
-  fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
-  fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
+  fertilized_N += om.total_N (geo) / geo.surface_area (); 
+  fertilized_C += om.total_C (geo) / geo.surface_area ();
   om.mix (geo, from, to, 1.0,
           tillage_N_top, tillage_C_top,
-          tillage_N_soil, tillage_C_soil, dt);
+          tillage_N_soil, tillage_C_soil);
   add (om);
 }
 
 void 
 OrganicStandard::fertilize (const Metalib& metalib, const FrameModel& frame,
                             const Geometry& geo, const Volume& volume,
-                            const Time& now, const double dt, Treelog& msg)
+                            const Time& now, Treelog& msg)
 { 
   AM& om = AM::create (metalib, frame, geo, now, msg);
-  fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
-  fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
+  fertilized_N += om.total_N (geo) / geo.surface_area (); 
+  fertilized_C += om.total_C (geo) / geo.surface_area ();
   om.mix (geo, volume, 1.0,
           tillage_N_top, tillage_C_top,
-          tillage_N_soil, tillage_C_soil, dt);
+          tillage_N_soil, tillage_C_soil);
   add (om);
 }
 
@@ -1092,13 +1092,29 @@ OrganicStandard::tick (const Geometry& geo,
                        const double dt,
                        Treelog& msg)
 {
+  // Extract stuff.
   Chemical *const soil_NO3 = chemistry.know (Chemical::NO3 ())
     ? &chemistry.find (Chemical::NO3 ())
     : NULL;
   Chemical *const soil_NH4 = chemistry.know (Chemical::NH4 ())
     ? &chemistry.find (Chemical::NH4 ())
     : NULL;
+  const size_t cell_size = geo.cell_size ();
 
+  // Fluxify management data.
+  fertilized_N /= dt;
+  fertilized_C /= dt;
+  tillage_N_top /= dt;
+  tillage_C_top /= dt;
+  daisy_assert (tillage_N_soil.size () == cell_size);
+  daisy_assert (tillage_C_soil.size () == cell_size);
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      tillage_N_soil[c] /= dt;
+      tillage_C_soil[c] /= dt;
+    }
+
+  // Prepare mass balance.
   const double old_N = total_N (geo);
   const double old_C = total_C (geo);
 
@@ -1119,8 +1135,6 @@ OrganicStandard::tick (const Geometry& geo,
     dom[j]->clear ();
 
   // Setup arrays.
-  const size_t cell_size = geo.cell_size ();
-
   std::vector<double> N_soil (cell_size, -42.42e42);
   std::vector<double> N_used (cell_size, -42.42e42);
   std::vector<double> clay_factor (cell_size, -42.42e42);
@@ -1307,19 +1321,19 @@ OrganicStandard::mix (const Geometry& geo, const Soil& soil,
                       const SoilWater& soil_water,
                       const double from, const double to, 
                       const double penetration,
-                      const Time&, const double dt)
+                      const Time&)
 {
   buffer.mix (geo, from, to);
   for (size_t i = 0; i < am.size (); i++)
     am[i]->mix (geo, from, to, penetration, 
                 tillage_N_top, tillage_C_top, 
-                tillage_N_soil, tillage_C_soil, dt);
+                tillage_N_soil, tillage_C_soil);
   for (size_t i = 1; i < smb.size (); i++)
     smb[i]->mix (geo, from, to, 
-                 tillage_N_soil, tillage_C_soil, dt);
+                 tillage_N_soil, tillage_C_soil);
   for (size_t i = 0; i < som.size (); i++)
     som[i]->mix (geo, from, to, 
-                 tillage_N_soil, tillage_C_soil, dt);
+                 tillage_N_soil, tillage_C_soil);
   for (size_t i = 0; i < dom.size (); i++)
     dom[i]->mix (geo, soil, soil_water, from, to);
 
@@ -1342,18 +1356,18 @@ void
 OrganicStandard::swap (const Geometry& geo, const Soil& soil,
                        const SoilWater& soil_water,
                        const double from, const double middle, const double to,
-                       const Time&, const double dt)
+                       const Time&)
 {
   buffer.swap (geo, from, middle, to);
   for (size_t i = 0; i < am.size (); i++)
     am[i]->swap (geo, from, middle, to, 
-                 tillage_N_soil, tillage_C_soil, dt);
+                 tillage_N_soil, tillage_C_soil);
   for (size_t i = 1; i < smb.size (); i++)
     smb[i]->swap (geo, from, middle, to, 
-                  tillage_N_soil, tillage_C_soil, dt);
+                  tillage_N_soil, tillage_C_soil);
   for (size_t i = 0; i < som.size (); i++)
     som[i]->swap (geo, from, middle, to, 
-                  tillage_N_soil, tillage_C_soil, dt);
+                  tillage_N_soil, tillage_C_soil);
   for (size_t i = 0; i < dom.size (); i++)
     dom[i]->swap (geo, soil, soil_water, from, middle, to);
   // Leave CO2 alone.

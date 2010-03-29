@@ -211,7 +211,7 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
             tmp << "Fertilizing " << fert.type_name ();
           msg.message (tmp.str ());
           daisy.field->fertilize (daisy.metalib, fert, 
-                                  daisy.time, daisy.dt (), msg);
+                                  daisy.time, msg);
           if (water > 0.0)
             daisy.field->irrigate_surface (water, IM (u_solute),
                                            daisy.dt (), msg);

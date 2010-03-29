@@ -60,14 +60,14 @@ public:
   void mix (const Geometry&, double from, double to, double penetration,
             double& tillage_N_top, double& tillage_C_top,
             std::vector<double>& tillage_N_soil,
-            std::vector<double>& tillage_C_soil, double dt);
+            std::vector<double>& tillage_C_soil);
   void mix (const Geometry&, const Volume&, double penetration,
             double& tillage_N_top, double& tillage_C_top,
             std::vector<double>& tillage_N_soil,
-            std::vector<double>& tillage_C_soil, double dt);
+            std::vector<double>& tillage_C_soil);
   void swap (const Geometry&, double from, double middle, double to,
              std::vector<double>& tillage_N_soil,
-             std::vector<double>& tillage_C_soil, double dt);
+             std::vector<double>& tillage_C_soil);
   double total_C (const Geometry& geometry) const; // [g C/cm^2]
   double total_N (const Geometry& geometry) const; // [g N/cm^2]
   double C_at (size_t at) const;

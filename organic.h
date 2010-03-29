@@ -69,10 +69,10 @@ public:
   virtual double CO2_fast (size_t i) const = 0;	// [g C/cm^3/h]
   virtual void mix (const Geometry&, const Soil&, const SoilWater&,
                     double from, double to, double penetration,
-                    const Time& time, double dt) = 0;
+                    const Time& time) = 0;
   virtual void swap (const Geometry&, const Soil&, const SoilWater&, 
                      double from, double middle, double to,
-                     const Time& time, double dt) = 0;
+                     const Time& time) = 0;
 
   // Communication with external model.
   virtual double get_smb_c_at (size_t i) const = 0; // [g C/cm³]
@@ -85,13 +85,11 @@ public:
   virtual bool check_am (const FrameModel& am, Treelog& err) const = 0;
   virtual void add (AM&) = 0;
   virtual void fertilize (const Metalib&, const FrameModel&, 
-                          const Geometry&, 
-                          const Time&, double dt, Treelog&) = 0;
+                          const Geometry&, const Time&, Treelog&) = 0;
   virtual void fertilize (const Metalib&, const FrameModel&, const Geometry&,
-                          double from, double to, const Time&, double dt,
-                          Treelog&) = 0;
+                          double from, double to, const Time&, Treelog&) = 0;
   virtual void fertilize (const Metalib&, const FrameModel&, const Geometry&,
-                          const Volume&, const Time&, double dt, Treelog&) = 0;
+                          const Volume&, const Time&, Treelog&) = 0;
   virtual AM* find_am (symbol sort, symbol part) const = 0;
 public:
   virtual void initialize (const Metalib&, const Units&, 

@@ -64,15 +64,15 @@ struct Field::Implementation
   void irrigate_subsoil (double flux, const IM&, const Volume&,
                          double dt, Treelog& msg);
   void fertilize (const Metalib&, const FrameModel&, const Volume&, 
-                  const Time&, double dt, Treelog& msg);
+                  const Time&, Treelog& msg);
   void fertilize (const Metalib&, const FrameModel&, double from, double to, 
-                  const Time&, double dt, Treelog& msg);
+                  const Time&, Treelog& msg);
   void fertilize (const Metalib&, const FrameModel&, 
-                  const Time&, double dt, Treelog& msg);
+                  const Time&, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (symbol crop, Treelog&);
   void harvest (const Metalib& metalib, 
-                const Time&, double dt, symbol name,
+                const Time&, symbol name,
 		double stub_length, 
 		double stem_harvest, 
 		double leaf_harvest, 
@@ -80,20 +80,20 @@ struct Field::Implementation
                 const bool combine,
 		std::vector<const Harvest*>&, Treelog&);
   void pluck (const Metalib& metalib, 
-              const Time&, double dt, symbol name,
+              const Time&, symbol name,
               double stem_harvest, 
               double leaf_harvest, 
               double sorg_harvest,
               std::vector<const Harvest*>&, Treelog&);
   void mix (const Metalib& metalib, 
             double from, double to, double penetration, 
-            const Time&, double dt, Treelog&);
+            const Time&, Treelog&);
   void swap (const Metalib& metalib, 
              double from, double middle, double to, 
-             const Time&, double dt, Treelog&);
+             const Time&, Treelog&);
   void set_porosity (double at, double Theta, Treelog& msg);
   void set_heat_source (double at, double value);
-  void spray (symbol chemical, double amount, double dt, Treelog&); // [g/ha]
+  void spray (symbol chemical, double amount, Treelog&); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
 
   // Conditions.
@@ -276,39 +276,36 @@ Field::Implementation::irrigate_subsoil (const double flux, const IM& im,
 void 
 Field::Implementation::fertilize (const Metalib& metalib, const FrameModel& al, 
 				  const double from, const double to,
-                                  const Time& now, const double dt, 
-                                  Treelog& msg)
+                                  const Time& now, Treelog& msg)
 {
   if (selected)
-    selected->fertilize (metalib, al, from, to, now, dt, msg);
+    selected->fertilize (metalib, al, from, to, now, msg);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-	 (*i)->fertilize (metalib, al, from, to, now, dt, msg);
+	 (*i)->fertilize (metalib, al, from, to, now, msg);
 }
 
 void 
 Field::Implementation::fertilize (const Metalib& metalib, const FrameModel& al, 
-                                  const Volume& volume,
-                                  const Time& now, const double dt,
+                                  const Volume& volume, const Time& now,
                                   Treelog& msg)
 {
   if (selected)
-    selected->fertilize (metalib, al, volume, now, dt, msg);
+    selected->fertilize (metalib, al, volume, now, msg);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-	 (*i)->fertilize (metalib, al, volume, now, dt, msg);
+	 (*i)->fertilize (metalib, al, volume, now, msg);
 }
 
 void 
 Field::Implementation::fertilize (const Metalib& metalib, const FrameModel& al, 
-                                  const Time& now, const double dt, 
-                                  Treelog& msg)
+                                  const Time& now, Treelog& msg)
 {
   if (selected)
     {
-      selected->fertilize (metalib, al, now, dt, msg);
+      selected->fertilize (metalib, al, now, msg);
     }
   else 
     {
@@ -316,7 +313,7 @@ Field::Implementation::fertilize (const Metalib& metalib, const FrameModel& al,
 	   i != columns.end ();
 	   i++)
 	{
-	  (*i)->fertilize (metalib, al, now, dt, msg);
+	  (*i)->fertilize (metalib, al, now, msg);
 	}
     }
 }
@@ -354,7 +351,7 @@ Field::Implementation::emerge (symbol name, Treelog& out)
 
 void
 Field::Implementation::harvest (const Metalib& metalib, 
-                                const Time& time, const double dt,
+                                const Time& time, 
                                 const symbol name,
 				const double stub_length, 
 				const double stem_harvest, 
@@ -367,7 +364,7 @@ Field::Implementation::harvest (const Metalib& metalib,
   if (selected)
     {
       Treelog::Open nest (out, selected->name);
-      selected->harvest (metalib, time, dt, name,
+      selected->harvest (metalib, time, name,
 			 stub_length,
 			 stem_harvest, leaf_harvest, sorg_harvest, combine, 
                          total, out);
@@ -379,7 +376,7 @@ Field::Implementation::harvest (const Metalib& metalib,
 	   i++)
 	{
 	  Treelog::Open nest (out, (*i)->name);
-	  (*i)->harvest (metalib, time, dt, name,
+	  (*i)->harvest (metalib, time, name,
 			 stub_length,
 			 stem_harvest, leaf_harvest, sorg_harvest, combine,
                          total, out);
@@ -389,7 +386,7 @@ Field::Implementation::harvest (const Metalib& metalib,
 
 void
 Field::Implementation::pluck (const Metalib& metalib, 
-                              const Time& time, const double dt,
+                              const Time& time, 
                               const symbol name,
                               const double stem_harvest, 
                               const double leaf_harvest, 
@@ -400,7 +397,7 @@ Field::Implementation::pluck (const Metalib& metalib,
   if (selected)
     {
       Treelog::Open nest (out, selected->name);
-      selected->pluck (metalib, time, dt, name,
+      selected->pluck (metalib, time, name,
                        stem_harvest, leaf_harvest, sorg_harvest, 
                        total, out);
     }
@@ -411,7 +408,7 @@ Field::Implementation::pluck (const Metalib& metalib,
 	   i++)
 	{
 	  Treelog::Open nest (out, (*i)->name);
-	  (*i)->pluck (metalib, time, dt, name,
+	  (*i)->pluck (metalib, time, name,
                        stem_harvest, leaf_harvest, sorg_harvest, 
                        total, out);
 	}
@@ -422,19 +419,19 @@ void
 Field::Implementation::mix (const Metalib& metalib, 
                             const double from, const double to,
                             double penetration, const Time& time,
-			    const double dt, Treelog& msg)
+			    Treelog& msg)
 {
   if (selected)
     {
       Treelog::Open nest (msg, selected->name); 
-      selected->mix (metalib, from, to, penetration, time, dt, msg);
+      selected->mix (metalib, from, to, penetration, time, msg);
     }
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
     {
       Treelog::Open nest (msg, (*i)->name);
-      (*i)->mix (metalib, from, to, penetration, time, dt, msg);
+      (*i)->mix (metalib, from, to, penetration, time, msg);
     }
 }
 
@@ -442,19 +439,19 @@ void
 Field::Implementation::swap (const Metalib& metalib, 
                              const double from, const double middle, 
                              const double to, 
-                             const Time& time, const double dt, Treelog& msg)
+                             const Time& time, Treelog& msg)
 {
   if (selected)
     {
       Treelog::Open nest (msg, selected->name);
-      selected->swap (metalib, from, middle, to, time, dt, msg);
+      selected->swap (metalib, from, middle, to, time, msg);
     }
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
     {
       Treelog::Open nest (msg, (*i)->name);
-      (*i)->swap (metalib, from, middle, to, time, dt, msg);
+      (*i)->swap (metalib, from, middle, to, time, msg);
     }
 }
 
@@ -483,15 +480,14 @@ Field::Implementation::set_heat_source (double at, double value)
 
 void 
 Field::Implementation::spray (const symbol chemical, 
-                              const double amount, const double dt,
-                              Treelog& msg) // [g/ha]
+                              const double amount, Treelog& msg) // [g/ha]
 {
   if (selected)
-    selected->spray (chemical, amount, dt, msg);
+    selected->spray (chemical, amount, msg);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->spray (chemical, amount, dt, msg);
+    (*i)->spray (chemical, amount, msg);
 }
 
 void 
@@ -902,19 +898,19 @@ Field::irrigate_subsoil (double water, const IM& im,
 void 
 Field::fertilize (const Metalib& metalib, const FrameModel& al, 
                   const double from, const double to, 
-                  const Time& now, const double dt, Treelog& msg)
-{ impl->fertilize (metalib, al, from, to, now, dt, msg); }
+                  const Time& now, Treelog& msg)
+{ impl->fertilize (metalib, al, from, to, now, msg); }
 
 void 
 Field::fertilize (const Metalib& metalib, const FrameModel& al, 
                   const Volume& volume, 
-                  const Time& now, const double dt, Treelog& msg)
-{ impl->fertilize (metalib, al, volume, now, dt, msg); }
+                  const Time& now, Treelog& msg)
+{ impl->fertilize (metalib, al, volume, now, msg); }
 
 void 
 Field::fertilize (const Metalib& metalib, const FrameModel& al, 
-                  const Time& now, const double dt, Treelog& msg)
-{ impl->fertilize (metalib, al, now, dt, msg); }
+                  const Time& now, Treelog& msg)
+{ impl->fertilize (metalib, al, now, msg); }
 
 void 
 Field::clear_second_year_utilization ()
@@ -926,26 +922,26 @@ Field::emerge (symbol name, Treelog& msg)
 
 void
 Field::harvest (const Metalib& metalib, 
-                const Time& time, const double dt, const symbol name,
+                const Time& time, const symbol name,
 		const double stub_length, 
 		const double stem_harvest, 
 		const double leaf_harvest, 
 		const double sorg_harvest,
                 const bool combine,
 		std::vector<const Harvest*>& total, Treelog& msg)
-{ impl->harvest (metalib, time, dt, name,
+{ impl->harvest (metalib, time, name,
 		stub_length,
 		stem_harvest, leaf_harvest, sorg_harvest, combine, 
                 total, msg); }
 
 void
 Field::pluck (const Metalib& metalib, 
-              const Time& time, const double dt, const symbol name,
+              const Time& time, const symbol name,
               const double stem_harvest, 
               const double leaf_harvest, 
               const double sorg_harvest,
               std::vector<const Harvest*>& total, Treelog& msg)
-{ impl->pluck (metalib, time, dt, name,
+{ impl->pluck (metalib, time, name,
                stem_harvest, leaf_harvest, sorg_harvest, 
                total, msg); }
 
@@ -953,14 +949,14 @@ void
 Field::mix (const Metalib& metalib, 
             const double from, const double to, 
             const double penetration, 
-            const Time& time, const double dt, Treelog& msg)
-{ impl->mix (metalib, from, to, penetration, time, dt, msg); }
+            const Time& time, Treelog& msg)
+{ impl->mix (metalib, from, to, penetration, time, msg); }
 
 void 
 Field::swap (const Metalib& metalib, 
              const double from, const double middle, const double to, 
-             const Time& time, const double dt, Treelog& msg)
-{ impl->swap (metalib, from, middle, to, time, dt, msg); }
+             const Time& time, Treelog& msg)
+{ impl->swap (metalib, from, middle, to, time, msg); }
 
 void 
 Field::set_porosity (const double at, const double Theta, Treelog& msg)
@@ -971,10 +967,9 @@ Field::set_heat_source (double at, double value)
 { impl->set_heat_source (at, value); }
 
 void 
-Field::spray (const symbol chemical, 
-              const double amount, const double dt,
+Field::spray (const symbol chemical, const double amount,
               Treelog& msg) // [g/ha]
-{ impl->spray (chemical, amount, dt, msg); }
+{ impl->spray (chemical, amount, msg); }
 
 void 
 Field::set_surface_detention_capacity (double height) // [mm]

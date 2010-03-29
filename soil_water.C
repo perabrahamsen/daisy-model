@@ -492,7 +492,7 @@ SoilWater::mix (const Geometry& geo, const Soil& soil,
                 const SoilHeat& soil_heat, const double from, 
                 const double to, Treelog& msg)
 {
-  geo.mix (Theta_, from, to, tillage_, 1.0);
+  geo.mix (Theta_, from, to, tillage_);
   return overflow (geo, soil, soil_heat, msg);
 }
 
@@ -502,7 +502,7 @@ SoilWater::swap (const Geometry& geo, const Soil& soil,
                  const double middle, const double to,
                  Treelog& msg)
 {
-  geo.swap (Theta_, from, middle, to, tillage_, 1.0);
+  geo.swap (Theta_, from, middle, to, tillage_);
   return overflow (geo, soil, soil_heat, msg);
 }
 

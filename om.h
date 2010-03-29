@@ -57,14 +57,11 @@ public:
 public:
   void output (Log&) const;
   void mix (const Geometry&, double from, double to,
-            std::vector<double>& N_change, std::vector<double>& C_change, 
-            double dt);
+            std::vector<double>& N_change, std::vector<double>& C_change);
   void mix (const Geometry&, const Volume&,
-            std::vector<double>& N_change, std::vector<double>& C_change, 
-            double dt);
+            std::vector<double>& N_change, std::vector<double>& C_change);
   void swap (const Geometry&, double from, double middle, double to,
-             std::vector<double>& N_change, std::vector<double>& C_change,
-             double dt);
+             std::vector<double>& N_change, std::vector<double>& C_change);
   double soil_C (const Geometry& geometry) const;
   double soil_N (const Geometry& geometry) const;
   double soil_C (const Geometry& geometry, double from, double to) const;

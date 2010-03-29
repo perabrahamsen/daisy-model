@@ -62,8 +62,7 @@ OM::output (Log& log) const
 
 void 
 OM::mix (const Geometry& geo, const double from, const double to,
-         std::vector<double>& N_change, std::vector<double>& C_change,
-         const double dt)
+         std::vector<double>& N_change, std::vector<double>& C_change)
 {
   // Ignore tiny pools.
   if (soil_C (geo) < 1e-20)
@@ -71,17 +70,16 @@ OM::mix (const Geometry& geo, const double from, const double to,
 
   // Mix.
   daisy_non_negative (C);
-  geo.mix (C, from, to, C_change, dt);
+  geo.mix (C, from, to, C_change);
   daisy_non_negative (C);
   daisy_non_negative (N);
-  geo.mix (N, from, to, N_change, dt);
+  geo.mix (N, from, to, N_change);
   daisy_non_negative (N);
 }
 
 void 
 OM::mix (const Geometry& geo, const Volume& volume,
-         std::vector<double>& N_change, std::vector<double>& C_change,
-         const double dt)
+         std::vector<double>& N_change, std::vector<double>& C_change)
 {
   // Ignore tiny pools.
   if (soil_C (geo) < 1e-20)
@@ -89,18 +87,17 @@ OM::mix (const Geometry& geo, const Volume& volume,
 
   // Mix.
   daisy_non_negative (C);
-  geo.mix (C, volume, C_change, dt);
+  geo.mix (C, volume, C_change);
   daisy_non_negative (C);
   daisy_non_negative (N);
-  geo.mix (N, volume, N_change, dt);
+  geo.mix (N, volume, N_change);
   daisy_non_negative (N);
 }
 
 void
 OM::swap (const Geometry& geo, 
           const double from, const double middle, const double to,
-          std::vector<double>& N_change, std::vector<double>& C_change, 
-          const double dt)
+          std::vector<double>& N_change, std::vector<double>& C_change)
 {
   // Ignore tiny pools.
   if (soil_C (geo) < 1e-20)
@@ -108,10 +105,10 @@ OM::swap (const Geometry& geo,
 
   // Swap.
   daisy_non_negative (C);
-  geo.swap (C, from, middle, to, C_change, dt);
+  geo.swap (C, from, middle, to, C_change);
   daisy_non_negative (C);
   daisy_non_negative (N);
-  geo.swap (N, from, middle, to, N_change, dt);
+  geo.swap (N, from, middle, to, N_change);
   daisy_non_negative (N);
 }
 

@@ -10,17 +10,21 @@ Specielt pressure secondary domain.  MACRO har mere vand i det domæne.
 
 *** irrigation?
 
-Liste af aktive irrigation/fertigation events?
+**** Liste af aktive irrigation/fertigation events?
 
-Skal dt tilpasses disse events?
+(time_left flux solute target)*
+
+***** solute
+
+component?  Metode til at udtrække IM?
+
+***** target
+
+overhead, surface, soil volumen
+
+**** Skal dt tilpasses disse events?
 
 Eller skal vi ignorere dem?  Det er input.  Men de kan fylde jorden op med vand.
-
-*** spray?
-
-Fluxify hvornår? i starten af chemical::tick?
-
-Det er input, så det behøver ikke påvirke dt.
 
 ** Fjern Daisy::dt
 

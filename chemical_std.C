@@ -646,7 +646,7 @@ ChemicalStandard::mix (const Geometry& geo,
   geo.add_surface (tillage, from, to, penetrated);
 
   // Mix.
-  geo.mix (M_total_, from, to, tillage, 1.0);
+  geo.mix (M_total_, from, to, tillage);
   update_C (soil, soil_water);
 }
 
@@ -655,7 +655,7 @@ ChemicalStandard::swap (const Geometry& geo,
                         const Soil& soil, const SoilWater& soil_water,
                         const double from, const double middle, const double to)
 { 
-  geo.swap (M_total_, from, middle, to, tillage, 1.0);
+  geo.swap (M_total_, from, middle, to, tillage);
   update_C (soil, soil_water);
 }
 

@@ -83,17 +83,17 @@ struct AM::Implementation
   bool check (Treelog& err) const;
   void mix (const Geometry&, double from, double to, double penetration,
             double& tillage_N_top, double& tillage_C_top,
-            std::vector<double>& tillage_N_soil, std::vector<double>& tillage_C_soil,
-            double dt);
+            std::vector<double>& tillage_N_soil,
+            std::vector<double>& tillage_C_soil);
   void mix (const Geometry&, const Volume&, double penetration,
             double& tillage_N_top, double& tillage_C_top,
-            std::vector<double>& tillage_N_soil, std::vector<double>& tillage_C_soil,
-            double dt);
+            std::vector<double>& tillage_N_soil,
+            std::vector<double>& tillage_C_soil);
   void mix (const Geometry&, double from, double to);
   void mix (const Geometry&, const Volume&);
   void swap (const Geometry&, double from, double middle, double to,
-             std::vector<double>& tillage_N_soil, std::vector<double>& tillage_C_soil,
-             double dt);
+             std::vector<double>& tillage_N_soil, 
+             std::vector<double>& tillage_C_soil);
   double total_C (const Geometry& geo) const;
   double total_N (const Geometry& geo) const;
   double C_at (size_t at) const;
@@ -466,8 +466,7 @@ AM::Implementation::mix (const Geometry& geo,
 			 double from, double to, double penetration,
                          double& tillage_N_top, double& tillage_C_top,
                          std::vector<double>& tillage_N_soil, 
-                         std::vector<double>& tillage_C_soil, 
-                         const double dt)
+                         std::vector<double>& tillage_C_soil)
 {
   const double old_C = total_C (geo);
   const double old_N = total_N (geo);
@@ -478,7 +477,7 @@ AM::Implementation::mix (const Geometry& geo,
                         tillage_N_top, tillage_C_top, 
                         tillage_N_soil, tillage_C_soil);
       om[i]->mix (geo, from, to, 
-                  tillage_N_soil, tillage_C_soil, dt);
+                  tillage_N_soil, tillage_C_soil);
     }
   const double new_C = total_C (geo);
   const double new_N = total_N (geo);
@@ -492,8 +491,7 @@ AM::Implementation::mix (const Geometry& geo,
                          const Volume& volume, double penetration,
                          double& tillage_N_top, double& tillage_C_top,
                          std::vector<double>& tillage_N_soil, 
-                         std::vector<double>& tillage_C_soil, 
-                         const double dt)
+                         std::vector<double>& tillage_C_soil)
 {
   const double old_C = total_C (geo);
   const double old_N = total_N (geo);
@@ -503,7 +501,7 @@ AM::Implementation::mix (const Geometry& geo,
       om[i]->penetrate (geo, volume, penetration, 
                         tillage_N_top, tillage_C_top, 
                         tillage_N_soil, tillage_C_soil);
-      om[i]->mix (geo, volume, tillage_N_soil, tillage_C_soil, dt);
+      om[i]->mix (geo, volume, tillage_N_soil, tillage_C_soil);
     }
   const double new_C = total_C (geo);
   const double new_N = total_N (geo);
@@ -517,15 +515,14 @@ AM::Implementation::swap (const Geometry& geo,
 			  const double from, const double middle, 
                           const double to,
                           std::vector<double>& tillage_N_soil,
-                          std::vector<double>& tillage_C_soil,
-                          const double dt)
+                          std::vector<double>& tillage_C_soil)
 {
   const double old_C = total_C (geo);
   const double old_N = total_N (geo);
 
   for (size_t i = 0; i < om.size (); i++)
     om[i]->swap (geo, from, middle, to, 
-                 tillage_N_soil, tillage_C_soil, dt);
+                 tillage_N_soil, tillage_C_soil);
 
   const double new_C = total_C (geo);
   const double new_N = total_N (geo);
@@ -617,30 +614,27 @@ AM::mix (const Geometry& geo,
 	 const double from, const double to, const double penetration,
          double& tillage_N_top, double& tillage_C_top,
          std::vector<double>& tillage_N_soil,
-	 std::vector<double>& tillage_C_soil,
-         const double dt)
+	 std::vector<double>& tillage_C_soil)
 { impl->mix (geo, from, to, penetration, 
              tillage_N_top, tillage_C_top, 
-             tillage_N_soil, tillage_C_soil, dt); }
+             tillage_N_soil, tillage_C_soil); }
 
 void 
 AM::mix (const Geometry& geo,
 	 const Volume& volume, const double penetration,
          double& tillage_N_top, double& tillage_C_top,
          std::vector<double>& tillage_N_soil,
-	 std::vector<double>& tillage_C_soil,
-         const double dt)
+	 std::vector<double>& tillage_C_soil)
 { impl->mix (geo, volume, penetration, 
              tillage_N_top, tillage_C_top, 
-             tillage_N_soil, tillage_C_soil, dt); }
+             tillage_N_soil, tillage_C_soil); }
 
 void
 AM::swap (const Geometry& geo,
 	  const double from, const double middle, const double to,
           std::vector<double>& tillage_N_soil,
-	  std::vector<double>& tillage_C_soil,
-          const double dt)
-{ impl->swap (geo, from, middle, to, tillage_N_soil, tillage_C_soil, dt); }
+	  std::vector<double>& tillage_C_soil)
+{ impl->swap (geo, from, middle, to, tillage_N_soil, tillage_C_soil); }
 
 double 
 AM::total_C (const Geometry& geo) const

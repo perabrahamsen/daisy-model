@@ -1,5 +1,15 @@
 2010-03-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* geometry.h, geometry.C (mix, swap): Remove dt.
+	* am.C, am.h, om.C, om.h (mix, swap): Remove dt.
+	* organic.h, organic_std.C (mix, swap, fertilize): Remove dt.
+	* organic_std.C (tick): Defluxify.
+	* column.h, column_std.C (mix, swap, fertilize, spray):
+	(pluck, harvest): Remove dt.
+	* action_fertilize.C, action_table.C, action_extern.C, action_crop.C:
+	* action_harvest.C, action_spray.C, action_tillage.C (doIt):
+	Update caller.
+
 	* soil_water.C (tick_before): Fluxify.
 	* soil_water.C, soil_water.h (mix, swap, overflow): Remove dt.
 	* bioclimate.h, bioclimate_std.C (add_tillage_water): Take amount
