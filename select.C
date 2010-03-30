@@ -50,16 +50,11 @@ Select::Handle::symbol2handle (symbol s)
   {
     sym_set_t ()
     {
-      static symbol min_symbol ("min");
-      insert (std::pair<symbol,handle_t> (min_symbol, min));
-      static symbol max_symbol ("max");
-      insert (std::pair<symbol,handle_t> (max_symbol, max));
-      static symbol average_symbol ("average");
-      insert (std::pair<symbol,handle_t> (average_symbol, average));
-      static symbol sum_symbol ("sum");
-      insert (std::pair<symbol,handle_t> (sum_symbol, sum));
-      static symbol current_symbol ("current");
-      insert (std::pair<symbol,handle_t> (current_symbol, current));
+      insert (std::pair<symbol,handle_t> ("min", min));
+      insert (std::pair<symbol,handle_t> ("max", max));
+      insert (std::pair<symbol,handle_t> ("average", average));
+      insert (std::pair<symbol,handle_t> ("sum", sum));
+      insert (std::pair<symbol,handle_t> ("current", current));
     } 
   } sym_set;
   sym_set_t::const_iterator i = sym_set.find (s);
@@ -74,12 +69,9 @@ Select::Multi::symbol2handle (symbol s)
   {
     sym_set_t ()
     {
-      static symbol min_symbol ("min");
-      insert (std::pair<symbol,handle_t> (min_symbol, min));
-      static symbol max_symbol ("max");
-      insert (std::pair<symbol,handle_t> (max_symbol, max));
-      static symbol sum_symbol ("sum");
-      insert (std::pair<symbol,handle_t> (sum_symbol, sum));
+      insert (std::pair<symbol,handle_t> ("min", min));
+      insert (std::pair<symbol,handle_t> ("max", max));
+      insert (std::pair<symbol,handle_t> ("sum", sum));
     } 
   } sym_set;
   sym_set_t::const_iterator i = sym_set.find (s);

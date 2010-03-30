@@ -1,8 +1,36 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Irrigation 
+
+** Event -> subsoil water
+
+** Solute->IM
+
+** Event -> chemistry spray
+
+** Event -> chemistry subsoil
+
+** test-irr.dai
+
+** Irrigation til column
+
+** Column::irrigate* skal bruge det nye modul
+
+** Check at vandbalancen er den samme
+
+** Irrigation::output
+
+** checkpoint, restore
+
+** Ny irrigate action?
+
+** Fjern Daisy.dt
+
 * Prøv 2D med MACRO hydraulics
 
 Specielt pressure secondary domain.  MACRO har mere vand i det domæne.
+
+VIRKER IKKE!  failure 50% af tiden
 
 * Variable tidsskridt
 
@@ -12,17 +40,13 @@ Specielt pressure secondary domain.  MACRO har mere vand i det domæne.
 
 **** Liste af aktive irrigation/fertigation events?
 
-(time_left flux solute target)*
+(time_left flux solute target volume)*
 
 shared_pointer for solute and target so they can be shared with action.
 
 ***** solute
 
 component?  Metode til at udtrække IM?
-
-***** target
-
-overhead, surface, soil volumen
 
 **** Skal dt tilpasses disse events?
 

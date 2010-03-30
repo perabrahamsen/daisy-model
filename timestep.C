@@ -162,9 +162,13 @@ Timestep::load_frame (Frame& frame)
 
 const Timestep& 
 Timestep::null ()
+{ return zero (); }
+
+const Timestep& 
+Timestep::zero ()
 {
-  static Timestep none (0, 0, 0, 0);
-  return none;
+  static Timestep step (0, 0, 0, 0);
+  return step;
 }
 
 Timestep::Timestep (const Block& al)

@@ -684,10 +684,14 @@ ColumnStandard::tick (const Metalib& metalib, const Time& time, const double dt,
                            *soil_water, surface, msg);
 
   // Early calculation.
+
+  // Add deposition. 
+  chemistry->deposit (my_weather.deposit (), msg);
+
   const double old_pond = bioclimate->get_snow_storage () + surface.ponding ();
-  bioclimate->tick (units, time, surface, my_weather, 
+  bioclimate->tick (units, time, surface, my_weather,
                     *vegetation, *litter, *movement,
-                    geometry, *soil, *soil_water, *soil_heat, *chemistry,
+                    geometry, *soil, *soil_water, *soil_heat,
                     dt, msg);
   vegetation->tick (metalib, time, *bioclimate, geometry, *soil, 
                     *soil_heat, *soil_water, *chemistry, *organic_matter, 

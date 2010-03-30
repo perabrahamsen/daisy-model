@@ -35,7 +35,6 @@ class Geometry;
 class Soil;
 class SoilWater;
 class SoilHeat;
-class Chemistry;
 class Log;
 class Time;
 class Treelog;
@@ -56,7 +55,7 @@ public:
                      const Time&, Surface&, const Weather&, Vegetation&, 
                      const Litter& litter, const Movement&, const Geometry&,
 		     const Soil&, SoilWater&, const SoilHeat&, 
-		     Chemistry&, double dt, Treelog&) = 0;
+		     double dt, Treelog&) = 0;
   virtual void clear () = 0;
   virtual double get_intercepted_water () const = 0; // [mm]
   virtual double get_snow_storage () const = 0; // [mm]

@@ -30,8 +30,6 @@
 #include "geometry.h"
 #include "soil.h"
 #include "soil_heat.h"
-#include "chemistry.h"
-#include "chemical.h"
 #include "snow.h"
 #include "log.h"
 #include "mathlib.h"
@@ -190,7 +188,7 @@ struct BioclimateStandard : public Bioclimate
   void tick (const Units&, const Time&, Surface&, const Weather&, 
              Vegetation&, const Litter& litter, 
              const Movement&, const Geometry&,
-             const Soil&, SoilWater&, const SoilHeat&, Chemistry&, 
+             const Soil&, SoilWater&, const SoilHeat&, 
              double dt, Treelog&);
   void clear ();
   void output (Log&) const;
@@ -1049,7 +1047,6 @@ BioclimateStandard::tick (const Units& units, const Time& time,
                           const Movement& movement,
                           const Geometry& geo, const Soil& soil, 
                           SoilWater& soil_water, const SoilHeat& soil_heat,
-                          Chemistry& chemistry,
                           const double dt, Treelog& msg)
 {
   // Keep weather information during time step.
@@ -1062,9 +1059,6 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   atmospheric_CO2_ = weather.CO2 ();
   atmospheric_O2_ = weather.O2 ();
   air_pressure_ = weather.air_pressure ();
-
-  // Add deposition. 
-  chemistry.deposit (weather.deposit (), msg);
 
   // Update canopy structure.
   CanopyStructure (vegetation);

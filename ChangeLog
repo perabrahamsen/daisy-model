@@ -4,6 +4,9 @@
 	* solute.C, solute.h: New component.
 	* Makefile (COMPONENTS, SUBMODELS): Add them.
 
+	* bioclimate_std.C, bioclimate.h (tick): No chemistry.
+	* column_std.C (tick): Add deposition here.
+
 2010-03-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* geometry.h, geometry.C (mix, swap): Remove dt.

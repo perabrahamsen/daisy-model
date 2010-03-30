@@ -68,6 +68,7 @@ public:
   static void load_syntax (Frame&);
   static void load_frame (Frame&);
   static const Timestep& null ();
+  static const Timestep& zero ();
   explicit Timestep (const Block&);
   Timestep (int days, int hours, int minutes, int seconds);
   ~Timestep ();
