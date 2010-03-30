@@ -27,6 +27,7 @@
 #include <vector>
 #include <set>
 #include <memory>
+#include <boost/noncopyable.hpp>
 
 class Horizon;
 class Log;
@@ -36,7 +37,7 @@ class Frame;
 class Block;
 class Treelog;
 
-class Soil
+class Soil : private boost::noncopyable
 {
   // Content.
 public:
@@ -113,8 +114,6 @@ public:
   bool check_y_border (double, Treelog& err) const;
 
   static void load_syntax (Frame&);
-private:
-  Soil (const Soil&);
 public:
   explicit Soil (const Block&);
   double initialize_aquitard (const Block&,

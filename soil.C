@@ -733,6 +733,6 @@ Soil::~Soil ()
 
 static DeclareSubmodel 
 soil_submodel (Soil::load_syntax, "Soil", "\
-The soil component provides the numeric and physical properties of the soil.");
+The soil submodel provides the numeric and physical properties of the soil.");
 
 // soil.C ends here.

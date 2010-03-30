@@ -72,10 +72,10 @@ public:
   Timestep (int days, int hours, int minutes, int seconds);
   ~Timestep ();
   Timestep (const Timestep&);
+  const Timestep& operator= (const Timestep&);
 private:                    
   explicit Timestep ();
   explicit Timestep (const FrameSubmodel&);
-  const Timestep& operator= (const Timestep&);
 };
 
 // Time operations.

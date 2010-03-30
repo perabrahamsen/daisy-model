@@ -23,8 +23,8 @@
 #include "bound.h"
 #include "block_model.h"
 #include "mathlib.h"
-#include "librarian.h"
 #include "frame.h"
+#include "librarian.h"
 #include <sstream>
 
 // bound component.

@@ -321,7 +321,8 @@ static struct Volume_BoxSyntax : public DeclareModel
   Model* make (const BlockModel& al) const
   { return new VolumeBox (al); }
   Volume_BoxSyntax ()
-    : DeclareModel (Volume::component, "box", "A volume defined by intervals on each axis.\n\
+    : DeclareModel (Volume::component, "box", "\
+A volume defined by intervals on each axis.\n\
 By default, the intervals fill the entire axis.  You can modify this by\n\
 setting the parameters.")
   { }

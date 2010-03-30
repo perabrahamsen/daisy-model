@@ -185,13 +185,20 @@ Timestep::Timestep (int d, int h, int m, int s)
   : impl (new Implementation (d, h, m, s))
 { }
 
+Timestep::~Timestep ()
+{ }
+
 Timestep::Timestep (const Timestep& other)
   : impl (new Implementation (other.days (), other.hours (),
                               other.minutes (), other.seconds ()))
 { }
 
-Timestep::~Timestep ()
-{ }
+const Timestep& 
+Timestep::operator= (const Timestep& t)
+{
+  *(this->impl) = *(t.impl);
+  return *this;
+}
 
 void operator+= (Time& time, const Timestep& step)
 {

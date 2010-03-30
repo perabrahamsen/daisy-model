@@ -67,8 +67,8 @@ USE_OPTIMIZE = true
 
 # Set USE_PROFILE if you want to profile the executable
 #
-USE_PROFILE = true
-#USE_PROFILE = false
+#USE_PROFILE = true
+USE_PROFILE = false
 
 # Set COMPILER according to which compiler you use.
 #	sun		Use the unbundled sun compiler.
@@ -481,7 +481,7 @@ DISABLED = depend.C \
 	weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C 
 # A component is a common interface to a number of models.
 # 
-COMPONENTS = drain.C \
+COMPONENTS = solute.C drain.C \
 	draineqd.C condedge.C rainergy.C ponddamp.C scope_model.C seed.C \
 	stomatacon.C tertiary.C biopore.C secondary.C heatrect.C unit_model.C \
 	ABAprod.C solver.C element.C ui.C reaction.C scopesel.C \
@@ -499,7 +499,8 @@ COMPONENTS = drain.C \
 
 # Submodels are combined models and components.
 #
-SUBMODELS = fetch_pretty.C toplevel.C timestep.C geometry_rect.C doe.C \
+SUBMODELS = irrigate.C \
+	fetch_pretty.C toplevel.C timestep.C geometry_rect.C doe.C \
         geometry1d.C fetch.C horheat.C time.C \
 	som.C smb.C aom.C dom.C crpn.C vernalization.C \
 	partition.C production.C \

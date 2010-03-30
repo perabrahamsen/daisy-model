@@ -14,6 +14,8 @@ Specielt pressure secondary domain.  MACRO har mere vand i det domæne.
 
 (time_left flux solute target)*
 
+shared_pointer for solute and target so they can be shared with action.
+
 ***** solute
 
 component?  Metode til at udtrække IM?

@@ -1,6 +1,6 @@
-// model_logable.h -- Base class for logable models in Daisy.
+// solute.h --- Dirty water.
 // 
-// Copyright 2007, 2009 Per Abrahamsen and KVL.
+// Copyright 2010 KU.
 //
 // This file is part of Daisy.
 // 
@@ -19,29 +19,27 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef MODEL_LOGABLE_H
-#define MODEL_LOGABLE_H
+#ifndef SOLUTE_H
+#define SOLUTE_H
 
-#include "model.h"
+#include "model_logable.h"
 #include "symbol.h"
 
-class Log;
+class BlockModel;
 
-// 'ModelLogable' is the base class for all logable models.
-class ModelLogable : public Model
+class Solute : public ModelLogable
 {
-  // Content.
+  // Identity.
 public:
-  const symbol name;            // Remember name for logs.
-  virtual symbol library_id () const = 0;
+  static const char *const component;
+  symbol library_id () const;
 
-  // Use.
-public:
-  virtual void output (Log& log) const = 0;
+  // Content.
 
   // Create and Destroy.
-protected:
-  ModelLogable (symbol);
+public:
+  Solute (const BlockModel& al);
+  ~Solute ();
 };
 
-#endif // MODEL_LOGABLE_H
+#endif // SOLUTE_H

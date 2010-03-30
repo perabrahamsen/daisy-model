@@ -1,3 +1,9 @@
+2010-03-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* irrigate.C, irrigate.h: New submodel.
+	* solute.C, solute.h: New component.
+	* Makefile (COMPONENTS, SUBMODELS): Add them.
+
 2010-03-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* geometry.h, geometry.C (mix, swap): Remove dt.
