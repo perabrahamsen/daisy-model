@@ -89,21 +89,7 @@ public:
   virtual void irrigate (const double duration, const double flux, 
                          const double temp, Irrigation::target_t target,
                          const IM& sm, const boost::shared_ptr<Volume> volume,
-                         Treelog& msg) = 0;
-  virtual void irrigate_overhead (double flux, double temp, const IM&, 
-                                  double dt, Treelog& msg) = 0;
-  virtual void irrigate_surface (double flux, double temp, const IM&,
-                                 double dt, Treelog& msg) = 0;
-  virtual void irrigate_overhead (double flux, const IM&, double dt,
-				  Treelog& msg) = 0;
-  virtual void irrigate_surface (double flux, const IM&, double dt, 
-				 Treelog& msg) = 0;
-  virtual void irrigate_subsoil (double flux, const IM&, 
-                                 double from, double to, double dt, 
-				 Treelog& msg) = 0;
-  virtual void irrigate_subsoil (double flux, const IM&, const Volume&,
-                                 double dt, 
-				 Treelog& msg) = 0;
+                         const bool silence, Treelog& msg) = 0;
   virtual void fertilize (const Metalib&, const FrameModel&,
                           double from, double to, 
                           const Time&, Treelog& msg) = 0;

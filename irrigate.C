@@ -58,6 +58,7 @@ struct Irrigation::Event : private boost::noncopyable
   const target_t target;
   static target_t symbol2target (symbol s);
   const boost::shared_ptr<Volume> volume;
+  const bool silence;
 
   // Use.
   void tick (const Unit& u_mm, const Unit& u_storage, 
@@ -74,7 +75,8 @@ struct Irrigation::Event : private boost::noncopyable
          const double temperature /* dg C */,
          const target_t target,
          const IM& solute /* [M/L^3] */,
-         const boost::shared_ptr<Volume> volume);
+         const boost::shared_ptr<Volume> volume,
+         const bool silence);
 };
 
 Irrigation::target_t 
@@ -180,6 +182,8 @@ subsoil: In the soil.  The 'volume' parameter will specify where.");
                         Attribute::Const, Attribute::Singleton, "\
 Soil volume to apply for subsoil irrigation.\n\
 Ignored for overhead and surface irrigation.");
+  frame.declare_boolean ("silence", Attribute::Const, "\
+True if event should not declare when it is over.");
 }
 
 Irrigation::Event::Event (const BlockSubmodel& al)
@@ -188,7 +192,8 @@ Irrigation::Event::Event (const BlockSubmodel& al)
     temperature (al.number ("temperature", at_air_temperature)),
     solute (al, "solute"),
     target (symbol2target (al.name ("target"))),
-    volume (Librarian::build_item<Volume> (al, "volume"))
+    volume (Librarian::build_item<Volume> (al, "volume")),
+    silence (al.flag ("silence"))
 { }
 
 Irrigation::Event::Event (const Unit& u_solute_per_mm /* [g/cm^2/mm] */, 
@@ -197,13 +202,15 @@ Irrigation::Event::Event (const Unit& u_solute_per_mm /* [g/cm^2/mm] */,
                           const double temp /* dg C */,
                           const target_t targ,
                           const IM& sol /* [M/L^3] */,
-                          const boost::shared_ptr<Volume> vol)
+                          const boost::shared_ptr<Volume> vol,
+                          const bool sil)
   : time_left (duration),
     flux (f),
     temperature (temp),
     solute (u_solute_per_mm, sol),
     target (targ),
-    volume (vol)
+    volume (vol),
+    silence (sil)
 { }
 
 void 
@@ -213,11 +220,15 @@ Irrigation::add (const double duration /* [h] */,
                  const target_t target,
                  const IM& solute /* [M/L^3] */,
                  const boost::shared_ptr<Volume> volume, 
+                 const bool silence,
                  Treelog& msg)
 {
   event.push_back (new Event (u_solute_per_mm,
                               duration, flux, temperature, target, 
-                              solute, volume));
+                              solute, volume, silence));
+  
+  if (silence)
+    return;
 
   std::ostringstream tmp;
   tmp << "Irrigating " << flux << " mm/h for "
@@ -273,7 +284,8 @@ Irrigation::cleanup (Treelog& msg)
 	   e++)
 	if ((*e)->done ())
 	  {
-            msg.message ("Irrigation done");
+            if (!(*e)->silence)
+              msg.message ("Irrigation done");
             delete *e;
             event.erase (e); // This invalidates the iterator.
             // Restart the loop.

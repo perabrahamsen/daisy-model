@@ -147,8 +147,7 @@ struct ActionExternFertigation : public Action
   double NO3_value;
   const std::auto_ptr<Number> NH4_expr;
   double NH4_value;
-  const double from;
-  const double to;
+  const boost::shared_ptr<Volume> volume;
 
   static const symbol kg_N_per_ha_per_h;
 
@@ -157,9 +156,11 @@ struct ActionExternFertigation : public Action
     daisy_assert (extern_scope)       ;
     ScopeMulti multi (*extern_scope, parent_scope);
     const Units& units = daisy.units ();
-    if (!surface_expr->tick_value (units, surface_value, Units::mm_per_h (), multi, msg))
+    if (!surface_expr->tick_value (units, surface_value,
+                                   Units::mm_per_h (), multi, msg))
       surface_value = 0.0;
-    if (!subsoil_expr->tick_value (units, subsoil_value, Units::mm_per_h (), multi, msg))
+    if (!subsoil_expr->tick_value (units, subsoil_value,
+                                   Units::mm_per_h (), multi, msg))
       subsoil_value = 0.0;
     if (!overhead_expr->tick_value (units, overhead_value,
                                     Units::mm_per_h (), multi, msg))
@@ -173,7 +174,7 @@ struct ActionExternFertigation : public Action
   void doIt (Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   { 
     Field& field = *daisy.field;
-    const double dt = daisy.dt ();
+    const double duration = 1.0; // [h]
 
     daisy_assert (extern_scope);
     ScopeMulti multi (*extern_scope, parent_scope);
@@ -191,17 +192,26 @@ struct ActionExternFertigation : public Action
         const Unit& u_ppm = units.get_unit (Units::ppm ());
         const Unit& u_per_mm = units.get_unit (Units::per_mm ());
 	IM im (u_mg_per_square_m);
-	im.set_value (Chemical::NH4 (), u_kg_per_ha, NH4_value * dt);
-	im.set_value (Chemical::NO3 (), u_kg_per_ha, NO3_value * dt);
-        const double water = total_flux * dt; // [mm]
+	im.set_value (Chemical::NH4 (), u_kg_per_ha, NH4_value * duration);
+	im.set_value (Chemical::NO3 (), u_kg_per_ha, NO3_value * duration);
+        const double water = total_flux * duration; // [mm]
 	im.multiply_assign (Scalar (1.0 / water, u_per_mm), u_ppm);
         
 	if (surface_value > 0)
-	  field.irrigate_surface (surface_value, im, dt, msg); 
+	  field.irrigate (duration, surface_value,
+                          Irrigation::at_air_temperature,
+                          Irrigation::surface, im, boost::shared_ptr<Volume> (),
+                          false, msg); 
 	if (overhead_value > 0)
-	  field.irrigate_overhead (overhead_value, im, dt, msg); 
+	  field.irrigate (duration, overhead_value,
+                          Irrigation::at_air_temperature,
+                          Irrigation::overhead, im, 
+                          boost::shared_ptr<Volume> (), false, msg); 
 	if (subsoil_value > 0)
-	  field.irrigate_subsoil (subsoil_value, im, from, to, dt, msg); 
+	  field.irrigate (duration, subsoil_value,
+                          Irrigation::at_air_temperature,
+                          Irrigation::subsoil, im, volume, false, msg); 
+
       }
     else if (NH4_value + NO3_value > 0.0)
       {
@@ -275,8 +285,7 @@ struct ActionExternFertigation : public Action
       NO3_value (0.0),
       NH4_expr (Librarian::build_item<Number> (al, "NH4")),
       NH4_value (0.0),
-      from (al.number ("from")),
-      to (al.number ("to"))
+      volume (Volume::build_obsolete (al))
   { }
   ~ActionExternFertigation ()
   { }
@@ -338,6 +347,10 @@ Scope to evaluate expessions in.");
 		       Attribute::Const, Attribute::Singleton, 
 "Amount of NH4 in irrigation.");
 
+    frame.declare_object ("volume", Volume::component, 
+                       Attribute::Const, Attribute::Singleton,
+                       "Soil volume to add irritaion.");
+    frame.set ("volume", "box");
     frame.declare ("from", "cm", Check::non_positive (), Attribute::Const, "\
 Height where you want to start the incorporation (a negative number).");
     frame.set ("from", 0.0);
@@ -360,7 +373,7 @@ struct ActionExternSubsoil : public Action
   const std::vector<symbol> constituents;
   IM sm;
 
-  std::auto_ptr<Volume> volume;
+  boost::shared_ptr<Volume> volume;
 
   void tick (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   {
@@ -390,8 +403,9 @@ struct ActionExternSubsoil : public Action
   { 
     if (flux < 1e-100)
       return;
-
-    daisy.field->irrigate_subsoil (flux, sm, *volume, daisy.dt (), msg); 
+    const double duration = 1.0; // [h]
+    daisy.field->irrigate (duration, flux, Irrigation::at_air_temperature,
+                           Irrigation::subsoil, sm, volume, false, msg); 
   }
 
   bool done (const Daisy&, const Scope&, Treelog&) const

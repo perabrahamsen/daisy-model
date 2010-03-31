@@ -198,6 +198,7 @@ struct ActionCrop : public Action
     // Content.
     const MM_DD from;
     const MM_DD to;
+    const double flux;         // Application speed [mm/h]
     const double amount;
     const double potential;
 
@@ -723,9 +724,10 @@ ActionCrop::Irrigation::doIt (Daisy& daisy, const Scope&, Treelog& msg) const
   tmp << "Irrigating " << amount << " mm";
   msg.message (tmp.str ());
   const Units& units = daisy.units ();
-  daisy.field->irrigate_overhead (amount,
-                                  IM (units.get_unit (IM::solute_unit ())),
-                                  daisy.dt (), msg);
+  daisy.field->irrigate (amount/flux, flux, ::Irrigation::at_air_temperature,
+                         ::Irrigation::overhead, 
+                         IM (units.get_unit (IM::solute_unit ())),
+                         boost::shared_ptr<Volume> (), false, msg);  
   return true;
 }
 
@@ -738,6 +740,9 @@ ActionCrop::Irrigation::load_syntax (Frame& frame)
   frame.declare_submodule ("to", Attribute::Const, 
 			"End of irrigation period.",
 			MM_DD::load_syntax);
+  frame.declare ("flux", "mm/h", Check::positive (), Attribute::Const,
+                 "Water application speed.");
+  frame.set ("flux", 2.0);
   frame.declare ("amount", "mm", Check::non_negative (), Attribute::Const, 
 	      "Amount of water to apply on irrigation.");
   frame.declare ("potential", "cm", Check::negative (), Attribute::Const, 
@@ -747,6 +752,7 @@ ActionCrop::Irrigation::load_syntax (Frame& frame)
 ActionCrop::Irrigation::Irrigation (const FrameSubmodel& al)
   : from (al.submodel ("from")),
     to (al.submodel ("to")),
+    flux (al.number ("flux")),
     amount (al.number ("amount")),
     potential (al.number ("potential"))
 { }

@@ -1,7 +1,9 @@
 2010-03-31  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* field.h, field.C, column.h, column_std.C (irrigate): New function.
-	* action_irrigate.C: Update caller.
+	(irrigate_overhead, irrigate_surface, irrigate_sunsoil): Removed.
+	* action_irrigate.C, action_fertilize.C, action_extern.C:
+	* action_table.C, action_crop.C: Update callers.
 
 	* action_irrigate.C (irrigate_top): Removed obsolete action.
 

@@ -63,7 +63,7 @@ public:
             double temperature /* dg C */,
             target_t target,
             const IM& solute /* [M/L^3] */,
-            boost::shared_ptr<Volume> volume, Treelog&);
+            boost::shared_ptr<Volume> volume, const bool silence, Treelog&);
   void tick (const Geometry&, SoilWater&, Chemistry&, Bioclimate&, 
              const double dt, Treelog&);
 private:

@@ -33,6 +33,8 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame_model.h"
+#include "volume.h"
+#include "check.h"
 #include <set>
 #include <map>
 #include <memory>
@@ -51,6 +53,8 @@ struct ActionTable : public Action
   std::map<Time, double> fertilize_events;
   std::map<Time, double> irrigate_events;
   std::map<Time, const FrameModel*> fertilizers;
+  const double flux; // [mm/h]
+  const boost::shared_ptr<Volume> volume;
 
   static void read_model (const LexerTable&,
                           const std::vector<std::string>& entries, 
@@ -176,8 +180,10 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
           IM im = AM::get_IM (metalib, u_mg_per_square_m, fert);
 	  daisy_assert (std::isnormal (value));
 	  im.multiply_assign (Scalar (1.0 / value, u_per_mm), u_ppm);
-          daisy.field->irrigate_subsoil (value, im, -5.0, -25.0, 
-                                         daisy.dt (), msg);
+          daisy.field->irrigate (value/flux, flux, 
+                                 Irrigation::at_air_temperature,
+                                 Irrigation::subsoil, 
+                                 im, volume, false, msg);
           tmp << "Fertigating " << value << " mm, with";
 	  for (IM::const_iterator i = im.begin (); i != im.end (); i++)
 	    {
@@ -213,8 +219,10 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
           daisy.field->fertilize (daisy.metalib, fert, 
                                   daisy.time, msg);
           if (water > 0.0)
-            daisy.field->irrigate_surface (water, IM (u_solute),
-                                           daisy.dt (), msg);
+            daisy.field->irrigate (water/flux, flux, 
+                                   Irrigation::at_air_temperature,
+                                   Irrigation::surface, IM (u_solute),
+                                   boost::shared_ptr<Volume> (), false, msg);  
         }
     }
   else if (irrigate_events.find (daisy.time) != irrigate_events.end ())
@@ -222,7 +230,10 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
       const double value = irrigate_events[daisy.time];
       std::ostringstream tmp;
       IM im;
-      daisy.field->irrigate_overhead (value, im, daisy.dt (), msg); 
+      daisy.field->irrigate (value/flux, flux, 
+                             Irrigation::at_air_temperature,
+                             Irrigation::overhead, im,
+                             boost::shared_ptr<Volume> (), false, msg);  
       tmp << "Irrigating " << value << " mm";
       msg.message (tmp.str ());
     }
@@ -276,7 +287,9 @@ ActionTable::ActionTable (const BlockModel& al)
              : NULL),
     am (al.check ("fertilizer") 
         ? &al.model ("fertilizer").clone ()
-        : NULL)
+        : NULL),
+    flux (al.number ("flux")),
+    volume (Volume::build_obsolete (al))
 { 
   LexerTable lex (al);
   if (!lex.read_header (al.msg ()))
@@ -371,8 +384,25 @@ it with the 'enable_fertilization' attribute.\n\
 \n\
 Fertilizer [name]: The type of fertilizer to be applied.")
   { }
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
+  { 
+    bool ok = true;
+    if (al.check ("from") && al.check ("to"))
+      {
+        const double from = al.number ("from");
+        const double to = al.number ("to");
+        if (from <= to)
+          {
+            err.entry ("'from' must be higher than 'to' in"
+                       " the subsoil irrigation zone");
+            ok = false;
+          }
+      }
+    return ok;
+  }
   void load_frame (Frame& frame) const
   { 
+    frame.add_check (check_alist);	
     LexerTable::load_syntax (frame);
     frame.declare_object ("sow", Action::component, 
                        Attribute::OptionalConst, Attribute::Singleton, 
@@ -392,6 +422,21 @@ Set this to false to ignore any irrigation information in the file.");
     frame.declare_boolean ("enable_fertilization", Attribute::Const, "\
 Set this to false to ignore any fertilization information in the file.");
     frame.set ("enable_fertilization", true);
+    frame.declare ("flux", "mm/h", Check::positive (), Attribute::Const,
+                   "Water application speed.");
+    frame.set ("flux", 2.0);
+    frame.declare_object ("volume", Volume::component, 
+                       Attribute::Const, Attribute::Singleton,
+                       "Soil volume to add irritaion.");
+    frame.set ("volume", "box");
+    frame.declare ("from", "cm", Check::non_positive (), Attribute::Const, "\
+Height where you want to start the incorporation (a negative number).\n\
+OBSOLETE: Use (volume box (top FROM)) instead.");
+    frame.set ("from", -5.0);
+    frame.declare ("to", "cm", Check::non_positive (), Attribute::Const, "\
+Height where you want to end the incorporation (a negative number).\n\
+OBSOLETE: Use (volume box (bottom TO)) instead.");
+    frame.set ("to", -25.0);
   }
 } ActionTable_syntax;
 

@@ -114,17 +114,7 @@ public:
   void irrigate (const double duration, const double flux, 
                  const double temp, Irrigation::target_t target,
                  const IM& sm, const boost::shared_ptr<Volume> volume,
-                 Treelog& msg);
-  void irrigate_overhead (double flux, double temp, const IM&, double dt,
-                          Treelog& msg);
-  void irrigate_surface (double flux, double temp, const IM&, double dt, 
-                         Treelog& msg);
-  void irrigate_overhead (double flux, const IM&, double dt, Treelog& msg);
-  void irrigate_surface (double flux, const IM&, double dt, Treelog& msg);
-  void irrigate_subsoil (double flux, const IM& sm, 
-                         double from, double to, double dt, Treelog& msg);
-  void irrigate_subsoil (double flux, const IM& sm, 
-                         const Volume& volume, double dt, Treelog& msg);
+                 const bool silence, Treelog& msg);
   void fertilize (const IM&, Treelog& msg);
   void fertilize (const Metalib&, const FrameModel&,
                   const Time&, Treelog& msg);
@@ -222,95 +212,10 @@ void
 ColumnStandard::irrigate (const double duration, const double flux, 
                           const double temp, Irrigation::target_t target,
                           const IM& sm, const boost::shared_ptr<Volume> volume,
+                          const bool silence, 
                           Treelog& msg)
 {
-  irrigation->add (duration, flux, temp, target, sm, volume, msg);
-}
-
-void 
-ColumnStandard::irrigate_overhead (const double flux, const double temp,
-                                   const IM& sm, const double dt, Treelog& msg)
-{
-  daisy_assert (flux >= 0.0);
-  bioclimate->irrigate_overhead (flux, temp);
-  const Unit& u_solute_per_mm = units.get_unit (solute_per_mm_unit);
-  const Unit& u_mm = units.get_unit (Units::mm ());
-  const Unit& u_storage = units.get_unit (IM::storage_unit ());
-  IM im (u_solute_per_mm, sm);
-  im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
-  fertilize (im, msg);
-}
-
-void 
-ColumnStandard::irrigate_surface (const double flux, const double temp, 
-                                  const IM& sm, const double dt, Treelog& msg)
-{
-  daisy_assert (flux >= 0.0);
-  bioclimate->irrigate_surface (flux, temp);
-  const Unit& u_solute_per_mm = units.get_unit (solute_per_mm_unit);
-  const Unit& u_mm = units.get_unit (Units::mm ());
-  const Unit& u_storage = units.get_unit (IM::storage_unit ());
-  IM im (u_solute_per_mm, sm);
-  im.multiply_assign (Scalar (flux * dt, u_mm ), u_storage);
-  fertilize (im, msg);
-}
-
-void 
-ColumnStandard::irrigate_overhead (const double flux,
-                                   const IM& sm, const double dt, Treelog& msg)
-{
-  daisy_assert (flux >= 0.0);
-  bioclimate->irrigate_overhead (flux);
-  const Unit& u_solute_per_mm = units.get_unit (solute_per_mm_unit);
-  const Unit& u_mm = units.get_unit (Units::mm ());
-  const Unit& u_storage = units.get_unit (IM::storage_unit ());
-  IM im (u_solute_per_mm, sm);
-  im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
-  fertilize (im, msg);
-}
-
-void 
-ColumnStandard::irrigate_surface (const double flux, 
-                                  const IM& sm, const double dt, Treelog& msg)
-{
-  daisy_assert (flux >= 0.0);
-  bioclimate->irrigate_surface (flux);
-  const Unit& u_solute_per_mm = units.get_unit (solute_per_mm_unit);
-  const Unit& u_mm = units.get_unit (Units::mm ());
-  const Unit& u_storage = units.get_unit (IM::storage_unit ());
-  IM im (u_solute_per_mm, sm);
-  im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
-  fertilize (im, msg);
-}
-
-void
-ColumnStandard::irrigate_subsoil (const double flux, const IM& sm, 
-                                  const double from, const double to, 
-                                  const double dt, Treelog& msg)
-{
-  soil_water->incorporate (geometry, flux / 10.0 /* mm -> cm */, from, to);
-  bioclimate->irrigate_subsoil (flux);
-  const Unit& u_solute_per_mm = units.get_unit (solute_per_mm_unit);
-  const Unit& u_mm = units.get_unit (Units::mm ());
-  const Unit& u_storage = units.get_unit (IM::storage_unit ());
-  IM im (u_solute_per_mm, sm);
-  im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
-  chemistry->incorporate (geometry, im, from, to, msg);
-}
-
-void
-ColumnStandard::irrigate_subsoil (const double flux, const IM& sm, 
-                                  const Volume& volume, 
-                                  const double dt, Treelog& msg)
-{
-  soil_water->incorporate (geometry, flux / 10.0 /* mm -> cm */, volume);
-  bioclimate->irrigate_subsoil (flux);
-  const Unit& u_solute_per_mm = units.get_unit (solute_per_mm_unit);
-  const Unit& u_mm = units.get_unit (Units::mm ());
-  const Unit& u_storage = units.get_unit (IM::storage_unit ());
-  IM im (u_solute_per_mm, sm);
-  im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
-  chemistry->incorporate (geometry, im, volume, msg);
+  irrigation->add (duration, flux, temp, target, sm, volume, silence, msg);
 }
 
 void

@@ -304,6 +304,7 @@ struct ActionFertilizeSurface : public ActionFertilize
   // Parameters.
   const double from;
   const double to;
+  boost::shared_ptr<Volume> volume;
 
   // Simulation.
   void doIt (Daisy& daisy, const Scope&, Treelog&);
@@ -312,8 +313,16 @@ struct ActionFertilizeSurface : public ActionFertilize
   ActionFertilizeSurface (const BlockModel& al)
     : ActionFertilize (al),
       from (al.number ("from")),
-      to (al.number ("to"))
-  {  }
+      to (al.number ("to")),
+      volume (Librarian::build_stock<Volume> (al.metalib (), al.msg (),
+                                              "box", name))
+  {  
+    if (to < from)
+      {
+        volume->limit_top (from);
+        volume->limit_bottom (to);
+      }
+  }
   ~ActionFertilizeSurface ()
   { }
 };
@@ -324,23 +333,27 @@ ActionFertilizeSurface::doIt (Daisy& daisy, const Scope&, Treelog& msg)
   const Units& units = daisy.units ();
   double water = 0.0;
   common_doIt (daisy, water, msg);
-
+  const double duration = 0.1;  // [h]
   if (to < from)
     {
       daisy.field->fertilize (daisy.metalib, *am, from, to, 
                               daisy.time, msg);
       if (water > 0.0)
-        daisy.field->irrigate_subsoil (water,
-                                       IM (units.get_unit (IM::solute_unit ())),
-                                       from, to, daisy.dt (), msg);
+        daisy.field->irrigate (duration, water / duration,
+                               Irrigation::at_air_temperature,
+                               Irrigation::subsoil,
+                               IM (units.get_unit (IM::solute_unit ())),
+                               volume, true, msg);
     }
   else
     {
       daisy.field->fertilize (daisy.metalib, *am, daisy.time, msg);
       if (water > 0.0)
-        daisy.field->irrigate_surface (water, 
-                                       IM (units.get_unit (IM::solute_unit ())),
-                                       daisy.dt (), msg);
+        daisy.field->irrigate (duration, water / duration,
+                               Irrigation::at_air_temperature,
+                               Irrigation::surface,
+                               IM (units.get_unit (IM::solute_unit ())),
+                               boost::shared_ptr<Volume> (), true, msg);
     }
 }
 
@@ -393,7 +406,7 @@ OBSOLETE:  Use 'fertilize_incorporate' instead.");
 struct ActionFertilizeIncorporate : public ActionFertilize
 {
   // Parameters.
-  std::auto_ptr<Volume> volume;
+  boost::shared_ptr<Volume> volume;
 
   // Simulation.
   void doIt (Daisy& daisy, const Scope&, Treelog&);
@@ -410,16 +423,19 @@ struct ActionFertilizeIncorporate : public ActionFertilize
 void 
 ActionFertilizeIncorporate::doIt (Daisy& daisy, const Scope&, Treelog& msg)
 {
+  const Units& units = daisy.units ();
   double water = 0.0;
   common_doIt (daisy, water, msg);
+  const double duration = 0.1;  // [h]
 
   daisy.field->fertilize (daisy.metalib, *am, *volume,
                           daisy.time, msg);
   if (water > 0.0)
-    daisy.field->irrigate_subsoil (water,
-                                   IM (daisy.units ()
-                                       .get_unit (IM::solute_unit ())),
-                                   *volume, daisy.dt (), msg);
+    daisy.field->irrigate (duration, water / duration,
+                           Irrigation::at_air_temperature,
+                           Irrigation::subsoil,
+                           IM (units.get_unit (IM::solute_unit ())),
+                           volume, true, msg);
 }
 
 static struct ActionFertilizeIncorporateSyntax : public DeclareModel

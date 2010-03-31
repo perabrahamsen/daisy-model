@@ -2,14 +2,6 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Irrigation 
 
-** test-irr.dai
-
-** Irrigation til column
-
-** Column::irrigate* skal bruge det nye modul
-
-** Check at vandbalancen er den samme
-
 ** Irrigation::output
 
 ** checkpoint, restore

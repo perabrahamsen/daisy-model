@@ -137,13 +137,13 @@ static struct MV_SoilSyntax : DeclareModel
                 Attribute::Const, "Field capacity, topsoil.");
     frame.declare ("Theta_wo", Attribute::Fraction (), Check::positive (), 
                 Attribute::Const,
-                "Wielding point, topsoil.");
+                "Wilting point, topsoil.");
     frame.declare ("Theta_fu", Attribute::Fraction (), Check::positive (), 
                 Attribute::Const,
                 "Field capacity, subsoil.");
     frame.declare ("Theta_wu", Attribute::Fraction (), Check::positive (), 
                 Attribute::Const,
-                "Wielting point, subsoil.");
+                "Wilting point, subsoil.");
     frame.declare ("C_e", "mm", Check::non_negative (), Attribute::Const,
                 "Capacity of evaporation reservoir.");
     frame.declare ("c_e", Attribute::Fraction (), Check::non_negative (), 
@@ -352,6 +352,8 @@ Green leaf area index at the time where growth rate become exponential.");
 
 struct ActionMarkvand : public Action
 {
+  const double flux;         // Application speed [mm/h]
+
   // Soil & Crop.
   const std::auto_ptr<MV_Soil> soil;
   const struct crop_map_t : public std::map<symbol, const MV_Crop*>
@@ -504,7 +506,9 @@ ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& msg)
       tmp << "MARKVAND Irrigating " << I << " mm";
       msg.message (tmp.str ());
       IM im;
-      daisy.field->irrigate_overhead (I, im, daisy.dt (), msg);
+      daisy.field->irrigate (I/flux, flux, Irrigation::at_air_temperature,
+                             Irrigation::overhead, im, 
+                             boost::shared_ptr<Volume> (), false, msg);
     }
 
   // Update temperature sum and time.
@@ -655,6 +659,7 @@ ActionMarkvand::output (Log& log) const
 
 ActionMarkvand::ActionMarkvand (const BlockModel& al)
   : Action (al),
+    flux (al.number ("flux")),
     soil (Librarian::build_item<MV_Soil> (al, "soil")),
     crop_map (al, "map"),
     T_sum (al.number ("T_sum", -1.0)),
@@ -686,6 +691,9 @@ Irrigate the field according to MARKVAND scheduling.")
   void load_frame (Frame& frame) const
   { 
     frame.add_check (check_alist);	
+    frame.declare ("flux", "mm/h", Check::positive (), Attribute::Const,
+                   "Water application speed.");
+    frame.set ("flux", 2.0);
     frame.declare_object ("soil", MV_Soil::component, Attribute::Const, 
                        Attribute::Singleton,
                        "Soil type to schedule irrigation on.");

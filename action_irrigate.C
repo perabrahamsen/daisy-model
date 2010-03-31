@@ -44,7 +44,7 @@ struct ActionIrrigate : public Action
 {
   const int days;
   const int hours;
-  double remaining_time;
+  const double remaining_time;
 
   const std::auto_ptr<Number> expr_flux;
   double flux;
@@ -84,7 +84,6 @@ struct ActionIrrigate : public Action
     : Action (al),
       days (al.integer ("days")),
       hours (al.integer ("hours", (days > 0) ? 0 : 1)),
-      activated (false),
       remaining_time (al.number ("remaining_time", days * 24.0 + hours)),
       expr_flux (Librarian::build_item<Number> (al, "flux")),
       flux (-42.42e42),
@@ -151,7 +150,7 @@ struct ActionIrrigateOverhead : public ActionIrrigate
                  const double dt, Treelog& msg) const
   { 
     f.irrigate (dt, flux, temp, Irrigation::overhead, im, 
-                boost::shared_ptr<Volume> (), msg);
+                boost::shared_ptr<Volume> (), false, msg);
   }
   ActionIrrigateOverhead (const BlockModel& al)
     : ActionIrrigate (al)
@@ -164,7 +163,7 @@ struct ActionIrrigateSurface : public ActionIrrigate
                  const double dt, Treelog& msg) const
   {
     f.irrigate (dt, flux, temp, Irrigation::surface, im, 
-                boost::shared_ptr<Volume> (), msg);
+                boost::shared_ptr<Volume> (), false, msg);
   }
   ActionIrrigateSurface (const BlockModel& al)
     : ActionIrrigate (al)
@@ -179,7 +178,7 @@ struct ActionIrrigateSubsoil : public ActionIrrigate
                  const IM& im, const double dt, Treelog& msg) const
   { 
     f.irrigate (dt, flux, Irrigation::at_air_temperature, 
-                Irrigation::subsoil, im, volume, msg);
+                Irrigation::subsoil, im, volume, false, msg);
   }
   ActionIrrigateSubsoil (const BlockModel& al)
     : ActionIrrigate (al),

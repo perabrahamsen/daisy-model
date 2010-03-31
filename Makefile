@@ -2016,7 +2016,8 @@ action_table${OBJ}: action_table.C action.h model_framed.h model_logable.h \
  model.h symbol.h metalib.h frame.h scope.h attribute.h library.h daisy.h \
  program.h run.h time.h timestep.h vcheck.h memutils.h field.h irrigate.h \
  border.h am.h im.h units.h lexer_table.h block_model.h block_nested.h \
- block.h treelog.h frame_model.h mathlib.h assertion.h librarian.h
+ block.h treelog.h frame_model.h mathlib.h assertion.h librarian.h \
+ volume.h check.h
 xysource_merge${OBJ}: xysource_merge.C xysource.h model.h symbol.h \
  block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
  frame_model.h frame.h gnuplot_utils.h number.h scope_sources.h time.h \
