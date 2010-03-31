@@ -182,7 +182,7 @@ struct ActionIrrigateSubsoil : public ActionIrrigate
   }
   ActionIrrigateSubsoil (const BlockModel& al)
     : ActionIrrigate (al),
-      volume (Volume::build_obsolete (al))
+      volume (Volume::build_obsolete (al).release ())
   { }
 };
 

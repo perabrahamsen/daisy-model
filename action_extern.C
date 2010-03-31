@@ -285,7 +285,7 @@ struct ActionExternFertigation : public Action
       NO3_value (0.0),
       NH4_expr (Librarian::build_item<Number> (al, "NH4")),
       NH4_value (0.0),
-      volume (Volume::build_obsolete (al))
+      volume (Volume::build_obsolete (al).release ())
   { }
   ~ActionExternFertigation ()
   { }
@@ -472,7 +472,7 @@ struct ActionExternSubsoil : public Action
       flux (-42.42e42),
       constituents (al.name_sequence ("constituents")),
       sm (al.units ().get_unit (Units::ppm ())),
-      volume (Volume::build_obsolete (al))
+      volume (Volume::build_obsolete (al).release ())
   { }
   ~ActionExternSubsoil ()
   { }

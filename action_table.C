@@ -289,7 +289,7 @@ ActionTable::ActionTable (const BlockModel& al)
         ? &al.model ("fertilizer").clone ()
         : NULL),
     flux (al.number ("flux")),
-    volume (Volume::build_obsolete (al))
+    volume (Volume::build_obsolete (al).release ())
 { 
   LexerTable lex (al);
   if (!lex.read_header (al.msg ()))
