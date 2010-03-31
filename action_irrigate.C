@@ -44,10 +44,7 @@ struct ActionIrrigate : public Action
 {
   const int days;
   const int hours;
-  bool activated;
   double remaining_time;
-
-  static const double at_air_temperature;
 
   const std::auto_ptr<Number> expr_flux;
   double flux;
@@ -80,64 +77,7 @@ struct ActionIrrigate : public Action
   
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   {
-    if (!activated)
-      {
-	activated = true;
-#ifdef NEW_IRRIGATE
-        irrigate (*daisy.field, flux, temp, sm, remaining_time, msg);
-        remaining_time = 0.0;
-#else
-        if (remaining_time < -1.0)
-          remaining_time = days * 24 + hours ;
-        std::ostringstream tmp;
-        tmp << "Irrigating " << flux << " mm/h for "
-            << remaining_time << " hour";
-        if (!approximate (remaining_time, 1.0))
-          tmp << "s";
-        tmp << " total " << flux * remaining_time << " mm";
-	static const symbol conc_flux_unit ("kg/ha/mm");
-        const Unit& u_cf = daisy.units ().get_unit (conc_flux_unit);
-        const double N = (sm.get_value (Chemical::NO3 (), u_cf)
-			  + sm.get_value (Chemical::NH4 (), u_cf))
-	  * flux * remaining_time;
-        if (N > 1e-10)
-          tmp << "; adding " << N << " kg N/ha";
-	for (IM::const_iterator i = sm.begin (); i != sm.end (); i++)
-	  {
-	    const symbol chem = *i;
-	    if (chem == Chemical::NO3 () || chem == Chemical::NH4 ())
-	      continue;
-	    const double value = sm.get_value (chem, u_cf)
-	      * flux * (days * 24 + hours) * 1000.0 /* [g/kg] */;
-	    if (!std::isnormal (value))
-	      continue;
-	    tmp << "; " << value << " g " << chem << "/ha";
-	  }
-			  
-        msg.message (tmp.str ());      
-      }
-    const double dt = daisy.dt ();
-    double this_flux = flux;
-    if (remaining_time < dt * 1.001)
-      {
-        if (remaining_time < dt * 0.999)
-          this_flux *= remaining_time / dt;
-
-        remaining_time = 0.0;
-        msg.message ("Irrigating done");
-      }
-    else 
-      remaining_time -= dt;
-    daisy_assert (std::isfinite (this_flux));
-    daisy_assert (this_flux >= 0.0);
-    irrigate (*daisy.field, this_flux, temp, sm, daisy.dt (), msg);
-#endif
-  }
-
-  bool done (const Daisy& daisy, const Scope&, Treelog&) const
-  {
-    daisy_assert (activated);
-    return remaining_time < daisy.dt () * 0.0001; 
+    irrigate (*daisy.field, flux, temp, sm, remaining_time, msg);
   }
 
   ActionIrrigate (const BlockModel& al)
@@ -145,10 +85,10 @@ struct ActionIrrigate : public Action
       days (al.integer ("days")),
       hours (al.integer ("hours", (days > 0) ? 0 : 1)),
       activated (false),
-      remaining_time (al.number ("remaining_time", -42.42e42)),
+      remaining_time (al.number ("remaining_time", days * 24.0 + hours)),
       expr_flux (Librarian::build_item<Number> (al, "flux")),
       flux (-42.42e42),
-      temp (al.number ("temperature", at_air_temperature)),
+      temp (al.number ("temperature", Irrigation::at_air_temperature)),
       sm (al, "solute")
   { }
   ~ActionIrrigate ()
@@ -203,8 +143,6 @@ Solutes in irrigation water.", IM::load_const_ppm);
   }
 } ActionIrrigateBase_syntax;
 
-const double ActionIrrigate::at_air_temperature = -500;
-
 const symbol ActionIrrigate::mm_per_h ("mm/h");
 
 struct ActionIrrigateOverhead : public ActionIrrigate
@@ -212,15 +150,8 @@ struct ActionIrrigateOverhead : public ActionIrrigate
   void irrigate (Field& f, const double flux, const double temp, const IM& im, 
                  const double dt, Treelog& msg) const
   { 
-#ifdef NEW_IRRIGATE
     f.irrigate (dt, flux, temp, Irrigation::overhead, im, 
                 boost::shared_ptr<Volume> (), msg);
-#else
-    if (approximate (temp, at_air_temperature))
-      f.irrigate_overhead (flux, im, dt, msg); 
-    else
-      f.irrigate_overhead (flux, temp, im, dt, msg); 
-#endif
   }
   ActionIrrigateOverhead (const BlockModel& al)
     : ActionIrrigate (al)
@@ -232,15 +163,8 @@ struct ActionIrrigateSurface : public ActionIrrigate
   void irrigate (Field& f, const double flux, const double temp, const IM& im, 
                  const double dt, Treelog& msg) const
   {
-#ifdef NEW_IRRIGATE
     f.irrigate (dt, flux, temp, Irrigation::surface, im, 
                 boost::shared_ptr<Volume> (), msg);
-#else
-    if (approximate (temp, at_air_temperature))
-      f.irrigate_surface (flux, im, dt, msg);
-    else
-      f.irrigate_surface (flux, temp, im, dt, msg); 
-#endif
   }
   ActionIrrigateSurface (const BlockModel& al)
     : ActionIrrigate (al)
@@ -254,12 +178,8 @@ struct ActionIrrigateSubsoil : public ActionIrrigate
   void irrigate (Field& f, const double flux, const double /* temp */, 
                  const IM& im, const double dt, Treelog& msg) const
   { 
-#ifdef NEW_IRRIGATE
     f.irrigate (dt, flux, Irrigation::at_air_temperature, 
                 Irrigation::subsoil, im, volume, msg);
-#else
-    f.irrigate_subsoil (flux, im, *volume, dt, msg); 
-#endif
   }
   ActionIrrigateSubsoil (const BlockModel& al)
     : ActionIrrigate (al),
