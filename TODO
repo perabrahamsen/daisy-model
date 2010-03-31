@@ -2,6 +2,11 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Irrigation 
 
+** Implementer Irrigation::output uden Volume
+
+Giv en advarsel hvis der er subsoil uden volume, og undskyld at
+checkpoints ikke virker.
+
 ** Bound skal være logable
 
 Men den er "mutable type"!
