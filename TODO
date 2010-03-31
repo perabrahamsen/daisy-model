@@ -2,6 +2,16 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Irrigation 
 
+** Bound skal være logable
+
+Men den er "mutable type"!
+
+Hvad gør vi?  Studer AM.
+
+** Volume skal være ModelFramed
+
+** Volume::output
+
 ** Irrigation::output
 
 ** checkpoint, restore
@@ -9,6 +19,8 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 ** Ny irrigate action?
 
 ** Fjern Daisy.dt
+
+Kun LogSelect::done bruger den
 
 * Prøv 2D med MACRO hydraulics
 
