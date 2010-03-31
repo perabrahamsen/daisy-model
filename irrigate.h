@@ -26,48 +26,54 @@
 #include "memutils.h"
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
-#include <vector>
 
-class Solute;
+class Geometry;
+class SoilWater;
+class Chemistry;
+class Bioclimate;
+class IM;
 class Volume;
 class BlockSubmodel;
 class Frame;
-class Chemistry;
-class Bioclimate;
 class Treelog;
+class Unit;
 
 class Irrigation : private boost::noncopyable
 {
+  // Units.
+  const Unit& u_mm;           // [mm]
+  const Unit& u_storage;      // [g/cm^2]
+  static const symbol solute_per_mm; // [g/cm^2/mm]
+  const Unit& u_solute_per_mm;  // [g/cm^2/mm]
+  static const symbol conc_flux; // [kg/ha/mm]
+  const Unit& u_conc_flux;  // [kg/ha/mm]
+
   // Content.
+public:
   static const double at_air_temperature;
   enum target_t { overhead, surface, subsoil };
-  struct Event : private boost::noncopyable
-  {
-    // Content.
-    double time_left;           // [h]
-    const double flux;          // [mm/h]
-    const double temperature;   // [dg C]
-    const boost::shared_ptr<Solute> solute;
-    const target_t target;
-    static target_t symbol2target (symbol s);
-    const boost::shared_ptr<Volume> volume;
-    
-    // Use.
-    void tick (Chemistry&, Bioclimate&, const double dt, Treelog&);
-    bool done () const;
-
-    // Create and Destroy.
-    static void load_syntax (Frame&);
-    explicit Event (const BlockSubmodel&);
-  };
+private:
+  class Event;
   auto_vector<Event*> event;
 
-  void tick (Chemistry&, Bioclimate&, const double dt, Treelog&);
+  // Use.
+public:
+  void add (double duration /* [h] */,
+            double flux /* [mm/h] */,
+            double temperature /* dg C */,
+            target_t target,
+            const IM& solute /* [M/L^3] */,
+            boost::shared_ptr<Volume> volume, Treelog&);
+  void tick (const Geometry&, SoilWater&, Chemistry&, Bioclimate&, 
+             const double dt, Treelog&);
+private:
+  void cleanup (Treelog&);
 
   // Create and Destroy.
-  static void load_syntax (Frame&);
 public:
+  static void load_syntax (Frame&);
   Irrigation (const BlockSubmodel&);
+  ~Irrigation ();
 };
 
 #endif // IRRIGATE_H

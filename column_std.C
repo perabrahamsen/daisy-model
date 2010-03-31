@@ -40,6 +40,7 @@
 #include "im.h"
 #include "am.h"
 #include "dom.h"
+#include "irrigate.h"
 #include "time.h"
 #include "log.h"
 #include "submodeler.h"
@@ -78,6 +79,7 @@ struct ColumnStandard : public Column
   std::auto_ptr<OrganicMatter> organic_matter;
   double second_year_utilization_;
   std::vector<double> tillage_age;
+  std::auto_ptr<Irrigation> irrigation;
 
   // Log variables.
   double harvest_DM;
@@ -109,6 +111,10 @@ public:
             double row_width, double row_pos, double seed,
             const Time&, Treelog&);
   void ridge (const FrameSubmodel& al);
+  void irrigate (const double duration, const double flux, 
+                 const double temp, Irrigation::target_t target,
+                 const IM& sm, const boost::shared_ptr<Volume> volume,
+                 Treelog& msg);
   void irrigate_overhead (double flux, double temp, const IM&, double dt,
                           Treelog& msg);
   void irrigate_surface (double flux, double temp, const IM&, double dt, 
@@ -211,6 +217,15 @@ ColumnStandard::sow (const Metalib& metalib, const FrameModel& al,
 void 
 ColumnStandard::ridge (const FrameSubmodel& al)
 { movement->ridge (surface, *soil, *soil_water, al); }
+
+void 
+ColumnStandard::irrigate (const double duration, const double flux, 
+                          const double temp, Irrigation::target_t target,
+                          const IM& sm, const boost::shared_ptr<Volume> volume,
+                          Treelog& msg)
+{
+  irrigation->add (duration, flux, temp, target, sm, volume, msg);
+}
 
 void 
 ColumnStandard::irrigate_overhead (const double flux, const double temp,
@@ -653,6 +668,9 @@ ColumnStandard::tick (const Metalib& metalib, const Time& time, const double dt,
                       const Weather* global_weather, const Scope& parent_scope,
                       Treelog& msg)
 {
+  // Irrigation is delayed management.
+  irrigation->tick (geometry, *soil_water, *chemistry, *bioclimate, dt, msg);
+
   // Put on timestep on management results for output.
   harvest_DM /= dt;
   harvest_N /= dt;
@@ -950,6 +968,7 @@ ColumnStandard::ColumnStandard (const BlockModel& al)
     organic_matter (Librarian::build_item<OrganicMatter> 
                     (al, "OrganicMatter")),
     second_year_utilization_ (al.number ("second_year_utilization")),
+    irrigation (submodel<Irrigation> (al, "Irrigation")),
     harvest_DM (0.0),
     harvest_N (0.0),
     harvest_C (0.0),
@@ -1148,6 +1167,10 @@ By default, the top 25 cm will have an initial tillage age of 100 days,\n\
 while the soil below that will have an initial tillage age of 100 years.\n\
 If you specify fewer values than there are soil cells, the last specified\n\
 value will be used for the remaining cells."); 
+    frame.declare_submodule ("Irrigation", Attribute::State,
+                             "Active irrigation events.",
+                             Irrigation::load_syntax);
+
     frame.declare ("seed_N", "kg N/ha/h", Attribute::LogOnly,
                    "Amount of nitrogen in seed applied this time step.");
     frame.declare ("seed_C", "kg C/ha/h", Attribute::LogOnly,

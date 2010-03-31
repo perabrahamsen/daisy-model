@@ -2,14 +2,6 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Irrigation 
 
-** Event -> subsoil water
-
-** Solute->IM
-
-** Event -> chemistry spray
-
-** Event -> chemistry subsoil
-
 ** test-irr.dai
 
 ** Irrigation til column

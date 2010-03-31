@@ -23,6 +23,7 @@
 #ifndef FIELD_H
 #define FIELD_H
 
+#include "irrigate.h"
 #include "border.h"
 #include "symbol.h"
 #include <vector>
@@ -70,6 +71,10 @@ public:
             double row_width, double row_pos, double seed,
             const Time&, Treelog&);
   void ridge (const FrameSubmodel& ridge);
+  void irrigate (const double duration, const double flux, 
+                 const double temp, Irrigation::target_t target,
+                 const IM& sm, const boost::shared_ptr<Volume> volume,
+                 Treelog& msg);
   void irrigate_overhead (double water, double temp, const IM&, double dt,
 			  Treelog& msg);
   void irrigate_surface (double water, double temp, const IM&, double dt,

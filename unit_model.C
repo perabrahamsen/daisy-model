@@ -559,6 +559,8 @@ Connvert to SI base units by multiplying with a factor.")
          "Concentration.");
     add ("mg N/l", p_m * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
          "Nitrogen concentration.");
+    add ("g N/l", u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
+         "Nitrogen concentration.");
     add ("g/cm^2/mm", u_g / p_c_2 / p_m,
          -3, 1, 0, 0, 0, 0, 0,
          "Irrigation and percolation concentration.");

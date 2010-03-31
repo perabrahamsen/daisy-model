@@ -24,6 +24,7 @@
 #define COLUMN_H
 
 #include "model_framed.h"
+#include "irrigate.h"
 #include <vector>
 
 class Frame;
@@ -85,6 +86,10 @@ public:
                     double row_width, double row_pos, double seed,
                     const Time&, Treelog&) = 0;
   virtual void ridge (const FrameSubmodel& ridge) = 0;
+  virtual void irrigate (const double duration, const double flux, 
+                         const double temp, Irrigation::target_t target,
+                         const IM& sm, const boost::shared_ptr<Volume> volume,
+                         Treelog& msg) = 0;
   virtual void irrigate_overhead (double flux, double temp, const IM&, 
                                   double dt, Treelog& msg) = 0;
   virtual void irrigate_surface (double flux, double temp, const IM&,

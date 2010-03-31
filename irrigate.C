@@ -22,9 +22,11 @@
 
 #include "irrigate.h"
 #include "volume.h"
-#include "solute.h"
+#include "im.h"
+#include "soil_water.h"
 #include "bioclimate.h"
 #include "chemistry.h"
+#include "chemical.h"
 #include "frame.h"
 #include "check.h"
 #include "vcheck.h"
@@ -33,9 +35,47 @@
 #include "librarian.h"
 #include "assertion.h"
 #include "mathlib.h"
+#include "units.h"
+#include "treelog.h"
+#include <sstream>
+
+const symbol 
+Irrigation::solute_per_mm ("g/cm^2/mm");
+
+const symbol 
+Irrigation::conc_flux ("kg/ha/mm");
 
 const double 
 Irrigation::at_air_temperature = -500.0;
+
+struct Irrigation::Event : private boost::noncopyable
+{
+  // Content.
+  double time_left;           // [h]
+  const double flux;          // [mm/h]
+  const double temperature;   // [dg C]
+  const IM solute;            // [M/L^3]
+  const target_t target;
+  static target_t symbol2target (symbol s);
+  const boost::shared_ptr<Volume> volume;
+
+  // Use.
+  void tick (const Unit& u_mm, const Unit& u_storage, 
+             const Geometry&, SoilWater&, Chemistry&, Bioclimate&,
+             const double dt, Treelog&);
+  bool done () const;
+
+  // Create and Destroy.
+  static void load_syntax (Frame&);
+  explicit Event (const BlockSubmodel&);
+  Event (const Unit& u_solute_per_mm /* [g/cm^2/mm] */, 
+         const double duration /* [h] */,
+         const double flux /* [mm/h] */,
+         const double temperature /* dg C */,
+         const target_t target,
+         const IM& solute /* [M/L^3] */,
+         const boost::shared_ptr<Volume> volume);
+};
 
 Irrigation::target_t 
 Irrigation::Event::symbol2target (const symbol s)
@@ -55,14 +95,18 @@ Irrigation::Event::symbol2target (const symbol s)
 }  
 
 void
-Irrigation::Event::tick (Chemistry& chemistry, Bioclimate& bioclimate,
+Irrigation::Event::tick (const Unit& u_mm, const Unit& u_storage, 
+                         const Geometry& geo, SoilWater& soil_water,
+                         Chemistry& chemistry, Bioclimate& bioclimate,
                          const double dt, Treelog& msg)
 { 
+  // Time.
   const double time_used = std::min (dt, time_left);
   time_left -= time_used;
   const double amount = flux * time_used;
   const double flux_used = amount / dt;
   
+  // Water.
   switch (target)
     {
     case overhead:
@@ -81,11 +125,31 @@ Irrigation::Event::tick (Chemistry& chemistry, Bioclimate& bioclimate,
 
     case subsoil:
       bioclimate.irrigate_subsoil (flux_used);
-      // TODO: Add to soil
+      daisy_assert (volume.get ());
+      soil_water.incorporate (geo, flux_used * 0.1 /* mm -> cm */, *volume);
       break;
     }
   
-  // TODO: Add solute.
+  // Solute amount.
+  IM im = solute;
+  im.multiply_assign (Scalar (amount, u_mm), u_storage);
+
+  // Apply it.
+  switch (target)
+    {
+    case overhead:
+      chemistry.spray (im, msg);
+      break;
+
+    case surface:
+      chemistry.spray (im, msg); // BUG!
+      break;
+
+    case subsoil:
+      daisy_assert (volume.get ());
+      chemistry.incorporate (geo, im, *volume, msg);
+      break;
+    }
 }
 
 bool
@@ -102,9 +166,8 @@ Water applied.");
   frame.declare ("temperature", "dg C", Attribute::OptionalConst, "\
 Irrigation temperature. By default, use daily air temperature.\n\
 Ignored for subsoil irrigation.");
-  frame.declare_object ("solute", Solute::component, 
-                        Attribute::State, Attribute::Singleton, "\
-Constituents of irrigation water.");
+  frame.declare_submodule_sequence ("solute", Attribute::Const, "\
+Solutes in irrigation water.", IM::load_const_ppm);
   frame.declare_string ("target", Attribute::Const, "\
 Where to apply the irrigation.  \n\
 \n\
@@ -123,19 +186,83 @@ Irrigation::Event::Event (const BlockSubmodel& al)
   : time_left (al.number ("time_left")),
     flux (al.number ("flux")),
     temperature (al.number ("temperature", at_air_temperature)),
-    solute (Librarian::build_item<Solute> (al, "solute")),
+    solute (al, "solute"),
     target (symbol2target (al.name ("target"))),
     volume (Librarian::build_item<Volume> (al, "volume"))
 { }
 
+Irrigation::Event::Event (const Unit& u_solute_per_mm /* [g/cm^2/mm] */, 
+                          const double duration /* [h] */,
+                          const double f /* [mm/h] */,
+                          const double temp /* dg C */,
+                          const target_t targ,
+                          const IM& sol /* [M/L^3] */,
+                          const boost::shared_ptr<Volume> vol)
+  : time_left (duration),
+    flux (f),
+    temperature (temp),
+    solute (u_solute_per_mm, sol),
+    target (targ),
+    volume (vol)
+{ }
+
+void 
+Irrigation::add (const double duration /* [h] */,
+                 const double flux /* [mm/h] */,
+                 const double temperature /* dg C */,
+                 const target_t target,
+                 const IM& solute /* [M/L^3] */,
+                 const boost::shared_ptr<Volume> volume, 
+                 Treelog& msg)
+{
+  event.push_back (new Event (u_solute_per_mm,
+                              duration, flux, temperature, target, 
+                              solute, volume));
+
+  std::ostringstream tmp;
+  tmp << "Irrigating " << flux << " mm/h for "
+      << duration << " hour";
+  if (!approximate (duration, 1.0))
+    tmp << "s";
+  tmp << " total " << flux * duration << " mm";
+
+  const double N = (solute.get_value (Chemical::NO3 (), u_conc_flux)
+                    + solute.get_value (Chemical::NH4 (), u_conc_flux))
+    * flux * duration;
+  if (N > 1e-10)
+    tmp << "; adding " << N << " kg N/ha";
+  for (IM::const_iterator i = solute.begin (); i != solute.end (); i++)
+    {
+      const symbol chem = *i;
+      if (chem == Chemical::NO3 () || chem == Chemical::NH4 ())
+        continue;
+      const double value = solute.get_value (chem, u_conc_flux)
+        * flux * duration * 1000.0 /* [g/kg] */;
+      if (!std::isnormal (value))
+        continue;
+      tmp << "; " << value << " g " << chem << "/ha";
+    }
+			  
+  msg.message (tmp.str ());
+}
+
 void
-Irrigation::tick (Chemistry& chemistry, Bioclimate& bioclimate,
+Irrigation::tick (const Geometry& geo, SoilWater& soil_water,
+                  Chemistry& chemistry, Bioclimate& bioclimate,
                   const double dt, Treelog& msg)
 {
   // Perform events.
   for (size_t e = 0; e < event.size (); e++)
-    event[e]->tick (chemistry, bioclimate, dt, msg);
+    event[e]->tick (u_mm, u_storage,
+                    geo, soil_water, chemistry, bioclimate, dt, msg);
 
+  // Remove all dead events.
+  cleanup (msg);
+}
+
+void
+Irrigation::cleanup (Treelog& msg)
+{
   // Remove all dead events.  There has to be a better way.
   bool removed;
   do
@@ -146,6 +273,7 @@ Irrigation::tick (Chemistry& chemistry, Bioclimate& bioclimate,
 	   e++)
 	if ((*e)->done ())
 	  {
+            msg.message ("Irrigation done");
             delete *e;
             event.erase (e); // This invalidates the iterator.
             // Restart the loop.
@@ -161,12 +289,24 @@ Irrigation::load_syntax (Frame& frame)
 {
   frame.declare_submodule_sequence ("event", Attribute::State, "\
 Currently active irrigation events.", Event::load_syntax);
-  frame.order ("event");
+  frame.set_empty ("event");
 }
 
 Irrigation::Irrigation (const BlockSubmodel& al)
-  : event (map_submodel<Event> (al, "events"))
+  : u_mm (al.units ().get_unit (Units::mm ())),
+    u_storage (al.units ().get_unit (IM::storage_unit ())),
+    u_solute_per_mm (al.units ().get_unit (solute_per_mm)),
+    u_conc_flux (al.units ().get_unit (conc_flux)),
+    event (map_submodel<Event> (al, "event"))
 { }
+
+Irrigation::~Irrigation ()
+{ }
+
+static DeclareSubmodel 
+irrigation_submodel (Irrigation::load_syntax, "Irrigation", "\
+Keep track of active irrigation events.\n                       \
+Usually not set explicitly, but may be found in a checkpint.");
 
 // irrigate.C ends here.
 

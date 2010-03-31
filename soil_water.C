@@ -476,16 +476,14 @@ SoilWater::mass_balance (const Geometry& geo, double dt, Treelog& msg)
 }
 
 void 
-SoilWater::incorporate (const Geometry& geo, const double amount,
+SoilWater::incorporate (const Geometry& geo, const double flux,
                         const double from, const double to)
-
-{ geo.add_surface (S_incorp_, from, to, -amount); }
+{ geo.add_surface (S_incorp_, from, to, -flux); }
 
 void 
-SoilWater::incorporate (const Geometry& geo, const double amount,
+SoilWater::incorporate (const Geometry& geo, const double flux,
                         const Volume& volume)
-
-{ geo.add_surface (S_incorp_, volume, -amount); }
+{ geo.add_surface (S_incorp_, volume, -flux); }
 
 double
 SoilWater::mix (const Geometry& geo, const Soil& soil, 

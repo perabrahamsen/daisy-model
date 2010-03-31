@@ -24,6 +24,7 @@
 
 #include "model_logable.h"
 #include "symbol.h"
+#include "im.h"
 
 class BlockModel;
 
@@ -35,6 +36,7 @@ public:
   symbol library_id () const;
 
   // Content.
+  virtual IM concentration () const = 0;
 
   // Create and Destroy.
 public:

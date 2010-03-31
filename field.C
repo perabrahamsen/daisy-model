@@ -53,6 +53,10 @@ struct Field::Implementation
             double row_width, double row_pos, double seed,
             const Time& time, Treelog&);
   void ridge (const FrameSubmodel& ridge);
+  void irrigate (const double duration, const double flux, 
+                 const double temp, Irrigation::target_t target,
+                 const IM& sm, const boost::shared_ptr<Volume> volume,
+                 Treelog& msg);
   void irrigate_overhead (double flux, double temp, const IM&, double dt, 
 			  Treelog& msg);
   void irrigate_surface (double flux, double temp, const IM&, double dt, 
@@ -195,6 +199,21 @@ Field::Implementation::ridge (const FrameSubmodel& ridge)
 	   i++)
 	(*i)->ridge (ridge);
     }
+}
+
+void 
+Field::Implementation::irrigate (const double duration, const double flux, 
+                                 const double temp, Irrigation::target_t target,
+                                 const IM& sm,
+                                 const boost::shared_ptr<Volume> volume,
+                                 Treelog& msg)
+{
+  if (selected)
+    selected->irrigate (duration, flux, temp, target, sm, volume, msg);
+  else for (ColumnList::iterator i = columns.begin ();
+	    i != columns.end ();
+	    i++)
+	 (*i)->irrigate (duration, flux, temp, target, sm, volume, msg);
 }
 
 void 
@@ -866,6 +885,13 @@ Field::sow (const Metalib& metalib, const FrameModel& crop,
 void 
 Field::ridge (const FrameSubmodel& al)
 { impl->ridge (al); }
+
+void 
+Field::irrigate (const double duration, const double flux, 
+                 const double temp, Irrigation::target_t target,
+                 const IM& sm, const boost::shared_ptr<Volume> volume,
+                 Treelog& msg)
+{ impl->irrigate (duration, flux, temp, target, sm, volume, msg); }
 
 void 
 Field::irrigate_overhead (double water, double temp, const IM& im, double dt,

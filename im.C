@@ -28,7 +28,7 @@
 #include "unit.h"
 #include "am.h"
 #include "log.h"
-#include "block_model.h"
+#include "block.h"
 #include "frame_submodel.h"
 #include "check.h"
 #include "assertion.h"
@@ -197,7 +197,7 @@ IM::clear ()
     (*i).second = 0.0;
 }
 
-IM::IM (const BlockModel& parent, const char *const key)
+IM::IM (const Block& parent, const char *const key)
 {
   // Find dimension.
   const Frame& parent_frame = parent.find_frame (key);
@@ -253,5 +253,10 @@ IM::add_syntax (Frame& frame,
              "Value for chemical.");
   frame.order ("name", "value");
 }
+
+void 
+IM::load_const_ppm (Frame& frame)
+{ add_syntax (frame, Attribute::Const, Units::ppm ()); }
+
 
 // im.C ends here.

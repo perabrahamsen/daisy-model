@@ -1,3 +1,10 @@
+2010-03-31  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* field.h, field.C, column.h, column_std.C (irrigate): New function.
+	* action_irrigate.C: Update caller.
+
+	* action_irrigate.C (irrigate_top): Removed obsolete action.
+
 2010-03-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* irrigate.C, irrigate.h: New submodel.

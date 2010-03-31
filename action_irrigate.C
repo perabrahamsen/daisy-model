@@ -38,6 +38,8 @@
 #include "frame.h"
 #include <sstream>
 
+// #define NEW_IRRIGATE
+
 struct ActionIrrigate : public Action
 {
   const int days;
@@ -81,6 +83,10 @@ struct ActionIrrigate : public Action
     if (!activated)
       {
 	activated = true;
+#ifdef NEW_IRRIGATE
+        irrigate (*daisy.field, flux, temp, sm, remaining_time, msg);
+        remaining_time = 0.0;
+#else
         if (remaining_time < -1.0)
           remaining_time = days * 24 + hours ;
         std::ostringstream tmp;
@@ -125,6 +131,7 @@ struct ActionIrrigate : public Action
     daisy_assert (std::isfinite (this_flux));
     daisy_assert (this_flux >= 0.0);
     irrigate (*daisy.field, this_flux, temp, sm, daisy.dt (), msg);
+#endif
   }
 
   bool done (const Daisy& daisy, const Scope&, Treelog&) const
@@ -170,9 +177,6 @@ Shared parameter for irrigate actions.")
     return ok;
   }
 
-  static void load_ppm (Frame& frame)
-  { IM::add_syntax (frame, Attribute::Const, Units::ppm ()); }
-
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);	
@@ -194,7 +198,7 @@ Setting this overrides the 'days' and 'hours' parameters.");
 		Check::positive (), Attribute::OptionalConst,
 		"Temperature of irrigation (default: air temperature).");
     frame.declare_submodule_sequence ("solute", Attribute::Const, "\
-Solutes in irrigation water.", load_ppm);
+Solutes in irrigation water.", IM::load_const_ppm);
     frame.set_empty ("solute");
   }
 } ActionIrrigateBase_syntax;
@@ -208,10 +212,15 @@ struct ActionIrrigateOverhead : public ActionIrrigate
   void irrigate (Field& f, const double flux, const double temp, const IM& im, 
                  const double dt, Treelog& msg) const
   { 
+#ifdef NEW_IRRIGATE
+    f.irrigate (dt, flux, temp, Irrigation::overhead, im, 
+                boost::shared_ptr<Volume> (), msg);
+#else
     if (approximate (temp, at_air_temperature))
       f.irrigate_overhead (flux, im, dt, msg); 
     else
       f.irrigate_overhead (flux, temp, im, dt, msg); 
+#endif
   }
   ActionIrrigateOverhead (const BlockModel& al)
     : ActionIrrigate (al)
@@ -223,10 +232,15 @@ struct ActionIrrigateSurface : public ActionIrrigate
   void irrigate (Field& f, const double flux, const double temp, const IM& im, 
                  const double dt, Treelog& msg) const
   {
+#ifdef NEW_IRRIGATE
+    f.irrigate (dt, flux, temp, Irrigation::surface, im, 
+                boost::shared_ptr<Volume> (), msg);
+#else
     if (approximate (temp, at_air_temperature))
       f.irrigate_surface (flux, im, dt, msg);
     else
       f.irrigate_surface (flux, temp, im, dt, msg); 
+#endif
   }
   ActionIrrigateSurface (const BlockModel& al)
     : ActionIrrigate (al)
@@ -235,11 +249,18 @@ struct ActionIrrigateSurface : public ActionIrrigate
 
 struct ActionIrrigateSubsoil : public ActionIrrigate
 {
-  std::auto_ptr<Volume> volume;
+  boost::shared_ptr<Volume> volume;
 
   void irrigate (Field& f, const double flux, const double /* temp */, 
                  const IM& im, const double dt, Treelog& msg) const
-  { f.irrigate_subsoil (flux, im, *volume, dt, msg); }
+  { 
+#ifdef NEW_IRRIGATE
+    f.irrigate (dt, flux, Irrigation::at_air_temperature, 
+                Irrigation::subsoil, im, volume, msg);
+#else
+    f.irrigate_subsoil (flux, im, *volume, dt, msg); 
+#endif
+  }
   ActionIrrigateSubsoil (const BlockModel& al)
     : ActionIrrigate (al),
       volume (Volume::build_obsolete (al))
@@ -269,27 +290,6 @@ Irrigate the field directly on the soil surface, bypassing the canopy.")
   void load_frame (Frame&) const
   { }
 } ActionIrrigateSurface_syntax;
-
-static struct ActionIrrigateTopSyntax : DeclareModel
-{
-  Model* make (const BlockModel& al) const
-  { return new ActionIrrigateOverhead (al); }
-  static bool check_alist (const Metalib&, const Frame&, Treelog& err)
-  {
-    static bool warned = false;
-    if (warned)
-      return true;
-    warned = true;
-    err.entry ("OBSOLETE: Use 'irrigate_overhead' instead of 'irrigate_top'");
-    return true;
-  }
-  ActionIrrigateTopSyntax ()
-    : DeclareModel (Action::component, "irrigate_top", "irrigate_base", "\
-OBSOLETE.  Use 'irrigate_overhead' instead.")
-  { }
-  void load_frame (Frame& frame) const
-  { frame.add_check (check_alist); }
-} ActionIrrigateTop_syntax;
 
 static struct ActionIrrigateSubsoilSyntax : DeclareModel
 {
