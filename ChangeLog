@@ -1,5 +1,7 @@
 2010-04-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* action_activity.C (doIt): Allow multiple actions per timestep.
+
 	* bound.C, bound.h, volume.C, volume.h: Made it logable.
 	* irrigate.C, irrigate.h: Ditto.
 	* column_std.C (output): Log irrigation.

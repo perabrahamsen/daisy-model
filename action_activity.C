@@ -46,16 +46,20 @@ struct ActionActivity : public Action
 
   void doIt (Daisy& daisy, const Scope& scope, Treelog& out)
   { 
-    if (actions.size () == 0U)
-      return;
-
-    Action* action = actions.front ();
-    action->doIt (daisy, scope, out);
-
-    if (action->done (daisy, scope, out))
+    while (true)
       {
-	delete action;
-	actions.erase (actions.begin ());
+        if (actions.size () == 0U)
+          return;
+
+        Action* action = actions.front ();
+        action->doIt (daisy, scope, out);
+
+        if (!action->done (daisy, scope, out))
+          // Not finished yet?  Save for next timestep.
+          return;
+
+        delete action;
+        actions.erase (actions.begin ());
       }
   }
 

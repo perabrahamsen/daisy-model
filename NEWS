@@ -13,8 +13,8 @@ release.
 ** The default weather model will now distribute daily rain better.
 
 Rain intensity below the value of 'minimum_precipitation' parameter
-will be applied at the beginning of the day at the rate specified by
-the parameter, followed dry weather for the rest of the day.
+will be applied beginning at midnight at the rate specified by the
+parameter, followed dry weather for the rest of the day.
 
 The default value (0.83 mm/h) is the average hourly rain intensity at
 the Taastrup agrometeorological station.
@@ -22,13 +22,45 @@ the Taastrup agrometeorological station.
 The effect of is that transpiration and soil evaporation increase, and
 evaporation from ponded and intercepted water decreases.
 
-** The FAO_PM reference evapotranpiration model used actual albedo.
+** Most management actions are now instantanious.
 
-Not it used the reference value.
+They used to take one timestep (1 hour).
+
+For example 
+
+  (wait (at 1987 4 5 1))
+  (fertilize (pig_slurry (first_year_utilization 100 [%]))
+             (equivalent_weight 100 [kg N/ha]))
+  (sow "Grass")
+  (sow "Spring Barley")
+
+will now both fertilize and sow the two crops during the same hour, it
+used to take three hours to complete all three actions.
+
+This includes irrigation, even when a irrigation duration is
+specified.  For example
+
+  (wait (at 1987 6 5 1))
+  (irrigate_overhead 2 [mm/h] (hours 3)
+                     (solute (NH4 1 [g N/l])(NO3 2 [g N/l])))
+  (fertilize (mineral (weight 80.0 [kg N/ha])
+                      (NH4_fraction 0.5 [])))
+
+will start the irrigation and then immidiately fertilize in the first
+hour.  The irrigation will then continue for two more hours, without
+need for further manager involvement.
+
+This affects the 'activity' action model.  The change was made to make
+management more independent of the selected timestep, and because the
+old semantics could be problematic to get right.
 
 ** New EpFacWet canopy parameter.
 
 Specifies K_c for wet surface.  By default it is identical to EpFac.
+
+** The FAO_PM reference evapotranpiration model used actual albedo.
+
+Not it used the reference value.
 
 ** The FAO_PM model will now use wet surface reference.
 
@@ -67,7 +99,7 @@ Set this to false to make 'aperture' only affect hydraulic
 conductivity, without introducing a secondary domain for solute
 transport.
 
-** Fix gnuplot output for gnuplot 4.4.
+** Fix output for gnuplot 4.4.
 
 ** Chemicals may now decompose when part of the litter pack.
 
