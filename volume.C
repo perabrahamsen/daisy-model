@@ -74,11 +74,11 @@ Volume::build_obsolete (const BlockModel& al)
 }
 
 Volume::Volume (const BlockModel& al)
-  : name (al.type_name ())
+  : ModelDerived (al.type_name ())
 { }
 
 Volume::Volume (const char *const id)
-  : name (id)
+  : ModelDerived (id)
 { }
 
 Volume::~Volume ()

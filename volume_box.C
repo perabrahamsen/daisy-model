@@ -27,6 +27,7 @@
 #include "treelog.h"
 #include "frame.h"
 #include "block_model.h"
+#include "log.h"
 #include <sstream>
 
 const VolumeBox::bounds_t 
@@ -166,7 +167,7 @@ VolumeBox::limit (const Volume& other, Treelog& msg)
                 {
                 case Bound::none:
                   /* do nothing */;
-                break;
+                  break;
                 case Bound::full:
                   bound.set_full ();
                   break;
@@ -272,6 +273,17 @@ VolumeBox::contain_point (double z, double x, double y) const
     && in_interval (y, *front, *back);
 }
 
+void 
+VolumeBox::output (Log& log) const
+{
+  output_derived (bottom, "bottom", log);
+  output_derived (top, "top", log);
+  output_derived (left, "left", log);
+  output_derived (right, "right", log);
+  output_derived (front, "front", log);
+  output_derived (back, "back", log);
+}
+
 VolumeBox::VolumeBox (const BlockModel& al)
   : Volume (al),
     bottom (Librarian::build_item<Bound> (al, "bottom")),
@@ -330,30 +342,30 @@ setting the parameters.")
   {
     Model::load_model (frame);
     frame.declare_object ("bottom", Bound::component, 
-                       Attribute::Const, Attribute::Singleton,
-                       "Lower boundary on the z-axis.");
-    frame.set ("bottom", "none");
+                          Attribute::State, Attribute::Singleton,
+                          "Lower boundary on the z-axis.");
+    frame.set ("bottom", "empty");
     frame.declare_object ("top", Bound::component,
-                       Attribute::Const, Attribute::Singleton,
-                       "Upper boundary on the z-axis.");
-    frame.set ("top", "none");
+                          Attribute::State, Attribute::Singleton,
+                          "Upper boundary on the z-axis.");
+    frame.set ("top", "empty");
     frame.declare_object ("left", Bound::component,
-                       Attribute::Const, Attribute::Singleton,
-                       "Lower boundary on the x-axis.");
-    frame.set ("left", "none");
+                          Attribute::State, Attribute::Singleton,
+                          "Lower boundary on the x-axis.");
+    frame.set ("left", "empty");
     frame.declare_object ("right", Bound::component,
-                       Attribute::Const, Attribute::Singleton,
-                       "Upper boundary on the x-axis.");
-    frame.set ("right", "none");
+                          Attribute::State, Attribute::Singleton,
+                          "Upper boundary on the x-axis.");
+    frame.set ("right", "empty");
     frame.declare_object ("front", Bound::component,
-                       Attribute::Const, Attribute::Singleton,
-                       "Lower boundary on the y-axis.");
-    frame.set ("front", "none");
+                          Attribute::State, Attribute::Singleton,
+                          "Lower boundary on the y-axis.");
+    frame.set ("front", "empty");
     frame.declare_object ("back", Bound::component,
-                       Attribute::Const, Attribute::Singleton,
-                       "Upper boundary on the y-axis.");
-    frame.set ("back", "none");
-    }
+                          Attribute::State, Attribute::Singleton,
+                          "Upper boundary on the y-axis.");
+    frame.set ("back", "empty");
+  }
 } VolumeBox_syntax;
 
 // volume_box.C ends here.

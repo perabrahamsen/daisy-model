@@ -23,7 +23,7 @@
 #ifndef VOLUME_H
 #define VOLUME_H
 
-#include "model.h"
+#include "model_derived.h"
 #include "symbol.h"
 #include <memory>
 #include <vector>
@@ -34,11 +34,10 @@ class Border;
 class Treelog;
 class BlockModel;
 
-class Volume : public Model 
+class Volume : public ModelDerived
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
   virtual std::string one_line_description () const = 0;

@@ -22,12 +22,12 @@
 #ifndef BOUND_H
 #define BOUND_H
 
-#include "model.h"
+#include "model_derived.h"
 #include "symbol.h"
 
 class BlockModel;
 
-class Bound : public Model
+class Bound : public ModelDerived
 {
   // Identity.
 public:
@@ -38,6 +38,8 @@ public:
   // Content.
 public:
   enum type_t { none, full, finite };
+  static type_t symbol2type (symbol);
+  static symbol type2symbol (type_t);
 private:
   type_t type_;
   double value_;
@@ -48,6 +50,9 @@ public:
   void set_finite (double value);
   void set_none ();
   void set_full ();
+
+  // Simulation.
+  void output (Log&) const;
 
   // Create and Destroy.
 public:

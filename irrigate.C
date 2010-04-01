@@ -189,10 +189,8 @@ Irrigation::Event::output (Log& log) const
     output_variable (temperature, log);
   output_submodule (solute, "solute", log);
   output_value (target2symbol (target), "target", log);
-#ifdef TODO
   if (volume.get ())
-    output_derived (*volume, "volume", log);
-#endif // TODO
+    output_derived (volume, "volume", log);
   output_variable (silence, log);
 }
 
@@ -208,10 +206,8 @@ Irrigation::Event::check_alist (const Metalib&,
   if (frame.name ("target") == target2symbol (subsoil)
       && !frame.check ("volume"))
     {
-      msg.warning ("Subsoil irrigation specified with no volume");
-      msg.message ("Substituting with surface irrigation");
-      msg.message ("\
-Checkpoints with active subsoil irrigation not yet implemented");
+      msg.error ("Subsoil irrigation specified with no volume");
+      ok = false;
     }
   return ok;
 }
@@ -250,10 +246,7 @@ Irrigation::Event::Event (const BlockSubmodel& al)
     flux (al.number ("flux")),
     temperature (al.number ("temperature", at_air_temperature)),
     solute (al, "solute"),
-    target (al.name ("target") == target2symbol (subsoil)
-            && !al.check ("volume")
-            ? surface           // subsoil checkpoint not implemented.
-            : symbol2target (al.name ("target"))),
+    target (symbol2target (al.name ("target"))),
     volume (al.check ("volume") 
             ? Librarian::build_item<Volume> (al, "volume")
             : NULL),

@@ -70,6 +70,10 @@ private:
                            const Bound& from, const Bound& to);
   bool contain_point (double z, double x, double y) const;
 
+  // Simulation.
+public:
+  void output (Log&) const;
+
   // Create and Destroy.
 public:
   VolumeBox (const BlockModel& al);

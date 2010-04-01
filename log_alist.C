@@ -368,20 +368,28 @@ LogSubmodel::close_alist ()
   else
     close_ignore (); 
 }
+
 void
 LogSubmodel::open_derived (const symbol field, const symbol type, 
-                           const symbol library)
+                           const symbol component)
 { 
   if (frame_entry ().is_log (field))
     open_ignore ();
   else if (frame_entry ().check (field))
-    open_object (field, type, frame_entry ().model (field), library);
+    open_object (field, type, frame_entry ().model (field), component);
   else
     {
-      std::ostringstream tmp;
-      tmp << "No field '" << field << "' (type " << type
-          << ") within library '" << library << "'";
-      daisy_panic (tmp.str ());
+      daisy_assert (metalib ().exist (component));
+      const Library& library = metalib ().library (component);
+      if (library.check (type))
+        open_object (field, type, library.model (type), component);
+      else
+        {
+          std::ostringstream tmp;
+          tmp << "No field '" << field << "' (type " << type
+              << ") within library '" << component << "'";
+          daisy_panic (tmp.str ());
+        }
     }
 }
 	

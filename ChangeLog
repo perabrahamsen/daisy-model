@@ -1,3 +1,9 @@
+2010-04-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* bound.C, bound.h, volume.C, volume.h: Made it logable.
+	* irrigate.C, irrigate.h: Ditto.
+	* column_std.C (output): Log irrigation.
+
 2010-03-31  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* field.h, field.C, column.h, column_std.C (irrigate): New function.

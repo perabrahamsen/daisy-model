@@ -25,11 +25,22 @@
 #include "mathlib.h"
 #include "frame.h"
 #include "librarian.h"
+#include "log.h"
+#include "vcheck.h"
 #include <sstream>
+#include <map>
 
 // bound component.
 
 const char *const Bound::component = "bound";
+
+static struct BoundInit : public DeclareComponent 
+{
+  BoundInit ()
+    : DeclareComponent (Bound::component, "\
+Specify one end of an interval boundary.")
+  { }
+} Bound_init;
 
 symbol
 Bound::library_id () const
@@ -55,6 +66,40 @@ Bound::describe () const
       break;
     }
   return tmp.str ();
+}
+
+Bound::type_t 
+Bound::symbol2type (const symbol s)
+{
+  static struct sym_set_t : std::map<symbol, type_t>
+  {
+    sym_set_t ()
+    {
+      insert (std::pair<symbol,type_t> ("finite", finite));
+      insert (std::pair<symbol,type_t> ("full", full));
+      insert (std::pair<symbol,type_t> ("none", none));
+    } 
+  } sym_set;
+  sym_set_t::const_iterator i = sym_set.find (s);
+  daisy_assert (i != sym_set.end ());
+  return (*i).second;
+}  
+
+symbol 
+Bound::type2symbol (const type_t t)
+{
+  static struct sym_set_t : std::map<type_t, symbol>
+  {
+    sym_set_t ()
+    {
+      insert (std::pair<type_t,symbol> (finite, "finite"));
+      insert (std::pair<type_t,symbol> (full, "full"));
+      insert (std::pair<type_t,symbol> (none, "none"));
+    } 
+  } sym_set;
+  sym_set_t::const_iterator i = sym_set.find (t);
+  daisy_assert (i != sym_set.end ());
+  return (*i).second;
 }
 
 double 
@@ -84,14 +129,23 @@ Bound::set_full ()
   type_ = full;
   value_ = 68.68e68;
 }
+void 
+Bound::output (Log& log) const
+{
+  output_value (type2symbol (type_), "type", log);
+  if (type () == finite)
+    output_value (value_, "bound", log);
+}
 
 Bound::Bound (const BlockModel& al, const type_t type, const double value)
-  : type_ (type),
+  : ModelDerived ("state"),
+    type_ (type),
     value_ (value)
 { }
 
 Bound::Bound (const char *const, const type_t type, const double value)
-  : type_ (type),
+  : ModelDerived ("state"),
+    type_ (type),
     value_ (value)
 { }
 
@@ -140,12 +194,51 @@ static struct BoundFiniteSyntax : public DeclareModel
   }
 } BoundFinite_syntax;
 
-static struct BoundInit : public DeclareComponent 
+// state model.
+static struct BoundStateSyntax : public DeclareModel
 {
-  BoundInit ()
-    : DeclareComponent (Bound::component, "\
-Specify one end of an interval boundary.")
+  Model* make (const BlockModel& al) const
+  { return new Bound (al, Bound::symbol2type (al.name ("type")), 
+                      al.number ("bound", -42.42e42)); }
+  BoundStateSyntax ()
+    : DeclareModel (Bound::component, "state", "Bound used for checkpoints.")
   { }
-} Bound_init;
+  static bool check_alist (const Metalib&, const Frame& frame, Treelog& msg)
+  {
+    bool ok = true;
+    const bool is_finite 
+      = Bound::symbol2type (frame.name ("type")) == Bound::finite;
+    
+    if (is_finite && !frame.check ("bound"))
+      {
+        msg.error ("'bound' should be set for the 'finite' type");
+        ok = false;
+      }
+    else if (!is_finite && frame.check ("bound"))
+      msg.warning ("'bound' will be ignored");
+
+    return ok;
+  }
+  void load_frame (Frame& frame) const
+  {
+    frame.declare_string ("type", Attribute::State, "Bound type");
+    static VCheck::Enum type_check ("finite", "full", "none");
+    frame.set_check ("type", type_check);
+    frame.declare ("bound", "cm", Attribute::OptionalState, "\
+Interval bound to use.  Only valid for the 'finite' type.");
+  }
+} BoundState_syntax;
+
+static struct BoundEmptySyntax : public DeclareParam
+{
+  BoundEmptySyntax ()
+    : DeclareParam (Bound::component, "empty", "state", "\
+A 'state' model set to 'none.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set ("type", Bound::type2symbol (Bound::none)); 
+  }
+} BoundEmpty_syntax;
 
 // bound.C ends here.
