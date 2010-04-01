@@ -824,6 +824,7 @@ ColumnStandard::output (Log& log) const
   output_derived (organic_matter, "OrganicMatter", log);
   output_value (second_year_utilization_, "second_year_utilization", log);
   output_variable (tillage_age, log);
+  output_submodule (*irrigation, "Irrigation", log);
   output_variable (seed_N, log);
   output_variable (seed_C, log);
   output_variable (applied_DM, log);

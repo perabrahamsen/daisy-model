@@ -59,14 +59,29 @@ The 'Stomatacon' component calculates the stomata conductance of water vapour.")
 
 double
 StomataCon_WSF_base::wsf (const double ABA /* [g/cm^3] */,
-                     const double h_x /* [MPa] */) const
+                          const double h_x /* [MPa] */) const
 {
   daisy_assert (ABA >= 0.0);
   daisy_assert (h_x >= 0.0);
   const double wsf 
     = std::exp (-beta * std::max (ABA - ABA_min, 0.0))
     * std::exp (-delta * h_x);
-  daisy_assert (wsf > 0.0);
+  if  (wsf <= 0.0)
+    {
+      std::ostringstream tmp;
+      tmp << "wsf = " << wsf
+          << ", beta = " << beta
+          << ", ABA = " << ABA
+          << ", ABA_min = " << ABA_min
+          << ", ABA effect = "
+          << std::exp (-beta * std::max (ABA - ABA_min, 0.0)) // 
+          << ", delta = " << delta
+          << ", h_x = " << h_x
+          << ", Psi effect = " << std::exp (-delta * h_x);
+      Assertion::message (tmp.str ());
+      return 1.0;
+    }
+    
   return wsf;
 }
                       

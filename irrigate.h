@@ -37,6 +37,7 @@ class BlockSubmodel;
 class Frame;
 class Treelog;
 class Unit;
+class Log;
 
 class Irrigation : private boost::noncopyable
 {
@@ -66,6 +67,7 @@ public:
             boost::shared_ptr<Volume> volume, const bool silence, Treelog&);
   void tick (const Geometry&, SoilWater&, Chemistry&, Bioclimate&, 
              const double dt, Treelog&);
+  void output (Log&) const;
 private:
   void cleanup (Treelog&);
 

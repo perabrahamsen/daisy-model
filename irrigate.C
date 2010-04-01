@@ -37,6 +37,7 @@
 #include "mathlib.h"
 #include "units.h"
 #include "treelog.h"
+#include "log.h"
 #include <sstream>
 
 const symbol 
@@ -57,6 +58,7 @@ struct Irrigation::Event : private boost::noncopyable
   const IM solute;            // [M/L^3]
   const target_t target;
   static target_t symbol2target (symbol s);
+  static symbol target2symbol (target_t t);
   const boost::shared_ptr<Volume> volume;
   const bool silence;
 
@@ -65,8 +67,11 @@ struct Irrigation::Event : private boost::noncopyable
              const Geometry&, SoilWater&, Chemistry&, Bioclimate&,
              const double dt, Treelog&);
   bool done () const;
+  void output (Log&) const;
 
   // Create and Destroy.
+  static void load_solute (Frame&);
+  static bool check_alist (const Metalib&, const Frame&, Treelog&);
   static void load_syntax (Frame&);
   explicit Event (const BlockSubmodel&);
   Event (const Unit& u_solute_per_mm /* [g/cm^2/mm] */, 
@@ -95,6 +100,23 @@ Irrigation::Event::symbol2target (const symbol s)
   daisy_assert (i != sym_set.end ());
   return (*i).second;
 }  
+
+symbol 
+Irrigation::Event::target2symbol (const target_t t)
+{
+  static struct sym_set_t : std::map<target_t, symbol>
+  {
+    sym_set_t ()
+    {
+      insert (std::pair<target_t,symbol> (overhead, "overhead"));
+      insert (std::pair<target_t,symbol> (surface, "surface"));
+      insert (std::pair<target_t,symbol> (subsoil, "subsoil"));
+    } 
+  } sym_set;
+  sym_set_t::const_iterator i = sym_set.find (t);
+  daisy_assert (i != sym_set.end ());
+  return (*i).second;
+}
 
 void
 Irrigation::Event::tick (const Unit& u_mm, const Unit& u_storage, 
@@ -159,18 +181,55 @@ Irrigation::Event::done () const
 { return time_left < 1e-9; }
 
 void 
+Irrigation::Event::output (Log& log) const
+{
+  output_variable (time_left, log);
+  output_variable (flux, log);
+  if (!approximate (temperature, at_air_temperature))
+    output_variable (temperature, log);
+  output_submodule (solute, "solute", log);
+  output_value (target2symbol (target), "target", log);
+#ifdef TODO
+  if (volume.get ())
+    output_derived (*volume, "volume", log);
+#endif // TODO
+  output_variable (silence, log);
+}
+
+void 
+Irrigation::Event::load_solute (Frame& frame)
+{ IM::add_syntax (frame, Attribute::State, solute_per_mm); }
+
+bool 
+Irrigation::Event::check_alist (const Metalib&, 
+                                const Frame& frame, Treelog& msg)
+{
+  bool ok = true;
+  if (frame.name ("target") == target2symbol (subsoil)
+      && !frame.check ("volume"))
+    {
+      msg.warning ("Subsoil irrigation specified with no volume");
+      msg.message ("Substituting with surface irrigation");
+      msg.message ("\
+Checkpoints with active subsoil irrigation not yet implemented");
+    }
+  return ok;
+}
+
+void 
 Irrigation::Event::load_syntax (Frame& frame)
 { 
+  frame.add_check (check_alist);
   frame.declare ("time_left", "h", Check::non_negative (), Attribute::State, "\
 Time left of this irrigation event.");
-  frame.declare ("flux", "mm/h", Check::non_negative (), Attribute::Const, "\
+  frame.declare ("flux", "mm/h", Check::non_negative (), Attribute::State, "\
 Water applied.");
-  frame.declare ("temperature", "dg C", Attribute::OptionalConst, "\
+  frame.declare ("temperature", "dg C", Attribute::OptionalState, "\
 Irrigation temperature. By default, use daily air temperature.\n\
 Ignored for subsoil irrigation.");
-  frame.declare_submodule_sequence ("solute", Attribute::Const, "\
-Solutes in irrigation water.", IM::load_const_ppm);
-  frame.declare_string ("target", Attribute::Const, "\
+  frame.declare_submodule_sequence ("solute", Attribute::State, "\
+Solutes in irrigation water.", load_solute);
+  frame.declare_string ("target", Attribute::State, "\
 Where to apply the irrigation.  \n\
 \n\
 overhead: Above crop canopy.\n\
@@ -179,10 +238,10 @@ subsoil: In the soil.  The 'volume' parameter will specify where.");
   static VCheck::Enum target_check ("overhead", "surface", "subsoil");
   frame.set_check ("target", target_check);
   frame.declare_object ("volume", Volume::component, 
-                        Attribute::Const, Attribute::Singleton, "\
+                        Attribute::OptionalState, Attribute::Singleton, "\
 Soil volume to apply for subsoil irrigation.\n\
 Ignored for overhead and surface irrigation.");
-  frame.declare_boolean ("silence", Attribute::Const, "\
+  frame.declare_boolean ("silence", Attribute::State, "\
 True if event should not declare when it is over.");
 }
 
@@ -191,8 +250,13 @@ Irrigation::Event::Event (const BlockSubmodel& al)
     flux (al.number ("flux")),
     temperature (al.number ("temperature", at_air_temperature)),
     solute (al, "solute"),
-    target (symbol2target (al.name ("target"))),
-    volume (Librarian::build_item<Volume> (al, "volume")),
+    target (al.name ("target") == target2symbol (subsoil)
+            && !al.check ("volume")
+            ? surface           // subsoil checkpoint not implemented.
+            : symbol2target (al.name ("target"))),
+    volume (al.check ("volume") 
+            ? Librarian::build_item<Volume> (al, "volume")
+            : NULL),
     silence (al.flag ("silence"))
 { }
 
@@ -270,6 +334,10 @@ Irrigation::tick (const Geometry& geo, SoilWater& soil_water,
   // Remove all dead events.
   cleanup (msg);
 }
+
+void 
+Irrigation::output (Log& log) const
+{ output_vector (event, "event", log); }
 
 void
 Irrigation::cleanup (Treelog& msg)

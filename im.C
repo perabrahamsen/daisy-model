@@ -254,9 +254,4 @@ IM::add_syntax (Frame& frame,
   frame.order ("name", "value");
 }
 
-void 
-IM::load_const_ppm (Frame& frame)
-{ add_syntax (frame, Attribute::Const, Units::ppm ()); }
-
-
 // im.C ends here.

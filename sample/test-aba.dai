@@ -35,7 +35,10 @@ Based on data collected by Fulai Liu, 2007."
 	;; Doesn't work right now.
 	(LeafPhot FC_C3 
 	   	  (Xn 6e-3 [mol/mol/s])
-	    	  (ABAeffect ABA-exp (k 23456 [cm^3/ng]))
+	    	  (Stomatacon Leuning
+                              (m 11 [])
+                              (b 0.01 [mol/m^2/s])
+                              (beta 1555311.743 [cm^3/g]))
 	    	  (TempEff (0 1) (100 1)))
 	)))
 

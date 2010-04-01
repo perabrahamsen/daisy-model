@@ -116,6 +116,9 @@ Shared parameter for irrigate actions.")
     return ok;
   }
 
+  static void load_ppm (Frame& frame)
+  { IM::add_syntax (frame, Attribute::Const, Units::ppm ()); }
+
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);	
@@ -137,7 +140,7 @@ Setting this overrides the 'days' and 'hours' parameters.");
 		Check::positive (), Attribute::OptionalConst,
 		"Temperature of irrigation (default: air temperature).");
     frame.declare_submodule_sequence ("solute", Attribute::Const, "\
-Solutes in irrigation water.", IM::load_const_ppm);
+Solutes in irrigation water.", load_ppm);
     frame.set_empty ("solute");
   }
 } ActionIrrigateBase_syntax;

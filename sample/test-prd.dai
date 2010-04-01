@@ -38,14 +38,14 @@ Based on data collected by Fulai Liu, 2007."
   (Kc25 27.24 [Pa])
   (Ko25 16580 [Pa])
   (Gamma25 3.74 [Pa])
-  ;; ABA effect on stomata conductance according to Fulai et al., 2005:
-  (ABAeffect ABA-exp 
-             (k 0.0062 [cm^3/ng])
-             (alpha 0.7368)) 
-  ;; Minimal stomatal conductance for potatos (Fuilai et al., 2005)
-  (b 0.1074)
-  ;; Slope coefficient in Ball model for potatoes (Fuilai, personal comm.)
-  (m 15) 
+  (Stomatacon BB
+              ;; ABA effect on stomata cond. according to Fulai et al., 2005:
+              (beta 0.0062 [cm^3/ng])
+              (delta 0.7368 [MPa^-1])
+              ;; Minimal stomatal conductance for potatos (Fuilai et al., 2005)
+              (b 0.1074 [mol/m^2/s])
+              ;; Slope coefficient in Ball model for potatoes (Fuilai, p. comm.)
+              (m 15 []))
   ;; Intended for avoiding excessive growth for early crops in cold climate.
   (TempEff (0 1) (100 1)))
 

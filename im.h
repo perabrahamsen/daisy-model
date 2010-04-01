@@ -125,7 +125,6 @@ public:
 public:
   static void add_syntax (Frame&, Attribute::category cat, 
 			  const symbol dimension);
-  static void load_const_ppm (Frame&);
   explicit IM (const Block&, const char* key);
   explicit IM ();
   IM (const IM& im);
