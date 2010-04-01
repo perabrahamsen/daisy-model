@@ -57,7 +57,7 @@ Output::initial_logs (const Daisy& daisy, Treelog& msg)
 		  output_submodule (previous, "time", log);
                   daisy.output (log);
                   output_list (logs, "output", log, Log::component);
-		  log.initial_done (time_columns, daisy, msg);
+		  log.initial_done (time_columns, previous, msg);
 		}
 	    }
 	}
@@ -71,7 +71,8 @@ Output::initial_logs (const Daisy& daisy, Treelog& msg)
 }
 
 void
-Output::tick (const Daisy& daisy, Treelog& msg)
+Output::tick (const Daisy& daisy, const Time& time, const double dt, 
+              Treelog& msg)
 {
   if (logging)
     {
@@ -80,10 +81,10 @@ Output::tick (const Daisy& daisy, Treelog& msg)
 	  Log& log = *active_logs[i];
 	  if (log.match (daisy, msg))
 	    {
-	      output_submodule (daisy.time, "time", log);
+	      output_submodule (time, "time", log);
               daisy.output (log);
               output_list (logs, "output", log, Log::component);
-	      log.done (time_columns, daisy, msg);
+	      log.done (time_columns, time, dt, msg);
 	    }
 	}
     }

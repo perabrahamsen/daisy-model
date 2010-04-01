@@ -45,12 +45,12 @@ public:
   void insert_active ();
   bool match (const Daisy& daisy, Treelog&);
   void done (const std::vector<Time::component_t>& time_columns,
-	     const Daisy&, Treelog&);
+	     const Time&, double dt, Treelog&);
 
   // Initial line.
   bool initial_match (const Daisy&, Treelog&);
   void initial_done (const std::vector<Time::component_t>& time_columns,
-		     const Daisy&, Treelog&);
+		     const Time&, Treelog&);
 
   // Open a derived type.
   void open_derived_type (symbol type, symbol library);

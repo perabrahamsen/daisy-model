@@ -42,7 +42,7 @@ LogDLF::common_match (const Daisy& daisy, Treelog&)
 
 void 
 LogDLF::common_done (const std::vector<Time::component_t>& time_columns,
-                     const Time& time, const Daisy& daisy, Treelog&)
+                     const Time& time, Treelog&)
 { 
   if (print_tags)
     {
@@ -165,9 +165,9 @@ LogDLF::match (const Daisy& daisy, Treelog& msg)
 }
 void 
 LogDLF::done (const std::vector<Time::component_t>& time_columns,
-              const Daisy& daisy, Treelog& msg)
+              const Time& time, const double dt, Treelog& msg)
 { 
-  LogSelect::done (time_columns, daisy, msg);
+  LogSelect::done (time_columns, time, dt, msg);
 
   if (!is_printing)
     return;
@@ -176,8 +176,8 @@ LogDLF::done (const std::vector<Time::component_t>& time_columns,
     if (entries[i]->prevent_printing ())
       return;
 
-  common_done (time_columns, daisy.time, daisy, msg);
-  end = daisy.time;
+  common_done (time_columns, time, msg);
+  end = time;
 }
 
 bool 
@@ -191,10 +191,9 @@ LogDLF::initial_match (const Daisy& daisy, Treelog& msg)
 
 void 
 LogDLF::initial_done (const std::vector<Time::component_t>& time_columns,
-                      const Daisy& daisy, Treelog& msg)
+                      const Time& time, Treelog& msg)
 { 
-  const Time previous = daisy.time - daisy.timestep;
-  LogSelect::initial_done (time_columns, daisy, msg);
+  LogSelect::initial_done (time_columns, time, msg);
 
   bool prevent_printing = !print_initial;
   for (unsigned int i = 0; i < entries.size (); i++)
@@ -208,8 +207,8 @@ LogDLF::initial_done (const std::vector<Time::component_t>& time_columns,
       return;
     }
       
-  common_done (time_columns, previous, daisy, msg);
-  begin = previous;
+  common_done (time_columns, time, msg);
+  begin = time;
 }
 
 bool 

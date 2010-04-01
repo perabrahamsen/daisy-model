@@ -1,54 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Irrigation 
-
-** Bound skal være logable
-
-Men den er "mutable type"!
-
-Hvad gør vi?  Studer AM.
-
-** Volume skal være ModelFramed
-
-** Volume::output
-
-** Irrigation::output
-
-** checkpoint, restore
-
-** Ny irrigate action?
-
-** Fjern Daisy.dt
-
-Kun LogSelect::done bruger den
-
-* Prøv 2D med MACRO hydraulics
-
-Specielt pressure secondary domain.  MACRO har mere vand i det domæne.
-
-VIRKER IKKE!  failure 50% af tiden
-
 * Variable tidsskridt
-
-** Management skal være uafhængig af tidsskridt.
-
-*** irrigation?
-
-**** Liste af aktive irrigation/fertigation events?
-
-(time_left flux solute target volume)*
-
-shared_pointer for solute and target so they can be shared with action.
-
-***** solute
-
-component?  Metode til at udtrække IM?
-
-**** Skal dt tilpasses disse events?
-
-Eller skal vi ignorere dem?  Det er input.  Men de kan fylde jorden op med vand.
-
-** Fjern Daisy::dt
 
 ** Split "tick" op i en uden dt, og en med
 
@@ -62,7 +14,15 @@ tick_turnover, tick_movement
 
 ** Movement skal bestemme tidsskridt fra S termer.
 
-* VAP 
+* Prøv 2D med MACRO hydraulics
+
+Specielt pressure secondary domain.  MACRO har mere vand i det domæne.
+
+VIRKER IKKE!  failure 50% af tiden
+
+* VAP: For meget bromid i dræn (mere end der tilføres)
+
+S termen tager mere bromid end der i vandet.
 
 ** daisy i små tidsskridt?
 

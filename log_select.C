@@ -71,9 +71,8 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
 
 void
 LogSelect::done (const std::vector<Time::component_t>& time_columns,
-		 const Daisy& daisy, Treelog&)
+		 const Time&, const double dt, Treelog&)
 { 
-  const double dt = daisy.dt ();
   for (std::vector<Select*>::const_iterator i = entries.begin (); 
        i < entries.end (); 
        i++)
@@ -100,7 +99,7 @@ LogSelect::initial_match (const Daisy& daisy, Treelog&)
 
 void
 LogSelect::initial_done (const std::vector<Time::component_t>& time_columns,
-			 const Daisy&, Treelog&)
+			 const Time&, Treelog&)
 {
   for (std::vector<Select*>::const_iterator i = entries.begin (); 
        i < entries.end (); 

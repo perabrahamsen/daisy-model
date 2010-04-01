@@ -56,10 +56,6 @@ const Units&
 Daisy::units () const
 { return metalib.units (); }
 
-double
-Daisy::dt () const
-{ return current_dt; }
-
 void 
 Daisy::attach_ui (Run* run, const std::vector<Log*>& logs)
 { 
@@ -132,12 +128,12 @@ Daisy::tick_before (Treelog& msg)
 
 void
 Daisy::tick_columns (Treelog& msg)
-{ field->tick_all (metalib, time, dt (), 
+{ field->tick_all (metalib, time, current_dt, 
                    weather.get (), *extern_scope, msg); }
 
 void
 Daisy::tick_column (const size_t col, Treelog& msg)
-{ field->tick_one (metalib, col, time, dt (),
+{ field->tick_one (metalib, col, time, current_dt,
                    weather.get (), *extern_scope, msg); }
 
 void
@@ -147,7 +143,7 @@ Daisy::tick_after (Treelog& msg)
   if (next >= stop)
     running = false;
 
-  output_log->tick (*this, msg);
+  output_log->tick (*this, time, current_dt, msg);
   field->clear ();
   time = next;
   

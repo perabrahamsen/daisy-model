@@ -52,12 +52,12 @@ struct LogCheckpoint : public LogSubmodel
   bool check_interior (symbol) const;
   bool match (const Daisy&, Treelog&);
   void done (const std::vector<Time::component_t>& time_columns,
-	     const Daisy&, Treelog&);
+	     const Time&, const double dt, Treelog&);
 
   bool initial_match (const Daisy&, Treelog&)
   { return false; }
   void initial_done (const std::vector<Time::component_t>& time_columns,
-		     const Daisy&, Treelog&)
+		     const Time&, Treelog&)
   { daisy_notreached (); }
 
   // Create and Destroy.
@@ -132,7 +132,7 @@ public:
 
 void
 LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
-		     const Daisy&, Treelog&)
+		     const Time&, const double, Treelog&)
 {
   if (is_active)
     {

@@ -74,13 +74,13 @@ public:
   virtual bool match (const Daisy&, Treelog&) = 0;
   // Called at the end of each time step.
   virtual void done (const std::vector<Time::component_t>& time_columns,
-		     const Daisy&, Treelog&) = 0;
+		     const Time& time, const double dt, Treelog&) = 0;
 
   // Initial line.
 public:
   virtual bool initial_match (const Daisy&, Treelog&) = 0;
   virtual void initial_done (const std::vector<Time::component_t>& time_columns,
-			     const Daisy&, Treelog&) = 0;
+			     const Time& time, Treelog&) = 0;
 
   // Normal items.
 public:

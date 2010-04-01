@@ -39,7 +39,7 @@ private:
 	     const Time&, double dt);
   bool initial_match (const Daisy&, Treelog&);
   void initial_done (const std::vector<Time::component_t>& time_columns,
-		     const Time& time, double dt);
+		     const Time& time);
 
   // Get result.
 public:

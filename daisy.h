@@ -69,12 +69,8 @@ public:
 private:
   const double max_dt;
   double current_dt;
-public:
-  double dt () const;
-private:
   const Time stop;
   int duration;
-public:
   std::auto_ptr<Action> action;
   std::auto_ptr<Weather> weather;
 public:
@@ -82,6 +78,7 @@ public:
   auto_vector<const Harvest*> harvest;
 
   // UI.
+public:
   void attach_ui (Run* run, const std::vector<Log*>& logs);
 
   // Simulation.
@@ -95,9 +92,6 @@ public:
   void output (Log&) const;
 
   // Create and Destroy.
-private:
-  Daisy ();
-  Daisy (const Daisy&);
 public:
   void initialize (Metalib&, Block&);
   bool check (Treelog& err);

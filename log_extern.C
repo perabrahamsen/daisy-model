@@ -35,9 +35,9 @@
 
 void 
 LogExtern::done (const std::vector<Time::component_t>& time_columns,
-		 const Daisy& daisy, Treelog& msg)
+		 const Time& time, const double dt, Treelog& msg)
 { 
-  LogSelect::done (time_columns, daisy, msg);
+  LogSelect::done (time_columns, time, dt, msg);
 
   if (!is_printing)
     return;
