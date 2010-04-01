@@ -23,11 +23,11 @@
 
 void
 LogQt::done (const std::vector<Time::component_t>& time_columns,
-	     const Daisy& daisy, Treelog& msg)
+	     const Time& time, const double dt, Treelog& msg)
 { 
   {
     QMutexLocker lock (&mutex);
-    LogExtern::done (time_columns, daisy, msg);
+    LogExtern::done (time_columns, time, dt, msg);
   }
   emit ready ();
 }

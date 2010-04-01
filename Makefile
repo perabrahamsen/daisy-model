@@ -205,9 +205,9 @@ CROSSSTRIP = "$(TARGETTYPE)-strip"
 ifeq ($(COMPILER),gcc)
 #	New warning flags in GCC 4.4
 	WAR4    = -Wlogical-op -Wstrict-null-sentinel -Wvariadic-macros -Wvla \
-		  -Wmissing-declarations -Wfloat-equal 
+		  -Wmissing-declarations -Wfloat-equal -Wcast-qual 
 #	GCC 3 had gave uninitialized warnings during initialization.
-	WAR3	= -Wno-uninitialized
+	WAR3	= -Wno-uninitialized -Wno-unknown-pragmas 
 
 	ifeq ($(HOSTTYPE),sun4)
 		OSFLAGS = 
@@ -235,7 +235,7 @@ ifeq ($(COMPILER),gcc)
 
 	WARNING = -Wall -Wextra $(WAREXTRA) \
 		  -Woverloaded-virtual -Wundef -Wpointer-arith -Wwrite-strings \
-		  -Wcast-qual -Wcast-align -Wmissing-format-attribute \
+		  -Wcast-align -Wmissing-format-attribute \
 		  -Wold-style-cast -Wformat=2 -Winit-self \
 		  -Wsign-promo -Wredundant-decls \
 		  -Wno-unused-parameter -Wno-sign-compare 

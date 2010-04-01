@@ -1,3 +1,7 @@
+2010-04-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* movement_solute.h: Use boost::scoped_ptr.
+
 2010-04-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* action_activity.C (doIt): Allow multiple actions per timestep.

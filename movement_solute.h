@@ -23,6 +23,7 @@
 
 #include "movement.h"
 #include "memutils.h"
+#include <boost/scoped_ptr.hpp>
 #include <map>
 
 class Transport;
@@ -32,7 +33,7 @@ class MovementSolute : public Movement
   // Solute.
 private:
   const auto_vector<Transport*> matrix_solute;
-  const std::auto_ptr<Transport> matrix_solid;
+  const boost::scoped_ptr<Transport> matrix_solid;
   static void secondary_flow (const Geometry& geo, 
                               const std::vector<double>& Theta_old,
                               const std::vector<double>& Theta_new,
