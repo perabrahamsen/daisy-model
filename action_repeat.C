@@ -32,6 +32,7 @@
 
 struct ActionRepeat : public Action
 {
+  const Metalib& metalib;
   FrameModel modified_frame;
   const std::auto_ptr<FrameModel> repeat;
   std::auto_ptr<Action> action;
@@ -51,7 +52,7 @@ struct ActionRepeat : public Action
 	action.reset (NULL);
     if (!action.get ())
       {
-	action.reset(Librarian::build_frame<Action> (daisy.metalib, 
+	action.reset(Librarian::build_frame<Action> (metalib, 
                                                      msg, *repeat, "repeat"));
 	action->initialize (daisy, scope, msg);
 	if (!action->check (daisy, scope, msg))
@@ -88,6 +89,7 @@ struct ActionRepeat : public Action
 
   ActionRepeat (const BlockModel& al)
     : Action (al),
+      metalib (al.metalib ()),
       modified_frame (Action::frame (), FrameModel::parent_link),
       repeat (&al.model ("repeat").clone ()),
       action (al.check ("do") 

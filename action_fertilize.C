@@ -42,6 +42,8 @@
 
 struct ActionFertilize : public Action
 {
+  const Metalib& metalib;
+
   // Parameters.
   std::auto_ptr<FrameModel> am;
   const bool second_year_compensation;
@@ -134,7 +136,6 @@ ActionFertilize::Precision::~Precision ()
 void 
 ActionFertilize::common_doIt (Daisy& daisy, double& water, Treelog& msg)
 {
-  const Metalib& metalib = daisy.metalib;
   if (precision.get ())
     {
       const double weight 
@@ -193,13 +194,14 @@ bool
 ActionFertilize::check (const Daisy& daisy, const Scope&, Treelog& err) const
 {
   bool ok = true;
-  if (!AM::is_mineral (daisy.metalib, *am) && !daisy.field->check_am (*am, err))
+  if (!AM::is_mineral (metalib, *am) && !daisy.field->check_am (*am, err))
     ok = false;
   return ok;
 }
 
 ActionFertilize::ActionFertilize (const BlockModel& al)
   : Action (al),
+    metalib (al.metalib ()),
     am (&al.model ("am").clone ()),
     second_year_compensation (al.flag ("second_year_compensation")),
     minimum_weight (al.number ("minimum_weight")),
@@ -336,7 +338,7 @@ ActionFertilizeSurface::doIt (Daisy& daisy, const Scope&, Treelog& msg)
   const double duration = 0.1;  // [h]
   if (to < from)
     {
-      daisy.field->fertilize (daisy.metalib, *am, from, to, 
+      daisy.field->fertilize (metalib, *am, from, to, 
                               daisy.time (), msg);
       if (water > 0.0)
         daisy.field->irrigate (duration, water / duration,
@@ -347,7 +349,7 @@ ActionFertilizeSurface::doIt (Daisy& daisy, const Scope&, Treelog& msg)
     }
   else
     {
-      daisy.field->fertilize (daisy.metalib, *am, daisy.time (), msg);
+      daisy.field->fertilize (metalib, *am, daisy.time (), msg);
       if (water > 0.0)
         daisy.field->irrigate (duration, water / duration,
                                Irrigation::at_air_temperature,
@@ -428,7 +430,7 @@ ActionFertilizeIncorporate::doIt (Daisy& daisy, const Scope&, Treelog& msg)
   common_doIt (daisy, water, msg);
   const double duration = 0.1;  // [h]
 
-  daisy.field->fertilize (daisy.metalib, *am, *volume,
+  daisy.field->fertilize (metalib, *am, *volume,
                           daisy.time (), msg);
   if (water > 0.0)
     daisy.field->irrigate (duration, water / duration,

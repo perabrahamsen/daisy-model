@@ -38,7 +38,7 @@
 
 void
 LogDLF::common_match (const Daisy& daisy, Treelog&)
-{ print_header.finish (out, daisy.metalib, daisy.frame ()); }
+{ print_header.finish (out, metalib (), daisy.frame ()); }
 
 void 
 LogDLF::common_done (const std::vector<Time::component_t>& time_columns,

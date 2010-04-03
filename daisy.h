@@ -24,21 +24,16 @@
 #define DAISY_H
 
 #include "program.h"
-#include "time.h"
-#include "timestep.h"
 #include "memutils.h"
 #include <boost/scoped_ptr.hpp>
 #include <vector>
 #include <memory>
 
-class Action;
 class Harvest;
-class Weather;
 class Log;
 class Field;
 class Treelog;
-class Output;
-class Condition;
+class Time;
 class Timestep;
 class Metalib;
 class Scopesel;
@@ -62,8 +57,9 @@ public:
   size_t scope_size () const;
   const Time& time () const;
   const Timestep& timestep () const;
-public:
+private:
   const Metalib& metalib;
+public:
   const Units& units () const;
 
   // Content.

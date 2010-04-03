@@ -33,6 +33,7 @@
 
 struct ActionSow : public Action
 {
+  const Metalib& metalib;
   const std::auto_ptr<FrameModel> crop;
   const double row_width;
   const double row_pos;
@@ -41,7 +42,7 @@ struct ActionSow : public Action
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   { 
     msg.message ("Sowing " + crop->type_name ());      
-    daisy.field->sow (daisy.metalib, *crop, row_width, row_pos, seed, 
+    daisy.field->sow (metalib, *crop, row_width, row_pos, seed, 
                       daisy.time (), msg); 
   }
 
@@ -54,6 +55,7 @@ struct ActionSow : public Action
 
   ActionSow (const BlockModel& al)
     : Action (al),
+      metalib (al.metalib ()),
       crop (&al.model ("crop").clone ()),
       // Use 'plant_distance' if set, otherwise use 'row_width'.
       row_width (al.number ("plant_distance", al.number ("row_width"))),

@@ -42,6 +42,7 @@
 
 struct ActionTable : public Action
 {
+  const Metalib& metalib;
   const std::auto_ptr<Action> sow;
   const std::auto_ptr<Action> emerge;
   const std::auto_ptr<Action> harvest;
@@ -145,7 +146,6 @@ void
 ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 { 
   // Units.
-  const Metalib& metalib = daisy.metalib;
   const Units& units = daisy.units ();
   static const symbol mg_per_square_m ("mg/m^2");
   const Unit& u_mg_per_square_m = units.get_unit (mg_per_square_m);
@@ -198,10 +198,10 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
         {
           double water = 0.0;
           std::ostringstream tmp;
-          if (AM::is_mineral (daisy.metalib, fert))
+          if (AM::is_mineral (metalib, fert))
             tmp << "Fertilizing " << fert.number ("weight") 
                 << " kg "<< fert.type_name () << "-N/ha";
-          else if (AM::is_organic (daisy.metalib, fert))
+          else if (AM::is_organic (metalib, fert))
             {
               tmp  << "Fertilizing " << fert.number ("weight") 
                    << " ton "<< fert.type_name () << " ww/ha";
@@ -216,7 +216,7 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
           else
             tmp << "Fertilizing " << fert.type_name ();
           msg.message (tmp.str ());
-          daisy.field->fertilize (daisy.metalib, fert, 
+          daisy.field->fertilize (metalib, fert, 
                                   daisy.time (), msg);
           if (water > 0.0)
             daisy.field->irrigate (water/flux, flux, 
@@ -276,6 +276,7 @@ ActionTable::check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
 
 ActionTable::ActionTable (const BlockModel& al)
   : Action (al),
+    metalib (al.metalib ()),
     sow (al.check ("sow") 
          ? Librarian::build_item<Action> (al, "sow")
          : NULL),

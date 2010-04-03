@@ -134,6 +134,7 @@ Scope to evaluate expessions in.");
 
 struct ActionExternFertigation : public Action
 {
+  const Metalib& metalib;
   const std::auto_ptr<Scopesel> scopesel;
   mutable const Scope* extern_scope;
 
@@ -215,7 +216,6 @@ struct ActionExternFertigation : public Action
       }
     else if (NH4_value + NO3_value > 0.0)
       {
-        const Metalib& metalib = daisy.metalib;
         const Library& library = metalib.library (AM::component);
 	FrameModel frame (library.model ("mineral"), Frame::parent_link);
 	AM::set_mineral (metalib, frame, NH4_value, NO3_value);
@@ -273,6 +273,7 @@ struct ActionExternFertigation : public Action
 
   ActionExternFertigation (const BlockModel& al)
     : Action (al),
+      metalib (al.metalib ()),
       scopesel (Librarian::build_item<Scopesel> (al, "scope")),
       extern_scope (NULL),
       surface_expr (Librarian::build_item<Number> (al, "surface")),

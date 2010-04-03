@@ -132,6 +132,8 @@ This is mostly useful for silage.");
 
 struct ActionHarvest : public Action
 {
+  const Metalib& metalib;
+
   const symbol crop;
   const double stub;
   const double stem;
@@ -150,7 +152,7 @@ struct ActionHarvest : public Action
     double old_DM = 0.0;
     for (size_t i = 0; i < daisy.harvest.size (); i++)
       old_DM += daisy.harvest[i]->total_DM ();
-    daisy.field->harvest (daisy.metalib, daisy.time (), 
+    daisy.field->harvest (metalib, daisy.time (), 
                           crop, stub, stem, leaf, sorg, combine,
                           daisy.harvest, msg);
     double new_DM = 0.0;
@@ -184,6 +186,7 @@ If this was intended, you should use the 'cut' action instead to avoid this mess
 
   ActionHarvest (const BlockModel& al)
     : Action (al),
+      metalib (al.metalib ()),
       crop (al.name ("crop")), 
       stub (al.number ("stub")),
       stem (al.number ("stem")),
@@ -236,6 +239,8 @@ static struct ActionCutSyntax : DeclareModel
 
 struct ActionPluck : public Action
 {
+  const Metalib& metalib;
+
   const symbol crop;
   const double stem;
   const double leaf;
@@ -252,7 +257,7 @@ struct ActionPluck : public Action
     double old_DM = 0.0;
     for (size_t i = 0; i < daisy.harvest.size (); i++)
       old_DM += daisy.harvest[i]->total_DM ();
-    daisy.field->pluck (daisy.metalib, 
+    daisy.field->pluck (metalib, 
                         daisy.time (), crop, stem, leaf, sorg, 
                         daisy.harvest, msg);
     double new_DM = 0.0;
@@ -280,6 +285,7 @@ If this was intended, you should use the 'harvest' action instead to avoid this 
 
   ActionPluck (const BlockModel& al)
     : Action (al),
+      metalib (al.metalib ()),
       crop (al.name ("crop")), 
       stem (al.number ("stem")),
       leaf (al.number ("leaf")),

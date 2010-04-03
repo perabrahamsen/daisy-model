@@ -57,7 +57,7 @@ struct LogHarvest : public Log
   // Checking to see if we should log this time step.
   bool match (const Daisy& daisy, Treelog&)
   {
-    print_header.finish (out, daisy.metalib, daisy.frame ());
+    print_header.finish (out, metalib (), daisy.frame ());
 
     if (print_tags)
       {

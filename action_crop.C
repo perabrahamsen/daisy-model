@@ -45,6 +45,8 @@
 
 struct ActionCrop : public Action
 {
+  const Metalib& metalib;
+
   // Submodules.
   struct MM_DD			// Dates.
   {
@@ -73,7 +75,7 @@ struct ActionCrop : public Action
     bool done;
   
     // Simulation.
-    void doIt (Daisy&, const Scope&, Treelog&);
+    void doIt (const Metalib&, Daisy&, const Scope&, Treelog&);
     void output (Log&) const;
 
     // Create and Destroy.
@@ -96,7 +98,7 @@ struct ActionCrop : public Action
     bool done;
   
     // Simulation.
-    bool doIt (Daisy&, const Scope&, Treelog&, symbol name);
+    bool doIt (const Metalib&, Daisy&, const Scope&, Treelog&, symbol name);
     void output (Log&) const;
 
     // Create and Destroy.
@@ -123,10 +125,11 @@ struct ActionCrop : public Action
 
     // Simulation.
   private:
-    void harvest (Daisy&, Treelog&);
+    void harvest (const Metalib&, Daisy&, Treelog&);
   public:
-    bool doIt (Daisy&, const Scope&, Treelog&, symbol name);
-    bool doIt (Daisy&, const Scope&, Treelog&, symbol primary, symbol secondary);
+    bool doIt (const Metalib&, Daisy&, const Scope&, Treelog&, symbol name);
+    bool doIt (const Metalib&, Daisy&, const Scope&, Treelog&, 
+               symbol primary, symbol secondary);
     bool done (const Daisy&, Treelog&) const;
     void output (Log&) const;
 
@@ -152,7 +155,7 @@ struct ActionCrop : public Action
   const std::vector <const Fertilize*> fertilize_at;
   int fertilize_at_index;
   const bool fertilize_incorporate;
-  void fertilize (Daisy& daisy, Treelog&, const FrameModel& am) const;
+  void fertilize (const Metalib&, Daisy&, Treelog&, const FrameModel& am) const;
 
   struct Tillage		// Tillage operations.
   {
@@ -288,12 +291,13 @@ ActionCrop::MM_DD::~MM_DD ()
 { }
 
 void 
-ActionCrop::Sow::doIt (Daisy& daisy, const Scope&, Treelog& msg)
+ActionCrop::Sow::doIt (const Metalib& metalib, Daisy& daisy,
+                       const Scope&, Treelog& msg)
 {
   if (!done && date.match (daisy.time ()))
     {
       msg.message ("Sowing " + crop->type_name ());      
-      daisy.field->sow (daisy.metalib, *crop, 0.0, 0.0, -42.42e42,
+      daisy.field->sow (metalib, *crop, 0.0, 0.0, -42.42e42,
                         daisy.time (), msg); 
       done = true;
     }
@@ -333,7 +337,8 @@ ActionCrop::Sow::~Sow ()
 { }
 
 bool
-ActionCrop::Annual::doIt (Daisy& daisy, const Scope&, Treelog& msg, symbol name)
+ActionCrop::Annual::doIt (const Metalib& metalib, Daisy& daisy,
+                          const Scope&, Treelog& msg, symbol name)
 {
   if (!done && (daisy.field->crop_ds (name) >= 2.0
 		|| latest.match (daisy.time ())))
@@ -342,7 +347,7 @@ ActionCrop::Annual::doIt (Daisy& daisy, const Scope&, Treelog& msg, symbol name)
       const double stem = remove_residuals ? 1.0 : 0.0;
       const double leaf = remove_residuals ? 1.0 : 0.0;
       const double sorg = (1.0 - loss);
-      daisy.field->harvest (daisy.metalib, daisy.time (), 
+      daisy.field->harvest (metalib, daisy.time (), 
                             Vegetation::all_crops (), stub, stem, leaf, sorg, 
                             false, daisy.harvest, msg);
       msg.message ("Annual harvest of " + name);
@@ -392,20 +397,22 @@ ActionCrop::Annual::~Annual ()
 { }
 
 void
-ActionCrop::Perennial::harvest (Daisy& daisy, Treelog& msg)
+ActionCrop::Perennial::harvest (const Metalib& metalib, 
+                                Daisy& daisy, Treelog& msg)
 {
   const double stub = 8.0;
   const double stem = 1.0;
   const double leaf = 1.0;
   const double sorg = 1.0;
-  daisy.field->harvest (daisy.metalib, daisy.time (), 
+  daisy.field->harvest (metalib, daisy.time (), 
                         Vegetation::all_crops (), stub, stem, leaf, sorg, 
                         false, daisy.harvest, msg);
   msg.message ("Perennial harvest");
 }
 
 bool
-ActionCrop::Perennial::doIt (Daisy& daisy, const Scope&, Treelog& msg, symbol name)
+ActionCrop::Perennial::doIt (const Metalib& metalib, Daisy& daisy,
+                             const Scope&, Treelog& msg, symbol name)
 {
   const double stub = 8.0;
 
@@ -415,14 +422,15 @@ ActionCrop::Perennial::doIt (Daisy& daisy, const Scope&, Treelog& msg, symbol na
   if (daisy.field->crop_ds (name) >= DS 
       || daisy.field->crop_dm (name, stub) >= DM)
     {
-      harvest (daisy, msg);
+      harvest (metalib, daisy, msg);
       return true;
     }
   return false;
 }
 
 bool
-ActionCrop::Perennial::doIt (Daisy& daisy, const Scope&, Treelog& msg,
+ActionCrop::Perennial::doIt (const Metalib& metalib, 
+                             Daisy& daisy, const Scope&, Treelog& msg,
 			     symbol primary, symbol secondary)
 {
   const double stub = 8.0;
@@ -435,7 +443,7 @@ ActionCrop::Perennial::doIt (Daisy& daisy, const Scope&, Treelog& msg,
       || (daisy.field->crop_dm (primary, stub)
 	  + daisy.field->crop_dm (secondary, stub)) >= DM)
     {
-      harvest (daisy, msg);
+      harvest (metalib, daisy, msg);
       return true;
     }
   return false;
@@ -586,7 +594,7 @@ ActionCrop::Fertilize::~Fertilize ()
 { }
 
 void
-ActionCrop::fertilize (Daisy& daisy, Treelog& msg,
+ActionCrop::fertilize (const Metalib& metalib, Daisy& daisy, Treelog& msg,
 		       const FrameModel& am) const
 {
   msg.message (std::string ("[Fertilizing ") + am.type_name () + "]");
@@ -595,10 +603,10 @@ ActionCrop::fertilize (Daisy& daisy, Treelog& msg,
   const double to = -18.0;
       
   if (fertilize_incorporate)
-    daisy.field->fertilize (daisy.metalib, am, from, to, 
+    daisy.field->fertilize (metalib, am, from, to, 
                             daisy.time (), msg);
   else
-    daisy.field->fertilize (daisy.metalib, am, daisy.time (), msg);
+    daisy.field->fertilize (metalib, am, daisy.time (), msg);
 }
 
 void 
@@ -764,9 +772,9 @@ void
 ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 {
   // Sowing.
-  primary->doIt (daisy, scope, msg);
+  primary->doIt (metalib, daisy, scope, msg);
   if (secondary)
-    secondary->doIt (daisy, scope, msg);
+    secondary->doIt (metalib, daisy, scope, msg);
 
   // Harvesting.
   bool harvested = false;
@@ -778,12 +786,12 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 	{
 	  // If annual done, do perennial.
 	  if (secondary->done 
-	      && harvest_perennial->doIt (daisy, scope, msg,
+	      && harvest_perennial->doIt (metalib, daisy, scope, msg,
 					  secondary->crop->type_name ()))
 	    harvested = true;
 	}
       else if (primary->done 
-	       && harvest_annual->doIt (daisy, scope, msg, 
+	       && harvest_annual->doIt (metalib, daisy, scope, msg, 
 					primary->crop->type_name ()))
 	// else do annual.
 	harvested = true;
@@ -792,7 +800,7 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
     {
       // We have only annual crops.  Let 'primary' when they are harvested.
       if (primary->done 
-	  && harvest_annual->doIt (daisy, scope, 
+	  && harvest_annual->doIt (metalib, daisy, scope, 
                                    msg, primary->crop->type_name ()))
 	harvested = true;
     }
@@ -804,13 +812,13 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 	{
 	  // If we have two, let them both control.
 	  if ((primary->done || secondary->done)
-	      && harvest_perennial->doIt (daisy, scope, msg,
+	      && harvest_perennial->doIt (metalib, daisy, scope, msg,
 					  primary->crop->type_name (),
 					  secondary->crop->type_name ()))
 	    harvested = true;
 	}
       else if (primary->done 
-	       && harvest_perennial->doIt (daisy, scope, msg, 
+	       && harvest_perennial->doIt (metalib, daisy, scope, msg, 
 					   primary->crop->type_name ()))
 	// If we have only one, it is of course in control.
 	harvested = true;
@@ -823,7 +831,7 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
       && daisy.time ().mday () == fertilize_at[fertilize_at_index]->day)
     {
       // Fertilize by date.
-      fertilize (daisy, msg, *fertilize_at[fertilize_at_index]->what);
+      fertilize (metalib, daisy, msg, *fertilize_at[fertilize_at_index]->what);
       fertilize_at_index++;
     }
   if (harvested && harvest_perennial && harvest_perennial->fertilize)
@@ -859,7 +867,7 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 	  // If 'fertilize' is active, use it.
           const FrameModel& model = *(*harvest_perennial->fertilize) 
             [harvest_perennial->fertilize_index];
-	  fertilize (daisy, msg, model);
+	  fertilize (metalib, daisy, msg, model);
 	  harvest_perennial->fertilize_index++;
 	}
       else if (harvest_perennial->fertilize_rest 
@@ -869,7 +877,7 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 	  // Else, if 'fertilize_rest' is active, us that.
           const FrameModel& model = *(*harvest_perennial->fertilize_rest)
             [harvest_perennial->fertilize_rest_index];
-          fertilize (daisy, msg, model);
+          fertilize (metalib, daisy, msg, model);
 	  harvest_perennial->fertilize_rest_index++;
 	}
     }
@@ -974,6 +982,7 @@ ActionCrop::check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
 
 ActionCrop::ActionCrop (const BlockModel& al)
   : Action (al),
+    metalib (al.metalib ()),
     primary (new Sow (al.submodel ("primary"))),
     secondary (al.check ("secondary") 
 	       ? new Sow (al.submodel ("secondary"))
