@@ -38,7 +38,7 @@
 
 void
 LogDLF::common_match (const Daisy& daisy, Treelog&)
-{ print_header.finish (out, daisy); }
+{ print_header.finish (out, daisy.metalib, daisy.frame ()); }
 
 void 
 LogDLF::common_done (const std::vector<Time::component_t>& time_columns,
@@ -181,12 +181,12 @@ LogDLF::done (const std::vector<Time::component_t>& time_columns,
 }
 
 bool 
-LogDLF::initial_match (const Daisy& daisy, Treelog& msg)
+LogDLF::initial_match (const Daisy& daisy, const Time& previous, Treelog& msg)
 {
-  begin = daisy.time;
+  begin = daisy.time ();
 
   common_match (daisy, msg);
-  return LogSelect::initial_match (daisy, msg);
+  return LogSelect::initial_match (daisy, previous, msg);
 }
 
 void 

@@ -153,24 +153,24 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
   const Unit& u_per_mm = units.get_unit (Units::per_mm ());
   const Unit& u_solute = units.get_unit (IM::solute_unit ());
 
-  if (sow.get () && sow_dates.find (daisy.time) != sow_dates.end ())
+  if (sow.get () && sow_dates.find (daisy.time ()) != sow_dates.end ())
     sow->doIt (daisy, scope, msg);
-  if (emerge.get () && emerge_dates.find (daisy.time) != emerge_dates.end ())
+  if (emerge.get () && emerge_dates.find (daisy.time ()) != emerge_dates.end ())
     emerge->doIt (daisy, scope, msg);
   if (harvest.get () 
-      && harvest_dates.find (daisy.time) != harvest_dates.end ())
+      && harvest_dates.find (daisy.time ()) != harvest_dates.end ())
     harvest->doIt (daisy, scope, msg);
   if ((am.get () 
-       || fertilizers.find (daisy.time) != fertilizers.end ())
-      && fertilize_events.find (daisy.time) != fertilize_events.end ())
+       || fertilizers.find (daisy.time ()) != fertilizers.end ())
+      && fertilize_events.find (daisy.time ()) != fertilize_events.end ())
     {
-      FrameModel fert (((fertilizers.find (daisy.time) != fertilizers.end ())
-                        ? *fertilizers[daisy.time] : *am), Frame::parent_link);
+      FrameModel fert (((fertilizers.find (daisy.time ()) != fertilizers.end ())
+                        ? *fertilizers[daisy.time ()] : *am), Frame::parent_link);
 
-      AM::set_utilized_weight (metalib, fert, fertilize_events[daisy.time]);
-      if (irrigate_events.find (daisy.time) != irrigate_events.end ())
+      AM::set_utilized_weight (metalib, fert, fertilize_events[daisy.time ()]);
+      if (irrigate_events.find (daisy.time ()) != irrigate_events.end ())
         {
-          double value = irrigate_events[daisy.time];
+          double value = irrigate_events[daisy.time ()];
           std::ostringstream tmp;
           if (iszero (value))
             {
@@ -217,7 +217,7 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
             tmp << "Fertilizing " << fert.type_name ();
           msg.message (tmp.str ());
           daisy.field->fertilize (daisy.metalib, fert, 
-                                  daisy.time, msg);
+                                  daisy.time (), msg);
           if (water > 0.0)
             daisy.field->irrigate (water/flux, flux, 
                                    Irrigation::at_air_temperature,
@@ -225,9 +225,9 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
                                    boost::shared_ptr<Volume> (), false, msg);  
         }
     }
-  else if (irrigate_events.find (daisy.time) != irrigate_events.end ())
+  else if (irrigate_events.find (daisy.time ()) != irrigate_events.end ())
     {
-      const double value = irrigate_events[daisy.time];
+      const double value = irrigate_events[daisy.time ()];
       std::ostringstream tmp;
       IM im;
       daisy.field->irrigate (value/flux, flux, 

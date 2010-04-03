@@ -350,8 +350,8 @@ daisy_daisy_is_running (daisy_daisy* daisy);
  * parts of the daisy simulation.
  */
 
-EXPORT daisy_time*                     /* Extract time. */
-daisy_daisy_get_time (daisy_daisy* daisy);
+EXPORT const daisy_time*                     /* Extract time. */
+daisy_daisy_get_time (const daisy_daisy* daisy);
 
 EXPORT unsigned int        /* Count the number of columns in daisy. */
 daisy_daisy_count_columns (const daisy_daisy* daisy);

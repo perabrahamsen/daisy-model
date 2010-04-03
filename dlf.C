@@ -100,15 +100,14 @@ DLF::log_description (std::ostream& out, const symbol description_s) const
 }
 
 void
-DLF::finish (std::ostream& out, const Daisy& daisy)
+DLF::finish (std::ostream& out,
+             const Metalib& global_alist,
+             const FrameModel& daisy_alist)
 {
   // No (additional) header.
   if (value == None)
     return;
   
-  const Metalib& global_alist = daisy.metalib;
-  const FrameModel& daisy_alist = daisy.frame;
-
   // SIMFILE:
   const std::vector<symbol>& files = global_alist.parser_files ();
   if (value == Terse)

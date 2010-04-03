@@ -498,7 +498,7 @@ daisy_daisy_tick (Toplevel* toplevel)
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      Treelog::Open nest (toplevel->msg (), daisy.time.print ());
+      Treelog::Open nest (toplevel->msg (), daisy.time ().print ());
       daisy.tick (toplevel->msg ()); 
     }
   DAISY_CATCH_BLOCK(toplevel);
@@ -550,13 +550,13 @@ daisy_daisy_tick_after (Toplevel* toplevel)
 
 // @@ Manipulating the simulation.
 
-extern "C" Time* EXPORT
+extern "C" const Time* EXPORT
 daisy_daisy_get_time (Toplevel* toplevel)
 {
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      return &daisy.time; 
+      return &daisy.time (); 
     }
   DAISY_CATCH_BLOCK(toplevel);
   return NULL;
@@ -648,7 +648,7 @@ daisy_daisy_scope_extern_size (Toplevel *const toplevel)
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      return daisy.output_log->scope_size ();
+      return daisy.scope_size ();
     }
   DAISY_CATCH_BLOCK(toplevel);
   return 0;
@@ -661,7 +661,7 @@ daisy_daisy_scope_extern_get (Toplevel *const toplevel,
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      return &daisy.output_log->scope (index); 
+      return &daisy.find_scope (index); 
     }
   DAISY_CATCH_BLOCK(toplevel);
   return NULL;

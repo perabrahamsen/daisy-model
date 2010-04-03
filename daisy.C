@@ -52,6 +52,117 @@
 const char *const Daisy::default_description = "\
 The Daisy crop/soil/atmosphere model.";
 
+struct Daisy::Implementation
+{
+  // Content.
+  const FrameModel& frame;
+  const boost::scoped_ptr<Scopesel> scopesel;
+  const Scope* extern_scope;
+  const boost::scoped_ptr<Condition> print_time;
+  const boost::scoped_ptr<Output> output_log;
+  const Timestep timestep;
+  const double max_dt;
+  double current_dt;
+  Time time;
+  const Time stop;
+  int duration;
+  const boost::scoped_ptr<Action> action;
+  const boost::scoped_ptr<Weather> weather;
+  
+  // Use.
+  const Scope& scope ()
+  { return extern_scope ? *extern_scope : Scope::null (); }
+  const Scope* find_scope (const Scopesel& sel, Treelog& msg) const
+  { return sel.lookup (*output_log, msg); }
+
+  // Simulation.
+  void tick_before (Daisy& daisy, Treelog& msg)
+  { 
+    const Time previous = time - timestep;
+    output_log->initial_logs (daisy, previous, msg);
+    if (weather.get ())
+      weather->tick (time, msg);
+    action->tick (daisy, scope (), msg);
+    action->doIt (daisy, scope (), msg);
+  }
+
+  void output (Log& log) const
+  {
+    output_value (current_dt, "dt", log);
+    if (weather.get ())
+      output_derived (weather, "weather", log);
+    output_object (action, "manager", log);
+  }
+  // Create and Destroy.
+  void initialize (Treelog& msg)
+  { extern_scope = find_scope (*scopesel, msg); }
+  bool check (Treelog& msg)
+  {
+    bool ok = true;
+    if (!extern_scope)
+      {
+        msg.error ("Extern scope not found");
+        ok = false;
+      }
+    if (!approximate (max_dt, 1.0))
+      {
+        std::ostringstream tmp;
+        tmp << "Daisy is designed for a timestep of 1 hour, you specified " 
+            << max_dt << " hours";
+        msg.warning (tmp.str ());
+      }
+    return ok;
+  }
+  Implementation (const BlockModel& al)
+    : frame (al.frame ()),
+      scopesel (Librarian::build_item<Scopesel> (al, "scope")),
+      extern_scope (NULL),
+      print_time (Librarian::build_item<Condition> (al, "print_time")),
+      output_log (new Output (al)),
+      timestep (al.check ("timestep") 
+                ? submodel_value<Timestep> (al, "timestep")
+                : Timestep::hour ()),
+      max_dt (timestep.total_hours ()),
+      current_dt (max_dt),
+      time (al.submodel ("time")),
+      stop (al.check ("stop")
+            ? Time (al.submodel ("stop")) 
+            : Time (9999, 1, 1, 1)),
+      duration (al.check ("stop")
+                ? Time::hours_between (stop, time)
+                :-1),
+      action (Librarian::build_item<Action> (al, "manager")),
+      weather (al.check ("weather") 
+               ? Librarian::build_item<Weather> (al, "weather")
+               : NULL)
+  { }
+};
+
+const FrameModel&
+Daisy::frame () const
+{ return impl->frame; }
+
+const Scope* 
+Daisy::find_scope (const Scopesel& sel, Treelog& msg) const
+{ return impl->find_scope (sel, msg); }
+
+Scope&
+Daisy::find_scope (const size_t index) const
+{ return impl->output_log->scope (index); }
+
+
+size_t 
+Daisy::scope_size () const
+{ return impl->output_log->scope_size (); }
+
+const Time& 
+Daisy::time () const
+{ return impl->time; }
+
+const Timestep& 
+Daisy::timestep () const
+{ return impl->timestep; }
+
 const Units& 
 Daisy::units () const
 { return metalib.units (); }
@@ -62,14 +173,12 @@ Daisy::attach_ui (Run* run, const std::vector<Log*>& logs)
   Program::attach_ui (run, logs);
 
   for (size_t i = 0; i < logs.size (); i++)
-    output_log->add_log (logs[i]);
+    impl->output_log->add_log (logs[i]);
 }
 
 bool
 Daisy::run (Treelog& msg)
 {
-  daisy_assert (extern_scope);
-
   // Run simulation.
   {
     Treelog::Open nest (msg, "Running");
@@ -78,7 +187,7 @@ Daisy::run (Treelog& msg)
 
     do
       {
-	Treelog::Open nest (msg, time.print ());
+	Treelog::Open nest (msg, impl->time.print ());
 
 	if (!running)
 	  {
@@ -86,9 +195,9 @@ Daisy::run (Treelog& msg)
 	    msg.message ("Begin simulation");
 	  }
 
-	print_time->tick (*this, *extern_scope, msg);
+	impl->print_time->tick (*this, impl->scope (), msg);
 	const bool force_print 
-          = print_time->match (*this, *extern_scope, msg);
+          = impl->print_time->match (*this, impl->scope (), msg);
 
 	tick (msg);
 
@@ -116,36 +225,28 @@ Daisy::tick (Treelog& msg)
 
 void
 Daisy::tick_before (Treelog& msg)
-{ 
-  daisy_assert (extern_scope);
-
-  output_log->initial_logs (*this, msg);
-  if (weather.get ())
-    weather->tick (time, msg);
-  action->tick (*this, *extern_scope, msg);
-  action->doIt (*this, *extern_scope, msg);
-}
+{ impl->tick_before (*this, msg); }
 
 void
 Daisy::tick_columns (Treelog& msg)
-{ field->tick_all (metalib, time, current_dt, 
-                   weather.get (), *extern_scope, msg); }
+{ field->tick_all (metalib, impl->time, impl->current_dt, 
+                   impl->weather.get (), impl->scope (), msg); }
 
 void
 Daisy::tick_column (const size_t col, Treelog& msg)
-{ field->tick_one (metalib, col, time, current_dt,
-                   weather.get (), *extern_scope, msg); }
+{ field->tick_one (metalib, col, impl->time, impl->current_dt,
+                   impl->weather.get (), impl->scope (), msg); }
 
 void
 Daisy::tick_after (Treelog& msg)
 { 
-  const Time next = time + timestep;
-  if (next >= stop)
+  const Time next = impl->time + impl->timestep;
+  if (next >= impl->stop)
     running = false;
 
-  output_log->tick (*this, time, current_dt, msg);
+  impl->output_log->tick (*this, impl->time, impl->current_dt, msg);
   field->clear ();
-  time = next;
+  impl->time = next;
   
   if (!ui_running ())
     {
@@ -154,15 +255,15 @@ Daisy::tick_after (Treelog& msg)
     }
   if (!running)
     ui_set_progress (1.0);
-  else if (duration > 0)
+  else if (impl->duration > 0)
     {
-      const double total_hours = duration; // int -> double
-      const double hours_left = Time::hours_between (time, stop);
+      const double total_hours = impl->duration; // int -> double
+      const double hours_left = Time::hours_between (impl->time, impl->stop);
       ui_set_progress ((total_hours - hours_left) / total_hours);
     }
-  else if (duration != -42)
+  else if (impl->duration != -42)
     {
-      duration = -42;           // Magic to call this only once
+      impl->duration = -42;           // Magic to call this only once
       ui_set_progress (-1.0);
     }
 }
@@ -170,30 +271,27 @@ Daisy::tick_after (Treelog& msg)
 void
 Daisy::output (Log& log) const
 {
-  output_value (current_dt, "dt", log);
+  impl->output (log);
   output_submodule (*field, "column", log);
-  if (weather.get ())
-    output_derived (weather, "weather", log);
   output_vector (harvest, "harvest", log);
-  output_object (action, "manager", log);
 }
 
 void
 Daisy::initialize (Metalib& metalib, Block& block)
 { 
   Treelog& msg = block.msg ();
-  if (weather.get () && !weather->initialize (time, msg))
+  if (impl->weather.get () && !impl->weather->initialize (impl->time, msg))
     return;
   {
     Treelog::Open nest (msg, "output");
-    output_log->initialize (metalib, msg);
+    impl->output_log->initialize (metalib, msg);
   }
-  extern_scope = scopesel->lookup (*output_log, msg); 
-  const Scope& scope = extern_scope ? *extern_scope : Scope::null ();
-  field->initialize (block, *output_log, time, weather.get (), scope);
+  impl->initialize (msg);
+  field->initialize (block, *impl->output_log, impl->time, 
+                     impl->weather.get (), impl->scope ());
   {                       
     Treelog::Open nest (msg, "manager");
-    action->initialize (*this, scope, msg);
+    impl->action->initialize (*this, impl->scope (), msg);
   }
 }
 
@@ -201,44 +299,36 @@ bool
 Daisy::check (Treelog& msg)
 {
   bool ok = true;
-  const Scope& scope = extern_scope ? *extern_scope : Scope::null ();
-
-  if (!approximate (max_dt, 1.0))
-    {
-      std::ostringstream tmp;
-      tmp << "Daisy only works with a timestep of 1 hour, you specified " 
-          << max_dt << " hours";
-      msg.warning (tmp.str ());
-    }
 
   // Check weather.
   {
     Treelog::Open nest (msg, "weather");
-    if (weather.get () && !weather->check (time, stop, msg))
+    if (impl->weather.get () && !impl->weather->check (impl->time,
+                                                       impl->stop, msg))
       return false;
   }
 
   // Check field.
   {
     Treelog::Open nest (msg, "column");
-    if (!field->check (weather.get (), time, stop, scope, msg))
+    if (!field->check (impl->weather.get (), impl->time, impl->stop,
+                       impl->scope (), msg))
       ok = false;
   }
   // Check logs.
   {
     Treelog::Open nest (msg, "output");
-    if (!output_log->check (*field, msg))
+    if (!impl->output_log->check (*field, msg))
       ok = false;
   }
-  if (!extern_scope)
-    {
-      msg.error ("Extern scope not found");
-      ok = false;
-    }
+  // Implementation.
+  if (!impl->check (msg))
+    ok = false;
+
   // Check actions.
   {
     Treelog::Open nest (msg, "manager");
-    if (!action->check (*this, scope, msg))
+    if (!impl->action->check (*this, impl->scope (), msg))
       ok = false;
   }
   return ok;
@@ -246,29 +336,9 @@ Daisy::check (Treelog& msg)
 
 Daisy::Daisy (const BlockModel& al)
   : Program (al),
+    impl (new Implementation (al)),
     metalib (al.metalib ()),
-    frame (al.frame ()),
     running (false),
-    output_log (new Output (al)),
-    scopesel (Librarian::build_item<Scopesel> (al, "scope")),
-    extern_scope (NULL),
-    print_time (Librarian::build_item<Condition> (al, "print_time")),
-    time (al.submodel ("time")),
-    timestep (al.check ("timestep") 
-              ? submodel_value<Timestep> (al, "timestep")
-              : Timestep::hour ()),
-    max_dt (timestep.total_hours ()),
-    current_dt (max_dt),
-    stop (al.check ("stop")
-	  ? Time (al.submodel ("stop")) 
-	  : Time (9999, 1, 1, 1)),
-    duration (al.check ("stop")
-              ? Time::hours_between (stop, time)
-              :-1),
-    action (Librarian::build_item<Action> (al, "manager")),
-    weather (al.check ("weather") 
-	     ? Librarian::build_item<Weather> (al, "weather")
-	     : NULL), 
     field (new Field (al, "column")),
     harvest (map_submodel_const<Harvest> (al, "harvest"))
 { }
@@ -323,7 +393,7 @@ the simulation.  Can be overwritten by column specific weather.");
 void
 Daisy::summarize (Treelog& msg) const
 {
-  output_log->summarize (msg);
+  impl->output_log->summarize (msg);
   field->summarize (msg);
 }
 

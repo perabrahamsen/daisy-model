@@ -76,7 +76,7 @@ struct ActionWaitDays : public Action
     if (!activated)
       {
 	activated = true;
-	end_time = daisy.time;
+	end_time = daisy.time ();
 	end_time.tick_hour (hours - 1);
 	end_time.tick_day (days);
       }
@@ -85,7 +85,7 @@ struct ActionWaitDays : public Action
   bool done (const Daisy& daisy, const Scope&, Treelog&) const
   {
     daisy_assert (activated);
-    return daisy.time >= end_time; 
+    return daisy.time () >= end_time; 
   }
 
   void output (Log& log) const
@@ -127,9 +127,9 @@ struct ActionWaitMMDD : public Action
 
   bool done (const Daisy& daisy, const Scope&, Treelog&) const
   { 
-    return daisy.time.month () == month
-      && daisy.time.mday () == day 
-      && daisy.time.hour () == hour; 
+    return daisy.time ().month () == month
+      && daisy.time ().mday () == day 
+      && daisy.time ().hour () == hour; 
   }
 
   void tick (const Daisy&, const Scope&, Treelog&)

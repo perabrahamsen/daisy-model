@@ -46,7 +46,7 @@ Condition::Condition (const BlockModel& al)
 { }
 
 void 
-Condition::initiate_log (const Daisy&)
+Condition::initiate_log (const Daisy&, const Time& previous)
 { }
 
 Condition::Condition (const char *const id)

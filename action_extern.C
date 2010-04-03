@@ -73,7 +73,7 @@ struct ActionExtern : public Action
 
   void initialize (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   { 
-    extern_scope = scopesel->lookup (*daisy.output_log, msg); 
+    extern_scope = daisy.find_scope (*scopesel, msg); 
     if (extern_scope)
       {
         ScopeMulti multi (*extern_scope, parent_scope);
@@ -219,7 +219,7 @@ struct ActionExternFertigation : public Action
         const Library& library = metalib.library (AM::component);
 	FrameModel frame (library.model ("mineral"), Frame::parent_link);
 	AM::set_mineral (metalib, frame, NH4_value, NO3_value);
-        field.fertilize (metalib, frame, daisy.time, msg);
+        field.fertilize (metalib, frame, daisy.time (), msg);
       }
   }
 
@@ -231,7 +231,7 @@ struct ActionExternFertigation : public Action
 
   void initialize (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   { 
-    extern_scope = scopesel->lookup (*daisy.output_log, msg); 
+    extern_scope = daisy.find_scope (*scopesel, msg); 
     if (!extern_scope)
       return;
 
@@ -416,10 +416,10 @@ struct ActionExternSubsoil : public Action
 
   void initialize (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   { 
-    extern_scope = scopesel->lookup (*daisy.output_log, msg); 
+    extern_scope = daisy.find_scope (*scopesel, msg); 
     if (!extern_scope)
       return;
-
+    
     ScopeMulti multi (*extern_scope, parent_scope);
     const Units& units = daisy.units ();
     expr_flux->initialize (units, multi, msg);

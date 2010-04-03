@@ -72,7 +72,7 @@ protected:
   void done (const std::vector<Time::component_t>& time_columns,
 	     const Time&, double dt, Treelog&);
 private:
-  bool initial_match (const Daisy&, Treelog&);
+  bool initial_match (const Daisy&, const Time& previous, Treelog&);
 
   // Self use.
   void output (Log&) const;

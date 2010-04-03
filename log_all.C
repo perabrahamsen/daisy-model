@@ -124,14 +124,14 @@ LogAll::done (const std::vector<Time::component_t>& time_columns,
 }
 
 bool 
-LogAll::initial_match (const Daisy& daisy, Treelog& out)
+LogAll::initial_match (const Daisy& daisy, const Time& previous, Treelog& out)
 {
   msg = &out;
   is_active = false;
   for (std::vector<LogSelect*>::const_iterator i = slaves.begin (); 
        i != slaves.end (); 
        i++)
-    if ((*i)->initial_match (daisy, out))
+    if ((*i)->initial_match (daisy, previous, out))
       is_active = true;
 
   if (is_active)

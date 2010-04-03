@@ -45,11 +45,11 @@ struct ConditionMMDD : public Condition
 public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
   {
-    return daisy.time.month () == month
-      && daisy.time.mday () == day 
-      && daisy.time.hour () == hour
-      && daisy.time.minute () == minute
-      && daisy.time.second () == second; 
+    return daisy.time ().month () == month
+      && daisy.time ().mday () == day 
+      && daisy.time ().hour () == hour
+      && daisy.time ().minute () == minute
+      && daisy.time ().second () == second; 
   }
 
   void output (Log&) const
@@ -85,29 +85,29 @@ struct ConditionBeforeMMDD : public Condition
 public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
   {
-    if (daisy.time.month () < month)
+    if (daisy.time ().month () < month)
       return true;
-    if (daisy.time.month () > month)
+    if (daisy.time ().month () > month)
       return false;
 
-    if (daisy.time.mday () < day)
+    if (daisy.time ().mday () < day)
       return true;
-    if (daisy.time.mday () > day)
+    if (daisy.time ().mday () > day)
       return false;
 
-    if (daisy.time.hour () < hour)
+    if (daisy.time ().hour () < hour)
       return true;
-    if (daisy.time.hour () > hour)
+    if (daisy.time ().hour () > hour)
       return false;
 
-    if (daisy.time.minute () < minute)
+    if (daisy.time ().minute () < minute)
       return true;
-    if (daisy.time.minute () > minute)
+    if (daisy.time ().minute () > minute)
       return false;
 
-    if (daisy.time.second () < second)
+    if (daisy.time ().second () < second)
       return true;
-    if (daisy.time.second () > second)
+    if (daisy.time ().second () > second)
       return false;
 
     // Equal
@@ -147,29 +147,29 @@ struct ConditionAfterMMDD : public Condition
 public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
   {
-    if (daisy.time.month () < month)
+    if (daisy.time ().month () < month)
       return false;
-    if (daisy.time.month () > month)
+    if (daisy.time ().month () > month)
       return true;
 
-    if (daisy.time.mday () < day)
+    if (daisy.time ().mday () < day)
       return false;
-    if (daisy.time.mday () > day)
+    if (daisy.time ().mday () > day)
       return true;
 
-    if (daisy.time.hour () < hour)
+    if (daisy.time ().hour () < hour)
       return false;
-    if (daisy.time.hour () > hour)
+    if (daisy.time ().hour () > hour)
       return true;
 
-    if (daisy.time.minute () < minute)
+    if (daisy.time ().minute () < minute)
       return false;
-    if (daisy.time.minute () > minute)
+    if (daisy.time ().minute () > minute)
       return true;
 
-    if (daisy.time.second () < second)
+    if (daisy.time ().second () < second)
       return false;
-    if (daisy.time.second () > second)
+    if (daisy.time ().second () > second)
       return true;
 
     // Equal
@@ -204,7 +204,7 @@ struct ConditionAt : public Condition
   const Time time;
 public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return time == daisy.time; }
+  { return time == daisy.time (); }
   void output (Log&) const
   { }
 
@@ -230,7 +230,7 @@ struct ConditionBefore : public Condition
   const Time time;
 public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return time > daisy.time; }
+  { return time > daisy.time (); }
   void output (Log&) const
   { }
 
@@ -256,7 +256,7 @@ struct ConditionAfter : public Condition
   const Time time;
 public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return time < daisy.time; }  
+  { return time < daisy.time (); }  
   void output (Log&) const
   { }
 
@@ -283,7 +283,7 @@ struct ConditionHour : public Condition
   symbol timestep ()
   { return "d"; } 
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return daisy.time.hour () == at; }
+  { return daisy.time ().hour () == at; }
   void output (Log&) const
   { }
   void tick (const Daisy&, const Scope&, Treelog&)
@@ -307,7 +307,7 @@ struct ConditionMDay : public Condition
 {
   const int at;
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return daisy.time.mday () == at; }
+  { return daisy.time ().mday () == at; }
   void output (Log&) const
   { }
 
@@ -334,7 +334,7 @@ struct ConditionYDay : public Condition
   const int at;
 public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return daisy.time.yday () == at; }
+  { return daisy.time ().yday () == at; }
   void output (Log&) const
   { }
   void tick (const Daisy&, const Scope&, Treelog&)
@@ -359,7 +359,7 @@ struct ConditionMonth : public Condition
   const int at;
 public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return daisy.time.month () == at; }
+  { return daisy.time ().month () == at; }
   void output (Log&) const
   { }
 
@@ -385,7 +385,7 @@ struct ConditionYear : public Condition
   const int at;
 public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return daisy.time.year () == at; }
+  { return daisy.time ().year () == at; }
   void output (Log&) const
   { }
   void tick (const Daisy&, const Scope&, Treelog&)
@@ -691,7 +691,8 @@ struct ConditionEnd : public Condition
   { return timestep_name; } 
 
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return (daisy.time.*entry) () != ((daisy.time + daisy.timestep).*entry) (); }
+  { return (daisy.time ().*entry) () 
+      != ((daisy.time () + daisy.timestep ()).*entry) (); }
 
   void output (Log&) const
   { }
@@ -834,18 +835,21 @@ private:
   
   void tick (const Daisy& daisy, const Scope&, Treelog&)
   { 
-    does_match = (next <= daisy.time);
+    does_match = (next <= daisy.time ());
 
     if (!does_match)
       return;
     
-    next = daisy.time + interval;
+    next = daisy.time () + interval;
   }
-  void initiate_log (const Daisy& daisy)
-  { next = daisy.time + interval - daisy.timestep; }
+  void initiate_log (const Daisy& daisy, const Time& previous)
+  { next = previous + interval; }
 
   void initialize (const Daisy& daisy, const Scope&, Treelog&)
-  { initiate_log (daisy); }
+  { 
+    const Time previous = daisy.time () - daisy.timestep ();
+    initiate_log (daisy, previous); 
+  }
   
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }

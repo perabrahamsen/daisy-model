@@ -337,7 +337,7 @@ ActionFertilizeSurface::doIt (Daisy& daisy, const Scope&, Treelog& msg)
   if (to < from)
     {
       daisy.field->fertilize (daisy.metalib, *am, from, to, 
-                              daisy.time, msg);
+                              daisy.time (), msg);
       if (water > 0.0)
         daisy.field->irrigate (duration, water / duration,
                                Irrigation::at_air_temperature,
@@ -347,7 +347,7 @@ ActionFertilizeSurface::doIt (Daisy& daisy, const Scope&, Treelog& msg)
     }
   else
     {
-      daisy.field->fertilize (daisy.metalib, *am, daisy.time, msg);
+      daisy.field->fertilize (daisy.metalib, *am, daisy.time (), msg);
       if (water > 0.0)
         daisy.field->irrigate (duration, water / duration,
                                Irrigation::at_air_temperature,
@@ -429,7 +429,7 @@ ActionFertilizeIncorporate::doIt (Daisy& daisy, const Scope&, Treelog& msg)
   const double duration = 0.1;  // [h]
 
   daisy.field->fertilize (daisy.metalib, *am, *volume,
-                          daisy.time, msg);
+                          daisy.time (), msg);
   if (water > 0.0)
     daisy.field->irrigate (duration, water / duration,
                            Irrigation::at_air_temperature,

@@ -290,11 +290,11 @@ ActionCrop::MM_DD::~MM_DD ()
 void 
 ActionCrop::Sow::doIt (Daisy& daisy, const Scope&, Treelog& msg)
 {
-  if (!done && date.match (daisy.time))
+  if (!done && date.match (daisy.time ()))
     {
       msg.message ("Sowing " + crop->type_name ());      
       daisy.field->sow (daisy.metalib, *crop, 0.0, 0.0, -42.42e42,
-                        daisy.time, msg); 
+                        daisy.time (), msg); 
       done = true;
     }
 }
@@ -336,13 +336,13 @@ bool
 ActionCrop::Annual::doIt (Daisy& daisy, const Scope&, Treelog& msg, symbol name)
 {
   if (!done && (daisy.field->crop_ds (name) >= 2.0
-		|| latest.match (daisy.time)))
+		|| latest.match (daisy.time ())))
     {
       const double stub = 8.0;
       const double stem = remove_residuals ? 1.0 : 0.0;
       const double leaf = remove_residuals ? 1.0 : 0.0;
       const double sorg = (1.0 - loss);
-      daisy.field->harvest (daisy.metalib, daisy.time, 
+      daisy.field->harvest (daisy.metalib, daisy.time (), 
                             Vegetation::all_crops (), stub, stem, leaf, sorg, 
                             false, daisy.harvest, msg);
       msg.message ("Annual harvest of " + name);
@@ -398,7 +398,7 @@ ActionCrop::Perennial::harvest (Daisy& daisy, Treelog& msg)
   const double stem = 1.0;
   const double leaf = 1.0;
   const double sorg = 1.0;
-  daisy.field->harvest (daisy.metalib, daisy.time, 
+  daisy.field->harvest (daisy.metalib, daisy.time (), 
                         Vegetation::all_crops (), stub, stem, leaf, sorg, 
                         false, daisy.harvest, msg);
   msg.message ("Perennial harvest");
@@ -410,7 +410,7 @@ ActionCrop::Perennial::doIt (Daisy& daisy, const Scope&, Treelog& msg, symbol na
   const double stub = 8.0;
 
   if (year_of_last_harvest < 0)
-    year_of_last_harvest = daisy.time.year () + seasons - 1;
+    year_of_last_harvest = daisy.time ().year () + seasons - 1;
 
   if (daisy.field->crop_ds (name) >= DS 
       || daisy.field->crop_dm (name, stub) >= DM)
@@ -428,7 +428,7 @@ ActionCrop::Perennial::doIt (Daisy& daisy, const Scope&, Treelog& msg,
   const double stub = 8.0;
 
   if (year_of_last_harvest < 0)
-    year_of_last_harvest = daisy.time.year () + seasons - 1;
+    year_of_last_harvest = daisy.time ().year () + seasons - 1;
 
   if (daisy.field->crop_ds (primary) >= DS 
       || daisy.field->crop_ds (secondary) >= DS 
@@ -447,8 +447,8 @@ ActionCrop::Perennial::done (const Daisy& daisy, Treelog&) const
   if (year_of_last_harvest < 0)
     return false;
 
-  daisy_assert (daisy.time.year () <= year_of_last_harvest);
-  return daisy.time.year () == year_of_last_harvest && end.match (daisy.time);
+  daisy_assert (daisy.time ().year () <= year_of_last_harvest);
+  return daisy.time ().year () == year_of_last_harvest && end.match (daisy.time ());
 }
 
 void 
@@ -596,9 +596,9 @@ ActionCrop::fertilize (Daisy& daisy, Treelog& msg,
       
   if (fertilize_incorporate)
     daisy.field->fertilize (daisy.metalib, am, from, to, 
-                            daisy.time, msg);
+                            daisy.time (), msg);
   else
-    daisy.field->fertilize (daisy.metalib, am, daisy.time, msg);
+    daisy.field->fertilize (daisy.metalib, am, daisy.time (), msg);
 }
 
 void 
@@ -707,8 +707,8 @@ ActionCrop::Irrigation::doIt (Daisy& daisy, const Scope&, Treelog& msg) const
   if (iszero (amount))
     return false;
 
-  const int mm = daisy.time.month ();
-  const int dd = daisy.time.yday ();
+  const int mm = daisy.time ().month ();
+  const int dd = daisy.time ().yday ();
 
   if (mm < from.month || (mm == from.month && dd < from.day))
     return false;
@@ -818,9 +818,9 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 
   // Fertilize.
   if (fertilize_at_index < fertilize_at.size ()
-      && daisy.time.hour () == 8
-      && daisy.time.month () == fertilize_at[fertilize_at_index]->month
-      && daisy.time.mday () == fertilize_at[fertilize_at_index]->day)
+      && daisy.time ().hour () == 8
+      && daisy.time ().month () == fertilize_at[fertilize_at_index]->month
+      && daisy.time ().mday () == fertilize_at[fertilize_at_index]->day)
     {
       // Fertilize by date.
       fertilize (daisy, msg, *fertilize_at[fertilize_at_index]->what);
@@ -832,11 +832,11 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
       if (harvest_perennial->fertilize_year < 0)
 	{
 	  // First season initialization.
-	  harvest_perennial->fertilize_year = daisy.time.year ();
+	  harvest_perennial->fertilize_year = daisy.time ().year ();
 	  harvest_perennial->fertilize_rest_index
 	    = harvest_perennial->fertilize_rest->size ();
 	}
-      else if (harvest_perennial->fertilize_year < daisy.time.year ())
+      else if (harvest_perennial->fertilize_year < daisy.time ().year ())
 	{
 	  // New season initialization.
 	  if (harvest_perennial->fertilize_rest)
@@ -851,7 +851,7 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 	      // Otherwise, reuse 'fertilize'.
 	      harvest_perennial->fertilize_index = 0;
 	    }
-	  harvest_perennial->fertilize_year = daisy.time.year ();
+	  harvest_perennial->fertilize_year = daisy.time ().year ();
 	}
       if (harvest_perennial->fertilize_index 
 	  < harvest_perennial->fertilize->size ())
@@ -876,9 +876,9 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 
   // Tillage.
   if (tillage_index < tillage.size ()
-      && daisy.time.hour () == 8
-      && daisy.time.month () == tillage[tillage_index]->month
-      && daisy.time.mday () == tillage[tillage_index]->day)
+      && daisy.time ().hour () == 8
+      && daisy.time ().month () == tillage[tillage_index]->month
+      && daisy.time ().mday () == tillage[tillage_index]->day)
     {
       tillage[tillage_index]->operation->doIt (daisy, scope, msg);
       tillage_index++;
@@ -886,9 +886,9 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 
   // Spray.
   if (spray_index < spray.size ()
-      && daisy.time.hour () == 8
-      && daisy.time.month () == spray[spray_index]->month
-      && daisy.time.mday () == spray[spray_index]->day)
+      && daisy.time ().hour () == 8
+      && daisy.time ().month () == spray[spray_index]->month
+      && daisy.time ().mday () == spray[spray_index]->day)
     {
       symbol chemical = spray[spray_index]->name;
       const double amount = spray[spray_index]->amount;
@@ -900,12 +900,12 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 
   // Irrigation.
   if (irrigation_year < 0)
-    irrigation_year = daisy.time.year ();
+    irrigation_year = daisy.time ().year ();
   if (irrigation_delay > 0)
     irrigation_delay--;
   else if (irrigation)
     {
-      if (irrigation_rest && irrigation_year != daisy.time.year ())
+      if (irrigation_rest && irrigation_year != daisy.time ().year ())
 	{
 	  if (irrigation_rest->doIt (daisy, scope, msg))
 	    irrigation_delay = 48;

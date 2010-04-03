@@ -27,7 +27,7 @@
 #include "time.h"
 #include "timestep.h"
 #include "memutils.h"
-
+#include <boost/scoped_ptr.hpp>
 #include <vector>
 #include <memory>
 
@@ -48,31 +48,26 @@ class FrameModel;
 
 class Daisy : public Program
 {
-  // Initial content.
 public:
   static const char *const default_description;
+
+  // Initial content.
+private:
+  class Implementation;
+  const boost::scoped_ptr<Implementation> impl;
+public:
+  const FrameModel& frame () const;
+  const Scope* find_scope (const Scopesel&, Treelog&) const;
+  Scope& find_scope (size_t index) const;
+  size_t scope_size () const;
+  const Time& time () const;
+  const Timestep& timestep () const;
+public:
   const Metalib& metalib;
-  const FrameModel& frame;      // For checkpoint.
   const Units& units () const;
 
   // Content.
-  const std::string directory;  // Initialize, check and run here.
   bool running;
-  const std::auto_ptr<Output> output_log;
-private:
-  const std::auto_ptr<Scopesel> scopesel;
-  const Scope* extern_scope;
-  const std::auto_ptr<Condition> print_time;
-public:
-  Time time;
-  const Timestep timestep;
-private:
-  const double max_dt;
-  double current_dt;
-  const Time stop;
-  int duration;
-  std::auto_ptr<Action> action;
-  std::auto_ptr<Weather> weather;
 public:
   std::auto_ptr<Field> field;
   auto_vector<const Harvest*> harvest;

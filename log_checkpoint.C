@@ -54,7 +54,7 @@ struct LogCheckpoint : public LogSubmodel
   void done (const std::vector<Time::component_t>& time_columns,
 	     const Time&, const double dt, Treelog&);
 
-  bool initial_match (const Daisy&, Treelog&)
+  bool initial_match (const Daisy&, const Time& previous, Treelog&)
   { return false; }
   void initial_done (const std::vector<Time::component_t>& time_columns,
 		     const Time&, Treelog&)
@@ -83,11 +83,11 @@ LogCheckpoint::match (const Daisy& daisy, Treelog& msg)
   if (is_active)
     {
       TREELOG_MODEL (msg);
-      msg.message ("Making checkpoint of " + daisy.frame.type_name ());
+      msg.message ("Making checkpoint of " + daisy.frame ().type_name ());
       static const symbol daisy_symbol ("daisy");
       global_frame = &daisy.metalib;
-      push (daisy_symbol, daisy.frame);
-      time = daisy.time;
+      push (daisy_symbol, daisy.frame ());
+      time = daisy.time ();
     }
   return is_active;
 }

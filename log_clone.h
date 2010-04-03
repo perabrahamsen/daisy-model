@@ -37,7 +37,7 @@ private:
   bool match (const Daisy& daisy, Treelog&);
   void done (const std::vector<Time::component_t>& time_columns,
 	     const Time&, double dt);
-  bool initial_match (const Daisy&, Treelog&);
+  bool initial_match (const Daisy&, const Time& previous, Treelog&);
   void initial_done (const std::vector<Time::component_t>& time_columns,
 		     const Time& time);
 

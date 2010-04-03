@@ -30,6 +30,7 @@ class Log;
 class BlockModel;
 class Treelog;
 class Scope;
+class Time;
 
 class Condition : public ModelFramed
 {  
@@ -42,7 +43,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Daisy&, const Scope&, Treelog&) = 0;
-  virtual void initiate_log (const Daisy& daisy);
+  virtual void initiate_log (const Daisy& daisy, const Time& previous);
   virtual bool match (const Daisy&, const Scope&, Treelog&) const = 0;
   virtual void output (Log&) const = 0;
 

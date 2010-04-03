@@ -78,9 +78,9 @@ public:
 
   // Initial line.
 public:
-  virtual bool initial_match (const Daisy&, Treelog&) = 0;
+  virtual bool initial_match (const Daisy&, const Time& previous, Treelog&) = 0;
   virtual void initial_done (const std::vector<Time::component_t>& time_columns,
-			     const Time& time, Treelog&) = 0;
+			     const Time& previous, Treelog&) = 0;
 
   // Normal items.
 public:

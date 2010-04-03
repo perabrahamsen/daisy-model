@@ -47,10 +47,10 @@ struct ConditionTSum : public Condition
 
   void tick (const Daisy& daisy, const Scope&, Treelog&)
   {
-    if (daisy.time.hour () == check_hour)
+    if (daisy.time ().hour () == check_hour)
       {
-	if (daisy.time.mday () == reset_mday
-	    && daisy.time.month () == reset_month)
+	if (daisy.time ().mday () == reset_mday
+	    && daisy.time ().month () == reset_month)
 	  TSum_now = 0.0;
 	const double T = daisy.field->daily_air_temperature ();
 	if (T > 0.0)

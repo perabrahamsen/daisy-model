@@ -26,8 +26,9 @@
 #include <string>
 #include <vector>
 
-class Daisy;
 class Volume;
+class Metalib;
+class FrameModel;
 
 class DLF
 {
@@ -47,7 +48,7 @@ public:
                   const symbol name, const symbol value) const;
   void interval (std::ostream& out, const Volume&) const;
   void log_description (std::ostream& out, symbol description) const;
-  void finish (std::ostream& out, const Daisy& daisy);
+  void finish (std::ostream& out, const Metalib&, const FrameModel&);
 
   // Create and destroy.
 private:

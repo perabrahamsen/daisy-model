@@ -50,7 +50,7 @@ LogExtern::done (const std::vector<Time::component_t>& time_columns,
 }
 
 bool 
-LogExtern::initial_match (const Daisy&, Treelog&)
+LogExtern::initial_match (const Daisy&, const Time& previous, Treelog&)
   // No initial line.
 { return false; }
 

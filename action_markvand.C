@@ -435,7 +435,7 @@ ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& msg)
   const double default_A = 0.6;
 
   // Daily occurence.
-  if (daisy.time.hour () != 8)
+  if (daisy.time ().hour () != 8)
     return;
   
   // Emergence and harvest.

@@ -44,7 +44,7 @@ LogClone::done (const Time&, double)
 { daisy_notreached (); }
 
 bool 
-LogClone::initial_match (const Daisy&, Treelog&) 
+LogClone::initial_match (const Daisy&, const Time& previous, Treelog&) 
 { daisy_notreached (); }
 
 void 

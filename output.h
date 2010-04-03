@@ -51,7 +51,7 @@ private:
 
   // Use.
 public:
-  void initial_logs (const Daisy&, Treelog&);
+  void initial_logs (const Daisy&, const Time& previous, Treelog&);
   void tick (const Daisy&, const Time& time, double dt, Treelog&);
   void summarize (Treelog&) const;
   size_t scope_size () const;

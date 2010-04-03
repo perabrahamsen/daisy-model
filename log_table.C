@@ -51,7 +51,7 @@ struct LogTable : public LogDLF, public Destination
   void process_entry (size_t i);
 
   // Initial line.
-  bool initial_match (const Daisy&, Treelog&);
+  bool initial_match (const Daisy&, const Time& previous, Treelog&);
 
   // Select::Destination
   void error ();
@@ -102,12 +102,12 @@ LogTable::process_entry (const size_t i)
 }
 
 bool 
-LogTable::initial_match (const Daisy& daisy, Treelog& msg)
+LogTable::initial_match (const Daisy& daisy, const Time& previous, Treelog& msg)
 {
   for (unsigned int i = 0; i < summary.size (); i++)
     summary[i]->clear ();
 
-  return LogDLF::initial_match (daisy, msg);
+  return LogDLF::initial_match (daisy, previous, msg);
 }
 
 void 

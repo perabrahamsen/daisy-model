@@ -57,7 +57,7 @@ struct LogHarvest : public Log
   // Checking to see if we should log this time step.
   bool match (const Daisy& daisy, Treelog&)
   {
-    print_header.finish (out, daisy);
+    print_header.finish (out, daisy.metalib, daisy.frame ());
 
     if (print_tags)
       {
@@ -116,7 +116,7 @@ struct LogHarvest : public Log
 	     const Time&, const double, Treelog&)
   { daisy_notreached (); }
 
-  bool initial_match (const Daisy&, Treelog&)
+  bool initial_match (const Daisy&, const Time& previous, Treelog&)
   { return false; }
   void initial_done (const std::vector<Time::component_t>& time_columns,
 		     const Time&, Treelog&)

@@ -67,7 +67,7 @@ struct ConditionExtern : public Condition
   void initialize (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   { 
     daisy_assert (!extern_scope);
-    extern_scope = scopesel->lookup (*daisy.output_log, msg); 
+    extern_scope = daisy.find_scope (*scopesel, msg); 
     if (!extern_scope)
       return;
     ScopeMulti multi (*extern_scope, parent_scope);
