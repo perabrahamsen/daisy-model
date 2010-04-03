@@ -37,6 +37,7 @@ class Time;
 class Timestep;
 class Metalib;
 class Scopesel;
+class Units;
 class Scope;
 class Frame;
 class FrameModel;

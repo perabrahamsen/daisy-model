@@ -34,6 +34,7 @@
 #include "librarian.h"
 #include "metalib.h"
 #include "library.h"
+#include "vcheck.h"
 #include <sstream>
 
 void
