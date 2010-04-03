@@ -30,7 +30,7 @@
 struct ConditionRunning : public Condition
 {
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return daisy.running; }
+  { return daisy.is_running (); }
   void output (Log&) const
   { }
   void tick (const Daisy&, const Scope&, Treelog&)
@@ -50,7 +50,7 @@ struct ConditionRunning : public Condition
 struct ConditionFinished : public Condition
 {
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return !daisy.running; }
+  { return !daisy.is_running (); }
   void output (Log&) const
   { }
   void tick (const Daisy&, const Scope&, Treelog&)

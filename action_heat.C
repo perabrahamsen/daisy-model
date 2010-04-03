@@ -40,7 +40,7 @@ struct ActionSetHeatSource : public Action
   void doIt (Daisy& daisy, const Scope&, Treelog& out)
   {
     out.message ("Adjusting heat source");
-    daisy.field->set_heat_source (height, value);
+    daisy.field ().set_heat_source (height, value);
   }
 
   void tick (const Daisy&, const Scope&, Treelog&)

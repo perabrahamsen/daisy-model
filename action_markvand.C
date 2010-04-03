@@ -422,7 +422,7 @@ ActionMarkvand::crop_map_t::~crop_map_t ()
 const MV_Crop*
 ActionMarkvand::get_crop (Daisy& daisy) const
 {
-  const std::string crop_name = daisy.field->crop_names ();
+  const std::string crop_name = daisy.field ().crop_names ();
   const crop_map_t::const_iterator entry = crop_map.find (crop_name);
   return (entry != crop_map.end ()) ? entry->second : NULL;
 }
@@ -440,7 +440,7 @@ ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& msg)
   
   // Emergence and harvest.
   const bool has_crop
-    = daisy.field->crop_dm (Vegetation::all_crops (), 0.1) > 0.0; 
+    = daisy.field ().crop_dm (Vegetation::all_crops (), 0.1) > 0.0; 
   if (T_sum < 0.0)
     {
       if (has_crop)
@@ -453,7 +453,7 @@ ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& msg)
 			 + crop->name.name () + ".");
 	  else
 	    msg.message ("Starting MARKVAND irrigation for unknown crop "
-                         + daisy.field->crop_names () + ".");
+                         + daisy.field ().crop_names () + ".");
 	  const double z_x = crop 
 	    ? std::min (crop->z_xA, soil->z_xJ)
 	    : soil->z_xJ;
@@ -475,9 +475,9 @@ ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& msg)
     }
 
   // Weather data.
-  const double air_temperature = daisy.field->daily_air_temperature ();
-  const double global_radiation = daisy.field->daily_global_radiation ();
-  const double P = daisy.field->daily_precipitation ();
+  const double air_temperature = daisy.field ().daily_air_temperature ();
+  const double global_radiation = daisy.field ().daily_global_radiation ();
+  const double P = daisy.field ().daily_precipitation ();
   const double reference_evapotranspiration 
     = FAO::Makkink (air_temperature, global_radiation) * 24.0;
 
@@ -506,7 +506,7 @@ ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& msg)
       tmp << "MARKVAND Irrigating " << I << " mm";
       msg.message (tmp.str ());
       IM im;
-      daisy.field->irrigate (I/flux, flux, Irrigation::at_air_temperature,
+      daisy.field ().irrigate (I/flux, flux, Irrigation::at_air_temperature,
                              Irrigation::overhead, im, 
                              boost::shared_ptr<Volume> (), false, msg);
     }

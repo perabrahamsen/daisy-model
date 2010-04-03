@@ -39,7 +39,7 @@ struct ActionWithColumn : public Action
 public:
   void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 
-    Field::Restrict restriction (*daisy.field, column);
+    Field::Restrict restriction (daisy.field (), column);
     Treelog::Open nest (out, column);
     for (std::vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
@@ -51,7 +51,7 @@ public:
 
   void doIt (Daisy& daisy, const Scope& scope, Treelog& out)
   { 
-    Field::Restrict restriction (*daisy.field, column);
+    Field::Restrict restriction (daisy.field (), column);
     Treelog::Open nest (out, column);
     for (std::vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
@@ -80,7 +80,7 @@ public:
 
   void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 
-    Field::Restrict restriction (*daisy.field, column);
+    Field::Restrict restriction (daisy.field (), column);
     Treelog::Open nest (out, column);
     for (std::vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
@@ -101,7 +101,7 @@ public:
 	if (!(*i)->check (daisy, scope, err))
 	  ok = false;
       }
-    if (!daisy.field->find (column))
+    if (!daisy.field ().find (column))
       {
 	err.entry (std::string ("No column '") + column + "'");
 	ok = false;

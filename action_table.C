@@ -181,7 +181,7 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
           IM im = AM::get_IM (metalib, u_mg_per_square_m, fert);
 	  daisy_assert (std::isnormal (value));
 	  im.multiply_assign (Scalar (1.0 / value, u_per_mm), u_ppm);
-          daisy.field->irrigate (value/flux, flux, 
+          daisy.field ().irrigate (value/flux, flux, 
                                  Irrigation::at_air_temperature,
                                  Irrigation::subsoil, 
                                  im, volume, false, msg);
@@ -217,10 +217,10 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
           else
             tmp << "Fertilizing " << fert.type_name ();
           msg.message (tmp.str ());
-          daisy.field->fertilize (metalib, fert, 
+          daisy.field ().fertilize (metalib, fert, 
                                   daisy.time (), msg);
           if (water > 0.0)
-            daisy.field->irrigate (water/flux, flux, 
+            daisy.field ().irrigate (water/flux, flux, 
                                    Irrigation::at_air_temperature,
                                    Irrigation::surface, IM (u_solute),
                                    boost::shared_ptr<Volume> (), false, msg);  
@@ -231,7 +231,7 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
       const double value = irrigate_events[daisy.time ()];
       std::ostringstream tmp;
       IM im;
-      daisy.field->irrigate (value/flux, flux, 
+      daisy.field ().irrigate (value/flux, flux, 
                              Irrigation::at_air_temperature,
                              Irrigation::overhead, im,
                              boost::shared_ptr<Volume> (), false, msg);  

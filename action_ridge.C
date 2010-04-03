@@ -37,7 +37,7 @@ struct ActionRidge : public Action
   void doIt (Daisy& daisy, const Scope&, Treelog& out)
     { 
       out.message ("Ridging");      
-      daisy.field->ridge (ridge); 
+      daisy.field ().ridge (ridge); 
     }
 
   void tick (const Daisy&, const Scope&, Treelog&)

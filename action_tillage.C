@@ -42,7 +42,7 @@ struct ActionMix : public Action
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
     {
       msg.message ("Tillage operation " + name);
-      daisy.field->mix (metalib, 0.0, depth, penetration, daisy.time (),  msg);
+      daisy.field ().mix (metalib, 0.0, depth, penetration, daisy.time (),  msg);
     }
 
   void tick (const Daisy&, const Scope&, Treelog&)
@@ -95,7 +95,7 @@ struct ActionSwap : public Action
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   {
     msg.message ("Tillage operation " + name);
-    daisy.field->swap (metalib, 
+    daisy.field ().swap (metalib, 
                        0.0, middle, depth, daisy.time (), msg);
   }
 
@@ -161,7 +161,7 @@ struct ActionSetPorosity : public Action
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   {
     msg.message ("Adjusting porosity");
-    daisy.field->set_porosity (depth, porosity, msg);
+    daisy.field ().set_porosity (depth, porosity, msg);
   }
 
   void tick (const Daisy&, const Scope&, Treelog&)

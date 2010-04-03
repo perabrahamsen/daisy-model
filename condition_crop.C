@@ -42,7 +42,7 @@ struct ConditionDSAfter : public Condition
 
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { 
-    const double crop_ds = daisy.field->crop_ds (crop); 
+    const double crop_ds = daisy.field ().crop_ds (crop); 
     if (!approximate (crop_ds, Crop::DSremove) && crop_ds >= ds)
       return true;
     return false;
@@ -96,7 +96,7 @@ struct ConditionDMOver : public Condition
   const double height;
 
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return (daisy.field->crop_dm (crop, height) >= weight); }
+  { return (daisy.field ().crop_dm (crop, height) >= weight); }
 
   void output (Log&) const
   { }
@@ -150,7 +150,7 @@ struct ConditionDMSOrgOver : public Condition
   const double weight;
 
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return (daisy.field->crop_sorg_dm (crop) >= weight); }
+  { return (daisy.field ().crop_sorg_dm (crop) >= weight); }
 
   void output (Log&) const
   { }

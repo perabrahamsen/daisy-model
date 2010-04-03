@@ -55,6 +55,7 @@ The Daisy crop/soil/atmosphere model.";
 struct Daisy::Implementation
 {
   // Content.
+  const Metalib& metalib;
   const FrameModel& frame;
   const boost::scoped_ptr<Scopesel> scopesel;
   const Scope* extern_scope;
@@ -68,6 +69,9 @@ struct Daisy::Implementation
   int duration;
   const boost::scoped_ptr<Action> action;
   const boost::scoped_ptr<Weather> weather;
+  bool running;
+  const boost::scoped_ptr<Field> field;
+  auto_vector<const Harvest*> harvest;
   
   // Use.
   const Scope& scope ()
@@ -92,13 +96,53 @@ struct Daisy::Implementation
     if (weather.get ())
       output_derived (weather, "weather", log);
     output_object (action, "manager", log);
+    output_submodule (*field, "column", log);
+    output_vector (harvest, "harvest", log);
+
   }
   // Create and Destroy.
-  void initialize (Treelog& msg)
-  { extern_scope = find_scope (*scopesel, msg); }
-  bool check (Treelog& msg)
+  void initialize (Metalib& metalib, Daisy& daisy, Block& block)
+  { 
+    Treelog& msg = block.msg ();
+    if (weather.get () && !weather->initialize (time, msg))
+      return;
+    {
+      Treelog::Open nest (msg, "output");
+      output_log->initialize (metalib, msg);
+    }
+    extern_scope = find_scope (*scopesel, msg); 
+    field->initialize (block, *output_log, time, 
+                             weather.get (), scope ());
+    {                       
+      Treelog::Open nest (msg, "manager");
+      action->initialize (daisy, scope (), msg);
+    }
+  }
+  bool check (const Daisy& daisy, Treelog& msg)
   {
     bool ok = true;
+
+    // Check weather.
+    {
+      Treelog::Open nest (msg, "weather");
+      if (weather.get () && !weather->check (time,
+                                                         stop, msg))
+        return false;
+    }
+
+    // Check field.
+    {
+      Treelog::Open nest (msg, "column");
+      if (!field->check (weather.get (), time, stop,
+                               scope (), msg))
+        ok = false;
+    }
+    // Check logs.
+    {
+      Treelog::Open nest (msg, "output");
+      if (!output_log->check (*field, msg))
+        ok = false;
+    }
     if (!extern_scope)
       {
         msg.error ("Extern scope not found");
@@ -111,10 +155,22 @@ struct Daisy::Implementation
             << max_dt << " hours";
         msg.warning (tmp.str ());
       }
+    // Check actions.
+    {
+      Treelog::Open nest (msg, "manager");
+      if (!action->check (daisy, scope (), msg))
+        ok = false;
+    }
     return ok;
   }
+  void summarize (Treelog& msg) const
+  {
+    output_log->summarize (msg);
+    field->summarize (msg);
+  }
   Implementation (const BlockModel& al)
-    : frame (al.frame ()),
+    : metalib (al.metalib ()),
+      frame (al.frame ()),
       scopesel (Librarian::build_item<Scopesel> (al, "scope")),
       extern_scope (NULL),
       print_time (Librarian::build_item<Condition> (al, "print_time")),
@@ -134,7 +190,10 @@ struct Daisy::Implementation
       action (Librarian::build_item<Action> (al, "manager")),
       weather (al.check ("weather") 
                ? Librarian::build_item<Weather> (al, "weather")
-               : NULL)
+               : NULL),
+      running (false),
+      field (new Field (al, "column")),
+      harvest (map_submodel_const<Harvest> (al, "harvest"))
   { }
 };
 
@@ -165,7 +224,23 @@ Daisy::timestep () const
 
 const Units& 
 Daisy::units () const
-{ return metalib.units (); }
+{ return impl->metalib.units (); }
+
+Field& 
+Daisy::field () const
+{ return *impl->field; }
+
+std::vector<const Harvest*>&
+Daisy::harvest () const
+{ return impl->harvest; }
+
+bool 
+Daisy::is_running () const
+{ return impl->running; }
+
+void 
+Daisy::stop ()
+{ impl->running = false; }
 
 void 
 Daisy::attach_ui (Run* run, const std::vector<Log*>& logs)
@@ -183,15 +258,15 @@ Daisy::run (Treelog& msg)
   {
     Treelog::Open nest (msg, "Running");
 
-    running = false;
+    impl->running = false;
 
     do
       {
 	Treelog::Open nest (msg, impl->time.print ());
 
-	if (!running)
+	if (!impl->running)
 	  {
-	    running = true;
+	    impl->running = true;
 	    msg.message ("Begin simulation");
 	  }
 
@@ -201,7 +276,7 @@ Daisy::run (Treelog& msg)
 
 	tick (msg);
 
-	if (!running)
+	if (!impl->running)
 	  msg.message ("End simulation");
 	if (force_print)
 	  {
@@ -209,9 +284,9 @@ Daisy::run (Treelog& msg)
 	    msg.flush ();
 	  }
       }
-    while (running);
+    while (impl->running);
   }
-  summarize (msg);
+  impl->summarize (msg);
   return true;
 }
 
@@ -229,31 +304,31 @@ Daisy::tick_before (Treelog& msg)
 
 void
 Daisy::tick_columns (Treelog& msg)
-{ field->tick_all (metalib, impl->time, impl->current_dt, 
-                   impl->weather.get (), impl->scope (), msg); }
+{ impl->field->tick_all (impl->metalib, impl->time, impl->current_dt, 
+                         impl->weather.get (), impl->scope (), msg); }
 
 void
 Daisy::tick_column (const size_t col, Treelog& msg)
-{ field->tick_one (metalib, col, impl->time, impl->current_dt,
-                   impl->weather.get (), impl->scope (), msg); }
+{ impl->field->tick_one (impl->metalib, col, impl->time, impl->current_dt,
+                          impl->weather.get (), impl->scope (), msg); }
 
 void
 Daisy::tick_after (Treelog& msg)
 { 
   const Time next = impl->time + impl->timestep;
   if (next >= impl->stop)
-    running = false;
+    impl->running = false;
 
   impl->output_log->tick (*this, impl->time, impl->current_dt, msg);
-  field->clear ();
+  impl->field->clear ();
   impl->time = next;
   
   if (!ui_running ())
     {
       msg.error ("Simulation aborted");
-      running = false;
+      impl->running = false;
     }
-  if (!running)
+  if (!impl->running)
     ui_set_progress (1.0);
   else if (impl->duration > 0)
     {
@@ -270,77 +345,19 @@ Daisy::tick_after (Treelog& msg)
 
 void
 Daisy::output (Log& log) const
-{
-  impl->output (log);
-  output_submodule (*field, "column", log);
-  output_vector (harvest, "harvest", log);
-}
+{ impl->output (log); }
 
 void
 Daisy::initialize (Metalib& metalib, Block& block)
-{ 
-  Treelog& msg = block.msg ();
-  if (impl->weather.get () && !impl->weather->initialize (impl->time, msg))
-    return;
-  {
-    Treelog::Open nest (msg, "output");
-    impl->output_log->initialize (metalib, msg);
-  }
-  impl->initialize (msg);
-  field->initialize (block, *impl->output_log, impl->time, 
-                     impl->weather.get (), impl->scope ());
-  {                       
-    Treelog::Open nest (msg, "manager");
-    impl->action->initialize (*this, impl->scope (), msg);
-  }
-}
+{ impl->initialize (metalib, *this, block); }
 
 bool
 Daisy::check (Treelog& msg)
-{
-  bool ok = true;
-
-  // Check weather.
-  {
-    Treelog::Open nest (msg, "weather");
-    if (impl->weather.get () && !impl->weather->check (impl->time,
-                                                       impl->stop, msg))
-      return false;
-  }
-
-  // Check field.
-  {
-    Treelog::Open nest (msg, "column");
-    if (!field->check (impl->weather.get (), impl->time, impl->stop,
-                       impl->scope (), msg))
-      ok = false;
-  }
-  // Check logs.
-  {
-    Treelog::Open nest (msg, "output");
-    if (!impl->output_log->check (*field, msg))
-      ok = false;
-  }
-  // Implementation.
-  if (!impl->check (msg))
-    ok = false;
-
-  // Check actions.
-  {
-    Treelog::Open nest (msg, "manager");
-    if (!impl->action->check (*this, impl->scope (), msg))
-      ok = false;
-  }
-  return ok;
-}
+{ return impl->check (*this, msg); }
 
 Daisy::Daisy (const BlockModel& al)
   : Program (al),
-    impl (new Implementation (al)),
-    metalib (al.metalib ()),
-    running (false),
-    field (new Field (al, "column")),
-    harvest (map_submodel_const<Harvest> (al, "harvest"))
+    impl (new Implementation (al))
 { }
 
 void
@@ -388,13 +405,6 @@ the simulation.  Can be overwritten by column specific weather.");
 				 "Total list of all crop yields.",
 				 Harvest::load_syntax);
   frame.set_empty ("harvest");
-}
-
-void
-Daisy::summarize (Treelog& msg) const
-{
-  impl->output_log->summarize (msg);
-  field->summarize (msg);
 }
 
 Daisy::~Daisy ()

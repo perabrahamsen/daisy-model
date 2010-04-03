@@ -24,10 +24,8 @@
 #define DAISY_H
 
 #include "program.h"
-#include "memutils.h"
 #include <boost/scoped_ptr.hpp>
 #include <vector>
-#include <memory>
 
 class Harvest;
 class Log;
@@ -47,7 +45,7 @@ class Daisy : public Program
 public:
   static const char *const default_description;
 
-  // Initial content.
+  // Content.
 private:
   class Implementation;
   const boost::scoped_ptr<Implementation> impl;
@@ -58,17 +56,12 @@ public:
   size_t scope_size () const;
   const Time& time () const;
   const Timestep& timestep () const;
-private:
-  const Metalib& metalib;
   const Units& units () const;
-
-  // Content.
-public:
-  bool running;
-public:
-  std::auto_ptr<Field> field;
-  auto_vector<const Harvest*> harvest;
-
+  Field& field () const;
+  std::vector<const Harvest*>& harvest () const;
+  bool is_running () const;
+  void stop ();
+  
   // UI.
 public:
   void attach_ui (Run* run, const std::vector<Log*>& logs);
@@ -86,11 +79,9 @@ public:
   // Create and Destroy.
 public:
   void initialize (Metalib&, Block&);
-  bool check (Treelog& err);
+  bool check (Treelog&);
   static void load_syntax (Frame&);
   explicit Daisy (const BlockModel&);
-private:
-  void summarize (Treelog&) const;
   ~Daisy ();
 };
 

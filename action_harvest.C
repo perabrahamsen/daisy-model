@@ -42,13 +42,13 @@ struct ActionEmerge : public Action
   {
     if (crop != Vegetation::all_crops ())
       {
-        if (daisy.field->crop_ds (crop) < -1.0)
+        if (daisy.field ().crop_ds (crop) < -1.0)
           {
             out.warning ("Attempted forced emerge of " 
                          + crop + " which is not on the field");
             return;
           }
-        if (daisy.field->crop_ds (crop) >= 0.0)
+        if (daisy.field ().crop_ds (crop) >= 0.0)
           {
             out.warning ("Forced emerge of " + crop
                          + " which is already emerged");
@@ -56,7 +56,7 @@ struct ActionEmerge : public Action
           }
       }
     out.message ("Forcing emergence of " + crop);
-    daisy.field->emerge (crop, out);
+    daisy.field ().emerge (crop, out);
   }
 
   void tick (const Daisy&, const Scope&, Treelog&)
@@ -143,23 +143,23 @@ struct ActionHarvest : public Action
 
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   {
-    if (crop != Vegetation::all_crops () && daisy.field->crop_ds (crop) < 0.0)
+    if (crop != Vegetation::all_crops () && daisy.field ().crop_ds (crop) < 0.0)
       {
 	msg.warning ("Attempting to harvest " + crop 
 		     + " which has not emerged on the field");
 	return;
       }
     double old_DM = 0.0;
-    for (size_t i = 0; i < daisy.harvest.size (); i++)
-      old_DM += daisy.harvest[i]->total_DM ();
-    daisy.field->harvest (metalib, daisy.time (), 
+    for (size_t i = 0; i < daisy.harvest ().size (); i++)
+      old_DM += daisy.harvest ()[i]->total_DM ();
+    daisy.field ().harvest (metalib, daisy.time (), 
                           crop, stub, stem, leaf, sorg, combine,
-                          daisy.harvest, msg);
+                          daisy.harvest (), msg);
     double new_DM = 0.0;
-    for (size_t i = 0; i < daisy.harvest.size (); i++)
-      new_DM += daisy.harvest[i]->total_DM ();
+    for (size_t i = 0; i < daisy.harvest ().size (); i++)
+      new_DM += daisy.harvest ()[i]->total_DM ();
     std::ostringstream tmp;
-    const bool killed = daisy.field->crop_ds (crop) < 0.0;
+    const bool killed = daisy.field ().crop_ds (crop) < 0.0;
     if (killed)
       tmp << "Harvesting ";
     else
@@ -248,23 +248,23 @@ struct ActionPluck : public Action
 
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   {
-    if (crop != Vegetation::all_crops () && daisy.field->crop_ds (crop) < 0.0)
+    if (crop != Vegetation::all_crops () && daisy.field ().crop_ds (crop) < 0.0)
       {
 	msg.warning ("Attempting to pluck " + crop 
 		     + " which has not emerged on the field");
 	return;
       }
     double old_DM = 0.0;
-    for (size_t i = 0; i < daisy.harvest.size (); i++)
-      old_DM += daisy.harvest[i]->total_DM ();
-    daisy.field->pluck (metalib, 
+    for (size_t i = 0; i < daisy.harvest ().size (); i++)
+      old_DM += daisy.harvest ()[i]->total_DM ();
+    daisy.field ().pluck (metalib, 
                         daisy.time (), crop, stem, leaf, sorg, 
-                        daisy.harvest, msg);
+                        daisy.harvest (), msg);
     double new_DM = 0.0;
-    for (size_t i = 0; i < daisy.harvest.size (); i++)
-      new_DM += daisy.harvest[i]->total_DM ();
+    for (size_t i = 0; i < daisy.harvest ().size (); i++)
+      new_DM += daisy.harvest ()[i]->total_DM ();
     std::ostringstream tmp;
-    const bool killed = daisy.field->crop_ds (crop) < 0.0;
+    const bool killed = daisy.field ().crop_ds (crop) < 0.0;
     if (killed)
       tmp << "Harvesting ";
     else

@@ -140,7 +140,7 @@ ActionFertilize::common_doIt (Daisy& daisy, double& water, Treelog& msg)
     {
       const double weight 
 	= precision->target
-	- daisy.field->soil_inorganic_nitrogen (precision->from, precision->to);
+	- daisy.field ().soil_inorganic_nitrogen (precision->from, precision->to);
       
       if (weight <= minimum_weight)
 	{
@@ -152,8 +152,8 @@ ActionFertilize::common_doIt (Daisy& daisy, double& water, Treelog& msg)
   else if (second_year_compensation)
     {
       const double weight = AM::utilized_weight (metalib, *am);
-      const double compensation = daisy.field->second_year_utilization ();
-      daisy.field->clear_second_year_utilization ();
+      const double compensation = daisy.field ().second_year_utilization ();
+      daisy.field ().clear_second_year_utilization ();
 
       if (weight - compensation <= minimum_weight)
 	{
@@ -194,7 +194,7 @@ bool
 ActionFertilize::check (const Daisy& daisy, const Scope&, Treelog& err) const
 {
   bool ok = true;
-  if (!AM::is_mineral (metalib, *am) && !daisy.field->check_am (*am, err))
+  if (!AM::is_mineral (metalib, *am) && !daisy.field ().check_am (*am, err))
     ok = false;
   return ok;
 }
@@ -338,10 +338,10 @@ ActionFertilizeSurface::doIt (Daisy& daisy, const Scope&, Treelog& msg)
   const double duration = 0.1;  // [h]
   if (to < from)
     {
-      daisy.field->fertilize (metalib, *am, from, to, 
+      daisy.field ().fertilize (metalib, *am, from, to, 
                               daisy.time (), msg);
       if (water > 0.0)
-        daisy.field->irrigate (duration, water / duration,
+        daisy.field ().irrigate (duration, water / duration,
                                Irrigation::at_air_temperature,
                                Irrigation::subsoil,
                                IM (units.get_unit (IM::solute_unit ())),
@@ -349,9 +349,9 @@ ActionFertilizeSurface::doIt (Daisy& daisy, const Scope&, Treelog& msg)
     }
   else
     {
-      daisy.field->fertilize (metalib, *am, daisy.time (), msg);
+      daisy.field ().fertilize (metalib, *am, daisy.time (), msg);
       if (water > 0.0)
-        daisy.field->irrigate (duration, water / duration,
+        daisy.field ().irrigate (duration, water / duration,
                                Irrigation::at_air_temperature,
                                Irrigation::surface,
                                IM (units.get_unit (IM::solute_unit ())),
@@ -430,10 +430,10 @@ ActionFertilizeIncorporate::doIt (Daisy& daisy, const Scope&, Treelog& msg)
   common_doIt (daisy, water, msg);
   const double duration = 0.1;  // [h]
 
-  daisy.field->fertilize (metalib, *am, *volume,
+  daisy.field ().fertilize (metalib, *am, *volume,
                           daisy.time (), msg);
   if (water > 0.0)
-    daisy.field->irrigate (duration, water / duration,
+    daisy.field ().irrigate (duration, water / duration,
                            Irrigation::at_air_temperature,
                            Irrigation::subsoil,
                            IM (units.get_unit (IM::solute_unit ())),

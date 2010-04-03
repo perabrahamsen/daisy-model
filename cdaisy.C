@@ -469,24 +469,13 @@ daisy_daisy_delete (Toplevel* toplevel)
 
 // @@ Running the simulation.
 
-extern "C" void EXPORT
-daisy_daisy_start (Toplevel* toplevel)
-{
-  try
-    {
-      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      daisy.running = true; 
-    }
-  DAISY_CATCH_BLOCK(toplevel);
-}
-
 extern "C" daisy_bool EXPORT
 daisy_daisy_is_running (Toplevel* toplevel)
 { 
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      return daisy.running; 
+      return daisy.is_running (); 
     }
   DAISY_CATCH_BLOCK(toplevel);
   return false;
@@ -568,7 +557,7 @@ daisy_daisy_count_columns (Toplevel *const toplevel)
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      return daisy.field->size (); 
+      return daisy.field ().size (); 
     }
   DAISY_CATCH_BLOCK(toplevel);
   return 0;
@@ -580,8 +569,8 @@ daisy_daisy_get_column (Toplevel* toplevel, const int col)
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      daisy_assert (col >= 0 && col < daisy.field->size ()); 
-      return daisy.field->find (col); 
+      daisy_assert (col >= 0 && col < daisy.field ().size ()); 
+      return daisy.field ().find (col); 
     }
   DAISY_CATCH_BLOCK(toplevel)
   return NULL;

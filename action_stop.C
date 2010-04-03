@@ -28,7 +28,7 @@
 struct ActionStop : public Action
 {
   void doIt (Daisy& daisy, const Scope&, Treelog&)
-    { daisy.running = false; }
+  { daisy.stop (); }
 
   void tick (const Daisy&, const Scope&, Treelog&)
   { }

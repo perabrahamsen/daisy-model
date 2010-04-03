@@ -77,7 +77,7 @@ struct ActionIrrigate : public Action
   
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   {
-    irrigate (*daisy.field, flux, temp, sm, remaining_time, msg);
+    irrigate (daisy.field (), flux, temp, sm, remaining_time, msg);
   }
 
   ActionIrrigate (const BlockModel& al)

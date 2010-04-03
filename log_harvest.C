@@ -81,9 +81,9 @@ struct LogHarvest : public Log
 	out << "\td\td\tkg/m^3\n";
 	print_dimension = false;
       }
-    for (; last_size < daisy.harvest.size (); last_size++)
+    for (; last_size < daisy.harvest ().size (); last_size++)
       {
-	const Harvest& harvest = *(daisy.harvest[last_size]);
+	const Harvest& harvest = *(daisy.harvest ()[last_size]);
 	out << harvest.time.year ()
 	    << "\t" << harvest.time.month ()
 	    << "\t" << harvest.time.mday ()
