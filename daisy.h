@@ -60,10 +60,10 @@ public:
   const Timestep& timestep () const;
 private:
   const Metalib& metalib;
-public:
   const Units& units () const;
 
   // Content.
+public:
   bool running;
 public:
   std::auto_ptr<Field> field;
