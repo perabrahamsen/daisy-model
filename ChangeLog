@@ -1,3 +1,7 @@
+2010-04-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.81 released.
+
 2010-04-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* daisy.h, daisy.C: Moved content into 'impl'.
