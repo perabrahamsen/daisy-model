@@ -64,6 +64,14 @@ Not it used the reference value.
 
 ** The FAO_PM model will now use wet surface reference.
 
+** New LAIfactor permanent vegetation parameter.
+
+This is used for scaling LAI.  For example
+
+  (Vegetation (Coniferous (LAIfactor 2.0 [])) )
+
+will use the Coniferous parameters, with twice as much LAI.
+
 ** New biopores tertiary model parameter 'active_msg'
 
 Set this to 'cell' (old style), 'range' (new default) or 'none' to control

@@ -1,3 +1,7 @@
+2010-04-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* vegetation_permanent.C (LAIfactor): New parameter.
+
 2010-04-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.81 released.

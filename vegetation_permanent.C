@@ -60,6 +60,7 @@ struct VegetationPermanent : public Vegetation
     YearlyLAI (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& als);
   } yearly_LAI;
   const PLF LAIvsDAY;		// LAI as a function of time.
+  const double LAIfactor;       // Multiply by this. []
   CanopySimple canopy;
   double cover_;		// Fraction of soil covered by crops [0-1]
   PLF HvsLAI_;			// Height with LAI below [f: R -> cm]
@@ -257,6 +258,7 @@ VegetationPermanent::reset_canopy_structure (const Time& time)
   canopy.CAI = yearly_LAI (time.year (), time.yday ());
   if (canopy.CAI < 0.0)
     canopy.CAI = LAIvsDAY (time.yday ());
+  canopy.CAI *= LAIfactor;
   cover_ =  1.0 - exp (-(canopy.EPext * canopy.CAI));
   daisy_assert (cover_ >= 0.0);
   daisy_assert (cover_ <= 1.0);
@@ -395,6 +397,7 @@ VegetationPermanent::VegetationPermanent (const BlockModel& al)
   : Vegetation (al),
     yearly_LAI (al.submodel_sequence ("YearlyLAI")),
     LAIvsDAY (al.plf ("LAIvsDAY")),
+    LAIfactor (al.number ("LAIfactor")),
     canopy (al.submodel ("Canopy")),
     cover_ (-42.42e42),
     N_per_LAI (al.number ("N_per_LAI") * 0.1), // [kg N / ha] -> [g N / m^2]
@@ -433,12 +436,14 @@ These numbers are used when there are no yearly numbers (YearlyLAI).");
     frame.declare_submodule_sequence("YearlyLAI", Attribute::Const, "\
 Yearly LAI measurements.", VegetationPermanent::YearlyLAI::load_syntax);
     frame.set_empty ("YearlyLAI");
-
-
+    frame.declare ("LAIfactor", Attribute::None (), Check::non_negative (),
+                   Attribute::Const, "\
+Multiply calculated LAI with this number for quick scaling.");
+    frame.set ("LAIfactor", 1.0);
     frame.declare_submodule("Canopy", Attribute::State, "Canopy.",
 			 CanopySimple::load_syntax);
     frame.declare ("Height", "cm", Check::positive (), Attribute::Const, 
-		"permanent height of vegetation.");
+		"Permanent height of vegetation.");
     frame.set ("Height", 80.0);
     frame.declare ("N_per_LAI", "kg N/ha/LAI", Check::positive (), Attribute::Const,
 		"N content as function of LAI.");
