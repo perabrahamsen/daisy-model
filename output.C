@@ -234,8 +234,8 @@ List of default time components to include in log files. Choose between:\n";
 
   for (Time::component_t i = Time::First; i <= Time::Last; i++)
     {
-      const std::string& name = Time::component_name (i);
-      const std::string& doc = Time::component_documentation (i);
+      const symbol name = Time::component_name (i);
+      const symbol doc = Time::component_documentation (i);
       log_time_doc += " '" + name + "': " + doc + "\n";
       if (empty_valid)
 	valid_component.add (name);

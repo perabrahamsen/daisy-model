@@ -39,8 +39,8 @@
 struct Time::Implementation
 {
   static const int mlen[];
-  static const std::string mname[];
-  static const std::string wname[];
+  static const symbol mname[];
+  static const symbol wname[];
   short year;
   short yday;
   char hour;  
@@ -53,11 +53,11 @@ struct Time::Implementation
 const int Time::Implementation::mlen[] =
 { -999, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 };
 
-const std::string Time::Implementation::mname[] =
+const symbol Time::Implementation::mname[] =
 { "Error", "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November" , "December" };
 
-const std::string Time::Implementation::wname[] =
+const symbol Time::Implementation::wname[] =
 { "Error", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", 
   "Saturday", "Sunday" };
 
@@ -168,7 +168,7 @@ Time::component_value (component_t c) const
   daisy_notreached ();
 }
 
-std::string
+symbol
 Time::component_name (component_t c)
 {
   switch (c)
@@ -195,7 +195,7 @@ Time::component_name (component_t c)
   daisy_notreached ();
 }
 
-std::string
+symbol
 Time::component_documentation (component_t c)
 {
   switch (c)
@@ -347,14 +347,14 @@ Time::tick_year (int years)
 
 // @ Convert.
 
-std::string
+symbol
 Time::month_name (int month)
 {
   daisy_assert (month >= 1 && month <= 12);
   return Implementation::mname[month];
 }
 
-std::string
+symbol
 Time::wday_name (int wday)
 {
   daisy_assert (wday >= 1 && wday <= 7);
@@ -362,7 +362,7 @@ Time::wday_name (int wday)
 }
 
 int
-Time::month_number (std::string name)
+Time::month_number (symbol name)
 {
   for (int month = 1; month <= 12; month++)
     if (Implementation::mname[month] == name)
@@ -371,7 +371,7 @@ Time::month_number (std::string name)
 }
 
 int
-Time::wday_number (std::string name)
+Time::wday_number (symbol name)
 {
   for (int wday = 1; wday <= 7; wday++)
     if (Implementation::wname[wday] == name)

@@ -1,6 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Daisy::timestep () 89991809
+* Daisy::timestep ()
 
 Bliver brugt i ConditionEvery (hourly, daily, weekly).
 

@@ -69,8 +69,8 @@ public:
     First = Year, Last = Second
   };
   int component_value (component_t) const;
-  static std::string component_name (component_t);
-  static std::string component_documentation (component_t);
+  static symbol component_name (component_t);
+  static symbol component_documentation (component_t);
 
   // Simulate. 
   int tick_generic (const int amount, const int limit, 
@@ -85,10 +85,10 @@ public:
   
   // Convert.
 public:
-  static std::string month_name (int month);
-  static std::string wday_name (int wday);
-  static int month_number (std::string name);
-  static int wday_number (std::string day);
+  static symbol month_name (int month);
+  static symbol wday_name (int wday);
+  static int month_number (symbol name);
+  static int wday_number (symbol day);
   static int mday2yday (int year, int month, int mday);
   static int yday2mday (int year, int yday);
   static int yday2wday (int year, int yday); // 0=monday, 6=sunday.
