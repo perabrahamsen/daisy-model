@@ -52,7 +52,7 @@ struct DrainLateral : public Drain
 
   void tick (const Geometry& geo, const Soil& soil, 
              const SoilHeat& soil_heat, const Surface& surface, 
-             const double dt, SoilWater& soil_water, Treelog& msg);
+             SoilWater& soil_water, Treelog& msg);
   void output (Log&) const;
   
   // Helpers.
@@ -71,9 +71,9 @@ struct DrainLateral : public Drain
 
 void 
 DrainLateral::tick (const Geometry& geo, const Soil& soil, 
-                      const SoilHeat& soil_heat, const Surface& surface, 
-                      const double, SoilWater& soil_water, 
-                      Treelog&)
+                    const SoilHeat& soil_heat, const Surface& surface, 
+                    SoilWater& soil_water, 
+                    Treelog&)
 {
   const size_t cell_size = geo.cell_size ();
 

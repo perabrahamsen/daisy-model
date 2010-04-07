@@ -6,6 +6,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.84 
+
+** Surface decompose rate now defaults to canopy dissipitation rate.
+
+It use to default to soil decompose rate.
+
 * 4.83
 
 ** Made 'K_at_h' with with the 'B_C_inverse' hydraulic model.

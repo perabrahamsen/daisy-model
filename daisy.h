@@ -32,7 +32,6 @@ class Log;
 class Field;
 class Treelog;
 class Time;
-class Timestep;
 class Metalib;
 class Scopesel;
 class Units;

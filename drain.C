@@ -59,7 +59,7 @@ struct DrainNone : public Drain
 {
   // Simulation.
   void tick (const Geometry&, const Soil&, const SoilHeat&, const Surface&, 
-             const double dt, SoilWater&, Treelog&)
+             SoilWater&, Treelog&)
   { }
   void output (Log&) const
   { }

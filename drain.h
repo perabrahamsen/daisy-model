@@ -45,8 +45,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Geometry&, const Soil&, const SoilHeat&,
-                     const Surface&, const double dt, SoilWater&,
-                     Treelog&) = 0;
+                     const Surface&, SoilWater&, Treelog&) = 0;
 
 public:
   virtual void output (Log&) const = 0;

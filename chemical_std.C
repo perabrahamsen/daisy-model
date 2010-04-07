@@ -239,7 +239,6 @@ struct ChemicalStandard : public Chemical
   static void fillup (std::vector<double>& v, const size_t size);
   void initialize (const Units&, const Scope&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
-  static double find_surface_decompose_rate (const Block& al);
   ChemicalStandard (const BlockModel&);
 };
 
@@ -1465,19 +1464,6 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
   daisy_assert (static_decompose_rate.size () == cell_size);
 }
 
-double
-ChemicalStandard::find_surface_decompose_rate (const Block& al)
-{
-  if (al.check ("surface_decompose_rate"))
-    return al.number ("surface_decompose_rate");
-  if (al.check ("surface_decompose_halftime"))
-    return halftime_to_rate (al.number ("surface_decompose_halftime"));
-  if (al.check ("decompose_rate"))
-    return al.number ("decompose_rate");
-  
-  return halftime_to_rate (al.number ("decompose_halftime"));
-}
-
 ChemicalStandard::ChemicalStandard (const BlockModel& al)
   : Chemical (al),
     crop_uptake_reflection_factor 
@@ -1489,7 +1475,11 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
              ? halftime_to_rate (al.number ("canopy_dissipation_halftime"))
              : al.number ("canopy_dissipation_rate_coefficient"))),
     canopy_washoff_coefficient (al.number ("canopy_washoff_coefficient")),
-    surface_decompose_rate (find_surface_decompose_rate (al)),
+    surface_decompose_rate (al.check ("surface_decompose_rate")
+                            ? al.number ("surface_decompose_rate")
+                            : (al.check ("surface_decompose_halftime")
+                               ? halftime_to_rate (al.number ("surface_decompose_halftime"))
+                               : canopy_dissipation_rate)),
     diffusion_coefficient_ (al.number ("diffusion_coefficient") * 3600.0),
     decompose_rate (al.check ("decompose_rate")
                     ? al.number ("decompose_rate")
@@ -1730,12 +1720,14 @@ Fraction of the chemical that follows the water off the canopy.");
                    Check::fraction (), Attribute::OptionalConst,
                    "How fast does the chemical decomposee on surface.\n\
 You must specify it with either 'surface_decompose_halftime' or\n\
-'surface_decompose_rate'.  If neither is specified, 'decompose_rate' is used.");
+'surface_decompose_rate'.  If neither is specified,\n\
+'canopy_dissipation_rate' is used.");
     frame.declare ("surface_decompose_halftime", "h", 
                    Check::positive (), Attribute::OptionalConst,
                    "How fast does the chemical decompose on surface.\n\
 You must specify it with either 'surface_decompose_halftime' or\n\
-'surface_decompose_rate'.  If neither is specified, 'decompose_rate' is used.");
+'surface_decompose_rate'.  If neither is specified,\n\
+'canopy_dissipation_rate' is used.");
 
     // Soil parameters.
     frame.declare ("diffusion_coefficient", "cm^2/s", Check::non_negative (),

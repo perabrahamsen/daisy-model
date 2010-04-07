@@ -1,5 +1,8 @@
 2010-04-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* chemical_std.C (surface_decompose_rate): Default to
+	'canopy_dissipation_rate'.
+
 	* daisy.h, daisy.C (tick_before, tick_columns, tick_after): Removed.
 	* cdaisy.h, cdaisy.C (daisy_daisy_tick_before)
 	(daisy_daisy_tick_columns, daisy_daisy_tick_after): Removed.

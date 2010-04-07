@@ -1,5 +1,17 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Gennemgå VAP rapport og nedskriv.
+
+* Move Drain out of Movement.
+
+* Implement the whole tick_source, find_dt, tick_move for drain only
+
+* Test?
+
+* Implement 3-way for tertiary
+
+** Maybe surface need to be source/sink based...
+
 * Variable tidsskridt
 
 ** Split "tick" op i en uden dt, og en med

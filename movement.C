@@ -120,7 +120,7 @@ Movement::tick_tertiary (const Units& units,
                          SoilWater& soil_water, Surface& surface, Treelog& msg)
 { 
   tertiary->tick (units, geo, soil, soil_heat, dt, soil_water, surface, msg); 
-  drain->tick (geo, soil, soil_heat, surface, dt, soil_water, msg);
+  drain->tick (geo, soil, soil_heat, surface, soil_water, msg);
 }
 
 void
