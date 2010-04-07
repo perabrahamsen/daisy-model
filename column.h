@@ -147,10 +147,11 @@ public:
 
   // Simulation.
   virtual void clear () = 0;
-  virtual void tick (const Metalib& metalib, 
-                     const Time&, double dt, const Weather*, 
-		     const Scope&, Treelog&) = 0;
-
+  virtual void tick_source (const Time&, Treelog&) = 0;
+  virtual double suggest_dt (double max_dt) const = 0;
+  virtual void tick_move (const Metalib& metalib, 
+                          const Time&, double dt, const Weather*, 
+                          const Scope&, Treelog&) = 0;
   virtual bool check (const Weather* global_weather,
 		      const Time& from, const Time& to, 
 		      const Scope&, Treelog&) const = 0;

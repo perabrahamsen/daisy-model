@@ -112,9 +112,11 @@ public:
   std::string crop_names () const;
   // Simulation.
   void clear ();
-  void tick_all (const Metalib& metalib, 
-                 const Time&, double dt, const Weather*,
-		 const Scope&, Treelog&);
+  void tick_source (const Time&, Treelog&);
+  double suggest_dt (double max_dt) const;
+  void tick_move (const Metalib& metalib, 
+                  const Time&, double dt, const Weather*, 
+                  const Scope&, Treelog&);
 
   // Find a specific column.
   double relative_weight (const Column& column, const Select& select) const;
@@ -612,20 +614,52 @@ Field::Implementation::clear ()
 }
 
 void 
-Field::Implementation::tick_all (const Metalib& metalib, 
-                                 const Time& time, const double dt, 
-                                 const Weather* weather, const Scope& scope,
-				 Treelog& msg)
+Field::Implementation::tick_source (const Time& time, Treelog& msg)
 {
   if (columns.size () == 1)
-    (*(columns.begin ()))->tick (metalib, time, dt, weather, scope, msg);
+    (*(columns.begin ()))->tick_source (time, msg);
   else
     for (ColumnList::const_iterator i = columns.begin ();
          i != columns.end ();
          i++)
       {
         Treelog::Open nest (msg, "Column " + (*i)->name);
-        (*i)->tick (metalib, time, dt, weather, scope, msg);
+        (*i)->tick_source (time, msg);
+      }
+}
+
+double
+Field::Implementation::suggest_dt (const double max_dt) const
+{
+  if (columns.size () == 1)
+    return (*(columns.begin ()))->suggest_dt (max_dt);
+  
+  double min_dt = max_dt;
+  for (ColumnList::const_iterator i = columns.begin ();
+       i != columns.end ();
+       i++)
+    {
+      const double dt = (*i)->suggest_dt (max_dt);
+      if (dt < min_dt)
+        min_dt = dt;
+    }
+}
+
+void 
+Field::Implementation::tick_move (const Metalib& metalib, 
+                                  const Time& time, const double dt, 
+                                  const Weather* weather, const Scope& scope,
+                                  Treelog& msg)
+{
+  if (columns.size () == 1)
+    (*(columns.begin ()))->tick_move (metalib, time, dt, weather, scope, msg);
+  else
+    for (ColumnList::const_iterator i = columns.begin ();
+         i != columns.end ();
+         i++)
+      {
+        Treelog::Open nest (msg, "Column " + (*i)->name);
+        (*i)->tick_move (metalib, time, dt, weather, scope, msg);
       }
 }
 
@@ -928,10 +962,18 @@ Field::clear ()
 { impl->clear (); }
 
 void
-Field::tick_all (const Metalib& metalib, 
-                 const Time& time, const double dt, const Weather* weather, 
-                 const Scope& scope, Treelog& msg)
-{ impl->tick_all (metalib, time, dt, weather, scope, msg); }
+Field::tick_source (const Time& time, Treelog& msg)
+{ impl->tick_source (time, msg); }
+
+double
+Field::suggest_dt (const double max_dt) const
+{ return impl->suggest_dt (max_dt); }
+
+void
+Field::tick_move (const Metalib& metalib, 
+                  const Time& time, const double dt, const Weather* weather, 
+                  const Scope& scope, Treelog& msg)
+{ impl->tick_move (metalib, time, dt, weather, scope, msg); }
 
 void 
 Field::output (Log& log) const

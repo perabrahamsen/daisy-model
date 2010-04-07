@@ -125,9 +125,11 @@ public:
   std::string crop_names () const;
   // Simulation.
   void clear ();
-  void tick_all (const Metalib& metalib, 
-                 const Time&, double dt, const Weather*, 
-		 const Scope&, Treelog&);
+  void tick_source (const Time&, Treelog&);
+  double suggest_dt (double max_dt) const;
+  void tick_move (const Metalib& metalib, 
+                  const Time&, double dt, const Weather*, 
+                  const Scope&, Treelog&);
   void output (Log&) const;
   double relative_weight (const Column&, const Select&) const;
 

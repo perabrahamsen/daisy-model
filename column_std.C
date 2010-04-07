@@ -163,8 +163,11 @@ public:
 
   // Simulation.
   void clear ();
-  void tick (const Metalib& metalib, const Time&, const double dt, const Weather*,
-             const Scope&, Treelog&);
+  void tick_source (const Time&, Treelog&);
+  double suggest_dt (double max_dt) const;
+  void tick_move (const Metalib& metalib, 
+                  const Time&, double dt, const Weather*, 
+                  const Scope&, Treelog&);
   bool check (const Weather* global_weather,
               const Time& from, const Time& to, 
               const Scope&, Treelog&) const;
@@ -569,9 +572,23 @@ ColumnStandard::clear ()
 }
 
 void
-ColumnStandard::tick (const Metalib& metalib, const Time& time, const double dt,
-                      const Weather* global_weather, const Scope& parent_scope,
-                      Treelog& msg)
+ColumnStandard::tick_source (const Time& time, Treelog& msg)
+{ 
+  // Weather.
+  if (weather.get ())
+    weather->tick (time, msg);
+}
+
+double
+ColumnStandard::suggest_dt (const double max_dt) const
+{ return max_dt; }
+
+void
+ColumnStandard::tick_move (const Metalib& metalib, const Time& time, 
+                           const double dt,
+                           const Weather* global_weather,
+                           const Scope& parent_scope,
+                           Treelog& msg)
 {
   // Irrigation is delayed management.
   irrigation->tick (geometry, *soil_water, *chemistry, *bioclimate, dt, msg);
@@ -595,10 +612,6 @@ ColumnStandard::tick (const Metalib& metalib, const Time& time, const double dt,
   // Scope.
   daisy_assert (extern_scope);
   ScopeMulti scope (*extern_scope, parent_scope);
-
-  // Weather.
-  if (weather.get ())
-    weather->tick (time, msg);
 
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
 

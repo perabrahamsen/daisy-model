@@ -131,7 +131,16 @@ struct Daisy::Implementation
     action->doIt (daisy, scope (), msg);
 
     // Turnover and movement.
-    field->tick_all (metalib, time, current_dt, weather.get (), scope (), msg); 
+    field->tick_source (time, msg); 
+    current_dt = field->suggest_dt (max_dt); 
+    if (current_dt < max_dt)
+      {
+        std::ostringstream tmp;
+        tmp << "Field suggested dt = " << current_dt << ", ignored";
+        msg.warning (tmp.str ());
+        current_dt = max_dt;
+      }
+    field->tick_move (metalib, time, current_dt, weather.get (), scope (), msg);
 
     // Update time.
     previous = time;

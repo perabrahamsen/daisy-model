@@ -1,3 +1,11 @@
+2010-04-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_std.C, column.h, field.C, field.h (tick_source, suggest_dt):
+	(tick_move): New functions.
+	* column_std.C, column.h (tick): Removed.
+	* field.C, field.h (tick_all): Removed.
+	* daisy.C (tick): Update caller.
+
 2010-04-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* drain.h, drain.C, drain_lateral.C (tick): No dt.
