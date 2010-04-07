@@ -1,19 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Daisy::timestep ()
-
-Bliver brugt i ConditionEvery (hourly, daily, weekly).
-
-Det ville være bede hvis vi loggede i begyndelsen af et timestep, i
-stedet for slutningen.  Altså kl 0 i stedet for kl 24.  Kan det ordnes?
-
-Problemet er at daglig log vil virke som forkert dag.  Udvaskning for
-den 15' vil stå som den 16.
-
-...
-
-log lige før "time" opdateres.  Så vi kender "next time".
-
 * Variable tidsskridt
 
 ** Split "tick" op i en uden dt, og en med

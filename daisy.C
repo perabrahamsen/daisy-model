@@ -65,6 +65,7 @@ struct Daisy::Implementation
   const double max_dt;
   double current_dt;
   Time time;
+  Time previous;
   const Time stop;
   int duration;
   const boost::scoped_ptr<Action> action;
@@ -80,18 +81,96 @@ struct Daisy::Implementation
   { return sel.lookup (*output_log, msg); }
 
   // Simulation.
-  void tick_before (Daisy& daisy, Treelog& msg)
+  bool run (Daisy& daisy, Treelog& msg)
+  {
+    // Run simulation.
+    {
+      Treelog::Open nest (msg, "Running");
+
+      running = false;
+
+      do
+        {
+          Treelog::Open nest (msg, time.print ());
+
+          if (!running)
+            {
+              running = true;
+              msg.message ("Begin simulation");
+            }
+
+          print_time->tick (daisy, scope (), msg);
+          const bool force_print 
+            = print_time->match (daisy, scope (), msg);
+
+          tick (daisy, msg);
+
+          if (!running)
+            msg.message ("End simulation");
+          if (force_print)
+            {
+              msg.touch ();
+              msg.flush ();
+            }
+        }
+      while (running);
+    }
+    summarize (msg);
+    return true;
+  }
+
+  void tick (Daisy& daisy, Treelog& msg)
   { 
-    const Time previous = time - timestep;
+    // Initial logs.
     output_log->initial_logs (daisy, previous, msg);
+
+    // Weather and management.
     if (weather.get ())
       weather->tick (time, msg);
     action->tick (daisy, scope (), msg);
     action->doIt (daisy, scope (), msg);
+
+    // Turnover and movement.
+    field->tick_all (metalib, time, current_dt, weather.get (), scope (), msg); 
+
+    // Update time.
+    previous = time;
+    time += timestep;
+    if (time >= stop)
+      running = false;
+
+    // Log values.
+    output_log->tick (daisy, previous, current_dt, msg);
+
+    // Clear values for next timestep.
+    field->clear ();
+
+    // Communicate with the UI.
+    if (!daisy.ui_running ())
+      {
+        msg.error ("Simulation aborted");
+        running = false;
+      }
+    if (!running)
+      daisy.ui_set_progress (1.0);
+    else if (duration > 0)
+      {
+        const double total_hours = duration; // int -> double
+        const double hours_left = Time::hours_between (time, stop);
+        daisy.ui_set_progress ((total_hours - hours_left) / total_hours);
+      }
+    else if (duration != -42)
+      {
+        duration = -42;           // Magic to call this only once
+        daisy.ui_set_progress (-1.0);
+      }
   }
+
 
   void output (Log& log) const
   {
+    output_submodule (time, "time", log);
+    output_submodule (previous, "previous", log);
     output_value (current_dt, "dt", log);
     if (weather.get ())
       output_derived (weather, "weather", log);
@@ -100,6 +179,7 @@ struct Daisy::Implementation
     output_vector (harvest, "harvest", log);
 
   }
+
   // Create and Destroy.
   void initialize (Metalib& metalib, Daisy& daisy, Block& block)
   { 
@@ -118,6 +198,7 @@ struct Daisy::Implementation
       action->initialize (daisy, scope (), msg);
     }
   }
+
   bool check (const Daisy& daisy, Treelog& msg)
   {
     bool ok = true;
@@ -163,11 +244,13 @@ struct Daisy::Implementation
     }
     return ok;
   }
+
   void summarize (Treelog& msg) const
   {
     output_log->summarize (msg);
     field->summarize (msg);
   }
+
   Implementation (const BlockModel& al)
     : metalib (al.metalib ()),
       frame (al.frame ()),
@@ -181,6 +264,9 @@ struct Daisy::Implementation
       max_dt (timestep.total_hours ()),
       current_dt (max_dt),
       time (al.submodel ("time")),
+      previous (al.check ("previous")
+                ? Time (al.submodel ("previous"))
+                : time - timestep),
       stop (al.check ("stop")
             ? Time (al.submodel ("stop")) 
             : Time (9999, 1, 1, 1)),
@@ -218,9 +304,9 @@ const Time&
 Daisy::time () const
 { return impl->time; }
 
-const Timestep& 
-Daisy::timestep () const
-{ return impl->timestep; }
+const Time& 
+Daisy::previous () const
+{ return impl->previous; }
 
 const Units& 
 Daisy::units () const
@@ -253,95 +339,11 @@ Daisy::attach_ui (Run* run, const std::vector<Log*>& logs)
 
 bool
 Daisy::run (Treelog& msg)
-{
-  // Run simulation.
-  {
-    Treelog::Open nest (msg, "Running");
-
-    impl->running = false;
-
-    do
-      {
-	Treelog::Open nest (msg, impl->time.print ());
-
-	if (!impl->running)
-	  {
-	    impl->running = true;
-	    msg.message ("Begin simulation");
-	  }
-
-	impl->print_time->tick (*this, impl->scope (), msg);
-	const bool force_print 
-          = impl->print_time->match (*this, impl->scope (), msg);
-
-	tick (msg);
-
-	if (!impl->running)
-	  msg.message ("End simulation");
-	if (force_print)
-	  {
-	    msg.touch ();
-	    msg.flush ();
-	  }
-      }
-    while (impl->running);
-  }
-  impl->summarize (msg);
-  return true;
-}
+{ return impl->run (*this, msg); }
 
 void
 Daisy::tick (Treelog& msg)
-{ 
-  tick_before (msg);
-  tick_columns (msg);
-  tick_after (msg);
-}
-
-void
-Daisy::tick_before (Treelog& msg)
-{ impl->tick_before (*this, msg); }
-
-void
-Daisy::tick_columns (Treelog& msg)
-{ impl->field->tick_all (impl->metalib, impl->time, impl->current_dt, 
-                         impl->weather.get (), impl->scope (), msg); }
-
-void
-Daisy::tick_column (const size_t col, Treelog& msg)
-{ impl->field->tick_one (impl->metalib, col, impl->time, impl->current_dt,
-                          impl->weather.get (), impl->scope (), msg); }
-
-void
-Daisy::tick_after (Treelog& msg)
-{ 
-  const Time next = impl->time + impl->timestep;
-  if (next >= impl->stop)
-    impl->running = false;
-
-  impl->output_log->tick (*this, impl->time, impl->current_dt, msg);
-  impl->field->clear ();
-  impl->time = next;
-  
-  if (!ui_running ())
-    {
-      msg.error ("Simulation aborted");
-      impl->running = false;
-    }
-  if (!impl->running)
-    ui_set_progress (1.0);
-  else if (impl->duration > 0)
-    {
-      const double total_hours = impl->duration; // int -> double
-      const double hours_left = Time::hours_between (impl->time, impl->stop);
-      ui_set_progress ((total_hours - hours_left) / total_hours);
-    }
-  else if (impl->duration != -42)
-    {
-      impl->duration = -42;           // Magic to call this only once
-      ui_set_progress (-1.0);
-    }
-}
+{ impl->tick (*this, msg); }
 
 void
 Daisy::output (Log& log) const
@@ -381,12 +383,14 @@ Good values for this parameter would be hourly, daily or monthly.");
                      Attribute::Singleton,
                      "Specify the management operations to perform during\n\
 the simulation.");
-  frame.declare_submodule ("time", Attribute::State,
-			"Current time in the simulation.", Time::load_syntax);
-  frame.declare_submodule ("timestep", Attribute::OptionalState,
-			"Length of timestep in simlation.\n\
+  frame.declare_submodule ("time", Attribute::State, "\
+Current time in the simulation.", Time::load_syntax);
+  frame.declare_submodule ("previous", Attribute::OptionalState, "\
+Previous time in the simulation.", Time::load_syntax);
+  frame.declare_submodule ("timestep", Attribute::OptionalState, "\
+Length of timestep in simlation.\n\
 The default value is 1 hour, anything else is unlikely to work.",
-                        Timestep::load_syntax);
+                           Timestep::load_syntax);
   frame.set_check ("timestep", Timestep::positive ());
   frame.declare ("dt", "h", Attribute::LogOnly, "\
 Current timestep used by simulation.");

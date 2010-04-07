@@ -128,9 +128,6 @@ public:
   void tick_all (const Metalib& metalib, 
                  const Time&, double dt, const Weather*, 
 		 const Scope&, Treelog&);
-  void tick_one (const Metalib& metalib, 
-                 size_t, const Time&, double dt, const Weather*,
-		 const Scope&, Treelog&);
   void output (Log&) const;
   double relative_weight (const Column&, const Select&) const;
 

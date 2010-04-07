@@ -55,7 +55,7 @@ public:
   Scope& find_scope (size_t index) const;
   size_t scope_size () const;
   const Time& time () const;
-  const Timestep& timestep () const;
+  const Time& previous () const;
   const Units& units () const;
   Field& field () const;
   std::vector<const Harvest*>& harvest () const;
@@ -70,10 +70,6 @@ public:
 public:
   bool run (Treelog&);
   void tick (Treelog&);
-  void tick_before (Treelog&);
-  void tick_columns (Treelog&);
-  void tick_column (size_t, Treelog&);
-  void tick_after (Treelog&);
   void output (Log&) const;
 
   // Create and Destroy.

@@ -181,12 +181,6 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       printer.print_comment ("Cloned objects:");
       printer.print_library_file ("*clone*");
 
-      // Start checkpoint from next timestep.
-      daisy_assert (daisy.check ("time"));
-      Time time (daisy.submodel ("time"));
-      time.tick_hour ();
-      time.set_time (daisy, "time");
-
       // Print content.
       printer.print_comment ("Content");
       

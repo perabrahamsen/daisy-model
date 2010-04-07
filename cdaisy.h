@@ -326,18 +326,6 @@ daisy_daisy_delete (daisy_daisy* toplevel);
 EXPORT void                /* Run all processes a single time step. */
 daisy_daisy_tick (daisy_daisy* daisy);
 
-EXPORT void                     /* Timestep before colums. */
-daisy_daisy_tick_before (daisy_daisy* daisy);
-
-EXPORT void                  /* Run all columns a single time step. */
-daisy_daisy_tick_columns (daisy_daisy* daisy);
-
-EXPORT void                  /* Run column #col a single time step. */
-daisy_daisy_tick_column (daisy_daisy* daisy, int col);
-
-EXPORT void              /* Timestep after columns */
-daisy_daisy_tick_after (daisy_daisy* daisy);
-
 EXPORT daisy_bool           /* Check if simulation is still active. */
 daisy_daisy_is_running (daisy_daisy* daisy);
 

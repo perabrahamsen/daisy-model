@@ -80,7 +80,6 @@ Output::tick (const Daisy& daisy, const Time& time, const double dt,
 	  Log& log = *active_logs[i];
 	  if (log.match (daisy, msg))
 	    {
-	      output_submodule (time, "time", log);
               daisy.output (log);
               output_list (logs, "output", log, Log::component);
 	      log.done (time_columns, time, dt, msg);

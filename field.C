@@ -115,9 +115,6 @@ public:
   void tick_all (const Metalib& metalib, 
                  const Time&, double dt, const Weather*,
 		 const Scope&, Treelog&);
-  void tick_one (const Metalib& metalib, 
-                 size_t, const Time&, double dt, const Weather*, 
-		 const Scope&, Treelog&);
 
   // Find a specific column.
   double relative_weight (const Column& column, const Select& select) const;
@@ -632,17 +629,6 @@ Field::Implementation::tick_all (const Metalib& metalib,
       }
 }
 
-void 
-Field::Implementation::tick_one (const Metalib& metalib, 
-                                 const size_t col,
-                                 const Time& time, const double dt, 
-                                 const Weather* weather, 
-				 const Scope& scope, Treelog& msg)
-{
-  daisy_assert (columns.size () > 0);
-  columns[col]->tick (metalib, time, dt, weather, scope, msg);
-}
-
 double 
 Field::Implementation::relative_weight (const Column& column, 
                                         const Select& select) const
@@ -946,13 +932,6 @@ Field::tick_all (const Metalib& metalib,
                  const Time& time, const double dt, const Weather* weather, 
                  const Scope& scope, Treelog& msg)
 { impl->tick_all (metalib, time, dt, weather, scope, msg); }
-
-void
-Field::tick_one (const Metalib& metalib, 
-                 const size_t col,
-                 const Time& time, const double dt, const Weather* weather, 
-                 const Scope& scope, Treelog& msg)
-{ impl->tick_one (metalib, col, time, dt, weather, scope, msg); }
 
 void 
 Field::output (Log& log) const

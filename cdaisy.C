@@ -493,50 +493,6 @@ daisy_daisy_tick (Toplevel* toplevel)
   DAISY_CATCH_BLOCK(toplevel);
 }
 
-extern "C" void EXPORT
-daisy_daisy_tick_before (Toplevel* toplevel)
-{
-  try
-    {
-      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      daisy.tick_before (toplevel->msg ());
-    }
-  DAISY_CATCH_BLOCK(toplevel);
-}
-
-extern "C" void EXPORT
-daisy_daisy_tick_columns (Toplevel* toplevel)
-{
-  try
-    {
-      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      daisy.tick_columns (toplevel->msg ());
-    }
-  DAISY_CATCH_BLOCK(toplevel);
-}
-
-extern "C" void EXPORT
-daisy_daisy_tick_column (Toplevel* toplevel, int col)
-{
-  try
-    {
-      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      daisy.tick_column (col, toplevel->msg ());
-    }
-  DAISY_CATCH_BLOCK(toplevel);
-}
-
-extern "C" void EXPORT
-daisy_daisy_tick_after (Toplevel* toplevel)
-{
-  try
-    {
-      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      daisy.tick_after (toplevel->msg ());
-    }
-  DAISY_CATCH_BLOCK(toplevel);
-}
-
 // @@ Manipulating the simulation.
 
 extern "C" const Time* EXPORT

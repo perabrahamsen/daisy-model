@@ -1,3 +1,18 @@
+2010-04-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* daisy.h, daisy.C (tick_before, tick_columns, tick_after): Removed.
+	* cdaisy.h, cdaisy.C (daisy_daisy_tick_before)
+	(daisy_daisy_tick_columns, daisy_daisy_tick_after): Removed.
+
+	* daisy.h, daisy.C (timestep): Removed.
+	* condition_time.C: Update caller.
+	* daisy.h, daisy.C (previous): Beginning of timestep.
+	* log_checkpoint.C (done): Adjust.
+
+	* field.h, field.C (tick_one): Removed.
+	* daisy.h, daisy.C (tick_column): Removed.
+	* cdaisy.h, cdaisy.C (daisy_daisy_tick_column): Removed.
+
 2010-04-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.83 released.

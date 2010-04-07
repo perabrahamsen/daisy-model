@@ -691,8 +691,7 @@ struct ConditionEnd : public Condition
   { return timestep_name; } 
 
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return (daisy.time ().*entry) () 
-      != ((daisy.time () + daisy.timestep ()).*entry) (); }
+  { return (daisy.time ().*entry) () != (daisy.previous ().*entry) (); }
 
   void output (Log&) const
   { }
@@ -847,7 +846,7 @@ private:
 
   void initialize (const Daisy& daisy, const Scope&, Treelog&)
   { 
-    const Time previous = daisy.time () - daisy.timestep ();
+    const Time previous = daisy.previous ();
     initiate_log (daisy, previous); 
   }
   
