@@ -1,5 +1,8 @@
 2010-04-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* drain.h, drain.C, drain_lateral.C (tick): No dt.
+	* movement.C (tick_tertiary): Update caller.
+
 	* chemical_std.C (surface_decompose_rate): Default to
 	'canopy_dissipation_rate'.
 

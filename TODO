@@ -2,6 +2,8 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Gennemgå VAP rapport og nedskriv.
 
+* Test log af time og previous
+
 * Move Drain out of Movement.
 
 * Implement the whole tick_source, find_dt, tick_move for drain only
