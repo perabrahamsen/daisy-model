@@ -6,6 +6,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.83
+
+** Made 'K_at_h' with with the 'B_C_inverse' hydraulic model.
+
 * 4.82
 
 ** New LAIfactor permanent vegetation parameter.

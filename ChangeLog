@@ -1,5 +1,8 @@
 2010-04-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* hydraulic_B_C_inverse.C (Hydraulic): Initialize K after other
+	parameters.
+
 	* time.h, time.C: Use symbols.
 	* output.C (load_syntax): Update caller.
 

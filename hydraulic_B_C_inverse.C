@@ -99,7 +99,6 @@ struct HydraulicB_C_inverse : public Hydraulic
                    double rho_b, const bool top_soil, Treelog& msg)
   {
     TREELOG_MODEL (msg);
-    Hydraulic::initialize (texture, rho_b, top_soil, msg);
     std::ostringstream tmp;
 
     // Find Theta_sat.
@@ -146,6 +145,9 @@ struct HydraulicB_C_inverse : public Hydraulic
     tmp << "(b " << b << " [])\n"
         << "(h_b " << h_b << " [cm])";
     msg.debug (tmp.str ());
+
+    // Must be called last (K_init depends on the other parameters).
+    Hydraulic::initialize (texture, rho_b, top_soil, msg);
   }    
                            
   HydraulicB_C_inverse (const BlockModel& al)
