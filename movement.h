@@ -42,7 +42,6 @@ class BlockModel;
 class Log;
 class Scope;
 class Tertiary;
-class Drain;
 class Units;
 class FrameSubmodel;
 
@@ -74,7 +73,6 @@ public:
   // Tertiary transport.
 protected:
   std::auto_ptr<Tertiary> tertiary;
-  std::auto_ptr<Drain> drain;
 public:
   void deactivate_tertiary (int steps);
   void tick_tertiary (const Units&,

@@ -83,8 +83,7 @@ public:
 public:
   void nitrification (const double M, const double C, 
                       const double h, const double T,
-                      double& NH4, double& N2O, double& NO3, 
-                      const double dt) const;
+                      double& NH4, double& N2O, double& NO3) const;
  
 void output (Log&) const;
 

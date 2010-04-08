@@ -1,3 +1,10 @@
+2010-04-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* nitrinitrification.h, nitrinitrification_soil.C:
+	* nitrification_solute.C (tick): Remove dt.
+	* soil.h, soil.C, horizon.h, horizon.C (nitrification): Update caller.
+	* reaction_nit.C (tick_soil): Update caller.
+
 2010-04-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* column_std.C, column.h, field.C, field.h (tick_source, suggest_dt):

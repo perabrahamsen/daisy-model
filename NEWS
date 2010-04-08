@@ -12,6 +12,16 @@ release.
 
 It use to default to soil decompose rate.
 
+** Drain moved from Movement to column.
+
+(defcolumn Example default
+  (Drain lateral
+         (L 18 [m])
+         (pipe_position -110.0 [cm]))
+  (Groundwater aquitard
+               (K_aquitard 0.050 [cm/h])
+               (Z_aquitard 200 [cm])
+               (pressure_table (file "Rorrende_88.gwt"))))
 * 4.83
 
 ** Made 'K_at_h' with with the 'B_C_inverse' hydraulic model.

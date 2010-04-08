@@ -45,7 +45,7 @@ private:
 public:
   void tick (const double M, const double C, 
              const double h, const double T,
-             double& NH4, double& N2O, double& NO3, double dt) const;
+             double& NH4, double& N2O, double& NO3) const;
 
   // Create.
 public:
@@ -56,8 +56,7 @@ public:
 void 
 NitrificationSoil::tick (const double M, const double /* C */, 
                          const double h, const double T,
-                         double& NH4, double& N2O, double& NO3,
-                         const double dt) const
+                         double& NH4, double& N2O, double& NO3) const
 {
   const double T_factor = (heat_factor.size () < 1)
     ? Abiotic::f_T2 (T)

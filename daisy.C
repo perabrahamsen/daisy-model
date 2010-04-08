@@ -131,7 +131,7 @@ struct Daisy::Implementation
     action->doIt (daisy, scope (), msg);
 
     // Turnover and movement.
-    field->tick_source (time, msg); 
+    field->tick_source (time, weather.get (), msg); 
     current_dt = field->suggest_dt (max_dt); 
     if (current_dt < max_dt)
       {

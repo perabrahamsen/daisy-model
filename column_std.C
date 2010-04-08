@@ -26,6 +26,7 @@
 #include "surface.h"
 #include "soil_heat.h"
 #include "movement.h"
+#include "drain.h"
 #include "groundwater.h"
 #include "geometry.h"
 #include "soil.h"
@@ -49,7 +50,6 @@
 #include "scopesel.h"
 #include "units.h"
 #include "treelog.h"
-#include "column.h"
 #include "librarian.h"
 #include "assertion.h"
 #include "frame_model.h"
@@ -65,6 +65,7 @@ struct ColumnStandard : public Column
   const std::auto_ptr<Scopesel> scopesel;
   const Scope* extern_scope;
   std::auto_ptr<Movement> movement;
+  std::auto_ptr<Drain> drain;
   std::auto_ptr<Groundwater> groundwater;
   std::auto_ptr<Weather> weather;
   std::auto_ptr<Vegetation> vegetation;
@@ -163,7 +164,7 @@ public:
 
   // Simulation.
   void clear ();
-  void tick_source (const Time&, Treelog&);
+  void tick_source (const Time&, const Weather*, Treelog&);
   double suggest_dt (double max_dt) const;
   void tick_move (const Metalib& metalib, 
                   const Time&, double dt, const Weather*, 
@@ -572,11 +573,22 @@ ColumnStandard::clear ()
 }
 
 void
-ColumnStandard::tick_source (const Time& time, Treelog& msg)
+ColumnStandard::tick_source (const Time& time, 
+                             const Weather *const global_weather,
+                             Treelog& msg)
 { 
   // Weather.
   if (weather.get ())
     weather->tick (time, msg);
+
+  const Weather& my_weather = weather.get () ? *weather : *global_weather;
+
+  // Add deposition. 
+  chemistry->deposit (my_weather.deposit (), msg);
+
+
+  // Drainage.
+  drain->tick (geometry, *soil, *soil_heat, surface, *soil_water, msg);
 }
 
 double
@@ -586,7 +598,7 @@ ColumnStandard::suggest_dt (const double max_dt) const
 void
 ColumnStandard::tick_move (const Metalib& metalib, const Time& time, 
                            const double dt,
-                           const Weather* global_weather,
+                           const Weather *const global_weather,
                            const Scope& parent_scope,
                            Treelog& msg)
 {
@@ -620,9 +632,6 @@ ColumnStandard::tick_move (const Metalib& metalib, const Time& time,
                            *soil_water, surface, msg);
 
   // Early calculation.
-
-  // Add deposition. 
-  chemistry->deposit (my_weather.deposit (), msg);
 
   const double old_pond = bioclimate->get_snow_storage () + surface.ponding ();
   bioclimate->tick (units, time, surface, my_weather,
@@ -718,6 +727,11 @@ ColumnStandard::check (const Weather* global_weather,
   {
     Treelog::Open nest (msg, "SoilHeat");
     if (!soil_heat->check (n, msg))
+      ok = false;
+  }
+  {
+    Treelog::Open nest (msg, "Drain");
+    if (!drain->check (msg))
       ok = false;
   }
   {
@@ -862,6 +876,7 @@ ColumnStandard::output (Log& log) const
                + surface.ponding (),
                "surface_water", log);
   output_derived (movement, "Movement", log);
+  output_derived (drain, "Drain", log);
   output_derived (groundwater, "Groundwater", log);
 }
 
@@ -871,6 +886,7 @@ ColumnStandard::ColumnStandard (const BlockModel& al)
     scopesel (Librarian::build_item<Scopesel> (al, "scope")),
     extern_scope (NULL),
     movement (Librarian::build_item<Movement> (al, "Movement")),
+    drain (Librarian::build_item<Drain> (al, "Drain")),
     groundwater (Librarian::build_item<Groundwater> (al, "Groundwater")),
     weather (al.check ("weather") 
              ? Librarian::build_item<Weather> (al, "weather")
@@ -938,6 +954,7 @@ ColumnStandard::initialize (const Block& block,
                         tillage_age.back ());
 
   groundwater->initialize (units, geometry, time, scope, msg);
+  drain->initialize (geometry, msg);
 
   // Movement depends on soil and groundwater
   movement->initialize (units, *soil, *groundwater,  scope, msg);
@@ -1036,6 +1053,10 @@ the simulation.  If unspecified, used global weather.");
     frame.declare_submodule ("Surface", Attribute::State,
                              "The upper border of the soil.",
                              Surface::load_syntax);
+    frame.declare_object ("Drain", Drain::component, 
+                          Attribute::State, Attribute::Singleton, "\
+Drainage.");
+    frame.set ("Drain", "none");
     frame.declare_object ("Groundwater", Groundwater::component,
                           "The groundwater level.");
     frame.declare_object ("Chemistry", Chemistry::component, 

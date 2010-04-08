@@ -76,7 +76,7 @@ ReactionNitrification::tick_soil (const Units&, const Geometry& geo,
                                   const SoilHeat& soil_heat,
                                   const OrganicMatter& organic_matter, 
                                   Chemistry& chemistry, 
-                                  const double dt, Treelog&)
+                                  const double /* dt */, Treelog&)
 {
   const size_t cell_size = geo.cell_size ();
   const std::vector<bool> active = organic_matter.active (); 
@@ -94,7 +94,7 @@ ReactionNitrification::tick_soil (const Units&, const Geometry& geo,
                             soil_NH4.M_primary (i), 
 			    soil_NH4.C_primary (i), 
                             soil_water.h (i), soil_heat.T (i),
-                            NH4[i], N2O[i], NO3[i], dt);
+                            NH4[i], N2O[i], NO3[i]);
       else
         NH4[i] = N2O[i] = NO3[i] = 0.0;        
     }

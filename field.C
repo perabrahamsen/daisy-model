@@ -112,7 +112,7 @@ public:
   std::string crop_names () const;
   // Simulation.
   void clear ();
-  void tick_source (const Time&, Treelog&);
+  void tick_source (const Time&, const Weather*, Treelog&);
   double suggest_dt (double max_dt) const;
   void tick_move (const Metalib& metalib, 
                   const Time&, double dt, const Weather*, 
@@ -614,17 +614,19 @@ Field::Implementation::clear ()
 }
 
 void 
-Field::Implementation::tick_source (const Time& time, Treelog& msg)
+Field::Implementation::tick_source (const Time& time, 
+                                    const Weather *const global_weather,
+                                    Treelog& msg)
 {
   if (columns.size () == 1)
-    (*(columns.begin ()))->tick_source (time, msg);
+    (*(columns.begin ()))->tick_source (time, global_weather, msg);
   else
     for (ColumnList::const_iterator i = columns.begin ();
          i != columns.end ();
          i++)
       {
         Treelog::Open nest (msg, "Column " + (*i)->name);
-        (*i)->tick_source (time, msg);
+        (*i)->tick_source (time, global_weather, msg);
       }
 }
 
@@ -643,6 +645,7 @@ Field::Implementation::suggest_dt (const double max_dt) const
       if (dt < min_dt)
         min_dt = dt;
     }
+  return min_dt;
 }
 
 void 
@@ -962,8 +965,9 @@ Field::clear ()
 { impl->clear (); }
 
 void
-Field::tick_source (const Time& time, Treelog& msg)
-{ impl->tick_source (time, msg); }
+Field::tick_source (const Time& time, const Weather *const global_weather, 
+                    Treelog& msg)
+{ impl->tick_source (time, global_weather, msg); }
 
 double
 Field::suggest_dt (const double max_dt) const

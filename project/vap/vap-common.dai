@@ -26,13 +26,13 @@
 (defsecondary vap_nocracks vap_pressure 
   (h_lim 1.2 [pF]))
 
-(defhorizon VAP_Ap FAO3
-  (secondary_domain vap_nocracks))
-
 (defsecondary vap_cracks cracks
   (aperture 78 [um])
   (density 10 [m^-1])
   (alpha 0.01 [h^-1]))
+
+(defhorizon VAP_Ap FAO3
+  (secondary_domain vap_nocracks))
 
 (defhorizon VAP_B FAO3
   (secondary_domain vap_cracks))
@@ -315,6 +315,8 @@
 
 (defgnuplot theta plottime
   (device "pdf size 12cm, 4cm")
+  (extra &old
+         "set xtics rotate")
   ;; (begin 1999 9 1) (end 2002 7 1)
   (declare depth String "Soil depth to plot.") 
   (where "fig/${station}-theta-${depth}.pdf")
@@ -330,7 +332,7 @@
                   (title "Obs"))))
 
 (defgnuplot sc-bromide plottime
-  (device "pdf size 12cm, 4cm")
+  (device "pdf size 12cm, 6cm")
   ;; Only application (both site) 2000-05-22.
   (begin 2000 05 01)
   (where "fig/${station}-sc-bromide.pdf")
@@ -418,6 +420,8 @@
 (defgnuplot horizontal plottime
   ;; (device "pdf size 12cm, 4cm")
   ;; First application (either site) 2000-05-22.
+  (extra &old
+         "set xtics rotate")
   (begin 2000 05 01)
   (where "fig/${station}-horizontal.pdf")
   (title "Horizontal screen")
@@ -477,6 +481,7 @@
   ;; (begin 2000 04 29) (end 2002 6 30)
   (device "pdf size 12cm, 4cm")
   (where "fig/${station}-biopore.pdf")
+  (extra &old "set xtics rotate")
   (title "Biopore flow")
   (source (column (file "log/${station}-drain.dlf")
                   (tag "Surface water tertiary")
@@ -496,6 +501,7 @@
 
 (defgnuplot biopore-acc plottime
   ;; (begin 2000 04 29) (end 2002 6 30)
+  (extra &old "set xtics rotate")
   (device "pdf size 12cm, 4cm")
   (where "fig/${station}-biopore-acc.pdf")
   (title "Accumulated biopore flow")
@@ -522,6 +528,7 @@
 
 (defgnuplot biopore-drain plottime
   ;; (begin 2000 04 29) (end 2002 6 30)
+  (extra &old "set xtics rotate")
   (device "pdf size 12cm, 4cm")
   (where "fig/${station}-biopore-drain.pdf")
   (title "Biopore drain flow")
@@ -543,6 +550,7 @@
 
 (defgnuplot biopore-drain-acc plottime
   ;; (begin 2000 04 29) (end 2002 6 30)
+  (extra &old "set xtics rotate")
   (device "pdf size 12cm, 4cm")
   (where "fig/${station}-biopore-drain-acc.pdf")
   (title "Accumulated biopore drain flow")
@@ -618,6 +626,7 @@
 
 (defgnuplot colloids plottime
   (device "pdf size 12cm, 4cm")
+  (extra &old "set xtics rotate")
   (declare chemical String "Name of chemical to plot")
   (chemical colloid)
   ;; (begin 2000 10 1) (end 2002 4 1)

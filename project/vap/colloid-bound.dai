@@ -167,6 +167,12 @@
 (defchemical Glyphosate-immobile-strong Glyphosate-immobile)
 (defchemical Glyphosate-immobile-weak Glyphosate-immobile)
 
+(defchemical Glyphosate-colloid Glyphosate-base
+  "Glyphosate sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
 (defreaction Glyphosate-immobile-sorption sorption
   "Sorption equilibrium between dissolved and immobile Glyphosate."
   (cite gjettermann2009)
@@ -182,12 +188,6 @@
   (sorbed Glyphosate-immobile-weak)
   (K_d 40 [l/kg])
   (k_sorption 0.05 [h^-1]))
-
-(defchemical Glyphosate-colloid Glyphosate-base
-  "Glyphosate sorbed to colloids."
-  (adsorption none)
-  ;; Same diffusion coefficient as other colloids.
-  (diffusion_coefficient 4.6e-6 [cm^2/s]))
 
 (defreaction Glyphosate-colloid-sorption Glyphosate-immobile-sorption-weak
   "Sorption equilibrium between dissolved and colloid-bound Glyphosate."

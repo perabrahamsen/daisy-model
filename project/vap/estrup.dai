@@ -117,10 +117,9 @@
         (MaxRootingDepth 150 [cm])))
 
 (defcolumn Estrup-1D Estrup
-  (Movement original 
-            (Drain lateral
-                   (L 13 [m])
-                   (pipe_position -110.0 [cm]))))
+  (Drain lateral
+         (L 13 [m])
+         (pipe_position -110.0 [cm])))
 
 (defcolumn Estrup-2D Estrup
   (Movement Rorrende-2D
@@ -149,11 +148,11 @@
 
 (defcolumn Estrup-1C-Center Estrup
   (area 630 [cm^2])
+  (Drain lateral
+         (L 13 [m])
+         (x 325 [cm])
+         (pipe_position -110.0 [cm]))
   (Movement original 
-            (Drain lateral
-                   (L 13 [m])
-                   (x 325 [cm])
-                   (pipe_position -110.0 [cm]))
             (Tertiary (VAP 
                        (classes ("matrix_0cm" (height_end -27 [cm]))
                                 ("matrix_2cm" (density 23 [m^-2]))
@@ -657,12 +656,16 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
          ;; First application: Bromide 2000-05-22
          ;; Last application: Glyphosate 2000-10-13
          (est-drainmass (begin 2000 05 26) (chemical Bromide))
-         (drainmass-sim (begin 2000 05 26)(chemical Dimethoate))
-         (drainmass-sim (begin 2000 05 26)(chemical Fenpropimorph))
+         (drainmass-sim (begin 2000 05 26)(chemical Dimethoate)
+                        (extra &old "set xtics rotate"))
+         (drainmass-sim (begin 2000 05 26)(chemical Fenpropimorph)
+                        (extra &old "set xtics rotate"))
          (est-drainmass (begin 2000 05 26) (chemical Glyphosate))
          (est-drainmass-acc (begin 2000 05 26) (chemical Bromide))
-         (drainmass-acc-sim (begin 2000 05 26) (chemical Dimethoate))
-         (drainmass-acc-sim (begin 2000 05 26) (chemical Fenpropimorph))
+         (drainmass-acc-sim (begin 2000 05 26) (chemical Dimethoate)
+                            (extra &old "set xtics rotate"))
+         (drainmass-acc-sim (begin 2000 05 26) (chemical Fenpropimorph)
+                            (extra &old "set xtics rotate"))
          (est-drainmass-acc (begin 2000 05 26) (chemical Glyphosate))
          ))
 

@@ -107,10 +107,9 @@
         (MaxRootingDepth 50 [cm])))
 
 (defcolumn Silstrup-1D Silstrup
-  (Movement original 
-            (Drain lateral
-                   (L 18 [m])
-                   (pipe_position -110.0 [cm]))))
+  (Drain lateral
+         (L 18 [m])
+         (pipe_position -110.0 [cm])))
 
 (defcolumn Silstrup-2D Silstrup
   (Movement Rorrende-2D
@@ -147,11 +146,11 @@
 
 (defcolumn Silstrup-1C-Center Silstrup
   (area 880 [cm^2])
+  (Drain lateral
+         (L 18 [m])
+         (x 4.5 [m])
+         (pipe_position -110.0 [cm]))
   (Movement original 
-            (Drain lateral
-                   (L 18 [m])
-                   (x 4.5 [m])
-                   (pipe_position -110.0 [cm]))
             (Tertiary (VAP 
                        (classes ("matrix_0cm" (height_end -31 [cm]))
                                 ("matrix_2cm" (density 23 [m^-2]))
@@ -628,10 +627,14 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
          (drain-acc (begin 2000 04 29))
          (colloids (begin 2000 04 29))
          ;; Metamitron and Bromide first applied 2000-05-22.
-         (sil-drainmass (begin 2000 04 29) (chemical Metamitron))
-         (sil-drainmass-acc (begin 2000 04 29) (chemical Metamitron))
-         (sil-drainmass (begin 2000 04 29) (chemical Bromide))
-         (sil-drainmass-acc (begin 2000 04 29) (chemical Bromide))
+         (sil-drainmass (begin 2000 04 29) (chemical Metamitron)
+                        (extra &old "set xtics rotate"))
+         (sil-drainmass-acc (begin 2000 04 29) (chemical Metamitron)
+                            (extra &old "set xtics rotate"))
+         (sil-drainmass (begin 2000 04 29) (chemical Bromide)
+                        (extra &old "set xtics rotate"))
+         (sil-drainmass-acc (begin 2000 04 29) (chemical Bromide)
+                            (extra &old "set xtics rotate"))
          ;; Dimethoate first applied 2001-07-16
          ;; Fenpropimorph first applied 2001-06-21
          ;; Glyphosate first applied 2001-10-25
