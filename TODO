@@ -1,5 +1,7 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Kørsel: 10 sec
+
 * Test log af time og previous
 
 * Implement the whole tick_source, find_dt, tick_move for drain only

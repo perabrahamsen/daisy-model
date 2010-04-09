@@ -54,10 +54,12 @@ struct ProgramOsvaldo : public Program
       }
     size_t count = 0;
     double measured_avg = 0.0;
-    while (*measure)
+    while (true)
       {
         double number;
         *measure >> number;
+        if (!*measure)
+          break;
         measured.push_back (number);
         measured_avg += number;
         count++;
@@ -112,10 +114,12 @@ struct ProgramOsvaldo : public Program
             return false;
           }
         std::vector<double> simulated;
-        while (*par_file)
+        while (true)
           {
             double number;
             *par_file >> number;
+            if (!*par_file)
+              break;
             simulated.push_back (number);
           }
         if (!par_file->eof ())
@@ -137,7 +141,7 @@ struct ProgramOsvaldo : public Program
         // Find squared difference:
         double diff2 = 0;
         for (int i = 0; i < size; ++i)
-            diff2 += sqr (simulated[i] - measured[i]);
+          diff2 += sqr (simulated[i] - measured[i]);
         
         // Output result.
         daisy_assert (measured_diff2 > 0.0);
