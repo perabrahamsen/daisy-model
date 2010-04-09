@@ -4,31 +4,31 @@
 
 ;; We don't want an initial line just because times are not fluxes.
 (defselect Year number 
-  (path time year)
+  (path previous year)
   (interesting_content false))
 
 (defselect Month number 
-  (path time month)
+  (path previous month)
   (interesting_content false))
 
 (defselect MDay number 
-  (path time mday)
+  (path previous mday)
   (interesting_content false))
 
 (defselect Hour number 
-  (path time hour)
+  (path previous hour)
   (interesting_content false))
  
 (defselect Week number 
-  (path time week)
+  (path previous week)
   (interesting_content false))
  
 (defselect YDay number 
-  (path time yday)
+  (path previous yday)
   (interesting_content false))
  
 (defselect WDay number 
-  (path time wday)
+  (path previous wday)
   (interesting_content false))
 
 (deflog "Total Soil Content" column
@@ -2000,6 +2000,9 @@ sum of all chemicals will be logged."
            (number (path weather "*" snow)
                    (handle sum)
                    (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate default albedo)
+                   (handle average)
+                   (spec bioclimate default albedo))
            (number (path column "${column}" Bioclimate "*" total_ep)
                    (handle sum)
                    (dimension "mm/&"))

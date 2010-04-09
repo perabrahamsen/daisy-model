@@ -45,8 +45,9 @@
 
 ;;(run batch (run (Silstrup-2D (column (Silstrup-2D-MACRO (Chemistry multi (combine Bromide))))) (plotall (graph Silstrup))))
 ;;(run batch (run Estrup-2C Silstrup-2C plotall))
-(run batch (run (Silstrup-2C (timestep (seconds 10)))
-                (plotall (graph Silstrup))))
+ (run batch (run (Silstrup-2C (timestep (seconds 10)))
+                 (Estrup-2C (timestep (seconds 10)))
+                 (plotall)))
 ;;(run (Silstrup (column (Silstrup-1C-Center))))
 
 ;; (run batch (run Estrup-1C-Drain Silstrup-1C-Drain plotall))

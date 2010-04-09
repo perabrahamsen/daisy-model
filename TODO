@@ -1,30 +1,36 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Osvaldo: Send resultat af hans simulering
+
 * Kørsel: 10 sec
 
-* Test log af time og previous
-
-* Implement the whole tick_source, find_dt, tick_move for drain only
-
-* Test?
-
-* Implement 3-way for tertiary
-
-** Maybe surface need to be source/sink based...
+Hvad sker der?
 
 * Variable tidsskridt
 
-** Split "tick" op i en uden dt, og en med
+** tertiary biopores
 
-tick_turnover, tick_movement
+*** Selvstændig "udregn start source" function
 
-** Ny parameter variable_timestep (default false)
+Alene baseret på betingelserne i starten af tidsskridtet.  Den skal
+ikke bruges til andet end at beregne et foreslået tidsskridt med.
 
-** En funktion til at finde dt
+Den behøver ikke tage hensyn til hvad der trænger ind i bioporerne fra
+oven, da vi er mest bekymret for bioporerne som sink.
 
-** Omsætning skal være uafhængig af tidsskridt.
+** Prøv med denne som begrænsning (suggest dt)
 
-** Movement skal bestemme tidsskridt fra S termer.
+*** Vand: 
+
+abs (S) * dt < f_Theta * Theta_avail
+
+*** Stof: 
+
+dt * -S * C_secondary < M_secondary
+
+ELLER (parameter)
+
+dt * -S * C_secondary < M_total
 
 * Prøv 2D med MACRO hydraulics
 

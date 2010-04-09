@@ -142,9 +142,10 @@ struct BioclimateStandard : public Bioclimate
                           double dt, Treelog&);
 
   // Radiation.
-  static double albedo (const Vegetation& crops, const Litter& litter,
-                        const Surface& surface, 
-                        const Geometry&, const Soil&, const SoilWater&);
+  static double find_albedo (const Vegetation& crops, const Litter& litter,
+                             const Surface& surface, 
+                             const Geometry&, const Soil&, const SoilWater&);
+  double albedo;                  // Reflection factor []
   std::auto_ptr<Raddist> raddist;// Radiation distribution model.
   const double min_sin_beta_;     // Sinus to lowest sun angle for some models.
   void RadiationDistribution (const Vegetation&, double sin_beta, Treelog&);
@@ -476,6 +477,7 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     crop_ea_svat (0.0),
     crop_ea_ (0.0),
     production_stress (-1.0),
+    albedo (NAN),
     raddist (Librarian::build_item<Raddist> (al, "raddist")),
     min_sin_beta_ (std::sin (al.number ("min_sun_angle"))),
     difrad (al.check ("difrad") 
@@ -549,10 +551,10 @@ BioclimateStandard::CanopyStructure (const Vegetation& vegetation)
 }
 
 double 
-BioclimateStandard::albedo (const Vegetation& crops, const Litter& litter,
-                            const Surface& surface, 
-                            const Geometry& geo,
-                            const Soil& soil, const SoilWater& soil_water)
+BioclimateStandard::find_albedo (const Vegetation& crops, const Litter& litter,
+                                 const Surface& surface, 
+                                 const Geometry& geo,
+                                 const Soil& soil, const SoilWater& soil_water)
 {
   const double surface_albedo = surface.albedo (geo, soil, soil_water);
   const double litter_albedo = litter.albedo ();
@@ -652,9 +654,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
   const double air_temperature = weather.air_temperature ();//[dg C]
   const double VaporPressure = weather.vapor_pressure ();
   const double Si = weather.global_radiation ();
-  const double Albedo = albedo (vegetation, litter, surface, 
-                                geo, soil, soil_water);
-  net_radiation->tick (Cloudiness, air_temperature, VaporPressure, Si, Albedo,
+  albedo = find_albedo (vegetation, litter, surface, geo, soil, soil_water);
+  net_radiation->tick (Cloudiness, air_temperature, VaporPressure, Si, albedo,
                        msg);
   const double Rn = net_radiation->net_radiation ();
 
@@ -1116,6 +1117,7 @@ void
 BioclimateStandard::output (Log& log) const
 {
   output_variable (Height, log);
+  output_variable (albedo, log);
   output_derived (net_radiation, "net_radiation", log);
   output_derived (raddist, "raddist", log);
   daisy_assert (pet.get () != NULL);
@@ -1423,6 +1425,8 @@ what the SVAT module requires.");
                    "Measured wind speed.");
 
     //Radiation
+    frame.declare ("albedo", Attribute::None (), Attribute::LogOnly, "\
+Reflection factor.");
     frame.declare ("min_sun_angle", "rad", Attribute::Const, "\
 Minimum sun angle above ground for some 'raddist' and 'svat' models.\n\
 \n\

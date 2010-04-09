@@ -231,8 +231,9 @@ bool
 LogDLF::contain_time_columns (const std::vector<Select*>& entries)
 {
   static const symbol time ("time");
+  static const symbol previous ("previous");
   for (unsigned int i = 0; i < entries.size (); i++)
-    if (entries[i]->path[0] == time)
+    if (entries[i]->path[0] == time || (entries[i]->path[0] == previous))
       return true;
   return false;
 }

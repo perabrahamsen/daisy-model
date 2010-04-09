@@ -1,3 +1,11 @@
+2010-04-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* bioclimate_std.C (albedo): Made it logable.
+
+	* weather_std.C (tick): Work with small timesteps.
+
+	* log_dlf.C (contain_time_columns): "previous" is also a time column.
+
 2010-04-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.84 released.

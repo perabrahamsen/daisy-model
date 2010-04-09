@@ -522,6 +522,10 @@ WeatherStandard::has_data (const std::string& name)
 void
 WeatherStandard::tick (const Time& time, Treelog& msg)
 {
+  // Currently limited to hourly discretization.
+  if (hour == time.hour ())
+    return;
+
   Treelog::Open nest (msg, "Weather: " + name);
 
   WeatherBase::tick (time, msg);
