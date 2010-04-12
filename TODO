@@ -1,11 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Osvaldo: Send resultat af hans simulering
-
-* Kørsel: 10 sec
-
-Hvad sker der?
-
 * Variable tidsskridt
 
 ** tertiary biopores
@@ -31,6 +25,16 @@ dt * -S * C_secondary < M_secondary
 ELLER (parameter)
 
 dt * -S * C_secondary < M_total
+
+* Kørsel: 10 sec
+
+Hvad sker der?  Meget mindre vand i dræn???????????
+
+Test 1C-Center (10 sec) mod 1C-Center (1 hour)
+
+Det ser ud til at være Bioporer der er problemet.
+
+Prøv igen når vi har variable tidsskridt
 
 * Prøv 2D med MACRO hydraulics
 

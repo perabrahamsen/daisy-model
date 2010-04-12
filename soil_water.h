@@ -127,6 +127,9 @@ public:
   double K_cell (size_t i) const
   { return K_cell_[i]; }
 
+  const std::vector<double>& h_all () const
+  { return h_; }
+
   // Modify.
 public:
   void set_content (size_t cell, double h, double Theta);

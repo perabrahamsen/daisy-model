@@ -1,3 +1,9 @@
+2010-04-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* soil_water.h (h_all): New function.
+	* tertiary_biopores.C (tick_source): New function.
+	(tick): Use it.
+
 2010-04-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.85 released.

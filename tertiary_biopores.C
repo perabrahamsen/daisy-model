@@ -96,6 +96,7 @@ struct TertiaryBiopores : public Tertiary
   // - For use by column.
   void deactivate (const int steps)
   { deactivate_steps += steps; }
+  void tick_source (const Geometry&, const SoilWater&, Treelog&);
   void tick (const Units&, const Geometry& geo, const Soil& soil, 
              const SoilHeat& soil_heat, const double dt, 
              SoilWater& soil_water, Surface& surface, Treelog& msg);
@@ -262,18 +263,29 @@ TertiaryBiopores::clear ()
 }
 
 void
+TertiaryBiopores::tick_source (const Geometry& geo, const SoilWater& soil_water,
+                               Treelog& msg)
+{
+  // Clear old infiltration.
+  clear ();
+
+  // Find matrix state.
+  const std::vector<double>& h = soil_water.h_all ();
+  update_active (geo, h, msg);
+}
+
+void
 TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil, 
                         const SoilHeat& soil_heat, const double dt, 
                         SoilWater& soil_water, Surface& surface, Treelog& msg)
 {
+  tick_source (geo, soil_water, msg);
+
   Treelog::Open nest (msg, component + std::string (": ") + name);
 
   // Flux.
   const size_t edge_size = geo.edge_size ();
   std::vector<double> q_tertiary (edge_size, 0.0);
-
-  // Clear old infiltration.
-  clear ();
 
   // Infiltration.
   const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
@@ -332,13 +344,8 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   // Keep original state.
   const Anystate old_state = get_state ();
 
-  // Find matrix state.
-  std::vector<double> h;
-  for (size_t c = 0; c < cell_size; c++)
-    h.push_back (soil_water.h (c));
-  update_active (geo, h, msg);
-  
   // Find an implicit solution.
+  const std::vector<double>& h = soil_water.h_all ();
   ddt = dt;
   find_implicit_water (old_state, geo, soil, soil_heat, h, ddt);
   

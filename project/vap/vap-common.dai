@@ -98,8 +98,7 @@
                     (tag "SW025cm")
                     (dimension "%")
                     (spec fixed SoilWater Theta))
-           (number (path column "${column}" Movement vertical
-                         Drain lateral height)
+           (number (path column "${column}" Drain lateral height)
                    (tag "GWT")
                    (spec drain lateral height))
            (flux_bottom (path column "${column}" Chemistry "*"

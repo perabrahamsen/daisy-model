@@ -363,7 +363,8 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
         = (wall_top - low_point) / (cell_top - cell_bottom);
       S = - wall_fraction * biopore_to_matrix (R_wall, M_c, r_c, h, h3_cell);
     }
-  else if ((allow_upward_flow || cell_z > z3_lowest) && active && h>h3_cell + h_barrier)
+  else if ((allow_upward_flow || cell_z > z3_lowest) 
+           && active && h>h3_cell + h_barrier)
     {
       // The largest pressure gradient between the domains are
       // pressure_limit, above that we claim air will disrupt the suction.
@@ -385,7 +386,7 @@ BioporeMatrix::find_matrix_sink (const Geometry& geo,
                                  const double pressure_limit,
                                  const std::vector<double>& h3_bottom, 
                                  const std::vector<double>& h, 
-                                 const double dt,
+                                 const double /* dt */,
                                  std::vector<double>& S3) const
 {
   // Find sink terms per cell.
