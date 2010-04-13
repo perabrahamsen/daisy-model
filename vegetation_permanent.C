@@ -40,6 +40,7 @@
 #include "bioclimate.h"
 #include "soil_heat.h"
 #include "block_model.h"
+#include <boost/scoped_ptr.hpp>
 #include <sstream>
 #include <deque>
 
@@ -61,7 +62,7 @@ struct VegetationPermanent : public Vegetation
   } yearly_LAI;
   const PLF LAIvsDAY;		// LAI as a function of time.
   const double LAIfactor;       // Multiply by this. []
-  CanopySimple canopy;
+  boost::scoped_ptr<CanopySimple> canopy;
   double cover_;		// Fraction of soil covered by crops [0-1]
   PLF HvsLAI_;			// Height with LAI below [f: R -> cm]
 
@@ -75,7 +76,7 @@ struct VegetationPermanent : public Vegetation
   double N_litter;		// N litter this hour. [g N/m^2/h]
   const std::vector<boost::shared_ptr<const FrameModel>/**/>& litter_am; // Litter AM parameters.
   // Root.
-  std::auto_ptr<RootSystem> root_system;
+  boost::scoped_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
 
   // Radiation.
@@ -83,46 +84,46 @@ struct VegetationPermanent : public Vegetation
 
   // Queries.
   double rs_min () const	// Minimum transpiration resistance.
-  { return canopy.rs_min; }
+  { return canopy->rs_min; }
   double rs_max () const	// Maximum transpiration resistance.
-  { return canopy.rs_max; }
+  { return canopy->rs_max; }
   double shadow_stomata_conductance () const
   { return 1.0 / rs_min (); }
   double sunlit_stomata_conductance () const
   { return 1.0 / rs_min (); }
   double LAI () const
-  { return canopy.CAI; }
+  { return canopy->CAI; }
   double height () const
-  { return canopy.Height; }
+  { return canopy->Height; }
   double leaf_width () const
-  { return canopy.leaf_width (1.0  /* arbitrary */); }
+  { return canopy->leaf_width (1.0  /* arbitrary */); }
   double cover () const
   { 
     daisy_assert (cover_ >= 0.0);
     return cover_; 
   }
   const PLF& LAIvsH () const
-  { return canopy.LAIvsH; }
+  { return canopy->LAIvsH; }
   const PLF& HvsLAI () const
   { return HvsLAI_; }
   double ACExt_PAR () const
-  { return canopy.PARext; }
+  { return canopy->PARext; }
   double ACRef_PAR () const
-  { return canopy.PARref; }
+  { return canopy->PARref; }
   double ACExt_NIR () const
-  { return canopy.PARext; }
+  { return canopy->PARext; }
   double ACRef_NIR () const
-  { return canopy.PARref; }
+  { return canopy->PARref; }
   double ARExt () const
-  { return canopy.EPext; }
+  { return canopy->EPext; }
   double EpFactorDry () const
-  { return canopy.EpFactorDry (1.0 /* arbitrary */); }
+  { return canopy->EpFactorDry (1.0 /* arbitrary */); }
   double EpFactorWet () const
-  { return canopy.EpFactorWet (1.0 /* arbitrary */); }
+  { return canopy->EpFactorWet (1.0 /* arbitrary */); }
   double albedo () const
   { return albedo_; }
   double interception_capacity () const
-  { return canopy.IntcpCap * LAI (); }
+  { return canopy->IntcpCap * LAI (); }
 
 
   // Individual crop queries.
@@ -255,17 +256,17 @@ VegetationPermanent::YearlyLAI::YearlyLAI
 void
 VegetationPermanent::reset_canopy_structure (const Time& time)
 {
-  canopy.CAI = yearly_LAI (time.year (), time.yday ());
-  if (canopy.CAI < 0.0)
-    canopy.CAI = LAIvsDAY (time.yday ());
-  canopy.CAI *= LAIfactor;
-  cover_ =  1.0 - exp (-(canopy.EPext * canopy.CAI));
+  canopy->CAI = yearly_LAI (time.year (), time.yday ());
+  if (canopy->CAI < 0.0)
+    canopy->CAI = LAIvsDAY (time.yday ());
+  canopy->CAI *= LAIfactor;
+  cover_ =  1.0 - exp (-(canopy->EPext * canopy->CAI));
   daisy_assert (cover_ >= 0.0);
   daisy_assert (cover_ <= 1.0);
-  canopy.LAIvsH.clear ();
-  canopy.LAIvsH.add (0.0, 0.0);
-  canopy.LAIvsH.add (canopy.Height, canopy.CAI);
-  HvsLAI_ = canopy.LAIvsH.inverse ();
+  canopy->LAIvsH.clear ();
+  canopy->LAIvsH.add (0.0, 0.0);
+  canopy->LAIvsH.add (canopy->Height, canopy->CAI);
+  HvsLAI_ = canopy->LAIvsH.inverse ();
 }
 void
 VegetationPermanent::tick (const Metalib& metalib,
@@ -281,7 +282,7 @@ VegetationPermanent::tick (const Metalib& metalib,
                            const double dt, Treelog& msg)
 {
   // Canopy.
-  const double old_LAI = canopy.CAI;
+  const double old_LAI = canopy->CAI;
   reset_canopy_structure (time);
 
   // Root system.
@@ -291,7 +292,7 @@ VegetationPermanent::tick (const Metalib& metalib,
   root_system->tick_dynamic (T_soil, day_fraction, soil_water, dt);
 
   // Nitrogen uptake.
-  N_demand = canopy.CAI * N_per_LAI;
+  N_demand = canopy->CAI * N_per_LAI;
   if (N_actual < -1e10)
     N_actual = N_demand;	// Initialization.
   else
@@ -300,7 +301,7 @@ VegetationPermanent::tick (const Metalib& metalib,
                                            chemistry, 0.0, 0.0,
                                            N_demand - N_actual, dt);
   
-  if (canopy.CAI < old_LAI)
+  if (canopy->CAI < old_LAI)
     {
       // Litter.
       static const double C_per_DM = 0.420;
@@ -308,7 +309,7 @@ VegetationPermanent::tick (const Metalib& metalib,
       static const double ha_per_cm2 = 1.0e-8;
       static const double m2_per_cm2 = 1.0e-4;
       
-      const double dLAI = old_LAI - canopy.CAI;
+      const double dLAI = old_LAI - canopy->CAI;
       const double DM = dLAI * DM_per_LAI * g_per_Mg 
         *ha_per_cm2 / m2_per_cm2; // [g DM/m^2]
       const double C = DM * C_per_DM; // [g C/m^2]
@@ -347,7 +348,7 @@ VegetationPermanent::transpiration (const Units& units,
 				    const double dt, 
                                     Treelog& msg)
 {
-  if (canopy.CAI > 0.0)
+  if (canopy->CAI > 0.0)
     return  root_system->water_uptake (units, potential_transpiration, 
                                        geo, soil, soil_water, 
                                        canopy_evaporation, 
@@ -359,7 +360,7 @@ void
 VegetationPermanent::output (Log& log) const
 {
   Vegetation::output (log);
-  output_submodule (canopy, "Canopy", log);
+  output_submodule (*canopy, "Canopy", log);
   output_variable (N_demand, log);
   output_variable (N_actual, log);
   output_variable (N_uptake, log);
@@ -398,7 +399,7 @@ VegetationPermanent::VegetationPermanent (const BlockModel& al)
     yearly_LAI (al.submodel_sequence ("YearlyLAI")),
     LAIvsDAY (al.plf ("LAIvsDAY")),
     LAIfactor (al.number ("LAIfactor")),
-    canopy (al.submodel ("Canopy")),
+    canopy (submodel<CanopySimple> (al, "Canopy")),
     cover_ (-42.42e42),
     N_per_LAI (al.number ("N_per_LAI") * 0.1), // [kg N / ha] -> [g N / m^2]
     DM_per_LAI (al.number ("DM_per_LAI")),
@@ -412,7 +413,7 @@ VegetationPermanent::VegetationPermanent (const BlockModel& al)
     WRoot (al.number ("root_DM") * 100.0), // [Mg DM / ha] -> [g DM / m^2]
     albedo_ (al.number ("Albedo"))
 {
-  canopy.Height = al.number ("Height");
+  canopy->Height = al.number ("Height");
 }
 
 VegetationPermanent::~VegetationPermanent ()

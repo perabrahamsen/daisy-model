@@ -52,26 +52,27 @@
 #include "treelog.h"
 #include "frame.h"
 #include "block_model.h"
+#include <boost/scoped_ptr.hpp>
 #include <sstream>
 #include <numeric>
 
 struct CropStandard : public Crop
 {
   // Content.
-  const std::auto_ptr<Seed> seed;
-  const std::auto_ptr<RootSystem> root_system;
-  CanopyStandard canopy;
-  std::auto_ptr<Harvesting> harvesting;
+  const boost::scoped_ptr<Seed> seed;
+  const boost::scoped_ptr<RootSystem> root_system;
+  const boost::scoped_ptr<CanopyStandard> canopy;
+  boost::scoped_ptr<Harvesting> harvesting;
   Production production;
-  std::auto_ptr<Time> last_time;
-  std::auto_ptr<Phenology> development;
+  boost::scoped_ptr<Time> last_time;
+  boost::scoped_ptr<Phenology> development;
   const Partition partition;
-  std::auto_ptr<Vernalization> vernalization;
-  const std::auto_ptr<Photo> shadow;
-  const std::auto_ptr<Photo> sunlit;
-  const std::auto_ptr<Photo> reserved;
+  boost::scoped_ptr<Vernalization> vernalization;
+  const boost::scoped_ptr<Photo> shadow;
+  const boost::scoped_ptr<Photo> sunlit;
+  const boost::scoped_ptr<Photo> reserved;
   CrpN nitrogen;
-  const std::auto_ptr<WSE> water_stress_effect;
+  const boost::scoped_ptr<WSE> water_stress_effect;
   const bool enable_N_stress;
   const double min_light_fraction;
 
@@ -80,9 +81,9 @@ struct CropStandard : public Crop
   { return min_light_fraction; }
 
   double rs_min () const	// Minimum transpiration resistance.
-  { return canopy.rs_min; }
+  { return canopy->rs_min; }
   double rs_max () const	// Maximum transpiration resistance.
-  { return canopy.rs_max; }
+  { return canopy->rs_max; }
   double shadow_stomata_conductance () const // Current gs [m/s FIELD].
   {
     
@@ -102,34 +103,34 @@ struct CropStandard : public Crop
     return gs; 
   }
   double leaf_width () const
-  { return canopy.leaf_width (DS ()); }
+  { return canopy->leaf_width (DS ()); }
 
   double height () const	// Crop height [cm]
-  { return canopy.Height; }
+  { return canopy->Height; }
   double LAI () const
-  { return canopy.CAI; }
+  { return canopy->CAI; }
   double SimLAI () const
-  { return canopy.SimCAI; }
+  { return canopy->SimCAI; }
   const PLF& LAIvsH () const
-  { return canopy.LAIvsH; }
+  { return canopy->LAIvsH; }
   double PARext () const
-  { return canopy.PARext; }
+  { return canopy->PARext; }
   double PARref () const
-  { return canopy.PARref; }
+  { return canopy->PARref; }
   double NIRext () const
-  { return canopy.PARext; }
+  { return canopy->PARext; }
   double NIRref () const
-  { return canopy.PARref; }
+  { return canopy->PARref; }
   double EPext () const
-  { return canopy.EPext; }
+  { return canopy->EPext; }
   double IntcpCap () const	// Interception Capacity.
-  { return canopy.IntcpCap; }
+  { return canopy->IntcpCap; }
   double EpFacDry () const		// Convertion to potential evapotransp.
-  { return canopy.EpFactorDry (DS ()); }
+  { return canopy->EpFactorDry (DS ()); }
   double EpFacWet () const		// Convertion to potential evapotransp.
-  { return canopy.EpFactorWet (DS ()); }
+  { return canopy->EpFactorWet (DS ()); }
   void CanopyStructure ()
-  { canopy.CanopyStructure (development->DS); }
+  { canopy->CanopyStructure (development->DS); }
   double ActualWaterUptake (const Units& units, double Ept, 
                             const Geometry& geo,
 			    const Soil& soil, const SoilWater& soil_water,
@@ -217,9 +218,9 @@ struct CropStandard : public Crop
 double 
 CropStandard::DM (const double height) const
 {
-  const double stem_harvest = bound (0.0, (1.0 - height / canopy.Height), 1.0);
-  const double leaf_harvest = (canopy.CAI > 0.0 && height < canopy.Height)
-    ? bound (0.0, (1.0 - canopy.LAIvsH (height)  / canopy.CAI), 1.0)
+  const double stem_harvest = bound (0.0, (1.0 - height / canopy->Height), 1.0);
+  const double leaf_harvest = (canopy->CAI > 0.0 && height < canopy->Height)
+    ? bound (0.0, (1.0 - canopy->LAIvsH (height)  / canopy->CAI), 1.0)
     : 0.0;
   const double sorg_harvest = (height < harvesting->sorg_height) ? 1.0 : 0.0;
   const double total = stem_harvest * (production.WStem + production.WDead)
@@ -229,8 +230,8 @@ CropStandard::DM (const double height) const
 #if 0
   std::ostringstream tmp;
   tmp << "height = " << height << ", CAI (height) = "  
-      << ((leaf_harvest > 0.0) ? canopy.LAIvsH (height) : 0.0 )
-      << ", CAI = " << canopy.CAI 
+      << ((leaf_harvest > 0.0) ? canopy->LAIvsH (height) : 0.0 )
+      << ", CAI = " << canopy->CAI 
       << ", leaf_harvest = " << leaf_harvest 
       << ", sorg_harvest = " << sorg_harvest << ", total = " << total * 10.0;
   Assertion::message (tmp.str ());
@@ -290,9 +291,9 @@ CropStandard::initialize_shared (const Metalib& metalib, const Geometry& geo,
       
       // Update derived state content.
       const double WLeaf = production.WLeaf;
-      const double SpLAI = canopy.specific_LAI (DS);
+      const double SpLAI = canopy->specific_LAI (DS);
       const double seed_CAI = seed->forced_CAI (WLeaf, SpLAI, DS);
-      canopy.tick (WLeaf, production.WSOrg, production.WStem, DS, 
+      canopy->tick (WLeaf, production.WSOrg, production.WStem, DS, 
 		   // We don't save the forced CAI, use simulated CAI
 		   //  until midnight (small error).
 		   seed_CAI);
@@ -381,7 +382,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
       const double height = PAR_height[i+1];
       daisy_assert (height < PAR_height[i]);
 
-      if (top_crop && height <= canopy.Height)
+      if (top_crop && height <= canopy->Height)
         {
           // We count day hours at the top of the crop.
           top_crop = false;
@@ -396,9 +397,9 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
   // photosynthesis.  N content above critical is considered
   // luxury, and also not used in photosynthesis.
   const double N_at_Nf 
-    = canopy.corresponding_WLeaf (DS) * nitrogen.NfLeafCnc (DS);
+    = canopy->corresponding_WLeaf (DS) * nitrogen.NfLeafCnc (DS);
   const double N_at_Cr
-    = canopy.corresponding_WLeaf (DS) * nitrogen.CrLeafCnc (DS);
+    = canopy->corresponding_WLeaf (DS) * nitrogen.CrLeafCnc (DS);
   const double N_above_Nf = production.NLeaf - N_at_Nf;
   const double rubiscoN = bound (0.0, N_above_Nf, N_at_Cr - N_at_Nf);
   daisy_assert (rubiscoN >= 0.0);
@@ -431,7 +432,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
                                      T_canopy, T_leaf_shadow,
                                      rubiscoN, shadow_PAR, PAR_height,
                                      total_LAI, fraction_shadow_LAI, dt,
-                                     canopy, *development, msg)
+                                     *canopy, *development, msg)
           * bioclimate.shared_light_fraction ();
         }
 
@@ -448,7 +449,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
                                      T_canopy, T_leaf_sun,
                                      rubiscoN, sun_PAR,  PAR_height,
                                      total_LAI, fraction_sun_LAI, dt,
-                                     canopy, *development, msg)
+                                     *canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
         }
     }
@@ -473,7 +474,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
                                    T_canopy, bioclimate.canopy_temperature(),
                                    rubiscoN, PAR, PAR_height,
                                    bioclimate.LAI (), fraction_total_LAI, dt,
-                                   canopy, *development, msg)
+                                   *canopy, *development, msg)
         * min_light_fraction;
     }
   daisy_assert (std::isfinite (Ass));
@@ -540,9 +541,9 @@ CropStandard::tick (const Metalib& metalib,
 	{
 	  msg.message ("Emerging");
           const double WLeaf = production.WLeaf;
-          const double SpLAI = canopy.specific_LAI (DS);
+          const double SpLAI = canopy->specific_LAI (DS);
           const double seed_CAI = seed->forced_CAI (WLeaf, SpLAI, DS);
-	  canopy.tick (production.WLeaf, production.WSOrg,
+	  canopy->tick (production.WLeaf, production.WSOrg,
 		       production.WStem, DS, seed_CAI);
 	  nitrogen.content (DS, production, msg);
 	  root_system->tick_daily (geo, soil, production.WRoot, 0.0,
@@ -612,7 +613,7 @@ CropStandard::tick (const Metalib& metalib,
   const double seed_C = seed->release_C (dt);
   production.tick (bioclimate.daily_air_temperature (), T_soil_3,
 		   root_system->Density, geo, DS, 
-		   canopy.CAImRat, nitrogen, nitrogen_stress, seed_C, 
+		   canopy->CAImRat, nitrogen, nitrogen_stress, seed_C, 
                    partition, 
 		   residuals_DM, residuals_N_top, residuals_C_top,
 		   residuals_N_soil, residuals_C_soil, dt, msg);
@@ -621,9 +622,9 @@ CropStandard::tick (const Metalib& metalib,
     return;
 
   const double WLeaf = production.WLeaf;
-  const double SpLAI = canopy.specific_LAI (DS);
+  const double SpLAI = canopy->specific_LAI (DS);
   const double seed_CAI = seed->forced_CAI (WLeaf, SpLAI, DS);
-  canopy.tick (WLeaf, production.WSOrg, production.WStem, 
+  canopy->tick (WLeaf, production.WSOrg, production.WStem, 
                DS, ForcedCAI < 0.0 ? seed_CAI : ForcedCAI);
 
   development->tick_daily (bioclimate.daily_air_temperature (), 
@@ -661,14 +662,14 @@ CropStandard::harvest (const Metalib& metalib,
   // Leave stem and leaf below stub alone.
   double stem_harvest;
   double leaf_harvest;
-  if (stub_length < canopy.Height)
+  if (stub_length < canopy->Height)
     {
-      stem_harvest = (1.0 - stub_length / canopy.Height);
+      stem_harvest = (1.0 - stub_length / canopy->Height);
 
-      if (canopy.CAI > 0.0)
+      if (canopy->CAI > 0.0)
 	{
-	  const double stub_CAI = canopy.LAIvsH (stub_length);
-	  leaf_harvest = (1.0 - stub_CAI / canopy.CAI);
+	  const double stub_CAI = canopy->LAIvsH (stub_length);
+	  leaf_harvest = (1.0 - stub_CAI / canopy->CAI);
 	}
       else 
 	leaf_harvest = 0.0;
@@ -705,7 +706,7 @@ CropStandard::harvest (const Metalib& metalib,
 	      // We want a cut to always put back development, even
 	      // for a crop which is so retarded that it has no stem
 	      // worth speaking about, and hence, no height.
-	      const double DS_height = canopy.DS_at_height (stub_length);
+	      const double DS_height = canopy->DS_at_height (stub_length);
 	      if (development->DS > DS_height)
 		development->DS = std::max (DS_height, 0.01);
 	    }
@@ -713,12 +714,12 @@ CropStandard::harvest (const Metalib& metalib,
 	    development->DS = harvesting->DSnew;
 	  
 	  // Cut canopy.
-	  canopy.cut (production.WStem, development->DS, stub_length);
+	  canopy->cut (production.WStem, development->DS, stub_length);
 
-	  daisy_assert (approximate (canopy.CropHeight (production.WStem,
+	  daisy_assert (approximate (canopy->CropHeight (production.WStem,
 							development->DS), 
-				     canopy.Height));
-	  canopy.CropCAI (production.WLeaf, production.WSOrg,
+				     canopy->Height));
+	  canopy->CropCAI (production.WLeaf, production.WSOrg,
 			  production.WStem, development->DS);
 	  if (LAI () > 0.0)
 	    CanopyStructure ();
@@ -775,7 +776,7 @@ CropStandard::pluck (const Metalib& metalib,
 	    development->DS = harvesting->DSnew;
 	  
 	  // Reset canopy.
-	  canopy.CropCAI (production.WLeaf, production.WSOrg,
+	  canopy->CropCAI (production.WLeaf, production.WSOrg,
 			  production.WStem, development->DS);
 	  if (LAI () > 0.0)
 	    CanopyStructure ();
@@ -791,7 +792,7 @@ CropStandard::output (Log& log) const
 {
   output_derived (seed, "Seed", log);
   output_submodule (*root_system, "Root", log);
-  output_submodule (canopy, "Canopy", log);
+  output_submodule (*canopy, "Canopy", log);
   output_submodule (*harvesting, "Harvest", log);
 #if 1
   static const symbol Prod_symbol ("Prod");
@@ -833,7 +834,7 @@ CropStandard::CropStandard (const BlockModel& al)
   : Crop (al),
     seed (Librarian::build_item<Seed> (al, "Seed")),
     root_system (submodel<RootSystem> (al, "Root")),
-    canopy (al.submodel ("Canopy")),
+    canopy (submodel<CanopyStandard> (al, "Canopy")),
     harvesting (submodel<Harvesting> (al, "Harvest")),
     production (al.submodel ("Prod")),
     last_time (al.check ("last_time")

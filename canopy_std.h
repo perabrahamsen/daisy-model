@@ -26,7 +26,7 @@
 #include <vector>
 
 class Frame;
-class FrameSubmodel;
+class BlockSubmodel;
 
 class CanopyStandard : public CanopySimple
 {
@@ -78,7 +78,7 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Frame&);
-  CanopyStandard (const FrameSubmodel&);
+  CanopyStandard (const BlockSubmodel&);
   ~CanopyStandard ();
 };
 

@@ -1,5 +1,9 @@
 2010-04-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* canopy_simple.h, canopy_simple.C, canopy_std.h, canopy_std.C:
+	* vegetation_permanent.C, crop_simple.C, crop_std.C:
+	Made canopy constructors take BlockSubmodel arguments.
+
 	* fetch.C (select_dimension): Initialize.
 
 	* tortuosity_linear.C (h_wp): Made it const.

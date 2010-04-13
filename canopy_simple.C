@@ -23,7 +23,7 @@
 
 #include "canopy_simple.h"
 #include "log.h"
-#include "frame_submodel.h"
+#include "block_submodel.h"
 #include "librarian.h"
 
 double
@@ -98,7 +98,7 @@ By default this is identical to EpFac.");
 	      "Accumulated Leaf Area Index at Height.");
 }
 
-CanopySimple::CanopySimple (const FrameSubmodel& vl)
+CanopySimple::CanopySimple (const BlockSubmodel& vl)
   : PARref (vl.number ("PARref")),
     PARext (vl.number ("PARext")),
     NIRref (vl.number ("NIRref")),

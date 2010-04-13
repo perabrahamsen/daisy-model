@@ -23,7 +23,7 @@
 
 #include "canopy_std.h"
 #include "log.h"
-#include "frame_submodel.h"
+#include "block_submodel.h"
 #include "mathlib.h"
 #include "librarian.h"
 
@@ -289,7 +289,7 @@ If the relative PAR get below this, the bottom leaves will start dying.");
 	      "(CAIm - CAI) / CAIm.");
 }
 
-CanopyStandard::CanopyStandard (const FrameSubmodel& vl)
+CanopyStandard::CanopyStandard (const BlockSubmodel& vl)
   : CanopySimple (vl),
     SpLAI (vl.number ("SpLAI")),
     LeafAIMod (vl.plf ("LeafAIMod")),

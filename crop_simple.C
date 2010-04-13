@@ -42,6 +42,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
+#include <boost/scoped_ptr.hpp>
 
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
@@ -52,7 +53,7 @@ public:
   // Canopy.
   const PLF LAIvsT;		// LAI as a function of time.
   double forced_LAI;		// Minimum LAI to use until exceeded by LAIvsTS
-  CanopySimple& canopy;
+  boost::scoped_ptr<CanopySimple> canopy;
   const double height_max;	// Max height of canopy [cm]
 
   // Temperature sum and day.
@@ -86,33 +87,33 @@ public:
   // Communication with Bioclimate.
 public:
   double rs_min () const	// Minimum transpiration resistance.
-  { return canopy.rs_min; }
+  { return canopy->rs_min; }
   double rs_max () const	// Maximum transpiration resistance.
-  { return canopy.rs_max; }
+  { return canopy->rs_max; }
   double leaf_width () const
-  { return canopy.leaf_width (DS ()); }
+  { return canopy->leaf_width (DS ()); }
   double height () const	// Crop height [cm]
-  { return canopy.Height; }
+  { return canopy->Height; }
   double LAI () const
-  { return canopy.CAI; }
+  { return canopy->CAI; }
   const PLF& LAIvsH () const
-  { return canopy.LAIvsH; }
+  { return canopy->LAIvsH; }
   double PARext () const
-  { return canopy.PARext; }
+  { return canopy->PARext; }
   double PARref () const
-  { return canopy.PARref; }
+  { return canopy->PARref; }
   double NIRext () const
-  { return canopy.PARext; }
+  { return canopy->PARext; }
   double NIRref () const
-  { return canopy.PARref; }
+  { return canopy->PARref; }
   double EPext () const
-  { return canopy.EPext; }
+  { return canopy->EPext; }
   double IntcpCap () const	// Interception Capacity.
-  { return canopy.IntcpCap; }
+  { return canopy->IntcpCap; }
   double EpFacDry () const		// Convertion to potential evapotransp.
-  { return canopy.EpFactorDry (DS ()); }
+  { return canopy->EpFactorDry (DS ()); }
   double EpFacWet () const		// Convertion to potential evapotransp.
-  { return canopy.EpFactorWet (DS ()); }
+  { return canopy->EpFactorWet (DS ()); }
   void CanopyStructure ();
   void CropCAI ();
   double ActualWaterUptake (const Units&, double Ept, const Geometry& geo,
@@ -183,9 +184,9 @@ void
 CropSimple::CanopyStructure ()
 {
   // Uniform vertical distribution of leafs.
-  canopy.LAIvsH.clear ();
-  canopy.LAIvsH.add (0.0, 0.0);
-  canopy.LAIvsH.add (canopy.Height, canopy.CAI);
+  canopy->LAIvsH.clear ();
+  canopy->LAIvsH.add (0.0, 0.0);
+  canopy->LAIvsH.add (canopy->Height, canopy->CAI);
 }
 
 void
@@ -196,11 +197,11 @@ CropSimple::CropCAI ()
   else
     T = day;
 
-  canopy.CAI = LAIvsT (T);
+  canopy->CAI = LAIvsT (T);
 
-  if (canopy.CAI < forced_LAI)
-    canopy.CAI = forced_LAI;
-  else if (canopy.CAI > forced_LAI)
+  if (canopy->CAI < forced_LAI)
+    canopy->CAI = forced_LAI;
+  else if (canopy->CAI > forced_LAI)
     forced_LAI = 0.0;
 }
 
@@ -277,7 +278,7 @@ CropSimple::tick (const Metalib&, const Time& time, const Bioclimate& bioclimate
 	  const double T_growth = T_flowering - T_emergence;
 	  const double this_far = (T - T_emergence) / T_growth;
 	  
-	  canopy.Height = height_max * this_far;
+	  canopy->Height = height_max * this_far;
 	  root_system->tick_daily (geo, soil, WRoot * this_far, true, 
                                    DS (), msg);
 	}
@@ -363,7 +364,7 @@ void
 CropSimple::output (Log& log) const
 {
   output_variable (forced_LAI, log);
-  output_submodule (canopy, "Canopy", log);
+  output_submodule (*canopy, "Canopy", log);
   output_variable (T_sum, log);
   output_variable (day, log);
   output_submodule (*root_system, "Root", log);
@@ -447,7 +448,7 @@ CropSimple::CropSimple (const BlockModel& al)
   : Crop (al),
     LAIvsT (al.check ("LAIvsTS") ? al.plf ("LAIvsTS") : al.plf ("LAIvsDay")),
     forced_LAI (al.number ("forced_LAI")),
-    canopy (*new CanopySimple (al.submodel ("Canopy"))),
+    canopy (submodel<CanopySimple> (al, "Canopy")),
     height_max (al.number ("height_max")),
     T_sum (al.number ("T_sum")),
     day (al.number ("day")),

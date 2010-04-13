@@ -23,12 +23,13 @@
 #define CANOPY_SIMPLE_H
 
 #include "plf.h"
+#include <boost/noncopyable.hpp>
 
 struct Log;
 struct Frame;
-struct FrameSubmodel;
+struct BlockSubmodel;
 
-class CanopySimple
+class CanopySimple : private boost::noncopyable
 {
   // Paramaters.
 public:
@@ -62,7 +63,7 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Frame&);
-  CanopySimple (const FrameSubmodel&);
+  CanopySimple (const BlockSubmodel&);
   ~CanopySimple ();
 };
 

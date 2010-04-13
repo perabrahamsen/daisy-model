@@ -8,18 +8,15 @@ SoilWater::tick_source
 
 ** Timestep::microseconds
 
-** Prøv med denne som begrænsning (suggest dt)
-
-*** Vand: 
-
-abs (S) * dt < f_Theta * Theta_avail
-
-*** Stof: 
+** Stof begrænsning: 
 
 dt * -S * C_secondary < M_total
 
-Vi kan ikke bruge M_secondary her, da det sekundære domæne skal kunne
-tømmes helt ud.  Men måske 2 * M_secundary?
+ELLER
+
+dt * -S * C_secondary < n * M_secondary; n > 1
+
+Vi kan ikke bruge n <= 1, da det sekundære domæne skal kunne tørre helt ud.
 
 * Kørsel: 10 sec
 
