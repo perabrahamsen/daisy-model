@@ -1,3 +1,7 @@
+2010-04-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.86 released.
+
 2010-04-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* canopy_simple.h, canopy_simple.C, canopy_std.h, canopy_std.C:

@@ -594,7 +594,7 @@ SoilWater::output (Log& log) const
   output_value (h_ice_, "h_ice", log);
   output_value (q_matrix_, "q", log);
   output_value (q_tertiary_, "q_p", log);
-  output_value (K_cell_, "K_cell", log);
+  output_value (K_cell_, "K", log);
   if (std::isnormal (sink_dt))
     {
       output_value (sink_dt, "dt", log);
