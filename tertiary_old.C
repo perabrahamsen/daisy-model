@@ -47,6 +47,9 @@ struct TertiaryOld : public Tertiary
   // Simulation.
   void deactivate (const int)
   { }
+  void tick_source (const Geometry&, const Soil&, const SoilHeat&, 
+                    SoilWater&, Treelog&)
+  { }
   void tick (const Units&, const Geometry& geo, const Soil& soil, 
              const SoilHeat& soil_heat, const double dt, 
              SoilWater& soil_water, Surface& surface, Treelog& msg);

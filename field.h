@@ -126,7 +126,7 @@ public:
   // Simulation.
   void clear ();
   void tick_source (const Time&, const Weather*, Treelog&);
-  double suggest_dt (double max_dt) const;
+  double suggest_dt () const;
   void tick_move (const Metalib& metalib, 
                   const Time&, double dt, const Weather*, 
                   const Scope&, Treelog&);

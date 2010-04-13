@@ -1,3 +1,20 @@
+2010-04-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* fetch.C (select_dimension): Initialize.
+
+	* tortuosity_linear.C (h_wp): Made it const.
+
+	* movement.h, movement.C (tick_source): New function.
+	* column_std.C (tick_source): Call it.
+	* soil_water.h, soil_water.C (S_forward, dt, sink_cell): New log
+	variables.
+	(tick_source, suggest_dt): New functions.
+	* soil_water.C (drain): Call it.
+	* biopore.h, biopore_matrix.C, biopore_drain.C (tick_source):
+	(update_matrix_sink): New functions.
+	* biopore_drain.C, biopore_matrix.C (update_matrix_sink): Adjust.
+	* tertiary_biopores.C (tick_source): Call it.
+
 2010-04-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* soil_water.h (h_all): New function.

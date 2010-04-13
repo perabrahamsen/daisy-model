@@ -124,8 +124,17 @@ struct BioporeMatrix : public Biopore
                          const double pressure_limit,
                          const std::vector<double>& h3_bottom, 
                          const std::vector<double>& h, 
-                         const double dt,
                          std::vector<double>& S3) const;
+  void forward_sink (const Geometry& geo,    
+                     const Soil& soil,  
+                     const std::vector<bool>& active,
+                     const std::vector<double>& K, 
+                     const double h_barrier,
+                     const double pressure_limit,
+                     const std::vector<double>& h, 
+                     std::vector<double>& S3) const;
+  void tick_source (const Geometry& geo, const std::vector<bool>& active,
+                    const std::vector<double>& h);
   void update_matrix_sink (const Geometry& geo,    
                            const Soil& soil,  
                            const std::vector<bool>& active,
@@ -386,7 +395,6 @@ BioporeMatrix::find_matrix_sink (const Geometry& geo,
                                  const double pressure_limit,
                                  const std::vector<double>& h3_bottom, 
                                  const std::vector<double>& h, 
-                                 const double /* dt */,
                                  std::vector<double>& S3) const
 {
   // Find sink terms per cell.
@@ -395,9 +403,61 @@ BioporeMatrix::find_matrix_sink (const Geometry& geo,
     {
       const size_t col = column[c];
       const double M_c = density_column[col]; // [cm^-2]
-      S3[c] = matrix_biopore_matrix (c, geo, soil, active[c], h_barrier, M_c,
-                                     pressure_limit, K[c], z3_lowest[col],
-                                     h3_bottom[col], h[c]);
+      S3[c] += matrix_biopore_matrix (c, geo, soil, active[c], h_barrier, M_c,
+                                      pressure_limit, K[c], z3_lowest[col],
+                                      h3_bottom[col], h[c]);
+    }
+}
+
+void
+BioporeMatrix::forward_sink (const Geometry& geo,    
+                             const Soil& soil,  
+                             const std::vector<bool>& active,
+                             const std::vector<double>& K, 
+                             const double h_barrier,
+                             const double pressure_limit,
+                             const std::vector<double>& h, 
+                             std::vector<double>& S3) const
+{ find_matrix_sink (geo, soil, active, K, h_barrier, pressure_limit, 
+                    h_bottom, h, S3); }
+
+
+void
+BioporeMatrix::tick_source (const Geometry& geo, 
+                            const std::vector<bool>& active,
+                            const std::vector<double>& h)
+{
+  const size_t col_size = xplus.size ();
+  const size_t cell_size = geo.cell_size ();
+
+  // Find lowest unsaturated cell in each column.
+  daisy_assert (z3_lowest.size () == col_size);
+  std::fill (z3_lowest.begin (), z3_lowest.end (), 0.0);
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      if (h[c] > -0.01)
+        // Saturated.
+        continue;
+
+      const size_t col = column[c];
+      const double z = geo.cell_z (c);
+      if (z < z3_lowest[col])
+        z3_lowest[col] = z;
+    }
+
+  // Find estimate based on highest pressured active cell.
+  const double h_capacity = height_start - height_end;
+  daisy_assert (h3_soil.size () == col_size);
+  std::fill (h3_soil.begin (), h3_soil.end (), 0.0);
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      if (!active[c])
+        // Only active cells may participate.
+        continue;
+
+      const size_t col = column[c];
+      const double soil_cell = geo.cell_z (c) + h[c];
+      h3_soil[col] = bound (h3_soil[col], soil_cell - height_end, h_capacity);
     }
 }
 
@@ -413,39 +473,9 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
 {
   // Find initial guess of sink terms per cell, plus the coresponding added
   // removed water volume per column.
-  const double h_capacity = height_start - height_end;
   const size_t col_size = xplus.size ();
   const size_t cell_size = geo.cell_size ();
 
-  // Find estimate based on highest pressured active cell.
-  daisy_assert (h3_soil.size () == col_size);
-  std::fill (h3_soil.begin (), h3_soil.end (), 0.0);
-  for (size_t c = 0; c < cell_size; c++)
-    {
-      if (!active[c])
-        // Only active cells may participate.
-        continue;
-
-      const size_t col = column[c];
-      const double soil_cell = geo.cell_z (c) + h[c];
-      h3_soil[col] = bound (h3_soil[col], soil_cell - height_end, h_capacity);
-    }
-  
-  // Find lowest unsaturated cell in each column.
-  daisy_assert (z3_lowest.size () == col_size);
-  std::fill (z3_lowest.begin (), z3_lowest.end (), 0.0);
-  for (size_t c = 0; c < cell_size; c++)
-    {
-      if (h[c] > -0.01)
-        // Saturated.
-        continue;
-
-      const size_t col = column[c];
-      const double z = geo.cell_z (c);
-      if (z < z3_lowest[col])
-        z3_lowest[col] = z;
-    }
-  
   // Initial guess and interval.
   std::vector<double> h3_min (col_size, 0.0);
   std::vector<double> h3_max (col_size);
@@ -467,9 +497,10 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
   // Main iteration loop.
   for (iterations = 0; iterations < max_iterations; iterations++)
     {
+      std::fill (S.begin (), S.end (), 0.0);
       find_matrix_sink (geo, soil, active, K, 
                         h_barrier, pressure_limit,
-                        guess, h, dt, S);
+                        guess, h, S);
       
       // Added water volume.
       std::vector<double> water (col_size, 0.0);
@@ -574,9 +605,10 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
       else if (guess[col] > h_bottom[col])
         guess[col] = h3_min[col];
       
+      std::fill (S.begin (), S.end (), 0.0);
       find_matrix_sink (geo, soil, active, K,
                         h_barrier, pressure_limit, 
-                        guess, h, dt, S);
+                        guess, h, S);
     }
 
   // Find added and removed water.

@@ -113,7 +113,7 @@ public:
   // Simulation.
   void clear ();
   void tick_source (const Time&, const Weather*, Treelog&);
-  double suggest_dt (double max_dt) const;
+  double suggest_dt () const;
   void tick_move (const Metalib& metalib, 
                   const Time&, double dt, const Weather*, 
                   const Scope&, Treelog&);
@@ -630,22 +630,24 @@ Field::Implementation::tick_source (const Time& time,
       }
 }
 
+#include <sstream>
 double
-Field::Implementation::suggest_dt (const double max_dt) const
+Field::Implementation::suggest_dt () const
 {
   if (columns.size () == 1)
-    return (*(columns.begin ()))->suggest_dt (max_dt);
+    return (*(columns.begin ()))->suggest_dt ();
   
-  double min_dt = max_dt;
+  double dt = 0.0;
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
     {
-      const double dt = (*i)->suggest_dt (max_dt);
-      if (dt < min_dt)
-        min_dt = dt;
+      const double col_dt = (*i)->suggest_dt ();
+      if (!std::isnormal (dt) || dt > col_dt)
+        dt = col_dt;
     }
-  return min_dt;
+  daisy_assert (!std::isnormal (dt));
+  return dt;
 }
 
 void 
@@ -970,8 +972,8 @@ Field::tick_source (const Time& time, const Weather *const global_weather,
 { impl->tick_source (time, global_weather, msg); }
 
 double
-Field::suggest_dt (const double max_dt) const
-{ return impl->suggest_dt (max_dt); }
+Field::suggest_dt () const
+{ return impl->suggest_dt (); }
 
 void
 Field::tick_move (const Metalib& metalib, 

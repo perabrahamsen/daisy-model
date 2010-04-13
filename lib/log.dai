@@ -3690,4 +3690,23 @@ parameter in the 'default' bioclimate model.  By default, 30."))
                    (spec photosynthesis Farquhar gbw)
                    (handle current))))
 
+(deflog "Time" column
+  "Keep track of time."
+  (where "time.dlf")
+  (summary (simple (fetch (Used) (SoilWater))))
+  (when true)
+  (entries ;; Year Month MDay Hour
+           (number (path dt)
+                   (tag "Used")
+                   (handle average)
+                   (spec program Daisy dt))
+           (number (path column "${column}" SoilWater dt)
+                   (tag "SoilWater")
+                   (handle average)
+                   (spec fixed SoilWater dt))
+           (number (path column "${column}" SoilWater sink_cell)
+                   (tag "Cell")
+                   (handle average)
+                   (spec fixed SoilWater sink_cell))))
+
 ;;; log.dai ends here

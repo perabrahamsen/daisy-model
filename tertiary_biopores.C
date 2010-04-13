@@ -57,6 +57,7 @@ struct TertiaryBiopores : public Tertiary
 
   // Helper.
   std::auto_ptr<Scalar> per_surface_area;
+  std::vector<double> K;        // Adjusted matrix2biopore conductivity [cm/h]
 
   // Identity.
   bool has_macropores ()
@@ -96,7 +97,8 @@ struct TertiaryBiopores : public Tertiary
   // - For use by column.
   void deactivate (const int steps)
   { deactivate_steps += steps; }
-  void tick_source (const Geometry&, const SoilWater&, Treelog&);
+  void tick_source (const Geometry&, const Soil&, const SoilHeat&, 
+                    SoilWater&, Treelog&);
   void tick (const Units&, const Geometry& geo, const Soil& soil, 
              const SoilHeat& soil_heat, const double dt, 
              SoilWater& soil_water, Surface& surface, Treelog& msg);
@@ -107,14 +109,12 @@ struct TertiaryBiopores : public Tertiary
   
   void update_biopores (const Geometry& geo, 
                         const Soil& soil,  
-                        const SoilHeat& soil_heat, 
                         const std::vector<double>& h,
                         const double dt);
   void update_water ();
   void find_implicit_water (const Anystate& old_state, 
                             const Geometry& geo, 
                             const Soil& soil,  
-                            const SoilHeat& soil_heat, 
                             const std::vector<double>& h,
                             const double dt);
   void update_active (const Geometry&, const std::vector<double>& h, Treelog&);
@@ -263,8 +263,9 @@ TertiaryBiopores::clear ()
 }
 
 void
-TertiaryBiopores::tick_source (const Geometry& geo, const SoilWater& soil_water,
-                               Treelog& msg)
+TertiaryBiopores::tick_source (const Geometry& geo, const Soil& soil,
+                               const SoilHeat& soil_heat, 
+                               SoilWater& soil_water, Treelog& msg)
 {
   // Clear old infiltration.
   clear ();
@@ -272,6 +273,30 @@ TertiaryBiopores::tick_source (const Geometry& geo, const SoilWater& soil_water,
   // Find matrix state.
   const std::vector<double>& h = soil_water.h_all ();
   update_active (geo, h, msg);
+
+  // Find conductivity.
+  const size_t cell_size = geo.cell_size ();
+  daisy_assert (K.size () == cell_size);
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double h_cond = std::min(pressure_initiate, h[c]);
+      const double T = soil_heat.T (c);
+      const double h_ice = 0.0;    //ice ignored 
+      const double K_zz = soil.K (c, h_cond, h_ice, T);
+      const double K_xx = K_zz * soil.anisotropy_cell (c);
+      K[c] = K_xx;
+    }
+
+  // Prepare classes and find forward source.
+  std::vector<double> S_forward (cell_size, 0.0);
+  for (size_t b = 0; b < classes.size (); b++)
+    {
+      classes[b]->tick_source (geo, active, h);
+      classes[b]->forward_sink (geo, soil, active, K, pressure_barrier,
+                                pressure_limit, h, S_forward);
+    }
+
+  soil_water.forward_sink (S_forward);
 }
 
 void
@@ -279,9 +304,7 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
                         const SoilHeat& soil_heat, const double dt, 
                         SoilWater& soil_water, Surface& surface, Treelog& msg)
 {
-  tick_source (geo, soil_water, msg);
-
-  Treelog::Open nest (msg, component + std::string (": ") + name);
+  TREELOG_MODEL (msg);
 
   // Flux.
   const size_t edge_size = geo.edge_size ();
@@ -347,7 +370,7 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   // Find an implicit solution.
   const std::vector<double>& h = soil_water.h_all ();
   ddt = dt;
-  find_implicit_water (old_state, geo, soil, soil_heat, h, ddt);
+  find_implicit_water (old_state, geo, soil, h, ddt);
   
   // Limit sink.
   matrix_sink (S_matrix, S_drain);
@@ -374,7 +397,7 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
     }
 
   // Update tertiary state with new ddt.
-  find_implicit_water (old_state, geo, soil, soil_heat, h, ddt);
+  find_implicit_water (old_state, geo, soil, h, ddt);
 
   // Scale sink with timestep.
   const double scale = ddt / dt;
@@ -403,23 +426,9 @@ TertiaryBiopores::matrix_sink (std::vector<double>& S_matrix,
 void 
 TertiaryBiopores::update_biopores (const Geometry& geo, 
                                    const Soil& soil,  
-                                   const SoilHeat& soil_heat, 
                                    const std::vector<double>& h,
                                    const double dt) 
 {
-  // Find conductivity.
-  const size_t cell_size = geo.cell_size ();
-  std::vector<double> K (cell_size);
-  for (size_t c = 0; c < cell_size; c++)
-    {
-      const double h_cond = std::min(pressure_initiate, h[c]);
-      const double T = soil_heat.T (c);
-      const double h_ice = 0.0;    //ice ignored 
-      const double K_zz = soil.K (c, h_cond, h_ice, T);
-      const double K_xx = K_zz * soil.anisotropy_cell (c);
-      K[c] = K_xx;
-    }
-  
   for (size_t b = 0; b < classes.size (); b++)
     classes[b]->update_matrix_sink (geo, soil, active, K, 
                                     pressure_barrier, 
@@ -437,7 +446,6 @@ void
 TertiaryBiopores::find_implicit_water (const Anystate& old_state, 
                                        const Geometry& geo, 
                                        const Soil& soil,  
-                                       const SoilHeat& soil_heat, 
                                        const std::vector<double>& h,
                                        const double dt)
 {
@@ -445,7 +453,7 @@ TertiaryBiopores::find_implicit_water (const Anystate& old_state,
   set_state (old_state);
   const Anystate new_state = get_state ();
   // Find added water with "new water content".
-  update_biopores (geo, soil, soil_heat, h, dt);
+  update_biopores (geo, soil, h, dt);
   // Reset water content to begining of timestep.
   set_state (old_state);
   // Add water to get new state.
@@ -633,6 +641,8 @@ TertiaryBiopores::initialize (const Units& units,
 
   while (active.size () < cell_size)
     active.push_back (geo.cell_z (active.size ()) < table);
+  while (K.size () < cell_size)
+    K.push_back (NAN);
 
   water_volume = total_water ();
   water_height = water_volume / geo.surface_area ();

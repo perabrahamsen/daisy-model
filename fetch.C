@@ -172,6 +172,7 @@ The tag of a column in the log file to summarize in this line.");
 
 Fetch::Fetch (const FrameSubmodel& al)
   : tag (al.name ("tag")),
+    select_dimension (Attribute::Unknown ()),
     type (Error),
     initial (-42.42e42),
     last (-42.42e42),
@@ -180,6 +181,7 @@ Fetch::Fetch (const FrameSubmodel& al)
 
 Fetch::Fetch (const symbol key)
   : tag (key),
+    select_dimension (Attribute::Unknown ()),
     type (Error),
     initial (-42.42e42),
     last (-42.42e42),

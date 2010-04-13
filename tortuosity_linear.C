@@ -27,7 +27,7 @@
 #include "librarian.h"
 #include "frame.h"
 
-static double h_wp = -15000;
+static const double h_wp = -15000;
 
 class TortuosityLinear : public Tortuosity
 {

@@ -43,6 +43,7 @@ class SoilWater
   // Parameters.
 private:
   const double max_exfiltration_gradient; // [cm/cm]
+  const double max_sink_change;           // Max change in available water [] 
 
   // Content.
 private:
@@ -61,6 +62,7 @@ private:
   std::vector<double> S_p_;
   std::vector<double> S_permanent_;
   std::vector<double> S_ice_;
+  std::vector<double> S_forward_;
   std::vector<double> tillage_;
   std::vector<double> X_ice_;
   std::vector<double> X_ice_buffer_;
@@ -71,14 +73,17 @@ private:
   std::vector<double> q_tertiary_;
   std::vector<double> K_cell_;
   std::vector<double> K_edge_;
+  double sink_dt;
+  int sink_cell;
 
   // Sink.
 public:
   void clear ();
   void freeze (const Soil&, size_t c, double rate /* [h^-1] */);
   void drain (const std::vector<double>&);
+  void forward_sink (const std::vector<double>&);
   void root_uptake (const std::vector<double>&);
-  
+
   // Queries
 public:
   double h (size_t i) const
@@ -105,6 +110,8 @@ public:
   { return S_drain_[i]; }
   double S_ice (size_t i) const
   { return S_ice_[i]; }
+  double S_forward (size_t i) const
+  { return S_forward_[i]; }
   double S_sum (size_t i) const
   { return S_sum_[i]; }
   double h_ice (size_t i) const
@@ -142,6 +149,10 @@ public:
 
   // Simulation.
 public:
+
+  void tick_source (const Geometry&, const Soil&, Treelog&);
+  double suggest_dt ();
+
   // Before water movement.
   void tick_before (const Geometry&, const Soil& soil, 
                     double dt, Treelog& msg);

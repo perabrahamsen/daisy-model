@@ -1,16 +1,12 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+SoilWater::tick_source
+
 * Variable tidsskridt
 
-** tertiary biopores
+** Find et "pænt" dt
 
-*** Selvstændig "udregn start source" function
-
-Alene baseret på betingelserne i starten af tidsskridtet.  Den skal
-ikke bruges til andet end at beregne et foreslået tidsskridt med.
-
-Den behøver ikke tage hensyn til hvad der trænger ind i bioporerne fra
-oven, da vi er mest bekymret for bioporerne som sink.
+** Timestep::microseconds
 
 ** Prøv med denne som begrænsning (suggest dt)
 
@@ -20,11 +16,10 @@ abs (S) * dt < f_Theta * Theta_avail
 
 *** Stof: 
 
-dt * -S * C_secondary < M_secondary
-
-ELLER (parameter)
-
 dt * -S * C_secondary < M_total
+
+Vi kan ikke bruge M_secondary her, da det sekundære domæne skal kunne
+tømmes helt ud.  Men måske 2 * M_secundary?
 
 * Kørsel: 10 sec
 

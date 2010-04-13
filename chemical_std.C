@@ -1014,7 +1014,7 @@ ChemicalStandard::infiltrate (const double rate, const double dt)
   daisy_assert (surface_storage >= 0.0);
   daisy_assert (surface_solute >= 0.0);
   daisy_assert (surface_immobile >= 0.0);
-  if (surface_storage < surface_solute)
+  if (surface_storage * 1.001 < surface_solute)
     {
       std::ostringstream tmp;
       tmp << "surface_storage = " << surface_storage 

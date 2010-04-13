@@ -132,7 +132,10 @@ struct Daisy::Implementation
 
     // Turnover and movement.
     field->tick_source (time, weather.get (), msg); 
-    current_dt = field->suggest_dt (max_dt); 
+    current_dt = field->suggest_dt (); 
+
+    if (!std::isnormal (current_dt) || current_dt > max_dt)
+      current_dt = max_dt;
     if (current_dt < max_dt)
       {
         std::ostringstream tmp;

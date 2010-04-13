@@ -92,6 +92,17 @@ public:
                                   const double amount /* [g] */, 
                                   const double dt);
   void clear ();
+  virtual void forward_sink (const Geometry& geo,    
+                             const Soil& soil,  
+                             const std::vector<bool>& active,
+                             const std::vector<double>& K, 
+                             const double h_barrier,
+                             const double pressure_limit,
+                             const std::vector<double>& h, 
+                             std::vector<double>& S3) const = 0;
+  virtual void tick_source (const Geometry&, 
+                            const std::vector<bool>& active,
+                            const std::vector<double>& h) = 0;
   virtual void update_matrix_sink (const Geometry& geo,    
                                    const Soil& soil,  
                                    const std::vector<bool>& active,

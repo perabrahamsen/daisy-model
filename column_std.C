@@ -54,6 +54,7 @@
 #include "assertion.h"
 #include "frame_model.h"
 #include "block_model.h"
+#include "mathlib.h"
 #include <sstream>
 
 struct ColumnStandard : public Column
@@ -165,7 +166,7 @@ public:
   // Simulation.
   void clear ();
   void tick_source (const Time&, const Weather*, Treelog&);
-  double suggest_dt (double max_dt) const;
+  double suggest_dt () const;
   void tick_move (const Metalib& metalib, 
                   const Time&, double dt, const Weather*, 
                   const Scope&, Treelog&);
@@ -587,13 +588,26 @@ ColumnStandard::tick_source (const Time& time,
   chemistry->deposit (my_weather.deposit (), msg);
 
 
-  // Drainage.
+  // Find forward sink.
   drain->tick (geometry, *soil, *soil_heat, surface, *soil_water, msg);
+  movement->tick_source (*soil, *soil_heat, *soil_water, msg);
+
+  // Find water based limit.
+  soil_water->tick_source (geometry, *soil, msg);
 }
 
 double
-ColumnStandard::suggest_dt (const double max_dt) const
-{ return max_dt; }
+ColumnStandard::suggest_dt () const
+{ 
+  double dt = 0.0;
+  
+  const double sw_dt = soil_water->suggest_dt ();
+  
+  if (!std::isnormal (dt) || dt > sw_dt)
+    dt = sw_dt;
+
+  return dt;
+}
 
 void
 ColumnStandard::tick_move (const Metalib& metalib, const Time& time, 

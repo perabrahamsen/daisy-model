@@ -82,6 +82,7 @@ public:
   // Simulation.
 public:
   virtual void clear ();
+  virtual void tick_source (const Soil&, const SoilHeat&, SoilWater&, Treelog&);
   virtual void tick (const Soil&, SoilWater&, const SoilHeat&, Surface&,
                      Groundwater&, const Time&, const Weather&, 
                      double dt, Treelog&) = 0;

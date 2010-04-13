@@ -47,6 +47,7 @@ SoilWater::clear ()
   fill (S_p_.begin (), S_p_.end (), 0.0);
   fill (tillage_.begin (), tillage_.end (), 0.0);
   fill (S_ice_.begin (), S_ice_.end (), 0.0);
+  fill (S_forward_.begin (), S_forward_.end (), 0.0);
 
   fill (q_primary_.begin (), q_primary_.end (), 0.0);
   fill (q_secondary_.begin (), q_secondary_.end (), 0.0);
@@ -69,6 +70,8 @@ SoilWater::freeze (const Soil&, const size_t c, const double rate /* [h^-1] */)
 void
 SoilWater::drain (const std::vector<double>& v)
 {
+  forward_sink (v);
+
   daisy_assert (S_sum_.size () == v.size ());
   daisy_assert (S_drain_.size () == v.size ());
   for (unsigned i = 0; i < v.size (); i++)
@@ -82,6 +85,14 @@ SoilWater::drain (const std::vector<double>& v)
       S_sum_[i] += v[i];
       S_drain_[i] += v[i];
     }
+}
+
+void
+SoilWater::forward_sink (const std::vector<double>& v)
+{
+  daisy_assert (S_forward_.size () == v.size ());
+  for (unsigned i = 0; i < v.size (); i++)
+    S_forward_[i] += v[i];
 }
 
 void
@@ -232,6 +243,38 @@ SoilWater::set_tertiary_flux (const std::vector<double>& q_p)
 {
   q_tertiary_ = q_p;
 }
+
+void 
+SoilWater::tick_source (const Geometry& geo, const Soil& soil, Treelog& msg)
+{
+  const size_t cell_size = geo.cell_size ();
+
+  sink_dt = 0.0;
+  sink_cell = Geometry::cell_error;
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double S = S_forward (c);
+      if (!std::isnormal (S))
+        continue;
+      static const double h_wp = -15000.0;
+      static const double h_sat = 0.0;
+      const double h_ice = this->h_ice (c);
+      const double Theta_wp = soil.Theta (c, h_wp, h_ice);
+      const double Theta_sat = soil.Theta (c, h_sat, h_ice);
+      const double Theta_max = Theta_sat - Theta_wp;
+      daisy_assert (Theta_max > 0.0);
+      const double dt = Theta_max * max_sink_change / S;
+      if (!std::isnormal (sink_dt) || sink_dt > dt)
+        {
+          sink_dt = dt;
+          sink_cell = c;
+        }
+    }
+}
+ 
+double 
+SoilWater::suggest_dt ()
+{ return std::fabs (sink_dt); }
 
 void
 SoilWater::tick_before (const Geometry& geo, const Soil& soil, 
@@ -545,12 +588,18 @@ SoilWater::output (Log& log) const
   output_value (S_p_, "S_p", log);
   output_value (S_permanent_, "S_permanent", log);
   output_value (S_ice_, "S_ice", log);
+  output_value (S_forward_, "S_forward", log);
   output_value (X_ice_, "X_ice", log);
   output_value (X_ice_buffer_, "X_ice_buffer", log);
   output_value (h_ice_, "h_ice", log);
   output_value (q_matrix_, "q", log);
   output_value (q_tertiary_, "q_p", log);
-  // output_value (K_cell_, "K_cell", log);
+  output_value (K_cell_, "K_cell", log);
+  if (std::isnormal (sink_dt))
+    {
+      output_value (sink_dt, "dt", log);
+      output_variable (sink_cell, log);
+    }
 }
 
 double
@@ -644,6 +693,16 @@ SoilWater::load_syntax (Frame& frame)
                  "Maximal pressure gradient for calculating exfiltration.\n\
 The gradient is assumed from center of top node to surface of top node.\n\
 By default, there is no maximum.");
+  frame.declare ("max_sink_change", Attribute::None (), Check::positive (), 
+                 Attribute::Const,
+                 "Largest change to available water within a timestep.\n\
+This is used for calculating the suggested timestep.  The suggested\n\
+timestep will be small enough that the change water due to forward\n\
+calculated sinks (S_forward) alone is less than the specified value.\n\
+\n\
+Plant available water is defined as the difference between saturation\n\
+and wilting point.");
+  frame.set ("max_sink_change", 0.1);
   Geometry::add_layer (frame, Attribute::OptionalState, "h", load_h);
   Geometry::add_layer (frame, Attribute::OptionalState, "Theta", load_Theta);
   frame.declare ("Theta_primary", "cm^3/cm^3", Attribute::LogOnly, Attribute::SoilCells,
@@ -670,6 +729,10 @@ Conventionally, this is the inter-aggregate pores.");
   frame.set_empty ("S_permanent");
   frame.declare ("S_ice", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Ice sink (due to thawing or freezing).");
+  frame.declare ("S_forward", "cm^3/cm^3/h",
+                 Attribute::LogOnly, Attribute::SoilCells, "\
+Sink at beginning of timestep, used for limiting size of timestep.\n\
+Currently this includes drain and tertiary domain (biopores).");
   frame.declare_fraction ("X_ice", Attribute::OptionalState, Attribute::SoilCells,
                           "Ice volume fraction in soil.");
   frame.declare ("X_ice_buffer", Attribute::None (), 
@@ -683,8 +746,15 @@ presummed to occupy the large pores, so it is h (Theta_sat - X_ice).");
                  "Matrix water flux (positive numbers mean upward).");  
   frame.declare ("q_p", "cm/h", Attribute::LogOnly, Attribute::SoilEdges,
                  "Water flux in macro pores (positive numbers mean upward).");
+#if 1
   frame.declare ("K", "cm/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Hydraulic conductivity.");
+#endif
+  frame.declare ("dt", "h", Attribute::LogOnly, "\
+Suggested timestep length (based on S_forward).\n\
+The absolute value is used, negative numbers indicate source based limits.");
+  frame.declare_integer ("sink_cell", Attribute::LogOnly, "\
+Cell with largest forward sink compared to available water.");
 }
 
 void
@@ -789,7 +859,7 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
   // Sources.
   S_sum_.insert (S_sum_.begin (), cell_size, 0.0);
   S_root_.insert (S_root_.begin (), cell_size, 0.0);
-  S_drain_.insert (S_incorp_.begin (), cell_size, 0.0);
+  S_drain_.insert (S_drain_.begin (), cell_size, 0.0);
   S_incorp_.insert (S_incorp_.begin (), cell_size, 0.0);
   tillage_.insert (tillage_.begin (), cell_size, 0.0);
   S_p_.insert (S_p_.begin (), cell_size, 0.0);
@@ -797,6 +867,7 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
     S_permanent_.insert (S_permanent_.end (), cell_size - S_permanent_.size (),
                          0.0);
   S_ice_.insert (S_ice_.begin (), cell_size, 0.0);
+  S_forward_.insert (S_forward_.begin (), cell_size, 0.0);
 
   // Fluxes.
   q_primary_.insert (q_primary_.begin (), edge_size, 0.0);
@@ -817,7 +888,10 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
 
 SoilWater::SoilWater (const Block& al)
   : max_exfiltration_gradient (al.number ("max_exfiltration_gradient", -1.0)),
-    S_permanent_ (al.number_sequence ("S_permanent"))
+    max_sink_change (al.number ("max_sink_change")),
+    S_permanent_ (al.number_sequence ("S_permanent")),
+    sink_dt (NAN),
+    sink_cell (-1)
 { }
 
 SoilWater::~SoilWater ()

@@ -1093,8 +1093,8 @@ organic${OBJ}: organic.C organic.h model_derived.h model_logable.h model.h \
  treelog.h frame_model.h frame.h librarian.h
 movement${OBJ}: movement.C movement.h model_derived.h model_logable.h model.h \
  symbol.h block_model.h block_nested.h block.h scope.h attribute.h \
- treelog.h frame_model.h frame.h librarian.h tertiary.h drain.h log.h \
- time.h border.h model_framed.h assertion.h
+ treelog.h frame_model.h frame.h librarian.h tertiary.h log.h time.h \
+ border.h model_framed.h assertion.h
 integer${OBJ}: integer.C integer.h model.h symbol.h boolean.h submodeler.h \
  block_submodel.h block_nested.h block.h scope.h attribute.h treelog.h \
  frame_submodel.h frame.h block_model.h frame_model.h memutils.h \
@@ -2287,12 +2287,12 @@ macro_none${OBJ}: macro_none.C macro.h model.h symbol.h librarian.h frame.h \
  scope.h attribute.h
 column_std${OBJ}: column_std.C column.h model_framed.h model_logable.h \
  model.h symbol.h irrigate.h memutils.h library.h surface.h uzmodel.h \
- soil_heat.h movement.h model_derived.h groundwater.h geometry.h \
+ soil_heat.h movement.h model_derived.h drain.h groundwater.h geometry.h \
  attribute.h soil.h soil_water.h vegetation.h litter.h bioclimate.h \
  weather.h im.h chemistry.h chemical.h organic.h am.h dom.h plf.h time.h \
  log.h border.h submodeler.h block_submodel.h block_nested.h block.h \
  scope.h treelog.h frame_submodel.h frame.h scope_multi.h scopesel.h \
- units.h librarian.h assertion.h frame_model.h block_model.h
+ units.h librarian.h assertion.h frame_model.h block_model.h mathlib.h
 weather_simple${OBJ}: weather_simple.C weather_old.h weather_base.h weather.h \
  model_derived.h model_logable.h model.h symbol.h im.h attribute.h \
  block_model.h block_nested.h block.h scope.h treelog.h frame_model.h \

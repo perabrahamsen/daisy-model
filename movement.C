@@ -122,6 +122,11 @@ Movement::tick_tertiary (const Units& units,
 }
 
 void
+Movement::tick_source (const Soil& soil, const SoilHeat& soil_heat, 
+                       SoilWater& soil_water, Treelog& msg)
+{  tertiary->tick_source (geometry (), soil, soil_heat, soil_water, msg); }
+
+void
 Movement::clear ()
 {
   water_failure_level = -1;
