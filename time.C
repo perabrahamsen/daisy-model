@@ -46,7 +46,8 @@ struct Time::Implementation
   char hour;  
   char minute;
   char second;
-  Implementation (int, int, int, int, int);
+  int microsecond;              // Assume 21 bit int minimum.
+  Implementation (int, int, int, int, int, int);
   Implementation (const Implementation&);
 };
 
@@ -61,12 +62,13 @@ const symbol Time::Implementation::wname[] =
 { "Error", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", 
   "Saturday", "Sunday" };
 
-Time::Implementation::Implementation (int y, int d, int h, int m, int s)
+Time::Implementation::Implementation (int y, int d, int h, int m, int s, int us)
   : year (static_cast<short> (y)),
     yday (static_cast<short> (d)),
     hour (static_cast<char> (h)),
     minute (static_cast<char> (m)),
-    second (static_cast<char> (s))
+    second (static_cast<char> (s)),
+    microsecond (us)
 { }
 
 Time::Implementation::Implementation (const Implementation& i)
@@ -74,7 +76,8 @@ Time::Implementation::Implementation (const Implementation& i)
     yday (i.yday),
     hour (i.hour), 
     minute (i.minute), 
-    second (i.second)
+    second (i.second),
+    microsecond (i.microsecond)
 { }
 
 // @ Extract.
@@ -115,6 +118,10 @@ int
 Time::second () const
 { return impl->second; }
 
+int
+Time::microsecond () const
+{ return impl->microsecond; }
+
 std::string
 Time::print () const
 {
@@ -125,6 +132,10 @@ Time::print () const
       << std::setw (2) << hour () << ":"
       << std::setw (2) << minute () << ":"
       << std::setw (2) << second ();
+  const int us = microsecond ();
+  if (us != 0)
+    tmp << "." << std::setw (6) << microsecond ();
+  
   return tmp.str ();
 }
 
@@ -138,6 +149,7 @@ Time::set_time (Frame& parent, const symbol key) const
   child->set ("hour", hour ());
   child->set ("minute", minute ());
   child->set ("second", second ());
+  child->set ("microsecond", microsecond ());
   parent.set (key, child);
 }
 
@@ -164,6 +176,8 @@ Time::component_value (component_t c) const
       return minute ();
     case Second:
       return second ();
+    case Microsecond:
+      return microsecond ();
     }
   daisy_notreached ();
 }
@@ -191,6 +205,8 @@ Time::component_name (component_t c)
       return "minute";
     case Second:
       return "second";
+    case Microsecond:
+      return "microsecond";
     }
   daisy_notreached ();
 }
@@ -218,6 +234,8 @@ Time::component_documentation (component_t c)
       return "Minute";
     case Second:
       return "Second";
+    case Microsecond:
+      return "Microsecond";
     }
   daisy_notreached ();
 }
@@ -236,6 +254,7 @@ Time::output (Log& log) const
   output_value (hour (), "hour", log);
   output_value (minute (), "minute", log);
   output_value (second (), "second", log);
+  output_value (microsecond (), "microsecond", log);
 }
 
 int
@@ -271,6 +290,13 @@ Time::tick_generic (const int amount, const int limit,
 }
 
 void
+Time::tick_microsecond (int microseconds)
+{ 
+  impl->microsecond = tick_generic (microseconds, 1000000,
+                                    &Time::tick_second, impl->microsecond); 
+}
+
+void
 Time::tick_second (int seconds)
 { impl->second 
     = tick_generic (seconds, 60, &Time::tick_minute, impl->second); }
@@ -284,29 +310,6 @@ void
 Time::tick_hour (int hours)
 { impl->hour
     = tick_generic (hours, 24, &Time::tick_day, impl->hour); }
-
-#if 0
-void 
-Time::tick_hour (int hours)
-{
-  for (; hours > 0; --hours)
-    if (impl->hour < 23)
-      impl->hour++;
-    else
-      {
-	impl->hour = 0;
-	tick_day (1);
-      }
-  for (; hours < 0; ++hours)
-    if (impl->hour > 0)
-      impl->hour--;
-    else
-      {
-	impl->hour = 23;
-	tick_day (-1);
-      }
-}
-#endif
 
 void 
 Time::tick_day (int days)
@@ -443,7 +446,8 @@ Time::month_length (int year, int month)
 }
 
 bool 
-Time::valid (int year, int month, int mday, int hour, int minute, int second)
+Time::valid (int year, int month, int mday, int hour, int minute, int second,
+             int microsecond)
 {
   if (1 > year || year > 9999)
     return false;
@@ -453,9 +457,11 @@ Time::valid (int year, int month, int mday, int hour, int minute, int second)
     return false;
   if (0 > hour || hour > 23)
     return false;
-  if (0 > minute || minute > 60)
+  if (0 > minute || minute > 59)
     return false;
-  if (0 > second || second > 60)
+  if (0 > second || second > 59)
+    return false;
+  if (0 > microsecond || microsecond > 999999)
     return false;
 
   return true;
@@ -506,8 +512,9 @@ static bool check_alist (const Metalib&, const Frame& al, Treelog& msg)
   const int hour = al.integer ("hour");
   const int minute = al.integer ("minute");
   const int second = al.integer ("second");
+  const int microsecond = al.integer ("microsecond");
 
-  if (!Time::valid (year, month, mday, hour, minute, second))
+  if (!Time::valid (year, month, mday, hour, minute, second, microsecond))
     {
       msg.error ("Invalid date");
       ok = false;
@@ -539,6 +546,11 @@ Time::load_syntax (Frame& frame)
   frame.declare_integer ("second", Attribute::State, "Current second.");
   frame.set_check ("second", ss);
   frame.set ("second", 0);
+  static VCheck::IRange us (0, 999999);
+  frame.declare_integer ("microsecond", Attribute::State, "\
+Current microsecond.");
+  frame.set_check ("microsecond", us);
+  frame.set ("microsecond", 0);
   frame.declare_integer ("week", Attribute::LogOnly, "Current week.");
   frame.declare_integer ("yday", Attribute::LogOnly, "Current Julian day.");
   frame.declare_string ("wday", Attribute::LogOnly, "Current weekday.\n\
@@ -552,7 +564,8 @@ Time::Time (const Block& al)
                                          al.integer ("mday")),
                               al.integer ("hour"),
                               al.integer ("minute"),
-                              al.integer ("second")))
+                              al.integer ("second"),
+                              al.integer ("microsecond")))
 { }
 
 Time::Time (const FrameSubmodel& al)
@@ -562,12 +575,13 @@ Time::Time (const FrameSubmodel& al)
                                          al.integer ("mday")),
                               al.integer ("hour"),
                               al.integer ("minute"),
-                              al.integer ("second")))
+                              al.integer ("second"),
+                              al.integer ("microsecond")))
 { }
 
 static DeclareSubmodel 
 time_submodel (Time::load_syntax, "Time", "\
-Year, month, day and hour.");
+Year, month, day and hour, minute, second and microsecond.");
 
 // @ Construct.
 
@@ -595,14 +609,15 @@ Time::operator= (const Time& t)
   return *this;
 }
 
-Time::Time (int y, int mo, int md, int h, int mi, int s)
-  : impl (new Implementation (y, mday2yday (y, mo, md), h, mi, s))
+Time::Time (int y, int mo, int md, int h, int mi, int s, int us)
+  : impl (new Implementation (y, mday2yday (y, mo, md), h, mi, s, us))
 { 
   daisy_assert (mo > 0 && mo < 13);
   daisy_assert (md > 0 && mo == month ());
   daisy_assert (h >= 0 && h < 24);
   daisy_assert (mi >= 0 && mi < 60);
   daisy_assert (s >= 0 && s < 60);
+  daisy_assert (us >= 0 && us < 1000000);
 }
     
 Time::Time (const Time& t)
@@ -613,7 +628,7 @@ Time::~Time ()
 { }
 
 Time::Time ()
-  : impl (new Implementation (99999, 99999, 99999, 99999, 99999))
+  : impl (new Implementation (99999, 99999, 99999, 99999, 99999, 99999))
 { }
 
 // Operators.
@@ -624,7 +639,8 @@ Time::operator== (const Time& other) const
     && (impl->yday == other.impl->yday)
     && (impl->hour == other.impl->hour)
     && (impl->minute == other.impl->minute)
-    && (impl->second == other.impl->second); }
+    && (impl->second == other.impl->second)
+    && (impl->microsecond == other.impl->microsecond); }
 
 bool
 Time::operator!= (const Time& other) const
@@ -651,8 +667,12 @@ Time::operator<  (const Time& other) const
     return false;
   if (impl->second < other.impl->second)
     return true;
-#if 0
   if (impl->second > other.impl->second)
+    return false;
+  if (impl->microsecond < other.impl->microsecond)
+    return true;
+#if 0
+  if (impl->microsecond > other.impl->microsecond)
     return false;
 #endif
   return false;

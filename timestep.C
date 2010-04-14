@@ -26,7 +26,8 @@
 #include "assertion.h"
 #include "mathlib.h"
 #include "treelog.h"
-#include <memory>
+#include <sstream>
+#include <iomanip>
 
 struct Timestep::Implementation
 { 
@@ -34,11 +35,13 @@ struct Timestep::Implementation
   int hours;
   int minutes;
   int seconds;
-  Implementation (int d, int h, int m, int s)
+  int microseconds;
+  Implementation (int d, int h, int m, int s, int us)
     : days (d),
       hours (h),
       minutes (m),
-      seconds (s)
+      seconds (s),
+      microseconds (us)
   { }
 };
 
@@ -70,6 +73,20 @@ Timestep::second ()
   return value;
 }
 
+const Timestep& 
+Timestep::microsecond ()
+{
+  static const Timestep value (0, 0, 0, 0, 1);
+  return value;
+}
+
+const Timestep& 
+Timestep::zero ()
+{
+  static Timestep step (0, 0, 0, 0);
+  return step;
+}
+
 int
 Timestep::days () const
 { return impl->days; }
@@ -86,10 +103,45 @@ int
 Timestep::seconds () const
 { return impl->seconds; }
 
+int
+Timestep::microseconds () const
+{ return impl->microseconds; }
+
 double 
 Timestep::total_hours () const
 {
-  return (days ()) * 24.0 + hours () + (minutes () + seconds () / 60.0) / 60.0;
+  double result =  0;           // [us]
+  result += microseconds ();    
+  result /= 1000000.0;          // [s]
+  result += seconds ();           
+  result /= 60.0;               // [m]
+  result += minutes ();
+  result /= 60.0;               // [h]
+  result += hours () + days () * 24.0;
+  return result;
+}
+
+std::string
+Timestep::print () const
+{
+  std::ostringstream tmp;
+  if (days () > 0)
+    tmp << days () << "d";
+  if (hours () > 0)
+    tmp << hours () << "h";
+  if (minutes () > 0)
+    tmp << minutes () << "m";
+  if (seconds () > 0 || microseconds () > 0)
+    {
+      tmp << seconds ();
+      if (microseconds () > 0)
+        tmp << "." << std::setfill ('0') << std::setw (6) << microseconds ();
+      tmp << "s";
+    }
+  std::string result = tmp.str ();
+  if (result.size () == 0)
+    result = "0s";
+  return result;
 }
 
 bool
@@ -158,35 +210,78 @@ Timestep::load_frame (Frame& frame)
   frame.declare_integer ("seconds", Attribute::State, 
               "Number of seconds.");
   frame.set ("seconds", 0);
+  frame.declare_integer ("microseconds", Attribute::State, 
+              "Number of microseconds.");
+  frame.set ("microseconds", 0);
 }
 
 const Timestep& 
 Timestep::null ()
 { return zero (); }
 
-const Timestep& 
-Timestep::zero ()
+Timestep
+Timestep::build_hours (const double dt /* h */)
 {
-  static Timestep step (0, 0, 0, 0);
-  return step;
+  daisy_assert (dt > 0);
+  static const double us = 1.0 / (60.0 * 60.0 * 1000000.0);
+  double time = dt + 0.1 * us;       // We add 0.1 [us] for rounding.
+  daisy_assert (time >= 0.0);
+  time /= 24.0;                 // [d]
+  const int days = double2int (time);
+  time -= days;
+  daisy_assert (time >= 0.0);
+  daisy_assert (time < 1.0);
+  time *= 24.0;                 // [h]
+  const int hours = double2int (time);
+  daisy_assert (hours < 24);
+  time -= hours;
+  daisy_assert (time >= 0.0);
+  daisy_assert (time < 1.0);
+  time *= 60.0;                 // [m]
+  const int minutes = double2int (time);
+  daisy_assert (minutes < 60);
+  time -= minutes;
+  daisy_assert (time >= 0.0);
+  daisy_assert (time < 1.0);
+  time *= 60.0;                 // [s]
+  const int seconds = double2int (time);
+  daisy_assert (seconds < 60);
+  time -= seconds;
+  daisy_assert (time >= 0.0);
+  daisy_assert (time < 1.0);
+  time *= 1000000.0;            // [us]
+  int microseconds = double2int (time);
+  daisy_assert (microseconds < 1000000);
+  time -= microseconds;
+  daisy_assert (time >= 0.0);
+  daisy_assert (time < 1.0);
+
+  Timestep result (days, hours, minutes, seconds, microseconds);
+  const double new_dt = result.total_hours ();
+  daisy_assert (new_dt <= dt + 0.2 * us);
+  daisy_assert (new_dt > 0);
+  daisy_assert ((dt - new_dt) * 1000000.0 < 1.0);
+  return result;
 }
 
 Timestep::Timestep (const Block& al)
   : impl (new Implementation (al.integer ("days"),
                               al.integer ("hours"),
                               al.integer ("minutes"),
-                              al.integer ("seconds")))
+                              al.integer ("seconds"),
+                              al.integer ("microseconds")))
 { }
 
 Timestep::Timestep (const FrameSubmodel& al)
   : impl (new Implementation (al.integer ("days"),
                               al.integer ("hours"),
                               al.integer ("minutes"),
-                              al.integer ("seconds")))
+                              al.integer ("seconds"),
+                              al.integer ("microseconds")))
 { }
 
-Timestep::Timestep (int d, int h, int m, int s)
-  : impl (new Implementation (d, h, m, s))
+Timestep::Timestep (int d, int h, int m, int s, int us)
+  : impl (new Implementation (d, h, m, s, us))
 { }
 
 Timestep::~Timestep ()
@@ -194,7 +289,8 @@ Timestep::~Timestep ()
 
 Timestep::Timestep (const Timestep& other)
   : impl (new Implementation (other.days (), other.hours (),
-                              other.minutes (), other.seconds ()))
+                              other.minutes (), other.seconds (),
+                              other.microseconds ()))
 { }
 
 const Timestep& 
@@ -210,6 +306,7 @@ void operator+= (Time& time, const Timestep& step)
   time.tick_hour (step.hours ());
   time.tick_minute (step.minutes ());
   time.tick_second (step.seconds ());
+  time.tick_microsecond (step.microseconds ());
 }
 
 Time operator+ (const Time& old, const Timestep& step)
@@ -230,23 +327,31 @@ Timestep operator+ (const Timestep& a, const Timestep& b)
 { return Timestep (a.days () + b.days (),
                    a.hours () + b.hours (),
                    a.minutes () + b.minutes (),
-                   a.seconds () + b.seconds ()); }
+                   a.seconds () + b.seconds (),
+                   a.microseconds () + b.microseconds ()); }
 
 Timestep operator- (const Timestep& step)
 { return Timestep (-step.days (), -step.hours (), 
-                   -step.minutes (), -step.seconds ()); }
+                   -step.minutes (), -step.seconds (),
+                   -step.microseconds ()); }
 
 Timestep operator- (const Time& a, const Time& b)
 {
   if (a < b)
     return -(b - a);
 
+  int microseconds = a.microsecond () - b.microsecond ();
   int seconds = a.second () - b.second ();
   int minutes = a.minute () - b.minute ();
   int hours = a.hour () - b.hour ();
   const Time a_day (a.year (), a.month (), a.mday (), 0, 0, 0);
   const Time b_day (b.year (), b.month (), b.mday (), 0, 0, 0);
   int days = Time::days_between (b_day, a_day);
+  if (microseconds < 0)
+    {
+      microseconds += 1000000;
+      seconds -= 1;
+    }
   if (seconds < 0)
     {
       seconds += 60;
@@ -262,7 +367,23 @@ Timestep operator- (const Time& a, const Time& b)
       hours += 24;
       days -= 1;
     }
-  return Timestep (days, hours, minutes, seconds);
+  return Timestep (days, hours, minutes, seconds, microseconds);
+}
+
+Timestep operator/ (const Timestep& step, int divisor)
+{
+  int days = step.days ();
+  int hours = (days % divisor) * 24 + step.hours ();
+  days /= divisor;
+  int minutes = (hours % divisor) * 60 + step.minutes ();
+  hours /= divisor;
+  int seconds = (minutes % divisor) * 60 + step.seconds ();
+  minutes /= divisor;
+  int microseconds = (seconds % divisor) * 1000000 + step.microseconds ();
+  seconds /= divisor;
+  microseconds /= divisor;
+
+  return Timestep (days, hours, minutes, seconds, microseconds);
 }
 
 bool 

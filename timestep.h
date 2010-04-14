@@ -23,8 +23,8 @@
 
 #include "time.h"
 #include "vcheck.h"
+#include <boost/scoped_ptr.hpp>
 #include <string>
-#include <memory>
 
 class Frame;
 class FrameSubmodel;
@@ -35,7 +35,7 @@ class Timestep
   // Content.
 private:
   struct Implementation;
-  const std::auto_ptr<Implementation> impl;
+  const boost::scoped_ptr<Implementation> impl;
 
   // Prebuild values.
 public:
@@ -43,6 +43,8 @@ public:
   static const Timestep& hour ();
   static const Timestep& minute ();
   static const Timestep& second ();
+  static const Timestep& microsecond ();
+  static const Timestep& zero ();
 
   // Extract elements.
 public:
@@ -50,11 +52,13 @@ public:
   int hours () const;
   int minutes () const;
   int seconds () const;
+  int microseconds () const;
 
   // Extract totals.
 public:
   double total_hours () const;
-    
+  std::string print () const;
+
   // Create.
 public:
   struct GenCheck : public VCheck
@@ -68,9 +72,10 @@ public:
   static void load_syntax (Frame&);
   static void load_frame (Frame&);
   static const Timestep& null ();
-  static const Timestep& zero ();
+  static Timestep build_hours (const double dt /* h */);
   explicit Timestep (const Block&);
-  Timestep (int days, int hours, int minutes, int seconds);
+  Timestep (int days, int hours, int minutes, int seconds,
+            int microseconds = 0);
   ~Timestep ();
   Timestep (const Timestep&);
   const Timestep& operator= (const Timestep&);
@@ -88,6 +93,7 @@ Time operator- (const Time&, const Timestep&);
 Timestep operator- (const Timestep& step);
 Timestep operator- (const Time&, const Time&);
 Timestep operator+ (const Timestep&, const Timestep&);
+Timestep operator/ (const Timestep&, int divisor);
 bool operator== (const Timestep&, const Timestep&);
 
 #endif // TIMESTEP_H

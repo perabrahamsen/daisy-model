@@ -160,6 +160,7 @@
 (defprogram VAP Daisy
   "Simulation for the PLAP stations."
   (declare station String "Name of station")
+  (minimal_timestep (microseconds 1))
   (output (Time (where "log/${station}-time.dlf"))
           (harvest (where "log/${station}-harvest.dlf"))
           ("Chemical Content" (chemical "Glyphosate-base")

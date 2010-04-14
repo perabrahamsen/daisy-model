@@ -61,12 +61,13 @@ public:
   int hour () const;
   int minute () const;
   int second () const;
+  int microsecond () const;
   std::string print () const;
   void set_time (Frame&, symbol key) const;
 
   enum component_t {
-    Year, Month, Week, Yday, Mday, Wday, Hour, Minute, Second, 
-    First = Year, Last = Second
+    Year, Month, Week, Yday, Mday, Wday, Hour, Minute, Second, Microsecond,
+    First = Year, Last = Microsecond
   };
   int component_value (component_t) const;
   static symbol component_name (component_t);
@@ -76,6 +77,7 @@ public:
   int tick_generic (const int amount, const int limit, 
                     void (Time::*next) (int), const int old);
 public:
+  void tick_microsecond (int microseconds = 1);
   void tick_second (int seconds = 1);
   void tick_minute (int minutes = 1);
   void tick_hour (int hours = 1);
@@ -99,7 +101,8 @@ public:
   static bool leap (int year);
   static int month_length (int year, int month);
   static bool valid (int year, int month, int mday, 
-                     int hour = 0, int minute = 0, int second = 0);
+                     int hour = 0, int minute = 0, int second = 0,
+                     int microsecond = 0);
   static int days_between (const Time& first, const Time& last);
   static int hours_between (const Time& first, const Time& last);
 
@@ -124,7 +127,7 @@ public:
   const Time& operator= (const Time&);
   Time (const Time&);
   Time (int year, int month, int mday, int hour,
-        int minute = 0, int second = 0);
+        int minute = 0, int second = 0, int microsecond = 0);
   ~Time ();
 private:                    
   explicit Time ();

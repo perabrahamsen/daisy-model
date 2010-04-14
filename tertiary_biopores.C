@@ -484,12 +484,12 @@ TertiaryBiopores::update_active (const Geometry& geo,
           if (h[c] < pressure_end)
             {
               active[c] = false;
-              bottom_act = std::min (geo.cell_bottom (c), bottom_act);
-              top_act = std::max (geo.cell_top (c), top_act);
+              bottom_dea = std::min (geo.cell_bottom (c), bottom_act);
+              top_dea = std::max (geo.cell_top (c), top_act);
               if (active_msg == msg_cell)
                 {
                   std::ostringstream tmp;
-                  tmp << "h[" << c << "] = " << h[c] << ", activated";
+                  tmp << "h[" << c << "] = " << h[c] << ", deactivated";
                   msg.message (tmp.str ());
                 }
             }
@@ -499,12 +499,12 @@ TertiaryBiopores::update_active (const Geometry& geo,
           if (h[c] > pressure_initiate)
             {
               active[c] = true;
-              bottom_dea = std::min (geo.cell_bottom (c), bottom_dea);
-              top_dea = std::max (geo.cell_top (c), top_dea);
+              bottom_act = std::min (geo.cell_bottom (c), bottom_dea);
+              top_act = std::max (geo.cell_top (c), top_dea);
               if (active_msg == msg_cell)
                 {
                   std::ostringstream tmp;
-                  tmp << "h[" << c << "] = " << h[c] << ", deactivated";
+                  tmp << "h[" << c << "] = " << h[c] << ", activated";
                   msg.message (tmp.str ());
                 }
             }

@@ -562,6 +562,11 @@ ParserFile::Implementation::add_derived (Library& lib)
 {
   // Get the name of the class and the existing superclass to derive from.
   const symbol name = get_symbol ();
+  if (name == error_symbol)
+    {
+      skip_to_end ();
+      return;
+    }
   // Check for duplicates.
   if (lib.check (name))
     {
@@ -583,8 +588,9 @@ ParserFile::Implementation::add_derived (Library& lib)
     : get_symbol ();
   if (!lib.check (super))
     {
-      error (std::string ("Unknown '") + lib.name ()
-             + "' model '" + super + "'");
+      if (super != error_symbol)
+        error (std::string ("Unknown '") + lib.name ()
+               + "' model '" + super + "'");
       skip_to_end ();
       return;
     }
@@ -605,7 +611,11 @@ ParserFile::Implementation::add_derived (Library& lib)
       && looking_at ('"')
       && frame->lookup ("description") == Attribute::String
       && frame->type_size ("description") == Attribute::Singleton)
-    frame->set ("description", get_string ());
+    {
+      const symbol d = get_symbol ();
+      if (d != error_symbol)
+        frame->set ("description", d);
+    }
 
   // Add separate attributes for this object.
   Treelog::Open nest (msg, "Defining " + lib.name () + " '" + name + "'");
@@ -682,6 +692,11 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
           skipped = true;
         }
       type = get_symbol ();
+      if (type == error_symbol)
+        {
+          skip_to_end ();
+          return result;
+        }
     }
 
   try
@@ -756,6 +771,9 @@ ParserFile::Implementation::load_list (Frame& frame)
 	  current++;
 	}
 
+      if (name == error_symbol)
+        continue;
+
       // Make sure we skip the ')' afterwards.
       struct RAII_skip
       { 
@@ -779,8 +797,10 @@ ParserFile::Implementation::load_list (Frame& frame)
 	{
 	  bool ok = true;
 	  // Special handling of block local parameters.
-	  const std::string var = get_string ();
-	  if (frame.lookup (var) != Attribute::Error)
+	  const symbol var = get_symbol ();
+          if (var == error_symbol)
+            ok = false;
+	  else if (frame.lookup (var) != Attribute::Error)
 	    {
 	      error ("'" + var + "' already exists");
 	      ok = false;
@@ -795,7 +815,9 @@ ParserFile::Implementation::load_list (Frame& frame)
                 size = get_integer ();
               skip ("]");
             }
-	  const std::string type_name = get_string ();
+	  const symbol type_name = get_symbol ();
+          if (type_name == error_symbol)
+            ok = false;
 	  symbol doc = "User defined " + type_name + ".";
 	  const Attribute::type type = Attribute::type_number (type_name);
 	  switch (type)
@@ -804,6 +826,8 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      {
 		if (!looking_at ('('))
 		  doc = get_symbol ();
+                if (doc == error_symbol)
+                  ok = false;
 		if (ok)
 		  frame.declare_string (var, Attribute::Const, size, doc);
 		break;
@@ -812,6 +836,8 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      {
 		if (!looking_at ('('))
 		  doc = get_symbol ();
+                if (doc == error_symbol)
+                  ok = false;
 		if (ok)
 		  frame.declare_integer (var, Attribute::Const, size, doc);
 		break;
@@ -822,11 +848,15 @@ ParserFile::Implementation::load_list (Frame& frame)
 		if (looking_at ('['))
                   {
                     dim = get_symbol ();
+                    if (dim == error_symbol)
+                      dim == Attribute::Unknown ();
                     if (dim.name ().size () == 0)
                       dim = Attribute::None ();
                   }
 		if (!looking_at ('('))
 		  doc = get_symbol ();
+                if (doc == error_symbol)
+                  ok = false;
 		if (ok)
 		  frame.declare (var, dim, Attribute::Const, size, doc);
 		break;
@@ -835,16 +865,21 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      {
                 if (type_name == "fixed")
                   {
-                    const std::string submodel = get_string ();
-                    if (Librarian::submodel_registered (submodel))
+                    const symbol submodel = get_symbol ();
+                    if (submodel == error_symbol)
+                      ok = false;
+                    else if (Librarian::submodel_registered (submodel))
                       {
                         if (!looking_at ('('))
                           doc = get_string ();
-                        if (ok)
+                        if (doc == error_symbol)
+                          ok = false;
+                        else if (ok)
                           {
                             const Frame::load_syntax_t load
                               = Librarian::submodel_load (submodel);
-                            frame.declare_submodule (var, Attribute::Const, doc, load);
+                            frame.declare_submodule (var, Attribute::Const, 
+                                                     doc, load);
                           }
                         break;
                       }
@@ -857,7 +892,9 @@ ParserFile::Implementation::load_list (Frame& frame)
                       {
                         if (!looking_at ('('))
                           doc = get_string ();
-                        if (ok)
+                        if (doc == error_symbol)
+                          ok = false;
+                        else if (ok)
                           frame.declare_object (var, type_symbol, 
                                              Attribute::Const, size, doc);
                         break;
@@ -867,8 +904,11 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      }
 	      // Fallthrough
 	    default:
-	      error ("'" + type_name + "' unhandled type");
-	      ok = false;
+	      if (ok)
+                {
+                  error ("'" + type_name + "' unhandled type");
+                  ok = false;
+                }
 	    }
           // Next attribute.
           continue;
@@ -905,8 +945,10 @@ ParserFile::Implementation::load_list (Frame& frame)
       else if (looking_at ('$'))
         {
           skip ("$");
-          const std::string var = get_string ();
-          if (name == var)
+          const symbol var = get_symbol ();
+          if (var == error_symbol)
+            /* Do nothing */;
+          else if (name == var)
             error ("Reference $" + var + " refers to itself");
           else
             frame.set_reference (name, var);
@@ -994,22 +1036,26 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      break;
 	    }
 	  case Attribute::String:
-	    frame.set (name, get_string ());
-	    // Handle "directory" immediately.
-	    if (&frame == &metalib () && name == "directory")
-	      if (!metalib ().path ().set_directory (frame.name (name).name ()))
-		error ("Could not set directory '" + frame.name (name) + "'");
-	    break;
+            {
+              const symbol n = get_symbol ();
+              if (n == error_symbol)
+                break;
+              frame.set (name, n);
+              // Handle "directory" immediately.
+              if (&frame == &metalib () && name == "directory")
+                if (!metalib ().path ().set_directory (n))
+                  error ("Could not set directory '" + n + "'");
+            }
+            break;
 	  case Attribute::Boolean:
 	    {
-	      const std::string flag = get_string ();
-
+	      const symbol flag = get_string ();
 	      if (flag == "true")
 		frame.set (name, true);
 	      else
 		{
 		  frame.set (name, false);
-		  if (flag != "false")
+		  if (flag != "false" && flag != error_symbol)
 		    error ("Expected 'true' or 'false'");
 		}
 	      break;
@@ -1351,7 +1397,9 @@ ParserFile::Implementation::load_list (Frame& frame)
                           array.push_back (old_sequence[i]);
                         continue;
                       }
-		    array.push_back (get_symbol ());
+                    const symbol s = get_symbol ();
+                    if (s != error_symbol)
+                      array.push_back (s);
 		    count++;
 		  }
 		if (!Attribute::flexible_size (size) && count != size)

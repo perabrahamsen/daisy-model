@@ -630,7 +630,6 @@ Field::Implementation::tick_source (const Time& time,
       }
 }
 
-#include <sstream>
 double
 Field::Implementation::suggest_dt () const
 {
@@ -646,7 +645,6 @@ Field::Implementation::suggest_dt () const
       if (!std::isnormal (dt) || dt > col_dt)
         dt = col_dt;
     }
-  daisy_assert (!std::isnormal (dt));
   return dt;
 }
 

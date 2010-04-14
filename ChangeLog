@@ -1,3 +1,9 @@
+2010-04-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* time.h, time.C (microsecond): New field.
+	* timestep.h, timestep.C: Ditto.
+	* daisy.C (tick): Use it.
+
 2010-04-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.86 released.

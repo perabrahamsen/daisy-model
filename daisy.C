@@ -63,9 +63,13 @@ struct Daisy::Implementation
   const boost::scoped_ptr<Output> output_log;
   const Timestep timestep;
   const double max_dt;
+  const Timestep minimal_timestep;
+  const double min_dt;
+  double small_dt;
   double current_dt;
   Time time;
   Time previous;
+  Time next_large;
   const Time stop;
   int duration;
   const boost::scoped_ptr<Action> action;
@@ -86,7 +90,7 @@ struct Daisy::Implementation
     // Run simulation.
     {
       Treelog::Open nest (msg, "Running");
-
+      
       running = false;
 
       do
@@ -119,70 +123,33 @@ struct Daisy::Implementation
     return true;
   }
 
-  void tick (Daisy& daisy, Treelog& msg)
-  { 
-    // Initial logs.
-    output_log->initial_logs (daisy, previous, msg);
-
-    // Weather and management.
-    if (weather.get ())
-      weather->tick (time, msg);
-    action->tick (daisy, scope (), msg);
-    action->doIt (daisy, scope (), msg);
-
-    // Turnover and movement.
-    field->tick_source (time, weather.get (), msg); 
-    current_dt = field->suggest_dt (); 
-
-    if (!std::isnormal (current_dt) || current_dt > max_dt)
-      current_dt = max_dt;
-    if (current_dt < max_dt)
-      {
-        std::ostringstream tmp;
-        tmp << "Field suggested dt = " << current_dt << ", ignored";
-        msg.warning (tmp.str ());
-        current_dt = max_dt;
-      }
-    field->tick_move (metalib, time, current_dt, weather.get (), scope (), msg);
-
-    // Update time.
-    previous = time;
-    time += timestep;
-    if (time >= stop)
-      running = false;
-
-    // Log values.
-    output_log->tick (daisy, previous, current_dt, msg);
-
-    // Clear values for next timestep.
-    field->clear ();
-
-    // Communicate with the UI.
-    if (!daisy.ui_running ())
-      {
-        msg.error ("Simulation aborted");
-        running = false;
-      }
-    if (!running)
-      daisy.ui_set_progress (1.0);
-    else if (duration > 0)
-      {
-        const double total_hours = duration; // int -> double
-        const double hours_left = Time::hours_between (time, stop);
-        daisy.ui_set_progress ((total_hours - hours_left) / total_hours);
-      }
-    else if (duration != -42)
-      {
-        duration = -42;           // Magic to call this only once
-        daisy.ui_set_progress (-1.0);
-      }
+  static void prettify_time (const Time& lim, Time& val)
+  // Crop the least significant part of val, but stay larger than lim.
+  {
+    daisy_assert (val > lim);
+    Time test = val;
+    test.tick_microsecond (-test.microsecond ());
+    if (test <= lim)
+      return;
+    val = test;
+    test.tick_second (-test.second ());
+    if (test <= lim)
+      return;
+    val = test;
+    test.tick_minute (-test.minute ());
+    if (test <= lim)
+      return;
+    val = test;
+    return;
   }
 
+  void tick (Daisy& daisy, Treelog& msg);
 
   void output (Log& log) const
   {
     output_submodule (time, "time", log);
     output_submodule (previous, "previous", log);
+    output_submodule (next_large, "next_large", log);
     output_value (current_dt, "dt", log);
     if (weather.get ())
       output_derived (weather, "weather", log);
@@ -244,8 +211,8 @@ struct Daisy::Implementation
     if (!approximate (max_dt, 1.0))
       {
         std::ostringstream tmp;
-        tmp << "Daisy is designed for a timestep of 1 hour, you specified " 
-            << max_dt << " hours";
+        tmp << "Daisy is designed for a timestep of 1h, you specified " 
+            << timestep.print () << " hours";
         msg.warning (tmp.str ());
       }
     // Check actions.
@@ -274,11 +241,19 @@ struct Daisy::Implementation
                 ? submodel_value<Timestep> (al, "timestep")
                 : Timestep::hour ()),
       max_dt (timestep.total_hours ()),
+      minimal_timestep (al.check ("minimal_timestep")
+                        ? submodel_value<Timestep> (al, "minimal_timestep")
+                        : timestep),
+      min_dt (minimal_timestep.total_hours ()),
+      small_dt (max_dt),
       current_dt (max_dt),
       time (al.submodel ("time")),
       previous (al.check ("previous")
                 ? Time (al.submodel ("previous"))
                 : time - timestep),
+      next_large (al.check ("next_large")
+                  ? Time (al.submodel ("next_large"))
+                  : time + timestep),
       stop (al.check ("stop")
             ? Time (al.submodel ("stop")) 
             : Time (9999, 1, 1, 1)),
@@ -294,6 +269,135 @@ struct Daisy::Implementation
       harvest (map_submodel_const<Harvest> (al, "harvest"))
   { }
 };
+
+void 
+Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
+{ 
+  // Initial logs.
+  output_log->initial_logs (daisy, previous, msg);
+
+  // Weather and management.
+  if (weather.get ())
+    weather->tick (time, msg);
+  action->tick (daisy, scope (), msg);
+  action->doIt (daisy, scope (), msg);
+
+  // Find sources.
+  field->tick_source (time, weather.get (), msg); 
+
+  // Find next timestep.
+  Time next_time = Time::null ();
+
+  if (approximate (min_dt, max_dt))
+    // Fixed timesteps.
+    {
+      next_time = time + timestep;
+      next_large = next_time + timestep;
+      current_dt = max_dt;
+    }
+  else
+    // Source limited timestep.
+    {
+      double suggested_dt = field->suggest_dt (); 
+      if (!std::isnormal (suggested_dt))
+        suggested_dt = max_dt;
+
+      if (suggested_dt < min_dt)
+        {
+          static const double us = 1.0 / (60.0 * 60.0 * 1000000.0);
+          std::ostringstream tmp;
+          tmp << "Suggested timestep too small: " << suggested_dt << " (" ;
+          if (suggested_dt < 1.0 * us)
+            tmp << suggested_dt / us << " [us]";
+          else
+            tmp  << Timestep::build_hours (suggested_dt).print ();
+          tmp << ") < " << min_dt << " (" << minimal_timestep.print () << ")";
+          suggested_dt = min_dt;
+          msg.warning (tmp.str ());
+        }
+        
+
+      // Time remaining of current large timestep.
+      daisy_assert (next_large > time);
+      const Timestep ts_time_left = next_large - time;
+      const double ts_hours_left = ts_time_left.total_hours ();
+      daisy_assert (ts_hours_left > 0.0);
+
+      // Find next time.
+      if (suggested_dt >= ts_hours_left)
+        {
+          // We can complete the current large timestep in one go.
+          current_dt = ts_hours_left;
+          next_time = next_large;
+          next_large += timestep;
+        }
+      else if (suggested_dt * 2.0 > ts_hours_left)
+        {
+          // We split the remaining time in two, and round down.
+          next_time = time + ts_time_left / 2;
+          prettify_time (time, next_time);
+          Timestep ts = next_time - time;
+          current_dt = ts.total_hours ();
+        }
+      else 
+        {
+          // Use something close to suggested value.
+          Timestep approx = Timestep::build_hours (suggested_dt);
+          next_time = time + approx;
+          prettify_time (time, next_time);
+          Timestep ts = next_time - time;
+          current_dt = ts.total_hours ();
+        }
+
+      if (current_dt < small_dt)
+        {
+          small_dt = current_dt;
+          std::ostringstream tmp;
+          tmp << "Using small timestep: " 
+              << Timestep::build_hours (current_dt).print ();
+          msg.message (tmp.str ());
+        }
+      else if (small_dt < max_dt * 0.99 && approximate (current_dt, max_dt))
+        {
+          small_dt = max_dt;
+          msg.message ("Back to normal size timesteps");
+        }
+    }
+    
+  field->tick_move (metalib, time, current_dt, weather.get (), scope (), msg);
+
+  // Update time.
+  previous = time;
+  time = next_time;
+  if (time >= stop)
+    running = false;
+
+  // Log values.
+  output_log->tick (daisy, previous, current_dt, msg);
+
+  // Clear values for next timestep.
+  field->clear ();
+
+  // Communicate with the UI.
+  if (!daisy.ui_running ())
+    {
+      msg.error ("Simulation aborted");
+      running = false;
+    }
+  if (!running)
+    daisy.ui_set_progress (1.0);
+  else if (duration > 0)
+    {
+      const double total_hours = duration; // int -> double
+      const double hours_left = Time::hours_between (time, stop);
+      daisy.ui_set_progress ((total_hours - hours_left) / total_hours);
+    }
+  else if (duration != -42)
+    {
+      duration = -42;           // Magic to call this only once
+      daisy.ui_set_progress (-1.0);
+    }
+}
 
 const FrameModel&
 Daisy::frame () const
@@ -399,11 +503,17 @@ the simulation.");
 Current time in the simulation.", Time::load_syntax);
   frame.declare_submodule ("previous", Attribute::OptionalState, "\
 Previous time in the simulation.", Time::load_syntax);
+  frame.declare_submodule ("next_large", Attribute::OptionalState, "\
+End of next large timestep.", Time::load_syntax);
   frame.declare_submodule ("timestep", Attribute::OptionalState, "\
-Length of timestep in simlation.\n\
+Length of large timestep in simulation.\n\
 The default value is 1 hour, anything else is unlikely to work.",
                            Timestep::load_syntax);
   frame.set_check ("timestep", Timestep::positive ());
+  frame.declare_submodule ("minimal_timestep", Attribute::OptionalState, "\
+Minimum length of timestep in simulation.\n\
+By default, this is the same as 'timestep'.",
+                           Timestep::load_syntax);
   frame.declare ("dt", "h", Attribute::LogOnly, "\
 Current timestep used by simulation.");
   frame.declare_submodule ("stop", Attribute::OptionalConst,
