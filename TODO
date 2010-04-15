@@ -2,21 +2,19 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Check resultat af vap kørsel.
 
+* Bromid
+
+Plot M_total i hver horizont
+
+Plot M_secondary i hver horizont
+
+Plot crop uptake, drain, leaching
+
+tertiary, surface, infiltration
+
 * Hvordan reagerer bioporer på dt?
 
 Analyser.
-
-* Variable tidsskridt
-
-** Stof begrænsning: 
-
-dt * -S * C_secondary < f M_total
-
-OG/ELLER
-
-dt * -S * C_secondary < n * M_secondary; n > 1
-
-Vi kan ikke bruge n <= 1, da det sekundære domæne skal kunne tørre helt ud.
 
 * Kørsel: 10 sec
 
@@ -26,25 +24,13 @@ Test 1C-Center (10 sec) mod 1C-Center (1 hour)
 
 Det ser ud til at være Bioporer der er problemet.
 
-Prøv igen når vi har variable tidsskridt
+** Prøv igen når vi har variable tidsskridt
 
 * Prøv 2D med MACRO hydraulics
 
 Specielt pressure secondary domain.  MACRO har mere vand i det domæne.
 
 VIRKER IKKE!  failure 50% af tiden
-
-* VAP: For meget bromid i dræn (mere end der tilføres)
-
-S termen tager mere bromid end der i vandet.
-
-** daisy i små tidsskridt?
-
-Mindsker fejlen...
-
-** drain i små tidsskridt?
-
-** convection domain 2?
 
 * Optimize
 
