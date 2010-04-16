@@ -1,8 +1,18 @@
+2010-04-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemistry.h, chemistry_std.C, chemistry_multi.C:
+	* chemical.h, chemical_std.C (tick_source, suggest_dt): New functions.
+	* column_std.C (tick_source): Call it.
+
+	* chemistry_multi.C (none): New build-in parameterization.
+	* lib/chemistry.dai (none): Removed.
+
 2010-04-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* time.h, time.C (microsecond): New field.
 	* timestep.h, timestep.C: Ditto.
 	* daisy.C (tick): Use it.
+	* lib/log.dai ("Time"): New log.
 
 2010-04-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 

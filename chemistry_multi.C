@@ -28,7 +28,9 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "vcheck.h"
+#include "check.h"
 #include "frame.h"
+#include "mathlib.h"
 #include <map>
 #include <sstream>
  
@@ -37,7 +39,11 @@ struct ChemistryMulti : public Chemistry
   // Parameters.
   auto_vector<Chemistry*> combine;
   std::vector<symbol> ignore;
-  
+  const double max_sink_total;     // []
+  const double max_sink_solute;    // []
+  const double max_sink_secondary; // []
+  const double min_sink_total;     // []
+
   // Cache.
   const std::vector<Chemical*> chemicals;
 
@@ -66,6 +72,13 @@ struct ChemistryMulti : public Chemistry
                     const Volume&, Treelog& msg);
   
   // Simulation.
+  void tick_source (const Scope&, 
+                    const Geometry&, const Soil&, const SoilWater&, 
+                    const SoilHeat&, const OrganicMatter&, const Chemistry&, 
+                    Treelog&);
+  double find_dt (double S, double C, 
+                  double M_secondary, double M_solute, double M_total) const;
+  double suggest_dt () const;
   void tick_top (const Units&, const Geometry&, const Soil&, 
                  const SoilWater&, const SoilHeat&, 
                  const double tillage_age /* [d] */,
@@ -302,6 +315,52 @@ ChemistryMulti::incorporate (const Geometry& geo,
 }
 
 void 
+ChemistryMulti::tick_source (const Scope& scope, const Geometry& geo,
+                             const Soil& soil, const SoilWater& soil_water, 
+                             const SoilHeat& soil_heat, 
+                             const OrganicMatter& organic, 
+                             const Chemistry& chemistry, Treelog& msg)
+{
+  for (size_t c = 0; c < combine.size (); c++)
+    combine[c]->tick_source (scope, geo, soil, soil_water, soil_heat, 
+                             organic, chemistry, msg);
+}
+
+double 
+ChemistryMulti::find_dt (const double S, const double C, 
+                         double M_secondary, const double M_solute,
+                         const double M_total) const
+{
+  double min_M = std::min (max_sink_solute * M_solute,
+                           max_sink_total * M_total);
+
+  if (M_secondary > 0.0)
+    min_M = std::min (min_M, max_sink_secondary * M_secondary);
+
+  const double dt = std::max (min_sink_total * M_total, min_M) / (S * C);
+
+  if (dt < 0.0)
+    return 0.0;
+
+  return dt;
+}
+
+double 
+ChemistryMulti::suggest_dt () const
+{
+  double dt = 0.0;
+  for (size_t c = 0; c < combine.size (); c++)
+    {
+      const double chem_dt = combine[c]->suggest_dt ();
+      if (std::isnormal (chem_dt)
+          && (!std::isnormal (dt) || chem_dt < dt))
+        dt = chem_dt;
+    }
+  return dt;
+}
+
+
+void 
 ChemistryMulti::tick_top (const Units& units, const Geometry& geo, 
                           const Soil& soil, const SoilWater& soil_water, 
                           const SoilHeat& soil_heat, 
@@ -438,6 +497,10 @@ ChemistryMulti::ChemistryMulti (const BlockModel& al)
   : Chemistry (al),
     combine (Librarian::build_vector<Chemistry> (al, "combine")),
     ignore (al.name_sequence ("ignore")),
+    max_sink_total (al.number ("max_sink_total")),
+    max_sink_solute (al.number ("max_sink_solute")),
+    max_sink_secondary (al.number ("max_sink_secondary")),
+    min_sink_total (al.number ("min_sink_total")),
     chemicals (find_chemicals (combine))
 { }
 
@@ -452,17 +515,50 @@ static struct ChemistryMultiSyntax : public DeclareModel
   {
 
     frame.declare_object ("combine", Chemistry::component, 
-                      Attribute::State, Attribute::Variable, "\
+                          Attribute::State, Attribute::Variable, "\
 List of chemistry parameterizations you want to combine.");
     frame.declare_string ("ignore", Attribute::State, Attribute::Variable,
-               "Don't warn when spraying one of these chemicals.\n\
+                          "Don't warn when spraying one of these chemicals.\n\
 The first time an untraced chemical not on the list is sprayed on the\n\
 field, Daisy will issue a warning and add the chemical to this list.");
     frame.set_check ("ignore", VCheck::unique ());
     frame.set_empty ("ignore");
     frame.declare_object ("trace", Chemical::component, 
-                      Attribute::LogOnly, Attribute::Variable, "\
+                          Attribute::LogOnly, Attribute::Variable, "\
 List of chemicals in nested chemistries.");
+    frame.declare ("max_sink_total", Attribute::None (), Check::positive (), 
+                   Attribute::Const, "\
+Maximum allowed sink term as a fraction of total content.\n\
+\n\
+If variable timesteps are enabled, Daisy will try to scale down the\n\
+timestep in order to ensure that no more than this fraction of the\n\
+total content is removed by drains or biopores within the timestep.");
+    frame.set ("max_sink_total", 0.5);
+    frame.declare ("max_sink_solute", Attribute::None (), Check::positive (), 
+                   Attribute::Const, "\
+Maximum allowed sink term as a fraction of solute content.\n\
+\n\
+If variable timesteps are enabled, Daisy will try to scale down the\n\
+timestep in order to ensure that no more than this fraction of the\n\
+solute content is removed by drains or biopores within the timestep.");
+    frame.set ("max_sink_solute", 0.9);
+    frame.declare ("max_sink_secondary", Attribute::None (), Check::positive (), 
+                   Attribute::Const, "\
+Maximum allowed sink term as a fraction of secondary domain content.\n\
+\n                                                                    \
+If variable timesteps are enabled, Daisy will try to scale down the\n\
+timestep in order to ensure that no more than this fraction of the\n\
+secondary domain content is removed by drains or biopores within the\n\
+timestep.  This should usually be above 1 to allow for the case where\n\
+the secondary domain is emptied within a timestep.");
+    frame.set ("max_sink_secondary", 1.5);
+    
+    frame.declare ("min_sink_total", Attribute::None (), Check::positive (), 
+                   Attribute::Const, "\n\
+Always allow this fraction of total content to be removed by sink term.\n\
+\n\
+This overwrites all the 'max_sink' parameters.");
+    frame.set ("min_sink_total", 0.01);
   }
 } ChemistryMulti_syntax;
 
@@ -475,5 +571,15 @@ Include 'N' chemistry so organic matter and plants will work.")
   void load_frame (Frame& frame) const
   { frame.set_strings ("combine", "N"); }
 } ChemistryNutrient_syntax;
+
+static struct ChemistryNoneSyntax : public DeclareParam
+{ 
+  ChemistryNoneSyntax ()
+    : DeclareParam (Chemistry::component, "none", "multi", "\
+No active chemistries.")
+  { }
+  void load_frame (Frame& frame) const
+  { frame.set_empty ("combine"); }
+} ChemistryNone_syntax;
 
 // chemistry_multi.C ends here

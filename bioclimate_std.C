@@ -712,8 +712,22 @@ BioclimateStandard::WaterDistribution (const Units& units,
   snow_water_out = snow.percolation ();
   if (snow_water_out < 0.0)
     {
-      daisy_assert (snow_water_out * dt + surface.ponding () >= 0.0);
-      surface.put_ponding (snow_water_out * dt + surface.ponding ());
+      double adjusted_pond = snow_water_out * dt + surface.ponding ();
+      if (adjusted_pond < 0.0)
+        {
+          if (approximate (-snow_water_out * dt, surface.ponding ()))
+            adjusted_pond = 0.0;
+          else
+            {
+              std::ostringstream tmp;
+              tmp << "snow_water_out (" << snow_water_out 
+                  << ") * dt (" << dt 
+                  << ") + pond (" << surface.ponding () 
+                  << ") = " << adjusted_pond << ") < 0";
+              msg.warning (tmp.str ());
+            }
+        }
+      surface.put_ponding (adjusted_pond);
       snow_water_out = 0.0;
     }
   snow_water_out_temperature = snow.temperature ();

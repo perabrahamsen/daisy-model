@@ -72,7 +72,4 @@
   (trace DDT
 	 Heptachlor "2,4-D" Ioxynil Pendimethalin MCPP IPU Bentazon Atrazine))
 
-(defchemistry none multi
-  (combine))
-
 ;;; chemestry.dai ends here.

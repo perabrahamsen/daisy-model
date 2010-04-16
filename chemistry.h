@@ -87,6 +87,14 @@ public:
 
   // Simulation.
 public:
+  virtual void tick_source (const Scope&, 
+                            const Geometry&, const Soil&, const SoilWater&, 
+                            const SoilHeat&, const OrganicMatter&, 
+                            const Chemistry&, Treelog&) = 0;
+  virtual double find_dt (double S, double C, 
+                          double M_secondary, double M_solute, 
+                          double M_total) const = 0;
+  virtual double suggest_dt () const = 0;
   virtual void tick_top (const Units&, const Geometry&, const Soil&, 
                          const SoilWater&, const SoilHeat&, 
                          const double tillage_age /* [d] */,

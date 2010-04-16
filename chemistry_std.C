@@ -35,6 +35,7 @@
 #include "vcheck.h"
 #include "treelog.h"
 #include "frame.h"
+#include "mathlib.h"
 
 struct ChemistryStandard : public Chemistry
 {
@@ -67,6 +68,13 @@ struct ChemistryStandard : public Chemistry
                     const Volume&, Treelog& msg);
   
   // Simulation.
+  void tick_source (const Scope&, 
+                    const Geometry&, const Soil&, const SoilWater&, 
+                    const SoilHeat&, const OrganicMatter&, const Chemistry&, 
+                    Treelog&);
+  double find_dt (double, double, double, double, double) const
+  { return 0.0; }
+  double suggest_dt () const;
   void tick_top (const Units&, const Geometry&, const Soil&, 
                  const SoilWater&, const SoilHeat&, 
                  const double tillage_age /* [d] */,
@@ -233,6 +241,32 @@ ChemistryStandard::incorporate (const Geometry& geo,
         return;
       }
   msg.warning ("Unknwon chemical '" + chem + "' ignored");
+}
+
+void 
+ChemistryStandard::tick_source (const Scope& scope, const Geometry& geo,
+                                const Soil& soil, const SoilWater& soil_water, 
+                                const SoilHeat& soil_heat, 
+                                const OrganicMatter& organic, 
+                                const Chemistry& chemistry, Treelog& msg)
+{
+  for (size_t c = 0; c < chemicals.size (); c++)
+    chemicals[c]->tick_source (scope, geo, soil, soil_water, soil_heat, 
+                               organic, chemistry, msg);
+}
+
+double 
+ChemistryStandard::suggest_dt () const
+{
+  double dt = 0.0;
+  for (size_t c = 0; c < chemicals.size (); c++)
+    {
+      const double chem_dt = chemicals[c]->suggest_dt ();
+      if (std::isnormal (chem_dt)
+          && (!std::isnormal (dt) || chem_dt < dt))
+        dt = chem_dt;
+    }
+  return dt;
 }
 
 void 

@@ -165,7 +165,7 @@ public:
 
   // Simulation.
   void clear ();
-  void tick_source (const Time&, const Weather*, Treelog&);
+  void tick_source (const Time&, const Weather*, const Scope&, Treelog&);
   double suggest_dt () const;
   void tick_move (const Metalib& metalib, 
                   const Time&, double dt, const Weather*, 
@@ -576,6 +576,7 @@ ColumnStandard::clear ()
 void
 ColumnStandard::tick_source (const Time& time, 
                              const Weather *const global_weather,
+                             const Scope& parent_scope,
                              Treelog& msg)
 { 
   // Weather.
@@ -587,13 +588,20 @@ ColumnStandard::tick_source (const Time& time,
   // Add deposition. 
   chemistry->deposit (my_weather.deposit (), msg);
 
-
   // Find forward sink.
   drain->tick (geometry, *soil, *soil_heat, surface, *soil_water, msg);
   movement->tick_source (*soil, *soil_heat, *soil_water, msg);
 
   // Find water based limit.
   soil_water->tick_source (geometry, *soil, msg);
+
+  // Scope.
+  daisy_assert (extern_scope);
+  ScopeMulti scope (*extern_scope, parent_scope);
+
+  // Find solute based limit.
+  chemistry->tick_source (scope, geometry, *soil, *soil_water, *soil_heat, 
+                          *organic_matter, *chemistry, msg);
 }
 
 double
@@ -603,8 +611,15 @@ ColumnStandard::suggest_dt () const
   
   const double sw_dt = soil_water->suggest_dt ();
   
-  if (!std::isnormal (dt) || dt > sw_dt)
+  if (std::isnormal (sw_dt) 
+      && (!std::isnormal (dt) || dt > sw_dt))
     dt = sw_dt;
+
+  const double chem_dt = chemistry->suggest_dt ();
+
+  if (std::isnormal (chem_dt) 
+      && (!std::isnormal (dt) || dt > chem_dt))
+    dt = chem_dt;
 
   return dt;
 }

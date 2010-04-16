@@ -40,20 +40,24 @@
 
 ;; (run batch (run plotfull))
 
-;;(run batch (run Silstrup-2D (plotall (graph Silstrup))))
+;; (run batch (run Silstrup-2D (plotall (graph Silstrup))))
 ;;(run batch (run Estrup-2D Silstrup-2D plotall))
 
 ;;(run batch (run (Silstrup-2D (column (Silstrup-2D-MACRO (Chemistry multi (combine Bromide))))) (plotall (graph Silstrup))))
-(run batch (run Estrup-2C Silstrup-2C plotall))
+;; (run batch (run Estrup-2C Silstrup-2C plotall))
+;;(run batch (run Silstrup-2C) (plotall (graph Silstrup)))
 ;; (run batch (run ;;(Silstrup-1C-Center (column (Silstrup-1C-Center (Chemistry none))) (timestep (seconds 20)))
                  ;; (Estrup-2C (timestep (seconds 10)))
                  ;;(plotall (graph Silstrup) )
 ;;                 ))
-;;(run (Silstrup (column (Silstrup-1C-Center))))
+(run batch 
+     (run (Silstrup (timestep (seconds 20)) (column (Silstrup-1C-Center)))
+          (plotall (graph Silstrup))))
 
 ;;(run batch (run Estrup-1C-Drain Silstrup-1C-Drain plotall))
 
 ;;(run batch (run plotall))
+;;(run batch (plotall (graph Silstrup)))
 ;;(run plothydro)
 
 ;;; vap.dai ends here.

@@ -109,12 +109,12 @@ inkluderet.  GEUS leverede yderligere regneark med både flow og
 tidsproportionelle målinger af glyfosat og bromid i dræn, samt
 punktmålinger for fenpropimorph, dimethoate samt metamitron i dræn.
 GEUS data er for størstedelens vedkommende tidligere blevet
-præsenteret i \citet{vap2009}, med yderligere information in
+præsenteret i \citet{vap2009}, med yderligere information i
 \citet{lindhardt2001}.  De fleste måletal er omformet til
-\texttt{.ddf} format, som er et format Daisy kan forstå, om som
-muliggør at de bliver plottet sammen Daisys simuleringsresultater (der
-ligger i \texttt{.dlf} format).  De fleste grafer i dette kapitel er
-genereret automatisk af Daisy med hjælp fra \texttt{gnuplot} ud fra
+\texttt{.ddf} format, som er et format Daisy kan forstå, og som
+muliggør at de bliver plottet sammen med Daisys simuleringsresultater
+(der ligger i \texttt{.dlf} format).  De fleste grafer i dette kapitel
+er genereret automatisk af Daisy med hjælp fra \texttt{gnuplot} ud fra
 \texttt{.ddf} og \texttt{.dlf} filer.
 
 DJF leverede klimatal for Silstrup, Tylstrup, samt Askov.  Både time
@@ -124,7 +124,7 @@ vindhastighed, vindretning, relativ luftfugtighed, nedbør,
 globalstråling, lufttryk, samt middelværdier (også hver time) for
 lufttemperatur, vindhastighed, vindretning, og relativ luftfugtighed.
 Døgnværdierne består af døgnmiddeltemperatur, nedbør, ``MakkEpot''
-(antageligvis potentiel fordampning udregnet fra Makkinks formel),
+(potentiel fordampning udregnet fra Makkinks formel),
 middelvindhastighed, relativ fugtighed, damptryksunderskud, samt
 globalstråling.  Luftfugtighed (for både time og døgntal) og
 temperatur (for timetal) er målt i 2 meters højde, vindhastigheden i
@@ -136,8 +136,8 @@ filen \texttt{vap.dai}.
 \subsection{Kolloider, bioporer og diskretisering}
 
 Vi har ikke fået nogen data om bioporer eller kolloider for de berørte
-arealer.  For bioporer har vi valgt at bruge optælling fra Rørrende
-\citep{habekost1} fra dette projekt. Disse kan findes i
+arealer.  For bioporer har vi valgt at bruge optælling fra
+Rørrendegård \citep{habekost1} fra dette projekt. Disse kan findes i
 opsætningsfilen \texttt{biopores.dai}.  For kolloider har vi valgt at
 bruge en opsætning baseret på data fra agrovand projektet, som kan
 findes i filen \texttt{colloid-bound.dai} sammen med definition af
@@ -174,7 +174,7 @@ indenfor hver celle (for stof skelnes der dog mellem om det befinder
 sig i det primære eller det sekundære domæne.  Det tertiære domæner
 har sin helt egen diskretisering), derfor er det vigtigt at
 cellestørrelsen er lille omkring de steder hvor der sker meget.  Det
-vil især sig ved overfladen, omkring drænet, samt til dels lige over
+vil især sige ved overfladen, omkring drænet, samt til dels lige over
 horisontgrænserne.  Dette skal afvægtes mod beregningstid, som stiger
 hurtigt med antallet af celler. Der bør altid være inddelinger ved
 horisontgrænserne, således at hver celle holder sig indenfor en
@@ -234,11 +234,11 @@ kunne være
     (adsorption linear (K_OC 207 [l/kg])))
 \end{verbatim}
 
-For kolloidfaciliteret transport er vi nødt til at skelne mellem
+For kolloidfaciliteret transport er vi nødt til at skelne mellem de
 forskellige former pesticidet kan optræde i, opløst, bundet til
 jormatricen, eller bundet til kolloider.  Det har desuden været
-nødvendt at dele den det der er bundet til jormatricen op i en svag og
-en stærk binding, for at kunne forklare den observerede dynamik. 
+nødvendt at dele den del der er bundet til jormatricen op i en svag og
+en stærk binding, for at kunne forklare den observerede dynamik.
 
 Vi definerer først en fælles beskrivelse for alle former, hvor vi
 placerer pesticidets nedbrydningsrate, som vi altså antager er den
@@ -277,7 +277,7 @@ en svagt adsorbered variant.
 (defchemical Glyphosate-immobile-strong Glyphosate-immobile)
 (defchemical Glyphosate-immobile-weak Glyphosate-immobile)
 \end{verbatim}
-Til sidst angives defineres den kolloidbunde form
+Til sidst defineres den kolloidbunde form
 \begin{verbatim}
 (defchemical Glyphosate-colloid Glyphosate-base
   "Glyphosate sorbed to colloids."
@@ -315,7 +315,7 @@ således at summen er den målte værdi
   (k_sorption 0.05 [h^-1]))
 \end{verbatim}
 Opdelingen mellem de to former bestemmes ved kalibrering, det samme
-gør sorptionsraterne, da måletal fra laboratoriet kan vanskeligt
+gør sorptionsraterne, da måletal fra laboratoriet vanskeligt kan
 overføres til markforhold.  Vi har her valgt at have en hurtig men
 svagt adsorberende form, samt en langsom men stærkt adsorberende form.
 Effekten af dette er at stoffet vil blive bundet svagt i starten, men
@@ -333,25 +333,28 @@ Sorption til kollider er tilsvarende:
 \end{verbatim}
 Vi angive her navnet på det kolloid som vores opløste glyfosat skal
 søge ligevægt med (\texttt{colloid}). Til ligevægten tilfører vi
-\verb|soil_enrichment_factor|, som indikerer at glyfosat her vil
-10000 gange hellere sætte sig på et kolloid, end på jordmatricen.
+\verb|soil_enrichment_factor|, som indikerer at glyfosat her 
+10000 gange hellere vil sætte sig på et kolloid, end på jordmatricen.
 Igen en parameter det er vanskeligt at finde anvendelige
 litteraturværdier for.
 
 Beskrivelsen af kolloider og pesticider kan findes i filen
 \texttt{colloid-bound.dai}.
 
-\subsection{Forvaltning}
+\subsection{Dyrkning}
 
-Forvaltningsdata fra GEUS består af jordbehandling, gødning, såning og
-høst af afgrøder, pesticidanvendelse.  Desuden er der informationerne
-om afgrødernes udviklingstrin, biomasse på udvalgte tidspunkter, samt
-høstudbytte.
+Data vedrørende dyrkning fra GEUS består af jordbehandling, gødning,
+såning og høst af afgrøder, pesticidanvendelse.  Desuden er der
+informationerne om afgrødernes udviklingstrin, biomasse på udvalgte
+tidspunkter, samt høstudbytte.
 
 Da vores fokus ikke er på planter eller kvælstof, har vi valgt at køre
 Daisy uden kvælstof, som angives således:
 \begin{verbatim}
-  (Chemistry multi (combine Silstrup))
+  (Chemistry multi 
+             (combine colloids Bromide
+                      Dimethoate Fenpropimorph 
+                      Glyphosate Metamitron))
 \end{verbatim}
 Parameteren \texttt{combine} i \texttt{Chemistry} skulle have
 inkluderet \texttt{N} hvis Daisy skulle holde regnskab med NO$_3^-$ og
@@ -397,8 +400,8 @@ Eksempel:
 
 For jordbehandling bruger vi dato, type og dybde, som alle indgår i
 Daisy opsætningen.  Jordbehandling er vigtig for udvaskning af
-pesticider, specielt i forbindelse med for kolloidbåren transport, men
-den mekanistiske sammenhæng er endnu ikke inde i modellen, og Daisy
+pesticider, specielt i forbindelse med kolloidbåren transport, men den
+mekanistiske sammenhæng er endnu ikke inde i modellen, og Daisy
 benytter sig i lighed med MACRO af empiriske faktorer baseret på
 typisk jordbehandling.  Eksempel:
 \begin{verbatim}
@@ -593,7 +596,7 @@ GEUS har leveret grundvandsdata fra piezometer placeret i P3, med et
 filter placeret i 5.5 til 6 meters dybde.  Dat det er tæt på den dybde
 hvortil jorden er beskrevet (5 meter) har vi valgt at bruge trykket
 fra piezometeret som nedre rand for vores system.  Der er en meget
-klar sammenhæng disse måletal, og hvornår drænene er aktive.  Da
+klar sammenhæng mellem disse måletal, og hvornår drænene er aktive.  Da
 piezometeret er placeret på toppen af skråningen, og da drænmålingerne
 viser at drænene bliver aktiveret før den målte grundvandsdybde når
 drænrørene, har vi valgt at tilføje et fast offset til det målte tryk.
@@ -642,20 +645,21 @@ er en god chance for at de ikke er repræsentative for marken.
 \subsection{Koncentration i jord}
 
 Der er målt bromid med sugekopper ved S1 og S2 i 1 og 2 meters dybde,
-vi har fået data fra S1 i en meters dybde.  Da variationen mellem S1
-og S2 vist i \citet{vap2009} er stor på trods af at de to målepunkter
+vi har fået data fra S1 i en meters dybde.  Da forskellen mellem S1 og
+S2 vist i \citet{vap2009} er stor på trods af at de to målepunkter
 ligger tæt, har vi valgt ikke at kalibrere efter disse punktdata, vist
 på figur~\ref{fig:Silstrup-sc-bromide}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/Silstrup-sc-bromide}
   \end{center}
-  \caption{Bromid i jorden i en meters dybde ved S1 i Silstrup.}
+  \caption{Bromid i jordvæske udtaget med sugekop i en meters dybde
+    ved S1 i Silstrup.}
   \label{fig:Silstrup-sc-bromide}
 \end{figure}
 
-Der er desuden målt på pesticider i to vandrette skærme beliggende i
-3,5 meters dybde.  Disse er på sin vis mere interessante, da de omgår
+Der er desuden målt på pesticider i to vandretliggende filtre i 3,5
+meters dybde.  Disse er på sin vis mere interessante, da de omgår
 problemet med heterogenitet ved at integrere over et stort område.
 Ingen af disse målinger har dog vist koncentrationer over
 detektionsgrænsen.  De simulerede værdier kan ses på
@@ -664,7 +668,7 @@ figur~\ref{fig:Silstrup-horizontal}.
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/Silstrup-horizontal}
   \end{center}
-  \caption{Pesticider i jorden i 3,5 meters dybde i Silstrup.}
+  \caption{Simuleret pesticidkoncentration i jordvæske i 3,5 meters dybde i Silstrup.}
   \label{fig:Silstrup-horizontal}
 \end{figure}
 
@@ -768,7 +772,7 @@ matrix kan ses på figur~\ref{fig:Silstrup-kolloid} og
 bidrag fra matrix til bioporer tæller positivt, og bidrag fra bioporer
 til matrix tæller negativt.  Vi har valgt at se på fem forskellige
 lag. 1) Vand der ryger direkte fra overfladen til bioporer (Above
-surface).  2) Udveksling i de øverste 3 cm (Top soil).  3) udveksling
+surface).  2) Udveksling i de øverste 3 cm (0-3 cm).  3) Udveksling
 i resten af Ap horizonten (Ap).  Udveksling i pløjesålen (Plow
 pan). Udveksling under pløjesålen, ned til 50 cm (B50).  Der skelnes
 mellem bioporer som ender i matrix, og bioporer som ender direkte i
@@ -777,7 +781,7 @@ dræn.
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/Silstrup-colloid}
   \end{center}
-  \caption{Kolloider i drænvand}
+  \caption{Kolloider i drænvand (simuleret).}
   \label{fig:Silstrup-kolloid}
 \end{figure}
 \begin{figure}[htbp]
@@ -787,7 +791,7 @@ dræn.
     \includegraphics[width=\columnwidth]{fig/Silstrup-biopore-drain}\\
     \includegraphics[width=\columnwidth]{fig/Silstrup-biopore-drain-acc}
   \end{center}
-  \caption{Bioporeaktivitet i 5 forskellige jordlag.}
+  \caption{Bioporeaktivitet i 5 forskellige jordlag (simuleret).}
   \label{fig:Silstrup-biopore}
 \end{figure}
 
@@ -947,19 +951,20 @@ figur~\ref{fig:Estrup-sc-bromide}.
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/Estrup-sc-bromide}
   \end{center}
-  \caption{Bromid i jorden i en meters dybde ved S1 i Estrup.}
+  \caption{Bromid i jordvæske udtaget med sugekop i en meters dybde ved S1 i Estrup.}
   \label{fig:Estrup-sc-bromide}
 \end{figure}
 
-Der er desuden målt på pesticider i en vandrette skærm beliggende i
-3,5 meters dybde.  Ingen af disse målinger har dog vist
-koncentrationer over detektionsgrænsen.  De simulerede værdier kan ses
-på figur~\ref{fig:Estrup-horizontal}.
+Der er desuden målt på pesticider i en vandretliggende filtre i 3,5
+meters dybde.  Ingen af disse målinger har dog vist koncentrationer
+over detektionsgrænsen.  De simulerede værdier kan ses på
+figur~\ref{fig:Estrup-horizontal}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/Estrup-horizontal}
   \end{center}
-  \caption{Pesticider i jorden i 3,5 meters dybde i Estrup.}
+  \caption{Simuleret pesticidkoncentration i jordvæske i 3,5 meters
+    dybde i Estrup.}
   \label{fig:Estrup-horizontal}
 \end{figure}
 
@@ -1037,7 +1042,7 @@ matrix kan ses på figur~\ref{fig:Estrup-kolloid} og
 bidrag fra matrix til bioporer tæller positivt, og bidrag fra bioporer
 til matrix tæller negativt.  Vi har valgt at se på fem forskellige
 lag. 1) Vand der ryger direkte fra overfladen til bioporer (Above
-surface).  2) Udveksling i de øverste 3 cm (Top soil).  3) udveksling
+surface).  2) Udveksling i de øverste 3 cm (0-3 cm).  3) Udveksling
 i resten af Ap horizonten (Ap).  Udveksling i pløjesålen (Plow
 pan). Udveksling under pløjesålen, ned til 50 cm (B50).  Der skelnes
 mellem bioporer som ender i matrix, og bioporer som ender direkte i
@@ -1046,7 +1051,7 @@ dræn.
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/Estrup-colloid}
   \end{center}
-  \caption{Kolloider i drænvand.}
+  \caption{Kolloider i drænvand (simuleret).}
   \label{fig:Estrup-kolloid}
 \end{figure}
 \begin{figure}[htbp]
@@ -1056,8 +1061,7 @@ dræn.
     \includegraphics[width=\columnwidth]{fig/Estrup-biopore-drain}\\
     \includegraphics[width=\columnwidth]{fig/Estrup-biopore-drain-acc}
   \end{center}
-  \caption{Bioporeaktivitet i 5 forskellige
-    jordlag.}
+  \caption{Bioporeaktivitet i 5 forskellige jordlag (simuleret).}
   \label{fig:Estrup-biopore}
 \end{figure}
 
@@ -1089,9 +1093,9 @@ belæg for at sætte $K_b$ til 1 mm/h (op fra 0,1 mm/h brugt af GEUS),
 og for Estrup satte vi $K_b$ til 0,5 mm/h (op fra 0,1 mm/h).
 
 For Silstrup har vi sat ledningsevnen i overfladelaget ned til 1
-promille mellem høst og pløjning, for at fremtvinge
-makroporeaktivitet.  For Estrup har vi foreløbigt sat den ned til 10\%
-af den justerede værdi.
+promille af den i resten af perioden anvendte værdi mellem høst og
+pløjning, for at fremtvinge makroporeaktivitet.  For Estrup har vi
+foreløbigt sat den ned til 10\% af den justerede værdi.
 
 \addcontentsline{toc}{section}{\numberline{}References}
 \bibliography{../../txt/daisy}

@@ -124,6 +124,11 @@ public:
 
   // Simulation.
 public:
+  virtual void tick_source (const Scope&, 
+                            const Geometry&, const Soil&, const SoilWater&, 
+                            const SoilHeat&, const OrganicMatter&, 
+                            const Chemistry&, Treelog&) = 0;
+  virtual double suggest_dt () const = 0;
   virtual void tick_top (double snow_leak_rate /* [h^-1] */,
                          double canopy_cover /* [] */,
                          double canopy_leak_rate /* [h^-1] */,

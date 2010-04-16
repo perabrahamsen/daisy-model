@@ -65,7 +65,7 @@ MovementSolute::secondary_flow (const Geometry& geo,
   for (;;)
     {
       // Are we done yet?
-      const double min_timestep_factor = 0.001;
+      const double min_timestep_factor = 1e-19;
       if (time_left < 0.1 * min_timestep_factor * dt)
         break;
 
@@ -90,15 +90,19 @@ MovementSolute::secondary_flow (const Geometry& geo,
       // Limit timestep based on water flux.
       for (size_t e = 0; e < edge_size; e++)
         {
-          const int cell = (q[e] > 0.0 ? geo.edge_to (e) : geo.edge_from (e));
-          if (geo.cell_is_internal (cell))
+          const int cell = (q[e] > 0.0 ? geo.edge_from (e) : geo.edge_to (e));
+          if (geo.cell_is_internal (cell) 
+              && Theta[cell] > 1e-6 && M[cell] > 0.0)
             {
               const double loss_rate = std::fabs (q[e]) * geo.edge_area (e);
               const double content = Theta[cell] * geo.cell_volume (cell); 
               const double time_to_empty = content / loss_rate;
               if (time_to_empty < min_timestep_factor * dt)
-                // Unreasonable small time step.  Give up.
-                continue;
+                {
+                  msg.warning ("Too fast water movement in secondary domain");
+                  ddt = min_timestep_factor * dt;
+                  break;
+                }
               
               // Go down in timestep while it takes less than two to empty cell.
               while (time_to_empty < 2.0 * ddt)

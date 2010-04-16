@@ -283,7 +283,7 @@ Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
   action->doIt (daisy, scope (), msg);
 
   // Find sources.
-  field->tick_source (time, weather.get (), msg); 
+  field->tick_source (time, weather.get (), scope (), msg); 
 
   // Find next timestep.
   Time next_time = Time::null ();

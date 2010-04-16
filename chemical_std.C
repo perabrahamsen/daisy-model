@@ -136,6 +136,8 @@ struct ChemicalStandard : public Chemical
   std::vector<double> J_tertiary; // Solute transport log in tertiary water.
   std::vector<double> tillage;         // Changes during tillage.
   std::vector<double> lag;
+  double sink_dt;                            // Suggested timestep [h]
+  int sink_cell;                             // Relevant cell.
 
   // Cache.
   std::vector<double> static_decompose_rate; // Depth adusted decompose rate.
@@ -202,6 +204,11 @@ struct ChemicalStandard : public Chemical
              double from, double middle, double to);
   
   // Simulation.
+  void tick_source (const Scope&, 
+                    const Geometry&, const Soil&, const SoilWater&, 
+                    const SoilHeat&, const OrganicMatter&, const Chemistry&, 
+                    Treelog&);
+  double suggest_dt () const;
   static void divide_loss (const double absolute_loss_rate, 
                            const double first_rate, const double second_rate,
                            double& first, double& second);
@@ -658,6 +665,44 @@ ChemicalStandard::swap (const Geometry& geo,
   update_C (soil, soil_water);
 }
 
+void 
+ChemicalStandard::tick_source (const Scope& scope, const Geometry& geo,
+                               const Soil& soil, const SoilWater& soil_water, 
+                               const SoilHeat& soil_heat, 
+                               const OrganicMatter& organic, 
+                               const Chemistry& chemistry, Treelog& msg)
+{ 
+  const size_t cell_size = geo.cell_size ();
+
+  sink_dt = 0.0;
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double Theta = soil_water.Theta (c);
+      const double Theta_secondary = soil_water.Theta_secondary (c);
+      const bool has_secondary =  Theta_secondary > 1e-9 * Theta;
+      const double S = soil_water.S_forward (c);
+      const double C = this->C_secondary (c);
+      const double M_total = this->M_total (c);
+      const double M_solute = C * Theta;
+      const double M_secondary = has_secondary 
+        ? this->M_secondary (c)
+        : 0.0;
+      
+      const double dt 
+        = chemistry.find_dt (S, C, M_secondary, M_solute, M_total);
+      if (std::isnormal (dt)
+          && (!std::isnormal (sink_dt) || dt < sink_dt))
+        {
+          sink_dt = dt;
+          sink_cell = c;
+        }
+    }
+}
+
+double 
+ChemicalStandard::suggest_dt () const
+{ return sink_dt; }
+
 void
 ChemicalStandard::divide_loss (const double absolute_loss_rate, 
                                const double first_rate, 
@@ -761,6 +806,22 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   first_order_change (old_surface_storage, surface_in + surface_transform, 
                       surface_runoff_rate + surface_decompose_rate, dt,
                       surface_storage, surface_absolute_loss_rate);
+  if (surface_storage < 0.0)
+    {
+      std::ostringstream tmp;
+      tmp << "old_surface_storage = " << old_surface_storage 
+          << ", surface_in = " << surface_in 
+          << ", surface_transform = " << surface_transform
+          << ", surface_runoff_rate = " << surface_runoff_rate 
+          << ", surface_decompose_rate = " << surface_decompose_rate
+          << ", dt = " << dt
+          << ", surface_storage = " << surface_storage 
+          << ", surface_absolute_loss_rate = " << surface_absolute_loss_rate;
+      msg.debug (tmp.str ());
+      surface_decompose = surface_storage / dt;
+      surface_runoff = 0.0;
+      surface_storage = 0.0;
+    }
   divide_loss (surface_absolute_loss_rate,
                surface_decompose_rate, surface_runoff_rate,
                surface_decompose, surface_runoff);
@@ -1209,6 +1270,11 @@ ChemicalStandard::output (Log& log) const
   output_variable (J_tertiary, log);
   output_variable (tillage, log);
   output_variable (lag, log);
+  if (std::isnormal (sink_dt))
+    {
+      output_value (sink_dt, "dt", log);
+      output_variable (sink_cell, log);
+    }
 }
 
 bool 
@@ -1527,7 +1593,9 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
     S_permanent (al.number_sequence ("S_permanent")),
     lag (al.check ("lag")
          ? al.number_sequence ("lag")
-         : std::vector<double> ())
+         : std::vector<double> ()),
+    sink_dt (NAN),
+    sink_cell (Geometry::cell_error)
 { }
 
 struct NumberInitialC : public Number
@@ -1919,7 +1987,11 @@ which can be negative.");
     frame.declare ("lag", Attribute::None (), Attribute::OptionalState, 
                    Attribute::SoilCells,
                    "This state variable grows with lag_increment (C) each hour.\n\
-When it reached 1.0, decomposition begins.");
+When it reached 1.0, decomposition begins."); 
+    frame.declare ("dt", "h", Attribute::LogOnly, "\
+Suggested timestep length based on sink terms.");
+    frame.declare_integer ("sink_cell", Attribute::LogOnly, "\
+Cell with largest forward sink compared to available matter.");
   }
 } ChemicalStandard_syntax;
 

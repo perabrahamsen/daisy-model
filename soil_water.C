@@ -256,6 +256,8 @@ SoilWater::tick_source (const Geometry& geo, const Soil& soil, Treelog& msg)
       const double S = S_forward (c);
       if (!std::isnormal (S))
         continue;
+      if (S < 0.0)
+        continue;
       static const double h_wp = -15000.0;
       static const double h_sat = 0.0;
       const double h_ice = this->h_ice (c);
@@ -264,7 +266,8 @@ SoilWater::tick_source (const Geometry& geo, const Soil& soil, Treelog& msg)
       const double Theta_max = Theta_sat - Theta_wp;
       daisy_assert (Theta_max > 0.0);
       const double dt = Theta_max * max_sink_change / S;
-      if (!std::isnormal (sink_dt) || sink_dt > dt)
+      if (std::isnormal (dt)
+          && (!std::isnormal (sink_dt) || std::fabs (sink_dt) > std::fabs (dt)))
         {
           sink_dt = dt;
           sink_cell = c;
@@ -891,7 +894,7 @@ SoilWater::SoilWater (const Block& al)
     max_sink_change (al.number ("max_sink_change")),
     S_permanent_ (al.number_sequence ("S_permanent")),
     sink_dt (NAN),
-    sink_cell (-1)
+    sink_cell (Geometry::cell_error)
 { }
 
 SoilWater::~SoilWater ()
