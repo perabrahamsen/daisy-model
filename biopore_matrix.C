@@ -47,8 +47,7 @@ struct BioporeMatrix : public Biopore
 {
   // Parameters.
   /* const */ std::vector<double> xplus; // [cm]
-  const double R_primary;       // [h/cm]
-  const double R_secondary;     // [h/cm]
+  const double K_wall_relative;       // []
   const int debug;
   const int max_iterations;     // Convergence.
   const double max_absolute_difference; // [cm]
@@ -109,26 +108,29 @@ struct BioporeMatrix : public Biopore
                           const double dt);
 
   double matrix_biopore_matrix (size_t c, const Geometry& geo, 
-                                const Soil& soil, bool active, 
+                                bool active, 
                                 const double h_barrier, double M_c,
                                 double pressure_limit, 
-                                double K_xx, double z3_lowest, double h3_bottom, double h) const;
+                                double K_xx, double K_crack,
+                                double z3_lowest, double h3_bottom, 
+                                double h) const;
   double matrix_biopore_drain (size_t c, const Geometry& geo, 
                                const Soil& soil, bool active, 
                                double K_xx, double h) const
   {return 0.0;}
-  void find_matrix_sink (const Geometry& geo, const Soil& soil,  
+  void find_matrix_sink (const Geometry& geo, 
                          const std::vector<bool>& active,
                          const std::vector<double>& K, 
+                         const std::vector<double>& K_crack, 
                          const double h_barrier,
                          const double pressure_limit,
                          const std::vector<double>& h3_bottom, 
                          const std::vector<double>& h, 
                          std::vector<double>& S3) const;
   void forward_sink (const Geometry& geo,    
-                     const Soil& soil,  
                      const std::vector<bool>& active,
                      const std::vector<double>& K, 
+                     const std::vector<double>& K_crack, 
                      const double h_barrier,
                      const double pressure_limit,
                      const std::vector<double>& h, 
@@ -136,9 +138,9 @@ struct BioporeMatrix : public Biopore
   void tick_source (const Geometry& geo, const std::vector<bool>& active,
                     const std::vector<double>& h);
   void update_matrix_sink (const Geometry& geo,    
-                           const Soil& soil,  
                            const std::vector<bool>& active,
                            const std::vector<double>& K,
+                           const std::vector<double>& K_crack,
                            const double h_barrier,
                            const double pressure_limit,
                            const std::vector<double>& h,
@@ -310,10 +312,10 @@ BioporeMatrix::solute_infiltrate (const symbol chem,
 
 double 
 BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo, 
-                                      const Soil& soil, const bool active, 
+                                      const bool active, 
                                       const double h_barrier, double M_c,
                                       const double pressure_limit,
-                                      const double K_xx, 
+                                      const double K_xx, const double K_crack,
                                       const double z3_lowest,
                                       const double h3_bottom, 
                                       const double h) const
@@ -321,17 +323,6 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
   if (!std::isnormal (density (c)))
     // No biopores here.
     return 0.0;
-
-  // The secondary domain consists of small continious cracks with a
-  // high condutivity compared to the rest of the matrix domain.  Not
-  // all soil types have such a domain.
-  const bool use_primary = soil.h_secondary (c) >= 0.0;
-
-  // The resistence to be overcome for water leaving the biopore is
-  // different in the primary and secondary domain, in general we
-  // assume the water will have a much easier time leaving the
-  // biopores if the soil has cracks.
-  const double R_wall = use_primary ? R_primary : R_secondary; // [h]  
 
   // The radius of the biopores.
   const double r_c = diameter / 2.0; // [cm]
@@ -370,7 +361,19 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
       const double wall_top = std::min (z_air, high_point);
       const double wall_fraction
         = (wall_top - low_point) / (cell_top - cell_bottom);
-      S = - wall_fraction * biopore_to_matrix (R_wall, M_c, r_c, h, h3_cell);
+
+      // The resistence to be overcome for water leaving the biopore is
+      // different in the primary and secondary domain, in general we
+      // assume the water will have a much easier time leaving the
+      // biopores if the soil has cracks.
+      const double S1 = - wall_fraction * biopore_to_primary (K_xx, 
+                                                              K_wall_relative,
+                                                              M_c, r_c,
+                                                              h, h3_cell);
+      const double S2 = (K_crack < 0.0)
+        ? 0.0
+        : - wall_fraction * biopore_to_secondary (K_crack, M_c, r_c, h3_cell);
+      S = std::min (S1, S2);
     }
   else if ((allow_upward_flow || cell_z > z3_lowest) 
            && active && h>h3_cell + h_barrier)
@@ -388,9 +391,9 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
 
 void
 BioporeMatrix::find_matrix_sink (const Geometry& geo,    
-                                 const Soil& soil,  
                                  const std::vector<bool>& active,
                                  const std::vector<double>& K, 
+                                 const std::vector<double>& K_crack, 
                                  const double h_barrier,
                                  const double pressure_limit,
                                  const std::vector<double>& h3_bottom, 
@@ -403,22 +406,22 @@ BioporeMatrix::find_matrix_sink (const Geometry& geo,
     {
       const size_t col = column[c];
       const double M_c = density_column[col]; // [cm^-2]
-      S3[c] += matrix_biopore_matrix (c, geo, soil, active[c], h_barrier, M_c,
-                                      pressure_limit, K[c], z3_lowest[col],
-                                      h3_bottom[col], h[c]);
+      S3[c] += matrix_biopore_matrix (c, geo, active[c], h_barrier, M_c,
+                                      pressure_limit, K[c], K_crack[c],
+                                      z3_lowest[col], h3_bottom[col], h[c]);
     }
 }
 
 void
 BioporeMatrix::forward_sink (const Geometry& geo,    
-                             const Soil& soil,  
                              const std::vector<bool>& active,
                              const std::vector<double>& K, 
+                             const std::vector<double>& K_crack, 
                              const double h_barrier,
                              const double pressure_limit,
                              const std::vector<double>& h, 
                              std::vector<double>& S3) const
-{ find_matrix_sink (geo, soil, active, K, h_barrier, pressure_limit, 
+{ find_matrix_sink (geo, active, K, K_crack, h_barrier, pressure_limit, 
                     h_bottom, h, S3); }
 
 
@@ -463,9 +466,9 @@ BioporeMatrix::tick_source (const Geometry& geo,
 
 void
 BioporeMatrix::update_matrix_sink (const Geometry& geo,    
-                                   const Soil& soil,  
                                    const std::vector<bool>& active,
                                    const std::vector<double>& K, 
+                                   const std::vector<double>& K_crack, 
                                    const double h_barrier,
                                    const double pressure_limit,
                                    const std::vector<double>& h, 
@@ -498,7 +501,7 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
   for (iterations = 0; iterations < max_iterations; iterations++)
     {
       std::fill (S.begin (), S.end (), 0.0);
-      find_matrix_sink (geo, soil, active, K, 
+      find_matrix_sink (geo, active, K, K_crack,
                         h_barrier, pressure_limit,
                         guess, h, S);
       
@@ -606,7 +609,7 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
         guess[col] = h3_min[col];
       
       std::fill (S.begin (), S.end (), 0.0);
-      find_matrix_sink (geo, soil, active, K,
+      find_matrix_sink (geo, active, K, K_crack,
                         h_barrier, pressure_limit, 
                         guess, h, S);
     }
@@ -1003,8 +1006,7 @@ BioporeMatrix::BioporeMatrix (const BlockModel& al)
     xplus (al.check ("xplus") 
            ? al.number_sequence ("xplus") 
            : std::vector<double> ()),
-    R_primary (al.number ("R_primary")),
-    R_secondary (al.number ("R_secondary", R_primary)),
+    K_wall_relative (al.number ("K_wall_relative")),
     debug (al.integer ("debug")),
     max_iterations (al.integer ("max_iterations")),
     max_absolute_difference (al.number ("max_absolute_difference")),
@@ -1035,12 +1037,9 @@ Biopores that ends in the matrix.")
 Water and chemical content is tracked individually for each interval.\n\
 By default, use intervals as specified by the geometry.");
     frame.set_check ("xplus", VCheck::increasing ());
-    frame.declare ("R_primary", "h", Check::positive (), Attribute::Const, "\
-Resistance for water moving from biopore through wall to primary domain.");
-    frame.declare ("R_secondary", "h", Check::positive (), 
-                Attribute::OptionalConst, "\
-Resistance for water moving from biopore through wall to secondary domain.\n\
-If not specified, this will be identical to 'R_primary'.");
+    frame.declare ("K_wall_relative", Attribute::None (), 
+                   Check::positive (), Attribute::Const, "\
+Relative conductivity of biopore wall compared to matrix.");
     frame.declare_integer ("debug", Attribute::Const, "Debug level.\n\
 Increase value to get more debug message.");
     frame.set ("debug", 0);

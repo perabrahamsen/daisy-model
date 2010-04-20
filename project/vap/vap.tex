@@ -204,7 +204,7 @@ tryk på 1.2 pF.
   (alpha 0.01 [h^-1]))
 \end{verbatim}
 Ud fra profilbeskrivelsen i \citet{lindhardt2001} har vi valgt at C
-horisonten i Silstrup under 3.5 m skal være uden sprækker, og i Estrup
+horisonten i Silstrup under 3,5 m skal være uden sprækker, og i Estrup
 har vi valgt (ligeledes baseret på \citet{lindhardt2001}) at udelade
 sprækker i toppen af C2 horisonten. 
 
@@ -733,7 +733,7 @@ figur~\ref{fig:Silstrup-weekly}.
     \includegraphics[width=\columnwidth]{fig/Silstrup-Glyphosate-weekly}\\
     \includegraphics[width=\columnwidth]{fig/Silstrup-Metamitron-weekly}
   \end{center}
-  \caption{Ugentligt drænflow af bromid og udvalgte pesticide.}
+  \caption{Ugentligt drænflow af bromid og udvalgte pesticider.}
   \label{fig:Silstrup-weekly}
 \end{figure}
 GEUS tal er gjort arealrelative ved at dividere med drænarealet for
@@ -1003,7 +1003,7 @@ figur~\ref{fig:Estrup-weekly}.
     \includegraphics[width=\columnwidth]{fig/Estrup-Fenpropimorph-weekly}\\
     \includegraphics[width=\columnwidth]{fig/Estrup-Glyphosate-weekly}\\
   \end{center}
-  \caption{Ugentligt drænflow af bromid og udvalgte pesticide.}
+  \caption{Ugentligt drænflow af bromid og udvalgte pesticider.}
   \label{fig:Estrup-weekly}
 \end{figure}
 GEUS tal er gjort arealrelative ved at dividere med drænarealet for
@@ -1067,7 +1067,35 @@ dræn.
 
 \section{Kalibrering}
 
-\subsection{Vand og bromid}
+På baggrund af de leverede oplysninger om jord, dyrkning, og vejr er
+det muligt at køre Daisy og få de første simuleringsresultater.  Disse
+kan divergere fra måleresultater at flere årsager:
+\begin{description}
+\item[Heterogenitet] Målinger på marken er kun gyldige præcis der hvor
+  de er målt, og er ikke nødvendigvis representative for hele marken.
+  Hvis man måler flere steder er det ikke nødvendigvis at man kan
+  bruge en middelværdi, hvis de involverede processor er ikke-lineære.
+  Hvis jordens ledningsevne f.eks. er højere nogle steder end andre,
+  er der en god chance for at udvaskning vil være domineret fra de
+  steder med høj ledningsevne.
+\item[Manglende data] Der er masser af parametre i modellen der ikke
+  er målt, for eksempel Kd værdier for de enkelte pesticider.  Her
+  anvender vi som første bud litteraturværdier, der sagtens kan være
+  forkerte for de aktuelle marker.
+\item[Manglende processer] Herunder forkert processforståelse.
+  Systemet kan være domineret af processor vi ikke har medtaget, eller
+  hvor vores modeller passer dårligt.  
+\end{description}
+Kalibrering går ud på at sammenligne målte og simulerede værdier,
+vurdere hvilke af ovennævnte forklaringer der er aktuelle, og
+evt. justere parametre eller indføre nye modeller.
+
+\subsection{Vand og bromid i jord}
+
+Vi har valgt ikke at kalibrere efter vand og bromid i jord, da vi ikke
+regner med at de valgte udtagningssteder er representative for marken.
+
+\subsection{Vand og bromid i dræn}
 
 Vand og bromid kan normalt med fordel kalibreres på plads med 1D
 simuleringer, da 1D modellen (der bygger på \citet{hooghoudt}, med
@@ -1092,10 +1120,181 @@ A4.4 og figur A4.5 i \citet{vap2005}.  For Silstrup mente vi der var
 belæg for at sætte $K_b$ til 1 mm/h (op fra 0,1 mm/h brugt af GEUS),
 og for Estrup satte vi $K_b$ til 0,5 mm/h (op fra 0,1 mm/h).
 
-For Silstrup har vi sat ledningsevnen i overfladelaget ned til 1
-promille af den i resten af perioden anvendte værdi mellem høst og
-pløjning, for at fremtvinge makroporeaktivitet.  For Estrup har vi
-foreløbigt sat den ned til 10\% af den justerede værdi.
+Vand kunne relativt let kalibreres på plads, så både mængde og periode
+passer med beskedne forskydninger af mængder indenfor hver periode.
+
+Bromid passer ikke særlig godt, specielt ikke på Silstrup.  Den store
+forskel mellem Silstrup og Estrup i simuleringerne er planteoptag,
+hvor Silstrup med en rodzone på kun 50 cm har et meget beskedent
+planteoptag.  Da vi ikke har data for planteoptag har vi valgt at lade
+dette ligge.
+
+\subsection{Pesticider i jord}
+
+Der er målt på pesticider i 3,5 meters dybde uden at at nogen prøver
+har været over detektionsgrænsen.  Vores simuleringer viser heller
+ikke koncetrationer over detektionsgrænsen, se
+figur~\ref{fig:Silstrup-horizontal} og ~\ref{fig:Estrup-horizontal}.
+Dette understøttes af figur~\ref{fig:Silstrup-leak150}
+og~\ref{fig:Estrup-leak150}, der viser at der ikke er nogen
+nævneværdig udvaskning i simuleringerne så snart vi er kommet fra af
+bioporedomænet.
+
+\subsection{Pesticider i dræn}
+
+Det første pesticid i dræn vi kiggede på var glyfosat for Silstrup.
+Det gav anledning til tre udvidelser af vores model før vi kunne gå
+igang med en egentlig kalibrering af parametre.
+
+\subsubsection{Stærk og svag sorption}
+
+Vores første simuleringer viste at alt glyfosat meget hurtigt blev
+adsorberet til jorden, og derfor ikke forekom i dræn i noget nær de
+målte koncentrationer.  Ud fra laboratorieforsøg ved vi at glyfosat
+både sorberer hurtigt og stærkt.  Vores løsning var en to-fase
+sorption, hvor den ene fase sorberer hurtigt men svagt, og den anden
+langsomt men stærkt.  Det giver en dynamik hvor glyfosaten hurtigt
+sorberes svagt, men over tid stærkere og stærkere, hvilket svarer godt
+til vores forståelse af hvad der foregår på marken.
+
+\subsubsection{Hydrauliske egenskaber der varierer over tid}
+
+Det første glyfosat ankommer til dræn i store mængder, med en
+hastighed der kun kan forklares med bioporeaktivitet.  Dette kunne
+ikke ses i simuleringerne, da bioporerne slet ikke er aktive når det
+første glyfosat ankommer.  Nedbørintensiteten i perioden er moderat
+($<$ 2 mm/h, se figur~\ref{fig:Silstrup-weather-glyphosate}), hvilket
+øverste horisont ikke har problemer med at optage, så bioporerne
+bliver ikke aktiveret.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{fig/Silstrup-weather-glyphosate.pdf}
+  \end{center}
+  \caption{Nedbør i dagene hvor første glyfosat først måles i dræn i Silstrup.}
+  \label{fig:Silstrup-weather-glyphosate}
+\end{figure}
+
+Men dette sker et halvt år efter sidste jordbehandling, hvor vi ved
+overfladen har ændrer egenskaber.  Vi har derfor tilført en speciel
+overfladehorisont på 3 cm hvor porøsiteten kan ændres, og de
+hydrauliske egenskaber følger med.
+\begin{verbatim}
+(defhorizon Silstrup_Ap_surface Silstrup_Ap
+  (hydraulic M_vG_compact
+             (Theta_sat 0.392719 []) (ref_n 1.1 []) (ref_alpha 0.01 [cm^-1])
+             (ref_K_sat 2.25027 [cm/h])
+             (mod_alpha (0 1) (1 1)) (mod_n  (0 1) (1 1))
+             (mod_K_sat  (0.3 0.001) (0.392719 1))
+             (Theta_res 0 [%])))
+\end{verbatim}
+Den eneste egenskab vi ændrer her er den mættede ledningsevne, som for
+Silstrup sættes ned til 1 promille når porøsiteten sættes ned to 30\%.
+De øvrige egenskaber er de samme som for resten af Ap horisonten.
+
+Vi justerer porøsiteten med nogle pseudo-management operationer lige
+efter høst, samt efter næste jordbehandling
+\begin{verbatim}
+  (wait (at 2001 09 05))
+    ;; Harvest of spring barley. ;; Stubbleheight 12 cm, 
+    ;; grain yield 74.77 hkg/ha 85% DM, straw yield 28.62 hkg/ha 100% DM
+    (harvest "Spring Barley" (stub 12 [cm]) (leaf 0.3 []) (stem 0.3 []))
+    (set_porosity (depth -1 [cm]) (porosity 0.3))
+  ;; ...
+  (wait (at 2001 12 18))
+    (plowing (depth -22 [cm]))
+    (set_porosity (depth -1 [cm]) (porosity 0.392719))
+\end{verbatim}
+
+Med denne ændring fik vi aktiveret bioporerne ved den store hændelse
+den 30/10.
+
+\subsubsection{Planterester}
+
+Desvære fik vi stadig ikke betydelige mængder af glyfosat i dræn.  Det
+skyldes de små hændelser dagene inden (se
+figur~\ref{fig:Silstrup-weather-glyphosate}).  Ved disse hændelser
+blev glyfosaten vasket ned i jordoverfladen, hvor det blev sorberet.
+Vores hypotese var at glyfosaten lå på planteresterne fra høsten, et
+fænomen vi tidligere havde observeret.\citep{gjettermann2009}.
+
+Daisy holder allerede styr på planterester og andet organisk materiale
+på overfladen, hvorfra det kan inkorporeres i jorden med
+jordbehandling eller regnormeaktivitet.  Men vi brugte ikke
+planteresterne som et reqservour for vand og kemikalier.  For at kunne
+gøre dette valgte vi at implementere en Brasiliansk model
+\citep{scopel2004} der konceptuelt passer godt med Daisy.  I denne
+model dækker planteresterne en del af jorden afhængig af mænde og
+type, hvor de både forhindrer jordfordampning samt opsamler nedbør.  I
+Daisy udvidede vi dette til også at opsamle kemikalier. To
+parameteriseringer blev angivet, begge er lagt ind i Daisy, i dette
+projekt valgte vi en benytte en baseret på hirse.\citep{macena2003}.
+
+Med denne ændring kunne vi også fange den første puls af glyfosat i
+dræn.
+
+\subsubsection{Glyfosat Silstrup}
+
+Glyfosat kan justeres til et bedre fit ved f.eks. at ændre på hvor
+hurtigt regnorme inkorporerer planterester fra overfladen (påvirker
+den første hændelse meget), eller at ændre på fordelingen mellem svagt
+og stærkt sorberet stof.  Men faktisk mener vi de ukalibrerede
+resultater allerede er fuldt ud acceptable i forhold til den
+systemusikkerhed vi opererer med.
+
+\subsubsection{Metamitron Silstrup}
+
+Vi deler metamitron op i en svagt og en stærk sorberet del på samme
+måde som glyfosat, da vi ikke ved bedre.  I \citet{lindhard2001} er
+halveringstiden for metamitron angivet til 14 dage, men målinger viser
+betydelig udvaskning efter 6 måneder.  For at rette op på det
+misforhold ændrer vi halveringstiden til 55 dage.  Det giver dog en
+alt for stor udvaskning i starten, som vi kompenserer for ved at sætte
+sorbtionen op.  Helt præcist ændrer vi den i \citet{lindhard2001}
+$K_{OC}$ værdi til en $K_d$ værdi, uden anden begrundelse en at det
+giver en akkumuleret udvaskning der passer godt med målingerne.
+
+\subsubsection{Glyfosat Estrup}
+
+For at få den første puls på plads nedsætter vi porøsiteten og den
+hydrauliske ledningsevne i overfladelaget, som for Silstrup.  Desuden
+efterlader vi også her blade og stængler på marken ved høst, så det
+kan virke som et reservoir for vand og pesticid.  Endelig sætter vi
+grundvandsstanden en anelse op, for at få fremskudt starten på
+drænsæsonen så den passer med målingerne.
+
+\subsubsection{Andre pesticider}
+
+Fenpropimorph er ikke blevet målt over detektionsgrænsen på nogen af
+lokaliteterne, så det har ikke givet mening at kalibrere på dette.
+For dimethoate er der en enkelt måling på detektionsgrænsen for
+Siltrup, hvilket vi ikke har ment var nok til at forsøge at kalibrere
+efter.
+\section{Anbefalinger}
+
+\subsection{Yderligere simuleringer}
+
+Hvis vi skal simulere yderligere vap data, bør vi vælge en lokalitet
+og periode hvor der er observeret pesticider i de horisontale filtre i
+3,5 meters dybde.
+
+\subsection{Modeludvikling}
+
+\subsubsection{Overfladelag}
+
+Der bør udvikles en standardmodel for dannelsen af overfladelag for
+danske jorde, da det er vigtigt for efterårssprøjtning.
+
+\subsubsection{Planterester}
+
+Effekten af planterester på jorden for vandbalancen (og derved
+pesticider) bør kalibreres og valideres efter danske forhold, og
+danske afgrøder.
+
+\subsubsection{Pesticider}
+
+Parameterisering af pesticider bør foregå på baggrund af markforsøg,
+eller i det mindste forsøg under forrhold der meget ligner marken, da
+det er svært at overføre viden fra laboratorieforsøg til markforhold.
 
 \addcontentsline{toc}{section}{\numberline{}References}
 \bibliography{../../txt/daisy}

@@ -1,8 +1,7 @@
 ;;; biopores.dai -- 2D specific information for VAP setups
 
 (defbiopore common matrix
-  (R_primary 10 [h])
-  (R_secondary 1 [h])
+  (K_wall_relative 1 [%])
   (allow_upward_flow false))
 
 

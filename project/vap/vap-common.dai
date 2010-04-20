@@ -42,7 +42,7 @@
 (defcolumn VAP default
   "Shared parameters for VAP fields."
   (OrganicMatter original
-                 ;;(Bioincorporation (C_per_N_factor (25 1) (50 0.1) (60 0.01)))
+                 ;; (Bioincorporation (C_per_N_factor (20 1) (100 0.1) (120 0.01)))
                  )
   (Litter Millet))
   

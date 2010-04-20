@@ -1,3 +1,12 @@
+2010-04-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* biopore.h, biopore.C (biopore_to_primary, biopore_to_secondary):
+	New functions.
+	(biopore_to_matrix): Removed.
+	* biopore_matrix.C (matrix_biopore_matrix): Update caller.
+	(K_wall_relative): New parameter.
+	(R_primary, R_secondary): Removed.
+
 2010-04-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* chemistry.h, chemistry_std.C, chemistry_multi.C:

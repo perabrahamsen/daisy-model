@@ -204,7 +204,6 @@
 (defreaction Glyphosate-colloid-generation bound_release
   "Release immobile Glyphosate as colloids in mixing layer."
   (colloid colloid)
-  (immobile Glyphosate-immobile)
   (bound Glyphosate-colloid))
 
 (defreaction Glyphosate-colloid-generation-strong Glyphosate-colloid-generation 
@@ -228,8 +227,10 @@
 
 (defchemical Metamitron-base herbicide
   "Base parameterization for all Metamitron forms."
-  (cite lindhardt2001)
-  (decompose_halftime 14 [d]))
+  ;;(cite lindhardt2001)
+  ;;(decompose_halftime 14 [d])
+  (decompose_halftime 55 [d])
+  )
 
 (defchemical Metamitron Metamitron-base
   "Dissolved metamitron."
@@ -239,12 +240,25 @@
   "Metamitron sorbed to immobile soil."
   (adsorption full))
 
+(defchemical Metamitron-immobile-strong Metamitron-immobile)
+(defchemical Metamitron-immobile-weak Metamitron-immobile)
+
 (defreaction Metamitron-immobile-sorption sorption
   "Sorption equilibrium between dissolved and immobile Metamitron."
-  (sorbed Metamitron-immobile)
   (solute Metamitron)
   (cite lindhardt2001)
-  (K_OC 207 [l/kg])
+  ;; (K_OC 207 [l/kg])
+  (K_d 207 [l/kg])
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Metamitron-immobile-sorption-strong Metamitron-immobile-sorption
+  (sorbed Metamitron-immobile-strong)
+  (K_d 187 [l/kg])
+  (k_sorption 0.005 [h^-1]))
+
+(defreaction Metamitron-immobile-sorption-weak Metamitron-immobile-sorption
+  (sorbed Metamitron-immobile-weak)
+  (K_d 20 [l/kg])
   (k_sorption 0.05 [h^-1]))
 
 (defchemical Metamitron-colloid Metamitron-base
@@ -263,20 +277,28 @@
 (defreaction Metamitron-filter colloid-filter
   "Filtration of colloid-bound metamitron in the soil matrix."
   (mobile Metamitron-colloid)
-  (immobile Metamitron-immobile))
+  (immobile Metamitron-immobile-weak))
 
 (defreaction Metamitron-colloid-generation bound_release
   "Release immobile Metamitron as colloids in mixing layer."
   (colloid colloid)
-  (immobile Metamitron-immobile)
   (bound Metamitron-colloid))
+
+(defreaction Metamitron-colloid-generation-strong Metamitron-colloid-generation 
+  (immobile Metamitron-immobile-strong))
+
+(defreaction Metamitron-colloid-generation-weak Metamitron-colloid-generation 
+  (immobile Metamitron-immobile-weak))
 
 (defchemistry Metamitron default
   "Metamitron in both immobile, solute and colloid form."
-  (trace Metamitron Metamitron-immobile Metamitron-colloid)
-  (reaction Metamitron-immobile-sorption
+  (trace Metamitron Metamitron-immobile-strong Metamitron-immobile-weak
+         Metamitron-colloid)
+  (reaction Metamitron-immobile-sorption-strong
+            Metamitron-immobile-sorption-weak
             Metamitron-filter 
-            Metamitron-colloid-generation
+            Metamitron-colloid-generation-strong
+            Metamitron-colloid-generation-weak
             Metamitron-colloid-sorption))
 
 (defsummary "Colloid bound sorption" balance

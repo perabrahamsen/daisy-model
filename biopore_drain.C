@@ -68,13 +68,13 @@ struct BioporeDrain : public Biopore
   }
 
   double matrix_biopore_drain (size_t c, const Geometry& geo, 
-                               const Soil& soil, bool active, 
+                               bool active, 
                                const double h_barrier, double pressure_limit,
                                double K_xx, double h) const;
   void forward_sink (const Geometry& geo,    
-                     const Soil& soil,  
                      const std::vector<bool>& active,
                      const std::vector<double>& K, 
+                     const std::vector<double>& K_crack, 
                      const double h_barrier,
                      const double pressure_limit,
                      const std::vector<double>& h, 
@@ -83,9 +83,9 @@ struct BioporeDrain : public Biopore
                     const std::vector<double>&)
   { }
   void update_matrix_sink (const Geometry& geo,    
-                           const Soil& soil,  
                            const std::vector<bool>& active,
                            const std::vector<double>& K,
+                           const std::vector<double>& K_crack,
                            const double h_barrier,
                            const double pressure_limit,
                            const std::vector<double>& h,
@@ -134,7 +134,7 @@ struct BioporeDrain : public Biopore
 
 double 
 BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo, 
-                                    const Soil& soil, bool active, 
+                                    bool active, 
                                     const double h_barrier, 
                                     const double pressure_limit,
                                     double K_xx, double h) const
@@ -177,9 +177,9 @@ BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo,
 
 void 
 BioporeDrain::forward_sink (const Geometry& geo,    
-                            const Soil& soil,  
                             const std::vector<bool>& active,
                             const std::vector<double>& K, 
+                            const std::vector<double>& /* K_crack */, 
                             const double h_barrier,
                             const double pressure_limit,
                             const std::vector<double>& h, 
@@ -187,22 +187,22 @@ BioporeDrain::forward_sink (const Geometry& geo,
 {
   const size_t cell_size = geo.cell_size ();
   for (size_t c = 0; c < cell_size; c++)
-    S3[c] += matrix_biopore_drain (c, geo, soil, active[c], h_barrier, 
+    S3[c] += matrix_biopore_drain (c, geo, active[c], h_barrier, 
                                    pressure_limit, K[c], h[c]);
 }
 
 void
 BioporeDrain::update_matrix_sink (const Geometry& geo,    
-                                  const Soil& soil,  
                                   const std::vector<bool>& active,
                                   const std::vector<double>& K, 
+                                  const std::vector<double>& K_crack, 
                                   const double h_barrier,
                                   const double pressure_limit,
                                   const std::vector<double>& h, 
                                   const double /* dt */)
 {
   std::fill (S.begin (), S.end (), 0.0);
-  forward_sink (geo, soil, active, K, h_barrier, pressure_limit, h, S);
+  forward_sink (geo, active, K, K_crack, h_barrier, pressure_limit, h, S);
 }
 
 BioporeDrain::BioporeDrain (const BlockModel& al)

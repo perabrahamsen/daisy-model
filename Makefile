@@ -62,8 +62,8 @@ SVNROOT = https://daisy-model.googlecode.com/svn
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
-#USE_OPTIMIZE = true
-USE_OPTIMIZE = false
+USE_OPTIMIZE = true
+#USE_OPTIMIZE = false
 
 # Set USE_PROFILE if you want to profile the executable
 #

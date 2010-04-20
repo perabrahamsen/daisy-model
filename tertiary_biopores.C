@@ -58,6 +58,7 @@ struct TertiaryBiopores : public Tertiary
   // Helper.
   std::auto_ptr<Scalar> per_surface_area;
   std::vector<double> K;        // Adjusted matrix2biopore conductivity [cm/h]
+  std::vector<double> K_crack;  // Secondary domain conductivity [cm/h]
 
   // Identity.
   bool has_macropores ()
@@ -277,14 +278,21 @@ TertiaryBiopores::tick_source (const Geometry& geo, const Soil& soil,
   // Find conductivity.
   const size_t cell_size = geo.cell_size ();
   daisy_assert (K.size () == cell_size);
+  daisy_assert (K_crack.size () == cell_size);
   for (size_t c = 0; c < cell_size; c++)
     {
       const double h_cond = std::min(pressure_initiate, h[c]);
       const double T = soil_heat.T (c);
       const double h_ice = 0.0;    //ice ignored 
       const double K_zz = soil.K (c, h_cond, h_ice, T);
-      const double K_xx = K_zz * soil.anisotropy_cell (c);
+      const double anisotropy = soil.anisotropy_cell (c);
+      const double K_xx = K_zz * anisotropy;
       K[c] = K_xx;
+      const double h_lim = soil.h_secondary (c);
+      if (h_lim >= 0.0)
+        K_crack[c] = -42.42e24;
+      else
+        K_crack[c] = soil.K (c, h_lim + 0.001, h_ice, T) * anisotropy;
     }
 
   // Prepare classes and find forward source.
@@ -292,7 +300,7 @@ TertiaryBiopores::tick_source (const Geometry& geo, const Soil& soil,
   for (size_t b = 0; b < classes.size (); b++)
     {
       classes[b]->tick_source (geo, active, h);
-      classes[b]->forward_sink (geo, soil, active, K, pressure_barrier,
+      classes[b]->forward_sink (geo, active, K, K_crack, pressure_barrier,
                                 pressure_limit, h, S_forward);
     }
 
@@ -430,7 +438,7 @@ TertiaryBiopores::update_biopores (const Geometry& geo,
                                    const double dt) 
 {
   for (size_t b = 0; b < classes.size (); b++)
-    classes[b]->update_matrix_sink (geo, soil, active, K, 
+    classes[b]->update_matrix_sink (geo, active, K, K_crack,
                                     pressure_barrier, 
                                     pressure_limit, h, dt);
 }
@@ -643,6 +651,8 @@ TertiaryBiopores::initialize (const Units& units,
     active.push_back (geo.cell_z (active.size ()) < table);
   while (K.size () < cell_size)
     K.push_back (NAN);
+  while (K_crack.size () < cell_size)
+    K_crack.push_back (NAN);
 
   water_volume = total_water ();
   water_height = water_volume / geo.surface_area ();

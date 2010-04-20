@@ -144,11 +144,37 @@ Biopore::matrix_to_biopore (double K_xx, double M_c, double r_c,
 }
 
 double 
-Biopore::biopore_to_matrix (double R_wall, double M_c, double r_c,
-                            double h, double h_3)
+Biopore::biopore_to_primary (const double K_matrix,
+                             const double K_wall_rel, //  K_wall_rel []
+                             const double M_c, const double r_c,
+                             const double h, const double h_3)
 {
-  const double S = 4*M_PI*M_c*(h-h_3) / 
-    (R_wall*log(M_PI*M_c*r_c*r_c));
+  const double a1 = 1.1;  // Relative biopore wall size: r_i / r_c [] 
+  const double a2 = K_wall_rel; // Relative biopore wall conductivity []
+  const double A1 
+    = a2 * (0.5 * log (M_PI * M_c * sqr (r_c)) - std::log (a1))
+    / std::log (a1);
+  const double B1 = A1 / (1.0 + A1);
+  const double K = B1 * K_matrix;
+  const double r_matrix = std::pow (M_PI * M_c, -0.5);
+  const double S = M_c * 2.0 * M_PI * K * (h_3 - h)
+    / std::log (r_c / r_matrix);
+  daisy_assert (S >= 0.0);
+  return S;
+}
+
+double 
+Biopore::biopore_to_secondary (const double K_crack,
+                               const double M_c, const double r_c,
+                               const double h_3)
+{
+  const double h = 0.0;
+  if (h_3 < h)
+    return 0.0;
+  const double r_matrix = std::pow (M_PI * M_c, -0.5);
+  daisy_assert (K_crack > 0.0);
+  const double S = M_c * 2.0 * M_PI * K_crack * (h - h_3)
+    / std::log (r_c / r_matrix);
   daisy_assert (S >= 0.0);
   return S;
 }

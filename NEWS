@@ -82,6 +82,12 @@ This log will provide information about the timestep.
 So there is no longer any reason to load 'chemistry.dai' just in order
 to disable chemstry.
 
+** Biopore wall resistence change.
+
+The R_primary and R_secondary parameters are gone, instead we have
+K_wall_relative, which denote the conductivity of the biopore wall
+relative to the surrounding matrix.
+
 * 4.86
 
 ** No externally visible changes.

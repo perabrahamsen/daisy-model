@@ -1,50 +1,20 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Check kørsel med 10 sek
+* ONSDAG: MST: Sæt vækkeur!
 
-Specielt GWT.
+* Plot bromid i 3,5 meters dybde
+
+* Metamitron Silstrup
+
+* Glyfosat Estrup.
+
+* Glyfosat Silstrup
 
 * Hent gammel PC.
 
 Flyt indhold til ny?  Eller stick?
 
 * Ryd op på Joy.
-
-* Bromid
-
-Stadig dårlig match af bromid.
-
-Plot M_total i hver horizont
-
-Plot M_secondary i hver horizont
-
-Plot crop uptake, drain, leaching
-
-tertiary, surface, infiltration
-
-Analyser.
-
-* SH: Erstatning for Rwall
-
-* Hvordan reagerer bioporer på dt?
-
-Analyser.
-
-* Kørsel: 10 sec
-
-Hvad sker der?  Meget mindre vand i dræn???????????
-
-Test 1C-Center (10 sec) mod 1C-Center (1 hour)
-
-Det ser ud til at være Bioporer der er problemet.
-
-** Prøv igen når vi har variable tidsskridt
-
-Sammenlign også GWT:  Hvis GWT er den samme skal drænflow også være den samme!
-
-Prøv at køre uden dræn! 10s vs 1h; er det bunden der afgør?
-
-Groundwater aqutard er en fluxrand.
 
 * Prøv 2D med MACRO hydraulics
 

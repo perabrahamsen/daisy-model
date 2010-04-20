@@ -70,8 +70,13 @@ protected:
   static double matrix_to_biopore (double K_xx, double M_c, 
                                    double r_c, double h, double h_3);
   
-  static double biopore_to_matrix (double R_wall, double M_c, 
-                                   double r_c, double h, double h_3);
+  static double biopore_to_primary (const double K_matrix,
+                                    const double K_wall_rel, // []
+                                    const double M_c, const double r_c,
+                                    const double h, const double h_3);
+  static double biopore_to_secondary (const double K_crack,
+                                      const double M_c, const double r_c,
+                                      const double h_3);
   double max_infiltration_rate (const Geometry&, size_t e) const; // [cm/h]
 
   // Interface.
@@ -93,9 +98,9 @@ public:
                                   const double dt);
   void clear ();
   virtual void forward_sink (const Geometry& geo,    
-                             const Soil& soil,  
                              const std::vector<bool>& active,
                              const std::vector<double>& K, 
+                             const std::vector<double>& K_crack, 
                              const double h_barrier,
                              const double pressure_limit,
                              const std::vector<double>& h, 
@@ -104,9 +109,9 @@ public:
                             const std::vector<bool>& active,
                             const std::vector<double>& h) = 0;
   virtual void update_matrix_sink (const Geometry& geo,    
-                                   const Soil& soil,  
                                    const std::vector<bool>& active,
                                    const std::vector<double>& K, 
+                                   const std::vector<double>& K_crack, 
                                    const double h_barrier,
                                    const double pressure_limit,
                                    const std::vector<double>& h, 

@@ -241,7 +241,7 @@ FAO::RefPenmanMonteithWet (double Rn, double G, double Temp, double ea,
 			   double U2, double AtmPressure, double rb)
 {
   const double ra = RefAerodynamicResistance (U2);
-  const double rc = rb;       // Added, user to be 0.0, pa 2009-09-22
+  const double rc = rb;       // Added, used to be 0.0, pa 2009-09-22
   const double E1 = ETrad (AtmPressure, Temp, Rn, G, ra, rc);
   const double E2 = ETaero (AtmPressure, Temp, ea, ra, rc);
   //const double E2 = RefETaero (AtmPressure, Temp, ea, U2);

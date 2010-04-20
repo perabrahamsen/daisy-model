@@ -3,9 +3,9 @@
 ;; Chemistry
 
 (defchemistry Silstrup multi
-  (combine colloids 
-           Bromide Dimethoate Fenpropimorph 
-           Glyphosate Metamitron
+  (combine Bromide 
+           colloids Dimethoate Fenpropimorph Glyphosate
+           Metamitron
            ))
 
 ;; Soil 
