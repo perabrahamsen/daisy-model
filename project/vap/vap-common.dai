@@ -430,6 +430,17 @@
           (column (file "log/${station}-content.dlf")
                   (tag "Glyphosate"))))
 
+(defgnuplot horizontal-bromide plottime
+  ;; (device "pdf size 12cm, 4cm")
+  ;; First application (either site) 2000-05-22.
+  (extra &old
+         "set xtics rotate")
+  (begin 2000 05 01)
+  (where "fig/${station}-Bromide-horizontal.pdf")
+  (legend none)
+  (source (column (file "log/${station}-content.dlf")
+                  (tag "Bromide"))))
+
 (defgnuplot drain plottime
   ;; (begin 2000 04 29) (end 2002 6 30)
   (where "fig/${station}-drain.pdf")
@@ -647,6 +658,7 @@
          (theta (depth "SW025cm"))
          sc-bromide 
          leak150bromide
+         horizontal-bromide
          drain drain-acc
          biopore biopore-acc biopore-drain biopore-drain-acc
          colloids

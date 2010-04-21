@@ -153,6 +153,7 @@
 
 (defchemical Glyphosate-base herbicide
   "Base parameterization for all Glyphosate forms."
+  (canopy_dissipation_rate 0.00083 [h^-1])
   (cite lindhardt2001)
   (decompose_halftime 16 [d]))
 
@@ -177,16 +178,19 @@
   "Sorption equilibrium between dissolved and immobile Glyphosate."
   (cite gjettermann2009)
   (K_d 503 [l/kg])
+  ;; (K_d 10 [l/kg])
   (solute Glyphosate))
 
 (defreaction Glyphosate-immobile-sorption-strong Glyphosate-immobile-sorption
   (sorbed Glyphosate-immobile-strong)
   (K_d 463 [l/kg])
+  ;; (K_d 10 [l/kg])
   (k_sorption 0.005 [h^-1]))
 
 (defreaction Glyphosate-immobile-sorption-weak Glyphosate-immobile-sorption
   (sorbed Glyphosate-immobile-weak)
   (K_d 40 [l/kg])
+  ;; (K_d 1 [l/kg])
   (k_sorption 0.05 [h^-1]))
 
 (defreaction Glyphosate-colloid-sorption Glyphosate-immobile-sorption-weak
@@ -229,7 +233,7 @@
   "Base parameterization for all Metamitron forms."
   ;;(cite lindhardt2001)
   ;;(decompose_halftime 14 [d])
-  (decompose_halftime 55 [d])
+  (decompose_halftime 30 [d])
   )
 
 (defchemical Metamitron Metamitron-base
@@ -240,26 +244,15 @@
   "Metamitron sorbed to immobile soil."
   (adsorption full))
 
-(defchemical Metamitron-immobile-strong Metamitron-immobile)
-(defchemical Metamitron-immobile-weak Metamitron-immobile)
-
 (defreaction Metamitron-immobile-sorption sorption
   "Sorption equilibrium between dissolved and immobile Metamitron."
-  (solute Metamitron)
-  (cite lindhardt2001)
+  ;;(cite lindhardt2001)
   ;; (K_OC 207 [l/kg])
-  (K_d 207 [l/kg])
-  (k_sorption 0.05 [h^-1]))
-
-(defreaction Metamitron-immobile-sorption-strong Metamitron-immobile-sorption
-  (sorbed Metamitron-immobile-strong)
-  (K_d 187 [l/kg])
-  (k_sorption 0.005 [h^-1]))
-
-(defreaction Metamitron-immobile-sorption-weak Metamitron-immobile-sorption
-  (sorbed Metamitron-immobile-weak)
-  (K_d 20 [l/kg])
-  (k_sorption 0.05 [h^-1]))
+  (K_d 4 [l/kg])
+  (k_sorption 0.05 [h^-1])
+  (solute Metamitron)
+  (sorbed Metamitron-immobile)
+  )
 
 (defchemical Metamitron-colloid Metamitron-base
   "Metamitron sorbed to colloids."
@@ -277,28 +270,20 @@
 (defreaction Metamitron-filter colloid-filter
   "Filtration of colloid-bound metamitron in the soil matrix."
   (mobile Metamitron-colloid)
-  (immobile Metamitron-immobile-weak))
+  (immobile Metamitron-immobile))
 
 (defreaction Metamitron-colloid-generation bound_release
   "Release immobile Metamitron as colloids in mixing layer."
   (colloid colloid)
-  (bound Metamitron-colloid))
-
-(defreaction Metamitron-colloid-generation-strong Metamitron-colloid-generation 
-  (immobile Metamitron-immobile-strong))
-
-(defreaction Metamitron-colloid-generation-weak Metamitron-colloid-generation 
-  (immobile Metamitron-immobile-weak))
+  (bound Metamitron-colloid)
+  (immobile Metamitron-immobile))
 
 (defchemistry Metamitron default
   "Metamitron in both immobile, solute and colloid form."
-  (trace Metamitron Metamitron-immobile-strong Metamitron-immobile-weak
-         Metamitron-colloid)
-  (reaction Metamitron-immobile-sorption-strong
-            Metamitron-immobile-sorption-weak
+  (trace Metamitron Metamitron-immobile Metamitron-colloid)
+  (reaction Metamitron-immobile-sorption
             Metamitron-filter 
-            Metamitron-colloid-generation-strong
-            Metamitron-colloid-generation-weak
+            Metamitron-colloid-generation
             Metamitron-colloid-sorption))
 
 (defsummary "Colloid bound sorption" balance

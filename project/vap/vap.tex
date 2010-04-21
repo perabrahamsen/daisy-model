@@ -663,13 +663,22 @@ meters dybde.  Disse er på sin vis mere interessante, da de omgår
 problemet med heterogenitet ved at integrere over et stort område.
 Ingen af disse målinger har dog vist koncentrationer over
 detektionsgrænsen.  De simulerede værdier kan ses på
-figur~\ref{fig:Silstrup-horizontal}.
+figur~\ref{fig:Silstrup-horizontal} for pesticider, og~\ref{fig:Silstrup-Bromide-horizontal} for bromid.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/Silstrup-horizontal}
   \end{center}
   \caption{Simuleret pesticidkoncentration i jordvæske i 3,5 meters dybde i Silstrup.}
   \label{fig:Silstrup-horizontal}
+\end{figure}
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{fig/Silstrup-Bromide-horizontal}
+  \end{center}
+  \caption{Simuleret bromidkoncentration i jordvæske i 3,5 meters
+    dybde i Silstrup.  De målte værdier ligger på mellem 0 og 1 mg/l i
+    perioden (Figur 17D i \citet{vap2009}).}
+  \label{fig:Silstrup-Bromide-horizontal}
 \end{figure}
 
 \subsection{Dræn og drænvand}
@@ -958,7 +967,8 @@ figur~\ref{fig:Estrup-sc-bromide}.
 Der er desuden målt på pesticider i en vandretliggende filtre i 3,5
 meters dybde.  Ingen af disse målinger har dog vist koncentrationer
 over detektionsgrænsen.  De simulerede værdier kan ses på
-figur~\ref{fig:Estrup-horizontal}.
+figur~\ref{fig:Estrup-horizontal} for pesticider,
+og~\ref{fig:Estrup-Bromide-horizontal} for bromid.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/Estrup-horizontal}
@@ -966,6 +976,15 @@ figur~\ref{fig:Estrup-horizontal}.
   \caption{Simuleret pesticidkoncentration i jordvæske i 3,5 meters
     dybde i Estrup.}
   \label{fig:Estrup-horizontal}
+\end{figure}
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{fig/Estrup-Bromide-horizontal}
+  \end{center}
+  \caption{Simuleret bromidkoncentration i jordvæske i 3,5 meters
+    dybde i Estrup.  De målte værdier ligger på mellem 0 og 1 mg/l i
+    perioden (Figur 23D i \citet{vap2009}).}
+  \label{fig:Estrup-Bromide-horizontal}
 \end{figure}
 
 \subsection{Dræn og drænvand}
@@ -1168,7 +1187,7 @@ første glyfosat ankommer.  Nedbørintensiteten i perioden er moderat
 bliver ikke aktiveret.
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Silstrup-weather-glyphosate.pdf}
+    \includegraphics[width=\columnwidth]{fig/Silstrup-weather-glyphosate}
   \end{center}
   \caption{Nedbør i dagene hvor første glyfosat først måles i dræn i Silstrup.}
   \label{fig:Silstrup-weather-glyphosate}
@@ -1223,7 +1242,7 @@ jordbehandling eller regnormeaktivitet.  Men vi brugte ikke
 planteresterne som et reqservour for vand og kemikalier.  For at kunne
 gøre dette valgte vi at implementere en Brasiliansk model
 \citep{scopel2004} der konceptuelt passer godt med Daisy.  I denne
-model dækker planteresterne en del af jorden afhængig af mænde og
+model dækker planteresterne en del af jorden afhængig af mængde og
 type, hvor de både forhindrer jordfordampning samt opsamler nedbør.  I
 Daisy udvidede vi dette til også at opsamle kemikalier. To
 parameteriseringer blev angivet, begge er lagt ind i Daisy, i dette
@@ -1243,24 +1262,43 @@ systemusikkerhed vi opererer med.
 
 \subsubsection{Metamitron Silstrup}
 
-Vi deler metamitron op i en svagt og en stærk sorberet del på samme
-måde som glyfosat, da vi ikke ved bedre.  I \citet{lindhard2001} er
-halveringstiden for metamitron angivet til 14 dage, men målinger viser
-betydelig udvaskning efter 6 måneder.  For at rette op på det
-misforhold ændrer vi halveringstiden til 55 dage.  Det giver dog en
-alt for stor udvaskning i starten, som vi kompenserer for ved at sætte
-sorbtionen op.  Helt præcist ændrer vi den i \citet{lindhard2001}
-$K_{OC}$ værdi til en $K_d$ værdi, uden anden begrundelse en at det
-giver en akkumuleret udvaskning der passer godt med målingerne.
+I \citet{lindhardt2001} er halveringstiden for metamitron angivet til
+14 dage, men målingerne viser den største pukkel i udvaskning efter 6
+måneder, så vi mener der er grundlag for at sætte den op.  I
+\citet{madsen2000pesticide} er sorbtionegenskaber bestemt for en række
+danske lokaliteter.  Den bedste korrelation for sorption til
+jordparametre er jernoxid (FeO), og kun ringe korrelation til organisk
+stof.  Den højeste målte Kd 3,1 $\pm$ 0,9 L/kg for Drengsted, og den
+laveste 0,16 $\pm$ 0,02 L/kg.  Vi regner derfor med at at Kd bør holde
+sig i intervalet 0,14 -- 4.0 L/kg.
+
+En Kd på 4.0 L/kg giver de bedste resultater, men stadig alt for høje
+værdier straks efter udbringningen.  En mulig forklaring er at
+udbringningen er 19 dage efter seneste jordbehandling, og at vi på
+dette tidspunkt både undervurderer pløjelagets ledningsevne, og
+overvurderer antallet af bioporer, hvilket giver en for høj
+bioporeaktivitet.
+
+Den sene puls i måleresultaterne kan rammes ved at justere
+nedbrydningsraten, en halveringstid på 30 dage giver rimelige
+resultater.
 
 \subsubsection{Glyfosat Estrup}
 
 For at få den første puls på plads nedsætter vi porøsiteten og den
 hydrauliske ledningsevne i overfladelaget, som for Silstrup.  Desuden
 efterlader vi også her blade og stængler på marken ved høst, så det
-kan virke som et reservoir for vand og pesticid.  Endelig sætter vi
-grundvandsstanden en anelse op, for at få fremskudt starten på
-drænsæsonen så den passer med målingerne.
+kan virke som et reservoir for vand og pesticid.  Endelig sættes
+nedbrydningen i laget af planterester ned til en 10\%, da det meste
+glyfosat eller ville nå at blive nedbrudt.
+
+Det giver en tidlig puls på omtrent den rigtige størrelse, men for
+tidligt, den 19/10.  Den første måling er dækker perioden 24/10 til
+31/10.  Der er en pløjning den 23/10.  Vi rammer slet ikke den
+aktivitet der kommer efter pløjningen.  Man kunne forestille sig at en
+pløjning på et tidspunkt hvor der ligger store mængder glyfosat i
+toppen af jorden vil have stor betydning for kolloidfaciliteret
+transport, noget vi ikke tager højde for i modellen.
 
 \subsubsection{Andre pesticider}
 
