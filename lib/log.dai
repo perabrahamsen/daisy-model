@@ -1511,24 +1511,48 @@ sum of all chemicals will be logged."
 ;; We need two new log models.
 (deflog "Chemical Content" chemical
   "Amount of chemicals in each numeric soil layer."
-  (where "${colfid}chemical_content.dlf")
+  (declare unit String "Base unit.")
+  (unit "ug/m^3")
+  (where "${colfid}content_${chemfid}.dlf")
   (when hourly)
   (entries Year Month MDay Hour
            (array (path column "${column}" Chemistry "*"
                         trace "${chemical}" M)
                   (handle current)
-                  (dimension "ug/m^3")
+                  (dimension "${unit}")
                   (spec chemical default M))))
 
 (deflog "Chemical Concentration" chemical
   "Concentration in water of chemicals in each numeric soil layer.  "
-  (where "${colfid}chemical_conc.dlf")
+  (declare unit String "Base unit.")
+  (unit "ng/l")
+  (where "${colfid}conc_${chemfid}.dlf")
   (when hourly)
-  (entries  Year Month MDay Hour
+  (entries Year Month MDay Hour
            (array (path column "${column}" Chemistry "*" trace "${chemical}" C)
                   (handle current)
-                  (dimension "ng/l")
+                  (dimension "${unit}")
                   (spec chemical default C))))
+
+(deflog "Chemical Content Secondary" "Chemical Content"
+  "Amount of chemicals in each numeric soil layer."
+  (where "${colfid}content_${chemfid}.dlf")
+  (entries Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*"
+                        trace "${chemical}" M_secondary)
+                  (handle current)
+                  (dimension "${unit}")
+                  (spec chemical default M_secondary))))
+
+(deflog "Chemical Concentration Secondary" "Chemical Concentration"
+  "Concentration in water of chemicals in each numeric soil layer.  "
+  (where "${colfid}conc_${chemfid}.dlf")
+  (entries  Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*" trace "${chemical}" C_secondary)
+                  (handle current)
+                  (dimension "${unit}")
+                  (spec chemical default C_secondary))))
+
 
 (deflog reaction column 
   "A log table for a specific reaction."

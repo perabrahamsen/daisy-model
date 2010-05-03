@@ -24,6 +24,7 @@
 #define HYDRAULIC_H
 
 #include "model_derived.h"
+#include <boost/scoped_ptr.hpp>
 #include <memory>
 
 class Log;
@@ -42,7 +43,7 @@ public:
 private:
   struct K_at_h;
 protected:
-  const K_at_h *const K_init;
+  const boost::scoped_ptr<K_at_h>  K_init;
 
   // Standard parameters.
 public:

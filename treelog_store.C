@@ -126,8 +126,19 @@ private:
   void add (int nest, const std::string& text)
   { 
     if (!closed)
-      entries.push_back (Entry (nest, text)); 
-
+      {
+        if (nest == is_close)
+          {
+            daisy_assert (entries.size () > 0);
+            if (entries.back ().nest >= 0)
+              {
+                entries.pop_back ();
+                goto done;
+              }
+          }
+        entries.push_back (Entry (nest, text)); 
+      }
+  done:
     propagate (nest, text);
   }
 public:

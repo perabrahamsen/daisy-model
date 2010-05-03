@@ -664,7 +664,8 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
          "Conductivity C1 Estrup"
          "Retention C2 Estrup"
          "Conductivity C2 Estrup"
-         horizontal leak150 leak150acc
+         (theta (depth "SW025cm") (extra &old "set xtics rotate"))
+         horizontal horizontal-bromide leak150 leak150acc
          ;; First measurement 2000-05-26.
          (drain (begin 2000 05 26))
          (drain-acc (begin 2000 05 26))

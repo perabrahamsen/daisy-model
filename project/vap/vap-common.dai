@@ -24,7 +24,9 @@
   (alpha 0.01 [h^-1]))
 
 (defsecondary vap_nocracks vap_pressure 
-  (h_lim 1.2 [pF]))
+  ;;(h_lim 1.2 [pF])
+  (h_lim 2 [pF])
+  )
 
 (defsecondary vap_cracks cracks
   (aperture 78 [um])
@@ -32,10 +34,14 @@
   (alpha 0.01 [h^-1]))
 
 (defhorizon VAP_Ap FAO3
-  (secondary_domain vap_nocracks))
+  ;; (secondary_domain none)
+  (secondary_domain vap_nocracks)
+  )
 
 (defhorizon VAP_B FAO3
-  (secondary_domain vap_cracks))
+  ;;(secondary_domain none)
+  (secondary_domain vap_cracks)
+  )
 
 (defhorizon VAP_C VAP_B)
 
@@ -72,7 +78,13 @@
   (entries (content (z -1 [m])
                     (path column "${column}" Chemistry "*" 
                           trace "Bromide" C)
-                    (tag Bromide)
+                    (tag "Bromide 1")
+                    (dimension "mg/L")
+                    (spec chemical default C))
+           (content (z -3.5 [m])
+                    (path column "${column}" Chemistry "*" 
+                          trace "Bromide" C)
+                    (tag "Bromide 35")
                     (dimension "mg/L")
                     (spec chemical default C))
            (content (z -3.5 [m])
@@ -303,6 +315,7 @@
 
 (defgnuplot gw plottime
   ;; (begin 2000 04 29) (end 2002 6 30)
+  (extra &old "set xtics rotate")
   (where "fig/${station}-gw.pdf")
   (title "Groundwater")
   (source (column (file "log/${station}-content.dlf")
@@ -316,7 +329,7 @@
 (defgnuplot theta plottime
   (device "pdf size 12cm, 4cm")
   (extra &old
-         "set xtics rotate")
+         "set ytics 5")
   ;; (begin 1999 9 1) (end 2002 7 1)
   (declare depth String "Soil depth to plot.") 
   (where "fig/${station}-theta-${depth}.pdf")
@@ -337,7 +350,7 @@
   (begin 2000 05 01)
   (where "fig/${station}-sc-bromide.pdf")
   (source (column (file "log/${station}-content.dlf")
-                  (tag "Bromide")
+                  (tag "Bromide 1")
                   (title "Sim"))
           (column (file "${station}-sc-bromide.ddf")
                   (missing missing)
@@ -352,8 +365,8 @@
   ;; (device "pdf size 12cm, 4cm")
   ;; First application (either site) 2000-05-22.
   (extra &old
-         "set lmargin 6"
-         "set rmargin 5")
+         "set lmargin 8"
+         "set rmargin 8")
   (begin 2000 05 01)
   (where "fig/${station}-leak150.pdf")
   (title "Pesticide leaching")
@@ -383,7 +396,7 @@
 
 
 (defgnuplot leak150bromide leak150common
-  (extra &old [set format x ""])
+  (extra &old "set xtics rotate")
   (where "fig/${station}-leak150bromide.pdf")
   (title "Bromide")
   (legend none)
@@ -437,9 +450,18 @@
          "set xtics rotate")
   (begin 2000 05 01)
   (where "fig/${station}-Bromide-horizontal.pdf")
-  (legend none)
   (source (column (file "log/${station}-content.dlf")
-                  (tag "Bromide"))))
+                  (title "Sim")
+                  (tag "Bromide 35"))
+          (column (file "${station}-35-bromide.ddf")
+                  (missing missing)
+                  (tag "H1.1"))
+          (column (file "${station}-35-bromide.ddf")
+                  (missing missing)
+                  (tag "H1.2"))
+          (column (file "${station}-35-bromide.ddf")
+                  (missing missing)
+                  (tag "H1.3"))))
 
 (defgnuplot drain plottime
   ;; (begin 2000 04 29) (end 2002 6 30)
@@ -655,10 +677,8 @@
   (declare station String "Name of station to plot.")
   (declare area Number [ha] "Area to plot.")
   (graph weather gw
-         (theta (depth "SW025cm"))
          sc-bromide 
          leak150bromide
-         horizontal-bromide
          drain drain-acc
          biopore biopore-acc biopore-drain biopore-drain-acc
          colloids

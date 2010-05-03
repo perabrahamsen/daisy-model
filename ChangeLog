@@ -1,3 +1,9 @@
+2010-04-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* oldunits.C: Fix memory leak found by valgrind.
+	* hydraulic.h, hydraulic.C (K_init): Ditto.
+	* treelog_store.C (Implementation): Eliminated memory pig found by valgrind.
+
 2010-04-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* biopore.h, biopore.C (biopore_to_primary, biopore_to_secondary):

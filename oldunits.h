@@ -25,6 +25,7 @@
 #define OLDUNITS_H
 
 #include "symbol.h"
+#include <boost/shared_ptr.hpp>
 
 static class Oldunits
 {
@@ -64,7 +65,8 @@ public:
 public:
   static void add (const symbol from, const symbol to,
 		   double factor, double offset = 0.0);
-  static void add (const symbol from, const symbol to, Convert&);
+  static void add (const symbol from, const symbol to, 
+                   boost::shared_ptr<Convert>);
   static double convert (const symbol from, const symbol to, double value);
   static bool can_convert (const symbol from, const symbol to);
   static bool can_convert (const symbol from, const symbol to, double value);

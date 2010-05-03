@@ -28,7 +28,7 @@
 
 struct Oldunits::Content
 {
-  typedef std::map<symbol, Convert*> to_type;
+  typedef std::map<symbol, boost::shared_ptr<Convert>/**/> to_type;
   typedef std::map<symbol, to_type> table_type;
   table_type table;
 
@@ -182,15 +182,7 @@ Oldunits::Content::Content ()
 { }
   
 Oldunits::Content::~Content ()
-{
-  for (table_type::iterator i = table.begin ();
-       i != table.end ();
-       i++)
-    for (to_type::iterator j = (*i).second.begin ();
-	 j != (*i).second.end ();
-	 j++)
-      map_delete ((*i).second.begin (), (*i).second.begin ());
-}
+{ }
 
 Oldunits::Content* Oldunits::content = NULL;
 int Oldunits::count = 0;
@@ -291,29 +283,31 @@ struct ConvertLinear : public Oldunits::Convert
 
 void 
 Oldunits::add (const symbol from, const symbol to,
-	    double factor, double offset)
+               double factor, double offset)
 { 
   daisy_assert (content);
   if (!(content->table[from].find (to) == content->table[from].end ()))
     daisy_warning ("convert from [" + from + "] to [" + to + "] duplicate\n");
   else
-    content->table[from][to] = new ConvertLinear (factor, offset);
+    content->table[from][to] 
+      = boost::shared_ptr<Convert> (new ConvertLinear (factor, offset));
   // Reverse conversion.
   daisy_assert (std::isnormal (factor));
   if (!(content->table[to].find (from) == content->table[to].end ()))
     daisy_warning ("convert from [" + from + "] to [" + to + "] reverse\n");
   else
-    content->table[to][from] = new ConvertLinear (1.0 / factor, 
-                                                  -offset / factor);
+    content->table[to][from] 
+      = boost::shared_ptr<Convert> (new ConvertLinear (1.0 / factor, 
+                                                       -offset / factor));
 }
 
 void 
-Oldunits::add (const symbol from, const symbol to, Convert& convert)
+Oldunits::add (const symbol from, const symbol to,
+               boost::shared_ptr<Convert> convert)
 {
   daisy_assert (content);
   daisy_assert (content->table[from].find (to) == content->table[from].end ());
-  content->table[from][to] = &convert;
-  
+  content->table[from][to] = convert;
 }
 
 double 
@@ -432,55 +426,51 @@ Oldunits::multiply (const symbol one, const symbol two)
   return Attribute::Unknown ();
 }
 
-// GCC 2.95 requires these to be defined outside a function.
-static class Convert_pF_cm_ : public Oldunits::Convert
+class Convert_pF_cm : public Oldunits::Convert
 {
   bool valid (double value) const
   { return value >= 0.0; }
   double operator() (double value) const
   { return pF2h (value); }
-} Convert_pF_cm;
+};
 
-static class Convert_cm_pF_ : public Oldunits::Convert
+class Convert_cm_pF : public Oldunits::Convert
 {
   bool valid (double value) const
   { return value < 0.0; }
   double operator() (double value) const
   {
     if (value >= 0.0)
-#if 0
-      throw "Cannot represent non-negative pressure as pF";
-#else 
       return -1.0;
-#endif
     return h2pF (value); 
   }
-} Convert_cm_pF;
+};
 
-static class Convert_kPa_pF_ : public Oldunits::Convert
+class Convert_kPa_pF : public Oldunits::Convert
 {
   bool valid (double value) const
   { return value < 0.0; }
   double operator() (double value) const
   { 
     if (value >= 0.0)
-#if 0
-      throw "Cannot represent non-negative pressure as pF";
-#else 
       return -1.0;
-#endif
     return h2pF (value * 10.0); 
   }
-} Convert_kPa_pF;
+};
 
 void
 Oldunits::standard_conversions ()
 {
+  
+
   // Parameters.
   add ("m", "cm", 100.0);
-  add ("pF", "cm", Convert_pF_cm);
-  add ("cm", "pF", Convert_cm_pF);
-  add ("kPa", "pF", Convert_kPa_pF);
+  static boost::shared_ptr<Convert> Convert_pF_cm_ptr (new Convert_pF_cm ());
+  add ("pF", "cm", Convert_pF_cm_ptr);
+  static boost::shared_ptr<Convert> Convert_cm_pF_ptr (new Convert_cm_pF ());
+  add ("cm", "pF", Convert_cm_pF_ptr);
+  static boost::shared_ptr<Convert> Convert_kPa_pF_ptr (new Convert_kPa_pF ());
+  add ("kPa", "pF", Convert_kPa_pF_ptr);
   add ("cm", "hPa", 1.0);
   add ("cm", "kPa", 0.1);
   add ("hPa", "kPa", 0.1);

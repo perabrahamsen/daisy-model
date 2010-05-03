@@ -39,7 +39,7 @@
              (ref_K_sat 2.25027 [cm/h])
              (mod_alpha (0 1) (1 1))
              (mod_n  (0 1) (1 1))
-             (mod_K_sat  (0.3 0.001) (0.392719 1))
+             (mod_K_sat  (0.3 0.001) (0.35 0.01) (0.392719 1))
              (Theta_res 0 [%])
              (ref_alpha 0.01 [cm^-1])))
 
@@ -64,9 +64,9 @@
   (secondary_domain vap_pressure (h_lim -10 [cm])))
 
 (defhorizon Silstrup_B_plow_pan Silstrup_B
-  ;; 10% of original.
+  ;; 50% of original.
   (secondary_domain vap_nocracks)
-  (hydraulic original (K_b 0.01 [mm/h])))
+  (hydraulic original (K_b 0.05 [mm/h])))
 
 (defhorizon Silstrup_C_base VAP_C
   (clay 26.28 [%]) (silt 20.86 [%]) (sand 52.86 [%])
@@ -95,16 +95,29 @@
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;;  cm too high,  cm is too low
-               (offset 40 [cm]))
+               ;;  0 cm too high,  cm is too low
+               ;; (offset 3 [cm])
+               (offset -2 [cm]) 
+               )
+  ;;(Groundwater aquitard 
+  ;;             (K_aquitard 1 [mm/h])
+  ;;             ;;(K_aquitard 0.1 [mm/h])
+  ;;             ;; We cannot get both seasons right using a fixed pressure.
+  ;;              ;; (pressure_table const -140 [cm])
+  ;;             (pressure_table file "dk-silstrup.gwt")
+  ;;             )
   (Chemistry Silstrup)
   (Soil (horizons (  -3.00 [cm] Silstrup_Ap_surface)
                   ( -31.00 [cm] Silstrup_Ap)
-                  ( -39.00 [cm] Silstrup_B_plow_pan)
-                  (-113.00 [cm] Silstrup_B)
+                  ;;( -39.00 [cm] Silstrup_B_plow_pan)
+                  (-75.00 [cm] (Silstrup_B (secondary_domain vap_cracks)))
+                  (-113.00 [cm] (Silstrup_B (secondary_domain vap_nocracks)
+                                            (anisotropy 100)))
+                  (-180.00 [cm] (Silstrup_C (secondary_domain vap_nocracks)
+                                            (anisotropy 100)))
                   (-350.00 [cm] Silstrup_C)
                   (-500.00 [cm] Silstrup_C_Nocracks))
-        (MaxRootingDepth 50 [cm])))
+        (MaxRootingDepth 130 [cm])))
 
 (defcolumn Silstrup-1D Silstrup
   (Drain lateral
@@ -193,6 +206,8 @@
     ;; Bromine atomic weight 79.904 g/mol
     ;; 30 kg potassium bromide = 30 * (79.904 / 119.002) = 20.14 kg bromine
     (spray Bromide 20.14 [kg/ha])
+  (wait (at 2000 06 01))
+    (set_porosity (depth -1 [cm]) (porosity 0.35))
   (wait (at 2000 06 15))
     ;; BBCH stage 11-15			
     ;; Goltix WG+Betanal Optima 
@@ -268,7 +283,8 @@
      (irrigate_overhead 4.0 [l/ha/h] (solute (Glyphosate 360 [g/kg])))
   (wait (at 2001 12 18))
     (plowing (depth -22 [cm]))
-    (set_porosity (depth -1 [cm]) (porosity 0.392719))
+    ;; (set_porosity (depth -1 [cm]) (porosity 0.392719))
+    (set_porosity (depth -1 [cm]) (porosity 0.35))
   (wait (at 2002 04 03))
     (seed_bed_preparation -3 [cm])
   (wait (at 2002 04 17))	
@@ -436,8 +452,46 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
   (column Silstrup-1C-Drain))
 
 (defprogram Silstrup-2C Silstrup
-  (column Silstrup-1C-Drain Silstrup-1C-Center))
-
+  (column Silstrup-1C-Drain Silstrup-1C-Center)
+  (output &old
+          ("Chemical Content" 
+           (when daily)
+           (where "log/${colfid}content_${chemfid}.dlf")
+           (unit [mg/L])
+           (column Silstrup-1C-Center)
+           (chemical Bromide))
+          ("Chemical Concentration" 
+           (when daily)
+           (where "log/${colfid}conc_${chemfid}.dlf")
+           (unit [mg/L])
+           (column Silstrup-1C-Center)
+           (chemical Bromide))
+          ("Chemical Content Secondary" 
+           (when daily)
+           (where "log/${colfid}content2_${chemfid}.dlf")
+           (unit [mg/L])
+           (column Silstrup-1C-Center)
+           (chemical Bromide))
+          ("Chemical Concentration Secondary" 
+           (when daily)
+           (where "log/${colfid}conc2_${chemfid}.dlf")
+           (unit [mg/L])
+           (column Silstrup-1C-Center)
+           (chemical Bromide))
+          ("Chemical Content" 
+           (when daily)
+           (where "log/${colfid}content_${chemfid}.dlf")
+           (unit [mg/L])
+           (column Silstrup-1C-Drain)
+           (chemical Bromide))
+          ("Chemical Concentration" 
+           (when daily)
+           (where "log/${colfid}conc_${chemfid}.dlf")
+           (unit [mg/L])
+           (column Silstrup-1C-Drain)
+           (chemical Bromide))
+          ))
+          
 ;; Plots
 
 (defxysource "Retention Ap Silstrup Daisy" "Retention Daisy" 
@@ -610,6 +664,16 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
          (horizontal (source &old 
                              (column (file "log/${station}-content.dlf")
                                      (tag "Metamitron"))))
+         (horizontal-bromide (source &old
+                                     (column (file "${station}-35-bromide.ddf")
+                                             (missing missing)
+                                             (tag "H2.1"))
+                                     (column (file "${station}-35-bromide.ddf")
+                                             (missing missing)
+                                             (tag "H2.2"))
+                                     (column (file "${station}-35-bromide.ddf")
+                                             (missing missing)
+                                             (tag "H2.3"))))
          (leak150 (source &old 
                           (column (file "log/${station}-content.dlf")
                                   (tag "Metamitron leak 150")
@@ -620,8 +684,10 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
                                      (timestep d)
                                      (tag "Metamitron leak 150")
                                      (title "Metamitron"))))
-         (theta (depth "SW060cm"))
-         (theta (depth "SW110cm"))
+         (theta (depth "SW025cm")  (extra &old [set format x ""]))
+         (theta (depth "SW060cm")  (extra &old [set format x ""]))
+         (theta (depth "SW110cm")
+                (extra &old "set xtics rotate"))
          ;; First measurement 2000-04-29
          (drain (begin 2000 04 29))
          (drain-acc (begin 2000 04 29))

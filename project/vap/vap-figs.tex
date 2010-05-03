@@ -1,5 +1,7 @@
-\documentclass[a4paper]{article}
+\documentclass[fullpage,a4paper]{article}
 
+%\usepackage[left=1cm,top=1cm,right=1cm,nohead,nofoot]{geometry}
+\usepackage[left=1cm,top=1cm,right=1cm,nohead,nofoot]{geometry}
 \usepackage[latin1]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[danish]{babel}
@@ -83,12 +85,10 @@
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/Silstrup-Bromide-horizontal}
   \end{center}
-  \caption{Simuleret bromidkoncentration i jordvæske i 3,5 meters
-    dybde i Silstrup.  De målte værdier ligger på mellem 0 og 1 mg/l i
-    perioden (Figur 17D i \citet{vap2009}).}
+  \caption{Bromid i jorden ved horizontale filtre i 3,5 meters dybde i
+    Silstrup.}
   \label{fig:Silstrup-Bromide-horizontal}
 \end{figure}
-
 
 \begin{figure}[htbp]
   \begin{center}
@@ -106,35 +106,48 @@
   \label{fig:Silstrup-drain-acc}
 \end{figure}
 
+\FloatBarrier
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/Silstrup-Bromide-weekly}\\
-    \includegraphics[width=\columnwidth]{fig/Silstrup-Dimethoate-weekly}\\
-    \includegraphics[width=\columnwidth]{fig/Silstrup-Fenpropimorph-weekly}\\
-    \includegraphics[width=\columnwidth]{fig/Silstrup-Glyphosate-weekly}\\
     \includegraphics[width=\columnwidth]{fig/Silstrup-Metamitron-weekly}
   \end{center}
-  \caption{Weekly drain flow of Bromide and selected pesticides.}
+  \caption{Weekly drain flow of Bromide and Metamitron.}
   \label{fig:Silstrup-weekly}
 \end{figure}
 
 \begin{figure}[htbp]
   \begin{center}
+    \includegraphics[width=\columnwidth]{fig/Silstrup-Dimethoate-weekly}\\
+    \includegraphics[width=\columnwidth]{fig/Silstrup-Fenpropimorph-weekly}\\
+    \includegraphics[width=\columnwidth]{fig/Silstrup-Glyphosate-weekly}
+  \end{center}
+  \caption{Weekly drain flow of selected pesticides.}
+  \label{fig:Silstrup-weekly2}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
     \includegraphics[width=\columnwidth]{fig/Silstrup-Bromide-acc}\\
-    \includegraphics[width=\columnwidth]{fig/Silstrup-Dimethoate-acc}\\
-    \includegraphics[width=\columnwidth]{fig/Silstrup-Fenpropimorph-acc}\\
-    \includegraphics[width=\columnwidth]{fig/Silstrup-Glyphosate-acc}\\
     \includegraphics[width=\columnwidth]{fig/Silstrup-Metamitron-acc}
   \end{center}
-  \caption{Accumulated drain flow of Bromide and selected pesticides.}
+  \caption{Accumulated drain flow of Bromide and Metamitron.}
   \label{fig:Silstrup-acc}
 \end{figure}
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Silstrup-leak150bromide}\\
-    \includegraphics[width=\columnwidth]{fig/Silstrup-leak150}\\
-    \includegraphics[width=\columnwidth]{fig/Silstrup-leak150acc}
+    \includegraphics[width=\columnwidth]{fig/Silstrup-Dimethoate-acc}\\
+    \includegraphics[width=\columnwidth]{fig/Silstrup-Fenpropimorph-acc}\\
+    \includegraphics[width=\columnwidth]{fig/Silstrup-Glyphosate-acc}
+  \end{center}
+  \caption{Accumulated drain flow of selected pesticides.}
+  \label{fig:Silstrup-acc}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{fig/Silstrup-leak150bromide}
   \end{center}
   \caption{Simuleret udvaskning i 150 cm, 30 cm under bioporer.}
   \label{fig:Silstrup-leak150}
@@ -142,18 +155,40 @@
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Silstrup-colloid}\\
-    \includegraphics[width=\columnwidth]{fig/Silstrup-biopore}\\
-    \includegraphics[width=\columnwidth]{fig/Silstrup-biopore-acc}\\
-    \includegraphics[width=\columnwidth]{fig/Silstrup-biopore-drain}\\
-    \includegraphics[width=\columnwidth]{fig/Silstrup-biopore-drain-acc}
+    \includegraphics[width=\columnwidth]{fig/Silstrup-leak150}\\
+    \includegraphics[width=\columnwidth]{fig/Silstrup-leak150acc}
   \end{center}
-  \caption{Kolloider i drænvand, samt bioporeaktivitet i 5 forskellige
-    jordlag.}
+  \caption{Simuleret udvaskning i 150 cm, 30 cm under bioporer.}
+  \label{fig:Silstrup-leak1502}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{fig/Silstrup-colloid}
+  \end{center}
+  \caption{Kolloider i drænvand.}
   \label{fig:Silstrup-biopore}
 \end{figure}
 
-%% \end{document}
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{fig/Silstrup-biopore}\\
+    \includegraphics[width=\columnwidth]{fig/Silstrup-biopore-acc}\\
+  \end{center}
+  \caption{Bioporeaktivitet i 5 forskellige jordlag.}
+  \label{fig:Silstrup-biopore2}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{fig/Silstrup-biopore-drain}\\
+    \includegraphics[width=\columnwidth]{fig/Silstrup-biopore-drain-acc}
+  \end{center}
+  \caption{Bidrag til dræn i 5 forskellige jordlag.}
+  \label{fig:Silstrup-biopore3}
+\end{figure}
+
+\end{document}
 \FloatBarrier
 \subsection*{Estrup}
 
@@ -211,9 +246,8 @@
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/Estrup-Bromide-horizontal}
   \end{center}
-  \caption{Simuleret bromidkoncentration i jordvæske i 3,5 meters
-    dybde i Estrup.  De målte værdier ligger på mellem 0 og 1 mg/l i
-    perioden (Figur 23D i \citet{vap2009}).}
+  \caption{Bromid i jorden ved horizontale filtre i 3,5 meters dybde i
+    Estrup.}
   \label{fig:Estrup-Bromide-horizontal}
 \end{figure}
 

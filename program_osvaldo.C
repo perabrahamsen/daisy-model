@@ -31,6 +31,7 @@
 #include <sstream>
 #include <iomanip>
 #include <memory>
+#include <numeric>
 
 struct ProgramOsvaldo : public Program
 {
@@ -144,9 +145,11 @@ struct ProgramOsvaldo : public Program
           diff2 += sqr (simulated[i] - measured[i]);
         
         // Output result.
+        const double simsum 
+          = std::accumulate (simulated.begin (), simulated.end (), 0.0);
         daisy_assert (measured_diff2 > 0.0);
         const double E = 1.0 - diff2 / measured_diff2;
-        result << par << "\t" << diff2 << "\t" << E << "\n";
+        result << par << "\t" << simsum << "\t" << E << "\n";
       }
     msg.message (result.str ());
     return true;
@@ -186,7 +189,7 @@ static struct ProgramOsvaldoSyntax : public DeclareModel
   { return new ProgramOsvaldo (al); }
   ProgramOsvaldoSyntax ()
     : DeclareModel (Program::component, "Osvaldo", "\
-Find the sum of squared difference.\n\
+Find the modelling error.\n\
 This is done between one set of measured data and multiple sets of\n\
 simulated data.")
   { }

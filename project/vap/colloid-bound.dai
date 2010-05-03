@@ -4,7 +4,8 @@
 
 (defchemical "Bromide" common
   (diffusion_coefficient 2.0e-5 [cm^2/s])
-  (crop_uptake_reflection_factor 0.5 [])
+  ;;(crop_uptake_reflection_factor 0.5 [])
+  (crop_uptake_reflection_factor 0.0 [])
   (canopy_dissipation_rate 0 [h^-1])
   (decompose_rate 0 [h^-1])
   (C_below const 0 [g/cm^3]))

@@ -24,81 +24,7 @@
 
 \begin{document}
 
-\section*{Statusnotat for}
-\subsection*{Flerdimensionel modellering af vandstrømning og
-  stoftransport i de øverste 1-2 m af jorden i systemer med markdræn.}
-\subsubsection*{Apr 2010}
-
-\subsection*{Modelbeskrivelse}
-
-Den overordnede modelbeskrivelse, som tænkes at indgå i den endelige
-rapport er givet i årsrapporten.
-
-\subsection*{Markeksperiment på Rørrendegaard}
-
-Afrapportering af eksperimentelle undersøgelser, som tænkes at indgå i
-den endelige rapport findes i årsrapporten.
-
-\subsection*{Daisy simulering af Rørrendegaard}
-
-Der er ikke foretaget yderligere kalibrering på Rørrendegaard siden
-seneste statusnotat.
-
 \section*{Daisy simulation for Silstrup og Estrup}
-
-\section*{Status}
-
-Daisy er sat op på de to forsøgsmarker.  Kalibrering efter vand var
-trivielt, ud fra de målte grundvandsdata.  I første omgang passede
-bromid pænt, så snart vand var kalibreret på plads.  For pesticider
-valgte vi at starte med glyfosat i Silstrup.  At få den ønskede
-dynamik her krævede implementation af en række fysiske processer, som
-vi allerede vidste eksisterede og havde betydning, men af hensyn til
-afgrænsning havde håbet at kunne se bort fra.  Vores glyfosat-dynamik
-er nu god nok til at vi tror på at både den og de øvrige pesticider
-kan kalibreres på plads.
-
-Desværre har det afsløret en problem i modellen som giver sig udslag
-for bromid.  I den tilrettede model bliver bromid "`tabt"' til dræn og
-bioporer ved pludselige hændelser med en hastighed som transporten
-i matricen ikke kan kompensere for.  Det giver en massebalancefejl.
-Problemet giver sig kun synligt udtryk for bromid, da de øvrige
-stoffer har et lager af adsorberet stof der kan kompensere.
-
-Den korrekte løsning på problemet med bromid vil være dynamisk at
-tilpasse tidsskridtet til de involverede processer.  En del arbejde er
-allerede gjort med henblik på dette, men meget mangler.  Hvor meget er
-svært at sige, da vi endnu ikke har identificeret alle de processer
-der skal rettes til, eller fundet en løsning på alle dem der er
-identificeret.
-
-I forbindelse med opsætning af Daisy til VAP er der sket er række
-forbedringer af den grundlæggende model, som rækker ud over det
-aktuelle projekt.
-\begin{enumerate}
-\item Vores fordampningsmodel er blevet justeret på baggrund af især
-  \citet{kjaersgaard2008crop} således at barjordsfordampningen er sat
-  ned, mens at fordampningen fra afgrødedække er sat tilsvarende op.
-\item Vores implementering af \citet{FAO-PM} tager nu korrekt højde
-  for fordampning fra våd overflade.
-\item Planterester på overfladen kan nu begrænse fordampning, samt
-  fungere som et beskyttet lager for pesticider.
-\item Vores gamle, uprøvede kode til at håndtere komprimering af jord
-  er rettet til og taget i anvendelse.
-\item Vores gamle, uprøvede kode til at håndtere kinetisk ligevægt
-  mellem flere adsorptionsformer er rettet til og taget i anvendelse.
-\end{enumerate}
-
-Metodemæssigt har vi haft lovende resultater med at kombinere vægtede
-resultater for to 1D søjler, en for drængrøften med en eksplicit
-adgang til dræn, og en for resten af marken hvor drænflow udregnes ved
-hjælp af \citet{hooghoudt}, i stedet for en enkelt 2D søjle der
-repræsenterer hele marken.  Det sparer meget beregningstid.
-
-Den resterende del af dette notat udgøres af et foreløbigt udkast til
-vores rapport om kalibreringen, med resultatet af de seneste
-simuleringer.  Der er tale om en kørsel med 2 1D søjler, da det er
-hvad vi bruger mens vi prøver at få variable tidsskridt på plads.
 
 \section{Data og opsætning}
 
@@ -572,6 +498,7 @@ egenskaber afbilledet på figur~\ref{fig:Silstrup-C}.
 \end{verbatim}
 
 \subsubsection{Profil}
+
 Alle ovenstående tal er fra GEUS.  MACRO bruger organisk kulstof som
 input, hvor Daisy bruger humus.  Funktionen C2OM omregner ved at
 dividere kulstofprocenten med 0.578.
@@ -579,15 +506,15 @@ dividere kulstofprocenten med 0.578.
 GEUS oplyser at der ingen pløjesål er observeret, men den kan godt
 eksistere alligevel.
 
-Jordprofilen angives sammen med den maksimale roddybde, som GEUS har
-oplyst til 50 cm.
+I \citet{lindhardt2001} blev der fundet røder ned til kalkgrænsen ved
+1,3 meters dybde.
 \begin{verbatim}
   (Soil (horizons (  -3.00 [cm] Silstrup_Ap_surface)
                   ( -31.00 [cm] Silstrup_Ap)
                   ( -39.00 [cm] Silstrup_B_plow_pan)
                   (-113.00 [cm] Silstrup_B)
                   (-500.00 [cm] Silstrup_C))
-        (MaxRootingDepth 50 [cm])))
+        (MaxRootingDepth 130 [cm])))
 \end{verbatim}
 
 \subsection{Grundvand}
@@ -658,27 +585,27 @@ på figur~\ref{fig:Silstrup-sc-bromide}.
   \label{fig:Silstrup-sc-bromide}
 \end{figure}
 
-Der er desuden målt på pesticider i to vandretliggende filtre i 3,5
-meters dybde.  Disse er på sin vis mere interessante, da de omgår
+Der er desuden målt på bromid
+(figur~\ref{fig:Silstrup-Bromide-horizontal}) og pesticider
+(figur~\ref{fig:Silstrup-horizontal}) i to vandretliggende filtre i
+3,5 meters dybde.  Disse er på sin vis mere interessante, da de omgår
 problemet med heterogenitet ved at integrere over et stort område.
-Ingen af disse målinger har dog vist koncentrationer over
-detektionsgrænsen.  De simulerede værdier kan ses på
-figur~\ref{fig:Silstrup-horizontal} for pesticider, og~\ref{fig:Silstrup-Bromide-horizontal} for bromid.
+Ingen af pesticidmålinger har vist koncentrationer over
+detektionsgrænsen.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{fig/Silstrup-Bromide-horizontal}
+  \end{center}
+  \caption{Bromid i jorden ved horizontale filtre i 3,5 meters dybde i
+    Silstrup.}
+  \label{fig:Silstrup-Bromide-horizontal}
+\end{figure}
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/Silstrup-horizontal}
   \end{center}
   \caption{Simuleret pesticidkoncentration i jordvæske i 3,5 meters dybde i Silstrup.}
   \label{fig:Silstrup-horizontal}
-\end{figure}
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Silstrup-Bromide-horizontal}
-  \end{center}
-  \caption{Simuleret bromidkoncentration i jordvæske i 3,5 meters
-    dybde i Silstrup.  De målte værdier ligger på mellem 0 og 1 mg/l i
-    perioden (Figur 17D i \citet{vap2009}).}
-  \label{fig:Silstrup-Bromide-horizontal}
 \end{figure}
 
 \subsection{Dræn og drænvand}
@@ -964,27 +891,27 @@ figur~\ref{fig:Estrup-sc-bromide}.
   \label{fig:Estrup-sc-bromide}
 \end{figure}
 
-Der er desuden målt på pesticider i en vandretliggende filtre i 3,5
-meters dybde.  Ingen af disse målinger har dog vist koncentrationer
-over detektionsgrænsen.  De simulerede værdier kan ses på
-figur~\ref{fig:Estrup-horizontal} for pesticider,
-og~\ref{fig:Estrup-Bromide-horizontal} for bromid.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Estrup-horizontal}
-  \end{center}
-  \caption{Simuleret pesticidkoncentration i jordvæske i 3,5 meters
-    dybde i Estrup.}
-  \label{fig:Estrup-horizontal}
-\end{figure}
+Der er desuden målt på bromid
+(figur~\ref{fig:Estrup-Bromide-horizontal}) og pesticider
+(figur~\ref{fig:Estrup-horizontal}) i to vandretliggende filtre i
+3,5 meters dybde.  Disse er på sin vis mere interessante, da de omgår
+problemet med heterogenitet ved at integrere over et stort område.
+Ingen af pesticidmålinger har vist koncentrationer over
+detektionsgrænsen.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/Estrup-Bromide-horizontal}
   \end{center}
-  \caption{Simuleret bromidkoncentration i jordvæske i 3,5 meters
-    dybde i Estrup.  De målte værdier ligger på mellem 0 og 1 mg/l i
-    perioden (Figur 23D i \citet{vap2009}).}
+  \caption{Bromid i jorden ved horizontale filtre i 3,5 meters dybde i
+    Estrup.}
   \label{fig:Estrup-Bromide-horizontal}
+\end{figure}
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{fig/Estrup-horizontal}
+  \end{center}
+  \caption{Simuleret pesticidkoncentration i jordvæske i 3,5 meters dybde i Estrup.}
+  \label{fig:Estrup-horizontal}
 \end{figure}
 
 \subsection{Dræn og drænvand}
@@ -1111,10 +1038,11 @@ evt. justere parametre eller indføre nye modeller.
 
 \subsection{Vand og bromid i jord}
 
-Vi har valgt ikke at kalibrere efter vand og bromid i jord, da vi ikke
-regner med at de valgte udtagningssteder er representative for marken.
+Vi har valgt ikke at kalibrere efter punktmplingerne af vand og bromid
+i jord, da vi ikke regner med at de valgte udtagningssteder er
+representative for marken.
 
-\subsection{Vand og bromid i dræn}
+\subsection{Grundvandsstand, vand og bromid i dræn}
 
 Vand og bromid kan normalt med fordel kalibreres på plads med 1D
 simuleringer, da 1D modellen (der bygger på \citet{hooghoudt}, med
@@ -1142,11 +1070,51 @@ og for Estrup satte vi $K_b$ til 0,5 mm/h (op fra 0,1 mm/h).
 Vand kunne relativt let kalibreres på plads, så både mængde og periode
 passer med beskedne forskydninger af mængder indenfor hver periode.
 
-Bromid passer ikke særlig godt, specielt ikke på Silstrup.  Den store
-forskel mellem Silstrup og Estrup i simuleringerne er planteoptag,
-hvor Silstrup med en rodzone på kun 50 cm har et meget beskedent
-planteoptag.  Da vi ikke har data for planteoptag har vi valgt at lade
-dette ligge.
+\subsubsection{Silstrup}
+
+Vi var nødt til at sætte grundvandsstanden 40 cm højere end den målte
+for at få drænmængder til at passe.  Det kunne tyde på at vandet har
+letere ved at bevæge sig til dræn end nedad i virkeligheden, end i
+vores simulering.  I \citet{lindhardt2001} side A3-17 beskrives
+sprækkesystemet i dybden 0,7 til 1,8 meter som horizontalt.  I Macro
+opsætningen er ledningsevnen i makroporer angivet til ca. 100 gange
+højere end i matrix.  Da Daisy ikke kan simulere anisotropi i
+sprækkesystemet alene, har vi valgt helt at fjerne det, og i stedet
+sætte en generel anisotropi for de berørte lag til en faktor 100.  Det
+betyder at vi kan nedsætte grundsvandsstanden i simuleringen, så den
+nu kun er 3 cm højere end den målte.
+
+Det største tilbageværende for vand var at den målte drænperiode i
+specielt andet år er meget længere end den simulerede.  Det kan måske
+tilskrives heterogenitet i jorden.
+
+Vores bromid i drænvand var alt for stor, til gengæld kunne vi fra
+simuleringen se at planteoptaget var beskedent.  Samtidig havde vi
+også for meget bromid i 3,5 meters dybde.  GEUS har fortsat med at
+måle på Bromid i dræn og i 3,5 meters dybde, og ude fra de tal ser det
+ud til at det meste Bromid er forsvundet i en tredje retning (hverken
+til dræn eller som udvaskning).  Det mest oplagte bud var at det blev
+optaget af planter.  Men at øge planteoptaget til det maksimale
+modellen tillader gav slet ikke nok.  Vores hyptese var derfor at
+Bromiden lå bsekyttet i rodzonen, medens at vandet løb udenom gennem
+bioporer.  Vi tilføjede derfor et overfladelag med 1\% af den
+oprindelige ledningsevne efter udbringningen af bromid, hvilket
+resulterede i at lidt over halvedelen af vandet trængte ind i Jorden
+gennem bioporer.  Samtidig fjernede vi pløjesålen, for at undgå at
+bioporer blev aktiveret der.  Resultatet var bromid i dræn i en den
+rigtige størrelsesorden, men stadig for meget.
+
+Der bliver målt relativt høje koncentrationer af bromid i 3,5 meters
+dybde i de første observationer efter udbringning, hvilket tyder på at
+der er en hurtig strømningsvej helt ned i den dybde.  Hvilket dog gør
+det overraskende at der ikke observeres pesticider i den dybde.  Der
+er ikke observeret bioporer der går så langt ned, og vi har ikke
+modelleret dem i Daisy, så bromiden trænger først derned væsentligt
+senere i simuleringen.
+
+\subsubsection{Estrup}
+
+
 
 \subsection{Pesticider i jord}
 
