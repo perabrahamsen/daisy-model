@@ -231,7 +231,7 @@
     (spray Metamitron 700 [g/ha])       ;  (assume 1 kg = 1 l)
   (wait (at 2000 11 15))
     ;; Yield of root 13.45 t/ha 100% DM. Yield of top: 2.63 t/ha 100% DM
-    (harvest "Fodder Beet")
+    (harvest all)
   (wait (at 2001 04 01))
     (plowing (depth -18 [cm]))
   (wait (at 2001 05 07))
