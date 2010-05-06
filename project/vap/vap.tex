@@ -118,11 +118,11 @@ hurtigt stof udveksles mellem de to domæner.  Værdien er tager fra
 Rørrendegård opsætningen.  Vi har valgt at have et egentligt
 sprækkesystem i B og til dels i C horisonterne  For de øvrige
 horisonter opdeler vi stadig mellem mobilt og immobilt vand, ved et
-tryk på 1.2 pF.
+tryk på 2.0 pF.
 \begin{verbatim}
 (defsecondary vap_nocracks pressure 
   (alpha 0.01 [h^-1]))
-  (h_lim 1.2 [pF]))
+  (h_lim 2.0 [pF]))
 
 (defsecondary vap_cracks cracks
   (aperture 78 [um])
@@ -291,7 +291,7 @@ en stor rolle som potentielt reservoir for pesticider.  Planterester
 kan derudover mindske fordampningen.  I forbindelse med VAP
 kalibreringen har vi implementeret et nyt modul til dette, baseret på
 \citet{scopel2004}.  To parameteriseringer blev angivet, vi valgte en
-basseret på hirse.\citep{macena2003}
+basseret på hirse.~\citep{macena2003}
 \begin{verbatim}
   (Litter Millet)
 \end{verbatim}
@@ -560,14 +560,14 @@ figur~\ref{fig:Silstrup-theta}.
   \caption{Jordvand for målepunkt S1 i Silstrup.}
   \label{fig:Silstrup-theta}
 \end{figure}
-Umiddelbart kan man se at der tilsyneladende er dårlig overensstemmelse
-mellem porøsister ved S1 og den porøsitet der er målt for jorden som
-helhed, da målingerne viser et vandindhold over porøsiteten i lange
-perioder.  Desuden tyder den manglende sæsonvariation for de to dybe
-prober (60 og 110 cm) på at der ikke er mange rødder dernede.  Det
-passer med oplysninger fra GEUS om at marken har en maksimal roddybde
-på 50 cm.  Vi har valgt ikke at hæfte stor vægt disse målinger da der
-er en god chance for at de ikke er repræsentative for marken.
+Umiddelbart kan man se at der tilsyneladende er dårlig
+overensstemmelse mellem porøsister ved S1 og den porøsitet der er målt
+for jorden som helhed, da målingerne viser et vandindhold over
+porøsiteten i lange perioder.  Desuden tyder den manglende
+sæsonvariation for de to dybe prober (60 og 110 cm) på at der ikke er
+mange rødder dernede.  Vi har valgt ikke at hæfte stor vægt disse
+målinger da der er en god chance for at de ikke er repræsentative for
+marken.
 
 \subsection{Koncentration i jord}
 
@@ -590,7 +590,7 @@ Der er desuden målt på bromid
 (figur~\ref{fig:Silstrup-horizontal}) i to vandretliggende filtre i
 3,5 meters dybde.  Disse er på sin vis mere interessante, da de omgår
 problemet med heterogenitet ved at integrere over et stort område.
-Ingen af pesticidmålinger har vist koncentrationer over
+Ingen af pesticidmålingerne har vist koncentrationer over
 detektionsgrænsen.
 \begin{figure}[htbp]
   \begin{center}
@@ -732,284 +732,284 @@ dræn.
 \end{figure}
 
 \section{Estrup}
-
-En oversigt over Estrup forsøgsområde kan ses på figur~21, side 42 i
-\citet{vap2009}.  Daisy opsætning for Estrup kan findes i filen
-\texttt{estrup.dai}.
-
-\subsection{Vejr}
-
-De rå data fra DJF blev konverteret til Daisy format i filen
-\texttt{dk-siltrup-hourly.dwf}.  Der var 31 manglende timer mellem
-1999-1-1 og 2002-4-16, oftest en til to timer, to gange mangler der
-tre timer i træk.  Desuden var der flere udfald på globalstråling i op
-til 1,5 døgn, specielt i 1999.  For disse blev strålingsniveaet
-erstattet med værdier fra det foregående døgn.  Enkeltstående udfald
-af vind, luftfugtighed, og nedbør blev udfyld med data fra de
-omkringstående timer.  De generelle oplysninger om stationen er udfyldt
-som for Silstrup.
-
-En oversigt over udvalgte data kan ses på
-figur~\ref{fig:Estrup-weather}.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Estrup-weather}
-  \end{center}
-  \caption{Akkumuleret nedbør og fordampning, samt timeværdier for
-    temperatur for målestationen i Estrup.  Potentiel og aktuel
-    fordamppning er identiske når der ikke er vandstress.}
-  \label{fig:Estrup-weather}
-\end{figure}
-
-\subsection{Jord}
-
-Jordopsætning er baseret på jordfysiske parametre fra GEUS opsætning
-af MACRO.  Der er anvendt fire jordhorisonter.
-
-\subsubsection{Ap}
-
-Daisy opsætning for Ap horizonten følger, med de hydrauliske
-egenskaber afbilledet på figur~\ref{fig:Estrup-Ap}.
-\horfig{Estrup}{Ap}
-\begin{verbatim}
-(defhorizon Estrup_Ap_base VAP_Ap
-  (clay 14.6 [%]) (silt 23.33 [%])(sand 62.07 [%])
-  (humus (C2OM (C 3.248 [%]))) (dry_bulk_density 1.51 [g/cm^3])
-  (hydraulic MACRO 
-             (Theta_b 36 [%]) (Theta_res 0.0 [%])
-             (n 1.16 []) 
-             ;; (K_b 0.1 [mm/h])
-             (K_b 0.5 [mm/h])
-             (l 0.5 []) (alpha 0.02 [cm^-1])
-             (Theta_sat 41 [%]) (K_sat 238 [mm/h]) (h_b -5 [cm]) (n_ma 4 [])))
-\end{verbatim}
-
-\subsubsection{B}
-
-Daisy opsætning for B horizonten følger, med de hydrauliske
-egenskaber afbilledet på figur~\ref{fig:Estrup-B}.
-\horfig{Estrup}{B}
-\begin{verbatim}
-(defhorizon Estrup_B_base VAP_B
-  (clay 21.7 [%]) (silt 17.87 [%])(sand 60.43 [%])
-  (humus (C2OM (C 0.812 [%]))) (dry_bulk_density 1.68 [g/cm^3])
-  (hydraulic MACRO
-             (Theta_b 35 [%]) (Theta_res 0.0 [%])
-             (n 1.14 []) (K_b 0.3 [mm/h]) (l 0.5 []) (alpha 0.01 [cm^-1])
-             (Theta_sat 37 [%]) (K_sat 10 [mm/h]) (h_b -15 [cm]) (n_ma 4 [])))
-\end{verbatim}
-
-\subsubsection{C1}
-
-Daisy opsætning for C1 horizonten følger, med de hydrauliske
-egenskaber afbilledet på figur~\ref{fig:Estrup-C1}.
-\horfig{Estrup}{C1}
-\begin{verbatim}
-(defhorizon Estrup_C1_base VAP_C
-  (clay 26.75 [%]) (silt 14.23 [%])(sand 59.02 [%])
-  (humus (C2OM (C 0.203 [%]))) (dry_bulk_density 1.73 [g/cm^3])
-  (hydraulic MACRO
-             (Theta_b 32 [%]) (Theta_res 0.0 [%])
-             (n 1.1 []) (K_b 0.3 [mm/h])
-             (l 0.5 []) (alpha 0.01 [cm^-1])
-             (Theta_sat 34 [%]) (K_sat 12 [mm/h]) (h_b -12 [cm]) (n_ma 4 [])))
-\end{verbatim}
-
-\subsubsection{C2}
-
-Daisy opsætning for C2 horizonten følger, med de hydrauliske
-egenskaber afbilledet på figur~\ref{fig:Estrup-C2}.
-\horfig{Estrup}{C2}
-\begin{verbatim}
-(defhorizon Estrup_C2_base VAP_C
-  (clay 25.7 [%]) (silt 22.2 [%])(sand 52.1 [%])
-  (humus (C2OM (C 0.233 [%]))) (dry_bulk_density 1.64 [g/cm^3])
-  (hydraulic MACRO
-             (Theta_b 39 [%]) (Theta_res 0.0 [%])
-             (n 1.1 []) (K_b 0.16 [mm/h])
-             (l 0.5 []) (alpha 0.005 [cm^-1])
-             (Theta_sat 40 [%]) (K_sat 0.5 [mm/h]) (h_b -10 [cm]) (n_ma 4 [])))
-\end{verbatim}
-
-\subsubsection{Profil}
-Alle ovenstående tal er fra GEUS.  MACRO bruger organisk kulstof som
-input, hvor Daisy bruger humus.  Funktionen C2OM omregner ved at
-dividere kulstofprocenten med 0.578.
-
-GEUS oplyser at der ingen pløjesål er observeret, men den kan godt
-eksistere alligevel.
-
-Jorprofilen angives sammen med den maksimale roddybde, som GEUS har
-oplyst er variabel, ned til 200 cm.  Vi har valgt 150 cm.  Som ved
-Silstrup tilføjer vi to ekstra jordlag ved overfladen og pløjesålen.
-
-\begin{verbatim}
-  (Soil (horizons (  -3.00 Estrup_Ap_surface)
-                  ( -27.00 Estrup_Ap)
-                  ( -35.00 Estrup_B_plow_pan)
-                  ( -55.00 Estrup_B)
-                  (-105.00 Estrup_C1)
-                  (-200.00 Estrup_C2_Nocracks)
-                  (-500.00 Estrup_C2))
-        (MaxRootingDepth 150 [cm]))
-\end{verbatim}
-
-\subsection{Grundvand}
-
-Grundvandsstand taget fra P1 i filter 4.5 til 5 meters dybde.
-Simuleret og observeret (uden offset) grundvandstand kan ses på
-figur~\ref{fig:Estrup-gw}.  De første målinger er manuelt aflæst fra P3.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Estrup-gw}
-  \end{center}
-  \caption{Grundvandsstand for Estrup.}
-  \label{fig:Estrup-gw}
-\end{figure}
-
-\subsection{Jordvand}
-
-Jordvandsmålinger er fra S1. Resultaterne er vist på
-figur~\ref{fig:Estrup-theta}.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Estrup-theta-SW025cm}
-  \end{center}
-  \caption{Jordvand for målepunkt S1 i Estrup.}
-  \label{fig:Estrup-theta}
-\end{figure}
-
-\subsection{Sugekopper}
-
-Data for sugekopper er fra S1 og S2, og en meters dybde, og vist på
-figur~\ref{fig:Estrup-sc-bromide}.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Estrup-sc-bromide}
-  \end{center}
-  \caption{Bromid i jordvæske udtaget med sugekop i en meters dybde ved S1 i Estrup.}
-  \label{fig:Estrup-sc-bromide}
-\end{figure}
-
-Der er desuden målt på bromid
-(figur~\ref{fig:Estrup-Bromide-horizontal}) og pesticider
-(figur~\ref{fig:Estrup-horizontal}) i to vandretliggende filtre i
-3,5 meters dybde.  Disse er på sin vis mere interessante, da de omgår
-problemet med heterogenitet ved at integrere over et stort område.
-Ingen af pesticidmålinger har vist koncentrationer over
-detektionsgrænsen.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Estrup-Bromide-horizontal}
-  \end{center}
-  \caption{Bromid i jorden ved horizontale filtre i 3,5 meters dybde i
-    Estrup.}
-  \label{fig:Estrup-Bromide-horizontal}
-\end{figure}
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Estrup-horizontal}
-  \end{center}
-  \caption{Simuleret pesticidkoncentration i jordvæske i 3,5 meters dybde i Estrup.}
-  \label{fig:Estrup-horizontal}
-\end{figure}
-
-\subsection{Dræn og drænvand}
-
-Dræn er placeret 1.10 meter under jordoverfladen, og med variabel
-afstand (mellem 9 og 20 meter).  Den typiske afstand er dog ca. 13
-meter, hvilket er blevet brugt i Daisy opsætningen.
-Drænafstrømning er vist i figur~\ref{fig:Estrup-drain}.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Estrup-drain}
-  \end{center}
-  \caption{Drænafstrømning i Estrup.}
-  \label{fig:Estrup-drain}
-\end{figure}
-Akkumuleret drænafstrømning er vist i figur~\ref{fig:Estrup-drain-acc}
-sammen med perkolation og nettonedbør.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Estrup-drain-acc}
-  \end{center}
-  \caption{Akkumuleret drænafstrømning i Estrup.}
-  \label{fig:Estrup-drain-acc}
-\end{figure}
-
-\subsection{Drænkoncentrationer}
-
-Ingen målinger af Dimethoate eller Fenpropimorph var over
-detektionsgrænsen.  Sammenligning af ugentlige udvaskninger kan ses på
-figur~\ref{fig:Estrup-weekly}.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Estrup-Bromide-weekly}\\
-    \includegraphics[width=\columnwidth]{fig/Estrup-Dimethoate-weekly}\\
-    \includegraphics[width=\columnwidth]{fig/Estrup-Fenpropimorph-weekly}\\
-    \includegraphics[width=\columnwidth]{fig/Estrup-Glyphosate-weekly}\\
-  \end{center}
-  \caption{Ugentligt drænflow af bromid og udvalgte pesticider.}
-  \label{fig:Estrup-weekly}
-\end{figure}
-GEUS tal er gjort arealrelative ved at dividere med drænarealet for
-Estrup. Den akkumulerede udvaskning kan ses på
-figur~\ref{fig:Estrup-acc}.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Estrup-Bromide-acc}\\
-    \includegraphics[width=\columnwidth]{fig/Estrup-Dimethoate-acc}\\
-    \includegraphics[width=\columnwidth]{fig/Estrup-Fenpropimorph-acc}\\
-    \includegraphics[width=\columnwidth]{fig/Estrup-Glyphosate-acc}\\
-  \end{center}
-  \caption{Akkumuleret drænflow af bromid og udvalgte pesticider.}
-  \label{fig:Estrup-acc}
-\end{figure}
-
-På figur~\ref{fig:Estrup-leak150} ses simuleret udvaskningen ved 150
-cm dybde.  Det er 30 cm under de dybeste bioporer i opsætningen, og
-giver derfor et bud på hvor langt stofferne kan komme uden hjælp fra
-bioporer.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Estrup-leak150bromide}\\
-    \includegraphics[width=\columnwidth]{fig/Estrup-leak150}\\
-    \includegraphics[width=\columnwidth]{fig/Estrup-leak150acc}
-  \end{center}
-  \caption{Simuleret udvaskning i 150 cm, 30 cm under bioporer.}
-  \label{fig:Estrup-leak150}
-\end{figure}
-
-\subsection{Bioporer og kolloider}
-
-Udvaskning af kolloider, samt udveksling af vand mellem bioporer og
-matrix kan ses på figur~\ref{fig:Estrup-kolloid} og
-\ref{fig:Estrup-biopore}.  Der er tale om netto-udveksling, hvor
-bidrag fra matrix til bioporer tæller positivt, og bidrag fra bioporer
-til matrix tæller negativt.  Vi har valgt at se på fem forskellige
-lag. 1) Vand der ryger direkte fra overfladen til bioporer (Above
-surface).  2) Udveksling i de øverste 3 cm (0-3 cm).  3) Udveksling
-i resten af Ap horizonten (Ap).  Udveksling i pløjesålen (Plow
-pan). Udveksling under pløjesålen, ned til 50 cm (B50).  Der skelnes
-mellem bioporer som ender i matrix, og bioporer som ender direkte i
-dræn.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Estrup-colloid}
-  \end{center}
-  \caption{Kolloider i drænvand (simuleret).}
-  \label{fig:Estrup-kolloid}
-\end{figure}
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/Estrup-biopore}\\
-    \includegraphics[width=\columnwidth]{fig/Estrup-biopore-acc}\\
-    \includegraphics[width=\columnwidth]{fig/Estrup-biopore-drain}\\
-    \includegraphics[width=\columnwidth]{fig/Estrup-biopore-drain-acc}
-  \end{center}
-  \caption{Bioporeaktivitet i 5 forskellige jordlag (simuleret).}
-  \label{fig:Estrup-biopore}
-\end{figure}
+%% 
+%% En oversigt over Estrup forsøgsområde kan ses på figur~21, side 42 i
+%% \citet{vap2009}.  Daisy opsætning for Estrup kan findes i filen
+%% \texttt{estrup.dai}.
+%% 
+%% \subsection{Vejr}
+%% 
+%% De rå data fra DJF blev konverteret til Daisy format i filen
+%% \texttt{dk-siltrup-hourly.dwf}.  Der var 31 manglende timer mellem
+%% 1999-1-1 og 2002-4-16, oftest en til to timer, to gange mangler der
+%% tre timer i træk.  Desuden var der flere udfald på globalstråling i op
+%% til 1,5 døgn, specielt i 1999.  For disse blev strålingsniveaet
+%% erstattet med værdier fra det foregående døgn.  Enkeltstående udfald
+%% af vind, luftfugtighed, og nedbør blev udfyld med data fra de
+%% omkringstående timer.  De generelle oplysninger om stationen er udfyldt
+%% som for Silstrup.
+%% 
+%% En oversigt over udvalgte data kan ses på
+%% figur~\ref{fig:Estrup-weather}.
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-weather}
+%%   \end{center}
+%%   \caption{Akkumuleret nedbør og fordampning, samt timeværdier for
+%%     temperatur for målestationen i Estrup.  Potentiel og aktuel
+%%     fordamppning er identiske når der ikke er vandstress.}
+%%   \label{fig:Estrup-weather}
+%% \end{figure}
+%% 
+%% \subsection{Jord}
+%% 
+%% Jordopsætning er baseret på jordfysiske parametre fra GEUS opsætning
+%% af MACRO.  Der er anvendt fire jordhorisonter.
+%% 
+%% \subsubsection{Ap}
+%% 
+%% Daisy opsætning for Ap horizonten følger, med de hydrauliske
+%% egenskaber afbilledet på figur~\ref{fig:Estrup-Ap}.
+%% \horfig{Estrup}{Ap}
+%% \begin{verbatim}
+%% (defhorizon Estrup_Ap_base VAP_Ap
+%%   (clay 14.6 [%]) (silt 23.33 [%])(sand 62.07 [%])
+%%   (humus (C2OM (C 3.248 [%]))) (dry_bulk_density 1.51 [g/cm^3])
+%%   (hydraulic MACRO 
+%%              (Theta_b 36 [%]) (Theta_res 0.0 [%])
+%%              (n 1.16 []) 
+%%              ;; (K_b 0.1 [mm/h])
+%%              (K_b 0.5 [mm/h])
+%%              (l 0.5 []) (alpha 0.02 [cm^-1])
+%%              (Theta_sat 41 [%]) (K_sat 238 [mm/h]) (h_b -5 [cm]) (n_ma 4 [])))
+%% \end{verbatim}
+%% 
+%% \subsubsection{B}
+%% 
+%% Daisy opsætning for B horizonten følger, med de hydrauliske
+%% egenskaber afbilledet på figur~\ref{fig:Estrup-B}.
+%% \horfig{Estrup}{B}
+%% \begin{verbatim}
+%% (defhorizon Estrup_B_base VAP_B
+%%   (clay 21.7 [%]) (silt 17.87 [%])(sand 60.43 [%])
+%%   (humus (C2OM (C 0.812 [%]))) (dry_bulk_density 1.68 [g/cm^3])
+%%   (hydraulic MACRO
+%%              (Theta_b 35 [%]) (Theta_res 0.0 [%])
+%%              (n 1.14 []) (K_b 0.3 [mm/h]) (l 0.5 []) (alpha 0.01 [cm^-1])
+%%              (Theta_sat 37 [%]) (K_sat 10 [mm/h]) (h_b -15 [cm]) (n_ma 4 [])))
+%% \end{verbatim}
+%% 
+%% \subsubsection{C1}
+%% 
+%% Daisy opsætning for C1 horizonten følger, med de hydrauliske
+%% egenskaber afbilledet på figur~\ref{fig:Estrup-C1}.
+%% \horfig{Estrup}{C1}
+%% \begin{verbatim}
+%% (defhorizon Estrup_C1_base VAP_C
+%%   (clay 26.75 [%]) (silt 14.23 [%])(sand 59.02 [%])
+%%   (humus (C2OM (C 0.203 [%]))) (dry_bulk_density 1.73 [g/cm^3])
+%%   (hydraulic MACRO
+%%              (Theta_b 32 [%]) (Theta_res 0.0 [%])
+%%              (n 1.1 []) (K_b 0.3 [mm/h])
+%%              (l 0.5 []) (alpha 0.01 [cm^-1])
+%%              (Theta_sat 34 [%]) (K_sat 12 [mm/h]) (h_b -12 [cm]) (n_ma 4 [])))
+%% \end{verbatim}
+%% 
+%% \subsubsection{C2}
+%% 
+%% Daisy opsætning for C2 horizonten følger, med de hydrauliske
+%% egenskaber afbilledet på figur~\ref{fig:Estrup-C2}.
+%% \horfig{Estrup}{C2}
+%% \begin{verbatim}
+%% (defhorizon Estrup_C2_base VAP_C
+%%   (clay 25.7 [%]) (silt 22.2 [%])(sand 52.1 [%])
+%%   (humus (C2OM (C 0.233 [%]))) (dry_bulk_density 1.64 [g/cm^3])
+%%   (hydraulic MACRO
+%%              (Theta_b 39 [%]) (Theta_res 0.0 [%])
+%%              (n 1.1 []) (K_b 0.16 [mm/h])
+%%              (l 0.5 []) (alpha 0.005 [cm^-1])
+%%              (Theta_sat 40 [%]) (K_sat 0.5 [mm/h]) (h_b -10 [cm]) (n_ma 4 [])))
+%% \end{verbatim}
+%% 
+%% \subsubsection{Profil}
+%% Alle ovenstående tal er fra GEUS.  MACRO bruger organisk kulstof som
+%% input, hvor Daisy bruger humus.  Funktionen C2OM omregner ved at
+%% dividere kulstofprocenten med 0.578.
+%% 
+%% GEUS oplyser at der ingen pløjesål er observeret, men den kan godt
+%% eksistere alligevel.
+%% 
+%% Jorprofilen angives sammen med den maksimale roddybde, som GEUS har
+%% oplyst er variabel, ned til 200 cm.  Vi har valgt 150 cm.  Som ved
+%% Silstrup tilføjer vi to ekstra jordlag ved overfladen og pløjesålen.
+%% 
+%% \begin{verbatim}
+%%   (Soil (horizons (  -3.00 Estrup_Ap_surface)
+%%                   ( -27.00 Estrup_Ap)
+%%                   ( -35.00 Estrup_B_plow_pan)
+%%                   ( -55.00 Estrup_B)
+%%                   (-105.00 Estrup_C1)
+%%                   (-200.00 Estrup_C2_Nocracks)
+%%                   (-500.00 Estrup_C2))
+%%         (MaxRootingDepth 150 [cm]))
+%% \end{verbatim}
+%% 
+%% \subsection{Grundvand}
+%% 
+%% Grundvandsstand taget fra P1 i filter 4.5 til 5 meters dybde.
+%% Simuleret og observeret (uden offset) grundvandstand kan ses på
+%% figur~\ref{fig:Estrup-gw}.  De første målinger er manuelt aflæst fra P3.
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-gw}
+%%   \end{center}
+%%   \caption{Grundvandsstand for Estrup.}
+%%   \label{fig:Estrup-gw}
+%% \end{figure}
+%% 
+%% \subsection{Jordvand}
+%% 
+%% Jordvandsmålinger er fra S1. Resultaterne er vist på
+%% figur~\ref{fig:Estrup-theta}.
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-theta-SW025cm}
+%%   \end{center}
+%%   \caption{Jordvand for målepunkt S1 i Estrup.}
+%%   \label{fig:Estrup-theta}
+%% \end{figure}
+%% 
+%% \subsection{Sugekopper}
+%% 
+%% Data for sugekopper er fra S1 og S2, og en meters dybde, og vist på
+%% figur~\ref{fig:Estrup-sc-bromide}.
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-sc-bromide}
+%%   \end{center}
+%%   \caption{Bromid i jordvæske udtaget med sugekop i en meters dybde ved S1 i Estrup.}
+%%   \label{fig:Estrup-sc-bromide}
+%% \end{figure}
+%% 
+%% Der er desuden målt på bromid
+%% (figur~\ref{fig:Estrup-Bromide-horizontal}) og pesticider
+%% (figur~\ref{fig:Estrup-horizontal}) i to vandretliggende filtre i
+%% 3,5 meters dybde.  Disse er på sin vis mere interessante, da de omgår
+%% problemet med heterogenitet ved at integrere over et stort område.
+%% Ingen af pesticidmålinger har vist koncentrationer over
+%% detektionsgrænsen.
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-Bromide-horizontal}
+%%   \end{center}
+%%   \caption{Bromid i jorden ved horizontale filtre i 3,5 meters dybde i
+%%     Estrup.}
+%%   \label{fig:Estrup-Bromide-horizontal}
+%% \end{figure}
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-horizontal}
+%%   \end{center}
+%%   \caption{Simuleret pesticidkoncentration i jordvæske i 3,5 meters dybde i Estrup.}
+%%   \label{fig:Estrup-horizontal}
+%% \end{figure}
+%% 
+%% \subsection{Dræn og drænvand}
+%% 
+%% Dræn er placeret 1.10 meter under jordoverfladen, og med variabel
+%% afstand (mellem 9 og 20 meter).  Den typiske afstand er dog ca. 13
+%% meter, hvilket er blevet brugt i Daisy opsætningen.
+%% Drænafstrømning er vist i figur~\ref{fig:Estrup-drain}.
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-drain}
+%%   \end{center}
+%%   \caption{Drænafstrømning i Estrup.}
+%%   \label{fig:Estrup-drain}
+%% \end{figure}
+%% Akkumuleret drænafstrømning er vist i figur~\ref{fig:Estrup-drain-acc}
+%% sammen med perkolation og nettonedbør.
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-drain-acc}
+%%   \end{center}
+%%   \caption{Akkumuleret drænafstrømning i Estrup.}
+%%   \label{fig:Estrup-drain-acc}
+%% \end{figure}
+%% 
+%% \subsection{Drænkoncentrationer}
+%% 
+%% Ingen målinger af Dimethoate eller Fenpropimorph var over
+%% detektionsgrænsen.  Sammenligning af ugentlige udvaskninger kan ses på
+%% figur~\ref{fig:Estrup-weekly}.
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-Bromide-weekly}\\
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-Dimethoate-weekly}\\
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-Fenpropimorph-weekly}\\
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-Glyphosate-weekly}\\
+%%   \end{center}
+%%   \caption{Ugentligt drænflow af bromid og udvalgte pesticider.}
+%%   \label{fig:Estrup-weekly}
+%% \end{figure}
+%% GEUS tal er gjort arealrelative ved at dividere med drænarealet for
+%% Estrup. Den akkumulerede udvaskning kan ses på
+%% figur~\ref{fig:Estrup-acc}.
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-Bromide-acc}\\
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-Dimethoate-acc}\\
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-Fenpropimorph-acc}\\
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-Glyphosate-acc}\\
+%%   \end{center}
+%%   \caption{Akkumuleret drænflow af bromid og udvalgte pesticider.}
+%%   \label{fig:Estrup-acc}
+%% \end{figure}
+%% 
+%% På figur~\ref{fig:Estrup-leak150} ses simuleret udvaskningen ved 150
+%% cm dybde.  Det er 30 cm under de dybeste bioporer i opsætningen, og
+%% giver derfor et bud på hvor langt stofferne kan komme uden hjælp fra
+%% bioporer.
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-leak150bromide}\\
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-leak150}\\
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-leak150acc}
+%%   \end{center}
+%%   \caption{Simuleret udvaskning i 150 cm, 30 cm under bioporer.}
+%%   \label{fig:Estrup-leak150}
+%% \end{figure}
+%% 
+%% \subsection{Bioporer og kolloider}
+%% 
+%% Udvaskning af kolloider, samt udveksling af vand mellem bioporer og
+%% matrix kan ses på figur~\ref{fig:Estrup-kolloid} og
+%% \ref{fig:Estrup-biopore}.  Der er tale om netto-udveksling, hvor
+%% bidrag fra matrix til bioporer tæller positivt, og bidrag fra bioporer
+%% til matrix tæller negativt.  Vi har valgt at se på fem forskellige
+%% lag. 1) Vand der ryger direkte fra overfladen til bioporer (Above
+%% surface).  2) Udveksling i de øverste 3 cm (0-3 cm).  3) Udveksling
+%% i resten af Ap horizonten (Ap).  Udveksling i pløjesålen (Plow
+%% pan). Udveksling under pløjesålen, ned til 50 cm (B50).  Der skelnes
+%% mellem bioporer som ender i matrix, og bioporer som ender direkte i
+%% dræn.
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-colloid}
+%%   \end{center}
+%%   \caption{Kolloider i drænvand (simuleret).}
+%%   \label{fig:Estrup-kolloid}
+%% \end{figure}
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-biopore}\\
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-biopore-acc}\\
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-biopore-drain}\\
+%%     \includegraphics[width=\columnwidth]{fig/Estrup-biopore-drain-acc}
+%%   \end{center}
+%%   \caption{Bioporeaktivitet i 5 forskellige jordlag (simuleret).}
+%%   \label{fig:Estrup-biopore}
+%% \end{figure}
 
 \section{Kalibrering}
 
@@ -1072,49 +1072,50 @@ passer med beskedne forskydninger af mængder indenfor hver periode.
 
 \subsubsection{Silstrup}
 
-Vi var nødt til at sætte grundvandsstanden 40 cm højere end den målte
-for at få drænmængder til at passe.  Det kunne tyde på at vandet har
-letere ved at bevæge sig til dræn end nedad i virkeligheden, end i
-vores simulering.  I \citet{lindhardt2001} side A3-17 beskrives
-sprækkesystemet i dybden 0,7 til 1,8 meter som horizontalt.  I Macro
-opsætningen er ledningsevnen i makroporer angivet til ca. 100 gange
-højere end i matrix.  Da Daisy ikke kan simulere anisotropi i
-sprækkesystemet alene, har vi valgt helt at fjerne det, og i stedet
-sætte en generel anisotropi for de berørte lag til en faktor 100.  Det
-betyder at vi kan nedsætte grundsvandsstanden i simuleringen, så den
-nu kun er 3 cm højere end den målte.
+Vi var først nødt til at sætte grundvandsstanden 40 cm højere med
+ovennævnte metode, end den målte for at få drænmængder til at passe.
+Det kunne tyde på at vandet har letere ved at bevæge sig til dræn end
+nedad i virkeligheden, end i vores simulering.  I
+\citet{lindhardt2001} side A3-17 beskrives sprækkesystemet i dybden
+0,7 til 1,8 meter som horizontalt.  I Macro opsætningen er
+ledningsevnen i makroporer angivet til ca. 100 gange højere end i
+matrix.  Da Daisy ikke kan simulere anisotropi i sprækkesystemet
+alene, har vi valgt helt at fjerne det, og i stedet sætte en generel
+anisotropi for de berørte lag til en faktor 100.  Det betyder at vi
+kan nedsætte grundsvandsstanden i simuleringen, så den nu er 2 cm
+under den målte.
 
-Det største tilbageværende for vand var at den målte drænperiode i
-specielt andet år er meget længere end den simulerede.  Det kan måske
-tilskrives heterogenitet i jorden.
+Det største tilbageværende problem for vand var at den målte
+drænperiode i specielt andet år er meget længere end den simulerede.
+Det kan måske tilskrives heterogenitet i jorden.
 
-Vores bromid i drænvand var alt for stor, til gengæld kunne vi fra
-simuleringen se at planteoptaget var beskedent.  Samtidig havde vi
-også for meget bromid i 3,5 meters dybde.  GEUS har fortsat med at
-måle på Bromid i dræn og i 3,5 meters dybde, og ude fra de tal ser det
-ud til at det meste Bromid er forsvundet i en tredje retning (hverken
-til dræn eller som udvaskning).  Det mest oplagte bud var at det blev
-optaget af planter.  Men at øge planteoptaget til det maksimale
-modellen tillader gav slet ikke nok.  Vores hyptese var derfor at
-Bromiden lå bsekyttet i rodzonen, medens at vandet løb udenom gennem
-bioporer.  Vi tilføjede derfor et overfladelag med 1\% af den
-oprindelige ledningsevne efter udbringningen af bromid, hvilket
-resulterede i at lidt over halvedelen af vandet trængte ind i Jorden
-gennem bioporer.  Samtidig fjernede vi pløjesålen, for at undgå at
-bioporer blev aktiveret der.  Resultatet var bromid i dræn i en den
-rigtige størrelsesorden, men stadig for meget.
+Vores bromid i drænvand var til at starte med alt for stor, til
+gengæld kunne vi fra simuleringen se at planteoptaget var beskedent.
+Samtidig havde vi også for meget bromid i 3,5 meters dybde.  GEUS har
+fortsat med at måle på bromid i dræn og i 3,5 meters dybde, og ude fra
+de tal ser det ud til at det meste bromid er forsvundet i en tredje
+retning (hverken til dræn eller som udvaskning).  Det mest oplagte bud
+var at det blev optaget af planter.  Men at øge planteoptaget til det
+maksimale modellen tillader gav slet ikke nok.  Vores hypotese var
+derfor at bromiden lå beskyttet i rodzonen, medens at vandet løb
+udenom gennem bioporer.  Vi tilføjede derfor et overfladelag med 1\%
+af den oprindelige ledningsevne efter udbringningen af bromid, hvilket
+resulterede i at lidt over halvdelen af vandet trængte ind i Jorden
+gennem bioporer.  Samtidig øgede vi mikroporeledningsvnen i
+pløjesålen, for at undgå at bioporer blev aktiveret der.  Pløjesålen
+er dog stadig uden sprækker, så den nær mættede ledningsvne er meget
+lavere end for resten af B horisonten.  Resultatet var bromid i dræn i
+en den rigtige størrelsesorden, men stadig for meget.
 
 Der bliver målt relativt høje koncentrationer af bromid i 3,5 meters
 dybde i de første observationer efter udbringning, hvilket tyder på at
 der er en hurtig strømningsvej helt ned i den dybde.  Hvilket dog gør
 det overraskende at der ikke observeres pesticider i den dybde.  Der
 er ikke observeret bioporer der går så langt ned, og vi har ikke
-modelleret dem i Daisy, så bromiden trænger først derned væsentligt
-senere i simuleringen.
+modelleret dem i Daisy, så bromiden når først derned væsentligt senere
+i simuleringen.
 
 \subsubsection{Estrup}
-
-
 
 \subsection{Pesticider i jord}
 
@@ -1124,7 +1125,7 @@ ikke koncetrationer over detektionsgrænsen, se
 figur~\ref{fig:Silstrup-horizontal} og ~\ref{fig:Estrup-horizontal}.
 Dette understøttes af figur~\ref{fig:Silstrup-leak150}
 og~\ref{fig:Estrup-leak150}, der viser at der ikke er nogen
-nævneværdig udvaskning i simuleringerne så snart vi er kommet fra af
+nævneværdig udvaskning i simuleringerne så snart vi er kommet ud af
 bioporedomænet.
 
 \subsection{Pesticider i dræn}
@@ -1149,7 +1150,7 @@ til vores forståelse af hvad der foregår på marken.
 Det første glyfosat ankommer til dræn i store mængder, med en
 hastighed der kun kan forklares med bioporeaktivitet.  Dette kunne
 ikke ses i simuleringerne, da bioporerne slet ikke er aktive når det
-første glyfosat ankommer.  Nedbørintensiteten i perioden er moderat
+første glyfosat ankommer.  Nedbørsintensiteten i perioden er moderat
 ($<$ 2 mm/h, se figur~\ref{fig:Silstrup-weather-glyphosate}), hvilket
 øverste horisont ikke har problemer med at optage, så bioporerne
 bliver ikke aktiveret.
@@ -1202,13 +1203,13 @@ skyldes de små hændelser dagene inden (se
 figur~\ref{fig:Silstrup-weather-glyphosate}).  Ved disse hændelser
 blev glyfosaten vasket ned i jordoverfladen, hvor det blev sorberet.
 Vores hypotese var at glyfosaten lå på planteresterne fra høsten, et
-fænomen vi tidligere havde observeret.\citep{gjettermann2009}.
+fænomen vi tidligere havde observeret.~\citep{gjettermann2009}.
 
 Daisy holder allerede styr på planterester og andet organisk materiale
 på overfladen, hvorfra det kan inkorporeres i jorden med
 jordbehandling eller regnormeaktivitet.  Men vi brugte ikke
-planteresterne som et reqservour for vand og kemikalier.  For at kunne
-gøre dette valgte vi at implementere en Brasiliansk model
+planteresterne som et reservour for vand og kemikalier.  For at kunne
+gøre dette valgte vi at implementere en brasiliansk model
 \citep{scopel2004} der konceptuelt passer godt med Daisy.  I denne
 model dækker planteresterne en del af jorden afhængig af mængde og
 type, hvor de både forhindrer jordfordampning samt opsamler nedbør.  I
@@ -1217,7 +1218,11 @@ parameteriseringer blev angivet, begge er lagt ind i Daisy, i dette
 projekt valgte vi en benytte en baseret på hirse.\citep{macena2003}.
 
 Med denne ændring kunne vi også fange den første puls af glyfosat i
-dræn.
+dræn.  Vi fanger stadig ikke "`halen"' efter den første hændelse.  Vi
+regner med at det skyldes at ikke lat glyfosat der føres ned gennem
+bioporerne i drængrøften ender direkte i dræn, men meget ender i
+sprækker og rodkanaler nær drænet, hvorfra det relativt let kan vaskes
+det sidste stykke.  Den effekt har vi ikke med i modellen.
 
 \subsubsection{Glyfosat Silstrup}
 
@@ -1235,53 +1240,83 @@ I \citet{lindhardt2001} er halveringstiden for metamitron angivet til
 måneder, så vi mener der er grundlag for at sætte den op.  I
 \citet{madsen2000pesticide} er sorbtionegenskaber bestemt for en række
 danske lokaliteter.  Den bedste korrelation for sorption til
-jordparametre er jernoxid (FeO), og kun ringe korrelation til organisk
-stof.  Den højeste målte Kd 3,1 $\pm$ 0,9 L/kg for Drengsted, og den
-laveste 0,16 $\pm$ 0,02 L/kg.  Vi regner derfor med at at Kd bør holde
-sig i intervalet 0,14 -- 4.0 L/kg.
+jordparametre er total jernoxid (FeO$_{\mbox{total}}$), og kun ringe
+korrelation til organisk stof og ingen til let ekstraherbar jernoxid
+(FeO$_{\mbox{oxalate}}$) som ellers er målt på Silstrup.  Den højeste
+målte Kd 3,1 $\pm$ 0,9 L/kg for Drengsted, og den laveste 0,16 $\pm$
+0,02 L/kg.  Vi regner derfor med at at Kd bør holde sig i intervalet
+0,14 -- 4,0 L/kg.
 
-En Kd på 4.0 L/kg giver de bedste resultater, men stadig alt for høje
-værdier straks efter udbringningen.  En mulig forklaring er at
-udbringningen er 19 dage efter seneste jordbehandling, og at vi på
-dette tidspunkt både undervurderer pløjelagets ledningsevne, og
-overvurderer antallet af bioporer, hvilket giver en for høj
-bioporeaktivitet.
+En Kd på den højeste værdi i intervallet, 4,0 L/kg, giver det bedste
+match for den tidlige hændelse.  Lavere værdier giver højere
+udvaskning.  Vi kunne alternativt skrue ned på overfladeparametrene
+for at lukke af for den hurtige transportvej ned, hvilket kunne
+forsvares med at udbringningen er kort efter en jorbehandling, hvor vi
+måske undervurderer pløjelagets ledningsevne, og overvurderer antallet
+af bioporer.  Bromidmålingerne supporterer ikke dette.  Bromid blev
+udbragt samtidig med metamitron, men der er desværre ikke nogen
+målinger fra dræn i samme periode til at sammenligne med.  Men
+eftersom der bliver observeret bromid i jordvand i en meters dybde må
+vi konkludere at der findes nogen hurtige veje derned.  Faktisk tyder
+målingerne i 1 og 3,5 meters dybde på at vi undervurderer hvor hurtigt
+Bromid trænger ned, samtidig med at vi overvurderer hvor hurtigt
+Metamitron trænger ned i dræn.
 
-Den sene puls i måleresultaterne kan rammes ved at justere
-nedbrydningsraten, en halveringstid på 30 dage giver rimelige
-resultater.
+For at få den sene udvaskning af metamitron på plads kalibrerede vi os
+frem til en halveringstid på 35 dage.
 
-\subsubsection{Glyfosat Estrup}
-
-For at få den første puls på plads nedsætter vi porøsiteten og den
-hydrauliske ledningsevne i overfladelaget, som for Silstrup.  Desuden
-efterlader vi også her blade og stængler på marken ved høst, så det
-kan virke som et reservoir for vand og pesticid.  Endelig sættes
-nedbrydningen i laget af planterester ned til en 10\%, da det meste
-glyfosat eller ville nå at blive nedbrudt.
-
-Det giver en tidlig puls på omtrent den rigtige størrelse, men for
-tidligt, den 19/10.  Den første måling er dækker perioden 24/10 til
-31/10.  Der er en pløjning den 23/10.  Vi rammer slet ikke den
-aktivitet der kommer efter pløjningen.  Man kunne forestille sig at en
-pløjning på et tidspunkt hvor der ligger store mængder glyfosat i
-toppen af jorden vil have stor betydning for kolloidfaciliteret
-transport, noget vi ikke tager højde for i modellen.
+%% \subsubsection{Glyfosat Estrup}
+%% 
+%% For at få den første puls på plads nedsætter vi porøsiteten og den
+%% hydrauliske ledningsevne i overfladelaget, som for Silstrup.  Desuden
+%% efterlader vi også her blade og stængler på marken ved høst, så det
+%% kan virke som et reservoir for vand og pesticid.  Endelig sættes
+%% nedbrydningen i laget af planterester ned til en 10\%, da det meste
+%% glyfosat eller ville nå at blive nedbrudt.
+%% 
+%% Det giver en tidlig puls på omtrent den rigtige størrelse, men for
+%% tidligt, den 19/10.  Den første måling er dækker perioden 24/10 til
+%% 31/10.  Der er en pløjning den 23/10.  Vi rammer slet ikke den
+%% aktivitet der kommer efter pløjningen.  Man kunne forestille sig at en
+%% pløjning på et tidspunkt hvor der ligger store mængder glyfosat i
+%% toppen af jorden vil have stor betydning for kolloidfaciliteret
+%% transport, noget vi ikke tager højde for i modellen.
 
 \subsubsection{Andre pesticider}
 
 Fenpropimorph er ikke blevet målt over detektionsgrænsen på nogen af
-lokaliteterne, så det har ikke givet mening at kalibrere på dette.
-For dimethoate er der en enkelt måling på detektionsgrænsen for
-Siltrup, hvilket vi ikke har ment var nok til at forsøge at kalibrere
-efter.
+lokaliteterne, så det har ikke givet mening at kalibrere på dette.  I
+simuleringen har vi to hændelser med betydelig udvaskning, men de
+ligger begge før den første måling.  For dimethoate er der en enkelt
+måling på detektionsgrænsen, hvor vi da også ser dimethoate i
+simuleringen, men vi ikke har ment dette var nok til at forsøge at
+kalibrere.
+
+\section{Diskussion}
+
+\subsection{Overfladens betydning}
+
+I det har afsnit demonstrerer vi overfladens betydning for resultaterne.
+
+\subsubsection{Overfladelag}
+
+Eksempel med pesticidudvaskning med 2 simuleringer, med to værdier for
+ledningsevnen i overfladelaget.
+
+\subsubsection{Planterester}
+
+Eksempel med pesticidudvaskning med 2 simuleringer, med to værdier for
+bioinkorporering af planterester.
+
 \section{Anbefalinger}
 
 \subsection{Yderligere simuleringer}
 
 Hvis vi skal simulere yderligere vap data, bør vi vælge en lokalitet
 og periode hvor der er observeret pesticider i de horisontale filtre i
-3,5 meters dybde.
+3,5 meters dybde.  Og helst en lokalitet med en mere homogen jord.
+Figur 5.13 i \citet{lindhardt2001} antyder at vi har valgt de to mest
+heterogene lokaliteter.
 
 \subsection{Modeludvikling}
 

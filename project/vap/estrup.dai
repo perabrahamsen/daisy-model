@@ -240,7 +240,7 @@
     ;; Harvest.Stubleheight 10 cm 
     ;; Grain yield  52.60 hkg/ha 85% DM, strawyield 13.05 hkg/ha 100% DM
     (harvest "Spring Barley" (stub 10 [cm]) (leaf 0.3 []) (stem 0.3 []))
-    (set_porosity (depth -1 [cm]) (porosity 0.3))
+    ;;(set_porosity (depth -1 [cm]) (porosity 0.3))
   (wait (at 2000 10 13))
     ;; Roundup Bio - weeds - 4.0 l/ha 
     ;; 360 g/l * 4.0 l/ha = 1440 g/ha
@@ -248,7 +248,7 @@
   (wait (at 2000 10 23))
     ;; Ploughed - depth 20 cm
     (plowing (depth -20 [cm]))
-    (set_porosity (depth -1 [cm]) (porosity 0.363337))
+    ;;(set_porosity (depth -1 [cm]) (porosity 0.363337))
   ;; 2001=05=01	Fertilization 20 P, 105 K, kg/ha
   (wait (at 2001 05 02))
     ;; Seed bed preparation depth 9-10 cm

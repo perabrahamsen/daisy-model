@@ -49,7 +49,7 @@ GnuplotMulti::initialize (const Units& units, Treelog& msg)
   bool ok = true;
   for (size_t i = 0; i < graph.size(); i++)
     {
-      Treelog::Open nest (msg, name.name (), i, graph[i]->name);
+      Treelog::Open nest (msg, name, i, graph[i]->name);
       msg.touch ();
       if (!graph[i]->initialize (units, msg))
         ok = false;
@@ -63,17 +63,17 @@ GnuplotMulti::plot (std::ostream& out, Treelog& msg)
   bool ok = true;
 
   for (size_t i = 0; i < before.size (); i++)
-    out << before[i].name () << "\n";
+    out << before[i] << "\n";
  
   for (size_t i = 0; i < graph.size(); i++)
     {
-      Treelog::Open nest (msg, name.name (), i, graph[i]->name);
+      Treelog::Open nest (msg, name, i, graph[i]->name);
       if (!graph[i]->plot (out, msg))
         ok = false;
     }
 
   for (size_t i = 0; i < after.size (); i++)
-    out << after[i].name () << "\n";
+    out << after[i] << "\n";
 
   return ok;
 }

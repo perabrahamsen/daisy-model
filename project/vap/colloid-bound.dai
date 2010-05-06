@@ -234,7 +234,8 @@
   "Base parameterization for all Metamitron forms."
   ;;(cite lindhardt2001)
   ;;(decompose_halftime 14 [d])
-  (decompose_halftime 30 [d])
+  ;; (decompose_halftime 30 [d])
+  (decompose_halftime 35 [d])
   )
 
 (defchemical Metamitron Metamitron-base
@@ -249,6 +250,7 @@
   "Sorption equilibrium between dissolved and immobile Metamitron."
   ;;(cite lindhardt2001)
   ;; (K_OC 207 [l/kg])
+  ;; (K_d 1 [l/kg])
   (K_d 4 [l/kg])
   (k_sorption 0.05 [h^-1])
   (solute Metamitron)

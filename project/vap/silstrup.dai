@@ -64,9 +64,10 @@
   (secondary_domain vap_pressure (h_lim -10 [cm])))
 
 (defhorizon Silstrup_B_plow_pan Silstrup_B
-  ;; 50% of original.
   (secondary_domain vap_nocracks)
-  (hydraulic original (K_b 0.05 [mm/h])))
+  (hydraulic original 
+             ;; (K_b 0.05 [mm/h])
+             ))
 
 (defhorizon Silstrup_C_base VAP_C
   (clay 26.28 [%]) (silt 20.86 [%]) (sand 52.86 [%])
@@ -109,7 +110,7 @@
   (Chemistry Silstrup)
   (Soil (horizons (  -3.00 [cm] Silstrup_Ap_surface)
                   ( -31.00 [cm] Silstrup_Ap)
-                  ;;( -39.00 [cm] Silstrup_B_plow_pan)
+                  ( -39.00 [cm] Silstrup_B_plow_pan)
                   (-75.00 [cm] (Silstrup_B (secondary_domain vap_cracks)))
                   (-113.00 [cm] (Silstrup_B (secondary_domain vap_nocracks)
                                             (anisotropy 100)))

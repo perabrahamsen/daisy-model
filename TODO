@@ -1,43 +1,24 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Silstrup
+* VAP
 
-** Silstrup1
+** Kørsel
 
-anistropi 100 i området fra 75 til 180 cm, ingen sprækker
+Fjern sprækker i C2
+offset
 
-B plow layer VÆK
-
-K=1% surface layer
-
-crop refelection=0
-
-h_lim = pF 2
-
-** Silstrup2
-
-fjern overfladelag efter glyfosat pløjning 
-
-** Prøv
-
-offset = 0
-
-h_lim = 1.2
-
-spring barley
-
-anisotropi 10
-
-** Prøv
-
-* Estrup
+** Estrup
 
 Nedsæt ledningsvne i b & c horizont, øg ledningsvne i Ap horizont
 DRAMATISK (undskyldning er hældning), stejl kurve for bromid
 
+** Agrovand
+
+** FOCUS
+
 * Hent gammel PC.
 
-Flyt indhold til ny?  Eller stick?
+Flyt indhold til hd?  Eller stick?
 
 * Ryd op på Joy.
 

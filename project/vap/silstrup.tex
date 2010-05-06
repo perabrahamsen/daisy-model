@@ -1,41 +1,98 @@
-\documentclass[a4paper]{article}
-
+\documentclass[a4paper,11pt,twoside]{article}
+\usepackage{a4}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{natbib}
 \usepackage{graphicx}
-
-\usepackage[left=1cm,top=1cm,right=1cm,nohead,nofoot]{geometry}
 
 \begin{document}
 
-\newpage
-\today \\
-%
-\begin{tabular}{l}
-\includegraphics[height=0.40\textheight]{silstrup-drain} \\
-\includegraphics[height=0.40\textheight]{silstrup-drain-acc}
-\end{tabular}
+\title{Modelling surface processes related to Glyphosate leaching
+  through drain pipes}
 
-\newpage
-\today \\
-%
-\begin{tabular}{l}
-\includegraphics[height=0.40\textheight]{silstrup-sc-bromide} \\
-\includegraphics[height=0.40\textheight]{silstrup-theta-SW025cm}
-\end{tabular}
+\author{Per Abrahamsen, Søren Hansen, Carsten Petersen,\\
+  Annette E. Rosenbom, Jeanne Kjær, Marie Habekost Nielsen,\\
+  and Mikkel Mollerup}
 
-\newpage
-\today \\
-%
-\begin{tabular}{l}
-\includegraphics[height=0.40\textheight]{silstrup-theta-SW060cm} \\
-\includegraphics[height=0.40\textheight]{silstrup-theta-SW110cm}
-\end{tabular}
+\maketitle
 
-\newpage
-\today \\
-%
-\begin{tabular}{l}
-\includegraphics[height=0.40\textheight]{silstrup-gw} \\
-\includegraphics[height=0.40\textheight]{silstrup-weather}
-\end{tabular}
+\begin{abstract}
+  Measurements of pesticides in drain pipe outlets is is integral to
+  the Danish Pesticide Leaching Assessment Programme (PLAP).  In order
+  to relate these meaurements with deep leaching of pesticides, and
+  thus the potential risk to tap water quality, modelling is needed.
+  The Daisy simulation model has been extended to handle new processes
+  relevant to strongly sorbing pesticides, among those biopores,
+  surface litter as pesticide storage reservoir, and surface seal
+  formation.  The extended model is set up for one of the PLAP sites
+  (Silstrup), and measured values for Glyphosate are show together
+  with simulated values with and without inclusion of the surface seal
+  and litter pack processes, demonstrating how these are essential for
+  the results.  Finally we demonstrate how the results is very
+  sensitive to adjustment parameters for the litter pack model.
+\end{abstract}
+
+\section{Introduction}
+
+\begin{verbatim}
+** om VAP (jk)
+
+** om Maries projekt? (maha?)
+
+** om Andre modeller (aek? sh?)
+
+** om Daisy? (sh, pa)
+
+\end{verbatim}
+
+\section{Materials and methods}
+
+\subsection{Test sites}
+
+\begin{verbatim}
+Silstrup
+
+Rørrende
+\end{verbatim}
+
+\subsection{Model}
+
+\begin{verbatim}
+*** Generelt
+
+Richards equation, crop growth and root uptake, om model
+(bioincorporation), cd transport, snow, evapotranspiration, 1D drain
+model
+
+*** 2C setup
+
+*** Biopores setup
+
+*** Litter model
+\end{verbatim}
+
+\section{Results}
+
+\begin{verbatim}
+** Water and bromide
+
+** Glyphosate, no surface
+
+** Rain, biopore activity
+
+** Glyphosate, surface
+
+** Glyphosate, litter
+\end{verbatim}
+
+\section{Discussion and concluding remarks}
+
+\begin{verbatim}
+** Glyphosate, slightly different litter
+\end{verbatim}
+
+\end{verbatim}
 
 \end{document}
