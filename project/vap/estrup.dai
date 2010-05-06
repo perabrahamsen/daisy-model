@@ -122,12 +122,12 @@
                (offset -20 [cm]))
   (Chemistry Estrup)
   (Soil (horizons (  -3.00 Estrup_Ap_surface)
-                  ( -27.00 Estrup_Ap)
+                  ( -27.00 (Estrup_Ap (anistropy 10)))
                   ( -35.00 Estrup_B_plow_pan)
-                  ( -55.00 Estrup_B)
-                  (-105.00 Estrup_C1)
+                  ( -55.00 (Estrup_B (secondary_domain vap_nocracks)))
+                  (-105.00 (Estrup_C1 (secondary_domain vap_nocracks)))
                   (-200.00 Estrup_C2_Nocracks)
-                  (-500.00 Estrup_C2))
+                  (-500.00 Estrup_C2_Nocracks))
         (MaxRootingDepth 150 [cm])))
 
 (defcolumn Estrup-1D Estrup
