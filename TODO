@@ -1,11 +1,36 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* 2D plot
+
+Lille test-2d.dai fil
+
+read array fra dlf
+vælg tidspunkt 
+udskriv gnuplot data
+
+* VAP skriv
+
+** Hvordan bruger man Daisy-2D til pesticider?
+
+** Opsætning
+
+** Kalibrering
+
+** Overflade, Silstrup
+
+** Pløjesål, Estrup
+
 * VAP
 
 ** Kørsel
 
-Fjern sprækker i C2
-offset
+*** NE: ref
+
+*** NW: -5
+
+*** SE: -10
+
+*** SW: 5 
 
 ** Estrup
 

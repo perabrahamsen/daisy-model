@@ -832,7 +832,19 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
       const size_t col = column[c];
       const double total_water  // [cm^3 W]
         = column_water (col) + water_left[col];
-      daisy_assert (total_water >= 0.0);
+      if (total_water <= 0.0)
+        {
+          if (total_water < -1e99)
+            {
+              std::ostringstream tmp;
+              tmp << col << ": column_water (" << column_water (col)
+                  << ") + water left (" << water_left[col] 
+                  << ") = total_water (" << total_water << ") < 0";
+              msg.bug (tmp.str ());
+            }
+          continue;
+        }
+      daisy_assert (total_water > 0.0);
       const double M = solute->get_value (chem, col); // [g]
       if (M <= 0.0)
         continue;

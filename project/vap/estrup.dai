@@ -119,7 +119,7 @@
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
                ;; 0 cm is too high, -5 cm is too low
-               (offset -2 [cm]))
+               (offset -12 [cm]))
   (Chemistry Estrup)
   (Soil (horizons (  -3.00 Estrup_Ap_surface)
                   ( -27.00 (Estrup_Ap (anisotropy 10)))
