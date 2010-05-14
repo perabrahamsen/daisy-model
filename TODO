@@ -1,5 +1,33 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* VAP
+
+** Kørsel
+
+*** NW: ref
+
+*** NE: gammel ref
+
+*** SW: ingen overfladelag sommer Silstrup
+
+*** SE: ingen overfladelag fra 28 juni Silstrup
+
+* 23 uger til aflevering
+
+4 uger ferie, 2 uger før
+
+18 uger
+
+* EU standard for dybdepåvirkning af pesticider
+
+* Overfladeafstrømning.  Option til at fjerne?
+
+* aer input
+
+** mere dynamik i A horizonten
+
+** luk op for overfladen om sommeren
+
 * 2D plot
 
 Lille test-2d.dai fil
@@ -19,18 +47,6 @@ udskriv gnuplot data
 ** Overflade, Silstrup
 
 ** Pløjesål, Estrup
-
-* VAP
-
-** Kørsel
-
-*** NE: ref
-
-*** NW: -5
-
-*** SE: -10
-
-*** SW: 5 
 
 ** Estrup
 

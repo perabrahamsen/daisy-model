@@ -8,6 +8,10 @@ release.
 
 * 4.87
 
+** FAO_PM pet model: 'use_wet' now default true.
+
+Should lead to more evapotranspiration from wet surfaces.
+
 ** Variable timesteps.
 
 Yo can now allow Daisy to temporarily decrease timesteps in order to

@@ -171,7 +171,7 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const double /* Rn */,
 \n\
 This flag is for compatibility with older version of Daisy, which always\n\
 used dry PM (and which overestimated the effect of wet PM).");
-     frame.set ("use_wet", false);
+     frame.set ("use_wet", true);
      frame.declare ("rb", "s/m", Attribute::Const, 
                     "Boundary layer resistance for wet surface.");
      frame.set ("rb", 20.0);
