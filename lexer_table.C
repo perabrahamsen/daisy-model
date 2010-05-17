@@ -162,6 +162,50 @@ LexerTable::read_header (Treelog& msg)
       fil_col.push_back (c);
     }
   
+  // Array tags.
+  for (size_t i = 0; i < tag_names.size (); i++)
+    {
+      std::string name = tag_names[i].name ();
+      const size_t pos = name.find (" @ ");
+      if (pos == std::string::npos)
+        continue;
+      const std::string tag = name.substr (0, pos);
+      if (array_name == Attribute::Unknown ())
+        array_name = tag;
+      else if (array_name != tag)
+        continue;
+      daisy_assert (name.size () >= pos + 3);
+      const std::string rest = name.substr (pos + 3);
+      if (rest.size () < 1)
+        continue;
+      if (rest[0] == '(')
+        // 2D
+        {
+          std::istringstream in (rest);
+          in.get ();
+          double z;
+          double x;
+          in >> z >> x;
+          if (in.get () != ')')
+            continue;
+          if (in.fail ())
+            continue;
+          array_z.push_back (z);
+          array_x.push_back (x);
+        }
+      else
+        // 1D
+        { 
+          std::istringstream in (rest);
+          double z;
+          in >> z;
+          if (in.fail ())
+            continue;
+          array_z.push_back (z);
+        }
+      array_c.push_back (i);
+    }
+
   // Read dimensions.
   if (dim_line)
     {
@@ -196,6 +240,9 @@ LexerTable::read_header (Treelog& msg)
       error (tmp.str ());
       return false;
     }
+
+  
+
 
   return lex->good ();
 }  
@@ -434,6 +481,30 @@ LexerTable::convert_to_double (const std::string& value) const
   if (*end_ptr != '\0')
     error (std::string ("Junk at end of number '") + end_ptr + "'");
   return val;
+}
+
+void 
+LexerTable::soil_value (const std::vector<std::string>& entries,
+                        std::vector<double>& values,
+                        Treelog& msg) const
+{
+  for (size_t i = 0; i < array_c.size (); i++)
+    {
+      const size_t c = array_c[i];
+      std::istringstream in (entries[c]);
+      double value;
+      in >> value;
+      if (values.size () < c)
+        values.push_back (c);
+      else
+        values[c] = value;
+      if (in.fail ())
+        {
+          std::ostringstream tmp;
+          tmp << c << ": " << entries[c] << ": parse problems";
+          msg.error (tmp.str ());
+        }
+    }
 }
 
 void

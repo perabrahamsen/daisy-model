@@ -1,3 +1,7 @@
+2010-05-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lexer_table.C, lexer_table.h: Support arrays.
+
 2010-05-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* pet_FAO_PM.C (use_wet): Made default value 'true'.

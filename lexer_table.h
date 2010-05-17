@@ -92,6 +92,23 @@ public:
   bool is_missing (const std::string& value) const;
   double convert_to_double (const std::string& value) const;
 
+  // Array support.
+private:
+  symbol array_name;
+  std::vector<size_t> array_c;
+  std::vector<double> array_z;
+  std::vector<double> array_x;
+public:
+  symbol soil_tag () const
+  { return array_name; }
+  const std::vector<double>& soil_z () const
+  { return array_z; }
+  const std::vector<double>& soil_x () const
+  { return array_x; }
+  void soil_value (const std::vector<std::string>& entries,
+                   std::vector<double>& values,
+                   Treelog& msg) const;
+
   // Messages.
 public:
   void debug (const std::string& str) const;
