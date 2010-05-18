@@ -207,7 +207,7 @@
     ;; 30 kg potassium bromide = 30 * (79.904 / 119.002) = 20.14 kg bromine
     (spray Bromide 20.14 [kg/ha])
   (wait (at 2000 06 01))
-    (set_porosity (depth -1 [cm]) (porosity 0.35))
+    ;; (set_porosity (depth -1 [cm]) (porosity 0.35))
   (wait (at 2000 06 15))
     ;; BBCH stage 11-15			
     ;; Goltix WG+Betanal Optima 
