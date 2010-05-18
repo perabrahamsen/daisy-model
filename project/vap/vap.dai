@@ -63,8 +63,8 @@
 
 ;; (run batch (run plotfull))
 
-;;(run batch (run Silstrup-2D (plotall (graph Silstrup))))
-(run batch (run Estrup-2D Silstrup-2D plotall))
+(run batch (run Silstrup-2D (plotall (graph Silstrup))))
+;;(run batch (run Estrup-2D Silstrup-2D plotall))
 
 ;;(run batch (run (Silstrup-2D (column (Silstrup-2D-MACRO (Chemistry multi (combine Bromide))))) (plotall (graph Silstrup))))
 ;;(run batch (run Estrup-2C Silstrup-2C plotall))
