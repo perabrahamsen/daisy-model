@@ -43,8 +43,8 @@
 
 (defchemical Fenpropimorph-base herbicide
   "Base parameterization for all Fenpropimorph forms."
-  (cite lindhardt2001)
-  (decompose_halftime 67 [d]))
+  (cite ppdb20100517)
+  (decompose_halftime 25.5 [d]))
 
 (defchemical Fenpropimorph Fenpropimorph-base
   "Dissolved fenpropimorph."
@@ -58,8 +58,8 @@
   "Sorption equilibrium between dissolved and immobile Fenpropimorph."
   (sorbed Fenpropimorph-immobile)
   (solute Fenpropimorph)
-  (cite lindhardt2001)
-  (K_OC 3700 [l/kg])  
+  (cite ppdb20100517)
+  (K_OC 2401 [ml/g])  
   (k_sorption 0.05 [h^-1]))
 
 (defchemical Fenpropimorph-colloid Fenpropimorph-base
@@ -99,8 +99,8 @@
 
 (defchemical Dimethoate-base herbicide
   "Base parameterization for all Dimethoate forms."
-  (cite lindhardt2001)
-  (decompose_halftime 16 [d]))
+  (cite ppdb20100517)
+  (decompose_halftime 7.2 [d]))
 
 (defchemical Dimethoate Dimethoate-base
   "Dissolved dimethoate."
@@ -114,7 +114,7 @@
   "Sorption equilibrium between dissolved and immobile Dimethoate."
   (sorbed Dimethoate-immobile)
   (solute Dimethoate)
-  (cite lindhardt2001)
+  (cite ppdb20100517)
   (K_OC 30 [l/kg])
   (k_sorption 0.05 [h^-1]))                  ;Sorption rate.
 
@@ -156,8 +156,8 @@
 (defchemical Glyphosate-base herbicide
   "Base parameterization for all Glyphosate forms."
   (canopy_dissipation_rate 0.00083 [h^-1])
-  (cite lindhardt2001)
-  (decompose_halftime 16 [d]))
+  (cite ppdb20100517)
+  (decompose_halftime 12 [d]))
 
 (defchemical Glyphosate Glyphosate-base
   "Dissolved glyphosate."
