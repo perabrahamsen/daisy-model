@@ -1,18 +1,22 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* opdel pond
+
+* focus/footprint pesticider
+
+* skriv om potentiel fordampning
+
 * VAP
 
 ** Kørsel
 
-*** NW: ref
+*** NW: offset 5
 
-*** NE: gammel ref
+*** NE: offset 10
 
-*** SW: ingen overfladelag sommer Silstrup
+*** SW: offset 5, B Theta_res 8%
 
-P1
-
-*** SE: ingen overfladelag fra 28 juni Silstrup
+*** SE: C_Nocracks K_b 50%
 
 * 23 uger til aflevering
 
