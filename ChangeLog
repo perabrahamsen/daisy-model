@@ -1,3 +1,7 @@
+2010-05-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* surface.C (pond_section): New state variable.
+
 2010-05-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* lexer_table.C, lexer_table.h: Support arrays.

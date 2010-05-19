@@ -46,9 +46,10 @@ struct Surface::Implementation
   const double forced_pressure_value;
   const bool use_forced_flux;
   const double forced_flux_value;
-  typedef std::map<size_t, double> pond_map;
+  typedef std::map<size_t, size_t> pond_map;
   pond_map pond_edge;
   double pond_average;
+  std::vector<double> pond_section;
   double EvapSoilSurface;
   double Eps;
   double T;
@@ -94,10 +95,6 @@ Surface::top_type (const Geometry& geo, size_t edge) const
 Surface::top_t 
 Surface::Implementation::top_type (const Geometry& geo, size_t edge) const
 {
-  daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
-  pond_map::const_iterator i = pond_edge.find (edge);
-  daisy_assert (i != pond_edge.end ());
-
   if (use_forced_flux)
     return forced_flux;
 
@@ -107,7 +104,11 @@ Surface::Implementation::top_type (const Geometry& geo, size_t edge) const
   if (use_forced_pressure)
     return forced_pressure;
   
-  if ((*i).second <= 0.0)
+  daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
+  pond_map::const_iterator i = pond_edge.find (edge);
+  daisy_assert (i != pond_edge.end ());
+  const size_t c = (*i).second;
+  if (pond_section[c] <= 0.0)
     return forced_flux;
   
   return limited_water;
@@ -122,10 +123,6 @@ double
 Surface::Implementation::q_top (const Geometry& geo, const size_t edge,
                                 const double dt) const
 {
-  daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
-  pond_map::const_iterator i = pond_edge.find (edge);
-  daisy_assert (i != pond_edge.end ());
-
   if (use_forced_pressure)
     return forced_pressure_value * 0.1 / 1.0; // mm -> cm/h.
 
@@ -134,8 +131,12 @@ Surface::Implementation::q_top (const Geometry& geo, const size_t edge,
 
   if (ridge_.get ())
     return -ridge_->h () / 1.0 /* [h] */;
-  else
-    return -(*i).second * 0.1 / dt /* [h] */; // mm -> cm/h.
+
+  daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
+  pond_map::const_iterator i = pond_edge.find (edge);
+  daisy_assert (i != pond_edge.end ());
+  const size_t c = (*i).second;
+  return -pond_section[c] * 0.1 / dt /* [h] */; // mm -> cm/h.
 }
   
 double
@@ -214,26 +215,27 @@ Surface::Implementation::exfiltrate (const Geometry& geo, const size_t edge,
   if (use_forced_pressure)
     return;
 
-  if (pond_edge[edge] + water < 0.0)
+  const size_t c = pond_edge[edge];
+  if (pond_section[c] + water < 0.0)
     // - std::max (fabs (pond_edge[edge]), fabs (water)) / 100.0)
     {
-      if (!approximate (fabs (pond_edge[edge]), fabs (water), 0.001))
+      if (!approximate (fabs (pond_section[c]), fabs (water), 0.001))
       {
         Treelog::Open nest (msg, 
                             "Surface exfiltration for edge " 
                             + geo.edge_name (edge));
         
         std::ostringstream tmp;
-        tmp << "edge " << geo.edge_name (edge) << ": pond (" << pond_edge[edge]
+        tmp << "edge " << geo.edge_name (edge) << ": pond (" << pond_section[c]
             << ") + exfiltration (" << water << ") in dt (" << dt << ") = " 
-            << pond_edge[edge] + water << ", should be non-negative";
+            << pond_section[c] + water << ", should be non-negative";
         msg.warning (tmp.str ());
       }
-      pond_edge[edge] = 0.0;
+      pond_section[c] = 0.0;
       return;
     }
 
-  pond_edge[edge] += water;
+  pond_section[c] += water;
 }
 
 double
@@ -285,9 +287,10 @@ Surface::Implementation::update_pond_average (const Geometry& geo)
   for (int i = 0; i < top_edges_size; i++)
     {
       const size_t edge = top_edges[i];
+      const size_t c = pond_edge[edge];
       const double area = geo.edge_area (edge);
       total_area += area;
-      total_pond += pond_edge[edge] * area;
+      total_pond += pond_section[c] * area;
     }
   daisy_approximate (total_area, geo.surface_area ());
   pond_average = total_pond / total_area; // [mm];
@@ -304,23 +307,28 @@ Surface::Implementation::tick (Treelog& msg,
                                const double dt)
 {
 
-  // Runoff and average pond size.
-  update_pond_average (geo);
-  if (pond_average > DetentionCapacity)
-    {
-      runoff = (pond_average - DetentionCapacity) * ReservoirConstant;
-      runoff_fraction = runoff / pond_average;
-      pond_average -= runoff * dt;
-    }
-  else
-    {
-      runoff = 0.0;
-      runoff_fraction = 0.0;
-    }
+  // Runoff.
+  runoff = 0.0;
+  runoff_fraction = 0.0;
+  double total_area = 0.0;
   for (pond_map::iterator i = pond_edge.begin ();
        i != pond_edge.end ();
        i++)
-    (*i).second = pond_average;
+    {
+      const size_t edge = (*i).first;
+      const size_t c = (*i).second;
+      const double area = geo.edge_area (edge);
+      total_area += area;
+      if (pond_section[c] > DetentionCapacity)
+        {
+          const double runoff_section 
+            = (pond_section[c] - DetentionCapacity) * ReservoirConstant;
+          runoff_fraction += area * runoff_section / pond_section[c];
+          pond_section[c] -= runoff_section * dt;
+        }
+    }
+  runoff /= total_area;
+  runoff_fraction /= total_area;
   
   // Remember potential evaopration
   Eps = PotSoilEvaporationWet;
@@ -333,6 +341,7 @@ Surface::Implementation::tick (Treelog& msg,
   for (size_t i = 0; i < top_edges_size; i++)
     {
       const size_t edge = top_edges[i];
+      const size_t c = pond_edge[edge];
       const double area = geo.edge_area (edge); // [cm^2]
 
       // Exfiltration.
@@ -341,11 +350,11 @@ Surface::Implementation::tick (Treelog& msg,
                  soil_water.MaxExfiltration (geo, edge, soil, soil_T) * 10.0,
                  PotSoilEvaporationDry); 
 
-      const double epond = pond_edge[edge]; // [mm]
+      const double epond = pond_section[c]; // [mm]
       if (epond < 0.0)
         {
           std::ostringstream tmp;
-          tmp << "pond_edge[" << edge << "] = "<< pond_edge[edge];
+          tmp << "pond_edge[" << edge << "] = "<< pond_section[c];
           msg.warning (tmp.str ());
         }
 
@@ -357,13 +366,13 @@ Surface::Implementation::tick (Treelog& msg,
 
       EvapSoilTotal += evap * area;    // [mm cm^2/h]
 
-      pond_edge[edge] += flux_in * dt - evap * dt;
+      pond_section[c] += flux_in * dt - evap * dt;
       daisy_assert (evap < 1000.0);
 
       if (ridge_.get ())
         {
           const Geometry1D& geo1d = dynamic_cast<const Geometry1D&> (geo);
-          ridge_->tick (geo1d, soil, soil_water, pond_edge[edge], dt);
+          ridge_->tick (geo1d, soil, soil_water, pond_section[c], dt);
           exfiltrate (geo, edge, ridge_->exfiltration (), dt, msg);
         }
     }
@@ -493,7 +502,10 @@ Surface::put_ponding (double p)	// [mm]
   for (Implementation::pond_map::iterator i = impl->pond_edge.begin ();
        i != impl->pond_edge.end ();
        i++)
-    (*i).second = p;
+    {
+      const size_t c = (*i).second;
+      impl->pond_section[c] = p;
+    }
 
   impl->pond_average = p; 
 }
@@ -525,7 +537,9 @@ Surface::Implementation::initialize (const Geometry& geo)
   for (size_t i = 0; i < top_edges_size; i++)
     {
       const size_t edge = top_edges[i];
-      pond_edge[edge] = pond_average;
+      pond_edge[edge] = i;
+      if (pond_section.size () <= i)
+        pond_section.push_back (0.0);
     }
 }
 
@@ -555,10 +569,15 @@ The autumn value can be lower, due to muching.  With a crop factor of\n\
 Set this to force a permanent pressure top.");
   frame.declare ("forced_flux", "mm/h", Attribute::OptionalConst, "\
 Set this to force a permanent flux top.  Positive upwards (exfiltration).");
-  frame.declare ("pond", "mm", Attribute::State, "\
+  frame.declare ("pond", "mm", Attribute::LogOnly, "\
 Amount of ponding on the surface.\n\
 Negative numbers indicate soil exfiltration.");
-  frame.set ("pond", 0.0);
+  frame.declare ("pond_section", "mm",
+                 Attribute::OptionalState, Attribute::Variable, "\
+Amount of ponding on each section of the surface.\n\
+By default, there will be no ponding. In an 1D simulation, there\n\
+will only be one section.  In general, there will be a section for each\n\
+numeric cell in the soil matrix with an edge towards the surface.");
   frame.declare ("EvapSoilSurface", "mm/h", Attribute::LogOnly, "\
 Water evaporated from the surface, including the pond and exfiltration.");
   frame.declare ("Eps", "mm/h", Attribute::LogOnly, "\
@@ -599,7 +618,9 @@ Surface::Implementation::Implementation (const FrameSubmodel& al)
     forced_pressure_value (al.number ("forced_pressure", -42.42e42)),
     use_forced_flux (al.check ("forced_flux")),
     forced_flux_value (al.number ("forced_flux", -42.42e42)),
-    pond_average (al.number ("pond")),
+    pond_section (al.check ("pond_section")
+                  ? al.number_sequence ("pond_section")
+                  : std::vector<double> ()),
     EvapSoilSurface (0.0),
     Eps (0.0),
     T (0.0),
