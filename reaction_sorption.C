@@ -140,7 +140,7 @@ struct ReactionSorption : public Reaction
     TREELOG_MODEL (msg);
 
     const double m2_per_cm2 = 0.01 * 0.01 ; // [m^2/cm^2]
-    const double pond = std::max (surf.ponding (), 0.0);
+    const double pond = std::max (surf.ponding_average (), 0.0);
     const double z_mixing = surf.mixing_depth ();
 
     // Find solute 

@@ -586,6 +586,8 @@ Connvert to SI base units by multiplying with a factor.")
          "Volume per mass.");
     add ("cm^3/g", p_c_3 / u_g, 3, -1, 0, 0, 0, 0, 0,
          "Volume per mass.");
+    add ("ml/g", p_c_3 / u_g, 3, -1, 0, 0, 0, 0, 0,
+         "Volume per mass.");
     add ("cm^3/ng", p_c_3 / (p_n * u_g),
          3, -1, 0, 0, 0, 0, 0,
          "Volume per mass.");

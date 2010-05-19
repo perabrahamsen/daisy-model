@@ -239,7 +239,7 @@ Surface::Implementation::exfiltrate (const Geometry& geo, const size_t edge,
 }
 
 double
-Surface::ponding () const
+Surface::ponding_average () const
 { return impl->pond_average; }
 
 double
@@ -452,6 +452,7 @@ Surface::Implementation::output (Log& log) const
 {
   output_variable (T, log);
   output_value (pond_average, "pond", log);
+  output_variable (pond_section, log);
   output_variable (EvapSoilSurface, log);
   output_variable (Eps, log);
   output_variable (runoff, log);

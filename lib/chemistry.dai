@@ -14,11 +14,11 @@
   (cite focus2002)
   ;; decompose depth factor is from FOCUS 2002.
   (decompose_depth_factor (   0 [cm] 1.0 [])
-                          (- 25 [cm] 1.0 []) ;FOCUS lim 30 cm
-                          (- 35 [cm] 0.5 [])
-                          (- 55 [cm] 0.5 []) ;FOCUS lim 60 cm
-                          (- 65 [cm] 0.3 [])
-                          (- 95 [cm] 0.3 []) ;FOCUS lim 100 cm
+                          ( -25 [cm] 1.0 []) ;FOCUS lim 30 cm
+                          ( -35 [cm] 0.5 [])
+                          ( -55 [cm] 0.5 []) ;FOCUS lim 60 cm
+                          ( -65 [cm] 0.3 [])
+                          ( -95 [cm] 0.3 []) ;FOCUS lim 100 cm
                           (-105 [cm] 0.0 []))
   (canopy_dissipation_rate 0.0083 [h^-1]) ;Source?
   (canopy_washoff_coefficient 1.0 [])

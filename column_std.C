@@ -662,7 +662,8 @@ ColumnStandard::tick_move (const Metalib& metalib, const Time& time,
 
   // Early calculation.
 
-  const double old_pond = bioclimate->get_snow_storage () + surface.ponding ();
+  const double old_pond 
+    = bioclimate->get_snow_storage () + surface.ponding_average ();
   bioclimate->tick (units, time, surface, my_weather,
                     *vegetation, *litter, *movement,
                     geometry, *soil, *soil_water, *soil_heat,
@@ -701,7 +702,7 @@ ColumnStandard::tick_move (const Metalib& metalib, const Time& time,
   litter->update (organic_matter->top_DM ());
   // Transport.
   groundwater->tick (units, geometry, *soil, *soil_water, 
-                     surface.ponding () * 0.1, 
+                     surface.ponding_average () * 0.1, 
                      *soil_heat, time, scope, msg);
   movement->tick (*soil, *soil_water, *soil_heat,
                   surface, *groundwater, time, my_weather, 
@@ -712,7 +713,8 @@ ColumnStandard::tick_move (const Metalib& metalib, const Time& time,
   soil_water->mass_balance (geometry, dt, msg);
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
   chemistry->tick_soil (scope, geometry, 
-                        surface.ponding (), surface.mixing_resistance (),
+                        surface.ponding_average (),
+                        surface.mixing_resistance (),
                         *soil, *soil_water, *soil_heat, 
                         *movement, *organic_matter, *chemistry, dt, msg);
   organic_matter->transport (units, geometry, 
@@ -902,7 +904,7 @@ ColumnStandard::output (Log& log) const
                "residuals_C_root", log);
   output_lazy (bioclimate->get_intercepted_water ()
                + bioclimate->get_snow_storage ()
-               + surface.ponding (),
+               + surface.ponding_average (),
                "surface_water", log);
   output_derived (movement, "Movement", log);
   output_derived (drain, "Drain", log);

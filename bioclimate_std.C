@@ -671,7 +671,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
   const double total_input 
     = rain + weather.snow () + irrigation_overhead + irrigation_surface;
   const double free_water = total_input * dt 
-    + snow.storage () + surface.ponding () 
+    + snow.storage () + surface.ponding_average () 
     + canopy_water_storage + litter_water_storage;
 
   daisy_assert (pet.get () != NULL);
@@ -703,7 +703,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
   snow.tick (msg, movement, soil, soil_water, soil_heat, 
              weather.global_radiation (), 0.0,
              snow_water_in, weather.snow (),
-             surface.ponding (),
+             surface.ponding_average (),
              snow_water_in_temperature, snow_ep, dt);
   snow_ea_ = snow.evaporation ();
   daisy_assert (snow_ea_ >= 0.0);
@@ -712,17 +712,17 @@ BioclimateStandard::WaterDistribution (const Units& units,
   snow_water_out = snow.percolation ();
   if (snow_water_out < 0.0)
     {
-      double adjusted_pond = snow_water_out * dt + surface.ponding ();
+      double adjusted_pond = snow_water_out * dt + surface.ponding_average ();
       if (adjusted_pond < 0.0)
         {
-          if (approximate (-snow_water_out * dt, surface.ponding ()))
+          if (approximate (-snow_water_out * dt, surface.ponding_average ()))
             adjusted_pond = 0.0;
           else
             {
               std::ostringstream tmp;
               tmp << "snow_water_out (" << snow_water_out 
                   << ") * dt (" << dt 
-                  << ") + pond (" << surface.ponding () 
+                  << ") + pond (" << surface.ponding_average () 
                   << ") = " << adjusted_pond << ") < 0";
               msg.warning (tmp.str ());
             }

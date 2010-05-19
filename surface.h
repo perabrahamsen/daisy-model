@@ -78,7 +78,7 @@ public:
              double soil_T /* [dg C] */, double dt /* [h] */);
 
   // Communication with bioclimate.
-  double ponding () const;
+  double ponding_average () const;
   double temperature () const;
   double EpFactor () const;
   double albedo (const Geometry&, const Soil&, const SoilWater&) const;

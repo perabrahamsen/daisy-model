@@ -302,7 +302,7 @@ ChemistryStandard::tick_top (const Units& units, const Geometry& geo,
       
 
   const double z_mixing = surface.mixing_depth ();
-  const double pond_rain = std::max (surface.ponding (), 0.0);
+  const double pond_rain = std::max (surface.ponding_average (), 0.0);
   for (size_t c = 0; c < chemicals.size (); c++)
     {
       chemicals[c]->tick_top (snow_leak_rate, canopy_cover, canopy_leak_rate, 

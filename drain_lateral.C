@@ -81,7 +81,7 @@ DrainLateral::tick (const Geometry& geo, const Soil& soil,
   fill (S.begin (), S.end (), 0.0);
   
   // Find groundwater height.
-  const double h_surface = surface.ponding () * 0.1;
+  const double h_surface = surface.ponding_average () * 0.1;
 
   const double old_height = height;
   height = 1.0;
