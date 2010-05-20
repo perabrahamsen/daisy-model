@@ -36,7 +36,7 @@
 struct GnuplotSoil : public GnuplotBase
 {
   // Ranges.
-  boost::scoped_ptr<Time> at;
+  const boost::scoped_ptr<Time> at;
   const double width;
   const double depth;
 
