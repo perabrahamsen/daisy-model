@@ -400,10 +400,15 @@ Daisy vejrfilen angives det således:
 Med disse data vil Daisy bruge FAO Penman-Monteith\citep{FAO-PM} til
 udregning af en referencefordampning.  Potentiel fordampning er
 udregnet fra referencefordampning med en afgrødefaktor afhængig af det
-aktuelle simulerede bladsække.  Aktuel fordampning er yderligere
-begrænset af jordens evne til at levere vand, med det aktuelle
-simulerede rodnet.  En oversigt over udvalgte data kan ses på
-figur~\ref{fig:Silstrup-weather}.
+aktuelle simulerede bladsække.  Baseret på blandt andet
+\citet{kjaersgaard2008crop} har vi valgt in afgrødefaktor på 1,2 og en
+jordfaktor på 0,6, hvilket giver en kombineret faktor på omkring 1,15
+ved typisk afgrødedække om sommeren.  Men barjordsfordampningen er
+lavere end der traditionelt er regnet med, hvilket betyder lavere
+årlig potentiel fordampning, specielt ved forårsafgrøder.  Aktuel
+fordampning er yderligere begrænset af jordens evne til at levere
+vand, med det aktuelle simulerede rodnet.  En oversigt over udvalgte
+data kan ses på figur~\ref{fig:Silstrup-weather}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/Silstrup-weather}
@@ -1148,7 +1153,7 @@ den primære laterale strømning foregik i pløjelaget mod drængrøften,
 og derfra hurtigt (via bioporer) til dræn.  For at simulere dette
 antog vi sprækkesystemet i underjorden ikke bidrog til den mættede
 ledningsevne, og vi tilførte en anisotropi i pløjelaget for at
-simulere en hurtig transport lige over pløjesålen.
+fange effekten af skrånene terrain.
 
 Med disse ændringer kunne vi få drænmængderne til at passe med et
 grundvand 2 cm under det målte.  Første drænsæson der kommer efter en

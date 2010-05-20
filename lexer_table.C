@@ -26,7 +26,6 @@
 #include "assertion.h"
 #include "mathlib.h"
 #include "submodeler.h"
-#include "memutils.h"
 #include "time.h"
 #include "vcheck.h"
 #include "path.h"
@@ -162,50 +161,6 @@ LexerTable::read_header (Treelog& msg)
       fil_col.push_back (c);
     }
   
-  // Array tags.
-  for (size_t i = 0; i < tag_names.size (); i++)
-    {
-      std::string name = tag_names[i].name ();
-      const size_t pos = name.find (" @ ");
-      if (pos == std::string::npos)
-        continue;
-      const std::string tag = name.substr (0, pos);
-      if (array_name == Attribute::Unknown ())
-        array_name = tag;
-      else if (array_name != tag)
-        continue;
-      daisy_assert (name.size () >= pos + 3);
-      const std::string rest = name.substr (pos + 3);
-      if (rest.size () < 1)
-        continue;
-      if (rest[0] == '(')
-        // 2D
-        {
-          std::istringstream in (rest);
-          in.get ();
-          double z;
-          double x;
-          in >> z >> x;
-          if (in.get () != ')')
-            continue;
-          if (in.fail ())
-            continue;
-          array_z.push_back (z);
-          array_x.push_back (x);
-        }
-      else
-        // 1D
-        { 
-          std::istringstream in (rest);
-          double z;
-          in >> z;
-          if (in.fail ())
-            continue;
-          array_z.push_back (z);
-        }
-      array_c.push_back (i);
-    }
-
   // Read dimensions.
   if (dim_line)
     {
@@ -241,9 +196,58 @@ LexerTable::read_header (Treelog& msg)
       return false;
     }
 
-  
+  // Array tags.
+  for (size_t i = 0; i < tag_names.size (); i++)
+    {
+      std::string name = tag_names[i].name ();
+      const size_t pos = name.find (" @ ");
+      if (pos == std::string::npos)
+        continue;
+      const std::string tag = name.substr (0, pos);
 
+      if (array_name == Attribute::Unknown ())
+        array_name = tag;
+      else if (array_name != tag)
+        continue;
 
+      if (array_dimension == Attribute::Unknown ())
+        array_dimension = dim_names[i];
+      else if (array_dimension != dim_names[i])
+        continue;
+
+      daisy_assert (name.size () >= pos + 3);
+      const std::string rest = name.substr (pos + 3);
+      if (rest.size () < 1)
+        continue;
+      if (rest[0] == '(')
+        // 2D
+        {
+          std::istringstream in (rest);
+          in.get ();
+          double z;
+          double x;
+          in >> z >> x;
+          if (in.get () != ')')
+            continue;
+          if (in.fail ())
+            continue;
+          array_z.push_back (z);
+          array_x.push_back (x);
+        }
+      else
+        // 1D
+        { 
+          std::istringstream in (rest);
+          double z;
+          in >> z;
+          if (in.fail ())
+            continue;
+          array_z.push_back (z);
+        }
+      array_c.push_back (i);
+    }
+
+  // 
   return lex->good ();
 }  
 
@@ -483,28 +487,36 @@ LexerTable::convert_to_double (const std::string& value) const
   return val;
 }
 
-void 
+bool
 LexerTable::soil_value (const std::vector<std::string>& entries,
                         std::vector<double>& values,
                         Treelog& msg) const
 {
-  for (size_t i = 0; i < array_c.size (); i++)
+  const size_t size = array_c.size ();
+  if (values.size () < size)
+    values.insert (values.end (), size - values.size (), 0.0);
+  if (values.size () != size)
+    {
+      std::ostringstream tmp;
+      tmp << "values:" << values.size () << ", columns:" << size;
+      daisy_bug (tmp.str ());
+      return false;
+    }
+  for (size_t i = 0; i < size; i++)
     {
       const size_t c = array_c[i];
-      std::istringstream in (entries[c]);
-      double value;
-      in >> value;
-      if (values.size () < c)
-        values.push_back (c);
-      else
-        values[c] = value;
-      if (in.fail ())
+      daisy_assert (c < entries.size ());
+      const char *const str = entries[c].c_str ();
+      const char* end_ptr = str;
+      const double value = strtod (str, const_cast<char**> (&end_ptr));
+      values[i] = value;
+      if (*end_ptr != '\0')
         {
-          std::ostringstream tmp;
-          tmp << c << ": " << entries[c] << ": parse problems";
-          msg.error (tmp.str ());
+          msg.error (std::string ("Junk at end of number '") + end_ptr + "'");
+          return false;
         }
     }
+  return true;
 }
 
 void
@@ -573,10 +585,12 @@ LexerTable::LexerTable (const BlockModel& al)
     original (al.check ("original")
 	      ? al.name_sequence ("original")
 	      : std::vector<symbol> ()),
-    dim_line (al.flag ("dim_line", !al.check ("original")))
+    dim_line (al.flag ("dim_line", !al.check ("original"))),
+    array_name (Attribute::Unknown ()),
+    array_dimension (Attribute::Unknown ())
 { }
 
 LexerTable::~LexerTable ()
-{ sequence_delete (filter.begin (), filter.end ()); }
+{ }
 
 // lexer_table.C ends here.

@@ -401,7 +401,7 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C
-MODELS = reaction_sorption.C hydraulic_B_C_inverse.C \
+MODELS = gnuplot_soil.C reaction_sorption.C hydraulic_B_C_inverse.C \
 	program_osvaldo.C vegetation_permanent.C  litter.C drain_lateral.C \
 	hydraulic_MACRO.C program_cpedata.C \
 	reaction_boundrel.C log_regress.C reaction_Morgan98.C \

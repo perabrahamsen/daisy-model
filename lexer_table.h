@@ -24,11 +24,13 @@
 
 #include "block_model.h"
 #include "symbol.h"
+#include "memutils.h"
 #include <string>
 #include <vector>
 #include <map>
-#include <memory>
 #include <iosfwd>
+#include <memory>
+#include <boost/scoped_ptr.hpp>
 
 class Frame;
 class Treelog;
@@ -43,7 +45,7 @@ private:
   Path& path;
   const symbol filename;  
   std::auto_ptr<std::istream> owned_stream;
-  std::auto_ptr<LexerData> lex;
+  boost::scoped_ptr<LexerData> lex;
   std::string field_sep;
   std::string type_;
   const std::vector<std::string> missing;
@@ -51,7 +53,7 @@ private:
   std::map<symbol,int> tag_pos;
   std::vector<size_t> fil_col;
   struct Filter;
-  std::vector<const Filter*> filter;
+  auto_vector<const Filter*> filter;
   int year_c;
   int month_c;
   int mday_c;
@@ -95,17 +97,20 @@ public:
   // Array support.
 private:
   symbol array_name;
+  symbol array_dimension;
   std::vector<size_t> array_c;
   std::vector<double> array_z;
   std::vector<double> array_x;
 public:
   symbol soil_tag () const
   { return array_name; }
+  symbol soil_dimension () const
+  { return array_dimension; }
   const std::vector<double>& soil_z () const
   { return array_z; }
   const std::vector<double>& soil_x () const
   { return array_x; }
-  void soil_value (const std::vector<std::string>& entries,
+  bool soil_value (const std::vector<std::string>& entries,
                    std::vector<double>& values,
                    Treelog& msg) const;
 

@@ -1,3 +1,8 @@
+2010-05-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* gnuplot_soil.C: New model.
+	* Makefile (MODELS): Add it.
+
 2010-05-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* surface.C (pond_section): New state variable.

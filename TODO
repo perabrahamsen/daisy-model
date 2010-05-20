@@ -1,10 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* skriv om potentiel fordampning
+* stof surface section?
 
 * VAP
 
-** Kørsel
+** Kørsel (ny pest, pond_sections)
 
 *** NW: offset 5
 
@@ -20,24 +20,6 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 18 uger
 
-* EU standard for dybdepåvirkning af pesticider
-
-* Overfladeafstrømning.  Option til at fjerne?
-
-* aer input
-
-** mere dynamik i A horizonten
-
-** luk op for overfladen om sommeren
-
-* 2D plot
-
-Lille test-2d.dai fil
-
-read array fra dlf
-vælg tidspunkt 
-udskriv gnuplot data
-
 * VAP skriv
 
 ** Hvordan bruger man Daisy-2D til pesticider?
@@ -49,11 +31,6 @@ udskriv gnuplot data
 ** Overflade, Silstrup
 
 ** Pløjesål, Estrup
-
-** Estrup
-
-Nedsæt ledningsvne i b & c horizont, øg ledningsvne i Ap horizont
-DRAMATISK (undskyldning er hældning), stejl kurve for bromid
 
 ** Agrovand
 

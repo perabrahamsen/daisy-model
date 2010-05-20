@@ -24,20 +24,31 @@
 #include "lexer_table.h"
 #include "treelog.h"
 #include "mathlib.h"
-#include "memutils.h"
 #include "librarian.h"
 #include "frame.h"
+#include "time.h"
+#include "units.h"
+#include "submodeler.h"
+#include "check.h"
 #include <sstream>
+#include <boost/scoped_ptr.hpp>
 
 struct GnuplotSoil : public GnuplotBase
 {
   // Ranges.
-  std::auto_ptr<Time> at;
+  boost::scoped_ptr<Time> at;
   const double width;
   const double depth;
 
   // Data.
   LexerTable lex;
+
+  // Plot.
+  symbol dimension;
+  symbol tag;
+  std::vector<double> z;
+  std::vector<double> x;
+  std::vector<double> value;
 
   // Use.
   bool initialize (const Units& units, Treelog& msg);
@@ -51,13 +62,6 @@ struct GnuplotSoil : public GnuplotBase
 bool
 GnuplotSoil::initialize (const Units& units, Treelog& msg)
 { 
-  bool ok = true;
-  return ok;
-}
-
-bool
-GnuplotSoil::load (Treelog& msg)
-{
   // Read header.
   if (!lex.read_header (msg))
     return false;
@@ -65,84 +69,64 @@ GnuplotSoil::load (Treelog& msg)
   if (!lex.good ())
     return false;
 
-  // Tag.
-  const int tag_c = lex.find_tag (tag);
-  if (tag_c < 0)
-    {
-      lex.error ("Tag '" + tag + "' not found");
-      return false;
-    }
+  // Array.
+  tag = lex.soil_tag ();
+  z = lex.soil_z ();
+  x = lex.soil_x ();
 
-  // Read dimensions.
-  symbol original (lex.dimension (tag_c));
-  if (accumulate ())
-    {
-      const symbol accumulated = Units::multiply (original, timestep);
-      if (accumulated != Attribute::Unknown ())
-        original = accumulated;
-    }
-  if (original != Attribute::Unknown () && dimension_ == Attribute::Unknown ())
-    dimension_ = original;
-  else if (!has_factor && !units.can_convert (original, dimension_))
+  symbol original (lex.soil_dimension ());
+
+  if (dimension == Attribute::Unknown ())
+    dimension = original;
+  else if (!units.can_convert (original, dimension))
     {
       std::ostringstream tmp;
-      tmp << "Cannot convert from [" << original << "] to [" << dimension_ 
-          << "]";
+      tmp << "Cannot convert from [" << original 
+          << "] to [" << dimension << "]";
       lex.error (tmp.str ());
       return false;
     }
 
   // Read data.
-  Time last_time (9999, 12, 31, 23);
-  std::vector<double> vals;
-
+  double closest = -42.42e42; // [h]
+  
   while (lex.good ())
     {
       // Read entries.
       std::vector<std::string> entries;
       Time time (9999, 1, 1, 0);
-      if (!read_entry (entries, time))
+      // Read entries.
+      if (!lex.get_entries (entries))
+        continue;
+      if (!lex.get_time (entries, time, 8))
         continue;
 
-      // Extract value.
-      const std::string value = entries[tag_c];
+      double distance = std::fabs (Time::hours_between (time, *at));
 
-      // Skip missing values.
-      if (lex.is_missing (value))
-        continue;
-        
-      // Convert it.
-      double val = lex.convert_to_double (value);
-      if (has_factor)
-        val *= factor;
-      else if (units.can_convert (original, dimension_, val))
-        val = units.convert (original, dimension_, val);
-      else 
-        {
-          static bool has_warned = false;
-          if (!has_warned)
-            {
-              std::ostringstream tmp;
-              tmp << "Cannot convert " << val << " from [" << original 
-                  << "] to [" << dimension_ << "]";
-              lex.debug (tmp.str ());
-              has_warned = true;
-            }
-          // Treat as missing value.
-          continue;
-        }
-
-      // Store it.
-      if (time != last_time)
-	{
-          if (vals.size () > 0)
-            add_entry (last_time, vals);
-	  last_time = time;
-	}
-      vals.push_back (val);
+      if (closest < 0.0 || distance < closest)
+        if (lex.soil_value (entries, value, msg))
+          closest = distance;
     }
-  if (vals.size () > 0)
-    add_entry (last_time, vals);
+  if (closest < 0.0)
+    {
+      msg.error ("No data found");
+      return false;
+    }
+
+  // Convert
+  if (dimension != original)
+    for (size_t i = 0; i < value.size (); i++)
+      {
+        if (!units.can_convert (original, dimension, value[i]))
+          {
+            std::ostringstream tmp;
+            tmp << "Can't convert " << value[i] << " from [" << original 
+                << "] to [" << dimension << "]";
+            msg.error (tmp.str ());
+            return false;
+          }
+        value[i] = units.convert (original, dimension, value[i]);
+      }
 
   // Done.
   return true;
@@ -151,13 +135,20 @@ GnuplotSoil::load (Treelog& msg)
 bool
 GnuplotSoil::plot (std::ostream& out, Treelog& msg)
 { 
-  // Read data.
-  
+  const size_t size = x.size ();
+  if (size < 1)
+    {
+      msg.warning ("Nothing to plot");
+      return false;
+    }
 
   // Header.
   plot_header (out);
   out << "\
-set pm3d map\n\
+set contour\n\
+set view map\n\
+unset surface\n\
+set cntrparam levels 5\n\
 set size ratio -1\n";
 
   // Legend.
@@ -173,49 +164,24 @@ set size ratio -1\n";
     out << extra[i].name () << "\n";
 
   // Plot.
-  out << "splot '-' using 1:2:3\n";
+  out << "splot '-' using 1:2:3 with lines title \"\"\n";
   
   // Data.
-  for (size_t i = 0; i < source.size (); i++)
+  daisy_assert (z.size () == size);
+  daisy_assert (value.size () == size);
+  
+  double last_x = x[0];
+  for (size_t i = 0; i < size; i++)
     {
-      if (source[i]->value ().size () < 1)
-        continue;
-      const bool use_ebars = source[i]->with () == "errorbars";
-      const size_t size = source[i]->time ().size ();
-      daisy_assert (size == source[i]->value ().size ());
-      bool begun = (begin.get () == NULL);
-      double last = 0.0;
-      const bool accumulate = source[i]->accumulate ();
-      for (size_t j = 0; j < size; j++)
+      if (!approximate (x[i], last_x))
         {
-          // 
-          const Time time = source[i]->time ()[j];
-          if (!begun)
-            {
-              if (time >= *begin)
-                // Begin logging.
-                begun = true;
-              else 
-                // To early, skip entry.
-                continue;
-            }
-          else if (end.get () && time > *end)
-            // Finished.
-            break;
-
-          const double value = source[i]->value ()[j];
-          if (accumulate)
-            last += value;
-          else
-            last = value;
-          out << time.year () << "-" << time.month () << "-" << time.mday ()
-              << "T" << time.hour () << "\t" << last;
-	  if (use_ebars)
-	    out << "\t" << source[i]->ebar ()[j];
-	  out << "\n";
+          out << "\n";
+          last_x = x[i];
         }
-      out << "e\n";
+      out << x[i] << "\t" << z[i] << "\t"<< value[i] << "\n";
     }
+
+  out << "e\n";
 
   // The end.
   if (interactive ())
@@ -226,57 +192,37 @@ set size ratio -1\n";
 
 GnuplotSoil::GnuplotSoil (const BlockModel& al)
   : GnuplotBase (al),
-    begin (al.check ("begin") 
-	   ? new Time (al.submodel ("begin")) 
-	   : NULL),
-    end (al.check ("end")
-	 ? new Time (al.submodel ("end")) 
-	 : NULL),
-    ymin_flag (al.check ("ymin")),
-    ymin (al.number ("ymin", 42.42e42)),
-    ymax_flag (al.check ("ymax")),
-    ymax (al.number ("ymax", 42.42e42)),
-    y2min_flag (al.check ("y2min")),
-    y2min (al.number ("y2min", 42.42e42)),
-    y2max_flag (al.check ("y2max")),
-    y2max (al.number ("y2max", 42.42e42)),
-    source (Librarian::build_vector<Source> (al, "source"))
+    at (submodel<Time> (al, "at")),
+    width (al.number ("width")),
+    depth (al.number ("depth")),
+    lex (al),
+    dimension (al.name ("dimension", Attribute::Unknown ())),
+    tag (Attribute::Unknown ())
 { }
 
 GnuplotSoil::~GnuplotSoil ()
-{ 
-  sequence_delete (source.begin (), source.end ()); 
-}
+{ }
 
 static struct GnuplotSoilSyntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
   { return new GnuplotSoil (al); }
   GnuplotSoilSyntax ()
-    : DeclareModel (Gnuplot::component, "time", "common",
-               "Generate a gnuplot graph with times series.")
+    : DeclareModel (Gnuplot::component, "soil", "common",
+                    "Generate a 2D gnuplot graph with soil content.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_submodule ("begin", Attribute::OptionalConst,
-			  "First date at x-axis.", Time::load_syntax);
-    frame.declare_submodule ("end", Attribute::OptionalConst,
-			  "Last date at x-axis.", Time::load_syntax);
-    frame.declare ("ymin", Attribute::User (), Attribute::OptionalConst, "\
-Fixed lowest value on left y-axis.\n\
-By default determine this from the data.");
-    frame.declare ("ymax", Attribute::User (), Attribute::OptionalConst, "\
-Fixed highest value on right y-axis.\n\
-By default determine this from the data.");
-    frame.declare ("y2min", Attribute::User (), Attribute::OptionalConst, "\
-Fixed lowest value on left y-axis.\n\
-By default determine this from the data.");
-    frame.declare ("y2max", Attribute::User (), Attribute::OptionalConst, "\
-Fixed highest value on right y-axis.\n\
-By default determine this from the data.");
-                
-    frame.declare_object ("source", Source::component, Attribute::State, 
-                       Attribute::Variable, "\
-Time series to plot.");
+    frame.declare_submodule ("at", Attribute::Const, "\
+Use value closest to this time.", Time::load_syntax);
+    frame.declare ("depth", "cm", Check::negative (), Attribute::Const, "\
+Maximum z value in plot.");
+    frame.declare ("width", "cm", Check::positive (), Attribute::Const, "\
+Maximum x value in plot.");
+    LexerTable::load_syntax (frame);
+    frame.declare_string ("dimension", Attribute::OptionalConst, "\
+Dimension for data.  By default, use dimension from file.");
   }
 } GnuplotSoil_syntax;
+
+// gnuplot_soil.C ends here.
