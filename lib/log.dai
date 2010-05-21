@@ -207,8 +207,7 @@ flow to drain pipes, and subsoil irrigation."
   (entries ;; Year Month MDay Hour
            (array (path column "${column}" SoilWater S_sum)
                   (spec fixed SoilWater S_sum)
-                  (handle sum)
-                  (dimension "cm^3/cm^3/&"))))
+                  (handle sum))))
 
 (deflog "Soil Hydraulic Conductivity (log10)" column
   (when daily)
@@ -238,7 +237,8 @@ flow to drain pipes, and subsoil irrigation."
   (when hourly)
   (entries ;; Year Month MDay Hour
            (array (path column "${column}" SoilWater q_p)
-                  (factor -10)          ;cm->mm
+                  (spec fixed SoilWater q_p)
+                  (handle sum)
                   (dimension "mm/&"))))
 
 (deflog "Matrix Water Flux" column
@@ -247,9 +247,29 @@ flow to drain pipes, and subsoil irrigation."
   (when hourly)
   (entries ;; Year Month MDay Hour
            (array (path column "${column}" SoilWater q)
-                  (factor -10)          ;cm->mm
+                  (spec fixed SoilWater q)
                   (handle sum)
                   (dimension "mm/&"))))
+
+(deflog "Preferential Chemical Transport" chemical
+  "The preferential chemical transport between all numeric soil layers."
+  (where "${colfid}J_p_${chemfid}.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*" trace
+                        "${chemical}" J_tertiary)
+                  (spec chemical default J_tertiary)
+                  (handle sum))))
+
+(deflog "Matrix Chemical Transport" chemical
+  "The matrix chemical transport between all numeric soil layers."
+  (where "${colfid}J_${chemfid}.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*" trace
+                        "${chemical}" J_matrix)
+                  (spec chemical default J_matrix)
+                  (handle sum))))
 
 (deflog "Preferential NO3 Transport" column
   "The preferential nitrogen transport between all numeric soil layers."
@@ -3395,6 +3415,15 @@ contains no water."
   (when hourly)
   (entries (array (path column "${column}" SoilWater S_p)
                   (spec fixed SoilWater S_p)
+                  (handle sum))))
+
+(deflog "Tertiary chemical sink" chemical
+  "Tertiary chemical sink term."
+  (where "${colfid}tertiary-${chemfid}-sink.dlf")
+  (when hourly)
+  (entries (array (path column "${column}" Chemistry "*" 
+                        trace "${chemical}" S_tertiary)
+                  (spec chemical default S_tertiary)
                   (handle sum))))
 
 (defsummary "Surface water balance" balance

@@ -170,6 +170,21 @@
                    
            ))
 
+(deflog "Soil pF" column
+  "Average water potential in all numeric soil layers, in pF."
+  (when monthly)
+  (entries (array (path column "${column}" SoilWater h)
+                  (handle average)
+                  (dimension [pF])
+                  (spec fixed SoilWater h))))
+
+(deflog "Soil Theta" column
+  "Average water content in all numeric soil layers."
+  (when monthly)
+  (entries (array (path column "${column}" SoilWater Theta)
+                  (handle average)
+                  (spec fixed SoilWater Theta))))
+
 ;; Program
 
 (defprogram VAP Daisy
@@ -177,6 +192,30 @@
   (declare station String "Name of station")
   (minimal_timestep (microseconds 1))
   (output (Time (where "log/${station}-time.dlf"))
+          ("Matrix Water Flux" (when monthly)
+           (where "log/${station}-q_p.dlf"))
+          ("Preferential Water Flux" (when monthly)
+           (where "log/${station}-q.dlf"))
+          ("Preferential Chemical Transport" (when monthly)
+           (chemical "Glyphosate-base")
+           (where "log/${station}-J_p-Glyphosate.dlf"))
+          ("Preferential Chemical Transport" (when monthly)
+           (chemical "Bromide")
+           (where "log/${station}-J_p-${chemfid}.dlf"))
+          ("Matrix Chemical Transport" (when monthly)
+           (chemical "Glyphosate-base")
+           (where "log/${station}-J-Glyphosate.dlf"))
+          ("Matrix Chemical Transport" (when monthly)
+           (chemical "Bromide")
+           (where "log/${station}-J-${chemfid}.dlf"))
+          ("Soil pF" (where "log/${station}-pF.dlf"))
+          ("Soil Theta" (where "log/${station}-Theta.dlf"))
+          ("Tertiary water sink" (when monthly)
+           (where "log/${station}-b2m-water.dlf"))
+          ("Tertiary chemical sink" (when monthly) (chemical "Glyphosate-base")
+           (where "log/${station}-b2m-Glyphosate.dlf"))
+          ("Tertiary chemical sink" (when monthly) (chemical "Bromide")
+           (where "log/${station}-b2m-${chemfid}.dlf"))
           (harvest (where "log/${station}-harvest.dlf"))
           ("Chemical Content" (chemical "Glyphosate-base")
            (where "log/${station}-content-Glyphosate.dlf"))

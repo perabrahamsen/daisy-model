@@ -96,7 +96,7 @@
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;;   cm too high,  cm is too low
+               ;;   cm too high, 10 cm is too low
                (offset 0 [cm]) 
                )
   ;;(Groundwater aquitard 
@@ -207,7 +207,7 @@
     ;; 30 kg potassium bromide = 30 * (79.904 / 119.002) = 20.14 kg bromine
     (spray Bromide 20.14 [kg/ha])
   (wait (at 2000 06 01))
-    ;; (set_porosity (depth -1 [cm]) (porosity 0.35))
+    (set_porosity (depth -1 [cm]) (porosity 0.35))
   (wait (at 2000 06 15))
     ;; BBCH stage 11-15			
     ;; Goltix WG+Betanal Optima 
@@ -283,8 +283,8 @@
      (irrigate_overhead 4.0 [l/ha/h] (solute (Glyphosate 360 [g/kg])))
   (wait (at 2001 12 18))
     (plowing (depth -22 [cm]))
-    (set_porosity (depth -1 [cm]) (porosity 0.392719))
-    ;;(set_porosity (depth -1 [cm]) (porosity 0.35))
+    ;;(set_porosity (depth -1 [cm]) (porosity 0.392719))
+    (set_porosity (depth -1 [cm]) (porosity 0.35))
   (wait (at 2002 04 03))
     (seed_bed_preparation -3 [cm])
   (wait (at 2002 04 17))	
@@ -430,6 +430,14 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
 
 
   (output &old
+          ("Tertiary chemical sink" (when monthly) (chemical "Metamitron-base")
+           (where "log/${station}-b2m-Metamitron.dlf"))
+          ("Preferential Chemical Transport" (when monthly)
+           (chemical "Metamitron-base")
+           (where "log/${station}-J_p-Metamitron.dlf"))
+          ("Matrix Chemical Transport" (when monthly)
+           (chemical "Metamitron-base")
+           (where "log/${station}-J-Metamitron.dlf"))
           ("Field chemical" 
            (chemical "Metamitron-base")
            (where "log/${station}-field-Metamitron.dlf"))
