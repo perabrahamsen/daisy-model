@@ -197,6 +197,8 @@ LexerTable::read_header (Treelog& msg)
     }
 
   // Array tags.
+  std::vector<double> array_z;
+  std::vector<double> array_x;
   for (size_t i = 0; i < tag_names.size (); i++)
     {
       std::string name = tag_names[i].name ();
@@ -246,8 +248,56 @@ LexerTable::read_header (Treelog& msg)
         }
       array_c.push_back (i);
     }
+  const size_t array_size = array_c.size ();
+  daisy_assert (array_z.size () == array_size);
+  const bool has_x = array_x.size () > 0;
+  if (has_x && array_x.size () != array_size)
+    {
+      msg.error ("Dimension mixup");
+      return false;
+    }
 
-  // 
+  // Find interval ends.
+  bool done_z = false;
+  double last_z = 0.0;
+  double last_x = 0.0;
+  for (size_t i = 0; i < array_size; i++)
+    {
+      const double z = array_z[i];
+      if (done_z)
+        /* Do nothing. */;
+      else if (z > last_z)
+        done_z = true;
+      else
+        {
+          last_z += (z - last_z) * 2.0;
+          matrix_zplus.push_back (last_z);
+        }
+
+      if (!has_x)
+        continue;
+      
+      const double x = array_x[i];
+      if (x > last_x)
+        {
+          last_x += (x - last_x) * 2.0;
+          matrix_xplus.push_back (last_x);
+        }
+    }
+
+  if (has_x 
+      ? matrix_zplus.size () * matrix_xplus.size () != array_size
+      : matrix_zplus.size () != array_size)
+    {
+      std::ostringstream tmp;
+      tmp << "Array location mismatch: #a = " << array_size
+          << "; #z = " << matrix_zplus.size ()
+          << "; #x = " << matrix_xplus.size ();
+      msg.error (tmp.str ());
+      return false;
+    }
+  
+  // Done
   return lex->good ();
 }  
 
@@ -488,7 +538,7 @@ LexerTable::convert_to_double (const std::string& value) const
 }
 
 bool
-LexerTable::soil_value (const std::vector<std::string>& entries,
+LexerTable::soil_cells (const std::vector<std::string>& entries,
                         std::vector<double>& values,
                         Treelog& msg) const
 {

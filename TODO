@@ -2,21 +2,31 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * 2dplot
 
-** brug zplus/xplus, samt corner2box c1
+** NEWS
 
-* stof surface section?
+** top, bottom, left, right, min, max
+
+** type: rectangles, contour, interpolate, surface
+
+** dato
+
+** create multiple images (jpg?) from one dlf file to be encoded into film later
+
+with eg mencoder
 
 * VAP
 
 ** Kørsel (ny pest, pond_sections)
 
-*** NW: offset 5
+*** NW: sil offset 0, estrup offset 0
 
-*** NE: offset 10
+*** NE: sil offset 10, estrup offset 10 
 
-*** SW: offset 5, B Theta_res 8%
+*** SW: sil offset 20, estrup offset 20 
 
-*** SE: C_Nocracks K_b 50%
+*** SE: sil offset 40, estrup offset -10
+
+* stof surface section?
 
 * 23 uger til aflevering
 

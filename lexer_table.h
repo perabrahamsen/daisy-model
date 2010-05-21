@@ -98,19 +98,20 @@ public:
 private:
   symbol array_name;
   symbol array_dimension;
-  std::vector<size_t> array_c;
-  std::vector<double> array_z;
-  std::vector<double> array_x;
+  std::vector<double> array_c;
+  std::vector<double> matrix_value;
+  std::vector<double> matrix_zplus;
+  std::vector<double> matrix_xplus;
 public:
   symbol soil_tag () const
   { return array_name; }
   symbol soil_dimension () const
   { return array_dimension; }
-  const std::vector<double>& soil_z () const
-  { return array_z; }
-  const std::vector<double>& soil_x () const
-  { return array_x; }
-  bool soil_value (const std::vector<std::string>& entries,
+  const std::vector<double>& soil_zplus () const
+  { return matrix_zplus; }
+  const std::vector<double>& soil_xplus () const
+  { return matrix_xplus; }
+  bool soil_cells (const std::vector<std::string>& entries,
                    std::vector<double>& values,
                    Treelog& msg) const;
 

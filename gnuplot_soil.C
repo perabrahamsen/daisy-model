@@ -33,6 +33,8 @@
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
 
+#define USE_PM3D
+
 struct GnuplotSoil : public GnuplotBase
 {
   // Ranges.
@@ -46,8 +48,8 @@ struct GnuplotSoil : public GnuplotBase
   // Plot.
   symbol dimension;
   symbol tag;
-  std::vector<double> z;
-  std::vector<double> x;
+  std::vector<double> zplus;
+  std::vector<double> xplus;
   std::vector<double> value;
 
   // Use.
@@ -71,9 +73,13 @@ GnuplotSoil::initialize (const Units& units, Treelog& msg)
 
   // Array.
   tag = lex.soil_tag ();
-  z = lex.soil_z ();
-  x = lex.soil_x ();
-
+  zplus = lex.soil_zplus ();
+  xplus = lex.soil_xplus ();
+  if (xplus.size () < 1)
+    {
+      msg.error ("One dimensional data");
+      return false;
+    }
   symbol original (lex.soil_dimension ());
 
   if (dimension == Attribute::Unknown ())
@@ -104,7 +110,7 @@ GnuplotSoil::initialize (const Units& units, Treelog& msg)
       double distance = std::fabs (Time::hours_between (time, *at));
 
       if (closest < 0.0 || distance < closest)
-        if (lex.soil_value (entries, value, msg))
+        if (lex.soil_cells (entries, value, msg))
           closest = distance;
     }
   if (closest < 0.0)
@@ -135,8 +141,7 @@ GnuplotSoil::initialize (const Units& units, Treelog& msg)
 bool
 GnuplotSoil::plot (std::ostream& out, Treelog& msg)
 { 
-  const size_t size = x.size ();
-  if (size < 1)
+  if (xplus.size () < 1)
     {
       msg.warning ("Nothing to plot");
       return false;
@@ -144,11 +149,23 @@ GnuplotSoil::plot (std::ostream& out, Treelog& msg)
 
   // Header.
   plot_header (out);
+
+#ifdef USE_CONTOUR
   out << "\
 set contour\n\
 set view map\n\
 unset surface\n\
-set cntrparam levels 5\n\
+set cntrparam levels 5\n";
+#endif
+
+#ifdef USE_PM3D
+  out << "\
+set pm3d map\n\
+set pm3d corners2color c4\n";
+#endif
+
+  // Same size axes.
+  out << "\
 set size ratio -1\n";
 
   // Legend.
@@ -156,30 +173,43 @@ set size ratio -1\n";
     out << "set key " << legend_table[legend] << "\n";
 
   // Range
-  out << "set xrange [0:" << width << "]\n";
-  out << "set yrange [" << depth << ":0]\n";
+  const double vmax = *std::max_element (value.begin (), value.end ());
+  const double vmin = *std::min_element (value.begin (), value.end ());
+  out << "set xrange [0:" << width << "]\n"
+      << "set yrange [" << depth << ":0]\n"
+      << "set zrange [" << vmin << ":" << vmax << "]\n"
+    ;
   
   // Extra.
   for (size_t i = 0; i < extra.size (); i++)
     out << extra[i].name () << "\n";
 
   // Plot.
-  out << "splot '-' using 1:2:3 with lines title \"\"\n";
+  out << "splot '-' using 2:1:3 ";
+
+#ifdef USE_CONTOUR
+  out << "with lines ";
+#endif
+  out << "title \"" << dimension << "\"\n";
   
   // Data.
-  daisy_assert (z.size () == size);
-  daisy_assert (value.size () == size);
+  daisy_assert (value.size () == xplus.size () * zplus.size ());
   
-  double last_x = x[0];
-  for (size_t i = 0; i < size; i++)
+  size_t c = 0;
+  out << "0 0 " << vmax << "\n";
+  for (size_t iz = 0; iz < zplus.size (); iz++)
+    out << zplus[iz] << " 0 " << vmax << "\n";
+  for (size_t ix = 0; ix < xplus.size (); ix++)
     {
-      if (!approximate (x[i], last_x))
+      out << "\n0 " << xplus[ix] << " " << vmax << "\n";
+      for (size_t iz = 0; iz < zplus.size (); iz++)
         {
-          out << "\n";
-          last_x = x[i];
+          daisy_assert (c < value.size ());
+          out << zplus[iz] << " " << xplus[ix] << " " << value[c] << "\n";
+          c++;
         }
-      out << x[i] << "\t" << z[i] << "\t"<< value[i] << "\n";
     }
+  daisy_assert (c == value.size ());
 
   out << "e\n";
 
