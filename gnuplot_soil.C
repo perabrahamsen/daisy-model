@@ -38,9 +38,13 @@
 struct GnuplotSoil : public GnuplotBase
 {
   // Ranges.
-  const boost::scoped_ptr<Time> at;
-  const double width;
-  const double depth;
+  const boost::scoped_ptr<Time> when;
+  const double top;
+  const double bottom;
+  const double left;
+  const double right;
+  const double vmin;
+  const double vmax;
 
   // Data.
   LexerTable lex;
@@ -107,7 +111,7 @@ GnuplotSoil::initialize (const Units& units, Treelog& msg)
       if (!lex.get_time (entries, time, 8))
         continue;
 
-      double distance = std::fabs (Time::hours_between (time, *at));
+      double distance = std::fabs (Time::hours_between (time, *when));
 
       if (closest < 0.0 || distance < closest)
         if (lex.soil_cells (entries, value, msg))
@@ -141,7 +145,7 @@ GnuplotSoil::initialize (const Units& units, Treelog& msg)
 bool
 GnuplotSoil::plot (std::ostream& out, Treelog& msg)
 { 
-  if (xplus.size () < 1)
+  if (xplus.size () < 1 || zplus.size () < 1)
     {
       msg.warning ("Nothing to plot");
       return false;
@@ -173,11 +177,21 @@ set size ratio -1\n";
     out << "set key " << legend_table[legend] << "\n";
 
   // Range
-  const double vmax = *std::max_element (value.begin (), value.end ());
-  const double vmin = *std::min_element (value.begin (), value.end ());
-  out << "set xrange [0:" << width << "]\n"
-      << "set yrange [" << depth << ":0]\n"
-      << "set zrange [" << vmin << ":" << vmax << "]\n"
+  const double vmaxf = std::isfinite (vmax)
+    ? vmax
+    : *std::max_element (value.begin (), value.end ());
+  const double vminf = std::isfinite (vmin)
+    ? vmin
+    : *std::min_element (value.begin (), value.end ());
+  const double bottomf = std::isfinite (bottom)
+    ? bottom
+    : zplus[zplus.size () - 1];
+  const double rightf = std::isfinite (right)
+    ? right
+    : xplus[xplus.size () - 1];
+  out << "set xrange [" << left << ":" << rightf << "]\n"
+      << "set yrange [" << bottomf << ":" << top << "]\n"
+      << "set cbrange [" << vminf << ":" << vmaxf << "]\n"
     ;
   
   // Extra.
@@ -196,12 +210,12 @@ set size ratio -1\n";
   daisy_assert (value.size () == xplus.size () * zplus.size ());
   
   size_t c = 0;
-  out << "0 0 " << vmax << "\n";
+  out << "0 0 " << vmaxf << "\n";
   for (size_t iz = 0; iz < zplus.size (); iz++)
-    out << zplus[iz] << " 0 " << vmax << "\n";
+    out << zplus[iz] << " 0 " << vmaxf << "\n";
   for (size_t ix = 0; ix < xplus.size (); ix++)
     {
-      out << "\n0 " << xplus[ix] << " " << vmax << "\n";
+      out << "\n0 " << xplus[ix] << " " << vmaxf << "\n";
       for (size_t iz = 0; iz < zplus.size (); iz++)
         {
           daisy_assert (c < value.size ());
@@ -222,9 +236,13 @@ set size ratio -1\n";
 
 GnuplotSoil::GnuplotSoil (const BlockModel& al)
   : GnuplotBase (al),
-    at (submodel<Time> (al, "at")),
-    width (al.number ("width")),
-    depth (al.number ("depth")),
+    when (submodel<Time> (al, "when")),
+    top (al.number ("top")),
+    bottom (al.number ("bottom", NAN)),
+    left (al.number ("left")),
+    right (al.number ("right", NAN)),
+    vmin (al.number ("min", NAN)),
+    vmax (al.number ("max", NAN)),
     lex (al),
     dimension (al.name ("dimension", Attribute::Unknown ())),
     tag (Attribute::Unknown ())
@@ -243,12 +261,27 @@ static struct GnuplotSoilSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_submodule ("at", Attribute::Const, "\
+    frame.declare_submodule ("when", Attribute::Const, "\
 Use value closest to this time.", Time::load_syntax);
-    frame.declare ("depth", "cm", Check::negative (), Attribute::Const, "\
-Maximum z value in plot.");
-    frame.declare ("width", "cm", Check::positive (), Attribute::Const, "\
-Maximum x value in plot.");
+    frame.declare ("top", "cm", Check::non_positive (),
+                   Attribute::Const, "\
+Higest z value in plot.");
+    frame.set ("top", 0.0);
+    frame.declare ("bottom", "cm", Check::negative (),
+                   Attribute::OptionalConst, "\
+Deepest z value in plot.  By default, derive value from data file.");
+    frame.declare ("left", "cm", Check::non_negative (), 
+                   Attribute::Const, "\
+Minimum x value in plot.");
+    frame.set ("left", 0.0);
+    frame.declare ("right", "cm", Check::positive (), 
+                   Attribute::OptionalConst, "\
+Maximum x value in plot. By default, derive value from data file.");
+    frame.declare ("min", Attribute::User (), Attribute::OptionalConst, "\
+Fixed lowest value.  By default determine this from the data.");
+    frame.declare ("max", Attribute::User (), Attribute::OptionalConst, "\
+Fixed highest value.  By default determine this from the data.");
+
     LexerTable::load_syntax (frame);
     frame.declare_string ("dimension", Attribute::OptionalConst, "\
 Dimension for data.  By default, use dimension from file.");

@@ -175,6 +175,7 @@
   (when monthly)
   (entries (array (path column "${column}" SoilWater h)
                   (handle average)
+                  (expr (min -1 [cm] x))
                   (dimension [pF])
                   (spec fixed SoilWater h))))
 
@@ -217,6 +218,10 @@
           ("Tertiary chemical sink" (when monthly) (chemical "Bromide")
            (where "log/${station}-b2m-${chemfid}.dlf"))
           (harvest (where "log/${station}-harvest.dlf"))
+          ("Chemical Content" (chemical "Bromide")
+           (where "log/${station}-content-Bromide.dlf"))
+          ("Chemical Concentration" (chemical "Bromide")
+           (where "log/${station}-conc-Bromide.dlf"))
           ("Chemical Content" (chemical "Glyphosate-base")
            (where "log/${station}-content-Glyphosate.dlf"))
           ("Chemical Concentration" (chemical "Glyphosate-base")

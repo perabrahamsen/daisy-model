@@ -96,8 +96,8 @@
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;;   cm too high, 10 cm is too low
-               (offset 0 [cm]) 
+               ;;   cm too high, 20 cm is too low
+               (offset 40 [cm]) 
                )
   ;;(Groundwater aquitard 
   ;;             (K_aquitard 1 [mm/h])

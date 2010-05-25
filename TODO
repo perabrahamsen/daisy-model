@@ -1,10 +1,14 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Næste kørsler 
+
+Bromid i Jord
+
 * 2dplot
 
 ** NEWS
 
-** top, bottom, left, right, min, max
+** DONE top, bottom, left, right, min, max
 
 ** type: rectangles, contour, interpolate, surface
 
