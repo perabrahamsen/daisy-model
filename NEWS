@@ -98,7 +98,25 @@ But there is still full mixing of soil chemicals.
 
 ** New 2D plot facility.
 
-...
+Assuming 'Theta.dlf' list water content in all cells, the following
+small setup file will generate a 'daisy.gnuplot' file, which will show
+a 2D representation on the screen when feed into the gnuplot program.
+
+  (defgnuplot sample soil
+    (file "soil_water_content.dlf")
+    (when 2000 5 28))
+  
+  (defprogram showme gnuplot
+    (graph sample))
+  
+  (run showme)
+
+The 'type' parameter allows you to select between 'block', 'smooth',
+'surface', and 'contour' plots, and the 'top', 'bottom', 'left' and
+'right' parameters allows you to zoom into a rectangular subset of the
+soil..  More information about generating plots can be found in the
+tutorial, and more deails on the 'soil' model can be found in the
+reference manual.
 
 * 4.86
 

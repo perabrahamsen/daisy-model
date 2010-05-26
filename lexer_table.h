@@ -31,6 +31,7 @@
 #include <iosfwd>
 #include <memory>
 #include <boost/scoped_ptr.hpp>
+#include <boost/noncopyable.hpp>
 
 class Frame;
 class Treelog;
@@ -38,7 +39,7 @@ class LexerData;
 class Time;
 class Path;
 
-class LexerTable
+class LexerTable : private boost::noncopyable
 {
   // Content.
 private:
@@ -49,7 +50,9 @@ private:
   std::string field_sep;
   std::string type_;
   const std::vector<std::string> missing;
+protected:
   std::vector<symbol> tag_names;
+private:
   std::map<symbol,int> tag_pos;
   std::vector<size_t> fil_col;
   struct Filter;
@@ -61,6 +64,7 @@ private:
   int time_c;
   const std::vector<symbol> original;
   const bool dim_line;
+protected:
   std::vector<symbol> dim_names;
   
   // Use.
@@ -94,27 +98,6 @@ public:
   bool is_missing (const std::string& value) const;
   double convert_to_double (const std::string& value) const;
 
-  // Array support.
-private:
-  symbol array_name;
-  symbol array_dimension;
-  std::vector<double> array_c;
-  std::vector<double> matrix_value;
-  std::vector<double> matrix_zplus;
-  std::vector<double> matrix_xplus;
-public:
-  symbol soil_tag () const
-  { return array_name; }
-  symbol soil_dimension () const
-  { return array_dimension; }
-  const std::vector<double>& soil_zplus () const
-  { return matrix_zplus; }
-  const std::vector<double>& soil_xplus () const
-  { return matrix_xplus; }
-  bool soil_cells (const std::vector<std::string>& entries,
-                   std::vector<double>& values,
-                   Treelog& msg) const;
-
   // Messages.
 public:
   void debug (const std::string& str) const;
@@ -124,10 +107,6 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Frame&);
-private:
-  LexerTable (const LexerTable&);
-  LexerTable ();
-public:
   explicit LexerTable (const BlockModel&);
   ~LexerTable ();
 };

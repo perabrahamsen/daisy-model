@@ -1,4 +1,4 @@
-// gnuplot_time.C -- Plot soil content at specific time.
+// gnuplot_soil.C -- Plot soil content at specific time.
 // 
 // Copyright 2005 and 2010 Per Abrahamsen and KVL.
 //
@@ -21,7 +21,7 @@
 #define BUILD_DLL
 #include "gnuplot_base.h"
 #include "block_model.h"
-#include "lexer_table.h"
+#include "lexer_soil.h"
 #include "treelog.h"
 #include "mathlib.h"
 #include "librarian.h"
@@ -30,10 +30,9 @@
 #include "units.h"
 #include "submodeler.h"
 #include "check.h"
+#include "vcheck.h"
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
-
-#define USE_PM3D
 
 struct GnuplotSoil : public GnuplotBase
 {
@@ -47,15 +46,20 @@ struct GnuplotSoil : public GnuplotBase
   const double vmax;
 
   // Data.
-  LexerTable lex;
+  LexerSoil lex;
 
   // Plot.
+  enum type_t { block, smooth, contour, surface };
+  static type_t symbol2type (symbol);
+  static symbol type2symbol (type_t);
+  type_t type;
   symbol dimension;
   symbol tag;
   std::vector<double> zplus;
   std::vector<double> xplus;
   std::vector<double> value;
 
+  
   // Use.
   bool initialize (const Units& units, Treelog& msg);
   bool plot (std::ostream& out, Treelog& msg);
@@ -65,11 +69,49 @@ struct GnuplotSoil : public GnuplotBase
   ~GnuplotSoil ();
 };
 
+GnuplotSoil::type_t 
+GnuplotSoil::symbol2type (const symbol s)
+{
+  static struct sym_set_t : std::map<symbol, type_t>
+  {
+    sym_set_t ()
+    {
+      insert (std::pair<symbol,type_t> ("block", block));
+      insert (std::pair<symbol,type_t> ("smooth", smooth));
+      insert (std::pair<symbol,type_t> ("contour", contour));
+      insert (std::pair<symbol,type_t> ("surface", surface));
+    } 
+  } sym_set;
+  sym_set_t::const_iterator i = sym_set.find (s);
+  daisy_assert (i != sym_set.end ());
+  return (*i).second;
+}  
+
+symbol 
+GnuplotSoil::type2symbol (const type_t t)
+{
+  static struct sym_set_t : std::map<type_t, symbol>
+  {
+    sym_set_t ()
+    {
+      insert (std::pair<type_t,symbol> (block, "block"));
+      insert (std::pair<type_t,symbol> (smooth, "smooth"));
+      insert (std::pair<type_t,symbol> (contour, "contour"));
+      insert (std::pair<type_t,symbol> (surface, "surface"));
+    } 
+  } sym_set;
+  sym_set_t::const_iterator i = sym_set.find (t);
+  daisy_assert (i != sym_set.end ());
+  return (*i).second;
+}
+
 bool
 GnuplotSoil::initialize (const Units& units, Treelog& msg)
 { 
   // Read header.
   if (!lex.read_header (msg))
+    return false;
+  if (!lex.read_soil (msg))
     return false;
 
   if (!lex.good ())
@@ -154,19 +196,29 @@ GnuplotSoil::plot (std::ostream& out, Treelog& msg)
   // Header.
   plot_header (out);
 
-#ifdef USE_CONTOUR
-  out << "\
+  switch (type)
+    {
+    case block:
+      out << "\
+set pm3d map\n\
+set pm3d corners2color c4\n";
+      break;
+    case smooth:
+      out << "\
+set pm3d map\n\
+set samples 50\n\
+set isosamples 50\n";
+      break;
+    case contour:
+      out << "\
 set contour\n\
 set view map\n\
 unset surface\n\
 set cntrparam levels 5\n";
-#endif
-
-#ifdef USE_PM3D
-  out << "\
-set pm3d map\n\
-set pm3d corners2color c4\n";
-#endif
+      break;
+    case surface:
+      break;
+    }
 
   // Same size axes.
   out << "\
@@ -191,8 +243,10 @@ set size ratio -1\n";
     : xplus[xplus.size () - 1];
   out << "set xrange [" << left << ":" << rightf << "]\n"
       << "set yrange [" << bottomf << ":" << top << "]\n"
-      << "set cbrange [" << vminf << ":" << vmaxf << "]\n"
-    ;
+      << "set zrange [" << vminf << ":" << vmaxf << "]\n";
+
+  if (type == block || type == smooth)
+    out << "set cbrange [" << vminf << ":" << vmaxf << "]\n";
   
   // Extra.
   for (size_t i = 0; i < extra.size (); i++)
@@ -201,30 +255,111 @@ set size ratio -1\n";
   // Plot.
   out << "splot '-' using 2:1:3 ";
 
-#ifdef USE_CONTOUR
-  out << "with lines ";
-#endif
+  if (type == contour || type == surface)
+    out << "with lines ";
+
   out << "title \"" << dimension << "\"\n";
   
   // Data.
   daisy_assert (value.size () == xplus.size () * zplus.size ());
-  
   size_t c = 0;
-  out << "0 0 " << vmaxf << "\n";
-  for (size_t iz = 0; iz < zplus.size (); iz++)
-    out << zplus[iz] << " 0 " << vmaxf << "\n";
-  for (size_t ix = 0; ix < xplus.size (); ix++)
-    {
-      out << "\n0 " << xplus[ix] << " " << vmaxf << "\n";
+
+  switch (type)
+    { 
+    case block:
+      // Cell corners only.
+      out << "0 0 " << vmaxf << "\n";
       for (size_t iz = 0; iz < zplus.size (); iz++)
+        out << zplus[iz] << " 0 " << vmaxf << "\n";
+      for (size_t ix = 0; ix < xplus.size (); ix++)
         {
-          daisy_assert (c < value.size ());
-          out << zplus[iz] << " " << xplus[ix] << " " << value[c] << "\n";
-          c++;
+          out << "\n0 " << xplus[ix] << " " << vmaxf << "\n";
+          for (size_t iz = 0; iz < zplus.size (); iz++)
+            {
+              daisy_assert (c < value.size ());
+              out << zplus[iz] << " " << xplus[ix] << " " << value[c] << "\n";
+              c++;
+            }
         }
+      break;
+    case smooth:
+      {
+        // Outer corners and cell centers.
+        double last_x = 0.0;
+
+        // First line.
+        double last_z = 0.0; 
+        daisy_assert (c < value.size ()); 
+        out << last_z << " " << last_x << " " << value[c] << "\n";
+        for (size_t iz = 0; iz < zplus.size (); iz++)
+          {
+            const double z = (last_z + zplus[iz]) / 2.0;
+            last_z = zplus[iz];
+            daisy_assert (c < value.size ());
+            out << z << " " << last_x << " " << value[c] << "\n";
+            c++;
+          }
+        out << last_z << " " << last_x << " " << value[c - 1] << "\n";
+        c -= zplus.size ();
+
+        // Data.
+        for (size_t ix = 0; ix < xplus.size (); ix++)
+          {
+            const double x = (last_x + xplus[ix]) / 2.0;
+            last_x = xplus[ix];
+            last_z = 0.0;
+            out << "\n" << last_z << " " << x << " " << value[c] << "\n";
+            for (size_t iz = 0; iz < zplus.size (); iz++)
+              {
+                const double z = (last_z + zplus[iz]) / 2.0;
+                last_z = zplus[iz];
+                daisy_assert (c < value.size ());
+                out << z << " " << x << " " << value[c] << "\n";
+                c++;
+              }
+            out << last_z << " " << x << " " << value[c-1] << "\n";
+          }
+
+        // Last line.
+        c -= zplus.size ();
+        last_z = 0.0; 
+        daisy_assert (c < value.size ()); 
+        out << "\n" << last_z << " " << last_x << " " << value[c] << "\n";
+        for (size_t iz = 0; iz < zplus.size (); iz++)
+          {
+            const double z = (last_z + zplus[iz]) / 2.0;
+            last_z = zplus[iz];
+            daisy_assert (c < value.size ());
+            out << z << " " << last_x << " " << value[c] << "\n";
+            c++;
+          }
+        out << last_z << " " << last_x << " " << value[c - 1] << "\n";
+      }
+      break;
+    case surface:
+    case contour:
+      // Cell centers only.
+      {
+        double last_x = 0.0;
+        for (size_t ix = 0; ix < xplus.size (); ix++)
+          {
+            const double x = (last_x + xplus[ix]) / 2.0;
+            last_x = xplus[ix];
+            double last_z = 0.0;
+            for (size_t iz = 0; iz < zplus.size (); iz++)
+              {
+                const double z = (last_z + zplus[iz]) / 2.0;
+                last_z = zplus[iz];
+                daisy_assert (c < value.size ());
+                out << z << " " << x << " " << value[c] << "\n";
+                c++;
+              }
+            out << "\n";
+          }
+      }
+      break;
     }
   daisy_assert (c == value.size ());
-
   out << "e\n";
 
   // The end.
@@ -244,6 +379,7 @@ GnuplotSoil::GnuplotSoil (const BlockModel& al)
     vmin (al.number ("min", NAN)),
     vmax (al.number ("max", NAN)),
     lex (al),
+    type (symbol2type (al.name ("type"))),
     dimension (al.name ("dimension", Attribute::Unknown ())),
     tag (Attribute::Unknown ())
 { }
@@ -282,7 +418,13 @@ Fixed lowest value.  By default determine this from the data.");
     frame.declare ("max", Attribute::User (), Attribute::OptionalConst, "\
 Fixed highest value.  By default determine this from the data.");
 
-    LexerTable::load_syntax (frame);
+    frame.declare_string ("type", Attribute::State, "Plot type.\n\
+Valid options are 'block' and 'contour'.");
+    frame.set ("type", "block");
+    static VCheck::Enum type_check ("block", "smooth", "contour", "surface");
+    frame.set_check ("type", type_check);
+
+    LexerSoil::load_syntax (frame);
     frame.declare_string ("dimension", Attribute::OptionalConst, "\
 Dimension for data.  By default, use dimension from file.");
   }

@@ -170,22 +170,6 @@
                    
            ))
 
-(deflog "Soil pF" column
-  "Average water potential in all numeric soil layers, in pF."
-  (when monthly)
-  (entries (array (path column "${column}" SoilWater h)
-                  (handle average)
-                  (expr (min -1 [cm] x))
-                  (dimension [pF])
-                  (spec fixed SoilWater h))))
-
-(deflog "Soil Theta" column
-  "Average water content in all numeric soil layers."
-  (when monthly)
-  (entries (array (path column "${column}" SoilWater Theta)
-                  (handle average)
-                  (spec fixed SoilWater Theta))))
-
 ;; Program
 
 (defprogram VAP Daisy
@@ -194,9 +178,9 @@
   (minimal_timestep (microseconds 1))
   (output (Time (where "log/${station}-time.dlf"))
           ("Matrix Water Flux" (when monthly)
-           (where "log/${station}-q_p.dlf"))
-          ("Preferential Water Flux" (when monthly)
            (where "log/${station}-q.dlf"))
+          ("Preferential Water Flux" (when monthly)
+           (where "log/${station}-q_p.dlf"))
           ("Preferential Chemical Transport" (when monthly)
            (chemical "Glyphosate-base")
            (where "log/${station}-J_p-Glyphosate.dlf"))
@@ -209,8 +193,10 @@
           ("Matrix Chemical Transport" (when monthly)
            (chemical "Bromide")
            (where "log/${station}-J-${chemfid}.dlf"))
-          ("Soil pF" (where "log/${station}-pF.dlf"))
-          ("Soil Theta" (where "log/${station}-Theta.dlf"))
+          ("Soil Water Potential (pF)" (where "log/${station}-pF.dlf")
+           (when monthly))
+          ("Soil Water Content" (where "log/${station}-Theta.dlf")
+           (when monthly))
           ("Tertiary water sink" (when monthly)
            (where "log/${station}-b2m-water.dlf"))
           ("Tertiary chemical sink" (when monthly) (chemical "Glyphosate-base")

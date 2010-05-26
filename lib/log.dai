@@ -195,6 +195,8 @@ This include only nitrogen atoms of the ammonium."
   (when hourly)
   (entries ;; Year Month MDay Hour
            (array (path column "${column}" SoilWater h)
+                  (handle current)
+                  (expr (min -1 [cm] x))
                   (dimension [pF])
                   (spec fixed SoilWater h))))
 
@@ -3086,8 +3088,8 @@ Use \"*\" to log all added organic matter matter.")
   (when hourly)
   (entries ;; Year Month MDay Hour
            (array (path column "${column}" SoilWater Theta)
-                  (dimension "cm^3/cm^3"))))
-
+                  (handle current)
+                  (spec fixed SoilWater Theta))))
 
 (deflog "Fertilizer" column
   "Track applied fertilizer."

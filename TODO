@@ -1,34 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Gnuplot flux
+
+find bottom og right rigtigt (brug xplus, zplus)
+
+Skal det være xysource?
+
 * Næste kørsler 
 
-Bromid i Jord
+** NW ref
 
-* 2dplot
-
-** NEWS
-
-** DONE top, bottom, left, right, min, max
-
-** type: rectangles, contour, interpolate, surface
-
-** dato
-
-** create multiple images (jpg?) from one dlf file to be encoded into film later
-
-with eg mencoder
-
-* VAP
-
-** Kørsel (ny pest, pond_sections)
-
-*** NW: sil offset 0, estrup offset 0
-
-*** NE: sil offset 10, estrup offset 10 
-
-*** SW: sil offset 20, estrup offset 20 
-
-*** SE: sil offset 40, estrup offset -10
+** NE 8% Theta_res i B, 50% K_b i C
 
 * stof surface section?
 
@@ -53,6 +35,15 @@ with eg mencoder
 ** Agrovand
 
 ** FOCUS
+
+
+* 2dplot movie
+
+** create multiple images (jpg?) from one dlf file to be encoded into film later
+
+with eg mencoder
+
+Fixed position for time
 
 * Hent gammel PC.
 
