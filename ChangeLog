@@ -1,10 +1,12 @@
+2010-05-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* xysource_flux.C: New model.
+	* Makefile (MODELS): Add it.
+
 2010-05-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* lexer_flux.h, lexer_flux.C: New utility.
 	* lexer_soil.h, lexer_soil.C: New utility.
 	* Makefile (OTHER): Add them.
-	* gnuplot_soil.C: New model.
-	* Makefile (MODELS): Add it.
 
 2010-05-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
 

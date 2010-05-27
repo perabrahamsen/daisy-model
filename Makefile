@@ -401,7 +401,7 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C
-MODELS = gnuplot_flux.C \
+MODELS = xysource_flux.C \
 	gnuplot_soil.C reaction_sorption.C hydraulic_B_C_inverse.C \
 	program_osvaldo.C vegetation_permanent.C  litter.C drain_lateral.C \
 	hydraulic_MACRO.C program_cpedata.C \
@@ -612,7 +612,7 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = none
+REMOVE = gnuplot_flux.C 
 
 REMOVED = ABAeffect_exp.C ABAeffect.C ABAeffect.h \
 	stomatacon_Leuning.C stomatacon_BB.C \
@@ -1634,11 +1634,11 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
-gnuplot_flux${OBJ}: gnuplot_flux.C gnuplot_base.h gnuplot.h model.h symbol.h \
- block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
- frame_model.h frame.h lexer_flux.h lexer_table.h memutils.h mathlib.h \
- assertion.h librarian.h time.h units.h submodeler.h block_submodel.h \
- frame_submodel.h check.h vcheck.h geometry.h
+xysource_flux${OBJ}: xysource_flux.C xysource.h model.h symbol.h \
+ gnuplot_utils.h lexer_flux.h lexer_table.h block_model.h block_nested.h \
+ block.h scope.h attribute.h treelog.h frame_model.h frame.h memutils.h \
+ check.h vcheck.h geometry.h time.h units.h submodeler.h block_submodel.h \
+ frame_submodel.h assertion.h mathlib.h librarian.h
 gnuplot_soil${OBJ}: gnuplot_soil.C gnuplot_base.h gnuplot.h model.h symbol.h \
  block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
  frame_model.h frame.h lexer_soil.h lexer_table.h memutils.h mathlib.h \

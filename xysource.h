@@ -50,7 +50,8 @@ public:
 
   // Utilities.
 public:
-  void limit (double& xmin, double& xmax, double& ymin, double& ymax) const;
+  virtual void limit (double& xmin, double& xmax,
+                      double& ymin, double& ymax) const;
   void distance (double xmin, double xmax, double ymin, double ymax,
 		 double& nw, double& ne, double& sw, double& se) const;
   

@@ -169,49 +169,50 @@ set style data lines\n";
   if (!ok)
     return false;
 
+  // Find ranges.
+  double soft_xmin = 1e99;
+  double soft_xmax = -soft_xmin;
+  double soft_x2min = soft_xmin;
+  double soft_x2max = soft_xmax;
+  double soft_ymin = 1e99;
+  double soft_ymax = -soft_ymin;
+  double soft_y2min = soft_ymin;
+  double soft_y2max = soft_ymax;
+
+  for (size_t i = 0; i < source.size (); i++)
+    if (source[i]->x ().size () < 1)
+      /**/;
+    else if (x_axis[i] == 0)
+      if (y_axis[i] == 0)
+        source[i]->limit (soft_xmin, soft_xmax, soft_ymin, soft_ymax);
+      else
+        source[i]->limit (soft_xmin, soft_xmax, soft_y2min, soft_y2max);
+    else
+      if (y_axis[i] == 0)
+        source[i]->limit (soft_x2min, soft_x2max, soft_ymin, soft_ymax);
+      else
+        source[i]->limit (soft_x2min, soft_x2max, soft_y2min, soft_y2max);
+
+  if (xmin_flag)
+    soft_xmin = xmin;
+  if (xmax_flag)
+    soft_xmax = xmax;
+  if (x2min_flag)
+    soft_x2min = x2min;
+  if (x2max_flag)
+    soft_x2max = x2max;
+  if (ymin_flag)
+    soft_ymin = ymin;
+  if (ymax_flag)
+    soft_ymax = ymax;
+  if (y2min_flag)
+    soft_y2min = y2min;
+  if (y2max_flag)
+    soft_y2max = y2max;
+
   // Legend.
   if (legend == "auto")
     {
-      // Find ranges.
-      double soft_xmin = 1e99;
-      double soft_xmax = -soft_xmin;
-      double soft_x2min = soft_xmin;
-      double soft_x2max = soft_xmax;
-      double soft_ymin = 1e99;
-      double soft_ymax = -soft_ymin;
-      double soft_y2min = soft_ymin;
-      double soft_y2max = soft_ymax;
-
-      for (size_t i = 0; i < source.size (); i++)
-        if (source[i]->x ().size () < 1)
-          /**/;
-        else if (x_axis[i] == 0)
-          if (y_axis[i] == 0)
-            source[i]->limit (soft_xmin, soft_xmax, soft_ymin, soft_ymax);
-          else
-            source[i]->limit (soft_xmin, soft_xmax, soft_y2min, soft_y2max);
-	else
-          if (y_axis[i] == 0)
-            source[i]->limit (soft_x2min, soft_x2max, soft_ymin, soft_ymax);
-          else
-            source[i]->limit (soft_x2min, soft_x2max, soft_y2min, soft_y2max);
-
-      if (xmin_flag)
-	soft_xmin = xmin;
-      if (xmax_flag)
-	soft_xmax = xmax;
-      if (x2min_flag)
-	soft_x2min = x2min;
-      if (x2max_flag)
-	soft_x2max = x2max;
-      if (ymin_flag)
-	soft_ymin = ymin;
-      if (ymax_flag)
-	soft_ymax = ymax;
-      if (y2min_flag)
-	soft_y2min = y2min;
-      if (y2max_flag)
-	soft_y2max = y2max;
 
       // Find distances.
       double nw = 1.0;
@@ -257,6 +258,7 @@ set style data lines\n";
   out << "set key " << legend_table[legend] << "\n";
 
   // X range
+#if 0
   out << "set xrange [";
   if (xmin_flag)
     out << xmin;
@@ -313,6 +315,14 @@ set style data lines\n";
     }
   else
     out << "unset y2range\n";
+#else
+  out << "set xrange [" << soft_xmin << ":" << soft_xmax << "]\n";
+  if (x_dims.size () == 2)
+    out << "set x2range [" << soft_x2min << ":" << soft_x2max << "]\n";
+  out << "set yrange [" << soft_ymin << ":" << soft_ymax << "]\n";
+  if (y_dims.size () == 2)
+    out << "set y2range [" << soft_y2min << ":" << soft_y2max << "]\n";
+#endif
 
   // Extra.
   for (size_t i = 0; i < extra.size (); i++)
@@ -341,15 +351,17 @@ set style data lines\n";
       out << " axes x" << x_axis[i] + 1 << "y" << y_axis[i] + 1;
       out << " with ";	
       const int style = source[i]->style ();
-      out << with << " ls ";
+      out << with;
       if (with == "points" || with == "errorbars")
-	out << (style < 0 ? ++points : ((style == 0) ? points : style));
+	out << " ls "
+            << (style < 0 ? ++points : ((style == 0) ? points : style));
       else if (with == "lines")
-	out << (style < 0 ? ++lines :  ((style == 0) ? lines : style));
+	out << " ls "
+            << (style < 0 ? ++lines :  ((style == 0) ? lines : style));
       else 
 	{
 	  if (style >= 0)
-	    out  << style;
+	    out << " ls " << style;
 	}
     }
   out << "\n";

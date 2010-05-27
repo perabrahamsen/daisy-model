@@ -1,6 +1,7 @@
-// gnuplot_flux.C -- Plot flux content at specific time.
+// xysource_flux.h -- Plot flux at specific time.
 // 
-// Copyright 2005 and 2010 Per Abrahamsen and KVL.
+// Copyright 2005 Per Abrahamsen and KVL.
+// Copyright 2010 KU.
 //
 // This file is part of Daisy.
 // 
@@ -19,69 +20,86 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #define BUILD_DLL
-#include "gnuplot_base.h"
-#include "block_model.h"
+#include "xysource.h"
+#include "gnuplot_utils.h"
 #include "lexer_flux.h"
-#include "treelog.h"
-#include "mathlib.h"
-#include "librarian.h"
-#include "frame.h"
+#include "check.h"
+#include "vcheck.h"
+#include "geometry.h"
 #include "time.h"
 #include "units.h"
 #include "submodeler.h"
-#include "check.h"
-#include "geometry.h"
+#include "assertion.h"
+#include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
 
-struct GnuplotFlux : public GnuplotBase
-{
-  // Parameters.
+class XYSourceFlux : public XYSource
+{ 
+  // Flux parameters.
   const boost::scoped_ptr<Time> when;
   const double plot_z;
   const double plot_x;
-  const double top;
-  double bottom;
-  const double left;
-  double right;
-  double vmin;
-  double vmax;
-  
-  // Data.
-  LexerFlux lex;
-
-  // Plot.
   symbol dimension;
-  symbol tag;
-  std::vector<double> position;
-  std::vector<double> value;
-  
-  // Use.
-  bool initialize (const Units& units, Treelog& msg);
-  bool plot (std::ostream& out, Treelog& msg);
-  
-  // Create and Destroy.
-  explicit GnuplotFlux (const BlockModel& al);
-  ~GnuplotFlux ();
+  const symbol pos_dim;
+
+  // Content.
+  LexerFlux lex;
+  symbol with_;
+  const int style_;
+  std::vector<double> xs;
+  std::vector<double> ys;
+  symbol title_;
+  symbol x_dimension_;
+  symbol y_dimension_;
+  double soil_bottom;
+  double soil_right;
+
+  // Interface.
+public:
+  symbol title () const
+  { return title_; }
+  const std::vector<double>& x () const
+  { return xs; }
+  const std::vector<double>& y () const
+  { return ys; }
+  symbol with () const
+  { return with_; }
+  int style () const 
+  { return style_; }
+  symbol x_dimension () const 
+  { return x_dimension_; }
+  symbol y_dimension () const 
+  { return y_dimension_; }
+
+  // Read.
+public:
+  bool load (const Units&, Treelog& msg);
+  void limit (double& xmin, double& xmax, double& ymin, double& ymax) const;
+
+  // Create.
+public:
+  explicit XYSourceFlux (const BlockModel&);
+  ~XYSourceFlux ();
 };
 
 static bool approx2 (double a, double b)
 { return approximate (a, b); }
 
 bool
-GnuplotFlux::initialize (const Units& units, Treelog& msg)
-{ 
+XYSourceFlux::load (const Units& units, Treelog& msg)
+{
   // Read header.
   if (!lex.read_header (msg))
     return false;
   if (!lex.read_flux (msg))
     return false;
-
   if (!lex.good ())
     return false;
 
   // Array.
-  tag = lex.flux_tag ();
+  symbol tag = lex.flux_tag ();
   if (lex.edge_z ().size () > 0)
     {
       msg.error ("One dimensional data");
@@ -100,7 +118,7 @@ GnuplotFlux::initialize (const Units& units, Treelog& msg)
       msg.error ("No cells");
       return false;
     }
-
+  
   symbol original (lex.flux_dimension ());
 
   if (dimension == Attribute::Unknown ())
@@ -174,7 +192,6 @@ GnuplotFlux::initialize (const Units& units, Treelog& msg)
       return false;
     }
 
-  const double soil_top = 0.0;
   std::sort (all_z.begin (), all_z.end ());
 
   all_z.erase (std::unique (all_z.begin (), all_z.end (), approx2),
@@ -183,22 +200,17 @@ GnuplotFlux::initialize (const Units& units, Treelog& msg)
   double zplus = 0;
   for (size_t i = 0; i < all_z.size (); i++)
     zplus += (all_z[i] - zplus) * 2.0;
-  const double soil_bottom = zplus;
-  if (!std::isfinite (bottom))
-    bottom = soil_bottom;
 
-  const double soil_left = 0.0;
   std::sort (all_x.begin (), all_x.end ());
   all_x.erase (std::unique (all_x.begin (), all_x.end (), approx2),
                all_x.end ());
   double xplus = 0;
   for (size_t i = 0; i < all_x.size (); i++)
     xplus += (all_x[i] - xplus) * 2.0;
-  const double soil_right = xplus;
-  if (!std::isfinite (right))
-    right = soil_right;
   
   // Filter and convert
+  std::vector<double> value;
+  std::vector<double> position;
   for (size_t i = 0; i < array_size; i++)
     {
       double val = all_values[i];
@@ -213,18 +225,18 @@ GnuplotFlux::initialize (const Units& units, Treelog& msg)
           double to_z;
           
           if (from == Geometry::cell_above)
-            from_z = soil_top;
+            from_z = 0.0;
           else if (from == Geometry::cell_below)
-            from_z = soil_bottom;
+            from_z = zplus;
           else if (from < 0)
             continue;
           else
             from_z = center_z[from];
 
           if (to == Geometry::cell_above)
-            to_z = soil_top;
+            to_z = 0.0;
           else if (to == Geometry::cell_below)
-            to_z = soil_bottom;
+            to_z = zplus;
           else if (to < 0)
             continue;
           else
@@ -247,18 +259,18 @@ GnuplotFlux::initialize (const Units& units, Treelog& msg)
           double to_x;
           
           if (from == Geometry::cell_left)
-            from_x = soil_left;
+            from_x = 0.0;
           else if (from == Geometry::cell_right)
-            from_x = soil_right;
+            from_x = xplus;
           else if (from < 0)
             continue;
           else
             from_x = center_x[from];
 
           if (to == Geometry::cell_left)
-            to_x = soil_left;
+            to_x = 0.0;
           else if (to == Geometry::cell_right)
-            to_x = soil_right;
+            to_x = xplus;
           else if (to < 0)
             continue;
           else
@@ -274,118 +286,133 @@ GnuplotFlux::initialize (const Units& units, Treelog& msg)
           else 
             pos = (center_z[to] + center_z[from]) / 2.0;
        }
-
+      
       // Convert.
-      if (dimension != original)
+      if (!units.can_convert (original, dimension, val))
         {
-          if (!units.can_convert (original, dimension, val))
-            {
-              std::ostringstream tmp;
-              tmp << "Can't convert " << val << " from [" << original 
-                  << "] to [" << dimension << "]";
-              msg.error (tmp.str ());
-              return false;
-            }
+          std::ostringstream tmp;
+          tmp << "Can't convert " << val << " from [" << original 
+              << "] to [" << dimension << "]";
+          msg.error (tmp.str ());
+          return false;
         }
       val = units.convert (original, dimension, val);
-      
+      if (!units.can_convert ("cm", pos_dim, pos))
+        {
+          std::ostringstream tmp;
+          tmp << "Can't convert " << pos << " from [cm] to [" << pos_dim << "]";
+          msg.error (tmp.str ());
+          return false;
+        }
+      pos = units.convert ("cm", pos_dim, pos);
+
       // Store.
       value.push_back (val);
       position.push_back (pos);
     }
+  
+  if (std::isfinite (plot_x))
+    {
+      ys = position;
+      y_dimension_ = pos_dim;
+      
+      xs = value;
+      x_dimension_ = dimension;
+      if (title_ == Attribute::Unknown ())
+        {
+          std::ostringstream tmp;
+          tmp << plot_x << " " << when->print () << " " << tag;
+          title_ = tmp.str ();
+        }
+    }
+  else
+    {
+      xs = position;
+      x_dimension_ = pos_dim;
+      ys = value;
+      y_dimension_ = dimension;
+      if (title_ == Attribute::Unknown ())
+        {
+          std::ostringstream tmp;
+          tmp << plot_z << " " << when->print () << " " << tag;
+          title_ = tmp.str ();
+        }
+    }
 
-  // Value range.
-  if (value.size () < 1)
-   {
-     msg.error ("No values");
-     return false;
-   }
-  if (!std::isfinite (vmax))
-    vmax = *std::max_element (value.begin (), value.end ());
-  if (!std::isfinite  (vmin))
-    vmin = *std::min_element (value.begin (), value.end ());
+  if (!units.can_convert ("cm", pos_dim, zplus))
+    {
+      std::ostringstream tmp;
+      tmp << "Can't convert " << zplus << " from [cm] to [" << pos_dim << "]";
+      msg.error (tmp.str ());
+      return false;
+    }
+  soil_bottom = units.convert ("cm", pos_dim, zplus);
+  if (!units.can_convert ("cm", pos_dim, xplus))
+    {
+      std::ostringstream tmp;
+      tmp << "Can't convert " << xplus << " from [cm] to [" << pos_dim << "]";
+      msg.error (tmp.str ());
+      return false;
+    }
+  soil_right = units.convert ("cm", pos_dim, xplus);
 
   // Done.
   return true;
 }
 
-bool
-GnuplotFlux::plot (std::ostream& out, Treelog& msg)
-{ 
-  // Header.
-  plot_header (out);
-
-  // Legend.
-  if (legend != "auto")
-    out << "set key " << legend_table[legend] << "\n";
-
-  // Range
+void 
+XYSourceFlux::limit (double& xmin, double& xmax,
+                     double& ymin, double& ymax) const
+{
+  XYSource::limit (xmin, xmax, ymin, ymax);
   if (std::isfinite (plot_x))
-    out << "set yrange [" << bottom << ":" << top << "]\n"
-        << "set xrange [" << vmin << ":" << vmax << "]\n";
-  else
-    out << "set xrange [" << left << ":" << right << "]\n"
-        << "set yrange [" << vmin << ":" << vmax << "]\n";
-
-  // Extra.
-  for (size_t i = 0; i < extra.size (); i++)
-    out << extra[i].name () << "\n";
-
-  // Plot.
-  out << "plot '-'";
-
-  if (std::isfinite (plot_x))
-    out << " using 2:1";
-
-  out << " with lines title \"\"";
-
-  
-  out << "\n";
-
-  // Data.
-  const size_t size = value.size ();
-  daisy_assert (size == position.size ());
-
-  for (size_t i = 0; i < size; i++)
-    out << position[i] << " " << value[i] << "\n";
-
-  out << "e\n";
-
-  // The end.
-  if (interactive ())
-    out << "pause mouse\n";
-  
-  return true;
+    {
+      if (ymin > soil_bottom)
+        ymin = soil_bottom;
+      if (ymax < 0.0)
+        ymax = 0.0;
+    }
+  if (std::isfinite (plot_z))
+    {
+      if (xmin > 0.0)
+        xmin = 0.0;
+      if (xmax < soil_right)
+        xmax = soil_right;
+    }
 }
 
-GnuplotFlux::GnuplotFlux (const BlockModel& al)
-  : GnuplotBase (al),
+XYSourceFlux::XYSourceFlux (const BlockModel& al)
+  : XYSource (al),
     when (submodel<Time> (al, "when")),
     plot_z (al.number ("z", NAN)),
     plot_x (al.number ("x", NAN)),
-    top (al.number ("top")),
-    bottom (al.number ("bottom", NAN)),
-    left (al.number ("left")),
-    right (al.number ("right", NAN)),
-    vmin (al.number ("min", NAN)),
-    vmax (al.number ("max", NAN)),
-    lex (al),
     dimension (al.name ("dimension", Attribute::Unknown ())),
-    tag (Attribute::Unknown ())
+    pos_dim (al.name ("pos_dim")),
+    lex (al),
+    with_ (al.name ("with", "lines")),
+    style_ (al.integer ("style", -1)),
+    title_ (al.name ("title", Attribute::Unknown ())),
+    x_dimension_ ("UNINITIALIZED"),
+    y_dimension_ ("UNINITIALIZED"),
+    soil_bottom (NAN),
+    soil_right (NAN)
 { }
 
-GnuplotFlux::~GnuplotFlux ()
+XYSourceFlux::~XYSourceFlux ()
 { }
 
-static struct GnuplotFluxSyntax : public DeclareModel
+
+static struct XYSourceFluxSyntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
-  { return new GnuplotFlux (al); }
-  GnuplotFluxSyntax ()
-    : DeclareModel (Gnuplot::component, "flux", "common",
-                    "Generate a 2D gnuplot graph with flux content.")
+  { return new XYSourceFlux (al); }
+
+  XYSourceFluxSyntax ()
+    : DeclareModel (XYSource::component, "flux", 
+                    "Read a daisy 2d log file, extract flux through line.")
   { }
-  static bool check_alist (const Metalib&, const Frame& al, Treelog& msg)
+  static bool check_alist (const Metalib&, const Frame& al,
+                           Treelog& msg)
   {
     bool ok = true;
 
@@ -395,42 +422,32 @@ static struct GnuplotFluxSyntax : public DeclareModel
         ok = false;
       }
     return ok;
-  }
 
+  }
   void load_frame (Frame& frame) const
-  {
+  { 
     frame.add_check (check_alist);
     frame.declare_submodule ("when", Attribute::Const, "\
 Use value closest to this time.", Time::load_syntax);
-    frame.declare ("z", "cm", Check::negative (),
+    frame.declare ("z", "cm", Check::non_positive (),
                    Attribute::OptionalConst, "\
 Plot flux through this depth.");
-    frame.declare ("x", "cm", Check::positive (),
+    frame.declare ("x", "cm", Check::non_negative (),
                    Attribute::OptionalConst, "\
 Plot flux through this position.");
-    frame.declare ("top", "cm", Check::non_positive (),
-                   Attribute::Const, "\
-Higest z value in plot.");
-    frame.set ("top", 0.0);
-    frame.declare ("bottom", "cm", Check::negative (),
-                   Attribute::OptionalConst, "\
-Deepest z value in plot.  By default, derive value from data file.");
-    frame.declare ("left", "cm", Check::non_negative (), 
-                   Attribute::Const, "\
-Minimum x value in plot.");
-    frame.set ("left", 0.0);
-    frame.declare ("right", "cm", Check::positive (), 
-                   Attribute::OptionalConst, "\
-Maximum x value in plot. By default, derive value from data file.");
-    frame.declare ("min", Attribute::User (), Attribute::OptionalConst, "\
-Fixed lowest value.  By default determine this from the data.");
-    frame.declare ("max", Attribute::User (), Attribute::OptionalConst, "\
-Fixed highest value.  By default determine this from the data.");
-
-    LexerFlux::load_syntax (frame);
     frame.declare_string ("dimension", Attribute::OptionalConst, "\
 Dimension for data.  By default, use dimension from file.");
-  }
-} GnuplotFlux_syntax;
+    frame.declare_string ("pos_dim", Attribute::Const, "\
+Dimension for soil position.");
+    static VCheck::Compatible is_length ("cm");
+    frame.set_check ("pos_dim", is_length);
+    frame.set ("pos_dim", "cm");
 
-// gnuplot_flux.C ends here.
+    LexerTable::load_syntax (frame);
+    GnuplotUtil::load_style (frame, "\
+By default, data will be drawn with lines.", "\
+By default the specified 'z' or 'x' value.");
+  }
+} XYSourceFlux_syntax;
+
+// xysource_flux.C ends here.
