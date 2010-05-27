@@ -31,7 +31,7 @@ class LexerFlux : public LexerTable
 private:
   symbol array_name;
   symbol array_dimension;
-  std::vector<double> array_c;
+  std::vector<int> array_c;
   std::vector<double> center_z;
   std::vector<double> center_x;
   std::vector<int> flux_from;

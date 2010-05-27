@@ -30,7 +30,7 @@ class LexerSoil : public LexerTable
 private:
   symbol array_name;
   symbol array_dimension;
-  std::vector<double> array_c;
+  std::vector<int> array_c;
   std::vector<double> matrix_zplus;
   std::vector<double> matrix_xplus;
 public:

@@ -307,6 +307,51 @@ TertiaryBiopores::tick_source (const Geometry& geo, const Soil& soil,
   soil_water.forward_sink (S_forward);
 }
 
+static void
+pass_below (const Geometry& geo,
+            const std::vector<double>& S_matrix,
+            const std::vector<double>& S_drain,
+            const size_t edge_above,
+            const int cell_above,
+            const double flux_above,
+            std::vector<double>& q_tertiary)
+{
+  const int cell = geo.edge_other (edge_above, cell_above);
+  if (!geo.cell_is_internal (cell))
+    return;
+  const double S = S_matrix[cell] + S_drain[cell];
+  const double volume = geo.cell_volume (cell);
+  const double area_above = geo.edge_area (edge_above);
+  const double volume_below = flux_above * area_above + S * volume;
+  const std::vector<size_t>& cell_edges = geo.cell_edges (cell);
+  const size_t cell_edges_size = cell_edges.size ();
+  size_t lowest_edge = edge_above;
+  double lowest_z = geo.cell_z (cell);
+  for (size_t i = 0; i < cell_edges_size; i++)
+    {
+      const size_t edge_below = cell_edges[i];
+      const int cell_below = geo.edge_other (edge_below, cell);
+      if (cell_below == Geometry::cell_below)
+        {
+          lowest_edge = cell_below;
+          break;
+        }
+      if (!geo.cell_is_internal (cell_below))
+        continue;
+      const double z = geo.cell_z (cell_below);
+      if (z < lowest_z)
+        {
+          lowest_z = z;
+          lowest_edge = edge_below;
+        }
+    }
+  daisy_assert (iszero (q_tertiary[lowest_edge]));
+  const double area_below = geo.edge_area (lowest_edge);
+  const double flux_below = volume_below / area_below;
+  pass_below (geo, S_matrix, S_drain, lowest_edge, cell, flux_below,
+              q_tertiary);
+}
+
 void
 TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil, 
                         const SoilHeat& soil_heat, const double dt, 
@@ -419,6 +464,16 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   // Make it official.
   soil_water.add_tertiary_sink (S_matrix);
   soil_water.drain (S_drain);
+
+  // Fake tertiary flux by mass balance ignoring tertiary storage.
+  for (size_t i = 0; i < edge_above_size; i++)
+    {
+      const size_t edge = edge_above[i];
+      const double flux_above = q_tertiary[edge];
+      pass_below (geo, S_matrix, S_drain, edge, Geometry::cell_above,
+                  flux_above, q_tertiary);
+    }
+  soil_water.set_tertiary_flux (q_tertiary);
 }
 
 void 

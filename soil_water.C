@@ -748,11 +748,11 @@ presummed to occupy the large pores, so it is h (Theta_sat - X_ice).");
   frame.declare ("q", "cm/h", Attribute::LogOnly, Attribute::SoilEdges,
                  "Matrix water flux (positive numbers mean upward).");  
   frame.declare ("q_p", "cm/h", Attribute::LogOnly, Attribute::SoilEdges,
-                 "Water flux in macro pores (positive numbers mean upward).");
-#if 1
+                 "Water flux in macro pores (positive numbers mean upward).\n\
+Only the surface flux is accurate for models with tertiary storage.\n\
+Use S_p instead, which is always accurate.");
   frame.declare ("K", "cm/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Hydraulic conductivity.");
-#endif
   frame.declare ("dt", "h", Attribute::LogOnly, "\
 Suggested timestep length (based on S_forward).\n\
 The absolute value is used, negative numbers indicate source based limits.");
