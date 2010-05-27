@@ -389,7 +389,7 @@ XYSourceFlux::XYSourceFlux (const BlockModel& al)
     dimension (al.name ("dimension", Attribute::Unknown ())),
     pos_dim (al.name ("pos_dim")),
     lex (al),
-    with_ (al.name ("with", "lines")),
+    with_ (al.name ("with", "linespoints")),
     style_ (al.integer ("style", -1)),
     title_ (al.name ("title", Attribute::Unknown ())),
     x_dimension_ ("UNINITIALIZED"),
@@ -445,8 +445,8 @@ Dimension for soil position.");
 
     LexerTable::load_syntax (frame);
     GnuplotUtil::load_style (frame, "\
-By default, data will be drawn with lines.", "\
-By default the specified 'z' or 'x' value.");
+By default, data will be drawn with linespoints.", "\
+By default the specified 'z' or 'x' value, time, and tag.");
   }
 } XYSourceFlux_syntax;
 
