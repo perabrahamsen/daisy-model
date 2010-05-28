@@ -401,7 +401,7 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C
-MODELS = xysource_flux.C \
+MODELS = xysource_xycombine.C xysource_flux.C \
 	gnuplot_soil.C reaction_sorption.C hydraulic_B_C_inverse.C \
 	program_osvaldo.C vegetation_permanent.C  litter.C drain_lateral.C \
 	hydraulic_MACRO.C program_cpedata.C \
@@ -522,7 +522,7 @@ SPECIALS = log_dlf.C reaction_colgen.C weather_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = lexer_flux.C lexer_soil.C iterative.C \
+OTHER = scope_xysources.C lexer_flux.C lexer_soil.C iterative.C \
 	water.C block_nested.C block_submodel.C block_top.C block_model.C \
 	value.C type.C model_derived.C model_logable.C model_framed.C \
 	printer.C printer_file.C filepos.C frame_submodel.C \
@@ -1478,6 +1478,9 @@ geometry${OBJ}: geometry.C geometry.h symbol.h attribute.h volume.h \
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
  model_framed.h model_logable.h model.h library.h frame_submodel.h \
  frame.h scope.h attribute.h frame_model.h assertion.h metalib.h
+scope_xysources${OBJ}: scope_xysources.C scope_xysources.h scope.h \
+ attribute.h symbol.h memutils.h xysource.h model.h treelog.h assertion.h \
+ mathlib.h
 lexer_flux${OBJ}: lexer_flux.C lexer_flux.h lexer_table.h block_model.h \
  block_nested.h block.h scope.h attribute.h symbol.h treelog.h \
  frame_model.h frame.h memutils.h geometry.h mathlib.h assertion.h
@@ -1634,6 +1637,10 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+xysource_xycombine${OBJ}: xysource_xycombine.C xysource.h model.h symbol.h \
+ block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
+ frame_model.h frame.h gnuplot_utils.h number.h scope_xysources.h \
+ memutils.h assertion.h librarian.h
 xysource_flux${OBJ}: xysource_flux.C xysource.h model.h symbol.h \
  gnuplot_utils.h lexer_flux.h lexer_table.h block_model.h block_nested.h \
  block.h scope.h attribute.h treelog.h frame_model.h frame.h memutils.h \

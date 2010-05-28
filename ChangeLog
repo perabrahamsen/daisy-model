@@ -1,3 +1,10 @@
+2010-05-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* xysource_xycombine.C: New model.
+	Makefile (MODELS): Add it.
+	* scope_xysources.h, scope_xysources.C: New utility.
+	* Makefile (OTHER): Add it.
+
 2010-05-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* xysource_flux.C: New model.

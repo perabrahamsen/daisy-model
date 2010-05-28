@@ -25,7 +25,6 @@
 #include "source.h"
 #include "treelog.h"
 #include "assertion.h"
-#include "memutils.h"
 #include <sstream>
 
 void 
