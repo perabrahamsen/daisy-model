@@ -56,6 +56,8 @@ public:
 
   // Propagate.
   bool load (const Units&, Treelog&);
+  void limit_range (double& xmin, double& xmax, 
+                    double& ymin, double& ymax) const;
   symbol with ();
 
   // Loop.

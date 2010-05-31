@@ -187,6 +187,19 @@ ScopeXYSources::with ()
 }
 
 void 
+ScopeXYSources::limit_range (double& xmin, double& xmax, 
+                             double& ymin, double& ymax) const
+{
+  double dummy_min = NAN;
+  double dummy_max = NAN;
+  for (size_t i = 0; i < source.size (); i++)
+    if (range_is_x ())
+      source[i]->limit (xmin, xmax, dummy_min, dummy_max);
+    else
+      source[i]->limit (dummy_min, dummy_max, ymin, ymax);
+}
+  
+void 
 ScopeXYSources::first ()
 { index = 0; }
 

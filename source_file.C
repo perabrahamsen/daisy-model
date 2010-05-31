@@ -109,6 +109,9 @@ SourceFile::load_style (Frame& frame,
 By default, data from dwf and dlf files will be\n\
 drawn with lines, and data from ddf files will be drawn with points.", 
                            default_title);
+  frame.declare_boolean ("accumulate", Attribute::Const, "\
+Accumulate values.");
+  frame.set ("accumulate", false);
   frame.declare_string ("handle", Attribute::Const, "\
 Determine how to handle multiple simultaniously.  Possible values are:\n\
 \n\

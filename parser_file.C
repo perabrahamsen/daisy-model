@@ -987,6 +987,9 @@ ParserFile::Implementation::load_list (Frame& frame)
 		      skip ("(");
 		    }
 		}
+              if (looking_at ('&'))
+                skip ("&old");
+              
               boost::shared_ptr<FrameSubmodel> child (&frame.submodel (name).clone ());
 	      load_list (*child);
 	      frame.set (name, child);

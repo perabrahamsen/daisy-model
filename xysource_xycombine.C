@@ -63,7 +63,8 @@ public:
 
   // Read. 
 public:
- bool load (const Units&, Treelog& msg);
+  bool load (const Units&, Treelog& msg);
+  void limit (double& xmin, double& xmax, double& ymin, double& ymax) const;
 
   // Create and Destroy.
 public:
@@ -132,6 +133,15 @@ XYSourceXYCombine::load (const Units& units, Treelog& msg)
   // Done.
   return true;
 }
+
+void 
+XYSourceXYCombine::limit (double& xmin, double& xmax,
+                          double& ymin, double& ymax) const
+{
+  XYSource::limit (xmin, xmax, ymin, ymax);
+  scope.limit_range (xmin, xmax, ymin, ymax);
+}
+
 
 XYSourceXYCombine::XYSourceXYCombine (const BlockModel& al)
   : XYSource (al),

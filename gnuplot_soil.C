@@ -53,6 +53,7 @@ struct GnuplotSoil : public GnuplotBase
   static type_t symbol2type (symbol);
   static symbol type2symbol (type_t);
   type_t type;
+  const int samples;
   symbol dimension;
   symbol tag;
   std::vector<double> zplus;
@@ -142,6 +143,7 @@ GnuplotSoil::initialize (const Units& units, Treelog& msg)
   // Read data.
   double closest = -42.42e42; // [h]
   
+  std::vector<std::string> closest_entries;
   while (lex.good ())
     {
       // Read entries.
@@ -156,12 +158,19 @@ GnuplotSoil::initialize (const Units& units, Treelog& msg)
       double distance = std::fabs (Time::hours_between (time, *when));
 
       if (closest < 0.0 || distance < closest)
-        if (lex.soil_cells (entries, value, msg))
+        {
           closest = distance;
+          closest_entries = entries;
+        }
     }
   if (closest < 0.0)
     {
       msg.error ("No data found");
+      return false;
+    }
+  if (!lex.soil_cells (closest_entries, value, msg))
+    {
+      msg.error ("Problem reading cell data");
       return false;
     }
 
@@ -206,15 +215,15 @@ set pm3d corners2color c4\n";
     case smooth:
       out << "\
 set pm3d map\n\
-set samples 50\n\
-set isosamples 50\n";
+set samples " << samples << "\n                  \
+set isosamples " << samples << "\n";
       break;
     case contour:
       out << "\
 set contour\n\
 set view map\n\
 unset surface\n\
-set cntrparam levels 5\n";
+set cntrparam levels " << samples << "\n";
       break;
     case surface:
       break;
@@ -380,6 +389,7 @@ GnuplotSoil::GnuplotSoil (const BlockModel& al)
     vmax (al.number ("max", NAN)),
     lex (al),
     type (symbol2type (al.name ("type"))),
+    samples (al.integer ("samples")),
     dimension (al.name ("dimension", Attribute::Unknown ())),
     tag (Attribute::Unknown ())
 { }
@@ -423,7 +433,9 @@ Valid options are 'block' and 'contour'.");
     frame.set ("type", "block");
     static VCheck::Enum type_check ("block", "smooth", "contour", "surface");
     frame.set_check ("type", type_check);
-
+    frame.declare_integer ("samples", Attribute::Const, "\
+Number of sample lines for the 'smooth' and 'contour' types.");
+    frame.set ("samples", 25);
     LexerSoil::load_syntax (frame);
     frame.declare_string ("dimension", Attribute::OptionalConst, "\
 Dimension for data.  By default, use dimension from file.");

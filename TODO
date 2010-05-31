@@ -1,14 +1,67 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Næste kørsler 
+* tilføj 2D grafer til vap-figs.tex
 
-** NW ref
+Vi har tre år: 
 
-** NE 8% Theta_res i B, 50% K_b i C
+For hvert år viser vi 
+
+12 x pF, 
+12 x M for hvert stof, 
+12 x C for hvert pesticid (lim 0.1 ug/l)
+
+1 x hor + 1 x ver for q+q_p og J+J_p for hvert stof
+
+For et år viser vi 1 x q_p 
+
+** Vand 
+
+*** 12 Theta
+
+*** 12 pF
+
+*** 12 v-flux
+
+*** 12 h-flux
+
+** Bromide 
+
+*** 12 M
+
+*** 12? v-flux
+
+*** 12? h-flux
+
+** Glyphosate 
+
+*** 12 M
+
+*** 12 C
+
+*** 12? v-flux
+
+*** 12? h-flux
+
+
+** Metamitron 
+
+*** 12? M
+
+*** 12? C
+
+*** 12? v-flux
+
+*** 12? h-flux
+
+* Kørsler 
+
+** NW Silstrup: ref
+
+** NE Silstrup: 8% Theta_res i B, 50% K_b i C
 
 ** SW ref med pref flow flux log
 
-** SE Estrup 1 måned
+** SE Silstrup: drain node
 
 * Prøv
 

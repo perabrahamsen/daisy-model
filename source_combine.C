@@ -138,6 +138,9 @@ static struct SourceCombineSyntax : public DeclareModel
     GnuplotUtil::load_style (frame, "\
 By default, let the first source decide.", "\
 By default the name of the 'expr' object.");
+    frame.declare_boolean ("accumulate", Attribute::Const, "\
+Accumulate values.");
+    frame.set ("accumulate", false);
     frame.declare_object ("source", Source::component, 
                        Attribute::State, Attribute::Variable, "\
 List of sources for data.  The style information for the sources is\n\

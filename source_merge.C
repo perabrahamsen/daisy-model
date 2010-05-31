@@ -220,6 +220,9 @@ same time.")
   { 
     GnuplotUtil::load_style (frame, "\
 By default, let the first source decide.", "");
+    frame.declare_boolean ("accumulate", Attribute::Const, "\
+Accumulate values.");
+    frame.set ("accumulate", false);
     frame.declare_object ("source", Source::component, 
                        Attribute::State, Attribute::Variable, "\
 List of timeseries to merge.");
