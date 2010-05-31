@@ -1,0 +1,57 @@
+(defgnuplot Estrup-pF soil
+  (declare station String "Name of station.")
+  (declare m Integer "Month to plot.")
+  (declare y Integer "Year to plot.")
+  (station Estrup)
+  (device "pdf size 8cm,6cm")
+  (extra &old
+         [set format x ""]
+         [set format y ""]
+         [set palette defined (0 "blue", 2 "white", 4.2 "red", 5.0 "black")]
+         [unset colorbox]
+         [unset xlabel]
+         [unset ylabel]
+         [set lmargin 0]
+         [set rmargin 0]
+         [set bmargin 0]
+         [set tmargin 0]
+         )
+  (when &old $y $m 28)
+  (where "fig/${station}-pF-${y}-${m}.pdf")
+  (title "${y}-${m}")
+  (file "log/${station}-pF.dlf")
+  (min 0 [pF])
+  (max 5 [pF]))
+
+(defgnuplot Estrup-pF-2000 multi
+  (graph (Estrup-pF (y 2000) (m 5))
+         (Estrup-pF (y 2000) (m 6))
+         (Estrup-pF (y 2000) (m 7))
+         (Estrup-pF (y 2000) (m 8))
+         (Estrup-pF (y 2000) (m 9))
+         (Estrup-pF (y 2000) (m 10))
+         (Estrup-pF (y 2000) (m 11))
+         (Estrup-pF (y 2000) (m 12))
+         (Estrup-pF (y 2001) (m 1))
+         (Estrup-pF (y 2001) (m 2))
+         (Estrup-pF (y 2001) (m 3))
+         (Estrup-pF (y 2001) (m 4))))
+
+(defgnuplot Estrup-pF-2001 multi
+  (graph (Estrup-pF (y 2001) (m 5))
+         (Estrup-pF (y 2001) (m 6))
+         (Estrup-pF (y 2001) (m 7))
+         (Estrup-pF (y 2001) (m 8))
+         (Estrup-pF (y 2001) (m 9))
+         (Estrup-pF (y 2001) (m 10))
+         (Estrup-pF (y 2001) (m 11))
+         (Estrup-pF (y 2001) (m 12))
+         (Estrup-pF (y 2002) (m 1))
+         (Estrup-pF (y 2002) (m 2))
+         (Estrup-pF (y 2002) (m 3))
+         (Estrup-pF (y 2002) (m 4))))
+
+(defprogram plot2d gnuplot
+  (graph Estrup-pF-2000 Estrup-pF-2001))
+
+(run plot2d)

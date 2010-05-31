@@ -1,0 +1,67 @@
+\documentclass[a4paper]{article}
+
+\usepackage[left=1cm,top=1cm,right=1cm,nohead,nofoot]{geometry}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[danish]{babel}
+\usepackage{natbib}
+\bibliographystyle{apalike}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{placeins}
+
+\newcommand{\figxyz}[1]{\includegraphics[trim=12mm 0mm 17mm 9mm,clip=true]{fig/#1}}
+
+\begin{document}
+
+\begin{figure}[htbp]\centering
+  
+  \begin{tabular}{ccc}
+    \figxyz{Estrup-pF-2000-5} & 
+    \figxyz{Estrup-pF-2000-6} & 
+    \figxyz{Estrup-pF-2000-7} \\
+    \figxyz{Estrup-pF-2000-8} & 
+    \figxyz{Estrup-pF-2000-9} & 
+    \figxyz{Estrup-pF-2000-10} \\
+    \figxyz{Estrup-pF-2000-11} & 
+    \figxyz{Estrup-pF-2000-12} & 
+    \figxyz{Estrup-pF-2001-1} \\
+    \figxyz{Estrup-pF-2001-2} & 
+    \figxyz{Estrup-pF-2001-3} & 
+    \figxyz{Estrup-pF-2001-4}
+  \end{tabular}
+  
+  \caption{Estrup soil potential at the end of each month since first
+    application of Bromide.  The z-axes is denote depth, the x axes
+    distance from drain.  There are tick marks for every meter.  Blue
+    denote saturation or near saturation (pF<0), white field capacity
+    (pF=2), and red wilting point (pF=4.2).}
+\label{fig:Estrup-pF-2000}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  
+  \begin{tabular}{ccc}
+    \figxyz{Estrup-pF-2001-5} & 
+    \figxyz{Estrup-pF-2001-6} & 
+    \figxyz{Estrup-pF-2001-7} \\
+    \figxyz{Estrup-pF-2001-8} & 
+    \figxyz{Estrup-pF-2001-9} & 
+    \figxyz{Estrup-pF-2001-10} \\
+    \figxyz{Estrup-pF-2001-11} & 
+    \figxyz{Estrup-pF-2001-12} & 
+    \figxyz{Estrup-pF-2002-1} \\
+    \figxyz{Estrup-pF-2002-2} & 
+    \figxyz{Estrup-pF-2002-3} & 
+    \figxyz{Estrup-pF-2002-4}
+  \end{tabular}
+  
+  \caption{Estrup soil potential at the end of each month second year
+    after application of Bromide.  The z-axes is denote depth, the x
+    axes distance from drain.  There are tick marks for every meter.
+    Blue denote saturation or near saturation (pF<0), white field
+    capacity (pF=2), and red wilting point (pF=4.2).}
+\label{fig:Estrup-pF-2000}
+\end{figure}
+
+\end{document}
