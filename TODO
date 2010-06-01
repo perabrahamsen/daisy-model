@@ -1,18 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* tilføj 2D grafer til vap-figs.tex
-
-Vi har tre år: 
-
-For hvert år viser vi 
-
-12 x pF, 
-12 x M for hvert stof, 
-12 x C for hvert pesticid (lim 0.1 ug/l)
-
-1 x hor + 1 x ver for q+q_p og J+J_p for hvert stof
-
-For et år viser vi 1 x q_p 
+* Handle::sum skal gange dimension med 'h'
 
 * Kørsler 
 

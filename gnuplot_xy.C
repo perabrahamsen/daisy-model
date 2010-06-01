@@ -210,6 +210,16 @@ set style data lines\n";
   if (y2max_flag)
     soft_y2max = y2max;
 
+  // Avouid empty range.
+  if (soft_xmax <= soft_xmin)
+    soft_xmax = soft_xmin + 1.0;
+  if (soft_x2max <= soft_x2min)
+    soft_x2max = soft_x2min + 1.0;
+  if (soft_ymax <= soft_ymin)
+    soft_ymax = soft_ymin + 1.0;
+  if (soft_y2max <= soft_y2min)
+    soft_y2max = soft_y2min + 1.0;
+
   // Legend.
   if (legend == "auto")
     {
@@ -258,71 +268,12 @@ set style data lines\n";
   out << "set key " << legend_table[legend] << "\n";
 
   // X range
-#if 0
-  out << "set xrange [";
-  if (xmin_flag)
-    out << xmin;
-  else
-    out << "*";
-  out << ":";
-  if (xmax_flag)
-    out << xmax;
-  else
-    out << "*";
-  out << "]\n";
-  if (x_dims.size () == 2)
-    {
-      out << "set x2range [";
-      if (x2min_flag)
-        out << x2min;
-      else
-        out << "*";
-      out << ":";
-      if (x2max_flag)
-        out << x2max;
-      else
-        out << "*";
-      out << "]\n";
-    }
-  else
-    out << "unset x2range\n";
-
-  // Y range
-  out << "set yrange [";
-  if (ymin_flag)
-    out << ymin;
-  else
-    out << "*";
-  out << ":";
-  if (ymax_flag)
-    out << ymax;
-  else
-    out << "*";
-  out << "]\n";
-  if (y_dims.size () == 2)
-    {
-      out << "set y2range [";
-      if (y2min_flag)
-        out << y2min;
-      else
-        out << "*";
-      out << ":";
-      if (y2max_flag)
-        out << y2max;
-      else
-        out << "*";
-      out << "]\n";
-    }
-  else
-    out << "unset y2range\n";
-#else
   out << "set xrange [" << soft_xmin << ":" << soft_xmax << "]\n";
   if (x_dims.size () == 2)
     out << "set x2range [" << soft_x2min << ":" << soft_x2max << "]\n";
   out << "set yrange [" << soft_ymin << ":" << soft_ymax << "]\n";
   if (y_dims.size () == 2)
     out << "set y2range [" << soft_y2min << ":" << soft_y2max << "]\n";
-#endif
 
   // Extra.
   for (size_t i = 0; i < extra.size (); i++)
