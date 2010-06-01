@@ -35,10 +35,12 @@
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
 
-class XYSourceFlux : public XYSource
+struct XYSourceFlux : public XYSource
 { 
   // Flux parameters.
   const boost::scoped_ptr<Time> when;
+  const boost::scoped_ptr<Time> begin;
+  const boost::scoped_ptr<Time> end;
   const double plot_z;
   const double plot_x;
   symbol dimension;
@@ -57,7 +59,6 @@ class XYSourceFlux : public XYSource
   double soil_right;
 
   // Interface.
-public:
   symbol title () const
   { return title_; }
   const std::vector<double>& x () const
@@ -74,18 +75,85 @@ public:
   { return y_dimension_; }
 
   // Read.
-public:
+  bool load_when (std::vector<double>& all_values, Treelog& msg);
+  bool load_interval (std::vector<double>& all_values, Treelog& msg);
   bool load (const Units&, Treelog& msg);
   void limit (double& xmin, double& xmax, double& ymin, double& ymax) const;
 
   // Create.
-public:
   explicit XYSourceFlux (const BlockModel&);
   ~XYSourceFlux ();
 };
 
 static bool approx2 (double a, double b)
 { return approximate (a, b); }
+
+bool
+XYSourceFlux::load_when (std::vector<double>& all_values, Treelog& msg)
+{
+  double closest = -42.42e42; // [h]
+  
+  while (lex.good ())
+    {
+      // Read entries.
+      std::vector<std::string> entries;
+      Time time (9999, 1, 1, 0);
+      // Read entries.
+      if (!lex.get_entries (entries))
+        continue;
+      if (!lex.get_time (entries, time, 8))
+        continue;
+
+      double distance = std::fabs (Time::hours_between (time, *when));
+
+      if (closest < 0.0 || distance < closest)
+        if (lex.flux_edges (entries, all_values, msg))
+          closest = distance;
+    }
+  if (closest < 0.0)
+    {
+      msg.error ("No date found");
+      return false;
+    }
+  return true;
+}
+
+bool
+XYSourceFlux::load_interval (std::vector<double>& all_values, Treelog& msg)
+{
+  while (lex.good ())
+    {
+      // Read entries.
+      std::vector<std::string> entries;
+      Time time (9999, 1, 1, 0);
+      // Read entries.
+      if (!lex.get_entries (entries))
+        continue;
+      if (!lex.get_time (entries, time, 8))
+        continue;
+      if (begin.get () && time < *begin)
+        continue;
+      if (end.get () && time > *end)
+        continue;
+
+      std::vector<double> values;
+      
+      if (!lex.flux_edges (entries, all_values, msg))
+        continue;
+      
+      if (all_values.size () < 1)
+        all_values = values;
+      else 
+        {
+          const size_t size = all_values.size ();
+          if (values.size () != size)
+            continue;
+          for (size_t i = 0; i < size; i++)
+            all_values[i] += values[i];
+        }
+    }
+  return all_values.size () > 0;
+}
 
 bool
 XYSourceFlux::load (const Units& units, Treelog& msg)
@@ -133,31 +201,12 @@ XYSourceFlux::load (const Units& units, Treelog& msg)
     }
 
   // Read data.
-  double closest = -42.42e42; // [h]
-  
   std::vector<double> all_values;
-  while (lex.good ())
-    {
-      // Read entries.
-      std::vector<std::string> entries;
-      Time time (9999, 1, 1, 0);
-      // Read entries.
-      if (!lex.get_entries (entries))
-        continue;
-      if (!lex.get_time (entries, time, 8))
-        continue;
 
-      double distance = std::fabs (Time::hours_between (time, *when));
-
-      if (closest < 0.0 || distance < closest)
-        if (lex.flux_edges (entries, all_values, msg))
-          closest = distance;
-    }
-  if (closest < 0.0)
-    {
-      msg.error ("No date found");
-      return false;
-    }
+  if (when.get ())
+    load_when (all_values, msg);
+  else
+    load_interval (all_values, msg);
 
   daisy_assert (all_values.size () == array_size);
 
@@ -321,7 +370,20 @@ XYSourceFlux::load (const Units& units, Treelog& msg)
       if (title_ == Attribute::Unknown ())
         {
           std::ostringstream tmp;
-          tmp << plot_x << " " << when->print () << " " << tag;
+          tmp << plot_x;
+          if (when.get ())
+            tmp << " " << when->print ();
+          else
+            {
+              tmp << "[";
+              if (begin.get ())
+                tmp << begin->print ();
+              tmp << ":";
+              if (end.get ())
+                tmp << end->print ();
+              tmp << "]";
+            }
+          tmp << " " << tag;
           title_ = tmp.str ();
         }
     }
@@ -383,7 +445,9 @@ XYSourceFlux::limit (double& xmin, double& xmax,
 
 XYSourceFlux::XYSourceFlux (const BlockModel& al)
   : XYSource (al),
-    when (submodel<Time> (al, "when")),
+    when (al.check ("when") ? submodel<Time> (al, "when") : NULL),
+    begin (al.check ("begin") ? submodel<Time> (al, "begin") : NULL),
+    end (al.check ("end") ? submodel<Time> (al, "end") : NULL),
     plot_z (al.number ("z", NAN)),
     plot_x (al.number ("x", NAN)),
     dimension (al.name ("dimension", Attribute::Unknown ())),
@@ -409,7 +473,8 @@ static struct XYSourceFluxSyntax : public DeclareModel
 
   XYSourceFluxSyntax ()
     : DeclareModel (XYSource::component, "flux", 
-                    "Read a daisy 2d log file, extract flux through line.")
+                    "Read a daisy 2d log file, extract flux through line.\n\
+Values between 'begin' and 'end' will be accumulated, unless 'when' is set.")
   { }
   static bool check_alist (const Metalib&, const Frame& al,
                            Treelog& msg)
@@ -421,14 +486,21 @@ static struct XYSourceFluxSyntax : public DeclareModel
         msg.error ("You must specify exactly one of 'x' and 'z'");
         ok = false;
       }
+    if (al.check ("when") && (al.check ("begin") || al.check ("end")))
+      msg.warning ("'when' overwrites 'begin' and 'end'");
+
     return ok;
 
   }
   void load_frame (Frame& frame) const
   { 
     frame.add_check (check_alist);
-    frame.declare_submodule ("when", Attribute::Const, "\
+    frame.declare_submodule ("when", Attribute::OptionalConst, "\
 Use value closest to this time.", Time::load_syntax);
+    frame.declare_submodule ("begin", Attribute::OptionalConst, "\
+Ignore values before this time.", Time::load_syntax);
+    frame.declare_submodule ("end", Attribute::OptionalConst, "\
+Ignore values after this time.", Time::load_syntax);
     frame.declare ("z", "cm", Check::non_positive (),
                    Attribute::OptionalConst, "\
 Plot flux through this depth.");

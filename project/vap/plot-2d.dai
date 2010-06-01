@@ -3,6 +3,9 @@
   (declare station String "Name of station.")
   (declare m Integer "Month to plot.")
   (declare y Integer "Year to plot.")
+
+  (declare base String "Location of simulation")
+  (base "/home/abraham/sim/sim-sw")
   (extra &old
          [set format x ""]
          [set format y ""]
@@ -26,7 +29,7 @@
   (extra &old
          [set palette defined (0 "blue", 2 "white", 4.2 "red", 5.0 "black")])
   (where "fig/${station}-pF-${y}-${m}.pdf")
-  (file "/home/abraham/sim/sim-sw/log/${station}-pF.dlf")
+  (file "${base}/log/${station}-pF.dlf")
   (min 0 [pF])
   (max 5 [pF]))
 
@@ -38,19 +41,19 @@
 
 (defgnuplot Estrup-2D-M-Bromide Estrup-2D-M
   (where "fig/${station}-M-Bromide-${y}-${m}.pdf")
-  (file "/home/abraham/sim/sim-sw/log/${station}-content-Bromide.dlf")
+  (file "${base}/log/${station}-content-Bromide.dlf")
   )
 
 (defgnuplot Estrup-2D-M-Glyphosate Estrup-2D-M
   (where "fig/${station}-M-Glyphosate-${y}-${m}.pdf")
-  (file "/home/abraham/sim/sim-sw/log/${station}-content-Glyphosate.dlf")
+  (file "${base}/log/${station}-content-Glyphosate.dlf")
   )
 
 (defgnuplot Estrup-2D-C Estrup-2D-M)
 
 (defgnuplot Estrup-2D-C-Glyphosate Estrup-2D-C
   (where "fig/${station}-C-Glyphosate-${y}-${m}.pdf")
-  (file "/home/abraham/sim/sim-sw/log/${station}-conc-Glyphosate.dlf")
+  (file "${base}/log/${station}-conc-Glyphosate.dlf")
   )
 
 (defgnuplot Estrup-2D-pF-2000 multi
@@ -123,11 +126,124 @@
          (Estrup-2D-C-Glyphosate (y 2001) (m 3))
          (Estrup-2D-C-Glyphosate (y 2001) (m 4))))
 
+(defgnuplot Silstrup-2D vap-2D
+  "Plot monthly 2D data for Silstrup."
+  (station Silstrup)
+  (device "pdf size 8cm,5cm"))
+
+(defgnuplot Silstrup-2D-pF Silstrup-2D
+  (extra &old
+         [set palette defined (0 "blue", 2 "white", 4.2 "red", 5.0 "black")])
+  (where "fig/${station}-pF-${y}-${m}.pdf")
+  (file "${base}/log/${station}-pF.dlf")
+  (min 0 [pF])
+  (max 5 [pF]))
+
+(defgnuplot Silstrup-2D-M Silstrup-2D
+  (extra &old [set palette defined (0 "white", 1e-2 "white", 1e0 "yellow", 1e2 "orange", 1e4 "red", 1e6 "black", 1e8 "black")])
+  (min 0 [ug/m^3])
+  (max 1e8 [ug/m^3])
+  )
+
+(defgnuplot Silstrup-2D-M-Bromide Silstrup-2D-M
+  (where "fig/${station}-M-Bromide-${y}-${m}.pdf")
+  (file "${base}/log/${station}-content-Bromide.dlf")
+  )
+
+(defgnuplot Silstrup-2D-M-Glyphosate Silstrup-2D-M
+  (where "fig/${station}-M-Glyphosate-${y}-${m}.pdf")
+  (file "${base}/log/${station}-content-Glyphosate.dlf")
+  )
+
+(defgnuplot Silstrup-2D-C Silstrup-2D-M)
+
+(defgnuplot Silstrup-2D-C-Glyphosate Silstrup-2D-C
+  (where "fig/${station}-C-Glyphosate-${y}-${m}.pdf")
+  (file "${base}/log/${station}-conc-Glyphosate.dlf")
+  )
+
+(defgnuplot Silstrup-2D-pF-2000 multi
+  (graph (Silstrup-2D-pF (y 2000) (m 5))
+         (Silstrup-2D-pF (y 2000) (m 6))
+         (Silstrup-2D-pF (y 2000) (m 7))
+         (Silstrup-2D-pF (y 2000) (m 8))
+         (Silstrup-2D-pF (y 2000) (m 9))
+         (Silstrup-2D-pF (y 2000) (m 10))
+         (Silstrup-2D-pF (y 2000) (m 11))
+         (Silstrup-2D-pF (y 2000) (m 12))
+         (Silstrup-2D-pF (y 2001) (m 1))
+         (Silstrup-2D-pF (y 2001) (m 2))
+         (Silstrup-2D-pF (y 2001) (m 3))
+         (Silstrup-2D-pF (y 2001) (m 4))))
+
+(defgnuplot Silstrup-2D-pF-2001 multi
+  (graph (Silstrup-2D-pF (y 2001) (m 5))
+         (Silstrup-2D-pF (y 2001) (m 6))
+         (Silstrup-2D-pF (y 2001) (m 7))
+         (Silstrup-2D-pF (y 2001) (m 8))
+         (Silstrup-2D-pF (y 2001) (m 9))
+         (Silstrup-2D-pF (y 2001) (m 10))
+         (Silstrup-2D-pF (y 2001) (m 11))
+         (Silstrup-2D-pF (y 2001) (m 12))
+         (Silstrup-2D-pF (y 2002) (m 1))
+         (Silstrup-2D-pF (y 2002) (m 2))))
+
+(defgnuplot Silstrup-2D-M-Bromide-2000 multi
+  (graph (Silstrup-2D-M-Bromide (y 2000) (m 5))
+         (Silstrup-2D-M-Bromide (y 2000) (m 6))
+         (Silstrup-2D-M-Bromide (y 2000) (m 7))
+         (Silstrup-2D-M-Bromide (y 2000) (m 8))
+         (Silstrup-2D-M-Bromide (y 2000) (m 9))
+         (Silstrup-2D-M-Bromide (y 2000) (m 10))
+         (Silstrup-2D-M-Bromide (y 2000) (m 11))
+         (Silstrup-2D-M-Bromide (y 2000) (m 12))
+         (Silstrup-2D-M-Bromide (y 2001) (m 1))
+         (Silstrup-2D-M-Bromide (y 2001) (m 2))
+         (Silstrup-2D-M-Bromide (y 2001) (m 3))
+         (Silstrup-2D-M-Bromide (y 2001) (m 4))))
+
+(defgnuplot Silstrup-2D-M-Glyphosate-2001 multi
+  (graph (Silstrup-2D-M-Glyphosate (y 2001) (m 5))
+         (Silstrup-2D-M-Glyphosate (y 2001) (m 6))
+         (Silstrup-2D-M-Glyphosate (y 2001) (m 7))
+         (Silstrup-2D-M-Glyphosate (y 2001) (m 8))
+         (Silstrup-2D-M-Glyphosate (y 2001) (m 9))
+         (Silstrup-2D-M-Glyphosate (y 2001) (m 10))
+         (Silstrup-2D-M-Glyphosate (y 2001) (m 11))
+         (Silstrup-2D-M-Glyphosate (y 2001) (m 12))
+         (Silstrup-2D-M-Glyphosate (y 2002) (m 1))
+         (Silstrup-2D-M-Glyphosate (y 2002) (m 2))))
+
+(defgnuplot Silstrup-2D-C-Glyphosate-2001 multi
+  (graph (Silstrup-2D-C-Glyphosate (y 2001) (m 5))
+         (Silstrup-2D-C-Glyphosate (y 2001) (m 6))
+         (Silstrup-2D-C-Glyphosate (y 2001) (m 7))
+         (Silstrup-2D-C-Glyphosate (y 2001) (m 8))
+         (Silstrup-2D-C-Glyphosate (y 2001) (m 9))
+         (Silstrup-2D-C-Glyphosate (y 2001) (m 10))
+         (Silstrup-2D-C-Glyphosate (y 2001) (m 11))
+         (Silstrup-2D-C-Glyphosate (y 2001) (m 12))
+         (Silstrup-2D-C-Glyphosate (y 2002) (m 1))
+         (Silstrup-2D-C-Glyphosate (y 2002) (m 2))))
+
+(defgnuplot plot2d-Estrup multi
+  (graph 
+   Estrup-2D-pF-2000 Estrup-2D-pF-2001
+   Estrup-2D-M-Bromide-2000 Estrup-2D-M-Glyphosate-2000
+   Estrup-2D-C-Glyphosate-2000
+   ))
+
+(defgnuplot plot2d-Silstrup multi
+  (graph 
+   Silstrup-2D-pF-2000 Silstrup-2D-pF-2001
+   ;;Silstrup-2D-M-Bromide-2000 Silstrup-2D-M-Glyphosate-2001
+   ;;Silstrup-2D-C-Glyphosate-2001
+   ))
+  
 (defprogram plot2d gnuplot
   (graph 
-   ;;Estrup-2D-pF-2000 Estrup-2D-pF-2001
-   ;;Estrup-2D-M-Bromide-2000 Estrup-2D-M-Glyphosate-2000
-   Estrup-2D-C-Glyphosate-2000
+   ;; plot2d-Estrup 
+   plot2d-Silstrup
    ))
 
 (run plot2d)
