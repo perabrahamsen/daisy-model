@@ -376,10 +376,41 @@ SoilWater::tick_after (const Geometry& geo,
   daisy_assert (Theta_primary_.size () == cell_size);
   daisy_assert (Theta_secondary_.size () == cell_size);
 
+  double z_low = geo.top ();
+  table_low = NAN;
+  double z_high = geo.bottom ();
+  table_high = NAN;
+
   for (size_t c = 0; c < cell_size; c++)
     {
+      // Groundwater table.
+      const double z = geo.cell_top (c);
+      const double h = h_[c];
+      const double table = z + h;
+      if (h < 0)
+        {
+          if (approximate (z, z_low))
+            {
+              if (!std::isnormal (table_low)
+                  || table < table_low)
+                table_low = table;
+            }
+          else if (z < z_low)
+            table_low = table;
+        }
+      else if (approximate (z, z_high))
+        {
+          if (!std::isnormal (table_high)
+              || table > table_high)
+            table_high = table;
+        }
+      else if (z > z_high)
+        table_high = table;
+
+      // Conductivity.
       K_cell_[c] = soil.K (c, h_[c], h_ice_[c], soil_heat.T (c));
       
+      // Primary and secondary water.
       const double h_lim = soil.h_secondary (c);
       if (h_lim >= 0.0 || h_[c] <= h_lim)
         {
@@ -603,6 +634,10 @@ SoilWater::output (Log& log) const
       output_value (sink_dt, "dt", log);
       output_variable (sink_cell, log);
     }
+  if (std::isnormal (table_low))
+    output_variable (table_low, log);
+  if (std::isnormal (table_high))
+    output_variable (table_high, log);
 }
 
 double
@@ -758,6 +793,14 @@ Suggested timestep length (based on S_forward).\n\
 The absolute value is used, negative numbers indicate source based limits.");
   frame.declare_integer ("sink_cell", Attribute::LogOnly, "\
 Cell with largest forward sink compared to available water.");
+  frame.declare ("table_low", "cm", Attribute::LogOnly, "\
+Groundwater table estimated by presure in lowest unsaturated cell.\n\
+If there are multiple unsaturated cells in the same depth, the one\n\
+with the lowest pressure will be used.");
+  frame.declare ("table_high", "cm", Attribute::LogOnly, "\
+Groundwater table estimated by presure in highest saturated cell.\n\
+If there are multiple saturated cells in the same depth, the one\n\
+with the highest pressure will be used.");
 }
 
 void
@@ -894,7 +937,9 @@ SoilWater::SoilWater (const Block& al)
     max_sink_change (al.number ("max_sink_change")),
     S_permanent_ (al.number_sequence ("S_permanent")),
     sink_dt (NAN),
-    sink_cell (Geometry::cell_error)
+    sink_cell (Geometry::cell_error),
+    table_low (NAN),
+    table_high (NAN)
 { }
 
 SoilWater::~SoilWater ()

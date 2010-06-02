@@ -81,10 +81,8 @@ DrainLateral::tick (const Geometry& geo, const Soil& soil,
   fill (S.begin (), S.end (), 0.0);
   
   // Find groundwater height.
-  const double h_surface = surface.ponding_average () * 0.1;
-
   const double old_height = height;
-  height = 1.0;
+  height = surface.ponding_average () * 0.1;
   double lowest = 0.0;
   for (size_t i = 0; i < cell_size; i++)
     {
@@ -110,8 +108,6 @@ DrainLateral::tick (const Geometry& geo, const Soil& soil,
           height = z + h;
         }
     }    
-  if (height > 0.0)
-    height = h_surface;
 
   // Find sink term.
   EqDrnFlow = EquilibriumDrainFlow (geo, soil, soil_heat);   

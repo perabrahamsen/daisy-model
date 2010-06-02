@@ -7,7 +7,7 @@
 ;; 2D sims
 
 ;;(run batch (run Estrup-2D Silstrup-2D plotall))
-(run batch (run Silstrup-2D (plotall (graph Silstrup))))
+;;(run batch (run Silstrup-2D (plotall (graph Silstrup))))
 
 ;;(run batch (run (Silstrup-2D (column (Silstrup-2D-MACRO (Chemistry multi (combine Bromide))))) (plotall (graph Silstrup))))
 
@@ -26,6 +26,7 @@
 
 ;;(run batch (run plotall))
 ;; (run batch (run (plotall (graph Silstrup))))
+(run batch (run (plotall (graph plot2d-pF-all))))
 ;;(run plothydro)
 
 ;;; vap.dai ends here.

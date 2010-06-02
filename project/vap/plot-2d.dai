@@ -32,7 +32,7 @@
 
 (defgnuplot Estrup-2D-pF Estrup-2D
   (extra &old
-         [set palette defined (0 "blue", 2 "white", 4.2 "red", 5.0 "black")])
+         [set palette defined (0 "blue", 1 "white", 2 "yellow", 3 "orange", 4 "red", 5.0 "black")])
   (where "fig/${station}-pF-${y}-${m}.pdf")
   (file "${base}/log/${station}-pF.dlf")
   (min 0 [pF])
@@ -152,7 +152,7 @@
 
 (defgnuplot Silstrup-2D-pF Silstrup-2D
   (extra &old
-         [set palette defined (0 "blue", 2 "white", 4.2 "red", 5.0 "black")])
+         [set palette defined (0 "blue", 1 "white", 2 "yellow", 3 "orange", 4 "red", 5.0 "black")])
   (where "fig/${station}-pF-${y}-${m}.pdf")
   (file "${base}/log/${station}-pF.dlf")
   (min 0 [pF])
@@ -271,6 +271,10 @@
    Silstrup-2D-M-Glyphosate-2001 Silstrup-2D-C-Glyphosate-2001
    ))
   
+(defgnuplot plot2d-pF-all base
+  (graph Estrup-2D-pF-2000 Estrup-2D-pF-2001
+         Silstrup-2D-pF-2000 Silstrup-2D-pF-2001))
+
 (defgnuplot vap-xy xy
   (device "pdf size 15cm,10cm"))
 
@@ -366,8 +370,6 @@
   (y2 2002))
 
 (defxysource vap-flow flux
-  (declare base String "Location of simulation")
-  (base "/home/abraham/sim/sim-sw")
 
   (dimension "${dim}")
   (declare pos Number [cm] "Position.")
@@ -510,6 +512,15 @@
    plot2d-flow-Silstrup-Glyphosate-2001
    plot2d-flow-Silstrup-Metamitron-2000
    plot2d-flow-Silstrup-Metamitron-2001))
+
+(defgnuplot plot2d-block base
+  (graph plot2d-block-Estrup plot2d-block-Silstrup))
+
+(defgnuplot plot2d-flux-all base
+  (graph plot2d-flux-Estrup-2000
+         plot2d-flux-Estrup-2001
+         plot2d-flux-Silstrup-2000
+         plot2d-flux-Silstrup-2001))
 
 (defgnuplot plot2d-Estrup base
   (graph plot2d-block-Estrup plot2d-flux-Estrup))

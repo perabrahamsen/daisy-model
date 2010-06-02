@@ -75,6 +75,8 @@ private:
   std::vector<double> K_edge_;
   double sink_dt;
   int sink_cell;
+  double table_low;
+  double table_high;
 
   // Sink.
 public:

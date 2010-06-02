@@ -1,5 +1,7 @@
 2010-06-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* drain_lateral.C (tick): Simplify.
+
 	* select.C (initialize): Multiply spec_dim with 'h' when using
 	Handle::sum.
 	* summary.h, summary_simple.C, summary_balance.C: Adjust.
