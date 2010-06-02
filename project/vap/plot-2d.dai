@@ -1,11 +1,11 @@
+;; plot-2d.dai -- Plot 2D daisy from PLAP areas.
+
 (defgnuplot vap-2D soil
   "Plot soil content specific month."
   (declare station String "Name of station.")
   (declare m Integer "Month to plot.")
   (declare y Integer "Year to plot.")
 
-  (declare base String "Location of simulation")
-  (base "/home/abraham/sim/sim-sw")
   (extra &old
          [set format x ""]
          [set format y ""]
@@ -19,6 +19,11 @@
          )
   (title "${y}-${m}")
   (when &old $y $m 28))
+
+(defgnuplot base multi
+  (declare base String "Location of simulation")
+  ;; (base "/home/abraham/sim/sim-sw")
+  (base "."))
 
 (defgnuplot Estrup-2D vap-2D
   "Plot monthly 2D data for Estrup."
@@ -56,7 +61,7 @@
   (file "${base}/log/${station}-conc-Glyphosate.dlf")
   )
 
-(defgnuplot Estrup-2D-pF-2000 multi
+(defgnuplot Estrup-2D-pF-2000 base
   (graph (Estrup-2D-pF (y 2000) (m 5))
          (Estrup-2D-pF (y 2000) (m 6))
          (Estrup-2D-pF (y 2000) (m 7))
@@ -70,7 +75,7 @@
          (Estrup-2D-pF (y 2001) (m 3))
          (Estrup-2D-pF (y 2001) (m 4))))
 
-(defgnuplot Estrup-2D-pF-2001 multi
+(defgnuplot Estrup-2D-pF-2001 base
   (graph (Estrup-2D-pF (y 2001) (m 5))
          (Estrup-2D-pF (y 2001) (m 6))
          (Estrup-2D-pF (y 2001) (m 7))
@@ -84,7 +89,7 @@
          (Estrup-2D-pF (y 2002) (m 3))
          (Estrup-2D-pF (y 2002) (m 4))))
 
-(defgnuplot Estrup-2D-M-Bromide-2000 multi
+(defgnuplot Estrup-2D-M-Bromide-2000 base
   (graph (Estrup-2D-M-Bromide (y 2000) (m 5))
          (Estrup-2D-M-Bromide (y 2000) (m 6))
          (Estrup-2D-M-Bromide (y 2000) (m 7))
@@ -98,7 +103,7 @@
          (Estrup-2D-M-Bromide (y 2001) (m 3))
          (Estrup-2D-M-Bromide (y 2001) (m 4))))
 
-(defgnuplot Estrup-2D-M-Bromide-2001 multi
+(defgnuplot Estrup-2D-M-Bromide-2001 base
   (graph (Estrup-2D-M-Bromide (y 2001) (m 5))
          (Estrup-2D-M-Bromide (y 2001) (m 6))
          (Estrup-2D-M-Bromide (y 2001) (m 7))
@@ -112,7 +117,7 @@
          (Estrup-2D-M-Bromide (y 2002) (m 3))
          (Estrup-2D-M-Bromide (y 2002) (m 4))))
 
-(defgnuplot Estrup-2D-M-Glyphosate-2000 multi
+(defgnuplot Estrup-2D-M-Glyphosate-2000 base
   (graph (Estrup-2D-M-Glyphosate (y 2000) (m 5))
          (Estrup-2D-M-Glyphosate (y 2000) (m 6))
          (Estrup-2D-M-Glyphosate (y 2000) (m 7))
@@ -126,7 +131,7 @@
          (Estrup-2D-M-Glyphosate (y 2001) (m 3))
          (Estrup-2D-M-Glyphosate (y 2001) (m 4))))
 
-(defgnuplot Estrup-2D-C-Glyphosate-2000 multi
+(defgnuplot Estrup-2D-C-Glyphosate-2000 base
   (graph (Estrup-2D-C-Glyphosate (y 2000) (m 5))
          (Estrup-2D-C-Glyphosate (y 2000) (m 6))
          (Estrup-2D-C-Glyphosate (y 2000) (m 7))
@@ -176,7 +181,7 @@
   (file "${base}/log/${station}-conc-Glyphosate.dlf")
   )
 
-(defgnuplot Silstrup-2D-pF-2000 multi
+(defgnuplot Silstrup-2D-pF-2000 base
   (graph (Silstrup-2D-pF (y 2000) (m 5))
          (Silstrup-2D-pF (y 2000) (m 6))
          (Silstrup-2D-pF (y 2000) (m 7))
@@ -190,7 +195,7 @@
          (Silstrup-2D-pF (y 2001) (m 3))
          (Silstrup-2D-pF (y 2001) (m 4))))
 
-(defgnuplot Silstrup-2D-pF-2001 multi
+(defgnuplot Silstrup-2D-pF-2001 base
   (graph (Silstrup-2D-pF (y 2001) (m 5))
          (Silstrup-2D-pF (y 2001) (m 6))
          (Silstrup-2D-pF (y 2001) (m 7))
@@ -202,7 +207,7 @@
          (Silstrup-2D-pF (y 2002) (m 1))
          (Silstrup-2D-pF (y 2002) (m 2))))
 
-(defgnuplot Silstrup-2D-M-Bromide-2000 multi
+(defgnuplot Silstrup-2D-M-Bromide-2000 base
   (graph (Silstrup-2D-M-Bromide (y 2000) (m 5))
          (Silstrup-2D-M-Bromide (y 2000) (m 6))
          (Silstrup-2D-M-Bromide (y 2000) (m 7))
@@ -216,7 +221,7 @@
          (Silstrup-2D-M-Bromide (y 2001) (m 3))
          (Silstrup-2D-M-Bromide (y 2001) (m 4))))
 
-(defgnuplot Silstrup-2D-M-Bromide-2001 multi
+(defgnuplot Silstrup-2D-M-Bromide-2001 base
   (graph (Silstrup-2D-M-Bromide (y 2001) (m 5))
          (Silstrup-2D-M-Bromide (y 2001) (m 6))
          (Silstrup-2D-M-Bromide (y 2001) (m 7))
@@ -228,7 +233,7 @@
          (Silstrup-2D-M-Bromide (y 2002) (m 1))
          (Silstrup-2D-M-Bromide (y 2002) (m 2))))
 
-(defgnuplot Silstrup-2D-M-Glyphosate-2001 multi
+(defgnuplot Silstrup-2D-M-Glyphosate-2001 base
   (graph (Silstrup-2D-M-Glyphosate (y 2001) (m 5))
          (Silstrup-2D-M-Glyphosate (y 2001) (m 6))
          (Silstrup-2D-M-Glyphosate (y 2001) (m 7))
@@ -240,7 +245,7 @@
          (Silstrup-2D-M-Glyphosate (y 2002) (m 1))
          (Silstrup-2D-M-Glyphosate (y 2002) (m 2))))
 
-(defgnuplot Silstrup-2D-C-Glyphosate-2001 multi
+(defgnuplot Silstrup-2D-C-Glyphosate-2001 base
   (graph (Silstrup-2D-C-Glyphosate (y 2001) (m 5))
          (Silstrup-2D-C-Glyphosate (y 2001) (m 6))
          (Silstrup-2D-C-Glyphosate (y 2001) (m 7))
@@ -252,14 +257,14 @@
          (Silstrup-2D-C-Glyphosate (y 2002) (m 1))
          (Silstrup-2D-C-Glyphosate (y 2002) (m 2))))
 
-(defgnuplot plot2d-Estrup multi
+(defgnuplot plot2d-block-Estrup base
   (graph 
    Estrup-2D-pF-2000 Estrup-2D-pF-2001
    Estrup-2D-M-Bromide-2000 Estrup-2D-M-Bromide-2001
    Estrup-2D-M-Glyphosate-2000 Estrup-2D-C-Glyphosate-2000
    ))
 
-(defgnuplot plot2d-Silstrup multi
+(defgnuplot plot2d-block-Silstrup base
   (graph 
    Silstrup-2D-pF-2000 Silstrup-2D-pF-2001
    Silstrup-2D-M-Bromide-2000 Silstrup-2D-M-Bromide-2001
@@ -270,9 +275,6 @@
   (device "pdf size 15cm,10cm"))
 
 (defxysource vap-flux flux
-  (declare base String "Location of simulation")
-  (base "/home/abraham/sim/sim-sw")
-
   (timestep m)
   (declare pos Number [cm] "Position.")
   (title "${pos}")
@@ -326,8 +328,6 @@
           (flux-b (pos -50 [cm])) 
           (flux-b (pos -100 [cm]))))
 
-(defunit [mm/m] base)
-
 (defgnuplot flux-combined vap-xy
   (where "fig/${station}-water-${y}.pdf")
   ;;(title "Vertical flux")
@@ -339,7 +339,7 @@
           (flux-z (pos -200 [cm]))
          ))
 
-(defgnuplot plot2d-flux multi
+(defgnuplot plot2d-flux base
   (declare station String "Name of station.")
   (declare y Integer "Year to plot.")
   (declare y2 Integer "Next year.")
@@ -433,7 +433,7 @@
           (flow-z (pos -200 [cm]))
          ))
 
-(defgnuplot plot2d-flow multi
+(defgnuplot plot2d-flow base
   (declare station String "Name of station.")
   (declare chemical String "Name of chemical.")
   (declare dim String "Dimension for mass.")
@@ -493,22 +493,36 @@
   (dim [mg/ha])
   (chemical Metamitron))
 
-(defprogram plot2d gnuplot
+(defgnuplot plot2d-flux-Estrup base
   (graph 
-   ;;plot2d-Estrup 
-   ;; plot2d-Silstrup
    plot2d-flux-Estrup-2000
    plot2d-flux-Estrup-2001
-   plot2d-flux-Silstrup-2000
-   plot2d-flux-Silstrup-2001
    plot2d-flow-Estrup-Bromide-2000
    plot2d-flow-Estrup-Bromide-2001
+   plot2d-flow-Estrup-Glyphosate-2000))
+  
+(defgnuplot plot2d-flux-Silstrup base
+  (graph 
+   plot2d-flux-Silstrup-2000
+   plot2d-flux-Silstrup-2001
    plot2d-flow-Silstrup-Bromide-2000
    plot2d-flow-Silstrup-Bromide-2001
-   plot2d-flow-Estrup-Glyphosate-2000
    plot2d-flow-Silstrup-Glyphosate-2001
    plot2d-flow-Silstrup-Metamitron-2000
-   plot2d-flow-Silstrup-Metamitron-2001
-   ))
+   plot2d-flow-Silstrup-Metamitron-2001))
 
-(run plot2d)
+(defgnuplot plot2d-Estrup base
+  (graph plot2d-block-Estrup plot2d-flux-Estrup))
+
+(defgnuplot plot2d-Silstrup base
+  (graph plot2d-block-Silstrup plot2d-flux-Silstrup))
+
+(defgnuplot plot2d base
+  (graph plot2d-Estrup plot2d-Silstrup))
+
+(defprogram plot2d gnuplot 
+  (graph plot2d))
+
+;; (run plot2d)
+
+;; plot-2d.dai ends here.

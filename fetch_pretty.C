@@ -27,24 +27,6 @@
 #include "mathlib.h"
 #include <ostream>
 
-double
-FetchPretty::period_factor (const symbol period, const int hours)
-{ 
-  if (period == "")
-    return 1.0;
-  if (period == "y")
-    return 365.2425 * 24.0 / hours;
-  if (period == "m")
-    return 30.0 * 24.0 / hours;
-  if (period == "w")
-    return 7.0 * 24.0 / hours;
-  if (period == "d")
-    return 24.0 / hours;
-  if (period == "h")
-    return 1.0 / hours;
-  return -42.42e42;
-}
-    
 int 
 FetchPretty::width (const double value)
 {
@@ -71,8 +53,7 @@ FetchPretty::name_size () const
 }
 
 int 
-FetchPretty::value_size (double& total, const symbol period, 
-                         const int hours) const
+FetchPretty::value_size (double& total) const
 {
   double value = 0.0;
   switch (type)
@@ -84,7 +65,7 @@ FetchPretty::value_size (double& total, const symbol period,
       value = (last - initial) * factor;
       break;
     case Flux:
-      value = sum * factor * period_factor (period, hours);
+      value = sum * factor;
       break;
     }
   total += value;
@@ -92,8 +73,7 @@ FetchPretty::value_size (double& total, const symbol period,
 }
 
 void 
-FetchPretty::summarize (std::ostream& out, const int width, 
-                        const symbol period, const int hours) const
+FetchPretty::summarize (std::ostream& out, const int width) const
 {
   if (type == Content && add_delta)
     out << "delta ";
@@ -115,7 +95,7 @@ FetchPretty::summarize (std::ostream& out, const int width,
       break;
     case Flux:
       {
-        const double value = sum * factor * period_factor (period, hours);
+        const double value = sum * factor;
         out << value;
       }
       break;
@@ -123,7 +103,7 @@ FetchPretty::summarize (std::ostream& out, const int width,
       out << "bogus data";
       break;
     }
-  out << " " << "[" << dimension (period) << "]\n";
+  out << " " << "[" << dimension () << "]\n";
 }
 
 void

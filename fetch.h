@@ -58,7 +58,7 @@ private:
 
   // Use.
 public:
-  symbol dimension (const symbol period) const;
+  symbol dimension () const;
 
   // Create and Destroy.
 public:

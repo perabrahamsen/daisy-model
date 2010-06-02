@@ -603,7 +603,11 @@ Select::initialize (const Units& units, const Volume&,
 { 
   symbol spec_dim;
   if (impl->spec.get ())
-    spec_dim = default_dimension (impl->spec->dimension ());
+    {
+      spec_dim = default_dimension (impl->spec->dimension ());
+      if (handle == Handle::sum)
+        spec_dim = Units::multiply (spec_dim, Units::h ());
+    }
   else
     spec_dim = Attribute::Unknown ();
 
@@ -635,31 +639,22 @@ Select::initialize (const Units& units, const Volume&,
 
   // Replace '&' with timestep.
   std::string new_dim;
-  std::string hour_dim;
   const std::string impl_dim = impl->dimension.name ();
   for (unsigned int i = 0; i < impl_dim.length (); i++)
     if (impl_dim[i] == '&')
-      {
-        new_dim += timestep.name ();
-        hour_dim += "h";
-      }
+      new_dim += timestep.name ();
     else
-      {
-        new_dim += impl_dim[i];
-        hour_dim += impl_dim[i];
-      }
+      new_dim += impl_dim[i];
 
   // Attempt to find convertion with new dimension.
   if (impl->spec.get () && !impl->spec_conv)
     {
-      // We must convert to hour_dim instead of new_dim, as the code
-      // already accumulate the values.
-      if (units.can_convert (spec_dim, hour_dim))
-        impl->spec_conv = &units.get_convertion (spec_dim, hour_dim);
+      if (units.can_convert (spec_dim, new_dim))
+        impl->spec_conv = &units.get_convertion (spec_dim, new_dim);
     }
 
   // Use new dimension.
-  impl->dimension = symbol (new_dim);
+  impl->dimension = new_dim;
 
   return true;
 }

@@ -52,7 +52,7 @@ struct SummarySimple : public Summary
   void initialize (std::vector<Select*>&, Treelog&);
   explicit SummarySimple (const BlockModel&);
   ~SummarySimple ();
-  void summarize (int hours, Treelog&) const;
+  void summarize (Treelog&) const;
 };
 
 const symbol SummarySimple::default_description ("\
@@ -85,7 +85,7 @@ SummarySimple::~SummarySimple ()
 { sequence_delete (fetch.begin (), fetch.end ()); }
 
 void 
-SummarySimple::summarize (const int hours, Treelog& msg) const
+SummarySimple::summarize (Treelog& msg) const
 {
   Treelog::Open nest (msg, title);
   std::ostringstream tmp;
@@ -101,24 +101,23 @@ SummarySimple::summarize (const int hours, Treelog& msg) const
     max_size = std::max (max_size, fetch[i]->name_size ());
   int max_digits = 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
-    max_digits = std::max (max_digits, fetch[i]->value_size (total, period, hours));
+    max_digits = std::max (max_digits, fetch[i]->value_size (total));
   max_digits = std::max (max_digits, FetchPretty::width (total));
   const int width = max_digits + (precision > 0 ? 1 : 0) + precision;
   size_t dim_size = 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
-    dim_size 
-      = std::max (dim_size, fetch[i]->dimension (period).name ().size ());
+    dim_size = std::max (dim_size, fetch[i]->dimension ().name ().size ());
   symbol last_dim;
   bool same_dim = true;
   for (unsigned int i = 0; i < fetch.size (); i++)
     {
       if (i == 0)
-	last_dim = fetch[i]->dimension (period);
-      else if (same_dim && fetch[i]->dimension (period) != last_dim)
+	last_dim = fetch[i]->dimension ();
+      else if (same_dim && fetch[i]->dimension () != last_dim)
 	same_dim = false;
 	
       tmp << std::string (max_size - fetch[i]->name_size (), ' ');
-      fetch[i]->summarize (tmp, width, period, hours);
+      fetch[i]->summarize (tmp, width);
     }
   if (print_sum)
   {

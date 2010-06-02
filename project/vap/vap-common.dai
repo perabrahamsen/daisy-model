@@ -9,6 +9,7 @@
 ;;(input file "colloid-bound-slow.dai")
 (input file "colloid-bound.dai")
 (input file "biopores.dai")
+(input file "plot-2d.dai")
 
 ;; Soil 
 
@@ -120,7 +121,7 @@
                               trace Bromide J_matrix)
                         (spec chemical default J_matrix)
                         (to -150 [cm])
-                        (handle current)
+                        (handle average)
                         (negate true)
                         (tag "Bromide leak 150")
                         (dimension "g/ha/&"))
@@ -128,7 +129,7 @@
                               trace Dimethoate J_matrix)
                         (to -150 [cm])
                         (spec chemical default J_matrix)
-                        (handle current)
+                        (handle average)
                         (negate true)
                         (tag "Dimethoate leak 150")
                         (dimension "ug/ha/&"))
@@ -136,7 +137,7 @@
                               trace Fenpropimorph J_matrix)
                         (to -150 [cm])
                         (spec chemical default J_matrix)
-                        (handle current)
+                        (handle average)
                         (negate true)
                         (tag "Fenpropimorph leak 150")
                         (dimension "ug/ha/&"))
@@ -144,7 +145,7 @@
                               trace Glyphosate J_matrix)
                         (to -150 [cm])
                         (spec chemical default J_matrix)
-                        (handle current)
+                        (handle average)
                         (negate true)
                         (tag "Glyphosate leak 150")
                         (dimension "ug/ha/&"))
@@ -729,6 +730,7 @@
 (defprogram plotall gnuplot
   (graph Silstrup
          Estrup
+         plot2d
          ))
          
 ;;; vap-common.dai ends here.

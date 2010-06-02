@@ -185,9 +185,8 @@ LogTable::summarize (Treelog& msg)
           tmp << "\n" << parameters[i].first << ": " << parameters[i].second;
 
       msg.message (tmp.str ());
-      const Timestep step = end - begin;
       for (size_t i = 0; i < summary.size (); i++)
-        summary[i]->summarize (Time::hours_between (begin, end), msg);
+        summary[i]->summarize (msg);
     }
 }
 

@@ -39,7 +39,6 @@ struct SummaryBalance : public Summary
   const symbol description;
   const symbol file;
   const symbol title;
-  const symbol period;
 
   // Content.
   const int precision;
@@ -70,14 +69,14 @@ struct SummaryBalance : public Summary
   explicit SummaryBalance (const BlockModel&);
   bool in_list (size_t i, const std::vector<symbol>& names) const;
   double find_total (const std::vector<symbol>& names, 
-                     int& max_digits, int hours) const;
+                     int& max_digits) const;
   symbol print_entries (std::ostream& out, const std::vector<symbol>& names, 
-                        int max_size, int width, int hours) const;
+                        int max_size, int width) const;
   void print_balance (std::ostream& out,
                       const symbol title, double total, symbol dim,
                       int dim_size, int max_size,
                       int width) const;
-  void summarize (int hours, Treelog&) const;
+  void summarize (Treelog&) const;
 };
 
 const char *const SummaryBalance::default_description  = "\
@@ -99,7 +98,6 @@ SummaryBalance::SummaryBalance (const BlockModel& al)
     description (al.frame ().description ()),
     file (al.name ("where", "")),
     title (al.check ("title") ? al.name ("title") : name),
-    period (al.check ("period") ? al.name ("period") : symbol ("")),
     precision (al.integer ("precision")),
     require_top (al.flag ("require_top")),
     input (al.name_sequence ("input")),
@@ -114,20 +112,18 @@ SummaryBalance::in_list (size_t i, const std::vector<symbol>& names) const
 
 double
 SummaryBalance::find_total (const std::vector<symbol>& names, 
-                            int& max_digits, int hours) const
+                            int& max_digits) const
 {
   double total = 0.0;
   for (size_t i = 0; i < fetch.size (); i++)
     if (in_list (i, names))
-      max_digits = std::max (max_digits, 
-                             fetch[i]->value_size (total, period, hours));
+      max_digits = std::max (max_digits, fetch[i]->value_size (total));
   return total;
 }
 
 symbol
 SummaryBalance::print_entries (std::ostream& out, const std::vector<symbol>& names, 
-                               const int max_size, const int width, 
-                               const int hours) const
+                               const int max_size, const int width) const
 {
   symbol dim = Attribute::User ();
   for (unsigned int i = 0; i < fetch.size (); i++)
@@ -136,12 +132,12 @@ SummaryBalance::print_entries (std::ostream& out, const std::vector<symbol>& nam
         continue;
           
       if (dim == Attribute::User ())
-        dim = fetch[i]->dimension (period);
-      else if (fetch[i]->dimension (period) != dim)
+        dim = fetch[i]->dimension ();
+      else if (fetch[i]->dimension () != dim)
         dim = Attribute::Unknown ();
 
       out << std::string (max_size - fetch[i]->name_size (), ' ');
-      fetch[i]->summarize (out, width, period, hours);
+      fetch[i]->summarize (out, width);
     }
   return dim;
 }
@@ -163,7 +159,7 @@ SummaryBalance::print_balance (std::ostream& out,
 }
 
 void 
-SummaryBalance::summarize (const int hours, Treelog& msg) const
+SummaryBalance::summarize (Treelog& msg) const
 {
   Treelog::Open nest (msg, title);
 
@@ -183,9 +179,9 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
 
   // Find width and total values
   int max_digits = 0;
-  const double total_input = find_total (input, max_digits, hours);
-  const double total_output = find_total (output, max_digits, hours);
-  const double total_content = find_total (content, max_digits, hours);
+  const double total_input = find_total (input, max_digits);
+  const double total_output = find_total (output, max_digits);
+  const double total_content = find_total (content, max_digits);
   const double total = total_input - total_output - total_content;
   max_digits = std::max (max_digits, FetchPretty::width (total_input));
   max_digits = std::max (max_digits, FetchPretty::width (total_output));
@@ -198,14 +194,13 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
   // Find width of dimensions.
   size_t dim_size = 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
-    dim_size = std::max (dim_size, 
-                         fetch[i]->dimension (period).name ().size ());
+    dim_size = std::max (dim_size, fetch[i]->dimension ().name ().size ());
 
   // Print all entries.
   symbol shared_dim = Attribute::User ();
   if (input.size () > 0)
     {
-      const symbol dim = print_entries (tmp, input, max_size, width, hours);
+      const symbol dim = print_entries (tmp, input, max_size, width);
       print_balance (tmp, "Total input", total_input, dim,
                      dim_size, max_size, width);
       shared_dim = dim;
@@ -214,7 +209,7 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
 
   if (output.size () > 0)
     {
-      const symbol dim = print_entries (tmp, output, max_size, width, hours);
+      const symbol dim = print_entries (tmp, output, max_size, width);
       print_balance (tmp, "Total output", total_output, dim,
                      dim_size, max_size, width);
       if (shared_dim == Attribute::User ()) 
@@ -226,7 +221,7 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
 
   if (content.size () > 0)
     {
-      const symbol dim = print_entries (tmp, content, max_size, width, hours);
+      const symbol dim = print_entries (tmp, content, max_size, width);
       print_balance (tmp, content_title, total_content, dim,
                      dim_size, max_size, width);
       if (shared_dim == Attribute::User ()) 
@@ -268,9 +263,6 @@ By default, the summary will be stored in daisy.log and the screen.");
       frame.declare_string ("title", Attribute::OptionalConst,
 		  "Title of this summary.\n\
 By default, use the name of the parameterization.");
-      frame.declare_string ("period", Attribute::OptionalConst, "\
-Set this to 'y', 'm', 'w', 'd' or 'h' to get fluxes per time period\n\
-instead of total amount.");
       frame.declare_integer ("precision", Attribute::Const,
 		  "Number of digits to print after decimal point.");
       frame.set ("precision", 2);

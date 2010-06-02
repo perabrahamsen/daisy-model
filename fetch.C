@@ -78,35 +78,8 @@ Fetch::add (const symbol)
 { type = Error; }
 
 symbol
-Fetch::dimension (const symbol period) const
-{
-  if (type != Flux)
-    return select_dimension;
-
-  const size_t size = select_dimension.name ().size ();
-  if (size > 1)
-    {
-      const char last = select_dimension.name ()[size - 1];
-      const char second_last = select_dimension.name ()[size - 2];
-      if (second_last == '/'
-          && (last == 'h' || last == 'd' || last == 'w' 
-              || last == 'm' || last == 'y'))
-        {
-          const std::string strip 
-            = select_dimension.name ().substr (0, size - 2);
-          if (period != "")
-            return strip + "/" + period;
-          else
-            return strip;
-        }
-    }
-  if (period == "h")
-    return select_dimension;
-  else if (period == "")
-    return select_dimension + "h";
-  else
-    return select_dimension + "h/" + period;
-}
+Fetch::dimension () const
+{ return select_dimension; }
 
 void
 Fetch::clear (const std::vector<Fetch*>& fetch)

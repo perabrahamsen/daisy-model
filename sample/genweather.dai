@@ -130,7 +130,7 @@
                    (path weather default air_temperature)
                    (spec weather default air_temperature))
            (number (tag "Precip")
-                   (dimension "mm/d")
+                   (dimension "mm/h")
                    (handle average)
                    (path weather default precipitation)
                    (spec weather default precipitation))

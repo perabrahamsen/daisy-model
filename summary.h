@@ -45,7 +45,7 @@ public:
 protected:
   Summary (const BlockModel& al);
 public:
-  virtual void summarize (int hours, Treelog&) const = 0;
+  virtual void summarize (Treelog&) const = 0;
   ~Summary ();
 };
 

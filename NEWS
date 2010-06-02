@@ -12,6 +12,31 @@ release.
 
 Should lead to more evapotranspiration from wet surfaces.
 
+** Dimension change in log files.
+
+The dimension of most flux variables in the standard log files has
+changed so it no longer contain the log timestep.  For example,
+logging "Field water" weekly would have the unit for fluxes be mm/w,
+while logging monthly would have the same units be mm/m.  Now it will
+be mm.  The actual values will be the same, the interpretation is
+"amount of water since last we logged".
+
+The advantages of this new interpretation are that 1) We avoid weird
+units, 2) it works with intervals that have no nice symbol (like
+biweekly), and 3) it works with variable timesteps.
+
+Technically, internally in Daisy most flux unit are per time
+(independent of the actual timestep used by Daisy).  When a log file
+parametrization specifies (handle sum) this value will be multiplied
+with the length of the timestep.  What happens now is that the unit is
+also multiplied be the unit of the timestep [h].
+
+If you really want the dimension of flux variables to be per time,
+specify (handle average) instead, which will divide the value and unit
+by the total time between log entries in hours, returning to the
+original unit.  You can then tell Daisy to convert this to another
+timestep by specifying 'dimension' explicitly.
+
 ** Variable timesteps.
 
 Yo can now allow Daisy to temporarily decrease timesteps in order to
@@ -84,9 +109,9 @@ This log will provide information about the timestep.
 ** The 'none' chemistry is now build in.
 
 So there is no longer any reason to load 'chemistry.dai' just in order
-to disable chemstry.
+to disable chemistry.
 
-** Biopore wall resistence change.
+** Biopore wall resistance change.
 
 The R_primary and R_secondary parameters are gone, instead we have
 K_wall_relative, which denote the conductivity of the biopore wall
@@ -115,7 +140,7 @@ The 'type' parameter allows you to select between 'block', 'smooth',
 'surface', and 'contour' plots, and the 'top', 'bottom', 'left' and
 'right' parameters allows you to zoom into a rectangular subset of the
 soil..  More information about generating plots can be found in the
-tutorial, and more deails on the 'soil' model can be found in the
+tutorial, and more details on the 'soil' model can be found in the
 reference manual.
 
 * 4.86
@@ -128,7 +153,7 @@ reference manual.
 
 * 4.84 
 
-** Surface decompose rate now defaults to canopy dissipitation rate.
+** Surface decompose rate now defaults to canopy dissipation rate.
 
 It use to default to soil decompose rate.
 
@@ -5636,7 +5661,7 @@ Affects mineralization, nitrification, and denitrification.
 
 This action specifies a strategy for managing a specific crop or
 multicrop.  To create a crop rotation, you can combine these 'crop'
-action sequenctially using the 'activity' action.
+action sequentially using the 'activity' action.
 
 * 1.04
 
@@ -5652,7 +5677,7 @@ action sequenctially using the 'activity' action.
 
 ** Added surface runoff.
 
-Controlable with the new 'DetentionCapacity' and 'ReservoirConstant'
+Controllable with the new 'DetentionCapacity' and 'ReservoirConstant'
 surface parameters. 
 
 ** Added mixing of inorganic nitrogen between surface and soil.

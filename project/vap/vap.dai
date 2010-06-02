@@ -4,68 +4,9 @@
 
 (input file "vap-common.dai")
 
-(defgnuplot Silstrup-zoom Station
-  (station Silstrup)
-  (area 1.69 [ha])
-  (graph (drain (begin 2001 10 25) (end 2001 11 01))
-         (drain-acc (begin 2001 10 25) (end 2001 11 01))
-         (biopore  (begin 2001 10 25) (end 2001 11 01))
-         (biopore-acc (begin 2001 10 25) (end 2001 11 01))
-         (biopore-drain  (begin 2001 10 25) (end 2001 11 01))
-         (biopore-drain-acc (begin 2001 10 25) (end 2001 11 01))
-         (colloids (begin 2001 10 25) (end 2001 11 01))))
-
-(defprogram plotzoom gnuplot
-  (graph Silstrup-zoom))
-         
-
-;; (run batch (run Silstrup-1C-Drain plotzoom))
-
-(defgnuplot Silstrup-full Station
-  (station Silstrup)
-  (area 1.69 [ha])
-  (graph (drain ); 2001 10 25) (end 2001 11 01))
-         (drain-acc ); 2001 10 25) (end 2001 11 01))
-         (biopore  ); 2001 10 25) (end 2001 11 01))
-         (biopore-acc ); 2001 10 25) (end 2001 11 01))
-         (biopore-drain  ); 2001 10 25) (end 2001 11 01))
-         (biopore-drain-acc ); 2001 10 25) (end 2001 11 01))
-         (colloids ); 2001 10 25) (end 2001 11 01))
-         ))
-
-(defgnuplot Silstrup-weather-glyphosate plottime
-  (begin 2001 10 25) (end 2001 11 01)
-
-  (extra [set format x "%d/%m"])
-  (legend none)
-  (title "Precipitation leading up to first Glyphosate event 30/10-2001")
-  (where "fig/${station}-weather-glyphosate.pdf")
-  (source (column (file "log/${station}-field-water-hourly.dlf")
-                  (tag "Precipitation"))
-          ;;(column (file "log/${station}-field-water-hourly.dlf")
-          ;;        (tag "Potential evapotranspiration"))
-          ;;(column (file "log/${station}-field-water-hourly.dlf")
-          ;;        (tag "Actual evapotranspiration"))
-          ;;(column (file "dk-${station}-hourly.dwf")
-          ;;        (tag AirTemp)))
-  ))
-
-;;(run batch (run Silstrup-1C-Drain plotzoom))
-
-(defprogram plotfull gnuplot
-  (declare station String "Name of station to plot.")
-  (station Silstrup)
-  (graph ;; Silstrup-weather-glyphosate 
-         ;; Silstrup-full
-         (sil-drainmass-acc   (where "fig/${station}-Glyphosate-acc-title.pdf")
-(title "Accumulated") (begin 2001 06 01) (chemical Glyphosate))
-         ))
-
-;; (run batch (run plotfull))
-
 ;; 2D sims
 
-(run batch (run Estrup-2D Silstrup-2D plotall))
+;;(run batch (run Estrup-2D Silstrup-2D plotall))
 ;;(run batch (run Silstrup-2D (plotall (graph Silstrup))))
 
 ;;(run batch (run (Silstrup-2D (column (Silstrup-2D-MACRO (Chemistry multi (combine Bromide))))) (plotall (graph Silstrup))))
@@ -83,7 +24,7 @@
 
 ;; Plot only
 
-;;(run batch (run plotall))
+(run batch (run plotall))
 ;; (run batch (run (plotall (graph Silstrup))))
 ;;(run plothydro)
 
