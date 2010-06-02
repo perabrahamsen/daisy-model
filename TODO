@@ -1,28 +1,26 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Ny faveskala til vand (blå0, hvid1, gul2, orange3, rød4, sort5)
-
-Ret figurtekst
-
 * commit
 
 * hastighed?
 
 * Kørsler 
 
-** NW Silstrup: ref
+** NW Estrup: ref
+
+*** new biopores (drain pipe + matrix i drængrøft)
+
+*** Estrup Ap anistropy 100 (op fra 10)
 
 ** NE Silstrup: 8% Theta_res i B, 50% K_b i C
 
-** SW Silstrup
+** SW Silstrup: ref
 
 *** new biopores (drain pipe + matrix i drængrøft)
 
 *** Silstrup plow pan
 
 *** Silstrup Ap anistropy 100
-
-*** Estrup Ap anistropy 100 (op fra 10)
 
 *** Silstrup 8% Theta res i B
 
