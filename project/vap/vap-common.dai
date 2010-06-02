@@ -162,12 +162,12 @@
                          trace Glyphosate-base litter_in)
                    (spec chemical Glyphosate-base litter_in)
                    (handle sum)
-                   (dimension [g/ha/h]))
+                   (dimension [g/ha]))
            (number (path column "${column}" Chemistry "*"
                          trace Glyphosate-base litter_out)
                    (spec chemical Glyphosate-base litter_out)
                    (handle sum)
-                   (dimension [g/ha/h]))
+                   (dimension [g/ha]))
                    
            ))
 
