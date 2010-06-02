@@ -20,7 +20,7 @@
            (diameter 4 [mm])
            (density (plf x (range [m^-2])
                            (domain [cm])
-                           (points (20 0)
+                           (points (20 11.5)
                                    (30 23))))))       
            ; 5% af 190
                    
@@ -32,7 +32,7 @@
            (pipe_position -112.5 [cm])
            (density (plf x (range [m^-2])
                            (domain [cm])
-                           (points (20 23)
+                           (points (20 11.5)
                                    (30 0))))))
           ;; 5% af 190
 
@@ -42,7 +42,7 @@
            (diameter 4 [mm])
            (density (plf x (range [m^-2])
                            (domain [cm])
-                           (points (20 0)
+                           (points (20 3.5)
                                    (30 7))))))      
            
 (defbiopore "drain_30cm"
@@ -52,7 +52,17 @@
            (pipe_position -112.5 [cm])
            (density (plf x (range [m^-2])
                            (domain [cm])
-                           (points (20 7)
+                           (points (20 3.5)
+                                   (30 0))))))
+
+(defbiopore "drain_pipe"
+   (drain  (height_start -92.5 [cm])
+           (height_end -132.5 [cm])
+           (diameter 4 [mm])
+           (pipe_position -112.5 [cm])
+           (density (plf x (range [m^-2])
+                           (domain [cm])
+                           (points (20 1000)
                                    (30 0))))))
 
 ;;; biopores.dai

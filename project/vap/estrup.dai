@@ -122,7 +122,7 @@
                (offset 12 [cm]))
   (Chemistry Estrup)
   (Soil (horizons (  -3.00 Estrup_Ap_surface)
-                  ( -27.00 (Estrup_Ap (anisotropy 10)))
+                  ( -27.00 (Estrup_Ap (anisotropy 100)))
                   ( -35.00 Estrup_B_plow_pan)
                   ( -55.00 (Estrup_B (secondary_domain vap_nocracks)))
                   (-105.00 (Estrup_C1 (secondary_domain vap_nocracks)))
@@ -138,7 +138,8 @@
 (defcolumn Estrup-2D Estrup
   (Movement Rorrende-2D
             (Tertiary (VAP
-                       (classes ("matrix_0cm" (height_end -27 [cm])) 
+                       (classes ("drain_pipe")
+                                ("matrix_0cm" (height_end -27 [cm])) 
                                 ("matrix_2cm")
                                 ("drain_2cm")
                                 ("matrix_30cm" (height_start -30 [cm]))

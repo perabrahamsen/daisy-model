@@ -2,19 +2,33 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Ny faveskala til vand (blå0, hvid1, gul2, orange3, rød4, sort5)
 
+* matrix bioporer i drængrøft
+
+* anistropi 100 i Ap estrup
+
+* Figurer: 1 rapport, 5 filer
+
 * Kørsler 
 
 ** NW Silstrup: ref
 
 ** NE Silstrup: 8% Theta_res i B, 50% K_b i C
 
-** SW ref med pref flow flux log
+** SW 
+
+*** new biopores (drain pipe + materix i drængrø)f
+
+*** Silstrup plow pan
+
+*** Silstrup Ap anistropy 100
+
+*** Estrup Ap anistropy 100 (op fra 10)
+
+*** Silstrup 8% Theta res i B
+
+*** Silstrup bioporer til 2 meter
 
 ** SE Silstrup: drain node
-
-* Prøv
-
-** matrix bioporer i drængrøft
 
 * stof surface section?
 

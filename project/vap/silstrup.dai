@@ -47,7 +47,7 @@
   (clay 27.97 [%]) (silt 26.17 [%]) (sand 45.86 [%])
   (humus (C2OM (C 0.47 [%]))) (dry_bulk_density 1.61 [g/cm^3])
   (hydraulic MACRO
-             (Theta_b 38 [%]) (Theta_res 0 [%])
+             (Theta_b 38 [%]) (Theta_res 8 [%]) ; Was 0%
              (n 1.13 []) (K_b 0.1 [mm/h])
              (l 0.5 []) (alpha 0.012 [cm^-1])
              (Theta_sat 39 [%]) (K_sat 36 [mm/h]) (h_b -10 [cm]) (n_ma 3 [])))
@@ -66,7 +66,7 @@
 (defhorizon Silstrup_B_plow_pan Silstrup_B
   (secondary_domain vap_nocracks)
   (hydraulic original 
-             ;; (K_b 0.05 [mm/h])
+             (K_b 0.05 [mm/h])
              ))
 
 (defhorizon Silstrup_C_base VAP_C
@@ -108,7 +108,7 @@
   ;;             )
   (Chemistry Silstrup)
   (Soil (horizons (  -3.00 [cm] Silstrup_Ap_surface)
-                  ( -31.00 [cm] Silstrup_Ap)
+                  ( -31.00 [cm] Silstrup_Ap (anisotropy 100))
                   ( -39.00 [cm] Silstrup_B_plow_pan)
                   (-75.00 [cm] (Silstrup_B (secondary_domain vap_cracks)))
                   (-113.00 [cm] (Silstrup_B (secondary_domain vap_nocracks)
@@ -127,10 +127,12 @@
 (defcolumn Silstrup-2D Silstrup
   (Movement Rorrende-2D
             (Tertiary (VAP
-                       (classes ("matrix_0cm" (height_end -31 [cm])) 
-                                ("matrix_2cm")
+                       (classes ("drain_pipe")
+                                ("matrix_0cm" (height_end -31 [cm])) 
+                                ("matrix_2cm" (height_end -200 [cm]))
                                 ("drain_2cm")
-                                ("matrix_30cm" (height_start -35 [cm]))
+                                ("matrix_30cm" (height_start -35 [cm])
+                                  (height_end -200 [cm]))
                                 ("drain_30cm" (height_start -35 [cm])))))
             (Geometry (zplus -1.5 -3 -5 -10 -20 -25 -31
                              -35 -39
