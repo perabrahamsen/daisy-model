@@ -108,7 +108,7 @@
   ;;             )
   (Chemistry Silstrup)
   (Soil (horizons (  -3.00 [cm] Silstrup_Ap_surface)
-                  ( -31.00 [cm] Silstrup_Ap (anisotropy 100))
+                  ( -31.00 [cm] (Silstrup_Ap (anisotropy 100)))
                   ( -39.00 [cm] Silstrup_B_plow_pan)
                   (-75.00 [cm] (Silstrup_B (secondary_domain vap_cracks)))
                   (-113.00 [cm] (Silstrup_B (secondary_domain vap_nocracks)
