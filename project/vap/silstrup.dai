@@ -66,7 +66,7 @@
 (defhorizon Silstrup_B_plow_pan Silstrup_B
   (secondary_domain vap_nocracks)
   (hydraulic original 
-             (K_b 0.05 [mm/h])
+             (K_b 0.01 [mm/h])          ;Was 0.05
              ))
 
 (defhorizon Silstrup_C_base VAP_C
