@@ -1,3 +1,10 @@
+2010-06-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C (pass_below): New function.
+	* chemical.h, chemical_std.C (adjust_tertiary): New function.
+
+	* chemical.h, chemical_std.C (set_macro_flux): Removed.
+
 2010-06-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* drain_lateral.C (tick): Simplify.

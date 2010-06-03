@@ -165,7 +165,7 @@ TertiaryOld::solute (const Geometry& geometry, const SoilWater& soil_water,
 
   mactrans->tick (geo, soil_water, M, C, S, S_p, J_p, dt, msg);
 
-  solute.set_tertiary (S_p, J_p);
+  solute.set_tertiary_full (S_p, J_p);
 }
 
 void 

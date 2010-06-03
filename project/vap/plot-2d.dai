@@ -233,6 +233,58 @@
          (Silstrup-2D-M-Bromide (y 2002) (m 1))
          (Silstrup-2D-M-Bromide (y 2002) (m 2))))
 
+(defgnuplot Silstrup-2D-M-Matamitron-2000 base
+  (graph (Silstrup-2D-M-Matamitron (y 2000) (m 5))
+         (Silstrup-2D-M-Matamitron (y 2000) (m 6))
+         (Silstrup-2D-M-Matamitron (y 2000) (m 7))
+         (Silstrup-2D-M-Matamitron (y 2000) (m 8))
+         (Silstrup-2D-M-Matamitron (y 2000) (m 9))
+         (Silstrup-2D-M-Matamitron (y 2000) (m 10))
+         (Silstrup-2D-M-Matamitron (y 2000) (m 11))
+         (Silstrup-2D-M-Matamitron (y 2000) (m 12))
+         (Silstrup-2D-M-Matamitron (y 2001) (m 1))
+         (Silstrup-2D-M-Matamitron (y 2001) (m 2))
+         (Silstrup-2D-M-Matamitron (y 2001) (m 3))
+         (Silstrup-2D-M-Matamitron (y 2001) (m 4))))
+
+(defgnuplot Silstrup-2D-M-Matamitron-2001 base
+  (graph (Silstrup-2D-M-Matamitron (y 2001) (m 5))
+         (Silstrup-2D-M-Matamitron (y 2001) (m 6))
+         (Silstrup-2D-M-Matamitron (y 2001) (m 7))
+         (Silstrup-2D-M-Matamitron (y 2001) (m 8))
+         (Silstrup-2D-M-Matamitron (y 2001) (m 9))
+         (Silstrup-2D-M-Matamitron (y 2001) (m 10))
+         (Silstrup-2D-M-Matamitron (y 2001) (m 11))
+         (Silstrup-2D-M-Matamitron (y 2001) (m 12))
+         (Silstrup-2D-M-Matamitron (y 2002) (m 1))
+         (Silstrup-2D-M-Matamitron (y 2002) (m 2))))
+
+(defgnuplot Silstrup-2D-C-Matamitron-2000 base
+  (graph (Silstrup-2D-C-Matamitron (y 2000) (m 5))
+         (Silstrup-2D-C-Matamitron (y 2000) (m 6))
+         (Silstrup-2D-C-Matamitron (y 2000) (m 7))
+         (Silstrup-2D-C-Matamitron (y 2000) (m 8))
+         (Silstrup-2D-C-Matamitron (y 2000) (m 9))
+         (Silstrup-2D-C-Matamitron (y 2000) (m 10))
+         (Silstrup-2D-C-Matamitron (y 2000) (m 11))
+         (Silstrup-2D-C-Matamitron (y 2000) (m 12))
+         (Silstrup-2D-C-Matamitron (y 2001) (m 1))
+         (Silstrup-2D-C-Matamitron (y 2001) (m 2))
+         (Silstrup-2D-C-Matamitron (y 2001) (m 3))
+         (Silstrup-2D-C-Matamitron (y 2001) (m 4))))
+
+(defgnuplot Silstrup-2D-C-Matamitron-2001 base
+  (graph (Silstrup-2D-C-Matamitron (y 2001) (m 5))
+         (Silstrup-2D-C-Matamitron (y 2001) (m 6))
+         (Silstrup-2D-C-Matamitron (y 2001) (m 7))
+         (Silstrup-2D-C-Matamitron (y 2001) (m 8))
+         (Silstrup-2D-C-Matamitron (y 2001) (m 9))
+         (Silstrup-2D-C-Matamitron (y 2001) (m 10))
+         (Silstrup-2D-C-Matamitron (y 2001) (m 11))
+         (Silstrup-2D-C-Matamitron (y 2001) (m 12))
+         (Silstrup-2D-C-Matamitron (y 2002) (m 1))
+         (Silstrup-2D-C-Matamitron (y 2002) (m 2))))
+
 (defgnuplot Silstrup-2D-M-Glyphosate-2001 base
   (graph (Silstrup-2D-M-Glyphosate (y 2001) (m 5))
          (Silstrup-2D-M-Glyphosate (y 2001) (m 6))
@@ -268,6 +320,8 @@
   (graph 
    Silstrup-2D-pF-2000 Silstrup-2D-pF-2001
    Silstrup-2D-M-Bromide-2000 Silstrup-2D-M-Bromide-2001
+   Silstrup-2D-M-Metamitron-2000 Silstrup-2D-M-Metamitron-2001
+   Silstrup-2D-C-Metamitron-2000 Silstrup-2D-C-Metamitron-2001
    Silstrup-2D-M-Glyphosate-2001 Silstrup-2D-C-Glyphosate-2001
    ))
   

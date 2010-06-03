@@ -645,7 +645,7 @@ TertiaryBiopores::solute (const Geometry& geo, const SoilWater& soil_water,
     classes[b]->matrix_solute (geo, dt, chemical, source_chem, msg);
 
   // Make it official.
-  chemical.set_tertiary (source_chem, J_chem);
+  chemical.set_tertiary_top (source_chem, J_chem);
 }
 
 double

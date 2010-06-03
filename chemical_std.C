@@ -141,6 +141,7 @@ struct ChemicalStandard : public Chemical
 
   // Cache.
   std::vector<double> static_decompose_rate; // Depth adusted decompose rate.
+  bool need_fake_tertiary;      // If J_p should be faked.
 
   // Solute.
   const Adsorption& adsorption () const;
@@ -172,8 +173,10 @@ struct ChemicalStandard : public Chemical
   void set_secondary (const Soil& soil, const SoilWater& soil_water,
                       const std::vector<double>& C,
                       const std::vector<double>& J);
-  void set_tertiary (const std::vector<double>& S_p, 
-                     const std::vector<double>& J_p);
+  void set_tertiary_full (const std::vector<double>& S_p, 
+                          const std::vector<double>& J_p);
+  void set_tertiary_top (const std::vector<double>& S_p, 
+                         const std::vector<double>& J_p);
 
   // Sink.
   void clear ();
@@ -335,10 +338,6 @@ ChemicalStandard::S_tertiary (size_t i) const
 { return S_tertiary_[i]; }
 
 void 
-ChemicalStandard::set_macro_flux (const size_t e, const double value)
-{ J_tertiary[e] = value; }
-
-void 
 ChemicalStandard::set_primary (const Soil& soil, const SoilWater& soil_water,
                                const std::vector<double>& M,
                                const std::vector<double>& J)
@@ -416,14 +415,27 @@ ChemicalStandard::set_secondary (const Soil& soil, const SoilWater& soil_water,
 }
 
 void 
-ChemicalStandard::set_tertiary (const std::vector<double>& S_p, 
-                                const std::vector<double>& J_p)
+ChemicalStandard::set_tertiary_full (const std::vector<double>& S_p, 
+                                     const std::vector<double>& J_p)
 {
   daisy_assert (S_tertiary_.size () == S_p.size ());
   S_tertiary_ = S_p;
   add_to_source_secondary (S_p);
   daisy_assert (J_tertiary.size () == J_p.size ());
   J_tertiary = J_p;
+  need_fake_tertiary = false;
+}
+
+void 
+ChemicalStandard::set_tertiary_top (const std::vector<double>& S_p, 
+                                    const std::vector<double>& J_p)
+{
+  daisy_assert (S_tertiary_.size () == S_p.size ());
+  S_tertiary_ = S_p;
+  add_to_source_secondary (S_p);
+  daisy_assert (J_tertiary.size () == J_p.size ());
+  J_tertiary = J_p;
+  need_fake_tertiary = true;
 }
 
 
@@ -914,6 +926,52 @@ ChemicalStandard::tick_surface (const double pond /* [cm] */,
     daisy_approximate (surface_storage, surface_solute);
 }
 
+
+static void
+pass_below (const Geometry& geo,
+            const std::vector<double>& S_matrix,
+            const std::vector<double>& S_drain,
+            const size_t edge_above,
+            const int cell_above,
+            std::vector<double>& q_tertiary)
+{
+  const double flux_above = q_tertiary[edge_above];
+  const int cell = geo.edge_other (edge_above, cell_above);
+  if (!geo.cell_is_internal (cell))
+    return;
+  const double S = -(S_matrix[cell] + S_drain[cell]); // SOURCE, water is sink.
+  const double volume = geo.cell_volume (cell);
+  const double area_above = geo.edge_area (edge_above);
+  const double volume_below = flux_above * area_above - S * volume;
+  const std::vector<size_t>& cell_edges = geo.cell_edges (cell);
+  const size_t cell_edges_size = cell_edges.size ();
+  size_t lowest_edge = edge_above;
+  double lowest_z = geo.cell_z (cell);
+  for (size_t i = 0; i < cell_edges_size; i++)
+    {
+      const size_t edge_below = cell_edges[i];
+      const int cell_below = geo.edge_other (edge_below, cell);
+      if (cell_below == Geometry::cell_below)
+        {
+          lowest_edge = edge_below;
+          break;
+        }
+      if (!geo.cell_is_internal (cell_below))
+        continue;
+      const double z = geo.cell_z (cell_below);
+      if (z < lowest_z)
+        {
+          lowest_z = z;
+          lowest_edge = edge_below;
+        }
+    }
+  daisy_assert (iszero (q_tertiary[lowest_edge]));
+  const double area_below = geo.edge_area (lowest_edge);
+  const double flux_below = volume_below / area_below;
+  q_tertiary[lowest_edge] = flux_below;
+  pass_below (geo, S_matrix, S_drain, lowest_edge, cell, q_tertiary);
+}
+
 void                            // Called just before solute movement.
 ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
                              const Soil& soil,
@@ -1036,6 +1094,20 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
     }
   add_to_sink_primary (S_exchange); 
   add_to_source_secondary (S_exchange); 
+
+  // Fake tertiary flux by mass balance ignoring tertiary storage.
+  if (need_fake_tertiary)
+    {
+      const std::vector<size_t>& edge_above 
+        = geo.cell_edges (Geometry::cell_above);
+      const size_t edge_above_size = edge_above.size ();
+      for (size_t i = 0; i < edge_above_size; i++)
+        {
+          const size_t edge = edge_above[i];
+          pass_below (geo, S_tertiary_, S_drain, edge, Geometry::cell_above,
+                      J_tertiary);
+        }
+    }
 }
 
 void 
