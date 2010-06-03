@@ -169,12 +169,21 @@
   (file "${base}/log/${station}-content-Bromide.dlf")
   )
 
+(defgnuplot Silstrup-2D-M-Metamitron Silstrup-2D-M
+  (where "fig/${station}-M-Metamitron-${y}-${m}.pdf")
+  (file "${base}/log/${station}-content-Metamitron.dlf")
+  )
+
 (defgnuplot Silstrup-2D-M-Glyphosate Silstrup-2D-M
   (where "fig/${station}-M-Glyphosate-${y}-${m}.pdf")
   (file "${base}/log/${station}-content-Glyphosate.dlf")
   )
 
 (defgnuplot Silstrup-2D-C Silstrup-2D-M)
+
+(defgnuplot Silstrup-2D-C-Metamitron Silstrup-2D-C
+  (where "fig/${station}-C-Metamitron-${y}-${m}.pdf")
+  (file "${base}/log/${station}-conc-Metamitron.dlf"))
 
 (defgnuplot Silstrup-2D-C-Glyphosate Silstrup-2D-C
   (where "fig/${station}-C-Glyphosate-${y}-${m}.pdf")
