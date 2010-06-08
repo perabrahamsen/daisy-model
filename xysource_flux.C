@@ -41,7 +41,6 @@ struct XYSourceFlux : public XYSource
   const boost::scoped_ptr<Time> when;
   const boost::scoped_ptr<Time> begin;
   const boost::scoped_ptr<Time> end;
-  const symbol timestep;
   const double plot_z;
   const double plot_x;
   symbol dimension;
@@ -189,8 +188,6 @@ XYSourceFlux::load (const Units& units, Treelog& msg)
     }
   
   symbol original (lex.flux_dimension ());
-  if (!when.get ())
-    original = Units::multiply (original, timestep);
   
   if (dimension == Attribute::Unknown ())
     dimension = original;
@@ -451,7 +448,6 @@ XYSourceFlux::XYSourceFlux (const BlockModel& al)
     when (al.check ("when") ? submodel<Time> (al, "when") : NULL),
     begin (al.check ("begin") ? submodel<Time> (al, "begin") : NULL),
     end (al.check ("end") ? submodel<Time> (al, "end") : NULL),
-    timestep (al.name ("timestep")),
     plot_z (al.number ("z", NAN)),
     plot_x (al.number ("x", NAN)),
     dimension (al.name ("dimension", Attribute::Unknown ())),
@@ -505,9 +501,6 @@ Use value closest to this time.", Time::load_syntax);
 Ignore values before this time.", Time::load_syntax);
     frame.declare_submodule ("end", Attribute::OptionalConst, "\
 Ignore values after this time.", Time::load_syntax);
-    frame.declare_string ("timestep", Attribute::Const, "\
-Multiple with this dimension when accumulating.");
-    frame.set ("timestep", "h");
     frame.declare ("z", "cm", Check::non_positive (),
                    Attribute::OptionalConst, "\
 Plot flux through this depth.");

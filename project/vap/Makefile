@@ -5,7 +5,7 @@ sim:	fig log
 	gnuplot daisy.gnuplot
 
 linux:	fig log
-	( export DAISYHOME=/home/abraham/daisy; "${DAISYHOME}/obj/daisy" vap.dai )
+	( export DAISYHOME=/home/abraham/daisy; nice "${DAISYHOME}/obj/daisy" vap.dai )
 	gnuplot daisy.gnuplot
 
 fig:

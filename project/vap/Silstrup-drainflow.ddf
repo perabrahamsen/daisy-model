@@ -2,7 +2,7 @@ ddf-0.0 -- Drain flow from Silstrup
 
 --------------------------------------------
 year	month	mday	drain
-			mm/d
+			mm
 2000	04	29	6.70E-06
 2000	04	30	1.20E-04
 2000	05	01	3.35E-04

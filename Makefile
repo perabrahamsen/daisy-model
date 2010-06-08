@@ -62,13 +62,13 @@ SVNROOT = https://daisy-model.googlecode.com/svn
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
-#USE_OPTIMIZE = true
-USE_OPTIMIZE = false
+USE_OPTIMIZE = true
+#USE_OPTIMIZE = false
 
 # Set USE_PROFILE if you want to profile the executable
 #
-#USE_PROFILE = true
-USE_PROFILE = false
+USE_PROFILE = true
+#USE_PROFILE = false
 
 # Set COMPILER according to which compiler you use.
 #	sun		Use the unbundled sun compiler.
@@ -139,22 +139,22 @@ endif
 #
 ifeq ($(USE_OPTIMIZE),true)
 	ifeq ($(COMPILER),gcc)
-		OPTIMIZE = -O3 -ffast-math 
+		OPTIMIZE = -O3 -ffast-math -fno-finite-math-only 
 		ifeq ($(HOSTTYPE),sun4)
-		  OPTIMIZE = -O3 -ffast-math -mcpu=v8 -mtune=ultrasparc
+		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mcpu=v8 -mtune=ultrasparc
 #`-mcpu=ultrasparc' breaks `IM::IM ()' with gcc 2.95.1.
 		endif
 		ifeq ($(HOSTTYPE),i386-linux)
-		  OPTIMIZE = -O3 -ffast-math -mtune=generic -march=pentium
+		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mtune=generic -march=pentium
 	        endif
 		ifeq ($(HOSTTYPE),x86_64)
-		  OPTIMIZE = -O3 -ffast-math -mtune=native  -march=native
+		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mtune=native  -march=native
 	        endif
 		ifeq ($(HOSTTYPE),cygwin)
-		  OPTIMIZE = -O3 -ffast-math -mtune=pentium-m -march=pentium
+		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mtune=pentium-m -march=pentium
 		endif
 		ifeq ($(HOSTTYPE),mingw)
-		  OPTIMIZE = -O3 -ffast-math -mtune=pentium-m -march=pentium
+		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mtune=pentium-m -march=pentium
 		endif
 	endif
 	ifeq ($(COMPILER),icc)

@@ -2,7 +2,7 @@ ddf-0.0 -- Drain flow from Estrup
 
 --------------------------------------------
 year	month	mday	drain
-			mm/d
+			mm
 2000	05	26	0.18
 2000	05	27	0.18
 2000	05	28	0.16

@@ -1,32 +1,28 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* J_p down
-
-* hastighed?
-
 * Kørsler 
 
-** NW Estrup: ref
+** NE = Ref
 
 *** new biopores (drain pipe + matrix i drængrøft)
 
 *** Estrup Ap anistropy 100 (op fra 10)
 
-** NE = NW+SW + J_p
-
-** SW Silstrup: ref
-
-*** new biopores (drain pipe + matrix i drængrøft)
-
 *** Silstrup plow pan
-
+    
 *** Silstrup Ap anistropy 100
-
+    
 *** Silstrup 8% Theta res i B
 
 *** Silstrup bioporer til 2 meter
 
-** SE Silstrup: drain node
+** NW Silstrup: Rxylem = 20
+
+** SW Silstrup: Rxylem = 50
+
+** SE: drain node
+
+offset Sil: 0, Est: 0, Rxylem = 20
 
 * stof surface section?
 

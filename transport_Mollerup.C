@@ -55,6 +55,13 @@ struct TransportMollerup : public Transport
   const bool enable_boundary_diffusion;
   const int debug;
   const double upstream_weight;
+
+  // Reuse matrixes for speed.
+  mutable bool matrix_initialized;
+  mutable Solver::build_matrix m_sum;
+  mutable Solver::Matrix A_fixed;
+  mutable Solver::Matrix A;  
+  mutable Solver::Matrix b_mat;  
  
   // Water flux.
   static void cell_based_flux (const Geometry& geo,  
@@ -98,15 +105,15 @@ struct TransportMollerup : public Transport
   
   static void diffusion_xx_zz (const Geometry& geo,
                                const ublas::vector<double>& ThetaD_xx_zz,
-                               Solver::Matrix& diff_xx_zz);
+                               Solver::build_matrix& diff_xx_zz);
   
   static void diffusion_xz_zx (const GeometryRect& geo,
                                const ublas::vector<double>& ThetaD_xz_zx,      
-                               Solver::Matrix& diff_xz_zx);
+                               Solver::build_matrix& diff_xz_zx);
 
   void advection (const Geometry& geo,
                   const ublas::vector<double>& q_edge,
-                  Solver::Matrix& advec) const;
+                  Solver::build_matrix& advec) const;
   
   static void Neumann_expl (const size_t cell, const double area, 
                             const double in_sign, const double J, 
@@ -376,7 +383,7 @@ TransportMollerup::thetadiff_xx_zz_xz_zx
 void 
 TransportMollerup::diffusion_xx_zz (const Geometry& geo,
                                     const ublas::vector<double>& ThetaD_xx_zz,
-                                    Solver::Matrix& diff_xx_zz)
+                                    Solver::build_matrix& diff_xx_zz)
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
   
@@ -400,7 +407,7 @@ TransportMollerup::diffusion_xx_zz (const Geometry& geo,
 void 
 TransportMollerup::diffusion_xz_zx (const GeometryRect& geo,
                                     const ublas::vector<double>& ThetaD_xz_zx,
-                                    Solver::Matrix& diff_xz_zx)
+                                    Solver::build_matrix& diff_xz_zx)
 {
   
   const size_t edge_size = geo.edge_size (); // number of edges  
@@ -474,8 +481,8 @@ TransportMollerup::diffusion_xz_zx (const GeometryRect& geo,
 
 void 
 TransportMollerup::advection (const Geometry& geo,
-                                 const ublas::vector<double>& q_edge,
-                                 Solver::Matrix& advec) const
+                              const ublas::vector<double>& q_edge,
+                              Solver::build_matrix& advec) const
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
 
@@ -502,10 +509,11 @@ TransportMollerup::advection (const Geometry& geo,
           const double alpha = (q_edge[e] >= 0) 
             ? upstream_weight 
             : 1.0 - upstream_weight;
-          advec (from, from) += alpha*value;
-          advec (from, to)   += (1.0-alpha)*value;
-          advec (to, from)   -= alpha*value;
-          advec (to, to)     -= (1.0-alpha)*value;
+          // Reverse sign due to how it is used.
+          advec (from, from) -= alpha*value;
+          advec (from, to)   -= (1.0-alpha)*value;
+          advec (to, from)   += alpha*value;
+          advec (to, to)     += (1.0-alpha)*value;
         } 
     }
 }
@@ -945,31 +953,6 @@ TransportMollerup::fluxes (const GeometryRect& geo,
     }
 }
 
-static void
-add_to (const Solver::Matrix& from, ublas::coordinate_matrix<double>& to)
-{
-  for (Solver::Matrix::const_iterator1 i1 = from.begin1 ();
-       i1 != from.end1 ();
-       ++i1)
-    for (Solver::Matrix::const_iterator2 i2 = i1.begin ();
-         i2 != i1.end ();
-         ++i2)
-      to.append_element (i2.index1 (), i2.index2 (), *i2);
-}
-
-static void
-sub_to (const Solver::Matrix& from, ublas::coordinate_matrix<double>& to)
-{
-  for (Solver::Matrix::const_iterator1 i1 = from.begin1 ();
-       i1 != from.end1 ();
-       ++i1)
-    for (Solver::Matrix::const_iterator2 i2 = i1.begin ();
-         i2 != i1.end ();
-         ++i2)
-      to.append_element (i2.index1 (), i2.index2 (), - *i2);
-}
-
-
 void
 TransportMollerup::flow (const Geometry& geo_base, 
                             const Soil& soil, 
@@ -989,6 +972,15 @@ TransportMollerup::flow (const Geometry& geo_base,
 
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
+
+  if (!matrix_initialized)
+    {
+      matrix_initialized = true;
+      A.resize (cell_size);  
+      A_fixed.resize (cell_size);  
+      b_mat.resize (cell_size);  
+      m_sum.resize (cell_size, cell_size, false);
+    }
 
   // Solution old
   ublas::vector<double> C_old (cell_size);
@@ -1134,22 +1126,19 @@ TransportMollerup::flow (const Geometry& geo_base,
   //--- For moving in/out of tick loop ---
   //--------------------------------------
 
+  m_sum.clear ();
   //Initialize xx_zz diffusion - average
-  Solver::Matrix diff_xx_zz_avg (cell_size);
-  diffusion_xx_zz (geo, ThetaD_xx_zz_avg, diff_xx_zz_avg);    
+  diffusion_xx_zz (geo, ThetaD_xx_zz_avg, m_sum);    
 
   //Initialize xz_zx diffusion matrix -average 
-  Solver::Matrix diff_xz_zx_avg (cell_size);
-  diffusion_xz_zx (geo, ThetaD_xz_zx_avg, diff_xz_zx_avg); 
+  diffusion_xz_zx (geo, ThetaD_xz_zx_avg, m_sum); 
   
-
+  //Advection
+  advection (geo, q_edge, m_sum);  
 
   //--- Things that not changes in smal timesteps --- 
- 
-  //Advection
-  Solver::Matrix advec (cell_size);
-  advection (geo, q_edge, advec);  
-  
+  noalias (A_fixed) = m_sum;
+
   //Sink term
    ublas::vector<double> S_vol (cell_size); // sink term 
   for (size_t cell = 0; cell != cell_size ; ++cell) 
@@ -1195,11 +1184,9 @@ TransportMollerup::flow (const Geometry& geo_base,
   const bool simple_dcthetadt = true;
  
   //Initialize A-matrix (left hand side)
-  Solver::Matrix A (cell_size);  
   
   //Initialize b-vector (right hand side)
   ublas::vector<double> b (cell_size);   
-  Solver::Matrix b_mat (cell_size);  
 
   //-------------------------------------------
   //--- End, For moving in/out of tick loop ---
@@ -1224,6 +1211,7 @@ TransportMollerup::flow (const Geometry& geo_base,
   double dtime = 0.0;
 
   double R = 1.0;  //Retardation factor 
+
 
   while (dtime * 1.000001 < dt)
     {
@@ -1251,33 +1239,24 @@ TransportMollerup::flow (const Geometry& geo_base,
      
       if (simple_dcthetadt)
         {
-#if 1
-          // UBLAS matrix addition is slow.
-          // Using coordinate matrix and append_element is less bad.
-          ublas::coordinate_matrix<double> m_sum (cell_size, cell_size);
-          add_to (diff_xx_zz_avg, m_sum);       // xx_zz diffusion
-          add_to (diff_xz_zx_avg, m_sum);       // xz_zx diffusion
-          sub_to (advec,          m_sum);       // advec
+          // Use the sum matrix.
+          noalias (A) =  A_fixed;
 
           // Banded matrix can be done fast, just not by ublas.
           for (size_t c = 0; c < cell_size; c++)
-            {
-              const double val = B_mat (c, c) // impl Neumann BC 
-                + diffm_xx_zz_mat (c, c)      // Dirichlet BC
-                - advecm_mat (c, c);        // Dirichlet BC
-              m_sum.append_element (c, c, val);
-            }
+            A (c, c) += B_mat (c, c);
 
-          // Use the sum matrix.
-          A = - gamma * m_sum;
-          b_mat =  (1 - gamma) * m_sum;
+          noalias (b_mat) = A;
+          A *= - gamma;
+          b_mat *=  (1 - gamma);
           // As usual, band matrix is faster cell based.
           for (size_t c = 0; c < cell_size; c++)
             {
               A (c, c) += R *(1.0 / ddt) * QTheta_mat_np1 (c, c); // dtheta/ddt
               b_mat (c, c) += R * (1.0 / ddt) * QTheta_mat_n (c, c);
             }
-#else
+#if 0 
+          // This is the original, slow formulation-
           A = R *(1.0 / ddt) * QTheta_mat_np1       // dtheta/ddt
             - gamma * diff_xx_zz_avg                // xx_zz diffusion
             - gamma * diff_xz_zx_avg                // xz_zx diffusion
@@ -1375,7 +1354,11 @@ TransportMollerup::TransportMollerup (const BlockModel& al)
     solver (Librarian::build_item<Solver> (al, "solver")),
     enable_boundary_diffusion (al.flag ("enable_boundary_diffusion")),
     debug (al.integer ("debug")),
-    upstream_weight (al.number ("upstream_weight"))
+    upstream_weight (al.number ("upstream_weight")),
+    matrix_initialized (false),
+    A_fixed (1),
+    A (1),  
+    b_mat (1)
 { }
 
 TransportMollerup::~TransportMollerup ()

@@ -127,7 +127,7 @@
 (defcolumn Silstrup-2D Silstrup
   (Movement Rorrende-2D
             (Tertiary (VAP
-                       (classes ("drain_pipe")
+                       (classes ;;("drain_pipe")
                                 ("matrix_0cm" (height_end -31 [cm])) 
                                 ("matrix_2cm" (height_end -200 [cm]))
                                 ("drain_2cm")

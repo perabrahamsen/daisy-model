@@ -373,7 +373,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
                               
 	  //Initialize sum matrix
 	  Solver::Matrix summat (cell_size);  
-	  summat = diff + Dm_mat;
+	  noalias (summat) = diff + Dm_mat;
 
 	  //Initialize sum vector
 	  ublas::vector<double> sumvec (cell_size);  
@@ -381,11 +381,11 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
 	  // QCw is shorthand for Qmatrix * Cw
 	  Solver::Matrix Q_Cw (cell_size);
-	  Q_Cw = prod (Qmat, Cw);
+	  noalias (Q_Cw) = prod (Qmat, Cw);
 
 	  //Initialize A-matrix
 	  Solver::Matrix A (cell_size);  
-	  A = (1.0 / ddt) * Q_Cw - summat;  
+	  noalias (A) = (1.0 / ddt) * Q_Cw - summat;  
 
 	  // Q_Cw_h is shorthand for Qmatrix * Cw * h
 	  const ublas::vector<double> Q_Cw_h = prod (Q_Cw, h);

@@ -33,6 +33,10 @@ Solver::library_id () const
   return id;
 }
 
+void 
+Solver::Matrix::resize (size_t size)
+{ SMatrix_type::resize (size, size, false); }
+
 Solver::Matrix::Matrix (const size_t size)
   : SMatrix_type (size, size)
 {

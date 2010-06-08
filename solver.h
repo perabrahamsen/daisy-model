@@ -25,6 +25,7 @@
 #include "symbol.h"
 
 #include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/vector_of_vector.hpp>
 
 #ifdef USE_DENSE_MATRIX
 #include <boost/numeric/ublas/matrix.hpp>
@@ -46,10 +47,12 @@ public:
 
   // Types.
 public:
+  typedef boost::numeric::ublas::generalized_vector_of_vector<double, boost::numeric::ublas::row_major, boost::numeric::ublas::vector<boost::numeric::ublas::coordinate_vector<double> > > build_matrix;
   typedef boost::numeric::ublas::vector<double> Vector;
   struct Matrix : public SMatrix_type
   {
     using SMatrix_type::operator=;
+    void resize (size_t size);
     Matrix (size_t size);
   };
   

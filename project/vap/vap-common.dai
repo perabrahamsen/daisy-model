@@ -332,9 +332,6 @@
   (where "fig/${station}-${hor}-K.pdf")
   (title "Conductivity curve"))
 
-(defunit [w] [s] (factor 604800))
-(defunit [g/ha/w] [kg/m^2/s] (factor 1.653e-13))
-
 (defgnuplot plottime time
   (device "pdf size 12cm, 6cm")
   (extra "unset logscale"
@@ -367,7 +364,7 @@
           (column (file "log/${station}-content.dlf")
                   (tag "GWT-high")
                   (style 3)
-                  (title "Sim (low)"))
+                  (title "Sim (high)"))
           (column (file "log/${station}-content.dlf")
                   (tag "GWT")
                   (style 4)
@@ -687,8 +684,7 @@
   (source &old
           (arithmetic (file "${station}-drainmass.ddf")
                       (missing missing)
-                      (expr (/ (convert (/ "${chemical}" area) [g/ha])
-                               1 [w]))
+                      (expr (convert (/ "${chemical}" area) [g/ha]))
                       (with points)
                       (style 2)
                       (title "Obs"))))
