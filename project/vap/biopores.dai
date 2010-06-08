@@ -27,7 +27,7 @@
 (defbiopore "drain_2cm"
    (drain  ;;(height_start -1.5 [cm])
            (height_start 0 [cm])
-           (height_end -115 [cm])
+           (height_end -100 [cm])
            (diameter 4 [mm])
            (pipe_position -112.5 [cm])
            (density (plf x (range [m^-2])
@@ -47,7 +47,7 @@
            
 (defbiopore "drain_30cm"
    (drain  (height_start -30 [cm])
-           (height_end -115 [cm])
+           (height_end -100 [cm])
            (diameter 4 [mm])
            (pipe_position -112.5 [cm])
            (density (plf x (range [m^-2])

@@ -342,7 +342,6 @@
   (device "pdf size 15cm,10cm"))
 
 (defxysource vap-flux flux
-  (timestep m)
   (declare pos Number [cm] "Position.")
   (title "${pos}")
   (file "${base}/log/${station}-q.dlf")
