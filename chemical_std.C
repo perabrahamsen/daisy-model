@@ -230,6 +230,7 @@ struct ChemicalStandard : public Chemical
   void tick_soil (const Units&,
                   const Geometry&, const Soil&, const SoilWater&, double dt,
                   const Scope&, Treelog&);
+  void tick_after (const Geometry&, Treelog&);
   void mixture (const Geometry& geo,
                 const double pond /* [mm] */, 
                 const double rate /* [h/mm] */,
@@ -1094,19 +1095,23 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
     }
   add_to_sink_primary (S_exchange); 
   add_to_source_secondary (S_exchange); 
+}
 
+void
+ChemicalStandard::tick_after (const Geometry& geo, Treelog&)
+{
+  if (!need_fake_tertiary)
+    return;
+  
   // Fake tertiary flux by mass balance ignoring tertiary storage.
-  if (need_fake_tertiary)
+  const std::vector<size_t>& edge_above 
+    = geo.cell_edges (Geometry::cell_above);
+  const size_t edge_above_size = edge_above.size ();
+  for (size_t i = 0; i < edge_above_size; i++)
     {
-      const std::vector<size_t>& edge_above 
-        = geo.cell_edges (Geometry::cell_above);
-      const size_t edge_above_size = edge_above.size ();
-      for (size_t i = 0; i < edge_above_size; i++)
-        {
-          const size_t edge = edge_above[i];
-          pass_below (geo, S_tertiary_, S_drain, edge, Geometry::cell_above,
-                      J_tertiary);
-        }
+      const size_t edge = edge_above[i];
+      pass_below (geo, S_tertiary_, S_drain, edge, Geometry::cell_above,
+                  J_tertiary);
     }
 }
 

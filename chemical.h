@@ -146,6 +146,7 @@ public:
   virtual void tick_soil (const Units&,
                           const Geometry&, const Soil&, const SoilWater&,
                           double dt, const Scope&, Treelog&) = 0;
+  virtual void tick_after (const Geometry&, Treelog&) = 0;
   virtual void mixture (const Geometry& geo,
                         const double pond /* [mm] */, 
                         const double rate /* [h/mm] */,

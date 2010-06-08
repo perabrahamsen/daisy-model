@@ -367,6 +367,9 @@ ChemistryStandard::tick_soil (const Scope& scope,
       movement.solute (soil, soil_water, J_above, *chemicals[c], 
 		       dt, scope, msg); 
     }
+  
+  for (size_t c = 0; c < chemicals.size (); c++)
+    chemicals[c]->tick_after (geo, msg);
 }
 
 void
