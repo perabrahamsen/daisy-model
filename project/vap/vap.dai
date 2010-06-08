@@ -28,7 +28,7 @@
 
 ;;(run batch (run plotall))
 ;;(run batch (run (plotall (graph Silstrup))))
-(run batch (run (plotall (graph Silstrup))))
+;;(run batch (run (plotall (graph Silstrup))))
 ;;(run plothydro)
 
 ;;; vap.dai ends here.
