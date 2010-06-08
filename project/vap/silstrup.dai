@@ -96,8 +96,8 @@
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;;   cm too high, cm is too low
-               (offset 0 [cm]) 
+               ;;   cm too high, 0 cm is too low
+               (offset 10 [cm]) 
                )
   ;;(Groundwater aquitard 
   ;;             (K_aquitard 1 [mm/h])
@@ -127,8 +127,7 @@
 (defcolumn Silstrup-2D Silstrup
   (Movement Rorrende-2D
             (Tertiary (VAP
-                       (classes ;;("drain_pipe")
-                                ("matrix_0cm" (height_end -31 [cm])) 
+                       (classes ("matrix_0cm" (height_end -31 [cm])) 
                                 ("matrix_2cm" (height_end -200 [cm]))
                                 ("drain_2cm")
                                 ("matrix_30cm" (height_start -35 [cm])

@@ -118,8 +118,8 @@
   (Groundwater file "dk-estrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;; cm is too high, cm is too low
-               (offset 0 [cm]))
+               ;; 0 cm is too high, cm is too low
+               (offset -5 [cm]))
   (Chemistry Estrup)
   (Soil (horizons (  -3.00 Estrup_Ap_surface)
                   ( -27.00 (Estrup_Ap (anisotropy 100)))
@@ -138,8 +138,7 @@
 (defcolumn Estrup-2D Estrup
   (Movement Rorrende-2D
             (Tertiary (VAP
-                       (classes ;;("drain_pipe")
-                                ("matrix_0cm" (height_end -27 [cm])) 
+                       (classes ("matrix_0cm" (height_end -27 [cm])) 
                                 ("matrix_2cm")
                                 ("drain_2cm")
                                 ("matrix_30cm" (height_start -30 [cm]))
