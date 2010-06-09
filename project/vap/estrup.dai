@@ -118,7 +118,7 @@
   (Groundwater file "dk-estrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;; 0 cm is too high, cm is too low
+               ;; -2 cm is too high, -10 cm is too low
                (offset -5 [cm]))
   (Chemistry Estrup)
   (Soil (horizons (  -3.00 Estrup_Ap_surface)

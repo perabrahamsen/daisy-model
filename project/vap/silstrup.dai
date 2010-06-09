@@ -66,7 +66,7 @@
 (defhorizon Silstrup_B_plow_pan Silstrup_B
   (secondary_domain vap_nocracks)
   (hydraulic original 
-             (K_b 0.01 [mm/h])          ;Was 0.05
+             (K_b 0.01 [mm/h])          ;Was 0.1
              ))
 
 (defhorizon Silstrup_C_base VAP_C
@@ -96,8 +96,8 @@
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;;   cm too high, 0 cm is too low
-               (offset 10 [cm]) 
+               ;; 10  cm too high, 0 cm is too low
+               (offset 8 [cm]) 
                )
   ;;(Groundwater aquitard 
   ;;             (K_aquitard 1 [mm/h])
@@ -128,10 +128,9 @@
   (Movement Rorrende-2D
             (Tertiary (VAP
                        (classes ("matrix_0cm" (height_end -31 [cm])) 
-                                ("matrix_2cm" (height_end -200 [cm]))
+                                ("matrix_2cm")
                                 ("drain_2cm")
-                                ("matrix_30cm" (height_start -35 [cm])
-                                  (height_end -200 [cm]))
+                                ("matrix_30cm" (height_start -35 [cm]))
                                 ("drain_30cm" (height_start -35 [cm])))))
             (Geometry (zplus -1.5 -3 -5 -10 -20 -25 -31
                              -35 -39

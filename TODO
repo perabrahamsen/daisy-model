@@ -1,28 +1,36 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Næster kørster
+
+Silstrup: Bioporer ender 120
+
+Silstrup: Max rooting depth Ap bund
+
+Silstrup: Fjern anisotropy i B & C horizont
+
+Silstrup: Fjern anisotropy i C horizont
+
 * Kørsler 
 
-** NE = Ref
+** SE = Ref
 
-*** new biopores (drain pipe + matrix i drængrøft)
+Silstrup: Offset 10, Rxylem 20
+Estrup: Offset -5
 
-*** Estrup Ap anistropy 100 (op fra 10)
+** NE
 
-*** Silstrup plow pan
-    
-*** Silstrup Ap anistropy 100
-    
-*** Silstrup 8% Theta res i B
+Silstrup: Offset 20, Rxylem = 30
+Estrup Offset -10
 
-*** Silstrup bioporer til 2 meter
+** SW 
 
-** NW Silstrup: Rxylem = 20
+Silstrup: Offset 10, Rxylem = 50
+Estrup: Offset -2
 
-** SW Silstrup: Rxylem = 50
+** NW: 
 
-** SE: drain node
-
-offset Sil: 0, Est: 0, Rxylem = 20
+Silstrup: Offset 30, Rxylem = 20
+Estrup: Offset -15
 
 * stof surface section?
 
