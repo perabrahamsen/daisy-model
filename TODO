@@ -1,44 +1,26 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Næster kørster
+* MASSEBALANCEFEJL
 
-Silstrup: Bioporer ender 120
+Kør Silstrup indtil massebalancefejl, se hvilke source/sink der er aktive.
 
-Silstrup: Max rooting depth Ap bund
+* Næste kørster
 
-Silstrup: Fjern anisotropy i B & C horizont
+** NW: Silstrup: Bioporer ender 120
 
-Silstrup: Fjern anisotropy i C horizont
+** NE: Silstrup: Max rooting depth Ap bund
 
-* Kørsler 
+** SE: Silstrup: Fjern anisotropy i B & C horizont
 
-** SE = Ref
-
-Silstrup: Offset 10, Rxylem 20
-Estrup: Offset -5
-
-** NE
-
-Silstrup: Offset 20, Rxylem = 30
-Estrup Offset -10
-
-** SW 
-
-Silstrup: Offset 10, Rxylem = 50
-Estrup: Offset -2
-
-** NW: 
-
-Silstrup: Offset 30, Rxylem = 20
-Estrup: Offset -15
-
-* stof surface section?
+** SW: Silstrup: Fjern anisotropy i B horizont
 
 * 23 uger til aflevering
 
 4 uger ferie, 2 uger før
 
 18 uger
+
+* stof surface section?
 
 * VAP skriv
 
