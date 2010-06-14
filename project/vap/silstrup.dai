@@ -4,8 +4,8 @@
 
 (defchemistry Silstrup multi
   (combine Bromide 
-           colloids Dimethoate Fenpropimorph Glyphosate
-           Metamitron
+           ;; colloids Dimethoate Fenpropimorph Glyphosate
+           ;; Metamitron
            ))
 
 ;; Soil 
@@ -173,6 +173,19 @@
 
 ;; Management.
 
+(defrootdens SB_PlowPan Depth_Depth
+  (entries ( -10 [cm] ( -11 [cm] 0.00)
+                      (  -9 [cm] 1.00)
+                      (   0 [cm] 1.00))
+           ( -35 [cm] ( -35 [cm] 0.00)
+                      ( -10 [cm] 1.00)
+                      (   0 [cm] 1.00))
+           (-120 [cm] (-121 [cm] 0.00)
+                      (-119 [cm] 0.01)
+                      ( -35 [cm] 0.01)
+                      ( -28 [cm] 1.00)
+                      (   0 [cm] 1.00))))
+
 (defaction Silstrup activity
   (wait (at 1999 11 01))
     (stubble_cultivation -7 [cm])
@@ -189,7 +202,8 @@
     ;; Sowing fodderbeat cultivare Kyros. depth 3 cm 
     ;; rowdistance 50 cm plantdistance 19 cm. 
     ;; seeding rate 3.0 kg/ha. Final plantnumber 5.7/m2			
-    (sow ("Fodder Beet"  (Root (Rxylem 20))))
+    ;;(sow ("Fodder Beet"  (Root (Rxylem 20) (rootdens SB_PlowPan))))
+    (sow ("Spring Barley" (Root (Rxylem 20) (rootdens SB_PlowPan))))
   (wait (at 2000 05 15))	
     ;; Fertilization -  103 N, 26 P, 78 K, kg/ha			
     (fertilize (NPK01 (weight 103 [kg/ha])))
@@ -244,7 +258,7 @@
     (seed_bed_preparation -4.0 [cm])
     ;; Sowing spring barley Cultivare Otira. depth 3.5 cm 
     ;; rowdistance 12 cm seeding rate 155 kg/ha. Final plantnumber 298/m2
-    (sow ("Spring Barley"  (Root (Rxylem 20))))
+    (sow ("Spring Barley"  (Root (Rxylem 20) (rootdens SB_PlowPan))))
   (wait (at 2001 05 20))
     ;; Emergence-  BBCH stage 9 (between 17/5 and 23/5)
   (wait (at 2001 05 22))

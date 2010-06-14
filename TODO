@@ -16,7 +16,9 @@ Hvis gennemsnitspond er over thresshold, udjævn over hele overfladen
 
 Hvis gennemsnitspond er under thresshold, fordel ekstra jævnt på øvrige noder.
 
-* Kørster
+* Kørsler
+
+** Alle: Nu med 1mm LocalDetentionCapacity.
 
 ** NW: Silstrup: Bioporer ender 120
 

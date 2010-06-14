@@ -369,7 +369,6 @@ Surface::Implementation::tick (Treelog& msg,
           else if (pond_section[c] + epsilon < LocalDetentionCapacity)
             free_area += area;
         }
-      extra /= total_area;      // [mm]
       update_pond_average (geo);
       daisy_balance (local_pond_average, pond_average, -extra);
 
