@@ -401,6 +401,7 @@ Surface::Implementation::tick (Treelog& msg,
           daisy_assert (extra < old_extra);
         }
     }
+  update_pond_average (geo);
   daisy_approximate (local_pond_average, pond_average);
   
   // Remember potential evaopration
