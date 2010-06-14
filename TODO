@@ -1,21 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* MASSEBALANCEFEJL
-
-Kør Silstrup indtil massebalancefejl, se hvilke source/sink der er aktive.
-
-* Silstrup
-
-** Rødder kun i Ap horisont, med en anden afgrøde første sommer.
-
-** Rodfordeling med kun få rødder under pløjesål
-
-** Overfladetransport
-
-Hvis gennemsnitspond er over thresshold, udjævn over hele overfladen
-
-Hvis gennemsnitspond er under thresshold, fordel ekstra jævnt på øvrige noder.
-
 * Kørsler
 
 ** Alle: Nu med 1mm LocalDetentionCapacity.

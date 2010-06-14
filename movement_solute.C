@@ -377,7 +377,7 @@ MovementSolute::primary_transport (const Geometry& geo, const Soil& soil,
               << ", sum " << soil_water.S_sum (c)
               << ", v1 " << soil_water.velocity_cell_primary (geo, c)
               << ", v2 " << soil_water.velocity_cell_secondary (geo, c);
-          msg.bug (tmp.str ());
+          msg.debug (tmp.str ());
         }
     }
 

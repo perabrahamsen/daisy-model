@@ -370,7 +370,7 @@ Surface::Implementation::tick (Treelog& msg,
             free_area += area;
         }
       update_pond_average (geo);
-      daisy_balance (local_pond_average, pond_average, -extra);
+      daisy_balance (local_pond_average, pond_average, -extra / total_area);
 
       // Redistribute.
       while (extra > epsilon * total_area && free_area > 1e-9)
