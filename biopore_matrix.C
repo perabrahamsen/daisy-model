@@ -352,7 +352,7 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
   // ends above the middle of the cell.
 
   // Now we find the source/sink term S.  Positive S here denotes a
-  // sink in the matrix domain, but a source in th etertiary domain.
+  // sink in the matrix domain, but a source in the tertiary domain.
   double S; 
   if (h3_bottom > 0.0 && h3_cell>h3_min && h3_cell>h + h_barrier)
     {

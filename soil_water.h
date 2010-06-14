@@ -62,7 +62,8 @@ private:
   std::vector<double> S_p_;
   std::vector<double> S_permanent_;
   std::vector<double> S_ice_;
-  std::vector<double> S_forward_;
+  std::vector<double> S_forward_total_;
+  std::vector<double> S_forward_sink_;
   std::vector<double> tillage_;
   std::vector<double> X_ice_;
   std::vector<double> X_ice_buffer_;
@@ -83,7 +84,8 @@ public:
   void clear ();
   void freeze (const Soil&, size_t c, double rate /* [h^-1] */);
   void drain (const std::vector<double>&);
-  void forward_sink (const std::vector<double>&);
+  void forward_sink (const std::vector<double>& total, 
+                     const std::vector<double>& sink);
   void root_uptake (const std::vector<double>&);
 
   // Queries
@@ -110,10 +112,14 @@ public:
   { return S_root_[i]; }
   double S_drain (size_t i) const
   { return S_drain_[i]; }
+  double S_p (size_t i) const
+  { return S_p_[i]; }
   double S_ice (size_t i) const
   { return S_ice_[i]; }
-  double S_forward (size_t i) const
-  { return S_forward_[i]; }
+  double S_forward_total (size_t i) const
+  { return S_forward_total_[i]; }
+  double S_forward_sink (size_t i) const
+  { return S_forward_sink_[i]; }
   double S_sum (size_t i) const
   { return S_sum_[i]; }
   double h_ice (size_t i) const

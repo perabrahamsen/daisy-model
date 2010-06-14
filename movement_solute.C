@@ -61,6 +61,12 @@ MovementSolute::secondary_flow (const Geometry& geo,
   for (size_t c = 0; c < cell_size; c++)
     Theta[c] = Theta_old[c];
 
+#if 1
+  // Cell source.  Must be before transport to avoid negative values.
+  for (size_t c = 0; c < cell_size; c++)
+    M[c] += S[c] * dt;
+#endif
+
   // Small timesteps.
   for (;;)
     {
@@ -72,21 +78,6 @@ MovementSolute::secondary_flow (const Geometry& geo,
       // Find new timestep.
       double ddt = time_left;
   
-#if 0             // Not needed, since we fall back on primary domain.
-      // Limit timestep based on source term.
-      for (size_t c = 0; c < cell_size; c++)
-        if (S[c] < 0.0 && M[c] > 0.0) // If it is a sink.
-          {
-            const double time_to_empty = -M[c] / S[c];
-            if (time_to_empty < min_timestep_factor * dt)
-              // Unreasonable small time step.  Give up.
-              continue;
-            
-            // Go down in timestep while it takes less than two to empty cell.
-            while (time_to_empty < 2.0 * ddt)
-              ddt *= 0.5;
-          }
-#endif
       // Limit timestep based on water flux.
       for (size_t e = 0; e < edge_size; e++)
         {
@@ -110,9 +101,11 @@ MovementSolute::secondary_flow (const Geometry& geo,
             }
         }
 
-      // Cell source.
+#if 0
+      // Cell source.  Must be before transport to avoid negative values.
       for (size_t c = 0; c < cell_size; c++)
         M[c] += S[c] * ddt;
+#endif
 
       // Find fluxes using new values (more stable).
       std::vector<double> dJ (edge_size, -42.42e42);
@@ -361,6 +354,31 @@ MovementSolute::primary_transport (const Geometry& geo, const Soil& soil,
     {
       daisy_assert (std::isfinite (C[c]));
       M[c] = A[c] + C[c] * Theta_new[c];
+
+      if (M[c] < 0.0)
+        {
+          std::ostringstream tmp;
+          tmp << "M[" << c << "] = " << M[c] 
+              << " @ " << geo.cell_name (c)
+              << ", C = " << C[c]
+              << ", M_old = " << solute.M_primary (c) << ", dt " << dt
+              << ", S_extra = " << S_extra[c] 
+              << ", S1 = " << solute.S_primary (c)
+              << ", S2 = " << solute.S_secondary (c)
+              << ", S3 = " << solute.S_tertiary (c)
+              << ", Theta_old " << Theta_old[c]
+              << ", new " << Theta_new[c]
+              << ", root " << soil_water.S_root (c)
+              << ", drain " << soil_water.S_drain (c)
+              << ", bio " << soil_water.S_p (c)
+              << ", ice " << soil_water.S_ice (c)
+              << ", forward_total " << soil_water.S_forward_total (c)
+              << ", forward_sink " << soil_water.S_forward_sink (c)
+              << ", sum " << soil_water.S_sum (c)
+              << ", v1 " << soil_water.velocity_cell_primary (geo, c)
+              << ", v2 " << soil_water.velocity_cell_secondary (geo, c);
+          msg.bug (tmp.str ());
+        }
     }
 
   solute.set_primary (soil, soil_water, M, J);

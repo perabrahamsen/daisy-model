@@ -73,10 +73,14 @@ struct ReactionFilter : public Reaction
           = soil_water.Theta_primary (i); //[cm^3 cm^-3]
         const double Theta_secondary
           = soil_water.Theta_secondary (i); //[cm^3 cm^-3]
+#if 0
         const double M_primary = C_primary * Theta_primary;//[g cm^-3 soil]
         const double M_secondary
           = C_secondary * Theta_secondary;//[g cm^-3 soil]
-
+#else
+        const double M_primary = 0.5 * mob.M_primary (i);//[g cm^-3 soil]
+        const double M_secondary = 0.5 * mob.M_secondary (i);//[g cm^-3 soil]
+#endif
         // Extract pore water velocity.
         const double v_primary
           = soil_water.velocity_cell_primary (geo, i); // [cm/h]

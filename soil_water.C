@@ -47,7 +47,8 @@ SoilWater::clear ()
   fill (S_p_.begin (), S_p_.end (), 0.0);
   fill (tillage_.begin (), tillage_.end (), 0.0);
   fill (S_ice_.begin (), S_ice_.end (), 0.0);
-  fill (S_forward_.begin (), S_forward_.end (), 0.0);
+  fill (S_forward_total_.begin (), S_forward_total_.end (), 0.0);
+  fill (S_forward_sink_.begin (), S_forward_sink_.end (), 0.0);
 
   fill (q_primary_.begin (), q_primary_.end (), 0.0);
   fill (q_secondary_.begin (), q_secondary_.end (), 0.0);
@@ -70,7 +71,7 @@ SoilWater::freeze (const Soil&, const size_t c, const double rate /* [h^-1] */)
 void
 SoilWater::drain (const std::vector<double>& v)
 {
-  forward_sink (v);
+  forward_sink (v, v);
 
   daisy_assert (S_sum_.size () == v.size ());
   daisy_assert (S_drain_.size () == v.size ());
@@ -88,11 +89,15 @@ SoilWater::drain (const std::vector<double>& v)
 }
 
 void
-SoilWater::forward_sink (const std::vector<double>& v)
+SoilWater::forward_sink (const std::vector<double>& total, 
+                         const std::vector<double>& sink)
 {
-  daisy_assert (S_forward_.size () == v.size ());
-  for (unsigned i = 0; i < v.size (); i++)
-    S_forward_[i] += v[i];
+  daisy_assert (S_forward_total_.size () == total.size ());
+  for (size_t i = 0; i < total.size (); i++)
+    S_forward_total_[i] += total[i];
+  daisy_assert (S_forward_sink_.size () == sink.size ());
+  for (size_t i = 0; i < sink.size (); i++)
+    S_forward_sink_[i] += sink[i];
 }
 
 void
@@ -253,7 +258,7 @@ SoilWater::tick_source (const Geometry& geo, const Soil& soil, Treelog& msg)
   sink_cell = Geometry::cell_error;
   for (size_t c = 0; c < cell_size; c++)
     {
-      const double S = S_forward (c);
+      const double S = S_forward_total (c);
       if (!std::isnormal (S))
         continue;
       if (S < 0.0)
@@ -622,7 +627,8 @@ SoilWater::output (Log& log) const
   output_value (S_p_, "S_p", log);
   output_value (S_permanent_, "S_permanent", log);
   output_value (S_ice_, "S_ice", log);
-  output_value (S_forward_, "S_forward", log);
+  output_value (S_forward_total_, "S_forward_total", log);
+  output_value (S_forward_sink_, "S_forward_sink", log);
   output_value (X_ice_, "X_ice", log);
   output_value (X_ice_buffer_, "X_ice_buffer", log);
   output_value (h_ice_, "h_ice", log);
@@ -767,9 +773,15 @@ Conventionally, this is the inter-aggregate pores.");
   frame.set_empty ("S_permanent");
   frame.declare ("S_ice", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Ice sink (due to thawing or freezing).");
-  frame.declare ("S_forward", "cm^3/cm^3/h",
+  frame.declare ("S_forward_total", "cm^3/cm^3/h",
                  Attribute::LogOnly, Attribute::SoilCells, "\
-Sink at beginning of timestep, used for limiting size of timestep.\n\
+Sink (including source terms) at beginning of timestep.\n\
+Used for limiting size of timestep.\n\
+Currently this includes drain and tertiary domain (biopores).");
+  frame.declare ("S_forward_sink", "cm^3/cm^3/h",
+                 Attribute::LogOnly, Attribute::SoilCells, "\
+Sink (excluding source terms) at beginning of timestep.\n\
+Used for limiting size of timestep.\n\
 Currently this includes drain and tertiary domain (biopores).");
   frame.declare_fraction ("X_ice", Attribute::OptionalState, Attribute::SoilCells,
                           "Ice volume fraction in soil.");
@@ -913,7 +925,8 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
     S_permanent_.insert (S_permanent_.end (), cell_size - S_permanent_.size (),
                          0.0);
   S_ice_.insert (S_ice_.begin (), cell_size, 0.0);
-  S_forward_.insert (S_forward_.begin (), cell_size, 0.0);
+  S_forward_total_.insert (S_forward_total_.begin (), cell_size, 0.0);
+  S_forward_sink_.insert (S_forward_sink_.begin (), cell_size, 0.0);
 
   // Fluxes.
   q_primary_.insert (q_primary_.begin (), edge_size, 0.0);

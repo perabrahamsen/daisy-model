@@ -328,7 +328,7 @@ ChemistryMulti::tick_source (const Scope& scope, const Geometry& geo,
 
 double 
 ChemistryMulti::find_dt (const double S, const double C, 
-                         double M_secondary, const double M_solute,
+                         const double M_secondary, const double M_solute,
                          const double M_total) const
 {
   double min_M = std::min (max_sink_solute * M_solute,

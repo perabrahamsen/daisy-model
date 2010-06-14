@@ -216,8 +216,6 @@ Movement1D::tick_water (const Geometry1D& geo,
           msg.debug (std::string ("UZ trouble: ") + error);
         }
       
-      // Make sure we don't call tertiary transport right after reserve model.
-      tertiary->deactivate (3); 
       water_failure (m);
     }
   throw "Water matrix transport failed"; 

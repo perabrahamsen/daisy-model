@@ -693,7 +693,7 @@ ChemicalStandard::tick_source (const Scope& scope, const Geometry& geo,
       const double Theta = soil_water.Theta (c);
       const double Theta_secondary = soil_water.Theta_secondary (c);
       const bool has_secondary =  Theta_secondary > 1e-9 * Theta;
-      const double S = soil_water.S_forward (c);
+      const double S = soil_water.S_forward_sink (c);
       const double C = this->C_secondary (c);
       const double M_total = this->M_total (c);
       const double M_solute = C * Theta;
@@ -1010,7 +1010,12 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
  
   // Drainage.
   for (size_t c = 0; c < cell_size; c++)
-    S_drain[c] = -soil_water.S_drain (c) * C_secondary_[c];
+    {
+      // We really should go down in timesteps here instead.
+      const double S_min = -0.5 * M_total_[c] / dt;
+      S_drain[c] = std::max (-soil_water.S_drain (c) * C_secondary_[c],
+                             S_min);
+    }
   add_to_source_secondary (S_drain); 
 
   // Exchange between primary and secondary domains.

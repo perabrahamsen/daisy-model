@@ -396,7 +396,6 @@ ColumnStandard::mix (const Metalib& metalib, const double from, const double to,
   const double extra 
     = soil_water->mix (geometry, *soil, *soil_heat, from, to, msg);
   overflow (extra, msg);
-  movement->deactivate_tertiary (2);
   soil_heat->set_energy (geometry, *soil, *soil_water, from, to, energy);
   chemistry->mix (geometry, *soil, *soil_water, from, to, penetration);
   surface.unridge ();

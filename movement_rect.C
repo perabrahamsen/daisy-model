@@ -292,7 +292,6 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
       catch (const std::string& error)
         { report (error, msg); }
 
-      tertiary->deactivate (3); // Don't try tertiary right after reserve.
       water_failure (i);
     }
   throw "Matrix water transport failed";

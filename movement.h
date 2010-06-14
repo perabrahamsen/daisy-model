@@ -74,7 +74,6 @@ public:
 protected:
   std::auto_ptr<Tertiary> tertiary;
 public:
-  void deactivate_tertiary (int steps);
   void tick_tertiary (const Units&,
                       const Geometry&, const Soil&, const SoilHeat&,
                       const double dt, SoilWater&, Surface&, Treelog&);

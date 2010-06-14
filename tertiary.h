@@ -50,7 +50,6 @@ public:
   // Simulation.
 public:
   // - For use by Column.
-  virtual void deactivate (int steps) = 0;
   virtual void tick_source (const Geometry&, const Soil&, const SoilHeat&, 
                             SoilWater&, Treelog&) = 0;
   virtual void tick (const Units&, 

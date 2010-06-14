@@ -86,9 +86,7 @@ struct TertiaryBiopores : public Tertiary
   double water_height;          // -||- converted to height.
   IM solute_mass;               // Mass of solutes in biopores.
   IM solute_storage;            // -||- per surface area.
-  bool log_ddt;                 // True if ddt was calculated this timestep.
   double ddt;
-  int deactivate_steps;         // Number of timesteps tertiary is deactivated.
   
   // Infiltration.
   double infiltration_capacity (const Geometry&, size_t e, double dt);
@@ -96,8 +94,6 @@ struct TertiaryBiopores : public Tertiary
   void clear ();
 
   // - For use by column.
-  void deactivate (const int steps)
-  { deactivate_steps += steps; }
   void tick_source (const Geometry&, const Soil&, const SoilHeat&, 
                     SoilWater&, Treelog&);
   void tick (const Units&, const Geometry& geo, const Soil& soil, 
@@ -296,15 +292,24 @@ TertiaryBiopores::tick_source (const Geometry& geo, const Soil& soil,
     }
 
   // Prepare classes and find forward source.
-  std::vector<double> S_forward (cell_size, 0.0);
+  std::vector<double> S_forward_total (cell_size, 0.0);
+  std::vector<double> S_forward_sink (cell_size, 0.0);
+  std::vector<double> S_forward (cell_size);
   for (size_t b = 0; b < classes.size (); b++)
     {
       classes[b]->tick_source (geo, active, h);
+      std::fill (S_forward.begin (), S_forward.end (), 0.0);
       classes[b]->forward_sink (geo, active, K, K_crack, pressure_barrier,
                                 pressure_limit, h, S_forward);
+      for (size_t c = 0; c < cell_size; c++)
+        {
+          S_forward_total[c] += S_forward[c];
+          if (S_forward[c] > 0.0)
+            S_forward_sink[c] += S_forward[c];
+        }
     }
 
-  soil_water.forward_sink (S_forward);
+  soil_water.forward_sink (S_forward_total, S_forward_sink);
 }
 
 static void
@@ -403,15 +408,6 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   soil_water.set_tertiary_flux (q_tertiary);
   surface.update_pond_average (geo);
 
-  // We might want to handle matrix interaction is small timesteps.
-  log_ddt = false;
-  if (deactivate_steps > 0)
-    {
-      deactivate_steps--;
-      return;
-    }
-  log_ddt = true;
-  
   // Soil matrix exchange.
   const size_t cell_size = geo.cell_size ();
   std::vector<double> S_drain (cell_size, 0.0);
@@ -674,9 +670,7 @@ TertiaryBiopores::output (Log& log) const
   output_variable (water_height, log);
   output_submodule (solute_mass, "solute_mass", log);
   output_submodule (solute_storage, "solute_storage", log);
-  if (log_ddt)
-    output_variable (ddt, log);
-  output_variable (deactivate_steps, log);
+  output_variable (ddt, log);
 }
 
 
@@ -750,9 +744,7 @@ TertiaryBiopores::TertiaryBiopores (const BlockModel& al)
     water_height (-42.42e42),
     solute_mass (al.units ().get_unit (IM::mass_unit ())),
     solute_storage (al.units ().get_unit (IM::storage_unit ())),
-    log_ddt (false),
-    ddt (-42.42e42),
-    deactivate_steps (al.integer ("deactivate_steps"))
+    ddt (-42.42e42)
 { }
 
 static struct TertiaryBioporesSyntax : public DeclareModel
