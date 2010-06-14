@@ -55,6 +55,7 @@ struct Surface::Implementation
   double T;
   double DetentionCapacity;
   const double ReservoirConstant;
+  const double LocalDetentionCapacity;
   double runoff;
   double runoff_fraction;
   const double R_mixing;
@@ -306,8 +307,8 @@ Surface::Implementation::tick (Treelog& msg,
 			       const double soil_T,
                                const double dt)
 {
-
-  // Runoff.
+  // Runoff out of field.
+  const double old_pond_average = pond_average;
   runoff = 0.0;
   runoff_fraction = 0.0;
   double total_area = 0.0;
@@ -329,6 +330,79 @@ Surface::Implementation::tick (Treelog& msg,
     }
   runoff /= total_area;
   runoff_fraction /= total_area;
+  update_pond_average (geo);
+  daisy_balance (old_pond_average, pond_average, runoff);
+
+  // Runoff internal.
+  const double local_pond_average = pond_average;
+  if (pond_average > LocalDetentionCapacity)
+    {
+      for (pond_map::iterator i = pond_edge.begin ();
+           i != pond_edge.end ();
+           i++)
+        {
+          const size_t c = (*i).second;
+          pond_section[c] = pond_average;
+        }
+      update_pond_average (geo);
+    }
+  else
+    {
+      // Any sections above local capacity?
+      double extra = 0.0;       // [mm cm^2] 
+      double total_area = 0.0;        // [cm^2]
+      double free_area = 0.0;         // [cm^2]
+      const double epsilon = 1e-9; // [mm]
+      for (pond_map::iterator i = pond_edge.begin ();
+           i != pond_edge.end ();
+           i++)
+        {
+          const size_t edge = (*i).first;
+          const size_t c = (*i).second;
+          const double area = geo.edge_area (edge);
+          total_area += area;
+          if (pond_section[c] > LocalDetentionCapacity + epsilon)
+            {
+              extra += area * (pond_section[c] - LocalDetentionCapacity);
+              pond_section[c] = LocalDetentionCapacity;
+            }
+          else if (pond_section[c] + epsilon < LocalDetentionCapacity)
+            free_area += area;
+        }
+      extra /= total_area;      // [mm]
+      update_pond_average (geo);
+      daisy_balance (local_pond_average, pond_average, -extra);
+
+      // Redistribute.
+      while (extra > epsilon * total_area && free_area > 1e-9)
+        {
+          const double old_extra = extra;
+          const double fill = extra / free_area;
+          free_area = 0.0;
+          for (pond_map::iterator i = pond_edge.begin ();
+               i != pond_edge.end ();
+               i++)
+            {
+              const size_t edge = (*i).first;
+              const size_t c = (*i).second;
+              const double area = geo.edge_area (edge);
+              
+              if (pond_section[c] + fill + epsilon < LocalDetentionCapacity)
+                {
+                  extra -= fill * area;
+                  pond_section[c] += fill;
+                  free_area += area;
+                }
+              else if (pond_section[c] < LocalDetentionCapacity)
+                {
+                  extra -= (LocalDetentionCapacity - pond_section[c]) * area;
+                  pond_section[c] = LocalDetentionCapacity;
+                }
+            }
+          daisy_assert (extra < old_extra);
+        }
+    }
+  daisy_approximate (local_pond_average, pond_average);
   
   // Remember potential evaopration
   Eps = PotSoilEvaporationWet;
@@ -586,12 +660,19 @@ Potential evaporation from the surface.");
   frame.declare ("T", "dg C", Attribute::LogOnly, "\
 Temperature of water or air directly above the surface.");
   frame.declare ("DetentionCapacity", "mm", Check::non_negative (),
-	      Attribute::State, "Amount of ponding the surface can retain.");
+	      Attribute::State, "Amount of ponding the surface can retain.\n\
+If ponding in any part of the surface is above this, exceed will runoff.");
   frame.set ("DetentionCapacity", 1000.0);
   frame.declare ("ReservoirConstant", "h^-1", Check::fraction (), 
 	      Attribute::Const, "\
 Fraction of ponding above DetentionCapacity that runoffs each hour.");
   frame.set ("ReservoirConstant", 1.0);
+  frame.declare ("LocalDetentionCapacity", "mm", Check::non_negative (),
+                 Attribute::State, "\
+Amount of ponding the surface can retain locally.\n                     \
+If ponding in any part of the surface is above this, exceed will be\n\
+distributed to the rest of the surface.");
+  frame.set ("LocalDetentionCapacity", 10.0);
   frame.declare ("runoff", "mm/h", Attribute::LogOnly, "\
 Amount of water runoff from ponding this hour.");
   frame.declare ("z_mixing", "cm", Check::non_negative (), Attribute::Const, "\
@@ -627,6 +708,7 @@ Surface::Implementation::Implementation (const FrameSubmodel& al)
     T (0.0),
     DetentionCapacity (al.number ("DetentionCapacity")),
     ReservoirConstant (al.number ("ReservoirConstant")),
+    LocalDetentionCapacity (al.number ("LocalDetentionCapacity")),
     runoff (0.0),
     runoff_fraction (0.0),
     R_mixing (al.number ("R_mixing")),

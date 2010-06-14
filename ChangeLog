@@ -1,3 +1,7 @@
+2010-06-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* surface.C (LocalDetentionCapacity): New parameter.
+
 2010-06-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* chemical_std.C (pass_below): New function.
