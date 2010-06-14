@@ -2,21 +2,13 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Kørsler
 
-** Alle: Nu med 1mm LocalDetentionCapacity.
+** NW: Silstrup ref
 
-** NW: Silstrup: Bioporer ender 120
+** NE: anisotropy B:10 C:10
 
-** NE: Silstrup: Max rooting depth Ap bund
+** SE: anisotropy B:1 C:100
 
-Vårbyg i stedet for foderroe
-make 50% S_drain og max 50% filter
-
-** SE: Silstrup: Fjern anisotropy i B & C horizont & Estrup
-
-Vårbyg i stedet for foderroe
-make 50% S_drain og max 50% filter
-
-** SW: Silstrup: Fjern anisotropy i B horizont
+** SW: anisotropy B:1 C:1
 
 Vårbyg i stedet for foderroe
 make 50% S_drain og max 50% filter
