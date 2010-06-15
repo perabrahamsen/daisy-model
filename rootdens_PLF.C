@@ -169,13 +169,14 @@ Rootdens_PLF::get_density (Treelog&, std::vector<double>& abs_dens,
       daisy_assert (after != NULL);
       daisy_assert (before != NULL);
       daisy_assert (after->index > before->index);
-
+      
+      const double top = geo.top ();
       const double rel_dist 
 	= (index - before->index) / (after->index - before->index);
       for (size_t i = 0; i < geo.cell_size (); i++)
 	{
 	  const double z = geo.cell_z (i) * z_factor;
-	  if (z < max_depth || i == 1)
+	  if (z < max_depth || approximate (geo.cell_top (i) + 1.0, top + 1.0))
 	    {
 	      const double a = before->density (z);
 	      const double b = after->density (z);
@@ -187,16 +188,20 @@ Rootdens_PLF::get_density (Treelog&, std::vector<double>& abs_dens,
     }
 
   // Find absolute distribution.
-  daisy_assert (WRoot > 0.0);
-  daisy_assert (SpRtLength > 0.0);
-  static const double m_per_cm = 0.01;
-  const double LengthPrArea = m_per_cm * SpRtLength * WRoot; // [cm/cm^2]
-  const double sum = geo.total_soil (abs_dens);
+  daisy_assert (WRoot > 0.0);          // [g DM/m^2 S]
+  daisy_assert (SpRtLength > 0.0);     // [m R/g DM]
+  static const double m_per_cm = 0.01; // [m/cm]
+  // [cm R/cm^2 S] = [m/cm] * [m R/g DM] * [g DM/m^2 S]
+  const double LengthPrArea = m_per_cm * SpRtLength * WRoot; // [cm R/cm^2 S]
+  const double sum = geo.total_soil (abs_dens);              // [cm^3 S]
   daisy_assert (sum > 0.0);
-  const double factor = LengthPrArea / sum;
+  const double surface_area = geo.surface_area (); // [cm^2 S]
+  const double TotalRootLength = LengthPrArea * surface_area; // [cm R]
+  const double factor 
+    = TotalRootLength / sum; // [cm R/cm^3 S]
   for (unsigned int i = 0; i < abs_dens.size (); i++)
     abs_dens[i] *= factor;
-  daisy_assert (approximate (LengthPrArea, geo.total_soil (abs_dens)));
+  daisy_assert (approximate (TotalRootLength, geo.total_soil (abs_dens)));
 }
 
 Rootdens_PLF::Rootdens_PLF (const BlockModel& al)
