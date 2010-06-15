@@ -664,7 +664,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
          "Conductivity C1 Estrup"
          "Retention C2 Estrup"
          "Conductivity C2 Estrup"
-         (theta (depth "SW025cm") (extra &old "set xtics rotate"))
+         (theta (depth "SW025cm"))
          horizontal horizontal-bromide leak150 leak150acc
          ;; First measurement 2000-05-26.
          (drain (begin 2000 05 26))
@@ -673,16 +673,12 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
          ;; First application: Bromide 2000-05-22
          ;; Last application: Glyphosate 2000-10-13
          (est-drainmass (begin 2000 05 26) (chemical Bromide))
-         (drainmass-sim (begin 2000 05 26)(chemical Dimethoate)
-                        (extra &old "set xtics rotate"))
-         (drainmass-sim (begin 2000 05 26)(chemical Fenpropimorph)
-                        (extra &old "set xtics rotate"))
+         (drainmass-sim (begin 2000 05 26)(chemical Dimethoate))
+         (drainmass-sim (begin 2000 05 26)(chemical Fenpropimorph))
          (est-drainmass (begin 2000 05 26) (chemical Glyphosate))
          (est-drainmass-acc (begin 2000 05 26) (chemical Bromide))
-         (drainmass-acc-sim (begin 2000 05 26) (chemical Dimethoate)
-                            (extra &old "set xtics rotate"))
-         (drainmass-acc-sim (begin 2000 05 26) (chemical Fenpropimorph)
-                            (extra &old "set xtics rotate"))
+         (drainmass-acc-sim (begin 2000 05 26) (chemical Dimethoate))
+         (drainmass-acc-sim (begin 2000 05 26) (chemical Fenpropimorph))
          (est-drainmass-acc (begin 2000 05 26) (chemical Glyphosate))
          ))
 

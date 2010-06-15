@@ -318,9 +318,9 @@
   (title "HYPRES"))
 
 (defgnuplot "Hydraulic" xy
-  (device "pdf size 9cm, 6cm")
+  (device "pdf size 9cm, 5.5cm")
   (extra &old
-         [set lmargin 10]
+         [set lmargin 9]
          [set rmargin 1]
          [set bmargin 3]
          [set tmargin 3]))
@@ -348,7 +348,7 @@
 (defgnuplot plottime time
   (device "pdf size 19cm, 8cm")
   (extra &old
-         [set lmargin 10]
+         [set lmargin 12]
          [set rmargin 10]
          [set bmargin 2]
          [set tmargin 1]  
@@ -454,7 +454,6 @@
 
 
 (defgnuplot leak150bromide leak150common
-  (extra &old "set xtics rotate")
   (where "fig/${station}-leak150bromide.pdf")
   (title "Bromide")
   (legend none)
@@ -467,8 +466,7 @@
 
 
 (defgnuplot leak150acc leak150common
-  (extra &old
-         "set xtics rotate")
+  (extra &old)
   (where "fig/${station}-leak150acc.pdf")
   (title "Accumulated")
   (source (column (file "log/${station}-content.dlf")
@@ -489,21 +487,22 @@
 
 (defgnuplot horizontal plottime
   ;; First application (either site) 2000-05-22.
-  (extra &old
-         "set xtics rotate")
+  (extra &old)
   (begin 2000 05 01)
   (where "fig/${station}-horizontal.pdf")
   (source (column (file "log/${station}-content.dlf")
-                  (tag "Dimethoate"))
+                  (tag "Dimethoate")
+                  (dimension [ug/L]))
           (column (file "log/${station}-content.dlf")
-                  (tag "Fenpropimorph"))
+                  (tag "Fenpropimorph")
+                  (dimension [ug/L]))
           (column (file "log/${station}-content.dlf")
-                  (tag "Glyphosate"))))
+                  (tag "Glyphosate")
+                  (dimension [ug/L]))))
 
 (defgnuplot horizontal-bromide plottime
   ;; First application (either site) 2000-05-22.
-  (extra &old
-         "set xtics rotate")
+  (extra &old)
   (begin 2000 05 01)
   (where "fig/${station}-Bromide-horizontal.pdf")
   (source (column (file "log/${station}-content.dlf")
@@ -566,7 +565,6 @@
 (defgnuplot biopore plottime
   ;; (begin 2000 04 29) (end 2002 6 30)
   (where "fig/${station}-biopore.pdf")
-  (extra &old "set xtics rotate")
   (title "Biopore flow")
   (source (arithmetic (file "log/${station}-drain.dlf")
                       (expr (/ "Surface water tertiary" 1.0 [h]))
@@ -586,7 +584,6 @@
 
 (defgnuplot biopore-acc plottime
   ;; (begin 2000 04 29) (end 2002 6 30)
-  (extra &old "set xtics rotate")
   (where "fig/${station}-biopore-acc.pdf")
   (title "Accumulated biopore flow")
   (source (column (file "log/${station}-drain.dlf")
@@ -612,7 +609,6 @@
 
 (defgnuplot biopore-drain plottime
   ;; (begin 2000 04 29) (end 2002 6 30)
-  (extra &old "set xtics rotate")
   (where "fig/${station}-biopore-drain.pdf")
   (title "Biopore drain flow")
   (source (arithmetic (file "log/${station}-drain.dlf")
@@ -633,7 +629,6 @@
 
 (defgnuplot biopore-drain-acc plottime
   ;; (begin 2000 04 29) (end 2002 6 30)
-  (extra &old "set xtics rotate")
   (where "fig/${station}-biopore-drain-acc.pdf")
   (title "Accumulated biopore drain flow")
   (source (column (file "log/${station}-drain.dlf")
@@ -704,7 +699,6 @@
                       (title "Obs"))))
 
 (defgnuplot colloids plottime
-  (extra &old "set xtics rotate")
   (declare chemical String "Name of chemical to plot")
   (chemical colloid)
   ;; (begin 2000 10 1) (end 2002 4 1)

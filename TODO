@@ -26,13 +26,13 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 Silstrup ref
 
-** NW: ldc 1 mm
+** NW: 5
 
-** NE: ldc 2 mm
+** NE: 0
 
-** SW: ldc 4 mm
+** SW: -5
 
-** SE: ldc 8 mm
+** SE: -10
 
 * 23 uger til aflevering
 
