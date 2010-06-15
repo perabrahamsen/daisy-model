@@ -43,6 +43,7 @@
 ;; Plot only
 ;;(run batch (run plotall))
 ;;(run batch (run (plotall (graph Silstrup))))
+;;(run batch (run (plotall (graph Estrup))))
 ;;(run plothydro)
 
 ;;; vap.dai ends here.

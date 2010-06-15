@@ -96,8 +96,8 @@
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;; 10  cm too high, 0 cm is too low
-               (offset 8 [cm]) 
+               ;; 8  cm too high,  cm is too low
+               (offset 5 [cm]) 
                )
   ;;(Groundwater aquitard 
   ;;             (K_aquitard 1 [mm/h])
@@ -174,17 +174,16 @@
 ;; Management.
 
 (defrootdens SB_PlowPan Depth_Depth
-  (entries ( 10 [?cm] ((  0 [?cm] 1.00 [])
-                       (  9 [?cm] 1.00 [])
-                       ( 11 [?cm] 0.00 [])))
-           ( 35 [?cm] ((  0 [?cm] 1.00 [])
-                       ( 10 [?cm] 1.00 [])
-                       ( 35 [?cm] 0.00 [])))
-           (120 [?cm] ((  0 [?cm] 1.00 [])
-                       ( 28 [?cm] 1.00 [])
-                       ( 35 [?cm] 0.01 [])
-                       (119 [?cm] 0.01 [])
-                       (121 [?cm] 0.00 [])))))
+  (entries ( 10 [?cm] ((  0 [?cm] 1.000 [])
+                       (  9 [?cm] 1.000 [])
+                       ( 11 [?cm] 0.000 [])))
+           ( 35 [?cm] ((  0 [?cm] 1.000 [])
+                       ( 10 [?cm] 1.000 [])
+                       ( 35 [?cm] 0.000 [])))
+           (120 [?cm] ((  0 [?cm] 1.000 [])
+                       ( 28 [?cm] 1.000 [])
+                       ( 35 [?cm] 0.001 [])
+                       (120 [?cm] 0.000 [])))))
 
 (defaction Silstrup activity
   (wait (at 1999 11 01))

@@ -1,7 +1,7 @@
-\documentclass[fullpage,a4paper]{article}
+\documentclass[a4paper]{article}
 
 %\usepackage[left=1cm,top=1cm,right=1cm,nohead,nofoot]{geometry}
-\usepackage[left=1cm,top=1cm,right=1cm,nohead,nofoot]{geometry}
+\usepackage[left=1cm,top=2cm,right=1cm]{geometry}
 \usepackage[latin1]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[danish]{babel}
@@ -16,7 +16,7 @@
 
 \newcommand{\horfig}[2]{
 \begin{figure}[htbp] 
-  \includegraphics[]{fig/#1-#2-Theta}\includegraphics[]{fig/#1-#2-K}
+  \includegraphics{fig/#1-#2-Theta}\includegraphics{fig/#1-#2-K}
   \caption{Hydrauliske egenskaber for #1 #2.  MACRO angiver den
     oprindelige parameterisering, Daisy den modificerede
     parameterisering, og HYPRES refererer til parametre estimeret med
@@ -29,12 +29,12 @@
 
 % \section*{Daisy simulation figures for Silstrup og Estrup}
 
-\include{figs-Silstrup}
+%% \include{figs-Silstrup}
 
  \include{figs-Estrup}
 
-\include{figs-Silstrup-2D}
+%%\include{figs-Silstrup-2D}
 
- \include{figs-Estrup-2D}
+%%  \include{figs-Estrup-2D}
 
 \end{document}

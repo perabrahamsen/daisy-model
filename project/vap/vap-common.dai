@@ -54,7 +54,7 @@
 (defcolumn VAP default
   "Shared parameters for VAP fields."
   ;; (Bioclimate original (pet makkink))
-  (Surface (LocalDetentionCapacity 1 [mm]))
+  (Surface (LocalDetentionCapacity 2 [mm]))
   (Bioclimate original (pet (FAO_PM (use_wet true))))
   (OrganicMatter original
                  ;; (Bioincorporation (C_per_N_factor (20 1) (100 0.1) (120 0.01)))
@@ -318,12 +318,12 @@
   (title "HYPRES"))
 
 (defgnuplot "Hydraulic" xy
-  (device "pdf size 8cm, 8cm")
+  (device "pdf size 9cm, 6cm")
   (extra &old
          [set lmargin 10]
-         [set rmargin 0]
-         [set bmargin 1]
-         [set tmargin 0]))
+         [set rmargin 1]
+         [set bmargin 3]
+         [set tmargin 3]))
 
 (defgnuplot "Retention All" "Hydraulic"
   "Plot retention curve."
@@ -331,7 +331,7 @@
   (ymin  0 [])
   (declare hor String "Name of horizon.")
   (where "fig/${station}-${hor}-Theta.pdf")
-  (title "Retention curve"))
+  (title "${hor} retention curve"))
 
 (defgnuplot "Conductivity All" "Hydraulic"
   "Plot conductivity curve."
@@ -343,16 +343,15 @@
   (ymin 1e-10 [])
   (declare hor String "Name of horizon.")
   (where "fig/${station}-${hor}-K.pdf")
-  (title "Conductivity curve"))
+  (title "${hor} conductivity curve"))
 
 (defgnuplot plottime time
-  (device "pdf size 18cm, 10cm")
+  (device "pdf size 19cm, 8cm")
   (extra &old
          [set lmargin 10]
          [set rmargin 10]
-         [set bmargin 1]
-         [set tmargin 0]  
-         "unset logscale"
+         [set bmargin 2]
+         [set tmargin 1]  
          [set format x "%y-%m"]
          "unset xlabel"))
 
@@ -373,7 +372,6 @@
 
 (defgnuplot gw plottime
   ;; (begin 2000 04 29) (end 2002 6 30)
-  (extra &old "set xtics rotate")
   (where "fig/${station}-gw.pdf")
   (title "Groundwater")
   (source (column (file "log/${station}-content.dlf")
@@ -427,9 +425,6 @@
 
 (defgnuplot leak150common plottime
   ;; First application (either site) 2000-05-22.
-  (extra &old
-         "set lmargin 8"
-         "set rmargin 8")
   (begin 2000 05 01)
   (where "fig/${station}-leak150.pdf")
   (title "Pesticide leaching")

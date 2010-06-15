@@ -1,5 +1,20 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* VAP skriv
+
+** Hvordan bruger man Daisy-2D til pesticider?
+   
+** Opsætning
+
+** Kalibrering
+   
+** Overflade, Silstrup
+
+** Pløjesål, Estrup
+
+** Agrovand
+
+** FOCUS
 
 * Test
 
@@ -9,16 +24,15 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Kørsler
 
-** NW: Silstrup ref
+Silstrup ref
 
-** NE: anisotropy B:10 C:10
+** NW: ldc 1 mm
 
-** SE: anisotropy B:1 C:100
+** NE: ldc 2 mm
 
-** SW: anisotropy B:1 C:1
+** SW: ldc 4 mm
 
-Vårbyg i stedet for foderroe
-make 50% S_drain og max 50% filter
+** SE: ldc 8 mm
 
 * 23 uger til aflevering
 
@@ -27,23 +41,6 @@ make 50% S_drain og max 50% filter
 18 uger
 
 * stof surface section?
-
-* VAP skriv
-
-** Hvordan bruger man Daisy-2D til pesticider?
-
-** Opsætning
-
-** Kalibrering
-
-** Overflade, Silstrup
-
-** Pløjesål, Estrup
-
-** Agrovand
-
-** FOCUS
-
 
 * 2dplot movie
 
