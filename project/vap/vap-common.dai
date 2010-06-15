@@ -54,7 +54,6 @@
 (defcolumn VAP default
   "Shared parameters for VAP fields."
   ;; (Bioclimate original (pet makkink))
-  (Surface (LocalDetentionCapacity 2 [mm]))
   (Bioclimate original (pet (FAO_PM (use_wet true))))
   (OrganicMatter original
                  ;; (Bioincorporation (C_per_N_factor (20 1) (100 0.1) (120 0.01)))

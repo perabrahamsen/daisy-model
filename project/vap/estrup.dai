@@ -115,6 +115,7 @@
   (secondary_domain vap_nocracks))
 
 (defcolumn Estrup VAP
+  (Surface (LocalDetentionCapacity 5 [cm]))
   (Groundwater file "dk-estrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.

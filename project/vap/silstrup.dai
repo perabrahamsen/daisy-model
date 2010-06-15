@@ -93,6 +93,7 @@
   (secondary_domain vap_nocracks))
 
 (defcolumn Silstrup VAP
+  (Surface (LocalDetentionCapacity 2 [mm]))
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
