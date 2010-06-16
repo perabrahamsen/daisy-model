@@ -4,37 +4,88 @@
 \usepackage[left=1cm,top=2cm,right=1cm]{geometry}
 \usepackage[latin1]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[danish]{babel}
 \usepackage{natbib}
 \bibliographystyle{apalike}
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{fancyhdr}
 \usepackage{placeins}
+\usepackage{comment}
 \pagestyle{fancy}
 \rhead{\today}
 
-\newcommand{\horfig}[2]{
-\begin{figure}[htbp] 
-  \includegraphics{fig/#1-#2-Theta}\includegraphics{fig/#1-#2-K}
-  \caption{Hydrauliske egenskaber for #1 #2.  MACRO angiver den
-    oprindelige parameterisering, Daisy den modificerede
-    parameterisering, og HYPRES refererer til parametre estimeret med
-    pedotransferfunktionen beskrevet i \citet{hypres}.}
-  \label{fig:#1-#2}
-\end{figure}\FloatBarrier
-}
+%\includecomment{text}
+\excludecomment{text}
 
 \begin{document}
 
+\begin{text}
+* Introduction
+
+** About PLAP
+
+** Role of PLAP simulations in R2D2
+
+** Presentation of sites
+
+** Selection criteria
+
+* Data
+
+** Weather
+
+** Management
+
+** Soil Lindhart, MACRO
+
+** Measurements
+
+* Model
+
+* Setup
+
+* Calibration
+
+* Results
+
+\end{text}
+
 % \section*{Daisy simulation figures for Silstrup og Estrup}
 
-%% \include{figs-Silstrup}
+\include{figs-Silstrup}
 
- \include{figs-Estrup}
+%% \include{figs-Estrup}
 
-%%\include{figs-Silstrup-2D}
+\include{figs-Silstrup-2D}
 
-%%  \include{figs-Estrup-2D}
+%% \include{figs-Estrup-2D}
 
+\begin{text}
+\section{Discussion and conclusion}
+
+It is possible to explain the measured data based on the processes
+included in the present model, with some caveats
+\begin{itemize}
+\item The high degree of heterogenity found in the Estrup site would
+  require a detailed 3D model of the entire area to model
+  mechanistically, the current 2D model setup must be viewed as
+  ``effective parameters''.
+\item * Silstrup drain dynamics.  Surface transport both for drain and for bromide.
+\item * Large scale fracture transport.
+\end{itemize}
+This work does not count as a validation of the parameterization or
+the conceptual model, there are too many unknowns where we have had to
+guess or calibrate parameters, and there are likely many different
+setups that would have resultet in as good or better fits to the
+measured results.  It is not certain that a proper validation is
+possible, but by appling the model on more datasets we should be able
+to gain confidence in it it.
+
+Further work:
+* Surface processes.
+* Pesticide processes (colloids, sorbtion sites, sorption kinetics)
+* More sites and years.
+
+\end{text}
+  
 \end{document}

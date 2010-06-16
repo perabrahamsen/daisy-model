@@ -661,7 +661,7 @@
                       (file "log/${station}-field-${chemical}-weekly.dlf")
                       (expr (/ (+ "Soil-Drain" "Surface-Drain") 1 [w]))
                       (with lines)
-                      (title "Sim"))))
+                      (title "${chemical}"))))
 
 (defgnuplot drainmass-acc-sim plottime
   (declare chemical String "Name of chemical to plot")
@@ -674,7 +674,7 @@
                       (expr (+ "Soil-Drain" "Surface-Drain"))
                       (with lines)
                       (accumulate true)
-                      (title "Sim"))))
+                      (title "${chemical}"))))
 
 (defgnuplot drainmass drainmass-sim
   (declare area Number [ha] "Area to plot.")

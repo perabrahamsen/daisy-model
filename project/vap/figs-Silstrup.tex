@@ -2,23 +2,27 @@
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-weather}
+    \includegraphics{fig/Silstrup-weather}
   \end{center}
-  \caption{Akkumuleret nedbør og fordampning, samt timeværdier for
-    temperatur for målestationen i Silstrup.  Potentiel og aktuel
-    fordamppning er identiske når der ikke er vandstress.}
+  \caption{Accumulated precipitation and hourly values for temperature
+    measured at Silstrup station.  Calculated potentiel and simulated
+    actual evapotranspiration are also shown.}
   \label{fig:Silstrup-weather}
 \end{figure}\FloatBarrier
 
-\horfig{Silstrup}{Ap}
-
-\horfig{Silstrup}{B}
-
-\horfig{Silstrup}{C}
+\begin{figure}[htbp] 
+  \includegraphics{fig/Silstrup-Ap-Theta}\includegraphics{fig/Silstrup-Ap-K}\\
+  \includegraphics{fig/Silstrup-B-Theta}\includegraphics{fig/Silstrup-B-K}\\
+  \includegraphics{fig/Silstrup-C-Theta}\includegraphics{fig/Silstrup-C-K}
+  \caption{Hydraulic properties for Silstrup soil.  MACRO denotes the
+    original parametrization, Daisy the modifiet parametrization, and
+    HYPRES refers to parameters estimated according to \citet{hypres}.}
+  \label{fig:Silstrup-hor}
+\end{figure}\FloatBarrier
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-gw}
+    \includegraphics{fig/Silstrup-gw}
   \end{center}
   \caption{Grundvandsstand for Silstrup.}
   \label{fig:Silstrup-gw}
@@ -26,9 +30,9 @@
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-theta-SW025cm}\\
-    \includegraphics[]{fig/Silstrup-theta-SW060cm}\\
-    \includegraphics[]{fig/Silstrup-theta-SW110cm}
+    \includegraphics{fig/Silstrup-theta-SW025cm}\\
+    \includegraphics{fig/Silstrup-theta-SW060cm}\\
+    \includegraphics{fig/Silstrup-theta-SW110cm}
   \end{center}
   \caption{Jordvand for målepunkt S1 i Silstrup.}
   \label{fig:Silstrup-theta}
@@ -36,7 +40,7 @@
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-sc-bromide}
+    \includegraphics{fig/Silstrup-sc-bromide}
   \end{center}
   \caption{Bromid i jorden i en meters dybde ved S1 i Silstrup.}
   \label{fig:Silstrup-sc-bromide}
@@ -44,7 +48,7 @@
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-horizontal}
+    \includegraphics{fig/Silstrup-horizontal}
   \end{center}
   \caption{Pesticider i jorden i 3,5 meters dybde i Silstrup.}
   \label{fig:Silstrup-horizontal}
@@ -52,7 +56,7 @@
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-Bromide-horizontal}
+    \includegraphics{fig/Silstrup-Bromide-horizontal}
   \end{center}
   \caption{Bromid i jorden ved horizontale filtre i 3,5 meters dybde i
     Silstrup.}
@@ -61,7 +65,7 @@
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-drain}
+    \includegraphics{fig/Silstrup-drain}
   \end{center}
   \caption{Drænafstrøming i Silstrup.}
   \label{fig:Silstrup-drain}
@@ -69,7 +73,7 @@
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-drain-acc}
+    \includegraphics{fig/Silstrup-drain-acc}
   \end{center}
   \caption{Akkumuleret drænafstrømning i Silstrup.}
   \label{fig:Silstrup-drain-acc}
@@ -77,8 +81,8 @@
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-Bromide-weekly}\\
-    \includegraphics[]{fig/Silstrup-Metamitron-weekly}
+    \includegraphics{fig/Silstrup-Bromide-weekly}\\
+    \includegraphics{fig/Silstrup-Metamitron-weekly}
   \end{center}
   \caption{Weekly drain flow of Bromide and Metamitron.}
   \label{fig:Silstrup-weekly}
@@ -86,9 +90,9 @@
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-Dimethoate-weekly}\\
-    \includegraphics[]{fig/Silstrup-Fenpropimorph-weekly}\\
-    \includegraphics[]{fig/Silstrup-Glyphosate-weekly}
+    \includegraphics{fig/Silstrup-Dimethoate-weekly}\\
+    \includegraphics{fig/Silstrup-Fenpropimorph-weekly}\\
+    \includegraphics{fig/Silstrup-Glyphosate-weekly}
   \end{center}
   \caption{Weekly drain flow of selected pesticides.}
   \label{fig:Silstrup-weekly2}
@@ -96,8 +100,8 @@
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-Bromide-acc}\\
-    \includegraphics[]{fig/Silstrup-Metamitron-acc}
+    \includegraphics{fig/Silstrup-Bromide-acc}\\
+    \includegraphics{fig/Silstrup-Metamitron-acc}
   \end{center}
   \caption{Accumulated drain flow of Bromide and Metamitron.}
   \label{fig:Silstrup-bromide-acc}
@@ -105,9 +109,9 @@
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-Dimethoate-acc}\\
-    \includegraphics[]{fig/Silstrup-Fenpropimorph-acc}\\
-    \includegraphics[]{fig/Silstrup-Glyphosate-acc}
+    \includegraphics{fig/Silstrup-Dimethoate-acc}\\
+    \includegraphics{fig/Silstrup-Fenpropimorph-acc}\\
+    \includegraphics{fig/Silstrup-Glyphosate-acc}
   \end{center}
   \caption{Accumulated drain flow of selected pesticides.}
   \label{fig:Silstrup-acc}
@@ -115,24 +119,24 @@
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-leak150bromide}
+    \includegraphics{fig/Silstrup-leak150bromide}
   \end{center}
-  \caption{Simuleret udvaskning i 150 cm, 30 cm under bioporer.}
+  \caption{Simuleret bromidudvaskning i 150 cm, 30 cm under bioporer.}
   \label{fig:Silstrup-leak150}
 \end{figure}\FloatBarrier
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-leak150}\\
-    \includegraphics[]{fig/Silstrup-leak150acc}
+    \includegraphics{fig/Silstrup-leak150}\\
+    \includegraphics{fig/Silstrup-leak150acc}
   \end{center}
-  \caption{Simuleret udvaskning i 150 cm, 30 cm under bioporer.}
+  \caption{Simuleret pesticidudvaskning i 150 cm, 30 cm under bioporer.}
   \label{fig:Silstrup-leak1502}
 \end{figure}\FloatBarrier
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-colloid}
+    \includegraphics{fig/Silstrup-colloid}
   \end{center}
   \caption{Kolloider i drænvand.}
   \label{fig:Silstrup-biopore}
@@ -140,8 +144,8 @@
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-biopore}\\
-    \includegraphics[]{fig/Silstrup-biopore-acc}\\
+    \includegraphics{fig/Silstrup-biopore}\\
+    \includegraphics{fig/Silstrup-biopore-acc}\\
   \end{center}
   \caption{Bioporeaktivitet i 5 forskellige jordlag.}
   \label{fig:Silstrup-biopore2}
@@ -149,8 +153,8 @@
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[]{fig/Silstrup-biopore-drain}\\
-    \includegraphics[]{fig/Silstrup-biopore-drain-acc}
+    \includegraphics{fig/Silstrup-biopore-drain}\\
+    \includegraphics{fig/Silstrup-biopore-drain-acc}
   \end{center}
   \caption{Bidrag til dræn i 5 forskellige jordlag.}
   \label{fig:Silstrup-biopore3}
