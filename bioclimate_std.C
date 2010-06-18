@@ -93,6 +93,7 @@ struct BioclimateStandard : public Bioclimate
   // Water intercepted on canopy.
   double canopy_ep;             // Potential canopy evaporation [mm/h]
   double canopy_ea_;            // Actual canopy evaporation [mm/h]
+  double canopy_water_capacity;  // Pot. intercepted water on canopy [mm]
   double canopy_water_storage;  // Intercepted water on canopy [mm]
   double canopy_water_temperature; // Temperature of incoming water [dg C]
   double canopy_water_in;       // Water entering canopy [mm/h]
@@ -102,6 +103,7 @@ struct BioclimateStandard : public Bioclimate
   // Water intercepted on litter.
   double litter_ep;             // Potential litter evaporation [mm/h]
   double litter_ea;             // Actual litter evaporation [mm/h]
+  double litter_water_capacity;  // Pot. intercepted water in litter [mm]
   double litter_water_storage;  // Intercepted water in litter [mm]
   double litter_water_temperature; // Temperature of water in litter [dg C]
   double litter_water_in;       // Water entering litter [mm/h]
@@ -450,6 +452,7 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     snow_water_out_temperature (0.0),
     canopy_ep (0.0),
     canopy_ea_ (0.0),
+    canopy_water_capacity (0.0),
     canopy_water_storage (al.number ("canopy_water_storage")),
     canopy_water_temperature (0.0),
     canopy_water_in (0.0),
@@ -457,6 +460,7 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     canopy_water_bypass (0.0),
     litter_ep (0.0),
     litter_ea (0.0),
+    litter_water_capacity (0.0),
     litter_water_storage (al.number ("litter_water_storage")),
     litter_water_temperature (0.0),
     litter_water_in (0.0),
@@ -835,7 +839,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
   total_ea_ += litter_ea;
   daisy_assert (total_ea_ >= 0.0);
   
-  const double litter_water_capacity = litter.water_capacity ();
+  litter_water_capacity = litter.water_capacity ();
   litter_water_storage += (litter_water_in - litter_ea) * dt;
   if (litter_water_storage < 0.0)
     {
@@ -1162,6 +1166,7 @@ BioclimateStandard::output (Log& log) const
                 "snow_water_out_temperature", log);
   output_variable (canopy_ep, log);
   output_value (canopy_ea_, "canopy_ea", log);
+  output_variable (canopy_water_capacity, log);
   output_variable (canopy_water_storage, log);
   output_variable (canopy_water_temperature, log);
   output_variable (canopy_water_in, log);
@@ -1169,6 +1174,7 @@ BioclimateStandard::output (Log& log) const
   output_variable (canopy_water_bypass, log);
   output_variable (litter_ep, log);
   output_variable (litter_ea, log);
+  output_variable (litter_water_capacity, log);
   output_variable (litter_water_storage, log);
   output_variable (litter_water_temperature, log);
   output_variable (litter_water_in, log);
@@ -1350,6 +1356,8 @@ The intended use is colloid generation.");
                    "Potential canopy evaporation.");
     frame.declare ("canopy_ea", "mm/h", Attribute::LogOnly,
                    "Actual canopy evaporation.");
+    frame.declare ("canopy_water_capacity", "mm", Attribute::LogOnly,
+                   "Potential intercepted water on canopy.");
     frame.declare ("canopy_water_storage", "mm", Attribute::State,
                    "Intercepted water on canopy.");
     frame.set ("canopy_water_storage", 0.0);
@@ -1367,6 +1375,8 @@ The intended use is colloid generation.");
                    "Potential evaporation litter.");
     frame.declare ("litter_ea", "mm/h", Attribute::LogOnly,
                    "Actual litter evaporation.");
+    frame.declare ("litter_water_capacity", "mm", Attribute::LogOnly,
+                   "Potential intercepted water on litter.");
     frame.declare ("litter_water_storage", "mm", Attribute::State,
                    "Intercepted water on litter.");
     frame.set ("litter_water_storage", 0.0);

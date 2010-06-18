@@ -4,8 +4,8 @@
 
 (defchemistry Silstrup multi
   (combine Bromide 
-           ;; colloids Dimethoate Fenpropimorph Glyphosate
-           ;; Metamitron
+           colloids Dimethoate Fenpropimorph Glyphosate
+           Metamitron
            ))
 
 ;; Soil 
@@ -444,6 +444,8 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
 
 
   (output &old
+          ("Surface Chemicals" (when hourly) (chemical "Glyphosate-base")
+           (where "log/${station}-surface-Glyphosate.dlf"))
           ("Tertiary chemical sink" (when monthly) (chemical "Metamitron-base")
            (where "log/${station}-b2m-Metamitron.dlf"))
           ("Preferential Chemical Transport" (when monthly)
@@ -677,10 +679,74 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
          "Retention C Silstrup"
          "Conductivity C Silstrup"))
 
+(defgnuplot Silstrup-short plottime
+  (begin 2001 10 25) (end 2001 11 01)
+  (extra &old [set format x "%d/%m"]))
+  
+
+(defgnuplot Silstrup-weather-glyphosate Silstrup-short
+  (where "fig/${station}-weather-glyphosate.pdf")
+  (source (arithmetic (file "log/${station}-surface-water.dlf")
+                      (title "Precipitation")
+                      (expr (/ Precipitation 1 [h])))
+          (arithmetic (file "log/${station}-surface-water.dlf")
+                      (title "Litter evaporation")
+                      (expr (/ "Litter evaporation" 1 [h])))
+          (arithmetic (file "log/${station}-surface-water.dlf")
+                      (title "Surface evaporation")
+                      (expr (/ "Surface evaporation" 1 [h])))
+          (arithmetic (file "log/${station}-surface-water.dlf")
+                      (title "Matrix infiltration")
+                      (expr (/ "Matrix infiltration" 1 [h])))
+          (arithmetic (file "log/${station}-surface-water.dlf")
+                      (title "Tertiary infiltration")
+                      (expr (/ "Tertiary infiltration" 1 [h])))))
+
+(defgnuplot Silstrup-water-glyphosate Silstrup-short
+  (begin 2001 10 25) (end 2001 11 01)
+  (extra &old [set format x "%d/%m"])
+  ;; (legend none)
+  (where "fig/${station}-water-glyphosate.pdf")
+  (source (column (file "log/${station}-surface-water.dlf")
+                  (tag "Litter capacity"))
+          (column (file "log/${station}-surface-water.dlf")
+                  (tag Litter))
+          (column (file "log/${station}-surface-water.dlf")
+                  (tag Pond))
+  ))
+
+(defgnuplot Silstrup-first-glyphosate Silstrup-short
+  (where "fig/${station}-first-glyphosate.pdf")
+  (source (column (file "log/${station}-surface-Glyphosate.dlf")
+                  (title "Litter storage")
+                  (tag litter_storage))
+          (column (file "log/${station}-surface-Glyphosate.dlf")
+                  (title "Litter decompose")
+                  (tag litter_decompose)
+                  (accumulate true))
+          (column (file "log/${station}-surface-Glyphosate.dlf")
+                  (title "Surface storage")
+                  (tag surface_storage))
+          (column (file "log/${station}-surface-Glyphosate.dlf")
+                  (title "Surface decompose")
+                  (tag surface_decompose)
+                  (accumulate true))
+          (column (file "log/${station}-surface-Glyphosate.dlf")
+                  (title "Matrix in")
+                  (tag matrix_in)
+                  (accumulate true))
+          (column (file "log/${station}-surface-Glyphosate.dlf")
+                  (title "Tertiary in")
+                  (tag tertiary_in)
+                  (accumulate true))))
+
 (defgnuplot Silstrup Station
   (station Silstrup)
   (area 1.69 [ha])
   (graph &old 
+         Silstrup-weather-glyphosate
+         Silstrup-water-glyphosate
+         Silstrup-first-glyphosate
          "Retention Ap Silstrup"
          "Conductivity Ap Silstrup"
          "Retention B Silstrup"

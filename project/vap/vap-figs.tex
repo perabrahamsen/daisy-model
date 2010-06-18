@@ -30,7 +30,9 @@
 
 ** Selection criteria
 
-* Data
+* Model
+
+* Data, model setup, and calibration
 
 ** Weather
 
@@ -40,52 +42,75 @@
 
 ** Measurements
 
-* Model
-
-* Setup
-
-* Calibration
-
 * Results
 
 \end{text}
 
 % \section*{Daisy simulation figures for Silstrup og Estrup}
 
-\include{figs-Silstrup}
+%% \include{figs-Silstrup}
 
 %% \include{figs-Estrup}
 
-\include{figs-Silstrup-2D}
+%% \include{figs-Silstrup-2D}
 
 %% \include{figs-Estrup-2D}
 
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics{fig/Silstrup-weather-glyphosate}\\
+    \includegraphics{fig/Silstrup-water-glyphosate}\\
+    \includegraphics{fig/Silstrup-first-glyphosate}
+  \end{center}
+  \caption{Silstrup surface water and Glyphosate in the period
+    between first application of Glyphosate, and detection of
+    Glyphosate in drain water.}
+  \label{fig:Silstrup-weather-glyphosate}
+\end{figure}
+
 \begin{text}
-\section{Discussion and conclusion}
+\section{Discussion}
+
+\section{Conclusion and further work}
 
 It is possible to explain the measured data based on the processes
 included in the present model, with some caveats
 \begin{itemize}
 \item The high degree of heterogenity found in the Estrup site would
   require a detailed 3D model of the entire area to model
-  mechanistically, the current 2D model setup must be viewed as
+  mechanistically, the current 2D model setup can at best be viewed as
   ``effective parameters''.
-\item * Silstrup drain dynamics.  Surface transport both for drain and for bromide.
-\item * Large scale fracture transport.
+\item The drain are activated more abrubtly (first year) and sooner
+  (second year) in reality, than what we have been able to simulate
+  for the Silsrup site.  This is particularily noticable for the
+  Bromide measurements.  
+\item Bromide is found in some of the horizontal filters at 3.5 meters
+  depth at both sites in the first measurements after application of
+  Bromide.  No pesticides are found in those depth though.  It does
+  indicate a transport way for non-sorbing solutes that we cannot
+  model.  One possibility is large scale fractures, this suggestion is
+  supported by other work at GEUS.
 \end{itemize}
-This work does not count as a validation of the parameterization or
-the conceptual model, there are too many unknowns where we have had to
-guess or calibrate parameters, and there are likely many different
-setups that would have resultet in as good or better fits to the
-measured results.  It is not certain that a proper validation is
-possible, but by appling the model on more datasets we should be able
-to gain confidence in it it.
 
-Further work:
-* Surface processes.
-* Pesticide processes (colloids, sorbtion sites, sorption kinetics)
-* More sites and years.
+Furthermore, the work presented in thus report cannot count as a
+validation of either the parameterization or the conceptual model,
+there are too many unknowns where we have had to guess or calibrate
+parameters, and there are likely many different setups that would have
+resultet in as good or better fits to the measured results.  It is not
+certain that a proper validation is possible, but by applying the
+model on more datasets we should be able to gain confidence in it it.
 
+Apart from applying the model on more and larger datasets, two areas
+in particular need further work.
+\begin{itemize}
+\item The surface processes (flow, litter storage, decomposition) are
+  very important, especially for the Silstrup site, but only the
+  minimal work on those to get an effect have been done in this project.
+\item The pesticide processes (colloid transport, sorbtion sites,
+  sorption kinetics, and docposition) are parameterized from
+  litterature values and ``best guesses'', many of those parameters
+  should be adabted to direct local measurements.
+\end{itemize}
 \end{text}
   
 \end{document}
