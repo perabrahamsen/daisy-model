@@ -1,3 +1,7 @@
+2010-06-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* bioclimate_std.C (canopy_water_below): New log variable.
+
 2010-06-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* bioclimate_std.C (canopy_water_capacity, litter_water_capacity):

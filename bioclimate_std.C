@@ -99,7 +99,8 @@ struct BioclimateStandard : public Bioclimate
   double canopy_water_in;       // Water entering canopy [mm/h]
   double canopy_water_out;      // Canopy drip throughfall [mm/h]
   double canopy_water_bypass;   // Water from above bypassing the canopy [mm/h]
-  
+  double canopy_water_below;    // Total water input below canopy [mm/h]
+
   // Water intercepted on litter.
   double litter_ep;             // Potential litter evaporation [mm/h]
   double litter_ea;             // Actual litter evaporation [mm/h]
@@ -458,6 +459,7 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     canopy_water_in (0.0),
     canopy_water_out (0.0),
     canopy_water_bypass (0.0),
+    canopy_water_below (0.0),
     litter_ep (0.0),
     litter_ea (0.0),
     litter_water_capacity (0.0),
@@ -811,23 +813,23 @@ BioclimateStandard::WaterDistribution (const Units& units,
       litter_ep = 0.0;
     }
 
-  const double water_below_canopy
-    = canopy_water_out + canopy_water_bypass + irrigation_surface + tillage_water; 
-  const double water_below_canopy_temperature 
-    = water_below_canopy > 0.01
+  canopy_water_below = canopy_water_out + canopy_water_bypass 
+    + irrigation_surface + tillage_water; 
+  const double canopy_water_below_temperature 
+    = canopy_water_below > 0.01
     ? ((canopy_water_bypass * snow_water_out_temperature
         + canopy_water_out * canopy_water_temperature
         + irrigation_surface * irrigation_surface_temperature
         + tillage_water * air_temperature)
-       / water_below_canopy)
+       / canopy_water_below)
     : air_temperature;
-  litter_water_in = water_below_canopy * litter_cover;
-  const double litter_water_bypass = water_below_canopy - litter_water_in;
+  litter_water_in = canopy_water_below * litter_cover;
+  const double litter_water_bypass = canopy_water_below - litter_water_in;
   
   if (litter_water_in > 0.01)
     litter_water_temperature 
       = (litter_water_storage * air_temperature
-         + litter_water_in * dt * water_below_canopy_temperature)
+         + litter_water_in * dt * canopy_water_below_temperature)
       / (litter_water_in * dt + litter_water_storage);
   else
     litter_water_temperature = air_temperature;
@@ -884,7 +886,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
   const double pond_in = litter_water_out + litter_water_bypass;
   const double pond_in_temperature = (pond_in > 0.01)
     ? ((litter_water_out * litter_water_temperature
-        + litter_water_bypass * water_below_canopy_temperature) / pond_in)
+        + litter_water_bypass * canopy_water_below_temperature) / pond_in)
     : air_temperature;
 
   const double soil_T 
@@ -1172,6 +1174,7 @@ BioclimateStandard::output (Log& log) const
   output_variable (canopy_water_in, log);
   output_variable (canopy_water_out, log);
   output_variable (canopy_water_bypass, log);
+  output_variable (canopy_water_below, log);
   output_variable (litter_ep, log);
   output_variable (litter_ea, log);
   output_variable (litter_water_capacity, log);
@@ -1369,6 +1372,8 @@ The intended use is colloid generation.");
                    "Canopy drip throughfall.");
     frame.declare ("canopy_water_bypass", "mm/h", Attribute::LogOnly,
                    "Water from above bypassing the canopy.");
+    frame.declare ("canopy_water_below", "mm/h", Attribute::LogOnly,
+                   "Total water input below canopy.");
 
     // Water intercepted by litter.
     frame.declare ("litter_ep", "mm/h", Attribute::LogOnly,
