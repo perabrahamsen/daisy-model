@@ -6,13 +6,13 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Kørsler
 
-** NW: ref
+** NW: ref, R_max 0.45, k½ 11.1
    
-** NE: C/N 20
+** NE: R_max 0.4 k½ 22.0
    
-** SW: R_max 0.25
+** SW: R_max 0.35 k½ 6.6
 
-** SE: k_half 2
+** SE: R_max 0.3 k½ 30
 
 
 * Få Glyphosat i Silstrup

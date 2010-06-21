@@ -686,6 +686,8 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
 
 (defgnuplot Silstrup-weather-glyphosate Silstrup-short
   (where "fig/${station}-weather-glyphosate.pdf")
+  (legend nw)
+  (extra &old [set format x ""])
   (source (arithmetic (file "log/${station}-surface-water.dlf")
                       (title "Precipitation")
                       (expr (/ Precipitation 1 [h])))
@@ -703,9 +705,8 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
                       (expr (/ "Tertiary infiltration" 1 [h])))))
 
 (defgnuplot Silstrup-water-glyphosate Silstrup-short
-  (begin 2001 10 25) (end 2001 11 01)
-  (extra &old [set format x "%d/%m"])
-  ;; (legend none)
+  (extra &old [set format x ""])
+  (legend nw)
   (where "fig/${station}-water-glyphosate.pdf")
   (source (column (file "log/${station}-surface-water.dlf")
                   (tag "Litter capacity"))
