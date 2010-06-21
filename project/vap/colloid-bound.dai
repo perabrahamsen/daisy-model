@@ -233,10 +233,9 @@
 
 (defchemical Metamitron-base herbicide
   "Base parameterization for all Metamitron forms."
-  ;;(cite lindhardt2001)
-  ;;(decompose_halftime 14 [d])
-  ;; (decompose_halftime 30 [d])
-  (decompose_halftime 35 [d])
+  ;; 6.6-11.1-22.0
+  ;; 35 too high
+  (decompose_halftime 11.1 [d])
   )
 
 (defchemical Metamitron Metamitron-base

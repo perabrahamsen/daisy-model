@@ -56,7 +56,8 @@
   ;; (Bioclimate original (pet makkink))
   (Bioclimate original (pet (FAO_PM (use_wet true))))
   (OrganicMatter original
-                 ;; (Bioincorporation (C_per_N_factor (20 1) (100 0.1) (120 0.01)))
+                 ;; 0.25 too low, 0.5 too high
+                 (Bioincorporation (R_max 0.45))
                  )
   (Litter Millet))
   
@@ -390,15 +391,14 @@
                   (title "Obs"))))
 
 (defgnuplot theta plottime
-  (extra &old
-         "set ytics 5")
+  (extra &old "set ytics 5")
   ;; (begin 1999 9 1) (end 2002 7 1)
   (declare depth String "Soil depth to plot.") 
   (where "fig/${station}-theta-${depth}.pdf")
   (title "${depth}")
   (source (column (file "log/${station}-content.dlf")
                   (tag "${depth}")
-                  (title "Sim"))
+                  (title "${depth}"))
           (column (file "${station}-theta.ddf")
                   (style 2)
                   (with lines)

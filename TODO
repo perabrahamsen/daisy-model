@@ -1,22 +1,25 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Osvaldo:
+
+** throughfall file
+
+* Kørsler
+
+** NW: ref
+   
+** NE: C/N 20
+   
+** SW: R_max 0.25
+
+** SE: k_half 2
+
+
 * Få Glyphosat i Silstrup
 
 ** Tilføj figurer
 
 ** Prøv forskellige ting...
-
-* Kørsler
-
-Silstrup ref
-
-** NW: -2
-
-** NE: -3
-
-** SW: -4
-
-** SE: -3, full
 
 
 * Osvaldo
