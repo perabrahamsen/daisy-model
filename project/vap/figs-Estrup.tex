@@ -4,9 +4,9 @@
   \begin{center}
     \includegraphics{fig/Estrup-weather}
   \end{center}
-  \caption{Akkumuleret nedbør og fordampning, samt timeværdier for
-    temperatur for målestationen i Estrup.  Potentiel og aktuel
-    fordamppning er identiske når der ikke er vandstress.}
+  \caption{Accumulated precipitation and hourly values for temperature
+    measured at Estrup station.  Calculated potentiel and simulated
+    actual evapotranspiration are also shown.}
   \label{fig:Estrup-weather}
 \end{figure}\FloatBarrier
 
@@ -15,9 +15,11 @@
   \includegraphics{fig/Estrup-B-Theta}\includegraphics{fig/Estrup-B-K}\\
   \includegraphics{fig/Estrup-C1-Theta}\includegraphics{fig/Estrup-C1-K}\\
   \includegraphics{fig/Estrup-C2-Theta}\includegraphics{fig/Estrup-C2-K}
-  \caption{Hydraulic properties for Estrup soil.  MACRO denotes the
-    original parametrization, Daisy the modifiet parametrization, and
-    HYPRES refers to parameters estimated according to \citet{hypres}.}
+  \caption{Estrup soil hydraulic properties.  MACRO denotes the
+    original parametrization, Daisy the modified parametrization, and
+    HYPRES refers to parameters estimated according to \citet{hypres}.
+    No cracks represent conductivity in the part of the horizon with
+    no cracks.}
   \label{fig:Estrup-hor}
 \end{figure}\FloatBarrier
 
@@ -25,7 +27,12 @@
   \begin{center}
     \includegraphics{fig/Estrup-gw}
   \end{center}
-  \caption{Grundvandsstand for Estrup.}
+  \caption{Estrup groundwater table.  Manual montly measurement until
+    2000-09-19 are from P3, automatic daily measurements from
+    2000-09-22 are from P1.  Simulated low value is calculated from
+    pressure in lowest unsatured numeric cell, typically located near
+    drain.  Simulated high value is calculated from pressure in
+    highest saturated cell, typically farthest from drain.}
   \label{fig:Estrup-gw}
 \end{figure}\FloatBarrier
 
@@ -33,49 +40,51 @@
   \begin{center}
     \includegraphics{fig/Estrup-theta-SW025cm}
   \end{center}
-  \caption{Jordvand for målepunkt S1 i Estrup.}
+  \caption{Soilstrup soil water content for measurement point S1.}
   \label{fig:Estrup-theta}
 \end{figure}\FloatBarrier
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics{fig/Estrup-sc-bromide}
+    \includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/Estrup-sc-bromide}\\
+    \includegraphics{fig/Estrup-Bromide-horizontal}
   \end{center}
-  \caption{Bromid i jorden i en meters dybde ved S1 i Estrup.}
-  \label{fig:Estrup-sc-bromide}
+  \caption{Estrup soil bromide content in 1.0 m depth (top) and 3.5
+    m depth (bottom).  Sim (avg) is the average simulated
+    concentration, Sim (fast) is the simulated concentration in the
+    large (fast) pores.  S1 and S2 are suction cup measurements.
+    H$1$.$m$ refer to measured values in different sections of
+    horizontal filters.}
+  \label{fig:Estrup-bromide}
 \end{figure}\FloatBarrier
+
 
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics{fig/Estrup-horizontal}
   \end{center}
-  \caption{Pesticider i jorden i 3,5 meters dybde i Estrup.}
+  \caption{Estrup pesticide concentration in soil water at 3.5 meters
+    depth.}
   \label{fig:Estrup-horizontal}
 \end{figure}\FloatBarrier
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics{fig/Estrup-Bromide-horizontal}
+    \includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/Estrup-leak150bromide}\\
+    \includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/Estrup-leak150}\\
+    \includegraphics{fig/Estrup-leak150acc}
   \end{center}
-  \caption{Bromid i jorden ved horizontale filtre i 3,5 meters dybde i
-    Estrup.}
-  \label{fig:Estrup-Bromide-horizontal}
+  \caption{Estrup simuleret leaching at 1.5 meter, 30 cm under bioporers.}
+  \label{fig:Estrup-leak150}
 \end{figure}\FloatBarrier
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics{fig/Estrup-drain}
-  \end{center}
-  \caption{Drænafstrøming i Estrup.}
-  \label{fig:Estrup-drain}
-\end{figure}\FloatBarrier
-
-\begin{figure}[htbp]
-  \begin{center}
+    \includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/Estrup-drain}\\
     \includegraphics{fig/Estrup-drain-acc}
   \end{center}
-  \caption{Akkumuleret drænafstrømning i Estrup.}
-  \label{fig:Estrup-drain-acc}
+  \caption{Estrup drain flow, daily values and accumulated.}
+  \label{fig:Estrup-drain}
 \end{figure}\FloatBarrier
 
 \begin{figure}[htbp]
@@ -106,23 +115,6 @@
   \end{center}
   \caption{Estrup accumulated drain flow of selected pesticides.}
   \label{fig:Estrup-acc}
-\end{figure}\FloatBarrier
-
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics{fig/Estrup-leak150bromide}
-  \end{center}
-  \caption{Simuleret udvaskning af bromid i 150 cm, 30 cm under bioporer.}
-  \label{fig:Estrup-leak150bromide}
-\end{figure}\FloatBarrier
-
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics{fig/Estrup-leak150}\\
-    \includegraphics{fig/Estrup-leak150acc}
-  \end{center}
-  \caption{Simuleret udvaskning af pesticider i 150 cm, 30 cm under bioporer.}
-  \label{fig:Estrup-leak150pest}
 \end{figure}\FloatBarrier
 
 \begin{figure}[htbp]

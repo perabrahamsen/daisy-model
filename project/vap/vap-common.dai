@@ -56,8 +56,8 @@
   ;; (Bioclimate original (pet makkink))
   (Bioclimate original (pet (FAO_PM (use_wet true))))
   (OrganicMatter original
-                 ;; 0.25 too low, 0.5 too high
-                 (Bioincorporation (R_max 0.45))
+                 ;; 0.3 too low, 0.35 too high
+                 (Bioincorporation (R_max 0.33))
                  )
   (Litter Millet))
   
@@ -90,6 +90,12 @@
                     (tag "Bromide 1")
                     (dimension "mg/L")
                     (spec chemical default C))
+           (content (z -1 [m])
+                    (path column "${column}" Chemistry "*" 
+                          trace "Bromide" C_secondary)
+                    (tag "BromideFast 1")
+                    (dimension "mg/L")
+                    (spec chemical default C_secondary))
            (content (z -3.5 [m])
                     (path column "${column}" Chemistry "*" 
                           trace "Bromide" C)
@@ -98,19 +104,25 @@
                     (spec chemical default C))
            (content (z -3.5 [m])
                     (path column "${column}" Chemistry "*" 
-                          trace "Dimethoate" C)
+                          trace "Bromide" C)
+                    (tag "BromideFast 35")
+                    (dimension "mg/L")
+                    (spec chemical default C))
+           (content (z -3.5 [m])
+                    (path column "${column}" Chemistry "*" 
+                          trace "Dimethoate-base" C)
                     (tag Dimethoate)
                     (dimension "mg/L")
                     (spec chemical default C))
            (content (z -3.5 [m])
                     (path column "${column}" Chemistry "*" 
-                          trace "Fenpropimorph" C)
+                          trace "Fenpropimorph-base" C)
                     (tag Fenpropimorph)
                     (dimension "mg/L")
                     (spec chemical default C))
            (content (z -3.5 [m])
                     (path column "${column}" Chemistry "*" 
-                          trace "Glyphosate" C)
+                          trace "Glyphosate-base" C)
                     (tag Glyphosate)
                     (dimension "mg/L")
                     (spec chemical default C))
@@ -142,7 +154,7 @@
                         (tag "Bromide leak 150")
                         (dimension "g/ha/&"))
            (flux_bottom (path column "${column}" Chemistry "*"
-                              trace Dimethoate J_matrix)
+                              trace Dimethoate-base J_matrix)
                         (to -150 [cm])
                         (spec chemical default J_matrix)
                         (handle average)
@@ -150,7 +162,7 @@
                         (tag "Dimethoate leak 150")
                         (dimension "ug/ha/&"))
            (flux_bottom (path column "${column}" Chemistry "*"
-                              trace Fenpropimorph J_matrix)
+                              trace Fenpropimorph-base J_matrix)
                         (to -150 [cm])
                         (spec chemical default J_matrix)
                         (handle average)
@@ -158,7 +170,7 @@
                         (tag "Fenpropimorph leak 150")
                         (dimension "ug/ha/&"))
            (flux_bottom (path column "${column}" Chemistry "*"
-                              trace Glyphosate J_matrix)
+                              trace Glyphosate-base J_matrix)
                         (to -150 [cm])
                         (spec chemical default J_matrix)
                         (handle average)
@@ -168,7 +180,8 @@
            (number (path column "${column}" OrganicMatter default top_DM)
                    (spec organic default top_DM)
                    (dimension [Mg DM/ha]))
-           (number (path column "${column}" Bioclimate default litter_water_storage)
+           (number (path column "${column}"
+                         Bioclimate default litter_water_storage)
                    (spec bioclimate default litter_water_storage))
            (number (path column "${column}" Chemistry "*"
                          trace Glyphosate-base litter_storage)
@@ -396,6 +409,8 @@
   (declare depth String "Soil depth to plot.") 
   (where "fig/${station}-theta-${depth}.pdf")
   (title "${depth}")
+  (ymax 50 [%])
+  (ymin 10 [%])
   (source (column (file "log/${station}-content.dlf")
                   (tag "${depth}")
                   (title "${depth}"))
@@ -407,12 +422,19 @@
                   (title "Obs"))))
 
 (defgnuplot sc-bromide plottime
+  (extra &old [set format x ""])
   ;; Only application (both site) 2000-05-22.
   (begin 2000 05 01)
+  (begin 2002 07 01)
+  (ymax 2 [mg/L])
   (where "fig/${station}-sc-bromide.pdf")
   (source (column (file "log/${station}-content.dlf")
                   (tag "Bromide 1")
-                  (title "Sim"))
+                  (title "Sim 1.0 m (avg)"))
+          (column (file "log/${station}-content.dlf")
+                  (tag "BromideFast 1")
+                  (style 4)
+                  (title "Sim (fast)"))
           (column (file "${station}-sc-bromide.ddf")
                   (missing missing)
                   (tag "S1")
@@ -425,6 +447,7 @@
 (defgnuplot leak150common plottime
   ;; First application (either site) 2000-05-22.
   (begin 2000 05 01)
+  (begin 2002 07 01)
   (where "fig/${station}-leak150.pdf")
   (title "Pesticide leaching")
   (source (column (file "log/${station}-content.dlf")
@@ -438,75 +461,95 @@
                   (title "Glyphosate"))))
 
 (defgnuplot leak150 leak150common
-  (extra &old [set format x ""])
   (where "fig/${station}-leak150.pdf")
+  (extra &old [set format x ""])
   (title "Pesticide leaching")
+  (ymax 20 [mg/ha/d])
+  (ymin  0 [mg/ha/d])
   (source (column (file "log/${station}-content.dlf")
                   (tag "Dimethoate leak 150")
+                  (dimension [mg/ha/d])
                   (title "Dimethoate"))
           (column (file "log/${station}-content.dlf")
+                  (dimension [mg/ha/d])
                   (tag "Fenpropimorph leak 150")
                   (title "Fenpropimorph"))
           (column (file "log/${station}-content.dlf")
+                  (dimension [mg/ha/d])
                   (tag "Glyphosate leak 150")
                   (title "Glyphosate"))))
 
 
 (defgnuplot leak150bromide leak150common
   (where "fig/${station}-leak150bromide.pdf")
+  (extra &old [set format x ""])
   (title "Bromide")
-  (legend none)
+  (ymax 120 [g/ha/d])
+  (ymin -60 [g/ha/d])
+  (y2max 4500 [g/ha])
+  (y2min 0 [g/ha])
   (source (column (file "log/${station}-content.dlf")
+                  (title "Daily bromide")
                   (tag "Bromide leak 150"))
           (column (file "log/${station}-content.dlf")
+                  (title "Accumulated")
                   (accumulate true)
                   (timestep d)
                   (tag "Bromide leak 150"))))
 
 
 (defgnuplot leak150acc leak150common
-  (extra &old)
   (where "fig/${station}-leak150acc.pdf")
   (title "Accumulated")
+  (ymax 700 [mg/ha])
+  (ymin   0 [mg/ha])
   (source (column (file "log/${station}-content.dlf")
                   (accumulate true)
+                  (dimension [mg/ha])
                   (timestep d)
                   (tag "Dimethoate leak 150")
                   (title "Dimethoate"))
           (column (file "log/${station}-content.dlf")
                   (accumulate true)
+                  (dimension [mg/ha])
                   (timestep d)
                   (tag "Fenpropimorph leak 150")
                   (title "Fenpropimorph"))
           (column (file "log/${station}-content.dlf")
                   (accumulate true)
+                  (dimension [mg/ha])
                   (timestep d)
                   (tag "Glyphosate leak 150")
                   (title "Glyphosate"))))
 
 (defgnuplot horizontal plottime
   ;; First application (either site) 2000-05-22.
-  (extra &old)
   (begin 2000 05 01)
+  (begin 2002 07 01)
   (where "fig/${station}-horizontal.pdf")
   (source (column (file "log/${station}-content.dlf")
                   (tag "Dimethoate")
-                  (dimension [ug/L]))
+                  (dimension [ng/L]))
           (column (file "log/${station}-content.dlf")
                   (tag "Fenpropimorph")
-                  (dimension [ug/L]))
+                  (dimension [ng/L]))
           (column (file "log/${station}-content.dlf")
                   (tag "Glyphosate")
-                  (dimension [ug/L]))))
+                  (dimension [ng/L]))))
 
 (defgnuplot horizontal-bromide plottime
   ;; First application (either site) 2000-05-22.
-  (extra &old)
   (begin 2000 05 01)
+  (begin 2002 07 01)
+  (ymax 2 [mg/L])
   (where "fig/${station}-Bromide-horizontal.pdf")
   (source (column (file "log/${station}-content.dlf")
-                  (title "Sim")
+                  (title "Sim 3.5 m (avg)")
                   (tag "Bromide 35"))
+          (column (file "log/${station}-content.dlf")
+                  (title "Sim (fast)")
+                  (style 4)
+                  (tag "BromideFast 35"))
           (column (file "${station}-35-bromide.ddf")
                   (missing missing)
                   (tag "H1.1"))
@@ -518,9 +561,12 @@
                   (tag "H1.3"))))
 
 (defgnuplot drain plottime
-  ;; (begin 2000 04 29) (end 2002 6 30)
+  (extra &old [set format x ""])
   (where "fig/${station}-drain.pdf")
-  (ymin 0)
+  (begin 2000 05 01)
+  (begin 2002 07 01)
+  (ymin 0 [mm/d])
+  (ymax 25 [mm/d])
   (source (arithmetic (missing "none")
                       (file "log/${station}-field-water-daily.dlf")
                       (expr (/ (+ "Soil drain flow" "Surface drain flow")
@@ -532,7 +578,9 @@
                       (title "Obs"))))
 
 (defgnuplot drain-acc plottime
-  ;; (begin 2000 04 29) (end 2002 6 30)
+  (begin 2000 05 01)
+  (begin 2002 07 01)
+  (ymax 1400 [mm])
   (where "fig/${station}-drain-acc.pdf")
   (source (arithmetic (missing "none")
                       (file "log/${station}-field-water-daily.dlf")

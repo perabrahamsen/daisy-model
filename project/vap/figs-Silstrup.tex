@@ -14,9 +14,10 @@
   \includegraphics{fig/Silstrup-Ap-Theta}\includegraphics{fig/Silstrup-Ap-K}\\
   \includegraphics{fig/Silstrup-B-Theta}\includegraphics{fig/Silstrup-B-K}\\
   \includegraphics{fig/Silstrup-C-Theta}\includegraphics{fig/Silstrup-C-K}
-  \caption{Hydraulic properties for Silstrup soil.  MACRO denotes the
-    original parametrization, Daisy the modifiet parametrization, and
-    HYPRES refers to parameters estimated according to \citet{hypres}.}
+  \caption{Silstrup soil hydraulic properties.  MACRO denotes the
+    original parametrization, Daisy the modified parametrization, and
+    HYPRES refers to parameters estimated according to
+    \citet{hypres}.}
   \label{fig:Silstrup-hor}
 \end{figure}\FloatBarrier
 
@@ -24,59 +25,63 @@
   \begin{center}
     \includegraphics{fig/Silstrup-gw}
   \end{center}
-  \caption{Grundvandsstand for Silstrup.}
+  \caption{Silstrup groundwater table.  Automatic daily measurements
+    are from P3.  Simulated low value is calculated from pressure in
+    lowest unsatured numeric cell, typically located near drain.
+    Simulated high value is calculated from pressure in highest
+    saturated cell, typically farthest from the drain.}
   \label{fig:Silstrup-gw}
 \end{figure}\FloatBarrier
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics{fig/Silstrup-theta-SW025cm}\\
-    \includegraphics{fig/Silstrup-theta-SW060cm}\\
+    \includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/Silstrup-theta-SW025cm}\\
+    \includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/Silstrup-theta-SW060cm}\\
     \includegraphics{fig/Silstrup-theta-SW110cm}
   \end{center}
-  \caption{Jordvand for målepunkt S1 i Silstrup.}
+  \caption{Silstrup soil water content for measurement point S1.}
   \label{fig:Silstrup-theta}
 \end{figure}\FloatBarrier
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics{fig/Silstrup-sc-bromide}
+    \includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/Silstrup-sc-bromide}\\
+    \includegraphics{fig/Silstrup-Bromide-horizontal}
   \end{center}
-  \caption{Bromid i jorden i en meters dybde ved S1 i Silstrup.}
-  \label{fig:Silstrup-sc-bromide}
+  \caption{Silstrup soil bromide content in 1.0 m depth (top) and 3.5
+    m depth (bottom).  Sim (avg) is the average simulated
+    concentration, Sim (fast) is the simulated concentration in the
+    large (fast) pores.  S1 and S2 are suction cup measurements.
+    H$n$.$m$ refer to measured values in different sections of
+    horizontal filters.}
+  \label{fig:Silstrup-bromide}
 \end{figure}\FloatBarrier
 
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics{fig/Silstrup-horizontal}
   \end{center}
-  \caption{Pesticider i jorden i 3,5 meters dybde i Silstrup.}
+  \caption{Silstrup pesticide concentration in soil water at 3.5 meters depth.}
   \label{fig:Silstrup-horizontal}
 \end{figure}\FloatBarrier
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics{fig/Silstrup-Bromide-horizontal}
+    \includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/Silstrup-leak150bromide}\\
+    \includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/Silstrup-leak150}\\
+    \includegraphics{fig/Silstrup-leak150acc}
   \end{center}
-  \caption{Bromid i jorden ved horizontale filtre i 3,5 meters dybde i
-    Silstrup.}
-  \label{fig:Silstrup-Bromide-horizontal}
+  \caption{Silstrup simuleret leaching at 1.5 meter, 30 cm under bioporers.}
+  \label{fig:Silstrup-leak150}
 \end{figure}\FloatBarrier
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics{fig/Silstrup-drain}
-  \end{center}
-  \caption{Drænafstrøming i Silstrup.}
-  \label{fig:Silstrup-drain}
-\end{figure}\FloatBarrier
-
-\begin{figure}[htbp]
-  \begin{center}
+    \includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/Silstrup-drain}\\
     \includegraphics{fig/Silstrup-drain-acc}
   \end{center}
-  \caption{Akkumuleret drænafstrømning i Silstrup.}
-  \label{fig:Silstrup-drain-acc}
+  \caption{Silstrup drain flow, daily values and accumulated.}
+  \label{fig:Silstrup-drain}
 \end{figure}\FloatBarrier
 
 \begin{figure}[htbp]
@@ -115,23 +120,6 @@
   \end{center}
   \caption{Accumulated drain flow of selected pesticides.}
   \label{fig:Silstrup-acc}
-\end{figure}\FloatBarrier
-
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics{fig/Silstrup-leak150bromide}
-  \end{center}
-  \caption{Simuleret bromidudvaskning i 150 cm, 30 cm under bioporer.}
-  \label{fig:Silstrup-leak150}
-\end{figure}\FloatBarrier
-
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics{fig/Silstrup-leak150}\\
-    \includegraphics{fig/Silstrup-leak150acc}
-  \end{center}
-  \caption{Simuleret pesticidudvaskning i 150 cm, 30 cm under bioporer.}
-  \label{fig:Silstrup-leak1502}
 \end{figure}\FloatBarrier
 
 \begin{figure}[htbp]

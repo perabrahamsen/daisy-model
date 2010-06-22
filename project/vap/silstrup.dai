@@ -402,7 +402,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
   (entries &old 
            (content (z -3.5 [m])
                     (path column "${column}" Chemistry "*" 
-                          trace "Metamitron" C)
+                          trace "Metamitron-base" C)
                     (tag Metamitron)
                     (dimension "mg/L")
                     (spec chemical default C))
@@ -417,7 +417,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
                     (dimension "%")
                     (spec fixed SoilWater Theta))
            (flux_bottom (path column "${column}" Chemistry "*"
-                              trace Metamitron J_matrix)
+                              trace Metamitron-base J_matrix)
                         (to -150 [cm])
                         (spec chemical default J_matrix)
                         (handle average)
@@ -756,6 +756,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
          "Conductivity C Silstrup"
          (horizontal (source &old 
                              (column (file "log/${station}-content.dlf")
+                                     (dimension [ng/L])
                                      (tag "Metamitron"))))
          (horizontal-bromide (source &old
                                      (column (file "${station}-35-bromide.ddf")
@@ -769,11 +770,13 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
                                              (tag "H2.3"))))
          (leak150 (source &old 
                           (column (file "log/${station}-content.dlf")
+                                  (dimension [mg/ha/d])
                                   (tag "Metamitron leak 150")
                                   (title "Metamitron"))))
          (leak150acc (source &old 
                              (column (file "log/${station}-content.dlf")
                                      (accumulate true)
+                                     (dimension [mg/ha])
                                      (timestep d)
                                      (tag "Metamitron leak 150")
                                      (title "Metamitron"))))
