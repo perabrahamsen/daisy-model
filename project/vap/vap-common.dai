@@ -425,7 +425,7 @@
   (extra &old [set format x ""])
   ;; Only application (both site) 2000-05-22.
   (begin 2000 05 01)
-  (begin 2002 07 01)
+  (end 2002 07 01)
   (ymax 2 [mg/L])
   (where "fig/${station}-sc-bromide.pdf")
   (source (column (file "log/${station}-content.dlf")
@@ -447,7 +447,7 @@
 (defgnuplot leak150common plottime
   ;; First application (either site) 2000-05-22.
   (begin 2000 05 01)
-  (begin 2002 07 01)
+  (end 2002 07 01)
   (where "fig/${station}-leak150.pdf")
   (title "Pesticide leaching")
   (source (column (file "log/${station}-content.dlf")
@@ -525,7 +525,7 @@
 (defgnuplot horizontal plottime
   ;; First application (either site) 2000-05-22.
   (begin 2000 05 01)
-  (begin 2002 07 01)
+  (end 2002 07 01)
   (where "fig/${station}-horizontal.pdf")
   (source (column (file "log/${station}-content.dlf")
                   (tag "Dimethoate")
@@ -540,7 +540,7 @@
 (defgnuplot horizontal-bromide plottime
   ;; First application (either site) 2000-05-22.
   (begin 2000 05 01)
-  (begin 2002 07 01)
+  (end 2002 07 01)
   (ymax 2 [mg/L])
   (where "fig/${station}-Bromide-horizontal.pdf")
   (source (column (file "log/${station}-content.dlf")
@@ -564,7 +564,7 @@
   (extra &old [set format x ""])
   (where "fig/${station}-drain.pdf")
   (begin 2000 05 01)
-  (begin 2002 07 01)
+  (end 2002 07 01)
   (ymin 0 [mm/d])
   (ymax 25 [mm/d])
   (source (arithmetic (missing "none")
@@ -579,7 +579,7 @@
 
 (defgnuplot drain-acc plottime
   (begin 2000 05 01)
-  (begin 2002 07 01)
+  (end 2002 07 01)
   (ymax 1400 [mm])
   (where "fig/${station}-drain-acc.pdf")
   (source (arithmetic (missing "none")
