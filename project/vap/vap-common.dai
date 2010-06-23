@@ -369,8 +369,12 @@
          "unset xlabel"))
 
 (defgnuplot weather plottime
-  ;; (begin 2000 04 29) (end 2002 6 30)
+  (begin 1999 08 30) (end 2002 5 1)
   (where "fig/${station}-weather.pdf")
+  (ymin 0)
+  (ymax 3500)
+  (y2min -20)
+  (y2max 30)
   (source (column (file "log/${station}-field-water-hourly.dlf")
                   (tag "Precipitation")
                   (accumulate true))
@@ -464,7 +468,7 @@
   (where "fig/${station}-leak150.pdf")
   (extra &old [set format x ""])
   (title "Pesticide leaching")
-  (ymax 20 [mg/ha/d])
+  (ymax 40 [mg/ha/d])
   (ymin  0 [mg/ha/d])
   (source (column (file "log/${station}-content.dlf")
                   (tag "Dimethoate leak 150")
@@ -581,6 +585,7 @@
   (begin 2000 05 01)
   (end 2002 07 01)
   (ymax 1400 [mm])
+  (legend nw)
   (where "fig/${station}-drain-acc.pdf")
   (source (arithmetic (missing "none")
                       (file "log/${station}-field-water-daily.dlf")
@@ -610,7 +615,7 @@
                   (with lines))))
 
 (defgnuplot biopore plottime
-  ;; (begin 2000 04 29) (end 2002 6 30)
+  (begin 1999 08 30) (end 2002 4 1)
   (where "fig/${station}-biopore.pdf")
   (title "Biopore flow")
   (source (arithmetic (file "log/${station}-drain.dlf")
@@ -630,9 +635,10 @@
                       (title "B50"))))
 
 (defgnuplot biopore-acc plottime
-  ;; (begin 2000 04 29) (end 2002 6 30)
+  (begin 1999 08 30) (end 2002 4 1)
   (where "fig/${station}-biopore-acc.pdf")
   (title "Accumulated biopore flow")
+  (legend nw)
   (source (column (file "log/${station}-drain.dlf")
                   (accumulate true)
                   (tag "Surface water tertiary")
@@ -655,7 +661,7 @@
                   (title "B50"))))
 
 (defgnuplot biopore-drain plottime
-  ;; (begin 2000 04 29) (end 2002 6 30)
+  (begin 1999 08 30) (end 2002 4 1)
   (where "fig/${station}-biopore-drain.pdf")
   (title "Biopore drain flow")
   (source (arithmetic (file "log/${station}-drain.dlf")
@@ -675,7 +681,7 @@
                       (title "B50"))))
 
 (defgnuplot biopore-drain-acc plottime
-  ;; (begin 2000 04 29) (end 2002 6 30)
+  (begin 1999 08 30) (end 2002 4 1)
   (where "fig/${station}-biopore-drain-acc.pdf")
   (title "Accumulated biopore drain flow")
   (source (column (file "log/${station}-drain.dlf")
@@ -705,6 +711,7 @@
   (where "fig/${station}-${chemical}-weekly.pdf")
   (title "${chemical}")
   (ymin 0) 
+  (ymax 1 [g/ha/w])
   (source (arithmetic (missing "none")
                       (file "log/${station}-field-${chemical}-weekly.dlf")
                       (expr (/ (+ "Soil-Drain" "Surface-Drain") 1 [w]))
@@ -717,6 +724,7 @@
   (where "fig/${station}-${chemical}-acc.pdf")
   (title "${chemical}")
   (ymin 0)
+  (ymax 2 [g/ha])
   (source (arithmetic (missing "none")
                       (file "log/${station}-field-${chemical}.dlf")
                       (expr (+ "Soil-Drain" "Surface-Drain"))
@@ -736,6 +744,7 @@
 
 (defgnuplot drainmass-acc drainmass-acc-sim
   (declare area Number [ha] "Area to plot.")
+  (legend nw)
   (source &old
           (arithmetic (file "${station}-drainmass.ddf")
                       (missing missing)
@@ -748,9 +757,13 @@
 (defgnuplot colloids plottime
   (declare chemical String "Name of chemical to plot")
   (chemical colloid)
-  ;; (begin 2000 10 1) (end 2002 4 1)
+  (begin 2000 05 01)
+  (end 2002 07 01)
   (where "fig/${station}-${chemical}.pdf")
   (ymin 0)
+  (ymax 250)
+  (y2min 0)
+  (y2max 15000)
   (source (arithmetic (missing "none")
                       (file "log/${station}-soil-${chemical}.dlf")
                       (expr (/ Drain 1 [h]))
@@ -768,7 +781,7 @@
   (declare area Number [ha] "Area to plot.")
   (graph weather gw
          sc-bromide 
-         leak150bromide
+         (leak150bromide (legend nw))
          drain drain-acc
          biopore biopore-acc biopore-drain biopore-drain-acc
          colloids

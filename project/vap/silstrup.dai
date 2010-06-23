@@ -768,12 +768,14 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
                                      (column (file "${station}-35-bromide.ddf")
                                              (missing missing)
                                              (tag "H2.3"))))
-         (leak150 (source &old 
+         (leak150 (legend nw)
+                  (source &old 
                           (column (file "log/${station}-content.dlf")
                                   (dimension [mg/ha/d])
                                   (tag "Metamitron leak 150")
                                   (title "Metamitron"))))
-         (leak150acc (source &old 
+         (leak150acc (legend nw)
+                     (source &old 
                              (column (file "log/${station}-content.dlf")
                                      (accumulate true)
                                      (dimension [mg/ha])
@@ -790,9 +792,11 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
          ;; Metamitron and Bromide first applied 2000-05-22.
          (sil-drainmass (begin 2000 04 29) (chemical Metamitron))
          (sil-drainmass-acc (begin 2000 04 29) (chemical Metamitron))
-         (sil-drainmass (begin 2000 04 29) (chemical Bromide)
+         (sil-drainmass (ymax 800 [g/ha/w])
+                        (begin 2000 04 29) (chemical Bromide)
                         (extra &old [set format x ""]))
-         (sil-drainmass-acc (begin 2000 04 29) (chemical Bromide)
+         (sil-drainmass-acc (ymax 6000 [g/ha])
+                            (begin 2000 04 29) (chemical Bromide)
                             (extra &old [set format x ""]))
          ;; Dimethoate first applied 2001-07-16
          ;; Fenpropimorph first applied 2001-06-21
