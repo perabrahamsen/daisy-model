@@ -46,22 +46,22 @@ that was fixed as the first site.  We wanted to use the same years for
 both sites to see the results of similar climate on two different
 locations.  Hourly weather data from the site had to be present, both
 for the modelling period and one growth season before for warmup.  The
-initial choice of Fårdrup for the second site was rejected as it was
-not possible to get sufficient quality weather data.  Furthermore, we
-wanted to the same pesticides on both sites, and both weakly and
+initial choice of F{\aa}rdrup for the second site was rejected as it
+was not possible to get sufficient quality weather data.  Furthermore,
+we wanted the same pesticides on both sites, and both weakly and
 strongly sorbing pesticides represented.  Glyphosate had to be one of
-them
+them.
 
 Based on these criteria, we chose Silstrup and Estrup, drain seasons
 2000-2001 and 2001-2002, with the pesticides glyphosate, fenpropimorph,
 dimethoate, and metamitron.
 
 Both sites are described in detail in \citet{lindhardt2001}, with an
-overview of the measured data found in \citet{vap2009}.  Estrup is an
-extremely heterogeneous site, containing both areas with sand and
-clay, peat, thin layers of chalk, and even sand from railroad
-construction.  Silstrup is also heterogeneous, but less so, with high
-levels of clay dominating the area.
+overview of the measured data found in \citet{vap2009}.  Estrup is a
+pedologically rich site, containing both areas with sand and clay,
+peat, thin layers of chalk, and even sand from railroad construction.
+Silstrup is also heterogeneous, but less so, with high levels of clay
+dominating the area.
 
 \section{Model setup}
 
@@ -127,27 +127,109 @@ of the applications, both effect is likely to be negigible.
 
 \subsubsection{Crop management}
 
-Table
+For sowing information about date, crop and sowing density were
+provided.  The Daisy crop parametrizations do not rely on sowing
+density, but instead assume that ``standard practise'' is used.  Daisy
+has experimental support for a crop model that include sowing density,
+but given that the PLAP is expected to follow standard management
+practise, we found it safer to use the older and better tested crop
+parameterizations.
 
-No attempt to match harvest (except "no severe stress")
+Information about the crow growth was given phenologically (BBCH
+stage) and in terms of above ground biomass. No attempt was made
+calibrate the crop in order to match this with the simulated
+development stage and biomass.  Information about the two important
+parameters for the water balance, namely leaf area and root density,
+were not provided, but are normally related to the two measured
+parameters.
 
-Fodder beet -> Spring Barley
+Harvest data included date, stubble height, as well as grain and straw
+yields.  Date and stubble height can be directly used by Daisy.  Grain
+yield can be used for calibration, however, as crop production is not
+the focus of this project, we merely noted that both measured and
+simulated yield where within the normal range.  The ratio of between
+grain and straw yield was used for a coarse estimation of the fraction
+of the crop left on the field as residuals after harvest.  The
+residuals play a crusial role in the simulation for the Silstrup
+glyphosate leaching.
+
+\begin{table}[htbp]
+  \caption{Crop management.}
+  \label{tab:crop-man}
+  \centering
+  \begin{tabular}{c||c|c|c||c|c|c}\hline
+    & \multicolumn{3}{c||}{Silstrup} & \multicolumn{3}{c}{Estrup}\\
+    Year & Crop          & Sow   & Harvest & Crop          & Sow   & Harvest\\
+\hline
+    2000 & Fodder Beet   & 04/05 & 15/11   & Spring Barley & 12/4  & 28/8 \\
+    2001 & Spring Barley & 9/5   & 5/9     & Peas          & 5/2   & 22/8 \\
+    2001 &               &       &         & Winter Wheat  & 19/10 & --- \\
+  \end{tabular}
+\end{table}
+
+The only calibration done on crop management was to replace the fodder
+beet (see table~\ref{tab:crop-man}) with spring barley.  The Silstrup
+soil water measurements indicated that we underestimated ability of
+the summer 2000 crop to empty the plow layer soil water (see
+figure~\ref{fig:Silstrup-theta}).  The spring barley parametrization
+did a better job at this than the less tested fodder beet.
 
 \subsubsection{Pesticide application}
 
-Date, amount, commercial name
+The data for pesticide application consisted of date, amount, and
+trade name.  Trade name is is translated to active ingredient using
+``Middeldatabasen'' from \textsc{dlbr} Landbrugsinfo
+(\url{http://www.landbrugsinfo.dk/}).  Note that Goltix WG application
+is given in L/ha, while the active ingredient is specified in g/kg.
+To resolve, a density of 1~kg/L is assumed. 
 
-Database
+The applications are sumarized in table~\ref{tab:man-pest}.
+\begin{table}[htbp]
+  \caption{Pesticide and bromide application.  Only those active 
+    ingredients we track are listed.  }
+  \label{tab:man-pest}
+  \centering
+  \begin{tabular}{c|crl|crl}\hline
+    \emph{Silstrup} & Trade name & \multicolumn{2}{c|}{Amount} 
+               & Active ingredient & \multicolumn{2}{c}{Active amount} \\
+    2000-05-22 & Potassium bromide & 30 & kg/ha & Bromide    & 20.14 & kg/ha\\
+    2000-05-22 & Goltix WG      & 1   & L/ha & Metamitron    & 700   & g/ha\\
+    2000-06-15 & Goltix WG      & 1   & L/ha & Metamitron    & 700   & g/ha\\
+    2000-07-12 & Goltix WG      & 1   & L/ha & Metamitron    & 700   & g/ha\\
+    2001-06-21 & Tilt Top       & 0.5 & L/ha & Fenpropimorph & 187.5 & g/ha\\
+    2001-07-04 & Tilt Top       & 0.5 & L/ha & Fenpropimorph & 187.5 & g/ha\\
+    2001-07-16 & Perfektion 500 & 0.6 & L/ha & Dimethoate    & 300   & g/ha\\
+    2001-10-25 & Roundup Bio    & 4.0 & L/ha & Glyphosate    & 1440  & g/ha\\
+    \hline
+    \emph{Estrup} & Trade name & \multicolumn{2}{c|}{Amount} 
+               & Active ingredient & \multicolumn{2}{c}{Active amount} \\
+    2000-05-15 & Potassium bromide & 30 & kg/ha & Bromide & 20.14 & kg/ha\\
+    2000-06-15 & Tilt Top       & 0.5 & L/ha & Fenpropimorph & 187.5 & g/ha\\
+    2000-06-15 & Perfektion 500 & 0.4 & L/ha & Dimethoate    & 200   & g/ha\\
+    2000-07-05 & Tilt Top       & 0.5 & L/ha & Fenpropimorph & 187.5 & g/ha\\
+    2000-06-15 & Perfektion 500 & 0.4 & L/ha & Dimethoate    & 200   & g/ha\\
+    2000-10-13 & Roundup Bio    & 4.0 & L/ha & Glyphosate    & 1440  & g/ha\\
+  \end{tabular}
+\end{table}
+
+\subsection{Pesticide properties}
 
 \begin{verbatim}
-
-* Chemistry
-
-colloids
+surface turnover
 
 Footprint & FOCUS
 
-* Soil
+heat/moisture factors
+
+strong/weak
+
+colloids
+
+\end{verbatim}
+
+\subsection{Soil}
+
+\begin{verbatim}
 
 ** Lindhart, MACRO
 
@@ -156,8 +238,10 @@ Footprint & FOCUS
 ** OM \& N
 
 ** Surface, plow pan
-
 \end{verbatim}
+
+\subsection{Groundwater table}
+
 \section{Results}
 
 \end{text}
@@ -180,7 +264,7 @@ Footprint & FOCUS
 
 * Silstrup drain flow follow first rain, indicate surface flow and anisotropy
 
-* Silstrup Metamitron not påvirket af halverinsgtid
+* Silstrup Metamitron not p{\aa}virket af halverinsgtid
 \end{verbatim}
 
 \section{Conclusion and further work}
