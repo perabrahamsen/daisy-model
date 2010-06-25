@@ -9,17 +9,16 @@
 \usepackage{hyperref}
 \usepackage{fancyhdr}
 \usepackage{placeins}
-\usepackage{comment}
 \pagestyle{fancy}
 \lhead{\today}
 
-\includeonly{}
-\includecomment{text}
-%%\excludecomment{text}
+\newcommand{\koc}{$\mbox{K}_{\mbox{\textsc{oc}}}$}
+\newcommand{\kclay}{$\mbox{K}_{\mbox{clay}}$}
+\newcommand{\kd}{$\mbox{K}_{\mbox{d}}$}
+
+%% \includeonly{}
 
 \begin{document}
-
-\begin{text}
 
 \section*{Daisy simulation of Silstrup and Estrup}
 
@@ -131,9 +130,9 @@ For sowing information about date, crop and sowing density were
 provided.  The Daisy crop parametrizations do not rely on sowing
 density, but instead assume that ``standard practise'' is used.  Daisy
 has experimental support for a crop model that include sowing density,
-but given that the PLAP is expected to follow standard management
-practise, we found it safer to use the older and better tested crop
-parameterizations.
+but given that the PLAP sites are expected to follow standard
+management practise, we found it safer to use the older and better
+tested crop parameterizations.
 
 Information about the crow growth was given phenologically (BBCH
 stage) and in terms of above ground biomass. No attempt was made
@@ -174,14 +173,15 @@ the summer 2000 crop to empty the plow layer soil water (see
 figure~\ref{fig:Silstrup-theta}).  The spring barley parametrization
 did a better job at this than the less tested fodder beet.
 
-\subsubsection{Pesticide application}
+\subsubsection{Pesticide and bromide application}
 
 The data for pesticide application consisted of date, amount, and
 trade name.  Trade name is is translated to active ingredient using
 ``Middeldatabasen'' from \textsc{dlbr} Landbrugsinfo
 (\url{http://www.landbrugsinfo.dk/}).  Note that Goltix WG application
 is given in L/ha, while the active ingredient is specified in g/kg.
-To resolve, a density of 1~kg/L is assumed. 
+To resolve, a density of 1~kg/L is assumed.  For potassium bromide,
+bromide content was calculated from relative molar mass.
 
 The applications are sumarized in table~\ref{tab:man-pest}.
 \begin{table}[htbp]
@@ -192,6 +192,7 @@ The applications are sumarized in table~\ref{tab:man-pest}.
   \begin{tabular}{c|crl|crl}\hline
     \emph{Silstrup} & Trade name & \multicolumn{2}{c|}{Amount} 
                & Active ingredient & \multicolumn{2}{c}{Active amount} \\
+    \hline
     2000-05-22 & Potassium bromide & 30 & kg/ha & Bromide    & 20.14 & kg/ha\\
     2000-05-22 & Goltix WG      & 1   & L/ha & Metamitron    & 700   & g/ha\\
     2000-06-15 & Goltix WG      & 1   & L/ha & Metamitron    & 700   & g/ha\\
@@ -200,9 +201,10 @@ The applications are sumarized in table~\ref{tab:man-pest}.
     2001-07-04 & Tilt Top       & 0.5 & L/ha & Fenpropimorph & 187.5 & g/ha\\
     2001-07-16 & Perfektion 500 & 0.6 & L/ha & Dimethoate    & 300   & g/ha\\
     2001-10-25 & Roundup Bio    & 4.0 & L/ha & Glyphosate    & 1440  & g/ha\\
-    \hline
+    \hline\hline
     \emph{Estrup} & Trade name & \multicolumn{2}{c|}{Amount} 
                & Active ingredient & \multicolumn{2}{c}{Active amount} \\
+    \hline
     2000-05-15 & Potassium bromide & 30 & kg/ha & Bromide & 20.14 & kg/ha\\
     2000-06-15 & Tilt Top       & 0.5 & L/ha & Fenpropimorph & 187.5 & g/ha\\
     2000-06-15 & Perfektion 500 & 0.4 & L/ha & Dimethoate    & 200   & g/ha\\
@@ -212,20 +214,145 @@ The applications are sumarized in table~\ref{tab:man-pest}.
   \end{tabular}
 \end{table}
 
-\subsection{Pesticide properties}
+\subsection{Pesticide and bromide properties}
 
-\begin{verbatim}
-surface turnover
+Of the four pesticides examined, only metamitron and glyphosate were
+memasured in concentrations above the detection limit in the examined
+dataset.  A single sample at the detection limit were found for
+dimethoate, and none were found for fenpropimorph.  No calibration has
+therefore been performed on those.  
 
-Footprint & FOCUS
+\subsubsection{Soil sorption and decomposition}
 
-heat/moisture factors
+Sorption and decomposition parameters for pesticides are primarily
+taken from \citet{ppdb20100517}, with values as shown in
+table~\ref{tab:ppdb}.  The database specify a \koc{} value
+independently of whether the pesticide is actually sorbed to organic
+matter.  We chosed to use a \kd{} values measured in Denmark for the
+two main pesticides.  For metamitron, \citet{madsen2000pesticide}
+specify \kd{} values together with sil properties for a number of
+Danish sites.  Section~\ref{sec:cal-metamitron} describes how we
+selected a \kd{} based on those.  For glyphosate, the \kd{} value is
+from \citet{gjettermann2009}.  The asorption is not instantaneous, an
+adsorption rate of 0.05 h$^-1$ was used as an reasonable initial
+guess.  We found no reason to change the value, except for glyphosate,
+see section~\ref{sec:cal-glyphosate}.
 
-strong/weak
+The effect of depth on decomposition is taken from
+\citet{focus2000,focus2002}.  The build in effect of temperature and
+humidity for turnover of organic matter in Daisy is also applied for
+pesticides.  The default diffusion coefficient used by Daisy for
+pesticides of 4.6e-6 cm$^2$/s is used unchanged for all pesticides as
+well as for colloids.  For bromide, a value of 2.0e-5 cm$^2$/s is used
+instead, reflecting the smaller molecules.  We assume that the
+pesticide molecules are all reflected by the roots, so there is no
+crop uptake of pesticides.
 
-colloids
+\begin{table}[htbp]
+  \centering
+  \caption{Pesticide properties from  \citet{ppdb20100517}. 
+    The DT50 value is the decomposition halftime in days.  For both DT50
+    and \koc{} we put the value marked  'field' in \citet{ppdb20100517}
+    in the center, surrounded by the lower and upper limit found in 
+    field studies, as marked in a note in the database. For fenpropimorph
+    the \koc{} field value did not fall within the specifed interval.  
+    The \kd{} value for glyphosate is from \citet{gjettermann2009}, and
+    the \kd{} range for metamitron is from \citet{madsen2000pesticide}.  
+    The values used are in \textbf{bold}.}
+  \label{tab:ppdb}
 
-\end{verbatim}
+  \begin{tabular}{l|ccc}\hline
+    Name & DT50 & \koc{} [ml/g] & \kd{} [ml/g] \\\hline
+    Dimethoate & 4.6 -- \textbf{7.2} -- 9.8 & 16.25 -- \textbf{30} -- 51.88 & \\
+    Fenpropimorph & 8.8 -- \textbf{25.5} -- 50.6 & 2771 -- \textbf{2401} -- 5943 &\\
+    Glyphosate & 5 -- \textbf{12} -- 21 & 884 -- 21699 -- 60000  & \textbf{503} \\
+    Metamitron & 6.6 -- \textbf{11.1} -- 22.0 & 77.1 -- 80.7 -- 132.5 & 0.14 -- \textbf{4.0}\\
+  \end{tabular}
+\end{table}
+
+\subsubsection{Surface turnover}
+
+None of our sources had specific information on above ground turnover.
+As the glyphosate calibration (see section~\ref{sec:cal-glyphosate})
+depend on part of the glyphosate staying in the litter pack for
+several days, surface turnover potentially becomes a factor.  The
+default value in Daisy of DT50 = 3.5 for pesticides is used.
+
+\subsubsection{Colloids and colloid facilitated transport}
+
+We have no data for colloids, so the parameters for colloid generation
+and filtering calibrated for Rørrendegård have been reused for both
+sites.  The model itself will adjust to the different clay content.
+The pesticides are assumed to be able to sorb to and be transported
+with colloids, meaning the colloids will be in competition with the
+soil matrix as potential sorbtion sites for the solute form of the
+pesticides.  In the lack of any measurements, we have assumed that the
+colloids are 10000 more likely to attack to a dissolved soil particle
+(a colloid) than to a stationary soil particle (part of the soil
+matrix).
+
+\subsubsection{Glyphosate calibration}
+\label{sec:cal-glyphosate}
+
+The highest glyphosate contrations in both sites were seen right after
+application, or at the first large rain event after application.  This
+is unlikely to a function of the pesticide properties, but rather of
+the transport routes to the drain.  See~\ref{sec:cal-silstrup-surface}
+for how this was calibrates.
+
+The initial simulations showed practically no glyphosate movement once
+it entered the soil matrix.  The measurements, however, did show some
+late findings of glyphosate in the drain water.  In order to give the
+glyphosate a chance to move, we divided the sorption into a weak but
+fast and a strong but slow form.  The strong but slow form represent
+90\% of the \kd{} value, the weak but fast form the remaining 10\%.
+The effect is that the glyphosate is relatively mobile in the
+beginning, but becomes less so as more glyphosate become sorbed in the
+slow form.
+
+\subsubsection{Metamitron calibration}
+\label{sec:cal-metamitron}
+
+Adjusting the decompose rate for metamitron has little effect on the
+simulation results.  Figure~\ref{fig:Silstrup-C-Metamitron-2000} and
+\ref{fig:Silstrup-Metamitron-2000-horizontal} shows why. The
+metamitron we find in the drains is the same metamitron that was first
+transported vertically to the end of the biopores, and then
+horizontally towards the drain.  Since the biopores in the simulation
+ends 1.2 meter below surface, this means the metamitron is located
+below the 1 meter depth limit for decomposition specified by FOCUS.
+
+In \citet{madsen2000pesticide} er sorbtionegenskaber bestemt for en
+række danske lokaliteter.  Den bedste korrelation for sorption til
+jordparametre er total jernoxid (FeO$_{\mbox{total}}$), og kun ringe
+korrelation til organisk stof og ingen til let ekstraherbar jernoxid
+(FeO$_{\mbox{oxalate}}$) som ellers er målt på Silstrup.  Den højeste
+målte Kd 3,1 $\pm$ 0,9 L/kg for Drengsted, og den laveste 0,16 $\pm$
+0,02 L/kg.  Vi regner derfor med at at Kd bør holde sig i intervalet
+0,14 -- 4,0 L/kg.
+
+En Kd på den højeste værdi i intervallet, 4,0 L/kg, giver det bedste
+match for den tidlige hændelse.  Lavere værdier giver højere
+udvaskning.  Vi kunne alternativt skrue ned på overfladeparametrene
+for at lukke af for den hurtige transportvej ned, hvilket kunne
+forsvares med at udbringningen er kort efter en jorbehandling, hvor vi
+måske undervurderer pløjelagets ledningsevne, og overvurderer antallet
+af bioporer.  Bromidmålingerne supporterer ikke dette.  Bromid blev
+udbragt samtidig med metamitron, men der er desværre ikke nogen
+målinger fra dræn i samme periode til at sammenligne med.  Men
+eftersom der bliver observeret bromid i jordvand i en meters dybde må
+vi konkludere at der findes nogen hurtige veje derned.  Faktisk tyder
+målingerne i 1 og 3,5 meters dybde på at vi undervurderer hvor hurtigt
+Bromid trænger ned, samtidig med at vi overvurderer hvor hurtigt
+Metamitron trænger ned i dræn.
+
+For at få den sene udvaskning af metamitron på plads kalibrerede vi os
+frem til en halveringstid på 35 dage.
+
+\subsubsection{Bromide calibration}
+\label{sec:cal-bromide}
+
+crop uptake reclection factor
 
 \subsection{Soil}
 
@@ -238,13 +365,22 @@ colloids
 ** OM \& N
 
 ** Surface, plow pan
+
+grundvand
+
 \end{verbatim}
+
+\subsubsection{Silstrup surface}
+\label{sec:cal-silstrup-surface}
+
+Glyphosate
+
+Bromide
 
 \subsection{Groundwater table}
 
-\section{Results}
 
-\end{text}
+\section{Results}
 
 % \section*{Daisy simulation figures for Silstrup og Estrup}
 
@@ -256,7 +392,6 @@ colloids
 
 \include{figs-Estrup-2D}
 
-\begin{text}
 \section{Discussion}
 
 \begin{verbatim}
@@ -311,6 +446,4 @@ in particular need further work.
 \addcontentsline{toc}{section}{\numberline{}References}
 \bibliography{../../txt/daisy}
 
-\end{text}
-  
 \end{document}
