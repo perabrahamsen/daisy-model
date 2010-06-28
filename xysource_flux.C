@@ -138,7 +138,7 @@ XYSourceFlux::load_interval (std::vector<double>& all_values, Treelog& msg)
 
       std::vector<double> values;
       
-      if (!lex.flux_edges (entries, all_values, msg))
+      if (!lex.flux_edges (entries, values, msg))
         continue;
       
       if (all_values.size () < 1)

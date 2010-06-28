@@ -779,7 +779,7 @@
 (defgnuplot Station multi
   (declare station String "Name of station to plot.")
   (declare area Number [ha] "Area to plot.")
-  (graph weather gw
+  (graph gw
          sc-bromide 
          (leak150bromide (legend nw))
          drain drain-acc

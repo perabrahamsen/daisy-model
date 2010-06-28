@@ -30,6 +30,8 @@
   (hydraulic hypres) (secondary_domain none))
 
 (defhorizon Silstrup_Ap_MACRO Silstrup_Ap_base
+  (hydraulic original
+             (K_b 0.1 [mm/h]))
   (secondary_domain vap_pressure (h_lim -10 [cm])))
 
 (defhorizon Silstrup_Ap_surface Silstrup_Ap
@@ -61,6 +63,8 @@
   (hydraulic hypres) (secondary_domain none))
 
 (defhorizon Silstrup_B_MACRO Silstrup_B_base
+  (hydraulic original
+             (Theta_res 0 [%]))
   (secondary_domain vap_pressure (h_lim -10 [cm])))
 
 (defhorizon Silstrup_B_plow_pan Silstrup_B
@@ -745,6 +749,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
   (station Silstrup)
   (area 1.69 [ha])
   (graph &old 
+         (weather (extra &old [set format x ""]))
          Silstrup-weather-glyphosate
          Silstrup-water-glyphosate
          Silstrup-first-glyphosate

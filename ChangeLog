@@ -1,3 +1,8 @@
+2010-06-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* xysource_flux.C (load_interval): Bux fix.  Only last value in
+	interval was counted.
+
 2010-06-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.87 released.
