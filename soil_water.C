@@ -496,7 +496,7 @@ SoilWater::tick_after (const Geometry& geo,
       daisy_assert (std::isnormal (K_edge));
       // This may not have been what was used for calculating q matrix.
       const double K_factor = K_lim / K_edge;
-      daisy_assert (std::isfinite (K_edge));
+      daisy_assert (std::isfinite (K_factor));
       if (K_factor < 0.99999)
         {
           q_primary_[e] = q_matrix_[e] * K_factor;

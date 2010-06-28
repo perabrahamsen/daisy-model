@@ -488,14 +488,102 @@ pedotransfer function.
 \subsubsection{Soil surface and plow pan}
 \label{sec:surface-plow-pan}
 
+Danish agricultural soils usually feature both a plow pan, and a
+highly variable conductivity in the soil surface.  These can create
+layers of near saurated soil, which is needed for activating the
+biopores module in Daisy.  Hence, such layers was added to the soil
+description.  The plow pan is defined at the top of the B horizon, but
+with different hydraulic properties.  The cracks are removed from the
+plow pan, and the hydraulic conductivity in the micropores is reduced
+to 10\%.  The surface layer constitute the top of the Ap horizon.
+Changing the parameters have not been necessary for Estrup.  For
+Silstrup, the hydraulic conductuctivity is temporarily decreased to
+0.1\% of the original value, see the description in
+section~\ref{sec:cal-silstrup-surface}.
+
 \subsubsection{Fast and slow water}
+
+Water movement in the matrix is calculated by Richard's Equation.
+However, for pesticide transport the water is later divided into a
+slow moving primary domain consiting of the smallers pores, and a fast
+moving secondary domain consiting of the larger pores.  If the horizon
+has cracks, the secondary domain water will consist of the water in
+the cracks.  If not, the secondary domain water will consist of the
+water above pF 2.  We have used pF 1.2 as the limit in other
+simulations, but since the retention curves in this simulations are
+relatively flat near saturarion, that represented very little water.
+Pesticed are tracked independent in the two domains, with an exchange
+factor ($\alpha$) at its default value of 0.01 h$^-1$. 
+
+No calibration has been done on these parameters.
 
 \subsubsection{Biopores}
 \label{sec:biopores}
 
+The Daisy, once the soil is near saturation, biopores will become
+activated, and extract water from the matrix down to -30 cm pressure,
+at which point the biupores will deactivate.  The capability of the
+biopores to extract water is further limited by the storage capacity
+of the biopores themself, and the ability to pass the water back to
+the matrix in a deeper layer.  
+
+The biopores a divided into a number of user specified classes, each
+defined by density, diameter, where they start and end (including
+ending directly in drain).  \citet{lindhardt2001} contain some
+information about biopores, but not enough for use by Daisy.  We have
+therefore chosen to use a biopore setup based on data measured at
+Rørrende specifcally for use by Daisy.
+
+One calibration has been performed, the original setup for Rørrende
+had all biopores near the drain end in the drain.  In order to get
+more of tail in leaching numbers, half the biopores near the drain now
+ends in the soil matrix.
+
 \subsubsection{Groundwater table and drain pipes}
 
+Drain depth and ditance are taken from \citet{lindhardt2001}, and can
+be used directly by Daisy.  Automatic meaurements of groundwater
+pressure table near the bottom of the part of the soil we have
+described in Daisy are being used as a lower boundary condition, just
+like net precipitation is the upper boundary condition.  A constant
+offset has been added to the measured numbers in order to get the
+drain flow right.  The offset has been varying depending on the soil
+description (between -40 and 30 cm), for the final setup it ended up
+being -4 cm for Silstrup and -5 cm for Estrup.
+
+The simulated groundwater table is hard to define, given that the
+model is two dimensional.  We have chosen to show two values, a low
+value based on the pressure in the lowest located unsaturated numeric
+cell (usually near the drain), and high value based on the pressure in
+the highest located saturated numeric cell (usually in the center
+between drains).  Measured and simulated groundwater table can be seem
+on figure~\ref{fig:gw}.  The frequent zeros for the high value at
+Silstrup coresponds to ponding, where the top of the soil will become
+saturated.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics{fig/Silstrup-gw}
+    \includegraphics{fig/Estrup-gw}
+  \end{center}
+  \caption{Groundwater table at Silstrup (top) and Estrup (bottom).
+    Automatic daily measurements at Silstrup are from P3.  Manual
+    montly measurement at Estrup until 2000-09-19 are from P3,
+    automatic daily measurements from 2000-09-22 are from P1.
+    Simulated low value is calculated from pressure in lowest
+    unsatured numeric cell, typically located near drain.  Simulated
+    high value is calculated from pressure in highest saturated cell,
+    typically farthest from the drain.}
+  \label{fig:gw}
+\end{figure}
+
 \subsubsection{Organic matter and nitrogen}
+
+Inorganic nitrogen has been disabled, in order to save simulation
+time.  Initially the organic matter turnover was also disabled.
+However, since bioincorporaion of litter into the soil is part of that
+module, we had to reenable it as the litter layer appeared to be significant.
+No calibration has been done apart from the bioincorporation speed, as
+described in section~\ref{sec:cal-silstrup-surface}.
 
 \subsection{Silstrup surface}
 \label{sec:cal-silstrup-surface}
