@@ -749,6 +749,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
   (station Silstrup)
   (area 1.69 [ha])
   (graph &old 
+         (gw (extra &old [set format x ""]))
          (weather (extra &old [set format x ""]))
          Silstrup-weather-glyphosate
          Silstrup-water-glyphosate

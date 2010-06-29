@@ -650,6 +650,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
   (station Estrup)
   (area 1.26 [ha])
   (graph &old
+         (gw (legend none))
          (weather (legend none))
          "Retention Ap Estrup"
          "Conductivity Ap Estrup"
