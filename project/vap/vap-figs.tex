@@ -1,6 +1,7 @@
-\documentclass[a4paper]{article}
+\documentclass[a4paper]{report}
 
-\usepackage[left=1cm,top=2cm,right=1cm]{geometry}
+%%\usepackage[left=1cm,top=2cm,right=1cm]{geometry}
+\usepackage[top=3cm,bottom=2cm]{geometry}
 \usepackage[latin1]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{natbib}
@@ -20,12 +21,39 @@
 \newcommand{\hypres}{\textsc{hypres}}
 \newcommand{\macro}{\textsc{macro}}
 \newcommand{\Macro}{\textsc{Macro}}
+\newcommand{\figl}{\hspace*{-2cm}}
+\newcommand{\figright}[1]{\includegraphics{fig/#1}}
+\newcommand{\fig}[1]{\figl\figright{#1}}
+\newcommand{\figtop}[1]{\figl\includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/#1}}
 
 %% \includeonly{}
 
 \begin{document}
 
-\section*{Daisy simulation of Silstrup and Estrup}
+\chapter*{Daisy simulation of Silstrup and Estrup}
+
+\begin{bf}
+  \begin{large}
+    Søren Hansen \texttt{$<$sha@life.ku.dk$>$}\\
+    Carsten Pedersen \texttt{$<$cpe@life.ku.dk$>$}\\
+    Marie Habekost Nielsen \texttt{$<$maha@life.ku.dk$>$}\\
+    Per Abrahamsen \texttt{$<$abraham@dina.kvl.dk$>$}\\
+    \\
+    \today{}\\
+  \end{large}
+\end{bf}
+\vfill\noindent
+University of Copenhagen\\
+Department of Basic Sciences and Environment\\
+Environmental Chemistry and Physics\\
+Thorvaldsensvej 40\\
+DK-1871 Frederiksberg C\\
+Tel: \texttt{$+$45 353 32300}\\
+Fax: \texttt{$+$45 353 32398}
+
+\tableofcontents
+
+\chapter{Introduction}
 
 The Danish Pesticide Leaching Assessment Programme (PLAP) has been
 monitoring drain and soil water since 1999 in six different locations
@@ -67,9 +95,9 @@ peat, thin layers of chalk, and even sand from railroad construction.
 Silstrup is also heterogeneous, but less so, with high levels of clay
 dominating the area.
 
-\section{Model setup}
+\chapter{Model setup}
 
-\subsection{Weather}
+\section{Weather}
 
 Hourly weather data for Silstrup, Tylstrup and Askov (near Estrup) was
 provided by the Faculty of Agricultural Sciences, Aarhus University.
@@ -96,8 +124,8 @@ root system and soil surface to extract water from the soil.
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/Silstrup-weather}
-    \includegraphics{fig/Estrup-weather}
+    \figtop{Silstrup-weather}
+    \fig{Estrup-weather}
   \end{center}
   \caption{Accumulated precipitation and hourly values for temperature
     measured at Silstrup (top) and Askov (bottom).  Calculated
@@ -107,11 +135,11 @@ root system and soil surface to extract water from the soil.
 Precipitation, air temperature, ETc and ETa can be seen on
 figure~\ref{fig:weather}.
 
-\subsection{Management}
+\section{Management}
 
 All management data were provided by GEUS.
 
-\subsubsection{Tillage}
+\subsection{Tillage}
 
 Date, type, and depth were specified for all tillage operations.  All
 three were entered into Daisy.  In Daisy, the main effects of tillage
@@ -125,7 +153,7 @@ operation.  Since we chose to implement dynamic hydraulic soil
 properties for the Silstrup soil surface, the tillage information were
 useful there as well.
 
-\subsubsection{Fertilization}
+\subsection{Fertilization}
 
 Date, type, and amount were specified for each fertilization event, as
 well as N, P and K content of fertilizer.  Of these nutrients, Daisy
@@ -139,7 +167,7 @@ pesticides, until it become incroporated into the soil by either
 tillage operations or earthworm activity.  However, due to the timing
 of the applications, both effect is likely to be negigible.
 
-\subsubsection{Crop management}
+\subsection{Crop management}
 \label{sec:crop-man}
 
 For sowing information about date, crop and sowing density were
@@ -198,7 +226,7 @@ most bromide, in order to explain the low amount of bromide found in
 the drain water.  See also section~\ref{sec:cal-bromide}
 and~\ref{sec:cal-silstrup-surface}.
 
-\subsubsection{Pesticide and bromide application}
+\subsection{Pesticide and bromide application}
 
 The data for pesticide application consisted of date, amount, and
 trade name.  Trade name is is translated to active ingredient using
@@ -216,7 +244,7 @@ The applications are sumarized in table~\ref{tab:man-pest}.
   \centering
   \begin{tabular}{c|crl|crl}\hline
     \emph{Silstrup} & Trade name & \multicolumn{2}{c|}{Amount} 
-               & Active ingredient & \multicolumn{2}{c}{Active amount} \\
+               & Active ingredient & \multicolumn{2}{c}{Amount} \\
     \hline
     2000-05-22 & Potassium bromide & 30 & kg/ha & Bromide    & 20.14 & kg/ha\\
     2000-05-22 & Goltix WG      & 1   & L/ha & Metamitron    & 700   & g/ha\\
@@ -228,7 +256,7 @@ The applications are sumarized in table~\ref{tab:man-pest}.
     2001-10-25 & Roundup Bio    & 4.0 & L/ha & Glyphosate    & 1440  & g/ha\\
     \hline\hline
     \emph{Estrup} & Trade name & \multicolumn{2}{c|}{Amount} 
-               & Active ingredient & \multicolumn{2}{c}{Active amount} \\
+               & Active ingredient & \multicolumn{2}{c}{Amount} \\
     \hline
     2000-05-15 & Potassium bromide & 30 & kg/ha & Bromide & 20.14 & kg/ha\\
     2000-06-15 & Tilt Top       & 0.5 & L/ha & Fenpropimorph & 187.5 & g/ha\\
@@ -239,7 +267,7 @@ The applications are sumarized in table~\ref{tab:man-pest}.
   \end{tabular}
 \end{table}
 
-\subsection{Pesticide and bromide properties}
+\section{Pesticide and bromide properties}
 
 Of the four pesticides examined, only metamitron and glyphosate were
 memasured in concentrations above the detection limit in the examined
@@ -247,7 +275,7 @@ dataset.  A single sample at the detection limit were found for
 dimethoate, and none were found for fenpropimorph.  No calibration has
 therefore been performed on those.  
 
-\subsubsection{Soil sorption and decomposition}
+\subsection{Soil sorption and decomposition}
 
 Sorption and decomposition parameters for pesticides are primarily
 taken from \citet{ppdb20100517}, with values as shown in
@@ -295,7 +323,7 @@ crop uptake of pesticides.
   \end{tabular}
 \end{table}
 
-\subsubsection{Surface turnover}
+\subsection{Surface turnover}
 
 None of our sources had specific information on above ground turnover.
 As the glyphosate calibration (see section~\ref{sec:cal-glyphosate})
@@ -303,7 +331,7 @@ depend on part of the glyphosate staying in the litter pack for
 several days, surface turnover potentially becomes a factor.  The
 default value in Daisy of DT50 = 3.5 for pesticides is used.
 
-\subsubsection{Colloids and colloid facilitated transport}
+\subsection{Colloids and colloid facilitated transport}
 
 We have no data for colloids, so the parameters for colloid generation
 and filtering calibrated for Rørrendegård have been reused for both
@@ -316,7 +344,7 @@ colloids are 10000 more likely to attack to a dissolved soil particle
 (a colloid) than to a stationary soil particle (part of the soil
 matrix).
 
-\subsubsection{Glyphosate calibration}
+\subsection{Glyphosate calibration}
 \label{sec:cal-glyphosate}
 
 The highest glyphosate contrations in both sites were seen right after
@@ -335,7 +363,7 @@ The effect is that the glyphosate is relatively mobile in the
 beginning, but becomes less so as more glyphosate becomes sorbed in
 the slow form.
 
-\subsubsection{Metamitron calibration}
+\subsection{Metamitron calibration}
 \label{sec:cal-metamitron}
 
 Adjusting the decompose rate for metamitron has little effect on the
@@ -357,7 +385,7 @@ L/kg for Drengsted, and the lowest 0.16 $\pm$ 0.02 L/kg.  We therefore
 decided \kd{} should be within the interval 0.14 -- 4.0 L/kg.  A \kd{}
 value at the high end of the interval, 4.0 L/kg, gave the best match.
 
-\subsubsection{Bromide calibration}
+\subsection{Bromide calibration}
 \label{sec:cal-bromide}
 
 As discussed in section~\ref{sec:crop-man} we wanted the crop to take
@@ -373,14 +401,14 @@ a single value.  With a reflection factor of 0.25 we got a good match
 for total amount in Silstrup.  In Estrup, it resulted in too little
 drain leaching, but still good dynamics.
 
-\subsection{Soil}
+\section{Soil}
 
 The soil setup is based on multiple sources, which will be described
 in this section.
 
-\subsubsection{The soil matrix domain}
+\subsection{The soil matrix domain}
 
-\paragraph{The primary domain (micropores).}
+\subsubsection{The primary domain (micropores)}
 
 GEUS had already calibrated the model \macro{}
 \citep{jarvis1994simulation,larsbo2003macro} for both sites.  As
@@ -404,7 +432,7 @@ introduction of 8\% residual water in the B horizon of Silstrup, based
 on the relative lack of drying during the summer, as seen on
 figure~\ref{fig:Silstrup-theta}.
 
-\paragraph{Soil cracks and anisotropy.}
+\subsubsection{Soil cracks and anisotropy}
 
 Unlike \macro{}, Daisy distinguish sharply between macropores small
 enough that the cabilary forces are still dominating, and macropores
@@ -442,18 +470,19 @@ Silstrup (figures~\ref{fig:Silstrup-water-2000-horizontal} and
 Estrup (figures~\ref{fig:Estrup-water-2000-horizontal}
 and~\ref{fig:Estrup-water-2001-horizontal}).
 
-\citet{lindhardt2001} specify no cracks in Silstrup below 3.5 m,
-Biopores and cracks.  For Estrup, we get the best suimulation result
-by ignoring all cracks below the plow pan, thus assuming that the
-cracks found in \citet{lindhardt2001} are not hydraulically connected.
-Note that the high saturated conductivity used in the \macro{}
-simulation for the A, B, and C1 horizons are still reflected in Daisy
-through the biopores.  It is only the horizontal conductivity (as
-Daisy biopores are vertical) that is low, which fit well with Estrup
-having a high groundwater table despite the drain pipes being close
-together.
+\citet{lindhardt2001} specifies no cracks in Silstrup below 3.5 m. For
+Estrup, the high groundwater level could indicate a poor horizontal
+conductivity.  Furthermore, the shape of the bromide drain leaching
+(figure~\ref{fig:Estrup-bromide-weekly}) where the high values are
+early also indicate that thr drain water are extracted from the top
+soil layers.  We therefore assumed that the cracks found in
+\citet{lindhardt2001} are not hydraulically connected, and thus
+doesn't influence the conductivity.  Note that the higher saturated
+conductivity used in the \macro{} simulation for the B and C1 horizons
+are still reflected in Daisy through the biopores.  It is only the
+horizontal conductivity (as Daisy biopores are vertical) that is low.
 
-\paragraph{Figures.}
+\subsubsection{Figures and tables}
 
 Figures~\ref{fig:Silstrup-hor} and~\ref{fig:Estrup-hor} show the
 original \macro{} parameterization and the modified parameterization
@@ -463,10 +492,35 @@ is not included.  For comparison, we have also elected to show the
 effect of the parameters estimated from soil texture by the \hypres{}
 pedotransfer function.
 
+
+\newcommand{\dd}[2]{#1\hspace{-3mm} &--&\hspace{-3.5mm}#2}
+\begin{table}[htbp]
+  \caption{
+    Soil profile for the two sites.  Depth is in cm below soil surface.  
+    The Note column specifies \emph{Dynamic} conductivity for the soil
+    surface layer, \emph{Dense} (low conductivity) for the plowing pan, 
+    \emph{Anisotropy} for layers with high horizontal hydraulic conductivity,
+    and \emph{Cracks} for layers with high near saturated hydraulic 
+    conductivity.}
+  \label{tab:profile}
+  \centering
+  \begin{tabular}{rclll||rclll}\hline
+    \multicolumn{5}{l||}{\emph{Silstrup}} & \multicolumn{5}{l}{\emph{Estrup}} \\
+    \multicolumn{3}{c}{Depth} & Horizon & Note& \multicolumn{3}{c}{Depth} & Horizon & Note \\\hline
+    \dd{0}{3}     & Ap (surface) & Dynamic    & \dd{0}{3}     & Ap (surface)    & Dynamic    \\
+    \dd{3}{31}    & Ap           & Anisotropy & \dd{3}{27}    & Ap              & Anisotropy \\
+    \dd{31}{39}   & B (plow pan) & Dense      & \dd{27}{35}   & B (plow pan)    & Dense \\
+    \dd{39}{75}   & B            & Cracks     & \dd{35}{55}   & B               & \\
+    \dd{75}{113}  & B            & Anisotropy & \dd{55}{105}  & C1              & \\
+    \dd{113}{180} & C            & Anisotropy & \dd{105}{500} & C2              & \\
+    \dd{180}{350} & C            & Cracks\\
+    \dd{350}{500} & C            & \\
+  \end{tabular}
+\end{table}
 \begin{figure}[htbp] 
-  \includegraphics{fig/Silstrup-Ap-Theta}\includegraphics{fig/Silstrup-Ap-K}\\
-  \includegraphics{fig/Silstrup-B-Theta}\includegraphics{fig/Silstrup-B-K}\\
-  \includegraphics{fig/Silstrup-C-Theta}\includegraphics{fig/Silstrup-C-K}
+  \fig{Silstrup-Ap-Theta}\figright{Silstrup-Ap-K}\\
+  \fig{Silstrup-B-Theta}\figright{Silstrup-B-K}\\
+  \fig{Silstrup-C-Theta}\figright{Silstrup-C-K}
   \caption{Silstrup soil hydraulic properties.  MACRO denotes the
     original parametrization, Daisy the modified parametrization
     (ignoring anisotropy and biopores), and HYPRES refers to
@@ -474,10 +528,10 @@ pedotransfer function.
   \label{fig:Silstrup-hor}
 \end{figure}
 \begin{figure}[htbp] 
-  \includegraphics{fig/Estrup-Ap-Theta}\includegraphics{fig/Estrup-Ap-K}\\
-  \includegraphics{fig/Estrup-B-Theta}\includegraphics{fig/Estrup-B-K}\\
-  \includegraphics{fig/Estrup-C1-Theta}\includegraphics{fig/Estrup-C1-K}\\
-  \includegraphics{fig/Estrup-C2-Theta}\includegraphics{fig/Estrup-C2-K}
+  \fig{Estrup-Ap-Theta}\figright{Estrup-Ap-K}\\
+  \fig{Estrup-B-Theta}\figright{Estrup-B-K}\\
+  \fig{Estrup-C1-Theta}\figright{Estrup-C1-K}\\
+  \fig{Estrup-C2-Theta}\figright{Estrup-C2-K}
   \caption{Estrup soil hydraulic properties.  \Macro{} denotes the
     original parametrization, Daisy the modified parametrization
     (ignoring anisotropy and biopores), and \hypres{} refers to
@@ -485,7 +539,7 @@ pedotransfer function.
   \label{fig:Estrup-hor}
 \end{figure}
 
-\subsubsection{Soil surface and plow pan}
+\subsection{Soil surface and plow pan}
 \label{sec:surface-plow-pan}
 
 Danish agricultural soils usually feature both a plow pan, and a
@@ -501,7 +555,7 @@ Silstrup, the hydraulic conductuctivity is temporarily decreased to
 0.1\% of the original value, see the description in
 section~\ref{sec:cal-silstrup-surface}.
 
-\subsubsection{Fast and slow water}
+\subsection{Fast and slow water}
 
 Water movement in the matrix is calculated by Richard's Equation.
 However, for pesticide transport the water is later divided into a
@@ -517,7 +571,7 @@ factor ($\alpha$) at its default value of 0.01 h$^-1$.
 
 No calibration has been done on these parameters.
 
-\subsubsection{Biopores}
+\subsection{Biopores}
 \label{sec:biopores}
 
 The Daisy, once the soil is near saturation, biopores will become
@@ -539,7 +593,7 @@ had all biopores near the drain end in the drain.  In order to get
 more of tail in leaching numbers, half the biopores near the drain now
 ends in the soil matrix.
 
-\subsubsection{Groundwater table and drain pipes}
+\subsection{Groundwater table and drain pipes}
 
 Drain depth and ditance are taken from \citet{lindhardt2001}, and can
 be used directly by Daisy.  Automatic meaurements of groundwater
@@ -562,8 +616,8 @@ Silstrup coresponds to ponding, where the top of the soil will become
 saturated.
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/Silstrup-gw}
-    \includegraphics{fig/Estrup-gw}
+    \figtop{Silstrup-gw}
+    \fig{Estrup-gw}
   \end{center}
   \caption{Groundwater table at Silstrup (top) and Estrup (bottom).
     Automatic daily measurements at Silstrup are from P3.  Manual
@@ -576,7 +630,7 @@ saturated.
   \label{fig:gw}
 \end{figure}
 
-\subsubsection{Organic matter and nitrogen}
+\subsection{Organic matter and nitrogen}
 
 Inorganic nitrogen has been disabled, in order to save simulation
 time.  Initially the organic matter turnover was also disabled.
@@ -585,29 +639,149 @@ module, we had to reenable it as the litter layer appeared to be significant.
 No calibration has been done apart from the bioincorporation speed, as
 described in section~\ref{sec:cal-silstrup-surface}.
 
-\subsection{Silstrup surface}
+\FloatBarrier
+\section{Silstrup surface}
 \label{sec:cal-silstrup-surface}
 
-Glyphosate
+The Silstrup simulations presented two challenges that both were
+resolved through calibration of the system surface.  The first
+challenge was the measurements of glyphosate in the drain, shown on
+figure~\ref{fig:Silstrup-weekly2}, the first week after application of
+glyphosate.  The glyphosate is applied 2001-10-25.  The drain
+measurements cover the period from the 24'th to 30'th of October.
 
-Litter
+\subsection{Soil surface crust}
 
-Bromide
+Figure~\ref{fig:Silstrup-weather-glyphosate} was created to examine what
+happened that week.  The two upper graphs concern the water, which is
+needed to bring down the glyphosate (shown on the bottom graph).  All
+the graphs are from the final simulation.  Precipitation (top graph)
+was obviously measured.  Let us start with that.  What we see are
+three small precipitation events in the early hours the 27'th, 28'th
+and 29'th ($<$ 1 mm), followed by a larger event starting at noon the
+29'th.
 
-\FloatBarrier
-\section{Results}
+\begin{figure}[htbp]
+  \begin{center}
+    \figtop{Silstrup-weather-glyphosate}\\
+    \figtop{Silstrup-water-glyphosate}\\
+    \fig{Silstrup-first-glyphosate}
+  \end{center}
+  \caption{Silstrup surface water and glyphosate in the first week
+    after application.  Top graph shows fluxes affecting surface
+    water.  Middle graph shows water storage on surface, as well as
+    the water holding capcaity of the litter pack.  Bottom graph track
+    the fate of glyphosate on the surface.}
+  \label{fig:Silstrup-weather-glyphosate}
+\end{figure}
 
-% \section*{Daisy simulation figures for Silstrup og Estrup}
+What happened initially was that none of the events would initiate the
+biopores, thus no glyphosate in the drains.  As glyhosate \emph{was}
+found in the drains, some biopores must have been activated.  The
+alternative, that a strongly sorbing pesticide would be able to move
+one meter down through the soul matrix in less than a week, were not
+considered reaslistic.  
+
+At this point in the simulation, we were more than five month after
+the last soil treatment, and nearly two months after harvest.  It
+seemed likely that the soil surface at this point would have formed a
+crust with low hydraulic property.  By calibration, we found that we
+generated biopore flow at the large event if we decreased the
+hydraulic conductivity of the soild surface to 0.1\%.  As we don't
+have a crust formation model implemented, we chose to make this change
+in conductivity at once at harvest day.
+
+\subsection{Litter pack}
+
+We now got water, but not signficant amounts of glyphosate, in the
+simulated drains.  The explanation for this can also be found in top
+graph on figure~\ref{fig:Silstrup-weather-glyphosate}.  The three
+first events are too small to activate the biopores, instead the water
+would infilrate through the matrix.  Bringing with it all the
+glyphosate.  Heavy rain and ponding may -- also in Daisy -- release
+the glyphosate or colloid bound glyphosate again to the surface.  But
+the event wasn't that large or violent, so very little glyphosate
+would follow the water through the biopores to the drain.  What was
+needed was a mechanism to protect the glyphosate on the surface.
+
+The harvest data provided on esuch mechanism.  The yield was over 7
+tons grains per hectar, and less than 3 ton straws was removed.  This
+made it likely that a lot of residuals were left on the field.
+Furthermore, \citet{gjettermann2009} demostrated that glyphosate did not
+sorb to straws.  Thus, it seemed likely that some of the glyphosate
+was kept in the litter pack together with the water from the small
+events, and only washed out with the large event.  To implement this
+in Daisy, we needed a pre-existing and pre-calibrated model, as there
+were no time or money for new experiments at this point.
+
+Luckily, this was not hard to find.  Mulching is a known technique to
+conserve water, to other people had been interested in the water
+dynamics of the litter pack before us.  The model described in
+\citet{scopel2004} was a good conceptual fit with Daisy.  In this
+model the plant residuals will cover a fraction (calculated by Beer's
+law) of the soil based on the amount and type, where they prevent soil
+evaporation for the covered area, and catch a corresponding amount of
+the precipitation.  The water holding capacity is based on amount and
+type of residuals.  In Daisy this was extended to also catch a
+fraction of the applied pesticides.  A parameterization based on
+millet from \citet{macena2003} was selected.
+
+This left the incorporation of crop residuals from the surface by
+earth worms as the remaining calibration parameter.  By decreasing the
+maximum speed of incorporation from 0.5 to 0.35 g DM/m$^2$/h we were
+able to get a good fit.  As can be seen on the bottom graph of
+figure~\ref{fig:Silstrup-weather-glyphosate}, most of the glyphosate
+still enter the soil matrix through the three small events, but more
+than enough remain to be transported with the biopores at the large
+event to match measured data (figure~\ref{fig:Silstrup-weekly2}).
+
+\subsection{Surface water flow}
+
+The second problem at Siltrup was due to the bromide.  More than one
+third of the net precipitation end up in the drains, yet less than 10
+percent of the bromide is found there.  Despite our best efforts, we
+were not able to make the crop uptake large enough to compensate for
+the difference.  The explanation that gave was results was that a
+signficant amount of water fully bypassed the soil matrix on its way
+to the drain pipes, thus diluting the drain water. The bromide was
+applied 2001-05-22.  The last tillage operation was 2001-05-03, with
+no large precipitation events in between (total precipitation 9.6 mm,
+highest intensity 1.4 mm/h).  It is therefre likely that the hydraulic
+conductivity is still high at that point.  We chose to add crust
+2001-06-01 (after 48.4 mm rain, max intensity 4.9 mm/h), setting the
+hydraulic conductivity down to one percent of the original.  At this
+point, the bromide was safely in the soil matrix
+
+The crust would generate biopore activity, but not necessarily to the
+drain (only the bioproes at 20 cm to either side of the drain pipes
+are assumed to be connected to them) .  The biopores not connected to
+the drains were not able to take all the water, resulting in ponding
+at the rest of the field.  To lead this water to the drains, a simple
+surface water movement was implemented.  When the ponding was higher
+than the local detension capacity in part of the field, the surplus
+water was redistributed evenly to the part of the field where the
+ponding was lower.  Using this as a calibration parameter, we found
+that a local detension capacity of 2 mm would result 10\% of the total
+water bypassing the drain pipes, and the right amount bromide in the
+drains seen over a whole season.
+
+One other observation that points to surface flow possibly being a
+real factor is the response time in the drains to precipitation
+events.  As the bottom graph on figure~\ref{fig:Silstrup-drain} shows,
+the observed drain flow is almost identical the the net precipitation
+at the beginnng of the drain season.  This suggest a very fast
+connection to the drains, which even with the surface flow module we
+could not quite match,
+
+\chapter{Results}
+
+% \chapter*{Daisy simulation figures for Silstrup og Estrup}
 
 \include{figs-Silstrup}
 
-\include{figs-Silstrup-2D}
-
 \include{figs-Estrup}
 
-\include{figs-Estrup-2D}
-
-\section{Discussion}
+\chapter{Discussion}
 
 \begin{verbatim}
 * Silstrup drain period may be too short due to heterogenity.
@@ -617,7 +791,7 @@ Bromide
 * Silstrup Metamitron not p{\aa}virket af halverinsgtid
 \end{verbatim}
 
-\section{Conclusion and further work}
+\chapter{Conclusion and further work}
 
 It is possible to explain the measured data based on the processes
 included in the present model, with some caveats
@@ -658,7 +832,13 @@ in particular need further work.
   should be adapted to direct local measurements.
 \end{itemize}
 
-\addcontentsline{toc}{section}{\numberline{}References}
+\addcontentsline{toc}{chapter}{\numberline{}References}
 \bibliography{../../txt/daisy}
+
+\appendix
+
+\include{figs-Silstrup-2D}
+
+\include{figs-Estrup-2D}
 
 \end{document}

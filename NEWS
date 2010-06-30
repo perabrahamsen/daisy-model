@@ -12,6 +12,8 @@ release.
 
 Should lead to more evapotranspiration from wet surfaces.
 
+** Reduced memory use during initialization by orders of magnitude.
+
 ** Dimension change in log files.
 
 The dimension of most flux variables in the standard log files has
@@ -117,15 +119,33 @@ The R_primary and R_secondary parameters are gone, instead we have
 K_wall_relative, which denote the conductivity of the biopore wall
 relative to the surrounding matrix.
 
-** Water no longer move on the x surface with 2D simulations.
+** Water movement on the x surface with 2D simulations.
 
-But there is still full mixing of soil chemicals.
+The water movement on surface within the system being simulated is now
+controlled by a new Surface parameter LocalDetentionCapacity.  If the
+average ponding on the surface is above this threshold, all part of
+the surface will have the same ponding.  Otherwise, if the ponding
+locally is above this threshold, excess water will be distributed
+evenly to the rest of the surface (limited by the threshold).
 
-** New 2D plot facility.
+** Tertiary flux below surface now approximated.
 
-Assuming 'Theta.dlf' list water content in all cells, the following
-small setup file will generate a 'daisy.gnuplot' file, which will show
-a 2D representation on the screen when feed into the gnuplot program.
+The 'biopores' tertiary model didn't use to calculate a flux below
+surface.  It still doesn't but it find an approximate value based on a
+mass balance that ignores the storage capacity of the biopores.  The
+values will likely be very much of for individual timesteps, but
+averaged over a long period (long enough that the storage capacity
+become an insignificant part of the mass balance), the approximation
+should work well.
+
+** New 2D plot facilities.
+
+*** Content.
+
+Assuming 'soil_water_content.dlf' list water content in all cells, the
+following small setup file will generate a 'daisy.gnuplot' file, which
+will show a 2D representation on the screen when feed into the gnuplot
+program.
 
   (defgnuplot sample soil
     (file "soil_water_content.dlf")
@@ -142,6 +162,33 @@ The 'type' parameter allows you to select between 'block', 'smooth',
 soil..  More information about generating plots can be found in the
 tutorial, and more details on the 'soil' model can be found in the
 reference manual.
+
+*** Flux
+
+You can now plot horizontal flux as a function of depth, or vertical
+flux as a function of the x-position.  Here is an example that plot
+horizontal flux at two different distances from the drain.
+
+(defxysource hor50 flux
+  "Horizontal flux at x=50."
+  (file "matrix-water-flux.dlf")
+  (x 50 [cm])
+  (when 1999 9 28))
+
+(defxysource hor150 flux
+  "Horizontal flux at x=150."
+  (file "matrix-water-flux.dlf")
+  (x 150 [cm])
+  (when 1999 9 28))
+
+(defgnuplot plothor xy
+  "Horizontal flux at x=50 and x=150."
+  (source hor50 hor150))
+
+(defprogram showit gnuplot
+  (graph plothor))
+
+(run showit)
 
 * 4.86
 
