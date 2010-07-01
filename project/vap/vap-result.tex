@@ -7,7 +7,7 @@ been considered in the calibration process.  Data regarding dynamic
 crop growth is not presented.  Static data used for the initial setup
 (soil physics) and dynamic data used to drive the simulation (weather,
 groundwater pressure, and crop management) are presented in
-chapter~\ref{cha:setup}.  Daisy will calculate a lot of other
+chapter~\ref{cha:setup}.  Daisy will calculate a lot of additional
 information, which is useless for validation purposes, but can be
 important for interpretation of the results.  We have chosen to put
 what we consider the most important such data (regarding colloids,
@@ -44,7 +44,7 @@ bromide leaching data for Silstrup also lead to us to believe that we
 underestimated the crop ability to extract water from the top horizon
 (containing most of the bromide during the summer), two changes were
 made.  The residual water of the B horizon was set to 8\% (up from 0),
-and the crop was calibrated to most of the roots would be concentrated
+and the crop was calibrated so most of the roots would be concentrated
 in the Ap horizon.
 
 \begin{figure}[htbp]
@@ -68,14 +68,14 @@ in the Ap horizon.
 \FloatBarrier
 \subsection{Suction cups and horizontal filters}
 
-Bromide and pesticide concentration in soil water was measured with
-suction cells one meter below surface at the same place the TDR's were
-installed, and 3.5 meter below surface with horizontal filters.  The
-suction cup measurements are unlikely to be representative for the
-field as a whole, due to the large heterogeneity observed.  The
-horizontal filters on the other hand have been places downstream in
-the expected general direction of groundwater flow, and should thus be
-more likely to represent the entire field.
+Bromide and pesticide concentration in soil water were measured with
+suction cells one meter below surface, at the same part of the field
+the TDR's were installed, and 3.5 meter below surface with horizontal
+filters.  The suction cup measurements are unlikely to be
+representative for the field as a whole, due to the large
+heterogeneity observed.  The horizontal filters, on the other hand,
+are placed downstream in the expected general direction of groundwater
+flow, and should thus be more likely to represent the entire field.
 
 As Daisy keep separate track of solutes in small and large pores (see
 section~\ref{sec:fast-slow}), and it is likely that the suction cups
@@ -88,11 +88,11 @@ figure~\ref{fig:Estrup-bromide}.  The simulated values for 1 meter are
 well within the variation shown by the the suction cups.  The
 measurements does hint that the first bromide should arrive earlier
 though, especially in Silstrup.  The concentration in the large pores
-compared to average does not change this picture.  In variation
-between the two is short lived in the time scale of the graphs.  For
-3.5 meter the simulation is still within the general variation,
-however the filters clearly show that some bromide find its way to 3.5
-meter very fast (two month after application).
+compared to average does not change this picture.  Variation between
+the two is short lived in the time scale of the graphs.  For 3.5 meter
+the simulation is still within the general variation, however the
+filters clearly show that some bromide find its way to 3.5 meter very
+fast (two months after application).
 
 We did not got pesticide measurement data for 3.5 meter depth in time
 for this report, but none were above the detection limit anyway.  This
@@ -141,29 +141,29 @@ figure~\ref{fig:pest-horizontal}.
 \section{Drain}
 
 Drain water flow was measured daily.  The measurements of bromide and
-pesticides were done using a mixture of two sampling methods.  One is
-time time proportional sampling, we samples is taken with specific
-time intervals.  The other is flow proportional sampling, where
-samples is taken with intervals proportional to the amount of water
-flow in the drains.  GEUS has combined the two into a ``best
+pesticides were done using a mixture of two sampling methods.  The
+first is time time proportional sampling, we samples are taken in
+specific time intervals.  The other is flow proportional sampling,
+where samples are taken with intervals proportional to the amount of
+water flow in the drains.  GEUS has combined the two into a ``best
 estimate'' of the total weekly flow, which is what we have used for
-calibrating against.
+calibration.
 
 \subsection{Water}
 
 Calibrating the simulated total drain flow over the two season is
-``just'' a question of picking the right offset the measured ground
-water pressure (see section~\ref{sec:gwt}).  Getting the length of the
-drain seasons right is trickier, and involves calibrating the soil
-physics.  Drain flow for Silstrup is shown on
+``just'' a question of picking the right offset for the measured
+ground water pressure (see section~\ref{sec:gwt}).  Getting the length
+of the drain seasons right is trickier, and involves calibrating the
+soil physics.  Drain flow for Silstrup is shown on
 figure~\ref{fig:Silstrup-drain} and for Estrup on
-figure\ref{fig:Estrup-drain}.  For Silstrup the drain season length is
-right the first year, but the distribution is much more even in the
-simulation, compared to the measurements where the flow more directly
-follows the precipitation.  For the second season the simulation
-underestimate the start of the season, and compensate by
+figure~\ref{fig:Estrup-drain}.  For Silstrup the drain season length
+is right the first year, but the distribution is more even in the
+simulation, compared to the measurements where the flow almost
+directly follows the precipitation.  For the second season the
+simulation underestimate the start of the season, and compensate by
 overestimating the end of the season.  For Estrup we got an overall
-good match both season, slightly underestimating the drain flow at the
+good match both seasons, slightly underestimating the drain flow at the
 beginning of the first season, while overestimating the drain flow at
 the beginning of the second season.
 
@@ -194,7 +194,7 @@ described in section~\ref{sec:cal-silstrup-bromide}.  For Silstrup
 we get a good match the first year, but the second year the dynamics
 are off even if the total amount is right.  The poor second year
 dynamics for bromide likely reflect the poor second year dynamics for
-water.  Foe Estrup (figure~\ref{fig:Estrup-bromide-drain}), we
+water.  For Estrup (figure~\ref{fig:Estrup-bromide-drain}), we
 underestimate both the initial leaching the first season, and the
 leaching the entire second season.
 
@@ -242,10 +242,11 @@ The second interesting pesticide is glyphosate, here presented
 together with fenpropimorph and dimethoate.  As can be seen on
 figure~\ref{fig:Silstrup-acc} and figure~\ref{fig:Estrup-acc} we get
 the total amount right for both sites.  The weekly numbers show that
-dynamic is also reasonable in Estrup (figure~\ref{fig:Estrup-weekly}),
-but that Silstrup overestimate the initial event compared to later
-leaching (figure~\ref{fig:Silstrup-weekly2}).  The Silstrup simulated
-results required a lot of focus on surface processes (see
+the dynamics is also reasonable in Silstrup
+(figure~\ref{fig:Silstrup-weekly2}), but that the simulation
+underestimate the later leaching at Estrup
+(figure~\ref{fig:Estrup-weekly}).  The Silstrup simulated results
+required a lot of focus on surface processes (see
 section~\ref{sec:cal-silstrup-surface}) to obtain, while the late
 numbers are a result of adjusting the pesticide sorption model (see
 section~\ref{sec:cal-glyphosate}).  No (additional) adjustment where
