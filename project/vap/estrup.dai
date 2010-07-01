@@ -652,6 +652,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
   (graph &old
          (gw (legend none))
          (weather (legend none))
+         colloids
          "Retention Ap Estrup"
          "Conductivity Ap Estrup"
          "Retention B Estrup"
@@ -665,7 +666,6 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
          ;; First measurement 2000-05-26.
          (drain (begin 2000 05 26))
          (drain-acc (begin 2000 05 26))
-         (colloids (begin 2000 05 26))
          ;; First application: Bromide 2000-05-22
          ;; Last application: Glyphosate 2000-10-13
          (est-drainmass (ymax 800 [g/ha/w])

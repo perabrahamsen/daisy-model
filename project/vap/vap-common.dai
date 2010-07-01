@@ -532,6 +532,7 @@
   (begin 2000 05 01)
   (end 2002 07 01)
   (where "fig/${station}-horizontal.pdf")
+  (ymax 15 [ng/L])
   (source (column (file "log/${station}-content.dlf")
                   (tag "Dimethoate")
                   (dimension [ng/L]))
@@ -784,7 +785,6 @@
          (leak150bromide (legend nw))
          drain drain-acc
          biopore biopore-acc biopore-drain biopore-drain-acc
-         colloids
          ))
 
 ;; Sites

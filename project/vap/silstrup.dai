@@ -751,6 +751,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
   (graph &old 
          (gw (extra &old [set format x ""]))
          (weather (extra &old [set format x ""]))
+         (colloids (legend none) (extra &old [set format x ""]))
          Silstrup-weather-glyphosate
          Silstrup-water-glyphosate
          Silstrup-first-glyphosate
@@ -760,7 +761,8 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
          "Conductivity B Silstrup"
          "Retention C Silstrup"
          "Conductivity C Silstrup"
-         (horizontal (source &old 
+         (horizontal (extra &old [set format x ""])
+                     (source &old 
                              (column (file "log/${station}-content.dlf")
                                      (dimension [ng/L])
                                      (tag "Metamitron"))))
@@ -794,7 +796,6 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
          ;; First measurement 2000-04-29
          (drain (begin 2000 04 29))
          (drain-acc (begin 2000 04 29))
-         (colloids (begin 2000 04 29))
          ;; Metamitron and Bromide first applied 2000-05-22.
          (sil-drainmass (begin 2000 04 29) (chemical Metamitron))
          (sil-drainmass-acc (begin 2000 04 29) (chemical Metamitron))
