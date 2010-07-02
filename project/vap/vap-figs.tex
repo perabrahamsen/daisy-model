@@ -68,10 +68,11 @@ Fax: \texttt{$+$45 353 32398}
 \chapter{Introduction}
 
 The Danish Pesticide Leaching Assessment Programme (PLAP) has been
-monitoring drain and soil water since 1999 in six different locations
+monitoring drain and soil water since 1999 at six different locations
 in order to evaluate the leaching risk of pesticides.  Pesticides are
-found in some drain water measurements, but not in the horizontal
-filters 3.5 meter below the surface.
+found in concentrations above 0.1 $\mu$g/L in drain water, whereas
+such concentrations are rarely found in the horizontal filters 3.5
+meter below the surface.
 
 In order to better understand the system, and eventually how the
 measurements can be better used for assessing potential risk of
@@ -89,28 +90,29 @@ The most significant measured results are from the Estrup site, so
 that was fixed as the first site.  We wanted to use the same years for
 both sites to see the results of similar climate on two different
 locations.  Hourly weather data from the site had to be present, both
-for the modelling period and for one growth season before for warmup.
-The initial choice of F{\aa}rdrup for the second site was rejected, as
-it was not possible to get sufficient quality weather data.
-Furthermore, we wanted the same pesticides on both sites, and both
-weakly and strongly sorbing pesticides represented.  Glyphosate had to
-be one of them.
+for the modelling period and for one growth season before for
+"`warmup"'.  The initial choice of F{\aa}rdrup as the second site was
+rejected, as it was not possible to get sufficient quality weather
+data.  Furthermore, we wanted the same pesticides on both sites, and
+both weakly and strongly sorbing pesticides represented.  Glyphosate
+had to be one of them.
 
 Based on these criteria, we chose Silstrup and Estrup, drain seasons
 2000-2001 and 2001-2002, with the pesticides glyphosate, fenpropimorph,
 dimethoate, and metamitron.
 
-Both sites are described in detail in \citet{lindhardt2001}, with an
-overview of the measured data found in \citet{vap2009}.  Estrup is a
-pedologically rich site, containing both areas with sand and clay,
-peat, thin layers of chalk, and even sand from railroad construction.
-Silstrup is also heterogeneous, but less so, with high levels of clay
-dominating the area.  Figure 5.13 of \citet{lindhardt2001} is
-illustrative, based on two profiles Silstrup shows the second largest
-variation, but is consistently the highest or second highest in clay
-content among the PLAP sites.  Estrup, on the other hand, show even
-larger variation, and features both the highest and lowest clay
-content among the four clay sites.
+Both sites are described in details in \citet{lindhardt2001}. An
+overview of the measured data can be found in \citet{vap2009}.  Estrup
+is a pedologically rich site, containing both areas with sand and
+clay, peat, thin layers of chalk, and even sand fill from railroad
+construction.  Silstrup is also heterogeneous, but less so, with high
+(for Danish soils) levels of clay dominating the area.  Figure 5.13 of
+\citet{lindhardt2001} is illustrative.  Based on two profiles,
+Silstrup shows the second largest variation in soil texture, but is
+consistently the highest or second highest in clay content among the
+PLAP sites.  Estrup, on the other hand, shows even larger variation,
+and features both the the highest and lowest clay content among the
+four loamy soil sites.
 
 \include{vap-setup}
 
@@ -118,33 +120,34 @@ content among the four clay sites.
 
 \chapter{Discussion}
 
-\section{Validation}
+\section{Comparison between simulated and measured data}
 
 It is possible to explain the measured data based on the processes
 included in the present model, with some caveats
 \begin{itemize}
-\item The high degree of heterogeneity found in the Estrup site would
+\item The high degree of heterogeneity at the Estrup site would
   require a detailed 3D model of the entire area to model
-  mechanistically, the current 2D model setup can at best be viewed as
-  ``effective parameters''.
+  mechanistically.  The current 2D model setup can at best be viewed
+  as ``effective parameters''.
 \item The simulated second year drain season for Silstrup is too
   short. This is particularly noticeable for the Bromide measurements.
 \item Measurements at both sites show
   (figure~\ref{fig:Silstrup-weekly2} and~\ref{fig:Estrup-weekly}) that
-  the initial glyphosate event is followed by a couple of weeks of
+  the initial glyphosate event is followed by a couple of weeks with
   addition drain leaching.  We believe this is due to easily
-  remobilizable glyphosate in the preferential transport system, a
+  remobilizable glyphosate within the preferential transport system, a
   process we have not implemented in our model.
 \item Bromide is found in some of the horizontal filters at 3.5 meters
   depth at both sites in the first measurements after application of
-  Bromide.  No pesticides are found in those depth though.  It does
-  indicate a transport way for non-sorbing solutes that we cannot
-  model.  One possibility is large scale fractures, this suggestion is
-  supported by other work at GEUS.
+  Bromide.  No pesticides are generally found at this depth though.
+  It does indicate a transport way for non-sorbing solutes that we
+  cannot currently model.  One possibility is large scale fractures,
+  this suggestion is supported by other work at GEUS.
 \end{itemize}
 
-Sine we have been developing the model (adding new processes), the
-work presented in this report cannot count as a validation.
+Sine we have been developing the model (adding new processes) based on
+the measured data, the work presented in this report cannot count as a
+model validation.
 
 \section{Deep leaching of pesticides}
 
@@ -154,7 +157,7 @@ event, none for Estrup.  If we look at
 figure~\ref{fig:Silstrup-C-Metamitron-2000},~\ref{fig:Silstrup-C-Glyphosate-2001},
 and~\ref{fig:Estrup-C-Glyphosate-2000} we see the metamitron moving
 downward but being diluted in the process.  The glyphosate is not
-visible moving from beyond the end of the biopores at either site.
+visibly moving from beyond the end of the biopores at either site.
 The high concentration at the end the biopores is likely mostly a
 reflection of a limitation in the model, we have specified all
 biopores to end in the same depth, in reality they will end at
@@ -164,11 +167,11 @@ different depths.
 
 Apart from the significance of biopores for pesticide leaching, it is
 interesting to note how the two sites are dominated by different
-processes.  For Silstrup surface processes (crust formation, litter,
+processes.  For Silstrup, surface processes (crust formation, litter,
 and overland flow) were dominating the system.  For Estrup, the
 measurements can to a large degree be adequately explained by what
-happens in the plowing layer, see e.g.\ the first year horizontal
-bromide flux (figure~\ref{fig:Estrup-Bromide-2000-horizontal}).
+happens in the plow layer, see e.g.\ the first year horizontal bromide
+flux (figure~\ref{fig:Estrup-Bromide-2000-horizontal}).
 
 \section{Further work}
 

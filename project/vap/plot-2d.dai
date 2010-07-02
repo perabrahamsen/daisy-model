@@ -339,7 +339,7 @@
          Silstrup-2D-pF-2000 Silstrup-2D-pF-2001))
 
 (defgnuplot vap-xy xy
-  (device "pdf size 15cm,10cm"))
+  (device "pdf size 19cm,10cm"))
 
 (defxysource vap-flux flux
   (declare pos Number [cm] "Position.")
@@ -367,6 +367,7 @@
 
 (defgnuplot flux-horizontal vap-xy
   (where "fig/${station}-water-horizontal-${y}.pdf")
+  (xmin -8000 [mm])
   ;; (title "Horizontal flux")
   (source (flux-x (pos 25 [cm]))
           (flux-x (pos 50 [cm])) 
@@ -375,7 +376,11 @@
           (flux-x (pos 300 [cm]))
          ))
 
-(defgnuplot flux-matrix vap-xy
+(defgnuplot flux-water-vertical vap-xy
+  (ymin -12000 [mm])
+  (ymax   2000 [mm]))
+
+(defgnuplot flux-matrix flux-water-vertical
   (where "fig/${station}-water-matrix-${y}.pdf")
   ;;(title "Vertical matrix flux")
   (source (flux-z (pos 0 [cm]))
@@ -386,17 +391,19 @@
           (flux-z (pos -200 [cm]))
          ))
 
-(defgnuplot flux-biopores vap-xy
+(defgnuplot flux-biopores flux-water-vertical
   (where "fig/${station}-water-biopore-${y}.pdf")
   ;;(title "Vertical biopore flux")
+  (legend none)
   (source (flux-b (pos 0 [cm]))
           (flux-b (pos -25 [cm]))
           (flux-b (pos -50 [cm])) 
           (flux-b (pos -100 [cm]))))
 
-(defgnuplot flux-combined vap-xy
+(defgnuplot flux-combined flux-water-vertical
   (where "fig/${station}-water-${y}.pdf")
   ;;(title "Vertical flux")
+  (extra &old [set format x ""])
   (source (flux-c (ps 0 [cm]))
           (flux-c (ps -25 [cm]))
           (flux-c (ps -50 [cm])) 
@@ -409,25 +416,31 @@
   (declare station String "Name of station.")
   (declare y Integer "Year to plot.")
   (declare y2 Integer "Next year.")
-  (graph flux-horizontal flux-matrix flux-biopores flux-combined))
+  (graph flux-matrix flux-biopores flux-combined))
 
 (defgnuplot plot2d-flux-Estrup-2000 plot2d-flux
   (station Estrup)
+  (graph &old (flux-horizontal (extra &old [set format x ""])))
   (y 2000)
   (y2 2001))
 
 (defgnuplot plot2d-flux-Estrup-2001 plot2d-flux
   (station Estrup)
+  (graph &old (flux-horizontal (legend none)))
   (y 2001)
   (y2 2002))
 
 (defgnuplot plot2d-flux-Silstrup-2000 plot2d-flux
   (station Silstrup)
+  (graph &old
+         (flux-horizontal (extra &old [set format x ""])))
   (y 2000)
   (y2 2001))
 
 (defgnuplot plot2d-flux-Silstrup-2001 plot2d-flux
   (station Silstrup)
+  (graph &old 
+         (flux-horizontal (legend none)))
   (y 2001)
   (y2 2002))
 

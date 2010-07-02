@@ -10,8 +10,8 @@ groundwater pressure, and crop management) are presented in
 chapter~\ref{cha:setup}.  Daisy will calculate a lot of additional
 information, which is useless for validation purposes, but can be
 important for interpretation of the results.  We have chosen to put
-what we consider the most important such data (regarding colloids,
-biopores and 2D flow) in
+what we consider the most important of such data (regarding deep
+leaching, colloids, biopores and 2D flow) in
 appendix~\ref{app:col-biopores},~\ref{app:silstrup-2d}
 and~\ref{app:estrup-2d}.  The data presented in this chapter fall in
 two broad categories: measurements of water and solutes within the
@@ -31,21 +31,22 @@ below soil surface.  The 110 cm probe values show two distinct curves
 when plotted as points rather than lines.  The variation on the 60 cm
 probe seem to bear little relationship to the seasons.  The 25 cm
 probes at both sites are a better match for our expectations.  The
-ability of the crop to dry out the soil at both sites are larger than
-the simulated.  Also, the simulated high (wither) level at Silstrup is
+ability of the crop to dry out the soil is larger than the simulated
+at both sites.  Also, the simulated high (winter) level at Silstrup is
 slightly above the measured high level.
 
 In general, we didn't want to calibrate our soil physics based on
 these measurements (e.g.\ by lowering the porosity of the Silstrup Ap
-horizon), as the soil physics were based on samples from different
-parts of the field, and as such more likely to be representative of
-the field as a whole, than the TDR measurements.  However, as the
-bromide leaching data for Silstrup also lead to us to believe that we
+horizon), as the soil physics were based on distributed samples from
+the field, and as such more likely to be representative of the field
+as a whole, than the TDR measurements.  However, as the bromide
+leaching data for Silstrup also lead us to believe that we
 underestimated the crop ability to extract water from the top horizon
 (containing most of the bromide during the summer), two changes were
 made.  The residual water of the B horizon was set to 8\% (up from 0),
-and the crop was calibrated so most of the roots would be concentrated
-in the Ap horizon.
+and the crop was calibrated so that most of the roots would be
+concentrated in the Ap horizon.  See section~\ref{sec:cal-primary} and
+section~\ref{sec:crop-man}.
 
 \begin{figure}[htbp]
   \begin{center}
@@ -69,13 +70,14 @@ in the Ap horizon.
 \subsection{Suction cups and horizontal filters}
 
 Bromide and pesticide concentration in soil water were measured with
-suction cells one meter below surface, at the same part of the field
-the TDR's were installed, and 3.5 meter below surface with horizontal
-filters.  The suction cup measurements are unlikely to be
-representative for the field as a whole, due to the large
-heterogeneity observed.  The horizontal filters, on the other hand,
-are placed downstream in the expected general direction of groundwater
-flow, and should thus be more likely to represent the entire field.
+small suction cells one meter below surface, in the same part of the
+field as where the TDR's were installed, and 3.5 meter below surface
+within large horizontal filters.  The suction cup measurements are
+unlikely to be representative for the field as a whole, due to the
+large heterogeneity observed.  The horizontal filters, on the other
+hand, are placed downstream in the expected general direction of
+groundwater flow, and should thus more likely represent the entire
+field.
 
 As Daisy keep separate track of solutes in small and large pores (see
 section~\ref{sec:fast-slow}), and it is likely that the suction cups
@@ -89,12 +91,12 @@ well within the variation shown by the the suction cups.  The
 measurements does hint that the first bromide should arrive earlier
 though, especially in Silstrup.  The concentration in the large pores
 compared to average does not change this picture.  Variation between
-the two is short lived in the time scale of the graphs.  For 3.5 meter
-the simulation is still within the general variation, however the
-filters clearly show that some bromide find its way to 3.5 meter very
-fast (two months after application).
+the two is short lived at the time scale of the graphs.  For 3.5
+meter, the simulation is still within the general variation, however
+the filters clearly show that some bromide find its way to 3.5 meter
+very fast (two months after application).
 
-We did not got pesticide measurement data for 3.5 meter depth in time
+We did not get pesticide measurement data for 3.5 meter depth in time
 for this report, but none were above the detection limit anyway.  This
 fit well with the simulated results shown on
 figure~\ref{fig:pest-horizontal}.
@@ -104,7 +106,7 @@ figure~\ref{fig:pest-horizontal}.
     \figtop{Silstrup-sc-bromide}\\
     \fig{Silstrup-Bromide-horizontal}
   \end{center}
-  \caption{Silstrup soil bromide content in 1.0 m depth (top) and 3.5
+  \caption{Silstrup soil bromide content at 1.0 m depth (top) and 3.5
     m depth (bottom).  Sim (avg) is the average simulated
     concentration, Sim (fast) is the simulated concentration in the
     large (fast) pores.  S1 and S2 are suction cup measurements.
@@ -118,7 +120,7 @@ figure~\ref{fig:pest-horizontal}.
     \figtop{Estrup-sc-bromide}\\
     \fig{Estrup-Bromide-horizontal}
   \end{center}
-  \caption{Estrup soil bromide content in 1.0 m depth (top) and 3.5
+  \caption{Estrup soil bromide content at 1.0 m depth (top) and 3.5
     m depth (bottom).  Sim (avg) is the average simulated
     concentration, Sim (fast) is the simulated concentration in the
     large (fast) pores.  S1 and S2 are suction cup measurements.
@@ -133,25 +135,27 @@ figure~\ref{fig:pest-horizontal}.
     \fig{Estrup-horizontal}
   \end{center}
   \caption{Pesticide concentration in soil water at 3.5 meters depth
-    for Silstrup (top) and Estrup (bottom).}
+    for Silstrup (top) and Estrup (bottom).  The simulated values for
+    Estrup are in the order of femtograms per hectare, and not visible
+    on a nagogram per hectare scale.}
   \label{fig:pest-horizontal}
 \end{figure}
 
 \FloatBarrier
 \section{Drain}
 
-Drain water flow was measured daily.  The measurements of bromide and
-pesticides were done using a mixture of two sampling methods.  The
-first is time time proportional sampling, we samples are taken in
-specific time intervals.  The other is flow proportional sampling,
-where samples are taken with intervals proportional to the amount of
-water flow in the drains.  GEUS has combined the two into a ``best
-estimate'' of the total weekly flow, which is what we have used for
-calibration.
+Drain water flow was measured continuesly, GEUS provided daily values.
+The measurements of bromide and pesticides were done using a mixture
+of two sampling methods.  The first is time proportional sampling
+where samples are taken at specific time intervals.  The other is flow
+proportional sampling, where samples are taken with intervals
+proportional to the amount of water flow in the drains.  GEUS has
+combined the two into a ``best estimate'' of the total weekly flow,
+which is what we have used for calibration.
 
 \subsection{Water}
 
-Calibrating the simulated total drain flow over the two season is
+Calibrating the simulated total drain flow over the two seasons is
 ``just'' a question of picking the right offset for the measured
 ground water pressure (see section~\ref{sec:gwt}).  Getting the length
 of the drain seasons right is trickier, and involves calibrating the
@@ -160,12 +164,12 @@ figure~\ref{fig:Silstrup-drain} and for Estrup on
 figure~\ref{fig:Estrup-drain}.  For Silstrup the drain season length
 is right the first year, but the distribution is more even in the
 simulation, compared to the measurements where the flow almost
-directly follows the precipitation.  For the second season the
-simulation underestimate the start of the season, and compensate by
-overestimating the end of the season.  For Estrup we got an overall
-good match both seasons, slightly underestimating the drain flow at the
-beginning of the first season, while overestimating the drain flow at
-the beginning of the second season.
+directly follows the precipitation.  For the second season, the
+simulation underestimate water flow at the start of the season, and
+compensate by overestimating at the end of the season.  For Estrup we
+got an overall good match both seasons, slightly underestimating the
+drain flow at the beginning of the first season, while overestimating
+the drain flow at the beginning of the second season.
 
 \begin{figure}[htbp]
   \begin{center}
@@ -193,20 +197,20 @@ described in section~\ref{sec:cal-silstrup-bromide}.  For Silstrup
 (figure~\ref{fig:Silstrup-weekly} and~\ref{fig:Silstrup-bromide-acc})
 we get a good match the first year, but the second year the dynamics
 are off even if the total amount is right.  The poor second year
-dynamics for bromide likely reflect the poor second year dynamics for
+dynamics for bromide likely reflects the poor second year dynamics for
 water.  For Estrup (figure~\ref{fig:Estrup-bromide-drain}), we
 underestimate both the initial leaching the first season, and the
 leaching the entire second season.
 
 Metamitron is one of the two pesticides we have interesting data for,
 unfortunately only for one site.  By increasing the \kd{} parameter to
-the largest value we could defend by literature (see
+the largest value we could defend by literature values (see
 section~\ref{sec:cal-metamitron}) we were able to get a good match
 with both weekly (figure~\ref{fig:Silstrup-weekly}) and accumulated
-(figure~\ref{fig:Silstrup-bromide-acc}) measured numbers.  The
-accumulated numbers may seem off, but that is only due to two weeks
+(figure~\ref{fig:Silstrup-bromide-acc}) measured values.  The
+accumulated values may seem off, but that is only due to two weeks
 where the majority of leaching in the simulation occurs, but where the
-actual drain water were not analyzed for metamitron.
+measured drain water were not analyzed for metamitron.
 
 \begin{figure}[htbp]
   \begin{center}
@@ -242,13 +246,13 @@ The second interesting pesticide is glyphosate, here presented
 together with fenpropimorph and dimethoate.  As can be seen on
 figure~\ref{fig:Silstrup-acc} and figure~\ref{fig:Estrup-acc} we get
 the total amount right for both sites.  The weekly numbers show that
-the dynamics is also reasonable in Silstrup
+the dynamics is also reasonable for Silstrup
 (figure~\ref{fig:Silstrup-weekly2}), but that the simulation
 underestimate the later leaching at Estrup
-(figure~\ref{fig:Estrup-weekly}).  The Silstrup simulated results
-required a lot of focus on surface processes (see
-section~\ref{sec:cal-silstrup-surface}) to obtain, while the late
-numbers are a result of adjusting the pesticide sorption model (see
+(figure~\ref{fig:Estrup-weekly}).  The early Silstrup simulated
+results required a lot of focus on surface processes (see
+section~\ref{sec:cal-silstrup-surface}), while the late values are a
+result of adjusting the pesticide sorption model (see
 section~\ref{sec:cal-glyphosate}).  No (additional) adjustment where
 made for Estrup.
 
@@ -256,7 +260,9 @@ There is a single measurement at the detection limit of dimethoate at
 Silstrup.  The simulation has three spikes at roughly the same size,
 one of them matching the detection.  There are no measurements of
 dimethoate above detection limit at Estrup, and none for fenpropimorph
-at either site.  The simulation results are in agreement with this.
+at either site.  The simulation results are in agreement with this, as
+the two large spikes simulated at Silstrup both occur before the
+measured drain water is analyzed fenpropimorph.
 
 \begin{figure}[htbp]
   \begin{center}
