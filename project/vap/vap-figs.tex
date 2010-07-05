@@ -31,7 +31,7 @@
 
 \begin{document}
 
-\chapter*{Daisy simulation of Silstrup and Estrup}
+\chapter*{Daisy 2D simulation of Silstrup and Estrup}
 
 Part of project
 \begin{otherlanguage}{danish}
@@ -49,7 +49,7 @@ for the Danish Environmental Protection Agency.
     Søren Hansen \texttt{$<$sha@life.ku.dk$>$}\\
     Per Abrahamsen \texttt{$<$abraham@dina.kvl.dk$>$}\\
     Carsten Pedersen \texttt{$<$cpe@life.ku.dk$>$}\\
-    Marie Habekost Nielsen \texttt{$<$maha@life.ku.dk$>$}\\
+    %% Marie Habekost Nielsen \texttt{$<$maha@life.ku.dk$>$}\\
     \\
     \today{}\\
   \end{large}
@@ -112,7 +112,7 @@ Silstrup shows the second largest variation in soil texture, but is
 consistently the highest or second highest in clay content among the
 PLAP sites.  Estrup, on the other hand, shows even larger variation,
 and features both the the highest and lowest clay content among the
-four loamy soil sites.
+four loamy soil sites.  
 
 \include{vap-setup}
 
@@ -134,9 +134,11 @@ included in the present model, with some caveats
 \item Measurements at both sites show
   (figure~\ref{fig:Silstrup-weekly2} and~\ref{fig:Estrup-weekly}) that
   the initial glyphosate event is followed by a couple of weeks with
-  addition drain leaching.  We believe this is due to easily
-  remobilizable glyphosate within the preferential transport system, a
-  process we have not implemented in our model.
+  addition drain leaching.  This could be due to easily remobilizable
+  glyphosate in proximity of the preferential transport system, a
+  process we have not implemented in our model, or for Estrup, due to
+  the peat below part of site, which hasn't been included in the
+  setup.
 \item Bromide is found in some of the horizontal filters at 3.5 meters
   depth at both sites in the first measurements after application of
   Bromide.  No pesticides are generally found at this depth though.
@@ -170,19 +172,19 @@ interesting to note how the two sites are dominated by different
 processes.  For Silstrup, surface processes (crust formation, litter,
 and overland flow) were dominating the system.  For Estrup, the
 measurements can to a large degree be adequately explained by what
-happens in the plow layer, see e.g.\ the first year horizontal bromide
-flux (figure~\ref{fig:Estrup-Bromide-2000-horizontal}).
+happens in the plow layer, see figures and discussion in
+appendix~\ref{app:plot-2d}.
 
 \section{Further work}
 
 Apart from applying the model on more and larger data sets, two areas
 in particular need further work.
 \begin{itemize}
-\item The surface processes (flow, litter storage, decomposition) are
+\item The surface processes (flow, litter storage, degradation) are
   very important, especially for the Silstrup site, but only the
   minimal work on those to get an effect have been done in this project.
 \item The pesticide processes (colloid transport, sorption sites,
-  sorption kinetics, and decomposition) are parametrized from
+  sorption kinetics, and degradation) are parametrized from
   literature values and ``best guesses'', many of those parameters
   should be adapted to direct local measurements.
 \end{itemize}
@@ -193,7 +195,6 @@ in particular need further work.
 \appendix
 
 \include{vap-colbio}
-\include{figs-Silstrup-2D}
-\include{figs-Estrup-2D}
+\include{vap-plot-2d}
 
 \end{document}

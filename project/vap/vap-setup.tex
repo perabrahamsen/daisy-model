@@ -4,11 +4,11 @@
 \section{Weather}
 
 Hourly weather data for Silstrup, Tylstrup and Askov (near Estrup) was
-provided by the Faculty of Agricultural Sciences, Aarhus University.
-The idea was that Tylstrup data could be used to fill in gaps in the
-Silstrup data.  Both the Silstrup and Askov data sets contained
-several short gaps.  We filled those by using values from the
-preceding or following hours.  The Silstrup data set ended at
+provided by Finn Plauborg from the Faculty of Agricultural Sciences,
+Aarhus University.  The idea was that Tylstrup data could be used to
+fill in gaps in the Silstrup data.  Both the Silstrup and Askov data
+sets contained several short gaps.  We filled those by using values
+from the preceding or following hours.  The Silstrup data set ended at
 2002-03-12.  The drain season ended 2002-03-20, with 0.6 mm water
 collected from the drains the last 8 days.  Bearing this in mind, we
 chose to end the simulation 2002-03-11, rather than continue with data
@@ -44,7 +44,9 @@ figure~\ref{fig:weather}.
 
 \section{Management}
 
-All management data were provided by GEUS.
+All management data were provided by Preben Olsen from the Faculty of
+Agricultural Sciences, Aarhus Universityprovided via Annette E.\@
+Rosenbom from GEUS.
 
 \subsection{Tillage}
 
@@ -184,9 +186,9 @@ data set.  A single sample at the detection limit were found for
 dimethoate, and none were found for fenpropimorph.  No calibration has
 therefore been performed on those two pesticides.
 
-\subsection{Soil sorption and decomposition}
+\subsection{Soil sorption and degradation}
 
-Sorption and decomposition parameters for pesticides are primarily
+Sorption and degradation parameters for pesticides are primarily
 taken from \citet{ppdb20100517}, with values as shown in
 table~\ref{tab:ppdb}.  The database specify a \koc{} value
 independently of whether the pesticide is actually sorbed to organic
@@ -201,7 +203,7 @@ guess.  We found no reason to change the value during calibration of
 metamitron, but did for glyphosate as detailed in
 section~\ref{sec:cal-glyphosate}.
 
-The effect of depth on decomposition is taken from
+The effect of depth on degradation is taken from
 \citet{focus2000,focus2002}.  The effect of temperature and humidity
 for turnover of organic matter in Daisy is also used for pesticides.
 The default diffusion coefficient used by Daisy for pesticides of
@@ -213,7 +215,7 @@ reflected by the roots, so there is no crop uptake of pesticides.
 \begin{table}[htbp]
   \centering
   \caption{Pesticide properties from  \citet{ppdb20100517}. 
-    The DT50 value is the decomposition halftime in days.  For both DT50
+    The DT50 value is the degradation halftime in days.  For both DT50
     and \koc{} we put the value marked  `field' in \citet{ppdb20100517}
     in the center, surrounded by the lower and upper limit found in 
     field studies, as marked in a note in the database. For fenpropimorph
@@ -224,7 +226,7 @@ reflected by the roots, so there is no crop uptake of pesticides.
   \label{tab:ppdb}
 
   \begin{tabular}{l|ccc}\hline
-    Name & DT50 & \koc{} [ml/g] & \kd{} [ml/g] \\\hline
+    Name & DT50 [d] & \koc{} [ml/g] & \kd{} [ml/g] \\\hline
     Dimethoate & 4.6 -- \textbf{7.2} -- 9.8 & 16.25 -- \textbf{30} -- 51.88 & \\
     Fenpropimorph & 8.8 -- \textbf{25.5} -- 50.6 & 2771 -- \textbf{2401} -- 5943 &\\
     Glyphosate & 5 -- \textbf{12} -- 21 & 884 -- 21699 -- 60000  & \textbf{503} \\
@@ -232,14 +234,14 @@ reflected by the roots, so there is no crop uptake of pesticides.
   \end{tabular}
 \end{table}
 
-\subsection{Surface decomposition}
+\subsection{Surface degradation}
 
 None of our sources had specific information on above ground
-decomposition.  As the glyphosate calibration (see
+degradation.  As the glyphosate calibration (see
 section~\ref{sec:cal-glyphosate}) depends on keeping part of the
-glyphosate in the litter pack for several days, surface decomposition
+glyphosate in the litter pack for several days, surface degradation
 potentially becomes a factor.  The default value in Daisy of
-DT50~=~3.5 for surface decomposition of pesticides is used.
+DT50~=~3.5 for surface degradation of pesticides is used.
 
 \subsection{Colloids and colloid facilitated transport}
 \label{sec:coltrans}
@@ -262,7 +264,7 @@ a stationary soil particle (part of the soil matrix).
 The highest glyphosate concentrations were seen at both sites right
 after application, or during the first large rain event after
 application.  This is unlikely to be a function of the pesticide
-properties as such, but rather of the transport routes to the drain.
+properties as such, but rather of the transport pathways to the drain.
 See section~\ref{sec:cal-silstrup-surface} for how this was
 calibrated.
 
@@ -279,14 +281,14 @@ glyphosate becomes sorbed in the slow form.
 \subsection{Metamitron calibration}
 \label{sec:cal-metamitron}
 
-Adjusting the decompose rate for metamitron had little effect on the
+Adjusting the degradation rate for metamitron had little effect on the
 simulation results.  Figure~\ref{fig:Silstrup-C-Metamitron-2000}
 and~\ref{fig:Silstrup-Metamitron-2000-horizontal} shows why. The
 metamitron we find in the drains is the same metamitron that was first
 transported vertically to the end of the biopores, and then
 horizontally towards the drain.  Since the biopores in the simulation
 ends 1.2 meter below surface, this means the metamitron is located
-below the 1 meter depth limit for decomposition specified by \focus{}.
+below the 1 meter depth limit for degradation specified by \focus{}.
 
 In \citet{madsen2000pesticide} sorption parameters are measured for
 several Danish sites.  The best correlation for sorption to soil
@@ -294,7 +296,7 @@ parameters is for total iron oxide (FeO$_{\mbox{total}}$), the
 correlation to organic matter is weak, and no correlation was found to
 the easily extracted iron oxide (FeO$_{\mbox{oxalate}}$) which was
 measured at Silstrup.  The largest measured \kd{} is 3.1 $\pm$ 0,9
-L/kg for Drengsted, and the lowest 0.16 $\pm$ 0.02 L/kg.  We therefore
+L/kg at Drengsted, and the lowest 0.16 $\pm$ 0.02 L/kg at Vejen.  We therefore
 decided \kd{} should be within the interval 0.14 -- 4.0 L/kg.  A \kd{}
 value at the high end of the interval, 4.0 L/kg, gave the best match.
 
@@ -325,7 +327,8 @@ in this section.
 \label{sec:cal-primary}
 
 GEUS had already calibrated the model \macro{}
-\citep{jarvis1994simulation,larsbo2003macro} for both sites.  As
+\citep{jarvis1994simulation,larsbo2003macro} for both sites.  The
+\macro{} setup was provided by Annette E.\@ Rosenbom from GEUS.  As
 \macro{}, like Daisy, solves Richard's Equation, we chose to use the
 \macro{} calibration of the hydraulic properties (retention and
 conductivity curves) as a basis.  \Macro{} uses a bimodal description

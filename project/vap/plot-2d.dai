@@ -145,6 +145,20 @@
          (Estrup-2D-C-Glyphosate (y 2001) (m 3))
          (Estrup-2D-C-Glyphosate (y 2001) (m 4))))
 
+(defgnuplot Estrup-2D-C-Glyphosate-2001 base
+  (graph (Estrup-2D-C-Glyphosate (y 2001) (m 5))
+         (Estrup-2D-C-Glyphosate (y 2001) (m 6))
+         (Estrup-2D-C-Glyphosate (y 2001) (m 7))
+         (Estrup-2D-C-Glyphosate (y 2001) (m 8))
+         (Estrup-2D-C-Glyphosate (y 2001) (m 9))
+         (Estrup-2D-C-Glyphosate (y 2001) (m 10))
+         (Estrup-2D-C-Glyphosate (y 2001) (m 11))
+         (Estrup-2D-C-Glyphosate (y 2001) (m 12))
+         (Estrup-2D-C-Glyphosate (y 2002) (m 1))
+         (Estrup-2D-C-Glyphosate (y 2002) (m 2))
+         (Estrup-2D-C-Glyphosate (y 2002) (m 3))
+         (Estrup-2D-C-Glyphosate (y 2002) (m 4))))
+
 (defgnuplot Silstrup-2D vap-2D
   "Plot monthly 2D data for Silstrup."
   (station Silstrup)
@@ -323,6 +337,7 @@
    Estrup-2D-pF-2000 Estrup-2D-pF-2001
    Estrup-2D-M-Bromide-2000 Estrup-2D-M-Bromide-2001
    Estrup-2D-M-Glyphosate-2000 Estrup-2D-C-Glyphosate-2000
+   Estrup-2D-C-Glyphosate-2001
    ))
 
 (defgnuplot plot2d-block-Silstrup base
@@ -494,6 +509,7 @@
 (defgnuplot flow-biopores vap-xy
   (where "fig/${station}-${chemical}-biopore-${y}.pdf")
   ;;(title "Vertical biopore flow")
+  (legend none)
   (source (flow-b (pos 0 [cm]))
           (flow-b (pos -25 [cm]))
           (flow-b (pos -50 [cm])) 
@@ -502,6 +518,7 @@
 (defgnuplot flow-combined vap-xy
   (where "fig/${station}-${chemical}-${y}.pdf")
   ;;(title "Vertical flow")
+  (extra &old [set format x ""])
   (source (flow-c (ps 0 [cm]))
           (flow-c (ps -25 [cm]))
           (flow-c (ps -50 [cm])) 
@@ -516,7 +533,7 @@
   (declare dim String "Dimension for mass.")
   (declare y Integer "Year to plot.")
   (declare y2 Integer "Next year.")
-  (graph flow-horizontal flow-matrix flow-biopores flow-combined))
+  (graph flow-matrix))
 
 (defgnuplot plot2d-flow-Estrup-2000 plot2d-flow
   (station Estrup)
@@ -539,35 +556,73 @@
   (y2 2002))
 
 (defgnuplot plot2d-flow-Estrup-Bromide-2000 plot2d-flow-Estrup-2000
-  (dim [g/ha])
+  (graph &old 
+         (flow-horizontal (xmin -55 [kg/ha]) (extra &old [set format x ""]))
+         (flow-biopores (ymin -100 [kg/ha]) (ymax 10 [kg/ha]))
+         (flow-combined (ymin -100 [kg/ha]) (ymax 10 [kg/ha])))
+  (dim [kg/ha])
   (chemical Bromide))
 
 (defgnuplot plot2d-flow-Estrup-Bromide-2001 plot2d-flow-Estrup-2001
-  (dim [g/ha])
+  (graph &old
+         (flow-horizontal (xmin -55 [kg/ha]) (legend none))
+         (flow-biopores (ymin -100 [kg/ha]) (ymax 10 [kg/ha]))  
+         (flow-combined (ymin -100 [kg/ha]) (ymax 10 [kg/ha]))) 
+  (dim [kg/ha])
   (chemical Bromide))
 
 (defgnuplot plot2d-flow-Silstrup-Bromide-2000 plot2d-flow-Silstrup-2000
-  (dim [g/ha])
+  (graph &old
+         (flow-horizontal (xmin -55 [kg/ha]) (extra &old [set format x ""]))
+         (flow-biopores (ymin -100 [kg/ha]) (ymax 10 [kg/ha]))  
+         (flow-combined (ymin -100 [kg/ha]) (ymax 10 [kg/ha]))) 
+  (dim [kg/ha])
   (chemical Bromide))
 
 (defgnuplot plot2d-flow-Silstrup-Bromide-2001 plot2d-flow-Silstrup-2001
-  (dim [g/ha])
+  (graph &old 
+         (flow-horizontal (xmin -55 [kg/ha]) (legend none))
+         (flow-biopores (ymin -100 [kg/ha]) (ymax 10 [kg/ha])) 
+         (flow-combined (ymin -100 [kg/ha]) (ymax 10 [kg/ha]))) 
+  (dim [kg/ha])
   (chemical Bromide))
 
 (defgnuplot plot2d-flow-Estrup-Glyphosate-2000 plot2d-flow-Estrup-2000
-  (dim [mg/ha])
+  (graph &old 
+         (flow-horizontal (xmin -80 [g/ha]))
+         (flow-biopores (ymin -1400 [g/ha]) (ymax 0 [g/ha])) 
+         (flow-combined (ymin -1400 [g/ha]) (ymax 0 [g/ha])))
+  (dim [g/ha])
+  (chemical Glyphosate))
+
+(defgnuplot plot2d-flow-Estrup-Glyphosate-2001 plot2d-flow-Estrup-2001
+  (graph &old 
+         (flow-horizontal (xmin -80 [g/ha]))
+         (flow-biopores (ymin -1400 [g/ha]) (ymax 0 [g/ha])) 
+         (flow-combined (ymin -1400 [g/ha]) (ymax 0 [g/ha])))
+  (dim [g/ha])
   (chemical Glyphosate))
 
 (defgnuplot plot2d-flow-Silstrup-Glyphosate-2001 plot2d-flow-Silstrup-2001
-  (dim [mg/ha])
+  (graph &old 
+         (flow-horizontal (xmin -80 [g/ha]))
+         (flow-biopores  (ymin -1400 [g/ha]) (ymax 0 [g/ha]))
+         (flow-combined  (ymin -1400 [g/ha]) (ymax 0 [g/ha])))
+  (dim [g/ha])
   (chemical Glyphosate))
 
 (defgnuplot plot2d-flow-Silstrup-Metamitron-2000 plot2d-flow-Silstrup-2000
-  (dim [mg/ha])
+  (graph &old (flow-horizontal)
+         (flow-biopores (ymin -1250 [g/ha]) (ymax 0 [g/ha]))
+         (flow-combined (ymin -1250 [g/ha]) (ymax 0 [g/ha])))
+  (dim [g/ha])
   (chemical Metamitron))
 
 (defgnuplot plot2d-flow-Silstrup-Metamitron-2001 plot2d-flow-Silstrup-2001
-  (dim [mg/ha])
+  (graph &old (flow-horizontal)
+          flow-biopores 
+          flow-combined)
+  (dim [g/ha])
   (chemical Metamitron))
 
 (defgnuplot plot2d-flux-Estrup base
@@ -576,7 +631,8 @@
    plot2d-flux-Estrup-2001
    plot2d-flow-Estrup-Bromide-2000
    plot2d-flow-Estrup-Bromide-2001
-   plot2d-flow-Estrup-Glyphosate-2000))
+   plot2d-flow-Estrup-Glyphosate-2000
+   ))
   
 (defgnuplot plot2d-flux-Silstrup base
   (graph 
@@ -586,7 +642,8 @@
    plot2d-flow-Silstrup-Bromide-2001
    plot2d-flow-Silstrup-Glyphosate-2001
    plot2d-flow-Silstrup-Metamitron-2000
-   plot2d-flow-Silstrup-Metamitron-2001))
+   plot2d-flow-Silstrup-Metamitron-2001
+   ))
 
 (defgnuplot plot2d-block base
   (graph plot2d-block-Estrup plot2d-block-Silstrup))
