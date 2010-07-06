@@ -1,4 +1,4 @@
-;; colloid-bound.dai
+;; colloid-bound-slow.dai
 
 ;;; Bromide.
 
@@ -623,4 +623,4 @@ carbon part of the 'K' factor.")
                      (dimension "${unit}")
                      (spec chemical default M))))
 
-;;; colloid-bound.dai ends here.
+;;; colloid-bound-slow.dai ends here.

@@ -1,0 +1,47 @@
+Daisy 2D simulation of Silstrup and Estrup
+==========================================
+
+Data files.
+-----------
+
+*.ddf: Drain and soil water measurements for comparison with simulation.
+*.gwt: Measured groundwater table.
+*.dwf: Measured weater data.
+
+Daisy setup files.
+------------------
+
+colloid-bound.dai: Main describtion of bromide, colloids, and pesticides.
+colloid-bound-slow.dai: (alternative) Same, using more general mechanisms.
+chem-1d.dai: (alternative) No colloids or sorption dynamics.
+biopores.dai: Description of biopores from Rørrendegård.
+plot-2d.dai: Description of plots from appendix B.
+vap-common.dai: Shared setup for Silstrup and Estrup.
+silstrup.dai: Silstrup specific setup.
+estrup.dai: Estrup specific setup.
+vap.dai: Choose which simulations to run.
+
+Generated files.
+----------------
+
+log/*: Simulation results.
+fig/*: Autmatically generated figures.
+daisy.gnuplot: Generated gnuplot setup.
+daisy.log: Summary of last simulation.
+
+Documentation files.
+--------------------
+
+vap-figs.tex: Main report of simulation.
+vap-setup.tex: Chapter 2.
+vap-result.tex: Chapter 3.
+vap-colbio.tex: Appendix A.
+vap-plot-2d.tex: Appendix B.
+
+silstrup.tex: Outline for article about surface processes.
+
+Other files.
+------------
+
+Makefile: Automatic run simulation and generate figures.
+README: This file.
