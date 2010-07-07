@@ -446,6 +446,9 @@ Connvert to SI base units by multiplying with a factor.")
          "Miligram per hectare");
     add ("ug/ha", p_u * u_g / u_ha, -2, 1, 0, 0, 0, 0, 0,
          "Microgram per hectare");
+    add ("ug/m^2", p_u * u_g ,
+         -2, 1, 0, 0, 0, 0, 0,
+         "Microgram per square meter.");
     add ("g w.w./m^2", u_g, -2, 1, 0, 0, 0, 0, 0,
          "Wet weight per area.");
     add ("kg/ha", p_k * u_g / u_ha, -2, 1, 0, 0, 0, 0, 0,

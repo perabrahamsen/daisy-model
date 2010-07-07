@@ -297,7 +297,8 @@
   "drain flow."
   (ymin 0.00)(ymax 0.35)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
-                      (expr (+ "Surface drain flow" "Soil drain flow"))
+                      (expr (/ (+ "Surface drain flow" "Soil drain flow")
+                               1.0 [h]))
                       (title "Drain flow"))
           (column (file "drain-flow.ddf")
                   (tag "drain")
@@ -425,13 +426,13 @@
   "Particles in drain."
   (ymin 0)(ymax 200)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
-                      (expr (+ "Soil-Drain, Col"))
+                      (expr (/ "Soil-Drain, Col" 1.0 [h]))
                       (title "Particles"))
           (column (file "particles.ddf")
                   (tag "particles")
-                  (dimension [g/ha])
+                  (dimension [g/ha/h])
                   (style 3)
-                  (title "Obs [g/ha]"))))
+                  (title "Obs [g/ha/h]"))))
 
 (defgnuplot particles-98-99 particles
   "Drain flow winter 98-99"
@@ -690,7 +691,8 @@
    (graph season-98-99 season-98-99-zoom 
           season-99-00 season-99-00-zoom
           season-00-01 season-00-01-zoom
-          season-01-02))
+          ;; season-01-02
+          ))
 
 (defprogram plotall gnuplot
   (graph drainplots
