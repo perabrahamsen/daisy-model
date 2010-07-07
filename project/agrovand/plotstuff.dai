@@ -302,7 +302,7 @@
           (column (file "drain-flow.ddf")
                   (tag "drain")
                   (style 3)
-                  (title "Obs [mm/h]"))))
+                  (title "Obs [mm]"))))
 
 (defgnuplot drainflow-98-99 drainflow
   "Drain flow winter 98-99"
@@ -363,11 +363,11 @@
   (ymin 0) (ymax 25)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
                       (missing "none")
-                      (valid (not (> 0.000 [mm/h]
+                      (valid (not (> 0.000 [mm]
                                      (+ "Surface drain flow" "Soil drain flow")
-                                     0.0001 [mm/h])))
+                                     0.0001 [mm])))
                       (expr (if (> (+ "Surface drain flow" "Soil drain flow")
-                                   0.0001 [mm/h])
+                                   0.0001 [mm])
                                 (dim (* 0.1 [] ;[g/ha] -> [mg/m^2]
                                         (/ (+ "Surface-Drain, Br"
                                               "Soil-Drain, Br")
@@ -403,10 +403,10 @@
                                    (tag "bromide"))
                            (column (file "drain-flow.ddf")
                                    (tag "drain")))
-                   (expr (convert (dim (* bromide drain) [ug/m^2/h])
-                                  [g/ha/h]))
+                   (expr (convert (dim (* bromide drain) [ug/m^2])
+                                  [g/ha]))
                    (style 3)
-                   (title "Obs, [g/ha/h]"))))
+                   (title "Obs, [g/ha]"))))
 
 (defgnuplot brommass-98-99 brommass
   "Bromide drain mass winther 98-99."
@@ -429,9 +429,9 @@
                       (title "Particles"))
           (column (file "particles.ddf")
                   (tag "particles")
-                  (dimension [g/ha/h])
+                  (dimension [g/ha])
                   (style 3)
-                  (title "Obs [g/ha/h]"))))
+                  (title "Obs [g/ha]"))))
 
 (defgnuplot particles-98-99 particles
   "Drain flow winter 98-99"
@@ -457,7 +457,7 @@
   "Particles in drain."
   (legend se)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
-                      (expr (convert (+ "Soil-Drain, Col") [kg/ha/h]))
+                      (expr (convert (+ "Soil-Drain, Col") [kg/ha]))
                       (accumulate true)
                       (title "Accumulated"))
           (column (file "particles.ddf")
@@ -495,11 +495,11 @@
   (ymin 0)(ymax 15)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
                       (missing "none")
-                      (valid (not (> 0.000 [mm/h]
+                      (valid (not (> 0.000 [mm]
                                      (+ "Surface drain flow" "Soil drain flow")
-                                     0.0001 [mm/h])))
+                                     0.0001 [mm])))
                       (expr (if (> (+ "Surface drain flow" "Soil drain flow")
-                                   0.0001 [mm/h])
+                                   0.0001 [mm])
                                 (dim (* 100.0 [] ;[g/ha] -> [ug/m^2]
                                         (/ (+ "Surface-Drain, Pend"
                                               "Soil-Drain, Pend")
@@ -532,17 +532,17 @@
                       (missing "none")
                       (expr (convert (+ "Surface-Drain, Pend" 
                                         "Soil-Drain, Pend")
-                                     [mg/ha/h]))
+                                     [mg/ha]))
                       (title "Pendimethalin"))
           (combine (source (column (file "pendimethalin.ddf")
                                    (tag "pendimethalin"))
                            (column (file "drain-flow.ddf")
                                    (tag "drain")))
-                   (expr (convert (dim (* pendimethalin drain) [ug/m^2/h])
-                                  [mg/ha/h]))
+                   (expr (convert (dim (* pendimethalin drain) [ug/m^2])
+                                  [mg/ha]))
                                   
                    (style 3)
-                   (title "Obs, [mg/ha/h]"))))
+                   (title "Obs, [mg/ha]"))))
 
 (defgnuplot pendmass-99-00 pendmass
   "Drain flow winter 99-00"
@@ -558,11 +558,11 @@
   "Ioxynil concentration flow."
   (source (arithmetic (file "Rorrende_AllChem.dlf")
                       (missing "none")
-                      (valid (not (> 0.000 [mm/h]
+                      (valid (not (> 0.000 [mm]
                                      (+ "Surface drain flow" "Soil drain flow")
-                                     0.0001 [mm/h])))
+                                     0.0001 [mm])))
                       (expr (if (> (+ "Surface drain flow" "Soil drain flow")
-                                   0.0001 [mm/h])
+                                   0.0001 [mm])
                                 (dim (* 100000.0 [] ;[g/ha] -> [ng/m^2]
                                         (/ (+ "Surface-Drain, Iox"
                                               "Soil-Drain, Iox")
@@ -587,17 +587,17 @@
   (source (arithmetic (file "Rorrende_AllChem.dlf")
                       (missing "none")
                       (expr (convert (+ "Surface-Drain, Iox" "Soil-Drain, Iox")
-                                     [mg/ha/h]))
+                                     [mg/ha]))
                       (title "Ioxynil"))
           (combine (source (column (file "ioxynil.ddf")
                                    (tag "ioxynil"))
                            (column (file "drain-flow.ddf")
                                    (tag "drain")))
-                   (expr (convert (dim (* ioxynil drain) [ug/m^2/h])
-                                  [mg/ha/h]))
+                   (expr (convert (dim (* ioxynil drain) [ug/m^2])
+                                  [mg/ha]))
                                   
                    (style 3)
-                   (title "Obs, [mg/ha/h]"))))
+                   (title "Obs, [mg/ha]"))))
 
 (defgnuplot ioxmass-00-01 ioxmass
   "Drain flow winter 00-01"
@@ -693,4 +693,6 @@
           season-01-02))
 
 (defprogram plotall gnuplot
-  (graph drainplots "Rorrende Graphs"))
+  (graph drainplots
+         "Rorrende Graphs"
+         ))

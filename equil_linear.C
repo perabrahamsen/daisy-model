@@ -59,10 +59,12 @@ EquilibriumLinear::find (const Units& units, const Scope& scope, int,
   daisy_assert (has_A >= 0.0);
   daisy_assert (has_B >= 0.0);
   const double M = has_A + has_B;
+  daisy_assert (std::isfinite (M));
 
   double K = 1.0;
   if (!K_expr->tick_value (units, K, Attribute::None (), scope, msg))
     msg.error ("Could not evaluate 'K'");
+  daisy_assert (K >= 0.0);
 
   // We need to solve the following equation w.r.t. B
   //
@@ -75,7 +77,9 @@ EquilibriumLinear::find (const Units& units, const Scope& scope, int,
   //     B = M / (1 + K)
 
   want_B = M / (1.0 + K);
+  daisy_assert (std::isfinite (want_B));
   want_A = M - want_B;
+  daisy_assert (std::isfinite (want_A));
   if (want_A < 0.0)
     {
       want_A = 0.0;

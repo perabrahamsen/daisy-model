@@ -1,48 +1,12 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* VAP rapport
+* Agrovand
 
-** DONE decompose -> degrade 
+** Kør simulering
 
-** personkilder
+** Plot resultater
 
-** DONE peat i discussion
-
-** DONE flow vand, transport stof
-
-** DONE soil potential -> soil water pressure potential
-
-* VAP skriv
-
-** Hvordan bruger man Daisy-2D til pesticider?
-   
-** Opsætning
-
-** Kalibrering
-   
-** Overflade, Silstrup
-
-** Pløjesål, Estrup
-
-** Agrovand
-
-** FOCUS
-
-* 23 uger til aflevering
-
-4 uger ferie, 2 uger før
-
-18 uger
-
-* stof surface section?
-
-* 2dplot movie
-
-** create multiple images (jpg?) from one dlf file to be encoded into film later
-
-with eg mencoder
-
-Fixed position for time
+* FOCUS
 
 * Hent gammel PC.
 

@@ -13,7 +13,8 @@ VEGCROPS = beetroot.dai broccoli.dai brusselssprouts.dai celeriac.dai \
 	earlypotato.dai earlywhitecabbage.dai onion.dai \
 	onion_plantingofsets.dai whitecabbage.dai
 
-DAISY 	= OpenMI.dai markvand.dai log-std.dai dk-fertilizer.dai \
+DAISY 	= chemistry-base.dai \
+	OpenMI.dai markvand.dai log-std.dai dk-fertilizer.dai \
 	dk-crop.dai dk-horizon.dai log-old.dai crop-old.dai vegetation.dai \
 	crop.dai fertilizer.dai tillage.dai log.dai mini.dai chemistry.dai \
 	$(OLDCROPS) $(NEWCROPS) $(DKCROPS) $(VEGCROPS)

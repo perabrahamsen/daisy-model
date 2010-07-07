@@ -101,8 +101,9 @@
                   (alpha 0.01 [h^-1])))
                   
 (defbiopore common matrix
-  (R_primary 1 [h])
-  (R_secondary 0.01 [h])
+  ;; (R_primary 1 [h])
+  ;; (R_secondary 0.01 [h])
+  (K_wall_relative 1 [%])
   (allow_upward_flow true))
 
 
@@ -181,7 +182,6 @@
                       -90 -105 -120 -140 -160 -180 -200)                    
                (xplus 5 10 15 25 35 40 50 75 125 200 275 350 450 550 650 800 [cm]))
         (Tertiary (biopores 
-                     (use_small_timesteps false)
                      (classes ("matrix_0cm") 
                               ("matrix_2cm")
                               ("drain_2cm")

@@ -15,8 +15,8 @@ ScreenHeight: 2.0 m
 
 # General information about the available data.
 
-Begin: 1995-03-24
-End:   2008-10-31
+Begin: 1997-01-01
+End:   2002-12-31
 Timestep: 1 hours
 
 Note: Data are from Højbakke station, modified with fields measurements

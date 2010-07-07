@@ -1,17 +1,13 @@
 ;;; ror-setup.dai main setup file for Agrovand simulations.
 
-(input file "rorrendechemicals.dai") 	
-;;(input file "rorrendechemicals_2.dai") 
-;;(input file "rorrendechemicals_3.dai") 
-;;(input file "rorrendechemicals_4.dai") 
-;;(input file "rorrendechemicals_5.dai") 
-;;(input file "rorrendechemicals_6.dai") 
-;;(input file "rorrendechemicals_7.dai") 
+(input file "ror-log.dai")                
 
+(input file "chemistry-base.dai")
+(input file "colloid-bound.dai")
+;;(input file "rorrendechemicals.dai") 	
 
 (input file "ror-soil.dai")
 (input file "ror-manager.dai")
-(input file "ror-log.dai")                
 
 (defprogram Rorrende Daisy
   "Main Daisy setup for Agrovand project."
@@ -55,42 +51,42 @@
              (where "SWC_Bromide.dlf"))
           ("Tertiary water sink drain")
           
-          ;; ("Chemical Concentration" 
-          ;;  (chemical Pendimethalin-base) 
-          ;;  ;;(when hourly)
-          ;;  (when daily)
-          ;;  (where "SWC_Pendimethalin.dlf"))  
-          ;; ("Chemical Concentration" 
-          ;;  (chemical Ioxynil-base) 
-          ;;  ;;(when hourly)
-          ;;  (when daily)
-          ;;  (where "SWC_Ioxynil.dlf"))                                                      
-          ;;("Chemical Content" 
-          ;;          (chemical colloid) 
-          ;;          (when hourly)
-          ;;          (where "colloid_content.dlf"))   
-          ;;("Failure")   ;;log problems with water movement model
-          ;;("Crop Production")
-          ;;("Field chemical" (chemical colloid))
-          ;;("Chemical Content" (chemical colloid)
-          ;;          (where "M-colloids.dlf"))
-          ;;("Colloids")
-          ;;("Field chemical" (chemical Pendimethalin))
-          ;;("Field chemical" (chemical Pendimethalin-immobile))
-          ;;("Field chemical" (chemical Pendimethalin-colloid))
-          ;;("Soil chemical" (chemical Pendimethalin))
-          ;;("Soil chemical" (chemical Pendimethalin-immobile))
-          ;;("Soil chemical" (chemical Pendimethalin-colloid))
-          ;;("Colloid bound" (chemical Pendimethalin))   
+           ("Chemical Concentration" 
+            (chemical Pendimethalin-base) 
+            ;;(when hourly)
+            (when daily)
+            (where "SWC_Pendimethalin.dlf"))  
+           ("Chemical Concentration" 
+            (chemical Ioxynil-base) 
+            ;;(when hourly)
+            (when daily)
+            (where "SWC_Ioxynil.dlf"))                                                      
+          ("Chemical Content" 
+                    (chemical colloid) 
+                    (when hourly)
+                    (where "colloid_content.dlf"))   
+          ("Failure")   ;;log problems with water movement model
+          ("Crop Production")
+          ("Field chemical" (chemical colloid))
+          ("Chemical Content" (chemical colloid)
+                    (where "M-colloids.dlf"))
+          ("Colloids")
+          ("Field chemical" (chemical Pendimethalin))
+          ("Field chemical" (chemical Pendimethalin-immobile))
+          ("Field chemical" (chemical Pendimethalin-colloid))
+          ("Soil chemical" (chemical Pendimethalin))
+          ("Soil chemical" (chemical Pendimethalin-immobile))
+          ("Soil chemical" (chemical Pendimethalin-colloid))
+          ("Colloid bound" (chemical Pendimethalin))   
           
-          ;;("Field chemical" (chemical Ioxynil))
-          ;;("Field chemical" (chemical Ioxynil-immobile))
-          ;;("Field chemical" (chemical Ioxynil-colloid))
-          ;;("Soil chemical" (chemical Ioxynil))
-          ;;("Soil chemical" (chemical Ioxynil-immobile))
-          ;;("Soil chemical" (chemical Ioxynil-colloid))
-          ;;("Colloid bound" (chemical Ioxynil))
-          ;; ("Soil water")
+          ("Field chemical" (chemical Ioxynil))
+          ("Field chemical" (chemical Ioxynil-immobile))
+          ("Field chemical" (chemical Ioxynil-colloid))
+          ("Soil chemical" (chemical Ioxynil))
+          ("Soil chemical" (chemical Ioxynil-immobile))
+          ("Soil chemical" (chemical Ioxynil-colloid))
+          ("Colloid bound" (chemical Ioxynil))
+           ("Soil water")
           )
 ) 
 
