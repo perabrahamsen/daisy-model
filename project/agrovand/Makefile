@@ -42,7 +42,8 @@ OTHER = ror-mmo.dai ror-pa.dai plotstuff-9899.dai
 
 DOC = plotstuff.tex plotstuff-9899.tex
 
-DAISY = ../../obj/daisy
+DAISY = /home/abraham/daisy/obj/daisy
+
 
 TEXT = $(SETUP) $(OTHER) $(DOC) Makefile $(DATA)
 
