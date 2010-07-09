@@ -8,6 +8,10 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 *** SE; som  NE men med grov diskretisering
 
+*** Konklusion:  Der er C_avg der gør den stabil.
+
+Hvad gør vi ved det?
+
 ** Plot side 10
 
 TDR føljer daglig vejrdata, events mangler i timeværdier
