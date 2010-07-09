@@ -31,7 +31,7 @@ EPSFIGS = drainflow-98-99.eps drainflowacc-98-99.eps particles-98-99.eps \
 	infiltration_short.eps pondingdepth_short.eps \
 
 SETUP = chemical25.dai plotstuff.dai ror-log.dai ror-manager.dai \
-	ror-setup.dai ror-soil.dai rorrendechemicals.dai
+	ror-setup.dai ror-soil.dai rorrendechemicals.dai colloid-bound.dai
 
 DATA = rain.ddf \
 	Bromide-25.ddf bromide.ddf drain-flow.ddf ioxynil.ddf particles.ddf \
@@ -80,5 +80,5 @@ plotstuff-9899.dvi: plotstuff-9899.tex .gnuplot-stamp
 	@touch .gnuplot-stamp
 
 daisy.gnuplot: $(SETUP) $(DAISY) plotstuff.dai plotstuff-9899.dai
-	$(DAISY) ror-pa.dai
+	nice $(DAISY) ror-pa.dai
 
