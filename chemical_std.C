@@ -1013,8 +1013,13 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
     {
       // We really should go down in timesteps here instead.
       const double S_min = -0.5 * M_total_[c] / dt;
+#if 0
       S_drain[c] = std::max (-soil_water.S_drain (c) * C_secondary_[c],
                              S_min);
+#else
+      S_drain[c] = std::max (-soil_water.S_drain (c) * C_avg_[c],
+                             S_min);
+#endif
     }
   add_to_source_secondary (S_drain); 
 

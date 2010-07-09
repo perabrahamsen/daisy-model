@@ -2,7 +2,9 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Agrovand
 
-** Kør simulering
+** Køsler
+
+*** NE: Prøv med C_avg i stedet for C_secondary
 
 ** Plot resultater
 
