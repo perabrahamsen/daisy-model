@@ -2,11 +2,31 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Agrovand
 
-** Køsler
+** Kørsler
 
 *** NE: Prøv med C_avg i stedet for C_secondary
 
+*** SE; som  NE men med grov diskretisering
+
+** Plot side 10
+
+TDR føljer daglig vejrdata, events mangler i timeværdier
+
 ** Plot resultater
+
+** Skriv
+
+*** Process
+
+Tilde:  1D vand bromid
+
+Nanna: 2D vand, opdelt mark
+
+MMO: 2D bromid, partikler, variablets tryk
+
+(PLAP
+
+PA: pest
 
 * FOCUS
 
