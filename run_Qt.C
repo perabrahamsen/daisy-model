@@ -109,11 +109,15 @@ RunQtMain::~RunQtMain()
 
 void 
 RunQtText::send_text (const std::string& text) const
-{ emit text_ready (text); }
+{ 
+  emit text_ready (text); 
+}
 
 void 
 RunQtText::signal_error () const
-{ emit error_occured (); }
+{
+  emit error_occured (); 
+}
 
 RunQtText::RunQtText(QObject* parent)
   : QObject (parent)

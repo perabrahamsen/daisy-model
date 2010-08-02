@@ -159,7 +159,24 @@ Biopore::biopore_to_primary (const double K_matrix,
   const double r_matrix = std::pow (M_PI * M_c, -0.5);
   const double S = M_c * 2.0 * M_PI * K * (h_3 - h)
     / std::log (r_c / r_matrix);
-  daisy_assert (S >= 0.0);
+  if (S < 0.0)
+    {
+      std::ostringstream tmp;
+      tmp << "K_matrix = " << K_matrix << " [cm/h]\n"
+          << "K_wall_rel = " << K_wall_rel << " []\n"
+          << "M_c = " << M_c << " [cm^-2]\n"
+          << "r_c = " << r_c << " [cm]\n"
+          << "h = " << h << " [cm]\n"
+          << "h_3 = " << h_3 << " [cm]\n"
+          << "a1 = " << a1 << " []\n"
+          << "a2 = " << a2 << " []\n"
+          << "A1 = " << A1 << " []\n"
+          << "B1 = " << B1 << " []\n"
+          << "K = " << K << " [cm/h]\n"
+          << "r_matrix = " << r_matrix << " [cm]\n"
+          << "S = " << S << " [] (expected >= 0)";
+      daisy_bug (tmp.str ());
+    }
   return S;
 }
 

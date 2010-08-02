@@ -260,7 +260,9 @@ Toplevel::files_found () const
 
 void
 Toplevel::add_treelog (boost::shared_ptr<Treelog> client)
-{ impl->msg.add_client (client); }
+{ 
+  impl->msg.add_client (client); 
+}
 
 void 
 Toplevel::set_ui_progress ()

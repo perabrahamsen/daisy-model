@@ -237,12 +237,13 @@ UIRun::attach (Toplevel& toplevel)
 
   // A text window for simulation messages.
   // Use a special treelog to relay messages to window.
-  boost::shared_ptr<TreelogQtText> tlog (new TreelogQtText);                  
+  TreelogQtText* tlog = new TreelogQtText;
   VisQtText *const qt_vis = new VisQtText;
   qt_vis->setToolTip ("Textual feedback from the program.");
   QObject::connect(tlog->tracker (), SIGNAL(text_ready (std::string)),
                    qt_vis, SLOT(new_text (std::string))); 
-  toplevel.add_treelog (tlog); 
+  boost::shared_ptr<Treelog> tlog_share (tlog);
+  toplevel.add_treelog (tlog_share); 
   layout->addWidget (qt_vis);
 
   // The bottom line

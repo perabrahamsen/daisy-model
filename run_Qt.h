@@ -115,7 +115,7 @@ public:
   const QObject* tracker () const;
 
   // Use.
-private:
+public:
   void write (const std::string& text);
   void touch ();
   void debug (const std::string&);

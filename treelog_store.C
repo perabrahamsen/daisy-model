@@ -85,7 +85,7 @@ struct TreelogStore::Implementation
 public:
   void add_client (boost::shared_ptr<Treelog> msg)
   {
-    daisy_assert (msg);
+    daisy_assert (msg.get ());
     client.push_back (msg);
     propagate (*msg);
   }
