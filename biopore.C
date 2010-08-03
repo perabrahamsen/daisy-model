@@ -149,15 +149,15 @@ Biopore::biopore_to_primary (const double K_matrix,
                              const double M_c, const double r_c,
                              const double h, const double h_3)
 {
+  const double r_matrix = std::pow (M_PI * M_c, -0.5);
   const double a1 = 1.1;  // Relative biopore wall size: r_i / r_c [] 
   const double a2 = K_wall_rel; // Relative biopore wall conductivity []
   const double A1 
-    = a2 * (0.5 * log (M_PI * M_c * sqr (r_c)) - std::log (a1))
+    = a2 * (std::log (r_matrix / r_c) - std::log (a1))
     / std::log (a1);
   const double B1 = A1 / (1.0 + A1);
   const double K = B1 * K_matrix;
-  const double r_matrix = std::pow (M_PI * M_c, -0.5);
-  const double S = M_c * 2.0 * M_PI * K * (h_3 - h)
+  const double S = -M_c * 2.0 * M_PI * K * (h_3 - h)
     / std::log (r_c / r_matrix);
   if (S < 0.0)
     {
