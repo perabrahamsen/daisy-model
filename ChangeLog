@@ -1,3 +1,14 @@
+2010-08-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C (drain_secondary): New parameter.
+
+2010-08-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* sample/dk-taastrup-hourly.dwf: Fix data for agrovand.
+	* sample/dk-taastrup.dwf: Ditto.
+
+	* biopore.C (biopore_to_primary): More robust formulation.
+
 2010-06-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* xysource_flux.C (load_interval): Bux fix.  Only last value in

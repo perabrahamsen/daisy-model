@@ -12,11 +12,8 @@
 (defprogram Rorrende Daisy
   "Main Daisy setup for Agrovand project."
 
-  ;; Hourly weather data.
-  (weather default "Rorrende.dwf"
-           (missing_years ((1997 1997) (1998 1998)))
-           (PrecipScale 1.41 1.42 1.35 1.24 1.13 1.11
-                        1.10 1.10 1.11 1.14 1.23 1.37 []))
+  ;; No correction needed, by comparison with daily Højbakkegård measurements.
+  (weather default "Rorrende.dwf")
   ;; Only relative area count.
   (column (Rorrende_aq (area 1.0 [ha]))
           (Rorrende_fd (area 2.0 [ha])))

@@ -2,21 +2,15 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Agrovand
 
-** Kørsler
+** Sammenlign diskretisering.
 
-*** NE: Prøv med C_avg i stedet for C_secondary
+** Få vand på plads
 
-*** SE; som  NE men med grov diskretisering
+** Få kolloider på plads
 
-*** Konklusion:  Der er C_avg der gør den stabil.
+** Få Bromid på plads
 
-Hvad gør vi ved det?
-
-** Plot side 10
-
-TDR føljer daglig vejrdata, events mangler i timeværdier
-
-** Plot resultater
+** Få pesticid på plads
 
 ** Skriv
 
@@ -28,7 +22,7 @@ Nanna: 2D vand, opdelt mark
 
 MMO: 2D bromid, partikler, variablets tryk
 
-(PLAP
+(PLAP)
 
 PA: pest
 

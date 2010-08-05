@@ -3630,7 +3630,7 @@ nowhere go to.  For typical setups, this value will be zero.")
                      (path column "${column}" Chemistry "*" trace 
                            colloid S_transform)
                      (spec chemical default S_transform)
-                     (dimension "${unit}/h")
+                     (dimension "${unit}")
                      (negate true)
                      (handle sum))
            (number (path column "${column}" Movement "*" 

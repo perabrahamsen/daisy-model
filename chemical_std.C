@@ -71,7 +71,8 @@ struct ChemicalStandard : public Chemical
     Product (const Block&);
   };
   const auto_vector<const Product*> product;
-  
+
+  const bool drain_secondary;
   const std::auto_ptr<Number> C_below_expr;
   double C_below_value;
   const std::auto_ptr<Number> initial_expr;
@@ -1013,13 +1014,12 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
     {
       // We really should go down in timesteps here instead.
       const double S_min = -0.5 * M_total_[c] / dt;
-#if 0
-      S_drain[c] = std::max (-soil_water.S_drain (c) * C_secondary_[c],
-                             S_min);
-#else
-      S_drain[c] = std::max (-soil_water.S_drain (c) * C_avg_[c],
-                             S_min);
-#endif
+      if (drain_secondary)
+        S_drain[c] = std::max (-soil_water.S_drain (c) * C_secondary_[c],
+                               S_min);
+      else
+        S_drain[c] = std::max (-soil_water.S_drain (c) * C_avg_[c],
+                               S_min);
     }
   add_to_source_secondary (S_drain); 
 
@@ -1644,6 +1644,7 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
     decompose_depth_factor (al.plf ("decompose_depth_factor")),
     decompose_lag_increment (al.plf ("decompose_lag_increment")),
     product (map_submodel_const<Product> (al, "decompose_products")),
+    drain_secondary (al.flag ("drain_secondary")),
     C_below_expr (Librarian::build_item<Number> (al, "C_below")),
     C_below_value (-42.42e42),
     initial_expr (Librarian::build_item<Number> (al, "initial")),
@@ -1921,6 +1922,13 @@ concentration each hour.  When lag in any cell reaches 1.0,\n\
 decomposition begins.  It can never be more than 1.0 or less than 0.0.\n\
 By default, there is no lag.");
     frame.set ("decompose_lag_increment", PLF::empty ());
+    frame.declare_boolean ("drain_secondary", Attribute::Const, "\
+Concentration in secondary soil water user for drainage.\n\
+If you set this to true the concentration in the secondary domain is used\n\
+for concentration in drain water.  Otherwise, the average concentration is\n\
+the matix is used.  Using the secondary domain is more physically correct,\n\
+but also more likely to give unstable results.");
+    frame.set ("drain_secondary", false);
     frame.declare_object ("C_below", Number::component, 
                           Attribute::Const, Attribute::Singleton, "\
 Concentration below the layer of soil being examined.\n\
