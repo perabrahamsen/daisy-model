@@ -1,10 +1,37 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* OpenMI
+
+Check om det virker.
+
 * Agrovand
 
-** Sammenlign diskretisering.
-
 ** Få vand på plads
+
+Mellem 10 og 20, varierer per år.
+
+*** NW offset +10
+
+98-99 12
+99-00 9
+00-01 1
+
+*** NE offset +20
+98-99 14
+99-00 8 
+00-01 2
+
+*** SW offset +30
+
+98-99 16
+99-00 7
+00-01 3
+
+*** ES offset +40
+
+98-99 18
+99-00 6
+00-01 4
 
 ** Få kolloider på plads
 

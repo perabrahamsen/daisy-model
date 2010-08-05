@@ -1,5 +1,7 @@
 2010-08-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* cdaisy.C (daisy_daisy_start): Restored as dummy.
+
 	* chemical_std.C (drain_secondary): New parameter.
 
 2010-08-04  Per Abrahamsen  <per.abrahamsen@gmail.com>

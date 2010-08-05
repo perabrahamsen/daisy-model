@@ -469,6 +469,10 @@ daisy_daisy_delete (Toplevel* toplevel)
 
 // @@ Running the simulation.
 
+extern "C" void EXPORT
+daisy_daisy_start (Toplevel* toplevel)
+{ }
+
 extern "C" daisy_bool EXPORT
 daisy_daisy_is_running (Toplevel* toplevel)
 { 

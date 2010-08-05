@@ -323,6 +323,9 @@ daisy_daisy_delete (daisy_daisy* toplevel);
  * 'tick' function.   
  */
 
+EXPORT void                     /* Start the simulation. */
+daisy_daisy_start (daisy_daisy* daisy);
+
 EXPORT void                /* Run all processes a single time step. */
 daisy_daisy_tick (daisy_daisy* daisy);
 
