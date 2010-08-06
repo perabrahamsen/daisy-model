@@ -6,6 +6,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.88 
+
+Bug fixes.
+
 * 4.87
 
 ** FAO_PM pet model: 'use_wet' now default true.
