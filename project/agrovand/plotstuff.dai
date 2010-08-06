@@ -11,6 +11,8 @@
          "set bmargin 0"
          "set size ratio 0.15 "))
 
+(defunit [dgC] [dg C])
+
 (defgnuplot plotweather plotformat  
   "Plot precipitation."
   (where "weather.eps")
@@ -18,17 +20,38 @@
          "set ytics 10"
          "set y2tics 10"
          "unset y2label")   
-  (source (column (file "GenAverage.dwf")
+  (ymin 0)
+  (ymax 5)
+  (y2min -10)
+  (y2max 10)
+  (source (column (file "Rorrende.dwf")
                   (tag "Precip")
                   (style 1)
-                  (title "Precipitation")
+                  (title "Precipitation [mm/h]")
                   (with impulses))
-          (column (file "GenAverage.dwf")
+          (column (file "Rorrende.dwf")
                   (tag "AirTemp")
                   (style 3)
                   ;;(with [lines linetype "blue"])
                   (title "Air temperature")
-                  )))
+                  )
+          (arithmetic (expr 0 [dgC])
+                      (file "Rorrende_aq_infiltration.dlf")
+                      (title "")
+                      (style 0))))
+
+(defgnuplot plotweather9899 plotweather
+  (begin 1998 10 28 12) (end 1999 3 21 19)
+  (where "weather-98-99.eps"))
+
+(defgnuplot plotweather9900 plotweather
+  (begin 1999 12 10 0) (end 2000 3 28 3)
+  (where "weather-99-00.eps"))
+
+(defgnuplot plotweather0001 plotweather
+  (begin 2000 11 20 14) (end 2001 2 19 21)
+  (where "weather-00-01.eps"))
+
 
 (defgnuplot plotZcm plotformat
   "Plot theta at Z cm."
@@ -216,6 +239,9 @@
          "unset mxtics"))
 
 (defgnuplot shortplotweather plotweather
+  (ymax 10)
+  (y2min 0)
+  (y2max 30)
   (begin 1998 05 01)(end 1998 08 15)
   (where "weather_short.eps"))
 
@@ -240,7 +266,10 @@
   )
 
 (defgnuplot "Rorrende Graphs" multi
-  (graph (plotweather) 
+  (graph (plotweather (ymax 15) (y2min -10) (y2max 30))
+         plotweather9899 
+         plotweather9900 
+         plotweather0001 
          (plotZcm (z "4"))
          (plotZcm (z "8"))
          (plotZcm (z "12"))
@@ -295,7 +324,7 @@
 
 (defgnuplot drainflow draincommon
   "drain flow."
-  (ymin 0.00)(ymax 0.35)
+  (ymin 0.00)(ymax 0.25)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
                       (expr (/ (+ "Surface drain flow" "Soil drain flow")
                                1.0 [h]))
@@ -303,7 +332,7 @@
           (column (file "drain-flow.ddf")
                   (tag "drain")
                   (style 3)
-                  (title "Obs [mm]"))))
+                  (title "Obs [mm/h]"))))
 
 (defgnuplot drainflow-98-99 drainflow
   "Drain flow winter 98-99"
@@ -327,7 +356,7 @@
 
 (defgnuplot drainflowacc draincommon
   "Accumulated drain flow."
-  (ymin 0)(ymax 70)
+  (ymin 0)(ymax 40)
   (legend nw)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
                       (accumulate true)
@@ -425,8 +454,10 @@
 (defgnuplot particles draincommon
   "Particles in drain."
   (ymin 0)(ymax 200)
-  (source (arithmetic (file "Rorrende_AllChem.dlf")
+  (source (arithmetic (file "particles_m.dlf")
                       (expr (/ "Soil-Drain, Col" 1.0 [h]))
+                      (with points)
+                      (style 1)
                       (title "Particles"))
           (column (file "particles.ddf")
                   (tag "particles")
@@ -564,18 +595,18 @@
                                      0.0001 [mm])))
                       (expr (if (> (+ "Surface drain flow" "Soil drain flow")
                                    0.0001 [mm])
-                                (dim (* 100000.0 [] ;[g/ha] -> [ng/m^2]
+                                (dim (* 100.0 [] ;[g/ha] -> [ug/m^2]
                                         (/ (+ "Surface-Drain, Iox"
                                               "Soil-Drain, Iox")
                                            (+ "Surface drain flow" 
                                               "Soil drain flow")))
-                                     [ng/l])
-                              0.0 [ng/l]))
+                                     [ug/l])
+                              0.0 [ug/l]))
                       (title "Ioxynil"))
           (column (file "ioxynil.ddf")
                   (tag "ioxynil")
                   (style 3)
-                  (dimension [ng/l])
+                  (dimension [ug/l])
                   (title "Obs, [ng/l]"))))
 
 (defgnuplot ioxconc-00-01 ioxconc
@@ -612,7 +643,9 @@
 
 (defgnuplot season-98-99-zoom multi 
   "All graphs for the 98-99 drain season, zoomed."
-  (graph (drainflow-98-99 (begin 1998 12 12) (end 1999 01 16)
+  (graph (plotweather (begin 1998 12 12) (end 1999 01 16)
+                  (where "weather-98-99-zoom.eps"))
+         (drainflow-98-99 (begin 1998 12 12) (end 1999 01 16)
                           (where "drainflow-98-99-zoom.eps"))
          (drainflowacc-98-99  (begin 1998 12 12) (end 1999 01 16)
                               (where "drainflowacc-98-99-zoom.eps"))
@@ -632,7 +665,9 @@
 
 (defgnuplot season-99-00-zoom multi 
   "All graphs for the 99-00 drain season, zoomed."
-  (graph (drainflow-99-00 (where "drainflow-99-00-zoom.eps")
+  (graph (plotweather (where "weather-99-00-zoom.eps")
+                      (begin 1999 12 10 0) (end 2000 01 08))
+         (drainflow-99-00 (where "drainflow-99-00-zoom.eps")
                           (end 2000 01 08))
          (drainflowacc-99-00 (where "drainflowacc-99-00-zoom.eps")
                              (end 2000 01 08))
@@ -663,7 +698,9 @@
 
 (defgnuplot season-00-01-zoom multi 
   "All graphs for the 00-01 drain season, zoomed."
-  (graph (drainflow-00-01 (where "drainflow-00-01-zoom.eps")
+  (graph (plotweather (where "weather-00-01-zoom.eps")
+                      (begin 2000 11 20 14) (end 2000 12 18))
+         (drainflow-00-01 (where "drainflow-00-01-zoom.eps")
                           (end 2000 12 18))
          (drainflowacc-00-01 (where "drainflowacc-00-01-zoom.eps")
                              (end 2000 12 18))

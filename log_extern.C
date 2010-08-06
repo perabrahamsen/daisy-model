@@ -335,3 +335,5 @@ API interface by specifying '(names column crop)'.");
     frame.set_empty ("parameter_names");
   }
 } LogExtern_syntax;
+
+// log_extern.C ends here.
