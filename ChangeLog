@@ -1,3 +1,7 @@
+2010-08-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.89 released.
+
 2010-08-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* log_extern.C (initialize): Don't overwrite 'numbers'.
