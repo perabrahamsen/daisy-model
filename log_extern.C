@@ -246,7 +246,9 @@ LogExtern::initialize (Treelog&)
     {
       const symbol tag = LogSelect::entries[i]->tag ();
       sizes[tag] = LogSelect::entries[i]->size ();
-      types[tag] = Missing;
+      if (types.find (tag) == types.end ())
+        // May already have been initialized with "numbers".
+        types[tag] = Missing;
       dimensions[tag] = LogSelect::entries[i]->dimension ();
     }
 }

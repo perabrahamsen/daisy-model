@@ -17,7 +17,7 @@
   "Plot precipitation."
   (where "weather.eps")
   (extra &old "unset xtics"
-         "set ytics 10"
+         "set ytics 2"
          "set y2tics 10"
          "unset y2label")   
   (ymin 0)
@@ -524,7 +524,7 @@
 
 (defgnuplot pendconc draincommon
   "Pendimethalin concentration flow."
-  (ymin 0)(ymax 15)
+  (ymin 0)(ymax 5)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
                       (missing "none")
                       (valid (not (> 0.000 [mm]
@@ -574,7 +574,7 @@
                                   [mg/ha]))
                                   
                    (style 3)
-                   (title "Obs, [mg/ha]"))))
+                   (title "Obs, [mg/ha/h]"))))
 
 (defgnuplot pendmass-99-00 pendmass
   "Drain flow winter 99-00"
@@ -588,6 +588,7 @@
 
 (defgnuplot ioxconc draincommon
   "Ioxynil concentration flow."
+  (ymax 5)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
                       (missing "none")
                       (valid (not (> 0.000 [mm]
@@ -607,7 +608,7 @@
                   (tag "ioxynil")
                   (style 3)
                   (dimension [ug/l])
-                  (title "Obs, [ng/l]"))))
+                  (title "Obs, [ug/l]"))))
 
 (defgnuplot ioxconc-00-01 ioxconc
   "Drain flow winter 00-01"
@@ -629,7 +630,7 @@
                                   [mg/ha]))
                                   
                    (style 3)
-                   (title "Obs, [mg/ha]"))))
+                   (title "Obs, [mg/ha/h]"))))
 
 (defgnuplot ioxmass-00-01 ioxmass
   "Drain flow winter 00-01"
