@@ -32,11 +32,13 @@
 #include "treelog.h"
 #include "frame_model.h"
 #include "daisy.h"
+#include <sstream>
 
 void 
 LogExtern::done (const std::vector<Time::component_t>& time_columns,
 		 const Time& time, const double dt, Treelog& msg)
 { 
+  Assertion::message (__FUNCTION__);
   LogSelect::done (time_columns, time, dt, msg);
 
   if (!is_printing)
@@ -82,18 +84,21 @@ LogExtern::output (Log& log) const
 void 
 LogExtern::error ()
 { 
+  Assertion::message (__FUNCTION__);
   types[last_done] = Error;
 }
 
 void 
 LogExtern::missing ()
 { 
+  Assertion::message (__FUNCTION__);
   types[last_done] = Missing;
 }
 
 void 
 LogExtern::add (const std::vector<double>& value)
 { 
+  Assertion::message (__FUNCTION__);
   types[last_done] = Array;
   arrays[last_done] = &value;
   sizes[last_done] = value.size ();
@@ -104,11 +109,15 @@ LogExtern::add (double value)
 { 
   types[last_done] = Number;
   numbers[last_done] = value;
+  std::ostringstream tmp;
+  tmp << "Set '" << last_done << "' = " << value;
+  Assertion::message (tmp.str ());
 }
 
 void 
 LogExtern::add (symbol value)
 { 
+  Assertion::message (__FUNCTION__);
   types[last_done] = Name;
   names[last_done] = value;
 }
@@ -210,6 +219,11 @@ LogExtern::number (symbol tag) const
 {
   const number_map::const_iterator i = numbers.find (tag);
   daisy_assert (i != numbers.end ());
+
+  std::ostringstream tmp;
+  tmp << "Get '" << tag << "' = " << (*i).second;
+  Assertion::message (tmp.str ());
+
   return (*i).second;
 }
 
@@ -218,6 +232,9 @@ LogExtern::dimension (symbol tag) const
 {
   const name_map::const_iterator i = dimensions.find (tag);
   daisy_assert (i != dimensions.end ());
+  std::ostringstream tmp;
+  tmp << "Dim '" << tag << "' = " << (*i).second;
+  Assertion::message (tmp.str ());
   return (*i).second;
 }
 

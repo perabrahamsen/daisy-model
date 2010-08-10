@@ -5,6 +5,7 @@
   (extra "set pointsize 0.5"  
          [set format x " "]       
          "unset ylabel"
+         "unset y2label"
          "set lmargin 0"
          "set rmargin 0"
          "set tmargin 0.5"
@@ -41,7 +42,7 @@
                       (style 0))))
 
 (defgnuplot plotweather9899 plotweather
-  (begin 1998 10 28 12) (end 1999 3 21 19)
+  (begin 1998 10 14 12) (end 1999 3 21 19)
   (where "weather-98-99.eps"))
 
 (defgnuplot plotweather9900 plotweather
@@ -336,7 +337,7 @@
 
 (defgnuplot drainflow-98-99 drainflow
   "Drain flow winter 98-99"
-  (begin 1998 10 28 12) (end 1999 3 21 19)
+  (begin 1998 10 14 12) (end 1999 3 21 19)
   (where "drainflow-98-99.eps"))
 
 (defgnuplot drainflow-99-00 drainflow
@@ -370,7 +371,7 @@
 
 (defgnuplot drainflowacc-98-99 drainflowacc
   "Accumulated drain flow winter 98-99"
-  (begin 1998 10 28 12) (end 1999 3 21 19)
+  (begin 1998 10 14 12) (end 1999 3 21 19)
   (where "drainflowacc-98-99.eps"))
 
 (defgnuplot drainflowacc-99-00 drainflowacc
@@ -415,7 +416,7 @@
 (defgnuplot bromide-98-99 bromconc
   "Bromide concentrations winter 98-99."
   (where "bromide-98-99.eps")
-  (begin 1998 10 28 12) (end 1999 3 21 19))
+  (begin 1998 10 14 12) (end 1999 3 21 19))
 
 (defgnuplot bromide-99-00 bromconc
   "Bromide concentrations winter 99-00."
@@ -444,7 +445,7 @@
          "set mxtics 7"
          "set format x \"%y-%m-%d\"")
   (where "brommass-98-99.eps")
-  (begin 1998 10 28 12) (end 1999 3 21 19))
+  (begin 1998 10 14 12) (end 1999 3 21 19))
 
 (defgnuplot brommass-99-00 brommass
   "Bromide drain mass winther 99-00."
@@ -463,11 +464,16 @@
                   (tag "particles")
                   (dimension [g/ha/h])
                   (style 3)
-                  (title "Obs [g/ha/h]"))))
+                  (title "Obs [g/ha/h]"))
+          (column (file "colloids.dlf")
+                  (tag "Avail-Surface")
+                  (title "Reservoir [kg/ha]")
+                  (dimension [kg/ha]))
+          ))
 
 (defgnuplot particles-98-99 particles
   "Drain flow winter 98-99"
-  (begin 1998 10 28 12) (end 1999 3 21 19)
+  (begin 1998 10 14 12) (end 1999 3 21 19)
   (where "particles-98-99.eps"))
 
 (defgnuplot particles-99-00 particles
@@ -501,7 +507,7 @@
 
 (defgnuplot particlesacc-98-99 particlesacc
   "Drain flow winter 98-99"
-  (begin 1998 10 28 12) (end 1999 3 21 19)
+  (begin 1998 10 14 12) (end 1999 3 21 19)
   (where "particlesacc-98-99.eps"))
 
 (defgnuplot particlesacc-99-00 particlesacc
@@ -700,24 +706,42 @@
 (defgnuplot season-00-01-zoom multi 
   "All graphs for the 00-01 drain season, zoomed."
   (graph (plotweather (where "weather-00-01-zoom.eps")
-                      (begin 2000 11 20 14) (end 2000 12 18))
-         (drainflow-00-01 (where "drainflow-00-01-zoom.eps")
-                          (end 2000 12 18))
-         (drainflowacc-00-01 (where "drainflowacc-00-01-zoom.eps")
-                             (end 2000 12 18))
-         (particles-00-01 (where "particles-00-01-zoom.eps")
-                          (end 2000 12 18))
-         (particlesacc-00-01 (legend nw)
-                             (where "particlesacc-00-01-zoom.eps")
-                             (end 2000 12 18))
-         (pendconc-00-01 (where "pendconc-00-01-zoom.eps")
-                         (end 2000 12 18))
-         (pendmass-00-01 (where "pendmass-00-01-zoom.eps")
-                         (end 2000 12 18))
-         (ioxconc-00-01 (where "ioxconc-00-01-zoom.eps")
-                        (end 2000 12 18))
-         (ioxmass-00-01 (where "ioxmass-00-01-zoom.eps")
-                        (end 2000 12 18))
+                      (begin 2000 12 12) (end 2000 12 18)
+                      (extra &old "set xtics 24 * 60 * 60"
+                             "set mxtics 24"))
+         (drainflow (where "drainflow-00-01-zoom.eps")
+                    (begin 2000 12 12) (end 2000 12 18)
+                    (extra &old "set xtics 24 * 60 * 60"
+                           "set mxtics 24"))
+         (drainflowacc (where "drainflowacc-00-01-zoom.eps")
+                       (begin 2000 12 12) (end 2000 12 18)
+                       (extra &old "set xtics 24 * 60 * 60"
+                              "set mxtics 24"))
+         (particles (where "particles-00-01-zoom.eps")
+                    (begin 2000 12 12) (end 2000 12 18)
+                    (extra &old "set xtics 24 * 60 * 60"
+                           "set mxtics 24"))
+         (particlesacc (legend nw)
+                       (where "particlesacc-00-01-zoom.eps")
+                       (begin 2000 12 12) (end 2000 12 18)
+                       (extra &old "set xtics 24 * 60 * 60"
+                              "set mxtics 24"))
+         (pendconc (where "pendconc-00-01-zoom.eps")
+                   (begin 2000 12 12) (end 2000 12 18)
+                   (extra &old "set xtics 24 * 60 * 60"
+                          "set mxtics 24"))
+         (pendmass (where "pendmass-00-01-zoom.eps")
+                   (begin 2000 12 12) (end 2000 12 18)
+                   (extra &old "set xtics 24 * 60 * 60"
+                          "set mxtics 24"))
+         (ioxconc (where "ioxconc-00-01-zoom.eps")
+                  (begin 2000 12 12) (end 2000 12 18)
+                  (extra &old "set xtics 24 * 60 * 60"
+                         "set mxtics 24"))
+         (ioxmass (where "ioxmass-00-01-zoom.eps")
+                  (begin 2000 12 12) (end 2000 12 18)
+                  (extra &old "set xtics 24 * 60 * 60"
+                         "set mxtics 24"))
          ))
 
 (defgnuplot season-01-02 multi 
