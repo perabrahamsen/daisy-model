@@ -456,6 +456,8 @@
 (defgnuplot particles draincommon
   "Particles in drain."
   (ymin 0)(ymax 200)
+  (y2min 0)(y2max 200)
+  (extra &old "unset y2tics")
   (source (arithmetic (file "particles_m.dlf")
                       (expr (/ "Soil-Drain, Col" 1.0 [h]))
                       (with points)
@@ -494,6 +496,8 @@
 
 (defgnuplot particlesacc draincommon
   "Particles in drain."
+  (y2max 0.15)
+  (extra &old "set y2tics 0.05")
   (legend se)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
                       (expr (convert (+ "Soil-Drain, Col") [kg/ha]))
@@ -508,7 +512,7 @@
           (column (file "infiltration.dlf") 
                   (tag "Surface2Bio2Drain")
                   (style 4)
-                  (title "Surf2Drain, mm/h"))))
+                  (title "Surf2Drain [mm/h]"))))
 
 (defgnuplot particlesacc-98-99 particlesacc
   "Drain flow winter 98-99"
