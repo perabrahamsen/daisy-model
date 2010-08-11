@@ -1,28 +1,32 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* OpenMI 
-
-** MissingValue?
-
-Hvad rækkefølge blivber ting kaldet i?
-
-Hvorfor virker "numbers" ikke?
-
 * Agrovand
 
-** Grafer 
+** Bromid placering
 
-*** particles/h?
+*** NW Prøv mere i sekundært vand
 
-*** Temperatur 00-01
+værre
 
-** Kalibrer part gen 00-01
+*** NE Prøv at lukke pløjesål
+
+bedre
+
+*** SW Prøv at åbne pløjesål
+
+værre
+
+*** SE Prøv at lukke overflade
+
+værre
+
+** Bioporeaktivitet per uge?  Lang graf.
 
 ** Skriv
 
 *** Process
 
-Tilde:  1D vand bromid
+Tilde: 1D vand bromid
 
 Nanna: 2D vand, opdelt mark
 

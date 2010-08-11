@@ -123,7 +123,7 @@
   (where "brom-${top}-${bottom}-output.eps")   
   ;;(ymin -3000)(ymax 3000)
   ;;(ymin -100)(ymax 100)
-  (ymin -150)(ymax 150)
+  (ymin -50)(ymax 50)
   (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  ;; &old keep other existing properties else it would be deleted
          "unset mxtics"
          "set ytics 50")   
@@ -321,11 +321,12 @@
          ))
 
 (defgnuplot draincommon plotformat
-  "Common parameters for drain flow plots")
+  "Common parameters for drain flow plots"
+  (ymin 0.00))
 
 (defgnuplot drainflow draincommon
   "drain flow."
-  (ymin 0.00)(ymax 0.25)
+  (ymax 0.25)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
                       (expr (/ (+ "Surface drain flow" "Soil drain flow")
                                1.0 [h]))
@@ -411,7 +412,7 @@
                   (tag "bromide")
                   (style 3)
                   (dimension [mg/l])
-                  (title "Obs, [mg/l]"))))
+                  (title "Obs [mg/l]"))))
 
 (defgnuplot bromide-98-99 bromconc
   "Bromide concentrations winter 98-99."
@@ -437,7 +438,7 @@
                    (expr (convert (dim (* bromide drain) [ug/m^2])
                                   [g/ha]))
                    (style 3)
-                   (title "Obs, [g/ha]"))))
+                   (title "Obs [g/ha]"))))
 
 (defgnuplot brommass-98-99 brommass
   "Bromide drain mass winther 98-99."
@@ -503,7 +504,11 @@
                   (dimension [kg/ha])
                   (accumulate true)
                   (style 3)
-                  (title "Obs, [kg/ha]"))))
+                  (title "Obs [kg/ha]"))
+          (column (file "infiltration.dlf") 
+                  (tag "Surface2Bio2Drain")
+                  (style 4)
+                  (title "Surf2Drain, mm/h"))))
 
 (defgnuplot particlesacc-98-99 particlesacc
   "Drain flow winter 98-99"
@@ -549,7 +554,7 @@
           (column (file "pendimethalin.ddf")
                   (tag "pendimethalin")
                   (style 3)
-                  (title "Obs, [ug/l]"))))
+                  (title "Obs [ug/l]"))))
 
 (defgnuplot pendconc-99-00 pendconc
   "Drain flow winter 99-00"
@@ -580,7 +585,7 @@
                                   [mg/ha]))
                                   
                    (style 3)
-                   (title "Obs, [mg/ha/h]"))))
+                   (title "Obs [mg/ha/h]"))))
 
 (defgnuplot pendmass-99-00 pendmass
   "Drain flow winter 99-00"
@@ -614,7 +619,7 @@
                   (tag "ioxynil")
                   (style 3)
                   (dimension [ug/l])
-                  (title "Obs, [ug/l]"))))
+                  (title "Obs [ug/l]"))))
 
 (defgnuplot ioxconc-00-01 ioxconc
   "Drain flow winter 00-01"
@@ -636,7 +641,7 @@
                                   [mg/ha]))
                                   
                    (style 3)
-                   (title "Obs, [mg/ha/h]"))))
+                   (title "Obs [mg/ha/h]"))))
 
 (defgnuplot ioxmass-00-01 ioxmass
   "Drain flow winter 00-01"
