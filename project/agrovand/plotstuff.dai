@@ -659,19 +659,19 @@
 
 (defgnuplot season-98-99-zoom multi 
   "All graphs for the 98-99 drain season, zoomed."
-  (graph (plotweather (begin 1998 12 12) (end 1999 01 16)
+  (graph (plotweather (begin 1999 02 25) (end 1999 03 16)
                   (where "weather-98-99-zoom.eps"))
-         (drainflow-98-99 (begin 1998 12 12) (end 1999 01 16)
+         (drainflow-98-99 (begin 1999 02 25) (end 1999 03 16)
                           (where "drainflow-98-99-zoom.eps"))
-         (drainflowacc-98-99  (begin 1998 12 12) (end 1999 01 16)
+         (drainflowacc-98-99  (begin 1999 02 25) (end 1999 03 16)
                               (where "drainflowacc-98-99-zoom.eps"))
-         (bromide-98-99 (begin 1998 12 12) (end 1999 01 16)
+         (bromide-98-99 (begin 1999 02 25) (end 1999 03 16)
                         (where "bromide-98-99-zoom.eps"))
-         (brommass-98-99 (begin 1998 12 12) (end 1999 01 16)
+         (brommass-98-99 (begin 1999 02 25) (end 1999 03 16)
                          (where "brommass-98-99-zoom.eps"))
-         (particles-98-99  (begin 1998 12 12) (end 1999 01 16)
+         (particles-98-99  (begin 1999 02 25) (end 1999 03 16)
                            (where "particles-98-99-zoom.eps"))
-         (particlesacc-98-99 (begin 1998 12 12) (end 1999 01 16)
+         (particlesacc-98-99 (begin 1999 02 25) (end 1999 03 16)
                              (where "particlesacc-98-99-zoom.eps"))))
 
 (defgnuplot season-99-00 multi 
@@ -682,23 +682,23 @@
 (defgnuplot season-99-00-zoom multi 
   "All graphs for the 99-00 drain season, zoomed."
   (graph (plotweather (where "weather-99-00-zoom.eps")
-                      (begin 1999 12 10 0) (end 2000 01 08))
+                      (begin 2000 03 06) (end 2000 03 18))
          (drainflow-99-00 (where "drainflow-99-00-zoom.eps")
-                          (end 2000 01 08))
+                      (begin 2000 03 06) (end 2000 03 18))
          (drainflowacc-99-00 (where "drainflowacc-99-00-zoom.eps")
-                             (end 2000 01 08))
+                      (begin 2000 03 06) (end 2000 03 18))
          (bromide-99-00  (where "bromide-99-00-zoom.eps")
-                         (end 2000 01 08))
+                      (begin 2000 03 06) (end 2000 03 18))
          (brommass-99-00 (where "brommass-99-00-zoom.eps")
-                         (end 2000 01 08))
+                      (begin 2000 03 06) (end 2000 03 18))
          (particles-99-00  (where "particles-99-00-zoom.eps")
-                           (end 2000 01 08))
+                      (begin 2000 03 06) (end 2000 03 18))
          (particlesacc-99-00 (where "particlesacc-99-00-zoom.eps")
-                             (end 2000 01 08))
+                      (begin 2000 03 06) (end 2000 03 18))
          (pendconc-99-00  (where "pendconc-99-00-zoom.eps")
-                          (end 2000 01 08))
+                      (begin 2000 03 06) (end 2000 03 18))
          (pendmass-99-00 (where "pendmass-99-00-zoom.eps")
-                         (end 2000 01 08))
+                      (begin 2000 03 06) (end 2000 03 18))
          ))
 
 (defgnuplot season-00-01 multi 
@@ -715,40 +715,40 @@
 (defgnuplot season-00-01-zoom multi 
   "All graphs for the 00-01 drain season, zoomed."
   (graph (plotweather (where "weather-00-01-zoom.eps")
-                      (begin 2000 12 12) (end 2000 12 18)
+                      (begin 2001 01 01) (end 2000 01 10)
                       (extra &old "set xtics 24 * 60 * 60"
                              "set mxtics 24"))
          (drainflow (where "drainflow-00-01-zoom.eps")
-                    (begin 2000 12 12) (end 2000 12 18)
+                    (begin 2001 01 01) (end 2000 01 10)
                     (extra &old "set xtics 24 * 60 * 60"
                            "set mxtics 24"))
          (drainflowacc (where "drainflowacc-00-01-zoom.eps")
-                       (begin 2000 12 12) (end 2000 12 18)
+                       (begin 2001 01 01) (end 2000 01 10)
                        (extra &old "set xtics 24 * 60 * 60"
                               "set mxtics 24"))
          (particles (where "particles-00-01-zoom.eps")
-                    (begin 2000 12 12) (end 2000 12 18)
+                    (begin 2001 01 01) (end 2000 01 10)
                     (extra &old "set xtics 24 * 60 * 60"
                            "set mxtics 24"))
          (particlesacc (legend nw)
                        (where "particlesacc-00-01-zoom.eps")
-                       (begin 2000 12 12) (end 2000 12 18)
+                       (begin 2001 01 01) (end 2000 01 10)
                        (extra &old "set xtics 24 * 60 * 60"
                               "set mxtics 24"))
          (pendconc (where "pendconc-00-01-zoom.eps")
-                   (begin 2000 12 12) (end 2000 12 18)
+                   (begin 2001 01 01) (end 2000 01 10)
                    (extra &old "set xtics 24 * 60 * 60"
                           "set mxtics 24"))
          (pendmass (where "pendmass-00-01-zoom.eps")
-                   (begin 2000 12 12) (end 2000 12 18)
+                   (begin 2001 01 01) (end 2000 01 10)
                    (extra &old "set xtics 24 * 60 * 60"
                           "set mxtics 24"))
          (ioxconc (where "ioxconc-00-01-zoom.eps")
-                  (begin 2000 12 12) (end 2000 12 18)
+                  (begin 2001 01 01) (end 2000 01 10)
                   (extra &old "set xtics 24 * 60 * 60"
                          "set mxtics 24"))
          (ioxmass (where "ioxmass-00-01-zoom.eps")
-                  (begin 2000 12 12) (end 2000 12 18)
+                  (begin 2001 01 01) (end 2000 01 10)
                   (extra &old "set xtics 24 * 60 * 60"
                          "set mxtics 24"))
          ))

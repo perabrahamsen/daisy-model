@@ -4,21 +4,21 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** Bromid placering
 
-*** NW Prøv mere i sekundært vand
+*** NW 
 
-værre
+alpha 0.001 lim 1.2
 
-*** NE Prøv at lukke pløjesål
+*** NE 
 
-bedre
+alpha 0.001 lim 2.0
 
-*** SW Prøv at åbne pløjesål
+*** SW 
 
-værre
+alpha 0.0001 lim 1.2
 
-*** SE Prøv at lukke overflade
+*** SE 
 
-værre
+alpha 0.0001 lim 2.0
 
 ** Bioporeaktivitet per uge?  Lang graf.
 

@@ -672,6 +672,8 @@ struct NumberDivide : public NumberOperands
         if (dim == Attribute::Unknown ())
           return Attribute::Unknown ();
         const std::string dimstr = dim.name ();
+        if (dimstr.length () == 0)
+          continue;
         if (dimstr.find_first_of ('/') != std::string::npos)
           name += "/(" + dimstr + ")";
         else
