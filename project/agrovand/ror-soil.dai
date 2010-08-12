@@ -15,7 +15,7 @@
                   (K_sat 0.173704 [cm/h])
                   ;;(K_sat 1.73704 [cm/h])
                   (l -2.05473))
-  (secondary_domain agrovand)
+  (secondary_domain agrovand))
 
 (defhorizon "Rorrende Ap" USDA3
   (description "3-25 cm")
@@ -27,7 +27,7 @@
                   (n 1.2656)
                   (K_sat 1.73704 [cm/h])
                   (l -2.05473))
-  (secondary_domain agrovand)
+  (secondary_domain agrovand))
   
 (defhorizon "Rorrende Bplow layer" USDA3
   (description "25-33 cm Petersen et al (2004)")
@@ -42,7 +42,7 @@
                   ;;(K_sat 0.00925 [cm/h])
                   (K_sat 0.0925 [cm/h])
                   (l -2.92948))
-  (secondary_domain agrovand)                
+  (secondary_domain agrovand))               
 
 (defhorizon "Rorrende Bt" USDA3
   (description "33-120 cm")
@@ -64,7 +64,7 @@
                   ;;(K_sat 0.537042 [cm/h])
                   (K_sat 0.268521 [cm/h])
                   (Theta_sat 0.356969))
-    (secondary_domain agrovand)  
+    (secondary_domain agrovand))  
                                           
 (defhorizon "Rorrende C" USDA3
   (description "120-200 cm")
@@ -78,7 +78,7 @@
                   ;;(K_sat 0.54407 [cm/h])
                   (K_sat 1.50000 [cm/h])
                   (l -3.60322))
-  (secondary_domain agrovand) 
+  (secondary_domain agrovand))
 
 (defhorizon "Drain_canyon" ISSS4
   (clay 0.213)(silt 0.190)(coarse_sand 0.244)(fine_sand  0.339)(humus 0.014)
@@ -90,7 +90,7 @@
                   (n 1.14609)
                   (K_sat 0.526775 [cm/h])
                   (l -3.62743))
-  (secondary_domain agrovand)
+  (secondary_domain agrovand))
                   
 (defbiopore common matrix
   ;; (R_primary 1 [h])
