@@ -239,15 +239,6 @@
                      (handle sum)
                      (negate true)
                      (dimension "mm"))   ;;converts 2 mm/d 
-           (flux_top (tag "Surface2Matrix")
-                     (description "\
-  	Amount of water entering the soil through the matrix system. 
-  	This is the normal infiltration channel.")
-                     (path column "${column}" SoilWater q)
-                     (spec fixed SoilWater q)
-                     (handle sum)
-                     (negate true)
-                     (dimension "mm"))   ;;converts 2 mm/d 
            (number (tag "Surface2Bio2Matrix")
                    (description "\
                              Flux of water from surface to matrix through biopores, 

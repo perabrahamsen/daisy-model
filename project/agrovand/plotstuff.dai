@@ -74,14 +74,12 @@
                   (with points))))  ;points instead of error bars
 
 (defgnuplot plotinfiltration plotformat
+  (begin 1998 11 20) (end 1999 04 01)
   (where "infiltration.eps")
                                         ;(ymin -5)(ymax 20)
   (extra &old "set ytics 5"
-         "unset ylabel"
-         "set xtics 24 * 60 * 60 *30 nomirror"  ;; &old keep other existing properties else it would be deleted
-         "unset mxtics")
-  ;;"set xtics 24 * 60 * 60 *30 rotate")        
-  ;;"set format x \"%y-%m-%d\"")    
+         "set xtics 24 * 60 * 60 *30 nomirror"
+         "set mxtics 3")
   (source (column ;;(file "infiltration.dlf") 
            (file "Rorrende_aq_infiltration.dlf") 
            (tag "Surface2Primary")
@@ -90,28 +88,26 @@
           (column ;;(file "infiltration.dlf") 
            (file "Rorrende_aq_infiltration.dlf") 
            (tag "Surface2Secondary")
-           (style 1)
+           (style 2)
            (title "Surf2Secondary, mm/d"))
           (column ;;(file "infiltration.dlf") 
            (file "Rorrende_aq_infiltration.dlf")
            (tag "Surface2Bio2Matrix")
-           (style 2)
+           (style 3)
            (title "Surf2Bio2Mat, mm/d"))
           (column ;;(file "infiltration.dlf") 
            (file "Rorrende_aq_infiltration.dlf")
            (tag "Surface2Bio2Drain")
-           (style 3)
+           (style 4)
            (title "Surf2Bio2Drain, mm/d"))))
 
 (defgnuplot plotpondingdepth plotformat
+  (begin 1998 11 20) (end 1999 04 01)
   (where "pondingdepth.eps")
-                                        ;(ymin -5)(ymax 20)
-  ;;(extra &old "set ytics 5"
-  ;;            "unset ylabel"
-  ;;            "set xtics 24 * 60 * 60 *30 rotate"        
-  ;;            "set format x \"%y-%m-%d\"")    
-  (extra &old "unset xtics")
-  (source (column ;;(file "ponding_depth.dlf") 
+  (extra &old
+         "set xtics 24 * 60 * 60 *30 nomirror"
+         "set mxtics 3")
+  (source (column 
            (file "Rorrende_aq_ponding_depth.dlf") 
            (tag "Surface Ponding")
            (style 1)
@@ -119,6 +115,7 @@
 
 (defgnuplot brom-output plotformat
   "Total bromide output in specified interval."
+  (begin 1998 11 20) (end 1999 04 01)
   (declare top String "Top of interval.") 
   (declare bottom String "Bottom of interval.") 
   (declare acc-prefix String "Prefix to get accumulated values")
@@ -128,14 +125,12 @@
   (where "brom-${top}-${bottom}-output.eps")   
   ;;(ymin -3000)(ymax 3000)
   ;;(ymin -100)(ymax 100)
-  (ymin -50)(ymax 50)
+  ;; (ymin -50)(ymax 50)
   (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  ;; &old keep other existing properties else it would be deleted
-         "unset mxtics"
+         "set mxtics 3"
          "set ytics 50")   
-  ;;(extra &old "unset ytics")   
   (source (column (file "Bromide-25.dlf")
                   (tag "${acc-prefix}Primary ${bottom} cm")
-                  ;;(title "Output, Primary"))
                   (title "${title-prefix}Primary"))
           (column (file "Bromide-25.dlf")
                   (tag "${acc-prefix}Secondary ${bottom} cm")
@@ -150,10 +145,10 @@
 (defgnuplot brom-total plotformat
   "Total bromide content in 25 cm intervals."
   (where "brom-total.eps")
-  (ymin 0)(ymax 35000)
-  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  ;; &old keep other existing properties else it would be deleted
-         "unset mxtics"
-         "set ytics 5000")   
+  (begin 1998 11 20) (end 1999 04 01)
+  ;; (ymin 0)(ymax 35000)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror" 
+         "set mxtics 3")   
   (source (arithmetic (file "Bromide-25.dlf")
                       (expr (+ "Primary 0-25 cm" "Secondary 0-25 cm"))
                       (title "Total, 0-25 cm"))
@@ -190,10 +185,9 @@
 (defgnuplot brom-primary plotformat
   "Bromide content in 25 cm intervals in primary domain."
   (where "brom-primary.eps")
-  (ymin 0)(ymax 35000)
-  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  ;; &old keep other existing properties else it would be deleted
-         "unset mxtics"
-         "set ytics 5000")   
+  (begin 1998 11 20) (end 1999 04 01)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
+         "set mxtics 3")   
   (source (arithmetic (file "Bromide-25.dlf")
                       (expr (+ "Primary 0-25 cm"))
                       (title "Primary, 0-25 cm"))
@@ -210,10 +204,10 @@
 (defgnuplot brom-secondary plotformat
   "Bromide content in 25 cm intervals in secondary domain."
   (where "brom-secondary.eps")
+  (begin 1998 11 20) (end 1999 04 01)
   (ymin 0)(ymax 35000)
-  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  ;; &old keep other existing properties else it would be deleted
-         "unset mxtics"
-         "set ytics 5000")   
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
+         "set mxtics 3")   
   (source (arithmetic (file "Bromide-25.dlf")
                       (expr (+ "Secondary 0-25 cm"))
                       (title "Secondary, 0-25 cm"))
@@ -230,13 +224,20 @@
 (defgnuplot brom-accumulated brom-output
   "Accumulated output in each interval."
   (where "brom-${top}-${bottom}-acc.eps")
+  (begin 1998 11 20) (end 1999 04 01)
   (ymin -10000)(ymax 30000)
-  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  ;; &old keep other existing properties else it would be deleted
-         "unset mxtics"
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
+         "set mxtics 3"
          "set ytics 10000")
   (acc-prefix "Acc ")
   (title-prefix "Acc, "))
 
+(defgnuplot bromplotweather plotweather
+  (begin 1998 11 20) (end 1999 04 01)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
+         "set mxtics 3"
+         "set ytics 10000")
+  (where "weather_brominf.eps"))
 
 (defgnuplot shortplotZcm plotZcm
   (begin 1998 05 01)(end 1998 08 15)
@@ -287,7 +288,7 @@
                   (extra &old "set xtics 24 * 60 * 60 *30 rotate"  ;; &old keep other existing properties else it would be deleted 
                          "set mxtics 3"
                          "set format x \"%y-%m-%d\""))   
-         (plotinfiltration)
+         (plotinfiltration )
          (plotpondingdepth)         
          (brom-output (top "0") (bottom "25"))
          (brom-output (top "25") (bottom "50"))
@@ -306,6 +307,7 @@
                            (extra &old "set xtics 24 * 60 * 60 *30 rotate"  ;; &old keep other existing properties else it would be deleted 
                                   "set mxtics 3"
                                   "set format x \"%y-%m-%d\""))       
+         (bromplotweather)
          (shortplotweather)      
          (shortplotZcm (z "4"))
          (shortplotZcm (z "8"))
@@ -323,20 +325,6 @@
           (extra &old "set xtics 24 * 60 * 60 * 7 rotate"   
                  "set mxtics 7"
                  "set format x \"%y-%m-%d\""))   
-
-         (plotweather (begin 1998 11 20) (end 1998 12 01)
-                      (where "weather_brominf.eps")
-                      (extra &old "set xtics 24 * 60 * 60"   
-                             "set mxtics 4" [set format x ""]))
-         (plotinfiltration (begin 1998 11 20) (end 1998 12 01)
-                           (where "infiltration_brominf.eps")
-                           (extra &old "set xtics 24 * 60 * 60"   
-                                  "set mxtics 4" [set format x ""]))
-         (plotpondingdepth (begin 1998 11 20) (end 1998 12 01)
-                           (where "pondingdepth_brominf.eps")
-                           (extra &old "set xtics 24 * 60 * 60 rotate"   
-                                  "set mxtics 4"
-                                  "set format x \"%y-%m-%d\""))
          ))
 
 (defgnuplot draincommon plotformat
