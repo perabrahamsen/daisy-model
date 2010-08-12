@@ -223,7 +223,9 @@
   "Main Daisy setup for Agrovand project."
 
   ;; No correction needed, by comparison with daily Højbakkegård measurements.
-  (weather default "Rorrende.dwf")
+  (weather default "Rorrende.dwf" 
+           ;; Disable snow.
+           (T_rain -400) (T_snow -500))
   ;; Only relative area count.
   (column (Rorrende_aq (area 1.0 [ha]))
           (Rorrende_fd (area 2.0 [ha])))
