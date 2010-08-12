@@ -329,11 +329,11 @@
                       (extra &old "set xtics 24 * 60 * 60"   
                              "set mxtics 4" [set format x ""]))
          (plotinfiltration (begin 1998 11 20) (end 1998 12 01)
-                           (where "infil_brominf.eps")
+                           (where "infiltration_brominf.eps")
                            (extra &old "set xtics 24 * 60 * 60"   
                                   "set mxtics 4" [set format x ""]))
          (plotpondingdepth (begin 1998 11 20) (end 1998 12 01)
-                           (where "pond_brominf.eps")
+                           (where "pondingdepth_brominf.eps")
                            (extra &old "set xtics 24 * 60 * 60 rotate"   
                                   "set mxtics 4"
                                   "set format x \"%y-%m-%d\""))
