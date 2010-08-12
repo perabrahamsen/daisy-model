@@ -633,6 +633,8 @@ SoilWater::output (Log& log) const
   output_value (X_ice_buffer_, "X_ice_buffer", log);
   output_value (h_ice_, "h_ice", log);
   output_value (q_matrix_, "q", log);
+  output_value (q_primary_, "q_primary", log);
+  output_value (q_secondary_, "q_secondary", log);
   output_value (q_tertiary_, "q_p", log);
   output_value (K_cell_, "K", log);
   if (std::isnormal (sink_dt))
@@ -794,6 +796,12 @@ When there are no ice, this is 0.0.  When there are ice, the ice is\n\
 presummed to occupy the large pores, so it is h (Theta_sat - X_ice).");
   frame.declare ("q", "cm/h", Attribute::LogOnly, Attribute::SoilEdges,
                  "Matrix water flux (positive numbers mean upward).");  
+  frame.declare ("q_primary", "cm/h",
+                 Attribute::LogOnly, Attribute::SoilEdges, "\
+Primary domain water flux (positive numbers mean upward).");  
+  frame.declare ("q_secondary", "cm/h",
+                 Attribute::LogOnly, Attribute::SoilEdges, "\
+Secondary domain water flux (positive numbers mean upward).");  
   frame.declare ("q_p", "cm/h", Attribute::LogOnly, Attribute::SoilEdges,
                  "Water flux in macro pores (positive numbers mean upward).\n\
 Only the surface flux is accurate for models with tertiary storage.\n\

@@ -84,9 +84,14 @@
   ;;"set format x \"%y-%m-%d\"")    
   (source (column ;;(file "infiltration.dlf") 
            (file "Rorrende_aq_infiltration.dlf") 
-           (tag "Surface2Matrix")
+           (tag "Surface2Primary")
            (style 1)
-           (title "Surf2Mat, mm/d"))
+           (title "Surf2Primary, mm/d"))
+          (column ;;(file "infiltration.dlf") 
+           (file "Rorrende_aq_infiltration.dlf") 
+           (tag "Surface2Secondary")
+           (style 1)
+           (title "Surf2Secondary, mm/d"))
           (column ;;(file "infiltration.dlf") 
            (file "Rorrende_aq_infiltration.dlf")
            (tag "Surface2Bio2Matrix")
@@ -318,6 +323,20 @@
           (extra &old "set xtics 24 * 60 * 60 * 7 rotate"   
                  "set mxtics 7"
                  "set format x \"%y-%m-%d\""))   
+
+         (plotweather (begin 1998 11 20) (end 1998 12 01)
+                      (where "weather_brominf.eps")
+                      (extra &old "set xtics 24 * 60 * 60"   
+                             "set mxtics 4" [set format x ""]))
+         (plotinfiltration (begin 1998 11 20) (end 1998 12 01)
+                           (where "infil_brominf.eps")
+                           (extra &old "set xtics 24 * 60 * 60"   
+                                  "set mxtics 4" [set format x ""]))
+         (plotpondingdepth (begin 1998 11 20) (end 1998 12 01)
+                           (where "pond_brominf.eps")
+                           (extra &old "set xtics 24 * 60 * 60 rotate"   
+                                  "set mxtics 4"
+                                  "set format x \"%y-%m-%d\""))
          ))
 
 (defgnuplot draincommon plotformat

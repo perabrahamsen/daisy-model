@@ -12,19 +12,11 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 *** NW 
 
-alpha 0.001 lim 1.2
+Intet sekundært domæne.
 
 *** NE 
 
-alpha 0.001 lim 2.0
-
-*** SW 
-
-alpha 0.0001 lim 1.2
-
-*** SE 
-
-alpha 0.0001 lim 2.0
+Ingen sne.
 
 ** Bioporeaktivitet per uge?  Lang graf.
 
