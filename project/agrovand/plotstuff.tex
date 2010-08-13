@@ -1,177 +1,212 @@
 \documentclass[a4paper]{article}
-%\documentclass[a3paper]{article}
 
 \usepackage{graphicx}
+\usepackage{natbib}
 
-\usepackage[left=1cm,top=1cm,right=1cm,nohead,nofoot]{geometry}
+\usepackage[top=3cm,bottom=2cm]{geometry}
+%% \usepackage[left=1cm,top=1cm,right=1cm,nohead,nofoot]{geometry}
 
-%% \usepackage{vmargin}
-%% \setpapersize{A4}
-%% \setmarginsrb{0pt}{0pt}{0pt}{0pt}{0pt}{0pt}{0pt}{0pt}
+\newcommand{\figl}{\hspace*{-2cm}}
+\newcommand{\figright}[1]{\includegraphics{fig/#1}}
+\newcommand{\fig}[1]{\figl\figright{#1}}
+\newcommand{\figtop}[1]{\figl\includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/#1}}
+\newcommand{\figctop}[1]{\hspace*{-1cm}\figright{#1}} 
+\newcommand{\figc}[1]{\vspace*{-1.5cm}\figctop{#1}}
 
+\newcommand{\Hypres}{\textsc{Hypres}}
 
+\usepackage{placeins}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\today}
 
 \begin{document}
 
-\newpage
-\today \\
-%
-\begin{tabular}{l}
-\includegraphics[width=\textwidth]{weather-98-99.eps} \\
-\includegraphics[width=\textwidth]{drainflow-98-99.eps} \\
-\includegraphics[width=\textwidth]{drainflowacc-98-99.eps} \\
-\includegraphics[width=\textwidth]{particles-98-99.eps} \\
-\includegraphics[width=\textwidth]{particlesacc-98-99.eps} \\
-\includegraphics[width=\textwidth]{bromide-98-99.eps} \\
-\includegraphics[width=\textwidth]{brommass-98-99.eps}
-\end{tabular}
+\begin{figure}[htbp] 
+  \fig{Rorrende-Ap-Theta}\figright{Rorrende-Ap-K}\\
+  \fig{Rorrende-Bt-Theta}\figright{Rorrende-Bt-K}\\
+  \fig{Rorrende-C-Theta}\figright{Rorrende-C-K}\\
+  \fig{Rorrende-DC-Theta}\figright{Rorrende-DC-K}
+  \caption{R{\o}rrende soil hydraulic properties.  \Hypres{} refers to
+    parameters estimated according to \citet{hypres}, Daisy to the
+    final parametrization (ignoring anisotropy and biopores), and
+    Surface and plow pan to the conditions at the top of the A and Bt
+    horizons.  DC is the drain canyon.}
+  \label{fig:Rorrende-hor}
+\end{figure}
 
-\newpage
-\today \\
-%
-\begin{tabular}{l}
-\includegraphics[width=\textwidth]{weather-98-99-zoom.eps} \\
-\includegraphics[width=\textwidth]{drainflow-98-99-zoom.eps} \\
-\includegraphics[width=\textwidth]{drainflowacc-98-99-zoom.eps} \\
-\includegraphics[width=\textwidth]{particles-98-99-zoom.eps} \\
-\includegraphics[width=\textwidth]{particlesacc-98-99-zoom.eps} \\
-\includegraphics[width=\textwidth]{bromide-98-99-zoom.eps} \\
-\includegraphics[width=\textwidth]{brommass-98-99-zoom.eps}
-\end{tabular}
+\FloatBarrier{}
+\newpage{}
+\newgeometry{left=1cm,top=1cm,right=1cm,bottom=1cm,nohead,nofoot}
+\pagestyle{empty}
 
-\newpage
-\today \\
-%
-\begin{tabular}{l}
-\includegraphics[width=\textwidth]{weather-99-00.eps} \\
-\includegraphics[width=\textwidth]{drainflow-99-00.eps} \\
-\includegraphics[width=\textwidth]{drainflowacc-99-00.eps} \\
-\includegraphics[width=\textwidth]{particles-99-00.eps} \\
-\includegraphics[width=\textwidth]{particlesacc-99-00.eps} \\
-\includegraphics[width=\textwidth]{bromide-99-00.eps} \\
-\includegraphics[width=\textwidth]{brommass-99-00.eps} \\
-\includegraphics[width=\textwidth]{pendconc-99-00.eps} \\
-\includegraphics[width=\textwidth]{pendmass-99-00.eps}
-\end{tabular}
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather-98-99} \\
+    \figc{drainflow-98-99} \\
+    \figc{drainflowacc-98-99} \\
+    \figc{particles-98-99} \\
+    \figc{particlesacc-98-99} \\
+    \figc{bromide-98-99} \\
+    \figc{brommass-98-99}
+  \end{center}
+  \caption{Drain season 1998 -- 1999.}
+  \label{fig:season9899}
+\end{figure}
 
-\newpage
-\today \\
-%
-\begin{tabular}{l}
-\includegraphics[width=\textwidth]{weather-99-00-zoom.eps} \\
-\includegraphics[width=\textwidth]{drainflow-99-00-zoom.eps} \\
-\includegraphics[width=\textwidth]{drainflowacc-99-00-zoom.eps} \\
-\includegraphics[width=\textwidth]{particles-99-00-zoom.eps} \\
-\includegraphics[width=\textwidth]{particlesacc-99-00-zoom.eps} \\
-\includegraphics[width=\textwidth]{bromide-99-00-zoom.eps} \\
-\includegraphics[width=\textwidth]{brommass-99-00-zoom.eps} \\
-\includegraphics[width=\textwidth]{pendconc-99-00-zoom.eps} \\
-\includegraphics[width=\textwidth]{pendmass-99-00-zoom.eps}
-\end{tabular}
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather-98-99-zoom} \\
+    \figc{drainflow-98-99-zoom} \\
+    \figc{drainflowacc-98-99-zoom} \\
+    \figc{particles-98-99-zoom} \\
+    \figc{particlesacc-98-99-zoom} \\
+    \figc{bromide-98-99-zoom} \\
+    \figc{brommass-98-99-zoom}
+  \end{center}
+  \caption{Drain season 1998 --- 1999, single event.}
+  \label{fig:season9899zoom}
+\end{figure}
 
-\newpage
-\today \\
-%
-\begin{tabular}{l}
-\includegraphics[width=\textwidth]{weather-00-01.eps} \\
-\includegraphics[width=\textwidth]{drainflow-00-01.eps} \\
-\includegraphics[width=\textwidth]{drainflowacc-00-01.eps} \\
-\includegraphics[width=\textwidth]{particles-00-01.eps} \\
-\includegraphics[width=\textwidth]{particlesacc-00-01.eps} \\
-\includegraphics[width=\textwidth]{ioxconc-00-01.eps} \\
-\includegraphics[width=\textwidth]{ioxmass-00-01.eps} \\
-\includegraphics[width=\textwidth]{pendconc-00-01.eps} \\
-\includegraphics[width=\textwidth]{pendmass-00-01.eps}
-\end{tabular}
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather-99-00} \\
+    \figc{drainflow-99-00} \\
+    \figc{drainflowacc-99-00} \\
+    \figc{particles-99-00} \\
+    \figc{particlesacc-99-00} \\
+    \figc{bromide-99-00} \\
+    \figc{brommass-99-00} \\
+    \figc{pendconc-99-00} \\
+    \figc{pendmass-99-00}
+  \end{center}
+  \caption{Drain season 1999 --- 2000.}
+  \label{fig:season9900}
+\end{figure}
 
-\newpage
-\today \\
-%
-\begin{tabular}{l}
-\includegraphics[width=\textwidth]{weather-00-01-zoom.eps} \\
-\includegraphics[width=\textwidth]{drainflow-00-01-zoom.eps} \\
-\includegraphics[width=\textwidth]{drainflowacc-00-01-zoom.eps} \\
-\includegraphics[width=\textwidth]{particles-00-01-zoom.eps} \\
-\includegraphics[width=\textwidth]{particlesacc-00-01-zoom.eps} \\
-\includegraphics[width=\textwidth]{ioxconc-00-01-zoom.eps} \\
-\includegraphics[width=\textwidth]{ioxmass-00-01-zoom.eps} \\
-\includegraphics[width=\textwidth]{pendconc-00-01-zoom.eps} \\
-\includegraphics[width=\textwidth]{pendmass-00-01-zoom.eps}
-\end{tabular}
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather-99-00-zoom} \\
+    \figc{drainflow-99-00-zoom} \\
+    \figc{drainflowacc-99-00-zoom} \\
+    \figc{particles-99-00-zoom} \\
+    \figc{particlesacc-99-00-zoom} \\
+    \figc{bromide-99-00-zoom} \\
+    \figc{brommass-99-00-zoom} \\
+    \figc{pendconc-99-00-zoom} \\
+    \figc{pendmass-99-00-zoom}
+  \end{center}
+  \caption{Drain season 1999 --- 2000, single event.}
+  \label{fig:season9900zoom}
+\end{figure}
 
-%%\newpage
-%%\today \\
-%%%
-%%\begin{tabular}{l}
-%%\includegraphics[width=\textwidth]{drainflow-01-02.eps} \\
-%%\includegraphics[width=\textwidth]{drainflowacc-01-02.eps} \\
-%%\includegraphics[width=\textwidth]{particles-01-02.eps} \\
-%%\includegraphics[width=\textwidth]{particlesacc-01-02.eps}
-%%\end{tabular}
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather-00-01} \\
+    \figc{drainflow-00-01} \\
+    \figc{drainflowacc-00-01} \\
+    \figc{particles-00-01} \\
+    \figc{particlesacc-00-01} \\
+    \figc{ioxconc-00-01} \\
+    \figc{ioxmass-00-01} \\
+    \figc{pendconc-00-01} \\
+    \figc{pendmass-00-01}
+  \end{center}
+  \caption{Drain season 2000 --- 2001.}
+  \label{fig:season0001}
+\end{figure}
 
-\newpage
-\today \\
-%
-\begin{tabular}{l}
-\includegraphics[width=\textwidth]{weather.eps} \\
-\includegraphics[width=\textwidth]{theta4cm.eps} \\
-\includegraphics[width=\textwidth]{theta8cm.eps} \\
-\includegraphics[width=\textwidth]{theta12cm.eps} \\
-\includegraphics[width=\textwidth]{theta16cm.eps} \\
-\includegraphics[width=\textwidth]{theta20cm.eps} \\
-\includegraphics[width=\textwidth]{theta24cm.eps} \\
-\includegraphics[width=\textwidth]{theta36cm.eps} \\
-\includegraphics[width=\textwidth]{theta60cm.eps}
-\end{tabular}
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather-00-01-zoom} \\
+    \figc{drainflow-00-01-zoom} \\
+    \figc{drainflowacc-00-01-zoom} \\
+    \figc{particles-00-01-zoom} \\
+    \figc{particlesacc-00-01-zoom} \\
+    \figc{ioxconc-00-01-zoom} \\
+    \figc{ioxmass-00-01-zoom} \\
+    \figc{pendconc-00-01-zoom} \\
+    \figc{pendmass-00-01-zoom}
+  \end{center}
+  \caption{Drain season 2000 --- 2001, single event.}
+  \label{fig:season0001zoom}
+\end{figure}
 
-\newpage
-\today \\
-%
-\begin{tabular}{l}
-\includegraphics[width=\textwidth]{weather_brominf.eps} \\
-\includegraphics[width=\textwidth]{infiltration.eps}\\
-\includegraphics[width=\textwidth]{pondingdepth.eps}\\
-\includegraphics[width=\textwidth]{brom-0-25-output.eps} \\
-\includegraphics[width=\textwidth]{brom-25-50-output.eps} \\
-\includegraphics[width=\textwidth]{brom-50-75-output.eps} \\
-\includegraphics[width=\textwidth]{brom-75-105-output.eps}
-\end{tabular}
+%% \figc{drainflow-01-02} \\
+%% \figc{drainflowacc-01-02} \\
+%% \figc{particles-01-02} \\
+%% \figc{particlesacc-01-02}
 
-\newpage
-\today \\
-%
-\begin{tabular}{l}
-\includegraphics[width=\textwidth]{brom-total.eps} \\
-\includegraphics[width=\textwidth]{brom-primary.eps} \\
-\includegraphics[width=\textwidth]{brom-secondary.eps} \\
-\includegraphics[width=\textwidth]{brom-0-25-acc.eps} \\
-\includegraphics[width=\textwidth]{brom-25-50-acc.eps} \\
-\includegraphics[width=\textwidth]{brom-50-75-acc.eps} \\
-\includegraphics[width=\textwidth]{brom-75-105-acc.eps}
-\end{tabular}
+\begin{figure}[htbp]
+  \begin{center}
+    \figc{weather} \\
+    \figc{theta4cm} \\
+    \figc{theta8cm} \\
+    \figc{theta12cm} \\
+    \figc{theta16cm} \\
+    \figc{theta20cm} \\
+    \figc{theta24cm} \\
+    \figc{theta36cm} \\
+    \figc{theta60cm}
+  \end{center}
+  \caption{TDR measurements.}
+  \label{fig:tdr}
+\end{figure}
 
-\newpage
-\today \\
-%
-\begin{tabular}{l}
-\includegraphics[width=\textwidth]{weather_short.eps} \\
-\includegraphics[width=\textwidth]{theta_short4cm.eps} \\
-\includegraphics[width=\textwidth]{theta_short8cm.eps} \\
-\includegraphics[width=\textwidth]{theta_short12cm.eps} \\
-\includegraphics[width=\textwidth]{theta_short16cm.eps} \\
-\includegraphics[width=\textwidth]{theta_short20cm.eps} \\
-\includegraphics[width=\textwidth]{theta_short24cm.eps} \\
-\includegraphics[width=\textwidth]{theta_short36cm.eps} \\
-\includegraphics[width=\textwidth]{theta_short60cm.eps}
-\end{tabular}
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather_brominf} \\
+    \figc{infiltration}\\
+    \figc{pondingdepth}\\
+    \figc{brom-input} \\
+    \figc{brom-0-25-output} \\
+    \figc{brom-25-50-output} \\
+    \figc{brom-50-75-output} \\
+    \figc{brom-75-105-output}
+  \end{center}
+  \caption{Bromide dynamics.}
+  \label{fig:bromide}
+\end{figure}
 
-\newpage
-\today \\
-%
-\begin{tabular}{l}
-\includegraphics[width=\textwidth]{weather_short.eps} \\
-\includegraphics[width=\textwidth]{infiltration_short.eps} \\
-\includegraphics[width=\textwidth]{pondingdepth_short.eps} \\
-\end{tabular}
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{brom-total} \\
+    \figc{brom-primary} \\
+    \figc{brom-secondary} \\
+    \figc{brom-input-acc} \\
+    \figc{brom-0-25-acc} \\
+    \figc{brom-25-50-acc} \\
+    \figc{brom-50-75-acc} \\
+    \figc{brom-75-105-acc}
+  \end{center}
+  \caption{Accumulated bromide.}
+  \label{fig:bromide-acc}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather_short} \\
+    \figc{theta_short4cm} \\
+    \figc{theta_short8cm} \\
+    \figc{theta_short12cm} \\
+    \figc{theta_short16cm} \\
+    \figc{theta_short20cm} \\
+    \figc{theta_short24cm} \\
+    \figc{theta_short36cm} \\
+    \figc{theta_short60cm}
+  \end{center}
+  \caption{Early TDR measurements.}
+  \label{fig:tdr-zoom}
+\end{figure}
+
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \figctop{weather_short} \\
+%%     \figc{infiltration_short} \\
+%%     \figc{pondingdepth_short} \\
+%%   \end{center}
+%%   \caption{Early weather.}
+%%   \label{fig:weather-zoom}
+%% \end{figure}
 
 \end{document}

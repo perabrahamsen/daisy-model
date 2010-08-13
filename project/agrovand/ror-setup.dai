@@ -241,6 +241,9 @@
   (print_time periodic)
 
   ;; And tell us what happened.
+
+(log_prefix "log/")
+
   (output harvest
 
           ;; The following log model are used by the gnuplot graphs.
@@ -283,7 +286,7 @@
           ("Field chemical" (chemical colloid))
           ("Chemical Content" (chemical colloid)
                     (where "M-colloids.dlf"))
-          ("Colloids")
+          ("Colloids" (where "colloids.dlf"))
           ("Field chemical" (chemical Pendimethalin))
           ("Field chemical" (chemical Pendimethalin-immobile))
           ("Field chemical" (chemical Pendimethalin-colloid))
