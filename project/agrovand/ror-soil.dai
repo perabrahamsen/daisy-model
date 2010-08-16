@@ -3,9 +3,13 @@
 (defsecondary agrovand pressure 
   ;; (h_lim 1.2 [pF])
   ;; (alpha 0.01 [h^-1])
-  (h_lim 3.0 [pF])
-  (alpha 0.0003 [h^-1])
+  (h_lim 2.0 [pF])
+  (alpha 0.01 [h^-1])
   )
+
+(defsecondary Ap agrovand
+  (h_lim 3.0 [pF])
+  (alpha 0.00003 [h^-1]))
 
 (defhorizon "Overflade Ap" USDA3
   (description "0-3 cm")
@@ -18,7 +22,7 @@
                   (K_sat 0.173704 [cm/h])
                   ;;(K_sat 1.73704 [cm/h])
                   (l -2.05473))
-  (secondary_domain agrovand))
+  (secondary_domain Ap))
 
 (defhorizon "Rorrende Ap" USDA3
   (description "3-25 cm")
@@ -30,7 +34,7 @@
                   (n 1.2656)
                   (K_sat 1.73704 [cm/h])
                   (l -2.05473))
-  (secondary_domain agrovand))
+  (secondary_domain Ap))
   
 (defhorizon "Rorrende Bplow layer" USDA3
   (description "25-33 cm Petersen et al (2004)")
@@ -110,6 +114,13 @@
            (density 100 [m^-2])
            (diameter 2 [mm])))
            
+(defbiopore "matrix_halfway"
+   (common (height_start 0 [cm])
+           (height_end -75 [cm])
+           (diameter 4 [mm])
+           (density 22 [m^-2])))
+
+
 (defbiopore "matrix_2cm"
    (common ;;(height_start  -1.5 [cm])
            (height_start 0 [cm])
@@ -118,8 +129,7 @@
            (density (plf x (range [m^-2])
                            (domain [cm])
                            (points (20 0)
-                                   (30 45))))))       
-           ; 5% af 190
+                                   (30 23))))))       
                    
 (defbiopore "drain_2cm"
    (drain  ;;(height_start -1.5 [cm])
@@ -129,9 +139,8 @@
            (pipe_position -112.5 [cm])
            (density (plf x (range [m^-2])
                            (domain [cm])
-                           (points (20 45)
+                           (points (20 23)
                                    (30 0))))))
-          ;; 5% af 190
 
 (defbiopore "matrix_30cm"
    (common (height_start -30 [cm])
@@ -140,7 +149,7 @@
            (density (plf x (range [m^-2])
                            (domain [cm])
                            (points (20 0)
-             	 (30 15))))))      
+                                   (30 15))))))      
            
 (defbiopore "drain_30cm"
    (drain  (height_start -30 [cm])
@@ -171,11 +180,6 @@
                                 (max_number_of_small_time_steps 1000000))
                       (v+h))
         (drainpoints (-112.5 [cm] 1 [cm]))
-        ;; (Geometry 
-        ;;      ;;(zplus -1.5 -3 -5 -9 -13 -20 -25 -30 -35 -40 -50 -60 -75 -100 -110 -115 -120 -130 -140 -160 -180 -190 -200)
-        ;;        (zplus -1.5 -3 -5 -7 -9 -11 -13 -15 -17 -19 -21 -23 -25 -27 -29 -31 -33 -35 -37 -41 -45 -50 -55 -65 -75
-        ;;               -90 -105 -120 -140 -160 -180 -200)                    
-        ;;        (xplus 5 10 15 25 35 40 50 75 125 200 275 350 450 550 650 800 [cm]))
         (Geometry (zplus -1.5 -3 
                          -5.5 -10 -14 -18 -22 -25 ;TDR: 4, 8, 12, 16, 20, 24
                          -27 -30 -33              ;Bromide 25, 50, 75, 100
@@ -184,6 +188,7 @@
                   (xplus 25 50 100 150 300 500 650 800 [cm])) ;TDR 400
         (Tertiary (biopores 
                      (classes ("matrix_0cm") 
+                              ("matrix_halfway")
                               ("matrix_2cm")
                               ("drain_2cm")
                               ("matrix_30cm")
