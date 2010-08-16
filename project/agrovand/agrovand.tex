@@ -1,0 +1,368 @@
+\documentclass[a4paper]{report}
+
+%%\usepackage[left=1cm,top=2cm,right=1cm]{geometry}
+\usepackage[top=3cm,bottom=2cm]{geometry}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[danish,english]{babel}
+\usepackage{natbib}
+\bibliographystyle{apalike}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{placeins}
+\pagestyle{fancy}
+\lhead{\today}
+
+\newcommand{\koc}{$\mbox{K}_{\mbox{\textsc{oc}}}$}
+\newcommand{\kclay}{$\mbox{K}_{\mbox{clay}}$}
+\newcommand{\kd}{$\mbox{K}_{\mbox{d}}$}
+
+\newcommand{\focus}{\textsc{focus}}
+\newcommand{\hypres}{\textsc{hypres}}
+\newcommand{\Hypres}{\textsc{Hypres}}
+\newcommand{\macro}{\textsc{macro}}
+\newcommand{\Macro}{\textsc{Macro}}
+\newcommand{\figl}{\hspace*{-2cm}}
+\newcommand{\figright}[1]{\includegraphics{fig/#1}}
+\newcommand{\fig}[1]{\figl\figright{#1}}
+\newcommand{\figtop}[1]{\figl\includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/#1}}
+
+\newcommand{\figctop}[1]{\hspace*{-1cm}\figright{#1}} 
+\newcommand{\figc}[1]{\vspace*{-1.5cm}\figctop{#1}}
+
+% \includeonly{vap-result}
+
+\begin{document}
+
+\chapter*{Daisy 2D simulation of Rørrendegård}
+
+Part of project
+\begin{otherlanguage}{danish}
+  \begin{it}
+    Flerdimensional modelling of vandstrømning og stoftransport i de
+    øverste 1-2 m af jorden i systemer med markdræn
+  \end{it}
+\end{otherlanguage}
+for the Danish Environmental Protection Agency.
+\vspace{1cm}
+
+\begin{bf}
+  \begin{large}
+    \noindent
+    Søren Hansen \texttt{$<$sha@life.ku.dk$>$}\\
+    Per Abrahamsen \texttt{$<$abraham@dina.kvl.dk$>$}\\
+    Carsten Pedersen \texttt{$<$cpe@life.ku.dk$>$}\\
+    Marie Habekost Nielsen \texttt{$<$maha@life.ku.dk$>$}\\
+    Mikkel Mollerup \texttt{$<$mmo@geus.dk$>$}\\
+    \\
+    \today{}\\
+  \end{large}
+\end{bf}
+\vfill\noindent
+University of Copenhagen\\
+Department of Basic Sciences and Environment\\
+Environmental Chemistry and Physics\\
+Thorvaldsensvej 40\\
+DK-1871 Frederiksberg C\\
+Tel: \texttt{$+$45 353 32300}\\
+Fax: \texttt{$+$45 353 32398}
+
+\tableofcontents
+
+\chapter{Introduction}
+
+The Rørrendegård site is part of the Copenhagen University
+experimental station in Tåstrup.  It was selected for for the present
+project mainly because soil particles in drain water were measured,
+and soil particles can be an important transport mechanism for
+strongly sorbing pesticides, e.g. \citet{}.   
+
+The Agrovand project measured drain water together  particles 
+
+The results have been partly documented in \citet{Petersen200181}
+
+because of the high resolution flow proportional drain data collected
+as part of the Agrovand project in the four drain season between
+between 1998 and 2002, which included soil particles, a likely
+transport path for strongly sorbing pesticides.
+
+\begin{verbatim}
+
+The data from the Rørrendegård site is mostly taken
+The Agrovand project 
+- KU experimental field Rørrendegård
+- Effect of tillage on drain water and transport to drains
+- Some results published in
+
+Old data
+- Four seasons
+- Four tillage regimenes
+- Particles, TDR, Piezometers
+- Bromide, Pesticides
+
+New data
+- Biopores
+
+Our interest
+
+Limitations
+\end{verbatim}
+
+\chapter{Setup}
+
+Process \citet{tilde-agrovand,nanna-agrovand}, mmo, \citet{vap2d}, pa
+
+\section{Weather}
+
+\section{Management}
+
+\section{Pesticide and bromide properties}
+
+\section{Soil}
+
+\subsection{Matrix}
+
+Figure~\ref{fig:Rorrende-hor}.
+
+\begin{figure}[htbp] 
+  \fig{Rorrende-Ap-Theta}\figright{Rorrende-Ap-K}\\
+  \fig{Rorrende-Bt-Theta}\figright{Rorrende-Bt-K}\\
+  \fig{Rorrende-C-Theta}\figright{Rorrende-C-K}\\
+  \fig{Rorrende-DC-Theta}\figright{Rorrende-DC-K}
+  \caption{R{\o}rrende soil hydraulic properties.  \Hypres{} refers to
+    parameters estimated according to \citet{hypres}, Daisy to the
+    final parametrization (ignoring anisotropy and biopores), and
+    Surface and plow pan to the conditions at the top of the A and Bt
+    horizons.  DC is the drain canyon.}
+  \label{fig:Rorrende-hor}
+\end{figure}
+
+\subsection{Fast and slow water}
+
+The division between fast and slow water for the Ap horizon were
+mainly calibrated from the measurements shown on the top graph on
+figure~\ref{fig:bromide-acc}.  The simulated dynamics shown on
+figure~\ref{fig:bromide} were used as a help.  The two figures are
+explined in section~\ref{sec:soil-bromide}.
+
+\subsection{Biopores}
+
+\subsection{Groundwater table and drain pipes}
+
+\subsection{Organic matter and nitrogen}
+
+\chapter{Results}
+
+The simulation results are presented together with measured data in
+figures~\ref{fig:first} to~\ref{fig:last}, found at the end of the
+report.  The figures have a high information density, and have
+therefore been allowed to fill most of the page.  Each figure contains
+multiple graphs, all of which share the same x-axis.  This structure
+is intended to facilitate comparison.
+
+\section{Soil water}
+
+\section{Soil bromide}
+\label{sec:soil-bromide}
+
+Same pattern in all treatments.
+
+figure~\ref{fig:bromide} and figure~\ref{fig:bromide-acc}
+
+\section{Drains}
+
+The full drain seasons are depicted on
+figure~\ref{fig:season9899},~\ref{fig:season9900},
+and~\label{fig:season0001}, while
+figure~\ref{fig:season9899zoom},~\ref{fig:season9900zoom},
+and~\label{fig:season0001zoom} focus on a single event within each
+drain season.
+
+\chapter{Discussion}
+
+\section{Colloid generation}
+
+The most signficant part of the dataset is the colloid leaching for
+different soil treatment regimes.  We have only looked at the
+conventional tillage regime, and used that for calibrating the colloid
+generation model described in \citet{macro-colloid}.  By using data
+from the three other regimes, it should be possible to improve the
+model to takes into account the timing of tillage operations, and help
+predict the possible effect of low tillage regimes on pesticide
+leaching.
+
+\addcontentsline{toc}{chapter}{\numberline{}References}
+\bibliography{../../txt/daisy}
+
+\appendix{}
+
+%% Drain figures
+
+\FloatBarrier{}
+\newpage{}
+\newgeometry{left=1cm,top=1cm,right=1cm,bottom=1cm,nohead,nofoot}
+\pagestyle{empty}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figc{weather} \\
+    \figc{theta4cm} \\
+    \figc{theta8cm} \\
+    \figc{theta12cm} \\
+    \figc{theta16cm} \\
+    \figc{theta20cm} \\
+    \figc{theta24cm} \\
+    \figc{theta36cm} \\
+    \figc{theta60cm}
+  \end{center}
+  \caption{TDR measurements.}
+  \label{fig:tdr}
+  \label{fig:first}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather_short} \\
+    \figc{theta_short4cm} \\
+    \figc{theta_short8cm} \\
+    \figc{theta_short12cm} \\
+    \figc{theta_short16cm} \\
+    \figc{theta_short20cm} \\
+    \figc{theta_short24cm} \\
+    \figc{theta_short36cm} \\
+    \figc{theta_short60cm}
+  \end{center}
+  \caption{Early TDR measurements.}
+  \label{fig:tdr-zoom}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather_brominf} \\
+    \figc{infiltration}\\
+    \figc{pondingdepth}\\
+    \figc{brom-input} \\
+    \figc{brom-0-25-output} \\
+    \figc{brom-25-50-output} \\
+    \figc{brom-50-75-output} \\
+    \figc{brom-75-100-output}
+  \end{center}
+  \caption{Bromide dynamics.}
+  \label{fig:bromide}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{brom-total} \\
+    \figc{brom-primary} \\
+    \figc{brom-secondary} \\
+    \figc{brom-input-acc} \\
+    \figc{brom-0-25-acc} \\
+    \figc{brom-25-50-acc} \\
+    \figc{brom-50-75-acc} \\
+    \figc{brom-75-100-acc}
+  \end{center}
+  \caption{Accumulated bromide.}
+  \label{fig:bromide-acc}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather-98-99} \\
+    \figc{drainflow-98-99} \\
+    \figc{drainflowacc-98-99} \\
+    \figc{particles-98-99} \\
+    \figc{particlesacc-98-99} \\
+    \figc{bromide-98-99} \\
+    \figc{brommass-98-99}
+  \end{center}
+  \caption{Drain season 1998 -- 1999.}
+  \label{fig:season9899}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather-98-99-zoom} \\
+    \figc{drainflow-98-99-zoom} \\
+    \figc{drainflowacc-98-99-zoom} \\
+    \figc{particles-98-99-zoom} \\
+    \figc{particlesacc-98-99-zoom} \\
+    \figc{bromide-98-99-zoom} \\
+    \figc{brommass-98-99-zoom}
+  \end{center}
+  \caption{Drain season 1998 --- 1999, single event.}
+  \label{fig:season9899zoom}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather-99-00} \\
+    \figc{drainflow-99-00} \\
+    \figc{drainflowacc-99-00} \\
+    \figc{particles-99-00} \\
+    \figc{particlesacc-99-00} \\
+    \figc{bromide-99-00} \\
+    \figc{brommass-99-00} \\
+    \figc{pendconc-99-00} \\
+    \figc{pendmass-99-00}
+  \end{center}
+  \caption{Drain season 1999 --- 2000.}
+  \label{fig:season9900}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather-99-00-zoom} \\
+    \figc{drainflow-99-00-zoom} \\
+    \figc{drainflowacc-99-00-zoom} \\
+    \figc{particles-99-00-zoom} \\
+    \figc{particlesacc-99-00-zoom} \\
+    \figc{bromide-99-00-zoom} \\
+    \figc{brommass-99-00-zoom} \\
+    \figc{pendconc-99-00-zoom} \\
+    \figc{pendmass-99-00-zoom}
+  \end{center}
+  \caption{Drain season 1999 --- 2000, single event.}
+  \label{fig:season9900zoom}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather-00-01} \\
+    \figc{drainflow-00-01} \\
+    \figc{drainflowacc-00-01} \\
+    \figc{particles-00-01} \\
+    \figc{particlesacc-00-01} \\
+    \figc{ioxconc-00-01} \\
+    \figc{ioxmass-00-01} \\
+    \figc{pendconc-00-01} \\
+    \figc{pendmass-00-01}
+  \end{center}
+  \caption{Drain season 2000 --- 2001.}
+  \label{fig:season0001}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figctop{weather-00-01-zoom} \\
+    \figc{drainflow-00-01-zoom} \\
+    \figc{drainflowacc-00-01-zoom} \\
+    \figc{particles-00-01-zoom} \\
+    \figc{particlesacc-00-01-zoom} \\
+    \figc{ioxconc-00-01-zoom} \\
+    \figc{ioxmass-00-01-zoom} \\
+    \figc{pendconc-00-01-zoom} \\
+    \figc{pendmass-00-01-zoom}
+  \end{center}
+  \caption{Drain season 2000 --- 2001, single event.}
+  \label{fig:season0001zoom}
+  \label{fig:last}
+\end{figure}
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
