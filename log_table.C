@@ -61,7 +61,7 @@ struct LogTable : public LogDLF, public Destination
   void add (const symbol value);
 
   // Create and destroy.
-  void initialize (Treelog&);
+  void initialize (const symbol log_dir, Treelog&);
   explicit LogTable (const BlockModel& al);
   void summarize (Treelog&);
   ~LogTable ();
@@ -145,9 +145,9 @@ LogTable::add (const symbol value)
 
 
 void
-LogTable::initialize (Treelog& msg)
+LogTable::initialize (const symbol log_dir, Treelog& msg)
 {
-  LogDLF::initialize (msg);
+  LogDLF::initialize (log_dir, msg);
 
   Treelog::Open nest (msg, name);
   for (unsigned int i = 0; i < summary.size (); i++)

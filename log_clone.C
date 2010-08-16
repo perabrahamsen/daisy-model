@@ -56,7 +56,7 @@ LogClone::result ()
 { return alist (); }
 
 void 
-LogClone::initialize (Treelog&)
+LogClone::initialize (const symbol, Treelog&)
 { }
 
 LogClone::LogClone (const std::string& name, 

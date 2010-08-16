@@ -130,8 +130,8 @@ void
 Output::initialize (Metalib& metalib, Treelog& msg)
 {
   for (size_t i = 0; i < logs.size (); i++)
-    logs[i]->initialize_common (metalib, msg);
-  log_all->initialize_common (metalib, msg);
+    logs[i]->initialize_common (log_prefix, metalib, msg);
+  log_all->initialize_common (log_prefix, metalib, msg);
 }
 
 void 
@@ -194,7 +194,8 @@ Output::Output (const BlockModel& al)
     active_logs (find_active_logs (logs, *log_all)),
     scopes (find_extern_logs (logs, exchanges)),
     activate_output (Librarian::build_item<Condition> (al, "activate_output")),
-    time_columns (find_time_columns (al.name_sequence ("log_time_columns")))
+    time_columns (find_time_columns (al.name_sequence ("log_time_columns"))),
+    log_prefix (al.name ("log_prefix"))
 { }
 
 Output::Output ()
@@ -202,7 +203,8 @@ Output::Output ()
     exchanges (std::vector<MScope*> ()),
     logs (std::vector<Log*> ()),
     active_logs (std::vector<Log*> ()),
-    scopes (std::vector<Scope*> ())
+    scopes (std::vector<Scope*> ()),
+    log_prefix ("")
 { }
 
 Output::~Output ()
@@ -252,6 +254,10 @@ List of default time components to include in log files. Choose between:\n";
   default_time.push_back (symbol ("second"));
 #endif
   frame.set ("log_time_columns", default_time);
+
+   frame.declare_string ("log_prefix", Attribute::Const, "\
+Prefix for log file names.  Set it to 'log/' to put all files in a subdir.");
+   frame.set ("log_prefix", "");
 }
 
 // output.C ends here.

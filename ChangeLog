@@ -1,3 +1,11 @@
+2010-08-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemistry_std.C (infiltrate): Don't infiltrate chemical with
+	negligible water.
+
+	* output.C, output.h (log_prefix): New parameter.
+	* log*.C, log.h (initialize, initialize_common): Obey it.
+
 2010-08-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* number_arit.C (NumberDivide): Division by [] don't change

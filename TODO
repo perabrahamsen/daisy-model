@@ -2,29 +2,11 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Agrovand
 
-** Fjern sne.
-
-** Hvad sker der med Br hvis vi fjerner sekundært domæne?
-
 ** Bromid placering
 
-*** NW 
+*** Kørsel lim=3 pF, alpha = 0.001
 
-SW + h_lim = 2.0 pF
-
-*** NE 
-
-Ingen sne.
-
-*** SW 
-
-NE + plot q1&q2
-
-*** SE
-
-SW + Surface h_lim = pf 5
-
-** Bioporeaktivitet per uge?  Lang graf.
+Se om tidlig infiltration er væk 
 
 ** Skriv
 

@@ -58,7 +58,7 @@ struct LogRegress : public LogDLF, public Destination
   void add (const symbol value);
 
   // Create and destroy.
-  void initialize (Treelog&);
+  void initialize (const symbol, Treelog&);
   explicit LogRegress (const BlockModel& al);
   void summarize (Treelog&);
   ~LogRegress ();
@@ -140,9 +140,9 @@ LogRegress::add (const symbol value)
 
 
 void
-LogRegress::initialize (Treelog& msg)
+LogRegress::initialize (const symbol log_dir, Treelog& msg)
 {
-  LogDLF::initialize (msg);
+  LogDLF::initialize (log_dir, msg);
 }
 
 LogRegress::LogRegress (const BlockModel& al)

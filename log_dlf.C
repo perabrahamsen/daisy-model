@@ -239,9 +239,10 @@ LogDLF::contain_time_columns (const std::vector<Select*>& entries)
 }
 
 void
-LogDLF::initialize (Treelog& msg)
+LogDLF::initialize (const symbol log_dir, Treelog& msg)
 {
-  out.open (file.name ().c_str ());
+  const std::string fn = log_dir.name () + file.name ();
+  out.open (fn.c_str ());
 
   print_header.start (out, name, file, parsed_from_file);
 

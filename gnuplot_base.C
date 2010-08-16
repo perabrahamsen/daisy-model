@@ -64,14 +64,20 @@ GnuplotBase::plot_header (std::ostream& out) const
     out << "set output " << quote (file) << "\n";
   else
     out << "unset output\n";
+
   if (device != "screen")
-    out << "set terminal " << device << "\n";
+    out << "set terminal " << device;
   else if (getenv ("DISPLAY"))
-    out << "set terminal x11\n";
+    out << "set terminal x11";
   else 
-    out << "set terminal windows\n";
+    out << "set terminal windows"; 
+  if (canvas != Attribute::None ())
+    out << " size " << canvas;
+  out << "\n";
+
   if (title != "")
     out << "set title " << quote (title) << "\n";
+
   if (size.x > 0.0)
     out << "set size " << size.x << ", " << size.y << "\n";
 }
@@ -108,6 +114,7 @@ GnuplotBase::GnuplotBase (const BlockModel& al)
   : Gnuplot (al),
     file (al.name ("where")),
     device (al.name ("device", file2device (file))),
+    canvas (al.name ("canvas", Attribute::None ())),
     extra (al.name_sequence ("extra")),
     title (al.name ("title", "")),
     size (al.check ("size") ? &al.submodel ("size") : NULL),
@@ -155,6 +162,8 @@ the screen instead of being stored in a file.");
     frame.set ("where", "screen");
     frame.declare_string ("device", Attribute::OptionalConst, "\
 Output device.  By default, this is derived from the file extenstion.");
+    frame.declare_string ("canvas", Attribute::OptionalConst, "\
+Canvas size.  By default, this depend on the device.");
     frame.declare_string ("extra", Attribute::Const, 
                 Attribute::Variable, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the plot command.\n\

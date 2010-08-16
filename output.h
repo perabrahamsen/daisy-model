@@ -48,6 +48,7 @@ private:
   const std::vector<Scope*> scopes;
   const std::auto_ptr<Condition> activate_output;
   const std::vector<Time::component_t> time_columns;
+  const symbol log_prefix;
 
   // Use.
 public:

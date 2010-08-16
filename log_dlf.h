@@ -72,7 +72,7 @@ struct LogDLF : public LogSelect
   // Create and destroy.
   bool check (const Border&, Treelog& msg) const;
   static bool contain_time_columns (const std::vector<Select*>& entries);
-  void initialize (Treelog&);
+  void initialize (const symbol log_dir, Treelog&);
   static std::vector<std::pair<symbol, symbol>/**/>
   /**/ build_parameters (const BlockModel& al);
   explicit LogDLF (const BlockModel& al);

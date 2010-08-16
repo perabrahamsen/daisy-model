@@ -121,11 +121,11 @@ Log::output (Log&) const
 { }
 
 void
-Log::initialize_common (Metalib& metalib, Treelog& msg)
+Log::initialize_common (const symbol log_dir, Metalib& metalib, Treelog& msg)
 {
   daisy_assert (!impl->metalib);
   impl->metalib = &metalib;
-  initialize (msg);
+  initialize (log_dir, msg);
 }
 
 Log::Log (const BlockModel& al)

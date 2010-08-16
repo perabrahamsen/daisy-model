@@ -310,9 +310,9 @@ public:
 public:
   virtual bool check (const Border&, Treelog& err) const = 0;
 protected:
-  virtual void initialize (Treelog& out) = 0;
+  virtual void initialize (const symbol log_dir, Treelog& out) = 0;
 public:
-  void initialize_common (Metalib&, Treelog& out);
+  void initialize_common (const symbol log_dir, Metalib&, Treelog& out);
 protected:
   Log (const BlockModel& al);
   Log (const char* id);

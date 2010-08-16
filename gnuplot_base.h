@@ -35,6 +35,7 @@ private:
   const symbol file;
 protected:
   const symbol device;
+  const symbol canvas;
   const std::vector<symbol> extra;
 private:
   const symbol title;

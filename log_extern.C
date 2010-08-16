@@ -257,7 +257,7 @@ LogExtern::name (symbol tag) const
 }
 
 void 
-LogExtern::initialize (Treelog&)
+LogExtern::initialize (const symbol, Treelog&)
 {
   for (size_t i = 0; i < LogSelect::entries.size (); i++)
     {
