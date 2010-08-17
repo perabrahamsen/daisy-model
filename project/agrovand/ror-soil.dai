@@ -4,7 +4,7 @@
   ;; (h_lim 1.2 [pF])
   ;; (alpha 0.01 [h^-1])
   (h_lim 2.0 [pF])
-  (alpha 0.01 [h^-1])
+  (alpha 0.0001 [h^-1])
   )
 
 (defsecondary Ap agrovand
@@ -49,7 +49,7 @@
                   ;;(K_sat 0.00925 [cm/h])
                   (K_sat 0.0925 [cm/h])
                   (l -2.92948))
-  (secondary_domain agrovand))               
+  (secondary_domain Ap))               
 
 (defhorizon "Rorrende Bt" USDA3
   (description "33-120 cm")
@@ -116,7 +116,7 @@
            
 (defbiopore "matrix_halfway"
    (common (height_start 0 [cm])
-           (height_end -75 [cm])
+           (height_end -60 [cm])
            (diameter 4 [mm])
            (density 22 [m^-2])))
 
