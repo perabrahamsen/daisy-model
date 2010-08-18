@@ -17,6 +17,7 @@
   (description "0-3 cm")
   (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.03)
   (dry_bulk_density 1.49 [g/cm^3])
+  (anisotropy 100)
   (hydraulic M_vG (Theta_res 0.00)
                   (Theta_sat 0.395489)
                   (alpha 0.04769)
