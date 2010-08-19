@@ -81,14 +81,15 @@
 
 (defgnuplot "Retention Ap Rorrende" "Retention All"
   (hor "Ap")
-  (source "Retention Ap Rorrende HYPRES"
-          "Retention Ap Rorrende Daisy"))
+  (legend none)
+  (source ;; "Retention Ap Rorrende HYPRES"
+          ("Retention Ap Rorrende Daisy" (style 2))))
 
 (defgnuplot "Conductivity Ap Rorrende" "Conductivity All"
   (hor "Ap")
-  (source "Conductivity Ap Rorrende HYPRES"
-          "Conductivity Ap Rorrende Daisy"
-          "Conductivity Ap Rorrende Surface"))
+  (source ;; "Conductivity Ap Rorrende HYPRES"
+          ("Conductivity Ap Rorrende Daisy" (title "Ap") (style 2))
+          ("Conductivity Ap Rorrende Surface" (style 3))))
 
 (defxysource "Retention Bt Rorrende Daisy" "Retention Daisy" 
   (y (convert (soil_Theta (horizon "Rorrende Bt")
@@ -130,9 +131,9 @@
 
 (defgnuplot "Retention Bt Rorrende" "Retention All"
   (hor "Bt")
-  (source "Retention Bt Rorrende HYPRES"
-          "Retention Bt Rorrende Daisy"
-          "Retention Bt Rorrende plow pan"))
+  (source ;;"Retention Bt Rorrende HYPRES"
+          ("Retention Bt Rorrende Daisy" (style 2) (title Bt))
+          ("Retention Bt Rorrende plow pan" (style 3))))
 
 (defgnuplot "Conductivity Bt Rorrende" "Conductivity All"
   (hor "Bt")
@@ -166,8 +167,9 @@
 
 (defgnuplot "Retention C Rorrende" "Retention All"
   (hor "C")
-  (source "Retention C Rorrende HYPRES"
-          "Retention C Rorrende Daisy"))
+  (legend none)
+  (source ;; "Retention C Rorrende HYPRES"
+          ("Retention C Rorrende Daisy" (style 2))))
 
 (defgnuplot "Conductivity C Rorrende" "Conductivity All"
   (hor "C")
@@ -200,13 +202,17 @@
 
 (defgnuplot "Retention DC Rorrende" "Retention All"
   (hor "DC")
-  (source "Retention DC Rorrende HYPRES"
-          "Retention DC Rorrende Daisy"))
+  (legend none)
+  (title "Drain canyon retention curve")
+  (source ;; "Retention DC Rorrende HYPRES"
+          ("Retention DC Rorrende Daisy" (style 2))))
 
 (defgnuplot "Conductivity DC Rorrende" "Conductivity All"
   (hor "DC")
-  (source "Conductivity DC Rorrende HYPRES"
-          "Conductivity DC Rorrende Daisy"))
+  (title "Drain canyon conductivity curve")
+  (legend none)
+  (source ;; "Conductivity DC Rorrende HYPRES"
+          ("Conductivity DC Rorrende Daisy" (style 2))))
 
 (defgnuplot Rorrende-hydraulics multi
   (declare station String "Name of station to plot.")

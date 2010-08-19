@@ -13,11 +13,11 @@
 \usepackage{placeins}
 \pagestyle{fancy}
 \lhead{\today}
-
+\usepackage{multirow}
 \newcommand{\koc}{$\mbox{K}_{\mbox{\textsc{oc}}}$}
 \newcommand{\kclay}{$\mbox{K}_{\mbox{clay}}$}
 \newcommand{\kd}{$\mbox{K}_{\mbox{d}}$}
-
+\newcommand{\rhob}{$\rho_{\mbox{b}}$}
 \newcommand{\focus}{\textsc{focus}}
 \newcommand{\hypres}{\textsc{hypres}}
 \newcommand{\Hypres}{\textsc{Hypres}}
@@ -79,13 +79,16 @@ proportional drain data collected as part of the Agrovand project in
 the four drain season between between 1998 and 2002, which included
 soil particles, a likely transport path for strongly sorbing
 pesticides.  The results of the Agrovand project have been partly
-documented
-in~\citet{Petersen200181,petersen2002movement,petersen2004movement,petersen2008spatio}.
+documented in~\citet{petersen200181} (biopores),
+\citet{petersen2002movement} (particles and pesticides),
+\citet{petersen2004movement} (particles and bromide), and
+\citet{petersen2008spatio} (anisotropy).
 
 The main focus of the Agrovand project was the influence of tillage on
 the soil as a transport medium, so four plots with different tillage
 strategies were followed.  In this project we have only studied the
-data from plot 4, representing conventional tillage.  Apart from
+data from plot 4, representing conventional tillage, and only the
+first three season where the best data is availble.  Apart from
 particles, the drain water has been analysed for bromide (one
 application), pendimethalin (two applications) and ioxynil (one
 application), which we have chosen to include in our simulations
@@ -95,7 +98,7 @@ TDR probes, and the only one we have used for our calibration.
 Furthermore, transport pathways have been explored using dye tracer,
 and biopores have been counted both in the original project, and with
 more detail forming the basis for the new Daisy biopore model in the
-present project~\citep{habekost1}.
+present project~\citep{habekost1,habekost2,habekost3}.
 
 The goal for the simulations presented in this paper is to test the
 two subcomponents of the the newly developed 2D Daisy against real
@@ -121,9 +124,8 @@ history.
 \item An initial setup was developed for water and bromide using the
   original Daisy model by Tilde Hellsten, as part of her Master
   Thesis~\citep{tilde-agrovand}.
-\item A setup for water using the new 2D model and new biopore model
-  for water only by Nanna Gudmand-Høyer, as part of her Master
-  Thesis~\citep{nanna-agrovand}.
+\item A setup for water using the new 2D model was developed by Nanna
+  Gudmand-Høyer, as part of her Master Thesis~\citep{nanna-agrovand}.
 \item This 2D setup was extended for bromide, particles, and
   pesticides by Mikkel Mollerup, and used as a basis for the PLAP site
   calibration~\citep{vap2d}.
@@ -131,21 +133,141 @@ history.
   PLAP site calibration, the setup was recalibrated by Per Abrahamsen.
 \end{enumerate}
 
-Process \citet{tilde-agrovand,nanna-agrovand}, mmo, \citet{vap2d}, pa
-
-Used for development.  Redo from scrath.
+This history does mean that the setup likely contain parameter choices
+that no longer are applicable due to changes in the model, and that a
+new setup made from scratch could be simpler or give better results,
+had time permitted.
 
 \section{Weather}
 
+All weather data with the exception of precipitation were collected at
+a station located at Højbakkegård, XXX meter from the experimental
+field.  Three sources were considered for precipitation.  Hourly
+measurements XXX meter above ground at the field in the drain seasons,
+hourly measurements at Højbakkegård XXX meter above ground, and daily
+measurements at ground level.
+
+As a starting point, we used the hourly field measurements for the
+drain season, supplemented with the hourly measurements from
+Højbakkegård for the rest of the season.  These were compared with the
+daily measurements.  Where the daily measurements showed precipitan
+but the hourly measurements didn't we examined the TDR measurements
+near the surface.  If they indicated precipitation, the daily were
+used to supplement the hourly measurements.  Comparison of monthly
+sums between the hourly and daily precipitation data indicated no
+systematic bias, thus the hourly data were used without correction for
+possible effect of wind and snowfall.
+
 \section{Management}
 
-\section{Pesticide and bromide properties}
+All seasons had winter wheat with mineral fertilizer, with one plowing
+operation between harvest and sowing.  For Daisy, the dates of the
+plowing, sowing and harvest is used (table~\ref{tab:crop-man}).
+Furthermore, Daisy use information about the seed bed preperation.  As
+we have not enabled nitrogen in the simulation, the fertilization
+operations are irrelevant.  We use default parameters for the tillage
+operations.  For the harvest, we specify 8 cm stub and that stems and
+leaves are left on the field.  However, since we have not enabled a
+model for above ground litter, and we are not interested in soil
+organic matter, that information is not used in the simulation.
 
-\section{Soil}
+In the 2004 and 2005 seasons, the potential evapotranspiration for a
+winter wheat on the experimental field was measured using an eddy
+covariance system, and from this a dynamic crop factor was calculated
+(\citet{kjaersgaard2008crop}).  The the default parameterization was
+adjusted based on this, and furthermore as part of calibration of soil
+water the max penetration depth was increased to 1.5 meter, and the
+interception coeeficient were lowered to 0.05 mm per LAI.
 
-\subsection{Matrix}
+\begin{table}[htbp]
+  \caption{Dates for crop management operations.  The initial crop was
+    sowed 1997-9-23.}
+  \label{tab:crop-man}
+  \centering
+  \begin{tabular}{l|lll}\hline
+    Operation & 1998 & 1999 & 2000 \\
+\hline
+    Harvest & 8-20 & 8-20 & 8-20  \\
+    Plowing & 9-15 & 9-15 & 9-15 \\
+    Sow & 9-23 & 9-27 & 10-18 
+  \end{tabular}
+\end{table}
 
-Figure~\ref{fig:Rorrende-hor}.
+Date and amount is specified for pesticide and bromide application.
+The model setup described in \citet{vap2d} were duplicated here, with
+field values for DT50 and \koc{} taken from \citet{ppdb20100517}.  No
+calibration was done on the persticides.  See
+table~\ref{tab:pest-man}.
+
+\begin{table}[htbp]
+  \caption{Pesticide and bromide application.}
+  \label{tab:pest-man}
+  \centering
+  \begin{tabular}{l|l|l|r|r}\hline
+    Date       & Name          & Amount [g/ha] & DT50 [d] & \koc{} [ml/g] \\
+\hline
+    1998-11-24 & Bromide       & 34000 & & \\
+    1999-11-16 & Pendimethalin &  2000 & \multirow{2}{*}{90}
+                                       & \multirow{2}{*}{15744} \\
+    \multirow{2}{*}{2000-11-10} 
+               & Pendimethalin &  2000 & & \\
+               & Ioxynil       &   200 & 5 & 276
+  \end{tabular}
+\end{table}
+
+All management operation are assumed to be performed at noon.
+
+\section{Soil profile}
+
+The soil profile and the description of the drain canyon is based on
+the work presented in \citet{habekost3}, where \textsc{isss4} testure
+classification was used.  \citet{petersen200181} presents testure and
+dry bulk density (\rhob{}) analyses for four depths, which have been
+used as basis for the main horizons.  Unfortunately, no measurements
+for the C horizon is presented, instead we use the measurement from
+the bottom of the B horizon (85--90 cm).  The Ap measurements (10--15
+cm) differers between treatments and between spring and autumn, we
+have used the spring values for T4 (conventional tillage).  The soil
+humus data are from plot A in \citet{petersen2002movement}.  The
+values used are summarized in table~\ref{tab:texture}.
+
+\begin{table}[htbp]
+  \caption{Soil properties. Depth is specified in cm below soil surface, 
+    and the dry bulk density (\rhob{}) specified in g/cm$^3$.
+    Humus is given as a percentage of total weight.  For the drain canying, 
+    where the \textsc{isss4} texture classification system was used,
+    the mineral mineral soil particle distribution is also given as
+    fraction of total weight.  For the other horizons the \textsc{usda3} 
+    system was used, and the mineral soil particle distribution is given 
+    as percentage of total mineral weight.}
+  \label{tab:texture}
+  \centering
+  \begin{tabular}{rrrrrrrr}
+    Horizon & Depth & Clay & Silt & \multicolumn{2}{r}{Sand} & Humus
+            & \rhob{} \\
+    & & $< 2\;\mu$m & $< 50\;\mu$m & \multicolumn{2}{r}{$< 2\;$mm} & & \\\hline
+    Ap & 0--25 & 10.7 & 22.2 & \multicolumn{2}{r}{67.1} & 3.0 & 1.49 \\
+    Plow pan & 25--33 &  14.8 & 21.4 & \multicolumn{2}{r}{63.8} & 1.6 & 1.70 \\
+    Bt & 33--120 & 22.2 & 19.5 & \multicolumn{2}{r}{58.3} & 1.6 & 1.65 \\
+    C & 120--200 & 20.7 & 23.5 & \multicolumn{2}{r}{55.8} & 1.0 &  1.69 \\
+    \\
+    Area & Depth & Clay & Silt & Fine Sand & Coarse sand & Humus
+            & \rhob{} \\
+    &  & $< 2\;\mu$m & $< 20\;\mu$m & $< 200\;\mu$m & $< 2\;$mm & & \\\hline
+    Drain canyon & 33--120 & 21.3 & 19.0 & 24.4 & 33.9 & 1.4 & 1.65 
+  \end{tabular}
+\end{table}
+
+\section{Hydraulic properties of the matrix domain}
+
+\Hypres{} was used initially to estimate hydraulic properties for all
+horizons. The TDR measurements (see figure~\ref{fig:tdr}) have been
+used for calibrating.  The only parameter that has been changes is
+$K_{\mbox{sat}}$ (saturated conductivity).  For the surface layer (top
+3 cm), this has been decreased to 10\% of the value suggested by
+\hypres{}.  In the Bt horizon conductivity has been decreased to 50\%,
+and in the C horizon is has been trippled.  The result is shown on
+figure~\ref{fig:Rorrende-hor}.
 
 \begin{figure}[htbp] 
   \fig{Rorrende-Ap-Theta}\figright{Rorrende-Ap-K}\\
@@ -155,24 +277,37 @@ Figure~\ref{fig:Rorrende-hor}.
   \caption{R{\o}rrende soil hydraulic properties.  \Hypres{} refers to
     parameters estimated according to \citet{hypres}, Daisy to the
     final parametrization (ignoring anisotropy and biopores), and
-    Surface and plow pan to the conditions at the top of the A and Bt
-    horizons.  DC is the drain canyon.}
+    surface and plow pan to the conditions at the top of the A and Bt
+    horizons.}
   \label{fig:Rorrende-hor}
 \end{figure}
 
-\subsection{Fast and slow water}
+We have not included cracks in the description of the conductivity
+curve.  Based on \citet{petersen2008spatio} we chose to add an
+anisotropy of 12 (meaning horizontal flow is 12 times faster than
+vertical) to the plow pan.
+
+\section{Fast and slow water}
 
 The division between fast and slow water for the Ap horizon were
 mainly calibrated from the measurements shown on the top graph on
 figure~\ref{fig:bromide-acc}.  The simulated dynamics shown on
 figure~\ref{fig:bromide} were used as a help.  The two figures are
-explined in section~\ref{sec:soil-bromide}.
+explained in section~\ref{sec:soil-bromide}.
 
-\subsection{Biopores}
+\section{Biopores}
 
-\subsection{Groundwater table and drain pipes}
+MH optælling, plus ekstra for bromid
 
-\subsection{Organic matter and nitrogen}
+\section{Groundwater table and drain pipes}
+
+Opdel marken i 2, gw + fd
+aquitard, pressure table.
+
+\section{Particles}
+
+Forsøgte flere modeler (ref), endte op med jarvis.  Kalibrering,
+udgangspunkt, og resultat.
 
 \chapter{Results}
 
@@ -184,6 +319,8 @@ multiple graphs, all of which share the same x-axis.  This structure
 is intended to facilitate comparison.
 
 \section{Soil water}
+
+figure~\ref{fig:tdr} and~\ref{fig:tdr-zoom}
 
 \section{Soil bromide}
 \label{sec:soil-bromide}

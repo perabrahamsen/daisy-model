@@ -13,32 +13,25 @@
   (h_lim 3.0 [pF])
   (alpha 0.00003 [h^-1]))
 
-(defhorizon "Overflade Ap" USDA3
-  (description "0-3 cm")
-  (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.03)
-  (dry_bulk_density 1.49 [g/cm^3])
-  (anisotropy 100)
-  (hydraulic M_vG (Theta_res 0.00)
-                  (Theta_sat 0.395489)
-                  (alpha 0.04769)
-                  (n 1.2656)
-                  (K_sat 0.173704 [cm/h])
-                  ;;(K_sat 1.73704 [cm/h])
-                  (l -2.05473))
-  (secondary_domain Ap))
-
 (defhorizon "Rorrende Ap" USDA3
   (description "3-25 cm")
   (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.03)
   (dry_bulk_density 1.49 [g/cm^3])
-  (hydraulic M_vG (Theta_res 0.00)
-                  (Theta_sat 0.395489)
-                  (alpha 0.04769)
-                  (n 1.2656)
-                  (K_sat 1.73704 [cm/h])
-                  (l -2.05473))
+;;  (hydraulic M_vG (Theta_res 0.00)
+;;                  (Theta_sat 0.395489)
+;;                  (alpha 0.04769)
+;;                  (n 1.2656)
+;;                  (K_sat 1.73704 [cm/h])
+;;                  (l -2.05473))
   (secondary_domain Ap))
   
+(defhorizon "Overflade Ap" "Rorrende Ap"
+  (description "0-3 cm")
+  ;; (anisotropy 1) 
+  (hydraulic original
+             ;; 10%
+             (K_sat 0.173704 [cm/h])))
+
 (defhorizon "Rorrende Bplow layer" USDA3
   (description "25-33 cm Petersen et al (2004)")
   (clay 0.148)(silt 0.214)(sand 0.638) (humus 0.016)
@@ -167,7 +160,7 @@
                   (-33.00 "Rorrende Bplow layer")
                   (-120 "Rorrende Bt")
                   (-200 "Rorrende C"))
-        (zones ((box  (top finite -33 [cm]) (bottom finite -115 [cm])
+        (zones ((box  (top finite -33 [cm]) (bottom finite -120 [cm])
                        (left finite 0 [cm]) (right finite 25 [cm]))
                         Drain_canyon)))
   (Movement rectangle
