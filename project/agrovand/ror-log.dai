@@ -717,4 +717,22 @@
                   (spec biopore component S))))
 
 
+(deflog "GWT" column
+  (when daily)
+  (where "${colfid}gwt.dlf")
+  (entries (number (path column "${column}" Groundwater common height)
+                   (handle average)
+                   (tag "GWT")
+                   (spec groundwater common height))
+           (number (path column "${column}" SoilWater table_low)
+                   (handle min)
+                   (multi min)
+                   (tag "GWT-low")
+                   (spec fixed SoilWater table_low))
+           (number (path column "${column}" SoilWater table_high)
+                   (handle max)
+                   (multi max)
+                   (tag "GWT-high")
+                   (spec fixed SoilWater table_high))))
+
 ;;; ror-log.dai ends here.

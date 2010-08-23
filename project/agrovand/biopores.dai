@@ -58,6 +58,6 @@
    (common (height_start 0 [cm])
            (height_end -60 [cm])
            (diameter 4 [mm])
-           (density 22 [m^-2])))
+           (density 23 [m^-2])))
 
 ;;; biopores.dai

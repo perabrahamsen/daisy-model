@@ -14,15 +14,19 @@
 \pagestyle{fancy}
 \lhead{\today}
 \usepackage{multirow}
+
 \newcommand{\koc}{$\mbox{K}_{\mbox{\textsc{oc}}}$}
 \newcommand{\kclay}{$\mbox{K}_{\mbox{clay}}$}
 \newcommand{\kd}{$\mbox{K}_{\mbox{d}}$}
 \newcommand{\rhob}{$\rho_{\mbox{b}}$}
+\newcommand{\hlim}{\mbox{$h_{\mbox{lim}}$}}
+
 \newcommand{\focus}{\textsc{focus}}
 \newcommand{\hypres}{\textsc{hypres}}
 \newcommand{\Hypres}{\textsc{Hypres}}
 \newcommand{\macro}{\textsc{macro}}
 \newcommand{\Macro}{\textsc{Macro}}
+
 \newcommand{\figl}{\hspace*{-2cm}}
 \newcommand{\figright}[1]{\includegraphics{fig/#1}}
 \newcommand{\fig}[1]{\figl\figright{#1}}
@@ -141,11 +145,10 @@ had time permitted.
 \section{Weather}
 
 All weather data with the exception of precipitation were collected at
-a station located at Højbakkegård, XXX meter from the experimental
-field.  Three sources were considered for precipitation.  Hourly
-measurements XXX meter above ground at the field in the drain seasons,
-hourly measurements at Højbakkegård XXX meter above ground, and daily
-measurements at ground level.
+a station located at Højbakkegård.  Three sources were considered for
+precipitation.  Hourly measurements 1.2 meter above ground at the
+field in the drain seasons, hourly measurements at Højbakkegård also
+1.2 meter above ground, and daily measurements at ground level.
 
 As a starting point, we used the hourly field measurements for the
 drain season, supplemented with the hourly measurements from
@@ -156,7 +159,17 @@ near the surface.  If they indicated precipitation, the daily were
 used to supplement the hourly measurements.  Comparison of monthly
 sums between the hourly and daily precipitation data indicated no
 systematic bias, thus the hourly data were used without correction for
-possible effect of wind and snowfall.
+possible effect of wind and snowfall.  
+
+Whether the precipitation falls as snow or rain will obviusly affect
+the drain flow, especially at short time scale.  Unfortunately, we did
+not have direct measurements of the type of precipitation.  A build-in
+model of Daisy will let an increasing amount of the precipitation fall
+as snow when the air temperature drops below 2$\,^\circ$C.  This works
+reasonable well for long time simulations, but not when we as here are
+inteersted in the individual events.  For simplicity, we chose to full
+disable this snow model, so all precipitation in the simulation will
+fall as rain.
 
 \section{Management}
 
@@ -217,7 +230,8 @@ table~\ref{tab:pest-man}.
 
 All management operation are assumed to be performed at noon.
 
-\section{Soil profile}
+\section{Soil profile and biopores}
+\label{sec:soil-profile}
 
 The soil profile and the description of the drain canyon is based on
 the work presented in \citet{habekost3}, where \textsc{isss4} testure
@@ -242,7 +256,7 @@ values used are summarized in table~\ref{tab:texture}.
     as percentage of total mineral weight.}
   \label{tab:texture}
   \centering
-  \begin{tabular}{rrrrrrrr}
+  \begin{tabular}{rrrrrrrr}\hline
     Horizon & Depth & Clay & Silt & \multicolumn{2}{r}{Sand} & Humus
             & \rhob{} \\
     & & $< 2\;\mu$m & $< 50\;\mu$m & \multicolumn{2}{r}{$< 2\;$mm} & & \\\hline
@@ -258,7 +272,36 @@ values used are summarized in table~\ref{tab:texture}.
   \end{tabular}
 \end{table}
 
-\section{Hydraulic properties of the matrix domain}
+Initially, three classes of biopores were used in the simulation based
+on \citet{habekost1}, where we focused on the biopores that had
+potentially had connection to the drain pipes.  Initially we assumed
+that all the deep biopores (the two classes ending in 120 cm) in the
+drain canyon would be directly connected to the drain pipes.  Based on
+pesticide measurements in drains in the PLAP sites, we decided to
+change this so only half the deep biopores in the drain canyon would
+be directly connected to the drain pipes \citep{vap2d}.  Compared to
+the PLAP simulations, we were had additional soil bromide measurements
+(section~\ref{sec:brom-cal}), so we decided to add an extra class
+ending halfway down.  The meaurements of \citet{petersen200181}
+indicated a roughly linear decrease of biopore densisty with depth, so
+we chose to use the same density as for the full length biopores.  The
+classes are summarized in table~\ref{tab:biopores}.
+
+\begin{table}[htbp]
+  \caption{Biopore classes.}
+  \label{tab:biopores}
+  \centering
+  \begin{tabular}{ll|rrrr}\hline
+    Depth    & cm      & 0--25 & 0--120 & 30--120 & 0--60\\
+    Diameter & mm      & 2    & 4       & 4       & 4 \\
+    Density  & m$^{-2}$& 100  & 23      & 7       & 23
+  \end{tabular}
+\end{table}
+
+The organic matter and nitrogen modules were disabled in order to save
+time.
+
+\section{TDR and hydraulic properties}
 
 \Hypres{} was used initially to estimate hydraulic properties for all
 horizons. The TDR measurements (see figure~\ref{fig:tdr}) have been
@@ -282,27 +325,109 @@ figure~\ref{fig:Rorrende-hor}.
   \label{fig:Rorrende-hor}
 \end{figure}
 
-We have not included cracks in the description of the conductivity
-curve.  Based on \citet{petersen2008spatio} we chose to add an
+Based on \citet{petersen2008spatio} we chose to add an
 anisotropy of 12 (meaning horizontal flow is 12 times faster than
 vertical) to the plow pan.
 
-\section{Fast and slow water}
+\section{Groundwater table and drain water}
 
-The division between fast and slow water for the Ap horizon were
-mainly calibrated from the measurements shown on the top graph on
-figure~\ref{fig:bromide-acc}.  The simulated dynamics shown on
-figure~\ref{fig:bromide} were used as a help.  The two figures are
-explained in section~\ref{sec:soil-bromide}.
-
-\section{Biopores}
-
-MH optælling, plus ekstra for bromid
-
-\section{Groundwater table and drain pipes}
+With the soil hydraulics properties fixed, 
 
 Opdel marken i 2, gw + fd
 aquitard, pressure table.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figtop{gwt}
+  \end{center}
+  \caption{Groundwater table.  Simulated low value is calculated from
+    pressure in lowest unsaturated numeric cell, typically located
+    near drain.  Simulated high value is calculated from pressure in
+    highest saturated cell, typically farthest away from the drain.}
+  \label{fig:gw}
+\end{figure}
+
+\section{Soil bromide and the secondary domain}
+\label{sec:brom-cal}
+
+We have not included cracks in the description of the conductivity
+curve, but still divide water into two domains for the sake of solute
+transport.  This division was esxclusively calibrated based on bromide
+soil measurements shown on the top graph on
+figure~\ref{fig:bromide-acc}.  The simulated dynamics shown on
+figure~\ref{fig:bromide} were used as a help.  The two figures are
+explained in section~\ref{sec:soil-bromide}.  
+
+The division between water in to domain (the primary ``slow'' domain
+and the secondary ``fast'' domain) is controlled by single horizon
+specific parameter, \hlim{}, a pressure head.  If the actual pressure
+head ($h_a$) is below \hlim{}, all matrix water will be part of the
+primary domain where.  Othewise, the water in the soil corresponding
+to \hlim{} is considered part of the primary domain, and any
+additional matrix water is considered part of the secondary
+domain. The water flux calculated by Richard's equation ($q$) will be
+divided so the primary domain water flux ($q_1$) is
+\begin{displaymath}
+  q_1 = \frac{K (\hlim)}{K (h_a)}
+\end{displaymath}
+where $K(h)$ is the hydraulic conductivity at pressure head $h$, and
+the secondary domain water flux ($q_2$) is $q_2 = q - q_1$.
+Solute transport in the primary domain is calculated with the
+convection-dispertion equation, while solute movement in the secondary
+domain is handled as pure convection.  A second parameter, $\alpha{}$
+determine the speed of exchange between the two domains.
+
+The bromide were measured in for intervals of 25 cm, starting from the
+soil surface.  The results show the highest bromide concentrations
+below 50 cm.  The results were based on 16 random samples of each
+plot, and the patern were similar in the three other
+plots.~\citep{petersen2004movement}.  Using a plain one domain
+convection-dispertion equation, our simulations showed that most
+bromide should still be in the top 50 cm.  In other word, this was a
+classic case where the convection-dispertion equation, which assumes
+full equilibrium between solute content in different pore classes, was
+inadequate.  The idea was that by dividing the pore classes in two
+domains, and calculating transport seperately for each domain, the
+bromide could stay in the secondary domain and move down faster.
+
+As an initial guess, we used $\hlim{} = 2\; \mbox{pF}$ and $\alpha =
+0.01\; \mbox{h}^{-1}$, the later taken from \citet{jaynes1995field}.
+Using these values, our initial results were far worse than with the
+pure convection-dispertion equation.  In these simulations, the bromid
+would stay in the top 25 cm.  There were two problems: The soil
+surface was dry enough that much of solute would enter the primary
+domain, and stay relatively protected there.  Lowering \hlim{} to 3 pF
+in the soil surface would ensure that all the water (and solute) would
+enter the secondary domain.  The second problem was the long period,
+over a month, before two large events caused significant leakage out
+of the plow layer.  With an $\alpha$ of $0.01\; \mbox{h}^{-1}$ this
+was plenty of time to reach equilibrium, again causing some of the
+bromide to be protected in the primary domain.  We got the best
+results by lowering $\alpha$ to $0.00003\; \mbox{h}^{-1}$ in the top
+soil (to the bottom of the plow pan), decreasing it further had little
+effect.  
+
+As the biopores were the main transport mechanism through the plow
+pan, we added a new biopore class that ended in 60 cm in order not to
+bypass the 50--100 cm area entirely, see
+section~\ref{sec:soil-profile}.  This gave a problem for estimation of
+$\alpha$ below 33 cm.  A too high value would cause some bromide to
+stick just below the plow pan, where it would count as part of the
+25-50 cm interval.  A too low value would cause the bromide that were
+transported down to 60 cm through the biopores to move too fast below
+100 cm.  We never found a good value.  The values used are listed in
+table~\ref{tab:secondary}.
+
+\begin{table}[htbp]
+  \caption{Two domain solute transport parameters.}
+  \label{tab:secondary}
+  \centering
+  \begin{tabular}{lll}\hline
+    Depth [cm] & \hlim{} [pF] & $\alpha$ [h$^{-1}$] \\\hline
+    0-33 & 3.0 & 0.00003 \\
+    33-  & 2.0 & 0.0001
+  \end{tabular}
+\end{table}
 
 \section{Particles}
 
@@ -333,12 +458,42 @@ figure~\ref{fig:bromide} and figure~\ref{fig:bromide-acc}
 
 The full drain seasons are depicted on
 figure~\ref{fig:season9899},~\ref{fig:season9900},
-and~\label{fig:season0001}, while
+and~\ref{fig:season0001}, while
 figure~\ref{fig:season9899zoom},~\ref{fig:season9900zoom},
-and~\label{fig:season0001zoom} focus on a single event within each
-drain season.
+and~\ref{fig:season0001zoom} focus on a single event within each drain
+season.
 
 \chapter{Discussion}
+
+\section{Drain water flow}
+
+Getting the model to simulate the measured responsiveness to events
+has been a problem from the start, for example~\citet{nanna-agrovand}
+dedicate several sections to the issue.  The situation as improved a
+lot since then, but the figures showing drain flow for individual
+events still show too litte response.  We had more luck with the PLAP
+sites \citep{vap2d}.  A difference between the two is that we used
+measured pressure 5 meter below surface there, where in the present
+simulation we use a mostly static pressure table.  As the dynamics of
+the individual events is likely very important for pestice leaching in
+drain pipes, we should probably start using the piezometers for
+estimating the lower boundary, if we are goind to return to the dataset.
+
+
+\section{Secondary domain}
+
+We do not believe in the calibration of the secondary domain in
+section~\ref{sec:soil-bromide}.  The bromide was applied when the soil
+was frozen, and figure~\ref{fig:bromide} shows that the temperature
+fluctuates around the freezing point up to the events where the
+bromide is moved out of the plowing layer.  The present version of the
+Daisy model does not handle ice, and we know that ice will force water
+out of the small pores which will obviously have a large effect on the
+primary/secondary domain dynamics.    
+
+However, the work is far from wasted.  The simulation now reacts as
+expected on the parameters, so it has been useful as a test of the
+implementation of our model.
 
 \section{Colloid generation}
 

@@ -248,6 +248,7 @@
 
           ;; The following log model are used by the gnuplot graphs.
           ("Sample water content 2" (column Rorrende_aq))
+          ("GWT" (column Rorrende_aq))
           ("Infiltration" (column Rorrende_aq))
           ("Infiltration" (when hourly))
           ("Ponding depth" (column Rorrende_aq))

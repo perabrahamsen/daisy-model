@@ -231,6 +231,37 @@
   (graph Rorrende-hydraulics
          ))
 
+(defgnuplot plottime time
+  (device "pdf size 19cm, 8cm")
+  (extra &old
+         [set lmargin 12]
+         [set rmargin 10]
+         [set bmargin 2]
+         [set tmargin 1]  
+         [set format x "%y-%m"]
+         "unset xlabel"))
+
+(defgnuplot gw plottime
+  (where "fig/gwt.pdf")
+  (title "Groundwater")
+  (ymin -500 [cm])
+  (source (column (file "log/Rorrende_aq_gwt.dlf")
+                  (tag "GWT-low")
+                  (title "Sim (low)"))
+          (arithmetic (file "log/Rorrende_aq_gwt.dlf")
+                      (expr (min "GWT-high" 0.0 [cm]))
+                      (style 3)
+                      (title "Sim (high)"))
+          (column (file "log/Rorrende_aq_gwt.dlf")
+                  (tag "GWT")
+                  (style 4)
+                  (title "Sim"))
+          ;;(column (file )
+          ;;        (tag "Level")
+          ;;        (style 2)
+          ;;        (title "Obs"))
+          ))
+
 (defgnuplot plotformat time 
   "Common for weather and water cotent plots"
   (begin 1998 05 01)(end 2000 08 15)
@@ -1085,6 +1116,7 @@
 
 (defprogram plotall gnuplot
   (graph drainplots
+         gw
          Rorrende-hydraulics
          "Rorrende Graphs"
          ))
