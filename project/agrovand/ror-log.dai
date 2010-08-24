@@ -2,6 +2,29 @@
 
 (input file "log.dai")                
 
+(deflog "Pressure" column
+  "Piezometers"
+  (where "pressure.dlf")
+  (when hourly)
+  (entries (content (tag "70")
+                    (x 70 [cm])
+                    (z -230 [cm])
+                    (path column "${column}" SoilWater h)
+                    (spec fixed SoilWater h)
+                    (handle current))
+           (content (tag "400")
+                    (x 400 [cm])
+                    (z -230 [cm])
+                    (path column "${column}" SoilWater h)
+                    (spec fixed SoilWater h)
+                    (handle current))
+           (content (tag "800")
+                    (x 795 [cm])
+                    (z -230 [cm])
+                    (path column "${column}" SoilWater h)
+                    (spec fixed SoilWater h)
+                    (handle current))))
+
 (deflog "Sample water content 2" column
   "Daily average water content at location of TDR probes"
   (where "interval_water_content2.dlf")
@@ -733,6 +756,9 @@
                    (handle max)
                    (multi max)
                    (tag "GWT-high")
-                   (spec fixed SoilWater table_high))))
+                   (spec fixed SoilWater table_high))
+           
+           
+))
 
 ;;; ror-log.dai ends here.

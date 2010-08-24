@@ -331,20 +331,33 @@ vertical) to the plow pan.
 
 \section{Groundwater table and drain water}
 
-With the soil hydraulics properties fixed, 
 
-Opdel marken i 2, gw + fd
-aquitard, pressure table.
+An EM38 map of the field indicated large areas to have a sandy
+underground, and the piezometers showed that these areas had a
+significantly lower groundwater level.  As a rough cut, we estimated
+that two thirds of the field did not contribute to the drainage
+through the groundwater level.  In Daisy we modelled this by dividing
+the field into two columns.  The first column had a free drainage
+lower boundary, and represented twice the area of the other column,
+with an aquitard bottom.  The aquitard layer was described with a size
+(2 meters), a conductivity (0.5 mm/h) and the pressure table of the
+underlying aquifer.  The presure table was made variable in order to
+match drain flow, and is shown on figure~\ref{fig:gwt} together with
+the simulated ground water table.  The free drainage column would
+still contribute to the drain water through directly connected
+biopores.  The TDR and soil bromide measurements were all performed in
+the part of the field with clay underground, and the comparisons are
+therefore done to the column with an aquitard.
 
 \begin{figure}[htbp]
   \begin{center}
-    \figtop{gwt}
+    \fig{gwt}
   \end{center}
   \caption{Groundwater table.  Simulated low value is calculated from
     pressure in lowest unsaturated numeric cell, typically located
     near drain.  Simulated high value is calculated from pressure in
     highest saturated cell, typically farthest away from the drain.}
-  \label{fig:gw}
+  \label{fig:gwt}
 \end{figure}
 
 \section{Soil bromide and the secondary domain}
@@ -431,8 +444,30 @@ table~\ref{tab:secondary}.
 
 \section{Particles}
 
-Forsøgte flere modeler (ref), endte op med jarvis.  Kalibrering,
-udgangspunkt, og resultat.
+Particles in Daisy is generated on the soil surface as a result of
+rainfall, and then transported down through the soil matrix or
+biopores.  We use the filter function from~\citet{macro-colloid} for
+the matrix domain.  As the matrix domain in Daisy is divided into a
+primary and secondary domain, we use difference filter cooeficients
+for the two domains.  We choose values of 80 and 40 m$^-1$ for the
+primary and secondary domain respictively, in order to stay near the
+50 m$^-1$ used in~\citet{macro-colloid}. Daisy will (unlike \macro{})
+not filter particles in the biopores, only in the matrix.
+
+For the particle generation we tried multiple models
+\citep{Styczen88,EUROSEM,macro-colloid}, but
+only~\citet{macro-colloid} gave anything near the desired dynamics.
+It was also the only of the models designed to match drain
+measurements, and the only model with a pool of readily available
+particles.  We use the values from~\citet{macro-colloid} as a starting
+point, except for $M_{\mbox{max}}$ which is estimated based on the
+clay content as described in~\citet{mmax} (method 1).  From
+calibration, we would that the detachment rate coefficient ($k_d$)
+should be decreased to 7.5 g/J, the replenishment rate ($k_r$) to 0.1
+g/m$^2$/h, and the depth of the soil affected by detachment and
+dispersion ($z_i$) to 0.5 mm.
+
+The results are discussed in section~\ref{sec:drains}.
 
 \chapter{Results}
 
@@ -455,6 +490,7 @@ Same pattern in all treatments.
 figure~\ref{fig:bromide} and figure~\ref{fig:bromide-acc}
 
 \section{Drains}
+\label{sec:drains}
 
 The full drain seasons are depicted on
 figure~\ref{fig:season9899},~\ref{fig:season9900},
@@ -477,7 +513,7 @@ measured pressure 5 meter below surface there, where in the present
 simulation we use a mostly static pressure table.  As the dynamics of
 the individual events is likely very important for pestice leaching in
 drain pipes, we should probably start using the piezometers for
-estimating the lower boundary, if we are goind to return to the dataset.
+estimating the lower boundary, if we are going to return to the dataset.
 
 
 \section{Secondary domain}
