@@ -92,7 +92,7 @@ The main focus of the Agrovand project was the influence of tillage on
 the soil as a transport medium, so four plots with different tillage
 strategies were followed.  In this project we have only studied the
 data from plot 4, representing conventional tillage, and only the
-first three season where the best data is availble.  Apart from
+first three season where the best data is available.  Apart from
 particles, the drain water has been analysed for bromide (one
 application), pendimethalin (two applications) and ioxynil (one
 application), which we have chosen to include in our simulations
@@ -460,12 +460,12 @@ only~\citet{macro-colloid} gave anything near the desired dynamics.
 It was also the only of the models designed to match drain
 measurements, and the only model with a pool of readily available
 particles.  We use the values from~\citet{macro-colloid} as a starting
-point, except for $M_{\mbox{max}}$ which is estimated based on the
-clay content as described in~\citet{mmax} (method 1).  From
-calibration, we would that the detachment rate coefficient ($k_d$)
-should be decreased to 7.5 g/J, the replenishment rate ($k_r$) to 0.1
-g/m$^2$/h, and the depth of the soil affected by detachment and
-dispersion ($z_i$) to 0.5 mm.
+point, except for the maximum particle storage ($M_{\mbox{max}}$)
+which is estimated based on the clay content as described
+in~\citet{mmax} (method 1).  From calibration, we would that the
+detachment rate coefficient ($k_d$) should be decreased to 7.5 g/J,
+the replenishment rate ($k_r$) to 0.1 g/m$^2$/h, and the depth of the
+soil affected by detachment and dispersion ($z_i$) to 0.5 mm.
 
 The results are discussed in section~\ref{sec:drains}.
 
@@ -476,18 +476,61 @@ figures~\ref{fig:first} to~\ref{fig:last}, found at the end of the
 report.  The figures have a high information density, and have
 therefore been allowed to fill most of the page.  Each figure contains
 multiple graphs, all of which share the same x-axis.  This structure
-is intended to facilitate comparison.
+is intended to facilitate comparison.  The same figures were used for
+calibration.  All figures have precipitation and air temperature for
+the period in the top graph.
 
 \section{Soil water}
 
-figure~\ref{fig:tdr} and~\ref{fig:tdr-zoom}
+Figure~\ref{fig:tdr} shows horizontal TDR measurements for different
+depths.  The two authomn gaps are after plowing, when the TDR probes
+are removed.  At the third season the TDR probes had drifted, and were
+left out.  The TDR probes does not work on ice, which explain the
+noise in the measurements during periods with frost.  The simulation
+overstimate the water level near the soil surface, which could
+possibly be a problem with the TDR measuring some air.  We may
+overstimate the dynamics near the bottom of the plow layer.  The
+measurements for the bottom TDR show fast variations during the winter
+which looks mostly like noise, something not duplicated in the
+simulation.
+
+Figure~\ref{fig:tdr-zoom} shows the same data, but only for the first
+summer after installation, where the TDR measurements are likely to be
+most reliable.  The general water level seem to be slightly
+overestimated at the end of the period, except in the 60 cm TDR where
+it is underestimated.  Also, the effect of the two first large events
+(based on daily precipitation) goes deeper in the simulation than in
+the measurements.
 
 \section{Soil bromide}
 \label{sec:soil-bromide}
 
-Same pattern in all treatments.
+The measured and simulated bromide content in the top four 25 cm
+intervals is shown on the top graph in figure~\ref{fig:bromide-acc}.
+The period is from right before application, to right after the soil
+measurement.  
 
-figure~\ref{fig:bromide} and figure~\ref{fig:bromide-acc}
+As can be seen, the content of 25-50 cm is overestimated in the
+simulation, while the content of 50-75 and 75-100 cm are both
+underestimated.  The same pattern (most bromide found in the deeper
+intervals) were found for the three other treatments, not shown here.
+The two next graphs below that divide the content in the same
+intervals into the primary domain (small pores, slow water movement)
+and the secondary domain (large pores, fast water movement).  The
+remaining graphs shows bromide transport through the borders between
+the soil intervals.  As can be seen, the secondary domain dominate at
+0 and 25 cm, while the tertiary domain (biopores) below.  There is no
+significant transport in the primary domain.  However, at the end of
+the period the primary domain dominate storage.
+
+Figure~\ref{fig:bromide} show the usual weather graph at the top.
+Next is a graph showing how the water enter the system.  We see that
+the first rain after application enter the soil through the secondary
+domain.  So does most of the remaining rain, the exception being four
+events with ponding above the thresshold for activating surface
+biopores, as shown on the third graph.  The bottom five graph
+correspond to the bottom five graphs of figure~\ref{fig:bromide-acc},
+except the values are not accumulated.
 
 \section{Drains}
 \label{sec:drains}
@@ -501,20 +544,28 @@ season.
 
 \chapter{Discussion}
 
+\section{Soil water}
+
+The simulation match the TDR measurements very well, indicating that
+our description of the upper boundary (precipitation) and top 60 cm of
+soil is likely to be good.
+
 \section{Drain water flow}
 
 Getting the model to simulate the measured responsiveness to events
 has been a problem from the start, for example~\citet{nanna-agrovand}
-dedicate several sections to the issue.  The situation as improved a
-lot since then, but the figures showing drain flow for individual
-events still show too litte response.  We had more luck with the PLAP
-sites \citep{vap2d}.  A difference between the two is that we used
-measured pressure 5 meter below surface there, where in the present
-simulation we use a mostly static pressure table.  As the dynamics of
-the individual events is likely very important for pestice leaching in
+dedicate a sections to the issue.  The situation as improved a lot
+since then, but the figures showing drain flow for individual events
+still show too litte response.  We had more luck with the PLAP sites
+\citep{vap2d}.  A difference between the two is that we used measured
+pressure 5 meter below surface there, where in the present simulation
+we use a mostly static pressure table.  As the dynamics of the
+individual events is likely very important for pestice leaching in
 drain pipes, we should probably start using the piezometers for
-estimating the lower boundary, if we are going to return to the dataset.
-
+estimating the lower boundary, if we are going to return to the
+dataset.  Part of the problem is also the heterogenity of the lower
+layers of soil, as indicated by the EM38 map.  In any case, the lower
+boundary definitely need more attention.
 
 \section{Secondary domain}
 
@@ -533,7 +584,7 @@ implementation of our model.
 
 \section{Colloid generation}
 
-The most signficant part of the dataset is the colloid leaching for
+The most significant part of the dataset is the colloid leaching for
 different soil treatment regimes.  We have only looked at the
 conventional tillage regime, and used that for calibrating the colloid
 generation model described in \citet{macro-colloid}.  By using data
@@ -541,6 +592,11 @@ from the three other regimes, it should be possible to improve the
 model to takes into account the timing of tillage operations, and help
 predict the possible effect of low tillage regimes on pesticide
 leaching.
+
+\section{Pesticides}
+
+Too much -> May indicate we overstimate fast pathways
+
 
 \addcontentsline{toc}{chapter}{\numberline{}References}
 \bibliography{../../txt/daisy}

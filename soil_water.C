@@ -432,6 +432,19 @@ SoilWater::tick_after (const Geometry& geo,
         }
     }
 
+  if (!std::isnormal (table_high))
+    {
+      // No saturated cell, use lowest unsaturated.
+      daisy_assert (std::isnormal (table_low));
+      table_high = table_low;
+    }
+  else if (!std::isnormal (table_low))
+    {
+      // No unsaturated cell, use highest saturated.
+      daisy_assert (std::isnormal (table_high));
+      table_low = table_high;
+    }
+
   // Initialize
   if (initial)
     {

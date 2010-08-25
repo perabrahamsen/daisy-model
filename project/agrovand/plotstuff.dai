@@ -261,10 +261,8 @@
           ))
 
 (defgnuplot piezo-sim plottime
-  (where "fig/piezo-sim.pdf")
   (title "Simulated groundwater pressure at 230 cm depth.")
   ;; (ymin -200 [cm])
-  (begin 1998 10 14 12) (end 1999 3 21 19)
   (source (arithmetic (file "log/pressure.dlf")
                       (expr (- "70" 230 [cm]))
                       (title "70"))
@@ -285,9 +283,9 @@
   (title "Roundwater pressure at 230 cm depth, 70 cm from drain.")
   ;; (ymin -200 [cm])
   (begin 1998 10 14 12) (end 1999 3 21 19)
-  (source (arithmetic (file "log/pressure.dlf")
-                      (expr (- "70" 230 [cm]))
-                      (title "sim"))
+  (source ;;(arithmetic (file "log/pressure.dlf")
+          ;;            (expr (- "70" 230 [cm]))
+          ;;            (title "sim"))
           (column (file "piezometer.ddf") (missing missing) (with dots)
                   (tag "18")
                   (title "10N"))
@@ -313,9 +311,9 @@
   (title "Roundwater pressure at 230 cm depth, 400 cm from drain.")
   ;; (ymin -200 [cm])
   (begin 1998 10 14 12) (end 1999 3 21 19)
-  (source (arithmetic (file "log/pressure.dlf")
-                      (expr (- "400" 230 [cm]))
-                      (title "sim"))
+  (source ;;(arithmetic (file "log/pressure.dlf")
+          ;;            (expr (- "400" 230 [cm]))
+          ;;            (title "sim"))
           (column (file "piezometer.ddf") (missing missing) (with dots)
                   (tag "17")
                   (title "10N"))
@@ -341,9 +339,9 @@
   (title "Roundwater pressure at 230 cm depth, 800 cm from drain.")
   ;; (ymin -200 [cm])
   (begin 1998 10 14 12) (end 1999 3 21 19)
-  (source (arithmetic (file "log/pressure.dlf")
-                      (expr (- "800" 230 [cm]))
-                      (title "sim"))
+  (source ;;(arithmetic (file "log/pressure.dlf")
+          ;;            (expr (- "800" 230 [cm]))
+          ;;            (title "sim"))
           (column (file "piezometer.ddf") (missing missing) (with dots)
                   (tag "16")
                   (title "10N"))
@@ -484,7 +482,7 @@
   (declare acc-prefix String "Prefix to get accumulated values")
   (acc-prefix "")  ;;for accumulated stuff
   (declare title-prefix String "Prefix to title")
-  (title-prefix "In, ")
+  (title-prefix "0 cm In, ")
   (where "fig/brom-input.pdf")   
   (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  
          "set mxtics 3")   
@@ -508,7 +506,8 @@
          "set mxtics 3"
          "set ytics 10000")
   (acc-prefix "Acc ")
-  (title-prefix "Acc, "))
+  (title-prefix "${top} cm Acc, ")
+  )
 
 (defgnuplot brom-output plotformat
   "Total bromide output in specified interval."
@@ -518,7 +517,7 @@
   (declare acc-prefix String "Prefix to get accumulated values")
   (acc-prefix "")  ;;for accumulated stuff
   (declare title-prefix String "Prefix to title")
-  (title-prefix "Out, ")
+  (title-prefix "${bottom} cm Out, ")
   (where "fig/brom-${top}-${bottom}-output.pdf")   
   ;;(ymin -3000)(ymax 3000)
   ;;(ymin -100)(ymax 100)
@@ -628,7 +627,7 @@
          "set mxtics 3"
          "set ytics 10000")
   (acc-prefix "Acc ")
-  (title-prefix "Acc, "))
+  (title-prefix "${bottom} cm Acc, "))
 
 (defgnuplot bromplotweather plotweather
   (begin 1998 11 20) (end 1999 04 01)
@@ -841,15 +840,17 @@
 
 (defgnuplot brommass draincommon
   "Bromide mass in drain."
-  (ymin 0) (ymax 25)
+  ;; (ymin 0) (ymax 25)
   (source (arithmetic (file "log/Rorrende_AllChem.dlf")
                       (missing "none")
+                      ;; (accumulate true)
                       (expr (+ "Surface-Drain, Br" "Soil-Drain, Br"))
                       (title "Bromide"))
           (combine (source (column (file "bromide.ddf")
                                    (tag "bromide"))
                            (column (file "drain-flow.ddf")
                                    (tag "drain")))
+                   ;; (accumulate true)
                    (expr (convert (dim (* bromide drain) [ug/m^2])
                                   [g/ha]))
                    (style 3)
@@ -1166,40 +1167,40 @@
 (defgnuplot season-00-01-zoom multi 
   "All graphs for the 00-01 drain season, zoomed."
   (graph (plotweather (where "fig/weather-00-01-zoom.pdf")
-                      (begin 2001 01 01) (end 2001 01 10)
+                      (begin 2000 12 11) (end 2000 12 21)
                       (extra &old "set xtics 24 * 60 * 60 nomirror"
                              "set mxtics 4"))
          (drainflow (where "fig/drainflow-00-01-zoom.pdf")
-                    (begin 2001 01 01) (end 2001 01 10)
+                    (begin 2000 12 11) (end 2000 12 21)
                     (extra &old "set xtics 24 * 60 * 60"
                            "set mxtics 4"))
          (drainflowacc (where "fig/drainflowacc-00-01-zoom.pdf")
-                       (begin 2001 01 01) (end 2001 01 10)
+                       (begin 2000 12 11) (end 2000 12 21)
                        (extra &old "set xtics 24 * 60 * 60"
                               "set mxtics 4"))
          (particles (where "fig/particles-00-01-zoom.pdf")
-                    (begin 2001 01 01) (end 2001 01 10)
+                    (begin 2000 12 11) (end 2000 12 21)
                     (extra &old "set xtics 24 * 60 * 60"
                            "set mxtics 4"))
          (particlesacc (legend nw)
                        (where "fig/particlesacc-00-01-zoom.pdf")
-                       (begin 2001 01 01) (end 2001 01 10)
+                       (begin 2000 12 11) (end 2000 12 21)
                        (extra &old "set xtics 24 * 60 * 60"
                               "set mxtics 4"))
          (pendconc (where "fig/pendconc-00-01-zoom.pdf")
-                   (begin 2001 01 01) (end 2001 01 10)
+                   (begin 2000 12 11) (end 2000 12 21)
                    (extra &old "set xtics 24 * 60 * 60"
                           "set mxtics 4"))
          (pendmass (where "fig/pendmass-00-01-zoom.pdf")
-                   (begin 2001 01 01) (end 2001 01 10)
+                   (begin 2000 12 11) (end 2000 12 21)
                    (extra &old "set xtics 24 * 60 * 60"
                           "set mxtics 4"))
          (ioxconc (where "fig/ioxconc-00-01-zoom.pdf")
-                  (begin 2001 01 01) (end 2001 01 10)
+                  (begin 2000 12 11) (end 2000 12 21)
                   (extra &old "set xtics 24 * 60 * 60"
                          "set mxtics 4"))
          (ioxmass (where "fig/ioxmass-00-01-zoom.pdf")
-                  (begin 2001 01 01) (end 2001 01 10)
+                  (begin 2000 12 11) (end 2000 12 21)
                   (extra &old "set xtics 24 * 60 * 60"
                          "set mxtics 4"))
          ))
@@ -1216,9 +1217,27 @@
          ;; season-01-02
          ))
 
+(defgnuplot piezo-all multi
+  (graph ;;(piezo-sim (where "fig/piezo-sim-9899.pdf")
+         ;;           (begin 1998 10 14 12) (end 1999 3 21 19))
+         (piezo-70 (where "fig/piezo-70-9899.pdf")
+                   (begin 1998 10 14 12) (end 1999 3 21 19))
+         (piezo-400 (where "fig/piezo-400-9899.pdf")
+                    (begin 1998 10 14 12) (end 1999 3 21 19))
+         (piezo-800 (where "fig/piezo-800-9899.pdf")
+                    (begin 1998 10 14 12) (end 1999 3 21 19))
+         ;;(piezo-sim (where "fig/piezo-sim-9900.pdf")
+         ;;           (begin 1999 12 10 0) (end 2000 3 28 3))
+         (piezo-70 (where "fig/piezo-70-9900.pdf")
+                   (begin 1999 12 10 0) (end 2000 3 28 3))
+         (piezo-400 (where "fig/piezo-400-9900.pdf")
+                    (begin 1999 12 10 0) (end 2000 3 28 3))
+         (piezo-800 (where "fig/piezo-800-9900.pdf")
+                    (begin 1999 12 10 0) (end 2000 3 28 3))))
+
 (defprogram plotall gnuplot
   (graph drainplots
-         gw piezo-sim piezo-70 piezo-400 piezo-800
+         gw piezo-all
          Rorrende-hydraulics
          "Rorrende Graphs"
          ))
