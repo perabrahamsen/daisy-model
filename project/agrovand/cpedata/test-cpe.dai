@@ -43,7 +43,6 @@
   (file "particles-99-00.ddf"))
 
 (defprogram particles-00-01 particles
-  (handle sum)
   (file "particles-00-01.ddf"))
 
 (defprogram particles-01-02 particles
@@ -102,17 +101,18 @@
   (file "bromacc-99-00.ddf"))
 
 (run batch
-     (run brommass-98-99 brommass-99-00
+     (run 
+;;          brommass-98-99 brommass-99-00
 ;;          (write (what "File: drain-flow.ddf"))
 ;;          flow-98-99
 ;;          flow-99-00
 ;;          flow-00-01
 ;;          flow-01-02
 ;;          (write (what "File: particles.ddf"))
-;;          particles-98-99
-;;          particles-99-00
-;;          particles-00-01
-;;          particles-01-02
+          particles-98-99
+          particles-99-00
+          particles-00-01
+          particles-01-02
 ;;          (write (what "File: bromine.ddf"))
 ;;          bromine-98-99
 ;;          bromine-99-00

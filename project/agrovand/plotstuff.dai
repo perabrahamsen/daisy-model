@@ -930,7 +930,7 @@
 
 (defgnuplot particlesacc draincommon
   "Particles in drain."
-  (ymax 2.5 [kg/ha])
+  (ymax 4.5 [kg/ha])
   (y2max 0.15)
   (extra &old "set y2tics 0.05")
   (legend se)
