@@ -88,8 +88,22 @@
   (begin 2001 10 1 0)
   (file "rain-01-02.ddf"))
 
+(defprogram brommass Agrovand
+  (handle difference)
+  ;; (every_hour true)
+  (value Bromine))
+
+(defprogram brommass-98-99 brommass
+  ;;(begin 1998 10 1 0)
+  (file "bromacc-98-99.ddf"))
+
+(defprogram brommass-99-00 brommass
+  ;; (begin 1999 10 1 0)
+  (file "bromacc-99-00.ddf"))
+
 (run batch
-     (run (write (what "File: drain-flow.ddf"))
+     (run brommass-98-99 brommass-99-00
+;;          (write (what "File: drain-flow.ddf"))
 ;;          flow-98-99
 ;;          flow-99-00
 ;;          flow-00-01
@@ -107,11 +121,11 @@
 ;;          pend-00-01
 ;;          (write (what "File: ioxynil.ddf"))
 ;;          ioxynil-00-01
-          (write (what "File: rain.ddf"))
-          rain-98-99
-          rain-99-00
-          rain-00-01
-          rain-01-02
+;;          (write (what "File: rain.ddf"))
+;;          rain-98-99
+;;          rain-99-00
+;;          rain-00-01
+;;          rain-01-02
      ))
 
 ;; test-cpe.dai ends here

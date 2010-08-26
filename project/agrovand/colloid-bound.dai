@@ -30,9 +30,12 @@
 
 (defreaction colloid-generation colgen_Jarvis99
   "Release of colloids in soil surface from heavy rain."
-  (kd 7.5 [g/J])                       ;Detachment rate coefficient.
-  (kr 0.05 [g/m^2/h])                    ;Replenishment rate coefficient.
-  (zi 0.05 [cm])                         ;Surface layer thickness.
+  ;; (kd 7.5 [g/J])                       ;Detachment rate coefficient.
+  (kd 15 [g/J])                       ;Detachment rate coefficient.
+  ;; (kr 0.05 [g/m^2/h])                    ;Replenishment rate coefficient.
+  (kr 0.1 [g/m^2/h])
+  ;; (zi 0.05 [cm])                         ;Surface layer thickness.
+  (zi 0.1 [cm])
   (colloid colloid))
 
 (defchemistry colloids default

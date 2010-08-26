@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <stack>
 #include <boost/shared_ptr.hpp>
 
 class Treelog;
@@ -63,6 +64,7 @@ public:
   // Variables.
 private:
   symbol expand_string (symbol) const;
+  symbol expand_string (const symbol value_s, std::set<symbol>& outer) const;
   symbol expand_reference (const symbol key) const;
 
   // Error handling.

@@ -33,9 +33,44 @@
 #include "frame_model.h"
 #include <sstream>
 
+class PushStack
+{
+  std::set<symbol>& my_stack;
+  const symbol my_key;
+public:
+  PushStack (std::set<symbol>& s, const symbol key)
+    : my_stack (s),
+      my_key (key)
+  { my_stack.insert (my_key); }
+  ~PushStack ()
+  { my_stack.erase (my_key); }
+};
+  
+
+
 symbol
 Block::expand_string (const symbol value_s) const
 {
+  std::set<symbol> outer;
+  return expand_string (value_s, outer);
+}
+
+symbol
+Block::expand_string (const symbol value_s, std::set<symbol>& outer) const
+{
+  if (outer.find (value_s) != outer.end ())
+    {
+      std::ostringstream tmp;
+      tmp << "Recursive expansion:";
+      for (std::set<symbol>::const_iterator i = outer.begin ();
+           i != outer.end ();
+           i++)
+        tmp << " '" << *i << "'";
+      Assertion::error (tmp.str ());
+      return tmp.str ();
+    }
+
+  PushStack nest (outer, value_s);
   const std::string value = value_s.name ();
   std::ostringstream result;
   enum mode_t { normal, escaped, keyed } mode = normal;
@@ -85,7 +120,7 @@ Block::expand_string (const symbol value_s) const
                   switch (type)
                     {
                     case Attribute::String:
-                      result << frame.name (key); 
+                      result << expand_string (frame.name (key), outer); 
                       break;
                     case Attribute::Integer:
                       result << frame.integer (key); 

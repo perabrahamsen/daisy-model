@@ -346,6 +346,13 @@
                      (negate true)
                      (dimension "${unit}")
                      (spec chemical default J_tertiary))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores classes drain 
+                         solute_infiltration "${chemical}" value)
+                   (spec biopore drain solute_infiltration value)
+                   (tag "Drain 0 cm")
+                   (handle sum)
+                   (dimension "${unit}"))
            (flux_top (path column "${column}" Chemistry "*" 
                            trace "${chemical}" J_primary)
                      (tag "Primary 25 cm")
@@ -590,6 +597,13 @@
                      (negate true) (accumulate true)
                      (dimension "${unit}")
                      (spec chemical default J_tertiary))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores classes drain 
+                         solute_infiltration "${chemical}" value)
+                   (spec biopore drain solute_infiltration value)
+                   (tag "Acc Drain 0 cm")
+                   (handle sum) (accumulate true)
+                   (dimension "${unit}"))
            (flux_top (path column "${column}" Chemistry "*" 
                            trace "${chemical}" J_primary)
                      (tag "Acc Primary 25 cm")

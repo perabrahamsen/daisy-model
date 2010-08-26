@@ -356,7 +356,10 @@ therefore done to the column with an aquitard.
   \caption{Groundwater table.  Simulated low value is calculated from
     pressure in lowest unsaturated numeric cell, typically located
     near drain.  Simulated high value is calculated from pressure in
-    highest saturated cell, typically farthest away from the drain.}
+    highest saturated cell, typically farthest away from the drain.
+    The sudden jumps of the high value represents situations with
+    surface ponding, where the top numeric cell becomes saturated.
+    The pressure table is a calibration parameter.}
   \label{fig:gwt}
 \end{figure}
 
@@ -462,10 +465,14 @@ measurements, and the only model with a pool of readily available
 particles.  We use the values from~\citet{macro-colloid} as a starting
 point, except for the maximum particle storage ($M_{\mbox{max}}$)
 which is estimated based on the clay content as described
-in~\citet{mmax} (method 1).  From calibration, we would that the
-detachment rate coefficient ($k_d$) should be decreased to 7.5 g/J,
-the replenishment rate ($k_r$) to 0.1 g/m$^2$/h, and the depth of the
-soil affected by detachment and dispersion ($z_i$) to 0.5 mm.
+in~\citet{mmax} (method 1).  From calibration, we would initially
+conclude that the detachment rate coefficient ($k_d$) should be
+decreased to 7.5 g/J, the replenishment rate ($k_r$) to 0.1 g/m$^2$/h,
+and the depth of the soil affected by detachment and dispersion
+($z_i$) to 0.5 mm.  These values were used for PLAP simulations.
+Later we found that reverting to the values from~\citet{macro-colloid}
+gave better results, and those values are used for the present
+simulations.
 
 The results are discussed in section~\ref{sec:drains}.
 
@@ -544,13 +551,11 @@ season.
 
 \chapter{Discussion}
 
-\section{Soil water}
+\section{Soil and drain water}
 
 The simulation match the TDR measurements very well, indicating that
 our description of the upper boundary (precipitation) and top 60 cm of
 soil is likely to be good.
-
-\section{Drain water flow}
 
 Getting the model to simulate the measured responsiveness to events
 has been a problem from the start, for example~\citet{nanna-agrovand}
@@ -566,6 +571,39 @@ estimating the lower boundary, if we are going to return to the
 dataset.  Part of the problem is also the heterogenity of the lower
 layers of soil, as indicated by the EM38 map.  In any case, the lower
 boundary definitely need more attention.
+
+The piezometer measurements for plot 4 are shown on
+figure~\ref{fig:piezo-9899} and~\ref{fig:piezo-9900}.  They show large
+variation within the field, but also a temporal variance much larger
+than what we see on figure~\ref{fig:gwt}.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figtop{piezo-70-9899}
+    \figtop{piezo-400-9899}
+    \fig{piezo-800-9899}
+  \end{center}
+  \caption{Pressure at 230 cm below surface, 70 cm (top), 4 m (middle)
+    and 8 m (bottom) from drain.  First drain season.  The labels
+    indicate distance from drain well (in meters) and whether the
+    piezometer is located \textbf{N}orth or \textbf{S}outh of the
+    drain pipe.}
+  \label{fig:piezo-9899}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figtop{piezo-70-9900}
+    \figtop{piezo-400-9900}
+    \fig{piezo-800-9900}
+  \end{center}
+  \caption{Pressure at 230 cm below surface, 70 cm (top), 4 m
+    (middle) and 8 m (bottom) from drain.  Second drain season.  The labels
+    indicate distance from drain well (in meters) and whether the
+    piezometer is located \textbf{N}orth or \textbf{S}outh of the
+    drain pipe.}
+  \label{fig:piezo-9900}
+\end{figure}
 
 \section{Secondary domain}
 
