@@ -258,6 +258,10 @@
                   (tag "GWT")
                   (style 4)
                   (title "Pressure table"))
+          (column (file "piezo-median.ddf")
+                  (tag "Median")
+                  (title "Piezometer")
+                  (with lines))
           ))
 
 (defgnuplot piezo-sim plottime
@@ -277,6 +281,58 @@
                   (title "Lower boundary"))
           ))
 
+(defgnuplot piezo-drain plottime
+  (where "fig/piezo-drain.pdf")
+  (ymax 0 [cm]) (ymin -200 [cm])
+  (source (column (file "piezo-median.ddf")
+                  (tag "D70")
+                  (title "70 cm")
+                  (with lines))
+          (column (file "piezo-median.ddf")
+                  (tag "D400")
+                  (title "4 m")
+                  (with lines))
+          (column (file "piezo-median.ddf")
+                  (tag "D800")
+                  (title "8 m")
+                  (with lines))))
+
+(defgnuplot piezo-well plottime
+  (where "fig/piezo-well.pdf")
+  (ymax 0 [cm]) (ymin -200 [cm])
+  (source (column (file "piezo-median.ddf")
+                  (tag "W10")
+                  (title "10 m")
+                  (with lines))
+          (column (file "piezo-median.ddf")
+                  (tag "W40")
+                  (title "40 m")
+                  (with lines))
+          (column (file "piezo-median.ddf")
+                  (tag "W70")
+                  (title "70 m")
+                  (with lines))
+          (column (file "piezo-median.ddf")
+                  (tag "Median")
+                  (title "10 + 40 m")
+                  (with lines))))
+
+(defgnuplot piezo-plot plottime
+  (where "fig/piezo-plot.pdf")
+  (ymax 0 [cm]) (ymin -200 [cm])
+  (source (column (file "piezo-median.ddf")
+                  (tag "P1")
+                  (with lines))
+          (column (file "piezo-median.ddf")
+                  (tag "P2")
+                  (with lines))
+          (column (file "piezo-median.ddf")
+                  (tag "P3")
+                  (with lines))
+          (column (file "piezo-median.ddf")
+                  (tag "P4")
+                  (with lines))))
+
 (defgnuplot piezo-70 plottime
   (where "fig/piezo-70.pdf")
   (title "Roundwater pressure at 230 cm depth, 70 cm from drain.")
@@ -284,6 +340,10 @@
   (source ;;(arithmetic (file "log/pressure.dlf")
           ;;            (expr (- "70" 230 [cm]))
           ;;            (title "sim"))
+          ;;(column (file "piezo-median.ddf")
+          ;;        (tag "D70")
+          ;;        (with lines)
+          ;;        (title "Median"))
           (column (file "piezometer.ddf") (missing missing) (with dots)
                   (tag "18")
                   (title "10N"))
@@ -311,6 +371,10 @@
   (source ;;(arithmetic (file "log/pressure.dlf")
           ;;            (expr (- "400" 230 [cm]))
           ;;            (title "sim"))
+          ;;(column (file "piezo-median.ddf")
+          ;;        (tag "D400")
+          ;;        (with lines)
+          ;;        (title "Median"))
           (column (file "piezometer.ddf") (missing missing) (with dots)
                   (tag "17")
                   (title "10N"))
@@ -338,6 +402,10 @@
   (source ;;(arithmetic (file "log/pressure.dlf")
           ;;            (expr (- "800" 230 [cm]))
           ;;            (title "sim"))
+          ;;(column (file "piezo-median.ddf")
+          ;;        (tag "D800")
+          ;;        (with lines)
+          ;;        (title "Median"))
           (column (file "piezometer.ddf") (missing missing) (with dots)
                   (tag "16")
                   (title "10N"))
@@ -1238,6 +1306,12 @@
 (defgnuplot piezo-all multi
   (graph ;;(piezo-sim (where "fig/piezo-sim-9899.pdf")
          ;;           (begin 1998 10 14 12) (end 1999 3 21 19))
+         (piezo-drain (where "fig/piezo-drain-9899.pdf")
+                      (begin 1998 10 14 12) (end 1999 3 21 19))
+         (piezo-well (where "fig/piezo-well-9899.pdf")
+                     (begin 1998 10 14 12) (end 1999 3 21 19))
+         (piezo-plot (where "fig/piezo-plot-9899.pdf")
+                     (begin 1998 10 14 12) (end 1999 3 21 19))
          (piezo-70 (where "fig/piezo-70-9899.pdf")
                    (begin 1998 10 14 12) (end 1999 3 21 19))
          (piezo-400 (where "fig/piezo-400-9899.pdf")
@@ -1246,6 +1320,12 @@
                     (begin 1998 10 14 12) (end 1999 3 21 19))
          ;;(piezo-sim (where "fig/piezo-sim-9900.pdf")
          ;;           (begin 1999 12 10 0) (end 2000 3 28 3))
+         (piezo-drain (where "fig/piezo-drain-9900.pdf")
+                      (begin 1999 12 10 0) (end 2000 3 28 3))
+         (piezo-well (where "fig/piezo-well-9900.pdf")
+                     (begin 1999 12 10 0) (end 2000 3 28 3))
+         (piezo-plot (where "fig/piezo-plot-9900.pdf")
+                     (begin 1999 12 10 0) (end 2000 3 28 3))
          (piezo-70 (where "fig/piezo-70-9900.pdf")
                    (begin 1999 12 10 0) (end 2000 3 28 3))
          (piezo-400 (where "fig/piezo-400-9900.pdf")
@@ -1254,8 +1334,8 @@
                     (begin 1999 12 10 0) (end 2000 3 28 3))))
 
 (defprogram plotall gnuplot
-  (graph drainplots
+  (graph ;;drainplots
          gw piezo-all
-         Rorrende-hydraulics
-         "Rorrende Graphs"
+         ;;Rorrende-hydraulics
+         ;;"Rorrende Graphs"
          ))
