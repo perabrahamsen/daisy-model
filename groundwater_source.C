@@ -25,6 +25,7 @@
 #include "groundwater.h"
 #include "source.h"
 #include "time.h"
+#include "units.h"
 #include "assertion.h"
 #include "block_model.h"
 #include "librarian.h"
@@ -54,19 +55,26 @@ public:
 
   // Simulation.
 public:
-  void tick (const Units&, const Geometry&,
+  void tick (const Units& units, const Geometry&,
              const Soil&, SoilWater&, double, const SoilHeat&,
 	     const Time& time, const Scope&, Treelog& msg)
-  { tick (time, msg); }
-  void tick (const Time&, Treelog&);
+  { tick (units, time, msg); }
+  void tick (const Units&, const Time&, Treelog&);
   double table () const;
 
   // Create and Destroy.
 public:
   void initialize (const Units& units,
                    const Geometry&, const Time& time, const Scope&, Treelog&);
-  bool check (const Units&, const Geometry&, const Scope&, Treelog&) const
-  { return is_ok; }
+  bool check (const Units& units, const Geometry&, const Scope&,
+              Treelog& msg) const
+  { 
+    bool ok = is_ok;
+    if (!units.can_convert (source->dimension (), Units::cm (), msg))
+      ok = false;
+
+    return ok; 
+  }
   GroundwaterSource (const BlockModel&);
   ~GroundwaterSource ();
 };
@@ -81,7 +89,7 @@ GroundwaterSource::bottom_type () const
 }
 
 void
-GroundwaterSource::tick (const Time& time, Treelog& msg)
+GroundwaterSource::tick (const Units& units, const Time& time, Treelog& msg)
 {
   TREELOG_MODEL (msg);
 
@@ -102,7 +110,9 @@ GroundwaterSource::tick (const Time& time, Treelog& msg)
       next_time = source->time ()[index];
       
       daisy_assert (index < source->value ().size ());
-      next_depth =  source->value ()[index];
+      next_depth = units.convert (source->dimension (), Units::cm (),
+                                  source->value ()[index]);
+      
       if (next_depth > 0.0)
 	msg.error ("positive depth, assuming free drainage");
 
@@ -128,7 +138,7 @@ GroundwaterSource::table () const
 }
 
 void
-GroundwaterSource::initialize (const Units&,
+GroundwaterSource::initialize (const Units& units,
                                const Geometry&, const Time& time, const Scope&, 
                                Treelog& msg)
 {
@@ -145,8 +155,8 @@ GroundwaterSource::initialize (const Units&,
     }
   Time prev = time;
   prev.tick_hour (-1);
-  tick (prev, msg); 
-  tick (time, msg); 
+  tick (units, prev, msg); 
+  tick (units, time, msg); 
 }
 
 GroundwaterSource::GroundwaterSource (const BlockModel& al)

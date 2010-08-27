@@ -1638,9 +1638,9 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
 groundwater_source${OBJ}: groundwater_source.C groundwater.h model_derived.h \
- model_logable.h model.h symbol.h source.h time.h assertion.h \
- block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
- frame_model.h frame.h librarian.h
+ model_logable.h model.h symbol.h source.h time.h units.h memutils.h \
+ assertion.h block_model.h block_nested.h block.h scope.h attribute.h \
+ treelog.h frame_model.h frame.h librarian.h
 xysource_xycombine${OBJ}: xysource_xycombine.C xysource.h model.h symbol.h \
  block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
  frame_model.h frame.h gnuplot_utils.h number.h scope_xysources.h \
