@@ -688,7 +688,7 @@ SoilWater::infiltration (const Geometry& geo) const
 
   for (size_t e = 0; e < edge_size; e++)
     if (geo.edge_to (e) == Geometry::cell_above)
-      sum -= q_matrix (e) * geo.edge_area (e);
+      sum -= (q_matrix (e) + q_tertiary (e)) * geo.edge_area (e);
   
   const double mm_per_cm = 10.0;
   return mm_per_cm * sum / geo.surface_area ();

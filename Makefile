@@ -401,7 +401,7 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C
-MODELS = xysource_xycombine.C xysource_flux.C \
+MODELS = groundwater_source.C xysource_xycombine.C xysource_flux.C \
 	gnuplot_soil.C reaction_sorption.C hydraulic_B_C_inverse.C \
 	program_osvaldo.C vegetation_permanent.C  litter.C drain_lateral.C \
 	hydraulic_MACRO.C program_cpedata.C \
@@ -1637,6 +1637,10 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+groundwater_source${OBJ}: groundwater_source.C groundwater.h model_derived.h \
+ model_logable.h model.h symbol.h source.h time.h assertion.h \
+ block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
+ frame_model.h frame.h librarian.h
 xysource_xycombine${OBJ}: xysource_xycombine.C xysource.h model.h symbol.h \
  block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
  frame_model.h frame.h gnuplot_utils.h number.h scope_xysources.h \

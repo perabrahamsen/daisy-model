@@ -1,3 +1,14 @@
+2010-08-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* groundwater_source.C: New model.
+
+	* chemical_std.C (update_C): Avoid mixing primary and secondary
+	domain if old values are adequate.
+
+	* soil_water.C (infiltration): Also include tertiary water.
+
+	* block.C, block.h (expand_string): Allow recursive expansion.
+
 2010-08-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* chemistry_std.C (infiltrate): Don't infiltrate chemical with

@@ -286,7 +286,7 @@
   (ymax 0 [cm]) (ymin -200 [cm])
   (source (column (file "piezo-median.ddf")
                   (tag "D70")
-                  (title "70 cm")
+                  (title "Drain distance, 70 cm")
                   (with lines))
           (column (file "piezo-median.ddf")
                   (tag "D400")
@@ -302,7 +302,7 @@
   (ymax 0 [cm]) (ymin -200 [cm])
   (source (column (file "piezo-median.ddf")
                   (tag "W10")
-                  (title "10 m")
+                  (title "Well distance, 10 m")
                   (with lines))
           (column (file "piezo-median.ddf")
                   (tag "W40")
@@ -322,15 +322,19 @@
   (ymax 0 [cm]) (ymin -200 [cm])
   (source (column (file "piezo-median.ddf")
                   (tag "P1")
+                  (title "Plot 1, no tillage")
                   (with lines))
           (column (file "piezo-median.ddf")
                   (tag "P2")
+                  (title "Plot 2")
                   (with lines))
           (column (file "piezo-median.ddf")
                   (tag "P3")
+                  (title "Plot 3")
                   (with lines))
           (column (file "piezo-median.ddf")
                   (tag "P4")
+                  (title "Plot 4, conventional tillage")
                   (with lines))))
 
 (defgnuplot piezo-70 plottime
@@ -461,7 +465,7 @@
                   (tag "AirTemp")
                   (style 3)
                   ;;(with [lines linetype "blue"])
-                  (title "Air temperature")
+                  (title "Air temperature [dg C]")
                   )
           (arithmetic (expr 0 [dgC])
                       (file "log/Rorrende_aq_infiltration.dlf")
@@ -502,33 +506,42 @@
                   (dimension [%])
                   (with points))))  ;points instead of error bars
 
+(defunit [mm*] [mm])
+
 (defgnuplot plotinfiltration plotformat
   (begin 1998 11 20) (end 1999 04 01)
   (where "fig/infiltration.pdf")
                                         ;(ymin -5)(ymax 20)
   (extra &old "set ytics 5"
+         "set y2tics 1"
          "set xtics 24 * 60 * 60 *30 nomirror"
          "set mxtics 3")
   (source (column ;;(file "log/infiltration.dlf") 
            (file "log/Rorrende_aq_infiltration.dlf") 
            (tag "Surface2Primary")
            (style 1)
-           (title "Surf2Primary, mm/d"))
+           (title "Surf2Primary [mm/d]"))
           (column ;;(file "log/infiltration.dlf") 
            (file "log/Rorrende_aq_infiltration.dlf") 
            (tag "Surface2Secondary")
            (style 2)
-           (title "Surf2Secondary, mm/d"))
+           (title "Surf2Secondary"))
           (column ;;(file "log/infiltration.dlf") 
            (file "log/Rorrende_aq_infiltration.dlf")
            (tag "Surface2Bio2Matrix")
            (style 3)
-           (title "Surf2Bio2Mat, mm/d"))
+           (title "Surf2Bio2Mat"))
           (column ;;(file "log/infiltration.dlf") 
            (file "log/Rorrende_aq_infiltration.dlf")
            (tag "Surface2Bio2Drain")
            (style 4)
-           (title "Surf2Bio2Drain, mm/d"))))
+           (title "Surf2Bio2Drain"))
+          (column 
+           (file "log/Rorrende_aq_ponding_depth.dlf") 
+           (tag "Surface Ponding")
+           (style 5)
+           (dimension [mm*])            ;Force secondary axis.
+           (title "Ponding [mm]"))))
 
 (defgnuplot plotpondingdepth plotformat
   (begin 1998 11 20) (end 1999 04 01)
@@ -540,7 +553,7 @@
            (file "log/Rorrende_aq_ponding_depth.dlf") 
            (tag "Surface Ponding")
            (style 1)
-           (title "Surface Ponding, mm"))))
+           (title "Ponding [mm]"))))
 
 (defgnuplot brom-input plotformat
   "Total bromide output in specified interval."
@@ -548,22 +561,26 @@
   (declare acc-prefix String "Prefix to get accumulated values")
   (acc-prefix "")  ;;for accumulated stuff
   (declare title-prefix String "Prefix to title")
-  (title-prefix "0 cm In, ")
+  (title-prefix "0 cm [kg/ha/h] ")
   (where "fig/brom-input.pdf")   
   (extra &old "set xtics 24 * 60 * 60 *30 nomirror" 
-         "set ytics 10000"
+         "set ytics 10"
          "set mxtics 3")  
-  (ymin 0)(ymax 35000) 
+  (ymin 0)(ymax 35) 
   (source (column (file "log/Bromide-25.dlf")
+                  (dimension [kg/ha])
                   (tag "${acc-prefix}Primary 0 cm")
                   (title "${title-prefix}Primary"))
           (column (file "log/Bromide-25.dlf")
+                  (dimension [kg/ha])
                   (tag "${acc-prefix}Secondary 0 cm")
                   (title "Secondary"))
           (column (file "log/Bromide-25.dlf")
+                  (dimension [kg/ha])
                   (tag "${acc-prefix}Tertiary 0 cm")
                   (title "Tertiary"))
           (column (file "log/Bromide-25.dlf")
+                  (dimension [kg/ha])
                   (tag "${acc-prefix}Drain 0 cm")
                   (title "Drain"))
           ))
@@ -572,13 +589,9 @@
   "Accumulated input."
   (where "fig/brom-input-acc.pdf")
   (begin 1998 11 20) (end 1999 04 01)
-  (ymin 0)(ymax 35000)
   (legend se)
-  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
-         "set mxtics 3"
-         "set ytics 10000")
   (acc-prefix "Acc ")
-  (title-prefix "0 cm Acc, ")
+  (title-prefix "0 cm [kg/ha] ")
   )
 
 (defgnuplot brom-output plotformat
@@ -589,7 +602,9 @@
   (declare acc-prefix String "Prefix to get accumulated values")
   (acc-prefix "")  ;;for accumulated stuff
   (declare title-prefix String "Prefix to title")
-  (title-prefix "${bottom} cm Out, ")
+  (title-prefix "${bottom} cm [g/ha/h] ")
+  (declare dim String "Dimension")
+  (dim [g/ha])
   (where "fig/brom-${top}-${bottom}-output.pdf")   
   ;;(ymin -3000)(ymax 3000)
   ;;(ymin -100)(ymax 100)
@@ -598,15 +613,19 @@
          "set mxtics 3"
          "set ytics 50")   
   (source (column (file "log/Bromide-25.dlf")
+                  (dimension [${dim}])
                   (tag "${acc-prefix}Primary ${bottom} cm")
                   (title "${title-prefix}Primary"))
           (column (file "log/Bromide-25.dlf")
+                  (dimension [${dim}])
                   (tag "${acc-prefix}Secondary ${bottom} cm")
                   (title "Secondary"))
           (column (file "log/Bromide-25.dlf")
+                  (dimension [${dim}])
                   (tag "${acc-prefix}Tertiary ${top}-${bottom} cm")
                   (title "Tertiary"))
           (column (file "log/Bromide-25.dlf")
+                  (dimension [${dim}])
                   (tag "${acc-prefix}Drain ${top}-${bottom} cm")
                   (title "Drain"))))
 
@@ -614,38 +633,47 @@
   "Total bromide content in 25 cm intervals."
   (where "fig/brom-total.pdf")
   (begin 1998 11 20) (end 1999 04 01)
-  (ymin 0)(ymax 35000)
+  (ymin 0)(ymax 35)
   (extra &old "set xtics 24 * 60 * 60 *30 nomirror" 
-         "set ytics 10000"
+         "set ytics 10"
          "set mxtics 3")   
   (source (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (+ "Primary 0-25 cm" "Secondary 0-25 cm"))
-                      (title "Total, 0-25 cm"))
+                      (expr (convert (+ "Primary 0-25 cm" "Secondary 0-25 cm")
+                                     [kg/ha]))
+                      (title "Total [kg/ha], 0-25 cm"))
           (column     (file "Bromide-25.ddf")
+                      (dimension [kg/ha])
                       (tag "0-25cm")
                       ;;(style 3)
                       (title "Obs")
                       )                   
           (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (+ "Primary 25-50 cm" "Secondary 25-50 cm"))
+                      (expr (convert (+ "Primary 25-50 cm" "Secondary 25-50 cm")
+                                     [kg/ha]))
                       (title "25-50 cm"))
           (column     (file "Bromide-25.ddf")
+                      (dimension [kg/ha])
                       (tag "25-50cm")
                       ;;(style 3)
                       (title "Obs")
                       )
           (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (+ "Primary 50-75 cm" "Secondary 50-75 cm"))
+                      (expr (convert (+ "Primary 50-75 cm" "Secondary 50-75 cm")
+                                     [kg/ha]))
                       (title "50-75 cm"))
           (column     (file "Bromide-25.ddf")
+                      (dimension [kg/ha])
                       (tag "50-75cm")
                       ;;(style 3)
                       (title "Obs")
                       )
           (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (+ "Primary 75-100 cm" "Secondary 75-100 cm"))
+                      (expr (convert (+ "Primary 75-100 cm"
+                                        "Secondary 75-100 cm")
+                                     [kg/ha]))
                       (title "75-100 cm"))
           (column     (file "Bromide-25.ddf")
+                      (dimension [kg/ha])
                       (tag "75-100cm")
                       ;;(style 3)
                       (title "Obs")
@@ -655,54 +683,55 @@
   "Bromide content in 25 cm intervals in primary domain."
   (where "fig/brom-primary.pdf")
   (begin 1998 11 20) (end 1999 04 01)
-  (ymin 0)(ymax 35000)
+  (ymin 0)(ymax 35)
   (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
-         "set ytics 10000"
+         "set ytics 10"
          "set mxtics 3")   
   (source (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (+ "Primary 0-25 cm"))
-                      (title "Primary, 0-25 cm"))
+                      (expr (convert (+ "Primary 0-25 cm") [kg/ha]))
+                      (title "Primary, 0-25 cm [kg/ha]"))
           (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (+ "Primary 25-50 cm"))
+                      (expr (convert (+ "Primary 25-50 cm") [kg/ha]))
                       (title "25-50 cm"))
           (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (+ "Primary 50-75 cm"))
+                      (expr (convert (+ "Primary 50-75 cm") [kg/ha]))
                       (title "50-75 cm"))
           (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (+ "Primary 75-100 cm"))
+                      (expr (convert (+ "Primary 75-100 cm") [kg/ha]))
                       (title "75-100 cm"))))
 
 (defgnuplot brom-secondary plotformat
   "Bromide content in 25 cm intervals in secondary domain."
   (where "fig/brom-secondary.pdf")
   (begin 1998 11 20) (end 1999 04 01)
-  (ymin 0)(ymax 35000)
+  (ymin 0)(ymax 35)
   (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
-         "set ytics 10000"
+         "set ytics 10"
          "set mxtics 3")   
   (source (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (+ "Secondary 0-25 cm"))
-                      (title "Secondary, 0-25 cm"))
+                      (expr (convert (+ "Secondary 0-25 cm") [kg/ha]))
+                      (title "Secondary, 0-25 cm [kg/ha]"))
           (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (+ "Secondary 25-50 cm"))
+                      (expr (convert (+ "Secondary 25-50 cm") [kg/ha]))
                       (title "25-50 cm"))
           (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (+ "Secondary 50-75 cm"))
+                      (expr (convert (+ "Secondary 50-75 cm") [kg/ha]))
                       (title "50-75 cm"))
           (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (+ "Secondary 75-100 cm"))
+                      (expr (convert (+ "Secondary 75-100 cm") [kg/ha]))
                       (title "75-100 cm"))))
 
 (defgnuplot brom-accumulated brom-output
   "Accumulated output in each interval."
   (where "fig/brom-${top}-${bottom}-acc.pdf")
   (begin 1998 11 20) (end 1999 04 01)
-  (ymin -10000)(ymax 35000)
+  (ymin -10)(ymax 35)
+  (dim [kg/ha])
   (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
          "set mxtics 3"
-         "set ytics 10000")
+         "set ytics 10")
   (acc-prefix "Acc ")
-  (title-prefix "${bottom} cm Acc, "))
+  (title-prefix "${bottom} cm [kg/ha] "))
 
 (defgnuplot bromplotweather plotweather
   (begin 1998 11 20) (end 1999 04 01)
@@ -1335,7 +1364,7 @@
 
 (defprogram plotall gnuplot
   (graph ;;drainplots
-         gw piezo-all
+         ;; gw piezo-all
          ;;Rorrende-hydraulics
-         ;;"Rorrende Graphs"
+         "Rorrende Graphs"
          ))

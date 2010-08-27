@@ -586,6 +586,12 @@ ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
 {
   for (size_t i = 0; i < C_primary_.size (); i++)
     {
+      const double M1 = C_primary_[i] * soil_water.Theta_primary (i);
+      const double M2 = C_secondary_[i] * soil_water.Theta_secondary (i);
+      if (approximate (M1, M_primary_[i], 0.00001)
+          && approximate (M1 + M2, M_total_[i], 0.00001))
+        continue;
+
       C_avg_[i] = adsorption_->M_to_C (soil, soil_water.Theta (i), i,
                                        M_total_[i]);
       C_primary_[i] = C_avg_[i];

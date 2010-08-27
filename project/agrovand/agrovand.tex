@@ -480,12 +480,7 @@ The results are discussed in section~\ref{sec:drains}.
 
 The simulation results are presented together with measured data in
 figures~\ref{fig:first} to~\ref{fig:last}, found at the end of the
-report.  The figures have a high information density, and have
-therefore been allowed to fill most of the page.  Each figure contains
-multiple graphs, all of which share the same x-axis.  This structure
-is intended to facilitate comparison.  The same figures were used for
-calibration.  All figures have precipitation and air temperature for
-the period in the top graph.
+report (appendix~\ref{app:time-series}).  
 
 \section{Soil water}
 
@@ -577,64 +572,6 @@ figure~\ref{fig:piezo-9899} and~\ref{fig:piezo-9900}.  They show large
 variation within the field, but also a temporal variance much larger
 than what we see on figure~\ref{fig:gwt}.
 
-\begin{figure}[htbp]
-  \begin{center}
-    \figtop{piezo-70-9899}
-    \figtop{piezo-400-9899}
-    \fig{piezo-800-9899}
-  \end{center}
-  \caption{Pressure at 230 cm below surface, 70 cm (top), 4 m (middle)
-    and 8 m (bottom) from drain.  First drain season.  The labels
-    indicate distance from drain well (in meters) and whether the
-    piezometer is located \textbf{N}orth or \textbf{S}outh of the
-    drain pipe.}
-  \label{fig:piezo-9899}
-\end{figure}
-
-\begin{figure}[htbp]
-  \begin{center}
-    \figtop{piezo-70-9900}
-    \figtop{piezo-400-9900}
-    \fig{piezo-800-9900}
-  \end{center}
-  \caption{Pressure at 230 cm below surface, 70 cm (top), 4 m
-    (middle) and 8 m (bottom) from drain.  Second drain season.  The labels
-    indicate distance from drain well (in meters) and whether the
-    piezometer is located \textbf{N}orth or \textbf{S}outh of the
-    drain pipe.}
-  \label{fig:piezo-9900}
-\end{figure}
-
-\begin{figure}[htbp]
-  \begin{center}
-    \fig{piezo-drain-9899}
-    \fig{piezo-drain-9900}
-  \end{center}
-  \caption{Median measured pressure level at 230 cm below surface for
-    different distances from drain pipes.}
-  \label{fig:piezo-drain}
-\end{figure}
-
-\begin{figure}[htbp]
-  \begin{center}
-    \fig{piezo-well-9899}
-    \fig{piezo-well-9900}
-  \end{center}
-  \caption{Median measured pressure level at 230 cm below surface for
-    different distances from drain wells.}
-  \label{fig:piezo-well}
-\end{figure}
-
-\begin{figure}[htbp]
-  \begin{center}
-    \fig{piezo-plot-9899}
-    \fig{piezo-plot-9900}
-  \end{center}
-  \caption{Median measured pressure level at 230 cm below surface for
-    different plots.}
-  \label{fig:piezo-plot}
-\end{figure}
-
 \section{Secondary domain}
 
 We do not believe in the calibration of the secondary domain in
@@ -671,7 +608,83 @@ Too much -> May indicate we overstimate fast pathways
 
 \appendix{}
 
-%% Drain figures
+\chapter{Piezemeters}
+\label{app:piezometers}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figtop{piezo-70-9899}
+    \figtop{piezo-400-9899}
+    \fig{piezo-800-9899}
+  \end{center}
+  \caption{Pressure at 230 cm below surface, 70 cm (top), 4 m (middle)
+    and 8 m (bottom) from drain.  First drain season, plot 4.  The
+    labels indicate distance from drain well (in meters) and whether
+    the piezometer is located \textbf{N}orth or \textbf{S}outh of the
+    drain pipe.}
+  \label{fig:piezo-9899}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figtop{piezo-70-9900}
+    \figtop{piezo-400-9900}
+    \fig{piezo-800-9900}
+  \end{center}
+  \caption{Pressure at 230 cm below surface, 70 cm (top), 4 m
+    (middle) and 8 m (bottom) from drain.  Second drain season, plot 4.  The labels
+    indicate distance from drain well (in meters) and whether the
+    piezometer is located \textbf{N}orth or \textbf{S}outh of the
+    drain pipe.}
+  \label{fig:piezo-9900}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figtop{piezo-drain-9899}
+    \figtop{piezo-well-9899}
+    \fig{piezo-plot-9899}
+  \end{center}
+  \caption{Median measured pressure level at 230 cm below surface for
+    first drain season.  Top graph show distance from drain, middle
+    graph distance from well, and bottom graph plot number.}
+  \label{fig:piezo-median-9899}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \figtop{piezo-drain-9900}
+    \figtop{piezo-well-9900}
+    \fig{piezo-plot-9900}
+  \end{center}
+  \caption{Median measured pressure level at 230 cm below surface for
+    first drain season.  Top graph show distance from drain, middle
+    graph distance from well, and bottom graph plot number.}
+  \label{fig:piezo-median-9900}
+\end{figure}
+
+\chapter{Time series}
+\label{app:time-series}
+
+The figures have a high information density, and have therefore been
+allowed to fill most of the page.  Each figure contains multiple
+graphs, all of which share the same x-axis.  This structure is
+intended to facilitate comparison.  The same figures were used for
+calibration.  All figures except~\ref{fig:bromide-acc} have
+precipitation (left axis) and air temperature (right axis) for the
+period in the top graph.
+
+\section{Soil water content}
+\label{sec:soil-water}
+
+The graphs on figure~\ref{fig:tdr} and~\ref{fig:tdr-zoom} shows
+simulated and measured volumetric water content at different depths.
+
+\section{Soil bromide content}
+\label{sec:soil-bromide}
+
+Figure~\ref{fig:bromide} and~\ref{fig:bromide-acc} concern soil
+bromide content
 
 \newgeometry{left=1cm,top=1cm,right=1cm,bottom=1cm,nohead,nofoot}
 \pagestyle{empty}
