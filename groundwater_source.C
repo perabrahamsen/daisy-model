@@ -25,11 +25,13 @@
 #include "groundwater.h"
 #include "source.h"
 #include "time.h"
+#include "timestep.h"
 #include "units.h"
 #include "assertion.h"
 #include "block_model.h"
 #include "librarian.h"
 #include "frame.h"
+#include "mathlib.h"
 #include <boost/scoped_ptr.hpp>
 #include <sstream>
 
@@ -81,12 +83,7 @@ public:
 
 Groundwater::bottom_t
 GroundwaterSource::bottom_type () const
-{
-  if (depth > 0)	     // Positive numbers indicate flux bottom.
-    return free_drainage;
-  else
-    return pressure;
-}
+{ return pressure; }
 
 void
 GroundwaterSource::tick (const Units& units, const Time& time, Treelog& msg)
@@ -113,9 +110,6 @@ GroundwaterSource::tick (const Units& units, const Time& time, Treelog& msg)
       next_depth = units.convert (source->dimension (), Units::cm (),
                                   source->value ()[index]);
       
-      if (next_depth > 0.0)
-	msg.error ("positive depth, assuming free drainage");
-
       index++;
     }
 
@@ -124,9 +118,17 @@ GroundwaterSource::tick (const Units& units, const Time& time, Treelog& msg)
   daisy_assert (time < next_time  || time == next_time);
 
   // Interpolate depth values.
-  const double total_interval = Time::days_between (previous_time, next_time);
-  const double covered_interval = Time::days_between (previous_time, time);
+  const double total_interval = (next_time - previous_time).total_hours ();
+  if (total_interval < 1e-6)
+    {
+      msg.error ("Bad time interval: " + previous_time.print ()
+                 + " to " + next_time.print ());
+      return;                   // Reuse last depth.
+    }
+  const double covered_interval = (time - previous_time).total_hours ();
   const double covered_fraction = covered_interval / total_interval;
+  daisy_assert (std::isfinite (previous_depth));
+  daisy_assert (std::isfinite (next_depth));
   const double total_change = next_depth - previous_depth;
   depth = previous_depth + covered_fraction * total_change;
 }
@@ -134,6 +136,7 @@ GroundwaterSource::tick (const Units& units, const Time& time, Treelog& msg)
 double
 GroundwaterSource::table () const
 {
+  daisy_assert (std::isfinite (depth));
   return depth + offset;
 }
 
@@ -167,9 +170,9 @@ GroundwaterSource::GroundwaterSource (const BlockModel& al)
     offset (al.number ("offset")),
     previous_time (42, 1, 1, 0),
     next_time (42, 1, 1, 0),
-    previous_depth (-42.42e42),
-    next_depth (-42.42e42),
-    depth (-42.42e42)
+    previous_depth (NAN),
+    next_depth (NAN),
+    depth (NAN)
 { }
 
 GroundwaterSource::~GroundwaterSource ()
@@ -185,8 +188,8 @@ Read groundwater table from a source.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare_object ("source", Source::component, Attribute::State, 
-                          Attribute::Variable, "\
+    frame.declare_object ("source", Source::component, Attribute::Const, 
+                          Attribute::Singleton, "\
 Groundwater table time series.");
     frame.order ("source");
     frame.declare ("offset", "cm", Attribute::Const,

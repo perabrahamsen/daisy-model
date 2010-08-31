@@ -26,6 +26,7 @@
 #include "lexer_data.h"
 #include "assertion.h"
 #include "time.h"
+#include "timestep.h"
 #include "librarian.h"
 #include "path.h"
 #include "frame.h"
@@ -135,8 +136,14 @@ GroundwaterFile::tick (const Time& time, Treelog&)
   daisy_assert (time < next_time  || time == next_time);
 
   // Interpolate depth values.
-  const double total_interval = Time::days_between (previous_time, next_time);
-  const double covered_interval = Time::days_between (previous_time, time);
+  const double total_interval = (next_time - previous_time).total_hours ();
+  if (total_interval < 1e-6)
+    {
+      lex->error ("Bad time interval: " + previous_time.print ()
+                  + " to " + next_time.print ());
+      return;                   // Reuse last depth.
+    }
+  const double covered_interval = (time - previous_time).total_hours ();
   const double covered_fraction = covered_interval / total_interval;
   const double total_change = next_depth - previous_depth;
   depth = previous_depth + covered_fraction * total_change;

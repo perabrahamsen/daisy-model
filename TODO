@@ -4,27 +4,33 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** Emacs
 
+Ice
+
 ** NW
 
-Fin diskretisering
+
 
 ** NE
 
-overflade, samme 2 domæne
+
 
 ** SW
 
-overflade, vap 2 domæne
+
 
 ** SE
 
-overflade, intet 2 domæne
+
+
+** C
+
+piezometer bottom
 
 * Agrovand
 
-** Fjern piezometer igen (2 m)
+** 2D Plot
 
-** Beslut dig for param.
+Vand, bromid, pest, kun for drænsæson
 
 ** Skriv
 

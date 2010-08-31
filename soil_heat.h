@@ -50,7 +50,6 @@ private:
 
   // State
 private:
-  std::vector<double> T_old;
   double T_top_;
   std::vector<double> T_freezing;
   std::vector<double> T_thawing;
@@ -118,11 +117,13 @@ private:
                                const SoilWater& soil_water);
   bool update_state (const Geometry& geo,
                      const Soil& soil, const SoilWater& soil_water, 
-                     std::vector<double>& T, double dt);
+                     const std::vector<double>& T_old, std::vector<double>& T, 
+                     double dt);
   double calculate_freezing_rate (const Geometry& geo,
                                   const Soil& soil,
                                   const SoilWater& soil_water,
                                   unsigned int i, 
+                                  const std::vector<double>& T_old,
                                   const std::vector<double>& T,
                                   double dt);
   bool check_state (const Soil& soil, 

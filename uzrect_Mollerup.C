@@ -684,6 +684,13 @@ UZRectMollerup::Dirichlet (const size_t edge, const size_t cell,
                            ublas::vector<double>& Dm_vec, 
                            ublas::vector<double>& Gm)
 {
+  daisy_assert (std::isnormal (area));
+  daisy_assert (std::isfinite (K_area_per_length));
+  daisy_assert (std::isfinite (h_old));
+  daisy_assert (std::isfinite (pressure));
+  daisy_assert (std::isfinite (K_cell));
+  daisy_assert (std::isfinite (in_sign));
+
   daisy_approximate (sin_angle, 1.0);
 
   Dm_mat (cell, cell) += K_area_per_length;
