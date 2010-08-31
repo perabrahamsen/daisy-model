@@ -677,7 +677,18 @@
                       (tag "75-100cm")
                       ;;(style 3)
                       (title "Obs")
-                      )))
+                      ) 
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 100-125 cm"
+                                        "Secondary 100-125 cm")
+                                     [kg/ha]))
+                      (title "100-125 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 125-150 cm"
+                                        "Secondary 125-150 cm")
+                                     [kg/ha]))
+                      (title "125-150 cm"))
+         ))
 
 (defgnuplot brom-primary plotformat
   "Bromide content in 25 cm intervals in primary domain."
@@ -698,7 +709,14 @@
                       (title "50-75 cm"))
           (arithmetic (file "log/Bromide-25.dlf")
                       (expr (convert (+ "Primary 75-100 cm") [kg/ha]))
-                      (title "75-100 cm"))))
+                      (title "75-100 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 100-125 cm") [kg/ha]))
+                      (title "100-125 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 125-150 cm") [kg/ha]))
+                      (title "125-150 cm"))
+          ))
 
 (defgnuplot brom-secondary plotformat
   "Bromide content in 25 cm intervals in secondary domain."
@@ -719,7 +737,13 @@
                       (title "50-75 cm"))
           (arithmetic (file "log/Bromide-25.dlf")
                       (expr (convert (+ "Secondary 75-100 cm") [kg/ha]))
-                      (title "75-100 cm"))))
+                      (title "75-100 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Secondary 100-125 cm") [kg/ha]))
+                      (title "100-125 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Secondary 125-150 cm") [kg/ha]))
+                      (title "125-150 cm"))))
 
 (defgnuplot brom-accumulated brom-output
   "Accumulated output in each interval."
@@ -802,6 +826,8 @@
                       (extra &old "set xtics 24 * 60 * 60 *30 rotate"   
                              "set mxtics 3"
                              "set format x \"%y-%m-%d\""))            
+         (brom-output (top "100") (bottom "125"))
+         (brom-output (top "125") (bottom "150"))
          (brom-total) 
          (brom-primary) 
          (brom-secondary) 
@@ -814,6 +840,8 @@
                            (extra &old "set xtics 24 * 60 * 60 *30 rotate"   
                                   "set mxtics 3"
                                   "set format x \"%y-%m-%d\""))       
+         (brom-accumulated (top "100") (bottom "125"))
+         (brom-accumulated (top "125") (bottom "150"))
          (bromplotweather)
          (shortplotweather)      
          (shortplotZcm (z "4"))
@@ -846,6 +874,8 @@
 (defgnuplot drainflow draincommon
   "drain flow."
   (ymax 0.25)
+  (y2max 0 [cm])
+  (y2min -200 [cm])
   (source (arithmetic (file "log/Rorrende_AllChem.dlf")
                       (expr (/ (+ "Surface drain flow" "Soil drain flow")
                                1.0 [h]))
@@ -853,7 +883,16 @@
           (column (file "drain-flow.ddf")
                   (tag "drain")
                   (style 3)
-                  (title "Obs [mm/h]"))))
+                  (title "Obs [mm/h]"))
+          (column (file "piezo-median.ddf")
+                  (tag "Aquitard")
+                  (with lines)
+                  (title "Piezometer [cm]")
+                  (style 4))
+          (column (file "log/Rorrende_aq_gwt.dlf")
+                  (tag "GWT")
+                  (title "Calibrated")
+                  (style 5))))
 
 (defgnuplot drainflow-98-99 drainflow
   "Drain flow winter 98-99"
@@ -1363,8 +1402,8 @@
                     (begin 1999 12 10 0) (end 2000 3 28 3))))
 
 (defprogram plotall gnuplot
-  (graph ;;drainplots
-         ;; gw piezo-all
-         ;;Rorrende-hydraulics
+  (graph drainplots
+         gw piezo-all
+         Rorrende-hydraulics
          "Rorrende Graphs"
          ))

@@ -5,7 +5,7 @@
 (input file "plotstuff.dai")
 
 (run batch (run 
-            ;;Rorrende 
+            Rorrende 
             plotall 
             ))
 
