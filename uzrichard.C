@@ -129,6 +129,8 @@ UZRichard::richard (Treelog& msg,
   const unsigned int size = last - first + 1;
   const Surface::top_t top_type = top.top_type (geo, top_edge);
   const double h_top = top.h_top (geo, top_edge);
+  daisy_assert (h_top < 1000.0);
+  daisy_assert (h_top > -1000.0);
   const double q_top = top.q_top (geo, top_edge, dt);
   daisy_approximate (h_top, -q_top * dt);
   const Groundwater::bottom_t bottom_type = bottom.bottom_type ();
@@ -583,8 +585,17 @@ UZRichard::richard (Treelog& msg,
   copy (Theta.begin (), Theta.end (), &Theta_new[first]);
 
   // Check upper boundary.
-  daisy_assert (top_type == Surface::soil
-                || balance (h_top, available_water, top_water));
+  daisy_assert (h_top < 1000.0);
+  daisy_assert (h_top > -1000.0);
+
+  if (!(top_type == Surface::soil
+        || balance (h_top, available_water, top_water)))
+    {
+      std::ostringstream tmp;
+      tmp << "h_top = " << h_top << ", available_water = " << available_water
+          << ", top_water = " << top_water;
+      msg.error (tmp.str ());
+    }
 
   // We know flux on upper border, use mass preservation to
   // calculate flux below given the change in water content.

@@ -305,7 +305,7 @@ SoilWater::tick_before (const Geometry& geo, const Soil& soil,
 
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
 
-#if 1
+#if 0
       // Move extra ice to buffer.
       const double available_space
         = Theta_sat - Theta_[i] - X_ice_[i] + S_sum_[i] * dt;

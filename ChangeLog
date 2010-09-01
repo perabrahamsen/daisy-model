@@ -1,3 +1,7 @@
+2010-08-31  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* soil_heat.C, soil_heat.h, soil_water.C: Make ice run.
+
 2010-08-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* groundwater_source.C: New model.

@@ -589,7 +589,7 @@ ColumnStandard::tick_source (const Time& time,
 
   // Find forward sink.
   drain->tick (geometry, *soil, *soil_heat, surface, *soil_water, msg);
-  movement->tick_source (*soil, *soil_heat, *soil_water, msg);
+  movement->tick_source (time, my_weather, *soil, *soil_heat, *soil_water, msg);
 
   // Find water based limit.
   soil_water->tick_source (geometry, *soil, msg);
@@ -703,11 +703,20 @@ ColumnStandard::tick_move (const Metalib& metalib, const Time& time,
   groundwater->tick (units, geometry, *soil, *soil_water, 
                      surface.ponding_average () * 0.1, 
                      *soil_heat, time, scope, msg);
+#define USE_ICE
+#ifdef USE_ICE
+  soil_heat->tick (geometry, *soil, *soil_water, *movement, 
+                   surface, dt, msg);
+  movement->tick (*soil, *soil_water, *soil_heat,
+                  surface, *groundwater, time, my_weather, 
+                  dt, msg);
+#else 
   movement->tick (*soil, *soil_water, *soil_heat,
                   surface, *groundwater, time, my_weather, 
                   dt, msg);
   soil_heat->tick (geometry, *soil, *soil_water, *movement, 
                    surface, dt, msg);
+#endif
   soil_water->tick_after (geometry, *soil, *soil_heat, false, msg);
   soil_water->mass_balance (geometry, dt, msg);
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);

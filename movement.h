@@ -81,7 +81,9 @@ public:
   // Simulation.
 public:
   virtual void clear ();
-  virtual void tick_source (const Soil&, const SoilHeat&, SoilWater&, Treelog&);
+  void tick_source (const Time&, const Weather&, 
+                    const Soil&, const SoilHeat&, SoilWater&, 
+                    Treelog&);
   virtual void tick (const Soil&, SoilWater&, const SoilHeat&, Surface&,
                      Groundwater&, const Time&, const Weather&, 
                      double dt, Treelog&) = 0;
@@ -94,7 +96,6 @@ public:
   virtual void heat (const std::vector<double>& q_water,
 		     const std::vector<double>& S_water,
 		     const std::vector<double>& S_heat,
-		     const std::vector<double>& capacity_old,
 		     const std::vector<double>& capacity_new,
 		     const std::vector<double>& conductivity,
 		     double T_top,
@@ -114,7 +115,11 @@ public:
                                  double dZs) const = 0;
   virtual std::vector<double> default_heat (const Soil&, 
                                             const Time&, const Weather&) = 0;
-  virtual double bottom_T () const = 0;
+private:
+  double T_bottom;              // [dg C]
+  virtual double bottom_heat (const Time&, const Weather&) const = 0;
+public:
+  double bottom_T () const;
 
   // Create and Destroy.
 private:

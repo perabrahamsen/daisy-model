@@ -69,7 +69,6 @@ struct Movement1D : public MovementSolute
 
   // Heat.
   /* const */ double delay;     // Period delay [ cm/rad ??? ]
-  double T_bottom;              // [dg C]
   double surface_snow_T (const Soil& soil,
                          const SoilWater& soil_water,
                          const SoilHeat& soil_heat,
@@ -77,14 +76,12 @@ struct Movement1D : public MovementSolute
                          const double K_snow,
                          const double dZs) const;
   double bottom_heat (const Time& time, const Weather& weather) const ;
-  double bottom_T () const;
   std::vector<double> default_heat (const Soil& soil, 
                                     const Time& time, const Weather& weather);
   static void solve_heat (const Geometry1D& geo,
                           const std::vector<double>& q_water,
                           const std::vector<double>& S_water,
                           const std::vector<double>& S_heat,
-                          const std::vector<double>& capacity_old,
                           const std::vector<double>& capacity_new,
                           const std::vector<double>& conductivity,
                           const double T_top,
@@ -95,8 +92,7 @@ struct Movement1D : public MovementSolute
   void heat (const std::vector<double>& q_water,
              const std::vector<double>& S_water,
              const std::vector<double>& S_heat,
-             const std::vector<double>& capacity_old,
-             const std::vector<double>& capacity_new,
+               const std::vector<double>& capacity_new,
              const std::vector<double>& conductivity,
              double T_top,
              double T_top_new,
@@ -237,18 +233,19 @@ Movement1D::surface_snow_T (const Soil& soil,
     * 1e-7 * 100.0 / 3600.0; // [erg/cm/h/dg C] -> [W/m/dg C]
   const double Z = -geo->cell_z (0) / 100.0; // [cm] -> [m]
   const double T_soil = soil_heat.T (0); // [dg C]
+  daisy_assert (T_soil > -100.0);
+  daisy_assert (T_soil < 50.0);
 
-  return (K_soil / Z * T_soil + K_snow / dZs * T_snow) 
+  const double T = (K_soil / Z * T_soil + K_snow / dZs * T_snow) 
     / (K_soil / Z + K_snow / dZs);
+  daisy_assert (T > -100.0);
+  daisy_assert (T < 50.0);
+  return T;
 }
 
 double 
 Movement1D::bottom_heat (const Time& time, const Weather& weather) const 
 { return weather.T_normal (time, delay); }
-
-double
-Movement1D::bottom_T () const
-{ return T_bottom; }
 
 std::vector<double> 
 Movement1D::default_heat (const Soil& soil, 
@@ -284,7 +281,6 @@ Movement1D::solve_heat (const Geometry1D& geo,
                         const std::vector<double>& q_water,
                         const std::vector<double>& /* S_water */,
                         const std::vector<double>& S, // Heat.
-                        const std::vector<double>& /* capacity_old */,
                         const std::vector<double>& capacity, // New.
                         const std::vector<double>& conductivity,
                         const double T_top,
@@ -371,7 +367,6 @@ void
 Movement1D::heat (const std::vector<double>& q_water,
                   const std::vector<double>& S_water,
                   const std::vector<double>& S_heat,
-                  const std::vector<double>& capacity_old,
                   const std::vector<double>& capacity_new,
                   const std::vector<double>& conductivity,
                   const double T_top,
@@ -380,8 +375,8 @@ Movement1D::heat (const std::vector<double>& q_water,
                   const double dt, Treelog&) const
 {
   solve_heat (*geo, q_water, S_water, S_heat, 
-              capacity_old, capacity_new, conductivity,
-              T_top, T_top_new, T_bottom, T, dt);
+              capacity_new, conductivity,
+              T_top, T_top_new, bottom_T (), T, dt);
 }
 
 void 
@@ -402,7 +397,6 @@ Movement1D::tick (const Soil& soil, SoilWater& soil_water,
 
   Treelog::Open nest (msg, "Movement: " + name.name ());
 
-  T_bottom = bottom_heat (time, weather);
   soil_water.tick_before (*geo, soil, dt, msg);
 
   // Cells.
@@ -460,8 +454,7 @@ Movement1D::initialize_derived (const Soil& soil,
 Movement1D::Movement1D (const BlockModel& al)
   : MovementSolute (al),
     geo (submodel<Geometry1D> (al, "Geometry")),
-    matrix_water (Librarian::build_vector<UZmodel> (al, "matrix_water")),
-    T_bottom (-42.42e42)
+    matrix_water (Librarian::build_vector<UZmodel> (al, "matrix_water"))
 { }
 
 Movement1D::~Movement1D ()

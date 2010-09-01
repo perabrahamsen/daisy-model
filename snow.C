@@ -303,7 +303,8 @@ Snow::Implementation::tick (Treelog& msg,
                                    T, K_snow, dZs);
 
       T = std::min (T_surface, 0.0);
-      daisy_assert (T > -100.0 && T < 50.0);
+      daisy_assert (T > -100.0);
+      daisy_assert (T < 50.0);
     } 
   temperature = T;
 

@@ -247,8 +247,11 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
       const double Theta = soil_water.Theta (c);
       const double X_ice = soil_water.X_ice (c);
       conductivity[c] = soil.heat_conductivity (c, Theta, X_ice);
+#if 0
       S_water[c] = soil_water.S_sum (c); // Bug? S_sum includes freeze/thaw.
-
+#else
+      S_water[c] = 0.0;
+#endif
       // Changes with ice state.
       T[c] = this->T (c);
       capacity_apparent[c] = this->capacity_apparent (soil, soil_water, c);
@@ -258,7 +261,7 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
   // Solve with old state.
   const std::vector<double> T_old = T;
   movement.heat (q_water, S_water, S_heat, 
-		 capacity_old, capacity_apparent, conductivity,
+		 capacity_apparent, conductivity,
 		 T_top_old, T_top_new, T, dt, msg);
 
   // Update ice state according to new temperatures.
@@ -278,7 +281,7 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
 	    }
 	  T = T_old;
 	  movement.heat (q_water, S_water, S_heat,
-			 capacity_old, capacity_apparent, conductivity,
+			 capacity_apparent, conductivity,
 			 T_top_old, T_top_new, T, dt, msg);
 
 	  // Check if state match new temperatures.
@@ -757,8 +760,13 @@ SoilHeat::initialize (const FrameSubmodel& al, const Geometry& geo,
   q.insert (q.end (), edge_size, 0.0);
 
   for (unsigned int i = 0; i < cell_size; i++)
-    if (T_.size () <= i)
-      T_.push_back (default_T[i]);
+    {
+      if (T_.size () <= i)
+        T_.push_back (default_T[i]);
+
+      daisy_assert (T_[i] > -100.0);
+      daisy_assert (T_[i] < 50.0);
+    }
 
   // May be larger if user initialized it wrongly.  Checked in "check".
   daisy_assert (T_.size () >= cell_size);

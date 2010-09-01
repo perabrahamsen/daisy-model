@@ -31,7 +31,6 @@ struct HeatrectLinear : public Heatrect
               const std::vector<double>& q_water,
               const std::vector<double>& S_water,
               const std::vector<double>& S_heat,
-              const std::vector<double>& capacity_old,
               const std::vector<double>& capacity_new,
               const std::vector<double>& conductivity,
               const double T_top,
@@ -49,17 +48,16 @@ struct HeatrectLinear : public Heatrect
 
 void
 HeatrectLinear::solve (const GeometryRect& geo,
-                       const std::vector<double>& q_water,
-                       const std::vector<double>& S_water,
-                       const std::vector<double>& S_heat,
-                       const std::vector<double>& capacity_old,
-                       const std::vector<double>& capacity_new,
-                       const std::vector<double>& conductivity,
-                       const double T_top_old,                   
+                       const std::vector<double>& /* q_water */,
+                       const std::vector<double>& /* S_water */,
+                       const std::vector<double>& /* S_heat */,
+                       const std::vector<double>& /* capacity_new */,
+                       const std::vector<double>& /* conductivity */,
+                       const double T_top_old,
                        const double T_top_new,
                        const double T_bottom,
                        std::vector<double>& T,
-                       const double dt, Treelog& msg) const
+                       const double /* dt*/ , Treelog&) const
 {
   const size_t cell_size = geo.cell_size ();
   const double T_top = (T_top_new + T_top_old) / 2.0;

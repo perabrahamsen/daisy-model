@@ -69,9 +69,7 @@ struct MovementRect : public MovementSolute
   std::auto_ptr<Heatrect> heatrect;
 
   /* const */ double delay;	// Period delay [ cm/rad ??? ]
-  double T_bottom;		// [dg C]
   double bottom_heat (const Time&, const Weather&) const ;
-  double bottom_T () const;
   std::vector<double> default_heat (const Soil&, 
                                     const Time&, const Weather&);
   double surface_snow_T (const Soil&, const SoilWater&, const SoilHeat&,
@@ -80,7 +78,6 @@ struct MovementRect : public MovementSolute
   void heat (const std::vector<double>& q_water,
 	     const std::vector<double>& S_water,
 	     const std::vector<double>& S_heat,
-	     const std::vector<double>& capacity_old,
 	     const std::vector<double>& capacity_new,
 	     const std::vector<double>& conductivity,
 	     double T_top,
@@ -158,10 +155,6 @@ double
 MovementRect::bottom_heat (const Time& time, const Weather& weather) const 
 { return weather.T_normal (time, delay); }
 
-double
-MovementRect::bottom_T () const
-{ return T_bottom; }
-
 std::vector<double> 
 MovementRect::default_heat (const Soil& soil, 
                             const Time& time, const Weather& weather)
@@ -228,7 +221,6 @@ void
 MovementRect::heat (const std::vector<double>& q_water,
 		    const std::vector<double>& S_water,
 		    const std::vector<double>& S_heat,
-		    const std::vector<double>& capacity_old,
 		    const std::vector<double>& capacity_new,
 		    const std::vector<double>& conductivity,
 		    const double T_top,
@@ -237,8 +229,8 @@ MovementRect::heat (const std::vector<double>& q_water,
 		    const double dt, Treelog& msg) const
 {
   heatrect->solve (*geo, q_water, S_water, S_heat,
-		    capacity_old, capacity_new, conductivity, 
-		    T_top, T_top_new, T_bottom, T, dt, msg);
+                   capacity_new, conductivity, 
+                   T_top, T_top_new, bottom_T (), T, dt, msg);
 }
 
 void
@@ -249,8 +241,6 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
                     const Weather& weather, 
                     const double dt, Treelog& msg) 
 {
-  T_bottom = bottom_heat (time, weather);
-
   const size_t edge_size = geo->edge_size ();
 
   soil_water.tick_before (*geo, soil, dt, msg); 
@@ -319,8 +309,7 @@ MovementRect::MovementRect (const BlockModel& al)
     drain_position (map_construct_const<Point> 
                     (al.submodel_sequence ("drainpoints"))),
     matrix_water (Librarian::build_vector<UZRect> (al, "matrix_water")),
-    heatrect (Librarian::build_item<Heatrect> (al, "heat")),
-    T_bottom (-42.42e42)
+    heatrect (Librarian::build_item<Heatrect> (al, "heat"))
 { 
   for (size_t i = 0; i < drain_position.size (); i++)
     {

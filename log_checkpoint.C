@@ -143,10 +143,11 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
 
       // Create file name.
       std::ostringstream scratch;
+      scratch << log_dir << file << "-";
       scratch.fill (0);
       scratch.width (2);
-      scratch << log_dir << file << "-" << time.year () << "-"
-              << time.month () << "-" << time.mday () << "+" << time.hour () 
+      scratch << time.year () << "-" << time.month () 
+              << "-" << time.mday () << "+" << time.hour () 
               << ".dai";
       const symbol filename (scratch.str ());
       std::ofstream out (scratch.str ().c_str ());

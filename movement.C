@@ -28,6 +28,7 @@
 #include "treelog.h"
 #include "assertion.h"
 #include "frame.h"
+#include "mathlib.h"
 #include <sstream>
 
 const char *const Movement::component = "movement";
@@ -108,6 +109,15 @@ Movement::summarize (Treelog& msg) const
     msg.message ("See 'daisy.log' for details.");
 }
 
+void
+Movement::tick_source (const Time& time, const Weather& weather, 
+                       const Soil& soil, const SoilHeat& soil_heat,
+                       SoilWater& soil_water, Treelog& msg)
+{
+  tertiary->tick_source (geometry (), soil, soil_heat, soil_water, msg); 
+  T_bottom = bottom_heat (time, weather);
+}
+
 void 
 Movement::tick_tertiary (const Units& units,
                          const Geometry& geo, const Soil& soil, 
@@ -116,11 +126,6 @@ Movement::tick_tertiary (const Units& units,
 { 
   tertiary->tick (units, geo, soil, soil_heat, dt, soil_water, surface, msg); 
 }
-
-void
-Movement::tick_source (const Soil& soil, const SoilHeat& soil_heat, 
-                       SoilWater& soil_water, Treelog& msg)
-{  tertiary->tick_source (geometry (), soil, soil_heat, soil_water, msg); }
 
 void
 Movement::clear ()
@@ -136,6 +141,10 @@ Movement::output_base (Log& log) const
   output_variable (solute_failure_level, log);
   output_derived (tertiary, "Tertiary", log);
 }
+
+double
+Movement::bottom_T () const
+{ return T_bottom; }
 
 bool 
 Movement::check (Treelog& msg) const
@@ -175,7 +184,8 @@ Movement::Movement (const BlockModel& al)
   : ModelDerived (al.type_name ()),
     water_failure_level (-1),
     solute_failure_level (-1),
-    tertiary (Librarian::build_item<Tertiary> (al, "Tertiary"))
+    tertiary (Librarian::build_item<Tertiary> (al, "Tertiary")),
+    T_bottom (NAN)
 { }
 
 Movement::~Movement ()
