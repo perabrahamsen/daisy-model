@@ -493,11 +493,11 @@
   (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  
          "unset mxtics"
          "set ytics 10")
-  (source (arithmetic (file "log/interval_water_content2.dlf") 
-                      (expr (convert (+ "${z} cm, 400 cm"
-                                        "Ice ${z} cm, 400 cm") [%]))
-                      (style 2)
-                      (title "Ice + Water"))
+  (source ;;(arithmetic (file "log/interval_water_content2.dlf") 
+          ;;            (expr (convert (+ "${z} cm, 400 cm"
+          ;;                              "Ice ${z} cm, 400 cm") [%]))
+          ;;            (style 2)
+          ;;            (title "Ice + Water"))
           (column (file "log/interval_water_content2.dlf") 
                   (tag "${z} cm, 400 cm")
                   (style 1)
@@ -888,14 +888,14 @@
                   (tag "drain")
                   (style 3)
                   (title "Obs [mm/h]"))
+          (column (file "log/Rorrende_aq_gwt.dlf")
+                  (tag "GWT")
+                  (title "Calibrated")
+                  (style 4))
           (column (file "piezo-median.ddf")
                   (tag "Aquitard")
                   (with lines)
                   (title "Piezometer [cm]")
-                  (style 4))
-          (column (file "log/Rorrende_aq_gwt.dlf")
-                  (tag "GWT")
-                  (title "Calibrated")
                   (style 5))))
 
 (defgnuplot drainflow-98-99 drainflow
