@@ -494,11 +494,10 @@
          "unset mxtics"
          "set ytics 10")
   (source (arithmetic (file "log/interval_water_content2.dlf") 
-                      (expr (+ "${z} cm, 400 cm"
-                               "Ice ${z} cm, 400 cm"))
+                      (expr (convert (+ "${z} cm, 400 cm"
+                                        "Ice ${z} cm, 400 cm") [%]))
                       (style 2)
-                      (title "Ice + Water")
-                      (dimension [%]))
+                      (title "Ice + Water"))
           (column (file "log/interval_water_content2.dlf") 
                   (tag "${z} cm, 400 cm")
                   (style 1)
