@@ -245,6 +245,8 @@
 (log_prefix "log/")
 
   (output harvest
+          ("Soil Temperature" (column Rorrende_aq))
+          ("Soil Heat Balance" (column Rorrende_aq))
 
           ;; The following log model are used by the gnuplot graphs.
           ("Sample water content 2" (column Rorrende_aq))
