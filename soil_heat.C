@@ -131,6 +131,7 @@ SoilHeat::source (const Geometry& geo, const SoilWater& soil_water,
 	  // [erg/cm^3/h] += [erg/g] * [g/cm^3] * [] * [cm^3/h] / [cm^3]
 	}
     }
+
   return v;
 }
 
@@ -247,8 +248,8 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
       const double Theta = soil_water.Theta (c);
       const double X_ice = soil_water.X_ice (c);
       conductivity[c] = soil.heat_conductivity (c, Theta, X_ice);
-#if 0
-      S_water[c] = soil_water.S_sum (c); // Bug? S_sum includes freeze/thaw.
+#if 1
+      S_water[c] = soil_water.S_sum (c) - soil_water.S_ice_water (c);
 #else
       S_water[c] = 0.0;
 #endif
@@ -556,16 +557,17 @@ SoilHeat::calculate_freezing_rate (const Geometry& geo,
     { 
       const size_t edge = cell_edges[j];
       const int from = geo.edge_from (edge);
+      const double area = geo.edge_area (edge);
       if (i == from)
-        dq += q[edge];
+        dq += q[edge] * area;
       else
-        dq -= q[edge];
+        dq -= q[edge] * area;
     }
   
 
   const double vol = geo.cell_volume (i);
   const double S 
-    = soil_water.S_sum (i) - soil_water.S_ice (i) * rho_ice / rho_water;
+    = soil_water.S_sum (i) - soil_water.S_ice_water (i);
   const double Sh
     = water_heat_capacity * rho_water * S * T_mean;
   const double cap = capacity (soil, soil_water, i);

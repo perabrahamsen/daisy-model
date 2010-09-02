@@ -433,7 +433,9 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
       const double h_ice = soil_water.h_ice (c);
       const double Theta_min = soil.Theta (c, pressure_end, h_ice);
       const double allowed_loss = Theta - Theta_min;
-      daisy_assert (allowed_loss > 0.0);
+      if (allowed_loss < 0.01)
+        // Ice?
+        continue;
       if (Theta_loss < allowed_loss + 0.01)
         // Less than one percent above allowed loss, deal with it.
         continue;

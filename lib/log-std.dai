@@ -288,8 +288,9 @@ Water in the soil interval turned into ice.
 
 This number will be zero unless the 'enable_ice' SoilHeat parameter
 has been set.")
-                     (path column "${column}" SoilWater S_ice)
-                     (spec fixed SoilWater S_ice)
+                     (path column "${column}" SoilWater S_ice_water)
+                     (spec fixed SoilWater S_ice_water)
+                     (negate true)
                      (handle sum)
                      (dimension "mm"))
            (interval (tag "Tillage")

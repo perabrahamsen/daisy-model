@@ -23,7 +23,7 @@
 (description "Spring Barley; Soil: Fine sandy loam; Weather: Taastrup")
 
 ;;  Defining soil horizons of a fine sandy loam
-(defhorizon "Ap F.S.L." default
+(defhorizon "Ap F.S.L." FAO3
     (dry_bulk_density 1.53 [g/cm^3]) 
     (clay 0.113 [])
     (silt 0.277 [])
@@ -38,7 +38,7 @@
                     (K_sat 7.52 [cm/h]))
     (description "Data from O.H. Jacobsen (1989)")
 )
-(defhorizon "B F.S.L." default
+(defhorizon "B F.S.L." FAO3
     (dry_bulk_density 1.51 [g/cm^3]) 
     (clay 0.235 [])
     (silt 0.253 [])
@@ -53,7 +53,7 @@
                     (K_sat 14.5 [cm/h]))
     (description "Data from O.H. Jacobsen (1989)")
 )
-(defhorizon "C F.S.L." default
+(defhorizon "C F.S.L." FAO3
     (dry_bulk_density 1.57 [g/cm^3]) 
     (clay 0.244 [])
     (silt 0.283 [])
@@ -178,14 +178,14 @@
 (output harvest
         "Crop Production"
 ;;      Water balance 0-100 cm  
-        ("Root Zone Water Balance" (to -100 [cm])(when daily)
+        ("Soil water" (to -100 [cm])(when daily)
           (where "Daily_WB.dlf"))  
-        ("Root Zone Water Balance" (to -100 [cm])(when monthly)  
+        ("Soil water" (to -100 [cm])(when monthly)  
           (where "Monthly_WB.dlf"))  
 ;;      Nitrogen balance 0-100 cm  
-        ("N Balance" (to -100 [cm])(when daily)
+        ("Soil nitrogen" (to -100 [cm])(when daily)
           (where "Daily_NB.dlf"))  
-        ("N Balance" (to -100 [cm])(when monthly)  
+        ("Soil nitrogen" (to -100 [cm])(when monthly)  
           (where "Monthly_NB.dlf"))  
 ;;      Soil profile data
         ("Groundwater" (when daily))       

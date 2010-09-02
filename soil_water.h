@@ -61,7 +61,8 @@ private:
   std::vector<double> S_incorp_;
   std::vector<double> S_p_;
   std::vector<double> S_permanent_;
-  std::vector<double> S_ice_;
+  std::vector<double> S_ice_ice;
+  std::vector<double> S_ice_water_;
   std::vector<double> S_forward_total_;
   std::vector<double> S_forward_sink_;
   std::vector<double> tillage_;
@@ -114,8 +115,8 @@ public:
   { return S_drain_[i]; }
   double S_p (size_t i) const
   { return S_p_[i]; }
-  double S_ice (size_t i) const
-  { return S_ice_[i]; }
+  double S_ice_water (size_t i) const
+  { return S_ice_water_[i]; }
   double S_forward_total (size_t i) const
   { return S_forward_total_[i]; }
   double S_forward_sink (size_t i) const

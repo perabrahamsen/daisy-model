@@ -22,7 +22,7 @@
 (description "Spring Barley; Soil: Coarse sand; Weather: Taastrup")
 
 ;;  Defining soil horizons of a fine sandy loam
-(defhorizon "Ap C.S." default
+(defhorizon "Ap C.S." FAO3
     (dry_bulk_density 1.49 [g/cm^3]) 
     (clay 0.039 [])
     (silt 0.072 [])
@@ -36,7 +36,7 @@
                     (K_sat 21.65 [cm/h]))
     (description "Data from O.H. Jacobsen (1989)")
 )
-(defhorizon "C C.S." default
+(defhorizon "C C.S." FAO3
     (dry_bulk_density 1.49 [g/cm^3]) 
     (clay 0.029 [])
     (silt 0.023 [])
@@ -110,14 +110,14 @@
 (output harvest
         "Crop Production"
 ;;      Water balance 0-100 cm  
-        ("Root Zone Water Balance" (to -100 [cm])(when daily)
+        ("Soil water" (to -100 [cm])(when daily)
           (where "Daily_WB.dlf"))  
-        ("Root Zone Water Balance" (to -100 [cm])(when monthly)  
+        ("Soil water" (to -100 [cm])(when monthly)  
           (where "Monthly_WB.dlf"))  
 ;;      Nitrogen balance 0-100 cm  
-        ("N Balance" (to -100 [cm])(when daily)
+        ("Soil nitrogen" (to -100 [cm])(when daily)
           (where "Daily_NB.dlf"))  
-        ("N Balance" (to -100 [cm])(when monthly)  
+        ("Soil nitrogen" (to -100 [cm])(when monthly)  
           (where "Monthly_NB.dlf"))  
 ;;      Soil profile data
         ("Groundwater" (when daily))       
