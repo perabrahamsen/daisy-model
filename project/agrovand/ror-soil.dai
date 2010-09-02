@@ -94,61 +94,6 @@
                   (K_sat 0.526775 [cm/h])
                   (l -3.62743))
   (secondary_domain agrovand))
-                  
-;;; (defbiopore common matrix
-;;;   ;; (R_primary 1 [h])
-;;;   ;; (R_secondary 0.01 [h])
-;;;   (K_wall_relative 1 [%])
-;;;   (allow_upward_flow true))
-;;; 
-;;; 
-;;; (defbiopore "matrix_0cm"
-;;;    (common (height_start 0 [cm])
-;;;            (height_end -25 [cm])
-;;;            ;;(density 179 [m^-2])
-;;;            ;;; ca 95% af 190 [m^-2]
-;;;            (density 100 [m^-2])
-;;;            (diameter 2 [mm])))
-;;;            
-;;; (defbiopore "matrix_2cm"
-;;;    (common ;;(height_start  -1.5 [cm])
-;;;            (height_start 0 [cm])
-;;;            (height_end -120 [cm])
-;;;            (diameter 4 [mm])
-;;;            (density (plf x (range [m^-2])
-;;;                            (domain [cm])
-;;;                            (points (20 0)
-;;;                                    (30 45))))))       
-;;;                    
-;;; (defbiopore "drain_2cm"
-;;;    (drain  ;;(height_start -1.5 [cm])
-;;;            (height_start 0 [cm])
-;;;            (height_end -115 [cm])
-;;;            (diameter 4 [mm])
-;;;            (pipe_position -112.5 [cm])
-;;;            (density (plf x (range [m^-2])
-;;;                            (domain [cm])
-;;;                            (points (20 45)
-;;;                                    (30 0))))))
-;;; 
-;;; (defbiopore "matrix_30cm"
-;;;    (common (height_start -30 [cm])
-;;;            (height_end -120 [cm])
-;;;            (diameter 4 [mm])
-;;;            (density (plf x (range [m^-2])
-;;;                            (domain [cm])
-;;;                            (points (20 0)
-;;;                                    (30 15))))))      
-;;;            
-;;; (defbiopore "drain_30cm"
-;;;    (drain  (height_start -30 [cm])
-;;;            (height_end -115 [cm])
-;;;            (diameter 4 [mm])
-;;;            (pipe_position -112.5 [cm])
-;;;            (density (plf x (range [m^-2])
-;;;                            (domain [cm])
-;;;                            (points (20 15)
-;;;                                    (30 0))))))
 
 (defcolumn Rorrende default
   "This is a Rorrende soil with pipe drains."
@@ -165,10 +110,10 @@
                        (left finite 0 [cm]) (right finite 25 [cm]))
                         Drain_canyon)))
   (Movement rectangle
-        (matrix_solute Mollerup convection none)
-        (matrix_water (Mollerup (max_time_step_reductions 16)
-                                (max_number_of_small_time_steps 1000000))
-                      (v+h))
+        ;;(matrix_solute Mollerup convection none)
+        ;;(matrix_water (Mollerup (max_time_step_reductions 16)
+        ;;                        (max_number_of_small_time_steps 1000000))
+        ;;              (v+h))
         (drainpoints (-112.5 [cm] 1 [cm]))
         (Geometry (zplus -1.5 -3 
                          -5.5 -10 -14 -18 -22 -25 ;TDR: 4, 8, 12, 16, 20, 24
@@ -191,7 +136,9 @@
         ;(K_aquitard 0.0100744 [cm/h]) ;0.7196*0.014 linear interp corresponds to mean temp (7.8 grad)
         (K_aquitard 0.050 [cm/h])
         (Z_aquitard 200 [cm])
-        (pressure_table (file "Rorrende_88.gwt"))))
+        ;;(pressure_table (file "Rorrende_88.gwt"))
+        (pressure_table (file "piezo-calib.gwt"))
+        ))
 
 (defcolumn Rorrende_fd Rorrende
   "Rorrende soil with free drainiage."
