@@ -236,13 +236,14 @@
   ;; Begining and end of simulation.
   (time 1997 6 1)
   (stop 2001 2 20) ;; End of third draining season.
+  (minimal_timestep (microseconds 1))
 
   ;; Keep us updated.
   (print_time periodic)
 
   ;; And tell us what happened.
 
-(log_prefix "log/")
+  (log_prefix "log/")
 
   (output harvest
           ("Soil Temperature" (column Rorrende_aq))

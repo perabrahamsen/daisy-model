@@ -565,7 +565,7 @@
   (declare acc-prefix String "Prefix to get accumulated values")
   (acc-prefix "")  ;;for accumulated stuff
   (declare title-prefix String "Prefix to title")
-  (title-prefix "0 cm [kg/ha/h] ")
+  (title-prefix "0 cm [kg/ha/h]")
   (where "fig/brom-input.pdf")   
   (extra &old "set xtics 24 * 60 * 60 *30 nomirror" 
          "set ytics 10"
@@ -574,7 +574,7 @@
   (source (column (file "log/Bromide-25.dlf")
                   (dimension [kg/ha])
                   (tag "${acc-prefix}Primary 0 cm")
-                  (title "${title-prefix}Primary"))
+                  (title "Primary ${title-prefix}"))
           (column (file "log/Bromide-25.dlf")
                   (dimension [kg/ha])
                   (tag "${acc-prefix}Secondary 0 cm")
@@ -595,7 +595,7 @@
   (begin 1998 11 20) (end 1999 04 01)
   (legend se)
   (acc-prefix "Acc ")
-  (title-prefix "0 cm [kg/ha] ")
+  (title-prefix "0 cm [kg/ha]")
   )
 
 (defgnuplot brom-output plotformat
@@ -606,7 +606,7 @@
   (declare acc-prefix String "Prefix to get accumulated values")
   (acc-prefix "")  ;;for accumulated stuff
   (declare title-prefix String "Prefix to title")
-  (title-prefix "${bottom} cm [g/ha/h] ")
+  (title-prefix "${bottom} cm [g/ha/h]")
   (declare dim String "Dimension")
   (dim [g/ha])
   (where "fig/brom-${top}-${bottom}-output.pdf")   
@@ -619,7 +619,7 @@
   (source (column (file "log/Bromide-25.dlf")
                   (dimension [${dim}])
                   (tag "${acc-prefix}Primary ${bottom} cm")
-                  (title "${title-prefix}Primary"))
+                  (title "Primary ${title-prefix}"))
           (column (file "log/Bromide-25.dlf")
                   (dimension [${dim}])
                   (tag "${acc-prefix}Secondary ${bottom} cm")
@@ -704,7 +704,7 @@
          "set mxtics 3")   
   (source (arithmetic (file "log/Bromide-25.dlf")
                       (expr (convert (+ "Primary 0-25 cm") [kg/ha]))
-                      (title "Primary, 0-25 cm [kg/ha]"))
+                      (title "Primary [kg/ha] 0-25 cm"))
           (arithmetic (file "log/Bromide-25.dlf")
                       (expr (convert (+ "Primary 25-50 cm") [kg/ha]))
                       (title "25-50 cm"))
@@ -732,7 +732,7 @@
          "set mxtics 3")   
   (source (arithmetic (file "log/Bromide-25.dlf")
                       (expr (convert (+ "Secondary 0-25 cm") [kg/ha]))
-                      (title "Secondary, 0-25 cm [kg/ha]"))
+                      (title "Secondary [kg/ha] 0-25 cm"))
           (arithmetic (file "log/Bromide-25.dlf")
                       (expr (convert (+ "Secondary 25-50 cm") [kg/ha]))
                       (title "25-50 cm"))
@@ -759,7 +759,7 @@
          "set mxtics 3"
          "set ytics 10")
   (acc-prefix "Acc ")
-  (title-prefix "${bottom} cm [kg/ha] "))
+  (title-prefix "${bottom} cm [kg/ha]"))
 
 (defgnuplot bromplotweather plotweather
   (begin 1998 11 20) (end 1999 04 01)
@@ -878,8 +878,8 @@
 (defgnuplot drainflow draincommon
   "drain flow."
   (ymax 0.25)
-  (y2max 0 [cm])
-  (y2min -200 [cm])
+  (y2max 0 [m])
+  (y2min -2 [m])
   (source (arithmetic (file "log/Rorrende_AllChem.dlf")
                       (expr (/ (+ "Surface drain flow" "Soil drain flow")
                                1.0 [h]))
@@ -890,12 +890,14 @@
                   (title "Obs [mm/h]"))
           (column (file "log/Rorrende_aq_gwt.dlf")
                   (tag "GWT")
-                  (title "Calibrated")
+                  (title "Aquifer [m]")
+                  (dimension [m])
                   (style 4))
           (column (file "piezo-median.ddf")
                   (tag "Aquitard")
                   (with lines)
-                  (title "Piezometer [cm]")
+                  (title "Piezometer")
+                  (dimension [m])
                   (style 5))))
 
 (defgnuplot drainflow-98-99 drainflow
