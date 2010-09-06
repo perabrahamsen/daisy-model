@@ -2,16 +2,18 @@
 
 (input file "biopores.dai")
 
+(defsecondary Ap pressure
+  (h_lim 3.0 [pF])
+  (alpha 0.00003 [h^-1]))
+
+(defsecondary PlowPan pressure
+  (h_lim 2.0 [pF])
+  (alpha 0.00003 [h^-1]))
+
 (defsecondary agrovand pressure 
-  ;; (h_lim 1.2 [pF])
-  ;; (alpha 0.01 [h^-1])
   (h_lim 2.0 [pF])
   (alpha 0.0001 [h^-1])
   )
-
-(defsecondary Ap agrovand
-  (h_lim 3.0 [pF])
-  (alpha 0.00003 [h^-1]))
 
 (defhorizon "Rorrende Ap" USDA3
   (description "3-25 cm")
@@ -45,7 +47,7 @@
                   ;;(K_sat 0.00925 [cm/h])
                   (K_sat 0.0925 [cm/h])
                   (l -2.92948))
-  (secondary_domain Ap))               
+  (secondary_domain PlowPan))               
 
 (defhorizon "Rorrende Bt" USDA3
   (description "33-120 cm")

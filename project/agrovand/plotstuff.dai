@@ -311,10 +311,6 @@
           (column (file "piezo-median.ddf")
                   (tag "W70")
                   (title "70 m")
-                  (with lines))
-          (column (file "piezo-median.ddf")
-                  (tag "Median")
-                  (title "10 + 40 m")
                   (with lines))))
 
 (defgnuplot piezo-plot plottime
@@ -681,18 +677,7 @@
                       (tag "75-100cm")
                       ;;(style 3)
                       (title "Obs")
-                      ) 
-          (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (convert (+ "Primary 100-125 cm"
-                                        "Secondary 100-125 cm")
-                                     [kg/ha]))
-                      (title "100-125 cm"))
-          (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (convert (+ "Primary 125-150 cm"
-                                        "Secondary 125-150 cm")
-                                     [kg/ha]))
-                      (title "125-150 cm"))
-         ))
+                      )))
 
 (defgnuplot brom-primary plotformat
   "Bromide content in 25 cm intervals in primary domain."
@@ -714,12 +699,6 @@
           (arithmetic (file "log/Bromide-25.dlf")
                       (expr (convert (+ "Primary 75-100 cm") [kg/ha]))
                       (title "75-100 cm"))
-          (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (convert (+ "Primary 100-125 cm") [kg/ha]))
-                      (title "100-125 cm"))
-          (arithmetic (file "log/Bromide-25.dlf")
-                      (expr (convert (+ "Primary 125-150 cm") [kg/ha]))
-                      (title "125-150 cm"))
           ))
 
 (defgnuplot brom-secondary plotformat
@@ -741,7 +720,72 @@
                       (title "50-75 cm"))
           (arithmetic (file "log/Bromide-25.dlf")
                       (expr (convert (+ "Secondary 75-100 cm") [kg/ha]))
-                      (title "75-100 cm"))
+                      (title "75-100 cm"))))
+
+(defgnuplot brom-total-extra plotformat
+  "Total bromide content in 25 cm intervals."
+  (where "fig/brom-total-extra.pdf")
+  (begin 1998 11 20) (end 1999 04 01)
+  (ymin 0)(ymax 35)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror" 
+         "set ytics 10"
+         "set mxtics 3")   
+  (source (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 25-33 cm" "Secondary 25-33 cm")
+                                     [kg/ha]))
+                      (title "25-33 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 33-50 cm" "Secondary 33-50 cm")
+                                     [kg/ha]))
+                      (title "33-50 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 100-125 cm"
+                                        "Secondary 100-125 cm")
+                                     [kg/ha]))
+                      (title "100-125 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 125-150 cm"
+                                        "Secondary 125-150 cm")
+                                     [kg/ha]))
+                      (title "125-150 cm"))
+         ))
+
+(defgnuplot brom-primary-extra plotformat
+  "Bromide content in 25 cm intervals in primary domain."
+  (where "fig/brom-primary-extra.pdf")
+  (begin 1998 11 20) (end 1999 04 01)
+  (ymin 0)(ymax 35)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
+         "set ytics 10"
+         "set mxtics 3")   
+  (source (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 25-33 cm") [kg/ha]))
+                      (title "Primary [kg/ha] 25-33 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 33-50 cm") [kg/ha]))
+                      (title "33-50 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 100-125 cm") [kg/ha]))
+                      (title "100-125 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 125-150 cm") [kg/ha]))
+                      (title "125-150 cm"))
+          ))
+
+(defgnuplot brom-secondary-extra plotformat
+  "Bromide content in 25 cm intervals in secondary domain."
+  (where "fig/brom-secondary-extra.pdf")
+  (begin 1998 11 20) (end 1999 04 01)
+  (ymin 0)(ymax 35)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
+         "set ytics 10"
+         "set mxtics 3")   
+  (source (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Secondary 25-33 cm") [kg/ha]))
+                      (title "25-33 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Secondary 33-50 cm") [kg/ha]))
+                      (title "33-50 cm"))
           (arithmetic (file "log/Bromide-25.dlf")
                       (expr (convert (+ "Secondary 100-125 cm") [kg/ha]))
                       (title "100-125 cm"))
@@ -824,6 +868,8 @@
          (brom-input)
          (brom-output (top "0") (bottom "25"))
          (brom-output (top "25") (bottom "50"))
+         (brom-output (top "25") (bottom "33"))
+         (brom-output (top "33") (bottom "50"))
          (brom-output (top "50") (bottom "75"))
          (brom-output (top "75") (bottom "100")
                       (canvas "21cm, 4.3cm")
@@ -831,13 +877,22 @@
                              "set mxtics 3"
                              "set format x \"%y-%m-%d\""))            
          (brom-output (top "100") (bottom "125"))
-         (brom-output (top "125") (bottom "150"))
+         (brom-output (top "125") (bottom "150")
+                      (canvas "21cm, 4.3cm")
+                      (extra &old "set xtics 24 * 60 * 60 *30 rotate"   
+                             "set mxtics 3"
+                             "set format x \"%y-%m-%d\""))
          (brom-total) 
          (brom-primary) 
          (brom-secondary) 
          (brom-input-acc)
+         (brom-primary-extra) 
+         (brom-secondary-extra) 
+         (brom-input-acc-extra)
          (brom-accumulated (top "0") (bottom "25"))
          (brom-accumulated (top "25") (bottom "50"))
+         (brom-accumulated (top "25") (bottom "33"))
+         (brom-accumulated (top "33") (bottom "50"))
          (brom-accumulated (top "50") (bottom "75"))
          (brom-accumulated (top "75") (bottom "100")
                            (canvas "21cm, 4.3cm")
@@ -845,7 +900,11 @@
                                   "set mxtics 3"
                                   "set format x \"%y-%m-%d\""))       
          (brom-accumulated (top "100") (bottom "125"))
-         (brom-accumulated (top "125") (bottom "150"))
+         (brom-accumulated (top "125") (bottom "150")
+                           (canvas "21cm, 4.3cm")
+                           (extra &old "set xtics 24 * 60 * 60 *30 rotate"   
+                                  "set mxtics 3"
+                                  "set format x \"%y-%m-%d\""))
          (bromplotweather)
          (shortplotweather)      
          (shortplotZcm (z "4"))
