@@ -28,7 +28,7 @@
 (deflog "Sample water content 2" column
   "Daily average water content at location of TDR probes"
   (where "interval_water_content2.dlf")
-  (when (hour 23))
+  (when daily)
   (entries (content (tag "4 cm, 400 cm")
                     (x 400 [cm])
                     (z -4 [cm])
@@ -281,7 +281,7 @@
   "Infiltration to matrix, drains and bipores2drain and biopores2matrix."
   (where "${colfid}infiltration.dlf")
   ;;(when hourly)
-  (when (hour 23))
+  (when daily)
   ;;(summary "Field water balance")
   (entries (flux_top (tag "Surface2Matrix")
                      (description "\

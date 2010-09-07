@@ -3,10 +3,12 @@
 (input file "ror-setup.dai")
 ;;(input file "plotstuff-9899.dai")
 (input file "plotstuff.dai")
+(input file "plot-2d.dai")
 
 (run batch (run 
-            Rorrende 
-            plotall 
+            ;;Rorrende 
+            ;;plotall 
+            plot2d
             ))
 
 ;;; ror-pa.dai ends here.

@@ -12,6 +12,8 @@
          [unset colorbox]
          [unset xlabel]
          [unset ylabel]
+         [set xtics 100]
+         [set ytics 100]
          [set lmargin 0]
          [set rmargin 0]
          [set bmargin 0]
@@ -28,7 +30,7 @@
 (defgnuplot Rorrende-2D vap-2D
   "Plot monthly 2D data for Rorrende."
   (station Rorrende)
-  (device "pdf size 8cm,6cm"))
+  (canvas "8cm,3cm"))
 
 (defgnuplot Rorrende-2D-pF Rorrende-2D
   (extra &old

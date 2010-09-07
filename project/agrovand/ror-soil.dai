@@ -116,6 +116,7 @@
         ;;(matrix_water (Mollerup (max_time_step_reductions 16)
         ;;                        (max_number_of_small_time_steps 1000000))
         ;;              (v+h))
+        (matrix_water (Mollerup (K_average harmonic)))
         (drainpoints (-112.5 [cm] 1 [cm]))
         (Geometry (zplus -1.5 -3 
                          -5.5 -10 -14 -18 -22 -25 ;TDR: 4, 8, 12, 16, 20, 24
