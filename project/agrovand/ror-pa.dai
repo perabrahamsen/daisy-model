@@ -1,16 +1,14 @@
 ;;; ror-pa.dai -- Setup files with pa specific information.
 
 (input file "ror-setup.dai")
-;;(input file "plotstuff-9899.dai")
 (input file "plotstuff.dai")
 (input file "plot-2d.dai")
 
 (defprogram plotall gnuplot
   (graph plot1d plot2d))
 
-
 (run batch (run 
-            ;; Rorrende 
+            Rorrende 
             plotall 
             ))
 
