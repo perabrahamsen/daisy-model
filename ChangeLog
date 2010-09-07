@@ -1,5 +1,7 @@
 2010-09-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* xysource_flux.C (load): Allow plot of boundaries.
+
 	* uzlr.C (tick): Make it work with ice.
 
 	* parser_file.C (get_dimension): Return Attribute::None () for
