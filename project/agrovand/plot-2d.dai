@@ -25,12 +25,12 @@
   ;; (base "/home/abraham/sim/sim-sw")
   (base "."))
 
-(defgnuplot Estrup-2D vap-2D
-  "Plot monthly 2D data for Estrup."
-  (station Estrup)
+(defgnuplot Rorrende-2D vap-2D
+  "Plot monthly 2D data for Rorrende."
+  (station Rorrende)
   (device "pdf size 8cm,6cm"))
 
-(defgnuplot Estrup-2D-pF Estrup-2D
+(defgnuplot Rorrende-2D-pF Rorrende-2D
   (extra &old
          [set palette defined (0 "blue", 1 "white", 2 "yellow", 3 "orange", 4 "red", 5.0 "black")])
   (where "fig/${station}-pF-${y}-${m}.pdf")
@@ -38,320 +38,204 @@
   (min 0 [pF])
   (max 5 [pF]))
 
-(defgnuplot Estrup-2D-M Estrup-2D
+(defgnuplot Rorrende-2D-M Rorrende-2D
   (extra &old [set palette defined (0 "white", 1e-2 "white", 1e0 "yellow", 1e2 "orange", 1e4 "red", 1e6 "black", 1e10 "black")])
   (min 0 [ug/m^3])
   (max 1e10 [ug/m^3])
   )
 
-(defgnuplot Estrup-2D-M-Bromide Estrup-2D-M
+(defgnuplot Rorrende-2D-M-Bromide Rorrende-2D-M
   (where "fig/${station}-M-Bromide-${y}-${m}.pdf")
   (file "${base}/log/${station}-content-Bromide.dlf")
   )
 
-(defgnuplot Estrup-2D-M-Glyphosate Estrup-2D-M
-  (where "fig/${station}-M-Glyphosate-${y}-${m}.pdf")
-  (file "${base}/log/${station}-content-Glyphosate.dlf")
+(defgnuplot Rorrende-2D-C Rorrende-2D-M)
+
+(defgnuplot Rorrende-2D-pF-1998 base
+  (graph (Rorrende-2D-pF (y 1998) (m 5))
+         (Rorrende-2D-pF (y 1998) (m 6))
+         (Rorrende-2D-pF (y 1998) (m 7))
+         (Rorrende-2D-pF (y 1998) (m 8))
+         (Rorrende-2D-pF (y 1998) (m 9))
+         (Rorrende-2D-pF (y 1998) (m 10))
+         (Rorrende-2D-pF (y 1998) (m 11))
+         (Rorrende-2D-pF (y 1998) (m 12))
+         (Rorrende-2D-pF (y 1999) (m 1))
+         (Rorrende-2D-pF (y 1999) (m 2))
+         (Rorrende-2D-pF (y 1999) (m 3))
+         (Rorrende-2D-pF (y 1999) (m 4))))
+
+(defgnuplot Rorrende-2D-pF-1999 base
+  (graph (Rorrende-2D-pF (y 1999) (m 5))
+         (Rorrende-2D-pF (y 1999) (m 6))
+         (Rorrende-2D-pF (y 1999) (m 7))
+         (Rorrende-2D-pF (y 1999) (m 8))
+         (Rorrende-2D-pF (y 1999) (m 9))
+         (Rorrende-2D-pF (y 1999) (m 10))
+         (Rorrende-2D-pF (y 1999) (m 11))
+         (Rorrende-2D-pF (y 1999) (m 12))
+         (Rorrende-2D-pF (y 2000) (m 1))
+         (Rorrende-2D-pF (y 2000) (m 2))
+         (Rorrende-2D-pF (y 2000) (m 3))
+         (Rorrende-2D-pF (y 2000) (m 4))))
+
+(defgnuplot Rorrende-2D-pF-2000 base
+  (graph (Rorrende-2D-pF (y 2000) (m 5))
+         (Rorrende-2D-pF (y 2000) (m 6))
+         (Rorrende-2D-pF (y 2000) (m 7))
+         (Rorrende-2D-pF (y 2000) (m 8))
+         (Rorrende-2D-pF (y 2000) (m 9))
+         (Rorrende-2D-pF (y 2000) (m 10))
+         (Rorrende-2D-pF (y 2000) (m 11))
+         (Rorrende-2D-pF (y 2000) (m 12))
+         (Rorrende-2D-pF (y 2001) (m 1))
+         (Rorrende-2D-pF (y 2001) (m 2))
+         (Rorrende-2D-pF (y 2001) (m 3))
+         (Rorrende-2D-pF (y 2001) (m 4))))
+
+(defgnuplot Rorrende-2D-M-Bromide-1998 base
+  (graph (Rorrende-2D-M-Bromide (y 1998) (m 5))
+         (Rorrende-2D-M-Bromide (y 1998) (m 6))
+         (Rorrende-2D-M-Bromide (y 1998) (m 7))
+         (Rorrende-2D-M-Bromide (y 1998) (m 8))
+         (Rorrende-2D-M-Bromide (y 1998) (m 9))
+         (Rorrende-2D-M-Bromide (y 1998) (m 10))
+         (Rorrende-2D-M-Bromide (y 1998) (m 11))
+         (Rorrende-2D-M-Bromide (y 1998) (m 12))
+         (Rorrende-2D-M-Bromide (y 1999) (m 1))
+         (Rorrende-2D-M-Bromide (y 1999) (m 2))
+         (Rorrende-2D-M-Bromide (y 1999) (m 3))
+         (Rorrende-2D-M-Bromide (y 1999) (m 4))))
+
+(defgnuplot Rorrende-2D-M-Bromide-1999 base
+  (graph (Rorrende-2D-M-Bromide (y 1999) (m 5))
+         (Rorrende-2D-M-Bromide (y 1999) (m 6))
+         (Rorrende-2D-M-Bromide (y 1999) (m 7))
+         (Rorrende-2D-M-Bromide (y 1999) (m 8))
+         (Rorrende-2D-M-Bromide (y 1999) (m 9))
+         (Rorrende-2D-M-Bromide (y 1999) (m 10))
+         (Rorrende-2D-M-Bromide (y 1999) (m 11))
+         (Rorrende-2D-M-Bromide (y 1999) (m 12))
+         (Rorrende-2D-M-Bromide (y 2000) (m 1))
+         (Rorrende-2D-M-Bromide (y 2000) (m 2))
+         (Rorrende-2D-M-Bromide (y 2000) (m 3))
+         (Rorrende-2D-M-Bromide (y 2000) (m 4))))
+
+(defgnuplot Rorrende-2D-M-Ioxynil Rorrende-2D-M
+  (where "fig/${station}-M-Ioxynil-${y}-${m}.pdf")
+  (file "${base}/log/${station}-content-Ioxynil.dlf")
   )
 
-(defgnuplot Estrup-2D-C Estrup-2D-M)
-
-(defgnuplot Estrup-2D-C-Glyphosate Estrup-2D-C
-  (where "fig/${station}-C-Glyphosate-${y}-${m}.pdf")
-  (file "${base}/log/${station}-conc-Glyphosate.dlf")
+(defgnuplot Rorrende-2D-C-Ioxynil Rorrende-2D-C
+  (where "fig/${station}-C-Ioxynil-${y}-${m}.pdf")
+  (file "${base}/log/${station}-conc-Ioxynil.dlf")
   )
 
-(defgnuplot Estrup-2D-pF-2000 base
-  (graph (Estrup-2D-pF (y 2000) (m 5))
-         (Estrup-2D-pF (y 2000) (m 6))
-         (Estrup-2D-pF (y 2000) (m 7))
-         (Estrup-2D-pF (y 2000) (m 8))
-         (Estrup-2D-pF (y 2000) (m 9))
-         (Estrup-2D-pF (y 2000) (m 10))
-         (Estrup-2D-pF (y 2000) (m 11))
-         (Estrup-2D-pF (y 2000) (m 12))
-         (Estrup-2D-pF (y 2001) (m 1))
-         (Estrup-2D-pF (y 2001) (m 2))
-         (Estrup-2D-pF (y 2001) (m 3))
-         (Estrup-2D-pF (y 2001) (m 4))))
+(defgnuplot Rorrende-2D-M-Ioxynil-2000 base
+  (graph (Rorrende-2D-M-Ioxynil (y 2000) (m 5))
+         (Rorrende-2D-M-Ioxynil (y 2000) (m 6))
+         (Rorrende-2D-M-Ioxynil (y 2000) (m 7))
+         (Rorrende-2D-M-Ioxynil (y 2000) (m 8))
+         (Rorrende-2D-M-Ioxynil (y 2000) (m 9))
+         (Rorrende-2D-M-Ioxynil (y 2000) (m 10))
+         (Rorrende-2D-M-Ioxynil (y 2000) (m 11))
+         (Rorrende-2D-M-Ioxynil (y 2000) (m 12))
+         (Rorrende-2D-M-Ioxynil (y 2001) (m 1))
+         (Rorrende-2D-M-Ioxynil (y 2001) (m 2))
+         (Rorrende-2D-M-Ioxynil (y 2001) (m 3))
+         (Rorrende-2D-M-Ioxynil (y 2001) (m 4))))
 
-(defgnuplot Estrup-2D-pF-2001 base
-  (graph (Estrup-2D-pF (y 2001) (m 5))
-         (Estrup-2D-pF (y 2001) (m 6))
-         (Estrup-2D-pF (y 2001) (m 7))
-         (Estrup-2D-pF (y 2001) (m 8))
-         (Estrup-2D-pF (y 2001) (m 9))
-         (Estrup-2D-pF (y 2001) (m 10))
-         (Estrup-2D-pF (y 2001) (m 11))
-         (Estrup-2D-pF (y 2001) (m 12))
-         (Estrup-2D-pF (y 2002) (m 1))
-         (Estrup-2D-pF (y 2002) (m 2))
-         (Estrup-2D-pF (y 2002) (m 3))
-         (Estrup-2D-pF (y 2002) (m 4))))
+(defgnuplot Rorrende-2D-C-Ioxynil-2000 base
+  (graph (Rorrende-2D-C-Ioxynil (y 2000) (m 5))
+         (Rorrende-2D-C-Ioxynil (y 2000) (m 6))
+         (Rorrende-2D-C-Ioxynil (y 2000) (m 7))
+         (Rorrende-2D-C-Ioxynil (y 2000) (m 8))
+         (Rorrende-2D-C-Ioxynil (y 2000) (m 9))
+         (Rorrende-2D-C-Ioxynil (y 2000) (m 10))
+         (Rorrende-2D-C-Ioxynil (y 2000) (m 11))
+         (Rorrende-2D-C-Ioxynil (y 2000) (m 12))
+         (Rorrende-2D-C-Ioxynil (y 2001) (m 1))
+         (Rorrende-2D-C-Ioxynil (y 2001) (m 2))
+         (Rorrende-2D-C-Ioxynil (y 2001) (m 3))
+         (Rorrende-2D-C-Ioxynil (y 2001) (m 4))))
 
-(defgnuplot Estrup-2D-M-Bromide-2000 base
-  (graph (Estrup-2D-M-Bromide (y 2000) (m 5))
-         (Estrup-2D-M-Bromide (y 2000) (m 6))
-         (Estrup-2D-M-Bromide (y 2000) (m 7))
-         (Estrup-2D-M-Bromide (y 2000) (m 8))
-         (Estrup-2D-M-Bromide (y 2000) (m 9))
-         (Estrup-2D-M-Bromide (y 2000) (m 10))
-         (Estrup-2D-M-Bromide (y 2000) (m 11))
-         (Estrup-2D-M-Bromide (y 2000) (m 12))
-         (Estrup-2D-M-Bromide (y 2001) (m 1))
-         (Estrup-2D-M-Bromide (y 2001) (m 2))
-         (Estrup-2D-M-Bromide (y 2001) (m 3))
-         (Estrup-2D-M-Bromide (y 2001) (m 4))))
-
-(defgnuplot Estrup-2D-M-Bromide-2001 base
-  (graph (Estrup-2D-M-Bromide (y 2001) (m 5))
-         (Estrup-2D-M-Bromide (y 2001) (m 6))
-         (Estrup-2D-M-Bromide (y 2001) (m 7))
-         (Estrup-2D-M-Bromide (y 2001) (m 8))
-         (Estrup-2D-M-Bromide (y 2001) (m 9))
-         (Estrup-2D-M-Bromide (y 2001) (m 10))
-         (Estrup-2D-M-Bromide (y 2001) (m 11))
-         (Estrup-2D-M-Bromide (y 2001) (m 12))
-         (Estrup-2D-M-Bromide (y 2002) (m 1))
-         (Estrup-2D-M-Bromide (y 2002) (m 2))
-         (Estrup-2D-M-Bromide (y 2002) (m 3))
-         (Estrup-2D-M-Bromide (y 2002) (m 4))))
-
-(defgnuplot Estrup-2D-M-Glyphosate-2000 base
-  (graph (Estrup-2D-M-Glyphosate (y 2000) (m 5))
-         (Estrup-2D-M-Glyphosate (y 2000) (m 6))
-         (Estrup-2D-M-Glyphosate (y 2000) (m 7))
-         (Estrup-2D-M-Glyphosate (y 2000) (m 8))
-         (Estrup-2D-M-Glyphosate (y 2000) (m 9))
-         (Estrup-2D-M-Glyphosate (y 2000) (m 10))
-         (Estrup-2D-M-Glyphosate (y 2000) (m 11))
-         (Estrup-2D-M-Glyphosate (y 2000) (m 12))
-         (Estrup-2D-M-Glyphosate (y 2001) (m 1))
-         (Estrup-2D-M-Glyphosate (y 2001) (m 2))
-         (Estrup-2D-M-Glyphosate (y 2001) (m 3))
-         (Estrup-2D-M-Glyphosate (y 2001) (m 4))))
-
-(defgnuplot Estrup-2D-C-Glyphosate-2000 base
-  (graph (Estrup-2D-C-Glyphosate (y 2000) (m 5))
-         (Estrup-2D-C-Glyphosate (y 2000) (m 6))
-         (Estrup-2D-C-Glyphosate (y 2000) (m 7))
-         (Estrup-2D-C-Glyphosate (y 2000) (m 8))
-         (Estrup-2D-C-Glyphosate (y 2000) (m 9))
-         (Estrup-2D-C-Glyphosate (y 2000) (m 10))
-         (Estrup-2D-C-Glyphosate (y 2000) (m 11))
-         (Estrup-2D-C-Glyphosate (y 2000) (m 12))
-         (Estrup-2D-C-Glyphosate (y 2001) (m 1))
-         (Estrup-2D-C-Glyphosate (y 2001) (m 2))
-         (Estrup-2D-C-Glyphosate (y 2001) (m 3))
-         (Estrup-2D-C-Glyphosate (y 2001) (m 4))))
-
-(defgnuplot Estrup-2D-C-Glyphosate-2001 base
-  (graph (Estrup-2D-C-Glyphosate (y 2001) (m 5))
-         (Estrup-2D-C-Glyphosate (y 2001) (m 6))
-         (Estrup-2D-C-Glyphosate (y 2001) (m 7))
-         (Estrup-2D-C-Glyphosate (y 2001) (m 8))
-         (Estrup-2D-C-Glyphosate (y 2001) (m 9))
-         (Estrup-2D-C-Glyphosate (y 2001) (m 10))
-         (Estrup-2D-C-Glyphosate (y 2001) (m 11))
-         (Estrup-2D-C-Glyphosate (y 2001) (m 12))
-         (Estrup-2D-C-Glyphosate (y 2002) (m 1))
-         (Estrup-2D-C-Glyphosate (y 2002) (m 2))
-         (Estrup-2D-C-Glyphosate (y 2002) (m 3))
-         (Estrup-2D-C-Glyphosate (y 2002) (m 4))))
-
-(defgnuplot Silstrup-2D vap-2D
-  "Plot monthly 2D data for Silstrup."
-  (station Silstrup)
-  (device "pdf size 8cm,5cm"))
-
-(defgnuplot Silstrup-2D-pF Silstrup-2D
-  (extra &old
-         [set palette defined (0 "blue", 1 "white", 2 "yellow", 3 "orange", 4 "red", 5.0 "black")])
-  (where "fig/${station}-pF-${y}-${m}.pdf")
-  (file "${base}/log/${station}-pF.dlf")
-  (min 0 [pF])
-  (max 5 [pF]))
-
-(defgnuplot Silstrup-2D-M Silstrup-2D
-  (extra &old [set palette defined (0 "white", 1e-2 "white", 1e0 "yellow", 1e2 "orange", 1e4 "red", 1e6 "black", 1e10 "black")])
-  (min 0 [ug/m^3])
-  (max 1e10 [ug/m^3])
+(defgnuplot Rorrende-2D-M-Pendimethalin Rorrende-2D-M
+  (where "fig/${station}-M-Pendimethalin-${y}-${m}.pdf")
+  (file "${base}/log/${station}-content-Pendimethalin.dlf")
   )
 
-(defgnuplot Silstrup-2D-M-Bromide Silstrup-2D-M
-  (where "fig/${station}-M-Bromide-${y}-${m}.pdf")
-  (file "${base}/log/${station}-content-Bromide.dlf")
+(defgnuplot Rorrende-2D-C-Pendimethalin Rorrende-2D-C
+  (where "fig/${station}-C-Pendimethalin-${y}-${m}.pdf")
+  (file "${base}/log/${station}-conc-Pendimethalin.dlf")
   )
 
-(defgnuplot Silstrup-2D-M-Metamitron Silstrup-2D-M
-  (where "fig/${station}-M-Metamitron-${y}-${m}.pdf")
-  (file "${base}/log/${station}-content-Metamitron.dlf")
-  )
+(defgnuplot Rorrende-2D-M-Pendimethalin-1999 base
+  (graph (Rorrende-2D-M-Pendimethalin (y 1999) (m 5))
+         (Rorrende-2D-M-Pendimethalin (y 1999) (m 6))
+         (Rorrende-2D-M-Pendimethalin (y 1999) (m 7))
+         (Rorrende-2D-M-Pendimethalin (y 1999) (m 8))
+         (Rorrende-2D-M-Pendimethalin (y 1999) (m 9))
+         (Rorrende-2D-M-Pendimethalin (y 1999) (m 10))
+         (Rorrende-2D-M-Pendimethalin (y 1999) (m 11))
+         (Rorrende-2D-M-Pendimethalin (y 1999) (m 12))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 1))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 2))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 3))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 4))))
 
-(defgnuplot Silstrup-2D-M-Glyphosate Silstrup-2D-M
-  (where "fig/${station}-M-Glyphosate-${y}-${m}.pdf")
-  (file "${base}/log/${station}-content-Glyphosate.dlf")
-  )
+(defgnuplot Rorrende-2D-C-Pendimethalin-1999 base
+  (graph (Rorrende-2D-C-Pendimethalin (y 1999) (m 5))
+         (Rorrende-2D-C-Pendimethalin (y 1999) (m 6))
+         (Rorrende-2D-C-Pendimethalin (y 1999) (m 7))
+         (Rorrende-2D-C-Pendimethalin (y 1999) (m 8))
+         (Rorrende-2D-C-Pendimethalin (y 1999) (m 9))
+         (Rorrende-2D-C-Pendimethalin (y 1999) (m 10))
+         (Rorrende-2D-C-Pendimethalin (y 1999) (m 11))
+         (Rorrende-2D-C-Pendimethalin (y 1999) (m 12))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 1))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 2))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 3))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 4))))
 
-(defgnuplot Silstrup-2D-C Silstrup-2D-M)
+(defgnuplot Rorrende-2D-M-Pendimethalin-2000 base
+  (graph (Rorrende-2D-M-Pendimethalin (y 2000) (m 5))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 6))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 7))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 8))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 9))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 10))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 11))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 12))
+         (Rorrende-2D-M-Pendimethalin (y 2001) (m 1))
+         (Rorrende-2D-M-Pendimethalin (y 2001) (m 2))
+         (Rorrende-2D-M-Pendimethalin (y 2001) (m 3))
+         (Rorrende-2D-M-Pendimethalin (y 2001) (m 4))))
 
-(defgnuplot Silstrup-2D-C-Metamitron Silstrup-2D-C
-  (where "fig/${station}-C-Metamitron-${y}-${m}.pdf")
-  (file "${base}/log/${station}-conc-Metamitron.dlf"))
+(defgnuplot Rorrende-2D-C-Pendimethalin-2000 base
+  (graph (Rorrende-2D-C-Pendimethalin (y 2000) (m 5))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 6))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 7))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 8))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 9))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 10))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 11))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 12))
+         (Rorrende-2D-C-Pendimethalin (y 2001) (m 1))
+         (Rorrende-2D-C-Pendimethalin (y 2001) (m 2))
+         (Rorrende-2D-C-Pendimethalin (y 2001) (m 3))
+         (Rorrende-2D-C-Pendimethalin (y 2001) (m 4))))
 
-(defgnuplot Silstrup-2D-C-Glyphosate Silstrup-2D-C
-  (where "fig/${station}-C-Glyphosate-${y}-${m}.pdf")
-  (file "${base}/log/${station}-conc-Glyphosate.dlf")
-  )
-
-(defgnuplot Silstrup-2D-pF-2000 base
-  (graph (Silstrup-2D-pF (y 2000) (m 5))
-         (Silstrup-2D-pF (y 2000) (m 6))
-         (Silstrup-2D-pF (y 2000) (m 7))
-         (Silstrup-2D-pF (y 2000) (m 8))
-         (Silstrup-2D-pF (y 2000) (m 9))
-         (Silstrup-2D-pF (y 2000) (m 10))
-         (Silstrup-2D-pF (y 2000) (m 11))
-         (Silstrup-2D-pF (y 2000) (m 12))
-         (Silstrup-2D-pF (y 2001) (m 1))
-         (Silstrup-2D-pF (y 2001) (m 2))
-         (Silstrup-2D-pF (y 2001) (m 3))
-         (Silstrup-2D-pF (y 2001) (m 4))))
-
-(defgnuplot Silstrup-2D-pF-2001 base
-  (graph (Silstrup-2D-pF (y 2001) (m 5))
-         (Silstrup-2D-pF (y 2001) (m 6))
-         (Silstrup-2D-pF (y 2001) (m 7))
-         (Silstrup-2D-pF (y 2001) (m 8))
-         (Silstrup-2D-pF (y 2001) (m 9))
-         (Silstrup-2D-pF (y 2001) (m 10))
-         (Silstrup-2D-pF (y 2001) (m 11))
-         (Silstrup-2D-pF (y 2001) (m 12))
-         (Silstrup-2D-pF (y 2002) (m 1))
-         (Silstrup-2D-pF (y 2002) (m 2))))
-
-(defgnuplot Silstrup-2D-M-Bromide-2000 base
-  (graph (Silstrup-2D-M-Bromide (y 2000) (m 5))
-         (Silstrup-2D-M-Bromide (y 2000) (m 6))
-         (Silstrup-2D-M-Bromide (y 2000) (m 7))
-         (Silstrup-2D-M-Bromide (y 2000) (m 8))
-         (Silstrup-2D-M-Bromide (y 2000) (m 9))
-         (Silstrup-2D-M-Bromide (y 2000) (m 10))
-         (Silstrup-2D-M-Bromide (y 2000) (m 11))
-         (Silstrup-2D-M-Bromide (y 2000) (m 12))
-         (Silstrup-2D-M-Bromide (y 2001) (m 1))
-         (Silstrup-2D-M-Bromide (y 2001) (m 2))
-         (Silstrup-2D-M-Bromide (y 2001) (m 3))
-         (Silstrup-2D-M-Bromide (y 2001) (m 4))))
-
-(defgnuplot Silstrup-2D-M-Bromide-2001 base
-  (graph (Silstrup-2D-M-Bromide (y 2001) (m 5))
-         (Silstrup-2D-M-Bromide (y 2001) (m 6))
-         (Silstrup-2D-M-Bromide (y 2001) (m 7))
-         (Silstrup-2D-M-Bromide (y 2001) (m 8))
-         (Silstrup-2D-M-Bromide (y 2001) (m 9))
-         (Silstrup-2D-M-Bromide (y 2001) (m 10))
-         (Silstrup-2D-M-Bromide (y 2001) (m 11))
-         (Silstrup-2D-M-Bromide (y 2001) (m 12))
-         (Silstrup-2D-M-Bromide (y 2002) (m 1))
-         (Silstrup-2D-M-Bromide (y 2002) (m 2))))
-
-(defgnuplot Silstrup-2D-M-Metamitron-2000 base
-  (graph (Silstrup-2D-M-Metamitron (y 2000) (m 5))
-         (Silstrup-2D-M-Metamitron (y 2000) (m 6))
-         (Silstrup-2D-M-Metamitron (y 2000) (m 7))
-         (Silstrup-2D-M-Metamitron (y 2000) (m 8))
-         (Silstrup-2D-M-Metamitron (y 2000) (m 9))
-         (Silstrup-2D-M-Metamitron (y 2000) (m 10))
-         (Silstrup-2D-M-Metamitron (y 2000) (m 11))
-         (Silstrup-2D-M-Metamitron (y 2000) (m 12))
-         (Silstrup-2D-M-Metamitron (y 2001) (m 1))
-         (Silstrup-2D-M-Metamitron (y 2001) (m 2))
-         (Silstrup-2D-M-Metamitron (y 2001) (m 3))
-         (Silstrup-2D-M-Metamitron (y 2001) (m 4))))
-
-(defgnuplot Silstrup-2D-M-Metamitron-2001 base
-  (graph (Silstrup-2D-M-Metamitron (y 2001) (m 5))
-         (Silstrup-2D-M-Metamitron (y 2001) (m 6))
-         (Silstrup-2D-M-Metamitron (y 2001) (m 7))
-         (Silstrup-2D-M-Metamitron (y 2001) (m 8))
-         (Silstrup-2D-M-Metamitron (y 2001) (m 9))
-         (Silstrup-2D-M-Metamitron (y 2001) (m 10))
-         (Silstrup-2D-M-Metamitron (y 2001) (m 11))
-         (Silstrup-2D-M-Metamitron (y 2001) (m 12))
-         (Silstrup-2D-M-Metamitron (y 2002) (m 1))
-         (Silstrup-2D-M-Metamitron (y 2002) (m 2))))
-
-(defgnuplot Silstrup-2D-C-Metamitron-2000 base
-  (graph (Silstrup-2D-C-Metamitron (y 2000) (m 5))
-         (Silstrup-2D-C-Metamitron (y 2000) (m 6))
-         (Silstrup-2D-C-Metamitron (y 2000) (m 7))
-         (Silstrup-2D-C-Metamitron (y 2000) (m 8))
-         (Silstrup-2D-C-Metamitron (y 2000) (m 9))
-         (Silstrup-2D-C-Metamitron (y 2000) (m 10))
-         (Silstrup-2D-C-Metamitron (y 2000) (m 11))
-         (Silstrup-2D-C-Metamitron (y 2000) (m 12))
-         (Silstrup-2D-C-Metamitron (y 2001) (m 1))
-         (Silstrup-2D-C-Metamitron (y 2001) (m 2))
-         (Silstrup-2D-C-Metamitron (y 2001) (m 3))
-         (Silstrup-2D-C-Metamitron (y 2001) (m 4))))
-
-(defgnuplot Silstrup-2D-C-Metamitron-2001 base
-  (graph (Silstrup-2D-C-Metamitron (y 2001) (m 5))
-         (Silstrup-2D-C-Metamitron (y 2001) (m 6))
-         (Silstrup-2D-C-Metamitron (y 2001) (m 7))
-         (Silstrup-2D-C-Metamitron (y 2001) (m 8))
-         (Silstrup-2D-C-Metamitron (y 2001) (m 9))
-         (Silstrup-2D-C-Metamitron (y 2001) (m 10))
-         (Silstrup-2D-C-Metamitron (y 2001) (m 11))
-         (Silstrup-2D-C-Metamitron (y 2001) (m 12))
-         (Silstrup-2D-C-Metamitron (y 2002) (m 1))
-         (Silstrup-2D-C-Metamitron (y 2002) (m 2))))
-
-(defgnuplot Silstrup-2D-M-Glyphosate-2001 base
-  (graph (Silstrup-2D-M-Glyphosate (y 2001) (m 5))
-         (Silstrup-2D-M-Glyphosate (y 2001) (m 6))
-         (Silstrup-2D-M-Glyphosate (y 2001) (m 7))
-         (Silstrup-2D-M-Glyphosate (y 2001) (m 8))
-         (Silstrup-2D-M-Glyphosate (y 2001) (m 9))
-         (Silstrup-2D-M-Glyphosate (y 2001) (m 10))
-         (Silstrup-2D-M-Glyphosate (y 2001) (m 11))
-         (Silstrup-2D-M-Glyphosate (y 2001) (m 12))
-         (Silstrup-2D-M-Glyphosate (y 2002) (m 1))
-         (Silstrup-2D-M-Glyphosate (y 2002) (m 2))))
-
-(defgnuplot Silstrup-2D-C-Glyphosate-2001 base
-  (graph (Silstrup-2D-C-Glyphosate (y 2001) (m 5))
-         (Silstrup-2D-C-Glyphosate (y 2001) (m 6))
-         (Silstrup-2D-C-Glyphosate (y 2001) (m 7))
-         (Silstrup-2D-C-Glyphosate (y 2001) (m 8))
-         (Silstrup-2D-C-Glyphosate (y 2001) (m 9))
-         (Silstrup-2D-C-Glyphosate (y 2001) (m 10))
-         (Silstrup-2D-C-Glyphosate (y 2001) (m 11))
-         (Silstrup-2D-C-Glyphosate (y 2001) (m 12))
-         (Silstrup-2D-C-Glyphosate (y 2002) (m 1))
-         (Silstrup-2D-C-Glyphosate (y 2002) (m 2))))
-
-(defgnuplot plot2d-block-Estrup base
+(defgnuplot plot2d-block-Rorrende base
   (graph 
-   Estrup-2D-pF-2000 Estrup-2D-pF-2001
-   Estrup-2D-M-Bromide-2000 Estrup-2D-M-Bromide-2001
-   Estrup-2D-M-Glyphosate-2000 Estrup-2D-C-Glyphosate-2000
-   Estrup-2D-C-Glyphosate-2001
+   Rorrende-2D-pF-1998 Rorrende-2D-pF-1999 Rorrende-2D-pF-2000
+   Rorrende-2D-M-Bromide-1998 Rorrende-2D-M-Bromide-1999
+   Rorrende-2D-M-Ioxynil-2000 Rorrende-2D-C-Ioxynil-2000
+   Rorrende-2D-M-Pendimethalin-1999 Rorrende-2D-C-Pendimethalin-1999
+   Rorrende-2D-M-Pendimethalin-2000 Rorrende-2D-C-Pendimethalin-2000
    ))
 
-(defgnuplot plot2d-block-Silstrup base
-  (graph 
-   Silstrup-2D-pF-2000 Silstrup-2D-pF-2001
-   Silstrup-2D-M-Bromide-2000 Silstrup-2D-M-Bromide-2001
-   Silstrup-2D-M-Metamitron-2000 Silstrup-2D-M-Metamitron-2001
-   Silstrup-2D-C-Metamitron-2000 Silstrup-2D-C-Metamitron-2001
-   Silstrup-2D-M-Glyphosate-2001 Silstrup-2D-C-Glyphosate-2001
-   ))
-  
 (defgnuplot plot2d-pF-all base
-  (graph Estrup-2D-pF-2000 Estrup-2D-pF-2001
-         Silstrup-2D-pF-2000 Silstrup-2D-pF-2001))
+  (graph Rorrende-2D-pF-1998 Rorrende-2D-pF-1999 Rorrende-2D-pF-2000))
 
 (defgnuplot vap-xy xy
   (device "pdf size 19cm,10cm"))
@@ -433,31 +317,24 @@
   (declare y2 Integer "Next year.")
   (graph flux-matrix flux-biopores flux-combined))
 
-(defgnuplot plot2d-flux-Estrup-2000 plot2d-flux
-  (station Estrup)
+(defgnuplot plot2d-flux-Rorrende-1998 plot2d-flux
+  (station Rorrende)
+  (graph &old (flux-horizontal (extra &old [set format x ""])))
+  (y 1998)
+  (y2 1999))
+
+(defgnuplot plot2d-flux-Rorrende-1999 plot2d-flux
+  (station Rorrende)
+  (graph &old (flux-horizontal (extra &old [set format x ""])))
+  (y 1999)
+  (y2 2000))
+
+(defgnuplot plot2d-flux-Rorrende-2000 plot2d-flux
+  (station Rorrende)
   (graph &old (flux-horizontal (extra &old [set format x ""])))
   (y 2000)
   (y2 2001))
 
-(defgnuplot plot2d-flux-Estrup-2001 plot2d-flux
-  (station Estrup)
-  (graph &old (flux-horizontal (legend none)))
-  (y 2001)
-  (y2 2002))
-
-(defgnuplot plot2d-flux-Silstrup-2000 plot2d-flux
-  (station Silstrup)
-  (graph &old
-         (flux-horizontal (extra &old [set format x ""])))
-  (y 2000)
-  (y2 2001))
-
-(defgnuplot plot2d-flux-Silstrup-2001 plot2d-flux
-  (station Silstrup)
-  (graph &old 
-         (flux-horizontal (legend none)))
-  (y 2001)
-  (y2 2002))
 
 (defxysource vap-flow flux
 
@@ -535,27 +412,22 @@
   (declare y2 Integer "Next year.")
   (graph flow-matrix))
 
-(defgnuplot plot2d-flow-Estrup-2000 plot2d-flow
-  (station Estrup)
+(defgnuplot plot2d-flow-Rorrende-1998 plot2d-flow
+  (station Rorrende)
+  (y 1998)
+  (y2 1999))
+
+(defgnuplot plot2d-flow-Rorrende-1999 plot2d-flow
+  (station Rorrende)
+  (y 1999)
+  (y2 2000))
+
+(defgnuplot plot2d-flow-Rorrende-2000 plot2d-flow
+  (station Rorrende)
   (y 2000)
   (y2 2001))
 
-(defgnuplot plot2d-flow-Estrup-2001 plot2d-flow
-  (station Estrup)
-  (y 2001)
-  (y2 2002))
-
-(defgnuplot plot2d-flow-Silstrup-2000 plot2d-flow
-  (station Silstrup)
-  (y 2000)
-  (y2 2001))
-
-(defgnuplot plot2d-flow-Silstrup-2001 plot2d-flow
-  (station Silstrup)
-  (y 2001)
-  (y2 2002))
-
-(defgnuplot plot2d-flow-Estrup-Bromide-2000 plot2d-flow-Estrup-2000
+(defgnuplot plot2d-flow-Rorrende-Bromide-1998 plot2d-flow-Rorrende-1998
   (graph &old 
          (flow-horizontal (xmin -55 [kg/ha]) (extra &old [set format x ""]))
          (flow-biopores (ymin -100 [kg/ha]) (ymax 10 [kg/ha]))
@@ -563,7 +435,7 @@
   (dim [kg/ha])
   (chemical Bromide))
 
-(defgnuplot plot2d-flow-Estrup-Bromide-2001 plot2d-flow-Estrup-2001
+(defgnuplot plot2d-flow-Rorrende-Bromide-1999 plot2d-flow-Rorrende-1999
   (graph &old
          (flow-horizontal (xmin -55 [kg/ha]) (legend none))
          (flow-biopores (ymin -100 [kg/ha]) (ymax 10 [kg/ha]))  
@@ -571,97 +443,55 @@
   (dim [kg/ha])
   (chemical Bromide))
 
-(defgnuplot plot2d-flow-Silstrup-Bromide-2000 plot2d-flow-Silstrup-2000
-  (graph &old
-         (flow-horizontal (xmin -55 [kg/ha]) (extra &old [set format x ""]))
-         (flow-biopores (ymin -100 [kg/ha]) (ymax 10 [kg/ha]))  
-         (flow-combined (ymin -100 [kg/ha]) (ymax 10 [kg/ha]))) 
-  (dim [kg/ha])
-  (chemical Bromide))
-
-(defgnuplot plot2d-flow-Silstrup-Bromide-2001 plot2d-flow-Silstrup-2001
-  (graph &old 
-         (flow-horizontal (xmin -55 [kg/ha]) (legend none))
-         (flow-biopores (ymin -100 [kg/ha]) (ymax 10 [kg/ha])) 
-         (flow-combined (ymin -100 [kg/ha]) (ymax 10 [kg/ha]))) 
-  (dim [kg/ha])
-  (chemical Bromide))
-
-(defgnuplot plot2d-flow-Estrup-Glyphosate-2000 plot2d-flow-Estrup-2000
+(defgnuplot plot2d-flow-Rorrende-Ioxynil-2000 plot2d-flow-Rorrende-2000
   (graph &old 
          (flow-horizontal (xmin -80 [g/ha]))
          (flow-biopores (ymin -1400 [g/ha]) (ymax 0 [g/ha])) 
          (flow-combined (ymin -1400 [g/ha]) (ymax 0 [g/ha])))
   (dim [g/ha])
-  (chemical Glyphosate))
+  (chemical Ioxynil))
 
-(defgnuplot plot2d-flow-Estrup-Glyphosate-2001 plot2d-flow-Estrup-2001
+(defgnuplot plot2d-flow-Rorrende-Pendimethalin-1999 plot2d-flow-Rorrende-1999
   (graph &old 
          (flow-horizontal (xmin -80 [g/ha]))
          (flow-biopores (ymin -1400 [g/ha]) (ymax 0 [g/ha])) 
          (flow-combined (ymin -1400 [g/ha]) (ymax 0 [g/ha])))
   (dim [g/ha])
-  (chemical Glyphosate))
+  (chemical Pendimethalin))
 
-(defgnuplot plot2d-flow-Silstrup-Glyphosate-2001 plot2d-flow-Silstrup-2001
+(defgnuplot plot2d-flow-Rorrende-Pendimethalin-2000 plot2d-flow-Rorrende-2000
   (graph &old 
          (flow-horizontal (xmin -80 [g/ha]))
-         (flow-biopores  (ymin -1400 [g/ha]) (ymax 0 [g/ha]))
-         (flow-combined  (ymin -1400 [g/ha]) (ymax 0 [g/ha])))
+         (flow-biopores (ymin -1400 [g/ha]) (ymax 0 [g/ha])) 
+         (flow-combined (ymin -1400 [g/ha]) (ymax 0 [g/ha])))
   (dim [g/ha])
-  (chemical Glyphosate))
+  (chemical Pendimethalin))
 
-(defgnuplot plot2d-flow-Silstrup-Metamitron-2000 plot2d-flow-Silstrup-2000
-  (graph &old (flow-horizontal)
-         (flow-biopores (ymin -1250 [g/ha]) (ymax 0 [g/ha]))
-         (flow-combined (ymin -1250 [g/ha]) (ymax 0 [g/ha])))
-  (dim [g/ha])
-  (chemical Metamitron))
-
-(defgnuplot plot2d-flow-Silstrup-Metamitron-2001 plot2d-flow-Silstrup-2001
-  (graph &old (flow-horizontal)
-          flow-biopores 
-          flow-combined)
-  (dim [g/ha])
-  (chemical Metamitron))
-
-(defgnuplot plot2d-flux-Estrup base
+(defgnuplot plot2d-flux-Rorrende base
   (graph 
-   plot2d-flux-Estrup-2000
-   plot2d-flux-Estrup-2001
-   plot2d-flow-Estrup-Bromide-2000
-   plot2d-flow-Estrup-Bromide-2001
-   plot2d-flow-Estrup-Glyphosate-2000
+   plot2d-flux-Rorrende-1998
+   plot2d-flux-Rorrende-1999
+   plot2d-flux-Rorrende-2000
+   plot2d-flow-Rorrende-Bromide-1998
+   plot2d-flow-Rorrende-Bromide-1999
+   plot2d-flow-Rorrende-Ioxynil-2000
+   plot2d-flow-Rorrende-Pendimethalin-1999
+   plot2d-flow-Rorrende-Pendimethalin-2000
    ))
   
-(defgnuplot plot2d-flux-Silstrup base
-  (graph 
-   plot2d-flux-Silstrup-2000
-   plot2d-flux-Silstrup-2001
-   plot2d-flow-Silstrup-Bromide-2000
-   plot2d-flow-Silstrup-Bromide-2001
-   plot2d-flow-Silstrup-Glyphosate-2001
-   plot2d-flow-Silstrup-Metamitron-2000
-   plot2d-flow-Silstrup-Metamitron-2001
-   ))
-
 (defgnuplot plot2d-block base
-  (graph plot2d-block-Estrup plot2d-block-Silstrup))
+  (graph plot2d-block-Rorrende))
 
 (defgnuplot plot2d-flux-all base
-  (graph plot2d-flux-Estrup-2000
-         plot2d-flux-Estrup-2001
-         plot2d-flux-Silstrup-2000
-         plot2d-flux-Silstrup-2001))
+  (graph plot2d-flux-Rorrende-1998
+         plot2d-flux-Rorrende-1999
+         plot2d-flux-Rorrende-2000))
 
-(defgnuplot plot2d-Estrup base
-  (graph plot2d-block-Estrup plot2d-flux-Estrup))
-
-(defgnuplot plot2d-Silstrup base
-  (graph plot2d-block-Silstrup plot2d-flux-Silstrup))
+(defgnuplot plot2d-Rorrende base
+  (graph plot2d-block-Rorrende plot2d-flux-Rorrende))
 
 (defgnuplot plot2d base
-  (graph plot2d-Estrup plot2d-Silstrup))
+  (graph plot2d-Rorrende))
 
 (defprogram plot2d gnuplot 
   (graph plot2d))
