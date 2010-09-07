@@ -47,6 +47,7 @@
   )
 
 (defgnuplot Rorrende-2D-M-Bromide Rorrende-2D-M
+  (extra &old [set palette defined (0 "white", 1e3 "white", 1e4 "yellow", 1e5 "orange", 1e6 "red", 1e7 "black", 1e10 "black")])
   (where "fig/${station}-M-Bromide-${y}-${m}.pdf")
   (file "${base}/log/${station}-content-Bromide.dlf")
   )

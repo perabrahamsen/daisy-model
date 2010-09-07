@@ -8,8 +8,9 @@
   (graph plot1d plot2d))
 
 (run batch (run 
-            Rorrende 
-            plotall 
+            ;;Rorrende 
+            ;;plotall 
+            plot2d
             ))
 
 ;;; ror-pa.dai ends here.
