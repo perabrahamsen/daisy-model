@@ -304,47 +304,42 @@ SoilWater::tick_before (const Geometry& geo, const Soil& soil,
   // Ice first.
   for (size_t i = 0; i < cell_size; i++)
     {
-      X_ice_[i] -= S_ice_ice[i];
-
-
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
 
-#if 0
-      // Move extra ice to buffer.
-      const double available_space
-        = Theta_sat - Theta_[i] - X_ice_[i] + S_sum_[i] * dt;
-      if (available_space < 0.0)
-        {
-          X_ice_[i] += available_space;
-          X_ice_buffer_[i] -= available_space;
-        }
-      else if (X_ice_buffer_[i] > 0.0)
-        {
-          if (X_ice_buffer_[i] < available_space)
-            { 
-              X_ice_[i] += X_ice_buffer_[i];
-              X_ice_buffer_[i] = 0.0;
-            }
-          else
-            {
-              X_ice_[i] += available_space;
-              X_ice_buffer_[i] -= available_space;
-            }
-        }
+      X_ice_[i] -= S_ice_ice[i];
 
-      if (X_ice_[i] < 0.0)
+      // Move extra ice to buffer.
+      const double total_ice = X_ice_[i] + X_ice_buffer_[i];
+      if (total_ice > 0.0)
         {
-          if (X_ice_[i] < -1e-13)
+          const double Theta_res = soil.Theta_res (i);
+          if (Theta_[i] < Theta_res)
             {
               std::ostringstream tmp;
-              tmp << "X_ice[" << i << "] = " << X_ice_[i]
-                  << " (S_sum[i] = " << S_sum_[i] << ")";
-              msg.error (tmp.str ());
+              tmp << "Theta[" << i << "] = " << Theta_[i]
+                  << ", less than Theta_res = " << Theta_res;
+              daisy_warning (tmp.str ());
             }
-          X_ice_buffer_[i] += X_ice_[i];
-          X_ice_[i] = 0.0;
+          const double Theta_lim = std::max (Theta_res, Theta_[i]);
+
+          const double available_space = std::max (Theta_sat - Theta_lim - 1e-9,
+                                                   0.0);
+          if (available_space < total_ice)
+            {
+              X_ice_[i] = available_space;
+              X_ice_buffer_[i] = total_ice - available_space;
+            }
+          else if (X_ice_buffer_[i] > 0.0)
+            {
+              X_ice_[i] = total_ice;
+              X_ice_buffer_[i] = 0.0;
+            }
         }
-#endif 
+      else
+        {
+          X_ice_[i] = 0.0;
+          X_ice_buffer_[i] = total_ice;
+        }
 
       // Update ice pressure.
       h_ice_[i] = soil.h (i, Theta_sat - X_ice_[i]);

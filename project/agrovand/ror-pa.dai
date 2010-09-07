@@ -5,10 +5,13 @@
 (input file "plotstuff.dai")
 (input file "plot-2d.dai")
 
+(defprogram plotall gnuplot
+  (graph plot1d plot2d))
+
+
 (run batch (run 
-            Rorrende 
+            ;; Rorrende 
             plotall 
-            plot2d
             ))
 
 ;;; ror-pa.dai ends here.

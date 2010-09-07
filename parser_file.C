@@ -317,6 +317,8 @@ ParserFile::Implementation::get_dimension ()
       c = peek ();
     }
   skip ("]");
+  if (str == "")
+    return Attribute::None ();
   return str;
 }
 

@@ -242,6 +242,8 @@ struct BioclimateStandard : public Bioclimate
   }
 
   // Weather.
+  double daily_rain_temperature () const
+  { return std::max (daily_air_temperature_, 0.1); }
   double daily_air_temperature () const
   { return daily_air_temperature_; }
   double canopy_temperature () const
@@ -696,6 +698,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
   // 2 Snow Pack
 
+  const double rain_temperature = std::max (air_temperature, 0.1);
   snow_ep = total_ep_ - total_ea_;
   daisy_assert (snow_ep >= 0.0);
   snow_water_in = rain + irrigation_overhead;
@@ -703,9 +706,12 @@ BioclimateStandard::WaterDistribution (const Units& units,
   if (irrigation_overhead > 0.01)
     snow_water_in_temperature 
       = (irrigation_overhead * irrigation_overhead_temperature
-         + rain * air_temperature) / snow_water_in;
+         + rain * rain_temperature) / snow_water_in;
+  else if (rain > 0.01)
+    snow_water_in_temperature = rain_temperature;
   else
     snow_water_in_temperature = air_temperature;
+
   snow.tick (msg, movement, soil, soil_water, soil_heat, 
              weather.global_radiation (), 0.0,
              snow_water_in, weather.snow (),
@@ -766,7 +772,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
   if (canopy_water_in > 0.01)
     canopy_water_temperature 
-      = (canopy_water_storage * air_temperature 
+      = (canopy_water_storage * rain_temperature 
          + canopy_water_in * snow_water_out_temperature * dt)
       / (canopy_water_storage + canopy_water_in * dt);
   else
@@ -820,7 +826,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
     ? ((canopy_water_bypass * snow_water_out_temperature
         + canopy_water_out * canopy_water_temperature
         + irrigation_surface * irrigation_surface_temperature
-        + tillage_water * air_temperature)
+        + tillage_water * rain_temperature)
        / canopy_water_below)
     : air_temperature;
   litter_water_in = canopy_water_below * litter_cover;
@@ -828,7 +834,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
   
   if (litter_water_in > 0.01)
     litter_water_temperature 
-      = (litter_water_storage * air_temperature
+      = (litter_water_storage * rain_temperature
          + litter_water_in * dt * canopy_water_below_temperature)
       / (litter_water_in * dt + litter_water_storage);
   else
@@ -1232,7 +1238,7 @@ BioclimateStandard::irrigate_overhead (double flux, double temp)
     = (new_top > 0.01)
     ? (temp * flux
        + irrigation_overhead * irrigation_overhead_temperature) / new_top
-    : daily_air_temperature ();
+    : daily_rain_temperature ();
   irrigation_overhead = new_top;
 }
 
@@ -1244,17 +1250,17 @@ BioclimateStandard::irrigate_surface (double flux, double temp)
     = (new_surface > 0.01) 
     ? (temp * flux
        + irrigation_surface * irrigation_surface_temperature) / new_surface
-    : daily_air_temperature ();
+    : daily_rain_temperature ();
   irrigation_surface = new_surface;
 }
 
 void
 BioclimateStandard::irrigate_overhead (double flux)
-{ irrigate_overhead (flux, daily_air_temperature ()); }
+{ irrigate_overhead (flux, daily_rain_temperature ()); }
 
 void
 BioclimateStandard::irrigate_surface (double flux)
-{ irrigate_surface (flux, daily_air_temperature ()); }
+{ irrigate_surface (flux, daily_rain_temperature ()); }
 
 void
 BioclimateStandard::irrigate_subsoil (double flux)

@@ -137,20 +137,24 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       const double dz = geo.dz (i);
       const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
       const double Theta_res = soil.Theta_res (i);
+      const double h_min = pF2h (10.0);
+      const double Theta_min = soil.Theta (i, h_min, h_ice[i]);
       double Theta_new = Theta_old[i] - q[i] * dt / dz - S[i] * dt;
-      if (Theta_new < Theta_res)
+      if (Theta_new < Theta_min)
         {
-          std::ostringstream tmp;
-          tmp << i << ": Theta_new = " << Theta_new 
-              << ", Theta_old = " << Theta_old[i]
-              << ", q = " << q[i] << ", dt = " << dt << ", dz = " << dz 
-              << ", S " << S[i];
-          msg.error (tmp.str ());
-          Theta_new = Theta_res;
+          // Extreme dryness.
+          q[i+1] = (Theta_min - Theta_new) * dz / dt;
+          Theta[i] = Theta_min;
+          h[i] = h_min;
+          daisy_assert (std::isfinite (h[i]));
+          continue;
         }
+
+      daisy_assert (std::isfinite (h_old[i]));
       const double h_new = Theta_new >= Theta_sat 
         ? std::max (h_old[i], 0.0)
         : soil.h (i, Theta_new);
+      daisy_assert (std::isfinite (h_new));
       double K_new = soil.K (i, h_new, h_ice[i], soil_heat.T (i));
 
       // If we have free drainage bottom, we go for field capacity all
@@ -176,7 +180,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
           break;
         }
 
-      if (use_darcy && z > z_top && i < last)
+      if (use_darcy && z > z_top && i < last && h_fc < h_ice[i] )
         // Dry earth, near top.  Use darcy to move water up.
         {
 	  const double dist = z - geo.cell_z (i+1);
@@ -187,11 +191,13 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 	      q[i+1] = (Theta_sat - Theta_new) * dz / dt;
 	      Theta[i] = Theta_sat;
 	      h[i] = std::max (0.0, h_new);
+              daisy_assert (std::isfinite (h[i]));
 	    }
 	  else
 	    {
 	      Theta[i] = Theta_next;
 	      h[i] = soil.h (i, Theta[i]);
+              daisy_assert (std::isfinite (h[i]));
 	    }
 	}
       else if (h_new <= h_lim)
@@ -202,12 +208,14 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
               q[i+1] = 0.0;
               Theta[i] = Theta_new;
               h[i] = h_new;
+              daisy_assert (std::isfinite (h[i]));
             }
           else 
             {
               q[i+1] = (Theta_sat - Theta_new) * dz / dt;
               Theta[i] = Theta_sat;
               h[i] = std::max (0.0, h_new);
+              daisy_assert (std::isfinite (h[i]));
             }
 	}
       else
@@ -236,12 +244,14 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
                   q[i+1] = (Theta_lim - Theta_new) * dz / dt;
                   Theta[i] = Theta_lim;
                   h[i] = h_lim;
+                  daisy_assert (std::isfinite (h[i]));
                 }
               else
                 {
                   q[i+1] = 0.0;
                   Theta[i] = Theta_new;
                   h[i] = h_new;
+                  daisy_assert (std::isfinite (h[i]));
                 }
 	    }
 	  else if (Theta_next >= Theta_sat)
@@ -249,19 +259,21 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 	      q[i+1] = (Theta_sat - Theta_new) * dz / dt;
 	      Theta[i] = Theta_sat;
 	      h[i] = std::max (h_old[i], 0.0);
+              daisy_assert (std::isfinite (h[i]));
 	    }
 	  else
 	    {
 	      q[i+1] = -K_new;
 	      Theta[i] = Theta_next;
 	      h[i] = soil.h (i, Theta[i]);
+              daisy_assert (std::isfinite (h[i]));
 	    }
 	}
       daisy_assert (std::isfinite (h[i]));
       daisy_assert (std::isfinite (Theta[i]));
       daisy_assert (std::isfinite (q[i+1]));
       daisy_assert (Theta[i] <= Theta_sat);
-      daisy_assert (Theta[i] >= Theta_res);
+      daisy_assert (Theta[i] > Theta_res);
     }
 
   // Lower border.
@@ -285,9 +297,17 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
               break;
             }
 	  const double dz = geo.dz (i);
+          const double h_min = pF2h (10.0);
+          const double Theta_min = soil.Theta (i, h_min, h_ice[i]);
 	  const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
 	  Theta[i] += extra_water / dz;
-	  if (Theta[i] <= Theta_sat)
+          if (Theta[i] <= Theta_min)
+            {
+              extra_water = (Theta[i] - Theta_min) * dz;
+	      Theta[i] = Theta_min;
+	      h[i] = h_min;
+            }
+	  else if (Theta[i] <= Theta_sat)
 	    {
 	      extra_water = 0;
 	      h[i] = soil.h (i, Theta[i]);

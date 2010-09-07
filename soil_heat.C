@@ -391,7 +391,8 @@ SoilHeat::update_freezing_points (const Soil& soil,
       T_thawing[i] 
         = std::min (0.0, 273. *  h_melt / (latent_heat_of_fussion /gravity - h_melt));
       T_freezing[i] 
-        = std::min (T_thawing[i] - 0.01, 273. *  h / (latent_heat_of_fussion / gravity - h));
+        = std::min (T_thawing[i] - 0.01, 
+                    273. *  h / (latent_heat_of_fussion / gravity - h));
       daisy_assert (T_freezing[i] <= T_thawing[i]);
 
       switch (state[i])
@@ -470,7 +471,7 @@ SoilHeat::update_state (const Geometry& geo,
             }
           else
             freezing_rate_[i] = 0.0;
-          daisy_assert (-freezing_rate_[i] * rho_water / rho_ice
+          daisy_assert (-freezing_rate_[i] * dt * rho_water / rho_ice
                         <= soil_water.X_ice_total (i));
           break;
         case frozen:
@@ -514,7 +515,7 @@ SoilHeat::update_state (const Geometry& geo,
             }
           else
             freezing_rate_[i] = 0.0;
-          daisy_assert (-freezing_rate_[i] * rho_water / rho_ice
+          daisy_assert (-freezing_rate_[i] * dt * rho_water / rho_ice
                         <= soil_water.X_ice_total (i) * 1.0001);
           break;
         case liquid:
@@ -526,7 +527,7 @@ SoilHeat::update_state (const Geometry& geo,
             }
           break;
         }
-      daisy_assert (-freezing_rate_[i] * rho_water / rho_ice
+      daisy_assert (-freezing_rate_[i] * dt * rho_water / rho_ice
                     <= soil_water.X_ice_total (i) * 1.0001);
     }
   return changed;

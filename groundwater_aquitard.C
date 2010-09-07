@@ -136,6 +136,8 @@ struct GroundwaterAquitard : public Groundwater
       pressure_table.reset (Depth::create ((geo.bottom () - Z_aquitard)
                                            + h_aquifer));
     pressure_table->initialize (units, scope, msg);
+    if (!pressure_table->check (units, scope, msg))
+      return;
     Time prev = time;
     prev.tick_hour (-1);
     pressure_table->tick (units, prev, scope, msg);

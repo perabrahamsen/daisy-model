@@ -249,6 +249,7 @@
   (ymin -200 [cm])
   (source (column (file "log/Rorrende_aq_gwt.dlf")
                   (tag "GWT-low")
+                  (style 2)
                   (title "Sim (low)"))
           (arithmetic (file "log/Rorrende_aq_gwt.dlf")
                       (expr (min "GWT-high" 0.0 [cm]))
@@ -256,7 +257,7 @@
                       (title "Sim (high)"))
           (column (file "log/Rorrende_aq_gwt.dlf")
                   (tag "GWT")
-                  (style 4)
+                  (style 5)
                   (title "Pressure table"))
           (column (file "piezo-median.ddf")
                   (tag "Median")
@@ -1023,12 +1024,11 @@
                                      0.0001 [mm])))
                       (expr (if (> (+ "Surface drain flow" "Soil drain flow")
                                    0.0001 [mm])
-                                (dim (* 0.1 [] ;[g/ha] -> [mg/m^2]
-                                        (/ (+ "Surface-Drain, Br"
-                                              "Soil-Drain, Br")
-                                           (+ "Surface drain flow" 
-                                              "Soil drain flow")))
-                                     [mg/l])
+                                (convert (/ (+ "Surface-Drain, Br"
+                                               "Soil-Drain, Br")
+                                            (+ "Surface drain flow" 
+                                               "Soil drain flow"))
+                                         [mg/l])
                               0.0 [mg/l]))
                       (title "Bromide"))
           (column (file "bromide.ddf")
@@ -1184,12 +1184,11 @@
                                      0.0001 [mm])))
                       (expr (if (> (+ "Surface drain flow" "Soil drain flow")
                                    0.0001 [mm])
-                                (dim (* 100.0 [] ;[g/ha] -> [ug/m^2]
-                                        (/ (+ "Surface-Drain, Pend"
-                                              "Soil-Drain, Pend")
-                                           (+ "Surface drain flow" 
-                                              "Soil drain flow")))
-                                     [ug/l])
+                                (convert (/ (+ "Surface-Drain, Pend"
+                                               "Soil-Drain, Pend")
+                                            (+ "Surface drain flow" 
+                                               "Soil drain flow"))
+                                         [ug/l])
                               0.0 [ug/l]))
                       (title "Pendimethalin"))
           (column (file "pendimethalin.ddf")
@@ -1249,12 +1248,11 @@
                                      0.0001 [mm])))
                       (expr (if (> (+ "Surface drain flow" "Soil drain flow")
                                    0.0001 [mm])
-                                (dim (* 100.0 [] ;[g/ha] -> [ug/m^2]
-                                        (/ (+ "Surface-Drain, Iox"
-                                              "Soil-Drain, Iox")
-                                           (+ "Surface drain flow" 
-                                              "Soil drain flow")))
-                                     [ug/l])
+                                (convert (/ (+ "Surface-Drain, Iox"
+                                               "Soil-Drain, Iox")
+                                            (+ "Surface drain flow" 
+                                               "Soil drain flow"))
+                                         [ug/l])
                               0.0 [ug/l]))
                       (title "Ioxynil"))
           (column (file "ioxynil.ddf")
@@ -1466,9 +1464,13 @@
          (piezo-800 (where "fig/piezo-800-9900.pdf")
                     (begin 1999 12 10 0) (end 2000 3 28 3))))
 
-(defprogram plotall gnuplot
+(defgnuplot plot1d multi
   (graph drainplots
          gw piezo-all
          Rorrende-hydraulics
          "Rorrende Graphs"
          ))
+
+(defprogram plot1d gnuplot
+  (graph plot1d))
+

@@ -2,38 +2,33 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Sim
 
+** Generelt:  Kig på vandbalance
+
 ** Emacs
+
+Test 2D plot
 
 ** NW
 
-GWT Calib
-
-1998	12	11	-112 too low
-1999	3	6	-96 too low
-1999	12	11	-60 too low
-2000	3	6	-105 too low
-2000	11	21	-102 too low
-2000	12	13	-90 too low
-2001	01	02	-80 too low
-2001	02	11	-65 too low
+0.20 K_pp
 
 ** NE
 
-Som NE men higher
+Ice
 
 ** SW
 
-Prøv is, uden sink/source
+0.40 K_pp
 
 ** SE
 
-** C
+0.60 K_pp
 
 * Agrovand
 
 ** 2D Plot
 
-Vand, bromid, pest, kun for drænsæson
+ret plot-2d.dai
 
 ** Skriv
 

@@ -240,7 +240,7 @@
   (graph Rorrende-2D-pF-1998 Rorrende-2D-pF-1999 Rorrende-2D-pF-2000))
 
 (defgnuplot vap-xy xy
-  (device "pdf size 19cm,10cm"))
+  (device "pdf size 19cm,7cm"))
 
 (defxysource vap-flux flux
   (declare pos Number [cm] "Position.")
@@ -268,7 +268,7 @@
 
 (defgnuplot flux-horizontal vap-xy
   (where "fig/${station}-water-horizontal-${y}.pdf")
-  (xmin -8000 [mm])
+  (xmin -1500 [mm])
   ;; (title "Horizontal flux")
   (source (flux-x (pos 25 [cm]))
           (flux-x (pos 50 [cm])) 
@@ -278,8 +278,8 @@
          ))
 
 (defgnuplot flux-water-vertical vap-xy
-  (ymin -12000 [mm])
-  (ymax   2000 [mm]))
+  (ymin -1000 [mm])
+  (ymax  1000 [mm]))
 
 (defgnuplot flux-matrix flux-water-vertical
   (where "fig/${station}-water-matrix-${y}.pdf")
@@ -295,7 +295,7 @@
 (defgnuplot flux-biopores flux-water-vertical
   (where "fig/${station}-water-biopore-${y}.pdf")
   ;;(title "Vertical biopore flux")
-  (legend none)
+  ;; (legend none)
   (source (flux-b (pos 0 [cm]))
           (flux-b (pos -25 [cm]))
           (flux-b (pos -50 [cm])) 
@@ -333,7 +333,7 @@
 
 (defgnuplot plot2d-flux-Rorrende-2000 plot2d-flux
   (station Rorrende)
-  (graph &old (flux-horizontal (extra &old [set format x ""])))
+  (graph &old (flux-horizontal))
   (y 2000)
   (y2 2001))
 
@@ -388,7 +388,7 @@
 (defgnuplot flow-biopores vap-xy
   (where "fig/${station}-${chemical}-biopore-${y}.pdf")
   ;;(title "Vertical biopore flow")
-  (legend none)
+  ;;(legend none)
   (source (flow-b (pos 0 [cm]))
           (flow-b (pos -25 [cm]))
           (flow-b (pos -50 [cm])) 
@@ -431,41 +431,42 @@
 
 (defgnuplot plot2d-flow-Rorrende-Bromide-1998 plot2d-flow-Rorrende-1998
   (graph &old 
-         (flow-horizontal (xmin -55 [kg/ha]) (extra &old [set format x ""]))
-         (flow-biopores (ymin -100 [kg/ha]) (ymax 10 [kg/ha]))
-         (flow-combined (ymin -100 [kg/ha]) (ymax 10 [kg/ha])))
+         (flow-horizontal (xmin -35 [kg/ha]))
+         (flow-biopores (ymin -35 [kg/ha]) (ymax 10 [kg/ha]))
+         (flow-combined (ymin -35 [kg/ha]) (ymax 10 [kg/ha])))
   (dim [kg/ha])
   (chemical Bromide))
 
 (defgnuplot plot2d-flow-Rorrende-Bromide-1999 plot2d-flow-Rorrende-1999
   (graph &old
-         (flow-horizontal (xmin -55 [kg/ha]) (legend none))
-         (flow-biopores (ymin -100 [kg/ha]) (ymax 10 [kg/ha]))  
-         (flow-combined (ymin -100 [kg/ha]) (ymax 10 [kg/ha]))) 
+         (flow-horizontal (xmin -35 [kg/ha]) ;; (legend none)
+                          )
+         (flow-biopores (ymin -35 [kg/ha]) (ymax 10 [kg/ha]))  
+         (flow-combined (ymin -35 [kg/ha]) (ymax 10 [kg/ha]))) 
   (dim [kg/ha])
   (chemical Bromide))
 
 (defgnuplot plot2d-flow-Rorrende-Ioxynil-2000 plot2d-flow-Rorrende-2000
   (graph &old 
-         (flow-horizontal (xmin -80 [g/ha]))
-         (flow-biopores (ymin -1400 [g/ha]) (ymax 0 [g/ha])) 
-         (flow-combined (ymin -1400 [g/ha]) (ymax 0 [g/ha])))
+         (flow-horizontal (xmin -4 [g/ha]))
+         (flow-biopores (ymin -200 [g/ha]) (ymax 0 [g/ha])) 
+         (flow-combined (ymin -200 [g/ha]) (ymax 0 [g/ha])))
   (dim [g/ha])
   (chemical Ioxynil))
 
 (defgnuplot plot2d-flow-Rorrende-Pendimethalin-1999 plot2d-flow-Rorrende-1999
   (graph &old 
-         (flow-horizontal (xmin -80 [g/ha]))
-         (flow-biopores (ymin -1400 [g/ha]) (ymax 0 [g/ha])) 
-         (flow-combined (ymin -1400 [g/ha]) (ymax 0 [g/ha])))
+         (flow-horizontal (xmin -25 [g/ha]))
+         (flow-biopores (ymin -2000 [g/ha]) (ymax 0 [g/ha])) 
+         (flow-combined (ymin -2000 [g/ha]) (ymax 0 [g/ha])))
   (dim [g/ha])
   (chemical Pendimethalin))
 
 (defgnuplot plot2d-flow-Rorrende-Pendimethalin-2000 plot2d-flow-Rorrende-2000
   (graph &old 
-         (flow-horizontal (xmin -80 [g/ha]))
-         (flow-biopores (ymin -1400 [g/ha]) (ymax 0 [g/ha])) 
-         (flow-combined (ymin -1400 [g/ha]) (ymax 0 [g/ha])))
+         (flow-horizontal (xmin -25 [g/ha]))
+         (flow-biopores (ymin -2000 [g/ha]) (ymax 0 [g/ha])) 
+         (flow-combined (ymin -2000 [g/ha]) (ymax 0 [g/ha])))
   (dim [g/ha])
   (chemical Pendimethalin))
 

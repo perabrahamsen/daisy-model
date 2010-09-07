@@ -128,7 +128,7 @@ public:
   double X_ice (size_t i) const
   { return X_ice_[i]; }
   double X_ice_total (size_t i) const
-  { return X_ice_[i] + X_ice_buffer_[i]; }
+  { return std::max (X_ice_[i] + X_ice_buffer_[i], 0.0); }
   double q_matrix (size_t i) const
   { return q_matrix_[i]; }
   double q_primary (size_t i) const

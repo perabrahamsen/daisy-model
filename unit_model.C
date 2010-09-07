@@ -595,6 +595,9 @@ Connvert to SI base units by multiplying with a factor.")
     add ("kg N/ha/mm", p_k * u_g / u_ha / p_m,
          -3, 1, 0, 0, 0, 0, 0,
          "Irrigation and percolation concentration.");
+    add ("g/ha/mm", u_g / u_ha / p_m,
+         -3, 1, 0, 0, 0, 0, 0,
+         "gram per hectare per millimeter.");
     
     // Volume per mass.
     add ("m^3/kg", 1e0, 3, -1, 0, 0, 0, 0, 0,

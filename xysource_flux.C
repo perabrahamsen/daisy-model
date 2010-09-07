@@ -274,18 +274,18 @@ XYSourceFlux::load (const Units& units, Treelog& msg)
           double to_z;
           
           if (from == Geometry::cell_above)
-            from_z = 0.0;
+            from_z = 0.0 + 1.0;
           else if (from == Geometry::cell_below)
-            from_z = zplus;
+            from_z = zplus - 1.0;
           else if (from < 0)
             continue;
           else
             from_z = center_z[from];
 
           if (to == Geometry::cell_above)
-            to_z = 0.0;
+            to_z = 0.0 + 1.0;
           else if (to == Geometry::cell_below)
-            to_z = zplus;
+            to_z = zplus - 1.0;
           else if (to < 0)
             continue;
           else
@@ -308,18 +308,18 @@ XYSourceFlux::load (const Units& units, Treelog& msg)
           double to_x;
           
           if (from == Geometry::cell_left)
-            from_x = 0.0;
+            from_x = 0.0 - 1.0;
           else if (from == Geometry::cell_right)
-            from_x = xplus;
+            from_x = xplus + 1.0;
           else if (from < 0)
             continue;
           else
             from_x = center_x[from];
 
           if (to == Geometry::cell_left)
-            to_x = 0.0;
+            to_x = 0.0 - 1.0;
           else if (to == Geometry::cell_right)
-            to_x = xplus;
+            to_x = xplus + 1.0;
           else if (to < 0)
             continue;
           else
