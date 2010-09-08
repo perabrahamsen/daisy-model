@@ -4,24 +4,36 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** Generelt:  Kig på vandbalance
 
-** Emacs
+** TOO HIGH
 
-Test 2D plot
+1999	12	1	-150
+1999	12	7	-20
+1999	12	11	-20
+
 
 ** NW
 
-Ny ref.
+1999	12	1	-150
+1999	12	7	-40
+1999	12	11	-40
 
 ** NE
 
-NW + Ice
+1999	12	1	-150
+1999	12	7	-60
+1999	12	11	-60
 
 ** SW
 
-Hypres
+1999	12	1	-150
+1999	12	7	-30
+1999	12	11	-30
 
 ** SE
 
+1999	12	1	-150
+1999	12	7	-50
+1999	12	11	-50
 
 * Agrovand
 

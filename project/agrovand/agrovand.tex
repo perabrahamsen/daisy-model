@@ -526,25 +526,35 @@ measurement.
 
 As can be seen, the content of 25-50 cm is overestimated in the
 simulation, while the content of 50-75 and 75-100 cm are both
-underestimated.  The same pattern (most bromide found in the deeper
-intervals) were found for the three other treatments, not shown here.
-The two next graphs below that divide the content in the same
-intervals into the primary domain (small pores, slow water movement)
-and the secondary domain (large pores, fast water movement).  The
-remaining graphs shows bromide transport through the borders between
-the soil intervals.  As can be seen, the secondary domain dominate at
-0 and 25 cm, while the tertiary domain (biopores) below.  There is no
-significant transport in the primary domain.  However, at the end of
-the period the primary domain dominate storage.
+underestimated.  The two next graphs below that divide the content in
+the same intervals into the primary domain (small pores, slow water
+movement) and the secondary domain (large pores, fast water movement).
+The remaining graphs shows bromide transport through the borders
+between the soil intervals.  As can be seen, the bromide enter the
+soil through the secondary domain, and some move further down through
+the secondary domain at 25 cm, but most bromide are moved down through
+the tertiary domain (the biopores), There is no significant transport
+in the primary domain.  However, at the end of the period the primary
+domain dominate storage.
 
-Figure~\ref{fig:bromide} show the usual weather graph at the top.
+In figure~\ref{fig:bromide-acc-extra} we examine four additional
+intervals the same way, namely 25-33 cm (plow pan), 33-50 cm, 100-125
+cm (end of long biopores), and 125-150 cm (below biopores).  As can be
+seen, the first events bring down bromide with both the medium depth
+biopores that end in the 50-75 cm interval, and the deep biopores that
+end in the 100-125 cm interval.  But the later events apparently
+mostly activate the deep biopores.
+
+Figure~\ref{fig:bromide} shows the usual weather graph at the top.
 Next is a graph showing how the water enter the system.  We see that
 the first rain after application enter the soil through the secondary
-domain.  So does most of the remaining rain, the exception being four
-events with ponding above the thresshold for activating surface
-biopores, as shown on the third graph.  The bottom five graph
-correspond to the bottom five graphs of figure~\ref{fig:bromide-acc},
-except the values are not accumulated.
+domain.  So does most of the remaining rain, but some events result in
+ponding above the thresshold for activating surface biopores, as shown
+on the third graph.  The bottom five graph correspond to the bottom
+five graphs of figure~\ref{fig:bromide-acc}, except the values are not
+accumulated. Figure~\ref{fig:bromide-extra} is similar, except that
+the four bottom graphs represent the additional intervals from
+figure~\ref{fig:bromide-acc-extra}.
 
 \section{Drains}
 \label{sec:drains}
@@ -556,35 +566,77 @@ figure~\ref{fig:season9899zoom},~\ref{fig:season9900zoom},
 and~\ref{fig:season0001zoom} focus on a single event within each drain
 season.
 
+The top graph of all figures show precipitation and temperature for
+the period.  The next graph shows simulated and observed drain flow,
+as well as calibrated aquifer and measured median piezometer pressure.
+Below that we get accumulated drain flow, simulated and observed.  By
+calibrating the aquifer pressure, we were able to match total drain
+flow, however we consistently underestimate the dynamics of each
+event.  Furthermore, in the beginning of the first season we get too
+much water, despite using a very low aquifer pressure compared to the
+piezometer data, and for the second seasin we have the opposite
+problem.
+
+The next two graphs concern particle leaching.  In the first we see
+flow proportional particle leaching, with simulated values extracted
+the same time as measurements.  Each data point represents the
+accumulated value since last measurement.  We also plot the simulated
+reservoir of readily available particles from the \citet{jarvis99}
+model.  The next graph show accumulated values, as well as simulated
+water flow directly from surface to drain.  In general we see that the
+measurements tend to be taken when Daisy predict the deep biopores to
+be active (that is, when there is heavy rain).  The dynamic simulation
+rarely match measurements, but the accumulated numbers shows that seen
+over an event the simulation is more often a good match.  Not always
+though, which means Daisy overestimate total particle leaching the
+first year, and underestimate it the last year.  In general, the
+variation in the measured numbers is larger than the variation in the
+simulated numbers.
+
+BROMIDE
+
+PENDIMETHALIN
+
+IOXYNIL
+
 \chapter{Discussion}
 
-\section{Soil and drain water}
+\section{Snow and ice}
 
-The simulation match the TDR measurements very well, indicating that
-our description of the upper boundary (precipitation) and top 60 cm of
-soil is likely to be good.
+\section{Soil and drain water}
 
 Getting the model to simulate the measured responsiveness to events
 has been a problem from the start, for example~\citet{nanna-agrovand}
 dedicate a sections to the issue.  The situation as improved a lot
 since then, but the figures showing drain flow for individual events
-still show too litte response.  We had more luck with the PLAP sites
-\citep{vap2d}.  A difference between the two is that we used measured
-pressure 5 meter below surface there, where in the present simulation
-we use a mostly static pressure table.  As the dynamics of the
-individual events is likely very important for pestice leaching in
-drain pipes, we should probably start using the piezometers for
-estimating the lower boundary, if we are going to return to the
-dataset.  Part of the problem is also the heterogenity of the lower
-layers of soil, as indicated by the EM38 map.  In any case, the lower
-boundary definitely need more attention.
+still show too litte response.  As the dynamics of the individual
+events is likely very important for pestice leaching in drain pipes,
+this is a significant problem.
 
-The piezometer measurements for plot 4 are shown on
-figure~\ref{fig:piezo-9899} and~\ref{fig:piezo-9900}.  They show large
-variation within the field, but also a temporal variance much larger
-than what we see on figure~\ref{fig:gwt}.
+The simulation match the TDR measurements very well, indicating that
+our description of the upper boundary (precipitation) and top 60 cm of
+soil is likely to be good.  This points to the lower boundary as the
+culprint.
 
-\section{Secondary domain}
+PIEZO-VARIES (even individual, sometimes high, sometimes low)
+LITTLE WATER IN DRAIN, MAYBE VERY LOCAL
+
+\section{Colloid generation}
+
+NOT OPTIMIZED 
+
+The most significant part of the dataset is the colloid leaching for
+different soil treatment regimes.  We have only looked at the
+conventional tillage regime, and used that for calibrating the colloid
+generation model described in \citet{macro-colloid}.  By using data
+from the three other regimes, it should be possible to improve the
+model to takes into account the timing of tillage operations, and help
+predict the possible effect of low tillage regimes on pesticide
+leaching.
+
+\section{Bromide}
+
+MAIN PROBLEM: LOCATION OF BROMIDE IN SOIL
 
 We do not believe in the calibration of the secondary domain in
 section~\ref{sec:soil-bromide}.  The bromide was applied when the soil
@@ -599,21 +651,9 @@ However, the work is far from wasted.  The simulation now reacts as
 expected on the parameters, so it has been useful as a test of the
 implementation of our model.
 
-\section{Colloid generation}
-
-The most significant part of the dataset is the colloid leaching for
-different soil treatment regimes.  We have only looked at the
-conventional tillage regime, and used that for calibrating the colloid
-generation model described in \citet{macro-colloid}.  By using data
-from the three other regimes, it should be possible to improve the
-model to takes into account the timing of tillage operations, and help
-predict the possible effect of low tillage regimes on pesticide
-leaching.
-
 \section{Pesticides}
 
 Too much -> May indicate we overstimate fast pathways
-
 
 \addcontentsline{toc}{chapter}{\numberline{}References}
 \bibliography{../../txt/daisy}
