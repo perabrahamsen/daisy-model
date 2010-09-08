@@ -19,7 +19,7 @@
 \newcommand{\kclay}{$\mbox{K}_{\mbox{clay}}$}
 \newcommand{\kd}{$\mbox{K}_{\mbox{d}}$}
 \newcommand{\rhob}{$\rho_{\mbox{b}}$}
-\newcommand{\hlim}{\mbox{h$_{\mbox{lim}}$}}
+\newcommand{\hlim}{\mbox{$h_{\mbox{lim}}$}}
 
 \newcommand{\focus}{\textsc{focus}}
 \newcommand{\hypres}{\textsc{hypres}}
@@ -77,10 +77,10 @@ Fax: \texttt{$+$45 353 32398}
 \chapter{Introduction}
 
 The Rørrendegård site is part of the Copenhagen University
-experimental station in Tåstrup.  It was selected for for the present
+experimental station at Tåstrup.  It was selected for for the present
 project mainly because because of the high resolution flow
 proportional drain data collected as part of the Agrovand project in
-the four drain season between between 1998 and 2002, which included
+the four drain seasons between between 1998 and 2002, which included
 soil particles, a likely transport path for strongly sorbing
 pesticides.  The results of the Agrovand project have been partly
 documented in~\citet{petersen200181} (biopores),
@@ -92,21 +92,23 @@ The main focus of the Agrovand project was the influence of tillage on
 the soil as a transport medium, so four plots with different tillage
 strategies were followed.  In this project we have only studied the
 data from plot 4, representing conventional tillage, and only the
-first three season where the best data is available.  Apart from
+first three seasons, where the best data is available.  Apart from
 particles, the drain water has been analysed for bromide (one
 application), pendimethalin (two applications) and ioxynil (one
 application), which we have chosen to include in our simulations
 simulate.  Soil water have been followed with piezometers,
 tensiometers, and TDR probes.  The most stable results are from the
-TDR probes, and the only one we have used for our calibration.
+TDR probes, and they only one we have used directly for our
+calibration.  The piezometer measurements have been analyzed for use
+calibration of the lower boundary, see appendix~\ref{app:piezometers}.
 Furthermore, transport pathways have been explored using dye tracer,
-and biopores have been counted both in the original project, and with
+and biopores have been counted both in the original project, and in
 more detail forming the basis for the new Daisy biopore model in the
 present project~\citep{habekost1,habekost2,habekost3}.
 
-The goal for the simulations presented in this paper is to test the
-two subcomponents of the the newly developed 2D Daisy against real
-data: The first is the particle generation and filtration modules; the
+The goal for the simulations presented in this paper is to test two
+subcomponents of the the newly developed 2D Daisy against real data:
+The first is the particle generation and filtration modules; the
 second is the slow/fast water movement.  For the later, we will use
 the drain bromide data which are available at a high resolution, and
 where we have reliable soil measurements to back them up with.  The
@@ -117,7 +119,8 @@ useful suplement though, as we don't have particle data for the PLAP
 sites, and the PLAP bromide suffer from the fact that the application
 was in spring, meaning an unknown amount have been uptaken by the
 crop.  In Agrovand the bromide application was in the autumn,
-minimizing the potential plant uptake.
+minimizing the potential plant uptake.  Instead, the agrovand bromide
+data suffer from the effect of ice, which is not simulated.
 
 \chapter{Setup}
 
@@ -206,7 +209,7 @@ interception coeeficient were lowered to 0.05 mm per LAI.
   \end{tabular}
 \end{table}
 
-Date and amount is specified for pesticide and bromide application.
+Date and amount are specified for pesticide and bromide applications.
 The model setup described in \citet{vap2d} were duplicated here, with
 field values for DT50 and \koc{} taken from \citet{ppdb20100517}.  No
 calibration was done on the persticides.  See
@@ -228,7 +231,7 @@ table~\ref{tab:pest-man}.
   \end{tabular}
 \end{table}
 
-All management operation are assumed to be performed at noon.
+All management operations are assumed to be performed at noon.
 
 \section{Soil profile and biopores}
 \label{sec:soil-profile}
@@ -274,9 +277,9 @@ values used are summarized in table~\ref{tab:texture}.
 
 Initially, three classes of biopores were used in the simulation based
 on \citet{habekost1}, where we focused on the biopores that had
-potentially had connection to the drain pipes.  Initially we assumed
-that all the deep biopores (the two classes ending in 120 cm) in the
-drain canyon would be directly connected to the drain pipes.  Based on
+potentially had connection to the drain pipes.  We first assumed that
+all the deep biopores (the two classes ending in 120 cm) in the drain
+canyon would be directly connected to the drain pipes.  Based on
 pesticide measurements in drains in the PLAP sites, we decided to
 change this so only half the deep biopores in the drain canyon would
 be directly connected to the drain pipes \citep{vap2d}.  Compared to
@@ -305,7 +308,7 @@ time.
 
 \Hypres{} was used initially to estimate hydraulic properties for all
 horizons. The TDR measurements (see figure~\ref{fig:tdr}) have been
-used for calibrating.  The only parameter that has been changes is
+used for calibrating.  The only parameter that has been changed is
 $K_{\mbox{sat}}$ (saturated conductivity).  For the surface layer (top
 3 cm), this has been decreased to 10\% of the value suggested by
 \hypres{}.  In the Bt horizon conductivity has been decreased to 50\%,
@@ -333,18 +336,21 @@ vertical) to the plow pan.
 
 
 An EM38 map of the field indicated large areas to have a sandy
-underground, and the piezometers showed that these areas had a
-significantly lower groundwater level (see
-appendix~\ref{app:piezometers}).  As a rough cut, we estimated that
-two thirds of the field did not contribute to the drainage through the
+underground \citep{nanna-agrovand}, and the piezometers showed that
+these areas had a significantly lower groundwater level (see
+appendix~\ref{app:piezometers}).  We estimated that roughly two thirds
+of the field did not contribute to the drainage through the
 groundwater level.  In Daisy we modelled this by dividing the field
 into two columns.  The first column had a free drainage lower
 boundary, and represented twice the area of the other column, with an
 aquitard bottom.  The aquitard layer was described with a size (2
 meters), a conductivity (0.5 mm/h) and the pressure table of the
-underlying aquifer.  The presure table was made variable in order to
-match drain flow, and is shown on figure~\ref{fig:gwt} together with
-the simulated ground water table.  The free drainage column would
+underlying aquifer.  The presure table was based on a median
+piezometer value (see appendix~\ref{app:piezometers}), and calibrated
+to match drain flow, and is shown on figure~\ref{fig:gwt} together
+with the simulated ground water table.  Note that piezometer
+measurements represent pressure 2.3 m below surface, while the aquifer
+represents pressure 4 m below surface.  The free drainage column would
 still contribute to the drain water through directly connected
 biopores.  The TDR and soil bromide measurements were all performed in
 the part of the field with clay underground, and the comparisons are
@@ -489,13 +495,18 @@ Figure~\ref{fig:tdr} shows horizontal TDR measurements for different
 depths.  The two authomn gaps are after plowing, when the TDR probes
 are removed.  At the third season the TDR probes had drifted, and were
 left out.  The TDR probes does not work on ice, which explain the
-noise in the measurements during periods with frost.  The simulation
-overstimate the water level near the soil surface, which could
-possibly be a problem with the TDR measuring some air.  We may
-overstimate the dynamics near the bottom of the plow layer.  The
-measurements for the bottom TDR show fast variations during the winter
-which looks mostly like noise, something not duplicated in the
-simulation.
+apparent noise in the measurements during periods with frost.
+Enabling the experimental support for ice in Daisy showed a good match
+between upper TDR probes and simulated water during the two winter
+periods, supporting the idea that difference is due to ice.
+Unfortunately, the ice support in Daisy is not yet complete, and
+created too many other problems with the simulation, so it was
+disabled for the final runs. The simulation overstimate the water
+level near the soil surface, which could possibly be a problem with
+the TDR measuring some air.  We may overstimate the dynamics near the
+bottom of the plow layer.  The measurements for the bottom TDR show
+fast variations during the winter which looks mostly like noise,
+something not duplicated in the simulation, with or without ice.
 
 Figure~\ref{fig:tdr-zoom} shows the same data, but only for the first
 summer after installation, where the TDR measurements are likely to be

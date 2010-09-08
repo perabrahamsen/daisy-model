@@ -1,12 +1,12 @@
 SETUP = ror-pa.dai chemical25.dai plotstuff.dai ror-log.dai ror-manager.dai \
-	ror-setup.dai ror-soil.dai rorrendechemicals.dai colloid-bound.dai
+	ror-setup.dai ror-soil.dai colloid-bound.dai plot-2d.dai biopores.dai
 
-DATA = brommass.ddf piezometer.ddf rain.ddf \
+DATA = piezo-calib.gwt brommass.ddf piezometer.ddf rain.ddf \
 	Bromide-25.ddf bromide.ddf drain-flow.ddf ioxynil.ddf particles.ddf \
 	pendimethalin.ddf theta_12cm.ddf theta_16cm.ddf theta_20cm.ddf \
 	theta_24cm.ddf theta_36cm.ddf theta_4cm.ddf theta_60cm.ddf theta_8cm.ddf
 
-OTHER = ror-mmo.dai ror-pa.dai
+OTHER = ror-mmo.dai 
 
 DOC = plotstuff.tex 
 
@@ -32,12 +32,6 @@ add:
 
 plotstuff.pdf: plotstuff.tex .gnuplot-stamp
 	pdflatex plotstuff.tex
-
-plotstuff-9899.pdf: plotstuff-9899.dvi
-	dvipdfm plotstuff-9899.dvi
-
-plotstuff-9899.dvi: plotstuff-9899.tex .gnuplot-stamp
-	latex plotstuff-9899.tex
 
 .gnuplot-stamp: daisy.gnuplot
 	-gnuplot daisy.gnuplot
