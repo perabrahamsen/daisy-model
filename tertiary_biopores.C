@@ -279,7 +279,7 @@ TertiaryBiopores::tick_source (const Geometry& geo, const Soil& soil,
     {
       const double h_cond = std::min(pressure_initiate, h[c]);
       const double T = soil_heat.T (c);
-      const double h_ice = 0.0;    //ice ignored 
+      const double h_ice = soil_water.h_ice (c); 
       const double K_zz = soil.K (c, h_cond, h_ice, T);
       const double anisotropy = soil.anisotropy_cell (c);
       const double K_xx = K_zz * anisotropy;
