@@ -8,7 +8,7 @@
   (graph plot1d plot2d))
 
 (run batch (run 
-            ;;Rorrende 
+            Rorrende 
             plotall 
             ;;plot2d
             ))
