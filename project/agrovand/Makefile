@@ -37,12 +37,8 @@ plotstuff.pdf: plotstuff.tex .gnuplot-stamp
 	-gnuplot daisy.gnuplot
 	@touch .gnuplot-stamp
 
-daisy.gnuplot: $(SETUP) $(DAISY) plotstuff.dai fig log
+daisy.gnuplot: $(SETUP) $(DATA) $(DAISY) fig log
 	nice $(DAISY) ror-pa.dai
-
-linux:	fig log
-	( export DAISYHOME=/home/abraham/daisy; nice "${DAISYHOME}/obj/daisy" ror-pa.dai )
-	make plotstuff.pdf
 
 fig:
 	mkdir fig

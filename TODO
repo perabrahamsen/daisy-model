@@ -1,45 +1,35 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* TDR plot med is?
+
+* Fjern Flyt high/low gwt fra setup til tre selvstændige plots?
+
 * Sim
 
-** Generelt:  Kig på vandbalance
+2000	11	21	-75 TOO LOW
+2000	11	28	-110 TOO HIGH
 
-** TOO HIGH
+** NW 
 
-1999	12	1	-150
-1999	12	7	-20
-1999	12	11	-20
-
-
-** NW
-
-1999	12	1	-150
-1999	12	7	-40
-1999	12	11	-40
+2000	11	21	-45
+2000	11	24	-300
 
 ** NE
 
-1999	12	1	-150
-1999	12	7	-60
-1999	12	11	-60
+2000	11	21	-55
+2000	11	24	-200
 
 ** SW
 
-1999	12	1	-150
-1999	12	7	-30
-1999	12	11	-30
+2000	11	21	-65
+2000	11	24	-200
 
 ** SE
 
-1999	12	1	-150
-1999	12	7	-50
-1999	12	11	-50
+2000	11	21	-35
+2000	11	24	-300
 
 * Agrovand
-
-** 2D Plot
-
-ret plot-2d.dai
 
 ** Skriv
 
