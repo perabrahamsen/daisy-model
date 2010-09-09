@@ -347,26 +347,20 @@ aquitard bottom.  The aquitard layer was described with a size (2
 meters), a conductivity (0.5 mm/h) and the pressure table of the
 underlying aquifer.  The presure table was based on a median
 piezometer value (see appendix~\ref{app:piezometers}), and calibrated
-to match drain flow, and is shown on figure~\ref{fig:gwt} together
-with the simulated ground water table.  Note that piezometer
-measurements represent pressure 2.3 m below surface, while the aquifer
-represents pressure 4 m below surface.  The free drainage column would
-still contribute to the drain water through directly connected
-biopores.  The TDR and soil bromide measurements were all performed in
-the part of the field with clay underground, and the comparisons are
-therefore done to the column with an aquitard.
+to match drain flow, and is shown on figure~\ref{fig:gwt}.  Note that
+piezometer measurements represent pressure 2.3 m below surface, while
+the aquifer represents pressure 4 m below surface.  The free drainage
+column would still contribute to the drain water through directly
+connected biopores.  The TDR and soil bromide measurements were all
+performed in the part of the field with clay underground, and the
+comparisons are therefore done to the column with an aquitard.
 
 \begin{figure}[htbp]
   \begin{center}
     \fig{gwt}
   \end{center}
-  \caption{Groundwater table.  Simulated low value is calculated from
-    pressure in lowest unsaturated numeric cell, typically located
-    near drain.  Simulated high value is calculated from pressure in
-    highest saturated cell, typically farthest away from the drain.
-    The sudden jumps of the high value represents situations with
-    surface ponding, where the top numeric cell becomes saturated.
-    The pressure table is a calibration parameter.}
+  \caption{Median measured pressure level at 230 cm below surface
+    together with calibrated aquifer pressure level}
   \label{fig:gwt}
 \end{figure}
 
@@ -485,11 +479,14 @@ The results are discussed in section~\ref{sec:drains}.
 
 \chapter{Results}
 
-The simulation results are presented together with measured data in
-figures~\ref{fig:first} to~\ref{fig:last}, found at the end of the
-report (appendix~\ref{app:time-series}).  
+The main simulation results are presented together with measured data
+in figures~\ref{fig:first} to~\ref{fig:last}, found at the end of the
+report (appendix~\ref{app:time-series}).  Additional 2D plots with
+simulation results without matching measurements can be found in
+appendix~\ref{app:plot-2d}.
 
 \section{Soil water}
+\label{sec:tdr}
 
 Figure~\ref{fig:tdr} shows horizontal TDR measurements for different
 depths.  The two authomn gaps are after plowing, when the TDR probes
@@ -564,40 +561,46 @@ figure~\ref{fig:season9899},~\ref{fig:season9900},
 and~\ref{fig:season0001}, while
 figure~\ref{fig:season9899zoom},~\ref{fig:season9900zoom},
 and~\ref{fig:season0001zoom} focus on a single event within each drain
-season.
+season.  
 
 \subsection{Water}
+\label{sec:drain-water}
 
 The top graph of all figures show precipitation and temperature for
 the period.  The next graph shows simulated and observed drain flow,
 as well as calibrated aquifer and measured median piezometer pressure.
 Below that we get accumulated drain flow, simulated and observed.  By
-calibrating the aquifer pressure, we were able to match total drain
-flow, however we consistently underestimate the dynamics of each
-event.  Furthermore, in the beginning of the first season we get too
-much water, despite using a very low aquifer pressure compared to the
-piezometer data, and for the second seasin we have the opposite
-problem.
+calibrating the aquifer pressure (see figure~\ref{fig:gwt-sim}), we
+were able to match total drain flow, however we consistently
+underestimate the dynamics of each event.  Furthermore, in the
+beginning of the first season we get too much water, despite using a
+very low aquifer pressure compared to the piezometer data, and for the
+second seasin we have the opposite problem.
 
 \subsection{Particle leaching}
+\label{sec:particles}
 
 The next two graphs concern particle leaching.  In the first we see
 flow proportional particle leaching, with simulated values extracted
 the same time as measurements.  Each data point represents the
 accumulated value since last measurement.  We also plot the simulated
-reservoir of readily available particles from the \citet{jarvis99}
-model.  The next graph show accumulated values, as well as simulated
-water flow directly from surface to drain.  In general we see that the
-measurements tend to be taken when Daisy predict the deep biopores to
-be active (that is, when there is heavy rain).  The dynamic simulation
-rarely match measurements, but the accumulated numbers shows that seen
-over an event the simulation is more often a good match.  Not always
-though, which means Daisy overestimate total particle leaching the
-first year, and underestimate it the last year.  In general, the
-variation in the measured numbers is larger than the variation in the
-simulated numbers.
+reservoir of readily available particles from the
+\citet{macro-colloid} model.  The next graph show accumulated values,
+as well as simulated water flow directly from surface to drain.  In
+general we see that the measurements tend to be taken when Daisy
+predict the deep biopores to be active (that is, when there is heavy
+rain).  The dynamic simulation rarely match measurements, but the
+accumulated numbers shows that seen over an event the simulation is
+more often a good match.  Not always though, which means Daisy
+overestimate total particle leaching the first year, and underestimate
+it the last year.  In general, the variation in the measured numbers
+is larger than the variation in the simulated numbers.  We can also
+see that the strongly sorbing pendimethalin are almost exclusively
+leach together with particles, while ioxynil is found both particle
+bound and
 
 \subsection{Bromide and pesticides}
+\label{sec:drain-solutes}
 
 The next graphs vary by season. Simulated and observed concentration
 of bromide and pesticides are shown for the seasons they were
@@ -619,11 +622,28 @@ events.
 
 \chapter{Discussion}
 
-TOP SOIL
+* RESULTS
 
-UNDERGROUND
+** TOP SOIL
 
-LOCATION OF BROMIDE, PATHWAYS
+*** tdr
+
+*** particles
+
+*** Pesticides
+
+** UNDERGROUND
+
+** LOCATION OF BROMIDE, PATHWAYS
+
+* FURTHER WORK
+
+** Snow and ice
+
+** Particles and tillage
+
+** Pesticides
+
 
 \section{Snow and ice}
 
@@ -716,7 +736,8 @@ and that plot 1 likely contain more sand than the other three
 \citep{nanna-agrovand}.  As this matches well with our analysis of the
 piezometer measurements, we choose to include plot 2, 3 and 4 at 10 m
 and 40 m distance from the wells, in our final median piezometer
-value, shown on figure~\ref{fig:gwt}
+value, shown on figure~\ref{fig:gwt-sim} together with out calibrated
+aquifer pressure, and simulated groundwater table.
 
 \begin{figure}[htbp]
   \begin{center}
@@ -770,6 +791,25 @@ value, shown on figure~\ref{fig:gwt}
   \label{fig:piezo-median-9900}
 \end{figure}
 
+\begin{figure}[htbp]
+  \vspace*{-0.5cm}
+  \begin{center}
+    \figtop{gwt-9899}
+    \figtop{gwt-9900}
+    \fig{gwt-0001}
+  \end{center}
+  \vspace*{-0.5cm}
+  \caption{Median measured pressure level at 230 cm below surface
+      together with calibrated aquifer pressure level and simulated
+      groundwater table. Simulated low value is calculated from
+      pressure in lowest unsaturated numeric cell, typically located
+      near drain.  Simulated high value is calculated from pressure in
+      highest saturated cell, typically farthest away from the drain.
+      The sudden jumps of the high value represents situations with
+      surface ponding, where the top numeric cell becomes saturated.}
+  \label{fig:gwt-sim}
+\end{figure}
+
 \include{ror-plot-2d}
 
 \chapter{Time series}
@@ -790,13 +830,15 @@ samples representing less than one hour of flow very combined.
 \label{sec:soil-water}
 
 The graphs on figure~\ref{fig:tdr} and~\ref{fig:tdr-zoom} shows
-simulated and measured volumetric water content at different depths.
+simulated and measured volumetric water content at different depths,
+and are discussed in section~\ref{sec:tdr}.
 
 \section{Soil bromide content}
 \label{sec:soil-bromide-content}
 
-Figure~\ref{fig:bromide} and~\ref{fig:bromide-acc} concern soil
-bromide content
+Figures~\ref{fig:bromide},~\ref{fig:bromide-acc},~\ref{fig:bromide-extra},
+and~\ref{fig:bromide-acc-extra} concern soil bromide content, and are
+discussed in section~\ref{sec:soil-bromide}.
 
 \section{Drain content}
 \label{sec:drain-content}
@@ -806,12 +848,17 @@ figure~\ref{fig:season9899},~\ref{fig:season9900},
 and~\ref{fig:season0001}, while
 figure~\ref{fig:season9899zoom},~\ref{fig:season9900zoom},
 and~\ref{fig:season0001zoom} focus on a single event within each drain
-season.  Dynamic and accumulated water flow is shown on the two first
-graphs under the top graph.  The next two graphs show particle
-leaching.  The dynamic particle leaching represent particles collected
-since last measurement.  The particles may have leached before the
-time of meaurements.  The simulated reservoir of ready available
-particles is shown on the same graph.
+season.  See section~\ref{sec:drains}.
+
+Dynamic and accumulated water flow is shown on the two first graphs
+under the top graph.  The median piezometer pressure table, and the
+calibrated aquifer pressure is shown on the right axis on the dynamic
+water flow graph.  See section~\ref{sec:drain-water}.  The next two
+graphs show particle leaching.  The dynamic particle leaching
+represent particles collected since last measurement.  The particles
+may have leached before the time of meaurements.  The simulated
+reservoir of ready available particles is shown on the same graph.
+See section~\ref{sec:particles}
 
 The next graphs depend on season.  For season 1998--1999 and season
 1999--2000 (figures~\ref{fig:season9899}~--~\ref{fig:season9900zoom})
@@ -819,7 +866,8 @@ the next two graphs depicts bromide concentration, and accumulated
 bromide leaching.  For season 2000-2001 they instead depict ioxynil
 concentration and mass in drain water.  For the 1999--2000 and
 2000--2001 season, we finish off with pendimethalin concentration and
-mass.  
+mass.  For the pesticides, we both colloid bound and total amounts are
+shown.  See section~\ref{sec:drain-solutes}.
 
 \newgeometry{left=1cm,top=1cm,right=1cm,bottom=1cm,nohead,nofoot}
 \pagestyle{empty}

@@ -11,6 +11,7 @@
             Rorrende 
             plotall 
             ;;plot2d
+            ;;plot1d
             ))
 
 ;;; ror-pa.dai ends here.
