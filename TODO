@@ -1,48 +1,20 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* TDR plot med is?
+* Agrovand
 
-* Plot colloid bound pesticides in drain
+** TDR plot med is?
+
+** Læs rapport igennem
+
+** Lav figurer til Søren.
 
 * Sim
 
-2000	11	21	-75 TOO LOW
-2000	11	28	-110 TOO HIGH
+** Main: ref
 
-2000	11	21	-35 TOO LOW
-2000	11	24	-200 TOO LOW
+** NW: Ref
 
-** NW 
-
-2000	11	21	-35
-2000	11	24	-150
-2000	12	11	-150
-2000	12	12	-50
-
-** NE
-
-2000	11	21	-30
-2000	11	24	-150 
-
-** SW
-
-2000	11	21	-25
-2000	11	24	-150 
-
-** SE
-
-2000	11	21	-35
-2000	11	24	-150 
-2000	12	11	-150
-2000	12	12	-70
-
-* Agrovand
-
-** Skriv
-
-*** Results
-
-Valg af events (ingen is?)
+** NE: Ice
 
 * FOCUS
 

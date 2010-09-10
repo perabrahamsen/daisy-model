@@ -158,7 +158,7 @@ the screen instead of being stored in a file.");
         return false;
       }
     } check_where;
-    frame.set_check ("where", check_where);
+    // frame.set_check ("where", check_where);
     frame.set ("where", "screen");
     frame.declare_string ("device", Attribute::OptionalConst, "\
 Output device.  By default, this is derived from the file extenstion.");
