@@ -48,7 +48,7 @@ for the Danish Environmental Protection Agency.
     \noindent
     Søren Hansen \texttt{$<$sha@life.ku.dk$>$}\\
     Per Abrahamsen \texttt{$<$abraham@dina.kvl.dk$>$}\\
-    Carsten Pedersen \texttt{$<$cpe@life.ku.dk$>$}\\
+    Carsten Petersen \texttt{$<$cpe@life.ku.dk$>$}\\
     %% Marie Habekost Nielsen \texttt{$<$maha@life.ku.dk$>$}\\
     \\
     \today{}\\
@@ -68,17 +68,17 @@ Fax: \texttt{$+$45 353 32398}
 \chapter{Introduction}
 
 The Danish Pesticide Leaching Assessment Programme (PLAP) has been
-monitoring drain and soil water since 1999 at six different locations
-in order to evaluate the leaching risk of pesticides.  Pesticides are
-found in concentrations above 0.1 $\mu$g/L in drain water, whereas
-such concentrations are rarely found in the horizontal filters 3.5
-meter below the surface.
+monitoring drain and soil water since 1999 at six (five ongoing)
+locations in order to evaluate the leaching risk of pesticides.
+Pesticides are found in concentrations above 0.1 $\mu$g/L in drain
+water, whereas such concentrations are rarely found in the horizontal
+filters 3.5 meter below the surface.
 
 In order to better understand the system, and eventually how the
 measurements can be better used for assessing potential risk of
 contamination of drinking water, the Daisy agricultural model has been
-extended with support for those processes we assume are relevant for
-transport of pesticides from surface to drain pipes.
+extended by including support for those processes we assume are
+relevant for transport of pesticides from surface to drain pipes.
 
 To test our understanding as embedded in the model, as well as the
 applicability of the model to the PLAP sites, two PLAP sites, four
@@ -87,15 +87,15 @@ project.  Our hypothesis is here that we can explain the measured data
 with the model.
 
 The most significant measured results are from the Estrup site, so
-that was fixed as the first site.  We wanted to use the same years for
-both sites to see the results of similar climate on two different
-locations.  Hourly weather data from the site had to be present, both
-for the modelling period and for one growth season before for
-"`warmup"'.  The initial choice of F{\aa}rdrup as the second site was
-rejected, as it was not possible to get sufficient quality weather
-data.  Furthermore, we wanted the same pesticides on both sites, and
-both weakly and strongly sorbing pesticides represented.  Glyphosate
-had to be one of them.
+that was chosen as one of the sites to be calibrated.  We wanted to
+use the same years for both sites to see the results of similar
+climate on two different locations.  Hourly weather data from the site
+had to be present, both for the modelling period and for one growth
+season before for "`warmup"'.  The initial choice of F{\aa}rdrup as
+the second site was rejected, as it was not possible to get sufficient
+site-sepcific weather data.  Furthermore, we wanted the same
+pesticides on both sites, and both weakly and strongly sorbing
+pesticides represented.  Glyphosate had to be one of them.
 
 Based on these criteria, we chose Silstrup and Estrup, drain seasons
 2000-2001 and 2001-2002, with the pesticides glyphosate, fenpropimorph,
@@ -134,11 +134,16 @@ included in the present model, with some caveats
 \item Measurements at both sites show
   (figure~\ref{fig:Silstrup-weekly2} and~\ref{fig:Estrup-weekly}) that
   the initial glyphosate event is followed by a couple of weeks with
-  addition drain leaching.  This could be due to easily remobilizable
-  glyphosate in proximity of the preferential transport system, a
-  process we have not implemented in our model, or for Estrup, due to
-  the peat below part of site, which hasn't been included in the
-  setup.
+  addition drain leaching.  The model show the same, but underestimate
+  the size of the later events.  This could be due to easily
+  remobilizable glyphosate in proximity of the preferential transport
+  system, a process we have not implemented in our model, or for
+  Estrup, due to the peat below part of site, which hasn't been
+  included in the setup.  As glyphosate doesn't sorb to organic matter
+  \citep{gjettermann2009}, any glyphosate that finds it way down to
+  the peat through biopores, may potentially slowly move towards the
+  drain pipes.  For Estrup, Daisy continues to underestimate the late
+  events for the rest of the first drain season.
 \item Bromide is found in some of the horizontal filters at 3.5 meters
   depth at both sites in the first measurements after application of
   Bromide.  No pesticides are generally found at this depth though.
@@ -171,23 +176,71 @@ Apart from the significance of biopores for pesticide leaching, it is
 interesting to note how the two sites are dominated by different
 processes.  For Silstrup, surface processes (crust formation, litter,
 and overland flow) were dominating the system.  For Estrup, the
-measurements can to a large degree be adequately explained by what
-happens in the plow layer, see figures and discussion in
-appendix~\ref{app:plot-2d}.
+majority of the measured leaching can be adequately explained by what
+happens in the plow layer.  See also the figures and discussion in
+appendix~\ref{app:plot-2d} for further analysis of the simulated
+processes.
+
+\section{Localized pesticide parameters}
+
+Due to a communication snafu, we were not aware of the local estimates
+of sorption and degradation of some pesticides, documented
+in~\citet{vap2003}.  This concerns dimethoate at Estrup, for which we
+have no significant measurements, and metamitron at Silstrup, for
+which we \emph{do} have significant measurements.  Furthermore,
+fenpropimorph has been analyzed at the four remaining PLAP sites.
+Both topsoil (0-20 cm) and subsoil (80-100 cm) were analyzed.
+
+A \kd{} value was estimated for both soil depths, but \koc{} only for
+the topsoil.  For dimethoate sorption at Estrup, \koc{} was estimated
+to 86 mL/g, the value used in Daisy was 30 mL/g.  For metamitron at
+Silstrup, \koc{} was estimated to 160 mL/g.  The \kd{} value is 3.5
+mL/g in the topsoil, and 0.4 mL/g in the subsoil.  As the organic
+content of the subsoil is also 10 \% of the topsoil, using the \koc{}
+value seems sensible.  In Daisy we used a \kd{} of 4.0 mL/g.  For
+fenpropimorph, the four sites show a span of \koc{} from 1532 mL/g
+(Jyndevad) to 7496 mL/g (Sl{\ae}ggerup).  The value used in Daisy is
+2401 mL/g.
+
+For dimethoate at Estrup the DT50 value was estimated to be less than 2
+days in the top soil, and 74 days in the subsoil.  The value used in
+Daisy was 7.2 days in the top soil, which will translate into 24 days
+in the subsoil using the \focus{} depth function.  Note that the
+\focus{} depth function increase DT50 to infinity (no degradation)
+below 1 meter, just under the measured interval of subsoil.
+Metamitron decomposition was not analyzed.  For fenpropimorph, DT50
+was over 300 for all analyzed subsoils.  For the topsoil, DT50 varied
+between 15 and 379.  The value used in Daisy was 25.5 days for the
+topsoil, corresponding to 85 days for the subsoil.
+
+We do not believe the difference in parameter values between what was
+used by Daisy and what was measured for dimethoate at Estrup are
+sufficiently large to signifiantly change the simulated drain
+leaching.  However, using the lower measured sorption rate (especially
+in the subsoil) for metamitron at Silstrup would likely result in
+larger simulated drain leaching, which is not good as we already
+overestimate it.  The values used in Daisy for fenpropimorph are
+within the span measured at the other sites, except that degradation
+apparently descrease faster with depth than asserted by \focus{}.
 
 \section{Further work}
 
-Apart from applying the model on more and larger data sets, two areas
-in particular need further work.
-\begin{itemize}
-\item The surface processes (flow, litter storage, degradation) are
-  very important, especially for the Silstrup site, but only the
-  minimal work on those to get an effect have been done in this project.
-\item The pesticide processes (colloid transport, sorption sites,
-  sorption kinetics, and degradation) are parametrized from
-  literature values and ``best guesses'', many of those parameters
-  should be adapted to direct local measurements.
-\end{itemize}
+The surface processes (flow, litter storage, degradation) are very
+important, especially for the Silstrup site.  This was discovered
+late, hence the solutions have been less carefully worked out than we
+would desire.  The flow model is nearly non-existing (it just
+distribute excess water uniformly on the field), the litter storage
+model is based on millet growing in Brazil, and may or may not be the
+right choice for spring barley growing in Denmark.  The surface
+pesticide degradation parameters were based on an unrelated pesticide
+that happened to be in the Daisy pesticide library.
+
+We also need to use localized pesticide parameters like those
+available from \citet{vap2003}, as well as get better knowledge of
+colloid transport, different sorption sites, and sorption kinetics.
+The values for the later are mostly based on a desire to test the
+mechanisms in the model, than qualified estimates of the physical and
+chemical properties of the system.
 
 \addcontentsline{toc}{chapter}{\numberline{}References}
 \bibliography{../../txt/daisy}

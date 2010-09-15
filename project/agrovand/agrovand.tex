@@ -55,7 +55,7 @@ for the Danish Environmental Protection Agency.
   \begin{large}
     \noindent
     Søren Hansen \texttt{$<$sha@life.ku.dk$>$}\\
-    Carsten Pedersen \texttt{$<$cpe@life.ku.dk$>$}\\
+    Carsten Petersen \texttt{$<$cpe@life.ku.dk$>$}\\
     Per Abrahamsen \texttt{$<$abraham@dina.kvl.dk$>$}\\
     Marie Habekost Nielsen \texttt{$<$maha@life.ku.dk$>$}\\
     Mikkel Mollerup \texttt{$<$mmo@geus.dk$>$}\\
@@ -78,15 +78,17 @@ Fax: \texttt{$+$45 353 32398}
 
 The Rørrendegård site is part of the Copenhagen University
 experimental station at Tåstrup.  It was selected for for the present
-project mainly because because of the high resolution flow
-proportional drain data collected as part of the Agrovand project in
-the four drain seasons between between 1998 and 2002, which included
-soil particles, a likely transport path for strongly sorbing
-pesticides.  The results of the Agrovand project have been partly
-documented in~\citet{petersen200181} (biopores),
-\citet{petersen2002movement} (particles and pesticides),
-\citet{petersen2004movement} (particles and bromide), and
-\citet{petersen2008spatio} (anisotropy).
+project mainly because of the high resolution flow proportional drain
+data collected as part of the Agrovand project in the four drain
+seasons between between 1998 and 2002, which included soil particles,
+a likely transport path for strongly sorbing pesticides.  The results
+of the Agrovand project have been partly documented
+in~\citet{petersen200181} (biopores), \citet{petersen2002movement}
+(particles and pesticides), \citet{petersen2004movement} (particles
+and bromide), and \citet{petersen2008spatio} (anisotropy).
+Furthermore, investigations at the site on tillage effects on soil
+structure stability and hydraulic properties of the surface layer was
+reported in \citet{daraghmeh2008near,daraghmeh2009soil}.
 
 The main focus of the Agrovand project was the influence of tillage on
 the soil as a transport medium, so four plots with different tillage
@@ -95,16 +97,15 @@ data from plot 4, representing conventional tillage, and only the
 first three seasons, where the best data is available.  Apart from
 particles, the drain water has been analysed for bromide (one
 application), pendimethalin (two applications) and ioxynil (one
-application), which we have chosen to include in our simulations
-simulate.  Soil water have been followed with piezometers,
-tensiometers, and TDR probes.  The most stable results are from the
-TDR probes, and they only one we have used directly for our
-calibration.  The piezometer measurements have been analyzed for use
-in calibration of the lower boundary, see
-appendix~\ref{app:piezometers}.  Furthermore, transport pathways have
-been explored using dye tracer, and biopores have been counted both in
-the original project, and in more detail forming the basis for the new
-Daisy biopore model in the present
+application), which we have chosen to include in our simulations.
+Soil water status has been followed with piezometers, tensiometers,
+and TDR probes.  The most stable results are from the TDR probes, and
+they are the only one we have used directly for our calibration.  The
+piezometer measurements have been analyzed for use in calibration of
+the lower boundary, see appendix~\ref{app:piezometers}.  Furthermore,
+transport pathways have been explored using dye tracer, and biopores
+have been counted both in the original project, and in more details
+forming the basis for the new Daisy biopore model in the present
 project~\citep{habekost1,habekost2,habekost3}.
 
 The goal for the simulations presented in this paper is to test two
@@ -121,7 +122,8 @@ sites, and the PLAP bromide suffer from the fact that the application
 was in spring, meaning an unknown amount have been uptaken by the
 crop.  In Agrovand the bromide application was in the autumn,
 minimizing the potential plant uptake.  Instead, the agrovand bromide
-data suffer from the effect of ice, which is not simulated.
+may have been affected by the formation of ice in the soil, which is
+not simulated.
 
 \chapter{Setup}
 
@@ -138,7 +140,8 @@ history.
   pesticides by Mikkel Mollerup, and used as a basis for the PLAP site
   calibration~\citep{vap2d}.
 \item Based on the model changes and experience gained made during the
-  PLAP site calibration, the setup was recalibrated by Per Abrahamsen.
+  PLAP site calibration, the setup was recalibrated by Per
+  Abrahamsen~\citet{mst-agrovand}.
 \end{enumerate}
 
 This history does mean that the setup likely contain parameter choices
@@ -237,7 +240,7 @@ All management operations are assumed to be performed at noon.
 \section{Soil profile and biopores}
 \label{sec:soil-profile}
 
-The soil profile and the description of the drain canyon is based on
+The soil profile and the description of the drain ditch is based on
 the work presented in \citet{habekost3}, where \textsc{isss4} texture
 classification was used.  \citet{petersen200181} presents texture and
 dry bulk density (\rhob{}) analyses for four depths, which have been
@@ -252,7 +255,7 @@ are summarized in table~\ref{tab:texture}.
 \begin{table}[htbp]
   \caption{Soil properties. Depth is specified in cm below soil surface, 
     and the dry bulk density (\rhob{}) specified in g/cm$^3$.
-    Humus is given as a percentage of total weight.  For the drain canyon, 
+    Humus is given as a percentage of total weight.  For the drain ditch, 
     where the \textsc{isss4} texture classification system was used,
     the mineral mineral soil particle distribution is also given as
     fraction of total weight.  For the other horizons the \textsc{usda3} 
@@ -272,19 +275,19 @@ are summarized in table~\ref{tab:texture}.
     Area & Depth & Clay & Silt & Fine Sand & Coarse sand & Humus
             & \rhob{} \\
     &  & $< 2\;\mu$m & $< 20\;\mu$m & $< 200\;\mu$m & $< 2\;$mm & & \\\hline
-    Drain canyon & 33--120 & 21.3 & 19.0 & 24.4 & 33.9 & 1.4 & 1.65 
+    Drain ditch & 33--120 & 21.3 & 19.0 & 24.4 & 33.9 & 1.4 & 1.65 
   \end{tabular}
 \end{table}
 
 Initially, three classes of biopores were used in the simulation based
-on \citet{habekost1}, where we focused on the biopores that had
+on \citet{habekost1}, where we focused on the biopores that
 potentially had connection to the drain pipes.  We first assumed that
 all the deep biopores (the two classes ending in 120 cm) in the drain
-canyon would be directly connected to the drain pipes.  Based on
+ditch would be directly connected to the drain pipes.  Based on
 pesticide measurements in drains in the PLAP sites, we decided to
-change this so only half the deep biopores in the drain canyon would
-be directly connected to the drain pipes \citep{vap2d}.  Compared to
-the PLAP simulations, we had additional soil bromide measurements
+change this so only half the deep biopores in the drain ditch would be
+directly connected to the drain pipes \citep{vap2d}.  Compared to the
+PLAP simulations, we had additional soil bromide measurements
 (section~\ref{sec:brom-cal}), so we decided to add an extra class
 ending halfway down.  The measurements of \citet{petersen200181}
 indicated a roughly linear decrease of biopore density with depth, so
@@ -368,22 +371,22 @@ done to the column with an aquitard.
 \label{sec:brom-cal}
 
 We have not included cracks in the description of the conductivity
-curve, but still divide water into two domains for the sake of solute
-transport.  This division was calibrated based on bromide soil
+curve, but we still divide water into two domains for the sake of
+solute transport.  This division was calibrated based on bromide soil
 measurements shown on the top graph on figure~\ref{fig:bromide-acc}.
 The simulated dynamics shown on figure~\ref{fig:bromide} were used as
 a help.  The two figures are explained in
 section~\ref{sec:soil-bromide}.
 
-The division between water in to domain (the primary ``slow'' domain
-and the secondary ``fast'' domain) is controlled by single horizon
-specific parameter, \hlim{}, a pressure head.  If the actual pressure
-head ($h_a$) is below \hlim{}, all matrix water will be part of the
-primary domain where.  Otherwise, the water in the soil corresponding
+The division between water into two domains (the primary ``slow''
+domain and the secondary ``fast'' domain) is controlled by single
+horizon specific parameter, \hlim{}, a pressure head.  If the actual
+pressure head ($h_a$) is below \hlim{}, all matrix water will be part
+of the primary domain.  Otherwise, the water in the soil corresponding
 to \hlim{} is considered part of the primary domain, and any
 additional matrix water is considered part of the secondary
 domain. The water flux calculated by Richard's equation ($q$) will be
-divided so the primary domain water flux ($q_1$) is
+divided so that the primary domain water flux ($q_1$) is
 \begin{displaymath}
   q_1 = \frac{K (\hlim)}{K (h_a)}
 \end{displaymath}
@@ -410,23 +413,23 @@ bromide could stay in the secondary domain and move down faster.
 As an initial guess, we used $\hlim{} = 2\; \mbox{pF}$ and $\alpha =
 0.01\; \mbox{h}^{-1}$, the later taken from \citet{jaynes1995field}.
 Using these values, our initial results were far worse than with the
-pure convection-dispersion equation.  In these simulations, the bromide
-would stay in the top 25 cm.  There were two problems: The soil
-surface was dry enough that much of solute would enter the primary
-domain, and stay relatively protected there.  Lowering \hlim{} to 3 pF
-in the soil surface would ensure that all the water (and solute) would
-enter the secondary domain.  The second problem was the long period,
-over a month, before two large events caused significant leakage out
-of the plow layer.  With an $\alpha$ of $0.01\; \mbox{h}^{-1}$ this
-was plenty of time to reach equilibrium, again causing some of the
-bromide to be protected in the primary domain.  We got the best
-results by lowering $\alpha$ to $0.00003\; \mbox{h}^{-1}$ in the top
-soil (to the bottom of the plow pan), decreasing it further had little
-effect.  
+pure convection-dispersion equation.  In these simulations, the
+bromide would stay in the top 25 cm.  There were two problems: The
+soil surface was dry enough that much of solute would enter the
+primary domain, and stay relatively protected there.  Lowering \hlim{}
+to 3 pF in the soil surface would ensure that all the water (and
+solute) would enter the secondary domain.  The second problem was the
+long period, over a month, before two large events caused significant
+leakage out of the plow layer.  With an $\alpha$ of $0.01\;
+\mbox{h}^{-1}$ a month was plenty of time to reach equilibrium, again
+causing some of the bromide to be protected in the primary domain.  We
+got the best results by lowering $\alpha$ to $0.00003\; \mbox{h}^{-1}$
+in the top soil (to the bottom of the plow pan), decreasing it further
+had little effect.
 
 As the biopores were the main transport mechanism through the plow
-pan, we added a new biopore class that ended in 60 cm in order not to
-bypass the 50--100 cm area entirely, see
+pan, we added a new biopore class that ended 60 cm below ground, in
+order not to bypass the 50--100 cm area entirely, see
 section~\ref{sec:soil-profile}.  This gave a problem for estimation of
 $\alpha$ below 33 cm.  A too high value would cause some bromide to
 stick just below the plow pan, where it would count as part of the
@@ -491,26 +494,26 @@ appendix~\ref{app:plot-2d}.
 Figure~\ref{fig:tdr} shows horizontal TDR measurements for different
 depths.  The two autumn gaps are after plowing, when the TDR probes
 are removed.  At the third season the TDR probes had drifted, and were
-left out.  The TDR probes does not work on ice, which explain the
-apparent noise in the measurements during periods with frost.
-Enabling the experimental support for ice in Daisy showed a good match
-between upper TDR probes and simulated water during the two winter
-periods, supporting the idea that difference is due to ice (see
-figure~\ref{fig:tdr-ice}).  Unfortunately, the ice support in Daisy is
-not yet complete, and created too many other problems with the
-simulation, so it was disabled for the final runs. The simulation
-overestimates the water level near the soil surface, which could
-possibly be a problem with the TDR measuring some air.  We may
-overestimate the dynamics near the bottom of the plow layer.  The
-measurements for the bottom TDR show fast variations during the winter
-which looks mostly like noise, something not duplicated in the
-simulation, with or without ice.
+left out.  The TDR probes measurements do not include water in the
+form of ice, which explain the apparent noise in the measurements
+during periods with frost.  Enabling the experimental support for ice
+in Daisy showed a good match between upper TDR probes and simulated
+water during the two winter periods, supporting the idea that
+difference is due to ice (see figure~\ref{fig:tdr-ice}).
+Unfortunately, the ice support in Daisy is not yet complete, and
+enabling it created too many other problems with the simulation, so it
+was disabled for the final runs. The simulation overestimates the
+water level near the soil surface, which could possibly be a problem
+with the TDR measuring some air.  We may overestimate the dynamics
+near the bottom of the plow layer.  The measurements for the bottom
+TDR show fast variations during the winter which looks mostly like
+noise, something not duplicated in the simulation, with or without
+ice.
 
-Figure~\ref{fig:tdr-zoom} shows the same data, but only for the first
-summer after installation, where the TDR measurements are likely to be
-most reliable.  The general water level seem to be slightly
+Figure~\ref{fig:tdr-zoom} shows the same data for the first summer
+after installation.  The general water level seems to be slightly
 overestimated at the end of the period, except in the 60 cm TDR where
-it is underestimated.  
+it is underestimated.
 
 \section{Soil bromide}
 \label{sec:soil-bromide}
@@ -670,7 +673,7 @@ large variations in the drain pipes.  Related to this, the EM38 map
 suggest that large parts of the field has a sandy underground, and are
 unlikely to contribute to the drain flow.  Finally, the piezometers
 show great spatial and temporal variation, and indicate that different
-parts of the field may contribute to the drain flow and different
+parts of the field may contribute to the drain flow at different
 times.  As we sometimes have significant drain flow when the
 piezometers show low pressure, this could indicate that local areas of
 shallow groundwater may be at play.  The rightmost graph on the second
@@ -716,8 +719,8 @@ and~\ref{fig:bromide-acc}.  The first event activate both biopore
 classes, the later events mostly the deep biopores. 
 
 In general, this indicates a problem with our model of the pathways in
-the system, which will likely affect not only bromide but also
-particles and pesticides.
+the system, which will likely have some affect not only bromide but
+also on particles and pesticides.
 
 \section{Further work}
 
@@ -727,7 +730,7 @@ lower boundary is probably more than we can solve, but the bromide
 pathways is a problem that should be solvable with the present model.
 
 The agrovand dataset can also provide basis for further model
-development.  Ice obviously had a influence on the TDR measurements
+development.  Ice obviously had an influence on the TDR measurements
 (see figure~\ref{fig:tdr-ice}, especially the first season.  This
 could be used for finishing the ice module of Daisy, and would
 increase the trustworthiness of the simulation for that season,
@@ -739,10 +742,19 @@ bromide results.
 
 The largest potential in the dataset resides in the three other plots
 with different tillage regimes.  This dataset could be used for
-developing a model that included the effect of tillage on particle
-leaching, and consequently on leaching of strongly sorbing pesticides.
-A better model that would include tillage more directly might help
-explain the difference we measured between the three seasons.
+developing a model that included the effect of tillage on soil surface
+properties and particle leaching, and consequently on leaching of
+strongly sorbing pesticides.  A better model that would include
+tillage more directly might help explain the difference we measured
+between the three seasons.
+
+Preliminary results from the project \emph{Undersøgelse af
+  makroporekontinuitet ved markdræn og effekter af direkte forbundne
+  makroporer på jords filterfunktion} indicate that the zone around
+the drain pipes is wider that assumed in this project, which would
+help explain some of the observed drain water dynamics.  Thus,
+adjusting the setup to take these results into account would be an
+interesting avenue of investigation.
 
 Finally, we need better estimates for (de)sorption rates and the soil
 enrichment factor, either from literature or from focused experiment.
@@ -755,24 +767,22 @@ enrichment factor, either from literature or from focused experiment.
 \chapter{Piezometers}
 \label{app:piezometers}
 
-Piezometers were installed 2.3 m below soil surface for all four
-plots, 70 cm, 4 m and 8 m from each side of the drain pipes, and 10,
-40, and 70 m from the drain pipes, on the four plots each located
-around one drain pipe, for a total of 63 piezometers.  
+A total of 63 piezometers were installed 2.3 m below soil surface for
+all four plots, 70 cm, 4 m and 8 m from each side of the drain pipes,
+and 10, 40, and 70 m from the sampling wells.
 
-The results seem chaotic, witness e.g. the individual measurements
-from plot 4 for the two seasons on on figure~\ref{fig:piezo-9899}
-and~\ref{fig:piezo-9900}.  To impose some order, we chose to look at
-the median values, as shown on figure~\ref{fig:piezo-median-9899}
-and~\ref{fig:piezo-median-9900}.  The top graphs shows that there
-generally is higher pressure further from the drain pipes, at least in
-the periods where the pressure is high and the drains likely active.
-When the drains are inactive, there is no clear trend.  The middle
-graphs shows highest pressure closest to the well, and that at a
-distance of 70 m, the pressure is rarely high enough to expect drain
-activity.  The only clear trend shown in the bottom graph is that the
-pressure at plot 1 is lower than the pressure at the remaining three
-plots.
+Individual measurements from plot 4 for the two seasons are shown on
+figure~\ref{fig:piezo-9899} and~\ref{fig:piezo-9900}.  To impose some
+order, we chose to look at the median values, as shown on
+figure~\ref{fig:piezo-median-9899} and~\ref{fig:piezo-median-9900}.
+The top graphs shows that there generally is higher pressure further
+away from the drain pipes, at least in the periods where the pressure
+is high and the drains are likely to be active.  When the drains are
+inactive, there is no clear trend.  The middle graphs show highest
+pressure closest to the well, and that at a distance of 70 m, the
+pressure is rarely high enough to indicate drain activity.  The only
+clear trend shown in the bottom graph is that the pressure at plot 1
+is lower than the pressure at the remaining three plots.
 
 It order to have a single piezometer value for use in calibration of
 the lower boundary of the system, we want as many piezometer

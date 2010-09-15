@@ -35,8 +35,8 @@ surface to extract water from the soil.
   \end{center}
   \caption{Accumulated precipitation and hourly values for temperature
     measured at Silstrup (top) and the Askov (bottom) station located
-    near Estrup.  Calculated potential and simulated actual
-    evapotranspiration are also shown.}
+    near Estrup.  Calculated accumulated potential and simulated
+    actual evapotranspiration are also shown.}
   \label{fig:weather}
 \end{figure}
 Precipitation, air temperature, ETc and ETa can be seen on
@@ -45,7 +45,7 @@ figure~\ref{fig:weather}.
 \section{Management}
 
 All management data were provided by Preben Olsen from the Faculty of
-Agricultural Sciences, Aarhus Universityprovided via Annette E.\@
+Agricultural Sciences, Aarhus University provided via Annette E.\@
 Rosenbom from GEUS.
 
 \subsection{Tillage}
@@ -69,14 +69,15 @@ Date, type, and amount were specified for each fertilization event, as
 well as N, P and K content of fertilizer.  Of these nutrients, Daisy
 can normally only handle N, and N has been disabled for these
 simulations to save time.  All fertilization event have been added to
-Daisy, but without N there will be no effect of the mineral
-fertilizer.  The organic fertilizer will have a minimal effect, the
-water content of the fertilizer will be added, and the dry matter
-content will be added to the litter where it can catch water and
-pesticides (see section~\ref{sec:cal-litter}), until it becomes
-incorporated into the soil by either tillage operations or earthworm
-activity.  However, due to the timing of the applications, both
-effects are likely to have negligible effect on pesticide leaching.
+Daisy management description, but with N disabled the mineral
+fertilizer will not affect the simulation.  The organic fertilizer
+will have a minimal effect, the water content of the fertilizer will
+be added, and the dry matter content will be added to the litter where
+it can catch water and pesticides (see section~\ref{sec:cal-litter}),
+until it becomes incorporated into the soil by either tillage
+operations or earthworm activity.  However, due to the timing of the
+applications, both effects are likely to have negligible effect on
+pesticide leaching.
 
 \subsection{Crop management}
 \label{sec:crop-man}
@@ -131,21 +132,20 @@ beet.  The second calibration served a similar purpose, an ad hoc root
 density function that preserved almost the entire root mass in the
 plow layer, was added to the two Silstrup crops.  The plow pan was
 assumed to be so dense that only a few roots could penetrate through
-earthworm channels.  Apart from the soil water measurements, both
-calibrations also served to concentrate the uptake from the zone with
-most bromide, in order to explain the low amount of bromide found in
-the drain water.  See also section~\ref{sec:cal-bromide}
-and~\ref{sec:cal-silstrup-surface}.
+earthworm channels.  This also matches the lack of seasonal variation
+found with the 60 cm TDR probe (figure~\ref{fig:Silstrup-theta}).
+Apart from the soil water measurements, both calibrations also served
+to concentrate the uptake from the zone with most bromide, in order to
+explain the low amount of bromide found in the drain water.  See also
+section~\ref{sec:cal-bromide} and~\ref{sec:cal-silstrup-surface}.
 
 \subsection{Pesticide and bromide application}
 
 The data for pesticide application consisted of date, amount, and
 trade name.  Trade name was translated to active ingredient using
 ``Middeldatabasen'' from \textsc{dlbr} Landbrugsinfo
-(\url{http://www.landbrugsinfo.dk/}).  Note that Goltix WG application
-is given in L/ha, while the active ingredient is specified in g/kg.
-To resolve, a density of 1~kg/L was assumed.  For potassium bromide,
-bromide content was calculated from molar mass.
+(\url{http://www.landbrugsinfo.dk/}).  For potassium bromide, bromide
+content was calculated from molar mass.
 
 The applications are summarized in table~\ref{tab:man-pest}.
 \begin{table}[htbp]
@@ -158,9 +158,9 @@ The applications are summarized in table~\ref{tab:man-pest}.
                & Active ingredient & \multicolumn{2}{c}{Amount} \\
     \hline
     2000-05-22 & Potassium bromide & 30 & kg/ha & Bromide    & 20.14 & kg/ha\\
-    2000-05-22 & Goltix WG      & 1   & L/ha & Metamitron    & 700   & g/ha\\
-    2000-06-15 & Goltix WG      & 1   & L/ha & Metamitron    & 700   & g/ha\\
-    2000-07-12 & Goltix WG      & 1   & L/ha & Metamitron    & 700   & g/ha\\
+    2000-05-22 & Goltix WG      & 1   & kg/ha & Metamitron    & 700   & g/ha\\
+    2000-06-15 & Goltix WG      & 1   & kg/ha & Metamitron    & 700   & g/ha\\
+    2000-07-12 & Goltix WG      & 1   & kg/ha & Metamitron    & 700   & g/ha\\
     2001-06-21 & Tilt Top       & 0.5 & L/ha & Fenpropimorph & 187.5 & g/ha\\
     2001-07-04 & Tilt Top       & 0.5 & L/ha & Fenpropimorph & 187.5 & g/ha\\
     2001-07-16 & Perfektion 500 & 0.6 & L/ha & Dimethoate    & 300   & g/ha\\
@@ -253,17 +253,20 @@ Simulated colloid leaching is shown in
 appendix~\ref{app:col-biopores}.  The pesticides are assumed to be
 able to sorb to and be transported with colloids, meaning that the
 colloids will be in competition with the soil matrix as potential
-sorption sites for the solute form of the pesticides.  In the lack of
-any measurements, we have assumed that the pesticides are 10000 times
-more likely to attach to a dissolved soil particle (a colloid) than to
-a stationary soil particle (part of the soil matrix).
+sorption sites for the solute form of the pesticides.  This is
+difficult to measure directly, and is therefore sometimes used as a
+calibration parameter, see e.g.~\citet{sef1000} where a value of 1000
+was used.  As a starting point we chose a factor 10 higher than that
+(that is, a soil enrichment factor of 10000) to be certain this part
+of the model would be tested.  During calibration, we found no reason
+to change this initial value.  See also~\citet{mst-agrovand}.
 
 \subsection{Glyphosate calibration}
 \label{sec:cal-glyphosate}
 
-The highest glyphosate concentrations were seen at both sites right
-after application, or during the first large rain event after
-application.  This is unlikely to be a function of the pesticide
+The highest glyphosate concentrations in drains were seen at both
+sites right after application, or during the first large rain event
+after application.  This is unlikely to be a function of the pesticide
 properties as such, but rather of the transport pathways to the drain.
 See section~\ref{sec:cal-silstrup-surface} for how this was
 calibrated.
@@ -274,9 +277,13 @@ measurements, however, did show some late findings of glyphosate in
 the drain water.  In order to give the glyphosate a chance to move, we
 divided the sorption into a weak but fast and a strong but slow form.
 The strong but slow form represent 90\% of the \kd{} value, the weak
-but fast form the remaining 10\%.  The effect is that the glyphosate
-is relatively mobile in the beginning, but becomes less so as more
-glyphosate becomes sorbed in the slow form.
+but fast form the remaining 10\%.  This was a pure calibration
+measure, and may not necessarily reflect the chemical properties of
+the pesticide.  Two phase kinetics were also observed in
+\citet{glyphosate-kinetics}, but at a shorter time-scale.  The effect
+is that the glyphosate is relatively mobile in the beginning, but
+becomes less so as more glyphosate becomes sorbed in the slow form,
+resulting in a better overall match with drain measurements.
 
 \subsection{Metamitron calibration}
 \label{sec:cal-metamitron}
@@ -313,8 +320,10 @@ It would be possible to justify different values for the two sites, as
 there were grown different crops the first year.  However, without any
 direct measurements of bromide crop uptake, we found it better to use
 a single value.  With a reflection factor of 0.25 we got a good match
-for total amount in Silstrup.  In Estrup, this resulted in too little
-total drain leaching, but still good leaching dynamics.
+for total amount in Silstrup (figure~\ref{fig:Silstrup-weekly}
+and~\ref{fig:Silstrup-bromide-acc}).  In Estrup, this resulted in too
+little total drain leaching, but still good leaching dynamics
+(figure~\ref{fig:Estrup-bromide-drain}).
 
 \section{Soil}
 
@@ -339,15 +348,15 @@ part could be used directly.  We made two changes to the micropore
 setup: We increased the hydraulic conductivity for the plow layer at
 both sites based on the measurements depicted on figure~A4.4 and~A4.5
 in \citet{vap2005}.  For Silstrup the boundary hydraulic conductivity
-($K_b$) was raised from 0.1 to 1 mm/h mm/h, and for Estrup from 0.1 to
-0.5 mm/h.  However, the low values used by GEUS are far from
-unreasonable, as the conductivity of unprotected soil surface tend to
-decrease rapidly after heavy rain.  For the Daisy setup, we added a
-special surface layer with dynamic hydraulic properties to address
-this issue (see section~\ref{sec:surface-plow-pan}).  The other change
-was the introduction of 8\% residual water in the B horizon of
-Silstrup, based on the relative lack of drying during the summer, as
-seen on figure~\ref{fig:Silstrup-theta}.
+($K_b$) was raised from 0.1 to 1 mm/h, and for Estrup from 0.1 to 0.5
+mm/h.  However, the low values used by GEUS are far from unreasonable,
+as the conductivity of unprotected soil surface tend to decrease
+rapidly after heavy rain.  For the Daisy setup, we added a special
+surface layer with dynamic hydraulic properties to address this issue
+(see section~\ref{sec:surface-plow-pan}).  The other change was the
+introduction of 8\% residual water in the B horizon of Silstrup, based
+on the relative lack of drying during the summer, as seen on
+figure~\ref{fig:Silstrup-theta}.
 
 \subsubsection{Soil cracks and anisotropy}
 
@@ -355,36 +364,42 @@ Unlike \macro{}, Daisy distinguish sharply between macropores small
 enough that the capillary forces are still dominating, and macropores
 so large that the capillary forces are no longer a factor.  In Daisy
 terminology, these are called the secondary and tertiary domain,
-respectively.  The primary domain is the micropores.  Daisy does not
-use Richard's Equation for calculating transport in the tertiary
-domain.  Richard's Equation is used for both the primary and secondary
-domain, and in fact does not distinguish between the two.  They are
-(again in Daisy terminology) together referred to as the matrix
-domain.  The tertiary domain is described in
+respectively.  The primary domain is the micropores.  The model user
+is responsible for specifying both domains, and thus for specifying
+for which macropores Daisy should consider the capillary forces
+dominating.  Daisy does not use Richard's Equation for calculating
+transport in the tertiary domain.  Richard's Equation is used for both
+the primary and secondary domain, and in fact does not distinguish
+between the two.  They are (again in Daisy terminology) together
+referred to as the matrix domain.  The tertiary domain is described in
 section~\ref{sec:biopores}.
 
-Small soil cracks as those described in \citet{lindhardt2001} are part
-of the secondary domain.  A model for how cracks affect the
-conductivity based on aperture and density is included in Daisy.  In
+In the present setup, soil cracks as those described in
+\citet{lindhardt2001} have been specified as part of the secondary
+domain.  Daisy will use Poiseuille's law for calculating how these
+cracks affect the conductivity based on aperture and density.  In
 \citet{habekost1} an aperture of 50 to 150 $\mu$m is estimated.  In
 \citet{jorgensen1998} a value of 78 $\mu$m is used after calibration.
 Both sources specifies a density of 10 per meter.
 
 In \citet{lindhardt2001} the cracks in the depth interval 75 -- 180 cm
-in Silstrup are described as horizontal.  As the model of cracks in
-Daisy doesn't include direction, we have decided not to use that model
-in this interval, and instead specify an anisotropy of 100.  This
-means the horizontal conductivity is 100 times higher than the
+in Silstrup are primarily horizontal.  As the secondary domain model
+of cracks in Daisy doesn't include direction (they are assumed to be
+equally distributed in all directions), we have decided not to use
+that model in this interval, and instead specify an anisotropy of 100.
+This means the horizontal conductivity is 100 times higher than the
 vertical, which fit well with the \macro{} parametrization.  For dry
 soil this is wrong, but we don't expect large horizontal hydraulic
 gradients in that situation anyway.
 
-For the plow layer at both sites, we also chose an anisotropy of 100
-rather than a general modification of the hydraulic conductivity.
-They idea behind this is to model how the surface slope affect
-horizontal movement.  The effect is negligible on Silstrup
+For the plow layer at both sites (see table~\ref{tab:profile}), we
+also chose an anisotropy of 100 rather than a general modification of
+the hydraulic conductivity.  They idea behind this is to model how the
+surface slope affect horizontal movement.  The simulation results
+shows the effect of this anisotropy is negligible on Silstrup
 (figure~\ref{fig:Silstrup-water-horizontal}) but quite significant on
-Estrup (figure~\ref{fig:Estrup-water-horizontal}).
+Estrup (figure~\ref{fig:Estrup-water-horizontal}), likely due to
+differences in groundwater level.
 
 \citet{lindhardt2001} specifies no cracks at Silstrup below 3.5 m. For
 Estrup, the high groundwater level could indicate a poor horizontal
@@ -392,11 +407,12 @@ conductivity.  Furthermore, the shape of the bromide drain leaching
 curve (figure~\ref{fig:Estrup-bromide-drain}) where the high values
 are early also indicate that the drain water are extracted from the
 top soil layers.  We therefore assumed that the cracks found in
-\citet{lindhardt2001} are not hydraulically connected, and thus
-doesn't influence the conductivity.  Note that the higher saturated
-conductivity used in the \macro{} simulation for the B and C1 horizons
-are still reflected in Daisy through the biopores.  It is only the
-horizontal conductivity (as Daisy biopores are vertical) that is low.
+\citet{lindhardt2001} below 2m are not hydraulically connected, and
+thus doesn't influence the conductivity.  Note that the higher
+saturated conductivity used in the \macro{} simulation for the B and
+C1 horizons are still reflected in Daisy through the biopores.  It is
+only the horizontal conductivity (as Daisy biopores are vertical) that
+is low.
 
 \subsubsection{Figures and tables}
 
@@ -456,18 +472,18 @@ function.  Table~\ref{tab:profile} summarizes the two profiles.
 \subsection{Soil surface and plow pan}
 \label{sec:surface-plow-pan}
 
-Danish agricultural soils usually feature both a plow pan, and 
-highly variable conductivity near the soil surface.  These can create
-layers of near saturated soil, which is needed for activating the
-biopores module in Daisy.  Hence, such layers was added to the soil
+Danish agricultural soils may feature both a plow pan, and highly
+variable conductivity near the soil surface.  These can create layers
+of near saturated soil, which is needed for activating the biopores
+module in Daisy.  Hence, such layers was added to the soil
 description.  The plow pan is defined as the top of the B horizon, but
 with different hydraulic properties.  The cracks are removed from the
 plow pan, and the hydraulic conductivity in the micropores is reduced
-to 10\%.  The surface layer constitute the top of the Ap horizon.
-Changing the parameters has not been necessary for Estrup.  For
-Silstrup, the hydraulic conductivity is temporarily decreased to
-0.1\% of the original value, see the description in
-section~\ref{sec:cal-silstrup-surface}.
+to 10\% \citep{petersen2008spatio}.  The surface layer constitute the
+top of the Ap horizon.  Changing the parameters has not been necessary
+for Estrup.  For Silstrup, the hydraulic conductivity is temporarily
+decreased to 0.1\% of the original value \citep{soilseal}, see the
+description in section~\ref{sec:cal-silstrup-surface}.
 
 \subsection{Fast and slow water}
 \label{sec:fast-slow}
@@ -484,34 +500,42 @@ relatively flat near saturation, that value represented very little
 water.  Pesticides are tracked independent in the two domains, with an
 exchange factor ($\alpha$) at its default value of 0.01 h$^-1$.
 
-No calibration has been done on these parameters.
+The initial values were all set as part of the R{\o}rrendeg{\aa}rd
+calibration, see \citet{mst-agrovand} for a more detailed discussion.
+No further calibration was done on these parameters.
 
 \subsection{Biopores}
 \label{sec:biopores}
 
 Biopores are activated once the soil is near saturation, and they
 extract water from the matrix down to -30 cm pressure, at which point
-the biopores will deactivate.  The capability of the biopores to
-extract water is further limited by the storage capacity of the
-biopores themselves, and the ability to pass the water back to the
-soil matrix in a deeper layer.
+the biopores will deactivate
+\citep{tofteng2002film,gjettermann2004transport}.  The capability of
+the biopores to extract water is further limited by the storage
+capacity of the biopores themselves, and the ability to pass the water
+back to the soil matrix in a deeper layer.
 
 The biopores a divided into a number of user specified classes, each
 defined by density, diameter, where they start and end (including
 ending directly in drain).  \citet{lindhardt2001} contain some
 information about biopores, but not enough for use by Daisy.  We have
 therefore chosen to use a biopore setup based on data measured at
-Rørrende specifically for use by Daisy.
+Rørrende specifically for use by
+Daisy~\citep{habekost1,habekost2,habekost3}.
 
 One calibration has been applied. The original setup for Rørrende had
 all biopores near the drain ended in the drain.  In order to get more
 tailing on the simulated leaching curves, half the biopores near the
-drain now ends in the soil matrix.
+drain now ends in the soil matrix.  Neither setup is perfect match for
+the observations in~\citet{habekost3}, which show that the earth worm
+tunnels are generally well connected to the drain pipes, even if they
+don't end in the drain pipes.
 
 \subsection{Groundwater table and drain pipes}
 \label{sec:gwt}
 
-Depth and distance between drain pipes are taken from
+Depth (1.1 m below ground level) and distance between drain pipes (18
+m for Silstrup and 13 m for Estrup)) are taken from
 \citet{lindhardt2001}, and can be used directly by Daisy.  Automatic
 measurements of groundwater pressure near the bottom of the part of
 the soil we have described in Daisy are being used as a lower boundary
@@ -520,7 +544,9 @@ boundary condition.  A constant offset has been added to the measured
 values in order to get the drain flow right.  The offset has been
 varying depending on the soil description during calibration (between
 -40 and 30 cm), for the final setup it ended up being -4 cm for
-Silstrup and -5 cm for Estrup.
+Silstrup and -5 cm for Estrup.  This is less than the spatial
+variation shown by the multiple measurement points,
+see~\citet{vap2009}.
 
 The simulated groundwater table is not uniquely defined, given that
 the model is two dimensional and there can be multiple layers of
@@ -543,7 +569,8 @@ Silstrup corresponds to ponding.
     Simulated low value is calculated from pressure in lowest
     unsaturated numeric cell, typically located near drain.  Simulated
     high value is calculated from pressure in highest saturated cell,
-    typically farthest away from the drain.}
+    typically farthest away from the drain. See \citet{lindhardt2001}
+    for location of P1 and P3.}
   \label{fig:gw}
 \end{figure}
 
@@ -629,9 +656,12 @@ it likely that significant amounts of residuals was left on the field.
 Furthermore, \citet{gjettermann2009} demonstrated that glyphosate did
 not sorb to straws.  Thus, it seemed likely that some of the
 glyphosate was kept in the litter pack together with the water from
-the small events, and only washed out with the large event.  To
-implement this in Daisy, we needed a pre-existing and pre-calibrated
-model, as there were no time for new model development at this point.
+the small events, and only washed out with the large event.  Using
+this mechanism, depending on the size of the litter pack and the
+actual precipitation, between 0 and 100\% of the glyphosate might be
+stored in the litter pack.  To implement this in Daisy, we needed a
+pre-existing and pre-calibrated model, as there were no time for new
+model development at this point.
 
 Luckily, this was not hard to find.  Mulching is a known technique to
 conserve water, so other people had been interested in the water
@@ -661,16 +691,21 @@ The second problem at Silstrup was due to the bromide.  More than one
 third of the net precipitation end up in the drains, yet less than 10
 percent of the bromide is found there.  Despite our best efforts, we
 were not able to make the crop uptake large enough to compensate for
-the difference.  The explanation that gave the best results was that a
-significant amount of water fully bypassed the soil matrix on its way
-to the drain pipes, thus diluting the drain water. The bromide was
-applied 2000-05-22.  The last tillage operation was 2000-05-03, with
-no large precipitation events in between (total precipitation 9.6 mm,
-highest intensity 1.4 mm/h).  It is therefore likely that the
-hydraulic conductivity is still high at that point.  We chose to add
-crust 2000-06-01 (after 48.4 mm rain, max intensity 4.9 mm/h), setting
-the hydraulic conductivity down to one percent of the original.  At
-this point, the bromide was safely in the soil matrix
+the difference.  The division between fast and slow water we had
+inherited from preliminary calibration of Agrovand data
+\citep{mst-agrovand} were also inadequate to protect the
+bromide.\footnote{This calibration were later changed, unfortunately
+  too late to apply on the PLAP data.}  The explanation that gave the
+best results was that a significant amount of water fully bypassed the
+soil matrix on its way to the drain pipes, thus diluting the drain
+water. The bromide was applied 2000-05-22.  The last tillage operation
+was 2000-05-03, with no large precipitation events in between (total
+precipitation 9.6 mm, highest intensity 1.4 mm/h).  It is therefore
+likely that the hydraulic conductivity is still high at that point.
+We chose to add crust 2000-06-01 (after 48.4 mm rain, max intensity
+4.9 mm/h), setting the hydraulic conductivity down to one percent of
+the original.  At this point, the bromide was safely in the soil
+matrix
 
 The crust would generate biopore activity, but not necessarily to the
 drain (only the biopores at 20 cm to either side of the drain pipes
@@ -681,7 +716,7 @@ drains, a simple surface water movement was implemented.  When the
 ponding is higher than the local detention capacity in any part of the
 field, the surplus water is redistributed evenly to the remaining part
 of the field.  Using this as a calibration parameter, we found that a
-local detention capacity of 2 mm would result 10\% of the total water
+local detention capacity of 2 mm would result in 10\% of the total water
 bypassing the drain pipes, and the right amount bromide in the drains
 seen over a whole season.
 
