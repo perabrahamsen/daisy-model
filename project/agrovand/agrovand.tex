@@ -44,7 +44,7 @@
 Part of project
 \begin{otherlanguage}{danish}
   \begin{it}
-    Flerdimensional modelling of vandstrømning og stoftransport i de
+    Flerdimensional modellering of vandstrømning og stoftransport i de
     øverste 1-2 m af jorden i systemer med markdræn
   \end{it}
 \end{otherlanguage}
@@ -106,13 +106,13 @@ the lower boundary, see appendix~\ref{app:piezometers}.  Furthermore,
 transport pathways have been explored using dye tracer, and biopores
 have been counted both in the original project, and in more details
 forming the basis for the new Daisy biopore model in the present
-project~\citep{habekost1,habekost2,habekost3}.
+project~\citep{habekost2,habekost1,habekost3}.
 
 The goal for the simulations presented in this paper is to test two
 subcomponents of the the newly developed 2D Daisy against real data:
 The first is the particle generation and filtration modules; the
 second is the slow/fast water movement.  For the later, we will use
-the drain bromide data which are available at a high resolution, and
+the bromide drain data which are available at a high resolution, and
 where we have reliable soil measurements to back them up with.  The
 pesticide data is presented together with uncalibrated simulation
 results as the PLAP sites have more detailed pesticide data
@@ -223,7 +223,7 @@ calibration was done on the pesticides.  See table~\ref{tab:pest-man}.
   \caption{Pesticide and bromide application.}
   \label{tab:pest-man}
   \centering
-  \begin{tabular}{l|l|l|r|r}\hline
+  \begin{tabular}{l|l|r|r|r}\hline
     Date       & Name          & Amount [g/ha] & DT50 [d] & \koc{} [ml/g] \\
 \hline
     1998-11-24 & Bromide       & 34000 & & \\
@@ -257,7 +257,7 @@ are summarized in table~\ref{tab:texture}.
     and the dry bulk density (\rhob{}) specified in g/cm$^3$.
     Humus is given as a percentage of total weight.  For the drain ditch, 
     where the \textsc{isss4} texture classification system was used,
-    the mineral mineral soil particle distribution is also given as
+    the mineral soil particle distribution is also given as
     fraction of total weight.  For the other horizons the \textsc{usda3} 
     system was used, and the mineral soil particle distribution is given 
     as percentage of total mineral weight.}
@@ -344,9 +344,9 @@ these areas had a significantly lower groundwater level (see
 appendix~\ref{app:piezometers}).  We estimated that roughly two thirds
 of the field did not contribute to the drainage through the
 groundwater level.  In Daisy we modelled this by dividing the field
-into two columns.  The first column had a free drainage lower
-boundary, and represented twice the area of the other column, with an
-aquitard bottom.  The aquitard layer was described with a size (2
+into two columns.  The first column had a free drainage lower boundary
+conditions, and represented twice the area of the other column, with
+an aquitard bottom.  The aquitard layer was described with a size (2
 meters), a conductivity (0.5 mm/h) and the pressure table of the
 underlying aquifer.  The pressure table was based on a median
 piezometer value (see appendix~\ref{app:piezometers}), and calibrated
@@ -388,14 +388,14 @@ additional matrix water is considered part of the secondary
 domain. The water flux calculated by Richard's equation ($q$) will be
 divided so that the primary domain water flux ($q_1$) is
 \begin{displaymath}
-  q_1 = \frac{K (\hlim)}{K (h_a)}
+  q_1 = \frac{K (\hlim)}{K (h_a)}\; q
 \end{displaymath}
 where $K(h)$ is the hydraulic conductivity at pressure head $h$, and
 the secondary domain water flux ($q_2$) is $q_2 = q - q_1$.
 Solute transport in the primary domain is calculated with the
 convection-dispersion equation, while solute movement in the secondary
 domain is handled as pure convection.  A second parameter, $\alpha{}$
-determines the speed of exchange between the two domains.
+determines the speed of solute exchange between the two domains.
 
 The bromide was measured in 25 cm intervals, starting from the soil
 surface.  The measurements show the highest bromide concentrations

@@ -99,8 +99,13 @@
 
 (defchemical Dimethoate-base herbicide
   "Base parameterization for all Dimethoate forms."
-  (cite ppdb20100517)
-  (decompose_halftime 7.2 [d]))
+  ;;(cite ppdb20100517)
+  ;;(decompose_halftime 7.2 [d])
+  (cite vap2003)                            ;Estrup PLAP measurements.
+  (decompose_halftime 74 [d])           ;80-100 cm
+  (decompose_depth_factor (-80 [cm]  1.0 []) ;80- cm
+                          ;; End of Estrup plow layer is 27 cm
+                          (-27 [cm] 40.0 []))) ;1.85 d
 
 (defchemical Dimethoate Dimethoate-base
   "Dissolved dimethoate."
@@ -114,8 +119,12 @@
   "Sorption equilibrium between dissolved and immobile Dimethoate."
   (sorbed Dimethoate-immobile)
   (solute Dimethoate)
-  (cite ppdb20100517)
-  (K_OC 30 [l/kg])
+
+  ;; (cite ppdb20100517)
+  ;; (K_OC 30 [l/kg])
+  (cite vap2003)
+  (K_OC 86 [l/kg])
+  
   (k_sorption 0.05 [h^-1]))                  ;Sorption rate.
 
 (defchemical Dimethoate-colloid Dimethoate-base
@@ -251,7 +260,10 @@
   ;;(cite lindhardt2001)
   ;; (K_OC 207 [l/kg])
   ;; (K_d 1 [l/kg])
-  (K_d 4 [l/kg])
+  ;; Kalib:
+  ;; (K_d 4 [l/kg])
+  (cite vap2003) ;; Silstrup PLAP analysis. 
+  (K_OC 160 [l/kg])
   (k_sorption 0.05 [h^-1])
   (solute Metamitron)
   (sorbed Metamitron-immobile)

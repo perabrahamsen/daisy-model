@@ -36,7 +36,7 @@
 Part of project
 \begin{otherlanguage}{danish}
   \begin{it}
-    Flerdimensional modelling of vandstrømning og stoftransport i de
+    Flerdimensional modellering of vandstrømning og stoftransport i de
     øverste 1-2 m af jorden i systemer med markdræn
   \end{it}
 \end{otherlanguage}
@@ -213,15 +213,26 @@ was over 300 for all analyzed subsoils.  For the topsoil, DT50 varied
 between 15 and 379.  The value used in Daisy was 25.5 days for the
 topsoil, corresponding to 85 days for the subsoil.
 
-We do not believe the difference in parameter values between what was
-used by Daisy and what was measured for dimethoate at Estrup are
-sufficiently large to signifiantly change the simulated drain
-leaching.  However, using the lower measured sorption rate (especially
-in the subsoil) for metamitron at Silstrup would likely result in
-larger simulated drain leaching, which is not good as we already
-overestimate it.  The values used in Daisy for fenpropimorph are
-within the span measured at the other sites, except that degradation
-apparently descrease faster with depth than asserted by \focus{}.
+Using the local estimated parameter values for dimethoate at Estrup
+does not visibly affects the simulation results
+(figure~\ref{fig:Estrup-acc}).  However, using the lower measured
+sorption rate (especially in the subsoil) for metamitron at Silstrup
+does result in larger simulated drain leaching during the measurement
+period, as shown on figure~\ref{fig:local-metamitron}.  The values
+used in Daisy for fenpropimorph are within the span measured at the
+other sites, except that degradation apparently descrease faster with
+depth than asserted by \focus{}.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \hspace*{-2cm}\includegraphics{local/fig/Silstrup-Metamitron-acc.pdf}
+  \end{center}
+  \caption{Comparison of simulation of Metamitron at the Siltrup site
+    using sorption parameter from \citet{ppdb20100517} with a
+    simulation with local estimated sorption parameters
+    \citep{vap2003}.}
+  \label{fig:local-metamitron}
+\end{figure}
 
 \section{Further work}
 
