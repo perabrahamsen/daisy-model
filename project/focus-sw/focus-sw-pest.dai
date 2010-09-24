@@ -1,0 +1,18 @@
+(input file "chemistry-base.dai")
+
+(defchemical pest-1 insecticide
+  ;; Incorporated into soil!
+  (decompose_halftime 6 [d])
+  (K_OC 15 [ml/g]))
+
+(defchemical pest-2 herbicide
+  (decompose_halftime 43 [d])
+  (K_OC 91 [ml/g]))
+
+(defchemical pest-3 herbicide
+  (decompose_halftime 4 [d])
+  (K_OC 1 [ml/g]))
+
+(defchemistry focus-sw default
+  "Trace all known pesticides."
+  (trace pest-1 pest-2 pest-3))

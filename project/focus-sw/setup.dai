@@ -1,0 +1,47 @@
+(defcolumn Vredepeel default
+  (Soil (MaxRootingDepth 60 [cm]))
+
+(defmanager D3-Maize activity
+  (wait_mm_dd 05 05)
+  (sow Maize)
+  (emerge all)
+  (wait_mm_dd 09 20)
+  (harvest all))
+
+(defmanager D3-Potato activity
+  (wait_mm_dd 05 10)
+  (sow Potato)
+  (emerge all)
+  (wait_mm_dd 09 15)
+  (harvest all))
+
+(defmanager D3-WC activity
+  (wait_mm_dd 11 21)
+  (sow "Winter Wheat")
+  (emerge all)
+  (wait_mm_dd 08 15)
+  (harvest all))
+
+(defcolumn Skousbo default
+  (Soil (MaxRootingDepth 100 [cm]))
+
+(defmanager D4-Maize activity
+  (wait_mm_dd 05 10)
+  (sow Maize)
+  (emerge all)
+  (wait_mm_dd 09 12)
+  (harvest all))
+
+(defmanager D4-Potato activity
+  (wait_mm_dd 05 22)
+  (sow Potato)
+  (emerge all)
+  (wait_mm_dd 09 23)
+  (harvest all))
+
+(defmanager D4-WC activity
+  (wait_mm_dd 09 22)
+  (sow "Winter Wheat")
+  (emerge all)
+  (wait_mm_dd 08 21)
+  (harvest all))

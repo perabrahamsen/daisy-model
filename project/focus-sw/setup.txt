@@ -1,0 +1,7 @@
+* Crop
+
+The crop parameters used by MACRO was ignored in favor of the standard
+crop parameterizations in Daisy, with the exception of the fixed
+emergence and harvest dates, and an estimation of soil imposed max
+root penetration.
+
