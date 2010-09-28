@@ -1,8 +1,7 @@
 dwf-0.0 -- Daily weather data from Vredepeel.
 
-# Location of station
+# Location of station (Google maps)
 
-#Elevation from Eindhoven
 Station: Vredepeel
 Elevation: 35 m  
 Longitude: 6 dgEast 

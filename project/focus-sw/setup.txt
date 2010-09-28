@@ -1,7 +1,7 @@
 * Crop
 
-The crop parameters used by MACRO was ignored in favor of the standard
-crop parameterizations in Daisy, with the exception of the fixed
-emergence and harvest dates, and an estimation of soil imposed max
-root penetration.
-
+MACRO uses a site specific crop parameterization.  This was abandoned
+in favor of the generic crop parameterizations available in Daisy,
+with two exeptions: Emergence and harvest dates were used in the Daisy
+management module, and a soil imposed max root penetration depth were
+estimated from MACRO parameters.

@@ -1,5 +1,34 @@
+;;; setup.dai --- Focus surface scenarious setup.
+
+;;; Test pesticides 1, 2 and 3 from FOCUS surface scenarie
+;;
+;; TODO: Tilføj kolloider
+
+(input file "chemistry-base.dai")
+
+(defchemical pest-1 insecticide
+  ;; Incorporated into soil!
+  (decompose_halftime 6 [d])
+  (K_OC 15 [ml/g]))
+
+(defchemical pest-2 herbicide
+  (decompose_halftime 43 [d])
+  (K_OC 91 [ml/g]))
+
+(defchemical pest-3 herbicide
+  (decompose_halftime 4 [d])
+  (K_OC 1 [ml/g]))
+
+(defchemistry focus-sw default
+  "Trace all known pesticides."
+  (trace pest-1 pest-2 pest-3))
+
+;;; Vredepeel soil.
+
 (defcolumn Vredepeel default
   (Soil (MaxRootingDepth 60 [cm]))
+
+;;; Crop management, D3 (Vredepeel)
 
 (defmanager D3-Maize activity
   (wait_mm_dd 05 05)
@@ -22,8 +51,12 @@
   (wait_mm_dd 08 15)
   (harvest all))
 
+;;; Skousbo soil.
+
 (defcolumn Skousbo default
   (Soil (MaxRootingDepth 100 [cm]))
+
+;;; Crop management, D4 (Skousbo)
 
 (defmanager D4-Maize activity
   (wait_mm_dd 05 10)
@@ -45,3 +78,5 @@
   (emerge all)
   (wait_mm_dd 08 21)
   (harvest all))
+
+;;; setup.dai ends here.
