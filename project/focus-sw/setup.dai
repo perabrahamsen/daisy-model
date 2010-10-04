@@ -5,78 +5,651 @@
 ;; TODO: Tilføj kolloider
 
 (input file "chemistry-base.dai")
+(input file "log-std.dai")
+(input file "crop.dai")
 
-(defchemical pest-1 insecticide
-  ;; Incorporated into soil!
-  (decompose_halftime 6 [d])
-  (K_OC 15 [ml/g]))
+(input file "../agrovand/biopores.dai")
 
-(defchemical pest-2 herbicide
-  (decompose_halftime 43 [d])
-  (K_OC 91 [ml/g]))
+(input file "colloid-bound.dai")
 
-(defchemical pest-3 herbicide
-  (decompose_halftime 4 [d])
-  (K_OC 1 [ml/g]))
+;;; FOCUS Soil 
 
-(defchemistry focus-sw default
-  "Trace all known pesticides."
-  (trace pest-1 pest-2 pest-3))
+(defnumber C2OM identity
+  ;; Paramaters.
+  (declare C Number [] "Organic C content.")
+  ;; MACRO uses C content, while Daisy uses total humus content.
+  (declare C_in_humus Number [] "C fraction in humus.")
+  (C_in_humus 0.587 [])
+  (value (/ C C_in_humus)))
+
+;;; FOCUS Program.
+
+(defprogram FOCUS Daisy 
+  (output ("Soil chemical" (chemical pesticide))
+          ("Soil water"))
+  (weather default "OVERWRITE THIS" (minimum_precipitation 2.0 [mm/h])))
+
+(defhorizon FOCUS FAO3)
 
 ;;; Vredepeel soil.
 
+(defhorizon D3-Ap FOCUS
+  (clay 3 [%]) (silt 6 [%]) (sand 91 [%])
+  (humus (C2OM (C 2.3 [%]))) (dry_bulk_density 1.35 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 37 [%]) (Theta_res 3 [%])
+             (h_b -39 [cm]) (K_at_h -39 [cm] 0.54 [mm/h])
+             (lambda 0.847 [])))
+
+(defhorizon D3-Bw FOCUS
+  (clay 3 [%]) (silt 4 [%]) (sand 93 [%])
+  (humus (C2OM (C 0.5 [%]))) (dry_bulk_density 1.46 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 29 [%]) (Theta_res 3 [%])
+             (h_b -45 [cm]) (K_at_h -45 [cm] 1.9 [mm/h])
+             (lambda 1.958 [])))
+
+(defhorizon D3-C FOCUS
+  (clay 2 [%]) (silt 2 [%]) (sand 96 [%])
+  (humus (C2OM (C 0.1 [%]))) (dry_bulk_density 1.67 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 29 [%]) (Theta_res 3 [%])
+             (h_b -45 [cm]) (K_at_h -45 [cm] 1.9 [mm/h])
+             (lambda 1.958 [])))
+
+
+(defhorizon D3-plow-pan D3-Bw
+  (hydraulic original (K_at_h -45 [cm] 0.19 [mm/h])))
+
 (defcolumn Vredepeel default
-  (Soil (MaxRootingDepth 60 [cm]))
+  (Movement rectangle
+            (drainpoints (-175.0 [cm] 1 [cm]))
+            (Geometry (zplus -1.5 -3 -6 -10 -15 -20 -25 -30 
+                             -34 -38 
+                             -44 -50 
+                             -75 -100 -130 -150 -170 -180 [cm])
+                      (xplus 0.25 0.50 1 2 4 8 16 32 76 [m]))
+            (Tertiary (biopores 
+                       (classes ("matrix_0cm" (height_end -30 [cm])) 
+                                ("matrix_halfway")
+                                ("matrix_2cm")
+                                ("drain_2cm" (pipe_position -175 [cm]))
+                                ("matrix_30cm" (height_start -34 [cm]))
+                                ("drain_30cm" (height_start -34 [cm])
+                                 (pipe_position -175 [cm]))))))
+  (Soil (horizons ( -30 [cm] D3-Ap)
+                  ( -38 [cm] D3-plow-pan)
+                  ( -50 [cm] D3-Bw)
+                  (-180 [cm] D3-C))     ;Orig. 175
+        (MaxRootingDepth 60 [cm]))
+  (Groundwater aquitard))
 
 ;;; Crop management, D3 (Vredepeel)
 
-(defmanager D3-Maize activity
-  (wait_mm_dd 05 05)
-  (sow Maize)
-  (emerge all)
-  (wait_mm_dd 09 20)
-  (harvest all))
-
-(defmanager D3-Potato activity
+(defaction D3-Potato activity
   (wait_mm_dd 05 10)
   (sow Potato)
   (emerge all)
   (wait_mm_dd 09 15)
   (harvest all))
 
-(defmanager D3-WC activity
+(defaction D3-Potato-P1 activity
+  (wait (after 1986 1 1)) (wait_days 115)
+  (spray P1 3 [kg/ha])
+  (wait (after 1987 01 01)) (wait_days 127) 
+  (spray P1 3 [kg/ha])
+  (wait (after 1988 01 01)) (wait_days 123) 
+  (spray P1 3 [kg/ha])
+  (wait (after 1989 01 01)) (wait_days 116) 
+  (spray P1 3 [kg/ha])
+  (wait (after 1990 01 01)) (wait_days 123) 
+  (spray P1 3 [kg/ha])
+  (wait (after 1991 01 01)) (wait_days 118) 
+  (spray P1 3 [kg/ha])
+  (wait (after 1992 01 01)) (wait_days 124) 
+  (spray P1 3 [kg/ha]))
+        
+(defaction D3-Potato-irrigate activity
+  (wait (after 1986 5 21))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1986 6 14))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1986 6 25))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1986 8 19))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 5 18))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 5 25))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 6 3	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 6 20))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 7 18))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 7 29))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 8 19))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 5 19))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 5 28))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 6 26))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 7 16))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 7 25))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 8 3	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 8 15))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1989 5 25))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1989 6 11))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1989 7 12))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1989 8 4	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1989 8 17))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1989 9 1	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1990 5 21))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1990 5 28))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1990 6 23))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1990 6 30))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1990 7 31))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 5 9	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 5 23))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 6 5	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 6 23))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 7 2	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 8 28))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1992 5 21))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1992 5 28))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1992 6 23))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1992 6 30))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1992 7 31))
+  (irrigate_overhead 2 [mm/h] (hours 15)))
+
+(defaction D3-Maize activity
+  (wait_mm_dd 05 05)
+  (sow Maize)
+  (emerge all)
+  (wait_mm_dd 09 20)
+  (harvest all))
+
+(defaction D3-Maize-P2 activity
+  (wait (after 1986 1 1)) (wait_days 114)
+  (spray P2 1 [kg/ha])
+  (wait (after 1987 01 01)) (wait_days 129) 
+  (spray P2 1 [kg/ha])
+  (wait (after 1988 01 01)) (wait_days 123) 
+  (spray P2 1 [kg/ha])
+  (wait (after 1989 01 01)) (wait_days 116) 
+  (spray P2 1 [kg/ha])
+  (wait (after 1990 01 01)) (wait_days 110) 
+  (spray P2 1 [kg/ha])
+  (wait (after 1991 01 01)) (wait_days 118) 
+  (spray P2 1 [kg/ha])
+  (wait (after 1992 01 01)) (wait_days 110) 
+  (spray P2 1 [kg/ha]))
+
+(defaction D3-Maize-irrigate activity
+  (wait (after 1986 5 24))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1986 6 15))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1986 6 27))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1986 9 12))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 5 20))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 5 27))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 6 16))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 6 22))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 7 21))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 7 31))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 8 20))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 9 11))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 5 21))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 5 30))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 7 15))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 7 22))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 8 1	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 8 11))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1989 5 29))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1989 7 11))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1989 8 1	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1989 8 13))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1989 8 27))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1989 9 9	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1990 5 23))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1990 5 30))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1990 6 26))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1990 7 10))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1990 8 2	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 5 9	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 5 24))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 6 6	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 6 24))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 7 2	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 8 29))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1992 5 23))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1992 5 30))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1992 6 26))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1992 7 10))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1992 8 2	))
+  (irrigate_overhead 2 [mm/h] (hours 15)))
+
+(defaction D3-WC activity
   (wait_mm_dd 11 21)
   (sow "Winter Wheat")
   (emerge all)
   (wait_mm_dd 08 15)
   (harvest all))
 
+(defaction D3-WC-P3 activity
+  (wait (after 1986 1 1)) (wait_days 314)
+  (spray P3 1 [kg/ha])
+  (wait (after 1987 01 01)) (wait_days 338) 
+  (spray P3 1 [kg/ha])
+  (wait (after 1988 01 01)) (wait_days 310) 
+  (spray P3 1 [kg/ha])
+  (wait (after 1989 01 01)) (wait_days 318) 
+  (spray P3 1 [kg/ha])
+  (wait (after 1990 01 01)) (wait_days 310) 
+  (spray P3 1 [kg/ha])
+  (wait (after 1991 01 01)) (wait_days 310) 
+  (spray P3 1 [kg/ha])
+  (wait (after 1992 01 01)) (wait_days 310) 
+  (spray P3 1 [kg/ha]))
+
+(defaction D3-WC-irrigate activity
+  (wait (after 1986 5 21))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1986 6 16))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1986 6 30))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 5 21))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 5 29))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 6 20))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 7 21))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1987 8 15))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 5 9	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 5 28))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 7 18))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 7 28))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1988 8 6	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1989 5 23))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1989 6 7	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1989 8 2	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1990 5 25))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1990 6 28))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1990 8 1	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 4 30))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 5 11))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 5 31))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 6 13))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1991 7 3	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1992 5 25))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1992 6 28))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1992 8 1	))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1993 4 30))
+  (irrigate_overhead 2 [mm/h] (hours 15)))
+
+;; D3 program
+
+(defprogram D3 FOCUS 
+  (weather original "nl-Vredepeel.dwf")
+  (time 1986 01 01) (stop 1993 05 1)
+  (activate_output (after 1992 1 1)))
+
+(defprogram D3P1 D3
+  (column (Vredepeel (Chemistry multi (combine colloids P1))))
+  (log_prefix "log/D3P1/")
+  (manager (while (wait false) D3-Potato D3-Potato-P1 D3-Potato-irrigate)))
+             
+(defprogram D3P2 D3
+  (column (Vredepeel (Chemistry multi (combine colloids P2))))
+  (log_prefix "log/D3P2/")
+  (manager (while (wait false) D3-Maize D3-Maize-P2 D3-Maize-irrigate)))
+             
+(defprogram D3P3 D3
+  (column (Vredepeel (Chemistry multi (combine colloids P3))))
+  (log_prefix "log/D3P3/")
+  (manager (while (wait false) D3-WC D3-WC-P3 D3-WC-irrigate)))
+             
 ;;; Skousbo soil.
 
+(defhorizon D4-Ap FOCUS
+  (clay 12 [%]) (silt 37 [%]) (sand 51 [%])
+  (humus (C2OM (C 1.4 [%]))) (dry_bulk_density 1.48 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 40 [%]) (Theta_res 4 [%])
+             (h_b -10 [cm]) (K_at_h -10 [cm] 0.5 [mm/h])
+             (lambda 0.15 [])))
+
+(defhorizon D4-Eb FOCUS
+  (clay 13 [%]) (silt 17 [%]) (sand 70 [%])
+  (humus (C2OM (C 0.8 [%]))) (dry_bulk_density 1.65 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 34 [%]) (Theta_res 4 [%])
+             (h_b  -12 [cm]) (K_at_h -12 [cm] 1.0 [mm/h])
+             (lambda 0.15 [])))
+
+(defhorizon D4-Ebg FOCUS
+  (clay 15 [%]) (silt 18 [%]) (sand 67 [%])
+  (humus (C2OM (C 0.3 [%]))) (dry_bulk_density 1.65 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 34 [%]) (Theta_res 4 [%])
+             (h_b -12 [cm]) (K_at_h -12 [cm] 0.7 [mm/h])
+             (lambda 0.15 [])))
+
+(defhorizon D4-Btg FOCUS
+  (clay 28 [%]) (silt 39 [%]) (sand 33 [%])
+  (humus (C2OM (C 0.2 [%]))) (dry_bulk_density 1.76 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 32 [%]) (Theta_res 3 [%])
+             (h_b -16 [cm]) (K_at_h -16 [cm] 0.1 [mm/h])
+             (lambda 0.15 [])))
+
+(defhorizon D4-BCg FOCUS
+  (clay 10 [%]) (silt 17 [%]) (sand 73 [%])
+  (humus (C2OM (C 0.1 [%]))) (dry_bulk_density 1.8 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 29 [%]) (Theta_res 3 [%])
+             (h_b -16 [cm]) (K_at_h -16 [cm] 0.1 [mm/h])
+             (lambda 0.12 [])))
+
+(defhorizon D4-plow-pan D4-Eb
+  (hydraulic original (K_at_h -12 [cm] 0.1 [mm/h])))
+
 (defcolumn Skousbo default
-  (Soil (MaxRootingDepth 100 [cm]))
+  (Movement rectangle
+            (drainpoints (-120 [cm] 1 [cm]))
+            (Geometry (zplus -1.5 -3 -6 -10 -15 -20 -25 
+                             -29 -33 
+                             -39 -45
+                             -60 -75
+                             -90 -105 -120
+                             -140 -160 -180 [cm])
+                      (xplus 0.25 0.50 1 2 4 10 [m]))
+            (Tertiary (biopores 
+                       (classes ("matrix_0cm" (height_end -25 [cm])) 
+                                ("matrix_halfway")
+                                ("matrix_2cm")
+                                ("drain_2cm" (pipe_position -120 [cm]))
+                                ("matrix_30cm" (height_start -29 [cm]))
+                                ("drain_30cm" (height_start -29 [cm])
+                                 (pipe_position -120 [cm]))))))
+  (Soil (horizons ( -25 [cm] D4-Ap)
+                  ( -33 [cm] D4-plow-pan)
+                  ( -45 [cm] D4-Eb)
+                  ( -75 [cm] D4-Ebg)
+                  (-120 [cm] D4-Btg)
+                  (-180 [cm] D4-BCg))
+        (MaxRootingDepth 100 [cm]))
+  (Groundwater aquitard))
 
 ;;; Crop management, D4 (Skousbo)
 
-(defmanager D4-Maize activity
-  (wait_mm_dd 05 10)
-  (sow Maize)
-  (emerge all)
-  (wait_mm_dd 09 12)
-  (harvest all))
-
-(defmanager D4-Potato activity
+(defaction D4-Potato activity
   (wait_mm_dd 05 22)
   (sow Potato)
   (emerge all)
   (wait_mm_dd 09 23)
   (harvest all))
 
-(defmanager D4-WC activity
+(defaction D4-Potato-P1 activity
+  (wait (after 1979 1 1)) (wait_days 130)
+  (spray P1 3 [kg/ha])
+  (wait (after 1980 01 01)) (wait_days 136) 
+  (spray P1 3 [kg/ha])
+  (wait (after 1981 01 01)) (wait_days 127) 
+  (spray P1 3 [kg/ha])
+  (wait (after 1982 01 01)) (wait_days 140) 
+  (spray P1 3 [kg/ha])
+  (wait (after 1983 01 01)) (wait_days 135) 
+  (spray P1 3 [kg/ha])
+  (wait (after 1984 01 01)) (wait_days 131) 
+  (spray P1 3 [kg/ha])
+  (wait (after 1985 01 01)) (wait_days 136) 
+  (spray P1 3 [kg/ha]))
+
+(defaction D4-Potato-irrigate activity
+  (wait (after 1979 05 24))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1979 06 08))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1979 06 15))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1979 06 23))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1979 09 01))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1980 05 25))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1980 06 21))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1980 07 01))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1980 07 08))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1980 07 20))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1980 07 27))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1981 06 06))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1981 06 17))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1981 07 18))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1981 07 30))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1981 08 08))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1981 09 03))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1982 05 31))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1982 07 13))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1982 09 11))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1983 05 26))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1983 06 02))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1983 06 08))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1983 06 15))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1983 06 22))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1983 06 30))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1983 07 07))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1983 07 15))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1983 07 24))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1983 08 02))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1983 08 11))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1984 05 21))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1984 05 24))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1984 06 05))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1984 06 14))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1984 07 08))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1985 05 27))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1985 06 05))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1985 07 01))
+  (irrigate_overhead 2 [mm/h] (hours 15))
+  (wait (after 1985 07 11))
+  (irrigate_overhead 2 [mm/h] (hours 15)))
+
+(defaction D4-Maize activity
+  (wait_mm_dd 05 10)
+  (sow Maize)
+  (emerge all)
+  (wait_mm_dd 09 12)
+  (harvest all))
+
+(defaction D4-Maize-P2 activity
+  (wait (after 1979 1 1)) (wait_days 130)
+  (spray P2 1 [kg/ha])
+  (wait (after 1980 01 01)) (wait_days 145) 
+  (spray P2 1 [kg/ha])
+  (wait (after 1981 01 01)) (wait_days 126) 
+  (spray P2 1 [kg/ha])
+  (wait (after 1982 01 01)) (wait_days 115) 
+  (spray P2 1 [kg/ha])
+  (wait (after 1983 01 01)) (wait_days 115) 
+  (spray P2 1 [kg/ha])
+  (wait (after 1984 01 01)) (wait_days 115) 
+  (spray P2 1 [kg/ha])
+  (wait (after 1985 01 01)) (wait_days 115) 
+  (spray P2 1 [kg/ha]))
+
+(defaction D4-WC activity
   (wait_mm_dd 09 22)
   (sow "Winter Wheat")
   (emerge all)
   (wait_mm_dd 08 21)
   (harvest all))
+
+(defaction D4-WC-P3 activity
+  (wait (after 1979 1 1)) (wait_days 250)
+  (spray P3 1 [kg/ha])
+  (wait (after 1980 01 01)) (wait_days 271) 
+  (spray P3 1 [kg/ha])
+  (wait (after 1981 01 01)) (wait_days 255) 
+  (spray P3 1 [kg/ha])
+  (wait (after 1982 01 01)) (wait_days 257) 
+  (spray P3 1 [kg/ha])
+  (wait (after 1983 01 01)) (wait_days 250) 
+  (spray P3 1 [kg/ha])
+  (wait (after 1984 01 01)) (wait_days 261) 
+  (spray P3 1 [kg/ha])
+  (wait (after 1985 01 01)) (wait_days 252) 
+  (spray P3 1 [kg/ha]))
+
+(defprogram D4 FOCUS
+  (column Skousbo)
+  (weather original "sk-Skousbo.dwf")
+  (time 1979 01 01) (stop 1986 5 1)
+  (activate_output (after 1985 1 1)))
+
+(defprogram D4P1 D4
+  (column (Vredepeel (Chemistry multi (combine colloids P1))))
+  (log_prefix "log/D4P1/")
+  (manager (while (wait false) D4-Potato D4-Potato-P1 D4-Potato-irrigate)))
+             
+(defprogram D4P2 D4
+  (column (Vredepeel (Chemistry multi (combine colloids P2))))
+  (log_prefix "log/D4P2/")
+  (manager (while (wait false) D4-Maize D4-Maize-P2)))
+             
+(defprogram D4P3 D4
+  (column (Vredepeel (Chemistry multi (combine colloids P3))))
+  (log_prefix "log/D4P3/")
+  (manager (while (wait false) D4-WC D4-WC-P3)))
+             
+;;; Program
+
+(defprogram all batch
+  (run D3P1 D3P2 D3P3 D4P1 D4P2 D4P3))
+
+(run all)
 
 ;;; setup.dai ends here.
