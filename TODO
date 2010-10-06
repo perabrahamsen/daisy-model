@@ -1,112 +1,12 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Check Osvaldo sim...
+
 * FOCUS
 
-** 
+** Commit
 
-Mangler: Vanding i D3
-
-Tillage + såning
-
-** Surface Water
-
-*** Two scenarios: D3 (Vredepeeel) & D4 (Skousbo)
-
-*** Only one growing season
-
-Merete has send me weather.
-
-*** Pesticides
-
-Included:
-
-P1 (Potatoes)
-P2 (Maize)
-P3 (winter wheat)
-
-Not included:
-
-P5 (Apples): Apples not supported in Daisy.
-P6 (Winter wheat): Metabolits not supported in current project
-
-*** Crop parameterization
-
-We use Daisy default crops (with N stress disabled), rather than MACRO
-parameters.
-
-*** Application dates
-
-9 or 1 days?
-
-*** Irrigation
-
-Used in D3, not in D4.  
-
-*** Max root depth
-
-D3: 0.6 m (table C5).
-D4: 1.0 m (table C6)
-
-
-*** Emergence
-
-(table C5 & C6)
-
-Winter Wheat: D3 21/11 D4 22/9
-Potato: D3 10/5 D4 22/5
-Maize: D3 5/5 D4 10/5
-
-*** Høst
-
-(table C5 & C6)
-
-Winter Wheat: D3 15/8 D4 21/8
-Potato: D3 15/9 D4 23/9
-Maize: D3 20/9 D4 12/9
-
-*** Soil
-
-z_mixing: 0.1 mm (tabel C9)
-
-Drain, soil and hydraulic properties (table C13 & C14)
-
-Tillage: ignored
-
-*** Sammenligning
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+* Danske GW scenarier
 
 * Hent gammel PC.
 

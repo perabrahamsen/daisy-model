@@ -35,6 +35,8 @@ struct SourceStandard : public SourceFile
   symbol dimension_;
   const bool has_factor;
   const double factor;
+  double offset;
+  bool reset_offset;
 
   // Interface.
   symbol title () const
@@ -107,6 +109,13 @@ SourceStandard::load (Treelog& msg)
         
       // Convert it.
       double val = lex.convert_to_double (value);
+
+      if (reset_offset)
+        {
+          offset = -val;
+          reset_offset = false;
+        }
+      val += offset;
       if (has_factor)
         val *= factor;
       else if (units.can_convert (original, dimension_, val))
@@ -149,7 +158,9 @@ SourceStandard::SourceStandard (const BlockModel& al)
     title_ (al.name ("title", tag)),
     dimension_ (al.name ("dimension", Attribute::Unknown ())),
     has_factor (al.check ("factor")),
-    factor (al.number ("factor", 1.0))
+    factor (al.number ("factor", 1.0)),
+    offset (al.number ("offset")),
+    reset_offset (al.flag ("reset_offset"))
 { }
 
 SourceStandard::~SourceStandard ()
@@ -179,7 +190,13 @@ If 'factor' is not specified, Daisy will attempt to convert the data.");
     frame.declare ("factor", Attribute::Unknown (), Attribute::OptionalConst, "\
 Multiply all data by this number.\n\
 By default Daisy will convert from 'original' to 'dimension'.");
-
+    frame.declare ("offset", Attribute::Unknown (), Attribute::Const, "\
+Add this number to all data.");
+    frame.set ("offset", 0.0);
+    frame.declare_boolean ("reset_offset", Attribute::Const, "\
+Set offset to first value read.\n\
+Useful for plotting already accumulated data from a later date.");
+    frame.set ("reset_offset", false);
   }
 } SourceStandard_syntax;
 
