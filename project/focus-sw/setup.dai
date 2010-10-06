@@ -25,8 +25,11 @@
 ;;; FOCUS Program.
 
 (defprogram FOCUS Daisy 
-  (output ("Soil chemical" (chemical pesticide))
-          ("Soil water"))
+  (output ("Field chemical" (chemical pesticide))
+          ("Field water")
+          ("Soil chemical" (chemical pesticide))
+          ("Soil water")
+          )
   (weather default "OVERWRITE THIS" (minimum_precipitation 2.0 [mm/h])))
 
 (defhorizon FOCUS FAO3)
@@ -626,30 +629,157 @@
 
 (defprogram D4 FOCUS
   (column Skousbo)
-  (weather original "sk-Skousbo.dwf")
+  (weather original "dk-Skousbo.dwf")
   (time 1979 01 01) (stop 1986 5 1)
   (activate_output (after 1985 1 1)))
 
 (defprogram D4P1 D4
-  (column (Vredepeel (Chemistry multi (combine colloids P1))))
+  (column (Skousbo (Chemistry multi (combine colloids P1))))
   (log_prefix "log/D4P1/")
   (manager (while (wait false) D4-Potato D4-Potato-P1 D4-Potato-irrigate)))
              
 (defprogram D4P2 D4
-  (column (Vredepeel (Chemistry multi (combine colloids P2))))
+  (column (Skousbo (Chemistry multi (combine colloids P2))))
   (log_prefix "log/D4P2/")
   (manager (while (wait false) D4-Maize D4-Maize-P2)))
              
 (defprogram D4P3 D4
-  (column (Vredepeel (Chemistry multi (combine colloids P3))))
+  (column (Skousbo (Chemistry multi (combine colloids P3))))
   (log_prefix "log/D4P3/")
   (manager (while (wait false) D4-WC D4-WC-P3)))
              
+;; Plot
+
+(defsource MACRO column 
+  (file "${sim}.ddf")
+  (reset_offset true)
+  (title "MACRO")
+  (with lines)
+  (style 3))
+
+(defsource Daisy arithmetic
+  (accumulate true)
+  (title "Daisy")
+  (with lines)
+  (style 1))
+
+(defgnuplot FOCUS time
+  (declare ext String "File extension.")
+  ;;(ext "pdf")
+  (ext "emf")
+  (device "emf")
+  (canvas "350,200")
+
+  (extra &old
+         "set xtics 24 * 60 * 60 * 30 * 3"
+         "set mxtics 3"         
+         [set lmargin 10]
+         [set rmargin 0.5]
+         [set bmargin 0.5]
+         [set tmargin 2.5]  
+         [set format x ""]
+         )
+
+  )
+
+(defgnuplot Drain-Water FOCUS
+  (where "${ext}/${site}-drain-water.${ext}")
+  (title "${site} Drain water")
+  (ymax 600 [mm])
+  (extra &old
+         [set ylabel ""]
+         [set format y ""]
+         )
+  (source (MACRO (tag "Drainage            mm      Acc. (total)     004    ")
+                 (file "${site}P1.ddf")
+                 (original [mm]))
+          (MACRO (tag "Drainage            mm      Acc. (total)     004    ")
+                 (file "${site}P2.ddf") (title "")
+                 (original [mm]))
+          (MACRO (tag "Drainage            mm      Acc. (total)     004    ")
+                 (file "${site}P3.ddf") (title "")
+                 (original [mm]))
+          (Daisy (file "log/${site}P1/field_water.dlf")
+                 (expr (+ "Soil drain flow" "Surface drain flow")))
+          (Daisy (file "log/${site}P2/field_water.dlf") (title "")
+                 (expr (+ "Soil drain flow" "Surface drain flow")))
+          (Daisy (file "log/${site}P3/field_water.dlf") (title "")
+                 (expr (+ "Soil drain flow" "Surface drain flow")))
+          ))
+
+(defgnuplot Leak-Water FOCUS
+  (where "${ext}/${site}-percolation.${ext}")
+  (title "${site} Percolation")
+  (ymax 600 [mm])
+  (source (MACRO (tag "Percolation         mm      Acc. (Total)     004    ")
+                 (file "${site}P1.ddf")
+                 (original [mm]))
+          (MACRO (tag "Percolation         mm      Acc. (Total)     004    ")
+                 (file "${site}P2.ddf") (title "")
+                 (original [mm]))
+          (MACRO (tag "Percolation         mm      Acc. (Total)     004    ")
+                 (file "${site}P3.ddf") (title "")
+                 (original [mm]))
+          (Daisy (file "log/${site}P1/field_water.dlf")
+                 (expr "Matrix percolation"))
+          (Daisy (file "log/${site}P2/field_water.dlf") (title "")
+                 (expr "Matrix percolation"))
+          (Daisy (file "log/${site}P3/field_water.dlf") (title "")
+                 (expr "Matrix percolation"))
+          ))
+
+(defgnuplot Drain-Pest FOCUS
+  (where "${ext}/${sim}-drain-leaching.${ext}")
+  (title "${sim} Drain leaching")
+  (extra &old "set yrange [*:${max}]"
+         [set ylabel ""]
+         [set format y ""]
+         )
+  (source (MACRO (tag "Solute flow to drain        Accum. (total)   004    ")
+                 (original [mg/m^2])
+                 (dimension [g/ha]))
+          (Daisy (file "log/${sim}/field_pesticide.dlf")
+                 (expr (+ "Soil-Drain" "Surface-Drain")))
+          ))
+
+(defgnuplot Leak-Pest FOCUS
+  (where "${ext}/${sim}-deep-leaching.${ext}")
+  (title "${sim} Deep leaching")
+  (extra &old "set yrange [*:${max}]")
+  (source (MACRO (tag "Solute leaching             Acc.(Total)      004    ")
+                 (original [mg/m^2])
+                 (dimension [g/ha]))
+          (Daisy (file "log/${sim}/field_pesticide.dlf")
+                 (expr "Leak-Matrix"))
+          ))
+
+(defgnuplot Water multi
+  (declare site String "Site to plot.")
+  (graph Drain-Water Leak-Water))
+
+(defgnuplot Pest multi
+  (declare sim String "Simulation to plot.")
+  (declare max String "Max val.")
+  (graph Drain-Pest Leak-Pest))
+
+(defprogram plot gnuplot
+  (graph (Water (site D3))
+         (Water (site D4))
+         (Pest (sim D3P1) (max "40"))
+         (Pest (sim D3P2) (max "4"))
+         (Pest (sim D3P3) (max "250"))
+         (Pest (sim D4P1) (max "4"))
+         (Pest (sim D4P2) (max "8"))
+         (Pest (sim D4P3) (max "2"))
+         ))
+
 ;;; Program
 
 (defprogram all batch
-  (run D3P1 D3P2 D3P3 D4P1 D4P2 D4P3))
+  (run D3P1 D3P2 D3P3 
+       D4P1 D4P2 D4P3
+       ))
 
-(run all)
+(run plot)
 
 ;;; setup.dai ends here.
