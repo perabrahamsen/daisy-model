@@ -637,6 +637,10 @@ Connvert to SI base units by multiplying with a factor.")
          "Nanogram per kilopascal.");
     add ("ng/MPa", p_n * u_g / p_M, 1, 0, 2, 0, 0, 0, 0,
          "Nanogram per megapascal.");
+
+    // Mass per volume per pressure.
+    add ("ug/L/MPa", p_u / u_l / p_M, -2, 0, 2, 0, 0, 0, 0,
+         "Microgram per liter per megapascal.");
     
     // Amount of substance per area.
     add ("mol/m^2", 1.0, -2, 0, 0, 0, 0, 1, 0,
@@ -685,6 +689,12 @@ Connvert to SI base units by multiplying with a factor.")
     add ("MJ/m^2/d", p_M / u_d,
          0, 1, -3, 0, 0, 0, 0,
          "Megajoule per square meter per day.");
+    add ("MJ/h/m^2", p_M / u_h,
+         0, 1, -3, 0, 0, 0, 0,
+         "Megajoule per hour per square meter.");
+    add ("MJ/m^2/h", p_M / u_h,
+         0, 1, -3, 0, 0, 0, 0,
+         "Megajoule per square meter per hour.");
   }
   void load_frame (Frame& frame) const
   {
