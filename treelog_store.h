@@ -56,6 +56,7 @@ public:
 public:
   void add_client (boost::shared_ptr<Treelog>);
   void propagate (Treelog&) const;
+  void propagate_debug (Treelog&) const;
   void no_more_clients ();
   bool has_unhandled_events () const;
 

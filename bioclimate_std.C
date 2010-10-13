@@ -1013,8 +1013,11 @@ BioclimateStandard::WaterDistribution (const Units& units,
               std::ostringstream tmp;
               tmp << "svat iteration " << iteration;
               Treelog::Open nest (msg, tmp.str ());
+              if (svat_fail > 0)
+                svat_msg.propagate_debug (msg);
+              else
+                svat_msg.propagate (msg);
               svat_fail++;
-              svat_msg.propagate (msg);
             }
           goto success;
         }

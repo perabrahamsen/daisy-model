@@ -68,7 +68,7 @@ struct ActionActivity : public Action
 
   void output (Log& log) const
   { 
-    output_list (actions, "actions", log, Action::component);
+    output_list (actions, "do", log, Action::component);
   }
 
   void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
@@ -94,14 +94,14 @@ struct ActionActivity : public Action
 
   ActionActivity (const BlockModel& al)
     : Action (al),
-      actions (Librarian::build_vector<Action> (al, "actions"))
+      actions (Librarian::build_vector<Action> (al, "do"))
   { }
 
   ~ActionActivity ()
   { }
 };
 
-static struct ActionActivitySyntax : public DeclareModel
+static struct ActionSequenceSyntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
   { return new ActionActivity (al); }
@@ -113,13 +113,13 @@ static struct ActionActivitySyntax : public DeclareModel
     const symbol description = al.description ();
     const Library& library = metalib.library (Action::component);
     if (library.check (description))
-      msg.warning ("'" + description + "' is taken as a description of this activity, but is also a valid action.  Maybe you meant to write '(" + description + ") instead");
+      msg.warning ("'" + description + "' is taken as a description of this sequence, but is also a valid action.  Maybe you meant to write '(" + description + ") instead");
 
     return ok;
   }
 
-  ActionActivitySyntax ()
-    : DeclareModel (Action::component, "activity", "\
+  ActionSequenceSyntax ()
+    : DeclareModel (Action::component, "sequence", "\
 Perform all the specified actions in the sequence listed.  Each\n\
 action is performed until done.  At most one action can be performed\n\
 at each time step.")
@@ -127,11 +127,24 @@ at each time step.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.declare_object ("actions", Action::component, 
+    frame.declare_object ("do", Action::component, 
                        Attribute::State, Attribute::Variable,
                        "Sequence of actions to perform.");
-    frame.set_empty ("actions");
-    frame.order ("actions");
+    frame.set_empty ("do");
+  }
+} ActionSequence_syntax;
+
+static struct ActionActivitySyntax : public DeclareParam
+{
+  ActionActivitySyntax ()
+    : DeclareParam (Action::component, "activity", "sequence", "\
+Perform all the specified actions in the sequence listed.  Each\n\
+action is performed until done.  At most one action can be performed\n\
+at each time step.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.order ("do");
   }
 } ActionActivity_syntax;
 

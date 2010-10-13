@@ -81,6 +81,36 @@ struct TreelogStore::Implementation
         msg.open (text);
       }
   }
+  void propagate_debug (int nest, const std::string& text)
+  {
+    for (size_t i = 0; i < client.size (); i++)
+      propagate_debug (*client[i], nest, text);
+  }
+  static void propagate_debug (Treelog& msg, int nest, const std::string& text)
+  {
+    switch (nest)
+      {
+      case is_unknown:
+      case is_debug:
+      case is_plain:
+      case is_warning:
+      case is_error:
+      case is_bug:
+        msg.debug (text);
+        break;
+      case is_close:
+        msg.close ();
+        break;
+      case is_touch:
+        msg.touch ();
+        break;
+      case is_flush:
+        msg.flush ();
+        break;
+      default:
+        msg.open (text);
+      }
+  }
 
 public:
   void add_client (boost::shared_ptr<Treelog> msg)
@@ -95,6 +125,13 @@ public:
     daisy_assert (!closed);
     for (size_t i = 0; i < entries.size (); i++)
       propagate (msg, entries[i].nest, entries[i].text);
+  }
+
+  void propagate_debug (Treelog& msg) const
+  {
+    daisy_assert (!closed);
+    for (size_t i = 0; i < entries.size (); i++)
+      propagate_debug (msg, entries[i].nest, entries[i].text);
   }
 
   void no_more_clients ()
@@ -231,6 +268,10 @@ TreelogStore::add_client (boost::shared_ptr<Treelog> msg)
 void 
 TreelogStore::propagate (Treelog& msg) const
 { impl->propagate (msg); }
+
+void 
+TreelogStore::propagate_debug (Treelog& msg) const
+{ impl->propagate_debug (msg); }
 
 void 
 TreelogStore::no_more_clients ()

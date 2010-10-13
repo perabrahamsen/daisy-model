@@ -61,65 +61,24 @@
 (defcrop SBShortNormal SBShort (ABAfac 1.0 []))
 (defcrop SBShortHigh SBShort (ABAfac 2.0 []))
 
-(defaction "SBLow" activity
-  (wait_mm_dd 3 05)
-  (fertilize (N25S (weight 115 [kg N/ha])))
+(defaction "SB" activity
+  (wait_mm_dd 4 16)
   (plowing)
-  (wait_mm_dd 4 05)
-  (seed_bed_preparation)(sow "SBLow")
-  (wait (or (crop_ds_after "SBLow" 2.0)(mm_dd 08 20)))
-  (harvest "SBLow" (stub 8 [cm])(stem 0.70))
-)
-
-(defaction "SBNormal" activity
-  (wait_mm_dd 3 05)
-  (fertilize (N25S (weight 115 [kg N/ha])))
-  (plowing)
-  (wait_mm_dd 4 05)
-  (seed_bed_preparation)(sow "SBNormal")
-  (wait (or (crop_ds_after "SBNormal" 2.0)(mm_dd 08 20)))
-  (harvest "SBNormal" (stub 8 [cm])(stem 0.70))
-)
-
-(defaction "SBHigh" activity
-  (wait_mm_dd 3 05)
-  (fertilize (N25S (weight 115 [kg N/ha])))
-  (plowing)
-  (wait_mm_dd 4 05)
-  (seed_bed_preparation)(sow "SBHigh")
-  (wait (or (crop_ds_after "SBHigh" 2.0)(mm_dd 08 20)))
-  (harvest "SBHigh" (stub 8 [cm])(stem 0.70))
-)
-
-(defaction "SBShortLow" activity
-  (wait_mm_dd 3 05)
-  (fertilize (N25S (weight 115 [kg N/ha])))
-  (plowing)
-  (wait_mm_dd 4 05)
-  (seed_bed_preparation)(sow "SBShortLow")
-  (wait (or (crop_ds_after "SBShortLow" 2.0)(mm_dd 08 20)))
-  (harvest "SBShortLow" (stub 8 [cm])(stem 0.70))
-)
-
-(defaction "SBShortNormal" activity
-  (wait_mm_dd 3 05)
-  (fertilize (N25S (weight 115 [kg N/ha])))
-  (plowing)
-  (wait_mm_dd 4 05)
-  (seed_bed_preparation)(sow "SBShortNormal")
-  (wait (or (crop_ds_after "SBShortNormal" 2.0)(mm_dd 08 20)))
-  (harvest "SBShortNormal" (stub 8 [cm])(stem 0.70))
-)
-
-(defaction "SBShortHigh" activity
-  (wait_mm_dd 3 05)
-  (fertilize (N25S (weight 115 [kg N/ha])))
-  (plowing)
-  (wait_mm_dd 4 05)
-  (seed_bed_preparation)(sow "SBShortHigh")
-  (wait (or (crop_ds_after "SBShortHigh" 2.0)(mm_dd 08 20)))
-  (harvest "SBShortHigh" (stub 8 [cm])(stem 0.70))
-)
+  (wait_mm_dd 4 17)
+  (seed_bed_preparation)(sow $Crop)
+  (wait_mm_dd 4 20)
+  (fertilize (N25S (weight 100 [kg N/ha])))
+  (wait_mm_dd 6 2)
+  (message "CALIB: Plants have three leaves")
+  (wait_mm_dd 7 7)
+  (message "CALIB: Flowering?")
+  (wait_mm_dd 8 3)
+  (message "CALIB: Led 1 moden")
+  (wait_mm_dd 8 8)
+  (message "CALIB: Resten moden")
+  (wait_mm_dd 8 23)
+  (harvest all (stub 8 [cm])(stem 0) (leaf 0))
+  (stop))
 
 (defhorizon "Rorrende Ap" USDA3
   (description "3-25 cm")
@@ -172,6 +131,18 @@
   (Bioclimate original
               (svat SSOC)
               (raddist sun-shade))
+  (Vegetation original
+              ;; Behandling 1, measured LAI.
+              (ForcedLAI (2010 ((130	0.126865346178995)
+                                (138	0.341699606805203)
+                                (139	0.331505397470374)
+                                (145	0.732362900577582)
+                                (149	1.04893322333451)
+                                (154	1.38190243729417)
+                                (159	1.88876407381112)
+                                (165	2.01596625098118)
+                                (169	2.10844172461756)
+                                (174	2.41132224385265)))))
   (Chemistry none)
   (OrganicMatter none)
   ;; (OrganicMatter original (init (end -25 [cm]) (input 3000 [kg C/ha/y])))
@@ -196,6 +167,8 @@
   (PrecipScale 1.2 1.2 1.2 1.2  1.2 1.2 1.2 1.2  1.2 1.2 1.2 1.2))
   
 (defprogram Bakkegaarden Daisy
+  (declare Crop crop "Crop to sow.")
+  (manager SB)
   (column Bakkegaarden)
   (weather Normal)
   (time 2010 1 2)
@@ -204,95 +177,95 @@
 
 (defprogram DSH Bakkegaarden
   (weather Dry)
-  (manager SBShortHigh)
+  (Crop SBShortHigh)
   (log_prefix "log/DSH-"))
 
 (defprogram DSN Bakkegaarden
   (weather Dry)
-  (manager SBShortNormal)
+  (Crop SBShortNormal)
   (log_prefix "log/DSN-"))
 
 (defprogram DSL Bakkegaarden
   (weather Dry)
-  (manager SBShortLow)
+  (Crop SBShortLow)
   (log_prefix "log/DSL-"))
 
 (defprogram DNH Bakkegaarden
   (weather Dry)
-  (manager SBHigh)
+  (Crop SBHigh)
   (log_prefix "log/DNH-"))
 
 (defprogram DNN Bakkegaarden
   (weather Dry)
-  (manager SBNormal)
+  (Crop SBNormal)
   (log_prefix "log/DNN-"))
 
 (defprogram DNL Bakkegaarden
   (weather Dry)
-  (manager SBLow)
+  (Crop SBLow)
   (log_prefix "log/DNL-"))
 
 (defprogram NSH Bakkegaarden
   (weather Normal)
-  (manager SBShortHigh)
+  (Crop SBShortHigh)
   (log_prefix "log/NSH-"))
 
 (defprogram NSN Bakkegaarden
   (weather Normal)
-  (manager SBShortNormal)
+  (Crop SBShortNormal)
   (log_prefix "log/NSN-"))
 
 (defprogram NSL Bakkegaarden
   (weather Normal)
-  (manager SBShortLow)
+  (Crop SBShortLow)
   (log_prefix "log/NSL-"))
 
 (defprogram NNH Bakkegaarden
   (weather Normal)
-  (manager SBHigh)
+  (Crop SBHigh)
   (log_prefix "log/NNH-"))
 
 (defprogram NNN Bakkegaarden
   (weather Normal)
-  (manager SBNormal)
+  (Crop SBNormal)
   (log_prefix "log/NNN-"))
 
 (defprogram NNL Bakkegaarden
   (weather Normal)
-  (manager SBLow)
+  (Crop SBLow)
   (log_prefix "log/NNL-"))
 
 (defprogram WSH Bakkegaarden
   (weather Wet)
-  (manager SBShortHigh)
+  (Crop SBShortHigh)
   (log_prefix "log/WSH-"))
 
 (defprogram WSN Bakkegaarden
   (weather Wet)
-  (manager SBShortNormal)
+  (Crop SBShortNormal)
   (log_prefix "log/WSN-"))
 
 (defprogram WSL Bakkegaarden
   (weather Wet)
-  (manager SBShortLow)
+  (Crop SBShortLow)
   (log_prefix "log/WSL-"))
 
 (defprogram WNH Bakkegaarden
   (weather Wet)
-  (manager SBHigh)
+  (Crop SBHigh)
   (log_prefix "log/WNH-"))
 
 (defprogram WNN Bakkegaarden
   (weather Wet)
-  (manager SBNormal)
+  (Crop SBNormal)
   (log_prefix "log/WNN-"))
 
 (defprogram WNL Bakkegaarden
   (weather Wet)
-  (manager SBLow)
+  (Crop SBLow)
   (log_prefix "log/WNL-"))
 
 (run batch (run DSH DSN DSL DNH DNN DNL NSH NSN NSL NNH NNN NNL WSH WSN WSL WNH WNN WNL ))
-;;(run batch (run NNN ))
+;;(run NNN)
 
 ;; setup.dai ends here.
