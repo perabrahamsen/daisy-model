@@ -1,3 +1,7 @@
+2010-10-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.90 released.
+
 2010-10-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* OpenMI/daisywrapper.cs (SetValues): Don't always use the first
