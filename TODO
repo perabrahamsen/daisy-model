@@ -2,7 +2,33 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Danske GW scenarier
 
-Check indhold af .bin filer.
+** Udtræk data
+
+*** jord
+
+*** vejr
+
+*** pesticider
+
+*** crop (emerge and harvest)
+
+*** management?
+
+specielt application day.  Hvor finder jeg den?
+
+** Opsæt scenarier for macro
+
+** Kør macro scenarier
+
+** Opsæt scenarier for Daisy
+
+log udvaskning i en meter og i bund
+
+** Kør Daisy scenarier
+
+** Plot mod hinanden (som for SW)
+
+** Skriv
 
 * Drænrøg
 

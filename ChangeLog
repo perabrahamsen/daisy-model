@@ -1,3 +1,12 @@
+2010-10-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* OpenMI/daisywrapper.cs (SetValues): Don't always use the first
+	value.
+	* action_activity.C (sequence): New model.
+
+	* source_std.C (reset_offset): New parameter.
+
+
 2010-09-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* tertiary_biopores.C (tick_source): Don't ignore ice.

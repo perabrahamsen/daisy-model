@@ -6,6 +6,47 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.90
+
+** New "log_prefix" top level parameter.
+
+All output files will have this added to the front of their names.
+Can be used as an alternative to the "directory" parameter, but
+remember the directory seperator.  E.g. 
+
+  (log_prefix "C:/foo/")
+
+to put all log files in "C:\foo".
+
+** Fixed OpenMI bug.
+
+** New 'reset_offset' column source parameter.
+
+This allows you to force time plots to start at zero.
+
+** New 'sequence' action.
+
+This is just like activity, except that all the action list is within
+a 'do' parameter.
+
+** Some work on ice.
+
+It doesn't really work yet, though.
+
+** Allow plot of boundaries with xysource.
+
+** Prevent rain from being below 0.1 degrees.
+
+** New "source" groundwater model.
+
+Reads data from a ".ddf" file, unlike the old "file" model.
+
+** Don't infiltrate chemicals when negligible water enter the soil.
+
+* 4.89
+
+Bug fix affecting OpenMI.
+
 * 4.88 
 
 Bug fixes.
