@@ -387,7 +387,7 @@ namespace dk.ku.life.Daisy.OpenMI
                             if (found)
                                 throw new Exception("Duplicate QuantityID: '" + QuantityID + "' in DaisyEngine");
                             if (scope.IsNumber(QuantityID))
-                                scope.SetNumber(QuantityID, val.GetScalar(0));
+                                scope.SetNumber(QuantityID, val.GetScalar(e));
                             else
                                 throw new Exception("'" + QuantityID + "' is not a number");
                             found = true;

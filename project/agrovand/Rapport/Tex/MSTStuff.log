@@ -1,14 +1,12 @@
-This is pdfTeX, Version 3.141592-1.40.3 (MiKTeX 2.6) (preloaded format=latex 2007.8.20)  23 NOV 2007 15:52
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.8.27)  14 OCT 2010 10:30
 entering extended mode
-**MSTStuff.tex
-(MSTStuff.tex
-LaTeX2e <2005/12/01>
-Babel <v3.8g> and hyphenation patterns for english, dumylang, nohyphenation, ge
-rman, ngerman, french, loaded.
-("C:\Program Files\MiKTeX 2.6\tex\latex\base\report.cls"
-Document Class: report 2005/09/16 v1.4f Standard LaTeX document class
-("C:\Program Files\MiKTeX 2.6\tex\latex\base\size10.clo"
-File: size10.clo 2005/09/16 v1.4f Standard LaTeX file (size option)
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**\input MSTStuff.tex
+(./MSTStuff.tex (/usr/share/texmf-texlive/tex/latex/base/report.cls
+Document Class: report 2007/10/19 v1.4h Standard LaTeX document class
+(/usr/share/texmf-texlive/tex/latex/base/size10.clo
+File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 )
 \c@part=\count79
 \c@chapter=\count80
@@ -22,31 +20,31 @@ File: size10.clo 2005/09/16 v1.4f Standard LaTeX file (size option)
 \abovecaptionskip=\skip41
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
-) (natbibDK.sty
+) (./natbibDK.sty
 Package: natbibDK 1998/02/19 6.8 (PWD)
 \bibhang=\skip43
 \bibsep=\skip44
 LaTeX Info: Redefining \cite on input line 451.
 \c@NAT@ctr=\count88
 )
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsmath\amsmath.sty"
+(/usr/share/texmf-texlive/tex/latex/amsmath/amsmath.sty
 Package: amsmath 2000/07/18 v2.13 AMS math features
 \@mathmargin=\skip45
 
 For additional information on amsmath, use the `?' option.
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsmath\amstext.sty"
+(/usr/share/texmf-texlive/tex/latex/amsmath/amstext.sty
 Package: amstext 2000/06/29 v2.01
 
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsmath\amsgen.sty"
+(/usr/share/texmf-texlive/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0
 \@emptytoks=\toks14
 \ex@=\dimen103
 ))
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsmath\amsbsy.sty"
+(/usr/share/texmf-texlive/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d
 \pmbraise@=\dimen104
 )
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsmath\amsopn.sty"
+(/usr/share/texmf-texlive/tex/latex/amsmath/amsopn.sty
 Package: amsopn 1999/12/14 v2.01 operator names
 )
 \inf@bad=\count89
@@ -87,39 +85,41 @@ LaTeX Font Info:    Redeclaring font encoding OMS on input line 568.
 LaTeX Info: Redefining \[ on input line 2666.
 LaTeX Info: Redefining \] on input line 2667.
 )
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsfonts\amssymb.sty"
-Package: amssymb 2002/01/22 v2.2d
+(/usr/share/texmf-texlive/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2009/06/22 v3.00
 
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsfonts\amsfonts.sty"
-Package: amsfonts 2001/10/25 v2.2f
+(/usr/share/texmf-texlive/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2009/06/22 v3.00 Basic AMSFonts support
 \symAMSa=\mathgroup4
 \symAMSb=\mathgroup5
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
-(Font)                  U/euf/m/n --> U/euf/b/n on input line 132.
-)) (graphicx.sty
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 96.
+)) (./graphicx.sty
 Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
 
-("C:\Program Files\MiKTeX 2.6\tex\latex\graphics\keyval.sty"
+(/usr/share/texmf-texlive/tex/latex/graphics/keyval.sty
 Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
 \KV@toks@=\toks19
 )
-("C:\Program Files\MiKTeX 2.6\tex\latex\graphics\graphics.sty"
-Package: graphics 2006/02/20 v1.0o Standard LaTeX Graphics (DPC,SPQR)
+(/usr/share/texmf-texlive/tex/latex/graphics/graphics.sty
+Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
 
-("C:\Program Files\MiKTeX 2.6\tex\latex\graphics\trig.sty"
+(/usr/share/texmf-texlive/tex/latex/graphics/trig.sty
 Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
 )
-("C:\Program Files\MiKTeX 2.6\tex\latex\00miktex\graphics.cfg"
-File: graphics.cfg 2005/12/29 v1.2 MiKTeX 'graphics' configuration
+(/etc/texmf/tex/latex/config/graphics.cfg
+File: graphics.cfg 2009/08/28 v1.8 graphics configuration of TeX Live
 )
-Package graphics Info: Driver file: dvips.def on input line 90.
+Package graphics Info: Driver file: dvips.def on input line 91.
 
-("C:\Program Files\MiKTeX 2.6\tex\latex\graphics\dvips.def"
+(/usr/share/texmf-texlive/tex/latex/graphics/dvips.def
 File: dvips.def 1999/02/16 v3.0i Driver-dependant file (DPC,SPQR)
 ))
 \Gin@req@height=\dimen112
 \Gin@req@width=\dimen113
-) (MSTStuff.aux)
+) (./MSTStuff.aux)
+\openout1 = `MSTStuff.aux'.
+
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 13.
 LaTeX Font Info:    ... okay on input line 13.
 LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 13.
@@ -137,16 +137,16 @@ Chapter 1.
 [1
 
 
-]
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
 Chapter 2.
 LaTeX Font Info:    Try loading font information for U+msa on input line 47.
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsfonts\umsa.fd"
-File: umsa.fd 2002/01/19 v2.2g AMS font definitions
+(/usr/share/texmf-texlive/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2009/06/22 v3.00 AMS symbols A
 )
 LaTeX Font Info:    Try loading font information for U+msb on input line 47.
 
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsfonts\umsb.fd"
-File: umsb.fd 2002/01/19 v2.2g AMS font definitions
+(/usr/share/texmf-texlive/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2009/06/22 v3.00 AMS symbols B
 )
 Missing character: There is no ´ in font cmr10!
 Missing character: There is no ´ in font cmr10!
@@ -184,8 +184,8 @@ ths,
 
 Missing character: There is no å in font cmr10!
 Missing character: There is no ø in font cmr10!
-[6]
 Missing character: There is no ø in font cmbx12!
+[6]
 Missing character: There is no å in font cmr10!
  [7]
 Underfull \hbox (badness 10000) in paragraph at lines 429--431
@@ -199,7 +199,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 429--431
 
 LaTeX Font Info:    Try loading font information for OMS+cmr on input line 433.
 
-("C:\Program Files\MiKTeX 2.6\tex\latex\base\omscmr.fd"
+(/usr/share/texmf-texlive/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
@@ -214,16 +214,33 @@ Underfull \hbox (badness 10000) in paragraph at lines 434--435
 
  []
 
-(MSTStuff.bbl [8] [9
+(./MSTStuff.bbl [8] [9
 
-]) [10] (MSTStuff.aux) ) 
+]) [10] (./MSTStuff.aux) ) 
 Here is how much of TeX's memory you used:
- 1770 strings out of 95306
- 18807 string characters out of 1185221
- 71044 words of memory out of 1070136
- 4894 multiletter control sequences out of 60000
- 10864 words of font info for 40 fonts, out of 1000000 for 2000
- 14 hyphenation exceptions out of 8191
- 27i,16n,24p,224b,219s stack positions out of 5000i,500n,10000p,200000b,32768s
+ 1700 strings out of 495042
+ 19208 string characters out of 1181749
+ 73184 words of memory out of 3000000
+ 4887 multiletter control sequences out of 15000+50000
+ 10864 words of font info for 40 fonts, out of 3000000 for 9000
+ 28 hyphenation exceptions out of 8191
+ 27i,16n,24p,231b,219s stack positions out of 5000i,500n,10000p,200000b,50000s
+</usr/share/texmf-texlive/fonts/type1/public/amsfonts
+/cm/cmbx10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx12.
+pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/s
+hare/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-
+texlive/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texmf-texlive/font
+s/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-texlive/fonts/type1/publ
+ic/amsfonts/cm/cmmib10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfont
+s/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr5.pf
+b></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share
+/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texl
+ive/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texmf-texlive/fonts/ty
+pe1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-texlive/fonts/type1/public/a
+msfonts/cm/cmti10.pfb>
+Output written on MSTStuff.pdf (10 pages, 196662 bytes).
+PDF statistics:
+ 91 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
-Output written on MSTStuff.dvi (10 pages, 24240 bytes).

@@ -1,14 +1,12 @@
-This is pdfTeX, Version 3.141592-1.40.3 (MiKTeX 2.6) (preloaded format=latex 2009.8.27)  13 OCT 2009 16:52
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.8.27)  14 OCT 2010 10:33
 entering extended mode
-**MSTStuff_english.tex
-(MSTStuff_english.tex
-LaTeX2e <2005/12/01>
-Babel <v3.8g> and hyphenation patterns for english, dumylang, nohyphenation, ge
-rman, ngerman, french, loaded.
-("C:\Program Files\MiKTeX 2.6\tex\latex\base\report.cls"
-Document Class: report 2005/09/16 v1.4f Standard LaTeX document class
-("C:\Program Files\MiKTeX 2.6\tex\latex\base\size10.clo"
-File: size10.clo 2005/09/16 v1.4f Standard LaTeX file (size option)
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**\input MSTStuff_english.tex
+(./MSTStuff_english.tex (/usr/share/texmf-texlive/tex/latex/base/report.cls
+Document Class: report 2007/10/19 v1.4h Standard LaTeX document class
+(/usr/share/texmf-texlive/tex/latex/base/size10.clo
+File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 )
 \c@part=\count79
 \c@chapter=\count80
@@ -22,31 +20,31 @@ File: size10.clo 2005/09/16 v1.4f Standard LaTeX file (size option)
 \abovecaptionskip=\skip41
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
-) (natbib.sty
+) (./natbib.sty
 Package: natbib 1997/07/05 6.6 (PWD)
 \bibhang=\skip43
 \bibsep=\skip44
 LaTeX Info: Redefining \cite on input line 416.
 \c@NAT@ctr=\count88
 )
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsmath\amsmath.sty"
+(/usr/share/texmf-texlive/tex/latex/amsmath/amsmath.sty
 Package: amsmath 2000/07/18 v2.13 AMS math features
 \@mathmargin=\skip45
 
 For additional information on amsmath, use the `?' option.
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsmath\amstext.sty"
+(/usr/share/texmf-texlive/tex/latex/amsmath/amstext.sty
 Package: amstext 2000/06/29 v2.01
 
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsmath\amsgen.sty"
+(/usr/share/texmf-texlive/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0
 \@emptytoks=\toks14
 \ex@=\dimen103
 ))
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsmath\amsbsy.sty"
+(/usr/share/texmf-texlive/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d
 \pmbraise@=\dimen104
 )
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsmath\amsopn.sty"
+(/usr/share/texmf-texlive/tex/latex/amsmath/amsopn.sty
 Package: amsopn 1999/12/14 v2.01 operator names
 )
 \inf@bad=\count89
@@ -87,55 +85,56 @@ LaTeX Font Info:    Redeclaring font encoding OMS on input line 568.
 LaTeX Info: Redefining \[ on input line 2666.
 LaTeX Info: Redefining \] on input line 2667.
 )
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsfonts\amssymb.sty"
-Package: amssymb 2002/01/22 v2.2d
+(/usr/share/texmf-texlive/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2009/06/22 v3.00
 
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsfonts\amsfonts.sty"
-Package: amsfonts 2001/10/25 v2.2f
+(/usr/share/texmf-texlive/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2009/06/22 v3.00 Basic AMSFonts support
 \symAMSa=\mathgroup4
 \symAMSb=\mathgroup5
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
-(Font)                  U/euf/m/n --> U/euf/b/n on input line 132.
-)) (graphicx.sty
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 96.
+)) (./graphicx.sty
 Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
 
-("C:\Program Files\MiKTeX 2.6\tex\latex\graphics\keyval.sty"
+(/usr/share/texmf-texlive/tex/latex/graphics/keyval.sty
 Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
 \KV@toks@=\toks19
 )
-("C:\Program Files\MiKTeX 2.6\tex\latex\graphics\graphics.sty"
-Package: graphics 2006/02/20 v1.0o Standard LaTeX Graphics (DPC,SPQR)
+(/usr/share/texmf-texlive/tex/latex/graphics/graphics.sty
+Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
 
-("C:\Program Files\MiKTeX 2.6\tex\latex\graphics\trig.sty"
+(/usr/share/texmf-texlive/tex/latex/graphics/trig.sty
 Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
 )
-("C:\Program Files\MiKTeX 2.6\tex\latex\00miktex\graphics.cfg"
-File: graphics.cfg 2005/12/29 v1.2 MiKTeX 'graphics' configuration
+(/etc/texmf/tex/latex/config/graphics.cfg
+File: graphics.cfg 2009/08/28 v1.8 graphics configuration of TeX Live
 )
-Package graphics Info: Driver file: dvips.def on input line 90.
+Package graphics Info: Driver file: dvips.def on input line 91.
 
-("C:\Program Files\MiKTeX 2.6\tex\latex\graphics\dvips.def"
+(/usr/share/texmf-texlive/tex/latex/graphics/dvips.def
 File: dvips.def 1999/02/16 v3.0i Driver-dependant file (DPC,SPQR)
 ))
 \Gin@req@height=\dimen112
 \Gin@req@width=\dimen113
 )
-("C:\Program Files\MiKTeX 2.6\tex\latex\base\fontenc.sty"
+(/usr/share/texmf-texlive/tex/latex/base/fontenc.sty
 Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
 
-("C:\Program Files\MiKTeX 2.6\tex\latex\base\t1enc.def"
+(/usr/share/texmf-texlive/tex/latex/base/t1enc.def
 File: t1enc.def 2005/09/27 v1.99g Standard LaTeX file
 LaTeX Font Info:    Redeclaring font encoding T1 on input line 43.
 ))
-("C:\Program Files\MiKTeX 2.6\tex\latex\base\inputenc.sty"
-Package: inputenc 2006/05/05 v1.1b Input encoding file
+(/usr/share/texmf-texlive/tex/latex/base/inputenc.sty
+Package: inputenc 2008/03/30 v1.1d Input encoding file
 \inpenc@prehook=\toks20
 \inpenc@posthook=\toks21
 
-("C:\Program Files\MiKTeX 2.6\tex\latex\base\latin1.def"
-File: latin1.def 2006/05/05 v1.1b Input encoding file
-))
-(MSTStuff_english.aux)
+(/usr/share/texmf-texlive/tex/latex/base/latin1.def
+File: latin1.def 2008/03/30 v1.1d Input encoding file
+)) (./MSTStuff_english.aux)
+\openout1 = `MSTStuff_english.aux'.
+
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 27.
 LaTeX Font Info:    ... okay on input line 27.
 LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 27.
@@ -151,17 +150,17 @@ LaTeX Font Info:    ... okay on input line 27.
 
 Chapter 1.
 LaTeX Font Info:    Try loading font information for U+msa on input line 50.
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsfonts\umsa.fd"
-File: umsa.fd 2002/01/19 v2.2g AMS font definitions
+(/usr/share/texmf-texlive/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2009/06/22 v3.00 AMS symbols A
 )
 LaTeX Font Info:    Try loading font information for U+msb on input line 50.
 
-("C:\Program Files\MiKTeX 2.6\tex\latex\amsfonts\umsb.fd"
-File: umsb.fd 2002/01/19 v2.2g AMS font definitions
+(/usr/share/texmf-texlive/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2009/06/22 v3.00 AMS symbols B
 ) [1
 
 
-]
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
 Underfull \hbox (badness 10000) in paragraph at lines 175--192
 
  []
@@ -204,10 +203,11 @@ File: grid_trapz_part.eps Graphic file (type eps)
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[6]
+[6
+Non-PDF special ignored!]
 LaTeX Font Info:    Try loading font information for OMS+cmr on input line 491.
 
- ("C:\Program Files\MiKTeX 2.6\tex\latex\base\omscmr.fd"
+ (/usr/share/texmf-texlive/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
@@ -217,21 +217,21 @@ Underfull \hbox (badness 10000) in paragraph at lines 496--497
 
  []
 
-[7] [8]
+[7
+Non-PDF special ignored!] [8
+Non-PDF special ignored!]
 File: meshrect_nswe.eps Graphic file (type eps)
  <meshrect_nswe.eps>
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 File: meshrect_gradient.eps Graphic file (type eps)
-<meshrect_gradient.eps> [9] [10] [11] [12]
+<meshrect_gradient.eps> [9] [10
+Non-PDF special ignored!] [11
+Non-PDF special ignored!] [12]
 Underfull \hbox (badness 10000) in paragraph at lines 776--779
 
  []
-
-
-Package natbib Warning: Citation `Chow' on page 13 undefined on input line 783.
-
 
 [13]
 File: drainaqui.eps Graphic file (type eps)
@@ -239,7 +239,8 @@ File: drainaqui.eps Graphic file (type eps)
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[14] [15]
+[14] [15
+Non-PDF special ignored!]
 Underfull \hbox (badness 10000) in paragraph at lines 1043--1053
 
  []
@@ -275,10 +276,14 @@ File: VerificHor.eps Graphic file (type eps)
 File: Mesh.eps Graphic file (type eps)
  <Mesh.eps>
 File: MeshPart.eps Graphic file (type eps)
- <MeshPart.eps> [19]
+ <MeshPart.eps> [19
+Non-PDF special ignored!]
 File: watercontent24h.eps Graphic file (type eps)
-
-<watercontent24h.eps> [20] [21] [22]
+ <watercontent24h.eps> [20
+Non-PDF special ignored!] [21
+Non-PDF special ignored!
+Non-PDF special ignored!] [22
+Non-PDF special ignored!]
 Chapter 2.
 [23
 
@@ -303,112 +308,117 @@ Underfull \hbox (badness 10000) in paragraph at lines 1610--1628
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1639--1654
+Underfull \hbox (badness 10000) in paragraph at lines 1639--1653
 
  []
 
 [26]
-Underfull \hbox (badness 10000) in paragraph at lines 1707--1720
+Underfull \hbox (badness 10000) in paragraph at lines 1706--1719
 
  []
 
 [27]
-Underfull \hbox (badness 10000) in paragraph at lines 1739--1755
+Underfull \hbox (badness 10000) in paragraph at lines 1738--1754
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1763--1778
+Underfull \hbox (badness 10000) in paragraph at lines 1762--1777
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1792--1804
+Underfull \hbox (badness 10000) in paragraph at lines 1791--1803
 
  []
 
 [28]
 File: Stab_Upstream.eps Graphic file (type eps)
  <Stab_Upstream.eps>
-Underfull \hbox (badness 10000) in paragraph at lines 1860--1914
+Underfull \hbox (badness 10000) in paragraph at lines 1859--1913
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1860--1914
+Underfull \hbox (badness 10000) in paragraph at lines 1859--1913
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1860--1914
+Underfull \hbox (badness 10000) in paragraph at lines 1859--1913
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1860--1914
+Underfull \hbox (badness 10000) in paragraph at lines 1859--1913
 
  []
 
-[29] [30]
+[29] [30
+Non-PDF special ignored!]
 File: Stab_Methods.eps Graphic file (type eps)
  <Stab_Methods.eps>
 File: Stab_TimeStepRed.eps Graphic file (type eps)
  <Stab_TimeStepRed.eps>
 File: Stab_StreamDiff.eps Graphic file (type eps)
- <Stab_StreamDiff.eps>
-Underfull \hbox (badness 10000) in paragraph at lines 1965--1969
+
+<Stab_StreamDiff.eps>
+Underfull \hbox (badness 10000) in paragraph at lines 1964--1968
 
  []
 
-[31] [32] [33]
-Underfull \hbox (badness 10000) in paragraph at lines 1970--1987
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1992--2003
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2008--2041
+[31
+Non-PDF special ignored!] [32
+Non-PDF special ignored!] [33
+Non-PDF special ignored!]
+Underfull \hbox (badness 10000) in paragraph at lines 1969--1986
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2008--2041
+Underfull \hbox (badness 10000) in paragraph at lines 1991--2002
 
  []
 
 
-Overfull \hbox (1.33209pt too wide) in paragraph at lines 2008--2041
+Underfull \hbox (badness 10000) in paragraph at lines 2007--2040
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2007--2040
+
+ []
+
+
+Overfull \hbox (1.33209pt too wide) in paragraph at lines 2007--2040
 \T1/cmr/m/n/10 The Dirich-let bound-ary con-di-tion is im-ple-mented as an ex-p
 licit Neu-mann bound-
  []
 
 [34]
-Overfull \hbox (10.9964pt too wide) in paragraph at lines 2063--2083
-[]\T1/cmr/m/n/10 There are de-vel-oped a lot of an-a-lyt-i-cal so-lu-tions for 
-the one-dimensional convective-
+Overfull \hbox (10.9964pt too wide) in paragraph at lines 2062--2082
+\T1/cmr/m/n/10 There are de-vel-oped a lot of an-a-lyt-i-cal so-lu-tions for th
+e one-dimensional convective-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2063--2083
+Underfull \hbox (badness 10000) in paragraph at lines 2062--2082
 
  []
 
 [35]
-Underfull \hbox (badness 10000) in paragraph at lines 2102--2108
+Underfull \hbox (badness 10000) in paragraph at lines 2101--2107
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2102--2108
+Underfull \hbox (badness 10000) in paragraph at lines 2101--2107
 
  []
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 2166.
+LaTeX Font Warning: Command \small invalid in math mode on input line 2165.
 
 [36]
 File: test_chem1d.eps Graphic file (type eps)
@@ -416,81 +426,108 @@ File: test_chem1d.eps Graphic file (type eps)
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[37] [38]
+[37] [38
+Non-PDF special ignored!]
 Chapter 3.
 
-Underfull \hbox (badness 10000) in paragraph at lines 2271--2282
+Underfull \hbox (badness 10000) in paragraph at lines 2270--2281
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2286--2300
+Underfull \hbox (badness 10000) in paragraph at lines 2285--2299
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2303--2315
+Underfull \hbox (badness 10000) in paragraph at lines 2302--2314
 
  []
 
 [39
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 2338--2361
+Underfull \hbox (badness 10000) in paragraph at lines 2337--2360
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2338--2361
+Underfull \hbox (badness 10000) in paragraph at lines 2337--2360
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2365--2367
+Underfull \hbox (badness 10000) in paragraph at lines 2364--2366
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2368--2373
+Underfull \hbox (badness 10000) in paragraph at lines 2367--2372
 
  []
 
 [40]
-Underfull \hbox (badness 10000) in paragraph at lines 2398--2412
+Underfull \hbox (badness 10000) in paragraph at lines 2397--2411
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2417--2426
+Underfull \hbox (badness 10000) in paragraph at lines 2416--2425
 
  []
 
-(MSTStuff_english.bbl [41]
-Underfull \hbox (badness 5726) in paragraph at lines 33--37
-[][]\T1/cmr/m/n/10 Mollerup, M. and Hansen, S. (2007).  Power se-ries so-lu-tio
-n for
+(./MSTStuff_english.bbl [41]
+Underfull \hbox (badness 5726) in paragraph at lines 38--42
+[]\T1/cmr/m/n/10 Mollerup, M. and Hansen, S. (2007).  Power se-ries so-lu-tion 
+for
  []
 
 
-Underfull \hbox (badness 1308) in paragraph at lines 33--37
+Underfull \hbox (badness 1308) in paragraph at lines 38--42
 \T1/cmr/m/n/10 falling-head ponded in-fil-tra-tion.  \T1/cmr/m/it/10 Wa-ter Re-
 sour. Res.\T1/cmr/m/n/10 , \T1/cmr/bx/n/10 43\T1/cmr/m/n/10 .  W03425,
  []
 
 [42
 
-])
-
-Package natbib Warning: There were undefined citations.
-
-[43] (MSTStuff_english.aux) ) 
+]) [43] (./MSTStuff_english.aux) ) 
 Here is how much of TeX's memory you used:
- 2210 strings out of 95306
- 23125 string characters out of 1185221
- 74055 words of memory out of 1070587
- 5220 multiletter control sequences out of 60000
- 24856 words of font info for 62 fonts, out of 1000000 for 2000
- 14 hyphenation exceptions out of 8191
- 27i,20n,24p,548b,292s stack positions out of 5000i,500n,10000p,200000b,32768s
+ 2076 strings out of 495042
+ 23243 string characters out of 1181749
+ 77906 words of memory out of 3000000
+ 5214 multiletter control sequences out of 15000+50000
+ 24847 words of font info for 62 fonts, out of 3000000 for 9000
+ 28 hyphenation exceptions out of 8191
+ 27i,20n,24p,555b,292s stack positions out of 5000i,500n,10000p,200000b,50000s
+ </home/abraham/.texmf-var/fonts/pk/ljfour/jk
+nappen/ec/ecrm0600.600pk> </home/abraham/.texmf-var/fonts/pk/ljfour/jknappen/ec
+/ecbx0700.600pk> </home/abraham/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1000
+.600pk> </home/abraham/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1000.600pk> <
+/home/abraham/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk> </home/abr
+aham/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm0500.600pk> </home/abraham/.tex
+mf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk> </home/abraham/.texmf-var/fo
+nts/pk/ljfour/jknappen/ec/ecrm0700.600pk> </home/abraham/.texmf-var/fonts/pk/lj
+four/jknappen/ec/ecrm1000.600pk> </home/abraham/.texmf-var/fonts/pk/ljfour/jkna
+ppen/ec/ecbx2488.600pk> </home/abraham/.texmf-var/fonts/pk/ljfour/jknappen/ec/e
+cbx2074.600pk></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx10.p
+fb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx7.pfb></usr/sha
+re/texmf-texlive/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf-te
+xlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-texlive/fonts
+/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texmf-texlive/fonts/type1/publi
+c/amsfonts/cm/cmmi6.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/c
+m/cmmi7.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi9.pfb>
+</usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/shar
+e/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texl
+ive/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texmf-texlive/fonts/typ
+e1/public/amsfonts/cm/cmr6.pfb></usr/share/texmf-texlive/fonts/type1/public/ams
+fonts/cm/cmr7.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr9
+.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/
+share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texmf-
+texlive/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-texlive/font
+s/type1/public/amsfonts/cm/cmsy9.pfb>
+Output written on MSTStuff_english.pdf (43 pages, 418375 bytes).
+PDF statistics:
+ 601 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
-Output written on MSTStuff_english.dvi (43 pages, 126648 bytes).
