@@ -1,0 +1,1416 @@
+// am.C -- Added Matter, i.e. fertilizer and residuals.
+// 
+// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2002, 2006 Per Abrahamsen and KVL.
+//
+// This file is part of Daisy.
+// 
+// Daisy is free software; you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation; either version 2.1 of the License, or
+// (at your option) any later version.
+// 
+// Daisy is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser Public License
+// along with Daisy; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#define BUILD_DLL
+
+#include "am.h"
+#include "aom.h"
+#include "chemical.h"
+#include "metalib.h"
+#include "library.h"
+#include "submodeler.h"
+#include "frame_model.h"
+#include "frame_submodel.h"
+#include "time.h"
+#include "log.h"
+#include "geometry.h"
+#include "check.h"
+#include "vcheck.h"
+#include "mathlib.h"
+#include "program.h"
+#include "memutils.h"
+#include "librarian.h"
+#include "unit.h"
+#include "treelog.h"
+#include "filepos.h"
+#include "block_model.h"
+#include <numeric>
+#include <sstream>
+
+const char *const AM::component = "am";
+
+symbol
+AM::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
+struct AM::Implementation
+{
+  // Check.
+  struct Check_OM_Pools : public VCheck
+  {
+    // Check that the OM pools are correct for organic fertilizer.
+    bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
+  };
+
+  // Content.
+  bool initialized;             // Whether initialize_derived has been called.
+  Time creation;		// When it was created.
+  const symbol name;		// What is was.
+  const std::vector<AOM*> om;		// Organic matter pool.
+  const double total_C_fraction;        // Fraction of C in DM.
+
+  // Use this if a living crop is adding to this AM.
+  struct Lock;
+  const Lock* lock;
+  void unlock ();		// Crop died.
+  bool locked () const;		// Test if this AM can be safely removed.
+  symbol crop_name () const; // Name of locked crop.
+  symbol crop_part_name () const; // Name of locked crop part.
+
+  // Simulation.
+  void output (Log&) const;
+  bool check (Treelog& err) const;
+  void mix (const Geometry&, double from, double to, double penetration,
+            double& tillage_N_top, double& tillage_C_top,
+            std::vector<double>& tillage_N_soil,
+            std::vector<double>& tillage_C_soil);
+  void mix (const Geometry&, const Volume&, double penetration,
+            double& tillage_N_top, double& tillage_C_top,
+            std::vector<double>& tillage_N_soil,
+            std::vector<double>& tillage_C_soil);
+  void mix (const Geometry&, double from, double to);
+  void mix (const Geometry&, const Volume&);
+  void swap (const Geometry&, double from, double middle, double to,
+             std::vector<double>& tillage_N_soil, 
+             std::vector<double>& tillage_C_soil);
+  double total_C (const Geometry& geo) const;
+  double total_N (const Geometry& geo) const;
+  double C_at (size_t at) const;
+  double N_at (size_t at) const;
+  void pour (std::vector<double>& cc, std::vector<double>& nn); // Move content to cc&nn.
+  void append_to (std::vector<AOM*>& added); // Add OM's to added.
+  void distribute (double C, std::vector<double>& om_C, // Helper for 'add' fns.
+		   double N, std::vector<double>& om_N);
+  void add (double C, double N);// Add dead leafs.
+  void add (const Geometry& geo, AM::Implementation& other);
+  void add_surface (const Geometry&,	// Add dead roots.
+                    double C, double N, 
+                    const std::vector<double>& density);
+  double top_DM () const;
+  double top_C () const;
+  double top_N () const;
+  void multiply_top (double fraction);
+
+  // Create and Destroy.
+  Implementation (bool initialized, 
+                  const Time& c, symbol n, const std::vector<AOM*>& o, 
+                  double tcf);
+  ~Implementation ();
+};
+
+bool
+AM::Implementation::Check_OM_Pools::verify (const Metalib&, const Frame& frame,
+                                            const symbol key,
+                                            Treelog& msg) const
+{ 
+  daisy_assert (frame.check (key));
+  daisy_assert (frame.lookup (key) == Attribute::Model);
+  daisy_assert (!frame.is_log (key));
+  daisy_assert (frame.type_size (key) == Attribute::Variable);
+
+  if (frame.flag ("initialized", false))
+    // No checking checkpoints.
+    return true;
+
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& om_frame 
+    = frame.model_sequence (key);
+  int missing_initial_fraction = 0;
+  int missing_C_per_N = 0;
+  double total_fractions = 0.0;
+  bool same_unspecified = false;
+  for (size_t i = 0; i < om_frame.size (); i++)
+    {
+      if (!om_frame[i]->check ("initial_fraction"))
+	missing_initial_fraction++;
+      else 
+	total_fractions += om_frame[i]->number ("initial_fraction");
+      if (!om_frame[i]->check ("C_per_N"))
+	missing_C_per_N++;
+
+      if (!om_frame[i]->check ("initial_fraction") 
+	  && !om_frame[i]->check ("C_per_N"))
+	same_unspecified = true;
+    }
+  daisy_assert (total_fractions >= 0.0);
+  bool ok = true;
+  if (total_fractions < 1e-10 && !same_unspecified)
+    {
+      msg.error ("you should specify at least one non-zero fraction");
+      ok = false;
+    }
+  if (approximate (total_fractions, 1.0))
+    {
+      msg.error ("sum of specified fractions should be < 1.0");
+      ok = false;
+    }
+  if (total_fractions > 1.0)
+    {
+      msg.error ("sum of fractions should be < 1.0");
+      ok = false;
+    }
+  if (missing_initial_fraction != 1)
+    {
+      msg.error ("you should leave initial_fraction in one om unspecified");
+      ok = false;
+    }
+  if (missing_C_per_N != 1)
+    {
+      msg.error ("You must leave C/N unspecified in exactly one pool");
+      ok = false;
+    }
+  return ok;
+}
+
+struct AM::Implementation::Lock
+{ 
+  // Content.
+  symbol crop;
+  symbol part;
+
+  // Simulation.
+  void output (Log&) const;
+    
+  // Create and Destroy.
+  static void load_syntax (Frame&);
+  Lock (symbol c, symbol p);
+  Lock (const FrameSubmodel& al);
+};
+
+void 
+AM::Implementation::Lock::output (Log& log) const
+{
+  output_variable (crop, log);
+  output_variable (part, log);
+}  
+
+void
+AM::Implementation::Lock::load_syntax (Frame& frame)
+{
+  frame.declare_string ("crop", Attribute::State, 
+                 "Crop to which this am is locked");
+  frame.declare_string ("part", Attribute::State, 
+                 "Crop part to which this am is locked");
+}
+
+AM::Implementation::Lock::Lock (symbol c, symbol p)
+  : crop (c),
+    part (p)
+{ }
+  
+AM::Implementation::Lock::Lock (const FrameSubmodel& al)
+  : crop (al.name ("crop")),
+    part (al.name ("part"))
+{ }
+
+void 
+AM::Implementation::unlock ()
+{
+  daisy_assert (lock != NULL);
+  delete lock;
+  lock = NULL;
+}
+
+bool 
+AM::Implementation::locked () const
+{ return lock != NULL; }
+
+symbol
+AM::Implementation::crop_name () const
+{ 
+  daisy_assert (lock);
+  return lock->crop;
+}
+
+symbol
+AM::Implementation::crop_part_name () const
+{
+  daisy_assert (lock);
+  return lock->part;
+}
+
+void
+AM::Implementation::distribute (double C, std::vector<double>& om_C, 
+				double N, std::vector<double>& om_N)
+{
+  daisy_assert (C >= 0.0);
+  daisy_assert (N >= 0.0);
+  daisy_assert (!std::isnormal (C) || N > 0.0);
+
+  // Fill out the blanks.
+  int missing_fraction = -1;
+  int missing_C_per_N = -1;
+  
+  for (size_t i = 0; i < om.size (); i++)
+    {
+      const double fraction = om[i]->initial_fraction;
+      const double C_per_N = om[i]->initial_C_per_N;
+
+      if (!approximate (fraction, OM::Unspecified))
+	{
+	  om_C[i] = C * fraction;
+	  daisy_assert (om_C[i] >= 0.0);
+
+	  if (!approximate (C_per_N, OM::Unspecified))
+	    {
+	      om_N[i] = om_C[i] / C_per_N;
+	      daisy_assert (om_N[i] >= 0.0);
+	    }
+	  else
+	    {
+	      daisy_assert (missing_C_per_N < 0);
+	      missing_C_per_N = i;
+	    }
+	}
+      else
+	{
+	  daisy_assert (missing_fraction < 0);
+	  missing_fraction = i;
+	  if (approximate (om[i]->initial_C_per_N, OM::Unspecified))
+	    {
+	      daisy_assert (missing_C_per_N < 0);
+	      missing_C_per_N = i;
+	    }
+	}
+    }
+  daisy_assert (missing_C_per_N > -1);
+  daisy_assert (missing_fraction > -1);
+
+  // Calculate C in missing fraction.
+  om_C[missing_fraction] = C - accumulate (om_C.begin (), om_C.end (), 0.0);
+  daisy_assert (om_C[missing_fraction] >= 0.0);
+
+  // Calculate N in missing C/N.
+  if (missing_fraction != missing_C_per_N)
+    {
+      const double C_per_N = om[missing_fraction]->initial_C_per_N;
+      daisy_assert (C_per_N >= 0.0);
+      om_N[missing_fraction] = om_C[missing_fraction] / C_per_N;
+      daisy_assert (om_N[missing_fraction] >= 0.0);
+    }
+  om_N[missing_C_per_N] = N - accumulate (om_N.begin (), om_N.end (), 0.0);
+
+  if (om_N[missing_C_per_N] < 0.0)
+    {
+      // Too little N, distribute evenly.
+      for (size_t i = 0; i < om.size (); i++)
+	{
+	  const double fraction = om[i]->initial_fraction;
+	  if (approximate (fraction, OM::Unspecified))
+	    {
+	      daisy_assert (i == missing_fraction);
+	      om_N[i] = 0.0;
+	    }
+	  else
+	    om_N[i] = N * fraction;
+	}
+      om_N[missing_fraction]
+	= N - accumulate (om_N.begin (), om_N.end (), 0.0);
+      daisy_assert (om_N[missing_fraction] >= 0.0);
+    }
+  daisy_assert (om_N[missing_C_per_N] >= 0.0);
+
+  daisy_assert (approximate (C, accumulate (om_C.begin (), om_C.end (), 0.0)));
+  daisy_assert (approximate (N, accumulate (om_N.begin (), om_N.end (), 0.0)));
+}
+
+void
+AM::Implementation::add (double C, double N)
+{
+  daisy_assert (C >= 0);
+  daisy_assert (N >= 0);
+  std::vector<double> om_C (om.size (), 0.0);
+  std::vector<double> om_N (om.size (), 0.0);
+
+  distribute (C, om_C, N, om_N);
+
+  for (size_t i = 0; i < om.size (); i++)
+    om[i]->add (om_C[i], om_N[i]);
+}
+
+void
+AM::Implementation::add (const Geometry& geo,
+			 AM::Implementation& other)
+{
+  daisy_assert (&other != this);
+  const double old_C = total_C (geo) + other.total_C (geo);
+  const double old_N = total_N (geo) + other.total_N (geo);
+
+  std::vector<double> cc (geo.cell_size (), 0.0);
+  std::vector<double> nn (geo.cell_size (), 0.0);
+  other.pour (cc, nn);
+
+  for (size_t at = 0; at < geo.cell_size (); at++)
+    {
+      std::vector<double> om_C (om.size (), 0.0);
+      std::vector<double> om_N (om.size (), 0.0);
+
+      distribute (cc[at], om_C, nn[at], om_N);
+
+      for (size_t i = 0; i < om.size (); i++)
+	om[i]->add (at, om_C[i], om_N[i]);
+    }
+
+  add (other.top_C (), other.top_N ());
+
+  const double new_C = total_C (geo);
+  const double new_N = total_N (geo);
+  daisy_assert (approximate (old_C, new_C));
+  daisy_assert (approximate (old_N, new_N));
+}
+
+void
+AM::Implementation::add_surface (const Geometry& geo, 
+                                 double C, double N,
+                                 const std::vector<double>& density)
+{
+  daisy_assert (C >= 0);
+  daisy_assert (N >= 0);
+  C *= geo.surface_area ();
+  N *= geo.surface_area ();
+  const double old_C = total_C (geo);
+  const double old_N = total_N (geo);
+
+  std::vector<double> om_C (om.size (), 0.0);
+  std::vector<double> om_N (om.size (), 0.0);
+
+  distribute (C, om_C, N, om_N);
+
+  for (size_t i = 0; i < om.size (); i++)
+    om[i]->add (geo, om_C[i], om_N[i], density);
+
+  daisy_assert (approximate (old_C + C, total_C (geo)));
+  daisy_assert (approximate (old_N + N, total_N (geo)));
+}
+
+double
+AM::Implementation::top_DM () const
+{ return top_C () / total_C_fraction; }
+
+double
+AM::Implementation::top_C () const
+{ 
+  double total = 0.0;
+  for (size_t i = 0; i < om.size (); i++)
+    total += om[i]->top_C;
+  return total;
+}
+
+double 
+AM::Implementation::top_N () const
+{ 
+  double total = 0.0;
+  for (size_t i = 0; i < om.size (); i++)
+    total += om[i]->top_N;
+  return total;
+}
+
+void 
+AM::Implementation::multiply_top (double fraction)
+{ 
+  for (size_t i = 0; i < om.size (); i++)
+    {
+      om[i]->top_N *= fraction;
+      om[i]->top_C *= fraction;
+    }
+}
+
+void 
+AM::Implementation::append_to (std::vector<AOM*>& added)
+{
+  for (unsigned i = 0; i < om.size (); i++)
+    added.push_back (om[i]);
+}
+
+void
+AM::Implementation::output (Log& log) const
+{ 
+  output_variable (initialized, log);
+  if (creation != Time (1, 1, 1, 1))
+    output_submodule (creation, "creation", log);
+  output_variable (name, log);
+  if (lock)
+    output_submodule (*lock, "lock", log);
+  output_list (om, "om", log, AOM::component);
+}
+
+bool 
+AM::Implementation::check (Treelog& /*err*/) const
+{ 
+  bool ok = true;
+  return ok;
+}
+
+void 
+AM::Implementation::mix (const Geometry& geo,
+			 double from, double to, double penetration,
+                         double& tillage_N_top, double& tillage_C_top,
+                         std::vector<double>& tillage_N_soil, 
+                         std::vector<double>& tillage_C_soil)
+{
+  const double old_C = total_C (geo);
+  const double old_N = total_N (geo);
+
+  for (size_t i = 0; i < om.size (); i++)
+    {
+      om[i]->penetrate (geo, from, to, penetration, 
+                        tillage_N_top, tillage_C_top, 
+                        tillage_N_soil, tillage_C_soil);
+      om[i]->mix (geo, from, to, 
+                  tillage_N_soil, tillage_C_soil);
+    }
+  const double new_C = total_C (geo);
+  const double new_N = total_N (geo);
+  
+  daisy_assert (approximate (new_C, old_C));
+  daisy_assert (approximate (new_N, old_N));
+}
+
+void 
+AM::Implementation::mix (const Geometry& geo, 
+                         const Volume& volume, double penetration,
+                         double& tillage_N_top, double& tillage_C_top,
+                         std::vector<double>& tillage_N_soil, 
+                         std::vector<double>& tillage_C_soil)
+{
+  const double old_C = total_C (geo);
+  const double old_N = total_N (geo);
+
+  for (size_t i = 0; i < om.size (); i++)
+    {
+      om[i]->penetrate (geo, volume, penetration, 
+                        tillage_N_top, tillage_C_top, 
+                        tillage_N_soil, tillage_C_soil);
+      om[i]->mix (geo, volume, tillage_N_soil, tillage_C_soil);
+    }
+  const double new_C = total_C (geo);
+  const double new_N = total_N (geo);
+  
+  daisy_assert (approximate (new_C, old_C));
+  daisy_assert (approximate (new_N, old_N));
+}
+
+void
+AM::Implementation::swap (const Geometry& geo,
+			  const double from, const double middle, 
+                          const double to,
+                          std::vector<double>& tillage_N_soil,
+                          std::vector<double>& tillage_C_soil)
+{
+  const double old_C = total_C (geo);
+  const double old_N = total_N (geo);
+
+  for (size_t i = 0; i < om.size (); i++)
+    om[i]->swap (geo, from, middle, to, 
+                 tillage_N_soil, tillage_C_soil);
+
+  const double new_C = total_C (geo);
+  const double new_N = total_N (geo);
+  
+  daisy_assert (approximate (new_C, old_C));
+  daisy_assert (approximate (new_N, old_N));
+}
+
+double 
+AM::Implementation::total_C (const Geometry& geo) const
+{
+  double total = 0.0;
+  for (size_t i = 0; i < om.size (); i++)
+    total += om[i]->full_C (geo);
+  return total;
+}
+
+double 
+AM::Implementation::total_N (const Geometry& geo) const
+{
+  double total = 0.0;
+  for (size_t i = 0; i < om.size (); i++)
+    total += om[i]->full_N (geo);
+  return total;
+}
+
+double 
+AM::Implementation::C_at (const size_t at) const
+{
+  double total = 0.0;
+  for (size_t i = 0; i < om.size (); i++)
+    total += om[i]->C_at (at);
+  return total;
+}
+
+double 
+AM::Implementation::N_at (const size_t at) const
+{
+  double total = 0.0;
+  for (size_t i = 0; i < om.size (); i++)
+    total += om[i]->N_at (at);
+  return total;
+}
+
+void 
+AM::Implementation::pour (std::vector<double>& cc, std::vector<double>& nn)
+{
+  for (size_t i = 0; i < om.size (); i++)
+    om[i]->pour (cc, nn);
+}
+
+AM::Implementation::Implementation (const bool i,
+                                    const Time& c, const symbol n,
+				    const std::vector<AOM*>& o,
+                                    const double tcf)
+  : initialized (i),
+    creation (c),
+    name (n),
+    om (o),
+    total_C_fraction (tcf),
+    lock (NULL)
+{ }
+
+AM::Implementation::~Implementation ()
+{ 
+  if (lock)
+    delete lock;
+  sequence_delete (om.begin (), om.end ()); 
+}
+
+symbol
+AM::real_name () const
+{ return impl->name; }
+
+void
+AM::output (Log& log) const
+{ impl->output (log); }
+
+void 
+AM::append_to (std::vector<AOM*>& added)
+{ impl->append_to (added); }
+
+bool 
+AM::check (Treelog& err) const
+{ return impl->check (err); }
+
+void 
+AM::mix (const Geometry& geo,
+	 const double from, const double to, const double penetration,
+         double& tillage_N_top, double& tillage_C_top,
+         std::vector<double>& tillage_N_soil,
+	 std::vector<double>& tillage_C_soil)
+{ impl->mix (geo, from, to, penetration, 
+             tillage_N_top, tillage_C_top, 
+             tillage_N_soil, tillage_C_soil); }
+
+void 
+AM::mix (const Geometry& geo,
+	 const Volume& volume, const double penetration,
+         double& tillage_N_top, double& tillage_C_top,
+         std::vector<double>& tillage_N_soil,
+	 std::vector<double>& tillage_C_soil)
+{ impl->mix (geo, volume, penetration, 
+             tillage_N_top, tillage_C_top, 
+             tillage_N_soil, tillage_C_soil); }
+
+void
+AM::swap (const Geometry& geo,
+	  const double from, const double middle, const double to,
+          std::vector<double>& tillage_N_soil,
+	  std::vector<double>& tillage_C_soil)
+{ impl->swap (geo, from, middle, to, tillage_N_soil, tillage_C_soil); }
+
+double 
+AM::total_C (const Geometry& geo) const
+{ return impl->total_C (geo); }
+
+double 
+AM::total_N (const Geometry& geo) const
+{ return impl->total_N (geo); }
+
+double 
+AM::C_at (size_t at) const
+{ return impl->C_at (at); }
+
+double 
+AM::N_at (size_t at) const
+{ return impl->N_at (at); }
+
+void 
+AM::pour (std::vector<double>& cc, std::vector<double>& nn)
+{ impl->pour (cc, nn); }
+
+void 
+AM::add (double C, double N)
+{ impl->add (C, N); }
+
+void 
+AM::add (const Geometry& geo, AM& other)
+{ impl->add (geo, *other.impl); }
+
+void 
+AM::add_surface (const Geometry& geo,
+                 double C, double N, 
+                 const std::vector<double>& density)
+{ impl->add_surface (geo, C, N, density); }
+
+double
+AM::top_DM () const
+{ return impl->top_DM (); }
+
+double
+AM::top_C () const
+{ return impl->top_C (); }
+
+double 
+AM::top_N () const
+{ return impl->top_N (); }
+
+void 
+AM::multiply_top (double fraction)
+{ impl->multiply_top (fraction); }
+
+void 
+AM::unlock ()
+{ impl->unlock (); }
+
+bool 
+AM::locked () const
+{ return impl->locked (); }
+
+symbol
+AM::crop_name () const
+{ return impl->crop_name (); }
+
+symbol
+AM:: crop_part_name () const
+{ return impl->crop_part_name (); }
+
+const VCheck& 
+AM::check_om_pools ()
+{ 
+  static Implementation::Check_OM_Pools check;
+  return check;
+}
+
+AM& 
+AM::create (const Metalib& metalib, const FrameModel& frame, const Geometry& geo, 
+            const Time& now, Treelog& msg)
+{ 
+  AM& am = *Librarian::build_frame<AM> (metalib, msg, frame, "fertilizer");
+  am.impl->creation = now;
+  am.initialize (geo, -42.42e42);
+  return am;
+}
+
+// Crop part.
+AM& 
+AM::create (const Metalib& metalib, const Geometry& geo, const Time& now,
+	    const std::vector<boost::shared_ptr<const FrameModel>/**/>& ol,
+	    const symbol sort, const symbol part,
+	    AM::lock_type lock, Treelog& msg)
+{
+  const Library& library = metalib.library (AM::component);
+  FrameModel frame (library.model ("state"), Frame::parent_link);
+  frame.set ("initialized", true);
+  frame.set ("name", sort + "/" + part);
+  frame.set ("om", ol);
+  AM& am = *Librarian::build_frame<AM> (metalib, msg, frame, "crop part");
+  am.impl->creation = now;
+  for (size_t i = 0; i < am.impl->om.size (); i++)
+    am.impl->om[i]->initialize (geo.cell_size ());
+  if (lock == AM::Locked)
+    am.impl->lock = new AM::Implementation::Lock (sort, part);
+  return am;
+}
+
+const std::vector<symbol>&
+AM::default_AM ()
+{
+  static const struct DefaultAM : public std::vector<symbol> 
+  {
+    DefaultAM ()
+    {
+      push_back ("AOM-SLOW");
+      push_back ("AOM-FAST");
+    }
+  } am;
+  
+  return am;
+}
+
+double
+AM::get_NO3 (const Metalib& metalib, const FrameModel& al)
+{
+  if (al.check ("weight"))
+    {
+      if (is_organic (metalib, al))
+	{
+	  // Organic fertilizer.
+	  const double weight = al.number ("weight") 
+	    * al.number ("dry_matter_fraction") 
+	    * 0.01;			// T w.w. / ha --> g / cm²
+	  const double N = weight * al.number ("total_N_fraction");
+	  return N * al.number ("NO3_fraction");
+	}
+      // Mineral fertilizer.
+      daisy_assert (is_mineral (metalib, al));
+      return al.number ("weight")
+	* (1.0 - al.number ("NH4_fraction"))
+	* (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))); // kg/ha -> g/cm^2
+    }
+  // Other.
+  return al.number ("NO3");
+}
+
+double
+AM::get_NH4 (const Metalib& metalib, const FrameModel& al)
+{
+  daisy_assert (IM::storage_unit () == symbol ("g/cm^2"));
+
+  if (al.check ("weight"))
+    {
+      const double volatilization = al.number ("volatilization");
+
+      if (is_organic (metalib, al))
+	{
+	  // Organic fertilizer.
+	  const double weight = al.number ("weight") 
+	    * al.number ("dry_matter_fraction") 
+	    * 0.01;			// T w.w. / ha --> g / cm²
+	  const double N = weight * al.number ("total_N_fraction");
+	  return N * al.number ("NH4_fraction") * (1.0 - volatilization);
+	}
+      // Mineral fertilizer.
+      daisy_assert (is_mineral (metalib, al));
+      
+      return al.number ("weight")
+	* al.number ("NH4_fraction") * (1.0 - volatilization)
+	* (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))); // kg/ha -> g/cm^2
+    }
+  // Other.
+  daisy_assert (!al.check ("volatilization"));
+  return al.number ("NH4");
+}
+
+IM
+AM::get_IM (const Metalib& metalib, const Unit& unit, const FrameModel& al)
+{
+  daisy_assert (unit.native_name () == IM::storage_unit ());
+  IM result (unit);
+  result.set_value (Chemical::NH4 (), unit, get_NH4 (metalib, al));
+  result.set_value (Chemical::NO3 (), unit, get_NO3 (metalib, al));
+  return result;
+}
+
+double
+AM::get_volatilization (const Metalib& metalib, const FrameModel& al)
+{
+  if (al.check ("weight"))
+    {
+      const double volatilization = al.number ("volatilization");
+
+      if (is_organic (metalib, al))
+	{
+	  // Organic fertilizer.
+	  const double weight = al.number ("weight") 
+	    * al.number ("dry_matter_fraction") 
+	    * 100.0;			// T w.w. / ha --> g / m^2
+	  const double N = weight * al.number ("total_N_fraction");
+	  return N * al.number ("NH4_fraction") * volatilization;
+	}
+      // Mineral fertilizer.
+      daisy_assert (is_mineral (metalib, al));
+      
+      return al.number ("weight")
+	* al.number ("NH4_fraction") * volatilization; 
+    }
+  // Other.
+  daisy_assert (!al.check ("volatilization"));
+  return 0.0;
+}
+
+double
+AM::get_DM (const Metalib& metalib, const FrameModel& al)	// [Mg DM/ha]
+{
+  if (al.check ("weight") && is_organic (metalib, al))
+    return al.number ("weight") * al.number ("dry_matter_fraction");
+
+  return 0.0;
+}
+
+double
+AM::get_water (const Metalib& metalib, const FrameModel& al)	// [mm]
+{
+  if (al.check ("weight") && is_organic (metalib, al))
+    return al.number ("weight")
+      * (1.0  - al.number ("dry_matter_fraction"))
+      * 0.1;                    // t/ha -> mm
+
+  return 0.0;
+}
+
+void
+AM::set_utilized_weight (const Metalib& metalib, 
+                         FrameModel& am, const double weight)
+{
+  if (is_mineral (metalib, am))
+    am.set ("weight", weight);
+  else
+    {
+      daisy_assert (is_organic (metalib, am));
+      daisy_assert (am.check ("total_N_fraction"));
+      daisy_assert (am.check ("dry_matter_fraction"));
+      const double N_fraction = am.number ("total_N_fraction");
+      const double utilization = am.number ("first_year_utilization", 1.0);
+      const double dry_matter_fraction = am.number ("dry_matter_fraction");
+      const double kg_per_ton = 1000.0;
+      am.set ("weight", weight 
+	      / (dry_matter_fraction *N_fraction * utilization * kg_per_ton));
+    }
+}
+
+double
+AM::utilized_weight (const Metalib& metalib, const FrameModel& am)
+{
+  if (am.check ("first_year_utilization")
+      && am.check ("dry_matter_fraction")
+      && am.check ("total_N_fraction")
+      && am.check ("weight"))
+    {
+      const double kg_per_ton = 1000.0;
+      return am.number ("weight")
+        * am.number ("dry_matter_fraction")
+        * am.number ("total_N_fraction")
+        * am.number ("first_year_utilization")
+        * kg_per_ton;
+    }
+  else if (is_mineral (metalib, am))
+    return am.number ("weight");
+
+  return 0.0;
+}
+
+double
+AM::second_year_utilization (const Metalib&, const FrameModel& am)
+{
+  if (am.check ("second_year_utilization")
+      && am.check ("dry_matter_fraction")
+      && am.check ("total_N_fraction")
+      && am.check ("weight"))
+    {
+      const double kg_per_ton = 1000.0;
+      return am.number ("weight")
+        * am.number ("dry_matter_fraction")
+        * am.number ("total_N_fraction")
+        * am.number ("second_year_utilization")
+        * kg_per_ton;
+    }
+  return 0.0;
+}
+
+void
+AM::set_mineral (const Metalib&, FrameModel& am, double NH4, double NO3)
+{
+  const double total_N = NH4 + NO3;
+  am.set ("weight", total_N);
+  am.set ("NH4_fraction", (total_N > 0.0) ? NH4 / total_N : 0.0);
+  am.set ("volatilization", 0.0);
+}
+
+bool 
+AM::is_fertilizer (const Metalib& metalib, const FrameModel& am) 
+{ return is_mineral (metalib, am) || is_organic (metalib, am); }
+
+bool 
+AM::is_mineral (const Metalib& metalib, const FrameModel& am)
+{ 
+  Library& library = metalib.library (component);
+  return library.is_derived_from (am.type_name (), "mineral");
+}
+
+bool 
+AM::is_organic (const Metalib& metalib, const FrameModel& am)
+{ 
+  Library& library = metalib.library (component);
+  return library.is_derived_from (am.type_name (), "organic");
+}
+
+AM::AM (const BlockModel& al)
+  : ModelFramed (al),
+    impl (new Implementation 
+	  (al.flag ("initialized"),
+           al.check ("creation")
+	   ? Time (al.submodel ("creation"))
+	   : Time (1, 1, 1, 1),
+           al.check ("name") ? al.name ("name") : al.type_name (),
+	   Librarian::build_vector<AOM> (al, "om"),
+           al.number ("total_C_fraction", 0.4)))
+{
+  if (al.check ("lock"))
+    impl->lock = new AM::Implementation::Lock (al.submodel ("lock"));
+}
+
+void
+AM::initialize (const Geometry& geo, const double max_rooting_depth)
+{
+  for (size_t i = 0; i < impl->om.size (); i++)
+    impl->om[i]->initialize (geo.cell_size ());
+
+  if (frame ().check ("lock"))
+    impl->lock = new Implementation::Lock (frame ().submodel ("lock"));
+
+  if (!impl->initialized)
+    {
+      impl->initialized = true;
+      initialize_derived (geo, max_rooting_depth);
+    }
+}
+
+AM::~AM ()
+{ }
+
+static struct AMInit : public DeclareComponent 
+{
+  AMInit ()
+    : DeclareComponent (AM::component, "\
+The 'am' component describes various kinds of fertilizer and other\n\
+added matter such as crop residues.  In particular, it describes how\n\
+they decompose.")
+  { }
+} AM_init;
+
+static struct AMMineralSyntax : public DeclareModel
+{
+  Model* make (const BlockModel&) const
+  { 
+    // We never use this directly, onlu the frame.
+    daisy_notreached (); 
+  }
+  AMMineralSyntax ()
+    : DeclareModel (AM::component, "mineral", "Mineral fertilizer.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    Model::load_model (frame);
+    frame.declare ("weight", "kg N/ha", Check::non_negative (), Attribute::Const,
+                "Amount of fertilizer applied.");
+    frame.set ("weight", 0.0);
+    frame.declare_fraction ("NH4_fraction", Attribute::Const, "\
+Ammonium fraction of total N in fertilizer. \n\
+The remaining nitrogen is assumed to be nitrate.");
+    frame.declare_fraction ("volatilization", Attribute::Const, "\
+Fraction of NH4 that evaporates on application.");
+    frame.set ("volatilization", 0.0);
+  }
+} AMMineral_syntax;
+
+// The 'base' AM base model.
+
+static struct AMBaseSyntax : public DeclareBase
+{
+  AMBaseSyntax ()
+    : DeclareBase (AM::component, "base", "\
+Common attributes for all added organic matter models.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.declare_boolean ("initialized", Attribute::State, "\
+True if this AM has been initialized.\n\
+It will usually be false in user setup files, but true in checkpoints.");
+    frame.set ("initialized", false);
+    frame.declare_submodule ("creation", Attribute::OptionalState, 
+                         "Time this AM was created.", Time::load_syntax);
+    frame.declare_string ("name", Attribute::OptionalState, "\
+A name given to this AOM so you can identify it in for example log files.");
+    frame.declare_submodule ("lock", Attribute::OptionalState, "\
+This AM belongs to a still living plant",
+                          AM::Implementation::Lock::load_syntax);
+    frame.declare_object ("om", AOM::component, 
+                      Attribute::OptionalState, Attribute::Variable, "\
+The individual AOM pools.");
+  }
+} AMBase_syntax;
+
+// The 'state' AM model.
+
+struct AMState : public AM
+{
+  void initialize_derived (const Geometry&, const double)
+  { }
+  AMState (const BlockModel& al)
+    : AM (al)
+  { }
+};
+
+static struct AMStateSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new AMState (al); }
+  AMStateSyntax ()
+    : DeclareModel (AM::component, "state", "base", "\
+Most AM models are only used for initialization, they will be comnverted\n\
+to this generic model after creation, so this is what you will see in a\n\
+checkpoint.  This model contains a number (typically 2) of separate\n\
+pools, each of which have their own turnover rate.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} AMState_syntax;
+
+// The 'organic' AM model.
+
+struct AMOrganic : public AM
+{
+  void initialize_derived (const Geometry& geo, const double)
+  {
+    // Get initialization parameters.
+    const double weight = frame ().number ("weight") 
+      * frame ().number ("dry_matter_fraction") 
+      * 0.01;			// T / ha --> g / cm²
+
+    const double C = weight * frame ().number ("total_C_fraction");
+    const double N = weight * frame ().number ("total_N_fraction")
+      * (1.0 - (frame ().number ("NO3_fraction") 
+                + frame ().number ("NH4_fraction")));
+    add (C, N);
+  }
+  AMOrganic (const BlockModel& al)
+    : AM (al)
+  { }
+};
+
+static struct AMOrganicSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new AMOrganic (al); }
+  AMOrganicSyntax ()
+    : DeclareModel (AM::component, "organic", "base", "\
+Organic fertilizer, typically slurry or manure from animals.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    Model::load_model (frame);
+    frame.declare ("weight", "Mg w.w./ha", Check::non_negative (),
+                Attribute::Const,
+                "Amount of fertilizer applied.");
+    frame.set ("weight", 0.0);
+    frame.declare_fraction ("first_year_utilization", Attribute::OptionalConst, 
+                         "\
+Estimated useful N fraction for the first year.\n\
+In Denmark, this is governed by legalisation.");
+    frame.declare_fraction ("second_year_utilization", 
+                         Attribute::OptionalConst, "\
+Estimated useful N fraction for the second year.\n\
+In Denmark, this is governed by legalisation.");
+    frame.declare_fraction ("dry_matter_fraction", Attribute::Const,
+                         "Dry matter fraction of total (wet) weight.");
+    frame.declare_fraction ("total_C_fraction", Attribute::Const,
+                         "Carbon fraction of dry matter.");
+    frame.declare_fraction ("total_N_fraction", Attribute::Const,
+                         "Nitrogen fraction of dry matter.");
+    frame.set_check ("om", AM::check_om_pools ());
+    frame.declare_fraction ("NO3_fraction", Attribute::Const, 
+                         "Nitrate fraction of total N in fertilizer. \n\
+The remaining nitrogen is assumed to be ammonium or organic.");
+    frame.set ("NO3_fraction", 0.0);
+    frame.declare_fraction ("NH4_fraction", Attribute::Const, "\
+Ammonium fraction of total N in fertilizer. \n\
+The remaining nitrogen is assumed to be nitrate or organic.");
+    frame.set ("NH4_fraction", 0.0);
+    frame.declare_fraction ("volatilization", Attribute::Const, "\
+Fraction of NH4 that evaporates on application.");
+    frame.set ("volatilization", 0.0);
+  }
+} AMOrganic_syntax;
+
+// The 'initial' AM model.
+
+struct AMInitial : public AM
+{
+  void initialize_derived (const Geometry& geo, const double)
+  {
+    const std::vector<boost::shared_ptr<const FrameModel>/**/>& oms
+      = frame ().model_sequence ("om");
+    const std::vector<AOM*>& om = impl->om;
+
+    const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& layers 
+      = frame ().submodel_sequence ("layers");
+
+    double last = 0.0;
+    for (size_t i = 0; i < layers.size (); i++)
+      {
+        const double end = layers[i]->number ("end");
+        const double weight = layers[i]->number ("weight"); // Kg C/m²
+        const double C = weight * 1000.0 / (100.0 * 100.0); // g C / cm²
+        int missing_number = -1;
+        double missing_fraction = 1.0;
+        for (size_t j = 0; j < oms.size (); j++)
+          {
+            if (oms[j]->check  ("initial_fraction"))
+              {
+                const double fraction = oms[j]->number ("initial_fraction");
+                daisy_assert (fraction >= 0.0);
+                daisy_assert (fraction <= 1.0);
+                missing_fraction -= fraction;
+                geo.add_surface (om[j]->C, last, end, C * fraction);
+              }
+            else if (missing_number != -1)
+              // Should be catched by syntax check.
+              throw ("Missing initial fraction in initial am");
+            else
+              missing_number = j;
+          }
+        if (missing_number > -1)
+          {
+            if (missing_fraction < -0.1e-10)
+              throw ("Specified over 100% C in om in initial am");
+            else if (missing_fraction > 0.0)
+              geo.add_surface (om[missing_number]->C, 
+                               last, end, C * missing_fraction);
+          }
+        else if (missing_fraction < -0.1e-10)
+          throw ("Specified more than all C in om in initial am");
+        else if (missing_fraction > 0.1e-10)
+          throw ("Specified less than all C in om in initial am");
+
+        last = end;
+      }
+    // Fill N to match C.
+    for (size_t i = 0; i < om.size (); i++)
+      {
+        daisy_assert (om[i]->initial_C_per_N > 0);
+        while (om[i]->N.size () < om[i]->C.size ())
+          om[i]->N.push_back (om[i]->C[om[i]->N.size ()] 
+                              / om[i]->initial_C_per_N);
+      }
+  }
+  AMInitial (const BlockModel& al)
+    : AM (al)
+  { }
+};
+
+static struct AMInitialSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new AMInitial (al); }
+  AMInitialSyntax ()
+    : DeclareModel (AM::component, "initial", "base", "\
+Initial added organic matter at the start of the simulation.")
+  { }
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
+  { 
+    if (al.flag ("initialized", false))
+      // No checking checkpoints.
+    return true;
+
+    bool ok = true;
+
+    // We need exactly one pool with unspecified OM.
+    daisy_assert (al.check ("om"));
+    const std::vector<boost::shared_ptr<const FrameModel>/**/>& om = al.model_sequence ("om");
+    for (size_t i = 0; i < om.size (); i++)
+      if (approximate (OM::get_initial_C_per_N (*om[i]), OM::Unspecified))
+	{
+	  std::ostringstream tmp;
+	  tmp << "om[" << i << "]";
+	  Treelog::Open nest (err, tmp.str ());
+	  err.entry ("You must specify C/N for all pools.");
+	  ok = false;
+	}
+    return ok;
+  }
+
+  static void load_layer (Frame& frame)
+  {
+    frame.declare ("end", "cm", Check::negative (), Attribute::Const, "\
+Height where this layer ends (a negative number).");
+    frame.declare ("weight", "kg C/m^2", Check::non_negative (),
+               Attribute::Const, "Carbon in this layer.");
+    frame.order ("end", "weight");
+  }
+
+  void load_frame (Frame& frame) const
+  {
+    frame.add_check (check_alist);
+    frame.declare_submodule_sequence ("layers", Attribute::Const, "\
+Carbon content in different soil layers.  The carbon is assumed to be\n \
+uniformly distributed in each layer.", load_layer);
+  }
+} AMInitial_syntax;
+
+// The 'root' AM model.
+
+struct AMRoot : public AM
+{
+  void initialize_derived (const Geometry& geo, const double max_rooting_depth)
+  {
+    // Get paramters.
+    const double weight = frame ().number ("weight"); // T DM / ha
+    const double total_C_fraction = frame ().number ("total_C_fraction");
+    const double total_N_fraction = frame ().number ("total_N_fraction");
+    const double C = weight * 1000.0*1000.0 / (100.0*100.0*100.0*100.0)
+      * total_C_fraction; // g C / cm²;
+    const double N = weight * 1000.0*1000.0 / (100.0*100.0*100.0*100.0)
+      * total_N_fraction; // g C / cm²;
+    const double k = M_LN2 / frame ().number ("dist");
+    const double depth = frame ().number ("depth", max_rooting_depth);
+    daisy_assert (depth < 0.0);
+
+    // Calculate density.
+    std::vector<double> density (geo.cell_size (), 0.0);
+    for (size_t i = 0; i < geo.cell_size (); i++)
+      if (geo.cell_z (i) > depth)
+        density[i] = k * exp (k * geo.cell_z (i));
+
+    // Add it.
+    impl->add_surface (geo, C, N, density);
+  }
+  AMRoot (const BlockModel& al)
+    : AM (al)
+  { }
+};
+
+static struct AMRootSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new AMRoot (al); }
+  AMRootSyntax ()
+    : DeclareModel (AM::component, "root", "base", "\
+Initialization of old root remains.")
+  { }
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
+  { 
+    if (al.flag ("initialized", false))
+      // No checking checkpoints.
+      return true;
+
+    bool ok = true;
+
+    // We need exactly one pool with unspecified OM.
+    daisy_assert (al.check ("om"));
+    int unspecified = 0;
+    const std::vector<boost::shared_ptr<const FrameModel>/**/>& om = al.model_sequence ("om");
+    for (size_t i = 0; i < om.size (); i++)
+      if (approximate (OM::get_initial_C_per_N (*om[i]), OM::Unspecified))
+	unspecified++;
+    if (unspecified != 1)
+      { 
+	err.entry ("You must leave C/N unspecified in exactly one pool.");
+	ok = false;
+      }
+    return ok;
+  }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_check (check_alist);
+    frame.declare ("depth", "cm", Check::negative (), 
+               Attribute::OptionalConst, "\
+How far down does the old root reach? (a negative number)\n\
+By default, the soils maximal rooting depth will be used.");
+    frame.declare ("dist", "cm", Check::positive (), Attribute::Const, "\
+Distance to go down in order to decrease the root density to half the\n\
+original.");
+    frame.set ("dist", 7.0);
+    frame.declare ("weight", "Mg DM/ha", Check::non_negative (), Attribute::Const, 
+               "Total weight of old root dry matter.");
+    frame.set ("weight", 1.2);
+    frame.declare_fraction ("total_C_fraction", Attribute::Const, 
+                        "Carbon fraction of total root dry matter");
+    frame.set ("total_C_fraction", 0.40);
+    frame.declare_fraction ("total_N_fraction", Attribute::Const, 
+                        "Nitrogen fraction of total root dry matter");
+    frame.set ("total_N_fraction", 0.01);
+    frame.set ("om", AM::default_AM ());
+  }
+} AMRoot_syntax;
+
+// The 'AM_table' program model.
+
+struct ProgramAM_table : public Program
+{
+  const Library& library;
+
+  // Use.
+  bool run (Treelog& msg)
+  {
+    std::vector<symbol> entries;
+    library.entries (entries);
+    std::ostringstream tmp;
+    tmp << "Name\tSuper\tFile\tNH4\tNO3\tvolatilization\tN\tC\tDM";
+    for (std::vector<symbol>::const_iterator i = entries.begin ();
+         i != entries.end ();
+         i++)
+      {
+        tmp << "\n";
+        const symbol name = *i;
+        daisy_assert (library.check (name));
+        const Frame& frame = library.model (name);
+        daisy_assert (frame.type_name () == name);
+        // const Syntax& syntax = library.syntax (name);
+        tmp << name << "\t" << frame.base_name () << "\t";
+        tmp << frame.own_position ().filename () << "\t";
+        if (frame.check ("NH4_fraction"))
+          tmp << frame.number ("NH4_fraction");
+        tmp << "\t";
+        if (frame.check ("NO3_fraction"))
+          tmp << frame.number ("NO3_fraction");
+        tmp << "\t";
+        if (frame.check ("volatilization"))
+          tmp << frame.number ("volatilization");
+        tmp << "\t";
+        if (frame.check ("total_N_fraction"))
+          tmp << frame.number ("total_N_fraction");
+        tmp << "\t";
+        if (frame.check ("total_C_fraction"))
+          tmp << frame.number ("total_C_fraction");
+        tmp << "\t";
+        if (frame.check ("dry_matter_fraction"))
+          tmp << frame.number ("dry_matter_fraction");
+      }
+    msg.message (tmp.str ());
+    return true;
+  }
+
+  // Create and Destroy.
+  void initialize (Metalib&, Block&)
+  { };
+  bool check (Treelog&)
+  { return true; }
+  ProgramAM_table (const BlockModel& al)
+    : Program (al),
+      library (al.metalib ().library (AM::component))
+  { }
+  ~ProgramAM_table ()
+  { }
+};
+
+static struct ProgramAM_tableSyntax : DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ProgramAM_table (al); }
+  ProgramAM_tableSyntax ()
+    : DeclareModel (Program::component, "AM_table", "\
+Generate a table of fertilizers.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
+} ProgramAM_table_syntax;
+
+// am.C ends here.

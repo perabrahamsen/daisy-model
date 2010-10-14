@@ -1,0 +1,41 @@
+Agrovand
+========
+
+This directory contains source data for the data setup from the
+Agrovand project.  All data pertain to plot 4.
+
+Drain measurements
+==================
+
+The original measurements have been converted to hourly values and
+daisy format, and are found in the following files.
+
+bromide.ddf
+drain-flow.ddf
+ioxynil.ddf
+particles.ddf
+pendimethalin.ddf
+
+Drain water and particles have been measure for four seasons, from
+winther 1998-1999 to winthe 2001-2002.  Bromide was measured the first
+two seasons.  Pendimethalin have been measured second and third
+season.  Ioxynil only the third season.
+
+This is the Daisy setup file used to convert the drain measurements:
+
+test-cpe.dai
+
+TDR meaurements
+===============
+
+insert here
+
+Daisy simulation setup
+======================
+
+insert here
+
+Plot and text files
+===================
+
+insert here

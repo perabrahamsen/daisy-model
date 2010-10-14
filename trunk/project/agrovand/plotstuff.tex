@@ -1,0 +1,54 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{natbib}
+
+\usepackage[top=3cm,bottom=2cm]{geometry}
+%% \usepackage[left=1cm,top=1cm,right=1cm,nohead,nofoot]{geometry}
+
+\newcommand{\figl}{\hspace*{-2cm}}
+\newcommand{\figright}[1]{\includegraphics{fig/#1}}
+\newcommand{\fig}[1]{\figl\figright{#1}}
+\newcommand{\figtop}[1]{\figl\includegraphics[trim=0mm 5mm 0mm 0mm,clip]{fig/#1}}
+\newcommand{\figctop}[1]{\hspace*{-1cm}\figright{#1}} 
+\newcommand{\figc}[1]{\vspace*{-1.5cm}\figctop{#1}}
+
+\newcommand{\Hypres}{\textsc{Hypres}}
+\newcommand{\MyID}{\today:~}
+
+\usepackage{placeins}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\today}
+
+\begin{document}
+
+\begin{figure}[htbp] 
+  \fig{Rorrende-Ap-Theta}\figright{Rorrende-Ap-K}\\
+  \fig{Rorrende-Bt-Theta}\figright{Rorrende-Bt-K}\\
+  \fig{Rorrende-C-Theta}\figright{Rorrende-C-K}\\
+  \fig{Rorrende-DC-Theta}\figright{Rorrende-DC-K}
+  \caption{\MyID{}R{\o}rrende soil hydraulic properties.  \Hypres{} refers to
+    parameters estimated according to \citet{hypres}, Daisy to the
+    final parametrization (ignoring anisotropy and biopores), and
+    Surface and plow pan to the conditions at the top of the A and Bt
+    horizons.  DC is the drain canyon.}
+  \label{fig:Rorrende-hor}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \fig{gwt}
+  \end{center}
+  \caption{Groundwater table.  Simulated low value is calculated from
+    pressure in lowest unsaturated numeric cell, typically located
+    near drain.  Simulated high value is calculated from pressure in
+    highest saturated cell, typically farthest away from the drain.}
+  \label{fig:gw}
+\end{figure}
+
+\newgeometry{left=1cm,top=1cm,right=1cm,bottom=1cm,nohead,nofoot}
+\pagestyle{empty}
+\include{agrofigs}
+
+\end{document}

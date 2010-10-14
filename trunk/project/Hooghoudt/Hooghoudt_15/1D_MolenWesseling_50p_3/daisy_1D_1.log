@@ -1,0 +1,492 @@
+Using standard MS Windows home.
+Using 'C:/daisy' as daisy home.
+Reseting current directory to 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D'
+Daisy crop/soil simulation version 4.73. (Oct  2 2009)
+Copyright 1996 - 2007 Per Abrahamsen, Søren Hansen and KVL.
+Changing directory to 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D' success
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Opening absolute file name 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\Hooghoudt_1D_2.dai'
+* Parsing file: 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\Hooghoudt_1D_2.dai'
+Path set to:
+0: '.'
+1: 'c:/cygwin/home/mmo/daisy/lib'
+2: 'c:/cygwin/home/mmo/daisy/sample'
+done
+** input
+*** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'log.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\log.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\log.dai' success!
+** Parsing file: 'log.dai'
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'log-std.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\log-std.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\log-std.dai' success!
+** input
+*** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'crop.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\crop.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\crop.dai' success!
+** Parsing file: 'crop.dai'
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'maize.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\maize.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\maize.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'pea.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\pea.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\pea.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'potato.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\potato.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\potato.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'rye.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\rye.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\rye.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'sbarley.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\sbarley.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\sbarley.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'sugarbeet.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\sugarbeet.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\sugarbeet.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'fodderbeet.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\fodderbeet.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\fodderbeet.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'srape.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\srape.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\srape.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'swheat.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\swheat.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\swheat.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'wbarley.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\wbarley.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\wbarley.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'wrape.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\wrape.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\wrape.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'wwheat.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\wwheat.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\wwheat.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'grass.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\grass.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\grass.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'ryegrass.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\ryegrass.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\ryegrass.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'wclover.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\wclover.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\wclover.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'beetroot.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\beetroot.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\beetroot.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'broccoli.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\broccoli.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\broccoli.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'brusselssprouts.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\brusselssprouts.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\brusselssprouts.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'celeriac.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\celeriac.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\celeriac.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'earlypotato.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\earlypotato.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\earlypotato.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'whitecabbage.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\whitecabbage.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\whitecabbage.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'earlywhitecabbage.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\earlywhitecabbage.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\earlywhitecabbage.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'onion.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\onion.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\onion.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'onion_plantingofsets.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\onion_plantingofsets.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\onion_plantingofsets.dai' success!
+** input
+*** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'tillage.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\tillage.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\tillage.dai' success!
+** input
+*** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'fertilizer.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\fertilizer.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\fertilizer.dai' success!
+Command line: C:\cygwin\home\mmo\daisy\daisy.exe C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\Hooghoudt_1D_2.dai
+Storing 'daisy.log' in 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D'
+* Weather: default
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D':
+Looking for file 'Rorrende.dwf'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_1\1D\Rorrende.dwf' (cwd) success!
+** Weather: default
+Using data from [1998-1998] for years [1997-1997]
+* Rorrende
+** Soil
+*** Horizons
+**** Rorrende Ap
+Quartz = 0.606511 []
+h	h	Theta	K
+cm	pF		cm/h
+0		0.395489	1.73704
+-1	0	0.393747	0.54249
+-10	1	0.368983	0.1093
+-100	2	0.25417	0.00310628
+-1000	3	0.141469	3.5374e-005
+-15848.9	4.2	0.0680148	1.47429e-007
+**** Rorrende Bt
+Quartz = 0.554928 []
+h	h	Theta	K
+cm	pF		cm/h
+0		0.356969	0.268521
+-1	0	0.355305	0.0332968
+-10	1	0.33826	0.00555153
+-100	2	0.271879	0.000216178
+-1000	3	0.196485	4.64474e-006
+-15848.9	4.2	0.130807	4.2617e-008
+**** Rorrende C
+Quartz = 0.563646 []
+h	h	Theta	K
+cm	pF		cm/h
+0		0.348314	1.5
+-1	0	0.346954	0.214499
+-10	1	0.33229	0.0392431
+-100	2	0.268648	0.00154988
+-1000	3	0.192305	3.0002e-005
+-15848.9	4.2	0.126066	2.37324e-007
+**** aquitard
+***** aquitard
+;; clay = 50, silt = 20, sand = 29.99, humus = 0.01, rho_b = 2 (subsoil)
+M_vG
+(l -3.77729)
+;; (m 0.00492155)
+(n 1.00495)
+(alpha 0.569775)
+(K_sat 0.01 [cm/h])
+(Theta_sat 0.266652)
+Quartz = 0.410623 []
+h	h	Theta	K
+cm	pF		cm/h
+0		0.266652	0.01
+-1	0	0.266063	2.50488e-007
+-10	1	0.264159	6.45345e-009
+-100	2	0.261352	7.60174e-011
+-1000	3	0.258412	7.87576e-013
+-15848.9	4.2	0.254906	3.21754e-015
+** Groundwater pipe
+WARNING: drained soil needs soil intervals < 10.0 cm; largest is 20 (warning)
+** Bioclimate: default
+Pet choosen: FAO_PM
+Difrad choosen: DPF
+Program started Tue Oct 06 13:50:20 2009, 1 second ago.
+* Running
+** 1997-06-01T00:00:00
+Begin simulation
+Start logging
+Fate of 'NO3' will not be traced
+Fate of 'NH4' will not be traced
+** 1997-09-23T13:00:00
+Tillage operation seed_bed_preparation
+** 1997-09-23T14:00:00
+Sowing WWheat
+*** Rorrende
+**** sow
+***** WWheat
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1997-10-02T00:00:00
+*** crop: WWheat tick
+Emerging
+** 1997-10-21T08:00:00
+*** crop: WWheat tick
+Luxury nitrogen uptake initiated
+** 1997-10-28T09:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+** 1997-10-28T10:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+** 1997-10-28T11:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+** 1998-01-01T00:00:00
+*** Weather: default
+Using current data
+** 1998-01-03T20:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+Emptied pond, switching to flux top
+Not accepted, mark switched top
+** 1998-04-03T18:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+Emptied pond, switching to flux top
+Not accepted, mark switched top
+** 1998-04-16T13:00:00
+Fertilizing 138 kg NPK01-N/ha
+** 1998-06-01T00:00:00
+*** crop: WWheat tick
+Flowering
+** 1998-08-07T00:00:00
+*** crop: WWheat tick
+Ripe
+** 1998-08-20T13:00:00
+Harvesting WWheat, removing 8.93882 Mg DM/ha
+** 1998-09-15T13:00:00
+Tillage operation plowing
+** 1998-09-23T13:00:00
+Tillage operation seed_bed_preparation
+** 1998-09-23T14:00:00
+Sowing WWheat
+*** Rorrende
+**** sow
+***** WWheat
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1998-10-02T00:00:00
+*** crop: WWheat tick
+Emerging
+** 1998-10-21T08:00:00
+*** crop: WWheat tick
+Luxury nitrogen uptake initiated
+** 1998-10-28T09:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+** 1998-10-28T10:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+** 1998-10-28T11:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+** 1999-03-07T06:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+** 1999-03-07T07:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+** 1999-03-07T08:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+** 1999-03-07T09:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+** 1999-03-07T10:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+** 1999-03-07T11:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+** 1999-04-14T13:00:00
+Fertilizing 132 kg NPK01-N/ha
+** 1999-06-07T00:00:00
+*** crop: WWheat tick
+Flowering
+** 1999-08-01T00:00:00
+*** crop: WWheat tick
+Ripe
+** 1999-08-20T13:00:00
+Harvesting WWheat, removing 9.33882 Mg DM/ha
+** 1999-09-15T13:00:00
+Tillage operation plowing
+** 1999-09-27T13:00:00
+Tillage operation seed_bed_preparation
+** 1999-09-27T14:00:00
+Sowing WWheat
+*** Rorrende
+**** sow
+***** WWheat
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1999-10-06T00:00:00
+*** crop: WWheat tick
+Emerging
+** 1999-10-25T12:00:00
+*** crop: WWheat tick
+Luxury nitrogen uptake initiated
+** 1999-12-25T08:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+** 2000-04-28T13:00:00
+Fertilizing 143 kg NPK01-N/ha
+** 2000-05-26T00:00:00
+*** crop: WWheat tick
+Flowering
+** 2000-08-02T14:00:00
+*** Movement: vertical
+**** richards
+***** UZ Richard: 0 to 16
+Saturated soil, switching to pressure top
+Not accepted, mark switched top
+Emptied pond, switching to flux top
+Not accepted, mark switched top
+** 2000-08-03T00:00:00
+*** crop: WWheat tick
+Ripe
+** 2000-08-20T13:00:00
+Harvesting WWheat, removing 8.82365 Mg DM/ha
+** 2000-09-15T13:00:00
+Tillage operation plowing
+** 2000-10-18T13:00:00
+Tillage operation seed_bed_preparation
+** 2000-10-18T14:00:00
+Sowing WWheat
+*** Rorrende
+**** sow
+***** WWheat
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 2000-10-28T00:00:00
+*** crop: WWheat tick
+Emerging
+** 2000-12-30T23:00:00
+End simulation
+* Summary
+** Soil water
+LOGFILE: soil_water.dlf
+VOLUME: box none
+TIME: 1997-05-31T23:00:00 to 2000-12-30T23:00:00
+*** Soil water balance
+Water balance for the soil.
+
+            Matrix infiltration = 1681.5 [mm]
+             Subsoil irrigation =    0.0 [mm]
+                        Tillage =    0.0 [mm]
+                                  ------
+                    Total input = 1681.5 [mm]
+
+             Matrix percolation =  221.8 [mm]
+                       Tertiary =    0.0 [mm]
+                     Drain flow =  598.6 [mm]
+                Root extraction =  814.5 [mm]
+                       Freezing =    0.0 [mm]
+                                  ------
+                   Total output = 1634.9 [mm]
+
+            Soil water increase =   46.6 [mm]
+                                  ------
+      Total increase in content =   46.6 [mm]
+
+                                  ------
+Balance (= In - Out - Increase) =   -0.0 [mm]
+                                  ======
+Program finished after 37 seconds.

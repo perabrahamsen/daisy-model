@@ -1,0 +1,1460 @@
+Using standard MS Windows home.
+Using 'C:/daisy' as daisy home.
+Reseting current directory to 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3'
+Daisy crop/soil simulation version 4.74. (Oct 30 2009)
+Copyright 1996 - 2007 Per Abrahamsen, Søren Hansen and KVL.
+Changing directory to 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3' success
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Opening absolute file name 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\Hooghoudt_1D_15_MolenWesseling_50p_3.dai'
+* Parsing file: 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\Hooghoudt_1D_15_MolenWesseling_50p_3.dai'
+Path set to:
+0: '.'
+1: 'c:/cygwin/home/mmo/daisy/lib'
+2: 'c:/cygwin/home/mmo/daisy/sample'
+done
+** input
+*** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'log.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\log.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\log.dai' success!
+** Parsing file: 'log.dai'
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'log-std.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\log-std.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\log-std.dai' success!
+** input
+*** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'crop.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\crop.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\crop.dai' success!
+** Parsing file: 'crop.dai'
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'maize.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\maize.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\maize.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'pea.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\pea.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\pea.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'potato.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\potato.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\potato.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'rye.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\rye.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\rye.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'sbarley.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\sbarley.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\sbarley.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'sugarbeet.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\sugarbeet.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\sugarbeet.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'fodderbeet.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\fodderbeet.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\fodderbeet.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'srape.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\srape.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\srape.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'swheat.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\swheat.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\swheat.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'wbarley.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\wbarley.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\wbarley.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'wrape.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\wrape.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\wrape.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'wwheat.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\wwheat.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\wwheat.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'grass.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\grass.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\grass.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'ryegrass.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\ryegrass.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\ryegrass.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'wclover.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\wclover.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\wclover.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'beetroot.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\beetroot.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\beetroot.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'broccoli.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\broccoli.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\broccoli.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'brusselssprouts.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\brusselssprouts.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\brusselssprouts.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'celeriac.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\celeriac.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\celeriac.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'earlypotato.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\earlypotato.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\earlypotato.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'whitecabbage.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\whitecabbage.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\whitecabbage.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'earlywhitecabbage.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\earlywhitecabbage.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\earlywhitecabbage.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'onion.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\onion.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\onion.dai' success!
+*** input
+**** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'onion_plantingofsets.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\onion_plantingofsets.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\onion_plantingofsets.dai' success!
+** input
+*** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'tillage.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\tillage.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\tillage.dai' success!
+** input
+*** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'fertilizer.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\fertilizer.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\fertilizer.dai' success!
+** input
+*** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'hooghoudtchemicals_1.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\hooghoudtchemicals_1.dai' (cwd) success!
+** input
+*** file
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'dk-horizon.dai'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\dk-horizon.dai' (cwd)
+Trying 'c:/cygwin/home/mmo/daisy/lib\dk-horizon.dai' success!
+C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\Hooghoudt_1D_15_MolenWesseling_50p_3.dai:73:22: Bromide is already defined in hooghoudtchemicals_1.dai, overwriting (warning)
+Command line: C:\cygwin\home\mmo\daisy\daisy.exe C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\Hooghoudt_1D_15_MolenWesseling_50p_3.dai
+Storing 'daisy.log' in 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3'
+* Weather: default
+In directory 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3':
+Looking for file 'dk-taastrup.dwf'
+Trying 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_15\1D_MolenWesseling_50p_3\dk-taastrup.dwf' (cwd) success!
+* JB6Drainage
+** Soil
+*** Horizons
+**** Ap_JB6
+Quartz = 0.596384 []
+h	h	Theta	K
+cm	pF		cm/h
+0		0.386	1.469
+-1	0	0.384464	0.429366
+-10	1	0.363289	0.0904371
+-100	2	0.260454	0.00303026
+-1000	3	0.151891	4.12747e-005
+-15848.9	4.2	0.0771034	2.11921e-007
+**** B_JB6
+Quartz = 0.612033 []
+h	h	Theta	K
+cm	pF		cm/h
+0		0.36	0.9584
+-1	0	0.358155	0.260263
+-10	1	0.333694	0.0453501
+-100	2	0.231203	0.00098565
+-1000	3	0.133151	8.50434e-006
+-15848.9	4.2	0.0670066	2.54038e-008
+**** C_JB6
+Quartz = 0.608212 []
+h	h	Theta	K
+cm	pF		cm/h
+0		0.3382	0.6246
+-1	0	0.336792	0.156061
+-10	1	0.318622	0.0285678
+-100	2	0.234417	0.000600005
+-1000	3	0.143764	4.08063e-006
+-15848.9	4.2	0.0777595	8.75907e-009
+** Bioclimate: default
+Pet choosen: weather
+Difrad choosen: DPF
+** OrganicStandard
+lay	humus	humus	input	input	AOM	SMB1	SMB2	SOM1	SOM2	SOM3	dSMB1	dSMB1	dSMB2	dSMB2	dSOM1	dSOM1	dSOM2	dSOM2	dSOM3	dSOM3
+	kg C/ha/cm	%	kg C/ha/cm/y	%	%	%	%	%	%	%	kg C/ha/cm/y	y^-1	kg C/ha/cm/y	y^-1	kg C/ha/cm/y	y^-1	kg C/ha/cm/y	y^-1	kg C/ha/cm/y	y^-1
+0	2247.52	2.5025	45.3151	2.01622	1.66897	0.160714	0.201648	140.926	-42.9574	-1.54368e-014	0	0	0	0	-37.8278	-0.0119431	36.7278	-0.0380411	-0	0	Above SOM1 limit
+0	2247.52	2.5025	45.3151	2.01622	1.66897	1.3043	0.204901	67.7753	29.0465	-3.55046e-013	0	0	0	0	-8.15037	-0.00535059	-11.23	-0.0172021	-0	0
+1	2247.52	2.5025	45.3151	2.01622	1.01725	0.158116	0.201641	142.096	-43.4735	3.08735e-014	0	0	0	0	-38.1742	-0.0119531	37.0742	-0.037944	-0	-0	Above SOM1 limit
+1	2247.52	2.5025	45.3151	2.01622	1.01725	1.31296	0.204926	68.2254	29.2395	-4.47666e-013	0	0	0	0	-8.2045	-0.00535059	-11.3559	-0.0172802	-0	0
+2	2247.52	2.5025	45.3151	2.01622	0.620021	0.156532	0.201636	142.81	-43.7881	0	0	0	0	0	-38.3853	-0.0119592	37.2853	-0.0378859	-0	nan	Above SOM1 limit
+2	2247.52	2.5025	45.3151	2.01622	0.620021	1.31824	0.204941	68.4998	29.357	-2.16115e-013	0	0	0	0	-8.23749	-0.00535059	-11.4326	-0.0173273	-0	0
+3	2247.52	2.5025	45.3151	2.01622	0.377907	0.155566	0.201634	143.245	-43.9798	0	0	0	0	0	-38.514	-0.0119629	37.414	-0.0378509	-0	nan	Above SOM1 limit
+3	2247.52	2.5025	45.3151	2.01622	0.377907	1.32146	0.20495	68.667	29.4287	-2.16115e-013	0	0	0	0	-8.2576	-0.00535059	-11.4794	-0.0173558	-0	0
+4	2247.52	2.5025	45.3151	2.01622	0.230337	0.154978	0.201632	143.51	-44.0967	3.08735e-014	0	0	0	0	-38.5924	-0.0119651	37.4924	-0.0378297	-0	-0	Above SOM1 limit
+4	2247.52	2.5025	45.3151	2.01622	0.230337	1.32342	0.204956	68.7689	29.4724	-3.85919e-013	0	0	0	0	-8.26986	-0.00535059	-11.5079	-0.0173731	-0	0
+5	2247.52	2.5025	45.3151	2.01622	0.140392	0.154619	0.201631	143.671	-44.1679	4.63103e-014	0	0	0	0	-38.6402	-0.0119664	37.5402	-0.0378169	-0	-0	Above SOM1 limit
+5	2247.52	2.5025	45.3151	2.01622	0.140392	1.32461	0.204959	68.831	29.499	-1.23494e-013	0	0	0	0	-8.27733	-0.00535059	-11.5253	-0.0173836	-0	0
+6	500.494	0.519896	3.20533	0.640435	0.384261	0.123881	0.064258	3.65021	3.73712	92.0403	0	0	0	0	0	0	0	0	-0	-0
+7	500.494	0.519896	1.95367	0.390349	0.23421	0.0755062	0.0391657	2.22483	2.2778	95.1485	0	0	0	0	0	0	0	0	-0	-0
+8	500.494	0.519896	0.92965	0.185747	0.111448	0.0359295	0.0186369	1.05868	1.08389	97.6914	0	0	0	0	0	0	0	0	-0	-0
+9	500.494	0.519896	0.345364	0.0690046	0.0414028	0.0133477	0.00692358	0.393298	0.402662	99.1424	0	0	0	0	0	0	0	0	-0	-0
+10	500.494	0.519896	0.128302	0.0256351	0.0153811	0.00495867	0.0025721	0.14611	0.149588	99.6814	0	0	0	0	0	0	0	0	-0	-0
+11	500.494	0.519896	0.0476641	0.00952341	0.00571405	0.00184214	0.000955532	0.0542795	0.0555719	99.8816	0	0	0	0	0	0	0	0	-0	-0
+12	222.299	0.220176	0.0177071	0.00796547	0.00477928	0.00157493	0.000799216	0.0464061	0.047511	99.8989	0	0	0	0	0	0	0	0	-0	-0
+13	222.299	0.220176	0.00657817	0.00295916	0.0017755	0.000585084	0.000296908	0.0172398	0.0176503	99.9625	0	0	0	0	0	0	0	0	-0	-0
+14	222.299	0.220176	0	0	0	-0	-0	-0	-0	100	0	nan	0	nan	0	nan	0	nan	-0	-0
+15	222.299	0.220176	0	0	0	-0	-0	-0	-0	100	0	nan	0	nan	0	nan	0	nan	-0	-0
+16	222.299	0.220176	0	0	0	-0	-0	-0	-0	100	0	nan	0	nan	0	nan	0	nan	-0	-0
+17	222.299	0.220176	0	0	0	-0	-0	-0	-0	100	0	nan	0	nan	0	nan	0	nan	-0	-0
+18	222.299	0.220176	0	0	0	-0	-0	-0	-0	100	0	nan	0	nan	0	nan	0	nan	-0	-0
+19	222.299	0.220176	0	0	0	-0	-0	-0	-0	100	0	nan	0	nan	0	nan	0	nan	-0	-0
+20	222.299	0.220176	0	0	0	-0	-0	-0	-0	100	0	nan	0	nan	0	nan	0	nan	-0	-0
+21	222.299	0.220176	0	0	0	-0	-0	-0	-0	100	0	nan	0	nan	0	nan	0	nan	-0	-0
+22	222.299	0.220176	0	0	0	-0	-0	-0	-0	100	0	nan	0	nan	0	nan	0	nan	-0	-0
+23	222.299	0.220176	0	0	0	-0	-0	-0	-0	100	0	nan	0	nan	0	nan	0	nan	-0	-0
+24	222.299	0.220176	0	0	0	-0	-0	-0	-0	100	0	nan	0	nan	0	nan	0	nan	-0	-0
+*** Total soil summary
+Expected humus change: -589.642 [kg C/ha/y], -5.65037e-007 [y^-1].
+Expected background mineralization: 53.6038 [kg N/ha/y].
+*** Top soil summary
+	SOM1	SOM2	SOM3	SMB1	SMB2	AOM1	AOM2	total
+kg C/ha	46160.4	19783	0	888.331	138.181	364.537	91.1343	67425.7
+kg N/ha	4175.5	1789.5	0	132.587	20.6241	4.05041	7.34137	6129.61
+
+Depth	30	cm
+T	7.8	dg C
+h	-100	cm
+clay	12.4124	%
+Specified input	1400	kg C/ha/y
+Specified background mineralization	3	kg N/ha/y
+Zone input	1359.45	kg C/ha/y
+Zone background mineralization	0	kg C/ha/y
+Zone humus change	0	kg C/ha/y
+Time	Mon Jan 25 17:15:47 2010
+
+Program started Mon Jan 25 17:15:46 2010, 1 second ago.
+* Running
+** 1985-03-01T00:00:00
+Begin simulation
+** 1985-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 1985-03-05T10:00:00
+Tillage operation plowing
+** 1985-04-05T09:00:00
+Tillage operation seed_bed_preparation
+** 1985-04-05T10:00:00
+Sowing Byg
+*** JB6Drainage
+**** sow
+***** Byg
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1985-04-27T00:00:00
+*** crop: Byg tick
+Emerging
+** 1985-05-12T08:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1985-05-28T02:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1985-06-07T11:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1985-06-23T00:00:00
+*** crop: Byg tick
+Flowering
+** 1985-08-12T00:00:00
+*** crop: Byg tick
+Ripe
+** 1985-08-12T02:00:00
+Harvesting Byg, removing 8.74898 Mg DM/ha
+** 1986-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 1986-03-05T10:00:00
+Tillage operation plowing
+** 1986-04-05T09:00:00
+Tillage operation seed_bed_preparation
+** 1986-04-05T10:00:00
+Sowing Byg
+*** JB6Drainage
+**** sow
+***** Byg
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1986-05-01T00:00:00
+*** crop: Byg tick
+Emerging
+** 1986-05-07T20:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1986-05-23T17:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1986-06-19T10:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1986-06-24T00:00:00
+*** crop: Byg tick
+Flowering
+** 1986-08-12T00:00:00
+*** crop: Byg tick
+Ripe
+** 1986-08-12T02:00:00
+Harvesting Byg, removing 10.2185 Mg DM/ha
+** 1987-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 1987-03-05T10:00:00
+Tillage operation plowing
+** 1987-04-05T09:00:00
+Tillage operation seed_bed_preparation
+** 1987-04-05T10:00:00
+Sowing Byg
+*** JB6Drainage
+**** sow
+***** Byg
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1987-04-26T00:00:00
+*** crop: Byg tick
+Emerging
+** 1987-05-06T06:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1987-05-27T18:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1987-05-31T04:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1987-05-31T13:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1987-06-15T00:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1987-07-04T00:00:00
+*** crop: Byg tick
+Flowering
+** 1987-08-26T00:00:00
+*** crop: Byg tick
+Ripe
+** 1987-08-26T02:00:00
+Harvesting Byg, removing 9.75031 Mg DM/ha
+** 1988-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 1988-03-05T10:00:00
+Tillage operation plowing
+** 1988-04-05T09:00:00
+Tillage operation seed_bed_preparation
+** 1988-04-05T10:00:00
+Sowing Byg
+*** JB6Drainage
+**** sow
+***** Byg
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1988-04-23T00:00:00
+*** crop: Byg tick
+Emerging
+** 1988-05-07T18:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1988-05-24T23:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1988-06-07T04:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1988-06-17T00:00:00
+*** crop: Byg tick
+Flowering
+** 1988-07-17T14:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1988-07-25T01:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1988-07-25T12:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1988-07-27T01:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1988-07-27T10:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1988-07-28T01:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1988-07-28T11:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1988-07-29T01:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1988-07-29T03:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1988-07-30T01:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1988-07-30T15:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1988-07-31T01:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1988-07-31T14:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1988-08-01T01:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1988-08-05T00:00:00
+*** crop: Byg tick
+Ripe
+** 1988-08-05T02:00:00
+Harvesting Byg, removing 10.3822 Mg DM/ha
+** 1989-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 1989-03-05T10:00:00
+Tillage operation plowing
+** 1989-04-05T09:00:00
+Tillage operation seed_bed_preparation
+** 1989-04-05T10:00:00
+Sowing Byg
+*** JB6Drainage
+**** sow
+***** Byg
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1989-04-20T00:00:00
+*** crop: Byg tick
+Emerging
+** 1989-05-04T15:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1989-06-21T00:00:00
+*** crop: Byg tick
+Flowering
+** 1989-08-11T00:00:00
+*** crop: Byg tick
+Ripe
+** 1989-08-11T02:00:00
+Harvesting Byg, removing 7.60364 Mg DM/ha
+** 1989-09-01T09:00:00
+Spraying 1000 g Bromide_1/ha
+** 1990-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 1990-03-05T10:00:00
+Tillage operation plowing
+** 1990-04-01T00:00:00
+Start logging
+** 1990-04-05T09:00:00
+Tillage operation seed_bed_preparation
+** 1990-04-05T10:00:00
+Sowing Byg
+*** JB6Drainage
+**** sow
+***** Byg
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1990-04-24T00:00:00
+*** crop: Byg tick
+Emerging
+** 1990-05-02T15:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1990-05-18T19:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1990-06-02T19:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1990-06-18T00:00:00
+*** crop: Byg tick
+Flowering
+** 1990-08-07T00:00:00
+*** crop: Byg tick
+Ripe
+** 1990-08-07T02:00:00
+Harvesting Byg, removing 9.03834 Mg DM/ha
+** 1990-09-01T09:00:00
+Spraying 1000 g Bromide_2/ha
+** 1991-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 1991-03-05T10:00:00
+Tillage operation plowing
+** 1991-04-05T09:00:00
+Tillage operation seed_bed_preparation
+** 1991-04-05T10:00:00
+Sowing Byg
+*** JB6Drainage
+**** sow
+***** Byg
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1991-04-24T00:00:00
+*** crop: Byg tick
+Emerging
+** 1991-05-11T10:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1991-05-29T19:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1991-06-07T23:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1991-07-05T00:00:00
+*** crop: Byg tick
+Flowering
+** 1991-08-23T00:00:00
+*** crop: Byg tick
+Ripe
+** 1991-08-23T02:00:00
+Harvesting Byg, removing 10.5254 Mg DM/ha
+** 1991-09-01T09:00:00
+Spraying 1000 g Bromide_3/ha
+** 1992-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 1992-03-05T10:00:00
+Tillage operation plowing
+** 1992-04-05T09:00:00
+Tillage operation seed_bed_preparation
+** 1992-04-05T10:00:00
+Sowing Byg
+*** JB6Drainage
+**** sow
+***** Byg
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1992-04-27T00:00:00
+*** crop: Byg tick
+Emerging
+** 1992-05-08T15:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1992-05-21T16:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1992-06-08T17:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1992-06-15T00:00:00
+*** crop: Byg tick
+Flowering
+** 1992-08-02T00:00:00
+*** crop: Byg tick
+Ripe
+** 1992-08-02T02:00:00
+Harvesting Byg, removing 7.37915 Mg DM/ha
+** 1992-09-01T09:00:00
+Spraying 1000 g Bromide_4/ha
+** 1993-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 1993-03-05T10:00:00
+Tillage operation plowing
+** 1993-04-05T09:00:00
+Tillage operation seed_bed_preparation
+** 1993-04-05T10:00:00
+Sowing Byg
+*** JB6Drainage
+**** sow
+***** Byg
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1993-04-26T00:00:00
+*** crop: Byg tick
+Emerging
+** 1993-05-07T09:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1993-06-14T00:00:00
+*** crop: Byg tick
+Flowering
+** 1993-08-08T00:00:00
+*** crop: Byg tick
+Ripe
+** 1993-08-08T02:00:00
+Harvesting Byg, removing 5.97447 Mg DM/ha
+** 1993-09-01T09:00:00
+Spraying 1000 g Bromide_5/ha
+** 1994-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 1994-03-05T10:00:00
+Tillage operation plowing
+** 1994-04-05T09:00:00
+Tillage operation seed_bed_preparation
+** 1994-04-05T10:00:00
+Sowing Byg
+*** JB6Drainage
+**** sow
+***** Byg
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1994-04-24T00:00:00
+*** crop: Byg tick
+Emerging
+** 1994-05-02T20:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1994-05-29T10:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1994-06-06T03:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1994-06-27T00:00:00
+*** crop: Byg tick
+Flowering
+** 1994-07-09T15:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1994-07-28T02:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1994-08-14T00:00:00
+*** crop: Byg tick
+Ripe
+** 1994-08-14T02:00:00
+Harvesting Byg, removing 8.91943 Mg DM/ha
+** 1994-09-01T09:00:00
+Spraying 1000 g Bromide_6/ha
+** 1995-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 1995-03-05T10:00:00
+Tillage operation plowing
+** 1995-04-05T09:00:00
+Tillage operation seed_bed_preparation
+** 1995-04-05T10:00:00
+Sowing Byg
+*** JB6Drainage
+**** sow
+***** Byg
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1995-04-25T00:00:00
+*** crop: Byg tick
+Emerging
+** 1995-05-04T20:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1995-05-23T11:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1995-06-20T06:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1995-06-26T00:00:00
+*** crop: Byg tick
+Flowering
+** 1995-07-20T14:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1995-08-05T01:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1995-08-13T00:00:00
+*** crop: Byg tick
+Ripe
+** 1995-08-13T02:00:00
+Harvesting Byg, removing 9.92258 Mg DM/ha
+** 1995-09-01T09:00:00
+Spraying 1000 g Bromide_7/ha
+** 1996-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 1996-03-05T10:00:00
+Tillage operation plowing
+** 1996-04-05T09:00:00
+Tillage operation seed_bed_preparation
+** 1996-04-05T10:00:00
+Sowing Byg
+*** JB6Drainage
+**** sow
+***** Byg
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1996-04-23T00:00:00
+*** crop: Byg tick
+Emerging
+** 1996-05-03T19:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1996-06-05T11:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1996-06-16T01:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1996-06-28T00:00:00
+*** crop: Byg tick
+Flowering
+** 1996-08-17T00:00:00
+*** crop: Byg tick
+Ripe
+** 1996-08-17T02:00:00
+Harvesting Byg, removing 7.2436 Mg DM/ha
+** 1996-09-01T09:00:00
+Spraying 1000 g Bromide_8/ha
+** 1997-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 1997-03-05T10:00:00
+Tillage operation plowing
+** 1997-04-05T09:00:00
+Tillage operation seed_bed_preparation
+** 1997-04-05T10:00:00
+Sowing Byg
+*** JB6Drainage
+**** sow
+***** Byg
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1997-04-29T00:00:00
+*** crop: Byg tick
+Emerging
+** 1997-05-10T05:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1997-06-01T16:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1997-06-15T15:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1997-06-26T00:00:00
+*** crop: Byg tick
+Flowering
+** 1997-08-13T00:00:00
+*** crop: Byg tick
+Ripe
+** 1997-08-13T02:00:00
+Harvesting Byg, removing 11.1164 Mg DM/ha
+** 1997-09-01T09:00:00
+Spraying 1000 g Bromide_9/ha
+** 1998-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 1998-03-05T10:00:00
+Tillage operation plowing
+** 1998-04-05T09:00:00
+Tillage operation seed_bed_preparation
+** 1998-04-05T10:00:00
+Sowing Byg
+*** JB6Drainage
+**** sow
+***** Byg
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1998-04-24T00:00:00
+*** crop: Byg tick
+Emerging
+** 1998-05-04T11:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1998-05-18T17:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1998-06-09T08:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1998-06-17T00:00:00
+*** crop: Byg tick
+Flowering
+** 1998-08-09T00:00:00
+*** crop: Byg tick
+Ripe
+** 1998-08-09T02:00:00
+Harvesting Byg, removing 8.99737 Mg DM/ha
+** 1998-09-01T09:00:00
+Spraying 1000 g Bromide_10/ha
+** 1999-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 1999-03-05T10:00:00
+Tillage operation plowing
+** 1999-04-05T09:00:00
+Tillage operation seed_bed_preparation
+** 1999-04-05T10:00:00
+Sowing Byg
+*** JB6Drainage
+**** sow
+***** Byg
+Water stress calculated from energy balance
+Nitrogen stress handled by crop nitrogen module
+** 1999-04-21T00:00:00
+*** crop: Byg tick
+Emerging
+** 1999-04-30T11:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1999-05-20T20:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1999-06-08T16:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1999-06-20T00:00:00
+*** crop: Byg tick
+Flowering
+** 1999-07-14T12:00:00
+*** crop: Byg tick
+Crop affected by nitrogen stress
+** 1999-07-30T01:00:00
+*** crop: Byg tick
+Luxury nitrogen uptake initiated
+** 1999-08-09T00:00:00
+*** crop: Byg tick
+Ripe
+** 1999-08-09T02:00:00
+Harvesting Byg, removing 9.66205 Mg DM/ha
+** 2000-03-05T09:00:00
+Fertilizing 100 kg N25S-N/ha
+** 2000-03-05T10:00:00
+Tillage operation plowing
+** 2000-03-31T23:00:00
+End simulation
+* Summary
+** Soil water
+LOGFILE: soil_water.dlf
+VOLUME: box none
+TIME: 1990-03-31T23:00:00 to 2000-03-31T23:00:00
+COLUMN: *
+*** Soil water balance
+Water balance for the soil.
+
+            Matrix infiltration = 3009.1 [mm]
+             Subsoil irrigation =    0.0 [mm]
+                        Tillage =    0.0 [mm]
+                                  ------
+                    Total input = 3009.1 [mm]
+
+             Matrix percolation =  571.5 [mm]
+                       Tertiary =    0.0 [mm]
+                     Drain flow =  574.4 [mm]
+                Root extraction = 1834.0 [mm]
+                       Freezing =    0.0 [mm]
+                                  ------
+                   Total output = 2979.9 [mm]
+
+            Soil water increase =   29.2 [mm]
+                                  ------
+      Total increase in content =   29.2 [mm]
+
+                                  ------
+Balance (= In - Out - Increase) =   -0.0 [mm]
+                                  ======
+** Field chemical
+LOGFILE: field_Bromide_1.dlf
+VOLUME: box none
+TIME: 1990-03-31T23:00:00 to 2000-03-31T23:00:00
+COLUMN: *
+CHEMICAL: Bromide_1
+*** balance
+                          Spray =    0.000 [g/ha]
+                        Deposit =    0.000 [g/ha]
+                       External =    0.000 [g/ha]
+              Surface Transform =    0.000 [g/ha]
+                 Soil Transform =    0.000 [g/ha]
+                                  --------
+                    Total input =    0.000 [g/ha]
+
+                        Harvest =    0.000 [g/ha]
+                      Dissipate =    0.000 [g/ha]
+              Surface Decompose =    0.000 [g/ha]
+                         Runoff =    0.000 [g/ha]
+                 Soil Decompose =    0.000 [g/ha]
+                    Leak-Matrix =  422.365 [g/ha]
+                  Surface-Drain =    0.000 [g/ha]
+                     Soil-Drain =  145.843 [g/ha]
+                         Uptake =  430.071 [g/ha]
+                                  --------
+                   Total output =  998.279 [g/ha]
+
+                  Snow increase =    0.000 [g/ha]
+                Canopy increase =    0.000 [g/ha]
+               Surface increase =    0.000 [g/ha]
+                  Soil increase = -998.279 [g/ha]
+              Tertiary increase =    0.000 [g/ha]
+                 Error increase =    0.000 [g/ha]
+                                  --------
+      Total increase in content = -998.279 [g/ha]
+
+                                  --------
+Balance (= In - Out - Increase) =   -0.000 [g/ha]
+                                  ========
+** Field chemical
+LOGFILE: field_Bromide_2.dlf
+VOLUME: box none
+TIME: 1990-03-31T23:00:00 to 2000-03-31T23:00:00
+COLUMN: *
+CHEMICAL: Bromide_2
+*** balance
+                          Spray = 1000.000 [g/ha]
+                        Deposit =    0.000 [g/ha]
+                       External =    0.000 [g/ha]
+              Surface Transform =    0.000 [g/ha]
+                 Soil Transform =    0.000 [g/ha]
+                                  --------
+                    Total input = 1000.000 [g/ha]
+
+                        Harvest =    0.000 [g/ha]
+                      Dissipate =    0.000 [g/ha]
+              Surface Decompose =    0.000 [g/ha]
+                         Runoff =    0.000 [g/ha]
+                 Soil Decompose =    0.000 [g/ha]
+                    Leak-Matrix =  509.315 [g/ha]
+                  Surface-Drain =    0.000 [g/ha]
+                     Soil-Drain =  241.904 [g/ha]
+                         Uptake =  245.393 [g/ha]
+                                  --------
+                   Total output =  996.613 [g/ha]
+
+                  Snow increase =    0.000 [g/ha]
+                Canopy increase =    0.000 [g/ha]
+               Surface increase =    0.000 [g/ha]
+                  Soil increase =    3.387 [g/ha]
+              Tertiary increase =    0.000 [g/ha]
+                 Error increase =    0.000 [g/ha]
+                                  --------
+      Total increase in content =    3.387 [g/ha]
+
+                                  --------
+Balance (= In - Out - Increase) =   -0.000 [g/ha]
+                                  ========
+** Field chemical
+LOGFILE: field_Bromide_3.dlf
+VOLUME: box none
+TIME: 1990-03-31T23:00:00 to 2000-03-31T23:00:00
+COLUMN: *
+CHEMICAL: Bromide_3
+*** balance
+                          Spray = 1000.000 [g/ha]
+                        Deposit =    0.000 [g/ha]
+                       External =    0.000 [g/ha]
+              Surface Transform =    0.000 [g/ha]
+                 Soil Transform =    0.000 [g/ha]
+                                  --------
+                    Total input = 1000.000 [g/ha]
+
+                        Harvest =    0.000 [g/ha]
+                      Dissipate =    0.000 [g/ha]
+              Surface Decompose =    0.000 [g/ha]
+                         Runoff =    0.000 [g/ha]
+                 Soil Decompose =    0.000 [g/ha]
+                    Leak-Matrix =  382.354 [g/ha]
+                  Surface-Drain =    0.000 [g/ha]
+                     Soil-Drain =  257.943 [g/ha]
+                         Uptake =  354.068 [g/ha]
+                                  --------
+                   Total output =  994.365 [g/ha]
+
+                  Snow increase =    0.000 [g/ha]
+                Canopy increase =    0.000 [g/ha]
+               Surface increase =    0.000 [g/ha]
+                  Soil increase =    5.635 [g/ha]
+              Tertiary increase =    0.000 [g/ha]
+                 Error increase =    0.000 [g/ha]
+                                  --------
+      Total increase in content =    5.635 [g/ha]
+
+                                  --------
+Balance (= In - Out - Increase) =   -0.000 [g/ha]
+                                  ========
+** Field chemical
+LOGFILE: field_Bromide_4.dlf
+VOLUME: box none
+TIME: 1990-03-31T23:00:00 to 2000-03-31T23:00:00
+COLUMN: *
+CHEMICAL: Bromide_4
+*** balance
+                          Spray = 1000.000 [g/ha]
+                        Deposit =    0.000 [g/ha]
+                       External =    0.000 [g/ha]
+              Surface Transform =    0.000 [g/ha]
+                 Soil Transform =    0.000 [g/ha]
+                                  --------
+                    Total input = 1000.000 [g/ha]
+
+                        Harvest =    0.000 [g/ha]
+                      Dissipate =    0.000 [g/ha]
+              Surface Decompose =    0.000 [g/ha]
+                         Runoff =    0.000 [g/ha]
+                 Soil Decompose =    0.000 [g/ha]
+                    Leak-Matrix =  407.950 [g/ha]
+                  Surface-Drain =    0.000 [g/ha]
+                     Soil-Drain =  342.343 [g/ha]
+                         Uptake =  237.738 [g/ha]
+                                  --------
+                   Total output =  988.032 [g/ha]
+
+                  Snow increase =    0.000 [g/ha]
+                Canopy increase =    0.000 [g/ha]
+               Surface increase =    0.000 [g/ha]
+                  Soil increase =   11.968 [g/ha]
+              Tertiary increase =    0.000 [g/ha]
+                 Error increase =    0.000 [g/ha]
+                                  --------
+      Total increase in content =   11.968 [g/ha]
+
+                                  --------
+Balance (= In - Out - Increase) =   -0.000 [g/ha]
+                                  ========
+** Field chemical
+LOGFILE: field_Bromide_5.dlf
+VOLUME: box none
+TIME: 1990-03-31T23:00:00 to 2000-03-31T23:00:00
+COLUMN: *
+CHEMICAL: Bromide_5
+*** balance
+                          Spray = 1000.000 [g/ha]
+                        Deposit =    0.000 [g/ha]
+                       External =    0.000 [g/ha]
+              Surface Transform =    0.000 [g/ha]
+                 Soil Transform =    0.000 [g/ha]
+                                  --------
+                    Total input = 1000.000 [g/ha]
+
+                        Harvest =    0.000 [g/ha]
+                      Dissipate =    0.000 [g/ha]
+              Surface Decompose =    0.000 [g/ha]
+                         Runoff =    0.000 [g/ha]
+                 Soil Decompose =    0.000 [g/ha]
+                    Leak-Matrix =  414.587 [g/ha]
+                  Surface-Drain =    0.000 [g/ha]
+                     Soil-Drain =  442.788 [g/ha]
+                         Uptake =  115.039 [g/ha]
+                                  --------
+                   Total output =  972.414 [g/ha]
+
+                  Snow increase =    0.000 [g/ha]
+                Canopy increase =    0.000 [g/ha]
+               Surface increase =    0.000 [g/ha]
+                  Soil increase =   27.586 [g/ha]
+              Tertiary increase =    0.000 [g/ha]
+                 Error increase =    0.000 [g/ha]
+                                  --------
+      Total increase in content =   27.586 [g/ha]
+
+                                  --------
+Balance (= In - Out - Increase) =   -0.000 [g/ha]
+                                  ========
+** Field chemical
+LOGFILE: field_Bromide_6.dlf
+VOLUME: box none
+TIME: 1990-03-31T23:00:00 to 2000-03-31T23:00:00
+COLUMN: *
+CHEMICAL: Bromide_6
+*** balance
+                          Spray = 1000.000 [g/ha]
+                        Deposit =    0.000 [g/ha]
+                       External =    0.000 [g/ha]
+              Surface Transform =    0.000 [g/ha]
+                 Soil Transform =    0.000 [g/ha]
+                                  --------
+                    Total input = 1000.000 [g/ha]
+
+                        Harvest =    0.000 [g/ha]
+                      Dissipate =    0.000 [g/ha]
+              Surface Decompose =    0.000 [g/ha]
+                         Runoff =    0.000 [g/ha]
+                 Soil Decompose =    0.000 [g/ha]
+                    Leak-Matrix =  350.344 [g/ha]
+                  Surface-Drain =    0.000 [g/ha]
+                     Soil-Drain =  279.131 [g/ha]
+                         Uptake =  275.278 [g/ha]
+                                  --------
+                   Total output =  904.753 [g/ha]
+
+                  Snow increase =    0.000 [g/ha]
+                Canopy increase =    0.000 [g/ha]
+               Surface increase =    0.000 [g/ha]
+                  Soil increase =   95.247 [g/ha]
+              Tertiary increase =    0.000 [g/ha]
+                 Error increase =    0.000 [g/ha]
+                                  --------
+      Total increase in content =   95.247 [g/ha]
+
+                                  --------
+Balance (= In - Out - Increase) =   -0.000 [g/ha]
+                                  ========
+** Field chemical
+LOGFILE: field_Bromide_7.dlf
+VOLUME: box none
+TIME: 1990-03-31T23:00:00 to 2000-03-31T23:00:00
+COLUMN: *
+CHEMICAL: Bromide_7
+*** balance
+                          Spray = 1000.000 [g/ha]
+                        Deposit =    0.000 [g/ha]
+                       External =    0.000 [g/ha]
+              Surface Transform =    0.000 [g/ha]
+                 Soil Transform =    0.000 [g/ha]
+                                  --------
+                    Total input = 1000.000 [g/ha]
+
+                        Harvest =    0.000 [g/ha]
+                      Dissipate =    0.000 [g/ha]
+              Surface Decompose =    0.000 [g/ha]
+                         Runoff =    0.000 [g/ha]
+                 Soil Decompose =    0.000 [g/ha]
+                    Leak-Matrix =  135.273 [g/ha]
+                  Surface-Drain =    0.000 [g/ha]
+                     Soil-Drain =   90.676 [g/ha]
+                         Uptake =  651.340 [g/ha]
+                                  --------
+                   Total output =  877.288 [g/ha]
+
+                  Snow increase =    0.000 [g/ha]
+                Canopy increase =    0.000 [g/ha]
+               Surface increase =    0.000 [g/ha]
+                  Soil increase =  122.712 [g/ha]
+              Tertiary increase =    0.000 [g/ha]
+                 Error increase =    0.000 [g/ha]
+                                  --------
+      Total increase in content =  122.712 [g/ha]
+
+                                  --------
+Balance (= In - Out - Increase) =   -0.000 [g/ha]
+                                  ========
+** Field chemical
+LOGFILE: field_Bromide_8.dlf
+VOLUME: box none
+TIME: 1990-03-31T23:00:00 to 2000-03-31T23:00:00
+COLUMN: *
+CHEMICAL: Bromide_8
+*** balance
+                          Spray = 1000.000 [g/ha]
+                        Deposit =    0.000 [g/ha]
+                       External =    0.000 [g/ha]
+              Surface Transform =    0.000 [g/ha]
+                 Soil Transform =    0.000 [g/ha]
+                                  --------
+                    Total input = 1000.000 [g/ha]
+
+                        Harvest =    0.000 [g/ha]
+                      Dissipate =    0.000 [g/ha]
+              Surface Decompose =    0.000 [g/ha]
+                         Runoff =    0.000 [g/ha]
+                 Soil Decompose =    0.000 [g/ha]
+                    Leak-Matrix =  209.570 [g/ha]
+                  Surface-Drain =    0.000 [g/ha]
+                     Soil-Drain =  151.464 [g/ha]
+                         Uptake =  420.782 [g/ha]
+                                  --------
+                   Total output =  781.817 [g/ha]
+
+                  Snow increase =    0.000 [g/ha]
+                Canopy increase =    0.000 [g/ha]
+               Surface increase =    0.000 [g/ha]
+                  Soil increase =  218.183 [g/ha]
+              Tertiary increase =    0.000 [g/ha]
+                 Error increase =    0.000 [g/ha]
+                                  --------
+      Total increase in content =  218.183 [g/ha]
+
+                                  --------
+Balance (= In - Out - Increase) =   -0.000 [g/ha]
+                                  ========
+** Field chemical
+LOGFILE: field_Bromide_9.dlf
+VOLUME: box none
+TIME: 1990-03-31T23:00:00 to 2000-03-31T23:00:00
+COLUMN: *
+CHEMICAL: Bromide_9
+*** balance
+                          Spray = 1000.000 [g/ha]
+                        Deposit =    0.000 [g/ha]
+                       External =    0.000 [g/ha]
+              Surface Transform =    0.000 [g/ha]
+                 Soil Transform =    0.000 [g/ha]
+                                  --------
+                    Total input = 1000.000 [g/ha]
+
+                        Harvest =    0.000 [g/ha]
+                      Dissipate =    0.000 [g/ha]
+              Surface Decompose =    0.000 [g/ha]
+                         Runoff =    0.000 [g/ha]
+                 Soil Decompose =    0.000 [g/ha]
+                    Leak-Matrix =  226.873 [g/ha]
+                  Surface-Drain =    0.000 [g/ha]
+                     Soil-Drain =  213.275 [g/ha]
+                         Uptake =  163.797 [g/ha]
+                                  --------
+                   Total output =  603.944 [g/ha]
+
+                  Snow increase =    0.000 [g/ha]
+                Canopy increase =    0.000 [g/ha]
+               Surface increase =    0.000 [g/ha]
+                  Soil increase =  396.056 [g/ha]
+              Tertiary increase =    0.000 [g/ha]
+                 Error increase =    0.000 [g/ha]
+                                  --------
+      Total increase in content =  396.056 [g/ha]
+
+                                  --------
+Balance (= In - Out - Increase) =   -0.000 [g/ha]
+                                  ========
+** Field chemical
+LOGFILE: field_Bromide_10.dlf
+VOLUME: box none
+TIME: 1990-03-31T23:00:00 to 2000-03-31T23:00:00
+COLUMN: *
+CHEMICAL: Bromide_10
+*** balance
+                          Spray = 1000.000 [g/ha]
+                        Deposit =    0.000 [g/ha]
+                       External =    0.000 [g/ha]
+              Surface Transform =    0.000 [g/ha]
+                 Soil Transform =    0.000 [g/ha]
+                                  --------
+                    Total input = 1000.000 [g/ha]
+
+                        Harvest =    0.000 [g/ha]
+                      Dissipate =    0.000 [g/ha]
+              Surface Decompose =    0.000 [g/ha]
+                         Runoff =    0.000 [g/ha]
+                 Soil Decompose =    0.000 [g/ha]
+                    Leak-Matrix =   52.667 [g/ha]
+                  Surface-Drain =    0.000 [g/ha]
+                     Soil-Drain =  128.937 [g/ha]
+                         Uptake =  207.847 [g/ha]
+                                  --------
+                   Total output =  389.451 [g/ha]
+
+                  Snow increase =    0.000 [g/ha]
+                Canopy increase =    0.000 [g/ha]
+               Surface increase =    0.000 [g/ha]
+                  Soil increase =  610.549 [g/ha]
+              Tertiary increase =    0.000 [g/ha]
+                 Error increase =    0.000 [g/ha]
+                                  --------
+      Total increase in content =  610.549 [g/ha]
+
+                                  --------
+Balance (= In - Out - Increase) =   -0.000 [g/ha]
+                                  ========
+** Soil nitrogen
+LOGFILE: soil_nitrogen.dlf
+VOLUME: box none
+TIME: 1990-03-31T23:00:00 to 2000-03-31T23:00:00
+COLUMN: *
+*** Soil NO3- balance
+NO3- balance for a soil interval.
+
+                         NO3-In =  246.471 [kg N/ha]
+                     NO3-Incorp =    0.000 [kg N/ha]
+                    NO3-Tillage =  295.247 [kg N/ha]
+              NO3-Nitrification = 1303.630 [kg N/ha]
+                                  --------
+                    Total input = 1845.349 [kg N/ha]
+
+                NO3-Leak-Matrix =   82.848 [kg N/ha]
+                   NO3-Tertiary =    0.000 [kg N/ha]
+                      NO3-Drain =   87.344 [kg N/ha]
+                     NO3-Uptake = 1633.165 [kg N/ha]
+                Denitrification =   65.932 [kg N/ha]
+             NO3-Immobilization =    4.215 [kg N/ha]
+                                  --------
+                   Total output = 1873.505 [kg N/ha]
+
+           NO3-Content increase =  -28.156 [kg N/ha]
+             NO3-Error increase =    0.000 [kg N/ha]
+                                  --------
+      Total increase in content =  -28.156 [kg N/ha]
+
+                                  --------
+Balance (= In - Out - Increase) =   -0.000 [kg N/ha]
+                                  ========
+*** Soil NH4+ balance
+NH4+ balance for a soil interval.
+
+                         NH4-In =  189.201 [kg N/ha]
+                     NH4-Incorp =    0.000 [kg N/ha]
+                    NH4-Tillage =  398.908 [kg N/ha]
+             NH4-Mineralization =  760.346 [kg N/ha]
+                                  --------
+                    Total input = 1348.455 [kg N/ha]
+
+                NH4-Leak-Matrix =    0.037 [kg N/ha]
+                   NH4-Tertiary =    0.000 [kg N/ha]
+                      NH4-Drain =    0.027 [kg N/ha]
+                     NH4-Uptake =    0.026 [kg N/ha]
+              NH4-Nitrification = 1330.235 [kg N/ha]
+                                  --------
+                   Total output = 1330.323 [kg N/ha]
+
+           NH4-Content increase =   18.132 [kg N/ha]
+             NH4-Error increase =    0.000 [kg N/ha]
+                                  --------
+      Total increase in content =   18.132 [kg N/ha]
+
+                                  --------
+Balance (= In - Out - Increase) =    0.000 [kg N/ha]
+                                  ========
+*** Soil mineral-N balance
+Mineral N balance for a soil interval.
+
+                         NO3-In =  246.471 [kg N/ha]
+                         NH4-In =  189.201 [kg N/ha]
+                     NO3-Incorp =    0.000 [kg N/ha]
+                     NH4-Incorp =    0.000 [kg N/ha]
+                    NO3-Tillage =  295.247 [kg N/ha]
+                    NH4-Tillage =  398.908 [kg N/ha]
+             NH4-Mineralization =  760.346 [kg N/ha]
+                                  --------
+                    Total input = 1890.174 [kg N/ha]
+
+                NO3-Leak-Matrix =   82.848 [kg N/ha]
+                NH4-Leak-Matrix =    0.037 [kg N/ha]
+                   NO3-Tertiary =    0.000 [kg N/ha]
+                   NH4-Tertiary =    0.000 [kg N/ha]
+                      NO3-Drain =   87.344 [kg N/ha]
+                      NH4-Drain =    0.027 [kg N/ha]
+                     NO3-Uptake = 1633.165 [kg N/ha]
+                     NH4-Uptake =    0.026 [kg N/ha]
+                Denitrification =   65.932 [kg N/ha]
+              N2O-Nitrification =   26.605 [kg N/ha]
+             NO3-Immobilization =    4.215 [kg N/ha]
+                                  --------
+                   Total output = 1900.198 [kg N/ha]
+
+           NO3-Content increase =  -28.156 [kg N/ha]
+           NH4-Content increase =   18.132 [kg N/ha]
+             NO3-Error increase =    0.000 [kg N/ha]
+             NH4-Error increase =    0.000 [kg N/ha]
+                                  --------
+      Total increase in content =  -10.025 [kg N/ha]
+
+                                  --------
+Balance (= In - Out - Increase) =   -0.000 [kg N/ha]
+                                  ========
+*** Soil organic-N balance
+Organic nitrogen balance for a soil interval.
+
+                    Residuals-N =  134.583 [kg N/ha]
+                  Tillage-Org_N =   -0.000 [kg N/ha]
+             NO3-Immobilization =    4.215 [kg N/ha]
+               Bioincorporation =  221.384 [kg N/ha]
+                                  --------
+                    Total input =  360.182 [kg N/ha]
+
+             NH4-Mineralization =  760.346 [kg N/ha]
+                                  --------
+                   Total output =  760.346 [kg N/ha]
+
+                   AOM increase =    0.651 [kg N/ha]
+                   SOM increase = -391.250 [kg N/ha]
+                   SMB increase =   -9.565 [kg N/ha]
+                Buffer increase =    0.000 [kg N/ha]
+                                  --------
+      Total increase in content = -400.164 [kg N/ha]
+
+                                  --------
+Balance (= In - Out - Increase) =    0.000 [kg N/ha]
+                                  ========
+*** Soil N balance
+Nitrogen balance for a soil interval.
+
+                         NO3-In =  246.471 [kg N/ha]
+                         NH4-In =  189.201 [kg N/ha]
+                     NO3-Incorp =    0.000 [kg N/ha]
+                     NH4-Incorp =    0.000 [kg N/ha]
+                    NO3-Tillage =  295.247 [kg N/ha]
+                    NH4-Tillage =  398.908 [kg N/ha]
+                    Residuals-N =  134.583 [kg N/ha]
+                  Tillage-Org_N =   -0.000 [kg N/ha]
+               Bioincorporation =  221.384 [kg N/ha]
+                                  --------
+                    Total input = 1485.795 [kg N/ha]
+
+                NO3-Leak-Matrix =   82.848 [kg N/ha]
+                NH4-Leak-Matrix =    0.037 [kg N/ha]
+                   NO3-Tertiary =    0.000 [kg N/ha]
+                   NH4-Tertiary =    0.000 [kg N/ha]
+                      NO3-Drain =   87.344 [kg N/ha]
+                      NH4-Drain =    0.027 [kg N/ha]
+                     NO3-Uptake = 1633.165 [kg N/ha]
+                     NH4-Uptake =    0.026 [kg N/ha]
+                Denitrification =   65.932 [kg N/ha]
+              N2O-Nitrification =   26.605 [kg N/ha]
+                                  --------
+                   Total output = 1895.983 [kg N/ha]
+
+           NO3-Content increase =  -28.156 [kg N/ha]
+           NH4-Content increase =   18.132 [kg N/ha]
+                   AOM increase =    0.651 [kg N/ha]
+                   SOM increase = -391.250 [kg N/ha]
+                   SMB increase =   -9.565 [kg N/ha]
+                Buffer increase =    0.000 [kg N/ha]
+             NO3-Error increase =    0.000 [kg N/ha]
+             NH4-Error increase =    0.000 [kg N/ha]
+                                  --------
+      Total increase in content = -410.188 [kg N/ha]
+
+                                  --------
+Balance (= In - Out - Increase) =   -0.000 [kg N/ha]
+                                  ========
+Program finished after 55 minutes and 46 seconds.
