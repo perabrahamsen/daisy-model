@@ -23,6 +23,7 @@
 #define WEATHER_BASE_H
 
 #include "weather.h"
+#include "im.h"
 
 class WeatherBase : public Weather
 {
@@ -67,7 +68,7 @@ private:
   { return cloudiness_; }
   double daily_cloudiness () const // [0-1]
   { return daily_cloudiness_; }
-  IM deposit () const; // [g [stuff] /cm²/h]
+  const IM& deposit () const; // [g [stuff] /cm²/h]
 
   // Simulation.
 public:

@@ -24,12 +24,12 @@
 #define WEATHER_H
 
 #include "model_derived.h"
-#include "im.h"
 
 class Time;
 class Treelog;
 class BlockModel;
 class Units;
+class IM;
 
 class Weather : public ModelDerived
 {
@@ -53,6 +53,8 @@ public:
   virtual surface_t surface () const = 0;
 
   // Simulation.
+protected:
+  void output_common (Log& log) const;
 public:
   virtual void tick (const Time& time, Treelog&) = 0;
   virtual void tick_after (const Time& time, Treelog&) = 0;
@@ -71,7 +73,7 @@ public:
   virtual double daily_precipitation () const = 0; // [mm/d]
   virtual double rain () const = 0;	// [mm/h]
   virtual double snow () const = 0;	// [mm/h]
-  virtual IM deposit () const = 0; // [g [stuff] /cm²/h]
+  virtual const IM& deposit () const = 0; // [g [stuff] /cm²/h]
   virtual double cloudiness () const = 0; // [0-1]
   virtual double daily_cloudiness () const = 0; // [0-1]
   virtual double vapor_pressure () const = 0; // [Pa]
@@ -113,10 +115,9 @@ public:
   virtual double sin_solar_elevation_angle (const Time& time) const = 0; // []
 
   // Create and Destroy.
-private:
-  Weather (const Weather&);
 public:
-  virtual bool initialize (const Time& time, Treelog& err) = 0;
+  static void load_common (Frame& frame);
+  virtual bool initialize (const Time& time, Treelog& msg) = 0;
 protected:
   Weather (const BlockModel&);
 public:

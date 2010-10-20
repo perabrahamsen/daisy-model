@@ -408,17 +408,18 @@ proportional to the area density, $M_{\text{c}}$ of the classes.
 \subsection{Mesh}
 
 In Daisy2D, the domain, $\Omega$ is divided into $N$
-non-overlapping polygons, also denoted control volumes or cells. In
-Daisy2D it should be possible to choose between grids consisting of
-only rectangular cells or meshes consisting of trapezoids with two
-vertical faces. Figure \ref{fig:grid_rect} shows a grid only consisting
-of rectangular cells. The domain $\Omega$ in the figure is in divided
-into 3 subdomains, each consisting of a number of cells. Each
-subdomain is characterized by different hydraulic properties. The
-grid shown in figure \ref{fig:grid_trapz} consists of trapezoids
-(where most of them also are rectangles). Only in the proximity of
-the drainpipe (see figure \ref{fig:grid_trapz_part}), the cells are not
-rectangular.
+non-overlapping rectangles (Figure \ref{fig:grid_rect}).
+%%non-overlapping polygons, also denoted control volumes or cells. In
+%%Daisy2D it should be possible to choose between grids consisting of
+%%only rectangular cells or meshes consisting of trapezoids with two
+%%vertical faces. Figure \ref{fig:grid_rect} shows a grid only consisting
+%%of rectangular cells. The domain $\Omega$ in the figure is in divided
+%%into 3 subdomains, each consisting of a number of cells. Each
+%%subdomain is characterized by different hydraulic properties. The
+%%grid shown in figure \ref{fig:grid_trapz} consists of trapezoids
+%%(where most of them also are rectangles). Only in the proximity of
+%%the drainpipe (see figure \ref{fig:grid_trapz_part}), the cells are not
+%%rectangular.
 
 \begin{figure}[h]
 \includegraphics[width=\hsize]{grid_rect.eps}
@@ -426,36 +427,36 @@ rectangular.
 \label{fig:grid_rect}
 \end{figure}
 
-\begin{figure}[h]
-%produced with
-%C:\MATLAB2007b\work\Matlab2006b_work\Daisy2D_V5
-%geom=geometrydata
-\includegraphics[width=\hsize]{grid_trapz.eps}
-\caption{Example of grid consisting of trapezoids.}
-\label{fig:grid_trapz}
-\end{figure}
+%%\begin{figure}[h]
+%%%produced with
+%%%C:\MATLAB2007b\work\Matlab2006b_work\Daisy2D_V5
+%%%geom=geometrydata
+%%\includegraphics[width=\hsize]{grid_trapz.eps}
+%%\caption{Example of grid consisting of trapezoids.}
+%%\label{fig:grid_trapz}
+%%\end{figure}
+%%
+%%\begin{figure}[h]
+%%\includegraphics[width=\hsize]{grid_trapz_part.eps}
+%%\caption{Close picture of grid near the drain pipe.}
+%%\label{fig:grid_trapz_part}
+%%\end{figure}
 
-\begin{figure}[h]
-\includegraphics[width=\hsize]{grid_trapz_part.eps}
-\caption{Close picture of grid near the drain pipe.}
-\label{fig:grid_trapz_part}
-\end{figure}
 
-
-The quadrilateral (rectangular or trapezoid) cells are denoted $Q_i$
-where $i=1,2,\cdots, N$. $|Q_i|$ denotes the area of $Q_i$, and
-$\partial Q_i$ is the boundary of $Q_i$ i.e. the edges (or faces) of
-$Q_i$. All internal edges $e_{ij}$ are labeled by indices, $i$ and
-$j$ of the adjacent cells that shares face. The grid is constructed
-such that only whole faces are shared ($e_{ij}=Q_i \cap Q_j$). The
-length of $e_{ij}$ is $|e_{ij}|$ and the unit normal vector pointing
-from $Q_i $into $Q_j$ and orthogonal to $e_{ij}$ is denoted
-$\bar{\mathbf{n}}_{ij}$. $\sigma_i$ contains cell indices of cells
-sharing faces with cell $i$. $\sigma_i'$ contain indices of cell
-faces of cell $i$ which are placed on $\partial \Omega$, i.e. it is
-not shared with another cell.  $\sigma_i'$ is divided into two
-subsets, $\sigma_{i}'^{D}$ and $\sigma_{i}'^{N}$ of boundary cell
-faces with a Dirichlet and Neumann boundary condition, respectively.
+The cells are denoted $Q_i$ where $i=1,2,\cdots, N$. $|Q_i|$ denotes
+the area of $Q_i$, and $\partial Q_i$ is the boundary of $Q_i$
+i.e. the edges (or faces) of $Q_i$. All internal edges $e_{ij}$ are
+labeled by indices, $i$ and $j$ of the adjacent cells that shares
+face. The grid is constructed such that only whole faces are shared
+($e_{ij}=Q_i \cap Q_j$). The length of $e_{ij}$ is $|e_{ij}|$ and the
+unit normal vector pointing from $Q_i $into $Q_j$ and orthogonal to
+$e_{ij}$ is denoted $\bar{\mathbf{n}}_{ij}$. $\sigma_i$ contains cell
+indices of cells sharing faces with cell $i$. $\sigma_i'$ contain
+indices of cell faces of cell $i$ which are placed on $\partial
+\Omega$, i.e. it is not shared with another cell.  $\sigma_i'$ is
+divided into two subsets, $\sigma_{i}'^{D}$ and $\sigma_{i}'^{N}$ of
+boundary cell faces with a Dirichlet and Neumann boundary condition,
+respectively.
 
 
 
@@ -508,10 +509,11 @@ D_{ij}(\boldsymbol{\psi})=|e_{ij}|(\mathbf{K}(\boldsymbol{\psi})\cdot (\nabla \p
 \end{equation}
 %
 For evaluating equation (\ref{eq:diffusitive}) it is necessary to
-estimate the gradient $(\nabla \psi)_{ij}$. $(\nabla \psi)_{ij}$ is
-evaluated by a different method for meshes with rectangular cells
-than for the more general and complicated case with meshes
-consisting of trapezoid cells. The gravitational transport from cell $i$
+estimate the gradient $(\nabla \psi)_{ij}$. 
+%%$(\nabla \psi)_{ij}$ is evaluated by a different method for meshes
+%%with rectangular cells than for the more general and complicated case
+%%with meshes consisting of trapezoid cells.
+The gravitational transport from cell $i$
 to cell $j$ can be calculated as
 %
 \begin{equation}
@@ -693,39 +695,41 @@ G_{iE'}^D(\boldsymbol{\psi})= 0
 
 
 
-\subsection{Trapezoid cells - not finished yet!}
-
-
-\subsubsection{Linear reconstruction}
-
-
-\begin{equation}
-\hat{\psi}(\mathbf{x},t)=\psi_i(t)+\eta_i(\boldsymbol{\psi})\cdot(\mathbf{x}-\mathbf{x}_i), \ \ \mathbf{x} \in Q_i, \ t>0
-\end{equation}
-
-Divergence theorem:
-
-Triangles:
-\begin{equation}
-\overline{\nabla \psi} \approx \sum \psi_j \mathbf{n}_j A_j \approx
-\frac{1}{2|T_i|}\mathbf{R}\left[\psi_{\alpha}(\mathbf{x}_{\beta}-\mathbf{x}_{\gamma})
-+\psi_{\beta}(\mathbf{x}_{\gamma}-\mathbf{x}_{\alpha})
-+\psi_{\gamma}(\mathbf{x}_{\alpha}-\mathbf{x}_{\beta})\right]
-\end{equation}
-
-Quadrilaterals:
-\begin{equation}
-\overline{\nabla \psi} \approx \sum \psi_j \mathbf{n}_j A_j \approx
-\frac{1}{2|Q_i|}\mathbf{R}\left[(\psi_{\alpha}-\psi_{\gamma})(\mathbf{x}_{\beta}-\mathbf{x}_{\delta})
-+(\psi_{\beta}-\psi_{\delta})(\mathbf{x}_{\gamma}-\mathbf{x}_{\alpha})\right]
-\end{equation}
-
-where
-
-\begin{equation}
-\mathbf{R}=\begin{bmatrix} 0 & 1 \\ -1 & 0 \end{bmatrix}
-\end{equation}
-
+%% \subsection{Trapezoid cells - not finished yet!}
+%% 
+%% 
+%% \subsubsection{Linear reconstruction}
+%% 
+%% 
+%% \begin{equation}
+%% \hat{\psi}(\mathbf{x},t)=\psi_i(t)+\eta_i(\boldsymbol{\psi})\cdot(\mathbf{x}-\mathbf{x}_i), \ \ \mathbf{x} \in Q_i, \ t>0
+%% \end{equation}
+%% 
+%% Divergence theorem:
+%% 
+%% Triangles:
+%% \begin{equation}
+%% \overline{\nabla \psi} \approx \sum \psi_j \mathbf{n}_j A_j \approx
+%% \frac{1}{2|T_i|}\mathbf{R}\left[\psi_{\alpha}(\mathbf{x}_{\beta}-\mathbf{x}_{\gamma})
+%% +\psi_{\beta}(\mathbf{x}_{\gamma}-\mathbf{x}_{\alpha})
+%% +\psi_{\gamma}(\mathbf{x}_{\alpha}-\mathbf{x}_{\beta})\right]
+%% \end{equation}
+%% 
+%% Quadrilaterals:
+%% \begin{equation}
+%% \overline{\nabla \psi} \approx \sum \psi_j \mathbf{n}_j A_j \approx
+%% \frac{1}{2|Q_i|}\mathbf{R}\left[(\psi_{\alpha}-\psi_{\gamma})(\mathbf{x}_{\beta}-\mathbf{x}_{\delta})
+%% +(\psi_{\beta}-\psi_{\delta})(\mathbf{x}_{\gamma}-\mathbf{x}_{\alpha})\right]
+%% \end{equation}
+%% 
+%% where
+%% 
+%% \begin{equation}
+%% \mathbf{R}=\begin{bmatrix} 0 & 1 \\ -1 & 0 \end{bmatrix}
+%% \end{equation}
+%% 
+%% 
+%% 
 
 \subsection{Conductivity at cell faces}
 
@@ -1107,26 +1111,26 @@ The retention model by van Genuchten has been adapted to a large
 class of soils.
 
 
-\subsection{Ridge - not for first report!}
-
-For describing the geometry and producing the finite element mesh
-is the general FEM-code, \citet{FEMLAB} used. In the actual case
-the two-dimensional geometry described using a so called geometry
-m-file. Of geometrical reasons only the half of a ridge is
-described. The soil profile is divided into 7 strata or subdomains
-with different soil properties which are described elsewhere in
-the paper. The ridge with the different subdomains is plotted in
-figure XXX. The ridge height can be described with a sine
-function:
-%
-\begin{equation}
-f(x)=A \left[ 1+sin\left(-\frac{\pi}{2}+2\frac{\pi x}{W}\right)
-\right], \ \ \ 0 \leq x \leq W/2
-\end{equation}
-%
-where $W$ is the width of the ridge and $A$ is the amplitude of the
-sine wave which is the same as half of the ridge height. The curve
-only describes half a ridge that will be used for the modeling.
+%% \subsection{Ridge - not for first report!}
+%% 
+%% For describing the geometry and producing the finite element mesh
+%% is the general FEM-code, \citet{FEMLAB} used. In the actual case
+%% the two-dimensional geometry described using a so called geometry
+%% m-file. Of geometrical reasons only the half of a ridge is
+%% described. The soil profile is divided into 7 strata or subdomains
+%% with different soil properties which are described elsewhere in
+%% the paper. The ridge with the different subdomains is plotted in
+%% figure XXX. The ridge height can be described with a sine
+%% function:
+%% %
+%% \begin{equation}
+%% f(x)=A \left[ 1+sin\left(-\frac{\pi}{2}+2\frac{\pi x}{W}\right)
+%% \right], \ \ \ 0 \leq x \leq W/2
+%% \end{equation}
+%% %
+%% where $W$ is the width of the ridge and $A$ is the amplitude of the
+%% sine wave which is the same as half of the ridge height. The curve
+%% only describes half a ridge that will be used for the modeling.
 
 
 \section{Verification}
@@ -1462,8 +1466,7 @@ necessarily equal to the rate for moving solute from
 $C_{\text{2}}$ to $C_{\text{1}}$, $\alpha_{\text{2}
 \rightarrow \text{1}}$.
 %
-XXXX Soren er der noget fornuftigt at sige her ? XXXX
-
+%% XXXX Soren er der noget fornuftigt at sige her ? XXXX
 
 The mass balance\index{mass balance!solute movement} for the
 solute can be expressed as:

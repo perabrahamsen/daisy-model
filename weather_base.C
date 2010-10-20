@@ -29,7 +29,6 @@
 #include "librarian.h"
 #include "block_model.h"
 #include "units.h"
-#include "frame.h"
 
 // WeatherBase
 
@@ -106,34 +105,9 @@ WeatherBase::tick_after (const Time& time, Treelog&)
 
 void
 WeatherBase::output (Log& log) const
-{
-  output_value (air_temperature (), "air_temperature", log);
-  output_value (daily_air_temperature (), "daily_air_temperature", log);
-  output_value (daily_min_air_temperature (),
-                "daily_min_air_temperature", log);
-  output_value (daily_max_air_temperature (), 
-                "daily_max_air_temperature", log);
-  output_value (global_radiation (), "global_radiation", log);
-  output_value (daily_global_radiation (), "daily_global_radiation", log);
-  if (has_reference_evapotranspiration ())
-    output_value (reference_evapotranspiration (), 
-                  "reference_evapotranspiration", log);
-  output_value (rain (), "rain", log);
-  output_value (snow (), "snow", log);
-  output_value (rain () + snow (), "precipitation", log);
-  output_value (cloudiness (), "cloudiness", log);
-  output_value (daily_cloudiness (), "daily_cloudiness", log);
-  output_value (vapor_pressure (), "vapor_pressure", log);
-  output_value (air_pressure (), "air_pressure", log);
-  output_value (diffuse_radiation (), "diffuse_radiation", log);
-  output_value (relative_humidity (), "relative_humidity", log);
-  output_value (wind (), "wind", log);
-  output_value (day_length (), "day_length", log);
-  output_value (day_cycle (), "day_cycle", log);
-  output_submodule (deposit_, "deposit", log);
-}
+{ output_common (log); }
 
-IM
+const IM&
 WeatherBase::deposit () const // [g [stuff] /cm²/h]
 { return deposit_; }
 
@@ -351,51 +325,8 @@ static struct WeatherBaseSyntax : public DeclareBase
     : DeclareBase (Weather::component, "base", "\
 This is not a model, but a list of parameters shared by all weather models.")
   { }
-  static void load_flux (Frame& frame)
-  { IM::add_syntax (frame, Attribute::LogOnly, IM::flux_unit ()); }
   void load_frame (Frame& frame) const
-  {
-    // Overwritten in weather_none.C
-    frame.declare ("air_temperature", "dg C", Attribute::LogOnly,
-                "Temperature this hour.");
-    frame.declare ("global_radiation", "W/m^2", Attribute::LogOnly,
-                "Global radiation this hour.");
-
-    // Logs.
-    frame.declare ("daily_air_temperature", "dg C", Attribute::LogOnly,
-                "Average temperature this day.");
-    frame.declare ("daily_min_air_temperature", "dg C", Attribute::LogOnly,
-                "Minumum temperature this day.");
-    frame.declare ("daily_max_air_temperature", "dg C", Attribute::LogOnly,
-                "Maximum temperature this day.");
-    frame.declare ("daily_global_radiation", "W/m^2", Attribute::LogOnly,
-                "Average radiation this day.");
-    frame.declare ("diffuse_radiation", "W/m^2", Attribute::LogOnly,
-                "Diffuse radiation this hour.");
-    frame.declare ("reference_evapotranspiration", "mm/h", Attribute::LogOnly,
-                "Reference evapotranspiration this hour");
-    frame.declare ("daily_extraterrastial_radiation", "W/m^2", Attribute::LogOnly,
-                "Extraterrestrial radiation this day.");
-    frame.declare ("rain", "mm/h", Attribute::LogOnly, "Rain this hour.");
-    frame.declare ("snow", "mm/h", Attribute::LogOnly, "Snow this hour.");
-    frame.declare ("precipitation", "mm/h", Attribute::LogOnly, 
-                "Precipitation this hour.");
-    frame.declare_fraction ("cloudiness", Attribute::LogOnly,
-                "Fraction of sky covered by clouds [0-1].");
-    frame.declare_fraction ("daily_cloudiness", Attribute::LogOnly,
-                "Fraction of sky covered by clouds [0-1].");
-    frame.declare ("vapor_pressure", "Pa", Attribute::LogOnly, "Humidity.");
-    frame.declare ("air_pressure", "Pa", Attribute::LogOnly, "Air pressure.");
-    frame.declare ("relative_humidity", Attribute::Fraction (), Attribute::LogOnly,
-                "Relative humidity.");
-    frame.declare ("wind", "m/s", Attribute::LogOnly, "Wind speed.");
-    frame.declare ("day_length", "h", Attribute::LogOnly,
-                "Number of light hours this day.");
-    frame.declare ("day_cycle", Attribute::None (), Attribute::LogOnly,
-                "Fraction of daily radiation received this hour.");
-    frame.declare_submodule_sequence ("deposit", Attribute::LogOnly, "\
-Total atmospheric deposition of nitrogen.", load_flux);
-    }
+  { Weather::load_common (frame); }
 } WeatherBase_syntax;
 
 // weather_base.C ends here.
