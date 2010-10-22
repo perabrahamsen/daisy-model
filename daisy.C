@@ -74,6 +74,7 @@ struct Daisy::Implementation
   int duration;
   const boost::scoped_ptr<Action> action;
   const boost::scoped_ptr<Weather> weather;
+  bool initialized;
   bool running;
   const boost::scoped_ptr<Field> field;
   auto_vector<const Harvest*> harvest;
@@ -176,10 +177,15 @@ struct Daisy::Implementation
       Treelog::Open nest (msg, "manager");
       action->initialize (daisy, scope (), msg);
     }
+
+    initialized = true;
   }
 
   bool check (const Daisy& daisy, Treelog& msg)
   {
+    if (!initialized)
+      return false;
+
     bool ok = true;
 
     // Check weather.
@@ -264,6 +270,7 @@ struct Daisy::Implementation
       weather (al.check ("weather") 
                ? Librarian::build_item<Weather> (al, "weather")
                : NULL),
+      initialized (false),
       running (false),
       field (new Field (al, "column")),
       harvest (map_submodel_const<Harvest> (al, "harvest"))

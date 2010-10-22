@@ -27,13 +27,17 @@
 #include "block_model.h"
 #include "lexer_table.h"
 #include <boost/scoped_ptr.hpp>
+#include <sstream>
 
 struct WeatherExtra : public Weather
 {
   // Content.
   const boost::scoped_ptr<Weather> weather;
   LexerTable lex;
-
+  Time last_read;
+  bool no_more_data;
+  double warn_lookahead;
+  
   double latitude () const
   { return weather->latitude (); }
   double longitude () const 
@@ -48,15 +52,8 @@ struct WeatherExtra : public Weather
   { return weather->surface (); }
   
   // Simulation.
-  void tick (const Time& time, Treelog& msg)
-  { weather->tick (time, msg); }
-  void tick_after (const Time& time, Treelog& msg)
-  { weather->tick_after (time, msg); }
-  void output (Log& log) const
-  {
-    output_common (log);
-    output_derived (weather, "weather", log);
-  }
+  void tick (const Time& time, Treelog& msg);
+  void output (Log& log) const;
 
   // Communication with Bioclimate.
   double air_temperature () const
@@ -143,16 +140,77 @@ struct WeatherExtra : public Weather
   { return weather->sin_solar_elevation_angle (time); }
   
   // Create and Destroy.
-  bool initialize (const Time& time, Treelog& msg) 
-  { return weather->initialize (time, msg); }
-  WeatherExtra (const BlockModel& al)
-    : Weather (al),
-      weather (Librarian::build_item<Weather> (al, "weather")),
-      lex (al)
-  { }
+  bool initialize (const Time& time, Treelog& msg);
+  WeatherExtra (const BlockModel& al);
   bool check (const Time& from, const Time& to, Treelog& msg) const
   { return weather->check (from, to, msg); }
 };
+
+void 
+WeatherExtra::tick (const Time& time, Treelog& msg)
+{ 
+  weather->tick (time, msg); 
+
+  if (no_more_data)
+    return;
+
+  if (time <= last_read)
+    return;
+  
+  // Read entries.
+  std::vector<std::string> entries;
+  if (!lex.get_entries (entries)
+      || !lex.get_time (entries, last_read, 11))
+    {
+      lex.warning ("Switching back to default weather.");
+      no_more_data = true;
+      return;
+    };
+  
+  const double days_ahead= Time::days_between (time, last_read);
+  if (days_ahead > warn_lookahead)
+    {
+      warn_lookahead = days_ahead;
+      std::ostringstream tmp;
+      tmp << "Using data from " << days_ahead << " days ahead";
+      lex.warning (tmp.str ());
+    }
+}
+
+
+void 
+WeatherExtra::output (Log& log) const
+{
+  output_common (log);
+  output_derived (weather, "weather", log);
+}
+
+bool 
+WeatherExtra::initialize (const Time& time, Treelog& msg) 
+{ 
+  TREELOG_MODEL (msg);
+  
+  bool ok = true;
+
+  if (!weather->initialize (time, msg))
+    ok = false;
+
+  if (!lex.read_header (msg))
+    ok = false;
+
+  
+
+  return ok;
+}
+
+WeatherExtra::WeatherExtra (const BlockModel& al)
+  : Weather (al),
+    weather (Librarian::build_item<Weather> (al, "weather")),
+    lex (al),
+    last_read (1, 1, 1, 0),
+    no_more_data (false),
+    warn_lookahead (1.0)
+{ }
 
 static struct WeatherExtraSyntax : public DeclareModel
 {
@@ -160,7 +218,10 @@ static struct WeatherExtraSyntax : public DeclareModel
   { return new WeatherExtra (al); }
   WeatherExtraSyntax ()
     : DeclareModel (Weather::component, "extra",
-                    "Add extra information from data file.")
+                    "Add extra weather data from a file.\n\
+This will overwrite the current values specified in a normal weather file.\n\
+Note that daily averages will still be taken from normal weather file, so\n\
+subsystems depending of those will act strangely.")
   { }
   void load_frame (Frame& frame) const
   { 

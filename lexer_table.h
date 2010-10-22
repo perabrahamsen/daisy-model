@@ -62,6 +62,9 @@ private:
   int mday_c;
   int hour_c;
   int time_c;
+  int minute_c;
+  int second_c;
+  int microsecond_c;
   const std::vector<symbol> original;
   const bool dim_line;
 protected:

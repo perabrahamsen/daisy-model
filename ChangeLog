@@ -1,7 +1,12 @@
+2010-10-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* weather_util.C, weather_util.h: New utility.
+	* Makefile (OTHER): Add it.
+
 2010-10-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* weather_extra.C: New model.
-	weather.h, weather.C, weather_base.h, weather_base.C: Restructuring.
+	* weather.h, weather.C, weather_base.h, weather_base.C: Restructuring.
 
 2010-10-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 

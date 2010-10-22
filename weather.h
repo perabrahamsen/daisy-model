@@ -57,7 +57,6 @@ protected:
   void output_common (Log& log) const;
 public:
   virtual void tick (const Time& time, Treelog&) = 0;
-  virtual void tick_after (const Time& time, Treelog&) = 0;
   virtual void output (Log&) const = 0;
 
   // Communication with Bioclimate.

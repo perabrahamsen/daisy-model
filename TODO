@@ -4,9 +4,20 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** Weather extra
 
-** Weather data
+Change warn_lookahead to max_lookahead.  Use default weather when too
+far in the future.
+
+Handle missing values.
+
+Tell when changing data source
+
+** Weathersource
+
+New model.  Read "raw" data from ddf file.
 
 ** Weather mix
+
+Combine weather sources, and interpolate/aggregate data.
 
 * Hent gammel PC.
 

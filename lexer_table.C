@@ -31,6 +31,7 @@
 #include "path.h"
 #include <sstream>
 #include <cstring>
+#include <iomanip>
 
 class LexerTable::Filter
 {
@@ -147,6 +148,9 @@ LexerTable::read_header (Treelog& msg)
   month_c = find_tag ("month", "Month");
   mday_c = find_tag ("mday", "Day");
   hour_c = find_tag ("hour", "Hour");
+  minute_c = find_tag ("minute", "Minute");
+  second_c = find_tag ("second", "Second");
+  microsecond_c = find_tag ("microsecond", "Microsecond");
   time_c = find_tag ("time", "Date");
 
   // Filter tags.
@@ -353,6 +357,34 @@ LexerTable::get_time (const std::string& entry, Time& time, int default_hour)
       if (sep3 != 'T')
         return false;
     }        
+  int minute = 0;
+  if (in.good () && !in.eof ())
+    {
+      char sep4;
+      in >> sep4 >> minute;
+      if (sep4 != ':')
+        return false;
+    }        
+
+  int second = 0;
+  if (in.good () && !in.eof ())
+    {
+      char sep5;
+      in >> sep5 >> second;
+      if (sep5 != ':')
+        return false;
+    }        
+
+  int microsecond = 0;
+  if (in.good () && !in.eof ())
+    {
+      double val6;
+      in >> val6;
+      microsecond = double2int (val6 * 1000000.0);
+    }        
+
+  if (!in.eof ())
+    return false;
 
   int mday;
   int month;
@@ -390,23 +422,27 @@ LexerTable::get_time (const std::vector<std::string>& entries,
       int month = get_date_component (entries, month_c, 1);
       int mday = get_date_component (entries, mday_c, 1);
       int hour = get_date_component (entries, hour_c, default_hour);
+      int minute = get_date_component (entries, minute_c, 0);
+      int second = get_date_component (entries, second_c, 0);
+      int microsecond = get_date_component (entries, microsecond_c, 0);
 
-      if (!Time::valid (year, month, mday, hour))
+      if (!Time::valid (year, month, mday, hour, minute, second, microsecond))
         {
           std::ostringstream tmp;
           tmp << year << "-" << month << "-" << mday << "T" << hour 
+              << ":" << minute << ":" << second 
+              << ":" << std::setw (6) << std::setfill ('0') << microsecond
               << ": invalid date";
           warning (tmp.str ());
           return false;
         }
       else
-        time = Time (year, month, mday, hour);
+        time = Time (year, month, mday, hour, minute, second, microsecond);
 
       if (time.year () == 9999)
         {
           std::ostringstream tmp;
-          tmp << time.year () << "-" << time.month () << "-" << time.mday () 
-              << "T" << time.hour () << ": invalid date";
+          tmp << time.print () << ": invalid date";
           warning (tmp.str ());
           return false;
         }
@@ -499,6 +535,9 @@ LexerTable::LexerTable (const BlockModel& al)
     mday_c (-42),
     hour_c (-42),
     time_c (-42),
+    minute_c (-42),
+    second_c (-42),
+    microsecond_c (-42),
     original (al.check ("original")
 	      ? al.name_sequence ("original")
 	      : std::vector<symbol> ()),
