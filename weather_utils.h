@@ -24,7 +24,7 @@
 
 #include "symbol.h"
 
-namespace Weatherdata
+namespace WeatherUtil
 {
   // Known symbols.
   symbol GlobRad ();

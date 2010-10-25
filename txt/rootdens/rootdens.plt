@@ -1,4 +1,3 @@
-cd "c:/cygwin/home/abraham/daisy/txt"
 set terminal epslatex
 set output "rootdens_W.eps"
 plot [-5:1] x*exp(x) title ""

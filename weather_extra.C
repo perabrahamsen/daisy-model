@@ -26,18 +26,26 @@
 #include "frame.h"
 #include "block_model.h"
 #include "lexer_table.h"
+#include "units.h"
 #include <boost/scoped_ptr.hpp>
 #include <sstream>
 
 struct WeatherExtra : public Weather
 {
   // Content.
+  const Units& units;
   const boost::scoped_ptr<Weather> weather;
   LexerTable lex;
   Time last_read;
   bool no_more_data;
-  double warn_lookahead;
-  
+  const double max_lookahead;
+  bool using_default_weather;
+
+  int rain_c;
+  int snow_c;
+  double rain_value;
+  double snow_value;
+
   double latitude () const
   { return weather->latitude (); }
   double longitude () const 
@@ -75,9 +83,19 @@ struct WeatherExtra : public Weather
   double daily_precipitation () const
   { return weather->daily_precipitation (); }
   double rain () const
-  { return weather->rain (); }
+  { 
+    if (rain_value < 0)
+      return weather->rain (); 
+
+    return rain_value;
+  }
   double snow () const
-  { return weather->snow (); }
+  { 
+    if (snow_value < 0.0)
+      return weather->snow (); 
+
+    return snow_value;
+  }
   const IM& deposit () const
   { return weather->deposit (); }
   double cloudiness () const
@@ -141,9 +159,8 @@ struct WeatherExtra : public Weather
   
   // Create and Destroy.
   bool initialize (const Time& time, Treelog& msg);
+  bool check (const Time& from, const Time& to, Treelog& msg) const;
   WeatherExtra (const BlockModel& al);
-  bool check (const Time& from, const Time& to, Treelog& msg) const
-  { return weather->check (from, to, msg); }
 };
 
 void 
@@ -164,17 +181,44 @@ WeatherExtra::tick (const Time& time, Treelog& msg)
     {
       lex.warning ("Switching back to default weather.");
       no_more_data = true;
+      using_default_weather = true;
+      snow_value = rain_value = -42.42e42;
       return;
     };
   
   const double days_ahead= Time::days_between (time, last_read);
-  if (days_ahead > warn_lookahead)
+  if (days_ahead > max_lookahead)
     {
-      warn_lookahead = days_ahead;
-      std::ostringstream tmp;
-      tmp << "Using data from " << days_ahead << " days ahead";
-      lex.warning (tmp.str ());
+      if (!using_default_weather)
+        {
+          using_default_weather = true;
+          snow_value = rain_value = -42.42e42;
+          std::ostringstream tmp;
+          tmp << "Next extra weather data are " << days_ahead << " days ahead."
+              << "  Using default weather";
+          msg.message (tmp.str ());
+        }
+      return;
     }
+
+  if (using_default_weather)
+    {
+      using_default_weather = false;
+      msg.message ("Extra weather data available");
+    }
+  
+  if (rain_c < 0)
+    rain_value = 0.0;
+  else
+    rain_value = units.convert (lex.dimension (rain_c),
+                                Units::mm_per_h (),
+                                lex.convert_to_double (entries[rain_c]));
+  if (snow_c < 0)
+    snow_value = 0.0;
+  else
+    snow_value = units.convert (lex.dimension (snow_c),
+                                Units::mm_per_h (),
+                                lex.convert_to_double (entries[snow_c]));
 }
 
 
@@ -198,18 +242,43 @@ WeatherExtra::initialize (const Time& time, Treelog& msg)
   if (!lex.read_header (msg))
     ok = false;
 
+  rain_c = lex.find_tag ("Rain");
+  snow_c = lex.find_tag ("Snow");
+
+  return ok;
+}
+
+bool 
+WeatherExtra::check (const Time& from, const Time& to, Treelog& msg) const
+{ 
+  TREELOG_MODEL (msg);
+
+  bool ok =  weather->check (from, to, msg); 
   
+  if (rain_c < 0)
+    {
+      if (snow_c < 0)
+        msg.warning ("No weather data found");
+      else
+        msg.warning ("No rain, only snow");
+    }
 
   return ok;
 }
 
 WeatherExtra::WeatherExtra (const BlockModel& al)
   : Weather (al),
+    units (al.units ()),
     weather (Librarian::build_item<Weather> (al, "weather")),
     lex (al),
     last_read (1, 1, 1, 0),
     no_more_data (false),
-    warn_lookahead (1.0)
+    max_lookahead (al.number ("max_lookahead")),
+    using_default_weather (false),
+    rain_c (-42),
+    snow_c (-42),
+    rain_value (-42.42e42),
+    snow_value (-42.42e42)
 { }
 
 static struct WeatherExtraSyntax : public DeclareModel
@@ -221,7 +290,12 @@ static struct WeatherExtraSyntax : public DeclareModel
                     "Add extra weather data from a file.\n\
 This will overwrite the current values specified in a normal weather file.\n\
 Note that daily averages will still be taken from normal weather file, so\n\
-subsystems depending of those will act strangely.")
+subsystems depending of those will act strangely.\n\
+\n\
+The following columns are recognized:\n\
+\n\
+Rain, Snow:  If exactly one of these are specified, the other is assumed\n\
+to be zero.  Using either may conflict with the markvand action model.")
   { }
   void load_frame (Frame& frame) const
   { 
@@ -231,7 +305,9 @@ subsystems depending of those will act strangely.")
     frame.declare_object ("weather", Weather::component,
                           Attribute::State, Attribute::Singleton, "\
 Get weather data from this file when not specified otherwise.");
-    
+    frame.declare ("max_lookahead", "d", Attribute::Const, "\
+Use extra weather data if the next entry is less than this period ahead.");
+    frame.set ("max_lookahead", 1.1);
   }
 } WeatherExtra_syntax;
 

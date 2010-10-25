@@ -82,9 +82,7 @@ public:
   { return find_tag (symbol (tag)); }
   int find_tag (const symbol tag) const;
 private:
-  int find_tag (const char *const tag1, const char *const tag2) const
-  { return find_tag (symbol (tag1), symbol (tag2)); }
-  int find_tag (const symbol tag1, const symbol tag2) const;
+  int find_tag (const symbol tag1, const symbol tag2, Treelog& msg) const;
 private:
   std::string get_entry () const;
   void get_entries_raw (std::vector<std::string>& entries) const;

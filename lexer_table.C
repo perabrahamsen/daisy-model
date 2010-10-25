@@ -144,14 +144,14 @@ LexerTable::read_header (Treelog& msg)
     }
 
   // Time tags.
-  year_c = find_tag ("year", "Year");
-  month_c = find_tag ("month", "Month");
-  mday_c = find_tag ("mday", "Day");
-  hour_c = find_tag ("hour", "Hour");
-  minute_c = find_tag ("minute", "Minute");
-  second_c = find_tag ("second", "Second");
-  microsecond_c = find_tag ("microsecond", "Microsecond");
-  time_c = find_tag ("time", "Date");
+  year_c = find_tag ("year", "Year", msg);
+  month_c = find_tag ("month", "Month", msg);
+  mday_c = find_tag ("mday", "Day", msg);
+  hour_c = find_tag ("hour", "Hour", msg);
+  minute_c = find_tag ("minute", "Minute", msg);
+  second_c = find_tag ("second", "Second", msg);
+  microsecond_c = find_tag ("microsecond", "Microsecond", msg);
+  time_c = find_tag ("time", "Date", msg);
 
   // Filter tags.
   for (size_t i = 0; i < filter.size (); i++)
@@ -217,10 +217,15 @@ LexerTable::find_tag (const symbol tag) const
 }
 
 int
-LexerTable::find_tag (const symbol tag1, const symbol tag2) const
+LexerTable::find_tag (const symbol tag1, const symbol tag2, Treelog& msg) const
 {
-  int result = find_tag (tag1);
-  return result < 0 ? find_tag (tag2) : result;
+  int tag1_c = find_tag (tag1);
+  int tag2_c = find_tag (tag2);
+  if (tag1_c < 0)
+    return tag2_c;
+  if (tag2_c >= 0)
+    msg.warning ("'" + tag1 + "' overwrites '" + tag2 + "'");
+  return tag1_c;
 }
 
 symbol

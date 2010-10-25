@@ -26,7 +26,7 @@
 #include "mathlib.h"
 #include <map>
 
-namespace Weatherdata
+namespace WeatherUtil
 {
   symbol GlobRad ()
   { static const symbol name ("GlobRad"); return name; }
@@ -83,16 +83,16 @@ namespace Weatherdata
   {
     data_description_map ()
     {
-      (*this)["GlobRad"] = DDT ("", "W/m^2", 0, 1400);
-      (*this)["AirTemp"] = DDT ("", "dgC", -70, 60);
-      (*this)["T_min"] = DDT ("", "dgC", -70, 60);
-      (*this)["T_max"] = DDT ("", "dgC", -70, 60);
-      (*this)["Precip"] = DDT ("", "mm/h", 0, 300);
-      (*this)["RefEvap"] = DDT ("", "mm/h", -10, 20);
-      (*this)["VapPres"] = DDT ("", "Pa", 0, 5000);
-      (*this)["DiffRad"] = DDT ("", "W/m^2", 0, 1400);
-      (*this)["RelHum"] = DDT ("", "fraction", 0, 5000);
-      (*this)["Wind"] = DDT ("", "m/s", 0, 40);
+      (*this)["GlobRad"] = DDT ("Global radiation", "W/m^2", 0, 1400);
+      (*this)["AirTemp"] = DDT ("Air temperature", "dgC", -70, 60);
+      (*this)["T_min"] = DDT ("Minimum air temperature", "dgC", -70, 60);
+      (*this)["T_max"] = DDT ("Maximum air temperature", "dgC", -70, 60);
+      (*this)["Precip"] = DDT ("Precipitation", "mm/h", 0, 300);
+      (*this)["RefEvap"] = DDT ("Reference evapotranspiration", "mm/h", -10, 20);
+      (*this)["VapPres"] = DDT ("Vapor pressure", "Pa", 0, 5000);
+      (*this)["DiffRad"] = DDT ("Diffuse radiation", "W/m^2", 0, 1400);
+      (*this)["RelHum"] = DDT ("Relative humidity", "fraction", 0, 5000);
+      (*this)["Wind"] = DDT ("Wind speed", "m/s", 0, 40);
     };
   } DD;
  
