@@ -42,8 +42,11 @@ private:
 public:
   Treelog& err;
   const symbol file;
+private:
   int error_count;
-
+public:
+  int get_error_count () const;
+  void add_errors (int);
   Filepos position ();
   void seek (const Filepos&);
 

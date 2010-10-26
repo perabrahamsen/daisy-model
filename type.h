@@ -50,6 +50,7 @@ public:
   int size () const;
   symbol description () const;
   virtual const std::vector<symbol>& cite () const;
+  virtual bool is_text () const;
   virtual symbol dimension () const;
   virtual bool verify (double value, Treelog&) const;
   virtual Frame::load_syntax_t  load_syntax () const;
@@ -123,6 +124,13 @@ class TypeString : public Type
   Attribute::type type () const;
 public:
   TypeString (const Attribute::category c, const int s, const symbol desc);
+};
+
+class TypeText : public TypeString
+{
+  bool is_text () const;
+public:
+  TypeText (const Attribute::category c, const int s, const symbol desc);
 };
 
 class TypeInteger : public Type

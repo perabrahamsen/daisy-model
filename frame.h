@@ -100,6 +100,7 @@ class EXPORT Frame : public WScope
   Attribute::type lookup (symbol) const;
   symbol component (symbol) const;
   int type_size (symbol) const;
+  bool is_text (symbol) const;
   symbol dimension (symbol) const;
   symbol domain (symbol) const;
   symbol range (symbol) const;
@@ -136,6 +137,15 @@ class EXPORT Frame : public WScope
                        Attribute::category cat,
                        symbol description)
   { declare_string (key, cat, Attribute::Singleton, description); }
+
+  void declare_text (symbol key, // Text area (specialized string).
+                     Attribute::category cat,
+                     int size,
+                     symbol description);
+  void declare_text (symbol key,
+                     Attribute::category cat,
+                     symbol description)
+  { declare_text (key, cat, Attribute::Singleton, description); }
 
   void declare (symbol key, // Number.
                 symbol dim,

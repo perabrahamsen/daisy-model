@@ -66,6 +66,10 @@ Type::cite () const
   return empty;
 }
 
+bool
+Type::is_text () const
+{ return false; }
+
 symbol 
 Type::dimension () const
 { daisy_notreached (); }
@@ -186,9 +190,19 @@ Attribute::type
 TypeString::type () const
 { return Attribute::String; }
 
-TypeString::TypeString (const Attribute::category c, const int s, const symbol desc)
+TypeString::TypeString (const Attribute::category c, 
+                        const int s, const symbol desc)
   : Type (c, s, desc)
 { }
+
+TypeText::TypeText (const Attribute::category c, const int s, const symbol desc)
+  : TypeString (c, s, desc)
+{ }
+
+bool
+TypeText::is_text () const
+{ return true; }
+
 
 Attribute::type 
 TypeInteger::type () const

@@ -27,7 +27,7 @@
 void 
 ScopeTable::entries (std::set<symbol>& all) const
 {
-  const std::vector<symbol>& tags = lex.get_tag_names ();
+  const std::vector<symbol>& tags = lex.tag_names ();
   for (size_t i = 0; i < tags.size (); i++)
     all.insert (tags[i]);
 }

@@ -24,6 +24,7 @@
 #define WEATHER_H
 
 #include "model_derived.h"
+#include "weatherdata.h"
 
 class Time;
 class Treelog;
@@ -44,13 +45,12 @@ public:
 
   // Location.
 public:
-  enum surface_t { reference, field };
   virtual double latitude () const = 0;
   virtual double longitude () const = 0; 
   virtual double elevation () const = 0; // [m]
   virtual double timezone () const = 0;
   virtual double screen_height () const = 0; // [m]
-  virtual surface_t surface () const = 0;
+  virtual Weatherdata::surface_t surface () const = 0;
 
   // Simulation.
 protected:

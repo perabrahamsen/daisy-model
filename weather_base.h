@@ -37,14 +37,14 @@ protected:
   /* const */ double longitude_;
   /* const */ double elevation_;
   /* const */ double timezone_;
-  /* const */ surface_t surface_;
+  /* const */ Weatherdata::surface_t surface_;
   /* const */ double screen_height_;
   double latitude () const;
   double longitude () const; 
   double elevation () const; // [m]
   double timezone () const;
   double screen_height () const; // [m]
-  surface_t surface () const;
+  Weatherdata::surface_t surface () const;
   
   // Deposit.
 protected:

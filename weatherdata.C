@@ -1,4 +1,4 @@
-// weather_utils.C -- Weather related utilities.
+// weatherdata.C -- Weather related utilities.
 // 
 // Copyright 2010 KU
 //
@@ -20,13 +20,15 @@
 
 #define BUILD_DLL
 
-#include "weather_utils.h"
+#include "weatherdata.h"
 #include "attribute.h"
 #include "assertion.h"
 #include "mathlib.h"
+#include "librarian.h"
+#include "frame.h"
 #include <map>
 
-namespace WeatherUtil
+namespace Weatherdata
 {
   symbol GlobRad ()
   { static const symbol name ("GlobRad"); return name; }
@@ -96,7 +98,7 @@ namespace WeatherUtil
     };
   } DD;
  
-  symbol unit (const symbol name)
+  symbol dimension (const symbol name)
   {
     const data_description_map::const_iterator i = DD.find (name);
     if (i == DD.end ())
@@ -125,6 +127,22 @@ namespace WeatherUtil
     daisy_assert (i != DD.end ());
     return (*i).second.max_value;
   }
+
+  void load_syntax (Frame& frame)
+  {
+    for (data_description_map::const_iterator i = DD.begin ();
+         i != DD.end ();
+         i++)
+      {
+        const symbol key = (*i).first;
+        frame.declare (key, dimension (key), Attribute::OptionalConst,
+                       description (key));
+      }
+  }
 }
 
-// weather_utils.C ends here.
+static DeclareSubmodel weatherdata_submodel (Weatherdata::load_syntax,
+                                             "Weatherdata", "\
+Weather data.");
+
+// weatherdata.C ends here.

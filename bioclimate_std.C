@@ -380,7 +380,7 @@ BioclimateStandard::initialize (const Block& block, const Weather& weather)
       else if (weather.has_vapor_pressure () 
                && weather.has_wind ())
         {
-          if (weather.surface () == Weather::field)
+          if (weather.surface () == Weatherdata::field)
             type = symbol ("PM");
           else
             type = symbol ("FAO_PM");    
@@ -1114,7 +1114,7 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   const double h = Height[0]/100.0; // [m]
   const double h0 = 0.12; // reference height [m]
 
-  if (weather.surface () == Weather::field || h < h0)
+  if (weather.surface () == Weatherdata::field || h < h0)
     wind_speed_field_ = wind_speed_weather;
   else
     {

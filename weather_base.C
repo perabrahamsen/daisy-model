@@ -52,7 +52,7 @@ double
 WeatherBase::screen_height () const
 { return screen_height_; }
 
-Weather::surface_t 
+Weatherdata::surface_t 
 WeatherBase::surface () const
 { return surface_; }
 
@@ -305,7 +305,7 @@ WeatherBase::WeatherBase (const BlockModel& al)
     longitude_ (-42.42e42),
     elevation_ (-42.42e42),
     timezone_ (-42.42e42),
-    surface_ (reference),
+    surface_ (Weatherdata::reference),
     screen_height_ (2.0),
     DryDeposit (units.get_unit (dry_deposit_unit ())),
     WetDeposit (units.get_unit (Units::ppm ())),

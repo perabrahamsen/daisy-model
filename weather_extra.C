@@ -56,7 +56,7 @@ struct WeatherExtra : public Weather
   { return weather->timezone (); }
   double screen_height () const
   { return weather->screen_height (); }
-  surface_t surface () const
+  Weatherdata::surface_t surface () const
   { return weather->surface (); }
   
   // Simulation.

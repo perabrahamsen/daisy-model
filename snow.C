@@ -365,6 +365,7 @@ Snow::load_syntax (Frame& frame)
 
   static const double hours_per_day = 24.0; // [h/d]
 
+  // frame.set_strings ("cite", "snow1956"); // Not implemented for submodels.
   frame.declare ("EvapSnowPack", "mm/h", Attribute::LogOnly, 
 	      "Evaporation from snowpack.");
   frame.declare ("q_s", "mm/h", Attribute::LogOnly,

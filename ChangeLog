@@ -1,6 +1,10 @@
+2010-10-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lexer_table.C, lexer_table.h: Use pimpl idiom.
+
 2010-10-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* weather_util.C, weather_util.h: New utility.
+	* weatherdata.C, weatherdata.h: New utility.
 	* Makefile (OTHER): Add it.
 
 2010-10-20  Per Abrahamsen  <per.abrahamsen@gmail.com>

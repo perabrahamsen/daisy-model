@@ -985,11 +985,11 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	  lex->skip_space ();
 	  const std::string type = lex->get_word ();
 	  if (type == "reference")
-	    surface_ = reference;
+	    surface_ = Weatherdata::reference;
 	  else if (type == "field")
-	    surface_ = field;
+	    surface_ = Weatherdata::field;
 	  else
-	    lex->error ("Uknown surface type");
+	    lex->error ("Unkown surface type");
 	}
       else if (key == "PrecipCorrect")
 	{
@@ -1394,10 +1394,10 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
       err.error ("file error for '" + lex->file +"'");
       return false;
     }
-  if (lex->error_count > 0)
+  if (lex->get_error_count () > 0)
     {
       std::ostringstream tmp;
-      tmp << lex->error_count << " parser errors encountered";
+      tmp << lex->get_error_count () << " parser errors encountered";
       err.error (tmp.str ());
       return false;
     }

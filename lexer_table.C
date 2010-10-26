@@ -28,18 +28,77 @@
 #include "submodeler.h"
 #include "time.h"
 #include "vcheck.h"
+#include "units.h"
 #include "path.h"
+#include "memutils.h"
 #include <sstream>
 #include <cstring>
 #include <iomanip>
+#include <map>
+#include <boost/algorithm/string/trim.hpp>
 
-class LexerTable::Filter
+struct LexerTable::Implementation : private boost::noncopyable
 {
-public:
+  // Content.
+  const Units& units;
+  const Path& path;
+  const symbol filename;  
+  std::auto_ptr<std::istream> owned_stream;
+  boost::scoped_ptr<LexerData> lex;
+  std::string field_sep;
+  std::string type_;
+  const std::vector<std::string> missing;
+  std::vector<symbol> tag_names;
+  std::map<symbol,int> tag_pos;
+  std::vector<size_t> fil_col;
+  struct Filter;
+  auto_vector<const Filter*> filter;
+  int year_c;
+  int month_c;
+  int mday_c;
+  int hour_c;
+  int time_c;
+  int minute_c;
+  int second_c;
+  int microsecond_c;
+  const std::vector<symbol> original;
+  const bool dim_line;
+  std::vector<symbol> dim_names;
+
+  int find_tag (const symbol tag1, const symbol tag2) const;
+  std::string get_entry () const;
+  void get_entries_raw (std::vector<std::string>& entries) const;
+  int get_date_component (const std::vector<std::string>& entries, 
+                          int column, int default_value) const;
+  bool good ();
+  bool read_type (Treelog& msg);
+  void read_keywords (Frame& keywords);
+  void read_tags ();
+  bool read_header (Treelog& msg);
+  bool read_header_with_keywords (Frame& keywords, Treelog& msg);
+  int find_tag (const symbol tag) const;
+  bool get_entries (std::vector<std::string>& entries) const;
+  static bool get_time (const std::string& entry, Time& time, 
+                        int default_hour); 
+  bool get_time (const std::vector<std::string>& entries, Time& time, 
+                 int default_hour) const;
+  bool is_missing (const std::string& value) const;
+  double convert_to_double (const std::string& value) const;
+
+  // Messages.
+  void warning (const std::string& str) const;
+  void error (const std::string& str) const;
+
+  // Create and destroy.
+  static std::vector<std::string> s2s_v (const std::vector<symbol>& syms);
+  Implementation (const BlockModel& al);
+};
+  
+struct LexerTable::Implementation::Filter
+{
   const symbol tag;
-private:
   const std::vector<symbol> allowed;
-public:
+
   bool match (const std::string& value) const
   {
     for (size_t i = 0; i < allowed.size (); i++)
@@ -63,7 +122,7 @@ public:
 };
 
 void 
-LexerTable::Filter::load_syntax (Frame& frame)
+LexerTable::Implementation::Filter::load_syntax (Frame& frame)
 {
   frame.declare_string ("tag", Attribute::Const, "\
 Name of column in Daisy log file to filter for.");
@@ -73,13 +132,138 @@ List of allowable values in filter.");
   frame.order ("tag", "allowed");
 }
 
-LexerTable::Filter::Filter (const Block& al)
+LexerTable::Implementation::Filter::Filter (const Block& al)
   : tag (al.name ("tag")),
     allowed (al.name_sequence ("allowed"))
 { }
 
+int
+LexerTable::Implementation::find_tag (const symbol tag1,
+                                      const symbol tag2) const
+{
+  int tag1_c = find_tag (tag1);
+  int tag2_c = find_tag (tag2);
+  if (tag1_c < 0)
+    return tag2_c;
+  if (tag2_c >= 0)
+    lex->warning ("'" + tag1 + "' overwrites '" + tag2 + "'");
+  return tag1_c;
+}
+
+std::string
+LexerTable::Implementation::get_entry () const
+{
+  std::string tmp_term;  // Data storage.
+  const char* field_term;
+
+  switch (field_sep.size ())
+    { 
+    case 0:
+      // Whitespace
+      field_term = " \t\n";
+      break;
+    case 1:
+      // Single character field seperator.
+      tmp_term = field_sep + "\n";
+      field_term = tmp_term.c_str ();
+      break;
+    default:
+      // Multi-character field seperator.
+      daisy_notreached ();
+    }
+
+  // Find it.
+  std::string entry = "";
+  while (lex->good ())
+    {
+      int c = lex->peek ();
+      if (std::strchr (field_term, c))
+	break;
+      entry += int2char (lex->get ());
+    }
+  return entry;
+}
+
+void
+LexerTable::Implementation::get_entries_raw (std::vector<std::string>& 
+                                             /**/ entries) const
+{
+  entries.clear ();
+  lex->skip ("\n");
+  while (lex->good () && lex->peek () == '#')
+    {
+      lex->skip_line ();
+      lex->skip ("\n");
+    }
+  while (lex->good ())
+    {
+      entries.push_back (get_entry ());
+
+      if (lex->peek () == '\n')
+        break;
+
+      if (field_sep == "")
+	lex->skip_space ();
+      else
+	lex->skip(field_sep.c_str ());
+    }
+}
+
+int
+LexerTable::Implementation::get_date_component (const std::vector<std::string>&
+                                                /**/ entries, 
+                                                const int column, 
+                                                const int default_value) const
+{
+  if (column < 0)
+    return default_value;
+  daisy_assert (column < entries.size ());
+  const char *const str = entries[column].c_str ();
+  const char* end_ptr = str;
+  const long lval = strtol (str, const_cast<char**> (&end_ptr), 10);
+  if (*end_ptr != '\0')
+    error (std::string ("Junk at end of number '") + end_ptr + "'");
+  const int ival = lval;
+  if (ival != lval)
+    error ("Number out of range");
+  return ival;
+}
+
+std::vector<std::string> 
+LexerTable::Implementation::s2s_v (const std::vector<symbol>& syms)
+{
+  std::vector<std::string> result;
+  for (size_t i = 0; i < syms.size (); i++)
+    result.push_back (syms[i].name ());
+  return result;
+}
+
+LexerTable::Implementation::Implementation (const BlockModel& al)
+  : units (al.units ()),
+    path (al.path ()),
+    filename (al.name ("file")),
+    owned_stream (NULL),
+    lex (NULL),
+    field_sep ("UNINITIALIZED"),
+    type_ ("UNINITIALIZED"),
+    missing (s2s_v (al.name_sequence ("missing"))),
+    filter (map_submodel_const<Filter> (al, "filter")),
+    year_c (-42),
+    month_c (-42),
+    mday_c (-42),
+    hour_c (-42),
+    time_c (-42),
+    minute_c (-42),
+    second_c (-42),
+    microsecond_c (-42),
+    original (al.check ("original")
+              ? al.name_sequence ("original")
+              : std::vector<symbol> ()),
+    dim_line (al.flag ("dim_line", !al.check ("original")))
+{ }
+
 bool 
-LexerTable::good ()
+LexerTable::Implementation::good ()
 {
   if (!lex.get ())
     return false;
@@ -91,8 +275,12 @@ LexerTable::good ()
   return false;
 }
 
+bool 
+LexerTable::good ()
+{ return impl->good (); }
+
 bool
-LexerTable::read_header (Treelog& msg)
+LexerTable::Implementation::read_type (Treelog& msg)
 {
   owned_stream = path.open_file (filename.name ());
   lex.reset (new LexerData (filename.name (), *owned_stream, msg));
@@ -116,19 +304,65 @@ LexerTable::read_header (Treelog& msg)
     }
   lex->skip_line ();
   lex->next_line ();
+  return true;
+}  
 
-  // Skip keywords.
+void
+LexerTable::Implementation::read_keywords (Frame& keywords)
+{
   while (lex->good () && lex->peek () != '-')
     {
-      lex->skip_line ();
+      lex->skip_space ();
+      if (lex->peek () == '\n')
+        {
+          lex->skip ("\n");
+          continue;
+        }
+      std::string name;
+      while (lex->good () && lex->peek () != ':')
+        name += lex->get ();
+      lex->skip (":");
+      lex->skip_space ();
+      const symbol key (name);
+      const Attribute::type type = keywords.lookup (key);
+      switch (type)
+        {
+        case Attribute::Number:
+          {
+            double val = lex->get_number ();
+            lex->skip_space ();
+            std::string dim;
+            while (lex->good () && lex->peek () != '\n')
+              dim += lex->get ();
+            boost::algorithm::trim (dim);
+            const symbol has_dim (dim);
+            const symbol want_dim = keywords.dimension (key);
+
+            if (units.can_convert (has_dim, want_dim, val))
+              keywords.set (key, units.convert (has_dim, want_dim, val));
+            else
+              {
+                error ("Cannot convert [" 
+                       + has_dim + "] to [" + want_dim + "]");
+              }
+          }
+          break;
+        case Attribute::Error:
+          lex->skip_line ();
+          error ("'" + key + "': Unknown keyword");
+          break;
+        default:
+          lex->skip_line ();
+          error ("'" + key + "': Unsupported type '" 
+                 + Attribute::type_name (type) + "'");
+        }
       lex->next_line ();
     }
+}
 
-  // Skip hyphens.
-  while (lex->good () && lex->peek () == '-')
-    lex->get ();
-  lex->skip_space ();
-
+void
+LexerTable::Implementation::read_tags ()
+{
   // Read tags.
   std::vector<std::string> tag_names_raw;
   get_entries_raw (tag_names_raw);
@@ -144,14 +378,32 @@ LexerTable::read_header (Treelog& msg)
     }
 
   // Time tags.
-  year_c = find_tag ("year", "Year", msg);
-  month_c = find_tag ("month", "Month", msg);
-  mday_c = find_tag ("mday", "Day", msg);
-  hour_c = find_tag ("hour", "Hour", msg);
-  minute_c = find_tag ("minute", "Minute", msg);
-  second_c = find_tag ("second", "Second", msg);
-  microsecond_c = find_tag ("microsecond", "Microsecond", msg);
-  time_c = find_tag ("time", "Date", msg);
+  year_c = find_tag ("year", "Year");
+  month_c = find_tag ("month", "Month");
+  mday_c = find_tag ("mday", "Day");
+  hour_c = find_tag ("hour", "Hour");
+  minute_c = find_tag ("minute", "Minute");
+  second_c = find_tag ("second", "Second");
+  microsecond_c = find_tag ("microsecond", "Microsecond");
+  time_c = find_tag ("time", "Date");
+
+  if (time_c >= 0)
+    {
+      if (year_c >= 0)
+        warning ("Column year ignored because of time column");
+      if (month_c >= 0)
+        warning ("Column month ignored because of time column");
+      if (mday_c >= 0)
+        warning ("Column mday ignored because of time column");
+      if (hour_c >= 0)
+        warning ("Column hour ignored because of time column");
+      if (minute_c >= 0)
+        warning ("Column minute ignored because of time column");
+      if (second_c >= 0)
+        warning ("Column second ignored because of time column");
+      if (microsecond_c >= 0)
+        warning ("Column microsecond ignored because of time column");
+    }
 
   // Filter tags.
   for (size_t i = 0; i < filter.size (); i++)
@@ -160,7 +412,7 @@ LexerTable::read_header (Treelog& msg)
       if (c < 0)
 	{
 	  error ("Filter tag '" + filter[i]->tag + "' not found");
-	  return false;
+	  return;
 	}
       fil_col.push_back (c);
     }
@@ -197,19 +449,77 @@ LexerTable::read_header (Treelog& msg)
       tmp << "Got " << tag_names.size () << " tags and " << dim_names.size ()
           << " dimensions";
       error (tmp.str ());
-      return false;
+      return;
     }
+}  
+
+bool
+LexerTable::Implementation::read_header_with_keywords (Frame& keywords, 
+                                                       Treelog& msg)
+{
+  // First line.
+  if (!read_type (msg))
+    return false;
+
+  // Keywords.
+  read_keywords (keywords);
+  
+  // Skip hyphens.
+  while (lex->good () && lex->peek () == '-')
+    lex->get ();
+  lex->skip_space ();           // 'read_tags' expects a newline.
+
+  // Tags.
+  read_tags ();
+
+  // Done
+  return lex->get_error_count () < 1;
+}
+
+bool
+LexerTable::Implementation::read_header (Treelog& msg)
+{
+  // First line.
+  if (!read_type (msg))
+    return false;
+
+  // Keywords.
+  while (lex->good () && lex->peek () != '-')
+    {
+      lex->skip_line ();
+      lex->next_line ();
+    }
+  
+  // Skip hyphens.
+  while (lex->good () && lex->peek () == '-')
+    lex->get ();
+  lex->skip_space ();           // 'read_tags' expects a newline.
+
+  // Tags.
+  read_tags ();
 
   // Done
   return lex->good ();
-}  
+}
+
+bool
+LexerTable::read_header (Treelog& msg)
+{ return impl->read_header (msg); }
+
+bool
+LexerTable::read_header_with_keywords (Frame& keywords, Treelog& msg)
+{ return impl->read_header_with_keywords (keywords, msg); }
 
 const std::string&
 LexerTable::type () const
-{ return type_; }
+{ return impl->type_; }
+
+const std::vector<symbol>& 
+LexerTable::tag_names () const
+{ return impl->tag_names; }
 
 int
-LexerTable::find_tag (const symbol tag) const
+LexerTable::Implementation::find_tag (const symbol tag) const
 {
   if (tag_pos.find (tag) == tag_pos.end ())
     return -1;
@@ -217,84 +527,19 @@ LexerTable::find_tag (const symbol tag) const
 }
 
 int
-LexerTable::find_tag (const symbol tag1, const symbol tag2, Treelog& msg) const
-{
-  int tag1_c = find_tag (tag1);
-  int tag2_c = find_tag (tag2);
-  if (tag1_c < 0)
-    return tag2_c;
-  if (tag2_c >= 0)
-    msg.warning ("'" + tag1 + "' overwrites '" + tag2 + "'");
-  return tag1_c;
-}
+LexerTable::find_tag (const symbol tag) const
+{ return impl->find_tag (tag); }
 
 symbol
 LexerTable::dimension (size_t tag_c) const
 { 
-  daisy_assert (tag_c < dim_names.size ());
-  return dim_names[tag_c];
-}
-
-std::string
-LexerTable::get_entry () const
-{
-  std::string tmp_term;  // Data storage.
-  const char* field_term;
-
-  switch (field_sep.size ())
-    { 
-    case 0:
-      // Whitespace
-      field_term = " \t\n";
-      break;
-    case 1:
-      // Single character field seperator.
-      tmp_term = field_sep + "\n";
-      field_term = tmp_term.c_str ();
-      break;
-    default:
-      // Multi-character field seperator.
-      daisy_notreached ();
-    }
-
-  // Find it.
-  std::string entry = "";
-  while (lex->good ())
-    {
-      int c = lex->peek ();
-      if (std::strchr (field_term, c))
-	break;
-      entry += int2char (lex->get ());
-    }
-  return entry;
-}
-
-void
-LexerTable::get_entries_raw (std::vector<std::string>& entries) const
-{
-  entries.clear ();
-  lex->skip ("\n");
-  while (lex->good () && lex->peek () == '#')
-    {
-      lex->skip_line ();
-      lex->skip ("\n");
-    }
-  while (lex->good ())
-    {
-      entries.push_back (get_entry ());
-
-      if (lex->peek () == '\n')
-        break;
-
-      if (field_sep == "")
-	lex->skip_space ();
-      else
-	lex->skip(field_sep.c_str ());
-    }
+  daisy_assert (tag_c < impl->dim_names.size ());
+  return impl->dim_names[tag_c];
 }
 
 bool
-LexerTable::get_entries (std::vector<std::string>& entries) const
+LexerTable::Implementation::get_entries (std::vector<std::string>& 
+                                         /**/ entries) const
 {
   get_entries_raw (entries);
 
@@ -320,27 +565,13 @@ LexerTable::get_entries (std::vector<std::string>& entries) const
   return true;
 }
 
-int
-LexerTable::get_date_component (const std::vector<std::string>& entries, 
-				const int column, 
-                                const int default_value) const
-{
-  if (column < 0)
-    return default_value;
-  daisy_assert (column < entries.size ());
-  const char *const str = entries[column].c_str ();
-  const char* end_ptr = str;
-  const long lval = strtol (str, const_cast<char**> (&end_ptr), 10);
-  if (*end_ptr != '\0')
-    error (std::string ("Junk at end of number '") + end_ptr + "'");
-  const int ival = lval;
-  if (ival != lval)
-    error ("Number out of range");
-  return ival;
-}
+bool
+LexerTable::get_entries (std::vector<std::string>& entries) const
+{ return impl->get_entries (entries); }
 
 bool
-LexerTable::get_time (const std::string& entry, Time& time, int default_hour)
+LexerTable::Implementation::get_time (const std::string& entry, Time& time,
+                                      int default_hour)
 {
   std::istringstream in (entry);
 
@@ -417,8 +648,13 @@ LexerTable::get_time (const std::string& entry, Time& time, int default_hour)
 }
 
 bool
-LexerTable::get_time (const std::vector<std::string>& entries,
-                      Time& time, const int default_hour) const
+LexerTable::get_time (const std::string& entry, Time& time,
+                      int default_hour)
+{ return Implementation::get_time (entry, time, default_hour); }
+
+bool
+LexerTable::Implementation::get_time (const std::vector<std::string>& entries,
+                                      Time& time, const int default_hour) const
 {
   // Extract date.
   if (time_c < 0)
@@ -463,8 +699,17 @@ LexerTable::get_time (const std::vector<std::string>& entries,
 }
 
 bool
-LexerTable::is_missing (const std::string& value) const
+LexerTable::get_time (const std::vector<std::string>& entries,
+                      Time& time, const int default_hour) const
+{ return impl->get_time (entries, time, default_hour); }
+
+bool
+LexerTable::Implementation::is_missing (const std::string& value) const
 { return find (missing.begin (), missing.end (), value) != missing.end (); }
+
+bool
+LexerTable::is_missing (const std::string& value) const
+{ return impl->is_missing (value); }
 
 double
 LexerTable::convert_to_double (const std::string& value) const
@@ -473,21 +718,29 @@ LexerTable::convert_to_double (const std::string& value) const
   const char* end_ptr = str;
   const double val = strtod (str, const_cast<char**> (&end_ptr));
   if (*end_ptr != '\0')
-    error (std::string ("Junk at end of number '") + end_ptr + "'");
+    impl->error (std::string ("Junk at end of number '") + end_ptr + "'");
   return val;
 }
 
 void
 LexerTable::debug (const std::string& str) const
+{ impl->lex->warning (str); }
+
+void
+LexerTable::Implementation::warning (const std::string& str) const
 { lex->warning (str); }
 
 void
 LexerTable::warning (const std::string& str) const
-{ lex->warning (str); }
+{ impl->warning (str); }
+
+void 
+LexerTable::Implementation::error (const std::string& str) const
+{ lex->error (str); }
 
 void 
 LexerTable::error (const std::string& str) const
-{ lex->error (str); }
+{ impl->error (str); }
 
 void 
 LexerTable::load_syntax (Frame& frame)
@@ -502,7 +755,8 @@ List of strings indicating missing values.");
   frame.set ("missing", misses);
   frame.declare_submodule_sequence ("filter", Attribute::Const, "\
 Only include data from rows that passes all these filters.",
-				 LexerTable::Filter::load_syntax);
+                                    LexerTable::Implementation
+                                    ::Filter::load_syntax);
   frame.set_empty ("filter");
   frame.declare_string ("original", Attribute::OptionalConst, 
               Attribute::Variable, "\
@@ -518,35 +772,8 @@ If true, assume the line after the tags contain dimensions.\n\
 By default this will be true iff 'original' is not specified.");
 }
 
-static std::vector<std::string> s2s_v (const std::vector<symbol>& syms)
-{
-  std::vector<std::string> result;
-  for (size_t i = 0; i < syms.size (); i++)
-    result.push_back (syms[i].name ());
-  return result;
-}
-
 LexerTable::LexerTable (const BlockModel& al)
-  : path (al.path ()),
-    filename (al.name ("file")),
-    owned_stream (NULL),
-    lex (NULL),
-    field_sep ("UNINITIALIZED"),
-    type_ ("UNINITIALIZED"),
-    missing (s2s_v (al.name_sequence ("missing"))),
-    filter (map_submodel_const<Filter> (al, "filter")),
-    year_c (-42),
-    month_c (-42),
-    mday_c (-42),
-    hour_c (-42),
-    time_c (-42),
-    minute_c (-42),
-    second_c (-42),
-    microsecond_c (-42),
-    original (al.check ("original")
-	      ? al.name_sequence ("original")
-	      : std::vector<symbol> ()),
-    dim_line (al.flag ("dim_line", !al.check ("original")))
+  : impl (new Implementation (al))
 { }
 
 LexerTable::~LexerTable ()

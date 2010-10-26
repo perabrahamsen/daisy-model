@@ -2,19 +2,26 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Små tidsskridt i vejr
 
-** Weather extra
+** Rename weather_utils til weatherdata.
 
-Handle missing values.
+** weatherdata submodel 
 
-Tell when changing data source
+** Wsource
 
-** Weathersource
+New component
 
-New model.  Read "raw" data from ddf file.
+** Wsource_table
+
+New model
+
+** Weather source
+
+New base class
 
 ** Weather mix
 
 Combine weather sources, and interpolate/aggregate data.
+Konverter typer, min/max, daily
 
 * Hent gammel PC.
 

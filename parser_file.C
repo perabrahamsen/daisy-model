@@ -1098,7 +1098,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                       parser->initialize (*mutable_metalib);
                       if (parser->check ())
                         parser->load_nested ();
-                      lexer->error_count += parser->error_count ();
+                      lexer->add_errors (parser->error_count ());
                     }
 		  inputs.push_back (child);
 		}
@@ -1537,9 +1537,7 @@ ParserFile::load_top ()
 
 int
 ParserFile::error_count () const
-{
- return impl->lexer->error_count; 
-}
+{ return impl->lexer->get_error_count (); }
 
 void 
 ParserFile::initialize (Metalib& lib)

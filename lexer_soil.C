@@ -31,9 +31,9 @@ LexerSoil::read_soil (Treelog& msg)
   // Array tags.
   std::vector<double> array_z;
   std::vector<double> array_x;
-  for (size_t i = 0; i < tag_names.size (); i++)
+  for (size_t i = 0; i < tag_names ().size (); i++)
     {
-      std::string name = tag_names[i].name ();
+      std::string name = tag_names ()[i].name ();
       const size_t pos = name.find (" @ ");
       if (pos == std::string::npos)
         continue;
@@ -45,8 +45,8 @@ LexerSoil::read_soil (Treelog& msg)
         continue;
 
       if (array_dimension == Attribute::Unknown ())
-        array_dimension = dim_names[i];
-      else if (array_dimension != dim_names[i])
+        array_dimension = dimension (i);
+      else if (array_dimension != dimension(i))
         continue;
 
       daisy_assert (name.size () >= pos + 3);

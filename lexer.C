@@ -26,6 +26,14 @@
 #include <sstream>
 #include <vector>
 
+int
+Lexer::get_error_count () const
+{ return error_count; }
+
+void
+Lexer::add_errors (const int extra)
+{ error_count += extra; }
+
 Filepos
 Lexer::position ()
 { return Filepos (file, line, column); }

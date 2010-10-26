@@ -24,74 +24,32 @@
 
 #include "block_model.h"
 #include "symbol.h"
-#include "memutils.h"
 #include <string>
 #include <vector>
-#include <map>
-#include <iosfwd>
-#include <memory>
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
 class Frame;
 class Treelog;
-class LexerData;
 class Time;
-class Path;
 
 class LexerTable : private boost::noncopyable
 {
   // Content.
 private:
-  Path& path;
-  const symbol filename;  
-  std::auto_ptr<std::istream> owned_stream;
-  boost::scoped_ptr<LexerData> lex;
-  std::string field_sep;
-  std::string type_;
-  const std::vector<std::string> missing;
-protected:
-  std::vector<symbol> tag_names;
-private:
-  std::map<symbol,int> tag_pos;
-  std::vector<size_t> fil_col;
-  struct Filter;
-  auto_vector<const Filter*> filter;
-  int year_c;
-  int month_c;
-  int mday_c;
-  int hour_c;
-  int time_c;
-  int minute_c;
-  int second_c;
-  int microsecond_c;
-  const std::vector<symbol> original;
-  const bool dim_line;
-protected:
-  std::vector<symbol> dim_names;
-  
+  class Implementation;
+  boost::scoped_ptr<Implementation> impl;
+
   // Use.
 public:
   bool good ();
   bool read_header (Treelog& msg);
+  bool read_header_with_keywords (Frame& keywords, Treelog& msg);
   const std::string& type () const;
+  const std::vector<symbol>& tag_names () const;
   symbol dimension (size_t tag_c) const;
-  const std::vector<symbol>& get_tag_names () const
-  { return tag_names; }
-  int find_tag (const char *const tag) const
-  { return find_tag (symbol (tag)); }
   int find_tag (const symbol tag) const;
-private:
-  int find_tag (const symbol tag1, const symbol tag2, Treelog& msg) const;
-private:
-  std::string get_entry () const;
-  void get_entries_raw (std::vector<std::string>& entries) const;
-public:
   bool get_entries (std::vector<std::string>& entries) const;
-private:
-  int get_date_component (const std::vector<std::string>& entries, 
-                          int column, int default_value) const;
-public:
   static bool get_time (const std::string& entry, Time& time, 
                         int default_hour); 
   bool get_time (const std::vector<std::string>& entries, Time& time, 

@@ -606,7 +606,18 @@ Frame::type_size (const symbol key) const
   daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
-symbol 
+bool
+Frame::is_text (const symbol key) const
+{
+  if (impl->has_type (key))
+    return impl->get_type (key).is_text ();
+  if (parent () )
+    return parent ()->is_text (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
+}
+
+symbol
 Frame::dimension (const symbol key) const
 {
   if (impl->has_type (key))
@@ -715,6 +726,15 @@ Frame::declare_string (const symbol key,	// String.
                        const symbol description)
 {
   impl->declare_type (key, new TypeString (cat, size, description));
+}
+
+void 
+Frame::declare_text (const symbol key,	// String (Text area)
+                     Attribute::category cat,
+                     int size,
+                     const symbol description)
+{
+  impl->declare_type (key, new TypeText (cat, size, description));
 }
 
 void 

@@ -362,7 +362,7 @@ struct DepthFile : public Depth
         lex.next_line ();
       }
     lex.eof ();
-    if (lex.error_count > 0)
+    if (lex.get_error_count () > 0)
       state = State::error;
     else if (lines < 2)
       {

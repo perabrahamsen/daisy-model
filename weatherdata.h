@@ -1,4 +1,4 @@
-// weather_utils.h -- Weather related utilities.
+// weatherdata.h -- Weather related utilities.
 // 
 // Copyright 2010 KU
 //
@@ -19,13 +19,18 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef WEATHER_UTILS_H
-#define WEATHER_UTILS_H
+#ifndef WEATHERDATA_H
+#define WEATHERDATA_H
 
 #include "symbol.h"
 
-namespace WeatherUtil
+class Frame;
+
+namespace Weatherdata
 {
+  // Surface type.
+  enum surface_t { reference, field };
+
   // Known symbols.
   symbol GlobRad ();
   symbol AirTemp ();
@@ -39,10 +44,13 @@ namespace WeatherUtil
   symbol Wind ();
 
   // Information about a symbol.
-  symbol unit (const symbol);
+  symbol dimension (const symbol);
   symbol description (const symbol);
   double min_value (const symbol);
   double max_value (const symbol);
+
+  // Frame.
+  void load_syntax (Frame&);
 }
 
-#endif // WEATHER_UTILS_H
+#endif // WEATHERDATA_H
