@@ -1,6 +1,6 @@
 ;;; setup.dai -- Bakkegården experiment.
 
-(input file "log-std.dai")
+(input file "log.dai")
 (input file "fertilizer.dai")
 (input file "tillage.dai")
 (input file "sbarley.dai")
@@ -126,23 +126,80 @@
                   (K_sat 1.50000 [cm/h])
                   (l -3.60322)))
 
+(defvegetation BH1 default
+  ;; Behandling 1, measured LAI.
+  (ForcedLAI (2010 ((130	0.126865346178995)
+                    (138	0.341699606805203)
+                    (139	0.331505397470374)
+                    (145	0.732362900577582)
+                    (149	1.04893322333451)
+                    (154	1.38190243729417)
+                    (159	1.88876407381112)
+                    (165	2.01596625098118)
+                    (169	2.10844172461756)
+                    (174	2.41132224385265)
+                    (181	3.77631417081021)
+                    (197        1.80889828363121) 
+                    (205	1.15122735165227)
+                    (215	0.356163334253353)))))
+
+(defvegetation BH2 default
+  ;; Behandling 2, measured LAI.
+  (ForcedLAI (2010 ((130	0.113054327543383)
+                    (138	0.249859290199894)
+                    (139	0.219404286204732)
+                    (145	0.480867705944001)
+                    (149	0.690345742029461)
+                    (154	0.952647646382848)
+                    (159	1.47432784912586 )
+                    (165	1.68498395873706 )
+                    (169	1.89090532280082 )
+                    (174	1.99596590752449 )
+                    (181	2.32005205370504 )
+                    (197        1.7890881944939  )
+                    (205	1.21848514913843 )
+                    (215	0.461197576260041)))))
+
+(defvegetation BH3 default
+  ;; Behandling 3, measured LAI.
+  (ForcedLAI (2010 ((130	0.0695399269384141)
+                    (138	0.209311233493097 )
+                    (139	0.179812881271794 )
+                    (145	0.398793220315028 )
+                    (149	0.539774965074643 )
+                    (154	0.720118564171243 )
+                    (159	1.20256332197327  )
+                    (165	1.45022877244852  )
+                    (169	1.56331217585878  )
+                    (174	1.81697063340985  )
+                    (181	2.07584493035373  )
+                    (197        1.5658323626276   )
+                    (205	1.14339826055821  )
+                    (215	0.475316794266712 )))))
+
+(defvegetation BH4 default
+  ;; Behandling 4, measured LAI.
+  (ForcedLAI (2010 ((130	0.0807776000555535)
+                    (138	0.201096272103707 )
+                    (139	0.201514396739801 )
+                    (145	0.43031403168066  )
+                    (149	0.596041777848572 )
+                    (154	0.747288227076631 )
+                    (159	1.25302227877605  )
+                    (165	1.54538254844275  )
+                    (169	1.59075090515908  )
+                    (174	1.85729307282682  )
+                    (181	2.0560667361044   )
+                    (197        1.5487887886542   )
+                    (205	1.09725376631662  )
+                    (215	0.45107200094898  )))))
+
 (defcolumn Bakkegaarden default
   "This is a Rorrende soil with deep drainage."
   (Bioclimate original
               (svat SSOC)
               (raddist sun-shade))
-  (Vegetation original
-              ;; Behandling 1, measured LAI.
-              (ForcedLAI (2010 ((130	0.126865346178995)
-                                (138	0.341699606805203)
-                                (139	0.331505397470374)
-                                (145	0.732362900577582)
-                                (149	1.04893322333451)
-                                (154	1.38190243729417)
-                                (159	1.88876407381112)
-                                (165	2.01596625098118)
-                                (169	2.10844172461756)
-                                (174	2.41132224385265)))))
+  (Vegetation $LAIFUN)
   (Chemistry none)
   (OrganicMatter none)
   ;; (OrganicMatter original (init (end -25 [cm]) (input 3000 [kg C/ha/y])))
@@ -169,11 +226,14 @@
 (defprogram Bakkegaarden Daisy
   (declare Crop crop "Crop to sow.")
   (manager SB)
+  (declare LAIFUN vegetation "LAI growth function.")
+  (LAIFUN crops)
+  (manager SB)
   (column Bakkegaarden)
   (weather Normal)
   (time 2010 1 2)
   (stop 2010 9 19)
-  (output harvest "Field water"))
+  (output harvest "Field water" "Crop Production"))
 
 (defprogram DSH Bakkegaarden
   (weather Dry)
@@ -265,7 +325,7 @@
   (Crop SBLow)
   (log_prefix "log/WNL-"))
 
-(run batch (run DSH DSN DSL DNH DNN DNL NSH NSN NSL NNH NNN NNL WSH WSN WSL WNH WNN WNL ))
-;;(run NNN)
+;;(run batch (run DSH DSN DSL DNH DNN DNL NSH NSN NSL NNH NNN NNL WSH WSN WSL WNH WNN WNL ))
+(run NNN)
 
 ;; setup.dai ends here.

@@ -1,10 +1,14 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* cpe-liu rapport
+
+Sammenlign udbytte med tre forskellige tvangsLAI.
+
 * Små tidsskridt i vejr
 
-** Rename weather_utils til weatherdata.
-
 ** weatherdata submodel 
+
+Extract?
 
 ** Wsource
 
@@ -901,7 +905,7 @@ Skal kunne være afhængig af kvælstof og temperatur.
 
 ** Generaliser til Number med ScopeSoil?
 
-* seperate harvest and cut actions
+* separate harvest and cut actions
 
 * SH: Salg af referencemanual på www-siden?
 
