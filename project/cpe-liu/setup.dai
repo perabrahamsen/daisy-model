@@ -9,7 +9,7 @@
   "Farquhar parameters for potatoes."
   (cite "ssoc")
   ;; This is the main calibration effect for unlimited production.
-  (Xn 1.6e-3 [mol/mol/s])               ;Kalibrated med fuld N
+  (Xn 3.78e-3 [mol/mol/s])               ;Kalibrated med fuld N
   ;;Farquhar parameters for potatos, calibrated by Fuilai
   (Kc25 27.24 [Pa])
   (Ko25 16580 [Pa])
@@ -126,7 +126,7 @@
                   (K_sat 1.50000 [cm/h])
                   (l -3.60322)))
 
-(defvegetation BH1 default
+(defvegetation BH1 crops
   ;; Behandling 1, measured LAI.
   (ForcedLAI (2010 ((130	0.126865346178995)
                     (138	0.341699606805203)
@@ -143,7 +143,7 @@
                     (205	1.15122735165227)
                     (215	0.356163334253353)))))
 
-(defvegetation BH2 default
+(defvegetation BH2 crops
   ;; Behandling 2, measured LAI.
   (ForcedLAI (2010 ((130	0.113054327543383)
                     (138	0.249859290199894)
@@ -160,7 +160,7 @@
                     (205	1.21848514913843 )
                     (215	0.461197576260041)))))
 
-(defvegetation BH3 default
+(defvegetation BH3 crops
   ;; Behandling 3, measured LAI.
   (ForcedLAI (2010 ((130	0.0695399269384141)
                     (138	0.209311233493097 )
@@ -177,7 +177,7 @@
                     (205	1.14339826055821  )
                     (215	0.475316794266712 )))))
 
-(defvegetation BH4 default
+(defvegetation BH4 crops
   ;; Behandling 4, measured LAI.
   (ForcedLAI (2010 ((130	0.0807776000555535)
                     (138	0.201096272103707 )
@@ -225,7 +225,6 @@
   
 (defprogram Bakkegaarden Daisy
   (declare Crop crop "Crop to sow.")
-  (manager SB)
   (declare LAIFUN vegetation "LAI growth function.")
   (LAIFUN crops)
   (manager SB)
@@ -325,7 +324,26 @@
   (Crop SBLow)
   (log_prefix "log/WNL-"))
 
+(defprogram BH1 NNN
+  (LAIFUN BH1)
+  (log_prefix "log/BH1-"))
+
+(defprogram BH2 NNN
+  (LAIFUN BH2)
+  (log_prefix "log/BH2-"))
+
+(defprogram BH3 NNN
+  (LAIFUN BH3)
+  (log_prefix "log/BH3-"))
+
+(defprogram BH4 NNN
+  (LAIFUN BH4)
+  (log_prefix "log/BH4-"))
+
+
 ;;(run batch (run DSH DSN DSL DNH DNN DNL NSH NSN NSL NNH NNN NNL WSH WSN WSL WNH WNN WNL ))
-(run NNN)
+;;(run NNN)
+
+(run batch (run BH1 BH2 BH3 BH4))
 
 ;; setup.dai ends here.

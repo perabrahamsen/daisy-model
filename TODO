@@ -1,20 +1,18 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* cpe-liu rapport
+* cpe-liu
 
-Sammenlign udbytte med tre forskellige tvangsLAI.
+** Check taastrup timeværdier mod taastrup dagsværdier
+
+** Lav 10 års simuleringer
 
 * Små tidsskridt i vejr
 
-** weatherdata submodel 
+** WSourceConst
 
-Extract?
+Split op i "const" og "base".
 
-** Wsource
-
-New component
-
-** Wsource_table
+** WSourceTable
 
 New model
 

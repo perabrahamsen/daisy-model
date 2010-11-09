@@ -1,3 +1,8 @@
+2010-11-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* wsource_const.C: New model.
+	* Makefile (MODELS): Add it.
+
 2010-11-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* wsource.C, wsource.h: New component.

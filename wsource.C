@@ -1,4 +1,4 @@
-// weatherdata.h -- Weather related utilities.
+// wsource.C -- Selected weather data.
 // 
 // Copyright 2010 KU
 //
@@ -18,40 +18,41 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#define BUILD_DLL
 
-#ifndef WEATHERDATA_H
-#define WEATHERDATA_H
+#include "wsource.h"
+#include "librarian.h"
 
-#include "symbol.h"
+const char *const WSource::component = "wsource";
 
-class Frame;
-class Block;
-
-namespace Weatherdata
+symbol
+WSource::library_id () const
 {
-  // Surface type.
-  enum surface_t { reference, field };
-
-  // Known symbols.
-  symbol GlobRad ();
-  symbol AirTemp ();
-  symbol T_min ();
-  symbol T_max ();
-  symbol Precip ();
-  symbol RefEvap ();
-  symbol VapPres ();
-  symbol DiffRad ();
-  symbol RelHum ();
-  symbol Wind ();
-
-  // Information about a symbol.
-  symbol dimension (const symbol);
-  symbol description (const symbol);
-  double min_value (const symbol);
-  double max_value (const symbol);
-
-  // Frame.
-  void load_syntax (Frame&);
+  static const symbol id (component);
+  return id;
 }
 
-#endif // WEATHERDATA_H
+bool 
+WSource::has (const symbol key) const
+{ return lookup (key) == Attribute::Number; }
+
+double
+WSource::value (const symbol key) const
+{ return number (key); }
+  
+WSource::WSource ()
+{ }
+
+WSource::~WSource ()
+{ }
+
+static struct WSourceInit : public DeclareComponent
+{
+  WSourceInit ()
+    : DeclareComponent (WSource::component, "\
+A 'wsource' is a source of raw weatherdata.")
+  { }
+} WSource_init;
+
+// wsource.C ends here.
+
