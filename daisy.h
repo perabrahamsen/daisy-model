@@ -58,6 +58,7 @@ public:
   const Units& units () const;
   Field& field () const;
   std::vector<const Harvest*>& harvest () const;
+  void start ();
   bool is_running () const;
   void stop ();
   

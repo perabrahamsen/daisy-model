@@ -471,7 +471,14 @@ daisy_daisy_delete (Toplevel* toplevel)
 
 extern "C" void EXPORT
 daisy_daisy_start (Toplevel* toplevel)
-{ }
+{
+  try
+    {
+      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
+      daisy.start (); 
+    }
+  DAISY_CATCH_BLOCK(toplevel);
+}
 
 extern "C" daisy_bool EXPORT
 daisy_daisy_is_running (Toplevel* toplevel)

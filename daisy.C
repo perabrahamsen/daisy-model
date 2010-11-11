@@ -443,6 +443,10 @@ std::vector<const Harvest*>&
 Daisy::harvest () const
 { return impl->harvest; }
 
+void
+Daisy::start ()
+{ impl->running = true; }
+
 bool 
 Daisy::is_running () const
 { return impl->running; }
