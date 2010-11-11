@@ -1,3 +1,7 @@
+2010-11-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.91 released.
+
 2010-11-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* daisy.C, daisy.h (start): New member function.
