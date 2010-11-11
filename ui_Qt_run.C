@@ -102,7 +102,7 @@ UIRun::build_log (Metalib& metalib, Block& block, const std::string& name)
   LogQt *const log = dynamic_cast<LogQt*> (log_raw.get ());
   if (log)
     {
-      log->initialize_common (metalib, msg);
+      log->initialize_common (id, metalib, msg);
       all_logs.push_back (log);
       logs[id] = log;
       log_raw.release ();
