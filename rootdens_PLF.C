@@ -315,7 +315,7 @@ struct Rootdens_Depth_Depth : public Rootdens_PLF
 		    std::vector<double>& abs_dens, Treelog& msg)
   { 
     const double Depth = std::min (SoilDepth, CropDepth);
-    get_density (msg, abs_dens, geo, WRoot, -CropDepth, -1.0, -Depth); 
+    get_density (msg, abs_dens, geo, WRoot, CropDepth, -1.0, Depth); 
   }
 
   // Create.

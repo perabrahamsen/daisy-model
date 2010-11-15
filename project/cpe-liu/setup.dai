@@ -42,6 +42,18 @@
                        ( 33 [?cm] 0.0001 [])
                        (120 [?cm] 0.0000 [])))))
 
+(defrootdens SB_Block Depth_Depth
+  (entries ( 10 [?cm] ((  0 [?cm] 1.0000 [])
+                       (  9 [?cm] 1.0000 [])
+                       ( 11 [?cm] 0.0000 [])))
+           ( 33 [?cm] ((  0 [?cm] 1.0000 [])
+                       ( 10 [?cm] 1.0000 [])
+                       ( 33 [?cm] 0.0000 [])))
+           (120 [?cm] ((  0 [?cm] 1.0000 [])
+                       ( 25 [?cm] 1.0000 [])
+                       ( 33 [?cm] 0.0000 [])
+                       (120 [?cm] 0.0000 [])))))
+
 (defcrop SB "Spring Barley"
   (declare ABAfac Number [] "Multiply ABA production (above base) with this.")
   (enable_N_stress false)

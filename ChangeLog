@@ -1,3 +1,11 @@
+2010-11-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* rootdens_PLF.C (Rootdens_PLF): Bug fix.
+
+2010-11-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* vegetation_crops.C (DS_by_name): Interpret "all" as oldest crop.
+
 2010-11-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.91 released.

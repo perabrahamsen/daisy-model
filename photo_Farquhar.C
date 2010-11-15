@@ -228,6 +228,20 @@ PhotoFarquhar::assimilate (const Units& units,
 	{  
 	  // PAR in mol/m2/s = PAR in W/m2 * 0.0000046
 	  const double dPAR = (PAR[i] - PAR[i+1])/dCAI * 0.0000046; //W/m2->mol/m²leaf/s
+
+          if (dPAR < 0)
+            {
+              std::stringstream tmp;
+              tmp << "Negative dPAR (" << dPAR
+                  << " [mol/m^2 leaf/h])" << " PAR[" << i << "] = " << PAR[i]
+                  << " PAR[" << i+1 << "] = " << PAR[i+1] 
+                  << " dCAI = " << dCAI
+                  << " LA = " << LA
+                  << " fraction[" << i << "] = " << fraction [i];
+              msg.debug (tmp.str ());
+              continue;
+            }
+
 	  // log variable
 	  PAR_ += dPAR * dCAI * 3600.0; //mol/m²area/h/fraction
 
@@ -327,7 +341,7 @@ PhotoFarquhar::assimilate (const Units& units,
                   << "  dPAR " <<  dPAR << "  gsw " <<  gsw 
                   << "  gbw " <<  gbw << "  Tl " <<  Tl 
                   << "  vmax25 " <<  vmax25 << "  rd " <<  rd; 
-              Assertion::message (tmp.str ());
+              msg.error (tmp.str ());
               pn_ = 0.0;
             }
 	  Ass_ += LA * pn_; // [g/m²area/h] 

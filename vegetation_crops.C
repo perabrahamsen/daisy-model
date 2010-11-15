@@ -307,8 +307,18 @@ VegetationCrops::CanopyHarmonic (CropFun fun) const
 double 
 VegetationCrops::DS_by_name (symbol name) const
 {
-  for (CropList::const_iterator crop = crops.begin();
-       crop != crops.end();
+  if (name == Vegetation::all_crops ())
+    {
+      double DS = -1.0;
+      for (CropList::const_iterator crop = crops.begin ();
+           crop != crops.end ();
+           crop++)
+        DS = std::max (DS, (*crop)->DS ());
+
+      return DS;
+    }
+  for (CropList::const_iterator crop = crops.begin ();
+       crop != crops.end ();
        crop++)
     if ((*crop)->name == name)
       return (*crop)->DS ();
