@@ -396,7 +396,20 @@ XYSourceFlux::load (const Units& units, Treelog& msg)
       if (title_ == Attribute::Unknown ())
         {
           std::ostringstream tmp;
-          tmp << plot_z << " " << when->print () << " " << tag;
+          tmp << plot_z;
+          if (when.get ())
+            tmp << " " << when->print ();
+          else
+            {
+              tmp << "[";
+              if (begin.get ())
+                tmp << begin->print ();
+              tmp << ":";
+              if (end.get ())
+                tmp << end->print ();
+              tmp << "]";
+            }
+          tmp << " " << tag;
           title_ = tmp.str ();
         }
     }

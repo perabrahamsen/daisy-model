@@ -4,13 +4,14 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 Søren vil gerne have udvaskning i forskellige dybder over en drænsæson.
 
-* cpe-liu
+test/test-flux har opsætning.  Lav regneark til at hive data ud.  
 
-** Lav 10 års simuleringer 1998-2007 
+Silstrup 2000-2001: metamitron + bromid
+Silstrup 2001-2002: glyfosat
+  Estrup 2001-2002: glyfosat + bromid
 
-** Tre rodfordelinger (og ingen ABA/Precip varians)
+Vi skal bruge flux 100 cm, flux 150 cm, samt drænflux
 
-** Plot de tre rodfordelinger.
 
 * Små tidsskridt i vejr
 

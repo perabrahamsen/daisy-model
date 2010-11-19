@@ -27,6 +27,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "frame.h"
+#include "submodeler.h"
 #include <sstream>
 
 struct GnuplotTime : public GnuplotBase
@@ -348,10 +349,10 @@ set style data lines\n";
 GnuplotTime::GnuplotTime (const BlockModel& al)
   : GnuplotBase (al),
     begin (al.check ("begin") 
-	   ? new Time (al.submodel ("begin")) 
+	   ? submodel<Time> (al, "begin")
 	   : NULL),
     end (al.check ("end")
-	 ? new Time (al.submodel ("end")) 
+	 ? submodel<Time> (al, "end")
 	 : NULL),
     ymin_flag (al.check ("ymin")),
     ymin (al.number ("ymin", 42.42e42)),

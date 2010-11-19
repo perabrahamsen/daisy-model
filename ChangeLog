@@ -1,3 +1,7 @@
+2010-11-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* program_flux.C: New model.
+
 2010-11-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* rootdens_PLF.C (Rootdens_PLF): Bug fix.
