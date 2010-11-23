@@ -1,6 +1,7 @@
-2010-11-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-11-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* program_flux.C: New model.
+	* wsource_base.h, wsource_base.C: New base model.
+	* Makefile (SPECIALS): Added it.
 
 2010-11-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
 

@@ -400,17 +400,6 @@ namespace dk.ku.life.Daisy
             return DLL.daisy_scope_number_name(scope, index);
         }
 
-        public bool IsNumber(string name)
-        {
-            bool test = false;
-            for (uint i = 0; i < NumberSize(); i++)
-            {
-                if (name == NumberName(i))
-                    test = true;
-            }
-            return test;
-        }
-
         public bool HasNumber(string name)
         {
             Debug.Assert(scope != (IntPtr)0);

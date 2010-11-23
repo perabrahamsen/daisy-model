@@ -290,6 +290,7 @@ namespace dk.ku.life.Daisy.OpenMI
                 throw new ApplicationException("Unknown element set '" + ElementSetID + "'");
             ElementSet elementSet = (ElementSet) _elementSets[ElementSetID];
             int count = elementSet.ElementCount;
+            int scope_size = _daisyEngine.ScopeSize();
             double[] returnValues = new double[count];
 
             // This is O (e * s * q) instead of O (1).
@@ -298,7 +299,7 @@ namespace dk.ku.life.Daisy.OpenMI
                 Element element = elementSet.GetElement(e);
                 string ColumnID = element.ID;
                 bool found = false;
-                for (int i = 0; i < _daisyEngine.ScopeSize(); i++)
+                for (int i = 0; i < scope_size; i++)
                 {
                     Scope scope = _daisyEngine.GetScope(i);
 
@@ -306,26 +307,19 @@ namespace dk.ku.life.Daisy.OpenMI
                         continue;
                     if (scope.Writeable())
                         continue;
-
                     if (scope.String("column") != ColumnID)
                         continue;
+                    if (!scope.HasNumber(QuantityID))
+                        continue;
 
-                    for (uint j = 0; j < scope.NumberSize(); j++)
-                    {
-                        if (scope.NumberName(j) == QuantityID)
-                        {
-                            if (found)
-                                throw new Exception("Duplicate QuantityID: '" + QuantityID + "' in DaisyEngine");
-                            if (scope.HasNumber(QuantityID))
-                                returnValues[e] = scope.Number(QuantityID);
-                            else
-                                returnValues[e] = GetMissingValueDefinition();
-                            found = true;
-                        }
-                    }
+                    if (found)
+                        throw new Exception("Duplicate QuantityID: '" + QuantityID + "' in DaisyEngine");
+
+                    returnValues[e] = scope.Number(QuantityID);
+                    found = true;
                 }
                 if (!found)
-                    throw new Exception("No QuantityID: '" + QuantityID + "' for column '" + ColumnID + "' defined in DaisyEngine");
+                    returnValues[e] = GetMissingValueDefinition();
             }
             Oatc.OpenMI.Sdk.Backbone.ScalarSet values = new Oatc.OpenMI.Sdk.Backbone.ScalarSet(returnValues);
             return values;
@@ -358,17 +352,18 @@ namespace dk.ku.life.Daisy.OpenMI
                 throw new ApplicationException("Unknown element set '" + ElementSetID + "'");
             ElementSet elementSet = (ElementSet)_elementSets[ElementSetID];
             int count = elementSet.ElementCount;
+            int scope_size = _daisyEngine.ScopeSize();
             if (count != value.Count)
                 throw new ApplicationException("Wrong number of values given to '" + QuantityID + "'");
             global::OpenMI.Standard.IScalarSet val = (global::OpenMI.Standard.IScalarSet)value;
-
+            
             // This is O (e * s * q) instead of O (1).
             for (int e = 0; e < count; e++)
             {
                 Element element = elementSet.GetElement(e);
                 string ColumnID = element.ID;
                 bool found = false;
-                for (int i = 0; i < _daisyEngine.ScopeSize(); i++)
+                for (int i = 0; i < scope_size; i++)
                 {
                     Scope scope = _daisyEngine.GetScope(i);
 
@@ -376,23 +371,16 @@ namespace dk.ku.life.Daisy.OpenMI
                         continue;
                     if (!scope.Writeable())
                         continue;
-
                     if (scope.String("column") != ColumnID)
                         continue;
+                    if (!scope.HasNumber(QuantityID))
+                        continue;
 
-                    for (uint j = 0; j < scope.NumberSize(); j++)
-                    {
-                        if (scope.NumberName(j) == QuantityID)
-                        {
-                            if (found)
-                                throw new Exception("Duplicate QuantityID: '" + QuantityID + "' in DaisyEngine");
-                            if (scope.IsNumber(QuantityID))
-                                scope.SetNumber(QuantityID, val.GetScalar(e));
-                            else
-                                throw new Exception("'" + QuantityID + "' is not a number");
-                            found = true;
-                        }
-                    }
+                    if (found)
+                        throw new Exception("Duplicate QuantityID: '" + QuantityID + "' in DaisyEngine");
+
+                    scope.SetNumber(QuantityID, val.GetScalar(e));
+                    found = true;
                 }
                 if (!found)
                     throw new Exception("No QuantityID: '" + QuantityID + "' for column '" + ColumnID + "' defined in DaisyEngine");

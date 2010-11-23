@@ -20,82 +20,16 @@
 
 #define BUILD_DLL
 
-#include "wsource.h"
-#include "weatherdata.h"
-#include "time.h"
-#include "submodeler.h"
-#include "block_model.h"
+#include "wsource_base.h"
 #include "librarian.h"
-#include "mathlib.h"
-#include <boost/scoped_ptr.hpp>
-#include <map>
 
-struct WSourceConst : public WSource
+struct WSourceConst : public WSourceBase
 {
-  std::map<symbol, double> numbers;
-  std::map<symbol, symbol> names;
-
-  // Scope interface.
-  void entries (std::set<symbol>& e) const
-  { 
-    for (std::map<symbol, double>::const_iterator i = numbers.begin ();
-         i != numbers.end ();
-         i++)
-      e.insert ((*i).first);
-    for (std::map<symbol, symbol>::const_iterator i = names.begin ();
-         i != names.end ();
-         i++)
-      e.insert ((*i).first);
-  }
-
-  Attribute::type lookup (const symbol key) const
-  {
-    if (numbers.find (key) != numbers.end ())
-      return Attribute::Number;
-    if (names.find (key) != names.end ())
-      return Attribute::String;
-    
-    return Attribute::Error;
-  }
-
-  symbol dimension (const symbol key) const
-  { return Weatherdata::dimension (key); }
-
-  symbol description (const symbol key) const
-  { return Weatherdata::description (key); }
-  
-  bool check (const symbol key) const
-  {
-    if (numbers.find (key) != numbers.end ())
-      return true;
-    if (names.find (key) != names.end ())
-      return true;
-
-    return false;
-  }
-  double number (const symbol key) const
-  {
-    std::map<symbol, double>::const_iterator i = numbers.find (key);
-    if (i != numbers.begin ())
-      return (*i).second;
-
-    daisy_notreached ();
-  }
-
-  // WSource interface.
-  symbol station (const symbol) const
-  { return Attribute::Unknown (); }
-  double screen_height (const symbol) const
-  { return NAN; }
-  const Time& begin () const
-  { static const Time time (1, 1, 1, 0); return time; }
-  const Time& end () const
-  { static const Time time (9999, 12, 31, 23); return time; }
   void tick () const
   { }
 
   WSourceConst (const BlockModel& al)
-    : WSource ()
+    : WSourceBase (al)
   { }
   ~WSourceConst ()
   { }
@@ -106,12 +40,11 @@ static struct WSourceConstSyntax : public DeclareModel
   Model* make (const BlockModel& al) const
   { return new WSourceConst (al); }
   WSourceConstSyntax ()
-    : DeclareModel (WSource::component, "const",
+    : DeclareModel (WSource::component, "const", "base"
                     "Weather that does not change during the simulation.")
   { }
-  void load_frame (Frame& frame) const
-  { Weatherdata::load_syntax (frame); }
+  void load_frame (Frame&) const
+  { }
 } WSourceConst_syntax;
 
 // wsource_const.C ends here.
-

@@ -1,23 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* sh: mrt
-
-Søren vil gerne have udvaskning i forskellige dybder over en drænsæson.
-
-test/test-flux har opsætning.  Lav regneark til at hive data ud.  
-
-Silstrup 2000-2001: metamitron + bromid
-Silstrup 2001-2002: glyfosat
-  Estrup 2001-2002: glyfosat + bromid
-
-Vi skal bruge flux 100 cm, flux 150 cm, samt drænflux
-
-
 * Små tidsskridt i vejr
-
-** WSourceConst
-
-Split op i "const" og "base".
 
 ** WSourceTable
 
