@@ -290,7 +290,7 @@ namespace dk.ku.life.Daisy.OpenMI
                 throw new ApplicationException("Unknown element set '" + ElementSetID + "'");
             ElementSet elementSet = (ElementSet) _elementSets[ElementSetID];
             int count = elementSet.ElementCount;
-            int scope_size = _daisyEngine.ScopeSize();
+            uint scope_size = _daisyEngine.ScopeSize();
             double[] returnValues = new double[count];
 
             // This is O (e * s * q) instead of O (1).
@@ -352,7 +352,7 @@ namespace dk.ku.life.Daisy.OpenMI
                 throw new ApplicationException("Unknown element set '" + ElementSetID + "'");
             ElementSet elementSet = (ElementSet)_elementSets[ElementSetID];
             int count = elementSet.ElementCount;
-            int scope_size = _daisyEngine.ScopeSize();
+            uint scope_size = _daisyEngine.ScopeSize();
             if (count != value.Count)
                 throw new ApplicationException("Wrong number of values given to '" + QuantityID + "'");
             global::OpenMI.Standard.IScalarSet val = (global::OpenMI.Standard.IScalarSet)value;
