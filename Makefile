@@ -1392,6 +1392,10 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h \
  frame_submodel.h frame.h scope.h attribute.h symbol.h log.h time.h \
  border.h model_framed.h model_logable.h model.h geometry.h soil.h am.h \
  im.h librarian.h plf.h aom.h om.h check.h vcheck.h mathlib.h assertion.h
+wsource_base${OBJ}: wsource_base.C wsource_base.h wsource.h model.h scope.h \
+ attribute.h symbol.h weatherdata.h time.h assertion.h mathlib.h \
+ librarian.h frame_submodel.h frame.h block_model.h block_nested.h \
+ block.h treelog.h frame_model.h
 log_dlf${OBJ}: log_dlf.C log_dlf.h log_select.h log.h time.h symbol.h \
  border.h model_framed.h model_logable.h model.h memutils.h dlf.h \
  select.h destination.h units.h volume.h model_derived.h attribute.h \
@@ -1647,10 +1651,8 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
-wsource_const${OBJ}: wsource_const.C wsource.h model.h scope.h attribute.h \
- symbol.h weatherdata.h time.h submodeler.h block_submodel.h \
- block_nested.h block.h treelog.h frame_submodel.h frame.h block_model.h \
- frame_model.h librarian.h mathlib.h assertion.h
+wsource_const${OBJ}: wsource_const.C wsource_base.h wsource.h model.h scope.h \
+ attribute.h symbol.h librarian.h
 weather_extra${OBJ}: weather_extra.C weather.h model_derived.h \
  model_logable.h model.h symbol.h weatherdata.h librarian.h log.h time.h \
  border.h model_framed.h frame.h scope.h attribute.h block_model.h \
@@ -2101,7 +2103,7 @@ gnuplot_multi${OBJ}: gnuplot_multi.C gnuplot.h model.h symbol.h block_model.h \
 gnuplot_time${OBJ}: gnuplot_time.C gnuplot_base.h gnuplot.h model.h symbol.h \
  block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
  frame_model.h frame.h source.h time.h mathlib.h assertion.h memutils.h \
- librarian.h
+ librarian.h submodeler.h block_submodel.h frame_submodel.h
 source_combine${OBJ}: source_combine.C source.h model.h time.h symbol.h \
  block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
  frame_model.h frame.h number.h scope_sources.h memutils.h \
