@@ -50,6 +50,7 @@ public:
   symbol dimension (size_t tag_c) const;
   int find_tag (const symbol tag) const;
   bool get_entries (std::vector<std::string>& entries) const;
+  static bool is_time (symbol tag);
   static bool get_time (const std::string& entry, Time& time, 
                         int default_hour); 
   bool get_time (const std::vector<std::string>& entries, Time& time, 

@@ -28,34 +28,25 @@
 #include "librarian.h"
 #include "frame_submodel.h"
 #include "block_model.h"
+#include "submodeler.h"
 #include <map>
 
-struct WSourceBase::Implementation
+struct WSourceBase::Implementation : public FrameSubmodelValue
 {
-  FrameSubmodelValue frame;
+  boost::scoped_ptr<Time> begin;
+  boost::scoped_ptr<Time> end;
 
-  // Scope interface.
-  void entries (std::set<symbol>& e) const
-  { frame.entries (e); }
-
-  Attribute::type lookup (const symbol key) const
-  { return frame.lookup (key); }
-
-  bool check (const symbol key) const
-  { return frame.check (key); }
-
-  double number (const symbol key) const
-  { return frame.number (key); }
-
-  // WSource interface.
   Implementation (const BlockModel& al)
-    : frame (*Librarian::submodel_frame (Weatherdata::load_syntax), 
-             Frame::parent_link)
+    : FrameSubmodelValue (*Librarian::submodel_frame 
+                          /**/ (Weatherdata::load_syntax), 
+                          Frame::parent_link),
+      begin (al.check ("begin") ? ::submodel<Time> (al, "begin") : NULL),
+      end (al.check ("end") ? ::submodel<Time> (al, "end") : NULL)
   { 
-    std::set<symbol> entries;
-    frame.entries (entries);
-    for (std::set<symbol>::iterator i = entries.begin ();
-         i != entries.end ();
+    std::set<symbol> all;
+    entries (all);
+    for (std::set<symbol>::iterator i = all.begin ();
+         i != all.end ();
          i++)
       {
         const symbol key = *i;
@@ -65,18 +56,16 @@ struct WSourceBase::Implementation
         switch (al.lookup (*i))
           {
           case Attribute::Number:
-            frame.set (key, al.number (key));
+            set (key, al.number (key));
             break;
           case Attribute::String:
-            frame.set (key, al.name (key));
+            set (key, al.name (key));
             break;
           default:
             break;
           }
       }
   }
-  ~Implementation ()
-  { }
 };
 
 void 
@@ -113,11 +102,21 @@ WSourceBase::screen_height (const symbol) const
 
 const Time& 
 WSourceBase::begin () const
-{ static const Time time (1, 1, 1, 0); return time; }
+{ 
+  if (impl->begin.get ())
+    return *impl->begin;
+  static const Time time (1, 1, 1, 0); 
+  return time; 
+}
 
 const Time& 
 WSourceBase::end () const
-{ static const Time time (9999, 12, 31, 23); return time; }
+{ 
+  if (impl->end.get ())
+    return *impl->end;
+  static const Time time (9999, 12, 31, 23); 
+  return time; 
+}
 
 
 WSourceBase::WSourceBase (const BlockModel& al)
@@ -135,7 +134,15 @@ static struct WSourceBaseSyntax : public DeclareBase
                    "Weather that does not change during the simulation.")
   { }
   void load_frame (Frame& frame) const
-  { Weatherdata::load_syntax (frame); }
+  {
+    Weatherdata::load_syntax (frame); 
+    frame.declare_submodule ("begin", Attribute::OptionalConst,
+                             "Only use data after this date.", 
+                             Time::load_syntax);
+    frame.declare_submodule ("end", Attribute::OptionalConst,
+                             "Only use data before this date.",
+                             Time::load_syntax);
+  }
 } WSourceBase_syntax;
 
 // wsource_base.C ends here.

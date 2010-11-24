@@ -24,8 +24,11 @@
 #include "attribute.h"
 #include "assertion.h"
 #include "mathlib.h"
+#include "treelog.h"
+#include "check.h"
 #include "librarian.h"
 #include "frame.h"
+#include <sstream>
 #include <map>
 
 namespace Weatherdata
@@ -64,20 +67,41 @@ namespace Weatherdata
   {
     symbol description;
     symbol dimension;
-    double min_value;
-    double max_value;
+
+    struct InCheck : public Check
+    {
+      double min_value;
+      double max_value;
+
+      bool verify (const double value, Treelog& msg) const
+      { 
+        if (value < min_value || value > max_value)
+          {
+            std::ostringstream tmp;
+            tmp << "'" << value << "' is outside the interval ["
+                << min_value << ":" << max_value << "]";
+            msg.warning (tmp.str ());
+          }
+        return true; 
+      }
+      
+      InCheck (const double mi, const double ma)
+        : min_value (mi),
+          max_value (ma)
+      { }
+    };
+    boost::shared_ptr<InCheck> in_check;
 
     DDT (const symbol de, const symbol di, const double mi, const double ma)
       : description (de),
         dimension (di),
-        min_value (mi),
-        max_value (ma)
+        in_check (new InCheck (mi, ma))
+        
     { }
     DDT ()
       : description ("dummy"),
         dimension (Attribute::Unknown ()),
-        min_value (NAN),
-        max_value (NAN)
+        in_check ()
     { }
   };
   
@@ -118,14 +142,16 @@ namespace Weatherdata
   {
     const data_description_map::const_iterator i = DD.find (name);
     daisy_assert (i != DD.end ());
-    return (*i).second.min_value;
+    daisy_assert ((*i).second.in_check.get ());
+    return (*i).second.in_check->min_value;
   }
 
   double max_value (const symbol name)
   {
     const data_description_map::const_iterator i = DD.find (name);
     daisy_assert (i != DD.end ());
-    return (*i).second.max_value;
+    daisy_assert ((*i).second.in_check.get ());
+    return (*i).second.in_check->max_value;
   }
 
   void load_syntax (Frame& frame)
@@ -135,8 +161,13 @@ namespace Weatherdata
          i++)
       {
         const symbol key = (*i).first;
-        frame.declare (key, dimension (key), Attribute::OptionalConst,
-                       description (key));
+        const Check *const check = (*i).second.in_check.get ();
+        if (check)
+          frame.declare (key, dimension (key), *check, Attribute::OptionalConst,
+                         description (key));
+        else
+          frame.declare (key, dimension (key), Attribute::OptionalConst,
+                         description (key));
       }
   }
 }

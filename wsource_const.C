@@ -25,9 +25,14 @@
 
 struct WSourceConst : public WSourceBase
 {
-  void tick () const
+  void tick ()
   { }
 
+  void initialize (Treelog&)
+  { }
+  using WSourceBase::check;
+  bool check (Treelog&) const
+  { return true; }
   WSourceConst (const BlockModel& al)
     : WSourceBase (al)
   { }

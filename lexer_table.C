@@ -570,6 +570,34 @@ LexerTable::get_entries (std::vector<std::string>& entries) const
 { return impl->get_entries (entries); }
 
 bool
+LexerTable::is_time (symbol tag)
+{
+  static struct times_t : public std::set<symbol>
+  {
+    times_t ()
+    {
+      insert ("year");
+      insert ("Year");
+      insert ("month");
+      insert ("Month");
+      insert ("mday");
+      insert ("Day");
+      insert ("hour");
+      insert ("Hour");
+      insert ("minute");
+      insert ("Minute");
+      insert ("second");
+      insert ("Second");
+      insert ("microsecond");
+      insert ("Microsecond");
+      insert ("time");
+      insert ("Date");
+    }
+  } times;
+  return times.find (tag) != times.end ();
+}
+      
+bool
 LexerTable::Implementation::get_time (const std::string& entry, Time& time,
                                       int default_hour)
 {

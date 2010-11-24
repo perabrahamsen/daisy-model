@@ -401,7 +401,7 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C
-MODELS = wsource_const.C weather_extra.C \
+MODELS = wsource_table.C wsource_const.C weather_extra.C \
 	groundwater_source.C xysource_xycombine.C xysource_flux.C \
 	gnuplot_soil.C reaction_sorption.C hydraulic_B_C_inverse.C \
 	program_osvaldo.C vegetation_permanent.C  litter.C drain_lateral.C \
@@ -1395,7 +1395,7 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h \
 wsource_base${OBJ}: wsource_base.C wsource_base.h wsource.h model.h scope.h \
  attribute.h symbol.h weatherdata.h time.h assertion.h mathlib.h \
  librarian.h frame_submodel.h frame.h block_model.h block_nested.h \
- block.h treelog.h frame_model.h
+ block.h treelog.h frame_model.h submodeler.h block_submodel.h
 log_dlf${OBJ}: log_dlf.C log_dlf.h log_select.h log.h time.h symbol.h \
  border.h model_framed.h model_logable.h model.h memutils.h dlf.h \
  select.h destination.h units.h volume.h model_derived.h attribute.h \
@@ -1490,7 +1490,8 @@ log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
  model_framed.h model_logable.h model.h library.h frame_submodel.h \
  frame.h scope.h attribute.h frame_model.h assertion.h metalib.h
 weatherdata${OBJ}: weatherdata.C weatherdata.h symbol.h attribute.h \
- assertion.h mathlib.h librarian.h model.h frame.h scope.h
+ assertion.h mathlib.h treelog.h check.h librarian.h model.h frame.h \
+ scope.h
 scope_xysources${OBJ}: scope_xysources.C scope_xysources.h scope.h \
  attribute.h symbol.h memutils.h xysource.h model.h treelog.h assertion.h \
  mathlib.h
@@ -1651,6 +1652,10 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+wsource_table${OBJ}: wsource_table.C wsource_base.h wsource.h model.h scope.h \
+ attribute.h symbol.h weatherdata.h time.h lexer_table.h block_model.h \
+ block_nested.h block.h treelog.h frame_model.h frame.h units.h \
+ memutils.h librarian.h frame_submodel.h assertion.h mathlib.h
 wsource_const${OBJ}: wsource_const.C wsource_base.h wsource.h model.h scope.h \
  attribute.h symbol.h librarian.h
 weather_extra${OBJ}: weather_extra.C weather.h model_derived.h \

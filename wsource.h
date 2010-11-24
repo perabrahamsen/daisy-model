@@ -27,6 +27,7 @@
 
 class BlockModel;
 class Time;
+class Treelog;
 
 class WSource : public Model, public Scope
 {
@@ -51,9 +52,13 @@ public:
 public:
   virtual const Time& begin () const = 0;         // Start of timestep.
   virtual const Time& end () const = 0;           // End of timestep.
-  virtual void tick () const = 0;
+  virtual void tick () = 0;
   
   // Create and Destroy.
+public:
+  virtual void initialize (Treelog&) = 0;
+  using Scope::check;
+  virtual bool check (Treelog&) const = 0;
 protected:
   explicit WSource ();
 public:

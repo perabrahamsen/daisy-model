@@ -1,3 +1,8 @@
+2010-11-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* wsource_table.C: New model.
+	* Makefile (MODELS): Added it.
+
 2010-11-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* wsource_base.h, wsource_base.C: New base model.
