@@ -807,12 +807,13 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	    air_temperature_[hour] = T_normal (now);
 	  global_radiation_[hour] = last_global_radiation;
 	  if (long_timestep)
-	    global_radiation_[hour] *= day_cycle (now) * 24.0;
+	    global_radiation_[hour] *= relative_extraterestial_radiation (now);
 	  if (has_diffuse_radiation_)
 	    {
 	      diffuse_radiation_[hour] = last_diffuse_radiation;
 	      if (long_timestep)
-		diffuse_radiation_[hour] *= day_cycle (now) * 24.0;
+		diffuse_radiation_[hour] 
+                  *= relative_extraterestial_radiation (now);
 	    }
 	  else 
 	    diffuse_radiation_[hour] = 0.0;
@@ -850,7 +851,8 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	      reference_evapotranspiration_[hour] 
 		= last_reference_evapotranspiration;
 	      if (long_timestep)
-		reference_evapotranspiration_[hour] *= day_cycle (now) * 24.0;
+		reference_evapotranspiration_[hour]
+                  *= relative_extraterestial_radiation (now);
 	    }
 	  else
 	    reference_evapotranspiration_[hour] 

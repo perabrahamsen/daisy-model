@@ -92,13 +92,21 @@ double
 WSourceBase::number (const symbol key) const
 { return impl->number (key); }
 
-symbol 
-WSourceBase::station (const symbol) const
-{ return Attribute::Unknown (); }
+symbol
+WSourceBase::name (const symbol key) const
+{ return impl->name (key); }
+
+Attribute::type 
+WSourceBase::meta_lookup (const symbol, const symbol meta) const
+{ return lookup (meta); }
 
 double 
-WSourceBase::screen_height (const symbol) const
-{ return NAN; }
+WSourceBase::meta_number (const symbol, const symbol meta) const
+{ return number (meta); }
+
+symbol 
+WSourceBase::meta_name (const symbol, const symbol meta) const
+{ return name (meta); }
 
 const Time& 
 WSourceBase::begin () const

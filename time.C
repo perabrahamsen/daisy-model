@@ -153,6 +153,26 @@ Time::set_time (Frame& parent, const symbol key) const
   parent.set (key, child);
 }
 
+double 
+Time::year_fraction () const
+{
+  // Fraction of year since new year.
+  const double total_days = leap (year ()) ? 366.0 : 365.0;
+  const double days = yday () + day_fraction ();
+  return days / total_days;
+}
+
+double 
+Time::day_fraction () const
+{
+  // Fraction of day since midnight.
+  const double microseconds = microsecond ();
+  const double seconds = second () + microseconds / 1000000.0;
+  const double minutes = minute () + seconds / 60.0;
+  const double hours = hour () + minutes / 60.0;
+  return hours / 24.0;
+}
+
 int 
 Time::component_value (component_t c) const
 {

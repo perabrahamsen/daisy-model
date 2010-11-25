@@ -49,12 +49,16 @@ struct WSourceTable : public WSourceBase
   // Scope.
   bool check (const symbol key) const;
   double number (const symbol key) const;
+  using WSource::name;
+  symbol name (const symbol key) const;
 
   // WSource.
   const Time& begin () const;
   const Time& end () const;
   void read_line ();
   void tick ();
+  bool done () const
+  { return !ok; }
 
   void initialize (Treelog& msg) ;
   bool check (Treelog&) const
@@ -110,6 +114,19 @@ WSourceTable::number (const symbol key) const
 
   // Keyword.
   return keywords.number (key);
+}
+
+symbol
+WSourceTable::name (const symbol key) const
+{ 
+  // Table not suported.
+
+  // Attribute.
+  if (super::check (key))
+    return super::name (key); 
+
+  // Keyword.
+  return keywords.name (key);
 }
 
 const Time& 
@@ -194,7 +211,7 @@ WSourceTable::tick ()
 void 
 WSourceTable::initialize (Treelog& msg) 
 { 
-  TREELOG_MODEL (msg);
+  TREELOG_SUBMODEL (msg, this->WSource::name);
 
   // Read header.
   ok = true;

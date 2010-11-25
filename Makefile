@@ -480,7 +480,7 @@ MODELS = wsource_table.C wsource_const.C weather_extra.C \
 
 DISABLED = depend.C \
 	crop_old.C crop_sold.C log_clone.C action_merge.C action_divide.C \
-	weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C 
+	hydraulic_old.C hydraulic_old2.C weather_hourly.C 
 # A component is a common interface to a number of models.
 # 
 COMPONENTS = wsource.C solute.C drain.C \
@@ -523,7 +523,7 @@ SPECIALS = wsource_base.C log_dlf.C reaction_colgen.C weather_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = weatherdata.C \
+OTHER = astronomy.C weatherdata.C \
 	scope_xysources.C lexer_flux.C lexer_soil.C iterative.C \
 	water.C block_nested.C block_submodel.C block_top.C block_model.C \
 	value.C type.C model_derived.C model_logable.C model_framed.C \
@@ -614,7 +614,7 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = gnuplot_flux.C 
+REMOVE = weather_file.C gnuplot_flux.C 
 
 REMOVED = ABAeffect_exp.C ABAeffect.C ABAeffect.h \
 	stomatacon_Leuning.C stomatacon_BB.C \
@@ -1193,7 +1193,7 @@ log${OBJ}: log.C log.h time.h symbol.h border.h model_framed.h \
 weather${OBJ}: weather.C weather.h model_derived.h model_logable.h model.h \
  symbol.h weatherdata.h block_model.h block_nested.h block.h scope.h \
  attribute.h treelog.h frame_model.h frame.h librarian.h log.h time.h \
- border.h model_framed.h im.h
+ border.h model_framed.h im.h astronomy.h
 column${OBJ}: column.C column.h model_framed.h model_logable.h model.h \
  symbol.h irrigate.h memutils.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h log.h time.h \
@@ -1489,9 +1489,11 @@ geometry${OBJ}: geometry.C geometry.h symbol.h attribute.h volume.h \
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
  model_framed.h model_logable.h model.h library.h frame_submodel.h \
  frame.h scope.h attribute.h frame_model.h assertion.h metalib.h
-weatherdata${OBJ}: weatherdata.C weatherdata.h symbol.h attribute.h \
- assertion.h mathlib.h treelog.h check.h librarian.h model.h frame.h \
- scope.h
+astronomy${OBJ}: astronomy.C astronomy.h time.h symbol.h mathlib.h \
+ assertion.h
+weatherdata${OBJ}: weatherdata.C weatherdata.h symbol.h time.h units.h \
+ memutils.h attribute.h assertion.h mathlib.h treelog.h check.h vcheck.h \
+ librarian.h model.h frame.h scope.h
 scope_xysources${OBJ}: scope_xysources.C scope_xysources.h scope.h \
  attribute.h symbol.h memutils.h xysource.h model.h treelog.h assertion.h \
  mathlib.h

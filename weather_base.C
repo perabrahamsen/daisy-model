@@ -60,8 +60,7 @@ void
 WeatherBase::tick (const Time& time, Treelog&)
 {
   // Day length.
-  day_length_ = day_length (time);
-  day_cycle_ = day_cycle (time);
+  day_length_ = Weather::day_length (time);
 }
 
 void 
@@ -69,25 +68,12 @@ WeatherBase::tick_after (const Time& time, Treelog&)
 {
   // Hourly claudiness.
   const double Si = global_radiation (); 
-  const double rad = HourlyExtraterrestrialRadiation (time);
+  const double rad = extraterrestrial_radiation (time);
   if (Si > 25.0 && rad > 25.0)
     {
       cloudiness_ = FAO::CloudinessFactor_Humid (Si, rad);
       daisy_assert (cloudiness_ >= 0.0);
       daisy_assert (cloudiness_ <= 1.0);
-    }
-
-  // Daily claudiness.
-  if (time.hour () == 0)
-    {
-      const double Si = daily_global_radiation () ;
-      const double rad = ExtraterrestrialRadiation (time);
-      if (Si > 25.0 && rad > 25.0)
-	{
-	  daily_cloudiness_ = FAO::CloudinessFactor_Humid (Si, rad);
-	  daisy_assert (daily_cloudiness_ >= 0.0);
-	  daisy_assert (daily_cloudiness_ <= 1.0);
-	}
     }
 
   // Deposition.
@@ -165,6 +151,7 @@ bool
 WeatherBase::has_min_max_temperature () const
 { return false; }
 
+#if 0
 double 
 WeatherBase::day_cycle (const Time& time) const	// Sum over a day is 1.0.
 {
@@ -178,7 +165,7 @@ WeatherBase::day_cycle (const Time& time) const	// Sum over a day is 1.0.
   for (int i = 0; i < 24; i++)
     sum += std::max (0.0, M_PI_2 / dl * cos (M_PI * (i + 0.5 - 12) / dl));
 
-  const double hour = time.hour () + 0.5; // Value in the middle of time step.
+  const double hour = time.day_fraction () * 24.0;
 
   // Day cycle.
   const double dc = std::max (0.0, M_PI_2 / dl * cos (M_PI * (hour - 12) / dl));
@@ -187,40 +174,19 @@ WeatherBase::day_cycle (const Time& time) const	// Sum over a day is 1.0.
 
   return dc / sum;
 }
-
-double
-WeatherBase::day_length (const Time& time) const
-{
-  double t = 2 * M_PI / 365 * time.yday ();
-
-  const double Dec = (0.3964 - 22.97 * cos (t) + 3.631 * sin (t)
-		      - 0.03885 * cos (2 * t)
-		      + 0.03838 * sin (2 * t) - 0.15870 * cos (3 * t)
-		      + 0.07659 * sin (3 * t) - 0.01021 * cos (4 * t));
-  double my_tan 
-    = -tan (M_PI / 180.0 * Dec) * tan (M_PI / 180.0 * latitude ());
-  if (my_tan <= -1.0)
-    my_tan = -1.0;
-  else if (my_tan >= 1.0)
-    my_tan = 1.0;
-  t = (24 / M_PI * acos (my_tan));
-  const double dl = (t < 0) ? t + 24.0 : t;
-  daisy_assert (dl >= 0.0);
-  daisy_assert (dl <= 24.0);
-  return dl;
-}
+#endif
 
 double
 WeatherBase::T_normal (const Time& time, double delay) const
 {
-  const double rad_per_day = 2.0 * M_PI / 365.0;
+  const double displacement = time.year_fraction () - max_Ta_yday / 365.0;
 
+  daisy_assert (delay <= 0);
   daisy_assert (T_average > -400);
   return T_average
     + T_amplitude
     * exp (delay)
-    * cos (rad_per_day * (time.yday () + (time.hour () - 15) / 24.0
-                          - max_Ta_yday) + delay);
+    * cos (2.0 * M_PI * displacement + delay);
 }
 
 double 
@@ -228,65 +194,6 @@ WeatherBase::average_temperature () const
 { 
   daisy_assert (T_average > -400);
   return T_average; 
-}
-
-double
-WeatherBase::SolarDeclination (const Time& time) // [rad]
-{
-  return (0.409 * sin (2.0 * M_PI * time.yday () / 365.0 - 1.39));
-}
-
-double
-WeatherBase::RelativeSunEarthDistance (const Time& time)
-{
-  return (1.0 + 0.033 * cos (2.0 * M_PI * time.yday () / 365.0));
-}
-
-double
-WeatherBase::SunsetHourAngle (double Dec, double Lat) // [rad]
-{
-  return (acos (-tan (Dec) * tan (Lat)));
-}
-
-const double SolarConstant = 1366.7; // {W/m2]
-
-double
-WeatherBase::ExtraterrestrialRadiation (const Time& time) const // [W/m2]
-{
-  const double Dec = SolarDeclination (time);
-  const double Lat = M_PI / 180 * latitude ();
-  const double x1 = SunsetHourAngle (Dec, Lat) * sin (Lat) * sin (Dec);
-  const double x2 = cos (Lat) * cos (Dec) * sin (SunsetHourAngle (Dec, Lat));
-  return (SolarConstant * RelativeSunEarthDistance (time) * (x1 + x2) / M_PI);
-}
-
-double
-WeatherBase::HourlyExtraterrestrialRadiation (const Time& time) const // [W/m2]
-{
-  return (SolarConstant * RelativeSunEarthDistance (time) 
-          * sin_solar_elevation_angle (time));
-}
-
-double
-WeatherBase::sin_solar_elevation_angle (const Time& time) const // []
-{
-  static const double EQT0   = 0.002733;
-  static const double EQT1[] = {-7.343,-9.470,-0.3289,-0.1955};
-  static const double EQT2[] = {0.5519,-3.020,-0.07581,-0.1245};
-  const double Dec = SolarDeclination (time);
-  
-  const double Lat = M_PI / 180.0 * latitude ();
-  const double timelag = (timezone () - longitude ()) / 15.0;
-  double EQT = EQT0;
-  for (unsigned int i = 0; i < 3; i++)
-    {
-       const double P = 2.0 * M_PI / 365.0 * (i+1) * time.yday();
-       EQT += EQT1[i] * sin(P) + EQT2[i] * cos(P);
-    }
-  EQT /= 60.0;
-  const double SunHourAngle = M_PI / 12.0 
-    * (time.hour() + 0.5 + EQT - timelag + 12);
-  return (sin(Lat)*sin(Dec) + cos(Lat)*cos(Dec)*cos(SunHourAngle));
 }
 
 bool
@@ -313,9 +220,7 @@ WeatherBase::WeatherBase (const BlockModel& al)
     T_amplitude (-42.42e42),
     max_Ta_yday (-42.42e42),
     day_length_ (-42.42e42),
-    day_cycle_ (-42.42e42),
     cloudiness_ (0.0),	// It may be dark at the start.
-    daily_cloudiness_ (0.0),
     deposit_ (al, "deposit")
 { }
 

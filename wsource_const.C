@@ -27,7 +27,8 @@ struct WSourceConst : public WSourceBase
 {
   void tick ()
   { }
-
+  bool done () const
+  { return true; }
   void initialize (Treelog&)
   { }
   using WSourceBase::check;

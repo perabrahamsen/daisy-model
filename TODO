@@ -4,16 +4,13 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** Weather source
 
-New base class.  Skal konvertere Weatherdata til specifikke funktioner.
+En enkelt WSource parameter.
 
-** Weather mix
+For hver virtuel Weather::function, afgør hvordan de skabes fra WSource.
 
-Combine weather sources, and interpolate/aggregate data.
-Konverter typer, min/max, daily
+** WSource combine
 
-** Flere default weather keywords i WSource
-
-Station, Begin, End, Note, Location, Surface
+combiner flere WSource
 
 * Hent gammel PC.
 

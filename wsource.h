@@ -39,20 +39,16 @@ public:
 
   // Meta information.
 public:  
-  // KEY is available in this source.  
-  bool has (symbol key) const;
-  // KEY is available in this source.  
-  double value (symbol key) const;
-  // KEY is measured at STATION.
-  virtual symbol station (symbol key) const = 0;  
-  // KEY is measured at SCREEN HEIGHT.
-  virtual double screen_height (symbol key) const = 0; 
-
+  virtual Attribute::type meta_lookup (symbol key, symbol meta) const = 0;
+  virtual double meta_number (symbol key, symbol meta) const = 0;
+  virtual symbol meta_name (symbol key, symbol meta) const = 0;
+  
   // Timestep.
 public:
   virtual const Time& begin () const = 0;         // Start of timestep.
   virtual const Time& end () const = 0;           // End of timestep.
   virtual void tick () = 0;
+  virtual bool done () const = 0;
   
   // Create and Destroy.
 public:

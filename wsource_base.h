@@ -39,11 +39,14 @@ public:
   using WSource::check;
   bool check (const symbol key) const;
   double number (const symbol key) const;
+  using WSource::name;
+  symbol name (const symbol key) const;
 
   // WSource interface.
 public:
-  symbol station (const symbol) const;
-  double screen_height (const symbol) const;
+  Attribute::type meta_lookup (symbol key, symbol meta) const;
+  double meta_number (symbol key, symbol meta) const;
+  symbol meta_name (symbol key, symbol meta) const;
   const Time& begin () const;
   const Time& end () const;
 

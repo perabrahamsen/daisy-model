@@ -60,14 +60,10 @@ protected:
   // State
 private:
   double day_length_;
-  double day_cycle_;
   double cloudiness_;
-  double daily_cloudiness_;
   IM deposit_;
   double cloudiness () const // [0-1]
   { return cloudiness_; }
-  double daily_cloudiness () const // [0-1]
-  { return daily_cloudiness_; }
   const IM& deposit () const; // [g [stuff] /cm²/h]
 
   // Simulation.
@@ -96,12 +92,6 @@ public:
 public:
   double day_length () const	// [h]
   { return day_length_; }
-  double day_cycle () const	// Sum over a day is 1.0.
-  { return day_cycle_; }
-public:
-  double day_cycle (const Time&) const;	// Sum over a day is 1.0.
-private:
-  double day_length (const Time&) const;
 
   // Communication with SoilHeat.
 public:
@@ -110,15 +100,6 @@ public:
   // OrganicMatter initialization.
 public:
   double average_temperature () const;
-
-  // Astronomic utilities.
-public:
-  static double SolarDeclination (const Time& time); // [rad]
-  static double RelativeSunEarthDistance (const Time& time);
-  static double SunsetHourAngle (double Dec, double Lat); // [rad]
-  double ExtraterrestrialRadiation (const Time& time) const; // [W/m2]
-  double HourlyExtraterrestrialRadiation (const Time& time) const; // [W/m2]
-  double sin_solar_elevation_angle (const Time& time) const; // []
 
   // Create and Destroy.
 public:

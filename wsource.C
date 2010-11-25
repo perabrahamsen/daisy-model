@@ -32,14 +32,6 @@ WSource::library_id () const
   return id;
 }
 
-bool 
-WSource::has (const symbol key) const
-{ return lookup (key) == Attribute::Number; }
-
-double
-WSource::value (const symbol key) const
-{ return number (key); }
-  
 WSource::WSource ()
 { }
 

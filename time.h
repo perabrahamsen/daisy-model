@@ -64,6 +64,8 @@ public:
   int microsecond () const;
   std::string print () const;
   void set_time (Frame&, symbol key) const;
+  double year_fraction () const; // Fraction of year since Jan 1.
+  double day_fraction () const;  // Fraction of day since midnight.
 
   enum component_t {
     Year, Month, Week, Yday, Mday, Wday, Hour, Minute, Second, Microsecond,

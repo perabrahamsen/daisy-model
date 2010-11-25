@@ -67,7 +67,8 @@ WeatherOld::output (Log& log) const
 
 double
 WeatherOld::global_radiation () const
-{ return (day_cycle () * 24.0) * daily_global_radiation (); }
+{ return relative_extraterestial_radiation (impl.time)
+    * daily_global_radiation (); }
 
 double
 WeatherOld::daily_global_radiation () const

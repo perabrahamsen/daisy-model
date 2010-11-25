@@ -46,20 +46,17 @@ struct PetHargreaves : public Pet
       const double T_diff = std::max (weather.daily_max_air_temperature () 
                                       - weather.daily_min_air_temperature (),
                                       0.0);
-      static const double s_per_d = 60.0 * 60.0 * 24.0; // [W] -> [J/d]
       const double latent_heat_of_vaporation = 
         FAO::LatentHeatVaporization (T_avg); // [J/kg] 
-      static const double W_per_m2_to_mm_per_d = s_per_d 
+      static const double s_per_h = 60.0 * 60.0; // [W] -> [J]
+      static const double W_per_m2_to_mm_per_h = s_per_h 
         / latent_heat_of_vaporation;
       // Note: andr. uses 0.4081633.  What are his units?
-      double Ra = weather.ExtraterrestrialRadiation (time)
-        * weather.day_cycle (time) // [d^-1] -> [h^-1]
-        * W_per_m2_to_mm_per_d; // [mm/h]
-      
+      double Ra =  weather.extraterrestrial_radiation (time)
+        * W_per_m2_to_mm_per_h; // [mm/h]
 
       reference_evapotranspiration 
         = K_hs * (T_avg + 17.8) * sqrt (T_diff) * Ra;
-
       potential_evapotranspiration_dry
 	= reference_to_potential_dry (crops, surface, 
                                       reference_evapotranspiration);

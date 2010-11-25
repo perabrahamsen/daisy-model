@@ -100,8 +100,6 @@ struct WeatherExtra : public Weather
   { return weather->deposit (); }
   double cloudiness () const
   { return weather->cloudiness (); }
-  double daily_cloudiness () const
-  { return weather->daily_cloudiness (); }
   double vapor_pressure () const
   { return weather->vapor_pressure (); }
   double relative_humidity () const
@@ -134,12 +132,6 @@ struct WeatherExtra : public Weather
   // Light distribution.
   double day_length () const
   { return weather->day_length (); }
-  double day_cycle () const
-  { return weather->day_cycle (); }
-  double day_cycle (const Time& time) const
-  { return weather->day_cycle (time); }
-  double day_length (const Time& time) const
-  { return weather->day_length (time); }
 
   // Communication with SoilHeat.
   double T_normal (const Time& time, double delay = 0.0) const
@@ -149,14 +141,6 @@ struct WeatherExtra : public Weather
   double average_temperature () const
   { return weather->average_temperature (); }
 
-  // Astronomic utilities.
-  double ExtraterrestrialRadiation (const Time& time) const
-  { return weather->ExtraterrestrialRadiation (time); }
-  double HourlyExtraterrestrialRadiation (const Time& time) const
-  { return weather->HourlyExtraterrestrialRadiation (time); }
-  double sin_solar_elevation_angle (const Time& time) const
-  { return weather->sin_solar_elevation_angle (time); }
-  
   // Create and Destroy.
   bool initialize (const Time& time, Treelog& msg);
   bool check (const Time& from, const Time& to, Treelog& msg) const;

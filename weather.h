@@ -74,7 +74,6 @@ public:
   virtual double snow () const = 0;	// [mm/h]
   virtual const IM& deposit () const = 0; // [g [stuff] /cm²/h]
   virtual double cloudiness () const = 0; // [0-1]
-  virtual double daily_cloudiness () const = 0; // [0-1]
   virtual double vapor_pressure () const = 0; // [Pa]
   virtual double relative_humidity () const = 0; // []
   virtual double wind () const = 0;	// [m/s]
@@ -95,9 +94,6 @@ public:
   // Light distribution.
 public:
   virtual double day_length () const = 0; // [h]
-  virtual double day_cycle () const = 0; // Sum over a day is 1.0.
-  virtual double day_cycle (const Time&) const = 0; // Sum over a day is 1.0.
-  virtual double day_length (const Time&) const = 0;
 
   // Communication with SoilHeat.
 public:
@@ -109,9 +105,11 @@ public:
 
   // Astronomic utilities.
 public:
-  virtual double ExtraterrestrialRadiation (const Time& time) const = 0; // [W/m2]
-  virtual double HourlyExtraterrestrialRadiation (const Time& time) const = 0; // [W/m2]
-  virtual double sin_solar_elevation_angle (const Time& time) const = 0; // []
+  double extraterrestrial_radiation (const Time&) const; // [W/m2]
+  double sin_solar_elevation_angle (const Time&) const; // []
+protected:
+  double relative_extraterestial_radiation (const Time&) const; // []
+  double day_length (const Time&) const; // [h]
 
   // Create and Destroy.
 public:

@@ -32,7 +32,7 @@ namespace Weatherdata
   // Surface type.
   enum surface_t { reference, field };
 
-  // Known symbols.
+  // Variable symbols.
   symbol GlobRad ();
   symbol AirTemp ();
   symbol T_min ();
@@ -44,6 +44,34 @@ namespace Weatherdata
   symbol RelHum ();
   symbol Wind ();
 
+  // Stationary symbols.
+  symbol Latitude ();
+  symbol Longitude ();
+  symbol Elevation ();
+  symbol TimeZone ();
+  symbol ScreenHeight ();
+  symbol TAverage ();
+  symbol TAmplitude ();
+  symbol MaxTDay ();
+  symbol NH4WetDep ();
+  symbol NH4DryDep ();
+  symbol NO3WetDep ();
+  symbol NO3DryDep ();
+  symbol Deposition ();
+  symbol DepDry ();
+  symbol DepDryNH4 ();
+  symbol DepWetNH4 ();
+  symbol PAverage ();
+  symbol Timestep ();
+
+  // Symbols representing non-numeric values.
+  symbol Station ();
+  symbol Note ();
+  symbol Surface ();
+  symbol PrecipCorrect ();
+  symbol Begin ();
+  symbol End ();
+  
   // Information about a symbol.
   symbol dimension (const symbol);
   symbol description (const symbol);

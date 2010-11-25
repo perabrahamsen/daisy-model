@@ -21,11 +21,14 @@
 #define BUILD_DLL
 
 #include "weatherdata.h"
+#include "time.h"
+#include "units.h"
 #include "attribute.h"
 #include "assertion.h"
 #include "mathlib.h"
 #include "treelog.h"
 #include "check.h"
+#include "vcheck.h"
 #include "librarian.h"
 #include "frame.h"
 #include <sstream>
@@ -62,6 +65,80 @@ namespace Weatherdata
 
   symbol Wind ()
   { static const symbol name ("Wind"); return name; }
+
+  // Stationary symbols.
+  symbol Latitude ()
+  { static const symbol name ("Latitude"); return name; }
+  
+  symbol Longitude ()
+  { static const symbol name ("Longitude"); return name; }
+  
+  symbol Elevation ()
+  { static const symbol name ("Elevation"); return name; }
+  
+  symbol TimeZone ()
+  { static const symbol name ("TimeZone"); return name; }
+  
+  symbol ScreenHeight ()
+  { static const symbol name ("ScreenHeight"); return name; }
+  
+  symbol TAverage ()
+  { static const symbol name ("TAverage"); return name; }
+  
+  symbol TAmplitude ()
+  { static const symbol name ("TAmplitude"); return name; }
+  
+  symbol MaxTDay ()
+  { static const symbol name ("MaxTDay"); return name; }
+  
+  symbol NH4WetDep ()
+  { static const symbol name ("NH4WetDep"); return name; }
+  
+  symbol NH4DryDep ()
+  { static const symbol name ("NH4DryDep"); return name; }
+  
+  symbol NO3WetDep ()
+  { static const symbol name ("NO3WetDep"); return name; }
+  
+  symbol NO3DryDep ()
+  { static const symbol name ("NO3DryDep"); return name; }
+  
+  symbol Deposition ()
+  { static const symbol name ("Deposition"); return name; }
+  
+  symbol DepDry ()
+  { static const symbol name ("DepDry"); return name; }
+  
+  symbol DepDryNH4 ()
+  { static const symbol name ("DepDryNH4"); return name; }
+  
+  symbol DepWetNH4 ()
+  { static const symbol name ("DepWetNH4"); return name; }
+  
+  symbol PAverage ()
+  { static const symbol name ("PAverage"); return name; }
+  
+  symbol Station ()
+  { static const symbol name ("Station"); return name; }
+  
+  symbol Note ()
+  { static const symbol name ("Note"); return name; }
+  
+  symbol Surface ()
+  { static const symbol name ("Surface"); return name; }
+  
+  symbol PrecipCorrect ()
+  { static const symbol name ("PrecipCorrect"); return name; }
+  
+  symbol Begin ()
+  { static const symbol name ("Begin"); return name; }
+  
+  symbol End ()
+  { static const symbol name ("End"); return name; }
+  
+  symbol Timestep ()
+  { static const symbol name ("Timestep"); return name; }
+  
 
   struct DDT
   {
@@ -109,16 +186,58 @@ namespace Weatherdata
   {
     data_description_map ()
     {
-      (*this)["GlobRad"] = DDT ("Global radiation", "W/m^2", 0, 1400);
-      (*this)["AirTemp"] = DDT ("Air temperature", "dgC", -70, 60);
-      (*this)["T_min"] = DDT ("Minimum air temperature", "dgC", -70, 60);
-      (*this)["T_max"] = DDT ("Maximum air temperature", "dgC", -70, 60);
-      (*this)["Precip"] = DDT ("Precipitation", "mm/h", 0, 300);
-      (*this)["RefEvap"] = DDT ("Reference evapotranspiration", "mm/h", -10, 20);
-      (*this)["VapPres"] = DDT ("Vapor pressure", "Pa", 0, 5000);
-      (*this)["DiffRad"] = DDT ("Diffuse radiation", "W/m^2", 0, 1400);
-      (*this)["RelHum"] = DDT ("Relative humidity", "fraction", 0, 5000);
-      (*this)["Wind"] = DDT ("Wind speed", "m/s", 0, 40);
+      (*this)["GlobRad"] = DDT ("Global radiation.", "W/m^2", 0, 1400);
+      (*this)["AirTemp"] = DDT ("Air temperature.", "dgC", -70, 60);
+      (*this)["T_min"] = DDT ("Minimum air temperature.", "dgC", -70, 60);
+      (*this)["T_max"] = DDT ("Maximum air temperature.", "dgC", -70, 60);
+      (*this)["Precip"] = DDT ("Precipitation.", "mm/h", 0, 300);
+      (*this)["RefEvap"] = DDT ("\
+Reference evapotranspiration.", "mm/h", -10, 20);
+      (*this)["VapPres"] = DDT ("Vapor pressure.", "Pa", 0, 5000);
+      (*this)["DiffRad"] = DDT ("Diffuse radiation.", "W/m^2", 0, 1400);
+      (*this)["RelHum"] = DDT ("Relative humidity.", "fraction", 0, 5000);
+      (*this)["Wind"] = DDT ("Wind speed.", "m/s", 0, 40);
+      (*this)["Latitude"] = DDT ("\
+Location of station (north-south).", "dgNorth", -90, 90);
+      (*this)["Longitude"] = DDT ("\
+Location of station (east-west).", "dgEast", -360, 360);
+      (*this)["Elevation"] = DDT ("\
+Station altitude over sea level.", "m", 0, 10000);
+      (*this)["TimeZone"] = DDT ("Time zone.", "dgEast", -360, 360);
+      (*this)["ScreenHeight"] = DDT ("\
+Measurement altitude over ground level.", "m", 0, 100);
+      (*this)["TAverage"] = DDT ("\
+Yearly average temperature.", "dgC", -10, 40);
+      (*this)["TAmplitude"] = DDT ("\
+Typical temperature variation over the seasons.\n\
+If you fit the daily average temperature over a year to a sinus curve,\
+this would be the amplitude.", "dgC", 0, 100);
+      (*this)["MaxTDay"] = DDT ("\
+Typical day where the temperature is highest.\n                         \
+If you fit the daily average temperature over a year to a sinus curve,\
+this would be maximum point.", "yday", 1, 365);
+      (*this)["NH4WetDep"] = DDT ("\
+NH4 concentration in precipitation.", Units::ppm (), 0, 100);
+      (*this)["NH4DryDep"] = DDT ("\
+Dry deposition of NH4.", "kg N/ha/y", 0, 100);
+      (*this)["NO3WetDep"] = DDT ("\
+NO3 concentration in precipitation.", Units::ppm (), 0, 100);
+      (*this)["NO3DryDep"] = DDT ("\
+Dry deposition of NO3.", "kg N/ha/y", 0, 100);
+      (*this)["Deposition"] = DDT ("Total N deposition.", "kg N/ha/y", 0, 100);
+      (*this)["DepDry"] = DDT ("\
+Fraction of total N deposition that is dry.", Attribute::Fraction (), 0, 1);
+      (*this)["DepDryNH4"] = DDT ("\
+NH4 fraction of dry deposition.", Attribute::Fraction (), 0, 1);
+      (*this)["DepWetNH4"] = DDT ("\
+NH4 fraction of wet deposition.", Attribute::Fraction (), 0, 1);
+      (*this)["PAverage"] = DDT ("\
+Average precipitation.  Used for deviding precipitation into dry and wet.",
+                                 "mm", 0.01, 3000);
+      (*this)["Timestep"] = DDT ("Timestep for weather data.",
+                                 "h", 
+                                 1.0 / (60.0 * 60.0 * 1000000.0), // 1 [us]
+                                 24 * 365.2425 * 1000.0);         // 1000 [y]
     };
   } DD;
  
@@ -156,6 +275,7 @@ namespace Weatherdata
 
   void load_syntax (Frame& frame)
   {
+    //Numbers.
     for (data_description_map::const_iterator i = DD.begin ();
          i != DD.end ();
          i++)
@@ -169,6 +289,25 @@ namespace Weatherdata
           frame.declare (key, dimension (key), Attribute::OptionalConst,
                          description (key));
       }
+
+    // Other stuf.
+    frame.declare_string (Station (), Attribute::OptionalConst, "\
+Name of weather station.");
+    frame.declare_text (Note (), Attribute::OptionalConst, "\
+Note regarding this set of data.");
+    frame.declare_string (Surface (), Attribute::OptionalConst, "\
+Surface type.\n\
+Either 'reference' for a weather station standard of short grass,\n\
+or 'field' for measurements directly at the field.");
+    static VCheck::Enum surfaces ("reference", "field");
+    frame.set_check (Surface (), surfaces);
+    frame.declare (PrecipCorrect (),
+                   Attribute::None (), Attribute::OptionalConst, 12, "\
+Monthly correction factors for precipitation.");
+    frame.declare_submodule (Begin (), Attribute::OptionalConst, "\
+Beginning of weather data.", Time::load_syntax);
+    frame.declare_submodule (End (), Attribute::OptionalConst, "\
+End of weather data.", Time::load_syntax);
   }
 }
 

@@ -26,6 +26,7 @@
 #include "librarian.h"
 #include "log.h"
 #include "im.h"
+#include "astronomy.h"
 
 const char *const Weather::component = "weather";
 
@@ -42,6 +43,32 @@ Weather::dry_deposit_unit ()
   static const symbol unit ("kg/ha/y");
   return unit;
 }
+
+double 
+Weather::extraterrestrial_radiation (const Time& time) const // [W/m2]
+{ return Astronomy::ExtraterrestrialRadiation (time, 
+                                               latitude (), longitude (),
+                                               timezone ()); }
+
+double 
+Weather::sin_solar_elevation_angle (const Time& time) const // []
+{ return Astronomy::SinSolarElevationAngle (time, latitude (), longitude (),
+                                            timezone ()); }
+
+double
+Weather::relative_extraterestial_radiation (const Time& time) const
+{
+  const double average 
+    = Astronomy::DailyExtraterrestrialRadiation (time, latitude ());
+  const double current 
+    = Astronomy::ExtraterrestrialRadiation (time, latitude (),
+                                            longitude (), timezone ());
+  return current / average;
+}
+
+double
+Weather::day_length (const Time& time) const // [h]
+{ return Astronomy::DayLength (time, latitude ()); }
 
 void 
 Weather::output_common (Log& log) const
@@ -61,14 +88,12 @@ Weather::output_common (Log& log) const
   output_value (snow (), "snow", log);
   output_value (rain () + snow (), "precipitation", log);
   output_value (cloudiness (), "cloudiness", log);
-  output_value (daily_cloudiness (), "daily_cloudiness", log);
   output_value (vapor_pressure (), "vapor_pressure", log);
   output_value (air_pressure (), "air_pressure", log);
   output_value (diffuse_radiation (), "diffuse_radiation", log);
   output_value (relative_humidity (), "relative_humidity", log);
   output_value (wind (), "wind", log);
   output_value (day_length (), "day_length", log);
-  output_value (day_cycle (), "day_cycle", log);
   output_submodule (deposit (), "deposit", log);
 }
 
@@ -114,8 +139,6 @@ Weather::load_common (Frame& frame)
   frame.declare ("wind", "m/s", Attribute::LogOnly, "Wind speed.");
   frame.declare ("day_length", "h", Attribute::LogOnly,
                  "Number of light hours this day.");
-  frame.declare ("day_cycle", Attribute::None (), Attribute::LogOnly,
-                 "Fraction of daily radiation received this hour.");
   frame.declare_submodule_sequence ("deposit", Attribute::LogOnly, "\
 Total atmospheric deposition of nitrogen.", load_flux);
 }
