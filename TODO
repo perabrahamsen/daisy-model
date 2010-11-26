@@ -1,111 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* WSource -> Weather
+* OpenMI
 
-** Want
-
-  // Location.
-  virtual double latitude () const = 0;
-  virtual double longitude () const = 0; 
-  virtual double elevation () const = 0; // [m]
-  virtual double timezone () const = 0;
-  virtual double screen_height () const = 0; // [m]
-  virtual Weatherdata::surface_t surface () const = 0;
-
-  // Communication with Bioclimate.
-  virtual double air_temperature () const = 0; // [dg C]
-  virtual double daily_air_temperature () const = 0; // [dg C]
-  virtual double daily_max_air_temperature () const = 0; // [dg C]
-  virtual double daily_min_air_temperature () const = 0; // [dg C]
-  virtual double global_radiation () const = 0; // [W/m2]
-  virtual double daily_global_radiation () const = 0; // [W/m2]
-  virtual double diffuse_radiation () const = 0; // [W/m2]
-  virtual double reference_evapotranspiration () const = 0; // [mm/h]
-  virtual double daily_precipitation () const = 0; // [mm/d]
-  virtual double rain () const = 0;	// [mm/h]
-  virtual double snow () const = 0;	// [mm/h]
-  virtual const IM& deposit () const = 0; // [g [stuff] /cm²/h]
-  virtual double cloudiness () const = 0; // [0-1]
-  virtual double vapor_pressure () const = 0; // [Pa]
-  virtual double relative_humidity () const = 0; // []
-  virtual double wind () const = 0;	// [m/s]
-  virtual double CO2 () const = 0; //[Pa]
-  virtual double O2 () const = 0; //[Pa]
-  virtual double air_pressure () const = 0; //[Pa]
-
-  // Initializing bioclimate.
-  virtual bool has_reference_evapotranspiration () const = 0;
-  virtual bool has_vapor_pressure () const = 0;
-  virtual bool has_wind () const = 0;
-  virtual bool has_min_max_temperature () const = 0;
-  virtual bool has_diffuse_radiation () const = 0;
-  virtual bool has_relative_humidity () const = 0;
-  virtual double timestep () const = 0; // [d]
-
-  // Light distribution.
-  virtual double day_length () const = 0; // [h]
-
-  // Communication with SoilHeat.
-  virtual double T_normal (const Time&, double delay = 0.0) const = 0;
-
-  // OrganicMatter initialization.
-  virtual double average_temperature () const = 0;
-
-** Have
-
-  // Variable symbols.
-  symbol GlobRad ();
-  symbol AirTemp ();
-  symbol T_min ();
-  symbol T_max ();
-  symbol Precip ();
-  symbol RefEvap ();
-  symbol VapPres ();
-  symbol DiffRad ();
-  symbol RelHum ();
-  symbol Wind ();
-
-  // Stationary symbols.
-  symbol Latitude ();
-  symbol Longitude ();
-  symbol Elevation ();
-  symbol TimeZone ();
-  symbol ScreenHeight ();
-  symbol TAverage ();
-  symbol TAmplitude ();
-  symbol MaxTDay ();
-  symbol NH4WetDep ();
-  symbol NH4DryDep ();
-  symbol NO3WetDep ();
-  symbol NO3DryDep ();
-  symbol Deposition ();
-  symbol DepDry ();
-  symbol DepDryNH4 ();
-  symbol DepWetNH4 ();
-  symbol PAverage ();
-  symbol Timestep ();
-
-  // Symbols representing non-numeric values.
-  symbol Station ();
-  symbol Note ();
-  symbol Surface ();
-  symbol PrecipCorrect ();
-  symbol Begin ();
-  symbol End ();
-
-
-
-
-
-
+Optimer Set/Get og Tick
 
 * Små tidsskridt i vejr
 
 ** Weather source
 
-En enkelt WSource parameter.
-
 For hver virtuel Weather::function, afgør hvordan de skabes fra WSource.
+
+interpolate, aggregate, pedotransfer (& check)
 
 ** WSource combine
 
