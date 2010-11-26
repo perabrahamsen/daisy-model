@@ -25,6 +25,13 @@
 
 struct WSourceConst : public WSourceBase
 {
+  bool end_check (symbol key) const
+  { return check (key); }
+  double end_number (symbol key) const
+  { return number (key); }
+  symbol end_name (symbol key) const
+  { return name (key); }
+
   void tick ()
   { }
   bool done () const

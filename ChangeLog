@@ -1,9 +1,14 @@
+2010-11-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* weather_source.C: New model.
+	* Makefile (MODELS): Added it.
+
 2010-11-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* astronomy.C, astronomy.h: New utility.
 	* Makefile (OTHER): Added it.
-
 	* weather.h, weather.C, weather_base.h, weather_base.C:
+	Moved astronomy stuff to astronomy.C.
 	(daily_cloudiness): Removed.
 	(ExtraterrestrialRadiation): Removed.
 	(HourlyExtraterrestrialRadiation): Renamed ExtraterrestrialRadiation.

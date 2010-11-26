@@ -36,6 +36,34 @@
 
 namespace Weatherdata
 {
+  symbol reference_name ()
+  { static const symbol name ("reference"); return name; }
+
+  symbol field_name ()
+  { static const symbol name ("field"); return name; }
+
+  surface_t symbol2surface (const symbol key)
+  {
+    if (key == reference_name ())
+      return reference;
+    if (key == field_name ())
+      return field;
+    daisy_notreached ();
+  }
+
+  symbol surface2symbol (surface_t surface)
+  {
+    switch (surface)
+      {
+      case reference:
+        return reference_name ();
+      case field:
+        return field_name ();
+      default:
+        daisy_notreached ();
+      }
+  }
+
   symbol GlobRad ()
   { static const symbol name ("GlobRad"); return name; }
 
@@ -299,7 +327,7 @@ Note regarding this set of data.");
 Surface type.\n\
 Either 'reference' for a weather station standard of short grass,\n\
 or 'field' for measurements directly at the field.");
-    static VCheck::Enum surfaces ("reference", "field");
+    static VCheck::Enum surfaces (reference_name (), field_name ());
     frame.set_check (Surface (), surfaces);
     frame.declare (PrecipCorrect (),
                    Attribute::None (), Attribute::OptionalConst, 12, "\

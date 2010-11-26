@@ -37,11 +37,21 @@ public:
   static const char *const component;
   symbol library_id () const;
 
+  // End of timstep.
+public:  
+  virtual bool end_check (symbol key) const = 0;
+  virtual double end_number (symbol key) const = 0;
+  virtual symbol end_name (symbol key) const = 0;
+
   // Meta information.
 public:  
-  virtual Attribute::type meta_lookup (symbol key, symbol meta) const = 0;
+  virtual bool meta_check (symbol key, symbol meta) const = 0;
   virtual double meta_number (symbol key, symbol meta) const = 0;
   virtual symbol meta_name (symbol key, symbol meta) const = 0;
+  virtual bool meta_end_check (symbol key, symbol meta) const = 0;
+  virtual double meta_end_number (symbol key, symbol meta) const = 0;
+  virtual symbol meta_end_name (symbol key, symbol meta) const = 0;
+
   
   // Timestep.
 public:

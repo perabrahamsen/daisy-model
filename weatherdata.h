@@ -31,7 +31,11 @@ namespace Weatherdata
 {
   // Surface type.
   enum surface_t { reference, field };
-
+  symbol reference_name ();
+  symbol field_name ();
+  surface_t symbol2surface (const symbol);
+  symbol surface2symbol (surface_t);
+  
   // Variable symbols.
   symbol GlobRad ();
   symbol AirTemp ();

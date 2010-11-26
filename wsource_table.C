@@ -49,10 +49,12 @@ struct WSourceTable : public WSourceBase
   // Scope.
   bool check (const symbol key) const;
   double number (const symbol key) const;
-  using WSource::name;
   symbol name (const symbol key) const;
 
   // WSource.
+  bool end_check (const symbol key) const;
+  double end_number (const symbol key) const;
+  symbol end_name (const symbol key) const;
   const Time& begin () const;
   const Time& end () const;
   void read_line ();
@@ -128,6 +130,49 @@ WSourceTable::name (const symbol key) const
   // Keyword.
   return keywords.name (key);
 }
+
+bool 
+WSourceTable::end_check (const symbol key) const
+{ 
+  // Table.
+  if (ok)
+    {
+      std::map<symbol, double>::const_iterator i = next_values.find (key);
+      if (i != next_values.end () && std::isfinite (i->second))
+        return true;
+    }
+  
+  // Attribute.
+  if (super::check (key))
+    return true;
+
+  // Keyword.
+  return keywords.check (key);
+
+}
+
+double 
+WSourceTable::end_number (const symbol key) const
+{
+  // Table.
+  if (ok)
+    {
+      std::map<symbol, double>::const_iterator i = next_values.find (key);
+      if (i != next_values.end () && std::isfinite (i->second))
+        return i->second;
+    }
+
+  // Attribute.
+  if (super::check (key))
+    return super::number (key); 
+
+  // Keyword.
+  return keywords.number (key);
+}
+
+symbol 
+WSourceTable::end_name (const symbol key) const
+{ return name (key); }
 
 const Time& 
 WSourceTable::begin () const
@@ -211,7 +256,7 @@ WSourceTable::tick ()
 void 
 WSourceTable::initialize (Treelog& msg) 
 { 
-  TREELOG_SUBMODEL (msg, this->WSource::name);
+  Treelog::Open nest (msg, __FUNCTION__);
 
   // Read header.
   ok = true;

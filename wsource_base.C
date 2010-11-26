@@ -96,9 +96,9 @@ symbol
 WSourceBase::name (const symbol key) const
 { return impl->name (key); }
 
-Attribute::type 
-WSourceBase::meta_lookup (const symbol, const symbol meta) const
-{ return lookup (meta); }
+bool
+WSourceBase::meta_check (const symbol, const symbol meta) const
+{ return check (meta); }
 
 double 
 WSourceBase::meta_number (const symbol, const symbol meta) const
@@ -107,6 +107,18 @@ WSourceBase::meta_number (const symbol, const symbol meta) const
 symbol 
 WSourceBase::meta_name (const symbol, const symbol meta) const
 { return name (meta); }
+
+bool
+WSourceBase::meta_end_check (const symbol, const symbol meta) const
+{ return end_check (meta); }
+
+double 
+WSourceBase::meta_end_number (const symbol, const symbol meta) const
+{ return end_number (meta); }
+
+symbol 
+WSourceBase::meta_end_name (const symbol, const symbol meta) const
+{ return end_name (meta); }
 
 const Time& 
 WSourceBase::begin () const

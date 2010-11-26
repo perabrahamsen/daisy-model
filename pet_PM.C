@@ -97,8 +97,7 @@ PetPM::tick (const Time&, const Weather& weather, const double Rn,
   const double Temp = weather.air_temperature ();
   const double VaporPressure = weather.vapor_pressure ();
   const double U2 = weather.wind ();
-  const double elevation = weather.elevation ();
-  const double AtmPressure = FAO::AtmosphericPressure (elevation);
+  const double AtmPressure = weather.air_pressure ();
   const double Cloudiness = weather.cloudiness ();
   
   // Ground heat flux.

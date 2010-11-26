@@ -39,14 +39,17 @@ public:
   using WSource::check;
   bool check (const symbol key) const;
   double number (const symbol key) const;
-  using WSource::name;
   symbol name (const symbol key) const;
 
   // WSource interface.
 public:
-  Attribute::type meta_lookup (symbol key, symbol meta) const;
+  bool meta_check (symbol key, symbol meta) const;
   double meta_number (symbol key, symbol meta) const;
   symbol meta_name (symbol key, symbol meta) const;
+  bool meta_end_check (symbol key, symbol meta) const;
+  double meta_end_number (symbol key, symbol meta) const;
+  symbol meta_end_name (symbol key, symbol meta) const;
+
   const Time& begin () const;
   const Time& end () const;
 
@@ -57,5 +60,3 @@ protected:
 };
 
 #endif // WSOURCE_BASE_H
-
-

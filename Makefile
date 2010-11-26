@@ -400,8 +400,8 @@ NOLINK = -c
 # These are all models of some component.
 # 
 
-LATER = tertiary_instant.C
-MODELS = wsource_table.C wsource_const.C weather_extra.C \
+LATER = tertiary_instant.C 
+MODELS = weather_source.C wsource_table.C wsource_const.C weather_extra.C \
 	groundwater_source.C xysource_xycombine.C xysource_flux.C \
 	gnuplot_soil.C reaction_sorption.C hydraulic_B_C_inverse.C \
 	program_osvaldo.C vegetation_permanent.C  litter.C drain_lateral.C \
@@ -513,7 +513,7 @@ SUBMODELS = irrigate.C \
 	bioincorporation.C 
 
 # Special or intermediate models with their own interface.
-#
+# 
 SPECIALS = wsource_base.C log_dlf.C reaction_colgen.C weather_base.C \
 	volume_box.C movement_solute.C scope_exchange.C photo_Farquhar.C \
 	scope_multi.C scope_id.C geometry_vert.C gnuplot_base.C \
@@ -1654,6 +1654,10 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+weather_source${OBJ}: weather_source.C weather.h model_derived.h \
+ model_logable.h model.h symbol.h weatherdata.h wsource.h scope.h \
+ attribute.h block_model.h block_nested.h block.h treelog.h frame_model.h \
+ frame.h librarian.h assertion.h
 wsource_table${OBJ}: wsource_table.C wsource_base.h wsource.h model.h scope.h \
  attribute.h symbol.h weatherdata.h time.h lexer_table.h block_model.h \
  block_nested.h block.h treelog.h frame_model.h frame.h units.h \

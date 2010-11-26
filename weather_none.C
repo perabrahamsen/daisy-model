@@ -108,3 +108,5 @@ static struct WeatherNoneSyntax : public DeclareModel
     frame.set ("snow_value", 0.0);
   }
 } WeatherNone_syntax;
+
+// weather_none.C ends here.

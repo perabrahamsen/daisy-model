@@ -37,6 +37,12 @@ int
 Scope::value_size (const symbol tag) const
 { return Attribute::Singleton; }
 
+#if 0
+symbol
+Scope::identifier (const symbol key) const
+{ return name (key); }
+#endif
+
 symbol
 Scope::name (symbol) const
 { daisy_notreached (); }
