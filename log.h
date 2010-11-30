@@ -284,23 +284,9 @@ public:
 
   // Keep track of geometry for logging arrays.
 public:
-  struct Col
-  {
-  private:
-    Log& ll;
-  public:
-    Col (Log& l, const Column& column, const Field& field)
-      : ll (l)
-    { ll.open_column (column, field); }
-    ~Col ()
-    { ll.close_column (); }
-  private:
-    Col (const Col&);
-  };
-private:
-  virtual void open_column (const Column& column, const Field& field);
-  virtual void close_column ();
-  friend struct Log::Col;
+  virtual void column_clear ();
+  virtual void column_add_to_total (const Column& column);
+  virtual void column_select (const Column& column);
 
   // Self use.
 public:

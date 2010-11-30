@@ -123,6 +123,7 @@ public:
   symbol current_name;
   static const symbol wildcard;
   double relative_weight;
+  double total_weight;
 
 public:
   bool valid (const symbol name) const

@@ -696,6 +696,7 @@ Select::Select (const BlockModel& al)
     last_index (path.size () - 1),
     current_name (path[0]),
     relative_weight (1.0),
+    total_weight (0.0),
     is_active (false)
 { }
 

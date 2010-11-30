@@ -109,11 +109,15 @@ Log::close_alist ()
 { close (); }
 
 void 
-Log::open_column (const Column&, const Field&)
+Log::column_clear ()
 { }
 
 void 
-Log::close_column ()
+Log::column_add_to_total (const Column&)
+{ }
+
+void 
+Log::column_select (const Column&)
 { }
 
 void

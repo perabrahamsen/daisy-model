@@ -29,6 +29,7 @@ class LogAll : public LogSelect
 {
   // Content.
 private:
+  std::map<const Column*, std::vector<Select*>/**/> column_entries;
   std::vector<LogSelect*> slaves;
   std::stack<std::vector<Select*>/**/> active_leafs;
   std::stack<std::vector<Select*>/**/> active_interiors;
@@ -60,8 +61,9 @@ public:
   void close ();
 
   // Columns.
-  void open_column (const Column& column, const Field& field);
-  void close_column ();
+  void column_clear ();
+  void column_add_to_total (const Column& column);
+  void column_select (const Column& column);
 
   void output_entry (symbol name, bool);
   void output_entry (symbol name, double);

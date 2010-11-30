@@ -2,11 +2,21 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * OpenMI
 
-Optimer Set/Get og Tick
+** DONE Optimer Set/Get
+
+** DONE Optimer Tick
+
+** Lav dist, skriv
+
+*** Log::column*
+
+*** slet Field::relative_weight
 
 * Små tidsskridt i vejr
 
 ** Weather source
+
+Se google docs.
 
 For hver virtuel Weather::function, afgør hvordan de skabes fra WSource.
 

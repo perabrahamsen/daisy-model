@@ -42,6 +42,7 @@ struct Field::Implementation
   const Library& collib;
   typedef std::vector<Column*> ColumnList;
   ColumnList columns;
+  bool total_area_known;        // If logs know total matching area.
 
   // Restrictions.
   Column* selected;
@@ -119,7 +120,6 @@ public:
                   const Scope&, Treelog&);
 
   // Find a specific column.
-  double relative_weight (const Column& column, const Select& select) const;
   Column* find (symbol name) const;
 
   // Create and destroy.
@@ -669,26 +669,6 @@ Field::Implementation::tick_move (const Metalib& metalib,
       }
 }
 
-double 
-Field::Implementation::relative_weight (const Column& column, 
-                                        const Select& select) const
-// Relative area of COLUMN compared to all columns matched by SELECT.
-{
-  double total_area = 0.0;
-  for (Implementation::ColumnList::const_iterator i = columns.begin ();
-       i != columns.end ();
-       i++)
-    {
-      const Column& col = **i;
-      if (select.valid (collib.ancestors (col.name)))
-        total_area += col.area;
-    }
-  if (total_area > 0.0)
-    return column.area / total_area;
-
-  return -42.42e42;
-}
-
 Column* 
 Field::Implementation::find (symbol name) const
 {
@@ -790,6 +770,7 @@ Field::Implementation::Implementation (const Block& parent,
 				       const std::string& key)
   : collib (parent.metalib ().library (Column::component)),
     columns (Librarian::build_vector<Column> (parent, key)),
+    total_area_known (false),
     selected (NULL)
 { }
 
@@ -986,6 +967,19 @@ void
 Field::output (Log& log) const
 {
   static const symbol libname (Column::component);
+
+  if (!impl->total_area_known)  // We need to reset after column areas change.
+    {
+      impl->total_area_known = true;
+      // Find total area.
+      log.column_clear ();
+      for (Implementation::ColumnList::const_iterator i = impl->columns.begin ();
+           i != impl->columns.end ();
+           i++)
+        log.column_add_to_total (**i);
+    }
+
+  // For each column.
   for (Implementation::ColumnList::const_iterator i = impl->columns.begin ();
        i != impl->columns.end ();
        i++)
@@ -993,18 +987,13 @@ Field::output (Log& log) const
       const Column& column = **i;
       if (log.check_entry (column.name, libname))
 	{
-          // Log::Col must be declared before Log::Entry
-          Log::Col col (log, column, *this); 
+          log.column_select (column); // Relative weight.
 	  Log::Entry open_entry (log, column.name, column.frame (),
 				 Column::component);
 	  column.output (log);
 	}
     }
 }
-
-double 
-Field::relative_weight (const Column& column, const Select& select) const
-{ return impl->relative_weight (column, select); }
 
 const Column* 
 Field::find (symbol name) const

@@ -84,7 +84,7 @@ LogSelect::initial_match (const Daisy& daisy, const Time& previous, Treelog&)
 {
   condition->initiate_log (daisy, previous);
 
- is_active = false;
+  is_active = false;
 
   for (std::vector<Select*>::const_iterator i = entries.begin (); 
        i < entries.end (); 

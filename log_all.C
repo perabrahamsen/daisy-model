@@ -235,22 +235,67 @@ LogAll::close ()
 
 
 void 
-LogAll::open_column (const Column& column, const Field& field)
+LogAll::column_clear ()
+{
+  column_entries.clear ();
+  for (std::vector<Select*>::const_iterator i = entries.begin (); 
+       i != entries.end (); 
+       i++)
+    {
+      Select& select = **i;
+      select.total_weight = 0.0;
+    }
+}
+
+void 
+LogAll::column_add_to_total (const Column& column)
 {
   static const symbol collib (Column::component);
   const Library& library = metalib ().library (collib);
   const std::set<symbol>& ancestors = library.ancestors (column.name);
   
-  const std::vector<Select*>& interiors = active_interiors.top ();
-  for (std::vector<Select*>::const_iterator i = interiors.begin (); 
-       i != interiors.end (); 
+  for (std::vector<Select*>::const_iterator i = entries.begin (); 
+       i != entries.end (); 
        i++)
     {
       Select& select = **i;
-      if (!select.valid (ancestors))
+#if 0
+      std::ostringstream tmp;
+      tmp << "Column " << column.name << " select " << select.tag ()
+          << " current name " << select.current_name;
+      msg->message (tmp.str ());
+#endif
+      if (select.path.size () < 2)
         continue;
+      if (select.path[0] != collib)
+        continue;
+      if (select.path[1] != Select::wildcard
+          && ancestors.find (select.path[1]) == ancestors.end ())
+        continue;
+      column_entries[&column].push_back (&select);
+      select.total_weight += column.area;
+#if 0
+      msg->message ("Added");
+#endif
+    }
+}
+
+void 
+LogAll::column_select (const Column& column)
+{
+  const std::vector<Select*>& colents = column_entries[&column];
+  // const std::vector<Select*>& colents = active_interiors.top ();
+  for (std::vector<Select*>::const_iterator i = colents.begin (); 
+       i != colents.end (); 
+       i++)
+    {
+      Select& select = **i;
       select.set_column (column, *msg);
-      select.relative_weight = field.relative_weight (column, select);
+      // daisy_assert (select.total_weight > 0.0);
+      if (select.total_weight > 0.0)
+        select.relative_weight = column.area / select.total_weight;
+      else
+        select.relative_weight = 1.0;
 #if 0
       std::ostringstream tmp;
       tmp << "Column " << column.name << " matched by " 
@@ -260,10 +305,6 @@ LogAll::open_column (const Column& column, const Field& field)
 #endif
     }
 }
-
-void 
-LogAll::close_column ()
-{ }
 
 void 
 LogAll::output_entry (symbol, const bool)
@@ -348,3 +389,5 @@ LogAll::~LogAll ()
   // Don't delete entries twice.
   entries.erase (entries.begin (), entries.end ());
 }
+
+// log_all.C ends here.
