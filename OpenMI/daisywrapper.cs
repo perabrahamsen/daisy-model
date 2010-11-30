@@ -64,6 +64,7 @@ namespace dk.ku.life.Daisy.OpenMI
         ArrayList _inputExchangeItems;
         ArrayList _outputExchangeItems;
         Hashtable _elementSets;
+        Hashtable _elementScopes;
         string FilePath;
         string ModelDescription;
 
@@ -148,6 +149,7 @@ namespace dk.ku.life.Daisy.OpenMI
             _inputExchangeItems = new ArrayList();
             _outputExchangeItems = new ArrayList();
             _elementSets = new Hashtable();
+            _elementScopes = new Hashtable();
             FilePath = ((string)properties["FilePath"]);
 
             InitializeDaisy((string)properties["FilePath"]);
@@ -164,6 +166,7 @@ namespace dk.ku.life.Daisy.OpenMI
                 // Create element.
                 string columnID = scope.String("column");
                 Element element = new Element (columnID);
+                _elementScopes[element] = scope;
                 if (_daisyEngine.HasColumn(columnID))
                 {
                     Column column = _daisyEngine.GetColumn(columnID);
@@ -290,7 +293,6 @@ namespace dk.ku.life.Daisy.OpenMI
                 throw new ApplicationException("Unknown element set '" + ElementSetID + "'");
             ElementSet elementSet = (ElementSet) _elementSets[ElementSetID];
             int count = elementSet.ElementCount;
-            uint scope_size = _daisyEngine.ScopeSize();
             double[] returnValues = new double[count];
 
             // This is O (e * s * q) instead of O (1).
@@ -298,27 +300,13 @@ namespace dk.ku.life.Daisy.OpenMI
             {
                 Element element = elementSet.GetElement(e);
                 string ColumnID = element.ID;
-                bool found = false;
-                for (int i = 0; i < scope_size; i++)
-                {
-                    Scope scope = _daisyEngine.GetScope(i);
+                if (!_elementScopes.Contains (element))
+                    throw new ApplicationException("Unknown element for '" + ColumnID + "'/'" + QuantityID + "'");
+                Scope scope = (Scope) _elementScopes[element];
 
-                    if (!scope.HasString("column"))
-                        continue;
-                    if (scope.Writeable())
-                        continue;
-                    if (scope.String("column") != ColumnID)
-                        continue;
-                    if (!scope.HasNumber(QuantityID))
-                        continue;
-
-                    if (found)
-                        throw new Exception("Duplicate QuantityID: '" + QuantityID + "' in DaisyEngine");
-
+                if (scope.HasNumber(QuantityID))
                     returnValues[e] = scope.Number(QuantityID);
-                    found = true;
-                }
-                if (!found)
+                else
                     returnValues[e] = GetMissingValueDefinition();
             }
             Oatc.OpenMI.Sdk.Backbone.ScalarSet values = new Oatc.OpenMI.Sdk.Backbone.ScalarSet(returnValues);
@@ -362,31 +350,11 @@ namespace dk.ku.life.Daisy.OpenMI
             {
                 Element element = elementSet.GetElement(e);
                 string ColumnID = element.ID;
-                bool found = false;
-                for (int i = 0; i < scope_size; i++)
-                {
-                    Scope scope = _daisyEngine.GetScope(i);
-
-                    if (!scope.HasString("column"))
-                        continue;
-                    if (!scope.Writeable())
-                        continue;
-                    if (scope.String("column") != ColumnID)
-                        continue;
-                    if (!scope.HasNumber(QuantityID))
-                        continue;
-
-                    if (found)
-                        throw new Exception("Duplicate QuantityID: '" + QuantityID + "' in DaisyEngine");
-
-                    scope.SetNumber(QuantityID, val.GetScalar(e));
-                    found = true;
-                }
-                if (!found)
-                    throw new Exception("No QuantityID: '" + QuantityID + "' for column '" + ColumnID + "' defined in DaisyEngine");
+                if (!_elementScopes.Contains (element))
+                    throw new ApplicationException("Unknown element for '" + ColumnID + "'/'" + QuantityID + "'");
+                Scope scope = (Scope) _elementScopes[element];
+                scope.SetNumber(QuantityID, val.GetScalar(e));
             }
-            
-          
         }
         public bool PerformTimeStep()
         {
