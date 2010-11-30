@@ -1,18 +1,12 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* OpenMI
-
-** DONE Optimer Set/Get
-
-** DONE Optimer Tick
-
-** Lav dist, skriv
-
-*** Log::column*
-
-*** slet Field::relative_weight
-
 * Små tidsskridt i vejr
+
+** Weather
+
+suggest_dt
+tick1: Med fuldt tidsskridt
+tick2: Evt med mindre tidsskridt
 
 ** Weather source
 
@@ -22,9 +16,32 @@ For hver virtuel Weather::function, afgør hvordan de skabes fra WSource.
 
 interpolate, aggregate, pedotransfer (& check)
 
+*** Vi skal håndtere dagsværdier bedre.
+
+Vi er nok nødt til at gemme dagsværdier for mindst to dage.
+
+Tidsskridt kan overlappe dage.
+Vi kan måske "backtracke" hvis next gøres mindre.
+
+** WSource table
+
+dato markerede data er fra den dato.  
+
+Andre data er fra perioden der ender på det markerede tidsrum.
+
+Der er generelt tale om gennemsnitsværdier.
+
+Dokumenter i beskrivelse af modul.
+
+Skal vi kunne angive afvigelser fra ovenstående?
+
 ** WSource combine
 
 combiner flere WSource
+
+** Hvordan markerer vi til resten af systemet at type af vejrdata er foranderet?
+
+** Evt merge weather og wsource
 
 * Hent gammel PC.
 

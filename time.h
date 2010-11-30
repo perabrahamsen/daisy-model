@@ -131,7 +131,6 @@ public:
   Time (int year, int month, int mday, int hour,
         int minute = 0, int second = 0, int microsecond = 0);
   ~Time ();
-private:                    
   explicit Time ();
 };
 
