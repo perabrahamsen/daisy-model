@@ -57,10 +57,10 @@ struct LexerTable::Implementation : private boost::noncopyable
   int month_c;
   int mday_c;
   int hour_c;
-  int time_c;
   int minute_c;
   int second_c;
   int microsecond_c;
+  int time_c;
   const std::vector<symbol> original;
   const bool dim_line;
   std::vector<symbol> dim_names;
@@ -79,9 +79,9 @@ struct LexerTable::Implementation : private boost::noncopyable
   int find_tag (const symbol tag) const;
   bool get_entries (std::vector<std::string>& entries) const;
   static bool get_time (const std::string& entry, Time& time, 
-                        int default_hour); 
+                        int default_hour, bool& date_only); 
   bool get_time (const std::vector<std::string>& entries, Time& time, 
-                 int default_hour) const;
+                 int default_hour, bool& date_only) const;
   bool is_missing (const std::string& value) const;
   double convert_to_double (const std::string& value) const;
 
@@ -252,10 +252,10 @@ LexerTable::Implementation::Implementation (const BlockModel& al)
     month_c (-42),
     mday_c (-42),
     hour_c (-42),
-    time_c (-42),
     minute_c (-42),
     second_c (-42),
     microsecond_c (-42),
+    time_c (-42),
     original (al.check ("original")
               ? al.name_sequence ("original")
               : std::vector<symbol> ()),
@@ -599,7 +599,7 @@ LexerTable::is_time (symbol tag)
       
 bool
 LexerTable::Implementation::get_time (const std::string& entry, Time& time,
-                                      int default_hour)
+                                      int default_hour, bool& date_only)
 {
   std::istringstream in (entry);
 
@@ -616,11 +616,15 @@ LexerTable::Implementation::get_time (const std::string& entry, Time& time,
   int hour = default_hour;
   if (in.good () && !in.eof ())
     {
+      date_only = false;
       char sep3;
       in >> sep3 >> hour;
       if (sep3 != 'T')
         return false;
-    }        
+    }
+  else
+    date_only = true;
+
   int minute = 0;
   if (in.good () && !in.eof ())
     {
@@ -676,13 +680,21 @@ LexerTable::Implementation::get_time (const std::string& entry, Time& time,
 }
 
 bool
+LexerTable::get_time (const std::string& entry, Time& time, int default_hour) 
+{ 
+  bool date_only;
+  return Implementation::get_time (entry, time, default_hour, date_only); 
+}
+
+bool
 LexerTable::get_time (const std::string& entry, Time& time,
-                      int default_hour)
-{ return Implementation::get_time (entry, time, default_hour); }
+                      bool& date_only)
+{ return Implementation::get_time (entry, time, 0, date_only); }
 
 bool
 LexerTable::Implementation::get_time (const std::vector<std::string>& entries,
-                                      Time& time, const int default_hour) const
+                                      Time& time, const int default_hour,
+                                      bool& date_only) const
 {
   // Extract date.
   if (time_c < 0)
@@ -716,10 +728,13 @@ LexerTable::Implementation::get_time (const std::vector<std::string>& entries,
           return false;
         }
     }
-  else if (!get_time (entries[time_c], time, default_hour))
+  else 
     {
-      warning (entries[time_c] + ": invalid time");
-      return false;
+      if (!get_time (entries[time_c], time, default_hour, date_only))
+        {
+          warning (entries[time_c] + ": invalid time");
+          return false;
+        }
     }
 
   // If we survived here, everything is fine.
@@ -729,7 +744,15 @@ LexerTable::Implementation::get_time (const std::vector<std::string>& entries,
 bool
 LexerTable::get_time (const std::vector<std::string>& entries,
                       Time& time, const int default_hour) const
-{ return impl->get_time (entries, time, default_hour); }
+{ 
+  bool date_only;
+  return impl->get_time (entries, time, default_hour, date_only);
+}
+
+bool
+LexerTable::get_time (const std::vector<std::string>& entries,
+                      Time& time, bool& date_only) const
+{ return impl->get_time (entries, time, 0, date_only); }
 
 bool
 LexerTable::Implementation::is_missing (const std::string& value) const

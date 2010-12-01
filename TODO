@@ -26,6 +26,7 @@ Vi kan måske "backtracke" hvis next gøres mindre.
 ** WSource table
 
 dato markerede data er fra den dato.  
+USE date_only
 
 Andre data er fra perioden der ender på det markerede tidsrum.
 

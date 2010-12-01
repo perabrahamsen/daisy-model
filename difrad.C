@@ -47,6 +47,8 @@ Difrad::~Difrad ()
 
 static struct DifradInit : public DeclareComponent 
 {
+  void load_frame (Frame& frame) const
+  { Model::load_model (frame); }
   DifradInit ()
     : DeclareComponent (Difrad::component, "\
 The 'difrad' component should calculate the diffuse radiation from\n\

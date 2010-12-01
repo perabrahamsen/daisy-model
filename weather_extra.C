@@ -160,8 +160,9 @@ WeatherExtra::tick (const Time& time, Treelog& msg)
   
   // Read entries.
   std::vector<std::string> entries;
+  bool date_only;
   if (!lex.get_entries (entries)
-      || !lex.get_time (entries, last_read, 11))
+      || !lex.get_time (entries, last_read, date_only))
     {
       lex.warning ("Switching back to default weather.");
       no_more_data = true;
@@ -169,7 +170,9 @@ WeatherExtra::tick (const Time& time, Treelog& msg)
       snow_value = rain_value = -42.42e42;
       return;
     };
-  
+  if (date_only)
+    last_read.tick_day (1);
+
   const double days_ahead= Time::days_between (time, last_read);
   if (days_ahead > max_lookahead)
     {

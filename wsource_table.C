@@ -197,8 +197,9 @@ WSourceTable::read_line ()
 { 
   // Get entries.
   std::vector<std::string> entries;
+  bool date_only;
   if (!lex.get_entries (entries)
-      || !lex.get_time (entries, timestep_end, 0))
+      || !lex.get_time (entries, timestep_end, date_only))
     {
       lex.warning ("No more weather data.");
       ok = false;
@@ -208,6 +209,8 @@ WSourceTable::read_line ()
         i->second = NAN;
       return;
     };
+  if (date_only)                // End of day.
+    timestep_end.tick_day (1);
 
   // Convert entries.
   for (std::map<symbol, size_t>::iterator i = columns.begin ();

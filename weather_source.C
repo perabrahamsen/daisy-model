@@ -28,6 +28,7 @@
 #include "librarian.h"
 #include "frame.h"
 #include "assertion.h"
+#include "mathlib.h"
 #include <boost/scoped_ptr.hpp>
 #include <map>
 #include <deque>
@@ -42,7 +43,20 @@ struct WeatherSource : public Weather
   name_map_t names;
   std::deque<Time> when;
   
-  // TODO: Current values.
+  // Current values.
+  double number_average (symbol) const;
+  void extract_average (symbol, double&, Treelog&) const;
+  symbol name_first (symbol) const;
+  double my_latitude;           // [dg North]
+  double my_longitude;
+  double my_elevation;
+  double my_timezone;
+  double my_screenheight;
+  double my_Taverage;
+  double my_Tamplitude;
+  double my_maxTday;
+  Weatherdata::surface_t my_surface;
+  // TODO: More.
 
   // Simulation.
   Time previous;
@@ -60,6 +74,100 @@ struct WeatherSource : public Weather
 };
 
 double 
+WeatherSource::number_average (const symbol key) const
+{
+  // This function considers the source data constant within the
+  // source interval, and will give you the average value for the
+  // weather interval.
+
+  // Available data.
+  const number_map_t::const_iterator e = numbers.find (key);
+  daisy_assert (e != numbers.end ());
+  const std::deque<double>& values = e->second;
+  const size_t data_size = when.size ();
+  daisy_assert (values.size () == data_size);
+
+  switch (data_size)
+    {
+    case 0:
+      daisy_panic ("No weather data");
+    case 1:
+      return values[0];
+    }
+
+  // Find start.
+  size_t i = 0;
+  while (i < data_size && when[i] <= previous)
+    i++;
+  
+  if (i == data_size)
+    // All data is before current period.
+    return values.back ();
+  
+  // Aggregate complete values.
+  double sum_value = 0.0;
+  double sum_hours = 0.0;
+  Time time = previous;
+  
+  while (i < data_size && when[i] < next)
+    {
+      const double hours = Time::hours_between (time, when[i]);
+      sum_hours += hours;
+      sum_value += hours * values[i];
+      time = when[i];
+      i++;
+    }
+
+  // Add end interval.
+  const double hours = Time::hours_between (time, next);
+  const double value = (i < data_size ? values[i] : values.back ());
+  sum_hours += hours;
+  sum_value += hours * value;
+  daisy_approximate (sum_hours, Time::hours_between (previous, next));
+  return sum_value / sum_hours;
+}
+    
+void 
+WeatherSource::extract_average (const symbol key, double& variable, 
+                                Treelog& msg) const
+{
+  const double value = number_average (key);
+  if (std::isfinite (value))
+    variable = value;
+  else
+    msg.error ("Missing value for '" + key + "', reusing old");
+}
+
+symbol
+WeatherSource::name_first (const symbol key) const
+{
+  // This function return the name used at the beginning of weather interval.
+
+  // Available data.
+  const name_map_t::const_iterator e = names.find (key);
+  daisy_assert (e != names.end ());
+  const std::deque<symbol>& values = e->second;
+  const size_t data_size = when.size ();
+  daisy_assert (values.size () == data_size);
+
+  switch (data_size)
+    {
+    case 0:
+      daisy_panic ("No weather data");
+    case 1:
+      return values[0];
+    }
+
+  // Find start.
+  size_t i = 0;
+  while (i < data_size && when[i] <= previous)
+    i++;
+  
+  // And that's it.
+  return values.back ();
+}
+    
+double 
 WeatherSource::suggest_dt () const // [h]
 { 
   // Suggest running until we get new data.
@@ -74,15 +182,152 @@ WeatherSource::suggest_dt () const // [h]
 void 
 WeatherSource::tick (const Time& time, Treelog& msg)
 {
+  daisy_assert (time > previous);
+
+  // Update time interval
+  bool new_day = false;
+
   if (time > next)
-    // New timestep.
-    previous = next;
+    {
+      // The beginning of the timestep determine what day we are in.
+      if (previous.year () != next.year () || previous.yday () != next.yday ())
+        new_day = true;
+
+      // New timestep.
+      previous = next;
+    }
 
   // Possible shorter version of same timestep.
   next = time;
 
+  // Push back.
+  Time next_day (next.year (), next.month (), next.mday (), 0);
+  next_day.tick_day (); // We keep one day worth of weather data.
+  while (!source->done () && when.back () < next_day)
+    {
+      daisy_assert (when.back () == source->begin ());
+      when.push_back (source->end ());
+
+      for (number_map_t::iterator i = numbers.begin ();
+           i != numbers.end ();
+           i++)
+        { 
+          const symbol meta = i->first;
+          const symbol key = Weatherdata::meta_key (meta);
+          std::deque<double>& data = i->second;
+          if (key == Attribute::Unknown ())
+            {
+              if (source->end_check (meta))
+                data.push_back (source->end_number (meta));
+              else 
+                data.push_back (NAN);
+            }
+          else
+            {
+              if (source->meta_end_check (key, meta))
+                data.push_back (source->meta_end_number (key, meta));
+              else
+                data.push_back (NAN);
+            }
+        }
+      for (name_map_t::iterator i = names.begin ();
+           i != names.end ();
+           i++)
+        { 
+          const symbol meta = i->first;
+          const symbol key = Weatherdata::meta_key (meta);
+          std::deque<symbol>& data = i->second;
+          if (key == Attribute::Unknown ())
+            {
+              if (source->end_check (meta))
+                data.push_back (source->end_name (meta));
+              else 
+                data.push_back (Attribute::Unknown ());
+            }
+          else
+            {
+              if (source->meta_end_check (key, meta))
+                data.push_back (source->meta_end_name (key, meta));
+              else
+                data.push_back (Attribute::Unknown ());
+            }
+       }
+    }
+
+  // Calculate new values.
+  if (when.size () < 1)
+    {
+      // No data, use old values.
+      return;
+    }
+  
+  // (Re)Calculate values for this timestep.
+  extract_average (Weatherdata::Latitude (), my_latitude, msg);
+  extract_average (Weatherdata::Longitude (), my_longitude, msg);
+  extract_average (Weatherdata::Elevation (), my_elevation, msg);
+  extract_average (Weatherdata::TimeZone (), my_timezone, msg);
+  extract_average (Weatherdata::ScreenHeight (), my_screenheight, msg);
+  extract_average (Weatherdata::TAverage (), my_Taverage, msg);
+  extract_average (Weatherdata::TAmplitude (), my_Tamplitude, msg);
+  extract_average (Weatherdata::MaxTDay (), my_maxTday, msg);
+  {
+    const symbol name = name_first (Weatherdata::Surface ());
+    if (name == Attribute::Unknown ())
+      msg.warning ("Unknown surface, using old");
+    else
+      my_surface = Weatherdata::symbol2surface (name);
+  }
+#ifdef TODO
+  if (number_check (Weatherdata::AirTemp ()))
+    my_air_temperature = number_average (Weatherdata::AirTemp ());
+  else if (number_check (Weatherdata::T_max ()) 
+           && number_check (Weatherdata::T_min ()))
+    my_air_temperature = 0.5 * (number_max (Weatherdata::T_max ())
+                                + number_min (Weatherdata::T_min ()));
+  else
+    msg.warning ("Missing temperature, using old");
+  
+  virtual double global_radiation () const = 0; // [W/m2]
+  virtual double diffuse_radiation () const = 0; // [W/m2]
+  virtual double reference_evapotranspiration () const = 0; // [mm/h]
+  virtual double rain () const = 0;	// [mm/h]
+  virtual double snow () const = 0;	// [mm/h]
+  virtual const IM& deposit () const = 0; // [g [stuff] /cm²/h]
+  virtual double cloudiness () const = 0; // [0-1]
+  virtual double vapor_pressure () const = 0; // [Pa]
+  virtual double relative_humidity () const = 0; // []
+  virtual double wind () const = 0;	// [m/s]
+  virtual double CO2 () const = 0; //[Pa]
+  virtual double O2 () const = 0; //[Pa]
+  virtual double air_pressure () const = 0; //[Pa]
+
+  virtual double timestep () const = 0; // [d]
+
+  virtual bool has_reference_evapotranspiration () const = 0;
+  virtual bool has_vapor_pressure () const = 0;
+  virtual bool has_wind () const = 0;
+  virtual bool has_min_max_temperature () const = 0;
+  virtual bool has_diffuse_radiation () const = 0;
+  virtual bool has_relative_humidity () const = 0;
+
+  virtual double daily_air_temperature () const = 0; // [dg C]
+  virtual double daily_max_air_temperature () const = 0; // [dg C]
+  virtual double daily_min_air_temperature () const = 0; // [dg C]
+  virtual double daily_global_radiation () const = 0; // [W/m2]
+  virtual double daily_precipitation () const = 0; // [mm/d]
+
+  virtual double day_length () const = 0; // [h]
+  virtual double T_normal (const Time&, double delay = 0.0) const = 0;
+#endif
+
+  // Only do this at a new day.
+  if (!new_day)
+    return;
+
+  // TODO: Calculate daily values. (period: day_start, next_day)
+
   // Pop front.
-  while (when.size () > 1 && when[1] < previous)
+  while (when.size () > 0 && when[0] < previous)
     {
       for (number_map_t::iterator i = numbers.begin ();
            i != numbers.end (); 
@@ -100,48 +345,8 @@ WeatherSource::tick (const Time& time, Treelog& msg)
         }
       when.pop_front ();
     }
-
-  // Push back.
-  const Time day_start (next.year (), next.month (), next.mday (), 0);
-  Time next_day (next.year (), next.month (), next.mday (), 0);
-  next_day.tick_day (); // We keep one day worth of weather data.
-  while (!source->done () && when.back () < next_day)
-    {
-      daisy_assert (when.back () == source->begin ());
-      when.push_back (source->end ());
-
-      for (number_map_t::iterator i = numbers.begin ();
-           i != numbers.end ();
-           i++)
-        { 
-          const symbol key = i->first;
-          std::deque<double>& data = i->second;
-          // TODO: Add meta when appropriate.
-          data.push_back (source->end_number (key));
-        }
-      for (name_map_t::iterator i = names.begin ();
-           i != names.end ();
-           i++)
-        { 
-          const symbol key = i->first;
-          std::deque<symbol>& data = i->second;
-          // TODO: Add meta when appropriate.
-          data.push_back (source->end_name (key));
-        }
-    }
-
-  // (Re)Calculate values for this timestep.
-  // TODO: Calculate value for this timestep (previous, next)
-  // If we don't have the full period, use old values.
-
-  
-  if (previous.year () == next.year () && previous.yday () == next.yday ())
-    // TODO: Hvad hvis "next" er forandret?
-    return;                     // Same day.
-  
-  // New day
-  // TODO: Calculate daily values. (period: day_start, next_day)
-  // If we don't have the full period, use old values.
+  if (when.size () < 1)
+    msg.warning ("No more weather data, last value");
 }
 
 bool 
@@ -181,6 +386,8 @@ WeatherSource::check (const Time& from, const Time& to, Treelog& msg) const
       ok = false;
       msg.error ("Required weather data '" + required[i] + "' missing");
     }
+
+  // TODO: More checks.
   return ok;
 }
 

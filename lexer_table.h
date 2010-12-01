@@ -53,8 +53,12 @@ public:
   static bool is_time (symbol tag);
   static bool get_time (const std::string& entry, Time& time, 
                         int default_hour); 
+  static bool get_time (const std::string& entry, Time& time, 
+                        bool& date_only); 
   bool get_time (const std::vector<std::string>& entries, Time& time, 
                  int default_hour) const;
+  bool get_time (const std::vector<std::string>& entries, Time& time, 
+                 bool& date_only) const;
   bool is_missing (const std::string& value) const;
   double convert_to_double (const std::string& value) const;
 

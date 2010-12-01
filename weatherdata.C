@@ -301,6 +301,31 @@ Average precipitation.  Used for deviding precipitation into dry and wet.",
     return (*i).second.in_check->max_value;
   }
 
+  symbol meta_key (const symbol meta)
+  {
+    static struct meta_map_t : public std::map<symbol, symbol>
+    {
+      meta_map_t ()
+      {
+        (*this)["Latitude"] = "GlobRad";
+        (*this)["Longitude"] = "GlobRad";
+        (*this)["Elevation"] = "GlobRad"; // Used for diff. rad.
+        (*this)["TimeZone"] = "GlobRad";
+        (*this)["ScreenHeight"] = "Wind";
+        (*this)["TAverage"] = "AirTemp";
+        (*this)["TAmplitude"] = "AirTemp";
+        (*this)["MaxTDay"] = "AirTemp";
+        (*this)["Surface"] = "GlobRad"; // Used for ref.evap.
+        (*this)["PrecipCorrect"] = "Precip";
+      }
+    } meta_map;
+
+    const meta_map_t::const_iterator i = meta_map.find (meta);
+    if (i == meta_map.end ())
+      return Attribute::None ();
+    return i->second;
+  }
+
   void load_syntax (Frame& frame)
   {
     //Numbers.

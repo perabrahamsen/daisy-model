@@ -46,7 +46,7 @@ struct DifradDPF : public Difrad
     if (sin_beta < 0.01)
       return 1.0;
 
-    const double P = FAO::AtmosphericPressure (weather.elevation ()); //[Pa]
+    const double P = weather.air_pressure (); //[Pa]
    
     // Atmospheric pressure at sea level
     const double P0 = 1.013E5; //[Pa]
@@ -97,6 +97,7 @@ Diffuse radiation calculated using the model of De Pury and Farquhar, 1997.")
   { }
   void load_frame (Frame& frame) const
   {
+    frame.set_strings ("cite", "pf1997simple");
     frame.declare ("fa", Attribute::Fraction (), Check::positive (), Attribute::Const, "\
 Diffuse radiation proportion.\n\
 Proportion of attenuated radiation that reaches the surface as diffuse\n\

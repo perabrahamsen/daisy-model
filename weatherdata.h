@@ -81,6 +81,7 @@ namespace Weatherdata
   symbol description (const symbol);
   double min_value (const symbol);
   double max_value (const symbol);
+  symbol meta_key (const symbol);
 
   // Frame.
   void load_syntax (Frame&);
