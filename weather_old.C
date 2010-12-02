@@ -126,10 +126,6 @@ WeatherOld::vapor_pressure () const
 }
 
 double 
-WeatherOld::relative_humidity () const
-{ return 0.5; }
-
-double 
 WeatherOld::wind () const
 { return 3.0; }
 

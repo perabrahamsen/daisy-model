@@ -102,8 +102,6 @@ struct WeatherExtra : public Weather
   { return weather->cloudiness (); }
   double vapor_pressure () const
   { return weather->vapor_pressure (); }
-  double relative_humidity () const
-  { return weather->relative_humidity (); }
   double wind () const
   { return weather->wind (); }
   double CO2 () const
@@ -124,8 +122,6 @@ struct WeatherExtra : public Weather
   { return weather->has_min_max_temperature (); }
   bool has_diffuse_radiation () const
   { return weather->has_diffuse_radiation (); }
-  bool has_relative_humidity () const
-  { return weather->has_relative_humidity (); }
   double timestep () const
   { return weather->timestep (); }
 

@@ -1,3 +1,10 @@
+2010-12-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* weather_std.C, weather_old.C, weather_extra.C, weather_base.C:
+	* weather_base.h, weather_old.h:
+	* weather.h (relative_humidity, has_relative_humidity): Removed.
+	* svat_ssoc.C (tick): Update caller.
+
 2010-11-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* all: Optimized case with many columns.

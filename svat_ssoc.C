@@ -320,7 +320,6 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   TREELOG_MODEL (msg);
 
   Ptot = weather.air_pressure (); // [Pa]
-  RH = weather.relative_humidity (); // []
   T_a = weather.air_temperature () + TK; // [K]
   z_r = weather.screen_height (); // [m]
   U_z = bio.wind_speed_field();   // [m s^-1]
@@ -333,7 +332,7 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   rho_a = FAO::AirDensity (Ptot, T_a - TK); //[kg m^-3]
   gamma = FAO::PsychrometricConstant (Ptot, T_a - TK); // [Pa/K]
   e_sat_air = FAO::SaturationVapourPressure (T_a - TK); // [Pa]
-  e_a = e_sat_air * RH;             // [Pa]; 
+  e_a = weather.vapor_pressure (); // [Pa]
   s = FAO::SlopeVapourPressureCurve (T_a - TK); // [Pa/K]
   lambda = FAO::LatentHeatVaporization (T_a - TK); // [J/kg]
   T_z0 = soil_heat.T_top() + TK;     // [K]

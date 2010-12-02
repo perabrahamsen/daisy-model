@@ -289,11 +289,6 @@ struct WeatherStandard : public WeatherBase
     daisy_assert (initialized);
     return diffuse_radiation_[hour]; 
   }
-  double relative_humidity () const // []
-  { 
-    daisy_assert (initialized);
-    return relative_humidity_[hour]; 
-  }
   double wind () const	// [m/s]
   { 
     daisy_assert (initialized);
@@ -308,9 +303,6 @@ struct WeatherStandard : public WeatherBase
 
   bool has_diffuse_radiation () const
   { return has_diffuse_radiation_; }
-
-  bool has_relative_humidity () const
-  { return has_relative_humidity_; }
 
   bool has_wind () const
   { return has_wind_speed; }

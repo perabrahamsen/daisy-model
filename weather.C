@@ -91,7 +91,6 @@ Weather::output_common (Log& log) const
   output_value (vapor_pressure (), "vapor_pressure", log);
   output_value (air_pressure (), "air_pressure", log);
   output_value (diffuse_radiation (), "diffuse_radiation", log);
-  output_value (relative_humidity (), "relative_humidity", log);
   output_value (wind (), "wind", log);
   output_value (day_length (), "day_length", log);
   output_submodule (deposit (), "deposit", log);
@@ -134,8 +133,6 @@ Weather::load_common (Frame& frame)
                           "Fraction of sky covered by clouds [0-1].");
   frame.declare ("vapor_pressure", "Pa", Attribute::LogOnly, "Humidity.");
   frame.declare ("air_pressure", "Pa", Attribute::LogOnly, "Air pressure.");
-  frame.declare ("relative_humidity", Attribute::Fraction (), Attribute::LogOnly,
-                 "Relative humidity.");
   frame.declare ("wind", "m/s", Attribute::LogOnly, "Wind speed.");
   frame.declare ("day_length", "h", Attribute::LogOnly,
                  "Number of light hours this day.");

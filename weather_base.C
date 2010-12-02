@@ -136,10 +136,6 @@ WeatherBase::has_diffuse_radiation () const
 { return false; }
 
 bool 
-WeatherBase::has_relative_humidity () const
-{ return false; }
-
-bool 
 WeatherBase::has_wind () const
 { return false; }
 

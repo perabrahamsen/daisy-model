@@ -56,6 +56,10 @@ struct WeatherSource : public Weather
   double my_Tamplitude;
   double my_maxTday;
   Weatherdata::surface_t my_surface;
+  double my_global_radiation;
+  double my_diffuse_radiation;
+  double my_reference_evapotranspiration;
+  double my_wind;
   // TODO: More.
 
   // Simulation.
@@ -261,7 +265,7 @@ WeatherSource::tick (const Time& time, Treelog& msg)
       return;
     }
   
-  // (Re)Calculate values for this timestep.
+  // Calculate values for this timestep.
   extract_average (Weatherdata::Latitude (), my_latitude, msg);
   extract_average (Weatherdata::Longitude (), my_longitude, msg);
   extract_average (Weatherdata::Elevation (), my_elevation, msg);
@@ -277,29 +281,127 @@ WeatherSource::tick (const Time& time, Treelog& msg)
     else
       my_surface = Weatherdata::symbol2surface (name);
   }
+  extract_average (Weatherdata::GlobRad (), my_global_radiation, msg);
+
+  // Optional values.
+  my_diffuse_radiation = number_average (Weatherdata::DiffRad ());
+  my_reference_evapotranspiration = number_average (Weatherdata::RefEvap ());
+  my_wind = number_average (Weatherdata::Wind ());
+
+  // Special values.
+  const double new_air_temperature = number_average (Weatherdata::AirTemp ());
+  const double new_vapor_pressure = number_average (Weatherdata::VapPres ());
+  const double new_relative_humidity = number_average (Weatherdata::RelHum ());
+
 #ifdef TODO
-  if (number_check (Weatherdata::AirTemp ()))
-    my_air_temperature = number_average (Weatherdata::AirTemp ());
-  else if (number_check (Weatherdata::T_max ()) 
-           && number_check (Weatherdata::T_min ()))
-    my_air_temperature = 0.5 * (number_max (Weatherdata::T_max ())
-                                + number_min (Weatherdata::T_min ()));
-  else
-    msg.warning ("Missing temperature, using old");
+
+  // Calculate:
+  // 1. Air temperature (from T_min / T_max)
+  // 2. Vapor pressure (from RelHum + T)
+  // 2. Rain/Snow (from Precip + T)
+
+  if (new_day)
+    {
+      // TODO: day_start, day_end and day_length
+      my_sunrise = 12.0 - my_day_length * 0.5; // Use astronomy.C.
+
+      // Min/Max T and day length.
+      // TODO: Add avg.
+      double new_max = NAN;
+      double new_min = NAN;
+      
+      // Available data.
+      const size_t data_size = when.size ();
+      const number_map_t::const_iterator eAvg 
+        = numbers.find (Weatherdata::AirTemp ());
+      daisy_assert (eAvg != numbers.end ());
+      const std::deque<double>& values_avg = eAvg->second;
+      daisy_assert (values_avg.size () == data_size);
+      const number_map_t::const_iterator eMin 
+        = numbers.find (Weatherdata::AirTemp ());
+      daisy_assert (eMin != numbers.end ());
+      const std::deque<double>& values_min = eMin->second;
+      daisy_assert (values_min.size () == data_size);
+      const number_map_t::const_iterator eMax 
+        = numbers.find (Weatherdata::AirTemp ());
+      daisy_assert (eMax != numbers.end ());
+      const std::deque<double>& values_max = eMax->second;
+      daisy_assert (values_max.size () == data_size);
+
+      if (data_size < 1)
+        daisy_panic ("No weather data");
+
+      // Find start.
+      size_t i = 0;
+      while (i < data_size && when[i] <= day_start)
+        i++;
   
-  virtual double global_radiation () const = 0; // [W/m2]
-  virtual double diffuse_radiation () const = 0; // [W/m2]
-  virtual double reference_evapotranspiration () const = 0; // [mm/h]
+      if (i == data_size)
+        // All data is before current period.
+        {
+          new_min = values_min.back ();
+          new_max = values_max.back ();
+        }
+      else while (i < data_size && (i == 0 || when[i-1] < day_end))
+        {
+          // Take all data in period into account.
+          if (!std::finite (new_min) || new_min > values_min[i])
+            new_min = values_min[i];
+          if (!std::finite (new_min) || new_min > values_avg[i])
+            new_min = values_avg[i];
+          if (!std::finite (new_max) || new_max < values_max[i])
+            new_max = values_max[i];
+          if (!std::finite (new_max) || new_max < values_avg[i])
+            new_max = values_avg[i];
+
+          i++;
+        }
+      
+      // Use it.
+      if (approximate (new_min, new_max))
+        my_daily_min_air_temperature = my_daily_max_air_temperature = NAN;
+      else
+        {
+          my_daily_min_air_temperature = new_min;
+          my_daily_max_air_temperature = new_max;
+        }
+    }
+  
+  if (!std::isfinite (new_air_temperature) && has_min_max_temperature ())
+    {
+      // We assume max T is at 15:00 and min T is at sunrise.
+      // We assume previous and next day are identical to this one,
+      // ignoring actual data from the two days.
+      // We assume linear change between max T of the preceding day,
+      // min T of the current day, max T of current day, and min T of
+      // the next day.
+
+      PLF T;
+      T.add (15.0 - 24.0, my_daily_max_air_temperature);
+      T.add (sunrise, my_daily_min_air_temperature);
+      T.add (15.0, my_daily_max_air_temperature);
+      T.add (sunrise + 24.0. my_daily_min_air_temperature);
+      const double hours = 0.5 * ((previous - day_start).total_hours ()
+                                  + (next - day_start).total_hours ());
+      new_air_temperature = T (hours);
+    }
+  if (std::isfinite (new_air_temperature))
+    msg.error ("No air temperature, resuing old value");
+  else
+    my_air_temperature = new_air_temperature;
+    
   virtual double rain () const = 0;	// [mm/h]
   virtual double snow () const = 0;	// [mm/h]
+
   virtual const IM& deposit () const = 0; // [g [stuff] /cm²/h]
+
   virtual double cloudiness () const = 0; // [0-1]
-  virtual double vapor_pressure () const = 0; // [Pa]
-  virtual double relative_humidity () const = 0; // []
-  virtual double wind () const = 0;	// [m/s]
+
+
   virtual double CO2 () const = 0; //[Pa]
   virtual double O2 () const = 0; //[Pa]
   virtual double air_pressure () const = 0; //[Pa]
+
 
   virtual double timestep () const = 0; // [d]
 
@@ -308,7 +410,6 @@ WeatherSource::tick (const Time& time, Treelog& msg)
   virtual bool has_wind () const = 0;
   virtual bool has_min_max_temperature () const = 0;
   virtual bool has_diffuse_radiation () const = 0;
-  virtual bool has_relative_humidity () const = 0;
 
   virtual double daily_air_temperature () const = 0; // [dg C]
   virtual double daily_max_air_temperature () const = 0; // [dg C]

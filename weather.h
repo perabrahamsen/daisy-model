@@ -75,7 +75,6 @@ public:
   virtual const IM& deposit () const = 0; // [g [stuff] /cm²/h]
   virtual double cloudiness () const = 0; // [0-1]
   virtual double vapor_pressure () const = 0; // [Pa]
-  virtual double relative_humidity () const = 0; // []
   virtual double wind () const = 0;	// [m/s]
   virtual double CO2 () const = 0; //[Pa]
   virtual double O2 () const = 0; //[Pa]
@@ -88,7 +87,6 @@ public:
   virtual bool has_wind () const = 0;
   virtual bool has_min_max_temperature () const = 0;
   virtual bool has_diffuse_radiation () const = 0;
-  virtual bool has_relative_humidity () const = 0;
   virtual double timestep () const = 0; // [d]
 
   // Light distribution.
