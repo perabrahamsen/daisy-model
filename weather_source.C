@@ -22,6 +22,7 @@
 
 #include "weather.h"
 #include "wsource.h"
+#include "plf.h"
 #include "time.h"
 #include "timestep.h"
 #include "block_model.h"
@@ -29,14 +30,19 @@
 #include "frame.h"
 #include "assertion.h"
 #include "mathlib.h"
+#include "astronomy.h"
+#include "fao.h"
 #include <boost/scoped_ptr.hpp>
 #include <map>
 #include <deque>
 
 struct WeatherSource : public Weather
 {
-  // Data.
+  // Parameters.
   boost::scoped_ptr<WSource> source;
+  const PLF snow_fraction;
+
+  // Data.
   typedef std::map<symbol, std::deque<double>/**/> number_map_t;
   number_map_t numbers;
   typedef std::map<symbol, std::deque<symbol>/**/> name_map_t;
@@ -44,7 +50,11 @@ struct WeatherSource : public Weather
   std::deque<Time> when;
   
   // Current values.
+  double number_average (const Time& previous, const Time& next,
+                         symbol) const;
   double number_average (symbol) const;
+  void extract_average (const Time& previous, const Time& next,
+                        symbol, double&, Treelog&) const;
   void extract_average (symbol, double&, Treelog&) const;
   symbol name_first (symbol) const;
   double my_latitude;           // [dg North]
@@ -60,7 +70,23 @@ struct WeatherSource : public Weather
   double my_diffuse_radiation;
   double my_reference_evapotranspiration;
   double my_wind;
+  double my_air_temperature;
+  double my_vapor_pressure;
+  double my_rain;
+  double my_snow;
+
   // TODO: More.
+
+  // Daily values.
+  Time day_start;
+  Time day_end;
+  double my_day_length;         // [h]
+  double my_sunrise;            // [h]
+  double my_daily_min_air_temperature; // [dg C]
+  double my_daily_max_air_temperature; // [dg C]
+  double my_daily_air_temperature;     // [dg C]
+  double my_daily_global_radiation;    // [W/m^2]
+  double my_daily_precipitation;       // [mm/d]
 
   // Simulation.
   Time previous;
@@ -78,7 +104,8 @@ struct WeatherSource : public Weather
 };
 
 double 
-WeatherSource::number_average (const symbol key) const
+WeatherSource::number_average (const Time& from, const Time& to,
+                               const symbol key) const
 {
   // This function considers the source data constant within the
   // source interval, and will give you the average value for the
@@ -101,7 +128,7 @@ WeatherSource::number_average (const symbol key) const
 
   // Find start.
   size_t i = 0;
-  while (i < data_size && when[i] <= previous)
+  while (i < data_size && when[i] <= from)
     i++;
   
   if (i == data_size)
@@ -111,9 +138,9 @@ WeatherSource::number_average (const symbol key) const
   // Aggregate complete values.
   double sum_value = 0.0;
   double sum_hours = 0.0;
-  Time time = previous;
+  Time time = from;
   
-  while (i < data_size && when[i] < next)
+  while (i < data_size && when[i] < to)
     {
       const double hours = Time::hours_between (time, when[i]);
       sum_hours += hours;
@@ -123,14 +150,31 @@ WeatherSource::number_average (const symbol key) const
     }
 
   // Add end interval.
-  const double hours = Time::hours_between (time, next);
+  const double hours = Time::hours_between (time, to);
   const double value = (i < data_size ? values[i] : values.back ());
   sum_hours += hours;
   sum_value += hours * value;
-  daisy_approximate (sum_hours, Time::hours_between (previous, next));
+  daisy_approximate (sum_hours, Time::hours_between (from, to));
   return sum_value / sum_hours;
 }
     
+
+double 
+WeatherSource::number_average (const symbol key) const
+{ return number_average (previous, next, key); }
+
+void 
+WeatherSource::extract_average (const Time& from, const Time& to,
+                                const symbol key, double& variable, 
+                                Treelog& msg) const
+{
+  const double value = number_average (from, to, key);
+  if (std::isfinite (value))
+    variable = value;
+  else
+    msg.warning ("Missing value for '" + key + "', reusing old");
+}
+
 void 
 WeatherSource::extract_average (const symbol key, double& variable, 
                                 Treelog& msg) const
@@ -139,7 +183,7 @@ WeatherSource::extract_average (const symbol key, double& variable,
   if (std::isfinite (value))
     variable = value;
   else
-    msg.error ("Missing value for '" + key + "', reusing old");
+    msg.warning ("Missing value for '" + key + "', reusing old");
 }
 
 symbol
@@ -212,6 +256,7 @@ WeatherSource::tick (const Time& time, Treelog& msg)
       daisy_assert (when.back () == source->begin ());
       when.push_back (source->end ());
 
+      // Numbers.
       for (number_map_t::iterator i = numbers.begin ();
            i != numbers.end ();
            i++)
@@ -234,6 +279,8 @@ WeatherSource::tick (const Time& time, Treelog& msg)
                 data.push_back (NAN);
             }
         }
+
+      // Names.
       for (name_map_t::iterator i = names.begin ();
            i != names.end ();
            i++)
@@ -255,7 +302,7 @@ WeatherSource::tick (const Time& time, Treelog& msg)
               else
                 data.push_back (Attribute::Unknown ());
             }
-       }
+        }
     }
 
   // Calculate new values.
@@ -265,51 +312,32 @@ WeatherSource::tick (const Time& time, Treelog& msg)
       return;
     }
   
-  // Calculate values for this timestep.
-  extract_average (Weatherdata::Latitude (), my_latitude, msg);
-  extract_average (Weatherdata::Longitude (), my_longitude, msg);
-  extract_average (Weatherdata::Elevation (), my_elevation, msg);
-  extract_average (Weatherdata::TimeZone (), my_timezone, msg);
-  extract_average (Weatherdata::ScreenHeight (), my_screenheight, msg);
-  extract_average (Weatherdata::TAverage (), my_Taverage, msg);
-  extract_average (Weatherdata::TAmplitude (), my_Tamplitude, msg);
-  extract_average (Weatherdata::MaxTDay (), my_maxTday, msg);
-  {
-    const symbol name = name_first (Weatherdata::Surface ());
-    if (name == Attribute::Unknown ())
-      msg.warning ("Unknown surface, using old");
-    else
-      my_surface = Weatherdata::symbol2surface (name);
-  }
-  extract_average (Weatherdata::GlobRad (), my_global_radiation, msg);
-
-  // Optional values.
-  my_diffuse_radiation = number_average (Weatherdata::DiffRad ());
-  my_reference_evapotranspiration = number_average (Weatherdata::RefEvap ());
-  my_wind = number_average (Weatherdata::Wind ());
-
-  // Special values.
-  const double new_air_temperature = number_average (Weatherdata::AirTemp ());
-  const double new_vapor_pressure = number_average (Weatherdata::VapPres ());
-  const double new_relative_humidity = number_average (Weatherdata::RelHum ());
-
-#ifdef TODO
-
-  // Calculate:
-  // 1. Air temperature (from T_min / T_max)
-  // 2. Vapor pressure (from RelHum + T)
-  // 2. Rain/Snow (from Precip + T)
-
   if (new_day)
+    // Daily values.
     {
-      // TODO: day_start, day_end and day_length
+      // Day duration.
+      day_start 
+        = Time (next.year (), next.month (), next.mday (), 0);
+      day_end = day_start;
+      day_end.tick_day (1);
+      my_day_length = Astronomy::DayLength (next, latitude ());
       my_sunrise = 12.0 - my_day_length * 0.5; // Use astronomy.C.
 
-      // Min/Max T and day length.
-      // TODO: Add avg.
+      // Average values.
+      extract_average (day_start, day_end, 
+                       Weatherdata::AirTemp (), my_daily_air_temperature, msg);
+      extract_average (day_start, day_end, 
+                       Weatherdata::GlobRad (), my_daily_global_radiation, msg);
+      double new_daily_precipitation; // [mm/h]
+      extract_average (day_start, day_end, 
+                       Weatherdata::Precip (), new_daily_precipitation, msg);
+      if (std::isfinite (new_daily_precipitation))
+        my_daily_precipitation = new_daily_precipitation * 24.0; // [mm/d]
+      
+      // Min/Max temperature.
       double new_max = NAN;
       double new_min = NAN;
-      
+
       // Available data.
       const size_t data_size = when.size ();
       const number_map_t::const_iterator eAvg 
@@ -345,29 +373,54 @@ WeatherSource::tick (const Time& time, Treelog& msg)
       else while (i < data_size && (i == 0 || when[i-1] < day_end))
         {
           // Take all data in period into account.
-          if (!std::finite (new_min) || new_min > values_min[i])
+          if (!std::isfinite (new_min) || new_min > values_min[i])
             new_min = values_min[i];
-          if (!std::finite (new_min) || new_min > values_avg[i])
+          if (!std::isfinite (new_min) || new_min > values_avg[i])
             new_min = values_avg[i];
-          if (!std::finite (new_max) || new_max < values_max[i])
+          if (!std::isfinite (new_max) || new_max < values_max[i])
             new_max = values_max[i];
-          if (!std::finite (new_max) || new_max < values_avg[i])
+          if (!std::isfinite (new_max) || new_max < values_avg[i])
             new_max = values_avg[i];
-
           i++;
         }
-      
+
       // Use it.
-      if (approximate (new_min, new_max))
-        my_daily_min_air_temperature = my_daily_max_air_temperature = NAN;
-      else
+      if (new_min < new_max)
         {
           my_daily_min_air_temperature = new_min;
           my_daily_max_air_temperature = new_max;
         }
+      else
+        my_daily_min_air_temperature = my_daily_max_air_temperature = NAN;
     }
-  
-  if (!std::isfinite (new_air_temperature) && has_min_max_temperature ())
+
+  // Calculate values for this timestep.
+  extract_average (Weatherdata::Latitude (), my_latitude, msg);
+  extract_average (Weatherdata::Longitude (), my_longitude, msg);
+  extract_average (Weatherdata::Elevation (), my_elevation, msg);
+  extract_average (Weatherdata::TimeZone (), my_timezone, msg);
+  extract_average (Weatherdata::ScreenHeight (), my_screenheight, msg);
+  extract_average (Weatherdata::TAverage (), my_Taverage, msg);
+  extract_average (Weatherdata::TAmplitude (), my_Tamplitude, msg);
+  extract_average (Weatherdata::MaxTDay (), my_maxTday, msg);
+  {
+    const symbol name = name_first (Weatherdata::Surface ());
+    if (name == Attribute::Unknown ())
+      msg.warning ("Unknown surface, using old");
+    else
+      my_surface = Weatherdata::symbol2surface (name);
+  }
+  extract_average (Weatherdata::GlobRad (), my_global_radiation, msg);
+
+  // Optional values.
+  my_diffuse_radiation = number_average (Weatherdata::DiffRad ());
+  my_reference_evapotranspiration = number_average (Weatherdata::RefEvap ());
+  my_wind = number_average (Weatherdata::Wind ());
+
+  const double new_air_temperature = number_average (Weatherdata::AirTemp ());
+  if (std::isfinite (new_air_temperature))
+    my_air_temperature = new_air_temperature;
+  else if (has_min_max_temperature ())
     {
       // We assume max T is at 15:00 and min T is at sunrise.
       // We assume previous and next day are identical to this one,
@@ -378,21 +431,39 @@ WeatherSource::tick (const Time& time, Treelog& msg)
 
       PLF T;
       T.add (15.0 - 24.0, my_daily_max_air_temperature);
-      T.add (sunrise, my_daily_min_air_temperature);
+      T.add (my_sunrise, my_daily_min_air_temperature);
       T.add (15.0, my_daily_max_air_temperature);
-      T.add (sunrise + 24.0. my_daily_min_air_temperature);
-      const double hours = 0.5 * ((previous - day_start).total_hours ()
-                                  + (next - day_start).total_hours ());
-      new_air_temperature = T (hours);
+      T.add (my_sunrise + 24.0, my_daily_min_air_temperature);
+      const double prev_hours = (previous - day_start).total_hours ();
+      const double next_hours = (next - day_start).total_hours ();
+      const double total_hours = next_hours - prev_hours;
+      my_air_temperature = T.integrate (prev_hours, next_hours) / total_hours;
     }
-  if (std::isfinite (new_air_temperature))
-    msg.error ("No air temperature, resuing old value");
   else
-    my_air_temperature = new_air_temperature;
-    
-  virtual double rain () const = 0;	// [mm/h]
-  virtual double snow () const = 0;	// [mm/h]
+    msg.warning ("No air temperature, resuing old value");
 
+  // Vapor pressure.
+  const double new_vapor_pressure = number_average (Weatherdata::VapPres ());
+  const double new_relative_humidity = number_average (Weatherdata::RelHum ());
+  if (std::isfinite (new_vapor_pressure))
+    my_vapor_pressure = new_vapor_pressure;
+  else if (std::isfinite (new_relative_humidity))
+    my_vapor_pressure = FAO::SaturationVapourPressure (my_air_temperature) 
+      * new_relative_humidity;
+  else
+    my_vapor_pressure = NAN;
+
+  // Rain and snow.
+  const double new_precipitation = number_average (Weatherdata::Precip ());
+  if (std::isfinite (new_precipitation))
+    {
+      my_snow = snow_fraction (my_air_temperature) * new_precipitation;
+      my_rain = new_precipitation - my_snow;
+    }
+  else
+    msg.warning ("Precipitation missing, reusing old");
+
+#ifdef TODO
   virtual const IM& deposit () const = 0; // [g [stuff] /cm²/h]
 
   virtual double cloudiness () const = 0; // [0-1]
@@ -411,9 +482,6 @@ WeatherSource::tick (const Time& time, Treelog& msg)
   virtual bool has_min_max_temperature () const = 0;
   virtual bool has_diffuse_radiation () const = 0;
 
-  virtual double daily_air_temperature () const = 0; // [dg C]
-  virtual double daily_max_air_temperature () const = 0; // [dg C]
-  virtual double daily_min_air_temperature () const = 0; // [dg C]
   virtual double daily_global_radiation () const = 0; // [W/m2]
   virtual double daily_precipitation () const = 0; // [mm/d]
 
@@ -494,7 +562,8 @@ WeatherSource::check (const Time& from, const Time& to, Treelog& msg) const
 
 WeatherSource::WeatherSource (const BlockModel& al)
   : Weather (al),
-    source (Librarian::build_item<WSource> (al, "source"))
+    source (Librarian::build_item<WSource> (al, "source")),
+    snow_fraction (al.plf ("snow_fraction"))
 { }
 
 WeatherSource::~WeatherSource ()
@@ -521,6 +590,13 @@ static struct WeatherSourceSyntax : public DeclareModel
 
     frame.declare_object ("source", WSource::component, "\
 Source of weather data.");
+    frame.declare ("snow_fraction", "dg C", Attribute::Fraction (),
+                   Attribute::Const, "\
+Fraction of precipitation that falls as snow as function of air temperature.");
+    PLF snow_fraction;
+    snow_fraction.add (-2.0, 1.0);
+    snow_fraction.add (2.0, 0.0);
+    frame.set ("snow_fraction", snow_fraction);
   }
 } WeatherSource_syntax;
 
