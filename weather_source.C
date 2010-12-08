@@ -22,6 +22,9 @@
 
 #include "weather.h"
 #include "wsource.h"
+#include "chemical.h"
+#include "im.h"
+#include "units.h"
 #include "plf.h"
 #include "time.h"
 #include "timestep.h"
@@ -35,12 +38,19 @@
 #include <boost/scoped_ptr.hpp>
 #include <map>
 #include <deque>
+#include <sstream>
 
 struct WeatherSource : public Weather
 {
+  const Units& units;
+
   // Parameters.
   boost::scoped_ptr<WSource> source;
   const PLF snow_fraction;
+
+  /* const */ IM DryDeposit;
+  /* const */ IM WetDeposit;
+  bool reset_deposition (Treelog& msg);
 
   // Data.
   typedef std::map<symbol, std::deque<double>/**/> number_map_t;
@@ -74,6 +84,7 @@ struct WeatherSource : public Weather
   double my_vapor_pressure;
   double my_rain;
   double my_snow;
+  IM my_deposit;
 
   // TODO: More.
 
@@ -82,6 +93,7 @@ struct WeatherSource : public Weather
   Time day_end;
   double my_day_length;         // [h]
   double my_sunrise;            // [h]
+  bool my_has_min_max_temperature;
   double my_daily_min_air_temperature; // [dg C]
   double my_daily_max_air_temperature; // [dg C]
   double my_daily_air_temperature;     // [dg C]
@@ -184,6 +196,135 @@ WeatherSource::extract_average (const symbol key, double& variable,
     variable = value;
   else
     msg.warning ("Missing value for '" + key + "', reusing old");
+}
+
+bool
+WeatherSource::reset_deposition (Treelog& msg)
+{
+  bool ok = true;
+  
+  const size_t data_size = when.size ();
+
+  int i = 0;
+  while (i < data_size && when[i] <= previous)
+    i++;
+  
+  if (i == data_size)
+    {
+      msg.error ("No deposition data");
+      return false;
+    }
+
+  struct Deposition
+  {
+    double total;
+    double dry;
+    double dry_NH4;
+    double wet_NH4;
+    double precipitation;
+    Deposition ()
+      : total (-42.42e42),
+        dry (0.4),
+        dry_NH4 (0.6),
+        wet_NH4 (0.5),
+        precipitation (-42.42e42)
+    { }
+  } deposition;
+
+  // Normal deposition.
+  const double NH4WetDep = numbers[Weatherdata::NH4WetDep ()][i];
+  const double NH4DryDep = numbers[Weatherdata::NH4DryDep ()][i];
+  const double NO3WetDep = numbers[Weatherdata::NO3WetDep ()][i];
+  const double NO3DryDep = numbers[Weatherdata::NO3DryDep ()][i];
+
+  // Alternative way of specifying deposition.
+  const double Deposition = numbers[Weatherdata::Deposition ()][i];
+  const double DepDry = numbers[Weatherdata::DepDry ()][i];
+  const double DepDryNH4 = numbers[Weatherdata::DepDryNH4 ()][i];
+  const double DepWetNH4 = numbers[Weatherdata::DepWetNH4 ()][i];
+  const double PAverage = numbers[Weatherdata::PAverage ()][i];
+
+  const Unit& u_ppm = units.get_unit (Units::ppm ());
+  const Unit& u_dpu = units.get_unit (Weather::dry_deposit_unit ());
+
+  if (std::isfinite (NH4WetDep))
+    WetDeposit.set_value (Chemical::NH4 (), u_ppm, NH4WetDep);
+  if (std::isfinite (NH4DryDep))
+    DryDeposit.set_value (Chemical::NH4 (), u_dpu, NH4DryDep);
+  if (std::isfinite (NO3WetDep))
+    WetDeposit.set_value (Chemical::NO3 (), u_ppm, NO3WetDep);
+  if (std::isfinite (NO3DryDep))
+    DryDeposit.set_value (Chemical::NO3 (), u_dpu, NO3DryDep);
+
+  // Alternative way of specifying deposition.
+  if (std::isfinite (Deposition))
+    deposition.total = Deposition;
+  if (std::isfinite (DepDry))
+    deposition.dry = DepDry;
+  if (std::isfinite (DepDryNH4))
+    deposition.dry_NH4 = DepDryNH4;
+  if (std::isfinite (DepWetNH4))
+    deposition.wet_NH4 = DepWetNH4;
+  if (std::isfinite (PAverage))
+    deposition.precipitation = PAverage;
+  
+  // Check consistency.
+  bool dep_ok = true;
+  const bool dep1_has_all = std::isfinite (NH4WetDep) 
+    && std::isfinite (NO3WetDep)
+    && std::isfinite (NH4DryDep)
+    && std::isfinite (NO3DryDep);
+  const bool dep1_has_any = std::isfinite (NH4WetDep) 
+    || std::isfinite (NO3WetDep)
+    || std::isfinite (NH4DryDep)
+    || std::isfinite (NO3DryDep);
+  if (dep1_has_any && !dep1_has_all)
+    dep_ok = false;
+  
+  const bool dep2_has_all = std::isfinite (Deposition) 
+    && std::isfinite (PAverage);
+  bool dep2_has_any = std::isfinite (Deposition) 
+    || std::isfinite (PAverage);
+  if (dep2_has_any && !dep2_has_all)
+    dep_ok = false;
+
+  if (!dep_ok)
+    {
+      msg.error ("\
+You must specify either all of 'NH4WetDep', 'NO3WetDep', 'NH4DryDep',\n\
+and 'NO3DryDep'; or alternatively all of 'Deposition' and 'PAverage',\n\
+but not both");
+      ok = false;
+    }
+  else if (dep1_has_all)
+    daisy_assert (!dep2_has_any);
+  else
+    {
+      daisy_assert (!dep1_has_any);
+      const double dry = deposition.total * deposition.dry;
+      const double wet = deposition.total * (1.0 - deposition.dry);
+      daisy_assert (approximate (dry + wet, deposition.total));
+      DryDeposit.set_value (Chemical::NH4 (), u_dpu, dry * deposition.dry_NH4);
+      DryDeposit.set_value (Chemical::NO3 (), u_dpu,
+			    dry * (1.0 - deposition.dry_NH4));
+      WetDeposit.set_value (Chemical::NH4 (), u_ppm, 
+                            wet * 100.0 * deposition.wet_NH4 
+			    / deposition.precipitation);
+      WetDeposit.set_value (Chemical::NO3 (), u_ppm, 
+			    wet * 100.0 * (1.0 - deposition.wet_NH4)
+			    / deposition.precipitation);
+      std::ostringstream tmp;
+      tmp << "NH4WetDep: " 
+	  << WetDeposit.get_value (Chemical::NH4 (), u_ppm) << " ppm\n\
+NH4DryDep: " 
+	  << DryDeposit.get_value (Chemical::NH4 (), u_dpu) << " kgN/ha/year\n\
+NO3WetDep: " << WetDeposit.get_value (Chemical::NO3 (), u_ppm) << " ppm\n\
+NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (), u_dpu) 
+          << " kgN/ha/year";
+      msg.debug (tmp.str ());
+    }
+
+  return ok;
 }
 
 symbol
@@ -323,17 +464,18 @@ WeatherSource::tick (const Time& time, Treelog& msg)
       my_day_length = Astronomy::DayLength (next, latitude ());
       my_sunrise = 12.0 - my_day_length * 0.5; // Use astronomy.C.
 
-      // Average values.
-      extract_average (day_start, day_end, 
-                       Weatherdata::AirTemp (), my_daily_air_temperature, msg);
+      // Global radiation.
       extract_average (day_start, day_end, 
                        Weatherdata::GlobRad (), my_daily_global_radiation, msg);
-      double new_daily_precipitation; // [mm/h]
-      extract_average (day_start, day_end, 
-                       Weatherdata::Precip (), new_daily_precipitation, msg);
+
+      // Precipitation.
+      double new_daily_precipitation // [mm/h]
+        = number_average (day_start, day_end, Weatherdata::Precip ());
       if (std::isfinite (new_daily_precipitation))
         my_daily_precipitation = new_daily_precipitation * 24.0; // [mm/d]
-      
+      else
+        msg.warning ("No daily precipitation, reusing old value");
+
       // Min/Max temperature.
       double new_max = NAN;
       double new_min = NAN;
@@ -364,14 +506,24 @@ WeatherSource::tick (const Time& time, Treelog& msg)
       while (i < data_size && when[i] <= day_start)
         i++;
   
+      bool has_min = false;
+      bool has_max = false;
       if (i == data_size)
         // All data is before current period.
         {
           new_min = values_min.back ();
           new_max = values_max.back ();
+          has_min = std::isfinite (values_min[i]);
+          has_max = std::isfinite (values_max[i]);
         }
       else while (i < data_size && (i == 0 || when[i-1] < day_end))
         {
+          // Explicit min/max temperature.
+          if (std::isfinite (values_min[i]))
+            has_min = true;
+          if (std::isfinite (values_max[i]))
+            has_max = true;
+              
           // Take all data in period into account.
           if (!std::isfinite (new_min) || new_min > values_min[i])
             new_min = values_min[i];
@@ -385,13 +537,23 @@ WeatherSource::tick (const Time& time, Treelog& msg)
         }
 
       // Use it.
-      if (new_min < new_max)
-        {
-          my_daily_min_air_temperature = new_min;
-          my_daily_max_air_temperature = new_max;
-        }
+      if (std::isfinite (my_daily_min_air_temperature))
+        my_daily_min_air_temperature = new_min;
+      if (std::isfinite (my_daily_max_air_temperature))
+        my_daily_max_air_temperature = new_max;
+      my_has_min_max_temperature = (new_min < new_max || (has_min && has_max));
+
+      const double new_T = number_average (day_start, day_end, 
+                                           Weatherdata::AirTemp ());
+
+      // Average temperature.
+      if (std::isfinite (new_T))
+        my_daily_air_temperature = new_T;
+      else if (my_has_min_max_temperature)
+        my_daily_air_temperature = 0.5 * (my_daily_min_air_temperature
+                                          + my_has_min_max_temperature);
       else
-        my_daily_min_air_temperature = my_daily_max_air_temperature = NAN;
+        msg.warning ("No daily air temperature, reusing using old value");
     }
 
   // Calculate values for this timestep.
@@ -455,6 +617,7 @@ WeatherSource::tick (const Time& time, Treelog& msg)
 
   // Rain and snow.
   const double new_precipitation = number_average (Weatherdata::Precip ());
+  // TODO PrecipCorrect PrecipScale.
   if (std::isfinite (new_precipitation))
     {
       my_snow = snow_fraction (my_air_temperature) * new_precipitation;
@@ -463,15 +626,17 @@ WeatherSource::tick (const Time& time, Treelog& msg)
   else
     msg.warning ("Precipitation missing, reusing old");
 
+  // Deposition.
+  const Unit& u_flux = units.get_unit (IM::flux_unit ());
+  const Unit& u_solute = units.get_unit (IM::solute_unit ());
+  const Unit& u_precip = units.get_unit (Units::mm_per_h ());
+  const IM dry (u_flux, DryDeposit);
+  const IM solute (u_solute, WetDeposit);
+  const IM wet (solute.multiply (Scalar (my_snow + my_rain, u_precip), u_flux));
+  my_deposit = dry + wet;
+
 #ifdef TODO
-  virtual const IM& deposit () const = 0; // [g [stuff] /cm²/h]
-
   virtual double cloudiness () const = 0; // [0-1]
-
-
-  virtual double CO2 () const = 0; //[Pa]
-  virtual double O2 () const = 0; //[Pa]
-  virtual double air_pressure () const = 0; //[Pa]
 
 
   virtual double timestep () const = 0; // [d]
@@ -524,6 +689,11 @@ WeatherSource::initialize (const Time& time, Treelog& msg)
   bool ok = true;
   // TODO: Initialize previous, next, numbers, names.
 
+  // Deposition.
+#if 0
+  reset_deposition ();
+#endif
+
   return ok;
 }
 
@@ -562,8 +732,12 @@ WeatherSource::check (const Time& from, const Time& to, Treelog& msg) const
 
 WeatherSource::WeatherSource (const BlockModel& al)
   : Weather (al),
+    units (al.units ()),
     source (Librarian::build_item<WSource> (al, "source")),
-    snow_fraction (al.plf ("snow_fraction"))
+    snow_fraction (al.plf ("snow_fraction")),
+    DryDeposit (units.get_unit (dry_deposit_unit ())),
+    WetDeposit (units.get_unit (Units::ppm ())),
+    my_deposit (al, "deposit")    // For the units...
 { }
 
 WeatherSource::~WeatherSource ()
