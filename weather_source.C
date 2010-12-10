@@ -67,6 +67,10 @@ struct WeatherSource : public Weather
                         symbol, double&, Treelog&) const;
   void extract_average (symbol, double&, Treelog&) const;
   symbol name_first (symbol) const;
+  double find_cloudiness (const Time& time, const double Si) const;
+  double number_cloudiness (const Time& from, const Time& to) const;
+  void extract_cloudiness (double& variable) const;
+
   double my_latitude;           // [dg North]
   double my_longitude;
   double my_elevation;
@@ -85,6 +89,7 @@ struct WeatherSource : public Weather
   double my_rain;
   double my_snow;
   IM my_deposit;
+  double my_cloudiness;
 
   // TODO: More.
 
@@ -196,6 +201,90 @@ WeatherSource::extract_average (const symbol key, double& variable,
     variable = value;
   else
     msg.warning ("Missing value for '" + key + "', reusing old");
+}
+
+double
+WeatherSource::find_cloudiness (const Time& time, const double Si) const
+{
+  const double rad = extraterrestrial_radiation (time);
+  if (Si > 25.0 && rad > 25.0)
+    return FAO::CloudinessFactor_Humid (Si, rad);
+  else
+    return NAN;
+}
+
+double 
+WeatherSource::number_cloudiness (const Time& from, const Time& to) const
+{
+  // This function considers the source data constant within the
+  // source interval, and will give you the average cloudiness for the
+  // weather interval.
+  const symbol key = Weatherdata::GlobRad ();
+  
+  // Available data.
+  const number_map_t::const_iterator e = numbers.find (key);
+  daisy_assert (e != numbers.end ());
+  const std::deque<double>& values = e->second;
+  const size_t data_size = when.size ();
+  daisy_assert (values.size () == data_size);
+
+  switch (data_size)
+    {
+    case 0:
+      daisy_panic ("No weather data");
+    case 1:
+      return find_cloudiness (when[0], values[0]);
+    }
+
+  // Find start.
+  size_t i = 0;
+  while (i < data_size && when[i] <= from)
+    i++;
+  
+  if (i == data_size)
+    // All data is before current period.
+    return find_cloudiness (when.back (), values.back ());
+  
+  // Aggregate complete values.
+  double sum_value = 0.0;
+  double sum_hours = 0.0;
+  Time time = from;
+  
+  while (i < data_size && when[i] < to)
+    {
+      const double value = find_cloudiness (when[i], values[i]);
+      if (std::isfinite (value))
+        {
+          const double hours = Time::hours_between (time, when[i]);
+          sum_hours += hours;
+          sum_value += hours * value;
+        }
+      time = when[i];
+      i++;
+    }
+
+  // Add end interval.
+  const double hours = Time::hours_between (time, to);
+  const double value = (i < data_size 
+                        ? find_cloudiness (when[i], values[i])
+                        : find_cloudiness (when.back (), values.back ()));
+  if (std::isfinite (value))
+    {
+      sum_hours += hours;
+      sum_value += hours * value;
+    }
+  if (std::isnormal (sum_hours))
+    return sum_value / sum_hours;
+
+  return NAN;
+}
+
+void 
+WeatherSource::extract_cloudiness (double& variable) const
+{
+  const double value = number_cloudiness (previous, next);
+  if (std::isfinite (value))
+    variable = value;
 }
 
 bool
@@ -635,9 +724,9 @@ WeatherSource::tick (const Time& time, Treelog& msg)
   const IM wet (solute.multiply (Scalar (my_snow + my_rain, u_precip), u_flux));
   my_deposit = dry + wet;
 
+  // Cloudiness.
+  extract_cloudiness (my_cloudiness);
 #ifdef TODO
-  virtual double cloudiness () const = 0; // [0-1]
-
 
   virtual double timestep () const = 0; // [d]
 
