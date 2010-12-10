@@ -10,18 +10,9 @@ tick2: Evt med mindre tidsskridt
 
 ** Weather source
 
-Se google docs.
+*** initialize & check
 
-For hver virtuel Weather::function, afgør hvordan de skabes fra WSource.
-
-interpolate, aggregate, pedotransfer (& check)
-
-*** Vi skal håndtere dagsværdier bedre.
-
-Vi er nok nødt til at gemme dagsværdier for mindst to dage.
-
-Tidsskridt kan overlappe dage.
-Vi kan måske "backtracke" hvis next gøres mindre.
+*** Prøv!
 
 ** WSource table
 

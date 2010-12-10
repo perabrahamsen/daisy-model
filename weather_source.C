@@ -71,6 +71,7 @@ struct WeatherSource : public Weather
   double number_cloudiness (const Time& from, const Time& to) const;
   void extract_cloudiness (double& variable) const;
 
+  // Current values.
   double my_latitude;           // [dg North]
   double my_longitude;
   double my_elevation;
@@ -91,8 +92,6 @@ struct WeatherSource : public Weather
   IM my_deposit;
   double my_cloudiness;
 
-  // TODO: More.
-
   // Daily values.
   Time day_start;
   Time day_end;
@@ -105,11 +104,93 @@ struct WeatherSource : public Weather
   double my_daily_global_radiation;    // [W/m^2]
   double my_daily_precipitation;       // [mm/d]
 
+  // Extract weather.
+double latitude () const
+  { return my_latitude; }
+  double longitude () const
+  { return my_longitude; }
+  double elevation () const
+  { return my_elevation; }
+  double timezone () const
+  { return my_timezone; }
+  double screen_height () const
+  { return my_screenheight; }
+  Weatherdata::surface_t surface () const
+  { return my_surface; }
+  double air_temperature () const
+  { return my_air_temperature; }
+  double daily_air_temperature () const
+  { return my_daily_air_temperature; }
+  double daily_max_air_temperature () const
+  { return my_daily_max_air_temperature; }
+  double daily_min_air_temperature () const
+  { return my_daily_min_air_temperature; }
+  double global_radiation () const
+  { return my_global_radiation; }
+  double daily_global_radiation () const
+  { return my_daily_global_radiation; }
+  double diffuse_radiation () const
+  { return my_diffuse_radiation; }
+  double reference_evapotranspiration () const
+  { return my_reference_evapotranspiration; }
+  double daily_precipitation () const
+  { return my_daily_precipitation; }
+  double rain () const
+  { return my_rain; }
+  double snow () const
+  { return my_snow; }
+  const IM& deposit () const
+  { return my_deposit; }
+  double cloudiness () const
+  { return my_cloudiness; }
+  double vapor_pressure () const
+  { return my_vapor_pressure; }
+  double wind () const
+  { return has_wind () ? my_wind : 5.0; }
+  double CO2 () const
+  { 
+    static const double standard_pressure = FAO::AtmosphericPressure (0.0);
+    return 35.0 * air_pressure () / standard_pressure; 
+  }
+  double O2 () const
+  { 
+    static const double standard_pressure = FAO::AtmosphericPressure (0.0);
+    return 20500.0 * air_pressure () / standard_pressure; 
+  }
+  double air_pressure () const
+  { return FAO::AtmosphericPressure (elevation ()); }
+  bool has_reference_evapotranspiration () const
+  { return std::isfinite (my_reference_evapotranspiration); }
+  bool has_vapor_pressure () const
+  { return std::isfinite (my_vapor_pressure); }
+  bool has_wind () const
+  { return std::isfinite (my_wind); }
+  bool has_min_max_temperature () const
+  { return my_has_min_max_temperature; }
+  bool has_diffuse_radiation () const
+  { return std::isfinite (my_diffuse_radiation); }
+  double timestep () const
+  { return Time::hours_between (previous, next); }
+
+  // Light distribution.
+public:
+  double day_length () const
+  { return my_day_length; }
+
+  // Soil heat initialization.
+  double T_normal (const Time& time, double delay) const;
+
+  double average_temperature () const
+  { return my_Taverage; }
+
   // Simulation.
   Time previous;
   Time next;
   double suggest_dt () const;   // [h]
   void tick (const Time& time, Treelog&);
+  void output (Log& log) const
+  { output_common (log); }
+    
 
   // TODO: Output.
 
@@ -445,6 +526,19 @@ WeatherSource::name_first (const symbol key) const
   return values.back ();
 }
     
+double
+WeatherSource::T_normal (const Time& time, double delay) const
+{
+  const double displacement = time.year_fraction () - my_maxTday / 365.0;
+  
+  daisy_assert (delay <= 0);
+  daisy_assert (my_Taverage > -400);
+  return my_Taverage
+    + my_Tamplitude
+    * exp (delay)
+    * cos (2.0 * M_PI * displacement + delay);
+}
+
 double 
 WeatherSource::suggest_dt () const // [h]
 { 
@@ -726,22 +820,6 @@ WeatherSource::tick (const Time& time, Treelog& msg)
 
   // Cloudiness.
   extract_cloudiness (my_cloudiness);
-#ifdef TODO
-
-  virtual double timestep () const = 0; // [d]
-
-  virtual bool has_reference_evapotranspiration () const = 0;
-  virtual bool has_vapor_pressure () const = 0;
-  virtual bool has_wind () const = 0;
-  virtual bool has_min_max_temperature () const = 0;
-  virtual bool has_diffuse_radiation () const = 0;
-
-  virtual double daily_global_radiation () const = 0; // [W/m2]
-  virtual double daily_precipitation () const = 0; // [mm/d]
-
-  virtual double day_length () const = 0; // [h]
-  virtual double T_normal (const Time&, double delay = 0.0) const = 0;
-#endif
 
   // Only do this at a new day.
   if (!new_day)
@@ -779,9 +857,7 @@ WeatherSource::initialize (const Time& time, Treelog& msg)
   // TODO: Initialize previous, next, numbers, names.
 
   // Deposition.
-#if 0
-  reset_deposition ();
-#endif
+  reset_deposition (msg);
 
   return ok;
 }
@@ -837,7 +913,7 @@ static struct WeatherSourceSyntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
   { 
-#if 0
+#if 1
     return new WeatherSource (al); 
 #else
     daisy_notreached ();
