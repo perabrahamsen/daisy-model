@@ -854,7 +854,31 @@ bool
 WeatherSource::initialize (const Time& time, Treelog& msg)
 {
   bool ok = true;
-  // TODO: Initialize previous, next, numbers, names.
+  
+  // Numbers and names.
+  std::set<symbol> all;
+  source->entries (all);
+  for (std::set<symbol>::const_iterator i = all.begin (); i != all.end (); i++)
+    {
+      const symbol key = *i;
+
+      if (source->type_size (key) != Attribute::Singleton)
+        continue;
+
+      switch (source->lookup (key))
+        {
+        case Attribute::Number:
+          numbers[key];         // Instantiate.
+          break;
+        case Attribute::String:
+          names[key];           // Instantiate.
+          break;
+        default:
+          break;
+        }
+    }
+
+  // TODO: Initialize previous, next
 
   // Deposition.
   reset_deposition (msg);
