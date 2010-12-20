@@ -1,0 +1,202 @@
+;; genweather.dai -- Automatic generation of weather files.
+;;
+;; This file demonstrate how to generate hourly weather data from
+;; daily, or daily weather data from hourly.
+
+;; Definition of time columns as they occur in weather files.
+
+
+
+(path "."
+       "c:/cygwin/home/mmo/daisy/lib"
+       "c:/cygwin/home/mmo/daisy/sample")
+
+
+;;  Here information is retrieved from Daisy library files. 
+;;  As soon as the “input file” is executed all information present
+;;  in the input file is available 
+
+;;(input file "log.dai")                
+;;(input file "crop.dai")
+;;(input file "tillage.dai")
+;;(input file "fertilizer.dai") 	;;
+;;(input file "chemistry.dai") 	;;for Pendimethalin and Ioxynil
+
+
+
+
+
+
+(defselect Year number 
+  (tag Year)
+  (dimension year)
+  (path time year)
+  (interesting_content false))
+
+(defselect Month number 
+  (tag Month)
+  (dimension month)
+  (path time month)
+  (interesting_content false))
+
+(defselect MDay number 
+  (tag Day)
+  (dimension mday)
+  (path time mday)
+  (interesting_content false))
+
+(defselect Hour number 
+  (tag Hour)
+  (dimension hour)
+  (path time hour)
+  (interesting_content false))
+
+;; The unit [dg C] is spelled differently in weather files.
+(defunit [dgC] [dg C])
+
+(deflog DailyWeather table
+  "Summarize daily weather with average temperature."
+  (when (hour 23))
+  (where "GenAverage.dwf")
+  (entries Year Month MDay
+           (number (tag "DiffRad")
+                   (dimension "W/m^2")
+                   (handle average)
+                   (path weather default diffuse_radiation)
+                   (spec weather default diffuse_radiation))
+           (number (tag "GlobRad")
+                   (dimension "W/m^2")
+                   (handle average)
+                   (path weather default global_radiation)
+                   (spec weather default global_radiation))
+           (number (tag "AirTemp")
+                   (dimension "dgC")
+                   (handle average)
+                   (path weather default air_temperature)
+                   (spec weather default air_temperature))
+           (number (tag "Precip")
+                   (dimension "mm/d")
+                   (handle average)
+                   (path weather default precipitation)
+                   (spec weather default precipitation))
+           (number (tag "VapPres")
+                   (dimension "Pa")
+                   (handle average)
+                   (path weather default vapor_pressure)
+                   (spec weather default vapor_pressure))
+           (number (tag "Wind")
+                   (dimension "m/s")
+                   (handle average)
+                   (path weather default wind)
+                   (spec weather default wind))))
+
+(deflog MinMaxWeather table
+  "Summarize daily weather with minimum and maximum temperatures."
+  (when (hour 23))
+  (where "GenMinMax.dwf")
+  (entries Year Month MDay
+           (number (tag "DiffRad")
+                   (dimension "W/m^2")
+                   (handle average)
+                   (path weather default diffuse_radiation)
+                   (spec weather default diffuse_radiation))
+           (number (tag "GlobRad")
+                   (dimension "W/m^2")
+                   (handle average)
+                   (path weather default global_radiation)
+                   (spec weather default global_radiation))
+           (number (tag "T_min")
+                   (dimension "dgC")
+                   (handle min)
+                   (path weather default air_temperature)
+                   (spec weather default air_temperature))
+           (number (tag "T_max")
+                   (dimension "dgC")
+                   (handle max)
+                   (path weather default air_temperature)
+                   (spec weather default air_temperature))
+           (number (tag "Precip")
+                   (dimension "mm/d")
+                   (handle average)
+                   (path weather default precipitation)
+                   (spec weather default precipitation))
+           (number (tag "VapPres")
+                   (dimension "Pa")
+                   (handle average)
+                   (path weather default vapor_pressure)
+                   (spec weather default vapor_pressure))
+           (number (tag "Wind")
+                   (dimension "m/s")
+                   (handle average)
+                   (path weather default wind)
+                   (spec weather default wind))))
+
+(deflog HourlyWeather table
+  "Hourly weather data."
+  (where "GenHourly.dwf")
+  (when hourly)
+  (entries Year Month MDay Hour
+           (number (tag "DiffRad")
+                   (dimension "W/m^2")
+                   (handle average)
+                   (path weather default diffuse_radiation)
+                   (spec weather default diffuse_radiation)
+                   )
+           (number (tag "GlobRad")
+                   (dimension "W/m^2")
+                   (handle average)
+                   (path weather default global_radiation)
+                   (spec weather default global_radiation))
+           (number (tag "AirTemp")
+                   (dimension "dgC")
+                   (handle average)
+                   (path weather default air_temperature)
+                   (spec weather default air_temperature))
+           (number (tag "Precip")
+                   (dimension "mm/d")
+                   (handle average)
+                   (path weather default precipitation)
+                   (spec weather default precipitation))
+           (number (tag "VapPres")
+                   (dimension "Pa")
+                   (handle average)
+                   (path weather default vapor_pressure)
+                   (spec weather default vapor_pressure))
+           (number (tag "RelHum")
+                   (dimension "%")
+                   (handle average)
+                   (path weather default relative_humidity)
+                   (spec weather default relative_humidity))
+           (number (tag "Wind")
+                   (dimension "m/s")
+                   (handle average)
+                   (path weather default wind)
+                   (spec weather default wind))))
+
+;; We are not interested in management operations.
+(defaction none activity)
+
+;; Now really in soil, so we just use some existing parameterization.
+(input file "dk-soil.dai")
+(defcolumn none Askov)
+
+;; And now the programs.
+(defprogram GenWeather Daisy
+  "Generate daily weather."
+  ;; EDIT HERE!  Insert name of existing weather file and the period.
+  ;;(weather default "Rorrende.dwf"
+  ;;         (missing_years ((1996 1996) (1997 1997))
+  ;;                        ((1998 1999) (1996 1997))))
+  (weather default "Rorrende.dwf"
+          (missing_years ((1997 1997) (1998 1998)))) 
+  ;;(time 1998 04 01)
+  ;;(stop 1998 10 01)
+  (time 1997 06 01)
+  (stop 2000 12 23)
+  (manager none)
+  (column none)
+  (output DailyWeather MinMaxWeather HourlyWeather))
+
+(run GenWeather)
+
+;;; genweather.dai ends here

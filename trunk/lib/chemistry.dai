@@ -1,0 +1,49 @@
+;;; chemestry.dai --- standard pesticides
+
+(input file "chemistry-base.dai")
+
+(defchemical Atrazine herbicide
+  (crop_uptake_reflection_factor 0.8 [])
+  (decompose_rate 7e-5 [h^-1])
+  (diffusion_coefficient 8e-6 [cm^2/s])
+  (adsorption linear (K_clay 7 [cm^3/g])))
+
+(defchemical Bentazon herbicide
+  (decompose_halftime 40 [d])	
+  (adsorption linear (K_OC 34 [cm^3/g])))
+
+(defchemical IPU herbicide
+  (decompose_halftime 29 [d])
+  (adsorption linear (K_OC 100 [cm^3/g])))
+
+(defchemical MCPP herbicide
+  (decompose_halftime 7 [d])
+  (adsorption linear (K_OC 20 [cm^3/g])))
+
+(defchemical Pendimethalin herbicide
+  (decompose_rate 0.0004 [h^-1])
+  (adsorption linear (K_OC 16000 [cm^3/g])))
+
+(defchemical Ioxynil herbicide
+  (decompose_halftime 10 [d])	
+  (adsorption linear (K_OC 350 [cm^3/g])))
+
+(defchemical "2,4-D" herbicide
+  "Selective herbicide, kill weeds but not crops."
+  (decompose_halftime 10 [d])
+  (adsorption linear (K_OC 20 [cm^3/g])))
+
+(defchemical Heptachlor insecticide
+  (decompose_halftime 300 [d])
+  (adsorption linear (K_OC 24e3 [cm^3/g])))
+
+(defchemical DDT insecticide
+  (decompose_halftime 2000 [d])
+  (adsorption linear (K_OC 2e6 [cm^3/g])))
+
+(defchemistry pesticides default
+  "Trace all known pesticides."
+  (trace DDT
+	 Heptachlor "2,4-D" Ioxynil Pendimethalin MCPP IPU Bentazon Atrazine))
+
+;;; chemestry.dai ends here.

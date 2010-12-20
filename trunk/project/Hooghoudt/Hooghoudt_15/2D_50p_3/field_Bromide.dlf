@@ -1,0 +1,12 @@
+dlf-0.0 -- Field chemical (defined in 'log-std.dai').
+
+VERSION: 4.74
+LOGFILE: field_Bromide.dlf
+RUN: Fri Oct 30 17:05:23 2009
+
+COLUMN: *
+CHEMICAL: Bromide
+INTERVAL: box none
+
+LOG: Content, transport and transformation of chemicals in the field.
+

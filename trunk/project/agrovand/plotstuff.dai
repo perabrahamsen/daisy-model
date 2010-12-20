@@ -1,0 +1,1528 @@
+(defxysource "Hydraulic" loop
+  "Plot hydraulic properties as function of pF."
+  (begin 0 [pF])
+  (end 5 [pF])
+  (step 0.1 [pF]))
+
+(defxysource "Retention Daisy" Hydraulic
+  "Retention curve used by Daisy."
+  (title "Daisy"))
+
+(defxysource "Retention HYPRES" Hydraulic
+  "The retention curve according to HYPRES."
+  (title "HYPRES"))
+
+(defxysource "Conductivity Daisy" Hydraulic
+  "Conductivity curve used by Daisy."
+  (title "Daisy"))
+
+(defxysource "Conductivity HYPRES" Hydraulic
+  "The conductivity curve according to HYPRES."
+  (title "HYPRES"))
+
+(defgnuplot "Hydraulic" xy
+  (canvas "9cm, 5.5cm")
+  (extra &old
+         [set lmargin 9]
+         [set rmargin 1]
+         [set bmargin 3]
+         [set tmargin 3]))
+
+(defgnuplot "Retention All" "Hydraulic"
+  "Plot retention curve."
+  (ymax 50 [])
+  (ymin  0 [])
+  (declare hor String "Name of horizon.")
+  (where "fig/${station}-${hor}-Theta.pdf")
+  (title "${hor} retention curve"))
+
+(defgnuplot "Conductivity All" "Hydraulic"
+  "Plot conductivity curve."
+  (extra &old
+         [set format x "%g"]
+         [set format y "%.0e"]
+         "set logscale y")
+  (ymax 1e4 [])
+  (ymin 1e-10 [])
+  (declare hor String "Name of horizon.")
+  (where "fig/${station}-${hor}-K.pdf")
+  (title "${hor} conductivity curve"))
+
+(defxysource "Retention Ap Rorrende Daisy" "Retention Daisy" 
+  (y (convert (soil_Theta (horizon "Rorrende Ap")
+                          (top_soil true)
+                          (h x))
+              [%])))
+
+(defxysource "Retention Ap Rorrende HYPRES" "Retention HYPRES"
+  (y (convert (soil_Theta (horizon ("Rorrende Ap" (hydraulic hypres)))
+                          (top_soil true)
+                          (h x))
+              [%])))
+
+(defxysource "Conductivity Ap Rorrende Daisy" "Conductivity Daisy" 
+  (y (convert (soil_K (horizon "Rorrende Ap")
+                      (top_soil true)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity Ap Rorrende HYPRES" "Conductivity HYPRES"
+  (y (convert (soil_K (horizon ("Rorrende Ap" (hydraulic hypres)))
+                      (top_soil true)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity Ap Rorrende Surface" "Conductivity Daisy" 
+  (title "Surface")
+  (y (convert (soil_K (horizon "Overflade Ap")
+                      (top_soil true)
+                      (h x))
+              [cm/d])))
+
+(defgnuplot "Retention Ap Rorrende" "Retention All"
+  (hor "Ap")
+  (legend none)
+  (source ;; "Retention Ap Rorrende HYPRES"
+          ("Retention Ap Rorrende Daisy" (style 2))))
+
+(defgnuplot "Conductivity Ap Rorrende" "Conductivity All"
+  (hor "Ap")
+  (source ;; "Conductivity Ap Rorrende HYPRES"
+          ("Conductivity Ap Rorrende Daisy" (title "Ap") (style 2))
+          ("Conductivity Ap Rorrende Surface" (style 3))))
+
+(defxysource "Retention Bt Rorrende Daisy" "Retention Daisy" 
+  (y (convert (soil_Theta (horizon "Rorrende Bt")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Retention Bt Rorrende HYPRES" "Retention HYPRES"
+  (y (convert (soil_Theta (horizon ("Rorrende Bt" (hydraulic hypres)))
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Retention Bt Rorrende plow pan" "Retention Daisy" 
+  (title "Plow pan")
+  (y (convert (soil_Theta (horizon "Rorrende Bplow layer")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Conductivity Bt Rorrende Daisy" "Conductivity Daisy" 
+  (y (convert (soil_K (horizon "Rorrende Bt")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity Bt Rorrende HYPRES" "Conductivity HYPRES"
+  (y (convert (soil_K (horizon ("Rorrende Bt" (hydraulic hypres)))
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity Bt Rorrende plow pan" "Conductivity Daisy" 
+  (title "Plow pan")
+  (y (convert (soil_K (horizon "Rorrende Bplow layer")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defgnuplot "Retention Bt Rorrende" "Retention All"
+  (hor "Bt")
+  (source ;;"Retention Bt Rorrende HYPRES"
+          ("Retention Bt Rorrende Daisy" (style 2) (title Bt))
+          ("Retention Bt Rorrende plow pan" (style 3))))
+
+(defgnuplot "Conductivity Bt Rorrende" "Conductivity All"
+  (hor "Bt")
+  (source "Conductivity Bt Rorrende HYPRES"
+          "Conductivity Bt Rorrende Daisy"
+          "Conductivity Bt Rorrende plow pan"))
+
+(defxysource "Retention C Rorrende Daisy" "Retention Daisy" 
+  (y (convert (soil_Theta (horizon "Rorrende C")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Retention C Rorrende HYPRES" "Retention HYPRES"
+  (y (convert (soil_Theta (horizon ("Rorrende C" (hydraulic hypres)))
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Conductivity C Rorrende Daisy" "Conductivity Daisy" 
+  (y (convert (soil_K (horizon "Rorrende C")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity C Rorrende HYPRES" "Conductivity HYPRES"
+  (y (convert (soil_K (horizon ("Rorrende C" (hydraulic hypres)))
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defgnuplot "Retention C Rorrende" "Retention All"
+  (hor "C")
+  (legend none)
+  (source ;; "Retention C Rorrende HYPRES"
+          ("Retention C Rorrende Daisy" (style 2))))
+
+(defgnuplot "Conductivity C Rorrende" "Conductivity All"
+  (hor "C")
+  (source "Conductivity C Rorrende HYPRES"
+          "Conductivity C Rorrende Daisy"))
+
+(defxysource "Retention DC Rorrende Daisy" "Retention Daisy" 
+  (y (convert (soil_Theta (horizon "Drain_canyon")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Retention DC Rorrende HYPRES" "Retention HYPRES"
+  (y (convert (soil_Theta (horizon ("Drain_canyon" (hydraulic hypres)))
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Conductivity DC Rorrende Daisy" "Conductivity Daisy" 
+  (y (convert (soil_K (horizon "Drain_canyon")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity DC Rorrende HYPRES" "Conductivity HYPRES"
+  (y (convert (soil_K (horizon ("Drain_canyon" (hydraulic hypres)))
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defgnuplot "Retention DC Rorrende" "Retention All"
+  (hor "DC")
+  (legend none)
+  (title "Drain canyon retention curve")
+  (source ;; "Retention DC Rorrende HYPRES"
+          ("Retention DC Rorrende Daisy" (style 2))))
+
+(defgnuplot "Conductivity DC Rorrende" "Conductivity All"
+  (hor "DC")
+  (title "Drain canyon conductivity curve")
+  (legend none)
+  (source ;; "Conductivity DC Rorrende HYPRES"
+          ("Conductivity DC Rorrende Daisy" (style 2))))
+
+(defgnuplot Rorrende-hydraulics multi
+  (declare station String "Name of station to plot.")
+  (station Rorrende)
+  (graph "Retention Ap Rorrende"
+         "Conductivity Ap Rorrende"
+         "Retention Bt Rorrende"
+         "Conductivity Bt Rorrende"
+         "Retention C Rorrende"
+         "Conductivity C Rorrende"
+         "Retention DC Rorrende"
+         "Conductivity DC Rorrende"
+         ))
+
+(defprogram plothydro gnuplot
+  (graph Rorrende-hydraulics
+         ))
+
+(defgnuplot plottime time
+  (device "pdf size 19cm, 8cm")
+  (extra &old
+         [set lmargin 12]
+         [set rmargin 10]
+         [set bmargin 2]
+         [set tmargin 1]  
+         [set format x "%y-%m"]
+         ;;"unset xlabel"
+         ))
+
+(defgnuplot gw-setup plottime
+  (where "fig/gwt.pdf")
+  (title "Groundwater")
+  (ymax 0 [cm])
+  (ymin -200 [cm])
+  (source (column (file "log/Rorrende_aq_gwt.dlf")
+                  (tag "GWT")
+                  (style 1)
+                  (title "Pressure table"))
+          (column (file "piezo-median.ddf")
+                  (tag "Median")
+                  (style 3)
+                  (title "Piezometer")
+                  (with lines))
+          ))
+
+(defgnuplot gw-sim plottime
+  (title "Groundwater")
+  (ymax 0 [cm])
+  (ymin -200 [cm])
+  (source (column (file "log/Rorrende_aq_gwt.dlf")
+                  (tag "GWT-low")
+                  (style 2)
+                  (title "Sim (low)"))
+          (arithmetic (file "log/Rorrende_aq_gwt.dlf")
+                      (expr (min "GWT-high" 0.0 [cm]))
+                      (style 5)
+                      (title "Sim (high)"))
+          (column (file "log/Rorrende_aq_gwt.dlf")
+                  (tag "GWT")
+                  (style 1)
+                  (title "Pressure table"))
+          (column (file "piezo-median.ddf")
+                  (tag "Median")
+                  (style 3)
+                  (title "Piezometer")
+                  (with lines))
+          ))
+(defgnuplot gw-cal plottime
+  (title "Groundwater")
+  (ymax 0 [cm])
+  (ymin -200 [cm])
+  (source (column (file "log/Rorrende_aq_gwt.dlf")
+                  (tag "GWT-low")
+                  (style 2)
+                  (title "Sim (low)"))
+          (arithmetic (file "log/Rorrende_aq_gwt.dlf")
+                      (expr (min "GWT-high" 0.0 [cm]))
+                      (style 5)
+                      (title "Sim (high)"))
+          (column (file "log/Rorrende_aq_gwt.dlf")
+                  (tag "GWT")
+                  (style 1)
+                  (title "Pressure table"))
+          ))
+
+(defgnuplot piezo-sim plottime
+  (title "Simulated groundwater pressure at 230 cm depth.")
+  (source (arithmetic (file "log/pressure.dlf")
+                      (expr (- "70" 230 [cm]))
+                      (title "70"))
+          (arithmetic (file "log/pressure.dlf")
+                      (expr (- "400" 230 [cm]))
+                      (title "400"))
+          (arithmetic (file "log/pressure.dlf")
+                      (expr (- "800" 230 [cm]))
+                      (title "800"))
+          (column (file "log/Rorrende_aq_gwt.dlf")
+                  (tag "GWT")
+                  (style 4)
+                  (title "Lower boundary"))
+          ))
+
+(defgnuplot piezo-drain plottime
+  (where "fig/piezo-drain.pdf")
+  (ymax 0 [cm]) (ymin -200 [cm])
+  (source (column (file "piezo-median.ddf")
+                  (tag "D70")
+                  (title "Drain distance, 70 cm")
+                  (with lines))
+          (column (file "piezo-median.ddf")
+                  (tag "D400")
+                  (title "4 m")
+                  (with lines))
+          (column (file "piezo-median.ddf")
+                  (tag "D800")
+                  (title "8 m")
+                  (with lines))))
+
+(defgnuplot piezo-well plottime
+  (where "fig/piezo-well.pdf")
+  (ymax 0 [cm]) (ymin -200 [cm])
+  (source (column (file "piezo-median.ddf")
+                  (tag "W10")
+                  (title "Well distance, 10 m")
+                  (with lines))
+          (column (file "piezo-median.ddf")
+                  (tag "W40")
+                  (title "40 m")
+                  (with lines))
+          (column (file "piezo-median.ddf")
+                  (tag "W70")
+                  (title "70 m")
+                  (with lines))))
+
+(defgnuplot piezo-plot plottime
+  (where "fig/piezo-plot.pdf")
+  (ymax 0 [cm]) (ymin -200 [cm])
+  (source (column (file "piezo-median.ddf")
+                  (tag "P1")
+                  (title "Plot 1, no tillage")
+                  (with lines))
+          (column (file "piezo-median.ddf")
+                  (tag "P2")
+                  (title "Plot 2")
+                  (with lines))
+          (column (file "piezo-median.ddf")
+                  (tag "P3")
+                  (title "Plot 3")
+                  (with lines))
+          (column (file "piezo-median.ddf")
+                  (tag "P4")
+                  (title "Plot 4, conventional tillage")
+                  (with lines))))
+
+(defgnuplot piezo-70 plottime
+  (where "fig/piezo-70.pdf")
+  (title "Roundwater pressure at 230 cm depth, 70 cm from drain.")
+  (ymax 0 [cm]) (ymin -200 [cm])
+  (source ;;(arithmetic (file "log/pressure.dlf")
+          ;;            (expr (- "70" 230 [cm]))
+          ;;            (title "sim"))
+          ;;(column (file "piezo-median.ddf")
+          ;;        (tag "D70")
+          ;;        (with lines)
+          ;;        (title "Median"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "18")
+                  (title "10N"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "19")
+                  (title "10S"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "39")
+                  (title "40N"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "40")
+                  (title "40S"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "60")
+                  (title "70N"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "61")
+                  (title "70S"))
+          ))
+
+(defgnuplot piezo-400 plottime
+  (where "fig/piezo-400.pdf")
+  (title "Roundwater pressure at 230 cm depth, 400 cm from drain.")
+  (ymax 0 [cm]) (ymin -200 [cm])
+  (source ;;(arithmetic (file "log/pressure.dlf")
+          ;;            (expr (- "400" 230 [cm]))
+          ;;            (title "sim"))
+          ;;(column (file "piezo-median.ddf")
+          ;;        (tag "D400")
+          ;;        (with lines)
+          ;;        (title "Median"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "17")
+                  (title "10N"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "20")
+                  (title "10S"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "38")
+                  (title "40N"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "41")
+                  (title "40S"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "59")
+                  (title "70N"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "62")
+                  (title "70S"))
+          ))
+
+(defgnuplot piezo-800 plottime
+  (where "fig/piezo-800.pdf")
+  (title "Roundwater pressure at 230 cm depth, 800 cm from drain.")
+  (ymax 0 [cm]) (ymin -200 [cm])
+  (source ;;(arithmetic (file "log/pressure.dlf")
+          ;;            (expr (- "800" 230 [cm]))
+          ;;            (title "sim"))
+          ;;(column (file "piezo-median.ddf")
+          ;;        (tag "D800")
+          ;;        (with lines)
+          ;;        (title "Median"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "16")
+                  (title "10N"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "21")
+                  (title "10S"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "37")
+                  (title "40N"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "42")
+                  (title "40S"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "58")
+                  (title "70N"))
+          (column (file "piezometer.ddf") (missing missing) (with dots)
+                  (tag "63")
+                  (title "70S"))
+          ))
+
+(defgnuplot plotformat time 
+  "Common for weather and water cotent plots"
+  (begin 1998 05 01)(end 2000 08 15)
+  (canvas "21cm, 4.3cm")
+  (extra "set pointsize 0.5"  
+         [set format x " "]       
+         "unset ylabel"
+         "unset y2label"
+         "set lmargin 8"
+         "set rmargin 8"
+         "set tmargin 0.5"
+         "set bmargin 5"))
+
+(defunit [dgC] [dg C])
+
+(defgnuplot plotweather plotformat  
+  "Plot precipitation."
+  (where "fig/weather.pdf")
+  (extra &old ;; "unset xtics"
+         ;;"set ytics 2"
+         ;;"set y2tics 10"
+         "unset y2label")   
+  (ymin 0)
+  (ymax 5)
+  (y2min -10)
+  (y2max 10)
+  (source (column (file "Rorrende.dwf")
+                  (tag "Precip")
+                  (style 1)
+                  (title "Precipitation [mm/h]")
+                  (with impulses))
+          (column (file "Rorrende.dwf")
+                  (tag "AirTemp")
+                  (style 3)
+                  ;;(with [lines linetype "blue"])
+                  (title "Air temperature [dg C]")
+                  )
+          (arithmetic (expr 0 [dgC])
+                      (file "log/Rorrende_aq_infiltration.dlf")
+                      (title "")
+                      (style 0))))
+
+(defgnuplot plotweather9899 plotweather
+  (begin 1998 10 14 12) (end 1999 3 21 19)
+  (where "fig/weather-98-99.pdf"))
+
+(defgnuplot plotweather9900 plotweather
+  (begin 1999 12 10 0) (end 2000 3 28 3)
+  (where "fig/weather-99-00.pdf"))
+
+(defgnuplot plotweather0001 plotweather
+  (begin 2000 11 20 14) (end 2001 2 19 21)
+  (where "fig/weather-00-01.pdf"))
+
+
+(defgnuplot plotZcm plotformat
+  "Plot theta at Z cm."
+  (declare z String "Soil depth to plot.") 
+  (ymin 0)(ymax 40)
+  (where "fig/theta${z}cm.pdf")
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  
+         "unset mxtics"
+         "set ytics 10")
+  (source ;;(arithmetic (file "log/interval_water_content2.dlf") 
+          ;;            (expr (convert (+ "${z} cm, 400 cm"
+          ;;                              "Ice ${z} cm, 400 cm") [%]))
+          ;;            (style 2)
+          ;;            (title "Ice + Water"))
+          (column (file "log/interval_water_content2.dlf") 
+                  (tag "${z} cm, 400 cm")
+                  (style 1)
+                  (title "${z} cm")
+                  (dimension [%]))
+          (column (file "theta_${z}cm.ddf") 
+                  (tag "Water content")
+                  (style 3)
+                  (title "TDR [%]")
+                  (dimension [%])
+                  (with points))))  ;points instead of error bars
+
+(defunit [mm*] [mm])
+
+(defgnuplot plotinfiltration plotformat
+  (begin 1998 11 20) (end 1999 04 01)
+  (where "fig/infiltration.pdf")
+                                        ;(ymin -5)(ymax 20)
+  (extra &old "set ytics 5"
+         "set y2tics 1"
+         "set xtics 24 * 60 * 60 *30 nomirror"
+         "set mxtics 3")
+  (source (column ;;(file "log/infiltration.dlf") 
+           (file "log/Rorrende_aq_infiltration.dlf") 
+           (tag "Surface2Primary")
+           (style 1)
+           (title "Surf2Primary [mm/d]"))
+          (column ;;(file "log/infiltration.dlf") 
+           (file "log/Rorrende_aq_infiltration.dlf") 
+           (tag "Surface2Secondary")
+           (style 2)
+           (title "Surf2Secondary"))
+          (column ;;(file "log/infiltration.dlf") 
+           (file "log/Rorrende_aq_infiltration.dlf")
+           (tag "Surface2Bio2Matrix")
+           (style 3)
+           (title "Surf2Bio2Mat"))
+          (column ;;(file "log/infiltration.dlf") 
+           (file "log/Rorrende_aq_infiltration.dlf")
+           (tag "Surface2Bio2Drain")
+           (style 4)
+           (title "Surf2Bio2Drain"))
+          (column 
+           (file "log/Rorrende_aq_ponding_depth.dlf") 
+           (tag "Surface Ponding")
+           (style 5)
+           (dimension [mm*])            ;Force secondary axis.
+           (title "Ponding [mm]"))))
+
+(defgnuplot plotpondingdepth plotformat
+  (begin 1998 11 20) (end 1999 04 01)
+  (where "fig/pondingdepth.pdf")
+  (extra &old
+         "set xtics 24 * 60 * 60 *30 nomirror"
+         "set mxtics 3")
+  (source (column 
+           (file "log/Rorrende_aq_ponding_depth.dlf") 
+           (tag "Surface Ponding")
+           (style 1)
+           (title "Ponding [mm]"))))
+
+(defgnuplot brom-input plotformat
+  "Total bromide output in specified interval."
+  (begin 1998 11 20) (end 1999 04 01)
+  (declare acc-prefix String "Prefix to get accumulated values")
+  (acc-prefix "")  ;;for accumulated stuff
+  (declare title-prefix String "Prefix to title")
+  (title-prefix "0 cm [kg/ha/h]")
+  (where "fig/brom-input.pdf")   
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror" 
+         "set ytics 10"
+         "set mxtics 3")  
+  (ymin 0)(ymax 35) 
+  (source (column (file "log/Bromide-25.dlf")
+                  (dimension [kg/ha])
+                  (tag "${acc-prefix}Primary 0 cm")
+                  (title "Primary ${title-prefix}"))
+          (column (file "log/Bromide-25.dlf")
+                  (dimension [kg/ha])
+                  (tag "${acc-prefix}Secondary 0 cm")
+                  (title "Secondary"))
+          (column (file "log/Bromide-25.dlf")
+                  (dimension [kg/ha])
+                  (tag "${acc-prefix}Tertiary 0 cm")
+                  (title "Tertiary"))
+          (column (file "log/Bromide-25.dlf")
+                  (dimension [kg/ha])
+                  (tag "${acc-prefix}Drain 0 cm")
+                  (title "Drain"))
+          ))
+
+(defgnuplot brom-input-acc brom-input
+  "Accumulated input."
+  (where "fig/brom-input-acc.pdf")
+  (begin 1998 11 20) (end 1999 04 01)
+  (legend se)
+  (acc-prefix "Acc ")
+  (title-prefix "0 cm [kg/ha]")
+  )
+
+(defgnuplot brom-output plotformat
+  "Total bromide output in specified interval."
+  (begin 1998 11 20) (end 1999 04 01)
+  (declare top String "Top of interval.") 
+  (declare bottom String "Bottom of interval.") 
+  (declare acc-prefix String "Prefix to get accumulated values")
+  (acc-prefix "")  ;;for accumulated stuff
+  (declare title-prefix String "Prefix to title")
+  (title-prefix "${bottom} cm [g/ha/h]")
+  (declare dim String "Dimension")
+  (dim [g/ha])
+  (where "fig/brom-${top}-${bottom}-output.pdf")   
+  ;;(ymin -3000)(ymax 3000)
+  ;;(ymin -100)(ymax 100)
+  (ymin -50)(ymax 100)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  
+         "set mxtics 3"
+         "set ytics 50")   
+  (source (column (file "log/Bromide-25.dlf")
+                  (dimension [${dim}])
+                  (tag "${acc-prefix}Primary ${bottom} cm")
+                  (title "Primary ${title-prefix}"))
+          (column (file "log/Bromide-25.dlf")
+                  (dimension [${dim}])
+                  (tag "${acc-prefix}Secondary ${bottom} cm")
+                  (title "Secondary"))
+          (column (file "log/Bromide-25.dlf")
+                  (dimension [${dim}])
+                  (tag "${acc-prefix}Tertiary ${top}-${bottom} cm")
+                  (title "Tertiary"))
+          (column (file "log/Bromide-25.dlf")
+                  (dimension [${dim}])
+                  (tag "${acc-prefix}Drain ${top}-${bottom} cm")
+                  (title "Drain"))))
+
+(defgnuplot brom-total plotformat
+  "Total bromide content in 25 cm intervals."
+  (where "fig/brom-total.pdf")
+  (begin 1998 11 20) (end 1999 04 01)
+  (ymin 0)(ymax 35)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror" 
+         "set ytics 10"
+         "set mxtics 3")   
+  (source (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 0-25 cm" "Secondary 0-25 cm")
+                                     [kg/ha]))
+                      (title "Total [kg/ha], 0-25 cm"))
+          (column     (file "Bromide-25.ddf")
+                      (dimension [kg/ha])
+                      (tag "0-25cm")
+                      ;;(style 3)
+                      (title "Obs")
+                      )                   
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 25-50 cm" "Secondary 25-50 cm")
+                                     [kg/ha]))
+                      (title "25-50 cm"))
+          (column     (file "Bromide-25.ddf")
+                      (dimension [kg/ha])
+                      (tag "25-50cm")
+                      ;;(style 3)
+                      (title "Obs")
+                      )
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 50-75 cm" "Secondary 50-75 cm")
+                                     [kg/ha]))
+                      (title "50-75 cm"))
+          (column     (file "Bromide-25.ddf")
+                      (dimension [kg/ha])
+                      (tag "50-75cm")
+                      ;;(style 3)
+                      (title "Obs")
+                      )
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 75-100 cm"
+                                        "Secondary 75-100 cm")
+                                     [kg/ha]))
+                      (title "75-100 cm"))
+          (column     (file "Bromide-25.ddf")
+                      (dimension [kg/ha])
+                      (tag "75-100cm")
+                      ;;(style 3)
+                      (title "Obs")
+                      )))
+
+(defgnuplot brom-primary plotformat
+  "Bromide content in 25 cm intervals in primary domain."
+  (where "fig/brom-primary.pdf")
+  (begin 1998 11 20) (end 1999 04 01)
+  (ymin 0)(ymax 35)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
+         "set ytics 10"
+         "set mxtics 3")   
+  (source (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 0-25 cm") [kg/ha]))
+                      (title "Primary [kg/ha] 0-25 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 25-50 cm") [kg/ha]))
+                      (title "25-50 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 50-75 cm") [kg/ha]))
+                      (title "50-75 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 75-100 cm") [kg/ha]))
+                      (title "75-100 cm"))
+          ))
+
+(defgnuplot brom-secondary plotformat
+  "Bromide content in 25 cm intervals in secondary domain."
+  (where "fig/brom-secondary.pdf")
+  (begin 1998 11 20) (end 1999 04 01)
+  (ymin 0)(ymax 35)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
+         "set ytics 10"
+         "set mxtics 3")   
+  (source (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Secondary 0-25 cm") [kg/ha]))
+                      (title "Secondary [kg/ha] 0-25 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Secondary 25-50 cm") [kg/ha]))
+                      (title "25-50 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Secondary 50-75 cm") [kg/ha]))
+                      (title "50-75 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Secondary 75-100 cm") [kg/ha]))
+                      (title "75-100 cm"))))
+
+(defgnuplot brom-total-extra plotformat
+  "Total bromide content in 25 cm intervals."
+  (where "fig/brom-total-extra.pdf")
+  (begin 1998 11 20) (end 1999 04 01)
+  (ymin 0)(ymax 35)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror" 
+         "set ytics 10"
+         "set mxtics 3")   
+  (source (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 25-33 cm" "Secondary 25-33 cm")
+                                     [kg/ha]))
+                      (title "25-33 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 33-50 cm" "Secondary 33-50 cm")
+                                     [kg/ha]))
+                      (title "33-50 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 100-125 cm"
+                                        "Secondary 100-125 cm")
+                                     [kg/ha]))
+                      (title "100-125 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 125-150 cm"
+                                        "Secondary 125-150 cm")
+                                     [kg/ha]))
+                      (title "125-150 cm"))
+         ))
+
+(defgnuplot brom-primary-extra plotformat
+  "Bromide content in 25 cm intervals in primary domain."
+  (where "fig/brom-primary-extra.pdf")
+  (begin 1998 11 20) (end 1999 04 01)
+  (ymin 0)(ymax 35)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
+         "set ytics 10"
+         "set mxtics 3")   
+  (source (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 25-33 cm") [kg/ha]))
+                      (title "Primary [kg/ha] 25-33 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 33-50 cm") [kg/ha]))
+                      (title "33-50 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 100-125 cm") [kg/ha]))
+                      (title "100-125 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Primary 125-150 cm") [kg/ha]))
+                      (title "125-150 cm"))
+          ))
+
+(defgnuplot brom-secondary-extra plotformat
+  "Bromide content in 25 cm intervals in secondary domain."
+  (where "fig/brom-secondary-extra.pdf")
+  (begin 1998 11 20) (end 1999 04 01)
+  (ymin 0)(ymax 35)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
+         "set ytics 10"
+         "set mxtics 3")   
+  (source (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Secondary 25-33 cm") [kg/ha]))
+                      (title "25-33 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Secondary 33-50 cm") [kg/ha]))
+                      (title "33-50 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Secondary 100-125 cm") [kg/ha]))
+                      (title "100-125 cm"))
+          (arithmetic (file "log/Bromide-25.dlf")
+                      (expr (convert (+ "Secondary 125-150 cm") [kg/ha]))
+                      (title "125-150 cm"))))
+
+(defgnuplot brom-accumulated brom-output
+  "Accumulated output in each interval."
+  (where "fig/brom-${top}-${bottom}-acc.pdf")
+  (begin 1998 11 20) (end 1999 04 01)
+  (ymin -10)(ymax 35)
+  (dim [kg/ha])
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
+         "set mxtics 3"
+         "set ytics 10")
+  (acc-prefix "Acc ")
+  (title-prefix "${bottom} cm [kg/ha]"))
+
+(defgnuplot bromplotweather plotweather
+  (begin 1998 11 20) (end 1999 04 01)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"
+         "set mxtics 3"
+         ;;"set ytics 10000"
+         )
+  (where "fig/weather_brominf.pdf"))
+
+(defgnuplot shortplotZcm plotZcm
+  (begin 1998 05 01)(end 1998 08 15)
+  (where "fig/theta_short${z}cm.pdf")
+  (extra &old "set xtics 24 * 60 * 60 * 7"
+         "unset mxtics"))
+
+(defgnuplot shortplotweather plotweather
+  (ymax 10)
+  (y2min 0)
+  (y2max 30)
+  (begin 1998 05 01)(end 1998 08 15)
+  (where "fig/weather_short.pdf"))
+
+(defgnuplot shortplotinfiltration plotinfiltration
+  (begin 1998 05 01)(end 1998 08 15)
+  (where "fig/infiltration_short.pdf")   
+  (extra &old "set xtics 24 * 60 * 60 *7 nomirror"))        
+
+(defgnuplot shortplotpondingdepth plotpondingdepth 
+  (begin 1998 05 01)(end 1998 08 15)
+  (where "fig/pondingdepth_short.pdf")
+  ;;(extra &old "set xtics 24 * 60 * 60 * 76 rotate"   
+  ;;       "set mxtics 7"
+  ;;       "set format x \"%y-%m-%d\""))       
+  ;;                   (extra &old "set xtics 24 * 60 * 60 * 7 rotate"   
+  ;;                               "set mxtics 7"
+  ;;                            "set format x \"%y-%m-%d\"")) 
+  ;;
+  ;;
+  ;;(extra &old "set xtics 24 * 60 * 60 *7 rotate"        
+  ;;            "set format x \"%y-%m-%d\""))   
+  )
+
+(defgnuplot "Rorrende Graphs" multi
+  (graph (plotweather (ymax 15) (y2min -10) (y2max 30))
+         plotweather9899 
+         plotweather9900 
+         plotweather0001 
+         (plotZcm (z "4"))
+         (plotZcm (z "8"))
+         (plotZcm (z "12"))
+         (plotZcm (z "16"))
+         (plotZcm (z "20"))
+         (plotZcm (z "24"))
+         (plotZcm (z "36"))     
+         (plotZcm (z "60")
+                  (canvas "21cm, 4.3cm")
+                  (extra &old "set xtics 24 * 60 * 60 *30 rotate"   
+                         "set mxtics 3"
+                         "set format x \"%y-%m-%d\""))   
+         (plotinfiltration )
+         (plotpondingdepth)         
+         (brom-input)
+         (brom-output (top "0") (bottom "25"))
+         (brom-output (top "25") (bottom "50"))
+         (brom-output (top "25") (bottom "33"))
+         (brom-output (top "33") (bottom "50"))
+         (brom-output (top "50") (bottom "75"))
+         (brom-output (top "75") (bottom "100")
+                      (canvas "21cm, 4.3cm")
+                      (extra &old "set xtics 24 * 60 * 60 *30 rotate"   
+                             "set mxtics 3"
+                             "set format x \"%y-%m-%d\""))            
+         (brom-output (top "100") (bottom "125"))
+         (brom-output (top "125") (bottom "150")
+                      (canvas "21cm, 4.3cm")
+                      (extra &old "set xtics 24 * 60 * 60 *30 rotate"   
+                             "set mxtics 3"
+                             "set format x \"%y-%m-%d\""))
+         (brom-total) 
+         (brom-primary) 
+         (brom-secondary) 
+         (brom-total-extra) 
+         (brom-primary-extra) 
+         (brom-secondary-extra) 
+         (brom-input-acc)
+         (brom-accumulated (top "0") (bottom "25"))
+         (brom-accumulated (top "25") (bottom "50"))
+         (brom-accumulated (top "25") (bottom "33"))
+         (brom-accumulated (top "33") (bottom "50"))
+         (brom-accumulated (top "50") (bottom "75"))
+         (brom-accumulated (top "75") (bottom "100")
+                           (canvas "21cm, 4.3cm")
+                           (extra &old "set xtics 24 * 60 * 60 *30 rotate"   
+                                  "set mxtics 3"
+                                  "set format x \"%y-%m-%d\""))       
+         (brom-accumulated (top "100") (bottom "125"))
+         (brom-accumulated (top "125") (bottom "150")
+                           (canvas "21cm, 4.3cm")
+                           (extra &old "set xtics 24 * 60 * 60 *30 rotate"   
+                                  "set mxtics 3"
+                                  "set format x \"%y-%m-%d\""))
+         (bromplotweather)
+         (shortplotweather)      
+         (shortplotZcm (z "4"))
+         (shortplotZcm (z "8"))
+         (shortplotZcm (z "12"))
+         (shortplotZcm (z "16"))
+         (shortplotZcm (z "20"))
+         (shortplotZcm (z "24"))
+         (shortplotZcm (z "36"))
+         (shortplotZcm (z "60")
+                       (canvas "21cm, 4.3cm")
+                       (extra &old "set xtics 24 * 60 * 60 * 7 rotate"   
+                              "set mxtics 7"
+                              "set format x \"%y-%m-%d\""))      
+         (shortplotinfiltration)
+         (shortplotpondingdepth
+          (canvas "21cm, 4.3cm")
+          (extra &old "set xtics 24 * 60 * 60 * 7 rotate"   
+                 "set mxtics 7"
+                 "set format x \"%y-%m-%d\""))   
+         ))
+
+(defgnuplot draincommon plotformat
+  "Common parameters for drain flow plots"
+  (extra &old "set xtics 24 * 60 * 60 * 7 rotate"   
+         "unset mxtics"
+         [set format x ""])
+  (ymin 0.00))
+
+(defgnuplot drainflow-last draincommon
+  "Drain flow."
+  (ymax 0.25)
+  (y2max 0 [m])
+  (y2min -2 [m])
+  (source (arithmetic (file "log/Rorrende_AllChem.dlf")
+                      (expr (/ (+ "Surface drain flow" "Soil drain flow")
+                               1.0 [h]))
+                      (title "Drain flow"))
+          (column (file "drain-flow.ddf")
+                  (tag "drain")
+                  (style 3)
+                  (title "Obs [mm/h]"))
+          (column (file "log/Rorrende_aq_gwt.dlf")
+                  (tag "GWT")
+                  (title "Aquifer")
+                  (dimension [m])
+                  (style 4))))
+
+(defgnuplot drainflow drainflow-last
+  "Drain flow."
+  (source &old 
+          (column (file "piezo-median.ddf")
+                  (tag "Aquitard")
+                  (with lines)
+                  (title "Piezometer [m]")
+                  (dimension [m])
+                  (style 5))))
+
+(defgnuplot drainflow-98-99 drainflow
+  "Drain flow winter 98-99"
+  (begin 1998 10 14 12) (end 1999 3 21 19)
+  (where "fig/drainflow-98-99.pdf"))
+
+(defgnuplot drainflow-99-00 drainflow
+  "Drain flow winter 99-00"
+  (begin 1999 12 10 0) (end 2000 3 28 3)
+  (where "fig/drainflow-99-00.pdf"))
+
+(defgnuplot drainflow-00-01 drainflow-last
+  "Drain flow winter 00-01"
+  (begin 2000 11 20 14) (end 2001 2 19 21)
+  (where "fig/drainflow-00-01.pdf"))
+
+(defgnuplot drainflow-01-02 drainflow-last
+  "Drain flow winter 01-02"
+  (begin 2001 12 3 3) (end 2002 3 16 7)
+  (where "fig/drainflow-01-02.pdf"))
+
+(defgnuplot drainflowacc draincommon
+  "Accumulated drain flow."
+  (ymin 0)(ymax 40)
+  (legend nw)
+  (source (arithmetic (file "log/Rorrende_AllChem.dlf")
+                      (accumulate true)
+                      (expr (+ "Surface drain flow" "Soil drain flow"))
+                      (title "Accumulated"))
+          (column (file "drain-flow.ddf")
+                  (accumulate true)
+                  (style 3)
+                  (tag "drain")
+                  (title "Obs [mm]"))))
+
+(defgnuplot drainflowacc-98-99 drainflowacc
+  "Accumulated drain flow winter 98-99"
+  (begin 1998 10 14 12) (end 1999 3 21 19)
+  (where "fig/drainflowacc-98-99.pdf"))
+
+(defgnuplot drainflowacc-99-00 drainflowacc
+  "Accumulated drain flow winter 99-00"
+  (begin 1999 12 10 0) (end 2000 3 28 3)
+  (where "fig/drainflowacc-99-00.pdf"))
+
+(defgnuplot drainflowacc-00-01 drainflowacc
+  "Accumulated drain flow winter 00-01"
+  (begin 2000 11 20 14) (end 2001 2 19 21)
+  (where "fig/drainflowacc-00-01.pdf"))
+
+(defgnuplot drainflowacc-01-02 drainflowacc
+  "Accumulated drain flow winter 01-02"
+  (where "fig/drainflowacc-01-02.pdf")
+  (begin 2001 12 3 3) (end 2002 3 16 7))
+
+(defgnuplot bromconc draincommon
+  "Bromide concentration flow."
+  (ymin 0) (ymax 25)
+  (source (arithmetic (file "log/Rorrende_AllChem.dlf")
+                      (missing "none")
+                      (valid (not (> 0.000 [mm]
+                                     (+ "Surface drain flow" "Soil drain flow")
+                                     0.0001 [mm])))
+                      (expr (if (> (+ "Surface drain flow" "Soil drain flow")
+                                   0.0001 [mm])
+                                (convert (/ (+ "Surface-Drain, Br"
+                                               "Soil-Drain, Br")
+                                            (+ "Surface drain flow" 
+                                               "Soil drain flow"))
+                                         [mg/l])
+                              0.0 [mg/l]))
+                      (title "Bromide"))
+          (column (file "bromide.ddf")
+                  (tag "bromide")
+                  (style 3)
+                  (dimension [mg/l])
+                  (title "Obs [mg/l]"))))
+
+(defgnuplot bromide-98-99 bromconc
+  "Bromide concentrations winter 98-99."
+  (where "fig/bromide-98-99.pdf")
+  (begin 1998 10 14 12) (end 1999 3 21 19))
+
+(defgnuplot bromide-99-00 bromconc
+  "Bromide concentrations winter 99-00."
+  (begin 1999 12 10 0) (end 2000 3 28 3)
+  (where "fig/bromide-99-00.pdf"))
+
+(defgnuplot brommass draincommon
+  "Bromide mass in drain."
+  (ymin 0) (ymax 3)
+  (source (arithmetic (file "log/Rorrende_AllChem.dlf")
+                      (missing "none")
+                      (accumulate true)
+                      (expr (convert (+ "Surface-Drain, Br" "Soil-Drain, Br")
+                                     [kg/ha]))
+                      (title "Bromide"))
+          (column (file "brommass.ddf")
+                  (tag "bromide")
+                  (title "Obs [kg/ha]")
+                  (style 3)
+                  (dimension [kg/ha])
+                  (accumulate true))
+          ;;(combine (source (column (file "bromide.ddf")
+          ;;                         (tag "bromide"))
+          ;;                 (column (file "drain-flow.ddf")
+          ;;                         (tag "drain")))
+          ;;         ;; (accumulate true)
+          ;;         (expr (convert (dim (* bromide drain) [ug/m^2])
+          ;;                        [g/ha]))
+          ;;         (style 3)
+          ;;         (title "Obs [g/ha]"))
+          ))
+
+(defgnuplot brommass-98-99 brommass
+  "Bromide drain mass winther 98-99."
+  (canvas "21cm, 4.3cm")
+  (extra &old "set xtics 24 * 60 * 60 * 7 rotate"   
+         "set mxtics 7"
+         "set format x \"%y-%m-%d\"")
+  (where "fig/brommass-98-99.pdf")
+  (begin 1998 10 14 12) (end 1999 3 21 19))
+
+(defgnuplot brommass-99-00 brommass
+  "Bromide drain mass winther 99-00."
+  (where "fig/brommass-99-00.pdf")
+  (begin 1999 12 10 0) (end 2000 3 28 3))
+
+(defgnuplot particles draincommon
+  "Particles in drain."
+  (ymin 0)(ymax 200)
+  (y2min 0)(y2max 200)
+  (extra &old "unset y2tics")
+  (source (arithmetic (file "log/particles_m.dlf")
+                      (expr (/ "Soil-Drain, Col" 1.0 [h]))
+                      (style -1)
+                      (with "points ps 1 pt 1")
+                      (title "Particles"))
+          (column (file "particles.ddf")
+                  (tag "particles")
+                  (dimension [g/ha/h])
+                  (style 3)
+                  (title "Obs [g/ha/h]"))
+          (column (file "log/colloids.dlf")
+                  (tag "Avail-Surface")
+                  (style 4)
+                  (title "Reservoir [kg/ha]")
+                  (dimension [kg/ha]))
+          ))
+
+(defgnuplot particles-98-99 particles
+  "Drain flow winter 98-99"
+  (begin 1998 10 14 12) (end 1999 3 21 19)
+  (where "fig/particles-98-99.pdf"))
+
+(defgnuplot particles-99-00 particles
+  "Drain flow winter 99-00"
+  (begin 1999 12 10 0) (end 2000 3 28 3)
+  (where "fig/particles-99-00.pdf"))
+
+(defgnuplot particles-00-01 particles
+  "Drain flow winter 00-01"
+  (begin 2000 11 20 14) (end 2001 2 19 21)
+  (where "fig/particles-00-01.pdf"))
+
+(defgnuplot particles-01-02 particles
+  "Drain flow winter 01-02"
+  (begin 2001 12 3 3) (end 2002 3 16 7)
+  (where "fig/particles-01-02.pdf"))
+
+(defgnuplot particlesacc draincommon
+  "Particles in drain."
+  (ymax 4.5 [kg/ha])
+  (y2max 0.15)
+  (extra &old "set y2tics 0.05")
+  (legend se)
+  (source (arithmetic (file "log/Rorrende_AllChem.dlf")
+                      (expr (convert (+ "Soil-Drain, Col") [kg/ha]))
+                      (accumulate true)
+                      (title "Accumulated"))
+          (column (file "particles.ddf")
+                  (tag "particles")
+                  (dimension [kg/ha])
+                  (accumulate true)
+                  (style 3)
+                  (title "Obs [kg/ha]"))
+          (column (file "log/infiltration.dlf") 
+                  (tag "Surface2Bio2Drain")
+                  (style 4)
+                  (title "Surf2Drain [mm/h]"))))
+
+(defgnuplot particlesacc-98-99 particlesacc
+  "Drain flow winter 98-99"
+  (begin 1998 10 14 12) (end 1999 3 21 19)
+  (where "fig/particlesacc-98-99.pdf"))
+
+(defgnuplot particlesacc-99-00 particlesacc
+  "Drain flow winter 99-00"
+  (begin 1999 12 10 0) (end 2000 3 28 3)
+  (where "fig/particlesacc-99-00.pdf"))
+
+(defgnuplot particlesacc-00-01 particlesacc
+  "Drain flow winter 00-01"
+  (begin 2000 11 20 14) (end 2001 2 19 21)
+  (where "fig/particlesacc-00-01.pdf"))
+
+(defgnuplot particlesacc-01-02 particlesacc
+  "Drain flow winter 01-02"
+  (canvas "21cm, 4.3cm")
+  (extra &old "set xtics 24 * 60 * 60 * 7 rotate"   
+         "set mxtics 7"
+         "set format x \"%y-%m-%d\"")
+  (begin 2001 12 3 3) (end 2002 3 16 7)
+  (where "fig/particlesacc-01-02.pdf"))
+
+(defgnuplot pendconc draincommon
+  "Pendimethalin concentration flow."
+  (ymin 0)(ymax 5)
+  (source (arithmetic (file "log/Rorrende_AllChem.dlf")
+                      (missing "none")
+                      (valid (not (> 0.000 [mm]
+                                     (+ "Surface drain flow" "Soil drain flow")
+                                     0.0001 [mm])))
+                      (expr (if (> (+ "Surface drain flow" "Soil drain flow")
+                                   0.0001 [mm])
+                                (convert (/ (+ "Surface-Drain, Pend"
+                                               "Soil-Drain, Pend")
+                                            (+ "Surface drain flow" 
+                                               "Soil drain flow"))
+                                         [ug/l])
+                              0.0 [ug/l]))
+                      (title "Pendimethalin"))
+          (column (file "pendimethalin.ddf")
+                  (tag "pendimethalin")
+                  (style 3)
+                  (title "Obs [ug/l]"))))
+
+(defgnuplot pendconc-99-00 pendconc
+  "Drain flow winter 99-00"
+  (begin 1999 12 10 0) (end 2000 3 28 3)
+  (where "fig/pendconc-99-00.pdf"))
+
+(defgnuplot pendconc-00-01 pendconc
+  "Drain flow winter 00-01"
+  (begin 2000 11 20 14) (end 2001 2 19 21)
+  (where "fig/pendconc-00-01.pdf"))
+
+(defgnuplot pendmass draincommon
+  "Pendimethalin mass in drain."
+  (canvas "21cm, 4.3cm")
+  (extra &old "set xtics 24 * 60 * 60 * 7 rotate"   
+         "set mxtics 7"
+         "set format x \"%y-%m-%d\"") 
+  (source (arithmetic (file "log/Rorrende_AllChem.dlf")
+                      (missing "none")
+                      (expr (convert (+ "Surface-Drain, Pend" 
+                                        "Soil-Drain, Pend")
+                                     [mg/ha]))
+                      (title "Pendimethalin (total)"))
+          (arithmetic (file "log/field_Pendimethalin-colloid.dlf")
+                      (expr (convert (+ Soil-Drain Surface-Drain)
+                                     [mg/ha]))
+                      (title "Pendimethalin (colloid bound)"))
+          (combine (source (column (file "pendimethalin.ddf")
+                                   (tag "pendimethalin"))
+                           (column (file "drain-flow.ddf")
+                                   (tag "drain")))
+                   (expr (convert (dim (* pendimethalin drain) [ug/m^2])
+                                  [mg/ha]))
+                   
+                   (style 3)
+                   (title "Obs [mg/ha/h]"))))
+
+(defgnuplot pendmass-99-00 pendmass
+  "Drain flow winter 99-00"
+  (begin 1999 12 10 0) (end 2000 3 28 3)
+  (where "fig/pendmass-99-00.pdf"))
+
+(defgnuplot pendmass-00-01 pendmass
+  "Drain flow winter 00-01"
+  (begin 2000 11 20 14) (end 2001 2 19 21)
+  (where "fig/pendmass-00-01.pdf"))
+
+(defgnuplot ioxconc draincommon
+  "Ioxynil concentration flow."
+  (ymax 5)
+  (source (arithmetic (file "log/Rorrende_AllChem.dlf")
+                      (missing "none")
+                      (valid (not (> 0.000 [mm]
+                                     (+ "Surface drain flow" "Soil drain flow")
+                                     0.0001 [mm])))
+                      (expr (if (> (+ "Surface drain flow" "Soil drain flow")
+                                   0.0001 [mm])
+                                (convert (/ (+ "Surface-Drain, Iox"
+                                               "Soil-Drain, Iox")
+                                            (+ "Surface drain flow" 
+                                               "Soil drain flow"))
+                                         [ug/l])
+                              0.0 [ug/l]))
+                      (title "Ioxynil"))
+          (column (file "ioxynil.ddf")
+                  (tag "ioxynil")
+                  (style 3)
+                  (dimension [ug/l])
+                  (title "Obs [ug/l]"))))
+
+(defgnuplot ioxconc-00-01 ioxconc
+  "Drain flow winter 00-01"
+  (begin 2000 11 20 14) (end 2001 2 19 21)
+  (where "fig/ioxconc-00-01.pdf"))
+
+(defgnuplot ioxmass draincommon
+  "Ioxynil mass in drain."
+  (source (arithmetic (file "log/Rorrende_AllChem.dlf")
+                      (missing "none")
+                      (expr (convert (+ "Surface-Drain, Iox" "Soil-Drain, Iox")
+                                     [mg/ha]))
+                      (title "Ioxynil (total)"))
+          (arithmetic (file "log/field_Ioxynil-colloid.dlf")
+                      (expr (convert (+ Soil-Drain Surface-Drain)
+                                     [mg/ha]))
+                      (title "Ioxynil (colloid bound)"))
+          (combine (source (column (file "ioxynil.ddf")
+                                   (tag "ioxynil"))
+                           (column (file "drain-flow.ddf")
+                                   (tag "drain")))
+                   (expr (convert (dim (* ioxynil drain) [ug/m^2])
+                                  [mg/ha]))
+                   
+                   (style 3)
+                   (title "Obs [mg/ha/h]"))))
+
+(defgnuplot ioxmass-00-01 ioxmass
+  "Drain flow winter 00-01"
+  (begin 2000 11 20 14) (end 2001 2 19 21)
+  (where "fig/ioxmass-00-01.pdf"))
+
+(defgnuplot season-98-99 multi 
+  "All graphs for the 98-99 drain season."
+  (graph drainflow-98-99 drainflowacc-98-99 bromide-98-99 brommass-98-99
+         particles-98-99 particlesacc-98-99))
+
+(defgnuplot season-98-99-zoom multi 
+  "All graphs for the 98-99 drain season, zoomed."
+  (graph (plotweather (begin 1999 02 25) (end 1999 03 16)
+                      (where "fig/weather-98-99-zoom.pdf")
+                      (extra &old "set xtics 24 * 60 * 60 nomirror"
+                             "set mxtics 4"))
+         (drainflow (begin 1999 02 25) (end 1999 03 16)
+                    (where "fig/drainflow-98-99-zoom.pdf")
+                    (extra &old "set xtics 24 * 60 * 60 nomirror"
+                           "set mxtics 4"))
+         (drainflowacc  (begin 1999 02 25) (end 1999 03 16)
+                        (where "fig/drainflowacc-98-99-zoom.pdf")
+                        (extra &old "set xtics 24 * 60 * 60 nomirror"
+                               "set mxtics 4"))
+         (bromconc (begin 1999 02 25) (end 1999 03 16)
+                   (where "fig/bromide-98-99-zoom.pdf")
+                   (extra &old "set xtics 24 * 60 * 60 nomirror"
+                          "set mxtics 4"))
+         (brommass (begin 1999 02 25) (end 1999 03 16)
+                   (where "fig/brommass-98-99-zoom.pdf")
+                   (extra &old "set xtics 24 * 60 * 60 nomirror rotate"
+                          "set mxtics 4"
+                          "set format x \"%y-%m-%d\""))
+         (particles  (begin 1999 02 25) (end 1999 03 16)
+                     (where "fig/particles-98-99-zoom.pdf")
+                     (extra &old "set xtics 24 * 60 * 60 nomirror"
+                            "set mxtics 4"))
+         (particlesacc (begin 1999 02 25) (end 1999 03 16)
+                       (where "fig/particlesacc-98-99-zoom.pdf")
+                       (extra &old "set xtics 24 * 60 * 60 nomirror"
+                              "set mxtics 4"))))
+
+(defgnuplot season-99-00 multi 
+  "All graphs for the 99-00 drain season."
+  (graph drainflow-99-00 drainflowacc-99-00 bromide-99-00 brommass-99-00
+         particles-99-00 particlesacc-99-00 pendconc-99-00 pendmass-99-00))
+
+(defgnuplot season-99-00-zoom multi 
+  "All graphs for the 99-00 drain season, zoomed."
+  (graph (plotweather (where "fig/weather-99-00-zoom.pdf")
+                      (begin 2000 03 06) (end 2000 03 18)
+                      (extra &old "set xtics 24 * 60 * 60 nomirror"
+                             "set mxtics 4"))
+         (drainflow (where "fig/drainflow-99-00-zoom.pdf")
+                    (begin 2000 03 06) (end 2000 03 18)
+                    (extra &old "set xtics 24 * 60 * 60 nomirror"
+                           "set mxtics 4"))
+         (drainflowacc (where "fig/drainflowacc-99-00-zoom.pdf")
+                       (begin 2000 03 06) (end 2000 03 18)
+                       (extra &old "set xtics 24 * 60 * 60 nomirror"
+                              "set mxtics 4"))
+         (bromconc  (where "fig/bromide-99-00-zoom.pdf")
+                    (begin 2000 03 06) (end 2000 03 18)
+                    (extra &old "set xtics 24 * 60 * 60 nomirror"
+                           "set mxtics 4"))
+         (brommass (where "fig/brommass-99-00-zoom.pdf")
+                   (begin 2000 03 06) (end 2000 03 18)
+                   (extra &old "set xtics 24 * 60 * 60 nomirror"
+                          "set mxtics 4"))
+         (particles  (where "fig/particles-99-00-zoom.pdf")
+                     (begin 2000 03 06) (end 2000 03 18)
+                     (extra &old "set xtics 24 * 60 * 60 nomirror"
+                            "set mxtics 4"))
+         (particlesacc (where "fig/particlesacc-99-00-zoom.pdf")
+                       (begin 2000 03 06) (end 2000 03 18)
+                       (extra &old "set xtics 24 * 60 * 60 nomirror"
+                              "set mxtics 4"))
+         (pendconc  (where "fig/pendconc-99-00-zoom.pdf")
+                    (begin 2000 03 06) (end 2000 03 18)
+                    (extra &old "set xtics 24 * 60 * 60 nomirror"
+                           "set mxtics 4"))
+         (pendmass (where "fig/pendmass-99-00-zoom.pdf")
+                   (begin 2000 03 06) (end 2000 03 18)
+                   (extra &old "set xtics 24 * 60 * 60 nomirror"
+                          "set mxtics 4"))
+         ))
+
+(defgnuplot season-00-01 multi 
+  "All graphs for the 00-01 drain season."
+  (graph drainflow-00-01
+         drainflowacc-00-01
+         particles-00-01
+         particlesacc-00-01
+         pendconc-00-01
+         pendmass-00-01
+         ioxconc-00-01
+         ioxmass-00-01))
+
+(defgnuplot season-00-01-zoom multi 
+  "All graphs for the 00-01 drain season, zoomed."
+  (graph (plotweather (where "fig/weather-00-01-zoom.pdf")
+                      (begin 2000 12 11) (end 2000 12 21)
+                      (extra &old "set xtics 24 * 60 * 60 nomirror"
+                             "set mxtics 4"))
+         (drainflow-last (where "fig/drainflow-00-01-zoom.pdf")
+                         (begin 2000 12 11) (end 2000 12 21)
+                         (extra &old "set xtics 24 * 60 * 60"
+                                "set mxtics 4"))
+         (drainflowacc (where "fig/drainflowacc-00-01-zoom.pdf")
+                       (begin 2000 12 11) (end 2000 12 21)
+                       (extra &old "set xtics 24 * 60 * 60"
+                              "set mxtics 4"))
+         (particles (where "fig/particles-00-01-zoom.pdf")
+                    (begin 2000 12 11) (end 2000 12 21)
+                    (extra &old "set xtics 24 * 60 * 60"
+                           "set mxtics 4"))
+         (particlesacc (legend nw)
+                       (where "fig/particlesacc-00-01-zoom.pdf")
+                       (begin 2000 12 11) (end 2000 12 21)
+                       (extra &old "set xtics 24 * 60 * 60"
+                              "set mxtics 4"))
+         (pendconc (where "fig/pendconc-00-01-zoom.pdf")
+                   (begin 2000 12 11) (end 2000 12 21)
+                   (extra &old "set xtics 24 * 60 * 60"
+                          "set mxtics 4"))
+         (pendmass (where "fig/pendmass-00-01-zoom.pdf")
+                   (begin 2000 12 11) (end 2000 12 21)
+                   (extra &old "set xtics 24 * 60 * 60"
+                          "set mxtics 4"))
+         (ioxconc (where "fig/ioxconc-00-01-zoom.pdf")
+                  (begin 2000 12 11) (end 2000 12 21)
+                  (extra &old "set xtics 24 * 60 * 60"
+                         "set mxtics 4"))
+         (ioxmass (where "fig/ioxmass-00-01-zoom.pdf")
+                  (begin 2000 12 11) (end 2000 12 21)
+                  (extra &old "set xtics 24 * 60 * 60"
+                         "set mxtics 4"))
+         ))
+
+(defgnuplot season-01-02 multi 
+  "All graphs for the 01-02 drain season."
+  (graph drainflow-01-02 drainflowacc-01-02
+         particles-01-02 particlesacc-01-02))
+
+(defgnuplot "drainplots" multi
+  (graph season-98-99 season-98-99-zoom 
+         season-99-00 season-99-00-zoom
+         season-00-01 season-00-01-zoom
+         ;; season-01-02
+         ))
+
+(defgnuplot piezo-all multi
+  (graph ;;(piezo-sim (where "fig/piezo-sim-9899.pdf")
+         ;;           (begin 1998 10 14 12) (end 1999 3 21 19))
+         (piezo-drain (where "fig/piezo-drain-9899.pdf")
+                      (begin 1998 10 14 12) (end 1999 3 21 19))
+         (piezo-well (where "fig/piezo-well-9899.pdf")
+                     (begin 1998 10 14 12) (end 1999 3 21 19))
+         (piezo-plot (where "fig/piezo-plot-9899.pdf")
+                     (begin 1998 10 14 12) (end 1999 3 21 19))
+         (piezo-70 (where "fig/piezo-70-9899.pdf")
+                   (begin 1998 10 14 12) (end 1999 3 21 19))
+         (piezo-400 (where "fig/piezo-400-9899.pdf")
+                    (begin 1998 10 14 12) (end 1999 3 21 19))
+         (piezo-800 (where "fig/piezo-800-9899.pdf")
+                    (begin 1998 10 14 12) (end 1999 3 21 19))
+         ;;(piezo-sim (where "fig/piezo-sim-9900.pdf")
+         ;;           (begin 1999 12 10 0) (end 2000 3 28 3))
+         (piezo-drain (where "fig/piezo-drain-9900.pdf")
+                      (begin 1999 12 10 0) (end 2000 3 28 3))
+         (piezo-well (where "fig/piezo-well-9900.pdf")
+                     (begin 1999 12 10 0) (end 2000 3 28 3))
+         (piezo-plot (where "fig/piezo-plot-9900.pdf")
+                     (begin 1999 12 10 0) (end 2000 3 28 3))
+         (piezo-70 (where "fig/piezo-70-9900.pdf")
+                   (begin 1999 12 10 0) (end 2000 3 28 3))
+         (piezo-400 (where "fig/piezo-400-9900.pdf")
+                    (begin 1999 12 10 0) (end 2000 3 28 3))
+         (piezo-800 (where "fig/piezo-800-9900.pdf")
+                    (begin 1999 12 10 0) (end 2000 3 28 3))))
+
+(defgnuplot plot1d multi
+  (graph drainplots
+         gw-setup
+         (gw-sim (where "fig/gwt-9899.pdf")
+                 (begin 1998 10 14 12) (end 1999 3 21 19))
+         (gw-sim (where "fig/gwt-9900.pdf")
+                 (begin 1999 12 10 0) (end 2000 3 28 3))
+         (gw-cal (where "fig/gwt-0001.pdf")
+                 (begin 2000 11 20 14) (end 2001 2 19 21))
+         piezo-all
+         Rorrende-hydraulics
+         "Rorrende Graphs"
+         ))
+
+(defprogram plot1d gnuplot
+  (graph plot1d))
+

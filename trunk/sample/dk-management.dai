@@ -1,0 +1,216 @@
+;; This file contains examples of agricultural management practices 
+;; for growing a number of common Danish crops
+;; Timing and fertilizer application rates are in accordance
+;; with common Danish practice
+
+;; Including external library-files
+(input file "tillage.dai")
+(input file "crop.dai")
+(input file "fertilizer.dai")
+;------------------------------------------------------------------------------
+;; This section contains information on growing Spring Barley using 
+;; mineral fertiliser (in the present case a fertilizer called N25S, 
+;; the parameters of which are defined in the library-file 
+;; fertilizer.dai) or organic fertilizer  (pig_slurry, the parameters 
+;; of which are also defined in the library-file fertilizer.dai)
+;; The two management practices are saved under names "SBarley w. MF" and
+;; "SBarley w. OF" respectively
+;; The management information is a list of activities:
+;;    1) wait until a certain date (March 5)
+;;    2) apply fertilizer (type and amount of fertilizer is defined)
+;;    3) plow (plowing parameters are adopted from tillage.dai)
+;;    4) wait until a certain date
+;;    5) perform a seed bed preparation (parameters from tillage.dai)
+;;    6) sow a crop (Spring Barley - parameters see crop.dai)
+;;    7) wait until one of two conditions are fulfilled
+;;          a) the development stage of "Spring Barley has reached 2 
+;;             (i.e. the crop is mature)
+;;          b) the date August 20 is reached
+;;    8) "Spring Barley" is harvested and 8 cm of stubble is left in the 
+;;       field together with 30% of the straw (70% of the straw is removed)
+(defaction "SBarley w. MF" activity
+  (wait_mm_dd 3 05)
+  (fertilize (N25S (weight 115 [kg N/ha])))
+  (plowing)
+  (wait_mm_dd 4 05)
+  (seed_bed_preparation)(sow "Spring Barley")
+  (wait (or (crop_ds_after "Spring Barley" 2.0)(mm_dd 08 20)))
+  (harvest "Spring Barley" (stub 8 [cm])(stem 0.70))
+)
+;; The management practice "SBarley w. OF" only differs from "SBarley w. MF"
+;; in the respect to fertilization. In the primer case organic 
+;; fertilizer is applied (fertilizer type, amount in tonnes of wet 
+;; weight per hectare and volatilization (percent of NH4-N lost 
+;; during application are specified)). The fertilizer is in this case 
+;; assumed to be placed in the top 1 cm of the soil
+
+(defaction "SBarley w. OF" activity
+  (wait_mm_dd 3 05)
+  (fertilize ("pig_slurry" (volatilization 5 [%]) 
+    (weight 28 [T w.w./ha]))(to -1 [cm]))
+  (plowing)
+  (wait_mm_dd 4 05)
+  (seed_bed_preparation)(sow "Spring Barley")
+  (wait (or (crop_ds_after "Spring Barley" 2.0)(mm_dd 08 20)))
+  (harvest "Spring Barley" (stub 8 [cm])(stem 0.70))
+)
+;------------------------------------------------------------------------------
+;; Growing of Winter Wheat; straw is left in the field
+(defaction "WWheat w. MF" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "Winter Wheat")
+  (wait_mm_dd 04 05)(fertilize (N25S (weight 060 [kg N/ha]))) 
+  (wait_mm_dd 05 05)(fertilize (N25S (weight 100 [kg N/ha])))  
+  (wait (or (crop_ds_after "Winter Wheat" 2.0)(mm_dd 9 1)))
+  (harvest "Winter Wheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+  (wait_mm_dd 9 02)(plowing)
+)
+(defaction "WWheat w. OF" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "Winter Wheat")
+  (wait_mm_dd 03 20)
+  (fertilize ("pig_slurry" (volatilization 10 [%])
+    (weight 40 [T w.w./ha]))(to -1 [cm]))
+  (wait (or (crop_ds_after "Winter Wheat" 2.0)(mm_dd 9 1)))
+  (harvest "Winter Wheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+  (wait_mm_dd 9 02)(plowing)
+)
+;------------------------------------------------------------------------------
+;; Growing of Winter Barley; straw is removed
+(defaction "WBarley w. MF" activity
+  (wait_mm_dd 9 01)(plowing)
+  (wait_mm_dd 9 10)(seed_bed_preparation)(sow "Winter Barley")
+  (wait_mm_dd 3 25)(fertilize (N25S (weight 60 [kg N/ha])))
+  (wait_mm_dd 4 25)(fertilize (N25S (weight 81 [kg N/ha])))
+  (wait (or (crop_ds_after "Winter Barley" 2.0)(mm_dd 8 9)))
+  (harvest "Winter Barley" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+)
+(defaction "WBarley w. MF & OF" activity
+  (wait_mm_dd 9 01)(plowing)
+  (wait_mm_dd 9 10)(seed_bed_preparation)(sow "Winter Barley")
+  (wait_mm_dd 3 25)(fertilize (N25S (weight 68 [kg N/ha])))
+  (wait_mm_dd 4 20)(fertilize ("pig_slurry" (volatilization 10 [%])
+     (weight 20 [T w.w./ha]))(to -1 [cm]))
+  (wait (or (crop_ds_after "Winter Barley" 2.0)(mm_dd 8 9)))
+  (harvest "Winter Barley" (stub 8 [cm]))
+)
+(defaction "WBarley w. OF" activity
+  (wait_mm_dd 9 01)(plowing)
+  (wait_mm_dd 9 10)(seed_bed_preparation)(sow "Winter Barley")
+  (wait_mm_dd 3 25)(fertilize ("pig_slurry" (volatilization 10 [%])
+     (weight 37 [T w.w./ha]))(to -1 [cm]))
+  (wait (or (crop_ds_after "Winter Barley" 2.0)(mm_dd 8 9)))
+  (harvest "Winter Barley" (stub 8 [cm]))
+)
+;------------------------------------------------------------------------------
+;; Growing of Winter Rape; straw is left in the field
+(defaction "WRape w. MF" activity
+  (wait_mm_dd 8 15)(plowing)
+  (wait_mm_dd 8 20)(fertilize (N25S (weight 25 [kg N/ha])))
+  (seed_bed_preparation)(sow "Winter Rape")
+  (wait_mm_dd 3 05)(fertilize (N25S (weight 130 [kg N/ha])))
+  (wait (or (crop_ds_after "Winter Rape" 2.0)(mm_dd 8 9)))
+  (harvest "Winter Rape" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+)
+(defaction "WRape w. OF" activity
+  (wait_mm_dd 8 15)(fertilize ("pig_slurry" (volatilization 5 [%])
+    (weight 20 [T w.w./ha]))(to -1 [cm]))
+  (plowing)
+  (wait_mm_dd 8 20)(seed_bed_preparation)(sow "Winter Rape")
+  (wait_mm_dd 3 05)(fertilize ("pig_slurry" (volatilization 10 [%])
+    (weight 26 [T w.w./ha]))(to -1 [cm]))
+  (wait (or (crop_ds_after "Winter Rape" 2.0)(mm_dd 8 9)))
+  (harvest "Winter Rape" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+)
+;------------------------------------------------------------------------------
+;; Growing of Maize for silage
+(defaction "Maize w. MF & OF" activity
+  (wait_mm_dd 4 05)(fertilize ("cattle_slurry" (volatilization 5 [%])
+    (weight 50 [T w.w./ha]))(to -1 [cm]))
+  (plowing)
+  (wait_mm_dd 4 20)(fertilize (Ammonia (weight 100 [kg N/ha])))
+  (seed_bed_preparation)(sow "Silage Maize")
+  (wait_mm_dd 10 1)(harvest "Silage Maize" (stub 8 [cm]))
+)
+;------------------------------------------------------------------------------
+;; Growing of Pea
+(defaction "Pea w. no F" activity
+  (wait_mm_dd 3 31)(plowing)	
+  (wait_mm_dd 4 05)(seed_bed_preparation)(sow "Pea")
+  (wait(or(crop_ds_after "Pea" 2.0)(mm_dd 8 15)))
+  (harvest "Pea" (sorg 0.99)(leaf 0.01)(stem 0.01)(stub 10 [cm]))
+)
+;------------------------------------------------------------------------------
+;; Growing of Spring Barley / Pea - the two crops are sown and harvested
+;; simultaneously
+(defaction "SBarley & Pea" activity
+  (wait_mm_dd 3 05)
+  (fertilize (N25S (weight 60 [kg N/ha])))
+  (plowing)
+  (wait_mm_dd 4 05)(seed_bed_preparation)
+  (progn (sow "Spring Barley")(sow "Pea"))
+  (wait_mm_dd 7 05)
+  (progn
+    (harvest "Spring Barley" (stub 8 [cm]))
+    (harvest "Pea" (stub 8 [cm])))
+)
+;------------------------------------------------------------------------------
+;; Growing of grass for cutting
+;; This management practis is build from two seperate activity-lists
+;;    1) An activity-list defining sowing
+;;    2) An activity-list defining cutting
+(defaction "Sowing Grass" activity
+  (wait_mm_dd 8 20)
+  (fertilize ("cattle_slurry" (volatilization 5 [%])
+    (weight 20 [T w.w./ha]))(to -1 [cm]))  
+  (plowing)
+  (wait_mm_dd 09 01)(seed_bed_preparation)(sow "Grass")
+  (wait_mm_dd 10 10)
+  (harvest "Grass" (stub 8 [cm])(stem 0.00)(leaf 0.00))
+)
+(defaction "Grass - 4 cuts" activity
+  (wait_mm_dd 03 15)(fertilize (AmmoniumNitrate (weight 100 [kg N/ha])))
+  (wait_mm_dd 05 25)
+  (harvest "Grass" (stub 8 [cm])(stem 0.90)(leaf 0.90))
+  (wait_days 1)(fertilize (AmmoniumNitrate (weight 100 [kg N/ha])))
+  (wait_mm_dd 07 01)
+  (harvest "Grass" (stub 8 [cm])(stem 0.80)(leaf 0.80))
+  (wait_days 1)(fertilize (AmmoniumNitrate (weight 75 [kg N/ha])))
+  (wait_mm_dd 08 10)
+  (harvest "Grass" (stub 8 [cm])(stem 0.80)(leaf 0.80))
+  (wait_days 1)(fertilize (AmmoniumNitrate (weight 50 [kg N/ha])))
+  (wait_mm_dd 10 10)
+  (harvest "Grass" (stub 8 [cm])(stem 0.80)(leaf 0.80))
+)
+(defaction "Grass for cutting - 2y" activity
+  "Sowing Grass"
+  "Grass - 4 cuts"
+  "Grass - 4 cuts"
+)
+;------------------------------------------------------------------------------
+;; Growing of Spring Barley with catch crop
+(defaction "SBarley w. catch crop" activity
+  (wait_mm_dd 3 05)
+  (fertilize (N25S (weight 115 [kg N/ha])))
+  (plowing)
+  (wait_mm_dd 4 05)
+  (seed_bed_preparation)(sow "Spring Barley")
+  (wait_mm_dd 7 05)(sow "Grass")
+  (wait (or (crop_ds_after "Spring Barley" 2.0)(mm_dd 08 20)))
+  (harvest "Spring Barley" (stub 8 [cm])(stem 0.70))
+)
+;------------------------------------------------------------------------------
+;; Growing of Potato
+(defaction "Potato Management" activity
+  (wait_mm_dd 04 24)
+  (fertilize (N25S (weight 160 [kg N/ha]))) 
+  (seed_bed_preparation)
+  (sow "Potato; SCRI")
+  (wait_mm_dd 10 22) 
+  (harvest "Potato; SCRI"(stem 0.0)(leaf 0.0))
+)
+
+ 
+ 
+
+
+
+;;; dk-management.dai ends here
