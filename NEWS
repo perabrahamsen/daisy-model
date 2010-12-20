@@ -6,6 +6,14 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.92 
+
+** Bug fixes and code cleanup.
+
+* 4.91
+
+** Bug fixes and code cleanup.
+
 * 4.90
 
 ** New "log_prefix" top level parameter.

@@ -580,6 +580,18 @@ daisy_time_delete (Time* time)
 { delete time; }
 
 extern "C" int EXPORT
+daisy_time_get_microsecond (Time* time)
+{ return time->microsecond (); }
+
+extern "C" int EXPORT
+daisy_time_get_second (Time* time)
+{ return time->second (); }
+
+extern "C" int EXPORT
+daisy_time_get_minute (Time* time)
+{ return time->minute (); }
+
+extern "C" int EXPORT
 daisy_time_get_hour (Time* time)
 { return time->hour (); }
 

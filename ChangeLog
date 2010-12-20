@@ -1,3 +1,7 @@
+2010-12-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C (infiltrate): Avoid assert if rate is too high.
+
 2010-12-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* weather_std.C, weather_old.C, weather_extra.C, weather_base.C:

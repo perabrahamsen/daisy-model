@@ -68,6 +68,15 @@ namespace dk.ku.life.Daisy
 
         //time
         [DllImport("daisy")]
+        public static extern int daisy_time_get_microsecond(IntPtr daisy_time);
+
+        [DllImport("daisy")]
+        public static extern int daisy_time_get_second(IntPtr daisy_time);
+
+        [DllImport("daisy")]
+        public static extern int daisy_time_get_minute(IntPtr daisy_time);
+
+        [DllImport("daisy")]
         public static extern int daisy_time_get_hour(IntPtr daisy_time);
 
         [DllImport("daisy")]
@@ -313,11 +322,17 @@ namespace dk.ku.life.Daisy
         {
             Debug.Assert(daisy != (IntPtr)0);
             IntPtr daisy_time = DLL.daisy_daisy_get_time(daisy);
+            int microsecond = DLL.daisy_time_get_microsecond(daisy_time);
+            int second = DLL.daisy_time_get_second(daisy_time);
+            int minute = DLL.daisy_time_get_minute(daisy_time);
             int hour = DLL.daisy_time_get_hour(daisy_time);
             int year = DLL.daisy_time_get_year(daisy_time);
             int month = DLL.daisy_time_get_month(daisy_time);
             int mday = DLL.daisy_time_get_mday(daisy_time);
-            return (new DateTime(year, month, mday, hour, 0, 0));
+            DateTime dt = new DateTime(year, month, mday, hour, minute, second);
+            double millisecond = microsecond / 1000.0;
+            dt.AddMilliseconds (millisecond);
+            return dt;
         }
 
         public uint CountColumns()

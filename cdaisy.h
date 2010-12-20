@@ -373,6 +373,15 @@ daisy_time_create (int year, int month, int mday, int hour);
 EXPORT void                            /* Delete time object. */
 daisy_time_delete (daisy_time* time);
 
+EXPORT int               /* Microsecond of second, starting with 0. */
+daisy_time_get_microsecond (const daisy_time* time);
+
+EXPORT int                             /* Second of minute, starting with 0. */
+daisy_time_get_second (const daisy_time* time);
+
+EXPORT int                             /* Minute of hour, starting with 0. */
+daisy_time_get_minute (const daisy_time* time);
+
 EXPORT int                             /* Hour of day, starting with 0. */
 daisy_time_get_hour (const daisy_time* time);
 
