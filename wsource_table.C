@@ -294,7 +294,7 @@ static struct WSourceTableSyntax : public DeclareModel
   Model* make (const BlockModel& al) const
   { return new WSourceTable (al); }
   WSourceTableSyntax ()
-    : DeclareModel (WSource::component, "table", "base"
+    : DeclareModel (WSource::component, "table", "base",
                     "Read weather data from a file.")
   { }
   void load_frame (Frame& frame) const

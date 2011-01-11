@@ -359,6 +359,8 @@ Connvert to SI base units by multiplying with a factor.")
          "Second.");
     add ("h", u_h, 0, 0, 1, 0, 0, 0, 0,
          "Hour.");
+    add ("hours", u_h, 0, 0, 1, 0, 0, 0, 0,
+         "Hour.");
     add ("d", u_d, 0, 0, 1, 0, 0, 0, 0,
          "Day.");
 
@@ -536,6 +538,9 @@ Connvert to SI base units by multiplying with a factor.")
          -2, 1, -1, 0, 0, 0, 0,
          "Field scale carbon.");
     add ("kg/ha/y", p_k * u_g / u_ha / u_y,
+         -2, 1, -1, 0, 0, 0, 0,
+         "Deposition.");
+    add ("kg N/ha/y", p_k * u_g / u_ha / u_y,
          -2, 1, -1, 0, 0, 0, 0,
          "Deposition.");
     add ("kgN/ha/year", p_k * u_g / u_ha / u_y,

@@ -31,6 +31,7 @@
 #include "units.h"
 #include "path.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 #include <cstring>
 #include <iomanip>
@@ -345,6 +346,30 @@ LexerTable::Implementation::read_keywords (Frame& keywords)
                 error ("Cannot convert [" 
                        + has_dim + "] to [" + want_dim + "]");
               }
+          }
+          break;
+        case Attribute::String:
+          {
+            std::string text = "";
+            if (keywords.is_text (key) && keywords.check (key))
+              text = keywords.name (key) + "\n";
+            while (lex->good () && lex->peek () != '\n')
+              text += lex->get ();
+            keywords.set (key, text);
+          }
+          break;
+        case Attribute::Submodel:
+          {
+            const symbol subname = keywords.submodel_name (key);
+            if (subname != Librarian::submodel_name (Time::load_syntax))
+              {
+                lex->skip_line ();
+                error ("'" + key + "': Unsupported submodel '" + subname + "'");
+                break;
+              }
+            Time time;
+            lex->skip_space ();
+            lex->read_date (time);
           }
           break;
         case Attribute::Error:

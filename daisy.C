@@ -218,7 +218,7 @@ struct Daisy::Implementation
       {
         std::ostringstream tmp;
         tmp << "Daisy is designed for a timestep of 1h, you specified " 
-            << timestep.print () << " hours";
+            << timestep.print ();
         msg.warning (tmp.str ());
       }
     // Check actions.

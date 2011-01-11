@@ -31,6 +31,8 @@
 #include "submodeler.h"
 #include <map>
 
+#include <sstream>
+
 struct WSourceBase::Implementation : public FrameSubmodelValue
 {
   boost::scoped_ptr<Time> begin;
@@ -50,6 +52,12 @@ struct WSourceBase::Implementation : public FrameSubmodelValue
          i++)
       {
         const symbol key = *i;
+        if (al.lookup (*i) == Attribute::Error)
+          {
+            al.msg ().message ("'" + key + "': not found");
+            continue;
+          }
+
         if (!al.type_size (key) != Attribute::Singleton)
           continue;
 
@@ -156,6 +164,8 @@ static struct WSourceBaseSyntax : public DeclareBase
   void load_frame (Frame& frame) const
   {
     Weatherdata::load_syntax (frame); 
+    daisy_assert (frame.lookup ("GlobRad") == Attribute::Number);
+    daisy_assert (frame.type_size ("GlobRad") == Attribute::Singleton);
     frame.declare_submodule ("begin", Attribute::OptionalConst,
                              "Only use data after this date.", 
                              Time::load_syntax);

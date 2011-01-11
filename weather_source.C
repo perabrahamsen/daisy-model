@@ -191,9 +191,6 @@ public:
   void output (Log& log) const
   { output_common (log); }
     
-
-  // TODO: Output.
-
   // Create and Destroy.
   bool initialize (const Time& time, Treelog& msg);
   bool check (const Time& from, const Time& to, Treelog&) const;
@@ -214,7 +211,12 @@ WeatherSource::number_average (const Time& from, const Time& to,
   daisy_assert (e != numbers.end ());
   const std::deque<double>& values = e->second;
   const size_t data_size = when.size ();
-  daisy_assert (values.size () == data_size);
+  if (values.size () != data_size)
+    {
+      std::ostringstream tmp;
+      tmp << "values: " << values.size () << ", when: " << when.size ();
+      daisy_panic (tmp.str ());
+    }
 
   switch (data_size)
     {
@@ -371,17 +373,27 @@ WeatherSource::extract_cloudiness (double& variable) const
 bool
 WeatherSource::reset_deposition (Treelog& msg)
 {
+  Treelog::Open next (msg, __FUNCTION__);
   bool ok = true;
   
   const size_t data_size = when.size ();
 
+  if (data_size == 0)
+    {
+      msg.error ("No data");
+      return false;
+    }
   int i = 0;
   while (i < data_size && when[i] <= previous)
     i++;
   
   if (i == data_size)
     {
-      msg.error ("No deposition data");
+      std::ostringstream tmp;
+      tmp << "Last data " << when.back ().print () 
+          << " before start of timestep "
+          << previous.print ();
+      msg.error (tmp.str ());
       return false;
     }
 
@@ -575,10 +587,18 @@ WeatherSource::tick (const Time& time, Treelog& msg)
   // Push back.
   Time next_day (next.year (), next.month (), next.mday (), 0);
   next_day.tick_day (); // We keep one day worth of weather data.
-  while (!source->done () && when.back () < next_day)
+  Time last = when.size () > 0 ? when.back () : source->begin ();
+  for (;!source->done () && last < next_day; source->tick ())
     {
-      daisy_assert (when.back () == source->begin ());
+      {
+        std::ostringstream tmp;
+        tmp << "Source: " << source->begin ().print () << " - " 
+            << source->end ().print ();
+        msg.message (tmp.str ());
+      }
+      daisy_assert (last == source->begin ());
       when.push_back (source->end ());
+      last = when.back ();
 
       // Numbers.
       for (number_map_t::iterator i = numbers.begin ();
@@ -825,8 +845,6 @@ WeatherSource::tick (const Time& time, Treelog& msg)
   if (!new_day)
     return;
 
-  // TODO: Calculate daily values. (period: day_start, next_day)
-
   // Pop front.
   while (when.size () > 0 && when[0] < previous)
     {
@@ -853,7 +871,14 @@ WeatherSource::tick (const Time& time, Treelog& msg)
 bool 
 WeatherSource::initialize (const Time& time, Treelog& msg)
 {
+  TREELOG_MODEL (msg);
+
   bool ok = true;
+
+  // Source.
+  source->initialize (msg);
+  if (!source->check (msg))
+    ok = false;
   
   // Numbers and names.
   std::set<symbol> all;
@@ -878,10 +903,16 @@ WeatherSource::initialize (const Time& time, Treelog& msg)
         }
     }
 
-  // TODO: Initialize previous, next
+  // Initialize previous, next
+  previous = time;
+  previous.tick_day (-1);
+  next = previous;
+  next.tick_hour (1);
+  tick (time, msg);
 
   // Deposition.
-  reset_deposition (msg);
+  if (!reset_deposition (msg))
+    ok = false;
 
   return ok;
 }
@@ -949,7 +980,7 @@ static struct WeatherSourceSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   { 
-    // TODO: Weather:load_common.
+    Weather::load_common (frame);
 
     frame.declare_object ("source", WSource::component, "\
 Source of weather data.");
