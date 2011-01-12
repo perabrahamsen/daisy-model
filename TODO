@@ -10,22 +10,11 @@ tick2: Evt med mindre tidsskridt
 
 ** Weather source
 
-*** initialize & check
+Flere checks?
 
-*** Prøv!
+Ændret deposition?
 
-** WSource table
-
-dato markerede data er fra den dato.  
-USE date_only
-
-Andre data er fra perioden der ender på det markerede tidsrum.
-
-Der er generelt tale om gennemsnitsværdier.
-
-Dokumenter i beskrivelse af modul.
-
-Skal vi kunne angive afvigelser fra ovenstående?
+Ændret andre ting?  (PET, difrad)
 
 ** WSource combine
 
