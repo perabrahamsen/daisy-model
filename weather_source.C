@@ -55,11 +55,14 @@ struct WeatherSource : public Weather
   // Data.
   typedef std::map<symbol, std::deque<double>/**/> number_map_t;
   number_map_t numbers;
+  number_map_t timesteps;
   typedef std::map<symbol, std::deque<symbol>/**/> name_map_t;
   name_map_t names;
   std::deque<Time> when;
   
   // Current values.
+  double max_timestep (const Time& previous, const Time& next, symbol) const;
+  double max_timestep (symbol) const;
   double number_average (const Time& previous, const Time& next,
                          symbol) const;
   double number_average (symbol) const;
@@ -130,7 +133,7 @@ double latitude () const
   double daily_global_radiation () const
   { return my_daily_global_radiation; }
   double diffuse_radiation () const
-  { return my_diffuse_radiation; }
+  { return has_diffuse_radiation () ? my_diffuse_radiation : 0.0; }
   double reference_evapotranspiration () const
   { return my_reference_evapotranspiration; }
   double daily_precipitation () const
@@ -144,7 +147,9 @@ double latitude () const
   double cloudiness () const
   { return my_cloudiness; }
   double vapor_pressure () const
-  { return my_vapor_pressure; }
+  { return has_vapor_pressure () 
+      ? my_vapor_pressure 
+      : FAO::SaturationVapourPressure (my_daily_min_air_temperature); }
   double wind () const
   { return has_wind () ? my_wind : 5.0; }
   double CO2 () const
@@ -199,6 +204,52 @@ public:
 };
 
 double 
+WeatherSource::max_timestep (const Time& from, const Time& to,
+                             const symbol key) const
+{
+  // Available data.
+  const number_map_t::const_iterator e = timesteps.find (key);
+  daisy_assert (e != timesteps.end ());
+  const std::deque<double>& values = e->second;
+  const size_t data_size = when.size ();
+  daisy_assert (values.size () == data_size);
+
+  switch (data_size)
+    {
+    case 0:
+      daisy_panic ("No weather data");
+    case 1:
+      return values[0];
+    }
+
+  // Find start.
+  size_t i = 0;
+  while (i < data_size && when[i] <= from)
+    i++;
+  
+  if (i == data_size)
+    // All data is before current period.
+    return values.back ();
+  
+  // Complete values.
+  double max_value = 0.0;
+  for (; i < data_size && when[i] < to; i++)
+    if (values[i] > max_value)
+      max_value = values[i];
+  
+  // Last value.
+  const double value = (i < data_size ? values[i] : values.back ());
+  if (value > max_value)
+    max_value = value;
+
+  return max_value;
+}
+
+double 
+WeatherSource::max_timestep (const symbol key) const
+{ return max_timestep (previous, next, key); }
+
+double 
 WeatherSource::number_average (const Time& from, const Time& to,
                                const symbol key) const
 {
@@ -211,12 +262,7 @@ WeatherSource::number_average (const Time& from, const Time& to,
   daisy_assert (e != numbers.end ());
   const std::deque<double>& values = e->second;
   const size_t data_size = when.size ();
-  if (values.size () != data_size)
-    {
-      std::ostringstream tmp;
-      tmp << "values: " << values.size () << ", when: " << when.size ();
-      daisy_panic (tmp.str ());
-    }
+  daisy_assert (values.size () == data_size);
 
   switch (data_size)
     {
@@ -584,18 +630,25 @@ WeatherSource::tick (const Time& time, Treelog& msg)
   // Possible shorter version of same timestep.
   next = time;
 
+  // Day cycle.
+  static const double long_timestep = 12.0; // [h]
+  const double day_cycle 
+    = 0.5 * (relative_extraterestial_radiation (previous)
+             + relative_extraterestial_radiation (next));
+
   // Push back.
   Time next_day (next.year (), next.month (), next.mday (), 0);
   next_day.tick_day (); // We keep one day worth of weather data.
   Time last = when.size () > 0 ? when.back () : source->begin ();
-  for (;!source->done () && last < next_day; source->tick ())
+  for (;!source->done () && last < next_day; source->tick (msg))
     {
-      {
-        std::ostringstream tmp;
-        tmp << "Source: " << source->begin ().print () << " - " 
-            << source->end ().print ();
-        msg.message (tmp.str ());
-      }
+      if (false)
+        {
+          std::ostringstream tmp;
+          tmp << "Source: " << source->begin ().print () << " - " 
+              << source->end ().print ();
+          msg.message (tmp.str ());
+        }
       daisy_assert (last == source->begin ());
       when.push_back (source->end ());
       last = when.back ();
@@ -622,6 +675,16 @@ WeatherSource::tick (const Time& time, Treelog& msg)
               else
                 data.push_back (NAN);
             }
+        }
+
+      // Timesteps.
+      for (number_map_t::iterator i = timesteps.begin ();
+           i != timesteps.end ();
+           i++)
+        { 
+          const symbol key = i->first;
+          std::deque<double>& data = i->second;
+          data.push_back (source->meta_timestep (key));
         }
 
       // Names.
@@ -775,11 +838,23 @@ WeatherSource::tick (const Time& time, Treelog& msg)
     else
       my_surface = Weatherdata::symbol2surface (name);
   }
-  extract_average (Weatherdata::GlobRad (), my_global_radiation, msg);
+
+  if (max_timestep (Weatherdata::GlobRad ()) < long_timestep)
+    extract_average (Weatherdata::GlobRad (), my_global_radiation, msg);
+  else
+    my_global_radiation = my_daily_global_radiation * day_cycle;
 
   // Optional values.
   my_diffuse_radiation = number_average (Weatherdata::DiffRad ());
+  if (std::isfinite (my_diffuse_radiation) 
+      && max_timestep (Weatherdata::DiffRad ()) >= long_timestep)
+    my_diffuse_radiation *= day_cycle;
+
   my_reference_evapotranspiration = number_average (Weatherdata::RefEvap ());
+  if (std::isfinite (my_reference_evapotranspiration) 
+      && max_timestep (Weatherdata::RefEvap ()) >= long_timestep)
+    my_reference_evapotranspiration *= day_cycle;
+
   my_wind = number_average (Weatherdata::Wind ());
 
   const double new_air_temperature = number_average (Weatherdata::AirTemp ());
@@ -855,6 +930,13 @@ WeatherSource::tick (const Time& time, Treelog& msg)
           daisy_assert (when.size () == i->second.size ());
           i->second.pop_front ();
         }
+      for (number_map_t::iterator i = timesteps.begin ();
+           i != timesteps.end (); 
+           i++)
+        {
+          daisy_assert (when.size () == i->second.size ());
+          i->second.pop_front ();
+        }
       for (name_map_t::iterator i = names.begin ();
            i != names.end (); 
            i++)
@@ -902,6 +984,11 @@ WeatherSource::initialize (const Time& time, Treelog& msg)
           break;
         }
     }
+
+  // Timesteps for day cycle variables.
+  timesteps[Weatherdata::GlobRad ()];
+  timesteps[Weatherdata::RefEvap ()];
+  timesteps[Weatherdata::DiffRad ()];
 
   // Initialize previous, next
   previous = time;

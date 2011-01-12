@@ -104,6 +104,28 @@ symbol
 WSourceBase::name (const symbol key) const
 { return impl->name (key); }
 
+const Time& 
+WSourceBase::begin () const
+{ 
+  if (impl->begin.get ())
+    return *impl->begin;
+  static const Time time (1, 1, 1, 0); 
+  return time; 
+}
+
+const Time& 
+WSourceBase::end () const
+{ 
+  if (impl->end.get ())
+    return *impl->end;
+  static const Time time (9999, 12, 31, 23); 
+  return time; 
+}
+
+double 
+WSourceBase::meta_timestep (const symbol) const
+{ return timestep (); }
+
 bool
 WSourceBase::meta_check (const symbol, const symbol meta) const
 { return check (meta); }
@@ -127,25 +149,6 @@ WSourceBase::meta_end_number (const symbol, const symbol meta) const
 symbol 
 WSourceBase::meta_end_name (const symbol, const symbol meta) const
 { return end_name (meta); }
-
-const Time& 
-WSourceBase::begin () const
-{ 
-  if (impl->begin.get ())
-    return *impl->begin;
-  static const Time time (1, 1, 1, 0); 
-  return time; 
-}
-
-const Time& 
-WSourceBase::end () const
-{ 
-  if (impl->end.get ())
-    return *impl->end;
-  static const Time time (9999, 12, 31, 23); 
-  return time; 
-}
-
 
 WSourceBase::WSourceBase (const BlockModel& al)
   : WSource (),

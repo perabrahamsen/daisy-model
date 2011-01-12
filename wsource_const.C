@@ -22,9 +22,14 @@
 
 #include "wsource_base.h"
 #include "librarian.h"
+#include "treelog.h"
+#include "time.h"
 
 struct WSourceConst : public WSourceBase
 {
+  const double timestep_hours;        // [h]
+  double timestep () const
+  { return timestep_hours; }
   bool end_check (symbol key) const
   { return check (key); }
   double end_number (symbol key) const
@@ -32,17 +37,27 @@ struct WSourceConst : public WSourceBase
   symbol end_name (symbol key) const
   { return name (key); }
 
-  void tick ()
+  void tick (Treelog&)
   { }
   bool done () const
   { return true; }
   void initialize (Treelog&)
   { }
   using WSourceBase::check;
-  bool check (Treelog&) const
-  { return true; }
+  bool check (Treelog& msg) const
+  { 
+    Treelog::Open nest (msg, __FUNCTION__);
+    bool ok = true;
+    if (timestep_hours < 0)
+      {
+        msg.error ("Period ends before it starts");
+        ok = false;
+      }
+    return ok; 
+  }
   WSourceConst (const BlockModel& al)
-    : WSourceBase (al)
+    : WSourceBase (al),
+      timestep_hours (Time::hours_between (begin (), end ()))
   { }
   ~WSourceConst ()
   { }

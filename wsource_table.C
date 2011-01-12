@@ -45,6 +45,7 @@ struct WSourceTable : public WSourceBase
   std::map<symbol, double> next_values;
   Time timestep_begin;
   Time timestep_end;
+  double timestep_hours;
 
   // Scope.
   bool check (const symbol key) const;
@@ -52,13 +53,14 @@ struct WSourceTable : public WSourceBase
   symbol name (const symbol key) const;
 
   // WSource.
+  const Time& begin () const;
+  const Time& end () const;
+  double timestep () const;
   bool end_check (const symbol key) const;
   double end_number (const symbol key) const;
   symbol end_name (const symbol key) const;
-  const Time& begin () const;
-  const Time& end () const;
   void read_line ();
-  void tick ();
+  void tick (Treelog& msg);
   bool done () const
   { return !ok; }
 
@@ -130,6 +132,10 @@ WSourceTable::name (const symbol key) const
   // Keyword.
   return keywords.name (key);
 }
+
+double 
+WSourceTable::timestep () const
+{ return timestep_hours; }
 
 bool 
 WSourceTable::end_check (const symbol key) const
@@ -246,14 +252,18 @@ WSourceTable::read_line ()
 }
 
 void 
-WSourceTable::tick ()
+WSourceTable::tick (Treelog& msg)
 { 
+  Treelog::Open nest (msg, __FUNCTION__);
+
   if (!ok)
     return;
 
   timestep_begin = timestep_end;
   values = next_values;
   read_line ();
+  timestep_hours = Time::hours_between (timestep_begin, timestep_end);
+  daisy_assert (timestep_hours > 0.0);
 }
   
 void 
@@ -286,7 +296,7 @@ WSourceTable::initialize (Treelog& msg)
   
   // Read first data.
   read_line ();
-  tick ();
+  tick (msg);
 }
 
 static struct WSourceTableSyntax : public DeclareModel

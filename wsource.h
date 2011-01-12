@@ -37,6 +37,12 @@ public:
   static const char *const component;
   symbol library_id () const;
 
+  // Timestep.
+public:
+  virtual const Time& begin () const = 0;         // Start of timestep.
+  virtual const Time& end () const = 0;           // End of timestep.
+  virtual double timestep () const = 0;           // Length of timetstep [h]
+
   // End of timstep.
 public:  
   virtual bool end_check (symbol key) const = 0;
@@ -45,19 +51,17 @@ public:
 
   // Meta information.
 public:  
+  virtual double meta_timestep (symbol key) const = 0;
   virtual bool meta_check (symbol key, symbol meta) const = 0;
   virtual double meta_number (symbol key, symbol meta) const = 0;
   virtual symbol meta_name (symbol key, symbol meta) const = 0;
   virtual bool meta_end_check (symbol key, symbol meta) const = 0;
   virtual double meta_end_number (symbol key, symbol meta) const = 0;
-  virtual symbol meta_end_name (symbol key, symbol meta) const = 0;
-
-  
-  // Timestep.
+  virtual symbol meta_end_name (symbol key, symbol meta) const = 0; 
+ 
+  // Simulation.
 public:
-  virtual const Time& begin () const = 0;         // Start of timestep.
-  virtual const Time& end () const = 0;           // End of timestep.
-  virtual void tick () = 0;
+  virtual void tick (Treelog& msg) = 0;
   virtual bool done () const = 0;
   
   // Create and Destroy.

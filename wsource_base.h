@@ -43,15 +43,15 @@ public:
 
   // WSource interface.
 public:
+  const Time& begin () const;
+  const Time& end () const;
+  double meta_timestep (symbol key) const;
   bool meta_check (symbol key, symbol meta) const;
   double meta_number (symbol key, symbol meta) const;
   symbol meta_name (symbol key, symbol meta) const;
   bool meta_end_check (symbol key, symbol meta) const;
   double meta_end_number (symbol key, symbol meta) const;
   symbol meta_end_name (symbol key, symbol meta) const;
-
-  const Time& begin () const;
-  const Time& end () const;
 
   // Create and destroy.
 protected:
