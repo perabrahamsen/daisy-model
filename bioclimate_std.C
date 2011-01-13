@@ -47,10 +47,13 @@
 #include "librarian.h"
 #include "treelog_store.h"
 #include "resistance.h"
+#include <boost/scoped_ptr.hpp>
 #include <sstream>
 
 struct BioclimateStandard : public Bioclimate
 { 
+  const Metalib& metalib;
+
   // Canopy State.
   const long No;                // No of intervals in canopy discretization.
   double LAI_;                  // Total LAI of all crops on this column. [0-]
@@ -68,8 +71,8 @@ struct BioclimateStandard : public Bioclimate
   void CanopyStructure (const Vegetation&);
 
   // External water sinks and sources.
-  std::auto_ptr<NetRadiation> net_radiation;
-  std::auto_ptr<Pet> pet;       // Potential Evapotranspiration model.
+  boost::scoped_ptr<NetRadiation> net_radiation;
+  boost::scoped_ptr<Pet> pet;       // Potential Evapotranspiration model.
   double total_ep_;             // Potential evapotranspiration [mm/h]
   double total_ea_;             // Actual evapotranspiration [mm/h]
   double direct_rain_;          // Rain hitting soil directly [mm/h]
@@ -123,7 +126,7 @@ struct BioclimateStandard : public Bioclimate
   const double max_svat_absolute_difference; // Max difference. [mm/h]
   const double maxTdiff;                     // Max temperature diff. [dg C]
   const double maxEdiff;                     // Max pressure diff [Pa]
-  std::auto_ptr<SVAT> svat;     // Soil Vegetation Atmosphere model.
+  boost::scoped_ptr<SVAT> svat;     // Soil Vegetation Atmosphere model.
   size_t svat_fail;             // Number of times the svat loop failed.
   size_t svat_total;            // Total number of times the swat loop entered.
   double crop_ep_;              // Potential transpiration. [mm/h]
@@ -149,10 +152,10 @@ struct BioclimateStandard : public Bioclimate
                              const Surface& surface, 
                              const Geometry&, const Soil&, const SoilWater&);
   double albedo;                  // Reflection factor []
-  std::auto_ptr<Raddist> raddist;// Radiation distribution model.
+  boost::scoped_ptr<Raddist> raddist;// Radiation distribution model.
   const double min_sin_beta_;     // Sinus to lowest sun angle for some models.
   void RadiationDistribution (const Vegetation&, double sin_beta, Treelog&);
-  std::auto_ptr<Difrad> difrad;  // Diffuse radiation model.
+  boost::scoped_ptr<Difrad> difrad;  // Diffuse radiation model.
   double difrad0;                // Diffuse radiation above canopy [W/m2]
 
   double absorbed_total_PAR_canopy; // Canopy absorbed PAR (sun+shade) [W/m2]
@@ -187,6 +190,16 @@ struct BioclimateStandard : public Bioclimate
   double atmospheric_CO2_;         // From weather [Pa]
   double atmospheric_O2_;         // From weather [Pa]
   double air_pressure_;         // From weather [Pa]
+
+  // Initialization.
+  const bool fixed_pet;
+  const bool fixed_difrad;
+  bool has_reference_evapotranspiration;
+  bool has_vapor_pressure;
+  bool has_wind;
+  bool has_min_max_temperature;
+  bool has_diffuse_radiation;
+  Weatherdata::surface_t old_surface;
 
   // Simulation
   void tick (const Units&, const Time&, Surface&, const Weather&, 
@@ -356,36 +369,48 @@ struct BioclimateStandard : public Bioclimate
   }
 
   // Create.
-  void initialize (const Block&, const Weather&);
-  bool check (const Weather& weather, Treelog& msg) const;
+  void initialize (const Weather&, Treelog&);
+  void reset_weather (const Weather&, Treelog&);
+  bool check (const Weather&, Treelog&) const;
   BioclimateStandard (const BlockModel&);
-  void summarize (Treelog& msg) const;
+  void summarize (Treelog&) const;
   ~BioclimateStandard ();
 };
 
 void 
-BioclimateStandard::initialize (const Block& block, const Weather& weather)
+BioclimateStandard::initialize (const Weather& weather, Treelog& msg)
 {
-  const Metalib& metalib = block.metalib ();
-  Treelog& msg = block.msg ();
-  Treelog::Open nest (msg, "Bioclimate: " + name);
+  TREELOG_MODEL (msg);
+  reset_weather (weather, msg);
+}
 
+void 
+BioclimateStandard::reset_weather (const Weather& weather, Treelog& msg)
+{
+  // Old weather.
+  has_reference_evapotranspiration 
+    = weather.has_reference_evapotranspiration ();
+  has_vapor_pressure = weather.has_vapor_pressure ();
+  has_wind = weather.has_wind ();
+  has_min_max_temperature = weather.has_min_max_temperature ();
+  has_diffuse_radiation = weather.has_diffuse_radiation ();
+  old_surface = weather.surface ();
 
-  if (!pet.get ())                      // Explicit.
+  // Potential evapotranspiration model.
+  if (!fixed_pet)                      // Explicit.
     {
       symbol type;
 
-      if (weather.has_reference_evapotranspiration ())
+      if (has_reference_evapotranspiration)
         type = "weather";
-      else if (weather.has_vapor_pressure () 
-               && weather.has_wind ())
+      else if (has_vapor_pressure && has_wind)
         {
-          if (weather.surface () == Weatherdata::field)
+          if (old_surface == Weatherdata::field)
             type = symbol ("PM");
           else
             type = symbol ("FAO_PM");    
         }
-      else if (weather.has_min_max_temperature ())
+      else if (has_min_max_temperature)
         type = symbol ("Hargreaves");
       else
         type = symbol ("makkink");
@@ -394,11 +419,12 @@ BioclimateStandard::initialize (const Block& block, const Weather& weather)
       pet.reset (Librarian::build_stock<Pet> (metalib, msg, type, "pet"));
     }
 
-  if (!difrad.get ())                      // Explicit.
+  // Diffuse radiation model.
+  if (!fixed_difrad)                      // Explicit.
     {
       symbol type;
 
-      if (weather.has_diffuse_radiation ())
+      if (has_diffuse_radiation)
         type = symbol ("weather");
       else
         type = symbol ("DPF");
@@ -421,6 +447,7 @@ BioclimateStandard::check (const Weather& weather, Treelog& msg) const
 
 BioclimateStandard::BioclimateStandard (const BlockModel& al)
   : Bioclimate (al),
+    metalib (al.metalib ()),
     No (al.integer ("NoOfIntervals")),
     LAI_ (0.0),
     cover_ (0.0),
@@ -505,7 +532,17 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     global_radiation_ (0.0),
     atmospheric_CO2_ (-42.42e42),
     atmospheric_O2_ (-42.42e42),
-    air_pressure_ (-42.42e42)
+    air_pressure_ (-42.42e42),
+
+    // For initialization and weather data shifts.
+    fixed_pet (pet.get ()),
+    fixed_difrad (difrad.get ()),
+    has_reference_evapotranspiration (false),
+    has_vapor_pressure (false),
+    has_wind (false),
+    has_min_max_temperature (false),
+    has_diffuse_radiation (false),
+    old_surface (Weatherdata::field)
 { }
 
 void 
@@ -1079,6 +1116,18 @@ BioclimateStandard::tick (const Units& units, const Time& time,
                           SoilWater& soil_water, const SoilHeat& soil_heat,
                           const double dt, Treelog& msg)
 {
+  TREELOG_MODEL (msg);
+
+  // Check if weather structure have changed enough to make us switch model.
+  if (has_reference_evapotranspiration 
+      != weather.has_reference_evapotranspiration ()
+      || has_vapor_pressure != weather.has_vapor_pressure ()
+      || has_wind != weather.has_wind ()
+      || has_min_max_temperature != weather.has_min_max_temperature ()
+      || has_diffuse_radiation != weather.has_diffuse_radiation ()
+      || old_surface != weather.surface ())
+    reset_weather (weather, msg);
+
   // Keep weather information during time step.
   // Remember this in case the crops should ask.
   global_radiation_ = weather.global_radiation ();

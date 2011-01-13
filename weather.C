@@ -27,6 +27,7 @@
 #include "log.h"
 #include "im.h"
 #include "astronomy.h"
+#include "mathlib.h"
 
 const char *const Weather::component = "weather";
 
@@ -95,6 +96,10 @@ Weather::output_common (Log& log) const
   output_value (day_length (), "day_length", log);
   output_submodule (deposit (), "deposit", log);
 }
+
+double 
+Weather::suggest_dt () const
+{ return NAN; }
 
 static void load_flux (Frame& frame)
 { IM::add_syntax (frame, Attribute::LogOnly, IM::flux_unit ()); }

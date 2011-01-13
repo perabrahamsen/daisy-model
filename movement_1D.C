@@ -96,6 +96,7 @@ struct Movement1D : public MovementSolute
              const std::vector<double>& conductivity,
              double T_top,
              double T_top_new,
+             double T_bottom,
              std::vector<double>& T,
              const double dt, Treelog&) const;
 
@@ -371,12 +372,13 @@ Movement1D::heat (const std::vector<double>& q_water,
                   const std::vector<double>& conductivity,
                   const double T_top,
                   const double T_top_new,
+                  const double T_bottom,
                   std::vector<double>& T,
                   const double dt, Treelog&) const
 {
   solve_heat (*geo, q_water, S_water, S_heat, 
               capacity_new, conductivity,
-              T_top, T_top_new, bottom_T (), T, dt);
+              T_top, T_top_new, T_bottom, T, dt);
 }
 
 void 

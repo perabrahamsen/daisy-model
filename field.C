@@ -113,7 +113,7 @@ public:
   std::string crop_names () const;
   // Simulation.
   void clear ();
-  void tick_source (const Time&, const Weather*, const Scope&, Treelog&);
+  void tick_source (const Scope&, Treelog&);
   double suggest_dt () const;
   void tick_move (const Metalib& metalib, 
                   const Time&, double dt, const Weather*, 
@@ -614,21 +614,17 @@ Field::Implementation::clear ()
 }
 
 void 
-Field::Implementation::tick_source (const Time& time, 
-                                    const Weather *const global_weather,
-                                    const Scope& parent_scope, 
-                                    Treelog& msg)
+Field::Implementation::tick_source (const Scope& parent_scope, Treelog& msg)
 {
   if (columns.size () == 1)
-    (*(columns.begin ()))->tick_source (time, global_weather, parent_scope, 
-                                        msg);
+    (*(columns.begin ()))->tick_source (parent_scope, msg);
   else
     for (ColumnList::const_iterator i = columns.begin ();
          i != columns.end ();
          i++)
       {
         Treelog::Open nest (msg, "Column " + (*i)->name);
-        (*i)->tick_source (time, global_weather, parent_scope, msg);
+        (*i)->tick_source (parent_scope, msg);
       }
 }
 
@@ -949,9 +945,8 @@ Field::clear ()
 { impl->clear (); }
 
 void
-Field::tick_source (const Time& time, const Weather *const global_weather, 
-                    const Scope& parent_scope, Treelog& msg)
-{ impl->tick_source (time, global_weather, parent_scope, msg); }
+Field::tick_source (const Scope& parent_scope, Treelog& msg)
+{ impl->tick_source (parent_scope, msg); }
 
 double
 Field::suggest_dt () const

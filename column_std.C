@@ -165,7 +165,7 @@ public:
 
   // Simulation.
   void clear ();
-  void tick_source (const Time&, const Weather*, const Scope&, Treelog&);
+  void tick_source (const Scope&, Treelog&);
   double suggest_dt () const;
   void tick_move (const Metalib& metalib, 
                   const Time&, double dt, const Weather*, 
@@ -573,23 +573,11 @@ ColumnStandard::clear ()
 }
 
 void
-ColumnStandard::tick_source (const Time& time, 
-                             const Weather *const global_weather,
-                             const Scope& parent_scope,
-                             Treelog& msg)
+ColumnStandard::tick_source (const Scope& parent_scope, Treelog& msg)
 { 
-  // Weather.
-  if (weather.get ())
-    weather->tick (time, msg);
-
-  const Weather& my_weather = weather.get () ? *weather : *global_weather;
-
-  // Add deposition. 
-  chemistry->deposit (my_weather.deposit (), msg);
-
   // Find forward sink.
   drain->tick (geometry, *soil, *soil_heat, surface, *soil_water, msg);
-  movement->tick_source (time, my_weather, *soil, *soil_heat, *soil_water, msg);
+  movement->tick_source (*soil, *soil_heat, *soil_water, msg);
 
   // Find water based limit.
   soil_water->tick_source (geometry, *soil, msg);
@@ -608,6 +596,13 @@ ColumnStandard::suggest_dt () const
 { 
   double dt = 0.0;
   
+  if (weather.get ())
+    {
+      const double w_dt = weather->suggest_dt ();
+      if (std::isnormal (w_dt) && (!std::isnormal (dt) || dt > w_dt))
+        dt = w_dt;
+    }
+
   const double sw_dt = soil_water->suggest_dt ();
   
   if (std::isnormal (sw_dt) 
@@ -630,6 +625,20 @@ ColumnStandard::tick_move (const Metalib& metalib, const Time& time,
                            const Scope& parent_scope,
                            Treelog& msg)
 {
+  // Scope.
+  daisy_assert (extern_scope);
+  ScopeMulti scope (*extern_scope, parent_scope);
+
+  // Weather.
+  if (weather.get ())
+    weather->tick (time, msg);
+
+  const Weather& my_weather = weather.get () ? *weather : *global_weather;
+  const double T_bottom = movement->bottom_heat (time, my_weather);
+
+  // Add deposition. 
+  chemistry->deposit (my_weather.deposit (), msg);
+
   // Irrigation is delayed management.
   irrigation->tick (geometry, *soil_water, *chemistry, *bioclimate, dt, msg);
 
@@ -648,12 +657,6 @@ ColumnStandard::tick_move (const Metalib& metalib, const Time& time,
   seed_C /= dt;
   applied_DM /= dt;
   first_year_utilization /= dt;
-
-  // Scope.
-  daisy_assert (extern_scope);
-  ScopeMulti scope (*extern_scope, parent_scope);
-
-  const Weather& my_weather = weather.get () ? *weather : *global_weather;
 
   // Macropores before everything else.
   movement->tick_tertiary (units, geometry, *soil, *soil_heat, dt,
@@ -703,7 +706,7 @@ ColumnStandard::tick_move (const Metalib& metalib, const Time& time,
   groundwater->tick (units, geometry, *soil, *soil_water, 
                      surface.ponding_average () * 0.1, 
                      *soil_heat, time, scope, msg);
-  soil_heat->tick (geometry, *soil, *soil_water, *movement, 
+  soil_heat->tick (geometry, *soil, *soil_water, T_bottom, *movement, 
                    surface, dt, msg);
   movement->tick (*soil, *soil_water, *soil_heat,
                   surface, *groundwater, time, my_weather, 
@@ -1000,7 +1003,7 @@ ColumnStandard::initialize (const Block& block,
       return false;
     }
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
-  bioclimate->initialize (block, my_weather);
+  bioclimate->initialize (my_weather, msg);
   soil_heat->initialize (frame ().submodel ("SoilHeat"), geometry, 
                          movement->default_heat (*soil, time, my_weather),
                          msg);

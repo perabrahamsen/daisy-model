@@ -56,6 +56,7 @@ public:
 protected:
   void output_common (Log& log) const;
 public:
+  virtual double suggest_dt () const;   // [h]
   virtual void tick (const Time& time, Treelog&) = 0;
   virtual void output (Log&) const = 0;
 

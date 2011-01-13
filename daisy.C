@@ -290,7 +290,7 @@ Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
   action->doIt (daisy, scope (), msg);
 
   // Find sources.
-  field->tick_source (time, weather.get (), scope (), msg); 
+  field->tick_source (scope (), msg); 
 
   // Find next timestep.
   Time next_time = Time::null ();
@@ -308,6 +308,14 @@ Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
       double suggested_dt = field->suggest_dt (); 
       if (!std::isnormal (suggested_dt))
         suggested_dt = max_dt;
+
+      if (weather.get ())
+        {
+          const double w_dt = weather->suggest_dt ();
+          if (std::isnormal (w_dt) 
+              && (!std::isnormal (suggested_dt) || suggested_dt > w_dt))
+            suggested_dt = w_dt;
+        }
 
       if (suggested_dt < min_dt)
         {

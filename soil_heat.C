@@ -215,7 +215,8 @@ SoilHeat::calculate_heat_flux (const Geometry& geo,
 
 void 
 SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
-		const Movement& movement, const Surface& surface, 
+		const double T_bottom, 
+                const Movement& movement, const Surface& surface, 
 		const double dt, Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
@@ -229,7 +230,6 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
   const double T_top_new = surface.temperature ();
   if (T_top_old < -400.0)
     T_top_old = T_top_new;
-  const double T_bottom = movement.bottom_T ();
 
   // Edges.
   std::vector<double> q_water (edge_size);
@@ -263,7 +263,7 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
   const std::vector<double> T_old = T;
   movement.heat (q_water, S_water, S_heat, 
 		 capacity_apparent, conductivity,
-		 T_top_old, T_top_new, T, dt, msg);
+		 T_top_old, T_top_new, T_bottom, T, dt, msg);
 
   // Update ice state according to new temperatures.
   if (this->enable_ice)
@@ -283,7 +283,7 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
 	  T = T_old;
 	  movement.heat (q_water, S_water, S_heat,
 			 capacity_apparent, conductivity,
-			 T_top_old, T_top_new, T, dt, msg);
+			 T_top_old, T_top_new, T_bottom, T, dt, msg);
 
 	  // Check if state match new temperatures.
 	  const bool changed_again = this->check_state (soil, T);

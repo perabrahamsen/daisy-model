@@ -108,7 +108,7 @@ struct WeatherSource : public Weather
   double my_daily_precipitation;       // [mm/d]
 
   // Extract weather.
-double latitude () const
+  double latitude () const
   { return my_latitude; }
   double longitude () const
   { return my_longitude; }
@@ -606,7 +606,7 @@ WeatherSource::suggest_dt () const // [h]
       return (when[i] - next).total_hours ();
   
   // No applicable weather data.  
-  return 24.0 * 365.2425 * 1000; // A millenium.
+  return NAN;
 }
 
 void 

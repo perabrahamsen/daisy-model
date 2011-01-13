@@ -2,11 +2,7 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Små tidsskridt i vejr
 
-** Weather
-
-suggest_dt
-tick1: Med fuldt tidsskridt
-tick2: Evt med mindre tidsskridt
+** PrecipCorrect
 
 ** Weather source
 

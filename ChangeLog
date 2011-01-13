@@ -1,3 +1,11 @@
+2011-01-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* bioclimate_std.C: Dynamically match pet and difrad models to
+	weather data.
+	* column_std.C, column.h (tick, tick_source, suggest_dt):
+	* field.C, field.h (tick_source):
+	* daisy.C (tick): Allow weather to suggest timestep.
+
 2010-12-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.92 released.

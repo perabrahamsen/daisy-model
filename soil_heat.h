@@ -98,8 +98,8 @@ private:
                                    double T_bottom,
                                    std::vector<double>& q);
 public:
-  void tick (const Geometry&, const Soil&, SoilWater&, const Movement&, 
-	     const Surface& surface, double dt, Treelog& msg);
+  void tick (const Geometry&, const Soil&, SoilWater&, const double T_bottom, 
+             const Movement&, const Surface& surface, double dt, Treelog& msg);
   void tick_after (const size_t cell_size, 
                    const Soil&, const SoilWater&, Treelog&);
   
