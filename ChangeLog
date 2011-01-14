@@ -1,3 +1,9 @@
+2011-01-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* vcheck.C, vcheck.h (VCheck::MultiSize): New class.
+	* weatherdata.C: Use it.
+	* lexer_table.C, lexer_table.h: Parse keywords from frame.
+
 2011-01-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* bioclimate_std.C: Dynamically match pet and difrad models to
