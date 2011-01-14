@@ -52,26 +52,40 @@ struct WSourceBase::Implementation : public FrameSubmodelValue
          i++)
       {
         const symbol key = *i;
-        if (al.lookup (*i) == Attribute::Error)
+        if (!al.check (key))
+          continue;
+
+        Attribute::type type = al.lookup (key);
+        if (type == Attribute::Error)
           {
             al.msg ().message ("'" + key + "': not found");
             continue;
           }
-
-        if (!al.type_size (key) != Attribute::Singleton)
-          continue;
-
-        switch (al.lookup (*i))
-          {
-          case Attribute::Number:
-            set (key, al.number (key));
-            break;
-          case Attribute::String:
-            set (key, al.name (key));
-            break;
-          default:
-            break;
-          }
+        
+        if (al.type_size (key) == Attribute::Singleton)
+          switch (type)
+            {
+            case Attribute::Number:
+              set (key, al.number (key));
+              break;
+            case Attribute::String:
+              set (key, al.name (key));
+              break;
+            default:
+              break;
+            }
+        else
+          switch (type)
+            {
+            case Attribute::Number:
+              set (key, al.number_sequence (key));
+              break;
+            case Attribute::String:
+              set (key, al.name_sequence (key));
+              break;
+            default:
+              break;
+            }
       }
   }
 };
@@ -121,6 +135,14 @@ WSourceBase::end () const
   static const Time time (9999, 12, 31, 23); 
   return time; 
 }
+
+const std::vector<double>& 
+WSourceBase::number_sequence (const symbol key) const
+{ return impl->number_sequence (key); }
+
+const std::vector<double>& 
+WSourceBase::end_number_sequence (const symbol key) const
+{ return number_sequence (key); }
 
 double 
 WSourceBase::meta_timestep (const symbol) const

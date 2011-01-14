@@ -899,6 +899,42 @@ VCheck::unique ()
 }
 
 bool
+VCheck::MultiSize::verify (const Metalib&, const Frame& frame, 
+                           const symbol key, Treelog& msg) const
+{
+  daisy_assert (frame.check (key));
+  daisy_assert (!frame.is_log (key));
+  daisy_assert (frame.type_size (key) != Attribute::Singleton);
+
+  if (sizes.find (frame.value_size (key)) != sizes.end ())
+    return true;
+
+  std::ostringstream tmp;
+  tmp << "'" << key << "' has " << frame.value_size (key)
+      << " elements, expected one of { ";
+  bool first = true;
+  for (std::set<size_t>::const_iterator i = sizes.begin ();
+       i != sizes.end ();
+       i++)
+    {
+      if (first)
+        first = false;
+      else
+        tmp << ", ";
+      tmp << *i;
+    }
+  tmp << "} elements";
+  msg.error (tmp.str ());
+  return false;
+}
+
+VCheck::MultiSize::MultiSize (const size_t a, const size_t b)
+{
+  sizes.insert (a);
+  sizes.insert (b);
+}
+
+bool
 VCheck::All::verify (const Metalib& metalib, const Frame& frame, const symbol key,
                      Treelog& msg) const
 {

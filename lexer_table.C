@@ -1,385 +1,437 @@
-// lexer_table.C --- Read tabular data from a file.
-// 
-// Copyright 2005 Per Abrahamsen and KVL.
-//
-// This file is part of Daisy.
-// 
-// Daisy is free software; you can redistribute it and/or modify
-// it under the terms of the GNU Lesser Public License as published by
-// the Free Software Foundation; either version 2.1 of the License, or
-// (at your option) any later version.
-// 
-// Daisy is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser Public License
-// along with Daisy; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ // lexer_table.C --- Read tabular data from a file.
+ // 
+ // Copyright 2005 Per Abrahamsen and KVL.
+ //
+ // This file is part of Daisy.
+ // 
+ // Daisy is free software; you can redistribute it and/or modify
+ // it under the terms of the GNU Lesser Public License as published by
+ // the Free Software Foundation; either version 2.1 of the License, or
+ // (at your option) any later version.
+ // 
+ // Daisy is distributed in the hope that it will be useful,
+ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ // GNU Lesser Public License for more details.
+ // 
+ // You should have received a copy of the GNU Lesser Public License
+ // along with Daisy; if not, write to the Free Software
+ // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#define BUILD_DLL
+ #define BUILD_DLL
 
-#include "lexer_table.h"
-#include "lexer_data.h"
-#include "frame.h"
-#include "assertion.h"
-#include "mathlib.h"
-#include "submodeler.h"
-#include "time.h"
-#include "vcheck.h"
-#include "units.h"
-#include "path.h"
-#include "memutils.h"
-#include "librarian.h"
-#include <sstream>
-#include <cstring>
-#include <iomanip>
-#include <map>
-#include <boost/algorithm/string/trim.hpp>
+ #include "lexer_table.h"
+ #include "lexer_data.h"
+ #include "frame.h"
+ #include "assertion.h"
+ #include "mathlib.h"
+ #include "submodeler.h"
+ #include "time.h"
+ #include "vcheck.h"
+ #include "units.h"
+ #include "path.h"
+ #include "memutils.h"
+ #include "librarian.h"
+ #include "treelog_text.h"
+ #include <boost/algorithm/string/trim.hpp>
+ #include <sstream>
+ #include <cstring>
+ #include <iomanip>
+ #include <map>
 
-struct LexerTable::Implementation : private boost::noncopyable
-{
-  // Content.
-  const Units& units;
-  const Path& path;
-  const symbol filename;  
-  std::auto_ptr<std::istream> owned_stream;
-  boost::scoped_ptr<LexerData> lex;
-  std::string field_sep;
-  std::string type_;
-  const std::vector<std::string> missing;
-  std::vector<symbol> tag_names;
-  std::map<symbol,int> tag_pos;
-  std::vector<size_t> fil_col;
-  struct Filter;
-  auto_vector<const Filter*> filter;
-  int year_c;
-  int month_c;
-  int mday_c;
-  int hour_c;
-  int minute_c;
-  int second_c;
-  int microsecond_c;
-  int time_c;
-  const std::vector<symbol> original;
-  const bool dim_line;
-  std::vector<symbol> dim_names;
 
-  int find_tag (const symbol tag1, const symbol tag2) const;
-  std::string get_entry () const;
-  void get_entries_raw (std::vector<std::string>& entries) const;
-  int get_date_component (const std::vector<std::string>& entries, 
-                          int column, int default_value) const;
-  bool good ();
-  bool read_type (Treelog& msg);
-  void read_keywords (Frame& keywords);
-  void read_tags ();
-  bool read_header (Treelog& msg);
-  bool read_header_with_keywords (Frame& keywords, Treelog& msg);
-  int find_tag (const symbol tag) const;
-  bool get_entries (std::vector<std::string>& entries) const;
-  static bool get_time (const std::string& entry, Time& time, 
-                        int default_hour, bool& date_only); 
-  bool get_time (const std::vector<std::string>& entries, Time& time, 
-                 int default_hour, bool& date_only) const;
-  bool is_missing (const std::string& value) const;
-  double convert_to_double (const std::string& value) const;
+ struct LexerTable::Implementation : private boost::noncopyable
+ {
+   // Content.
+   const Metalib& metalib;
+   const Units& units;
+   const Path& path;
+   const symbol filename;  
+   std::auto_ptr<std::istream> owned_stream;
+   boost::scoped_ptr<LexerData> lex;
+   std::string field_sep;
+   std::string type_;
+   const std::vector<std::string> missing;
+   std::vector<symbol> tag_names;
+   std::map<symbol,int> tag_pos;
+   std::vector<size_t> fil_col;
+   struct Filter;
+   auto_vector<const Filter*> filter;
+   int year_c;
+   int month_c;
+   int mday_c;
+   int hour_c;
+   int minute_c;
+   int second_c;
+   int microsecond_c;
+   int time_c;
+   const std::vector<symbol> original;
+   const bool dim_line;
+   std::vector<symbol> dim_names;
 
-  // Messages.
-  void warning (const std::string& str) const;
-  void error (const std::string& str) const;
+   int find_tag (const symbol tag1, const symbol tag2) const;
+   std::string get_entry () const;
+   void get_entries_raw (std::vector<std::string>& entries) const;
+   int get_date_component (const std::vector<std::string>& entries, 
+                           int column, int default_value) const;
+   bool good ();
+   bool read_type (Treelog& msg);
+   void read_keywords (Frame& keywords);
+   void read_tags ();
+   bool read_header (Treelog& msg);
+   bool read_header_with_keywords (Frame& keywords, Treelog& msg);
+   int find_tag (const symbol tag) const;
+   bool get_entries (std::vector<std::string>& entries) const;
+   static bool get_time (const std::string& entry, Time& time, 
+                         int default_hour, bool& date_only); 
+   bool get_time (const std::vector<std::string>& entries, Time& time, 
+                  int default_hour, bool& date_only) const;
+   bool is_missing (const std::string& value) const;
+   double convert_to_double (const std::string& value) const;
 
-  // Create and destroy.
-  static std::vector<std::string> s2s_v (const std::vector<symbol>& syms);
-  Implementation (const BlockModel& al);
-};
-  
-struct LexerTable::Implementation::Filter
-{
-  const symbol tag;
-  const std::vector<symbol> allowed;
+   // Messages.
+   void warning (const std::string& str) const;
+   void error (const std::string& str) const;
 
-  bool match (const std::string& value) const
-  {
-    for (size_t i = 0; i < allowed.size (); i++)
-      {
-        if (allowed[i] == value)
-          return true;
-        // Try to pad out our allowed value with spaces...
-        if (value.size () <= allowed[i].name ().size ())
-          continue;
-        const std::string allow
-          = allowed[i] + std::string (value.size () 
-                                      - allowed[i].name ().size (), ' ');
-        daisy_assert (allow.size () == value.size ());
-        if (allow == value)
-          return true;
-      }
-    return false;
-  }
-  static void load_syntax (Frame&);
-  explicit Filter (const Block&);
-};
+   // Create and destroy.
+   static std::vector<std::string> s2s_v (const std::vector<symbol>& syms);
+   Implementation (const BlockModel& al);
+ };
 
-void 
-LexerTable::Implementation::Filter::load_syntax (Frame& frame)
-{
-  frame.declare_string ("tag", Attribute::Const, "\
-Name of column in Daisy log file to filter for.");
-  frame.declare_string ("allowed", Attribute::Const, Attribute::Variable, "\
-List of allowable values in filter.");
-  frame.set_check ("allowed", VCheck::min_size_1 ());
-  frame.order ("tag", "allowed");
-}
+ struct LexerTable::Implementation::Filter
+ {
+   const symbol tag;
+   const std::vector<symbol> allowed;
 
-LexerTable::Implementation::Filter::Filter (const Block& al)
-  : tag (al.name ("tag")),
-    allowed (al.name_sequence ("allowed"))
-{ }
+   bool match (const std::string& value) const
+   {
+     for (size_t i = 0; i < allowed.size (); i++)
+       {
+         if (allowed[i] == value)
+           return true;
+         // Try to pad out our allowed value with spaces...
+         if (value.size () <= allowed[i].name ().size ())
+           continue;
+         const std::string allow
+           = allowed[i] + std::string (value.size () 
+                                       - allowed[i].name ().size (), ' ');
+         daisy_assert (allow.size () == value.size ());
+         if (allow == value)
+           return true;
+       }
+     return false;
+   }
+   static void load_syntax (Frame&);
+   explicit Filter (const Block&);
+ };
 
-int
-LexerTable::Implementation::find_tag (const symbol tag1,
-                                      const symbol tag2) const
-{
-  int tag1_c = find_tag (tag1);
-  int tag2_c = find_tag (tag2);
-  if (tag1_c < 0)
-    return tag2_c;
-  if (tag2_c >= 0)
-    lex->warning ("'" + tag1 + "' overwrites '" + tag2 + "'");
-  return tag1_c;
-}
+ void 
+ LexerTable::Implementation::Filter::load_syntax (Frame& frame)
+ {
+   frame.declare_string ("tag", Attribute::Const, "\
+ Name of column in Daisy log file to filter for.");
+   frame.declare_string ("allowed", Attribute::Const, Attribute::Variable, "\
+ List of allowable values in filter.");
+   frame.set_check ("allowed", VCheck::min_size_1 ());
+   frame.order ("tag", "allowed");
+ }
 
-std::string
-LexerTable::Implementation::get_entry () const
-{
-  std::string tmp_term;  // Data storage.
-  const char* field_term;
+ LexerTable::Implementation::Filter::Filter (const Block& al)
+   : tag (al.name ("tag")),
+     allowed (al.name_sequence ("allowed"))
+ { }
 
-  switch (field_sep.size ())
-    { 
-    case 0:
-      // Whitespace
-      field_term = " \t\n";
-      break;
-    case 1:
-      // Single character field seperator.
-      tmp_term = field_sep + "\n";
-      field_term = tmp_term.c_str ();
-      break;
-    default:
-      // Multi-character field seperator.
-      daisy_notreached ();
-    }
+ int
+ LexerTable::Implementation::find_tag (const symbol tag1,
+                                       const symbol tag2) const
+ {
+   int tag1_c = find_tag (tag1);
+   int tag2_c = find_tag (tag2);
+   if (tag1_c < 0)
+     return tag2_c;
+   if (tag2_c >= 0)
+     lex->warning ("'" + tag1 + "' overwrites '" + tag2 + "'");
+   return tag1_c;
+ }
 
-  // Find it.
-  std::string entry = "";
-  while (lex->good ())
-    {
-      int c = lex->peek ();
-      if (std::strchr (field_term, c))
-	break;
-      entry += int2char (lex->get ());
-    }
-  return entry;
-}
+ std::string
+ LexerTable::Implementation::get_entry () const
+ {
+   std::string tmp_term;  // Data storage.
+   const char* field_term;
 
-void
-LexerTable::Implementation::get_entries_raw (std::vector<std::string>& 
-                                             /**/ entries) const
-{
-  entries.clear ();
-  lex->skip ("\n");
-  while (lex->good () && lex->peek () == '#')
-    {
-      lex->skip_line ();
-      lex->skip ("\n");
-    }
-  while (lex->good ())
-    {
-      entries.push_back (get_entry ());
+   switch (field_sep.size ())
+     { 
+     case 0:
+       // Whitespace
+       field_term = " \t\n";
+       break;
+     case 1:
+       // Single character field seperator.
+       tmp_term = field_sep + "\n";
+       field_term = tmp_term.c_str ();
+       break;
+     default:
+       // Multi-character field seperator.
+       daisy_notreached ();
+     }
 
-      if (lex->peek () == '\n')
-        break;
+   // Find it.
+   std::string entry = "";
+   while (lex->good ())
+     {
+       int c = lex->peek ();
+       if (std::strchr (field_term, c))
+         break;
+       entry += int2char (lex->get ());
+     }
+   return entry;
+ }
 
-      if (field_sep == "")
-	lex->skip_space ();
-      else
-	lex->skip(field_sep.c_str ());
-    }
-}
+ void
+ LexerTable::Implementation::get_entries_raw (std::vector<std::string>& 
+                                              /**/ entries) const
+ {
+   entries.clear ();
+   lex->skip ("\n");
+   while (lex->good () && lex->peek () == '#')
+     {
+       lex->skip_line ();
+       lex->skip ("\n");
+     }
+   while (lex->good ())
+     {
+       entries.push_back (get_entry ());
 
-int
-LexerTable::Implementation::get_date_component (const std::vector<std::string>&
-                                                /**/ entries, 
-                                                const int column, 
-                                                const int default_value) const
-{
-  if (column < 0)
-    return default_value;
-  daisy_assert (column < entries.size ());
-  const char *const str = entries[column].c_str ();
-  const char* end_ptr = str;
-  const long lval = strtol (str, const_cast<char**> (&end_ptr), 10);
-  if (*end_ptr != '\0')
-    error (std::string ("Junk at end of number '") + end_ptr + "'");
-  const int ival = lval;
-  if (ival != lval)
-    error ("Number out of range");
-  return ival;
-}
+       if (lex->peek () == '\n')
+         break;
 
-std::vector<std::string> 
-LexerTable::Implementation::s2s_v (const std::vector<symbol>& syms)
-{
-  std::vector<std::string> result;
-  for (size_t i = 0; i < syms.size (); i++)
-    result.push_back (syms[i].name ());
-  return result;
-}
+       if (field_sep == "")
+         lex->skip_space ();
+       else
+         lex->skip(field_sep.c_str ());
+     }
+ }
 
-LexerTable::Implementation::Implementation (const BlockModel& al)
-  : units (al.units ()),
-    path (al.path ()),
-    filename (al.name ("file")),
-    owned_stream (NULL),
-    lex (NULL),
-    field_sep ("UNINITIALIZED"),
-    type_ ("UNINITIALIZED"),
-    missing (s2s_v (al.name_sequence ("missing"))),
-    filter (map_submodel_const<Filter> (al, "filter")),
-    year_c (-42),
-    month_c (-42),
-    mday_c (-42),
-    hour_c (-42),
-    minute_c (-42),
-    second_c (-42),
-    microsecond_c (-42),
-    time_c (-42),
-    original (al.check ("original")
-              ? al.name_sequence ("original")
-              : std::vector<symbol> ()),
-    dim_line (al.flag ("dim_line", !al.check ("original")))
-{ }
+ int
+ LexerTable::Implementation::get_date_component (const std::vector<std::string>&
+                                                 /**/ entries, 
+                                                 const int column, 
+                                                 const int default_value) const
+ {
+   if (column < 0)
+     return default_value;
+   daisy_assert (column < entries.size ());
+   const char *const str = entries[column].c_str ();
+   const char* end_ptr = str;
+   const long lval = strtol (str, const_cast<char**> (&end_ptr), 10);
+   if (*end_ptr != '\0')
+     error (std::string ("Junk at end of number '") + end_ptr + "'");
+   const int ival = lval;
+   if (ival != lval)
+     error ("Number out of range");
+   return ival;
+ }
 
-bool 
-LexerTable::Implementation::good ()
-{
-  if (!lex.get ())
-    return false;
-  if (lex->good ())
-    return true;
+ std::vector<std::string> 
+ LexerTable::Implementation::s2s_v (const std::vector<symbol>& syms)
+ {
+   std::vector<std::string> result;
+   for (size_t i = 0; i < syms.size (); i++)
+     result.push_back (syms[i].name ());
+   return result;
+ }
 
-  // Close file descriptor after first problem.
-  lex.reset (NULL);
-  return false;
-}
+ LexerTable::Implementation::Implementation (const BlockModel& al)
+   : metalib (al.metalib ()),
+     units (al.units ()),
+     path (al.path ()),
+     filename (al.name ("file")),
+     owned_stream (NULL),
+     lex (NULL),
+     field_sep ("UNINITIALIZED"),
+     type_ ("UNINITIALIZED"),
+     missing (s2s_v (al.name_sequence ("missing"))),
+     filter (map_submodel_const<Filter> (al, "filter")),
+     year_c (-42),
+     month_c (-42),
+     mday_c (-42),
+     hour_c (-42),
+     minute_c (-42),
+     second_c (-42),
+     microsecond_c (-42),
+     time_c (-42),
+     original (al.check ("original")
+               ? al.name_sequence ("original")
+               : std::vector<symbol> ()),
+     dim_line (al.flag ("dim_line", !al.check ("original")))
+ { }
 
-bool 
-LexerTable::good ()
-{ return impl->good (); }
+ bool 
+ LexerTable::Implementation::good ()
+ {
+   if (!lex.get ())
+     return false;
+   if (lex->good ())
+     return true;
 
-bool
-LexerTable::Implementation::read_type (Treelog& msg)
-{
-  owned_stream = path.open_file (filename.name ());
-  lex.reset (new LexerData (filename.name (), *owned_stream, msg));
+   // Close file descriptor after first problem.
+   lex.reset (NULL);
+   return false;
+ }
 
-  // Open errors?
-  if (!lex->good ())
-    return false;
+ bool 
+ LexerTable::good ()
+ { return impl->good (); }
 
-  // Read first line.
-  type_ = lex->get_word ();
-  if (type_ == "dwf-0.0")
-    field_sep = "";
-  else if (type_ == "dlf-0.0")
-    field_sep = "\t";
-  else if (type_ == "ddf-0.0")
-    field_sep = "\t";
-  else
-    {
-      error ("Unknown file type '" + type_ + "'");
-      field_sep = "\t";
-    }
-  lex->skip_line ();
-  lex->next_line ();
-  return true;
-}  
+ bool
+ LexerTable::Implementation::read_type (Treelog& msg)
+ {
+   owned_stream = path.open_file (filename.name ());
+   lex.reset (new LexerData (filename.name (), *owned_stream, msg));
 
-void
-LexerTable::Implementation::read_keywords (Frame& keywords)
-{
-  while (lex->good () && lex->peek () != '-')
-    {
-      lex->skip_space ();
-      if (lex->peek () == '\n')
-        {
-          lex->skip ("\n");
-          continue;
-        }
-      std::string name;
-      while (lex->good () && lex->peek () != ':')
-        name += lex->get ();
-      lex->skip (":");
-      lex->skip_space ();
-      const symbol key (name);
-      const Attribute::type type = keywords.lookup (key);
-      switch (type)
-        {
-        case Attribute::Number:
-          {
-            double val = lex->get_number ();
-            lex->skip_space ();
-            std::string dim;
-            while (lex->good () && lex->peek () != '\n')
-              dim += lex->get ();
-            boost::algorithm::trim (dim);
-            const symbol has_dim (dim);
-            const symbol want_dim = keywords.dimension (key);
+   // Open errors?
+   if (!lex->good ())
+     return false;
 
-            if (units.can_convert (has_dim, want_dim, val))
-              keywords.set (key, units.convert (has_dim, want_dim, val));
-            else
-              {
-                error ("Cannot convert [" 
-                       + has_dim + "] to [" + want_dim + "]");
-              }
-          }
-          break;
-        case Attribute::String:
-          {
-            std::string text = "";
-            if (keywords.is_text (key) && keywords.check (key))
-              text = keywords.name (key) + "\n";
-            while (lex->good () && lex->peek () != '\n')
-              text += lex->get ();
-            keywords.set (key, text);
-          }
-          break;
-        case Attribute::Submodel:
-          {
-            const symbol subname = keywords.submodel_name (key);
-            if (subname != Librarian::submodel_name (Time::load_syntax))
-              {
-                lex->skip_line ();
-                error ("'" + key + "': Unsupported submodel '" + subname + "'");
-                break;
-              }
-            Time time;
-            lex->skip_space ();
-            lex->read_date (time);
-          }
-          break;
-        case Attribute::Error:
-          lex->skip_line ();
-          error ("'" + key + "': Unknown keyword");
-          break;
-        default:
-          lex->skip_line ();
-          error ("'" + key + "': Unsupported type '" 
-                 + Attribute::type_name (type) + "'");
+   // Read first line.
+   type_ = lex->get_word ();
+   if (type_ == "dwf-0.0")
+     field_sep = "";
+   else if (type_ == "dlf-0.0")
+     field_sep = "\t";
+   else if (type_ == "ddf-0.0")
+     field_sep = "\t";
+   else
+     {
+       error ("Unknown file type '" + type_ + "'");
+       field_sep = "\t";
+     }
+   lex->skip_line ();
+   lex->next_line ();
+   return true;
+ }  
+
+ void
+ LexerTable::Implementation::read_keywords (Frame& keywords)
+ {
+   while (lex->good () && lex->peek () != '-')
+     {
+       lex->skip_space ();
+       if (lex->peek () == '\n')
+         {
+           lex->skip ("\n");
+           continue;
+         }
+       std::string name;
+       while (lex->good () && lex->peek () != ':')
+         name += lex->get ();
+       lex->skip (":");
+       lex->skip_space ();
+       const symbol key (name);
+       const Attribute::type type = keywords.lookup (key);
+       const int size = keywords.type_size (key);
+       if (type == Attribute::Error)
+         {
+           lex->skip_line ();
+           error ("'" + key + "': Unknown keyword");
+         }
+       else if (size == Attribute::Singleton)
+         switch (type)
+           {
+           case Attribute::Number:
+             {
+               double val = lex->get_number ();
+               lex->skip_space ();
+               std::string dim;
+               while (lex->good () && lex->peek () != '\n')
+                 dim += lex->get ();
+               boost::algorithm::trim (dim);
+               const symbol has_dim (dim);
+               const symbol want_dim = keywords.dimension (key);
+
+               if (units.can_convert (has_dim, want_dim, val))
+                 keywords.set (key, units.convert (has_dim, want_dim, val));
+               else
+                 {
+                   error ("Cannot convert [" 
+                          + has_dim + "] to [" + want_dim + "]");
+                 }
+             }
+             break;
+           case Attribute::String:
+             {
+               std::string text = "";
+               if (keywords.is_text (key) && keywords.check (key))
+                 text = keywords.name (key) + "\n";
+               while (lex->good () && lex->peek () != '\n')
+                 text += lex->get ();
+               keywords.set (key, text);
+             }
+             break;
+           case Attribute::Submodel:
+             {
+               const symbol subname = keywords.submodel_name (key);
+               if (subname != Librarian::submodel_name (Time::load_syntax))
+                 {
+                   lex->skip_line ();
+                   error ("'" + key + "': Unsupported submodel '" + subname + "'");
+                   break;
+                 }
+               Time time;
+               lex->skip_space ();
+               lex->read_date (time);
+             }
+             break;
+           default:
+             lex->skip_line ();
+             error ("'" + key + "': Unsupported type '" 
+                    + Attribute::type_name (type) + "'");
+           }
+       else
+         switch (type)
+           {
+           case Attribute::Number:
+             {
+               std::vector<double> raw_numbers;
+               do 
+                 {
+                   raw_numbers.push_back (lex->get_number ());
+                   lex->skip_space ();
+                 }
+               while (lex->good () && strchr ("0123456789.-", lex->peek ()));
+
+               std::string dim;
+               while (lex->good () && lex->peek () != '\n')
+                 dim += lex->get ();
+               boost::algorithm::trim (dim);
+               const symbol has_dim (dim);
+               const symbol want_dim = keywords.dimension (key);
+
+               std::vector<double> numbers;
+               for (size_t i = 0; i < raw_numbers.size (); i++)
+                 {
+                   double val = raw_numbers[i];
+                   if (units.can_convert (has_dim, want_dim, val))
+                     val = units.convert (has_dim, want_dim, val);
+                   else
+                     error ("Cannot convert [" + has_dim
+                            + "] to [" + want_dim + "]");
+                   numbers.push_back (val);
+                 }
+               keywords.set (key, numbers);
+             }
+             break;
+           default:
+             lex->skip_line ();
+             error ("'" + key + "': Unsupported type '" 
+                    + Attribute::type_name (type) + "'");
+           }
+       if (keywords.check (key))
+         {
+           TreelogString msg;
+           if (!keywords.check (metalib, key, msg))
+            lex->error ("'" + key + "': bad value: " + msg.str ());
         }
       lex->next_line ();
     }

@@ -41,7 +41,7 @@ namespace Attribute
   // A attribute entry has an associated size.  If the size is a positive
   // integer, the attribute entry specifies an array of that size.  The
   // default size 'Singleton' indicating that the attribute entry match a
-  // single item of the specified type, while the 'Sequence' used for
+  // single item of the specified type, while the 'Variable' used for
   // entries that contain an array of unspecified length. 
   const int Singleton = -117;	
   const int Variable = -3210;

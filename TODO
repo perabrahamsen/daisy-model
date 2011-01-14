@@ -2,7 +2,54 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Små tidsskridt i vejr
 
+** Hvad var ideen med "end_" egentlig?  Hvad med meta_?
+
 ** PrecipCorrect
+
+#if 0
+  // Convertions.
+public:
+  double corrected_precipitation () const;
+  double end_corrected_precipitation () const;
+ 
+double 
+WSource::corrected_precipitation () const
+{
+  daisy_assert (check (Weatherdata::Precip ()));
+  const double P = number (Weatherdata::Precip ());
+  if (!check (Weatherdata::PrecipCorrect ()))
+    return P;
+
+  const std::vector<double>& pc 
+    = number_sequence (Weatherdata::PrecipCorrect ());
+
+  if (pc.size () == 1)
+    return P * pc[0];
+
+  daisy_assert (pc.size () == 12);
+  const int month = begin ().month () - 1;
+  return P  * pc[month];
+}
+
+double 
+WSource::end_corrected_precipitation () const
+{
+  daisy_assert (check (Weatherdata::Precip ()));
+  const double P = end_number (Weatherdata::Precip ());
+  if (!check (Weatherdata::PrecipCorrect ()))
+    return P;
+
+  const std::vector<double>& pc 
+    = end_number_sequence (Weatherdata::PrecipCorrect ());
+
+  if (pc.size () == 1)
+    return P * pc[0];
+
+  daisy_assert (pc.size () == 12);
+  const int month = end ().month () - 1;
+  return P  * pc[month];
+}
+#endif
 
 ** Weather source
 

@@ -24,6 +24,7 @@
 #include "model.h"
 #include "scope.h"
 #include "symbol.h"
+#include <vector>
 
 class BlockModel;
 class Time;
@@ -49,6 +50,10 @@ public:
   virtual double end_number (symbol key) const = 0;
   virtual symbol end_name (symbol key) const = 0;
 
+  // Number sequences.
+  virtual const std::vector<double>& number_sequence (symbol) const = 0;
+  virtual const std::vector<double>& end_number_sequence (symbol) const = 0;
+
   // Meta information.
 public:  
   virtual double meta_timestep (symbol key) const = 0;
@@ -58,7 +63,7 @@ public:
   virtual bool meta_end_check (symbol key, symbol meta) const = 0;
   virtual double meta_end_number (symbol key, symbol meta) const = 0;
   virtual symbol meta_end_name (symbol key, symbol meta) const = 0; 
- 
+
   // Simulation.
 public:
   virtual void tick (Treelog& msg) = 0;

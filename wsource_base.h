@@ -45,6 +45,8 @@ public:
 public:
   const Time& begin () const;
   const Time& end () const;
+  const std::vector<double>& number_sequence (symbol) const;
+  const std::vector<double>& end_number_sequence (symbol) const;
   double meta_timestep (symbol key) const;
   bool meta_check (symbol key, symbol meta) const;
   double meta_number (symbol key, symbol meta) const;

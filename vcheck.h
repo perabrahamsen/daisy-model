@@ -90,6 +90,7 @@ public:
   // Sequence.
 public:
   static const VCheck& unique ();
+  class MultiSize;
 
   // Logic.
 public:
@@ -306,6 +307,21 @@ private:
   // Create and Destroy.
 public:
   InLibrary (const symbol lib);
+};
+
+class VCheck::MultiSize : public VCheck
+{
+  // Parameters.
+private:
+  std::set<size_t> sizes;
+
+  // Use.
+private:
+  bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
+
+  // Create and Destroy.
+public:
+  MultiSize (size_t a, size_t b);
 };
 
 class VCheck::All : public VCheck

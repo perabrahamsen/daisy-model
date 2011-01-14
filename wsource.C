@@ -21,7 +21,10 @@
 #define BUILD_DLL
 
 #include "wsource.h"
+#include "weatherdata.h"
+#include "time.h"
 #include "librarian.h"
+#include "assertion.h"
 
 const char *const WSource::component = "wsource";
 

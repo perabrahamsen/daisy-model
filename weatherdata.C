@@ -354,9 +354,13 @@ Either 'reference' for a weather station standard of short grass,\n\
 or 'field' for measurements directly at the field.");
     static VCheck::Enum surfaces (reference_name (), field_name ());
     frame.set_check (Surface (), surfaces);
-    frame.declare (PrecipCorrect (),
-                   Attribute::None (), Attribute::OptionalConst, 12, "\
-Monthly correction factors for precipitation.");
+    frame.declare (PrecipCorrect (), Attribute::None (), 
+                   Attribute::OptionalConst, Attribute::Variable, "\
+Correction factors for precipitation.\n\
+Can contain one or twelve numbers, in the later case the numbers\n\
+corresponds to months.");
+    VCheck::MultiSize multi (1, 12);
+    frame.set_check (PrecipCorrect (), multi);
     frame.declare_submodule (Begin (), Attribute::OptionalConst, "\
 Beginning of weather data.", Time::load_syntax);
     frame.declare_submodule (End (), Attribute::OptionalConst, "\
