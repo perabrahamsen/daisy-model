@@ -923,7 +923,7 @@ VCheck::MultiSize::verify (const Metalib&, const Frame& frame,
         tmp << ", ";
       tmp << *i;
     }
-  tmp << "} elements";
+  tmp << " } elements";
   msg.error (tmp.str ());
   return false;
 }

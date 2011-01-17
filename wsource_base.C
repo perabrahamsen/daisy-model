@@ -100,12 +100,16 @@ WSourceBase::lookup (const symbol key) const
 
 symbol 
 WSourceBase::dimension (const symbol key) const
-{ return Weatherdata::dimension (key); }
+{ return impl->dimension (key); }
 
 symbol 
 WSourceBase::description (const symbol key) const
-{ return Weatherdata::description (key); }
+{ return impl->description (key); }
   
+int 
+WSourceBase::type_size (const symbol key) const
+{ return impl->type_size (key); }
+
 bool 
 WSourceBase::check (const symbol key) const
 { return impl->check (key); }

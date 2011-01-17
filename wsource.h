@@ -38,6 +38,10 @@ public:
   static const char *const component;
   symbol library_id () const;
 
+  // Source.
+public:
+  int type_size (symbol tag) const = 0; // Don't use default from Scope.
+
   // Timestep.
 public:
   virtual const Time& begin () const = 0;         // Start of timestep.

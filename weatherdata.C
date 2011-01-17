@@ -359,7 +359,7 @@ or 'field' for measurements directly at the field.");
 Correction factors for precipitation.\n\
 Can contain one or twelve numbers, in the later case the numbers\n\
 corresponds to months.");
-    VCheck::MultiSize multi (1, 12);
+    static VCheck::MultiSize multi (1, 12);
     frame.set_check (PrecipCorrect (), multi);
     frame.declare_submodule (Begin (), Attribute::OptionalConst, "\
 Beginning of weather data.", Time::load_syntax);

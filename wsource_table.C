@@ -47,8 +47,13 @@ struct WSourceTable : public WSourceBase
   Time timestep_end;
   double timestep_hours;
 
+  // Precipitaion correction.
+  double precip_correct (const Time&) const;
+  double precip_correct (const Time&, const std::vector<double>&) const;
+
   // Scope.
   bool check (const symbol key) const;
+  double raw_number (const symbol key) const;
   double number (const symbol key) const;
   symbol name (const symbol key) const;
 
@@ -57,6 +62,7 @@ struct WSourceTable : public WSourceBase
   const Time& end () const;
   double timestep () const;
   bool end_check (const symbol key) const;
+  double raw_end_number (const symbol key) const;
   double end_number (const symbol key) const;
   symbol end_name (const symbol key) const;
   void read_line ();
@@ -81,6 +87,37 @@ struct WSourceTable : public WSourceBase
   { }
 };
 
+double 
+WSourceTable::precip_correct (const Time& time) const
+{
+  const symbol key = Weatherdata::PrecipCorrect ();
+
+  // Attribute.
+  if (super::check (key))
+    return precip_correct (time, super::number_sequence (key)); 
+
+  // Keyword.
+  if (keywords.check (key))
+    return precip_correct (time, keywords.number_sequence (key));
+
+  // No correction.
+  return 1.0;
+}
+
+double 
+WSourceTable::precip_correct (const Time& time,
+                              const std::vector<double>& numbers) const
+{
+  if (numbers.size () == 1)
+    // One factor for all months.
+    return numbers[0];
+  
+  // Monthly correction factors.
+  daisy_assert (numbers.size () == 12);
+
+  return numbers[time.month () - 1];
+}
+
 bool 
 WSourceTable::check (const symbol key) const
 { 
@@ -102,7 +139,7 @@ WSourceTable::check (const symbol key) const
 }
 
 double 
-WSourceTable::number (const symbol key) const
+WSourceTable::raw_number (const symbol key) const
 { 
   // Table.
   if (ok)
@@ -118,6 +155,17 @@ WSourceTable::number (const symbol key) const
 
   // Keyword.
   return keywords.number (key);
+}
+
+double 
+WSourceTable::number (const symbol key) const
+{ 
+  const double raw = raw_number (key);
+
+  if (key == Weatherdata::Precip ())
+    return raw * precip_correct (timestep_begin);
+
+  return raw;
 }
 
 symbol
@@ -158,7 +206,7 @@ WSourceTable::end_check (const symbol key) const
 }
 
 double 
-WSourceTable::end_number (const symbol key) const
+WSourceTable::raw_end_number (const symbol key) const
 {
   // Table.
   if (ok)
@@ -174,6 +222,17 @@ WSourceTable::end_number (const symbol key) const
 
   // Keyword.
   return keywords.number (key);
+}
+
+double 
+WSourceTable::end_number (const symbol key) const
+{ 
+  const double raw = raw_end_number (key);
+
+  if (key == Weatherdata::Precip ())
+    return raw * precip_correct (timestep_end);
+
+  return raw;
 }
 
 symbol 
