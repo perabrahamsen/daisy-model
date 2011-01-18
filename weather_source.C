@@ -48,8 +48,18 @@ struct WeatherSource : public Weather
   boost::scoped_ptr<WSource> source;
   const PLF snow_fraction;
 
-  /* const */ IM DryDeposit;
-  /* const */ IM WetDeposit;
+  double NH4WetDep;
+  double NH4DryDep;
+  double NO3WetDep;
+  double NO3DryDep;
+  double Deposition;
+  double DepDry;
+  double DepDryNH4;
+  double DepWetNH4;
+  double PAverage;
+  IM DryDeposit;
+  IM WetDeposit;
+  static bool unchanged (double a, double b);
   bool reset_deposition (Treelog& msg);
 
   // Data.
@@ -416,41 +426,65 @@ WeatherSource::extract_cloudiness (double& variable) const
     variable = value;
 }
 
+bool 
+WeatherSource::unchanged (const double a, const double b)
+{
+  if (std::isnormal (a) && std::isnormal (b))
+    return approximate (a, b);
+  
+  return std::isfinite (a) == std::isfinite (b);
+}
+
 bool
 WeatherSource::reset_deposition (Treelog& msg)
 {
   Treelog::Open next (msg, __FUNCTION__);
   bool ok = true;
   
-  const size_t data_size = when.size ();
+  // Normal deposition.
+  const double new_NH4WetDep = number_average (Weatherdata::NH4WetDep ());
+  const double new_NH4DryDep = number_average (Weatherdata::NH4DryDep ());
+  const double new_NO3WetDep = number_average (Weatherdata::NO3WetDep ());
+  const double new_NO3DryDep = number_average (Weatherdata::NO3DryDep ());
 
-  if (data_size == 0)
-    {
-      msg.error ("No data");
-      return false;
-    }
-  int i = 0;
-  while (i < data_size && when[i] <= previous)
-    i++;
+  // Alternative way of specifying deposition.
+  const double new_Deposition = number_average (Weatherdata::Deposition ());
+  const double new_DepDry = number_average (Weatherdata::DepDry ());
+  const double new_DepDryNH4 = number_average (Weatherdata::DepDryNH4 ());
+  const double new_DepWetNH4 = number_average (Weatherdata::DepWetNH4 ());
+  const double new_PAverage = number_average (Weatherdata::PAverage ());
   
-  if (i == data_size)
-    {
-      std::ostringstream tmp;
-      tmp << "Last data " << when.back ().print () 
-          << " before start of timestep "
-          << previous.print ();
-      msg.error (tmp.str ());
-      return false;
-    }
+  // No changes.
+  if (unchanged (new_NH4WetDep, NH4WetDep)
+      && unchanged (new_NH4DryDep, NH4DryDep)
+      && unchanged (new_NO3WetDep, NO3WetDep)
+      && unchanged (new_NO3DryDep, NO3DryDep)
+      && unchanged (new_Deposition, Deposition)
+      && unchanged (new_DepDry, DepDry)
+      && unchanged (new_DepDryNH4, DepDryNH4)
+      && unchanged (new_DepWetNH4, DepWetNH4)
+      && unchanged (new_PAverage, PAverage))
+    return ok;
 
-  struct Deposition
+  // New values.
+  NH4WetDep = new_NH4WetDep;
+  NH4DryDep = new_NH4DryDep;
+  NO3WetDep = new_NO3WetDep;
+  NO3DryDep = new_NO3DryDep;
+  Deposition = new_Deposition;
+  DepDry = new_DepDry;
+  DepDryNH4 = new_DepDryNH4;
+  DepWetNH4 = new_DepWetNH4;
+  PAverage = new_PAverage;
+
+  struct DepositionData
   {
     double total;
     double dry;
     double dry_NH4;
     double wet_NH4;
     double precipitation;
-    Deposition ()
+    DepositionData ()
       : total (-42.42e42),
         dry (0.4),
         dry_NH4 (0.6),
@@ -459,18 +493,6 @@ WeatherSource::reset_deposition (Treelog& msg)
     { }
   } deposition;
 
-  // Normal deposition.
-  const double NH4WetDep = numbers[Weatherdata::NH4WetDep ()][i];
-  const double NH4DryDep = numbers[Weatherdata::NH4DryDep ()][i];
-  const double NO3WetDep = numbers[Weatherdata::NO3WetDep ()][i];
-  const double NO3DryDep = numbers[Weatherdata::NO3DryDep ()][i];
-
-  // Alternative way of specifying deposition.
-  const double Deposition = numbers[Weatherdata::Deposition ()][i];
-  const double DepDry = numbers[Weatherdata::DepDry ()][i];
-  const double DepDryNH4 = numbers[Weatherdata::DepDryNH4 ()][i];
-  const double DepWetNH4 = numbers[Weatherdata::DepWetNH4 ()][i];
-  const double PAverage = numbers[Weatherdata::PAverage ()][i];
 
   const Unit& u_ppm = units.get_unit (Units::ppm ());
   const Unit& u_dpu = units.get_unit (Weather::dry_deposit_unit ());
@@ -516,6 +538,13 @@ WeatherSource::reset_deposition (Treelog& msg)
   if (dep2_has_any && !dep2_has_all)
     dep_ok = false;
 
+  if (dep1_has_all && dep2_has_any)
+    dep_ok = false;
+  if (dep2_has_all && dep1_has_any)
+    dep_ok = false;
+  if (!dep1_has_all && !dep2_has_all)
+    dep_ok = false;
+
   if (!dep_ok)
     {
       msg.error ("\
@@ -525,10 +554,10 @@ but not both");
       ok = false;
     }
   else if (dep1_has_all)
-    daisy_assert (!dep2_has_any);
+    /* Already handled */;
   else
     {
-      daisy_assert (!dep1_has_any);
+      daisy_assert (dep2_has_all);
       const double dry = deposition.total * deposition.dry;
       const double wet = deposition.total * (1.0 - deposition.dry);
       daisy_assert (approximate (dry + wet, deposition.total));
@@ -905,6 +934,9 @@ WeatherSource::tick (const Time& time, Treelog& msg)
     msg.warning ("Precipitation missing, reusing old");
 
   // Deposition.
+  if (!reset_deposition (msg))
+    throw "Bad deposition data";
+
   const Unit& u_flux = units.get_unit (IM::flux_unit ());
   const Unit& u_solute = units.get_unit (IM::solute_unit ());
   const Unit& u_precip = units.get_unit (Units::mm_per_h ());
@@ -1042,6 +1074,15 @@ WeatherSource::WeatherSource (const BlockModel& al)
     units (al.units ()),
     source (Librarian::build_item<WSource> (al, "source")),
     snow_fraction (al.plf ("snow_fraction")),
+    NH4WetDep (NAN),
+    NH4DryDep (NAN),
+    NO3WetDep (NAN),
+    NO3DryDep (NAN),
+    Deposition (NAN),
+    DepDry (NAN),
+    DepDryNH4 (NAN),
+    DepWetNH4 (NAN),
+    PAverage (NAN),
     DryDeposit (units.get_unit (dry_deposit_unit ())),
     WetDeposit (units.get_unit (Units::ppm ())),
     my_deposit (al, "deposit")    // For the units...
