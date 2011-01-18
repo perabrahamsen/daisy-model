@@ -60,7 +60,7 @@ struct WeatherSource : public Weather
   IM DryDeposit;
   IM WetDeposit;
   static bool unchanged (double a, double b);
-  bool reset_deposition (Treelog& msg);
+  void reset_deposition (Treelog& msg);
 
   // Data.
   typedef std::map<symbol, std::deque<double>/**/> number_map_t;
@@ -196,17 +196,25 @@ public:
   double T_normal (const Time& time, double delay) const;
 
   double average_temperature () const
-  { return my_Taverage; }
+  { 
+    if (initialized_ok)
+      return my_Taverage; 
+
+    // Used by initialization.
+    return 10.0;
+  }
 
   // Simulation.
   Time previous;
   Time next;
   double suggest_dt () const;   // [h]
   void tick (const Time& time, Treelog&);
+  void check_state (Treelog& msg);
   void output (Log& log) const
   { output_common (log); }
     
   // Create and Destroy.
+  bool initialized_ok;
   bool initialize (const Time& time, Treelog& msg);
   bool check (const Time& from, const Time& to, Treelog&) const;
   WeatherSource (const BlockModel&);
@@ -277,7 +285,7 @@ WeatherSource::number_average (const Time& from, const Time& to,
   switch (data_size)
     {
     case 0:
-      daisy_panic ("No weather data");
+      throw "No weather data";
     case 1:
       return values[0];
     }
@@ -435,12 +443,11 @@ WeatherSource::unchanged (const double a, const double b)
   return std::isfinite (a) == std::isfinite (b);
 }
 
-bool
+void
 WeatherSource::reset_deposition (Treelog& msg)
 {
   Treelog::Open next (msg, __FUNCTION__);
-  bool ok = true;
-  
+
   // Normal deposition.
   const double new_NH4WetDep = number_average (Weatherdata::NH4WetDep ());
   const double new_NH4DryDep = number_average (Weatherdata::NH4DryDep ());
@@ -464,7 +471,7 @@ WeatherSource::reset_deposition (Treelog& msg)
       && unchanged (new_DepDryNH4, DepDryNH4)
       && unchanged (new_DepWetNH4, DepWetNH4)
       && unchanged (new_PAverage, PAverage))
-    return ok;
+    return;
 
   // New values.
   NH4WetDep = new_NH4WetDep;
@@ -551,7 +558,7 @@ WeatherSource::reset_deposition (Treelog& msg)
 You must specify either all of 'NH4WetDep', 'NO3WetDep', 'NH4DryDep',\n\
 and 'NO3DryDep'; or alternatively all of 'Deposition' and 'PAverage',\n\
 but not both");
-      ok = false;
+      initialized_ok = false;
     }
   else if (dep1_has_all)
     /* Already handled */;
@@ -580,8 +587,6 @@ NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (), u_dpu)
           << " kgN/ha/year";
       msg.debug (tmp.str ());
     }
-
-  return ok;
 }
 
 symbol
@@ -616,6 +621,10 @@ WeatherSource::name_first (const symbol key) const
 double
 WeatherSource::T_normal (const Time& time, double delay) const
 {
+  if (!std::isnormal (my_Taverage) || !std::isnormal (my_Tamplitude))
+    // used by initialization.
+    return 10.0;
+
   const double displacement = time.year_fraction () - my_maxTday / 365.0;
   
   daisy_assert (delay <= 0);
@@ -671,13 +680,6 @@ WeatherSource::tick (const Time& time, Treelog& msg)
   Time last = when.size () > 0 ? when.back () : source->begin ();
   for (;!source->done () && last < next_day; source->tick (msg))
     {
-      if (false)
-        {
-          std::ostringstream tmp;
-          tmp << "Source: " << source->begin ().print () << " - " 
-              << source->end ().print ();
-          msg.message (tmp.str ());
-        }
       daisy_assert (last == source->begin ());
       when.push_back (source->end ());
       last = when.back ();
@@ -745,6 +747,7 @@ WeatherSource::tick (const Time& time, Treelog& msg)
   if (when.size () < 1)
     {
       // No data, use old values.
+      check_state (msg);
       return;
     }
   
@@ -934,9 +937,7 @@ WeatherSource::tick (const Time& time, Treelog& msg)
     msg.warning ("Precipitation missing, reusing old");
 
   // Deposition.
-  if (!reset_deposition (msg))
-    throw "Bad deposition data";
-
+  reset_deposition (msg);
   const Unit& u_flux = units.get_unit (IM::flux_unit ());
   const Unit& u_solute = units.get_unit (IM::solute_unit ());
   const Unit& u_precip = units.get_unit (Units::mm_per_h ());
@@ -947,6 +948,9 @@ WeatherSource::tick (const Time& time, Treelog& msg)
 
   // Cloudiness.
   extract_cloudiness (my_cloudiness);
+
+  // Got everything?
+  check_state (msg);
 
   // Only do this at a new day.
   if (!new_day)
@@ -982,11 +986,37 @@ WeatherSource::tick (const Time& time, Treelog& msg)
     msg.warning ("No more weather data, last value");
 }
 
+void
+WeatherSource::check_state (Treelog& msg)
+{
+  if (!std::isfinite (my_latitude)
+      || !std::isfinite (my_longitude)
+      || !std::isfinite (my_elevation)
+      || !std::isfinite (my_timezone)
+      || !std::isfinite (my_screenheight)
+      || !std::isfinite (my_Taverage)
+      || !std::isfinite (my_Tamplitude)
+      || !std::isfinite (my_maxTday)
+      || !std::isfinite (my_global_radiation)
+      || !std::isfinite (my_air_temperature)
+      || !std::isfinite (my_rain)
+      || !std::isfinite (my_snow)
+      || !std::isfinite (my_cloudiness)
+      || !std::isfinite (my_day_length)
+      || !std::isfinite (my_sunrise)
+      || !std::isfinite (my_daily_air_temperature)
+      || !std::isfinite (my_daily_global_radiation)
+      || !std::isfinite (my_daily_precipitation))
+    {
+      msg.error ("Insufficient weather data");
+      initialized_ok = false;
+    }
+}
+
 bool 
 WeatherSource::initialize (const Time& time, Treelog& msg)
 {
   TREELOG_MODEL (msg);
-
   bool ok = true;
 
   // Source.
@@ -1027,20 +1057,24 @@ WeatherSource::initialize (const Time& time, Treelog& msg)
   previous.tick_day (-1);
   next = previous;
   next.tick_hour (1);
-  tick (time, msg);
 
-  // Deposition.
-  if (!reset_deposition (msg))
-    ok = false;
+  if (ok)
+    initialized_ok = true;
+  try
+    { tick (time, msg); }
+  catch (...)
+    { initialized_ok = false; }
 
-  return ok;
+  return true;
 }
 
 bool 
 WeatherSource::check (const Time& from, const Time& to, Treelog& msg) const
 {
-  bool ok = true;
+  bool ok = initialized_ok;
+  TREELOG_MODEL (msg);
 
+  // Required parameters.
   static struct required_t : public std::vector<symbol>
   {
     required_t ()
@@ -1065,6 +1099,30 @@ WeatherSource::check (const Time& from, const Time& to, Treelog& msg) const
       msg.error ("Required weather data '" + required[i] + "' missing");
     }
 
+  // Check interval.
+  const Time& data_begin = source->data_begin ();
+  const Time& data_end = source->data_end ();
+  if ((data_begin != Time::null () && from < data_begin)
+      || (data_end != Time::null () && to > data_end))
+    {
+      ok = false;
+      std::ostringstream tmp;
+      tmp << "Simulation period from " << from.print () 
+          << " to " << to.print () 
+          << " is not covered by weather data from ";
+      if (data_begin != Time::null ())
+        tmp << data_begin.print ();
+      else 
+        tmp << "unknown";
+      tmp << " to ";
+      if (data_end != Time::null ())
+        tmp << data_end.print ();
+      else 
+        tmp << "unknown";
+        
+      msg.error (tmp.str ());
+    }
+
   // TODO: More checks.
   return ok;
 }
@@ -1085,7 +1143,33 @@ WeatherSource::WeatherSource (const BlockModel& al)
     PAverage (NAN),
     DryDeposit (units.get_unit (dry_deposit_unit ())),
     WetDeposit (units.get_unit (Units::ppm ())),
-    my_deposit (al, "deposit")    // For the units...
+    my_latitude (NAN),
+    my_longitude (NAN),
+    my_elevation (NAN),
+    my_timezone (NAN),
+    my_screenheight (NAN),
+    my_Taverage (NAN),
+    my_Tamplitude (NAN),
+    my_maxTday (NAN),
+    my_global_radiation (NAN),
+    my_diffuse_radiation (NAN),
+    my_reference_evapotranspiration (NAN),
+    my_wind (NAN),
+    my_air_temperature (NAN),
+    my_vapor_pressure (NAN),
+    my_rain (NAN),
+    my_snow (NAN),
+    my_deposit (al, "deposit"),    // For the units...
+    my_cloudiness (NAN),
+    my_day_length (NAN),
+    my_sunrise (NAN),
+    my_has_min_max_temperature (NAN),
+    my_daily_min_air_temperature (NAN),
+    my_daily_max_air_temperature (NAN),
+    my_daily_air_temperature (NAN),
+    my_daily_global_radiation (NAN),
+    my_daily_precipitation (NAN),
+    initialized_ok (false)
 { }
 
 WeatherSource::~WeatherSource ()

@@ -190,9 +190,7 @@ struct Daisy::Implementation
 
     // Check weather.
     {
-      Treelog::Open nest (msg, "weather");
-      if (weather.get () && !weather->check (time,
-                                                         stop, msg))
+      if (weather.get () && !weather->check (time, stop, msg))
         return false;
     }
 

@@ -44,6 +44,8 @@ public:
 
   // Timestep.
 public:
+  virtual const Time& data_begin () const = 0; // Start of first timestep.
+  virtual const Time& data_end () const = 0;   // End of last timestep.
   virtual const Time& begin () const = 0;         // Start of timestep.
   virtual const Time& end () const = 0;           // End of timestep.
   virtual double timestep () const = 0;           // Length of timetstep [h]

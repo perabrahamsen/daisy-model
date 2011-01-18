@@ -381,6 +381,7 @@
                Time time;
                lex->skip_space ();
                lex->read_date (time);
+               time.set_time (keywords, key);
              }
              break;
            default:

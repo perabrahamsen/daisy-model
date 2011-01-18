@@ -43,6 +43,8 @@ struct WSourceTable : public WSourceBase
   std::map<symbol, size_t> columns;
   std::map<symbol, double> values;
   std::map<symbol, double> next_values;
+  Time my_data_begin;
+  Time my_data_end;
   Time timestep_begin;
   Time timestep_end;
   double timestep_hours;
@@ -58,6 +60,8 @@ struct WSourceTable : public WSourceBase
   symbol name (const symbol key) const;
 
   // WSource.
+  const Time& data_begin () const;
+  const Time& data_end () const;
   const Time& begin () const;
   const Time& end () const;
   double timestep () const;
@@ -80,6 +84,8 @@ struct WSourceTable : public WSourceBase
       ok (false),
       keywords (*Librarian::submodel_frame (Weatherdata::load_syntax), 
                 Frame::parent_link),
+      my_data_begin (Time::null ()),
+      my_data_end (Time::null ()),
       timestep_begin (Time::null ()),
       timestep_end (Time::null ())
   { }
@@ -240,12 +246,20 @@ WSourceTable::end_name (const symbol key) const
 { return name (key); }
 
 const Time& 
+WSourceTable::data_begin () const
+{ return my_data_begin; }
+
+const Time& 
+WSourceTable::data_end () const
+{ return my_data_end; }
+
+const Time& 
 WSourceTable::begin () const
 { 
   if (ok)
     return timestep_begin;
   
-  return super::begin ();
+  return data_begin ();
 }
 
 const Time& 
@@ -254,7 +268,7 @@ WSourceTable::end () const
   if (ok)
     return timestep_end;
   
-  return super::end ();
+  return data_end ();
 }
 
 void 
@@ -352,6 +366,19 @@ WSourceTable::initialize (Treelog& msg)
         }
       columns[tag] = i;
     }
+
+  // Data time.
+  const Time& super_end = super::data_end ();
+  if (super_end == Time::null () && keywords.check (Weatherdata::End ()))
+    my_data_end = Time (keywords.submodel (Weatherdata::End ()));
+  else
+    my_data_end = super_end;
+
+  const Time& super_begin = super::data_begin ();
+  if (super_begin == Time::null () && keywords.check (Weatherdata::Begin ()))
+    my_data_begin = Time (keywords.submodel (Weatherdata::Begin ()));
+  else
+    my_data_begin = super_begin;
   
   // Read first data.
   read_line ();

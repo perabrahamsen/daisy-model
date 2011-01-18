@@ -44,6 +44,8 @@ public:
 
   // WSource interface.
 public:
+  const Time& data_begin () const; // Start of first timestep.
+  const Time& data_end () const;   // End of last timestep.
   const Time& begin () const;
   const Time& end () const;
   const std::vector<double>& number_sequence (symbol) const;

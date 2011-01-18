@@ -123,6 +123,22 @@ WSourceBase::name (const symbol key) const
 { return impl->name (key); }
 
 const Time& 
+WSourceBase::data_begin () const
+{ 
+  if (impl->begin.get ())
+    return *impl->begin;
+  return Time::null (); 
+}
+
+const Time& 
+WSourceBase::data_end () const
+{ 
+  if (impl->end.get ())
+    return *impl->end;
+  return Time::null (); 
+}
+
+const Time& 
 WSourceBase::begin () const
 { 
   if (impl->begin.get ())
