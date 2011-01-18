@@ -308,9 +308,27 @@ WSourceTable::read_line ()
                                  dimension (key),
                                  old_val))
             {
-              next_values[key] = units.convert (lex.dimension (col),
-                                                dimension (key),
-                                                old_val);
+              const double value = units.convert (lex.dimension (col),
+                                                  dimension (key),
+                                                  old_val);
+              next_values[key] = value;
+              if (value < Weatherdata::min_value (key))
+                {
+                  std::ostringstream tmp;
+                  tmp << "Value for '" << key << "' is " << value
+                      << ", expected it to be more than "
+                      << Weatherdata::min_value (key);
+                  lex.warning (tmp.str ());
+                }
+              if (value > Weatherdata::max_value (key))
+                {
+                  std::ostringstream tmp;
+                  tmp << "Value for '" << key << "' is " << value
+                      << ", expected it to be less than "
+                      << Weatherdata::max_value (key);
+                  lex.warning (tmp.str ());
+                }
+              
             }
           else
             {
