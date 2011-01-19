@@ -328,7 +328,6 @@ WSourceTable::read_line ()
                       << Weatherdata::max_value (key);
                   lex.warning (tmp.str ());
                 }
-              
             }
           else
             {

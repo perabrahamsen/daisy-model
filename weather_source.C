@@ -118,14 +118,16 @@ struct WeatherSource : public Weather
   double my_daily_precipitation;       // [mm/d]
 
   // Extract weather.
+  static double safe_value (const double value, const double reserve)
+  { return std::isfinite (value) ? value: reserve; }
   double latitude () const
-  { return my_latitude; }
+  { return safe_value (my_latitude, 56.0); }
   double longitude () const
-  { return my_longitude; }
+  { return safe_value (my_longitude, 12.0); }
   double elevation () const
   { return my_elevation; }
   double timezone () const
-  { return my_timezone; }
+  { return safe_value (my_timezone, 15.0); }
   double screen_height () const
   { return my_screenheight; }
   Weatherdata::surface_t surface () const
@@ -159,7 +161,9 @@ struct WeatherSource : public Weather
   double vapor_pressure () const
   { return has_vapor_pressure () 
       ? my_vapor_pressure 
-      : FAO::SaturationVapourPressure (my_daily_min_air_temperature); }
+      : has_min_max_temperature ()
+      ? FAO::SaturationVapourPressure (daily_min_air_temperature ())
+      : FAO::SaturationVapourPressure (daily_air_temperature () - 5.0); }
   double wind () const
   { return has_wind () ? my_wind : 5.0; }
   double CO2 () const
@@ -209,6 +213,7 @@ public:
   Time next;
   double suggest_dt () const;   // [h]
   void tick (const Time& time, Treelog&);
+  void check_state (const symbol key, const double value, Treelog& msg);
   void check_state (Treelog& msg);
   void output (Log& log) const
   { output_common (log); }
@@ -650,6 +655,7 @@ WeatherSource::suggest_dt () const // [h]
 void 
 WeatherSource::tick (const Time& time, Treelog& msg)
 {
+  TREELOG_MODEL (msg);
   daisy_assert (time > previous);
 
   // Update time interval
@@ -673,6 +679,7 @@ WeatherSource::tick (const Time& time, Treelog& msg)
   const double day_cycle 
     = 0.5 * (relative_extraterestial_radiation (previous)
              + relative_extraterestial_radiation (next));
+  daisy_assert (std::isfinite (day_cycle));
 
   // Push back.
   Time next_day (next.year (), next.month (), next.mday (), 0);
@@ -786,12 +793,12 @@ WeatherSource::tick (const Time& time, Treelog& msg)
       const std::deque<double>& values_avg = eAvg->second;
       daisy_assert (values_avg.size () == data_size);
       const number_map_t::const_iterator eMin 
-        = numbers.find (Weatherdata::AirTemp ());
+        = numbers.find (Weatherdata::T_min ());
       daisy_assert (eMin != numbers.end ());
       const std::deque<double>& values_min = eMin->second;
       daisy_assert (values_min.size () == data_size);
       const number_map_t::const_iterator eMax 
-        = numbers.find (Weatherdata::AirTemp ());
+        = numbers.find (Weatherdata::T_max ());
       daisy_assert (eMax != numbers.end ());
       const std::deque<double>& values_max = eMax->second;
       daisy_assert (values_max.size () == data_size);
@@ -835,11 +842,14 @@ WeatherSource::tick (const Time& time, Treelog& msg)
         }
 
       // Use it.
-      if (std::isfinite (my_daily_min_air_temperature))
+      if (!std::isfinite (my_daily_min_air_temperature))
         my_daily_min_air_temperature = new_min;
-      if (std::isfinite (my_daily_max_air_temperature))
+      if (!std::isfinite (my_daily_max_air_temperature))
         my_daily_max_air_temperature = new_max;
-      my_has_min_max_temperature = (new_min < new_max || (has_min && has_max));
+      double T_step = max_timestep (day_start, day_end, 
+                                    Weatherdata::AirTemp ());
+      my_has_min_max_temperature = ((has_min && has_max) 
+                                    || T_step < long_timestep);
 
       const double new_T = number_average (day_start, day_end, 
                                            Weatherdata::AirTemp ());
@@ -987,30 +997,43 @@ WeatherSource::tick (const Time& time, Treelog& msg)
 }
 
 void
+WeatherSource::check_state (const symbol key, const double value, Treelog& msg)
+{
+  if (std::isfinite (value))
+    return;
+  msg.error ("No data for '" + key + "'");
+  initialized_ok = false;
+}
+
+void
 WeatherSource::check_state (Treelog& msg)
 {
-  if (!std::isfinite (my_latitude)
-      || !std::isfinite (my_longitude)
-      || !std::isfinite (my_elevation)
-      || !std::isfinite (my_timezone)
-      || !std::isfinite (my_screenheight)
-      || !std::isfinite (my_Taverage)
-      || !std::isfinite (my_Tamplitude)
-      || !std::isfinite (my_maxTday)
-      || !std::isfinite (my_global_radiation)
-      || !std::isfinite (my_air_temperature)
-      || !std::isfinite (my_rain)
-      || !std::isfinite (my_snow)
-      || !std::isfinite (my_cloudiness)
-      || !std::isfinite (my_day_length)
-      || !std::isfinite (my_sunrise)
-      || !std::isfinite (my_daily_air_temperature)
-      || !std::isfinite (my_daily_global_radiation)
-      || !std::isfinite (my_daily_precipitation))
-    {
-      msg.error ("Insufficient weather data");
-      initialized_ok = false;
-    }
+  check_state (Weatherdata::Latitude (), my_latitude, msg);
+  check_state (Weatherdata::Longitude (), my_longitude, msg);
+  check_state (Weatherdata::Elevation (), my_elevation, msg);
+  check_state (Weatherdata::TimeZone (), my_timezone, msg);
+  check_state (Weatherdata::ScreenHeight (), my_screenheight, msg);
+  check_state (Weatherdata::TAverage (), my_Taverage, msg);
+  check_state (Weatherdata::TAmplitude (), my_Tamplitude, msg);
+  check_state (Weatherdata::MaxTDay (), my_maxTday, msg);
+  check_state (Weatherdata::GlobRad (), my_global_radiation, msg);
+  check_state (Weatherdata::AirTemp (), my_air_temperature, msg);
+  static const symbol my_rain_name ("Rain");
+  check_state (my_rain_name, my_rain, msg);
+  static const symbol my_snow_name ("Snow");
+  check_state (my_snow_name, my_snow, msg);
+  static const symbol my_cloudiness_name ("Cloudiness");
+  check_state (my_cloudiness_name, my_cloudiness, msg);
+  static const symbol my_day_length_name ("DayLength"); 
+  check_state (my_day_length_name, my_day_length, msg);
+  static const symbol my_sunrise_name ("Sunrise"); 
+  check_state (my_sunrise_name, my_sunrise, msg);
+  static const symbol my_daily_air_temperature_name ("DailyAirTemp"); 
+  check_state (my_daily_air_temperature_name, my_daily_air_temperature, msg);
+  static const symbol my_daily_global_radiation_name ("DailyGlobRad"); 
+  check_state (my_daily_global_radiation_name, my_daily_global_radiation, msg);
+  static const symbol my_daily_precipitation_name ("DailyPrecip"); 
+  check_state (my_daily_precipitation_name, my_daily_precipitation, msg);
 }
 
 bool 
@@ -1051,13 +1074,12 @@ WeatherSource::initialize (const Time& time, Treelog& msg)
   timesteps[Weatherdata::GlobRad ()];
   timesteps[Weatherdata::RefEvap ()];
   timesteps[Weatherdata::DiffRad ()];
+  timesteps[Weatherdata::AirTemp ()];
 
   // Initialize previous, next
-  previous = time;
-  previous.tick_day (-1);
-  next = previous;
-  next.tick_hour (1);
-
+  next = Time (time.year (), time.month (), time.mday (), 0);
+  previous = next;
+  previous.tick_hour (-1);
   if (ok)
     initialized_ok = true;
   try
@@ -1160,7 +1182,7 @@ WeatherSource::WeatherSource (const BlockModel& al)
     my_rain (NAN),
     my_snow (NAN),
     my_deposit (al, "deposit"),    // For the units...
-    my_cloudiness (NAN),
+    my_cloudiness (0.5),           // Wait for light.
     my_day_length (NAN),
     my_sunrise (NAN),
     my_has_min_max_temperature (NAN),
