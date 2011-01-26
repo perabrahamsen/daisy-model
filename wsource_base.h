@@ -1,4 +1,4 @@
-// wsource_base.h -- Weather data that never changes.
+// wsource_base.h -- Base classs for wsource parameters.
 // 
 // Copyright 2010 KU
 //

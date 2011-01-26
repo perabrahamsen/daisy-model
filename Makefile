@@ -401,7 +401,8 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C 
-MODELS = weather_source.C wsource_table.C wsource_const.C weather_extra.C \
+MODELS = wsource_indirect.C\
+	weather_source.C wsource_table.C wsource_const.C weather_extra.C \
 	groundwater_source.C xysource_xycombine.C xysource_flux.C \
 	gnuplot_soil.C reaction_sorption.C hydraulic_B_C_inverse.C \
 	program_osvaldo.C vegetation_permanent.C  litter.C drain_lateral.C \
