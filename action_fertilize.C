@@ -317,7 +317,7 @@ struct ActionFertilizeSurface : public ActionFertilize
       from (al.number ("from")),
       to (al.number ("to")),
       volume (Librarian::build_stock<Volume> (al.metalib (), al.msg (),
-                                              "box", name))
+                                              "box", objid))
   {  
     if (to < from)
       {

@@ -545,7 +545,7 @@ daisy_daisy_get_column (Toplevel* toplevel, const int col)
 
 extern "C" const char* EXPORT
 daisy_column_get_name (const Column* column)
-{ return column->name.name ().c_str (); }
+{ return column->objid.name ().c_str (); }
 
 extern "C" const char* EXPORT
 daisy_column_get_description (const Column* column)

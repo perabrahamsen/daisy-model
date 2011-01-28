@@ -118,7 +118,7 @@ bool
 ChemistryStandard::know (const symbol chem) const
 {
   for (size_t c = 0; c < chemicals.size (); c++)
-    if (chemicals[c]->name == chem)
+    if (chemicals[c]->objid == chem)
       return true;
 
   return false;
@@ -132,7 +132,7 @@ Chemical&
 ChemistryStandard::find (symbol chem)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
-    if (chemicals[c]->name == chem)
+    if (chemicals[c]->objid == chem)
       return *chemicals[c];
 
   daisy_panic ("Can't find chemical '" + chem + "'");
@@ -153,7 +153,7 @@ void
 ChemistryStandard::deposit (const symbol chem, const double flux, Treelog& msg)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
-    if (chemicals[c]->name == chem)
+    if (chemicals[c]->objid == chem)
       {
         chemicals[c]->deposit (flux);
         return;
@@ -166,7 +166,7 @@ ChemistryStandard::spray (const symbol chem,
                           const double amount, Treelog& msg)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
-    if (chemicals[c]->name == chem)
+    if (chemicals[c]->objid == chem)
       {
         chemicals[c]->spray (amount);
         return;
@@ -179,7 +179,7 @@ ChemistryStandard::dissipate (const symbol chem, const double amount,
 			      Treelog& msg)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
-    if (chemicals[c]->name == chem)
+    if (chemicals[c]->objid == chem)
       {
         chemicals[c]->dissipate (amount);
         return;
@@ -221,7 +221,7 @@ ChemistryStandard::incorporate (const Geometry& geo,
 				Treelog& msg)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
-    if (chemicals[c]->name == chem)
+    if (chemicals[c]->objid == chem)
       {
         chemicals[c]->incorporate (geo, amount, from, to);
         return;
@@ -235,7 +235,7 @@ ChemistryStandard::incorporate (const Geometry& geo,
                                 const Volume& volume, Treelog& msg)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
-    if (chemicals[c]->name == chem)
+    if (chemicals[c]->objid == chem)
       {
         chemicals[c]->incorporate (geo, amount, volume);
         return;
@@ -342,7 +342,7 @@ ChemistryStandard::tick_soil (const Scope& scope,
 			      Chemistry& chemistry,
                               const double dt, Treelog& msg)
 { 
-  Treelog::Open nest (msg, "Chemistry: " + name + ": tick soil");
+  Treelog::Open nest (msg, "Chemistry: " + objid + ": tick soil");
   infiltrate (geo, ponding, soil_water.infiltration (geo), R_mixing, dt);
 
   for (size_t c = 0; c < chemicals.size (); c++)
@@ -363,7 +363,7 @@ ChemistryStandard::tick_soil (const Scope& scope,
   for (size_t c = 0; c < chemicals.size (); c++)
     {
       Treelog::Open nest (msg, "Chemical: " 
-                          + chemicals[c]->name + ": transport");
+                          + chemicals[c]->objid + ": transport");
       // [g/m^2/h down -> g/cm^2/h up]
       const double J_above = -chemicals[c]->down () / (100.0 * 100.0);
       movement.solute (soil, soil_water, J_above, *chemicals[c], 
@@ -418,7 +418,7 @@ ChemistryStandard::check (const Scope& scope,
   bool ok = true; 
   for (size_t c = 0; c < chemicals.size (); c++)
     {
-      Treelog::Open nest (msg, "Chemical: '" + chemicals[c]->name  + "'");
+      Treelog::Open nest (msg, "Chemical: '" + chemicals[c]->objid  + "'");
       if (!chemicals[c]->check (units, scope, 
                                 geo, soil, soil_water, chemistry, msg))
 	ok = false;
@@ -426,7 +426,7 @@ ChemistryStandard::check (const Scope& scope,
 
   for (size_t r = 0; r < reactions.size (); r++)
     {
-      Treelog::Open nest (msg, "Reaction: '" + reactions[r]->name  + "'");
+      Treelog::Open nest (msg, "Reaction: '" + reactions[r]->objid  + "'");
       if (!reactions[r]->check (units, geo, soil, soil_water, soil_heat,
                                 chemistry, msg))
 	ok = false;

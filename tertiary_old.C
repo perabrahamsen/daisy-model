@@ -78,7 +78,7 @@ TertiaryOld::tick (const Units&, const Geometry& geo, const Soil& soil,
                    const SoilHeat& soil_heat, const double dt, 
                    SoilWater& soil_water, Surface& surface, Treelog& msg)
 {
-  Treelog::Open nest (msg, component + std::string (":") + name);
+  TREELOG_MODEL (msg);
   const size_t cell_size = geo.cell_size ();
   std::vector<double> S_drain (cell_size, 0.0);
   std::vector<double> S_matrix (cell_size, 0.0);
@@ -176,7 +176,7 @@ TertiaryOld::initialize (const Units&,
                          const Scope& scope, const Groundwater& groundwater, 
                          Treelog& msg)
 { 
-  Treelog::Open nest (msg, component + std::string (": ") + name);
+  TREELOG_MODEL (msg);
 
   if (!dynamic_cast<const Geometry1D*> (&geometry))
     {

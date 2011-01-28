@@ -76,7 +76,7 @@ struct NumberByDepth : public Number
   bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
     bool ok = true;
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     if (!h->initialize (units, scope, msg))
       ok = false;
     if (!z->initialize (units, scope, msg))
@@ -86,7 +86,7 @@ struct NumberByDepth : public Number
   bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
     bool ok = true;
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     if (!h->check (units, scope, msg))
       ok = false;
     else if (!units.can_convert (h->dimension (scope), Units::cm ()))
@@ -232,14 +232,14 @@ struct NumberByTension : public Number
   bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
     bool ok = true;
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     if (!h->initialize (units, scope, msg))
       ok = false;
     return ok;
   }
   bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     if (!h->check (units, scope, msg))
       return false;
     if (!units.can_convert (h->dimension (scope), Units::cm ()))
@@ -435,12 +435,12 @@ struct NumberTensionByTheta : public Number
   // Create.
   bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   {
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     return Theta->initialize (units, scope, msg);
   }
   bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     if (!Theta->check (units, scope, msg))
       return false;
     if (!units.can_convert (Theta->dimension (scope), Attribute::Fraction ()))

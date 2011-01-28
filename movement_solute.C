@@ -255,7 +255,7 @@ MovementSolute::secondary_transport (const Geometry& geo,
     }
   
   // Flow.
-  secondary_flow (geo, Theta_old, Theta_new, q, solute.name, 
+  secondary_flow (geo, Theta_old, Theta_new, q, solute.objid, 
                   S, J_forced, C_border, M, J, dt, msg);
 
   // Check fluxes.
@@ -338,7 +338,7 @@ MovementSolute::primary_transport (const Geometry& geo, const Soil& soil,
     }
   
   // Flow.
-  transport.flow (geo, soil, Theta_old, Theta_new, q, solute.name, 
+  transport.flow (geo, soil, Theta_old, Theta_new, q, solute.objid, 
                   S, J_forced, C_border, C, J, 
                   solute.diffusion_coefficient (), 
                   dt, msg);

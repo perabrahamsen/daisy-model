@@ -520,7 +520,7 @@ struct NumberIdentity : public NumberChild
   // Create.
   bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     bool ok = true;
 
     if (!child->check (units, scope, msg))
@@ -581,7 +581,7 @@ struct NumberConvert : public NumberChild
   // Create.
   bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     bool ok = true;
 
     if (!child->check (units, scope, msg))
@@ -636,7 +636,7 @@ struct NumberDim : public NumberChild
   // Create.
   bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     bool ok = true;
 
     if (!child->check (units, scope, msg))

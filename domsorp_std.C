@@ -92,7 +92,7 @@ struct DomsorpStandard : public Domsorp
               const size_t dom_size, const size_t som_size,
               Treelog& msg) const
   { 
-    Treelog::Open nest (msg, "Domsorp: " + name);
+    TREELOG_MODEL (msg);
     bool ok = true;
     {
       Treelog::Open nest (msg, "transform");

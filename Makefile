@@ -400,8 +400,8 @@ NOLINK = -c
 # These are all models of some component.
 # 
 
-LATER = tertiary_instant.C 
-MODELS = wsource_indirect.C\
+LATER = tertiary_instant.C  
+MODELS = wsource_combine.C wsource_indirect.C\
 	weather_source.C wsource_table.C wsource_const.C weather_extra.C \
 	groundwater_source.C xysource_xycombine.C xysource_flux.C \
 	gnuplot_soil.C reaction_sorption.C hydraulic_B_C_inverse.C \
@@ -1002,7 +1002,7 @@ pmain${OBJ}: pmain.C
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
 wsource${OBJ}: wsource.C wsource.h model.h scope.h attribute.h symbol.h \
- librarian.h
+ weatherdata.h time.h librarian.h assertion.h
 solute${OBJ}: solute.C solute.h model_logable.h model.h symbol.h im.h \
  attribute.h block_model.h block_nested.h block.h scope.h treelog.h \
  frame_model.h frame.h librarian.h
@@ -1194,7 +1194,7 @@ log${OBJ}: log.C log.h time.h symbol.h border.h model_framed.h \
 weather${OBJ}: weather.C weather.h model_derived.h model_logable.h model.h \
  symbol.h weatherdata.h block_model.h block_nested.h block.h scope.h \
  attribute.h treelog.h frame_model.h frame.h librarian.h log.h time.h \
- border.h model_framed.h im.h astronomy.h
+ border.h model_framed.h im.h astronomy.h mathlib.h assertion.h
 column${OBJ}: column.C column.h model_framed.h model_logable.h model.h \
  symbol.h irrigate.h memutils.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h log.h time.h \
@@ -1599,7 +1599,7 @@ lexer_table${OBJ}: lexer_table.C lexer_table.h block_model.h block_nested.h \
  block.h scope.h attribute.h symbol.h treelog.h frame_model.h frame.h \
  lexer_data.h lexer.h filepos.h assertion.h mathlib.h submodeler.h \
  block_submodel.h frame_submodel.h time.h vcheck.h units.h memutils.h \
- path.h
+ path.h librarian.h model.h treelog_text.h
 block${OBJ}: block.C block_model.h block_nested.h block.h scope.h attribute.h \
  symbol.h treelog.h frame_model.h frame.h metalib.h library.h librarian.h \
  model.h stringer.h number.h assertion.h scope_block.h
@@ -1655,16 +1655,26 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+wsource_combine${OBJ}: wsource_combine.C wsource.h model.h scope.h \
+ attribute.h symbol.h weatherdata.h time.h memutils.h librarian.h \
+ submodeler.h block_submodel.h block_nested.h block.h treelog.h \
+ frame_submodel.h frame.h block_model.h frame_model.h vcheck.h \
+ assertion.h
+wsource_indirect${OBJ}: wsource_indirect.C wsource_indirect.h wsource.h \
+ model.h scope.h attribute.h symbol.h librarian.h block_model.h \
+ block_nested.h block.h treelog.h frame_model.h frame.h
 weather_source${OBJ}: weather_source.C weather.h model_derived.h \
  model_logable.h model.h symbol.h weatherdata.h wsource.h scope.h \
- attribute.h block_model.h block_nested.h block.h treelog.h frame_model.h \
- frame.h librarian.h assertion.h
+ attribute.h chemical.h model_framed.h im.h units.h memutils.h plf.h \
+ time.h timestep.h vcheck.h block_model.h block_nested.h block.h \
+ treelog.h frame_model.h frame.h librarian.h assertion.h mathlib.h \
+ astronomy.h fao.h
 wsource_table${OBJ}: wsource_table.C wsource_base.h wsource.h model.h scope.h \
  attribute.h symbol.h weatherdata.h time.h lexer_table.h block_model.h \
  block_nested.h block.h treelog.h frame_model.h frame.h units.h \
  memutils.h librarian.h frame_submodel.h assertion.h mathlib.h
 wsource_const${OBJ}: wsource_const.C wsource_base.h wsource.h model.h scope.h \
- attribute.h symbol.h librarian.h
+ attribute.h symbol.h librarian.h treelog.h time.h
 weather_extra${OBJ}: weather_extra.C weather.h model_derived.h \
  model_logable.h model.h symbol.h weatherdata.h librarian.h log.h time.h \
  border.h model_framed.h frame.h scope.h attribute.h block_model.h \

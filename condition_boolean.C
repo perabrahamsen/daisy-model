@@ -45,7 +45,7 @@ struct ConditionBoolean : public Condition
 
   bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   { 
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
 
     if (state != error)
       {

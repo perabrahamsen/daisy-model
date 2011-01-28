@@ -35,7 +35,93 @@ WSource::library_id () const
   return id;
 }
 
-WSource::WSource ()
+const WSource& 
+WSource::null ()
+{
+  static const struct WSourceNull : public WSource
+  {
+    // Scope interface.
+    void entries (std::set<symbol>&) const
+    { }
+    Attribute::type lookup (symbol) const
+    { return Attribute::Error; }
+    symbol dimension (symbol) const
+    { return Attribute::Unknown (); }
+    symbol description (symbol) const
+    { return Attribute::Unknown (); }
+    using WSource::check;
+    bool check (symbol) const
+    { return false; }
+    double number (symbol) const
+    { daisy_notreached (); }
+    symbol name (symbol) const
+    { daisy_notreached (); }
+
+    // WSource interface.
+    int type_size (symbol) const // Don't use default from Scope.
+    { daisy_notreached (); }
+    int value_size (symbol) const
+    { daisy_notreached (); }
+    bool end_check (symbol) const
+    { return false; }
+    double end_number (symbol) const
+    { daisy_notreached (); }
+    symbol end_name (symbol) const
+    { daisy_notreached (); }
+    const std::vector<double>& number_sequence (symbol) const
+    { daisy_notreached (); }
+    const std::vector<double>& end_number_sequence (symbol) const
+    { daisy_notreached (); }
+
+    double meta_timestep (symbol) const
+    { daisy_notreached (); }
+    bool meta_check (symbol, symbol) const
+    { return false; }
+    double meta_number (symbol, symbol) const
+    { daisy_notreached (); }
+    symbol meta_name (symbol, symbol) const
+    { daisy_notreached (); }
+    bool meta_end_check (symbol, symbol) const
+    { return false; }
+    double meta_end_number (symbol, symbol) const
+    { daisy_notreached (); }
+    symbol meta_end_name (symbol, symbol) const
+    { daisy_notreached (); }
+
+    const Time& data_begin () const // Start of first timestep.
+    { daisy_notreached (); }
+    const Time& data_end () const   // End of last timestep.
+    { daisy_notreached (); }
+    const Time& begin () const
+    { daisy_notreached (); }
+    const Time& end () const
+    { daisy_notreached (); }
+    double timestep () const           // Length of timetstep [h]
+    { daisy_notreached (); }
+    void tick (Treelog&)
+    { daisy_notreached (); }
+    bool done () const
+    { return true; }
+
+    void initialize (Treelog&)
+    { }
+    using Scope::check;
+    bool check (Treelog&) const
+    { return true; }
+
+    // Create and destroy.
+    WSourceNull ()
+      : WSource ("null")
+    { }
+    ~WSourceNull ()
+    { }
+  } wsource_null;
+
+  return wsource_null;
+}
+
+WSource::WSource (const symbol name)
+  : objid (name)
 { }
 
 WSource::~WSource ()

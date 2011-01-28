@@ -317,7 +317,7 @@ ColumnStandard::harvest (const Metalib& metalib, const Time& time,
   const double old_LAI = vegetation->LAI ();
   std::vector<AM*> residuals;
   double min_height = 100.0;
-  vegetation->harvest (metalib, name, crop_name, time, geometry,
+  vegetation->harvest (metalib, objid, crop_name, time, geometry,
                        stub_length, 
                        stem_harvest, leaf_harvest, sorg_harvest,
                        harvest, min_height, 
@@ -352,7 +352,7 @@ ColumnStandard::pluck (const Metalib& metalib,
 { 
   const double old_LAI = vegetation->LAI ();
   std::vector<AM*> residuals;
-  vegetation->pluck (metalib, name, crop_name, time, geometry,
+  vegetation->pluck (metalib, objid, crop_name, time, geometry,
                      stem_harvest, leaf_harvest, sorg_harvest,
                      harvest, harvest_DM, harvest_N, harvest_C, 
                      residuals, residuals_DM, residuals_N_top, residuals_C_top,
@@ -387,7 +387,7 @@ ColumnStandard::mix (const Metalib& metalib, const double from, const double to,
                      const double penetration, const Time& time, Treelog& msg)
 {
   std::vector<AM*> residuals;
-  vegetation->kill_all (metalib, name, time, geometry, residuals, 
+  vegetation->kill_all (metalib, objid, time, geometry, residuals, 
                         residuals_DM, residuals_N_top, residuals_C_top, 
                         residuals_N_soil, residuals_C_soil, msg);
   add_residuals (residuals);
@@ -768,19 +768,19 @@ ColumnStandard::check (const Weather* global_weather,
       ok = false;
   }
   {
-    Treelog::Open nest (msg, "Movement: " + movement->name);
+    Treelog::Open nest (msg, "Movement: " + movement->objid);
     if (!movement->check (msg))
       ok = false;
   }
   {
-    Treelog::Open nest (msg, "Groundwater: " + groundwater->name);
+    Treelog::Open nest (msg, "Groundwater: " + groundwater->objid);
     if (!groundwater->check (units, geometry, scope, msg))
       ok = false;
   }
   {
     if (weather.get ())
       {
-        Treelog::Open nest (msg, "Weather: " + weather->name);
+        Treelog::Open nest (msg, "Weather: " + weather->objid);
         if (!weather->check (from, to, msg))
           // The rest is uninitialized, don't check it!
           return false;
@@ -824,14 +824,14 @@ ColumnStandard::check (const Weather* global_weather,
 bool 
 ColumnStandard::check_am (const FrameModel& am, Treelog& msg) const 
 { 
-  Treelog::Open nest (msg, name);
+  TREELOG_MODEL (msg);
   return organic_matter->check_am (am, msg); 
 }
 
 bool 
 ColumnStandard::check_z_border (const double value, Treelog& msg) const
 { 
-  Treelog::Open nest (msg, "column: " + name);
+  TREELOG_MODEL (msg);
 
   bool ok = true;
   if (!soil->check_z_border (value, msg))
@@ -844,7 +844,7 @@ ColumnStandard::check_z_border (const double value, Treelog& msg) const
 bool 
 ColumnStandard::check_x_border (const double value, Treelog& msg) const
 { 
-  Treelog::Open nest (msg, "column: " + name);
+  TREELOG_MODEL (msg);
 
   bool ok = true;
   if (!soil->check_x_border (value, msg))
@@ -857,7 +857,7 @@ ColumnStandard::check_x_border (const double value, Treelog& msg) const
 bool 
 ColumnStandard::check_y_border (const double value, Treelog& msg) const
 { 
-  Treelog::Open nest (msg, "column: " + name);
+  TREELOG_MODEL (msg);
 
   bool ok = true;
   if (!soil->check_y_border (value, msg))
@@ -961,7 +961,7 @@ ColumnStandard::initialize (const Block& block,
 {
   bool ok = true;
   Treelog& msg = block.msg ();
-  Treelog::Open nest (msg, name);
+  TREELOG_MODEL (msg);
   extern_scope = scopesel->lookup (output, msg); 
   ScopeMulti scope (extern_scope ? *extern_scope : Scope::null (),
                     parent_scope);

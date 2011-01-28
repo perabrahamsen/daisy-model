@@ -86,7 +86,7 @@ SeedRelease::initialize (const double seed_w, Treelog&)
 bool 
 SeedRelease::check (Treelog& msg) const
 {
-  Treelog::Open nest (msg, library_id () + ": " + name);
+  Treelog::Open nest (msg, library_id () + ": " + objid);
 
   bool ok = true;
   if (C < 0.0)

@@ -52,7 +52,7 @@ struct ConditionExtern : public Condition
   { 
     daisy_assert (extern_scope);
 
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     ScopeMulti multi (*extern_scope, parent_scope);
 
     if (expr->missing (multi))

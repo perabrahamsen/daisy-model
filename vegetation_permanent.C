@@ -134,7 +134,7 @@ struct VegetationPermanent : public Vegetation
   double SOrg_DM_by_name (symbol) const
   { return 0.0; }
   std::string crop_names () const
-  { return name.name (); }
+  { return objid.name (); }
 
   const std::vector<double>& root_density () const
   { return root_system->Density; }

@@ -232,7 +232,7 @@ CropSimple::tick (const Metalib&, const Time& time, const Bioclimate& bioclimate
                   std::vector<double>&, std::vector<double>&,
                   const double dt, Treelog& msg)
 {
-  Treelog::Open nest (msg, name);
+  TREELOG_MODEL (msg);
 
   static bool ForcedCAI_warned = false;
   if (!ForcedCAI_warned && ForcedCAI >= 0.0)
@@ -333,7 +333,7 @@ CropSimple::harvest (const Metalib& metalib,
       const double this_far = std::min (1.0, (T - T_emergence) / T_growth);
 
       static const symbol root_symbol ("root");
-      AM& am = AM::create (metalib, geo, time, root_am, name, root_symbol,
+      AM& am = AM::create (metalib, geo, time, root_am, objid, root_symbol,
                            AM::Unlocked, msg);
       daisy_assert (geo.total_soil (root_system->Density) > 0.0);
       am.add_surface (geo, 
@@ -352,7 +352,7 @@ CropSimple::harvest (const Metalib& metalib,
   double wsd = -1.0;
   double nsd = -1.0;
 
-  return *new Harvest (column_name, time, name,
+  return *new Harvest (column_name, time, objid,
 		       0.0, 0.0, 0.0, 
 		       0.0, 0.0, 0.0, 
 		       0.0, 0.0, 0.0, 

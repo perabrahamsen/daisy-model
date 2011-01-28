@@ -134,7 +134,7 @@ bool
 ChemistryMulti::know (const symbol chem) const
 {
   for (size_t c = 0; c < chemicals.size (); c++)
-    if (chemicals[c]->name == chem)
+    if (chemicals[c]->objid == chem)
       return true;
 
   return false;
@@ -144,7 +144,7 @@ Chemical&
 ChemistryMulti::find (symbol chem)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
-    if (chemicals[c]->name == chem)
+    if (chemicals[c]->objid == chem)
       return *chemicals[c];
 
   daisy_notreached ();
@@ -401,7 +401,7 @@ ChemistryMulti::tick_soil (const Scope& scope,
 			   Chemistry& chemistry, 
 			   const double dt, Treelog& msg)
 { 
-  Treelog::Open nest (msg, "Chemistry: " + name + ": tick soil");
+  TREELOG_MODEL (msg);
 
   for (size_t c = 0; c < combine.size (); c++)
     combine[c]->tick_soil (scope, geo, ponding, R_mixing, 
@@ -453,7 +453,7 @@ ChemistryMulti::check (const Scope& scope, const Geometry& geo,
   bool ok = true; 
   for (size_t c = 0; c < combine.size (); c++)
     {
-      Treelog::Open nest (msg, "Chemistry: '" + combine[c]->name  + "'");
+      Treelog::Open nest (msg, "Chemistry: '" + combine[c]->objid  + "'");
       if (!combine[c]->check (scope, geo, soil, soil_water, soil_heat,
                               chemistry, msg))
 	ok = false;
@@ -463,7 +463,7 @@ ChemistryMulti::check (const Scope& scope, const Geometry& geo,
   std::map<symbol, size_t> found;
   for (size_t i = 0; i < chemicals.size (); i++)
     {
-      const symbol type = chemicals[i]->name;
+      const symbol type = chemicals[i]->objid;
       std::map<symbol, size_t>::const_iterator f = found.find (type);
       if (f != found.end ())
 	{
@@ -471,7 +471,7 @@ ChemistryMulti::check (const Scope& scope, const Geometry& geo,
 	  tmp << "Chemical '" << type << "' definded in multiple chemistries:";
 	  for (size_t j = 0; j < combine.size (); j++)
 	    if (combine[j]->know (type))
-	      tmp << " '" << combine[j]->name << "'";
+	      tmp << " '" << combine[j]->objid << "'";
 	  msg.error (tmp.str ());
 	  ok = false;
 	}

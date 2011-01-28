@@ -252,7 +252,7 @@ LogAll::column_add_to_total (const Column& column)
 {
   static const symbol collib (Column::component);
   const Library& library = metalib ().library (collib);
-  const std::set<symbol>& ancestors = library.ancestors (column.name);
+  const std::set<symbol>& ancestors = library.ancestors (column.objid);
   
   for (std::vector<Select*>::const_iterator i = entries.begin (); 
        i != entries.end (); 

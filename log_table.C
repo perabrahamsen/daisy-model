@@ -149,7 +149,7 @@ LogTable::initialize (const symbol log_dir, Treelog& msg)
 {
   LogDLF::initialize (log_dir, msg);
 
-  Treelog::Open nest (msg, name);
+  TREELOG_MODEL (msg);
   for (unsigned int i = 0; i < summary.size (); i++)
     summary[i]->initialize (entries, msg);
 }
@@ -174,7 +174,7 @@ LogTable::summarize (Treelog& msg)
 {
   if (summary.size () > 0)
     {
-      Treelog::Open nest (msg, name);
+      TREELOG_MODEL (msg);
       std::ostringstream tmp;
 
       tmp << "LOGFILE: " << file  << "\n";

@@ -34,13 +34,15 @@ class WSource : public Model, public Scope
 {
   // Content.
 public:
-  const symbol name;
+  const symbol objid;
   static const char *const component;
   symbol library_id () const;
 
-  // Source.
+  // Scope.
 public:
   int type_size (symbol tag) const = 0; // Don't use default from Scope.
+  int value_size (symbol tag) const = 0;
+  // symbol name (symbol) const = 0;
 
   // Timestep.
 public:
@@ -77,11 +79,12 @@ public:
   
   // Create and Destroy.
 public:
+  static const WSource& null ();
   virtual void initialize (Treelog&) = 0;
   using Scope::check;
   virtual bool check (Treelog&) const = 0;
 protected:
-  explicit WSource ();
+  explicit WSource (const symbol name);
 public:
   ~WSource ();
 };

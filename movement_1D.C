@@ -397,7 +397,7 @@ Movement1D::tick (const Soil& soil, SoilWater& soil_water,
   const size_t edge_size = geo->edge_size ();
   const size_t cell_size = geo->cell_size ();
 
-  Treelog::Open nest (msg, "Movement: " + name.name ());
+  TREELOG_MODEL (msg);
 
   soil_water.tick_before (*geo, soil, dt, msg);
 
@@ -447,7 +447,7 @@ Movement1D::initialize_derived (const Soil& soil,
                                 const Groundwater& groundwater,
                                 bool has_macropores, Treelog& msg)
 {
-  Treelog::Open nest (msg, "Movement: " + name.name ());
+  TREELOG_MODEL (msg);
 
   for (size_t i = 0; i < matrix_water.size (); i++)
     matrix_water[i]->has_macropores (has_macropores);

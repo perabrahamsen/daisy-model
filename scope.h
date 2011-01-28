@@ -56,7 +56,6 @@ public:
   virtual bool check (symbol) const = 0;
   virtual double number (symbol) const = 0;
   virtual int value_size (symbol tag) const;
-  // virtual symbol identifier (const symbol key) const;
   virtual symbol name (symbol) const;
   virtual int integer (symbol) const;
 

@@ -74,7 +74,7 @@ public:
 };
 
 #define TREELOG_MODEL(msg) \
-  Treelog::Open nest (msg, this->library_id () + ": " + this->name \
+  Treelog::Open nest (msg, this->library_id () + ": " + this->objid \
                       + " " + __FUNCTION__)
 
 #define TREELOG_SUBMODEL(msg, submodel) \

@@ -146,7 +146,7 @@ GroundwaterSource::initialize (const Units& units,
                                Treelog& msg)
 {
   std::ostringstream tmp;
-  tmp << name << ": " << source->name << " '" << source->title () << "'";
+  tmp << objid << ": " << source->objid << " '" << source->title () << "'";
   Treelog::Open nest (msg, tmp.str ());
   is_ok = true;
   if (!source->load (msg))

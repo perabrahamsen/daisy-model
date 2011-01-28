@@ -41,7 +41,7 @@ struct ActionMix : public Action
   // Simulation.
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
     {
-      msg.message ("Tillage operation " + name);
+      TREELOG_MODEL (msg);
       daisy.field ().mix (metalib, 0.0, depth, penetration, daisy.time (),  msg);
     }
 
@@ -94,7 +94,7 @@ struct ActionSwap : public Action
   // Simulation.
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   {
-    msg.message ("Tillage operation " + name);
+    TREELOG_MODEL (msg);
     daisy.field ().swap (metalib, 
                        0.0, middle, depth, daisy.time (), msg);
   }

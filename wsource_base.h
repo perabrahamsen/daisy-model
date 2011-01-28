@@ -41,6 +41,7 @@ public:
   bool check (const symbol key) const;
   double number (const symbol key) const;
   symbol name (const symbol key) const;
+  int value_size (symbol tag) const;
 
   // WSource interface.
 public:

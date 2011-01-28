@@ -340,7 +340,7 @@ Horizon::initialize_base (bool top_soil,
                           int som_size, const Texture& texture, 
                           Treelog& msg)
 { 
-  Treelog::Open nest (msg, name);
+  TREELOG_MODEL (msg);
   const double clay_lim = texture_below ( 2.0 /* [um] USDA Clay */);
   fast_clay = texture.mineral () * clay_lim;
   fast_humus = texture.humus;

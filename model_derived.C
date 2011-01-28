@@ -29,9 +29,9 @@ void
 ModelDerived::output_as_derived (const symbol key, Log& log) const
 {
   const symbol component = library_id ();
-  if (log.check_derived (key, name, component))
+  if (log.check_derived (key, objid, component))
     {
-      Log::Derived derived (log, key, name, component);
+      Log::Derived derived (log, key, objid, component);
       output (log);
     }
 }

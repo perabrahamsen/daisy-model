@@ -32,7 +32,7 @@ class ModelLogable : public Model
 {
   // Content.
 public:
-  const symbol name;            // Remember name for logs.
+  const symbol objid;            // Remember name for logs.
   virtual symbol library_id () const = 0;
 
   // Use.

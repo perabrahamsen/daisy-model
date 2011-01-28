@@ -55,6 +55,10 @@ int
 WSourceIndirect::type_size (symbol key) const
 { return source->type_size (key); }
 
+int 
+WSourceIndirect::value_size (symbol key) const
+{ return source->value_size (key); }
+
 bool
 WSourceIndirect::end_check (symbol key) const
 { return source->end_check (key); }
@@ -131,7 +135,6 @@ bool
 WSourceIndirect::done () const
 { return source->done (); }
 
-
 void
 WSourceIndirect::initialize (Treelog& msg)
 { source->initialize (msg); }
@@ -142,7 +145,8 @@ WSourceIndirect::check (Treelog& msg) const
 
 
 WSourceIndirect::WSourceIndirect (const BlockModel& al)
-  : source (Librarian::build_item<WSource> (al, "source"))
+  : WSource (al.type_name ()),
+    source (Librarian::build_item<WSource> (al, "source"))
 { }
 
 WSourceIndirect::~WSourceIndirect ()

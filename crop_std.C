@@ -286,7 +286,7 @@ CropStandard::initialize_shared (const Metalib& metalib, const Geometry& geo,
   if (DS >= 0)
     {
       // Dead organic matter.
-      production.initialize (metalib, name, harvesting->Root, harvesting->Dead,
+      production.initialize (metalib, objid, harvesting->Root, harvesting->Dead,
                              geo, organic_matter, msg);
       
       // Update derived state content.
@@ -305,7 +305,7 @@ CropStandard::initialize_shared (const Metalib& metalib, const Geometry& geo,
 bool
 CropStandard::check (const Units& units, Treelog& msg) const
 {
-  Treelog::Open nest (msg, library_id () + ": " + name);
+  TREELOG_MODEL (msg);
 
   bool ok = true;
   if (!seed->check (msg))
@@ -556,14 +556,14 @@ CropStandard::tick (const Metalib& metalib,
             {
               production.AM_root
                 = &AM::create (metalib, geo, time, harvesting->Root,
-                               name, root_symbol, AM::Locked, msg);
+                               objid, root_symbol, AM::Locked, msg);
               organic_matter.add (*production.AM_root);
             }
           if (!production.AM_leaf)
             {
               production.AM_leaf
                 = &AM::create (metalib, geo, time, harvesting->Dead,
-                               name, dead_symbol, AM::Locked, msg);
+                               objid, dead_symbol, AM::Locked, msg);
               organic_matter.add (*production.AM_leaf);
 	    }
 	  else
@@ -571,11 +571,11 @@ CropStandard::tick (const Metalib& metalib,
 	      if (!production.AM_root)
 		production.AM_root
 		  = &AM::create (metalib, geo, time, harvesting->Root,
-				 name, root_symbol, AM::Unlocked, msg);
+				 objid, root_symbol, AM::Unlocked, msg);
 	      if (!production.AM_leaf)
 		production.AM_leaf
 		  = &AM::create (metalib, geo, time, harvesting->Dead,
-				 name, dead_symbol, AM::Unlocked, msg);
+				 objid, dead_symbol, AM::Unlocked, msg);
 	    }
 	}
       return;
@@ -654,7 +654,7 @@ CropStandard::harvest (const Metalib& metalib,
                        const bool combine,
 		       Treelog& msg)
 {
-  Treelog::Open nest (msg, name + " harvest");
+  TREELOG_MODEL (msg);
 
   // Update nitrogen content.
   nitrogen.content (development->DS, production, msg);
@@ -681,7 +681,7 @@ CropStandard::harvest (const Metalib& metalib,
     }
 
   const Harvest& harvest 
-    = harvesting->harvest (metalib, column_name, name, 
+    = harvesting->harvest (metalib, column_name, objid, 
                            root_system->Density,
                            time, geometry, production, development->DS,
                            stem_harvest, leaf_harvest, 1.0,
@@ -745,14 +745,14 @@ CropStandard::pluck (const Metalib& metalib,
                      std::vector<double>& residuals_C_soil,
                      Treelog& msg)
 {
-  Treelog::Open nest (msg, "Plucking " + name);
+  TREELOG_MODEL (msg);
   
   // Update nitrogen content.
   nitrogen.content (development->DS, production, msg);
 
   // Harvest.
   const Harvest& harvest 
-    = harvesting->harvest (metalib, column_name, name, 
+    = harvesting->harvest (metalib, column_name, objid, 
                            root_system->Density,
                            time, geometry, production, development->DS,
                            stem_harvest, leaf_harvest, sorg_harvest,

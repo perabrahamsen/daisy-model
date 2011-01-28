@@ -52,15 +52,15 @@ struct NumberOperand : public Number
   }
 
   // Create.
-  bool initialize (const Units& units, const Scope& scope, Treelog& err)
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
-    Treelog::Open nest (err, name);
-    return operand->initialize (units, scope, err); 
+    TREELOG_MODEL (msg);
+    return operand->initialize (units, scope, msg); 
   }
-  bool check (const Units& units, const Scope& scope, Treelog& err) const
+  bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
-    Treelog::Open nest (err, name);
-    return operand->check (units, scope, err); 
+    TREELOG_MODEL (msg);
+    return operand->check (units, scope, msg); 
   }
   NumberOperand (const BlockModel& al)
     : Number (al),
@@ -261,23 +261,23 @@ struct NumberPow : public Number
   { return Attribute::Unknown (); }
 
   // Create.
-  bool initialize (const Units& units, const Scope& scope, Treelog& err)
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
-    Treelog::Open nest (err, name);
+    TREELOG_MODEL (msg);
     bool ok = true;
-    if (!base->initialize (units, scope, err))
+    if (!base->initialize (units, scope, msg))
       ok = false;
-    if (!exponent->initialize (units, scope, err))
+    if (!exponent->initialize (units, scope, msg))
       ok = false;
     return ok;
   }
-  bool check (const Units& units, const Scope& scope, Treelog& err) const
+  bool check (const Units& units, const Scope& scope, Treelog& msg) const
   {
-    Treelog::Open nest (err, name);
+    TREELOG_MODEL (msg);
     bool ok = true;
-    if (!base->check (units, scope, err))
+    if (!base->check (units, scope, msg))
       ok = false;
-    if (!exponent->check (units, scope, err))
+    if (!exponent->check (units, scope, msg))
       ok = false;
     return ok;
   }
@@ -347,16 +347,16 @@ struct NumberOperands : public Number
   }
 
   // Create.
-  bool initialize (const Units& units, const Scope& scope, Treelog& err)
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
     bool ok = true;
     for (size_t i = 0; i < operands.size (); i++)
       {
         std::ostringstream tmp;
-        tmp << name << "[" << i << "]";
-        Treelog::Open nest (err, tmp.str ());
+        tmp << objid << "[" << i << "]";
+        Treelog::Open nest (msg, tmp.str ());
         
-        if (!operands[i]->initialize (units, scope, err))
+        if (!operands[i]->initialize (units, scope, msg))
           ok = false;
       }
     return ok;
@@ -398,16 +398,16 @@ struct NumberOperands : public Number
   } unique;
 #endif // CHECK_OPERANDS_DIM
 
-  bool check (const Units& units, const Scope& scope, Treelog& err) const
+  bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
     bool ok = true;
     for (size_t i = 0; i < operands.size (); i++)
       {
         std::ostringstream tmp;
-        tmp << name << "[" << i << "]";
-        Treelog::Open nest (err, tmp.str ());
+        tmp << objid << "[" << i << "]";
+        Treelog::Open nest (msg, tmp.str ());
         
-        if (!operands[i]->check (units, scope, err))
+        if (!operands[i]->check (units, scope, msg))
           ok = false;
       }
     return ok;

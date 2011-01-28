@@ -77,7 +77,7 @@ public:
     : Pet (al),
       net_radiation (Librarian::build_stock<NetRadiation> (al.metalib (),
                                                            al.msg (),
-                                                           "brunt", name)),
+                                                           "brunt", objid)),
       rb (al.number ("rb"))
     { }
   ~PetPM ()

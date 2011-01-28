@@ -95,15 +95,15 @@ struct ActionProgn : public Action
       }
   }
 
-  bool done (const Daisy& daisy, const Scope& scope, Treelog& out) const
+  bool done (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   {
     bool all_done = true;
-    Treelog::Open nest (out, name);
+    TREELOG_MODEL (msg);
     for (std::vector<Action*>::const_iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {
-	if (!(*i)->done (daisy, scope, out))
+	if (!(*i)->done (daisy, scope, msg))
 	  all_done = false;
       }
     return all_done;
@@ -112,13 +112,13 @@ struct ActionProgn : public Action
   void output (Log& log) const
   { output_list (actions, "actions", log, Action::component); }
 
-  void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
     for (std::vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {
-	(*i)->initialize (daisy, scope, out);
+	(*i)->initialize (daisy, scope, msg);
       }
   }
 
@@ -174,30 +174,30 @@ struct ActionCond : public Action
   };
   std::vector<clause*> clauses;
 
-  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
     for (std::vector<clause*>::iterator i = clauses.begin (); 
 	 i != clauses.end ();
 	 i++)
       {
-	(*i)->condition->tick (daisy, scope, out);
+	(*i)->condition->tick (daisy, scope, msg);
 	std::vector<Action*>& actions = (*i)->actions;
 	for (unsigned int j = 0; j < actions.size (); j++)
-	  actions[j]->tick (daisy, scope, out);
+	  actions[j]->tick (daisy, scope, msg);
       }
   }
 
-  void doIt (Daisy& daisy, const Scope& scope, Treelog& out)
+  void doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
     for (std::vector<clause*>::iterator i = clauses.begin (); 
 	 i != clauses.end ();
 	 i++)
       {
-	if ((*i)->condition->match (daisy, scope, out))
+	if ((*i)->condition->match (daisy, scope, msg))
 	  {
 	    std::vector<Action*>& actions = (*i)->actions;
 	    for (unsigned int j = 0; j < actions.size (); j++)
-	      actions[j]->doIt (daisy, scope, out);
+	      actions[j]->doIt (daisy, scope, msg);
 	    break;
 	  }
       }
@@ -219,16 +219,16 @@ struct ActionCond : public Action
       }
   }
 
-  void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
     for (std::vector<clause*>::iterator i = clauses.begin (); 
 	 i != clauses.end ();
 	 i++)
       {
-	(*i)->condition->initialize (daisy, scope, out);
+	(*i)->condition->initialize (daisy, scope, msg);
 	std::vector<Action*>& actions = (*i)->actions;
 	for (unsigned int j = 0; j < actions.size (); j++)
-	  actions[j]->initialize (daisy, scope, out);
+	  actions[j]->initialize (daisy, scope, msg);
       }
   }
 
@@ -262,19 +262,19 @@ struct ActionIf : public Action
   std::auto_ptr<Action> then_a;
   std::auto_ptr<Action> else_a;
 
-  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
-    if_c->tick (daisy, scope, out);
-    then_a->tick (daisy, scope, out);
-    else_a->tick (daisy, scope, out);
+    if_c->tick (daisy, scope, msg);
+    then_a->tick (daisy, scope, msg);
+    else_a->tick (daisy, scope, msg);
   }
 
-  void doIt (Daisy& daisy, const Scope& scope, Treelog& out)
+  void doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
-    if (if_c->match (daisy, scope, out))
-      then_a->doIt (daisy, scope, out);
+    if (if_c->match (daisy, scope, msg))
+      then_a->doIt (daisy, scope, msg);
     else
-      else_a->doIt (daisy, scope, out);
+      else_a->doIt (daisy, scope, msg);
   }
 
   void output (Log& log) const
@@ -284,11 +284,11 @@ struct ActionIf : public Action
     output_object (else_a, "else", log);
   }
 
-  void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
-    if_c->initialize (daisy, scope, out);
-    then_a->initialize (daisy, scope, out);
-    else_a->initialize (daisy, scope, out);
+    if_c->initialize (daisy, scope, msg);
+    then_a->initialize (daisy, scope, msg);
+    else_a->initialize (daisy, scope, msg);
   }
 
   bool check (const Daisy& daisy, const Scope& scope, Treelog& err) const

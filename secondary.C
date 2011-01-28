@@ -42,11 +42,11 @@ Secondary::library_id () const
 }
 
 Secondary::Secondary (const BlockModel& al)
-  : name (al.type_name ())
+  : objid (al.type_name ())
 { }
 
 Secondary::Secondary (const symbol name_)
-  : name (name_)
+  : objid (name_)
 { }
 
 Secondary::~Secondary ()

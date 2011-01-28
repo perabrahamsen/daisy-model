@@ -320,7 +320,7 @@ VegetationCrops::DS_by_name (symbol name) const
   for (CropList::const_iterator crop = crops.begin ();
        crop != crops.end ();
        crop++)
-    if ((*crop)->name == name)
+    if ((*crop)->objid == name)
       return (*crop)->DS ();
   return Crop::DSremove;
 }
@@ -343,7 +343,7 @@ VegetationCrops::DM_by_name (symbol name, double height) const
   for (CropList::const_iterator crop = crops.begin();
        crop != crops.end();
        crop++)
-    if ((*crop)->name == name)
+    if ((*crop)->objid == name)
       return (*crop)->DM (height);
   return 0.0;
 }
@@ -366,7 +366,7 @@ VegetationCrops::SOrg_DM_by_name (symbol name) const
   for (CropList::const_iterator crop = crops.begin();
        crop != crops.end();
        crop++)
-    if ((*crop)->name == name)
+    if ((*crop)->objid == name)
       return (*crop)->SOrg_DM ();
   return 0.0;
 }
@@ -381,7 +381,7 @@ VegetationCrops::crop_names () const
     {
       if (result != "")
 	result += ",";
-      result += (*crop)->name.name ();
+      result += (*crop)->objid.name ();
     }
   return result;
 }
@@ -396,7 +396,7 @@ VegetationCrops::root_density (symbol name) const
   for (CropList::const_iterator crop = crops.begin();
        crop != crops.end();
        crop++)
-    if ((*crop)->name == name)
+    if ((*crop)->objid == name)
       return (*crop)->root_density ();
 
   static const std::vector<double> empty;
@@ -548,7 +548,7 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
 	       crop++)
 	    {
 	      std::ostringstream tmp;
-	      tmp << (*crop)->name << " has height "
+	      tmp << (*crop)->objid << " has height "
 		     << (*crop)->height () << " and LAI "
 		     << (*crop)->LAI ();
 	      msg.error (tmp.str ());
@@ -671,7 +671,7 @@ VegetationCrops::emerge (const symbol crop_name, Treelog&)
   for (CropList::iterator crop = crops.begin();
        crop != crops.end();
        crop++)
-    if (all || (*crop)->name == crop_name)
+    if (all || (*crop)->objid == crop_name)
       (*crop)->emerge ();
 }
 
@@ -703,7 +703,7 @@ VegetationCrops::harvest (const Metalib& metalib,
   for (CropList::iterator crop = crops.begin();
        crop != crops.end();
        crop++)
-    if (all || (*crop)->name == crop_name)
+    if (all || (*crop)->objid == crop_name)
       {
         const double old_crop_C = (*crop)->total_C ();
         const double old_residuals_C_top = residuals_C_top;
@@ -775,7 +775,7 @@ VegetationCrops::pluck (const Metalib& metalib, symbol column_name,
   for (CropList::iterator crop = crops.begin();
        crop != crops.end();
        crop++)
-    if (all || (*crop)->name == crop_name)
+    if (all || (*crop)->objid == crop_name)
       {
         const double old_crop_C = (*crop)->total_C ();
         const double old_residuals_C_top = residuals_C_top;
@@ -830,7 +830,7 @@ VegetationCrops::cleanup_canopy (const symbol crop_name, Treelog& msg)
       for (CropList::iterator crop = crops.begin();
 	   crop != crops.end();
 	   crop++)
-	if (all || (*crop)->name == crop_name)
+	if (all || (*crop)->objid == crop_name)
 	  {
 	    if (Crop::ds_remove (*crop))
 	      {
@@ -865,11 +865,11 @@ VegetationCrops::sow (const Metalib& metalib, const FrameModel& al,
       msg.error ("Sowing failed");
       return;
     }
-  const symbol name = crop->name;
+  const symbol name = crop->objid;
   for (CropList::iterator i = crops.begin();
        i != crops.end();
        i++)
-    if ((*i)->name == name)
+    if ((*i)->objid == name)
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
   const Units& units = metalib.units ();
@@ -916,7 +916,7 @@ VegetationCrops::check (const Units& units, Treelog& msg) const
   bool ok = true;
   for (size_t i = 0; i < crops.size (); i++)
     {
-      Treelog::Open nest (msg, "crop:' " + crops[i]->name + "'");
+      Treelog::Open nest (msg, "crop:' " + crops[i]->objid + "'");
       crops[i]->check (units, msg);
     }
   return ok;

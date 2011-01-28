@@ -122,6 +122,10 @@ symbol
 WSourceBase::name (const symbol key) const
 { return impl->name (key); }
 
+int 
+WSourceBase::value_size (const symbol key) const
+{ return impl->value_size (key); }
+
 const Time& 
 WSourceBase::data_begin () const
 { 
@@ -193,7 +197,7 @@ WSourceBase::meta_end_name (const symbol, const symbol meta) const
 { return end_name (meta); }
 
 WSourceBase::WSourceBase (const BlockModel& al)
-  : WSource (),
+  : WSource (al.type_name ()),
     impl (new Implementation (al))
 { }
 

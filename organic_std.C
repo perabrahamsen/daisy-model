@@ -821,7 +821,7 @@ OrganicStandard::output (Log& log) const
 	  const symbol name = (*item)->real_name ();
 	  if (log.check_entry (name, AM::component))
 	    {
-	      Log::NamedEntry named_entry (log, name, (*item)->name,
+	      Log::NamedEntry named_entry (log, objid, (*item)->objid,
 					   (*item)->frame ());
 	      (*item)->output (log);
 	    }

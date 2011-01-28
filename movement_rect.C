@@ -122,7 +122,7 @@ MovementRect::summarize (Treelog& msg) const
   TREELOG_MODEL (msg);
   for (size_t i = 0; i < matrix_water.size (); i++)
     {
-      Treelog::Open nest (msg, "matrix_water", i, name);
+      Treelog::Open nest (msg, "matrix_water", i, objid);
       matrix_water[i]->summarize (msg);
     }
 }
@@ -248,7 +248,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
   for (size_t i = 0; i < matrix_water.size (); i++)
     {
       water_attempt (i);
-      Treelog::Open nest (msg, matrix_water[i]->name);
+      Treelog::Open nest (msg, matrix_water[i]->objid);
       try
         {
           matrix_water[i]->tick (*geo, drain_cell, soil, soil_water, soil_heat,

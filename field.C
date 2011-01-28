@@ -162,7 +162,7 @@ Field::Implementation::sow (const Metalib& metalib, const FrameModel& crop,
 {
   if (selected)
     {
-      Treelog::Open nest (msg, selected->name);
+      Treelog::Open nest (msg, selected->objid);
       selected->sow (metalib, crop, row_width, row_pos, seed, time, msg);
     }
   else 
@@ -171,7 +171,7 @@ Field::Implementation::sow (const Metalib& metalib, const FrameModel& crop,
 	   i != columns.end ();
 	   i++)
 	{
-	  Treelog::Open nest (msg, (*i)->name);
+	  Treelog::Open nest (msg, (*i)->objid);
 	  (*i)->sow (metalib, crop, row_width, row_pos, seed, time, msg);
 	}
     }
@@ -268,7 +268,7 @@ Field::Implementation::emerge (symbol name, Treelog& out)
 {
   if (selected)
     {
-      Treelog::Open nest (out, selected->name);
+      Treelog::Open nest (out, selected->objid);
       selected->emerge (name, out);
     }
   else
@@ -277,7 +277,7 @@ Field::Implementation::emerge (symbol name, Treelog& out)
 	   i != columns.end ();
 	   i++)
 	{
-	  Treelog::Open nest (out, (*i)->name);
+	  Treelog::Open nest (out, (*i)->objid);
 	  (*i)->emerge (name, out);
 	}
     }
@@ -297,7 +297,7 @@ Field::Implementation::harvest (const Metalib& metalib,
 {
   if (selected)
     {
-      Treelog::Open nest (out, selected->name);
+      Treelog::Open nest (out, selected->objid);
       selected->harvest (metalib, time, name,
 			 stub_length,
 			 stem_harvest, leaf_harvest, sorg_harvest, combine, 
@@ -309,7 +309,7 @@ Field::Implementation::harvest (const Metalib& metalib,
 	   i != columns.end ();
 	   i++)
 	{
-	  Treelog::Open nest (out, (*i)->name);
+	  Treelog::Open nest (out, (*i)->objid);
 	  (*i)->harvest (metalib, time, name,
 			 stub_length,
 			 stem_harvest, leaf_harvest, sorg_harvest, combine,
@@ -330,7 +330,7 @@ Field::Implementation::pluck (const Metalib& metalib,
 {
   if (selected)
     {
-      Treelog::Open nest (out, selected->name);
+      Treelog::Open nest (out, selected->objid);
       selected->pluck (metalib, time, name,
                        stem_harvest, leaf_harvest, sorg_harvest, 
                        total, out);
@@ -341,7 +341,7 @@ Field::Implementation::pluck (const Metalib& metalib,
 	   i != columns.end ();
 	   i++)
 	{
-	  Treelog::Open nest (out, (*i)->name);
+	  Treelog::Open nest (out, (*i)->objid);
 	  (*i)->pluck (metalib, time, name,
                        stem_harvest, leaf_harvest, sorg_harvest, 
                        total, out);
@@ -357,14 +357,14 @@ Field::Implementation::mix (const Metalib& metalib,
 {
   if (selected)
     {
-      Treelog::Open nest (msg, selected->name); 
+      Treelog::Open nest (msg, selected->objid); 
       selected->mix (metalib, from, to, penetration, time, msg);
     }
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
     {
-      Treelog::Open nest (msg, (*i)->name);
+      Treelog::Open nest (msg, (*i)->objid);
       (*i)->mix (metalib, from, to, penetration, time, msg);
     }
 }
@@ -377,14 +377,14 @@ Field::Implementation::swap (const Metalib& metalib,
 {
   if (selected)
     {
-      Treelog::Open nest (msg, selected->name);
+      Treelog::Open nest (msg, selected->objid);
       selected->swap (metalib, from, middle, to, time, msg);
     }
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
     {
-      Treelog::Open nest (msg, (*i)->name);
+      Treelog::Open nest (msg, (*i)->objid);
       (*i)->swap (metalib, from, middle, to, time, msg);
     }
 }
@@ -623,7 +623,7 @@ Field::Implementation::tick_source (const Scope& parent_scope, Treelog& msg)
          i != columns.end ();
          i++)
       {
-        Treelog::Open nest (msg, "Column " + (*i)->name);
+        Treelog::Open nest (msg, "Column " + (*i)->objid);
         (*i)->tick_source (parent_scope, msg);
       }
 }
@@ -660,7 +660,7 @@ Field::Implementation::tick_move (const Metalib& metalib,
          i != columns.end ();
          i++)
       {
-        Treelog::Open nest (msg, "Column " + (*i)->name);
+        Treelog::Open nest (msg, "Column " + (*i)->objid);
         (*i)->tick_move (metalib, time, dt, weather, scope, msg);
       }
 }
@@ -672,7 +672,7 @@ Field::Implementation::find (symbol name) const
        i != columns.end ();
        i++)
     { 
-      if ((*i)->name == name)
+      if ((*i)->objid == name)
 	return *i;
     }
   return NULL;
@@ -688,7 +688,7 @@ Field::Implementation::check (const Weather *const global_weather,
        i != columns.end ();
        i++)
     {
-      Treelog::Open nest (err, (*i) ? (*i)->name.name ().c_str () : "error");
+      Treelog::Open nest (err, (*i) ? (*i)->objid.name ().c_str () : "error");
       if ((*i) == NULL || !(*i)->check (global_weather, from, to, scope, err))
 	ok = false;
     }
@@ -705,7 +705,7 @@ Field::Implementation::check_am (const FrameModel& am, Treelog& err) const
        i != columns.end ();
        i++)
     {
-      Treelog::Open nest (err, (*i)->name);
+      Treelog::Open nest (err, (*i)->objid);
       if (!(*i)->check_am (am, err))
 	ok = false;
     }
@@ -980,10 +980,10 @@ Field::output (Log& log) const
        i++)
     {
       const Column& column = **i;
-      if (log.check_entry (column.name, libname))
+      if (log.check_entry (column.objid, libname))
 	{
           log.column_select (column); // Relative weight.
-	  Log::Entry open_entry (log, column.name, column.frame (),
+	  Log::Entry open_entry (log, column.objid, column.frame (),
 				 Column::component);
 	  column.output (log);
 	}

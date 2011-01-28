@@ -39,7 +39,7 @@ Number::library_id () const
 
 symbol
 Number::title () const
-{ return name; }
+{ return objid; }
 
 bool 
 Number::known (symbol dim)
@@ -53,7 +53,7 @@ Number::tick_value (const Units& units,
   this->tick (units, scope, msg);
   if (this->missing (scope))
     {
-      msg.warning ("Expression '" + name + "' '" 
+      msg.warning ("Expression '" + objid + "' '" 
                    + title () + "' is not found in scope");
       return false;
     }
@@ -94,7 +94,7 @@ Number::check_dim (const Units& units,
 }
 
 Number::Number (const BlockModel& al)
-  : name (al.type_name ())
+  : objid (al.type_name ())
 { }
 
 Number::~Number ()

@@ -25,7 +25,7 @@
 // The 'ModelLogable' Class.
 
 ModelLogable::ModelLogable (const symbol n)
-  : name (n)
+  : objid (n)
 { }
 
 // model_logable.C ends here.

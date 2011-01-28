@@ -215,7 +215,7 @@ LogDLF::initial_done (const std::vector<Time::component_t>& time_columns,
 bool 
 LogDLF::check (const Border& border, Treelog& msg) const
 { 
-  Treelog::Open nest (msg, name);
+  TREELOG_MODEL (msg);
   bool ok = LogSelect::check (border, msg);
   if (!out.good ())
     {
@@ -244,7 +244,7 @@ LogDLF::initialize (const symbol log_dir, Treelog& msg)
   const std::string fn = log_dir.name () + file.name ();
   out.open (fn.c_str ());
 
-  print_header.start (out, name, file, parsed_from_file);
+  print_header.start (out, objid, file, parsed_from_file);
 
   for (size_t i = 0; i < parameters.size (); i++)
     print_header.parameter (out, parameters[i].first, parameters[i].second);

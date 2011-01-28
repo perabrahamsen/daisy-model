@@ -92,7 +92,7 @@ Source::distance (const Time begin, const Time end,
 }
 
 Source::Source (const BlockModel& al)
-  : name (al.type_name ())
+  : objid (al.type_name ())
 { }
 
 Source::~Source ()

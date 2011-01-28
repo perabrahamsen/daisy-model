@@ -184,7 +184,7 @@ List of identifiers and values to bind in this scope.", Clause::load_syntax);
   bool initialize (const Units& units,
                    const Scope& inherit_scope, Treelog& msg)
   {
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     scope_clause.initialize (units, inherit_scope, msg);
     ScopeMulti scope (scope_clause, inherit_scope);
     return expr->initialize (units, scope, msg);
@@ -192,7 +192,7 @@ List of identifiers and values to bind in this scope.", Clause::load_syntax);
   bool check (const Units& units,
               const Scope& inherit_scope, Treelog& msg) const
   { 
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     if (!scope_clause.check (units, inherit_scope, msg))
       return false;
     scope_clause.tick (units, inherit_scope, msg);
@@ -256,14 +256,14 @@ struct NumberIf : public Number
   // Create.
   void tick (const Units& units, const Scope& scope, Treelog& msg)
   { 
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     if_b->tick (units, scope, msg);
     then_n->tick (units, scope, msg);
     else_n->tick (units, scope, msg);
   }
   bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   {
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     bool ok = true;
     if (!if_b->initialize (units, scope, msg))
       ok = false;
@@ -275,7 +275,7 @@ struct NumberIf : public Number
   }
   bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     bool ok = true;
     if (!if_b->check (units, scope, msg))
       ok = false;

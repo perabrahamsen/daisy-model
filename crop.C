@@ -79,7 +79,7 @@ Crop::pluck (const Metalib&, const symbol, const Time&, const Geometry&,
              std::vector<double>& residuals_N_soil,
              std::vector<double>& residuals_C_soil,
              Treelog&)
-{ throw name + " is unpluckable"; }
+{ throw objid + " is unpluckable"; }
 
 void
 Crop::kill (const Metalib& metalib, 

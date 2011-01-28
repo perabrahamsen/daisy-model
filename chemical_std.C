@@ -930,7 +930,7 @@ ChemicalStandard::tick_surface (const double pond /* [cm] */,
   static const symbol none ("none");
   if (adsorption_->full ())
     daisy_approximate (surface_storage, surface_immobile);
-  else if (adsorption_->name == none)
+  else if (adsorption_->objid == none)
     daisy_approximate (surface_storage, surface_solute);
 }
 
@@ -1385,7 +1385,7 @@ ChemicalStandard::check (const Units& units, const Scope& scope,
   const size_t cell_size = geo.cell_size ();
 
   // Warn against untraced chemicals.
-  if (!chemistry.know (name) && !chemistry.ignored (name))
+  if (!chemistry.know (objid) && !chemistry.ignored (objid))
     msg.warning ("This chemical will not be traced");
   else 
     for (size_t i = 0; i < product.size (); i++)
@@ -1453,7 +1453,7 @@ ChemicalStandard::check (const Units& units, const Scope& scope,
       catch (const char *const error)
         {
           std::stringstream tmp;
-          tmp << name << "[" << i << "]";
+          tmp << objid << "[" << i << "]";
           Treelog::Open next (msg, tmp.str ());
           msg.error (error);
           ok = false;

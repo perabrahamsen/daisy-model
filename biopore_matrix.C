@@ -777,7 +777,7 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
                               Treelog& msg)
 {
   TREELOG_MODEL (msg);
-  const symbol chem = chemical.name;
+  const symbol chem = chemical.objid;
   const size_t cell_size = geo.cell_size ();
   daisy_assert (source_chem.size () == cell_size);
   std::vector<double> sink_chem (cell_size, 0.0);
@@ -940,7 +940,7 @@ BioporeMatrix::initialize (const Units& units,
           break;
         default:
           msg.error ("Unsupported groundwater model '" 
-                     + groundwater.name + "'");
+                     + groundwater.objid + "'");
           ok = false;
         }
       const double h_bottom_start 

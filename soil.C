@@ -127,7 +127,7 @@ struct Soil::Implementation
         {
           msg.error ("Required attribute '" 
                      + name + "' is missing from the soil horizon '"
-                     + layers[i]->horizon->name + "'");
+                     + layers[i]->horizon->objid + "'");
           missing = true;
         }
     for (size_t i = 0; i < zones.size (); i++)
@@ -135,7 +135,7 @@ struct Soil::Implementation
         {
           msg.error ("Required attribute '" 
                      + name + "' is missing from the soil zone '"
-                     + zones[i]->horizon->name + "'");
+                     + zones[i]->horizon->objid + "'");
           missing = true;
         }
     return !missing;
@@ -404,7 +404,7 @@ Soil::check (const int som_size, Geometry& geo, Treelog& err) const
         for (size_t i = 0; i < impl->layers.size (); i++)
           {
             const Horizon& horizon = *impl->layers[i]->horizon;
-            Treelog::Open nest (err, horizon.name);
+            Treelog::Open nest (err, horizon.objid);
             const size_t f_size = horizon.SOM_fractions ().size ();
             if (f_size > 0 && f_size != som_size)
               {
@@ -430,7 +430,7 @@ Soil::check (const int som_size, Geometry& geo, Treelog& err) const
         for (size_t i = 0; i < impl->zones.size (); i++)
           {
             const Horizon& horizon = *impl->zones[i]->horizon;
-            Treelog::Open nest (err, horizon.name);
+            Treelog::Open nest (err, horizon.objid);
             const size_t f_size = horizon.SOM_fractions ().size ();
             if (f_size > 0 && f_size != som_size)
               {

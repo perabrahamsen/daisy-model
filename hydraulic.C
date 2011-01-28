@@ -103,7 +103,7 @@ Hydraulic::K_to_M (PLF& plf, const int intervals) const
 	    {
 	      std::ostringstream tmp;
 	      tmp << "Hydraulic conductivity changes too fast in " 
-		     << name << "\n";
+		     << objid << "\n";
 	      tmp << "h = " << h << ", step = " << step 
 		     << " and h + step = " << (h + step) << "\n";
 	      tmp << "K (h) = " << K (h) << ", K (h + step) = "

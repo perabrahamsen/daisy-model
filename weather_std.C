@@ -319,16 +319,16 @@ struct WeatherStandard : public WeatherBase
   }
 
   // Create and Destroy.
-  bool initialize (const Time& time, Treelog& err);
+  bool initialize (const Time& time, Treelog& msg);
   WeatherStandard (const BlockModel&);
   ~WeatherStandard ();
-  bool check (const Time& from, const Time& to, Treelog& err) const;
+  bool check (const Time& from, const Time& to, Treelog& msg) const;
 };
 
 bool
 WeatherStandard::YearMap::YearInterval::check_alist (const Metalib&,
                                                      const Frame& al,
-						     Treelog& err)
+						     Treelog& msg)
 {
   bool ok = true;
 
@@ -338,7 +338,7 @@ WeatherStandard::YearMap::YearInterval::check_alist (const Metalib&,
     {
       std::ostringstream tmp;
       tmp << "Start year " << from << " comes after end year " << to;
-      err.error (tmp.str ());
+      msg.error (tmp.str ());
       ok = false;
     }
   return ok;
@@ -518,7 +518,7 @@ WeatherStandard::tick (const Time& time, Treelog& msg)
   if (hour == time.hour ())
     return;
 
-  Treelog::Open nest (msg, "Weather: " + name);
+  TREELOG_MODEL (msg);
 
   WeatherBase::tick (time, msg);
 
@@ -896,7 +896,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 bool
 WeatherStandard::initialize (const Time& time, Treelog& msg)
 { 
-  Treelog::Open nest (msg, "Weather: " + name);
+  TREELOG_MODEL (msg);
 
   daisy_assert (!owned_stream.get ());
   owned_stream = path.open_file (where);
@@ -1377,39 +1377,39 @@ WeatherStandard::~WeatherStandard ()
 { }
 
 bool
-WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
+WeatherStandard::check (const Time& from, const Time& to, Treelog& msg) const
 { 
-  Treelog::Open nest (err, name);
+  TREELOG_MODEL (msg);
 
   daisy_assert (lex.get ());
   bool ok = true;
   if (!lex->good ())
     {
-      err.error ("file error for '" + lex->file +"'");
+      msg.error ("file error for '" + lex->file +"'");
       return false;
     }
   if (lex->get_error_count () > 0)
     {
       std::ostringstream tmp;
       tmp << lex->get_error_count () << " parser errors encountered";
-      err.error (tmp.str ());
+      msg.error (tmp.str ());
       return false;
     }
   if (from < begin && find_map (from) < 0)
     {
-      err.error ("Simulation starts before weather data");
+      msg.error ("Simulation starts before weather data");
       ok = false;
     }
   if (to.year () < 9000 && to > end && find_map (to) < 0)
     {
-      err.error ("Simulation ends after weather data");
+      msg.error ("Simulation ends after weather data");
       ok = false;
     }
   for (unsigned int i = 0; i < missing_years.size (); i++)
     {
       std::ostringstream tmp;
       tmp << "missing_years[" << i << "]";
-      Treelog::Open nest (err, tmp.str ());
+      Treelog::Open nest (msg, tmp.str ());
       const int from_from = missing_years[i]->from.from;
       const int from_to = missing_years[i]->from.to;
       if (from_from > begin.year () && from_to < end.year ())
@@ -1418,7 +1418,7 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
 	  tmp << "domain [" << from_from << "-" << from_to 
 		 << "] fully within [" << begin.year () << "-" << end.year ()
 		 << "]";
-	  err.warning (tmp.str ());
+	  msg.warning (tmp.str ());
 	}
       const int to_from = missing_years[i]->to.from;
       const int to_to = missing_years[i]->to.to;
@@ -1427,7 +1427,7 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
 	  std::ostringstream tmp;
 	  tmp << "range [" << to_from << "-" << to_to << "] not within [" 
 		 << begin.year () << "-" << end.year () << "]";
-	  err.error (tmp.str ());
+	  msg.error (tmp.str ());
 	  ok = false;
 	}
     }
@@ -1436,7 +1436,7 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
       std::ostringstream tmp;
       tmp << "Researching arctic agriculture? (latitude = " << 
 	latitude () << ")";
-      err.error (tmp.str ());
+      msg.error (tmp.str ());
     }
   return ok;
 }

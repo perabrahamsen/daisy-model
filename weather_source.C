@@ -282,6 +282,13 @@ WeatherSource::number_average (const Time& from, const Time& to,
 
   // Available data.
   const number_map_t::const_iterator e = numbers.find (key);
+  
+  if (e == numbers.end ())
+    {
+      Assertion::message ("Can't average '" + key + "'");
+      return NAN;
+    }
+
   daisy_assert (e != numbers.end ());
   const std::deque<double>& values = e->second;
   const size_t data_size = when.size ();
@@ -722,7 +729,10 @@ WeatherSource::tick (const Time& time, Treelog& msg)
         { 
           const symbol key = i->first;
           std::deque<double>& data = i->second;
-          data.push_back (source->meta_timestep (key));
+          if (source->check (key))
+            data.push_back (source->meta_timestep (key));
+          else
+            data.push_back (NAN);
         }
 
       // Names.

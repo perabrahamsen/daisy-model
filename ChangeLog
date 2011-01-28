@@ -1,3 +1,11 @@
+2011-01-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* all: Changed 'name' to 'objid' in all models.
+
+2011-01-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* wsource_combine.C: New model.
+
 2011-01-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* vcheck.C, vcheck.h (VCheck::MultiSize): New class.

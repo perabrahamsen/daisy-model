@@ -85,7 +85,7 @@ Movement::summarize (Treelog& msg) const
     if (water_fail[i] > 0)
       {
         found = true;
-        Treelog::Open nest (msg, "matrix_water", i, name);
+        Treelog::Open nest (msg, "matrix_water", i, objid);
         daisy_assert (water_total[i] > 0);
         std::ostringstream tmp;
         tmp << "Matrix water transport model " << i << " failed " 
@@ -97,7 +97,7 @@ Movement::summarize (Treelog& msg) const
     if (solute_fail[i] > 0)
       {
         found = true;
-        Treelog::Open nest (msg, "matrix_solute", i, name);
+        Treelog::Open nest (msg, "matrix_solute", i, objid);
         daisy_assert (solute_total[i] > 0);
         std::ostringstream tmp;
         tmp << "Matrix solute transport model " << i << " failed " 

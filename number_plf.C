@@ -82,12 +82,12 @@ struct NumberPLF : public Number
   // Create.
   bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     return operand->initialize (units, scope, msg); 
   }
   bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     return operand->check_dim (units, scope, domain, msg); 
   }
   static bool check_alist (const Metalib& metalib, 

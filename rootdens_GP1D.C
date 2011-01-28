@@ -274,7 +274,7 @@ Rootdens_GP1D::initialize (const Geometry&, double row_width, double,
                            Treelog& msg)
 {
   if (!iszero (row_width))
-    msg.warning ("Row width not supported for '" + name 
+    msg.warning ("Row width not supported for '" + objid 
                  + "' root density model");
 }
 

@@ -179,8 +179,8 @@ VolumeBox::limit (const Volume& other, Treelog& msg)
         }
       return true;
     }
-  msg.error ("Don't know how to limit a '" + name 
-             + "' to a '" + other.name + "'");
+  msg.error ("Don't know how to limit a '" + objid 
+             + "' to a '" + other.objid + "'");
   return false;
 }
  

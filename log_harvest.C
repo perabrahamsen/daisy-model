@@ -184,13 +184,13 @@ struct LogHarvest : public Log
     out.open (fn.c_str ()); 
 
     // Header.
-    print_header.start (out, name, file, "");
+    print_header.start (out, objid, file, "");
     out.flush ();
   }
 
   bool check (const Border&, Treelog& msg) const
   { 
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     bool ok = true;
     if (!out.good ())
       {

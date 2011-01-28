@@ -65,7 +65,7 @@ struct NumberSource : public Number
   virtual void initialize_derived (Treelog& msg) = 0;
   bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   {
-    Treelog::Open nest (msg, name);
+    TREELOG_MODEL (msg);
     msg.touch ();
     daisy_assert (state == uninitialized);
     daisy_assert (source.get ());

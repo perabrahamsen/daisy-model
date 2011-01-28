@@ -43,6 +43,7 @@ public:
   // WSource interface.
 public:
   int type_size (symbol tag) const; // Don't use default from Scope.
+  int value_size (symbol tag) const;
   bool end_check (symbol key) const;
   double end_number (symbol key) const;
   symbol end_name (symbol key) const;

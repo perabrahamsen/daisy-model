@@ -591,7 +591,7 @@ TertiaryBiopores::solute (const Geometry& geo, const SoilWater& soil_water,
                           const double dt,
                           Chemical& chemical, Treelog& msg)
 {
-  const symbol chem = chemical.name;
+  const symbol chem = chemical.objid;
   // Surface infiltration.
   const size_t edge_size = geo.edge_size ();
   std::vector<double> J_chem (edge_size, 0.0);
@@ -683,11 +683,11 @@ TertiaryBiopores::initialize (const Units& units,
                               const Groundwater& groundwater, 
                               Treelog& msg)
 { 
-  Treelog::Open nest (msg, component + std::string (": ") + name);
+  TREELOG_MODEL (msg);
   bool ok = true;
   for (size_t b = 0; b < classes.size (); b++)
     {
-      Treelog::Open nest2 (msg, "classes", b, classes[b]->name);
+      Treelog::Open nest2 (msg, "classes", b, classes[b]->objid);
       if (!classes[b]->initialize (units, geo, scope, groundwater, msg))
         ok = false;
     }
@@ -720,7 +720,7 @@ TertiaryBiopores::check (const Geometry& geo, Treelog& msg) const
   bool ok = true;
   for (size_t b = 0; b < classes.size (); b++)
     {
-      Treelog::Open (msg, "classes", b, classes[b]->name);
+      Treelog::Open (msg, "classes", b, classes[b]->objid);
       if (!classes[b]->check (geo, msg))
         ok = false;
     }

@@ -97,7 +97,7 @@ public:
     : Pet (al),
       net_radiation (Librarian::build_stock<NetRadiation> (al.metalib (),
                                                            al.msg (),
-                                                           "brunt", name)),
+                                                           "brunt", objid)),
       use_wet (al.flag ("use_wet")),
       rb (al.number ("rb")),
       Rn (-42.42e42)

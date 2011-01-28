@@ -142,7 +142,7 @@ void
 HydraulicHypres::initialize (const Texture& texture,
                              double rho_b, bool top_soil, Treelog& msg)
 {
-  Treelog::Open nest (msg, name);
+  TREELOG_MODEL (msg);
 
   const double clay_lim 
     = texture.fraction_of_minerals_smaller_than ( 2.0 /* [um] USDA Clay */);

@@ -38,7 +38,7 @@ class Number : public Model
 public:
   static const char *const component;
   symbol library_id () const;
-  const symbol name;
+  const symbol objid;
   virtual symbol title () const;
 
   // Simulation.
