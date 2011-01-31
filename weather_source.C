@@ -285,7 +285,16 @@ WeatherSource::number_average (const Time& from, const Time& to,
   
   if (e == numbers.end ())
     {
-      Assertion::message ("Can't average '" + key + "'");
+#if 0
+      std::ostringstream tmp;
+      tmp << "Can't average '" + key + "'; know";
+      for (number_map_t::const_iterator i = numbers.begin ();
+           i != numbers.end ();
+           i++)
+        tmp << " " << i->first;
+
+      Assertion::message (tmp.str ());
+#endif
       return NAN;
     }
 
@@ -797,6 +806,7 @@ WeatherSource::tick (const Time& time, Treelog& msg)
 
       // Available data.
       const size_t data_size = when.size ();
+      const std::deque<double> missing (data_size, NAN);
       const number_map_t::const_iterator eAvg 
         = numbers.find (Weatherdata::AirTemp ());
       daisy_assert (eAvg != numbers.end ());
@@ -804,13 +814,13 @@ WeatherSource::tick (const Time& time, Treelog& msg)
       daisy_assert (values_avg.size () == data_size);
       const number_map_t::const_iterator eMin 
         = numbers.find (Weatherdata::T_min ());
-      daisy_assert (eMin != numbers.end ());
-      const std::deque<double>& values_min = eMin->second;
+      const std::deque<double>& values_min = (eMin != numbers.end ())
+        ? eMin->second : missing;
       daisy_assert (values_min.size () == data_size);
       const number_map_t::const_iterator eMax 
         = numbers.find (Weatherdata::T_max ());
-      daisy_assert (eMax != numbers.end ());
-      const std::deque<double>& values_max = eMax->second;
+      const std::deque<double>& values_max = (eMax != numbers.end ())
+        ? eMax->second : missing;
       daisy_assert (values_max.size () == data_size);
 
       if (data_size < 1)
@@ -1009,6 +1019,11 @@ WeatherSource::tick (const Time& time, Treelog& msg)
 void
 WeatherSource::check_state (const symbol key, const double value, Treelog& msg)
 {
+#if 0
+  std::ostringstream tmp;
+  tmp << "Value of " << key << " is " << value;
+  msg.message (tmp.str ());
+#endif
   if (std::isfinite (value))
     return;
   msg.error ("No data for '" + key + "'");

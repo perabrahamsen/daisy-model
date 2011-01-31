@@ -59,7 +59,7 @@ WSource::null ()
 
     // WSource interface.
     int type_size (symbol) const // Don't use default from Scope.
-    { daisy_notreached (); }
+    { return Attribute::Unspecified; }
     int value_size (symbol) const
     { daisy_notreached (); }
     bool end_check (symbol) const
