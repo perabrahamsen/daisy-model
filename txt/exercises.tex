@@ -52,12 +52,9 @@
 
 \section*{General introduction to the application of the \Daisy{} model}
 
-Søren Hansen\\
-The Royal Veterinary and Agricultural University\\
-Department of Agricultural Sciences\\
-Laboratory for Agrohydrology and Bioclimatology\\
-\\
-Updated by Per Abrahamsen, \today{}.
+Søren Hansen and Per Abrahamsen\\
+University of Copenhagen\\
+\today{}.
 
 \begin{abstract}
   This introduction to the application of the \Daisy{} model comprises
@@ -168,11 +165,6 @@ going to be used by the simulation, as shown in box~\ref{box:header}.
     \caption{\Daisy{}-setup-file header}
     \label{box:header}
 \begin{verbatim}
-;; Setting "working directory", note that `/' is used and not `\'
-(directory "C:/DaisySim/Exercise/01")
-;; Setting search path for library-files
-(path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
-
 ;; Including external library-files
 (input file "tillage.dai")
 (input file "crop.dai")
@@ -180,7 +172,7 @@ going to be used by the simulation, as shown in box~\ref{box:header}.
 (input file "log.dai")
 
 ;; Weather data
-(weather default "Taastrup6201.dwf")
+(weather default "dk-taastrup.dwf")
 
 ;; Description that will occur in all output files
 (description "Spring Barley; Soil: Fine sandy loam; Weather: Taastrup")
@@ -399,7 +391,8 @@ external library file ``\texttt{log.dai}''.
     \caption{Select output files.}
     \label{box:output}
 \begin{verbatim}
-(output Harvest
+(log_prefix "E1/")
+(output harvest
         "Crop Production"
 ;;      Water balance of the upper 100 cm  
         ("Soil water" (to -100 [cm])(when daily)
@@ -418,14 +411,14 @@ external library file ``\texttt{log.dai}''.
 \end{verbatim}
   \end{boxedminipage}
 \end{figure}
-When \texttt{Harvest} is selected then the harvested yields are
-written to the output-file ``\texttt{Harvest.dlf}''. The extension
+When \texttt{harvest} is selected then the harvested yields are
+written to the output-file ``\texttt{harvest.dlf}''. The extension
 \texttt{.dlf} indicates that the file is written in
 \daisy{}-log-format, which is a format that easily can be opened in a
 spreadsheet. Furthermore it indicates that the output can be inspected
 by use of the \daisy{} output-viewer (\texttt{ShowDaisyOutput.exe}).
 However, the only exception from the latter is the
-\texttt{Harvest.dlf}-file; all other output files can be viewed by the
+\texttt{harvest.dlf}-file; all other output files can be viewed by the
 output-viewer. Furthermore \texttt{"Crop Production"} is selected. In
 this case daily (default) values of variables pertaining to crop
 production is written to ``\texttt{crop\_prod.dlf}''. It is noted that
@@ -435,6 +428,10 @@ monthly is selected (the when-command) and that the different output
 frequencies are written to different output-files (the
 where--command). In addition some profile data are selected as
 daily-values.
+
+The command \verb|(log_prefix "E1/")| will place all output files in
+a subfolder (\texttt{E1}) of the current folder.  You must create the
+subfolder before starting the simulation.
 
 Fill in the necessary information in the \daisy{}-setup-file
 \texttt{Exercise01.dai} and run a simulation by dragging and dropping
@@ -773,6 +770,7 @@ information see \daisyref{} and \daisytut{}.
 ;; Defining a pig slurry where 5% of the ammonium content is lost at 
 ;; pplication (defam = defining added matter)
 (defam "Slurry_Vol05%" pig_slurry 
+  (volatilization 5 [%])
   ;; Other parameters.
 )
 
@@ -887,9 +885,9 @@ ScreenHeight: 2 m
 Begin: 1962-04-01
 End: 2001-10-07
 NH4WetDep: 0.9 ppm 
-NH4DryDep: 2.2 kgN/year
+NH4DryDep: 2.2 kgN/ha/year
 NO3WetDep: 0.6 ppm
-NO3DryDep: 1.1 kgN/year
+NO3DryDep: 1.1 kgN/ha/year
 TAverage: 7.8 dgC
 TAmplitude: 8.5 dgC
 MaxTDay: 209 yday
@@ -935,7 +933,7 @@ The present example shows a minimum weather data required. However,
 \daisy{} can make use of more detailed data (see \daisyref{}).
 
 Build a \daisy{} weather file based on the data in the spreadsheet
-\texttt{ÅrslevWeatherDat.xls}. Årslev is a locality located at the
+\texttt{AArslevWeatherDat.xls}. Årslev is a locality located at the
 center of Funen. The precipitation is measured at 1.5 m height and the
 shelter category is B. The surface of weather station is short grass
 and the screen height is 2 m.  The precipitation correction is found
@@ -974,7 +972,7 @@ easy decomposable pool should be around 5.
 Include the mixed slurry in the fertilizer library. Help on how to
 write a new parameterization of a new organic fertilizer can be found
 in the \daisyref{}, section~\ref{ref-model:am-organic}
-and~\ref{ref-fixed:AOM}. 
+and~\ref{ref-component:AOM}. 
 
 Compare the results obtained with the new mixed slurry with the
 results obtained in exercise~\ref{ex:warmup}.

@@ -219,7 +219,7 @@ public:
   { output_common (log); }
     
   // Create and Destroy.
-  bool initialized_ok;
+  mutable bool initialized_ok;
   bool initialize (const Time& time, Treelog& msg);
   bool check (const Time& from, const Time& to, Treelog&) const;
   WeatherSource (const BlockModel&);
@@ -703,7 +703,9 @@ WeatherSource::tick (const Time& time, Treelog& msg)
   Time last = when.size () > 0 ? when.back () : source->begin ();
   for (;!source->done () && last < next_day; source->tick (msg))
     {
-      daisy_assert (last == source->begin ());
+      if (last != source->begin ())
+        daisy_panic (last.print () + " != " + source->begin ().print ());
+
       when.push_back (source->end ());
       last = when.back ();
 
@@ -1101,16 +1103,42 @@ WeatherSource::initialize (const Time& time, Treelog& msg)
   timesteps[Weatherdata::DiffRad ()];
   timesteps[Weatherdata::AirTemp ()];
 
+  // Check interval.
+  const Time& data_begin = source->data_begin ();
+  const Time& data_end = source->data_end ();
+  if ((data_begin != Time::null () && time < data_begin)
+      || (data_end != Time::null () && time > data_end))
+    {
+      initialized_ok = false;
+      std::ostringstream tmp;
+      tmp << "Simulation start " << time.print () 
+          << " is not covered by weather data from ";
+      if (data_begin != Time::null ())
+        tmp << data_begin.print ();
+      else 
+        tmp << "unknown";
+      tmp << " to ";
+      if (data_end != Time::null ())
+        tmp << data_end.print ();
+      else 
+        tmp << "unknown";
+        
+      msg.error (tmp.str ());
+      return initialized_ok;
+    }
+
   // Initialize previous, next
   next = Time (time.year (), time.month (), time.mday (), 0);
   previous = next;
   previous.tick_hour (-1);
+  initialized_ok = ok;
   if (ok)
-    initialized_ok = true;
-  try
-    { tick (time, msg); }
-  catch (...)
-    { initialized_ok = false; }
+    {
+      try
+        { tick (time, msg); }
+      catch (...)
+        { initialized_ok = false; }
+    }
 
   return true;
 }
@@ -1118,8 +1146,34 @@ WeatherSource::initialize (const Time& time, Treelog& msg)
 bool 
 WeatherSource::check (const Time& from, const Time& to, Treelog& msg) const
 {
-  bool ok = initialized_ok;
   TREELOG_MODEL (msg);
+
+  // Check interval.
+  const Time& data_begin = source->data_begin ();
+  const Time& data_end = source->data_end ();
+  if ((data_begin != Time::null () && from < data_begin)
+      || (data_end != Time::null () && to > data_end))
+    {
+      initialized_ok = false;
+      std::ostringstream tmp;
+      tmp << "Simulation period from " << from.print () 
+          << " to " << to.print () 
+          << " is not covered by weather data from ";
+      if (data_begin != Time::null ())
+        tmp << data_begin.print ();
+      else 
+        tmp << "unknown";
+      tmp << " to ";
+      if (data_end != Time::null ())
+        tmp << data_end.print ();
+      else 
+        tmp << "unknown";
+        
+      msg.error (tmp.str ());
+    }
+
+  if (!initialized_ok)
+    return false;
 
   // Required parameters.
   static struct required_t : public std::vector<symbol>
@@ -1142,36 +1196,12 @@ WeatherSource::check (const Time& from, const Time& to, Treelog& msg) const
   for (size_t i = 0; i < required.size (); i++)
     if (!source->check (required[i]))
     {
-      ok = false;
+      initialized_ok = false;
       msg.error ("Required weather data '" + required[i] + "' missing");
     }
 
-  // Check interval.
-  const Time& data_begin = source->data_begin ();
-  const Time& data_end = source->data_end ();
-  if ((data_begin != Time::null () && from < data_begin)
-      || (data_end != Time::null () && to > data_end))
-    {
-      ok = false;
-      std::ostringstream tmp;
-      tmp << "Simulation period from " << from.print () 
-          << " to " << to.print () 
-          << " is not covered by weather data from ";
-      if (data_begin != Time::null ())
-        tmp << data_begin.print ();
-      else 
-        tmp << "unknown";
-      tmp << " to ";
-      if (data_end != Time::null ())
-        tmp << data_end.print ();
-      else 
-        tmp << "unknown";
-        
-      msg.error (tmp.str ());
-    }
-
   // TODO: More checks.
-  return ok;
+  return initialized_ok;
 }
 
 WeatherSource::WeatherSource (const BlockModel& al)

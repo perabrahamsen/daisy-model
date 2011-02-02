@@ -341,7 +341,7 @@ Time::tick_day (int days)
 	if (leap (impl->year))
 	  {
 	    impl->yday++;
-	    return;
+	    continue;
 	  }
 	/* fallthrough */
       case 366:

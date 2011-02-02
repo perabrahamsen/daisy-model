@@ -1,3 +1,12 @@
+2011-02-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* time.C (tick_day): Fix leap year bug.
+
+	* wsource_time.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* Makefile, setup.nsi: Added ShowDaisyOutput
+
 2011-01-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* all: Changed 'name' to 'objid' in all models.

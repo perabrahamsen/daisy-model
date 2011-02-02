@@ -401,7 +401,7 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C  
-MODELS = wsource_combine.C wsource_indirect.C\
+MODELS = wsource_time.C wsource_combine.C wsource_indirect.C\
 	weather_source.C wsource_table.C wsource_const.C weather_extra.C \
 	groundwater_source.C xysource_xycombine.C xysource_flux.C \
 	gnuplot_soil.C reaction_sorption.C hydraulic_B_C_inverse.C \
@@ -925,6 +925,7 @@ setupnosvn:
 	$(MAKE) setupdocs
 	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
 	mkdir $(SETUPDIR)/bin
+	cp libdeps/ShowDaisyOutput.exe $(SETUPDIR)/bin
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
 	$(STRIP) -o $(SETUPDIR)/bin/daisyw.exe $(OBJHOME)/daisyw.exe
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll $(OBJHOME)/daisy.dll
