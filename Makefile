@@ -401,7 +401,7 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C  
-MODELS = wsource_time.C wsource_combine.C wsource_indirect.C\
+MODELS = wsource_std.C wsource_time.C wsource_combine.C wsource_indirect.C\
 	weather_source.C wsource_table.C wsource_const.C weather_extra.C \
 	groundwater_source.C xysource_xycombine.C xysource_flux.C \
 	gnuplot_soil.C reaction_sorption.C hydraulic_B_C_inverse.C \
@@ -1656,11 +1656,19 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+wsource_std${OBJ}: wsource_std.C wsource_table.h wsource_base.h wsource.h \
+ model.h scope.h attribute.h symbol.h time.h lexer_table.h block_model.h \
+ block_nested.h block.h treelog.h frame_model.h frame.h frame_submodel.h \
+ librarian.h timestep.h vcheck.h submodeler.h block_submodel.h
+wsource_time${OBJ}: wsource_time.C wsource_indirect.h wsource.h model.h \
+ scope.h attribute.h symbol.h librarian.h treelog.h timestep.h time.h \
+ vcheck.h block_model.h block_nested.h block.h frame_model.h frame.h \
+ submodeler.h block_submodel.h frame_submodel.h
 wsource_combine${OBJ}: wsource_combine.C wsource.h model.h scope.h \
  attribute.h symbol.h weatherdata.h time.h memutils.h librarian.h \
  submodeler.h block_submodel.h block_nested.h block.h treelog.h \
  frame_submodel.h frame.h block_model.h frame_model.h vcheck.h \
- assertion.h
+ assertion.h mathlib.h
 wsource_indirect${OBJ}: wsource_indirect.C wsource_indirect.h wsource.h \
  model.h scope.h attribute.h symbol.h librarian.h block_model.h \
  block_nested.h block.h treelog.h frame_model.h frame.h
@@ -1670,10 +1678,10 @@ weather_source${OBJ}: weather_source.C weather.h model_derived.h \
  time.h timestep.h vcheck.h block_model.h block_nested.h block.h \
  treelog.h frame_model.h frame.h librarian.h assertion.h mathlib.h \
  astronomy.h fao.h
-wsource_table${OBJ}: wsource_table.C wsource_base.h wsource.h model.h scope.h \
- attribute.h symbol.h weatherdata.h time.h lexer_table.h block_model.h \
- block_nested.h block.h treelog.h frame_model.h frame.h units.h \
- memutils.h librarian.h frame_submodel.h assertion.h mathlib.h
+wsource_table${OBJ}: wsource_table.C wsource_table.h wsource_base.h wsource.h \
+ model.h scope.h attribute.h symbol.h time.h lexer_table.h block_model.h \
+ block_nested.h block.h treelog.h frame_model.h frame.h frame_submodel.h \
+ weatherdata.h units.h memutils.h librarian.h assertion.h mathlib.h
 wsource_const${OBJ}: wsource_const.C wsource_base.h wsource.h model.h scope.h \
  attribute.h symbol.h librarian.h treelog.h time.h
 weather_extra${OBJ}: weather_extra.C weather.h model_derived.h \

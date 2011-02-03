@@ -1,4 +1,4 @@
-// wsource_table.C -- Weather data that never changes.
+// wsource_table.C -- Weather data read from table.
 // 
 // Copyright 2010 KU
 //
@@ -20,78 +20,13 @@
 
 #define BUILD_DLL
 
-#include "wsource_base.h"
+#include "wsource_table.h"
 #include "weatherdata.h"
-#include "time.h"
-#include "lexer_table.h"
 #include "units.h"
 #include "librarian.h"
-#include "frame_submodel.h"
 #include "assertion.h"
 #include "mathlib.h"
-#include <map>
 #include <sstream>
-
-struct WSourceTable : public WSourceBase
-{
-  typedef WSourceBase super;
-  const Units& units;
-  LexerTable lex;
-  bool ok;
-  FrameSubmodelValue keywords;
-
-  std::map<symbol, size_t> columns;
-  std::map<symbol, double> values;
-  std::map<symbol, double> next_values;
-  Time my_data_begin;
-  Time my_data_end;
-  Time timestep_begin;
-  Time timestep_end;
-  double timestep_hours;
-
-  // Precipitaion correction.
-  double precip_correct (const Time&) const;
-  double precip_correct (const Time&, const std::vector<double>&) const;
-
-  // Scope.
-  bool check (const symbol key) const;
-  double raw_number (const symbol key) const;
-  double number (const symbol key) const;
-  symbol name (const symbol key) const;
-
-  // WSource.
-  const Time& data_begin () const;
-  const Time& data_end () const;
-  const Time& begin () const;
-  const Time& end () const;
-  double timestep () const;
-  bool end_check (const symbol key) const;
-  double raw_end_number (const symbol key) const;
-  double end_number (const symbol key) const;
-  symbol end_name (const symbol key) const;
-  void read_line ();
-  void tick (Treelog& msg);
-  bool done () const
-  { return !ok; }
-
-  void initialize (Treelog& msg) ;
-  bool check (Treelog&) const
-  { return ok; }
-  WSourceTable (const BlockModel& al)
-    : WSourceBase (al),
-      units (al.units ()),
-      lex (al),
-      ok (false),
-      keywords (*Librarian::submodel_frame (Weatherdata::load_syntax), 
-                Frame::parent_link),
-      my_data_begin (Time::null ()),
-      my_data_end (Time::null ()),
-      timestep_begin (Time::null ()),
-      timestep_end (Time::null ())
-  { }
-  ~WSourceTable ()
-  { }
-};
 
 double 
 WSourceTable::precip_correct (const Time& time) const
@@ -401,6 +336,26 @@ WSourceTable::initialize (Treelog& msg)
   read_line ();
   tick (msg);
 }
+
+bool 
+WSourceTable::check (Treelog&) const
+{ return ok; }
+
+WSourceTable::WSourceTable (const BlockModel& al)
+  : WSourceBase (al),
+    units (al.units ()),
+    lex (al),
+    ok (false),
+    keywords (*Librarian::submodel_frame (Weatherdata::load_syntax), 
+              Frame::parent_link),
+    my_data_begin (Time::null ()),
+    my_data_end (Time::null ()),
+    timestep_begin (Time::null ()),
+    timestep_end (Time::null ())
+{ }
+
+WSourceTable::~WSourceTable ()
+{ }
 
 static struct WSourceTableSyntax : public DeclareModel
 {
