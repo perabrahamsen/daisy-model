@@ -1,27 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Små tidsskridt i vejr
-
-** WSourceCombine
-
-combiner flere WSource
-
-*** Tidsskridt
-
-** WSourceIndirect base class
-
-Just pass all queries to child source.
-
-** WSourceTimeOffset : public WSourceIndirect
-
-change time.
-
-** Evt WSourceTransform : public WSourceIndirect
-
-(transform (AirTemp (+ Precip CO2)) ; Something about units...
-           (VapPres (* Wind GlobRad)))
-
-** Evt merge weather og wsource
+* Merge weather og wsource
 
 * Hent gammel PC.
 

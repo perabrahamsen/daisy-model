@@ -401,7 +401,8 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C  
-MODELS = wsource_std.C wsource_time.C wsource_combine.C wsource_indirect.C\
+MODELS = program_hmovie.C \
+	wsource_std.C wsource_time.C wsource_combine.C wsource_indirect.C\
 	weather_source.C wsource_table.C wsource_const.C weather_extra.C \
 	groundwater_source.C xysource_xycombine.C xysource_flux.C \
 	gnuplot_soil.C reaction_sorption.C hydraulic_B_C_inverse.C \
@@ -1656,6 +1657,11 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+program_hmovie${OBJ}: program_hmovie.C program.h model.h symbol.h run.h \
+ gnuplot.h lexer_table.h block_model.h block_nested.h block.h scope.h \
+ attribute.h treelog.h frame_model.h frame.h librarian.h submodeler.h \
+ block_submodel.h frame_submodel.h vcheck.h memutils.h assertion.h \
+ mathlib.h path.h time.h units.h
 wsource_std${OBJ}: wsource_std.C wsource_table.h wsource_base.h wsource.h \
  model.h scope.h attribute.h symbol.h time.h lexer_table.h block_model.h \
  block_nested.h block.h treelog.h frame_model.h frame.h frame_submodel.h \
