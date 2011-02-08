@@ -68,8 +68,8 @@ static struct WSourceConstSyntax : public DeclareModel
   Model* make (const BlockModel& al) const
   { return new WSourceConst (al); }
   WSourceConstSyntax ()
-    : DeclareModel (WSource::component, "const", "base"
-                    "Weather that does not change during the simulation.")
+    : DeclareModel (WSource::component, "const", "base", "\
+Weather that does not change during the simulation.")
   { }
   void load_frame (Frame&) const
   { }

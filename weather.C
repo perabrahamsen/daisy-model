@@ -29,6 +29,7 @@
 #include "astronomy.h"
 #include "mathlib.h"
 
+#if 0
 const char *const Weather::component = "weather";
 
 symbol
@@ -37,6 +38,7 @@ Weather::library_id () const
   static const symbol id (component);
   return id;
 }
+#endif
 
 const symbol 
 Weather::dry_deposit_unit ()
@@ -145,13 +147,13 @@ Weather::load_common (Frame& frame)
 Total atmospheric deposition of nitrogen.", load_flux);
 }
 
-Weather::Weather (const BlockModel& al)
-  : ModelDerived (al.type_name ())
+Weather::Weather ()
 { }
 
 Weather::~Weather ()
 { }
 
+#if 0
 static struct WeatherInit : public DeclareComponent 
 {
   WeatherInit ()
@@ -161,6 +163,6 @@ responsibility of the 'weather' component, typically be reading the\n\
 data from a file.  The meteorological data are common to all columns.")
   { }
 } Weather_init;
-
+#endif
 
 // weather.C ends here.

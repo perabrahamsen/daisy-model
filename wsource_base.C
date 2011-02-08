@@ -197,7 +197,7 @@ WSourceBase::meta_end_name (const symbol, const symbol meta) const
 { return end_name (meta); }
 
 WSourceBase::WSourceBase (const BlockModel& al)
-  : WSource (al.type_name ()),
+  : WSourceWeather (al),
     impl (new Implementation (al))
 { }
 
@@ -207,7 +207,7 @@ WSourceBase::~WSourceBase ()
 static struct WSourceBaseSyntax : public DeclareBase
 {
   WSourceBaseSyntax ()
-    : DeclareBase (WSource::component, "base",
+    : DeclareBase (WSource::component, "base", "weather",
                    "Weather that does not change during the simulation.")
   { }
   void load_frame (Frame& frame) const

@@ -98,7 +98,7 @@ root zone, as well as the biopore zone."
 		   (documentation "\
 Total amount of water entering the system as rain and snow.")
                    (path weather "*" precipitation)
-                   (spec weather base precipitation)
+                   (spec weather weather precipitation)
                    (handle sum)
                    (dimension "mm"))
            (number (tag "Irrigation")

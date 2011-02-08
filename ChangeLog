@@ -1,3 +1,7 @@
+2011-02-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* wsowsource_weather.h, wsource_weather.C: New base model.
+
 2011-02-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* program_hmovie.C: New model.

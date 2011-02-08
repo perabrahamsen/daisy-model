@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "daisy.h"
-#include "weather.h"
+#include "wsource.h"
 #include "groundwater.h"
 #include "horizon.h"
 #include "output.h"
@@ -73,7 +73,7 @@ struct Daisy::Implementation
   const Time stop;
   int duration;
   const boost::scoped_ptr<Action> action;
-  const boost::scoped_ptr<Weather> weather;
+  const boost::scoped_ptr<WSource> weather;
   bool initialized;
   bool running;
   const boost::scoped_ptr<Field> field;
@@ -266,7 +266,7 @@ struct Daisy::Implementation
                 :-1),
       action (Librarian::build_item<Action> (al, "manager")),
       weather (al.check ("weather") 
-               ? Librarian::build_item<Weather> (al, "weather")
+               ? Librarian::build_item<WSource> (al, "weather")
                : NULL),
       initialized (false),
       running (false),
@@ -540,7 +540,7 @@ By default, the simulation will run until the manager request it to stop.",
   frame.declare_object ("column", Column::component, 
                         Attribute::State, Attribute::Variable,
                         "List of columns to use in this simulation.");
-  frame.declare_object ("weather", Weather::component,
+  frame.declare_object ("weather", WSource::component,
                      Attribute::OptionalState, Attribute::Singleton,
                      "Weather model for providing climate information during\n\
 the simulation.  Can be overwritten by column specific weather.");

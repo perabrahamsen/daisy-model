@@ -1,6 +1,6 @@
-// weather_source.C -- Weather data from WSource.
+// wsource_weather.C -- Weather data from WSource.
 // 
-// Copyright 2010 KU.
+// Copyright 2011 KU.
 //
 // This file is part of Daisy.
 // 
@@ -21,7 +21,8 @@
 #define BUILD_DLL
 
 #include "weather.h"
-#include "wsource.h"
+
+#include "wsource_weather.h"
 #include "chemical.h"
 #include "im.h"
 #include "units.h"
@@ -35,17 +36,29 @@
 #include "mathlib.h"
 #include "astronomy.h"
 #include "fao.h"
-#include <boost/scoped_ptr.hpp>
+#include "log.h"
 #include <map>
 #include <deque>
 #include <sstream>
 
-struct WeatherSource : public Weather
+struct WSourceWeather::Implementation
 {
+  const Weather& weather;
   const Units& units;
+  WSource& source;
+  
+  double relative_extraterestial_radiation (const Time& time) const
+  {
+    const double average 
+      = Astronomy::DailyExtraterrestrialRadiation (time, weather.latitude ());
+    const double current 
+      = Astronomy::ExtraterrestrialRadiation (time, weather.latitude (),
+                                              weather.longitude (), 
+                                              weather.timezone ());
+    return current / average;
+  }
 
   // Parameters.
-  boost::scoped_ptr<WSource> source;
   const PLF snow_fraction;
 
   double NH4WetDep;
@@ -120,93 +133,7 @@ struct WeatherSource : public Weather
   // Extract weather.
   static double safe_value (const double value, const double reserve)
   { return std::isfinite (value) ? value: reserve; }
-  double latitude () const
-  { return safe_value (my_latitude, 56.0); }
-  double longitude () const
-  { return safe_value (my_longitude, 12.0); }
-  double elevation () const
-  { return my_elevation; }
-  double timezone () const
-  { return safe_value (my_timezone, 15.0); }
-  double screen_height () const
-  { return my_screenheight; }
-  Weatherdata::surface_t surface () const
-  { return my_surface; }
-  double air_temperature () const
-  { return my_air_temperature; }
-  double daily_air_temperature () const
-  { return my_daily_air_temperature; }
-  double daily_max_air_temperature () const
-  { return my_daily_max_air_temperature; }
-  double daily_min_air_temperature () const
-  { return my_daily_min_air_temperature; }
-  double global_radiation () const
-  { return my_global_radiation; }
-  double daily_global_radiation () const
-  { return my_daily_global_radiation; }
-  double diffuse_radiation () const
-  { return has_diffuse_radiation () ? my_diffuse_radiation : 0.0; }
-  double reference_evapotranspiration () const
-  { return my_reference_evapotranspiration; }
-  double daily_precipitation () const
-  { return my_daily_precipitation; }
-  double rain () const
-  { return my_rain; }
-  double snow () const
-  { return my_snow; }
-  const IM& deposit () const
-  { return my_deposit; }
-  double cloudiness () const
-  { return my_cloudiness; }
-  double vapor_pressure () const
-  { return has_vapor_pressure () 
-      ? my_vapor_pressure 
-      : has_min_max_temperature ()
-      ? FAO::SaturationVapourPressure (daily_min_air_temperature ())
-      : FAO::SaturationVapourPressure (daily_air_temperature () - 5.0); }
-  double wind () const
-  { return has_wind () ? my_wind : 5.0; }
-  double CO2 () const
-  { 
-    static const double standard_pressure = FAO::AtmosphericPressure (0.0);
-    return 35.0 * air_pressure () / standard_pressure; 
-  }
-  double O2 () const
-  { 
-    static const double standard_pressure = FAO::AtmosphericPressure (0.0);
-    return 20500.0 * air_pressure () / standard_pressure; 
-  }
-  double air_pressure () const
-  { return FAO::AtmosphericPressure (elevation ()); }
-  bool has_reference_evapotranspiration () const
-  { return std::isfinite (my_reference_evapotranspiration); }
-  bool has_vapor_pressure () const
-  { return std::isfinite (my_vapor_pressure); }
-  bool has_wind () const
-  { return std::isfinite (my_wind); }
-  bool has_min_max_temperature () const
-  { return my_has_min_max_temperature; }
-  bool has_diffuse_radiation () const
-  { return std::isfinite (my_diffuse_radiation); }
-  double timestep () const
-  { return Time::hours_between (previous, next); }
-
-  // Light distribution.
-public:
-  double day_length () const
-  { return my_day_length; }
-
-  // Soil heat initialization.
   double T_normal (const Time& time, double delay) const;
-
-  double average_temperature () const
-  { 
-    if (initialized_ok)
-      return my_Taverage; 
-
-    // Used by initialization.
-    return 10.0;
-  }
 
   // Simulation.
   Time previous;
@@ -215,20 +142,18 @@ public:
   void tick (const Time& time, Treelog&);
   void check_state (const symbol key, const double value, Treelog& msg);
   void check_state (Treelog& msg);
-  void output (Log& log) const
-  { output_common (log); }
     
   // Create and Destroy.
   mutable bool initialized_ok;
   bool initialize (const Time& time, Treelog& msg);
   bool check (const Time& from, const Time& to, Treelog&) const;
-  WeatherSource (const BlockModel&);
-  ~WeatherSource ();
+  Implementation (const Weather&, WSource&, const BlockModel&);
+  ~Implementation ();
 };
 
 double 
-WeatherSource::max_timestep (const Time& from, const Time& to,
-                             const symbol key) const
+WSourceWeather::Implementation::max_timestep (const Time& from, const Time& to,
+                                              const symbol key) const
 {
   // Available data.
   const number_map_t::const_iterator e = timesteps.find (key);
@@ -269,12 +194,12 @@ WeatherSource::max_timestep (const Time& from, const Time& to,
 }
 
 double 
-WeatherSource::max_timestep (const symbol key) const
+WSourceWeather::Implementation::max_timestep (const symbol key) const
 { return max_timestep (previous, next, key); }
 
 double 
-WeatherSource::number_average (const Time& from, const Time& to,
-                               const symbol key) const
+WSourceWeather::Implementation::number_average (const Time& from, const Time& to,
+                                                const symbol key) const
 {
   // This function considers the source data constant within the
   // source interval, and will give you the average value for the
@@ -345,13 +270,13 @@ WeatherSource::number_average (const Time& from, const Time& to,
     
 
 double 
-WeatherSource::number_average (const symbol key) const
+WSourceWeather::Implementation::number_average (const symbol key) const
 { return number_average (previous, next, key); }
 
 void 
-WeatherSource::extract_average (const Time& from, const Time& to,
-                                const symbol key, double& variable, 
-                                Treelog& msg) const
+WSourceWeather::Implementation::extract_average (const Time& from, const Time& to,
+                                                 const symbol key, double& variable, 
+                                                 Treelog& msg) const
 {
   const double value = number_average (from, to, key);
   if (std::isfinite (value))
@@ -361,8 +286,8 @@ WeatherSource::extract_average (const Time& from, const Time& to,
 }
 
 void 
-WeatherSource::extract_average (const symbol key, double& variable, 
-                                Treelog& msg) const
+WSourceWeather::Implementation::extract_average (const symbol key, double& variable, 
+                                                 Treelog& msg) const
 {
   const double value = number_average (key);
   if (std::isfinite (value))
@@ -372,9 +297,9 @@ WeatherSource::extract_average (const symbol key, double& variable,
 }
 
 double
-WeatherSource::find_cloudiness (const Time& time, const double Si) const
+WSourceWeather::Implementation::find_cloudiness (const Time& time, const double Si) const
 {
-  const double rad = extraterrestrial_radiation (time);
+  const double rad = weather.extraterrestrial_radiation (time);
   if (Si > 25.0 && rad > 25.0)
     return FAO::CloudinessFactor_Humid (Si, rad);
   else
@@ -382,7 +307,7 @@ WeatherSource::find_cloudiness (const Time& time, const double Si) const
 }
 
 double 
-WeatherSource::number_cloudiness (const Time& from, const Time& to) const
+WSourceWeather::Implementation::number_cloudiness (const Time& from, const Time& to) const
 {
   // This function considers the source data constant within the
   // source interval, and will give you the average cloudiness for the
@@ -448,7 +373,7 @@ WeatherSource::number_cloudiness (const Time& from, const Time& to) const
 }
 
 void 
-WeatherSource::extract_cloudiness (double& variable) const
+WSourceWeather::Implementation::extract_cloudiness (double& variable) const
 {
   const double value = number_cloudiness (previous, next);
   if (std::isfinite (value))
@@ -456,7 +381,7 @@ WeatherSource::extract_cloudiness (double& variable) const
 }
 
 bool 
-WeatherSource::unchanged (const double a, const double b)
+WSourceWeather::Implementation::unchanged (const double a, const double b)
 {
   if (std::isnormal (a) && std::isnormal (b))
     return approximate (a, b);
@@ -465,7 +390,7 @@ WeatherSource::unchanged (const double a, const double b)
 }
 
 void
-WeatherSource::reset_deposition (Treelog& msg)
+WSourceWeather::Implementation::reset_deposition (Treelog& msg)
 {
   Treelog::Open next (msg, __FUNCTION__);
 
@@ -611,7 +536,7 @@ NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (), u_dpu)
 }
 
 symbol
-WeatherSource::name_first (const symbol key) const
+WSourceWeather::Implementation::name_first (const symbol key) const
 {
   // This function return the name used at the beginning of weather interval.
 
@@ -640,7 +565,7 @@ WeatherSource::name_first (const symbol key) const
 }
     
 double
-WeatherSource::T_normal (const Time& time, double delay) const
+WSourceWeather::Implementation::T_normal (const Time& time, double delay) const
 {
   if (!std::isnormal (my_Taverage) || !std::isnormal (my_Tamplitude))
     // used by initialization.
@@ -657,7 +582,7 @@ WeatherSource::T_normal (const Time& time, double delay) const
 }
 
 double 
-WeatherSource::suggest_dt () const // [h]
+WSourceWeather::Implementation::suggest_dt () const // [h]
 { 
   // Suggest running until we get new data.
   for (size_t i = 0; i < when.size (); i++)
@@ -669,9 +594,8 @@ WeatherSource::suggest_dt () const // [h]
 }
 
 void 
-WeatherSource::tick (const Time& time, Treelog& msg)
+WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
 {
-  TREELOG_MODEL (msg);
   daisy_assert (time > previous);
 
   // Update time interval
@@ -700,13 +624,13 @@ WeatherSource::tick (const Time& time, Treelog& msg)
   // Push back.
   Time next_day (next.year (), next.month (), next.mday (), 0);
   next_day.tick_day (); // We keep one day worth of weather data.
-  Time last = when.size () > 0 ? when.back () : source->begin ();
-  for (;!source->done () && last < next_day; source->tick (msg))
+  Time last = when.size () > 0 ? when.back () : source.begin ();
+  for (;!source.done () && last < next_day; source.tick (msg))
     {
-      if (last != source->begin ())
-        daisy_panic (last.print () + " != " + source->begin ().print ());
+      if (last != source.begin ())
+        daisy_panic (last.print () + " != " + source.begin ().print ());
 
-      when.push_back (source->end ());
+      when.push_back (source.end ());
       last = when.back ();
 
       // Numbers.
@@ -719,15 +643,15 @@ WeatherSource::tick (const Time& time, Treelog& msg)
           std::deque<double>& data = i->second;
           if (key == Attribute::Unknown ())
             {
-              if (source->end_check (meta))
-                data.push_back (source->end_number (meta));
+              if (source.end_check (meta))
+                data.push_back (source.end_number (meta));
               else 
                 data.push_back (NAN);
             }
           else
             {
-              if (source->meta_end_check (key, meta))
-                data.push_back (source->meta_end_number (key, meta));
+              if (source.meta_end_check (key, meta))
+                data.push_back (source.meta_end_number (key, meta));
               else
                 data.push_back (NAN);
             }
@@ -740,8 +664,8 @@ WeatherSource::tick (const Time& time, Treelog& msg)
         { 
           const symbol key = i->first;
           std::deque<double>& data = i->second;
-          if (source->check (key))
-            data.push_back (source->meta_timestep (key));
+          if (source.check (key))
+            data.push_back (source.meta_timestep (key));
           else
             data.push_back (NAN);
         }
@@ -756,15 +680,15 @@ WeatherSource::tick (const Time& time, Treelog& msg)
           std::deque<symbol>& data = i->second;
           if (key == Attribute::Unknown ())
             {
-              if (source->end_check (meta))
-                data.push_back (source->end_name (meta));
+              if (source.end_check (meta))
+                data.push_back (source.end_name (meta));
               else 
                 data.push_back (Attribute::Unknown ());
             }
           else
             {
-              if (source->meta_end_check (key, meta))
-                data.push_back (source->meta_end_name (key, meta));
+              if (source.meta_end_check (key, meta))
+                data.push_back (source.meta_end_name (key, meta));
               else
                 data.push_back (Attribute::Unknown ());
             }
@@ -787,7 +711,7 @@ WeatherSource::tick (const Time& time, Treelog& msg)
         = Time (next.year (), next.month (), next.mday (), 0);
       day_end = day_start;
       day_end.tick_day (1);
-      my_day_length = Astronomy::DayLength (next, latitude ());
+      my_day_length = Astronomy::DayLength (next, weather.latitude ());
       my_sunrise = 12.0 - my_day_length * 0.5; // Use astronomy.C.
 
       // Global radiation.
@@ -844,24 +768,24 @@ WeatherSource::tick (const Time& time, Treelog& msg)
           has_max = std::isfinite (values_max[i]);
         }
       else while (i < data_size && (i == 0 || when[i-1] < day_end))
-        {
-          // Explicit min/max temperature.
-          if (std::isfinite (values_min[i]))
-            has_min = true;
-          if (std::isfinite (values_max[i]))
-            has_max = true;
+             {
+               // Explicit min/max temperature.
+               if (std::isfinite (values_min[i]))
+                 has_min = true;
+               if (std::isfinite (values_max[i]))
+                 has_max = true;
               
-          // Take all data in period into account.
-          if (!std::isfinite (new_min) || new_min > values_min[i])
-            new_min = values_min[i];
-          if (!std::isfinite (new_min) || new_min > values_avg[i])
-            new_min = values_avg[i];
-          if (!std::isfinite (new_max) || new_max < values_max[i])
-            new_max = values_max[i];
-          if (!std::isfinite (new_max) || new_max < values_avg[i])
-            new_max = values_avg[i];
-          i++;
-        }
+               // Take all data in period into account.
+               if (!std::isfinite (new_min) || new_min > values_min[i])
+                 new_min = values_min[i];
+               if (!std::isfinite (new_min) || new_min > values_avg[i])
+                 new_min = values_avg[i];
+               if (!std::isfinite (new_max) || new_max < values_max[i])
+                 new_max = values_max[i];
+               if (!std::isfinite (new_max) || new_max < values_avg[i])
+                 new_max = values_avg[i];
+               i++;
+             }
 
       // Use it.
       if (!std::isfinite (my_daily_min_air_temperature))
@@ -924,7 +848,7 @@ WeatherSource::tick (const Time& time, Treelog& msg)
   const double new_air_temperature = number_average (Weatherdata::AirTemp ());
   if (std::isfinite (new_air_temperature))
     my_air_temperature = new_air_temperature;
-  else if (has_min_max_temperature ())
+  else if (weather.has_min_max_temperature ())
     {
       // We assume max T is at 15:00 and min T is at sunrise.
       // We assume previous and next day are identical to this one,
@@ -1019,7 +943,7 @@ WeatherSource::tick (const Time& time, Treelog& msg)
 }
 
 void
-WeatherSource::check_state (const symbol key, const double value, Treelog& msg)
+WSourceWeather::Implementation::check_state (const symbol key, const double value, Treelog& msg)
 {
 #if 0
   std::ostringstream tmp;
@@ -1033,7 +957,7 @@ WeatherSource::check_state (const symbol key, const double value, Treelog& msg)
 }
 
 void
-WeatherSource::check_state (Treelog& msg)
+WSourceWeather::Implementation::check_state (Treelog& msg)
 {
   check_state (Weatherdata::Latitude (), my_latitude, msg);
   check_state (Weatherdata::Longitude (), my_longitude, msg);
@@ -1064,27 +988,26 @@ WeatherSource::check_state (Treelog& msg)
 }
 
 bool 
-WeatherSource::initialize (const Time& time, Treelog& msg)
+WSourceWeather::Implementation::initialize (const Time& time, Treelog& msg)
 {
-  TREELOG_MODEL (msg);
   bool ok = true;
 
   // Source.
-  source->initialize (msg);
-  if (!source->check (msg))
+  source.initialize (msg);
+  if (!source.check (msg))
     ok = false;
   
   // Numbers and names.
   std::set<symbol> all;
-  source->entries (all);
+  source.entries (all);
   for (std::set<symbol>::const_iterator i = all.begin (); i != all.end (); i++)
     {
       const symbol key = *i;
 
-      if (source->type_size (key) != Attribute::Singleton)
+      if (source.type_size (key) != Attribute::Singleton)
         continue;
 
-      switch (source->lookup (key))
+      switch (source.lookup (key))
         {
         case Attribute::Number:
           numbers[key];         // Instantiate.
@@ -1104,8 +1027,8 @@ WeatherSource::initialize (const Time& time, Treelog& msg)
   timesteps[Weatherdata::AirTemp ()];
 
   // Check interval.
-  const Time& data_begin = source->data_begin ();
-  const Time& data_end = source->data_end ();
+  const Time& data_begin = source.data_begin ();
+  const Time& data_end = source.data_end ();
   if ((data_begin != Time::null () && time < data_begin)
       || (data_end != Time::null () && time > data_end))
     {
@@ -1144,13 +1067,11 @@ WeatherSource::initialize (const Time& time, Treelog& msg)
 }
 
 bool 
-WeatherSource::check (const Time& from, const Time& to, Treelog& msg) const
+WSourceWeather::Implementation::check (const Time& from, const Time& to, Treelog& msg) const
 {
-  TREELOG_MODEL (msg);
-
   // Check interval.
-  const Time& data_begin = source->data_begin ();
-  const Time& data_end = source->data_end ();
+  const Time& data_begin = source.data_begin ();
+  const Time& data_end = source.data_end ();
   if ((data_begin != Time::null () && from < data_begin)
       || (data_end != Time::null () && to > data_end))
     {
@@ -1194,20 +1115,22 @@ WeatherSource::check (const Time& from, const Time& to, Treelog& msg) const
   } required;
 
   for (size_t i = 0; i < required.size (); i++)
-    if (!source->check (required[i]))
-    {
-      initialized_ok = false;
-      msg.error ("Required weather data '" + required[i] + "' missing");
-    }
+    if (!source.check (required[i]))
+      {
+        initialized_ok = false;
+        msg.error ("Required weather data '" + required[i] + "' missing");
+      }
 
   // TODO: More checks.
   return initialized_ok;
 }
 
-WeatherSource::WeatherSource (const BlockModel& al)
-  : Weather (al),
+WSourceWeather::Implementation::Implementation (const Weather& w,
+                                                WSource& s,
+                                                const BlockModel& al)
+  : weather (w),
     units (al.units ()),
-    source (Librarian::build_item<WSource> (al, "source")),
+    source (s),
     snow_fraction (al.plf ("snow_fraction")),
     NH4WetDep (NAN),
     NH4DryDep (NAN),
@@ -1218,7 +1141,7 @@ WeatherSource::WeatherSource (const BlockModel& al)
     DepDryNH4 (NAN),
     DepWetNH4 (NAN),
     PAverage (NAN),
-    DryDeposit (units.get_unit (dry_deposit_unit ())),
+    DryDeposit (units.get_unit (Weather::dry_deposit_unit ())),
     WetDeposit (units.get_unit (Units::ppm ())),
     my_latitude (NAN),
     my_longitude (NAN),
@@ -1249,30 +1172,227 @@ WeatherSource::WeatherSource (const BlockModel& al)
     initialized_ok (false)
 { }
 
-WeatherSource::~WeatherSource ()
+WSourceWeather::Implementation::~Implementation ()
 { }
 
-// Add the WeatherSource syntax to the syntax table.
-static struct WeatherSourceSyntax : public DeclareModel
+double
+WSourceWeather::latitude () const
+{ return Implementation::safe_value (impl->my_latitude, 56.0); }
+
+double
+WSourceWeather::longitude () const
+{ return Implementation::safe_value (impl->my_longitude, 12.0); }
+
+double
+WSourceWeather::elevation () const
+{ return impl->my_elevation; }
+
+double
+WSourceWeather::timezone () const
+{ return Implementation::safe_value (impl->my_timezone, 15.0); }
+
+double
+WSourceWeather::screen_height () const
+{ return impl->my_screenheight; }
+
+Weatherdata::surface_t 
+WSourceWeather::surface () const
+{ return impl->my_surface; }
+
+double
+WSourceWeather::air_temperature () const
+{ return impl->my_air_temperature; }
+
+double
+WSourceWeather::daily_air_temperature () const
+{ return impl->my_daily_air_temperature; }
+
+double
+WSourceWeather::daily_max_air_temperature () const
+{ return impl->my_daily_max_air_temperature; }
+
+double
+WSourceWeather::daily_min_air_temperature () const
+{ return impl->my_daily_min_air_temperature; }
+
+double
+WSourceWeather::global_radiation () const
+{ return impl->my_global_radiation; }
+
+double
+WSourceWeather::daily_global_radiation () const
+{ return impl->my_daily_global_radiation; }
+
+double
+WSourceWeather::diffuse_radiation () const
+{ return has_diffuse_radiation () ? impl->my_diffuse_radiation : 0.0; }
+
+double
+WSourceWeather::reference_evapotranspiration () const
+{ return impl->my_reference_evapotranspiration; }
+
+double
+WSourceWeather::daily_precipitation () const
+{ return impl->my_daily_precipitation; }
+
+double
+WSourceWeather::rain () const
+{ return impl->my_rain; }
+
+double
+WSourceWeather::snow () const
+{ return impl->my_snow; }
+
+const IM&
+WSourceWeather::deposit () const
+{ return impl->my_deposit; }
+
+double
+WSourceWeather::cloudiness () const
+{ return impl->my_cloudiness; }
+
+double
+WSourceWeather::vapor_pressure () const
+{ return has_vapor_pressure () 
+    ? impl->my_vapor_pressure 
+    : has_min_max_temperature ()
+    ? FAO::SaturationVapourPressure (daily_min_air_temperature ())
+    : FAO::SaturationVapourPressure (daily_air_temperature () - 5.0); }
+
+double
+WSourceWeather::wind () const
+{ return has_wind () ? impl->my_wind : 5.0; }
+
+double
+WSourceWeather::CO2 () const
+{ 
+  static const double standard_pressure = FAO::AtmosphericPressure (0.0);
+  return 35.0 * air_pressure () / standard_pressure; 
+}
+
+double
+WSourceWeather::O2 () const
+{ 
+  static const double standard_pressure = FAO::AtmosphericPressure (0.0);
+  return 20500.0 * air_pressure () / standard_pressure; 
+}
+
+double
+WSourceWeather::air_pressure () const
+{ return FAO::AtmosphericPressure (elevation ()); }
+
+bool
+WSourceWeather::has_reference_evapotranspiration () const
+{ return std::isfinite (impl->my_reference_evapotranspiration); }
+
+bool
+WSourceWeather::has_vapor_pressure () const
+{ return std::isfinite (impl->my_vapor_pressure); }
+
+bool
+WSourceWeather::has_wind () const
+{ return std::isfinite (impl->my_wind); }
+
+bool
+WSourceWeather::has_min_max_temperature () const
+{ return impl->my_has_min_max_temperature; }
+
+bool
+WSourceWeather::has_diffuse_radiation () const
+{ return std::isfinite (impl->my_diffuse_radiation); }
+
+double
+WSourceWeather::timestep () const
+{ return Time::hours_between (impl->previous, impl->next); }
+
+double
+WSourceWeather::day_length () const
+{ return impl->my_day_length; }
+
+double 
+WSourceWeather::T_normal (const Time& time, double delay) const
+{ return impl->T_normal (time, delay); }
+
+double
+WSourceWeather::average_temperature () const
+{ 
+  if (impl->initialized_ok)
+    return impl->my_Taverage; 
+  
+  // Used by initialization.
+  return 10.0;
+}
+double 
+WSourceWeather::suggest_dt () const
+{ return impl->suggest_dt (); }
+
+void 
+WSourceWeather::tick (const Time& time, Treelog& msg)
 {
-  Model* make (const BlockModel& al) const
-  { 
-#if 1
-    return new WeatherSource (al); 
-#else
-    daisy_notreached ();
-#endif
-  }
-  WeatherSourceSyntax ()
-    : DeclareModel (Weather::component, "source",
-                    "Assemble weather data from weather source.")
+  TREELOG_MODEL (msg);
+  impl->tick (time, msg); 
+}
+
+void 
+WSourceWeather::output (Log& log) const
+{
+  output_value (air_temperature (), "air_temperature", log);
+  output_value (daily_air_temperature (), "daily_air_temperature", log);
+  output_value (daily_min_air_temperature (),
+                "daily_min_air_temperature", log);
+  output_value (daily_max_air_temperature (), 
+                "daily_max_air_temperature", log);
+  output_value (global_radiation (), "global_radiation", log);
+  output_value (daily_global_radiation (), "daily_global_radiation", log);
+  if (has_reference_evapotranspiration ())
+    output_value (reference_evapotranspiration (), 
+                  "reference_evapotranspiration", log);
+  output_value (rain (), "rain", log);
+  output_value (snow (), "snow", log);
+  output_value (rain () + snow (), "precipitation", log);
+  output_value (cloudiness (), "cloudiness", log);
+  output_value (vapor_pressure (), "vapor_pressure", log);
+  output_value (air_pressure (), "air_pressure", log);
+  output_value (diffuse_radiation (), "diffuse_radiation", log);
+  output_value (wind (), "wind", log);
+  output_value (day_length (), "day_length", log);
+  output_submodule (deposit (), "deposit", log);
+}
+
+
+bool 
+WSourceWeather::initialize (const Time& time, Treelog& msg)
+{
+  TREELOG_MODEL (msg);
+  return impl->initialize (time, msg);
+}
+
+bool 
+WSourceWeather::check (const Time& from, const Time& to, Treelog& msg) const
+{
+  TREELOG_MODEL (msg);
+  return impl->check (from, to, msg);
+}
+
+WSourceWeather::WSourceWeather (const BlockModel& al)
+  : WSource (al.type_name ()),
+    impl (new Implementation (*this, *this, al))
+{ }
+
+WSourceWeather::~WSourceWeather ()
+{ }
+
+// Add the WSourceWeather syntax to the syntax table.
+static struct WSourceWeatherSyntax : public DeclareBase
+{
+  WSourceWeatherSyntax ()
+    : DeclareBase (WSource::component, "weather",
+                   "Weather interface implementation.")
   { }
   void load_frame (Frame& frame) const
   { 
     Weather::load_common (frame);
 
-    frame.declare_object ("source", WSource::component, "\
-Source of weather data.");
     frame.declare ("snow_fraction", "dg C", Attribute::Fraction (),
                    Attribute::Const, "\
 Fraction of precipitation that falls as snow as function of air temperature.");
@@ -1281,7 +1401,7 @@ Fraction of precipitation that falls as snow as function of air temperature.");
     snow_fraction.add (2.0, 0.0);
     frame.set ("snow_fraction", snow_fraction);
   }
-} WeatherSource_syntax;
+} WSourceWeather_syntax;
 
-// weather_source.C ends here.
+// wsource_weather.C ends here.
 

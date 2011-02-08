@@ -21,10 +21,10 @@
 #ifndef WSOURCE_BASE_H
 #define WSOURCE_BASE_H
 
-#include "wsource.h"
+#include "wsource_weather.h"
 #include <boost/scoped_ptr.hpp>
 
-class WSourceBase : public WSource
+class WSourceBase : public WSourceWeather
 {
 private:
   struct Implementation;

@@ -398,12 +398,11 @@ NOLINK = -c
 
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
-# 
-
+#  weather_source.C weather_extra.C weather_std.C weather_simple.C weather_none.C weather_hourly.C weather_base.C weather_base.h weather_old.C weather_old.h
 LATER = tertiary_instant.C  
 MODELS = program_hmovie.C \
 	wsource_std.C wsource_time.C wsource_combine.C wsource_indirect.C\
-	weather_source.C wsource_table.C wsource_const.C weather_extra.C \
+	wsource_table.C wsource_const.C \
 	groundwater_source.C xysource_xycombine.C xysource_flux.C \
 	gnuplot_soil.C reaction_sorption.C hydraulic_B_C_inverse.C \
 	program_osvaldo.C vegetation_permanent.C  litter.C drain_lateral.C \
@@ -455,19 +454,19 @@ MODELS = program_hmovie.C \
 	action_repeat.C \
 	vegetation_crops.C crop_simple.C action_ridge.C groundwater_fixed.C \
 	groundwater_deep.C action_heat.C hydraulic_M_vG_compact.C \
-	action_crop.C groundwater_lysimeter.C action_message.C weather_std.C \
+	action_crop.C groundwater_lysimeter.C action_message.C \
 	groundwater_pipe.C \
 	select_index.C select_content.C \
 	select_number.C select_array.C log_table.C \
 	log_harvest.C action_while.C action_wait.C action_activity.C \
 	mactrans_std.C macro_std.C macro_none.C \
-	column_std.C  weather_simple.C uzrichard.C \
+	column_std.C  uzrichard.C \
 	hydraulic_yolo.C hydraulic_M_vG.C hydraulic_B_vG.C hydraulic_M_C.C \
 	hydraulic_B_C.C hydraulic_M_BaC.C hydraulic_B_BaC.C \
 	groundwater_static.C horizon_std.C \
 	crop_std.C action_sow.C action_stop.C condition_time.C \
 	condition_logic.C action_irrigate.C action_lisp.C \
-	weather_none.C action_tillage.C \
+	action_tillage.C \
 	action_harvest.C \
 	action_with.C nitrification_soil.C \
 	nitrification_solute.C hydraulic_mod_C.C uzlr.C adsorption_vS_S.C \
@@ -482,7 +481,7 @@ MODELS = program_hmovie.C \
 
 DISABLED = depend.C \
 	crop_old.C crop_sold.C log_clone.C action_merge.C action_divide.C \
-	hydraulic_old.C hydraulic_old2.C weather_hourly.C 
+	hydraulic_old.C hydraulic_old2.C 
 # A component is a common interface to a number of models.
 # 
 COMPONENTS = wsource.C solute.C drain.C \
@@ -516,11 +515,12 @@ SUBMODELS = irrigate.C \
 
 # Special or intermediate models with their own interface.
 # 
-SPECIALS = wsource_base.C log_dlf.C reaction_colgen.C weather_base.C \
+SPECIALS = wsource_weather.C \
+	wsource_base.C log_dlf.C reaction_colgen.C \
 	volume_box.C movement_solute.C scope_exchange.C photo_Farquhar.C \
 	scope_multi.C scope_id.C geometry_vert.C gnuplot_base.C \
 	source_file.C format_LaTeX.C log_all.C om.C select_value.C \
-	weather_old.C log_extern.C log_select.C parser_file.C \
+	log_extern.C log_select.C parser_file.C \
 	geometry.C log_alist.C
 
 # Various utility code that are neither a component nor a (sub)model.
@@ -1003,8 +1003,9 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
-wsource${OBJ}: wsource.C wsource.h model.h scope.h attribute.h symbol.h \
- weatherdata.h time.h librarian.h assertion.h
+wsource${OBJ}: wsource.C wsource_weather.h wsource.h weather.h \
+ model_derived.h model_logable.h model.h symbol.h weatherdata.h scope.h \
+ attribute.h time.h librarian.h assertion.h
 solute${OBJ}: solute.C solute.h model_logable.h model.h symbol.h im.h \
  attribute.h block_model.h block_nested.h block.h scope.h treelog.h \
  frame_model.h frame.h librarian.h
@@ -1395,10 +1396,17 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h \
  frame_submodel.h frame.h scope.h attribute.h symbol.h log.h time.h \
  border.h model_framed.h model_logable.h model.h geometry.h soil.h am.h \
  im.h librarian.h plf.h aom.h om.h check.h vcheck.h mathlib.h assertion.h
-wsource_base${OBJ}: wsource_base.C wsource_base.h wsource.h model.h scope.h \
- attribute.h symbol.h weatherdata.h time.h assertion.h mathlib.h \
- librarian.h frame_submodel.h frame.h block_model.h block_nested.h \
- block.h treelog.h frame_model.h submodeler.h block_submodel.h
+wsource_weather${OBJ}: wsource_weather.C weather.h model_derived.h \
+ model_logable.h model.h symbol.h weatherdata.h wsource_weather.h \
+ wsource.h scope.h attribute.h chemical.h model_framed.h im.h units.h \
+ memutils.h plf.h time.h timestep.h vcheck.h block_model.h block_nested.h \
+ block.h treelog.h frame_model.h frame.h librarian.h assertion.h \
+ mathlib.h astronomy.h fao.h log.h border.h
+wsource_base${OBJ}: wsource_base.C wsource_base.h wsource_weather.h wsource.h \
+ weather.h model_derived.h model_logable.h model.h symbol.h weatherdata.h \
+ scope.h attribute.h time.h assertion.h mathlib.h librarian.h \
+ frame_submodel.h frame.h block_model.h block_nested.h block.h treelog.h \
+ frame_model.h submodeler.h block_submodel.h
 log_dlf${OBJ}: log_dlf.C log_dlf.h log_select.h log.h time.h symbol.h \
  border.h model_framed.h model_logable.h model.h memutils.h dlf.h \
  select.h destination.h units.h volume.h model_derived.h attribute.h \
@@ -1410,11 +1418,6 @@ reaction_colgen${OBJ}: reaction_colgen.C reaction_colgen.h reaction.h \
  frame.h scope.h attribute.h log.h time.h border.h chemistry.h treelog.h \
  block_model.h block_nested.h block.h frame_model.h geometry.h soil.h \
  surface.h uzmodel.h
-weather_base${OBJ}: weather_base.C weather_base.h weather.h model_derived.h \
- model_logable.h model.h symbol.h weatherdata.h im.h attribute.h fao.h \
- assertion.h time.h log.h border.h model_framed.h mathlib.h librarian.h \
- block_model.h block_nested.h block.h scope.h treelog.h frame_model.h \
- frame.h units.h memutils.h
 volume_box${OBJ}: volume_box.C volume_box.h volume.h model_derived.h \
  model_logable.h model.h symbol.h bound.h border.h mathlib.h assertion.h \
  librarian.h treelog.h frame.h scope.h attribute.h block_model.h \
@@ -1465,10 +1468,6 @@ select_value${OBJ}: select_value.C select_value.h select.h destination.h \
  symbol.h model.h units.h memutils.h volume.h model_derived.h \
  model_logable.h attribute.h block_model.h block_nested.h block.h scope.h \
  treelog.h frame_model.h frame.h librarian.h check.h
-weather_old${OBJ}: weather_old.C weather_old.h weather_base.h weather.h \
- model_derived.h model_logable.h model.h symbol.h weatherdata.h im.h \
- attribute.h block_model.h block_nested.h block.h scope.h treelog.h \
- frame_model.h frame.h librarian.h fao.h time.h units.h memutils.h
 log_extern${OBJ}: log_extern.C log_extern.h log_select.h log.h time.h \
  symbol.h border.h model_framed.h model_logable.h model.h memutils.h \
  destination.h scope.h attribute.h select.h units.h volume.h \
@@ -1635,14 +1634,14 @@ treelog${OBJ}: treelog.C treelog.h symbol.h
 lexer_data${OBJ}: lexer_data.C lexer_data.h lexer.h symbol.h filepos.h time.h \
  mathlib.h assertion.h
 lexer${OBJ}: lexer.C lexer.h symbol.h filepos.h treelog.h
-daisy${OBJ}: daisy.C daisy.h program.h model.h symbol.h run.h weather.h \
- model_derived.h model_logable.h weatherdata.h groundwater.h horizon.h \
- output.h condition.h model_framed.h memutils.h time.h log.h border.h \
- parser.h nitrification.h bioclimate.h hydraulic.h field.h irrigate.h \
- harvest.h block_model.h block_nested.h block.h scope.h attribute.h \
- treelog.h frame_model.h frame.h action.h timestep.h vcheck.h library.h \
- submodeler.h block_submodel.h frame_submodel.h column.h scopesel.h \
- mathlib.h assertion.h librarian.h metalib.h
+daisy${OBJ}: daisy.C daisy.h program.h model.h symbol.h run.h wsource.h \
+ weather.h model_derived.h model_logable.h weatherdata.h scope.h \
+ attribute.h groundwater.h horizon.h output.h condition.h model_framed.h \
+ memutils.h time.h log.h border.h parser.h nitrification.h bioclimate.h \
+ hydraulic.h field.h irrigate.h harvest.h block_model.h block_nested.h \
+ block.h treelog.h frame_model.h frame.h action.h timestep.h vcheck.h \
+ library.h submodeler.h block_submodel.h frame_submodel.h column.h \
+ scopesel.h mathlib.h assertion.h librarian.h metalib.h
 library${OBJ}: library.C library.h symbol.h block_model.h block_nested.h \
  block.h scope.h attribute.h treelog.h frame_model.h frame.h assertion.h \
  memutils.h filepos.h
@@ -1662,39 +1661,34 @@ program_hmovie${OBJ}: program_hmovie.C program.h model.h symbol.h run.h \
  attribute.h treelog.h frame_model.h frame.h librarian.h submodeler.h \
  block_submodel.h frame_submodel.h vcheck.h memutils.h assertion.h \
  mathlib.h path.h time.h units.h
-wsource_std${OBJ}: wsource_std.C wsource_table.h wsource_base.h wsource.h \
- model.h scope.h attribute.h symbol.h time.h lexer_table.h block_model.h \
- block_nested.h block.h treelog.h frame_model.h frame.h frame_submodel.h \
- librarian.h timestep.h vcheck.h submodeler.h block_submodel.h
-wsource_time${OBJ}: wsource_time.C wsource_indirect.h wsource.h model.h \
- scope.h attribute.h symbol.h librarian.h treelog.h timestep.h time.h \
- vcheck.h block_model.h block_nested.h block.h frame_model.h frame.h \
- submodeler.h block_submodel.h frame_submodel.h
-wsource_combine${OBJ}: wsource_combine.C wsource.h model.h scope.h \
- attribute.h symbol.h weatherdata.h time.h memutils.h librarian.h \
- submodeler.h block_submodel.h block_nested.h block.h treelog.h \
- frame_submodel.h frame.h block_model.h frame_model.h vcheck.h \
- assertion.h mathlib.h
-wsource_indirect${OBJ}: wsource_indirect.C wsource_indirect.h wsource.h \
- model.h scope.h attribute.h symbol.h librarian.h block_model.h \
- block_nested.h block.h treelog.h frame_model.h frame.h
-weather_source${OBJ}: weather_source.C weather.h model_derived.h \
- model_logable.h model.h symbol.h weatherdata.h wsource.h scope.h \
- attribute.h chemical.h model_framed.h im.h units.h memutils.h plf.h \
- time.h timestep.h vcheck.h block_model.h block_nested.h block.h \
- treelog.h frame_model.h frame.h librarian.h assertion.h mathlib.h \
- astronomy.h fao.h
-wsource_table${OBJ}: wsource_table.C wsource_table.h wsource_base.h wsource.h \
- model.h scope.h attribute.h symbol.h time.h lexer_table.h block_model.h \
- block_nested.h block.h treelog.h frame_model.h frame.h frame_submodel.h \
- weatherdata.h units.h memutils.h librarian.h assertion.h mathlib.h
-wsource_const${OBJ}: wsource_const.C wsource_base.h wsource.h model.h scope.h \
- attribute.h symbol.h librarian.h treelog.h time.h
-weather_extra${OBJ}: weather_extra.C weather.h model_derived.h \
- model_logable.h model.h symbol.h weatherdata.h librarian.h log.h time.h \
- border.h model_framed.h frame.h scope.h attribute.h block_model.h \
- block_nested.h block.h treelog.h frame_model.h lexer_table.h units.h \
- memutils.h
+wsource_std${OBJ}: wsource_std.C wsource_table.h wsource_base.h \
+ wsource_weather.h wsource.h weather.h model_derived.h model_logable.h \
+ model.h symbol.h weatherdata.h scope.h attribute.h time.h lexer_table.h \
+ block_model.h block_nested.h block.h treelog.h frame_model.h frame.h \
+ frame_submodel.h librarian.h timestep.h vcheck.h submodeler.h \
+ block_submodel.h
+wsource_time${OBJ}: wsource_time.C wsource_indirect.h wsource_weather.h \
+ wsource.h weather.h model_derived.h model_logable.h model.h symbol.h \
+ weatherdata.h scope.h attribute.h librarian.h treelog.h timestep.h \
+ time.h vcheck.h block_model.h block_nested.h block.h frame_model.h \
+ frame.h submodeler.h block_submodel.h frame_submodel.h
+wsource_combine${OBJ}: wsource_combine.C wsource_weather.h wsource.h \
+ weather.h model_derived.h model_logable.h model.h symbol.h weatherdata.h \
+ scope.h attribute.h time.h memutils.h librarian.h submodeler.h \
+ block_submodel.h block_nested.h block.h treelog.h frame_submodel.h \
+ frame.h block_model.h frame_model.h vcheck.h assertion.h mathlib.h
+wsource_indirect${OBJ}: wsource_indirect.C wsource_indirect.h \
+ wsource_weather.h wsource.h weather.h model_derived.h model_logable.h \
+ model.h symbol.h weatherdata.h scope.h attribute.h librarian.h \
+ block_model.h block_nested.h block.h treelog.h frame_model.h frame.h
+wsource_table${OBJ}: wsource_table.C wsource_table.h wsource_base.h \
+ wsource_weather.h wsource.h weather.h model_derived.h model_logable.h \
+ model.h symbol.h weatherdata.h scope.h attribute.h time.h lexer_table.h \
+ block_model.h block_nested.h block.h treelog.h frame_model.h frame.h \
+ frame_submodel.h units.h memutils.h librarian.h assertion.h mathlib.h
+wsource_const${OBJ}: wsource_const.C wsource_base.h wsource_weather.h \
+ wsource.h weather.h model_derived.h model_logable.h model.h symbol.h \
+ weatherdata.h scope.h attribute.h librarian.h treelog.h time.h
 groundwater_source${OBJ}: groundwater_source.C groundwater.h model_derived.h \
  model_logable.h model.h symbol.h source.h time.h timestep.h vcheck.h \
  units.h memutils.h assertion.h block_model.h block_nested.h block.h \
@@ -2078,8 +2072,8 @@ boolean_string${OBJ}: boolean_string.C boolean.h model.h symbol.h \
 number_soil${OBJ}: number_soil.C number.h symbol.h model.h metalib.h frame.h \
  scope.h attribute.h library.h block_model.h block_nested.h block.h \
  treelog.h frame_model.h column.h model_framed.h model_logable.h \
- irrigate.h memutils.h horizon.h model_derived.h hydraulic.h weather.h \
- weatherdata.h output.h condition.h time.h librarian.h units.h
+ irrigate.h memutils.h horizon.h model_derived.h hydraulic.h wsource.h \
+ weather.h weatherdata.h output.h condition.h time.h librarian.h units.h
 organic_none${OBJ}: organic_none.C organic.h model_derived.h model_logable.h \
  model.h symbol.h geometry.h attribute.h librarian.h frame.h scope.h
 organic_std${OBJ}: organic_std.C organic.h model_derived.h model_logable.h \
@@ -2315,13 +2309,6 @@ action_message${OBJ}: action_message.C action.h model_framed.h \
  model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h condition.h log.h \
  time.h border.h daisy.h program.h run.h librarian.h
-weather_std${OBJ}: weather_std.C weather_base.h weather.h model_derived.h \
- model_logable.h model.h symbol.h weatherdata.h im.h attribute.h \
- chemical.h model_framed.h fao.h lexer_data.h lexer.h filepos.h time.h \
- plf.h mathlib.h assertion.h units.h memutils.h submodeler.h \
- block_submodel.h block_nested.h block.h scope.h treelog.h \
- frame_submodel.h frame.h check.h vcheck.h librarian.h path.h \
- block_model.h frame_model.h
 groundwater_pipe${OBJ}: groundwater_pipe.C groundwater.h model_derived.h \
  model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h log.h time.h \
@@ -2380,16 +2367,11 @@ column_std${OBJ}: column_std.C column.h model_framed.h model_logable.h \
  model.h symbol.h irrigate.h memutils.h library.h surface.h uzmodel.h \
  soil_heat.h movement.h model_derived.h drain.h groundwater.h geometry.h \
  attribute.h soil.h soil_water.h vegetation.h litter.h bioclimate.h \
- weather.h weatherdata.h chemistry.h chemical.h organic.h im.h am.h dom.h \
- plf.h time.h log.h border.h submodeler.h block_submodel.h block_nested.h \
- block.h scope.h treelog.h frame_submodel.h frame.h scope_multi.h \
- scopesel.h units.h librarian.h assertion.h frame_model.h block_model.h \
- mathlib.h
-weather_simple${OBJ}: weather_simple.C weather_old.h weather_base.h weather.h \
- model_derived.h model_logable.h model.h symbol.h weatherdata.h im.h \
- attribute.h block_model.h block_nested.h block.h scope.h treelog.h \
- frame_model.h frame.h time.h log.h border.h model_framed.h mathlib.h \
- assertion.h librarian.h
+ wsource.h weather.h weatherdata.h scope.h chemistry.h chemical.h \
+ organic.h im.h am.h dom.h plf.h time.h log.h border.h submodeler.h \
+ block_submodel.h block_nested.h block.h treelog.h frame_submodel.h \
+ frame.h scope_multi.h scopesel.h units.h librarian.h assertion.h \
+ frame_model.h block_model.h mathlib.h
 uzrichard${OBJ}: uzrichard.C uzmodel.h model.h symbol.h block_model.h \
  block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
  frame.h groundwater.h model_derived.h model_logable.h surface.h \
@@ -2466,10 +2448,6 @@ action_lisp${OBJ}: action_lisp.C action.h model_framed.h model_logable.h \
  memutils.h submodeler.h block_submodel.h block_nested.h block.h scope.h \
  attribute.h treelog.h frame_submodel.h frame.h librarian.h block_model.h \
  frame_model.h condition.h
-weather_none${OBJ}: weather_none.C weather_old.h weather_base.h weather.h \
- model_derived.h model_logable.h model.h symbol.h weatherdata.h im.h \
- attribute.h block_model.h block_nested.h block.h scope.h treelog.h \
- frame_model.h frame.h librarian.h
 action_tillage${OBJ}: action_tillage.C action.h model_framed.h \
  model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h daisy.h program.h \

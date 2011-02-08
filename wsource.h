@@ -21,7 +21,8 @@
 #ifndef WSOURCE_H
 #define WSOURCE_H
 
-#include "model.h"
+#include "weather.h"
+#include "model_derived.h"
 #include "scope.h"
 #include "symbol.h"
 #include <vector>
@@ -30,11 +31,10 @@ class BlockModel;
 class Time;
 class Treelog;
 
-class WSource : public Model, public Scope
+class WSource : public ModelDerived, public Scope, public Weather
 {
   // Content.
 public:
-  const symbol objid;
   static const char *const component;
   symbol library_id () const;
 
@@ -74,14 +74,16 @@ public:
 
   // Simulation.
 public:
+  using Weather::tick;
   virtual void tick (Treelog& msg) = 0;
   virtual bool done () const = 0;
   
   // Create and Destroy.
 public:
-  static const WSource& null ();
+  using Weather::initialize;
   virtual void initialize (Treelog&) = 0;
   using Scope::check;
+  using Weather::check;
   virtual bool check (Treelog&) const = 0;
 protected:
   explicit WSource (const symbol name);

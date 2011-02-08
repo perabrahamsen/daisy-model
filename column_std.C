@@ -34,7 +34,7 @@
 #include "vegetation.h"
 #include "litter.h"
 #include "bioclimate.h"
-#include "weather.h"
+#include "wsource.h"
 #include "chemistry.h"
 #include "chemical.h"
 #include "organic.h"
@@ -68,7 +68,7 @@ struct ColumnStandard : public Column
   std::auto_ptr<Movement> movement;
   std::auto_ptr<Drain> drain;
   std::auto_ptr<Groundwater> groundwater;
-  std::auto_ptr<Weather> weather;
+  std::auto_ptr<WSource> weather;
   std::auto_ptr<Vegetation> vegetation;
   std::auto_ptr<Litter> litter;
   std::auto_ptr<Bioclimate> bioclimate;
@@ -922,7 +922,7 @@ ColumnStandard::ColumnStandard (const BlockModel& al)
     drain (Librarian::build_item<Drain> (al, "Drain")),
     groundwater (Librarian::build_item<Groundwater> (al, "Groundwater")),
     weather (al.check ("weather") 
-             ? Librarian::build_item<Weather> (al, "weather")
+             ? Librarian::build_item<WSource> (al, "weather")
              : NULL), 
     vegetation (Librarian::build_item<Vegetation> (al, "Vegetation")),
     litter (Librarian::build_item<Litter> (al, "Litter")),
@@ -1066,9 +1066,9 @@ Scope to evaluate expessions in.");
                           Attribute::State, Attribute::Singleton, "\
 Discretization and movement of water, heat and solutes in the soil.");
     frame.set ("Movement", "vertical");
-    frame.declare_object ("weather", Weather::component,
-                          Attribute::OptionalState, Attribute::Singleton,
-                          "Weather model for providing climate information during\n\
+    frame.declare_object ("weather", WSource::component,
+                          Attribute::OptionalState, Attribute::Singleton, "\
+Weather model for providing climate information during\n\
 the simulation.  If unspecified, used global weather.");
     frame.declare_object ("Vegetation", Vegetation::component,
                           Attribute::State, Attribute::Singleton,

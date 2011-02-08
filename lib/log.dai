@@ -2305,8 +2305,8 @@ sum of all chemicals will be logged."
   (when hourly)
   (entries ;; Year Month MDay Hour
            (number (tag T_air)
-                   (path weather base air_temperature)
-                   (spec weather base air_temperature)
+                   (path weather weather air_temperature)
+                   (spec weather weather air_temperature)
                    (dimension "${T_unit}")
                    (handle current))
            (number (tag T_soil)
@@ -3460,8 +3460,8 @@ contains no water."
   (entries (number (tag "Precipitation")
 		   (documentation "\
 Amount of water entering the system as rain and snow.")
-                   (path weather "*" precipitation)
-                   (spec weather base precipitation)
+                   (path weather weather precipitation)
+                   (spec weather weather precipitation)
                    (handle sum)
                    (dimension "mm"))
            (number (tag "Overhead irrigation")

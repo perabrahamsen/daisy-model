@@ -145,7 +145,7 @@ WSourceIndirect::check (Treelog& msg) const
 
 
 WSourceIndirect::WSourceIndirect (const BlockModel& al)
-  : WSource (al.type_name ()),
+  : WSourceWeather (al),
     source (Librarian::build_item<WSource> (al, "source"))
 { }
 

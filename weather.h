@@ -32,13 +32,8 @@ class BlockModel;
 class Units;
 class IM;
 
-class Weather : public ModelDerived
+class Weather 
 {
-  // Content.
-public: 
-  static const char *const component;
-  symbol library_id () const;
-  
   // Units.
 public:
   static const symbol dry_deposit_unit ();
@@ -115,7 +110,7 @@ public:
   static void load_common (Frame& frame);
   virtual bool initialize (const Time& time, Treelog& msg) = 0;
 protected:
-  Weather (const BlockModel&);
+  Weather ();
 public:
   virtual bool check (const Time& from, const Time& to, Treelog&) const = 0;
   virtual ~Weather ();

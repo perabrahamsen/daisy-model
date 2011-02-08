@@ -18,7 +18,7 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "wsource.h"
+#include "wsource_weather.h"
 #include "weatherdata.h"
 #include "time.h"
 #include "memutils.h"
@@ -32,8 +32,10 @@
 #include <boost/noncopyable.hpp>
 #include <sstream>
 
-struct WSourceCombine : public WSource
+struct WSourceCombine : public WSourceWeather
 {
+  const boost::scoped_ptr<WSource> reserve;
+
   // Const.
   static symbol Any ();
 
@@ -134,7 +136,8 @@ struct WSourceCombine : public WSource
   using Scope::check;
   bool check (Treelog&) const;
   WSourceCombine (const BlockModel& al)
-    : WSource (al.type_name ()),
+    : WSourceWeather (al),
+      reserve (Librarian::build_item<WSource> (al, "reserve")),
       entry (map_submodel<Entry> (al, "source")),
       my_data_begin (9999,1,1,0),
       my_data_end (1, 1, 1, 1),
@@ -173,6 +176,10 @@ WSourceCombine::Entry::check_alist (const Metalib&,
 void
 WSourceCombine::Entry::load_syntax (Frame& frame)
 {
+  frame.declare_object ("reserve", WSource::component,
+                        Attribute::State, Attribute::Singleton, "\
+Reserve weather model to use when no source match.");
+  frame.set ("reserve", "null");
   frame.declare_object ("source", WSource::component, "\
 Source of weather data.");
   frame.declare_submodule ("begin", Attribute::OptionalConst, "\
@@ -260,7 +267,7 @@ WSourceCombine::find_source (const symbol key) const
 
   // Nope.
   // Assertion::message ("No source found for '" + key + "'");
-  return WSource::null ();
+  return *reserve;
 }
 
 const WSource& 
@@ -289,14 +296,14 @@ WSourceCombine::find_end (const symbol key) const
 
   // Nope.
   // Assertion::message ("No end source found for '" + key + "'");
-  return WSource::null ();
+  return *reserve;
 }
 
 const WSource& 
 WSourceCombine::find_meta (const symbol key, const symbol meta) const
 { 
   const WSource& source = find_source (key);
-  if (&source != &WSource::null ())
+  if (&source != reserve.get ())
     return source;
   return find_source (meta);
 }
@@ -305,7 +312,7 @@ const WSource&
 WSourceCombine::find_meta_end (const symbol key, const symbol meta) const
 { 
   const WSource& source = find_end (key);
-  if (&source != &WSource::null ())
+  if (&source != reserve.get ())
     return source;
   return find_end (meta);
 }
