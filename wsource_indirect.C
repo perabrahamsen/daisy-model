@@ -128,20 +128,20 @@ WSourceIndirect::timestep () const
 { return source->timestep (); }
 
 void
-WSourceIndirect::tick (Treelog& msg)
-{ source->tick (msg); }
+WSourceIndirect::source_tick (Treelog& msg)
+{ source->source_tick (msg); }
 
 bool
 WSourceIndirect::done () const
 { return source->done (); }
 
 void
-WSourceIndirect::initialize (Treelog& msg)
-{ source->initialize (msg); }
+WSourceIndirect::source_initialize (Treelog& msg)
+{ source->source_initialize (msg); }
 
 bool
-WSourceIndirect::check (Treelog& msg) const
-{ return source->check (msg); }
+WSourceIndirect::source_check (Treelog& msg) const
+{ return source->source_check (msg); }
 
 
 WSourceIndirect::WSourceIndirect (const BlockModel& al)
@@ -157,7 +157,7 @@ static struct WSourceIndirectSyntax : public DeclareModel
   Model* make (const BlockModel& al) const
   { return new WSourceIndirect (al); }
   WSourceIndirectSyntax ()
-    : DeclareModel (WSource::component, "indirect", 
+    : DeclareModel (WSource::component, "indirect", "weather",
                     "Delegate to another weather source.")
   { }
   void load_frame (Frame& frame) const

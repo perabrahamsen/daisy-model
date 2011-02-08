@@ -74,17 +74,19 @@ public:
 
   // Simulation.
 public:
-  using Weather::tick;
-  virtual void tick (Treelog& msg) = 0;
+  virtual void source_tick (Treelog& msg) = 0;
   virtual bool done () const = 0;
-  
+  virtual double suggest_dt () const = 0;   // [h]
+  virtual void weather_tick (const Time& time, Treelog&) = 0;
+  virtual void output (Log&) const = 0;
+
   // Create and Destroy.
 public:
-  using Weather::initialize;
-  virtual void initialize (Treelog&) = 0;
-  using Scope::check;
-  using Weather::check;
-  virtual bool check (Treelog&) const = 0;
+  virtual void source_initialize (Treelog&) = 0;
+  virtual bool source_check (Treelog&) const = 0;
+  virtual bool weather_check (const Time& from, const Time& to,
+                              Treelog&) const = 0;
+  virtual bool weather_initialize (const Time& time, Treelog& msg) = 0;
 protected:
   explicit WSource (const symbol name);
 public:

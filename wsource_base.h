@@ -37,7 +37,6 @@ public:
   symbol dimension (const symbol key) const;
   symbol description (const symbol key) const;
   int type_size (symbol tag) const;
-  using WSource::check;
   bool check (const symbol key) const;
   double number (const symbol key) const;
   symbol name (const symbol key) const;

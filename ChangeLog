@@ -1,5 +1,10 @@
 2011-02-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* weather_source.C, weather_extra.C, weather_std.C, weather_simple.C:
+	* weather_none.C, weather_hourly.C, weather_base.C, weather_base.h:
+	* weather_old.C, weather_old.h: Removed.
+	* Makefile: Updated.
+
 	* wsowsource_weather.h, wsource_weather.C: New base model.
 
 2011-02-03  Per Abrahamsen  <per.abrahamsen@gmail.com>

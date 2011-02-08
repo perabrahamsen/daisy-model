@@ -631,7 +631,7 @@ ColumnStandard::tick_move (const Metalib& metalib, const Time& time,
 
   // Weather.
   if (weather.get ())
-    weather->tick (time, msg);
+    weather->weather_tick (time, msg);
 
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
   const double T_bottom = movement->bottom_heat (time, my_weather);
@@ -781,7 +781,7 @@ ColumnStandard::check (const Weather* global_weather,
     if (weather.get ())
       {
         Treelog::Open nest (msg, "Weather: " + weather->objid);
-        if (!weather->check (from, to, msg))
+        if (!weather->weather_check (from, to, msg))
           // The rest is uninitialized, don't check it!
           return false;
       }
@@ -995,7 +995,7 @@ ColumnStandard::initialize (const Block& block,
   surface.initialize (geometry);
 
   // Bioclimate and heat depends on weather.
-  if (weather.get () && !weather->initialize (time, msg))
+  if (weather.get () && !weather->weather_initialize (time, msg))
     return false;
   if (!global_weather && !weather.get ())
     {

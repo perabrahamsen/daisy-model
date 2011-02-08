@@ -29,8 +29,36 @@
 
 struct WSourceStandard : public WSourceTable
 {
+  bool top_level;
+
+  bool weather_initialize (const Time& time, Treelog& msg)
+  {
+    bool ok = true;
+    top_level = true;
+    if (!WSourceTable::weather_initialize (time, msg))
+      ok = false;
+    top_level = false;
+    return ok;
+  }
+
+  bool source_check (Treelog& msg) const
+  { 
+    bool ok = true;
+    if (!top_level)
+      {
+        msg.error ("\
+The '" + objid + "' model cannot be used here.  Try 'table' instead");
+        ok = false;
+      }
+    if (!WSourceTable::source_check (msg))
+      ok = false;
+    return ok; 
+  }
+  
+
   WSourceStandard (const BlockModel& al)
-    : WSourceTable (al)
+    : WSourceTable (al),
+      top_level (false)
   { }
   ~WSourceStandard ()
   { }

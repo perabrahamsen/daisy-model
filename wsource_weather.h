@@ -47,8 +47,7 @@ protected:
   void output_common (Log& log) const;
 public:
   double suggest_dt () const;   // [h]
-  using WSource::tick;
-  void tick (const Time& time, Treelog&);
+  void weather_tick (const Time& time, Treelog&);
   void output (Log&) const;
 
   // Communication with Bioclimate.
@@ -104,13 +103,11 @@ protected:
   // Create and Destroy.
 public:
   static void load_common (Frame& frame);
-  using WSource::initialize;
-  bool initialize (const Time& time, Treelog& msg);
+  bool weather_initialize (const Time& time, Treelog& msg);
 protected:
   WSourceWeather (const BlockModel&);
 public:
-  using WSource::check;
-  bool check (const Time& from, const Time& to, Treelog&) const;
+  bool weather_check (const Time& from, const Time& to, Treelog&) const;
   ~WSourceWeather ();
 };
 

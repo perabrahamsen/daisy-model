@@ -37,14 +37,13 @@ struct WSourceConst : public WSourceBase
   symbol end_name (symbol key) const
   { return name (key); }
 
-  void tick (Treelog&)
+  void source_tick (Treelog&)
   { }
   bool done () const
   { return true; }
-  void initialize (Treelog&)
+  void source_initialize (Treelog&)
   { }
-  using WSourceBase::check;
-  bool check (Treelog& msg) const
+  bool source_check (Treelog& msg) const
   { 
     Treelog::Open nest (msg, __FUNCTION__);
     bool ok = true;

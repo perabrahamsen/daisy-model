@@ -47,6 +47,12 @@ struct WSourceWeather::Implementation
   const Units& units;
   WSource& source;
   
+  static const symbol dry_deposit_unit ()
+  {
+    static const symbol unit ("kg/ha/y");
+    return unit;
+  }
+
   double relative_extraterestial_radiation (const Time& time) const
   {
     const double average 
@@ -448,7 +454,7 @@ WSourceWeather::Implementation::reset_deposition (Treelog& msg)
 
 
   const Unit& u_ppm = units.get_unit (Units::ppm ());
-  const Unit& u_dpu = units.get_unit (Weather::dry_deposit_unit ());
+  const Unit& u_dpu = units.get_unit (dry_deposit_unit ());
 
   if (std::isfinite (NH4WetDep))
     WetDeposit.set_value (Chemical::NH4 (), u_ppm, NH4WetDep);
@@ -625,7 +631,7 @@ WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
   Time next_day (next.year (), next.month (), next.mday (), 0);
   next_day.tick_day (); // We keep one day worth of weather data.
   Time last = when.size () > 0 ? when.back () : source.begin ();
-  for (;!source.done () && last < next_day; source.tick (msg))
+  for (;!source.done () && last < next_day; source.source_tick (msg))
     {
       if (last != source.begin ())
         daisy_panic (last.print () + " != " + source.begin ().print ());
@@ -993,8 +999,8 @@ WSourceWeather::Implementation::initialize (const Time& time, Treelog& msg)
   bool ok = true;
 
   // Source.
-  source.initialize (msg);
-  if (!source.check (msg))
+  source.source_initialize (msg);
+  if (!source.source_check (msg))
     ok = false;
   
   // Numbers and names.
@@ -1067,7 +1073,8 @@ WSourceWeather::Implementation::initialize (const Time& time, Treelog& msg)
 }
 
 bool 
-WSourceWeather::Implementation::check (const Time& from, const Time& to, Treelog& msg) const
+WSourceWeather::Implementation::check (const Time& from, const Time& to,
+                                       Treelog& msg) const
 {
   // Check interval.
   const Time& data_begin = source.data_begin ();
@@ -1141,7 +1148,7 @@ WSourceWeather::Implementation::Implementation (const Weather& w,
     DepDryNH4 (NAN),
     DepWetNH4 (NAN),
     PAverage (NAN),
-    DryDeposit (units.get_unit (Weather::dry_deposit_unit ())),
+    DryDeposit (units.get_unit (dry_deposit_unit ())),
     WetDeposit (units.get_unit (Units::ppm ())),
     my_latitude (NAN),
     my_longitude (NAN),
@@ -1327,7 +1334,7 @@ WSourceWeather::suggest_dt () const
 { return impl->suggest_dt (); }
 
 void 
-WSourceWeather::tick (const Time& time, Treelog& msg)
+WSourceWeather::weather_tick (const Time& time, Treelog& msg)
 {
   TREELOG_MODEL (msg);
   impl->tick (time, msg); 
@@ -1361,14 +1368,15 @@ WSourceWeather::output (Log& log) const
 
 
 bool 
-WSourceWeather::initialize (const Time& time, Treelog& msg)
+WSourceWeather::weather_initialize (const Time& time, Treelog& msg)
 {
   TREELOG_MODEL (msg);
   return impl->initialize (time, msg);
 }
 
 bool 
-WSourceWeather::check (const Time& from, const Time& to, Treelog& msg) const
+WSourceWeather::weather_check (const Time& from, const Time& to,
+                               Treelog& msg) const
 {
   TREELOG_MODEL (msg);
   return impl->check (from, to, msg);

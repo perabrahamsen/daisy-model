@@ -35,7 +35,6 @@ public:
   Attribute::type lookup (const symbol key) const;
   symbol dimension (const symbol key) const;
   symbol description (const symbol key) const;
-  using WSource::check;
   bool check (const symbol key) const;
   double number (const symbol key) const;
   symbol name (const symbol key) const;
@@ -63,12 +62,11 @@ public:
   const Time& begin () const;
   const Time& end () const;
   double timestep () const;           // Length of timetstep [h]
-  void tick (Treelog& msg);
+  void source_tick (Treelog& msg);
   bool done () const;
 
-  void initialize (Treelog&);
-  using Scope::check;
-  bool check (Treelog&) const;
+  void source_initialize (Treelog&);
+  bool source_check (Treelog&) const;
 
   // Create and destroy.
 public:

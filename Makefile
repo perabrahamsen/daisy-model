@@ -398,7 +398,6 @@ NOLINK = -c
 
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
-#  weather_source.C weather_extra.C weather_std.C weather_simple.C weather_none.C weather_hourly.C weather_base.C weather_base.h weather_old.C weather_old.h
 LATER = tertiary_instant.C  
 MODELS = program_hmovie.C \
 	wsource_std.C wsource_time.C wsource_combine.C wsource_indirect.C\
@@ -494,7 +493,7 @@ COMPONENTS = wsource.C solute.C drain.C \
 	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
 	summary.C nitrification.C phenology.C clayom.C equil.C \
 	transform.C rootdens.C select.C average.C mactrans.C macro.C \
-	parser.C log.C weather.C column.C crop.C \
+	parser.C log.C column.C crop.C \
 	action.C condition.C horizon.C 	uzmodel.C hydraulic.C \
 	bioclimate.C groundwater.C am.C \
 	adsorption.C tortuosity.C chemical.C \
@@ -525,7 +524,7 @@ SPECIALS = wsource_weather.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = astronomy.C weatherdata.C \
+OTHER = weather.C astronomy.C weatherdata.C \
 	scope_xysources.C lexer_flux.C lexer_soil.C iterative.C \
 	water.C block_nested.C block_submodel.C block_top.C block_model.C \
 	value.C type.C model_derived.C model_logable.C model_framed.C \
@@ -1194,10 +1193,6 @@ log${OBJ}: log.C log.h time.h symbol.h border.h model_framed.h \
  model_logable.h model.h library.h metalib.h frame.h scope.h attribute.h \
  block_model.h block_nested.h block.h treelog.h frame_model.h daisy.h \
  program.h run.h assertion.h librarian.h
-weather${OBJ}: weather.C weather.h model_derived.h model_logable.h model.h \
- symbol.h weatherdata.h block_model.h block_nested.h block.h scope.h \
- attribute.h treelog.h frame_model.h frame.h librarian.h log.h time.h \
- border.h model_framed.h im.h astronomy.h mathlib.h assertion.h
 column${OBJ}: column.C column.h model_framed.h model_logable.h model.h \
  symbol.h irrigate.h memutils.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h log.h time.h \
@@ -1491,6 +1486,10 @@ geometry${OBJ}: geometry.C geometry.h symbol.h attribute.h volume.h \
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
  model_framed.h model_logable.h model.h library.h frame_submodel.h \
  frame.h scope.h attribute.h frame_model.h assertion.h metalib.h
+weather${OBJ}: weather.C weather.h model_derived.h model_logable.h model.h \
+ symbol.h weatherdata.h block_model.h block_nested.h block.h scope.h \
+ attribute.h treelog.h frame_model.h frame.h librarian.h log.h time.h \
+ border.h model_framed.h im.h astronomy.h mathlib.h assertion.h
 astronomy${OBJ}: astronomy.C astronomy.h time.h symbol.h mathlib.h \
  assertion.h
 weatherdata${OBJ}: weatherdata.C weatherdata.h symbol.h time.h units.h \

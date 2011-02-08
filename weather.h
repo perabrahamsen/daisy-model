@@ -1,7 +1,8 @@
-// weather.h
+// weather.h --- Interface to weather data.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
+// Copyright 2011 KU.
 //
 // This file is part of Daisy.
 // 
@@ -34,10 +35,6 @@ class IM;
 
 class Weather 
 {
-  // Units.
-public:
-  static const symbol dry_deposit_unit ();
-
   // Location.
 public:
   virtual double latitude () const = 0;
@@ -46,14 +43,6 @@ public:
   virtual double timezone () const = 0;
   virtual double screen_height () const = 0; // [m]
   virtual Weatherdata::surface_t surface () const = 0;
-
-  // Simulation.
-protected:
-  void output_common (Log& log) const;
-public:
-  virtual double suggest_dt () const;   // [h]
-  virtual void tick (const Time& time, Treelog&) = 0;
-  virtual void output (Log&) const = 0;
 
   // Communication with Bioclimate.
 public:
@@ -101,18 +90,13 @@ public:
 public:
   double extraterrestrial_radiation (const Time&) const; // [W/m2]
   double sin_solar_elevation_angle (const Time&) const; // []
-protected:
-  double relative_extraterestial_radiation (const Time&) const; // []
-  double day_length (const Time&) const; // [h]
 
   // Create and Destroy.
 public:
   static void load_common (Frame& frame);
-  virtual bool initialize (const Time& time, Treelog& msg) = 0;
 protected:
   Weather ();
 public:
-  virtual bool check (const Time& from, const Time& to, Treelog&) const = 0;
   virtual ~Weather ();
 };
 

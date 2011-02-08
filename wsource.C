@@ -65,7 +65,6 @@ struct WSourceNull : public WSourceWeather
   { return Attribute::Unknown (); }
   symbol description (symbol) const
   { return Attribute::Unknown (); }
-  using WSource::check;
   bool check (symbol) const
   { return false; }
   double number (symbol) const
@@ -114,15 +113,14 @@ struct WSourceNull : public WSourceWeather
   { daisy_notreached (); }
   double timestep () const           // Length of timetstep [h]
   { daisy_notreached (); }
-  void tick (Treelog&)
+  void source_tick (Treelog&)
   { daisy_notreached (); }
   bool done () const
   { return true; }
 
-  void initialize (Treelog&)
+  void source_initialize (Treelog&)
   { }
-  using Scope::check;
-  bool check (Treelog&) const
+  bool source_check (Treelog&) const
   { return true; }
 
   // Create and destroy.

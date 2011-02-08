@@ -44,19 +44,19 @@ struct WSourceTime : public WSourceIndirect
   const Time& end () const
   { return my_end; }
 
-  void tick (Treelog& msg)
+  void source_tick (Treelog& msg)
   {
     TREELOG_MODEL (msg);
 
-    source->tick (msg);
+    source->source_tick (msg);
     my_begin = source->begin () + offset;
     my_end = source->end () + offset;
   }    
-  void initialize (Treelog& msg)
+  void source_initialize (Treelog& msg)
   {
     TREELOG_MODEL (msg);
 
-    source->initialize (msg);
+    source->source_initialize (msg);
     my_data_begin = source->data_begin () + offset;
     my_data_end = source->data_end () + offset;
     my_begin = source->begin () + offset;

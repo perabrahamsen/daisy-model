@@ -29,24 +29,6 @@
 #include "astronomy.h"
 #include "mathlib.h"
 
-#if 0
-const char *const Weather::component = "weather";
-
-symbol
-Weather::library_id () const
-{
-  static const symbol id (component);
-  return id;
-}
-#endif
-
-const symbol 
-Weather::dry_deposit_unit ()
-{
-  static const symbol unit ("kg/ha/y");
-  return unit;
-}
-
 double 
 Weather::extraterrestrial_radiation (const Time& time) const // [W/m2]
 { return Astronomy::ExtraterrestrialRadiation (time, 
@@ -57,51 +39,6 @@ double
 Weather::sin_solar_elevation_angle (const Time& time) const // []
 { return Astronomy::SinSolarElevationAngle (time, latitude (), longitude (),
                                             timezone ()); }
-
-double
-Weather::relative_extraterestial_radiation (const Time& time) const
-{
-  const double average 
-    = Astronomy::DailyExtraterrestrialRadiation (time, latitude ());
-  const double current 
-    = Astronomy::ExtraterrestrialRadiation (time, latitude (),
-                                            longitude (), timezone ());
-  return current / average;
-}
-
-double
-Weather::day_length (const Time& time) const // [h]
-{ return Astronomy::DayLength (time, latitude ()); }
-
-void 
-Weather::output_common (Log& log) const
-{
-  output_value (air_temperature (), "air_temperature", log);
-  output_value (daily_air_temperature (), "daily_air_temperature", log);
-  output_value (daily_min_air_temperature (),
-                "daily_min_air_temperature", log);
-  output_value (daily_max_air_temperature (), 
-                "daily_max_air_temperature", log);
-  output_value (global_radiation (), "global_radiation", log);
-  output_value (daily_global_radiation (), "daily_global_radiation", log);
-  if (has_reference_evapotranspiration ())
-    output_value (reference_evapotranspiration (), 
-                  "reference_evapotranspiration", log);
-  output_value (rain (), "rain", log);
-  output_value (snow (), "snow", log);
-  output_value (rain () + snow (), "precipitation", log);
-  output_value (cloudiness (), "cloudiness", log);
-  output_value (vapor_pressure (), "vapor_pressure", log);
-  output_value (air_pressure (), "air_pressure", log);
-  output_value (diffuse_radiation (), "diffuse_radiation", log);
-  output_value (wind (), "wind", log);
-  output_value (day_length (), "day_length", log);
-  output_submodule (deposit (), "deposit", log);
-}
-
-double 
-Weather::suggest_dt () const
-{ return NAN; }
 
 static void load_flux (Frame& frame)
 { IM::add_syntax (frame, Attribute::LogOnly, IM::flux_unit ()); }
@@ -152,17 +89,5 @@ Weather::Weather ()
 
 Weather::~Weather ()
 { }
-
-#if 0
-static struct WeatherInit : public DeclareComponent 
-{
-  WeatherInit ()
-    : DeclareComponent (Weather::component, "\
-Meteorological data, as well as the global positioning, are the\n\
-responsibility of the 'weather' component, typically be reading the\n\
-data from a file.  The meteorological data are common to all columns.")
-  { }
-} Weather_init;
-#endif
 
 // weather.C ends here.

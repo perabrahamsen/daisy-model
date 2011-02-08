@@ -277,7 +277,7 @@ WSourceTable::read_line ()
 }
 
 void 
-WSourceTable::tick (Treelog& msg)
+WSourceTable::source_tick (Treelog& msg)
 { 
   Treelog::Open nest (msg, __FUNCTION__);
 
@@ -292,7 +292,7 @@ WSourceTable::tick (Treelog& msg)
 }
   
 void 
-WSourceTable::initialize (Treelog& msg) 
+WSourceTable::source_initialize (Treelog& msg) 
 { 
   Treelog::Open nest (msg, __FUNCTION__);
 
@@ -334,11 +334,11 @@ WSourceTable::initialize (Treelog& msg)
   
   // Read first data.
   read_line ();
-  tick (msg);
+  source_tick (msg);
 }
 
 bool 
-WSourceTable::check (Treelog&) const
+WSourceTable::source_check (Treelog&) const
 { return ok; }
 
 WSourceTable::WSourceTable (const BlockModel& al)

@@ -164,7 +164,7 @@ struct Daisy::Implementation
   void initialize (Metalib& metalib, Daisy& daisy, Block& block)
   { 
     Treelog& msg = block.msg ();
-    if (weather.get () && !weather->initialize (time, msg))
+    if (weather.get () && !weather->weather_initialize (time, msg))
       return;
     {
       Treelog::Open nest (msg, "output");
@@ -190,7 +190,7 @@ struct Daisy::Implementation
 
     // Check weather.
     {
-      if (weather.get () && !weather->check (time, stop, msg))
+      if (weather.get () && !weather->weather_check (time, stop, msg))
         return false;
     }
 
@@ -283,7 +283,7 @@ Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
 
   // Weather and management.
   if (weather.get ())
-    weather->tick (time, msg);
+    weather->weather_tick (time, msg);
   action->tick (daisy, scope (), msg);
   action->doIt (daisy, scope (), msg);
 

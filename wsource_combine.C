@@ -127,14 +127,13 @@ struct WSourceCombine : public WSourceWeather
   
   // Simulation.
   mutable bool ok;              // More data available.
-  void tick (Treelog& msg);
+  void source_tick (Treelog& msg);
   bool done () const
   { return !ok; }
   
   // Create and Destroy.
-  void initialize (Treelog&);
-  using Scope::check;
-  bool check (Treelog&) const;
+  void source_initialize (Treelog&);
+  bool source_check (Treelog&) const;
   WSourceCombine (const BlockModel& al)
     : WSourceWeather (al),
       reserve (Librarian::build_item<WSource> (al, "reserve")),
@@ -400,7 +399,7 @@ WSourceCombine::entries (std::set<symbol>& result) const
 }
 
 void 
-WSourceCombine::tick (Treelog& msg)
+WSourceCombine::source_tick (Treelog& msg)
 {
   if (!ok)
     return;
@@ -422,7 +421,7 @@ WSourceCombine::tick (Treelog& msg)
 
       Treelog::Open nest (msg, "source", i, entry[i]->source->objid);
       while(!source.done () && source.end () <= my_begin)
-        source.tick (msg);
+        source.source_tick (msg);
       if (source.done ())
         continue;
       
@@ -439,7 +438,7 @@ WSourceCombine::tick (Treelog& msg)
 }
 
 void 
-WSourceCombine::initialize (Treelog& msg)
+WSourceCombine::source_initialize (Treelog& msg)
 {
   ok = true;
 
@@ -449,7 +448,7 @@ WSourceCombine::initialize (Treelog& msg)
       daisy_assert (e.source.get ());
       WSource& source = *(e.source);
       Treelog::Open nest (msg, "source", i, source.objid);
-      source.initialize (msg);
+      source.source_initialize (msg);
       if (e.begin == Time::null ())
         e.begin = source.data_begin ();
       if (e.end == Time::null ())
@@ -475,7 +474,7 @@ WSourceCombine::initialize (Treelog& msg)
 }
 
 bool 
-WSourceCombine::check (Treelog& msg) const
+WSourceCombine::source_check (Treelog& msg) const
 {
   TREELOG_MODEL (msg);
   if (my_end <= my_begin)
@@ -495,7 +494,7 @@ WSourceCombine::check (Treelog& msg) const
   for (size_t i = 0; i < entry.size (); i++)
     {
       Treelog::Open nest (msg, "source", i, entry[i]->source->objid);
-      if (!entry[i]->source->check (msg))
+      if (!entry[i]->source->source_check (msg))
         ok = false;
     }
 

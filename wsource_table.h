@@ -68,12 +68,13 @@ class WSourceTable : public WSourceBase
   double end_number (const symbol key) const;
   symbol end_name (const symbol key) const;
   void read_line ();
-  void tick (Treelog& msg);
+  void source_tick (Treelog& msg);
   bool done () const
   { return !ok; }
 
-  void initialize (Treelog& msg);
-  bool check (Treelog&) const;
+  void source_initialize (Treelog& msg);
+protected:
+  bool source_check (Treelog&) const;
 public:
   WSourceTable (const BlockModel& al);
   ~WSourceTable ();
