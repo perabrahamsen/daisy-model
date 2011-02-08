@@ -1397,10 +1397,11 @@ static struct WSourceWeatherSyntax : public DeclareBase
     : DeclareBase (WSource::component, "weather",
                    "Weather interface implementation.")
   { }
+  static void load_flux (Frame& frame)
+  { IM::add_syntax (frame, Attribute::LogOnly, IM::flux_unit ()); }
+
   void load_frame (Frame& frame) const
   { 
-    Weather::load_common (frame);
-
     frame.declare ("snow_fraction", "dg C", Attribute::Fraction (),
                    Attribute::Const, "\
 Fraction of precipitation that falls as snow as function of air temperature.");
@@ -1408,6 +1409,42 @@ Fraction of precipitation that falls as snow as function of air temperature.");
     snow_fraction.add (-2.0, 1.0);
     snow_fraction.add (2.0, 0.0);
     frame.set ("snow_fraction", snow_fraction);
+
+    // Logs.
+    frame.declare ("air_temperature", "dg C", Attribute::LogOnly,
+                   "Temperature this hour.");
+    frame.declare ("global_radiation", "W/m^2", Attribute::LogOnly,
+                   "Global radiation this hour.");
+    frame.declare ("daily_air_temperature", "dg C", Attribute::LogOnly,
+                   "Average temperature this day.");
+    frame.declare ("daily_min_air_temperature", "dg C", Attribute::LogOnly,
+                   "Minumum temperature this day.");
+    frame.declare ("daily_max_air_temperature", "dg C", Attribute::LogOnly,
+                   "Maximum temperature this day.");
+    frame.declare ("daily_global_radiation", "W/m^2", Attribute::LogOnly,
+                   "Average radiation this day.");
+    frame.declare ("diffuse_radiation", "W/m^2", Attribute::LogOnly,
+                   "Diffuse radiation this hour.");
+    frame.declare ("reference_evapotranspiration", "mm/h", Attribute::LogOnly,
+                   "Reference evapotranspiration this hour");
+    frame.declare ("daily_extraterrastial_radiation", "W/m^2", Attribute::LogOnly,
+                   "Extraterrestrial radiation this day.");
+    frame.declare ("rain", "mm/h", Attribute::LogOnly, "Rain this hour.");
+    frame.declare ("snow", "mm/h", Attribute::LogOnly, "Snow this hour.");
+    frame.declare ("precipitation", "mm/h", Attribute::LogOnly, 
+                   "Precipitation this hour.");
+    frame.declare_fraction ("cloudiness", Attribute::LogOnly,
+                            "Fraction of sky covered by clouds [0-1].");
+    frame.declare_fraction ("daily_cloudiness", Attribute::LogOnly,
+                            "Fraction of sky covered by clouds [0-1].");
+    frame.declare ("vapor_pressure", "Pa", Attribute::LogOnly, "Humidity.");
+    frame.declare ("air_pressure", "Pa", Attribute::LogOnly, "Air pressure.");
+    frame.declare ("wind", "m/s", Attribute::LogOnly, "Wind speed.");
+    frame.declare ("day_length", "h", Attribute::LogOnly,
+                   "Number of light hours this day.");
+    frame.declare_submodule_sequence ("deposit", Attribute::LogOnly, "\
+Total atmospheric deposition of nitrogen.", load_flux);
+    
   }
 } WSourceWeather_syntax;
 

@@ -22,12 +22,7 @@
 #define BUILD_DLL
 
 #include "weather.h"
-#include "block_model.h"
-#include "librarian.h"
-#include "log.h"
-#include "im.h"
 #include "astronomy.h"
-#include "mathlib.h"
 
 double 
 Weather::extraterrestrial_radiation (const Time& time) const // [W/m2]
@@ -39,50 +34,6 @@ double
 Weather::sin_solar_elevation_angle (const Time& time) const // []
 { return Astronomy::SinSolarElevationAngle (time, latitude (), longitude (),
                                             timezone ()); }
-
-static void load_flux (Frame& frame)
-{ IM::add_syntax (frame, Attribute::LogOnly, IM::flux_unit ()); }
-
-void 
-Weather::load_common (Frame& frame)
-{
-  // Overwritten in weather_none.C
-  frame.declare ("air_temperature", "dg C", Attribute::LogOnly,
-                 "Temperature this hour.");
-  frame.declare ("global_radiation", "W/m^2", Attribute::LogOnly,
-                 "Global radiation this hour.");
-
-  // Logs.
-  frame.declare ("daily_air_temperature", "dg C", Attribute::LogOnly,
-                 "Average temperature this day.");
-  frame.declare ("daily_min_air_temperature", "dg C", Attribute::LogOnly,
-                 "Minumum temperature this day.");
-  frame.declare ("daily_max_air_temperature", "dg C", Attribute::LogOnly,
-                 "Maximum temperature this day.");
-  frame.declare ("daily_global_radiation", "W/m^2", Attribute::LogOnly,
-                 "Average radiation this day.");
-  frame.declare ("diffuse_radiation", "W/m^2", Attribute::LogOnly,
-                 "Diffuse radiation this hour.");
-  frame.declare ("reference_evapotranspiration", "mm/h", Attribute::LogOnly,
-                 "Reference evapotranspiration this hour");
-  frame.declare ("daily_extraterrastial_radiation", "W/m^2", Attribute::LogOnly,
-                 "Extraterrestrial radiation this day.");
-  frame.declare ("rain", "mm/h", Attribute::LogOnly, "Rain this hour.");
-  frame.declare ("snow", "mm/h", Attribute::LogOnly, "Snow this hour.");
-  frame.declare ("precipitation", "mm/h", Attribute::LogOnly, 
-                 "Precipitation this hour.");
-  frame.declare_fraction ("cloudiness", Attribute::LogOnly,
-                          "Fraction of sky covered by clouds [0-1].");
-  frame.declare_fraction ("daily_cloudiness", Attribute::LogOnly,
-                          "Fraction of sky covered by clouds [0-1].");
-  frame.declare ("vapor_pressure", "Pa", Attribute::LogOnly, "Humidity.");
-  frame.declare ("air_pressure", "Pa", Attribute::LogOnly, "Air pressure.");
-  frame.declare ("wind", "m/s", Attribute::LogOnly, "Wind speed.");
-  frame.declare ("day_length", "h", Attribute::LogOnly,
-                 "Number of light hours this day.");
-  frame.declare_submodule_sequence ("deposit", Attribute::LogOnly, "\
-Total atmospheric deposition of nitrogen.", load_flux);
-}
 
 Weather::Weather ()
 { }

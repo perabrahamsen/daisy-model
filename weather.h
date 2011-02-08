@@ -28,9 +28,6 @@
 #include "weatherdata.h"
 
 class Time;
-class Treelog;
-class BlockModel;
-class Units;
 class IM;
 
 class Weather 
@@ -92,8 +89,6 @@ public:
   double sin_solar_elevation_angle (const Time&) const; // []
 
   // Create and Destroy.
-public:
-  static void load_common (Frame& frame);
 protected:
   Weather ();
 public:
