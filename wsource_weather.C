@@ -150,8 +150,11 @@ struct WSourceWeather::Implementation
   void check_state (Treelog& msg);
     
   // Create and Destroy.
+  void set_all_maps ();
+  void rewind (const Time&, Treelog& msg);
   mutable bool initialized_ok;
-  bool initialize (const Time& time, Treelog& msg);
+  void initialize_one (Treelog& msg);
+  void initialize_two (const Time& time, Treelog& msg);
   bool check (const Time& from, const Time& to, Treelog&) const;
   Implementation (const Weather&, WSource&, const BlockModel&);
   ~Implementation ();
@@ -602,7 +605,11 @@ WSourceWeather::Implementation::suggest_dt () const // [h]
 void 
 WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
 {
-  daisy_assert (time > previous);
+  if (source.done ())
+    {
+      msg.error ("No weather data");
+      return;
+    }
 
   // Update time interval
   bool new_day = false;
@@ -638,7 +645,6 @@ WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
 
       when.push_back (source.end ());
       last = when.back ();
-
       // Numbers.
       for (number_map_t::iterator i = numbers.begin ();
            i != numbers.end ();
@@ -700,6 +706,9 @@ WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
             }
         }
     }
+
+  if (source.done ())
+    msg.message ("source done");
 
   // Calculate new values.
   if (when.size () < 1)
@@ -993,16 +1002,32 @@ WSourceWeather::Implementation::check_state (Treelog& msg)
   check_state (my_daily_precipitation_name, my_daily_precipitation, msg);
 }
 
-bool 
-WSourceWeather::Implementation::initialize (const Time& time, Treelog& msg)
+void
+WSourceWeather::Implementation::rewind (const Time& time, Treelog& msg)
 {
-  bool ok = true;
+  // Reset data.
+  numbers.clear ();
+  names.clear ();
+  when.clear ();
+  timesteps.clear ();
+  set_all_maps ();
 
-  // Source.
-  source.source_initialize (msg);
-  if (!source.source_check (msg))
-    ok = false;
-  
+  // Reset time.
+  next = Time (time.year (), time.month (), time.mday (), 0);
+  previous = next;
+  previous.tick_hour (-1);
+  if (initialized_ok)
+    {
+      try
+        { tick (time, msg); }
+      catch (...)
+        { initialized_ok = false; }
+    }
+}
+
+void
+WSourceWeather::Implementation::set_all_maps ()
+{
   // Numbers and names.
   std::set<symbol> all;
   source.entries (all);
@@ -1031,7 +1056,22 @@ WSourceWeather::Implementation::initialize (const Time& time, Treelog& msg)
   timesteps[Weatherdata::RefEvap ()];
   timesteps[Weatherdata::DiffRad ()];
   timesteps[Weatherdata::AirTemp ()];
+}
 
+void
+WSourceWeather::Implementation::initialize_one (Treelog& msg)
+{
+  // Source.
+  source.source_initialize (msg);
+  if (!source.source_check (msg))
+    initialized_ok = false;
+  
+  set_all_maps ();
+}
+
+void
+WSourceWeather::Implementation::initialize_two (const Time& time, Treelog& msg)
+{
   // Check interval.
   const Time& data_begin = source.data_begin ();
   const Time& data_end = source.data_end ();
@@ -1053,23 +1093,19 @@ WSourceWeather::Implementation::initialize (const Time& time, Treelog& msg)
         tmp << "unknown";
         
       msg.error (tmp.str ());
-      return initialized_ok;
     }
 
   // Initialize previous, next
   next = Time (time.year (), time.month (), time.mday (), 0);
   previous = next;
   previous.tick_hour (-1);
-  initialized_ok = ok;
-  if (ok)
+  if (initialized_ok)
     {
       try
         { tick (time, msg); }
       catch (...)
         { initialized_ok = false; }
     }
-
-  return true;
 }
 
 bool 
@@ -1366,12 +1402,29 @@ WSourceWeather::output (Log& log) const
   output_submodule (deposit (), "deposit", log);
 }
 
+void 
+WSourceWeather::rewind (const Time& time, Treelog& msg)
+{ impl->rewind (time, msg); }
 
-bool 
+void
+WSourceWeather::initialize_one (Treelog& msg)
+{
+  impl->initialized_ok = true;
+  impl->initialize_one (msg);
+}
+
+void
+WSourceWeather::initialize_two (const Time& time, Treelog& msg)
+{
+  impl->initialize_two (time, msg);
+}
+
+void
 WSourceWeather::weather_initialize (const Time& time, Treelog& msg)
 {
   TREELOG_MODEL (msg);
-  return impl->initialize (time, msg);
+  initialize_one (msg);
+  initialize_two (time, msg);
 }
 
 bool 

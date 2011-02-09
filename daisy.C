@@ -164,8 +164,9 @@ struct Daisy::Implementation
   void initialize (Metalib& metalib, Daisy& daisy, Block& block)
   { 
     Treelog& msg = block.msg ();
-    if (weather.get () && !weather->weather_initialize (time, msg))
-      return;
+    if (weather.get ())
+      weather->weather_initialize (time, msg);
+
     {
       Treelog::Open nest (msg, "output");
       output_log->initialize (metalib, msg);

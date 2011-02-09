@@ -101,9 +101,12 @@ protected:
   double day_length (const Time&) const; // [h]
 
   // Create and Destroy.
+protected:
+  void rewind (const Time& time, Treelog& msg);
+  void initialize_one (Treelog& msg);
+  void initialize_two (const Time& time, Treelog& msg);
 public:
-  static void load_common (Frame& frame);
-  bool weather_initialize (const Time& time, Treelog& msg);
+  void weather_initialize (const Time& time, Treelog& msg);
 protected:
   WSourceWeather (const BlockModel&);
 public:

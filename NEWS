@@ -6,6 +6,25 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.93
+
+** More flexible weather data handling.
+
+The code for handling weather data has been completely rewritten.
+There are probably many new bugs, and the error messages are likely
+less informative.
+
+*** More fine grained weather data available.
+
+You can now specify Minute, Second, and even Microsecond in the
+weather files.  If you have set 'minimal_timestep', Daisy will try to
+make the timesteps match the weather data.
+
+*** Combine multible weather data.
+
+*** Keywords, columns, and parameters interchangeable.
+
+
 * 4.92 
 
 ** Bug fixes and code cleanup.

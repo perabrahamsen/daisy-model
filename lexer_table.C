@@ -49,6 +49,7 @@
    const symbol filename;  
    std::auto_ptr<std::istream> owned_stream;
    boost::scoped_ptr<LexerData> lex;
+   Filepos end_of_header;
    std::string field_sep;
    std::string type_;
    const std::vector<std::string> missing;
@@ -94,6 +95,7 @@
    void error (const std::string& str) const;
 
    // Create and destroy.
+   void rewind ();
    static std::vector<std::string> s2s_v (const std::vector<symbol>& syms);
    Implementation (const BlockModel& al);
  };
@@ -549,6 +551,7 @@ LexerTable::Implementation::read_header_with_keywords (Frame& keywords,
 
   // Tags.
   read_tags ();
+  end_of_header = lex->position ();
 
   // Done
   return lex->get_error_count () < 1;
@@ -575,6 +578,7 @@ LexerTable::Implementation::read_header (Treelog& msg)
 
   // Tags.
   read_tags ();
+  end_of_header = lex->position ();
 
   // Done
   return lex->good ();
@@ -870,6 +874,14 @@ LexerTable::Implementation::error (const std::string& str) const
 void 
 LexerTable::error (const std::string& str) const
 { impl->error (str); }
+
+void 
+LexerTable::Implementation::rewind ()
+{ lex->seek (end_of_header); }
+
+void 
+LexerTable::rewind ()
+{ impl->rewind (); }
 
 void 
 LexerTable::load_syntax (Frame& frame)

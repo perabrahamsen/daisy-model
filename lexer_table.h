@@ -70,6 +70,7 @@ public:
 
   // Create and Destroy.
 public:
+  void rewind ();
   static void load_syntax (Frame&);
   explicit LexerTable (const BlockModel&);
   ~LexerTable ();

@@ -995,8 +995,9 @@ ColumnStandard::initialize (const Block& block,
   surface.initialize (geometry);
 
   // Bioclimate and heat depends on weather.
-  if (weather.get () && !weather->weather_initialize (time, msg))
-    return false;
+  if (weather.get ())
+    weather->weather_initialize (time, msg);
+
   if (!global_weather && !weather.get ())
     {
       msg.error ("No weather specified");

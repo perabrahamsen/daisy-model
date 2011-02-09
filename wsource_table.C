@@ -286,7 +286,12 @@ WSourceTable::source_tick (Treelog& msg)
 
   timestep_begin = timestep_end;
   values = next_values;
-  read_line ();
+  while (timestep_end <= timestep_begin)
+    {
+      read_line ();
+      if (!ok)
+        return;
+    }
   timestep_hours = Time::hours_between (timestep_begin, timestep_end);
   daisy_assert (timestep_hours > 0.0);
 }
@@ -333,6 +338,7 @@ WSourceTable::source_initialize (Treelog& msg)
     my_data_begin = super_begin;
   
   // Read first data.
+  timestep_end = my_data_begin;
   read_line ();
   source_tick (msg);
 }
@@ -340,6 +346,15 @@ WSourceTable::source_initialize (Treelog& msg)
 bool 
 WSourceTable::source_check (Treelog&) const
 { return ok; }
+
+void 
+WSourceTable::rewind (const Time& time, Treelog& msg)
+{
+  timestep_end = my_data_begin;
+  read_line ();
+  source_tick (msg);
+  super::rewind (time, msg);
+}
 
 WSourceTable::WSourceTable (const BlockModel& al)
   : WSourceBase (al),

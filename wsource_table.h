@@ -34,8 +34,10 @@ class WSourceTable : public WSourceBase
 {
   typedef WSourceBase super;
   const Units& units;
+protected:
   LexerTable lex;
   bool ok;
+private:
   FrameSubmodelValue keywords;
 
   std::map<symbol, size_t> columns;
@@ -58,8 +60,10 @@ class WSourceTable : public WSourceBase
   symbol name (const symbol key) const;
 
   // WSource.
+protected:
   const Time& data_begin () const;
   const Time& data_end () const;
+private:
   const Time& begin () const;
   const Time& end () const;
   double timestep () const;
@@ -75,6 +79,7 @@ class WSourceTable : public WSourceBase
   void source_initialize (Treelog& msg);
 protected:
   bool source_check (Treelog&) const;
+  void rewind (const Time&, Treelog&);
 public:
   WSourceTable (const BlockModel& al);
   ~WSourceTable ();

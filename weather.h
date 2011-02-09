@@ -24,7 +24,6 @@
 #ifndef WEATHER_H
 #define WEATHER_H
 
-#include "model_derived.h"
 #include "weatherdata.h"
 
 class Time;
