@@ -149,6 +149,10 @@ WSourceTable::end_check (const symbol key) const
 double 
 WSourceTable::raw_end_number (const symbol key) const
 {
+  // Attribute.
+  if (super::check (key))
+    return super::number (key); 
+
   // Table.
   if (ok)
     {
@@ -156,10 +160,6 @@ WSourceTable::raw_end_number (const symbol key) const
       if (i != next_values.end () && std::isfinite (i->second))
         return i->second;
     }
-
-  // Attribute.
-  if (super::check (key))
-    return super::number (key); 
 
   // Keyword.
   return keywords.number (key);

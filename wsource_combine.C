@@ -175,10 +175,6 @@ WSourceCombine::Entry::check_alist (const Metalib&,
 void
 WSourceCombine::Entry::load_syntax (Frame& frame)
 {
-  frame.declare_object ("reserve", WSource::component,
-                        Attribute::State, Attribute::Singleton, "\
-Reserve weather model to use when no source match.");
-  frame.set ("reserve", "null");
   frame.declare_object ("source", WSource::component, "\
 Source of weather data.");
   frame.declare_submodule ("begin", Attribute::OptionalConst, "\
@@ -506,13 +502,17 @@ static struct WSourceCombineSyntax : public DeclareModel
   Model* make (const BlockModel& al) const
   { return new WSourceCombine (al); }
   WSourceCombineSyntax ()
-    : DeclareModel (WSource::component, "combine", 
+    : DeclareModel (WSource::component, "combine", "weather",
                     "Combine multiple weather sources.")
   { }
   void load_frame (Frame& frame) const
   { 
     frame.declare_submodule_sequence ("source", Attribute::Const, "\
 List of weather sources.", WSourceCombine::Entry::load_syntax);
+  frame.declare_object ("reserve", WSource::component,
+                        Attribute::State, Attribute::Singleton, "\
+Reserve weather model to use when no source match.");
+  frame.set ("reserve", "null");
   }
 } WSourceCombine_syntax;
 
