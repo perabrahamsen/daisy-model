@@ -15,7 +15,7 @@ release.
 The new 'const' model (see later) can sometimes be used as
 replacement.
 
-*** The 'default' is rewritten.
+*** The 'default' weather model is rewritten.
 
 There are probably many new bugs, and the error messages are likely
 less informative.  However, it is more flexible as described below.
@@ -59,11 +59,11 @@ pressure of 1000 Pascal, you can specify
 
 in the weather file header.  Or alternatively, as a parameter:
 
-  (weather default "my_sample_weather.dwf"
+  (weather default "dk-taastrup.dwf"
     (VapPres 1000 [Pa]))
 
 Doing this will overwrite the value specified in
-my_sample_weather.dwf, if any.
+dk-taastrup.dwf, if any.
 
 Data that are not simple numbers (like Surface or PrecipCorrect) can
 be specified as keywords or parameters.
@@ -79,7 +79,7 @@ The new 'table' model differs from the 'default' model on three points.
 
 1. The file name is specified with an explicit 'file' parameter.  E.g. 
 
-  (weather table (file "my_sample_weather.dwf"))
+  (weather table (file "dk-taastrup.dwf"))
 
 2. The 'missing_years' parameter is not supported.
 

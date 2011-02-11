@@ -1,23 +1,18 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* 'combine' bug
+* Release
 
-The 'end' parameter destroy harvest.  Probably no precip.
+** Dokumentation?
 
-(weather combine
-         (source ((begin 2006 6 1 0)
-                  ;; (end   2006 9 1 0)
-                  (use Precip)
-                  (source table (file "dk-taastrup-hourly.dwf")))
-                 ((source table (file "dk-taastrup.dwf")))))
+** Wiki.
 
-* Check combination of hourly and daily weather
+* Next
 
-Do we still get a "day cycle" for the remaining daily weather
-information, when using an hourly source for data?
+** VAP populær artikel
 
+** Kina rødder
 
-* NEWS: weather
+** Kør VAP kørsler igen.
 
 * Hent gammel PC.
 

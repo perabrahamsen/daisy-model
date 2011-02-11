@@ -409,7 +409,7 @@ WSourceCombine::source_tick (Treelog& msg)
       Entry& e = *(entry[i]);
 
       // Within period?
-      if (my_begin < e.begin || my_end > e.end)
+      if (my_end < e.begin || my_begin > e.end)
         continue;
 
       daisy_assert (e.source.get ());
