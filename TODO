@@ -1,5 +1,35 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Vap-pop2
+
+Ny software baner vejen for bedre forståelse af landbrugets påvirkning
+af danske vandløb.
+
+Rundt regnet halvdelen af danske marker har etableret dræn, og vand
+fra disse dræn ender som oftest i vandløb.  Det er derfor af væsentlig
+interesse for det danske vandmiljø at forstå hvor drænvandet stammer
+fra, hvad det kan føre med sig af miljøfremmede stoffer, og hvordan
+landbrugets dyrkningspraksis påvirker indholdet.  Et nyt software
+system fra Det Biovidenskabelige Fakultet på Københavns Universitet
+bidrager til en forstålse af dette.
+
+Traditionelt har drænvand været regnet for representativt for vandet i
+jorden i den dybde hvor drænrør et placeret.  Nyere forskning har dog
+vist at regnormegange og sprækkesystemer med forbindelse til dræn har
+afgørende betydning for indholdet af bekæmpelsesmidler i drænvand,
+specielt i forbindelse med kraftig regn.  For at sætte tal på dette
+har Miljøstyrelsen financieret et nyt projekt hvor forskere fra
+Københavns Universitet har udviklet software baseret på en matematisk
+beskrivelse
+
+* Vap-pop3
+
+** Hvor stammer drænvandet fra?
+
+
+
+
+
 * Release
 
 ** Dokumentation?
