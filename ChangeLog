@@ -1,3 +1,7 @@
+2011-02-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.93 released.
+
 2011-02-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* weather_source.C, weather_extra.C, weather_std.C, weather_simple.C:
