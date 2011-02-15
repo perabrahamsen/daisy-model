@@ -185,7 +185,7 @@ Use weather data from source until this time.\n\
 By default, use data until end of source.", Time::load_syntax);
   frame.declare_string ("use", Attribute::Const, Attribute::Variable, "\
 List of weather data to use from source.\n\
-Specify 'All' to use all present weather data.");
+Specify 'Any' to use all present weather data.");
   frame.set_strings ("use", Any ());
   static struct UseCheck : public VCheck
   {

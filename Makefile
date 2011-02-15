@@ -379,7 +379,7 @@ endif
 ifeq ($(HOSTTYPE),mingw)
 	DAISYEXE = daisy.exe
 else
-	DAISYEXE = /usr/local/daisy/$(HOSTTYPE)/daisy
+	DAISYEXE = $(OBJHOME)/daisy
 endif
 
 # Figure out how to link.

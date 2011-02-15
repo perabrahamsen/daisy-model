@@ -62,8 +62,7 @@ in the weather file header.  Or alternatively, as a parameter:
   (weather default "dk-taastrup.dwf"
     (VapPres 1000 [Pa]))
 
-Doing this will overwrite the value specified in
-dk-taastrup.dwf, if any.
+Doing the later will overwrite any value specified in dk-taastrup.dwf.
 
 Data that are not simple numbers (like Surface or PrecipCorrect) can
 be specified as keywords or parameters.
@@ -88,16 +87,16 @@ explained below.
 
 *** New 'const' model.
 
-This is identical to the 'table' model, except that the file
-parameters is not accepted.  This means weather data must be specified
+This is identical to the 'table' model, except that the 'file'
+parameter is not accepted.  This means weather data must be specified
 as parameters.  The value will therefore be constant, except the
 radiation which will still follow a day cycle based on relative
 extraterrestrial radiation.
 
 *** New 'combine' model.
 
-The 'combine' model will allow you to combine multible sources of
-weather data.  It has a single parameter 'source', which is a list of
+The 'combine' model will allow you to combine multiple sources of
+weather data.  It has a single parameter 'entry', which is a list of
 weather sources entries.  Each entry have 'begin', 'end', 'use', and
 'source' parameters.  The 'begin' and 'end' parameters specify the
 time interval where we should use this particular source.  The 'use'
@@ -144,8 +143,9 @@ only a selected period.  For example
 will use data from "dk-taastrup.dwf", with the exception that 2002
 data will be used for 2006.
 
-Note that while dates until the 28 of February will be an exact match,
-later dates may be one day off due to leap years.
+Note that while dates until the 28 of February will be an exact match
+for the two specified years, other dates may be one day off due to
+leap years.
 
 If you don't want to map year to year, you can specify 'offset'
 instead of 'from' and 'to'.

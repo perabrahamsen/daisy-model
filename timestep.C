@@ -26,6 +26,7 @@
 #include "assertion.h"
 #include "mathlib.h"
 #include "treelog.h"
+#include "librarian.h"
 #include <sstream>
 #include <iomanip>
 
@@ -392,5 +393,9 @@ operator== (const Timestep& a, const Timestep& b)
   static const Time center (5000, 1, 1, 0);
   return center + a == center + b;
 }
+
+static DeclareSubmodel 
+timestep_submodel (Timestep::load_syntax, "Timestep", "\
+Relative time.");
 
 // timestep.C ends here
