@@ -115,11 +115,11 @@ Fo example, we might want to use weather data from the file
 we instead use data from file "dk-taastrup-hourly.dwf".   
 
   (weather combine
-           (source ((begin 2006 6 1 0)
-                    (end   2006 9 1 0)
-                    (use Precip)
-                    (source table (file "dk-taastrup-hourly.dwf")))
-                   ((source table (file "dk-taastrup.dwf")))))
+           (entry ((begin 2006 6 1 0)
+                   (end   2006 9 1 0)
+                   (use Precip)
+                   (source table (file "dk-taastrup-hourly.dwf")))
+                  ((source table (file "dk-taastrup.dwf")))))
 
 *** New 'time' model.
 
@@ -135,11 +135,11 @@ data for 2007.  It can be combined with the 'combine' model to map
 only a selected period.  For example
 
   (weather combine
-           (source ((begin 2006 1 1 0)
-                    (end   2007 1 1 0)
-                    (source time (from 2002) (to 2006)
-                            (source table (file "dk-taastrup.dwf"))))
-                   ((source table (file "dk-taastrup.dwf")))))
+           (entry ((begin 2006 1 1 0)
+                   (end   2007 1 1 0)
+                   (source time (from 2002) (to 2006)
+                           (source table (file "dk-taastrup.dwf"))))
+                  ((source table (file "dk-taastrup.dwf")))))
 
 will use data from "dk-taastrup.dwf", with the exception that 2002
 data will be used for 2006.

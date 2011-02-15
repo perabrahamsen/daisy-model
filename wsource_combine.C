@@ -137,7 +137,7 @@ struct WSourceCombine : public WSourceWeather
   WSourceCombine (const BlockModel& al)
     : WSourceWeather (al),
       reserve (Librarian::build_item<WSource> (al, "reserve")),
-      entry (map_submodel<Entry> (al, "source")),
+      entry (map_submodel<Entry> (al, "entry")),
       my_data_begin (9999,1,1,0),
       my_data_end (1, 1, 1, 1),
       my_begin (9999,1,1,0),
@@ -507,7 +507,7 @@ static struct WSourceCombineSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare_submodule_sequence ("source", Attribute::Const, "\
+    frame.declare_submodule_sequence ("entry", Attribute::Const, "\
 List of weather sources.", WSourceCombine::Entry::load_syntax);
   frame.declare_object ("reserve", WSource::component,
                         Attribute::State, Attribute::Singleton, "\
