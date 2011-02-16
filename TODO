@@ -1,5 +1,80 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Skabelon
+
+    * Overskrift for hele sammenfatningen
+      Angiver så vidt muligt hovedkonklusionen eller en spændende og vigtig vinkel på, hvad projektet er kommet frem til. Det må ikke være projektets titel eller tema. Højst 60 anslag. Jo kortere jo bedre.
+
+    * Manchet (ingen overskrift)(max. 100 ord)
+      Fokuser på det, der er nyt, spændende og/eller overraskende. Når man har læst manchetten, skal man have fået de vigtigste informationer. Projektets titel bør også nævnes, men gerne i en lidt populær form, hvis den korrekte titel er alt for lang og omfattende.
+
+
+
+    * Baggrund og formål" (max. 250 ord)
+      Her beskrives projektets problemstilling og formål, og det forklares, hvorfor projektet er sat i gang.
+
+    * "Undersøgelsen" (max. 100 ord)
+      Her fortælles der kort om, hvordan projektet er udført, hvor og af hvem.
+
+    * "Hovedkonklusioner" (max 300 ord)
+      Her fortælles der om projektets hovedkonklusioner. Hvilken ny viden har man opnået, hvad betyder det for miljøet, og hvad kan vi i øvrigt bruge den nye viden til? Hovedkonklusionerne opstilles evt. i punktform eller i et diagram.
+
+    * "Projektresultater" (max. 750 ord)
+      Her fortælles der om nogle af de resultater, der har ført til konklusionerne, gerne illustreret med enkle tabeller og grafik. De max 750 ord er inkl. grafik og tabeller. Lav en ekstra overskrift for hver ca. 200 ord.
+
+    * "Andre kilder"
+
+
+* Hvordan når glyfosat ud til dræn?
+
+Ny forskning fra Københavns Universitet øger forståelsen for hvordan
+kemiske bekæmpelsesmidler som glyfosat kan ende i vores vandløb og
+drikkevand.
+
+Glyfosat (den aktive ingrediens i Roundup) bliver brugt af landbruget
+til at beskytte afgrøderne mod ukrudt.  Andre kemiske bekæmpelsesmidler
+bliver brugt til at beskytte planterne mod angreb fra insekter eller
+svampe.  Fælles for alle disse midler er at de kun gør nytte så længe de
+forbliver på marken.  Alligevel kan de også nogle steder genfindes i
+både drikkevandsboringer, samt i vand fra drænrør.  Drænrør munder
+oftest ud vandløb, hvor bekæmpelsesmidlerne potentielt vil kunne påvirke
+de økologiske systemer.
+
+Det er derfor i alles (landbrug, miljø, og drikkevand) interesse at
+bekæmpelsesmidlerne forbliver på marken, og ikke ender i vandløb eller
+drikkevand.  På den baggrund har Miljøstyrelsen financieret et
+forskningsprojekt udført på Det Biovidenskabelige Fakultet på Københavns
+Universitet, som har kortlagt hvordan vand og bekæmpelsesmidler bevæger
+sig i de øverste meter af marken.  Et vigtigt produkt af denne forskning
+er et nyt software værktøj (Daisy), der er i stand til at modellere
+denne bevægelse under forskellige forhold.
+
+På kort sigt kan den ny forståelse påvirke hvordan Miljøstyrelsen
+fortolker de allerede eksisterende målinger af drænvand med henblik på
+beskyttelse af vores vandsressourcer, og på længere sigt vil den ny
+software kunne danne grundlag for retningslinier der hjælper landmændede
+med at få det optimale ud af bekæmpelsesmidlerne, med minimal risiko for
+vandløb og drikkevand.
+
+** Markekspriment
+
+** Udvikling af software
+
+** Aftestning af software
+
+
+* Vap-pop3
+
+** Hvor stammer drænvandet fra?
+
+Der er lagt dræn på halvdelen af Danmarks landbrugsareal.  Vand udtaget
+fra dræn er 
+
+et fra
+disse dræn ender hovedsageligt i vandløb og søer, hvor det kan medtage
+miljøfremmede stoffer i form af de kemiske bekæmpelsesmidler der bruges
+i konventionel landbrugsdrift.  
+
 * Vap-pop2
 
 Ny software baner vejen for bedre forståelse af landbrugets påvirkning
@@ -21,11 +96,6 @@ specielt i forbindelse med kraftig regn.  For at sætte tal på dette
 har Miljøstyrelsen financieret et nyt projekt hvor forskere fra
 Københavns Universitet har udviklet software baseret på en matematisk
 beskrivelse
-
-* Vap-pop3
-
-** Hvor stammer drænvandet fra?
-
 
 
 
