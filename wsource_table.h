@@ -50,6 +50,7 @@ private:
   double timestep_hours;
 
   // Precipitaion correction.
+  double precip_correct (const Time&, const symbol) const;
   double precip_correct (const Time&) const;
   double precip_correct (const Time&, const std::vector<double>&) const;
 

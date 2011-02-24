@@ -73,6 +73,7 @@ namespace Weatherdata
   symbol Note ();
   symbol Surface ();
   symbol PrecipCorrect ();
+  symbol PrecipScale ();
   symbol Begin ();
   symbol End ();
   

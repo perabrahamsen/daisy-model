@@ -23,6 +23,7 @@
 #define BUILD_DLL
 
 #include "time.h"
+#include "timestep.h"
 #include "assertion.h"
 #include "log.h"
 #include "frame_submodel.h"
@@ -488,7 +489,7 @@ Time::valid (int year, int month, int mday, int hour, int minute, int second,
 }
 
 int
-Time::days_between (const Time& first, const Time& last)
+Time::whole_days_between (const Time& first, const Time& last)
 {
   // Same years, just use the difference between the year numbers.
   if (first.year () == last.year ())
@@ -515,9 +516,16 @@ Time::days_between (const Time& first, const Time& last)
 }
 
 int
-Time::hours_between (const Time& first, const Time& last)
+Time::whole_hours_between (const Time& first, const Time& last)
 {
-  return last.hour () - first.hour () + 24 * days_between (first, last);
+  return last.hour () - first.hour () + 24 * whole_days_between (first, last);
+}
+
+double
+Time::fraction_hours_between (const Time& first, const Time& last)
+{
+  Timestep step = last - first;
+  return step.total_hours ();
 }
 
 // @ Create.

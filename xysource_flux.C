@@ -104,7 +104,7 @@ XYSourceFlux::load_when (std::vector<double>& all_values, Treelog& msg)
       if (!lex.get_time (entries, time, 8))
         continue;
 
-      double distance = std::fabs (Time::hours_between (time, *when));
+      double distance = std::fabs (Time::fraction_hours_between (time, *when));
 
       if (closest < 0.0 || distance < closest)
         if (lex.flux_edges (entries, all_values, msg))

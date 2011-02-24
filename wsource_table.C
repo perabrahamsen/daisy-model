@@ -29,10 +29,8 @@
 #include <sstream>
 
 double 
-WSourceTable::precip_correct (const Time& time) const
+WSourceTable::precip_correct (const Time& time, const symbol key) const
 {
-  const symbol key = Weatherdata::PrecipCorrect ();
-
   // Attribute.
   if (super::check (key))
     return precip_correct (time, super::number_sequence (key)); 
@@ -43,6 +41,13 @@ WSourceTable::precip_correct (const Time& time) const
 
   // No correction.
   return 1.0;
+}
+
+double 
+WSourceTable::precip_correct (const Time& time) const
+{
+  return precip_correct (time,  Weatherdata::PrecipCorrect ())
+    * precip_correct (time,  Weatherdata::PrecipScale ());
 }
 
 double 
@@ -292,7 +297,7 @@ WSourceTable::source_tick (Treelog& msg)
       if (!ok)
         return;
     }
-  timestep_hours = Time::hours_between (timestep_begin, timestep_end);
+  timestep_hours = Time::fraction_hours_between (timestep_begin, timestep_end);
   daisy_assert (timestep_hours > 0.0);
 }
   

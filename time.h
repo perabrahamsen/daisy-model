@@ -105,8 +105,9 @@ public:
   static bool valid (int year, int month, int mday, 
                      int hour = 0, int minute = 0, int second = 0,
                      int microsecond = 0);
-  static int days_between (const Time& first, const Time& last);
-  static int hours_between (const Time& first, const Time& last);
+  static int whole_days_between (const Time& first, const Time& last);
+  static int whole_hours_between (const Time& first, const Time& last);
+  static double fraction_hours_between (const Time& first, const Time& last);
 
   bool operator== (const Time&) const;
   bool operator!= (const Time&) const;

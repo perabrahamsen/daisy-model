@@ -1,3 +1,27 @@
+2011-02-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+
+	* time.C, time.h (whole_days_between, whole_hours_between): Added
+	'whole_prefix'.
+	(fraction_hours_between): New function.
+	* xysource_flux.C (load_when):
+	* gnuplot_soil.C (initialize):
+	* wsource_combine.C (source_tick, source_initialize):
+	* wsource_const.C (WSourceBase):
+	* wsource_table.C (source_tick):
+	* daisy.C (Daisy, tick, duration):
+	* wsource_weather.C (number_average, number_cloudiness, timestep):
+	* timestep.C (-):
+	* depth.C (DepthPLF::tick, DepthPLF::convert_to_plf):
+	(DepthFile::tick, DepthPLF::initialize):
+	* source.C (distance): Update callers.
+
+	* wsource_weather.C (initialize_two): Handle case where both
+	simulation and weather data starts at midnight the same day.
+
+	* weatherdata.C, weatherdata.h (PrecipScale): Reinstantiated.
+	* wsource_table.C. wsource_table.h (precip_correct): Use it.
+
 2011-02-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.93 released.

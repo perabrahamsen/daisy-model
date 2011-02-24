@@ -431,7 +431,7 @@ WSourceCombine::source_tick (Treelog& msg)
   if (all_done)
     ok = false;
 
-  my_timestep = Time::hours_between (my_begin, my_end);
+  my_timestep = Time::fraction_hours_between (my_begin, my_end);
   daisy_assert (my_timestep > 0.0);
 }
 
@@ -468,7 +468,7 @@ WSourceCombine::source_initialize (Treelog& msg)
       if (source.end () > my_begin && source.end () < my_end)
         my_end = source.end ();
     }
-  my_timestep = Time::hours_between (my_begin, my_end);
+  my_timestep = Time::fraction_hours_between (my_begin, my_end);
 }
 
 bool 

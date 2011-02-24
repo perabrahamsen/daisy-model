@@ -347,7 +347,7 @@ Timestep operator- (const Time& a, const Time& b)
   int hours = a.hour () - b.hour ();
   const Time a_day (a.year (), a.month (), a.mday (), 0, 0, 0);
   const Time b_day (b.year (), b.month (), b.mday (), 0, 0, 0);
-  int days = Time::days_between (b_day, a_day);
+  int days = Time::whole_days_between (b_day, a_day);
   if (microseconds < 0)
     {
       microseconds += 1000000;

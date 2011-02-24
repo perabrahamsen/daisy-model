@@ -158,6 +158,9 @@ namespace Weatherdata
   symbol PrecipCorrect ()
   { static const symbol name ("PrecipCorrect"); return name; }
   
+  symbol PrecipScale ()
+  { static const symbol name ("PrecipScale"); return name; }
+  
   symbol Begin ()
   { static const symbol name ("Begin"); return name; }
   
@@ -317,6 +320,7 @@ Average precipitation.  Used for deviding precipitation into dry and wet.",
         (*this)["MaxTDay"] = "AirTemp";
         (*this)["Surface"] = "GlobRad"; // Used for ref.evap.
         (*this)["PrecipCorrect"] = "Precip";
+        (*this)["PrecipScale"] = "Precip";
       }
     } meta_map;
 
@@ -354,13 +358,19 @@ Either 'reference' for a weather station standard of short grass,\n\
 or 'field' for measurements directly at the field.");
     static VCheck::Enum surfaces (reference_name (), field_name ());
     frame.set_check (Surface (), surfaces);
+    static VCheck::MultiSize multi (1, 12);
     frame.declare (PrecipCorrect (), Attribute::None (), 
                    Attribute::OptionalConst, Attribute::Variable, "\
 Correction factors for precipitation.\n\
 Can contain one or twelve numbers, in the later case the numbers\n\
 corresponds to months.");
-    static VCheck::MultiSize multi (1, 12);
     frame.set_check (PrecipCorrect (), multi);
+    frame.declare (PrecipScale (), Attribute::None (), 
+                   Attribute::OptionalConst, Attribute::Variable, "\
+Scale factors for precipitation.\n\
+Can contain one or twelve numbers, in the later case the numbers\n\
+corresponds to months.");
+    frame.set_check (PrecipScale (), multi);
     frame.declare_submodule (Begin (), Attribute::OptionalConst, "\
 Beginning of weather data.", Time::load_syntax);
     frame.declare_submodule (End (), Attribute::OptionalConst, "\

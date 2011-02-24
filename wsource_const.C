@@ -56,7 +56,7 @@ struct WSourceConst : public WSourceBase
   }
   WSourceConst (const BlockModel& al)
     : WSourceBase (al),
-      timestep_hours (Time::hours_between (begin (), end ()))
+      timestep_hours (Time::fraction_hours_between (begin (), end ()))
   { }
   ~WSourceConst ()
   { }

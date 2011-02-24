@@ -176,7 +176,7 @@ struct DepthPLF : public Depth
   double current_value;
 
   void  tick (const Units&, const Time& time, const Scope&, Treelog&)
-  { current_value = value (Time::hours_between (start, time)); }
+  { current_value = value (Time::fraction_hours_between (start, time)); }
 
   double operator()() const
   { return current_value; }
@@ -195,7 +195,7 @@ struct DepthPLF : public Depth
       {
         const Time now (table[i]->submodel ("time"));
         const double value = table[i]->number ("value");
-        result.add (Time::hours_between (start, now), value);
+        result.add (Time::fraction_hours_between (start, now), value);
       }
     return result;
   }
@@ -287,7 +287,7 @@ struct DepthFile : public Depth
   void tick (const Units&, const Time& time, const Scope&, Treelog&)
   { 
     daisy_assert (state == State::ok);
-    current_value = value (Time::hours_between (start, time)); 
+    current_value = value (Time::fraction_hours_between (start, time)); 
   }
   double operator()() const
   { return current_value; }
@@ -354,7 +354,7 @@ struct DepthFile : public Depth
               lex.error ("Height should be negative");
             else
               {
-                value.add (Time::hours_between (start, next), height);
+                value.add (Time::fraction_hours_between (start, next), height);
                 last = next;
                 lines++;
               }

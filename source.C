@@ -67,8 +67,8 @@ Source::distance (const Time begin, const Time end,
 
   for (size_t i = 0; i < times.size (); i++)
     {
-      const double xr = (Time::hours_between (begin, times[i]) + 0.0)
-	/ (Time::hours_between (begin, end) + 0.0);
+      const double xr = (Time::fraction_hours_between (begin, times[i]) + 0.0)
+	/ (Time::fraction_hours_between (begin, end) + 0.0);
       if (xr < 0.0 || xr > 1.0)
 	// Outside graph.
 	continue;

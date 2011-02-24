@@ -261,7 +261,7 @@ WSourceWeather::Implementation::number_average (const Time& from, const Time& to
   
   while (i < data_size && when[i] < to)
     {
-      const double hours = Time::hours_between (time, when[i]);
+      const double hours = Time::fraction_hours_between (time, when[i]);
       sum_hours += hours;
       sum_value += hours * values[i];
       time = when[i];
@@ -269,11 +269,13 @@ WSourceWeather::Implementation::number_average (const Time& from, const Time& to
     }
 
   // Add end interval.
-  const double hours = Time::hours_between (time, to);
+  const double hours = Time::fraction_hours_between (time, to);
   const double value = (i < data_size ? values[i] : values.back ());
   sum_hours += hours;
   sum_value += hours * value;
-  daisy_approximate (sum_hours, Time::hours_between (from, to));
+  daisy_approximate (sum_hours, Time::fraction_hours_between (from, to));
+  if (!std::isnormal (sum_hours))
+    daisy_panic ("No time between " + from.print () + " and " + to.print ());
   return sum_value / sum_hours;
 }
     
@@ -357,7 +359,7 @@ WSourceWeather::Implementation::number_cloudiness (const Time& from, const Time&
       const double value = find_cloudiness (when[i], values[i]);
       if (std::isfinite (value))
         {
-          const double hours = Time::hours_between (time, when[i]);
+          const double hours = Time::fraction_hours_between (time, when[i]);
           sum_hours += hours;
           sum_value += hours * value;
         }
@@ -366,7 +368,7 @@ WSourceWeather::Implementation::number_cloudiness (const Time& from, const Time&
     }
 
   // Add end interval.
-  const double hours = Time::hours_between (time, to);
+  const double hours = Time::fraction_hours_between (time, to);
   const double value = (i < data_size 
                         ? find_cloudiness (when[i], values[i])
                         : find_cloudiness (when.back (), values.back ()));
@@ -1097,6 +1099,8 @@ WSourceWeather::Implementation::initialize_two (const Time& time, Treelog& msg)
 
   // Initialize previous, next
   next = Time (time.year (), time.month (), time.mday (), 0);
+  if (time == next)
+    next.tick_day (-1);
   previous = next;
   previous.tick_hour (-1);
   if (initialized_ok)
@@ -1346,7 +1350,7 @@ WSourceWeather::has_diffuse_radiation () const
 
 double
 WSourceWeather::timestep () const
-{ return Time::hours_between (impl->previous, impl->next); }
+{ return Time::fraction_hours_between (impl->previous, impl->next); }
 
 double
 WSourceWeather::day_length () const

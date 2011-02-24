@@ -71,7 +71,7 @@ struct Daisy::Implementation
   Time previous;
   Time next_large;
   const Time stop;
-  int duration;
+  double duration;
   const boost::scoped_ptr<Action> action;
   const boost::scoped_ptr<WSource> weather;
   bool initialized;
@@ -263,7 +263,7 @@ struct Daisy::Implementation
             ? Time (al.submodel ("stop")) 
             : Time (9999, 1, 1, 1)),
       duration (al.check ("stop")
-                ? Time::hours_between (stop, time)
+                ? Time::fraction_hours_between (stop, time)
                 :-1),
       action (Librarian::build_item<Action> (al, "manager")),
       weather (al.check ("weather") 
@@ -403,12 +403,12 @@ Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
   else if (duration > 0)
     {
       const double total_hours = duration; // int -> double
-      const double hours_left = Time::hours_between (time, stop);
+      const double hours_left = Time::fraction_hours_between (time, stop);
       daisy.ui_set_progress ((total_hours - hours_left) / total_hours);
     }
-  else if (duration != -42)
+  else if (std::isfinite (duration))
     {
-      duration = -42;           // Magic to call this only once
+      duration = NAN;           // Magic to call this only once
       daisy.ui_set_progress (-1.0);
     }
 }

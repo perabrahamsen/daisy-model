@@ -86,6 +86,7 @@ struct WSourceStandard : public WSourceTable
   bool top_level;
   void weather_initialize (const Time& simulation_time, Treelog& msg)
   {
+    TREELOG_MODEL (msg);
     top_level = true;
     initialize_one (msg);
     Time mapped_time;

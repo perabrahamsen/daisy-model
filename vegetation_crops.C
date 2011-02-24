@@ -667,7 +667,6 @@ VegetationCrops::emerge (const symbol crop_name, Treelog&)
 {
   const bool all = (crop_name == Vegetation::all_crops ());
 
-  // Harvest all crops of this type.
   for (CropList::iterator crop = crops.begin();
        crop != crops.end();
        crop++)
