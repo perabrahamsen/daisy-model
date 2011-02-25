@@ -1,8 +1,26 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Next
+* Kina rødder
 
-** Kina rødder
+Program der læser roddatafil og beregner parametre samt ME for hvert sæt.
+
+General optimizer
+
+Nelder-Mead simplex.  Kode i dropbox.   Kan måske initialiseres fra et punkt (*1.01)
+
+** Implementer Nelder-Mead
+
+** Nyt program_rootmatch
+
+*** læs data
+
+*** Kald Nelder-Mead
+
+*** Udskriv resultat
+
+*** Udregn ME
+
+*** Udskriv resultat
 
 * Hent gammel PC.
 
