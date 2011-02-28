@@ -25,6 +25,8 @@
 #include "treelog.h"
 #include <sstream>
 
+// The 'Fixpoint' class.
+
 double 
 Fixpoint::find_epsilon () const
 { return max_distance ().size (); }
@@ -148,5 +150,9 @@ Fixpoint::Fixpoint (const int max_iter)
  
 Fixpoint::~Fixpoint ()
 { }
+
+// The 'NelderMead' class.
+
+
 
 // iterative.C ends here.
