@@ -126,6 +126,11 @@ Time::microsecond () const
 std::string
 Time::print () const
 {
+  if (*this == null ())
+    {
+      static const std::string null_name = "Time::null";
+      return null_name;
+    }
   std::ostringstream tmp;
   tmp << std::setfill ('0') << std:: setw (4) << year () << "-"
       << std::setw (2) << month () << "-" 
@@ -721,10 +726,9 @@ Time::operator>  (const Time& other) const
 bool 
 Time::between (const Time& from, const Time& to) const
 { 
-  daisy_assert (from <= to);
-  if (*this  < from)
+  if (from != null () && *this < from)
     return false;
-  if (to < *this)
+  if (to != null () && to < *this)
     return false;
   return true;
 }

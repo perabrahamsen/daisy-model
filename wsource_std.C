@@ -89,10 +89,16 @@ struct WSourceStandard : public WSourceTable
     TREELOG_MODEL (msg);
     top_level = true;
     initialize_one (msg);
-    Time mapped_time;
-    safe_end = data_end () - Timestep (2, 0, 0, 0);
-    map_time (simulation_time, mapped_time, msg);
-    initialize_two (mapped_time, msg);
+    if (initialized_ok ())
+      {
+        Time mapped_time;
+        if (data_end () == Time::null ())
+          safe_end = Time::null ();
+        else
+          safe_end = data_end () - Timestep (2, 0, 0, 0);
+        map_time (simulation_time, mapped_time, msg);
+        initialize_two (mapped_time, msg);
+      }
     top_level = false;
   }
   bool source_check (Treelog& msg) const
@@ -113,6 +119,9 @@ The '" + objid + "' model cannot be used here.  Try 'table' instead");
   {
     TREELOG_MODEL (msg);
 
+    if (!initialized_ok ())
+      return false;
+
     if (safe_end <= data_begin ())
       {
         msg.error ("Need more weather data at end of file");
@@ -121,7 +130,10 @@ The '" + objid + "' model cannot be used here.  Try 'table' instead");
     Time mapped_from;
     map_time_only (simulation_from, mapped_from, msg);
     Time mapped_to;
-    map_time_only (simulation_to, mapped_to, msg);
+    if (simulation_to == Time::null ())
+      mapped_to = Time::null ();
+    else
+      map_time_only (simulation_to, mapped_to, msg);
     return WSourceTable::weather_check (mapped_from, mapped_to, msg);
   }
 
@@ -336,7 +348,7 @@ WSourceStandard::map_time_only (const Time& simulation_time, Time& mapped_time,
     }
   if (!mapped_time.between (data_begin (), safe_end))
     {
-      msg.error ("No weather data for " + simulation_time.print ());
+      msg.error ("No weather for " + simulation_time.print ());
     }
 }
 

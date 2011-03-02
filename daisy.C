@@ -261,7 +261,7 @@ struct Daisy::Implementation
                   : time + timestep),
       stop (al.check ("stop")
             ? Time (al.submodel ("stop")) 
-            : Time (9999, 1, 1, 1)),
+            : Time::null ()),
       duration (al.check ("stop")
                 ? Time::fraction_hours_between (stop, time)
                 :-1),
@@ -383,7 +383,7 @@ Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
   // Update time.
   previous = time;
   time = next_time;
-  if (time >= stop)
+  if (stop != Time::null () && time >= stop)
     running = false;
 
   // Log values.

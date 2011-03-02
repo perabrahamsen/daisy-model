@@ -310,6 +310,7 @@ WSourceTable::source_initialize (Treelog& msg)
   ok = true;
   if (!lex.read_header_with_keywords (keywords, msg))
     {
+      msg.error ("Can't read weather file");
       ok = false;
       return;
     }

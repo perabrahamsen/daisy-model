@@ -1410,6 +1410,10 @@ void
 WSourceWeather::rewind (const Time& time, Treelog& msg)
 { impl->rewind (time, msg); }
 
+bool
+WSourceWeather::initialized_ok () const
+{ return impl->initialized_ok; }
+
 void
 WSourceWeather::initialize_one (Treelog& msg)
 {

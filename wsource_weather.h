@@ -103,6 +103,7 @@ protected:
   // Create and Destroy.
 protected:
   void rewind (const Time& time, Treelog& msg);
+  bool initialized_ok () const;
   void initialize_one (Treelog& msg);
   void initialize_two (const Time& time, Treelog& msg);
 public:
