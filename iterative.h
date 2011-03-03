@@ -145,4 +145,36 @@ struct Fixpoint : boost::noncopyable
   virtual ~Fixpoint ();
 };
 
+// The 'NelderMead namespace.
+//
+// Finds the minimum of a multivariable function.
+
+namespace NelderMead
+{
+  // Types.
+  typedef std::vector<double> Point;
+  typedef std::vector<Point> Simplex;
+  typedef double function_t (const Point&);
+
+  // Solution.
+  // 
+  // A solution requires at least min_iter iterations, and that the
+  // change in the best point in the simplex is below epsilon.  We
+  // give up after max_iter iterations.  If a solution is found, we
+  // return true, and store the solution in result.  If not, we return
+  // false, and store the last guess in result.  The function we want
+  // to find a minimum for is called fun, and has dim arguments.  Our
+  // starting simplex is simplex.  If we specify a point instead, a
+  // simplex is created from the original point, and additional points
+  // where each argument is multiplies with 1.01.
+  bool solve (const size_t min_iter, const size_t max_iter, 
+              const double epsilon,
+              const size_t dim, function_t fun, const Simplex& simplex,
+              Point& result);
+  bool solve (const size_t min_iter, const size_t max_iter, 
+              const double epsilon,
+              const size_t dim, function_t fun, const Point& start,
+              Point& result);
+}
+
 #endif // ITERATIVE_H

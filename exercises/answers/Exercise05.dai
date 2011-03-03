@@ -2,8 +2,7 @@
 ;;  Daisy writes a Daisy.log-file during execution. 
 ;;  This log-file contains any error messages
 ;;  If the working directory is set correctly the log-file will be found here
-;; (directory "C:/DaisySim/Exercise/05")
-(directory "/tmp")
+(directory "C:/DaisySim/Exercise/05")
 ;;  Setting search path for library-files 
 ;;(path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
 (path &old
@@ -20,62 +19,51 @@
 (weather default "Taastrup6201.dwf")
 
 ;;  Description that will occur in all output files
-(description "Spring Barley; Soil: Fine sandy loam; Weather: Taastrup")
+(description "Spring Barley; Soil: Coarse sand; Weather: Taastrup")
 
 ;;  Defining soil horizons of a fine sandy loam
-(defhorizon "Ap F.S.L." FAO3
-    (dry_bulk_density 1.53 [g/cm^3]) 
-    (clay 0.113 [])
-    (silt 0.277 [])
-    (sand 0.584 [])
-    (humus 0.026 [])
+(defhorizon "Ap C.S." FAO3
+    (dry_bulk_density 1.49 [g/cm^3]) 
+    (clay 0.039 [])
+    (silt 0.072 [])
+    (sand 0.866 [])
+    (humus 0.023 [])
     (C_per_N 11.0 [g C/g N])
-    (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
-                    (Theta_sat 0.403 [cm^3 H2O/cm^3])
-                    (alpha 0.0385 [cm^-1])
-                    (n 1.211 [])
-                    (K_sat 7.52 [cm/h]))
+    (hydraulic M_vG (Theta_res 0.070 [cm^3 H2O/cm^3])
+                    (Theta_sat 0.400 [cm^3 H2O/cm^3])
+                    (alpha 0.0308 [cm^-1])
+                    (n 2.02 [])
+                    (K_sat 21.65 [cm/h]))
     (description "Data from O.H. Jacobsen (1989)")
 )
-(defhorizon "B F.S.L." FAO3
-    (dry_bulk_density 1.51 [g/cm^3]) 
-    (clay 0.235 [])
-    (silt 0.253 [])
-    (sand 0.507 [])
-    (humus 0.005 [])
+(defhorizon "C C.S." FAO3
+    (dry_bulk_density 1.49 [g/cm^3]) 
+    (clay 0.029 [])
+    (silt 0.023 [])
+    (sand 0.944 [])
+    (humus 0.004 [])
     (C_per_N 11.0 [g C/g N])
-    (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
-                    (Theta_sat 0.421 [cm^3 H2O/cm^3])
-                    (alpha 0.2605 [cm^-1])
-                    (n 1.135 [])
-                    (K_sat 14.5 [cm/h]))
+    (hydraulic M_vG (Theta_res 0.018 [cm^3 H2O/cm^3])
+                    (Theta_sat 0.453 [cm^3 H2O/cm^3])
+                    (alpha 0.0723 [cm^-1])
+                    (n 1.99 [])
+                    (K_sat 39.4 [cm/h]))
     (description "Data from O.H. Jacobsen (1989)")
 )
-(defhorizon "C F.S.L." FAO3
-    (dry_bulk_density 1.57 [g/cm^3]) 
-    (clay 0.244 [])
-    (silt 0.283 [])
-    (sand 0.471 [])
-    (humus 0.002 [])
-    (C_per_N  11.0)    ; note that the dimention is omittet
-    (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
-                    (Theta_sat 0.401 [cm^3 H2O/cm^3])
-                    (alpha 0.0570 [cm^-1])
-                    (n 1.131 [])
-                    (K_sat 1.65 [cm/h]))
-    (description "Data from O.H. Jacobsen (1989)")
-)
-
-;;  Parameterisation of column (Fine sandy loam)
-(defcolumn "Fine sandy loam" default
+;;  Parameterisation of column (Coarse Sand)
+(defcolumn "Coarse sand" default
      (Soil
-          (MaxRootingDepth 100 [cm])
-          (horizons (  -30 [cm] "Ap F.S.L.")
-                    (  -80 [cm] "B F.S.L.")
-                    ( -220 [cm] "C F.S.L.")))
-     (OrganicMatter original (init (input 3000 [kg C/ha/y])))
-     (Groundwater pipe (pipe_position -1.1 [m])(L 18 [m])(h_aquifer 2.00 [m])
-          (Z_aquitard 2.00 [m])(K_aquitard 0.0015 [cm/h]))
+          (MaxRootingDepth 50 [cm])
+          (horizons (  -30 [cm] "Ap C.S.")
+                    ( -270 [cm] "C C.S.")))
+     (Movement vertical 
+          (Geometry
+              (zplus -2 -4 -7 -10 -13 -19 -22 -25 -27 -30 -35 -40 -45 -50
+                     -55 -60 -65 -70 -75 -80 -85 -90 -95 -100 -110 -120 -130
+                     -140 -150 -160 -170 -180 -190 -200 -210 -220 -230 
+                     -240 -250 -260 -270 [cm])))
+     (OrganicMatter (init (input 3000 [kg C/ha/y])))
+     (Groundwater deep)
 )
 ;; Spring Barley setup.
 (defaction SBarley_management activity
@@ -89,15 +77,33 @@
   (wait (or (crop_ds_after "Spring Barley" 2.0) ;Ripe
             (mm_dd 9 1))) (harvest "Spring Barley"))
 
+;; A tensiometer is placed in 20 cm depth and whenever the soil water potential
+;; gets below -200 cm the crop is irrigated with 30 mm if we are in the period
+;; 15. May to 15. June. We always waits 2 dayes before we can irrigate again
+(defaction irrigate_tensiometer activity
+  (wait (and (after_mm_dd  5 15)
+             (before_mm_dd 7 15)
+             (not (soil_water_pressure_above (height -20 [cm])
+             (potential -200 [cm])))))
+  (irrigate_overhead 30 [mm/h])
+  (wait_days 2))
+
+;; We combine the two strategies
+(defaction SBarley_irrigation activity
+  (while (SBarley_management)
+         (repeat irrigate_tensiometer)
+  )
+)
+
 ;;  Selecting column
-(column "Fine sandy loam")
+(column "Coarse sand")
 
 ;; Start of simulation.
 (time 1993 1 1)
 
 ;; Selecting management
 (manager activity
-  SBarley_management
+  SBarley_irrigation
   (wait_mm_dd 1 1) stop
 )
 ;; Selecting output files
@@ -105,17 +111,13 @@
         "Crop Production"
 ;;      Water balance 0-100 cm  
         ("Soil water" (to -100 [cm])(when daily)
-          (where "Daily_WB.dlf"))
-          
-;; OBS !!!!  the to statement has been removed             
-;;      Monthly water balance down to the top of the aquitard
-        ("Soil water" (when monthly)  
+          (where "Daily_WB.dlf"))  
+        ("Soil water" (to -100 [cm])(when monthly)  
           (where "Monthly_WB.dlf"))  
 ;;      Nitrogen balance 0-100 cm  
         ("Soil nitrogen" (to -100 [cm])(when daily)
           (where "Daily_NB.dlf"))  
- ;;      Monthly nitrigen balance down to the top of the aquitard
-       ("Soil nitrogen" (when monthly)  
+        ("Soil nitrogen" (to -100 [cm])(when monthly)  
           (where "Monthly_NB.dlf"))  
 ;;      Soil profile data
         ("Groundwater" (when daily))       

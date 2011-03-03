@@ -790,7 +790,7 @@ GTESTHOME = ../gtest
 GTESTINC = -isystem $(GTESTHOME)/include
 GTESTLIB = -L$(GTESTHOME)/lib -lgtest -lgtest_main
 
-UTESTSRC = ut_units.C ut_scope_exchange.C
+UTESTSRC = ut_math.C ut_units.C ut_scope_exchange.C
 UTESTOBJ = $(UTESTSRC:.C=${OBJ})
 
 utest${EXE}: $(UTESTOBJ) $(LIBOBJ)
@@ -802,7 +802,7 @@ unittest:
          && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile utest${EXE} \
 	 && ./utest${EXE})
 
-utest: utest.exe
+# utest: utest.exe
 
 xtest:	test/test.dai daisy
 	(cd test \

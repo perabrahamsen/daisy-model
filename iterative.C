@@ -24,6 +24,7 @@
 #include "assertion.h"
 #include "treelog.h"
 #include <sstream>
+#include <algorithm>
 
 // The 'Fixpoint' class.
 
@@ -151,8 +152,204 @@ Fixpoint::Fixpoint (const int max_iter)
 Fixpoint::~Fixpoint ()
 { }
 
-// The 'NelderMead' class.
+// The 'NelderMead' namespace.
+//
+// Finds the minimum of a multivariable function.
 
+namespace NelderMead
+{
+  // Types.
+  struct PointValue
+  {
+    Point point;
+    double value;
+    bool operator< (const PointValue& other) const
+    { return this->value < other.value; }
+  };
+  typedef std::vector<PointValue> SimplexValue;
+  typedef double function_t (const Point&);
+}
 
+bool
+NelderMead::solve (const size_t min_iter, const size_t max_iter, 
+                   const double epsilon, 
+                   const size_t dim, function_t fun, 
+                   const NelderMead::Simplex& simplex,
+                   NelderMead::Point& result)
+{
+  daisy_assert (min_iter > 1);
+  daisy_assert (min_iter < max_iter);
+  daisy_assert (epsilon > 0.0);
+  
+  // From Wikipedia article 'Nelder–Mead method'.
+
+  // Parameters;
+  const double alpha = 1.0; // Reflection.
+  const double gamma = 2.0; // Expansion.
+  const double rho = 0.5;   // Contraction.
+  const double sigma = 0.5; // Reduction.
+
+  // Start value.
+  daisy_assert (simplex.size () == dim + 1);
+  SimplexValue simplex_value (dim + 1);
+  for (size_t i = 0; i < dim + 1; i++)
+    {
+      simplex_value[i].point = simplex[i];
+      simplex_value[i].value = fun (simplex[i]);
+    }
+
+  // Variables.
+  Point x0 (dim, NAN);     // Center of gravity for dim best points.
+  Point xr (dim, NAN);     // Reflection of worst point.
+  Point xe (dim, NAN);     // Expanded point.
+  Point xc (dim, NAN);     // Contracted point.
+  PointValue& best = simplex_value[0];
+  PointValue& worst = simplex_value[dim];
+  PointValue& second_worst = simplex_value[dim-1];
+
+  double old_f_best = best.value;
+  for (size_t iter = 1;; iter++)
+    {
+      
+      // 1. Order according to the values at the vertices:
+      //    f(\textbf{x}_{1}) \leq f(\textbf{x}_{2}) \leq \cdots \leq f(\textbf{x}_{n+1})
+      std::sort (simplex_value.begin (), simplex_value.end ());
+
+      // Stop?
+      const double f_best = best.value;
+      if (iter > min_iter)
+        {
+          if (iter > max_iter)
+            {
+              result = best.point;
+              return false;
+            }
+          const double change = std::fabs (old_f_best - f_best);
+          
+          if (change < epsilon)
+            {
+              result = best.point;
+              return true;
+            }
+        }
+      old_f_best = f_best;
+
+      // 2. Calculate xo, the center of gravity of all points except xn + 1.
+      std::fill (x0.begin (), x0.end (), 0.0);
+      for (size_t i = 0; i < dim; i++)
+        for (size_t j = 0; j < dim; j++)
+          x0[j] += simplex_value[i].point[j];
+
+      const double factor = 1.0 / (dim + 0.0);
+      for (size_t i = 0; i < dim; i++)
+        x0[i] *= factor;
+
+      // 3. Reflection
+      // Compute reflected point
+      // \textbf{x}_r = \textbf{x}_o + \alpha (\textbf{x}_o - \textbf{x}_{n+1})
+      const Point& x_worst = worst.point;
+      for (size_t i = 0; i < dim; i++)
+        xr[i] = x0[i] + alpha * (x0[i] - x_worst[i]);
+      const double f_xr = fun (xr);
+
+      // If the reflected point is the best point so far, 
+      // f(\textbf{x}_{r}) < f(\textbf{x}_{1}), 
+      // then goto step 4 (expansion).
+      if (f_xr < f_best)
+        {
+          // 4. Expansion
+          // Compute the expanded point 
+          // \textbf{x}_{e} = \textbf{x}_o + \gamma (\textbf{x}_o - \textbf{x}_{n+1})
+          for (size_t i = 0; i < dim; i++)
+            xe[i] = x0[i] + gamma * (x0[i] - x_worst[i]);
+          const double f_xe = fun (xe);
+          // If the expanded point is better than the reflected point, 
+          //   f(\textbf{x}_{e}) < f(\textbf{x}_{r})
+          // then obtain a new simplex by replacing the worst point xn + 1 
+          // with the expanded point xe, and go to step 1 (order).
+          // Else obtain a new simplex by replacing the worst point xn + 1 
+          // with the reflected point xr, and go to step 1 (order).
+          if (f_xe < f_xr)
+            {
+              worst.point = xe;
+              worst.value = f_xe;
+            }
+          else
+            {
+              worst.point = xr;
+              worst.value = f_xr;
+            }
+          continue;             // Step 1 (order).
+        }
+
+      // Step 3 continued.
+      const double f_second_worst = second_worst.value; 
+      if (f_xr < f_second_worst)
+        {
+          // If the reflected point is better than the second worst,
+          // but not better than the best, i.e.: 
+          // f(\textbf{x}_{1}) \leq f(\textbf{x}_{r}) < f(\textbf{x}_{n}),
+          // then obtain a new simplex by replacing the worst point xn + 1 
+          // with the reflected point xr, and go to step 1 (order).
+          worst.point = xr;
+          worst.value = f_xr;
+          continue;           // Step 1 (order).
+        }
+
+      // 5. Contraction
+      // Here, it is certain that f(\textbf{x}_{r}) \geq f(\textbf{x}_{n}) 
+      // Compute contracted point 
+      // \textbf{x}_{c} = \textbf{x}_{n+1}+\rho(\textbf{x}_{o}-\textbf{x}_{n+1})
+      for (size_t i = 0; i < dim; i++)
+        xc[i] = x_worst[i] + rho * (x0[i] - x_worst[i]);
+      const double f_xc = fun (xc);
+
+      // If the contracted point is better than the worst point, i.e. 
+      //  f(\textbf{x}_{c}) < f(\textbf{x}_{n+1})
+      // then obtain a new simplex by replacing the worst point xn + 1 with
+      // the contracted point xc, and go to step 1 (order).
+      const double f_x_worst = worst.value;
+      if (f_xc < f_x_worst)
+        {
+          worst.point = xc;
+          worst.value = f_xc;
+          continue;           // Step 1 (order).
+        }
+      // Else go to step 6.
+
+      // 6. Reduction
+      // For all but the best point, replace the point with
+      // x_{i} = x_{1} + \sigma(x_{i} - x_{1}) \text{ for all i } \in\{2,\dots,n+1\}. 
+      const Point& x_best = best.point;
+      for (size_t i = 1; i < dim + 1; i++)
+        {
+          Point& xi = simplex_value[i].point;
+          double& f_xi = simplex_value[i].value;
+
+          for (size_t j = 0; j < dim; j++)
+            xi[j] = x_best[j] + sigma * (xi[j] - x_best[j]);
+          f_xi = fun (xi);
+        }
+      // Goto step 1. (order).
+    }
+}
+
+bool
+NelderMead::solve (const size_t min_iter, const size_t max_iter, 
+                   const double epsilon, 
+                   const size_t dim, function_t fun, 
+                   const NelderMead::Point& start,
+                   NelderMead::Point& result)
+{
+  // Make a simplex by putting a bit of noise on starting point.
+  Simplex simplex (dim + 1, start);
+  for (size_t i = 0; i < dim; i++)
+    if (std::isnormal (simplex[i][i]))
+      simplex[i][i] *= 1.01;
+    else
+      simplex[i][i] = 0.01;
+
+  return solve (min_iter, max_iter, epsilon, dim, fun, simplex, result);
+}
 
 // iterative.C ends here.

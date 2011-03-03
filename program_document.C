@@ -1390,14 +1390,11 @@ ProgramDocmodel::print_document (Treelog& msg)
   const Library& library = metalib.library (current_component);
 
   // For all members...
-  std::vector<symbol> entries = models;
-  ModelCompare model_compare (library);
-  sort (entries.begin (), entries.end (), model_compare);
-  for (size_t i = 0; i < entries.size (); i++)
-    if (library.check (entries[i]))
-      print_model (entries[i], library, msg);
+  for (size_t i = 0; i < models.size (); i++)
+    if (library.check (models[i]))
+      print_model (models[i], library, msg);
     else
-      msg.error ("'" + entries[i] + "': no such model");
+      msg.error ("'" + models[i] + "': no such model");
 }
 
 static struct ProgramDocmodelSyntax : public DeclareModel

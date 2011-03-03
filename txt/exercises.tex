@@ -572,17 +572,6 @@ might as well be omitted as it only specifies the default value.
 
 Does the crop in this example experience water stress?
 
-\section{Irrigation}
-\label{ex:irrigation}
-
-The objective of this exercise is to introduce irrigation in the
-management practice.
-
-Develop an irrigation strategy for the spring barley grown on a coarse
-sandy soil (exercise~\ref{ex:retc}). The \daisytut{}
-section~\ref{tut-sec:irrigation} describes how this can be done, and
-further information can be obtained from the \daisyref{}.
-
 \section{Groundwater}
 \label{ex:groundwater}
 
@@ -607,7 +596,8 @@ In the present case the lowest soil horizon ends at 2.2 m depth (i.e.\
 the top of the aquitard).  The new lower boundary condition is
 introduced by entering 
 \begin{verbatim}
-  (Groundwater pipe (K_aquitard 0.01 [cm/h]))
+  (Drain lateral)
+  (Groundwater aquitard (K_aquitard 0.01 [cm/h]))
 \end{verbatim}
 instead of 
 \begin{verbatim}
@@ -615,6 +605,17 @@ instead of
 \end{verbatim}
 The numerical value assigned to \texttt{K\_aquitard} is the value used
 for the calibration. 
+
+\section{Irrigation}
+\label{ex:irrigation}
+
+The objective of this exercise is to introduce irrigation in the
+management practice.
+
+Develop an irrigation strategy for the spring barley grown on a coarse
+sandy soil (exercise~\ref{ex:retc}). The \daisytut{}
+section~\ref{tut-sec:irrigation} describes how this can be done, and
+further information can be obtained from the \daisyref{}.
 
 \section{Rotations}
 \label{ex:rotation}
@@ -1127,6 +1128,15 @@ looking at the \texttt{Canopy}-parameters and afterwards at the
 
 \nocite{daisy-tut,daisy-def,daisy-fertilizer}
 
+\appendix
+\section{Standard log files}
+\label{app:logs}
+
+The columns for the main log files.
+
+\input{stdlog}
+
+\section{Bibliography}
 \bibliography{daisy}
 
 \end{document}
