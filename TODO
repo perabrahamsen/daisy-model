@@ -4,23 +4,45 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 Program der læser roddatafil og beregner parametre samt ME for hvert sæt.
 
-General optimizer
-
-Nelder-Mead simplex.  Kode i dropbox.   Kan måske initialiseres fra et punkt (*1.01)
-
-** Implementer Nelder-Mead
-
 ** Nyt program_rootmatch
 
-*** læs data
+*** DONE Implementer Nelder-Mead 
 
-*** Kald Nelder-Mead
+*** DONE læs data
 
-*** Udskriv resultat
+*** stand alone GP2D
 
-*** Udregn ME
+**** Identificer input parametre
 
-*** Udskriv resultat
+**** Løs 
+
+**** Funktion af (y, z)
+
+*** General ME function: (function + observations) -> ME
+
+*** N-M (ME (GP2D)
+
+** setup fil
+
+** Hent høst-data
+
+** Lav oversigtstabel
+
+** Snak med Søren
+
+*** Inviter evt Mathias.
+
+Han har været med til at skaffe data, kender kineserne.
+
+** Skriv artikel
+
+*** indledning
+
+*** præsenter sites
+
+*** præsenter resultater
+
+*** præsenter software
 
 * Ny reference manual
 

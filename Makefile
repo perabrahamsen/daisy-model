@@ -399,7 +399,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = program_hmovie.C \
+MODELS = program_rootmatch.C program_hmovie.C \
 	wsource_std.C wsource_time.C wsource_combine.C wsource_indirect.C\
 	wsource_table.C wsource_const.C \
 	groundwater_source.C xysource_xycombine.C xysource_flux.C \
@@ -1278,7 +1278,7 @@ toplevel${OBJ}: toplevel.C toplevel.h metalib.h symbol.h frame.h scope.h \
  treelog.h treelog_store.h librarian.h units.h memutils.h frame_model.h
 timestep${OBJ}: timestep.C timestep.h time.h symbol.h vcheck.h \
  frame_submodel.h frame.h scope.h attribute.h block.h assertion.h \
- mathlib.h treelog.h
+ mathlib.h treelog.h librarian.h model.h
 geometry_rect${OBJ}: geometry_rect.C geometry_rect.h geometry_vert.h \
  geometry.h symbol.h attribute.h volume.h model_derived.h model_logable.h \
  model.h check.h vcheck.h block_model.h block_nested.h block.h scope.h \
@@ -1298,9 +1298,9 @@ horheat${OBJ}: horheat.C horheat.h texture.h plf.h hydraulic.h \
  model_derived.h model_logable.h model.h symbol.h frame_submodel.h \
  frame.h scope.h attribute.h check.h mathlib.h assertion.h librarian.h \
  treelog.h
-time${OBJ}: time.C time.h symbol.h assertion.h log.h border.h model_framed.h \
- model_logable.h model.h frame_submodel.h frame.h scope.h attribute.h \
- vcheck.h librarian.h block.h treelog.h
+time${OBJ}: time.C time.h symbol.h timestep.h vcheck.h assertion.h log.h \
+ border.h model_framed.h model_logable.h model.h frame_submodel.h frame.h \
+ scope.h attribute.h librarian.h block.h treelog.h
 som${OBJ}: som.C som.h om.h model_framed.h model_logable.h model.h symbol.h \
  plf.h librarian.h block_model.h block_nested.h block.h scope.h \
  attribute.h treelog.h frame_model.h frame.h
@@ -1652,6 +1652,9 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+program_rootmatch${OBJ}: program_rootmatch.C program.h model.h symbol.h run.h \
+ lexer_table.h block_model.h block_nested.h block.h scope.h attribute.h \
+ treelog.h frame_model.h frame.h librarian.h units.h memutils.h
 program_hmovie${OBJ}: program_hmovie.C program.h model.h symbol.h run.h \
  gnuplot.h lexer_table.h block_model.h block_nested.h block.h scope.h \
  attribute.h treelog.h frame_model.h frame.h librarian.h submodeler.h \

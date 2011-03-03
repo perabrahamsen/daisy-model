@@ -1,0 +1,17 @@
+(defprogram china rootmatch
+  (dim_line false)
+  (dens_dim "cm/cm^3")
+  (file "china.ddf"))
+
+(defprogram CAAS china
+  (pos_dim "cm"))
+
+(defprogram CAAS-2008-3 CAAS
+  (filter ("XYear" "2008")
+          ("Site" "CAAS")
+          ("Plot number" "3")
+          ("Position X" "0")))
+
+(run CAAS-2008-3)
+
+             

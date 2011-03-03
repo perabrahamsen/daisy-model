@@ -1,5 +1,7 @@
 2011-03-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* program_rootmatch.C: New model.
+
 	* program_document.C (print_document): Don't sort models.
 
 2011-02-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
