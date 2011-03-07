@@ -21,20 +21,20 @@
 #define BUILD_DLL
 
 #include "program.h"
+#include "GP2D.h"
+#include "iterative.h"
 #include "lexer_table.h"
 #include "librarian.h"
+#include "check.h"
 #include "units.h"
+#include "assertion.h"
+#include "mathlib.h"
 
-#define BOOST_UBLAS_NDEBUG
-#define NDEBUG
-#include <boost/numeric/ublas/matrix.hpp>
-namespace ublas = boost::numeric::ublas;
-
-#include <fstream>
-#include <iomanip>
+#include <sstream>
 
 struct ProgramRootmatch : public Program
 {
+  // Read data.
   const Units& units;
   LexerTable lex;
   const symbol pos_dim;
@@ -43,7 +43,29 @@ struct ProgramRootmatch : public Program
   int c_z_min;
   int c_z_max;
   int c_density;
-  
+
+  // GP2D function.
+  struct GP2Dfun : public Iterative::PointFunction
+  {
+    GP2D root;
+
+    double value (const Iterative::Point& p) const
+    {
+      daisy_assert (p.size () == 2);
+      const double x = p[0];
+      const double z = p[1];
+      return root.density (x, z);
+    }
+    
+    GP2Dfun (const double row_position /* [cm] */,
+             const double row_distance /* [cm] */,
+             const double DensRtTip /* [cm/cm^3] */,
+             const double SpRtLength /* [m/g] */)
+      : root (row_position, row_distance, DensRtTip, SpRtLength)
+    { }
+  };
+  GP2Dfun gp2d;
+
   // Utils
   double get_value (const symbol from, const symbol to, std::string& entry)
   { return units.convert (from, to, lex.convert_to_double (entry)); }
@@ -51,10 +73,9 @@ struct ProgramRootmatch : public Program
   // Use.
   bool run (Treelog& msg)
   {
+    std::vector<Iterative::PointValue> obs;    
+
     static const symbol dens_dim_to ("cm/cm^3");
-    std::ostringstream out;
-    out << "Y\tZ\trho"
-        << "\n" << Units::cm () << "\t" << Units::cm () << "\t" << dens_dim_to;
     while (lex.good ())
       {
         // Read entries.
@@ -74,7 +95,126 @@ struct ProgramRootmatch : public Program
         const double z_pos = -0.5 * (z_min + z_max);
         const double density = get_value (dens_dim, dens_dim_to, 
                                           entries[c_density]);
-        out << "\n" << y_pos << "\t" << z_pos << "\t" << density;
+        Iterative::Point p;
+        p.push_back (y_pos);
+        p.push_back (-z_pos);
+        Iterative::PointValue pv;
+        pv.point = p;
+        pv.value = density;
+        obs.push_back (pv);
+      }
+
+    // Find best fit.
+    struct ToMinimize : Iterative::PointFunction
+    {
+      const std::vector<Iterative::PointValue>& obs;
+      GP2Dfun& fun;
+      const int debug;
+      Treelog& msg;
+
+      double value (const Iterative::Point& p) const
+      {
+        Treelog::Open nest (msg, "minimize");
+        
+        daisy_assert (p.size () == 4);
+        const double SoilDepth = p[0];
+        const double CropDepth = p[1];
+        const double CropWidth = p[2];
+        const double WRoot = p[3];
+
+        if (debug > 0)
+          {
+            std::ostringstream tmp;
+            tmp << "SoilDepth = " << SoilDepth << " cm\n"
+                << "CropDepth = " << CropDepth << " cm\n"
+                << "CropWidth = " << CropWidth << " cm\n"
+                << "WRoot = " << (0.01 * WRoot)  << " Mg DM/ha";
+            msg.message (tmp.str ());
+          }
+       
+        // Restrictions.
+        const double LARGE_NUMBER = 42.42e42;
+        if (SoilDepth <= 0)
+          return LARGE_NUMBER;
+        if (CropDepth <= 0)
+          return LARGE_NUMBER;
+        if (CropWidth <= 0)
+          return LARGE_NUMBER;
+        if (WRoot <= 0)
+          return LARGE_NUMBER;
+
+        bool ok = fun.root.set_dynamic (SoilDepth, CropDepth, CropWidth, WRoot,
+                                        debug, msg);
+        if (!ok)
+          return LARGE_NUMBER;
+
+        const double Rsqr = Iterative::RSquared (obs, fun);
+        if (debug > 0)
+          {
+            std::ostringstream tmp;
+            tmp << "R^2 = " << Rsqr;
+            msg.message (tmp.str ());
+          }
+
+        return -Rsqr;
+      }
+
+      ToMinimize (const std::vector<Iterative::PointValue>& o, GP2Dfun& f,
+                  const int d, 
+                  Treelog& m)
+        : obs (o),
+          fun (f),
+          debug (d),
+          msg (m)
+      { }
+    };
+    ToMinimize to_minimize (obs, gp2d, 0, msg);
+
+    // Initialial guess.
+    const double SoilDepth = 150; // [cm]
+    const double CropDepth = 70; // [cm]
+    const double CropWidth = 100; // [cm]
+    const double WRoot = 50;     // 150 [g DM/m^2] = 1.5 [Mg DM/ha]
+    Iterative::Point start;
+    start.push_back (SoilDepth);
+    start.push_back (CropDepth);
+    start.push_back (CropWidth);
+    start.push_back (WRoot);
+    daisy_assert (start.size () == 4);
+    const double epsilon = 0.01;
+    const size_t min_iter = 10000;
+    const size_t max_iter = 300000;
+    Iterative::Point result;
+    const bool solved = Iterative::NelderMead (min_iter, max_iter, epsilon,
+                                               to_minimize, start, result);
+    const double Rsqr = -to_minimize.value (result);
+    std::ostringstream out;
+    
+    out << "R^2 = " << Rsqr << " ";
+    if (solved)
+      out << " (solved)\n";
+    else
+      out << " (no solution)\n";
+    out << "SoilDepth = " << result[0] << " cm\n"
+        << "CropDepth = " << result[1] << " cm\n"
+        << "CropWidth = " << result[2] << " cm\n"
+        << "WRoot = " << (0.01 * result[3])  << " Mg DM/ha\n";
+
+    out << "L00 = " << gp2d.root.L00 << " cm/cm^3\n"
+        << "a_x = " << gp2d.root.a_x << " cm^-1\n"
+        << "a_z = " << gp2d.root.a_z << " cm^-1\n"
+        << "d_a = " << gp2d.root.d_a << " cm\n"
+        << "k* = " << gp2d.root.kstar << "\n";
+
+    out << "Y\tZ\tobs\tsim\n"
+        << Units::cm () << "\t" << Units::cm () << "\t" 
+        << dens_dim_to << "\t" << dens_dim_to;
+    for (size_t i = 0; i < obs.size (); i++)
+      {
+        const double x = obs[i].point[0];
+        const double z = obs[i].point[1];
+        out << "\n" << x << "\t" << z 
+            << "\t" << obs[i].value << "\t" << gp2d.root.density (x, z);
       }
     msg.message (out.str ());
     return true;
@@ -131,7 +271,11 @@ struct ProgramRootmatch : public Program
       c_y_pos (-1),
       c_z_min (-1),
       c_z_max (-1),
-      c_density (-1)
+      c_density (-1),
+      gp2d (al.number ("row_position"),
+            al.number ("row_distance"),
+            al.number ("DensRtTip"),
+            al.number ("SpRtLength"))
   { }
   ~ProgramRootmatch ()
   { }
@@ -158,6 +302,18 @@ Match root data with GP2D model.")
 Position dimension");
     frame.declare_string ("dens_dim", Attribute::Const, "\
 Root density dimension.");
+
+    frame.declare ("row_position", "cm", Attribute::State, "\
+Horizontal position of row crops.");
+    frame.set ("row_position", 0.0);
+    frame.declare ("row_distance", "cm", Attribute::State, 
+                "Distance between rows of crops.");
+    frame.declare ("DensRtTip", "cm/cm^3", Check::positive (), Attribute::Const,
+                "Root density at (potential) penetration depth.");
+    frame.set ("DensRtTip", 0.1);
+    frame.declare ("SpRtLength", "m/g", Check::positive (), Attribute::Const,
+                   "Specific root length");
+    frame.set ("SpRtLength", 100.0);
   }
 } ProgramRootmatch_syntax;
 

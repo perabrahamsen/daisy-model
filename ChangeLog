@@ -1,3 +1,8 @@
+2011-03-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* GP2D.C: New utility.
+	* Makefile (OTHER): Add it.
+
 2011-03-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* program_rootmatch.C: New model.

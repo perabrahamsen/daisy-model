@@ -23,66 +23,23 @@
 
 #define BUILD_DLL
 
+#include "GP2D.h"
 #include "treelog.h"
 #include "iterative.h"
 #include "mathlib.h"
 #include "assertion.h"
 #include <sstream>
 
-class GP2D
+// LogSquare
+struct InvQ
 {
-  // Static parameters.
-  const double row_position;   // Horizontal position of row crops. [cm]
-  const double row_distance;   // Distance betweeen rows. [cm]
-  const double DensRtTip;      // Root density at (pot) pen. depth. [cm/cm^3]
-  const double DensIgnore;     // Ignore cells below this density. [cm/cm^3]
-
-  // Calculated parameters.
-  double a_z;                  // Form parameter. [cm^-1]
-  double a_x;                  // Form parameter. [cm^-1]
-  double L00;		       // Root density at row at soil surface. [cm/cm^3]
-  double k;		       // Scale factor due to soil limit. []
-
-  // LogSquare
-  struct InvQ
-  {
-    static double derived (const double Q)
-    { return 2.0 * Q * std::exp (Q) + sqr (Q) * std::exp (Q); }
-    const double k;
-    double operator()(const double Q) const
-    { return sqr (Q) * std::exp (Q) - k; }
-    InvQ (const double k_)
-      : k (k_)
-    { }
-  };
-
-  // Use.
-public:
-  bool set_dynamic (double SoilDepth /* [cm] */, 
-                    double CropDepth /* [cm] */,
-                    double CropWidth /* [cm] */,
-                    double WRoot /* [g DM/m^2] */, 
-                    int debug /* Debug level. */,
-                    Treelog&);
-private:
-  void limit_depth (double l_r /* [cm/cm^2] */,
-		    double d_s /* [cm] */, 
-		    double d_a /* [cm] */, 
-		    Treelog&);
-public:
-  double density (double x /* [cm] */, double z /* [cm] */) const;
-  
-  // Create.
-public:
-  GP2D (const double rp, const double rd, const double drt, const double di)
-    : row_position (rp),
-      row_distance (rd),
-      DensRtTip (drt),
-      DensIgnore (di),
-      a_z (NAN),
-      a_x (NAN),
-      L00 (NAN),
-      k (NAN)
+  static double derived (const double Q)
+  { return 2.0 * Q * std::exp (Q) + sqr (Q) * std::exp (Q); }
+  const double k;
+  double operator()(const double Q) const
+  { return sqr (Q) * std::exp (Q) - k; }
+  InvQ (const double k_)
+    : k (k_)
   { }
 };
 
@@ -122,7 +79,7 @@ GP2D::set_dynamic (const double SoilDepth, const double CropDepth,
   const double d_s = SoilDepth;	// [cm]
 
   // Actual depth.
-  const double d_a = std::min (d_c, d_s); // [cm]
+  d_a = std::min (d_c, d_s); // [cm]
 
   // Minimum density.
   const double L_m = DensRtTip;	// [cm/cm^3]
@@ -148,10 +105,13 @@ GP2D::set_dynamic (const double SoilDepth, const double CropDepth,
   // Too little root mass to fill the root zone.
   if (D > D_max)
     {
-      std::ostringstream tmp;
-      tmp << "Min ratio is " << D << ", max is " << D_max << ".\n"
-          << "Not enough root mass to fill root zone.";
-      msg.warning (tmp.str ());
+      if (debug > 0)
+        {
+          std::ostringstream tmp;
+          tmp << "Min ratio is " << D << ", max is " << D_max << ".\n"
+              << "Not enough root mass to fill root zone.";
+          msg.warning (tmp.str ());
+        }
       return false;
     }
 
@@ -163,11 +123,15 @@ GP2D::set_dynamic (const double SoilDepth, const double CropDepth,
   const double g_Q = g (Q);
   if (!approximate (D, D - g_Q))
     {
-      std::ostringstream tmp;
-      tmp << "Newton's methods did not converge.\n";
-      tmp << "Q = " << Q << ", g (Q) = " << g_Q << ", D = " << D << "\n";
-      (void) Newton (-3.0, g, g.derived, &tmp);
-      msg.error (tmp.str ());
+      if (debug > 0)
+        {
+          std::ostringstream tmp;
+          tmp << "Newton's methods did not converge.\n";
+          tmp << "Q = " << Q << ", g (Q) = " << g_Q << ", D = " << D << "\n";
+          if (debug > 1)
+            (void) Newton (-3.0, g, g.derived, &tmp);
+          msg.error (tmp.str ());
+        }
       return false;
     }
 
@@ -181,9 +145,19 @@ GP2D::set_dynamic (const double SoilDepth, const double CropDepth,
   L00 = l_R  * a_z * a_x;	// [cm/cm^3]
 
   // Redistribute roots from outside root zone.
-  limit_depth (l_r, d_s, d_a, msg);
 
-  if (debug > 0)
+  // We first convert to 1D.
+
+  // \ref{eq:azisa} Eq. 30
+  const double a = a_z;
+  // \ref{eq:L0L00} Eq. 32
+  const double L0 = (2.0 * L00) / (a_x * R);
+  
+  // Then solve \ref{eq:scale-factor} Eq. 13.  With WolframAlpha we get:
+  const double int_0_da_Lz = L0 * (1.0 - std::exp (-a * d_a)) / a;
+  kstar = l_r / int_0_da_Lz;
+  
+  if (debug > 2)
     {
       std::ostringstream tmp;
       tmp << "R =\t" << R << "\tcm\tRow distance\n"
@@ -208,67 +182,20 @@ There is no solution when D is above the value at Q_max\n"
           << "a_z =\t" << a_z << "\tcm^-1\tVertical decrease\n"
           << "a_x =\t" << a_x << "\tcm^-1\tHorisontal decrease\n"
           << "L00 =\t" << L00 << "\tcm/cm^3\tDensity at (0, 0)\t\n"
-          << "k =\t" << k << "\t\tScale factor";
+          << "kstar =\t" << kstar << "\t\tScale factor";
       msg.message (tmp.str ());
     }
   return true;
 }
 
-void
-Rootdens_GP2D::limit_depth (const Geometry& geo, 
-			    const double l_r /* [cm/cm^2] */,
-			    const double d_s /* [cm] */, 
-			    const double d_a /* [cm] */, 
-			    std::vector<double>& Density  /* [cm/cm^3] */,
-			    Treelog& msg)
-{
-  const size_t cell_size = geo.cell_size ();
-			    
-  // Lowest density worth calculating on.
-  const double L_epsilon = DensIgnore; // [cm/cm^3]
-
-  // We find the total root length from cells above minimum.
-  double l_i = 0;		// Integrated root length [cm]
-  for (size_t cell = 0; cell < cell_size; cell++)
-    {
-      // Density in cell.
-      double L_c = Density[cell];
-
-      // Eliminate low density cells.
-      if (L_c < L_epsilon)
-	L_c = 0.0;
-
-      // Eliminate roots below actual root depth.
-      // TODO:  We really would like the soil maximum instead
-      L_c *= geo.fraction_in_z_interval (cell, 0, -d_s);
-
-      // Add and update.
-      l_i += L_c * geo.cell_volume (cell);
-      Density[cell] = L_c;
-    }
-  l_i /= geo.surface_area ();	// Per area [cm/cm^2]
-
-  // No roots, nothing to do.
-  if (iszero (l_i))
-    {
-      if (l_r > 0)
-	{
-	  msg.error ("We lost all roots.  Using uniform distribution");
-	  uniform (geo, l_r, d_a, Density);
-	}
-      k = -1.0;
-      return;
-    }
-  
-  // Scale factor.
-  k = l_r / l_i;		// \ref{eq:scale-factor} Eq. 13
-  for (size_t cell = 0; cell < cell_size; cell++)
-    Density[cell] *= k; 
-}
-
 double 
 GP2D::density (double x /* [cm] */, const double z /* [cm] */) const
 {
+  daisy_assert (z >= 0.0);      // Positive depth.
+
+  if (z > d_a)
+    return 0.0;
+
   // x should be relative to row position.
   x -= row_position;      
 
@@ -296,95 +223,19 @@ GP2D::density (double x /* [cm] */, const double z /* [cm] */) const
     / (1.0 - std::pow (1.0/std::exp (1.0), a_x * row_distance));
 
   // \ref{eq:limited-depth} Eq. 12
-  return k * Lzxstar;
+  return kstar * Lzxstar;
 }
 
-void 
-Rootdens_GP2D::output (Log& log) const
-{
-  output_variable (row_position, log);
-  output_variable (row_distance, log);
-  output_variable (a_z, log); 
-  output_variable (a_x, log); 
-  output_variable (L00, log); 
-  output_variable (k, log); 
-}
-
-Rootdens_GP2D::Rootdens_GP2D (const BlockModel& al)
-  : Rootdens (al),
-    debug (al.integer ("debug")),
-    row_position (al.number ("row_position")),
-    row_distance (al.number ("row_distance")),
-    DensRtTip (al.number ("DensRtTip")),
-    DensIgnore (al.number ("DensIgnore", DensRtTip)),
-    a_z (-42.42e42),
-    a_x (-42.42e42),
-    L00 (-42.42e42),
-    k (-42.42e42)
+GP2D::GP2D (const double rp, const double rd, 
+            const double drt, const double srl)
+  : row_position (rp),
+    row_distance (rd),
+    DensRtTip (drt),
+    SpRtLength (srl),
+    a_z (NAN),
+    a_x (NAN),
+    L00 (NAN),
+    kstar (NAN)
 { }
-
-std::auto_ptr<Rootdens> 
-Rootdens::create_row (const Metalib& metalib, Treelog& msg,
-                      const double row_width, const double row_position,
-                      const bool debug)
-{
-  const Library& library = metalib.library (Rootdens::component);
-  const FrameModel& parent = library.model ("GP2D");
-  FrameModel frame (parent, FrameModel::parent_link);
-  frame.set ("row_position", row_position);
-  frame.set ("row_distance", row_width);
-  frame.set ("debug", debug ? 1 : 0);
-  return std::auto_ptr<Rootdens> (Librarian::build_frame<Rootdens> (metalib, msg, frame, "row")); 
-}
-
-static struct Rootdens_GP2DSyntax : public DeclareModel
-{
-  Model* make (const BlockModel& al) const
-  { return new Rootdens_GP2D (al); }
-  Rootdens_GP2DSyntax ()
-    : DeclareModel (Rootdens::component, "GP2D", 
-	       "Use exponential function for root density in row crops.\n\
-\n\
-This is a two dimension model (z, x), where the z-axis is vertical,\n\
-and the x-axis is horizontal and ortogonal to the row.  The row is\n\
-assumed to be uniform (dense), allowing us to ignore that dimension.\n\
-\n\
-We assume the root density decrease with horizontal distance to row,\n\
-as well as depth below row.")
-  { }
-  void load_frame (Frame& frame) const
-  {
-    frame.set_strings ("cite", "gp74");
-    frame.declare_integer ("debug", Attribute::Const, "\
-Add debug messages if larger than 0.");
-    frame.set ("debug", 0);
-    frame.declare ("row_position", "cm", Attribute::State, "\
-Horizontal position of row crops.");
-    frame.set ("row_position", 0.0);
-    frame.declare ("row_distance", "cm", Attribute::State, 
-                "Distance between rows of crops.");
-    frame.declare ("DensRtTip", "cm/cm^3", Check::positive (), Attribute::Const,
-                "Root density at (potential) penetration depth.");
-    frame.set ("DensRtTip", 0.1);
-    frame.declare ("DensIgnore", "cm/cm^3", Check::positive (),
-                Attribute::OptionalConst,
-                "Ignore cells with less than this root density.\n\
-By default, this is the same as DensRtTip.");
-    frame.declare ("a_z", "cm^-1", Attribute::LogOnly, "Form parameter.\n\
-Calculated from 'DensRtTip'.");
-    frame.declare ("a_x", "cm^-1", Attribute::LogOnly, "Form parameter.\n\
-Calculated from 'DensRtTip'.");
-    frame.declare ("L00", "cm/cm^3", Attribute::LogOnly,
-                "Root density at row crop at soil surface.");
-    frame.declare ("k", Attribute::None (), Attribute::LogOnly,
-                "Scale factor due to soil limit.\n\
-\n\
-Some roots might be below the soil imposed maximum root depth, or in areas\n\
-with a density lower than the limit specified by 'DensIgnore'.\n\
-These roots will be re distributed within the root zone by multiplying the\n\
-density with this scale factor.");
-
-    }
-} Rootdens_GP2D_syntax;
 
 // rootdens_GP2D.C ends here.

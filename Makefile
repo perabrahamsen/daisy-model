@@ -524,7 +524,7 @@ SPECIALS = wsource_weather.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = weather.C astronomy.C weatherdata.C \
+OTHER = GP2D.C weather.C astronomy.C weatherdata.C \
 	scope_xysources.C lexer_flux.C lexer_soil.C iterative.C \
 	water.C block_nested.C block_submodel.C block_top.C block_model.C \
 	value.C type.C model_derived.C model_logable.C model_framed.C \
@@ -790,7 +790,7 @@ GTESTHOME = ../gtest
 GTESTINC = -isystem $(GTESTHOME)/include
 GTESTLIB = -L$(GTESTHOME)/lib -lgtest -lgtest_main
 
-UTESTSRC = ut_math.C ut_units.C ut_scope_exchange.C
+UTESTSRC = ut_iterative.C ut_units.C ut_scope_exchange.C
 UTESTOBJ = $(UTESTSRC:.C=${OBJ})
 
 utest${EXE}: $(UTESTOBJ) $(LIBOBJ)

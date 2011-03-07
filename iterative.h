@@ -145,36 +145,61 @@ struct Fixpoint : boost::noncopyable
   virtual ~Fixpoint ();
 };
 
-// The 'NelderMead namespace.
-//
-// Finds the minimum of a multivariable function.
+// The 'Iterative' namespace.
+// 
+// Function and data types usedful for the iterative methods.
 
-namespace NelderMead
+namespace Iterative
 {
-  // Types.
+  // A point in n-dimensional space.
   typedef std::vector<double> Point;
-  typedef std::vector<Point> Simplex;
-  typedef double function_t (const Point&);
 
-  // Solution.
+  // A point in n-dimensional space, and a value for that point.
+  struct PointValue
+  {
+    Point point;
+    double value;
+    bool operator< (const PointValue& other) const
+    { return this->value < other.value; }
+  };
+  
+  // A double valued function of a Point.
+  struct PointFunction
+  {
+    virtual double value (const Point&) const = 0;
+  };
+
+  // A n-dimensional object defined by n+1 points.
   // 
-  // A solution requires at least min_iter iterations, and that the
-  // change in the best point in the simplex is below epsilon.  We
-  // give up after max_iter iterations.  If a solution is found, we
-  // return true, and store the solution in result.  If not, we return
-  // false, and store the last guess in result.  The function we want
-  // to find a minimum for is called fun, and has dim arguments.  Our
-  // starting simplex is simplex.  If we specify a point instead, a
-  // simplex is created from the original point, and additional points
-  // where each argument is multiplies with 1.01.
-  bool solve (const size_t min_iter, const size_t max_iter, 
-              const double epsilon,
-              const size_t dim, function_t fun, const Simplex& simplex,
-              Point& result);
-  bool solve (const size_t min_iter, const size_t max_iter, 
-              const double epsilon,
-              const size_t dim, function_t fun, const Point& start,
-              Point& result);
+  // Think of it as a genarialized triangle.
+  typedef std::vector<Point> Simplex;
+
+  // Coefficient of determination.
+  // 
+  // Determine how good a fit 'fun' is to 'obs'.
+  // Perfect fit = 1, "Average" fit = 0.
+  double RSquared (const std::vector<PointValue>& obs,
+                   const PointFunction& fun);
+
+  
+  // The NelderMead methods of finding local minimum.
+  // 
+  // Use at least 'min_iter' iterations, never more that 'max_iter'.
+  // Due to the nature of the methods, 'min_iter' should not be too small
+  // if the initial guess is far from a local minimum.  After 'min_iter'
+  // iterations stop of the improvement is less than 'epsilon'.
+  // 
+  // The function to optimize is 'fun' by improving 'simplex'.
+  // If called with a Point (start), a simplex is genarated from that.
+  // If we suceed in finding a local minimum, store the result in 'result,
+  // and return true.  If not, return false.
+  bool NelderMead (const size_t min_iter, const size_t max_iter, 
+                   const double epsilon,
+                   const PointFunction& fun,
+                   const Simplex& simplex, Point& result);
+  bool NelderMead (const size_t min_iter, const size_t max_iter, 
+                   const double epsilon,
+                   const PointFunction& fun, const Point& start, Point& result);
 }
 
 #endif // ITERATIVE_H

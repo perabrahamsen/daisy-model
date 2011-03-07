@@ -3,15 +3,53 @@
   (dens_dim "cm/cm^3")
   (file "china.ddf"))
 
+(defprogram CAU china
+  (row_distance 80 [cm]))
+
 (defprogram CAAS china
+  (row_distance 75 [cm])
   (pos_dim "cm"))
 
-(defprogram CAAS-2008-3 CAAS
+(defprogram CAAS-2008 CAAS
   (filter ("XYear" "2008")
           ("Site" "CAAS")
-          ("Plot number" "3")
-          ("Position X" "0")))
+          ;; ("Position X" "0")
+          ))
 
-(run CAAS-2008-3)
+(defprogram CAAS-2008-3 CAAS-2008
+  (filter &old ("Plot number" "3")))
+
+(defprogram CAAS-2008-6 CAAS-2008
+  (filter &old ("Plot number" "6")))
+
+(defprogram CAAS-2008-9 CAAS-2008
+  (filter &old ("Plot number" "9")))
+
+(defprogram CAAS-2008-12 CAAS-2008
+  (filter &old ("Plot number" "12")))
+
+(defprogram CAAS-2008-15 CAAS-2008
+  (filter &old ("Plot number" "15")))
+
+(defprogram CAAS-2008-18 CAAS-2008
+  (filter &old ("Plot number" "18")))
+
+(defprogram CAAS-2008-21 CAAS-2008
+  (filter &old ("Plot number" "21")))
+
+(defprogram CAAS-2008-24 CAAS-2008
+  (filter &old ("Plot number" "24")))
+
+(run batch 
+     (run CAAS-2008-3
+          CAAS-2008-6
+          CAAS-2008-9
+          CAAS-2008-12
+          CAAS-2008-15
+          CAAS-2008-18
+          CAAS-2008-21
+          CAAS-2008-24
+          ))
+
 
              

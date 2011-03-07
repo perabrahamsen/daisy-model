@@ -23,6 +23,7 @@
 #include "iterative.h"
 #include "assertion.h"
 #include "treelog.h"
+#include "mathlib.h"
 #include <sstream>
 #include <algorithm>
 
@@ -152,35 +153,46 @@ Fixpoint::Fixpoint (const int max_iter)
 Fixpoint::~Fixpoint ()
 { }
 
-// The 'NelderMead' namespace.
-//
-// Finds the minimum of a multivariable function.
+// The 'RSquared' function.
 
-namespace NelderMead
+double 
+Iterative::RSquared (const std::vector<Iterative::PointValue>& obs,
+                     const Iterative::PointFunction& fun)
 {
-  // Types.
-  struct PointValue
-  {
-    Point point;
-    double value;
-    bool operator< (const PointValue& other) const
-    { return this->value < other.value; }
-  };
-  typedef std::vector<PointValue> SimplexValue;
-  typedef double function_t (const Point&);
+  const size_t n = obs.size ();
+  daisy_assert (n > 0);
+  std::vector<double> sim (n, NAN);
+  double obs_sum = 0.0;
+  for (size_t i = 0; i < n; i++)
+    {
+      sim[i] = fun.value (obs[i].point);
+      obs_sum += obs[i].value;
+    }
+  const double obs_avg = obs_sum / (n + 0.0);
+  double SS_tot = 0.0;
+  double SS_err = 0.0;
+  for (size_t i = 0; i < n; i++)
+    {
+      SS_tot += sqr (obs[i].value - obs_avg);
+      SS_err += sqr (obs[i].value - sim[i]);
+    }
+  daisy_assert (SS_tot > 0);
+  return 1.0 - (SS_err / SS_tot);
 }
 
 bool
-NelderMead::solve (const size_t min_iter, const size_t max_iter, 
-                   const double epsilon, 
-                   const size_t dim, function_t fun, 
-                   const NelderMead::Simplex& simplex,
-                   NelderMead::Point& result)
+Iterative::NelderMead (const size_t min_iter, const size_t max_iter, 
+                       const double epsilon, 
+                       const Iterative::PointFunction& fun, 
+                       const Iterative::Simplex& simplex,
+                       Iterative::Point& result)
 {
   daisy_assert (min_iter > 1);
   daisy_assert (min_iter < max_iter);
   daisy_assert (epsilon > 0.0);
   
+  typedef std::vector<PointValue> SimplexValue;
+
   // From Wikipedia article 'Nelder–Mead method'.
 
   // Parameters;
@@ -190,12 +202,13 @@ NelderMead::solve (const size_t min_iter, const size_t max_iter,
   const double sigma = 0.5; // Reduction.
 
   // Start value.
-  daisy_assert (simplex.size () == dim + 1);
+  daisy_assert (simplex.size () > 0);
+  const size_t dim = simplex.size () - 1u;
   SimplexValue simplex_value (dim + 1);
   for (size_t i = 0; i < dim + 1; i++)
     {
       simplex_value[i].point = simplex[i];
-      simplex_value[i].value = fun (simplex[i]);
+      simplex_value[i].value = fun.value (simplex[i]);
     }
 
   // Variables.
@@ -250,7 +263,7 @@ NelderMead::solve (const size_t min_iter, const size_t max_iter,
       const Point& x_worst = worst.point;
       for (size_t i = 0; i < dim; i++)
         xr[i] = x0[i] + alpha * (x0[i] - x_worst[i]);
-      const double f_xr = fun (xr);
+      const double f_xr = fun.value (xr);
 
       // If the reflected point is the best point so far, 
       // f(\textbf{x}_{r}) < f(\textbf{x}_{1}), 
@@ -262,7 +275,7 @@ NelderMead::solve (const size_t min_iter, const size_t max_iter,
           // \textbf{x}_{e} = \textbf{x}_o + \gamma (\textbf{x}_o - \textbf{x}_{n+1})
           for (size_t i = 0; i < dim; i++)
             xe[i] = x0[i] + gamma * (x0[i] - x_worst[i]);
-          const double f_xe = fun (xe);
+          const double f_xe = fun.value (xe);
           // If the expanded point is better than the reflected point, 
           //   f(\textbf{x}_{e}) < f(\textbf{x}_{r})
           // then obtain a new simplex by replacing the worst point xn + 1 
@@ -302,7 +315,7 @@ NelderMead::solve (const size_t min_iter, const size_t max_iter,
       // \textbf{x}_{c} = \textbf{x}_{n+1}+\rho(\textbf{x}_{o}-\textbf{x}_{n+1})
       for (size_t i = 0; i < dim; i++)
         xc[i] = x_worst[i] + rho * (x0[i] - x_worst[i]);
-      const double f_xc = fun (xc);
+      const double f_xc = fun.value (xc);
 
       // If the contracted point is better than the worst point, i.e. 
       //  f(\textbf{x}_{c}) < f(\textbf{x}_{n+1})
@@ -328,20 +341,21 @@ NelderMead::solve (const size_t min_iter, const size_t max_iter,
 
           for (size_t j = 0; j < dim; j++)
             xi[j] = x_best[j] + sigma * (xi[j] - x_best[j]);
-          f_xi = fun (xi);
+          f_xi = fun.value (xi);
         }
       // Goto step 1. (order).
     }
 }
 
 bool
-NelderMead::solve (const size_t min_iter, const size_t max_iter, 
-                   const double epsilon, 
-                   const size_t dim, function_t fun, 
-                   const NelderMead::Point& start,
-                   NelderMead::Point& result)
+Iterative::NelderMead (const size_t min_iter, const size_t max_iter, 
+                       const double epsilon, 
+                       const Iterative::PointFunction& fun, 
+                       const Iterative::Point& start,
+                       Iterative::Point& result)
 {
   // Make a simplex by putting a bit of noise on starting point.
+  const size_t dim = start.size ();
   Simplex simplex (dim + 1, start);
   for (size_t i = 0; i < dim; i++)
     if (std::isnormal (simplex[i][i]))
@@ -349,7 +363,7 @@ NelderMead::solve (const size_t min_iter, const size_t max_iter,
     else
       simplex[i][i] = 0.01;
 
-  return solve (min_iter, max_iter, epsilon, dim, fun, simplex, result);
+  return NelderMead (min_iter, max_iter, epsilon, fun, simplex, result);
 }
 
 // iterative.C ends here.

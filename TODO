@@ -10,23 +10,36 @@ Program der læser roddatafil og beregner parametre samt ME for hvert sæt.
 
 *** DONE læs data
 
-*** stand alone GP2D
+*** DONE stand alone GP2D
 
-**** Identificer input parametre
+*** DONE General ME function: (function + observations) -> ME
 
-**** Løs 
+*** DONE N-M (ME (GP2D)
 
-**** Funktion af (y, z)
+** Sammenlign 2D snit eller 3D data?
 
-*** General ME function: (function + observations) -> ME
+** slå soil depth fra?  k* = 1.0; d_a = Inf?
 
-*** N-M (ME (GP2D)
+** GP1D
+
+** F-test
 
 ** setup fil
 
 ** Hent høst-data
 
 ** Lav oversigtstabel
+
+Site, Date, Treatment,
+Obs yield
+Est. root zone depth
+Est. root zone width
+Est. root mass
+R^2 2D 
+R^2 1D
+F-test (2D vs. 1D)
+
+L00, a_x, a_z?
 
 ** Snak med Søren
 
