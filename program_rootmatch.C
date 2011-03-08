@@ -43,6 +43,8 @@ struct ProgramRootmatch : public Program
   int c_z_min;
   int c_z_max;
   int c_density;
+  const int debug;
+  static const symbol dens_dim_to;
 
   // GP2D function.
   struct GP2Dfun : public Iterative::PointFunction
@@ -66,6 +68,27 @@ struct ProgramRootmatch : public Program
   };
   GP2Dfun gp2d;
 
+  // GP1D function.
+  struct GP1Dfun : public Iterative::PointFunction
+  {
+    GP1D root;
+
+    double value (const Iterative::Point& p) const
+    {
+      daisy_assert (p.size () == 1);
+      const double z = p[0];
+      return root.density (z);
+    }
+    
+    GP1Dfun (const double DensRtTip /* [cm/cm^3] */,
+             const double SpRtLength /* [m/g] */)
+      : root (DensRtTip, SpRtLength)
+    { }
+  };
+  GP1Dfun gp1d;
+
+  const double SoilDepth;
+
   // Utils
   double get_value (const symbol from, const symbol to, std::string& entry)
   { return units.convert (from, to, lex.convert_to_double (entry)); }
@@ -73,9 +96,9 @@ struct ProgramRootmatch : public Program
   // Use.
   bool run (Treelog& msg)
   {
-    std::vector<Iterative::PointValue> obs;    
+    std::vector<Iterative::PointValue> obs2d;
+    std::vector<Iterative::PointValue> obs1d;
 
-    static const symbol dens_dim_to ("cm/cm^3");
     while (lex.good ())
       {
         // Read entries.
@@ -95,52 +118,83 @@ struct ProgramRootmatch : public Program
         const double z_pos = -0.5 * (z_min + z_max);
         const double density = get_value (dens_dim, dens_dim_to, 
                                           entries[c_density]);
-        Iterative::Point p;
-        p.push_back (y_pos);
-        p.push_back (-z_pos);
-        Iterative::PointValue pv;
-        pv.point = p;
-        pv.value = density;
-        obs.push_back (pv);
+        Iterative::Point p2d;
+        p2d.push_back (y_pos);
+        p2d.push_back (-z_pos);
+        Iterative::PointValue pv2d;
+        pv2d.point = p2d;
+        pv2d.value = density;
+        obs2d.push_back (pv2d);
+
+        Iterative::Point p1d;
+        p1d.push_back (-z_pos);
+        Iterative::PointValue pv1d;
+        pv1d.point = p1d;
+        pv1d.value = density;
+        obs1d.push_back (pv1d);
       }
 
+    const bool find_SoilDepth = !std::isfinite (SoilDepth);
+    const double RSS2 = solve_2D (obs2d, msg);
+    const double RSS1 = solve_1D (obs1d, msg);
+    const double p2 = find_SoilDepth ? 4 : 3;
+    const double p1 = find_SoilDepth ? 3 : 2;
+    const double n = obs1d.size ();
+    daisy_assert (obs1d.size () == obs2d.size ());
+    daisy_assert (RSS2 > 0.0);
+    const double F = ((RSS1 - RSS2)/(p2-p1))/(RSS2/(n-p2));
+    std::ostringstream tmp;
+    tmp << "\nF-test = " << F;
+    msg.message (tmp.str ());
+    return true;
+  }
+
+  double solve_2D (std::vector<Iterative::PointValue>& obs,
+                 Treelog& msg)
+  {
     // Find best fit.
     struct ToMinimize : Iterative::PointFunction
     {
       const std::vector<Iterative::PointValue>& obs;
       GP2Dfun& fun;
+      const double fixed_SoilDepth; // [cm]
+      const bool find_SoilDepth;
       const int debug;
       Treelog& msg;
 
       double value (const Iterative::Point& p) const
       {
         Treelog::Open nest (msg, "minimize");
-        
-        daisy_assert (p.size () == 4);
-        const double SoilDepth = p[0];
-        const double CropDepth = p[1];
-        const double CropWidth = p[2];
-        const double WRoot = p[3];
+
+        if (find_SoilDepth)
+          daisy_assert (p.size () == 4);
+        else
+          daisy_assert (p.size () == 3);
+        const double CropDepth = p[0];
+        const double CropWidth = p[1];
+        const double WRoot = p[2];
+        const double SoilDepth = find_SoilDepth ? p[3] : fixed_SoilDepth;
 
         if (debug > 0)
           {
             std::ostringstream tmp;
-            tmp << "SoilDepth = " << SoilDepth << " cm\n"
-                << "CropDepth = " << CropDepth << " cm\n"
+            tmp << "CropDepth = " << CropDepth << " cm\n"
                 << "CropWidth = " << CropWidth << " cm\n"
-                << "WRoot = " << (0.01 * WRoot)  << " Mg DM/ha";
+                << "WRoot = " << (0.01 * WRoot)  << " Mg DM/ha\n";
+            if (find_SoilDepth)
+              tmp << "SoilDepth = " << SoilDepth << " cm";
             msg.message (tmp.str ());
           }
        
         // Restrictions.
         const double LARGE_NUMBER = 42.42e42;
-        if (SoilDepth <= 0)
-          return LARGE_NUMBER;
         if (CropDepth <= 0)
           return LARGE_NUMBER;
         if (CropWidth <= 0)
           return LARGE_NUMBER;
         if (WRoot <= 0)
+          return LARGE_NUMBER;
+        if (find_SoilDepth && SoilDepth <= 0)
           return LARGE_NUMBER;
 
         bool ok = fun.root.set_dynamic (SoilDepth, CropDepth, CropWidth, WRoot,
@@ -160,27 +214,31 @@ struct ProgramRootmatch : public Program
       }
 
       ToMinimize (const std::vector<Iterative::PointValue>& o, GP2Dfun& f,
+                  const double sd,
                   const int d, 
                   Treelog& m)
         : obs (o),
           fun (f),
+          fixed_SoilDepth (sd),
+          find_SoilDepth (!std::isfinite (fixed_SoilDepth)),
           debug (d),
           msg (m)
       { }
     };
-    ToMinimize to_minimize (obs, gp2d, 0, msg);
+    ToMinimize to_minimize (obs, gp2d, SoilDepth, debug, msg);
 
     // Initialial guess.
-    const double SoilDepth = 150; // [cm]
-    const double CropDepth = 70; // [cm]
-    const double CropWidth = 100; // [cm]
-    const double WRoot = 50;     // 150 [g DM/m^2] = 1.5 [Mg DM/ha]
+    const double default_CropDepth = 70;  // [cm]
+    const double default_CropWidth = 100; // [cm]
+    const double default_WRoot = 50; // 150 [g DM/m^2] = 1.5 [Mg DM/ha]
+    const double default_SoilDepth = 150; // [cm]
     Iterative::Point start;
-    start.push_back (SoilDepth);
-    start.push_back (CropDepth);
-    start.push_back (CropWidth);
-    start.push_back (WRoot);
-    daisy_assert (start.size () == 4);
+    start.push_back (default_CropDepth);
+    start.push_back (default_CropWidth);
+    start.push_back (default_WRoot);
+    if (!std::isfinite (SoilDepth))
+      start.push_back (default_SoilDepth);  // [cm]
+    daisy_assert (start.size () == 4 || start.size () == 3);
     const double epsilon = 0.01;
     const size_t min_iter = 10000;
     const size_t max_iter = 300000;
@@ -195,29 +253,160 @@ struct ProgramRootmatch : public Program
       out << " (solved)\n";
     else
       out << " (no solution)\n";
-    out << "SoilDepth = " << result[0] << " cm\n"
-        << "CropDepth = " << result[1] << " cm\n"
-        << "CropWidth = " << result[2] << " cm\n"
-        << "WRoot = " << (0.01 * result[3])  << " Mg DM/ha\n";
-
-    out << "L00 = " << gp2d.root.L00 << " cm/cm^3\n"
-        << "a_x = " << gp2d.root.a_x << " cm^-1\n"
-        << "a_z = " << gp2d.root.a_z << " cm^-1\n"
-        << "d_a = " << gp2d.root.d_a << " cm\n"
-        << "k* = " << gp2d.root.kstar << "\n";
+    out << "2D CropDepth = " << result[0] << " cm\n"
+        << "2D CropWidth = " << result[1] << " cm\n"
+        << "2D WRoot = " << (0.01 * result[2])  << " Mg DM/ha\n";
+    if (result.size () == 4)
+      out << "2D SoilDepth = " << result[3] << " cm\n";
+        
+    out << "2D L00 = " << gp2d.root.L00 << " cm/cm^3\n"
+        << "2D a_x = " << gp2d.root.a_x << " cm^-1\n"
+        << "2D a_z = " << gp2d.root.a_z << " cm^-1\n";
+    if (gp2d.root.d_a > 0.0)
+      out << "2D d_a = " << gp2d.root.d_a << " cm\n"
+          << "2D k* = " << gp2d.root.kstar << "\n";
 
     out << "Y\tZ\tobs\tsim\n"
         << Units::cm () << "\t" << Units::cm () << "\t" 
         << dens_dim_to << "\t" << dens_dim_to;
+    double RSS = 0.0;
     for (size_t i = 0; i < obs.size (); i++)
       {
         const double x = obs[i].point[0];
         const double z = obs[i].point[1];
-        out << "\n" << x << "\t" << z 
-            << "\t" << obs[i].value << "\t" << gp2d.root.density (x, z);
+        const double o = obs[i].value;
+        const double f = gp2d.root.density (x, z);
+        RSS += sqr (o - f);
+        out << "\n" << x << "\t" << z << "\t" << o << "\t" << f;
       }
     msg.message (out.str ());
-    return true;
+    return RSS;
+  }
+
+  double solve_1D (std::vector<Iterative::PointValue>& obs,
+                   Treelog& msg)
+  {
+    // Find best fit.
+    struct ToMinimize : Iterative::PointFunction
+    {
+      const std::vector<Iterative::PointValue>& obs;
+      GP1Dfun& fun;
+      const double fixed_SoilDepth; // [cm]
+      const bool find_SoilDepth;
+      const int debug;
+      Treelog& msg;
+
+      double value (const Iterative::Point& p) const
+      {
+        Treelog::Open nest (msg, "minimize");
+
+        if (find_SoilDepth)
+          daisy_assert (p.size () == 3);
+        else
+          daisy_assert (p.size () == 2);
+        const double CropDepth = p[0];
+        const double WRoot = p[1];
+        const double SoilDepth = find_SoilDepth ? p[2] : fixed_SoilDepth;
+
+        if (debug > 0)
+          {
+            std::ostringstream tmp;
+            tmp << "CropDepth = " << CropDepth << " cm\n"
+                << "WRoot = " << (0.01 * WRoot)  << " Mg DM/ha\n";
+            if (find_SoilDepth)
+              tmp << "SoilDepth = " << SoilDepth << " cm";
+            msg.message (tmp.str ());
+          }
+       
+        // Restrictions.
+        const double LARGE_NUMBER = 42.42e42;
+        if (CropDepth <= 0)
+          return LARGE_NUMBER;
+        if (WRoot <= 0)
+          return LARGE_NUMBER;
+        if (find_SoilDepth && SoilDepth <= 0)
+          return LARGE_NUMBER;
+
+        bool ok = fun.root.set_dynamic (SoilDepth, CropDepth, WRoot,
+                                        debug, msg);
+        if (!ok)
+          return LARGE_NUMBER;
+
+        const double Rsqr = Iterative::RSquared (obs, fun);
+        if (debug > 0)
+          {
+            std::ostringstream tmp;
+            tmp << "R^2 = " << Rsqr;
+            msg.message (tmp.str ());
+          }
+
+        return -Rsqr;
+      }
+
+      ToMinimize (const std::vector<Iterative::PointValue>& o, GP1Dfun& f,
+                  const double sd,
+                  const int d, 
+                  Treelog& m)
+        : obs (o),
+          fun (f),
+          fixed_SoilDepth (sd),
+          find_SoilDepth (!std::isfinite (fixed_SoilDepth)),
+          debug (d),
+          msg (m)
+      { }
+    };
+    ToMinimize to_minimize (obs, gp1d, SoilDepth, debug, msg);
+
+    // Initialial guess.
+    const double default_CropDepth = 70;  // [cm]
+    const double default_WRoot = 50; // 150 [g DM/m^2] = 1.5 [Mg DM/ha]
+    const double default_SoilDepth = 150; // [cm]
+    Iterative::Point start;
+    start.push_back (default_CropDepth);
+    start.push_back (default_WRoot);
+    if (!std::isfinite (SoilDepth))
+      start.push_back (default_SoilDepth);  // [cm]
+    daisy_assert (start.size () == 3 || start.size () == 2);
+    const double epsilon = 0.01;
+    const size_t min_iter = 10000;
+    const size_t max_iter = 300000;
+    Iterative::Point result;
+    const bool solved = Iterative::NelderMead (min_iter, max_iter, epsilon,
+                                               to_minimize, start, result);
+    const double Rsqr = -to_minimize.value (result);
+    std::ostringstream out;
+    
+    out << "1D R^2 = " << Rsqr << " ";
+    if (solved)
+      out << " (solved)\n";
+    else
+      out << " (no solution)\n";
+    out << "1D CropDepth = " << result[0] << " cm\n"
+        << "1D WRoot = " << (0.01 * result[1])  << " Mg DM/ha\n";
+    if (result.size () == 3)
+      out << "1D SoilDepth = " << result[2] << " cm\n";
+        
+    out << "1D L0 = " << gp1d.root.L0 << " cm/cm^3\n"
+        << "1D a = " << gp1d.root.a << " cm^-1\n";
+    if (gp1d.root.d_a > 0.0)
+      out << "1D d_a = " << gp1d.root.d_a << " cm\n"
+          << "1D k* = " << gp1d.root.kstar << "\n";
+
+    out << "Z\tobs\tsim\n"
+        << Units::cm () << "\t" << Units::cm () << "\t" 
+        << dens_dim_to << "\t" << dens_dim_to;
+    double RSS = 0.0;
+    for (size_t i = 0; i < obs.size (); i++)
+      {
+        const double z = obs[i].point[0];
+        const double o = obs[i].value;
+        const double f = gp1d.root.density (z);
+        RSS += sqr (o - f);
+        out << "\n" << z << "\t" << o << "\t" << f;
+        
+      }
+    msg.message (out.str ());
+    return RSS;
   }
 
   // Create and Destroy.
@@ -272,14 +461,21 @@ struct ProgramRootmatch : public Program
       c_z_min (-1),
       c_z_max (-1),
       c_density (-1),
+      debug (al.integer ("debug")),
       gp2d (al.number ("row_position"),
             al.number ("row_distance"),
             al.number ("DensRtTip"),
-            al.number ("SpRtLength"))
+            al.number ("SpRtLength")),
+      gp1d (al.number ("DensRtTip"),
+            al.number ("SpRtLength")),
+      SoilDepth (al.number ("SoilDepth", NAN))
   { }
   ~ProgramRootmatch ()
   { }
 };
+
+const symbol 
+ProgramRootmatch::dens_dim_to ("cm/cm^3");
 
 static struct ProgramRootmatchSyntax : public DeclareModel
 {
@@ -302,7 +498,9 @@ Match root data with GP2D model.")
 Position dimension");
     frame.declare_string ("dens_dim", Attribute::Const, "\
 Root density dimension.");
-
+    frame.declare_integer ("debug", Attribute::Const, "\
+Show debug messages if larger than zero.");
+    frame.set ("debug", 0);
     frame.declare ("row_position", "cm", Attribute::State, "\
 Horizontal position of row crops.");
     frame.set ("row_position", 0.0);
@@ -314,6 +512,15 @@ Horizontal position of row crops.");
     frame.declare ("SpRtLength", "m/g", Check::positive (), Attribute::Const,
                    "Specific root length");
     frame.set ("SpRtLength", 100.0);
+    frame.declare ("SoilDepth", "cm", Check::none (), Attribute::OptionalConst,
+                   "Specifies how to handle soil imposed maximum root depth.\
+If positive, always use this depth.\n\
+If negative, disable maximum root depth (making the root zone infinite).\n\
+If not specified, use the value that gives the best fit.\n\
+\n\
+Note that unless you specify a negative value, the root zone will be\n\
+limited by DensRtTip, that is, depth where the corresponding 1D GP would\n\
+give densities less than DensRtTip, will instead have a zero density.");
   }
 } ProgramRootmatch_syntax;
 

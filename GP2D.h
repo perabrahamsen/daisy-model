@@ -26,6 +26,38 @@
 
 class Treelog;
 
+class GP1D
+{
+  // Static parameters.
+  const double DensRtTip;      // Root density at (pot) pen. depth. [cm/cm^3]
+  const double SpRtLength;     // Specific root length [m/g]
+
+  // Helper class.
+  class InvW;
+
+  // Calculated parameters.
+public:
+  double a;                    // Form parameter. [cm^-1]
+  double L0;		       // Root density at row at soil surface. [cm/cm^3]
+  double d_a;                  // Actual root depth. [cm]
+  double kstar;		       // Scale factor due to soil limit. []
+
+  // Use.
+public:
+  bool set_dynamic (double SoilDepth /* [cm] */, 
+                    double CropDepth /* [cm] */,
+                    double WRoot /* [g DM/m^2] */, 
+                    int debug /* Debug level. */,
+                    Treelog&);
+public:
+  double density (double z /* [cm] */) const;
+  
+  // Create.
+public:
+  GP1D (const double DensRtTip /* [cm/cm^3] */,
+        const double SpRtLength /* [m/g] */);
+};
+
 class GP2D
 {
   // Static parameters.
@@ -33,6 +65,9 @@ class GP2D
   const double row_distance;   // Distance betweeen rows. [cm]
   const double DensRtTip;      // Root density at (pot) pen. depth. [cm/cm^3]
   const double SpRtLength;     // Specific root length [m/g]
+
+  // Helper class.
+  class InvQ;
 
   // Calculated parameters.
 public:
@@ -50,11 +85,6 @@ public:
                     double WRoot /* [g DM/m^2] */, 
                     int debug /* Debug level. */,
                     Treelog&);
-private:
-  void limit_depth (double l_r /* [cm/cm^2] */,
-		    double d_s /* [cm] */, 
-		    double d_a /* [cm] */, 
-		    Treelog&);
 public:
   double density (double x /* [cm] */, double z /* [cm] */) const;
   

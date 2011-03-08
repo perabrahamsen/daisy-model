@@ -7,14 +7,16 @@
   (row_distance 80 [cm]))
 
 (defprogram CAAS china
+  (filter ("Site" "CAAS"))
+  (SoilDepth -1 [cm])                  ;Infinite.
   (row_distance 75 [cm])
   (pos_dim "cm"))
 
 (defprogram CAAS-2008 CAAS
-  (filter ("XYear" "2008")
-          ("Site" "CAAS")
-          ;; ("Position X" "0")
-          ))
+  (filter &old ("XYear" "2008"))
+          ;;("Position X" "0")
+          ;; ("Position Y" "0")
+          )
 
 (defprogram CAAS-2008-3 CAAS-2008
   (filter &old ("Plot number" "3")))
@@ -40,16 +42,52 @@
 (defprogram CAAS-2008-24 CAAS-2008
   (filter &old ("Plot number" "24")))
 
-(run batch 
-     (run CAAS-2008-3
-          CAAS-2008-6
-          CAAS-2008-9
-          CAAS-2008-12
-          CAAS-2008-15
-          CAAS-2008-18
-          CAAS-2008-21
-          CAAS-2008-24
-          ))
+(defprogram CAAS-2008-all batch 
+  (run CAAS-2008
+       CAAS-2008-3
+       CAAS-2008-6
+       CAAS-2008-9
+       CAAS-2008-12
+       CAAS-2008-15
+       CAAS-2008-18
+       CAAS-2008-21
+       CAAS-2008-24
+       ))
 
 
-             
+(defprogram CAAS-2006 CAAS
+  (filter &old ("XYear" "2006"))
+          ;;("Position X" "0")
+          ;; ("Position Y" "0")
+          )
+
+(defprogram CAAS-2006-7 CAAS-2006
+  (filter &old ("Plot number" "7")))
+
+(defprogram CAAS-2006-8 CAAS-2006
+  (filter &old ("Plot number" "8")))
+
+(defprogram CAAS-2006-9 CAAS-2006
+  (filter &old ("Plot number" "9")))
+
+(defprogram CAAS-2006-10 CAAS-2006
+  (filter &old ("Plot number" "10")))
+
+(defprogram CAAS-2006-11 CAAS-2006
+  (filter &old ("Plot number" "11")))
+
+(defprogram CAAS-2006-12 CAAS-2006
+  (filter &old ("Plot number" "12")))
+
+(defprogram CAAS-2006-all batch 
+  (run CAAS-2006
+       CAAS-2006-7
+       CAAS-2006-8
+       CAAS-2006-9
+       CAAS-2006-10
+       CAAS-2006-11
+       CAAS-2006-12
+       ))
+
+(run CAAS-2006-all)
+

@@ -30,8 +30,151 @@
 #include "assertion.h"
 #include <sstream>
 
-// LogSquare
-struct InvQ
+// GP1D
+
+struct GP1D::InvW  // LogProduct
+{
+  static double derived (const double W)
+  { return std::exp (W) + W * std::exp (W); }
+  const double k;
+  double operator()(const double W) const
+  { return W * std::exp (W) - k; }
+  InvW (const double k_)
+    : k (k_)
+  { }
+};
+
+bool
+GP1D::set_dynamic (const double SoilDepth, const double CropDepth, 
+                   const double WRoot, const int debug, Treelog& msg)
+{
+  // Check input.
+  daisy_assert (CropDepth > 0);
+  daisy_assert (WRoot > 0);
+
+  static const double m_per_cm = 0.01;
+
+  // Root dry matter.
+  const double M_r = WRoot /* [g/m^2] */ * m_per_cm * m_per_cm; // [g/cm^2]
+
+  // Specific root length.
+  const double S_r = SpRtLength /* [m/g] */ / m_per_cm; // [cm/g]
+
+  // Root length (\ref{eq:root_length} Eq 3).
+  const double l_r = S_r * M_r;	// [cm/cm^2]
+  
+  // Potential depth.
+  const double d_c = CropDepth;	// [cm]
+
+  // Soil depth.
+  const double d_s = SoilDepth;	// [cm]
+
+  // Actual depth.
+  d_a = std::min (d_c, d_s); // [cm]
+
+  // Minimum density.
+  const double L_m = DensRtTip;	// [cm/cm^3]
+
+  // Minimum root length in root zone.
+  const double l_m = L_m * d_c;	// [cm/cm^2]
+
+  // Minimum root length as fraction of total root length.
+  const double D = l_m / l_r;	// []
+
+  // Identity: W = - a d_c
+  // Solve: W * exp (W) = -D (\ref{eq:Lambert} Eq 6):
+  // IW (W) = W * exp (W) - D
+  // Since we know D, we can construct the function f.
+  const InvW f (-D);		// [] -> []
+
+  // ... And the derived df/dW
+
+  // The function f has a local minimum at -1.
+  const double W_min = -1;	   // []
+
+  // There is no solution when -D is below the value at W_min.
+  const double D_max = -W_min * std::exp (W_min); // []
+
+  // Too little root mass to fill the root zone.
+  if (D > D_max)
+    {
+      // We warn once.
+      if (debug > 0)
+	{
+	  // warn_about_to_little_root = false;
+	  std::ostringstream tmp;
+	  tmp << "Min ratio is " << D << ", max is " << D_max << ".\n"
+	      << "Not enough root mass to fill root zone.\n"
+	      << "Using uniform distribution.";
+	  msg.warning (tmp.str ());
+	}
+      return false;
+    }
+
+  // There are two solutions to f (W) = 0, we are interested in the
+  // one for W < W_min.  We start with a guess of -2.
+  const double W = Newton (-2.0, f, f.derived);
+  
+  // Check the solution.
+  const double f_W = f (W);
+  if (!approximate (D, D + f_W))
+    {
+      if (debug > 0)
+        {
+          std::ostringstream tmp;
+          tmp << "Newton's methods did not converge.\n";
+          tmp << "W = " << W << ", f (W) = " << f_W << ", D = " << D << "\n";
+          (void) Newton (-2.0, f, f.derived, &tmp);
+          tmp << "Using uniform distribution.";
+          msg.error (tmp.str ());
+        }
+      return false;
+    }
+
+  // Find a from W (\ref{eq:a-solved} Eq 7):
+  a = -W / d_c;			// [cm^-1]
+  // and L0 from a (\ref{eq:L0-found} Eq 8):
+  L0 = L_m  * std::exp (a * d_c); // [cm/cm^3]
+
+  // Then solve \ref{eq:scale-factor} Eq. 13.  With WolframAlpha we get:
+  if (d_a > 0.0)
+    {
+      const double int_0_da_Lz = L0 * (1.0 - std::exp (-a * d_a)) / a;
+      kstar = l_r / int_0_da_Lz;
+    }
+  else
+    kstar = 1.0;
+
+  return true;
+}
+
+double 
+GP1D::density (const double z /* [cm] */) const
+{
+  daisy_assert (z >= 0.0);      // Positive depth.
+
+  if (d_a > 0.0 && z > d_a)
+    return 0.0;
+
+  // \ref{eq:g+p} Eq 1.
+  const double Lz = L0 * std::exp (-a * z);
+
+  // \ref{eq:limited-depth} Eq. 12
+  return kstar * Lz;
+}
+
+GP1D::GP1D (const double drt, const double srl)
+  : DensRtTip (drt),
+    SpRtLength (srl),
+    a (NAN),
+    L0 (NAN),
+    d_a (NAN),
+    kstar (NAN)
+{ }
+
+// GP2D
+
+struct GP2D::InvQ // LogSquare
 {
   static double derived (const double Q)
   { return 2.0 * Q * std::exp (Q) + sqr (Q) * std::exp (Q); }
@@ -154,8 +297,13 @@ GP2D::set_dynamic (const double SoilDepth, const double CropDepth,
   const double L0 = (2.0 * L00) / (a_x * R);
   
   // Then solve \ref{eq:scale-factor} Eq. 13.  With WolframAlpha we get:
-  const double int_0_da_Lz = L0 * (1.0 - std::exp (-a * d_a)) / a;
-  kstar = l_r / int_0_da_Lz;
+  if (d_a > 0.0)
+    {
+      const double int_0_da_Lz = L0 * (1.0 - std::exp (-a * d_a)) / a;
+      kstar = l_r / int_0_da_Lz;
+    }
+  else
+    kstar = 1.0;
   
   if (debug > 2)
     {
@@ -193,7 +341,7 @@ GP2D::density (double x /* [cm] */, const double z /* [cm] */) const
 {
   daisy_assert (z >= 0.0);      // Positive depth.
 
-  if (z > d_a)
+  if (d_a > 0.0 && z > d_a)
     return 0.0;
 
   // x should be relative to row position.
@@ -235,6 +383,7 @@ GP2D::GP2D (const double rp, const double rd,
     a_z (NAN),
     a_x (NAN),
     L00 (NAN),
+    d_a (NAN),
     kstar (NAN)
 { }
 

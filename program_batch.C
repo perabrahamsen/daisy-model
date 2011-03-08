@@ -56,7 +56,7 @@ struct ProgramBatch : public Program
         if (!ui_running ())
           return false;
 
-        Treelog::Open nest (msg, name.name (), i, program[i]->name);
+        Treelog::Open nest (msg, name.name (), i, program[0]->name);
         msg.touch ();
         {
           BlockTop block (*metalib, msg, *metalib);

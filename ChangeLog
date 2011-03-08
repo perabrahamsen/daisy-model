@@ -1,3 +1,7 @@
+2011-03-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* program_batch.C (run): Wrong name used.
+
 2011-03-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* GP2D.C: New utility.
