@@ -68,7 +68,7 @@ GnuplotXY::initialize (const Units& units, Treelog& msg)
   for (size_t i = 0; i < source.size(); i++)
     {
       std::ostringstream tmp;
-      tmp << name << "[" << i << "]: " << source[i]->name 
+      tmp << objid << "[" << i << "]: " << source[i]->objid 
           << " '" << source[i]->title () << "'";
       Treelog::Open nest (msg, tmp.str ());
       if (!source[i]->load (units, msg))

@@ -39,13 +39,32 @@ struct ProgramRootmatch : public Program
   LexerTable lex;
   const symbol pos_dim;
   const symbol dens_dim;
-  int c_y_pos;
+  const symbol tag_x;
+  const symbol tag_z_min;
+  const symbol tag_z_max;
+  const symbol tag_density;
+  int c_x_pos;
   int c_z_min;
   int c_z_max;
   int c_density;
   const int debug;
+  const bool show_data;
+  const bool tabular;
+  const double row_position;
+  const double min_dist;
   static const symbol dens_dim_to;
-
+  
+  // Result.
+  std::vector<symbol> res_name;
+  std::vector<double> res_value;
+  std::vector<symbol> res_dim;
+  void store (const symbol name, const double value, const symbol dim)
+  {
+    res_name.push_back (name);
+    res_value.push_back (value);
+    res_dim.push_back (dim);
+  }
+                         
   // GP2D function.
   struct GP2Dfun : public Iterative::PointFunction
   {
@@ -109,31 +128,47 @@ struct ProgramRootmatch : public Program
               break;
             continue;
           }
-        const double y_pos = get_value (pos_dim,  Units::cm (), 
-                                        entries[c_y_pos]);
+        const double x_pos = get_value (pos_dim,  Units::cm (), 
+                                        entries[c_x_pos]);
         const double z_min = get_value (pos_dim,  Units::cm (), 
                                         entries[c_z_min]);
         const double z_max = get_value (pos_dim,  Units::cm (), 
                                         entries[c_z_max]);
-        const double z_pos = -0.5 * (z_min + z_max);
+        const double z_pos = 0.5 * (z_min + z_max);
         const double density = get_value (dens_dim, dens_dim_to, 
                                           entries[c_density]);
+        if (z_pos <= 0.0)
+          continue;
+
+        if (z_pos < min_dist && std::fabs (x_pos - row_position) < min_dist)
+          {
+            std::ostringstream tmp;
+            tmp << z_pos << ", " << x_pos << " too close, ignoring";
+            msg.message (tmp.str ());
+            continue;
+          }
+
         Iterative::Point p2d;
-        p2d.push_back (y_pos);
-        p2d.push_back (-z_pos);
+        p2d.push_back (x_pos);
+        p2d.push_back (z_pos);
         Iterative::PointValue pv2d;
         pv2d.point = p2d;
         pv2d.value = density;
         obs2d.push_back (pv2d);
 
         Iterative::Point p1d;
-        p1d.push_back (-z_pos);
+        p1d.push_back (z_pos);
         Iterative::PointValue pv1d;
         pv1d.point = p1d;
         pv1d.value = density;
         obs1d.push_back (pv1d);
       }
 
+    if (obs1d.size () < 1)
+      {
+        msg.error ("No observations found");
+        return true;
+      }
     const bool find_SoilDepth = !std::isfinite (SoilDepth);
     const double RSS2 = solve_2D (obs2d, msg);
     const double RSS1 = solve_1D (obs1d, msg);
@@ -143,12 +178,29 @@ struct ProgramRootmatch : public Program
     daisy_assert (obs1d.size () == obs2d.size ());
     daisy_assert (RSS2 > 0.0);
     const double F = ((RSS1 - RSS2)/(p2-p1))/(RSS2/(n-p2));
+    store ("F-test", F, "");
     std::ostringstream tmp;
-    tmp << "\nF-test = " << F;
+    if (tabular)
+      {
+        tmp << "Sim";
+        for (size_t i = 0; i < res_name.size (); i++)
+          tmp << "\t" << res_name[i];
+        tmp << "\n";
+        for (size_t i = 0; i < res_dim.size (); i++)
+          tmp << "\t" << res_dim[i];
+        tmp << "\n" << objid;
+        for (size_t i = 0; i < res_value.size (); i++)
+          tmp << "\t" << res_value[i];
+      }
+    else
+      for (size_t i = 0; i < res_name.size (); i++)
+        tmp << "\n" << res_name[i] 
+            << " = " << res_value[i] << " " << res_dim[i];
+    
     msg.message (tmp.str ());
     return true;
   }
-
+  
   double solve_2D (std::vector<Iterative::PointValue>& obs,
                  Treelog& msg)
   {
@@ -246,29 +298,27 @@ struct ProgramRootmatch : public Program
     const bool solved = Iterative::NelderMead (min_iter, max_iter, epsilon,
                                                to_minimize, start, result);
     const double Rsqr = -to_minimize.value (result);
-    std::ostringstream out;
     
-    out << "R^2 = " << Rsqr << " ";
-    if (solved)
-      out << " (solved)\n";
-    else
-      out << " (no solution)\n";
-    out << "2D CropDepth = " << result[0] << " cm\n"
-        << "2D CropWidth = " << result[1] << " cm\n"
-        << "2D WRoot = " << (0.01 * result[2])  << " Mg DM/ha\n";
+    store ("2D R^2", Rsqr, solved ? "(solved)" : "(no solution)");
+    store ("2D CropDepth", result[0], "cm");
+    store ("2D CropWidth", result[1], "cm");
+    store ("2D WRoot", (0.01 * result[2]) , "Mg DM/ha");;
     if (result.size () == 4)
-      out << "2D SoilDepth = " << result[3] << " cm\n";
+      store ("2D SoilDepth", result[3], "cm");;
         
-    out << "2D L00 = " << gp2d.root.L00 << " cm/cm^3\n"
-        << "2D a_x = " << gp2d.root.a_x << " cm^-1\n"
-        << "2D a_z = " << gp2d.root.a_z << " cm^-1\n";
+    store ("2D L00", gp2d.root.L00, "cm/cm^3");
+    store ("2D a_x", gp2d.root.a_x, "cm^-1");
+    store ("2D a_z", gp2d.root.a_z, "cm^-1");;
     if (gp2d.root.d_a > 0.0)
-      out << "2D d_a = " << gp2d.root.d_a << " cm\n"
-          << "2D k* = " << gp2d.root.kstar << "\n";
-
-    out << "Y\tZ\tobs\tsim\n"
-        << Units::cm () << "\t" << Units::cm () << "\t" 
-        << dens_dim_to << "\t" << dens_dim_to;
+      {
+        store ("2D d_a", gp2d.root.d_a, "cm");
+        store ("2D k*", gp2d.root.kstar , "");;
+      }
+    std::ostringstream out;
+    if (show_data)
+      out << "X\tZ\tobs\tsim\n"
+          << Units::cm () << "\t" << Units::cm () << "\t" 
+          << dens_dim_to << "\t" << dens_dim_to;
     double RSS = 0.0;
     for (size_t i = 0; i < obs.size (); i++)
       {
@@ -277,9 +327,11 @@ struct ProgramRootmatch : public Program
         const double o = obs[i].value;
         const double f = gp2d.root.density (x, z);
         RSS += sqr (o - f);
-        out << "\n" << x << "\t" << z << "\t" << o << "\t" << f;
+        if (show_data)
+          out << "\n" << x << "\t" << z << "\t" << o << "\t" << f;
       }
-    msg.message (out.str ());
+    if (show_data)
+      msg.message (out.str ());
     return RSS;
   }
 
@@ -374,27 +426,26 @@ struct ProgramRootmatch : public Program
     const bool solved = Iterative::NelderMead (min_iter, max_iter, epsilon,
                                                to_minimize, start, result);
     const double Rsqr = -to_minimize.value (result);
-    std::ostringstream out;
     
-    out << "1D R^2 = " << Rsqr << " ";
-    if (solved)
-      out << " (solved)\n";
-    else
-      out << " (no solution)\n";
-    out << "1D CropDepth = " << result[0] << " cm\n"
-        << "1D WRoot = " << (0.01 * result[1])  << " Mg DM/ha\n";
+    store ("1D R^2", Rsqr, solved ? "(solved)" : "(no solution)");
+    store ("1D CropDepth", result[0], "cm");
+    store ("1D WRoot", (0.01 * result[1]) , "Mg DM/ha");;
     if (result.size () == 3)
-      out << "1D SoilDepth = " << result[2] << " cm\n";
+      store ("1D SoilDepth", result[2], "cm");;
         
-    out << "1D L0 = " << gp1d.root.L0 << " cm/cm^3\n"
-        << "1D a = " << gp1d.root.a << " cm^-1\n";
+    store ("1D L0", gp1d.root.L0, "cm/cm^3");
+    store ("1D a", gp1d.root.a, "cm^-1");;
     if (gp1d.root.d_a > 0.0)
-      out << "1D d_a = " << gp1d.root.d_a << " cm\n"
-          << "1D k* = " << gp1d.root.kstar << "\n";
+      {
+        store ("1D d_a", gp1d.root.d_a, "cm");
+        store ("1D k*", gp1d.root.kstar, "");
+      }
 
-    out << "Z\tobs\tsim\n"
-        << Units::cm () << "\t" << Units::cm () << "\t" 
-        << dens_dim_to << "\t" << dens_dim_to;
+    std::ostringstream out;
+    if (show_data)
+      out << "Z\tobs\tsim\n"
+          << Units::cm () << "\t" << Units::cm () << "\t" 
+          << dens_dim_to << "\t" << dens_dim_to;
     double RSS = 0.0;
     for (size_t i = 0; i < obs.size (); i++)
       {
@@ -402,10 +453,11 @@ struct ProgramRootmatch : public Program
         const double o = obs[i].value;
         const double f = gp1d.root.density (z);
         RSS += sqr (o - f);
-        out << "\n" << z << "\t" << o << "\t" << f;
-        
+        if (show_data)
+          out << "\n" << z << "\t" << o << "\t" << f;
       }
-    msg.message (out.str ());
+    if (show_data)
+      msg.message (out.str ());
     return RSS;
   }
 
@@ -415,10 +467,10 @@ struct ProgramRootmatch : public Program
     if (!lex.read_header (al.msg ()))
       return;
 
-    c_y_pos = lex.find_tag ("Position Y");
-    c_z_min = lex.find_tag ("Position Z minimum");
-    c_z_max = lex.find_tag ("Position Z maximum");
-    c_density = lex.find_tag ("Root lenght density");
+    c_x_pos = lex.find_tag (tag_x);
+    c_z_min = lex.find_tag (tag_z_min);
+    c_z_max = lex.find_tag (tag_z_max);
+    c_density = lex.find_tag (tag_density);
   }
 
   bool check (Treelog& msg)
@@ -427,9 +479,9 @@ struct ProgramRootmatch : public Program
       return false;
     
     bool ok = true;
-    if (c_y_pos < 0)
+    if (c_x_pos < 0)
       {
-        msg.error ("Position Y: tag missing");
+        msg.error ("Position X: tag missing");
         ok = false;
       }
     if (c_z_min < 0)
@@ -457,11 +509,19 @@ struct ProgramRootmatch : public Program
       lex (al),
       pos_dim (al.name ("pos_dim")),
       dens_dim (al.name ("dens_dim")),
-      c_y_pos (-1),
+      tag_x (al.name ("tag_x")),
+      tag_z_min (al.name ("tag_z_min")),
+      tag_z_max (al.name ("tag_z_max")),
+      tag_density (al.name ("tag_density")),
+      c_x_pos (-1),
       c_z_min (-1),
       c_z_max (-1),
       c_density (-1),
       debug (al.integer ("debug")),
+      show_data (al.flag ("show_data")),
+      tabular (al.flag ("tabular")),
+      row_position (al.number ("row_position")),
+      min_dist (al.number ("min_dist")),
       gp2d (al.number ("row_position"),
             al.number ("row_distance"),
             al.number ("DensRtTip"),
@@ -498,9 +558,26 @@ Match root data with GP2D model.")
 Position dimension");
     frame.declare_string ("dens_dim", Attribute::Const, "\
 Root density dimension.");
+    frame.declare_string ("tag_x", Attribute::Const, "\
+Name of column indicating horizontal distance from row.");
+    frame.declare_string ("tag_z_min", Attribute::Const, "\
+Name of column indicating minimal vertical distance from row.");
+    frame.declare_string ("tag_z_max", Attribute::Const, "\
+Name of column indicating maximal vertical distance from row.");
+    frame.declare_string ("tag_density", Attribute::Const, "\
+Name of column containing measured root density.");
     frame.declare_integer ("debug", Attribute::Const, "\
 Show debug messages if larger than zero.");
     frame.set ("debug", 0);
+    frame.declare_boolean ("show_data", Attribute::Const, "\
+Show comparison of observed and modelled values.");
+    frame.set ("show_data", true);
+    frame.declare_boolean ("tabular", Attribute::Const, "\
+Show parameters in tabular form for easy import to spreadsheet.");
+    frame.set ("tabular", false);
+    frame.declare ("min_dist", "cm", Attribute::State, "\
+Ignore root data closer than this to the row in both dimensions.");
+    frame.set ("min_dist", -1.0);
     frame.declare ("row_position", "cm", Attribute::State, "\
 Horizontal position of row crops.");
     frame.set ("row_position", 0.0);

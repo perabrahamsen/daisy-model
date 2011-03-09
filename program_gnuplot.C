@@ -64,7 +64,7 @@ ProgramGnuplot::run (Treelog& msg)
     bool ok = true;
     for (size_t i = 0; i < graph.size(); i++)
       {
-        Treelog::Open nest (msg, name.name (), i, graph[i]->name);
+        Treelog::Open nest (msg, objid.name (), i, graph[i]->objid);
         msg.touch ();
         if (!graph[i]->initialize (units, msg))
           ok = false;
@@ -91,7 +91,7 @@ ProgramGnuplot::run (Treelog& msg)
     bool ok = true;
     for (size_t i = 0; i < graph.size(); i++)
       {
-        Treelog::Open nest (msg, name.name (), i, graph[i]->name);
+        Treelog::Open nest (msg, objid.name (), i, graph[i]->objid);
         if (!graph[i]->plot (out, msg))
           ok = false;
       }

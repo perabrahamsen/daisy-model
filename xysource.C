@@ -94,7 +94,7 @@ XYSource::distance (const double xmin, const double xmax,
 }
 
 XYSource::XYSource (const BlockModel& al)
-  : name (al.type_name ())
+  : objid (al.type_name ())
 { }
 
 XYSource::~XYSource ()

@@ -33,7 +33,7 @@ class Gnuplot : public Model
 {
   // Content.
 public:
-  const symbol name;
+  const symbol objid;
   static const char *const component;
   symbol library_id () const;
 

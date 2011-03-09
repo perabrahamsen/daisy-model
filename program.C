@@ -58,7 +58,7 @@ Program::ui_set_progress (const double value)
 }
 
 Program::Program (const BlockModel& al)
-  : name (al.type_name ()),
+  : objid (al.type_name ()),
     ui (NULL)
 { }
 
