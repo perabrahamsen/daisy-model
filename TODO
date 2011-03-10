@@ -16,30 +16,19 @@ Program der læser roddatafil og beregner parametre samt ME for hvert sæt.
 
 *** DONE N-M (ME (GP2D)
 
-** Sammenlign 2D snit eller 3D data?
+** DONE Sammenlign 2D snit eller 3D data?
 
-** slå soil depth fra?  k* = 1.0; d_a = Inf?
+** DONE slå soil depth fra?  k* = 1.0; d_a = Inf?
 
-** GP1D
+** DONE GP1D
 
-** F-test
+** DONE F-test
 
-** setup fil
+** DONE setup fil
 
 ** Hent høst-data
 
 ** Lav oversigtstabel
-
-Site, Date, Treatment,
-Obs yield
-Est. root zone depth
-Est. root zone width
-Est. root mass
-R^2 2D 
-R^2 1D
-F-test (2D vs. 1D)
-
-L00, a_x, a_z?
 
 ** Snak med Søren
 

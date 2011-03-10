@@ -216,6 +216,7 @@
        CAU-2008a-all
        CAU-2008b-all))
 
-(run CAU-all)
+(run batch 
+     (run CAAS-2006-all CAAS-2008-all CAU-all))
 
 
