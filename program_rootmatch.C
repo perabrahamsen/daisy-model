@@ -30,7 +30,11 @@
 #include "assertion.h"
 #include "mathlib.h"
 
+#include <boost/math/distributions/fisher_f.hpp>
+
 #include <sstream>
+
+namespace math = boost::math;
 
 struct ProgramRootmatch : public Program
 {
@@ -178,7 +182,12 @@ struct ProgramRootmatch : public Program
     daisy_assert (obs1d.size () == obs2d.size ());
     daisy_assert (RSS2 > 0.0);
     const double F = ((RSS1 - RSS2)/(p2-p1))/(RSS2/(n-p2));
-    store ("F-test", F, "");
+    store ("F", F, "");
+    const double Flim 
+      = math::quantile (math::complement (math::fisher_f (p2-p1, n-p2),
+                                          0.05));
+    store ("F (0.05)", Flim, "");
+      
     std::ostringstream tmp;
     if (tabular)
       {
