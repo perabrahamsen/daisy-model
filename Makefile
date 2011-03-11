@@ -55,7 +55,6 @@ MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
 MINGWHOME = /cygdrive/c/MinGW
 endif
 
-TARGETTYPE = i586-mingw32msvc
 SVNROOT = https://daisy-model.googlecode.com/svn
 
 # Set USE_GUI to Q4 or none, depending on what GUI you want.
@@ -198,10 +197,9 @@ ifeq ($(USE_DYNLIB),true)
 endif
 
 GCC = gcc
-CROSSGCC = $(GCC) # "$(TARGETTYPE)-gcc"
+CROSSGCC = /cygdrive/c/MinGW/bin/gcc.exe
 
 STRIP = strip
-CROSSSTRIP = "$(TARGETTYPE)-strip"
 
 ifeq ($(COMPILER),gcc)
 #	New warning flags in GCC 4.4
@@ -680,9 +678,9 @@ cnative:
          && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile cdaisy.exe)
 
 cross:
-	(cd $(TARGETTYPE) \
+	(cd obj \
          && $(MAKE) "PATH=/cygdrive/c/MinGW/bin:$(PATH)" \
-		    "CYGHOME=C:/cygwin" Q4HOME=c:/Qt/4.3.0\
+		    "CYGHOME=C:/cygwin" Q4HOME=c:/Qt/4.5.2\
 	            GCC=$(CROSSGCC) VPATH=$(SRCDIR) \
                     -f $(SRCDIR)/Makefile daisy${EXE} daisyw.exe)
 
