@@ -37,12 +37,14 @@
 \maketitle
 
 \begin{abstract}
+  TODO: Intro (From PRD to 2D root modelling)\\
   In this paper we extend an emperical root density distribution based
   on densely populated homogenious fields to row crops.  The row crops
   are modeled as having a uniform density in the direction parallel to
   the rows, but variable in the direction perpindicular to the row.
-  In each case how to find the distribution parameters from the root
-  dry matter and the size of the root zone.
+  In each case we demonstrate how to find the distribution parameters
+  from the root dry matter and the size of the root zone.\\
+  TODO: Data, results, and conclusion.
 \end{abstract}
 
 \section{Introduction}
@@ -50,11 +52,14 @@
 \begin{itemize}
 \item TODO: PRD er godt
 \item TODO: Modellering af PRD kræver jordfysisk beskrivelse af vand
-  bevægelse i 2 dimensioner, samt en 2D model for rodtæthed.
-\item TODO: 
+  bevægelse i 2 dimensioner, samt en 2D model for rodtæthed (fokus for
+  denne artikel).
+\item TODO: Om SAFIR \cite{safir2010}.
+\item TODO: Om Daisy. Udvikling af 2D: \cite{1dvs2d}.  Brug i PRD: \cite{ssoc}
+\item TODO: State-of-the-art rodmodellering.  Motivation for GP2D.
 \end{itemize}
 
-\section{Model description}
+\section{Model theory}
 
 \subsection{Densily populated fields}
 
@@ -182,8 +187,8 @@ going towards, but never reaching zero.  There are two problems with
 this.  The first one is emprical, for some soils it doesn't match what
 we observe, rather than a gradual decrease, there is sharp decrease at
 a specific depth, as the roots are unable to penetrate further
-down~\cite{limroot}. The other one is practical, too large a root zone
-makes computation impractical.
+down. The other one is practical, too large a root zone makes
+computation impractical.
 
 The way we model the first issue is to divide the root depth into a
 crop specific and soil independent potential root depth $d_c$, and soil
@@ -388,12 +393,12 @@ the first case to get rid of the sum
 \begin{equation}
   \begin{array}{rl}
      & \sum_{i=0}^{\infty} (L_{z,x + i R} + L_{z,R + i R - x})\\
-    =& L_{0,0}\, e^{-a_z z} 
-       \sum_{i=0}^{\infty} (e^{-a_x (x + i R)} + e^{-a_x (R + i R - x)})\\
+%%    =& L_{0,0}\, e^{-a_z z} 
+%%       \sum_{i=0}^{\infty} (e^{-a_x (x + i R)} + e^{-a_x (R + i R - x)})\\
     =& L_{0,0}\, e^{-a_z z} (       e^{-a_x x} \sum_{i=0}^{\infty} e^{-a_x i R} 
                           + e^{-a_x (R - x)} \sum_{i=0}^{\infty} e^{-a_x i R})\\
-    =& L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (R - x)})
-       \sum_{i=0}^{\infty} e^{-a_x i R}) \\
+%%    =& L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (R - x)})
+%%       \sum_{i=0}^{\infty} e^{-a_x i R}) \\
     =& L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (R - x)})
        \sum_{i=0}^{\infty} ((\frac{1}{e})^{a_x R})^i\\
     =& \frac{L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (R - x)})}
@@ -403,6 +408,7 @@ the first case to get rid of the sum
 \end{equation}
 
 \subsubsection{Mapping between the models}
+\label{sec:mapping}
 
 We would like to retain our original distribution when ignoring the x
 dimension.  We couldn't do that when looking only at the root system
@@ -441,14 +447,34 @@ dimensional descriptions.
 
 \section{Data description and methodology}
 
-\cite{nelder1965simplex}
+\begin{itemize}
+\item TODO: Two sites CAAS. Location. Potato.  CAU.  Near Beijing.
+  Tomato.  Treatments represent variation in irrigation source (tap
+  water, waste water with different treatments), application method
+  (furrow and subsoil drip), and strategy (FI, Deficit, and PRD).
+  Nutrients not included (should be sufficient).  Different irrigation
+  sources included for examining safety, not as nutrient source, but
+  may nontheless have an effect.  Three replications.  Root density
+  measured only for selected treatments, with no replications.
+\item TODO: CAAS.  2006 and 2008 data.  2006 data bad (all
+  measurements below DensRootTip).  Ridges.  Figure with field setup
+  and measurement points.  Choose to include all (3D) data.  Table
+  with plots, treatments, and yields.  FAOSTAT yield for reference.
+\item TODO: CAU.  2007 and 2008 data, all good.  Ridges.  Figure with
+  field setup and measurement points.  Only include 2D data. Table
+  with plots, treatments, and yields.  FAOSTAT yield for reference.
+\item TODO: ``Fixed'' model parameters.  Finding optimal free parameters
+  with regard to $R^2$ from data.  \cite{nelder1965simplex}.
+\item TODO: Find solution for both 1D and 2D model.  The 2D model is a
+  porper superset of the 1D model (\ref{sec:mapping}) with one more
+  parameter.  This means we can use a F-test to compare.
+\end{itemize}
 
 \section{Results}
 
 \begin{itemize}
 \item TODO: 5 tabeller med resultater
-\item TODO: Evt. 3 tabeller med oplysninger om mark.
-\item TODO: Evt. FAO Kina gennemsnitsudbytte.
+\item TODO: Perhaps figure (or table) with results from one plot.
 \end{itemize}
 
 No clear pattern emerge on the effect of the irrigation treatment on
@@ -479,10 +505,10 @@ fit for the root zone width was at least three times the distance
 between rows, indicating a situation where there root zones of the
 different plant rows were fully merged.  The $R^2$ values range from
 0.73 to 0.96 for 27 of 28 datasets, with the last dataset having $R^2
-= 0.30$.  For the aggregated datesets, $R^2$ range from 0.56 to 0.92.  
+= 0.30$.  For the aggregated datasets, $R^2$ range from 0.56 to 0.92.  
 
-Based on this we believe the model is useful for the intended purpose
-of modelling water dynamics in row crops with PRD irrigation.
+Based on this we believe the proposed model is useful for the intended
+purpose of modelling water dynamics in row crops with PRD irrigation.
 
 \section{Software and data availability}
 
@@ -491,12 +517,12 @@ density data, and in addition root zone width from 2D root density
 data, can be found at \url{http://www.daisy-model.org/} (look under
 \texttt{Wiki}, \texttt{\textsc{gp2d}}).  Also supported is estimating
 root density distribution from root mass, root zone depth, and
-optionally, root zone width.  The software is written in \cplusplus{}
-and covered by on open source license (\textsc{gnu lgpl}), so it can
-be freely incorporated in other models.
+optionally, root zone width.  The program code is written in
+\cplusplus{} and is covered by on open source license (\textsc{gnu
+  lgpl}), so it can be freely incorporated in other models.
 
 The root density data from the two field sites will be made available
-at\linebreak[4] \url{http://www.safir4eu.org/} from TODO-XXXX-DATE
+at \url{http://www.safir4eu.org/} from TODO-XXXX-DATE
 (look under \texttt{Trials}).
 
 \section*{List of symbols}

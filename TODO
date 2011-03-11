@@ -2,49 +2,11 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Kina rødder
 
-Program der læser roddatafil og beregner parametre samt ME for hvert sæt.
+** Skriv artikel.
 
-** Nyt program_rootmatch
+** MNA skal invitere kineserne
 
-*** DONE Implementer Nelder-Mead 
-
-*** DONE læs data
-
-*** DONE stand alone GP2D
-
-*** DONE General ME function: (function + observations) -> ME
-
-*** DONE N-M (ME (GP2D)
-
-** DONE Sammenlign 2D snit eller 3D data?
-
-** DONE slå soil depth fra?  k* = 1.0; d_a = Inf?
-
-** DONE GP1D
-
-** DONE F-test
-
-** DONE setup fil
-
-** Hent høst-data
-
-** Lav oversigtstabel
-
-** Snak med Søren
-
-*** Inviter evt Mathias.
-
-Han har været med til at skaffe data, kender kineserne.
-
-** Skriv artikel
-
-*** indledning
-
-*** præsenter sites
-
-*** præsenter resultater
-
-*** præsenter software
+** Skriv wiki/GP2D "howto" gå fra data til rodmasse og volumen, og omvendt
 
 * Ny reference manual
 
