@@ -1,24 +1,76 @@
-# set terminal pdf
+set terminal epslatex
+set output "sample-cau.eps"
 # set output "cau.pdf"
 set yrange [-25:25]
 set xrange [-40:40]
-set zrange [-100:50]
--30 -15 0 15 30
--20 -10 0 10 20
--15 -5 5 15 25 35 45
-splot '-' using 1:2:3 with points notitle, 30*cos(x*2*pi/80) with lines notitle
--30 0 (5 : 35)
+set zrange [-70:50]
+set xlabel "X"    
+set ylabel "Y"    
+set zlabel "Z"    
+set ticslevel 0
+splot '-' using 1:2:3 with points notitle, 20*cos(x*2*pi/80) with lines notitle, '-' using 1:2:3 with points notitle
+-30 0 -5
+-30 0 -15
+-30 0 -25
+-30 0 -35
 
--15 0 (-5 : 45)
+-15 0 -5
+-15 0 -15
+-15 0 -25
+-15 0 -35
+-15 0 -45
 
-0 -20 (-15 : 35)
-0 -10 (-15 : 55)
+0 0 -5
+0 0 -15
+0 0 -25
+0 0 -35
+0 0 -45
+0 0 -55
 
-0 0 (-15 : 55)
+15 0 -5
+15 0 -15
+15 0 -25
+15 0 -35
+15 0 -45
 
-0 10 (-15 : 55)
-0 20 (-15 : 35)
+30 0 -5
+30 0 -15
+30 0 -25
+30 0 -35
+e
+0 -20 15
+0 -20 5
+0 -20 -5
+0 -20 -15
+0 -20 -25
+0 -20 -35
 
-15 0 (-5 : 45)
+0 -10 15
+0 -10 5
+0 -10 -5
+0 -10 -15
+0 -10 -25
+0 -10 -35
+0 -10 -45
+0 -10 -55
 
-30 0 (5 : 35)
+0 0 15
+0 0 5
+
+0 10 15
+0 10 5
+0 10 -5
+0 10 -15
+0 10 -25
+0 10 -35
+0 10 -45
+0 10 -55
+
+0 20 15
+0 20 5
+0 20 -5
+0 20 -15
+0 20 -25
+0 20 -35
+e
+# pause mouse

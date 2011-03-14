@@ -1,10 +1,13 @@
-# set terminal pdf
-# set output "caas.pdf"
+set terminal epslatex
+set output "sample-caas.eps"
 set yrange [-25:25]
 set xrange [-40:40]
-set zrange [-100:50]
-#caas layout
-splot '-' using 2:1:3 with points notitle, 30*cos(x*2*pi/75) with lines notitle
+set zrange [-70:40]
+set xlabel "X"    
+set ylabel "Y"    
+set zlabel "Z"    
+set ticslevel 0
+splot '-' using 2:1:3 with points notitle, 15*cos(x*2*pi/75) with lines notitle
 0 0 -7.5
 0 0 -20
 0 0 -30
@@ -47,16 +50,3 @@ splot '-' using 2:1:3 with points notitle, 30*cos(x*2*pi/75) with lines notitle
 15 37.50 -60
 15 37.50 -70
 e
-#cau layout
--30 -15 0 15 30
--20 -10 0 10 20
--15 -5 5 15 25 35 45
-splot '-' using 1:2:3 with points notitle, 30*cos(x*2*pi/80) with lines notitle
--30 0 5
--30 0 15
-
--15 0 -5
--15 0 5
--15 0 15
--15 0 25
--15 0 35
