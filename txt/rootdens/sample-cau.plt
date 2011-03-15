@@ -1,5 +1,5 @@
-set terminal epslatex
-set output "sample-cau.eps"
+set terminal epslatex color
+set output "sample-cau.tex"
 # set output "cau.pdf"
 set yrange [-25:25]
 set xrange [-40:40]

@@ -2,7 +2,7 @@ set contour
 set view map
 unset surface
 set cntrparam levels discrete 6.40, 3.20, 1.60, 0.80, 0.40, 0.20, 0.10
-set terminal epslatex
+set terminal epslatex color
 set key right Right bottom
 
 set title "CAU 15-06-2008"

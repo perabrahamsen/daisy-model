@@ -1,6 +1,6 @@
 set yrange [-60:0]
 set xrange [0:2]
-set terminal epslatex size 5in,1.6in
+set terminal epslatex size 5in,1.6in color
 set key right Right bottom
 set format x ""
 
@@ -448,7 +448,7 @@ e
 -100	0.0406804
 e
 
-set terminal epslatex size 5in,1.7in
+set terminal epslatex size 5in,1.72in color
 set format x "%g"
 set output "compare+30.tex"
 plot '-' using 2:1:3 title "30 cm" with xerrorbars, '-' using 2:1 notitle with lines

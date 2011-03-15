@@ -1,5 +1,5 @@
-set terminal epslatex
-set output "sample-caas.eps"
+set terminal epslatex color
+set output "sample-caas.tex"
 set yrange [-25:25]
 set xrange [-40:40]
 set zrange [-70:40]
