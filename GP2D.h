@@ -61,12 +61,14 @@ public:
 class GP2D
 {
   // Static parameters.
+public:
   const double row_position;   // Horizontal position of row crops. [cm]
   const double row_distance;   // Distance betweeen rows. [cm]
   const double DensRtTip;      // Root density at (pot) pen. depth. [cm/cm^3]
   const double SpRtLength;     // Specific root length [m/g]
 
   // Helper class.
+private:
   class InvQ;
 
   // Calculated parameters.

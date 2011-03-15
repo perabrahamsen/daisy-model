@@ -29,6 +29,7 @@
 #include "units.h"
 #include "assertion.h"
 #include "mathlib.h"
+#include "submodeler.h"
 
 #include <boost/math/distributions/fisher_f.hpp>
 
@@ -53,6 +54,8 @@ struct ProgramRootmatch : public Program
   int c_density;
   const int debug;
   const bool show_data;
+  const bool show_match;
+  const double x_offset;
   const bool tabular;
   const double row_position;
   const double min_dist;
@@ -112,6 +115,64 @@ struct ProgramRootmatch : public Program
 
   const double SoilDepth;
 
+  struct Gnuplot : boost::noncopyable
+  {
+    const double x_start;
+    const double x_offset;
+    const double x_end_pos;
+    const double z_end_pos;
+    const double dx;
+    const double dz;
+    void show (const GP2D& root, std::ostream& tmp)
+    {
+      if (!std::isfinite (z_end_pos))
+        return;
+      const double x_end = std::isfinite (x_end_pos)
+        ? x_end_pos + dx * 0.1 
+        :  x_start + root.row_distance + dx * 0.1;
+      const double z_end = z_end_pos + dz * 0.1;
+      tmp << "\n";
+      for (double x = x_start; x < x_end; x++)
+        {
+          for (double z = 0.0; z < z_end; z++)
+            tmp << (x - x_offset) << "\t" << -z << "\t" << root.density (x, z) << "\n";
+          tmp << "\n";
+        }
+      tmp << "e";
+    }
+    static void load_syntax (Frame& frame)
+    {
+      frame.declare ("x_start", "cm", Check::none (), Attribute::Const,
+                     "Start table here.");
+      frame.set ("x_start", 0.0);
+      frame.declare ("x_offset", "cm", Check::none (), Attribute::OptionalConst,
+                     "Subtract this from printed x values.");
+      frame.set ("x_offset", 0.0);
+      frame.declare ("x_end", "cm", Check::none (), Attribute::OptionalConst,
+                     "End table here.\n\
+By default, this is `x_start' plus `row_distance'.");
+      frame.declare ("z_end", "cm", Check::none (), Attribute::OptionalConst,
+                     "End table here at this depth.");
+      frame.declare ("dx", "cm", Check::none (), Attribute::Const,
+                     "Horizontal interval size.");
+      frame.set ("dx", 1.0);
+      frame.declare ("dz", "cm", Check::none (), Attribute::OptionalConst,
+                     "Vertical interval size. \n\
+By default identical to `dx'.");
+      
+    }
+
+    Gnuplot (const Block& al)
+      : x_start (al.number ("x_start")),
+        x_offset (al.number ("x_offset")),
+        x_end_pos (al.number ("x_end", NAN)),
+        z_end_pos (al.number ("z_end", NAN)),
+        dx (al.number ("dx")),
+        dz (al.number ("dz", dx))
+    { }
+  };
+  boost::scoped_ptr<Gnuplot> gnuplot;
+
   // Utils
   double get_value (const symbol from, const symbol to, std::string& entry)
   { return units.convert (from, to, lex.convert_to_double (entry)); }
@@ -119,6 +180,7 @@ struct ProgramRootmatch : public Program
   // Use.
   bool run (Treelog& msg)
   {
+    // Read data.
     std::vector<Iterative::PointValue> obs2d;
     std::vector<Iterative::PointValue> obs1d;
 
@@ -173,6 +235,8 @@ struct ProgramRootmatch : public Program
         msg.error ("No observations found");
         return true;
       }
+
+    // F-test
     const bool find_SoilDepth = !std::isfinite (SoilDepth);
     const double RSS2 = solve_2D (obs2d, msg);
     const double RSS1 = solve_1D (obs1d, msg);
@@ -188,6 +252,7 @@ struct ProgramRootmatch : public Program
                                           0.05));
     store ("F (0.05)", Flim, "");
       
+    // Show results.
     std::ostringstream tmp;
     if (tabular)
       {
@@ -205,8 +270,11 @@ struct ProgramRootmatch : public Program
       for (size_t i = 0; i < res_name.size (); i++)
         tmp << "\n" << res_name[i] 
             << " = " << res_value[i] << " " << res_dim[i];
+
+    gnuplot->show (gp2d.root, tmp);
     
     msg.message (tmp.str ());
+
     return true;
   }
   
@@ -323,11 +391,105 @@ struct ProgramRootmatch : public Program
         store ("2D d_a", gp2d.root.d_a, "cm");
         store ("2D k*", gp2d.root.kstar , "");;
       }
-    std::ostringstream out;
+
+    // Show data.
     if (show_data)
-      out << "X\tZ\tobs\tsim\n"
-          << Units::cm () << "\t" << Units::cm () << "\t" 
-          << dens_dim_to << "\t" << dens_dim_to;
+      {
+        std::ostringstream out;
+        out << "X\tZ\tobs\tsim\n"
+            << Units::cm () << "\t" << Units::cm () << "\t" 
+            << dens_dim_to << "\t" << dens_dim_to;
+        for (size_t i = 0; i < obs.size (); i++)
+          {
+            const double x = obs[i].point[0];
+            const double z = obs[i].point[1];
+            const double o = obs[i].value;
+            const double f = gp2d.root.density (x, z);
+            out << "\n" << x << "\t" << z << "\t" << o << "\t" << f;
+          }
+        msg.message (out.str ());
+      }
+    
+    // Show errorbars
+    if (show_match)
+      {
+        std::ostringstream out;
+        typedef std::map<double, std::map<double, double>/**/> ddmap ;
+        ddmap sum;
+        ddmap count;
+        ddmap var;
+        ddmap avg;
+
+        // Clear all.
+        for (size_t i = 0; i < obs.size (); i++)
+          {
+            const double x = obs[i].point[0];
+            const double z = obs[i].point[1];
+            
+            sum[x][z] = 0.0;
+            count[x][z] = 0.0;
+            var[x][z] = 0.0;
+          }
+
+        // Count all.
+        for (size_t i = 0; i < obs.size (); i++)
+          {
+            const double x = obs[i].point[0];
+            const double z = obs[i].point[1];
+            const double o = obs[i].value;
+            
+            sum[x][z] += o;
+            count[x][z] += 1.0;
+          }
+
+        // Find mean.
+        for (ddmap::iterator i = sum.begin (); i != sum.end (); i++)
+          {
+            const double x = (*i).first;
+            std::map<double, double> zmap = (*i).second;
+            for (std::map<double, double>::iterator j = zmap.begin ();
+                 j != zmap.end ();
+                 j++)
+              {
+                const double z = (*j).first;
+                avg[x][z] = sum[x][z] / count[x][z];
+              }
+          }
+
+        // Find variation
+        for (size_t i = 0; i < obs.size (); i++)
+          {
+            const double x = obs[i].point[0];
+            const double z = obs[i].point[1];
+            const double o = obs[i].value;
+            
+            var[x][z] += sqr (avg[x][z] - o);
+          }
+
+        for (ddmap::iterator i = var.begin (); i != var.end (); i++)
+          {
+            const double x = (*i).first;
+            out << "x = " << (x - x_offset) << "cm \n"
+                << "Z\tmean\tstd_dev\n"
+                << Units::cm () << "\t" << dens_dim_to << "\t" << dens_dim_to;
+            std::map<double, double> zmap = (*i).second;
+            for (std::map<double, double>::iterator j = zmap.begin ();
+                 j != zmap.end ();
+                 j++)
+              {
+                const double z = (*j).first;
+                const double dev = sqrt (var[x][z] / count[x][z]);
+                out << "\n" << -z << "\t" << avg[x][z] << "\t" << dev;
+              }
+            out << "\n";
+            for (double z = 0.0; z < 100.1; z++)
+              out << "\n" << -z << "\t" << gp2d.root.density (x, z);
+            out << "\n\n";
+          }
+        msg.message (out.str ());
+      }
+
+    // Find RSS.
     double RSS = 0.0;
     for (size_t i = 0; i < obs.size (); i++)
       {
@@ -336,11 +498,7 @@ struct ProgramRootmatch : public Program
         const double o = obs[i].value;
         const double f = gp2d.root.density (x, z);
         RSS += sqr (o - f);
-        if (show_data)
-          out << "\n" << x << "\t" << z << "\t" << o << "\t" << f;
       }
-    if (show_data)
-      msg.message (out.str ());
     return RSS;
   }
 
@@ -528,6 +686,8 @@ struct ProgramRootmatch : public Program
       c_density (-1),
       debug (al.integer ("debug")),
       show_data (al.flag ("show_data")),
+      show_match (al.flag ("show_match")),
+      x_offset (al.number ("x_offset")),
       tabular (al.flag ("tabular")),
       row_position (al.number ("row_position")),
       min_dist (al.number ("min_dist")),
@@ -537,7 +697,8 @@ struct ProgramRootmatch : public Program
             al.number ("SpRtLength")),
       gp1d (al.number ("DensRtTip"),
             al.number ("SpRtLength")),
-      SoilDepth (al.number ("SoilDepth", NAN))
+      SoilDepth (al.number ("SoilDepth", NAN)),
+      gnuplot (submodel<Gnuplot> (al, "gnuplot"))
   { }
   ~ProgramRootmatch ()
   { }
@@ -581,6 +742,13 @@ Show debug messages if larger than zero.");
     frame.declare_boolean ("show_data", Attribute::Const, "\
 Show comparison of observed and modelled values.");
     frame.set ("show_data", true);
+    frame.declare_boolean ("show_match", Attribute::Const, "\
+Show matching observed and modelled values with errorbars.");
+    frame.set ("show_match", false);
+    frame.declare ("x_offset", "cm", Attribute::State, "\
+Substract this from the x values shown with `show_match'.");
+    frame.set ("x_offset", 0.0);
+    
     frame.declare_boolean ("tabular", Attribute::Const, "\
 Show parameters in tabular form for easy import to spreadsheet.");
     frame.set ("tabular", false);
@@ -607,6 +775,10 @@ If not specified, use the value that gives the best fit.\n\
 Note that unless you specify a negative value, the root zone will be\n\
 limited by DensRtTip, that is, depth where the corresponding 1D GP would\n\
 give densities less than DensRtTip, will instead have a zero density.");
+    frame.declare_submodule ("gnuplot", Attribute::Const, "\
+Irrigation model for first season.  If missing, don't irrigate.", 
+                             ProgramRootmatch::Gnuplot::load_syntax);
+    
   }
 } ProgramRootmatch_syntax;
 

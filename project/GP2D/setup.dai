@@ -216,7 +216,21 @@
        CAU-2008a-all
        CAU-2008b-all))
 
-(run batch 
-     (run CAAS-2006-all CAAS-2008-all CAU-all))
 
+(defprogram param batch (run CAAS-2006-all CAAS-2008-all CAU-all))
 
+(defprogram rows batch
+  (run (CAU-2008a
+        (gnuplot (x_start 3.2 [m])
+                 (x_offset 3.6 [m])
+                 (x_end 4.8 [m])
+                 (z_end 150.0 [cm])))
+       (CAU-2008b
+        (gnuplot (x_start 3.2 [m])
+                 (x_offset 3.6 [m])
+                 (x_end 4.8 [m])
+                 (z_end 150.0 [cm])))))
+
+(defprogram match CAU-2008b (show_match true) (x_offset 360 [cm]))
+
+(run match)
