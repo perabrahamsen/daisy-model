@@ -231,6 +231,12 @@
                  (x_end 4.8 [m])
                  (z_end 150.0 [cm])))))
 
-(defprogram match CAU-2008b (show_match true) (x_offset 360 [cm]))
+(defprogram match batch
+  (run (CAAS-2008 (show_match true))
+       (CAU-2007a (show_match true) (x_offset 360 [cm]))
+       (CAU-2007b (show_match true) (x_offset 360 [cm]))
+       (CAU-2008a (show_match true) (x_offset 360 [cm]))
+       (CAU-2008b (show_match true) (x_offset 360 [cm]))))
+       
 
 (run match)

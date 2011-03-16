@@ -423,7 +423,7 @@ By default identical to `dx'.");
         // Clear all.
         for (size_t i = 0; i < obs.size (); i++)
           {
-            const double x = obs[i].point[0];
+            const double x = std::fabs (obs[i].point[0] - x_offset);
             const double z = obs[i].point[1];
             
             sum[x][z] = 0.0;
@@ -434,7 +434,7 @@ By default identical to `dx'.");
         // Count all.
         for (size_t i = 0; i < obs.size (); i++)
           {
-            const double x = obs[i].point[0];
+            const double x = std::fabs (obs[i].point[0] - x_offset);
             const double z = obs[i].point[1];
             const double o = obs[i].value;
             
@@ -459,7 +459,7 @@ By default identical to `dx'.");
         // Find variation
         for (size_t i = 0; i < obs.size (); i++)
           {
-            const double x = obs[i].point[0];
+            const double x = std::fabs (obs[i].point[0] - x_offset);
             const double z = obs[i].point[1];
             const double o = obs[i].value;
             
@@ -469,9 +469,8 @@ By default identical to `dx'.");
         for (ddmap::iterator i = var.begin (); i != var.end (); i++)
           {
             const double x = (*i).first;
-            out << "x = " << (x - x_offset) << "cm \n"
-                << "Z\tmean\tstd_dev\n"
-                << Units::cm () << "\t" << dens_dim_to << "\t" << dens_dim_to;
+            out << "set output \"" << objid << "-" << x << ".tex\"\n\
+plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines\n";
             std::map<double, double> zmap = (*i).second;
             for (std::map<double, double>::iterator j = zmap.begin ();
                  j != zmap.end ();
@@ -479,12 +478,12 @@ By default identical to `dx'.");
               {
                 const double z = (*j).first;
                 const double dev = sqrt (var[x][z] / count[x][z]);
-                out << "\n" << -z << "\t" << avg[x][z] << "\t" << dev;
+                out << -z << "\t" << avg[x][z] << "\t" << dev << "\n";
               }
-            out << "\n";
+            out << "e\n\n";
             for (double z = 0.0; z < 100.1; z++)
-              out << "\n" << -z << "\t" << gp2d.root.density (x, z);
-            out << "\n\n";
+              out << -z << "\t" << gp2d.root.density (x + x_offset, z) << "\n";
+            out << "e\n\n";
           }
         msg.message (out.str ());
       }
