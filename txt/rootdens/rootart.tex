@@ -37,15 +37,40 @@
 \maketitle
 
 \begin{abstract}
-  TODO: Intro (From PRD to 2D root modelling)\\
-  In this paper we extend an empirical root density distribution based
-  on densely populated homogeneous fields to row crops.  The row crops
-  are modeled as having a uniform density in the direction parallel to
-  the rows, but variable in the direction perpendicular to the row.
-  In each case we demonstrate how to find the distribution parameters
-  from the root dry matter and the size of the root zone.\\
-  TODO: Data, results, and conclusion.
+  Partial root zone drying (PRD) is an irrigation technique that in some
+  cases can increase the water usage efficiency.  A \twod{} model of
+  water movement in the soil is needed to predict how to most
+  efficiently apply irrigation in order to achieve the PRD effect.  This
+  model must include a \twod{} root model.  In this paper we extend an
+  empirical root density distribution based on densely populated
+  homogeneous fields (\oned{}) to row crops (\twod{}).  The row crops
+  are modeled as having a uniform ensity in the direction parallel to
+  the rows, but variable in the direction perpendicular to the row.  In
+  each case we demonstrate how to find the distribution parameters from
+  the root dry matter and the size of the root zone.
+
+  The SAFIR EU project included \twod{} root density measurements
+  performed at two sites, the Chinese Academy of Agricultural Sciences
+  (CAAS) and the Chinese Agricultural University (CAU), for two
+  experimental years and on multiple plots.  Both the \oned{} and
+  \twod{} model are fitted to these datasets.  Based on a statistical
+  F-test we conclude that the \twod{} model is superior when the root
+  zone width is less than the distance between rows.  The median $R^2$
+  for all the examined datasets is 0.86, and a visual inspection
+  confirms that the model catches both the horizontal and vertical root
+  density variation pattern.
 \end{abstract}
+
+\section*{Questions}
+
+\begin{itemize}
+\item Where to publish?
+\item Who should be co-authors from China?
+\item Should it be shorter?  If so, what to cut?
+\item CAU: What is the ridge geometry?  And zero level?
+\item MNA: PRD references?
+\item SHA (and MMO): Notation: $L\,(z)$ or $L_z$?
+\end{itemize}
 
 \section{Introduction}
 
@@ -192,7 +217,7 @@ of $-2$.
 \subsubsection{Limited growth}
 
 The distribution in \eqref{eq:g+p} implies a gradual decrease of roots
-going towards, but never reaching zero.  There are two problems with
+going towards but never reaching zero.  There are two problems with
 this.  The first one is empirical, for some soils it doesn't match what
 we observe, rather than a gradual decrease, there is sharp decrease at
 a specific depth, as the roots are unable to penetrate further
@@ -208,19 +233,19 @@ root depth $d_a$ is then the shallowest of these two.
   \label{eq:actual-depth}
 \end{equation}
 
-We now create a modified root density function $L_z^*$ by defining it to
+We now create a modified root density function $L_z^\prime$ by defining it to
 zero below $d_a$, and a $L_z$ scaled to preserve mass balance above.
 \begin{equation}
-  L_z^* =
+  L_z^\prime =
   \begin{cases}
-    k^* L_z & \text{if $z \leq d_a$}\\
+    k^\prime L_z & \text{if $z \leq d_a$}\\
     0 & \text{if $z > d_a$}
   \end{cases}
   \label{eq:limited-depth}
 \end{equation}
 where
 \begin{equation}
-  k^* = \frac{l_r}{\int_0^{d_a} L_z \, dz}
+  k^\prime = \frac{l_r}{\int_0^{d_a} L_z \, dz}
   \label{eq:scale-factor}
 \end{equation}
 thus solving both problems.
@@ -245,12 +270,13 @@ dimensions.
 
 To find the parameters $a_z$, $a_x$ and $L_{0,0}$, we assume as before
 that the root depth and root mass is known, and now additionally that
-the root radius $w_c$ is known.  We define the root zone depth $d_c$
-to be the depth right below the row ($x = 0$) where the root density
-is $L_m$.  As $x=0$ is the place where \eqref{eq:Lzx} predicts the
-highest density, the average root density at that depth will be well
-below $L_m$.  Similarly, we define the radius $w_c$ as the horizontal
-distance from the row where the root density at the surface ($z = 0$)
+the root zone radius at soil surface $w_c$ is known.  We define the root
+zone depth $d_c$ to be the depth right below the row ($x = 0$) where the
+root density is $L_m$.  As $x=0$ is the place where \eqref{eq:Lzx}
+predicts the highest density, the average root density at that depth
+will be well below $L_m$.  Similarly, we define the radius $w_c$ as the
+horizontal distance from the row where the root density at the surface
+($z = 0$)
 \begin{equation}
   L_m = L_{d,0} = L_{0,r}
   \label{eq:minroot}
@@ -461,7 +487,7 @@ So we get
   L_{0,0} &=& ½ a_x R L_0\\\label{eq:L00L0}
   L_0 &=& \frac{2 L_{0,0}}{a_x R}\label{eq:L0L00}
 \end{eqnarray}
-as the equation to use when switching between the one and two
+as the equations to use when switching between the one and two
 dimensional descriptions.
 
 \section{Data description and methodology}
@@ -606,6 +632,7 @@ Plot	& Method	& Strategy	& Plot	& Method	& Strategy\\\hline
     average yield for the listed plots.  No yield information was found 
     for CAU 2008 plot 15.}
   \label{tab:yield}
+
   \begin{tabular}{ll|ll|ll}\\\hline
 \multicolumn{2}{c|}{CAAS 2008} & \multicolumn{2}{c|}{CAU 2007} & \multicolumn{2}{c}{CAU 2008} \\
 Plot	& Mg/ha	& Plot	& Mg/ha	& Plot	& Mg/ha\\\hline
@@ -631,7 +658,7 @@ Average	& 19.9	& Average	& 44.3	& Average	& 46.9\\
     the \twod{} model provides a significantly better fit.} 
 \label{tab:caas-ftest}
 
-\begin{tabular}{rrrrrrrrr}\hline
+\begin{tabular}{rrrrrrrrr}\\\hline
 Plot	& $d_c$ [cm]	& $2 w_c$ [cm]	& $M_r$ [Mg/ha]	& 2D R$^2$	& 1D R$^2$	& F	& F (0.05)\\\hline
 All	& 93	& 216	& 0.65	& 0.61	& 0.60	& \textbf{5.42}	& 3.88\\
 3	& 91	& 265	& 1.22	& 0.93	& 0.92	& 2.80	& 4.14\\
@@ -654,7 +681,7 @@ All	& 93	& 216	& 0.65	& 0.61	& 0.60	& \textbf{5.42}	& 3.88\\
     the \twod{} model provides significantly better fit.} 
   \label{tab:cau-ftest}
 
-  \begin{tabular}{rrrrrrrrr}\hline
+  \begin{tabular}{rrrrrrrrr}\\\hline
 Plot	& $d_c$ [cm]	& $2 w_c$ [cm]	& $M_r$ [Mg/ha]	& 2D R$^2$	& 1D R$^2$	& F	& F (0.05)\\\hline
 \multicolumn{8}{c}{2007-05-30} \\
 All	& 78	& 96	& 0.18	& 0.63	& 0.49	& \textbf{43.69}	& 3.93\\
@@ -804,14 +831,14 @@ $a_x$   & L$^{-1}$ & Horizontal root density distribution parameter\\
 $d_a$   & L       & Soil limited root depth\\
 $d_c$   & L       & Crop potential root depth\\
 $d_s$   & L       & Soil maximum root depth\\ 
-$k^*$   &         & Soil root limit factor\\ 
+$k^\prime$   &         & Soil root limit factor\\ 
 $l_r$   & L/L$^2$ & Total root length per area\\ 
 $l_R$   & L/L     & Total root length per length of row on one side\\ 
 $L_0$   & L/L$^3$ & Average root density at soil surface\\
 $L_{0,0}$& L/L$^3$ & Root density in row at soil surface\\
 $L_m$   & L/L$^3$ & Minimal root density\\ 
 $L_z$   & L/L$^3$ & Root density at soil depth $z$\\
-$L_z^*$ & L/L$^3$ & Soil limited root density at soil depth $z$\\ 
+$L_z^\prime$ & L/L$^3$ & Soil limited root density at soil depth $z$\\ 
 $L_{z,x}$& L/L$^3$ & Root density at soil depth $z$ and distance $x$ from row\\
 $L^*_{z,x}$& L/L$^3$ & Root density from multiple rows\\
 $M_r$   & M/L$^2$& Total root dry matter\\ 
@@ -819,7 +846,7 @@ $Q$     &         & Substitution variable\\
 $R$     & L       & Distance between rows\\
 $S_r$   & L/M    & Specific root length\\ 
 $W$     &         & Lambert-W function\\ 
-$w_c$     & L     & Horizontal root radius\\
+$w_c$     & L     & Horizontal root zone radius\\
 $x$     & L       & Horizontal distance from row \\
 $z$     & L       & Soil depth \\
 \end{tabular}
