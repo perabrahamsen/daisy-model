@@ -5,7 +5,7 @@ set cntrparam levels discrete 6.40, 3.20, 1.60, 0.80, 0.40, 0.20, 0.10
 set terminal epslatex color
 set key right Right bottom
 
-set title "CAU 15-06-2008"
+# set title "CAU 15-06-2008"
 set output "CAU2008a.tex"
 splot '-' notitle  with lines
 -40	-0	0.381505
@@ -24481,7 +24481,7 @@ splot '-' notitle  with lines
 120	-150	0.010715
 
 e
-set title "CAU 24-07-2008"
+#set title "CAU 24-07-2008"
 set output "CAU2008b.tex"
 splot '-' notitle with lines
 -40	-0	0.252372

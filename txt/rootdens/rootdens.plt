@@ -1,4 +1,4 @@
-set terminal epslatex color
+set terminal epslatex color size 5in,2.5in
 set output "rootdens_W.tex"
 plot [-5:1] x*exp(x) title ""
 set output "rootdens_Q.tex"
