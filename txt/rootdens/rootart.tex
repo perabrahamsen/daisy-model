@@ -70,6 +70,11 @@
 \item CAU: What is the ridge geometry?  And zero level?
 \item MNA: PRD references?
 \item SHA (and MMO): Notation: $L\,(z)$ or $L_z$?
+\item MNA: When will SAFIR root data become public?
+\item MNA: Should we have more details on treatments and experimental
+  protocol?
+\item Drop tabel~\ref{tab:yield}?
+\item Drop tabel~\ref{tab:caas-phenology} and~\ref{tab:cau-phenology}?
 \end{itemize}
 
 \section{Introduction}
@@ -96,6 +101,7 @@ distribution in terms of root dry mass and root zone width.  This will
 provide a reference to compare with later.
 
 \subsection{Densely populated fields}
+\label{sec:model-1d}
 
 In accordance with \cite{gp74}, the root density distribution $L_z$
 for a crop can be described by
@@ -215,6 +221,7 @@ thus find $W$ numerically using Newton's method and an initial guess
 of $-2$.
 
 \subsubsection{Limited growth}
+\label{sec:soillim}
 
 The distribution in \eqref{eq:g+p} implies a gradual decrease of roots
 going towards but never reaching zero.  There are two problems with
@@ -404,6 +411,7 @@ of $-3$.  From that we can find $a_z$ from \eqref{eq:Qaz}, $a_x$ from
 \eqref{eq:aztoax}, and $L_{0,0}$ from \eqref{eq:root-integral2}.
 
 \subsubsection{Multiple rows}
+\label{sec:model-rows}
 
 If the rows are close enough, the root systems will overlap as shown
 on figure~\ref{fig:zigzag}.
@@ -492,30 +500,37 @@ dimensional descriptions.
 
 \section{Data description and methodology}
 
-\begin{itemize}
-\item TODO: Two sites CAAS. Location. Potato.  CAU.  Near Beijing.
-  Tomato.  Treatments represent variation in irrigation source (tap
-  water, waste water with different treatments), application method
-  (furrow and subsoil drip), and strategy (FI, Deficit, and PRD).
-  Nutrients not included (should be sufficient).  Different irrigation
-  sources included for examining safety, not as nutrient source, but
-  may nonetheless have an effect.  Three replications.  Root density
-  measured only for selected treatments, with no replications.
-\item TODO: CAAS.  2006 and 2008 data.  2006 data bad (all
-  measurements below DensRootTip).  Ridges.  Figure with field setup
-  and measurement points.  Choose to include all (3D) data.  Table
-  with plots, treatments, and yields.  FAOSTAT yield for reference.
-\item TODO: CAU.  2007 and 2008 data, all good.  Ridges.  Figure with
-  field setup and measurement points.  Only include 2D data. Table
-  with plots, treatments, and yields.  FAOSTAT yield for reference.
-\item TODO: ``Fixed'' model parameters.  Finding optimal free parameters
-  with regard to $R^2$ from data.  \cite{nelder1965simplex}.
-\item TODO: Find solution for both 1D and 2D model.  The 2D model is a
-  proper superset of the 1D model (\ref{sec:mapping}) with one more
-  parameter.  This means we can use a F-test to compare.
-\end{itemize}
+Root sampling were performed at two experimental fields, the first
+being operated by the Chinese Academy for Agricultural Sciences (CAAS)
+and located near Zhengzhou in the Henan province, and the second
+operated by the Chinese Agricultural University and located near
+Beijing.  Potatoes were grown at the CAAS site, while the CAU site
+were growing tomatoes.
 
 \subsection{Treatments}
+
+The SAFIR project had two main aspects, the first was the reuse of
+waste water for irrigation, with emphasis on human safety.  The
+treatments were designed with sufficient fertilization, so that the
+constituents of the waste water would be unlikely to affect crop
+growth.  Hence, for crop growth the different irrigation sources could
+be seen as replicates.  The second aspect was how the design of the
+irrigation system could save water.  Two irrigation methods and three
+irrigation strategies were considered.  The irrigation methods were
+subsurface drip irrigation and ufrrow irrigation.  The irrigation
+strategies were full irrigation, deficit irrigation (70\% of full
+irrigation), and partial rootzone drying (like deficit, but altering
+sides of the crop). 
+
+At the CAAS site, root density sampling was perforemed in 2006 and
+2008.  Unfortunately, the 2006 harvest failed, and the measured root
+densities were below expectations (most measurements showed root
+densities so low, that they would be considered for outside the root
+zone by the model), so we have discarted that data set.  All
+treatments were done with three replicates, but due to the labour
+intensive nature of root density sampling, it was only performed on
+selected plots as outlined in table~\ref{tab:caas2008treatments}
+and~\ref{tab:cautreatments}.
 
 \begin{table}[htbp]
   \caption{CAAS 2008 treatments with root density measurements.  
@@ -554,6 +569,31 @@ Plot	& Method	& Strategy	& Plot	& Method	& Strategy\\\hline
 
 \subsection{Root sampling}
 
+Both sites used ridge systems.  To describe it, we use a coordinate
+system with the x-axis ortogonal to the ridges with x=0 cm representing
+the top of the ridge, the y-axis along the ridges with y=0 cm
+representing the plant position, and the z-axis representing height
+above the undisturbed ground level, positive upwards.  At the CAAS
+site, roots were sampled in a $3\times2\times7$ grid.  The sampling
+along the x-axis corresponded to the top of the ridge, the middle of
+the ridge wall, and the bottom of the valley (x=0 cm, x=18.75 cm,
+x=37.5 cm).  The sampling along the y-axis corresponded to the plant
+location, and the middle between two plants (y=0 cm, y=15 cm).  At the
+z-axis, there were sampling in ten  cm intervals starting just below
+the unditurbed ground level (z=-5 cm) at the top of the ridge, and
+starting 10 and 20 cm lower for sampling at the middle and bottom of
+the ridge system.  The sampling points are illustrated on
+figure~\ref{fig:sample-caas}.  A the CAU site, the sampling were done
+in a cross shape, with five sample locations at the top of the ridge
+(x=0 cm; and y=-20 cm, y=-10 cm, y=0 cm, y=10 cm, y=20 cm), and five sample
+locations across the ridge system (y=0 cm; and x=-30 cm, x=-15 cm,
+x=15 cm, x=15 cm, x=30 cm).  The sampling along the top of the ridge
+started at z=15 cm, that is above undisturbed ground level.  The
+sampling across the ridge started at z=-5 cm.  The samplings were
+performed in 10  cm intervals, the lowest varied between plots and with
+the horizontal distance to the plant, the lowest were at z=-55 cm. See
+figure~\ref{fig:sample-cau}.
+
 \begin{figure}[htbp]
   \input{sample-caas}
   \caption{Sampling points for CAAS site.  All distances in cm.  Root
@@ -582,7 +622,56 @@ Plot	& Method	& Strategy	& Plot	& Method	& Strategy\\\hline
   \label{fig:sample-cau}
 \end{figure}
 
+\subsection{Fitting the data to the model}
+
+The root density model presented in this paper assumes flat soil.  To
+solve this, a virtual soil surface corresponding to the undisturbed
+ground level (z=0 cm) was used in the model.  Furthermore, the root
+density model is \twod{}, while the root data for both sites is
+\threed{}.  The root model describes the x-axis (position between row)
+and the z-axis (height above ground), but not the y-axis (position
+within row).  For the CAAS dataset, we have similar datasets for two
+two y-values, and we have included both datasets, thus fitting a
+\twod{} model to a \threed{} dataset.  From the point of view of the
+model, we have two observations for each (x, z) pair.  For the CAU
+dataset, and the observations where y$\neq$0 cm have x=0 cm.
+Including these would give an unbalanced dataset.  So for the CAU
+dataset we have only used the measurements where y=0 cm.  Furthermore,
+we have ignored the measurements with z$>$0 cm, as illustrated on
+figure~\ref{fig:sample-cau}.  For each year, we created datasets for
+each plot, plus additional datasets consisting of all measurements
+from the same site, in effect a dataset where we consideret the
+different treatments as replicates.
+
+We used fixed values for the minimal root density ($L_m = 0.1
+cm/cm^3$) and specific root lenght ($S_r = 100 m/g$).  The distance
+between rows ($R$) were taken from the experimental setup, 75 cm for
+CAAS and 80 cm for CAU.  Given these, we could create a function that
+calculated the coefficient of determination ($R^2$) for the \oned{}
+model based on root dry mass ($M_r$) and root zone depth ($d_c$) as
+described in section~\ref{sec:model-1d}.  Imposing a soil limit (see
+section~\ref{sec:soillim} did not improve the fit, so we used $d_a =
+d_c$.  For the \twod{} model, we created a similar function based on
+section~\ref{sec:model-rows} that in addition took the horizontal root
+zone radius ($w_c$) as a parameter.  For each dataset, we found the
+parameter values that gave the highest $R^2$ using
+the~\cite{nelder1965simplex} algorithm.
+
+The \oned{} model has two free variables ($M_r$ and $d_c$) as used
+above, while the \twod{} model has three free variables ($M_r$, $d_c$,
+and $w_c$).  Furthermore, as demonstrated in
+section~\ref{sec:mapping}, the \oned{} model is special case of the
+\twod{} model.  This means we can use an F-test on the hypothesis that
+the \twod{} provide no significant advantage over the \oned{} model.
+We used $p=0.05$ as the test criterie.
+
 \section{Results}
+
+The phenological data is shown together with the root sampling date on
+table~\ref{tab:caas-phenology} and~\ref{tab:cau-phenology}.  Note that
+the 2008 sampling were later than the 2007 sampling at the CAU site.
+Final yield are shown on figure~\ref{tab:yield}, and are above Chinese
+average in all cases except plot 21 for the CAAS site.
 
 \begin{table}[htbp]
   \caption{CAAS phenology and root sampling.}
@@ -624,10 +713,10 @@ Plot	& Method	& Strategy	& Plot	& Method	& Strategy\\\hline
 2007-07-25	& 2008-08-01	& Ripening of fruit and seed\\
   \end{tabular}
 \end{table}
-         
+
 \begin{table}[htbp]
   \caption{Final yield.  All numbers are wt weight.  The ``China''
-    number is the average Chinese yield that year, as reported to FAO 
+    number is the average Chinese yield that year, as reported by FAO 
     (\url{http://faostat.fao.org/}).  The ``Average'' number is the 
     average yield for the listed plots.  No yield information was found 
     for CAU 2008 plot 15.}
@@ -649,6 +738,17 @@ Average	& 19.9	& Average	& 44.3	& Average	& 46.9\\
   \end{tabular}
 \end{table}
 
+
+\begin{itemize}
+\item TODO: Describe table~\ref{tab:caas-ftest}.
+  and~\ref{tab:cau-ftest}.
+\item TODO: With exception R2, lowest xx median XX.
+\item TODO: 1D has good R2 when root zone is wide, low otherwise.
+\item TODO: F-test ``succeed'' when root zone is wide, fail otherwise.
+\item TODO: Combined dataset have lower R2 than individual, exception CAU2008.
+\item TODO: Treatment effect: Subsoil potato prd: wide root zone.
+\end{itemize}
+
 \begin{table}[htbp]
   \caption{CAAS model fit.  The best fit for root zone depth ($d_c$),
     root zone diameter ($2 w_c$), and total root dry matter ($M_r$) is show
@@ -659,7 +759,7 @@ Average	& 19.9	& Average	& 44.3	& Average	& 46.9\\
 \label{tab:caas-ftest}
 
 \begin{tabular}{rrrrrrrrr}\\\hline
-Plot	& $d_c$ [cm]	& $2 w_c$ [cm]	& $M_r$ [Mg/ha]	& 2D R$^2$	& 1D R$^2$	& F	& F (0.05)\\\hline
+Plot	& $d_c$ [cm]	& $2\;w_c$ [cm]	& $M_r$ [Mg/ha]	& 2D R$^2$	& 1D R$^2$	& F	& F (0.05)\\\hline
 All	& 93	& 216	& 0.65	& 0.61	& 0.60	& \textbf{5.42}	& 3.88\\
 3	& 91	& 265	& 1.22	& 0.93	& 0.92	& 2.80	& 4.14\\
 6	& 81	& 743	& 1.11	& 0.88	& 0.88	& 0.03	& 4.14\\
@@ -713,6 +813,10 @@ All	& 108	& 45	& 0.25	& 0.92	& 0.13	& \textbf{894.32}	& 3.95\\
 15	& 113	& 47	& 0.26	& 0.89	& 0.11	& \textbf{101.73}	& 4.60\\
   \end{tabular}
 \end{table}
+
+\begin{itemize}
+\item TODO: Decribe root density figs.
+\end{itemize}
 
 \begin{figure}[htbp]
   \input{CAAS-2008-0}\\
@@ -779,6 +883,17 @@ supported by the 2006 CAU data.
 \end{figure}
 
 \section{Discussion and concluding remarks}
+
+\begin{itemize}
+\item TODO: Make text less of a summary.
+\item TODO: Uncertainty fitting flat geometry model to ridge reality.
+\item TODO: Root mass in top of ridge not taken into account.
+\item TODO: CAU: Distribution along y axis not taken into account
+  (overstimate root mass).
+\item TODO: Application in analysis.
+\item TODO: Difference in treatments outside scope of this article.
+\item TODO: Application in model.
+\end{itemize}
 
 We first presented a simple \twod{} extension of the parametric
 \oned{} model found by \cite{gp74}, and shown how to calculate the
