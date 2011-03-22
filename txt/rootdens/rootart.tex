@@ -44,7 +44,7 @@
   model must include a \twod{} root model.  In this paper we extend an
   empirical root density distribution based on densely populated
   homogeneous fields (\oned{}) to row crops (\twod{}).  The row crops
-  are modeled as having a uniform ensity in the direction parallel to
+  are modeled as having a uniform density in the direction parallel to
   the rows, but variable in the direction perpendicular to the row.  In
   each case we demonstrate how to find the distribution parameters from
   the root dry matter and the size of the root zone.
@@ -55,7 +55,7 @@
   experimental years and on multiple plots.  Both the \oned{} and
   \twod{} model are fitted to these datasets.  Based on a statistical
   F-test we conclude that the \twod{} model is superior when the root
-  zone width is less than the distance between rows.  The median $R^2$
+  zone width is less than the distance between rows.  The median R$^2$
   for all the examined datasets is 0.86, and a visual inspection
   confirms that the model catches both the horizontal and vertical root
   density variation pattern.
@@ -73,8 +73,8 @@
 \item MNA: When will SAFIR root data become public?
 \item MNA: Should we have more details on treatments and experimental
   protocol?
-\item Drop tabel~\ref{tab:yield}?
-\item Drop tabel~\ref{tab:caas-phenology} and~\ref{tab:cau-phenology}?
+\item Drop table~\ref{tab:yield}? (Yield)
+\item Drop table~\ref{tab:caas-phenology} and~\ref{tab:cau-phenology}? (Phenology)
 \end{itemize}
 
 \section{Introduction}
@@ -82,12 +82,29 @@
 \begin{itemize}
 \item TODO: PRD er godt
 \item TODO: Modellering af PRD kræver jordfysisk beskrivelse af vand
-  bevægelse i 2 dimensioner, samt en 2D model for rodtæthed (fokus for
+  bevægelse i 2 dimensioner, samt en \twod{} model for rodtæthed (fokus for
   denne artikel).
 \item TODO: Om SAFIR \cite{safir2010}.
-\item TODO: Om Daisy. Udvikling af 2D: \cite{1dvs2d}.  Brug i PRD: \cite{ssoc}
+\item TODO: Om Daisy. Udvikling af \twod{}: \cite{1dvs2d}.  Brug i PRD: \cite{ssoc}
 \item TODO: State-of-the-art rodmodellering.  Motivation for GP2D.
 \end{itemize}
+
+PRD.  At least \twod{}due to dry and wet zone.  Water move from wet to
+dry zone.  Need's Richard's equation.  For looking at the root zone of
+a single crop, radial coordinates can be used.
+E.g. \cite{vrugt2001calibration}, \cite{apri} (PRD). Problem for
+overlapping root zones.  In that case, simplification: Row crops.
+
+...
+
+Partial root zone drying is an irrigation technique where irrigation
+is applied on only part of the root zone, dividing it into a wet and a
+dry zone.  The idea is then that root signals from the dry zone will
+close lower the hydraulic conductivity through of the stomata, and
+thus reduce the transpiration from the wet zone.  For this to work,
+the irrigation scheme must alternate between what part of the root
+zone is wet, and what part is kept dry.  User properly, the technique
+has been showned to provide significant water savings (TODO: REF).
 
 \section{Model theory}
 
@@ -517,16 +534,16 @@ growth.  Hence, for crop growth the different irrigation sources could
 be seen as replicates.  The second aspect was how the design of the
 irrigation system could save water.  Two irrigation methods and three
 irrigation strategies were considered.  The irrigation methods were
-subsurface drip irrigation and ufrrow irrigation.  The irrigation
+subsurface drip irrigation and furrow irrigation.  The irrigation
 strategies were full irrigation, deficit irrigation (70\% of full
 irrigation), and partial rootzone drying (like deficit, but altering
 sides of the crop). 
 
-At the CAAS site, root density sampling was perforemed in 2006 and
+At the CAAS site, root density sampling was performed in 2006 and
 2008.  Unfortunately, the 2006 harvest failed, and the measured root
 densities were below expectations (most measurements showed root
 densities so low, that they would be considered for outside the root
-zone by the model), so we have discarted that data set.  All
+zone by the model), so we have discarded that data set.  All
 treatments were done with three replicates, but due to the labour
 intensive nature of root density sampling, it was only performed on
 selected plots as outlined in table~\ref{tab:caas2008treatments}
@@ -570,7 +587,7 @@ Plot	& Method	& Strategy	& Plot	& Method	& Strategy\\\hline
 \subsection{Root sampling}
 
 Both sites used ridge systems.  To describe it, we use a coordinate
-system with the x-axis ortogonal to the ridges with x=0 cm representing
+system with the x-axis orthogonal to the ridges with x=0 cm representing
 the top of the ridge, the y-axis along the ridges with y=0 cm
 representing the plant position, and the z-axis representing height
 above the undisturbed ground level, positive upwards.  At the CAAS
@@ -580,14 +597,14 @@ the ridge wall, and the bottom of the valley (x=0 cm, x=18.75 cm,
 x=37.5 cm).  The sampling along the y-axis corresponded to the plant
 location, and the middle between two plants (y=0 cm, y=15 cm).  At the
 z-axis, there were sampling in ten  cm intervals starting just below
-the unditurbed ground level (z=-5 cm) at the top of the ridge, and
+the undisturbed ground level (z=-5 cm) at the top of the ridge, and
 starting 10 and 20 cm lower for sampling at the middle and bottom of
 the ridge system.  The sampling points are illustrated on
 figure~\ref{fig:sample-caas}.  A the CAU site, the sampling were done
 in a cross shape, with five sample locations at the top of the ridge
 (x=0 cm; and y=-20 cm, y=-10 cm, y=0 cm, y=10 cm, y=20 cm), and five sample
 locations across the ridge system (y=0 cm; and x=-30 cm, x=-15 cm,
-x=15 cm, x=15 cm, x=30 cm).  The sampling along the top of the ridge
+x=15 cm, x=0 cm, x=30 cm).  The sampling along the top of the ridge
 started at z=15 cm, that is above undisturbed ground level.  The
 sampling across the ridge started at z=-5 cm.  The samplings were
 performed in 10  cm intervals, the lowest varied between plots and with
@@ -640,21 +657,21 @@ dataset we have only used the measurements where y=0 cm.  Furthermore,
 we have ignored the measurements with z$>$0 cm, as illustrated on
 figure~\ref{fig:sample-cau}.  For each year, we created datasets for
 each plot, plus additional datasets consisting of all measurements
-from the same site, in effect a dataset where we consideret the
+from the same site, in effect a dataset where we considered the
 different treatments as replicates.
 
-We used fixed values for the minimal root density ($L_m = 0.1
-cm/cm^3$) and specific root lenght ($S_r = 100 m/g$).  The distance
+We used fixed values for the minimal root density ($L_m = 0.1$
+cm/cm$^3$) and specific root length ($S_r = 100$ m/g).  The distance
 between rows ($R$) were taken from the experimental setup, 75 cm for
 CAAS and 80 cm for CAU.  Given these, we could create a function that
-calculated the coefficient of determination ($R^2$) for the \oned{}
+calculated the coefficient of determination (R$^2$) for the \oned{}
 model based on root dry mass ($M_r$) and root zone depth ($d_c$) as
 described in section~\ref{sec:model-1d}.  Imposing a soil limit (see
-section~\ref{sec:soillim} did not improve the fit, so we used $d_a =
+section~\ref{sec:soillim}) did not improve the fit, so we used $d_a =
 d_c$.  For the \twod{} model, we created a similar function based on
 section~\ref{sec:model-rows} that in addition took the horizontal root
 zone radius ($w_c$) as a parameter.  For each dataset, we found the
-parameter values that gave the highest $R^2$ using
+parameter values that gave the highest R$^2$ using
 the~\cite{nelder1965simplex} algorithm.
 
 The \oned{} model has two free variables ($M_r$ and $d_c$) as used
@@ -663,7 +680,7 @@ and $w_c$).  Furthermore, as demonstrated in
 section~\ref{sec:mapping}, the \oned{} model is special case of the
 \twod{} model.  This means we can use an F-test on the hypothesis that
 the \twod{} provide no significant advantage over the \oned{} model.
-We used $p=0.05$ as the test criterie.
+We used $p=0.05$ as the test criteria.
 
 \section{Results}
 
@@ -738,20 +755,26 @@ Average	& 19.9	& Average	& 44.3	& Average	& 46.9\\
   \end{tabular}
 \end{table}
 
-
-\begin{itemize}
-\item TODO: Describe table~\ref{tab:caas-ftest}.
-  and~\ref{tab:cau-ftest}.
-\item TODO: With exception R2, lowest xx median XX.
-\item TODO: 1D has good R2 when root zone is wide, low otherwise.
-\item TODO: F-test ``succeed'' when root zone is wide, fail otherwise.
-\item TODO: Combined dataset have lower R2 than individual, exception CAU2008.
-\item TODO: Treatment effect: Subsoil potato prd: wide root zone.
-\end{itemize}
+Table~\ref{tab:caas-ftest} and~\ref{tab:cau-ftest} shows the best fit
+root parameters for the \twod{} root density model, as well as the
+coefficient of determination (R$^2$) for both the \twod{} and \oned{}
+models, and the F-test value.  The horizontal root zone radius is the
+parameter that shows the largest variation between treatments, and
+root zone depth is the parameter that shows least variation.  With the
+exception of the early 2008 sampling of CAU plot 12, the \twod{} R$^2$
+is always above 0.55, with a median of 0.86.  The potato (CAAS)
+tend to have a wider root zone and more root mass than the tomato
+(CAU), but no clear difference in root zone depth.  The 2008 CAU
+sampling also shows the smallest deviation between plots.  The \oned{}
+R$^2$ were much lower (less than 0.20) for the plots where the
+estimated \twod{} root zone radius was less than half the distance
+between rows.  The F-test showed that the \twod{} model gave a
+significant better fit for all the aggregate datasets, half the CAAS
+datasets, and all but but three of the CAU datasets.
 
 \begin{table}[htbp]
   \caption{CAAS model fit.  The best fit for root zone depth ($d_c$),
-    root zone diameter ($2 w_c$), and total root dry matter ($M_r$) is show
+    root zone diameter ($2\; w_c$), and total root dry matter ($M_r$) is show
     for each plot.  The `All' plot indicate a dataset containing all
     the individual plots.  Furthermore, the R$^2$ for both the \oned{}
     and \twod{} fits are listed, as well as an F test indicating whether
@@ -759,7 +782,7 @@ Average	& 19.9	& Average	& 44.3	& Average	& 46.9\\
 \label{tab:caas-ftest}
 
 \begin{tabular}{rrrrrrrrr}\\\hline
-Plot	& $d_c$ [cm]	& $2\;w_c$ [cm]	& $M_r$ [Mg/ha]	& 2D R$^2$	& 1D R$^2$	& F	& F (0.05)\\\hline
+Plot	& $d_c$ [cm]	& $2\;w_c$ [cm]	& $M_r$ [Mg/ha]	& \twod{} R$^2$	& \oned{} R$^2$	& F	& F (0.05)\\\hline
 All	& 93	& 216	& 0.65	& 0.61	& 0.60	& \textbf{5.42}	& 3.88\\
 3	& 91	& 265	& 1.22	& 0.93	& 0.92	& 2.80	& 4.14\\
 6	& 81	& 743	& 1.11	& 0.88	& 0.88	& 0.03	& 4.14\\
@@ -782,7 +805,7 @@ All	& 93	& 216	& 0.65	& 0.61	& 0.60	& \textbf{5.42}	& 3.88\\
   \label{tab:cau-ftest}
 
   \begin{tabular}{rrrrrrrrr}\\\hline
-Plot	& $d_c$ [cm]	& $2 w_c$ [cm]	& $M_r$ [Mg/ha]	& 2D R$^2$	& 1D R$^2$	& F	& F (0.05)\\\hline
+Plot	& $d_c$ [cm]	& $2 w_c$ [cm]	& $M_r$ [Mg/ha]	& \twod{} R$^2$	& \oned{} R$^2$	& F	& F (0.05)\\\hline
 \multicolumn{8}{c}{2007-05-30} \\
 All	& 78	& 96	& 0.18	& 0.63	& 0.49	& \textbf{43.69}	& 3.93\\
 1	& 56	& 48	& 0.11	& 0.84	& 0.40	& \textbf{53.28}	& 4.38\\
@@ -814,9 +837,25 @@ All	& 108	& 45	& 0.25	& 0.92	& 0.13	& \textbf{894.32}	& 3.95\\
   \end{tabular}
 \end{table}
 
-\begin{itemize}
-\item TODO: Decribe root density figs.
-\end{itemize}
+The aggregate datasets have an R$^2$ for the \twod{} model are lower
+than for the individual datasets, except for the two 2008 CAU
+samplings.  We see on figure~\ref{fig:caas2008}, \ref{fig:cau2007},
+and~\ref{fig:cau2008} that the CAU 2008 aggregate datasets also have
+the lowest standard deviation between plots.  The CAAS 2008 aggregate
+dataset has the highest standard deviation, reflecting the fact that
+half the model parameter fits shows a wide root zone, and the other
+half a narrow root zone.  Both plots using subsoil drip irrigation and
+partial rootzone drying for the CAAS site show a wide root zone, and
+both plots with subsoil drip and ``normal'' deficit irrigation show a
+relatively narrow root zone.  However, one of the fully irrigated
+subsoil plots has a wide root zone, and the other a narrow root zone.
+The three samplings at the CAU site that shows a wide root zone
+represent both irrigation methods and both irrigation strategies.
+However, the two 2008 sampling at CAU shows a tendency of the roots to
+concentrate near the center of the row, as illustrated on
+figure~\ref{fig:tworows}.  The tendency is partly supported by the
+2007 data, where the root zone sampling was performed earlier
+(table~\ref{tab:cau-phenology}).
 
 \begin{figure}[htbp]
   \input{CAAS-2008-0}\\
@@ -867,11 +906,6 @@ All	& 108	& 45	& 0.25	& 0.92	& 0.13	& \textbf{894.32}	& 3.95\\
   \label{fig:cau2008}
 \end{figure}
 
-No clear pattern emerge on the effect of the irrigation treatment on
-the root zone.  The 2008 CAU data points toward a contraction of the
-root zone for all treatments between the first and the second
-sampling, see figure~\ref{fig:cau2008}.  This pattern is partly
-supported by the 2006 CAU data.
 \begin{figure}[htbp]
   \input{CAU2008a}\\
   \input{CAU2008b}
@@ -884,51 +918,44 @@ supported by the 2006 CAU data.
 
 \section{Discussion and concluding remarks}
 
-\begin{itemize}
-\item TODO: Make text less of a summary.
-\item TODO: Uncertainty fitting flat geometry model to ridge reality.
-\item TODO: Root mass in top of ridge not taken into account.
-\item TODO: CAU: Distribution along y axis not taken into account
-  (overstimate root mass).
-\item TODO: Application in analysis.
-\item TODO: Difference in treatments outside scope of this article.
-\item TODO: Application in model.
-\end{itemize}
+A major source of uncertainty is the mapping of the 3D ridge geometry
+to a 2D flat surface.  For both sites, we ignore the root mass that
+are placed in the top of the ridge.  We also ignore that the ridge
+valley does not contain any soil.  For the CAU site we furthermore
+ignore the third dimension, using only measurements at y = 0 cm where
+the root density is highest.  These systematic errors affect the
+estimate of all three parameters, but especially the root dry mass.
+However, a comparison between plots at the same site should still be
+valid.
 
-We first presented a simple \twod{} extension of the parametric
-\oned{} model found by \cite{gp74}, and shown how to calculate the
-distribution parameters for the model from root mass, root zone depth,
-and root zone width.
+The statistical analysis (table~\ref{tab:caas-ftest}
+and~\ref{tab:cau-ftest}) shows us that the presented \twod{} model
+constitute a significant improvement over the \oned{} model,
+especially in the cases where the root zone from the individual row is
+narrow.  Furthermore, visual inspection of observed data vs.\@
+predicted data (figure~\ref{fig:caas2008},~\ref{fig:cau2007},
+and~\ref{fig:cau2008}) shows that the model provides a good match for
+both the horizontal and vertical changes in root density.  Based on
+this we believe that the model will be useful for the intended purpose
+of simulating soil water dynamics in row crops.
 
-We then examined 28 datasets, plus five more that were created by
-aggregating data from different plots.  The datasets spanned two
-sites, two years, and two different sample dates within the same
-growing season.  For the CAAS site we 8 \threed{} dataset, plus one
-aggregated dataset.  For the CAU site we have 20 \twod{} datasets,
-plus 4 aggregated dataset.  
-
-The \twod{} model was a significant improvement over the \oned{} model
-for all the aggregated datasets, half the \threed{} datasets, and 17
-of the 20 \twod{} datasets.  The \twod{} model is never worse than the
-\oned{} model.  For all the cases where we were unable to show a
-statistically significant improvement for the \twod{} model, the best
-fit for the root zone width was at least three times the distance
-between rows, indicating a situation where there root zones of the
-different plant rows were fully merged.  The $R^2$ values range from
-0.73 to 0.96 for 27 of 28 datasets, with the last dataset having $R^2
-= 0.30$.  For the aggregated datasets, $R^2$ range from 0.56 to 0.92.  
-
-Based on this we believe the proposed model is useful for the intended
-purpose of modelling water dynamics in row crops with PRD irrigation.
+Additionally, we believe that conversion of root density measurements
+to general crop parameters (root dry mass, root zone depth, and root
+zone radius) will be useful when analysing the effect of treatments,
+climate, or soil type on root development.  Such an analysis is
+outside the scope of this paper, but the numbers presented on
+table~\ref{tab:caas-ftest} and~\ref{tab:cau-ftest} do not give a clear
+indication of the difference in treatments being the main factor in
+the difference between plots.
 
 \section{Software and data availability}
 
-Software to estimate root mass and root zone depth from 1D root
-density data, and in addition root zone width from 2D root density
-data, can be found at \url{http://www.daisy-model.org/} (look under
-\texttt{Wiki}, \texttt{\textsc{gp2d}}).  Also supported is estimating
-root density distribution from root mass, root zone depth, and
-optionally, root zone width.  The program code is written in
+Software to estimate root mass and root zone depth from \oned{} root
+density data, and in addition root zone width from \twod{} root
+density data, can be found at \url{http://www.daisy-model.org/} (look
+under \texttt{Wiki}, \texttt{\textsc{gp2d}}).  Also supported is
+estimating root density distribution from root mass, root zone depth,
+and optionally, root zone width.  The program code is written in
 \cplusplus{} and is covered by on open source license (\textsc{gnu
   lgpl}), so it can be freely incorporated in other models.
 
