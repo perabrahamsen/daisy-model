@@ -3,9 +3,10 @@ set output "sample-caas.tex"
 set yrange [-25:25]
 set xrange [-40:40]
 set zrange [-70:40]
-set xlabel "x"    
-set ylabel "y"    
-set zlabel "z"    
+set ztics ("50" -50, "25" -25, "0" 0, "-25" 25)
+set xlabel "$x$ [cm]"    
+set ylabel "$y$ [cm]"    
+set zlabel "$z$ [cm]" rotate   
 set ticslevel 0
 splot '-' using 2:1:3 with points notitle, 15*cos(x*2*pi/75) with lines notitle
 0 0 -7.5

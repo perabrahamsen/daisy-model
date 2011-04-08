@@ -1,6 +1,9 @@
+set ylabel "$z$ [cm]"
+set xlabel "$L$ [cm/cm$^3$]"
 set yrange [-60:0]
+set ytics ("0" 0, "25" -25, "50" -50)
 set xrange [0:2]
-set terminal epslatex size 2.5in,1.6in color
+set terminal epslatex size 2.5in,2in color
 set key right Right bottom
 # set format x ""
 
@@ -8,7 +11,8 @@ set key right Right bottom
 # set format x "%g"
 
 set output "CAAS-2008-0.tex"
-plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines
+set title "(a) $x$ = 0 cm"
+plot '-' using 2:1:3 title "Obs" with xerrorbars, '-' using 2:1 title "Est" with lines
 -7.5	2.96922	1.84822
 -20	1.55482	0.639438
 -30	0.841287	0.532383
@@ -122,7 +126,8 @@ e
 e
 
 set output "CAAS-2008-18.tex"
-plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines
+set title "(b) $x$ = 18.75 cm"
+plot '-' using 2:1:3 title "Obs" with xerrorbars, '-' using 2:1 title "Est" with lines
 -20	1.48909	1.16549
 -30	0.533554	0.264573
 -40	0.327701	0.173756
@@ -235,7 +240,8 @@ e
 e
 
 set output "CAAS-2008-37.tex"
-plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines
+set title "(c) $x$ = 37.5 cm"
+plot '-' using 2:1:3 title "Obs" with xerrorbars, '-' using 2:1 title "Est" with lines
 -30	0.312401	0.0972009
 -40	0.177211	0.0845735
 -50	0.13202	0.0759612
@@ -347,7 +353,8 @@ e
 e
 
 set output "CAU-2007a-0.tex"
-plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines
+set title "(a) $x$ = 0 cm (2007 early)"
+plot '-' using 2:1:3 title "Obs" with xerrorbars, '-' using 2:1 title "Est" with lines
 -5	0.796	0.144651
 -15	0.635	0.0892749
 -25	0.345	0.106066
@@ -460,7 +467,8 @@ e
 e
 
 set output "CAU-2007a-15.tex"
-plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines
+set title "(c) $x$ = 15 cm (2007 early)"
+plot '-' using 2:1:3 title "Obs" with xerrorbars, '-' using 2:1 title "Est" with lines
 -5	0.6733	0.257236
 -15	0.454444	0.145611
 -25	0.322	0.126732
@@ -572,7 +580,8 @@ e
 e
 
 set output "CAU-2007a-30.tex"
-plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines
+set title "(e) $x$ = 30 cm (2007 early)"
+plot '-' using 2:1:3 title "Obs" with xerrorbars, '-' using 2:1 title "Est" with lines
 -5	0.3687	0.210068
 -15	0.3295	0.13974
 -25	0.2265	0.0911057
@@ -683,7 +692,8 @@ e
 e
 
 set output "CAU-2007b-0.tex"
-plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines
+set title "(b) $x$ = 0 cm (2007 late)"
+plot '-' using 2:1:3 title "Obs" with xerrorbars, '-' using 2:1 title "Est" with lines
 -5	1.968	0.372312
 -15	1.943	0.274237
 -25	1.132	0.262118
@@ -796,7 +806,8 @@ e
 e
 
 set output "CAU-2007b-15.tex"
-plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines
+set title "(d) $x$ = 15 cm (2007 late)"
+plot '-' using 2:1:3 title "Obs" with xerrorbars, '-' using 2:1 title "Est" with lines
 -5	0.9615	0.615676
 -15	0.8335	0.486061
 -25	0.572	0.312532
@@ -908,7 +919,8 @@ e
 e
 
 set output "CAU-2007b-30.tex"
-plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines
+set title "(f) $x$ = 30 cm (2007 late)"
+plot '-' using 2:1:3 title "Obs" with xerrorbars, '-' using 2:1 title "Est" with lines
 -5	0.315	0.113413
 -15	0.3978	0.215827
 -25	0.355	0.151723
@@ -1019,7 +1031,8 @@ e
 e
 
 set output "CAU-2008a-0.tex"
-plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines
+set title "(a) $x$ = 0 cm (2008 early)"
+plot '-' using 2:1:3 title "Obs" with xerrorbars, '-' using 2:1 title "Est" with lines
 -5	1.024	0.1347
 -15	1.004	0.177381
 -25	0.724	0.0412795
@@ -1130,7 +1143,8 @@ e
 e
 
 set output "CAU-2008a-15.tex"
-plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines
+set title "(c) $x$ = 15 cm (2008 early)"
+plot '-' using 2:1:3 title "Obs" with xerrorbars, '-' using 2:1 title "Est" with lines
 -5	0.592	0.249512
 -15	0.585	0.265904
 -25	0.432	0.307142
@@ -1242,7 +1256,8 @@ e
 e
 
 set output "CAU-2008a-30.tex"
-plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines
+set title "(e) $x$ = 30 cm (2008 early)"
+plot '-' using 2:1:3 title "Obs" with xerrorbars, '-' using 2:1 title "Est" with lines
 -5	0.288	0.095373
 -15	0.313	0.094451
 e
@@ -1351,7 +1366,8 @@ e
 e
 
 set output "CAU-2008b-0.tex"
-plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines
+set title "(b) $x$ = 0 cm (2008 late)"
+plot '-' using 2:1:3 title "Obs" with xerrorbars, '-' using 2:1 title "Est" with lines
 -5	1.68	0.190997
 -15	1.562	0.104575
 -25	1.054	0.148405
@@ -1462,7 +1478,8 @@ e
 e
 
 set output "CAU-2008b-15.tex"
-plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines
+set title "(d) $x$ = 15 cm (2008 late)"
+plot '-' using 2:1:3 title "Obs" with xerrorbars, '-' using 2:1 title "Est" with lines
 -5	0.611	0.120868
 -15	0.517	0.0875271
 -25	0.384	0.0906863
@@ -1574,7 +1591,8 @@ e
 e
 
 set output "CAU-2008b-30.tex"
-plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines
+set title "(f) $x$ = 30 cm (2008 late)"
+plot '-' using 2:1:3 title "Obs" with xerrorbars, '-' using 2:1 title "Est" with lines
 -5	0.287778	0.0573058
 -15	0.246	0.0765768
 e

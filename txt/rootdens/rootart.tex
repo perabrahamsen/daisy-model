@@ -1,3 +1,5 @@
+%%\documentclass[twocolumn,final]{svjour3}
+%%\usepackage{mathptmx}
 \documentclass[a4paper,11pt,twoside]{article}
 \usepackage{a4}
 \usepackage[T1]{fontenc}
@@ -6,27 +8,30 @@
 \usepackage{hyperref}
 \usepackage{natbib}
 \usepackage{graphicx}
+\usepackage[left,running]{lineno}
+\usepackage{setspace}
 \input{macro}
-
-% MMO
-% L_z -> L(z)
-% L_{z,x} -> L(x,z)
 
 \newcommand{\attmark}[1]{\mbox{$^{\mbox{\footnotesize #1}}$}}
 \newcommand{\twod}{\textsc{2d}}
 \newcommand{\oned}{\textsc{1d}}
 \newcommand{\threed}{\textsc{3d}}
+
+
+\doublespace
+
 \begin{document}
+
+\linenumbers
 
 \title{A simple parametric \twod{} root density distribution model
   for row crops.}  
 
 \author{Per Abrahamsen\attmark{a,}\footnote{Corresponding author.
     Present address: IGM LIFE KU, Thorvaldsensvej 40, DK-1871
-    Frederiksberg.  Email: pa@life.ku.dk}, 
-  Mathias Neumann Andersen\attmark{b}, Xuebin Qi\attmark{c},\\
-  Guitong Li\attmark{d}, Mikkel Mollerup\attmark{a},
-  and Søren Hansen\attmark{a}\\
+    Frederiksberg.  Email: pa@life.ku.dk} \and 
+  Mathias Neumann Andersen\attmark{b} \and Søren Hansen\attmark{a} \and
+  Guitong Li\attmark{d} \and Mikkel Mollerup\attmark{a} \and Xuebin Qi\attmark{c}\\
   \\
   \small\em\attmark{a}University of Copenhagen, Denmark\\
   \small\em\attmark{b}Aarhus University,
@@ -37,27 +42,25 @@
 \maketitle
 
 \begin{abstract}
-  Partial root zone drying (PRD) is an irrigation technique that in some
-  cases can increase the water usage efficiency.  A \twod{} model of
-  water movement in the soil is needed to predict how to most
-  efficiently apply irrigation in order to achieve the PRD effect.  This
-  model must include a \twod{} root model.  In this paper we extend an
-  empirical root density distribution based on densely populated
-  homogeneous fields (\oned{}) to row crops (\twod{}).  The row crops
-  are modeled as having a uniform density in the direction parallel to
-  the rows, but variable in the direction perpendicular to the row.  In
-  each case we demonstrate how to find the distribution parameters from
-  the root dry matter and the size of the root zone.
+  A \twod{} model of water movement in the soil is needed to predict
+  how to most efficiently apply irrigation in order to achieve partial
+  root zone drying.  This model must include a \twod{} root model.  In
+  this paper we extend an empirical root density distribution based on
+  densely populated homogeneous fields (\oned{}) to row crops
+  (\twod{}).  The row crops are modeled as having a uniform density in
+  the direction parallel to the rows, but variable in the plane
+  perpendicular to the row.  In each case we demonstrate how to find
+  the distribution parameters from the root dry matter and the size of
+  the root zone.
 
-  The SAFIR EU project included \twod{} root density measurements
-  performed at two sites, near Zhengzhou and Beijing respectively, for
-  two experimental years and on multiple plots.  Both the \oned{} and
-  \twod{} model are fitted to these datasets.  Based on a statistical
-  F-test we conclude that the \twod{} model is superior when the root
-  zone width is less than the distance between rows.  The median R$^2$
-  for all the examined datasets is 0.86, and a visual inspection
-  confirms that the model catches both the horizontal and vertical
-  root density variation.
+  \twod{} root density measurements was performed at two sites for two
+  experimental years and multiple plots.  Both the \oned{} and \twod{}
+  model are fitted to these datasets.  Based on a statistical F-test
+  we conclude that the \twod{} model is superior when the root zone
+  width is less than the distance between rows.  The median of the
+  coefficient of determination for all the examined datasets is 0.86,
+  and a visual inspection confirms that the model catches both the
+  horizontal and vertical root density variation.
 \end{abstract}
 
 \section{Introduction}
@@ -72,28 +75,28 @@ technique has been shown to provide significant water savings
 alternate between what part of the root zone is wet, and what part is
 kept dry. (MNA-TODO: REF-SAFIR/Fulai) recommends that (MNA-TODO:
 SAFIR/Fulai strategy).  When these conditions are fulfilled is
-determined by the movement of water through the soil matrix from the
-wet zone to the dry zone, and the water uptake through the plant
-roots.  The established solution to the first is based on Richards
-equation \citep{richardseq}.  The formulation must be at least \twod{}
-to include both the vertical and a horizontal component.
+determined by both the movement of water through the soil matrix from
+the wet zone to the dry zone, and by the water uptake through the
+plant roots.  The established solution to the first is based on
+Richards equation \citep{richardseq}.  The formulation must be at
+least \twod{} to include both the vertical and a horizontal component.
 
 The issue of water uptake from the soil matrix through the roots can
 be broken into the total uptake (approximately equal to the
 transpiration), and the spatial distribution within the root zone.
-With PRD irrigation, the transpiration will depend on the
-distribution, due to the reliance of root signals, see
-e.g.\@~\cite{ssoc}.  This makes the spatial distribution even more
-important.  Several models incorporating this exists,
-e.g.\@~\cite{vrugt2001calibration} proposes a flexible, empirical
-\twod{} model with a radial geometry, which \cite{apri} successfully
-use to model PRD irrigation of a vineyard.  A static description of
-the root density based on measurements was used in the later
-application.  For perennial plants using a static description during
-the irrigation season can make sense, but for annual plants, such as
-most vegetables, the root zone is too dynamic.  A root growth model
-for row crops based on diffusion theory was proposed
-in~\cite{acock1996convective}. In general the model required a
+With PRD irrigation, the transpiration will depend on the spatial
+distribution, due to the reliance of root signals.  This makes the
+spatial distribution even more important.  Several models
+incorporating this exists, e.g.\@~\cite{vrugt2001calibration} proposes
+a flexible, empirical \twod{} root model with a radial geometry, which
+\cite{apri} successfully use to model PRD irrigation of a vineyard.  A
+static description of the root density based on measurements was used
+in the later application.  For perennial plants using a static
+description of the root zone during the irrigation season can make
+sense, but for annual plants, such as most vegetables, the root zone
+must be considered dynamic.  A dynamic root growth model for row crops
+based on diffusion theory was proposed
+in~\cite{acock1996convective}. In general this model required a
 numerical solution, but analytical solutions for special cases were
 found by~\cite{willigen2002two}.
 
@@ -101,43 +104,45 @@ The \twod{} radial and the \threed{} root density models typically
 include only a single plant.  In contrast, \oned{} models by their
 nature will be concerned with a whole population, like a forest or an
 agricultural crop.  An example of the later would be the model found
-by~\cite{gp74} in a meta-analysis, where they found an exponential
-decrease with depth to match the observations.  The root models
-mentioned above are parametric, the root are described as a density
-function, where the parameters are position in space relative to the
-plant and soil surface.  In contrast architectural root models track
-the structure and branches of the roots.  See \cite{wang2004modelling}
-for an overview of existing \oned{}, \twod{}, and \threed{} root
-models, both parametric and architectural.  
+by~\cite{gp74} based on a meta-analysis, where they found an
+exponential decrease with depth to match the observations.  The root
+models mentioned above are parametric, the root are described as a
+density function, where the parameters are position in space relative
+to the plant and soil surface.  In contrast architectural root models
+track the structure and branches of the roots.  See
+\cite{wang2004modelling} for an overview of existing \oned{}, \twod{},
+and \threed{} root models, both parametric and architectural.
 
 For looking at the root zone of a single plant, radial coordinates are
 a good match.  But when the root zones of the plants overlap, the
 problem becomes \threed{}.  Solving Richards equation in \threed{} is
 complex and results in long simulation times.  Finding a \twod{}
 approximation is therefore desirable.  In this paper we therefore
-propose a \twod{} model with Euclidean coordinates for row crops.  The
-assumption is that the row is sufficiently dense in the direction of
-the rows that we can ignore that dimension.  The two dimensions then
-become depth, and horizontal distance from the row.  The assumption is
-obviously from for the very young crop, but at that stage PRD
-irrigation is not feasible.
+propose a simple \twod{} model with Euclidean coordinates for row
+crops, based on on an extension of \cite{gp74}.  The assumption is
+that the row is sufficiently dense in the direction of the rows so we
+can ignore that dimension.  The two dimensions then become depth and
+horizontal distance from the row.  The proposed model static in that
+it doesn't include root growth, but it can be parametrized dynamically
+based on root mass and the depth and width of the root zone.
 
-The new root zone model was used in the SAFIR (SAFe IRrigation) EU
-project \citep{safir2010,ssoc} as part of the Daisy agro-ecological
-model \citep{daisy-fertilizer,daisy-ems}.  The SAFIR project had two
+The new root model was used in the SAFIR (SAFe IRrigation) EU project
+\citep{safir2010,ssoc} as part of the Daisy agro-ecological model
+\citep{daisy-fertilizer,daisy-ems}.  The SAFIR project had two
 aspects, the first being assessment of the risk for human health with
 regard to use of waster water for irrigation
-\citep{Forslund2010440,Surdyk2010451}, and water saving irrigation
-techniques, in particular PRD \citep{Jensen2010403}.  There were five
-experimental sites, three in Europe, and two in China, and three crops,
-potatoes, fresh tomatoes, and processing tomatoes.  For the two
-Chinese sites root density was measured. The original \oned{} Daisy
-model was extended to \twod{} \citep{1dvs2d}, and used for modelling
-the experiments.  The original Daisy crop model calculates root dry
-mass and root zone depth, and assumes a root density distribution
-following \cite{gp74}.  With the \twod{} extension root zone width was
-added to the crop model, as well as the root zone density distribution 
-model discussed in this paper.
+\citep{Forslund2010440,Surdyk2010451}, and the second water saving
+irrigation techniques, in particular PRD \citep{Jensen2010403}.  There
+were five experimental sites, three in Europe, and two in China, and
+three crops, potatoes, fresh tomatoes, and processing tomatoes.  For
+the two Chinese sites root density was measured. The original Daisy
+soil water model was extended from \oned{} to \twod{} \citep{1dvs2d},
+and used for modelling the experiments.  The original Daisy crop model
+\citep{eupotato} calculates root dry mass and root zone depth, and
+assumes a root density distribution following \cite{gp74}.  With the
+\twod{} extension root zone radius was added to the crop model, as
+well as the root zone density distribution model discussed in this
+paper.
 
 \section{Model theory}
 
@@ -145,92 +150,86 @@ Our goal is to describe the two dimensional root density distribution
 for row crops in terms of root dry mass, root zone depth, and root
 zone width.  These values can be provided by a general crop growth
 model (like the one found in Daisy), and furthermore have the
-advantage that they have a physical meaning.  However, first we will
-describe for a traditional one dimensional root density distribution
-in terms of root dry mass and root zone width.  This will provide a
-reference to compare with later.
+advantage that they all have a physical meaning.  However, first we
+will describe a traditional one dimensional root density distribution
+in terms of root dry mass and root zone depth.  This will provide a
+reference for later comparison.
 
 \subsection{Densely populated fields}
 \label{sec:model-1d}
 
-In accordance with \cite{gp74}, the root density distribution $L_z$
+In accordance with \cite{gp74}, the root density distribution $L\,(z)$
 for a crop can be described by
 \begin{equation}
-  L_z = L_0\, e^{-a z}
+  L\,(z) = L_0\, e^{-a z}
   \label{eq:g+p}
 \end{equation}
 where $L_0$ is the root density at the soil surface, $a$ is a
-distribution parameter, and $z$ is the depth below soil surface.
+distribution parameter, and $z$ is the depth below soil surface.  We
+here assume that the density is uniformly distributed on the
+horizontal plane, an assumption that fails with e.g.\ row crops.  The
+parameters $a$ and $L_0$ will both vary with time.  For a production
+oriented simulation model like Daisy, it can be more convenient to
+specify the density in terms of accumulated root dry matter $M_r$ and
+total root depth $d_c$ \citep{daisyN}.
 
-We here assume that the density is uniformly distributed on the
-horizontal plane, an assumption that fails with e.g.\ row crops.
-
-The parameters $a$ and $L_0$ will both vary with time.  For a
-production oriented simulation model like Daisy, it can be more
-convenient to specify the density in terms of accumulated root dry
-matter $M_r$ and total root depth $d_c$\citep{daisyN}.
-
-We define the root depth at the lowest depth where the root density is
-at above specified threshold $L_m$.  By inserting this in
-\eqref{eq:g+p}, we get
+We define the root depth at the depth where the root density is at a
+specified threshold $L_m$.  By inserting this in \eqref{eq:g+p}, we
+get
 \begin{equation}
-  L_m = L_{d_c} = L_0\, e^{-a d_c}
+  L_m = L_0\, e^{-a \, d_c}
   \label{eq:root-depth}
 \end{equation}
-
 We convert the root mass to root length $l_r$ by assuming the specific
 root length $S_r$ is a known constant
 \begin{equation}
   l_r = S_r \, M_r
   \label{eq:root-length}
 \end{equation}
-
 The total root length is also the integral of the root density over
 the profile
 \begin{equation}
-  l_r = \int_0^{\infty} L_z \: dz 
+  l_r = \int_0^{\infty} L\, (z) \: dz 
       = \int_0^{\infty} L_0\, e^{-a z} \, dz 
       = \frac{L_0}{a}
   \label{eq:root-integral}
 \end{equation}
-
 By inserting the expression we get for $L_0$ from
 \eqref{eq:root-integral} in \eqref{eq:root-depth} we get
 \begin{equation}
-  L_m = l_r \, a \, e^{-a d_c}
+  L_m = l_r \, a \, e^{-a \, d_c}
   \label{eq:a-only}
 \end{equation}
-
-If we substitute $W = -a d_c$ and isolate the known values on the right
+If we substitute $W = -a \, d_c$ and isolate the known values on the right
 side this gives us
 \begin{equation}
    W e^W = - L_m \frac{d_c}{l_r}
   \label{eq:Lambert}
 \end{equation}
 The solution to this equation with regard to $W$ happens to be the
-definition of the Lambert-W function \citep{euler83,lambert58}.  The
-function on the left hand side of the equation is depicted on
-figure~\ref{fig:W}. 
+definition of the Lambert-W function \citep{lambert58,euler83}.  The
+expression on the left hand side of the equation is depicted on
+figure~\ref{fig:W}.
 \begin{figure}[htbp]
   \input{rootdens_W}
-  \caption{$W e^W$}
+  \caption{The Lambert-W expression ($W e^W$).}
   \label{fig:W}
 \end{figure}
-
-Since we now know the value for $W$, we can find the desired density
+After finding a value for $W$, we can find the desired density
 parameters $L_0$ and $a$ by substituting back
 \begin{eqnarray}
    a   &=& -W / d_c\\\label{eq:a-solved}
-   L_0 &=& \frac{L_m}{e^{-a d_c}} = L_m e^{a d_c}\label{eq:L0-found}
+   L_0 &=& \frac{L_m}{e^{-a \, d_c}} = L_m e^{a \, d_c}\label{eq:L0-found}
 \end{eqnarray}
 
 \subsubsection{Numeric solution to $W$}
 \label{sec:W}
 
-We start by dividing the functions into monotonic intervals by finding
-the derivative
+In order to solve \eqref{eq:Lambert} with regard to $W$, we first
+divide the expression into monotonic intervals by finding the
+derivative
 \begin{equation}
-  \frac{d W\, e^W}{dW} = e^W + W e^W
+  \frac{d \, (W e^W)}{dW} = e^W + W e^W
   \label{eq:derived-W}
 \end{equation}
 The equation
@@ -239,14 +238,15 @@ The equation
   \label{eq:derived-W-solutions}
 \end{equation}
 has one solution, $W=-1$. The expression $W\, e^W$ is decreasing below
-$-1$ and increasing above $-1$.  Thus, $W=0$ is a global minimum.
+$-1$ and increasing above $-1$.  Thus, a global minimum is obtained
+for $W=-1$.
 
-Since $\lim_{W\to-\infty} W\,e^W=0$ we get a single solution when
-$-L_m \frac{d_c}{l_r}$ is exactly at the bottom point ($-1 e^{-1}$), two
-when it is above (it is never positive), and none when it is below.
-The later situation corresponds to the case where there is
-insufficient root $l_r$ to satisfy the minimal root density $L_m$
-within the given root zone $d_c$.
+Since $\lim_{W\to-\infty} W\,e^W=0$ we get a single solution
+to~\eqref{eq:Lambert} when $-L_m \frac{d_c}{l_r}$ is exactly at the
+bottom point ($-1 e^{-1}$), two when it is above (it is never
+positive), and none when it is below.  The later situation corresponds
+to the case where there is insufficient root $l_r$ to satisfy the
+minimal root density $L_m$ within the given root zone $d_c$.
 
 Both solutions are valid, but represent different distributions.
 \begin{itemize} 
@@ -255,7 +255,7 @@ Both solutions are valid, but represent different distributions.
   the solution corresponds to a root zone with a high density near the
   top that decreases rapidly to $L_m$ at the bottom of the root zone,
   and continues to decrease so only a small contribution to the total
-  root length come from below he root zone.
+  root length come from below the root zone.
 \item The solution for $W > -1$ (and thus small values of $a$ and
   $L_0$) corresponds to a low root density near the top that
   decreases slowly, and thus gives a larger contribution to the total
@@ -285,19 +285,19 @@ root depth $d_a$ is then the shallowest of these two.
   \label{eq:actual-depth}
 \end{equation}
 
-We now create a modified root density function $L_z^\prime$ by
+We now create a modified root density function $L^\prime (z)$ by
 defining it to zero below $d_a$, and scaled to preserve mass balance
 above.
 \begin{equation}
-  L_z^\prime =
+  L^\prime (z) =
   \begin{cases}
-    k^\prime L_z & \text{if $z \leq d_a$}\\
-    0 & \text{if $z > d_a$}
+    k^\prime L\, (z) & \text{for $z \leq d_a$}\\
+    0 & \text{for $z > d_a$}
   \end{cases}
   \label{eq:limited-depth}
 \end{equation}
 \begin{equation}
-  k^\prime = \frac{l_r}{\int_0^{d_a} L_z \, dz}
+  k^\prime = \frac{l_r}{\int_0^{d_a} L\, (z) \, dz}
           = \frac{l_r\; a}{L_0 - L_0  \; e^{-a\; d_a}}
   \label{eq:scale-factor}
 \end{equation}
@@ -307,14 +307,14 @@ above.
 We can describe a row crop with a two dimensional model by assuming
 that the plants are densely packed in the row.  Our second dimension
 $x$ is horizontal, orthogonal to the row.  The root density at a
-specific point can be denoted $L_{z,x}$, and we choose a coordinate
-system where $L_{0,0}$ is the the root density in the top center of
-the row.  We then define the following root distribution
+specific point can be denoted $L\, (x,z)$, and we choose a coordinate
+system where $L\, (0,0)$ (or $L_{0,0}$) is the root density in the
+top center of the row.  We then define the following root distribution
 \begin{equation}
-  L_{z,x} = L_{0,0}\, e^{-a_z z} e^{-a_x |x|}
-  \label{eq:Lzx}
+  L\, (x,z) = L_{0,0}\, e^{-a_z z} e^{-a_x |x|}
+  \label{eq:Lxz}
 \end{equation}
-where $a_z$ and $a_z$ control the density decrease in the two
+where $a_z$ and $a_x$ control the density decrease in the two
 dimensions.
 
 \subsubsection{Finding the parameters}
@@ -324,26 +324,28 @@ that the root depth and root mass are known, and now additionally that
 the root zone radius at soil surface $w_c$ is known.  We define the
 root zone depth $d_c$ to be the depth right below the row ($x = 0$)
 where the root density is $L_m$.  As $x=0$ is the place where
-\eqref{eq:Lzx} predicts the highest density, the average root density
+\eqref{eq:Lxz} predicts the highest density, the average root density
 at that depth will be below $L_m$.  Similarly, we define the radius
 $w_c$ as the horizontal distance from the row where the root density
 at the surface ($z = 0$) is equal to $L_m$.
 \begin{equation}
-  L_m = L_{d,0} = L_{0,r}
+  L_m = L\, (0,d_c) = L\,(w_c,0)
   \label{eq:minroot}
 \end{equation}
 See figure~\ref{fig:row} for an illustration.
 \begin{figure}[htbp]
   \input{row}
-  \caption{The \twod{} root zone of a single row of crops.  The x-axis
-    denotes horizontal distance to the row, and the z-axis height
-    above ground level.  The highest root density ($L_{0,0}$) can be
-    found in the row at ground level.  The root density decreases
+  \caption{The \twod{} root zone of a single row of crops.  
+    %%The x-axis
+    %%denotes horizontal distance to the row, and the z-axis depth below
+    %%ground level.  
+    The highest root density ($L_{0,0}$) can be found
+    in the row at ground level.  The root density decreases
     exponentially, with both horizontal and vertical distance.  Four
-    root density contours are shown.  The three innermost contours
+    root density isolines are shown.  The three innermost isolines
     each represents a fixed decrease in root density.  The last
-    contour represents the threshold value, $L_m$, and defines both
-    the root zone depth ($d_c$) and the root zone radius ($w_r$).}
+    isoline represents the threshold value, $L_m$, and defines both
+    the root zone depth ($d_c$) and the root zone radius ($w_c$).}
   \label{fig:row}
 \end{figure}
 
@@ -351,38 +353,38 @@ The total root length on one side of the row ($l_R$), which we assume
 is known from our crop model, is the integral of the root density over
 the half plane
 \begin{equation}
-    l_R = \int_0^{\infty} \int_0^{\infty} L_{z,x} \: dz \, dx = \frac{L_{0,0}}{a_z a_x}
+    l_R = \int_0^{\infty} \int_0^{\infty} L\, (x,z) \: dz \, dx = \frac{L_{0,0}}{a_z a_x}
 %%        = \int_0^{\infty} \int_0^{\infty} L_{0,0}\, e^{-a_z z} e^{-a_x |x|} \: dz \, dx
   \label{eq:root-integral2}
 \end{equation}
-Thus \eqref{eq:Lzx} can be rewritten 
+Thus \eqref{eq:Lxz} can be rewritten 
 \begin{equation}
-  L_{z,x} = l_R\, a_z\, a_x \, e^{-a_z z} e^{-a_x |x|}  
-  \label{eq:azx}
+  L\, (x,z) = l_R\, a_z\, a_x \, e^{-a_z z} e^{-a_x |x|}  
+  \label{eq:axz}
 \end{equation}
-By using \eqref{eq:azx} in \eqref{eq:minroot} we get
+By using \eqref{eq:axz} in \eqref{eq:minroot} we get
 \begin{eqnarray}
-  L_m &=& l_R\, a_z\, a_x \, e^{-a_z d} \\\label{eq:Ld0}
-  L_m &=& l_R\, a_z\, a_x \, e^{-a_x r}\label{eq:L0r}
+  L_m &=& l_R\, a_z\, a_x \, e^{-a_z d_c} \\\label{eq:Ld0}
+  L_m &=& l_R\, a_z\, a_x \, e^{-a_x w_c}\label{eq:L0r}
 \end{eqnarray}
-Thus $e^{-a_z d} = e^{-a_x r}$ or
+Thus $e^{-a_z d_c} = e^{-a_x w_c}$ or
 \begin{equation}
   a_x = \frac{d_c}{w_c} a_z
   \label{eq:aztoax}
 \end{equation}
 By inserting \eqref{eq:aztoax} in \eqref{eq:Ld0} we get
 \begin{equation}
-  L_m = l_R\, a_z\, \frac{d}{r} a_z \, e^{-a_z d}
+  L_m = l_R\, a_z\, \frac{d_c}{w_c} a_z \, e^{-a_z d_c}
   \label{eq:azeq1}
 \end{equation}
 If we substitute 
 \begin{equation}
-  Q = -a_z d
+  Q = -a_z d_c
   \label{eq:Qaz}
 \end{equation}
 and isolate the known values on the right side, this gives us:
 \begin{equation}
-  Q^2\, e^Q = L_m \frac{d \, r}{l_R}
+  Q^2\, e^Q = L_m \frac{d_c \, w_c}{l_R}
   \label{eq:logsquare}
 \end{equation}
 The left hand side expression is illustrated in figure~\ref{fig:Q}.
@@ -392,7 +394,7 @@ $a_z$~\eqref{eq:Qaz}, $a_x$~\eqref{eq:aztoax}, and
 $L_{0,0}$~\eqref{eq:root-integral2}.
 \begin{figure}[htbp]
   \input{rootdens_Q}
-  \caption{$Q^2 e^Q$}
+  \caption{The Q expression ($Q^2 e^Q$).}
   \label{fig:Q}
 \end{figure}
 
@@ -419,11 +421,9 @@ We are not interested in positive values for $Q$, they correspond to
 negative values for $a_z$, the simplification in
 \eqref{eq:root-integral2} are only valid if $a_z > 0$. Since
 $\lim_{Q\to-\infty} Q^2\,e^Q=0$ we get a single negative solution when
-$L_m \frac{d \, r}{l_R}$ is exactly at the top point ($2^2 e^{-2}$),
+$-a_z d_c$ is exactly at the top point ($2^2 e^{-2}$),
 two when it is smaller (it is never negative), and none when it is
-larger.  The later situation corresponds to the case where there is
-insufficient root $l_R$ to satisfy the minimal root density $L_m$
-within the given root zone.
+larger.  
 
 Both negative solutions are valid, but represent different
 distributions.  The solution for $Q > -2$ corresponds to a root
@@ -436,48 +436,49 @@ of $-3$.
 \label{sec:model-rows}
 
 If the rows are close, the root systems will overlap as shown on
-figure~\ref{fig:zigzag}.
+figure~\ref{fig:zigzag}. In theory, all the rows on the field will
+contribute some roots to the interval.  The root density in the
+interval will be the sum of all the individual contributions.
 \begin{figure}[htbp]
   \input{rootdens_L}
-  \caption{The x-axis represents the distance from a row to the
-    midpoint between it and the row to its right.  The y-axis is the
-    root density for roots originating in a specific row.  The top
-    line represents the roots from the row itself.  The next line the
-    roots from the row to the right.  And the last line the roots from
-    the row to the left.  In theory, all the rows on the field will
-    contribute some roots to the interval.  The root density in the
-    interval will be the sum of all the individual contributions.}
+  \caption{The x-axis represents the distance from a specific row to
+    the midpoint between it and the row to its right.  The L-axis is
+    the root density for roots originating in a specific row.  The
+    roots from three rows (the row itself and the rows at each side)
+    is shown.}
   \label{fig:zigzag}
 \end{figure}
 
-If $R$ is the distance between rows, and we assume an infinite number
+If $D$ is the distance between rows, and we assume an infinite number
 of identical rows, this can be expressed by the equation
 \begin{equation}
-  L^*_{z,x} =
-    \begin{cases}
-       \sum_{i=0}^{\infty} (L_{z,x + i R} + L_{z,R + i R - x}) & \text{if $x < R/2$}\\
-                                                    0  & \text{if $x \geq R/2$}
-    \end{cases}
-  \label{eq:Lzxstar}
+  L^* (x,z) = \sum_{i=0}^{\infty} (L\, (x + i D,z) + L\, (D + i D - x,z))\\
+  \label{eq:Lxzstar}
 \end{equation}
-
-Using \eqref{eq:Lzx} and the rules for geometric series we can rewrite
-the first case to get rid of the sum
+where $L\, (x + 0 D,z)$ represents the contribution from the row
+itself,\linebreak{} $\sum_{i=1}^{\infty} L\, (x + i D,z)$ represents
+the contributions from all the rows to the left, and
+$\sum_{i=0}^{\infty} L\, (D + i D - x,z)$ represents the contributions
+from all the rows to the right.  Equation~\eqref{eq:Lxzstar} is valid
+for the half row $0 \leq x \leq D/2$, but can be extended outside the
+interval by assuming all rows are identical $L^* (x,z) = L^* (x+D,z)$
+and symetrical $L^* (x,z) = L^* (-x,z)$. We can rewrite
+\eqref{eq:Lxzstar} to get rid of the sum
 \begin{equation}
   \begin{array}{rl}
-     & \sum_{i=0}^{\infty} (L_{z,x + i R} + L_{z,R + i R - x})\\
+     & \sum_{i=0}^{\infty} (L\, (x + i D,z) + L\, (D + i D - x,z))\\
 %%    =& L_{0,0}\, e^{-a_z z} 
-%%       \sum_{i=0}^{\infty} (e^{-a_x (x + i R)} + e^{-a_x (R + i R - x)})\\
-    =& L_{0,0}\, e^{-a_z z} (       e^{-a_x x} \sum_{i=0}^{\infty} e^{-a_x i R} 
-                          + e^{-a_x (R - x)} \sum_{i=0}^{\infty} e^{-a_x i R})\\
-%%    =& L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (R - x)})
-%%       \sum_{i=0}^{\infty} e^{-a_x i R}) \\
-    =& L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (R - x)})
-       \sum_{i=0}^{\infty} ((\frac{1}{e})^{a_x R})^i\\
-    =& \frac{L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (R - x)})}
-            {1 - \frac{1}{e}^{a_x R}}\\
+%%       \sum_{i=0}^{\infty} (e^{-a_x (x + i D)} + e^{-a_x (D + i D - x)})\\
+    =& L_{0,0}\, e^{-a_z z} (       e^{-a_x x} \sum_{i=0}^{\infty} e^{-a_x i D} 
+                          + e^{-a_x (D - x)} \sum_{i=0}^{\infty} e^{-a_x i D})\\
+%%    =& L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (D - x)})
+%%       \sum_{i=0}^{\infty} e^{-a_x i D}) \\
+    =& L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (D - x)})
+       \sum_{i=0}^{\infty} ((\frac{1}{e})^{a_x D})^i\\
+    =& \frac{L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (D - x)})}
+            {1 - \frac{1}{e}^{a_x D}}\\
   \end{array}
-  \label{eq:Lzxstar-solved}
+  \label{eq:Lxzstar-solved}
 \end{equation}
 Two examples of the resulting root density distribution can be found
 on figure~\ref{fig:tworows}.
@@ -485,40 +486,28 @@ on figure~\ref{fig:tworows}.
 \subsubsection{Mapping between the models}
 \label{sec:mapping}
 
-We would like to retain our original distribution \eqref{eq:g+p} when
-ignoring the x dimension.  We couldn't do that when looking only at
-the root system for a single row, as it is infinitely wide and thus
-has an average density of zero.  However, if we look at the roots of
-single row, we get
+We can get the vertical density distribution for \eqref{eq:Lxzstar} at
+a specific depth $L^* (z)$ by finding the total root length density of
+a single row \eqref{eq:Lxz} at the specific depth, and divide with the
+distance between rows.
 \begin{equation}
-  L_z = \frac{2 \int_0^{\infty} L_{z,x}\, dx}{R}
+  L^*(z) = \frac{\int_{-\infty}^{\infty} L\, (x,z)\, dx}{D}
   \label{eq:x-integrated}
 \end{equation}
-We multiply by two as we assume the two sides of the rows are
-identical.  By integrating to $\infty$ rather than just $R/2$ we do
-include roots from outside the row.  However, because the system has
-an infinite number of identical rows, the amount of roots from the
-crop outside its own row is exactly the same as the amount of roots
-from other rows inside the row we are examining.
-
-Inserting \eqref{eq:Lzx} and \eqref{eq:g+p} in \eqref{eq:x-integrated} we get
+By setting $L^* (z) = L\, (z)$ and inserting \eqref{eq:Lxz} and
+\eqref{eq:g+p} in \eqref{eq:x-integrated} we get
 \begin{equation}
   \begin{array}{rcl}
-    L_0\, e^{-a z} &=& \frac{2}{R} \int_{0}^{\infty} L_{0,0}\, e^{-a_z z} e^{-a_x x} dx\\
-                 &=& \frac{2 L_{0,0}\, e^{-a_z z}}{R} \int_{0}^{\infty} e^{-a_x x} dx\\
+    L_0\, e^{-a z} &=& \frac{1}{D} \int_{-\infty}^{\infty} L_{0,0}\, e^{-a_z z} e^{-a_x |x|} dx\\
+                 &=& \frac{2 L_{0,0}\, e^{-a_z z}}{D} \int_{0}^{\infty} e^{-a_x x} dx\\
                  &=& L_{0,0}\, e^{-a_z z} \frac{0 - 1}{-a_x}\\
-                 &=& \frac{2 L_{0,0}}{R a_x} e^{-a_z z}\\
+                 &=& \frac{2 L_{0,0}}{D a_x} e^{-a_z z}\\
   \end{array}
   \label{eq:1d2d}
 \end{equation}
-So we get
-\begin{eqnarray}
-  a_z &=& a\\\label{eq:azisa}
-  L_{0,0} &=& ½ a_x R L_0\\\label{eq:L00L0}
-  L_0 &=& \frac{2 L_{0,0}}{a_x R}\label{eq:L0L00}
-\end{eqnarray}
-as the equations to use when switching between the one and two
-dimensional descriptions.
+hence $a = a_z$ and $L_0 = \frac{2 L_{0,0}}{a_x D}$ are the parameter
+values to use in \eqref{eq:g+p} to get the same vertical density
+distribution as \eqref{eq:Lxzstar}.
 
 \section{Data description and methodology}
 
@@ -541,12 +530,13 @@ Two irrigation methods and three irrigation strategies were
 considered.  The irrigation methods were subsurface drip irrigation
 and furrow irrigation.  The irrigation strategies were full
 irrigation, deficit irrigation (70\% of full irrigation), and partial
-rootzone drying (like deficit, but altering sides of the crop).
+rootzone drying (like deficit, but application on alternating sides of
+the crop).
 
 At the CAAS site, root density sampling was performed in 2006 and
 2008.  Unfortunately, the 2006 harvest failed, so we have discarded
 that data set.  All treatments were done with three replicates, but
-due to the labour intensive nature of root density sampling, it was
+due to the labour intensive nature of root density sampling, that was
 only performed on selected plots as outlined in
 table~\ref{tab:caas2008treatments} and~\ref{tab:cautreatments}.
 
@@ -574,8 +564,8 @@ Plot	& Source	& Method	& Strategy\\\hline
     All treatments used tap water.  The strategy used was either 
     partial rootzone drying (PRD) or full irrigation (FI).}
   \label{tab:cautreatments}
-  \begin{tabular}{lll|lll}\\\hline
-\multicolumn{3}{c|}{2007} & \multicolumn{3}{c}{2008}\\
+  \begin{tabular}{llllll}\\\hline
+\multicolumn{3}{c}{2007} & \multicolumn{3}{c}{2008}\\
 Plot	& Method	& Strategy	& Plot	& Method	& Strategy\\\hline
 1	& Subsurface drip	& PRD	& 3	& Subsurface drip	& PRD\\
 2	& Subsurface drip	& PRD	& 6	& Subsurface drip	& FI\\
@@ -588,53 +578,56 @@ Plot	& Method	& Strategy	& Plot	& Method	& Strategy\\\hline
 \subsection{Root sampling}
 
 Both sites used ridge systems.  To describe it, we use a coordinate
-system with the x-axis orthogonal to the ridges with x=0 cm representing
-the top of the ridge, the y-axis along the ridges with y=0 cm
-representing the plant position, and the z-axis representing height
-above the undisturbed ground level, positive upwards.  At the CAAS
+system with the x-axis orthogonal to the ridges with $x$ = 0 cm
+representing the top of the ridge, the y-axis along the ridges with
+$y$ = 0 cm representing the plant position, and the z-axis
+representing depth below the undisturbed ground level.  At the CAAS
 site, roots were sampled in a $3\times2\times7$ grid.  The sampling
 along the x-axis corresponded to the top of the ridge, the middle of
-the ridge wall, and the bottom of the valley (x=0 cm, x=18.75 cm,
-x=37.5 cm).  The sampling along the y-axis corresponded to the plant
-location, and the middle between two plants (y=0 cm, y=15 cm).  At the
-z-axis, there were sampling in ten  cm intervals starting just below
-the undisturbed ground level (z=-5 cm) at the top of the ridge, and
-starting 10 and 20 cm lower for sampling at the middle and bottom of
-the ridge system.  The sampling points are illustrated on
-figure~\ref{fig:sample-caas}.  A the CAU site, the sampling were done
-in a cross shape, with five sample locations at the top of the ridge
-(x=0 cm; and y=-20 cm, y=-10 cm, y=0 cm, y=10 cm, y=20 cm), and five sample
-locations across the ridge system (y=0 cm; and x=-30 cm, x=-15 cm,
-x=15 cm, x=0 cm, x=30 cm).  The sampling along the top of the ridge
-started at z=15 cm, that is above undisturbed ground level.  The
-sampling across the ridge started at z=-5 cm.  The samplings were
-performed in 10  cm intervals, the lowest varied between plots and with
-the horizontal distance to the plant, the lowest were at z=-55 cm. See
-figure~\ref{fig:sample-cau}.
+the ridge wall, and the bottom of the valley ($x$ = 0 cm, $x$ = 18.75
+cm, $x$ = 37.5 cm).  The sampling along the y-axis corresponded to the
+plant location, and the middle between two plants ($y$ = 0 cm, $y$ =
+15 cm).  At the z-axis, there were sampling in ten cm intervals
+starting just below the undisturbed ground level ($z$ = 5 cm) at the
+top of the ridge, and starting 10 and 20 cm lower for sampling at the
+middle and bottom of the ridge system.  The sampling points are
+illustrated on figure~\ref{fig:sample-caas}.  A the CAU site, the
+sampling were done in a cross shape, with five sample locations at the
+top of the ridge ($x$ = 0 cm; and $y$ = -20 cm, $y$ = -10 cm, $y$ = 0
+cm, $y$ = 10 cm, $y$ = 20 cm), and five sample locations across the
+ridge system ($y$ = 0 cm; and $x$ = -30 cm, $x$ = -15 cm, $x$ = 15 cm,
+$x$ = 0 cm, $x$ = 30 cm).  The sampling along the top of the ridge
+started at $z$ = -15 cm, that is above undisturbed ground level.  The
+sampling across the ridge started at $z$ = 5 cm.  The samplings were
+performed in 10 cm intervals, the lowest varied between plots and with
+the horizontal distance to the plant, the lowest were at $z$ = 55
+cm. See figure~\ref{fig:sample-cau}.
 
 \begin{figure}[htbp]
   \input{sample-caas}
-  \caption{Sampling points for CAAS site.  All distances are in cm.
-    Root density has been sampled at the center of the ridge (x=0), at
-    the center of the furrow (x=37.5), and halfway between the furrow
-    and ridge (x=18.75).  This sampling was done both at the plant
-    location (y=0), and between the plants in the row (y=15).  The
-    sampling depth starts at soil surface and continues in 10 cm
-    intervals to -70 cm.  There are no samples in the top of the
-    ridge, above the original surface level.}
+  \caption{Sampling points for CAAS site.  
+%%    Root density has been sampled at the center of the ridge ($x$ = 0
+%%    cm), at the center of the furrow ($x$ = 37.5 cm), and halfway
+%%    between the furrow and ridge ($x$ = 18.75 cm).  This sampling was
+%%    done both at the plant location ($y$ = 0 cm), and between the plants
+%%    in the row ($y$ = 15 cm).  The sampling depth starts at soil surface
+%%    and continues in 10 cm intervals to 70 cm.  There are no samples
+%%    in the top of the ridge, above the original surface level.
+}
   \label{fig:sample-caas}
 \end{figure}
 
 \begin{figure}[htbp]
   \input{sample-cau}
-  \caption{Sampling points for CAU site.  All distances are in cm.
-    Root density has been sampled at a cross shape with center at
-    plant location, with samples 10 and 20 cm at each side of the
-    plant location within the ridge, and 15 and 30 cm at each side
-    across the ridge system.  The sampling depths start 15 centimeters
-    above the original ground level within the ridge, and continues
-    down to 55 cm at the plant location and 10 cm away, down to 45 cm
-    15 cm away, and down to 35 cm 20 and 30 cm away. We only use the
+  \caption{Sampling points for CAU site.  
+%%    Root density has been sampled at a cross shape with center at
+%%    plant location, with samples 10 and 20 cm at each side of the
+%%    plant location within the ridge, and 15 and 30 cm at each side
+%%    across the ridge system.  The sampling depths start 15 centimeters
+%%    above the original ground level within the ridge, and continues
+%%    down to 55 cm at the plant location and 10 cm away, down to 45 cm
+%%    15 cm away, and down to 35 cm 20 and 30 cm away. 
+    We only use the
     data from the samplings across the ridge system and below the
     original ground level, marked $+$ on the figure.}
   \label{fig:sample-cau}
@@ -644,18 +637,18 @@ figure~\ref{fig:sample-cau}.
 
 The root density model presented in this paper assumes flat soil.  To
 solve this, a virtual soil surface corresponding to the undisturbed
-ground level (z=0 cm) was used in the model.  Furthermore, the root
+ground level ($z$ = 0 cm) was used in the model.  Furthermore, the root
 density model is \twod{}, while the root data for both sites is
 \threed{}.  The root model describes the x-axis (position between row)
 and the z-axis (height above ground), but not the y-axis (position
 within row).  For the CAAS dataset, we have similar datasets for two
-y-values, and we have included both datasets, thus fitting a \twod{}
+$y$-values, and we have included both datasets, thus fitting a \twod{}
 model to a \threed{} dataset.  From the point of view of the model, we
-have two observations for each (x, z) pair.  For the CAU dataset, all
-the observations where y$\neq$0 cm have x=0 cm.  Including these would
+have two observations for each ($x$, $z$) pair.  For the CAU dataset, all
+the observations where $y\neq$ 0 cm have $x$ = 0 cm.  Including these would
 give an unbalanced dataset.  So for the CAU dataset we have only used
-the measurements where y=0 cm.  Furthermore, we have ignored the
-measurements with z$>$0 cm, as illustrated on
+the measurements where $y$ = 0 cm.  Furthermore, we have ignored the
+measurements with $z <$ 0 cm, as illustrated on
 figure~\ref{fig:sample-cau}.  For each year, we have dataset for each
 plot, plus on additional dataset consisting of all measurements from
 the same site, in effect a dataset where we considered the different
@@ -663,7 +656,7 @@ treatments as replicates.
 
 We used fixed values for the minimal root density ($L_m = 0.1$
 cm/cm$^3$) and specific root length ($S_r = 100$ m/g).  The distance
-between rows ($R$) were taken from the experimental setup, 75 cm for
+between rows ($D$) were taken from the experimental setup, 75 cm for
 CAAS and 80 cm for CAU.  Given these, we could create a function that
 calculated the coefficient of determination (R$^2$) for the \oned{}
 model based on root dry mass ($M_r$) and root zone depth ($d_c$) as
@@ -695,6 +688,7 @@ average in all cases except plot 21 for the CAAS site.
   \caption{CAAS phenology and root sampling.}
   \label{tab:caas-phenology}
   \begin{tabular}{ll}\\\hline
+Date & Stage\\\hline
 2008-03-15	& Sprouting/Bud development\\
 2008-03-25	& Emergence\\
 2008-04-10	& Tuber initiation\\
@@ -711,6 +705,7 @@ average in all cases except plot 21 for the CAAS site.
   \caption{CAU phenology and root sampling.}
   \label{tab:cau-phenology}
   \begin{tabular}{lll}\\\hline
+Date & Date & Stage\\\hline
 2007-04-20	& 2008-03-10	& Leaf development\\
 2007-05-10	& 2008-04-27	& Leaf development\\
 2007-05-25	& 2008-05-12	& Leaf development\\
@@ -740,8 +735,8 @@ average in all cases except plot 21 for the CAAS site.
     for CAU 2008 plot 15.}
   \label{tab:yield}
 
-  \begin{tabular}{ll|ll|ll}\\\hline
-\multicolumn{2}{c|}{CAAS 2008} & \multicolumn{2}{c|}{CAU 2007} & \multicolumn{2}{c}{CAU 2008} \\
+  \begin{tabular}{llllll}\\\hline
+\multicolumn{2}{c}{CAAS 2008} & \multicolumn{2}{c}{CAU 2007} & \multicolumn{2}{c}{CAU 2008} \\
 Plot	& Mg/ha	& Plot	& Mg/ha	& Plot	& Mg/ha\\\hline
 China	& 14.8	& China	& 23.1	& China	& 23.3\\\hline
 Average	& 19.9	& Average	& 44.3	& Average	& 46.9\\
@@ -778,7 +773,7 @@ datasets, and all but but three of the CAU datasets.
     for each plot.  The `All' plot indicate a dataset containing all
     the individual plots.  Furthermore, the R$^2$ for both the \oned{}
     and \twod{} fits are listed, as well as an F test indicating whether
-    the \twod{} model provides a significantly better fit.} 
+    the \twod{} model provides a significantly better fit (\textbf{bold}).} 
 \label{tab:caas-ftest}
 
 \begin{tabular}{rrrrrrrrr}\\\hline
@@ -801,7 +796,7 @@ All	& 93	& 216	& 0.65	& 0.61	& 0.60	& \textbf{5.42}	& 3.88\\
     for each plot.  The `All' plot indicate a dataset containing all
     the individual plots.  Furthermore, the R$^2$ for both the \oned{}
     and \twod{} fits are listed, as well as an F test indicating whether
-    the \twod{} model provides significantly better fit.} 
+    the \twod{} model provides significantly better fit (\textbf{bold}).} 
   \label{tab:cau-ftest}
 
   \begin{tabular}{rrrrrrrrr}\\\hline
@@ -843,7 +838,7 @@ samplings.  We see on figure~\ref{fig:caas2008}, \ref{fig:cau2007},
 and~\ref{fig:cau2008} that the CAU 2008 aggregate datasets also have
 the lowest standard deviation between plots.  The CAAS 2008 aggregate
 dataset has the highest standard deviation, reflecting the fact that
-half the model parameter fits shows a wide root zone, and the other
+half the model parameter fits show a wide root zone, and the other
 half a narrow root zone.  Both plots using subsoil drip irrigation and
 partial rootzone drying for the CAAS site show a wide root zone, and
 both plots with subsoil drip and ``normal'' deficit irrigation show a
@@ -862,13 +857,13 @@ figure~\ref{fig:tworows}.  The tendency is partly supported by the
   \input{CAAS-2008-18}\\
   \input{CAAS-2008-37}
   \caption{Estimated and observed root density for the 2008 CAAS root
-    density sampling.  The top graph show data from the plant row,
-    the center graph 18.75 cm from the row, and the bottom graph 30
-    cm from the plant rows.  The y-axes represent depth below the
-    original ground level in cm, the x-axes represent root 
-    density in cm/cm$^3$.  The curvy lines are the modelled root
-    density.  The error bars represent mean and standard deviation for
-    all treatments}
+    density sampling at three different row distances.  
+    %% The top graph show data from the plant row, the
+    %% center graph 18.75 cm from the row, and the bottom graph 37.50 cm
+    %% from the plant rows.  The z-axes represent depth below original
+    %% ground level, the x-axes represent root density.  The curvy lines
+    %% are the modelled root density.  
+    The error bars represent mean and standard deviation for all treatments}
   \label{fig:caas2008}
 \end{figure}
 
@@ -876,14 +871,15 @@ figure~\ref{fig:tworows}.  The tendency is partly supported by the
   \input{CAU-2007a-0}\input{CAU-2007b-0}\\
   \input{CAU-2007a-15}\input{CAU-2007b-15}\\
   \input{CAU-2007a-30}\input{CAU-2007b-30}
-  \caption{Estimated and observed root density for the 2007 CAU root
-    density sampling.  The left side is the May 30 sampling, the right
-    side the July 5 sampling.  The top graphs show data from the plant
-    row, the center graphs 15 cm from the row, and the bottom graphs
-    30 cm from the plant rows.  The y-axes represent depth below the
-    original ground level in cm, the x-axes represent root density in
-    cm/cm$^3$.  The curvy lines are the modelled root density.  The
-    error bars represent mean and standard deviation for all
+  \caption{Estimated and observed root density for the early and late
+    2007 CAU root density samplings at three different row distances.  
+    %% The left side is the May 30
+    %% sampling, the right side the July 5 sampling.  The top graphs show
+    %% data from the plant row, the center graphs 15 cm from the row, and
+    %% the bottom graphs 30 cm from the plant rows.  The z-axes represent
+    %% depth below the original ground level, the x-axes represent root
+    %% density.  The curvy lines are the modelled root density.  
+    The error bars represent mean and standard deviation for all
     treatments, including measurements at both sides of the row.}
   \label{fig:cau2007}
 \end{figure}
@@ -892,14 +888,16 @@ figure~\ref{fig:tworows}.  The tendency is partly supported by the
   \input{CAU-2008a-0}\input{CAU-2008b-0}\\
   \input{CAU-2008a-15}\input{CAU-2008b-15}\\
   \input{CAU-2008a-30}\input{CAU-2008b-30}
-  \caption{Estimated and observed root density for the 2008 CAU root
-    density sampling.  The left side is the June 15 sampling, the
-    right side the July 24 sampling.  The top graphs show data from
-    the plant row, the center graphs 15 cm from the row, and the
-    bottom graphs 30 cm from the plant rows.  The y-axes represent
-    depth below the original ground level in cm, the x-axes represent
-    root density in cm/cm$^3$.  The curvy lines are the modelled root
-    density.  The error bars represent mean and standard deviation for
+  \caption{Estimated and observed root density for the early and late
+    2008 CAU root density samplings at three different row distances.
+    %% The left side is the June 15
+    %% sampling, the right side the July 24 sampling.  The top graphs
+    %% show data from the plant row, the center graphs 15 cm from the
+    %% row, and the bottom graphs 30 cm from the plant rows.  The z-axes
+    %% represent depth below the original ground level, the x-axes
+    %% represent root density.  The curvy lines are the modelled root
+    %% density.  
+    The error bars represent mean and standard deviation for
     all treatments, including measurements at both sides of the row.}
   \label{fig:cau2008}
 \end{figure}
@@ -907,12 +905,13 @@ figure~\ref{fig:tworows}.  The tendency is partly supported by the
 \begin{figure}[htbp]
   \input{CAU2008a}\\
   \input{CAU2008b}
-  \caption{Estimated root zone for the CAU site.  The top graph shows
-    the 15-06-2008 root density distribution and the bottom graph the
-    24-07-2008 root density distribution. Two interacting rows at x =
-    0 and 80 cm are shown.  The lines represent root density contours
-    in cm/cm$^3$.  The axes show height above ground and horizontal
-    position relative to the first row in cm.}
+  \caption{Estimated root zone for the CAU site for the two 2008 root
+    samplings.
+    %%The top graph shows the 15-06-2008 root density
+    %%distribution and the bottom graph the 24-07-2008 root density
+    %% distribution. 
+    Two interacting rows at $x$ = 0 and 80 cm are shown.  The lines
+    represent root density ($L$) isolines.}
   \label{fig:tworows}
 \end{figure}
 
@@ -930,12 +929,12 @@ valid.
 
 The statistical analysis (table~\ref{tab:caas-ftest}
 and~\ref{tab:cau-ftest}) shows us that the presented \twod{} model
-constitute a significant improvement over the \oned{} model,
+constitutes a significant improvement over the \oned{} model,
 especially in the cases where the root zone from the individual row is
 narrow.  Furthermore, visual inspection of observed data vs.\@
 predicted data (figure~\ref{fig:caas2008},~\ref{fig:cau2007},
 and~\ref{fig:cau2008}) shows that the model provides a good match for
-both the horizontal and vertical changes in root density.  Based on
+both the horizontal and vertical variation in root density.  Based on
 this we believe that the model will be useful for the intended purpose
 of simulating soil water dynamics in row crops.
 
@@ -951,11 +950,11 @@ the difference between plots for the present experiment.
 \section{Software and data availability}
 
 Software to estimate root mass and root zone depth from \oned{} root
-density data, and in addition root zone width from \twod{} root
+density data, and in addition root zone radius from \twod{} root
 density data, can be found at \url{http://www.daisy-model.org/} (look
 under \texttt{Wiki}, \texttt{\textsc{gp2d}}).  Also supported is
 estimating root density distribution from root mass, root zone depth,
-and optionally, root zone width.  The program code is written in
+and optionally, root zone radius.  The program code is written in
 \cplusplus{} and is covered by on open source license (\textsc{gnu
   lgpl}), so it can be freely incorporated in other models.
 
@@ -981,23 +980,25 @@ $a_x$   & L$^{-1}$ & Horizontal root density distribution parameter\\
 $d_a$   & L       & Soil limited root depth\\
 $d_c$   & L       & Crop potential root depth\\
 $d_s$   & L       & Soil maximum root depth\\ 
+$D$     & L       & Distance between rows\\
 $k^\prime$   &         & Soil root limit factor\\ 
 $l_r$   & L/L$^2$ & Total root length per area\\ 
 $l_R$   & L/L     & Total root length per length of row on one side\\ 
 $L_0$   & L/L$^3$ & Average root density at soil surface\\
 $L_{0,0}$& L/L$^3$ & Root density in row at soil surface\\
 $L_m$   & L/L$^3$ & Minimal root density\\ 
-$L_z$   & L/L$^3$ & Root density at soil depth $z$\\
-$L_z^\prime$ & L/L$^3$ & Soil limited root density at soil depth $z$\\ 
-$L_{z,x}$& L/L$^3$ & Root density at soil depth $z$ and distance $x$ from row\\
-$L^*_{z,x}$& L/L$^3$ & Root density from multiple rows\\
+$L\, (z)$   & L/L$^3$ & Root density at soil depth $z$\\
+$L^\prime (z) $ & L/L$^3$ & Soil limited root density at soil depth $z$\\ 
+$L\, (x,z)$& L/L$^3$ & Root density at soil depth $z$ and distance $x$ from row\\
+$L^* (x,z)$& L/L$^3$ & Root density from multiple rows at position $(x,z)$\\
+$L^* (z)$& L/L$^3$ & Average vertical root density from multiple rows at depth $z$\\
 $M_r$   & M/L$^2$& Total root dry matter\\ 
 $Q$     &         & Substitution variable\\
-$R$     & L       & Distance between rows\\
 $S_r$   & L/M    & Specific root length\\ 
-$W$     &         & Lambert-W function\\ 
 $w_c$     & L     & Horizontal root zone radius\\
-$x$     & L       & Horizontal distance from row \\
+$W$     &         & Substitution variable\\ 
+$x$     & L       & Horizontal position across row \\
+$y$     & L       & Horizontal position along row \\
 $z$     & L       & Soil depth \\
 \end{tabular}
 \vfill{}
@@ -1012,34 +1013,19 @@ $z$     & L       & Soil depth \\
     The motivation is agricultural.
   \item Agricultural Water Management\\
     They hate math and models.
-  \item Plant \& Soil
+  \item Plant \& Soil\\
     Seem to like math and models
+  \item Other suggestions?
   \end{itemize}
 \item MNA: Who should be co-authors from China?
-\item I think most of the text is not stringent or ``to-the-point''
-  enough.  Not sure what to do about it.
-\item Should the article be shorter?  If so, what to cut?
-\item One could drop figure~\ref{fig:W} and~\ref{fig:Q} and
-  section~\ref{sec:W} and~\ref{sec:Q} and just say
-  ``Equation~\ref{eq:Lambert}/\ref{eq:logsquare} can be solved
-  numerically to find W/Q'' to save space.  I wouldn't like it though.
-\item Drop table~\ref{tab:yield}? (Yield)
-\item Drop table~\ref{tab:caas-phenology} and~\ref{tab:cau-phenology}?
-  (Phenology)
-\item MNA: Should we have more details on treatments and experimental
-  protocol?
-\item Should we have more references in the introduction?  We can add
-  lots of references on PRD and on various root models
 \item CAU: What is the ridge geometry?  And zero level?
 \item I'm still uncertain on the F-test is done right.  I followed the
   explanation in Wikipedia, which was the only one I could understand.
   Should I have more details?  Like dimensions for the F-distribution?
-\item Should RMSE numbers be included?
 \item MNA: PRD references?
-\item SHA (and MMO): Notation: $L\,(z)$ or $L_z$?
 \item MNA: When will SAFIR root data become public?
 \item Are the \cite{richardseq}, \cite{nelder1965simplex},
-  \citep{euler83}, and \cite{lambert58} citations too silly?
+  \cite{euler83}, and \cite{lambert58} citations too silly?
 \end{itemize}
 
 \end{document}

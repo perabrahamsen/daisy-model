@@ -4,9 +4,10 @@ set output "sample-cau.tex"
 set yrange [-25:25]
 set xrange [-40:40]
 set zrange [-70:50]
-set xlabel "x"    
-set ylabel "y"    
-set zlabel "z"    
+set ztics ("50" -50, "25" -25, "0" 0, "-25" 25)
+set xlabel "$x$ [cm]"    
+set ylabel "$y$ [cm]"    
+set zlabel "$z$ [cm]" rotate
 set ticslevel 0
 splot '-' using 1:2:3 with points notitle, 20*cos(x*2*pi/80) with lines notitle, '-' using 1:2:3 with points notitle
 -30 0 -5

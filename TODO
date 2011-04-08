@@ -1,5 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Kina rødder
+
+** Skriv wiki/GP2D "howto" gå fra data til rodmasse og volumen, og omvendt
+
+
 * Snak med SH om org.matter artikel.
 
 Kan den måske publiseres hvis den bliver drejet til en "diskussion af brug af
@@ -9,10 +14,6 @@ Konklusion:  Kør langtidssimuleringer med din model før du gør det.
 
 Opstillingen af ligningssystemet skal så komprimeres, da det ikke
 længere er en genial ny ide vi præsenterer.
-
-* Kina rødder
-
-** Skriv wiki/GP2D "howto" gå fra data til rodmasse og volumen, og omvendt
 
 * Ny reference manual
 
