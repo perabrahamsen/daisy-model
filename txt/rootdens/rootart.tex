@@ -40,16 +40,12 @@
 \maketitle
 
 \begin{abstract}
-  A \twod{} model of water movement in the soil is needed to predict
-  how to most efficiently apply irrigation in order to achieve partial
-  root zone drying.  This model must include a \twod{} root model.  In
-  this paper we extend an empirical root density distribution based on
-  densely populated homogeneous fields (\oned{}) to row crops
-  (\twod{}).  The row crops are modeled as having a uniform density in
-  the direction parallel to the rows, but variable in the plane
-  perpendicular to the row.  In each case we demonstrate how to find
-  the distribution parameters from the root dry matter and the size of
-  the root zone.
+  We extend an empirical root density distribution based on densely
+  populated homogeneous fields (\oned{}) to row crops (\twod{}).  The
+  row crops are modeled as having a uniform density in the direction
+  parallel to the rows, but variable in the plane perpendicular to the
+  row.  In each case we demonstrate how to find the distribution
+  parameters from the root dry matter and the size of the root zone.
 
   \twod{} root density measurements was performed at two sites for two
   experimental years and multiple plots.  Both the \oned{} and \twod{}
@@ -399,8 +395,8 @@ $L_{0,0}$~\eqref{eq:root-integral2}.
 \subsubsection{Numeric solution to $Q$}
 \label{sec:Q}
 
-We start by dividing the expression into monotonic intervals by
-finding the derivative
+We know $Q^2\, e^Q$ and want to find $Q$.  We start by dividing the
+expression into monotonic intervals by finding the derivative
 \begin{equation}
   \frac{d (Q^2\, e^Q)}{dQ} = 2 Q e^Q + Q^2 e^Q
   \label{eq:derived}
@@ -1005,6 +1001,15 @@ $z$     & L       & Soil depth \\
 \section*{Questions}
 
 \begin{itemize}
+\item Shortening the article.  Should I
+  \begin{itemize}
+  \item Remove first paragraph and start of second paragraph from
+    Introduction?
+  \item Remove the solutions to W and Q.  ``They can be found using
+    Newton's method''?
+  \item Remove first paragraph of Results, plus the yield and
+    phenology tables?
+  \end{itemize}
 \item Where to publish?
   \begin{itemize}
   \item Environmental Software \& Modelling\\
