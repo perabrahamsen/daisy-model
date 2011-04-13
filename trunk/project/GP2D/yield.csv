@@ -1,0 +1,198 @@
+Field name,Sample ident,Year,Country,Site,Trial ID number,Date,Plot number,Tuber FM,Tuber DM,Total fruit FM,Total fruit DM,"Treatment,water,ID","Treatment,water,Name","Treatment,irrigation,ID","Treatment,irrigation,Name","Treatment,strategy,ID","Treatment,strategy,Name","Replicate,ID","Replicate,Name"
+Unit,,,,,,,,g/m�,g/m�,g/m�,g/m�,,,,,,,,
+Unique name,SampleIdent,TrialYear,TrialCountryID,TrialSiteID,TrialID,RecordingDate,PlotID,FreshMassTuberYield,DryMatterTuberYield,TotalFruitFMTomatoFresh,TotalFruitDMTomatoFresh,TreatmentWaterID,TrialTreatmentWaterName,TreatmentIrrigationID,TrialTreatmentIrrigationName,TreatmentStrategyID,TrialTreatmentStrategyName,ReplicateID,TrialReplicateName
+1,,2006,CN,CAAS,1,29/05/2006,1,561.9693487,105.5659785,,,5,Secondary treated waste water with sand filter and Chloride treatment,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+2,,2006,CN,CAAS,1,29/05/2006,2,979.8060229,179.2171978,,,5,Secondary treated waste water with sand filter and Chloride treatment,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+7,,2006,CN,CAAS,1,14/06/2006,3,1179.662415,179.2009808,,,4,Secondary treated waste water with sand filter,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+8,,2006,CN,CAAS,1,14/06/2006,4,1084.943898,156.8391072,,,4,Secondary treated waste water with sand filter,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+13,,2006,CN,CAAS,1,24/06/2006,5,920.1919949,142.5609611,,,3,Secondary treated waste water,4,Furrow,2,Partial rootzone drying,1,Rep. 1
+14,,2006,CN,CAAS,1,24/06/2006,6,869.4852944,148.6629205,,,3,Secondary treated waste water,4,Furrow,1,Full irrigated,1,Rep. 1
+3,,2006,CN,CAAS,1,29/05/2006,7,768.900044,108.5033163,,,5,Secondary treated waste water with sand filter and Chloride treatment,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+4,,2006,CN,CAAS,1,29/05/2006,8,1346.535405,158.5207025,,,5,Secondary treated waste water with sand filter and Chloride treatment,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+9,,2006,CN,CAAS,1,14/06/2006,9,719.4293594,128.1371695,,,4,Secondary treated waste water with sand filter,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+10,,2006,CN,CAAS,1,14/06/2006,10,1100.496865,152.0557128,,,4,Secondary treated waste water with sand filter,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+15,,2006,CN,CAAS,1,24/06/2006,11,1013.085801,126.5893214,,,3,Secondary treated waste water,4,Furrow,2,Partial rootzone drying,2,Rep. 2
+16,,2006,CN,CAAS,1,24/06/2006,12,796.9253521,124.3134101,,,3,Secondary treated waste water,4,Furrow,1,Full irrigated,2,Rep. 2
+5,,2006,CN,CAAS,1,29/05/2006,13,938.0535628,160.0312718,,,5,Secondary treated waste water with sand filter and Chloride treatment,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+6,,2006,CN,CAAS,1,29/05/2006,14,1356.673478,235.3317505,,,5,Secondary treated waste water with sand filter and Chloride treatment,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+11,,2006,CN,CAAS,1,14/06/2006,15,1052.625757,127.1365888,,,4,Secondary treated waste water with sand filter,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+12,,2006,CN,CAAS,1,14/06/2006,16,1185.875933,186.399342,,,4,Secondary treated waste water with sand filter,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+17,,2006,CN,CAAS,1,24/06/2006,17,890.0387791,125.453085,,,3,Secondary treated waste water,4,Furrow,2,Partial rootzone drying,3,Rep. 3
+18,,2006,CN,CAAS,1,24/06/2006,18,1157.229616,170.7472142,,,3,Secondary treated waste water,4,Furrow,1,Full irrigated,3,Rep. 3
+118,,2008,CN,CAAS,1,30/06/2008,1,1797.530864,,,,18,Secondary treated waste water with sand filter+HM dosing+HM removal+UV,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+119,,2008,CN,CAAS,1,30/06/2008,2,1739.012346,,,,18,Secondary treated waste water with sand filter+HM dosing+HM removal+UV,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+120,,2008,CN,CAAS,1,30/06/2008,3,2056.54321,,,,18,Secondary treated waste water with sand filter+HM dosing+HM removal+UV,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+121,,2008,CN,CAAS,1,30/06/2008,4,1753.82716,,,,18,Secondary treated waste water with sand filter+HM dosing+HM removal+UV,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+122,,2008,CN,CAAS,1,30/06/2008,5,2189.876543,,,,18,Secondary treated waste water with sand filter+HM dosing+HM removal+UV,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+123,,2008,CN,CAAS,1,30/06/2008,6,2317.037037,,,,18,Secondary treated waste water with sand filter+HM dosing+HM removal+UV,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+124,,2008,CN,CAAS,1,30/06/2008,7,1502.962963,,,,18,Secondary treated waste water with sand filter+HM dosing+HM removal+UV,1,Subsurface drip,3,Deficit Irrigation,1,Rep. 1
+125,,2008,CN,CAAS,1,30/06/2008,8,2175.061728,,,,18,Secondary treated waste water with sand filter+HM dosing+HM removal+UV,1,Subsurface drip,3,Deficit Irrigation,2,Rep. 2
+126,,2008,CN,CAAS,1,30/06/2008,9,1830.864198,,,,18,Secondary treated waste water with sand filter+HM dosing+HM removal+UV,1,Subsurface drip,3,Deficit Irrigation,3,Rep. 3
+127,,2008,CN,CAAS,1,30/06/2008,10,1870.123457,,,,19,Secondary treated waste water with sand filter+HM dosing+HM removal,1,Subsurface drip,3,Deficit Irrigation,1,Rep. 1
+128,,2008,CN,CAAS,1,30/06/2008,11,2066.91358,,,,19,Secondary treated waste water with sand filter+HM dosing+HM removal,1,Subsurface drip,3,Deficit Irrigation,2,Rep. 2
+129,,2008,CN,CAAS,1,30/06/2008,12,1999.753086,,,,19,Secondary treated waste water with sand filter+HM dosing+HM removal,1,Subsurface drip,3,Deficit Irrigation,3,Rep. 3
+130,,2008,CN,CAAS,1,30/06/2008,13,1618.271605,,,,19,Secondary treated waste water with sand filter+HM dosing+HM removal,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+131,,2008,CN,CAAS,1,30/06/2008,14,1806.666667,,,,19,Secondary treated waste water with sand filter+HM dosing+HM removal,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+132,,2008,CN,CAAS,1,30/06/2008,15,1798.518519,,,,19,Secondary treated waste water with sand filter+HM dosing+HM removal,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+133,,2008,CN,CAAS,1,30/06/2008,16,2020,,,,19,Secondary treated waste water with sand filter+HM dosing+HM removal,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+134,,2008,CN,CAAS,1,30/06/2008,17,2287.160494,,,,19,Secondary treated waste water with sand filter+HM dosing+HM removal,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+135,,2008,CN,CAAS,1,30/06/2008,18,2244.938272,,,,19,Secondary treated waste water with sand filter+HM dosing+HM removal,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+136,,2008,CN,CAAS,1,30/06/2008,19,1623.703704,,,,3,Secondary treated waste water,4,Furrow,2,Partial rootzone drying,1,Rep. 1
+137,,2008,CN,CAAS,1,30/06/2008,20,2078.765432,,,,3,Secondary treated waste water,4,Furrow,2,Partial rootzone drying,2,Rep. 2
+138,,2008,CN,CAAS,1,30/06/2008,21,1443.209877,,,,3,Secondary treated waste water,4,Furrow,2,Partial rootzone drying,3,Rep. 3
+139,,2008,CN,CAAS,1,30/06/2008,22,1856.54321,,,,3,Secondary treated waste water,4,Furrow,1,Full irrigated,1,Rep. 1
+140,,2008,CN,CAAS,1,30/06/2008,23,2075.555556,,,,3,Secondary treated waste water,4,Furrow,1,Full irrigated,2,Rep. 2
+141,,2008,CN,CAAS,1,30/06/2008,24,2249.876543,,,,3,Secondary treated waste water,4,Furrow,1,Full irrigated,3,Rep. 3
+19,,2007,CN,CAU,1,10/7/2007,1,,,2682,214.6,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+52,,2007,CN,CAU,1,17/07/2007,1,,,1303,104.2,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+85,,2007,CN,CAU,1,26/07/2007,1,,,192,15.4,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+20,,2007,CN,CAU,1,10/7/2007,2,,,2766,221.3,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+53,,2007,CN,CAU,1,17/07/2007,2,,,1446,115.7,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+86,,2007,CN,CAU,1,26/07/2007,2,,,138,11,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+21,,2007,CN,CAU,1,10/7/2007,3,,,2954,236.3,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+54,,2007,CN,CAU,1,17/07/2007,3,,,1288,103.1,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+87,,2007,CN,CAU,1,26/07/2007,3,,,906,72.4,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+22,,2007,CN,CAU,1,10/7/2007,4,,,2439,195.1,1,Tap water,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+55,,2007,CN,CAU,1,17/07/2007,4,,,1118,89.4,1,Tap water,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+88,,2007,CN,CAU,1,26/07/2007,4,,,611,48.9,1,Tap water,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+23,,2007,CN,CAU,1,10/7/2007,5,,,2157,172.6,1,Tap water,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+56,,2007,CN,CAU,1,17/07/2007,5,,,1743,139.5,1,Tap water,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+89,,2007,CN,CAU,1,26/07/2007,5,,,401,32.1,1,Tap water,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+24,,2007,CN,CAU,1,10/7/2007,6,,,2444,195.5,1,Tap water,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+57,,2007,CN,CAU,1,17/07/2007,6,,,1926,154.1,1,Tap water,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+90,,2007,CN,CAU,1,26/07/2007,6,,,814,65.1,1,Tap water,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+25,,2007,CN,CAU,1,10/7/2007,7,,,1848,147.9,1,Tap water,4,Furrow,2,Partial rootzone drying,1,Rep. 1
+58,,2007,CN,CAU,1,17/07/2007,7,,,1439,115.1,1,Tap water,4,Furrow,2,Partial rootzone drying,1,Rep. 1
+91,,2007,CN,CAU,1,26/07/2007,7,,,582,46.6,1,Tap water,4,Furrow,2,Partial rootzone drying,1,Rep. 1
+26,,2007,CN,CAU,1,10/7/2007,8,,,2760,220.8,1,Tap water,4,Furrow,2,Partial rootzone drying,2,Rep. 2
+59,,2007,CN,CAU,1,17/07/2007,8,,,1506,120.5,1,Tap water,4,Furrow,2,Partial rootzone drying,2,Rep. 2
+92,,2007,CN,CAU,1,26/07/2007,8,,,356,28.5,1,Tap water,4,Furrow,2,Partial rootzone drying,2,Rep. 2
+27,,2007,CN,CAU,1,10/7/2007,9,,,2395,191.6,1,Tap water,4,Furrow,2,Partial rootzone drying,3,Rep. 3
+60,,2007,CN,CAU,1,17/07/2007,9,,,1773,141.8,1,Tap water,4,Furrow,2,Partial rootzone drying,3,Rep. 3
+93,,2007,CN,CAU,1,26/07/2007,9,,,147,11.8,1,Tap water,4,Furrow,2,Partial rootzone drying,3,Rep. 3
+28,,2007,CN,CAU,1,10/7/2007,10,,,1971,157.7,1,Tap water,4,Furrow,1,Full irrigated,1,Rep. 1
+61,,2007,CN,CAU,1,17/07/2007,10,,,1129,90.3,1,Tap water,4,Furrow,1,Full irrigated,1,Rep. 1
+94,,2007,CN,CAU,1,26/07/2007,10,,,703,56.2,1,Tap water,4,Furrow,1,Full irrigated,1,Rep. 1
+29,,2007,CN,CAU,1,10/7/2007,11,,,2068,165.4,1,Tap water,4,Furrow,1,Full irrigated,2,Rep. 2
+62,,2007,CN,CAU,1,17/07/2007,11,,,1399,111.9,1,Tap water,4,Furrow,1,Full irrigated,2,Rep. 2
+95,,2007,CN,CAU,1,26/07/2007,11,,,381,30.5,1,Tap water,4,Furrow,1,Full irrigated,2,Rep. 2
+30,,2007,CN,CAU,1,10/7/2007,12,,,3017,241.3,1,Tap water,4,Furrow,1,Full irrigated,3,Rep. 3
+63,,2007,CN,CAU,1,17/07/2007,12,,,1235,98.8,1,Tap water,4,Furrow,1,Full irrigated,3,Rep. 3
+96,,2007,CN,CAU,1,26/07/2007,12,,,507,40.6,1,Tap water,4,Furrow,1,Full irrigated,3,Rep. 3
+31,,2007,CN,CAU,1,10/7/2007,13,,,2090,167.2,1,Tap water,1,Subsurface drip,3,Deficit Irrigation,1,Rep. 1
+64,,2007,CN,CAU,1,17/07/2007,13,,,2147,171.7,1,Tap water,1,Subsurface drip,3,Deficit Irrigation,1,Rep. 1
+97,,2007,CN,CAU,1,26/07/2007,13,,,597,47.8,1,Tap water,1,Subsurface drip,3,Deficit Irrigation,1,Rep. 1
+32,,2007,CN,CAU,1,10/7/2007,14,,,3489,279.1,1,Tap water,1,Subsurface drip,3,Deficit Irrigation,2,Rep. 2
+65,,2007,CN,CAU,1,17/07/2007,14,,,2129,170.3,1,Tap water,1,Subsurface drip,3,Deficit Irrigation,2,Rep. 2
+98,,2007,CN,CAU,1,26/07/2007,14,,,369,29.5,1,Tap water,1,Subsurface drip,3,Deficit Irrigation,2,Rep. 2
+33,,2007,CN,CAU,1,10/7/2007,15,,,1469,117.5,1,Tap water,1,Subsurface drip,3,Deficit Irrigation,3,Rep. 3
+66,,2007,CN,CAU,1,17/07/2007,15,,,1791,143.3,1,Tap water,1,Subsurface drip,3,Deficit Irrigation,3,Rep. 3
+99,,2007,CN,CAU,1,26/07/2007,15,,,585,46.8,1,Tap water,1,Subsurface drip,3,Deficit Irrigation,3,Rep. 3
+34,,2007,CN,CAU,1,10/7/2007,16,,,1477,118.1,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,1,Rep. 1
+67,,2007,CN,CAU,1,17/07/2007,16,,,1443,115.4,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,1,Rep. 1
+100,,2007,CN,CAU,1,26/07/2007,16,,,988,79,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,1,Rep. 1
+35,,2007,CN,CAU,1,10/7/2007,17,,,2862,229,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,2,Rep. 2
+68,,2007,CN,CAU,1,17/07/2007,17,,,1712,137,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,2,Rep. 2
+101,,2007,CN,CAU,1,26/07/2007,17,,,615,49.2,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,2,Rep. 2
+36,,2007,CN,CAU,1,10/7/2007,18,,,2377,190.1,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,3,Rep. 3
+69,,2007,CN,CAU,1,17/07/2007,18,,,1895,151.6,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,3,Rep. 3
+102,,2007,CN,CAU,1,26/07/2007,18,,,593,47.4,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,3,Rep. 3
+37,,2007,CN,CAU,1,10/7/2007,19,,,3713,297.1,9,Primary treated waste water,4,Furrow,1,Full irrigated,1,Rep. 1
+70,,2007,CN,CAU,1,17/07/2007,19,,,1938,155.1,9,Primary treated waste water,4,Furrow,1,Full irrigated,1,Rep. 1
+103,,2007,CN,CAU,1,26/07/2007,19,,,324,25.9,9,Primary treated waste water,4,Furrow,1,Full irrigated,1,Rep. 1
+38,,2007,CN,CAU,1,10/7/2007,20,,,2317,185.4,9,Primary treated waste water,4,Furrow,1,Full irrigated,2,Rep. 2
+71,,2007,CN,CAU,1,17/07/2007,20,,,1783,142.6,9,Primary treated waste water,4,Furrow,1,Full irrigated,2,Rep. 2
+104,,2007,CN,CAU,1,26/07/2007,20,,,1085,86.8,9,Primary treated waste water,4,Furrow,1,Full irrigated,2,Rep. 2
+39,,2007,CN,CAU,1,10/7/2007,21,,,1659,132.7,9,Primary treated waste water,4,Furrow,1,Full irrigated,3,Rep. 3
+72,,2007,CN,CAU,1,17/07/2007,21,,,2209,176.7,9,Primary treated waste water,4,Furrow,1,Full irrigated,3,Rep. 3
+105,,2007,CN,CAU,1,26/07/2007,21,,,753,60.3,9,Primary treated waste water,4,Furrow,1,Full irrigated,3,Rep. 3
+40,,2007,CN,CAU,1,10/7/2007,22,,,3018,241.4,16,Primary treated waste water with sand filter,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+73,,2007,CN,CAU,1,17/07/2007,22,,,1782,142.6,16,Primary treated waste water with sand filter,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+106,,2007,CN,CAU,1,26/07/2007,22,,,589,47.1,16,Primary treated waste water with sand filter,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+41,,2007,CN,CAU,1,10/7/2007,23,,,2554,204.3,16,Primary treated waste water with sand filter,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+74,,2007,CN,CAU,1,17/07/2007,23,,,1579,126.3,16,Primary treated waste water with sand filter,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+107,,2007,CN,CAU,1,26/07/2007,23,,,589,47.1,16,Primary treated waste water with sand filter,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+42,,2007,CN,CAU,1,10/7/2007,24,,,2288,183,16,Primary treated waste water with sand filter,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+75,,2007,CN,CAU,1,17/07/2007,24,,,3045,243.6,16,Primary treated waste water with sand filter,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+108,,2007,CN,CAU,1,26/07/2007,24,,,1066,85.3,16,Primary treated waste water with sand filter,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+43,,2007,CN,CAU,1,10/7/2007,25,,,2200,176,16,Primary treated waste water with sand filter,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+76,,2007,CN,CAU,1,17/07/2007,25,,,1333,106.7,16,Primary treated waste water with sand filter,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+109,,2007,CN,CAU,1,26/07/2007,25,,,565,45.2,16,Primary treated waste water with sand filter,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+44,,2007,CN,CAU,1,10/7/2007,26,,,2637,211,16,Primary treated waste water with sand filter,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+77,,2007,CN,CAU,1,17/07/2007,26,,,1841,147.2,16,Primary treated waste water with sand filter,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+110,,2007,CN,CAU,1,26/07/2007,26,,,303,24.2,16,Primary treated waste water with sand filter,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+45,,2007,CN,CAU,1,10/7/2007,27,,,1789,143.1,16,Primary treated waste water with sand filter,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+78,,2007,CN,CAU,1,17/07/2007,27,,,2006,160.5,16,Primary treated waste water with sand filter,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+111,,2007,CN,CAU,1,26/07/2007,27,,,551,44.1,16,Primary treated waste water with sand filter,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+46,,2007,CN,CAU,1,10/7/2007,28,,,1162,92.9,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+79,,2007,CN,CAU,1,17/07/2007,28,,,1899,152,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+112,,2007,CN,CAU,1,26/07/2007,28,,,466,37.2,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+47,,2007,CN,CAU,1,10/7/2007,29,,,2125,170,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+80,,2007,CN,CAU,1,17/07/2007,29,,,1545,123.6,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+113,,2007,CN,CAU,1,26/07/2007,29,,,699,55.9,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+48,,2007,CN,CAU,1,10/7/2007,30,,,2209,176.7,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+81,,2007,CN,CAU,1,17/07/2007,30,,,1665,133.2,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+114,,2007,CN,CAU,1,26/07/2007,30,,,329,26.3,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+49,,2007,CN,CAU,1,10/7/2007,31,,,1625,130,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+82,,2007,CN,CAU,1,17/07/2007,31,,,1657,132.6,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+115,,2007,CN,CAU,1,26/07/2007,31,,,614,49.1,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+50,,2007,CN,CAU,1,10/7/2007,32,,,2050,164,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+83,,2007,CN,CAU,1,17/07/2007,32,,,2201,176.1,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+116,,2007,CN,CAU,1,26/07/2007,32,,,765,61.2,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+51,,2007,CN,CAU,1,10/7/2007,33,,,2013,161,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+84,,2007,CN,CAU,1,17/07/2007,33,,,1317,105.4,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+117,,2007,CN,CAU,1,26/07/2007,33,,,241,19.3,17,Primary treated waste water with sand filter+UV,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+178,,2008,CN,CAU,1,1/8/2008,1,,,637.4,51,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+142,,2008,CN,CAU,1,16/07/2008,1,,,1900,152,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+160,,2008,CN,CAU,1,24/07/2008,1,,,2027,162.1,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,1,Rep. 1
+179,,2008,CN,CAU,1,1/8/2008,2,,,745.1,59.6,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+143,,2008,CN,CAU,1,16/07/2008,2,,,1996,159.6,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+161,,2008,CN,CAU,1,24/07/2008,2,,,1376,110.1,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,2,Rep. 2
+180,,2008,CN,CAU,1,1/8/2008,3,,,827,66.2,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+144,,2008,CN,CAU,1,16/07/2008,3,,,2177,174.1,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+162,,2008,CN,CAU,1,24/07/2008,3,,,1509,120.7,1,Tap water,1,Subsurface drip,2,Partial rootzone drying,3,Rep. 3
+181,,2008,CN,CAU,1,1/8/2008,4,,,553,44.2,1,Tap water,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+145,,2008,CN,CAU,1,16/07/2008,4,,,1763,141,1,Tap water,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+163,,2008,CN,CAU,1,24/07/2008,4,,,1217,97.3,1,Tap water,1,Subsurface drip,1,Full irrigated,1,Rep. 1
+182,,2008,CN,CAU,1,1/8/2008,5,,,592.1,47.4,1,Tap water,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+146,,2008,CN,CAU,1,16/07/2008,5,,,2265,181.2,1,Tap water,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+164,,2008,CN,CAU,1,24/07/2008,5,,,1187,95,1,Tap water,1,Subsurface drip,1,Full irrigated,2,Rep. 2
+183,,2008,CN,CAU,1,1/8/2008,6,,,732.5,58.6,1,Tap water,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+147,,2008,CN,CAU,1,16/07/2008,6,,,1487,118.9,1,Tap water,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+165,,2008,CN,CAU,1,24/07/2008,6,,,1965,157.2,1,Tap water,1,Subsurface drip,1,Full irrigated,3,Rep. 3
+184,,2008,CN,CAU,1,1/8/2008,7,,,885.6,70.9,1,Tap water,4,Furrow,2,Partial rootzone drying,1,Rep. 1
+148,,2008,CN,CAU,1,16/07/2008,7,,,1631,130.4,1,Tap water,4,Furrow,2,Partial rootzone drying,1,Rep. 1
+166,,2008,CN,CAU,1,24/07/2008,7,,,2191,175.3,1,Tap water,4,Furrow,2,Partial rootzone drying,1,Rep. 1
+185,,2008,CN,CAU,1,1/8/2008,8,,,771.9,61.8,1,Tap water,4,Furrow,2,Partial rootzone drying,2,Rep. 2
+149,,2008,CN,CAU,1,16/07/2008,8,,,1952,156.2,1,Tap water,4,Furrow,2,Partial rootzone drying,2,Rep. 2
+167,,2008,CN,CAU,1,24/07/2008,8,,,1654,132.4,1,Tap water,4,Furrow,2,Partial rootzone drying,2,Rep. 2
+186,,2008,CN,CAU,1,1/8/2008,9,,,988.6,79.1,1,Tap water,4,Furrow,2,Partial rootzone drying,3,Rep. 3
+150,,2008,CN,CAU,1,16/07/2008,9,,,1866,149.3,1,Tap water,4,Furrow,2,Partial rootzone drying,3,Rep. 3
+168,,2008,CN,CAU,1,24/07/2008,9,,,2026,162.1,1,Tap water,4,Furrow,2,Partial rootzone drying,3,Rep. 3
+187,,2008,CN,CAU,1,1/8/2008,10,,,925.8,74.1,1,Tap water,4,Furrow,1,Full irrigated,1,Rep. 1
+151,,2008,CN,CAU,1,16/07/2008,10,,,1993,159.5,1,Tap water,4,Furrow,1,Full irrigated,1,Rep. 1
+169,,2008,CN,CAU,1,24/07/2008,10,,,2124,169.9,1,Tap water,4,Furrow,1,Full irrigated,1,Rep. 1
+188,,2008,CN,CAU,1,1/8/2008,11,,,733.8,58.7,1,Tap water,4,Furrow,1,Full irrigated,2,Rep. 2
+152,,2008,CN,CAU,1,16/07/2008,11,,,1885,150.8,1,Tap water,4,Furrow,1,Full irrigated,2,Rep. 2
+170,,2008,CN,CAU,1,24/07/2008,11,,,1387,110.9,1,Tap water,4,Furrow,1,Full irrigated,2,Rep. 2
+189,,2008,CN,CAU,1,1/8/2008,12,,,862.8,69,1,Tap water,4,Furrow,1,Full irrigated,3,Rep. 3
+153,,2008,CN,CAU,1,16/07/2008,12,,,2075,166,1,Tap water,4,Furrow,1,Full irrigated,3,Rep. 3
+171,,2008,CN,CAU,1,24/07/2008,12,,,2249,179.9,1,Tap water,4,Furrow,1,Full irrigated,3,Rep. 3
+190,,2008,CN,CAU,1,1/8/2008,16,,,412.5,33,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,1,Rep. 1
+154,,2008,CN,CAU,1,16/07/2008,16,,,1968,157.4,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,1,Rep. 1
+172,,2008,CN,CAU,1,24/07/2008,16,,,1643,131.4,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,1,Rep. 1
+191,,2008,CN,CAU,1,1/8/2008,17,,,573,45.8,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,2,Rep. 2
+155,,2008,CN,CAU,1,16/07/2008,17,,,1937,155,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,2,Rep. 2
+173,,2008,CN,CAU,1,24/07/2008,17,,,1892,151.4,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,2,Rep. 2
+192,,2008,CN,CAU,1,1/8/2008,18,,,678.7,54.3,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,3,Rep. 3
+156,,2008,CN,CAU,1,16/07/2008,18,,,2178,174.3,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,3,Rep. 3
+174,,2008,CN,CAU,1,24/07/2008,18,,,2508,200.7,9,Primary treated waste water,4,Furrow,2,Partial rootzone drying,3,Rep. 3
+193,,2008,CN,CAU,1,1/8/2008,19,,,634.5,50.8,9,Primary treated waste water,4,Furrow,1,Full irrigated,1,Rep. 1
+157,,2008,CN,CAU,1,16/07/2008,19,,,2334,186.7,9,Primary treated waste water,4,Furrow,1,Full irrigated,1,Rep. 1
+175,,2008,CN,CAU,1,24/07/2008,19,,,1464,117.1,9,Primary treated waste water,4,Furrow,1,Full irrigated,1,Rep. 1
+194,,2008,CN,CAU,1,1/8/2008,20,,,1031,82.5,9,Primary treated waste water,4,Furrow,1,Full irrigated,2,Rep. 2
+158,,2008,CN,CAU,1,16/07/2008,20,,,2435,194.8,9,Primary treated waste water,4,Furrow,1,Full irrigated,2,Rep. 2
+176,,2008,CN,CAU,1,24/07/2008,20,,,1757,140.5,9,Primary treated waste water,4,Furrow,1,Full irrigated,2,Rep. 2
+195,,2008,CN,CAU,1,1/8/2008,21,,,988.7,79.1,9,Primary treated waste water,4,Furrow,1,Full irrigated,3,Rep. 3
+159,,2008,CN,CAU,1,16/07/2008,21,,,2023,161.8,9,Primary treated waste water,4,Furrow,1,Full irrigated,3,Rep. 3
+177,,2008,CN,CAU,1,24/07/2008,21,,,2204,176.3,9,Primary treated waste water,4,Furrow,1,Full irrigated,3,Rep. 3

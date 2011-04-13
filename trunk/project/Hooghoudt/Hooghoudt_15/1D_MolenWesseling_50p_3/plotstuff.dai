@@ -1,0 +1,140 @@
+(defgnuplot plotformat time 
+   "Common for weather and water cotent plots"
+   (begin 1998 05 01)(end 2000 08 15)
+   (size 1 0.20)  ;;For A4
+   (extra "set pointsize 0.5"  
+          [set format x " "]       
+          "unset ylabel"
+          "set lmargin 0"
+          "set rmargin 0"
+          "set tmargin 0.5"
+          "set bmargin 0"
+          "set size ratio 0.15 "))
+       
+(defgnuplot plotweather plotformat  
+   "Plot precipitation."
+   (where "weather.eps")
+   (extra &old "unset xtics"
+               "set ytics 10"
+               "set y2tics 10"
+               "unset y2label")   
+   (source (column (file "GenAverage.dwf")
+                   (tag "Precip")
+                   (style 1)
+                   (title "Precipitation")
+                   (with impulses))
+           (column (file "GenAverage.dwf")
+                   (tag "AirTemp")
+                   (style 3)
+                   ;;(with [lines linetype "blue"])
+                   (title "Air temperature")
+                   )))
+
+(defgnuplot plotZcm plotformat
+   "Plot theta at Z cm."
+   (declare z String "Soil depth to plot.") 
+   (ymin 0.00)(ymax 0.40)
+   (where "theta${z}cm.eps")
+   (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  ;; &old keep other existing properties else it would be deleted
+               "unset mxtics"
+               "set ytics 0.1")
+   (source (column (file "interval_water_content2.dlf") 
+                   (tag "${z} cm, 400 cm")
+                   (style 1)
+                   (title "${z} cm")
+                   )
+           (column (file "theta_${z}cm.ddf") 
+                   (tag "Water content")
+                   (style 3)
+                   (title "TDR")
+                   (with points))))  ;points instead of error bars
+                                      
+(defgnuplot plotinfiltration plotformat
+   (where "infiltration.eps")
+   ;(ymin -5)(ymax 20)
+   (extra &old "set ytics 5"
+               "unset ylabel"
+               "set xtics 24 * 60 * 60 *30 rotate")        
+               ;;"set format x \"%y-%m-%d\"")    
+   (source (column (file "infiltration.dlf") 
+                   (tag "Surface2Matrix")
+                   (style 1)
+                   (title "Surf2Mat, mm/d"))
+           (column (file "infiltration.dlf") 
+                   (tag "Surface2Bio2Matrix")
+                   (style 2)
+                   (title "Surf2Bio2Mat, mm/d"))
+           (column (file "infiltration.dlf") 
+                   (tag "Surface2Bio2Drain")
+                   (style 3)
+                   (title "Surf2Bio2Drain, mm/d"))))
+
+(defgnuplot plotpondingdepth plotformat
+   (where "pondingdepth.eps")
+   ;(ymin -5)(ymax 20)
+   (extra &old "set ytics 5"
+               "unset ylabel"
+               "set xtics 24 * 60 * 60 *30 rotate"        
+               "set format x \"%y-%m-%d\"")    
+   (source (column (file "ponding_depth.dlf") 
+                   (tag "Surface Ponding")
+                   (style 1)
+                   (title "Surface Ponding, mm"))))
+            
+(defgnuplot shortplotZcm plotZcm
+   (begin 1998 05 01)(end 1998 08 15)
+   (where "theta_short${z}cm.eps")
+   (extra &old "set xtics 24 * 60 * 60 * 7"
+               "unset mxtics"))
+      
+(defgnuplot shortplotweather plotweather
+   (begin 1998 05 01)(end 1998 08 15)
+   (where "weather_short.eps"))
+   
+(defgnuplot shortplotinfiltration plotinfiltration
+   (begin 1998 05 01)(end 1998 08 15)
+   (where "infiltration_short.eps")
+   (extra &old "set xtics 24 * 60 * 60 *7 rotate"))        
+               ;;"set format x \"%y-%m-%d\""))   
+               ;;"unset format x"))
+               
+(defgnuplot shortplotpondingdepth plotpondingdepth 
+   (begin 1998 05 01)(end 1998 08 15)
+   (where "pondingdepth_short.eps")
+   (extra &old "set xtics 24 * 60 * 60 *7 rotate"        
+               "set format x \"%y-%m-%d\""))   
+
+(defprogram "Rorrende Graphs" gnuplot 
+   (graph (plotweather) 
+          (plotZcm (z "4"))
+          (plotZcm (z "8"))
+          (plotZcm (z "12"))
+          (plotZcm (z "16"))
+          (plotZcm (z "20"))
+          (plotZcm (z "24"))
+          (plotZcm (z "36"))     
+          (plotZcm (z "60")
+                   (extra &old "set xtics 24 * 60 * 60 *30 rotate"  ;; &old keep other existing properties else it would be deleted 
+                               "set mxtics 3"
+                               "set format x \"%y-%m-%d\""))   
+          (plotinfiltration)
+          (plotpondingdepth)
+          (shortplotweather)      
+          (shortplotZcm (z "4"))
+          (shortplotZcm (z "8"))
+          (shortplotZcm (z "12"))
+          (shortplotZcm (z "16"))
+          (shortplotZcm (z "20"))
+          (shortplotZcm (z "24"))
+          (shortplotZcm (z "36"))
+          (shortplotZcm (z "60")
+                   (extra &old "set xtics 24 * 60 * 60 * 7 rotate"   
+                               "set mxtics 7"
+                               "set format x \"%y-%m-%d\""))      
+          (shortplotinfiltration)
+          (shortplotpondingdepth)
+   ))
+   
+(run "Rorrende Graphs")
+
+

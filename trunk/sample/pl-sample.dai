@@ -1,0 +1,24 @@
+;; pl-sample.dai -- Sample soil from Poland, from FertOrgaNic project.
+
+;; Contacts: Plant Breeding and Acclimatisation Institute, Department
+;; of Agronomy, Jadwisin, 05-140 Serock, Poland; e-mail:
+;; w.mazurczyk@ihar.edu.pl.
+
+(input file "fertilizer.dai")
+(input file "crop.dai")
+(input file "tillage.dai")
+(input file "pl-soil.dai")
+(input file "pl-management.dai")
+
+(defprogram "WP1 PL IHAR 2004" Daisy
+  "Polish WP1 data for 2004."
+  (weather default "pl-jadwisin.dwf")
+  (time 1999 1 1)
+  (stop 2004 5 6 23)
+  (column "WP1 PL IHAR 2004")
+  (manager "WP1 PL 2004 warmup")
+  (output harvest))
+
+(run "WP1 PL IHAR 2004")
+
+;; pl-sample.dai ends here.

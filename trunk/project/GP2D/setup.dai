@@ -1,0 +1,242 @@
+(defprogram china rootmatch
+  (tag_z_min "Position Z minimum")
+  (tag_z_max "Position Z maximum")
+  (tag_density "Root lenght density")
+  (show_data false)
+  (tabular true)
+  (dim_line false)
+  (dens_dim "cm/cm^3")
+  (file "china.ddf"))
+
+(defprogram CAAS china
+  (tag_x "Position Y")
+  (filter ("Site" "CAAS"))
+  (SoilDepth -1 [cm])                  ;Infinite.
+  (row_distance 75 [cm])
+  (pos_dim "cm"))
+
+(defprogram CAAS-2008 CAAS
+  (filter &old ("XYear" "2008"))
+          ;;("Position X" "0")
+          ;; ("Position Y" "0")
+          )
+
+(defprogram CAAS-2008-3 CAAS-2008
+  (filter &old ("Plot number" "3")))
+
+(defprogram CAAS-2008-6 CAAS-2008
+  (filter &old ("Plot number" "6")))
+
+(defprogram CAAS-2008-9 CAAS-2008
+  (filter &old ("Plot number" "9")))
+
+(defprogram CAAS-2008-12 CAAS-2008
+  (filter &old ("Plot number" "12")))
+
+(defprogram CAAS-2008-15 CAAS-2008
+  (filter &old ("Plot number" "15")))
+
+(defprogram CAAS-2008-18 CAAS-2008
+  (filter &old ("Plot number" "18")))
+
+(defprogram CAAS-2008-21 CAAS-2008
+  (filter &old ("Plot number" "21")))
+
+(defprogram CAAS-2008-24 CAAS-2008
+  (filter &old ("Plot number" "24")))
+
+(defprogram CAAS-2008-all batch 
+  (run CAAS-2008
+       CAAS-2008-3
+       CAAS-2008-6
+       CAAS-2008-9
+       CAAS-2008-12
+       CAAS-2008-15
+       CAAS-2008-18
+       CAAS-2008-21
+       CAAS-2008-24
+       ))
+
+
+(defprogram CAAS-2006 CAAS
+  (filter &old ("XYear" "2006"))
+          ;;("Position X" "0")
+          ;; ("Position Y" "0")
+          )
+
+(defprogram CAAS-2006-7 CAAS-2006
+  (filter &old ("Plot number" "7")))
+
+(defprogram CAAS-2006-8 CAAS-2006
+  (filter &old ("Plot number" "8")))
+
+(defprogram CAAS-2006-9 CAAS-2006
+  (filter &old ("Plot number" "9")))
+
+(defprogram CAAS-2006-10 CAAS-2006
+  (filter &old ("Plot number" "10")))
+
+(defprogram CAAS-2006-11 CAAS-2006
+  (filter &old ("Plot number" "11")))
+
+(defprogram CAAS-2006-12 CAAS-2006
+  (filter &old ("Plot number" "12")))
+
+(defprogram CAAS-2006-all batch 
+  (run CAAS-2006
+       CAAS-2006-7
+       CAAS-2006-8
+       CAAS-2006-9
+       CAAS-2006-10
+       CAAS-2006-11
+       CAAS-2006-12
+       ))
+
+(defprogram CAU china
+  (tag_x "Position X")
+  (filter ("Site" "CAU")
+          ("Position Y" "5.5" "7"))
+  ;; (min_dist 10.0 [cm])
+  (SoilDepth -1 [cm])                  ;Infinite.
+  (row_position 3.6 [m])
+  (row_distance 80 [cm])
+  (pos_dim "m"))
+
+(defprogram CAU-2007a CAU
+  (filter &old ("XDate" "30/05/2007")))
+
+(defprogram CAU-2007a-1 CAU-2007a
+  (filter &old ("Plot number" "1")))
+
+(defprogram CAU-2007a-2 CAU-2007a
+  (filter &old ("Plot number" "2")))
+
+(defprogram CAU-2007a-3 CAU-2007a
+  (filter &old ("Plot number" "3")))
+
+(defprogram CAU-2007a-4 CAU-2007a
+  (filter &old ("Plot number" "4")))
+
+(defprogram CAU-2007a-5 CAU-2007a
+  (filter &old ("Plot number" "5")))
+
+(defprogram CAU-2007a-all batch 
+  (run CAU-2007a
+       CAU-2007a-1
+       CAU-2007a-2
+       CAU-2007a-3
+       CAU-2007a-4
+       CAU-2007a-5
+       ))
+
+(defprogram CAU-2007b CAU
+  (filter &old ("XDate" "05/07/07")))
+
+(defprogram CAU-2007b-1 CAU-2007b
+  (filter &old ("Plot number" "1")))
+
+(defprogram CAU-2007b-2 CAU-2007b
+  (filter &old ("Plot number" "2")))
+
+(defprogram CAU-2007b-3 CAU-2007b
+  (filter &old ("Plot number" "3")))
+
+(defprogram CAU-2007b-4 CAU-2007b
+  (filter &old ("Plot number" "4")))
+
+(defprogram CAU-2007b-5 CAU-2007b
+  (filter &old ("Plot number" "5")))
+
+(defprogram CAU-2007b-all batch 
+  (run CAU-2007b
+       CAU-2007b-1
+       CAU-2007b-2
+       CAU-2007b-3
+       CAU-2007b-4
+       CAU-2007b-5
+       ))
+
+(defprogram CAU-2008a CAU
+  (filter &old ("XDate" "15/06/2008")))
+
+(defprogram CAU-2008a-3 CAU-2008a
+  (filter &old ("Plot number" "3")))
+
+(defprogram CAU-2008a-6 CAU-2008a
+  (filter &old ("Plot number" "6")))
+
+(defprogram CAU-2008a-9 CAU-2008a
+  (filter &old ("Plot number" "9")))
+
+(defprogram CAU-2008a-12 CAU-2008a
+  (filter &old ("Plot number" "12")))
+
+(defprogram CAU-2008a-15 CAU-2008a
+  (filter &old ("Plot number" "15")))
+
+(defprogram CAU-2008a-all batch 
+  (run CAU-2008a
+       CAU-2008a-3
+       CAU-2008a-6
+       CAU-2008a-9
+       CAU-2008a-12
+       CAU-2008a-15
+       ))
+
+(defprogram CAU-2008b CAU
+  (filter &old ("XDate" "24/07/2008")))
+
+(defprogram CAU-2008b-3 CAU-2008b
+  (filter &old ("Plot number" "3")))
+
+(defprogram CAU-2008b-6 CAU-2008b
+  (filter &old ("Plot number" "6")))
+
+(defprogram CAU-2008b-9 CAU-2008b
+  (filter &old ("Plot number" "9")))
+
+(defprogram CAU-2008b-12 CAU-2008b
+  (filter &old ("Plot number" "12")))
+
+(defprogram CAU-2008b-15 CAU-2008b
+  (filter &old ("Plot number" "15")))
+
+(defprogram CAU-2008b-all batch 
+  (run CAU-2008b
+       CAU-2008b-3
+       CAU-2008b-6
+       CAU-2008b-9
+       CAU-2008b-12
+       CAU-2008b-15
+       ))
+
+(defprogram CAU-all batch 
+  (run CAU-2007a-all
+       CAU-2007b-all
+       CAU-2008a-all
+       CAU-2008b-all))
+
+
+(defprogram param batch (run CAAS-2006-all CAAS-2008-all CAU-all))
+
+(defprogram rows batch
+  (run (CAU-2008a
+        (gnuplot (x_start 3.2 [m])
+                 (x_offset 3.6 [m])
+                 (x_end 4.8 [m])
+                 (z_end 150.0 [cm])))
+       (CAU-2008b
+        (gnuplot (x_start 3.2 [m])
+                 (x_offset 3.6 [m])
+                 (x_end 4.8 [m])
+                 (z_end 150.0 [cm])))))
+
+(defprogram match batch
+  (run (CAAS-2008 (show_match true))
+       (CAU-2007a (show_match true) (x_offset 360 [cm]))
+       (CAU-2007b (show_match true) (x_offset 360 [cm]))
+       (CAU-2008a (show_match true) (x_offset 360 [cm]))
+       (CAU-2008b (show_match true) (x_offset 360 [cm]))))
+       
+
+(run match)

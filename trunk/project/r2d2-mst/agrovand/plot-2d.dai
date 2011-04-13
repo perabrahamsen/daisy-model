@@ -1,0 +1,505 @@
+;; plot-2d.dai -- Plot 2D daisy from Rørrende.
+
+(defgnuplot vap-2D soil
+  "Plot soil content specific month."
+  (declare station String "Name of station.")
+  (declare m Integer "Month to plot.")
+  (declare y Integer "Year to plot.")
+
+  (extra &old
+         [set format x ""]
+         [set format y ""]
+         [unset colorbox]
+         [unset xlabel]
+         [unset ylabel]
+         [set xtics 100]
+         [set ytics 100]
+         [set lmargin 0]
+         [set rmargin 0]
+         [set bmargin 0]
+         [set tmargin 0]
+         )
+  (title "${y}-${m}")
+  (when &old $y $m 28))
+
+(defgnuplot base multi
+  (declare base String "Location of simulation")
+  ;; (base "/home/abraham/sim/sim-sw")
+  (base "."))
+
+(defgnuplot Rorrende-2D vap-2D
+  "Plot monthly 2D data for Rorrende."
+  (station Rorrende)
+  (canvas "8cm,3cm"))
+
+(defgnuplot Rorrende-2D-pF Rorrende-2D
+  (extra &old
+         [set palette defined (0 "blue", 1 "white", 2 "yellow", 3 "orange", 4 "red", 5.0 "black")])
+  (where "fig/${station}-pF-${y}-${m}.pdf")
+  (file "${base}/log/${station}-pF.dlf")
+  (min 0 [pF])
+  (max 5 [pF]))
+
+(defgnuplot Rorrende-2D-M Rorrende-2D
+  (extra &old [set palette defined (0 "white", 1e-2 "white", 1e0 "yellow", 1e2 "orange", 1e4 "red", 1e6 "black", 1e10 "black")])
+  (min 0 [ug/m^3])
+  (max 1e10 [ug/m^3])
+  )
+
+(defgnuplot Rorrende-2D-M-Bromide Rorrende-2D-M
+  (extra &old [set palette defined (0 "white", 1e3 "white", 1e4 "yellow", 1e5 "orange", 1e6 "red", 1e7 "black", 1e10 "black")])
+  (where "fig/${station}-M-Bromide-${y}-${m}.pdf")
+  (file "${base}/log/${station}-content-Bromide.dlf")
+  )
+
+(defgnuplot Rorrende-2D-C Rorrende-2D-M)
+
+(defgnuplot Rorrende-2D-pF-1998 base
+  (graph (Rorrende-2D-pF (y 1998) (m 5))
+         (Rorrende-2D-pF (y 1998) (m 6))
+         (Rorrende-2D-pF (y 1998) (m 7))
+         (Rorrende-2D-pF (y 1998) (m 8))
+         (Rorrende-2D-pF (y 1998) (m 9))
+         (Rorrende-2D-pF (y 1998) (m 10))
+         (Rorrende-2D-pF (y 1998) (m 11))
+         (Rorrende-2D-pF (y 1998) (m 12))
+         (Rorrende-2D-pF (y 1999) (m 1))
+         (Rorrende-2D-pF (y 1999) (m 2))
+         (Rorrende-2D-pF (y 1999) (m 3))
+         (Rorrende-2D-pF (y 1999) (m 4))))
+
+(defgnuplot Rorrende-2D-pF-1999 base
+  (graph (Rorrende-2D-pF (y 1999) (m 5))
+         (Rorrende-2D-pF (y 1999) (m 6))
+         (Rorrende-2D-pF (y 1999) (m 7))
+         (Rorrende-2D-pF (y 1999) (m 8))
+         (Rorrende-2D-pF (y 1999) (m 9))
+         (Rorrende-2D-pF (y 1999) (m 10))
+         (Rorrende-2D-pF (y 1999) (m 11))
+         (Rorrende-2D-pF (y 1999) (m 12))
+         (Rorrende-2D-pF (y 2000) (m 1))
+         (Rorrende-2D-pF (y 2000) (m 2))
+         (Rorrende-2D-pF (y 2000) (m 3))
+         (Rorrende-2D-pF (y 2000) (m 4))))
+
+(defgnuplot Rorrende-2D-pF-2000 base
+  (graph (Rorrende-2D-pF (y 2000) (m 5))
+         (Rorrende-2D-pF (y 2000) (m 6))
+         (Rorrende-2D-pF (y 2000) (m 7))
+         (Rorrende-2D-pF (y 2000) (m 8))
+         (Rorrende-2D-pF (y 2000) (m 9))
+         (Rorrende-2D-pF (y 2000) (m 10))
+         (Rorrende-2D-pF (y 2000) (m 11))
+         (Rorrende-2D-pF (y 2000) (m 12))
+         (Rorrende-2D-pF (y 2001) (m 1))
+         (Rorrende-2D-pF (y 2001) (m 2))
+         (Rorrende-2D-pF (y 2001) (m 3))
+         (Rorrende-2D-pF (y 2001) (m 4))))
+
+(defgnuplot Rorrende-2D-M-Bromide-1998 base
+  (graph (Rorrende-2D-M-Bromide (y 1998) (m 5))
+         (Rorrende-2D-M-Bromide (y 1998) (m 6))
+         (Rorrende-2D-M-Bromide (y 1998) (m 7))
+         (Rorrende-2D-M-Bromide (y 1998) (m 8))
+         (Rorrende-2D-M-Bromide (y 1998) (m 9))
+         (Rorrende-2D-M-Bromide (y 1998) (m 10))
+         (Rorrende-2D-M-Bromide (y 1998) (m 11))
+         (Rorrende-2D-M-Bromide (y 1998) (m 12))
+         (Rorrende-2D-M-Bromide (y 1999) (m 1))
+         (Rorrende-2D-M-Bromide (y 1999) (m 2))
+         (Rorrende-2D-M-Bromide (y 1999) (m 3))
+         (Rorrende-2D-M-Bromide (y 1999) (m 4))))
+
+(defgnuplot Rorrende-2D-M-Bromide-1999 base
+  (graph (Rorrende-2D-M-Bromide (y 1999) (m 5))
+         (Rorrende-2D-M-Bromide (y 1999) (m 6))
+         (Rorrende-2D-M-Bromide (y 1999) (m 7))
+         (Rorrende-2D-M-Bromide (y 1999) (m 8))
+         (Rorrende-2D-M-Bromide (y 1999) (m 9))
+         (Rorrende-2D-M-Bromide (y 1999) (m 10))
+         (Rorrende-2D-M-Bromide (y 1999) (m 11))
+         (Rorrende-2D-M-Bromide (y 1999) (m 12))
+         (Rorrende-2D-M-Bromide (y 2000) (m 1))
+         (Rorrende-2D-M-Bromide (y 2000) (m 2))
+         (Rorrende-2D-M-Bromide (y 2000) (m 3))
+         (Rorrende-2D-M-Bromide (y 2000) (m 4))))
+
+(defgnuplot Rorrende-2D-M-Ioxynil Rorrende-2D-M
+  (where "fig/${station}-M-Ioxynil-${y}-${m}.pdf")
+  (file "${base}/log/${station}-content-Ioxynil.dlf")
+  )
+
+(defgnuplot Rorrende-2D-C-Ioxynil Rorrende-2D-C
+  (where "fig/${station}-C-Ioxynil-${y}-${m}.pdf")
+  (file "${base}/log/${station}-conc-Ioxynil.dlf")
+  )
+
+(defgnuplot Rorrende-2D-M-Ioxynil-2000 base
+  (graph (Rorrende-2D-M-Ioxynil (y 2000) (m 5))
+         (Rorrende-2D-M-Ioxynil (y 2000) (m 6))
+         (Rorrende-2D-M-Ioxynil (y 2000) (m 7))
+         (Rorrende-2D-M-Ioxynil (y 2000) (m 8))
+         (Rorrende-2D-M-Ioxynil (y 2000) (m 9))
+         (Rorrende-2D-M-Ioxynil (y 2000) (m 10))
+         (Rorrende-2D-M-Ioxynil (y 2000) (m 11))
+         (Rorrende-2D-M-Ioxynil (y 2000) (m 12))
+         (Rorrende-2D-M-Ioxynil (y 2001) (m 1))
+         (Rorrende-2D-M-Ioxynil (y 2001) (m 2))
+         (Rorrende-2D-M-Ioxynil (y 2001) (m 3))
+         (Rorrende-2D-M-Ioxynil (y 2001) (m 4))))
+
+(defgnuplot Rorrende-2D-C-Ioxynil-2000 base
+  (graph (Rorrende-2D-C-Ioxynil (y 2000) (m 5))
+         (Rorrende-2D-C-Ioxynil (y 2000) (m 6))
+         (Rorrende-2D-C-Ioxynil (y 2000) (m 7))
+         (Rorrende-2D-C-Ioxynil (y 2000) (m 8))
+         (Rorrende-2D-C-Ioxynil (y 2000) (m 9))
+         (Rorrende-2D-C-Ioxynil (y 2000) (m 10))
+         (Rorrende-2D-C-Ioxynil (y 2000) (m 11))
+         (Rorrende-2D-C-Ioxynil (y 2000) (m 12))
+         (Rorrende-2D-C-Ioxynil (y 2001) (m 1))
+         (Rorrende-2D-C-Ioxynil (y 2001) (m 2))
+         (Rorrende-2D-C-Ioxynil (y 2001) (m 3))
+         (Rorrende-2D-C-Ioxynil (y 2001) (m 4))))
+
+(defgnuplot Rorrende-2D-M-Pendimethalin Rorrende-2D-M
+  (where "fig/${station}-M-Pendimethalin-${y}-${m}.pdf")
+  (file "${base}/log/${station}-content-Pendimethalin.dlf")
+  )
+
+(defgnuplot Rorrende-2D-C-Pendimethalin Rorrende-2D-C
+  (where "fig/${station}-C-Pendimethalin-${y}-${m}.pdf")
+  (file "${base}/log/${station}-conc-Pendimethalin.dlf")
+  )
+
+(defgnuplot Rorrende-2D-M-Pendimethalin-1999 base
+  (graph (Rorrende-2D-M-Pendimethalin (y 1999) (m 5))
+         (Rorrende-2D-M-Pendimethalin (y 1999) (m 6))
+         (Rorrende-2D-M-Pendimethalin (y 1999) (m 7))
+         (Rorrende-2D-M-Pendimethalin (y 1999) (m 8))
+         (Rorrende-2D-M-Pendimethalin (y 1999) (m 9))
+         (Rorrende-2D-M-Pendimethalin (y 1999) (m 10))
+         (Rorrende-2D-M-Pendimethalin (y 1999) (m 11))
+         (Rorrende-2D-M-Pendimethalin (y 1999) (m 12))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 1))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 2))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 3))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 4))))
+
+(defgnuplot Rorrende-2D-C-Pendimethalin-1999 base
+  (graph (Rorrende-2D-C-Pendimethalin (y 1999) (m 5))
+         (Rorrende-2D-C-Pendimethalin (y 1999) (m 6))
+         (Rorrende-2D-C-Pendimethalin (y 1999) (m 7))
+         (Rorrende-2D-C-Pendimethalin (y 1999) (m 8))
+         (Rorrende-2D-C-Pendimethalin (y 1999) (m 9))
+         (Rorrende-2D-C-Pendimethalin (y 1999) (m 10))
+         (Rorrende-2D-C-Pendimethalin (y 1999) (m 11))
+         (Rorrende-2D-C-Pendimethalin (y 1999) (m 12))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 1))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 2))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 3))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 4))))
+
+(defgnuplot Rorrende-2D-M-Pendimethalin-2000 base
+  (graph (Rorrende-2D-M-Pendimethalin (y 2000) (m 5))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 6))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 7))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 8))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 9))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 10))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 11))
+         (Rorrende-2D-M-Pendimethalin (y 2000) (m 12))
+         (Rorrende-2D-M-Pendimethalin (y 2001) (m 1))
+         (Rorrende-2D-M-Pendimethalin (y 2001) (m 2))
+         (Rorrende-2D-M-Pendimethalin (y 2001) (m 3))
+         (Rorrende-2D-M-Pendimethalin (y 2001) (m 4))))
+
+(defgnuplot Rorrende-2D-C-Pendimethalin-2000 base
+  (graph (Rorrende-2D-C-Pendimethalin (y 2000) (m 5))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 6))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 7))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 8))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 9))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 10))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 11))
+         (Rorrende-2D-C-Pendimethalin (y 2000) (m 12))
+         (Rorrende-2D-C-Pendimethalin (y 2001) (m 1))
+         (Rorrende-2D-C-Pendimethalin (y 2001) (m 2))
+         (Rorrende-2D-C-Pendimethalin (y 2001) (m 3))
+         (Rorrende-2D-C-Pendimethalin (y 2001) (m 4))))
+
+(defgnuplot plot2d-block-Rorrende base
+  (graph 
+   Rorrende-2D-pF-1998 Rorrende-2D-pF-1999 Rorrende-2D-pF-2000
+   Rorrende-2D-M-Bromide-1998 Rorrende-2D-M-Bromide-1999
+   Rorrende-2D-M-Ioxynil-2000 Rorrende-2D-C-Ioxynil-2000
+   Rorrende-2D-M-Pendimethalin-1999 Rorrende-2D-C-Pendimethalin-1999
+   Rorrende-2D-M-Pendimethalin-2000 Rorrende-2D-C-Pendimethalin-2000
+   ))
+
+(defgnuplot plot2d-pF-all base
+  (graph Rorrende-2D-pF-1998 Rorrende-2D-pF-1999 Rorrende-2D-pF-2000))
+
+(defgnuplot vap-xy xy
+  (device "pdf size 19cm,7cm"))
+
+(defxysource vap-flux flux
+  (declare pos Number [cm] "Position.")
+  (title "${pos}")
+  (file "${base}/log/${station}-q.dlf")
+  (pos_dim [m])
+  (begin &old $y 5 1)
+  (end &old $y2 5 1))
+
+(defxysource flux-z vap-flux
+  (z $pos))
+
+(defxysource flux-x vap-flux
+  (x $pos))
+
+
+(defxysource flux-b flux-z
+  (file "${base}/log/${station}-q_p.dlf"))
+
+(defxysource flux-c xycombine
+  (declare ps Number [cm] "Position.")
+  (title "${ps}")
+  (expr (+ q p))
+  (source (flux-z (pos $ps) (title q)) (flux-b (pos $ps) (title p))))
+
+(defgnuplot flux-horizontal vap-xy
+  (where "fig/${station}-water-horizontal-${y}.pdf")
+  (xmin -1500 [mm])
+  ;; (title "Horizontal flux")
+  (source (flux-x (pos 25 [cm]))
+          (flux-x (pos 50 [cm])) 
+          (flux-x (pos 100 [cm]))
+          (flux-x (pos 150 [cm]))
+          (flux-x (pos 300 [cm]))
+         ))
+
+(defgnuplot flux-water-vertical vap-xy
+  (ymin -1000 [mm])
+  (ymax  1000 [mm]))
+
+(defgnuplot flux-matrix flux-water-vertical
+  (where "fig/${station}-water-matrix-${y}.pdf")
+  ;;(title "Vertical matrix flux")
+  (source (flux-z (pos 0 [cm]))
+          (flux-z (pos -25 [cm]))
+          (flux-z (pos -50 [cm])) 
+          (flux-z (pos -100 [cm]))
+          (flux-z (pos -150 [cm]))
+          (flux-z (pos -200 [cm]))
+         ))
+
+(defgnuplot flux-biopores flux-water-vertical
+  (where "fig/${station}-water-biopore-${y}.pdf")
+  ;;(title "Vertical biopore flux")
+  ;; (legend none)
+  (source (flux-b (pos 0 [cm]))
+          (flux-b (pos -25 [cm]))
+          (flux-b (pos -50 [cm])) 
+          (flux-b (pos -100 [cm]))))
+
+(defgnuplot flux-combined flux-water-vertical
+  (where "fig/${station}-water-${y}.pdf")
+  ;;(title "Vertical flux")
+  (extra &old [set format x ""])
+  (source (flux-c (ps 0 [cm]))
+          (flux-c (ps -25 [cm]))
+          (flux-c (ps -50 [cm])) 
+          (flux-c (ps -100 [cm]))
+          (flux-z (pos -150 [cm]))
+          (flux-z (pos -200 [cm]))
+         ))
+
+(defgnuplot plot2d-flux base
+  (declare station String "Name of station.")
+  (declare y Integer "Year to plot.")
+  (declare y2 Integer "Next year.")
+  (graph flux-matrix flux-biopores flux-combined))
+
+(defgnuplot plot2d-flux-Rorrende-1998 plot2d-flux
+  (station Rorrende)
+  (graph &old (flux-horizontal (extra &old [set format x ""])))
+  (y 1998)
+  (y2 1999))
+
+(defgnuplot plot2d-flux-Rorrende-1999 plot2d-flux
+  (station Rorrende)
+  (graph &old (flux-horizontal (extra &old [set format x ""])))
+  (y 1999)
+  (y2 2000))
+
+(defgnuplot plot2d-flux-Rorrende-2000 plot2d-flux
+  (station Rorrende)
+  (graph &old (flux-horizontal))
+  (y 2000)
+  (y2 2001))
+
+
+(defxysource vap-flow flux
+
+  (dimension "${dim}")
+  (declare pos Number [cm] "Position.")
+  (title "${pos}")
+  (file "${base}/log/${station}-J-${chemical}.dlf")
+  (pos_dim [m])
+  (begin &old $y 5 1)
+  (end &old $y2 5 1))
+
+(defxysource flow-z vap-flow
+  (z $pos))
+
+(defxysource flow-x vap-flow
+  (x $pos))
+
+
+(defxysource flow-b flow-z
+  (file "${base}/log/${station}-J_p-${chemical}.dlf"))
+
+(defxysource flow-c xycombine
+  (declare ps Number [cm] "Position.")
+  (title "${ps}")
+  (expr (+ q p))
+  (source (flow-z (pos $ps) (title q)) (flow-b (pos $ps) (title p))))
+
+(defgnuplot flow-horizontal vap-xy
+  (where "fig/${station}-${chemical}-horizontal-${y}.pdf")
+  ;;(title "Horizontal flow")
+  (source (flow-x (pos 25 [cm]))
+          (flow-x (pos 50 [cm])) 
+          (flow-x (pos 100 [cm]))
+          (flow-x (pos 150 [cm]))
+          (flow-x (pos 300 [cm]))
+         ))
+
+(defgnuplot flow-matrix vap-xy
+  (where "fig/${station}-${chemical}-matrix-${y}.pdf")
+  ;;(title "Vertical matrix flow")
+  (source (flow-z (pos 0 [cm]))
+          (flow-z (pos -25 [cm]))
+          (flow-z (pos -50 [cm])) 
+          (flow-z (pos -100 [cm]))
+          (flow-z (pos -150 [cm]))
+          (flow-z (pos -200 [cm]))
+         ))
+
+(defgnuplot flow-biopores vap-xy
+  (where "fig/${station}-${chemical}-biopore-${y}.pdf")
+  ;;(title "Vertical biopore flow")
+  ;;(legend none)
+  (source (flow-b (pos 0 [cm]))
+          (flow-b (pos -25 [cm]))
+          (flow-b (pos -50 [cm])) 
+          (flow-b (pos -100 [cm]))))
+
+(defgnuplot flow-combined vap-xy
+  (where "fig/${station}-${chemical}-${y}.pdf")
+  ;;(title "Vertical flow")
+  (extra &old [set format x ""])
+  (source (flow-c (ps 0 [cm]))
+          (flow-c (ps -25 [cm]))
+          (flow-c (ps -50 [cm])) 
+          (flow-c (ps -100 [cm]))
+          (flow-z (pos -150 [cm]))
+          (flow-z (pos -200 [cm]))
+         ))
+
+(defgnuplot plot2d-flow base
+  (declare station String "Name of station.")
+  (declare chemical String "Name of chemical.")
+  (declare dim String "Dimension for mass.")
+  (declare y Integer "Year to plot.")
+  (declare y2 Integer "Next year.")
+  (graph flow-matrix))
+
+(defgnuplot plot2d-flow-Rorrende-1998 plot2d-flow
+  (station Rorrende)
+  (y 1998)
+  (y2 1999))
+
+(defgnuplot plot2d-flow-Rorrende-1999 plot2d-flow
+  (station Rorrende)
+  (y 1999)
+  (y2 2000))
+
+(defgnuplot plot2d-flow-Rorrende-2000 plot2d-flow
+  (station Rorrende)
+  (y 2000)
+  (y2 2001))
+
+(defgnuplot plot2d-flow-Rorrende-Bromide-1998 plot2d-flow-Rorrende-1998
+  (graph &old 
+         (flow-horizontal (xmin -35 [kg/ha]))
+         (flow-biopores (ymin -35 [kg/ha]) (ymax 10 [kg/ha]))
+         (flow-combined (ymin -35 [kg/ha]) (ymax 10 [kg/ha])))
+  (dim [kg/ha])
+  (chemical Bromide))
+
+(defgnuplot plot2d-flow-Rorrende-Bromide-1999 plot2d-flow-Rorrende-1999
+  (graph &old
+         (flow-horizontal (xmin -35 [kg/ha]) ;; (legend none)
+                          )
+         (flow-biopores (ymin -35 [kg/ha]) (ymax 10 [kg/ha]))  
+         (flow-combined (ymin -35 [kg/ha]) (ymax 10 [kg/ha]))) 
+  (dim [kg/ha])
+  (chemical Bromide))
+
+(defgnuplot plot2d-flow-Rorrende-Ioxynil-2000 plot2d-flow-Rorrende-2000
+  (graph &old 
+         (flow-horizontal (xmin -4 [g/ha]))
+         (flow-biopores (ymin -200 [g/ha]) (ymax 0 [g/ha])) 
+         (flow-combined (ymin -200 [g/ha]) (ymax 0 [g/ha])))
+  (dim [g/ha])
+  (chemical Ioxynil))
+
+(defgnuplot plot2d-flow-Rorrende-Pendimethalin-1999 plot2d-flow-Rorrende-1999
+  (graph &old 
+         (flow-horizontal (xmin -25 [g/ha]))
+         (flow-biopores (ymin -2000 [g/ha]) (ymax 0 [g/ha])) 
+         (flow-combined (ymin -2000 [g/ha]) (ymax 0 [g/ha])))
+  (dim [g/ha])
+  (chemical Pendimethalin))
+
+(defgnuplot plot2d-flow-Rorrende-Pendimethalin-2000 plot2d-flow-Rorrende-2000
+  (graph &old 
+         (flow-horizontal (xmin -25 [g/ha]))
+         (flow-biopores (ymin -2000 [g/ha]) (ymax 0 [g/ha])) 
+         (flow-combined (ymin -2000 [g/ha]) (ymax 0 [g/ha])))
+  (dim [g/ha])
+  (chemical Pendimethalin))
+
+(defgnuplot plot2d-flux-Rorrende base
+  (graph 
+   plot2d-flux-Rorrende-1998
+   plot2d-flux-Rorrende-1999
+   plot2d-flux-Rorrende-2000
+   plot2d-flow-Rorrende-Bromide-1998
+   plot2d-flow-Rorrende-Bromide-1999
+   plot2d-flow-Rorrende-Ioxynil-2000
+   plot2d-flow-Rorrende-Pendimethalin-1999
+   plot2d-flow-Rorrende-Pendimethalin-2000
+   ))
+  
+(defgnuplot plot2d-block base
+  (graph plot2d-block-Rorrende))
+
+(defgnuplot plot2d-flux-all base
+  (graph plot2d-flux-Rorrende-1998
+         plot2d-flux-Rorrende-1999
+         plot2d-flux-Rorrende-2000))
+
+(defgnuplot plot2d-Rorrende base
+  (graph plot2d-block-Rorrende plot2d-flux-Rorrende))
+
+(defgnuplot plot2d base
+  (graph plot2d-Rorrende))
+
+(defprogram plot2d gnuplot 
+  (graph plot2d))
+
+;; (run plot2d)
+
+;; plot-2d.dai ends here.

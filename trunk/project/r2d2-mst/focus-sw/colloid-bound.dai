@@ -1,0 +1,193 @@
+;; colloid-bound.dai
+
+;;; Pure colloids.
+
+(defchemical colloid common
+  "Mobile colloids."
+  (diffusion_coefficient 4.6e-6 [cm^2/s])
+  (decompose_rate 0 [h^-1]))
+
+(defreaction colloid-filter filter_velocity
+  "Filtration of colloids in the soil matrix."
+  (cite "mcgechan2002")
+  (fc_primary 80 [m^-1])              ;Filter coefficient primary domain.
+  (fc_secondary 40 [m^-1])            ;Ditto for secondary domain.
+  (mobile colloid))
+
+(defreaction colloid-generation colgen_Jarvis99
+  "Release of colloids in soil surface from heavy rain."
+  ;; (kd 7.5 [g/J])                       ;Detachment rate coefficient.
+  (kd 15 [g/J])                       ;Detachment rate coefficient.
+  ;; (kr 0.05 [g/m^2/h])                    ;Replenishment rate coefficient.
+  (kr 0.1 [g/m^2/h])
+  ;; (zi 0.05 [cm])                         ;Surface layer thickness.
+  (zi 0.1 [cm])
+  (colloid colloid))
+
+(defchemistry colloids default
+  (trace colloid)
+  (reaction colloid-filter colloid-generation))
+
+;;; P1
+
+(defchemical P1-base insecticide
+  "Base parameterization for all P1 forms."
+  (decompose_halftime 6 [d]))
+
+(defchemical P1 P1-base
+  "Dissolved P1"
+  (adsorption none))
+
+(defchemical P1-immobile P1-base
+  "P1 sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction P1-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile P1."
+  (sorbed P1-immobile)
+  (solute P1)
+  (K_OC 15 [ml/g])
+  (k_sorption 0.05 [h^-1]))
+
+(defchemical P1-colloid P1-base
+  "P1 sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction P1-colloid-sorption P1-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound P1."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed P1-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction P1-filter colloid-filter
+  "Filtration of colloid-bound pendimethalin in the soil matrix."
+  (mobile P1-colloid)
+  (immobile P1-immobile))
+
+(defreaction P1-colloid-generation bound_release
+  "Release immobile P1 as colloids in mixing layer."
+  (colloid colloid)
+  (immobile P1-immobile)
+  (bound P1-colloid))
+
+(defchemistry P1 default
+  "P1 in both immobile, solute and colloid form."
+  (trace P1 P1-immobile P1-colloid)
+  (reaction P1-immobile-sorption
+            P1-filter 
+            P1-colloid-generation
+            P1-colloid-sorption
+            ))
+
+;;; P2
+
+(defchemical P2-base herbicide
+  "Base parameterization for all P2 forms."
+  (decompose_halftime 43 [d]))
+
+(defchemical P2 P2-base
+  "Dissolved P2"
+  (adsorption none))
+
+(defchemical P2-immobile P2-base
+  "P2 sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction P2-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile P2."
+  (sorbed P2-immobile)
+  (solute P2)
+  (K_OC 91 [ml/g])
+  (k_sorption 0.05 [h^-1]))
+
+(defchemical P2-colloid P2-base
+  "P2 sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction P2-colloid-sorption P2-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound P2."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed P2-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction P2-filter colloid-filter
+  "Filtration of colloid-bound pendimethalin in the soil matrix."
+  (mobile P2-colloid)
+  (immobile P2-immobile))
+
+(defreaction P2-colloid-generation bound_release
+  "Release immobile P2 as colloids in mixing layer."
+  (colloid colloid)
+  (immobile P2-immobile)
+  (bound P2-colloid))
+
+(defchemistry P2 default
+  "P2 in both immobile, solute and colloid form."
+  (trace P2 P2-immobile P2-colloid)
+  (reaction P2-immobile-sorption
+            P2-filter 
+            P2-colloid-generation
+            P2-colloid-sorption
+            ))
+
+;;; P3
+
+(defchemical P3-base herbicide
+  "Base parameterization for all P3 forms."
+  (decompose_halftime 4 [d]))
+
+(defchemical P3 P3-base
+  "Dissolved P3"
+  (adsorption none))
+
+(defchemical P3-immobile P3-base
+  "P3 sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction P3-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile P3."
+  (sorbed P3-immobile)
+  (solute P3)
+  (K_OC 1 [ml/g])
+  (k_sorption 0.05 [h^-1]))
+
+(defchemical P3-colloid P3-base
+  "P3 sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction P3-colloid-sorption P3-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound P3."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed P3-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction P3-filter colloid-filter
+  "Filtration of colloid-bound pendimethalin in the soil matrix."
+  (mobile P3-colloid)
+  (immobile P3-immobile))
+
+(defreaction P3-colloid-generation bound_release
+  "Release immobile P3 as colloids in mixing layer."
+  (colloid colloid)
+  (immobile P3-immobile)
+  (bound P3-colloid))
+
+(defchemistry P3 default
+  "P3 in both immobile, solute and colloid form."
+  (trace P3 P3-immobile P3-colloid)
+  (reaction P3-immobile-sorption
+            P3-filter 
+            P3-colloid-generation
+            P3-colloid-sorption
+            ))
+
+;;; colloid-bound.dai ends here.

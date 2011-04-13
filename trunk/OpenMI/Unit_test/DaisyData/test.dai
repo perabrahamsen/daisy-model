@@ -1,0 +1,50 @@
+;;; test.dai -- Sample file using the Daisy libraries.
+
+(description "Simulation for use in tutorial.")
+
+
+;; Weather data.
+(weather none)
+
+;; We have some very sandy soil.
+(defhorizon Ap FAO3
+  "Andeby top soil."
+  (clay 8.0 [%])
+  (silt 10.5 [%])
+  (sand 81.5 [%])
+  (humus 1.12 [%])
+  (C_per_N 11.0 [g C/g N])
+  (dry_bulk_density 1.5 [g/cm^3]))
+
+(defhorizon C Ap
+  "Andeby C horizon."
+  (humus 0.12 [%]))
+
+;; We build the column from the horizons.
+(defcolumn Andeby default
+  "The B.And farm, Andeby, 2002."
+  (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+        (MaxRootingDepth 60.0 [cm]))
+  (OrganicMatter (init (input 1400 [kg C/ha/y])
+                       (root 480 [kg C/ha/y])
+                       (end -20 [cm])))
+  ;; Measured numbers for groundwater table can be read from a file, like this:
+  ;; (Groundwater file "example.gwt")
+  ;; But here we assume free drainage.
+  (Groundwater deep))
+
+;; Use it.
+(column Andeby)
+
+;; Simulation start date.
+(time 1986 12 1 1)
+
+(manager activity
+  (wait (at 1986 12 2 1))
+  (stop))
+
+;; Create these log files.
+(output harvest
+           (checkpoint (when (at 1987 8 7 6))))
+
+;;; test.dai ends here.

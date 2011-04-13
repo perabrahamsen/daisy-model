@@ -1,0 +1,62 @@
+WP5 leader:
+
+Focus this year has been on finalizing the setups for the WP1 sites
+for M5_3 and D5_3, as well as for use in scenarios in WP6.  Compared
+to earlier years, this year more focus was on the crop calibration.
+Also, initial setup files for the 2005 experiments were required
+earlier.  A soil and crop parameterization for use in WP6 was to be
+delivered by all WP1 sites by 2005-11-15, and the final soil and crop
+parameterization was to be delivered by 2005-12-31.  
+
+These deadlines were mostly met.  As decided the previous year,
+Partner 6 took over crop calibration for partner 8, and partner 10
+visited partner 4 in order to help with the crop calibration.  At a
+modelling workshop in Udine, partner 1 and 10 provided support in
+calibrating Daisy for the remaining partners.
+
+Several draft of D5_3 have been uploaded to the FertOrgaNic homepage,
+and we are likely to meet M5_3 by delivering D5_3 on schedule.
+
+Partner 10:
+
+Research:
+
+WP3 and WP4: 
+
+Partner 10 have participated in the development of the DSS rules,
+along with partner 1 and partner 5.  Partner 10 also hosted a DSS
+workshop with participation of partner 1 and 5.
+
+WP5:
+
+Partner 10 has provided email support for the other partners for
+creating the final site and crop specific Daisy calibrations
+(milestone MP5_3).  Partners 10 also helped the remaining partners
+during the Udine workshop, and visited partner 4 for a week helping
+them do an initial calibration of their setup.  Partner 10 also did
+all the calibration work for the Partner 2, with the help of a master
+student.
+
+During the second half of the period, focus has been meeting M5_3.  In
+the start by developing facilities for Daisy for generating large
+amount of plots and tables comparing simulated and measured numbers,
+and latter for using these facilities for generating plots comparing
+all comparable numbers from the databases and simulations.  These
+plots have been organized into a report, together with the general
+information on the project, the WP1 data, the calibration process and
+the results.  This report will evolve into D5_3, and a number of
+drafts have been uploaded to the FertOrgaNic web site.
+
+Partner 10 has also continued to improve the Daisy software based on
+problems encountered, and to organize the setups delivered by the
+partners in a common structure, and uploading this to the FertOrgaNic
+site.
+
+WP6:
+
+Partner 10 constructed (consulting with partner 1 and 7) a series of
+scenarios for use in WP6, send out requests for information from the
+WP1 sites, organized this information, modified Daisy to be able to
+run using this information, wrote a Daisy setup for running all the
+scenarios, and taught partner 7 how to use this setup.
+

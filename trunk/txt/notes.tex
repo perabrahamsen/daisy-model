@@ -1,0 +1,135 @@
+\documentclass[a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{hyperref}
+\usepackage{a4}
+\usepackage{verbatim}
+\input{macro}
+\usepackage{natbib}
+%\bibliographystyle{plainnat}
+\bibliographystyle{apalike}
+\usepackage{graphicx}
+\usepackage{latexsym}
+
+\begin{document}
+
+\section*{\Daisy{} notes}
+
+This paper contain random \daisy{} notes I can't fit anywhere else.
+
+\section{The \texttt{default} crop model}
+
+This section should explain how to calibrate the \texttt{default} crop
+model.
+
+
+\subsection{Phenology: \textsc{ds}, development stage}
+\label{sec:phenology}
+
+Here we should describe how to calibrate the development stage of the
+crop.
+
+\subsection{Canopy: {\LAI{}, \textsc{CAI}, oh my\ldots}
+\label{sec:canopy}
+
+The \emph{leaf area index}, or \lai{} for short, is the total area of
+all leafs on a field or plot, divided by the area of the field or plot
+itself.  This term is commonly used in acgricultural science.
+\Daisy{} also have a \emph{crop area index}, or \textsc{cai}, which is
+less widely used.  The difference between the two is that the
+\textsc{cai} also included the photosynthetically effect of green stem
+and storage organ.  Since these later are rarely significant, you will
+often see \lai{} and \textsc{cai} used for the same.  
+
+When adding a parameterization of a \texttt{default} crop model to
+\daisy{}, you should focus on the \lai{} right first, on only bother
+with the \textsc{cai} when you know storage organ and stem gives a
+significant contribution .  You should have completed calibrating the
+\textsc{ds} (section~\ref{sec:phenology}) before calibrating \lai{}.
+
+Depending on how much information you have, you may have to calibrate
+the partioning (section~\ref{sec:patit}) simulatiously.
+
+\subsubsection{The model}
+
+How \lai{} (and \textsc{cai}) is calculated depend on whether the crop
+has left the initialization phase (\texttt{InitLAI} or not.  In the
+initialization phase, \lai{} is calculated like this:
+\begin{equation}
+  
+\end{equation}
+
+
+
+I den initialiseringsfasen gælder
+
+  Exit LAI = SpLAI * WLeaf
+
+  Max LAI = SpLAIfac (DS) * SpLAI * WLeaf
+
+  Fun LAI = 1.0/(1.0+exp(-15.0*(DS-DSLAI05)))
+
+  Hvis DS < 0.07
+   
+    LAI = Fun LAI
+
+  Ellers 
+
+    LAI = min (Max LAI, Fun LAI)
+
+  CAI = LAI
+
+  Hvis LAI > Exit LAI så forlader vi initialiseringsfasen
+
+Når vi er ude af inititaliseringsfasen, så er
+
+  LAI = LeafAIMod (DS) * SpLAI * WLeaf
+  SOrgAI = SpSOrgAI * SOrgAIMod (DS) * WSOrg;
+  StemAI = SpStemAI * StemAIMod (DS) * WStem;
+
+  CAI = LeafAI + StemPhotEff * StemAI + SOrgPhotEff * SOrgAI;
+
+
+\begin{displaymath}
+\frac{1}{1+e^{-15 (\mbox{\sc ds}-\mbox{\sc dslai05})}}
+\end{displaymath}
+
+\subsection{Patitioning}
+\label{sec:patit}
+
+
+
+\section*{Crop \lai{} parameterization}
+
+The \emph{leaf area index}, or \lai{} for short, is the total area of
+all leafs on a field or plot, divided by the area of the field or plot
+itself.  The \lai{} is important for photosynthesis and transpiration.
+The larger the \lai{} is, the more sunlight will be caught.  This is
+true even for \lai{} larger than 1, because the leafs are not
+uniformly distributed over the field so there is some overlap
+However, it is of course a case of dimishing returns.  A \lai{} of 5
+is commong for fully developed crops.
+
+The \textsc{default} crop model has three different mechanisms for
+calculating \lai{}.  These are used during different development
+phases of the crop.
+
+The first phase used right after emergence is is a forced curve, which
+is unique in that it depend solely on the development stage of the
+crop.  In the two other phases, the \lai{} is a function of the leaf
+dry matter.  But when the crop just emerge, it has no leaf dry
+matter.  In order to create keaf dry matter, it needs assimilate.  In
+order to create assimilate, it needs to catch sunligt.  Which again
+require a leaf area.  In order to escape this catch-22, the \lai{} is
+initialy calculated based on age alone.  The function is
+\begin{displaymath}
+\frac{1}{1+e^{-15 (\mbox{\sc ds}-\mbox{\sc dslai05})}}
+\end{displaymath}
+This function will be close to zero at DS = 0, 0.5 at DS =
+\texttt{DSLAI05}, and grow towards one from there.  The only
+calibration parameter for this phase is \texttt{DSLAI05}.  The smaller
+you mae this number, the fast LAI will grow towards 0.5.
+
+The crop will leave this phase when the LAI
+
+
+\end{document}
