@@ -876,7 +876,6 @@ svnci: $(TEXT)
 	(cd lib; $(MAKE) svnci);
 	(cd sample; $(MAKE) svnci);
 	(cd txt; $(MAKE) svnci);
-	(cd project; $(MAKE) svnci);
 	-svn add $(TEXT)
 	rm -f $(REMOVE) 
 	-svn remove $(REMOVE) 
