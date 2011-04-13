@@ -912,7 +912,7 @@ setupdocs:
 
 setupnosvn: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	$(MAKE) native 
+	$(MAKE) cross
 	rm -rf $(SETUPDIR)
 	mkdir $(SETUPDIR)
 	cp ChangeLog NEWS $(SETUPDIR)

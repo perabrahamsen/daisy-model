@@ -2,10 +2,6 @@
 
 	* Version 4.94 released.
 
-2011-04-13  Per Abrahamsen  <abraham@dina.kvl.dk>
-
-	* Version 4.94 released.
-
 2011-03-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* program_batch.C (run): Wrong name used.
