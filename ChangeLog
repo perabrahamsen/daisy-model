@@ -1,3 +1,7 @@
+2011-04-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.95 released.
+
 2011-04-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* chemical_std.C (infiltrate): Only warn of rate * dt > 1.001.
