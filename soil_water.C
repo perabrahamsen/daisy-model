@@ -426,8 +426,22 @@ SoilWater::tick_after (const Geometry& geo,
         {
           // Secondary domain activated.
           const double Theta_lim = soil.Theta (c, h_lim, h_ice_[c]);
-          Theta_primary_[c] = Theta_lim;
-          Theta_secondary_[c] = Theta_[c] - Theta_lim;
+          if (Theta_[c] >= Theta_lim)
+            {
+              Theta_primary_[c] = Theta_lim;
+              Theta_secondary_[c] = Theta_[c] - Theta_lim;
+            }
+          else
+            { 
+              std::ostringstream tmp;
+              tmp << "h[" << c << "] = " << h_[c] 
+                  << "; Theta[" << c << "] = " << Theta_[c] 
+                  << "\nh_lim = " << h_lim << "; Theta_lim = " << Theta_lim
+                  << "\nStrenge h > h_lim, yet Theta <= Theta_lim";
+              msg.bug (tmp.str ());
+              Theta_primary_[c] = Theta_[c];
+              Theta_secondary_[c] = 0.0;
+            }
         }
     }
 

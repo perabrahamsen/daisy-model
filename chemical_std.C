@@ -1175,7 +1175,7 @@ ChemicalStandard::infiltrate (const double rate, const double dt)
           << ", surface_solute = " << surface_solute;
       daisy_bug (tmp.str ());
     }
-  if (rate * dt > 1.0)
+  if (rate * dt > 1.001)
     {
       std::ostringstream tmp;
       tmp << "rate = " << rate << ", dt = " << dt;
