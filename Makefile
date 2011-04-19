@@ -151,10 +151,10 @@ ifeq ($(USE_OPTIMIZE),true)
 		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mtune=native  -march=native
 	        endif
 		ifeq ($(HOSTTYPE),cygwin)
-		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mtune=pentium-m -march=pentium
+		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mtune=generic -march=pentium
 		endif
 		ifeq ($(HOSTTYPE),mingw)
-		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mtune=pentium-m -march=pentium
+		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mtune=generic -march=pentium
 		endif
 	endif
 	ifeq ($(COMPILER),icc)
