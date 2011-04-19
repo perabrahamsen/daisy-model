@@ -1,0 +1,83 @@
+;;; vap.dai --- Run the VAP simulations
+
+(description "vap2003")
+
+(input file "vap-common.dai")
+
+(defgnuplot drainmass-acc-sim-exp plottime
+  (declare chemical String "Name of chemical to plot")
+  ;; (begin 2000 10 1) (end 2002 4 1)
+  (where "${log_prefix}fig/${station}-${chemical}-acc.pdf")
+  (title "${chemical}")
+  (ymin 0)
+  (ymax 2 [g/ha])
+  (source (arithmetic (missing "none")
+                      (file "FINAL/log/${station}-field-${chemical}.dlf")
+                      (expr (+ "Soil-Drain" "Surface-Drain"))
+                      (with lines)
+                      (accumulate true)
+                      (title "PPDB"))
+          (arithmetic (missing "none")
+                      (file "${log_prefix}log/${station}-field-${chemical}.dlf")
+                      (expr (+ "Soil-Drain" "Surface-Drain"))
+                      (with lines)
+                      (style 3)
+                      (accumulate true)
+                      (title "Local"))))
+
+(defgnuplot drainmass-acc-exp drainmass-acc-sim-exp
+  (declare area Number [ha] "Area to plot.")
+  (legend nw)
+  (source &old
+          (arithmetic (file "${station}-drainmass.ddf")
+                      (missing missing)
+                      (accumulate true)
+                      (expr (convert (/ "${chemical}" area) [g/ha]))
+                      (with points)
+                      (style 2)
+                      (title "Obs"))))
+
+(defgnuplot sil-drainmass-acc-exp drainmass-acc-exp (area 1.69 [ha]))
+
+(defgnuplot Estrup-exp Station
+  (station Estrup)
+  (area 1.26 [ha])
+  (graph (drainmass-acc-sim-exp (begin 2000 05 26) (chemical Dimethoate))))
+
+(defgnuplot Silstrup-exp Station
+  (station Silstrup)
+  (area 1.69 [ha])
+  (graph (sil-drainmass-acc-exp (begin 2000 04 29) (chemical Metamitron))))
+
+(defprogram plotexp gnuplot
+  (graph Silstrup-exp
+         Estrup-exp))
+
+;;(run batch (run Estrup-2D Silstrup-2D plotexp))
+
+;; 2D sims
+
+;;(run batch (run Estrup-2D Silstrup-2D plotall))
+(run batch (run Silstrup-2D (plotall (graph Silstrup plot2d-Silstrup))))
+
+;;(run batch (run (Silstrup-2D (column (Silstrup-2D-MACRO (Chemistry multi (combine Bromide))))) (plotall (graph Silstrup))))
+;;(run batch (run (Silstrup-2D (stop 1999 10 1))))
+
+;; 2C sims
+
+;;(run batch (run Estrup-2C Silstrup-2C plotall))
+;;(run batch (run Estrup-2C (plotall (graph Estrup))))
+;; (run batch (run (Silstrup-2C) (plotall (graph Silstrup))))
+
+;; 1C sims
+
+;;(run batch (run Estrup-1C-Drain Silstrup-1C-Drain plotall))
+;; (run batch (run Silstrup-1C-Center (plotall (graph Silstrup))))
+
+;; Plot only
+;;(run batch (run plotall))
+;;(run batch (run (plotall (graph plot2d-Silstrup))))
+;;(run batch (run (plotall (graph Estrup))))
+;;(run plothydro)
+
+;;; vap.dai ends here.

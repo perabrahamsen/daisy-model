@@ -1,0 +1,318 @@
+;;; dk-fertilizer.dai
+
+(input file "fertilizer.dai")
+
+(defam kvaeg_gylle slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.103)
+  (total_N_fraction 0.053)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.6))
+
+(defam kvaeg_staldgoedning slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.196)
+  (total_N_fraction 0.027)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.251))
+
+(defam kvaeg_ajle slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.033)
+  (total_N_fraction 0.162)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.9))
+
+(defam kvaeg_dybstroelse slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.289)
+  (total_N_fraction 0.025)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.267))
+
+(defam slagtesvin_gylle slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.054)
+  (total_N_fraction 0.09)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.75))
+
+(defam slagtesvin_staldgoedning slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.23)
+  (total_N_fraction 0.039)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.349))
+
+(defam slagtesvin_ajle slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.020)
+  (total_N_fraction 0.18)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.899))
+
+(defam slagtesvin_dybstroelse slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.33)
+  (total_N_fraction 0.035)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.25))
+
+(defam soer_gylle slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.05)
+  (total_N_fraction 0.101)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.75))
+
+(defam soer_staldgoedning slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.23)
+  (total_N_fraction 0.037)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.35))
+
+(defam soer_ajle slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.025)
+  (total_N_fraction 0.237)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.9))
+
+(defam soer_dybstroelse slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.33)
+  (total_N_fraction 0.022)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.25))
+
+  
+(defam slagtekyllinger_dybstroelse slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.484)
+  (total_N_fraction 0.077)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.3))
+
+(defam hoens_gylle slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.12)
+  (total_N_fraction 0.053)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.651))
+
+(defam hoens_staldgoedning slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.4)
+  (total_N_fraction 0.053)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.35))
+
+(defam hoens_dybstroelse slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.633)
+  (total_N_fraction 0.122)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.3))
+
+(defam kalkuner_dybstroelse slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.48)
+  (total_N_fraction 0.126)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.3))
+
+(defam aender_gaes_dybstroelse slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.35)
+  (total_N_fraction 0.079)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.3))
+
+(defam mink_raev_staldgoedning slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.25)
+  (total_N_fraction 0.044)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.45))
+
+(defam mink_raev_gylle slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.065)
+  (total_N_fraction 0.066)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.699))
+
+(defam hest_dybstroelse slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.26)
+  (total_N_fraction 0.032)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.25))
+
+(defam faar_geder_dybstroelse slurry
+  (description "Baseret på DJF-rapport nr. 36.
+                Kvælstof, fosfor og kalium i husdyrgødning - normtal 2000.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.346)
+  (total_N_fraction 0.034)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.25))
+
+(defam spildevandsslam slurry
+  (description "Miljøstyrelsen (2001). Spildevandsslam fra kommunale og private renseanlæg i 1999. Orientering fra Miljøstyrelsen Nr. 3.
+                Jens Petersen (2001). Gødningsværdi af organisk affald. JordbrugsForskning nr. 7, september 2001.
+                Claus Petersen (2001). Statistik for jordbrugsmæssig anvendelse. Miljøprojekt Nr. 621 2001")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.141)
+  (total_N_fraction 0.304)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.292))
+
+(defam komposteret_husholdningsaffald slurry
+  (description "Jens Petersen (2001). Gødningsværdi af organisk affald. JordbrugsForskning nr. 7, september 2001.					
+                Ann Marie Eilersen, Jens Chr. Tjell og Mogens Henze (2001).
+                Muligheder for jordbrugsanvendelse af affald fra husholdninger. NUTRAP rapport, http://www.agsci.kvl.dk/nutrap.
+                Torsten Müller og Jakob Magid (2001). Jordbrugets anvendelse af byaffald i Nord og Central Europa. NUTRAP rapport, http://www.agsci.kvl.dk/nutrap")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.5)
+  (total_N_fraction 0.019)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.107))
+
+(defam kartoffelfrugtsaft slurry
+  (description "Dansk Procesteknologi I/S (2003).
+                RAPPORT TIL KARTOFFELAFGIFTSFONDEN: KALIUM I FRUGTSAFT - OVERSIGT. LØSNINGSMETODER M.V. (Feb. 2003)")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.02)
+  (total_N_fraction 0.055)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.5))
+
+(defam novogro_slam slurry
+  (description "Novozymes, Kalundborg: green accounts. http://www.novonordisk.com/reports/press/environmental/er97/site/start.html")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.035)
+  (total_N_fraction 0.031)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.1))
+
+(defam novogro-30_slam slurry
+  (description "Novozymes, Kalundborg: green accounts. http://www.novonordisk.com/reports/press/environmental/er97/site/start.html")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.3)
+  (total_N_fraction 0.02)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.1))
+
+(defam pressesaft_groentpillefabrik slurry
+  (description "Albert Baumann (2003) Pers. medd. se side (Grøntpiller) <abdangr@post.tele.dk>")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.012)
+  (total_N_fraction 0.031)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.1))
+
+(defam svinegylle_usepareret slurry
+  (description "Peter Sørensen og Mette Højby Larsen (2002).
+                Udnyttelse af næringsstoffraktioner fra separeringsprodukter. Indlæg på Efterårskonferencen 2002; Mette Højby Larsen (2002) Kvælstof mineralisering af separeret kvæg- og svinegylle.
+                Specialeprojekt, KVL.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.061)
+  (total_N_fraction 0.12)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.78))
+
+(defam svinegylle_separeret_tyk slurry
+  (description "Peter Sørensen og Mette Højby Larsen (2002).
+                Udnyttelse af næringsstoffraktioner fra separeringsprodukter. Indlæg på Efterårskonferencen 2002; Mette Højby Larsen (2002) Kvælstof mineralisering af separeret kvæg- og svinegylle.
+                Specialeprojekt, KVL.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.245)
+  (total_N_fraction 0.048)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.322))
+
+(defam svinegylle_separeret_tynd slurry
+  (description "Peter Sørensen og Mette Højby Larsen (2002).
+                Udnyttelse af næringsstoffraktioner fra separeringsprodukter. Indlæg på Efterårskonferencen 2002; Mette Højby Larsen (2002) Kvælstof mineralisering af separeret kvæg- og svinegylle.
+                Specialeprojekt, KVL.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.023)
+  (total_N_fraction 0.278)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.864))
+
+(defam kvaeggylle_usepareret slurry
+  (description "Peter Sørensen og Mette Højby Larsen (2002).
+                Udnyttelse af næringsstoffraktioner fra separeringsprodukter. Indlæg på Efterårskonferencen 2002; Mette Højby Larsen (2002) Kvælstof mineralisering af separeret kvæg- og svinegylle.
+                Specialeprojekt, KVL.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.059)
+  (total_N_fraction 0.056)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.628))
+
+(defam kvaeggylle_separeret_tyk slurry
+  (description "Peter Sørensen og Mette Højby Larsen (2002).
+                Udnyttelse af næringsstoffraktioner fra separeringsprodukter. Indlæg på Efterårskonferencen 2002; Mette Højby Larsen (2002) Kvælstof mineralisering af separeret kvæg- og svinegylle.
+                Specialeprojekt, KVL.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.185)
+  (total_N_fraction 0.03)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.291))
+
+(defam kvaeggylle_separeret_tynd slurry
+  (description "Peter Sørensen og Mette Højby Larsen (2002).
+                Udnyttelse af næringsstoffraktioner fra separeringsprodukter. Indlæg på Efterårskonferencen 2002; Mette Højby Larsen (2002) Kvælstof mineralisering af separeret kvæg- og svinegylle.
+                Specialeprojekt, KVL.")
+  (volatilization 0.15)
+  (dry_matter_fraction 0.03)
+  (total_N_fraction 0.097)
+  (total_C_fraction 0.4)
+  (NH4_fraction 0.672))
+
+;;; dk-fertilizer.dai ends here

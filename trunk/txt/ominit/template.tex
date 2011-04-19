@@ -1,0 +1,221 @@
+%% Copernicus Publications Manuscript Preparation Template for LaTeX Submissions
+%% ---------------------------------
+%% This template should be used for the following class files: copernicus.cls, copernicus2.cls, copernicus_discussions.cls
+%% The class files, the Copernicus LaTeX Manual with detailed explanations regarding the comments
+%% and some style files are bundled in the Copernicus Latex Package which can be downloaded from the different journal webpages.
+%% For further assistance please contact the Publication Production Office (production@copernicus.org).
+%% http://publications.copernicus.org
+
+
+%% Differing comments regarding the specific class files are highlighted.
+
+
+%% copernicus.cls
+\documentclass[journal abbreviation]{copernicus}
+
+%% copernicus2.cls
+\documentclass[journal abbreviation]{copernicus2}
+
+%% copernicus_discussions.cls
+\documentclass[journal abbreviation, hvmath, online]{copernicus_discussions}
+
+
+\begin{document}
+
+
+\title{TEXT}
+
+
+\author[]{NAME}
+\author[]{NAME}
+\author[]{NAME}
+
+\affil[]{ADDRESS}
+\affil[]{ADDRESS}
+
+%% The [] brackets identify the author to the corresponding affiliation, 1, 2, 3, etc. should be inserted.
+
+
+
+\runningtitle{TEXT}
+
+\runningauthor{TEXT}
+
+\correspondence{NAME\\ (EMAIL)}
+
+
+
+\received{}
+\pubdiscuss{} %% only important for two-stage journals
+\revised{}
+\accepted{}
+\published{}
+
+%% These dates will be inserted by the Publication Production Office during the typesetting process.
+
+
+\firstpage{1}
+
+\maketitle
+
+
+
+\begin{abstract}
+TEXT
+\end{abstract}
+
+
+%% only used for copernicus2.cls
+\abstract{
+ TEXT
+ \keywords{TEXT}}
+
+
+
+\introduction
+%% \introduction[modified heading if necessary]
+TEXT
+
+
+
+\section{HEADING}
+TEXT
+
+\subsection{HEADING}
+TEXT
+
+\subsubsection{HEADING}
+TEXT
+
+
+
+
+\conclusions
+%% \conclusions[modified heading if necessary]
+TEXT
+
+
+
+
+\appendix
+\section{\\ \\ \hspace*{-7mm} HEADING}    %% Appendix A
+
+\subsection                               %% Appendix A1, A2, etc.
+
+
+
+
+\begin{acknowledgements}
+TEXT
+\end{acknowledgements}
+
+
+
+
+\begin{thebibliography}{}
+
+\bibitem[AUTHOR(YEAR)]{LABEL}
+REFERENCE 1
+
+\bibitem[AUTHOR(YEAR)]{LABEL}
+REFERENCE 2
+
+...
+
+\end{thebibliography}
+
+
+%% Literature citations
+%% command                        & example result
+%% \citet{jones90}|               & Jones et al.\ (1990)
+%% \citep{jones90}|               & (Jones et al., 1990)
+%% \citep{jones90,jones93}|       & (Jones et al., 1990, 1993)
+%% \citep[p.~32]{jones90}|        & (Jones et al., 1990, p.~32)
+%% \citep[e.g.,][]{jones90}|      & (e.g., Jones et al., 1990)
+%% \citep[e.g.,][p.~32]{jones90}| & (e.g., Jones et al., 1990, p.~32)
+%% \citeauthor{jones90}|          & Jones et al.
+%% \citeyear{jones90}|            & 1990
+
+
+
+
+
+
+%% FIGURES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% ONE-COLUMN FIGURES
+
+%f
+\begin{figure}[t]
+\vspace*{2mm}
+\begin{center}
+\includegraphics[width=8.3cm]{FILE NAME}
+\end{center}
+\caption{TEXT}
+\end{figure}
+
+
+
+%% TWO-COLUMN FIGURES
+
+%f
+\begin{figure*}[t]
+\vspace*{2mm}
+\begin{center}
+\includegraphics[width=12cm]{FILE NAME}
+\end{center}
+\caption{TEXT}
+\end{figure*}
+
+
+%% TABLES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% ONE-COLUMN TABLE
+
+%t
+\begin{table}[t]
+\caption{TEXT}
+\vskip4mm
+\centering
+\begin{tabular}{column = lcr}
+\tophline
+
+\middlehline
+
+\bottomhline
+\end{tabular}
+\end{table}
+
+
+%% TWO-COLUMN TABLE
+
+%t
+\begin{table*}[t]
+\caption{TEXT}
+\vskip4mm
+\centering
+\begin{tabular}{column = lcr}
+\tophline
+
+\middlehline
+
+\bottomhline
+\end{tabular}
+\end{table*}
+
+
+%% The different columns must be seperated with a & command and should
+%% end with \\ to identify the column brake.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% If figures and tables must be numbered 1a, 1b, etc. the following command
+%% should be inserted before the begin{} command.
+
+\addtocounter{figure}{-1}\renewcommand{\thefigure}{\arabic{figure}a}
+
+
+\end{document}

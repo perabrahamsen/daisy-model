@@ -1,0 +1,218 @@
+;;; setup.dai --- Focus groundwater scenarious setup.
+
+;;; Test pesticides A, B and C from FOCUS groundwater scenaries
+
+(path &old "/home/abraham/daisy/project/focus-gw")
+
+(input file "chemistry-base.dai")
+(input file "log-std.dai")
+(input file "wwheat.dai")
+
+(input file "/home/abraham/daisy/project/agrovand/biopores.dai")
+
+(input file "colloid-bound.dai")
+
+
+;;; Managememt
+
+(defcrop WC "Winter Wheat"
+  (Canopy (EpFac 1.0 [])))              ;Ref=Pot
+
+(defaction WC activity
+  (wait_mm_dd 09 22)
+  (sow WC)
+  (emerge all)
+  (wait_mm_dd 10 20)
+  (spray $Pest 1 [kg/ha])
+  (wait_mm_dd 08 21)
+  (harvest all))
+
+;;; FOCUS Soil 
+
+(defcolumn FOCUS default
+  (Surface (EpFactor 1.0 [])))          ;Ref=Pot
+
+;;; FOCUS Program.
+
+(defprogram FOCUS Daisy 
+  (declare Pest String "Name of pesticide to apply.")
+  (time 1968 01 01)
+  (stop 1994 01 01)
+  (activate_output (after 1974 1 1))
+  (manager activity
+    WC WC WC WC WC WC WC WC WC WC WC WC WC WC WC WC WC WC WC WC
+    WC WC WC WC WC WC WC WC WC WC WC WC WC WC WC WC WC WC WC WC)
+  (output ("Field chemical" (chemical "pesticide") (when daily))
+          ("Field water" (when daily))
+          ("Soil chemical" (chemical "pesticide")(when daily))
+          ("Soil water"(when daily))
+          )
+  (weather default "OVERWRITE THIS" (minimum_precipitation 2.0 [mm/h])))
+
+(defhorizon FOCUS FAO3)
+
+;;; Karup soil.
+
+(defhorizon Karup-Ap FOCUS              ;0-20 cm
+  (clay 6 [%]) (silt 7.0 [%]) (sand 87.0 [%])
+  (humus 2.20 [%]) (dry_bulk_density 1.51 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 34 [%]) (Theta_res 0 [%])
+             (h_b -15 [cm]) (K_at_h -15 [cm] 1.0 [mm/h])
+             (lambda 0.2 [])))
+
+(defhorizon Karup-B1 FOCUS              ;20-40 cm
+  (clay 5.5 [%]) (silt 5.5 [%]) (sand 89.0 [%])
+  (humus 1.74 [%]) (dry_bulk_density 1.55 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 32 [%]) (Theta_res 0 [%])
+             (h_b -15 [cm]) (K_at_h -15 [cm] 2.0  [mm/h])
+             (lambda 0.29 [])))
+
+(defhorizon Karup-B2 FOCUS              ;40-70 cm
+  (clay 5.5 [%]) (silt 5.5 [%]) (sand 89.0 [%])
+  (humus 0.30 [%]) (dry_bulk_density 1.55 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 32 [%]) (Theta_res 0 [%])
+             (h_b -15 [cm]) (K_at_h -15 [cm] 2.0 [mm/h])
+             (lambda 0.29 [])))
+
+(defhorizon Karup-BC FOCUS              ;70-250 cm
+  (clay 4.2 [%]) (silt 4.8 [%]) (sand 91.0 [%])
+  (humus 0.20 [%]) (dry_bulk_density 1.53 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 32 [%]) (Theta_res 2.5 [%])
+             (h_b -10 [cm]) (K_at_h -150 [cm] 10.0 [mm/h])
+             (lambda  0.72 [])))
+
+(defhorizon Karup-plow-pan Karup-B1
+  (hydraulic original (K_at_h -15 [cm] 0.2 [mm/h])))
+
+(defcolumn Karup FOCUS
+  (Movement vertical
+            (Geometry (zplus -1.5 -3 -6 -10 -15 -20 
+                             -24 -28 
+                             -34 -40 
+                             -44 -70 
+                             -75 -100 -130 -160 -200 -250 [cm]))
+            (Tertiary (biopores 
+                       (classes ("matrix_0cm" (height_end -24 [cm])) 
+                                ("matrix_halfway")
+                                ("matrix_2cm")
+                                ("matrix_30cm" (height_start -24 [cm]))))))
+  (Soil (horizons ( -20 [cm] Karup-Ap)
+                  ( -28 [cm] Karup-plow-pan)
+                  ( -40 [cm] Karup-B1)
+                  ( -70 [cm] Karup-B2)
+                  (-250 [cm] Karup-BC))
+        (MaxRootingDepth 80 [cm]))
+  (Groundwater deep))
+
+;; Karup program
+
+(defprogram Karup FOCUS 
+  (weather original "dk-Karup.dwf"))
+
+(defprogram KarupA Karup
+  (Pest A)
+  (column (Karup (Chemistry multi (combine colloids A)))))
+             
+(defprogram KarupB Karup
+  (Pest B)
+  (column (Karup (Chemistry multi (combine colloids B)))))
+             
+(defprogram KarupC Karup
+  (Pest C)
+  (column (Karup (Chemistry multi (combine colloids C)))))
+             
+;;; Langvad soil.
+
+(defhorizon Langvad-Ap FOCUS            ;0-20 cm
+  (clay 16.0 [%]) (silt 22.0 [%]) (sand 62.0 [%])
+  (humus 2.1 [%]) (dry_bulk_density 1.50 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 43 [%]) (Theta_res 4 [%])
+             (h_b -10 [cm]) (K_at_h -10 [cm] 0.5 [mm/h])
+             (lambda 0.15 [])))
+
+
+(defhorizon Langvad-Eb FOCUS            ;20-40 cm
+  (clay 20.0 [%]) (silt 21.0 [%]) (sand 59.0 [%])
+  (humus 1.42 [%]) (dry_bulk_density 1.65 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 34 [%]) (Theta_res 4 [%])
+             (h_b -12 [cm]) (K_at_h -12 [cm] 0.1 [mm/h])
+             (lambda 0.15 [])))
+
+(defhorizon Langvad-Ebg FOCUS            ;40-70 cm
+  (clay 20.0 [%]) (silt 21.0 [%]) (sand 59.0 [%])
+  (humus 0.5 [%]) (dry_bulk_density 1.65 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 34 [%]) (Theta_res 4 [%])
+             (h_b -12 [cm]) (K_at_h -12 [cm] 0.1 [mm/h])
+             (lambda 0.15 [])))
+
+
+(defhorizon Langvad-ECg FOCUS           ;70-250 cm
+  (clay 20.6 [%]) (silt 20.0 [%]) (sand 59.4 [%])
+  (humus 0.26 [%]) (dry_bulk_density 1.76 [g/cm^3])
+  (hydraulic B_BaC
+             (Theta_sat 33 [%]) (Theta_res 3 [%])
+             (h_b -25 [cm]) (K_at_h -25 [cm] 0.08 [mm/h])
+             (lambda 0.15 [])))
+
+
+(defhorizon Langvad-plow-pan Langvad-Eb
+  (hydraulic original (K_at_h -12 [cm] 0.01 [mm/h])))
+
+(defcolumn Langvad FOCUS
+  (Movement rectangle
+            (drainpoints (-130 [cm] 1 [cm]))
+            (Geometry (zplus -1.5 -3 -6 -10 -15 -20 
+                             -24 -28 
+                             -34 -40
+                             -55 -70
+                             -90 -105 -120
+                             -140 -160 -180 -210 -250 [cm])
+                      (xplus 0.25 0.50 1 2 4 8 12 [m]))
+            (Tertiary (biopores 
+                       (classes ("matrix_0cm" (height_end -25 [cm])) 
+                                ("matrix_halfway")
+                                ("matrix_2cm")
+                                ("drain_2cm" (pipe_position -120 [cm]))
+                                ("matrix_30cm" (height_start -29 [cm]))
+                                ("drain_30cm" (height_start -29 [cm])
+                                 (pipe_position -120 [cm]))))))
+  (Soil (horizons ( -20 [cm] Langvad-Ap)
+                  ( -28 [cm] Langvad-plow-pan)
+                  ( -40 [cm] Langvad-Eb)
+                  ( -70 [cm] Langvad-Ebg)
+                  (-250 [cm] Langvad-ECg))
+        (MaxRootingDepth 120 [cm]))
+  (Groundwater aquitard (K_aquitard 6e-3 [cm/h])))
+
+(defprogram Langvad FOCUS
+  (weather original "dk-Langvad.dwf"))
+
+(defprogram LangvadA Langvad
+  (Pest A)
+  (column (Langvad (Chemistry multi (combine colloids A)))))
+             
+(defprogram LangvadB Langvad
+  (Pest B)
+  (column (Langvad (Chemistry multi (combine colloids B)))))
+             
+(defprogram LangvadC Langvad
+  (Pest C)
+  (column (Langvad (Chemistry multi (combine colloids C)))))
+
+;;; Program
+
+;;(defprogram all batch
+;;  (run KarupA KarupB KarupC 
+;;       LangvadA LangvadB LangvadC
+;;       ))
+;;
+;;(run plot)
+
+;;; setup.dai ends here.

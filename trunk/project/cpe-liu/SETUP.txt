@@ -1,0 +1,23 @@
+* DONE
+
+Udregne timeværdier fre JRJ klimadata data
+Korriger nedbør efter døgntal.
+
+Brug Rørrende-jord med fri afdræning.
+
+* TODO
+
+** 
+
+Brug tvungen LAI fra fremspriring til skridning
+
+Resultat:
+
+Vi skal kun køre scenarier.  Måske følgende:
+
+Rodtæthed: Almindelig og "kun lidt rod under pløjesål".
+
+Vejr:  Våd og tør sommer.
+
+ABA: Normal, lav, høj
+

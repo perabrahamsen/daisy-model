@@ -1,0 +1,73 @@
+;;; vegetation.dai --- Permanent vegetation parameterizations.
+;;; JKL: Kopi af denne er lagt i Daisygis_DK\lib-folderen søndag 9.11.03 - På JKL computer
+;;; = RS-vegetation_FromEVB_091103.dai
+
+
+(defvegetation Coniferous permanent
+ ; (description "Evergreen forest, Kirsten Schelde <Kirsten.Schelde@agrsci.dk>.
+
+;WJ Massman and MR Kaufmann 1991: Stomatal response to certain environmental
+;factors: a comparison of models for subalpine trees in the Rocky Mountains.
+;Agric For Meteor 54, 155-167.
+;
+;FM Kelliher, R Leuning, MR Raupach, E-D Schulze 1995: Maximum conductances
+;for evaporation from global vegetation types. Agric For Meteor 73, 1-16.")
+; LAI er fra satellit (MODIS) data gældende for nåleskov;Tisvilde Hegn, Nord Sjælland (UTM 691495, 6214695). Eva Bøgh, evb@geogr.ku.dk
+;  (LAIvsDAY (1 2.05) (33 1.88) (49 2.08) (81 1.78) (97 1.88) (113 2.07) (129 4.47) 
+;  (145 6.33) (193 6.82) (209 6.73) (225 7.31) (241 6.14) (273 4.00) (289 3.12)(321 2.85))
+
+; Flg. satellit (MODIS) baserede LAI er et gennemsnit estimeret for alle nåleskove på Sjælland, 2001. Eva Bøgh, evb@geogr.ku.dk. 
+  (LAIvsDAY (1 1.04) (17 0.55) (33 1.40) (49 1.66) (97 0.71) (113 0.96) (129 3.60) (145 5.91)
+  (193 8.38) (209 9.57) (225 7.74) (241 9.31) (257 7.13) (273 2.89) (289 3.18) (321 1.26))
+  (Canopy (IntcpCap 0.5)
+	  (rs_min 45.0)
+	  (EpFac 1.2))
+  (Height 1000.0)
+  (Albedo 0.12)
+  (Root (MaxPen 100.0)))
+
+
+(defvegetation Hardwood permanent
+; Flg. satellit (MODIS) baserede LAI er for Lille Bøgeskov, Sorø, 2001 (UTM 667095, 6151933). Eva Bøgh, evb@geogr.ku.dk
+; (LAIvsDAY (1 0.19)(81 0.07)(97 0.5)(113 0.88)(129 2.31)(145 3.67)(172 4.81)(182 5.19)(193 7.69)
+; (225 1.05)(257 0.8)(273 0.25)(289 0.53))
+
+; Flg. satellit (MODIS) baserede LAI er et gennemsnit for alle løvskove på Sjælland, 2001. Eva Bøgh, evb@geogr.ku.dk. 
+  (LAIvsDAY (1 0.50) (17 0.28) (33 0.73) (49 0.81) (97 0.45) (113 0.63) (129 1.66) (145 2.68) (193 3.90) 
+  (209 3.77) (225 2.89) (241 2.59) (257 1.78) (273 1.37) (289 1.45) (321 0.70))
+  (Canopy (IntcpCap 2.25)			; Interception capacity (2.25 mm)
+;           (rs_min 30.0)			; Minimum transpiration resistance (s/m)
+	    (rs_min 70.0) 			; gældende for Lille Bøgeskov. Ebba Dellwik, ebba.dellwik@risoe.dk
+  	  (EpFac 1.2))				; Potential evapotranspiration factor (-)
+  (Height 2000.0)
+  (Albedo 0.16)           
+  (Root (MaxPen 100.0)))			; Permanent root depth (cm)
+ 
+ 
+ ;JKL/17.11.03: Navn ændret fra "Meadow til Grass efter EVB's forslag
+ (defvegetation Grass permanent ; eng arealer/permanent græs
+ ; Flg. LAI er satellit (MODIS sensor) baseret gennemsnit for alle græsarealer på Sjælland, 2001. Eva Bøgh, evb@geogr.ku.dk.
+   (LAIvsDAY (1 0.33) (17 0.17) (33 0.46) (49 0.51) (97 0.34) (113 0.50) (129 1.23) (145 2.12) (193 2.73)
+   (209 1.80) (225 0.70) (241 0.76) (257 0.76) (273 0.65) (289 0.72) (321 0.46))  
+   (Canopy (IntcpCap 0.5)			; Interception capacity (mm)
+             (rs_min 30.0)			; Minimum transpiration resistance (s/m)
+   	  (EpFac 1.0))				; Potential evapotranspiration factor (-)
+   (Height 15.0)
+   (Albedo 0.18)           
+   (Root (MaxPen 30.0)))			; Permanent root depth (cm)
+   
+   
+   (defvegetation Bush permanent
+   ; Busk bevoksning og ung skov. Flg. LAI er fra MODIS år 2001 udvalgt for et større sammenhængende areal defineret som "bush" (UTM  711072, 6179409). Eva Bøgh, evb@geogr.ku.dk
+   ; (LAIvsDAY (1 0.19)(81 0.09)(97 0.52)(113 0.73)(129 1.67)(145 3.59)(172 5.29)(182 5.5)(193 3.59)(225 0.47)(241 0.58)(257 0.46)(273 0.25)(289 0.11)(305 0.41))  ; LAI development fra MIKE SHE
+   
+   ;Flg. LAI er satellit (MODIS sensor) baseret gennemsnit for alle busk/"ung skov" arealer på Sjælland, 2001. Eva Bøgh, evb@geogr.ku.dk.
+    (LAIvsDAY (1 0.36) (17 0.22) (33 0.56) (49 0.61) (97 0.39) (113 0.58) (129 1.40) (145 2.32) (193 3.14) (209 2.43) (225 1.35) (241 1.41) (257 1.19)
+    (273 0.90) (289 1.01) (321 0.52))           ;JKL: (3.21 0-52)) ==> (321 0.52))
+    (Canopy (IntcpCap 0.8)			; Interception capacity (mm)  
+         (rs_min 30.0)				; Minimum transpiration resistance (s/m)
+      	  (EpFac 1.0))				; Potential evapotranspiration factor (-)
+      (Height 100.0)
+      (Albedo 0.17)           
+      (Root (MaxPen 100.0)))			; Permanent root depth (cm)
+
