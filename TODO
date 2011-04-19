@@ -1,21 +1,15 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* FP
-
-* T Offset i vejrfil
-
 * Kina rødder
-
-** Skriv wiki/GP2D "howto" gå fra data til rodmasse og volumen, og omvendt
 
 ** Forkort.  
 
-Første afsnit (PRD) ud.  
-
-Løsning af W/Q ligninger ud.  
-
 Udbyttetabel erstattes af range, fænologitabeller erstattes af tekst
 (eks: root sampling 7 days after...).
+
+** Check publikationer for yield og treatments.
+
+** Skriv wiki/GP2D "howto" gå fra data til rodmasse og volumen, og omvendt
 
 ** Latinske navne?
 

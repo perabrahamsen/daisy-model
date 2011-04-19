@@ -180,11 +180,11 @@ side this gives us
    W e^W = - L_m \frac{d_c}{l_r}
   \label{eq:Lambert}
 \end{equation}
-If the root length is TODO The equation may have multiple solutions, but only the solution for
-$W\leq-1$ is physically meaningful.  It can be found using Newton's
-method and an initial quess of $-2$.  After finding a value for $W$,
-we can find the desired density parameters $L_0$ and $a$ by
-substituting back
+If the root length is suffiently high the equation will have multiple
+solutions, but only the solution for $W\leq-1$ is physically
+meaningful.  It can be found using Newton's method and an initial
+quess of $-2$.  After finding a value for $W$, we can find the desired
+density parameters $L_0$ and $a$ by substituting back
 \begin{eqnarray}
    a   &=& -W / d_c\\\label{eq:a-solved}
    L_0 &=& \frac{L_m}{e^{-a \, d_c}} = L_m e^{a \, d_c}\label{eq:L0-found}
@@ -308,50 +308,11 @@ and isolate the known values on the right side, this gives us:
   Q^2\, e^Q = L_m \frac{d_c \, w_c}{l_R}
   \label{eq:logsquare}
 \end{equation}
-The left hand side expression is illustrated in figure~\ref{fig:Q}.
-Unlike \eqref{eq:Lambert}, nobody bothered to give the solution to
-\eqref{eq:logsquare} a name.  Knowing $Q$ we can find
+The equation can have multiple solution, but only the solution for
+$Q\leq -2$ is physically meaningful.  It can be found using Newton's
+method with an initial guess of $-3$. Knowing $Q$ we can find
 $a_z$~\eqref{eq:Qaz}, $a_x$~\eqref{eq:aztoax}, and
 $L_{0,0}$~\eqref{eq:root-integral2}.
-\begin{figure}[htbp]
-  \input{rootdens_Q}
-  \caption{The Q expression ($Q^2 e^Q$).}
-  \label{fig:Q}
-\end{figure}
-
-\subsubsection{Numeric solution to $Q$}
-\label{sec:Q}
-
-We know $Q^2\, e^Q$ and want to find $Q$.  We start by dividing the
-expression into monotonic intervals by finding the derivative
-\begin{equation}
-  \frac{d (Q^2\, e^Q)}{dQ} = 2 Q e^Q + Q^2 e^Q
-  \label{eq:derived}
-\end{equation}
-The equation
-\begin{equation}
-  2 Q e^Q + Q^2 e^Q = 0
-  \label{eq:derived-solutions}
-\end{equation}
-has two solutions, $Q=0$ and $Q=-2$, and the expression $Q^2\, e^Q$ is
-increasing below $-2$, decreasing between $-2$ and $0$, and increasing
-above $0$. Thus, $Q=0$ is a local (and in this case also global)
-minimum, and $Q=-2$ is a local maximum.
-
-We are not interested in positive values for $Q$, they correspond to
-negative values for $a_z$, the simplification in
-\eqref{eq:root-integral2} are only valid if $a_z > 0$. Since
-$\lim_{Q\to-\infty} Q^2\,e^Q=0$ we get a single negative solution when
-$L_m \frac{d_c \, w_c}{l_R}$ is exactly at the top point ($2^2 e^{-2}$),
-two when it is smaller (it is never negative), and none when it is
-larger.  
-
-Both negative solutions are valid, but represent different
-distributions.  The solution for $Q > -2$ corresponds to a root
-distribution with a large fraction of the root length being located
-from outside the root zone, hence we choose the solution for $Q < -2$.
-We can find $Q$ numerically using Newton's method and an initial guess
-of $-3$.
 
 \subsubsection{Multiple rows}
 \label{sec:model-rows}
@@ -994,7 +955,6 @@ transpiration), and the spatial distribution within the root zone.
 \end{em}
 
 \subsubsection*{Numeric solution to $W$}
-\label{sec:W}
 
 The expression on the left hand side of the equation is depicted on
 figure~\ref{fig:W}.
@@ -1051,6 +1011,45 @@ solutions converges to one.  As we like our roots to stay mostly
 within the root zone, we choose the solution for $W < -1$.  We can
 thus find $W$ numerically using Newton's method and an initial guess
 of $-2$.
+
+\subsubsection*{Numeric solution to $Q$}
+
+\begin{figure}[htbp]
+  \input{rootdens_Q}
+  \caption{The Q expression ($Q^2 e^Q$).}
+  \label{fig:Q}
+\end{figure}
+
+We know $Q^2\, e^Q$ and want to find $Q$.  We start by dividing the
+expression into monotonic intervals by finding the derivative
+\begin{equation}
+  \frac{d (Q^2\, e^Q)}{dQ} = 2 Q e^Q + Q^2 e^Q
+  \label{eq:derived}
+\end{equation}
+The equation
+\begin{equation}
+  2 Q e^Q + Q^2 e^Q = 0
+  \label{eq:derived-solutions}
+\end{equation}
+has two solutions, $Q=0$ and $Q=-2$, and the expression $Q^2\, e^Q$ is
+increasing below $-2$, decreasing between $-2$ and $0$, and increasing
+above $0$. Thus, $Q=0$ is a local (and in this case also global)
+minimum, and $Q=-2$ is a local maximum.
+
+We are not interested in positive values for $Q$, they correspond to
+negative values for $a_z$, the simplification in
+\eqref{eq:root-integral2} are only valid if $a_z > 0$. Since
+$\lim_{Q\to-\infty} Q^2\,e^Q=0$ we get a single negative solution when
+$L_m \frac{d_c \, w_c}{l_R}$ is exactly at the top point ($2^2 e^{-2}$),
+two when it is smaller (it is never negative), and none when it is
+larger.  
+
+Both negative solutions are valid, but represent different
+distributions.  The solution for $Q > -2$ corresponds to a root
+distribution with a large fraction of the root length being located
+from outside the root zone, hence we choose the solution for $Q < -2$.
+We can find $Q$ numerically using Newton's method and an initial guess
+of $-3$.
 
 
 \end{document}

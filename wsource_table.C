@@ -118,7 +118,7 @@ WSourceTable::number (const symbol key) const
   else if (key == Weatherdata::AirTemp ()
            || key == Weatherdata::T_min ()
            || key == Weatherdata::T_max ())
-    return raw * temp_offset (timestep_begin);
+    return raw + temp_offset (timestep_begin);
   
   return raw;
 }
@@ -189,7 +189,7 @@ WSourceTable::end_number (const symbol key) const
   else if (key == Weatherdata::AirTemp ()
            || key == Weatherdata::T_min ()
            || key == Weatherdata::T_max ())
-    return raw * temp_offset (timestep_end);
+    return raw + temp_offset (timestep_end);
 
   return raw;
 }
