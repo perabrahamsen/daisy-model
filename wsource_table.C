@@ -29,30 +29,24 @@
 #include <sstream>
 
 double 
-WSourceTable::precip_correct (const Time& time, const symbol key) const
+WSourceTable::lookup_month (const Time& time, const symbol key, 
+                            const double default_value) const
 {
   // Attribute.
   if (super::check (key))
-    return precip_correct (time, super::number_sequence (key)); 
+    return lookup_month (time, super::number_sequence (key)); 
 
   // Keyword.
   if (keywords.check (key))
-    return precip_correct (time, keywords.number_sequence (key));
+    return lookup_month (time, keywords.number_sequence (key));
 
-  // No correction.
-  return 1.0;
+  // No modification.
+  return default_value;
 }
 
 double 
-WSourceTable::precip_correct (const Time& time) const
-{
-  return precip_correct (time,  Weatherdata::PrecipCorrect ())
-    * precip_correct (time,  Weatherdata::PrecipScale ());
-}
-
-double 
-WSourceTable::precip_correct (const Time& time,
-                              const std::vector<double>& numbers) const
+WSourceTable::lookup_month (const Time& time,
+                            const std::vector<double>& numbers) const
 {
   if (numbers.size () == 1)
     // One factor for all months.
@@ -63,6 +57,17 @@ WSourceTable::precip_correct (const Time& time,
 
   return numbers[time.month () - 1];
 }
+
+double 
+WSourceTable::precip_correct (const Time& time) const
+{
+  return lookup_month (time,  Weatherdata::PrecipCorrect (), 1.0)
+    * lookup_month (time,  Weatherdata::PrecipScale (), 1.0);
+}
+
+double 
+WSourceTable::temp_offset (const Time& time) const
+{ return lookup_month (time,  Weatherdata::TempOffset (), 0.0); }
 
 bool 
 WSourceTable::check (const symbol key) const
@@ -110,7 +115,11 @@ WSourceTable::number (const symbol key) const
 
   if (key == Weatherdata::Precip ())
     return raw * precip_correct (timestep_begin);
-
+  else if (key == Weatherdata::AirTemp ()
+           || key == Weatherdata::T_min ()
+           || key == Weatherdata::T_max ())
+    return raw * temp_offset (timestep_begin);
+  
   return raw;
 }
 
@@ -177,6 +186,10 @@ WSourceTable::end_number (const symbol key) const
 
   if (key == Weatherdata::Precip ())
     return raw * precip_correct (timestep_end);
+  else if (key == Weatherdata::AirTemp ()
+           || key == Weatherdata::T_min ()
+           || key == Weatherdata::T_max ())
+    return raw * temp_offset (timestep_end);
 
   return raw;
 }

@@ -1,3 +1,7 @@
+2011-04-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* weatherdata.h, weatherdata.C (TempOffset): New parameter.
+
 2011-04-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.95 released.

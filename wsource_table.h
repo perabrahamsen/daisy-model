@@ -49,10 +49,11 @@ private:
   Time timestep_end;
   double timestep_hours;
 
-  // Precipitaion correction.
-  double precip_correct (const Time&, const symbol) const;
+  // Monthly modifications.
+  double lookup_month (const Time&, const symbol, double default_value) const;
+  double lookup_month (const Time&, const std::vector<double>&) const;
   double precip_correct (const Time&) const;
-  double precip_correct (const Time&, const std::vector<double>&) const;
+  double temp_offset (const Time&) const;
 
   // Scope.
   bool check (const symbol key) const;

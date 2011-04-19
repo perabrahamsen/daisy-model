@@ -59,40 +59,20 @@
 
 \section{Introduction}
 
-Partial root zone drying (PRD) is an irrigation technique where
-irrigation is applied on only part of the root zone, dividing it into
-a wet and a dry zone.  The idea is then that root signals from the dry
-zone will lower the hydraulic conductivity through of the stomata, and
-thus reduce the transpiration from the wet zone.  Used properly, the
-technique has been shown to provide significant water savings
-(MNA-TODO: REF).  For PRD to work, the irrigation scheme must
-alternate between what part of the root zone is wet, and what part is
-kept dry. (MNA-TODO: REF-SAFIR/Fulai) recommends that (MNA-TODO:
-SAFIR/Fulai strategy).  When these conditions are fulfilled is
-determined by both the movement of water through the soil matrix from
-the wet zone to the dry zone, and by the water uptake through the
-plant roots.  The established solution to the first is based on
-Richards equation \citep{richardseq}.  The formulation must be at
-least \twod{} to include both the vertical and a horizontal component.
-
-The issue of water uptake from the soil matrix through the roots can
-be broken into the total uptake (approximately equal to the
-transpiration), and the spatial distribution within the root zone.
 With PRD irrigation, the transpiration will depend on the spatial
-distribution, due to the reliance of root signals.  This makes the
-spatial distribution even more important.  Several models
-incorporating this exists, e.g.\@~\cite{vrugt2001calibration} proposes
-a flexible, empirical \twod{} root model with a radial geometry, which
-\cite{apri} successfully use to model PRD irrigation of a vineyard.  A
-static description of the root density based on measurements was used
-in the later application.  For perennial plants using a static
-description of the root zone during the irrigation season can make
-sense, but for annual plants, such as most vegetables, the root zone
-must be considered dynamic.  A dynamic root growth model for row crops
-based on diffusion theory was proposed
-in~\cite{acock1996convective}. In general this model required a
-numerical solution, but analytical solutions for special cases were
-found by~\cite{willigen2002two}.
+distribution of the roots, due to the reliance of root signals.
+Several models incorporating this exists,
+e.g.\@~\cite{vrugt2001calibration} proposes a flexible, empirical
+\twod{} root model with a radial geometry, which \cite{apri}
+successfully use to model PRD irrigation of a vineyard.  A static
+description of the root density based on measurements was used in the
+later application.  For perennial plants using a static description of
+the root zone during the irrigation season can make sense, but for
+annual plants, such as most vegetables, the root zone must be
+considered dynamic.  A dynamic root growth model for row crops based
+on diffusion theory was proposed in~\cite{acock1996convective}. In
+general this model required a numerical solution, but analytical
+solutions for special cases were found by~\cite{willigen2002two}.
 
 The \twod{} radial and the \threed{} root density models typically
 include only a single plant.  In contrast, \oned{} models by their
@@ -200,68 +180,15 @@ side this gives us
    W e^W = - L_m \frac{d_c}{l_r}
   \label{eq:Lambert}
 \end{equation}
-The solution to this equation with regard to $W$ happens to be the
-definition of the Lambert-W function \citep{lambert58,euler83}.  The
-expression on the left hand side of the equation is depicted on
-figure~\ref{fig:W}.
-\begin{figure}[htbp]
-  \input{rootdens_W}
-  \caption{The Lambert-W expression ($W e^W$).}
-  \label{fig:W}
-\end{figure}
-After finding a value for $W$, we can find the desired density
-parameters $L_0$ and $a$ by substituting back
+If the root length is TODO The equation may have multiple solutions, but only the solution for
+$W\leq-1$ is physically meaningful.  It can be found using Newton's
+method and an initial quess of $-2$.  After finding a value for $W$,
+we can find the desired density parameters $L_0$ and $a$ by
+substituting back
 \begin{eqnarray}
    a   &=& -W / d_c\\\label{eq:a-solved}
    L_0 &=& \frac{L_m}{e^{-a \, d_c}} = L_m e^{a \, d_c}\label{eq:L0-found}
 \end{eqnarray}
-
-\subsubsection{Numeric solution to $W$}
-\label{sec:W}
-
-In order to solve \eqref{eq:Lambert} with regard to $W$, we first
-divide the expression into monotonic intervals by finding the
-derivative
-\begin{equation}
-  \frac{d \, (W e^W)}{dW} = e^W + W e^W
-  \label{eq:derived-W}
-\end{equation}
-The equation
-\begin{equation}
-  e^W + W e^W = 0
-  \label{eq:derived-W-solutions}
-\end{equation}
-has one solution, $W=-1$. The expression $W\, e^W$ is decreasing below
-$-1$ and increasing above $-1$.  Thus, a global minimum is obtained
-for $W=-1$.
-
-Since $\lim_{W\to-\infty} W\,e^W=0$ we get a single solution
-to~\eqref{eq:Lambert} when $-L_m \frac{d_c}{l_r}$ is exactly at the
-bottom point ($-1 e^{-1}$), two when it is above (it is never
-positive), and none when it is below.  The later situation corresponds
-to the case where there is insufficient root $l_r$ to satisfy the
-minimal root density $L_m$ within the given root zone $d_c$.
-
-Both solutions are valid, but represent different distributions.
-\begin{itemize} 
-\item The solution for $W < -1$ represents a large $a$ parameter. From
-  \eqref{eq:L0-found} we see this also means $L_0$ is large.  Thus,
-  the solution corresponds to a root zone with a high density near the
-  top that decreases rapidly to $L_m$ at the bottom of the root zone,
-  and continues to decrease so only a small contribution to the total
-  root length come from below the root zone.
-\item The solution for $W > -1$ (and thus small values of $a$ and
-  $L_0$) corresponds to a low root density near the top that
-  decreases slowly, and thus gives a larger contribution to the total
-  root length from below the root zone.
-\end{itemize}
-As the total root length increases, pressing $W$ towards $0$ or
-$-\infty$, the difference between the solutions grow.  When there is
-just enough roots to satisfy the constraints at $W = -1$, the two
-solutions converges to one.  As we like our roots to stay mostly
-within the root zone, we choose the solution for $W < -1$.  We can
-thus find $W$ numerically using Newton's method and an initial guess
-of $-2$.
 
 \subsubsection{Limited growth}
 \label{sec:soillim}
@@ -1030,5 +957,100 @@ $z$     & L       & Soil depth \\
 \item Are the \cite{richardseq}, \cite{nelder1965simplex},
   \cite{euler83}, and \cite{lambert58} citations too silly?
 \end{itemize}
+
+\section*{Removed}
+
+\subsection*{Introduction}
+
+\begin{em}
+  Too much about PRD.
+\end{em}
+
+Partial root zone drying (PRD) is an irrigation technique where
+irrigation is applied on only part of the root zone, dividing it into
+a wet and a dry zone.  The idea is then that root signals from the dry
+zone will lower the hydraulic conductivity through of the stomata, and
+thus reduce the transpiration from the wet zone.  Used properly, the
+technique has been shown to provide significant water savings
+(MNA-TODO: REF).  For PRD to work, the irrigation scheme must
+alternate between what part of the root zone is wet, and what part is
+kept dry. (MNA-TODO: REF-SAFIR/Fulai) recommends that (MNA-TODO:
+SAFIR/Fulai strategy).  When these conditions are fulfilled is
+determined by both the movement of water through the soil matrix from
+the wet zone to the dry zone, and by the water uptake through the
+plant roots.  The established solution to the first is based on
+Richards equation \citep{richardseq}.  The formulation must be at
+least \twod{} to include both the vertical and a horizontal component.
+
+The issue of water uptake from the soil matrix through the roots can
+be broken into the total uptake (approximately equal to the
+transpiration), and the spatial distribution within the root zone.
+
+\subsection*{Model theory}
+
+\begin{em}
+  The W and Q equations aren't that complex, their solutions doesn't
+  warrent as much text and figures.
+\end{em}
+
+\subsubsection*{Numeric solution to $W$}
+\label{sec:W}
+
+The expression on the left hand side of the equation is depicted on
+figure~\ref{fig:W}.
+\begin{figure}[htbp]
+  \input{rootdens_W}
+  \caption{The Lambert-W expression ($W e^W$).}
+  \label{fig:W}
+\end{figure}
+
+The solution to this equation with regard to
+$W$ happens to be the definition of the Lambert-W function
+\citep{lambert58,euler83}.
+
+In order to solve \eqref{eq:Lambert} with regard to $W$, we first
+divide the expression into monotonic intervals by finding the
+derivative
+\begin{equation}
+  \frac{d \, (W e^W)}{dW} = e^W + W e^W
+  \label{eq:derived-W}
+\end{equation}
+The equation
+\begin{equation}
+  e^W + W e^W = 0
+  \label{eq:derived-W-solutions}
+\end{equation}
+has one solution, $W=-1$. The expression $W\, e^W$ is decreasing below
+$-1$ and increasing above $-1$.  Thus, a global minimum is obtained
+for $W=-1$.
+
+Since $\lim_{W\to-\infty} W\,e^W=0$ we get a single solution
+to~\eqref{eq:Lambert} when $-L_m \frac{d_c}{l_r}$ is exactly at the
+bottom point ($-1 e^{-1}$), two when it is above (it is never
+positive), and none when it is below.  The later situation corresponds
+to the case where there is insufficient root $l_r$ to satisfy the
+minimal root density $L_m$ within the given root zone $d_c$.
+
+Both solutions are valid, but represent different distributions.
+\begin{itemize} 
+\item The solution for $W < -1$ represents a large $a$ parameter. From
+  \eqref{eq:L0-found} we see this also means $L_0$ is large.  Thus,
+  the solution corresponds to a root zone with a high density near the
+  top that decreases rapidly to $L_m$ at the bottom of the root zone,
+  and continues to decrease so only a small contribution to the total
+  root length come from below the root zone.
+\item The solution for $W > -1$ (and thus small values of $a$ and
+  $L_0$) corresponds to a low root density near the top that
+  decreases slowly, and thus gives a larger contribution to the total
+  root length from below the root zone.
+\end{itemize}
+As the total root length increases, pressing $W$ towards $0$ or
+$-\infty$, the difference between the solutions grow.  When there is
+just enough roots to satisfy the constraints at $W = -1$, the two
+solutions converges to one.  As we like our roots to stay mostly
+within the root zone, we choose the solution for $W < -1$.  We can
+thus find $W$ numerically using Newton's method and an initial guess
+of $-2$.
+
 
 \end{document}

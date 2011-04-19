@@ -74,6 +74,7 @@ namespace Weatherdata
   symbol Surface ();
   symbol PrecipCorrect ();
   symbol PrecipScale ();
+  symbol TempOffset ();
   symbol Begin ();
   symbol End ();
   
