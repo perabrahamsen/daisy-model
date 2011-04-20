@@ -57,8 +57,18 @@
 
 ;; 2D sims
 
+(defweather SilstrupBase table
+  (file "dk-Silstrup-hourly.dwf")
+  (PrecipScale 1.41 1.42 1.35 1.24 1.13 1.11
+               1.10 1.10 1.11 1.14 1.23 1.37 []))
+
+(run batch (run (Silstrup-2D (weather SilstrupBase
+                                      (TempOffset 2.0 2.0 2.0 2.0 2.0 2.0 
+                                                  2.0 2.0 2.0 2.0 2.0 2.0)))))
+
+
 ;;(run batch (run Estrup-2D Silstrup-2D plotall))
-(run batch (run Silstrup-2D (plotall (graph Silstrup plot2d-Silstrup))))
+;; (run batch (run Silstrup-2D (plotall (graph Silstrup plot2d-Silstrup))))
 
 ;;(run batch (run (Silstrup-2D (column (Silstrup-2D-MACRO (Chemistry multi (combine Bromide))))) (plotall (graph Silstrup))))
 ;;(run batch (run (Silstrup-2D (stop 1999 10 1))))
