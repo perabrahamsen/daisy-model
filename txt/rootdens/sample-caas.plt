@@ -1,4 +1,4 @@
-set terminal epslatex color
+set terminal epslatex color size 3.8in,2.5in
 set output "sample-caas.tex"
 set yrange [-25:25]
 set xrange [-40:40]

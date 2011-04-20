@@ -3,7 +3,7 @@ set view map
 unset surface
 set cntrparam levels discrete 6.40, 3.20, 1.60, 0.80, 0.40, 0.20, 0.10
 set clabel "%g cm/cm$^3$"
-set terminal epslatex color
+set terminal epslatex color size 4in,2.5in
 set key right Right bottom
 set ylabel "$z$ [cm]"
 set ytics ("0" 0, "50" -50, "100" -100, "150" -150)

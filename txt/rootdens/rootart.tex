@@ -1,13 +1,19 @@
-\documentclass[a4paper,11pt,twoside]{article}
-\usepackage{a4}
+\documentclass[twocolumn,natbib]{svjour3}
+%%\documentclass[twocolumn,referee,natbib]{svjour3}
+\usepackage{mathptmx}
+\usepackage{graphicx}
+\journalname{Plant and Soil}
+
+%%\documentclass[a4paper,11pt,twoside]{article}
+%%\usepackage{a4}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
 \usepackage{amsmath}
 \usepackage{hyperref}
-\usepackage{natbib}
-\usepackage{graphicx}
-\usepackage[left,running]{lineno}
-\usepackage{setspace}
+
+%%\usepackage{natbib}
+%%\usepackage[left,running]{lineno}
+%%\usepackage{setspace}
 \input{macro}
 
 \newcommand{\attmark}[1]{\mbox{$^{\mbox{\footnotesize #1}}$}}
@@ -16,26 +22,32 @@
 \newcommand{\threed}{\textsc{3d}}
 
 
-\doublespace
+%%\doublespace
 
 \begin{document}
 
-\linenumbers
+%%\linenumbers
 
 \title{A simple parametric \twod{} root density distribution model
-  for row crops.}  
+  for row crops}  
 
-\author{Per Abrahamsen\attmark{a,}\footnote{Corresponding author.
-    Present address: IGM LIFE KU, Thorvaldsensvej 40, DK-1871
-    Frederiksberg.  Email: pa@life.ku.dk} \and 
-  Mathias Neumann Andersen\attmark{b} \and Søren Hansen\attmark{a} \and
-  Guitong Li\attmark{d} \and Mikkel Mollerup\attmark{a} \and Xuebin Qi\attmark{c}\\
-  \\
-  \small\em\attmark{a}University of Copenhagen, Denmark\\
-  \small\em\attmark{b}Aarhus University,
-  Denmark\\
-  \small\em\attmark{c}Chinese Academy of Agricultural Sciences, China\\
-  \small\em\attmark{d}China Agricultural University, China}
+\author{Per Abrahamsen \and Mathias Neumann Andersen \and Søren Hansen
+  \and Guitong Li \and Mikkel Mollerup \and Xuebin Qi}
+
+\institute{Per Abrahamsen \and Søren Hansen 
+  \at Department of Basic Sciences and Environment,\\
+      Faculty of Life Sciences, 
+      University of Copenhagen,\\
+      Thorvaldsensvej 40, DK-1871, Frederiksberg\\
+      \email{pa@life.ku.dk}
+  \and Mikkel Mollerup
+  \at Road Directorate, Ministry of Transport, Denmark
+  \and Xuebin Qi
+  \at Chinese Academy of Agricultural Sciences
+  \and Guitong Li
+  \at China Agricultural University}
+
+\date{\today{}}
 
 \maketitle
 
@@ -59,9 +71,9 @@
 
 \section{Introduction}
 
-With PRD irrigation, the transpiration will depend on the spatial
-distribution of the roots, due to the reliance of root signals.
-Several models incorporating this exists,
+With partial root zone drying (PRD) irrigation, the transpiration will
+depend on the spatial distribution of the roots, due to the reliance
+of root signals.  Several models incorporating this exists,
 e.g.\@~\cite{vrugt2001calibration} proposes a flexible, empirical
 \twod{} root model with a radial geometry, which \cite{apri}
 successfully use to model PRD irrigation of a vineyard.  A static
@@ -255,7 +267,7 @@ at the surface ($z = 0$) is equal to $L_m$.
 \end{equation}
 See figure~\ref{fig:row} for an illustration.
 \begin{figure}[htbp]
-  \input{row}
+  \hspace{-14mm}\input{row}
   \caption{The \twod{} root zone of a single row of crops.  
     %%The x-axis
     %%denotes horizontal distance to the row, and the z-axis depth below
@@ -308,7 +320,7 @@ and isolate the known values on the right side, this gives us:
   Q^2\, e^Q = L_m \frac{d_c \, w_c}{l_R}
   \label{eq:logsquare}
 \end{equation}
-The equation can have multiple solution, but only the solution for
+The equation can have multiple solutions, but only the solution for
 $Q\leq -2$ is physically meaningful.  It can be found using Newton's
 method with an initial guess of $-3$. Knowing $Q$ we can find
 $a_z$~\eqref{eq:Qaz}, $a_x$~\eqref{eq:aztoax}, and
@@ -322,7 +334,7 @@ figure~\ref{fig:zigzag}. In theory, all the rows on the field will
 contribute some roots to the interval.  The root density in the
 interval will be the sum of all the individual contributions.
 \begin{figure}[htbp]
-  \input{rootdens_L}
+  \hspace{-6mm}\input{rootdens_L}
   \caption{The x-axis represents the distance from a specific row to
     the midpoint between it and the row to its right.  The L-axis is
     the root density for roots originating in a specific row.  The
@@ -430,12 +442,12 @@ table~\ref{tab:caas2008treatments} and~\ref{tab:cautreatments}.
   \label{tab:caas2008treatments}
   \begin{tabular}{llll}\\\hline
 Plot	& Source	& Method	& Strategy\\\hline
-3	& SF + HM + UV	& Subsurface drip	& Partial rootzone drying\\
-6	& SF + HM + UV	& Subsurface drip	& Full irrigated\\
-9	& SF + HM + UV	& Subsurface drip	& Deficit Irrigation\\
-12	& SF + HM	& Subsurface drip	& Deficit Irrigation\\
-15	& SF + HM	& Subsurface drip	& Partial rootzone drying\\
-18	& SF + HM	& Subsurface drip	& Full irrigated\\
+3	& SF + HM + UV	& Subsurface	& Partial rootzone drying\\
+6	& SF + HM + UV	& Subsurface	& Full irrigated\\
+9	& SF + HM + UV	& Subsurface	& Deficit Irrigation\\
+12	& SF + HM	& Subsurface	& Deficit Irrigation\\
+15	& SF + HM	& Subsurface	& Partial rootzone drying\\
+18	& SF + HM	& Subsurface	& Full irrigated\\
 21	& 	& Furrow	& Partial rootzone drying\\
 24	& 	& Furrow	& Full irrigated
   \end{tabular}
@@ -449,11 +461,11 @@ Plot	& Source	& Method	& Strategy\\\hline
   \begin{tabular}{llllll}\\\hline
 \multicolumn{3}{c}{2007} & \multicolumn{3}{c}{2008}\\
 Plot	& Method	& Strategy	& Plot	& Method	& Strategy\\\hline
-1	& Subsurface drip	& PRD	& 3	& Subsurface drip	& PRD\\
-2	& Subsurface drip	& PRD	& 6	& Subsurface drip	& FI\\
-3	& Subsurface drip	& PRD	& 9	& Furrow	& PRD\\
-4	& Subsurface drip	& FI	& 12	& Furrow	& FI\\
-5	& Subsurface drip	& FI	& 15	& Subsurface drip	& FI\\
+1	& Subsurface	& PRD	& 3	& Subsurface	& PRD\\
+2	& Subsurface	& PRD	& 6	& Subsurface	& FI\\
+3	& Subsurface	& PRD	& 9	& Furrow	& PRD\\
+4	& Subsurface	& FI	& 12	& Furrow	& FI\\
+5	& Subsurface	& FI	& 15	& Subsurface	& FI\\
 \end{tabular}
 \end{table}
 
@@ -486,7 +498,7 @@ the horizontal distance to the plant, the lowest were at $z$ = 55
 cm. See figure~\ref{fig:sample-cau}.
 
 \begin{figure}[htbp]
-  \input{sample-caas}
+  \hspace{-1mm}\input{sample-caas}
   \caption{Sampling points for CAAS site.  
 %%    Root density has been sampled at the center of the ridge ($x$ = 0
 %%    cm), at the center of the furrow ($x$ = 37.5 cm), and halfway
@@ -500,7 +512,7 @@ cm. See figure~\ref{fig:sample-cau}.
 \end{figure}
 
 \begin{figure}[htbp]
-  \input{sample-cau}
+  \hspace{-1mm}\input{sample-cau}
   \caption{Sampling points for CAU site.  
 %%    Root density has been sampled at a cross shape with center at
 %%    plant location, with samples 10 and 20 cm at each side of the
@@ -514,6 +526,11 @@ cm. See figure~\ref{fig:sample-cau}.
     original ground level, marked $+$ on the figure.}
   \label{fig:sample-cau}
 \end{figure}
+
+The CAAS root sampling was performed 2008-06-10, 16 days before
+harvest.  The CAU root samplings were performed 2007-05-09 (before
+flowering), 2007-07-05 (after flowering), 2008-06-15 (middle of
+flowering), and 2008-07-24 (second harvest).
 
 \subsection{Fitting the data to the model}
 
@@ -560,106 +577,43 @@ We used $p=0.05$ as the test criteria.
 
 \section{Results}
 
-The phenological data is shown together with the root sampling dates on
-table~\ref{tab:caas-phenology} and~\ref{tab:cau-phenology}.  Note that
-the 2008 sampling were later than the 2007 sampling at the CAU site.
-Final yield are shown on figure~\ref{tab:yield}, and are above Chinese
-average in all cases except plot 21 for the CAAS site.
+For the CAAS site, the fully irrigated treatments all had yield
+between 22 and 23 Mg/ha, while the deficit and PRD treatments had
+yields from 18 to 21 Mg/ha, with the exception of plot 21 where the
+yield was 14 Mg/ha.  For comparison, FAOSTAT reports Chinese national
+average for 2008 as 15 Mg/ha.  For the CAU site, yield were between 42
+and 52 Mg/ha (Chinese average 23 Mg/ha).  There were no clear link
+between yield and treatment.
+
+Table~\ref{tab:ftest} shows the best fit root parameters for the
+\twod{} root density model, as well as the coefficient of
+determination (R$^2$) for both the \twod{} and \oned{} models, and the
+F-test value.  The horizontal root zone radius is the parameter that
+shows the largest variation between treatments, and root zone depth is
+the parameter that shows least variation.  With the exception of the
+early 2008 sampling of CAU plot 12, the \twod{} R$^2$ is always above
+0.55, with a median of 0.86.  The potato (CAAS) tend to have a wider
+root zone and more root mass than the tomato (CAU), but no clear
+difference in root zone depth.  The \oned{} R$^2$ were much lower
+(less than 0.20) for the plots where the estimated \twod{} root zone
+radius was less than half the distance between rows.  The F-test
+showed that the \twod{} model gave a significant better fit than the
+\oned{} model for all the aggregate datasets, half the CAAS datasets,
+and all but but three of the CAU datasets.
 
 \begin{table}[htbp]
-  \caption{CAAS phenology and root sampling.}
-  \label{tab:caas-phenology}
-  \begin{tabular}{ll}\\\hline
-Date & Stage\\\hline
-2008-03-15	& Sprouting/Bud development\\
-2008-03-25	& Emergence\\
-2008-04-10	& Tuber initiation\\
-2008-04-15	& First individual buds\\
-2008-04-20	& Beginning of flowering\\
-2008-05-20	& First berries visible\\
-2008-06-03	& Beginning of leaf yellowing\\
-2008-06-10   & \textbf{Root density sample}\\
-2008-06-26	& Final harvest\\
-  \end{tabular}
-\end{table}
-
-\begin{table}[htbp]
-  \caption{CAU phenology and root sampling.}
-  \label{tab:cau-phenology}
-  \begin{tabular}{lll}\\\hline
-Date & Date & Stage\\\hline
-2007-04-20	& 2008-03-10	& Leaf development\\
-2007-05-10	& 2008-04-27	& Leaf development\\
-2007-05-25	& 2008-05-12	& Leaf development\\
-2007-05-30	& 	& \textbf{Root density sample}\\
-2007-06-08	& 2008-05-21	& Inflorescence emergence\\
-2007-06-11	& 2008-05-25	& Flowering\\
-2007-06-14	& 2008-05-29	& Development of fruit\\
-2007-06-16	& 2008-06-07	& Inflorescence emergence\\
-2007-06-20	& 2008-06-12	& Flowering\\
-	& 2008-06-15 & \textit{\textbf{Root density sample}}\\
-2007-06-23	& 2008-06-20	& Development of fruit\\
-2007-06-27	& 2008-06-30	& Inflorescence emergence\\
-2007-07-01	& 2008-07-03	& Flowering\\
-2007-07-05	& 	& \textbf{Root density sample}\\
-2007-07-10	& 2008-07-16	& Ripening of fruit and seed\\
-2007-07-20	& 2008-07-24	& Ripening of fruit and seed\\
-	& 2008-07-24 & \textit{\textbf{Root density sample}}\\
-2007-07-25	& 2008-08-01	& Ripening of fruit and seed\\
-  \end{tabular}
-\end{table}
-
-\begin{table}[htbp]
-  \caption{Final yield.  All numbers are wet weight.  The ``China''
-    number is the average Chinese yield that year, as reported by FAO 
-    (\url{http://faostat.fao.org/}).  The ``Average'' number is the 
-    average yield for the listed plots.  Yield information is missing 
-    for CAU 2008 plot 15.}
-  \label{tab:yield}
-
-  \begin{tabular}{llllll}\\\hline
-\multicolumn{2}{c}{CAAS 2008} & \multicolumn{2}{c}{CAU 2007} & \multicolumn{2}{c}{CAU 2008} \\
-Plot	& Mg/ha	& Plot	& Mg/ha	& Plot	& Mg/ha\\\hline
-China	& 14.8	& China	& 23.1	& China	& 23.3\\\hline
-Average	& 19.9	& Average	& 44.3	& Average	& 46.9\\
-3	& 20.6	& 1	& 41.8	& 3	& 45.1\\
-6	& 23.2	& 2	& 43.5	& 6	& 41.8\\
-9	& 18.3	& 3	& 51.5	& 9	& 48.8\\
-12	& 20.0	& 4	& 41.7	& 12	& 51.9\\
-15	& 18.0	& 5	& 43.0	& 15	& n/a\\
-18	& 22.4	& 	& 	& 	& \\
-21	& 14.4	& 	& 	& 	& \\
-24	& 22.5	& 	& 	& 	& 
-  \end{tabular}
-\end{table}
-
-Table~\ref{tab:caas-ftest} and~\ref{tab:cau-ftest} shows the best fit
-root parameters for the \twod{} root density model, as well as the
-coefficient of determination (R$^2$) for both the \twod{} and \oned{}
-models, and the F-test value.  The horizontal root zone radius is the
-parameter that shows the largest variation between treatments, and
-root zone depth is the parameter that shows least variation.  With the
-exception of the early 2008 sampling of CAU plot 12, the \twod{} R$^2$
-is always above 0.55, with a median of 0.86.  The potato (CAAS) tend
-to have a wider root zone and more root mass than the tomato (CAU),
-but no clear difference in root zone depth.  The \oned{} R$^2$ were
-much lower (less than 0.20) for the plots where the estimated \twod{}
-root zone radius was less than half the distance between rows.  The
-F-test showed that the \twod{} model gave a significant better fit
-than the \oned{} model for all the aggregate datasets, half the CAAS
-datasets, and all but but three of the CAU datasets.
-
-\begin{table}[htbp]
-  \caption{CAAS model fit.  The best fit for root zone depth ($d_c$),
-    root zone diameter ($2\; w_c$), and total root dry matter ($M_r$) is show
+  \caption{The best fit for root zone depth ($d_c$),
+    root zone diameter ($2 w_c$), and total root dry matter ($M_r$) is show
     for each plot.  The `All' plot indicate a dataset containing all
     the individual plots.  Furthermore, the R$^2$ for both the \oned{}
     and \twod{} fits are listed, as well as an F test indicating whether
-    the \twod{} model provides a significantly better fit (\textbf{bold}).} 
-\label{tab:caas-ftest}
+    the \twod{} model provides significantly better fit (\textbf{bold}).} 
+  \label{tab:ftest}
 
-\begin{tabular}{rrrrrrrrr}\\\hline
-Plot	& $d_c$ [cm]	& $2\;w_c$ [cm]	& $M_r$ [Mg/ha]	& \twod{} R$^2$	& \oned{} R$^2$	& F	& F (0.05)\\\hline
+  \begin{tabular}{rrrrrrrrr}\\\hline
+Plot	& $d_c$	& $2\;w_c$ & $M_r$ & \twod{} & \oned{} & F	& F \\
+	& cm	& cm	& Mg/ha	& R$^2$	& R$^2$	& Obs	& 0.05 \\\hline
+\multicolumn{8}{c}{2008-06-10 CAAS} \\
 All	& 93	& 216	& 0.65	& 0.61	& 0.60	& \textbf{5.42}	& 3.88\\
 3	& 91	& 265	& 1.22	& 0.93	& 0.92	& 2.80	& 4.14\\
 6	& 81	& 743	& 1.11	& 0.88	& 0.88	& 0.03	& 4.14\\
@@ -669,42 +623,29 @@ All	& 93	& 216	& 0.65	& 0.61	& 0.60	& \textbf{5.42}	& 3.88\\
 18	& 87	& 82	& 0.22	& 0.88	& 0.79	& \textbf{23.80}	& 4.14\\
 21	& 88	& 99	& 0.28	& 0.86	& 0.79	& \textbf{16.53}	& 4.14\\
 24	& 132	& 164	& 0.74	& 0.73	& 0.69	& 4.10	& 4.14\\
-\end{tabular}
-\end{table}
-
-\begin{table}[htbp]
-  \caption{CAU model fit.  The best fit for root zone depth ($d_c$),
-    root zone diameter ($2 w_c$), and total root dry matter ($M_r$) is show
-    for each plot.  The `All' plot indicate a dataset containing all
-    the individual plots.  Furthermore, the R$^2$ for both the \oned{}
-    and \twod{} fits are listed, as well as an F test indicating whether
-    the \twod{} model provides significantly better fit (\textbf{bold}).} 
-  \label{tab:cau-ftest}
-
-  \begin{tabular}{rrrrrrrrr}\\\hline
-Plot	& $d_c$ [cm]	& $2 w_c$ [cm]	& $M_r$ [Mg/ha]	& \twod{} R$^2$	& \oned{} R$^2$	& F	& F (0.05)\\\hline
-\multicolumn{8}{c}{2007-05-30} \\
+\hline
+\multicolumn{8}{c}{2007-05-30 CAU} \\
 All	& 78	& 96	& 0.18	& 0.63	& 0.49	& \textbf{43.69}	& 3.93\\
 1	& 56	& 48	& 0.11	& 0.84	& 0.40	& \textbf{53.28}	& 4.38\\
 2	& 83	& 75	& 0.17	& 0.76	& 0.46	& \textbf{23.72}	& 4.38\\
 3	& 83	& 271	& 0.23	& 0.84	& 0.83	& 1.00	& 4.32\\
 4	& 90	& 259	& 0.24	& 0.83	& 0.82	& 1.09	& 4.32\\
 5	& 72	& 47	& 0.15	& 0.96	& 0.31	& \textbf{309.76}	& 4.38\\\hline
-\multicolumn{8}{c}{2007-07-05}\\
+\multicolumn{8}{c}{2007-07-05 CAU}\\
 All	& 112	& 64	& 0.33	& 0.67	& 0.19	& \textbf{172.94}	& 3.92\\
 1	& 85	& 39	& 0.20	& 0.88	& 0.16	& \textbf{121.21}	& 4.32\\
 2	& 94	& 40	& 0.22	& 0.94	& 0.15	& \textbf{276.04}	& 4.32\\
 3	& 137	& 97	& 0.51	& 0.76	& 0.34	& \textbf{36.52}	& 4.32\\
 4	& 126	& 89	& 0.50	& 0.84	& 0.32	& \textbf{67.25}	& 4.32\\
 5	& 93	& 39	& 0.21	& 0.94	& 0.15	& \textbf{265.82}	& 4.35\\\hline
-\multicolumn{8}{c}{2008-06-15}\\
+\multicolumn{8}{c}{2008-06-15 CAU}\\
 All	& 124	& 63	& 0.27	& 0.56	& 0.14	& \textbf{85.36}	& 3.95\\
 3	& 72	& 31	& 0.14	& 0.89	& 0.14	& \textbf{96.81}	& 4.54\\
 6	& 99	& 69	& 0.23	& 0.86	& 0.37	& \textbf{54.02}	& 4.54\\
 9	& 144	& 63	& 0.30	& 0.83	& 0.15	& \textbf{58.11}	& 4.54\\
 12	& 245	& 122	& 0.63	& 0.30	& 0.11	& 4.09	& 4.54\\
 15	& 125	& 44	& 0.24	& 0.85	& 0.12	& \textbf{70.26}	& 4.54\\\hline
-\multicolumn{8}{c}{2008-07-24}\\
+\multicolumn{8}{c}{2008-07-24 CAU}\\
 All	& 108	& 45	& 0.25	& 0.92	& 0.13	& \textbf{894.32}	& 3.95\\
 3	& 120	& 42	& 0.28	& 0.95	& 0.06	& \textbf{260.20}	& 4.60\\
 6	& 95	& 44	& 0.22	& 0.96	& 0.17	& \textbf{281.54}	& 4.54\\
@@ -731,8 +672,7 @@ represent both irrigation methods and both irrigation strategies.  The
 two 2008 sampling at CAU shows a tendency of the roots to concentrate
 near the center of the row, as illustrated on
 figure~\ref{fig:tworows}.  The tendency is partly supported by the
-2007 data, where the root zone sampling was performed earlier
-(table~\ref{tab:cau-phenology}).
+2007 data, where the root zone sampling was performed earlier.
 
 \begin{figure}[htbp]
   \input{CAAS-2008-0}\\
@@ -749,7 +689,7 @@ figure~\ref{fig:tworows}.  The tendency is partly supported by the
   \label{fig:caas2008}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
   \input{CAU-2007a-0}\input{CAU-2007b-0}\\
   \input{CAU-2007a-15}\input{CAU-2007b-15}\\
   \input{CAU-2007a-30}\input{CAU-2007b-30}
@@ -764,9 +704,9 @@ figure~\ref{fig:tworows}.  The tendency is partly supported by the
     The error bars represent mean and standard deviation for all
     treatments, including measurements at both sides of the row.}
   \label{fig:cau2007}
-\end{figure}
+\end{figure*}
 
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
   \input{CAU-2008a-0}\input{CAU-2008b-0}\\
   \input{CAU-2008a-15}\input{CAU-2008b-15}\\
   \input{CAU-2008a-30}\input{CAU-2008b-30}
@@ -782,11 +722,11 @@ figure~\ref{fig:tworows}.  The tendency is partly supported by the
     The error bars represent mean and standard deviation for
     all treatments, including measurements at both sides of the row.}
   \label{fig:cau2008}
-\end{figure}
+\end{figure*}
 
 \begin{figure}[htbp]
-  \input{CAU2008a}\\
-  \input{CAU2008b}
+  \hspace{-4mm}\vbox{\input{CAU2008a}\\
+    \input{CAU2008b}}
   \caption{Estimated root zone for the CAU site for the two 2008 root
     samplings.
     %%The top graph shows the 15-06-2008 root density
@@ -809,25 +749,25 @@ estimate of all three parameters, but especially the root dry mass.
 However, a comparison between plots at the same site should still be
 valid.
 
-The statistical analysis (table~\ref{tab:caas-ftest}
-and~\ref{tab:cau-ftest}) shows us that the presented \twod{} model
-constitutes a significant improvement over the \oned{} model,
-especially in the cases where the root zone from the individual row is
-narrow.  Furthermore, visual inspection of observed data vs.\@
-predicted data (figure~\ref{fig:caas2008},~\ref{fig:cau2007},
-and~\ref{fig:cau2008}) shows that the model provides a good match for
-both the horizontal and vertical variation in root density.  Based on
-this we believe that the model will be useful for the intended purpose
-of simulating soil water dynamics in row crops.
+The statistical analysis (table~\ref{tab:ftest}) shows us that the
+presented \twod{} model constitutes a significant improvement over the
+\oned{} model, especially in the cases where the root zone from the
+individual row is narrow.  Furthermore, visual inspection of observed
+data vs.\@ predicted data
+(figure~\ref{fig:caas2008},~\ref{fig:cau2007}, and~\ref{fig:cau2008})
+shows that the model provides a good match for both the horizontal and
+vertical variation in root density.  Based on this we believe that the
+model will be useful for the intended purpose of simulating soil water
+dynamics in row crops.
 
 Additionally, we believe that conversion of root density measurements
 to general crop parameters (root dry mass, root zone depth, and root
 zone radius) will be useful when analysing the effect of treatments,
 climate, or soil type on root development.  Such an analysis is
 outside the scope of this paper, but the numbers presented on
-table~\ref{tab:caas-ftest} and~\ref{tab:cau-ftest} do not give a clear
-indication of the difference in treatments being the main factor in
-the difference between plots for the present experiment.
+table~\ref{tab:ftest} do not give a clear indication of the difference
+in treatments being the main factor in the difference between plots
+for the present experiment.
 
 \section{Software and data availability}
 
@@ -844,10 +784,12 @@ The root density data from the two field sites will be made available
 at \url{http://www.safir4eu.org/} from MNA-TODO-XXXX-DATE
 (look under \texttt{Trials}).
 
-\section*{Acknowledgements}
+%% \section*{Acknowledgements}
 
-The research was partly funded by the EU-DG XII (FP6 Contract No. CT
-Food-2005-023168 SAFIR).
+\begin{acknowledgements}
+  The research was partly funded by the EU-DG XII (FP6 Contract No. CT
+  Food-2005-023168 SAFIR).
+\end{acknowledgements}
 
 \bibliographystyle{elsart-harv}
 \bibliography{../daisy}
@@ -857,23 +799,23 @@ Food-2005-023168 SAFIR).
 \begin{tabular}{lll}
 Symbol  & Unit    & Description\\\hline
 $a$     & L$^{-1}$ & Root density distribution parameter\\
-$a_z$   & L$^{-1}$ & Vertical root density distribution parameter\\
-$a_x$   & L$^{-1}$ & Horizontal root density distribution parameter\\
+$a_z$   & L$^{-1}$ & Vertical root density distribution\\
+$a_x$   & L$^{-1}$ & Horizontal root density distribution\\
 $d_a$   & L       & Soil limited root depth\\
 $d_c$   & L       & Crop potential root depth\\
 $d_s$   & L       & Soil maximum root depth\\ 
 $D$     & L       & Distance between rows\\
 $k^\prime$   &         & Soil root limit factor\\ 
 $l_r$   & L/L$^2$ & Total root length per area\\ 
-$l_R$   & L/L     & Total root length per length of row on one side\\ 
+$l_R$   & L/L     & Total root length per length of row\\ 
 $L_0$   & L/L$^3$ & Average root density at soil surface\\
 $L_{0,0}$& L/L$^3$ & Root density in row at soil surface\\
 $L_m$   & L/L$^3$ & Minimal root density\\ 
 $L\, (z)$   & L/L$^3$ & Root density at soil depth $z$\\
-$L^\prime (z) $ & L/L$^3$ & Soil limited root density at soil depth $z$\\ 
-$L\, (x,z)$& L/L$^3$ & Root density at soil depth $z$ and distance $x$ from row\\
-$L^* (x,z)$& L/L$^3$ & Root density from multiple rows at position $(x,z)$\\
-$L^* (z)$& L/L$^3$ & Average vertical root density from multiple rows at depth $z$\\
+$L^\prime (z) $ & L/L$^3$ & Soil limited root density\\ 
+$L\, (x,z)$& L/L$^3$ & Root density at position $(x,z)$\\
+$L^* (x,z)$& L/L$^3$ & Root density from multiple rows\\
+$L^* (z)$& L/L$^3$ & Average vertical root density for row\\
 $M_r$   & M/L$^2$& Total root dry matter\\ 
 $Q$     &         & Substitution variable\\
 $S_r$   & L/M    & Specific root length\\ 
@@ -885,40 +827,22 @@ $z$     & L       & Soil depth \\
 \end{tabular}
 \vfill{}
 
-\pagebreak[4]
+\pagebreak
 \section*{Questions}
 
 \begin{itemize}
-\item Shortening the article.  Should I
-  \begin{itemize}
-  \item Remove first paragraph and start of second paragraph from
-    Introduction?
-  \item Remove the solutions to W and Q.  ``They can be found using
-    Newton's method''?
-  \item Remove first paragraph of Results, plus the yield and
-    phenology tables?
-  \end{itemize}
-\item Where to publish?
-  \begin{itemize}
-  \item Environmental Software \& Modelling\\
-    The motivation is agricultural.
-  \item Agricultural Water Management\\
-    They hate math and models.
-  \item Plant \& Soil\\
-    Seem to like math and models
-  \item Other suggestions?
-  \end{itemize}
 \item MNA: Who should be co-authors from China?
 \item CAU: What is the ridge geometry?  And zero level?
 \item I'm still uncertain on the F-test is done right.  I followed the
   explanation in Wikipedia, which was the only one I could understand.
   Should I have more details?  Like dimensions for the F-distribution?
-\item MNA: PRD references?
+\item MNA: Short PRD references for introduction?
 \item MNA: When will SAFIR root data become public?
-\item Are the \cite{richardseq}, \cite{nelder1965simplex},
-  \cite{euler83}, and \cite{lambert58} citations too silly?
+\item Are there any publication on the Chinese experiments?  Yields,
+  effect of treatment, whatever?
 \end{itemize}
 
+\pagebreak
 \section*{Removed}
 
 \subsection*{Introduction}
@@ -1050,6 +974,86 @@ distribution with a large fraction of the root length being located
 from outside the root zone, hence we choose the solution for $Q < -2$.
 We can find $Q$ numerically using Newton's method and an initial guess
 of $-3$.
+
+\subsection*{Results}
+
+\begin{em}
+  Too much space for stuff we don't use.
+\end{em}
+
+The phenological data is shown together with the root sampling dates on
+table~\ref{tab:caas-phenology} and~\ref{tab:cau-phenology}.  Note that
+the 2008 sampling were later than the 2007 sampling at the CAU site.
+Final yield are shown on figure~\ref{tab:yield}, and are above Chinese
+average in all cases except plot 21 for the CAAS site.
+
+\begin{table}[htbp]
+  \caption{CAAS phenology and root sampling.}
+  \label{tab:caas-phenology}
+  \begin{tabular}{ll}\\\hline
+Date & Stage\\\hline
+2008-03-15	& Sprouting/Bud development\\
+2008-03-25	& Emergence\\
+2008-04-10	& Tuber initiation\\
+2008-04-15	& First individual buds\\
+2008-04-20	& Beginning of flowering\\
+2008-05-20	& First berries visible\\
+2008-06-03	& Beginning of leaf yellowing\\
+2008-06-10   & \textbf{Root density sample}\\
+2008-06-26	& Final harvest\\
+  \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+  \caption{CAU phenology and root sampling.}
+  \label{tab:cau-phenology}
+  \begin{tabular}{lll}\\\hline
+Date & Date & Stage\\\hline
+2007-04-20	& 2008-03-10	& Leaf development\\
+2007-05-10	& 2008-04-27	& Leaf development\\
+2007-05-25	& 2008-05-12	& Leaf development\\
+2007-05-30	& 	& \textbf{Root density sample}\\
+2007-06-08	& 2008-05-21	& Inflorescence emergence\\
+2007-06-11	& 2008-05-25	& Flowering\\
+2007-06-14	& 2008-05-29	& Development of fruit\\
+2007-06-16	& 2008-06-07	& Inflorescence emergence\\
+2007-06-20	& 2008-06-12	& Flowering\\
+	& 2008-06-15 & \textit{\textbf{Root density sample}}\\
+2007-06-23	& 2008-06-20	& Development of fruit\\
+2007-06-27	& 2008-06-30	& Inflorescence emergence\\
+2007-07-01	& 2008-07-03	& Flowering\\
+2007-07-05	& 	& \textbf{Root density sample}\\
+2007-07-10	& 2008-07-16	& Ripening of fruit and seed\\
+2007-07-20	& 2008-07-24	& Ripening of fruit and seed\\
+	& 2008-07-24 & \textit{\textbf{Root density sample}}\\
+2007-07-25	& 2008-08-01	& Ripening of fruit and seed\\
+  \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+  \caption{Final yield.  All numbers are wet weight.  The ``China''
+    number is the average Chinese yield that year, as reported by FAO 
+    (\url{http://faostat.fao.org/}).  The ``Average'' number is the 
+    average yield for the listed plots.  Yield information is missing 
+    for CAU 2008 plot 15.}
+  \label{tab:yield}
+
+  \begin{tabular}{llllll}\\\hline
+\multicolumn{2}{c}{CAAS 2008} & \multicolumn{2}{c}{CAU 2007} & \multicolumn{2}{c}{CAU 2008} \\
+Plot	& Mg/ha	& Plot	& Mg/ha	& Plot	& Mg/ha\\\hline
+China	& 14.8	& China	& 23.1	& China	& 23.3\\\hline
+Average	& 19.9	& Average	& 44.3	& Average	& 46.9\\
+3	& 20.6	& 1	& 41.8	& 3	& 45.1\\
+6	& 23.2	& 2	& 43.5	& 6	& 41.8\\
+9	& 18.3	& 3	& 51.5	& 9	& 48.8\\
+12	& 20.0	& 4	& 41.7	& 12	& 51.9\\
+15	& 18.0	& 5	& 43.0	& 15	& n/a\\
+18	& 22.4	& 	& 	& 	& \\
+21	& 14.4	& 	& 	& 	& \\
+24	& 22.5	& 	& 	& 	& 
+  \end{tabular}
+\end{table}
+
 
 
 \end{document}

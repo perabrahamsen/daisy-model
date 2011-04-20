@@ -1,4 +1,4 @@
-set terminal epslatex color
+set terminal epslatex color size 3.8in,2.5in
 set output "sample-cau.tex"
 # set output "cau.pdf"
 set yrange [-25:25]

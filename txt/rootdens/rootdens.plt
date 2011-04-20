@@ -1,4 +1,4 @@
-set terminal epslatex color size 5in,2.5in
+set terminal epslatex color size 3.6in,2.5in
 set xlabel "$W$"
 set ylabel "$W e^W$"
 set output "rootdens_W.tex"
@@ -18,7 +18,7 @@ unset xtics
 set xtics ("0" 0, "$D/2$" D*0.5)
 set ytics ("0" 0, "$L_{0,0}$" L(0,0))
 set xlabel "$x$"
-set ylabel "$L$\\vspace{-2.5cm}"
+set ylabel "$L$\\vspace{-3.5cm}"
 set lmargin 8
 set output "rootdens_L.tex"
 plot [0:D*0.5] L(x,0) title "Own roots", Lr(x,0) title "Right roots", Ll(x,0) title "Left roots"
