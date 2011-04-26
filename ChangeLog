@@ -1,3 +1,10 @@
+2011-04-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* uzlr.C (tick): Extra check of Theta.
+
+	* movement_1D.C: Removed dead code.
+	* uzrect_2x1.C: Ditto.
+
 2011-04-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.98 released.

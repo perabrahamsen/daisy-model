@@ -348,12 +348,19 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
   double total_S = 0.0;
   for (unsigned int i = first; i <= last; i++)
     {
-      daisy_assert (Theta[i] > 0.0);
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
       daisy_assert (Theta[i] <= Theta_sat + 1e-10);
       total_old += geo.dz (i) * Theta_old[i];
       total_new += geo.dz (i) * Theta[i];
       total_S += geo.dz (i) * S[i];
+      daisy_assert (std::isfinite (Theta[i]));
+      if (Theta[i] <= 0.0)
+        {
+          std::ostringstream tmp;
+          tmp << "Theta[" << i << "] = " << Theta[i];
+          daisy_bug (tmp.str ());
+          Theta[i] = 1e-9;
+        }
     }
   daisy_balance (total_old, total_new, (-q_up + q_down - total_S) * dt);
 }
