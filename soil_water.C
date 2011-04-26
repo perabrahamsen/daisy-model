@@ -415,6 +415,13 @@ SoilWater::tick_after (const Geometry& geo,
       K_cell_[c] = soil.K (c, h_[c], h_ice_[c], soil_heat.T (c));
       
       // Primary and secondary water.
+      if (Theta_[c] <= 0.0)
+        {
+          std::ostringstream tmp;
+          tmp << "Theta[" << c << "] = " << Theta_[c];
+          daisy_bug (tmp.str ());
+          Theta_[c] = 1e-9;
+        }
       const double h_lim = soil.h_secondary (c);
       if (h_lim >= 0.0 || h_[c] <= h_lim)
         {
@@ -426,6 +433,7 @@ SoilWater::tick_after (const Geometry& geo,
         {
           // Secondary domain activated.
           const double Theta_lim = soil.Theta (c, h_lim, h_ice_[c]);
+          daisy_assert (Theta_lim > 0.0);
           if (Theta_[c] >= Theta_lim)
             {
               Theta_primary_[c] = Theta_lim;

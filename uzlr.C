@@ -348,6 +348,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
   double total_S = 0.0;
   for (unsigned int i = first; i <= last; i++)
     {
+      daisy_assert (Theta[i] > 0.0);
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
       daisy_assert (Theta[i] <= Theta_sat + 1e-10);
       total_old += geo.dz (i) * Theta_old[i];

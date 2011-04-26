@@ -144,23 +144,6 @@ Movement1D::tick_water (const Geometry1D& geo,
 
   // Limit for groundwater table.
   size_t last  = soil.size () - 1;
-#ifdef INERT_GROUNDWATER
-  if (groundwater.bottom_type () == Groundwater::pressure)
-    {
-      daisy_assert (soil.size () > 1);
-      if (groundwater.table () <= geo.zplus (soil.size () - 2))
-        throw ("Groundwater table in or below lowest cell.");
-      last = geo.interval_plus (groundwater.table ());
-      if (last >=  soil.size () - 1)
-        daisy_assert ("Groundwater too low.");
-      // Pressure at the last cell is equal to the water above it.
-      for (size_t i = last + 1; i < soil.size (); i++)
-        {
-          h_old[i] = groundwater.table () - geo.cell_z (i);
-          h[i] = groundwater.table () - geo.cell_z (i);
-        }
-    }
-#endif // INERT_GROUNDWATER
 
   // Limit for ridging.
   const size_t first = (surface.top_type (geo, 0U) == Surface::soil)
@@ -185,15 +168,6 @@ Movement1D::tick_water (const Geometry1D& geo,
               q[i] = q[i-1];
               q_p[i] = q_p[i-1];
             }
-
-#ifdef INERT_GROUNDWATER
-          // Update Theta below groundwater table.
-          if (groundwater.bottom_type () == Groundwater::pressure)
-            {
-              for(size_t i = last + 1; i < soil.size (); i++)
-                Theta[i] = soil.Theta (i, h[i], h_ice[i]);
-            }
-#endif // INERT_GROUNDWATER
 
           // Update surface and groundwater reservoirs.
           surface.accept_top (q[0] * dt, geo, 0U, dt, msg);

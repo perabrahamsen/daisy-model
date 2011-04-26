@@ -292,21 +292,6 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
   daisy_assert (geo.edge_from (bottom_edge) == Geometry::cell_below);
   size_t last = bottom_cell;
 
-#ifdef INERT_GROUNDWATER
-  if (groundwater.bottom_type () == Groundwater::pressure)
-    {
-      if (groundwater.table () <= geo.zminus (bottom_cell))
-        throw ("Groundwater table in or below lowest cell.");
-
-      while (groundwater.table () > geo.zminus (last) && last > first)
-        last--;
-
-      // Pressure at the last cell is equal to the water above it.
-      for (size_t i = last + 1; i <= bottom_cell; i++)
-        h_old[i] = h[i] = groundwater.table () - geo.cell_z (i);
-    }
-#endif // INERT_GROUNDWATER
-
   // Calculate matrix flow next.
   for (size_t m = 0; m < vertical.size (); m++)
     {
@@ -325,14 +310,6 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
               q[i + q_offset] = q[i-1 + q_offset];
               q_p[i + q_offset] = q_p[i-1 + q_offset];
             }
-#ifdef INERT_GROUNDWATER
-          // Update Theta below groundwater table.
-          if (groundwater.bottom_type () == Groundwater::pressure)
-            {
-              for(size_t i = last + 1; i < soil.size (); i++)
-                Theta[i] = soil.Theta (i, h[i], h_ice[i]);
-            }
-#endif // INERT_GROUNDWATER
           if (m > 0)
             msg.debug ("Reserve model succeeded");
           return;
