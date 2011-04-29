@@ -97,8 +97,8 @@
                   (-120 "Rorrende Bt")
                   (-200 "Rorrende C"))
         (zones ((box  (top finite -33 [cm]) (bottom finite -120 [cm])
-                       (left finite 0 [cm]) (right finite 25 [cm]))
-                        Drain_canyon)))
+                      (left finite 0 [cm]) (right finite 25 [cm]))
+                Drain_canyon)))
   (Movement rectangle
         ;;(matrix_solute Mollerup convection none)
         ;;(matrix_water (Mollerup (max_time_step_reductions 16)
