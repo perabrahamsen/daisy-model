@@ -74,6 +74,12 @@ tutorial.pdf:	reference.pdf tutorial.tex stdlog.tex $(LIBS)
 	bibtex tutorial
 	pdflatex tutorial.tex < /dev/null
 
+litterature.pdf: litterature.tex daisy.bib
+	pdflatex litterature.tex
+	bibtex bu1
+	pdflatex litterature.tex
+	pdflatex litterature.tex
+
 dist: reference.pdf reference.ps tutorial.pdf exercises.pdf
 	cp -f reference.pdf $(FTPDIR)/daisy-ref.pdf
 	cp -f reference.ps $(FTPDIR)/daisy-ref.ps
