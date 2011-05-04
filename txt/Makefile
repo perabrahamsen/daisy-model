@@ -74,7 +74,7 @@ tutorial.pdf:	reference.pdf tutorial.tex stdlog.tex $(LIBS)
 	bibtex tutorial
 	pdflatex tutorial.tex < /dev/null
 
-litterature.pdf: litterature.tex daisy.bib
+litterature.pdf: litterature.tex daisy.bib Makefile
 	pdflatex litterature.tex
 	bibtex bu1
 	pdflatex litterature.tex
@@ -107,3 +107,6 @@ commit: $(TEXT)
 	rm -f $(REMOVE) 
 	-svn remove $(REMOVE) 
 	svn commit -m "commit" # "Version $(TAG)"
+
+clean:
+	rm -f *.aux *.log *.out *.bbl *.blg
