@@ -3,18 +3,38 @@
 \usepackage[latin1]{inputenc}
 \usepackage[american]{babel}
 \usepackage{csquotes}
-
 \usepackage{hyperref}
-
-%%\usepackage{natbib}
-%%\usepackage{bibunits}
-%%\bibliographystyle{apalike}
-
-\usepackage[sorting=ydnt,style=authoryear,backend=biber]{biblatex}
-%%\usepackage[sorting=ydnt,style=authoryear]{biblatex}
+\usepackage[sorting=ydnt,style=authoryear,dashed=false,maxnames=99,backend=biber]{biblatex}
 \addbibresource{daisy.bib}
 
 \input{macro}
+\setcounter{secnumdepth}{-1} 
+
+\newcommand{\daisykey}[2]{
+\defbibfilter{daisy-#1}{keyword=daisy and keyword=#1}
+\printbibliography[heading=subbibliography,%
+filter=daisy-#1,title={#2}]
+}
+\newcommand{\daisytype}[2]{
+\defbibfilter{daisy-#1}{keyword=daisy and type=#1 and not keyword=popular and not keyword=report}
+\printbibliography[heading=subbibliography,%
+filter=daisy-#1,title={#2}]
+}
+\newcommand{\daisyconf}[1]{
+\defbibfilter{daisy-conf}{keyword=daisy and ( type=inproceedings or type=conference ) and not keyword=popular and not keyword=report}
+\printbibliography[heading=subbibliography,%
+filter=daisy-conf,title={#1}]
+}
+\newcommand{\daisyreport}[1]{
+\defbibfilter{daisy-report}{keyword=daisy and ( type=report or keyword=report ) and not keyword=popular}
+\printbibliography[heading=subbibliography,%
+filter=daisy-report,title={#1}]
+}
+\newcommand{\daisyproject}[2]{
+\defbibfilter{daisy-#1}{( keyword=daisy  or keyword=project ) and keyword=#1}
+\printbibliography[heading=subbibliography,%
+filter=daisy-#1,title={#2}]
+}
 
 \begin{document}
 
@@ -23,359 +43,61 @@
 
 \maketitle{}
 
+This note is intended to provide an overview of papers that concerns
+Daisy.  The papers are listed three times, first organized by type,
+then organized by subject area, and finally organized by funding
+project.  The papers are listed in reverse chronological order.  Only
+papers that represent a signficant deployment or development of the
+model are included. Still, most papers are likely missing.  Please
+send missing references to daisy@daisy-model.dk.
+
 \nocite{*}
-%%\nocite{ssoc, Boegh2009300, eupotato, bgj-dom, frantisek, daisygis,
-%%    boegh04a, daisy-somnew, daisy-init, daisy-ems, orgReviw,
-%%    mueller-aom, mueller-smb, smith97-compar, diekkruger95-compar,
-%%    willigen91-compar, daisy-fertilizer}
 
-\defbibfilter{daisy-article}{type=article and keyword=daisy and not keyword=popular}
-\defbibfilter{daisy-chapter}{type=inbook and keyword=daisy}
-\defbibfilter{daisy-proceedings}{type=inproceedings and keyword=daisy}
-\defbibfilter{daisy-thesis}{type=thesis and keyword=daisy}
-\defbibfilter{daisy-report}{type=report and keyword=daisy}
-\defbibfilter{daisy-popular}{keyword=popular and keyword=daisy}
-%%\defbibfilter{daisy-other}{keyword=daisy and not (keyword=popular or type=article or type=inproceedings or type=thesis or type=report)}
-\defbibfilter{daisy-other}{keyword=daisy and not keyword=popular and not type=article and not type=inbook and not type=inproceedings and not type=thesis and not type=report}
+\section*{Overview by type}
 
-\printbibliography[maxnames=99,heading=subbibliography,%
-filter=daisy-article,title={Peer reviewed articles}]
-\printbibliography[maxnames=99,heading=subbibliography,%
-filter=daisy-chapter,title={Book chapters}]
-\printbibliography[maxnames=99,heading=subbibliography,%
-filter=daisy-proceedings,title={Conference and workshop proceedings}]
-\printbibliography[maxnames=99,heading=subbibliography,%
-filter=daisy-thesis,title={Thesises}]
-\printbibliography[maxnames=99,heading=subbibliography,%
-filter=daisy-report,title={Reports}]
-\printbibliography[maxnames=99,heading=subbibliography,%
-filter=daisy-popular,title={Popular articles}]
-\printbibliography[maxnames=99,heading=subbibliography,%
+\daisytype{article}{Peer reviewed articles}
+\daisytype{incollection}{Book chapters}
+\daisyconf{Conference and workshop proceedings}
+\daisytype{thesis}{Thesises and dissertations}
+\daisyreport{Reports}
+\daisykey{popular}{Popular articles}
+\defbibfilter{daisy-other}{keyword=daisy and not keyword=popular and not type=article and not type=incollection and not type=inproceedings and not type=thesis and not type=report}
+\printbibliography[heading=subbibliography,%
 filter=daisy-other,title={Other sources}]
 
-\end{document}
+\section*{Overview by subject}
 
-\section{By type}
+Daisy litterature divided by subject.  As some papers covers multiple
+subjects, there will be some overlap.
 
+\daisykey{description}{Model descriptions}
+\daisykey{pesticides}{Pesticide fate}
+\daisykey{climate}{Climate change}
+\daisykey{rs}{Remote sensing}
+\daisykey{svat}{Soil vegetation atmosphere transfer and evapotranspiration}
+\daisykey{hydrology}{Soil hydrology}
+\daisykey{usecase}{Use cases}
+\daisykey{nleach}{Nitrogen leaching}
+\daisykey{som}{Soil organic matter}
+\daisykey{dss}{Decision  support}
+\daisykey{farming}{Farming}
+\daisykey{organic}{Organic farming}
+\daisykey{crop}{Crop modelling}
+\daisykey{intercrop}{Intercropping}
+\daisykey{software}{Model software}
+\daisykey{danish}{Danish language}
 
-%%\begin{bibunit}[apalike]
-%%  \nocite{ssoc, Boegh2009300, eupotato, bgj-dom, frantisek, daisygis,
-%%    boegh04a, daisy-somnew, daisy-init, daisy-ems, orgReviw,
-%%    mueller-aom, mueller-smb, smith97-compar, diekkruger95-compar,
-%%    willigen91-compar, daisy-fertilizer} \putbib[daisy]
-%%\end{bibunit}
-%%
-%%\end{document}
+\section{Overview by project}
 
-\subsection{Peer reviewed articles}
+Daisy litterature divided by associated project.  As some papers
+describe worked funded by multiple projects, there are some overlap.
+Most papers have not yet been classified by project.
 
-Here we list peer reviewed articles where Daisy has been used as part
-of the work presented.  Articles that merely refer to Daisy for
-comparison or background are not listed.
-\begin{enumerate}
-\item \cite{ssoc}: Modelling of root {ABA} synthesis, stomatal
-  conductance, transpiration and potato production under water saving
-  irrigation regimes.
-\item \cite{Boegh2009300}: Remote sensing based evapotranspiration
-  and runoff modeling of agricultural, forest and urban flux sites in
-  Denmark: From field to macro-scale.
-\item \cite{eupotato}: Calibration procedure for a potato crop growth
-  model using information from across Europe.
-\item \cite{bgj-dom}: Challenges in modelling dissolved organic
-  matter dynamics in agricultural soil using {DAISY}.
-\item \cite{frantisek}: Dual permeability soil water dynamics and
-  water uptake by roots in irrigated potato fields.
-\item \cite{daisygis}: The Power of Models in Planning: The Case of
-  {DaisyGIS} and Nitrate Leaching.
-\item \cite{boegh04a}: Incorporating remote sensing data in
-  physically based distributed agro-hydrological modelling.
-\item \cite{daisy-somnew}: Calibration and Validation of the Soil
-  Organic Matter Dynamics of the Daisy Model with Data from the
-  {A}skov long-term experiments
-\item \cite{daisy-init}: Initialisation of the soil organic matter
-  pools of the Daisy model.
-\item \cite{daisy-ems}: Daisy: An Open Soil-Crop-Atmosphere Model.
-\item \cite{orgReviw}: A review of carbon and nitrogen processes in four soil nitrogen dynamics models.
-\item \cite{mueller-aom}: Turnover of carbon and nitrogen in a sandy
-  loam soil following incorporation of chopped maize plants, barley
-  straw and blue grass in field
-\item \cite{mueller-smb}: Temporal variation of {C} and {N} turnover
-  in soil after oilseed rape incorporation in the field: Simulation
-  with the soil-plant-atmosphere model Daisy.
-\item \cite{smith97-compar}: A comparison of the performance of nine soil organic matter models using datasets from seven long-term experiments.
-\item \cite{diekkruger95-compar}: Validity of agroecosystem models.  A comparison of results of different models applied to the same data set.
-\item \cite{willigen91-compar}: Nitrogen turnover in the soil--crop system; comparison of fourteen simulation models.
-\item \cite{daisy-fertilizer}: Simulation of Nitrogen Dynamics and
-  Biomass Production in Winter Wheat using the {D}anish Simulation
-  model Daisy.
-\end{enumerate}
-
-\subsection{Scientific books and book chapters}
-
-\begin{enumerate}
-\item \cite{daisyN}: Modeling Water and Nitrogen Uptake Using a Single-Root Concept: Exemplified by the Use in the Daisy Model.
-\item \cite{jensen2001application}: Application of the Daisy model for short and long-term simulation of soil carbon and nitrogen dynamics.
-\item \cite{hansen01scales}: Modeling nitrate leaching at different scales: Application of the Daisy model.
-\end{enumerate}
-
-\subsection{Workshops and conference proceedings}
-
-\begin{enumerate}
-\item \cite{frantisek-conf}: Dual permeability soil water dynamics,
-  plant growth and water uptake by roots in irrigated potato fields
-\item \cite{pimasa}: Can modelling fill the gap in our
-  knowledge of the of nitrogen dynamics of the maize-pigeonpea
-  intercrop?
-\end{enumerate}
-
-\subsection{Technical reports and non peer reviewed papers}
-
-\begin{enumerate}
-\item \cite{daisy-tut}: Daisy Tutorial.
-\item \cite{daisy-ref}: Daisy Program Reference Manual.
-\item \cite{daisy2Ddnumerics}: Daisy 2D Numerics.
-\item \cite{mst-agrovand}: Daisy {2D} simulation of {R}{\o}rrendeg{\aa}rd.
-\item \cite{vap2d}: Daisy {2D} simulation of {S}ilstrup and {E}strup.
-  --- Vejledning og baggrund.
-\item \cite{SAFIRD32}: D3\_2 Final version and documented models
-  available.
-\item \cite{nanna-agrovand}: 2D-modelering af vandtransport i jord.
-\item \cite{tilde-agrovand}: Vand- og stoftransport til grundvand og
-  markdr{\ae}n belyst ved udvaskningsfors{\o}g og Daisy-modellering
-\item \cite{daisy-staabi}: Standardopstillinger til {D}aisy-modellen
-\item \cite{MST}: Scenarieberegning af nitratudvaskning.
-\item \cite{novanastor}: NOVANA 2004. Landovervågning 2004.
-\item \cite{novana}: Det nationale program for overvågning af
-  vandmiljøet og naturen.
-\item \cite{VMP}: Vandmilj{\o}plan II - modelberegning af
-  kv{\ae}lstofudvaskning p{\aa} landsplan, 1984-2002.  Baggrundsnotat
-  til Vandmilj{\o}plan {I}{I} - slutevaluering.
-\item \cite{daisy-new}: Daisy, a flexible Soil-Plant-Atmosphere system Model.
-\item \cite{dina81}: Daisy Program Reference Manual.
-\item \cite{dina76}: Daisy: An Open Soil-Crop Model
-\item \cite{c-api}: The Daisy C \Api{}.
-\item \cite{daisy-guide}: Daisy Programmers Guide.
-\item \cite{daisy-project}: Daisy-{II} Bagrund og Systemanalyse.
-\item \cite{vereecken91-compar}: Comparison of simulation results of five nitrogen models using different data sets.
-\item \cite{daisy-def}: Daisy --- Soil Plant Atmostphere System Model.
-\end{enumerate}
-
-\subsection{Popular articles}
-\begin{enumerate}
-\item \cite{plantinfo-daisy}: Beregning af behov for efterg{\o}dskning med Daisy.
-\end{enumerate}
-
-\section{By subject}
-
-\subsection{Pesticide fate}
-
-\begin{enumerate}
-\item \cite{vap2d}: Daisy {2D} simulation of {S}ilstrup and {E}strup.
-\item \cite{mst-agrovand}: Daisy {2D} simulation of {R}{\o}rrendeg{\aa}rd.
-\item \cite{nanna-agrovand}: 2D-modelering af vandtransport i jord.
-\item \cite{tilde-agrovand}: Vand- og stoftransport til grundvand og
-  markdr{\ae}n belyst ved udvaskningsfors{\o}g og Daisy-modellering
-\end{enumerate}
-
-\subsection{Global change}
-
-\begin{enumerate}
-\item \cite{climate}: Effect of climate change on greenhouse gas
-  emissions from arable crop rotations.
-\end{enumerate}
-
-\subsection{SVAT and remote sensing}
-
-\begin{enumerate}
-\item \cite{ssoc}: Modelling of root {ABA} synthesis, stomatal
-  conductance, transpiration and potato production under water saving
-  irrigation regimes.
-\item \cite{Boegh2009300}: Remote sensing based evapotranspiration
-  and runoff modeling of agricultural, forest and urban flux sites in
-  Denmark: From field to macro-scale.
-\item \cite{boegh04a}: Incorporating remote sensing data in
-  physically based distributed agro-hydrological modelling.
-\end{enumerate}
-
-\subsection{Soil hydrology}
-
-\begin{enumerate}
-\item \cite{frantisek}: Dual permeability soil water dynamics and
-  water uptake by roots in irrigated potato fields.
-\item \cite{frantisek-conf}: Dual permeability soil water dynamics,
-  plant growth and water uptake by roots in irrigated potato fields
-\end{enumerate}
-
-
-\subsection{Soil carbon and nitrogen}
-
-\begin{enumerate}
-\item \cite{bgj-dom}: Challenges in modelling dissolved organic
-  matter dynamics in agricultural soil using {DAISY}.
-\item \cite{daisy-somnew}: Calibration and Validation of the Soil
-  Organic Matter Dynamics of the Daisy Model with Data from the
-  {A}skov long-term experiments
-\item \cite{daisy-init}: Initialisation of the soil organic matter
-  pools of the Daisy model.
-\item \cite{jensen2001application}: Application of the Daisy model for short and long-term simulation of soil carbon and nitrogen dynamics.
-\item \cite{hansen01scales}: Modeling nitrate leaching at different scales: Application of the Daisy model.
-\item \cite{mueller-aom}: Turnover of carbon and nitrogen in a sandy
-  loam soil following incorporation of chopped maize plants, barley
-  straw and blue grass in field
-\item \cite{mueller-smb}: Temporal variation of {C} and {N} turnover
-  in soil after oilseed rape incorporation in the field: Simulation
-  with the soil-plant-atmosphere model Daisy.
-\item \cite{smith97-compar}: A comparison of the performance of nine soil organic matter models using datasets from seven long-term experiments.
-\item \cite{diekkruger95-compar}: Validity of agroecosystem models.  A comparison of results of different models applied to the same data set.
-\item \cite{willigen91-compar}: Nitrogen turnover in the soil--crop system; comparison of fourteen simulation models.
-\item \cite{vereecken91-compar}: Comparison of simulation results of five nitrogen models using different data sets.
-\end{enumerate}
-
-\subsection{Danish national nitrate plans}
-
-\subsubsection{NPo}
-
-\begin{enumerate}
-\item \cite{daisy-def}: Daisy --- Soil Plant Atmostphere System Model.
-\end{enumerate}
-
-
-\subsubsection{Vandmiljøplan I-III}
-
-\begin{enumerate}
-\item \cite{MST}: Scenarieberegning af nitratudvaskning.
-\item \cite{VMP}: Vandmilj{\o}plan II - modelberegning af
-  kv{\ae}lstofudvaskning p{\aa} landsplan, 1984-2002.  Baggrundsnotat
-  til Vandmilj{\o}plan {I}{I} - slutevaluering.
-\end{enumerate}
-
-\subsubsection{NOVANA}
-
-\begin{enumerate}
-\item \cite{novanastor}: NOVANA 2004. Landovervågning 2004.
-\item \cite{novana}: Det nationale program for overvåagning af
-  vandmiljøet og naturen.
-\end{enumerate}
-\subsection{Crop science}
-
-\begin{enumerate}
-\item \cite{daisyN}: Modeling Water and Nitrogen Uptake Using a
-  Single-Root Concept: Exemplified by the Use in the Daisy Model.
-\item \item \cite{pimasa}: Can modelling fill the gap in our
-  knowledge of the of nitrogen dynamics of the maize-pigeonpea
-  intercrop?
-\end{enumerate}
-
-\subsection{Farming and environmental permits}
-
-\begin{enumerate}
-\item \cite{safir2010}: Safe and high quality food production using
-  low quality waters and improved irrigation systems and management:
-  {SAFIR}.
-\item \cite{eupotato}: Calibration procedure for a potato crop growth
-  model using information from across Europe.
-\item \cite{daisygis}: The Power of Models in Planning: The Case of
-  {DaisyGIS} and Nitrate Leaching.
-\item \cite{daisy-staabi}: Standardopstillinger til {D}aisy-modellen
-  --- Vejledning og baggrund.
-\item \cite{plantinfo-daisy}: Beregning af behov for efterg{\o}dskning med Daisy.
-\end{enumerate}
-
-\subsection{Software and general model descriptions}
-
-\begin{enumerate}
-\item \cite{daisy-tut}: Daisy Tutorial.
-\item \cite{daisy-ref}: Daisy Program Reference Manual.
-\item \cite{daisy-new}: Daisy, a flexible Soil-Plant-Atmosphere system Model.
-\item \cite{daisy-ems}: Daisy: An Open Soil-Crop-Atmosphere Model.
-\item \cite{dina81}: Daisy Program Reference Manual.
-\item \cite{dina76}: Daisy: An Open Soil-Crop Model
-\item \cite{c-api}: The Daisy C \Api{}.
-\item \cite{daisy-guide}: Daisy Programmers Guide.
-\item \cite{daisy-project}: Daisy-{II} Bagrund og Systemanalyse.
-\item \cite{daisy-fertilizer}: Simulation of Nitrogen Dynamics and
-  Biomass Production in Winter Wheat using the {D}anish Simulation
-  model Daisy.
-\item \cite{daisy-def}: Daisy --- Soil Plant Atmostphere System Model.
-\end{enumerate}
-
-\section{By Project}
-
-\subsection{MST-Markdræn}
-
-\begin{enumerate}
-\item \cite{vap2d}: Daisy {2D} simulation of {S}ilstrup and {E}strup.
-\item \cite{mst-agrovand}: Daisy {2D} simulation of {R}{\o}rrendeg{\aa}rd.
-\item \cite{nanna-agrovand}: 2D-modelering af vandtransport i jord.
-\item \cite{tilde-agrovand}: Vand- og stoftransport til grundvand og
-  markdr{\ae}n belyst ved udvaskningsfors{\o}g og Daisy-modellering
-\end{enumerate}
-
-\subsection{SAFIR}
-
-\begin{enumerate}
-\item \cite{SAFIR}: SAFIR --- Safe and High Quality Food Production
-  using Low Quality Waters and Improved Irrigation Systems and
-  Management.
-\item \cite{safir2010}: Safe and high quality food production using
-  low quality waters and improved irrigation systems and management:
-  {SAFIR}.
-\item \cite{ssoc}: Modelling of root {ABA} synthesis, stomatal
-  conductance, transpiration and potato production under water saving
-  irrigation regimes.
-\item \cite{SAFIRD32}: D3\_2 Final version and documented models
-  available.
-\end{enumerate}
-
-\subsection{FertOrgaNic}
-
-\begin{enumerate}
-\item \cite{FertOrgaNic}: FertOrgaNic --- Improved organic fertiliser
-  management for high nitrogen and water use efficiency and reduced
-  pollution in crop systems (QLK5-2002-01799).
-\item \cite{eupotato}: Calibration procedure for a potato crop growth
-  model using information from across Europe.
-\item \cite{frantisek}: Dual permeability soil water dynamics and
-  water uptake by roots in irrigated potato fields
-\item \cite{frantisek-conf}: Dual permeability soil water dynamics,
-  plant growth and water uptake by roots in irrigated potato fields
-\end{enumerate}
-
-\subsection{RS-Model}
-
-\begin{enumerate}
-\item \cite{boegh04a}: Incorporating remote sensing data in
-  physically based distributed agro-hydrological modelling.
-\end{enumerate}
-
-\subsection{SDSS}
-
-\begin{enumerate}
-\item \cite{sdss}: Assessment of cumulative uncertainty in Spatial
-  Decision Support Systems: Application to examine the contamination
-  of groundwater from diffuse sources.
-\end{enumerate}
-
-\section{Supporting literature}
-
-The following list some of the independent papers describing models
-that have been (partly) implemented in Daisy.
-\begin{itemize}
-\item \cite{gp74,vries-maize,pf1997simple}: Crop growth.
-\item \cite{markvand}: Irrigation.
-\item \cite{FAO-PM, bb87, leuning95, gs2002, Ahmadi20091541,
-    kjaersgaard2008crop}: Evapotranspiration.
-\item \cite{snow1956}: Snow dynamics.
-\item \cite{scopel1998, macena2003, scopel2004}: Litter.
-\item \cite{richardseq, burdine1953, campbell1974simple, mualem1976,
-    hypres, Cosby, MvGp}: Soil hydraulics.
-\item \cite{hooghoudt,molenwesseling,moody,wesseling}: Tile drainage.
-\item \cite{macro-colloid, mmax, styczen88, EUROSEM, park82, hairsine91,
-    brown87}: Particle transport.
-\item \cite{nelder1965simplex} Numerics.
-\end{itemize}
-
-\bibliography{daisy}
+\daisyproject{mst-tiledrain}{MST-Markdræn}
+\daisyproject{safir}{SAFIR}
+\daisyproject{fertorganic}{FertOrgaNic}
+\daisyproject{rsmodel}{RS-Model}
+\daisyproject{sdss}{SDSS}
 
 \end{document}
 
