@@ -52,7 +52,7 @@
   populated homogeneous fields (\oned{}) to row crops (\twod{}).  The
   row crops are modeled as having a uniform density in the direction
   parallel to the rows, but variable in the plane perpendicular to the
-  row.  In each case we demonstrate how to find the distribution
+  rows.  In each case we demonstrate how to find the distribution
   parameters from the root dry matter and the size of the root zone.
 
   \twod{} root density measurements was performed at two sites for two
@@ -98,15 +98,16 @@ and \threed{} root models, both parametric and architectural.
 For looking at the root zone of a single plant, radial coordinates are
 a good match.  But when the root zones of the plants overlap, the
 problem becomes \threed{}.  Solving Richards equation in \threed{} is
-complex and results in long simulation times.  Finding a \twod{}
-approximation is therefore desirable.  In this paper we therefore
-propose a simple \twod{} model with Euclidean coordinates for row
-crops, based on on an extension of \cite{gp74}.  The assumption is
-that the row is sufficiently dense in the direction of the rows so we
-can ignore that dimension.  The two dimensions then become depth and
-horizontal distance from the row.  The proposed model static in that
-it doesn't include root growth, but it can be parametrized dynamically
-based on root mass and the depth and width of the root zone.
+complex and results in long simulation times.  Hence, finding a
+\twod{} approximation is therefore desirable.  In this paper we
+therefore propose a simple \twod{} model with Euclidean coordinates
+for row crops, based on on an extension of \cite{gp74}.  The
+assumption is that the row is sufficiently dense in the direction of
+the rows for us to ignore that dimension.  The two dimensions then
+become depth and horizontal distance from the row.  The proposed model
+is static in that it doesn't include root growth, but it can be
+parametrized dynamically based on root mass and the depth and width of
+the root zone.
 
 The new root model was used in the SAFIR (SAFe IRrigation) EU project
 \citep{safir2010,ssoc} as part of the Daisy agro-ecological model
