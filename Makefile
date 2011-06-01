@@ -1484,6 +1484,8 @@ geometry${OBJ}: geometry.C geometry.h symbol.h attribute.h volume.h \
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
  model_framed.h model_logable.h model.h library.h frame_submodel.h \
  frame.h scope.h attribute.h frame_model.h assertion.h metalib.h
+GP2D${OBJ}: GP2D.C GP2D.h treelog.h symbol.h iterative.h mathlib.h \
+ assertion.h
 weather${OBJ}: weather.C weather.h weatherdata.h symbol.h astronomy.h
 astronomy${OBJ}: astronomy.C astronomy.h time.h symbol.h mathlib.h \
  assertion.h
@@ -1499,7 +1501,8 @@ lexer_flux${OBJ}: lexer_flux.C lexer_flux.h lexer_table.h block_model.h \
 lexer_soil${OBJ}: lexer_soil.C lexer_soil.h lexer_table.h block_model.h \
  block_nested.h block.h scope.h attribute.h symbol.h treelog.h \
  frame_model.h frame.h assertion.h
-iterative${OBJ}: iterative.C iterative.h assertion.h treelog.h symbol.h
+iterative${OBJ}: iterative.C iterative.h assertion.h treelog.h symbol.h \
+ mathlib.h
 water${OBJ}: water.C water.h plf.h
 block_nested${OBJ}: block_nested.C block_nested.h block.h scope.h attribute.h \
  symbol.h treelog.h frame.h
@@ -1650,9 +1653,16 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+xysource_profile${OBJ}: xysource_profile.C xysource.h model.h symbol.h \
+ gnuplot_utils.h lexer_soil.h lexer_table.h block_model.h block_nested.h \
+ block.h scope.h attribute.h treelog.h frame_model.h frame.h check.h \
+ vcheck.h geometry.h time.h units.h memutils.h submodeler.h \
+ block_submodel.h frame_submodel.h assertion.h mathlib.h librarian.h
 program_rootmatch${OBJ}: program_rootmatch.C program.h model.h symbol.h run.h \
- lexer_table.h block_model.h block_nested.h block.h scope.h attribute.h \
- treelog.h frame_model.h frame.h librarian.h units.h memutils.h
+ GP2D.h iterative.h lexer_table.h block_model.h block_nested.h block.h \
+ scope.h attribute.h treelog.h frame_model.h frame.h librarian.h check.h \
+ units.h memutils.h assertion.h mathlib.h submodeler.h block_submodel.h \
+ frame_submodel.h
 program_hmovie${OBJ}: program_hmovie.C program.h model.h symbol.h run.h \
  gnuplot.h lexer_table.h block_model.h block_nested.h block.h scope.h \
  attribute.h treelog.h frame_model.h frame.h librarian.h submodeler.h \
