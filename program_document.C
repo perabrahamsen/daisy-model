@@ -806,7 +806,7 @@ ProgramDocument::print_sample_name (const symbol name,
   if (top_level)
     {
       print_string (name);
-      format->special ("nbsp");
+      // format->special ("nbsp");
     }
 }
 
@@ -904,10 +904,20 @@ ProgramDocument::print_sample_entries (const symbol name,
 	
 	{
 	  Format::TableMultiCell dummy (*format, 2, "l");
-	  format->text (";; Shared parameters are described in section");
-	  format->special ("nbsp");
-	  format->ref ("model", 
-		       lib_name + "-" + frame.type_name ());
+          const symbol base = frame.base_name ();
+          if (base == root_name)
+            {
+              format->text (";; Shared parameters are described in chapter");
+              format->special ("nbsp");
+              format->ref ("component", lib_name);
+            }
+          else
+            {
+              format->text (";; Shared parameters are described in section");
+              format->special ("nbsp");
+              format->ref ("model", lib_name + "-" + base);
+            }
+          format->text (".");
 	}
       }
       for (std::set<symbol>::const_iterator i = base.begin ();
@@ -1112,9 +1122,12 @@ ProgramDocument::print_model (const symbol name, const Library& library,
   std::set<symbol> entries;
   own_entries (metalib, library, name, entries, true);
   if (entries.size () > 0)
-    print_submodel_entries (name, 0, 
-                            frame, entries, 
-                            library.name ());
+    {
+      print_sample (name, library);
+      print_submodel_entries (name, 0, 
+                              frame, entries, 
+                              library.name ());
+    }
 
   const std::vector<Library::doc_fun>& doc_funs = library.doc_funs ();
   for (size_t i = 0; i < doc_funs.size ();i++)
@@ -1168,7 +1181,7 @@ class ModelCompare
 
 public:
   bool operator() (const symbol a, const symbol b) const
-  { 
+  {
     // They may be the same.
     if (a == b)
       return false;
@@ -1195,7 +1208,7 @@ public:
 	base_b = find_next_in_line (base_b, b);
       }
     // Unrelated, sort according to their base classes.
-    return  base_a < base_b;
+    return  base_a.name () < base_b.name ();
   }
   ModelCompare (const Library& lib)
     : library (lib)

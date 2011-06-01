@@ -6,7 +6,7 @@ REFDOCS = reference.tex introduction.tex title.tex dwf.tex
 
 DOCS = colgen.tex aba.tex geometry.tex \
 	input-lang.tex gui-why.tex notes.tex requirements.tex exercises.tex \
-	litterature.tex c-api.tex guide.tex tutorial.tex $(REFDOCS)
+	literature.tex c-api.tex guide.tex tutorial.tex $(REFDOCS)
 
 PRESENTATIONS = esa-2004.tex 
 NOTES = 2DDaisy.txt forced_LAI.txt
@@ -73,12 +73,6 @@ tutorial.pdf:	reference.pdf tutorial.tex stdlog.tex $(LIBS)
 	pdflatex tutorial.tex < /dev/null
 	bibtex tutorial
 	pdflatex tutorial.tex < /dev/null
-
-litterature.pdf: litterature.tex daisy.bib Makefile
-	pdflatex litterature.tex
-	bibtex bu1
-	pdflatex litterature.tex
-	pdflatex litterature.tex
 
 dist: reference.pdf reference.ps tutorial.pdf exercises.pdf
 	cp -f reference.pdf $(FTPDIR)/daisy-ref.pdf

@@ -29,8 +29,6 @@ bool
 LexerSoil::read_soil (Treelog& msg)
 {
   // Array tags.
-  std::vector<double> array_z;
-  std::vector<double> array_x;
   for (size_t i = 0; i < tag_names ().size (); i++)
     {
       std::string name = tag_names ()[i].name ();

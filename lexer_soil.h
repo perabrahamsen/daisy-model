@@ -31,6 +31,8 @@ private:
   symbol array_name;
   symbol array_dimension;
   std::vector<int> array_c;
+  std::vector<double> array_z;
+  std::vector<double> array_x;
   std::vector<double> matrix_zplus;
   std::vector<double> matrix_xplus;
 public:
@@ -39,6 +41,10 @@ public:
   { return array_name; }
   symbol soil_dimension () const
   { return array_dimension; }
+  const std::vector<double>& soil_z () const
+  { return array_z; }
+  const std::vector<double>& soil_x () const
+  { return array_x; }
   const std::vector<double>& soil_zplus () const
   { return matrix_zplus; }
   const std::vector<double>& soil_xplus () const

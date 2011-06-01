@@ -1,3 +1,13 @@
+2011-06-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* xysource_profile.C: New model.
+	* Makefile (MODELS): Add it.
+
+2011-05-31  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* program_document.C (ModelCompare): Fix.
+	(print_model): Print sample.
+
 2011-04-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.99 released.

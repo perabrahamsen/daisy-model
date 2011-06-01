@@ -398,7 +398,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = program_rootmatch.C program_hmovie.C \
+MODELS = xysource_profile.C program_rootmatch.C program_hmovie.C \
 	wsource_std.C wsource_time.C wsource_combine.C wsource_indirect.C\
 	wsource_table.C wsource_const.C \
 	groundwater_source.C xysource_xycombine.C xysource_flux.C \

@@ -1,5 +1,46 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Smoke
+
+** Hvis zplus er specificeret eksplicit, brug den altid.
+
+** Hvorfor er ppm så høj?
+
+** JRJ regn
+
+** Check opsætninger
+
+** Tilføj måletal (maha)
+
+** Lav dokument
+
+** Diskuter med sha og cpe om kalibrering og følsomhed
+
+* Vestskoven
+
+Osvaldo setup is in project/osvaldo/Nitrogen
+
+From what I remember I should add to the setup (or Daisy):
+
+1) N uptake and C+N in litter for permanent vegetation
+
+2) Use bioincorporation to get the litter in the soil.  For the oak, we have earth worms, for the sprouce, we don't.  For the later, litter should be added to the top 5 cm of the soil, and no "transport loss" of C.
+
+3) Decrease organic matter turnover in soil.
+
+4) Create a nitrogen balance.  Get Per G and Søren to agree that it doesn't look totally wrong.
+
+Then add key parameters for optimization.  These would be:
+
+5) organic matter turnover factor
+
+6) C/N ratio in leaves (is it constant over a season?)
+
+7) SpLAI in leaves (is it constant over a season?)
+
+Then turn the setup back to Osvaldo for Monte Carlo generation.
+
+
 * Kina rødder
 
 ** Check publikationer for yield og treatments.
