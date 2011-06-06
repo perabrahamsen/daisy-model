@@ -112,12 +112,21 @@ Units::ppm ()
   return unit;
 }
 
+symbol
+Units::dry_soil_fraction ()
+{
+  static const symbol unit ("dry soil fraction");
+  return unit;
+}
+
 Units::special_convert_type
 Units::special_convert[] = {
   // We assume length is cm H2O, and convert to hPa.
   { "m" /* cm H2O */, Unit::pressure () /* hPa */, 10000.0 },
+#if 1 // Required by weather wet deposition.
   // We assume mass per volume is mg solute in l H2O, and convert to ppm.
   { Unit::mass_per_volume () /* mg/l */, "" /* ppm */, 0.001 },
+#endif
   // We assume amount of substance is mol photons in PAR and convert to Watt.
   { Unit::amount_of_substance_per_area_per_time () /* mol/m^2/s */,
     Unit::energy_per_area_per_time () /* W/m^2 */,

@@ -46,6 +46,7 @@ public:
   static symbol cm3 ();
   static symbol per_h ();
   static symbol ppm ();
+  static symbol dry_soil_fraction ();
 
   // Special conversion rules.
 private:

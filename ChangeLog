@@ -1,3 +1,12 @@
+2011-06-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* wsource_weather.C (initialize_two): Better error message.
+
+	* units.C, units.h (dry_soil_fraction): New function.
+	* unit_model.C (dry soil fraction, ppm dry soil): New units.
+	* bdconv.C (BD_convert): Use it.
+	* select_volume.C, select_array.C (special_convert): Use it.
+
 2011-06-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* xysource_profile.C: New model.

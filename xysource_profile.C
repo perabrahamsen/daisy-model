@@ -206,7 +206,7 @@ XYSourceProfile::limit (double& xmin, double& xmax,
   tmp << "1: [" << ymin << ":" << ymax << "]";
   XYSource::limit (xmin, xmax, ymin, ymax);
   tmp << "\n2: [" << ymin << ":" << ymax << "]";
-  if (ymin > plot_z)
+  if (ymin < plot_z)
     ymin = plot_z;
   if (ymax < 0.0)
     ymax = 0.0;

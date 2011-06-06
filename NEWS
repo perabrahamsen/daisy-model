@@ -6,6 +6,35 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.00
+
+** New units [fraction dry soil] and [dry soil ppm] for logging.
+
+To log content as fraction of dry soil.  Just using [ppm] only works
+for mediums with the same mass/volume ratio as water.
+
+** New 'profile' xysource model.
+
+** Restore model sample to reference manual.
+
+* 4.99
+
+Bug fixes.
+
+* 4.98
+
+Bug fixes.
+
+* 4.97
+
+Bug fixes.
+
+* 4.96
+
+** New TempOffset weather parameter.
+
+Works like PrecipScale.
+
 * 4.95
 
 ** Restored 'TempOffset'.

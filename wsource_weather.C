@@ -1106,9 +1106,17 @@ WSourceWeather::Implementation::initialize_two (const Time& time, Treelog& msg)
   if (initialized_ok)
     {
       try
-        { tick (time, msg); }
+        { 
+          tick (time, msg); 
+          return;
+        }
+      catch (const std::string s)
+        { msg.error (s); }
+      catch (const char *const s)
+        { msg.error (s); }
       catch (...)
-        { initialized_ok = false; }
+        { msg.error ("Initialization failed"); }
+      initialized_ok = false;
     }
 }
 

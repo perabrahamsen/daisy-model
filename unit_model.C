@@ -790,6 +790,10 @@ static DeclareBaseUnit Base_rad ("rad", "Radians");
 static DeclareBaseUnit Base_dgEast ("dgEast", "Degrees East of Greenwich.");
 static DeclareBaseUnit Base_dgNorth ("dgNorth", "Degrees North of Equator.");
 
+// Soil fraction.
+static DeclareBaseUnit Base_DS_fraction (Units::dry_soil_fraction (), 
+                                         "Fraction of dry soil.");
+
 // Unknown unit.
 static DeclareBaseUnit Base_unknown (Attribute::Unknown (), "\
 Nothing is known about the dimension of this unit.");
@@ -863,6 +867,11 @@ static DeclareBaseFactor Base_dg_West ("dgWest", -1.0, "dgEast", "\
 Degrees West of Greenwich.");
 static DeclareBaseFactor Base_dgSouth ("dgSouth", -1.0, "dgNorth", "\
 Degrees North of Equator.");
+
+// Add dry soil.
+static DeclareBaseFactor Base_DS_ppm ("ppm dry soil", 1e-6, 
+                                      Units::dry_soil_fraction (), "\
+Part per million in dry soil.");
 
 // Model 'offset'.
 
