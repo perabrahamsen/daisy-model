@@ -38,8 +38,12 @@ class XYSourceExpr : public XYSource
   const int style_;
   std::vector<double> xs;
   std::vector<double> ys;
+  std::vector<double> xbars;
+  std::vector<double> ybars;
   const std::auto_ptr<Number> x_expr;
   const std::auto_ptr<Number> y_expr;
+  const std::auto_ptr<Number> xbar_expr;
+  const std::auto_ptr<Number> ybar_expr;
   const symbol title_;
   symbol x_dimension_;
   symbol y_dimension_;
@@ -52,6 +56,10 @@ public:
   { return xs; }
   const std::vector<double>& y () const
   { return ys; }
+  const std::vector<double>& xbar () const
+  { return xbars; }
+  const std::vector<double>& ybar () const
+  { return ybars; }
   symbol with () const
   { return with_; }
   int style () const 
@@ -85,7 +93,15 @@ XYSourceExpr::read_header (Treelog& msg)
     return false;
 
   // Choose lines or points from type.
-  if (with_ == "")
+  if (with_ != "")
+    /* Use it */;
+  else if (xbar_expr.get () && ybar_expr.get ())
+    with_ = "xyerrorbars";
+  else if (xbar_expr.get ())
+    with_ = "xerrorbars";
+  else if (ybar_expr.get ())
+    with_ = "yerrorbars";
+  else
     {
       const std::string type = lex.type ();
       if (type == "dwf-0.0")
@@ -126,6 +142,40 @@ XYSourceExpr::load (const Units& units, Treelog& msg)
       }
     y_expr->tick (units, scope, msg);
     y_dimension_ = y_expr->dimension (scope);
+    if (xbar_expr.get ())
+      {
+      if (!xbar_expr->initialize (units, scope, msg)
+          || !xbar_expr->check (units, scope, msg))
+        {
+          lex.error ("Bad y expression");
+          ok = false;
+        }
+      xbar_expr->tick (units, scope, msg);
+      const symbol xbar_dim = xbar_expr->dimension (scope);
+      if (xbar_dim != x_dimension_)
+        {
+          lex.error ("errorbar mismmatch on x axes: " 
+                     + xbar_dim + " != " + x_dimension_);
+          ok = false;
+        }
+      }
+    if (ybar_expr.get ())
+      {
+      if (!ybar_expr->initialize (units, scope, msg)
+          || !ybar_expr->check (units, scope, msg))
+        {
+          lex.error ("Bad y expression");
+          ok = false;
+        }
+      ybar_expr->tick (units, scope, msg);
+      const symbol ybar_dim = ybar_expr->dimension (scope);
+      if (ybar_dim != y_dimension_)
+        {
+          lex.error ("errorbar mismmatch on y ayes: " 
+                     + ybar_dim + " != " + y_dimension_);
+          ok = false;
+        }
+      }
     if (!ok)
       return false;
   }
@@ -143,12 +193,19 @@ XYSourceExpr::load (const Units& units, Treelog& msg)
       scope.set (entries);
       
       // Missing value.
-      if (x_expr->missing (scope) || y_expr->missing (scope))
+      if (x_expr->missing (scope) || y_expr->missing (scope)
+          || (xbar_expr.get () && xbar_expr->missing (scope))
+          || (ybar_expr.get () && ybar_expr->missing (scope))
+          )
 	continue;
       
       // Store it.
       xs.push_back (x_expr->value (scope));
       ys.push_back (y_expr->value (scope));
+      if (xbar_expr.get ())
+        xbars.push_back (xbar_expr->value (scope));
+      if (ybar_expr.get ())
+        ybars.push_back (ybar_expr->value (scope));
     }
   daisy_assert (xs.size () == ys.size ());
 
@@ -164,6 +221,12 @@ XYSourceExpr::XYSourceExpr (const BlockModel& al)
     style_ (al.integer ("style", -1)),
     x_expr (Librarian::build_item<Number> (al, "x")),
     y_expr (Librarian::build_item<Number> (al, "y")),
+    xbar_expr (al.check ("xbar")
+               ? Librarian::build_item<Number> (al, "xbar")
+               : NULL),
+    ybar_expr (al.check ("ybar")
+               ? Librarian::build_item<Number> (al, "ybar")
+               : NULL),
     title_ (al.name ("title", y_expr->title () + " vs " + x_expr->title ())),
     x_dimension_ ("UNINITIALIZED"),
     y_dimension_ ("UNINITIALIZED")
@@ -201,7 +264,16 @@ for that column.");
 Expression for calculating the y value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");
-
+    frame.declare_object ("xbar", Number::component, 
+                          Attribute::OptionalConst, Attribute::Singleton, "\
+Expression for calculating x errorbar for this source for each row.\n\
+The expression can refer to the value in a specific column by the tag\n\
+for that column.");
+    frame.declare_object ("ybar", Number::component, 
+                          Attribute::OptionalConst, Attribute::Singleton, "\
+Expression for calculating y errorbar for this source for each row.\n\
+The expression can refer to the value in a specific column by the tag\n\
+for that column.");
   }
 } XYSourceExpr_syntax;
 

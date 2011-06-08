@@ -46,6 +46,8 @@ public:
   virtual int style () const = 0;
   virtual const std::vector<double>& x () const = 0;
   virtual const std::vector<double>& y () const = 0;
+  virtual const std::vector<double>& xbar () const;
+  virtual const std::vector<double>& ybar () const;
   virtual bool load (const Units& units, Treelog& msg) = 0;
 
   // Utilities.

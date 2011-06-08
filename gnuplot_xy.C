@@ -296,14 +296,17 @@ set style data lines\n";
       else
         out << ", ";
       out << "'-' using 1:2";
-      if (with == "errorbars")
+      if (with == "xerrorbars" || with == "yerrorbars")
 	out << ":3";
+      else if (with == "xyerrorbars")
+	out << ":3:4";
       out << " title " << quote (source[i]->title ());
       out << " axes x" << x_axis[i] + 1 << "y" << y_axis[i] + 1;
       out << " with ";	
       const int style = source[i]->style ();
       out << with;
-      if (with == "points" || with == "errorbars")
+      if (with == "points" || with == "xerrorbars" || with == "yerrorbars" 
+          || with == "xyerrorbars")
 	out << " ls "
             << (style < 0 ? ++points : ((style == 0) ? points : style));
       else if (with == "lines")
@@ -320,12 +323,33 @@ set style data lines\n";
   // Data.
   for (size_t i = 0; i < source.size (); i++)
     {
+      Treelog::Open nest (msg, source[i]->title (), i, source[i]->objid);
       if (source[i]->x ().size () < 1)
         continue;
       const size_t size = source[i]->x ().size ();
+      const symbol with = source[i]->with ();
       daisy_assert (size == source[i]->y ().size ());
+      if ((with == "xerrorbars" || with == "xyerrorbars") 
+          &&  source[i]->xbar ().size () != size)
+        {
+          msg.error ("Bad x errorbars");
+          return false;
+        }
+      if ((with == "yerrorbars" || with == "xyerrorbars") 
+          &&  source[i]->ybar ().size () != size)
+        {
+          msg.error ("Bad y errorbars");
+          return false;
+        }
       for (size_t j = 0; j < size; j++)
-        out <<  source[i]->x ()[j]  << "\t" <<  source[i]->y ()[j] << "\n";
+        {
+          out <<  source[i]->x ()[j]  << "\t" <<  source[i]->y ()[j];
+          if (with == "xerrorbars" || with == "xyerrorbars")
+            out << "\t" << source[i]->xbar ()[j];
+          if (with == "yerrorbars" || with == "xyerrorbars")
+            out << "\t" << source[i]->ybar ()[j];
+          out << "\n";
+        }
       out << "e\n";
     }
 

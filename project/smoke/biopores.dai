@@ -1,0 +1,55 @@
+;;; biopores.dai -- 2D specific information for VAP setups
+
+(defbiopore common matrix
+  (K_wall_relative 1 [%])
+  (allow_upward_flow false))
+
+(defbiopore "matrix_0cm"
+   (common (height_start 0 [cm])
+           (height_end -25 [cm])
+           ;;(density 179 [m^-2])
+           ;;; ca 95% af 190 [m^-2]
+           (density 1 [m^-2])
+           (diameter 2 [mm])))
+           
+(defbiopore "matrix_2cm"
+   (common ;;(height_start  -1.5 [cm])
+           (height_start 0 [cm])
+           (height_end -110 [cm])
+           (diameter 4 [mm])
+           (density 14 [m^-2])
+           ))       
+           ; påfyldning 7% af 1 m2 med en makropore da bør der vel være 93% mere på 1m2
+                   
+(defbiopore "drain_2cm"
+   (drain  ;;(height_start -1.5 [cm])
+           (height_start 0 [cm])
+           (height_end -110 [cm])
+           (diameter 4 [mm])
+           (pipe_position -110 [cm])
+           (density 14 [m^-2])
+           ))
+          ;; 5% af 190
+
+(defbiopore "matrix_30cm"
+   (common (height_start -30 [cm])
+           (height_end -120 [cm])
+           (diameter 4 [mm])
+           (density 1  [m^-2])
+           ))      
+           
+(defbiopore "drain_30cm"
+   (drain  (height_start -30 [cm])
+           (height_end -100 [cm])
+           (diameter 4 [mm])
+           (pipe_position -110 [cm])
+           (density 1 [m^-2])
+           ))
+
+(defbiopore "matrix_halfway"
+   (common (height_start 0 [cm])
+           (height_end -60 [cm])
+           (diameter 4 [mm])
+           (density 1 [m^-2])))
+
+;;; biopores.dai

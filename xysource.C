@@ -34,6 +34,20 @@ XYSource::library_id () const
   return id;
 }
 
+const std::vector<double>& 
+XYSource::xbar () const
+{ 
+  static const std::vector<double> empty;
+  return empty;
+}
+
+const std::vector<double>& 
+XYSource::ybar () const
+{ 
+  static const std::vector<double> empty;
+  return empty;
+}
+
 void 
 XYSource::limit (double& xmin, double& xmax, double& ymin, double& ymax) const
 {
