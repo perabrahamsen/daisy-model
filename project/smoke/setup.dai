@@ -173,7 +173,7 @@
   
   ;; Begining and end of simulation.
   (time 2009 6 2)
-  (stop 2010 12 13)
+  (stop 2010 12 13 13)
   (minimal_timestep (microseconds 1))
 
   ;; Keep us updated.
@@ -186,7 +186,8 @@
           ;;("Soil Water Potential (pF)")
           ;;;; Bromide
           ;;("Field chemical" (chemical "Bromide"))
-          ("Chemical Content" (chemical Bromide) (unit [PPM]) (when finished))
+          ("Chemical Content" (print_initial false)
+           (chemical Bromide) (unit [PPM]) (when finished))
           ;;("Chemical Content" (chemical Bromide) (unit [g/cm^3]))
           ;;("Smoke" (when daily))
   ))
@@ -222,7 +223,7 @@
   (where "fig/${what}.pdf")
   (xmax 5000 [PPM])
   (legend se)
-  (source (profile (when 2011 1 31 23)
+  (source (profile (when 2010 12 13)
                    (title "Sim")
                    (style 1)
                    (with lines)
@@ -253,8 +254,8 @@
 (defprogram both batch
   (run sims plot))
 
-;;(run both)
-(run plot)
+(run both)
+;;(run plot)
 ;;(run sims)
 
 ;; setup.dai ends here.

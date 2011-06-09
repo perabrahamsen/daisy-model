@@ -1,21 +1,14 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Marie
-
-** Er JRJ nedbør brugt ukorrigeret om sommeren?
-
-** Skal biopore diameter ændres til 5 mm?
-
-** Præcise diametre 6/30 cm? 6/29.7
-
 * Smoke
 
-** Ret/Check/Dokumenter opsætninger
-
-6 cm diameter
-5 g KBr
-
 ** 5 minutters klima
+
+*** Lav fil.
+
+*** Debug evt assertion failures for missing file og for land sim periode.
+
+** Plot pF eller h ved påførsel
 
 ** Tilføj nye måletal (maha)
 
