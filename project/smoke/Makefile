@@ -1,7 +1,6 @@
-SETUP = ror-manager.dai \
-	ror-setup.dai ror-soil.dai colloid-bound.dai biopores.dai
+SETUP = setup.dai colloid-bound.dai
 
-DATA = bromid.ddf
+DATA = bromid.ddf mixed-weather.dwf aquifer.gwt
 
 DOC = graphs.tex 
 
@@ -9,7 +8,7 @@ DAISY = /home/abraham/daisy/obj/daisy
 
 TEXT = $(SETUP) $(DOC) Makefile $(DATA)
 
-REMOVE 	= plotstuff-9899.dai plotstuff-9899.tex
+REMOVE 	= biopores.dai ror-manager.dai ror-setup.dai ror-soil.dai 
 
 all:
 	echo Please be specific

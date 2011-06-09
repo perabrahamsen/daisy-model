@@ -14,7 +14,7 @@
   "Main Daisy setup for smoke project."
 
   ;; No correction needed, by comparison with daily Højbakkegård measurements.
-  (weather default "daisy 2009-2010.dwf" 
+  (weather default "mixed-weather.dwf" 
            ;; Disable snow.
            (snow_fraction (-500 0.0) (500 0.0)))
 
@@ -25,7 +25,7 @@
   
   ;; Begining and end of simulation.
   (time 2009 6 2)
-  (stop 2011 2 1) ;; End of third draining season.
+  (stop 2011 2 1)
   (minimal_timestep (microseconds 1))
 
   ;; Keep us updated.
@@ -106,7 +106,7 @@
 
 ;; Choose
 
-(run plot)
-;;(run sims)
+;;(run plot)
+(run sims)
 
 ;; ror-setup.dai ends here.

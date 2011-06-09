@@ -5,6 +5,9 @@
 \usepackage[top=3cm,bottom=2cm]{geometry}
 %% \usepackage[left=1cm,top=1cm,right=1cm,nohead,nofoot]{geometry}
 
+\usepackage{natbib}
+\bibliographystyle{apalike}
+
 \newcommand{\fig}[1]{\includegraphics{fig/#1}}
 
 \usepackage{fancyhdr}
@@ -23,11 +26,83 @@
 \fig{drain}
 
 \pagebreak{}
-\section*{Setup}
+\section*{Experiment}
 
-Hello
+An amount of 5 gram potassium bromide (KBr) and 5 gram of Brilliant
+Blue was applied in 63 locations in the experimental field at
+Rørrendegård 2010-10-26.  Each application was done within a steel
+ring with a diameter of 6 cm.  Three types of locations were chosen.
+The first type was around a biopore where there has been strong smoke
+(near the drain), the second around a biopore where there were
+detected no smoke (5 or 9 meter from the drain), and the third at an
+area of the soil without macropores (3.5 meter from the drain).  On
+2010-11-13 the field was covered, and 2011-01-18 a cyldinder with 30
+cm diameter and 40 cm depth were dug up. The cylinders were cut over
+at 9, 18, 24, and 30 cm, giving a total of 5 samples per cylinder.
+Each sample was analysed for content of bromide and brilliant blue
+content, as well as dry bulk density ($\rho_b$).  The 9--18 cm sample
+had lower average
+dry bulk density, likely due to a higher degree of crop residuals.\\\\
+\begin{tabular}{|c|c|ccccc|}\hline
+  Interval & cm & 0--9 & 9--18 & 18--24 & 24--30 & 30--40\\
+  $\rho_b$ & g/cm$^3$ & 1.60 & 1.53 & 1.60 & 1.72 & 1.72\\\hline
+\end{tabular}\\
 
-world
+The mean and standard error was found for each combination of location
+type and sample depth, and are shown on the preceeding page.
+
+Weather data was provided by Jens Raunsø Jensen from a nearby weather
+station.  The rain measurements from that station is known to
+problematic.  The weather data was provided with 15 minutes intervals,
+and aggregated to hourly values.  From 2010-10-21 14:10 rain data was
+measured at the field with 5 minutes intervals.
+
+\section*{Daisy setup}
+
+The setup documented in~\citet{mst-agrovand} is mostly used as a base.
+
+The division and exchange rate between primary and secondary domain
+was taken from \citet{mst-agrovand}.  We chose to adjust the upper
+horizon borders so they match our sampling depth.  So the Ap horizon
+is 0--24 cm and the plow pan from 24-30 cm.  The C horizon is
+unchanged from~\cite{mst-agrovand}.  Texture is taken from
+\citet{mst-agrovand}. $\rho_b$ is set to 1.6~g/cm$^3$ in the Ap
+horizon (including the surface layer), and 1.72~g/cm$^3$ in the Bt
+horizon (including the plow pan).  Gydraulic properties are estimated
+with \textsc{hypres}~\citep{hypres}.  We chose an 1D setup.
+Discretization was adjusted to match sampling depths, and increased to
+Groundwater table variation was estimated from old measured values
+\citep{mst-agrovand}.  All considered biopores start at the surface,
+and have a diameter of 5 mm.  A single biopore in a cicle with a
+diamter of 6 cm corresponds to a biopore density of 354 per square
+meter.
+
+Based on this, three profiles were created.
+\begin{description}
+\item[drain] Corresponding to locations with biopores with smoke.  A
+  single biopore class was used, with biopores that ends in drain
+  pipes.  The Bt horizon was replaced with the drain canyon from
+  \citet{mst-agrovand}.  The drain connected biopores are responsible
+  for draining the soil.
+\item[macro] Corresponding to locations with biopores but without
+  smoke.  A single biopore class was used, with biopores that ends in
+  drain pipe depth, but not in drain pipes.  The 1D drain
+  approximation was setup with a distance of 7 meter from the drain
+  pipes.
+\item[without] Corresponding to locations without biopores.  The
+  tertiare transport system was disabled.  The 1D drain approximation
+  was setup with a distance of 3.5 meter from the drain.
+\end{description}
+
+A warmup period with winter wheat was added to give reasonable initial
+conditions for soil water, giving a total simulation period from
+2009-6-2 to 2010-12-13.  Daisy was allowed to decrease timestep to 1
+microsecond as needed.  The hourly weather data was used for the whole
+period, suplemented with 5 minute rain values for the drain season.
+Snow was disabled.
+
+\addcontentsline{toc}{chapter}{\numberline{}References}
+\bibliography{../../txt/daisy}
 
 \end{document}
 

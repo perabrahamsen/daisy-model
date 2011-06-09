@@ -1,0 +1,260 @@
+;;; setup.dai Rørrendegård setup for use in MST Smoke project.
+
+(input file "chemistry-base.dai")
+(input file "colloid-bound.dai")
+(input file "crop.dai")
+(input file "tillage.dai")
+(input file "fertilizer.dai") 	;;
+(input file "log.dai")
+
+;; Primary and secondary domain.
+
+(defsecondary Ap pressure
+  (h_lim 3.0 [pF])
+  (alpha 0.00003 [h^-1]))
+
+(defsecondary PlowPan pressure
+  (h_lim 3.0 [pF])
+  (alpha 0.00003 [h^-1]))
+
+(defsecondary agrovand pressure 
+  (h_lim 2.0 [pF])
+  (alpha 0.0001 [h^-1]))
+
+;; Horizons.
+
+(defhorizon "Ap" USDA3
+  (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.03)
+  (dry_bulk_density 1.60 [g/cm^3])
+  (secondary_domain Ap))
+
+(defhorizon "Surface" "Ap"
+  (hydraulic original))
+
+(defhorizon "Plow pan" USDA3
+  (clay 0.148)(silt 0.214)(sand 0.638) (humus 0.016)
+  (dry_bulk_density 1.72 [g/cm^3])
+  (anisotropy 12)
+  (secondary_domain PlowPan))               
+
+(defhorizon "Bt" USDA3
+  (clay 0.222)(silt 0.195)(sand 0.583)(humus 0.016)
+  (dry_bulk_density 1.72 [g/cm^3])
+  (secondary_domain agrovand))
+                                          
+(defhorizon "C" USDA3
+  (clay 0.207)(silt 0.235)(sand 0.558) (humus 0.01)
+  (dry_bulk_density 1.69 [g/cm^3])
+  (hydraulic M_vG (Theta_res 0.000)
+                  (Theta_sat 0.348314)
+                  (alpha 0.0476257)
+                  (n 1.15336)  
+                  (K_sat 1.50000 [cm/h])
+                  (l -3.60322))
+  (secondary_domain agrovand))
+
+(defhorizon "Drain canyon" ISSS4
+  (clay 0.213)(silt 0.190)(coarse_sand 0.244)(fine_sand  0.339)(humus 0.014)
+  (normalize true)
+  (dry_bulk_density 1.70 [g/cm^3])
+  (secondary_domain agrovand))
+
+;; Profile.
+
+(defcolumn Rorrende default
+  (OrganicMatter none)
+  (Chemistry multi (combine Bromide))
+  (Soil (MaxRootingDepth 150 [cm])
+        (horizons (-3.00 "Surface")
+                  (-24.00 "Ap")
+                  (-30.00 "Plow pan")
+                  (-120 "Bt")
+                  (-200 "C")))
+  (Movement original
+            (Geometry (zplus -1 -2 -3 ;; Ap. Sample 1. Surface.
+                             -5 -7 -9 ;; Ap. Sample 1.
+                             -12 -15 -18 ;; Ap. Sample 2.
+                             -20 -22 -24 ;; Ap. Sample 3.
+                             -26 -28 -30 ;; Bt. Plow pan. Sample 4
+                             -32 -35 -40 ;; Bt. Sample 5.
+                             -45 -50 -55 -60 -65 -70 -75 -80 -90 -95
+                             -100 -105 ;; Bt. 
+                             -115 ;; Drain at -110 cm.
+                             -120 ;; Bt.
+                             -125 -130 -135 -140 -145 -150 ;; C. Plot depth.
+                             -160 -170 -180 -190 -200))) ;; C. Sim depth.
+  (Drain lateral
+  	(pipe_position -1.1 [m])
+  	(L 18 [m]))
+  (Groundwater aquitard
+               (K_aquitard 0.050 [cm/h])
+               (Z_aquitard 200 [cm])
+               (pressure_table (file "aquifer.gwt"))))
+
+       
+(defbiopore "surface_to_drain"
+  (drain (height_start 0 [cm])
+         (height_end -110 [cm])
+         (diameter 5 [mm])
+         (pipe_position -110 [cm])
+         ;; 1 per (pi * (3 cm)^2 = 28.27 cm^2) = 354 m^-2
+         (density 354 [m^-2])))
+
+(defcolumn Drain Rorrende
+  "Rorrende soil with biopores to drain"
+  (Soil (MaxRootingDepth 150 [cm])
+        (horizons (-3.00 "Surface")
+                  (-24.00 "Ap")
+                  (-30.00 "Plow pan")
+                  (-120 "Drain canyon")
+                  (-200 "C")))
+  (Movement original (Tertiary (biopores (classes ("surface_to_drain"))))))
+ 
+(defbiopore "surface_to_matrix"
+  (matrix (K_wall_relative 1 [%])
+          (allow_upward_flow false)
+          (height_start 0 [cm])
+          (height_end -110 [cm])
+          (diameter 5 [mm])
+          ;; 1 per (pi * (3 cm)^2 = 28.27 cm^2) = 354 m^-2
+          (density 354 [m^-2])))
+
+(defcolumn Macro Rorrende
+  "Rorrende soil with biopores to matrix"
+  (Drain lateral
+         (pipe_position -1.1 [m])
+         (x 7 [m])
+         (L 18 [m]))
+  (Movement original (Tertiary (biopores (classes ("surface_to_matrix"))))))
+
+(defcolumn Without Rorrende
+  "Rorrende soil without biopores from surface"
+  (Drain lateral
+    	(pipe_position -1.1 [m])
+        (x 3.5 [m])
+  	(L 18 [m]))
+  (Movement original (Tertiary none)))
+
+;; Management.
+
+(defcrop "WWheat" "Winter Wheat"
+  (Root (MaxPen 150 [cm]))
+  (Canopy (EpFac 1.14 [])
+          (EpFacDS (0.355 0.386)(0.566 1)(1.381 1)(1.699 0.386)) ;; 0.44/1.14=0.386
+          (IntcpCap 0.05 [mm])))
+
+(defaction "management" activity
+  (wait (at 2009 9 09 12)) (plowing) 
+  (wait (at 2009 9 30 12)) (seed_bed_preparation)(sow WWheat)
+  (wait (at 2010 8 26 12)) (harvest "WWheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+  ;; 5 g KBr per (pi (3 cm)^2
+  ;; = 0.6714 Br/KBr * 5 g KBr per (pi (3 cm)^2
+  ;; = 0.1187 g Br/cm^2
+  ;; = 11.87 Mg/ha
+  (wait (at 2010 10 26 12)) (spray "Bromide" 11.87 [Mg/ha]))
+
+(defunit PPM [ppm dry soil])
+
+;; Simulations.
+
+(defprogram Smoke Daisy
+  "Main Daisy setup for smoke project."
+
+  ;; Combine weather soruces.
+  (weather combine 
+           (entry ;;((use Precip)
+                  ;; (source table (file "rain-data.dwf")))
+                  ((source table (file "mixed-weather.dwf"))))
+           ;; Disable snow.
+           (snow_fraction (-500 0.0) (500 0.0)))
+
+  ;; Field management.
+  (manager "management")
+  
+  ;; Begining and end of simulation.
+  (time 2009 6 2)
+  (stop 2010 12 13)
+  (minimal_timestep (microseconds 1))
+
+  ;; Keep us updated.
+  (print_time periodic)
+  (activate_output (after 2010 10 25))
+  (output harvest
+          ;;;; Water
+          ;;("Field water")                      ;Whole plot.
+          ;;("Soil Water Content")
+          ;;("Soil Water Potential (pF)")
+          ;;;; Bromide
+          ;;("Field chemical" (chemical "Bromide"))
+          ("Chemical Content" (chemical Bromide) (unit [PPM]) (when finished))
+          ;;("Chemical Content" (chemical Bromide) (unit [g/cm^3]))
+          ;;("Smoke" (when daily))
+  ))
+  
+(defprogram Drain Smoke
+  (column Drain)
+  (log_prefix "log/drain-"))
+
+(defprogram Macro Smoke
+  (column Macro)
+  (log_prefix "log/macro-"))
+
+(defprogram Without Smoke
+  (column Without)
+  (log_prefix "log/without-"))
+  
+;; Run simulation.
+(defprogram sims batch 
+  (run Without Drain Macro))
+
+;; Plot
+
+(defxysource line inline 
+  (style 0)
+  (title "")
+  (x_dimension [PPM])
+  (y_dimension [cm])
+  (with lines))
+  
+
+(defgnuplot plotme xy
+  (declare what String "What to plot.")
+  (where "fig/${what}.pdf")
+  (xmax 5000 [PPM])
+  (legend se)
+  (source (profile (when 2011 1 31 23)
+                   (title "Sim")
+                   (style 1)
+                   (with lines)
+                   (to -130 [cm])
+                   (file "log/${what}-content_Bromide.dlf"))
+          (arithmetic (file "bromid.ddf")
+                      (style 2)
+                      (title "Obs")
+                      (y Middle)
+                      (x (* 25 [] "${what}-avg"))
+                      (xbar (* 25 [] "${what}-dev")))
+          (line (points (0 -9) (10000 -9)))
+          (line (points (0 -18) (10000 -18)))
+          (line (points (0 -24) (10000 -24)))
+          (line (points (0 -30) (10000 -30)))
+          (line (points (0 -40) (10000 -40)))))
+
+(defgnuplot plotall multi
+  (graph (plotme (what "drain") (title "Drain connected biopore"))
+         (plotme (what "macro") (title "Biopore without smoke")) 
+         (plotme (what "without") (title "No biopores"))))
+  
+(defprogram plot gnuplot 
+  (graph (plotall)))
+
+;; Choose
+
+(defprogram both batch
+  (run sims plot))
+
+;;(run both)
+(run plot)
+;;(run sims)
+
+;; setup.dai ends here.

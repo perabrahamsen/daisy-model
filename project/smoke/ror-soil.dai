@@ -19,12 +19,6 @@
   (description "3-25 cm")
   (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.03)
   (dry_bulk_density 1.49 [g/cm^3])
-;;  (hydraulic M_vG (Theta_res 0.00)
-;;                  (Theta_sat 0.395489)
-;;                  (alpha 0.04769)
-;;                  (n 1.2656)
-;;                  (K_sat 1.73704 [cm/h])
-;;                  (l -2.05473))
   (secondary_domain Ap))
   
 (defhorizon "Overflade Ap" "Rorrende Ap"
