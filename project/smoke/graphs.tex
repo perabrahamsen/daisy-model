@@ -13,17 +13,32 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \lhead{\today}
-\chead{1}
+\chead{\thepage}
 \rhead{MST Smoke}
 \cfoot{}
 
 \begin{document}
 
-\section*{Bromide in soil}
+\section*{Bromide in soil samples}
 
-\noindent\fig{without}\\
-\fig{macro}\\
-\fig{drain}
+\noindent\fig{without-Br}\\
+\fig{macro-Br}\\
+\fig{drain-Br}
+
+\section*{Initial soil water}
+
+\noindent\fig{without-Pres}\\
+\fig{macro-Pres}\\
+\fig{drain-Pres}
+
+\section*{Rain}
+
+\noindent\fig{rain}
+
+\section*{Conductivity}
+
+\noindent\fig{conductivity}
+
 
 \pagebreak{}
 \section*{Experiment}
@@ -101,8 +116,8 @@ microsecond as needed.  The hourly weather data was used for the whole
 period, suplemented with 5 minute rain values for the drain season.
 Snow was disabled.
 
-\addcontentsline{toc}{chapter}{\numberline{}References}
-\bibliography{../../txt/daisy}
+%%\addcontentsline{toc}{chapter}{\numberline{}References}
+%%\bibliography{../../txt/daisy}
 
 \end{document}
 

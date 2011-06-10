@@ -274,7 +274,8 @@ Connvert to SI base units by multiplying with a factor.")
     // Units.
     static const double u_ha = p_h * p_h;        // Hectar.
     static const double u_s = 1.0;               // Second.
-    static const double u_h = 60.0 * 60.0;       // Hour.
+    static const double u_m = 60.0;              // Minute.
+    static const double u_h = u_m * 60.0;        // Hour.
     static const double u_d = u_h * 24.0;        // Day.
     static const double u_y = u_d * 365.2425;    // Year.
     static const double u_l = 1e-3;              // Liter.
@@ -357,6 +358,10 @@ Connvert to SI base units by multiplying with a factor.")
     // Time.
     add ("s", 1.0, 0, 0, 1, 0, 0, 0, 0,
          "Second.");
+    add ("seconds", 1.0, 0, 0, 1, 0, 0, 0, 0,
+         "Second.");
+    add ("minutes", u_m, 0, 0, 1, 0, 0, 0, 0,
+         "Minute.");
     add ("h", u_h, 0, 0, 1, 0, 0, 0, 0,
          "Hour.");
     add ("hours", u_h, 0, 0, 1, 0, 0, 0, 0,

@@ -1,4 +1,4 @@
-SETUP = setup.dai colloid-bound.dai
+SETUP = setup.dai colloid-bound.dai smoke-log.dai
 
 DATA = bromid.ddf mixed-weather.dwf aquifer.gwt
 
@@ -32,7 +32,7 @@ graphs.pdf: graphs.tex .gnuplot-stamp
 	@touch .gnuplot-stamp
 
 daisy.gnuplot: $(SETUP) $(DATA) $(DAISY) fig log
-	nice $(DAISY) ror-setup.dai
+	nice $(DAISY) setup.dai
 
 fig:
 	mkdir fig

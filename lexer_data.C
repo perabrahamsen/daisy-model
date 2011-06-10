@@ -96,13 +96,37 @@ LexerData::read_date (Time& time)
   skip ("-");
   int mday = get_cardinal ();
   int hour = 0;
-  if (peek () == 'T' || peek () == ':')
+  int minute = 0;
+  int second = 0;
+  int microsecond = 0;
+  if (peek () == 'T')
     {
       get ();
       hour = get_cardinal ();
+      if (peek () == ':')
+        {
+          get ();
+          minute = get_cardinal ();
+          if (peek () == ':')
+            {
+              get ();
+              second = get_cardinal ();
+              if (peek () == ':')
+                {
+                  get ();
+                  second = get_cardinal ();
+                  if (peek () == '.')
+                    {
+                      get ();
+                      microsecond = get_cardinal ();
+                    }
+                }
+            }
+        }
     }
-  if (Time::valid (year, month, mday, hour))
-    time = Time (year, month, mday, hour);
+
+  if (Time::valid (year, month, mday, hour, minute, second, microsecond))
+    time = Time (year, month, mday, hour, minute, second, microsecond);
   else
     error ("Invalid date");
 }
