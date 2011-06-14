@@ -277,8 +277,10 @@ struct NumberFetchGet : public Number
   { }
   symbol dimension (const Scope&) const
   { 
-    daisy_assert (scope_unit);
-    return scope_unit->native_name (); 
+    if (scope_unit)
+      return scope_unit->native_name (); 
+
+    return Attribute::Unknown ();
   }
   const Unit& unit () const
   { 

@@ -2,7 +2,7 @@ SETUP = setup.dai colloid-bound.dai smoke-log.dai
 
 DATA = bromid.ddf mixed-weather.dwf aquifer.gwt
 
-DOC = graphs.tex 
+DOC = graphs.tex lims.tex
 
 DAISY = /home/abraham/daisy/obj/daisy
 
@@ -26,6 +26,9 @@ add:
 
 graphs.pdf: graphs.tex .gnuplot-stamp
 	pdflatex graphs.tex
+
+lims.pdf: lims.tex .gnuplot-stamp
+	pdflatex lims.tex
 
 .gnuplot-stamp: daisy.gnuplot
 	-gnuplot daisy.gnuplot

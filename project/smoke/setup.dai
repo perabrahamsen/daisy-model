@@ -11,22 +11,37 @@
 ;; Primary and secondary domain.
 
 ;; From markdræn project:
+;; (defsecondary Ap pressure
+;;   (h_lim 3.0 [pF])
+;;   (alpha 0.00003 [h^-1]))
+;; 
+;; (defsecondary PlowPan pressure
+;;   (h_lim 3.0 [pF])
+;;   (alpha 0.00003 [h^-1]))
+;; 
+;; (defsecondary agrovand pressure 
+;;   (h_lim 2.0 [pF])
+;;   (alpha 0.0001 [h^-1]))
+
+;; Common:
+;; (defsecondary common pressure
+;;   (h_lim $LIM)
+;;   (alpha $ALPHA))
+;; 
+;; (defsecondary Ap common)
+;; (defsecondary PlowPan common)
+;; (defsecondary agrovand common)
+
+;; Mixed:
 (defsecondary Ap pressure
   (h_lim 3.0 [pF])
-  (alpha 0.00003 [h^-1]))
+  (alpha 0.00001 [h^-1]))
 
-(defsecondary PlowPan pressure
-  (h_lim 3.0 [pF])
-  (alpha 0.00003 [h^-1]))
+(defsecondary PlowPan Ap)
 
 (defsecondary agrovand pressure 
-  (h_lim 2.0 [pF])
-  (alpha 0.0001 [h^-1]))
-
-;; None:
-;;(defsecondary Ap none)
-;;(defsecondary PlowPan none)
-;;(defsecondary agrovand none)
+  (h_lim 2.4 [pF])
+  (alpha 0.00001 [h^-1]))
 
 ;; Horizons.
 
@@ -91,9 +106,6 @@
                              -120 ;; Bt.
                              -125 -130 -135 -140 -145 -150 ;; C. Plot depth.
                              -160 -170 -180 -190 -200))) ;; C. Sim depth.
-  (Drain lateral
-  	(pipe_position -1.1 [m])
-  	(L 18 [m]))
   (Groundwater aquitard
                (K_aquitard 0.050 [cm/h])
                (Z_aquitard 200 [cm])
@@ -116,6 +128,7 @@
                   (-30.00 "Plow pan")
                   (-120 "Drain canyon")
                   (-200 "C")))
+  (Drain none)
   (Movement original (Tertiary (biopores (classes ("surface_to_drain"))))))
  
 (defbiopore "surface_to_matrix"
@@ -283,7 +296,7 @@
 
 (defgnuplot rain time
   (where "fig/rain.pdf")
-  (source (arithmetic (expr (dim "Precip" [mm]))
+  (source (arithmetic (expr (convert "Precip" [mm/h]))
                       (with lines)
                       (title "")
                       (file "rain-data.dwf"))))
@@ -334,10 +347,90 @@
 (defprogram plot gnuplot 
   (graph plotall))
 
-;; Choose
-
 (defprogram both batch
   (run sims plot))
+
+;;; Test with 1/2 domain limits
+
+(defprogram lim Without
+  (declare LIM Number [cm] "")
+  (declare ALPHA Number [h^-1] ""))
+
+(defprogram lims batch
+  (run (lim (LIM 2.5 [pF])
+            (ALPHA 0.00002 [h^-1])
+            (log_prefix "log/lim-1-"))
+       (lim (LIM 2.5 [pF])
+            (ALPHA 0.00001 [h^-1])
+            (log_prefix "log/lim-2-"))
+       (lim (LIM 2.5 [pF])
+            (ALPHA 0.000005 [h^-1])
+            (log_prefix "log/lim-3-"))
+       (lim (LIM 3.0 [pF])
+            (ALPHA 0.00002 [h^-1])
+            (log_prefix "log/lim-4-"))
+       (lim (LIM 3.0 [pF])
+            (ALPHA 0.00001 [h^-1])
+            (log_prefix "log/lim-5-"))
+       (lim (LIM 3.0 [pF])
+            (ALPHA 0.000005 [h^-1])
+            (log_prefix "log/lim-6-"))
+       (lim (LIM 3.5 [pF])
+            (ALPHA 0.00002 [h^-1])
+            (log_prefix "log/lim-7-"))
+       (lim (LIM 3.5 [pF])
+            (ALPHA 0.00001 [h^-1])
+            (log_prefix "log/lim-8-"))
+       (lim (LIM 3.5 [pF])
+            (ALPHA 0.000005 [h^-1])
+            (log_prefix "log/lim-9-"))))
+       
+(defgnuplot lim xy
+  (declare what String "What to plot.")
+  (where "fig/${what}-Br.pdf")
+  (xmax 5000 [PPM])
+  (legend se)
+  (source (profile (when 2010 12 13)
+                   (title "Sim")
+                   (style 1)
+                   (with lines)
+                   (to -130 [cm])
+                   (file "log/${what}-content_Bromide.dlf"))
+          (profile (when 2010 12 13)
+                   (title "")
+                   (style 1)
+                   (with points)
+                   (to -130 [cm])
+                   (file "log/${what}-smoke-profile.dlf"))
+          (arithmetic (file "bromid.ddf")
+                      (style 2)
+                      (title "Obs")
+                      (y Middle)
+                      (x "without-avg")
+                      (xbar "without-dev"))
+          (line (points (0 -9) (10000 -9)))
+          (line (points (0 -18) (10000 -18)))
+          (line (points (0 -24) (10000 -24)))
+          (line (points (0 -30) (10000 -30)))
+          (line (points (0 -40) (10000 -40)))))
+
+(defgnuplot lims multi
+  (graph (lim (what "lim-1") (title "alpha 0.00002 [cm^ -1] h_lim 2.5 [pF]"))
+         (lim (what "lim-2") (title "alpha 0.00001 [cm^ -1] h_lim 2.5 [pF]"))
+         (lim (what "lim-3") (title "alpha 0.000005 [cm^ -1] h_lim 2.5 [pF]"))
+         (lim (what "lim-4") (title "alpha 0.00002 [cm^ -1] h_lim 3 [pF]"))
+         (lim (what "lim-5") (title "alpha 0.00001 [cm^ -1] h_lim 3 [pF]"))
+         (lim (what "lim-6") (title "alpha 0.000005[cm^ -1] h_lim 3 [pF]"))
+         (lim (what "lim-7") (title "alpha 0.00002 [cm^ -1] h_lim 3.5 [pF]"))
+         (lim (what "lim-8") (title "alpha 0.00001 [cm^ -1] h_lim 3.5 [pF]"))
+         (lim (what "lim-9") (title "alpha 0.000005 [cm^ -1] h_lim 3.5 [pF]"))))
+  
+;;(run batch (run (lims) 
+;;                (gnuplot (graph lims))))
+
+;; Choose
+
+;;(run batch (run (Without) (plot)))
 
 (run both)
 ;;(run plot)
