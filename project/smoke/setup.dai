@@ -94,6 +94,13 @@
                   (-120 "Bt")
                   (-200 "C")))
   (Movement original
+            (matrix_water (richards
+                           ;; (K_average harmonic)
+                           (max_time_step_reductions 8)
+                           (max_iterations 50)
+                           )
+                          ;; lr
+                          )
             (Geometry (zplus -1 -2 -3 ;; Ap. Sample 1. Surface.
                              -5 -7 -9 ;; Ap. Sample 1.
                              -12 -15 -18 ;; Ap. Sample 2.
@@ -111,6 +118,9 @@
                (Z_aquitard 200 [cm])
                (pressure_table (file "aquifer.gwt"))))
 
+(deftertiary Biopores biopores
+  ;; (pressure_end -40 [cm])
+  )
        
 (defbiopore "surface_to_drain"
   (drain (height_start 0 [cm])
@@ -129,7 +139,7 @@
                   (-120 "Drain canyon")
                   (-200 "C")))
   (Drain none)
-  (Movement original (Tertiary (biopores (classes ("surface_to_drain"))))))
+  (Movement original (Tertiary Biopores (classes ("surface_to_drain")))))
  
 (defbiopore "surface_to_matrix"
   (matrix (K_wall_relative 1 [%])
@@ -146,7 +156,7 @@
          (pipe_position -1.1 [m])
          (x 7 [m])
          (L 18 [m]))
-  (Movement original (Tertiary (biopores (classes ("surface_to_matrix"))))))
+  (Movement original (Tertiary Biopores (classes ("surface_to_matrix")))))
 
 (defcolumn Without Rorrende
   "Rorrende soil without biopores from surface"
@@ -302,8 +312,8 @@
                       (file "rain-data.dwf"))))
   
 (defxysource K loop
-  (begin -50 [hPa])
-  (end 0 [hPa])
+  (begin $FROM )
+  (end $TO)
   (step 0.1 [hPa]))
 
 (defxysource K_Surface K
@@ -311,38 +321,44 @@
   (y (convert (soil_K (horizon "Surface")
                       (top_soil true)
                       (h x))
-              [cm/d])))
+              [mm/h])))
 
 (defxysource K_Ap K
   (title "Ap")
   (y (convert (soil_K (horizon "Ap")
                       (top_soil true)
                       (h x))
-              [cm/d])))
+              [mm/h])))
 
 (defxysource K_Plow_pan K
   (title "Plow pan")
   (y (convert (soil_K (horizon "Plow pan")
                       (top_soil true)
                       (h x))
-              [cm/d])))
+              [mm/h])))
 
 (defxysource K_Bt K
   (title "Bt")
   (y (convert (soil_K (horizon "Bt")
                       (top_soil true)
                       (h x))
-              [cm/d])))
+              [mm/h])))
 
 (defgnuplot K xy
-  (where "fig/conductivity.pdf")
+  (declare FROM Number [<user>] "")
+  (declare TO Number [<user>] "")
   (source ;; K_Surface 
           K_Ap ;; K_Plow_pan 
           K_Bt))
 
 
 (defgnuplot plotall multi
-  (graph plotPresall plotBrall rain K))
+  (graph plotPresall plotBrall rain 
+         (K (FROM -50 [hPa]) (TO 0 [hPa]) 
+            (where "fig/conductivity.pdf"))
+         (K (FROM -80 [hPa]) (TO -20 [hPa])
+            (where "fig/conductivity_2.pdf")))
+)
 
 (defprogram plot gnuplot 
   (graph plotall))
@@ -432,8 +448,8 @@
 
 ;;(run batch (run (Without) (plot)))
 
-(run both)
-;;(run plot)
+;;(run both)
+(run plot)
 ;;(run sims)
 
 ;; setup.dai ends here.
