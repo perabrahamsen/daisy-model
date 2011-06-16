@@ -1048,7 +1048,7 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
       if (Theta_sec_new < 1e-6)
         // Move all to primary domain.
         {
-          S_exchange[c] = M_sec / dt;
+          S_exchange[c] = -M_sec / dt;
           continue;
         }
       
@@ -1067,47 +1067,19 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
               << M_sec - C_sec * Theta_sec_old;
           msg.warning (tmp.str ());
         }
-      double S_x = alpha * (C_prim - C_sec);
-
-      // But don't exchange more than what would result in equilibrium.
-      const double Theta_prim_new = soil_water.Theta_primary (c);
-      const double Theta_matrix_new = Theta_prim_new + Theta_sec_new;
-      daisy_approximate (Theta_matrix_new, Theta_prim_new + Theta_sec_new);
-      const double C_avg_new 
-        = adsorption_->M_to_C (soil, Theta_matrix_new, c, M_tot);
-      const double M_sec_new = C_avg_new * Theta_sec_new;
-      const double M_prim_new = M_tot - M_sec_new;
-
-      if (S_x > 0)
-        // Flow from primary to secondary domain.
-        {
-          if (M_sec + S_x * dt > M_sec_new)
-            // We overshoot.
-            {
-              if (M_sec_new > M_sec)
-                // If content should increse, go for it.
-                S_x = (M_sec_new - M_sec) / dt;
-              else
-                // If content should decrease, don't move any.
-                S_x = 0.0;
-            }
-        }
-      else
-        // Flow from secondary to primary domain.
-        {
-          if (M_prim - S_x * dt > M_sec_new)
-            // We overshoot.
-            {
-              if (M_prim_new > M_prim)
-                // If content should increase, go for it.
-                S_x = -(M_prim_new - M_prim) / dt;
-              else
-                // If content should decrease, don't move any.
-                S_x = 0.0;
-            }
-        }
-      // Make it official.
-      S_exchange[c] = S_x;      
+      
+      const double Theta_prim_old = soil_water.Theta_primary_old (c);
+      const double M1 = C_prim * Theta_prim_old;
+      const double M2 = C_sec * Theta_sec_old;
+      const double M = M1 + M2;
+      const double Theta = Theta_prim_old + Theta_sec_old;
+      const double C_avg = M / Theta;
+      const double M1_goal = C_avg * Theta_prim_old;
+      const double M2_goal = C_avg * Theta_sec_old;
+      const double M1_loss = alpha * (M1 - M1_goal);
+      const double M2_gain = alpha * (M2_goal - M2);
+      daisy_approximate (M1_loss, M2_gain);
+      S_exchange[c] = M1_loss;      
     }
   add_to_sink_primary (S_exchange); 
   add_to_source_secondary (S_exchange); 
