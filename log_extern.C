@@ -365,7 +365,7 @@ List of parameters to export.\n\
 \n\
 For example, if you have defined 'column' and 'crop' parameters for\n\
 this extern log parameterization, you can export them to through the\n\
-API interface by specifying '(names column crop)'.");
+API interface by specifying '(parameter_names column crop)'.");
     frame.set_empty ("parameter_names");
   }
 } LogExtern_syntax;

@@ -405,7 +405,7 @@ MODELS = xysource_profile.C program_rootmatch.C program_hmovie.C \
 	gnuplot_soil.C reaction_sorption.C hydraulic_B_C_inverse.C \
 	program_osvaldo.C vegetation_permanent.C  litter.C drain_lateral.C \
 	hydraulic_MACRO.C program_cpedata.C \
-	reaction_boundrel.C log_regress.C reaction_Morgan98.C \
+	reaction_boundrel.C reaction_Morgan98.C \
 	reaction_Styczen88.C program_GP2D.C svat_ssoc.C reaction_Jarvis99.C \
 	reaction_filter.C seed_LAI.C seed_release.C \
 	stomatacon_SHA.C \
@@ -455,7 +455,7 @@ MODELS = xysource_profile.C program_rootmatch.C program_hmovie.C \
 	action_crop.C groundwater_lysimeter.C action_message.C \
 	groundwater_pipe.C \
 	select_index.C select_content.C \
-	select_number.C select_array.C log_table.C \
+	select_number.C select_array.C \
 	log_harvest.C action_while.C action_wait.C action_activity.C \
 	mactrans_std.C macro_std.C macro_none.C \
 	column_std.C  uzrichard.C \
@@ -614,7 +614,7 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = weather_file.C gnuplot_flux.C 
+REMOVE = log_table.C log_regress.C weather_file.C gnuplot_flux.C 
 
 REMOVED = ABAeffect_exp.C ABAeffect.C ABAeffect.h \
 	stomatacon_Leuning.C stomatacon_BB.C \
@@ -1400,8 +1400,8 @@ wsource_base${OBJ}: wsource_base.C wsource_base.h wsource_weather.h wsource.h \
  scope.h attribute.h time.h assertion.h mathlib.h librarian.h \
  frame_submodel.h frame.h block_model.h block_nested.h block.h treelog.h \
  frame_model.h submodeler.h block_submodel.h
-log_dlf${OBJ}: log_dlf.C log_dlf.h log_select.h log.h time.h symbol.h \
- border.h model_framed.h model_logable.h model.h memutils.h dlf.h \
+log_dlf${OBJ}: log_dlf.C log_select.h log.h time.h symbol.h border.h \
+ model_framed.h model_logable.h model.h memutils.h dlf.h summary.h \
  select.h destination.h units.h volume.h model_derived.h attribute.h \
  geometry.h assertion.h daisy.h program.h run.h block_model.h \
  block_nested.h block.h scope.h treelog.h frame_model.h frame.h \
@@ -1556,7 +1556,7 @@ frame${OBJ}: frame.C frame.h scope.h attribute.h symbol.h frame_model.h \
  filepos.h metalib.h type.h value.h check.h vcheck.h plf.h mathlib.h
 bdconv${OBJ}: bdconv.C bdconv.h convert.h symbol.h geometry.h attribute.h \
  soil.h volume.h model_derived.h model_logable.h model.h units.h \
- memutils.h assertion.h
+ memutils.h assertion.h mathlib.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h
 scope_soil${OBJ}: scope_soil.C scope_soil.h scope.h attribute.h symbol.h \
  geometry.h soil.h soil_water.h soil_heat.h chemical.h model_framed.h \
@@ -1755,12 +1755,6 @@ reaction_boundrel${OBJ}: reaction_boundrel.C reaction.h model_framed.h \
  model_logable.h model.h symbol.h log.h time.h border.h geometry.h \
  attribute.h chemical.h chemistry.h treelog.h block_model.h \
  block_nested.h block.h scope.h frame_model.h frame.h librarian.h
-log_regress${OBJ}: log_regress.C log_dlf.h log_select.h log.h time.h symbol.h \
- border.h model_framed.h model_logable.h model.h memutils.h dlf.h \
- destination.h select.h units.h volume.h model_derived.h attribute.h \
- library.h block_model.h block_nested.h block.h scope.h treelog.h \
- frame_model.h frame.h timestep.h vcheck.h librarian.h scope_block.h \
- assertion.h
 reaction_Morgan98${OBJ}: reaction_Morgan98.C reaction_colgen.h reaction.h \
  model_framed.h model_logable.h model.h symbol.h ponddamp.h mathlib.h \
  assertion.h check.h block_model.h block_nested.h block.h scope.h \
@@ -2338,12 +2332,6 @@ select_array${OBJ}: select_array.C select.h destination.h symbol.h model.h \
  soil.h bdconv.h convert.h block_model.h block_nested.h block.h scope.h \
  treelog.h frame_model.h frame.h mathlib.h assertion.h librarian.h \
  column.h model_framed.h irrigate.h
-log_table${OBJ}: log_table.C log_dlf.h log_select.h log.h time.h symbol.h \
- border.h model_framed.h model_logable.h model.h memutils.h dlf.h \
- destination.h select.h units.h volume.h model_derived.h attribute.h \
- library.h block_model.h block_nested.h block.h scope.h treelog.h \
- frame_model.h frame.h summary.h timestep.h vcheck.h librarian.h \
- scope_block.h assertion.h
 log_harvest${OBJ}: log_harvest.C log.h time.h symbol.h border.h \
  model_framed.h model_logable.h model.h daisy.h program.h run.h harvest.h \
  block_model.h block_nested.h block.h scope.h attribute.h treelog.h \

@@ -212,7 +212,7 @@ ScopeBlock::name (const symbol tag) const
   if (type == Attribute::String)
     return frame.name (tag);
 
-  // Handle number objects.
+  // Handle stringer objects.
   daisy_assert (type == Attribute::Model);
   daisy_assert (frame.component (tag) == Stringer::component);
   daisy_assert (frame.check (block));

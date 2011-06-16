@@ -1,0 +1,11 @@
+;;; setup-pa.dai Rørrendegård setup for use in MST Smoke project.
+
+(input file "setup.dai")
+
+;;(run batch (run (Without) (plot)))
+
+(run both)
+;;(run plot)
+;;(run sims)
+
+;; setup-pa.dai ends here.

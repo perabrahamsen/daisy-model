@@ -76,21 +76,19 @@ measured at the field with 5 minutes intervals.
 
 The setup documented in~\citet{mst-agrovand} is mostly used as a base.
 
-The division and exchange rate between primary and secondary domain
-was taken from \citet{mst-agrovand}.  We chose to adjust the upper
-horizon borders so they match our sampling depth.  So the Ap horizon
-is 0--24 cm and the plow pan from 24-30 cm.  The C horizon is
-unchanged from~\cite{mst-agrovand}.  Texture is taken from
-\citet{mst-agrovand}. $\rho_b$ is set to 1.6~g/cm$^3$ in the Ap
-horizon (including the surface layer), and 1.72~g/cm$^3$ in the Bt
-horizon (including the plow pan).  Gydraulic properties are estimated
-with \textsc{hypres}~\citep{hypres}.  We chose an 1D setup.
-Discretization was adjusted to match sampling depths, and increased to
-Groundwater table variation was estimated from old measured values
-\citep{mst-agrovand}.  All considered biopores start at the surface,
-and have a diameter of 5 mm.  A single biopore in a cicle with a
-diamter of 6 cm corresponds to a biopore density of 354 per square
-meter.
+We chose to adjust the upper horizon borders so they match
+our sampling depth.  So the Ap horizon is 0--24 cm and the plow pan
+from 24-30 cm.  The C horizon is unchanged from~\cite{mst-agrovand}.
+Texture is taken from \citet{mst-agrovand}. $\rho_b$ is set to
+1.6~g/cm$^3$ in the Ap horizon (including the surface layer), and
+1.72~g/cm$^3$ in the Bt horizon (including the plow pan).  Gydraulic
+properties are estimated with \textsc{hypres}~\citep{hypres}.  We
+chose an 1D setup.  Discretization was adjusted to match sampling
+depths, and increased to Groundwater table variation was estimated
+from old measured values \citep{mst-agrovand}.  All considered
+biopores start at the surface, and have a diameter of 5 mm.  A single
+biopore in a cicle with a diamter of 6 cm corresponds to a biopore
+density of 354 per square meter.
 
 Based on this, three profiles were created.
 \begin{description}
@@ -115,6 +113,10 @@ conditions for soil water, giving a total simulation period from
 microsecond as needed.  The hourly weather data was used for the whole
 period, suplemented with 5 minute rain values for the drain season.
 Snow was disabled.
+
+The division and exchange rate between primary and secondary domain
+was found by calibration based on measurements from locations without
+biopores.  
 
 %%\addcontentsline{toc}{chapter}{\numberline{}References}
 %%\bibliography{../../txt/daisy}

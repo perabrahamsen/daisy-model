@@ -25,59 +25,7 @@
 
 #define BUILD_DLL
 
-#include "log_select.h"
-#include "dlf.h"
-#include "symbol.h"
-#include <fstream>
-#include <vector>
 
-struct LogDLF : public LogSelect
-{
-  // File Content.
-  const symbol parsed_from_file; // Defined in...
-  const symbol file;       // Filename.
-  std::ofstream out;            // Output stream.
-  const bool flush;             // Flush after each time step.
-  // char* faster than symbol for output.
-  const char *const record_separator; // String to print on records (time steps)
-  const char *const field_separator; // String to print between fields.
-  const char *const error_string; // String to print on errors.
-  const char *const missing_value; // String to print for missing values.
-  const char *const array_separator; // String to print between array entries.
-  DLF print_header;             // How much header should be printed?
-  std::vector<std::pair<symbol, symbol>/**/> parameters;      // Par vals.
-  bool print_tags;              // Set if tags should be printed.
-  bool print_dimension;         // Set if dimensions should be printed.
-  const bool print_initial;     // Set if initial values should be printed.
-  const bool std_time_columns;  // Add year, month, day and hour columns.
-  Time begin;                   // First log entry.
-  Time end;                     // Last log entry.
-
-  // Log.
-  void common_match (const Daisy& daisy, Treelog& out);
-  void common_done (const std::vector<Time::component_t>& time_columns,
-                    const Time& time, Treelog&);
-  virtual void process_entry (size_t) = 0;
-
-  // Log.
-  bool match (const Daisy& daisy, Treelog& out);
-  void done (const std::vector<Time::component_t>& time_columns,
-             const Time&, double dt, Treelog&);
-
-  // Initial line.
-  bool initial_match (const Daisy&, const Time& previous, Treelog&);
-  void initial_done (const std::vector<Time::component_t>& time_columns,
-                     const Time&, Treelog&);
-
-  // Create and destroy.
-  bool check (const Border&, Treelog& msg) const;
-  static bool contain_time_columns (const std::vector<Select*>& entries);
-  void initialize (const symbol log_dir, Treelog&);
-  static std::vector<std::pair<symbol, symbol>/**/>
-  /**/ build_parameters (const BlockModel& al);
-  explicit LogDLF (const BlockModel& al);
-  ~LogDLF ();
-};
 
 #endif // LOG_DLF_H
 

@@ -21,7 +21,10 @@
 
 #define BUILD_DLL
 
-#include "log_dlf.h"
+#include "log_select.h"
+#include "dlf.h"
+#include "summary.h"
+#include "symbol.h"
 #include "select.h"
 #include "geometry.h"
 #include "assertion.h"
@@ -36,6 +39,161 @@
 #include "library.h"
 #include "vcheck.h"
 #include <sstream>
+#include <fstream>
+#include <vector>
+
+class DestinationTable : public Destination
+{
+  // destination Content.
+  enum { Error, Missing, Number, Name, Array } type;
+  double dest_number;
+  symbol dest_name;
+  const std::vector<double>* dest_array;
+
+  // Select::Destination
+  void error ();
+  void missing ();
+  void add (const std::vector<double>& value);
+  void add (const double value);
+  void add (const symbol value);
+
+public:
+  void process_entry (std::ostream& out, 
+                      const char *const error_string,
+                      const char *const missing_value,
+                      const char *const array_separator);
+
+  DestinationTable ()
+    : type (Error),
+      dest_number (-42.42e42),
+      dest_name ("Daisy bug"),
+      dest_array (NULL)
+  { }
+};
+
+void 
+DestinationTable::process_entry (std::ostream& out, 
+                                 const char *const error_string,
+                                 const char *const missing_value,
+                                 const char *const array_separator)
+{ 
+  switch (type)
+    {
+    case Error:
+      out << error_string;
+      break;
+    case Missing: 
+      out << missing_value;
+      break;
+    case Number:
+      out << dest_number;
+      break;
+    case Name: 
+      out << dest_name;
+      break;
+    case Array:
+      {
+        daisy_assert (dest_array);
+        const std::vector<double> array = *dest_array;
+        for (unsigned int i = 0; i < array.size (); i++)
+          {
+            if (i != 0)
+              out << array_separator;
+            out << array[i];
+          }
+      }
+      break;
+    default:
+      daisy_notreached ();
+    }
+}
+
+void 
+DestinationTable::error ()
+{ 
+  type = Error;
+}
+
+void 
+DestinationTable::missing ()
+{ 
+  type = Missing;
+}
+
+void 
+DestinationTable::add (const std::vector<double>& value)
+{ 
+  type = Array;
+  dest_array = &value;
+}
+
+void 
+DestinationTable::add (const double value)
+{ 
+  type = Number;
+  dest_number = value;
+}
+
+void 
+DestinationTable::add (const symbol value)
+{ 
+  type = Name;
+  dest_name = value;
+}
+
+
+
+struct LogDLF : public LogSelect
+{
+  // File Content.
+  const symbol parsed_from_file; // Defined in...
+  const symbol file;       // Filename.
+  std::ofstream out;            // Output stream.
+  const bool flush;             // Flush after each time step.
+  // char* faster than symbol for output.
+  const char *const record_separator; // String to print on records (time steps)
+  const char *const field_separator; // String to print between fields.
+  const char *const error_string; // String to print on errors.
+  const char *const missing_value; // String to print for missing values.
+  const char *const array_separator; // String to print between array entries.
+  DLF print_header;             // How much header should be printed?
+  std::vector<std::pair<symbol, symbol>/**/> parameters;      // Par vals.
+  bool print_tags;              // Set if tags should be printed.
+  bool print_dimension;         // Set if dimensions should be printed.
+  const bool print_initial;     // Set if initial values should be printed.
+  const bool std_time_columns;  // Add year, month, day and hour columns.
+  Time begin;                   // First log entry.
+  Time end;                     // Last log entry.
+
+  // Data ends up here.
+  const auto_vector<Summary*> summary;
+  DestinationTable destination;
+
+  // Log.
+  void common_match (const Daisy& daisy, Treelog& out);
+  void common_done (const std::vector<Time::component_t>& time_columns,
+                    const Time& time, Treelog&);
+
+  // Log.
+  bool match (const Daisy& daisy, Treelog& out);
+  void done (const std::vector<Time::component_t>& time_columns,
+             const Time&, double dt, Treelog&);
+
+  // Initial line.
+  bool initial_match (const Daisy&, const Time& previous, Treelog&);
+  void initial_done (const std::vector<Time::component_t>& time_columns,
+                     const Time&, Treelog&);
+
+  // Create and destroy.
+  bool check (const Border&, Treelog& msg) const;
+  static bool contain_time_columns (const std::vector<Select*>& entries);
+  void initialize (const symbol log_dir, Treelog&);
+  void summarize (Treelog& msg);
+  static std::vector<std::pair<symbol, symbol>/**/>
+  /**/ build_parameters (const BlockModel& al);
+  explicit LogDLF (const BlockModel& al);
+  ~LogDLF ();
+};
 
 void
 LogDLF::common_match (const Daisy& daisy, Treelog&)
@@ -151,7 +309,8 @@ LogDLF::common_done (const std::vector<Time::component_t>& time_columns,
       
       entries[i]->done_print ();
 
-      process_entry (i);
+      destination.process_entry (out, 
+                                 error_string, missing_value, array_separator); 
     }
   out << record_separator;
   if (flush)
@@ -184,6 +343,9 @@ LogDLF::done (const std::vector<Time::component_t>& time_columns,
 bool 
 LogDLF::initial_match (const Daisy& daisy, const Time& previous, Treelog& msg)
 {
+  for (unsigned int i = 0; i < summary.size (); i++)
+    summary[i]->clear ();
+
   begin = daisy.time ();
 
   common_match (daisy, msg);
@@ -253,59 +415,52 @@ LogDLF::initialize (const symbol log_dir, Treelog& msg)
   print_header.log_description (out, description);
 
   out.flush ();
+
+  TREELOG_MODEL (msg);
+  for (unsigned int i = 0; i < summary.size (); i++)
+    summary[i]->initialize (entries, msg);
+}
+
+void
+LogDLF::summarize (Treelog& msg)
+{
+  if (summary.size () > 0)
+    {
+      TREELOG_MODEL (msg);
+      std::ostringstream tmp;
+
+      tmp << "LOGFILE: " << file  << "\n";
+      tmp << "VOLUME: " << volume->one_line_description () << "\n";
+      tmp << "TIME: " << begin.print () << " to " << end.print ();
+      for (size_t i = 0; i < parameters.size (); i++)
+        if (parameters[i].first != "*")
+          tmp << "\n" << parameters[i].first << ": " << parameters[i].second;
+
+      msg.message (tmp.str ());
+      for (size_t i = 0; i < summary.size (); i++)
+        summary[i]->summarize (msg);
+    }
 }
 
 std::vector<std::pair<symbol, symbol>/**/>
 LogDLF::build_parameters (const BlockModel& al)
 {
+  ScopeBlock scope_block (al);
+  daisy_assert (al.check ("parameter_names"));
+  const std::vector<symbol> pars = al.name_sequence ("parameter_names");
   std::vector<std::pair<symbol, symbol>/**/> result;
-  if (al.check ("parameter_names"))
+  for (size_t i = 0; i < pars.size (); i++)
     {
-      ScopeBlock scope_block (al);
-      std::vector<symbol> pars = al.name_sequence ("parameter_names");
-      for (size_t i = 0; i < pars.size (); i++)
+      const symbol key = pars[i];
+      if (scope_block.has_name (key))
         {
-          const symbol key = pars[i];
-          if (scope_block.has_name (key))
-            {
-              const symbol value = scope_block.name (key);
-              std::string id = key.name ();
-              std::transform (id.begin (), id.end (), id.begin (), ::toupper);
-              result.push_back (std::pair<symbol, symbol> (symbol (id), value));
-            }
-          else
-            al.msg ().warning ("Parameter name '" + key + "' not found"); 
+          const symbol value = scope_block.name (key);
+          std::string id = key.name ();
+          std::transform (id.begin (), id.end (), id.begin (), ::toupper);
+          result.push_back (std::pair<symbol, symbol> (symbol (id), value));
         }
-    }
-  else
-    {
-      daisy_notreached ();      // 'parameter_names' is not optional.
-      const Metalib& metalib = al.metalib ();
-      const Library& library = metalib.library (Log::component);
-      const FrameModel& dlf_frame = library.model ("DLF");
-      const Frame& my_frame = al.frame ();
-      std::set<symbol> dlf_entries;
-      std::set<symbol> my_entries;
-      std::set<symbol> new_entries;
-      dlf_frame.entries (dlf_entries);
-      my_frame.entries (my_entries);
-      std::set_difference (my_entries.begin (), my_entries.end (),
-                           dlf_entries.begin (), dlf_entries.end (), 
-                           std::inserter (new_entries, new_entries.end ()));
-      std::vector<std::pair<symbol, symbol>/**/> result;
-      std::vector<symbol> pars (new_entries.begin (), new_entries.end ());
-      ScopeBlock scope_block (al);
-      for (size_t i = 0; i < pars.size (); i++)
-        {
-          const symbol key = pars[i];
-          if (scope_block.has_name (key))
-            {
-              const symbol value = scope_block.name (key);
-              std::string id = key.name ();
-              std::transform (id.begin (), id.end (), id.begin (), ::toupper);
-              result.push_back (std::pair<symbol, symbol> (symbol (id), value));
-            }
-        }
+      else
+        al.msg ().warning ("Parameter name '" + key + "' not found"); 
     }
   return result;
 }
@@ -327,8 +482,15 @@ LogDLF::LogDLF (const BlockModel& al)
     print_initial (al.flag ("print_initial")),
     std_time_columns (al.ok () && !contain_time_columns (entries)),
     begin (1, 1, 1, 1),
-    end (1, 1, 1, 1)
-{ }
+    end (1, 1, 1, 1),
+    summary (Librarian::build_vector<Summary> (al, "summary"))
+{ 
+  if (!al.ok ())
+    return;
+
+  for (unsigned int i = 0; i < entries.size (); i++)
+    entries[i]->add_dest (&destination);
+}
 
 LogDLF::~LogDLF ()
 {
@@ -336,10 +498,13 @@ LogDLF::~LogDLF ()
     Assertion::error ("Problems writing to '" + file + "'");
 }
 
-static struct LogDLFSyntax : public DeclareBase
+static struct LogDLFSyntax : public DeclareModel
 {
+  Model* make (const BlockModel& al) const
+  { return new LogDLF (al); }
+
   LogDLFSyntax ()
-    : DeclareBase (Log::component, "DLF", "select", "\
+    : DeclareModel (Log::component, "DLF", "select", "\
 Shared base class for log models generating Daisy Log File formatted results.")
   { }
   void load_frame (Frame& frame) const
@@ -390,9 +555,23 @@ no crops on the field.");
     frame.declare_string ("array_separator", Attribute::Const, "\
 String to print between array entries.");
     frame.set ("array_separator", "\t");
+    frame.declare_object ("summary", Summary::component,
+                          Attribute::Const, Attribute::Variable,
+                          "Summaries for this log file.");
+    frame.set_empty ("summary");
     Librarian::add_doc_fun (Log::component, 
                             LogSelect::document_entries);
   }
 } LogDLF_syntax;
+
+static struct LogTableSyntax : public DeclareParam
+{
+  LogTableSyntax ()
+    : DeclareParam (Log::component, "table", "DLF", "\
+Each selected variable is represented by a column in the specified log file.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
+} LogTable_syntax;
 
 // log_dlf.C ends here.

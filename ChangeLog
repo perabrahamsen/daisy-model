@@ -1,3 +1,11 @@
+2011-06-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* log_regress.C, log_dlf.h: Removed.
+	* log_table.C: Merged into log_dlf.C.
+	* Makefile (MODELS): Updated.
+
+	* chemical_std.C (tick_soil): Simplified domain exchange.
+
 2011-06-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* wsource_weather.C (initialize_two): Better error message.
