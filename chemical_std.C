@@ -1055,7 +1055,7 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
       // Find alpha.
       const double alpha = soil.alpha (c);
 
-      // The exchange rate based on concentration gradient.
+      // The exchange rate based on solute.
       const double C_prim = C_primary (c);
       const double C_sec = C_secondary (c);
       if (!approximate (C_sec * Theta_sec_old, M_sec)
@@ -1067,19 +1067,21 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
               << M_sec - C_sec * Theta_sec_old;
           msg.warning (tmp.str ());
         }
-      
+
+      // Find mass of solutes (sorbed mass ignored).
       const double Theta_prim_old = soil_water.Theta_primary_old (c);
-      const double M1 = C_prim * Theta_prim_old;
-      const double M2 = C_sec * Theta_sec_old;
-      const double M = M1 + M2;
+      const double MS1 = C_prim * Theta_prim_old;
+      const double MS2 = C_sec * Theta_sec_old;
+      daisy_approximate (M_sec, MS2);
+      const double MS = MS1 + MS2;
       const double Theta = Theta_prim_old + Theta_sec_old;
-      const double C_avg = M / Theta;
-      const double M1_goal = C_avg * Theta_prim_old;
-      const double M2_goal = C_avg * Theta_sec_old;
-      const double M1_loss = alpha * (M1 - M1_goal);
-      const double M2_gain = alpha * (M2_goal - M2);
-      daisy_approximate (M1_loss, M2_gain);
-      S_exchange[c] = M1_loss;      
+      const double C_avg = MS / Theta;
+      const double MS1_goal = C_avg * Theta_prim_old;
+      const double MS2_goal = C_avg * Theta_sec_old;
+      const double MS1_loss = alpha * (MS1 - MS1_goal);
+      const double MS2_gain = alpha * (MS2_goal - MS2);
+      daisy_approximate (MS1_loss, MS2_gain);
+      S_exchange[c] = MS1_loss;      
     }
   add_to_sink_primary (S_exchange); 
   add_to_source_secondary (S_exchange); 
