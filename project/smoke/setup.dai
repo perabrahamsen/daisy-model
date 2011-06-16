@@ -448,8 +448,8 @@
 
 ;;(run batch (run (Without) (plot)))
 
-;;(run both)
-(run plot)
+(run both)
+;;(run plot)
 ;;(run sims)
 
 ;; setup.dai ends here.

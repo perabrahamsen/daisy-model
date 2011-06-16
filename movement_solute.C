@@ -61,7 +61,7 @@ MovementSolute::secondary_flow (const Geometry& geo,
   for (size_t c = 0; c < cell_size; c++)
     Theta[c] = Theta_old[c];
 
-#if 1
+#if 0
   // Cell source.  Must be before transport to avoid negative values.
   for (size_t c = 0; c < cell_size; c++)
     M[c] += S[c] * dt;
@@ -101,7 +101,7 @@ MovementSolute::secondary_flow (const Geometry& geo,
             }
         }
 
-#if 0
+#if 1
       // Cell source.  Must be before transport to avoid negative values.
       for (size_t c = 0; c < cell_size; c++)
         M[c] += S[c] * ddt;

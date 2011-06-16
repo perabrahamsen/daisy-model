@@ -1068,19 +1068,24 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
           msg.warning (tmp.str ());
         }
 
-      // Find mass of solutes (sorbed mass ignored).
+      // Find mass of solutes (sorbed mass ignored) at start of timestep.
       const double Theta_prim_old = soil_water.Theta_primary_old (c);
       const double MS1 = C_prim * Theta_prim_old;
       const double MS2 = C_sec * Theta_sec_old;
-      daisy_approximate (M_sec, MS2);
       const double MS = MS1 + MS2;
+
+      // Find average concentration at start of timestep.
       const double Theta = Theta_prim_old + Theta_sec_old;
       const double C_avg = MS / Theta;
+
+      // Find necessary change in domain solute towards average concentration.
       const double MS1_goal = C_avg * Theta_prim_old;
       const double MS2_goal = C_avg * Theta_sec_old;
       const double MS1_loss = alpha * (MS1 - MS1_goal);
       const double MS2_gain = alpha * (MS2_goal - MS2);
       daisy_approximate (MS1_loss, MS2_gain);
+
+      // Use it.
       S_exchange[c] = MS1_loss;      
     }
   add_to_sink_primary (S_exchange); 
