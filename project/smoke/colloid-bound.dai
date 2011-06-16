@@ -9,6 +9,7 @@
   ;; (crop_uptake_reflection_factor 0.0 []) ; Silstrup
   (canopy_dissipation_rate 0 [h^-1])
   (decompose_rate 0 [h^-1])
+;;  (drain_secondary true)
   (C_below const 0 [g/cm^3]))
 
 (defchemistry Bromide default
