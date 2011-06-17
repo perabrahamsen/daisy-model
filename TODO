@@ -2,6 +2,22 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Smoke
 
+** Log "dlf" and "table" should just be a destination in "select"
+
+Ditto for log "extern".
+
+(destinations (table)
+              (table (field_seperator ",") (where "foo.csv"))
+              (extern))
+
+"where" and "parameter_names" skal flyttes til "select".
+
+"where" skal kunne overskrives.
+
+** "fetch" burde bruges for extern?
+
+Den mapper en enkelt "select" til en fetch, sparer et opslag i en map.
+
 ** LogR2
 
 ** LogR2 Scope?
