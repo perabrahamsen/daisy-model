@@ -340,25 +340,33 @@ static struct LogSelectSyntax : public DeclareBase
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
+    frame.declare_string ("parameter_names", 
+                          Attribute::Const, Attribute::Variable, "\
+List of string parameters to print to the table header.\n\
+\n\
+For example, if you have defined 'column' and 'crop' parameters for\n\
+this table log parameterization, you can print them to the log file\n\
+header by specifying '(names column crop)'.");
+    frame.set_empty ("parameter_names");
     frame.declare_object ("when", Condition::component, "\
 Add entries to the log file when this condition is true.");
     frame.declare_object ("entries", Select::component, 
-                       Attribute::State, Attribute::Variable,
-                       "What to log in each column.");
+                          Attribute::State, Attribute::Variable,
+                          "What to log in each column.");
     frame.declare_boolean ("time_columns", Attribute::OptionalConst, "\
 Iff true, add columns for year, month, mday and hour in the begining of\n\
 the lines.  By default, this will be true of you have not specified any\n\
 time entries yourself.");
     frame.declare_object ("volume", Volume::component, 
-                       Attribute::Const, Attribute::Singleton,
-                       "Soil volume to log.");
+                          Attribute::Const, Attribute::Singleton,
+                          "Soil volume to log.");
     frame.set ("volume", "box");
     frame.declare ("from", "cm", Attribute::OptionalConst,
-                "Default 'from' value for all entries.\n\
+                   "Default 'from' value for all entries.\n\
 By default, use the top of the soil.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
     frame.declare ("to", "cm", Attribute::OptionalConst,
-                "Default 'to' value for all entries.\n\
+                   "Default 'to' value for all entries.\n\
 By default, use the bottom of the soil.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
   }

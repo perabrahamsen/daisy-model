@@ -357,14 +357,6 @@ Inititial numeric values.  By default, none.",
     frame.declare_string ("where", Attribute::OptionalConst,
                 "Name of the extern log to use.\n\
 By default, use the model name.");
-    frame.declare_string ("parameter_names", 
-                Attribute::Const, Attribute::Variable, "\
-List of parameters to export.\n\
-\n\
-For example, if you have defined 'column' and 'crop' parameters for\n\
-this extern log parameterization, you can export them to through the\n\
-API interface by specifying '(parameter_names column crop)'.");
-    frame.set_empty ("parameter_names");
   }
 } LogExtern_syntax;
 

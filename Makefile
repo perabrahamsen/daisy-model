@@ -1405,7 +1405,7 @@ log_dlf${OBJ}: log_dlf.C log_select.h log.h time.h symbol.h border.h \
  select.h destination.h units.h volume.h model_derived.h attribute.h \
  geometry.h assertion.h daisy.h program.h run.h block_model.h \
  block_nested.h block.h scope.h treelog.h frame_model.h frame.h filepos.h \
- librarian.h metalib.h library.h vcheck.h
+ librarian.h metalib.h library.h
 reaction_colgen${OBJ}: reaction_colgen.C reaction_colgen.h reaction.h \
  model_framed.h model_logable.h model.h symbol.h ponddamp.h librarian.h \
  frame.h scope.h attribute.h log.h time.h border.h chemistry.h treelog.h \
@@ -1600,7 +1600,7 @@ block${OBJ}: block.C block_model.h block_nested.h block.h scope.h attribute.h \
  model.h stringer.h number.h boolean.h assertion.h
 dlf${OBJ}: dlf.C dlf.h symbol.h volume.h model_derived.h model_logable.h \
  model.h assertion.h version.h daisy.h program.h run.h toplevel.h \
- metalib.h frame.h scope.h attribute.h frame_model.h
+ metalib.h frame.h scope.h attribute.h frame_model.h vcheck.h
 texture${OBJ}: texture.C texture.h plf.h assertion.h mathlib.h
 destination${OBJ}: destination.C destination.h symbol.h
 symbol${OBJ}: symbol.C symbol.h assertion.h
@@ -2332,7 +2332,7 @@ select_array${OBJ}: select_array.C select.h destination.h symbol.h model.h \
 log_harvest${OBJ}: log_harvest.C log.h time.h symbol.h border.h \
  model_framed.h model_logable.h model.h daisy.h program.h run.h harvest.h \
  block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
- frame_model.h frame.h dlf.h vcheck.h version.h assertion.h librarian.h
+ frame_model.h frame.h dlf.h version.h assertion.h librarian.h
 action_while${OBJ}: action_while.C action.h model_framed.h model_logable.h \
  model.h symbol.h frame.h scope.h attribute.h log.h time.h border.h \
  assertion.h memutils.h librarian.h treelog.h block_model.h \

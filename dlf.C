@@ -69,7 +69,10 @@ DLF::parameter (std::ostream& out,
 {
   if (this->value == DLF::None)
     return;
-  out << name << ": " << value << "\n"; 
+
+  std::string id = name.name ();
+  std::transform (id.begin (), id.end (), id.begin (), ::toupper);
+  out << id << ": " << value << "\n"; 
 }
 
 void

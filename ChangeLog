@@ -1,5 +1,10 @@
 2011-06-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* log_dlf.C: Cleanup.
+
+	* dlf.C, dlf.h (add_syntax): New function.
+	* log_harvest.C, log_dlf.C (load_frame): Use it.
+
 	* scope.h, scope.C, block.C (can_extract_as): New virtual function.
 	* block.C (number, name, flag): Support extracting models.
 	(expand_string): Use it.

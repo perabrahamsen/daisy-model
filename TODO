@@ -1,30 +1,14 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Parameter optimizer
+
+** Summary for calculatng R2?
+
+** Some way for summaries to write to a scope that can be checked later?
+
+** An optimizer that calculates an expression based on the summary scope?
+
 * Smoke
-
-** Log "dlf" and "table" should just be a destination in "select"
-
-Ditto for log "extern".
-
-(destinations (table)
-              (table (field_seperator ",") (where "foo.csv"))
-              (extern))
-
-"where" and "parameter_names" skal flyttes til "select".
-
-"where" skal kunne overskrives.
-
-** "fetch" burde bruges for extern?
-
-Den mapper en enkelt "select" til en fetch, sparer et opslag i en map.
-
-** LogR2
-
-** LogR2 Scope?
-
-** Optimize
-
-expr?
 
 * Vestskoven
 
