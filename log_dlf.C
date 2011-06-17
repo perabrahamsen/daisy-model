@@ -32,7 +32,6 @@
 #include "block_model.h"
 #include "frame_model.h"
 #include "treelog.h"
-#include "scope_block.h"
 #include "filepos.h"
 #include "librarian.h"
 #include "metalib.h"
@@ -445,16 +444,15 @@ LogDLF::summarize (Treelog& msg)
 std::vector<std::pair<symbol, symbol>/**/>
 LogDLF::build_parameters (const BlockModel& al)
 {
-  ScopeBlock scope_block (al);
   daisy_assert (al.check ("parameter_names"));
   const std::vector<symbol> pars = al.name_sequence ("parameter_names");
   std::vector<std::pair<symbol, symbol>/**/> result;
   for (size_t i = 0; i < pars.size (); i++)
     {
       const symbol key = pars[i];
-      if (scope_block.has_name (key))
+      if (al.can_extract_as (key, Attribute::String))
         {
-          const symbol value = scope_block.name (key);
+          const symbol value = al.name (key);
           std::string id = key.name ();
           std::transform (id.begin (), id.end (), id.begin (), ::toupper);
           result.push_back (std::pair<symbol, symbol> (symbol (id), value));

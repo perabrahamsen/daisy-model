@@ -28,7 +28,6 @@
 #include "number.h"
 #include "boolean.h"
 #include "assertion.h"
-#include "scope_block.h"
 #include "librarian.h"
 #include "treelog.h"
 #include "frame_model.h"
@@ -135,7 +134,6 @@ Block::expand_string (const symbol value_s, std::set<symbol>& outer) const
                         const FrameModel& obj = frame.model (key);
                         const symbol type = obj.type_name ();
                         const symbol component = frame.component (key);
-                        const ScopeBlock scope (*this);
                         if (component == Stringer::component)
                           {
                             const std::auto_ptr<Stringer> stringer 
@@ -143,12 +141,12 @@ Block::expand_string (const symbol value_s, std::set<symbol>& outer) const
                                                                  obj, key));
                             if (!ok () 
                                 || !stringer->initialize (units (),
-                                                          scope, msg ())
-                                || !stringer->check (units (), scope,
+                                                          *this, msg ())
+                                || !stringer->check (units (), *this,
                                                      msg ())
-                                || stringer->missing (scope))
+                                || stringer->missing (*this))
                               throw "Bad string: '" + type + "'";
-                            result << stringer->value (scope);
+                            result << stringer->value (*this);
                           }
                         else if (component == Number::component)
                           {
@@ -156,15 +154,15 @@ Block::expand_string (const symbol value_s, std::set<symbol>& outer) const
                               (Librarian::build_frame<Number> (*this, 
                                                                obj, key));
                             if (!ok () 
-                                || !number->initialize (units (), scope, 
+                                || !number->initialize (units (), *this, 
                                                         msg ())
-                                || !number->check (units (), scope, msg ()))
+                                || !number->check (units (), *this, msg ()))
                               throw "Bad number: '"+ type + "'";
-                            number->tick (units (), scope, msg ());
-                            if (number->missing (scope))
+                            number->tick (units (), *this, msg ());
+                            if (number->missing (*this))
                               throw "Bad number: '"+ type + "'";
-                            result << number->value (scope);
-                            const symbol dim = number->dimension (scope);
+                            result << number->value (*this);
+                            const symbol dim = number->dimension (*this);
                             if (dim == Attribute::Fraction ()
                                 || dim == Attribute::None ())
                               result << " []";
@@ -295,10 +293,77 @@ Block::can_extract_as (const symbol key, Attribute::type other_type) const
   const Attribute::type my_type = lookup (key);
   if (my_type == other_type)
     return true;
-  
-  // TODO: Handle string, flag, number objects
 
-  return false;
+  // BUG: Sometimes you can extract a name from a number (scalars?)
+  if (my_type != Attribute::Model)
+    return false;
+
+  if (type_size (key) != Attribute::Singleton)
+    return false;
+
+  if (!check (key))
+    return false;
+
+  const Frame& frame = find_frame (key);
+  switch (other_type)
+    {
+    case Attribute::Number:
+      {
+        if (frame.component (key) != Number::component)
+          return false;
+        if (!frame.check (*this))
+          return false;
+        
+        std::auto_ptr<Number> number (Librarian::build_frame<Number>
+                                      (*this, frame.model (key), key));
+        if (!number.get ())
+          return false;
+        if (!number->initialize (units (), *this, msg ()))
+          return false;
+        if (number->missing (*this))
+          return false;
+
+        return true;
+      }
+    case Attribute::String:
+      {
+        if (frame.component (key) != Stringer::component)
+          return false;
+        if (!frame.check (*this))
+          return false;
+        
+        std::auto_ptr<Stringer> stringer (Librarian::build_frame<Stringer>
+                                      (*this, frame.model (key), key));
+        if (!stringer.get ())
+          return false;
+        if (!stringer->initialize (units (), *this, msg ()))
+          return false;
+        if (stringer->missing (*this))
+          return false;
+
+        return true;
+      }
+    case Attribute::Boolean:
+      {
+        if (frame.component (key) != Boolean::component)
+          return false;
+        if (!frame.check (*this))
+          return false;
+        
+        std::auto_ptr<Boolean> boolean (Librarian::build_frame<Boolean>
+                                      (*this, frame.model (key), key));
+        if (!boolean.get ())
+          return false;
+        if (!boolean->initialize (units (), *this, msg ()))
+          return false;
+        if (boolean->missing (*this))
+          return false;
+
+        return true;
+      }
+    default:
+      return false;
+    }
 }
 
 

@@ -24,7 +24,6 @@
 
 #include "log_extern.h"
 #include "select.h"
-#include "scope_block.h"
 #include "block_model.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -309,15 +308,14 @@ LogExtern::LogExtern (const BlockModel& al)
     title_ (al.name ("where", al.type_name ()))
 { 
   std::vector<symbol> par_names = al.name_sequence ("parameter_names");
-  ScopeBlock scope_block (al);
 
   for (size_t i = 0; i < par_names.size (); i++)
     {
       const symbol id = par_names[i];
-      if (scope_block.has_name (id))
+      if (al.can_extract_as (id, Attribute::String))
         {
           types[id] = Name;
-          names[id] = scope_block.name (id);
+          names[id] = al.name (id);
         }
       else
         al.msg ().warning ("Parameter name " + id + " not found"); 

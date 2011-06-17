@@ -1,3 +1,13 @@
+2011-06-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* scope.h, scope.C, block.C (can_extract_as): New virtual function.
+	* block.C (number, name, flag): Support extracting models.
+	(expand_string): Use it.
+	* log_dlf.C (build_parameters): Ditto.
+	* log_extern.C (LogExtern): Ditto.
+	* scope_block.C: Removed.
+	* Makefile (OTHER): Adjusted.
+
 2011-06-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* log_regress.C, log_dlf.h: Removed.

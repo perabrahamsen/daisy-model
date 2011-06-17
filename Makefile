@@ -531,7 +531,7 @@ OTHER = GP2D.C weather.C astronomy.C weatherdata.C \
 	frame_model.C scope.C attribute.C unit.C border.C resistance.C \
 	convert.C units.C anystate.C imvec.C im.C frame.C \
 	bdconv.C abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
-	intrinsics.C metalib.C model.C output.C scope_block.C librarian.C \
+	intrinsics.C metalib.C model.C output.C librarian.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
 	block.C dlf.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C oldunits.C \
@@ -1404,8 +1404,8 @@ log_dlf${OBJ}: log_dlf.C log_select.h log.h time.h symbol.h border.h \
  model_framed.h model_logable.h model.h memutils.h dlf.h summary.h \
  select.h destination.h units.h volume.h model_derived.h attribute.h \
  geometry.h assertion.h daisy.h program.h run.h block_model.h \
- block_nested.h block.h scope.h treelog.h frame_model.h frame.h \
- scope_block.h filepos.h librarian.h metalib.h library.h vcheck.h
+ block_nested.h block.h scope.h treelog.h frame_model.h frame.h filepos.h \
+ librarian.h metalib.h library.h vcheck.h
 reaction_colgen${OBJ}: reaction_colgen.C reaction_colgen.h reaction.h \
  model_framed.h model_logable.h model.h symbol.h ponddamp.h librarian.h \
  frame.h scope.h attribute.h log.h time.h border.h chemistry.h treelog.h \
@@ -1464,8 +1464,8 @@ select_value${OBJ}: select_value.C select_value.h select.h destination.h \
 log_extern${OBJ}: log_extern.C log_extern.h log_select.h log.h time.h \
  symbol.h border.h model_framed.h model_logable.h model.h memutils.h \
  destination.h scope.h attribute.h select.h units.h volume.h \
- model_derived.h scope_block.h block.h block_model.h block_nested.h \
- treelog.h frame_model.h frame.h assertion.h librarian.h submodeler.h \
+ model_derived.h block_model.h block_nested.h block.h treelog.h \
+ frame_model.h frame.h assertion.h librarian.h submodeler.h \
  block_submodel.h frame_submodel.h daisy.h program.h run.h
 log_select${OBJ}: log_select.C log_select.h log.h time.h symbol.h border.h \
  model_framed.h model_logable.h model.h memutils.h select.h destination.h \
@@ -1579,9 +1579,6 @@ output${OBJ}: output.C output.h condition.h model_framed.h model_logable.h \
  log_select.h log.h border.h log_extern.h destination.h scope.h \
  attribute.h treelog.h timestep.h vcheck.h block_model.h block_nested.h \
  block.h frame_model.h frame.h assertion.h librarian.h scope_model.h
-scope_block${OBJ}: scope_block.C scope_block.h scope.h attribute.h symbol.h \
- block.h library.h number.h model.h stringer.h frame.h assertion.h \
- librarian.h
 librarian${OBJ}: librarian.C librarian.h model.h symbol.h library.h metalib.h \
  frame.h scope.h attribute.h intrinsics.h memutils.h block_top.h block.h \
  treelog_text.h treelog.h assertion.h frame_model.h block_model.h \
@@ -1600,7 +1597,7 @@ lexer_table${OBJ}: lexer_table.C lexer_table.h block_model.h block_nested.h \
  path.h librarian.h model.h treelog_text.h
 block${OBJ}: block.C block_model.h block_nested.h block.h scope.h attribute.h \
  symbol.h treelog.h frame_model.h frame.h metalib.h library.h librarian.h \
- model.h stringer.h number.h assertion.h scope_block.h
+ model.h stringer.h number.h boolean.h assertion.h
 dlf${OBJ}: dlf.C dlf.h symbol.h volume.h model_derived.h model_logable.h \
  model.h assertion.h version.h daisy.h program.h run.h toplevel.h \
  metalib.h frame.h scope.h attribute.h frame_model.h
