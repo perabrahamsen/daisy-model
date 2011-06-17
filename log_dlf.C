@@ -36,7 +36,6 @@
 #include "librarian.h"
 #include "metalib.h"
 #include "library.h"
-#include "vcheck.h"
 #include <sstream>
 #include <fstream>
 #include <vector>
@@ -517,13 +516,7 @@ header by specifying '(names column crop)'.");
     frame.set_empty ("parameter_names");
     frame.declare_string ("where", Attribute::Const,
                    "Name of the log file to create.");
-    frame.declare_string ("print_header", Attribute::Const,
-                   "If this is set to 'false', no header is printed.\n\
-If this is set to 'true', a full header is printer.\n\
-If this is set to 'fixed', a small fixed size header is printed.");
-    static VCheck::Enum check_header ("false", "true", "fixed");
-    frame.set_check ("print_header", check_header);
-    frame.set ("print_header", "true");
+    DLF::add_syntax (frame, "print_header");
     frame.declare_boolean ("print_tags", Attribute::Const,
                    "Print a tag line in the file.");
     frame.set ("print_tags", true);
@@ -568,7 +561,7 @@ static struct LogTableSyntax : public DeclareParam
     : DeclareParam (Log::component, "table", "DLF", "\
 Each selected variable is represented by a column in the specified log file.")
   { }
-  void load_frame (Frame& frame) const
+  void load_frame (Frame&) const
   { }
 } LogTable_syntax;
 

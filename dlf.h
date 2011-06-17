@@ -29,6 +29,7 @@
 class Volume;
 class Metalib;
 class FrameModel;
+class Frame;
 
 class DLF
 {
@@ -54,6 +55,7 @@ public:
 private:
   static type string2type (const symbol s);
 public:
+  static void add_syntax (Frame&, symbol key);
   explicit DLF (const symbol name)
     : value (string2type (name))
   { }

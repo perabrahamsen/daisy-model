@@ -28,6 +28,7 @@
 #include "toplevel.h"
 #include "metalib.h"
 #include "frame_model.h"
+#include "vcheck.h"
 #include <time.h>
 #include <ostream>
 
@@ -145,3 +146,18 @@ DLF::finish (std::ostream& out,
   // Only do this once.
   value = None;
 }
+
+void
+DLF::add_syntax (Frame& frame, const symbol key)
+{
+  frame.declare_string (key, Attribute::Const,
+                        "If this is set to 'false', no header is printed.\n\
+If this is set to 'true', a full header is printer.\n\
+If this is set to 'fixed', a small fixed size header is printed.");
+  static VCheck::Enum check_header ("false", "true", "fixed");
+  frame.set_check ("print_header", check_header);
+  frame.set ("print_header", "true");
+}
+
+// dlf.C ends here.
+

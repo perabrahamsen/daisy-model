@@ -24,7 +24,6 @@
 #include "daisy.h"
 #include "harvest.h"
 #include "dlf.h"
-#include "vcheck.h"
 #include "version.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -233,13 +232,7 @@ static struct LogHarvestSyntax : public DeclareModel
     frame.declare_string ("where", Attribute::Const,
 		"Name of the log file to create.");
     frame.set ("where", "harvest.dlf");
-    frame.declare_string ("print_header", Attribute::Const,
-                "If this is set to 'false', no header is printed.\n\
-If this is set to 'true', a full header is printer.\n\
-If this is set to 'fixed', a small fixed size header is printed.");
-    static VCheck::Enum check_header ("false", "true", "fixed");
-    frame.set_check ("print_header", check_header);
-    frame.set ("print_header", "true");
+    DLF::add_syntax (frame, "print_header");
     frame.declare_boolean ("print_tags", Attribute::Const,
 		"Print a tag line in the file.");
     frame.set ("print_tags", true);
