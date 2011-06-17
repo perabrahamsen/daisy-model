@@ -6,9 +6,21 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 Kopier Number & Stringer lookup til Block
 
+*** DONE bool Scope::can_extract_as (key, type)
+
+*** bool Block::can_extract_as (key, type)
+
+*** DONE Block::number
+*** DONE Block::name
+*** DONE Block::flag
+
 ** LogR2
 
+** LogR2 Scope?
+
 ** Optimize
+
+expr?
 
 * Vestskoven
 

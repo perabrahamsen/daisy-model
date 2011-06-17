@@ -26,6 +26,7 @@
 #include "librarian.h"
 #include "stringer.h"
 #include "number.h"
+#include "boolean.h"
 #include "assertion.h"
 #include "scope_block.h"
 #include "librarian.h"
@@ -280,13 +281,26 @@ void
 Block::set_error () const
 { is_ok = false; }
 
+void
+Block::entries (std::set<symbol>& all) const
+{ frame ().entries (all); }
+
 Attribute::type 
 Block::lookup (const symbol key) const
 { return frame ().lookup (key); }
 
-void
-Block::entries (std::set<symbol>& all) const
-{ frame ().entries (all); }
+bool 
+Block::can_extract_as (const symbol key, Attribute::type other_type) const
+{
+  const Attribute::type my_type = lookup (key);
+  if (my_type == other_type)
+    return true;
+  
+  // TODO: Handle string, flag, number objects
+
+  return false;
+}
+
 
 int 
 Block::type_size (const symbol tag) const
@@ -322,7 +336,22 @@ Block::number (const symbol key) const
   if (frame.is_reference (key))
     return number (expand_reference (key));
 
-  return frame.number (key); 
+  Attribute::type type = lookup (key);
+  if (type != Attribute::Model)
+    return frame.number (key);
+
+  // Handle number objects.
+  daisy_assert (type == Attribute::Model);
+  daisy_assert (frame.component (key) == Number::component);
+  daisy_assert (frame.check (*this));
+  std::auto_ptr<Number> number (Librarian::build_frame<Number> 
+                                (*this, frame.model (key), key));
+  daisy_assert (number.get ());
+  daisy_assert (number->initialize (units (), *this, msg ()));
+  daisy_assert (number->check (units (), *this, msg ()));
+  number->tick (units (), *this, msg ());
+  daisy_assert (!number->missing (*this));
+  return number->value (*this);
 }
 
 double 
@@ -342,7 +371,23 @@ Block::name (const symbol key) const
   if (frame.is_reference (key))
     return name (expand_reference (key));
 
-  return expand_string (frame.name (key)); 
+  //Handle primitive names.
+  Attribute::type type = lookup (key);
+  if (type != Attribute::Model)
+    return expand_string (frame.name (key)); 
+
+  // Handle stringer objects.
+  daisy_assert (type == Attribute::Model);
+  daisy_assert (frame.component (key) == Stringer::component);
+  daisy_assert (frame.check (*this));
+  std::auto_ptr<Stringer> stringer (Librarian::build_frame<Stringer> 
+                                (*this, frame.model (key), key));
+  daisy_assert (stringer.get ());
+  daisy_assert (stringer->initialize (units (), *this, msg ()));
+  daisy_assert (stringer->check (units (), *this, msg ()));
+  stringer->tick (units (), *this, msg ());
+  daisy_assert (!stringer->missing (*this));
+  return symbol (stringer->value (*this));
 }
 
 symbol
@@ -362,7 +407,23 @@ Block::flag (const symbol key) const
   if (frame.is_reference (key))
     return flag (expand_reference (key));
 
-  return frame.flag (key); 
+  //Handle primitive flags.
+  Attribute::type type = lookup (key);
+  if (type != Attribute::Model)
+    return frame.flag (key); 
+
+  // Handle boolean objects.
+  daisy_assert (type == Attribute::Model);
+  daisy_assert (frame.component (key) == Boolean::component);
+  daisy_assert (frame.check (*this));
+  std::auto_ptr<Boolean> boolean (Librarian::build_frame<Boolean> 
+                                (*this, frame.model (key), key));
+  daisy_assert (boolean.get ());
+  daisy_assert (boolean->initialize (units (), *this, msg ()));
+  daisy_assert (boolean->check (units (), *this, msg ()));
+  boolean->tick (units (), *this, msg ());
+  daisy_assert (!boolean->missing (*this));
+  return boolean->value (*this);
 }
 
 bool 

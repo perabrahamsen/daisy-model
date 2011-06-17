@@ -47,9 +47,10 @@ public:
 public:
   virtual void entries (std::set<symbol>&) const = 0;
   virtual Attribute::type lookup (symbol) const = 0;
+  virtual bool can_extract_as (symbol, Attribute::type) const;
   virtual symbol dimension (symbol) const = 0;
   virtual symbol description (symbol) const = 0;
-  virtual int type_size (symbol tag) const;
+  virtual int type_size (symbol) const;
 
   // Value.
 public:

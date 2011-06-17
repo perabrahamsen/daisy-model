@@ -81,8 +81,9 @@ public:
 
   // Syntax emulation.
 public:
-  virtual Attribute::type lookup (symbol) const;
-  virtual void entries (std::set<symbol>&) const;
+  void entries (std::set<symbol>&) const;
+  Attribute::type lookup (symbol) const;
+  bool can_extract_as (symbol, Attribute::type) const;
   int type_size (symbol tag) const;
   symbol dimension (symbol) const;
   symbol description (symbol) const;

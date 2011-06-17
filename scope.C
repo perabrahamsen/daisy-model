@@ -29,6 +29,10 @@ symbol
 Scope::title () const
 { return Attribute::Unknown (); }
 
+bool
+Scope::can_extract_as (const symbol tag, Attribute::type type) const
+{ return lookup (tag) == type; }
+
 int 
 Scope::type_size (const symbol tag) const
 { return Attribute::Singleton; }

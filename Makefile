@@ -614,7 +614,7 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = log_table.C log_regress.C weather_file.C gnuplot_flux.C 
+REMOVE = none
 
 REMOVED = ABAeffect_exp.C ABAeffect.C ABAeffect.h \
 	stomatacon_Leuning.C stomatacon_BB.C \
