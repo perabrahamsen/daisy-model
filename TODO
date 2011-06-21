@@ -4,6 +4,8 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** Summary for calculating R2
 
+*** Summary::tick in order to match the right measure.
+
 *** Build "fetch" like destination
 
 ** Some way for summaries to write to a scope that can be checked later?
