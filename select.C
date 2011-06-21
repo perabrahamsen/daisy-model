@@ -553,10 +553,6 @@ void
 Select::output_array (const std::vector<double>&)
 { throw ("This log selection can't log arrays."); }
 
-bool
-Select::prevent_printing ()
-{ return false; }
-
 void 
 Select::document (Format& format) const
 {
@@ -688,7 +684,8 @@ Select::Select (const BlockModel& al)
                             && al.flag ("flux")))
                       ? Handle::sum : Handle::current)),
     multi (al.name ("multi")),
-    interesting_content (al.flag ("interesting_content")),
+    interesting_content (al.flag ("interesting_content", 
+                                  handle == Handle::current)),
     first_result (true),
     first_small (true),
     dt (0.0),
@@ -833,10 +830,10 @@ the matches are from different columns.");
     static VCheck::Enum multi_check ("min", "max", "sum");
     frame.set_check ("multi", multi_check);
     frame.set ("multi", "sum");
-    frame.declare_boolean ("interesting_content", Attribute::Const, "\
+    frame.declare_boolean ("interesting_content", Attribute::OptionalConst, "\
 True if the content of this column is interesting enough to warrent an\n\
-initial line in the log file.  This only affects non-flux variables.");
-    frame.set ("interesting_content", true);
+initial line in the log file.\n\
+By default, this is true iff 'handle' is 'current'.");
     frame.declare_object ("expr", Number::component, 
                           Attribute::OptionalConst, Attribute::Singleton, "\
 Expression for findig the value for the log file, given the internal\n\

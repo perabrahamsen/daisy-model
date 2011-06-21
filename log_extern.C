@@ -52,11 +52,6 @@ LogExtern::done (const std::vector<Time::component_t>& time_columns,
     }
 }
 
-bool 
-LogExtern::initial_match (const Daisy&, const Time& previous, Treelog&)
-  // No initial line.
-{ return false; }
-
 void 
 LogExtern::output (Log& log) const
 {
@@ -271,8 +266,10 @@ LogExtern::name (symbol tag) const
 }
 
 void 
-LogExtern::initialize (const symbol, Treelog&)
+LogExtern::initialize (const symbol log_dir, Treelog& msg)
 {
+  TREELOG_MODEL (msg);
+  LogSelect::initialize (log_dir, msg);
   for (size_t i = 0; i < LogSelect::entries.size (); i++)
     {
       const symbol tag = LogSelect::entries[i]->tag ();
@@ -357,6 +354,10 @@ Inititial numeric values.  By default, none.",
     frame.declare_string ("where", Attribute::OptionalConst,
                 "Name of the extern log to use.\n\
 By default, use the model name.");
+    // Disable initial line as it might put "missing" values in
+    // initialized flux variables.  TODO: Make 'numbers' be default
+    // values, rather than initial values.
+    frame.set ("print_initial", false);
   }
 } LogExtern_syntax;
 

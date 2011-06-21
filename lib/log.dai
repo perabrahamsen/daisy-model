@@ -35,8 +35,7 @@
   "Information about the water, carbon and nitrogen content of the soil."
   (where "${colfid}soil_content.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (interval (path column "${column}" SoilWater Theta)
+  (entries (interval (path column "${column}" SoilWater Theta)
                      (spec fixed SoilWater Theta)
                      (tag "Water")
                      (dimension "mm"))
@@ -93,8 +92,7 @@
   "Added N from crop residual in all numeric soil layers."
   (where "${colfid}soil_N_res.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" residuals_N_soil)
+  (entries (array (path column "${column}" residuals_N_soil)
                   (handle sum)
                   (factor 1e5)      ;g/cm^2 -> kg/ha
                   (dimension "kg N/ha/cm"))))
@@ -103,8 +101,7 @@
   "Added C from crop residual in all numeric soil layers."
   (where "${colfid}soil_C_res.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" residuals_C_soil)
+  (entries (array (path column "${column}" residuals_C_soil)
                   (handle sum)
                   (factor 1e5)      ;g/cm^2 -> kg/ha
                   (dimension "kg C/ha/cm"))))
@@ -112,32 +109,29 @@
 (deflog "NO3 Root Uptake" column
   (where "${colfid}no3_uptake.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-   (array (path column "${column}" Chemistry "*" trace NO3 S_root)
-	  (spec chemical default S_root)
-          (tag "NO3-Root")
-	  (negate true)
-          (handle sum)
-          (dimension "kg N/ha/cm"))))
+  (entries (array (path column "${column}" Chemistry "*" trace NO3 S_root)
+                  (spec chemical default S_root)
+                  (tag "NO3-Root")
+                  (negate true)
+                  (handle sum)
+                  (dimension "kg N/ha/cm"))))
 
 (deflog "NH4 Root Uptake" column
   (where "${colfid}nh4_uptake.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-   (array (path column "${column}" Chemistry "*" trace NH4 S_root)
-	  (spec chemical default S_root)
-          (tag "NH4-Root")
-	  (negate true)
-          (handle sum)
-          (dimension "kg N/ha/cm"))))
+  (entries (array (path column "${column}" Chemistry "*" trace NH4 S_root)
+                  (spec chemical default S_root)
+                  (tag "NH4-Root")
+                  (negate true)
+                  (handle sum)
+                  (dimension "kg N/ha/cm"))))
 
 (deflog "Soil NO3 Concentration" column
   "Amount of nitrate in all numeric soil layers.
 This include both the nitrogen and oxygen atoms of the nitrate."
   (where "${colfid}soil_NO3.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*" trace NO3 C)
+  (entries (array (path column "${column}" Chemistry "*" trace NO3 C)
                   (dimension "mg/l")
                   (factor 4.43e6))))     ;g NO3-N/cm³ -> mg NO3/l
 
@@ -147,8 +141,7 @@ This include both the nitrogen and oxygen atoms of the nitrate."
 This include only nitrogen atoms of the nitrate."
   (where "${colfid}soil_NO3-N.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*" trace NO3 C)
+  (entries (array (path column "${column}" Chemistry "*" trace NO3 C)
                   (spec chemical default C)
                   (dimension "mg/l"))))
 
@@ -157,8 +150,7 @@ This include only nitrogen atoms of the nitrate."
 This include only nitrogen atoms of the ammonium."
   (where "${colfid}soil_NH4-N_conc.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*" trace NH4 C)
+  (entries (array (path column "${column}" Chemistry "*" trace NH4 C)
                   (spec chemical default C)
                   (dimension "mg/l"))))
 
@@ -167,16 +159,14 @@ This include only nitrogen atoms of the ammonium."
 This include only nitrogen atoms of the ammonium."
   (where "${colfid}soil_NH4-N_content.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*" trace NH4 M)
+  (entries (array (path column "${column}" Chemistry "*" trace NH4 M)
                   (spec chemical default M))))
 
 (deflog "Soil Temperature" column
   "Temperature in all numeric soil layers."
   (where "${colfid}soil_temperature.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilHeat T)
+  (entries (array (path column "${column}" SoilHeat T)
                   (spec fixed SoilHeat T)
                   (dimension "dg C"))))
 
@@ -184,8 +174,7 @@ This include only nitrogen atoms of the ammonium."
   "Water potential in all numeric soil layers, in cm."
   (where "${colfid}soil_water_potential.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilWater h)
+  (entries (array (path column "${column}" SoilWater h)
                   (spec fixed SoilWater h)
                   (dimension "cm"))))
 
@@ -193,8 +182,7 @@ This include only nitrogen atoms of the ammonium."
   "Water potential in all numeric soil layers, in pF."
   (where "${colfid}soil_water_pF.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilWater h)
+  (entries (array (path column "${column}" SoilWater h)
                   (handle current)
                   (expr (min -1 [cm] x))
                   (dimension [pF])
@@ -206,8 +194,7 @@ The water sink is an aggregate of root uptake, preferential flow,
 flow to drain pipes, and subsoil irrigation."
   (where "${colfid}soil_water_sink.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilWater S_sum)
+  (entries (array (path column "${column}" SoilWater S_sum)
                   (spec fixed SoilWater S_sum)
                   (handle sum))))
 
@@ -237,8 +224,7 @@ flow to drain pipes, and subsoil irrigation."
   "The preferential water flux between all numeric soil layers."
   (where "${colfid}pref_water_flux.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilWater q_p)
+  (entries (array (path column "${column}" SoilWater q_p)
                   (spec fixed SoilWater q_p)
                   (handle sum)
                   (dimension "mm"))))
@@ -247,8 +233,7 @@ flow to drain pipes, and subsoil irrigation."
   "The matrix water flux between all numeric soil layers."
   (where "${colfid}matrix_water_flux.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilWater q)
+  (entries (array (path column "${column}" SoilWater q)
                   (spec fixed SoilWater q)
                   (handle sum)
                   (dimension "mm"))))
@@ -257,8 +242,7 @@ flow to drain pipes, and subsoil irrigation."
   "The preferential chemical transport between all numeric soil layers."
   (where "${colfid}J_p_${chemfid}.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*" trace
+  (entries (array (path column "${column}" Chemistry "*" trace
                         "${chemical}" J_tertiary)
                   (spec chemical default J_tertiary)
                   (handle sum))))
@@ -267,8 +251,7 @@ flow to drain pipes, and subsoil irrigation."
   "The matrix chemical transport between all numeric soil layers."
   (where "${colfid}J_${chemfid}.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*" trace
+  (entries (array (path column "${column}" Chemistry "*" trace
                         "${chemical}" J_matrix)
                   (spec chemical default J_matrix)
                   (handle sum))))
@@ -277,8 +260,7 @@ flow to drain pipes, and subsoil irrigation."
   "The preferential nitrogen transport between all numeric soil layers."
   (where "${colfid}pref_NO3.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*" trace NO3 J_tertiary)
+  (entries (array (path column "${column}" Chemistry "*" trace NO3 J_tertiary)
                   (spec chemical default J_tertiary)
                   (tag "NO3-J_tertiary")
                   (handle sum)
@@ -288,8 +270,7 @@ flow to drain pipes, and subsoil irrigation."
   "The preferential ammonium transport between all numeric soil layers."
   (where "${colfid}pref_NH4.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*" trace NH4 J_tertiary)
+  (entries (array (path column "${column}" Chemistry "*" trace NH4 J_tertiary)
                   (spec chemical default J_tertiary)
                   (tag "NH4-J_tertiary")
                   (handle sum)
@@ -326,8 +307,7 @@ flow to drain pipes, and subsoil irrigation."
   (summary "Evapotranspiration")
   (where "${colfid}surface_water_balance.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (number (path weather "*" rain)
+  (entries (number (path weather "*" rain)
                    (handle sum)
                    (dimension "mm"))
            (number (path weather "*" snow)
@@ -426,8 +406,7 @@ flow to drain pipes, and subsoil irrigation."
   "All information about the Ridge subsystem."
   (where "${colfid}ridge.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (number (path column "${column}" Surface ridge Theta_pre)
+  (entries (number (path column "${column}" Surface ridge Theta_pre)
                    (dimension "cm^3/cm^3"))
            (number (path column "${column}" Surface ridge Theta)
                    (dimension "cm^3/cm^3"))
@@ -497,8 +476,7 @@ Note that negative deltas means the amount of water increases."
   (where "${colfid}root_zone_water_balance.dlf")
   (when hourly)
   (summary "Total Water Balance")
-  (entries ;; Year Month MDay Hour
-           (number (path weather "*" rain)
+  (entries (number (path weather "*" rain)
                    (handle sum)
                    (dimension "mm"))
            (number (path weather "*" snow)
@@ -779,8 +757,7 @@ soil increases."
   (summary "NH4 Soil Balance" "NO3 Soil Balance" "Organic Nitrogen Balance"
            "Crop Nitrogen Balance" "Nitrogen Balance")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (number (path column "${column}" Chemistry "*" trace NH4 spray)
+  (entries (number (path column "${column}" Chemistry "*" trace NH4 spray)
 		   (spec chemical default spray)
                    (handle sum)
                    (tag "NH4-Fertilizer-Surface")
@@ -1156,8 +1133,7 @@ soil increases."
   "All available information about the soil heat subsystem."
   (where "${colfid}soil_heat_balance.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (number (path weather "*" air_temperature)
+  (entries (number (path weather "*" air_temperature)
                    (tag "T_air")
                    (dimension "dg C"))
            (number (path column "${column}" SoilHeat T_top)
@@ -1308,8 +1284,7 @@ soil increases."
   "All available information about the snow subsystem."
   (where "${colfid}snow.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (number (path column "${column}" Bioclimate "*" Snow EvapSnowPack)
+  (entries (number (path column "${column}" Bioclimate "*" Snow EvapSnowPack)
                    (tag "Evaporation from snowpack")
                    (dimension "mm/h"))
            (number (path column "${column}" Bioclimate "*" Snow q_s)
@@ -1343,8 +1318,7 @@ sum of all chemicals will be logged."
                     (content snow_storage canopy_storage litter_storage
                              surface_solute surface_immobile)))
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+  (entries (number (path column "${column}" Chemistry "*" trace "${chemical}"
                          spray)
                    (handle sum)
                    (dimension "g/ha")
@@ -1483,8 +1457,7 @@ sum of all chemicals will be logged."
                             "Uptake")
                     (content "Content")))
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (flux_top (path column "${column}" Chemistry "*" 
+  (entries (flux_top (path column "${column}" Chemistry "*" 
                            trace "${chemical}" J_matrix)
                      (tag "In")
                      (handle sum)
@@ -1551,8 +1524,7 @@ sum of all chemicals will be logged."
   (unit "ug/m^3")
   (where "${colfid}content_${chemfid}.dlf")
   (when hourly)
-  (entries Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*"
+  (entries (array (path column "${column}" Chemistry "*"
                         trace "${chemical}" M)
                   (handle current)
                   (dimension "${unit}")
@@ -1564,8 +1536,7 @@ sum of all chemicals will be logged."
   (unit "ng/l")
   (where "${colfid}conc_${chemfid}.dlf")
   (when hourly)
-  (entries Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*" trace "${chemical}" C)
+  (entries (array (path column "${column}" Chemistry "*" trace "${chemical}" C)
                   (handle current)
                   (dimension "${unit}")
                   (spec chemical default C))))
@@ -1573,8 +1544,7 @@ sum of all chemicals will be logged."
 (deflog "Chemical Content Secondary" "Chemical Content"
   "Amount of chemicals in each numeric soil layer."
   (where "${colfid}content_${chemfid}.dlf")
-  (entries Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*"
+  (entries (array (path column "${column}" Chemistry "*"
                         trace "${chemical}" M_secondary)
                   (handle current)
                   (dimension "${unit}")
@@ -1583,8 +1553,7 @@ sum of all chemicals will be logged."
 (deflog "Chemical Concentration Secondary" "Chemical Concentration"
   "Concentration in water of chemicals in each numeric soil layer.  "
   (where "${colfid}conc_${chemfid}.dlf")
-  (entries  Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*" trace "${chemical}" C_secondary)
+  (entries (array (path column "${column}" Chemistry "*" trace "${chemical}" C_secondary)
                   (handle current)
                   (dimension "${unit}")
                   (spec chemical default C_secondary))))
@@ -1599,8 +1568,7 @@ sum of all chemicals will be logged."
 (deflog "Chemistry" reaction
   (where "${colfid}chemistry.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*" combine "*"
+  (entries (array (path column "${column}" Chemistry "*" combine "*"
                         reaction "${reaction}" S_AB)
                   (handle sum)
                   (spec reaction default S_AB))))
@@ -1608,8 +1576,7 @@ sum of all chemicals will be logged."
 (deflog "Weather" column
   (where "${colfid}weather.dlf")
   (when daily)
-  (entries ;; Year Month MDay
-           (number (handle sum)
+  (entries (number (handle sum)
                    (path weather "*" precipitation)
                    (dimension "mm"))
            (number (handle sum)
@@ -1663,8 +1630,7 @@ sum of all chemicals will be logged."
 (deflog "Crop Photosynthesis" crop
   (where "${colfid}crop_phot.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (number (path column "${column}" Vegetation crops crops "${crop}"
+  (entries (number (path column "${column}" Vegetation crops crops "${crop}"
                          Prod NetPhotosynthesis)
 		   (spec fixed Production NetPhotosynthesis)
                    (dimension "g CO2/m^2")
@@ -1699,8 +1665,7 @@ sum of all chemicals will be logged."
 (deflog "Crop Production" crop
   (where "${colfid}crop_prod.dlf")
   (when (hour 12))                      ;When the stress is highest.
-  (entries ;; Year Month MDay
-           (number (path column "${column}" Vegetation crops crops "${crop}"
+  (entries (number (path column "${column}" Vegetation crops crops "${crop}"
                          Devel "*" DS)
                    (dimension "none")
                    (factor 1.0))        ;Development stage [-1:2]
@@ -1842,8 +1807,7 @@ sum of all chemicals will be logged."
 (deflog "Forced LAI" crop
   (where "${colfid}forced_lai.dlf")
   (when (hour 12))                      ;When the stress is highest.
-  (entries ;; Year Month MDay
-           (number (path column "${column}" Vegetation crops crops "${crop}"
+  (entries (number (path column "${column}" Vegetation crops crops "${crop}"
                          Devel "*" DS)
                    (dimension "none")
                    (factor 1.0))        ;Development stage [-1:2]
@@ -1873,8 +1837,7 @@ sum of all chemicals will be logged."
 (deflog "Simple Crop Production" crop
   (where "${colfid}simple_crop_prod.dlf")
   (when (hour 12))
-  (entries ;; Year Month MDay
-           (number (path column "${column}"
+  (entries (number (path column "${column}"
 			 Vegetation crops crops "${crop}" T_sum)
                    (dimension "dg C d")
                    (factor 1.0))        ;Temperature sum
@@ -1905,8 +1868,7 @@ sum of all chemicals will be logged."
 (deflog "Old Crop Production" column
   (where "${colfid}old_crop_prod.dlf")
   (when daily)
-  (entries ;; Year Month MDay
-           (number (path column "${column}"
+  (entries (number (path column "${column}"
 			 Vegetation crops crops "*" Phenology DS)
                    (dimension "none")
                    (factor 1.0))        ;Development stage [-1:2]
@@ -1949,8 +1911,7 @@ sum of all chemicals will be logged."
 (deflog "Vegetation" column
   (where "${colfid}vegetation.dlf")
   (when daily)
-  (entries ;; Year Month MDay
-           (number (path column "${column}" Vegetation crops LAI)
+  (entries (number (path column "${column}" Vegetation crops LAI)
                    (dimension "m2/m2"))
            (number (path column "${column}" Vegetation crops height)
                    (dimension "cm"))
@@ -1973,8 +1934,7 @@ sum of all chemicals will be logged."
 (deflog "Permanent Vegetation" column
   (where "${colfid}vegetation.dlf")
   (when daily)
-  (entries ;; Year Month MDay
-           (number (path column "${column}" Vegetation "*" LAI)
+  (entries (number (path column "${column}" Vegetation "*" LAI)
                    (dimension "m2/m2"))
            (number (path column "${column}" Vegetation "*" N_demand)
                    (dimension "kg N/ha")
@@ -1994,16 +1954,14 @@ sum of all chemicals will be logged."
 (deflog "Root Density" crop
   (where "${colfid}rootdens.dlf")
   (when daily)
-  (entries ;; Year Month MDay
-           (array (path column "${column}" Vegetation crops crops "${crop}" 
+  (entries (array (path column "${column}" Vegetation crops crops "${crop}" 
                         Root Density)
                   (dimension "cm/cm^3"))))
 
 (deflog "Root form parameter" crop
   (where "${colfid}rootform.dlf")
   (when daily)
-  (entries ;; Year Month MDay
-           (number (path column "${column}" Vegetation crops crops "${crop}" 
+  (entries (number (path column "${column}" Vegetation crops crops "${crop}" 
                          Prod WRoot)
                    (spec fixed Production WRoot))
            (number (path column "${column}" Vegetation crops crops "${crop}" 
@@ -2041,8 +1999,7 @@ sum of all chemicals will be logged."
 (deflog "Bioclimate" column
   (where "${colfid}bioclimate.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (number (path weather "*" daily_air_temperature)
+  (entries (number (path weather "*" daily_air_temperature)
                    (dimension "dg C"))
            (number (path weather "*" air_temperature)
                    (dimension "dg C"))
@@ -2181,8 +2138,7 @@ sum of all chemicals will be logged."
   (when hourly)
   (print_dimension false)
   (print_tags false)
-  (entries ;; Year Month MDay Hour
-           (number (path column "${column}" Bioclimate "*" svat PMSW netrad_brunt)
+  (entries (number (path column "${column}" Bioclimate "*" svat PMSW netrad_brunt)
                    (dimension "W/m**2"))
            (number (path column "${column}" Bioclimate "*" svat PMSW r_a)
                    (dimension "s/m"))
@@ -2303,8 +2259,7 @@ sum of all chemicals will be logged."
   (E_unit "mm/h")
   (where "${colfid}svat_SSOC.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (number (tag T_air)
+  (entries (number (tag T_air)
                    (path weather weather air_temperature)
                    (spec weather weather air_temperature)
                    (dimension "${T_unit}")
@@ -2481,8 +2436,7 @@ sum of all chemicals will be logged."
 (deflog "Groundwater" column
   (where "${colfid}groundwater.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (number (path column "${column}" Groundwater "*" height)
+  (entries (number (path column "${column}" Groundwater "*" height)
                    (tag "table")
                    (dimension "cm"))
            (number (path column "${column}" Groundwater "*" h_aquifer)
@@ -2524,8 +2478,7 @@ sum of all chemicals will be logged."
 (deflog Bioincorporation column
   (where "${colfid}bioincorporation.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (interval (path column "${column}" OrganicMatter "*" am 
+  (entries (interval (path column "${column}" OrganicMatter "*" am 
                            "bio/incorporation" om "*" N)
                      (tag "SOIL_N")
                      (dimension "kg N/ha")
@@ -2590,8 +2543,7 @@ Use \"*\" to log all added organic matter matter.")
   "Log content of specific added organic matter, such as fertilizer."
   (where "${colfid}aom.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "*" N)
+  (entries (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "*" N)
                      (tag "SOIL_N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
@@ -2612,8 +2564,7 @@ Use \"*\" to log all added organic matter matter.")
   "Log content of all pools in specific added organic matter."
   (where "${colfid}aom-pools.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "0" N)
+  (entries (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "0" N)
                      (tag "SOIL1-N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
@@ -2667,8 +2618,7 @@ Use \"*\" to log all added organic matter matter.")
   "Information about all organic matter pools."
   (where "${colfid}organic-matter.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (interval (path column "${column}" OrganicMatter "*" som "0" N)
+  (entries (interval (path column "${column}" OrganicMatter "*" som "0" N)
                      (tag "SOM1-N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
@@ -2746,8 +2696,7 @@ Use \"*\" to log all added organic matter matter.")
   "Information about Disolved Organic Matter pools."
   (where "${colfid}dom.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (interval (path column "${column}" OrganicMatter "*" dom "0" N M)
+  (entries (interval (path column "${column}" OrganicMatter "*" dom "0" N M)
                      (tag "D1-N")
                      (spec fixed DOM-Element M)
                      (dimension "kg N/ha"))
@@ -2928,8 +2877,7 @@ Use \"*\" to log all added organic matter matter.")
   (where "${colfid}dom-pool.dlf")
   (summary "DOM Pool N Balance" "DOM Pool C Balance")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (interval (path column "${column}" 
+  (entries (interval (path column "${column}" 
 			   OrganicMatter "*" dom "${pool}" N M)
                      (tag "N")
                      (spec fixed DOM-Element M)
@@ -3047,8 +2995,7 @@ Use \"*\" to log all added organic matter matter.")
   "Information about nitrogen in disolved organic matter pools."
   (where "${colfid}dom-N.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" OrganicMatter "*" dom "${pool}" N M)
+  (entries (array (path column "${column}" OrganicMatter "*" dom "${pool}" N M)
                   (tag "N")
                   (spec fixed DOM-Element M))))
 
@@ -3056,32 +3003,28 @@ Use \"*\" to log all added organic matter matter.")
   "Information about carbon in disolved organic matter pools."
   (where "${colfid}dom-C.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" OrganicMatter "*" dom "${pool}" C M)
+  (entries (array (path column "${column}" OrganicMatter "*" dom "${pool}" C M)
                   (tag "C")
                   (spec fixed DOM-Element M))))
 
 (deflog "Drain Sink" column
   (where "${colfid}drain_sink.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" Groundwater pipe S)
+  (entries (array (path column "${column}" Groundwater pipe S)
                   (handle sum)
                   (dimension "cm^3/cm^3"))))
 
 (deflog "Drain Sink Water" column
   (where "${colfid}drain_sink_water.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilWater S_drain)
+  (entries (array (path column "${column}" SoilWater S_drain)
                   (handle sum)
                   (dimension "g/cm^3"))))
 
 (deflog "Drain Sink NO3" column
   (where "${colfid}drain_sink_NO3.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*" trace NO3 S_drain)
+  (entries (array (path column "${column}" Chemistry "*" trace NO3 S_drain)
 		  (spec chemical default S_drain)
                   (handle sum)
 		  (negate true)
@@ -3090,8 +3033,7 @@ Use \"*\" to log all added organic matter matter.")
 (deflog "Drain Sink NH4" column
   (where "${colfid}drain_sink_NH4.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*" trace NH4 S_drain)
+  (entries (array (path column "${column}" Chemistry "*" trace NH4 S_drain)
 		     (spec chemical default S_drain)
                   (handle sum)
 		  (negate true)
@@ -3100,8 +3042,7 @@ Use \"*\" to log all added organic matter matter.")
 (deflog "Soil Water Content" column
   (where "${colfid}soil_water_content.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilWater Theta)
+  (entries (array (path column "${column}" SoilWater Theta)
                   (handle current)
                   (spec fixed SoilWater Theta))))
 
@@ -3109,8 +3050,7 @@ Use \"*\" to log all added organic matter matter.")
   "Track applied fertilizer."
   (where "${colfid}fertilizer_monthly.dlf")
   (when monthly)
-  (entries ;; Year Month
-           (number (path column "${column}" Chemistry "*" trace NO3 spray)
+  (entries (number (path column "${column}" Chemistry "*" trace NO3 spray)
 		   (spec chemical default spray)
                    (handle sum)
                    (tag "Surface-NO3")
@@ -3263,8 +3203,7 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
   (when hourly)
   (summary "Total Carbon Balance" "Crop Carbon Balance" 
            "Litter Carbon Balance" "Soil Carbon Balance" "C Input")
-  (entries ;; Year Month MDay Hour
-           (interval (path column "${column}" OrganicMatter "*" total_C)
+  (entries (interval (path column "${column}" OrganicMatter "*" total_C)
                      (tag "Soil_C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
@@ -3776,8 +3715,7 @@ parameter in the 'default' bioclimate model.  By default, 30."))
   (where "time.dlf")
   (summary (simple (fetch (Used) (SoilWater))))
   (when true)
-  (entries ;; Year Month MDay Hour
-           (number (path dt)
+  (entries (number (path dt)
                    (tag "Used")
                    (handle average)
                    (spec program Daisy dt))

@@ -1,3 +1,16 @@
+2011-06-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* log_table.C: Renamed from log_dlf.C.
+	* Makefile (SPECIALS): Removed log_dlf.C.
+	(MODELS): Added log_table.C
+
+2011-06-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log.dai: Removed all time entries.
+
+	* log_select.h, log_select.C, log_dlf.C, log_extern.C:
+	* select.h, select.C, select_array.C: Cleanup.
+
 2011-06-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* log_dlf.C: Cleanup.

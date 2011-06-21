@@ -398,7 +398,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = xysource_profile.C program_rootmatch.C program_hmovie.C \
+MODELS = log_table.C xysource_profile.C program_rootmatch.C program_hmovie.C \
 	wsource_std.C wsource_time.C wsource_combine.C wsource_indirect.C\
 	wsource_table.C wsource_const.C \
 	groundwater_source.C xysource_xycombine.C xysource_flux.C \
@@ -514,7 +514,7 @@ SUBMODELS = irrigate.C \
 # Special or intermediate models with their own interface.
 # 
 SPECIALS = wsource_weather.C \
-	wsource_base.C log_dlf.C reaction_colgen.C \
+	wsource_base.C reaction_colgen.C \
 	volume_box.C movement_solute.C scope_exchange.C photo_Farquhar.C \
 	scope_multi.C scope_id.C geometry_vert.C gnuplot_base.C \
 	source_file.C format_LaTeX.C log_all.C om.C select_value.C \
@@ -1400,12 +1400,6 @@ wsource_base${OBJ}: wsource_base.C wsource_base.h wsource_weather.h wsource.h \
  scope.h attribute.h time.h assertion.h mathlib.h librarian.h \
  frame_submodel.h frame.h block_model.h block_nested.h block.h treelog.h \
  frame_model.h submodeler.h block_submodel.h
-log_dlf${OBJ}: log_dlf.C log_select.h log.h time.h symbol.h border.h \
- model_framed.h model_logable.h model.h memutils.h dlf.h summary.h \
- select.h destination.h units.h volume.h model_derived.h attribute.h \
- geometry.h assertion.h daisy.h program.h run.h block_model.h \
- block_nested.h block.h scope.h treelog.h frame_model.h frame.h filepos.h \
- librarian.h metalib.h library.h
 reaction_colgen${OBJ}: reaction_colgen.C reaction_colgen.h reaction.h \
  model_framed.h model_logable.h model.h symbol.h ponddamp.h librarian.h \
  frame.h scope.h attribute.h log.h time.h border.h chemistry.h treelog.h \
@@ -1472,7 +1466,7 @@ log_select${OBJ}: log_select.C log_select.h log.h time.h symbol.h border.h \
  units.h volume.h model_derived.h attribute.h condition.h metalib.h \
  frame.h scope.h library.h block_top.h block.h block_model.h \
  block_nested.h treelog.h frame_model.h field.h irrigate.h format.h \
- assertion.h librarian.h daisy.h program.h run.h
+ assertion.h librarian.h daisy.h program.h run.h summary.h
 parser_file${OBJ}: parser_file.C parser_file.h parser.h model.h symbol.h \
  metalib.h frame.h scope.h attribute.h library.h block_model.h \
  block_nested.h block.h treelog.h frame_model.h block_top.h lexer.h \
@@ -1650,6 +1644,11 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+log_table${OBJ}: log_table.C log_select.h log.h time.h symbol.h border.h \
+ model_framed.h model_logable.h model.h memutils.h dlf.h select.h \
+ destination.h units.h volume.h model_derived.h attribute.h geometry.h \
+ assertion.h daisy.h program.h run.h block_model.h block_nested.h block.h \
+ scope.h treelog.h frame_model.h frame.h filepos.h librarian.h library.h
 xysource_profile${OBJ}: xysource_profile.C xysource.h model.h symbol.h \
  gnuplot_utils.h lexer_soil.h lexer_table.h block_model.h block_nested.h \
  block.h scope.h attribute.h treelog.h frame_model.h frame.h check.h \

@@ -32,6 +32,7 @@ struct Select;
 struct Condition;
 struct Format;
 struct Volume;
+struct Summary;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -47,9 +48,17 @@ struct EXPORT LogSelect : public Log
 {
   // Parameters.
   const symbol description;	// Description of log file.
+  const symbol file;       // Filename.
+  const std::vector<std::pair<symbol, symbol>/**/> parameters;      // Par vals.
   std::auto_ptr<Condition> condition;	// Should we print a log now?
   auto_vector<Select*> entries;
   std::auto_ptr<const Volume> volume;
+  const bool print_initial;     // Set if initial values should be printed.
+
+  // Summary.
+  Time begin;                   // First log entry.
+  Time end;                     // Last log entry.
+  const auto_vector<Summary*> summary;
 
   // State. 
   bool is_printing;		// True iff this time step should be logged.
@@ -119,10 +128,15 @@ struct EXPORT LogSelect : public Log
   void output_entry (symbol name, const PLF&);
 
   // Create and Destroy.
+  void initialize (const symbol log_dir, Treelog&);
   bool check (const Border&, Treelog& err) const;
   static void document_entries (Format&, const Metalib&, Treelog&, symbol);
+  static std::vector<std::pair<symbol, symbol>/**/>
+  /**/ build_parameters (const Block& al);
+  static bool default_print_initial (const std::vector<Select*>& entries);
   LogSelect (const BlockModel& al);
   LogSelect (const char* id);
+  void summarize (Treelog&);
   ~LogSelect ();
 };
 

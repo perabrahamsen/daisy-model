@@ -38,6 +38,7 @@
 #include "treelog.h"
 #include "frame_model.h"
 #include "daisy.h"
+#include "summary.h"
 #include <sstream>
 
 bool 
@@ -71,26 +72,35 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
 
 void
 LogSelect::done (const std::vector<Time::component_t>& time_columns,
-		 const Time&, const double dt, Treelog&)
+		 const Time& time, const double dt, Treelog&)
 { 
   for (std::vector<Select*>::const_iterator i = entries.begin (); 
        i < entries.end (); 
        i++)
     (*i)->done_small (dt);
+  end = time;
 }
 
 bool
 LogSelect::initial_match (const Daisy& daisy, const Time& previous, Treelog&)
 {
+  for (unsigned int i = 0; i < summary.size (); i++)
+    summary[i]->clear ();
+
+  begin = daisy.time ();
+
   condition->initiate_log (daisy, previous);
 
-  is_active = false;
-
-  for (std::vector<Select*>::const_iterator i = entries.begin (); 
-       i < entries.end (); 
-       i++)
-    if ((*i)->initial_match ())
-      is_active = true;
+  if (print_initial)
+    {
+      for (std::vector<Select*>::const_iterator i = entries.begin (); 
+           i < entries.end (); 
+           i++)
+        if ((*i)->match (true))
+          is_active = true;
+    }
+  else
+    is_active = false;
 
   is_printing = is_active;
 
@@ -99,12 +109,13 @@ LogSelect::initial_match (const Daisy& daisy, const Time& previous, Treelog&)
 
 void
 LogSelect::initial_done (const std::vector<Time::component_t>& time_columns,
-			 const Time&, Treelog&)
+			 const Time& time, Treelog&)
 {
   for (std::vector<Select*>::const_iterator i = entries.begin (); 
        i < entries.end (); 
        i++)
     (*i)->done_small (0.0);
+  begin = time;
 }
 
 void 
@@ -212,6 +223,13 @@ void
 LogSelect::output_entry (symbol, const PLF&)
 { daisy_notreached (); }
 
+void
+LogSelect::initialize (const symbol, Treelog& msg)
+{
+  for (unsigned int i = 0; i < summary.size (); i++)
+    summary[i]->initialize (entries, msg);
+}
+
 bool 
 LogSelect::check (const Border& border, Treelog& err) const
 {
@@ -233,12 +251,47 @@ LogSelect::check (const Border& border, Treelog& err) const
   return ok; 
 }
 
+std::vector<std::pair<symbol, symbol>/**/>
+LogSelect::build_parameters (const Block& al)
+{
+  daisy_assert (al.check ("parameter_names"));
+  const std::vector<symbol> pars = al.name_sequence ("parameter_names");
+  std::vector<std::pair<symbol, symbol>/**/> result;
+  for (size_t i = 0; i < pars.size (); i++)
+    {
+      const symbol key = pars[i];
+      if (al.can_extract_as (key, Attribute::String))
+        result.push_back (std::pair<symbol, symbol> (key, al.name (key)));
+      else
+        al.msg ().warning ("Parameter name '" + key + "' not found"); 
+    }
+  return result;
+}
+
+bool
+LogSelect::default_print_initial (const std::vector<Select*>& entries)
+{
+  // Any in favour?
+  for (unsigned int i = 0; i < entries.size (); i++)
+    if (entries[i]->print_initial ())
+      return true;
+
+  // Noone cares.
+  return false;
+}
+
 LogSelect::LogSelect (const BlockModel& al)
   : Log (al),
     description (al.name ("description", "")),
+    file (al.name ("where")),
+    parameters (build_parameters (al)),
     condition (Librarian::build_item<Condition> (al, "when")),
     entries (Librarian::build_vector<Select> (al, "entries")),
-    volume (Volume::build_obsolete (al))
+    volume (Volume::build_obsolete (al)),
+    print_initial (al.flag ("print_initial", default_print_initial (entries))),
+    begin (1, 1, 1, 1),
+    end (1, 1, 1, 1),
+    summary (Librarian::build_vector<Summary> (al, "summary"))
 {
   if (!al.ok ())
     return;
@@ -250,15 +303,42 @@ LogSelect::LogSelect (const BlockModel& al)
       al.set_error ();
 }
 
+void
+LogSelect::summarize (Treelog& msg)
+{
+  if (summary.size () > 0)
+    {
+      TREELOG_MODEL (msg);
+      std::ostringstream tmp;
+
+      tmp << "LOGFILE: " << file  << "\n";
+      tmp << "VOLUME: " << volume->one_line_description () << "\n";
+      tmp << "TIME: " << begin.print () << " to " << end.print ();
+      for (size_t i = 0; i < parameters.size (); i++)
+        if (parameters[i].second != "*")
+          {
+            std::string id = parameters[i].first.name ();
+            std::transform (id.begin (), id.end (), id.begin (), ::toupper);
+            
+            tmp << "\n" << id << ": " << parameters[i].second;
+          }
+
+      msg.message (tmp.str ());
+      for (size_t i = 0; i < summary.size (); i++)
+        summary[i]->summarize (msg);
+    }
+}
+
 LogSelect::LogSelect (const char *const id)
   : Log (id),
     description ("Build in log select use."),
+    file (id),
     condition (Condition::create_true ()),
     entries (std::vector<Select*> ()),
-    volume (Volume::build_none ())
+    volume (Volume::build_none ()),
+    print_initial (false)
 { }
 
-  
 LogSelect::~LogSelect ()
 { }
 
@@ -369,6 +449,14 @@ OBSOLETE: Use (volume box (top FROM)) instead.");
                    "Default 'to' value for all entries.\n\
 By default, use the bottom of the soil.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
+    frame.declare_boolean ("print_initial", Attribute::OptionalConst, "\
+Print a line with initial values when logging starts.\n\
+By default, an initial line will be printed if any entry has 'handle'\n\
+set to 'current'.");
+    frame.declare_object ("summary", Summary::component,
+                          Attribute::Const, Attribute::Variable,
+                          "Summaries for this log file.");
+    frame.set_empty ("summary");
   }
 } LogSelect_syntax;
 

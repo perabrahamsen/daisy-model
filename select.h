@@ -55,7 +55,7 @@ public:
     handle_t value;
     static handle_t symbol2handle (symbol s);
   public:
-    operator handle_t ()
+    operator handle_t () const
     { return value; }
     Handle (handle_t v)
       : value (v)
@@ -73,7 +73,7 @@ protected:
     handle_t value;
     static handle_t symbol2handle (symbol s);
   public:
-    operator handle_t ()
+    operator handle_t () const
     { return value; }
     Multi (handle_t v)
       : value (v)
@@ -175,15 +175,11 @@ public:
     is_active = (handle != Handle::current) || is_printing;
     return is_active;
   }
-  bool initial_match ()
-  { 
-    is_active = (handle == Handle::current);
-    return is_active;
-  }
   // Print result at end of time step.
   virtual void done_small (double ddt) = 0;
   virtual void done_print () = 0;
-  virtual bool prevent_printing ();
+  bool print_initial () const
+  { return interesting_content; }
 
   // Create and Destroy.
 public:

@@ -2,7 +2,7 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Parameter optimizer
 
-** Summary for calculatng R2?
+** Summary for calculating R2?
 
 ** Some way for summaries to write to a scope that can be checked later?
 

@@ -224,9 +224,6 @@ The 'array' select model only handle bulk density for soil sized variables";
       }
   }
 
-  bool prevent_printing ()
-  { return first_small; }
-
   const Geometry* geometry () const
   { 
     if (last_column)
