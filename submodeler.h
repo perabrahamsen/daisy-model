@@ -68,7 +68,7 @@ submodel_value_block (const Block& nested)
 
 template <class T> 
 T
-submodel_value (const Block& parent, const std::string& key)
+submodel_value (const Block& parent, const symbol key)
 { 
   BlockSubmodel nested (parent, key);
   try
@@ -95,7 +95,7 @@ submodel_block (const BlockSubmodel& nested)
 
 template <class T> 
 T*
-submodel (const Block& parent, const std::string& key)
+submodel (const Block& parent, const symbol key)
 { 
   BlockSubmodel nested (parent, key);
   return submodel_block<T> (nested);
@@ -104,7 +104,7 @@ submodel (const Block& parent, const std::string& key)
 // Sequences
 template <class T> 
 std::vector<T*>
-map_submodel (const Block& parent, const std::string& key)
+map_submodel (const Block& parent, const symbol key)
 { 
   std::vector<T*> t;
   const size_t size = parent.value_size (key);
@@ -118,7 +118,7 @@ map_submodel (const Block& parent, const std::string& key)
 
 template <class T> 
 std::vector<const T*>
-map_submodel_const (const Block& parent, const std::string& key)
+map_submodel_const (const Block& parent, const symbol key)
 { 
   std::vector<const T*> t;
   const size_t size = parent.value_size (key);

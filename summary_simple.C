@@ -38,7 +38,6 @@ struct SummarySimple : public Summary
   static const symbol default_description;
   const symbol description;
   const symbol file;
-  const symbol title;
   const bool print_sum;
   const symbol sum_name;
   const symbol period;
@@ -65,7 +64,7 @@ SummarySimple::clear ()
 void
 SummarySimple::initialize (std::vector<Select*>& select, Treelog& msg)
 { 
-  Treelog::Open nest (msg, name);
+  TREELOG_MODEL (msg);
   FetchPretty::initialize (fetch, select, msg);
 }
 
@@ -73,7 +72,6 @@ SummarySimple::SummarySimple (const BlockModel& al)
   : Summary (al),
     description (al.frame ().description ()),
     file (al.name ("where", "")),
-    title (al.check ("title") ? al.name ("title") : name),
     print_sum (al.flag ("print_sum")),
     sum_name (al.name ("sum_name")),
     period (al.check ("period") ? al.name ("period") : symbol ("")),
@@ -87,7 +85,7 @@ SummarySimple::~SummarySimple ()
 void 
 SummarySimple::summarize (Treelog& msg) const
 {
-  Treelog::Open nest (msg, title);
+  TREELOG_MODEL (msg);
   std::ostringstream tmp;
   tmp.precision (precision);
   tmp.flags (std::ios::right | std::ios::fixed);
@@ -153,9 +151,6 @@ static struct SummarySimpleSyntax : public DeclareModel
     frame.declare_string ("where", Attribute::OptionalConst,
                 "File name to store the summary.\n\
 By default, the summary will be stored in daisy.log and the screen.");
-    frame.declare_string ("title", Attribute::OptionalConst,
-                "Title of this summary.\n\
-By default, use the name of the parameterization.");
     frame.declare_boolean ("print_sum", Attribute::Const, 
                 "Print sum of all the summary lines.");
     frame.set ("print_sum", true);

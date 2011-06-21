@@ -79,6 +79,9 @@ LogSelect::done (const std::vector<Time::component_t>& time_columns,
        i++)
     (*i)->done_small (dt);
   end = time;
+
+  if (is_printing)
+    done_print (time_columns, time);
 }
 
 bool
@@ -116,6 +119,9 @@ LogSelect::initial_done (const std::vector<Time::component_t>& time_columns,
        i++)
     (*i)->done_small (0.0);
   begin = time;
+
+  if (is_printing)
+    done_print (time_columns, time);
 }
 
 void 
@@ -248,6 +254,11 @@ LogSelect::check (const Border& border, Treelog& err) const
       if (!entries[i]->check_border (border, *volume, err))
         { /* ok = false */ }
     }
+
+  for (size_t i = 0; i < summary.size (); i++)
+    if (!summary[i]->check (err))
+      ok = false;
+
   return ok; 
 }
 

@@ -68,9 +68,8 @@ private:
 
   // Log.
   symbol last_done;
-protected:
-  void done (const std::vector<Time::component_t>& time_columns,
-	     const Time&, double dt, Treelog&);
+  void done_print  (const std::vector<Time::component_t>& time_columns,
+                    const Time& time);
 
   // Self use.
   void output (Log&) const;

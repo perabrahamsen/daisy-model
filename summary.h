@@ -34,14 +34,15 @@ class Summary : public Model
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
+  const symbol objid;
   symbol library_id () const;
 
   // Create and Destroy.
 public:
   virtual void clear () = 0;
   virtual void initialize (std::vector<Select*>&, Treelog&) = 0;
+  virtual bool check (Treelog&) const;
 protected:
   Summary (const BlockModel& al);
 public:

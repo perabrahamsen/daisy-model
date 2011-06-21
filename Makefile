@@ -398,7 +398,8 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = log_table.C xysource_profile.C program_rootmatch.C program_hmovie.C \
+MODELS = summary_Rsqr.C \
+	log_table.C xysource_profile.C program_rootmatch.C program_hmovie.C \
 	wsource_std.C wsource_time.C wsource_combine.C wsource_indirect.C\
 	wsource_table.C wsource_const.C \
 	groundwater_source.C xysource_xycombine.C xysource_flux.C \
@@ -1443,10 +1444,10 @@ source_file${OBJ}: source_file.C source_file.h source.h model.h time.h \
 format_LaTeX${OBJ}: format_LaTeX.C format_LaTeX.h format.h model.h symbol.h \
  version.h assertion.h librarian.h frame.h scope.h attribute.h
 log_all${OBJ}: log_all.C log_all.h log_select.h log.h time.h symbol.h \
- border.h model_framed.h model_logable.h model.h memutils.h select.h \
- destination.h units.h volume.h model_derived.h attribute.h metalib.h \
- frame.h scope.h library.h block_model.h block_nested.h block.h treelog.h \
- frame_model.h assertion.h field.h irrigate.h column.h
+ border.h model_framed.h model_logable.h model.h memutils.h assertion.h \
+ select.h destination.h units.h volume.h model_derived.h attribute.h \
+ metalib.h frame.h scope.h library.h block_model.h block_nested.h block.h \
+ treelog.h frame_model.h field.h irrigate.h column.h
 om${OBJ}: om.C om.h model_framed.h model_logable.h model.h symbol.h plf.h \
  som.h smb.h dom.h frame.h scope.h attribute.h check.h vcheck.h \
  geometry.h log.h time.h border.h mathlib.h assertion.h treelog.h \
@@ -1570,9 +1571,9 @@ metalib${OBJ}: metalib.C metalib.h symbol.h frame.h scope.h attribute.h \
 model${OBJ}: model.C model.h frame.h scope.h attribute.h symbol.h
 output${OBJ}: output.C output.h condition.h model_framed.h model_logable.h \
  model.h symbol.h memutils.h time.h daisy.h program.h run.h log_all.h \
- log_select.h log.h border.h log_extern.h destination.h scope.h \
- attribute.h treelog.h timestep.h vcheck.h block_model.h block_nested.h \
- block.h frame_model.h frame.h assertion.h librarian.h scope_model.h
+ log_select.h log.h border.h assertion.h log_extern.h destination.h \
+ scope.h attribute.h treelog.h timestep.h vcheck.h block_model.h \
+ block_nested.h block.h frame_model.h frame.h librarian.h scope_model.h
 librarian${OBJ}: librarian.C librarian.h model.h symbol.h library.h metalib.h \
  frame.h scope.h attribute.h intrinsics.h memutils.h block_top.h block.h \
  treelog_text.h treelog.h assertion.h frame_model.h block_model.h \
@@ -1644,6 +1645,10 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+summary_Rsqr${OBJ}: summary_Rsqr.C summary.h model.h symbol.h \
+ block_submodel.h block_nested.h block.h scope.h attribute.h treelog.h \
+ frame_submodel.h frame.h block_model.h frame_model.h librarian.h time.h \
+ memutils.h submodeler.h mathlib.h assertion.h vcheck.h
 log_table${OBJ}: log_table.C log_select.h log.h time.h symbol.h border.h \
  model_framed.h model_logable.h model.h memutils.h dlf.h select.h \
  destination.h units.h volume.h model_derived.h attribute.h geometry.h \

@@ -28,13 +28,14 @@ const char *const Summary::component = "summary";
 
 symbol
 Summary::library_id () const
-{
-  static const symbol id (component);
-  return id;
-}
+{ return component; }
+
+bool
+Summary::check (Treelog&) const
+{ return true; }
 
 Summary::Summary (const BlockModel& al)
-  : name (al.type_name ())
+  : objid (al.check ("title") ? al.name ("title") : al.type_name ())
 { }
 
 Summary::~Summary ()
@@ -47,6 +48,11 @@ static struct SummaryInit : public DeclareComponent
 Summary reports for log parameterizations.")
   { }
   void load_frame (Frame& frame) const
-  { Model::load_model (frame); }
+  { 
+    Model::load_model (frame); 
+    frame.declare_string ("title", Attribute::OptionalConst,
+		  "Title of this summary.\n\
+By default, use the name of the parameterization.");
+  }
 } Summary_init;
 

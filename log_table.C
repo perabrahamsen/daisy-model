@@ -330,17 +330,11 @@ struct LogTable : public LogSelect
   DestinationTable destination;
 
   // Log.
-  void common_done (const std::vector<Time::component_t>& time_columns,
-                    const Time& time, Treelog&);
-
-  // Log.
-  void done (const std::vector<Time::component_t>& time_columns,
-             const Time&, double dt, Treelog&);
+  void done_print (const std::vector<Time::component_t>& time_columns,
+                   const Time& time);
 
   // Initial line.
   bool initial_match (const Daisy&, const Time& previous, Treelog&);
-  void initial_done (const std::vector<Time::component_t>& time_columns,
-                     const Time&, Treelog&);
 
   // Create and destroy.
   bool check (const Border&, Treelog& msg) const;
@@ -350,25 +344,13 @@ struct LogTable : public LogSelect
 };
 
 void 
-LogTable::common_done (const std::vector<Time::component_t>& time_columns,
-                       const Time& time, Treelog&)
+LogTable::done_print (const std::vector<Time::component_t>& time_columns,
+                      const Time& time)
 { 
   destination.record_start (time_columns, time, const_entries); 
   for (size_t i = 0; i < entries.size (); i++)
     entries[i]->done_print ();
   destination.record_end ();
-}
-
-void 
-LogTable::done (const std::vector<Time::component_t>& time_columns,
-                const Time& time, const double dt, Treelog& msg)
-{ 
-  LogSelect::done (time_columns, time, dt, msg);
-
-  if (!is_printing)
-    return;
-
-  common_done (time_columns, time, msg);
 }
 
 bool 
@@ -377,16 +359,6 @@ LogTable::initial_match (const Daisy& daisy, const Time& previous, Treelog& msg)
   destination.end_header (metalib (), daisy.frame ());
   
   return LogSelect::initial_match (daisy, previous, msg);
-}
-
-void 
-LogTable::initial_done (const std::vector<Time::component_t>& time_columns,
-                        const Time& time, Treelog& msg)
-{ 
-  LogSelect::initial_done (time_columns, time, msg);
-
-  daisy_assert (print_initial);
-  common_done (time_columns, time, msg);
 }
 
 bool 

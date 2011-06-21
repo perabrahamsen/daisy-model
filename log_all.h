@@ -23,6 +23,7 @@
 #define LOG_ALL_H
 
 #include "log_select.h"
+#include "assertion.h"
 #include <stack>
 
 class LogAll : public LogSelect
@@ -52,6 +53,9 @@ public:
   bool initial_match (const Daisy&, const Time& previous, Treelog&);
   void initial_done (const std::vector<Time::component_t>& time_columns,
 		     const Time&, Treelog&);
+
+  // Print line handled by slaves.
+  void done_print (const std::vector<Time::component_t>&, const Time&) NORETURN;
 
   // Open a derived type.
   void open_derived_type (symbol type, symbol library);

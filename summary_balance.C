@@ -38,7 +38,6 @@ struct SummaryBalance : public Summary
   static const char *const default_description;
   const symbol description;
   const symbol file;
-  const symbol title;
 
   // Content.
   const int precision;
@@ -89,7 +88,7 @@ SummaryBalance::clear ()
 void
 SummaryBalance::initialize (std::vector<Select*>& select, Treelog& msg)
 { 
-  Treelog::Open nest (msg, name);
+  TREELOG_MODEL (msg);
   FetchPretty::initialize (fetch, select, msg);
 }
 
@@ -97,7 +96,6 @@ SummaryBalance::SummaryBalance (const BlockModel& al)
   : Summary (al),
     description (al.frame ().description ()),
     file (al.name ("where", "")),
-    title (al.check ("title") ? al.name ("title") : name),
     precision (al.integer ("precision")),
     require_top (al.flag ("require_top")),
     input (al.name_sequence ("input")),
@@ -161,7 +159,7 @@ SummaryBalance::print_balance (std::ostream& out,
 void 
 SummaryBalance::summarize (Treelog& msg) const
 {
-  Treelog::Open nest (msg, title);
+  TREELOG_MODEL (msg);
 
   // We write the summary to a string at first.
   std::ostringstream tmp;
@@ -260,9 +258,6 @@ static struct SummaryBalanceSyntax : public DeclareModel
       frame.declare_string ("where", Attribute::OptionalConst,
                   "File name to store the summary.\n\
 By default, the summary will be stored in daisy.log and the screen.");
-      frame.declare_string ("title", Attribute::OptionalConst,
-		  "Title of this summary.\n\
-By default, use the name of the parameterization.");
       frame.declare_integer ("precision", Attribute::Const,
 		  "Number of digits to print after decimal point.");
       frame.set ("precision", 2);

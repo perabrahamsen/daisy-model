@@ -1,5 +1,10 @@
 2011-06-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* submodeler.h: Use symbol instead of key.
+
+	* summary_Rsqr.C: New model.
+	* Makefile (MODELS): Added it.
+
 	* log_table.C: Renamed from log_dlf.C.
 	* Makefile (SPECIALS): Removed log_dlf.C.
 	(MODELS): Added log_table.C

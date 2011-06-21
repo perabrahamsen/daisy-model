@@ -79,6 +79,10 @@ struct EXPORT LogSelect : public Log
   void initial_done (const std::vector<Time::component_t>& time_columns,
 		     const Time&, Treelog&);
 
+  // Print line.
+  virtual void done_print (const std::vector<Time::component_t>& time_columns,
+                           const Time& time) = 0;
+
   // Open a derived type (for LogAll to overwrite).
   virtual void open_derived_type (symbol type, const symbol library);
 

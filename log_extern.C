@@ -34,17 +34,8 @@
 #include <sstream>
 
 void 
-LogExtern::done (const std::vector<Time::component_t>& time_columns,
-		 const Time& time, const double dt, Treelog& msg)
+LogExtern::done_print (const std::vector<Time::component_t>&, const Time&)
 { 
-#ifdef DEBUG_PROTOCOL
-  Assertion::message (__FUNCTION__);
-#endif
-  LogSelect::done (time_columns, time, dt, msg);
-
-  if (!is_printing)
-    return;
-
   for (size_t i = 0; i < LogSelect::entries.size (); i++)
     {
       last_done = LogSelect::entries[i]->tag ();
@@ -304,18 +295,12 @@ LogExtern::LogExtern (const BlockModel& al)
   : LogSelect (al),
     title_ (al.name ("where", al.type_name ()))
 { 
-  std::vector<symbol> par_names = al.name_sequence ("parameter_names");
-
-  for (size_t i = 0; i < par_names.size (); i++)
+  for (size_t i = 0; i < parameters.size (); i++)
     {
-      const symbol id = par_names[i];
-      if (al.can_extract_as (id, Attribute::String))
-        {
-          types[id] = Name;
-          names[id] = al.name (id);
-        }
-      else
-        al.msg ().warning ("Parameter name " + id + " not found"); 
+      const symbol id = parameters[i].first;
+      const symbol value = parameters[i].second;
+      types[id] = Name;
+      names[id] = value;
     }
 
   if (al.check ("numbers"))

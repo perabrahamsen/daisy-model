@@ -156,6 +156,11 @@ LogAll::initial_done (const std::vector<Time::component_t>& time_columns,
 }
 
 void 
+LogAll::done_print (const std::vector<Time::component_t>& time_columns,
+              const Time& time)
+{ daisy_notreached (); }
+
+void 
 LogAll::open_derived_type (const symbol key, const symbol component)
 { 
   daisy_assert (is_active);
