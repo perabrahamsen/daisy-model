@@ -122,7 +122,8 @@ struct NumberByDepth : public Number
     frame.set ("air_temperature", T);
     std::auto_ptr<WSource> weather (Librarian::build_frame<WSource>
                                     (al, frame, "initialize"));
-    column->initialize (al, output, time, weather.get (), Scope::null ());
+    column->initialize (al, output.scopes (),
+                        time, weather.get (), Scope::null ());
     max_depth = column->bottom ();
   }
 };

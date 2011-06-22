@@ -207,7 +207,7 @@ struct ProgramCPEData : public Program
   }
 
   // Create and Destroy.
-  void initialize (Metalib&, Block& al)
+  void initialize (Block& al)
   { 
     if (lex.read_header (al.msg ()))
       {

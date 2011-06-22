@@ -129,8 +129,8 @@ public:
   bool check_z_border (double, Treelog& err) const;
   bool check_x_border (double, Treelog& err) const;
   bool check_y_border (double, Treelog& err) const;
-  bool initialize (const Block&, const Output&, const Time&, const Weather*, 
-		   const Scope&);
+  bool initialize (const Block&, const std::vector<const Scope*> scopes,
+                   const Time&, const Weather*, const Scope&);
   Implementation (const Block& parent, const std::string& key);
   void summarize (Treelog& msg) const;
   ~Implementation ();
@@ -749,7 +749,8 @@ Field::Implementation::check_y_border (const double value, Treelog& err) const
 }
 
 bool
-Field::Implementation::initialize (const Block& block, const Output& output,
+Field::Implementation::initialize (const Block& block,
+                                   const std::vector<const Scope*> scopes,
                                    const Time& time, const Weather* weather,
 				   const Scope& scope)
 {
@@ -757,7 +758,7 @@ Field::Implementation::initialize (const Block& block, const Output& output,
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    if (!(*i)->initialize (block, output, time, weather, scope))
+    if (!(*i)->initialize (block, scopes, time, weather, scope))
       ok = false;
   return ok;
 }
@@ -1025,9 +1026,9 @@ Field::check_y_border (const double value, Treelog& err) const
 { return impl->check_y_border (value, err); }
 
 bool
-Field::initialize (const Block& block, const Output& output,
+Field::initialize (const Block& block, const std::vector<const Scope*> scopes,
                    const Time& time, const Weather* weather, const Scope& scope)
-{ return impl->initialize (block, output, time, weather, scope); }
+{ return impl->initialize (block, scopes, time, weather, scope); }
 
 Field::Field (const Block& parent, const std::string& key)
   : impl (new Implementation (parent, key))

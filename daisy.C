@@ -78,12 +78,9 @@ struct Daisy::Implementation
   bool running;
   const boost::scoped_ptr<Field> field;
   auto_vector<const Harvest*> harvest;
-  
-  // Use.
+
   const Scope& scope ()
   { return extern_scope ? *extern_scope : Scope::null (); }
-  const Scope* find_scope (const Scopesel& sel, Treelog& msg) const
-  { return sel.lookup (*output_log, msg); }
 
   // Simulation.
   bool run (Daisy& daisy, Treelog& msg)
@@ -161,7 +158,7 @@ struct Daisy::Implementation
   }
 
   // Create and Destroy.
-  void initialize (Metalib& metalib, Daisy& daisy, Block& block)
+  void initialize (Daisy& daisy, Block& block)
   { 
     Treelog& msg = block.msg ();
     if (weather.get ())
@@ -171,8 +168,8 @@ struct Daisy::Implementation
       Treelog::Open nest (msg, "output");
       output_log->initialize (metalib, msg);
     }
-    extern_scope = find_scope (*scopesel, msg); 
-    field->initialize (block, *output_log, time, 
+    extern_scope = scopesel->lookup (output_log->scopes (), msg); 
+    field->initialize (block, output_log->scopes (), time, 
                              weather.get (), scope ());
     {                       
       Treelog::Open nest (msg, "manager");
@@ -417,19 +414,6 @@ const FrameModel&
 Daisy::frame () const
 { return impl->frame; }
 
-const Scope* 
-Daisy::find_scope (const Scopesel& sel, Treelog& msg) const
-{ return impl->find_scope (sel, msg); }
-
-const Scope&
-Daisy::find_scope (const size_t index) const
-{ return impl->output_log->scope (index); }
-
-
-size_t 
-Daisy::scope_size () const
-{ return impl->output_log->scope_size (); }
-
 const std::vector<const Scope*>& 
 Daisy::scopes () const
 { return impl->output_log->scopes (); }
@@ -488,8 +472,8 @@ Daisy::output (Log& log) const
 { impl->output (log); }
 
 void
-Daisy::initialize (Metalib& metalib, Block& block)
-{ impl->initialize (metalib, *this, block); }
+Daisy::initialize (Block& block)
+{ impl->initialize (*this, block); }
 
 bool
 Daisy::check (Treelog& msg)

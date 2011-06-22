@@ -23,8 +23,8 @@
 
 #include "model.h"
 #include "symbol.h"
+#include <vector>
 
-class Output;
 class Scope;
 class Treelog;
 
@@ -37,7 +37,8 @@ public:
 
   // Use.
 public:
-  virtual const Scope* lookup (const Output&, Treelog& msg) const = 0;
+  virtual const Scope* lookup (const std::vector<const Scope*>&,
+                               Treelog&) const = 0;
 
   // Create and Destroy.
 private:

@@ -73,7 +73,7 @@ struct ActionExtern : public Action
 
   void initialize (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   { 
-    extern_scope = daisy.find_scope (*scopesel, msg); 
+    extern_scope = scopesel->lookup (daisy.scopes (), msg); 
     if (extern_scope)
       {
         ScopeMulti multi (*extern_scope, parent_scope);
@@ -231,7 +231,7 @@ struct ActionExternFertigation : public Action
 
   void initialize (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   { 
-    extern_scope = daisy.find_scope (*scopesel, msg); 
+    extern_scope = scopesel->lookup (daisy.scopes (), msg); 
     if (!extern_scope)
       return;
 
@@ -417,7 +417,7 @@ struct ActionExternSubsoil : public Action
 
   void initialize (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   { 
-    extern_scope = daisy.find_scope (*scopesel, msg); 
+    extern_scope = scopesel->lookup (daisy.scopes (), msg); 
     if (!extern_scope)
       return;
     

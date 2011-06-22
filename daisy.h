@@ -50,11 +50,6 @@ private:
   const boost::scoped_ptr<Implementation> impl;
 public:
   const FrameModel& frame () const;
-#if 0
-  const Scope* find_scope (const Scopesel&, Treelog&) const;
-  const Scope& find_scope (size_t index) const;
-  size_t scope_size () const;
-#endif
   const std::vector<const Scope*>& scopes () const;
   const Time& time () const;
   const Time& previous () const;
@@ -77,7 +72,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (Metalib&, Block&);
+  void initialize (Block&);
   bool check (Treelog&);
   static void load_syntax (Frame&);
   explicit Daisy (const BlockModel&);

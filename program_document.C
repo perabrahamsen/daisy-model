@@ -126,7 +126,7 @@ struct ProgramDocument : public Program
   }
 
   // Create and Destroy.
-  void initialize (Metalib&, Block&)
+  void initialize (Block&)
   { };
   bool check (Treelog&)
   { return true; }
@@ -1337,7 +1337,7 @@ struct ProgramDocmodel : public Program
   }
 
   // Create and Destroy.
-  void initialize (Metalib&, Block&)
+  void initialize (Block&)
   { };
   bool check (Treelog&)
   { return true; }

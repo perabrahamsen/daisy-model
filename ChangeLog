@@ -1,10 +1,17 @@
 2011-06-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* program.h, program.C, daisy.C, output.h, output.C (scopes): New
-	function.
+	* daisy.C (find_scope, scope_size): Removed.
+	* program.h, program.C, daisy.h, daisy.C:
+	* output.h, output.C (scopes): New function.
+	* cdaisy.C (daisy_daisy_scope_extern_size)
+	(daisy_daisy_scope_extern_get): Update.
+	* column.h, column_std.C, field.h, field.C (initialize): Update.
+	* number_soil.C (NumberByDepth): Ditto.
 
 	* program_optimize.C: New model.
 	* Makefile (MODELS): Add it.
+
+	* program (initialize): Drop metalib argument.
 
 	* destination.h, destination.C, fetch.C (error): Removed.
 	* log_table.C (error, error_string): Removed.

@@ -1389,7 +1389,7 @@ struct ProgramAM_table : public Program
   }
 
   // Create and Destroy.
-  void initialize (Metalib&, Block&)
+  void initialize (Block&)
   { };
   bool check (Treelog&)
   { return true; }

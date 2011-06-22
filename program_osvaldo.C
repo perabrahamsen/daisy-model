@@ -156,7 +156,7 @@ struct ProgramOsvaldo : public Program
   }
 
   // Create and Destroy.
-  void initialize (Metalib&, Block&)
+  void initialize (Block&)
   { }
 
   bool check (Treelog& msg)

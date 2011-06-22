@@ -245,7 +245,7 @@ set hidden3d\n\
   }
 
   // Create and Destroy.
-  void initialize (Metalib&, Block& al)
+  void initialize (Block& al)
   { 
     if (!lex.read_header (al.msg ()))
       return;

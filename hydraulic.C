@@ -278,7 +278,7 @@ struct ProgramHydraulic_table : public Program
   }
 
   // Create and Destroy.
-  void initialize (Metalib&, Block&)
+  void initialize (Block&)
   { };
   bool check (Treelog& msg)
   { return hydraulic->check (msg); }

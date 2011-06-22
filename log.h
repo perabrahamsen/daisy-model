@@ -60,7 +60,7 @@ private:
 public:
   static const char *const component;
   symbol library_id () const;
-  Metalib& metalib () const;
+  const Metalib& metalib () const;
   virtual void find_scopes (std::vector<const Scope*>&) const;
 
   // Filter
@@ -301,7 +301,7 @@ public:
 protected:
   virtual void initialize (const symbol log_dir, Treelog& out) = 0;
 public:
-  void initialize_common (const symbol log_dir, Metalib&, Treelog& out);
+  void initialize_common (const symbol log_dir, const Metalib&, Treelog& out);
 protected:
   Log (const BlockModel& al);
   Log (const char* id);

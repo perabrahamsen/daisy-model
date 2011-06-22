@@ -44,14 +44,14 @@ Log::library_id () const
 
 struct Log::Implementation
 {
-  Metalib* metalib;
+  const Metalib* metalib;
 
   Implementation ()
     : metalib (NULL)
   { }
 };
 
-Metalib&
+const Metalib&
 Log::metalib () const
 {
   daisy_assert (impl->metalib);
@@ -129,7 +129,8 @@ Log::output (Log&) const
 { }
 
 void
-Log::initialize_common (const symbol log_dir, Metalib& metalib, Treelog& msg)
+Log::initialize_common (const symbol log_dir, 
+                        const Metalib& metalib, Treelog& msg)
 {
   daisy_assert (!impl->metalib);
   impl->metalib = &metalib;

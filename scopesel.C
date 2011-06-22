@@ -23,7 +23,6 @@
 #include "scopesel.h"
 #include "scope.h"
 #include "assertion.h"
-#include "output.h"
 #include "block_model.h"
 #include "treelog.h"
 #include "librarian.h"
@@ -52,12 +51,13 @@ private:
 
   // Simulation.
 public:
-  const Scope* lookup (const Output& output, Treelog& msg) const
+  const Scope* lookup (const std::vector<const Scope*>& scopes, 
+                       Treelog& msg) const
   { 
     int found = -1;
-    for (size_t i = 0; i < output.scope_size (); i++)
+    for (size_t i = 0; i < scopes.size (); i++)
       {
-        const Scope& scope = output.scope (i);
+        const Scope& scope = *scopes[i];
 
         if (scope.title () == name)
           {
@@ -72,7 +72,7 @@ public:
       }
     if (found < 0)
       return NULL;
-    return &output.scope (found); 
+    return scopes[found]; 
   }
 
   // Create.
@@ -103,7 +103,7 @@ class ScopeselNull : public Scopesel
 {
   // Simulation.
 public:
-  Scope* lookup (const Output& output, Treelog& msg) const
+  Scope* lookup (const std::vector<const Scope*>&, Treelog& msg) const
   { return &Scope::null (); }
 
   // Create.

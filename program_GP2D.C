@@ -99,7 +99,7 @@ struct ProgramGP2D : public Program
   }
 
   // Create and Destroy.
-  void initialize (Metalib&, Block& al)
+  void initialize (Block& al)
   { 
     const bool volatile_bottom = false;
     const std::vector<double> fixed;

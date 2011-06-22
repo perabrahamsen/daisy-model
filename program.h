@@ -59,11 +59,12 @@ protected:
   void ui_set_progress (double val);
 
   // Extract information.
+public:
   virtual const std::vector<const Scope*>& scopes () const;
 
   // Create and Destroy.
 public:
-  virtual void initialize (Metalib&, Block&) = 0;
+  virtual void initialize (Block&) = 0;
   virtual bool check (Treelog& err) = 0;
 protected:
   explicit Program (const BlockModel&);

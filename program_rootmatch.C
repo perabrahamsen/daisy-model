@@ -628,7 +628,7 @@ plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines\n
   }
 
   // Create and Destroy.
-  void initialize (Metalib&, Block& al)
+  void initialize (Block& al)
   { 
     if (!lex.read_header (al.msg ()))
       return;

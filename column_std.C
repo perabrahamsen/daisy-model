@@ -182,8 +182,8 @@ public:
   // Create and Destroy.
   static Movement* build_vertical (const BlockModel& al);
   ColumnStandard (const BlockModel& al);
-  bool initialize (const Block&, const Output&, const Time&, const Weather*,
-                   const Scope& scope);
+  bool initialize (const Block&, const std::vector<const Scope*> scopes,
+                   const Time&, const Weather*, const Scope& scope);
   void summarize (Treelog& msg) const;
   ~ColumnStandard ();
 };
@@ -954,7 +954,7 @@ ColumnStandard::ColumnStandard (const BlockModel& al)
 
 bool
 ColumnStandard::initialize (const Block& block, 
-                            const Output& output,
+                            const std::vector<const Scope*> scopes,
                             const Time& time, 
                             const Weather* global_weather,
                             const Scope& parent_scope)
@@ -962,7 +962,7 @@ ColumnStandard::initialize (const Block& block,
   bool ok = true;
   Treelog& msg = block.msg ();
   TREELOG_MODEL (msg);
-  extern_scope = scopesel->lookup (output, msg); 
+  extern_scope = scopesel->lookup (scopes, msg); 
   ScopeMulti scope (extern_scope ? *extern_scope : Scope::null (),
                     parent_scope);
   soil->initialize (block, geometry, *groundwater,

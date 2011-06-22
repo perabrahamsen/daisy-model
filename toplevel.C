@@ -103,7 +103,7 @@ Toplevel::Implementation::run_program (const std::string& name_str)
       // Initialize.
       {
         BlockTop block (metalib, msg, metalib);
-        program->initialize (metalib, block);
+        program->initialize (block);
         if (!block.ok ())
           throw EXIT_FAILURE;
       }
@@ -442,7 +442,7 @@ Toplevel::initialize ()
       }
       {
         BlockTop block (metalib (), msg (), metalib ());
-        impl->program->initialize (metalib (), block);
+        impl->program->initialize (block);
         if (!block.ok ())
           throw EXIT_FAILURE;
       }

@@ -615,8 +615,7 @@ daisy_daisy_scope_extern_size (Toplevel *const toplevel)
 {
   try
     {
-      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      return daisy.scope_size ();
+      return toplevel->program ().scopes ().size ();
     }
   DAISY_CATCH_BLOCK(toplevel);
   return 0;
@@ -628,8 +627,8 @@ daisy_daisy_scope_extern_get (Toplevel *const toplevel,
 {
   try
     {
-      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      return &daisy.find_scope (index); 
+      daisy_assert (index < toplevel->program ().scopes ().size ());
+      toplevel->program ().scopes ()[index];
     }
   DAISY_CATCH_BLOCK(toplevel);
   return NULL;
