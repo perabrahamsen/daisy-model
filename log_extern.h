@@ -51,9 +51,9 @@ public:
   // Scopesel id.
 private:
   const symbol title_;
-
+  
   // Destination Content.
-  typedef enum { Error, Missing, Number, Name, Array } intern_type;
+  typedef enum { Missing, Number, Name, Array } intern_type;
   typedef std::map<symbol, intern_type> type_map;
   typedef std::map<symbol, double> number_map;
   typedef std::map<symbol, symbol> name_map;
@@ -67,6 +67,7 @@ private:
   name_map dimensions;
 
   // Log.
+  void find_scopes (std::vector<const Scope*>&) const;
   symbol last_done;
   void done_print  (const std::vector<Time::component_t>& time_columns,
                     const Time& time);
@@ -75,7 +76,6 @@ private:
   void output (Log&) const;
 
   // Select::Destination
-  void error ();
   void missing ();
   void add (const std::vector<double>& value);
   void add (const double value);

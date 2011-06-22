@@ -45,7 +45,7 @@ private:
   const auto_vector<Log*> logs;
   const std::auto_ptr<LogAll> log_all;
   std::vector<Log*> active_logs;
-  const std::vector<Scope*> scopes;
+  const std::vector<const Scope*> my_scopes;
   const std::auto_ptr<Condition> activate_output;
   const std::vector<Time::component_t> time_columns;
   const symbol log_prefix;
@@ -56,7 +56,8 @@ public:
   void tick (const Daisy&, const Time& time, double dt, Treelog&);
   void summarize (Treelog&) const;
   size_t scope_size () const;
-  Scope& scope (size_t) const;
+  const Scope& scope (size_t) const;
+  const std::vector<const Scope*>& scopes () const;
 
   // Create and Destroy.
 public:
@@ -66,7 +67,7 @@ public:
 private:
   static const std::vector<Log*> 
   /**/ find_active_logs (const std::vector<Log*>& logs, LogAll& log_all);
-  static const std::vector<Scope*> 
+  static const std::vector<const Scope*> 
   /**/ find_extern_logs (const std::vector<Log*>& logs, 
                          const std::vector<MScope*>& exchanges);
   static std::vector<Time::component_t>

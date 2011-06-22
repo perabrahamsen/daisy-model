@@ -421,7 +421,7 @@ const Scope*
 Daisy::find_scope (const Scopesel& sel, Treelog& msg) const
 { return impl->find_scope (sel, msg); }
 
-Scope&
+const Scope&
 Daisy::find_scope (const size_t index) const
 { return impl->output_log->scope (index); }
 
@@ -429,6 +429,10 @@ Daisy::find_scope (const size_t index) const
 size_t 
 Daisy::scope_size () const
 { return impl->output_log->scope_size (); }
+
+const std::vector<const Scope*>& 
+Daisy::scopes () const
+{ return impl->output_log->scopes (); }
 
 const Time& 
 Daisy::time () const

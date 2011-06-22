@@ -58,6 +58,10 @@ Log::metalib () const
   return *impl->metalib;
 }
 
+void 
+Log::find_scopes (std::vector<const Scope*>&) const
+{ }
+
 bool
 Log::check_entry (symbol name, const symbol component) const
 {

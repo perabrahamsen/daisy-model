@@ -64,6 +64,9 @@ struct EXPORT LogSelect : public Log
   bool is_printing;		// True iff this time step should be logged.
   bool is_active;		// True iff we need values for this time step.
 
+  // Scopes.
+  void find_scopes (std::vector<const Scope*>&) const;
+
   // Filter functions.
   bool check_leaf (symbol) const;
   bool check_interior (symbol) const;

@@ -52,7 +52,7 @@ private:
 
   // Simulation.
 public:
-  Scope* lookup (const Output& output, Treelog& msg) const
+  const Scope* lookup (const Output& output, Treelog& msg) const
   { 
     int found = -1;
     for (size_t i = 0; i < output.scope_size (); i++)

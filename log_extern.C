@@ -34,6 +34,13 @@
 #include <sstream>
 
 void 
+LogExtern::find_scopes (std::vector<const Scope*>& scopes) const
+{ 
+  LogSelect::find_scopes (scopes);
+  scopes.push_back (this); 
+}
+
+void 
 LogExtern::done_print (const std::vector<Time::component_t>&, const Time&)
 { 
   for (size_t i = 0; i < LogSelect::entries.size (); i++)
@@ -66,15 +73,6 @@ LogExtern::output (Log& log) const
           output_value (value, "value", log);
 	}
     }
-}
-
-void 
-LogExtern::error ()
-{ 
-#ifdef DEBUG_PROTOCOL
-  Assertion::message (__FUNCTION__);
-#endif
-  types[last_done] = Error;
 }
 
 void 
@@ -146,8 +144,6 @@ LogExtern::lookup (const symbol tag) const
 
   switch ((*i).second)
     {
-    case Error:
-      return Attribute::Error;
     case Number: 
     case Array:
       return Attribute::Number;
@@ -205,7 +201,6 @@ LogExtern::check (const symbol tag) const
     case Array:
       return true;
     case Missing:
-    case Error:
       return false;
     }
   daisy_notreached ();

@@ -50,7 +50,6 @@ protected:
 
   // Destination
 private:
-  void error ();
   void missing ();
   void add (const std::vector<double>&);
   void add (const double value);

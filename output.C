@@ -23,7 +23,6 @@
 #include "output.h"
 #include "daisy.h"
 #include "log_all.h"
-#include "log_extern.h"
 #include "treelog.h"
 #include "time.h"
 #include "timestep.h"
@@ -101,14 +100,18 @@ Output::summarize (Treelog& msg) const
 
 size_t
 Output::scope_size () const
-{ return scopes.size (); }
+{ return my_scopes.size (); }
 
-Scope&
+const Scope&
 Output::scope (size_t i) const
 { 
-  daisy_assert (i < scopes.size ());
-  return *scopes[i];
+  daisy_assert (i < my_scopes.size ());
+  return *my_scopes[i];
 }
+
+const std::vector<const Scope*>& 
+Output::scopes () const
+{ return my_scopes; }
 
 bool
 Output::check (const Border& field, Treelog& msg)
@@ -157,18 +160,17 @@ Output::find_active_logs (const std::vector<Log*>& logs, LogAll& log_all)
   return result;
 }
 
-const std::vector<Scope*> 
+const std::vector<const Scope*> 
 Output::find_extern_logs (const std::vector<Log*>& logs, 
                           const std::vector<MScope*>& exchanges)
 {
-  std::vector<Scope*> result;
+  std::vector<const Scope*> result;
 
   for (size_t i = 0; i < exchanges.size (); i++)
     result.push_back (exchanges[i]);
 
   for (size_t i = 0; i < logs.size (); i++)
-    if (LogExtern* log = dynamic_cast<LogExtern*> (logs[i]))
-      result.push_back (log);
+    logs[i]->find_scopes (result);
   
   return result;
 }
@@ -192,7 +194,7 @@ Output::Output (const BlockModel& al)
     logs (Librarian::build_vector<Log> (al, "output")),
     log_all (new LogAll (logs)),
     active_logs (find_active_logs (logs, *log_all)),
-    scopes (find_extern_logs (logs, exchanges)),
+    my_scopes (find_extern_logs (logs, exchanges)),
     activate_output (Librarian::build_item<Condition> (al, "activate_output")),
     time_columns (find_time_columns (al.name_sequence ("log_time_columns"))),
     log_prefix (al.name ("log_prefix"))
@@ -203,7 +205,7 @@ Output::Output ()
     exchanges (std::vector<MScope*> ()),
     logs (std::vector<Log*> ()),
     active_logs (std::vector<Log*> ()),
-    scopes (std::vector<Scope*> ()),
+    my_scopes (std::vector<const Scope*> ()),
     log_prefix ("")
 { }
 

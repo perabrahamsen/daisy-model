@@ -403,7 +403,7 @@ daisy_time_get_year (const daisy_time* time);
 EXPORT unsigned int             /* Return number of extern scopes */
 daisy_daisy_scope_extern_size (const daisy_daisy* daisy); /*  */
 
-EXPORT daisy_scope*             /* Return extern scope INDEX. */
+EXPORT const daisy_scope*       /* Return extern scope INDEX. */
 daisy_daisy_scope_extern_get (const daisy_daisy* daisy,
                               const unsigned int index);
 

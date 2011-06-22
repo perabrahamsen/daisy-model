@@ -57,6 +57,13 @@ Program::ui_set_progress (const double value)
   ui->set_progress (value); 
 }
 
+const std::vector<const Scope*>& 
+Program::scopes () const
+{
+  static const std::vector<const Scope*> empty;
+  return empty;
+}
+
 Program::Program (const BlockModel& al)
   : objid (al.type_name ()),
     ui (NULL)

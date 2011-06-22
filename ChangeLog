@@ -1,3 +1,21 @@
+2011-06-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* program.h, program.C, daisy.C, output.h, output.C (scopes): New
+	function.
+
+	* program_optimize.C: New model.
+	* Makefile (MODELS): Add it.
+
+	* destination.h, destination.C, fetch.C (error): Removed.
+	* log_table.C (error, error_string): Removed.
+	* log_extern.h, log_extern.C (error, Error): Removed.
+
+	* summary.h, summary.C, summary_Rsqr.C (tick): New function.
+	* log_select.C (done): Call it.
+	* log.h, log.C, log_select.C, log_extern.C:
+	* summary.h, summary.C, summary_Rsqr.C (find_scopes): New function.
+	* output.C (find_extern_logs): Call it.
+
 2011-06-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* submodeler.h: Use symbol instead of key.

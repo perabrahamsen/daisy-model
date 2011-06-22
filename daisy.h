@@ -51,8 +51,9 @@ private:
 public:
   const FrameModel& frame () const;
   const Scope* find_scope (const Scopesel&, Treelog&) const;
-  Scope& find_scope (size_t index) const;
+  const Scope& find_scope (size_t index) const;
   size_t scope_size () const;
+  const std::vector<const Scope*>& scopes () const;
   const Time& time () const;
   const Time& previous () const;
   const Units& units () const;

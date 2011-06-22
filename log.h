@@ -29,10 +29,11 @@
 #include "symbol.h"
 #include <iosfwd>
 #include <memory>
+#include <vector>
+
 #ifdef __unix
 #define EXPORT /* Nothing */
 #elif defined (BUILD_DLL)
-
 /* DLL export */
 #define EXPORT __declspec(dllexport)
 #else
@@ -48,6 +49,7 @@ class BlockModel;
 class Frame;
 class Column;
 class Field;
+class Scope;
 
 class EXPORT Log : public ModelFramed
 {
@@ -59,6 +61,7 @@ public:
   static const char *const component;
   symbol library_id () const;
   Metalib& metalib () const;
+  virtual void find_scopes (std::vector<const Scope*>&) const;
 
   // Filter
 public:

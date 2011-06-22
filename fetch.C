@@ -27,10 +27,6 @@
 #include "librarian.h"
 
 void 
-Fetch::error ()
-{ type = Error; }
-
-void 
 Fetch::missing ()
 { 
   switch (type)

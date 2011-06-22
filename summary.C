@@ -30,6 +30,14 @@ symbol
 Summary::library_id () const
 { return component; }
 
+void 
+Summary::find_scopes (std::vector<const Scope*>&) const
+{ }
+
+void 
+Summary::tick (const Time&)
+{ }
+
 bool
 Summary::check (Treelog&) const
 { return true; }

@@ -2,13 +2,13 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Parameter optimizer
 
-** Summary for calculating R2
-
-*** Summary::tick in order to match the right measure.
-
-*** Build "fetch" like destination
-
 ** Some way for summaries to write to a scope that can be checked later?
+
+*** Output::scopes
+
+*** Program::scopes
+
+*** Get rid of Daisy::find_scope og Daisy::scope_size
 
 ** An optimizer that calculates an expression based on the summary scope?
 

@@ -28,7 +28,9 @@
 
 struct Select;
 struct Treelog;
-class BlockModel;
+struct BlockModel;
+struct Time;
+struct Scope;
 
 class Summary : public Model
 {
@@ -37,6 +39,10 @@ public:
   static const char *const component;
   const symbol objid;
   symbol library_id () const;
+  virtual void find_scopes (std::vector<const Scope*>&) const;
+
+  // Simulation.
+  virtual void tick (const Time&);
 
   // Create and Destroy.
 public:

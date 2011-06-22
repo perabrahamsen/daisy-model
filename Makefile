@@ -398,7 +398,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = summary_Rsqr.C \
+MODELS = program_optimize.C summary_Rsqr.C \
 	log_table.C xysource_profile.C program_rootmatch.C program_hmovie.C \
 	wsource_std.C wsource_time.C wsource_combine.C wsource_indirect.C\
 	wsource_table.C wsource_const.C \
@@ -1571,9 +1571,9 @@ metalib${OBJ}: metalib.C metalib.h symbol.h frame.h scope.h attribute.h \
 model${OBJ}: model.C model.h frame.h scope.h attribute.h symbol.h
 output${OBJ}: output.C output.h condition.h model_framed.h model_logable.h \
  model.h symbol.h memutils.h time.h daisy.h program.h run.h log_all.h \
- log_select.h log.h border.h assertion.h log_extern.h destination.h \
- scope.h attribute.h treelog.h timestep.h vcheck.h block_model.h \
- block_nested.h block.h frame_model.h frame.h librarian.h scope_model.h
+ log_select.h log.h border.h assertion.h treelog.h timestep.h vcheck.h \
+ block_model.h block_nested.h block.h scope.h attribute.h frame_model.h \
+ frame.h librarian.h scope_model.h
 librarian${OBJ}: librarian.C librarian.h model.h symbol.h library.h metalib.h \
  frame.h scope.h attribute.h intrinsics.h memutils.h block_top.h block.h \
  treelog_text.h treelog.h assertion.h frame_model.h block_model.h \
@@ -1645,10 +1645,15 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
-summary_Rsqr${OBJ}: summary_Rsqr.C summary.h model.h symbol.h \
- block_submodel.h block_nested.h block.h scope.h attribute.h treelog.h \
+program_optimize${OBJ}: program_optimize.C program.h model.h symbol.h run.h \
+ block_top.h block.h scope.h attribute.h block_model.h block_nested.h \
+ treelog.h frame_model.h frame.h path.h assertion.h memutils.h \
+ librarian.h metalib.h
+summary_Rsqr${OBJ}: summary_Rsqr.C summary.h model.h symbol.h destination.h \
+ select.h units.h memutils.h volume.h model_derived.h model_logable.h \
+ attribute.h block_submodel.h block_nested.h block.h scope.h treelog.h \
  frame_submodel.h frame.h block_model.h frame_model.h librarian.h time.h \
- memutils.h submodeler.h mathlib.h assertion.h vcheck.h
+ submodeler.h mathlib.h assertion.h vcheck.h
 log_table${OBJ}: log_table.C log_select.h log.h time.h symbol.h border.h \
  model_framed.h model_logable.h model.h memutils.h dlf.h select.h \
  destination.h units.h volume.h model_derived.h attribute.h geometry.h \

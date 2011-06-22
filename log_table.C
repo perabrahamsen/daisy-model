@@ -49,7 +49,6 @@ class DestinationTable : public Destination
   // char* faster than symbol for output.
   const char *const record_separator; // String to print on records (time steps)
   const char *const field_separator; // String to print between fields.
-  const char *const error_string; // String to print on errors.
   const char *const missing_value; // String to print for missing values.
   const char *const array_separator; // String to print between array entries.
   DLF print_header;             // How much header should be printed?
@@ -62,7 +61,6 @@ class DestinationTable : public Destination
   inline void seperate_field ();
 
   // Select::Destination
-  void error ();
   void missing ();
   void add (const std::vector<double>& value);
   void add (const double value);
@@ -97,13 +95,6 @@ DestinationTable::seperate_field ()
     first_entry = false;
   else
     out << field_separator;
-}
-
-void 
-DestinationTable::error ()
-{
-  seperate_field ();
-  out << error_string; 
 }
 
 void 
@@ -306,7 +297,6 @@ DestinationTable::DestinationTable (const Block& al,
     flush (al.flag ("flush")),
     record_separator (al.name ("record_separator").name ().c_str ()),
     field_separator (al.name ("field_separator").name ().c_str ()),
-    error_string (al.name ("error_string").name ().c_str ()),
     missing_value (al.name ("missing_value").name ().c_str ()),
     array_separator (al.name ("array_separator").name ().c_str ()),
     print_header (al.name ("print_header")),
@@ -429,9 +419,6 @@ String to print between records (time steps).");
     frame.declare_string ("field_separator", Attribute::Const, "\
 String to print between fields.");
     frame.set ("field_separator", "\t");
-    frame.declare_string ("error_string", Attribute::Const, "\
-String to print when errors are encountered.");
-    frame.set ("error_string", "!");
     frame.declare_string ("missing_value", Attribute::Const, "\
 String to print when the path doesn't match anything.\n\
 This can be relevant for example if you are logging a crop, and there are\n\

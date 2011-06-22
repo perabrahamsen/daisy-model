@@ -41,6 +41,13 @@
 #include "summary.h"
 #include <sstream>
 
+void 
+LogSelect::find_scopes (std::vector<const Scope*>& scopes) const
+{
+  for (size_t i = 0; i < summary.size (); i++)
+    summary[i]->find_scopes (scopes);
+}
+
 bool 
 LogSelect::check_leaf (symbol) const
 { daisy_notreached (); }
@@ -81,13 +88,17 @@ LogSelect::done (const std::vector<Time::component_t>& time_columns,
   end = time;
 
   if (is_printing)
-    done_print (time_columns, time);
+    {
+      for (size_t i = 0; i < summary.size (); i++)
+        summary[i]->tick (time);
+      done_print (time_columns, time);
+    }
 }
 
 bool
 LogSelect::initial_match (const Daisy& daisy, const Time& previous, Treelog&)
 {
-  for (unsigned int i = 0; i < summary.size (); i++)
+  for (size_t i = 0; i < summary.size (); i++)
     summary[i]->clear ();
 
   begin = daisy.time ();
@@ -121,7 +132,11 @@ LogSelect::initial_done (const std::vector<Time::component_t>& time_columns,
   begin = time;
 
   if (is_printing)
-    done_print (time_columns, time);
+    {
+      for (size_t i = 0; i < summary.size (); i++)
+        summary[i]->tick (time);
+      done_print (time_columns, time);
+    }
 }
 
 void 
@@ -232,7 +247,7 @@ LogSelect::output_entry (symbol, const PLF&)
 void
 LogSelect::initialize (const symbol, Treelog& msg)
 {
-  for (unsigned int i = 0; i < summary.size (); i++)
+  for (size_t i = 0; i < summary.size (); i++)
     summary[i]->initialize (entries, msg);
 }
 
@@ -244,7 +259,7 @@ LogSelect::check (const Border& border, Treelog& err) const
   if (!volume->check_border (border, err))
     { /* ok = false */ }
 
-  for (unsigned int i = 0; i < entries.size (); i++)
+  for (size_t i = 0; i < entries.size (); i++)
     {
       std::ostringstream tmp;
       tmp << "entries [" << i << "]: " << entries[i]->tag ();
@@ -283,7 +298,7 @@ bool
 LogSelect::default_print_initial (const std::vector<Select*>& entries)
 {
   // Any in favour?
-  for (unsigned int i = 0; i < entries.size (); i++)
+  for (size_t i = 0; i < entries.size (); i++)
     if (entries[i]->print_initial ())
       return true;
 
@@ -308,7 +323,7 @@ LogSelect::LogSelect (const BlockModel& al)
     return;
 
   // Initialize entries.
-  for (unsigned int i = 0; i < entries.size (); i++)
+  for (size_t i = 0; i < entries.size (); i++)
     if (!entries[i]->initialize (al.units (), *volume, condition->timestep (),
                                  al.msg ()))
       al.set_error ();

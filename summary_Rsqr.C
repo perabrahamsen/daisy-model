@@ -21,6 +21,8 @@
 #define BUILD_DLL
 
 #include "summary.h"
+#include "destination.h"
+#include "select.h"
 #include "block_submodel.h"
 #include "block_model.h"
 #include "librarian.h"
@@ -33,6 +35,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <numeric>
 #include <sstream>
+#include <map>
 
 struct SummaryRsqr : public Summary
 {
@@ -55,10 +58,108 @@ struct SummaryRsqr : public Summary
     Measure (const BlockSubmodel&);
   };
   const auto_vector<const Measure*> measure;
+  symbol dimension;
+  symbol square_dimension;
   const double average;         // Measured average.
   const double SStot;           // Total sum of squares.
+
+  struct Compare : public Destination
+  {
+    const symbol tag;
+    SummaryRsqr& summary;
+
+    // Destination.
+    void missing ()
+    { }
+    void add (const std::vector<double>& value) NORETURN
+    { daisy_notreached (); }
+    void add (const double value)
+    { summary.compare (tag, value); }
+    void add (const symbol value) NORETURN
+    { daisy_notreached (); }
+
+    Compare (SummaryRsqr& sum, const symbol key)
+      : tag (key),
+        summary (sum)
+    { }
+  };
+  auto_vector<const Compare*> comparison;
+  void compare (symbol tag, double value);
+
   double SSerr;                 // Residual sum of of squares.
-  
+  size_t current;               // Next measure to compae with.
+  bool active;                  // True if current measure is active.
+  double R2;                    // Coefficient of determination;
+
+  const struct MyScope : public Scope
+  {
+    const SummaryRsqr& summary;
+    std::map<symbol, const double*> all;
+    static const struct DescMap : public std::map<symbol, symbol>
+    { 
+      DescMap (); 
+    } descriptions;
+
+    symbol title () const
+    { return summary.objid; }
+
+    void entries (std::set<symbol>& entries) const
+    {
+      for (std::map<symbol, const double*>::const_iterator i = all.begin ();
+           i != all.end ();
+           i++)
+        entries.insert ((*i).first);
+    }
+
+    Attribute::type lookup (const symbol key) const
+    {
+      std::map<symbol, const double*>::const_iterator i = all.find (key);
+      return (i == all.end () ? Attribute::Error : Attribute::Number);
+    }
+
+    symbol dimension (const symbol key) const
+    { 
+      if (key == "R2")
+        return Attribute::None ();
+      if (key == "average")
+        return summary.dimension;
+      if (all.find (key) == all.end ())
+        return Attribute::Unknown ();
+
+      return summary.square_dimension;
+    }
+
+    symbol description (const symbol key) const
+    { return (*descriptions.find (key)).second; }
+    int type_size (const symbol) const
+    { return Attribute::Singleton; }
+    bool check (const symbol key) const
+    { return all.find (key) != all.end (); }
+    double number (const symbol key) const
+    { return *(*all.find (key)).second; }
+    
+    static std::map<symbol, const double*> build_all (const SummaryRsqr& s)
+    {
+      std::map<symbol, const double*> all;
+      all["R2"] = &s.R2;
+      all["average"] = &s.average;
+      all["SStot"] = &s.SStot;
+      all["SSerr"] = &s.SSerr;
+      return all;
+    }   
+
+    MyScope (const SummaryRsqr& s)
+      : summary (s),
+        all (build_all (s))
+    { }
+  } scope;
+
+  void find_scopes (std::vector<const Scope*>& scopes) const
+  { scopes.push_back (&scope); }
+
+  // Simulation.
+  void tick (const Time&);
+
   // Create and Destroy.
   void clear ();
   void initialize (std::vector<Select*>&, Treelog&);
@@ -68,6 +169,16 @@ struct SummaryRsqr : public Summary
   explicit SummaryRsqr (const BlockModel&);
   void summarize (Treelog&) const;
 };
+
+SummaryRsqr::MyScope::DescMap::DescMap ()
+{
+  (*this)["R2"] = "Coefficient of determination.";
+  (*this)["average"] = "Average measured value.";
+  (*this)["SStot"] = "Total sum of squares.";
+  (*this)["SSerr"] = "Residual sum of squares.";
+}
+
+const SummaryRsqr::MyScope::DescMap SummaryRsqr::MyScope::descriptions;
 
 void
 SummaryRsqr::Data::load_syntax (Frame& frame)
@@ -107,14 +218,81 @@ SummaryRsqr::Measure::Measure (const BlockSubmodel& al)
     data (map_submodel_const<Data> (al, "data"))
 { }
 
+void 
+SummaryRsqr::compare (const symbol tag, const double value)
+{
+  if (!active)
+    return;
+  
+  const Measure& m = *measure[current];
+
+  for (size_t i = 0; i < m.data.size (); i++)
+    if (m.data[i]->tag == tag)
+      {
+        const std::vector<double>& v = m.data[i]->value;
+        for (size_t j = 0; j < v.size (); j++)
+          SSerr += sqr (value - v[j]);
+        break;
+      }
+
+  R2 = 1.0 - SSerr / SStot;
+}   
+
+void 
+SummaryRsqr::tick (const Time& time)
+{ 
+  if (active)
+    current++;
+
+  active = (current < measure.size () && time >= measure[current]->time);
+}
+
 void
 SummaryRsqr::clear ()
-{ SSerr = 0.0; }
+{ }
 
 void
 SummaryRsqr::initialize (std::vector<Select*>& select, Treelog& msg)
 { 
-  // TREELOG_MODEL (msg);
+  std::set<symbol> tags;
+  for (size_t i = 0; i < measure.size (); i++)
+    for (size_t j = 0; j < measure[i]->data.size (); j++)
+      tags.insert (measure[i]->data[j]->tag);
+
+  for (std::set<symbol>::const_iterator i = tags.begin (); 
+       i != tags.end ();
+       i++)
+    {
+      const symbol tag = *i;
+      bool found = false;
+      for (std::vector<Select*>::iterator j = select.begin (); 
+           j != select.end (); 
+           j++)
+        {
+          Select& s = **j;
+          if (tag != s.tag ())
+            continue;
+          if (found)
+            msg.warning ("Duplicate tag '" + tag + "' ignored");
+          else
+            {
+              found = true;
+              Compare* c = new Compare (*this, *i);
+              comparison.push_back (c);
+              s.add_dest (c);
+            }
+          if (s.dimension () == Attribute::Unknown ())
+            msg.warning ("'" + tag + "' has unknown dimension");
+          else if (dimension == Attribute::Unknown ())
+            dimension = s.dimension ();
+          else if (dimension != s.dimension ())
+            msg.warning ("Conflicting dimensions [" + dimension 
+                         + "] and [" + s.dimension () + "] for '" + tag + "'");
+        }
+      if (!found)
+        msg.warning ("Tag '" + tag + "' not found");
+    }
+  square_dimension = Units::multiply (dimension, dimension);
 }
 
 bool 
@@ -160,9 +338,14 @@ SummaryRsqr::find_SStot (const std::vector<const Measure*>& measure,
 SummaryRsqr::SummaryRsqr (const BlockModel& al)
   : Summary (al),
     measure (map_submodel_const<Measure> (al, "measure")),
+    dimension (Attribute::Unknown ()),
+    square_dimension (Attribute::Unknown ()),
     average (find_average (measure)),
     SStot (find_SStot (measure, average)),
-    SSerr (0.0)
+    SSerr (0.0),
+    current (0),
+    active (false),
+    scope (*this)
 { }
 
 void 
@@ -173,7 +356,7 @@ SummaryRsqr::summarize (Treelog& msg) const
   tmp << "average = " << average << "\n"
       << "SStot = " << SStot << "\n"
       << "SSerr = " << SSerr << "\n"
-      << "R^2 = " << (1.0 - SSerr / SStot);
+      << "R^2 = " << R2;
   msg.message (tmp.str ());
 }
 

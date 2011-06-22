@@ -622,7 +622,7 @@ daisy_daisy_scope_extern_size (Toplevel *const toplevel)
   return 0;
 }
 
-extern "C" Scope* EXPORT  // Return extern scope INDEX.
+extern "C" const Scope* EXPORT  // Return extern scope INDEX.
 daisy_daisy_scope_extern_get (Toplevel *const toplevel,
                               const unsigned int index)
 {

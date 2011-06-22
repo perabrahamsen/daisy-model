@@ -33,6 +33,7 @@ class BlockModel;
 class Block;
 class Metalib;
 class Log;
+class Scope;
 
 class Program : public Model
 {
@@ -56,6 +57,9 @@ protected:
   void propagate_ui (Program *const child); 
   bool ui_running () const;
   void ui_set_progress (double val);
+
+  // Extract information.
+  virtual const std::vector<const Scope*>& scopes () const;
 
   // Create and Destroy.
 public:

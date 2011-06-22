@@ -29,15 +29,6 @@ Destination::~Destination ()
 { }
 
 void
-MultiDest::error ()
-{
-  for (std::vector<Destination*>::iterator i = destinations.begin ();
-       i != destinations.end ();
-       i++)
-    (*i)->error ();
-}
-
-void
 MultiDest::missing ()
 {
   for (std::vector<Destination*>::iterator i = destinations.begin ();

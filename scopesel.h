@@ -37,7 +37,7 @@ public:
 
   // Use.
 public:
-  virtual Scope* lookup (const Output&, Treelog& msg) const = 0;
+  virtual const Scope* lookup (const Output&, Treelog& msg) const = 0;
 
   // Create and Destroy.
 private:
