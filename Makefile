@@ -524,7 +524,7 @@ SPECIALS = wsource_weather.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = GP2D.C weather.C astronomy.C weatherdata.C \
+OTHER = treelog_child.C GP2D.C weather.C astronomy.C weatherdata.C \
 	scope_xysources.C lexer_flux.C lexer_soil.C iterative.C \
 	water.C block_nested.C block_submodel.C block_top.C block_model.C \
 	value.C type.C model_derived.C model_logable.C model_framed.C \
@@ -1065,9 +1065,8 @@ reaction${OBJ}: reaction.C reaction.h model_framed.h model_logable.h model.h \
  symbol.h block_model.h block_nested.h block.h scope.h attribute.h \
  treelog.h frame_model.h frame.h librarian.h
 scopesel${OBJ}: scopesel.C scopesel.h model.h symbol.h scope.h attribute.h \
- assertion.h output.h condition.h model_framed.h model_logable.h \
- memutils.h time.h block_model.h block_nested.h block.h treelog.h \
- frame_model.h frame.h librarian.h
+ assertion.h block_model.h block_nested.h block.h treelog.h frame_model.h \
+ frame.h librarian.h
 transport${OBJ}: transport.C transport.h model.h symbol.h chemical.h \
  model_framed.h model_logable.h doe.h geometry.h attribute.h adsorption.h \
  model_derived.h block_model.h block_nested.h block.h scope.h treelog.h \
@@ -1479,6 +1478,7 @@ geometry${OBJ}: geometry.C geometry.h symbol.h attribute.h volume.h \
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
  model_framed.h model_logable.h model.h library.h frame_submodel.h \
  frame.h scope.h attribute.h frame_model.h assertion.h metalib.h
+treelog_child${OBJ}: treelog_child.C treelog_child.h treelog.h symbol.h
 GP2D${OBJ}: GP2D.C GP2D.h treelog.h symbol.h iterative.h mathlib.h \
  assertion.h
 weather${OBJ}: weather.C weather.h weatherdata.h symbol.h astronomy.h
@@ -1647,8 +1647,9 @@ nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
 program_optimize${OBJ}: program_optimize.C program.h model.h symbol.h run.h \
  block_top.h block.h scope.h attribute.h block_model.h block_nested.h \
- treelog.h frame_model.h frame.h path.h assertion.h memutils.h \
- librarian.h metalib.h
+ treelog.h frame_model.h frame.h block_submodel.h frame_submodel.h \
+ treelog_child.h assertion.h librarian.h scopesel.h number.h boolean.h \
+ metalib.h mathlib.h iterative.h vcheck.h
 summary_Rsqr${OBJ}: summary_Rsqr.C summary.h model.h symbol.h destination.h \
  select.h units.h memutils.h volume.h model_derived.h model_logable.h \
  attribute.h block_submodel.h block_nested.h block.h scope.h treelog.h \

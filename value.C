@@ -52,15 +52,15 @@ bool
 Value::flag () const
 { daisy_notreached (); }
 
-const PLF& 
+boost::shared_ptr<const PLF> 
 Value::plf () const
 { daisy_notreached (); }
 
-const FrameModel& 
+boost::shared_ptr<const FrameModel>
 Value::model () const
 { daisy_notreached (); }
 
-const FrameSubmodel& 
+boost::shared_ptr<const FrameSubmodel>
 Value::submodel () const
 { daisy_notreached (); }
 
@@ -180,25 +180,25 @@ ValueBoolean::ValueBoolean (const bool v)
   : value (v)
 { }
 
-const PLF& 
+boost::shared_ptr<const PLF>
 ValuePLF::plf () const
-{ return *value; }
+{ return value; }
 
 ValuePLF::ValuePLF (boost::shared_ptr<const PLF> v)
   : value (v)
 { }
 
-const FrameModel& 
+boost::shared_ptr<const FrameModel>
 ValueModel::model () const
-{ return *value; }
+{ return value; }
 
 ValueModel::ValueModel (boost::shared_ptr<const FrameModel> v)
   : value (v)
 { }
 
-const FrameSubmodel& 
+boost::shared_ptr<const FrameSubmodel>
 ValueSubmodel::submodel () const
-{ return *value; }
+{ return value; }
 
 ValueSubmodel::ValueSubmodel (boost::shared_ptr<const FrameSubmodel> v)
   : value (v)

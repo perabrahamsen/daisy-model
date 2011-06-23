@@ -40,9 +40,9 @@ public:
   virtual double number () const;
   virtual symbol name () const;
   virtual bool flag () const;
-  virtual const PLF& plf () const;
-  virtual const FrameModel& model () const;
-  virtual const FrameSubmodel& submodel () const;
+  virtual boost::shared_ptr<const PLF> plf () const;
+  virtual boost::shared_ptr<const FrameModel> model () const;
+  virtual boost::shared_ptr<const FrameSubmodel> submodel () const;
   virtual int integer () const;
   virtual const std::vector<double>& number_sequence () const;
   virtual const std::vector<symbol>& name_sequence () const;
@@ -122,7 +122,7 @@ public:
 class ValuePLF : public Value
 {
   boost::shared_ptr<const PLF> value;
-  const PLF& plf () const;
+  boost::shared_ptr<const PLF> plf () const;
 public:
   ValuePLF (boost::shared_ptr<const PLF> v);
 };
@@ -130,7 +130,7 @@ public:
 class ValueModel : public Value
 {
   boost::shared_ptr<const FrameModel> value;
-  const FrameModel& model () const;
+  boost::shared_ptr<const FrameModel> model () const;
 public:
   ValueModel (boost::shared_ptr<const FrameModel> f);
 };
@@ -138,7 +138,7 @@ public:
 class ValueSubmodel : public Value
 {
   boost::shared_ptr<const FrameSubmodel> value;
-  const FrameSubmodel& submodel () const;
+  boost::shared_ptr<const FrameSubmodel> submodel () const;
 public:
   ValueSubmodel (boost::shared_ptr<const FrameSubmodel> f);
 };

@@ -58,6 +58,7 @@ class EXPORT Frame : public WScope
   virtual symbol type_name () const;
   symbol base_name () const;
   virtual symbol description () const;
+  bool has_references () const;
 
  public:
   // Parser.
@@ -106,7 +107,7 @@ class EXPORT Frame : public WScope
   symbol range (symbol) const;
   symbol description (symbol) const;
   const std::vector<symbol>& type_cite (symbol key) const;
-  const FrameSubmodel& default_frame (symbol) const;
+  boost::shared_ptr<const FrameSubmodel> default_frame (symbol) const;
   symbol submodel_name (symbol) const;
 
   // Add attribute types.
@@ -289,8 +290,11 @@ class EXPORT Frame : public WScope
   bool flag (symbol) const;
   bool flag (symbol, bool default_value) const;
   const PLF& plf (symbol) const;
+  boost::shared_ptr<const PLF> plf_ptr (symbol) const;
   const FrameModel& model (symbol) const;
+  boost::shared_ptr<const FrameModel> model_ptr (symbol) const;
   const FrameSubmodel& submodel (symbol) const;
+  boost::shared_ptr<const FrameSubmodel> submodel_ptr (symbol) const;
   int integer (symbol) const;
   int integer (symbol, int default_value) const;
   const std::vector<double>& number_sequence (symbol) const;

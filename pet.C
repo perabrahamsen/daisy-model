@@ -94,6 +94,7 @@ from meteorological data, as well as the crop and soil state.")
   { }
   void load_frame (Frame& frame) const
   {
+    Model::load_model (frame);
     frame.declare ("wet", "mm/h", Attribute::LogOnly, 
                    "Potential evapotranspiration for a wet system.");
     frame.declare ("dry", "mm/h", Attribute::LogOnly, 

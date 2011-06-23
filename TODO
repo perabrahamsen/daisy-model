@@ -2,6 +2,15 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Parameter optimizer
 
+** Frame::has_references
+
+Call above in 
+
+bool 
+Frame::Implementation::check (const Metalib& metalib, const Frame& frame,
+                              Treelog& msg) const
+
+
 ** Parameters must be declared in program to optimize.
 
 ** Optimizer has a parameter whose value is a list of parameters to optimize
@@ -19,6 +28,10 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 ** Create new program and run it.
 
 ** Evaluate expression
+
+* Test pet Hargreaves
+
+Er den 10 gange for høj?
 
 * Smoke
 

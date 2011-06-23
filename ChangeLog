@@ -1,3 +1,8 @@
+2011-06-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* treelog_child.h, treelog_child.C: New utility.
+	* Makefile (OTHER): Add it.
+
 2011-06-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* daisy.C (find_scope, scope_size): Removed.

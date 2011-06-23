@@ -314,29 +314,28 @@ Frame::Implementation::check (const Metalib& metalib, const Frame& frame,
       ok = false;
     }
 
-  bool has_reference = false;
   for (type_map::const_iterator i = types.begin ();
        i != types.end ();
        i++)
     {
       const symbol key = (*i).first;
       const Type& type = *(*i).second;
-      if (frame.is_reference (key))
-        has_reference = true;
-      else if (!check (metalib, frame, type, key, msg))
+      if (!frame.is_reference (key)
+          && !check (metalib, frame, type, key, msg))
         ok = false;
     }
 
   if (!ok)
     return false;
 
-  if (!has_reference)
+  if (!frame.has_references ())
     for (size_t j = 0; j < checker.size (); j++)
       if (!checker[j] (metalib, frame, msg))
         return false;
 
   return true;
 }
+
 
 symbol 
 Frame::type_name () const
@@ -374,6 +373,63 @@ Frame::description () const
     return parent ()->description ();
 
   return Attribute::None ();
+}
+
+bool 
+Frame::has_references () const
+{
+  std::set<symbol> all;
+  entries (all);
+  
+  for (std::set<symbol>::const_iterator i = all.begin ();
+       i != all.end ();
+       i++)
+    {
+      const symbol key = *i;
+      if (is_reference (key))
+        return true;;
+      if (!check (key))
+        continue;
+      
+      Attribute::type type = lookup (key);
+      int size = type_size (key);
+      switch (type)
+        {
+        case Attribute::Submodel:
+          if (size == Attribute::Singleton)
+            {
+              if (submodel (key).has_references ())
+                return true;
+            }
+          else
+            {
+              const std::vector<boost::shared_ptr<const FrameSubmodel> >& models
+                = submodel_sequence (key);
+              for (size_t i = 0; i < models.size (); i++)
+                if (models[i]->has_references ())
+                  return true;
+            }
+          break;
+        case Attribute::Model:
+          if (size == Attribute::Singleton)
+            {
+              if (model (key).has_references ())
+                return true;
+            }
+          else
+            {
+              const std::vector<boost::shared_ptr<const FrameModel> >& models
+                = model_sequence (key);
+              for (size_t i = 0; i < models.size (); i++)
+                if (models[i]->has_references ())
+                  return true;
+            }
+          break;
+        default:
+          break;
+        }
+    }
+  return false;
 }
 
 const Filepos& 
@@ -673,13 +729,13 @@ Frame::type_cite (const symbol key) const
 }
 
 
-const FrameSubmodel& 
+boost::shared_ptr<const FrameSubmodel>
 Frame::default_frame (const symbol key) const
 {
   if (impl->has_type (key))
     {
       const load_syntax_t load_syntax = impl->get_type (key).load_syntax ();
-      return *Librarian::submodel_frame (load_syntax).get ();
+      return Librarian::submodel_frame (load_syntax);
     }
   if (parent () )
     return parent ()->default_frame (key);
@@ -1040,11 +1096,11 @@ Frame::subset (const Metalib& metalib, const Frame& other,
       case Attribute::Integer:
 	return mine.integer () == his.integer ();
       case Attribute::Model:
-        return mine.model ().subset (metalib, his.model ());
+        return mine.model ()->subset (metalib, *his.model ());
       case Attribute::Submodel:
-        return mine.submodel ().subset (metalib, his.submodel ());
+        return mine.submodel ()->subset (metalib, *his.submodel ());
       case Attribute::PLF:
-	return mine.plf () == his.plf ();
+	return *mine.plf () == *his.plf ();
       case Attribute::Reference:
       case Attribute::String:
 	return mine.name () == his.name ();
@@ -1238,30 +1294,42 @@ Frame::flag (const symbol key, bool default_value) const
 
 const PLF& 
 Frame::plf (const symbol key) const
+{ return *plf_ptr (key); }
+
+boost::shared_ptr<const PLF>
+Frame::plf_ptr (const symbol key) const
 { 
   if (impl->has_value (key))
     return impl->get_value (key).plf ();
   if (parent ())
-    return parent ()->plf (key);
+    return parent ()->plf_ptr (key);
 
   daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 const FrameModel&
 Frame::model (const symbol key) const
+{ return *model_ptr (key); }
+
+boost::shared_ptr<const FrameModel>
+Frame::model_ptr (const symbol key) const
 {
   verify (key, Attribute::Model);
 
   if (impl->has_value (key))
     return impl->get_value (key).model ();
   if (parent ())
-    return parent ()->model (key);
+    return parent ()->model_ptr (key);
 
   daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 const FrameSubmodel&
 Frame::submodel (const symbol key) const
+{ return *submodel_ptr (key); }
+
+boost::shared_ptr<const FrameSubmodel>
+Frame::submodel_ptr (const symbol key) const
 {
   if (type_size (key) != Attribute::Singleton)
     return default_frame (key);
@@ -1269,7 +1337,7 @@ Frame::submodel (const symbol key) const
   if (impl->has_value (key))
     return impl->get_value (key).submodel ();
   else if (parent () && parent ()->check (key))
-    return parent ()->submodel (key);
+    return parent ()->submodel_ptr (key);
   else
     return default_frame (key);
 }

@@ -240,13 +240,13 @@ Traverse::traverse_parameter (const Frame& frame,
                                      parameter, submodel);
                 else
                   traverse_submodel (entry_frame,
-                                     frame.default_frame (parameter), 
+                                     *frame.default_frame (parameter), 
                                      parameter, submodel);
 	      }
 	    else
 	      {
 		const Frame& nested_default_frame 
-                  = frame.default_frame (parameter);
+                  = *frame.default_frame (parameter);
 
 		traverse_submodel_sequence_default (nested_default_frame, 
 						    parameter, submodel);

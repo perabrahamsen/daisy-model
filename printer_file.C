@@ -231,7 +231,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	    print_alist (frame.submodel (key), &super->submodel (key), 
                          indent, false); 
 	  else
-	    print_alist (frame.submodel (key), &frame.default_frame (key),
+	    print_alist (frame.submodel (key), frame.default_frame (key).get (),
                          indent, false); 
 	  break;
 	case Attribute::PLF:
@@ -285,7 +285,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	  break;
 	case Attribute::Submodel:
 	  {
-	    const FrameSubmodel& other = frame.default_frame (key);
+	    const FrameSubmodel& other = *frame.default_frame (key);
 	    const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& value 
               = frame.submodel_sequence (key);
 	    

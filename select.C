@@ -153,7 +153,7 @@ Select::Implementation::Spec::leaf_frame () const
     }
 
   for (unsigned int i = 0; i < submodels_and_attribute.size () - 1; i++)
-    frame = &frame->default_frame (submodels_and_attribute[i]);
+    frame = frame->default_frame (submodels_and_attribute[i]).get ();
 
   return *frame;
 }

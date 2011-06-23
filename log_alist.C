@@ -194,11 +194,11 @@ LogSubmodel::open (const symbol name)
 	    case Attribute::Submodel:
 	      if (size != Attribute::Singleton && has_value)
 		push (name, 
-		      frame_entry ().default_frame (name),
+		      *frame_entry ().default_frame (name),
 		      frame_entry ().submodel_sequence (name));
 	      else if (size != Attribute::Singleton || !has_value)
 		push (name, 
-		      frame_entry ().default_frame (name));
+		      *frame_entry ().default_frame (name));
 	      else 
 		push (name, 
 		      frame_entry ().submodel (name));

@@ -1182,7 +1182,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      {
 		const size_t size = frame.type_size (name);
 		static const std::vector<boost::shared_ptr<const FrameSubmodel>/**/> no_sequence;
-		const FrameSubmodel& default_frame = frame.default_frame (name);
+		const FrameSubmodel& default_frame = *frame.default_frame (name);
 		const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& old_sequence
 		  = frame.check (name) 
 		  ? frame.submodel_sequence (name) 

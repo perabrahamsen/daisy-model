@@ -67,6 +67,9 @@ public:
   static const VCheck& decreasing ();
   static const VCheck& sum_equal_0 ();
   static const VCheck& sum_equal_1 ();
+
+  // Any sequence.
+public:
   static const VCheck& min_size_1 ();
 
   class SumEqual;

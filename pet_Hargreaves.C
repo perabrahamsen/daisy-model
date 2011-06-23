@@ -36,12 +36,13 @@ struct PetHargreaves : public Pet
   double potential_evapotranspiration_wet;
 
   // Simulation.
-  void tick (const Time& time, const Weather& weather, const double, const Vegetation& crops,
+  void tick (const Time& time, const Weather& weather, const double,
+             const Vegetation& crops,
 	     const Surface& surface, const Geometry&,
              const Soil&, const SoilHeat&,
 	     const SoilWater&, Treelog&)
     {
-      const double K_hs = 0.0023;
+      const double K_hs = 0.0023; // BUG: It is 0.00023 in reference.
       const double T_avg = weather.daily_air_temperature ();
       const double T_diff = std::max (weather.daily_max_air_temperature () 
                                       - weather.daily_min_air_temperature (),
@@ -88,17 +89,11 @@ static struct PetHargreavesSyntax : public DeclareModel
   Model* make (const BlockModel& al) const
     { return new PetHargreaves (al); }
   PetHargreavesSyntax ()
-    : DeclareModel (Pet::component, "Hargreaves", 
-		 "Potential evopotranspiration using Samani and Hargreaves.\n\
-\n\
-Hargreaves, G.H., and Samani, Z.A. (1982) Estimating potential\n\
-evapotranspiration. Tech. Note, J. Irrig. and Drain. Engrg., ASCE,\n\
-108(3):225-230.\n\
-\n\
-Hargreaves, G.H., and Samani, Z.A. (1985) Reference crop\n\
-evapotranspiration from temperature. Appl. Engrg. in Agric.,\n\
-1(2):96-99.")
+    : DeclareModel (Pet::component, "Hargreaves", "\
+Potential evopotranspiration based on temperature.")
   { }
-  void load_frame (Frame&) const
-  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.set_strings ("cite", "hargreaves1985reference");
+  }
 } PetHargreaves_syntax;

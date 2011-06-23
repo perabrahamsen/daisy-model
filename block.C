@@ -503,32 +503,44 @@ Block::flag (const symbol key, bool default_value) const
 
 const PLF& 
 Block::plf (const symbol key) const
+{ return *plf_ptr (key); }
+
+boost::shared_ptr<const PLF>
+Block::plf_ptr (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return plf (expand_reference (key));
+    return plf_ptr (expand_reference (key));
 
-  return frame.plf (key); 
+  return frame.plf_ptr (key); 
 }
 
 const FrameModel& 
 Block::model (const symbol key) const
+{ return *model_ptr (key); }
+
+boost::shared_ptr<const FrameModel>
+Block::model_ptr (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return model (expand_reference (key));
+    return model_ptr (expand_reference (key));
 
-  return frame.model (key); 
+  return frame.model_ptr (key); 
 }
 
 const FrameSubmodel& 
 Block::submodel (const symbol key) const
+{ return *submodel_ptr (key); }
+
+boost::shared_ptr<const FrameSubmodel>
+Block::submodel_ptr (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return submodel (expand_reference (key));
+    return submodel_ptr (expand_reference (key));
 
-  return frame.submodel (key); 
+  return frame.submodel_ptr (key); 
 }
 
 int 

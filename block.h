@@ -100,8 +100,11 @@ public:
   bool flag (symbol) const;
   bool flag (symbol, bool default_value) const;
   const PLF& plf (symbol) const;
+  boost::shared_ptr<const PLF> plf_ptr (symbol) const;
   const FrameModel& model (symbol) const;
+  boost::shared_ptr<const FrameModel> model_ptr (symbol) const;
   const FrameSubmodel& submodel (symbol) const;
+  boost::shared_ptr<const FrameSubmodel> submodel_ptr (symbol) const;
   int integer (symbol) const;
   int integer (symbol, int default_value) const;
   const std::vector<double>& number_sequence (symbol) const;

@@ -627,6 +627,7 @@ Surface::Implementation::initialize (const Geometry& geo)
       if (pond_section.size () <= i)
         pond_section.push_back (0.0);
     }
+  update_pond_average (geo);
 }
 
 void
@@ -711,6 +712,7 @@ Surface::Implementation::Implementation (const FrameSubmodel& al)
     forced_pressure_value (al.number ("forced_pressure", -42.42e42)),
     use_forced_flux (al.check ("forced_flux")),
     forced_flux_value (al.number ("forced_flux", -42.42e42)),
+    pond_average (NAN),
     pond_section (al.check ("pond_section")
                   ? al.number_sequence ("pond_section")
                   : std::vector<double> ()),

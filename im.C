@@ -201,7 +201,7 @@ IM::IM (const Block& parent, const char *const key)
 {
   // Find dimension.
   const Frame& parent_frame = parent.find_frame (key);
-  const Frame& child_frame = parent_frame.default_frame (key);
+  const Frame& child_frame = *parent_frame.default_frame (key);
   const symbol dim = child_frame.dimension ("value");
   unit_ = &(parent.units ().get_unit (dim));
   
