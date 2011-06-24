@@ -373,7 +373,8 @@ By default identical to `dx'.");
     const size_t max_iter = 300000;
     Iterative::Point result;
     const bool solved = Iterative::NelderMead (min_iter, max_iter, epsilon,
-                                               to_minimize, start, result);
+                                               to_minimize, start, result,
+                                               Treelog::null ());
     const double Rsqr = -to_minimize.value (result);
     
     store ("2D R^2", Rsqr, solved ? "(solved)" : "(no solution)");
@@ -590,7 +591,8 @@ plot '-' using 2:1:3 notitle with xerrorbars, '-' using 2:1 notitle with lines\n
     const size_t max_iter = 300000;
     Iterative::Point result;
     const bool solved = Iterative::NelderMead (min_iter, max_iter, epsilon,
-                                               to_minimize, start, result);
+                                               to_minimize, start, result,
+                                               Treelog::null ());
     const double Rsqr = -to_minimize.value (result);
     
     store ("1D R^2", Rsqr, solved ? "(solved)" : "(no solution)");

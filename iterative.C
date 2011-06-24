@@ -153,6 +153,23 @@ Fixpoint::Fixpoint (const int max_iter)
 Fixpoint::~Fixpoint ()
 { }
 
+// The 'PointValue' class.
+
+void 
+Iterative::PointValue::print (const size_t p , Treelog& msg) const
+{
+  if (&msg == &Treelog::null ())
+    return;
+
+  std::ostringstream tmp;
+  daisy_assert (point.size () > 0);
+  tmp << "P" << p << ": (" << point[0];
+  for (size_t i = 1; i < point.size (); i++)
+    tmp << " " << point[i];
+  tmp << ") = " << value;
+  msg.message (tmp.str ());
+}
+
 // The 'RSquared' function.
 
 double 
@@ -185,7 +202,7 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
                        const double epsilon, 
                        const Iterative::PointFunction& fun, 
                        const Iterative::Simplex& simplex,
-                       Iterative::Point& result)
+                       Iterative::Point& result, Treelog& msg)
 {
   daisy_assert (min_iter > 1);
   daisy_assert (min_iter < max_iter);
@@ -202,6 +219,7 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
   const double sigma = 0.5; // Reduction.
 
   // Start value.
+  msg.message ("Initial value.");
   daisy_assert (simplex.size () > 0);
   const size_t dim = simplex.size () - 1u;
   SimplexValue simplex_value (dim + 1);
@@ -209,6 +227,7 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
     {
       simplex_value[i].point = simplex[i];
       simplex_value[i].value = fun.value (simplex[i]);
+      simplex_value[i].print (i, msg);
     }
 
   // Variables.
@@ -227,8 +246,13 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
       // 1. Order according to the values at the vertices:
       //    f(\textbf{x}_{1}) \leq f(\textbf{x}_{2}) \leq \cdots \leq f(\textbf{x}_{n+1})
       std::sort (simplex_value.begin (), simplex_value.end ());
+      msg.message ("Sorting");
 
       // Stop?
+      std::ostringstream tmp;
+      tmp << "Iteration " << iter
+          << "; min " << min_iter << " max " << max_iter;
+      msg.message (tmp.str ());
       const double f_best = best.value;
       if (iter > min_iter)
         {
@@ -352,7 +376,7 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
                        const double epsilon, 
                        const Iterative::PointFunction& fun, 
                        const Iterative::Point& start,
-                       Iterative::Point& result)
+                       Iterative::Point& result, Treelog& msg)
 {
   // Make a simplex by putting a bit of noise on starting point.
   const size_t dim = start.size ();
@@ -363,7 +387,7 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
     else
       simplex[i][i] = 0.01;
 
-  return NelderMead (min_iter, max_iter, epsilon, fun, simplex, result);
+  return NelderMead (min_iter, max_iter, epsilon, fun, simplex, result, msg);
 }
 
 // iterative.C ends here.

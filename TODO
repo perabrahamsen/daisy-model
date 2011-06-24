@@ -2,33 +2,6 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Parameter optimizer
 
-** Frame::has_references
-
-Call above in 
-
-bool 
-Frame::Implementation::check (const Metalib& metalib, const Frame& frame,
-                              Treelog& msg) const
-
-
-** Parameters must be declared in program to optimize.
-
-** Optimizer has a parameter whose value is a list of parameters to optimize
-
-** Optimizer has initial simplex parameter
-
-** The parent frame must be saved.
-
-** Create new FrameModel that links to parent frame.
-
-** Set parameters in new frame.
-
-** Create new BlockTop based on metalib and new frame
-
-** Create new program and run it.
-
-** Evaluate expression
-
 * Test pet Hargreaves
 
 Er den 10 gange for høj?

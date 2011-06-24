@@ -161,6 +161,7 @@ namespace Iterative
     double value;
     bool operator< (const PointValue& other) const
     { return this->value < other.value; }
+    void print (const size_t, Treelog&) const;
   };
   
   // A double valued function of a Point.
@@ -196,10 +197,11 @@ namespace Iterative
   bool NelderMead (const size_t min_iter, const size_t max_iter, 
                    const double epsilon,
                    const PointFunction& fun,
-                   const Simplex& simplex, Point& result);
+                   const Simplex& simplex, Point& result, Treelog&);
   bool NelderMead (const size_t min_iter, const size_t max_iter, 
                    const double epsilon,
-                   const PointFunction& fun, const Point& start, Point& result);
+                   const PointFunction& fun, const Point& start,
+                   Point& result, Treelog&);
 }
 
 #endif // ITERATIVE_H
