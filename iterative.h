@@ -161,7 +161,6 @@ namespace Iterative
     double value;
     bool operator< (const PointValue& other) const
     { return this->value < other.value; }
-    void print (const size_t, Treelog&) const;
   };
   
   // A double valued function of a Point.

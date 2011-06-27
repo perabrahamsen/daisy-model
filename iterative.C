@@ -26,6 +26,7 @@
 #include "mathlib.h"
 #include <sstream>
 #include <algorithm>
+#include <limits>
 
 // The 'Fixpoint' class.
 
@@ -153,23 +154,6 @@ Fixpoint::Fixpoint (const int max_iter)
 Fixpoint::~Fixpoint ()
 { }
 
-// The 'PointValue' class.
-
-void 
-Iterative::PointValue::print (const size_t p , Treelog& msg) const
-{
-  if (&msg == &Treelog::null ())
-    return;
-
-  std::ostringstream tmp;
-  daisy_assert (point.size () > 0);
-  tmp << "P" << p << ": (" << point[0];
-  for (size_t i = 1; i < point.size (); i++)
-    tmp << " " << point[i];
-  tmp << ") = " << value;
-  msg.message (tmp.str ());
-}
-
 // The 'RSquared' function.
 
 double 
@@ -197,6 +181,26 @@ Iterative::RSquared (const std::vector<Iterative::PointValue>& obs,
   return 1.0 - (SS_err / SS_tot);
 }
 
+static void 
+print (const Iterative::Point& point, const double value, Treelog& msg)
+{
+  if (&msg == &Treelog::null ())
+    return;
+
+  std::ostringstream tmp;
+  daisy_assert (point.size () > 0);
+  tmp << "(" << point[0];
+  for (size_t i = 1; i < point.size (); i++)
+    tmp << " " << point[i];
+  tmp << ")";
+  if (value >= std::numeric_limits<double>::max ())
+    tmp << " out of bound";
+  else if (std::isfinite (value))
+    tmp << " = " << value;
+  msg.message (tmp.str ());
+}
+
+
 bool
 Iterative::NelderMead (const size_t min_iter, const size_t max_iter, 
                        const double epsilon, 
@@ -204,9 +208,9 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
                        const Iterative::Simplex& simplex,
                        Iterative::Point& result, Treelog& msg)
 {
-  daisy_assert (min_iter > 1);
-  daisy_assert (min_iter < max_iter);
-  daisy_assert (epsilon > 0.0);
+  daisy_assert (min_iter > 0);
+  daisy_assert (min_iter <= max_iter);
+  daisy_assert (epsilon >= 0.0);
   
   typedef std::vector<PointValue> SimplexValue;
 
@@ -219,15 +223,15 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
   const double sigma = 0.5; // Reduction.
 
   // Start value.
-  msg.message ("Initial value.");
   daisy_assert (simplex.size () > 0);
   const size_t dim = simplex.size () - 1u;
   SimplexValue simplex_value (dim + 1);
   for (size_t i = 0; i < dim + 1; i++)
     {
+      Treelog::Open nest (msg, "Initial value", i, "");
       simplex_value[i].point = simplex[i];
       simplex_value[i].value = fun.value (simplex[i]);
-      simplex_value[i].print (i, msg);
+      print (simplex_value[i].point, simplex_value[i].value, msg);
     }
 
   // Variables.
@@ -240,38 +244,40 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
   PointValue& second_worst = simplex_value[dim-1];
 
   double old_f_best = best.value;
+  size_t iter_best = 0;
   for (size_t iter = 1;; iter++)
     {
-      
+      Treelog::Open nest (msg, "Iteration", iter, "");
+
       // 1. Order according to the values at the vertices:
       //    f(\textbf{x}_{1}) \leq f(\textbf{x}_{2}) \leq \cdots \leq f(\textbf{x}_{n+1})
+      msg.message ("1: Sorting.");
       std::sort (simplex_value.begin (), simplex_value.end ());
-      msg.message ("Sorting");
 
       // Stop?
-      std::ostringstream tmp;
-      tmp << "Iteration " << iter
-          << "; min " << min_iter << " max " << max_iter;
-      msg.message (tmp.str ());
       const double f_best = best.value;
-      if (iter > min_iter)
+      const double change = std::fabs (old_f_best - f_best);
+      if (change > epsilon)
         {
-          if (iter > max_iter)
-            {
-              result = best.point;
-              return false;
-            }
-          const double change = std::fabs (old_f_best - f_best);
-          
-          if (change < epsilon)
-            {
-              result = best.point;
-              return true;
-            }
+          old_f_best = f_best;
+          iter_best = 1;
         }
-      old_f_best = f_best;
+      else
+        iter_best++;
+
+      if (iter_best > min_iter)
+        {
+          result = best.point;
+          return true;
+        }
+      if (iter > max_iter)
+        {
+          result = best.point;
+          return false;
+        }
 
       // 2. Calculate xo, the center of gravity of all points except xn + 1.
+      msg.message ("2: Find center of gravity of all but worst.");
       std::fill (x0.begin (), x0.end (), 0.0);
       for (size_t i = 0; i < dim; i++)
         for (size_t j = 0; j < dim; j++)
@@ -280,26 +286,33 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
       const double factor = 1.0 / (dim + 0.0);
       for (size_t i = 0; i < dim; i++)
         x0[i] *= factor;
+      print (x0, NAN, msg);
 
       // 3. Reflection
       // Compute reflected point
       // \textbf{x}_r = \textbf{x}_o + \alpha (\textbf{x}_o - \textbf{x}_{n+1})
+      msg.message ("3: Compute reflection point.");
       const Point& x_worst = worst.point;
       for (size_t i = 0; i < dim; i++)
         xr[i] = x0[i] + alpha * (x0[i] - x_worst[i]);
       const double f_xr = fun.value (xr);
-
+      print (xr, f_xr, msg);
+      
       // If the reflected point is the best point so far, 
       // f(\textbf{x}_{r}) < f(\textbf{x}_{1}), 
       // then goto step 4 (expansion).
       if (f_xr < f_best)
         {
+          msg.message ("Reflection point is the best so far.");
           // 4. Expansion
           // Compute the expanded point 
           // \textbf{x}_{e} = \textbf{x}_o + \gamma (\textbf{x}_o - \textbf{x}_{n+1})
+          msg.message ("4: Compute expanded point.");
           for (size_t i = 0; i < dim; i++)
             xe[i] = x0[i] + gamma * (x0[i] - x_worst[i]);
           const double f_xe = fun.value (xe);
+          print (xe, f_xe, msg);
+
           // If the expanded point is better than the reflected point, 
           //   f(\textbf{x}_{e}) < f(\textbf{x}_{r})
           // then obtain a new simplex by replacing the worst point xn + 1 
@@ -308,11 +321,13 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
           // with the reflected point xr, and go to step 1 (order).
           if (f_xe < f_xr)
             {
+              msg.message ("Expanded point best, replacing worst point.");
               worst.point = xe;
               worst.value = f_xe;
             }
           else
             {
+              msg.message ("Reflection point best, replacing worst point.");
               worst.point = xr;
               worst.value = f_xr;
             }
@@ -323,6 +338,8 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
       const double f_second_worst = second_worst.value; 
       if (f_xr < f_second_worst)
         {
+          msg.message ("\
+Reflected point better than second worst, replace worst.");
           // If the reflected point is better than the second worst,
           // but not better than the best, i.e.: 
           // f(\textbf{x}_{1}) \leq f(\textbf{x}_{r}) < f(\textbf{x}_{n}),
@@ -332,14 +349,17 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
           worst.value = f_xr;
           continue;           // Step 1 (order).
         }
+      msg.message ("Reflected point worse than second worst.");
 
       // 5. Contraction
       // Here, it is certain that f(\textbf{x}_{r}) \geq f(\textbf{x}_{n}) 
       // Compute contracted point 
       // \textbf{x}_{c} = \textbf{x}_{n+1}+\rho(\textbf{x}_{o}-\textbf{x}_{n+1})
+      msg.message ("5: Compute contraction point.");
       for (size_t i = 0; i < dim; i++)
         xc[i] = x_worst[i] + rho * (x0[i] - x_worst[i]);
       const double f_xc = fun.value (xc);
+      print (xc, f_xc, msg);
 
       // If the contracted point is better than the worst point, i.e. 
       //  f(\textbf{x}_{c}) < f(\textbf{x}_{n+1})
@@ -348,24 +368,29 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
       const double f_x_worst = worst.value;
       if (f_xc < f_x_worst)
         {
+          msg.message ("Contracted point better than worst, replace it.");
           worst.point = xc;
           worst.value = f_xc;
           continue;           // Step 1 (order).
         }
       // Else go to step 6.
+      msg.message ("Contracted point worse than worst.");
 
       // 6. Reduction
       // For all but the best point, replace the point with
       // x_{i} = x_{1} + \sigma(x_{i} - x_{1}) \text{ for all i } \in\{2,\dots,n+1\}. 
+      msg.message ("6: Reduction.");
       const Point& x_best = best.point;
       for (size_t i = 1; i < dim + 1; i++)
         {
+          Treelog::Open nest (msg, "Reducing", i, "");
           Point& xi = simplex_value[i].point;
           double& f_xi = simplex_value[i].value;
 
           for (size_t j = 0; j < dim; j++)
             xi[j] = x_best[j] + sigma * (xi[j] - x_best[j]);
           f_xi = fun.value (xi);
+          print (xi, f_xi, msg);
         }
       // Goto step 1. (order).
     }
