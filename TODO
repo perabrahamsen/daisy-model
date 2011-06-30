@@ -2,6 +2,21 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Parameter optimizer
 
+Udgangspunkt 
+
+(defhorizon
+
+  (clay )
+
+(defprogram mysim 
+
+ (
+)
+
+(run minimize )
+
+(defsummary )
+
 * Test pet Hargreaves
 
 Er den 10 gange for høj?

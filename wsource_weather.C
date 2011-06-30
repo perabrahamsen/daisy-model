@@ -119,6 +119,7 @@ struct WSourceWeather::Implementation
   double my_wind;
   double my_air_temperature;
   double my_vapor_pressure;
+  double my_relative_humidity;
   double my_rain;
   double my_snow;
   IM my_deposit;
@@ -805,9 +806,9 @@ WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
              }
 
       // Use it.
-      if (!std::isfinite (my_daily_min_air_temperature))
+      if (std::isfinite (new_min))
         my_daily_min_air_temperature = new_min;
-      if (!std::isfinite (my_daily_max_air_temperature))
+      if (std::isfinite (new_max))
         my_daily_max_air_temperature = new_max;
       double T_step = max_timestep (day_start, day_end, 
                                     Weatherdata::AirTemp ());
@@ -822,7 +823,7 @@ WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
         my_daily_air_temperature = new_T;
       else if (my_has_min_max_temperature)
         my_daily_air_temperature = 0.5 * (my_daily_min_air_temperature
-                                          + my_has_min_max_temperature);
+                                          + my_daily_max_air_temperature);
       else
         msg.warning ("No daily air temperature, reusing using old value");
     }
@@ -887,9 +888,10 @@ WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
   else
     msg.warning ("No air temperature, resuing old value");
 
-  // Vapor pressure.
+  // Vapor pressure and relative humidity.
   const double new_vapor_pressure = number_average (Weatherdata::VapPres ());
   const double new_relative_humidity = number_average (Weatherdata::RelHum ());
+
   if (std::isfinite (new_vapor_pressure))
     my_vapor_pressure = new_vapor_pressure;
   else if (std::isfinite (new_relative_humidity))
@@ -897,6 +899,14 @@ WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
       * new_relative_humidity;
   else
     my_vapor_pressure = NAN;
+
+  if (std::isfinite (new_relative_humidity))
+    my_relative_humidity = new_relative_humidity;
+  else if (std::isfinite (new_vapor_pressure))
+    my_relative_humidity 
+      = new_vapor_pressure / FAO::SaturationVapourPressure (my_air_temperature);
+  else
+    my_relative_humidity = NAN;
 
   // Rain and snow.
   const double new_precipitation = number_average (Weatherdata::Precip ());
@@ -1212,6 +1222,7 @@ WSourceWeather::Implementation::Implementation (const Weather& w,
     my_wind (NAN),
     my_air_temperature (NAN),
     my_vapor_pressure (NAN),
+    my_relative_humidity (NAN),
     my_rain (NAN),
     my_snow (NAN),
     my_deposit (al, "deposit"),    // For the units...
@@ -1407,6 +1418,8 @@ WSourceWeather::output (Log& log) const
   output_value (rain () + snow (), "precipitation", log);
   output_value (cloudiness (), "cloudiness", log);
   output_value (vapor_pressure (), "vapor_pressure", log);
+  if (std::isfinite (impl->my_relative_humidity))
+    output_value (impl->my_relative_humidity, "relative_humidity", log);
   output_value (air_pressure (), "air_pressure", log);
   output_value (diffuse_radiation (), "diffuse_radiation", log);
   output_value (wind (), "wind", log);
@@ -1507,6 +1520,8 @@ Fraction of precipitation that falls as snow as function of air temperature.");
     frame.declare_fraction ("daily_cloudiness", Attribute::LogOnly,
                             "Fraction of sky covered by clouds [0-1].");
     frame.declare ("vapor_pressure", "Pa", Attribute::LogOnly, "Humidity.");
+    frame.declare ("relative_humidity", Attribute::Fraction (), 
+                   Attribute::LogOnly, "Relative humidity.");
     frame.declare ("air_pressure", "Pa", Attribute::LogOnly, "Air pressure.");
     frame.declare ("wind", "m/s", Attribute::LogOnly, "Wind speed.");
     frame.declare ("day_length", "h", Attribute::LogOnly,

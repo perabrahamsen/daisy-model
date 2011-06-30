@@ -228,7 +228,7 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
   SimplexValue simplex_value (dim + 1);
   for (size_t i = 0; i < dim + 1; i++)
     {
-      Treelog::Open nest (msg, "Initial value", i, "");
+      Treelog::Open nest (msg, "Initial value", i + 1, "");
       simplex_value[i].point = simplex[i];
       simplex_value[i].value = fun.value (simplex[i]);
       print (simplex_value[i].point, simplex_value[i].value, msg);
@@ -243,7 +243,7 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
   PointValue& worst = simplex_value[dim];
   PointValue& second_worst = simplex_value[dim-1];
 
-  double old_f_best = best.value;
+  double old_f_best = std::numeric_limits<double>::max ();
   size_t iter_best = 0;
   for (size_t iter = 1;; iter++)
     {

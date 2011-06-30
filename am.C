@@ -839,7 +839,8 @@ AM::get_volatilization (const Metalib& metalib, const FrameModel& al)
       daisy_assert (is_mineral (metalib, al));
       
       return al.number ("weight")
-	* al.number ("NH4_fraction") * volatilization; 
+	* al.number ("NH4_fraction") * volatilization
+        * 0.1;                  // kg/ha -> g/m^2
     }
   // Other.
   daisy_assert (!al.check ("volatilization"));

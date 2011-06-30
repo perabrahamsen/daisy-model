@@ -332,13 +332,15 @@
        lex->skip_space ();
        const symbol key (name);
        const Attribute::type type = keywords.lookup (key);
-       const int size = keywords.type_size (key);
        if (type == Attribute::Error)
          {
            lex->skip_line ();
            error ("'" + key + "': Unknown keyword");
+           lex->skip_line ();
+           continue;
          }
-       else if (size == Attribute::Singleton)
+       const int size = keywords.type_size (key);
+       if (size == Attribute::Singleton)
          switch (type)
            {
            case Attribute::Number:

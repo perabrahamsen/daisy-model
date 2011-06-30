@@ -1,3 +1,13 @@
+2011-06-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* am.C (get_volatilization): Fix unix bug with volatilization of
+	mineral fertilizer.
+
+	* lexer_table.C (read_keywords): Don't ask for size of unknown
+	keywords.
+	* wsource_weather.C (relative_humidity): New log variable.
+	(tick): Fix min/max temperature.
+
 2011-06-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* treelog_child.h, treelog_child.C: New utility.

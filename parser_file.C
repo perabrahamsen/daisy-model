@@ -139,6 +139,7 @@ ParserFile::Implementation::get_string ()
     { return find (c) != end (); }
     IdExtra ()
     { 
+      insert ('=');
       insert ('<');
       insert ('>');
       insert ('_');

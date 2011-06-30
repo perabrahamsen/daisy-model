@@ -8,6 +8,8 @@ release.
 
 * 5.00
 
+** Bug fixes.
+
 ** New units [fraction dry soil] and [dry soil ppm] for logging.
 
 To log content as fraction of dry soil.  Just using [ppm] only works
