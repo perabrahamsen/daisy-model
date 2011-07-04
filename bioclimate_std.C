@@ -440,6 +440,8 @@ BioclimateStandard::check (const Weather& weather, Treelog& msg) const
 {
   TREELOG_MODEL (msg);
   bool ok = true;
+  if (!pet->check (weather, msg))
+    ok = false;
   if (!svat->check (weather, msg))
     ok = false;
   return ok;

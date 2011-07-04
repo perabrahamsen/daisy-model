@@ -27,6 +27,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "frame.h"
+#include "treelog.h"
 
 struct PetHargreaves : public Pet
 {
@@ -42,7 +43,12 @@ struct PetHargreaves : public Pet
              const Soil&, const SoilHeat&,
 	     const SoilWater&, Treelog&)
     {
-      const double K_hs = 0.0023; // BUG: It is 0.00023 in reference.
+      if (!weather.has_min_max_temperature ())
+        throw "Min/max temperature required by Hargreaves";
+
+      // K_hs is 0.00023 in reference, but reference evapotranspiration 
+      // seems to be right (comparable with FAO_PM).  Does units match up?
+      const double K_hs = 0.0023; 
       const double T_avg = weather.daily_air_temperature ();
       const double T_diff = std::max (weather.daily_max_air_temperature () 
                                       - weather.daily_min_air_temperature (),
@@ -52,7 +58,7 @@ struct PetHargreaves : public Pet
       static const double s_per_h = 60.0 * 60.0; // [W] -> [J]
       static const double W_per_m2_to_mm_per_h = s_per_h 
         / latent_heat_of_vaporation;
-      // Note: andr. uses 0.4081633.  What are his units?
+      // Note: Adriano uses 0.4081633.  What are his units?
       double Ra =  weather.extraterrestrial_radiation (time)
         * W_per_m2_to_mm_per_h; // [mm/h]
 
@@ -79,6 +85,18 @@ struct PetHargreaves : public Pet
   { return potential_evapotranspiration_wet; }
 
   // Create.
+  bool check (const Weather& weather, Treelog& msg) const
+  { 
+    bool ok = true;
+    if (!weather.has_min_max_temperature ())
+      {
+        ok = false;
+        TREELOG_MODEL (msg);
+        msg.error ("Min/max temperature required");
+      }
+    return ok;
+  }
+
   PetHargreaves (const BlockModel& al)
     : Pet (al)
     { }
@@ -93,7 +111,7 @@ static struct PetHargreavesSyntax : public DeclareModel
 Potential evopotranspiration based on temperature.")
   { }
   void load_frame (Frame& frame) const
-  { 
-    frame.set_strings ("cite", "hargreaves1985reference");
-  }
+  { frame.set_strings ("cite", "hargreaves1985reference"); }
 } PetHargreaves_syntax;
+
+// pet_Hargreaves.C ends here.

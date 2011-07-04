@@ -1,6 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Parameter optimizer
+* Parameter optimizer doc
 
 Udgangspunkt 
 
@@ -22,6 +22,16 @@ Udgangspunkt
 Er den 10 gange for høj?
 
 * Smoke
+
+** BB målinger
+
+*** Indsæt application
+
+*** Generer plot.
+
+*** Sammenlign Rsqr
+
+*** Optimer
 
 * Vestskoven
 

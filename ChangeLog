@@ -1,3 +1,8 @@
+2011-07-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* pet_Hargreaves.C (tick, check): Check for has_min_max_temperature.
+	* bioclimate_std.C (check): Check 'pet'.
+
 2011-06-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* am.C (get_volatilization): Fix unix bug with volatilization of
