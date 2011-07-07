@@ -405,4 +405,61 @@
             Metamitron-colloid-generation
             Metamitron-colloid-sorption))
 
+;;; Brilliant Blue
+
+(defchemical BB-base common
+  "Base parameterization for all Brilliant Blue forms."
+  ;; No decomposition.
+  (decompose_rate 0 [d^-1]))
+
+(defchemical BB BB-base
+  "Dissolved Brilliant Blue."
+  (adsorption none))
+
+(defchemical BB-immobile BB-base
+  "Brilliant Blue sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction BB-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Brilliant Blue."
+  (cite flury1995tracer)
+  ;; The three examined soils had K_clay of 8, 20, and 23.
+  (K_clay 20 [l/kg])
+  (k_sorption 0.05 [h^-1])
+  (solute BB)
+  (sorbed BB-immobile)
+  )
+
+(defchemical BB-colloid BB-base
+  "Brilliant Blue sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction BB-colloid-sorption BB-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound Brilliant Blue."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed BB-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction BB-filter colloid-filter
+  "Filtration of colloid-bound metamitron in the soil matrix."
+  (mobile BB-colloid)
+  (immobile BB-immobile))
+
+(defreaction BB-colloid-generation bound_release
+  "Release immobile Brilliant Blue as colloids in mixing layer."
+  (colloid colloid)
+  (bound BB-colloid)
+  (immobile BB-immobile))
+
+(defchemistry BB default
+  "Brilliant Blue in both immobile, solute and colloid form."
+  (trace BB BB-immobile BB-colloid)
+  (reaction BB-immobile-sorption
+            BB-filter 
+            BB-colloid-generation
+            BB-colloid-sorption))
+
 ;;; colloid-bound.dai ends here.

@@ -1083,7 +1083,19 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
       const double MS2_goal = C_avg * Theta_sec_old;
       const double MS1_loss = alpha * (MS1 - MS1_goal);
       const double MS2_gain = alpha * (MS2_goal - MS2);
-      daisy_approximate (MS1_loss, MS2_gain);
+      if (!approximate (MS + MS1_loss, MS + MS2_gain))
+        {
+          std::ostringstream tmp;
+          tmp << "1: Theta = " << Theta_prim_old << "; C = " << C_prim
+              << "; M = " << MS1 << "; Goal = " << MS1_goal
+              << " Loss: " << MS1_loss << "\n"
+              << "2: Theta = " << Theta_sec_old << "; C = " << C_sec
+              << "; M = " << MS2 << "; Goal = " << MS2_goal
+              << " Gain: " << MS2_gain << "\n"
+              << "X: Theta = " << Theta<< "; C = " << C_avg
+              << "; M = " << MS << "\n";
+          msg.error (tmp.str ());
+        }
 
       // Use it.
       S_exchange[c] = MS1_loss;      

@@ -1,31 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Parameter optimizer doc
-
-Udgangspunkt 
-
-(defhorizon
-
-  (clay )
-
-(defprogram mysim 
-
- (
-)
-
-(run minimize )
-
-(defsummary )
-
-* Test pet Hargreaves
-
-Er den 10 gange for høj?
-
 * Smoke
 
 ** BB målinger
 
-*** Indsæt application
+*** Indsæt måledata i BB-base.ddf
 
 *** Generer plot.
 

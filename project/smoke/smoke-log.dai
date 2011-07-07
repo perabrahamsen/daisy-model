@@ -1,10 +1,10 @@
 ;; Special log model for the smoke project.
 
 (deflog Smoke chemical
-  "Soil bromide and other stuff"
+  "Soil chemical and other stuff"
   (declare unit String "Base unit.")
   (unit "g/ha")
-  (where "${colfid}smoke.dlf")
+  (where "${colfid}smoke-${chemical}.dlf")
   (when true)
   (entries ;; Year Month MDay Hour
            (number (path column "${column}" Movement "*" 
@@ -317,10 +317,10 @@ Total amount in the specified soil interval.")
            ))
 
 (deflog SmokeProfile chemical
-  "Soil bromide brofile"
+  "Soil chemical profile"
   (declare unit String "Base unit.")
   (unit "g/ha")
-  (where "${colfid}smoke-profile.dlf")
+  (where "${colfid}smoke-${chemical}-profile.dlf")
   (when true)
   (entries ;; Year Month MDay Hour
            (interval (path column "${column}" Chemistry "*" 

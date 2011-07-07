@@ -1,6 +1,6 @@
 SETUP = setup-pa.dai setup.dai colloid-bound.dai smoke-log.dai
 
-DATA = bromid.ddf mixed-weather.dwf aquifer.gwt rain-data.dwf
+DATA = Bromide.ddf BB-base.ddf mixed-weather.dwf aquifer.gwt rain-data.dwf
 
 DOC = graphs.tex lims.tex
 

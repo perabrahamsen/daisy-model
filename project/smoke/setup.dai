@@ -62,7 +62,7 @@
 
 (defcolumn Rorrende default
   (OrganicMatter none)
-  (Chemistry multi (combine Bromide))
+  (Chemistry multi (combine Bromide colloids BB))
   (Soil (MaxRootingDepth 150 [cm])
         (horizons (-3.00 "Surface")
                   (-24.00 "Ap")
@@ -154,11 +154,17 @@
   (wait (at 2009 9 09 12)) (plowing) 
   (wait (at 2009 9 30 12)) (seed_bed_preparation)(sow WWheat)
   (wait (at 2010 8 26 12)) (harvest "WWheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
-  ;; 5 g KBr per (pi (3 cm)^2
-  ;; = 0.6714 Br/KBr * 5 g KBr per (pi (3 cm)^2
-  ;; = 0.1187 g Br/cm^2
-  ;; = 11.87 Mg/ha
-  (wait (at 2010 10 26 12)) (spray "Bromide" 11.87 [Mg/ha]))
+  (wait (at 2010 10 26 12))  
+  (progn 
+    ;; 5 g KBr per (pi (3 cm)^2
+    ;; = 0.6714 Br/KBr * 5 g KBr per (pi (3 cm)^2)
+    ;; = 0.1187 g Br/cm^2
+    ;; = 11.87 Mg/ha
+    (spray "Bromide" 11.87 [Mg/ha])
+    ;; 5 g BB per (pi (3 cm)^2
+    ;; = 0.1768 g BB/cm^2
+    ;; = 17.68 Mg/ha
+    (spray "BB" 17.68 [Mg/ha])))
 
 (defunit PPM [ppm dry soil])
 
@@ -197,8 +203,13 @@
           ("Field chemical" (chemical "Bromide"))
           ("Chemical Content" (print_initial false) 
            (chemical Bromide) (unit [PPM]) (when finished))
-          ("Smoke" (when daily))
-          ("SmokeProfile" (when finished))
+          ("Field chemical" (chemical "BB-base"))
+          ("Chemical Content" (print_initial false) 
+           (chemical BB-base) (unit [PPM]) (when finished))
+          ("Smoke" (when daily) (chemical "Bromide"))
+          ("SmokeProfile" (when finished)(chemical "Bromide"))
+          ("Smoke" (when daily) (chemical "BB-base"))
+          ("SmokeProfile" (when finished)(chemical "BB-base"))
   ))
   
 (defprogram Drain Smoke
@@ -228,7 +239,8 @@
   
 (defgnuplot plotBr xy
   (declare what String "What to plot.")
-  (where "fig/${what}-Br.pdf")
+  (declare chemical String "Chemical to plot.")
+  (where "fig/${what}-${chemical}.pdf")
   (xmax 5000 [PPM])
   (legend se)
   (source (profile (when 2010 12 13)
@@ -236,14 +248,14 @@
                    (style 1)
                    (with lines)
                    (to -130 [cm])
-                   (file "log/${what}-content_Bromide.dlf"))
+                   (file "log/${what}-content_${chemical}.dlf"))
           (profile (when 2010 12 13)
                    (title "")
                    (style 1)
                    (with points)
                    (to -130 [cm])
-                   (file "log/${what}-smoke-profile.dlf"))
-          (arithmetic (file "bromid.ddf")
+                   (file "log/${what}-smoke-${chemical}-profile.dlf"))
+          (arithmetic (file "${chemical}.ddf")
                       (style 2)
                       (title "Obs")
                       (y Middle)
@@ -256,9 +268,14 @@
           (line (points (0 -40) (10000 -40)))))
 
 (defgnuplot plotBrall multi
-  (graph (plotBr (what "drain") (title "Drain connected biopore"))
-         (plotBr (what "macro") (title "Biopore without smoke")) 
-         (plotBr (what "without") (title "No biopores"))))
+  (graph (plotBr (chemical "Bromide") (what "drain") (title "Drain connected biopore"))
+         (plotBr (chemical "Bromide") (what "macro") (title "Biopore without smoke")) 
+         (plotBr (chemical "Bromide") (what "without") (title "No biopores"))))
+  
+(defgnuplot plotBBall multi
+  (graph (plotBr (chemical "BB-base") (what "drain") (title "Drain connected biopore"))
+         (plotBr (chemical "BB-base") (what "macro") (title "Biopore without smoke")) 
+         (plotBr (chemical "BB-base") (what "without") (title "No biopores"))))
   
 
 (defgnuplot plotPres xy
@@ -329,7 +346,7 @@
 
 
 (defgnuplot plotall multi
-  (graph plotPresall plotBrall rain 
+  (graph plotPresall plotBrall plotBBall rain 
          (K (FROM -50 [hPa]) (TO 0 [hPa]) 
             (where "fig/conductivity.pdf"))
          (K (FROM -80 [hPa]) (TO -20 [hPa])
@@ -346,8 +363,8 @@
 
 ;;(run batch (run (Without) (plot)))
 
-(run both)
-;;(run plot)
+;;(run both)
+(run plot)
 ;;(run sims)
 
 ;; setup.dai ends here.
