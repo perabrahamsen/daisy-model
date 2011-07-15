@@ -1,3 +1,7 @@
+2011-07-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* scopesel.C (multi): New model.
+
 2011-07-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* pet_Hargreaves.C (tick, check): Check for has_min_max_temperature.

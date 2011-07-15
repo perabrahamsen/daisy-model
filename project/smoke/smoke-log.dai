@@ -328,7 +328,7 @@ Total amount in the specified soil interval.")
                      (from -0 [cm]) (to -9 [cm])
                      (documentation "\
 Total amount in the specified soil interval.")
-                     (tag "Br @ -4.5")
+                     (tag "M @ -4.5")
                      (dimension "PPM")
                      (spec chemical default M))
            (interval (path column "${column}" Chemistry "*" 
@@ -336,7 +336,7 @@ Total amount in the specified soil interval.")
                      (from -9 [cm]) (to -18 [cm])
                      (documentation "\
 Total amount in the specified soil interval.")
-                     (tag "Br @ -13.5")
+                     (tag "M @ -13.5")
                      (dimension "PPM")
                      (spec chemical default M))
            (interval (path column "${column}" Chemistry "*" 
@@ -344,7 +344,7 @@ Total amount in the specified soil interval.")
                      (from -18 [cm]) (to -24 [cm])
                      (documentation "\
 Total amount in the specified soil interval.")
-                     (tag "Br @ -21")
+                     (tag "M @ -21")
                      (dimension "PPM")
                      (spec chemical default M))
            (interval (path column "${column}" Chemistry "*" 
@@ -352,7 +352,7 @@ Total amount in the specified soil interval.")
                      (from -24 [cm]) (to -30 [cm])
                      (documentation "\
 Total amount in the specified soil interval.")
-                     (tag "Br @ -27")
+                     (tag "M @ -27")
                      (dimension "PPM")
                      (spec chemical default M))
            (interval (path column "${column}" Chemistry "*" 
@@ -360,7 +360,7 @@ Total amount in the specified soil interval.")
                      (from -30 [cm]) (to -40 [cm])
                      (documentation "\
 Total amount in the specified soil interval.")
-                     (tag "Br @ -35")
+                     (tag "M @ -35")
                      (dimension "PPM")
                      (spec chemical default M))
            ))

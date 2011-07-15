@@ -8,38 +8,34 @@
 (input file "log.dai")
 (input file "smoke-log.dai")
 
-;; Mixed:
-(defsecondary Ap pressure
-  (h_lim 3.0 [pF])
-  (alpha 0.00001 [h^-1]))
-
-(defsecondary PlowPan Ap)
-
-(defsecondary agrovand pressure 
-  (h_lim 2.4 [pF])
-  (alpha 0.00001 [h^-1]))
-
 ;; Horizons.
 
 (defhorizon "Ap" USDA3
   (hydraulic hypres (topsoil true))
   (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.03)
   (dry_bulk_density 1.60 [g/cm^3])
-  (secondary_domain Ap))
+  (secondary_domain pressure 
+                    (h_lim $Ap_lim)
+                    (alpha $X_alpha)))
 
 (defhorizon "Surface" "Ap"
-  (hydraulic original))
+  (hydraulic original)
+  (secondary_domain none))
 
 (defhorizon "Bt" USDA3
   (clay 0.222)(silt 0.195)(sand 0.583)(humus 0.016)
   (dry_bulk_density 1.72 [g/cm^3])
-  (secondary_domain agrovand))
+  (secondary_domain pressure 
+                    (h_lim $B_lim)
+                    (alpha $X_alpha)))
                                           
 (defhorizon "Plow pan" Bt
   ;; (clay 0.148)(silt 0.214)(sand 0.638) (humus 0.016)
   (dry_bulk_density 1.72 [g/cm^3])
   (anisotropy 12)
-  (secondary_domain PlowPan))               
+  (secondary_domain pressure 
+                    (h_lim $PP_lim)
+                    (alpha $X_alpha)))               
 
 (defhorizon "C" USDA3
   (clay 0.207)(silt 0.235)(sand 0.558) (humus 0.01)
@@ -50,13 +46,17 @@
                   (n 1.15336)  
                   (K_sat 1.50000 [cm/h])
                   (l -3.60322))
-  (secondary_domain agrovand))
+  (secondary_domain pressure 
+                    (h_lim $B_lim)
+                    (alpha $X_alpha)))
 
 (defhorizon "Drain canyon" ISSS4
   (clay 0.213)(silt 0.190)(coarse_sand 0.244)(fine_sand  0.339)(humus 0.014)
   (normalize true)
   (dry_bulk_density 1.70 [g/cm^3])
-  (secondary_domain agrovand))
+  (secondary_domain pressure 
+                    (h_lim $B_lim)
+                    (alpha $X_alpha)))
 
 ;; Profile.
 
@@ -176,6 +176,36 @@
 (defprogram Smoke Daisy
   "Main Daisy setup for smoke project."
 
+
+  (declare X_alpha Number [h^-1] "")
+  (X_alpha 0.1 [h^-1])
+  (declare S_alpha Number [h^-1] "")
+  (declare S_lim Number [cm] "")
+  (declare Ap_alpha Number [h^-1] "")
+  (declare Ap_lim Number [cm] "")
+  (declare PP_alpha Number [h^-1] "")
+  (declare PP_lim Number [cm] "")
+  (declare B_alpha Number [h^-1] "")
+  (declare B_lim Number [cm] "")
+  ;; Optimized with four layers.
+  (S_lim -1560.59 [cm])
+  (S_alpha 2.20408e-06 [h^-1])
+  (Ap_lim -618.804 [cm])
+  (Ap_alpha 0.000145529 [h^-1])
+  (PP_lim -112.641 [cm])
+  (PP_alpha 0.000180444 [h^-1])
+  (B_lim -17.4364 [cm])
+  (B_alpha 4.91986e-05 [h^-1])
+  ;; Optimized with S = Ap
+  ;; (S_lim -859.793 [cm])
+  ;; (S_alpha 9.13413e-05 [h^-1])
+  ;; (Ap_lim -859.793 [cm])
+  ;; (Ap_alpha 9.13413e-05 [h^-1])
+  ;; (PP_lim -53.3502 [cm])
+  ;; (PP_alpha 0.000275389 [h^-1])
+  ;; (B_lim -15.8104 [cm])
+  ;; (B_alpha 1.62341e-05 [h^-1])
+
   ;; Combine weather soruces.
   (weather combine 
            (entry ((use Precip)
@@ -209,19 +239,36 @@
           ("Smoke" (when daily) (chemical "Bromide"))
           ("SmokeProfile" (when finished)(chemical "Bromide"))
           ("Smoke" (when daily) (chemical "BB-base"))
-          ("SmokeProfile" (when finished)(chemical "BB-base"))
   ))
   
 (defprogram Drain Smoke
   (column Drain)
+  (output &old ("SmokeProfile" (when finished)(chemical "BB-base")))
   (log_prefix "log/drain-"))
 
 (defprogram Macro Smoke
   (column Macro)
+  (output &old ("SmokeProfile" (when finished)(chemical "BB-base")))
   (log_prefix "log/macro-"))
+
+(defsummary Without-BB-Rsqr Rsqr
+  (measure ((time 2010 12 13 12)
+            (data ("M @ -4.5" 42 29 160 305 16 33 120 17 64 53 73
+                   38 11 28 18 29 20 0 5)
+                  ("M @ -13.5" 212 96 76 426 193 165 388 105 73
+                   117 213 163 53 125 136 58 81 52 31)
+                  ("M @ -21" 240 219 278 471 104 356 224 202
+                   286 229 151 150 113 97 126 47 101 64 0)
+                  ("M @ -27" 217 349 538 94 271 233 85 328 60 135
+                   78 245 205 100 24 51 90 48 42)
+                  ("M @ -35" 105 98 0 19 21 65 0 130 30 36 8 156
+                   18 125 7 57 119 20 90)))))
+
 
 (defprogram Without Smoke
   (column Without)
+  (output &old ("SmokeProfile" (when finished) (chemical "BB-base")
+                (summary Without-BB-Rsqr)))
   (log_prefix "log/without-"))
   
 ;; Run simulation.
@@ -241,7 +288,7 @@
   (declare what String "What to plot.")
   (declare chemical String "Chemical to plot.")
   (where "fig/${what}-${chemical}.pdf")
-  (xmax 5000 [PPM])
+  (xmax 2000 [PPM])
   (legend se)
   (source (profile (when 2010 12 13)
                    (title "Sim")
@@ -338,6 +385,25 @@
               [mm/h])))
 
 (defgnuplot K xy
+  (declare X_alpha Number [h^-1] "")
+  (declare S_alpha Number [h^-1] "")
+  (declare S_lim Number [cm] "")
+  (declare Ap_alpha Number [h^-1] "")
+  (declare Ap_lim Number [cm] "")
+  (declare PP_alpha Number [h^-1] "")
+  (declare PP_lim Number [cm] "")
+  (declare B_alpha Number [h^-1] "")
+  (declare B_lim Number [cm] "")
+  ;; Dummies.
+  (X_alpha 0.1 [h^-1])
+  (S_lim -1 [cm])
+  (S_alpha 0.1 [h^-1])
+  (Ap_lim -1 [cm])
+  (Ap_alpha 0.1 [h^-1])
+  (PP_lim -1 [cm])
+  (PP_alpha 0.1 [h^-1])
+  (B_lim -1 [cm])
+  (B_alpha 0.1 [h^-1])
   (declare FROM Number [<user>] "")
   (declare TO Number [<user>] "")
   (source ;; K_Surface 
@@ -346,7 +412,8 @@
 
 
 (defgnuplot plotall multi
-  (graph plotPresall plotBrall plotBBall rain 
+  (graph plotPresall plotBrall 
+         plotBBall rain 
          (K (FROM -50 [hPa]) (TO 0 [hPa]) 
             (where "fig/conductivity.pdf"))
          (K (FROM -80 [hPa]) (TO -20 [hPa])
@@ -358,13 +425,5 @@
 
 (defprogram both batch
   (run sims plot))
-
-;; Choose
-
-;;(run batch (run (Without) (plot)))
-
-;;(run both)
-(run plot)
-;;(run sims)
 
 ;; setup.dai ends here.

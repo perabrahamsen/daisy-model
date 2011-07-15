@@ -2,15 +2,23 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Smoke
 
-** BB målinger
+** DONE: ælles alpha virker ikke  
 
-*** Indsæt måledata i BB-base.ddf
+** DISKUTER: secondary none i Surface virker slet ikke.
 
-*** Generer plot.
+Der er nok en design-fejl i primær/sekundær vand.  Det skulle være
+sekundær vand der altid var tilstede, og primær vand kun nogen gange.
+På den måde ville det sekundære domæne være forbundet.
 
-*** Sammenlign Rsqr
+For at løse det skal vi nok bruge almindelig (CD) transport for det
+sekundære domæne, og ingen transport i det primære.
 
-*** Optimer
+** Prøv at optimere på bromid alene
+
+** Prøv at optimere på K_sat i pløjesål for biopore.
+
+** Diskuter bromid målinger med CPE, SH, og MAHA.
+
 
 * Vestskoven
 
@@ -35,7 +43,6 @@ Then add key parameters for optimization.  These would be:
 7) SpLAI in leaves (is it constant over a season?)
 
 Then turn the setup back to Osvaldo for Monte Carlo generation.
-
 
 * Kina rødder
 
