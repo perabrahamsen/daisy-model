@@ -16,18 +16,20 @@
   (dry_bulk_density 1.60 [g/cm^3])
   (secondary_domain pressure 
                     (h_lim $Ap_lim)
-                    (alpha $X_alpha)))
+                    (alpha $Ap_alpha)))
 
 (defhorizon "Surface" "Ap"
   (hydraulic original)
-  (secondary_domain none))
+  (secondary_domain pressure
+                    (h_lim $S_lim)
+                    (alpha $S_alpha)))
 
 (defhorizon "Bt" USDA3
   (clay 0.222)(silt 0.195)(sand 0.583)(humus 0.016)
   (dry_bulk_density 1.72 [g/cm^3])
   (secondary_domain pressure 
                     (h_lim $B_lim)
-                    (alpha $X_alpha)))
+                    (alpha $B_alpha)))
                                           
 (defhorizon "Plow pan" Bt
   ;; (clay 0.148)(silt 0.214)(sand 0.638) (humus 0.016)
@@ -35,7 +37,7 @@
   (anisotropy 12)
   (secondary_domain pressure 
                     (h_lim $PP_lim)
-                    (alpha $X_alpha)))               
+                    (alpha $PP_alpha)))               
 
 (defhorizon "C" USDA3
   (clay 0.207)(silt 0.235)(sand 0.558) (humus 0.01)
@@ -48,7 +50,7 @@
                   (l -3.60322))
   (secondary_domain pressure 
                     (h_lim $B_lim)
-                    (alpha $X_alpha)))
+                    (alpha $B_alpha)))
 
 (defhorizon "Drain canyon" ISSS4
   (clay 0.213)(silt 0.190)(coarse_sand 0.244)(fine_sand  0.339)(humus 0.014)
@@ -56,7 +58,7 @@
   (dry_bulk_density 1.70 [g/cm^3])
   (secondary_domain pressure 
                     (h_lim $B_lim)
-                    (alpha $X_alpha)))
+                    (alpha $B_alpha)))
 
 ;; Profile.
 
@@ -175,10 +177,6 @@
 
 (defprogram Smoke Daisy
   "Main Daisy setup for smoke project."
-
-
-  (declare X_alpha Number [h^-1] "")
-  (X_alpha 0.1 [h^-1])
   (declare S_alpha Number [h^-1] "")
   (declare S_lim Number [cm] "")
   (declare Ap_alpha Number [h^-1] "")
@@ -187,25 +185,19 @@
   (declare PP_lim Number [cm] "")
   (declare B_alpha Number [h^-1] "")
   (declare B_lim Number [cm] "")
-  ;; Optimized with four layers.
-  (S_lim -1560.59 [cm])
-  (S_alpha 2.20408e-06 [h^-1])
-  (Ap_lim -618.804 [cm])
-  (Ap_alpha 0.000145529 [h^-1])
-  (PP_lim -112.641 [cm])
-  (PP_alpha 0.000180444 [h^-1])
-  (B_lim -17.4364 [cm])
-  (B_alpha 4.91986e-05 [h^-1])
-  ;; Optimized with S = Ap
-  ;; (S_lim -859.793 [cm])
-  ;; (S_alpha 9.13413e-05 [h^-1])
-  ;; (Ap_lim -859.793 [cm])
-  ;; (Ap_alpha 9.13413e-05 [h^-1])
-  ;; (PP_lim -53.3502 [cm])
-  ;; (PP_alpha 0.000275389 [h^-1])
-  ;; (B_lim -15.8104 [cm])
-  ;; (B_alpha 1.62341e-05 [h^-1])
-
+  ;; Optimized with four layers. r^2 = 0.20
+  (S_lim -45462.7 [cm])
+  (Ap_lim -453.466 [cm])
+  (PP_lim -234.562 [cm])
+  (B_lim -20.3634 [cm])
+  (S_alpha 8.30618e-06 [h^-1])
+  (Ap_alpha 0.000167111 [h^-1])
+  (PP_alpha 0.0001432 [h^-1])
+  (B_alpha 5.20258e-05 [h^-1])
+  ;; S as before (full mixing?)
+  ;; Ap/PP lim = -332.539
+  ;; Ap/PP/B alpha =  0.000187342
+  ;; r^2 = 0.19
   ;; Combine weather soruces.
   (weather combine 
            (entry ((use Precip)
@@ -241,14 +233,94 @@
           ("Smoke" (when daily) (chemical "BB-base"))
   ))
   
+(defsummary Drain-BB-Rsqr Rsqr
+  (measure ((time 2010 12 13 12)
+            (data ("M @ -4.5" 201 74 109 149 118 176 62 102 145
+                   129 31 0 75 68 85 58 46 53 104 95 27 38 37)
+                  ("M @ -13.5" 310 288 278 300 264 287 172 370
+                   278 263 124 45 230 39 153 121 155 166 234 238 25 75 104)
+                  ("M @ -21" 108 227 250 143 291 57 235 150 109
+                   208 55 57 112 27 75 100 182 134 179 55 23 93 57)
+                  ("M @ -27" 0 180 42 38 95 0 142 17 0 115 13 62
+                   19 0 10 18 45 60 31 0 10 36 48)
+                  ("M @ -35" 0 85 0 0 63 0 107 22 0 109 0 0 0 0 0
+                   9 0 39 0 0 7 0 20)))))
+
+(defsummary Drain-Br-Rsqr Rsqr
+  (measure ((time 2010 12 13 12)
+            (data ("M @ -4.5" 184.23 50.48 79.81 37.43 64.83
+                   98.51 69.28 110.17 59.93 43.15 302.05 61.44
+                   46.40 304.49 80.01 889.51 367.03 48.91 42.89
+                   45.75 36.87 122.51 125.93)
+                  ("M @ -13.5" 302.91 61.84 167.08 42.36 79.53
+                   194.82 71.74 163.38 77.50 50.29 143.54 72.38
+                   46.83 272.20 86.55 1515.08 470.12 58.13 53.94
+                   57.04 36.87 113.33 75.71)
+                  ("M @ -21" 364.59 80.18 269.76 58.56 107.16
+                   415.40 80.36 437.51 104.83 61.30 52.99 96.75
+                   53.14 123.05 107.19 250.68 225.82 67.78 55.69
+                   63.55 48.10 38.25 51.52)
+                  ("M @ -27" 383.18 113.70 459.60 240.94 157.91
+                   597.25 89.23 465.82 154.50 71.12 51.78 35.03
+                   62.90 56.14 127.63 120.33 94.73 88.68 76.41
+                   78.52 52.71 37.72 75.02)
+                  ("M @ -35" 741.35 194.77 598.56 536.25 334.20
+                   976.37 94.03 762.28 231.85 91.51 59.71 36.37
+                   96.30 61.93 141.11 171.36 180.47 144.68 121.40
+                   103.33 64.49 36.87 88.89)))))
+
 (defprogram Drain Smoke
   (column Drain)
-  (output &old ("SmokeProfile" (when finished)(chemical "BB-base")))
+  (output &old 
+          ("SmokeProfile" (when finished)(chemical "BB-base")
+           (summary Drain-BB-Rsqr))
+          ("SmokeProfile" (when finished)(chemical "Bromide")
+           (summary Drain-Br-Rsqr)))
   (log_prefix "log/drain-"))
+
+(defsummary Macro-BB-Rsqr Rsqr
+  (measure ((time 2010 12 13 12)
+            (data ("M @ -4.5" 0 142 202 44 155 93 64 109 267 91
+                   305 5 92 29 16 28 79 85 12 168)
+                  ("M @ -13.5" 0 239 224 93 267 185 178 498 322
+                   397 360 123 226 101 87 101 246 420 164 218)
+                  ("M @ -21" 8 31 14 25 51 26 60 234 176 113 126
+                   135 208 131 129 98 201 519 369 127)
+                  ("M @ -27" 0 8 0 0 20 0 22 56 13 13 12 187 78
+                   137 205 160 83 195 339 36)
+                  ("M @ -35" 13 0 7 8 0 0 0 0 6 16 0 40 0 161 283
+                   70 9 0 101 11)))))
+
+(defsummary Macro-Br-Rsqr Rsqr
+  (measure ((time 2010 12 13 12)
+            (data ("M @ -4.5" 313.57 114.07 462.65 205.90 133.71
+                   153.27 277.86 200.82 386.33 76.09 239.46
+                   158.34 77.49 57.79 51.04 60.78 111.48 167.02
+                   171.38 114.78)
+                  ("M @ -13.5" 105.44 299.94 449.62 112.99 303.34
+                   97.58 296.76 796.48 481.66 103.33 491.87
+                   108.70 138.29 61.14 55.94 41.06 418.32 291.60
+                   99.18 119.76)
+                  ("M @ -21" 139.11 859.27 245.57 267.55 537.04
+                   110.41 213.54 1059.35 657.07 124.27 501.41
+                   191.95 191.76 71.73 66.32 52.35 794.57 329.72
+                   155.86 145.34)
+                  ("M @ -27" 210.34 508.88 56.11 181.92 299.34
+                   140.15 194.74 704.40 308.48 193.17 287.36
+                   311.32 347.03 83.76 79.31 70.58 750.74 824.93
+                   284.33 191.12)
+                  ("M @ -35" 364.44 195.39 70.52 157.70 263.27
+                   182.52 284.02 538.98 81.77 196.68 83.71 145.42
+                   712.42 111.03 136.86 86.28 625.00 1770.11
+                   671.17 285.49)))))
 
 (defprogram Macro Smoke
   (column Macro)
-  (output &old ("SmokeProfile" (when finished)(chemical "BB-base")))
+  (output &old 
+          ("SmokeProfile" (when finished)(chemical "BB-base")
+           (summary Macro-BB-Rsqr))
+          ("SmokeProfile" (when finished)(chemical "Bromide")
+           (summary Macro-Br-Rsqr)))
   (log_prefix "log/macro-"))
 
 (defsummary Without-BB-Rsqr Rsqr
@@ -265,10 +337,36 @@
                    18 125 7 57 119 20 90)))))
 
 
+(defsummary Without-Br-Rsqr Rsqr
+  (measure ((time 2010 12 13 12)
+            (data ("M @ -4.5" 52.91 67.84 80.94 68.53 92.88
+                   129.00 72.26 76.87 98.26 434.21 102.69 194.46
+                   93.66 37.38 47.70 52.39 135.89 446.52 126.40
+                   102.88)
+                  ("M @ -13.5" 63.68 82.03 414.55 124.49 202.58
+                   319.35 110.53 114.72 494.59 445.90 129.81
+                   131.94 80.34 36.36 41.01 48.12 269.45 322.07
+                   51.41 171.36)
+                  ("M @ -21" 70.98 233.05 339.99 334.16 62.30
+                   543.73 240.96 413.53 266.03 504.76 216.42
+                   70.18 63.55 38.07 51.20 51.23 185.57 117.14
+                   55.48 258.65)
+                  ("M @ -27" 91.01 233.05 196.61 577.16 107.94
+                   462.25 362.12 617.18 499.26 461.98 256.63
+                   92.82 79.26 39.68 66.07 56.03 57.25 49.16
+                   59.07 73.88)
+                  ("M @ -35" 121.00 465.39 700.12 1048.52 93.31
+                   693.66 688.17 871.49 959.24 549.06 371.76
+                   148.36 154.50 46.59 123.79 66.72 65.88 65.18
+                   72.24 94.50)))))
+
 (defprogram Without Smoke
   (column Without)
-  (output &old ("SmokeProfile" (when finished) (chemical "BB-base")
-                (summary Without-BB-Rsqr)))
+  (output &old 
+          ("SmokeProfile" (when finished) (chemical "BB-base")
+           (summary Without-BB-Rsqr))
+          ("SmokeProfile" (when finished) (chemical "Bromide")
+           (summary Without-Br-Rsqr)))
   (log_prefix "log/without-"))
   
 ;; Run simulation.
@@ -385,7 +483,6 @@
               [mm/h])))
 
 (defgnuplot K xy
-  (declare X_alpha Number [h^-1] "")
   (declare S_alpha Number [h^-1] "")
   (declare S_lim Number [cm] "")
   (declare Ap_alpha Number [h^-1] "")
@@ -395,7 +492,6 @@
   (declare B_alpha Number [h^-1] "")
   (declare B_lim Number [cm] "")
   ;; Dummies.
-  (X_alpha 0.1 [h^-1])
   (S_lim -1 [cm])
   (S_alpha 0.1 [h^-1])
   (Ap_lim -1 [cm])

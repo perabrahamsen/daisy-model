@@ -1,3 +1,8 @@
+2011-07-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* block.C (expand_reference): Use key frame.
+	(name_sequence): Remove optimization.
+
 2011-07-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* scopesel.C (multi): New model.

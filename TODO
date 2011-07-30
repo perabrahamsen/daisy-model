@@ -2,7 +2,75 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Smoke
 
-** DONE: ælles alpha virker ikke  
+** Fler tests.
+
+*** Optimer med en "faktor" på en af dem.
+
+*** Optimer BB K_clay?
+
+** Brilliant blue resultat:
+
+*** Med 8 frihedsgrader:
+
+r^2 = 0.20
+
+*** Med 3 frihedgrader + fixed S:
+
+Surface: Næsten intet mobilt vand, meget lav alpha
+
+Resten kan have en fælles alpha.  
+
+  (S_lim -45462.7 [cm])
+  (S_alpha 8.30618e-06 [h^-1])
+
+  ;; S as before (full mixing?)
+  ;; Ap/PP lim = -332.539
+  ;; B lim = -20.3634
+  ;; Ap/PP/B alpha =  0.000187342
+  ;; r^2 = 0.19
+
+** Bromide Resultat (3 frihedsgrader, S fra BB8)
+
+(-37.0316 -3.1713 0.000994454) = -0.125932
+
+(A_lim -37.0316 [cm])
+(B_lim -3.1713 [cm])
+(X_alpha 0.000994454 [h^-1])
+
+** Bromide Resultat (8 frihedsgrader)
+
+r^2 = 0.131756
+
+(S_lim -1114.19 [cm])
+(Ap_lim -728.121 [cm])
+(PP_lim -16.8421 [cm])
+(B_lim -84.9921 [cm])
+(S_alpha 2.2452e-06 [h^-1])
+(Ap_alpha 0.000288944 [h^-1])
+(PP_alpha 0.0004188 [h^-1])
+(B_alpha 0.00102949 [h^-1])
+
+** Optimer Bromide og BB på samme tid (3 frihedsgrader)
+
+(-385.699 -79.7179 0.000224949) = 0.104717
+
+(A_lim -385.699 [cm])
+(B_lim -79.7179 [cm])
+(X_alpha 0.000224949 [h^-1])
+
+** Optimer Bromide og BB på samme tid (8 frihedsgrader)
+
+(-21436.5 -589.42 -726.251 -67.3819 1.58087e-05 0.000189976 4.53329e-05 4.41244e-05) = 0.111116
+(S_lim -21436.5 [cm])
+(Ap_lim -589.42 [cm])
+(PP_lim -726.251 [cm])
+(B_lim -67.3819 [cm])
+(S_alpha 1.58087e-05 [h^-1])
+(Ap_alpha 0.000189976 [h^-1])
+(PP_alpha 4.53329e-05 [h^-1])
+(B_alpha 4.41244e-05 [h^-1])
+Program finished after 14 hours, 4 minutes and 44 seconds.
+
 
 ** DISKUTER: secondary none i Surface virker slet ikke.
 
@@ -13,7 +81,7 @@ På den måde ville det sekundære domæne være forbundet.
 For at løse det skal vi nok bruge almindelig (CD) transport for det
 sekundære domæne, og ingen transport i det primære.
 
-** Prøv at optimere på bromid alene
+Virker ikke:  Tænk på at det sekundære domæne kan tørre ud.
 
 ** Prøv at optimere på K_sat i pløjesål for biopore.
 

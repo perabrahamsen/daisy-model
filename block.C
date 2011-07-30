@@ -198,17 +198,17 @@ Block::expand_string (const symbol value_s, std::set<symbol>& outer) const
 symbol
 Block::expand_reference (const symbol key) const
 {
-  if (!frame ().is_reference (key))
-    return key;
-  
-  const symbol var = frame ().get_reference (key);
+  const Frame& key_frame = find_frame (key);
+  daisy_assert (key_frame.is_reference (key));
+
+  const symbol var = key_frame.get_reference (key);
   if (var == key)
     {
       error ("Value of '" + key + "' refers to itself");
       throw "Reference loop";
     }
   const Attribute::type var_type = lookup (var);
-  const Attribute::type key_type = frame ().lookup (key);
+  const Attribute::type key_type = key_frame.lookup (key);
   if (var_type != key_type)
     {
       std::ostringstream tmp;
@@ -219,7 +219,7 @@ Block::expand_reference (const symbol key) const
       throw "Reference type mismatch";
     }
   const int var_size = find_frame (var).type_size (var);
-  const int key_size = frame ().type_size (key);
+  const int key_size = key_frame.type_size (key);
   if (var_size != key_size
       && (key_size != Attribute::Variable
           || var_size == Attribute::Singleton))
@@ -238,7 +238,7 @@ Block::expand_reference (const symbol key) const
       daisy_assert (key_type == Attribute::Number);
       
       const symbol var_dim = find_frame (var).dimension (var);
-      const symbol key_dim = frame ().dimension (key);
+      const symbol key_dim = key_frame.dimension (key);
 
       if (var_dim != key_dim)
         {
@@ -577,18 +577,11 @@ Block::number_sequence (const symbol key) const
 const std::vector<symbol>
 Block::name_sequence (const symbol key) const
 { 
-  if (!frame ().is_reference (key))
-    {
-      const std::vector<symbol>& value 
-        = frame ().name_sequence (expand_reference (key));
-      std::vector<symbol> result;
-      for (size_t i = 0; i < value.size (); i++)
-        result.push_back (expand_string (value[i]));
-      return result;
-    }
-  const symbol var = expand_reference (key);
-  const std::vector<symbol>& value
-    = find_frame (var).name_sequence (var); 
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
+    return name_sequence (expand_reference (key));
+
+  const std::vector<symbol>& value = frame.name_sequence (key);
   std::vector<symbol> result;
   for (size_t i = 0; i < value.size (); i++)
     result.push_back (expand_string (value[i]));
