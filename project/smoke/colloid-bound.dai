@@ -410,7 +410,7 @@
 (defchemical BB-base common
   "Base parameterization for all Brilliant Blue forms."
   ;; No decomposition.
-  (decompose_rate 0 [d^-1]))
+  (decompose_rate $BB_decomp))
 
 (defchemical BB BB-base
   "Dissolved Brilliant Blue."
@@ -424,7 +424,8 @@
   "Sorption equilibrium between dissolved and immobile Brilliant Blue."
   (cite flury1995tracer)
   ;; The three examined soils had K_clay of 8, 20, and 23.
-  (K_clay 20 [l/kg])
+  ;; (K_clay 20 [l/kg])
+  (K_clay $BB_K_clay)
   (k_sorption 0.05 [h^-1])
   (solute BB)
   (sorbed BB-immobile)

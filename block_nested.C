@@ -65,15 +65,6 @@ BlockNested::entries (std::set<symbol>& all) const
   context.entries (all);
 }
 
-bool 
-BlockNested::check (const symbol key) const
-{
-  Attribute::type type = frame ().lookup (key);
-  if (type != Attribute::Error)
-    return frame ().check (key);
-  return context.check (key);
-}
-
 BlockNested::BlockNested (const Block& block, symbol scope_tag)
   : context (block),
     msg_nest (block.msg (), scope_tag)

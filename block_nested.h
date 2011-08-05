@@ -36,7 +36,6 @@ public:
   const Frame& find_frame (const symbol key) const;
   Attribute::type lookup (symbol) const;
   void entries (std::set<symbol>&) const;
-  bool check (const symbol key) const;
 
   // Context
 protected:  

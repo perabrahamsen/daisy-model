@@ -4,9 +4,13 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** Fler tests.
 
-*** Optimer med en "faktor" på en af dem.
+*** Optimer BB_K_clay og factor
 
-*** Optimer BB K_clay?
+Vi har to vand per jord i analyse
+
+M_adjusted = M_old * (K/(2 [vand/jord]) + 1)
+
+** Check om Br tabel har stddev eller stderr.
 
 ** Brilliant blue resultat:
 

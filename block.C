@@ -383,11 +383,26 @@ Block::description (const symbol tag) const
 bool 
 Block::check (const symbol key) const
 {
-  Attribute::type type = frame ().lookup (key);
-  if (type != Attribute::Error)
-    return frame ().check (key);
+  const Frame& frame = find_frame (key);
 
-  return false;
+  if (frame.lookup (key) == Attribute::Error)
+    // Why are we asking?  No such attribute is defined.
+    return false;
+
+  if (!frame.is_reference (key))
+    // Just a normal attribute.
+    return frame.check (key);
+
+  // A reference.
+  const symbol var = frame.get_reference (key);
+  if (key == var)
+    {
+      error ("Self reference: '" + key + "'");
+      return false;
+    }
+  
+  // Try expanded version.
+  return this->check (var);
 }
 
 int 

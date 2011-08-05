@@ -90,7 +90,7 @@ public:
 
   // Submodel emulation.
 public:
-  virtual bool check (const symbol key) const;
+  bool check (const symbol key) const;
   int value_size (symbol tag) const;
   double number (symbol) const;
   double number (symbol, double default_value) const;

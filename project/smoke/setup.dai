@@ -177,6 +177,8 @@
 
 (defprogram Smoke Daisy
   "Main Daisy setup for smoke project."
+  (declare BB_decomp Number [h^-1] "")
+  (declare BB_K_clay Number [cm^3/g] "")
   (declare S_alpha Number [h^-1] "")
   (declare S_lim Number [cm] "")
   (declare Ap_alpha Number [h^-1] "")
@@ -185,19 +187,53 @@
   (declare PP_lim Number [cm] "")
   (declare B_alpha Number [h^-1] "")
   (declare B_lim Number [cm] "")
-  ;; Optimized with four layers. r^2 = 0.20
-  (S_lim -45462.7 [cm])
-  (Ap_lim -453.466 [cm])
-  (PP_lim -234.562 [cm])
-  (B_lim -20.3634 [cm])
-  (S_alpha 8.30618e-06 [h^-1])
-  (Ap_alpha 0.000167111 [h^-1])
-  (PP_alpha 0.0001432 [h^-1])
-  (B_alpha 5.20258e-05 [h^-1])
+  ;; *** Optimized with four layers. r^2 = 0.20
+  ;;(BB_decomp 0 [h^-1])
+  ;;(BB_K_clay 20 [cm^3/g])
+  ;;(S_lim -45462.7 [cm])
+  ;;(Ap_lim -453.466 [cm])
+  ;;(PP_lim -234.562 [cm])
+  ;;(B_lim -20.3634 [cm])
+  ;;(S_alpha 8.30618e-06 [h^-1])
+  ;;(Ap_alpha 0.000167111 [h^-1])
+  ;;(PP_alpha 0.0001432 [h^-1])
+  ;;(B_alpha 5.20258e-05 [h^-1])
+  ;; *** Three variables.
   ;; S as before (full mixing?)
   ;; Ap/PP lim = -332.539
   ;; Ap/PP/B alpha =  0.000187342
   ;; r^2 = 0.19
+  ;; Ten variables.
+  ;;(BB_decomp 0.066855 [h^-1])
+  ;;(BB_K_clay 0.713904 [cm^3/g])
+  ;;(S_lim -420.905 [cm])
+  ;;(Ap_lim -1216.87 [cm])
+  ;;(PP_lim -137.384 [cm])
+  ;;(B_lim -16.9006 [cm])
+  ;;(S_alpha 9.3015e-06 [h^-1])
+  ;;(Ap_alpha 8.90626e-05 [h^-1])
+  ;;(PP_alpha 7.54725e-05 [h^-1])
+  ;;(B_alpha 0.0014369 [h^-1])
+  ;; *** Four variables.
+  ;; (17.7382 -498.834 -136.54 0.000343216) = -0.102534
+  ;; Fixed.
+  (BB_decomp 0 [h^-1])
+  (S_lim -45462.7 [cm])
+  (S_alpha 8.30618e-06 [h^-1])
+  ;; New variables.
+  (declare X_alpha Number [h^-1] "")
+  (declare A_lim Number [cm] "")
+  (BB_K_clay 17.7382 [cm^3/g])
+  (A_lim -498.834 [cm])
+  (B_lim -136.54 [cm])
+  (X_alpha 0.000343216 [h^-1])
+  (Ap_lim $A_lim)
+  (PP_lim $A_lim)
+  (Ap_alpha $X_alpha)
+  (PP_alpha $X_alpha)
+  (B_alpha $X_alpha)
+
+
   ;; Combine weather soruces.
   (weather combine 
            (entry ((use Precip)
@@ -229,9 +265,11 @@
           ("Chemical Content" (print_initial false) 
            (chemical BB-base) (unit [PPM]) (when finished))
           ("Smoke" (when daily) (chemical "Bromide"))
-          ("SmokeProfile" (when finished)(chemical "Bromide"))
+          ("SmokeProfile" (when finished)(chemical "Bromide") 
+           (My_K_clay 0 [cm^3/g]))
           ("Smoke" (when daily) (chemical "BB-base"))
-  ))
+          ("SmokeProfile" (when finished)(chemical "BB-base") 
+           (My_K_clay $BB_K_clay))))
   
 (defsummary Drain-BB-Rsqr Rsqr
   (measure ((time 2010 12 13 12)
@@ -273,9 +311,9 @@
   (column Drain)
   (output &old 
           ("SmokeProfile" (when finished)(chemical "BB-base")
-           (summary Drain-BB-Rsqr))
+           (My_K_clay $BB_K_clay) (summary Drain-BB-Rsqr))
           ("SmokeProfile" (when finished)(chemical "Bromide")
-           (summary Drain-Br-Rsqr)))
+           (My_K_clay 0 [cm^3/g]) (summary Drain-Br-Rsqr)))
   (log_prefix "log/drain-"))
 
 (defsummary Macro-BB-Rsqr Rsqr
@@ -318,9 +356,9 @@
   (column Macro)
   (output &old 
           ("SmokeProfile" (when finished)(chemical "BB-base")
-           (summary Macro-BB-Rsqr))
+           (My_K_clay $BB_K_clay) (summary Macro-BB-Rsqr))
           ("SmokeProfile" (when finished)(chemical "Bromide")
-           (summary Macro-Br-Rsqr)))
+           (My_K_clay 0 [cm^3/g]) (summary Macro-Br-Rsqr)))
   (log_prefix "log/macro-"))
 
 (defsummary Without-BB-Rsqr Rsqr
@@ -364,9 +402,9 @@
   (column Without)
   (output &old 
           ("SmokeProfile" (when finished) (chemical "BB-base")
-           (summary Without-BB-Rsqr))
+           (My_K_clay $BB_K_clay) (summary Without-BB-Rsqr))
           ("SmokeProfile" (when finished) (chemical "Bromide")
-           (summary Without-Br-Rsqr)))
+           (My_K_clay 0 [cm^3/g]) (summary Without-Br-Rsqr)))
   (log_prefix "log/without-"))
   
 ;; Run simulation.

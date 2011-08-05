@@ -10,8 +10,8 @@
 ;;       (PP_alpha 1e-4 [h^-1])
 ;;       (B_alpha 1e-4 [h^-1])))
 
-;;(run both)
-(run plot)
+(run both)
+;;(run plot)
 ;;(run sims)
 
 ;; setup-pa.dai ends here.

@@ -322,10 +322,16 @@ Total amount in the specified soil interval.")
   (unit "g/ha")
   (where "${colfid}smoke-${chemical}-profile.dlf")
   (when true)
+  (declare My_K_clay Number [cm^3/g] "")
+  (declare Ap_fac number "")
+  (Ap_fac (/ 1.0 [] (+ (* 0.107 [] (convert (/ My_K_clay 2 [cm^3/g]) [])) 1.0 [])))
+  (declare Bt_fac number "")
+  (Bt_fac (/ 1.0 [] (+ (* 0.222 [] (/ My_K_clay 2 [cm^3/g])) 1.0 [])))
   (entries ;; Year Month MDay Hour
            (interval (path column "${column}" Chemistry "*" 
                            trace "${chemical}" M)
                      (from -0 [cm]) (to -9 [cm])
+                     (expr  (* x Ap_fac))
                      (documentation "\
 Total amount in the specified soil interval.")
                      (tag "M @ -4.5")
@@ -334,6 +340,7 @@ Total amount in the specified soil interval.")
            (interval (path column "${column}" Chemistry "*" 
                            trace "${chemical}" M)
                      (from -9 [cm]) (to -18 [cm])
+                     (expr (* x Ap_fac))
                      (documentation "\
 Total amount in the specified soil interval.")
                      (tag "M @ -13.5")
@@ -342,6 +349,7 @@ Total amount in the specified soil interval.")
            (interval (path column "${column}" Chemistry "*" 
                            trace "${chemical}" M)
                      (from -18 [cm]) (to -24 [cm])
+                     (expr (* x Ap_fac))
                      (documentation "\
 Total amount in the specified soil interval.")
                      (tag "M @ -21")
@@ -350,6 +358,7 @@ Total amount in the specified soil interval.")
            (interval (path column "${column}" Chemistry "*" 
                            trace "${chemical}" M)
                      (from -24 [cm]) (to -30 [cm])
+                     (expr (* x Bt_fac))
                      (documentation "\
 Total amount in the specified soil interval.")
                      (tag "M @ -27")
@@ -358,6 +367,7 @@ Total amount in the specified soil interval.")
            (interval (path column "${column}" Chemistry "*" 
                            trace "${chemical}" M)
                      (from -30 [cm]) (to -40 [cm])
+                     (expr (* x Bt_fac))
                      (documentation "\
 Total amount in the specified soil interval.")
                      (tag "M @ -35")

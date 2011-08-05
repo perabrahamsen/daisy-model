@@ -674,11 +674,19 @@ struct NumberDivide : public NumberOperands
         const std::string dimstr = dim.name ();
         if (dimstr.length () == 0)
           continue;
+        if (dimstr == name)
+          {
+            name = "";
+            continue;
+          }
         if (dimstr.find_first_of ('/') != std::string::npos)
           name += "/(" + dimstr + ")";
         else
           name += "/" + dimstr;
       }
+    if (name.length () == 0)
+      return Attribute::None ();
+
     return symbol (name);
   }
 

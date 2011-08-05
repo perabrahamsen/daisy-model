@@ -6,9 +6,9 @@
   (column Without)
   (print_time false)
   (output ("SmokeProfile" (when finished) (chemical "BB-base")
-           (summary Without-BB-Rsqr))
+           (My_K_clay $BB_K_clay) (summary Without-BB-Rsqr))
           ("SmokeProfile" (when finished) (chemical "Bromide")
-           (summary Without-Br-Rsqr)))
+           (My_K_clay 0 [cm^3/g]) (summary Without-Br-Rsqr)))
   (log_prefix "log/Both-Rsqr-"))
 
 (defprogram MakeCP Both-Rsqr
@@ -57,7 +57,9 @@
 
 (defprogram mytest minimize
   (scope multi Without-BB-Rsqr Without-Br-Rsqr)
-  (expr (- (min "Without-BB-Rsqr.R2" "Without-Br-Rsqr.R2")))
+  (expr (- (* 0.2 []
+              (+ "Without-BB-Rsqr.R2" "Without-Br-Rsqr.R2"
+                 (* 3.0 [] (min "Without-BB-Rsqr.R2" "Without-Br-Rsqr.R2"))))))
   (run ("MakeCP Checkpoint"))
   (epsilon 0.0))
 
@@ -79,6 +81,50 @@
               (< S_lim 0 [cm]) (< Ap_lim 0 [cm]) (< PP_lim 0 [cm]) (< B_lim 0 [cm])))
   (min_iter 50)
   (max_iter 18000))
+
+(defprogram mytest9 mytest
+  (parameter BB_K_clay S_lim Ap_lim PP_lim B_lim S_alpha Ap_alpha PP_alpha B_alpha )
+  (simplex (1 -10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-3)
+           (3 -1000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-3)
+           (7 -10000 -10000 -1000 -100 1e-6 1e-5 1e-4 1e-3)
+           (9 -10000 -1000 -100 -100 1e-6 1e-5 1e-4 1e-3)
+           (15 -10000 -1000 -1000 -1000 1e-6 1e-5 1e-4 1e-3)
+           (20 -10000 -1000 -1000 -100 1e-5 1e-5 1e-4 1e-3)
+           (25 -10000 -1000 -1000 -100 1e-6 1e-4 1e-4 1e-3)
+           (40 -10000 -1000 -1000 -100 1e-6 1e-5 1e-5 1e-3)
+           (100 -10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-4)
+           (150 -10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-4))
+  (limit (and (> BB_K_clay 0.0 [cm^3/g])
+              (>= S_alpha 0 [h^-1]) (<= S_alpha 1 [h^-1]) 
+              (>= Ap_alpha 0 [h^-1]) (<= Ap_alpha 1 [h^-1]) 
+              (>= PP_alpha 0 [h^-1]) (<= PP_alpha 1 [h^-1]) 
+              (>= B_alpha 0 [h^-1]) (<= B_alpha 1 [h^-1]) 
+              (< S_lim 0 [cm]) (< Ap_lim 0 [cm]) (< PP_lim 0 [cm]) (< B_lim 0 [cm])))
+  (min_iter 55)
+  (max_iter 20000))
+
+(defprogram mytest10 mytest
+  (parameter BB_decomp BB_K_clay S_lim Ap_lim PP_lim B_lim S_alpha Ap_alpha PP_alpha B_alpha )
+  (simplex (1e-2 1 -10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-3)
+           (1e-3 3 -1000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-3)
+           (1e-4 7 -10000 -10000 -1000 -100 1e-6 1e-5 1e-4 1e-3)
+           (1e-3 9 -10000 -1000 -100 -100 1e-6 1e-5 1e-4 1e-3)
+           (1e-4 15 -10000 -1000 -1000 -1000 1e-6 1e-5 1e-4 1e-3)
+           (1e-5 20 -10000 -1000 -1000 -100 1e-5 1e-5 1e-4 1e-3)
+           (1e-1 25 -10000 -1000 -1000 -100 1e-6 1e-4 1e-4 1e-3)
+           (1e-2 40 -10000 -1000 -1000 -100 1e-6 1e-5 1e-5 1e-3)
+           (1e-3 100 -10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-4)
+           (1e-4 150 -10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-4)
+           (1e-5 150 -10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-4))
+  (limit (and (>= BB_decomp 0 [h^-1])
+              (> BB_K_clay 0.0 [cm^3/g])
+              (>= S_alpha 0 [h^-1]) (<= S_alpha 1 [h^-1]) 
+              (>= Ap_alpha 0 [h^-1]) (<= Ap_alpha 1 [h^-1]) 
+              (>= PP_alpha 0 [h^-1]) (<= PP_alpha 1 [h^-1]) 
+              (>= B_alpha 0 [h^-1]) (<= B_alpha 1 [h^-1]) 
+              (< S_lim 0 [cm]) (< Ap_lim 0 [cm]) (< PP_lim 0 [cm]) (< B_lim 0 [cm])))
+  (min_iter 55)
+  (max_iter 20000))
 
 (defprogram Test3Par "MakeCP Checkpoint"
   (declare X_alpha Number [h^-1] "")
@@ -102,6 +148,58 @@
   (run (Test3Par))
   (min_iter 20)
   (max_iter 18000))
+
+(defprogram Test4Par "MakeCP Checkpoint"
+  ;; Fixed.
+  (BB_decomp 0 [h^-1])
+  (S_lim -45462.7 [cm])
+  (S_alpha 8.30618e-06 [h^-1])
+  ;; New variables.
+  (declare X_alpha Number [h^-1] "")
+  (X_alpha 1e-4)
+  (declare A_lim Number [cm] "")
+  (A_lim -300)
+  (Ap_lim $A_lim)
+  (PP_lim $A_lim)
+  (Ap_alpha $X_alpha)
+  (PP_alpha $X_alpha)
+  (B_alpha $X_alpha))
+  
+(defprogram mytest4 mytest
+  (parameter BB_K_clay A_lim B_lim X_alpha)
+  (simplex (1 -500 -20 0.0001)
+           (3 -1500 -200 0.00001)
+           (9 -50 -5 0.001)
+           (27 -500 -100 0.0001)
+           (1 -500 -100 0.0001) )
+  (limit (and (> BB_K_clay 0.0 [cm^3/g])
+              (>= X_alpha 0 [h^-1]) (<= X_alpha 1 [h^-1]) 
+              (< A_lim 0 [cm]) (< B_lim 0 [cm])))
+  (run (Test4Par))
+  (min_iter 20)
+  (max_iter 18000))
+
+(defprogram mytest8 mytest
+  (parameter BB_decomp BB_K_clay S_lim Ap_lim PP_lim B_lim S_alpha X_alpha)
+  (simplex (1e-2 1 -10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-3)
+           (1e-3 3 -1000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-3)
+           (1e-4 7 -10000 -10000 -1000 -100 1e-6 1e-5 1e-4 1e-3)
+           (1e-3 9 -10000 -1000 -100 -100 1e-6 1e-5 1e-4 1e-3)
+           (1e-4 15 -10000 -1000 -1000 -1000 1e-6 1e-5 1e-4 1e-3)
+           (1e-5 20 -10000 -1000 -1000 -100 1e-5 1e-5 1e-4 1e-3)
+           (1e-1 25 -10000 -1000 -1000 -100 1e-6 1e-4 1e-4 1e-3)
+           (1e-2 40 -10000 -1000 -1000 -100 1e-6 1e-5 1e-5 1e-3)
+           (1e-3 100 -10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-4)
+           (1e-4 150 -10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-4)
+           (1e-5 150 -10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-4))
+  (limit (and (>= BB_decomp 0 [h^-1])
+              (>= BB_K_clay 0.0 [cm^3/g])
+              (>= S_alpha 0 [h^-1]) (<= S_alpha 1 [h^-1]) 
+              (>= X_alpha 0 [h^-1]) (<= X_alpha 1 [h^-1]) 
+              (< S_lim 0 [cm]) (< Ap_lim 0 [cm]) (< PP_lim 0 [cm]) (< B_lim 0 [cm])))
+  (run (Test8Par))
+  (min_iter 55)
+  (max_iter 20000))
 
 (run mytest8)
 
