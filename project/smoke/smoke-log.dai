@@ -321,8 +321,9 @@ Total amount in the specified soil interval.")
   (declare unit String "Base unit.")
   (unit "g/ha")
   (where "${colfid}smoke-${chemical}-profile.dlf")
-  (when true)
+  (when finished)
   (declare My_K_clay Number [cm^3/g] "")
+  (My_K_clay 0 [cm^3/g])
   (declare Ap_fac number "")
   (Ap_fac (/ 1.0 [] (+ (* 0.107 [] (convert (/ My_K_clay 2 [cm^3/g]) [])) 1.0 [])))
   (declare Bt_fac number "")
@@ -374,5 +375,10 @@ Total amount in the specified soil interval.")
                      (dimension "PPM")
                      (spec chemical default M))
            ))
+
+(deflog "BB Profile" "SmokeProfile" 
+  (chemical "BB-base") 
+  (where "BB-Rsqr.dlf")
+  (My_K_clay $BB_K_clay))
 
 ;; smoke-log.dai ends here.

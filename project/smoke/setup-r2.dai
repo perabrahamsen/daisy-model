@@ -5,10 +5,10 @@
 (defprogram Both-Rsqr Smoke
   (column Without)
   (print_time false)
-  (output ("SmokeProfile" (when finished) (chemical "BB-base")
+  (output ("SmokeProfile" (chemical "BB-base") (where "BB-Rsqr.dlf")
            (My_K_clay $BB_K_clay) (summary Without-BB-Rsqr))
-          ("SmokeProfile" (when finished) (chemical "Bromide")
-           (My_K_clay 0 [cm^3/g]) (summary Without-Br-Rsqr)))
+          ("SmokeProfile" (chemical "Bromide") (where "Br-Rsqr.dlf")
+           (summary Without-Br-Rsqr)))
   (log_prefix "log/Both-Rsqr-"))
 
 (defprogram MakeCP Both-Rsqr
@@ -55,12 +55,15 @@
             (minute 55))
   (next_large 2010 10 25 13))
 
+(defprogram TestMe MyEnv
+  (run "MakeCP Checkpoint"))
+
 (defprogram mytest minimize
   (scope multi Without-BB-Rsqr Without-Br-Rsqr)
   (expr (- (* 0.2 []
               (+ "Without-BB-Rsqr.R2" "Without-Br-Rsqr.R2"
                  (* 3.0 [] (min "Without-BB-Rsqr.R2" "Without-Br-Rsqr.R2"))))))
-  (run ("MakeCP Checkpoint"))
+  (run TestMe)
   (epsilon 0.0))
 
 (defprogram mytest8 mytest
@@ -126,7 +129,7 @@
   (min_iter 55)
   (max_iter 20000))
 
-(defprogram Test3Par "MakeCP Checkpoint"
+(defprogram Test3Par TestMe
   (declare X_alpha Number [h^-1] "")
   (X_alpha 1e-4)
   (declare A_lim Number [cm] "")
@@ -149,7 +152,7 @@
   (min_iter 20)
   (max_iter 18000))
 
-(defprogram Test4Par "MakeCP Checkpoint"
+(defprogram Test4Par TestMe
   ;; Fixed.
   (BB_decomp 0 [h^-1])
   (S_lim -45462.7 [cm])
@@ -179,19 +182,25 @@
   (min_iter 20)
   (max_iter 18000))
 
+(defprogram Test4Par TestMe
+  ;; New variables.
+  (declare X_alpha Number [h^-1] "")
+  (X_alpha 1e-4)
+  (Ap_alpha $X_alpha)
+  (PP_alpha $X_alpha)
+  (B_alpha $X_alpha))
+
 (defprogram mytest8 mytest
   (parameter BB_decomp BB_K_clay S_lim Ap_lim PP_lim B_lim S_alpha X_alpha)
-  (simplex (1e-2 1 -10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-3)
-           (1e-3 3 -1000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-3)
-           (1e-4 7 -10000 -10000 -1000 -100 1e-6 1e-5 1e-4 1e-3)
-           (1e-3 9 -10000 -1000 -100 -100 1e-6 1e-5 1e-4 1e-3)
-           (1e-4 15 -10000 -1000 -1000 -1000 1e-6 1e-5 1e-4 1e-3)
-           (1e-5 20 -10000 -1000 -1000 -100 1e-5 1e-5 1e-4 1e-3)
-           (1e-1 25 -10000 -1000 -1000 -100 1e-6 1e-4 1e-4 1e-3)
-           (1e-2 40 -10000 -1000 -1000 -100 1e-6 1e-5 1e-5 1e-3)
-           (1e-3 100 -10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-4)
-           (1e-4 150 -10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-4)
-           (1e-5 150 -10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-4))
+  (simplex (1e-2 1 -10000 -1000 -1000 -100 1e-6 1e-3)
+           (1e-3 3 -1000 -1000 -1000 -100 1e-6 1e-3)
+           (1e-3 9 -10000 -1000 -100 -100 1e-6 1e-3)
+           (1e-4 15 -10000 -1000 -1000 -1000 1e-6 1e-3)
+           (1e-5 20 -10000 -100 -1000 -100 1e-5 1e-3)
+           (1e-1 25 -10000 -1000 -1000 -100 1e-6 1e-3)
+           (1e-3 100 -10000 -1000 -1000 -100 1e-6 1e-4)
+           (1e-4 150 -1000 -1000 -1000 -10 1e-6 1e-4)
+           (1e-5 150 -10000 -1000 -1000 -100 1e-6 1e-4))
   (limit (and (>= BB_decomp 0 [h^-1])
               (>= BB_K_clay 0.0 [cm^3/g])
               (>= S_alpha 0 [h^-1]) (<= S_alpha 1 [h^-1]) 

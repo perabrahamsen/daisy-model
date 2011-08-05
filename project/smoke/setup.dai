@@ -8,6 +8,65 @@
 (input file "log.dai")
 (input file "smoke-log.dai")
 
+;; Parameters.
+
+(defprogram MyEnv batch 
+  (declare BB_decomp Number [h^-1] "")
+  (declare S_alpha Number [h^-1] "")
+  (declare S_lim Number [cm] "")
+  (declare Ap_alpha Number [h^-1] "")
+  (declare Ap_lim Number [cm] "")
+  (declare PP_alpha Number [h^-1] "")
+  (declare PP_lim Number [cm] "")
+  (declare B_alpha Number [h^-1] "")
+  (declare B_lim Number [cm] "")
+  ;; *** Optimized with four layers. r^2 = 0.20
+  ;;(BB_decomp 0 [h^-1])
+  ;;(BB_K_clay 20 [cm^3/g])
+  ;;(S_lim -45462.7 [cm])
+  ;;(Ap_lim -453.466 [cm])
+  ;;(PP_lim -234.562 [cm])
+  ;;(B_lim -20.3634 [cm])
+  ;;(S_alpha 8.30618e-06 [h^-1])
+  ;;(Ap_alpha 0.000167111 [h^-1])
+  ;;(PP_alpha 0.0001432 [h^-1])
+  ;;(B_alpha 5.20258e-05 [h^-1])
+  ;; *** Three variables.
+  ;; S as before (full mixing?)
+  ;; Ap/PP lim = -332.539
+  ;; Ap/PP/B alpha =  0.000187342
+  ;; r^2 = 0.19
+  ;; Ten variables.
+  ;;(BB_decomp 0.066855 [h^-1])
+  ;;(BB_K_clay 0.713904 [cm^3/g])
+  ;;(S_lim -420.905 [cm])
+  ;;(Ap_lim -1216.87 [cm])
+  ;;(PP_lim -137.384 [cm])
+  ;;(B_lim -16.9006 [cm])
+  ;;(S_alpha 9.3015e-06 [h^-1])
+  ;;(Ap_alpha 8.90626e-05 [h^-1])
+  ;;(PP_alpha 7.54725e-05 [h^-1])
+  ;;(B_alpha 0.0014369 [h^-1])
+  ;; *** Four variables.
+  ;; (17.7382 -498.834 -136.54 0.000343216) = -0.102534
+  ;; Fixed.
+  (BB_decomp 0 [h^-1])
+  (S_lim -45462.7 [cm])
+  (S_alpha 8.30618e-06 [h^-1])
+  ;; New variables.
+  (declare X_alpha Number [h^-1] "")
+  (declare A_lim Number [cm] "")
+  (declare BB_K_clay Number [cm^3/g] "")
+  (BB_K_clay 17.7382 [cm^3/g])
+  (A_lim -498.834 [cm])
+  (B_lim -136.54 [cm])
+  (X_alpha 0.000343216 [h^-1])
+  (Ap_lim $A_lim)
+  (PP_lim $A_lim)
+  (Ap_alpha $X_alpha)
+  (PP_alpha $X_alpha)
+  (B_alpha $X_alpha))
+
 ;; Horizons.
 
 (defhorizon "Ap" USDA3
@@ -177,62 +236,6 @@
 
 (defprogram Smoke Daisy
   "Main Daisy setup for smoke project."
-  (declare BB_decomp Number [h^-1] "")
-  (declare BB_K_clay Number [cm^3/g] "")
-  (declare S_alpha Number [h^-1] "")
-  (declare S_lim Number [cm] "")
-  (declare Ap_alpha Number [h^-1] "")
-  (declare Ap_lim Number [cm] "")
-  (declare PP_alpha Number [h^-1] "")
-  (declare PP_lim Number [cm] "")
-  (declare B_alpha Number [h^-1] "")
-  (declare B_lim Number [cm] "")
-  ;; *** Optimized with four layers. r^2 = 0.20
-  ;;(BB_decomp 0 [h^-1])
-  ;;(BB_K_clay 20 [cm^3/g])
-  ;;(S_lim -45462.7 [cm])
-  ;;(Ap_lim -453.466 [cm])
-  ;;(PP_lim -234.562 [cm])
-  ;;(B_lim -20.3634 [cm])
-  ;;(S_alpha 8.30618e-06 [h^-1])
-  ;;(Ap_alpha 0.000167111 [h^-1])
-  ;;(PP_alpha 0.0001432 [h^-1])
-  ;;(B_alpha 5.20258e-05 [h^-1])
-  ;; *** Three variables.
-  ;; S as before (full mixing?)
-  ;; Ap/PP lim = -332.539
-  ;; Ap/PP/B alpha =  0.000187342
-  ;; r^2 = 0.19
-  ;; Ten variables.
-  ;;(BB_decomp 0.066855 [h^-1])
-  ;;(BB_K_clay 0.713904 [cm^3/g])
-  ;;(S_lim -420.905 [cm])
-  ;;(Ap_lim -1216.87 [cm])
-  ;;(PP_lim -137.384 [cm])
-  ;;(B_lim -16.9006 [cm])
-  ;;(S_alpha 9.3015e-06 [h^-1])
-  ;;(Ap_alpha 8.90626e-05 [h^-1])
-  ;;(PP_alpha 7.54725e-05 [h^-1])
-  ;;(B_alpha 0.0014369 [h^-1])
-  ;; *** Four variables.
-  ;; (17.7382 -498.834 -136.54 0.000343216) = -0.102534
-  ;; Fixed.
-  (BB_decomp 0 [h^-1])
-  (S_lim -45462.7 [cm])
-  (S_alpha 8.30618e-06 [h^-1])
-  ;; New variables.
-  (declare X_alpha Number [h^-1] "")
-  (declare A_lim Number [cm] "")
-  (BB_K_clay 17.7382 [cm^3/g])
-  (A_lim -498.834 [cm])
-  (B_lim -136.54 [cm])
-  (X_alpha 0.000343216 [h^-1])
-  (Ap_lim $A_lim)
-  (PP_lim $A_lim)
-  (Ap_alpha $X_alpha)
-  (PP_alpha $X_alpha)
-  (B_alpha $X_alpha)
-
 
   ;; Combine weather soruces.
   (weather combine 
@@ -265,11 +268,8 @@
           ("Chemical Content" (print_initial false) 
            (chemical BB-base) (unit [PPM]) (when finished))
           ("Smoke" (when daily) (chemical "Bromide"))
-          ("SmokeProfile" (when finished)(chemical "Bromide") 
-           (My_K_clay 0 [cm^3/g]))
           ("Smoke" (when daily) (chemical "BB-base"))
-          ("SmokeProfile" (when finished)(chemical "BB-base") 
-           (My_K_clay $BB_K_clay))))
+          ("SmokeProfile" (chemical "BB-base"))))
   
 (defsummary Drain-BB-Rsqr Rsqr
   (measure ((time 2010 12 13 12)
@@ -310,10 +310,8 @@
 (defprogram Drain Smoke
   (column Drain)
   (output &old 
-          ("SmokeProfile" (when finished)(chemical "BB-base")
-           (My_K_clay $BB_K_clay) (summary Drain-BB-Rsqr))
-          ("SmokeProfile" (when finished)(chemical "Bromide")
-           (My_K_clay 0 [cm^3/g]) (summary Drain-Br-Rsqr)))
+          ("BB Profile" (summary Drain-BB-Rsqr))
+          ("SmokeProfile" (chemical "Bromide") (summary Drain-Br-Rsqr)))
   (log_prefix "log/drain-"))
 
 (defsummary Macro-BB-Rsqr Rsqr
@@ -355,10 +353,8 @@
 (defprogram Macro Smoke
   (column Macro)
   (output &old 
-          ("SmokeProfile" (when finished)(chemical "BB-base")
-           (My_K_clay $BB_K_clay) (summary Macro-BB-Rsqr))
-          ("SmokeProfile" (when finished)(chemical "Bromide")
-           (My_K_clay 0 [cm^3/g]) (summary Macro-Br-Rsqr)))
+          ("BB Profile" (summary Macro-BB-Rsqr))
+          ("SmokeProfile" (chemical "Bromide") (summary Macro-Br-Rsqr)))
   (log_prefix "log/macro-"))
 
 (defsummary Without-BB-Rsqr Rsqr
@@ -401,14 +397,12 @@
 (defprogram Without Smoke
   (column Without)
   (output &old 
-          ("SmokeProfile" (when finished) (chemical "BB-base")
-           (My_K_clay $BB_K_clay) (summary Without-BB-Rsqr))
-          ("SmokeProfile" (when finished) (chemical "Bromide")
-           (My_K_clay 0 [cm^3/g]) (summary Without-Br-Rsqr)))
+          ("BB Profile"  (summary Without-BB-Rsqr))
+          ("SmokeProfile" (chemical "Bromide") (summary Without-Br-Rsqr)))
   (log_prefix "log/without-"))
   
 ;; Run simulation.
-(defprogram sims batch 
+(defprogram sims MyEnv
   (run Without Drain Macro))
 
 ;; Plot
@@ -423,6 +417,7 @@
 (defgnuplot plotBr xy
   (declare what String "What to plot.")
   (declare chemical String "Chemical to plot.")
+  (chemical "Bromide")
   (where "fig/${what}-${chemical}.pdf")
   (xmax 2000 [PPM])
   (legend se)
@@ -450,15 +445,53 @@
           (line (points (0 -30) (10000 -30)))
           (line (points (0 -40) (10000 -40)))))
 
+(defgnuplot plotBB plotBr
+  (chemical "BB-base")
+  (declare Ap_fac number "")
+  (Ap_fac (+ (* 0.107 [] (convert (/ BB_K_clay 2 [cm^3/g]) [])) 1.0 []))
+  (declare Bt_fac number "")
+  (Bt_fac (+ (* 0.222 [] (/ BB_K_clay 2 [cm^3/g])) 1.0 []))
+  (source (profile (when 2010 12 13)
+                   (title "Sim")
+                   (style 1)
+                   (with lines)
+                   (to -130 [cm])
+                   (file "log/${what}-content_${chemical}.dlf"))
+          (profile (when 2010 12 13)
+                   (title "")
+                   (style 1)
+                   (with points)
+                   (to -130 [cm])
+                   (file "log/${what}-smoke-${chemical}-profile.dlf"))
+          (arithmetic (file "${chemical}.ddf")
+                      (style 2)
+                      (title "Obs")
+                      (y Middle)
+                      (valid (> Middle -25 [cm]))
+                      (x (* "${what}-avg" Ap_fac))
+                      (xbar "${what}-dev"))
+          (arithmetic (file "${chemical}.ddf")
+                      (style 3)
+                      (title "")
+                      (y Middle)
+                      (valid (< Middle -25 [cm]))
+                      (x (* "${what}-avg" Bt_fac))
+                      (xbar "${what}-dev"))
+          (line (points (0 -9) (10000 -9)))
+          (line (points (0 -18) (10000 -18)))
+          (line (points (0 -24) (10000 -24)))
+          (line (points (0 -30) (10000 -30)))
+          (line (points (0 -40) (10000 -40)))))
+
 (defgnuplot plotBrall multi
-  (graph (plotBr (chemical "Bromide") (what "drain") (title "Drain connected biopore"))
-         (plotBr (chemical "Bromide") (what "macro") (title "Biopore without smoke")) 
-         (plotBr (chemical "Bromide") (what "without") (title "No biopores"))))
+  (graph (plotBr (what "drain") (title "Drain connected biopore"))
+         (plotBr (what "macro") (title "Biopore without smoke")) 
+         (plotBr (what "without") (title "No biopores"))))
   
 (defgnuplot plotBBall multi
-  (graph (plotBr (chemical "BB-base") (what "drain") (title "Drain connected biopore"))
-         (plotBr (chemical "BB-base") (what "macro") (title "Biopore without smoke")) 
-         (plotBr (chemical "BB-base") (what "without") (title "No biopores"))))
+  (graph (plotBB (what "drain") (title "Drain connected biopore"))
+         (plotBB (what "macro") (title "Biopore without smoke")) 
+         (plotBB (what "without") (title "No biopores"))))
   
 
 (defgnuplot plotPres xy
@@ -521,23 +554,6 @@
               [mm/h])))
 
 (defgnuplot K xy
-  (declare S_alpha Number [h^-1] "")
-  (declare S_lim Number [cm] "")
-  (declare Ap_alpha Number [h^-1] "")
-  (declare Ap_lim Number [cm] "")
-  (declare PP_alpha Number [h^-1] "")
-  (declare PP_lim Number [cm] "")
-  (declare B_alpha Number [h^-1] "")
-  (declare B_lim Number [cm] "")
-  ;; Dummies.
-  (S_lim -1 [cm])
-  (S_alpha 0.1 [h^-1])
-  (Ap_lim -1 [cm])
-  (Ap_alpha 0.1 [h^-1])
-  (PP_lim -1 [cm])
-  (PP_alpha 0.1 [h^-1])
-  (B_lim -1 [cm])
-  (B_alpha 0.1 [h^-1])
   (declare FROM Number [<user>] "")
   (declare TO Number [<user>] "")
   (source ;; K_Surface 
@@ -554,10 +570,10 @@
             (where "fig/conductivity_2.pdf")))
 )
 
-(defprogram plot gnuplot 
-  (graph plotall))
+(defprogram plot MyEnv
+  (run (gnuplot (graph plotall))))
 
-(defprogram both batch
+(defprogram both MyEnv
   (run sims plot))
 
 ;; setup.dai ends here.

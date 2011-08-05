@@ -24,6 +24,7 @@
 #include "scope_table.h"
 #include "gnuplot_utils.h"
 #include "number.h"
+#include "boolean.h"
 #include "vcheck.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -44,6 +45,7 @@ class XYSourceExpr : public XYSource
   const std::auto_ptr<Number> y_expr;
   const std::auto_ptr<Number> xbar_expr;
   const std::auto_ptr<Number> ybar_expr;
+  const std::auto_ptr<Boolean> valid;
   const symbol title_;
   symbol x_dimension_;
   symbol y_dimension_;
@@ -176,6 +178,14 @@ XYSourceExpr::load (const Units& units, Treelog& msg)
           ok = false;
         }
       }
+    if (!valid->initialize (units, scope, msg)
+        || !valid->check (units, scope, msg))
+      {
+        lex.error ("Bad 'valid' expression");
+        ok = false;
+      }
+    valid->tick (units, scope, msg);
+
     if (!ok)
       return false;
   }
@@ -198,6 +208,11 @@ XYSourceExpr::load (const Units& units, Treelog& msg)
           || (ybar_expr.get () && ybar_expr->missing (scope))
           )
 	continue;
+
+      if (valid->missing (scope))
+	continue;
+      if (!valid->value (scope))
+        continue;
       
       // Store it.
       xs.push_back (x_expr->value (scope));
@@ -227,6 +242,7 @@ XYSourceExpr::XYSourceExpr (const BlockModel& al)
     ybar_expr (al.check ("ybar")
                ? Librarian::build_item<Number> (al, "ybar")
                : NULL),
+    valid (Librarian::build_item<Boolean> (al, "valid")),
     title_ (al.name ("title", y_expr->title () + " vs " + x_expr->title ())),
     x_dimension_ ("UNINITIALIZED"),
     y_dimension_ ("UNINITIALIZED")
@@ -274,6 +290,10 @@ for that column.");
 Expression for calculating y errorbar for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");
+    frame.declare_object ("valid", Boolean::component, 
+                          Attribute::Const, Attribute::Singleton, "\
+Ignore entries if this boolean expression is false.");
+    frame.set ("valid", "true");
   }
 } XYSourceExpr_syntax;
 
