@@ -186,8 +186,13 @@ Value of each parameter.");
     double value (const Iterative::Point& point) const
     {
       double result = NAN;
-      if (program.find_value (result, msg, point))
-        return result;
+      try 
+        {
+          if (program.find_value (result, msg, point))
+            return result;
+        }
+      catch (...)
+        { }
       return std::numeric_limits<double>::max ();
     }
 

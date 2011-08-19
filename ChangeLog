@@ -1,7 +1,11 @@
+2011-08-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* xysource_expr.C (valid): New parameter.
+
 2011-08-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* block_top.C, block_top.h (check): Moved here.
-	* block.C, block.h (check): From here.
+	* block.C, block.h, block_nested.C, block_nested.h (check): Handle
+	in block.C exclusively.
 
 2011-07-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
 

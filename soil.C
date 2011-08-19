@@ -246,6 +246,10 @@ Soil::M (size_t i, double h) const
 { return horizon_[i]->hydraulic->M (h); }
 
 double 
+Soil::h_int (size_t i, double Theta) const
+{ return horizon_[i]->hydraulic->h_int (Theta); }
+
+double 
 Soil::dispersivity (size_t) const
 { return impl->dispersivity; }
 

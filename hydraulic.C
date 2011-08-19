@@ -49,6 +49,10 @@ Hydraulic::library_id () const
   return id;
 }
 
+double
+Hydraulic::r2h (const double r)
+{ return -1500.0 /* [um cm] */ / r; }
+
 struct Hydraulic::K_at_h
 {
   // Parameters.
@@ -76,6 +80,10 @@ Hydraulic::set_porosity (double Theta)
   daisy_assert (Theta > Theta_res);
   Theta_sat = Theta; 
 }
+
+double 
+Hydraulic::h_int (double Theta) const
+{ return my_h_int (Theta); }
 
 void 
 Hydraulic::output (Log& log) const
@@ -206,6 +214,20 @@ Hydraulic::initialize (const Texture&,
       K_sat = K_init->K / K_one;
       daisy_assert (approximate (K (K_init->h), K_init->K));
     }
+
+  // Initialize h_int.
+  const double h_min = r2h (r_pore_min);
+  const double Theta_min = Theta (h_min);
+  my_h_int.add (Theta_min, 0.0);
+  static const int intervals = 100;
+  double delta = (Theta_sat - Theta_min) / (intervals + 0.0);
+  double sum = 0.0;
+  for (double Theta = Theta_min + delta; Theta < Theta_sat; Theta += delta)
+    {
+      double my_h = h (Theta);
+      sum += my_h * delta;
+      my_h_int.add (Theta, sum);
+    }
 }
 
 bool 
@@ -222,6 +244,7 @@ Hydraulic::check (Treelog& msg) const
 
 Hydraulic::Hydraulic (const BlockModel& al)
   : ModelDerived (al.type_name ()),
+    r_pore_min (al.number ("r_pore_min")),
     K_init (al.check ("K_at_h")
 	    ? submodel<K_at_h> (al, "K_at_h")
 	    : NULL),
@@ -232,6 +255,7 @@ Hydraulic::Hydraulic (const BlockModel& al)
 
 Hydraulic::Hydraulic (const symbol name_, const double K_sat_)
   : ModelDerived (name_),
+    r_pore_min (0.1),
     K_init (NULL),
     Theta_sat (-42.42e42),
     Theta_res (0.0),
@@ -249,43 +273,69 @@ This component is responsible for specifying the soils hydraulic\n\
 properties.")
   { }
   void load_frame (Frame& frame) const
-  { Model::load_model (frame); }
+  { 
+    Model::load_model (frame);
+    frame.declare ("r_pore_min", "um", Attribute::Const, "\
+Smallest pores in the soil.");
+    frame.set ("r_pore_min", 0.1);
+  }
 } Hydraulic_init;
 
 
 // The 'hydraulic' program model.
 
+#include "horizon.h"
+
 struct ProgramHydraulic_table : public Program
 {
-  const std::auto_ptr<Hydraulic> hydraulic;
+  const std::auto_ptr<Horizon> horizon;
   const int intervals;
+  const bool top_soil;
+  const bool show_h_int;
 
   bool run (Treelog& msg)
   {
     std::ostringstream tmp;
-    tmp << "pressure\tpressure\tTheta\tK\n";
-    tmp << "pF\tcm\t%\tcm/h\n";
+    tmp << "pressure\tpressure\tTheta\tK";
+    if (show_h_int)
+      tmp << "\th_int";
+    tmp << "\n";
+    tmp << "pF\tcm\t%\tcm/h";
+    if (show_h_int)
+      tmp << "\tcm";
+    tmp << "\n";
     for (int i = 0; i <= intervals; i++)
       {
         const double pF = (5.0 * i) / (intervals + 0.0);
         const double h = pF2h (pF);
-        const double Theta = hydraulic->Theta (h) * 100;
-        const double K = hydraulic->K (h);
-        tmp << pF << "\t" << h << "\t" << Theta << "\t" << K << "\n";
+        const double Theta = horizon->hydraulic->Theta (h);
+        const double K = horizon->hydraulic->K (h);
+        tmp << pF << "\t" << h << "\t" << Theta * 100 << "\t" << K;
+        if (show_h_int)
+          {
+            const double h_int = horizon->hydraulic->h_int (Theta );
+            tmp << "\t" << h_int;
+          }
+        tmp << "\n";
       }
     msg.message (tmp.str ());
     return true;
   }
 
   // Create and Destroy.
-  void initialize (Block&)
-  { };
-  bool check (Treelog& msg)
-  { return hydraulic->check (msg); }
+  void initialize (Block& al)
+  { 
+    Treelog& msg = al.msg ();
+    horizon->initialize (top_soil, 2, msg);
+  };
+  bool check (Treelog&)
+  { return true; }
   ProgramHydraulic_table (const BlockModel& al)
     : Program (al),
-      hydraulic (Librarian::build_item<Hydraulic> (al, "hydraulic")),
-      intervals (al.integer ("intervals"))
+      horizon (Librarian::build_item<Horizon> (al, "horizon")),
+      intervals (al.integer ("intervals")),
+      top_soil (al.flag ("top_soil")),
+      show_h_int (al.flag ("show_h_int"))
   { }
   ~ProgramHydraulic_table ()
   { }
@@ -301,13 +351,18 @@ Generate a table of the rentention curve and hydraulic conductivity.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_object ("hydraulic", Hydraulic::component, 
-                       Attribute::Const, Attribute::Singleton, "\
+    frame.declare_object ("horizon", Horizon::component, 
+                          Attribute::Const, Attribute::Singleton, "\
 The hydraulic model to show in the table.");
     frame.declare_integer ("intervals", Attribute::Const, "\
 Number of intervals in the table.");
     frame.set ("intervals", 50);
-    frame.order ("hydraulic");
+    frame.declare_boolean ("top_soil", Attribute::Const, "\
+Set to true for the plowing layer.");
+    frame.declare_boolean ("show_h_int", Attribute::Const, "\
+Show h integrated over Theta.");
+    frame.set ("show_h_int", true);
+    frame.order ("horizon");
   }
 } ProgramHydraulic_table_syntax;
 

@@ -93,6 +93,15 @@ struct ReactionSorption : public Reaction
         const double clay = soil.clay (c);
         const double humus = soil.humus (c);
         
+        // Find fraction of sorbtion sites in primary domain.
+        const double h_lim = soil.h_secondary (c);
+        const double Theta_lim = soil.Theta (c, h_lim, 0.0);
+        const double Theta_sat = soil.Theta (c, 0.0, 0.0);
+        const double primary_sorption_fraction 
+          = soil.h_int (c, Theta_lim) / soil.h_int (c, Theta_sat);
+        const double h = soil_water.h_old (c);
+        const double f = (h < h_lim) ? 1.0 : primary_sorption_fraction;
+        
         // Primary domain.
         {
           const double Theta = soil_water.Theta_primary_old (c);
@@ -103,27 +112,26 @@ struct ReactionSorption : public Reaction
 
           const double C = solute.M_primary (c) / Theta;
           const double A = sorbed.M_primary (c);
-          const double S = find_rate (rho_b, clay, humus, Theta, A, C);
+          const double S = find_rate (f, rho_b, clay, humus, Theta, A, C);
           S_sorption_primary[c] = S;
           S_sorption[c] = S;
         }
         // Secondary domain.
-        if (colloid)
-          {
-            const double Theta = soil_water.Theta_secondary_old (c);
-            if (Theta > 1e-9)
-              {
-                const double rho_b 
-                  = colloid->M_secondary (c)  * soil_enrichment_factor;
-                const double C = solute.M_secondary (c) / Theta;
-                const double A = sorbed.M_secondary (c);
-                const double S = find_rate (rho_b, clay, humus, Theta, A, C);
-                S_sorption_secondary[c] = S;
-                S_sorption[c] += S;
-              }
-            else
-              S_sorption_secondary[c] = 0.0;
-          }
+        {
+          const double Theta = soil_water.Theta_secondary_old (c);
+          if (Theta > 1e-9)
+            {
+              const double rho_b = colloid
+                ? colloid->M_secondary (c)  * soil_enrichment_factor
+                : soil.dry_bulk_density (c);
+              const double C = solute.M_secondary (c) / Theta;
+              const double A = sorbed.M_secondary (c);
+              const double S = find_rate (1.0 - f, 
+                                          rho_b, clay, humus, Theta, A, C);
+              S_sorption_secondary[c] = S;
+              S_sorption[c] += S;
+            }
+        }
       }
     // Make the source/sink official.
     solute.add_to_transform_sink (S_sorption_primary);
@@ -186,12 +194,13 @@ struct ReactionSorption : public Reaction
     // Find source/sink term.
     const double A = has_sorbed;
     const double C = has_solute / Theta;
-    surface_sorption = find_rate (rho_b, clay, humus, Theta, A, C) * z_mixing;
+    surface_sorption 
+      = find_rate (1.0, rho_b, clay, humus, Theta, A, C) * z_mixing;
     solute.add_to_surface_transform_source (-surface_sorption);
     sorbed.add_to_surface_transform_source (surface_sorption);
   }
 
-  double find_rate (const double rho_b, 
+  double find_rate (const double f, const double rho_b, 
                     const double clay, const double humus, const double Theta, 
                     const double A, const double C)
   {
@@ -203,7 +212,7 @@ struct ReactionSorption : public Reaction
     const double K = (K_d > 0.0)
       ? K_d : clay * K_clay + humus * K_humus;
     // M = C (K rho_b + Theta) => C = M / (K rho_b + Theta)
-    const double equil_C = M / (K * rho_b + Theta);
+    const double equil_C = M / (f * K * rho_b + Theta);
     const double want_solute = equil_C * Theta;
     const double want_sorbed = M - want_solute;
     

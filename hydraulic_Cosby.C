@@ -121,8 +121,8 @@ Hydraulic_Cosby::Sr (double h) const
 }
 
 void
-Hydraulic_Cosby::initialize (const Texture& texture, double /* rho_b */,
-			     bool /* top_soil */, Treelog& msg)
+Hydraulic_Cosby::initialize (const Texture& texture, double rho_b,
+			     bool top_soil, Treelog& msg)
 {
   TREELOG_MODEL (msg);
 
@@ -149,6 +149,8 @@ Hydraulic_Cosby::initialize (const Texture& texture, double /* rho_b */,
   Theta_sat = (50.50 - 0.1420 * sand - 0.0370 * clay) * 0.01; // [%]
   daisy_assert (Theta_sat > 0.0);
   daisy_assert (Theta_sat < 1.0);
+
+  Hydraulic::initialize (texture, rho_b, top_soil, msg);
 
   // Debug messages.
   std::ostringstream tmp;
