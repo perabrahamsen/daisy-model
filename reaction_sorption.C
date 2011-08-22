@@ -37,6 +37,7 @@
 #include "check.h"
 #include "frame.h"
 #include <memory>
+#include <sstream>
 
 static const double c_fraction_in_humus = 0.587;
 
@@ -128,6 +129,15 @@ struct ReactionSorption : public Reaction
               const double A = sorbed.M_secondary (c);
               const double S = find_rate (1.0 - f, 
                                           rho_b, clay, humus, Theta, A, C);
+#if 0
+          if (std::isnormal (C))
+            {
+              std::ostringstream tmp;
+              tmp << c << ": " << "C = " << C << ", A = " << A 
+                  << ", S = " << S << ", f = " << f;
+              msg.message (tmp.str ());
+            }
+#endif
               S_sorption_secondary[c] = S;
               S_sorption[c] += S;
             }

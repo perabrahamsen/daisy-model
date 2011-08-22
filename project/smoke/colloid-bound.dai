@@ -409,8 +409,8 @@
 
 (defchemical BB-base common
   "Base parameterization for all Brilliant Blue forms."
-  ;; No decomposition.
-  (decompose_rate $BB_decomp))
+  (decompose_rate $BB_decomp)
+  )
 
 (defchemical BB BB-base
   "Dissolved Brilliant Blue."

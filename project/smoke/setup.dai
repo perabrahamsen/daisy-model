@@ -31,7 +31,7 @@
   (PP_K 0.410693 [cm/h])
   (BB_K_clay 5.69439 [cm^3/g])
   (BB_decomp 0 [h^-1])
-  (pore_min 0.1 [um])
+  (pore_min 1.0 [um])
   (BB_apply 17.68e6 [g/ha])
 
   ;; New variables.
