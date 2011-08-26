@@ -88,8 +88,8 @@ public:
   virtual void set_primary (const Soil& soil, const SoilWater& soil_water,
                             const std::vector<double>& M,
                             const std::vector<double>& J) = 0;
-  virtual void set_secondary (const Soil& soil, const SoilWater& soil_water,
-                              const std::vector<double>& C,
+  virtual void set_secondarM (const Soil& soil, const SoilWater& soil_water,
+                              const std::vector<double>& M,
                               const std::vector<double>& J) = 0;
   virtual void set_tertiary_full (const std::vector<double>& S_p, 
                                   const std::vector<double>& J_p) = 0;

@@ -61,12 +61,6 @@ MovementSolute::secondary_flow (const Geometry& geo,
   for (size_t c = 0; c < cell_size; c++)
     Theta[c] = Theta_old[c];
 
-#if 0
-  // Cell source.  Must be before transport to avoid negative values.
-  for (size_t c = 0; c < cell_size; c++)
-    M[c] += S[c] * dt;
-#endif
-
   // Small timesteps.
   for (;;)
     {
@@ -101,11 +95,9 @@ MovementSolute::secondary_flow (const Geometry& geo,
             }
         }
 
-#if 1
       // Cell source.  Must be before transport to avoid negative values.
       for (size_t c = 0; c < cell_size; c++)
         M[c] += S[c] * ddt;
-#endif
 
       // Find fluxes using new values (more stable).
       std::vector<double> dJ (edge_size, -42.42e42);
@@ -220,7 +212,8 @@ MovementSolute::secondary_transport (const Geometry& geo,
 
   std::vector<double> Theta_old (cell_size); // Water content at start...
   std::vector<double> Theta_new (cell_size); // ...and end of timestep.
-  std::vector<double> M (cell_size); // Content given to flow.
+  std::vector<double> A (cell_size); // Content ignored by flow.
+  std::vector<double> Mf (cell_size); // Content given to flow.
   std::vector<double> S (cell_size); // Source given to flow.
 
   for (size_t c = 0; c < cell_size; c++)
@@ -231,8 +224,10 @@ MovementSolute::secondary_transport (const Geometry& geo,
       daisy_assert (Theta_new[c] >= 0.0);
       const double source = solute.S_secondary (c);
       daisy_assert (std::isfinite (source));
-      M[c] = solute.C_secondary (c) * Theta_old[c];
-      daisy_assert (M[c] >= 0.0);
+      Mf[c] = solute.C_secondary (c) * Theta_old[c];
+      daisy_assert (Mf[c] >= 0.0);
+      A[c] = solute.M_secondary (c) - Mf[c];
+      daisy_assert (std::isfinite (A[c]));
       if (Theta_new[c] > 0)
         {
           if (Theta_old[c] > 0)
@@ -256,29 +251,27 @@ MovementSolute::secondary_transport (const Geometry& geo,
   
   // Flow.
   secondary_flow (geo, Theta_old, Theta_new, q, solute.objid, 
-                  S, J_forced, C_border, M, J, dt, msg);
+                  S, J_forced, C_border, Mf, J, dt, msg);
 
   // Check fluxes.
   for (size_t e = 0; e < edge_size; e++)
     daisy_assert (std::isfinite (J[e]));
 
+
   // Negative content should be handled by primary transport.
+  std::vector<double> Mn (cell_size); // New content.
   std::vector<double> C (cell_size);
   for (size_t c = 0; c < cell_size; c++)
     {
-      daisy_assert (std::isfinite (M[c]));
-      if (Theta_new[c] > 1e-6 &&  M[c] > 0.0)
-        // Positive mass in positive water.
-        C[c] = M[c] / Theta_new[c];
-      else
-        // Otherwise, pass to primary transport.
+      Mn[c] = A[c] + Mf[c];
+      if (Mn[c] < 0.0 || Theta_new[c] < 1e-6)
         {
-          S_extra[c] += M[c] / dt;
-          C[c] = 0.0;
+          S_extra[c] += Mn[c] / dt;
+          Mn[c] = 0.0;
         }
       daisy_assert (std::isfinite (S_extra[c]));
     }
-  solute.set_secondary (soil, soil_water, C, J);
+  solute.set_secondarM (soil, soil_water, Mn, J);
 }
 
 void

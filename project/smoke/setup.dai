@@ -30,7 +30,7 @@
   ;; Fixed.
   (PP_K 0.410693 [cm/h])
   (BB_K_clay 5.69439 [cm^3/g])
-  (BB_decomp 0 [h^-1])
+  (BB_decomp 1  [h^-1])
   (pore_min 1.0 [um])
   (BB_apply 17.68e6 [g/ha])
 
@@ -284,10 +284,13 @@
           ("Field water")                      ;Whole plot.
           ("Soil Water Potential")
           ;;;; Bromide
-          ("Field chemical" (chemical "Bromide"))
+          ("Soil chemical"  (to -30 [cm]) (chemical "Bromide"))
           ("Chemical Content" (print_initial false) 
            (chemical Bromide) (unit [PPM]) (when finished))
-          ("Field chemical" (chemical "BB-base"))
+          ("Soil chemical" (to -30 [cm]) (chemical "BB-base"))
+          ("Soil chemical" (to -30 [cm]) (chemical "BB"))
+          ("Soil chemical" (to -30 [cm]) (chemical "BB-immobile"))
+          ("Soil chemical" (to -30 [cm]) (chemical "BB-colloid"))
           ("Chemical Content" (print_initial false) 
            (chemical BB-base) (unit [PPM]) (when finished))
           ("Smoke" (when daily) (chemical "Bromide"))

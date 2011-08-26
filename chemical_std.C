@@ -171,8 +171,8 @@ struct ChemicalStandard : public Chemical
   void set_primary (const Soil& soil, const SoilWater& soil_water,
                     const std::vector<double>& M,
                     const std::vector<double>& J);
-  void set_secondary (const Soil& soil, const SoilWater& soil_water,
-                      const std::vector<double>& C,
+  void set_secondarM (const Soil& soil, const SoilWater& soil_water,
+                      const std::vector<double>& M,
                       const std::vector<double>& J);
   void set_tertiary_full (const std::vector<double>& S_p, 
                           const std::vector<double>& J_p);
@@ -384,23 +384,29 @@ ChemicalStandard::set_primary (const Soil& soil, const SoilWater& soil_water,
 }
 
 void 
-ChemicalStandard::set_secondary (const Soil& soil, const SoilWater& soil_water,
-                                 const std::vector<double>& C,
+ChemicalStandard::set_secondarM (const Soil& soil, const SoilWater& soil_water,
+                                 const std::vector<double>& M,
                                  const std::vector<double>& J)
 {
   // Update cells.
-  daisy_assert (C_secondary_.size () == C.size ());
-  const size_t cell_size = C.size ();
-  C_secondary_ = C;
-
+  daisy_assert (C_secondary_.size () == M.size ());
+  const size_t cell_size = M.size ();
   for (size_t c = 0; c < cell_size; c++)
     {
+      daisy_assert (M[c] >= 0.0);
+      daisy_assert (M_primary_[c] >= 0.0);
+      M_total_[c] = M_primary_[c] + M[c];
+      daisy_assert (M_total_[c] >= 0.0);
+      
       const double Theta_primary = soil_water.Theta_primary (c);
       const double Theta_secondary = soil_water.Theta_secondary (c);
       const double Theta_matrix = Theta_primary + Theta_secondary;
-      if (iszero (Theta_secondary))
+      
+      if (Theta_secondary > 0.0)
+        C_secondary_[c] = M[c] / Theta_secondary;
+      else 
         C_secondary_[c] = C_primary_[c];
-      M_total_[c] = M_primary_[c] + C_secondary_[c] * Theta_secondary;
+
       C_avg_[c] 
         = (Theta_primary * C_primary_[c] + Theta_secondary * C_secondary_[c]) 
         / Theta_matrix;

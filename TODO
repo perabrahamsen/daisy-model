@@ -1,20 +1,28 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-******************************
-
-Ingen decompose????
-
-Ingen sorption????
-
-******************************
-
-* Læs DHI afsnit ???
-
-* Læs SH artikel
-
 * Smoke
 
-** max_C i matrix? infiltration
+** Fix now!
+
+*** secondary domain for instant sorption badly broken
+
+Adsorbtion::C_to_M and M_to_C needs to take a fraction to multiple to
+rho.
+
+*** Why is Soil decompose so little?
+
+*** Why is there transport of BB-immobile?
+
+** Then
+
+*** colloid-bound.dai: Remove decompose_heat_factor
+
+** later
+
+*** max_C i matrix? infiltration
+
+
+* Læs DHI afsnit ???
 
 * Vestskoven
 
