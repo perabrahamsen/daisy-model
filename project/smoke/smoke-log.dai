@@ -381,4 +381,92 @@ Total amount in the specified soil interval.")
   (where "BB-Rsqr.dlf")
   (My_K_clay $BB_K_clay))
 
+(deflog "Primary" chemical
+  "Content, transport and transformation of chemicals in the primary domain."
+  (declare unit String "Base unit.")
+  (unit "g/ha")
+  (where "${colfid}secondary_${chemfid}.dlf")
+  (summary (balance (precision 3)
+                    (input "In" "Source")
+                    (output "Leak-Matrix" )
+                    (content "Content" ;; "Error"
+                             )))
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (flux_top (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" J_primary)
+                     (documentation "\
+Infiltration.")
+                     (tag "In")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default J_primary))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_primary)
+                        (documentation "\
+Leaching.")
+                        (tag "Leak-Matrix")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (spec chemical default J_primary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_primary)
+                     (tag "Source")
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_tertiary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M_primary)
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "Content")
+                     (dimension "${unit}")
+                     (spec chemical default M))))
+
+(deflog "Secondary" chemical
+  "Content, transport and transformation of chemicals in the secondary domain."
+  (declare unit String "Base unit.")
+  (unit "g/ha")
+  (where "${colfid}secondary_${chemfid}.dlf")
+  (summary (balance (precision 3)
+                    (input "In" "Source")
+                    (output "Leak-Matrix" )
+                    (content "Content" ;; "Error"
+                             )))
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (flux_top (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" J_secondary)
+                     (documentation "\
+Infiltration.")
+                     (tag "In")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default J_secondary))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_secondary)
+                        (documentation "\
+Leaching.")
+                        (tag "Leak-Matrix")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (spec chemical default J_secondary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_secondary)
+                     (tag "Source")
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_tertiary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M_secondary)
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "Content")
+                     (dimension "${unit}")
+                     (spec chemical default M))))
+
 ;; smoke-log.dai ends here.

@@ -60,7 +60,10 @@ public:
   double Theta_res (size_t i) const;
   double h (size_t i, double Theta) const;
   double M (size_t i, double h) const;
+private:
   double h_int (size_t i, double Theta) const;
+public:
+  double primary_sorption_fraction (size_t c) const;
   double dispersivity (size_t) const;
   double dispersivity_transversal (size_t) const;  
   void set_porosity (size_t i, double Theta);

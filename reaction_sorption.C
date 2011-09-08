@@ -93,15 +93,7 @@ struct ReactionSorption : public Reaction
       { 
         const double clay = soil.clay (c);
         const double humus = soil.humus (c);
-        
-        // Find fraction of sorbtion sites in primary domain.
-        const double h_lim = soil.h_secondary (c);
-        const double Theta_lim = soil.Theta (c, h_lim, 0.0);
-        const double Theta_sat = soil.Theta (c, 0.0, 0.0);
-        const double primary_sorption_fraction 
-          = soil.h_int (c, Theta_lim) / soil.h_int (c, Theta_sat);
-        const double h = soil_water.h_old (c);
-        const double f = (h < h_lim) ? 1.0 : primary_sorption_fraction;
+        const double rho_f1 = soil.primary_sorption_fraction (c);
         
         // Primary domain.
         {
@@ -113,7 +105,7 @@ struct ReactionSorption : public Reaction
 
           const double C = solute.M_primary (c) / Theta;
           const double A = sorbed.M_primary (c);
-          const double S = find_rate (f, rho_b, clay, humus, Theta, A, C);
+          const double S = find_rate (rho_f1, rho_b, clay, humus, Theta, A, C);
           S_sorption_primary[c] = S;
           S_sorption[c] = S;
         }
@@ -127,7 +119,7 @@ struct ReactionSorption : public Reaction
                 : soil.dry_bulk_density (c);
               const double C = solute.M_secondary (c) / Theta;
               const double A = sorbed.M_secondary (c);
-              const double S = find_rate (1.0 - f, 
+              const double S = find_rate (1.0 - rho_f1, 
                                           rho_b, clay, humus, Theta, A, C);
 #if 0
           if (std::isnormal (C))

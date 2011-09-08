@@ -118,6 +118,7 @@ struct ChemicalStandard : public Chemical
   std::vector<double> C_avg_;   // Concentration in soil solution [g/cm^3]
   std::vector<double> C_secondary_;   // Conc. in secondary domain [g/cm^3]
   std::vector<double> C_primary_; // Conc. in primary domain [g/cm^3]
+  std::vector<double> M_secondary_; // Content in secondary domain [g/cm^3]
   std::vector<double> M_primary_; // Content in primary domain [g/cm^3]
   std::vector<double> M_total_; // Concentration in soil [g/cm^3]
   std::vector<double> M_error; // Accumulated error [g/cm^3]
@@ -311,12 +312,12 @@ ChemicalStandard::C_primary (const size_t i) const
 { return C_primary_[i]; }
 
 double 
-ChemicalStandard::M_primary (const size_t i) const
-{ return M_primary_[i]; }
+ChemicalStandard::M_secondary (const size_t i) const
+{ return M_secondary_[i]; }
 
 double 
-ChemicalStandard::M_secondary (const size_t i) const
-{ return M_total (i) - M_primary (i); }
+ChemicalStandard::M_primary (const size_t i) const
+{ return M_primary_[i]; }
 
 double 
 ChemicalStandard::M_total (const size_t i) const
@@ -363,12 +364,12 @@ ChemicalStandard::set_primary (const Soil& soil, const SoilWater& soil_water,
       const double Theta_primary = soil_water.Theta_primary (c);
       const double Theta_secondary = soil_water.Theta_secondary (c);
       const double Theta_matrix = Theta_primary + Theta_secondary;
-      M_total_[c] = M_primary_[c] + C_secondary_[c] * Theta_secondary;
+      M_total_[c] = M_primary_[c] + M_secondary_[c];
       C_primary_[c] 
         = adsorption_->M_to_C (soil, Theta_primary, c, M_primary_[c]);
       C_avg_[c] 
-        = (Theta_primary * C_primary_[c] + Theta_secondary * C_secondary_[c]) 
-        / Theta_matrix;
+        = (Theta_primary * C_primary_[c]
+           + Theta_secondary * C_secondary_[c]) / Theta_matrix;
       if (iszero (Theta_secondary))
         C_secondary_[c] = C_primary_[c];
     }
@@ -389,13 +390,16 @@ ChemicalStandard::set_secondarM (const Soil& soil, const SoilWater& soil_water,
                                  const std::vector<double>& J)
 {
   // Update cells.
-  daisy_assert (C_secondary_.size () == M.size ());
   const size_t cell_size = M.size ();
+  daisy_assert (C_secondary_.size () == cell_size);
+  daisy_assert (M_secondary_.size () == cell_size);
+  M_secondary_ = M;
+
   for (size_t c = 0; c < cell_size; c++)
     {
       daisy_assert (M[c] >= 0.0);
       daisy_assert (M_primary_[c] >= 0.0);
-      M_total_[c] = M_primary_[c] + M[c];
+      M_total_[c] = M_primary_[c] + M_secondary_[c];
       daisy_assert (M_total_[c] >= 0.0);
       
       const double Theta_primary = soil_water.Theta_primary (c);
@@ -403,7 +407,8 @@ ChemicalStandard::set_secondarM (const Soil& soil, const SoilWater& soil_water,
       const double Theta_matrix = Theta_primary + Theta_secondary;
       
       if (Theta_secondary > 0.0)
-        C_secondary_[c] = M[c] / Theta_secondary;
+        C_secondary_[c]
+          = adsorption_->M_to_C (soil, Theta_secondary, c, M_secondary_[c]);
       else 
         C_secondary_[c] = C_primary_[c];
 
@@ -592,18 +597,28 @@ ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
 {
   for (size_t i = 0; i < C_primary_.size (); i++)
     {
-      const double M1 = C_primary_[i] * soil_water.Theta_primary (i);
-      const double M2 = C_secondary_[i] * soil_water.Theta_secondary (i);
+      const double Theta_primary = soil_water.Theta_primary (i);
+      const double M1 
+        = adsorption_->C_to_M (soil, Theta_primary, i, C_primary_[i]);
+      const double Theta_secondary = soil_water.Theta_secondary (i);
+      const double M2 = Theta_secondary > 0
+        ? adsorption_->C_to_M (soil, Theta_secondary, i, C_secondary_[i])
+        : 0.0;
+
       if (approximate (M1, M_primary_[i], 0.00001)
           && approximate (M1 + M2, M_total_[i], 0.00001))
         continue;
 
-      C_avg_[i] = adsorption_->M_to_C (soil, soil_water.Theta (i), i,
-                                       M_total_[i]);
+      const double Theta_matrix = soil_water.Theta (i);
+      C_avg_[i] = adsorption_->M_to_C (soil, Theta_matrix, i, M_total_[i]);
       C_primary_[i] = C_avg_[i];
       C_secondary_[i] = C_avg_[i];
-      M_primary_[i] = M_total_[i]
-        - C_secondary_[i] * soil_water.Theta_secondary (i);
+      M_primary_[i] 
+        = adsorption_->C_to_M (soil, Theta_primary, i, C_primary_[i]);
+      M_secondary_[i] = Theta_secondary > 0
+        ? adsorption_->C_to_M (soil, Theta_secondary, i, C_secondary_[i])
+        : 0.0;
+      daisy_approximate (M_primary_[i] + M_secondary_[i], M_total_[i]);
     }
 }
   
@@ -1048,9 +1063,7 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
 
       // New water.
       const double Theta_sec_new = soil_water.Theta_secondary (c);
-      const double M_tot = M_total (c);
-      const double M_prim = M_primary (c);
-      const double M_sec = M_tot - M_prim;
+      const double M_sec = M_secondary (c);
       if (Theta_sec_new < 1e-6)
         // Move all to primary domain.
         {
@@ -1064,15 +1077,6 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
       // The exchange rate based on solute.
       const double C_prim = C_primary (c);
       const double C_sec = C_secondary (c);
-      if (!approximate (C_sec * Theta_sec_old, M_sec)
-          && !approximate (M_prim, M_tot))
-        {
-          std::ostringstream tmp;
-          tmp << "C_sec (" << C_sec << ") * Theta_sec_old (" << Theta_sec_old
-              << ") != M_sec (" << M_sec << "), error = " 
-              << M_sec - C_sec * Theta_sec_old;
-          msg.warning (tmp.str ());
-        }
 
       // Find mass of solutes (sorbed mass ignored) at start of timestep.
       const double Theta_prim_old = soil_water.Theta_primary_old (c);
@@ -1338,16 +1342,8 @@ ChemicalStandard::output (Log& log) const
   output_value (C_secondary_, "C_secondary", log);
   output_value (C_primary_, "C_primary", log);
   output_value (M_total_, "M", log);
+  output_value (M_secondary_, "M_secondary", log);
   output_value (M_primary_, "M_primary", log);
-  static const symbol M_secondary_symbol ("M_secondary");
-  if (log.check_leaf (M_secondary_symbol))
-    {
-      std::vector<double> M_secondary = M_total_;
-      daisy_assert (M_primary_.size () == M_secondary.size ());
-      for (size_t i = 0; i < M_primary_.size (); i++)
-        M_secondary[i] -= M_primary_[i];
-      log.output_entry (M_secondary_symbol, M_secondary);
-    }
   output_value (M_error, "M_error", log);
   output_value (S_secondary_, "S_secondary", log);
   output_value (S_primary_, "S_primary", log);
@@ -1407,17 +1403,24 @@ ChemicalStandard::check (const Units& units, const Scope& scope,
           const double Theta_primary = soil_water.Theta_primary (i);
           const double Theta_secondary = soil_water.Theta_secondary (i);
           const double M = M_total_[i];
+          const double M_secondary = M_secondary_[i];
           const double M_primary = M_primary_[i];
           const double C = C_avg_[i];
           const double C_secondary = C_secondary_[i];
           const double C_primary = C_primary_[i];
           
+          if (!approximate (adsorption_->M_to_C (soil, Theta_secondary, i, 
+                                                 M_secondary),
+                            C_secondary))
+            throw "C_secondary does not match M_secondary";
           if (!approximate (adsorption_->M_to_C (soil, Theta_primary, i, 
                                                  M_primary),
                             C_primary))
             throw "C_primary does not match M_primary";
-          if (!approximate (M_primary, M - C_secondary * Theta_secondary))
-            throw "M_primary should be M - C_secondary * Theta"; 
+          if (!approximate (M_primary, M - M_secondary))
+            throw "M_primary should be M - M_secondary"; 
+          if (M_secondary > M)
+            throw "M_secondary > M";
           if (M_primary > M)
             throw "M_primary > M";
 
@@ -1487,11 +1490,13 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
   std::vector<double> Ms;
   geo.initialize_layer (C_avg_, frame (), "C", msg);
   geo.initialize_layer (C_secondary_, frame (), "C_secondary", msg);
+  geo.initialize_layer (M_secondary_, frame (), "M_secondary", msg);
   geo.initialize_layer (M_total_, frame (), "M", msg);
   geo.initialize_layer (Ms, frame (), "Ms", msg);
 
   fillup (C_avg_, cell_size);
   fillup (C_secondary_, cell_size);
+  fillup (M_secondary_, cell_size);
   fillup (M_total_, cell_size);
   fillup (Ms, cell_size);
 
@@ -1531,6 +1536,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
       const double Theta_secondary = soil_water.Theta_secondary (i);
       daisy_assert (approximate (Theta, Theta_secondary + Theta_primary));
       const bool has_C_secondary = C_secondary_.size () > i;
+      const bool has_M_secondary = M_secondary_.size () > i;
       const bool has_C_avg  = C_avg_.size () > i;
       const bool has_M_total  = M_total_.size () > i;
       daisy_assert (has_C_avg || has_M_total);
@@ -1541,17 +1547,22 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
           if (!has_C_avg)
             C_avg_.push_back (adsorption_->M_to_C (soil, Theta, i, 
                                                    M_total_[i]));
-          if (!has_M_total) 
-            M_total_.push_back (adsorption_->C_to_M (soil, Theta, i,
+          M_primary_.push_back (adsorption_->C_to_M (soil, Theta, i, 
                                                      C_avg_[i])); 
+          if (!has_M_secondary)
+            M_secondary_.push_back (0.0);
+          if (!has_M_total) 
+            M_total_.push_back (M_primary_[i] + M_secondary_[i]);
           if (!has_C_secondary)
             C_secondary_.push_back (C_avg_[i]);
           C_primary_.push_back (C_avg_[i]);
           M_primary_.push_back (M_total_[i]);
         }
-      else if (!has_C_secondary)
+      else if (!has_C_secondary && !has_M_secondary)
         // Secondary water in equilibrium.
         {
+          daisy_assert (has_C_avg || has_M_total);
+
           if (!has_C_avg)
             C_avg_.push_back (adsorption_->M_to_C (soil, Theta, i, 
                                                    M_total_[i]));
@@ -1560,12 +1571,25 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
                                                      C_avg_[i])); 
           C_primary_.push_back (C_avg_[i]);
           C_secondary_.push_back (C_avg_[i]);
-          M_primary_.push_back (M_total_[i] 
-                                - C_secondary_[i] * Theta_secondary);
+          M_primary_.push_back (adsorption_->C_to_M (soil, Theta_primary, i, 
+                                                     C_primary_[i]));
+          M_secondary_.push_back (adsorption_->C_to_M (soil, 
+                                                       Theta_secondary, i, 
+                                                       C_secondary_[i]));
         }
       else if (has_C_avg)
         // Average and secondary concentrations known.
         {
+          daisy_assert (has_C_secondary || has_M_secondary);
+          if (!has_C_secondary)
+            C_secondary_.push_back (adsorption_->M_to_C (soil, Theta_secondary,
+                                                         i, 
+                                                         M_secondary_[i]));
+          if (!has_M_secondary)
+            M_secondary_.push_back (adsorption_->C_to_M (soil, Theta_secondary,
+                                                         i, 
+                                                         C_secondary_[i]));
+          
           // Theta * C_a = Theta_i * C_i + Theta_m * C_m
           // => C_i = (Theta * C_a - Theta_m * C_m) / Theta_i
           C_primary_.push_back ((Theta * C_avg_[i]
@@ -1574,15 +1598,22 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
           M_primary_.push_back (adsorption_->C_to_M (soil, Theta_primary, i, 
                                                      C_primary_[i]));
           if (!has_M_total)
-            M_total_.push_back (M_primary_[i] 
-                                + Theta_secondary * C_secondary_[i]);
+            M_total_.push_back (M_primary_[i] + M_secondary_[i]);
         }
       else
         // Averarage concentration and total matter known.
         {
+          daisy_assert (has_C_secondary || has_M_secondary);
+          if (!has_C_secondary)
+            C_secondary_.push_back (adsorption_->M_to_C (soil, Theta_secondary,
+                                                         i, 
+                                                         M_secondary_[i]));
+          if (!has_M_secondary)
+            M_secondary_.push_back (adsorption_->C_to_M (soil, Theta_secondary,
+                                                         i, 
+                                                         C_secondary_[i]));
           daisy_assert (has_M_total);
-          M_primary_.push_back (M_total_[i]
-                                - C_secondary_[i] * Theta_secondary);
+          M_primary_.push_back (M_total_[i] - M_secondary_[i]);
           C_primary_.push_back (adsorption_->M_to_C (soil, 
                                                      Theta_primary,
                                                      i,
@@ -1595,6 +1626,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
 
   daisy_assert (C_secondary_.size () == cell_size);
   daisy_assert (C_primary_.size () == cell_size);
+  daisy_assert (M_secondary_.size () == cell_size);
   daisy_assert (M_primary_.size () == cell_size);
   daisy_assert (M_total_.size () == cell_size);
   M_error.insert (M_error.begin (), cell_size, 0.0);
@@ -1845,6 +1877,10 @@ Concentration in primary domain."); }
   { Geometry::add_layer (frame, "g/cm^3", Attribute::Const, "\
 Total mass per volume water, soil, and air."); }
 
+  static void load_M_secondary (Frame& frame)
+  { Geometry::add_layer (frame, "g/cm^3", Attribute::Const, "\
+Secondary domain mass per volume water, soil, and air."); }
+
   static void load_M_primary (Frame& frame)
   { Geometry::add_layer (frame, "g/cm^3", Attribute::Const, "\
 Primary domain mass per volume water, soil, and air."); }
@@ -2046,9 +2082,13 @@ which can be negative.");
     Geometry::add_layer (frame, Attribute::OptionalState, "C", load_C);
     Geometry::add_layer (frame, Attribute::OptionalState, "C_secondary",
                          load_C_secondary);
-    Geometry::add_layer (frame, Attribute::LogOnly, "C_primary", load_C_primary);
+    Geometry::add_layer (frame, Attribute::LogOnly, "C_primary", 
+                         load_C_primary);
     Geometry::add_layer (frame, Attribute::OptionalState, "M", load_M);
-    Geometry::add_layer (frame, Attribute::LogOnly, "M_primary", load_M_primary);
+    Geometry::add_layer (frame, Attribute::OptionalState, "M_secondary",
+                         load_M_secondary);
+    Geometry::add_layer (frame, Attribute::LogOnly, "M_primary", 
+                         load_M_primary);
     Geometry::add_layer (frame, Attribute::OptionalConst, "Ms", load_Ms);
     frame.declare ("M_secondary", "g/cm^3", 
                    Attribute::LogOnly, Attribute::SoilCells, 

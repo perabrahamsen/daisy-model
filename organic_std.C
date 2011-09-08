@@ -2406,7 +2406,7 @@ OrganicStandard::initialize (const Metalib& metalib,
   NO3_source.insert (NO3_source.end (), cell_size, 0.0);
   NH4_source.insert (NH4_source.end (), cell_size, 0.0);
   
-  // Clay affect of SMB turnover and mantenance.
+  // Clay affect of SMB turnover and maintenance.
   clayom->set_rates (soil, smb);
 
   // Clay and soil.

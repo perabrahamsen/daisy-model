@@ -290,6 +290,8 @@
           ("Soil chemical" (to -30 [cm]) (chemical "BB-base"))
           ("Soil chemical" (to -30 [cm]) (chemical "BB"))
           ("Soil chemical" (to -30 [cm]) (chemical "BB-immobile"))
+          ("Primary" (to -30 [cm]) (chemical "BB-immobile"))
+          ("Secondary" (to -30 [cm]) (chemical "BB-immobile"))
           ("Soil chemical" (to -30 [cm]) (chemical "BB-colloid"))
           ("Chemical Content" (print_initial false) 
            (chemical BB-base) (unit [PPM]) (when finished))
