@@ -29,10 +29,7 @@
 
   ;; Fixed.
   (PP_K 0.410693 [cm/h])
-  (BB_K_clay 5.69439 [cm^3/g])
-  (BB_decomp 1  [h^-1])
-  (pore_min 1.0 [um])
-  (BB_apply 17.68e6 [g/ha])
+  (BB_decomp 0 [h^-1])
 
   ;; New variables.
   (Ap_lim $A_lim)
@@ -42,32 +39,17 @@
   (B_alpha $X_alpha)
 
   ;; Solution, U4, Br
-  ;;(S_lim -24904.8)
-  ;;(A_lim -1684.18)
-  ;;(B_lim -796.978)
-  ;;(S_alpha 2.93089e-05)
-  ;;(X_alpha 7.53923e-05)
-
-  ;; Solution, U4 + bio + surf 0.01 K
-  ;;(S_lim -143.223 [cm])
-  ;;(A_lim -43.6486 [cm])
-  ;;(B_lim -980.286 [cm])
-  ;;(S_alpha 1.39486e-05 [h^-1])
-  ;;(X_alpha 0.000491535 [h^-1])
-
-  ;; Solution, U4 + bio + surf 0.1 K
-  ;;(S_lim -2285.55)
-  ;;(A_lim -82.2434)
-  ;;(B_lim -1158.65)
-  ;;(S_alpha 1.43852e-05)
-  ;;(X_alpha 0.000632455)
-
-  ;; Solution, U4 + bio surf 1 K
   (S_lim -20142.7)
   (A_lim -671.029)
   (B_lim -275.476)
   (S_alpha 8.75158e-05)
-  (X_alpha 1.59166e-05))
+  (X_alpha 1.59166e-05)
+
+  ;; Solution, U4, BB
+  (BB_K_clay 2.55682 [cm^3/g])
+  (pore_min 0.67759 [um])
+  (BB_apply 3.19859e+06 [g/ha])
+  )
 
 ;; Horizons.
 
@@ -195,6 +177,15 @@
           ;; 1 per (pi * (3 cm)^2 = 28.27 cm^2) = 354 m^-2
           (density 354 [m^-2])))
 
+(defbiopore "surface_to_matrix_1"
+  (matrix (K_wall_relative 1 [%])
+          (allow_upward_flow false)
+          (height_start 0 [cm])
+          (height_end -110 [cm])
+          (diameter 1 [mm])
+          ;; 1 per (pi * (3 cm)^2 = 28.27 cm^2) = 354 m^-2
+          (density 354 [m^-2])))
+
 (defcolumn Macro Rorrende
   "Rorrende soil with biopores to matrix"
   (Drain lateral
@@ -219,7 +210,7 @@
         (x 3.5 [m])
   	(L 18 [m]))
   (Movement original (Tertiary ;;none
-                               biopores (classes ("surface_to_matrix"))
+                               biopores (classes ("surface_to_matrix_1"))
                                ;;(classes ("near_surface_to_matrix"))
                                )))
 

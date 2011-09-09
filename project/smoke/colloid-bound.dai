@@ -411,7 +411,7 @@
   "Base parameterization for all Brilliant Blue forms."
   (decompose_rate $BB_decomp)
   ;; (decompose_rate 1 [h^-1])
-  (decompose_heat_factor (0 1) (1 1))
+  ;;(decompose_heat_factor (0 1) (1 1))
   )
 
 (defchemical BB BB-base

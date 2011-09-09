@@ -50,13 +50,14 @@
                     (tillage_age 390 390 390 390 390 411 411 411 411 610.5 610.5 610.5 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 [d])))
   (manager original (original (original (2010 10 26 12)))
                     (progn (spray Bromide 1.187e+07 [g/ha])
-                           (spray BB 1.768e+07 [g/ha])))
+                           (spray BB $BB_apply)))
   (previous 2010 10 25 11
             (minute 55))
   (next_large 2010 10 25 13))
 
 (defprogram TestMe "MakeCP Checkpoint"
   (declare PP_K Number [cm/h] "")
+  (declare BB_K_clay Number [cm^3/g] "")
   (declare BB_decomp Number [h^-1] "")
   (declare S_alpha Number [h^-1] "")
   (declare S_lim Number [cm] "")
@@ -68,24 +69,53 @@
   (declare B_lim Number [cm] "")
   (declare X_alpha Number [h^-1] "")
   (declare A_lim Number [cm] "")
-  (declare BB_K_clay Number [cm^3/g] "")
   (declare pore_min Number [um] "")
   (declare BB_apply Number [g/ha] "")
+
+  ;; Fixed.
   (PP_K 0.410693 [cm/h])
+  ;; (BB_K_clay 5.69439 [cm^3/g])
+  (BB_K_clay 2 [cm^3/g])
+  ;;(BB_decomp 1  [h^-1])
   (BB_decomp 0 [h^-1])
-  (S_lim -45462.7 [cm])
-  (S_alpha 8.30618e-06 [h^-1])
-  (BB_K_clay 17.7382 [cm^3/g])
-  (A_lim -498.834 [cm])
-  (B_lim -136.54 [cm])
-  (X_alpha 0.000343216 [h^-1])
+  (pore_min 1.0 [um])
+  ;;(BB_apply 17.68e6 [g/ha])
+  (BB_apply 3e6 [g/ha])
+
+  ;; New variables.
   (Ap_lim $A_lim)
   (PP_lim $A_lim)
   (Ap_alpha $X_alpha)
   (PP_alpha $X_alpha)
   (B_alpha $X_alpha)
-  (pore_min 0.1 [um])
-  (BB_apply 17.68e6 [g/ha]))
+
+  ;; Solution, U4, Br
+  ;;(S_lim -24904.8)
+  ;;(A_lim -1684.18)
+  ;;(B_lim -796.978)
+  ;;(S_alpha 2.93089e-05)
+  ;;(X_alpha 7.53923e-05)
+
+  ;; Solution, U4 + bio + surf 0.01 K
+  ;;(S_lim -143.223 [cm])
+  ;;(A_lim -43.6486 [cm])
+  ;;(B_lim -980.286 [cm])
+  ;;(S_alpha 1.39486e-05 [h^-1])
+  ;;(X_alpha 0.000491535 [h^-1])
+
+  ;; Solution, U4 + bio + surf 0.1 K
+  ;;(S_lim -2285.55)
+  ;;(A_lim -82.2434)
+  ;;(B_lim -1158.65)
+  ;;(S_alpha 1.43852e-05)
+  ;;(X_alpha 0.000632455)
+
+  ;; Solution, U4 + bio surf 1 K
+  (S_lim -20142.7)
+  (A_lim -671.029)
+  (B_lim -275.476)
+  (S_alpha 8.75158e-05)
+  (X_alpha 1.59166e-05))
 
 (defprogram mytest minimize
   (scope multi U4-BB-Rsqr U4-Br-Rsqr)
@@ -135,17 +165,17 @@
   (run (TestMe (col u4)))
   (expr (- R2))
   (parameter BB_K_clay pore_min BB_apply)
-  (simplex (10 0.1 1e6)
-           (15 0.75 12e6)
-           (20 0.5 5e6)
-           (30 1.0 17.68e6))
+  (simplex (1 0.1 1e6)
+           (2 0.1 2e6)
+           (2 1.0 3e6)
+           (3 1.0 4e6))
   (limit (and (>= BB_K_clay 0.0 [cm^3/g])
               (>= pore_min 0.1 [um]) (<= pore_min 1.0 [um])
               (>= BB_apply 0.0e6 [g/ha]) (<= BB_apply 17.68e6 [g/ha])))
   (min_iter 25)
   (max_iter 20000))
 
-(run SolveBB)
+(run SolveBr)
 
 ;; setup-r2.dai ends here.
 

@@ -1531,6 +1531,9 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
 
   for (size_t i = 0; i < cell_size; i++)
     {
+      Treelog::Open nest (msg, "for", i, "loop");
+      daisy_assert (M_primary_.size () == i);
+
       const double Theta = soil_water.Theta (i);
       const double Theta_primary = soil_water.Theta_primary (i);
       const double Theta_secondary = soil_water.Theta_secondary (i);
@@ -1540,7 +1543,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
       const bool has_C_avg  = C_avg_.size () > i;
       const bool has_M_total  = M_total_.size () > i;
       daisy_assert (has_C_avg || has_M_total);
-
+      
       if (iszero (Theta_secondary))
         // No secondary water.
         {
@@ -1556,7 +1559,6 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
           if (!has_C_secondary)
             C_secondary_.push_back (C_avg_[i]);
           C_primary_.push_back (C_avg_[i]);
-          M_primary_.push_back (M_total_[i]);
         }
       else if (!has_C_secondary && !has_M_secondary)
         // Secondary water in equilibrium.
