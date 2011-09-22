@@ -291,7 +291,7 @@ static struct ProgramOptimizeSyntax : public DeclareModel
     : DeclareModel (Program::component, "minimize", 
                     "Find local minimum for program.\n\
 \n\
-The optimization will stop of the best guess fail to improve more than\n\
+The optimization will stop of the worst guess fail to improve more than\n\
 'epsilon' within 'min_iter' iterations, or of the total number of\n\
 iterations exceed 'max_iter'.")
   { }
@@ -327,7 +327,7 @@ Scope to evaluate expessions in.");
 Expression to minimize.");
     frame.declare ("epsilon", Attribute::Unknown (), Check::non_negative (), 
                    Attribute::Const, "\
-Minimal improvement of best point to be considered for 'min_iter'.");
+Minimal improvement of worst point to be considered for 'min_iter'.");
     frame.declare_integer ("min_iter", Attribute::Const, "\
 Maximal number of iterations with no improvement of best point.");
     frame.set_check ("min_iter", VCheck::positive ());

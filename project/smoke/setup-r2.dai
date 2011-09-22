@@ -2,50 +2,83 @@
 
 (input file "setup.dai")
 
-(defprogram Both-Rsqr Smoke
-  (column Without)
-  (print_time false)
-  (output ("SmokeProfile" (chemical "BB-base") (where "BB-Rsqr.dlf")
-           (My_K_clay $BB_K_clay) (summary U4-BB-Rsqr))
-          ("SmokeProfile" (chemical "Bromide") (where "Br-Rsqr.dlf")
-           (summary U4-Br-Rsqr)))
-  (log_prefix "log/Both-Rsqr-"))
+(defprogram MakeCP U4
+  (output (checkpoint (when (at 2010 10 25 12))))
+  (stop 2010 10 26))
 
-(defprogram MakeCP Both-Rsqr
-  (output (checkpoint (when (at 2010 10 25 12)))))
-
-(defprogram "MakeCP Checkpoint" Both-Rsqr
-
-  (harvest ((time 2010 8 26 12)
-            (crop WWheat)
-            (column Without)
-            (water_stress_days 0 [d])
-            (nitrogen_stress_days 0 [d])
-            (stem_DM 0 [g/m^2])
-            (stem_N 0 [g/m^2])
-            (stem_C 0 [g/m^2])
-            (dead_DM 0 [g/m^2])
-            (dead_N 0 [g/m^2])
-            (dead_C 0 [g/m^2])
-            (leaf_DM 0 [g/m^2])
-            (leaf_N 0 [g/m^2])
-            (leaf_C 0 [g/m^2])
-            (sorg_DM 951.903 [g/m^2])
-            (sorg_N 33.5094 [g/m^2])
-            (sorg_C 438.196 [g/m^2])
-            (water_productivity 3.82044 [kg DM/m^3 H2O])))
+(defprogram "Without Checkpoint" U4
   (time 2010 10 25 12)
-  (column (original (SoilHeat (T 8.9509 8.81858 8.68942 8.50383 8.27928 8.091 7.91687 7.80095 7.77687 7.81238 7.86786 7.94056 8.02236 8.10845 8.19742 8.28708 8.3972 8.56296 8.74591 8.90067 9.02919 9.13536 9.22405 9.2997 9.36614 9.42651 9.50963 9.58942 9.64264 9.69629 9.77741 9.85824 9.91194 9.96573 10.0188 10.0709 10.122 10.1719 10.2441 10.3346 10.4175 10.4921 10.5584 [dg C])
+  (print_time false)
+  (column (original (SoilHeat (T 8.95107 8.81899 8.68942 8.50331 8.27968 8.09303 7.9187 7.8015 7.77631 7.81117 7.8663 7.9388 8.02054 8.10675 8.19594 8.28592 8.39654 8.56334 8.7479 8.90326 9.0317 9.1379 9.22666 9.30239 9.3689 9.42929 9.5129 9.59306 9.64615 9.69964 9.78044 9.86133 9.91532 9.96909 10.0219 10.0737 10.1246 10.1743 10.2462 10.3363 10.4187 10.493 10.5589 [dg C])
                               (T_top 9.0175 [dg C]))
-                    (SoilWater (h -28.1582 -26.8818 -25.8006 -24.4261 -23.1138 -22.1493 -21.1861 -20.1267 -18.8524 -17.5055 -16.2539 -14.8452 -13.7108 -15.9224 -18.5964 -21.9161 -27.2667 -38.7694 -54.121 -65.0622 -69.3975 -69.7258 -68.4821 -66.8018 -65.062 -63.2909 -60.2746 -55.3386 -50.4669 -43.6976 -31.4736 -17.338 -11.3283 -5.81931 -0.624932 4.41713 9.44185 14.4665 22.0035 32.0527 42.1017 52.1507 62.1995 [cm])
-                               (Theta 0.309163 0.311116 0.312809 0.315015 0.317179 0.318806 0.320463 0.322322 0.324611 0.327093 0.329457 0.332184 0.316072 0.313465 0.310504 0.307093 0.302128 0.293206 0.283891 0.278485 0.276556 0.276414 0.276954 0.277698 0.278485 0.279305 0.280748 0.283247 0.2859 0.289947 0.29862 0.311873 0.330302 0.338944 0.347518 0.348314 0.348314 0.348314 0.348314 0.348314 0.348314 0.348314 0.348314 [])
+                    (SoilWater (h -31.7323 -30.4152 -29.3425 -28.0436 -26.9709 -26.343 -25.8729 -25.3856 -24.5705 -23.4992 -22.4247 -21.1579 -20.9825 -24.6435 -29.0905 -34.4551 -42.641 -58.3066 -73.5192 -80.5592 -81.5192 -79.8056 -77.3011 -74.7204 -72.2326 -69.7607 -65.6939 -59.7293 -54.3644 -47.3285 -34.7514 -19.4989 -12.7372 -7.10827 -1.76132 3.31836 8.34426 13.3701 20.9088 30.9603 41.0117 51.063 61.1141 [cm])
+                               (Theta 0.303949 0.305828 0.307395 0.309336 0.310978 0.311955 0.312694 0.313469 0.314781 0.316538 0.318339 0.320512 0.308024 0.304486 0.300568 0.296313 0.290622 0.281723 0.274819 0.272044 0.271682 0.27233 0.273299 0.274329 0.275352 0.276399 0.278197 0.281015 0.283762 0.28772 0.296091 0.309549 0.328264 0.336832 0.34574 0.348314 0.348314 0.348314 0.348314 0.348314 0.348314 0.348314 0.348314 [])
                                (S_permanent 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 [cm^3/cm^3/h])
                                (X_ice 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 [])
                                (X_ice_buffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 []))
-                    (Surface (pond_section 8.67362e-19 [mm]))
+                    (Surface (pond_section 0 [mm]))
+                    (Movement original (Tertiary original (classes (original (solute (BB 0 [g])
+                                                                                     (colloid 5.79375e-22 [g])
+                                                                                     (Bromide 0 [g])
+                                                                                     ("BB-immobile" 0 [g])
+                                                                                     ("BB-colloid" 0 [g]))
+                                                                             (h_bottom 5.13893e-15 [cm])))))
                     (Bioclimate original (pet FAO_PM)
                                          (difrad DPF))
-                    (Drain original (height -130.634 [cm]))
+                    (Drain original (height -131.771 [cm]))
+                    (Groundwater original (h_aquifer 290 [cm]))
+                    (tillage_age 390 390 390 390 390 411 411 411 411 610.5 610.5 610.5 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 [d])))
+  (manager original (original (original (2010 10 26 12)))
+           (progn (spray Bromide 1.187e+07 [g/ha])
+                  (spray BB $BB_apply)))
+  (previous 2010 10 25 11
+            (minute 55))
+  (next_large 2010 10 25 13))
+
+(defprogram "Macro Checkpoint" M19
+  (time 2010 10 25 12)
+  (print_time false)
+(column (original (SoilHeat (T 8.95115 8.81936 8.68986 8.50505 8.28264 8.09569 7.92096 7.80284 7.7766 7.81107 7.86551 7.93764 8.01911 8.1047 8.19394 8.28409 8.39513 8.56402 8.75014 8.90623 9.0355 9.14252 9.23206 9.3085 9.37567 9.43624 9.51955 9.59986 9.653 9.70618 9.78649 9.86687 9.92053 9.97395 10.0264 10.0779 10.1284 10.1778 10.2493 10.3387 10.4205 10.4942 10.5595 [dg C])
+                              (T_top 9.0175 [dg C]))
+                    (SoilWater (h -37.4783 -36.095 -35.0496 -33.9127 -33.3244 -33.3718 -33.891 -34.5167 -34.5822 -34.0595 -33.355 -32.4025 -33.0401 -39.374 -46.957 -55.6946 -68.0484 -87.9554 -101.945 -105.802 -104.478 -101.402 -97.936 -94.3589 -90.4482 -85.7796 -77.1078 -64.4608 -55.4151 -46.1196 -32.8686 -19.7708 -13.2479 -7.63397 -2.25494 2.83269 7.8591 12.8855 20.425 30.4775 40.5299 50.5822 60.6344 [cm])
+                               (Theta 0.296282 0.298053 0.299422 0.300941 0.30174 0.301676 0.300971 0.30013 0.300042 0.300743 0.301699 0.303011 0.29739 0.29279 0.287942 0.28306 0.277145 0.269357 0.264808 0.263659 0.264049 0.264974 0.266048 0.267196 0.268499 0.270125 0.273375 0.278761 0.283207 0.288447 0.297523 0.309265 0.327542 0.335985 0.344926 0.348314 0.348314 0.348314 0.348314 0.348314 0.348314 0.348314 0.348314 [])
+                               (S_permanent 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 [cm^3/cm^3/h])
+                               (X_ice 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 [])
+                               (X_ice_buffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 []))
+                    (Surface (pond_section 0 [mm]))
+                    (Movement original (Tertiary original (classes (original (solute (BB 0 [g])
+                                                                                     (colloid 1.1184e-07 [g])
+                                                                                     (Bromide 0 [g])
+                                                                                     ("BB-immobile" 0 [g])
+                                                                                     ("BB-colloid" 0 [g]))
+                                                                             (h_bottom 0.0367316 [cm])))))
+                    (Bioclimate original (pet FAO_PM)
+                                         (difrad DPF))
+                    (Drain original (height -132.267 [cm]))
+                    (Groundwater original (h_aquifer 290 [cm]))
+                    (tillage_age 390 390 390 390 390 411 411 411 411 610.5 610.5 610.5 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 [d])))
+
+  (manager original (original (original (2010 10 26 12)))
+           (progn (spray Bromide 1.187e+07 [g/ha])
+                  (spray BB $BB_apply)))
+  (previous 2010 10 25 11
+            (minute 55))
+  (next_large 2010 10 25 13)
+  (col m19))
+
+(defprogram "Drain Checkpoint" D1
+  (time 2010 10 25 12)
+  (print_time false)
+  (column (original (SoilHeat (T 8.95154 8.8204 8.6918 8.50693 8.28341 8.09592 7.92091 7.8029 7.7767 7.81078 7.86562 7.93779 8.01935 8.10512 8.19463 8.2858 8.39894 8.56961 8.75722 8.91481 9.04475 9.15198 9.24153 9.31798 9.3848 9.44528 9.52939 9.61087 9.66492 9.71908 9.80092 9.8828 9.93694 9.99065 10.0436 10.0951 10.1451 10.1935 10.2633 10.3505 10.4299 10.501 10.5639 [dg C])
+                              (T_top 9.0175 [dg C]))
+                    (SoilWater (h -41.4025 -39.9757 -38.9634 -37.9761 -37.8144 -38.4592 -39.8727 -41.5415 -42.5252 -42.6838 -42.5003 -42.0437 -44.1301 -56.0634 -72.3316 -85.9827 -98.4992 -118.198 -135.118 -143.575 -145.887 -144.807 -142.02 -138.249 -133.646 -128.057 -117.804 -102.271 -90.263 -76.849 -56.8129 -36.6917 -27.6263 -20.4022 -13.6989 -7.56428 -2.00008 3.11739 10.6725 20.7459 30.8191 40.8921 50.9649 [cm])
+                               (Theta 0.291495 0.293197 0.294431 0.295656 0.295859 0.295054 0.293321 0.291332 0.290187 0.290004 0.290215 0.290745 0.289675 0.282868 0.27531 0.294037 0.289845 0.284095 0.279807 0.277846 0.277329 0.27757 0.278198 0.279068 0.28016 0.281533 0.284201 0.28867 0.292549 0.297427 0.306127 0.317333 0.310518 0.318341 0.326913 0.336096 0.345348 0.348314 0.348314 0.348314 0.348314 0.348314 0.348314 [])
+                               (S_permanent 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 [cm^3/cm^3/h])
+                               (X_ice 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 [])
+                               (X_ice_buffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 []))
+                    (Surface (pond_section 0 [mm]))
+                    (Bioclimate original (pet FAO_PM)
+                                         (difrad DPF))
                     (Groundwater original (h_aquifer 290 [cm]))
                     (tillage_age 390 390 390 390 390 411 411 411 411 610.5 610.5 610.5 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 [d])))
   (manager original (original (original (2010 10 26 12)))
@@ -55,114 +88,89 @@
             (minute 55))
   (next_large 2010 10 25 13))
 
-(defprogram TestMe "MakeCP Checkpoint"
-  (declare PP_K Number [cm/h] "")
-  (declare BB_K_clay Number [cm^3/g] "")
-  (declare BB_decomp Number [h^-1] "")
-  (declare S_alpha Number [h^-1] "")
-  (declare S_lim Number [cm] "")
-  (declare Ap_alpha Number [h^-1] "")
-  (declare Ap_lim Number [cm] "")
-  (declare PP_alpha Number [h^-1] "")
-  (declare PP_lim Number [cm] "")
-  (declare B_alpha Number [h^-1] "")
-  (declare B_lim Number [cm] "")
-  (declare X_alpha Number [h^-1] "")
-  (declare A_lim Number [cm] "")
-  (declare pore_min Number [um] "")
-  (declare BB_apply Number [g/ha] "")
+(defprogram OptU4 "Without Checkpoint"
+  (output ("SmokeProfile" (chemical "BB-base") (where "BB-Rsqr.dlf")
+           (My_K_clay $BB_K_clay) (summary U4-BB-Rsqr))
+          ("SmokeProfile" (chemical "Bromide") (where "Br-Rsqr.dlf")
+           (summary U4-Br-Rsqr)))
+  (log_prefix "log/OptU4-"))
 
-  ;; Fixed.
-  (PP_K 0.410693 [cm/h])
-  ;; (BB_K_clay 5.69439 [cm^3/g])
-  (BB_K_clay 2 [cm^3/g])
-  ;;(BB_decomp 1  [h^-1])
-  (BB_decomp 0 [h^-1])
-  (pore_min 1.0 [um])
-  ;;(BB_apply 17.68e6 [g/ha])
-  (BB_apply 3e6 [g/ha])
+(defprogram OptU13 "Without Checkpoint"
+  (output ("SmokeProfile" (chemical "BB-base") (where "BB-Rsqr.dlf")
+           (My_K_clay $BB_K_clay) (summary U13-BB-Rsqr))
+          ("SmokeProfile" (chemical "Bromide") (where "Br-Rsqr.dlf")
+           (summary U13-Br-Rsqr)))
+  (log_prefix "log/OptU13-"))
 
-  ;; New variables.
-  (Ap_lim $A_lim)
-  (PP_lim $A_lim)
-  (Ap_alpha $X_alpha)
-  (PP_alpha $X_alpha)
-  (B_alpha $X_alpha)
+(defprogram OptM19 "Macro Checkpoint"
+  (output ("SmokeProfile" (chemical "BB-base") (where "BB-Rsqr.dlf")
+           (My_K_clay $BB_K_clay) (summary M19-BB-Rsqr))
+          ("SmokeProfile" (chemical "Bromide") (where "Br-Rsqr.dlf")
+           (summary M19-Br-Rsqr)))
+  (log_prefix "log/OptM19-"))
 
-  ;; Solution, U4, Br
-  ;;(S_lim -24904.8)
-  ;;(A_lim -1684.18)
-  ;;(B_lim -796.978)
-  ;;(S_alpha 2.93089e-05)
-  ;;(X_alpha 7.53923e-05)
+(defprogram OptD1 "Drain Checkpoint"
+  (output ("SmokeProfile" (chemical "BB-base") (where "BB-Rsqr.dlf")
+           (My_K_clay $BB_K_clay) (summary D1-BB-Rsqr))
+          ("SmokeProfile" (chemical "Bromide") (where "Br-Rsqr.dlf")
+           (summary D1-Br-Rsqr)))
+  (log_prefix "log/OptD1-"))
 
-  ;; Solution, U4 + bio + surf 0.01 K
-  ;;(S_lim -143.223 [cm])
-  ;;(A_lim -43.6486 [cm])
-  ;;(B_lim -980.286 [cm])
-  ;;(S_alpha 1.39486e-05 [h^-1])
-  ;;(X_alpha 0.000491535 [h^-1])
+(defprogram OptD4 "Drain Checkpoint"
+  (output ("SmokeProfile" (chemical "BB-base") (where "BB-Rsqr.dlf")
+           (My_K_clay $BB_K_clay) (summary D4-BB-Rsqr))
+          ("SmokeProfile" (chemical "Bromide") (where "Br-Rsqr.dlf")
+           (summary D4-Br-Rsqr)))
+  (log_prefix "log/OptD4-"))
 
-  ;; Solution, U4 + bio + surf 0.1 K
-  ;;(S_lim -2285.55)
-  ;;(A_lim -82.2434)
-  ;;(B_lim -1158.65)
-  ;;(S_alpha 1.43852e-05)
-  ;;(X_alpha 0.000632455)
+(defprogram OptD8 "Drain Checkpoint"
+  (output ("SmokeProfile" (chemical "BB-base") (where "BB-Rsqr.dlf")
+           (My_K_clay $BB_K_clay) (summary D8-BB-Rsqr))
+          ("SmokeProfile" (chemical "Bromide") (where "Br-Rsqr.dlf")
+           (summary D8-Br-Rsqr)))
+  (log_prefix "log/OptD8-"))
 
-  ;; Solution, U4 + bio surf 1 K
-  (S_lim -20142.7)
-  (A_lim -671.029)
-  (B_lim -275.476)
-  (S_alpha 8.75158e-05)
-  (X_alpha 1.59166e-05))
-
-(defprogram mytest minimize
-  (scope multi U4-BB-Rsqr U4-Br-Rsqr)
-  (expr (- (* 0.2 []
-              (+ "U4-BB-Rsqr.R2" "U4-Br-Rsqr.R2"
-                 (* 3.0 [] (min "U4-BB-Rsqr.R2" "U4-Br-Rsqr.R2"))))))
-  (epsilon 1e-10))
-
-(defprogram mytestX mytest
-  (parameter PP_K BB_K_clay S_lim Ap_lim PP_lim B_lim S_alpha X_alpha)
-  (simplex (0.004 1 -10000 -1000 -1000 -100 1e-6 1e-3)
-           (0.040 3 -1000 -1000 -1000 -100 1e-6 1e-3)
-           (0.400 9 -10000 -1000 -100 -100 1e-6 1e-3)
-           (0.004 15 -10000 -1000 -1000 -1000 1e-6 1e-3)
-           (0.040 20 -10000 -100 -1000 -100 1e-5 1e-3)
-           (0.400 25 -10000 -1000 -1000 -100 1e-6 1e-3)
-           (0.004 100 -10000 -1000 -1000 -100 1e-6 1e-4)
-           (0.040 150 -1000 -1000 -1000 -10 1e-6 1e-4)
-           (0.400 150 -10000 -1000 -1000 -100 1e-6 1e-4))
-  (limit (and (> PP_K 0 [cm/h])
-              (>= BB_K_clay 0.0 [cm^3/g])
-              (>= S_alpha 0 [h^-1]) (<= S_alpha 1 [h^-1]) 
-              (>= X_alpha 0 [h^-1]) (<= X_alpha 1 [h^-1]) 
-              (< S_lim 0 [cm]) (< Ap_lim 0 [cm]) (< PP_lim 0 [cm]) (< B_lim 0 [cm])))
-  (min_iter 55)
-  (max_iter 20000))
-
-(defprogram SolveBr mytest
-  (scope name U4-Br-Rsqr)
-  (run (TestMe (col u4)))
+(defprogram SolveBr minimize
   (expr (- R2))
   (parameter S_lim A_lim B_lim S_alpha X_alpha)
-  (simplex (-10000 -1000  -1000 1e-6 1e-2)
-           (-1000  -10000 -1000 1e-3 1e-1)
-           (-10000 -10    -100  1e-4 1e-3)
-           (-100   -1000  -10   1e-6 1e-4)
-           (-1000  -100   -1000 1e-5 1e-5)
-           (-10000 -1000  -1000 1e-6 1e-6))
+  (simplex (-20000 -400  -100 1e-4 1e-5)
+           (-10000 -1000 -500 1e-5 1e-4)
+           (-15000 -800  -900 1e-4 1e-3)
+           (-12000 -1000 -300 1e-6 1e-4)
+           (-11000 -500  -900 1e-5 1e-5)
+           (-17000 -200  -100 1e-6 1e-6))
   (limit (and (>= S_alpha 0 [h^-1]) (<= S_alpha 1 [h^-1]) 
               (>= X_alpha 0 [h^-1]) (<= X_alpha 1 [h^-1]) 
               (< S_lim 0 [cm]) (< A_lim 0 [cm]) (< B_lim 0 [cm])))
+  (epsilon 1e-10)
   (min_iter 45)
   (max_iter 20000))
 
-(defprogram SolveBB mytest
-  (scope name U4-BB-Rsqr)
-  (run (TestMe (col u4)))
+(defprogram SolveU4Br SolveBr
+  (scope name U4-Br-Rsqr)
+  (run OptU4))
+
+(defprogram SolveU13Br SolveBr
+  (scope name U13-Br-Rsqr)
+  (run OptU13))
+
+(defprogram SolveM19Br SolveBr
+  (scope name M19-Br-Rsqr)
+  (run OptM19))
+
+(defprogram SolveD1Br SolveBr
+  (scope name D1-Br-Rsqr)
+  (run OptD1))
+
+(defprogram SolveD4Br SolveBr
+  (scope name D4-Br-Rsqr)
+  (run OptD4))
+
+(defprogram SolveD8Br SolveBr
+  (scope name D8-Br-Rsqr)
+  (run OptD8))
+
+(defprogram SolveBB minimize
   (expr (- R2))
   (parameter BB_K_clay pore_min BB_apply)
   (simplex (1 0.1 1e6)
@@ -172,10 +180,35 @@
   (limit (and (>= BB_K_clay 0.0 [cm^3/g])
               (>= pore_min 0.1 [um]) (<= pore_min 1.0 [um])
               (>= BB_apply 0.0e6 [g/ha]) (<= BB_apply 17.68e6 [g/ha])))
+  (epsilon 1e-10)
   (min_iter 25)
   (max_iter 20000))
 
-(run SolveBr)
+(defprogram SolveU4BB SolveBB
+  (scope name U4-BB-Rsqr)
+  (run OptU4))
+
+(defprogram SolveU13BB SolveBB
+  (scope name U13-BB-Rsqr)
+  (run OptU13))
+
+(defprogram SolveM19BB SolveBB
+  (scope name M19-BB-Rsqr)
+  (run OptM19))
+
+(defprogram SolveD1BB SolveBB
+  (scope name D1-BB-Rsqr)
+  (run OptD1))
+
+(defprogram SolveD4BB SolveBB
+  (scope name D4-BB-Rsqr)
+  (run OptD4))
+
+(defprogram SolveD8BB SolveBB
+  (scope name D8-BB-Rsqr)
+  (run OptD8))
+
+(run SolveU4BB)
 
 ;; setup-r2.dai ends here.
 

@@ -243,8 +243,8 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
   PointValue& worst = simplex_value[dim];
   PointValue& second_worst = simplex_value[dim-1];
 
-  double old_f_best = std::numeric_limits<double>::max ();
-  size_t iter_best = 0;
+  double old_f_worst = std::numeric_limits<double>::max ();
+  size_t iter_worst = 0;
   for (size_t iter = 1;; iter++)
     {
       Treelog::Open nest (msg, "Iteration", iter, "");
@@ -253,19 +253,20 @@ Iterative::NelderMead (const size_t min_iter, const size_t max_iter,
       //    f(\textbf{x}_{1}) \leq f(\textbf{x}_{2}) \leq \cdots \leq f(\textbf{x}_{n+1})
       msg.message ("1: Sorting.");
       std::sort (simplex_value.begin (), simplex_value.end ());
+      const double f_best = best.value;
 
       // Stop?
-      const double f_best = best.value;
-      const double change = std::fabs (old_f_best - f_best);
+      const double f_worst = worst.value;
+      const double change = std::fabs (old_f_worst - f_worst);
       if (change > epsilon)
         {
-          old_f_best = f_best;
-          iter_best = 1;
+          old_f_worst = f_worst;
+          iter_worst = 1;
         }
       else
-        iter_best++;
+        iter_worst++;
 
-      if (iter_best > min_iter)
+      if (iter_worst > min_iter)
         {
           result = best.point;
           return true;
