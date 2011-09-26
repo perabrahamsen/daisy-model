@@ -360,7 +360,11 @@ Horizon::initialize_base (bool top_soil,
       const double Theta_lim =  hydraulic->Theta (h_lim);
       tmp << "A saturated secondary domain contain " 
           << 100.0 * (Theta_sat - Theta_lim) / (Theta_sat - Theta_wp)
-          << " % of plant available water";
+          << " % of plant available water\n";
+      const double primary_sorption = hydraulic->h_int (Theta_lim) 
+        / hydraulic->h_int (Theta_sat);
+      tmp << "Primary domain contains " << 100.0 * primary_sorption
+          << " % of the available sorption sites\n";
     }
   tmp << "h\th\tTheta\tK\n"
       << "cm\tpF\t\tcm/h\n";

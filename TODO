@@ -2,6 +2,20 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Smoke
 
+** BB: Hvor meget betyder sorptionskinetik?
+
+Kan vi bruge kinetik i stedet for K_clay?
+
+Det ser ikke sådan ud, men prøv.  Også prøv begge to sammen.
+
+** Nye BB tal med lit. K_clay
+
+*** Estimer BB_apply
+
+*** Genkalibrer K_clay og pore_min
+
+*** Diskution?
+
 * Smoke senere
 
 ** Prøv at få U4 BB på plads med max_C_inf (1mm z-lag!)

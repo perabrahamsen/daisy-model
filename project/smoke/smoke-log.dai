@@ -325,7 +325,7 @@ Total amount in the specified soil interval.")
   (declare My_K_clay Number [cm^3/g] "")
   (My_K_clay 0 [cm^3/g])
   (declare Ap_fac number "")
-  (Ap_fac (/ 1.0 [] (+ (* 0.107 [] (convert (/ My_K_clay 2 [cm^3/g]) [])) 1.0 [])))
+  (Ap_fac (/ 1.0 [] (+ (* 0.107 [] (/ My_K_clay 2 [cm^3/g])) 1.0 [])))
   (declare Bt_fac number "")
   (Bt_fac (/ 1.0 [] (+ (* 0.222 [] (/ My_K_clay 2 [cm^3/g])) 1.0 [])))
   (entries ;; Year Month MDay Hour
@@ -379,7 +379,11 @@ Total amount in the specified soil interval.")
 (deflog "BB Profile" "SmokeProfile" 
   (chemical "BB-base") 
   (where "BB-Rsqr.dlf")
-  (My_K_clay $BB_K_clay))
+  (My_K_clay 20 [cm^3/g]))
+
+(deflog "Br Profile" "SmokeProfile" 
+  (chemical "Bromide") 
+  (where "Br-Rsqr.dlf"))
 
 (deflog "Primary" chemical
   "Content, transport and transformation of chemicals in the primary domain."
