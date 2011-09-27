@@ -30,30 +30,31 @@ class Adsorption_vS_S : public Adsorption
 {
   // Simulation.
 public:
-  double C_to_A (const Soil& soil, int i, double C) const;
-  double C_to_M (const Soil&, double Theta, int, double C) const;
-  double M_to_C (const Soil&, double Theta, int, double M) const;
+  double C_to_A (const Soil& soil, int i, double C, double sf) const;
+  double C_to_M (const Soil&, double Theta, int, double C, double sf) const;
+  double M_to_C (const Soil&, double Theta, int, double M, double sf) const;
 
   // Chemical soil constants.
   double K_planar () const
     { return 6.3e-5; }		// [g/cm³]
   double K_edge () const
     { return 1.372e-5; }	// [g/cm³]
-  double v_planar (const Soil& soil, int i) const
+  double v_planar (const Soil& soil, int i, double sf) const
     { 
       // Maximum specific absorbtion [g / g clay]
       const double S_planar = 5.964e-3;
       const double porosity = soil.Theta (i, 0.0, 0.0);
       const double clay = soil.clay (i);
-      return S_planar * clay * soil.dry_bulk_density (i) * (1.0 - porosity); 
+      const double rho_b = soil.dry_bulk_density (i);
+      return S_planar * clay * rho_b * sf * (1.0 - porosity); 
     }
-  double v_edge (const Soil& soil, int i) const
+  double v_edge (const Soil& soil, int i, double sf) const
     {
       const double S_edge = 0.308e-3;	// Same for edges. [g / g clay]
       const double porosity = soil.Theta (i, 0.0, 0.0);
       const double clay = soil.clay (i);
-      
-      return S_edge * clay * soil.dry_bulk_density (i) * (1.0 - porosity); 
+      const double rho_b = soil.dry_bulk_density (i);
+      return S_edge * clay * rho_b * sf * (1.0 - porosity); 
     }
 
   // Create.
@@ -64,24 +65,26 @@ public:
 };
 
 double
-Adsorption_vS_S::C_to_A (const Soil& soil, int i, double C) const
+Adsorption_vS_S::C_to_A (const Soil& soil, int i, double C, double sf) const
 {
-  return (v_planar (soil, i) * C) / (K_planar () + C)
-    + (v_edge (soil, i) * C) / (K_edge () + C);
+  return (v_planar (soil, i, sf) * C) / (K_planar () + C)
+    + (v_edge (soil, i, sf) * C) / (K_edge () + C);
 }
 
 double 
-Adsorption_vS_S::C_to_M (const Soil& soil, double Theta, int i, double C) const
+Adsorption_vS_S::C_to_M (const Soil& soil, double Theta, int i, double C,
+                         double sf) const
 {
-  return C_to_A (soil, i, C) + Theta * C;
+  return C_to_A (soil, i, C, sf) + Theta * C;
 }
 
 double 
-Adsorption_vS_S::M_to_C (const Soil& soil, double Theta, int i, double M) const
+Adsorption_vS_S::M_to_C (const Soil& soil, double Theta, int i, double M,
+                         double sf) const
 {
-  const double ve = v_edge (soil, i); 
+  const double ve = v_edge (soil, i, sf); 
   const double Ke = K_edge ();
-  const double vp = v_planar (soil, i);
+  const double vp = v_planar (soil, i, sf);
   const double Kp = K_planar ();
 
   double C;
@@ -98,7 +101,7 @@ Adsorption_vS_S::M_to_C (const Soil& soil, double Theta, int i, double M) const
       const double d = - M * Kp * Ke;
     
       C = single_positive_root_of_cubic_equation (a, b, c, d);
-      daisy_assert (approximate (M, C_to_M (soil, Theta, i, C)));
+      daisy_assert (approximate (M, C_to_M (soil, Theta, i, C, sf)));
     }
   return C;
 }

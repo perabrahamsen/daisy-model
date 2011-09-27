@@ -41,8 +41,8 @@ class AdsorptionFreundlich : public Adsorption
 
   // Simulation.
 public:
-  double C_to_M (const Soil&, double Theta, int, double C) const;
-  double M_to_C (const Soil&, double Theta, int, double M) const;
+  double C_to_M (const Soil&, double Theta, int, double C, double sf) const;
+  double M_to_C (const Soil&, double Theta, int, double M, double sf) const;
 
   // Create.
 public:
@@ -56,7 +56,7 @@ public:
 
 double 
 AdsorptionFreundlich::C_to_M (const Soil& soil,
-			      double Theta, int i, double C) const
+			      double Theta, int i, double C, double sf) const
 {
   daisy_assert (C >= 0.0);
   daisy_assert (Theta >= 0.0); 
@@ -64,12 +64,12 @@ AdsorptionFreundlich::C_to_M (const Soil& soil,
     + soil.humus (i) * c_fraction_in_humus * K_OC;
   const double rho = soil.dry_bulk_density (i);
   const double S = K * pow (C, m);
-  return rho * S + Theta * C;
+  return sf * rho * S + Theta * C;
 }
 
 double 
 AdsorptionFreundlich::M_to_C (const Soil& soil,
-			      double Theta, int i, double M) const
+			      double Theta, int i, double M, double sf) const
 {
   // Check for zero.
   if (iszero (M))
@@ -77,23 +77,23 @@ AdsorptionFreundlich::M_to_C (const Soil& soil,
 
   // Guess start boundary.
   double min_C = 0.0;
-  double min_M = C_to_M (soil, Theta, i, min_C);
+  double min_M = C_to_M (soil, Theta, i, min_C, sf);
   double max_C = 1.0;
-  double max_M = C_to_M (soil, Theta, i, max_C);
+  double max_M = C_to_M (soil, Theta, i, max_C, sf);
 
   // Find upper boundary by doubling repeatedly.
   while (max_M < M)
     {
       max_C *= 2;
       daisy_assert (max_C > 0.0); // Overlow detection.
-      max_M = C_to_M (soil, Theta, i, max_C);
+      max_M = C_to_M (soil, Theta, i, max_C, sf);
     }
 
   // Guess by middling the C value.
   while (!approximate (min_M, max_M))
     {
       const double new_C = (min_C + max_C) / 2.0;
-      const double new_M = C_to_M (soil, Theta, i, new_C);
+      const double new_M = C_to_M (soil, Theta, i, new_C, sf);
       if (new_M < M)
 	{
           daisy_assert (min_C < new_C);

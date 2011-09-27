@@ -40,8 +40,16 @@ public:
 public:
   virtual bool full () const;
   virtual void output (Log&) const;
-  virtual double C_to_M (const Soil&, double Theta, int i, double C) const = 0;
-  virtual double M_to_C (const Soil&, double Theta, int i, double M) const = 0;
+private:
+  virtual double C_to_M (const Soil&, double Theta, int i, double C, double sf) const = 0;
+  virtual double M_to_C (const Soil&, double Theta, int i, double M, double sf) const = 0;
+public:
+  double C_to_M_total (const Soil&, double Theta, int i, double C) const;
+  double M_to_C_total (const Soil&, double Theta, int i, double M) const;
+  double C_to_M1 (const Soil&, double Theta, int i, double C) const;
+  double M_to_C1 (const Soil&, double Theta, int i, double M) const;
+  double C_to_M2 (const Soil&, double Theta, int i, double C) const;
+  double M_to_C2 (const Soil&, double Theta, int i, double M) const;
 
   // Create and Destroy.
 public:

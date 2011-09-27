@@ -23,6 +23,7 @@
 #define BUILD_DLL
 
 #include "adsorption.h"
+#include "soil.h"
 #include "block_model.h"
 #include "librarian.h"
 #include "mathlib.h"
@@ -45,6 +46,42 @@ Adsorption::full () const
 void
 Adsorption::output (Log&) const
 { }
+
+double 
+Adsorption::C_to_M_total (const Soil& soil, double Theta, int i, double C) const
+{ return C_to_M (soil, Theta, i, C, 1.0); }
+
+double 
+Adsorption::M_to_C_total (const Soil& soil, double Theta, int i, double M) const
+{ return M_to_C (soil, Theta, i, M, 1.0); }
+
+double 
+Adsorption::C_to_M1 (const Soil& soil, double Theta, int i, double C) const
+{
+  const double sf = soil.primary_sorption_fraction (i);
+  return C_to_M (soil, Theta, i, C, sf);
+}
+
+double 
+Adsorption::M_to_C1 (const Soil& soil, double Theta, int i, double M) const
+{
+  const double sf = soil.primary_sorption_fraction (i);
+  return M_to_C (soil, Theta, i, M, sf);
+}
+
+double 
+Adsorption::C_to_M2 (const Soil& soil, double Theta, int i, double C) const
+{
+  const double sf = 1.0 - soil.primary_sorption_fraction (i);
+  return C_to_M (soil, Theta, i, C, sf);
+}
+double 
+
+Adsorption::M_to_C2 (const Soil& soil, double Theta, int i, double M) const
+{
+  const double sf = 1.0 - soil.primary_sorption_fraction (i);
+  return M_to_C (soil, Theta, i, M, sf);
+}
 
 Adsorption::Adsorption (const char *const type)
   : ModelDerived (symbol (type))
@@ -79,9 +116,9 @@ class AdsorptionNone : public Adsorption
 {
   // Simulation.
 public:
-  double C_to_M (const Soil&, double Theta, int, double C) const
+  double C_to_M (const Soil&, double Theta, int, double C, double) const
   { return C * Theta; }
-  double M_to_C (const Soil&, double Theta, int, double M) const
+  double M_to_C (const Soil&, double Theta, int, double M, double) const
   { return M / Theta; }
 
   // Create.
@@ -122,7 +159,7 @@ public:
   bool full () const
   { return true; }
 
-  double C_to_M (const Soil&, double Theta, int, double C) const
+  double C_to_M (const Soil&, double Theta, int, double C, double) const
   { 
     if (fabs (C) < 1.0e-100)
       return 0.0;
@@ -130,7 +167,7 @@ public:
     // If we initialized a non-zero C, put it all in M right away.
     return C * Theta;
   }
-  double M_to_C (const Soil&, double, int, double) const
+  double M_to_C (const Soil&, double, int, double, double) const
   { return 0; }
 
   // Create.

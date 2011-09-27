@@ -40,15 +40,15 @@ class AdsorptionLangmuir : public Adsorption
   // Simulation.
 public:
   double C_to_M (const Soil& soil, const double Theta,
-		 const int i, const double C) const
+		 const int i, const double C, double sf) const
     {
       const double my_max 
 	= my_max_clay * soil.clay (i) + my_max_OC * soil.humus (i);
       const double S = (my_max * C) / (K + C);
-      return soil.dry_bulk_density (i) * S + Theta * C;
+      return sf * soil.dry_bulk_density (i) * S + Theta * C;
     }
   double M_to_C (const Soil& soil, const double Theta, 
-		 const int i, const double M) const
+		 const int i, const double M, double sf) const
     {
       // We need to solve the following equation w.r.t. C.
       //
@@ -63,7 +63,7 @@ public:
       const double my_max = my_max_clay * soil.clay (i);
 
       const double a = Theta;
-      const double b = soil.dry_bulk_density (i) * my_max + Theta * K - M;
+      const double b = sf * soil.dry_bulk_density (i) * my_max + Theta * K - M;
       const double c = - M * K;
 
       return single_positive_root_of_square_equation (a, b, c);

@@ -245,18 +245,9 @@ double
 Soil::M (size_t i, double h) const
 { return horizon_[i]->hydraulic->M (h); }
 
-double 
-Soil::h_int (size_t i, double Theta) const
-{ return horizon_[i]->hydraulic->h_int (Theta); }
-
 double
 Soil::primary_sorption_fraction (size_t c) const
-{
-  const double h_lim = h_secondary (c);
-  const double Theta_lim = Theta (c, h_lim, 0.0);
-  const double Theta_sat = Theta (c, 0.0, 0.0);
-  return h_int (c, Theta_lim) / h_int (c, Theta_sat);
-}
+{ return horizon_[c]->primary_sorption_fraction (); }
 
 double 
 Soil::dispersivity (size_t) const

@@ -44,18 +44,21 @@ public:
       + soil.humus (c) * c_fraction_in_humus * K_OC;
   }
 
-  double C_to_M (const Soil& soil, double Theta, int i, double C) const
+  double C_to_M (const Soil& soil, double Theta, int i, 
+                 double C, double sf) const
   {
     const double K = this->K (soil, i);
     const double rho = soil.dry_bulk_density (i);
-    return C * (K * rho + Theta);
+    return C * (K * rho * sf + Theta);
   }
-  double M_to_C (const Soil& soil, double Theta, int i, double M) const
+  double M_to_C (const Soil& soil, double Theta, int i, 
+                 double M, double sf) const
   {
     const double K = this->K (soil, i);
     const double rho = soil.dry_bulk_density (i);
-    return M / (Theta + K * rho);
+    return M / (Theta + K * rho * sf);
   }
+
   // Create.
 public:
   AdsorptionLinearOld (const BlockModel& al)

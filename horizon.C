@@ -63,6 +63,7 @@ struct Horizon::Implementation
   const symbol_map dimensions;
   const std::auto_ptr<Nitrification> nitrification;
   const std::auto_ptr<Secondary> secondary;
+  double primary_sorption_fraction;
   HorHeat hor_heat;
   
   // Create and Detroy.
@@ -160,6 +161,7 @@ Horizon::Implementation::Implementation (const Frame& al)
     dimensions (get_dimensions (al.submodel_sequence ("attributes"))),
     nitrification (Nitrification::create_default ()),
     secondary (Secondary::create_none ()),
+    primary_sorption_fraction (NAN),
     hor_heat (al.submodel ("HorHeat"))
 { }
 
@@ -233,6 +235,13 @@ Horizon::heat_capacity (double Theta, double Ice) const
 const Secondary& 
 Horizon::secondary_domain () const
 { return *impl->secondary;}
+
+double
+Horizon::primary_sorption_fraction () const
+{
+  daisy_assert (std::isfinite (impl->primary_sorption_fraction));
+  return impl->primary_sorption_fraction;
+}
 
 double 
 Horizon::K (const double h /* [cm] */) const         // [cm/h]
@@ -351,7 +360,9 @@ Horizon::initialize_base (bool top_soil,
 
   std::ostringstream tmp;
   const double h_lim = secondary_domain ().h_lim ();
-  if (h_lim < 0.0)
+  if (h_lim >= 0.0)
+    impl->primary_sorption_fraction = 1.0;
+  else
     {
       const double h_sat = 0.0;
       const double Theta_sat = hydraulic->Theta (h_sat);
@@ -361,9 +372,10 @@ Horizon::initialize_base (bool top_soil,
       tmp << "A saturated secondary domain contain " 
           << 100.0 * (Theta_sat - Theta_lim) / (Theta_sat - Theta_wp)
           << " % of plant available water\n";
-      const double primary_sorption = hydraulic->h_int (Theta_lim) 
+      impl->primary_sorption_fraction = hydraulic->h_int (Theta_lim) 
         / hydraulic->h_int (Theta_sat);
-      tmp << "Primary domain contains " << 100.0 * primary_sorption
+      tmp << "Primary domain contains "
+          << 100.0 * impl->primary_sorption_fraction
           << " % of the available sorption sites\n";
     }
   tmp << "h\th\tTheta\tK\n"

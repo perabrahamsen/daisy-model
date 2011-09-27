@@ -366,7 +366,7 @@ ChemicalStandard::set_primary (const Soil& soil, const SoilWater& soil_water,
       const double Theta_matrix = Theta_primary + Theta_secondary;
       M_total_[c] = M_primary_[c] + M_secondary_[c];
       C_primary_[c] 
-        = adsorption_->M_to_C (soil, Theta_primary, c, M_primary_[c]);
+        = adsorption_->M_to_C1 (soil, Theta_primary, c, M_primary_[c]);
       C_avg_[c] 
         = (Theta_primary * C_primary_[c]
            + Theta_secondary * C_secondary_[c]) / Theta_matrix;
@@ -408,7 +408,7 @@ ChemicalStandard::set_secondarM (const Soil& soil, const SoilWater& soil_water,
       
       if (Theta_secondary > 0.0)
         C_secondary_[c]
-          = adsorption_->M_to_C (soil, Theta_secondary, c, M_secondary_[c]);
+          = adsorption_->M_to_C2 (soil, Theta_secondary, c, M_secondary_[c]);
       else 
         C_secondary_[c] = C_primary_[c];
 
@@ -599,10 +599,10 @@ ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
     {
       const double Theta_primary = soil_water.Theta_primary (i);
       const double M1 
-        = adsorption_->C_to_M (soil, Theta_primary, i, C_primary_[i]);
+        = adsorption_->C_to_M1 (soil, Theta_primary, i, C_primary_[i]);
       const double Theta_secondary = soil_water.Theta_secondary (i);
       const double M2 = Theta_secondary > 0
-        ? adsorption_->C_to_M (soil, Theta_secondary, i, C_secondary_[i])
+        ? adsorption_->C_to_M2 (soil, Theta_secondary, i, C_secondary_[i])
         : 0.0;
 
       if (approximate (M1, M_primary_[i], 0.00001)
@@ -610,15 +610,23 @@ ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
         continue;
 
       const double Theta_matrix = soil_water.Theta (i);
-      C_avg_[i] = adsorption_->M_to_C (soil, Theta_matrix, i, M_total_[i]);
+      C_avg_[i] = adsorption_->M_to_C_total (soil, Theta_matrix, 
+                                             i, M_total_[i]);
       C_primary_[i] = C_avg_[i];
       C_secondary_[i] = C_avg_[i];
       M_primary_[i] 
-        = adsorption_->C_to_M (soil, Theta_primary, i, C_primary_[i]);
+        = adsorption_->C_to_M1 (soil, Theta_primary, i, C_primary_[i]);
       M_secondary_[i] = Theta_secondary > 0
-        ? adsorption_->C_to_M (soil, Theta_secondary, i, C_secondary_[i])
+        ? adsorption_->C_to_M2 (soil, Theta_secondary, i, C_secondary_[i])
         : 0.0;
-      daisy_approximate (M_primary_[i] + M_secondary_[i], M_total_[i]);
+      if (!approximate (M_primary_[i] + M_secondary_[i], M_total_[i]))
+        {
+          std::ostringstream tmp;
+          tmp << i << ": M1 (" << M_primary_[i] << ") + M2 ("
+              << M_secondary_[i] << ") = " << (M_primary_[i] + M_secondary_[i])
+              << "; M = " << M_total_[i];
+          Assertion::message (tmp.str ());
+        }
     }
 }
   
@@ -921,7 +929,8 @@ ChemicalStandard::tick_surface (const double pond /* [cm] */,
       // Concentration in soil water.
       const double Theta = soil_water.Theta (cell) + Theta_pond;
       daisy_assert (Theta > 0.0);
-      const double C = adsorption_->M_to_C (soil, Theta, cell, M); // [g/cm^3]
+      const double C 
+        = adsorption_->M_to_C_total (soil, Theta, cell, M); // [g/cm^3]
       daisy_assert (C >= 0.0);
       // Accumulate based on cell surface area.
       const double area = geo.edge_area (edge); // [cm^2]
@@ -1409,12 +1418,22 @@ ChemicalStandard::check (const Units& units, const Scope& scope,
           const double C_secondary = C_secondary_[i];
           const double C_primary = C_primary_[i];
           
-          if (!approximate (adsorption_->M_to_C (soil, Theta_secondary, i, 
-                                                 M_secondary),
+          if (Theta_secondary > 0.0 && 
+              !approximate (adsorption_->M_to_C2 (soil, Theta_secondary, i, 
+                                                  M_secondary),
                             C_secondary))
-            throw "C_secondary does not match M_secondary";
-          if (!approximate (adsorption_->M_to_C (soil, Theta_primary, i, 
-                                                 M_primary),
+            {
+              std::ostringstream tmp;
+              tmp << "Theta_secondary = " << Theta_secondary 
+                  << ", M_secondary = " << M_secondary
+                  << ", M2C = " << (adsorption_->M_to_C2 (soil, Theta_secondary,
+                                                          i, M_secondary))
+                  << ", C = " << C_secondary;
+              msg.message (tmp.str ());
+              throw "C_secondary does not match M_secondary";
+            }
+          if (!approximate (adsorption_->M_to_C1 (soil, Theta_primary, i, 
+                                                  M_primary),
                             C_primary))
             throw "C_primary does not match M_primary";
           if (!approximate (M_primary, M - M_secondary))
@@ -1548,10 +1567,10 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
         // No secondary water.
         {
           if (!has_C_avg)
-            C_avg_.push_back (adsorption_->M_to_C (soil, Theta, i, 
-                                                   M_total_[i]));
-          M_primary_.push_back (adsorption_->C_to_M (soil, Theta, i, 
-                                                     C_avg_[i])); 
+            C_avg_.push_back (adsorption_->M_to_C1 (soil, Theta, i, 
+                                                    M_total_[i]));
+          M_primary_.push_back (adsorption_->C_to_M1 (soil, Theta, i, 
+                                                      C_avg_[i])); 
           if (!has_M_secondary)
             M_secondary_.push_back (0.0);
           if (!has_M_total) 
@@ -1566,39 +1585,39 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
           daisy_assert (has_C_avg || has_M_total);
 
           if (!has_C_avg)
-            C_avg_.push_back (adsorption_->M_to_C (soil, Theta, i, 
-                                                   M_total_[i]));
+            C_avg_.push_back (adsorption_->M_to_C_total (soil, Theta, i, 
+                                                         M_total_[i]));
           if (!has_M_total) 
-            M_total_.push_back (adsorption_->C_to_M (soil, Theta, i, 
-                                                     C_avg_[i])); 
+            M_total_.push_back (adsorption_->C_to_M_total (soil, Theta, i, 
+                                                           C_avg_[i])); 
           C_primary_.push_back (C_avg_[i]);
           C_secondary_.push_back (C_avg_[i]);
-          M_primary_.push_back (adsorption_->C_to_M (soil, Theta_primary, i, 
-                                                     C_primary_[i]));
-          M_secondary_.push_back (adsorption_->C_to_M (soil, 
-                                                       Theta_secondary, i, 
-                                                       C_secondary_[i]));
+          M_primary_.push_back (adsorption_->C_to_M1 (soil, Theta_primary, i, 
+                                                      C_primary_[i]));
+          M_secondary_.push_back (adsorption_->C_to_M2 (soil, 
+                                                        Theta_secondary, i, 
+                                                        C_secondary_[i]));
         }
       else if (has_C_avg)
         // Average and secondary concentrations known.
         {
           daisy_assert (has_C_secondary || has_M_secondary);
           if (!has_C_secondary)
-            C_secondary_.push_back (adsorption_->M_to_C (soil, Theta_secondary,
-                                                         i, 
-                                                         M_secondary_[i]));
+            C_secondary_.push_back (adsorption_->M_to_C2 (soil, Theta_secondary,
+                                                          i, 
+                                                          M_secondary_[i]));
           if (!has_M_secondary)
-            M_secondary_.push_back (adsorption_->C_to_M (soil, Theta_secondary,
-                                                         i, 
-                                                         C_secondary_[i]));
+            M_secondary_.push_back (adsorption_->C_to_M2 (soil, Theta_secondary,
+                                                          i, 
+                                                          C_secondary_[i]));
           
           // Theta * C_a = Theta_i * C_i + Theta_m * C_m
           // => C_i = (Theta * C_a - Theta_m * C_m) / Theta_i
           C_primary_.push_back ((Theta * C_avg_[i]
                                  - Theta_secondary * C_secondary_[i])
                                 / Theta_primary);
-          M_primary_.push_back (adsorption_->C_to_M (soil, Theta_primary, i, 
-                                                     C_primary_[i]));
+          M_primary_.push_back (adsorption_->C_to_M1 (soil, Theta_primary, i, 
+                                                      C_primary_[i]));
           if (!has_M_total)
             M_total_.push_back (M_primary_[i] + M_secondary_[i]);
         }
@@ -1607,19 +1626,19 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
         {
           daisy_assert (has_C_secondary || has_M_secondary);
           if (!has_C_secondary)
-            C_secondary_.push_back (adsorption_->M_to_C (soil, Theta_secondary,
-                                                         i, 
-                                                         M_secondary_[i]));
+            C_secondary_.push_back (adsorption_->M_to_C2 (soil, Theta_secondary,
+                                                          i, 
+                                                          M_secondary_[i]));
           if (!has_M_secondary)
-            M_secondary_.push_back (adsorption_->C_to_M (soil, Theta_secondary,
-                                                         i, 
-                                                         C_secondary_[i]));
+            M_secondary_.push_back (adsorption_->C_to_M2 (soil, Theta_secondary,
+                                                          i, 
+                                                          C_secondary_[i]));
           daisy_assert (has_M_total);
           M_primary_.push_back (M_total_[i] - M_secondary_[i]);
-          C_primary_.push_back (adsorption_->M_to_C (soil, 
-                                                     Theta_primary,
-                                                     i,
-                                                     M_primary_[i]));
+          C_primary_.push_back (adsorption_->M_to_C1 (soil, 
+                                                      Theta_primary,
+                                                      i,
+                                                      M_primary_[i]));
           C_avg_.push_back ((C_secondary_[i] * Theta_secondary
                              + C_primary_[i] * Theta_primary)
                             / Theta);
