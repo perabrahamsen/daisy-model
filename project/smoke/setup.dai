@@ -10,43 +10,52 @@
 
 ;; Horizons.
 
-(defhorizon "Ap" USDA3
-  (hydraulic hypres (topsoil true) (r_pore_min $pore_min))
-  (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.03)
-  (dry_bulk_density 1.60 [g/cm^3])
+(defhorizon common USDA3
+  (r_pore_min $pore_min))
+  
+(defhorizon "Ap1" common                 ;3-24
+  (hydraulic hypres (topsoil true))
+  (clay 0.11)(silt 0.22)(sand 0.67)(humus 0.03)
+  (dry_bulk_density 1.56 [g/cm^3])
   (secondary_domain pressure 
-                    (h_lim $Ap_lim)
-                    (alpha $Ap_alpha)))
+                    (h_lim $A_lim)
+                    (alpha $X_alpha)))
 
-(defhorizon "Surface" "Ap"
+(defhorizon "Surface" "Ap1"              ;0-3
   (hydraulic (original (K_sat $S_K)))
   (secondary_domain pressure
                     (h_lim $S_lim)
                     (alpha $S_alpha)))
 
-(defhorizon "Bt" USDA3
-  (hydraulic hypres (r_pore_min $pore_min))
-  (clay 0.222)(silt 0.195)(sand 0.583)(humus 0.016)
-  (dry_bulk_density 1.72 [g/cm^3])
+(defhorizon "Ap2" Ap1                   ;24-30
   (secondary_domain pressure 
                     (h_lim $B_lim)
-                    (alpha $B_alpha)))
-                                          
-(defhorizon "Plow pan" Bt
-  ;; (clay 0.148)(silt 0.214)(sand 0.638) (humus 0.016)
-  (dry_bulk_density 1.72 [g/cm^3])
-  (anisotropy 12)
-  (hydraulic original (K_sat $PP_K))
+                    (alpha $X_alpha)) 
+  (dry_bulk_density 1.69 [g/cm^3]))
 
-  (secondary_domain pressure 
-                    (h_lim $PP_lim)
-                    (alpha $PP_alpha)))               
-
-(defhorizon "C" USDA3
-  (clay 0.207)(silt 0.235)(sand 0.558) (humus 0.01)
+(defhorizon "A2" common                  ;30-40
+  (hydraulic hypres (topsoil false))
+  (clay 0.13)(silt 0.22)(sand 0.65)(humus 0.03)
   (dry_bulk_density 1.69 [g/cm^3])
+  (secondary_domain pressure 
+                    (h_lim $B_lim)
+                    (alpha $X_alpha)))
+
+(defhorizon "B1" A2                     ;40-60
+  (dry_bulk_density 1.7 [g/cm^3]))
+
+(defhorizon "Bt" common                 ;60-120
+  (hydraulic hypres)
+  (clay 0.22)(silt 0.20)(sand 0.58)(humus 0.016)
+  (dry_bulk_density 1.7 [g/cm^3])
+  (secondary_domain pressure 
+                    (h_lim $B_lim)
+                    (alpha $X_alpha)))
+
+(defhorizon "C" common                   ;120-
+  (clay 0.16)(silt 0.25)(sand 0.59) (humus 0.01)
+  (dry_bulk_density 1.8 [g/cm^3])
   (hydraulic M_vG  
-             (r_pore_min $pore_min)
              (Theta_res 0.000)
              (Theta_sat 0.348314)
              (alpha 0.0476257)
@@ -55,16 +64,22 @@
              (l -3.60322))
   (secondary_domain pressure 
                     (h_lim $B_lim)
-                    (alpha $B_alpha)))
+                    (alpha $X_alpha)))
 
-(defhorizon "Drain canyon" ISSS4
-  (hydraulic hypres (r_pore_min $pore_min))
-  (clay 0.213)(silt 0.190)(coarse_sand 0.244)(fine_sand  0.339)(humus 0.014)
-  (normalize true)
+(defhorizon "Ap2_Drain" Ap2             ;24-30
+  (dry_bulk_density 1.77 [g/cm^3]))
+
+(defhorizon "A2_Drain" A2               ;30-40
+  (dry_bulk_density 1.77 [g/cm^3]))
+
+  
+(defhorizon "Drain canyon" common        ;40-120
+  (hydraulic hypres)
+  (clay 0.16)(silt 0.20)(sand 0.64)(humus 0.014)
   (dry_bulk_density 1.70 [g/cm^3])
   (secondary_domain pressure 
                     (h_lim $B_lim)
-                    (alpha $B_alpha)))
+                    (alpha $X_alpha)))
 
 ;; Profile.
 
@@ -73,8 +88,10 @@
   (Chemistry multi (combine Bromide BB))
   (Soil (MaxRootingDepth 150 [cm])
         (horizons (-3.00 "Surface")
-                  (-24.00 "Ap")
-                  (-30.00 "Plow pan")
+                  (-24.00 "Ap1")
+                  (-30.00 "Ap2")
+                  (-40.00 "A2")
+                  (-60.00 "B1")
                   (-120 "Bt")
                   (-200 "C")))
   (Movement original
@@ -118,8 +135,9 @@
   "Rorrende soil with biopores to drain"
   (Soil (MaxRootingDepth 150 [cm])
         (horizons (-3.00 "Surface")
-                  (-24.00 "Ap")
-                  (-30.00 "Plow pan")
+                  (-24.00 "Ap1")
+                  (-30.00 "Ap2_Drain")
+                  (-40.00 "A2_Drain")
                   (-120 "Drain canyon")
                   (-200 "C")))
   (Drain none)
@@ -130,8 +148,9 @@
   "Pure convection-dispersion"
   (Soil (MaxRootingDepth 150 [cm])
         (horizons (-3.00 ("Surface" (secondary_domain none)))
-                  (-24.00 ("Ap"  (secondary_domain none)))
-                  (-30.00 ("Plow pan"  (secondary_domain none)))
+                  (-24.00 ("Ap1" (secondary_domain none)))
+                  (-30.00 ("Ap2_Drain" (secondary_domain none)))
+                  (-40.00 ("A2_Drain" (secondary_domain none)))
                   (-120 ("Drain canyon" (secondary_domain none)))
                   (-200 ("C" (secondary_domain none)))))
   (Drain lateral
@@ -170,8 +189,10 @@
   "Pure convection-dispersion."
   (Soil (MaxRootingDepth 150 [cm])
         (horizons (-3.00 ("Surface" (secondary_domain none)))
-                  (-24.00 ("Ap"  (secondary_domain none)))
-                  (-30.00 ("Plow pan"  (secondary_domain none)))
+                  (-24.00 ("Ap1" (secondary_domain none)))
+                  (-30.00 ("Ap2" (secondary_domain none)))
+                  (-40.00 ("A2" (secondary_domain none)))
+                  (-60.00 ("B1" (secondary_domain none)))
                   (-120 ("Bt" (secondary_domain none)))
                   (-200 ("C" (secondary_domain none)))))
   (Movement original (Tertiary none)))
@@ -200,8 +221,10 @@
   "Pure convection-dispersion"
   (Soil (MaxRootingDepth 150 [cm])
         (horizons (-3.00 ("Surface" (secondary_domain none)))
-                  (-24.00 ("Ap"  (secondary_domain none)))
-                  (-30.00 ("Plow pan"  (secondary_domain none)))
+                  (-24.00 ("Ap1" (secondary_domain none)))
+                  (-30.00 ("Ap2" (secondary_domain none)))
+                  (-40.00 ("A2" (secondary_domain none)))
+                  (-60.00 ("B1" (secondary_domain none)))
                   (-120 ("Bt" (secondary_domain none)))
                   (-200 ("C" (secondary_domain none)))))
   (Movement original (Tertiary none)))
@@ -250,11 +273,6 @@
   (declare BB_decomp Number [h^-1] "")
   (declare S_alpha Number [h^-1] "")
   (declare S_lim Number [cm] "")
-  (declare Ap_alpha Number [h^-1] "")
-  (declare Ap_lim Number [cm] "")
-  (declare PP_alpha Number [h^-1] "")
-  (declare PP_lim Number [cm] "")
-  (declare B_alpha Number [h^-1] "")
   (declare B_lim Number [cm] "")
   (declare X_alpha Number [h^-1] "")
   (declare A_lim Number [cm] "")
@@ -270,14 +288,6 @@
   (PE -45 [cm])
   (BB_apply 17.68e6 [g/ha])
   (BB_k_sorp 0.05 [h^-1])
-
-  ;; New variables.
-  (Ap_lim $A_lim)
-  (PP_lim $A_lim)
-  (Ap_alpha $X_alpha)
-  (PP_alpha $X_alpha)
-  (B_alpha $X_alpha)
-
 
   ;; Combine weather soruces.
   (weather combine 
@@ -327,11 +337,11 @@
   
 (defsummary U4-BB-Rsqr Rsqr
   (measure ((time 2010 12 13 12)
-            (data ("M @ -4.5" 305)
-                  ("M @ -13.5" 426)
-                  ("M @ -21" 471)
-                  ("M @ -27" 94)
-                  ("M @ -35" 19)))))
+            (data ("M @ -4.5"  1210	)
+                  ("M @ -13.5" 1690	)
+                  ("M @ -21"   1868	)
+                  ("M @ -27"   373	)
+                  ("M @ -35"   86	)))))
 
 (defsummary U4-Br-Rsqr Rsqr
   (measure ((time 2010 12 13 12)
@@ -345,66 +355,26 @@
   (col "u4")
 
   ;; Solution, U4, Br
-  (S_lim -5.2624e+09 [cm])
-  (A_lim -853.566 [cm])
-  (B_lim -997.502 [cm])
-  (S_alpha 8.39905e-05 [h^-1])
-  (X_alpha 0.000100855 [h^-1])
-
-  ;; Solution, U4, BB
-  ;;(BB_K_clay 2.55078 [cm^3/g])
-  ;;(pore_min 0.599901 [um])
-  ;;(BB_apply 3.10622e+06 [g/ha])
+  (S_lim -9325.09 [cm])
+  (A_lim -1202.38 [cm])
+  (B_lim -338.895 [cm])
+  (S_alpha 1.44872e-11 [h^-1])
+  (X_alpha 8.33685e-05 [h^-1])
 
   ;; Solution, U4, BB, R^2 = 0.991
-  (BB_K_clay 5.40164 [cm^3/g])
-  (pore_min 0.116366 [um])
-  (BB_apply 5.61255e+06 [g/ha])
-  (BB_k_sorp 1 [h^-1])
+  (BB_K_clay 7.18551 [cm^3/g])
+  (pore_min 0.1 [um])
+  (BB_apply 9.09419e+06 [g/ha])
+  (BB_k_sorp 0.244831 [h^-1])
 
   (output &old 
           ("BB Profile"  (summary U4-BB-Rsqr))
           ("Br Profile"  (summary U4-Br-Rsqr))))
 
-(defsummary U13-BB-Rsqr Rsqr
-  (measure ((time 2010 12 13 12)
-            (data ("M @ -4.5" 11)
-                  ("M @ -13.5" 53)
-                  ("M @ -21" 113)
-                  ("M @ -27" 205)
-                  ("M @ -35" 18)))))
-
-(defsummary U13-Br-Rsqr Rsqr
-  (measure ((time 2010 12 13 12)
-            (data ("M @ -4.5"  20.73)
-                  ("M @ -13.5" 19.96)
-                  ("M @ -21"   29.15)
-                  ("M @ -27"   9.66)
-                  ("M @ -35"   182.38)))))
-
 (defprogram UCD U4
   (column UCD)
   (log_prefix "log/ucd-"))
 
-(defprogram U13 Without
-  (col "u13")
-
-  ;; Solution, U13, Br
-  (S_lim -19700.3 [cm])
-  (A_lim -36.3213 [cm])
-  (B_lim -30.1022 [cm])
-  (S_alpha 9.77885e-09 [h^-1])
-  (X_alpha 0.0000936745 [h^-1])
-
-  ;; Solution, U4, BB
-  (BB_K_clay 2.55682 [cm^3/g])
-  (pore_min 0.67759 [um])
-  ;;(BB_apply 3.19859e+06 [g/ha])
-
-  (output &old 
-          ("BB Profile" (summary U13-BB-Rsqr))
-          ("Br Profile" (summary U13-Br-Rsqr))))
-  
 (defprogram Macro Smoke
   (column Macro))
 
@@ -418,43 +388,33 @@
 
 (defsummary M19-BB-Rsqr Rsqr
   (measure ((time 2010 12 13 12)
-            (data ("M @ -4.5"  12.4787267904509	)    
-                  ("M @ -13.5" 164.129920424403	)    
-                  ("M @ -21"   369.075676392573	)    
-                  ("M @ -27"   339.178726790451	)    
-                  ("M @ -35"   100.869708222812	)))))
+            (data ("M @ -4.5"  50	)    
+                  ("M @ -13.5" 652	)    
+                  ("M @ -21"   1465	)    
+                  ("M @ -27"   1347	)    
+                  ("M @ -35"   455	)))))
 
 (defprogram M19 Macro
   (col "m19")
 
-  ;; Solution, M19, Br
-  (S_lim -16019.5 [cm])
-  (A_lim -318.314 [cm])
-  (B_lim -160.896 [cm])
-  (S_alpha 1.82518e-13 [h^-1])
-  (X_alpha 1.76987e-05 [h^-1])
-
-  ;; Solution, U4, BB
-  ;;(BB_K_clay 2.55078 [cm^3/g])
-  ;;(pore_min 0.599901 [um])
-  ;;(BB_apply 3.10622e+06 [g/ha])
-
-  ;; Solution, M19, BB, R^2 = 0.83
-  ;;(BB_K_clay 1.60519 [cm^3/g])
-  ;;(pore_min 1 [um])
-  ;;(BB_apply 2.60519e+06 [g/ha])
+  ;; Solution, M19, Br, R² = -0.999541
+  (S_lim -13775.2 [cm])
+  (A_lim -545.848 [cm])
+  (B_lim -272.606 [cm])
+  (S_alpha 2.27626e-13 [h^-1])
+  (X_alpha 1.77238e-05 [h^-1])
 
   ;;  Solution, M19, BB, R² = 0.971
-  (BB_K_clay 0.756507 [cm^3/g])
-  (pore_min 1 [um])
-  (BB_apply 1.09805e+07 [g/ha])
-  (BB_k_sorp 0.0657206 [h^-1])
+  (BB_K_clay 1.44327 [cm^3/g])
+  (pore_min 0.987659 [um])
+  (BB_apply 6.97091e+06 [g/ha])
+  (BB_k_sorp 1 [h^-1])
 
   (output &old 
           ("BB Profile" (summary M19-BB-Rsqr))
           ("Br Profile" (summary M19-Br-Rsqr))))
 
-(defprogram MCD U4
+(defprogram MCD M19
   (column MCD)
   (log_prefix "log/mcd-"))
 
@@ -471,11 +431,11 @@
 
 (defsummary D1-BB-Rsqr Rsqr
   (measure ((time 2010 12 13 12)
-            (data ("M @ -4.5" 200.95949602122	)    
-                  ("M @ -13.5" 309.715066312997	)    
-                  ("M @ -21" 108.235623342175	)    
-                  ("M @ -27" 0	                )    
-                  ("M @ -35" 0	                )))))
+            (data ("M @ -4.5"  798 )    
+                  ("M @ -13.5" 1230)    
+                  ("M @ -21"   430 )    
+                  ("M @ -27"   0   )    
+                  ("M @ -35"   0   )))))
 
 (defprogram D1 Drain
   (col "d1")
@@ -487,16 +447,6 @@
   (S_alpha 4.06328e-15 [h^-1])
   (X_alpha 4.07497e-05 [h^-1])
 
-  ;; Solution, D1, BB, R^2 = -0.91 (bad!)
-  ;; (BB_K_clay 1.82188 [cm^3/g])
-  ;; (pore_min 0.100065 [um])
-  ;; (BB_apply 1.82195e+06 [g/ha])
-
-  ;; Solution, U4, BB
-  ;;(BB_K_clay 2.55078 [cm^3/g])
-  ;;(pore_min 0.599901 [um])
-  ;;(BB_apply 3.10622e+06 [g/ha])
-
   ;; Solution, D1, BB, R^2 = 0.167
   (BB_K_clay 1.90211 [cm^3/g])
   (pore_min 1 [um])
@@ -507,103 +457,11 @@
           ("BB Profile"  (summary D1-BB-Rsqr))
           ("Br Profile"  (summary D1-Br-Rsqr))))
 
-(defprogram DCD U4
+(defprogram DCD D1
   (column DCD)
   (log_prefix "log/dcd-"))
 
-(defsummary D8-Br-Rsqr Rsqr
-  (measure ((time 2010 12 13 12)
-            (data ("M @ -4.5"  31.58      )    
-                  ("M @ -13.5" 103.70     )    
-                  ("M @ -21"   241.95	)    
-                  ("M @ -27"   479.23	)    
-                  ("M @ -35"   823.61	)))))
 
-(defsummary D8-BB-Rsqr Rsqr
-  (measure ((time 2010 12 13 12)
-            (data ("M @ -4.5"  101.975722543353			)    
-                  ("M @ -13.5" 369.864327002477			)    
-                  ("M @ -21"   150.130924855491 		)    
-                  ("M @ -27"   17.4006193228737                 )    
-                  ("M @ -35"   22.2566061106523                 )))))
-
-(defprogram D8 Drain
-  (col "d8")
-
-  ;; ;; Solution, D8, Br
-  ;; (S_lim -4260.03 [cm])
-  ;; (A_lim -91.9679 [cm])
-  ;; (B_lim -7633.73 [cm])
-  ;; (S_alpha 4.92457e-05 [h^-1])
-  ;; (X_alpha 0.00023816 [h^-1])
-  ;; 
-  ;; ;; Solution, D8, BB
-  ;; (BB_K_clay 0.285611 [cm^3/g])
-  ;; (pore_min 0.1 [um])
-  ;; (BB_apply 285611 [g/ha])
-
-  ;; Solution, M19, Br
-  (S_lim -18919.3 [cm])
-  (A_lim -392.453 [cm])
-  (B_lim -126.066 [cm])
-  (S_alpha 7.52627e-05 [h^-1])
-  (X_alpha 1.56782e-05 [h^-1])
-
-  ;; Solution, M19, BB
-  (BB_K_clay 1.47412 [cm^3/g])
-  (pore_min 1 [um])
-  ;; (BB_apply 2.47412e+06 [g/ha])
-
-  (output &old 
-          ("BB Profile"  (summary D8-BB-Rsqr))
-          ("Br Profile" (summary D8-Br-Rsqr))))
-
-(defsummary D4-Br-Rsqr Rsqr
-  (measure ((time 2010 12 13 12)
-            (data ("M @ -4.5"  48.14	)    
-                  ("M @ -13.5" 81.63	)    
-                  ("M @ -21"   125.42	)    
-                  ("M @ -27"   361.09	)    
-                  ("M @ -35"   630.61	)))))
-
-(defsummary D4-BB-Rsqr Rsqr
-  (measure ((time 2010 12 13 12)
-            (data ("M @ -4.5"  149.113990384615	 )    
-                  ("M @ -13.5" 300.326971153846	 )    
-                  ("M @ -21"   143.116875	 )    
-                  ("M @ -27"   37.7389903846154	 )    
-                  ("M @ -35"   0		 )))))
-
-(defprogram D4 Drain
-  (col "d4")
-
-  ;; ;; Solution, D4, Br
-  ;; (S_lim -4260.03 [cm])
-  ;; (A_lim -91.9679 [cm])
-  ;; (B_lim -7633.73 [cm])
-  ;; (S_alpha 4.92457e-05 [h^-1])
-  ;; (X_alpha 0.00023816 [h^-1])
-  ;; 
-  ;; ;; Solution, D4, BB
-  ;; (BB_K_clay 0.285611 [cm^3/g])
-  ;; (pore_min 0.1 [um])
-  ;; (BB_apply 285611 [g/ha])
-
-  ;; Solution, M19, Br
-  (S_lim -18919.3 [cm])
-  (A_lim -392.453 [cm])
-  (B_lim -126.066 [cm])
-  (S_alpha 7.52627e-05 [h^-1])
-  (X_alpha 1.56782e-05 [h^-1])
-
-  ;; Solution, M19, BB
-  (BB_K_clay 1.47412 [cm^3/g])
-  (pore_min 1 [um])
-  ;;(BB_apply 2.47412e+06 [g/ha])
-
-  (output &old 
-          ("BB Profile" (summary D4-BB-Rsqr))
-          ("Br Profile" (summary D4-Br-Rsqr))))
 
 ;; Plot
 
@@ -651,10 +509,6 @@
 
 (defgnuplot plotBB plotBr
   (chemical "BB-base")
-  (declare Ap_fac number "")
-  (Ap_fac (+ (* 0.107 [] (/ BB_K_clay 2 [cm^3/g])) 1.0 []))
-  (declare Bt_fac number "")
-  (Bt_fac (+ (* 0.222 [] (/ BB_K_clay 2 [cm^3/g])) 1.0 []))
   (source (profile (when 2010 12 13)
                    (title "Sim")
                    (style 1)
@@ -671,14 +525,7 @@
                       (style 2)
                       (title "Obs")
                       (y Middle)
-                      (valid (> Middle -25 [cm]))
-                      (x (* "${col}" Ap_fac)))
-          (arithmetic (file "${chemical}.ddf")
-                      (style 3)
-                      (title "")
-                      (y Middle)
-                      (valid (< Middle -25 [cm]))
-                      (x (* "${col}" Bt_fac)))
+                      (x "${col}"))
           (profile (when 2010 12 13)
                    (title "CD")
                    (style 5)
@@ -711,15 +558,15 @@
               [mm/h])))
 
 (defxysource K_Ap K
-  (title "Ap")
-  (y (convert (soil_K (horizon "Ap")
+  (title "Ap(1)")
+  (y (convert (soil_K (horizon "Ap1")
                       (top_soil true)
                       (h x))
               [mm/h])))
 
 (defxysource K_Plow_pan K
-  (title "Plow pan")
-  (y (convert (soil_K (horizon "Plow pan")
+  (title "A2")
+  (y (convert (soil_K (horizon "A2")
                       (top_soil true)
                       (h x))
               [mm/h])))
@@ -742,8 +589,6 @@
 (defgnuplot plotall multi
   (declare col String "column to plot.")
   (declare cdc String "cd column to compare with.")
-  (declare BB_K_clay Number [cm^3/g] "")
-  (BB_K_clay 20 [cm^3/g])
   (graph plotBr 
          plotBB rain 
          (K (FROM -50 [hPa]) (TO 0 [hPa]) 
@@ -783,30 +628,27 @@
 
 (defprogram sims batch
   (run ;;UCD MCD DCD
-       (U4)
-       (M19)
-       (D1)
-       ;;U13  ;;D4 ;;D8
+       ;;(U4)
+       ;;(M19)
+       ;; (D1)
        ))
 
 (defgnuplot plots multi
 
   ;; Does not matter.
-  (declare Ap_lim Number [cm] "")
+  (declare A_lim Number [cm] "")
   (declare B_lim Number [cm] "")
-  (declare Ap_alpha Number [h^-1] "")
-  (declare B_alpha Number [h^-1] "")
+  (declare X_alpha Number [h^-1] "")
   (declare pore_min Number [um] "")
-  (Ap_lim -1 [cm])
+  (A_lim -1 [cm])
   (B_lim -1 [cm])
-  (Ap_alpha 1.0 [h^-1])
-  (B_alpha 1.0 [h^-1])
+  (X_alpha 1.0 [h^-1])
   (pore_min 1.0 [um])
   
-  (graph plotPres 
+  (graph ;;plotPres 
          (plotall (cdc ucd) (col u4)) 
          (plotall (cdc mcd) (col m19))
-         (plotall (cdc dcd) (col d1))
+         ;;(plotall (cdc dcd) (col d1))
          )
 )
 

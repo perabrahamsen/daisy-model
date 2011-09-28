@@ -40,10 +40,9 @@ public:
   static const char *const component;
   symbol library_id () const;
   //
-private:
+
   static double r2h (double r); // Find pressure for pore size.
-  const double r_pore_min;             // Smallest pore in soil [um]
-  PLF my_h_int;
+private:
   struct K_at_h;
 protected:
   const boost::scoped_ptr<K_at_h>  K_init;
@@ -64,10 +63,6 @@ public:
   virtual double Cw2 (double h) const = 0;
   virtual double h (double Theta) const = 0;
   virtual double M (double h) const = 0;
-
-  // Integrate h from Theta_res to Theta.
-public:
-  double h_int (double Theta) const;
 
   // Simulation.
 public:

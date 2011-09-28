@@ -63,6 +63,7 @@ struct Horizon::Implementation
   const symbol_map dimensions;
   const std::auto_ptr<Nitrification> nitrification;
   const std::auto_ptr<Secondary> secondary;
+  const double r_pore_min;             // Smallest pore in soil [um]
   double primary_sorption_fraction;
   HorHeat hor_heat;
   
@@ -145,6 +146,8 @@ Horizon::Implementation::Implementation (const BlockModel& al)
     dimensions (get_dimensions (al.submodel_sequence ("attributes"))),
     nitrification (Librarian::build_item<Nitrification> (al, "Nitrification")),
     secondary (Librarian::build_item<Secondary> (al, "secondary_domain")),
+    r_pore_min (al.number ("r_pore_min")),
+    primary_sorption_fraction (NAN),
     hor_heat (al.submodel ("HorHeat"))
 { }
 
@@ -161,6 +164,7 @@ Horizon::Implementation::Implementation (const Frame& al)
     dimensions (get_dimensions (al.submodel_sequence ("attributes"))),
     nitrification (Nitrification::create_default ()),
     secondary (Secondary::create_none ()),
+    r_pore_min (al.number ("r_pore_min")),
     primary_sorption_fraction (NAN),
     hor_heat (al.submodel ("HorHeat"))
 { }
@@ -366,14 +370,29 @@ Horizon::initialize_base (bool top_soil,
     {
       const double h_sat = 0.0;
       const double Theta_sat = hydraulic->Theta (h_sat);
+
+      // Integrate h over Theta.
+      PLF h_int;
+      const double h_min = Hydraulic::r2h (impl->r_pore_min);
+      const double Theta_min =hydraulic->Theta (h_min);
+      h_int.add (Theta_min, 0.0);
+      static const int intervals = 100;
+      double delta = (Theta_sat - Theta_min) / (intervals + 0.0);
+      double sum = 0.0;
+      for (double Theta = Theta_min + delta; Theta < Theta_sat; Theta += delta)
+        {
+          double my_h = hydraulic->h (Theta);
+          sum += my_h * delta;
+          h_int.add (Theta, sum);
+        }
+
       const double h_wp = -15000.0;
       const double Theta_wp = hydraulic->Theta (h_wp);
       const double Theta_lim =  hydraulic->Theta (h_lim);
       tmp << "A saturated secondary domain contain " 
           << 100.0 * (Theta_sat - Theta_lim) / (Theta_sat - Theta_wp)
           << " % of plant available water\n";
-      impl->primary_sorption_fraction = hydraulic->h_int (Theta_lim) 
-        / hydraulic->h_int (Theta_sat);
+      impl->primary_sorption_fraction = h_int (Theta_lim) / h_int (Theta_sat);
       tmp << "Primary domain contains "
           << 100.0 * impl->primary_sorption_fraction
           << " % of the available sorption sites\n";
@@ -520,6 +539,9 @@ this horizon.");
 List of additional attributes for this horizon.\n\
 Intended for use with pedotransfer functions.", load_attributes);
     frame.set_empty ("attributes");
+    frame.declare ("r_pore_min", "um", Attribute::Const, "\
+Smallest pores in the soil.");
+    frame.set ("r_pore_min", 0.1);
   }
 } Horizon_init;
 
