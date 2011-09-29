@@ -157,7 +157,7 @@
   (scope name D1-BB-Rsqr)
   (run OptD1))
 
-(run SolveM19BB)
+(run SolveD1BB)
 
 ;; setup-r2.dai ends here.
 

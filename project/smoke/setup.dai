@@ -440,18 +440,18 @@
 (defprogram D1 Drain
   (col "d1")
 
-  ;; Solution, D1, Br
-  (S_lim -14990.2 [cm])
-  (A_lim -371.453 [cm])
-  (B_lim -268.55 [cm])
-  (S_alpha 4.06328e-15 [h^-1])
-  (X_alpha 4.07497e-05 [h^-1])
+  ;; Solution, D1, Br, R^2 = 0.999408
+  (S_lim -5.377046e+13 [cm])
+  (A_lim -429.103 [cm])
+  (B_lim -444.339 [cm])
+  (S_alpha 0.013531 [h^-1])
+  (X_alpha 1.22115e-05 [h^-1])
 
-  ;; Solution, D1, BB, R^2 = 0.167
-  (BB_K_clay 1.90211 [cm^3/g])
+  ;; Solution, D1, BB, R^2 = 0.967296
+  (BB_K_clay 5.13366 [cm^3/g])
   (pore_min 1 [um])
-  (BB_apply 3.91871e+06 [g/ha])
-  (BB_k_sorp 0.00292115 [h^-1])
+  (BB_apply 4.68095e+06 [g/ha])
+  (BB_k_sorp 0.914811 [h^-1])
 
   (output &old 
           ("BB Profile"  (summary D1-BB-Rsqr))
@@ -630,7 +630,7 @@
   (run ;;UCD MCD DCD
        ;;(U4)
        ;;(M19)
-       ;; (D1)
+       (D1)
        ))
 
 (defgnuplot plots multi
@@ -646,9 +646,9 @@
   (pore_min 1.0 [um])
   
   (graph ;;plotPres 
-         (plotall (cdc ucd) (col u4)) 
-         (plotall (cdc mcd) (col m19))
-         ;;(plotall (cdc dcd) (col d1))
+         ;; (plotall (cdc ucd) (col u4)) 
+         ;; (plotall (cdc mcd) (col m19))
+         (plotall (cdc dcd) (col d1))
          )
 )
 
