@@ -285,7 +285,8 @@
   ;;(S_K 0.00116454 [cm/h])
   (PP_K 0.410693 [cm/h])
   (BB_decomp 0 [h^-1])
-  (PE -45 [cm])
+  ;; (PE -45 [cm])
+  (PE -30 [cm])
   (BB_apply 17.68e6 [g/ha])
   (BB_k_sorp 0.05 [h^-1])
 
@@ -354,14 +355,27 @@
 (defprogram U4 Without
   (col "u4")
 
-  ;; Solution, U4, Br
+  ;; Solution, U4, Br, h_end = -45
+  ;; (S_lim -9325.09 [cm])
+  ;; (A_lim -1202.38 [cm])
+  ;; (B_lim -338.895 [cm])
+  ;; (S_alpha 1.44872e-11 [h^-1])
+  ;; (X_alpha 8.33685e-05 [h^-1])
+
+  ;; Solution, U4, BB, R^2 = 0.991
+  ;; (BB_K_clay 7.18551 [cm^3/g])
+  ;; (pore_min 0.1 [um])
+  ;; (BB_apply 9.09419e+06 [g/ha])
+  ;; (BB_k_sorp 0.244831 [h^-1])
+
+  ;; Solution, U4, Br, R^2 = 0.991763, h_end = -30
   (S_lim -9325.09 [cm])
   (A_lim -1202.38 [cm])
   (B_lim -338.895 [cm])
   (S_alpha 1.44872e-11 [h^-1])
   (X_alpha 8.33685e-05 [h^-1])
 
-  ;; Solution, U4, BB, R^2 = 0.991
+  ;; Solution, U4, BB, R^2 = 0.953404, h_end = -30
   (BB_K_clay 7.18551 [cm^3/g])
   (pore_min 0.1 [um])
   (BB_apply 9.09419e+06 [g/ha])
@@ -397,17 +411,29 @@
 (defprogram M19 Macro
   (col "m19")
 
-  ;; Solution, M19, Br, R² = -0.999541
-  (S_lim -13775.2 [cm])
-  (A_lim -545.848 [cm])
-  (B_lim -272.606 [cm])
-  (S_alpha 2.27626e-13 [h^-1])
-  (X_alpha 1.77238e-05 [h^-1])
-
+  ;; Solution, M19, Br, R² = -0.999541, h_end = -30
+  ;; (S_lim -13775.2 [cm])
+  ;; (A_lim -545.848 [cm])
+  ;; (B_lim -272.606 [cm])
+  ;; (S_alpha 2.27626e-13 [h^-1])
+  ;; (X_alpha 1.77238e-05 [h^-1])
   ;;  Solution, M19, BB, R² = 0.971
-  (BB_K_clay 1.44327 [cm^3/g])
-  (pore_min 0.987659 [um])
-  (BB_apply 6.97091e+06 [g/ha])
+  ;; (BB_K_clay 1.44327 [cm^3/g])
+  ;; (pore_min 0.987659 [um])
+  ;; (BB_apply 6.97091e+06 [g/ha])
+  ;; (BB_k_sorp 1 [h^-1])
+
+  ;; Solution, M19, Br, R² = -0.999541, h_end = -30
+  (S_lim -13217.7 [cm])
+  (A_lim -625.25 [cm])
+  (B_lim -287.067 [cm])
+  (S_alpha 3.48131e-13 [h^-1])
+  (X_alpha 1.96537e-05 [h^-1])
+
+  ;;  Solution, M19, BB, R² = 0.86234, h_end = -30
+  (BB_K_clay 1.33798 [cm^3/g])
+  (pore_min 0.999955 [um])
+  (BB_apply 6.9373e+06 [g/ha])
   (BB_k_sorp 1 [h^-1])
 
   (output &old 
@@ -440,18 +466,31 @@
 (defprogram D1 Drain
   (col "d1")
 
-  ;; Solution, D1, Br, R^2 = 0.999408
-  (S_lim -5.377046e+13 [cm])
-  (A_lim -429.103 [cm])
-  (B_lim -444.339 [cm])
-  (S_alpha 0.013531 [h^-1])
-  (X_alpha 1.22115e-05 [h^-1])
+  ;; Solution, D1, Br, R^2 = 0.999408, h_end = -45
+  ;; (S_lim -5.377046e+13 [cm])
+  ;; (A_lim -429.103 [cm])
+  ;; (B_lim -444.339 [cm])
+  ;; (S_alpha 0.013531 [h^-1])
+  ;; (X_alpha 1.22115e-05 [h^-1])
 
-  ;; Solution, D1, BB, R^2 = 0.967296
-  (BB_K_clay 5.13366 [cm^3/g])
-  (pore_min 1 [um])
-  (BB_apply 4.68095e+06 [g/ha])
-  (BB_k_sorp 0.914811 [h^-1])
+  ;; Solution, D1, BB, R^2 = 0.967296, h_end = -45
+  ;; (BB_K_clay 5.13366 [cm^3/g])
+  ;; (pore_min 1 [um])
+  ;; (BB_apply 4.68095e+06 [g/ha])
+  ;; (BB_k_sorp 0.914811 [h^-1])
+
+  ;; Solution, D1, Br, R^2 = 0.99937, h_end = -30
+  (S_lim -5.377046e+13 [cm])
+  (A_lim -499.744 [cm])
+  (B_lim -472.721 [cm])
+  (S_alpha 0.00903673 [h^-1])
+  (X_alpha 1.61126e-05 [h^-1])
+
+  ;; Solution, D1, BB, R^2 = 0.863035, h_end = -30
+  (BB_K_clay 4.4599 [cm^3/g])
+  (pore_min 0.898568 [um])
+  (BB_apply 5.35064e+06 [g/ha])
+  (BB_k_sorp 0.999441 [h^-1])
 
   (output &old 
           ("BB Profile"  (summary D1-BB-Rsqr))
@@ -475,7 +514,7 @@
 (defgnuplot plotBr xy
   (declare chemical String "Chemical to plot.")
   (chemical "Bromide")
-  (where "fig/${col}-${chemical}.pdf")
+  (where "${ext}/${col}-${chemical}.${ext}")
   (xmax 2000 [PPM])
   (legend se)
   (source (profile (when 2010 12 13)
@@ -539,7 +578,7 @@
           (line (points (0 -40) (10000 -40)))))
 
 (defgnuplot rain time
-  (where "fig/rain.pdf")
+  (where "${ext}/rain.${ext}")
   (source (arithmetic (expr (convert "Precip" [mm/h]))
                       (with lines)
                       (title "")
@@ -592,14 +631,13 @@
   (graph plotBr 
          plotBB rain 
          (K (FROM -50 [hPa]) (TO 0 [hPa]) 
-            (where "fig/${col}-conductivity.pdf"))
+            (where "${ext}/${col}-conductivity.${ext}"))
          (K (FROM -80 [hPa]) (TO -20 [hPa])
-            (where "fig/${col}-conductivity_2.pdf")))
+            (where "${ext}/${col}-conductivity_2.${ext}")))
 )
 
 (defgnuplot plotPres xy
-  (where "emf/Pres.emf")
-  (device "emf")
+  (where "${ext}/Pres.${ext}")
   (xmax    0.0 [hPa])
   (xmin -150.0 [hPa])
   ;; (legend se)
@@ -627,13 +665,15 @@
 
 
 (defprogram sims batch
-  (run ;;UCD MCD DCD
-       ;;(U4)
-       ;;(M19)
+  (run UCD MCD DCD
+       (U4)
+       (M19)
        (D1)
        ))
 
 (defgnuplot plots multi
+
+  (declare ext String "File extension to generate.")
 
   ;; Does not matter.
   (declare A_lim Number [cm] "")
@@ -645,9 +685,11 @@
   (X_alpha 1.0 [h^-1])
   (pore_min 1.0 [um])
   
-  (graph ;;plotPres 
-         ;; (plotall (cdc ucd) (col u4)) 
-         ;; (plotall (cdc mcd) (col m19))
+  (ext "pdf")
+  ;; (ext "emf")
+  (graph plotPres 
+         (plotall (cdc ucd) (col u4)) 
+         (plotall (cdc mcd) (col m19))
          (plotall (cdc dcd) (col d1))
          )
 )

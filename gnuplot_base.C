@@ -107,6 +107,8 @@ GnuplotBase::file2device (const symbol file_s)
    return "postscript eps color";
  if (ext == "pdf")
    return "pdf";
+ if (ext == "emf")
+   return "emf";
  return "unknown";
 }
 
@@ -138,6 +140,7 @@ The format is determined from the file name extension:\n\
   *.tex: LaTeX code with PostScript specials.\n\
   *.eps: Encapsulated PostScript.\n\
   *.pdf: Adobe PDF files.\n\
+  *.emf: Enhanced Metafile.\n\
 \n\
 The special name 'screen' indicate that the data should be shown on\n\
 the screen instead of being stored in a file.");

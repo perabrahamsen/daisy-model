@@ -302,11 +302,11 @@ WSourceTable::source_tick (Treelog& msg)
   if (!ok)
     return;
 
-  timestep_begin = timestep_end;
   values = next_values;
+  timestep_begin = timestep_end; // Ensure we enter the loop.
   while (timestep_end <= timestep_begin)
     {
-      read_line ();
+      read_line ();             // Overwrites timestep_end.
       if (!ok)
         return;
     }
