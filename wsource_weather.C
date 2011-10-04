@@ -753,8 +753,8 @@ WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
       const std::deque<double> missing (data_size, NAN);
       const number_map_t::const_iterator eAvg 
         = numbers.find (Weatherdata::AirTemp ());
-      daisy_assert (eAvg != numbers.end ());
-      const std::deque<double>& values_avg = eAvg->second;
+      const std::deque<double>& values_avg = (eAvg != numbers.end ())
+        ? eAvg->second : missing;
       daisy_assert (values_avg.size () == data_size);
       const number_map_t::const_iterator eMin 
         = numbers.find (Weatherdata::T_min ());
