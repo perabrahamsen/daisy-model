@@ -517,6 +517,10 @@
   (where "${ext}/${col}-${chemical}.${ext}")
   (xmax 2000 [PPM])
   (legend se)
+  ;;(canvas "256,192")
+  (canvas "400,300")
+  ;;(canvas "512,384")
+  ;;(canvas "1024,768")
   (source (profile (when 2010 12 13)
                    (title "Sim")
                    (style 1)
@@ -530,13 +534,13 @@
                    (to -130 [cm])
                    (file "log/${col}-smoke-${chemical}-profile.dlf"))
           (arithmetic (file "${chemical}.ddf")
-                      (style 2)
+                      (style 5)
                       (title "Obs")
                       (y Middle)
                       (x "${col}"))
           (profile (when 2010 12 13)
                    (title "CD")
-                   (style 5)
+                   (style 2)
                    (with lines)
                    (to -130 [cm])
                    (file "log/${cdc}-content_${chemical}.dlf"))
@@ -561,13 +565,13 @@
                    (to -130 [cm])
                    (file "log/${col}-smoke-${chemical}-profile.dlf"))
           (arithmetic (file "${chemical}.ddf")
-                      (style 2)
+                      (style 5)
                       (title "Obs")
                       (y Middle)
                       (x "${col}"))
           (profile (when 2010 12 13)
                    (title "CD")
-                   (style 5)
+                   (style 2)
                    (with lines)
                    (to -130 [cm])
                    (file "log/${cdc}-content_${chemical}.dlf"))
@@ -685,8 +689,8 @@
   (X_alpha 1.0 [h^-1])
   (pore_min 1.0 [um])
   
-  (ext "pdf")
-  ;; (ext "emf")
+  ;;(ext "pdf")
+  (ext "emf")
   (graph plotPres 
          (plotall (cdc ucd) (col u4)) 
          (plotall (cdc mcd) (col m19))
@@ -698,7 +702,7 @@
   (run (gnuplot (graph plots))))
 
 (defprogram both batch
-  (run sims
+  (run ;;sims
        plot))
 
 ;; setup.dai ends here.

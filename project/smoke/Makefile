@@ -34,11 +34,11 @@ lims.pdf: lims.tex .gnuplot-stamp
 	-gnuplot daisy.gnuplot
 	@touch .gnuplot-stamp
 
-daisy.gnuplot: $(SETUP) $(DATA) $(DAISY) fig log
+daisy.gnuplot: $(SETUP) $(DATA) $(DAISY) pdf log
 	nice $(DAISY) setup-pa.dai
 
-fig:
-	mkdir fig
+pdf:
+	mkdir pdf
 
 log:
 	mkdir log
