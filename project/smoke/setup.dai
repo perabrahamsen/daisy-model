@@ -669,10 +669,10 @@
 
 
 (defprogram sims batch
-  (run UCD MCD DCD
+  (run ;;UCD MCD DCD
        (U4)
-       (M19)
-       (D1)
+       ;;(M19)
+       ;;(D1)
        ))
 
 (defgnuplot plots multi
@@ -702,7 +702,8 @@
   (run (gnuplot (graph plots))))
 
 (defprogram both batch
-  (run ;;sims
-       plot))
+  (run sims
+       ;;plot
+       ))
 
 ;; setup.dai ends here.
