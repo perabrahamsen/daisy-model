@@ -17,6 +17,10 @@
 
 ;;; Brilliant Blue
 
+(defchemical BBx common
+  (adsorption linear
+              (K_clay $BB_K_clay)))
+
 (defchemical BB-base common
   "Base parameterization for all Brilliant Blue forms."
   (decompose_rate $BB_decomp)

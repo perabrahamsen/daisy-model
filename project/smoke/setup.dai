@@ -486,11 +486,11 @@
   (S_alpha 0.00903673 [h^-1])
   (X_alpha 1.61126e-05 [h^-1])
 
-  ;; Solution, D1, BB, R^2 = 0.863035, h_end = -30
-  (BB_K_clay 4.4599 [cm^3/g])
-  (pore_min 0.898568 [um])
-  (BB_apply 5.35064e+06 [g/ha])
-  (BB_k_sorp 0.999441 [h^-1])
+  ;; Solution, D1, BB, R^2 = 0.98285, h_end = -30
+  (BB_K_clay 4.87589 [cm^3/g])
+  (pore_min 1 [um])
+  (BB_apply 4.60203e+06 [g/ha])
+  (BB_k_sorp 1 [h^-1])
 
   (output &old 
           ("BB Profile"  (summary D1-BB-Rsqr))
@@ -517,10 +517,7 @@
   (where "${ext}/${col}-${chemical}.${ext}")
   (xmax 2000 [PPM])
   (legend se)
-  ;;(canvas "256,192")
-  (canvas "400,300")
-  ;;(canvas "512,384")
-  ;;(canvas "1024,768")
+  ;;(canvas "400,300")
   (source (profile (when 2010 12 13)
                    (title "Sim")
                    (style 1)
@@ -670,9 +667,9 @@
 
 (defprogram sims batch
   (run ;;UCD MCD DCD
-       (U4)
+       ;; (U4)
        ;;(M19)
-       ;;(D1)
+       (D1)
        ))
 
 (defgnuplot plots multi
@@ -689,8 +686,8 @@
   (X_alpha 1.0 [h^-1])
   (pore_min 1.0 [um])
   
-  ;;(ext "pdf")
-  (ext "emf")
+  (ext "pdf")
+  ;;(ext "emf")
   (graph plotPres 
          (plotall (cdc ucd) (col u4)) 
          (plotall (cdc mcd) (col m19))
@@ -703,7 +700,7 @@
 
 (defprogram both batch
   (run sims
-       ;;plot
+       plot
        ))
 
 ;; setup.dai ends here.
