@@ -55,22 +55,6 @@ Solved.
 (BB_apply 4.42884e+06 [g/ha])
 (BB_k_sorp 1 [h^-1])
 
-** Skriv resultatafsnit
-
-** Skriv noget om Bromid og MARKDRÆN resultat
-
-** Læs projektbeskrivelse
-
-** Valg af pesticider?
-
-** Plan for sensitivitetanalyse
-
-*** Del 1, bromid og BB parametre
-
-*** Del 2, på vores valgte pesticider.
-
-* dokumenter nye faciliteter
-
 ** Ny jord plus pore_min = 0.4 um
 
 *** U4
@@ -109,7 +93,55 @@ Solved.
 (BB_k_sorp 1 [h^-1])
 Program finished after 39 minutes and 10 seconds.
 
-** Ny jord plus pore_min = 0.4 um, k_sorb = inf
+** Ny jord plus pore_min = 0.5 um, k_sorb = inf
+
+*** U4
+
+(2.57378 7.68418e+06) = -0.64257
+
+1: Sorting.
+Solved.
+(BB_K_clay 2.57378 [cm^3/g])
+(BB_apply 7.68418e+06 [g/ha])
+Program finished after 18 minutes and 17 seconds.
+
+*** M19
+
+5: Compute contraction point.
+(1.95379 7.27255e+06) = -0.85667
+Contracted point better than worst, replace it.
+
+1: Sorting.
+Solved.
+(BB_K_clay 1.95379 [cm^3/g])
+(BB_apply 7.27255e+06 [g/ha])
+Program finished after 19 minutes and 8 seconds.
+
+*** D1
+
+(5.93046 4.61785e+06) = -0.982031
+
+1: Sorting.
+Solved.
+(BB_K_clay 5.93046 [cm^3/g])
+(BB_apply 4.61785e+06 [g/ha])
+Program finished after 18 minutes and 1 second.
+
+** Skriv resultatafsnit
+
+** Skriv noget om Bromid og MARKDRÆN resultat
+
+** Læs projektbeskrivelse
+
+** Valg af pesticider?
+
+** Plan for sensitivitetanalyse
+
+*** Del 1, bromid og BB parametre
+
+*** Del 2, på vores valgte pesticider.
+
+* dokumenter nye faciliteter
 
 ** pore_min
 
