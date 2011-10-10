@@ -127,6 +127,40 @@ Solved.
 (BB_apply 4.61785e+06 [g/ha])
 Program finished after 18 minutes and 1 second.
 
+** Ny jord plus pore_min = 0.5 um, k_sorb = 0.25 h^-1
+
+*** U4
+
+3: Compute reflection point.
+(2.9091 8.09566e+06) = -0.813148
+Reflected point better than second worst, replace worst.
+1: Sorting.
+Solved.
+(BB_K_clay 2.9091 [cm^3/g])
+(BB_apply 8.09566e+06 [g/ha])
+Program finished after 18 minutes and 56 seconds.
+
+*** M19
+
+5: Compute contraction point.
+(1.93633 7.61139e+06) = -0.815737
+Contracted point better than worst, replace it.
+1: Sorting.
+Solved.
+(BB_K_clay 1.93633 [cm^3/g])
+(BB_apply 7.61139e+06 [g/ha])
+
+*** D1
+
+3: Compute reflection point.
+(6.28656 4.40821e+06) = -0.880144
+Reflected point better than second worst, replace worst.
+1: Sorting.
+Solved.
+(BB_K_clay 6.28656 [cm^3/g])
+(BB_apply 4.40821e+06 [g/ha])
+Program finished after 18 minutes and 55 seconds.
+
 ** Skriv resultatafsnit
 
 ** Skriv noget om Bromid og MARKDRÆN resultat
