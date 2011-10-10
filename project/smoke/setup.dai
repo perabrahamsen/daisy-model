@@ -517,7 +517,7 @@
   (where "${ext}/${col}-${chemical}.${ext}")
   (xmax 2000 [PPM])
   (legend se)
-  ;;(canvas "400,300")
+  (canvas "400,300")
   (source (profile (when 2010 12 13)
                    (title "Sim")
                    (style 1)
@@ -686,8 +686,8 @@
   (X_alpha 1.0 [h^-1])
   (pore_min 1.0 [um])
   
-  (ext "pdf")
-  ;;(ext "emf")
+  ;;(ext "pdf")
+  (ext "emf")
   (graph plotPres 
          (plotall (cdc ucd) (col u4)) 
          (plotall (cdc mcd) (col m19))
@@ -699,7 +699,7 @@
   (run (gnuplot (graph plots))))
 
 (defprogram both batch
-  (run sims
+  (run ;;sims
        plot
        ))
 

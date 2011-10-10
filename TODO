@@ -71,6 +71,46 @@ Solved.
 
 * dokumenter nye faciliteter
 
+** Ny jord plus pore_min = 0.4 um
+
+*** U4
+
+5: Compute contraction point.
+(2.70952 9.05019e+06 0.0297858) = -0.935083
+Contracted point better than worst, replace it.
+
+1: Sorting.
+Solved.
+(BB_K_clay 2.70952 [cm^3/g])
+(BB_apply 9.05019e+06 [g/ha])
+(BB_k_sorp 0.0297858 [h^-1])
+
+*** M19 
+
+4: Compute expanded point.
+(1.93996 7.40474e+06 1) = -0.843943
+Expanded point best, replacing worst point.
+1: Sorting.
+Solved.
+(BB_K_clay 1.93996 [cm^3/g])
+(BB_apply 7.40474e+06 [g/ha])
+(BB_k_sorp 1 [h^-1])
+Program finished after 48 minutes and 9 seconds.
+
+*** D1
+
+5: Compute contraction point.
+(5.96907 4.53593e+06 1) = -0.948475
+Contracted point better than worst, replace it.
+1: Sorting.
+Solved.
+(BB_K_clay 5.96907 [cm^3/g])
+(BB_apply 4.53593e+06 [g/ha])
+(BB_k_sorp 1 [h^-1])
+Program finished after 39 minutes and 10 seconds.
+
+** Ny jord plus pore_min = 0.4 um, k_sorb = inf
+
 ** pore_min
 
 * Smoke senere
