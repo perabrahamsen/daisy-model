@@ -55,7 +55,7 @@ Solved.
 (BB_apply 4.42884e+06 [g/ha])
 (BB_k_sorp 1 [h^-1])
 
-** Ny jord plus pore_min = 0.4 um
+** Ny jord plus pore_min = 0.5 um
 
 *** U4
 
@@ -160,6 +160,15 @@ Solved.
 (BB_K_clay 6.28656 [cm^3/g])
 (BB_apply 4.40821e+06 [g/ha])
 Program finished after 18 minutes and 55 seconds.
+
+** BB all
+
+(4.39714 8.65295e+06 2.89386 8.29425e+06 7.62572 4.57861e+06 0.195046 1) = -0.85732
+
+R^2 = 0.882116
+R^2 = 0.804912
+R^2 = 0.772664
+
 
 ** Skriv resultatafsnit
 
