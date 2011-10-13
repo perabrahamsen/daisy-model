@@ -163,11 +163,28 @@ Program finished after 18 minutes and 55 seconds.
 
 ** BB all
 
-(4.39714 8.65295e+06 2.89386 8.29425e+06 7.62572 4.57861e+06 0.195046 1) = -0.85732
+4: Compute expanded point.
+(4.39689 8.65225e+06 2.89191 8.26508e+06 7.64964 4.58142e+06 0.195542 1) = -0.857337
+Expanded point best, replacing worst point.
+1: Sorting.
+Solved.
+(U4_BB_K_clay 4.39689 [cm^3/g])
+(U4_BB_apply 8.65225e+06 [g/ha])
+(M19_BB_K_clay 2.89191 [cm^3/g])
+(M19_BB_apply 8.26508e+06 [g/ha])
+(D1_BB_K_clay 7.64964 [cm^3/g])
+(D1_BB_apply 4.58142e+06 [g/ha])
+(pore_min 0.195542 [um])
+(BB_k_sorp 1 [h^-1])
+
 
 R^2 = 0.882116
 R^2 = 0.804912
 R^2 = 0.772664
+
+R^2 = 0.881712
+R^2 = 0.805063
+R^2 = 0.773488
 
 
 ** Skriv resultatafsnit
