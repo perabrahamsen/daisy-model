@@ -1,205 +1,54 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Få test.dai til at virke med pipe drainage.
+
 * Smoke 
 
-** Ny jord
+** Sammenlign h_end
 
-*** U4 
+3 værdier for hver søjle, plus en graf der sammenligner starttryk
 
-1: Sorting.
-2: Find center of gravity of all but worst.
-(5.68088 0.100359 9.3053e+06 0.485474)
-3: Compute reflection point.
-(5.68088 0.100359 9.3053e+06 0.485475) = -0.956294
-Reflected point better than second worst, replace worst.
-1: Sorting.
-Solved.
-(BB_K_clay 5.68088 [cm^3/g])
-(pore_min 0.100359 [um])
-(BB_apply 9.3053e+06 [g/ha])
-(BB_k_sorp 0.485474 [h^-1])
-Program finished after 1 hour, 23 minutes and 22 seconds.
+** Pesticid
 
-*** M19
+*** udgangspunkt
 
-1: Sorting.
-2: Find center of gravity of all but worst.
-(1.30493 1 6.95536e+06 0.992153)
-3: Compute reflection point.
-(1.30493 1 6.95536e+06 0.992153) = -0.854536
-Reflection point is the best so far.
-4: Compute expanded point.
-(1.30493 1 6.95537e+06 0.992153) = -0.854536
-Expanded point best, replacing worst point.
+Vi tager udgangspunkt i MST-MARKDRÆN opsætning, med ioxynil og
+pendimethvidkål, og 2D.
 
-1: Sorting.
-Solved.
-(BB_K_clay 1.30493 [cm^3/g])
-(pore_min 1 [um])
-(BB_apply 6.95537e+06 [g/ha])
-(BB_k_sorp 0.992153 [h^-1])
+Vi tager nyt sekundært domæne fra bromid.
 
-*** D1
+Vi tager normalbioporer fra røgprojekt.
 
-1: Sorting.
-2: Find center of gravity of all but worst.
-(4.5887 0.995377 4.42884e+06 1)
-3: Compute reflection point.
-(4.5887 0.995377 4.42884e+06 1) = -0.993485
-Reflected point better than second worst, replace worst.
+Vi logger ved dræn, 100 cm, og 150 cm, fra udbringning til første
+drænsæson (1/4?).
 
-1: Sorting.
-Solved.
-(BB_K_clay 4.5887 [cm^3/g])
-(pore_min 0.995377 [um])
-(BB_apply 4.42884e+06 [g/ha])
-(BB_k_sorp 1 [h^-1])
+Timeværdier.
 
-** Ny jord plus pore_min = 0.5 um
+h_end = -30 cm
 
-*** U4
+MST overfladelag
 
-5: Compute contraction point.
-(2.70952 9.05019e+06 0.0297858) = -0.935083
-Contracted point better than worst, replace it.
+MST pløjesål
 
-1: Sorting.
-Solved.
-(BB_K_clay 2.70952 [cm^3/g])
-(BB_apply 9.05019e+06 [g/ha])
-(BB_k_sorp 0.0297858 [h^-1])
+*** Forsøg 1.
 
-*** M19 
+Sammenlign bioporer optalt for S4, middel, og lav
 
-4: Compute expanded point.
-(1.93996 7.40474e+06 1) = -0.843943
-Expanded point best, replacing worst point.
-1: Sorting.
-Solved.
-(BB_K_clay 1.93996 [cm^3/g])
-(BB_apply 7.40474e+06 [g/ha])
-(BB_k_sorp 1 [h^-1])
-Program finished after 48 minutes and 9 seconds.
+*** Forsøg 2.
 
-*** D1
+Sammenlign døgnværdier og timeværdier (ref).
 
-5: Compute contraction point.
-(5.96907 4.53593e+06 1) = -0.948475
-Contracted point better than worst, replace it.
-1: Sorting.
-Solved.
-(BB_K_clay 5.96907 [cm^3/g])
-(BB_apply 4.53593e+06 [g/ha])
-(BB_k_sorp 1 [h^-1])
-Program finished after 39 minutes and 10 seconds.
+*** Forsøg 3.
 
-** Ny jord plus pore_min = 0.5 um, k_sorb = inf
+Sammenlign overfladelag: Normal vs Omar vs MST (ref)
 
-*** U4
+*** Forsøg 4
 
-(2.57378 7.68418e+06) = -0.64257
+Sammnlign pløjesål: Ingen, vs MST (ref), vs CPE
 
-1: Sorting.
-Solved.
-(BB_K_clay 2.57378 [cm^3/g])
-(BB_apply 7.68418e+06 [g/ha])
-Program finished after 18 minutes and 17 seconds.
+*** Forsøg 5
 
-*** M19
-
-5: Compute contraction point.
-(1.95379 7.27255e+06) = -0.85667
-Contracted point better than worst, replace it.
-
-1: Sorting.
-Solved.
-(BB_K_clay 1.95379 [cm^3/g])
-(BB_apply 7.27255e+06 [g/ha])
-Program finished after 19 minutes and 8 seconds.
-
-*** D1
-
-(5.93046 4.61785e+06) = -0.982031
-
-1: Sorting.
-Solved.
-(BB_K_clay 5.93046 [cm^3/g])
-(BB_apply 4.61785e+06 [g/ha])
-Program finished after 18 minutes and 1 second.
-
-** Ny jord plus pore_min = 0.5 um, k_sorb = 0.25 h^-1
-
-*** U4
-
-3: Compute reflection point.
-(2.9091 8.09566e+06) = -0.813148
-Reflected point better than second worst, replace worst.
-1: Sorting.
-Solved.
-(BB_K_clay 2.9091 [cm^3/g])
-(BB_apply 8.09566e+06 [g/ha])
-Program finished after 18 minutes and 56 seconds.
-
-*** M19
-
-5: Compute contraction point.
-(1.93633 7.61139e+06) = -0.815737
-Contracted point better than worst, replace it.
-1: Sorting.
-Solved.
-(BB_K_clay 1.93633 [cm^3/g])
-(BB_apply 7.61139e+06 [g/ha])
-
-*** D1
-
-3: Compute reflection point.
-(6.28656 4.40821e+06) = -0.880144
-Reflected point better than second worst, replace worst.
-1: Sorting.
-Solved.
-(BB_K_clay 6.28656 [cm^3/g])
-(BB_apply 4.40821e+06 [g/ha])
-Program finished after 18 minutes and 55 seconds.
-
-** BB all
-
-4: Compute expanded point.
-(4.39689 8.65225e+06 2.89191 8.26508e+06 7.64964 4.58142e+06 0.195542 1) = -0.857337
-Expanded point best, replacing worst point.
-1: Sorting.
-Solved.
-(U4_BB_K_clay 4.39689 [cm^3/g])
-(U4_BB_apply 8.65225e+06 [g/ha])
-(M19_BB_K_clay 2.89191 [cm^3/g])
-(M19_BB_apply 8.26508e+06 [g/ha])
-(D1_BB_K_clay 7.64964 [cm^3/g])
-(D1_BB_apply 4.58142e+06 [g/ha])
-(pore_min 0.195542 [um])
-(BB_k_sorp 1 [h^-1])
-
-
-R^2 = 0.882116
-R^2 = 0.804912
-R^2 = 0.772664
-
-R^2 = 0.881712
-R^2 = 0.805063
-R^2 = 0.773488
-
-
-** Skriv resultatafsnit
-
-** Skriv noget om Bromid og MARKDRÆN resultat
-
-** Læs projektbeskrivelse
-
-** Valg af pesticider?
-
-** Plan for sensitivitetanalyse
-
-*** Del 1, bromid og BB parametre
-
-*** Del 2, på vores valgte pesticider.
+Sammenlign ref, uden bioporer, uden 2d, uden begge
 
 * dokumenter nye faciliteter
 

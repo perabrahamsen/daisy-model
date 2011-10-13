@@ -389,6 +389,14 @@
   (column UCD)
   (log_prefix "log/ucd-"))
 
+(defprogram U4-45 U4
+  (PE -45 [cm])
+  (log_prefix "log/u4-45-"))
+
+(defprogram U4-60 U4
+  (PE -60 [cm])
+  (log_prefix "log/u4-60-"))
+
 (defprogram Macro Smoke
   (column Macro))
 
@@ -444,6 +452,15 @@
 (defprogram MCD M19
   (column MCD)
   (log_prefix "log/mcd-"))
+
+
+(defprogram M19-45 M19
+  (PE -45 [cm])
+  (log_prefix "log/m19-45-"))
+
+(defprogram M19-60 M19
+  (PE -60 [cm])
+  (log_prefix "log/m19-60-"))
 
 (defprogram Drain Smoke
   (column Drain))
@@ -501,9 +518,43 @@
   (column DCD)
   (log_prefix "log/dcd-"))
 
+(defprogram D1-45 D1
+  (PE -45 [cm])
+  (log_prefix "log/d1-45-"))
 
+(defprogram D1-60 D1
+  (PE -60 [cm])
+  (log_prefix "log/d1-60-"))
 
 ;; Plot
+
+(defgnuplot plotEnd xy
+  (declare col String "column to plot.")
+  (declare chemical String "Chemical to plot.")
+  (chemical "Bromide")
+  (where "${ext}/${col}-${chemical}-end.${ext}")
+  (xmax 2000 [PPM])
+  (extra "set xtics 500")
+  (legend se)
+  (canvas "400,300")
+  (source (profile (when 2010 12 13)
+                   (title "-30 cm")
+                   (style 1)
+                   (with lines)
+                   (to -130 [cm])
+                   (file "log/${col}-content_${chemical}.dlf"))
+          (profile (when 2010 12 13)
+                   (title "-45 cm")
+                   (style 2)
+                   (with lines)
+                   (to -130 [cm])
+                   (file "log/${col}-45-content_${chemical}.dlf"))
+          (profile (when 2010 12 13)
+                   (title "-60 cm")
+                   (style 4)
+                   (with lines)
+                   (to -130 [cm])
+                   (file "log/${col}-60-content_${chemical}.dlf"))))
 
 (defxysource line inline 
   (style 0)
@@ -517,6 +568,7 @@
   (chemical "Bromide")
   (where "${ext}/${col}-${chemical}.${ext}")
   (xmax 2000 [PPM])
+  (extra "set xtics 500")
   (legend se)
   (canvas "400,300")
   (source (profile (when 2010 12 13)
@@ -643,22 +695,23 @@
   (xmax    0.0 [hPa])
   (xmin -150.0 [hPa])
   ;; (legend se)
+  (canvas "400,300")
   (source (profile (when 2010 10 26 12)
-                   (title "Uden synlig macropore")
+                   (title "U4")
                    (style 1)
                    (with lines)
                    (to -130 [cm])
                    (dimension [hPa])
                    (file "log/u4-soil_water_potential.dlf"))
           (profile (when 2010 10 26 12)
-                   (title "Macropore uden røg")
+                   (title "M19")
                    (style 2)
                    (with lines)
                    (to -130 [cm])
                    (dimension [hPa])
                    (file "log/m19-soil_water_potential.dlf"))
           (profile (when 2010 10 26 12)
-                   (title "Drænforbunden macropore")
+                   (title "D1")
                    (style 4)
                    (with lines)
                    (to -130 [cm])
@@ -668,9 +721,8 @@
 
 (defprogram sims batch
   (run ;;UCD MCD DCD
-       ;; (U4)
-       ;;(M19)
-       (D1)
+   (U4) (M19) (D1)
+   ;;U4-45 U4-60 M19-45 M19-60 D1-45 D1-60
        ))
 
 (defgnuplot plots multi
@@ -689,7 +741,10 @@
   
   ;;(ext "pdf")
   (ext "emf")
-  (graph plotPres 
+  (graph plotPres
+         (plotEnd (col u4))
+         (plotEnd (col m19))
+         (plotEnd (col d1))
          (plotall (cdc ucd) (col u4)) 
          (plotall (cdc mcd) (col m19))
          (plotall (cdc dcd) (col d1))

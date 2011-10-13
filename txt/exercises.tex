@@ -123,7 +123,7 @@ added or changed as compared to the selected database element (default
 or a previously defined horizon). In the present example the component
 ``horizon'' has a member ``clay'' of type ``number'' and furthermore
 the value 15.5 is assigned to this member.  The square brackets after
-the number (15.5) is used to give the dimension of the number. In the
+the value 15.5 is used to give the dimension of the number. In the
 present example the clay content is given as percent. If the brackets
 are left out, \daisy{} will use a default dimension, which may not be
 what you think.  So don't leave out the dimension.
@@ -157,8 +157,16 @@ The objective of this exercise is to illustrate how to write a
 results.
 
 When writing a \daisy{}-setup-file it is practical first to define
-computational environment and the external library-files, which is
-going to be used by the simulation, as shown in box~\ref{box:header}.
+computational environment. The working folder is by default the folder
+where the \daisy{}-setup-file is stored. However, output files can be routed 
+to a sub-folder by use of of the command \verb|(log_prefix "E1/")| (see below). 
+At installation \Daisy{} stores external library-files in prededined folders, 
+where \Daisy{} by default will search for the information. Box~\ref{box:header}
+shows how external library-files including the weather file are retrived by 
+the model.
+When the \daisy{} code is runnig it writes a log-file (\texttt{daisy.log}), where
+all messages from the simulation, including error messages, is stored in the 
+working folder.
 
 \begin{figure}[!htbp]
   \begin{boxedminipage}{\textwidth}
@@ -173,23 +181,15 @@ going to be used by the simulation, as shown in box~\ref{box:header}.
 
 ;; Weather data
 (weather default "dk-taastrup.dwf")
-
-;; Description that will occur in all output files
-(description "Spring Barley; Soil: Fine sandy loam; Weather: Taastrup")
 \end{verbatim}
   \end{boxedminipage}
 \end{figure}
 
-It is noted that first the working directory is set. The reason is
-that the \daisy{} code writes a log-file (\texttt{daisy.log}), where
-all messages from the simulation, including error messages, is stored.
-Hence if the working directory is set correctly then this log file
-will occur in the selected directory.
 
 The external library-files are written in the same \daisy{}
 input-language as the \daisy{}-setup-file. In fact any information,
 which is supplied by the \daisy{}-setup-file, could be moved to an
-external file, which then could be included by the input file
+external file, which then could be included by a input file
 statement. On the other hand any information supplied by the external
 library-files could also be written directly to the
 \daisy{}-setup-file. The use of external library-files is just a
@@ -361,8 +361,10 @@ condition of the or-statement becomes true when the date is 1$^{st}$
 of September \texttt{(mm\_dd 9 1)}.
 
 Now everything is ready so we can actually begin a simulation. As
-shown in box~\ref{box:activation} we activate a column, a stating date
-and an agricultural management practice.
+shown in box~\ref{box:activation} we activate a column, select a stating 
+date and an ending date, and we select an already defined agricultural 
+management practice.
+
 \begin{figure}[!htbp]
   \begin{boxedminipage}{\textwidth}
     \caption{Activate simulation.}
@@ -371,26 +373,29 @@ and an agricultural management practice.
 ;;  Selecting a previously defined column.
 (column ``Fine sandy loam'')
 
-;; Selecting the of the beginning of the simulation.
+;; Start and end of simulation.
 (time 1993 1 1)
+(stop 1994 1 1)
 
 ;; Selecting the agricultural management and the end of simulation
 (manager activity
    SBarley_management
-   (wait_mm_dd 1 1) 
-   stop)
 \end{verbatim}
   \end{boxedminipage}
 \end{figure}
+
 However, we have not selected any output. This is done with the output
 statement as shown in box~\ref{box:output}. In the present case we
 only make use of predefined output logs that can be found in the
 external library file ``\texttt{log.dai}''.
+
 \begin{figure}[!htbp]
   \begin{boxedminipage}{\textwidth}
     \caption{Select output files.}
     \label{box:output}
 \begin{verbatim}
+;; Description that will occur in all output files
+(description "Spring Barley; Soil: Fine sandy loam; Weather: Taastrup")
 (log_prefix "E1/")
 (output harvest
         "Crop Production"
@@ -411,14 +416,21 @@ external library file ``\texttt{log.dai}''.
 \end{verbatim}
   \end{boxedminipage}
 \end{figure}
+
+First we write a description of the simulation that will appear in 
+all output files. Then we tell the model to store the output files 
+in a sub-folder to the actual working folder. This is done by the 
+command \verb|(log_prefix "E1/")|, which will place all output files in
+the subfolder (\texttt{E1}).  You must create the sub-folder before
+starting the simulation.
 When \texttt{harvest} is selected then the harvested yields are
 written to the output-file ``\texttt{harvest.dlf}''. The extension
 \texttt{.dlf} indicates that the file is written in
 \daisy{}-log-format, which is a format that easily can be opened in a
 spreadsheet. Furthermore it indicates that the output can be inspected
 by use of the \daisy{} output-viewer (\texttt{ShowDaisyOutput.exe}).
-However, the only exception from the latter is the
-\texttt{harvest.dlf}-file; all other output files can be viewed by the
+The only exception from the latter is the \texttt{harvest.dlf}-file; 
+all other output files can be viewed by the
 output-viewer. Furthermore \texttt{"Crop Production"} is selected. In
 this case daily (default) values of variables pertaining to crop
 production is written to ``\texttt{crop\_prod.dlf}''. It is noted that
@@ -429,13 +441,10 @@ frequencies are written to different output-files (the
 where--command). In addition some profile data are selected as
 daily-values.
 
-The command \verb|(log_prefix "E1/")| will place all output files in
-a subfolder (\texttt{E1}) of the current folder.  You must create the
-subfolder before starting the simulation.
-
 Fill in the necessary information in the \daisy{}-setup-file
-\texttt{Exercise01.dai} and run a simulation by dragging and dropping
-the setup-file at the \daisy{} executeable. Inspect the created
+\texttt{Exercise01.dai} and run a simulation either  by activating
+the model within TextPad (go to Tools and select \daisy{}) or by dragging 
+and dropping the setup-file at the \daisy{} executeable. Inspect the created
 output-files by use of the output-viewer and an
 \textsc{excel}-spreadsheet.  Construct a water balance, a mineral
 nitrogen balance, an ammonium balance and a nitrate balance.
@@ -822,10 +831,10 @@ The objective of this exercise is to calibrate the MIT-model
 
 In box~\ref{box:column} organic matter section was introduced. The
 total carbon content of the soil is calculated from the humus
-contentwhich was defined in the horizon section
-(box~\ref{box:horizon}).  The MIT model comproses several organic
-matter pools and the toal carbon content is distributed among these
-pools by the initialization procedure that makes use of anual input of
+content, which was defined in the horizon section
+(box~\ref{box:horizon}).  The MIT model comprises several organic
+matter pools and the total carbon content is distributed among these
+pools by the initialization procedure that makes use of annual input of
 organic carbon.  This, in combination with a warm-up period, will
 often give a reasonable initializatin and hence a reasonable
 N-mineralization.  However this can be fine tuned by introducing the
@@ -844,7 +853,7 @@ decrease (be released) at a rate of 30 kg N/ha/y.
 
 In certain cases the model may not be able to initialize itself, and
 it may be necessary to park some of the soil organic carbon  in an
-inactive pool.  This is done be entreing the following parameter in
+inactive pool.  This is done be entering the following parameter in
 the \texttt{defhorizon} section
 \begin{verbatim}
   (SOM_fractions -1 -1 xxx)
@@ -965,7 +974,7 @@ basis); ammonium content 8.5\% (dry matter basis); and nitrate contend
 mineralization of the mixed slurry approximately can be described by
 splitting the organic matter into two pools and assume first order
 degradation kinetics for the pools. The resistant pool constituted
-79\% of the C with a half-life of 150 days and the more easy
+79\% of the C with a half-life of 150 days and the easier
 decomposable pool constituted 21\% of the C with a half-life of 15
 days. From previous experience it was suggested that the C/N of the
 easy decomposable pool should be around 5.
