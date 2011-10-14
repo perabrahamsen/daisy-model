@@ -1407,17 +1407,17 @@ ChemicalStandard::check (const Units& units, const Scope& scope,
 
   for (size_t i = 0; i < cell_size; i++)
     {
+      const double Theta_primary = soil_water.Theta_primary (i);
+      const double Theta_secondary = soil_water.Theta_secondary (i);
+      const double M = M_total_[i];
+      const double M_secondary = M_secondary_[i];
+      const double M_primary = M_primary_[i];
+      const double C = C_avg_[i];
+      const double C_secondary = C_secondary_[i];
+      const double C_primary = C_primary_[i];
+          
       try 
         {   
-          const double Theta_primary = soil_water.Theta_primary (i);
-          const double Theta_secondary = soil_water.Theta_secondary (i);
-          const double M = M_total_[i];
-          const double M_secondary = M_secondary_[i];
-          const double M_primary = M_primary_[i];
-          const double C = C_avg_[i];
-          const double C_secondary = C_secondary_[i];
-          const double C_primary = C_primary_[i];
-          
           if (Theta_secondary > 0.0 && 
               !approximate (adsorption_->M_to_C2 (soil, Theta_secondary, i, 
                                                   M_secondary),
@@ -1438,9 +1438,9 @@ ChemicalStandard::check (const Units& units, const Scope& scope,
             throw "C_primary does not match M_primary";
           if (!approximate (M_primary, M - M_secondary))
             throw "M_primary should be M - M_secondary"; 
-          if (M_secondary > M)
+          if (M_secondary > M * 1.00001)
             throw "M_secondary > M";
-          if (M_primary > M)
+          if (M_primary > M  * 1.00001)
             throw "M_primary > M";
 
           if (iszero (soil_water.Theta_secondary (i)))
@@ -1471,10 +1471,20 @@ ChemicalStandard::check (const Units& units, const Scope& scope,
         }
       catch (const char *const error)
         {
-          std::stringstream tmp;
-          tmp << objid << "[" << i << "]";
-          Treelog::Open next (msg, tmp.str ());
-          msg.error (error);
+          std::stringstream tmp1;
+          tmp1 << objid << "[" << i << "]";
+          Treelog::Open next (msg, tmp1.str ());
+          std::stringstream tmp2;
+          tmp2 << error;
+          tmp2 << "\nTheta_primary = " << Theta_primary;
+          tmp2 << "\nTheta_secondary = " << Theta_secondary;
+          tmp2 << "\nM = " << M;
+          tmp2 << "\nM_secondary = " << M_secondary;
+          tmp2 << "\nM_primary = " << M_primary;
+          tmp2 << "\nC = " << C;
+          tmp2 << "\nC_secondary = " << C_secondary;
+          tmp2 << "\nC_primary = " << C_primary;
+          msg.error (tmp2.str ());
           ok = false;
         }
     }
