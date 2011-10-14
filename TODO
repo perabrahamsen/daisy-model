@@ -1,21 +1,33 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Få test.dai til at virke med pipe drainage.
+* Find DEM fotosoftware til mes
 
 * Smoke 
 
-** Sammenlign h_end
-
-3 værdier for hver søjle, plus en graf der sammenligner starttryk
-
 ** Pesticid
+
+*** Lav setups for alle "forsøg" (test med 1D)
+
+**** Forsøg 1. Find bioporeoptællinger...
+
+*** Lav 2D checkpoint 
+
+*** Kør 2D
+
+*** Lav tabel med resultater
+
+*** Lav plots
+
+*** Lav LaTeX report med plots
+
+** Pesticid plan
 
 *** udgangspunkt
 
 Vi tager udgangspunkt i MST-MARKDRÆN opsætning, med ioxynil og
 pendimethvidkål, og 2D.
 
-Vi tager nyt sekundært domæne fra bromid.
+Nye jordparametre fra bromid (M19 & D1)
 
 Vi tager normalbioporer fra røgprojekt.
 
@@ -49,6 +61,10 @@ Sammnlign pløjesål: Ingen, vs MST (ref), vs CPE
 *** Forsøg 5
 
 Sammenlign ref, uden bioporer, uden 2d, uden begge
+
+*** Forsøg 6
+
+Brug U4 jord i stedet for M19.
 
 * dokumenter nye faciliteter
 
