@@ -207,7 +207,17 @@ Biopore::scale_sink (const double scale)
 void 
 Biopore::output_base (Log& log) const
 {
+  const size_t size = S.size ();
+  std::vector<double> B2M (size, 0.0);
+  std::vector<double> M2B (size, 0.0);
+  for (size_t c = 0; c < size; c++)
+    if (S[c] > 0)
+      M2B[c] = S[c];
+    else 
+      B2M[c] = S[c];
   output_variable (S, log);
+  output_variable (B2M, log);
+  output_variable (M2B, log);
   output_variable (infiltration, log);
   output_submodule (solute_infiltration, "solute_infiltration", log);
 }
@@ -317,7 +327,13 @@ Biopore density [cm^-2] as a function of 'x' [cm].");
     frame.declare ("diameter", "cm", Check::positive (),
                 Attribute::Const, "Biopore diameter.");
     frame.declare ("S", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
-                "Sink from matrix domain to biopore.");
+                "Total stream from matrix domain to biopore.");
+    frame.declare ("M2B", "cm^3/cm^3/h", 
+                   Attribute::LogOnly, Attribute::SoilCells,
+                   "Strem from matrix domain to biopore.  Never negative.");
+    frame.declare ("B2M", "cm^3/cm^3/h",
+                   Attribute::LogOnly, Attribute::SoilCells,
+                   "Stream from biopore to matrix domain.  Never negative.");
     frame.declare ("infiltration", "cm/h", Attribute::LogOnly, "\
 Surface infiltration.");
     frame.declare_submodule_sequence ("solute_infiltration", Attribute::LogOnly, "\

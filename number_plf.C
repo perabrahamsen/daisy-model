@@ -50,7 +50,7 @@ struct NumberPLF : public Number
       frame.order ("x", "y");
     }
     
-    Point (const FrameSubmodel& al)
+    Point (const BlockSubmodel& al)
       : x_value (al.number ("x")),
 	x_dimension (al.name ("x")),
 	y_value (al.number ("y")),
@@ -93,6 +93,9 @@ struct NumberPLF : public Number
   static bool check_alist (const Metalib& metalib, 
                            const Frame& al, Treelog& msg) 
   {
+#if 1
+    return true;
+#else
     const Units& units = metalib.units ();
     const symbol domain (al.name ("domain"));
     const symbol range (al.name ("range"));
@@ -142,6 +145,7 @@ struct NumberPLF : public Number
 	    }
       }
     return ok;
+#endif
   }
 
   static const PLF build_plf (const BlockModel& al) 
@@ -150,7 +154,7 @@ struct NumberPLF : public Number
     const symbol domain (al.name ("domain"));
     const symbol range (al.name ("range"));
     const auto_vector<const Point*> points 
-      = map_construct_const<Point> (al.submodel_sequence ("points"));
+      = map_submodel_const<Point> (al, "points");
 
     PLF plf;
 

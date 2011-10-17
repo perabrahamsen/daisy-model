@@ -144,6 +144,52 @@
             Ioxynil-colloid-sorption
             ))
 
+;;; Biopores
+
+(defbiopore common matrix
+  (K_wall_relative 1 [%])
+  (allow_upward_flow false))
+
+(defbiopore "matrix small"
+  (common (height_start  0 [cm])
+          (height_end -120 [cm])
+          (density (plf x 
+                        (domain [cm]) (range [m^-2])
+                        (points (0 0) (50 $SMALL))))
+          (diameter 2 [mm])))
+           
+(defbiopore "matrix large"
+  (common (height_start  0 [cm])
+          (height_end -120 [cm])
+          (density (plf x 
+                        (domain [cm]) (range [m^-2])
+                        (points (0 0) (50 $LARGE))))
+          (diameter 2 [mm])))
+           
+(defbiopore "drain small"
+   (drain  (height_start 0 [cm])
+           (height_end -100 [cm])
+           (diameter 2 [mm])
+           (pipe_position -110 [cm])
+           (density (plf x 
+                         (domain [cm]) (range [m^-2])
+                         (points (0 $SMALL) (50 0))))))
+
+(defbiopore "drain large"
+   (drain  (height_start 0 [cm])
+           (height_end -100 [cm])
+           (diameter 6 [mm])
+           (pipe_position -110 [cm])
+           (density (plf x 
+                         (domain [cm]) (range [m^-2])
+                         (points (0 $LARGE) (50 0))))))
+
+(deftertiary MyBiopores biopores
+  (classes ("matrix small")
+           ("matrix large")
+           ("drain small")
+           ("drain large")))
+  
 ;;; Soil
 
 (defsecondary common pressure
@@ -229,16 +275,28 @@
   (matrix_water (Mollerup (K_average harmonic)) (v+h))
   (drainpoints (-110.0 [cm] 1 [cm]))
   (Geometry (zplus -1.5 -3 
-                   -5.5 -10 -14 -18 -22 -25
-                   -27 -30 -33             
-                   -40 -50 -60 -75 -90 -100 -120
-                   -125 -150 -170 -200 [cm])
-            (xplus 25 50 100 150 300 500 650 800 [cm])))
+                   -5 -8 -12 -16 -20 -24
+                   -27 -30             
+                   -35 -40 
+                   -50 -60
+                   -75 -90 -100
+                   -120
+                   -140 -170 -200 [cm])
+            (xplus 25 50 75 100 150 300 500 650 800 [cm]))
+  (Tertiary MyBiopores))
 
 (defcolumn STD default
-  ;;(Movement STD)                        ;2D
+  (Movement STD)                        ;2D
   (OrganicMatter none)
   (Chemistry multi (combine colloids Pendimethalin Ioxynil))
+  ;; Heat and Water from checkpoint.
+  (SoilHeat (T 9.8 10.1534 10.4964 10.8968 11.3452 11.6995 11.9209 12.0384 12.0723 12.0702 12.0377 11.9596 11.8149 11.6372 11.47 11.3443 11.2788 11.221 11.1731 11.1114 10.9871 9.8 10.1346 10.4771 10.8992 11.3665 11.7276 11.9457 12.0542 12.078 12.0682 12.0269 11.9408 11.7931 11.6227 11.4624 11.34 11.2759 11.2197 11.1729 11.1115 10.9871 9.8 10.1342 10.4766 10.8985 11.3655 11.7258 11.9426 12.0497 12.0721 12.0615 12.0192 11.9324 11.7846 11.6158 11.4576 11.3371 11.2742 11.2191 11.173 11.1118 10.9871 9.8 10.1331 10.4749 10.8969 11.3642 11.7246 11.9414 12.0477 12.0699 12.0591 12.0166 11.9296 11.7818 11.6132 11.4556 11.336 11.2737 11.2192 11.1735 11.1122 10.9871 9.8 10.1324 10.4749 10.8972 11.3643 11.7247 11.9414 12.0475 12.0696 12.0587 12.016 11.9289 11.781 11.6125 11.4552 11.3361 11.2742 11.2201 11.1744 11.1128 10.9871 9.8 10.1334 10.4762 10.8995 11.3648 11.7237 11.941 12.0475 12.0697 12.0588 12.0161 11.9291 11.7812 11.6129 11.4558 11.3376 11.2761 11.222 11.176 11.1138 10.9871 9.8 10.1331 10.4766 10.8999 11.3653 11.7243 11.9416 12.048 12.0702 12.0592 12.0166 11.9294 11.7815 11.6132 11.4562 11.338 11.2766 11.2225 11.1764 11.114 10.9871 9.8 10.1332 10.4766 10.8999 11.3653 11.7244 11.9417 12.0481 12.0703 12.0593 12.0166 11.9295 11.7816 11.6133 11.4562 11.3381 11.2766 11.2225 11.1764 11.114 10.9871 9.8 10.1331 10.4766 10.8999 11.3653 11.7243 11.9416 12.048 12.0702 12.0593 12.0166 11.9295 11.7815 11.6133 11.4562 11.3381 11.2766 11.2225 11.1764 11.114 10.9871 [dg C])
+            (T_top 9.4 [dg C]))
+  (SoilWater (h -83.3631 -81.3234 -78.9677 -75.6807 -71.2343 -66.5236 -62.2559 -58.4109 -55.3794 -52.9298 -50.6957 -49.8791 -50.4714 -56.5388 -74.0841 -107.586 -139.551 -183.868 -186.414 -153.939 -94.9084 -81.7669 -79.7459 -77.4296 -74.2132 -69.8442 -65.1988 -60.9726 -57.1395 -54.1008 -51.6423 -49.3147 -48.2419 -47.5003 -47.7194 -64.6966 -108.178 -149.35 -201.541 -191.623 -154.815 -94.9753 -81.1597 -79.145 -76.835 -73.6262 -69.2643 -64.6187 -60.3827 -56.5303 -53.4661 -50.9821 -48.5792 -47.3066 -46.138 -45.5275 -60.4644 -104.947 -149.48 -206.108 -193.446 -155.187 -94.9898 -80.7161 -78.7058 -76.4001 -73.1958 -68.8372 -64.1891 -59.9442 -56.0771 -52.9949 -50.4932 -48.0392 -46.6456 -45.2474 -44.2718 -57.9477 -101.164 -145.837 -204.653 -193.354 -155.099 -94.9456 -80.0367 -78.034 -75.7366 -72.5424 -68.1946 -63.5509 -59.3015 -55.4219 -52.322 -49.8016 -47.2907 -45.7688 -44.136 -42.801 -55.1708 -96.3342 -140.186 -200.949 -192.329 -154.705 -94.8444 -78.6858 -76.6989 -74.4193 -71.2484 -66.9294 -62.3061 -58.0625 -54.1754 -51.0589 -48.5194 -45.9463 -44.2756 -42.3639 -40.5931 -51.4471 -90.0494 -132.658 -195.787 -190.643 -154.07 -94.6913 -78.2936 -76.3113 -74.0368 -70.8728 -66.5625 -61.9457 -57.7046 -53.8167 -50.6968 -48.1531 -45.5663 -43.8609 -41.8824 -40.0053 -50.4956 -88.4983 -130.815 -194.553 -190.258 -153.94 -94.663 -78.2579 -76.2759 -74.0019 -70.8386 -66.529 -61.9128 -57.672 -53.784 -50.6639 -48.1199 -45.532 -43.8237 -41.8397 -39.9536 -50.4139 -88.3675 -130.659 -194.447 -190.226 -153.93 -94.6609 -78.2651 -76.2831 -74.009 -70.8455 -66.5358 -61.9196 -57.6789 -53.791 -50.671 -48.1272 -45.54 -43.8332 -41.8517 -39.9701 -50.4526 -88.4826 -130.842 -194.618 -190.284 -153.949 -94.6645 [cm])
+             (Theta 0.258349 0.259726 0.253639 0.25559 0.258349 0.261436 0.264394 0.267201 0.263065 0.264609 0.271115 0.271605 0.272468 0.268079 0.257418 0.242496 0.232147 0.221363 0.246639 0.25337 0.270494 0.259424 0.260815 0.262454 0.264812 0.268179 0.271989 0.275683 0.279242 0.270524 0.27251 0.280404 0.281233 0.280761 0.280593 0.281545 0.265106 0.254641 0.24498 0.245675 0.25317 0.27047 0.259838 0.261236 0.262883 0.265253 0.268641 0.272482 0.276217 0.279827 0.27103 0.273055 0.280971 0.281967 0.281819 0.282301 0.28365 0.266089 0.254613 0.244263 0.245344 0.253085 0.270464 0.260143 0.261545 0.263198 0.265578 0.268984 0.272851 0.276617 0.280266 0.271409 0.273461 0.281391 0.282493 0.282523 0.283305 0.284964 0.267277 0.255413 0.24449 0.24536 0.253105 0.270481 0.260613 0.262022 0.263683 0.266076 0.269504 0.273402 0.277209 0.280907 0.271954 0.274042 0.28198 0.283198 0.283415 0.284508 0.28647 0.268859 0.256694 0.245074 0.245546 0.253195 0.270518 0.261559 0.262981 0.264658 0.267075 0.27054 0.274492 0.278366 0.282144 0.272991 0.275133 0.283054 0.284422 0.28487 0.286366 0.288592 0.271034 0.258486 0.245908 0.245854 0.25334 0.270575 0.261837 0.263263 0.264944 0.267368 0.270845 0.274812 0.278704 0.282505 0.273292 0.275448 0.283362 0.284767 0.285273 0.286872 0.289154 0.271593 0.25894 0.246111 0.245925 0.25337 0.270586 0.261863 0.263288 0.26497 0.267395 0.270872 0.274841 0.278735 0.282537 0.273319 0.275477 0.28339 0.284798 0.285309 0.286917 0.289203 0.271641 0.258978 0.246129 0.24593 0.253372 0.270587 0.261857 0.263283 0.264965 0.26739 0.270867 0.274835 0.278728 0.28253 0.273313 0.275471 0.283384 0.28479 0.285299 0.286903 0.28918 0.271599 0.258933 0.2461 0.24592 0.253368 0.270585 [])
+             (S_permanent 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 [cm^3/cm^3/h])
+             (X_ice 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 [])
+             (X_ice_buffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 []))
   (Soil (MaxRootingDepth 150 [cm])
         (horizons (-3.00 "Surface")
                   (-24.00 "Ap1")
@@ -300,22 +358,113 @@
 
 ;;; Output.
 
+(defunit [cm^3/cm^3/h] [h^-1])
+
 (deflog STD table
   (when daily)
   (where "${col}-pest.dlf")
   (declare unit String "Base unit.")
   (unit "g/ha")
-  (summary (simple (print_sum false)
+  (summary (simple (precision 6)
+                   (fetch ("W-Surface-Drain") ("W-Surface-Soil")
+                          ("W-Biopore-0-5")("W-Biopore-5-30")
+                          ("W-Biopore-30")("W-Matrix-30")))
+           (simple (print_sum false)
                    (precision 6)
-                   (fetch ("I-Leak-Matrix-100") ("I-Leak-Biopore-100")
+                   (fetch ("I-Surface-Matrix") 
+                          ("I-Leak-Matrix-50") ("I-Leak-Biopore-50")
+                          ("I-Leak-Matrix-100") ("I-Leak-Biopore-100")
                           ("I-Leak-Matrix-150") ("I-Leak-Biopore-150")
                           ("I-Soil-Drain") ("I-Surface-Drain")))
            (simple (print_sum false)
                    (precision 6)
-                   (fetch ("P-Leak-Matrix-100") ("P-Leak-Biopore-100")
+                   (fetch ("P-Surface-Matrix")
+                          ("P-Leak-Matrix-50") ("P-Leak-Biopore-50")
+                          ("P-Leak-Matrix-100") ("P-Leak-Biopore-100")
                           ("P-Leak-Matrix-150") ("P-Leak-Biopore-150")
                           ("P-Soil-Drain") ("P-Surface-Drain"))))
-  (entries (flux_bottom (path column component Chemistry "*" 
+  (entries (number (tag "W-Surface-Drain")
+                   (documentation "\
+Flux of water from surface to drain through biopores, bypassing the matrix.")
+                   (path column component Movement component 
+                         Tertiary biopores classes drain infiltration)
+                   (spec biopore drain infiltration)
+                   (handle sum)
+                   (dimension "mm"))
+           (number (tag "W-Surface-Soil")
+                   (documentation "\
+Flux of water from surface to biopores that end in matrix.")
+                   (path column component Movement component 
+                         Tertiary biopores classes matrix infiltration)
+                   (spec biopore matrix infiltration)
+                   (handle sum)
+                   (dimension "mm"))
+           (interval (tag "W-Biopore-0-5")
+                     (from 0 [cm])
+                     (to -5 [cm])
+                     (documentation "\
+Water that enters the biopores in the specified interval")
+                     (path column component Movement component 
+                           Tertiary biopores classes component B2M)
+                     (spec biopore component B2M)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "W-Biopore-5-30")
+                     (from -5 [cm])
+                     (to -30 [cm])
+                     (documentation "\
+Water that enters the biopores in the specified interval")
+                     (path column component Movement component 
+                           Tertiary biopores classes component M2B)
+                     (spec biopore component M2B)
+                     (handle sum)
+                     (dimension "mm"))
+           (flux_bottom (tag "W-Matrix-30")
+                        (path column component SoilWater q)
+                        (spec fixed SoilWater q)
+                        (handle sum)
+                        (to -30 [cm])
+                        (negate true)
+                        (dimension "mm"))
+           (flux_bottom (tag "W-Biopore-30")
+                        (path column component SoilWater q_p)
+                        (spec fixed SoilWater q_p)
+                        (handle sum)
+                        (to -30 [cm])
+                        (negate true)
+                        (dimension "mm"))
+
+           (flux_top (path column component Chemistry component 
+                           trace Ioxynil-base J_matrix)
+                     (documentation "\
+Lost due to leaching.")
+                     (tag "I-Surface-Matrix")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (from 0 [cm])
+                     (spec chemical default J_matrix))
+           (flux_bottom (path column component Chemistry component 
+                              trace Ioxynil-base J_matrix)
+                        (documentation "\
+Lost due to leaching.")
+                        (tag "I-Leak-Matrix-50")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (to -50 [cm])
+                        (spec chemical default J_matrix))
+           (flux_bottom (path column component Chemistry component 
+                              trace Ioxynil-base J_tertiary)
+                        (documentation "\
+Lost due to leaching.")
+                        (tag "I-Leak-Biopore-50")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (to -50 [cm])
+                        (spec chemical default J_tertiary))
+           (flux_bottom (path column component Chemistry component 
                               trace Ioxynil-base J_matrix)
                         (documentation "\
 Lost due to leaching.")
@@ -325,7 +474,7 @@ Lost due to leaching.")
                         (dimension "${unit}")
                         (to -100 [cm])
                         (spec chemical default J_matrix))
-           (flux_bottom (path column component Chemistry "*" 
+           (flux_bottom (path column component Chemistry component 
                               trace Ioxynil-base J_tertiary)
                         (documentation "\
 Lost due to leaching.")
@@ -335,7 +484,7 @@ Lost due to leaching.")
                         (dimension "${unit}")
                         (to -100 [cm])
                         (spec chemical default J_tertiary))
-           (flux_bottom (path column component Chemistry "*" 
+           (flux_bottom (path column component Chemistry component 
                               trace Ioxynil-base J_matrix)
                         (documentation "\
 Lost due to leaching.")
@@ -345,7 +494,7 @@ Lost due to leaching.")
                         (dimension "${unit}")
                         (to -150 [cm])
                         (spec chemical default J_matrix))
-           (flux_bottom (path column component Chemistry "*" 
+           (flux_bottom (path column component Chemistry component 
                               trace Ioxynil-base J_tertiary)
                         (documentation "\
 Lost due to leaching.")
@@ -356,7 +505,7 @@ Lost due to leaching.")
                         (to -150 [cm])
                         (spec chemical default J_tertiary))
            (interval (path column component
-                           Chemistry "*" trace Ioxynil-base S_drain)
+                           Chemistry component trace Ioxynil-base S_drain)
                      (spec chemical default S_drain)
                      (documentation "\
 Lost from the soil matrix to drain pipes.")
@@ -364,7 +513,7 @@ Lost from the soil matrix to drain pipes.")
                      (handle sum)
                      (negate true)
                      (dimension "${unit}"))
-           (number (path column component Movement "*" 
+           (number (path column component Movement component 
                          Tertiary biopores classes drain 
                          solute_infiltration Ioxynil-base value)
                    (spec biopore drain solute_infiltration value)
@@ -375,7 +524,37 @@ Amount moving directly from surface to drain, through biopores.
 This never come in contact with the soil matrix.")
                    (handle sum)
                    (dimension "${unit}"))
-           (flux_bottom (path column component Chemistry "*" 
+           (flux_top (path column component Chemistry component 
+                           trace Pendimethalin-base J_matrix)
+                     (documentation "\
+Lost due to leaching.")
+                     (tag "P-Surface-Matrix")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (from 0 [cm])
+                     (spec chemical default J_matrix))
+           (flux_bottom (path column component Chemistry component 
+                              trace Pendimethalin-base J_matrix)
+                        (documentation "\
+Lost due to leaching.")
+                        (tag "P-Leak-Matrix-50")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (to -50 [cm])
+                        (spec chemical default J_matrix))
+           (flux_bottom (path column component Chemistry component 
+                              trace Pendimethalin-base J_tertiary)
+                        (documentation "\
+Lost due to leaching.")
+                        (tag "P-Leak-Biopore-50")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (to -50 [cm])
+                        (spec chemical default J_matrix))
+           (flux_bottom (path column component Chemistry component 
                               trace Pendimethalin-base J_matrix)
                         (documentation "\
 Lost due to leaching.")
@@ -385,7 +564,7 @@ Lost due to leaching.")
                         (dimension "${unit}")
                         (to -100 [cm])
                         (spec chemical default J_matrix))
-           (flux_bottom (path column component Chemistry "*" 
+           (flux_bottom (path column component Chemistry component 
                               trace Pendimethalin-base J_tertiary)
                         (documentation "\
 Lost due to leaching.")
@@ -395,7 +574,7 @@ Lost due to leaching.")
                         (dimension "${unit}")
                         (to -100 [cm])
                         (spec chemical default J_matrix))
-           (flux_bottom (path column component Chemistry "*" 
+           (flux_bottom (path column component Chemistry component 
                               trace Pendimethalin-base J_matrix)
                         (documentation "\
 Lost due to leaching.")
@@ -405,7 +584,7 @@ Lost due to leaching.")
                         (dimension "${unit}")
                         (to -150 [cm])
                         (spec chemical default J_matrix))
-           (flux_bottom (path column component Chemistry "*" 
+           (flux_bottom (path column component Chemistry component 
                               trace Pendimethalin-base J_tertiary)
                         (documentation "\
 Lost due to leaching.")
@@ -416,7 +595,7 @@ Lost due to leaching.")
                         (to -150 [cm])
                         (spec chemical default J_tertiary))
            (interval (path column component
-                           Chemistry "*" trace Pendimethalin-base S_drain)
+                           Chemistry component trace Pendimethalin-base S_drain)
                      (spec chemical default S_drain)
                      (documentation "\
 Lost from the soil matrix to drain pipes.")
@@ -424,7 +603,7 @@ Lost from the soil matrix to drain pipes.")
                      (handle sum)
                      (negate true)
                      (dimension "${unit}"))
-           (number (path column component Movement "*" 
+           (number (path column component Movement component 
                          Tertiary biopores classes drain 
                          solute_infiltration Pendimethalin-base value)
                    (spec biopore drain solute_infiltration value)
@@ -442,8 +621,16 @@ This never come in contact with the soil matrix.")
   ;; Parameters.
   (declare col String "Short tag to use for this simulation.")
   (col "STD")
+
+  ;; Surface layer.
   (declare S_K Number [cm/h] "Hydraulic conductivity in surface layer.")
   (S_K 1.16454 [cm/h])
+
+  ;; Biopores.
+  (declare LARGE Number [<user>] "Density of large biopores.")
+  (LARGE 2.9 [m^-2])
+  (declare SMALL Number [<user>] "Density of small biopores.")
+  (SMALL 1.3 [m^-2])
 
   ;; Stuff.
   (weather default "Rorrende.dwf" )
@@ -457,9 +644,26 @@ This never come in contact with the soil matrix.")
 
   (output STD)) 
 
-(defprogram sims batch
-  (run STD))
+(defprogram MakeCP STD
+  (column (STD (Chemistry none)))
+  (time 1997 9 1)
+  (stop 2000 10 18 0)
+  (manager Warmup)
+  (output checkpoint))
 
-(run sims)
+(defprogram BMA STD
+  (col BMA)
+  (LARGE 1.1 [m^-2])
+  (SMALL 7.8 [m^-2]))
+
+(defprogram BMI STD
+  (col BMI)
+  (LARGE 1.2 [m^-2])
+  (SMALL 1.4 [m^-2]))
+
+(defprogram sims batch
+  (run STD BMA BMI))
+
+(run STD)
 
 ;; pest.dai ends here.
