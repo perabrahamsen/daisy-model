@@ -1,3 +1,9 @@
+2011-10-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* number_plf.C: Enable use of variables, disable check.
+
+	* biopore.C (B2M, M2B): New log variable.
+
 2011-10-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* horizon.C (r_pore_min): New parameter.
