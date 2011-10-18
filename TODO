@@ -4,11 +4,11 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** Pesticid
 
-*** udskriv CPE rapport
+*** DONE udskriv CPE rapport
 
 *** Lav setups for alle "forsøg" (test med 1D)
 
-**** Forsøg 1. Find bioporeoptællinger...
+**** Forsøg 1. Find bioporeoptællinger..
 
 *** Lav 2D checkpoint 
 
@@ -52,7 +52,7 @@ Sammenlign døgnværdier og timeværdier (ref).
 
 *** Forsøg 3.
 
-Sammenlign overfladelag: Normal vs Omar vs MST (ref)
+Sammenlign overfladelag: Normal vs Omar 
 
 *** Forsøg 4
 
@@ -60,11 +60,11 @@ Sammnlign pløjesål: Ingen, vs MST (ref), vs CPE
 
 *** Forsøg 5
 
-Sammenlign ref, uden bioporer, uden 2d, uden begge
+Brug U4 jord i stedet for M19.
 
 *** Forsøg 6
 
-Brug U4 jord i stedet for M19.
+Sammenlign ref, uden bioporer, uden 2d, uden begge
 
 * dokumenter nye faciliteter
 
