@@ -761,6 +761,32 @@ This never come in contact with the soil matrix.")
   (A_lim -1308 [cm])
   (B_lim -321 [cm]))
 
+(defcolumn NOS STD
+  (Soil (MaxRootingDepth 150 [cm])
+        (horizons (-3.00 ("Surface" (secondary_domain none)))
+                  (-24.00 ("Ap1" (secondary_domain none)))
+                  (-30.00 ("Ap2" (secondary_domain none)))
+                  (-40.00 ("A2" (secondary_domain none)))
+                  (-60.00 ("B1" (secondary_domain none)))
+                  (-120 ("Bt" (secondary_domain none)))
+                  (-200 ("C")))
+        (zones ((box  (top finite -3 [cm]) (bottom finite -24 [cm])
+                      (left finite 0 [cm]) (right finite 25 [cm]))
+                (Ap1_Drain (secondary_domain none)))
+               ((box  (top finite -24 [cm]) (bottom finite -30 [cm])
+                      (left finite 0 [cm]) (right finite 25 [cm]))
+                (Ap2_Drain (secondary_domain none)))
+               ((box  (top finite -30 [cm]) (bottom finite -40 [cm])
+                      (left finite 0 [cm]) (right finite 25 [cm]))
+                (A2_Drain (secondary_domain none)))
+               ((box  (top finite -40 [cm]) (bottom finite -120 [cm])
+                      (left finite 0 [cm]) (right finite 25 [cm]))
+                ("Drain canyon" (secondary_domain none))))))
+
+(defprogram NOS STD
+  (col NOS)
+  (column NOS))
+
 (defcolumn S1D default
   (OrganicMatter none)
   (Chemistry multi (combine colloids Pendimethalin Ioxynil))
@@ -797,9 +823,9 @@ This never come in contact with the soil matrix.")
   (I_OC 2.76 [ml/g]))
 
 (defprogram sims batch
-  (run ;;STD S1D N1D BMA BMI BNO DAY SUR PPK U4S 
+  (run STD S1D N1D BMA BMI BNO DAY SUR PPK U4S NOS
        K10 K01))
 
-(run sims)
+(run NOS)
 
 ;; pest.dai ends here.
