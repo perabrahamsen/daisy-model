@@ -21,7 +21,7 @@
 (defreaction colloid-generation colgen_Jarvis99
   "Release of colloids in soil surface from heavy rain."
   ;; (kd 7.5 [g/J])                       ;Detachment rate coefficient.
-  (kd 15 [g/J])                       ;Detachment rate coefficient.
+  (kd $PART)                       ;Detachment rate coefficient.
   ;; (kr 0.05 [g/m^2/h])                    ;Replenishment rate coefficient.
   (kr 0.1 [g/m^2/h])
   ;; (zi 0.05 [cm])                         ;Surface layer thickness.
@@ -53,7 +53,7 @@
   (solute Pendimethalin)
   (cite ppdb20100517)
   (K_OC $P_OC)                   ;6700-29400 [ml/g]
-  (k_sorption 0.05 [h^-1]))
+  (k_sorption $SORP))
 
 (defchemical Pendimethalin-colloid Pendimethalin-base
   "Pendimethalin sorbed to colloids."
@@ -66,7 +66,7 @@
   (colloid colloid)
   (soil_enrichment_factor 10000 [])
   (sorbed Pendimethalin-colloid)
-  (k_sorption 0.05 [h^-1]))
+  (k_sorption $SORP))
 
 (defreaction Pendimethalin-filter colloid-filter
   "Filtration of colloid-bound pendimethalin in the soil matrix."
@@ -109,7 +109,7 @@
   (solute Ioxynil)
   (cite ppdb20100517)
   (K_OC $I_OC)  
-  (k_sorption 0.05 [h^-1]))
+  (k_sorption $SORP))
 
 (defchemical Ioxynil-colloid Ioxynil-base
   "Ioxynil sorbed to colloids."
@@ -122,7 +122,7 @@
   (colloid colloid)
   (soil_enrichment_factor 10000 [])
   (sorbed Ioxynil-colloid)
-  (k_sorption 0.05 [h^-1]))
+  (k_sorption $SORP))
 
 (defreaction Ioxynil-filter colloid-filter
   "Filtration of colloid-bound ioxynil in the soil matrix."
@@ -223,7 +223,7 @@
                     (alpha 1e-5)))
 
 (defhorizon "Ap2" Ap1                   ;24-30
-  ;; (hydraulic (original (K_sat $PP_K)
+  (hydraulic (original (K_sat $PP_K)))
   (secondary_domain M_A) 
   (dry_bulk_density 1.69 [g/cm^3]))
 
@@ -699,6 +699,10 @@ This never come in contact with the soil matrix.")
   (declare I_OC Number [cm^3/g] "K_OC for Ioxynil.")
   (P_OC 15744 [ml/g])                   ;6700-29400 [ml/g]
   (I_OC 276 [ml/g])  
+  (declare SORP Number [h^-1] "Sorption speed.")
+  (SORP 0.05 [h^-1])
+  (declare PART Number [g/J] "Colloid detachement.")
+  (PART 15 [g/J])   
 
   ;; Stuff.
   (weather default "Rorrende.dwf" )
@@ -752,10 +756,19 @@ This never come in contact with the soil matrix.")
   (col SUR)
   (S_K 0.3 [cm/h]))
 
+(defprogram SUP STD
+  (col SUP)
+  (S_K 0.036 [cm/h]))
+
 (defprogram PPK STD
   (col PPK)
   ; 90% fractile is 1.80 cm/h, geometric mean is 0.90 cm/h
-  (S_K 0.036 [cm/h]))                   ;10% fractile
+  (PP_K 0.036 [cm/h]))                   ;10% fractile
+
+(defprogram SPP STD
+  (col SPP)
+  (S_K 0.3 [cm/h])
+  (PP_K 0.036 [cm/h]))
 
 (defprogram U4S STD
   (A_lim -1308 [cm])
@@ -822,10 +835,19 @@ This never come in contact with the soil matrix.")
   (P_OC 157.44 [ml/g])
   (I_OC 2.76 [ml/g]))
 
-(defprogram sims batch
-  (run STD S1D N1D BMA BMI BNO DAY SUR PPK U4S NOS
-       K10 K01))
+(defprogram KSO STD
+  (SORP 1.0 [h^-1]))
 
-(run NOS)
+(defprogram PAR STD
+  (PART 0.0 [g/J]))
+
+(defprogram sims batch
+  (run STD S1D N1D BMA BMI BNO DAY SUR SUP PPK SPP U4S NOS
+       K10 K01 KSO PAR))
+
+(defprogram new batch
+  (run PPK SPP KSO PAR))
+
+(run new)
 
 ;; pest.dai ends here.
