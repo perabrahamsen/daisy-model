@@ -1,3 +1,9 @@
+2011-10-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C (C_inf_max): New parameter.
+	* chemical.h, chemical_std.C (infiltrate): New 'water' parameter.
+	* chemistry_std.C (infiltrate): Adjust caller.
+
 2011-10-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* number_plf.C: Enable use of variables, disable check.

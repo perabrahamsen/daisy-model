@@ -321,13 +321,16 @@ ChemistryStandard::infiltrate (const Geometry& geo,
 { 
   const double old_pond = ponding + infiltration * dt;
   const double fraction = old_pond > 0.0
-    ? infiltration * dt / old_pond : 0.0;
+    ? infiltration * dt / old_pond 
+    : 0.0;
   const double rate = infiltration * dt > 0.01 /* [mm] */
     ? fraction / dt
     : 0.0;
   for (size_t c = 0; c < chemicals.size (); c++)
     {
-      chemicals[c]->infiltrate (std::max (0.0, rate), dt);
+      chemicals[c]->infiltrate (std::max (0.0, rate), 
+                                std::max (0.0, infiltration * dt),
+                                dt);
       chemicals[c]->mixture (geo, std::max (0.0, ponding), R_mixing, dt);
     }
 }

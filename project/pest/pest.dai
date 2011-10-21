@@ -41,6 +41,7 @@
 
 (defchemical Pendimethalin Pendimethalin-base
   "Dissolved pendimethalin."
+  (C_inf_max 0.33 [mg/l])               ;Source: PPDB solutability.
   (adsorption none))
 
 (defchemical Pendimethalin-immobile Pendimethalin-base
@@ -96,7 +97,8 @@
   (decompose_halftime 5 [d]))           ;No field studies
 
 (defchemical Ioxynil Ioxynil-base
-  "Dissolved ioxynil."
+  "Dissolved ioxynil." 
+  (C_inf_max 3034 [mg/l])               ;Source: PPDB solutability.
   (adsorption none))
 
 (defchemical Ioxynil-immobile Ioxynil-base
@@ -848,6 +850,6 @@ This never come in contact with the soil matrix.")
 (defprogram new batch
   (run PPK SPP KSO PAR))
 
-(run new)
+(run STD)
 
 ;; pest.dai ends here.

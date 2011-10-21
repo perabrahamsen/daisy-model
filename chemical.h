@@ -151,7 +151,9 @@ public:
                         const double pond /* [mm] */, 
                         const double rate /* [h/mm] */,
                         const double dt /* [h]*/) = 0;
-  virtual void infiltrate (const double rate, const double dt) = 0;
+  virtual void infiltrate (const double rate /* [h^-1] */,
+                           const double water /* [mm] */,
+                           const double dt /* [h] */) = 0;
   virtual double down () = 0;     // [g/m^2/h]
   virtual void uptake (const Soil&, const SoilWater&, double dt) = 0;
   virtual void decompose (const Geometry& geo,

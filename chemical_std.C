@@ -51,6 +51,7 @@ struct ChemicalStandard : public Chemical
   static const symbol g_per_cm3;
 
   // Parameters.
+  const double C_inf_max;
   const double crop_uptake_reflection_factor;
   const double canopy_dissipation_rate;
   const double canopy_washoff_coefficient;
@@ -237,7 +238,7 @@ struct ChemicalStandard : public Chemical
                 const double pond /* [mm] */, 
                 const double rate /* [h/mm] */,
                 const double dt /* [h]*/);
-  void infiltrate (const double rate, const double dt);
+  void infiltrate (const double rate, const double water, const double dt);
   double down ();                 // [g/m^2/h]
   void uptake (const Soil&, const SoilWater&, double dt);
   void decompose (const Geometry& geo,
@@ -1172,7 +1173,9 @@ ChemicalStandard::mixture (const Geometry& geo,
 }
 
 void 
-ChemicalStandard::infiltrate (const double rate, const double dt)
+ChemicalStandard::infiltrate (const double rate /* [h^-1] */, 
+                              const double water /* [mm] */,
+                              const double dt /* [h] */)
 {
   daisy_approximate (surface_storage, surface_solute + surface_immobile);
   daisy_assert (surface_storage >= 0.0);
@@ -1192,7 +1195,15 @@ ChemicalStandard::infiltrate (const double rate, const double dt)
       daisy_bug (tmp.str ());
     }    
 
-  surface_out = surface_solute * rate;
+  // Limit outflow concentration.
+  const double max_out /* [g/m^2] */
+    = 1000 /* [cm^3/l] */ 
+    * C_inf_max /* [g/cm^3] */
+    * water /* [mm] = [l/m^2] */;
+  daisy_assert (max_out >= 0.0);
+
+  surface_out = std::min (surface_solute * rate, max_out / dt);
+
   const double loss = surface_out * dt;
   if (loss < surface_solute)
     surface_solute -= loss;
@@ -1690,6 +1701,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
 
 ChemicalStandard::ChemicalStandard (const BlockModel& al)
   : Chemical (al),
+    C_inf_max (al.number ("C_inf_max")),
     crop_uptake_reflection_factor 
     /**/ (al.number ("crop_uptake_reflection_factor")),
     canopy_dissipation_rate 
@@ -1929,6 +1941,10 @@ Only for initialization of the 'M' parameter."); }
     Model::load_model (frame);
 
     // Surface parameters.
+    frame.declare ("C_inf_max", "g/cm^3", 
+                   Check::non_negative (), Attribute::Const, "\
+Maximal concentration in matrix infiltration from surface.");
+    frame.set ("C_inf_max", 1.0);
     frame.declare_fraction ("crop_uptake_reflection_factor", Attribute::Const, "\
 How much of the chemical is reflected at crop uptake.");
     frame.set ("crop_uptake_reflection_factor", 1.0);
