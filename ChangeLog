@@ -16,7 +16,7 @@
 	* horizon.C (r_pore_min): New parameter.
 	* chemical_std.C: Support adsorption in secondary domain.
 	* adsorption.h, adsorption.C, adsorption_freundlich.C:
-	* adsorption_langmuir.C, 	adsorption_linear.C, 	adsorption_vS_S.C:
+	* adsorption_langmuir.C, adsorption_linear.C, adsorption_vS_S.C:
 	Ditto.
 
 	* chemical_std.C (check): Better error message.
