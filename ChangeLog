@@ -1,3 +1,7 @@
+2011-10-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 5.00 released.
+
 2011-10-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* chemical_std.C (solubility, solubility_infiltration_factor):

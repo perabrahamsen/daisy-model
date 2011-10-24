@@ -27,7 +27,7 @@ LogQt::done (const std::vector<Time::component_t>& time_columns,
 { 
   {
     QMutexLocker lock (&mutex);
-    LogExtern::done (time_columns, time, dt, msg);
+    LogSelect::done (time_columns, time, dt, msg);
   }
   emit ready ();
 }
