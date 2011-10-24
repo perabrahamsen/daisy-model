@@ -51,7 +51,8 @@ struct ChemicalStandard : public Chemical
   static const symbol g_per_cm3;
 
   // Parameters.
-  const double C_inf_max;
+  const double solubility;
+  const double solubility_infiltration_factor;
   const double crop_uptake_reflection_factor;
   const double canopy_dissipation_rate;
   const double canopy_washoff_coefficient;
@@ -1198,7 +1199,8 @@ ChemicalStandard::infiltrate (const double rate /* [h^-1] */,
   // Limit outflow concentration.
   const double max_out /* [g/m^2] */
     = 1000 /* [cm^3/l] */ 
-    * C_inf_max /* [g/cm^3] */
+    * solubility /* [g/cm^3] */
+    * solubility_infiltration_factor /* [] */ 
     * water /* [mm] = [l/m^2] */;
   daisy_assert (max_out >= 0.0);
 
@@ -1701,7 +1703,9 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
 
 ChemicalStandard::ChemicalStandard (const BlockModel& al)
   : Chemical (al),
-    C_inf_max (al.number ("C_inf_max")),
+    solubility (al.number ("solubility")),
+    solubility_infiltration_factor
+    /**/ (al.number ("solubility_infiltration_factor")),
     crop_uptake_reflection_factor 
     /**/ (al.number ("crop_uptake_reflection_factor")),
     canopy_dissipation_rate 
@@ -1941,11 +1945,16 @@ Only for initialization of the 'M' parameter."); }
     Model::load_model (frame);
 
     // Surface parameters.
-    frame.declare ("C_inf_max", "g/cm^3", 
+    frame.declare ("solubility", "g/cm^3", 
                    Check::non_negative (), Attribute::Const, "\
-Maximal concentration in matrix infiltration from surface.");
-    frame.set ("C_inf_max", 1.0);
-    frame.declare_fraction ("crop_uptake_reflection_factor", Attribute::Const, "\
+Maximal concentration in water at 20 dg C.");
+    frame.set ("solubility", 1.0);
+    frame.declare ("solubility_infiltration_factor", Attribute::None (),
+                   Check::non_negative (), Attribute::Const, "\
+Adjustment for maximum concentration in infiltrated water.");
+    frame.set ("solubility_infiltration_factor", 1.0);
+    frame.declare_fraction ("crop_uptake_reflection_factor", 
+                            Attribute::Const, "\
 How much of the chemical is reflected at crop uptake.");
     frame.set ("crop_uptake_reflection_factor", 1.0);
     frame.declare ("canopy_dissipation_rate", "h^-1", 

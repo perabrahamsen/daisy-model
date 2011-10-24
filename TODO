@@ -2,77 +2,15 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Smoke 
 
-** Pesticid
+** C_inf_max -> solubility * solubility_infiltration_factor
 
-*** DONE udskriv CPE rapport
+** Log water
 
-*** Lav setups for alle "forsøg"
+** Vælg 10 år
 
-**** Forsøg 1. Find bioporeoptællinger..
+** Slet 1D & K01
 
-*** Lav 2D checkpoint 
-
-*** Kør 2D
-
-*** Lav tabel med resultater
-
-*** Lav plots
-
-*** Lav LaTeX report med plots
-
-** Pesticid plan
-
-*** udgangspunkt
-
-Vi tager udgangspunkt i MST-MARKDRÆN opsætning, med ioxynil og
-pendimethvidkål, og 2D.
-
-Nye jordparametre fra bromid (M19 & D1)
-
-Vi tager normalbioporer fra røgprojekt.
-
-Vi logger ved dræn, 100 cm, og 150 cm, fra udbringning til første
-drænsæson (1/4?).
-
-Timeværdier.
-
-h_end = -30 cm
-
-MST overfladelag
-
-MST pløjesål
-
-*** Forsøg 1.
-
-Sammenlign bioporer optalt for S4, middel, og lav
-
-*** Forsøg 2.
-
-Sammenlign døgnværdier og timeværdier (ref).
-
-*** Forsøg 3.
-
-Sammenlign overfladelag: Normal vs Omar 
-
-*** Forsøg 4
-
-Sammnlign pløjesål: Ingen, vs MST (ref), vs CPE
-
-*** Forsøg 5
-
-Brug U4 jord i stedet for M19.
-
-*** Forsøg 6
-
-Sammenlign ref, uden bioporer, uden 2d, uden begge
-
-* dokumenter nye faciliteter
-
-** pore_min
-
-* Smoke senere
-
-** Prøv at få U4 BB på plads med max_C_inf (1mm z-lag!)
+** Kør
 
 * decompose secondary domain
 

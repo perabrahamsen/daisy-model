@@ -1,6 +1,7 @@
 2011-10-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* chemical_std.C (C_inf_max): New parameter.
+	* chemical_std.C (solubility, solubility_infiltration_factor):
+	New parameters.
 	* chemical.h, chemical_std.C (infiltrate): New 'water' parameter.
 	* chemistry_std.C (infiltrate): Adjust caller.
 

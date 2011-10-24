@@ -10,12 +10,37 @@ release.
 
 ** Bug fixes.
 
+** New 'solubility' and 'solubility_infiltration_factor' parameters.
+
+In the default chemical model. These control the maximum concentration
+in water that enters the soil.
+
+** New 'Rsqr' summary model.
+
+Will compare simulation results with a data set and calculate R^2.
+
+** New 'minimize' program.
+
+Allow you to find the parameters that constitute the best fit.
+
+** New 'r_pore_min' horizon parameter.
+
+This parameter controls the division of sorption sites between primary
+and secondary domain.
+
+** New 'B2M' and 'M2B' biopore log variables.
+
+These will allow you to log water entering and leaving the biopores
+seperately.
+
 ** New units [fraction dry soil] and [dry soil ppm] for logging.
 
 To log content as fraction of dry soil.  Just using [ppm] only works
 for mediums with the same mass/volume ratio as water.
 
 ** New 'profile' xysource model.
+
+** New 'valid' parameter in the 'expr' xysource model.
 
 ** Restore model sample to reference manual.
 
