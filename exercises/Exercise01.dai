@@ -1,36 +1,23 @@
-;;; Exercise01.dai --- Daisy exercise file.
-;;
-;;  Setting "working directory"
-;;  Daisy writes a Daisy.log-file during execution. 
-;;  This log-file contains any error messages
-;;  If the working directory (folder) is set correctly the log-file will be found here
-;(directory "C:/DaisySim/")
-
 ;; Including external library-files
-(input file "tillage.dai")       ; tillage operation parameterization 
-(input file "crop.dai")          ; crop model parameterization
-(input file "dk-crop.dai")       ; crop model parameterization
-(input file "fertilizer.dai")    ; fertilizer parameterization 
-(input file "log.dai")           ; definition of output logs
+(input file "tillage.dai")
+(input file "crop.dai")
+(input file "fertilizer.dai")
+(input file "log.dai")
 
 ;; Weather data
 (weather default "dk-taastrup.dwf")
 
-;;  Description that will occur in all output files
-(description "Spring Barley; Soil: Fine sandy loam; Weather: Taastrup")
-
 ;;  Defining soil horizons of a fine sandy loam
-(defhorizon "Ap F.S.L." USDA3  ; Calssification: USDA with 3 textural classes.
-    (dry_bulk_density 1.53 [g/cm^3]) ; dry bulk density
-    (clay 0.113 [])                  ; clay content
-    (silt 0.277 [])                  ; silt content
-    (sand 0.584 [])                  ; sand content 
-    (humus 0.026 [])                 ; humus content - organic C=0.578*Humus
-    (C_per_N 11.0 [g C/g N]))        ; C/N ratio of the soil organic matter
-;;  Based on on the above information Daisy will use HYPRES-pedo-transfer function
-;;  to estimate hydraulic parameters (Mualem-van Genuchten Model)
+(defhorizon "Ap F.S.L." FAO3
+    "Data from Jacobsen 1983"
+    (dry_bulk_density 1.53 [g/cm^3]) 
+    (clay 0.113 [])
+    (silt 0.277 [])
+    (sand 0.584 [])
+    (humus 0.026 [])
+    (C_per_N 11.0 [g C/g N]))
 
-(defhorizon "B F.S.L." USDA3 
+(defhorizon "B F.S.L." FAO3
     (dry_bulk_density 1.51 [g/cm^3]) 
     (clay 0.235 [])
     (silt 0.253 [])
@@ -38,7 +25,7 @@
     (humus 0.005 [])
     (C_per_N 11.0 [g C/g N]))
 
-(defhorizon "C F.S.L." USDA3 
+(defhorizon "C F.S.L." FAO3
     (dry_bulk_density 1.57 [g/cm^3]) 
     (clay 0.244 [])
     (silt 0.283 [])
@@ -48,72 +35,53 @@
 
 ;;  Parameterisation of column (Fine sandy loam)
 (defcolumn "Fine sandy loam" default
-     (Soil (MaxRootingDepth 100 [cm])          ; Max rooting depth in the soil
-           (horizons (  -30 [cm] "Ap F.S.L.")  ; Depth where the "Ap F.S.L." horizon ends
-                     (  -80 [cm] "B F.S.L.")   ; Depth where the "B F.S.L." horizon ends
-                     ( -400 [cm] "C F.S.L."))) ; Depth where the "C F.S.L." horizon ends
-;;   Defines the drainage condition - deep groundwater corresponds to free drainage
+     (Soil (MaxRootingDepth 100 [cm])
+           (horizons (  -30 [cm] "Ap F.S.L.")
+                     (  -80 [cm] "B F.S.L.")
+                     ( -400 [cm] "C F.S.L.")))
      (Groundwater deep)
-;;   This information is used initialization of the organic matter pools
-     (OrganicMatter original (init (input 3000 [kg C/ha/y]))
-)
+     (OrganicMatter original (init (input 3000 [kg C/ha/y]))))
 
-;; Spring Barley setup - the information is stored under the name "SBarley Management" activity
-(defaction "SBarley Management" activity
-  (wait_mm_dd 3 20)                           ; Wait until March 20 - no actions before this date is reached
-  (plowing)                                   ; Plow the field 
-  (wait_mm_dd 4 15)                           ; Wait until April 15
-  (seed_bed_preparation)                      ; Do a seed bed preparation
-  (sow "Vaarbyg")                             ; Sow a spring barley crop (Vaarbyg in Danish)
-  (wait_mm_dd 4 20)                           ; Wait until April 20
-  (fertilize (N25S (weight 95 [kg N/ha])))    ; Broadcast 95 kg N/ha (fertilizer N25S)
-  (wait (or                                   ; Wait until one of the following conditions is fulfilled
-     (crop_ds_after "Vaarbyg" 2.0)            ; Condition 1: the crop is ripe
-     (mm_dd 8 20)))                           ; Condition 2: we have reached the date: August 20
-  (harvest "Vaarbyg"                          ; Harvest the crop (Spring Barley)
-     (stub 8 [cm])                            ; 8 cm of stubble is left in the field 
-     (stem 0.0)                               ; No stem (straw) is removed from the field
-     (leaf 0.0))                              ; No leaf is removed from the field         
-)
-
+;; Spring Barley setup.
+(defaction "SBarley_management" activity
+  (wait_mm_dd 3 20)
+  (plowing)
+  (wait_mm_dd 4 15) 
+  (seed_bed_preparation)
+  (sow "Spring Barley")
+  (wait_mm_dd 4 20) 
+  (fertilize (N25S (weight 95 [kg N/ha])))
+  (wait (or (crop_ds_after "Spring Barley" 2.0) ;Ripe
+            (mm_dd 9 1))) (harvest "Spring Barley"))
 
 ;;  Selecting column
 (column "Fine sandy loam")
 
-;; Begin and end of simulation.
-(time 2001 1 1)
-(stop 2002 1 1)
+;; Start and end of simulation.
+(time 1993 1 1)
+(stop 1994 1 1)
+
 ;; Selecting management
 (manager activity
-  ("SBarley Management")
+  "SBarley_management"
 )
-;; Selecting output files
-;; the selected output logs are "harvest", "Crop Production", "Field water" etc.
-;; the "where" statement defines name and location of output file
+;; Selecting output 
+;;  Description that will occur in all output files
+(description "Spring Barley; Soil: Fine sandy loam; Weather: Taastrup")
 
-;; the "to" statement defines the balance depth
-;; the "when" statement defines the output frequency
-;; log_prefix sets the prefix in front of the output file name 
-;; e.g. the file is placed in an folder named "E1" just beneath the working folder
-;; a description of the content of the output ("Field water", "Soil water", "Field nitrogen",
-;; and "Soil nitrogen") can be in the Daisy Ttutorial)
-(log_prefix "E1/")
-(output ("harvest" (where "harvest.dlf"))
-        ("Crop Production" (where "CropProduction.dlf"))
+;(activate_output (after 1993 03 31 23))
+(log_prefix "Ex1/")
+(output harvest
+        ("Crop Production" (when daily))
 ;;      Water balance 0-100 cm  
-        ("Field water"    (to -100 [cm])(when monthly)  
-          (where "FWater100-M.dlf"))  
-        ("Soil water"     (to -100 [cm])(when monthly)  
-          (where "SWater100-M.dlf"))        
+        ("Field water" (to -100 [cm])(when daily)
+         (where "Daily_FWB.dlf"))  
 ;;      Nitrogen balance 0-100 cm  
-        ("Field nitrogen" (to -100 [cm])(when monthly)  
-          (where "FN100-M.dlf"))  
-        ("Soil nitrogen"  (to -100 [cm])(when monthly)  
-          (where "SN100-M.dlf"))
+        ("Field nitrogen" (to -100 [cm])(when daily)
+          (where "Daily_FNB.dlf"))  
 ;;      Soil profile data
-        ("Soil Water Content" (when daily)(where "Theta.dlf"))
-        ("Soil Water Potential (pF)"(when daily)(where "pF.dlf"))
-        ("Soil NO3 Concentration"(when daily)(where "SNO3.dlf"))
+        ("Soil Water Content"       (when daily))
+        ("Soil Water Potential (pF)"(when daily))
+        ("Soil NO3 Concentration"   (when daily))
 )
 
-;;; Exercise01.dai ends here.
