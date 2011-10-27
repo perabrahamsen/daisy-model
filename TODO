@@ -1,14 +1,44 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Smoke 
+* MMO artikel
 
-** Log water
+** Indledning
 
-** Vælg 10 år
+*** Start: Hvad præcis vil vi.
 
-** Slet 1D & K01
+Dræn er vigtigt. Dræn er et 2D problem.  1D hurtig og let at implementere. 
+2D principielt bedre. 1D bruges i praksis. Er det i orden? 
 
-** Kør
+*** Brødtekst.
+
+Brug af 1D i stor skala.
+
+Tidligere forsøg på at svare på spørgsmålet.
+
+Hvad vi kan gøre bedre.
+
+*** Slut: To hypoteser 
+
+1) 1D er god nok til årsmiddeltal (grundvand + N)
+2) ikke god nok til daglige værdier (miljøfremmede stoffer).
+
+** Resultater og diskussion
+
+*** Årsværdier gode nok, hypotese opfyldt.
+
+*** Dagsværdier gode nok hypotese ikke opfyldt.
+
+*** Analyse af hvorfor 1D er god nok
+
+*** Diskussion af hvornår 1D mon ikke er god nok.
+
+Adsorption, bioporer, partikelfaciliteret transport.
+
+** Konklusion
+
+Den nuværende brug af 1D for nitrat virker i høj grad rimelig.
+
+Yderligere analyse påkrævet for adsorberende stoffer.
 
 * decompose secondary domain
 

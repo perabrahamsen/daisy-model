@@ -41,7 +41,7 @@
 
 (defchemical Pendimethalin Pendimethalin-base
   "Dissolved pendimethalin."
-  (C_inf_max 0.33 [mg/l])               ;Source: PPDB solutability.
+  (solubility 0.33 [mg/l])               ;Source: PPDB.
   (adsorption none))
 
 (defchemical Pendimethalin-immobile Pendimethalin-base
@@ -98,7 +98,7 @@
 
 (defchemical Ioxynil Ioxynil-base
   "Dissolved ioxynil." 
-  (C_inf_max 3034 [mg/l])               ;Source: PPDB solutability.
+  (solubility 3034 [mg/l])               ;Source: PPDB
   (adsorption none))
 
 (defchemical Ioxynil-immobile Ioxynil-base
@@ -350,10 +350,10 @@
   (wait (at 2000 9 15 12)) (plowing))
 
 (defaction "STD" activity
-  (wait (at 2000 10 18 12)) (seed_bed_preparation) (sow "WWheat")
-  (wait (at 2000 11 10 12)) (spray "Pendimethalin" 2000 [g/ha])
-                            (spray "Ioxynil" 200 [g/ha])
-  (wait (at 2001 4 30 12)) (fertilize (NPK01 (weight 143 [kg N/ha]))))
+  (wait_mm_dd 10 18) (seed_bed_preparation) (sow "WWheat")
+  (wait_mm_dd 11 10) (progn (spray "Pendimethalin" 2000 [g/ha])
+                            (spray "Ioxynil" 200 [g/ha]))
+  (wait_mm_dd 04 01) (stop))
 
 ;;; Output.
 
@@ -361,42 +361,70 @@
 
 (deflog STD table
   (when daily)
-  (where "${col}-pest.dlf")
+  (where "${col}-${YEAR}-pest.dlf")
   (declare unit String "Base unit.")
   (unit "g/ha")
   (summary (simple (print_sum false)
                    (precision 6)
-                   (fetch ("W-Surface-Drain") ("W-Surface-Soil")
+                   (fetch ("W-Surface-Matrix")
+                          ("W-Biopore-100")("W-Matrix-100")
+                          ("W-Matrix-150")
+                          ("W-Soil-Drain") ("W-Surface-Drain") 
                           ("W-Biopore-0-5")("W-Biopore-5-30")
-                          ("W-Biopore-30")("W-Matrix-30")))
+                          
+                          ))
            (simple (print_sum false)
                    (precision 6)
                    (fetch ("I-Surface-Matrix") 
-                          ("I-Leak-Matrix-50") ("I-Leak-Biopore-50")
                           ("I-Leak-Matrix-100") ("I-Leak-Biopore-100")
-                          ("I-Leak-Matrix-150") ("I-Leak-Biopore-150")
+                          ("I-Leak-Matrix-150") 
                           ("I-Soil-Drain") ("I-Surface-Drain")))
            (simple (print_sum false)
                    (precision 6)
                    (fetch ("P-Surface-Matrix")
-                          ("P-Leak-Matrix-50") ("P-Leak-Biopore-50")
                           ("P-Leak-Matrix-100") ("P-Leak-Biopore-100")
-                          ("P-Leak-Matrix-150") ("P-Leak-Biopore-150")
+                          ("P-Leak-Matrix-150") 
                           ("P-Soil-Drain") ("P-Surface-Drain"))))
-  (entries (number (tag "W-Surface-Drain")
-                   (documentation "\
-Flux of water from surface to drain through biopores, bypassing the matrix.")
-                   (path column component Movement component 
-                         Tertiary biopores classes drain infiltration)
-                   (spec biopore drain infiltration)
-                   (handle sum)
-                   (dimension "mm"))
-           (number (tag "W-Surface-Soil")
+  (entries (number (tag "W-Surface-Matrix")
                    (documentation "\
 Flux of water from surface to biopores that end in matrix.")
                    (path column component Movement component 
                          Tertiary biopores classes matrix infiltration)
                    (spec biopore matrix infiltration)
+                   (handle sum)
+                   (dimension "mm"))
+           (flux_bottom (tag "W-Matrix-100")
+                        (path column component SoilWater q)
+                        (spec fixed SoilWater q)
+                        (handle sum)
+                        (to -100 [cm])
+                        (negate true)
+                        (dimension "mm"))
+           (flux_bottom (tag "W-Biopore-100")
+                        (path column component SoilWater q_p)
+                        (spec fixed SoilWater q_p)
+                        (handle sum)
+                        (to -100 [cm])
+                        (negate true)
+                        (dimension "mm"))
+           (flux_bottom (tag "W-Matrix-150")
+                        (path column component SoilWater q)
+                        (spec fixed SoilWater q)
+                        (handle sum)
+                        (to -150 [cm])
+                        (negate true)
+                        (dimension "mm"))
+           (interval (tag "W-Soil-Drain")
+                     (path column component SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm"))
+           (number (tag "W-Surface-Drain")
+                   (documentation "\
+Flux of water from surface to drain through biopores, bypassing the matrix.")
+                   (path column component Movement component 
+                         Tertiary biopores classes drain infiltration)
+                   (spec biopore drain infiltration)
                    (handle sum)
                    (dimension "mm"))
            (interval (tag "W-Biopore-0-5")
@@ -419,21 +447,7 @@ Water that enters the biopores in the specified interval")
                      (spec biopore component M2B)
                      (handle sum)
                      (dimension "mm"))
-           (flux_bottom (tag "W-Matrix-30")
-                        (path column component SoilWater q)
-                        (spec fixed SoilWater q)
-                        (handle sum)
-                        (to -30 [cm])
-                        (negate true)
-                        (dimension "mm"))
-           (flux_bottom (tag "W-Biopore-30")
-                        (path column component SoilWater q_p)
-                        (spec fixed SoilWater q_p)
-                        (handle sum)
-                        (to -30 [cm])
-                        (negate true)
-                        (dimension "mm"))
-
+           
            (flux_top (path column component Chemistry component 
                            trace Ioxynil-base J_matrix)
                      (documentation "\
@@ -494,16 +508,6 @@ Lost due to leaching.")
                         (dimension "${unit}")
                         (to -150 [cm])
                         (spec chemical default J_matrix))
-           (flux_bottom (path column component Chemistry component 
-                              trace Ioxynil-base J_tertiary)
-                        (documentation "\
-Lost due to leaching.")
-                        (tag "I-Leak-Biopore-150")
-                        (negate true)
-                        (handle sum)
-                        (dimension "${unit}")
-                        (to -150 [cm])
-                        (spec chemical default J_tertiary))
            (interval (path column component
                            Chemistry component trace Ioxynil-base S_drain)
                      (spec chemical default S_drain)
@@ -538,26 +542,6 @@ Lost due to leaching.")
                               trace Pendimethalin-base J_matrix)
                         (documentation "\
 Lost due to leaching.")
-                        (tag "P-Leak-Matrix-50")
-                        (negate true)
-                        (handle sum)
-                        (dimension "${unit}")
-                        (to -50 [cm])
-                        (spec chemical default J_matrix))
-           (flux_bottom (path column component Chemistry component 
-                              trace Pendimethalin-base J_tertiary)
-                        (documentation "\
-Lost due to leaching.")
-                        (tag "P-Leak-Biopore-50")
-                        (negate true)
-                        (handle sum)
-                        (dimension "${unit}")
-                        (to -50 [cm])
-                        (spec chemical default J_matrix))
-           (flux_bottom (path column component Chemistry component 
-                              trace Pendimethalin-base J_matrix)
-                        (documentation "\
-Lost due to leaching.")
                         (tag "P-Leak-Matrix-100")
                         (negate true)
                         (handle sum)
@@ -584,16 +568,6 @@ Lost due to leaching.")
                         (dimension "${unit}")
                         (to -150 [cm])
                         (spec chemical default J_matrix))
-           (flux_bottom (path column component Chemistry component 
-                              trace Pendimethalin-base J_tertiary)
-                        (documentation "\
-Lost due to leaching.")
-                        (tag "P-Leak-Biopore-150")
-                        (negate true)
-                        (handle sum)
-                        (dimension "${unit}")
-                        (to -150 [cm])
-                        (spec chemical default J_tertiary))
            (interval (path column component
                            Chemistry component trace Pendimethalin-base S_drain)
                      (spec chemical default S_drain)
@@ -668,6 +642,15 @@ This never come in contact with the soil matrix.")
                    (handle average)
                    (path weather default wind)
                    (spec weather default wind))))
+
+(deflog YearlyPrecip table
+  "Summarize daily weather with minimum and maximum temperatures."
+  (when yearly)
+  (entries (number (tag "Precip")
+                   (dimension "mm")
+                   (handle sum)
+                   (path weather default precipitation)
+                   (spec weather default precipitation))))
   
 (defprogram STD Daisy
   "Reference scanerio."
@@ -707,11 +690,10 @@ This never come in contact with the soil matrix.")
   (PART 15 [g/J])   
 
   ;; Stuff.
-  (weather default "Rorrende.dwf" )
+  (weather default "dk-taastrup-hourly.dwf" )
   (column STD)
   (manager STD)
-  (time 2000 10 18 0)
-  (stop 2001 2 20) ;; End of third draining season.
+  (time $START)
   (minimal_timestep (microseconds 1))
   (print_time periodic)
   (log_prefix "log/")
@@ -726,15 +708,16 @@ This never come in contact with the soil matrix.")
   (output checkpoint))
 
 (defprogram MakeDaily Daisy
-  (weather default "Rorrende.dwf" )
+  (weather default "dk-taastrup-hourly.dwf" )
   (column (default 
             (Soil (MaxRootingDepth 150 [cm])
-                  (horizons (-200.00 "C")))
+                  (horizons (-200.00 (USDA3 (sand 0.90) (silt 0.05) (clay 0.04) (humus 0.01) (dry_bulk_density 1.5 [g/cm^3])))))
             (Groundwater deep)))
   (manager activity)
-  (time 2000 10 10 0)
-  (stop 2001 3 1)
-  (output MinMaxWeather))
+  (time 1995 03 25)
+  (stop 1998 10 28)
+  (output ;;MinMaxWeather
+   (YearlyPrecip (when monthly) (where "weather-monthly-hourly.dlf"))))
 
 (defprogram BMA STD
   (col BMA)
@@ -773,6 +756,7 @@ This never come in contact with the soil matrix.")
   (PP_K 0.036 [cm/h]))
 
 (defprogram U4S STD
+  (col U4S)
   (A_lim -1308 [cm])
   (B_lim -321 [cm]))
 
@@ -802,54 +786,56 @@ This never come in contact with the soil matrix.")
   (col NOS)
   (column NOS))
 
-(defcolumn S1D default
-  (OrganicMatter none)
-  (Chemistry multi (combine colloids Pendimethalin Ioxynil))
-  ;; Heat and Water from checkpoint.
-  (Soil (MaxRootingDepth 150 [cm])
-        (horizons (-3.00 "Surface")
-                  (-24.00 "Ap1")
-                  (-30.00 "Ap2")
-                  (-40.00 "A2")
-                  (-60.00 "B1")
-                  (-120 "Bt")
-                  (-200 "C")))
-  (Drain lateral)
-  (Groundwater aquitard
-        (K_aquitard 0.050 [cm/h])
-        (Z_aquitard 200 [cm])
-        (pressure_table (file "piezo-calib.gwt"))))
-
-  
-(defprogram S1D STD
-  (col S1D)
-  (column S1D))
-  
-(defprogram N1D S1D
-  (col N1D)
-  (column (original (Movement original (Tertiary none)))))
-
 (defprogram K10 STD
+  (col K10)
   (P_OC 1574.4 [ml/g])
   (I_OC 27.6 [ml/g]))
 
-(defprogram K01 STD
-  (P_OC 157.44 [ml/g])
-  (I_OC 2.76 [ml/g]))
-
 (defprogram KSO STD
+  (col KSO)
   (SORP 1.0 [h^-1]))
 
 (defprogram PAR STD
+  (col PAR)
   (PART 0.0 [g/J]))
 
 (defprogram sims batch
-  (run STD S1D N1D BMA BMI BNO DAY SUR SUP PPK SPP U4S NOS
-       K10 K01 KSO PAR))
+  (declare START fixed Time "")
+  (declare YEAR Integer "")
+  (run STD BMA BMI BNO DAY
+       SUR SUP PPK SPP U4S
+       NOS K10 KSO PAR))
 
-(defprogram new batch
-  (run PPK SPP KSO PAR))
+(defprogram sims10 batch
+  (run (sims (START 1998 10 1 0) (YEAR 1998))
+       (sims (START 1999 10 1 0) (YEAR 1999))
+       (sims (START 2000 10 1 0) (YEAR 2000))
+       (sims (START 2001 10 1 0) (YEAR 2001))
+       (sims (START 2002 10 1 0) (YEAR 2002))
+       (sims (START 2003 10 1 0) (YEAR 2003))
+       (sims (START 2004 10 1 0) (YEAR 2004))
+       (sims (START 2005 10 1 0) (YEAR 2005))
+       (sims (START 2006 10 1 0) (YEAR 2006))
+       (sims (START 2007 10 1 0) (YEAR 2007))))
 
-(run STD)
+(defprogram simsNW batch
+  (run (sims (START 1998 10 1 0) (YEAR 1998))
+       (sims (START 1999 10 1 0) (YEAR 1999))
+       (sims (START 2000 10 1 0) (YEAR 2000))))
+
+(defprogram simsNE batch
+  (run (sims (START 2001 10 1 0) (YEAR 2001))
+       (sims (START 2002 10 1 0) (YEAR 2002))
+       (sims (START 2003 10 1 0) (YEAR 2003))))
+
+(defprogram simsSW batch
+  (run (sims (START 2004 10 1 0) (YEAR 2004))
+       (sims (START 2005 10 1 0) (YEAR 2005))
+       (sims (START 2006 10 1 0) (YEAR 2006))))
+
+(defprogram simsSE batch
+  (run (sims (START 2007 10 1 0) (YEAR 2007))))
+
+(run sims10)
 
 ;; pest.dai ends here.
