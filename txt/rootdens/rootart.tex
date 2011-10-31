@@ -1,5 +1,5 @@
-\documentclass[twocolumn,natbib]{svjour3}
-%%\documentclass[referee,natbib]{svjour3}
+%%\documentclass[twocolumn,natbib]{svjour3}
+\documentclass[referee,natbib]{svjour3}
 \usepackage{mathptmx}
 \usepackage{graphicx}
 \journalname{Plant and Soil}
@@ -20,9 +20,11 @@
 \newcommand{\oned}{\textsc{1d}}
 \newcommand{\threed}{\textsc{3d}}
 
+\newcommand{\MyEq}[1]{Eq.~\ref{#1}}
+
 \begin{document}
 
-%%\linenumbers
+\linenumbers
 
 \title{A simple parametric \twod{} root density distribution model
   for row crops}  
@@ -57,7 +59,7 @@
 
   \twod{} root density measurements was performed at two sites for two
   experimental years and multiple plots.  Both the \oned{} and \twod{}
-  model are fitted to these datasets.  Based on a statistical F-test
+  models are fitted to these datasets.  Based on a statistical F-test
   we conclude that the \twod{} model is superior when the root zone
   width is less than the distance between rows.  The median of the
   coefficient of determination for all the examined datasets is 0.86,
@@ -85,7 +87,7 @@ solutions for special cases were found by~\cite{willigen2002two}.
 The \twod{} radial and the \threed{} root density models typically
 include only a single plant.  In contrast, \oned{} models by their
 nature will be concerned with a whole population, like a forest or an
-agricultural crop.  An example of the later would be the model found
+field crop.  An example of the later would be the model found
 by~\cite{gp74} based on a meta-analysis, where they found an
 exponential decrease with depth to match the observations.  The root
 models mentioned above are parametric, the root are described as a
@@ -101,16 +103,16 @@ problem becomes \threed{}.  Solving Richards equation in \threed{} is
 complex and results in long simulation times.  Hence, finding a
 \twod{} approximation is therefore desirable.  In this paper we
 therefore propose a simple \twod{} model with Euclidean coordinates
-for row crops, based on on an extension of \cite{gp74}.  The
-assumption is that the row is sufficiently dense in the direction of
-the rows for us to ignore that dimension.  The two dimensions then
+for row crops, based on on an extension of the model by \cite{gp74}.
+The assumption is that the row is sufficiently dense in the direction
+of the rows for us to ignore that dimension.  The two dimensions then
 become depth and horizontal distance from the row.  The proposed model
 is static in that it doesn't include root growth, but it can be
 parametrized dynamically based on root mass and the depth and width of
 the root zone.
 
 The new root model was used in the SAFIR (SAFe IRrigation) EU project
-\citep{safir2010,ssoc} as part of the Daisy agro-ecological model
+\citep{ssoc,safir2010} as part of the Daisy agro-ecological model
 \citep{daisy-fertilizer,daisy-ems}.  The SAFIR project had two
 aspects, the first being assessment of the risk for human health with
 regard to use of waster water for irrigation
@@ -122,10 +124,10 @@ the two Chinese sites root density was measured. The original Daisy
 soil water model was extended from \oned{} to \twod{} \citep{1dvs2d},
 and used for modelling the experiments.  The original Daisy crop model
 \citep{eupotato} calculates root dry mass and root zone depth, and
-assumes a root density distribution following \cite{gp74}.  With the
-\twod{} extension root zone radius was added to the crop model, as
-well as the root zone density distribution model discussed in this
-paper.
+assumes a root density distribution following the model by
+\cite{gp74}.  With the \twod{} extension root zone width was added to
+the crop model, as well as the root zone density distribution model
+discussed in this paper.
 
 \section{Model theory}
 
@@ -157,7 +159,7 @@ specify the density in terms of accumulated root dry matter $M_r$ and
 total root depth $d_c$ \citep{daisyN}.
 
 We define the root depth at the depth where the root density is at a
-specified threshold $L_m$.  By inserting this in \eqref{eq:g+p}, we
+specified threshold $L_m$.  By inserting this in \MyEq{eq:g+p}, we
 get
 \begin{equation}
   L_m = L_0\, e^{-a \, d_c}
@@ -178,7 +180,7 @@ the profile
   \label{eq:root-integral}
 \end{equation}
 By inserting the expression we get for $L_0$ from
-\eqref{eq:root-integral} in \eqref{eq:root-depth} we get
+\MyEq{eq:root-integral} in \MyEq{eq:root-depth} we get
 \begin{equation}
   L_m = l_r \, a \, e^{-a \, d_c}
   \label{eq:a-only}
@@ -190,10 +192,13 @@ side this gives us
   \label{eq:Lambert}
 \end{equation}
 If the root length is suffiently high the equation will have multiple
-solutions, but only the solution for $W\leq-1$ is physically
-meaningful.  It can be found using Newton's method and an initial
-quess of $-2$.  After finding a value for $W$, we can find the desired
-density parameters $L_0$ and $a$ by substituting back
+solutions, the solution for $W\le-1$ corresponds to a high density
+near the surface that decreases sharply with depth, and is more
+realistic than the solution for $W\gt-1$ which has a comparable flat
+root profile, where more of the roots lie outside the root zone.  The
+solution can be found using Newton's method and an initial quess of
+$-2$.  After finding a value for $W$, we can find the desired density
+parameters $L_0$ and $a$ by substituting back
 \begin{eqnarray}
    a   &=& -W / d_c\\\label{eq:a-solved}
    L_0 &=& \frac{L_m}{e^{-a \, d_c}} = L_m e^{a \, d_c}\label{eq:L0-found}
@@ -202,14 +207,14 @@ density parameters $L_0$ and $a$ by substituting back
 \subsubsection{Limited growth}
 \label{sec:soillim}
 
-The distribution in \eqref{eq:g+p} implies a gradual decrease of roots
+The distribution in \MyEq{eq:g+p} implies a gradual decrease of roots
 going towards but never reaching zero.  For some soils this doesn't
 match what we observe, rather than a gradual decrease, there is sharp
 decrease at a specific depth, as the roots are unable to penetrate
-further down.  To handle this, we divide the root depth into a crop
-specific and soil independent potential root depth $d_c$, and soil
-specific and crop independent maximum root depth $d_s$.  The actual
-root depth $d_a$ is then the shallowest of these two.
+further down.  To handle this, we can divide the root depth into a
+crop specific and soil independent potential root depth $d_c$, and
+soil specific and crop independent maximum root depth $d_s$.  The
+actual root depth $d_a$ is then the shallowest of these two.
 \begin{equation}
   d_a = \min (d_c, d_s)
   \label{eq:actual-depth}
@@ -238,7 +243,7 @@ We can describe a row crop with a two dimensional model by assuming
 that the plants are densely packed in the row.  Our second dimension
 $x$ is horizontal, orthogonal to the row.  The root density at a
 specific point can be denoted $L\, (x,z)$, and we choose a coordinate
-system where $L\, (0,0)$ (or $L_{0,0}$) is the root density in the
+system where $L\, (0,0)$ (also denoted $L_{0,0}$) is the root density in the
 top center of the row.  We then define the following root distribution
 \begin{equation}
   L\, (x,z) = L_{0,0}\, e^{-a_z z} e^{-a_x |x|}
@@ -247,17 +252,17 @@ top center of the row.  We then define the following root distribution
 where $a_z$ and $a_x$ control the density decrease in the two
 dimensions.
 
-\subsubsection{Finding the parameters}
+\subsubsection{Estimating the parameter values}
 
-To find the parameters $a_z$, $a_x$ and $L_{0,0}$, we assume as before
-that the root depth and root mass are known, and now additionally that
-the root zone radius at soil surface $w_c$ is known.  We define the
-root zone depth $d_c$ to be the depth right below the row ($x = 0$)
-where the root density is $L_m$.  As $x=0$ is the place where
-\eqref{eq:Lxz} predicts the highest density, the average root density
-at that depth will be below $L_m$.  Similarly, we define the radius
-$w_c$ as the horizontal distance from the row where the root density
-at the surface ($z = 0$) is equal to $L_m$.
+To estimate values for the parameters $a_z$, $a_x$ and $L_{0,0}$, we
+assume as before that the root depth and mass are known, and now
+additionally that the root zone width at soil surface $w_c$ is known.
+We define the root zone depth $d_c$ to be the depth right below the
+row ($x = 0$) where the root density is $L_m$.  As $x=0$ is the place
+where \MyEq{eq:Lxz} predicts the highest density, the average root
+density at that depth will be below $L_m$.  Similarly, we define the
+width $w_c$ as the horizontal distance from the row where the root
+density at the surface ($z = 0$) is equal to $L_m$.
 \begin{equation}
   L_m = L\, (0,d_c) = L\,(w_c,0)
   \label{eq:minroot}
@@ -275,7 +280,7 @@ See figure~\ref{fig:row} for an illustration.
     root density isolines are shown.  The three innermost isolines
     each represents a fixed decrease in root density.  The last
     isoline represents the threshold value, $L_m$, and defines both
-    the root zone depth ($d_c$) and the root zone radius ($w_c$).}
+    the root zone depth ($d_c$) and the root zone width ($w_c$).}
   \label{fig:row}
 \end{figure}
 
@@ -287,12 +292,12 @@ the half plane
 %%        = \int_0^{\infty} \int_0^{\infty} L_{0,0}\, e^{-a_z z} e^{-a_x |x|} \: dz \, dx
   \label{eq:root-integral2}
 \end{equation}
-Thus \eqref{eq:Lxz} can be rewritten 
+Thus \MyEq{eq:Lxz} can be rewritten 
 \begin{equation}
   L\, (x,z) = l_R\, a_z\, a_x \, e^{-a_z z} e^{-a_x |x|}  
   \label{eq:axz}
 \end{equation}
-By using \eqref{eq:axz} in \eqref{eq:minroot} we get
+By using \MyEq{eq:axz} in \MyEq{eq:minroot} we get
 \begin{eqnarray}
   L_m &=& l_R\, a_z\, a_x \, e^{-a_z d_c} \\\label{eq:Ld0}
   L_m &=& l_R\, a_z\, a_x \, e^{-a_x w_c}\label{eq:L0r}
@@ -302,7 +307,7 @@ Thus $e^{-a_z d_c} = e^{-a_x w_c}$ or
   a_x = \frac{d_c}{w_c} a_z
   \label{eq:aztoax}
 \end{equation}
-By inserting \eqref{eq:aztoax} in \eqref{eq:Ld0} we get
+By inserting \MyEq{eq:aztoax} in \MyEq{eq:Ld0} we get
 \begin{equation}
   L_m = l_R\, a_z\, \frac{d_c}{w_c} a_z \, e^{-a_z d_c}
   \label{eq:azeq1}
@@ -320,8 +325,8 @@ and isolate the known values on the right side, this gives us:
 The equation can have multiple solutions, but only the solution for
 $Q\leq -2$ is physically meaningful.  It can be found using Newton's
 method with an initial guess of $-3$. Knowing $Q$ we can find
-$a_z$~\eqref{eq:Qaz}, $a_x$~\eqref{eq:aztoax}, and
-$L_{0,0}$~\eqref{eq:root-integral2}.
+$a_z$~\MyEq{eq:Qaz}, $a_x$~\MyEq{eq:aztoax}, and
+$L_{0,0}$~\MyEq{eq:root-integral2}.
 
 \subsubsection{Multiple rows}
 \label{sec:model-rows}
@@ -346,15 +351,15 @@ of identical rows, this can be expressed by the equation
   L^* (x,z) = \sum_{i=0}^{\infty} (L\, (x + i D,z) + L\, (D + i D - x,z))\\
   \label{eq:Lxzstar}
 \end{equation}
-where $L\, (x + 0 D,z)$ represents the contribution from the row
+where $L\, (x,z)$ represents the contribution from the row
 itself,\linebreak{} $\sum_{i=1}^{\infty} L\, (x + i D,z)$ represents
 the contributions from all the rows to the left, and
 $\sum_{i=0}^{\infty} L\, (D + i D - x,z)$ represents the contributions
-from all the rows to the right.  Equation~\eqref{eq:Lxzstar} is valid
-for the half row $0 \leq x \leq D/2$, but can be extended outside the
-interval by assuming all rows are identical $L^* (x,z) = L^* (x+D,z)$
-and symetrical $L^* (x,z) = L^* (-x,z)$. We can rewrite
-\eqref{eq:Lxzstar} to get rid of the sum
+from all the rows to the right.  \MyEq{eq:Lxzstar} is valid for the
+half row $0 \leq x \leq D/2$, but can be extended outside the interval
+by assuming all rows are identical $L^* (x,z) = L^* (x+D,z)$ and
+symetrical $L^* (x,z) = L^* (-x,z)$. We can rewrite \MyEq{eq:Lxzstar}
+to get rid of the summation
 \begin{equation}
   \begin{array}{rl}
      & \sum_{i=0}^{\infty} (L\, (x + i D,z) + L\, (D + i D - x,z))\\
@@ -377,16 +382,16 @@ on figure~\ref{fig:tworows}.
 \subsubsection{Mapping between the models}
 \label{sec:mapping}
 
-We can get the vertical density distribution for \eqref{eq:Lxzstar} at
+We can get the vertical density distribution for \MyEq{eq:Lxzstar} at
 a specific depth $L^* (z)$ by finding the total root length density of
-a single row \eqref{eq:Lxz} at the specific depth, and divide with the
+a single row \MyEq{eq:Lxz} at the specific depth, and divide with the
 distance between rows.
 \begin{equation}
   L^*(z) = \frac{\int_{-\infty}^{\infty} L\, (x,z)\, dx}{D}
   \label{eq:x-integrated}
 \end{equation}
-By setting $L^* (z) = L\, (z)$ and inserting \eqref{eq:Lxz} and
-\eqref{eq:g+p} in \eqref{eq:x-integrated} we get
+By setting $L^* (z) = L\, (z)$ and inserting \MyEq{eq:Lxz} and
+\MyEq{eq:g+p} in \MyEq{eq:x-integrated} we get
 \begin{equation}
   \begin{array}{rcl}
     L_0\, e^{-a z} &=& \frac{1}{D} \int_{-\infty}^{\infty} L_{0,0}\, e^{-a_z z} e^{-a_x |x|} dx\\
@@ -397,8 +402,8 @@ By setting $L^* (z) = L\, (z)$ and inserting \eqref{eq:Lxz} and
   \label{eq:1d2d}
 \end{equation}
 hence $a = a_z$ and $L_0 = \frac{2 L_{0,0}}{a_x D}$ are the parameter
-values to use in \eqref{eq:g+p} to get the same vertical density
-distribution as \eqref{eq:Lxzstar}.
+values to use in \MyEq{eq:g+p} to get the same vertical density
+distribution as \MyEq{eq:Lxzstar}.
 
 \section{Data description and methodology}
 
@@ -560,7 +565,7 @@ described in section~\ref{sec:model-1d}.  Imposing a soil limit (see
 section~\ref{sec:soillim}) did not improve the fit, so we used $d_a =
 d_c$.  For the \twod{} model, we created a similar function based on
 section~\ref{sec:model-rows} that in addition took the horizontal root
-zone radius ($w_c$) as a parameter.  For each dataset, we found the
+zone width ($w_c$) as a parameter.  For each dataset, we found the
 parameter values that gave the highest R$^2$ using
 the~\cite{nelder1965simplex} simplex algorithm.
 
@@ -586,7 +591,7 @@ discussion.
 Table~\ref{tab:ftest} shows the best fit root parameters for the
 \twod{} root density model, as well as the coefficient of
 determination (R$^2$) for both the \twod{} and \oned{} models, and the
-F-test value.  The horizontal root zone radius is the parameter that
+F-test value.  The horizontal root zone width is the parameter that
 shows the largest variation between treatments, and root zone depth is
 the parameter that shows least variation.  With the exception of the
 early 2008 sampling of CAU plot 12, the \twod{} R$^2$ is always above
@@ -594,10 +599,10 @@ early 2008 sampling of CAU plot 12, the \twod{} R$^2$ is always above
 root zone and more root mass than the tomato (CAU), but no clear
 difference in root zone depth.  The \oned{} R$^2$ were much lower
 (less than 0.20) for the plots where the estimated \twod{} root zone
-radius was less than half the distance between rows.  The F-test
+width was less than half the distance between rows.  The F-test
 showed that the \twod{} model gave a significant better fit than the
 \oned{} model for all the aggregate datasets, half the CAAS datasets,
-and all but but three of the CAU datasets.
+and all but three of the CAU datasets.
 
 \begin{table}[htbp]
   \caption{The best fit for root zone depth ($d_c$),
@@ -760,7 +765,7 @@ dynamics in row crops.
 
 Additionally, we believe that conversion of root density measurements
 to general crop parameters (root dry mass, root zone depth, and root
-zone radius) will be useful when analysing the effect of treatments,
+zone width) will be useful when analysing the effect of treatments,
 climate, or soil type on root development.  Such an analysis is
 outside the scope of this paper, but the numbers presented on
 table~\ref{tab:ftest} do not give a clear indication of the difference
@@ -770,11 +775,11 @@ for the present experiment.
 \section{Software and data availability}
 
 Software to estimate root mass and root zone depth from \oned{} root
-density data, and in addition root zone radius from \twod{} root
+density data, and in addition root zone width from \twod{} root
 density data, can be found at \url{http://www.daisy-model.org/} (look
 under \texttt{Wiki}, \texttt{\textsc{gp2d}}).  Also supported is
 estimating root density distribution from root mass, root zone depth,
-and optionally, root zone radius.  The program code is written in
+and optionally, root zone width.  The program code is written in
 \cplusplus{} and is covered by on open source license (\textsc{gnu
   lgpl}), so it can be freely incorporated in other models.
 
@@ -819,7 +824,7 @@ $L^* (z)$& L/L$^3$ & Average vertical root density for row\\
 $M_r$   & M/L$^2$& Total root dry matter\\ 
 $Q$     &         & Substitution variable\\
 $S_r$   & L/M    & Specific root length\\ 
-$w_c$     & L     & Horizontal root zone radius\\
+$w_c$     & L     & Horizontal root zone width\\
 $W$     &         & Substitution variable\\ 
 $x$     & L       & Horizontal position across row \\
 $y$     & L       & Horizontal position along row \\
@@ -841,6 +846,8 @@ $z$     & L       & Soil depth \\
 \item Are there any publication on the Chinese experiments?  Yields,
   effect of treatment, whatever?
 \end{itemize}
+\end{document}
+
 
 \pagebreak
 \section*{Removed}
@@ -892,7 +899,7 @@ The solution to this equation with regard to
 $W$ happens to be the definition of the Lambert-W function
 \citep{lambert58,euler83}.
 
-In order to solve \eqref{eq:Lambert} with regard to $W$, we first
+In order to solve \MyEq{eq:Lambert} with regard to $W$, we first
 divide the expression into monotonic intervals by finding the
 derivative
 \begin{equation}
@@ -909,7 +916,7 @@ $-1$ and increasing above $-1$.  Thus, a global minimum is obtained
 for $W=-1$.
 
 Since $\lim_{W\to-\infty} W\,e^W=0$ we get a single solution
-to~\eqref{eq:Lambert} when $-L_m \frac{d_c}{l_r}$ is exactly at the
+to~\MyEq{eq:Lambert} when $-L_m \frac{d_c}{l_r}$ is exactly at the
 bottom point ($-1 e^{-1}$), two when it is above (it is never
 positive), and none when it is below.  The later situation corresponds
 to the case where there is insufficient root $l_r$ to satisfy the
@@ -918,7 +925,7 @@ minimal root density $L_m$ within the given root zone $d_c$.
 Both solutions are valid, but represent different distributions.
 \begin{itemize} 
 \item The solution for $W < -1$ represents a large $a$ parameter. From
-  \eqref{eq:L0-found} we see this also means $L_0$ is large.  Thus,
+  \MyEq{eq:L0-found} we see this also means $L_0$ is large.  Thus,
   the solution corresponds to a root zone with a high density near the
   top that decreases rapidly to $L_m$ at the bottom of the root zone,
   and continues to decrease so only a small contribution to the total
@@ -962,7 +969,7 @@ minimum, and $Q=-2$ is a local maximum.
 
 We are not interested in positive values for $Q$, they correspond to
 negative values for $a_z$, the simplification in
-\eqref{eq:root-integral2} are only valid if $a_z > 0$. Since
+\MyEq{eq:root-integral2} are only valid if $a_z > 0$. Since
 $\lim_{Q\to-\infty} Q^2\,e^Q=0$ we get a single negative solution when
 $L_m \frac{d_c \, w_c}{l_R}$ is exactly at the top point ($2^2 e^{-2}$),
 two when it is smaller (it is never negative), and none when it is

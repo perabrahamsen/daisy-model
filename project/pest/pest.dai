@@ -166,7 +166,7 @@
           (density (plf x 
                         (domain [cm]) (range [m^-2])
                         (points (0 0) (50 $LARGE))))
-          (diameter 2 [mm])))
+          (diameter 6 [mm])))
            
 (defbiopore "drain small"
    (drain  (height_start 0 [cm])
