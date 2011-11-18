@@ -25,22 +25,7 @@ steady state conditions.
 The purpose of the work descrived in this paper is to evaluate if and
 under which conditions an 1D solution to Richard's equation combined
 with lateral flow based on Hooghoudt theory is an adequate substitute
-for a 2D solution to Richard's equation. In particular, we look at
-both daily and yearly values, and examine transport of both nitrate (a
-natural part of the soil water system) and a tracer (bromide) applied
-only once.  
-
-
-
-
-
-
-** Indledning
-
-*** Start: Hvad præcis vil vi.
-
-Dræn er vigtigt. Dræn er et 2D problem.  1D hurtig og let at implementere. 
-2D principielt bedre. 1D bruges i praksis. Er det i orden? 
+for a 2D solution to Richard's equation.
 
 *** Brødtekst.
 
