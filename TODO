@@ -2,6 +2,39 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * MMO artikel
 
+** Introduction
+
+Water flow and solute transport in soil is in general a 3D
+problem. However, for the unsaturated zone it can often be adequately
+modelled as a 1D problem. Similarily, flow and transport in partially
+saturated soil with subsoil tile drains can be treated as a 2D
+problem.
+
+Richard's equation, the main equation used for flow in unsaturated or
+partially saturated soil, is notoriously difficult to solve, even
+numerically. There are two strong incentives for trying to reduce the
+number of dimensions: 1) a numerical solution to the equation becomes
+simpler to implement, and 2) the numerical solution takes less time to
+compute.  For these reasons even partially saturated soil with subsoil
+tile drains is often modelled as a 1D vertical flow, with a seperate
+mechanism for describing the lateral flow, often based on Hooghoudt
+theory \citep{hooghoudt}. However, the Hooghoudt theory was not
+developed for these kind of applications, for one thing it assumes
+steady state conditions.
+
+The purpose of the work descrived in this paper is to evaluate if and
+under which conditions an 1D solution to Richard's equation combined
+with lateral flow based on Hooghoudt theory is an adequate substitute
+for a 2D solution to Richard's equation. In particular, we look at
+both daily and yearly values, and examine transport of both nitrate (a
+natural part of the soil water system) and a tracer (bromide) applied
+only once.  
+
+
+
+
+
+
 ** Indledning
 
 *** Start: Hvad præcis vil vi.

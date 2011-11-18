@@ -2228,7 +2228,7 @@ Initial NO3 concentration in soil water.")
   void load_frame (Frame& frame) const
   {
     // We initialize to approximatey half the allowed content in
-    // drinking water [ 0.5 * 100 mg NO3/l ~= 5.0e-6 g NO3-N/cm^3 ]
+    // drinking water [ 0.5 * 50 mg NO3/l ~= 5.0e-6 g NO3-N/cm^3 ]
     frame.set ("C", 5e-6); 
   }
 } InitialNO3_syntax;
@@ -2269,7 +2269,7 @@ Initial NH4 concentration in soil water.")
   {
     // We initialize to approximatey 5% of the N corresponding to the
     // allowed content of NO3 in drinking water.
-    // [ 0.05 * 100 mg/l = 0.5e-6 g/cm^3 ]
+    // [ 0.05 * 50 mg/l = 0.5e-6 g/cm^3 ]
     frame.set ("C", 0.55e-6); 
   }
 } InitialNH4_syntax;

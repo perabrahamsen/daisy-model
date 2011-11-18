@@ -180,46 +180,7 @@ Toplevel::Implementation::~Implementation ()
 { add_daisy_log (); }
 
 const char *const
-Toplevel::default_description = 
-"\
-\n\
-The top level syntax for a Daisy setup file.\n\
-\n\
-The main parameter is 'run', which determines the program to run.  It\n\
-is also the only real parameter, the rest are more appropriately\n\
-called 'commands', as the have an immediate effect.  These are mostly\n\
-concerned with reading additionally files ('input'), and where to find\n\
-those files ('directory' and 'path').\n\
-\n\
-Also found at top level, but not listed here, are the named\n\
-parameterizations.  The format of those are:\n\
-\n\
-   (defCOMP NEW OLD \"DOC\" PARS...)\n\
-\n\
-Here COMP is the the component for which you want to define a new\n\
-parameterization, NEW is the name of the new paramterization, OLD the\n\
-name of an already defined parameterization or model you want to base\n\
-the new parameterization on, and PARS... is a list of parameters and\n\
-values you want to set for this paramaterization. \"DOC\" is an\n\
-optional decsription of the paramterization.\n\
-\n\
-You can declare new parameters both at the top level, and inside the\n\
-PARS... list in the paramterization definition described above.  Once\n\
-you have declared a new parameter, you can set it just like the\n\
-build-in parameters.  The syntax for declaring a new parameter is\n\
-\n\
-  (declare PAR [SIZE] TYPE \"DOC\")\n\
-\n\
-Here PAR is the name of the new parameter we want to declare, [SIZE]\n\
-is either missing, in which case the new parameter is a singleton, [],\n\
-in which case the new parameter is a sequence with an arbitrary\n\
-length, of SIZE is an integer, in which case the sequence must hold\n\
-exactly that number of values.  TYPE is either a name of a component,\n\
-in which case the parameter must hold a paramterization of a model\n\
-within that component, or String, Integer, or Number, in which case\n\
-the value must be a primitive of that type.  For Number, you can also\n\
-specify a dimension in square brackets afterwards.  DOC is a\n\
-non-optional description of the new parameter.";
+Toplevel::default_description = "The top level syntax for a Daisy setup file.";
 
 const Frame& 
 Toplevel::program_frame () const

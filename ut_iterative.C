@@ -1,6 +1,7 @@
 #define BUILD_DLL
 #include "iterative.h"
 #include "assertion.h"
+#include "treelog.h"
 #include <gtest/gtest.h>
 
 TEST (Iterative, NelderMead)
@@ -26,7 +27,8 @@ TEST (Iterative, NelderMead)
   const size_t max_iter = 3000;
   Iterative::Point result;
   const bool solved = Iterative::NelderMead (min_iter, max_iter, epsilon,
-                                             fun, start, result);
+                                             fun, start, result, 
+                                             Treelog::null ());
   EXPECT_TRUE (solved);
   EXPECT_EQ (result.size (), 2);
   const double x = result[0];
