@@ -329,7 +329,7 @@ Expression to minimize.");
                    Attribute::Const, "\
 Minimal improvement of worst point to be considered for 'min_iter'.");
     frame.declare_integer ("min_iter", Attribute::Const, "\
-Maximal number of iterations with no improvement of best point.");
+Maximal number of iterations with no improvement of worst point.");
     frame.set_check ("min_iter", VCheck::positive ());
     frame.set ("min_iter", 10);
     frame.declare_integer ("max_iter", Attribute::Const, "\

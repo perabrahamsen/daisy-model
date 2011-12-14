@@ -1,63 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* MMO artikel
-
-** Introduction
-
-Water flow and solute transport in soil is in general a 3D
-problem. However, for the unsaturated zone it can often be adequately
-modelled as a 1D problem. Similarily, flow and transport in partially
-saturated soil with subsoil tile drains can be treated as a 2D
-problem.
-
-Richard's equation, the main equation used for flow in unsaturated or
-partially saturated soil, is notoriously difficult to solve, even
-numerically. There are two strong incentives for trying to reduce the
-number of dimensions: 1) a numerical solution to the equation becomes
-simpler to implement, and 2) the numerical solution takes less time to
-compute.  For these reasons even partially saturated soil with subsoil
-tile drains is often modelled as a 1D vertical flow, with a seperate
-mechanism for describing the lateral flow, often based on Hooghoudt
-theory \citep{hooghoudt}. However, the Hooghoudt theory was not
-developed for these kind of applications, for one thing it assumes
-steady state conditions.
-
-The purpose of the work descrived in this paper is to evaluate if and
-under which conditions an 1D solution to Richard's equation combined
-with lateral flow based on Hooghoudt theory is an adequate substitute
-for a 2D solution to Richard's equation.
-
-*** Brødtekst.
-
-Brug af 1D i stor skala.
-
-Tidligere forsøg på at svare på spørgsmålet.
-
-Hvad vi kan gøre bedre.
-
-*** Slut: To hypoteser 
-
-1) 1D er god nok til årsmiddeltal (grundvand + N)
-2) ikke god nok til daglige værdier (miljøfremmede stoffer).
-
-** Resultater og diskussion
-
-*** Årsværdier gode nok, hypotese opfyldt.
-
-*** Dagsværdier gode nok hypotese ikke opfyldt.
-
-*** Analyse af hvorfor 1D er god nok
-
-*** Diskussion af hvornår 1D mon ikke er god nok.
-
-Adsorption, bioporer, partikelfaciliteret transport.
-
-** Konklusion
-
-Den nuværende brug af 1D for nitrat virker i høj grad rimelig.
-
-Yderligere analyse påkrævet for adsorberende stoffer.
-
 * decompose secondary domain
 
 * Vestskoven
@@ -93,12 +35,6 @@ Then turn the setup back to Osvaldo for Monte Carlo generation.
 ** Latinske navne?
 
 Abstract: background and aims
-
-* Ny reference manual
-
-** Check part I
-
-** Check sortering af modeller.
 
 * Hent gammel PC.
 

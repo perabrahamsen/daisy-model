@@ -30,20 +30,35 @@
   for row crops}  
 
 \author{Per Abrahamsen \and Mathias Neumann Andersen \and Søren Hansen
-  \and Guitong Li \and Mikkel Mollerup \and Xuebin Qi}
+  \and Guitong Li \and Ping Li \and Mikkel Mollerup \and Xuebin Qi 
+  \and Dongmei Qiao}
 
 \institute{Per Abrahamsen \and Søren Hansen 
   \at Department of Basic Sciences and Environment,\\
       Faculty of Life Sciences, 
       University of Copenhagen,\\
-      Thorvaldsensvej 40, DK-1871, Frederiksberg\\
+      Thorvaldsensvej 40, DK-1871, Frederiksberg, Denmark\\
       \email{pa@life.ku.dk}
+  \and Mathias Neumann Andersen
+  \at Department of Agroecology,\\
+      University of Aarhus,\\
+      Blichers Allé 20, DK-8830, Tjele, Denmark
   \and Mikkel Mollerup
   \at Road Directorate, Ministry of Transport, Denmark
-  \and Xuebin Qi
-  \at Chinese Academy of Agricultural Sciences
+  \and Ping Li \and Xuebin Qi \and Dongmei Qiao
+  \at Water Resources and Water Environment\\
+      Farmland Irrigation Research Institute\\
+      Chinese Academy of Agricultural Science 
+      and the Ministry of Water Resources \\
+      380 East Hongli Road,\\
+      Xinxiang City,Henan Province,453003, P.R.China
   \and Guitong Li
-  \at China Agricultural University}
+  \at Department of Soil and Water Science,\\
+      College of Resources and Environment,\\
+      China Agricultural University,\\
+      No.2 of West road of Yuanmingyuan, Haidian, \\
+      Beijing, 100193, China
+}
 
 \date{\today{}}
 
@@ -71,18 +86,22 @@
 
 With partial root zone drying (PRD) irrigation, the transpiration will
 depend on the spatial distribution of the roots, due to the reliance
-of root signals.  Several models incorporating this exists,
-e.g.\@~\cite{vrugt2001calibration} proposes a flexible, empirical
-\twod{} root model with a radial geometry, which \cite{apri}
-successfully use to model PRD irrigation of a vineyard.  A static
-description of the root density based on measurements was used in the
-later application.  For perennial plants using a static description of
-the root zone during the irrigation season can make sense, but for
-annual plants, such as most vegetables, the root zone must be
-considered dynamic.  A dynamic root growth model for row crops based
-on diffusion theory was proposed in~\cite{acock1996convective}. In
-general this model required a numerical solution, but analytical
-solutions for special cases were found by~\cite{willigen2002two}.
+of root signals. It has been shown that the concentration of xylem ABA
+from the roots of plants can be described as a function of water
+potential of the dry and wet
+zones. \citep{liu2008measurement,dodd2008accounting}. Several root
+models suitable for PRD exists, e.g.\@~\cite{vrugt2001calibration}
+proposes a flexible, empirical \twod{} root model with a radial
+geometry, which \cite{apri} successfully use to model PRD irrigation
+of a vineyard.  A static description of the root density based on
+measurements was used in the later application.  For perennial plants
+using a static description of the root zone during the irrigation
+season can make sense, but for annual plants, such as most vegetables,
+the root zone must be considered dynamic.  A dynamic root growth model
+for row crops based on diffusion theory was proposed
+in~\cite{acock1996convective}. In general this model required a
+numerical solution, but analytical solutions for special cases were
+found by~\cite{willigen2002two}.
 
 The \twod{} radial and the \threed{} root density models typically
 include only a single plant.  In contrast, \oned{} models by their
@@ -194,7 +213,7 @@ side this gives us
 If the root length is suffiently high the equation will have multiple
 solutions, the solution for $W\le-1$ corresponds to a high density
 near the surface that decreases sharply with depth, and is more
-realistic than the solution for $W\gt-1$ which has a comparable flat
+realistic than the solution for $W>-1$ which has a comparable flat
 root profile, where more of the roots lie outside the root zone.  The
 solution can be found using Newton's method and an initial quess of
 $-2$.  After finding a value for $W$, we can find the desired density
@@ -783,9 +802,10 @@ and optionally, root zone width.  The program code is written in
 \cplusplus{} and is covered by on open source license (\textsc{gnu
   lgpl}), so it can be freely incorporated in other models.
 
-The root density data from the two field sites will be made available
-at \url{http://www.safir4eu.org/} from MNA-TODO-XXXX-DATE
-(look under \texttt{Trials}).
+The root density data from the two field sites is available at
+\url{http://www.safir4eu.org/} (look under \texttt{Trials}). Contact
+\texttt{MathiasN.Andersen@agrsci.dk} to obtain a password for the
+database.
 
 %% \section*{Acknowledgements}
 
@@ -832,22 +852,17 @@ $z$     & L       & Soil depth \\
 \end{tabular}
 \vfill{}
 
+\end{document}
+
+
 \pagebreak
 \section*{Questions}
 
 \begin{itemize}
-\item MNA: Who should be co-authors from China?
 \item CAU: What is the ridge geometry?  And zero level?
-\item I'm still uncertain on the F-test is done right.  I followed the
-  explanation in Wikipedia, which was the only one I could understand.
-  Should I have more details?  Like dimensions for the F-distribution?
-\item MNA: Short PRD references for introduction?
-\item MNA: When will SAFIR root data become public?
 \item Are there any publication on the Chinese experiments?  Yields,
   effect of treatment, whatever?
 \end{itemize}
-\end{document}
-
 
 \pagebreak
 \section*{Removed}
