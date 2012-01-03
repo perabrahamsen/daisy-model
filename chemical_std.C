@@ -1817,7 +1817,8 @@ Find initial content from concentration.")
   {
 
     frame.declare ("C", "g/cm^3", Attribute::Const, "\
-Initial concentration in soil water.");
+Initial concentration in soil water with sorbtion ignored.\n\
+That is M = C * Theta.");
     frame.order ("C");
   }
 } NumberInitialC_syntax;
@@ -1826,7 +1827,7 @@ static struct InitialZeroSyntax : public DeclareParam
 { 
   InitialZeroSyntax ()
     : DeclareParam (Number::component, "initial_zero", "const", "\
-Initial zero concentration in soil water.")
+Initial zero content.")
   { }
   void load_frame (Frame& frame) const
   {
@@ -2039,7 +2040,7 @@ List of products from decomposition.", ChemicalStandard::Product::load_syntax);
     frame.set ("C_below", "zero_gradient");
     frame.declare_object ("initial", Number::component, 
                           Attribute::Const, Attribute::Singleton, "\
-Initial content if otherwise unspecified. [g/cm^3]");
+Initial content (M) if otherwise unspecified. [g/cm^3].");
     frame.set ("initial", "initial_zero");
     frame.declare_object ("adsorption", Adsorption::component, 
                           Attribute::Const, Attribute::Singleton, "\

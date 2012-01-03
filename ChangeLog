@@ -1,3 +1,7 @@
+2012-01-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C: Explain "initial" a little better.
+
 2011-10-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 5.00 released.

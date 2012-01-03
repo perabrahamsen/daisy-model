@@ -1,10 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Check NH4 init
-
 * Ret review comments i Daisy model artikel for SH
 
-* Root utils
+* Kina rødder
+
+** Check publikationer for yield og treatments.
+
+** Skriv wiki/GP2D "howto" gå fra data til rodmasse og volumen, og omvendt
+
+** Latinske navne?
+
+Abstract: background and aims
 
 * Mathias root article?
 
@@ -33,16 +39,6 @@ Then add key parameters for optimization.  These would be:
 7) SpLAI in leaves (is it constant over a season?)
 
 Then turn the setup back to Osvaldo for Monte Carlo generation.
-
-* Kina rødder
-
-** Check publikationer for yield og treatments.
-
-** Skriv wiki/GP2D "howto" gå fra data til rodmasse og volumen, og omvendt
-
-** Latinske navne?
-
-Abstract: background and aims
 
 * Hent gammel PC.
 
