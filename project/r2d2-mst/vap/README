@@ -8,6 +8,8 @@ Data files.
 *.gwt: Measured groundwater table.
 *.dwf: Measured weater data.
 
+These can be found in DropBox/Work/VAP/DaisyData.
+
 Daisy setup files.
 ------------------
 
