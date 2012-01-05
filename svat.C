@@ -59,6 +59,8 @@ stress, given the potential evapotranspiration, the actual\n\
 evaporation from the surface, meteorological data, and the vegetation\n\
 and soil state.")
   { }
+  void load_frame (Frame& frame) const
+  { Model::load_model (frame); }
 } SVAT_init;
 
 // svat.C ends here.

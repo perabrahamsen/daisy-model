@@ -991,6 +991,7 @@ static struct SVAT_SSOCSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
+    frame.set_strings ("cite", "ssoc");
     frame.declare_object ("solver", Solver::component, 
                        Attribute::Const, Attribute::Singleton, "\
 Model used for solving the energy balance equation system.");

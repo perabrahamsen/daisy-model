@@ -1936,6 +1936,7 @@ static struct SVAT_PMSWSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
+    frame.set_strings ("cite", "van2001modification");
     frame.declare ("netrad_brunt", "W/m^2", Attribute::LogOnly,
                 "Net radiation by Brunt");
     frame.declare ("netlong_brunt", "W/m^2", Attribute::LogOnly,

@@ -1,3 +1,7 @@
+2012-01-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* svat.C (DeclareComponent::load_frame): Added.
+
 2012-01-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* chemical_std.C: Explain "initial" a little better.
