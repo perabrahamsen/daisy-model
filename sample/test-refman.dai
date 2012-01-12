@@ -1,0 +1,17 @@
+;;; test-refman.dai -- Sample file using the Daisy libraries.
+
+(input file "dk-soil.dai")
+(input file "dk-management.dai")
+
+(defprogram RefSim Daisy
+  "Simulation for use in reference manual."
+  (weather default "dk-taastrup.dwf")
+  (column Askov)
+  (manager "SBarley w. catch crop")
+  (time 1986 12 1 1)
+  (stop 1988 4 1 1)
+  (output harvest))
+
+(run RefSim)
+
+;;; test-refman.dai ends here.
