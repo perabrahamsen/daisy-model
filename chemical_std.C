@@ -133,6 +133,8 @@ struct ChemicalStandard : public Chemical
   std::vector<double> S_permanent; // Permanent external source term.
   std::vector<double> S_root;   // Root uptake source term (negative).
   std::vector<double> S_decompose;      // Decompose source term.
+  std::vector<double> S_decompose_primary;      // Decompose, prim. dom.
+  std::vector<double> S_decompose_secondary;      // Decompose, sec. dom.
   std::vector<double> S_transform;      // Transform source term.
   std::vector<double> J_primary; // Solute transport in primary matrix water.
   std::vector<double> J_secondary; // Solute transport in secondary matrix.
@@ -190,6 +192,7 @@ struct ChemicalStandard : public Chemical
   void add_to_sink_primary (const std::vector<double>&);
   void add_to_root_sink (const std::vector<double>&);
   void add_to_decompose_sink (const std::vector<double>&);
+  void add_to_decompose_sink_secondary (const std::vector<double>&);
   void add_to_transform_source (const std::vector<double>&);
   void add_to_transform_sink (const std::vector<double>&);
   void add_to_transform_source_secondary (const std::vector<double>&);
@@ -471,6 +474,8 @@ ChemicalStandard::clear ()
   std::fill (S_external.begin (), S_external.end (), 0.0);
   std::fill (S_root.begin (), S_root.end (), 0.0);
   std::fill (S_decompose.begin (), S_decompose.end (), 0.0);
+  std::fill (S_decompose_primary.begin (), S_decompose_primary.end (), 0.0);
+  std::fill (S_decompose_secondary.begin (), S_decompose_secondary.end (), 0.0);
   std::fill (S_transform.begin (), S_transform.end (), 0.0);
   std::fill (J_primary.begin (), J_primary.end (), 0.0);
   std::fill (J_secondary.begin (), J_secondary.end (), 0.0);
@@ -538,9 +543,26 @@ void
 ChemicalStandard::add_to_decompose_sink (const std::vector<double>& v)
 {
   daisy_assert (S_decompose.size () >= v.size ());
+  daisy_assert (S_decompose_primary.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
-    S_decompose[i] -= v[i];
+    {
+      S_decompose[i] -= v[i];
+      S_decompose_primary[i] -= v[i];
+    }
   add_to_sink_primary (v);
+}
+
+void
+ChemicalStandard::add_to_decompose_sink_secondary (const std::vector<double>& v)
+{
+  daisy_assert (S_decompose.size () >= v.size ());
+  daisy_assert (S_decompose_secondary.size () >= v.size ());
+  for (unsigned i = 0; i < v.size (); i++)
+    {
+      S_decompose[i] -= v[i];
+      S_decompose_secondary[i] -= v[i];
+    }
+  add_to_sink_secondary (v);
 }
 
 void
@@ -1247,7 +1269,6 @@ ChemicalStandard::decompose (const Geometry& geo,
                              Chemistry& chemistry, const double dt, Treelog&)
 {
   const size_t cell_size = geo.cell_size ();
-  std::vector<double> decomposed (cell_size, 0.0);
 
   // Update lag time.
   if (decompose_lag_increment.size () > 0)
@@ -1271,38 +1292,49 @@ ChemicalStandard::decompose (const Geometry& geo,
         return;
     }
 
+  std::vector<double> decomposed (cell_size, NAN);
+  std::vector<double> decomposed_primary (cell_size, NAN);
+  std::vector<double> decomposed_secondary (cell_size, NAN);
+
   // Basic decompose rate.
   daisy_assert (static_decompose_rate.size () == cell_size);
   for (size_t c = 0; c < cell_size; c++)
-    decomposed[c] = M_primary (c) * static_decompose_rate[c];
-  
-  // Adjust for heat.
-  if (decompose_heat_factor.size () < 1)
-    for (size_t c = 0; c < cell_size; c++)
-      decomposed[c] *= Abiotic::f_T0 (soil_heat.T (c));
-  else
-    for (size_t c = 0; c < cell_size; c++)
-      decomposed[c] *= decompose_heat_factor (soil_heat.T (c));
+    {
+      // Basic rate.
+      double rate = static_decompose_rate[c];
 
-  // Adjust for moisture.
-  if (decompose_water_factor.size () < 1)
-    for (size_t c = 0; c < cell_size; c++)
-      decomposed[c] *= Abiotic::f_h (soil_water.h (c));
-  else
-    for (size_t c = 0; c < cell_size; c++)
-      decomposed[c] *= decompose_water_factor (soil_water.h (c));
+      // Adjust for heat.
+      if (decompose_heat_factor.size () < 1)
+        rate *= Abiotic::f_T0 (soil_heat.T (c));
+      else
+        rate *= decompose_heat_factor (soil_heat.T (c));
 
-  // Adjust for biological activity.
-  if (decompose_CO2_factor.size () > 0)
-    for (size_t c = 0; c < cell_size; c++)
-      decomposed[c] *= decompose_CO2_factor (organic_matter.CO2 (c));
+      // Adjust for moisture.
+      if (decompose_water_factor.size () < 1)
+        rate *= Abiotic::f_h (soil_water.h (c));
+      else
+        rate *= decompose_water_factor (soil_water.h (c));
 
-  // Adjust for concentration.
-  if (decompose_conc_factor.size () > 0)
-    for (size_t c = 0; c < cell_size; c++)
-      decomposed[c] *= decompose_conc_factor (C_primary_[c]);
-  
-  this->add_to_decompose_sink (decomposed);
+      // Adjust for biological activity.
+      if (decompose_CO2_factor.size () > 0)
+        rate *= decompose_CO2_factor (organic_matter.CO2 (c));
+
+      // Adjust for concentration.
+      double rate_primary = rate;
+      double rate_secondary = rate;
+      if (decompose_conc_factor.size () > 0)
+        {
+          rate_primary *= decompose_conc_factor (C_primary (c));
+          rate_secondary *= decompose_conc_factor (C_secondary (c));
+        }
+
+      // Decomposition.
+      decomposed_primary[c] = M_primary (c) * rate_primary;
+      decomposed_secondary[c] = M_secondary (c) * rate_secondary;
+    }
+
+  this->add_to_decompose_sink (decomposed_primary);
+  this->add_to_decompose_sink_secondary (decomposed_secondary);
 
   for (size_t i = 0; i < product.size (); i++)
     {
@@ -1311,10 +1343,15 @@ ChemicalStandard::decompose (const Geometry& geo,
         {
           Chemical& chemical = chemistry.find (name);
           const double fraction = product[i]->fraction;
-          std::vector<double> created = decomposed;
+          std::vector<double> created_primary = decomposed_primary;
+          std::vector<double> created_secondary = decomposed_secondary;
           for (size_t c = 0; c < cell_size; c++)
-            created[c] *= fraction;
-          chemical.add_to_transform_source (created);
+            {
+              created_primary[c] *= fraction;
+              created_secondary[c] *= fraction;
+            }
+          chemical.add_to_transform_source (created_primary);
+          chemical.add_to_transform_source_secondary (created_secondary);
         }
     }
 }
@@ -1376,6 +1413,8 @@ ChemicalStandard::output (Log& log) const
   output_variable (S_permanent, log);
   output_variable (S_root, log);
   output_variable (S_decompose, log);
+  output_variable (S_decompose_primary, log);
+  output_variable (S_decompose_secondary, log);
   output_variable (S_transform, log);
   output_variable (J_primary, log);
   output_variable (J_secondary, log);
@@ -1686,6 +1725,8 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
                         0.0);
   S_root.insert (S_root.begin (), cell_size, 0.0);
   S_decompose.insert (S_decompose.begin (), cell_size, 0.0);
+  S_decompose_primary.insert (S_decompose_primary.begin (), cell_size, 0.0);
+  S_decompose_secondary.insert (S_decompose_secondary.begin (), cell_size, 0.0);
   S_transform.insert (S_transform.begin (), cell_size, 0.0);
   J_primary.insert (J_primary.begin (), edge_size, 0.0);
   J_secondary.insert (J_secondary.begin (), edge_size, 0.0);
@@ -2172,6 +2213,10 @@ which can be negative.");
                    "Source term (root uptake only, always negative).");
     frame.declare ("S_decompose", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                    "Source term for decompose, is never positive.");
+    frame.declare ("S_decompose_primary", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
+                   "Source term for decompose in primary domain, is never positive.");
+    frame.declare ("S_decompose_secondary", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
+                   "Source term for decompose in secondary domain, is never positive.");
     frame.declare ("S_transform", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                    "Source term for transformations other than sorption.");
     frame.declare ("J_primary", "g/cm^2/h", Attribute::LogOnly, Attribute::SoilEdges,
