@@ -131,3 +131,45 @@ Current temeprature sum since last reset.");
       frame.order ("TSum_limit");
   }
 } ConditionWeather_syntax;
+
+struct ConditionAirTemperature : public Condition
+{
+  const double temperature;
+
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
+  { return (daisy.field ().daily_air_temperature () > temperature); }
+  void output (Log&) const
+  { }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
+  ConditionAirTemperature (const BlockModel& al)
+    : Condition (al),
+      temperature (al.number ("temperature"))
+  { }
+};
+
+static struct ConditionAirTemperatureSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ConditionAirTemperature (al); }
+  ConditionAirTemperatureSyntax ()
+    : DeclareModel (Condition::component, "air_temperature_above", "\
+Test if the air is warmer than the specified temperature.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.declare ("temperature", "dg C", Attribute::Const, "\
+Lowest air temperature for which the condition is true.");
+    frame.order ("temperature");
+  }
+} ConditionAirTemperature_syntax;
+
+// condition_weather.C ends here.

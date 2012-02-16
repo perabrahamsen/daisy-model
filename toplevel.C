@@ -40,6 +40,7 @@
 #include <sstream>
 #include <ctime>
 #include <cstring>
+#include <locale.h>
 
 #include <boost/noncopyable.hpp>
 
@@ -174,7 +175,9 @@ Toplevel::Implementation::Implementation (Metalib::load_frame_t load_syntax,
     state (is_unloaded),
     ran_user_interface (false),
     has_daisy_log (false)
-{ }
+{ 
+  (void) setlocale (LC_ALL, "C");
+}
   
 Toplevel::Implementation::~Implementation ()
 { add_daisy_log (); }

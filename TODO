@@ -1,6 +1,12 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* decompose secondary domain
+* condition_weather
+
+** temp
+
+field::daily_air_temperature -> field::air_temperature
+
+** rain 
 
 * Vestskoven
 
@@ -25,10 +31,6 @@ Then add key parameters for optimization.  These would be:
 7) SpLAI in leaves (is it constant over a season?)
 
 Then turn the setup back to Osvaldo for Monte Carlo generation.
-
-* Hent gammel PC.
-
-Flyt indhold til hd?  Eller stick?
 
 * Snak med SH om org.matter artikel.
 

@@ -260,7 +260,7 @@ struct Daisy::Implementation
             ? Time (al.submodel ("stop")) 
             : Time::null ()),
       duration (al.check ("stop")
-                ? Time::fraction_hours_between (stop, time)
+                ? Time::fraction_hours_between (time, stop)
                 :-1),
       action (Librarian::build_item<Action> (al, "manager")),
       weather (al.check ("weather") 

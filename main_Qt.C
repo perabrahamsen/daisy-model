@@ -1,4 +1,4 @@
-// main.C -- Run the Daisy model from the command line.
+// main_Qt.C -- Run the Daisy model from a Qt GUI window.
 //
 // Copyright 1996-2001 Per Abrahamsen.
 // Copyright 2000-2001 KVL.
@@ -35,7 +35,7 @@ main (int argc, char* argv[])
   qRegisterMetaType<Toplevel::state_t>("Toplevel::state_t");
   QApplication app (argc, argv);
   app.setApplicationName ("Daisy");
-  app.setOrganizationDomain ("life.ku.dk");
+  app.setOrganizationDomain ("ku.dk");
   app.setOrganizationName ("University of Copenhagen");
   UIQt::set_application (app);
 
@@ -83,4 +83,4 @@ main (int argc, char* argv[])
   return EXIT_FAILURE;
 }
       
-// main.C ends here.
+// main_Qt.C ends here.

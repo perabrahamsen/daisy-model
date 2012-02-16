@@ -7,9 +7,7 @@
 # The following envirnoment variables are used:
 #
 # HOSTTYPE
-#	sun4		Create code for Solaris-2 / UltraSPARC.
 #	i386-linux	Create code for ia32 / Linux.
-#	hp		Create code for HP/UX / HP-PA.
 #	win32		Create code for Win32 / Pentium.
 #	cygwin		Create code for Cygwin / Pentium.
 #	mingw		Create code for Mingw / Pentium.
@@ -37,8 +35,8 @@ ifeq ($(HOSTTYPE),x86_64)
 SRCDIR = $(HOME)/daisy
 OBJHOME =  $(SRCDIR)/obj
 NATIVEHOME = $(OBJHOME)
-NATIVEEXE = daisy
-USE_GUI = none
+NATIVEEXE = daisy daisyw
+USE_GUI = Q4
 BOOSTINC = #-isystem $(HOME)/boost/include/boost-1_35/
 else
 SRCDIR = ..
@@ -71,21 +69,13 @@ USE_OPTIMIZE = true
 USE_PROFILE = false
 
 # Set COMPILER according to which compiler you use.
-#	sun		Use the unbundled sun compiler.
 #	gcc		Use the GNU compiler.
 #	borland		Use the Borland compiler.
 #
-ifeq ($(HOSTTYPE),sun4)
-	COMPILER = gcc
-#	COMPILER = sun	
-endif
 ifeq ($(HOSTTYPE),i386-linux)
 	COMPILER = gcc
 endif
 ifeq ($(HOSTTYPE),x86_64)
-	COMPILER = gcc
-endif
-ifeq ($(HOSTTYPE),hp)
 	COMPILER = gcc
 endif
 ifeq ($(HOSTTYPE),win32)
@@ -95,11 +85,6 @@ ifeq ($(HOSTTYPE),mingw)
 	COMPILER = gcc
 endif
 
-# On SPARC platforms we trap mathematical exception with some assembler code.
-#
-SPARCSRC = set_exceptions.S
-SPARCOBJ = set_exceptions.o
-
 # Microsoft lacks some common Unix functions.
 #
 #MSSRC = win32_unistd.c
@@ -108,11 +93,6 @@ MSSRC =
 WINSRC = w32reg.c
 WINOBJ = w32reg.o
 WINHDR = w32reg.h
-
-ifeq ($(HOSTTYPE),sun4) 
-SYSSOURCES = $(SPARCSRC)
-SYSOBJECTS = $(SPARCOBJ)
-endif
 
 ifeq ($(COMPILER),ms)
 SYSSOURCES = $(MSSRC)
@@ -124,7 +104,7 @@ SYSOBJECTS = $(WINOBJ)
 SYSHEADERS = $(WINHDR)
 endif
 
-ALLSYSSRC = $(SPARCSRC) $(MSSRC) $(WINSRC)
+ALLSYSSRC = $(MSSRC) $(WINSRC)
 ALLSYSHDR = $(WINHDR)
 
 # Find the profile flags.
@@ -140,10 +120,6 @@ endif
 ifeq ($(USE_OPTIMIZE),true)
 	ifeq ($(COMPILER),gcc)
 		OPTIMIZE = -O3 -ffast-math -fno-finite-math-only 
-		ifeq ($(HOSTTYPE),sun4)
-		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mcpu=v8 -mtune=ultrasparc
-#`-mcpu=ultrasparc' breaks `IM::IM ()' with gcc 2.95.1.
-		endif
 		ifeq ($(HOSTTYPE),i386-linux)
 		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mtune=generic -march=pentium
 	        endif
@@ -174,12 +150,6 @@ endif
 ifeq ($(HOSTTYPE),x86_64)
 	USE_DYNLIB = false
 endif
-ifeq ($(HOSTTYPE),sun4)
-	USE_DYNLIB = false
-endif
-ifeq ($(HOSTTYPE),hp)
-	USE_DYNLIB = true
-endif
 ifeq ($(HOSTTYPE),win32)
 	USE_DYNLIB = false
 endif
@@ -208,10 +178,6 @@ ifeq ($(COMPILER),gcc)
 #	GCC 3 had gave uninitialized warnings during initialization.
 	WAR3	= -Wno-uninitialized -Wno-unknown-pragmas 
 
-	ifeq ($(HOSTTYPE),sun4)
-		OSFLAGS = 
-		DEBUG = -g
-	endif
 	ifeq ($(HOSTTYPE),i386-linux)
 		OSFLAGS = 
 		DEBUG = -g
@@ -250,10 +216,6 @@ ifeq ($(COMPILER),gcc)
 	CCOMPILE = $(COMPILE)
 	CPPLIB = -lstdc++
 endif
-ifeq ($(COMPILER),sun)
-	COMPILE = /pack/devpro/SUNWspro/bin/CC
-	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
-endif
 ifeq ($(COMPILER),borland)
 	WARNFLAGS = -w-csu -wdef -wnod -wamb -w-par -w-hid
 	COMPILE = $(BORLAND)Bin/bcc32 -P -v $(WARNFLAGS)
@@ -284,12 +246,6 @@ CC = $(COMPILE) $(OPTIMIZE) $(PROFILE)
 
 # Find the rigth math library.
 #
-ifeq ($(HOSTTYPE),sun4)
-	MATHLIB = -lm
-endif
-ifeq ($(HOSTTYPE),hp)
-	MATHLIB = -lM
-endif
 ifeq ($(HOSTTYPE),i386-linux)
 	MATHLIB =
 endif
@@ -310,24 +266,6 @@ endif
 CXSPARSELIB = -L../libdeps -lcxsparse
 CXSPARSEHEAD = ublas_cxsparse.h cs.h UFconfig.h
 
-# Locate the tk library.
-#
-TKINCLUDE	= -I/pack/tcl+tk-8/include -I/usr/openwin/include
-TKLIB	  	= -L/pack/tcl+tk-8/lib -L/usr/openwin/lib \
-		  -ltix4.1.8.0 -ltk8.0 -ltcl8.0 -lX11 -lsocket -lnsl -ldl
-
-# Locate the Gtk-- library.
-#
-GTKMMINCLUDE	= -I$(HOME)/gtk/lib/Gtk--/include \
-		  -I$(HOME)/gtk/lib/glib/include \
-		  -I$(HOME)/gtk/include -I/usr/openwin/include
-GTKMMLIB	= -L$(HOME)/gtk/lib -lgtkmm \
-		  -L/usr/openwin/lib -R/usr/openwin/lib \
-		  -lgtk -lgdk -lglib -lXext -lX11 -lsocket -lnsl -lm
-GTKMMDRAWINCLUDE = -I$(HOME)/gtk/include/gtk--draw \
-		   $(GTKMMINCLUDE)
-GTKMMDRAWLIB	= -L$(HOME)/gtk/lib -lgtkmmdraw ${GTKMMLIB}
-
 # Locate the Qt library.
 #
 ifeq ($(HOSTTYPE),i386-linux)
@@ -342,6 +280,10 @@ QTLIB		= -L/pack/qt/lib -R/pack/qt/lib -lqt \
 		  -L/usr/openwin/lib -R/usr/openwin/lib \
 		  -lXext -lX11 -lsocket -lnsl -lm
 QTMOC		= /pack/qt/bin/moc
+# Locate Qt 4
+Q4INCLUDE	= -isystem /usr/include/qt4 
+Q4LIB		= -lQtGui -lQtCore
+Q4MOC		= moc
 endif
 
 ifeq ($(HOSTTYPE),mingw)
@@ -581,10 +523,8 @@ GUIINCLUDE =
 GUIDLL =
 endif
 
-ALLGUISRC = tkmain.C gmain.C $(QTSOURCES) $(Q4SOURCES)
+ALLGUISRC = $(QTSOURCES) $(Q4SOURCES)
 ALLGUIHDR = $(QTHEADERS) $(Q4HEADERS)
-
-LOSTGUISRC = pmain.C
 
 # Select the C files that are not part of the library.
 #
@@ -604,14 +544,10 @@ HEADERS = $(INTERFACES:.C=.h) $(HEADONLY)
 
 # Find all printable files.
 #
-TEXT =  ChangeLog.3 ChangeLog.2 ChangeLog.1 setup.nsi \
+TEXT =  control-shared.txt ChangeLog.3 ChangeLog.2 ChangeLog.1 setup.nsi \
 	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB  $(DISABLED) \
 	$(HEADERS) $(SOURCES) $(ALLSYSHDR) $(ALLSYSSRC) \
 	$(ALLGUIHDR) $(ALLGUISRC) $(UTESTSRC)
-
-# The executables.
-#
-EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
@@ -635,7 +571,7 @@ REMOVED = ABAeffect_exp.C ABAeffect.C ABAeffect.h \
 
 # Create all the executables.
 #
-all:	#(EXECUTABLES)
+all:
 	@echo 'Use "make native" to create a native Daisy executable.'
 
 # Create a DLL.
@@ -655,7 +591,10 @@ daisy.exe:	main${OBJ} daisy.dll
 daisyw.exe:	$(GUIOBJECTS) daisy.dll
 	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) -Wl,--enable-runtime-pseudo-reloc -mwindows
 
-daisy:	main${OBJ} $(GUIOBJECTS) $(LIBOBJ)
+daisy:	main${OBJ} $(LIBOBJ)
+	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB)  $(CXSPARSELIB)
+
+daisyw:	$(GUIOBJECTS) $(LIBOBJ)
 	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB)  $(CXSPARSELIB)
 
 exp:	
@@ -733,11 +672,6 @@ daisy.so: $(LIBOBJ)
 
 # toplevel.o cdaisy.o:
 #	 $(CC) $(NOLINK) -DBUILD_DLL $<
-
-# Create daisy plot executable.
-#
-pdaisy${EXE}: pmain${OBJ} time.o
-	$(LINK)$@ $^ $(GTKMMDRAWLIB) $(MATHLIB)
 
 
 # Boost test
@@ -834,7 +768,7 @@ txt/components.tex: $(DAISYEXE)
 # Remove all the temporary files.
 #
 clean:
-	rm $(OBJECTS) *.rpo $(EXECUTABLES) *.obj *.exe *.o *~
+	rm $(OBJECTS) *.rpo $(NATIVEXE) *.obj *.exe *.o *~
 
 # Update the Makefile when dependencies have changed.
 #
@@ -942,27 +876,30 @@ upload:
 		-l Type-Installer,OpSys-Windows,Featured \
 		daisy-$(TAG)-setup.exe
 
-.PHONY: install
-install:
-	$(MAKE) native 
-	rm -rf $(SETUPDIR)
-	mkdir $(SETUPDIR)
-	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
-	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
-	mkdir $(SETUPDIR)/bin
-	cp -p $(OBJHOME)/daisy.exe $(SETUPDIR)/bin
-	cp -p $(OBJHOME)/daisyw.exe $(SETUPDIR)/bin
-	cp -p $(OBJHOME)/daisy.dll $(SETUPDIR)/bin
-	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
-	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
-	cp $(MINGWHOME)/bin/mingwm10.dll $(SETUPDIR)/bin
-	(cd OpenMI && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) install)
+debiannosvn: 
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	$(MAKE) linux
+	rm -rf debian
+	mkdir debian
+	mkdir debian/opt
+	mkdir debian/opt/daisy
+	cp ChangeLog NEWS debian/opt/daisy
+	mkdir debian/opt/daisy/src
+	cp $(TEXT) debian/opt/daisy/src
+	(cd lib && $(MAKE) SETUPDIR=../debian/opt/daisy TAG=$(TAG) setup)
+	(cd sample && $(MAKE) SETUPDIR=../debian/opt/daisy TAG=$(TAG) setup)
+#	$(MAKE) setupdocs
+#	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
+	mkdir debian/opt/daisy/bin
+	$(STRIP) -o debian/opt/daisy/bin/daisy $(OBJHOME)/daisy
+	$(STRIP) -o debian/opt/daisy/bin/daisyw $(OBJHOME)/daisyw
+	mkdir debian/DEBIAN
+	echo "Version: $(TAG)" > debian/DEBIAN/control
+	echo -n "Installed-Size: " >> debian/DEBIAN/control
+	du -sk debian | sed -e 's/\t.*//' >> debian/DEBIAN/control
+	cat control-shared.txt >> debian/DEBIAN/control
+	dpkg -b debian daisy_$(TAG)_amd64.deb
 
-
-# How to compile the assembler file.
-#
-set_exceptions${OBJ}: set_exceptions.S
-	as -o set_exceptions${OBJ} set_exceptions.S
 
 # How to compile a C++ file.
 #
@@ -993,11 +930,6 @@ gmain${OBJ}: gmain.C
 
 $(QTOBJECTS):
 	$(CC) $(QTINCLUDE) $(NOLINK) $<
-
-# Special rule for pmain.o
-#
-pmain${OBJ}: pmain.C
-	$(CC) $(GTKMMDRAWINCLUDE) $(NOLINK) $<
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!

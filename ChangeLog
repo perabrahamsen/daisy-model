@@ -1,3 +1,11 @@
+2012-02-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* ui_Qt_run.C, ui_Qt_run.C: Remove dead code.
+
+2012-02-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* daisy.C (duration): Fix sign.
+
 2012-01-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* chemical_std.C: Support decompose in secondary domain.

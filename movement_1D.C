@@ -335,7 +335,13 @@ Movement1D::solve_heat (const Geometry1D& geo,
     }
   d[size - 1] = d[size - 1] - c[size - 1] * T_bottom;
   tridia (0, size, a, b, c, d, T.begin ());
-  daisy_assert (T[0] < 50.0);
+  if (T[0] > 50.0)
+    {
+      std::ostringstream tmp;
+      tmp << "T[0] = " << T[0] << ", T_top = " << T_top 
+          << ", T_top_new = " << T_top_new << ", T_bottom = " << T_bottom;
+      daisy_bug (tmp.str ());
+    }
 }
 
 void 

@@ -3,6 +3,7 @@
 (deflog QtTime Qt
   "Let Qt UI know the simulation time."
   (when (or (every (hours 7)) finished))
+  (where "Qt-time-dummy.dlf")
   (entries (number (path time year))
            (number (path time month))
            (number (path time mday))
