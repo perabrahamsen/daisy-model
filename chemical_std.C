@@ -619,6 +619,10 @@ ChemicalStandard::release_surface_colloids (const double surface_release_value)
 void
 ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
 {
+  if (adsorption_->full ())
+    // Always zero.
+    return;
+
   for (size_t i = 0; i < C_primary_.size (); i++)
     {
       const double Theta_primary = soil_water.Theta_primary (i);
@@ -646,7 +650,7 @@ ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
       if (!approximate (M_primary_[i] + M_secondary_[i], M_total_[i]))
         {
           std::ostringstream tmp;
-          tmp << i << ": M1 (" << M_primary_[i] << ") + M2 ("
+          tmp << objid << ": " << i << ": M1 (" << M_primary_[i] << ") + M2 ("
               << M_secondary_[i] << ") = " << (M_primary_[i] + M_secondary_[i])
               << "; M = " << M_total_[i];
           Assertion::message (tmp.str ());

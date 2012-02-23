@@ -1,3 +1,12 @@
+2012-02-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C (update_C): Don't calculate C for immobile chemicals.
+
+2012-02-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* condition_weather.C (daily_air_temperature_above)
+	(daily_precipitation_above): New models.
+
 2012-02-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* ui_Qt_run.C, ui_Qt_run.C: Remove dead code.

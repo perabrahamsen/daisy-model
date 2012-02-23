@@ -34,6 +34,8 @@
 #include "frame.h"
 #include <sstream>
 
+// The 'TSum_above' Model.
+
 struct ConditionTSum : public Condition
 {
   // Parameters.
@@ -78,7 +80,8 @@ struct ConditionTSum : public Condition
       TSum_now (al.number ("TSum_now", -100.0e100))
   { }
 };
-static struct ConditionWeatherSyntax : public DeclareModel
+
+static struct ConditionTSumAboveSyntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
   { return new ConditionTSum (al); }
@@ -104,7 +107,7 @@ static struct ConditionWeatherSyntax : public DeclareModel
       }
     return ok;
   }
-  ConditionWeatherSyntax ()
+  ConditionTSumAboveSyntax ()
     : DeclareModel (Condition::component, "TSum_above", "\
 Test if the temperature sum is above the specified value\n\
 The temperature sum is the sum of the daily average air temperature since\n\
@@ -130,9 +133,11 @@ Temeperature sum above which the condition becomes true.");
 Current temeprature sum since last reset.");
       frame.order ("TSum_limit");
   }
-} ConditionWeather_syntax;
+} ConditionTSumAbove_syntax;
 
-struct ConditionAirTemperature : public Condition
+// The 'daily_air_temperature' Model.
+
+struct ConditionDailyAirTemperature : public Condition
 {
   const double temperature;
 
@@ -150,19 +155,19 @@ struct ConditionAirTemperature : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionAirTemperature (const BlockModel& al)
+  ConditionDailyAirTemperature (const BlockModel& al)
     : Condition (al),
       temperature (al.number ("temperature"))
   { }
 };
 
-static struct ConditionAirTemperatureSyntax : public DeclareModel
+static struct ConditionDailyAirTemperatureSyntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
-  { return new ConditionAirTemperature (al); }
-  ConditionAirTemperatureSyntax ()
-    : DeclareModel (Condition::component, "air_temperature_above", "\
-Test if the air is warmer than the specified temperature.")
+  { return new ConditionDailyAirTemperature (al); }
+  ConditionDailyAirTemperatureSyntax ()
+    : DeclareModel (Condition::component, "daily_air_temperature_above", "\
+Test if the daily air is warmer than the specified temperature.")
   { }
   void load_frame (Frame& frame) const
   {
@@ -170,6 +175,48 @@ Test if the air is warmer than the specified temperature.")
 Lowest air temperature for which the condition is true.");
     frame.order ("temperature");
   }
-} ConditionAirTemperature_syntax;
+} ConditionDailyAirTemperature_syntax;
+
+// The 'daily_precipitation' Model.
+
+struct ConditionDailyPrecipitation : public Condition
+{
+  const double precipitation;
+
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
+  { return (daisy.field ().daily_precipitation () > precipitation); }
+  void output (Log&) const
+  { }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
+  ConditionDailyPrecipitation (const BlockModel& al)
+    : Condition (al),
+      precipitation (al.number ("precipitation"))
+  { }
+};
+
+static struct ConditionDailyPrecipitationSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ConditionDailyPrecipitation (al); }
+  ConditionDailyPrecipitationSyntax ()
+    : DeclareModel (Condition::component, "daily_precipitation_above", "\
+Test if the daily precipitation is warmer than the specified value.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.declare ("precipitation", "mm", Attribute::Const, "\
+Lowest precipitation for which the condition is true.");
+    frame.order ("precipitation");
+  }
+} ConditionDailyPrecipitation_syntax;
 
 // condition_weather.C ends here.

@@ -1,13 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* condition_weather
-
-** temp
-
-field::daily_air_temperature -> field::air_temperature
-
-** rain 
-
 * Vestskoven
 
 Osvaldo setup is in project/osvaldo/Nitrogen
