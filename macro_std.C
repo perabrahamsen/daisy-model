@@ -288,7 +288,7 @@ MacroStandard::tick (const Geometry1D& geo,
     }
 
   // Check that the sink terms add up.
-  if (fabs (geo.total_surface (S_p) - q_top * dt - extra_water) > 1.0e-11)
+  if (fabs (geo.total_surface (S_p) * dt - q_top * dt - extra_water) > 1.0e-11)
     {
       std::ostringstream tmp;
       tmp << __FILE__ << ":" <<  __LINE__

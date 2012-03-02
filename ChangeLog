@@ -1,3 +1,9 @@
+2012-02-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* sample/DrainDrying.dai: Removed directory and path.
+
+	* uzrichard.C (max_time_step_reductions): Increased from 4 to 16.
+
 2012-02-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 5.01 released.

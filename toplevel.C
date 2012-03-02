@@ -285,8 +285,8 @@ Toplevel::copyright ()
   impl->has_printed_copyright = true;
   msg ().message (std::string ("Daisy crop/soil simulation version ")
                   + version + ". (" + version_date + ")\n"
-                  "Copyright 1996 - 2011 Per Abrahamsen, "
-                  "Søren Hansen and KVL.");
+                  "Copyright 1996 - 2012 Per Abrahamsen, "
+                  "Søren Hansen and KU.");
 }
 
 void

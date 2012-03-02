@@ -8,11 +8,6 @@
 ;; a very steep conductivity function. This can be changed by decreasing the l-value. 
 
 
-(directory "C:/KVL/DrainDrying")
-
-(path "C:/Programmer/Daisy/Lib" "C:/Programmer/Daisy/Sample"
-      "C:/Programmer/Daisy/Weather")
-
 ;; Ekstern  files from Daisy/Lib
 (input file "dk-management.dai")
 (input file "log.dai")

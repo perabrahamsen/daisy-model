@@ -794,7 +794,7 @@ Print additional debug messages, higher numbers means more messages.");
     frame.set ("debug", 0);
     frame.declare_integer ("max_time_step_reductions", Attribute::Const, "\
 Number of times we may reduce the time step before giving up");
-    frame.set ("max_time_step_reductions", 4);
+    frame.set ("max_time_step_reductions", 16);
     frame.declare_integer ("time_step_reduction", Attribute::Const, 
                "Divide the time step with this at each reduction.");
     frame.set ("time_step_reduction", 4);

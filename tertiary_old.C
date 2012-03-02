@@ -33,6 +33,7 @@
 #include "groundwater.h"
 #include "treelog.h"
 #include "frame.h"
+#include <sstream>
 
 struct TertiaryOld : public Tertiary
 {
@@ -209,7 +210,9 @@ This tertiary water transport model only works with the 'vertical' movement mode
       // Add them.
       macro = Macro::create (height);
 
-      msg.debug ("Adding macropores");
+      std::ostringstream tmp;
+      tmp << "Adding macropores to " << height << " cm";
+      msg.debug (tmp.str ());
     }
   else
     msg.debug ("No macropores");
