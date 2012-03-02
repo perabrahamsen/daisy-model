@@ -6,7 +6,7 @@
 ; teksturklasserne 20 og 63 mymeter. Tallene er derefter normaliseret
 ; til 100 %.  hydrauliske parametre er genereret med hypres.
 
-(defhorizon Ap_JB1 USDA3 (normalize true)
+(defhorizon Ap_JB1 default
 	(clay 3.9)
 	(silt 6.4)
 	;; (fine_sand 20.4)
@@ -23,7 +23,7 @@
 	(Theta_res 0.0)
 	(l -0.973))) ;; 
 	
-(defhorizon Ap_JB2 USDA3 (normalize true)
+(defhorizon Ap_JB2 default
 	(clay 4.4)
 	(silt 13.0)
 	;; (fine_sand 54.5)
@@ -40,7 +40,7 @@
 	(Theta_res 0.0)
 	(l -0.922))) ;; 
 	
-(defhorizon Ap_JB3 USDA3 (normalize true)
+(defhorizon Ap_JB3 default
 	(clay 6.8)
 	(silt 13.5)
 	;; (fine_sand 25)
@@ -57,7 +57,7 @@
 	(Theta_res 0.0)
 	(l -1.461))) ;; 
 	
-(defhorizon Ap_JB4 USDA3 (normalize true)
+(defhorizon Ap_JB4 default
 	(clay 7.9)
 	(silt 21.5)
 	;; (fine_sand 36.4)
@@ -74,7 +74,7 @@
 	(Theta_res 0.0)
 	(l -1.492))) ;
 	
-(defhorizon Ap_JB5 USDA3 (normalize true)
+(defhorizon Ap_JB5 default
 	(clay 12.3)
 	(silt 22.0)
 	;; (fine_sand 27.0)
@@ -91,7 +91,7 @@
 	(Theta_res 0.0)
 	(l -2.386))) ;
 	
-(defhorizon Ap_JB6 USDA3 (normalize true)
+(defhorizon Ap_JB6 default
 	(clay 12.4)
 	(silt 24.9)
 	;; (fine_sand 33.6)
@@ -108,7 +108,7 @@
 	(Theta_res 0.0)
 	(l -2.365))) ;
 	
-(defhorizon Ap_JB7 USDA3 (normalize true)
+(defhorizon Ap_JB7 default
 	(clay 17.5)
 	(silt 25.8)
 	;; (fine_sand 30.5)
@@ -125,7 +125,7 @@
 	(Theta_res 0.0)
 	(l -3.197))) ;
 	
-(defhorizon B_JB1 USDA3 (normalize true)
+(defhorizon B_JB1 default
 	(clay 3.8)
 	(silt 3.5)
 	;; (fine_sand 18.7)
@@ -142,7 +142,7 @@
 	(Theta_res 0.0)
 	(l -0.335))) ;
 	
-(defhorizon B_JB2 USDA3 (normalize true)
+(defhorizon B_JB2 default
 	(clay 4.1)
 	(silt 10.1)
 	;; (fine_sand 55.5)
@@ -159,7 +159,7 @@
 	(Theta_res 0.0)
 	(l -0.3))) ;
 	
-(defhorizon B_JB3 USDA3 (normalize true)
+(defhorizon B_JB3 default
 	(clay 6.8)
 	(silt 11.3)
 	;; (fine_sand 24.1)
@@ -176,7 +176,7 @@
 	(Theta_res 0.0)
 	(l -0.937))) ;
 	
-(defhorizon B_JB4 USDA3 (normalize true)
+(defhorizon B_JB4 default
 	(clay 7.1)
 	(silt 19.4)
 	;; (fine_sand 39.7)
@@ -193,7 +193,7 @@
 	(Theta_res 0.0)
 	(l -0.717))) ;
 	
-(defhorizon B_JB5 USDA3 (normalize true)
+(defhorizon B_JB5 default
 	(clay 11.9)
 	(silt 16.2)
 	;; (fine_sand 27.9)
@@ -210,7 +210,7 @@
 	(Theta_res 0.0)
 	(l -1.504))) ;
 	
-(defhorizon B_JB6 USDA3 (normalize true)
+(defhorizon B_JB6 default
 	(clay 12.5)
 	(silt 21.8)
 	;; (fine_sand 36.7)
@@ -227,7 +227,7 @@
 	(Theta_res 0.0)
 	(l -1.574))) ;
 	
-(defhorizon B_JB7 USDA3 (normalize true)
+(defhorizon B_JB7 default
 	(clay 20.0)
 	(silt 22)
 	;; (fine_sand 31.1)
@@ -244,7 +244,7 @@
 	(Theta_res 0.0)
 	(l -2.809))) ;
 	
-(defhorizon C_JB1 USDA3 (normalize true)
+(defhorizon C_JB1 default
 	(clay 2.9)
 	(silt 2.0)
 	;; (fine_sand 17.3)
@@ -260,7 +260,7 @@
 	(Theta_res 0.0)
 	(l 1.180))) ;
 	
-(defhorizon C_JB2 USDA3 (normalize true)
+(defhorizon C_JB2 default
 	(clay 3.4)
 	(silt 5.9)
 	;; (fine_sand 59.8)
@@ -276,7 +276,7 @@
 	(Theta_res 0.0)
 	(l 1.188))) ;
 	
-(defhorizon C_JB3 USDA3 (normalize true)
+(defhorizon C_JB3 default
 	(clay 7.5)
 	(silt 11.5)
 	;; (fine_sand 25.8)
@@ -292,7 +292,7 @@
 	(Theta_res 0.0)
 	(l 0.24))) ;
 	
-(defhorizon C_JB4 USDA3 (normalize true)
+(defhorizon C_JB4 default
 	(clay 8.0)
 	(silt 18.6)
 	;; (fine_sand 43.7)
@@ -308,7 +308,7 @@
 	(Theta_res 0.0)
 	(l -0.191))) ;
 	
-(defhorizon C_JB5 USDA3 (normalize true)
+(defhorizon C_JB5 default
 	(clay 14.9)
 	(silt 22.1)
 	;; (fine_sand 31.0)
@@ -324,7 +324,7 @@
 	(Theta_res 0.0)
 	(l -1.605))) ;
 	
-(defhorizon C_JB6 USDA3 (normalize true)
+(defhorizon C_JB6 default
 	(clay 13.3)
 	(silt 23.8)
 	;; (fine_sand 39.0)
@@ -340,7 +340,7 @@
 	(Theta_res 0.0)
 	(l -0.983))) ;
 	
-(defhorizon C_JB7 USDA3 (normalize true)
+(defhorizon C_JB7 default
 	(clay 19.8)
 	(silt 23.8)
 	;; (fine_sand 31.6)
