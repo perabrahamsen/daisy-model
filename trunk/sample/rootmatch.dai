@@ -1,0 +1,34 @@
+;;; rootmatch.dai -- Analyse root measuments in context of Daisy models.
+
+(defprogram MyMatch rootmatch
+  ;; Specify the name of the file containing root density measurements.
+  (file "rootdata.ddf")
+  ;; Specify the column names used in the data file.
+  (tag_z_min "z-min")
+  (tag_z_max "z-max")
+  (tag_x "x")
+  (tag_density "density")
+  ;; The dimensions used for positions and densities in the data file.
+  (pos_dim [cm])
+  (dens_dim [cm/cm^3])
+  ;; Distance between two rows.
+  (row_distance 75 [cm])
+  ;; The 'SoilDepth' parameters control the soil limits on root penetration.
+  ;; If the parameter is missing, Daisy will try to estimate it from the
+  ;; measurements.
+  ;; If the parameter is negative, like below, Daisy will assume no soil 
+  ;; limitation on root penetration.
+  ;; (SoilDepth -1 [cm])
+  ;; Finally, if you specify a positive value like below, that will be used 
+  ;; as the soil limit.
+  (SoilDepth 50 [cm])
+  ;; Show comparison of observed and modelled values.  
+  (show_data true)
+  ;; Change this to show parameters in tabular form for easy import
+  ;; to spreadsheet. 
+  (tabular false))
+
+(run MyMatch)
+
+;;; rootmatch.dai ends here.
+

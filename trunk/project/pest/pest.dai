@@ -1,0 +1,841 @@
+;;; pest.dai
+
+;;; Pesticides.
+
+(input file "chemistry-base.dai")
+
+;; Pure colloids.
+
+(defchemical colloid common
+  "Mobile colloids."
+  (diffusion_coefficient 4.6e-6 [cm^2/s])
+  (decompose_rate 0 [h^-1]))
+
+(defreaction colloid-filter filter_velocity
+  "Filtration of colloids in the soil matrix."
+  (cite "mcgechan2002")
+  (fc_primary 80 [m^-1])              ;Filter coefficient primary domain.
+  (fc_secondary 40 [m^-1])            ;Ditto for secondary domain.
+  (mobile colloid))
+
+(defreaction colloid-generation colgen_Jarvis99
+  "Release of colloids in soil surface from heavy rain."
+  ;; (kd 7.5 [g/J])                       ;Detachment rate coefficient.
+  (kd $PART)                       ;Detachment rate coefficient.
+  ;; (kr 0.05 [g/m^2/h])                    ;Replenishment rate coefficient.
+  (kr 0.1 [g/m^2/h])
+  ;; (zi 0.05 [cm])                         ;Surface layer thickness.
+  (zi 0.1 [cm])
+  (colloid colloid))
+
+(defchemistry colloids default
+  (trace colloid)
+  (reaction colloid-filter colloid-generation))
+
+;;; Pendimethalin
+
+(defchemical Pendimethalin-base herbicide
+  "Base parameterization for all Pendimethalin forms."
+  (cite ppdb20100517)
+  (decompose_halftime 90 [d]))          ;27-186 [d]
+
+(defchemical Pendimethalin Pendimethalin-base
+  "Dissolved pendimethalin."
+  (solubility 0.33 [mg/l])               ;Source: PPDB.
+  (adsorption none))
+
+(defchemical Pendimethalin-immobile Pendimethalin-base
+  "Pendimethalin sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction Pendimethalin-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Pendimethalin."
+  (sorbed Pendimethalin-immobile)
+  (solute Pendimethalin)
+  (cite ppdb20100517)
+  (K_OC $P_OC)                   ;6700-29400 [ml/g]
+  (k_sorption $SORP))
+
+(defchemical Pendimethalin-colloid Pendimethalin-base
+  "Pendimethalin sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Pendimethalin-colloid-sorption Pendimethalin-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound Pendimethalin."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Pendimethalin-colloid)
+  (k_sorption $SORP))
+
+(defreaction Pendimethalin-filter colloid-filter
+  "Filtration of colloid-bound pendimethalin in the soil matrix."
+  (mobile Pendimethalin-colloid)
+  (immobile Pendimethalin-immobile))
+
+(defreaction Pendimethalin-colloid-generation bound_release
+  "Release immobile Pendimethalin as colloids in mixing layer."
+  (colloid colloid)
+  (immobile Pendimethalin-immobile)
+  (bound Pendimethalin-colloid))
+
+(defchemistry Pendimethalin default
+  "Pendimethalin in both immobile, solute and colloid form."
+  (trace Pendimethalin Pendimethalin-immobile Pendimethalin-colloid)
+  (reaction Pendimethalin-immobile-sorption
+            Pendimethalin-filter 
+            Pendimethalin-colloid-generation
+            Pendimethalin-colloid-sorption
+            ))
+
+;; Ioxynil
+
+(defchemical Ioxynil-base herbicide
+  "Base parameterization for all Ioxynil forms."
+  (cite ppdb20100517)
+  (decompose_halftime 5 [d]))           ;No field studies
+
+(defchemical Ioxynil Ioxynil-base
+  "Dissolved ioxynil." 
+  (solubility 3034 [mg/l])               ;Source: PPDB
+  (adsorption none))
+
+(defchemical Ioxynil-immobile Ioxynil-base
+  "Ioxynil sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction Ioxynil-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Ioxynil."
+  (sorbed Ioxynil-immobile)
+  (solute Ioxynil)
+  (cite ppdb20100517)
+  (K_OC $I_OC)  
+  (k_sorption $SORP))
+
+(defchemical Ioxynil-colloid Ioxynil-base
+  "Ioxynil sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Ioxynil-colloid-sorption Ioxynil-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound Ioxynil."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Ioxynil-colloid)
+  (k_sorption $SORP))
+
+(defreaction Ioxynil-filter colloid-filter
+  "Filtration of colloid-bound ioxynil in the soil matrix."
+  (mobile Ioxynil-colloid)
+  (immobile Ioxynil-immobile))
+
+(defreaction Ioxynil-colloid-generation bound_release
+  "Release immobile Ioxynil as colloids in mixing layer."
+  (colloid colloid)
+  (immobile Ioxynil-immobile)
+  (bound Ioxynil-colloid))
+
+(defchemistry Ioxynil default
+  "Ioxynil in both immobile, solute and colloid form."
+  (trace Ioxynil Ioxynil-immobile Ioxynil-colloid)
+  (reaction Ioxynil-immobile-sorption
+            Ioxynil-filter 
+            Ioxynil-colloid-generation
+            Ioxynil-colloid-sorption
+            ))
+
+;;; Biopores
+
+(defbiopore common matrix
+  (K_wall_relative 1 [%])
+  (allow_upward_flow false))
+
+(defbiopore "matrix small"
+  (common (height_start  0 [cm])
+          (height_end -120 [cm])
+          (density (plf x 
+                        (domain [cm]) (range [m^-2])
+                        (points (0 0) (50 $SMALL))))
+          (diameter 2 [mm])))
+           
+(defbiopore "matrix large"
+  (common (height_start  0 [cm])
+          (height_end -120 [cm])
+          (density (plf x 
+                        (domain [cm]) (range [m^-2])
+                        (points (0 0) (50 $LARGE))))
+          (diameter 6 [mm])))
+           
+(defbiopore "drain small"
+   (drain  (height_start 0 [cm])
+           (height_end -100 [cm])
+           (diameter 2 [mm])
+           (pipe_position -110 [cm])
+           (density (plf x 
+                         (domain [cm]) (range [m^-2])
+                         (points (0 $SMALL) (50 0))))))
+
+(defbiopore "drain large"
+   (drain  (height_start 0 [cm])
+           (height_end -100 [cm])
+           (diameter 6 [mm])
+           (pipe_position -110 [cm])
+           (density (plf x 
+                         (domain [cm]) (range [m^-2])
+                         (points (0 $LARGE) (50 0))))))
+
+(deftertiary MyBiopores biopores
+  (classes ("matrix small")
+           ("matrix large")
+           ("drain small")
+           ("drain large")))
+  
+;;; Soil
+
+(defsecondary common pressure
+  (alpha 1e-5 [h^-1]))
+
+(defsecondary M_A common
+  (h_lim $A_lim))
+
+(defsecondary M_B common
+  (h_lim $B_lim))
+
+(defsecondary D1_A common
+  (h_lim -639 [cm]))
+
+(defsecondary D1_B common
+  (h_lim -281 [cm]))
+
+(defhorizon common USDA3
+  (r_pore_min 0.2))
+  
+(defhorizon "Ap1" common                 ;3-24
+  (hydraulic hypres (topsoil true))
+  (clay 0.11)(silt 0.22)(sand 0.67)(humus 0.03)
+  (dry_bulk_density 1.56 [g/cm^3])
+  (secondary_domain M_A))
+
+(defhorizon "Surface" "Ap1"              ;0-3
+  (hydraulic (original (K_sat $S_K)))
+  (secondary_domain pressure
+                    (h_lim -14000)
+                    (alpha 1e-5)))
+
+(defhorizon "Ap2" Ap1                   ;24-30
+  (hydraulic (original (K_sat $PP_K)))
+  (secondary_domain M_A) 
+  (dry_bulk_density 1.69 [g/cm^3]))
+
+(defhorizon "A2" common                  ;30-40
+  (hydraulic hypres (topsoil false))
+  (clay 0.13)(silt 0.22)(sand 0.65)(humus 0.03)
+  (dry_bulk_density 1.69 [g/cm^3])
+  (secondary_domain M_B))
+
+(defhorizon "B1" A2                     ;40-60
+  (dry_bulk_density 1.7 [g/cm^3]))
+
+(defhorizon "Bt" common                 ;60-120
+  (hydraulic hypres)
+  (clay 0.22)(silt 0.20)(sand 0.58)(humus 0.016)
+  (dry_bulk_density 1.7 [g/cm^3])
+  (secondary_domain M_B))
+
+(defhorizon "C" common                   ;120-
+  (clay 0.16)(silt 0.25)(sand 0.59) (humus 0.01)
+  (dry_bulk_density 1.8 [g/cm^3])
+  (hydraulic M_vG  
+             (Theta_res 0.000)
+             (Theta_sat 0.348314)
+             (alpha 0.0476257)
+             (n 1.15336)  
+             (K_sat 1.50000 [cm/h])
+             (l -3.60322))
+  (secondary_domain M_B))
+
+(defhorizon Ap1_Drain Ap2               ;3-24
+  (secondary_domain D1_A))
+
+(defhorizon "Ap2_Drain" Ap2             ;24-30
+  (secondary_domain D1_A)
+  (dry_bulk_density 1.77 [g/cm^3]))
+
+(defhorizon "A2_Drain" A2               ;30-40
+  (secondary_domain D1_B)
+  (dry_bulk_density 1.77 [g/cm^3]))
+
+  
+(defhorizon "Drain canyon" common        ;40-120
+  (hydraulic hypres)
+  (clay 0.16)(silt 0.20)(sand 0.64)(humus 0.014)
+  (dry_bulk_density 1.70 [g/cm^3])
+  (secondary_domain D1_B))
+
+(defmovement STD rectangle
+  (matrix_water (Mollerup (K_average harmonic)) (v+h))
+  (drainpoints (-110.0 [cm] 1 [cm]))
+  (Geometry (zplus -1.5 -3 
+                   -5 -8 -12 -16 -20 -24
+                   -27 -30             
+                   -35 -40 
+                   -50 -60
+                   -75 -90 -100
+                   -120
+                   -135 -150 -175 -200 [cm])
+            (xplus 25 50 75 100 150 300 500 650 800 [cm]))
+  (Tertiary MyBiopores))
+
+(defcolumn STD default
+  (Movement STD)                        ;2D
+  (OrganicMatter none)
+  (Chemistry multi (combine colloids Pendimethalin Ioxynil))
+  ;; Heat and Water from checkpoint.
+  (SoilHeat (T 9.8 10.1534 10.4964 10.8968 11.3452 11.6995 11.9209 12.0384 12.0723 12.0702 12.0377 11.9596 11.8149 11.6372 11.47 11.3443 11.2788 11.221 11.1731 11.1114 10.9871 9.8 10.1346 10.4771 10.8992 11.3665 11.7276 11.9457 12.0542 12.078 12.0682 12.0269 11.9408 11.7931 11.6227 11.4624 11.34 11.2759 11.2197 11.1729 11.1115 10.9871 9.8 10.1342 10.4766 10.8985 11.3655 11.7258 11.9426 12.0497 12.0721 12.0615 12.0192 11.9324 11.7846 11.6158 11.4576 11.3371 11.2742 11.2191 11.173 11.1118 10.9871 9.8 10.1331 10.4749 10.8969 11.3642 11.7246 11.9414 12.0477 12.0699 12.0591 12.0166 11.9296 11.7818 11.6132 11.4556 11.336 11.2737 11.2192 11.1735 11.1122 10.9871 9.8 10.1324 10.4749 10.8972 11.3643 11.7247 11.9414 12.0475 12.0696 12.0587 12.016 11.9289 11.781 11.6125 11.4552 11.3361 11.2742 11.2201 11.1744 11.1128 10.9871 9.8 10.1334 10.4762 10.8995 11.3648 11.7237 11.941 12.0475 12.0697 12.0588 12.0161 11.9291 11.7812 11.6129 11.4558 11.3376 11.2761 11.222 11.176 11.1138 10.9871 9.8 10.1331 10.4766 10.8999 11.3653 11.7243 11.9416 12.048 12.0702 12.0592 12.0166 11.9294 11.7815 11.6132 11.4562 11.338 11.2766 11.2225 11.1764 11.114 10.9871 9.8 10.1332 10.4766 10.8999 11.3653 11.7244 11.9417 12.0481 12.0703 12.0593 12.0166 11.9295 11.7816 11.6133 11.4562 11.3381 11.2766 11.2225 11.1764 11.114 10.9871 9.8 10.1331 10.4766 10.8999 11.3653 11.7243 11.9416 12.048 12.0702 12.0593 12.0166 11.9295 11.7815 11.6133 11.4562 11.3381 11.2766 11.2225 11.1764 11.114 10.9871 [dg C])
+            (T_top 9.4 [dg C]))
+  (SoilWater (h -83.3631 -81.3234 -78.9677 -75.6807 -71.2343 -66.5236 -62.2559 -58.4109 -55.3794 -52.9298 -50.6957 -49.8791 -50.4714 -56.5388 -74.0841 -107.586 -139.551 -183.868 -186.414 -153.939 -94.9084 -81.7669 -79.7459 -77.4296 -74.2132 -69.8442 -65.1988 -60.9726 -57.1395 -54.1008 -51.6423 -49.3147 -48.2419 -47.5003 -47.7194 -64.6966 -108.178 -149.35 -201.541 -191.623 -154.815 -94.9753 -81.1597 -79.145 -76.835 -73.6262 -69.2643 -64.6187 -60.3827 -56.5303 -53.4661 -50.9821 -48.5792 -47.3066 -46.138 -45.5275 -60.4644 -104.947 -149.48 -206.108 -193.446 -155.187 -94.9898 -80.7161 -78.7058 -76.4001 -73.1958 -68.8372 -64.1891 -59.9442 -56.0771 -52.9949 -50.4932 -48.0392 -46.6456 -45.2474 -44.2718 -57.9477 -101.164 -145.837 -204.653 -193.354 -155.099 -94.9456 -80.0367 -78.034 -75.7366 -72.5424 -68.1946 -63.5509 -59.3015 -55.4219 -52.322 -49.8016 -47.2907 -45.7688 -44.136 -42.801 -55.1708 -96.3342 -140.186 -200.949 -192.329 -154.705 -94.8444 -78.6858 -76.6989 -74.4193 -71.2484 -66.9294 -62.3061 -58.0625 -54.1754 -51.0589 -48.5194 -45.9463 -44.2756 -42.3639 -40.5931 -51.4471 -90.0494 -132.658 -195.787 -190.643 -154.07 -94.6913 -78.2936 -76.3113 -74.0368 -70.8728 -66.5625 -61.9457 -57.7046 -53.8167 -50.6968 -48.1531 -45.5663 -43.8609 -41.8824 -40.0053 -50.4956 -88.4983 -130.815 -194.553 -190.258 -153.94 -94.663 -78.2579 -76.2759 -74.0019 -70.8386 -66.529 -61.9128 -57.672 -53.784 -50.6639 -48.1199 -45.532 -43.8237 -41.8397 -39.9536 -50.4139 -88.3675 -130.659 -194.447 -190.226 -153.93 -94.6609 -78.2651 -76.2831 -74.009 -70.8455 -66.5358 -61.9196 -57.6789 -53.791 -50.671 -48.1272 -45.54 -43.8332 -41.8517 -39.9701 -50.4526 -88.4826 -130.842 -194.618 -190.284 -153.949 -94.6645 [cm]))
+  (Soil (MaxRootingDepth 150 [cm])
+        (horizons (-3.00 "Surface")
+                  (-24.00 "Ap1")
+                  (-30.00 "Ap2")
+                  (-40.00 "A2")
+                  (-60.00 "B1")
+                  (-120 "Bt")
+                  (-200 "C"))
+        (zones ((box  (top finite -3 [cm]) (bottom finite -24 [cm])
+                      (left finite 0 [cm]) (right finite 25 [cm]))
+                Ap1_Drain)
+               ((box  (top finite -24 [cm]) (bottom finite -30 [cm])
+                      (left finite 0 [cm]) (right finite 25 [cm]))
+                Ap2_Drain)
+               ((box  (top finite -30 [cm]) (bottom finite -40 [cm])
+                      (left finite 0 [cm]) (right finite 25 [cm]))
+                A2_Drain)
+               ((box  (top finite -40 [cm]) (bottom finite -120 [cm])
+                      (left finite 0 [cm]) (right finite 25 [cm]))
+                "Drain canyon")))
+  (Groundwater aquitard
+        (K_aquitard 0.050 [cm/h])
+        (Z_aquitard 200 [cm])
+        (pressure_table (file "piezo-calib.gwt"))))
+
+
+;;; Management.
+
+(input file "wwheat.dai")
+(input file "tillage.dai")
+(input file "fertilizer.dai") 	;;
+
+(defcrop "WWheat" "Winter Wheat"
+  (Root (MaxPen 150 [cm]))
+  (Canopy (EpFac 1.14 [])
+          (EpFacDS (0.355 0.386)(0.566 1)(1.381 1)(1.699 0.386)) ;; 0.44/1.14=0.386
+          (IntcpCap 0.05 [mm])))
+
+(defaction "Warmup" activity
+  (wait (at 1997 9 23 12)) (seed_bed_preparation) (sow "WWheat") 
+  (wait (at 1998 4 16 12)) (fertilize (NPK01 (weight 138 [kg N/ha]))) 
+  (wait (at 1998 8 20 12)) (harvest "WWheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+  (wait (at 1998 9 15 12)) (plowing)
+  (wait (at 1998 9 23 12)) (seed_bed_preparation) (sow "WWheat")
+  (wait (at 1999 4 14 12)) (fertilize (NPK01 (weight 132 [kg N/ha])))
+  (wait (at 1999 8 20 12)) (harvest "WWheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+  (wait (at 1999 9 15 12)) (plowing)
+  (wait (at 1999 9 27 12)) (seed_bed_preparation) (sow "WWheat")
+  (wait (at 1999 11 16 12)) (spray "Pendimethalin" 2000 [g/ha])
+  (wait (at 2000 4 28 12)) (fertilize (NPK01 (weight 143 [kg N/ha])))
+  (wait (at 2000 8 20 12)) (harvest "WWheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+  (wait (at 2000 9 15 12)) (plowing))
+
+(defaction "STD" activity
+  (wait_mm_dd 10 18) (seed_bed_preparation) (sow "WWheat")
+  (wait_mm_dd 11 10) (progn (spray "Pendimethalin" 2000 [g/ha])
+                            (spray "Ioxynil" 200 [g/ha]))
+  (wait_mm_dd 04 01) (stop))
+
+;;; Output.
+
+(defunit [cm^3/cm^3/h] [h^-1])
+
+(deflog STD table
+  (when daily)
+  (where "${col}-${YEAR}-pest.dlf")
+  (declare unit String "Base unit.")
+  (unit "g/ha")
+  (summary (simple (print_sum false)
+                   (precision 6)
+                   (fetch ("W-Surface-Matrix")
+                          ("W-Biopore-100")("W-Matrix-100")
+                          ("W-Matrix-150")
+                          ("W-Soil-Drain") ("W-Surface-Drain") 
+                          ("W-Biopore-0-5")("W-Biopore-5-30")
+                          
+                          ))
+           (simple (print_sum false)
+                   (precision 6)
+                   (fetch ("I-Surface-Matrix") 
+                          ("I-Leak-Matrix-100") ("I-Leak-Biopore-100")
+                          ("I-Leak-Matrix-150") 
+                          ("I-Soil-Drain") ("I-Surface-Drain")))
+           (simple (print_sum false)
+                   (precision 6)
+                   (fetch ("P-Surface-Matrix")
+                          ("P-Leak-Matrix-100") ("P-Leak-Biopore-100")
+                          ("P-Leak-Matrix-150") 
+                          ("P-Soil-Drain") ("P-Surface-Drain"))))
+  (entries (number (tag "W-Surface-Matrix")
+                   (documentation "\
+Flux of water from surface to biopores that end in matrix.")
+                   (path column component Movement component 
+                         Tertiary biopores classes matrix infiltration)
+                   (spec biopore matrix infiltration)
+                   (handle sum)
+                   (dimension "mm"))
+           (flux_bottom (tag "W-Matrix-100")
+                        (path column component SoilWater q)
+                        (spec fixed SoilWater q)
+                        (handle sum)
+                        (to -100 [cm])
+                        (negate true)
+                        (dimension "mm"))
+           (flux_bottom (tag "W-Biopore-100")
+                        (path column component SoilWater q_p)
+                        (spec fixed SoilWater q_p)
+                        (handle sum)
+                        (to -100 [cm])
+                        (negate true)
+                        (dimension "mm"))
+           (flux_bottom (tag "W-Matrix-150")
+                        (path column component SoilWater q)
+                        (spec fixed SoilWater q)
+                        (handle sum)
+                        (to -150 [cm])
+                        (negate true)
+                        (dimension "mm"))
+           (interval (tag "W-Soil-Drain")
+                     (path column component SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm"))
+           (number (tag "W-Surface-Drain")
+                   (documentation "\
+Flux of water from surface to drain through biopores, bypassing the matrix.")
+                   (path column component Movement component 
+                         Tertiary biopores classes drain infiltration)
+                   (spec biopore drain infiltration)
+                   (handle sum)
+                   (dimension "mm"))
+           (interval (tag "W-Biopore-0-5")
+                     (from 0 [cm])
+                     (to -5 [cm])
+                     (documentation "\
+Water that enters the biopores in the specified interval")
+                     (path column component Movement component 
+                           Tertiary biopores classes component B2M)
+                     (spec biopore component B2M)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "W-Biopore-5-30")
+                     (from -5 [cm])
+                     (to -30 [cm])
+                     (documentation "\
+Water that enters the biopores in the specified interval")
+                     (path column component Movement component 
+                           Tertiary biopores classes component M2B)
+                     (spec biopore component M2B)
+                     (handle sum)
+                     (dimension "mm"))
+           
+           (flux_top (path column component Chemistry component 
+                           trace Ioxynil-base J_matrix)
+                     (documentation "\
+Lost due to leaching.")
+                     (tag "I-Surface-Matrix")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (from 0 [cm])
+                     (spec chemical default J_matrix))
+           (flux_bottom (path column component Chemistry component 
+                              trace Ioxynil-base J_matrix)
+                        (documentation "\
+Lost due to leaching.")
+                        (tag "I-Leak-Matrix-50")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (to -50 [cm])
+                        (spec chemical default J_matrix))
+           (flux_bottom (path column component Chemistry component 
+                              trace Ioxynil-base J_tertiary)
+                        (documentation "\
+Lost due to leaching.")
+                        (tag "I-Leak-Biopore-50")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (to -50 [cm])
+                        (spec chemical default J_tertiary))
+           (flux_bottom (path column component Chemistry component 
+                              trace Ioxynil-base J_matrix)
+                        (documentation "\
+Lost due to leaching.")
+                        (tag "I-Leak-Matrix-100")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (to -100 [cm])
+                        (spec chemical default J_matrix))
+           (flux_bottom (path column component Chemistry component 
+                              trace Ioxynil-base J_tertiary)
+                        (documentation "\
+Lost due to leaching.")
+                        (tag "I-Leak-Biopore-100")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (to -100 [cm])
+                        (spec chemical default J_tertiary))
+           (flux_bottom (path column component Chemistry component 
+                              trace Ioxynil-base J_matrix)
+                        (documentation "\
+Lost due to leaching.")
+                        (tag "I-Leak-Matrix-150")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (to -150 [cm])
+                        (spec chemical default J_matrix))
+           (interval (path column component
+                           Chemistry component trace Ioxynil-base S_drain)
+                     (spec chemical default S_drain)
+                     (documentation "\
+Lost from the soil matrix to drain pipes.")
+                     (tag "I-Soil-Drain")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}"))
+           (number (path column component Movement component 
+                         Tertiary biopores classes drain 
+                         solute_infiltration Ioxynil-base value)
+                   (spec biopore drain solute_infiltration value)
+                   (tag "I-Surface-Drain")
+                   (documentation "\
+Amount moving directly from surface to drain, through biopores.
+
+This never come in contact with the soil matrix.")
+                   (handle sum)
+                   (dimension "${unit}"))
+           (flux_top (path column component Chemistry component 
+                           trace Pendimethalin-base J_matrix)
+                     (documentation "\
+Lost due to leaching.")
+                     (tag "P-Surface-Matrix")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (from 0 [cm])
+                     (spec chemical default J_matrix))
+           (flux_bottom (path column component Chemistry component 
+                              trace Pendimethalin-base J_matrix)
+                        (documentation "\
+Lost due to leaching.")
+                        (tag "P-Leak-Matrix-100")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (to -100 [cm])
+                        (spec chemical default J_matrix))
+           (flux_bottom (path column component Chemistry component 
+                              trace Pendimethalin-base J_tertiary)
+                        (documentation "\
+Lost due to leaching.")
+                        (tag "P-Leak-Biopore-100")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (to -100 [cm])
+                        (spec chemical default J_matrix))
+           (flux_bottom (path column component Chemistry component 
+                              trace Pendimethalin-base J_matrix)
+                        (documentation "\
+Lost due to leaching.")
+                        (tag "P-Leak-Matrix-150")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (to -150 [cm])
+                        (spec chemical default J_matrix))
+           (interval (path column component
+                           Chemistry component trace Pendimethalin-base S_drain)
+                     (spec chemical default S_drain)
+                     (documentation "\
+Lost from the soil matrix to drain pipes.")
+                     (tag "P-Soil-Drain")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}"))
+           (number (path column component Movement component 
+                         Tertiary biopores classes drain 
+                         solute_infiltration Pendimethalin-base value)
+                   (spec biopore drain solute_infiltration value)
+                   (tag "P-Surface-Drain")
+                   (documentation "\
+Amount moving directly from surface to drain, through biopores.
+
+This never come in contact with the soil matrix.")
+                   (handle sum)
+                   (dimension "${unit}"))))
+
+(defunit [dgC] [dg C])
+
+(deflog MinMaxWeather table
+  "Summarize daily weather with minimum and maximum temperatures."
+  (when (hour 23))
+  (where "GenMinMax.dwf")
+  (entries (number (tag Year)
+                   (dimension year)
+                   (path time year)
+                   (interesting_content false))
+           (number (tag Month)
+                   (dimension month)
+                   (path time month)
+                   (interesting_content false))
+           (number (tag Day)
+                   (dimension mday)
+                   (path time mday)
+                   (interesting_content false))
+           (number (tag "DiffRad")
+                   (dimension "W/m^2")
+                   (handle average)
+                   (path weather default diffuse_radiation)
+                   (spec weather default diffuse_radiation))
+           (number (tag "GlobRad")
+                   (dimension "W/m^2")
+                   (handle average)
+                   (path weather default global_radiation)
+                   (spec weather default global_radiation))
+           (number (tag "T_min")
+                   (dimension "dgC")
+                   (handle min)
+                   (path weather default air_temperature)
+                   (spec weather default air_temperature))
+           (number (tag "T_max")
+                   (dimension "dgC")
+                   (handle max)
+                   (path weather default air_temperature)
+                   (spec weather default air_temperature))
+           (number (tag "Precip")
+                   (dimension "mm/d")
+                   (handle average)
+                   (path weather default precipitation)
+                   (spec weather default precipitation))
+           (number (tag "VapPres")
+                   (dimension "Pa")
+                   (handle average)
+                   (path weather default vapor_pressure)
+                   (spec weather default vapor_pressure))
+           (number (tag "Wind")
+                   (dimension "m/s")
+                   (handle average)
+                   (path weather default wind)
+                   (spec weather default wind))))
+
+(deflog YearlyPrecip table
+  "Summarize daily weather with minimum and maximum temperatures."
+  (when yearly)
+  (entries (number (tag "Precip")
+                   (dimension "mm")
+                   (handle sum)
+                   (path weather default precipitation)
+                   (spec weather default precipitation))))
+  
+(defprogram STD Daisy
+  "Reference scanerio."
+
+  ;; Parameters.
+  (declare col String "Short tag to use for this simulation.")
+  (col "STD")
+
+  ;; Surface layer.
+  (declare S_K Number [cm/h] "Hydraulic conductivity in surface layer.")
+  (S_K 1.16454 [cm/h])
+
+  ;; Plow pan.
+  (declare PP_K Number [cm/h] "Hydraulic conductivity in plow pan.")
+  (PP_K 0.830855 [cm/h])
+
+  ;; Biopores.
+  (declare LARGE Number [<user>] "Density of large biopores.")
+  (LARGE 2.9 [m^-2])
+  (declare SMALL Number [<user>] "Density of small biopores.")
+  (SMALL 1.3 [m^-2])
+
+  ;; Secondary domain.
+  (declare A_lim Number [cm] "Pressure limit between domain 1 & 2, top soil.")
+  (declare B_lim Number [cm] "Pressure limit between domain 1 & 2, subsoil.")
+  (A_lim -639 [cm])
+  (B_lim -281 [cm])
+
+  ;; Sorption.
+  (declare P_OC Number [cm^3/g] "K_OC for Pendimethalin.")
+  (declare I_OC Number [cm^3/g] "K_OC for Ioxynil.")
+  (P_OC 15744 [ml/g])                   ;6700-29400 [ml/g]
+  (I_OC 276 [ml/g])  
+  (declare SORP Number [h^-1] "Sorption speed.")
+  (SORP 0.05 [h^-1])
+  (declare PART Number [g/J] "Colloid detachement.")
+  (PART 15 [g/J])   
+
+  ;; Stuff.
+  (weather default "dk-taastrup-hourly.dwf" )
+  (column STD)
+  (manager STD)
+  (time $START)
+  (minimal_timestep (microseconds 1))
+  (print_time periodic)
+  (log_prefix "log/")
+
+  (output STD)) 
+
+(defprogram MakeCP STD
+  (column (STD (Chemistry none)))
+  (time 1997 9 1)
+  (stop 2000 10 18 0)
+  (manager Warmup)
+  (output checkpoint))
+
+(defprogram MakeDaily Daisy
+  (weather default "dk-taastrup-hourly.dwf" )
+  (column (default 
+            (Soil (MaxRootingDepth 150 [cm])
+                  (horizons (-200.00 (USDA3 (sand 0.90) (silt 0.05) (clay 0.04) (humus 0.01) (dry_bulk_density 1.5 [g/cm^3])))))
+            (Groundwater deep)))
+  (manager activity)
+  (time 1995 03 25)
+  (stop 1998 10 28)
+  (output ;;MinMaxWeather
+   (YearlyPrecip (when monthly) (where "weather-monthly-hourly.dlf"))))
+
+(defprogram BMA STD
+  (col BMA)
+  (LARGE 1.1 [m^-2])
+  (SMALL 7.8 [m^-2]))
+
+(defprogram BMI STD
+  (col BMI)
+  (LARGE 1.2 [m^-2])
+  (SMALL 1.4 [m^-2]))
+
+(defprogram BNO STD
+  (col BNO)
+  (column (original (Movement original (Tertiary none)))))
+
+(defprogram DAY STD
+  (col DAY)
+  (weather default "GenMinMax.dwf"))
+
+(defprogram SUR STD
+  (col SUR)
+  (S_K 0.3 [cm/h]))
+
+(defprogram SUP STD
+  (col SUP)
+  (S_K 0.036 [cm/h]))
+
+(defprogram PPK STD
+  (col PPK)
+  ; 90% fractile is 1.80 cm/h, geometric mean is 0.90 cm/h
+  (PP_K 0.036 [cm/h]))                   ;10% fractile
+
+(defprogram SPP STD
+  (col SPP)
+  (S_K 0.3 [cm/h])
+  (PP_K 0.036 [cm/h]))
+
+(defprogram U4S STD
+  (col U4S)
+  (A_lim -1308 [cm])
+  (B_lim -321 [cm]))
+
+(defcolumn NOS STD
+  (Soil (MaxRootingDepth 150 [cm])
+        (horizons (-3.00 ("Surface" (secondary_domain none)))
+                  (-24.00 ("Ap1" (secondary_domain none)))
+                  (-30.00 ("Ap2" (secondary_domain none)))
+                  (-40.00 ("A2" (secondary_domain none)))
+                  (-60.00 ("B1" (secondary_domain none)))
+                  (-120 ("Bt" (secondary_domain none)))
+                  (-200 ("C")))
+        (zones ((box  (top finite -3 [cm]) (bottom finite -24 [cm])
+                      (left finite 0 [cm]) (right finite 25 [cm]))
+                (Ap1_Drain (secondary_domain none)))
+               ((box  (top finite -24 [cm]) (bottom finite -30 [cm])
+                      (left finite 0 [cm]) (right finite 25 [cm]))
+                (Ap2_Drain (secondary_domain none)))
+               ((box  (top finite -30 [cm]) (bottom finite -40 [cm])
+                      (left finite 0 [cm]) (right finite 25 [cm]))
+                (A2_Drain (secondary_domain none)))
+               ((box  (top finite -40 [cm]) (bottom finite -120 [cm])
+                      (left finite 0 [cm]) (right finite 25 [cm]))
+                ("Drain canyon" (secondary_domain none))))))
+
+(defprogram NOS STD
+  (col NOS)
+  (column NOS))
+
+(defprogram K10 STD
+  (col K10)
+  (P_OC 1574.4 [ml/g])
+  (I_OC 27.6 [ml/g]))
+
+(defprogram KSO STD
+  (col KSO)
+  (SORP 1.0 [h^-1]))
+
+(defprogram PAR STD
+  (col PAR)
+  (PART 0.0 [g/J]))
+
+(defprogram sims batch
+  (declare START fixed Time "")
+  (declare YEAR Integer "")
+  (run STD BMA BMI BNO DAY
+       SUR SUP PPK SPP U4S
+       NOS K10 KSO PAR))
+
+(defprogram sims10 batch
+  (run (sims (START 1998 10 1 0) (YEAR 1998))
+       (sims (START 1999 10 1 0) (YEAR 1999))
+       (sims (START 2000 10 1 0) (YEAR 2000))
+       (sims (START 2001 10 1 0) (YEAR 2001))
+       (sims (START 2002 10 1 0) (YEAR 2002))
+       (sims (START 2003 10 1 0) (YEAR 2003))
+       (sims (START 2004 10 1 0) (YEAR 2004))
+       (sims (START 2005 10 1 0) (YEAR 2005))
+       (sims (START 2006 10 1 0) (YEAR 2006))
+       (sims (START 2007 10 1 0) (YEAR 2007))))
+
+(defprogram simsNW batch
+  (run (sims (START 1998 10 1 0) (YEAR 1998))
+       (sims (START 1999 10 1 0) (YEAR 1999))
+       (sims (START 2000 10 1 0) (YEAR 2000))))
+
+(defprogram simsNE batch
+  (run (sims (START 2001 10 1 0) (YEAR 2001))
+       (sims (START 2002 10 1 0) (YEAR 2002))
+       (sims (START 2003 10 1 0) (YEAR 2003))))
+
+(defprogram simsSW batch
+  (run (sims (START 2004 10 1 0) (YEAR 2004))
+       (sims (START 2005 10 1 0) (YEAR 2005))
+       (sims (START 2006 10 1 0) (YEAR 2006))))
+
+(defprogram simsSE batch
+  (run (sims (START 2007 10 1 0) (YEAR 2007))))
+
+(run sims10)
+
+;; pest.dai ends here.

@@ -1,0 +1,464 @@
+;; Special log model for the smoke project.
+
+(deflog Smoke chemical
+  "Soil chemical and other stuff"
+  (declare unit String "Base unit.")
+  (unit "g/ha")
+  (where "${colfid}smoke-${chemical}.dlf")
+  (when true)
+  (entries ;; Year Month MDay Hour
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores classes drain 
+                         solute_infiltration "${chemical}" value)
+                   (spec biopore drain solute_infiltration value)
+                   (tag "Surface to drain")
+                   (handle sum)
+                   (dimension "${unit}"))
+           ;; 0-9
+           (flux_top (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" J_matrix)
+                     (from -0 [cm])
+                     (documentation "\
+Infiltration.")
+                     (tag "Top 0-9")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default J_matrix))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_matrix)
+                        (to -9 [cm])
+                        (documentation "\
+Leaching.")
+                        (tag "Bottom 0-9")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (spec chemical default J_matrix))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_tertiary)
+                     (from -0 [cm]) (to -9 [cm])
+                     (documentation "\
+Net-loss to biopores.
+
+This is positive if the flux from the soil matrix to the biopores
+is larger than the flux from the biopores to the soil matrix.")
+                     (tag "Tertiary ")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_tertiary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_drain)
+                     (from -0 [cm]) (to -9 [cm])
+                     (documentation "\
+Lost to drains.")
+                     (tag "Drain 0-9")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_drain))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (from -0 [cm]) (to -9 [cm])
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "Content 0-9")
+                     (dimension "${unit}")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (from -0 [cm]) (to -9 [cm])
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "Concentration 0-9")
+                     (dimension "PPM")
+                     (spec chemical default M))
+           ;; 9-18
+           (flux_top (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" J_matrix)
+                     (from -9 [cm])
+                     (documentation "\
+Infiltration.")
+                     (tag "Top 9-18")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default J_matrix))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_matrix)
+                        (to -18 [cm])
+                        (documentation "\
+Leaching.")
+                        (tag "Bottom 9-18")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (spec chemical default J_matrix))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_tertiary)
+                     (from -9 [cm]) (to -18 [cm])
+                     (documentation "\
+Net-loss to biopores.
+
+This is positive if the flux from the soil matrix to the biopores
+is larger than the flux from the biopores to the soil matrix.")
+                     (tag "Tertiary ")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_tertiary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_drain)
+                     (from -9 [cm]) (to -18 [cm])
+                     (documentation "\
+Lost to drains.")
+                     (tag "Drain 9-18")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_drain))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (from -9 [cm]) (to -18 [cm])
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "Content 9-18")
+                     (dimension "${unit}")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (from -9 [cm]) (to -18 [cm])
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "Concentration 9-18")
+                     (dimension "PPM")
+                     (spec chemical default M))
+           ;; 18-24
+           (flux_top (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" J_matrix)
+                     (from -18 [cm])
+                     (documentation "\
+Infiltration.")
+                     (tag "Top 18-24")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default J_matrix))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_matrix)
+                        (to -24 [cm])
+                        (documentation "\
+Leaching.")
+                        (tag "Bottom 18-24")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (spec chemical default J_matrix))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_tertiary)
+                     (from -18 [cm]) (to -24 [cm])
+                     (documentation "\
+Net-loss to biopores.
+
+This is positive if the flux from the soil matrix to the biopores
+is larger than the flux from the biopores to the soil matrix.")
+                     (tag "Tertiary ")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_tertiary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_drain)
+                     (from -18 [cm]) (to -24 [cm])
+                     (documentation "\
+Lost to drains.")
+                     (tag "Drain 18-24")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_drain))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (from -18 [cm]) (to -24 [cm])
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "Content 18-24")
+                     (dimension "${unit}")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (from -18 [cm]) (to -24 [cm])
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "Concentration 18-24")
+                     (dimension "PPM")
+                     (spec chemical default M))
+           ;; 24-30
+           (flux_top (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" J_matrix)
+                     (from -24 [cm])
+                     (documentation "\
+Infiltration.")
+                     (tag "Top 24-30")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default J_matrix))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_matrix)
+                        (to -30 [cm])
+                        (documentation "\
+Leaching.")
+                        (tag "Bottom 24-30")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (spec chemical default J_matrix))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_tertiary)
+                     (from -24 [cm]) (to -30 [cm])
+                     (documentation "\
+Net-loss to biopores.
+
+This is positive if the flux from the soil matrix to the biopores
+is larger than the flux from the biopores to the soil matrix.")
+                     (tag "Tertiary ")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_tertiary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_drain)
+                     (from -24 [cm]) (to -30 [cm])
+                     (documentation "\
+Lost to drains.")
+                     (tag "Drain 24-30")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_drain))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (from -24 [cm]) (to -30 [cm])
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "Content 24-30")
+                     (dimension "${unit}")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (from -24 [cm]) (to -30 [cm])
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "Concentration 24-30")
+                     (dimension "PPM")
+                     (spec chemical default M))
+           ;; 30-40
+           (flux_top (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" J_matrix)
+                     (from -30 [cm])
+                     (documentation "\
+Infiltration.")
+                     (tag "Top 30-40")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default J_matrix))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_matrix)
+                        (to -40 [cm])
+                        (documentation "\
+Leaching.")
+                        (tag "Bottom 30-40")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (spec chemical default J_matrix))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_tertiary)
+                     (from -30 [cm]) (to -40 [cm])
+                     (documentation "\
+Net-loss to biopores.
+
+This is positive if the flux from the soil matrix to the biopores
+is larger than the flux from the biopores to the soil matrix.")
+                     (tag "Tertiary ")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_tertiary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_drain)
+                     (from -30 [cm]) (to -40 [cm])
+                     (documentation "\
+Lost to drains.")
+                     (tag "Drain 30-40")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_drain))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (from -30 [cm]) (to -40 [cm])
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "Content 30-40")
+                     (dimension "${unit}")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (from -30 [cm]) (to -40 [cm])
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "Concentration 30-40")
+                     (dimension "PPM")
+                     (spec chemical default M))
+           ))
+
+(deflog SmokeProfile chemical
+  "Soil chemical profile"
+  (declare unit String "Base unit.")
+  (unit "g/ha")
+  (where "${colfid}smoke-${chemical}-profile.dlf")
+  (when finished)
+  (entries ;; Year Month MDay Hour
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (from -0 [cm]) (to -9 [cm])
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "M @ -4.5")
+                     (dimension "PPM")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (from -9 [cm]) (to -18 [cm])
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "M @ -13.5")
+                     (dimension "PPM")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (from -18 [cm]) (to -24 [cm])
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "M @ -21")
+                     (dimension "PPM")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (from -24 [cm]) (to -30 [cm])
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "M @ -27")
+                     (dimension "PPM")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (from -30 [cm]) (to -40 [cm])
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "M @ -35")
+                     (dimension "PPM")
+                     (spec chemical default M))
+           ))
+
+(deflog "BB Profile" "SmokeProfile" 
+  (chemical "BB-base") 
+  (where "BB-Rsqr.dlf"))
+
+(deflog "Br Profile" "SmokeProfile" 
+  (chemical "Bromide") 
+  (where "Br-Rsqr.dlf"))
+
+(deflog "Primary" chemical
+  "Content, transport and transformation of chemicals in the primary domain."
+  (declare unit String "Base unit.")
+  (unit "g/ha")
+  (where "${colfid}secondary_${chemfid}.dlf")
+  (summary (balance (precision 3)
+                    (input "In" "Source")
+                    (output "Leak-Matrix" )
+                    (content "Content" ;; "Error"
+                             )))
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (flux_top (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" J_primary)
+                     (documentation "\
+Infiltration.")
+                     (tag "In")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default J_primary))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_primary)
+                        (documentation "\
+Leaching.")
+                        (tag "Leak-Matrix")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (spec chemical default J_primary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_primary)
+                     (tag "Source")
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_tertiary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M_primary)
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "Content")
+                     (dimension "${unit}")
+                     (spec chemical default M))))
+
+(deflog "Secondary" chemical
+  "Content, transport and transformation of chemicals in the secondary domain."
+  (declare unit String "Base unit.")
+  (unit "g/ha")
+  (where "${colfid}secondary_${chemfid}.dlf")
+  (summary (balance (precision 3)
+                    (input "In" "Source")
+                    (output "Leak-Matrix" )
+                    (content "Content" ;; "Error"
+                             )))
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (flux_top (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" J_secondary)
+                     (documentation "\
+Infiltration.")
+                     (tag "In")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default J_secondary))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_secondary)
+                        (documentation "\
+Leaching.")
+                        (tag "Leak-Matrix")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (spec chemical default J_secondary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_secondary)
+                     (tag "Source")
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_tertiary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M_secondary)
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "Content")
+                     (dimension "${unit}")
+                     (spec chemical default M))))
+
+;; smoke-log.dai ends here.

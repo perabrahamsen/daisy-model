@@ -1,0 +1,41 @@
+;;; chemestry-base.dai --- Standard definitions.
+
+(defchemical solid default
+  "Non-dissolvable chemicals"
+  (crop_uptake_reflection_factor 1 [])
+  (canopy_dissipation_rate 0 [h^-1])
+  (canopy_washoff_coefficient 1 [])
+  (diffusion_coefficient 1 [cm^2/s])
+  (adsorption full)
+  (decompose_rate 0 [h^-1]))
+  
+(defchemical common default
+  "For chemicals where we know no better."
+  (cite focus2002)
+  ;; decompose depth factor is from FOCUS 2002.
+  (decompose_depth_factor (-105 [cm] 0.0 [])
+                          ( -95 [cm] 0.3 []) ;FOCUS lim 100 cm
+                          ( -65 [cm] 0.3 [])
+                          ( -55 [cm] 0.5 []) ;FOCUS lim 60 cm
+                          ( -35 [cm] 0.5 [])
+                          ( -25 [cm] 1.0 []) ;FOCUS lim 30 cm
+                          (   0 [cm] 1.0 []))
+  (canopy_dissipation_rate 0.0083 [h^-1]) ;Source?
+  (canopy_washoff_coefficient 1.0 [])
+  (crop_uptake_reflection_factor 1 [])
+  (diffusion_coefficient 4.6e-6 [cm^2/s]) ; Source?
+  )
+
+(defchemical pesticide common
+  "This stuff protects plants.")
+  
+(defchemical fungicide pesticide
+  "This stuff kills swamps.")
+
+(defchemical herbicide pesticide
+  "This stuff kills plants.")
+
+(defchemical insecticide pesticide
+  "This stuff kills insects.")
+
+;;; chemestry-base.dai ends here.

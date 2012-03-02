@@ -1,0 +1,30 @@
+;Mikkel Mollerup, KVL
+;for AArhus County, 2004/2005
+;$Revision 1.0, 2005/16/11: "LeafPhot" -> "LeafPhot original"
+;
+;Documentation in "Parameteriseringer af grønsager til Daisy, 2005"
+
+
+        
+(defcrop "Onion - planting of sets" "Onion"
+
+  (description "For AArhus County - Samsoe Project")
+   
+  (Devel original (EmrTSum 100)				 
+       (DSRate1 0.017))		 			  
+       
+  (Prod (NCrop  0.60)          ;[g N/m2]   
+       (WSOrg 20.00)           ;[g DM/m2] 	
+       (CH2OPool 0.00))        ;[g CH2O/m2] 	
+  
+  (LeafPhot original (Fm 4.1)				  						      
+       (Qeff 0.046)) 							 
+
+)
+  
+
+
+
+
+  
+  

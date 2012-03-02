@@ -1,0 +1,12 @@
+dlf-0.0 -- Field Bromide_x (defined in 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_8\1D\Hooghoudt_1D_8.dai').
+
+VERSION: 4.74
+LOGFILE: bromide_x_daily.dlf
+RUN: Wed Nov 04 14:38:07 2009
+
+COLUMN: *
+CHEMICAL: *
+INTERVAL: box none
+
+LOG: Content, transport and transformation of bromide in the field.
+

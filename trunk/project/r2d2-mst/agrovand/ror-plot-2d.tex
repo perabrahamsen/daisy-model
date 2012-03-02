@@ -1,0 +1,367 @@
+\newcommand{\figrorrende}[1]{\includegraphics[trim=9mm 0mm 14mm 12mm,clip]{fig/#1}}
+\newcommand{\figrorrendel}[1]{\hspace*{-2cm}\figrorrende{#1}}
+
+\chapter{2D plots}
+\label{app:plot-2d}
+
+In this appendix we present simulated 2D plots for water, bromide,
+pendimethalin, and ioxynil.  The simulated values presented here are
+all from the part of the soil with an aquitard bottom.  There are no
+measurements to compare with, a major caveat for both the results and
+discussion.  We use two kinds of graphs to capture the 2D structure.
+
+The first kind depict static distribution in the soil.  Each graph has
+horizontal distance from drain on the x-axis and height above surface
+on the y-axis, using the same scale for both axes.  The graph
+represents the computational soil area used in the simulation.
+The right side is the center between two drains (8 meter for
+R{\o}rrende), and the bottom is 2 meter below ground, where we use an
+aquitard lower boundary with a calibrated aquifer.  The graphs are
+color coded, where specific colors represent specific values for the
+soil.  Each numeric cell in the computation has a color representing
+the value within that cell.  Since cells are rectangular, the graphs
+appear blocky.  The graphs are ordered chronologically, with the
+earliest graph at the top left corner, continuing from there using the
+normal reading direction.
+
+The second kind of graph depicts horizontal or vertical movement.  For
+the graphs depicting horizontal movement, the y-axis specifies height
+above surface (negative number) and the x-axis movement away from
+drain (usually also negative).  The horizontal movement at different
+distances from the drain pipes is shown as separate plots on each
+graph.  For the graphs depicting vertical movement, the axes are
+swapped.  The individual plots represent different depths.  We use the
+same flow units as we used for the original input, so e.g.\ pesticide
+transport is given in g/ha.
+
+\FloatBarrier
+\section{Water}
+
+Monthly snapshots of the soil water potential is shown on
+figure~\ref{fig:Rorrende-pF} for all three drain seasons, and the
+preceding summers. We see shallow groundwater at the beginning of the
+first drain season, where we overestimate drain flow (see
+figure~\ref{fig:season9899}).  The horizontal movement flux is largest
+near the drain pipes, and at the bottom of the plow layer in
+(figure~\ref{fig:Rorrende-water-horizontal}).  We also see the largest
+upward flux below the drain pipes, and downward flux above the drain
+pipes (figure~\ref{fig:Rorrende-water-vertical}).  Most of the
+movement within the soil is through biopores
+(figure~\ref{fig:Rorrende-water-biopore}).
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figrorrendel{Rorrende-pF-1998-5} & 
+    \figrorrende{Rorrende-pF-1998-6} & 
+    \figrorrende{Rorrende-pF-1998-7} \\
+    \figrorrendel{Rorrende-pF-1998-8} & 
+    \figrorrende{Rorrende-pF-1998-9} & 
+    \figrorrende{Rorrende-pF-1998-10} \\
+    \figrorrendel{Rorrende-pF-1998-11} & 
+    \figrorrende{Rorrende-pF-1998-12} & 
+    \figrorrende{Rorrende-pF-1999-1} \\
+    \figrorrendel{Rorrende-pF-1999-2} & 
+    \figrorrende{Rorrende-pF-1999-3} & 
+    \figrorrende{Rorrende-pF-1999-4}\\
+    \figrorrendel{Rorrende-pF-1999-5} & 
+    \figrorrende{Rorrende-pF-1999-6} & 
+    \figrorrende{Rorrende-pF-1999-7} \\
+    \figrorrendel{Rorrende-pF-1999-8} & 
+    \figrorrende{Rorrende-pF-1999-9} & 
+    \figrorrende{Rorrende-pF-1999-10} \\
+    \figrorrendel{Rorrende-pF-1999-11} & 
+    \figrorrende{Rorrende-pF-1999-12} & 
+    \figrorrende{Rorrende-pF-2000-1} \\
+    \figrorrendel{Rorrende-pF-2000-2} & 
+    \figrorrende{Rorrende-pF-2000-3} & 
+    \figrorrende{Rorrende-pF-2000-4}\\
+    \figrorrendel{Rorrende-pF-2000-5} & 
+    \figrorrende{Rorrende-pF-2000-6} & 
+    \figrorrende{Rorrende-pF-2000-7} \\
+    \figrorrendel{Rorrende-pF-2000-8} & 
+    \figrorrende{Rorrende-pF-2000-9} & 
+    \figrorrende{Rorrende-pF-2000-10} \\
+    \figrorrendel{Rorrende-pF-2000-11} & 
+    \figrorrende{Rorrende-pF-2000-12} & 
+    \figrorrende{Rorrende-pF-2001-1} 
+  \end{tabular}
+  
+  \caption{Soil water pressure potential at the end of each month from
+    May 1998 (top left) to January 2001 (bottom right).  The y-axis
+    denotes depth, the x-axis distance from drain.  There are tick
+    marks for every meter.  Blue denotes pF<0, white pF=1, yellow
+    pF=2, orange pF=3, red pF=4, and black pF>5.}
+\label{fig:Rorrende-pF}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Rorrende-water-horizontal-1998}
+  \figtop{Rorrende-water-horizontal-1999}
+  \fig{Rorrende-water-horizontal-2000}
+  
+  \caption{Horizontal water flux between 1998-5-1 and 1999-5-1 (top),
+    between 1999-5-1 and 2000-5-1 (center), and between 2000-5-1 and
+    2001-2-1 (bottom).  The flux is shown on the x-axis (positive away
+    from drain) as a function of depth shown on the y-axis.  The graph
+    labels are the distance from drain in centimeters.}
+  \label{fig:Rorrende-water-horizontal}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Rorrende-water-1998}
+  \fig{Rorrende-water-1999}
+  \fig{Rorrende-water-2000}
+  
+  \caption{Total vertical water flux between 1998-5-1 and
+    1999-5-1 (top), between 1999-5-1 and 2000-5-1 (center), and
+    between 2000-5-1 and 2001-2-1 (bottom).  The flux is shown on the
+    y-axis (positive up) as a function of distance from drain shown on
+    the x-axis.  The graph labels are depths in centimeters above
+    surface.}
+  \label{fig:Rorrende-water-vertical}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Rorrende-water-biopore-1998}
+  \fig{Rorrende-water-biopore-1999}
+  \fig{Rorrende-water-biopore-2000}
+  
+  \caption{Biopore water flux between 1998-5-1 and 1999-5-1 (top),
+    between 1999-5-1 and 2000-5-1 (center), and between 2000-5-1 and
+    2001-2-1 (bottom).  The flux is shown on the y-axis (positive up)
+    as a function of distance from drain shown on the x-axis.  The
+    graph labels are depths in centimeters above surface.}
+  \label{fig:Rorrende-water-biopore}
+\end{figure}
+
+\FloatBarrier
+\section{Bromide}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figrorrendel{Rorrende-M-Bromide-1998-11} & 
+    \figrorrende{Rorrende-M-Bromide-1998-12} & 
+    \figrorrende{Rorrende-M-Bromide-1999-1} \\
+    \figrorrendel{Rorrende-M-Bromide-1999-2} & 
+    \figrorrende{Rorrende-M-Bromide-1999-3} & 
+    \figrorrende{Rorrende-M-Bromide-1999-4} \\
+    \figrorrendel{Rorrende-M-Bromide-1999-5} & 
+    \figrorrende{Rorrende-M-Bromide-1999-6} & 
+    \figrorrende{Rorrende-M-Bromide-1999-7} \\
+    \figrorrendel{Rorrende-M-Bromide-1999-8} & 
+    \figrorrende{Rorrende-M-Bromide-1999-9} & 
+    \figrorrende{Rorrende-M-Bromide-1999-10} \\
+    \figrorrendel{Rorrende-M-Bromide-1999-11} & 
+    \figrorrende{Rorrende-M-Bromide-1999-12} & 
+    \figrorrende{Rorrende-M-Bromide-2000-1} \\
+    \figrorrendel{Rorrende-M-Bromide-2000-2} & 
+    \figrorrende{Rorrende-M-Bromide-2000-3} & 
+    \figrorrende{Rorrende-M-Bromide-2000-4}
+  \end{tabular}
+  
+  \caption{Bromide soil content at the end of each month since first
+    application in November 1998 (top left graph) until April 2000
+    (bottom right graph).  The y-axis denotes depth, the x-axis
+    distance from drain.  There are tick marks for every meter. The
+    color scale is white<1 $\mu$g/l, yellow=10 $\mu$g/l, orange=100 $\mu$g/l,
+    red=1 mg/l, and black>10 mg/l}
+\label{fig:Rorrende-M-Bromide}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \fig{Rorrende-Bromide-horizontal-1998}
+  \figtop{Rorrende-Bromide-1998}
+  \fig{Rorrende-Bromide-biopore-1998}
+
+  
+  \caption{Bromide transport between 1998-5-1 and 1999-5-1.  The top
+    graph show horizontal transport (top), the center graph show total
+    vertical transport, and the bottom graph show biopore transport
+    only.  The transport in the top graph is shown on the x-axis
+    (positive away from drain) as a function of depth shown on the
+    y-axis, with graph labels indicating the distance from drain in
+    centimeters.  The transport on the two lower graphs are shown on
+    the y-axis (positive up) as a function of distance from drain
+    shown on the x-axis. The graph labels are depths in centimeters above
+    surface.}
+  \label{fig:Rorrende-Bromide-1998}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \fig{Rorrende-Bromide-horizontal-1999}
+  \figtop{Rorrende-Bromide-1999}
+  \fig{Rorrende-Bromide-biopore-1999}
+
+  
+  \caption{Bromide transport between 1999-5-1 and 2000-5-1.  The top
+    graph show horizontal transport (top), the center graph show total
+    vertical transport, and the bottom graph show biopore transport
+    only.  The transport in the top graph is shown on the x-axis
+    (positive away from drain) as a function of depth shown on the
+    y-axis, with graph labels indicating the distance from drain in
+    centimeters.  The transport on the two Lowery graphs are shown on
+    the y-axis (positive up) as a function of distance from drain
+    shown on the x-axis. The graph labels are depths in centimeters above
+    surface.}
+  \label{fig:Rorrende-Bromide-1999}
+\end{figure}
+
+\FloatBarrier
+\section{Pendimethalin}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figrorrendel{Rorrende-M-Pendimethalin-1999-11} & 
+    \figrorrende{Rorrende-M-Pendimethalin-1999-12} & 
+    \figrorrende{Rorrende-M-Pendimethalin-2000-1} \\
+    \figrorrendel{Rorrende-M-Pendimethalin-2000-2} & 
+    \figrorrende{Rorrende-M-Pendimethalin-2000-3} & 
+    \figrorrende{Rorrende-M-Pendimethalin-2000-4} \\
+    \figrorrendel{Rorrende-M-Pendimethalin-2000-5} & 
+    \figrorrende{Rorrende-M-Pendimethalin-2000-6} & 
+    \figrorrende{Rorrende-M-Pendimethalin-2000-7} \\
+    \figrorrendel{Rorrende-M-Pendimethalin-2000-8} & 
+    \figrorrende{Rorrende-M-Pendimethalin-2000-9} & 
+    \figrorrende{Rorrende-M-Pendimethalin-2000-10} \\
+    \figrorrendel{Rorrende-M-Pendimethalin-2000-11} & 
+    \figrorrende{Rorrende-M-Pendimethalin-2000-12} & 
+    \figrorrende{Rorrende-M-Pendimethalin-2001-1}
+  \end{tabular}
+  
+  \caption{Pendimethalin soil content at the end of each month since
+    first application in November 1999 (top left graph) until January
+    2001 (bottom right graph).  The y-axis denotes depth, the x-axis
+    distance from drain.  There are tick marks for every meter. The
+    color scale is white<10 pg/l, yellow=1 ng/l, orange=0.1 $\mu$g/l,
+    red=10 $\mu$g/l, and black>1 mg/l}
+\label{fig:Rorrende-M-Pendimethalin}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figrorrendel{Rorrende-C-Pendimethalin-1999-11} & 
+    \figrorrende{Rorrende-C-Pendimethalin-1999-12} & 
+    \figrorrende{Rorrende-C-Pendimethalin-2000-1} \\
+    \figrorrendel{Rorrende-C-Pendimethalin-2000-2} & 
+    \figrorrende{Rorrende-C-Pendimethalin-2000-3} & 
+    \figrorrende{Rorrende-C-Pendimethalin-2000-4} \\
+    \figrorrendel{Rorrende-C-Pendimethalin-2000-5} & 
+    \figrorrende{Rorrende-C-Pendimethalin-2000-6} & 
+    \figrorrende{Rorrende-C-Pendimethalin-2000-7} \\
+    \figrorrendel{Rorrende-C-Pendimethalin-2000-8} & 
+    \figrorrende{Rorrende-C-Pendimethalin-2000-9} & 
+    \figrorrende{Rorrende-C-Pendimethalin-2000-10} \\
+    \figrorrendel{Rorrende-C-Pendimethalin-2000-11} & 
+    \figrorrende{Rorrende-C-Pendimethalin-2000-12} & 
+    \figrorrende{Rorrende-C-Pendimethalin-2001-1}
+  \end{tabular}
+  
+  \caption{Pendimethalin soil water content at the end of each month
+    since first application in November 1999 (top left graph) until
+    January 2001 (bottom right graph).  The y-axis denotes depth, the
+    x-axis distance from drain.  There are tick marks for every
+    meter. The color scale is white<10 pg/l, yellow=1 ng/l, orange=0.1
+    $\mu$g/l, red=10 $\mu$g/l, and black>1 mg/l}
+\label{fig:Rorrende-C-Pendimethalin}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \fig{Rorrende-Pendimethalin-horizontal-1999}
+  \figtop{Rorrende-Pendimethalin-1999}
+  \fig{Rorrende-Pendimethalin-biopore-1999}
+  
+  \caption{Pendimethalin transport between 1999-5-1 and 2000-5-1.  The top
+    graph show horizontal transport (top), the center graph show total
+    vertical transport, and the bottom graph show biopore transport
+    only.  The transport in the top graph is shown on the x-axis
+    (positive away from drain) as a function of depth shown on the
+    y-axis, with graph labels indicating the distance from drain in
+    centimeters.  The transport on the two lower graphs are shown on
+    the y-axis (positive up) as a function of distance from drain
+    shown on the x-axis. The graph labels are depths in centimeters above
+    surface.}
+  \label{fig:Rorrende-Pendimethalin-1999}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \fig{Rorrende-Pendimethalin-horizontal-2000}
+  \figtop{Rorrende-Pendimethalin-2000}
+  \fig{Rorrende-Pendimethalin-biopore-2000}
+
+  \caption{Pendimethalin transport between 2000-5-1 and 2001-2-1.  The top
+    graph show horizontal transport (top), the center graph show total
+    vertical transport, and the bottom graph show biopore transport
+    only.  The transport in the top graph is shown on the x-axis
+    (positive away from drain) as a function of depth shown on the
+    y-axis, with graph labels indicating the distance from drain in
+    centimeters.  The transport on the two lower graphs are shown on
+    the y-axis (positive up) as a function of distance from drain
+    shown on the x-axis. The graph labels are depths in centimeters above
+    surface.}
+  \label{fig:Rorrende-Pendimethalin-2000}
+\end{figure}
+
+\FloatBarrier
+\section{Ioxynil}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figrorrendel{Rorrende-M-Ioxynil-2000-11} & 
+    \figrorrende{Rorrende-M-Ioxynil-2000-12} & 
+    \figrorrende{Rorrende-M-Ioxynil-2001-1}
+  \end{tabular}
+  
+  \caption{Ioxynil soil content at the end of each month since first
+    application in November 2000 (top left graph) until January 2001
+    (bottom right graph).  The y-axis denotes depth, the x-axis
+    distance from drain.  There are tick marks for every meter. The
+    color scale is white<10 pg/l, yellow=1 ng/l, orange=0.1 $\mu$g/l,
+    red=10 $\mu$g/l, and black>1 mg/l}
+\label{fig:Rorrende-M-Ioxynil}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figrorrendel{Rorrende-C-Ioxynil-2000-11} & 
+    \figrorrende{Rorrende-C-Ioxynil-2000-12} & 
+    \figrorrende{Rorrende-C-Ioxynil-2001-1}
+  \end{tabular}
+  
+  \caption{Ioxynil soil water content at the end of each month since
+    first application in November 2000 (left graph) until January 2001
+    (right graph).  The y-axis denotes depth, the x-axis distance
+    from drain.  There are tick marks for every meter. The color scale
+    is white<10 pg/l, yellow=1 ng/l, orange=0.1 $\mu$g/l, red=10
+    $\mu$g/l, and black>1 mg/l}
+\label{fig:Rorrende-C-Ioxynil}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \fig{Rorrende-Ioxynil-horizontal-2000}
+  \figtop{Rorrende-Ioxynil-2000}
+  \fig{Rorrende-Ioxynil-biopore-2000}
+
+  \caption{Ioxynil transport between 2000-11-1 and 2001-2-1.  The top
+    graph show horizontal transport (top), the center graph show total
+    vertical transport, and the bottom graph show biopore transport
+    only.  The transport in the top graph is shown on the x-axis
+    (positive away from drain) as a function of depth shown on the
+    y-axis, with graph labels indicating the distance from drain in
+    centimeters.  The transport on the two lower graphs are shown on
+    the y-axis (positive up) as a function of distance from drain
+    shown on the x-axis. The graph labels are depths in centimeters above
+    surface.}
+  \label{fig:Rorrende-Ioxynil-2000}
+\end{figure}
+
+%%% Local Variables: 
+%%% TeX-master: "agrovand"
+%%% End: 

@@ -1,0 +1,806 @@
+;;; vap-common.dai --- VAP simulations.
+
+(input file "tillage.dai")
+(input file "crop.dai")
+(input file "fertilizer.dai")
+(input file "chemistry.dai")
+(input file "log.dai")
+
+;;(input file "colloid-bound-slow.dai")
+(input file "colloid-bound.dai")
+(input file "biopores.dai")
+(input file "plot-2d.dai")
+
+;; Units.
+
+(defunit [w] [s] (factor 604800))
+(defunit [g/ha/w] [kg/m^2/s] (factor 1.653e-13))
+
+;; Soil 
+
+(defnumber C2OM identity
+  ;; Paramaters.
+  (declare C Number [] "Organic C content.")
+  ;; MACRO uses C content, while Daisy uses total humus content.
+  (declare C_in_humus Number [] "C fraction in humus.")
+  (C_in_humus 0.587 [])
+  (value (/ C C_in_humus)))
+
+(defsecondary vap_pressure pressure 
+  (alpha 0.01 [h^-1]))
+
+(defsecondary vap_nocracks vap_pressure 
+  ;;(h_lim 1.2 [pF])
+  (h_lim 2 [pF])
+  )
+
+(defsecondary vap_cracks cracks
+  (aperture 78 [um])
+  (density 10 [m^-1])
+  (alpha 0.01 [h^-1]))
+
+(defhorizon VAP_Ap FAO3
+  ;; (secondary_domain none)
+  (secondary_domain vap_nocracks)
+  )
+
+(defhorizon VAP_B FAO3
+  ;;(secondary_domain none)
+  (secondary_domain vap_cracks)
+  )
+
+(defhorizon VAP_C VAP_B)
+
+(defcolumn VAP default
+  "Shared parameters for VAP fields."
+  ;; (Bioclimate original (pet makkink))
+  (Bioclimate original (pet (FAO_PM (use_wet true))))
+  (OrganicMatter original
+                 ;; 0.3 too low, 0.35 too high
+                 (Bioincorporation (R_max 0.33))
+                 )
+  (Litter Millet))
+  
+
+;; Movement.
+
+(defmovement Rorrende-2D rectangle
+  (matrix_solute Mollerup convection none)
+  (matrix_water (Mollerup (max_time_step_reductions 7)
+                          (max_number_of_small_time_steps 1000000)
+                          ;; (K_average pressure (h_lim -5 [cm]))
+                          )
+                (v+h (vertical (richards (max_time_step_reductions 6)
+                                         (max_iterations 50))
+                               lr)))
+  (drainpoints (-110 [cm] 1 [cm]))
+  )
+
+(deftertiary VAP biopores
+  ;; (pond_max 5 [mm])
+  )
+
+;; Output
+
+(deflog "VAP Content" column
+  (when daily)
+  (entries (content (z -1 [m])
+                    (path column "${column}" Chemistry "*" 
+                          trace "Bromide" C)
+                    (tag "Bromide 1")
+                    (dimension "mg/L")
+                    (spec chemical default C))
+           (content (z -1 [m])
+                    (path column "${column}" Chemistry "*" 
+                          trace "Bromide" C_secondary)
+                    (tag "BromideFast 1")
+                    (dimension "mg/L")
+                    (spec chemical default C_secondary))
+           (content (z -3.5 [m])
+                    (path column "${column}" Chemistry "*" 
+                          trace "Bromide" C)
+                    (tag "Bromide 35")
+                    (dimension "mg/L")
+                    (spec chemical default C))
+           (content (z -3.5 [m])
+                    (path column "${column}" Chemistry "*" 
+                          trace "Bromide" C)
+                    (tag "BromideFast 35")
+                    (dimension "mg/L")
+                    (spec chemical default C))
+           (content (z -3.5 [m])
+                    (path column "${column}" Chemistry "*" 
+                          trace "Dimethoate-base" C)
+                    (tag Dimethoate)
+                    (dimension "mg/L")
+                    (spec chemical default C))
+           (content (z -3.5 [m])
+                    (path column "${column}" Chemistry "*" 
+                          trace "Fenpropimorph-base" C)
+                    (tag Fenpropimorph)
+                    (dimension "mg/L")
+                    (spec chemical default C))
+           (content (z -3.5 [m])
+                    (path column "${column}" Chemistry "*" 
+                          trace "Glyphosate-base" C)
+                    (tag Glyphosate)
+                    (dimension "mg/L")
+                    (spec chemical default C))
+           (content (z -0.25 [m])
+                    (path column "${column}" SoilWater Theta)
+                    (tag "SW025cm")
+                    (dimension "%")
+                    (spec fixed SoilWater Theta))
+           (number (path column "${column}" Drain lateral height)
+                   (handle average)
+                   (tag "GWT")
+                   (spec drain lateral height))
+           (number (path column "${column}" SoilWater table_low)
+                   (handle min)
+                   (multi min)
+                   (tag "GWT-low")
+                   (spec fixed SoilWater table_low))
+           (number (path column "${column}" SoilWater table_high)
+                   (handle max)
+                   (multi max)
+                   (tag "GWT-high")
+                   (spec fixed SoilWater table_high))
+           (flux_bottom (path column "${column}" Chemistry "*"
+                              trace Bromide J_matrix)
+                        (spec chemical default J_matrix)
+                        (to -150 [cm])
+                        (handle average)
+                        (negate true)
+                        (tag "Bromide leak 150")
+                        (dimension "g/ha/&"))
+           (flux_bottom (path column "${column}" Chemistry "*"
+                              trace Dimethoate-base J_matrix)
+                        (to -150 [cm])
+                        (spec chemical default J_matrix)
+                        (handle average)
+                        (negate true)
+                        (tag "Dimethoate leak 150")
+                        (dimension "ug/ha/&"))
+           (flux_bottom (path column "${column}" Chemistry "*"
+                              trace Fenpropimorph-base J_matrix)
+                        (to -150 [cm])
+                        (spec chemical default J_matrix)
+                        (handle average)
+                        (negate true)
+                        (tag "Fenpropimorph leak 150")
+                        (dimension "ug/ha/&"))
+           (flux_bottom (path column "${column}" Chemistry "*"
+                              trace Glyphosate-base J_matrix)
+                        (to -150 [cm])
+                        (spec chemical default J_matrix)
+                        (handle average)
+                        (negate true)
+                        (tag "Glyphosate leak 150")
+                        (dimension "ug/ha/&"))
+           (number (path column "${column}" OrganicMatter default top_DM)
+                   (spec organic default top_DM)
+                   (dimension [Mg DM/ha]))
+           (number (path column "${column}"
+                         Bioclimate default litter_water_storage)
+                   (spec bioclimate default litter_water_storage))
+           (number (path column "${column}" Chemistry "*"
+                         trace Glyphosate-base litter_storage)
+                   (spec chemical Glyphosate-base litter_storage)
+                   (dimension [g/ha]))
+           (number (path column "${column}" Chemistry "*"
+                         trace Glyphosate-base litter_in)
+                   (spec chemical Glyphosate-base litter_in)
+                   (handle sum)
+                   (dimension [g/ha]))
+           (number (path column "${column}" Chemistry "*"
+                         trace Glyphosate-base litter_out)
+                   (spec chemical Glyphosate-base litter_out)
+                   (handle sum)
+                   (dimension [g/ha]))
+                   
+           ))
+
+;; Program
+
+(defprogram VAP Daisy
+  "Simulation for the PLAP stations."
+  (declare station String "Name of station")
+  (minimal_timestep (microseconds 1))
+  (output (Time (where "log/${station}-time.dlf"))
+          ("Matrix Water Flux" (when monthly)
+           (where "log/${station}-q.dlf"))
+          ("Preferential Water Flux" (when monthly)
+           (where "log/${station}-q_p.dlf"))
+          ("Preferential Chemical Transport" (when monthly)
+           (chemical "Glyphosate-base")
+           (where "log/${station}-J_p-Glyphosate.dlf"))
+          ("Preferential Chemical Transport" (when monthly)
+           (chemical "Bromide")
+           (where "log/${station}-J_p-${chemfid}.dlf"))
+          ("Matrix Chemical Transport" (when monthly)
+           (chemical "Glyphosate-base")
+           (where "log/${station}-J-Glyphosate.dlf"))
+          ("Matrix Chemical Transport" (when monthly)
+           (chemical "Bromide")
+           (where "log/${station}-J-${chemfid}.dlf"))
+          ("Soil Water Potential (pF)" (where "log/${station}-pF.dlf")
+           (when monthly))
+          ("Soil Water Content" (where "log/${station}-Theta.dlf")
+           (when monthly))
+          ("Tertiary water sink" (when monthly)
+           (where "log/${station}-b2m-water.dlf"))
+          ("Tertiary chemical sink" (when monthly) (chemical "Glyphosate-base")
+           (where "log/${station}-b2m-Glyphosate.dlf"))
+          ("Tertiary chemical sink" (when monthly) (chemical "Bromide")
+           (where "log/${station}-b2m-${chemfid}.dlf"))
+          (harvest (where "log/${station}-harvest.dlf"))
+          ("Chemical Content" (chemical "Bromide") (when monthly) 
+           (where "log/${station}-content-Bromide.dlf"))
+          ("Chemical Concentration" (chemical "Bromide") (when monthly)
+           (where "log/${station}-conc-Bromide.dlf"))
+          ("Chemical Content" (chemical "Glyphosate-base") (when monthly)
+           (where "log/${station}-content-Glyphosate.dlf"))
+          ("Chemical Concentration" (chemical "Glyphosate-base") (when monthly)
+           (where "log/${station}-conc-Glyphosate.dlf"))
+          ("Colloid bound" (chemical "Glyphosate")
+           (where "log/${station}-bound-Glyphosate.dlf"))
+          ("Soil chemical" (chemical colloid)
+           (where "log/${station}-soil-colloid.dlf"))
+          ("Field chemical" (chemical colloid)
+           (where "log/${station}-field-colloid.dlf"))
+          ("Soil chemical" (chemical "Glyphosate")
+           (where "log/${station}-solute-Glyphosate.dlf"))
+          ("Soil chemical" 
+           (chemical "Glyphosate-colloid")
+           (where "log/${station}-colloid-Glyphosate.dlf"))
+          ("Soil chemical" 
+           (chemical "Glyphosate-immobile")
+           (where "log/${station}-immobile-Glyphosate.dlf"))
+          ("Soil chemical" 
+           (chemical "Glyphosate-base")
+           (where "log/${station}-soil-Glyphosate.dlf"))
+          ("Soil chemical" 
+           (chemical "Dimethoate-colloid")
+           (where "log/${station}-colloid-Dimethoate.dlf"))
+          ("Field chemical" 
+           (chemical "Bromide")
+           (where "log/${station}-field-Bromide.dlf"))
+          ("Field chemical" 
+           (chemical "Glyphosate-base")
+           (where "log/${station}-field-Glyphosate.dlf"))
+          ("Field chemical" 
+           (chemical "Fenpropimorph-base")
+           (where "log/${station}-field-Fenpropimorph.dlf"))
+          ("Field chemical" 
+           (chemical "Dimethoate-base")
+           (where "log/${station}-field-Dimethoate.dlf"))
+          ("Field chemical" (when weekly)
+           (chemical "Bromide")
+           (where "log/${station}-field-Bromide-weekly.dlf"))
+          ("Field chemical"  (when weekly)
+           (chemical "Glyphosate-base")
+           (where "log/${station}-field-Glyphosate-weekly.dlf"))
+          ("Field chemical"  (when weekly)
+           (chemical "Fenpropimorph-base")
+           (where "log/${station}-field-Fenpropimorph-weekly.dlf"))
+          ("Field chemical"  (when weekly)
+           (chemical "Dimethoate-base")
+           (where "log/${station}-field-Dimethoate-weekly.dlf"))
+          ("Soil water" (where "log/${station}-soil-water.dlf"))
+          ("Field water" (when daily)
+           (where "log/${station}-field-water-daily.dlf"))
+          ("Field water" (when hourly) 
+           (where "log/${station}-field-water-hourly.dlf"))
+          ("Surface water" (when hourly)
+           (where "log/${station}-surface-water.dlf"))))
+
+;; Plots
+
+(defxysource "Hydraulic" loop
+  "Plot hydraulic properties as function of pF."
+  (begin 0 [pF])
+  (end 5 [pF])
+  (step 0.1 [pF]))
+
+(defxysource "Retention Daisy" Hydraulic
+  "Retention curve provided by GEUS adjusted for Daisy."
+  (title "Daisy"))
+
+(defxysource "Retention MACRO" Hydraulic
+  "Retention curve provided by GEUS for MACRO."
+  (title "MACRO"))
+
+(defxysource "Retention HYPRES" Hydraulic
+  "The retention curve according to HYPRES."
+  (title "HYPRES"))
+
+(defxysource "Conductivity Daisy" Hydraulic
+  "Conductivity curve provided by GEUS adjusted for Daisy."
+  (title "Daisy"))
+
+(defxysource "Conductivity Nocracks" Hydraulic
+  "Conductivity curve provided by GEUS adjusted for Daisy (no cracks)."
+  (title "No cracks"))
+
+(defxysource "Conductivity MACRO" Hydraulic
+  "Conductivity curve provided by GEUS for MACRO."
+  (title "MACRO"))
+
+(defxysource "Conductivity HYPRES" Hydraulic
+  "The conductivity curve according to HYPRES."
+  (title "HYPRES"))
+
+(defgnuplot "Hydraulic" xy
+  (device "pdf size 9cm, 5.5cm")
+  (extra &old
+         [set lmargin 9]
+         [set rmargin 1]
+         [set bmargin 3]
+         [set tmargin 3]))
+
+(defgnuplot "Retention All" "Hydraulic"
+  "Plot retention curve."
+  (ymax 50 [])
+  (ymin  0 [])
+  (declare hor String "Name of horizon.")
+  (where "fig/${station}-${hor}-Theta.pdf")
+  (title "${hor} retention curve"))
+
+(defgnuplot "Conductivity All" "Hydraulic"
+  "Plot conductivity curve."
+  (extra &old
+         [set format x "%g"]
+         [set format y "%.0e"]
+         "set logscale y")
+  (ymax 1e4 [])
+  (ymin 1e-10 [])
+  (declare hor String "Name of horizon.")
+  (where "fig/${station}-${hor}-K.pdf")
+  (title "${hor} conductivity curve"))
+
+(defgnuplot plottime time
+  (device "pdf size 19cm, 8cm")
+  (extra &old
+         [set lmargin 12]
+         [set rmargin 10]
+         [set bmargin 2]
+         [set tmargin 1]  
+         [set format x "%y-%m"]
+         "unset xlabel"))
+
+(defgnuplot weather plottime
+  (begin 1999 08 30) (end 2002 5 1)
+  (where "fig/${station}-weather.pdf")
+  (ymin 0)
+  (ymax 3500)
+  (y2min -20)
+  (y2max 30)
+  (source (column (file "log/${station}-field-water-hourly.dlf")
+                  (tag "Precipitation")
+                  (accumulate true))
+          (column (file "log/${station}-field-water-hourly.dlf")
+                  (tag "Potential evapotranspiration")
+                  (accumulate true))
+          (column (file "log/${station}-field-water-hourly.dlf")
+                  (tag "Actual evapotranspiration")
+                  (accumulate true))
+          (column (file "dk-${station}-hourly.dwf")
+                  (tag AirTemp))))
+
+(defgnuplot gw plottime
+  ;; (begin 2000 04 29) (end 2002 6 30)
+  (where "fig/${station}-gw.pdf")
+  (title "Groundwater")
+  (ymin -500 [cm])
+  (source (column (file "log/${station}-content.dlf")
+                  (tag "GWT-low")
+                  (title "Sim (low)"))
+          (arithmetic (file "log/${station}-content.dlf")
+                      (expr (min "GWT-high" 0.0 [cm]))
+                      (style 3)
+                      (title "Sim (high)"))
+          (column (file "log/${station}-content.dlf")
+                  (tag "GWT")
+                  (style 4)
+                  (title "Sim"))
+          (column (file "dk-${station}.ddf")
+                  (tag "Level")
+                  (style 2)
+                  (title "Obs"))))
+
+(defgnuplot theta plottime
+  (extra &old "set ytics 5")
+  ;; (begin 1999 9 1) (end 2002 7 1)
+  (declare depth String "Soil depth to plot.") 
+  (where "fig/${station}-theta-${depth}.pdf")
+  (title "${depth}")
+  (ymax 50 [%])
+  (ymin 10 [%])
+  (source (column (file "log/${station}-content.dlf")
+                  (tag "${depth}")
+                  (title "${depth}"))
+          (column (file "${station}-theta.ddf")
+                  (style 2)
+                  (with lines)
+                  (missing missing)
+                  (tag "${depth}")
+                  (title "Obs"))))
+
+(defgnuplot sc-bromide plottime
+  (extra &old [set format x ""])
+  ;; Only application (both site) 2000-05-22.
+  (begin 2000 05 01)
+  (end 2002 07 01)
+  (ymax 2 [mg/L])
+  (where "fig/${station}-sc-bromide.pdf")
+  (source (column (file "log/${station}-content.dlf")
+                  (tag "Bromide 1")
+                  (title "Sim 1.0 m (avg)"))
+          (column (file "log/${station}-content.dlf")
+                  (tag "BromideFast 1")
+                  (style 4)
+                  (title "Sim (fast)"))
+          (column (file "${station}-sc-bromide.ddf")
+                  (missing missing)
+                  (tag "S1")
+                  (style 2))
+          (column (file "${station}-sc-bromide.ddf")
+                  (missing missing)
+                  (tag "S2")
+                  (style 3))))
+
+(defgnuplot leak150common plottime
+  ;; First application (either site) 2000-05-22.
+  (begin 2000 05 01)
+  (end 2002 07 01)
+  (where "fig/${station}-leak150.pdf")
+  (title "Pesticide leaching")
+  (source (column (file "log/${station}-content.dlf")
+                  (tag "Dimethoate leak 150")
+                  (title "Dimethoate"))
+          (column (file "log/${station}-content.dlf")
+                  (tag "Fenpropimorph leak 150")
+                  (title "Fenpropimorph"))
+          (column (file "log/${station}-content.dlf")
+                  (tag "Glyphosate leak 150")
+                  (title "Glyphosate"))))
+
+(defgnuplot leak150 leak150common
+  (where "fig/${station}-leak150.pdf")
+  (extra &old [set format x ""])
+  (title "Pesticide leaching")
+  (ymax 40 [mg/ha/d])
+  (ymin  0 [mg/ha/d])
+  (source (column (file "log/${station}-content.dlf")
+                  (tag "Dimethoate leak 150")
+                  (dimension [mg/ha/d])
+                  (title "Dimethoate"))
+          (column (file "log/${station}-content.dlf")
+                  (dimension [mg/ha/d])
+                  (tag "Fenpropimorph leak 150")
+                  (title "Fenpropimorph"))
+          (column (file "log/${station}-content.dlf")
+                  (dimension [mg/ha/d])
+                  (tag "Glyphosate leak 150")
+                  (title "Glyphosate"))))
+
+
+(defgnuplot leak150bromide leak150common
+  (where "fig/${station}-leak150bromide.pdf")
+  (extra &old [set format x ""])
+  (title "Bromide")
+  (ymax 120 [g/ha/d])
+  (ymin -60 [g/ha/d])
+  (y2max 4500 [g/ha])
+  (y2min 0 [g/ha])
+  (source (column (file "log/${station}-content.dlf")
+                  (title "Daily bromide")
+                  (tag "Bromide leak 150"))
+          (column (file "log/${station}-content.dlf")
+                  (title "Accumulated")
+                  (accumulate true)
+                  (timestep d)
+                  (tag "Bromide leak 150"))))
+
+
+(defgnuplot leak150acc leak150common
+  (where "fig/${station}-leak150acc.pdf")
+  (title "Accumulated")
+  (ymax 700 [mg/ha])
+  (ymin   0 [mg/ha])
+  (source (column (file "log/${station}-content.dlf")
+                  (accumulate true)
+                  (dimension [mg/ha])
+                  (timestep d)
+                  (tag "Dimethoate leak 150")
+                  (title "Dimethoate"))
+          (column (file "log/${station}-content.dlf")
+                  (accumulate true)
+                  (dimension [mg/ha])
+                  (timestep d)
+                  (tag "Fenpropimorph leak 150")
+                  (title "Fenpropimorph"))
+          (column (file "log/${station}-content.dlf")
+                  (accumulate true)
+                  (dimension [mg/ha])
+                  (timestep d)
+                  (tag "Glyphosate leak 150")
+                  (title "Glyphosate"))))
+
+(defgnuplot horizontal plottime
+  ;; First application (either site) 2000-05-22.
+  (begin 2000 05 01)
+  (end 2002 07 01)
+  (where "fig/${station}-horizontal.pdf")
+  (ymax 15 [ng/L])
+  (source (column (file "log/${station}-content.dlf")
+                  (tag "Dimethoate")
+                  (dimension [ng/L]))
+          (column (file "log/${station}-content.dlf")
+                  (tag "Fenpropimorph")
+                  (dimension [ng/L]))
+          (column (file "log/${station}-content.dlf")
+                  (tag "Glyphosate")
+                  (dimension [ng/L]))))
+
+(defgnuplot horizontal-bromide plottime
+  ;; First application (either site) 2000-05-22.
+  (begin 2000 05 01)
+  (end 2002 07 01)
+  (ymax 2 [mg/L])
+  (where "fig/${station}-Bromide-horizontal.pdf")
+  (source (column (file "log/${station}-content.dlf")
+                  (title "Sim 3.5 m (avg)")
+                  (tag "Bromide 35"))
+          (column (file "log/${station}-content.dlf")
+                  (title "Sim (fast)")
+                  (style 4)
+                  (tag "BromideFast 35"))
+          (column (file "${station}-35-bromide.ddf")
+                  (missing missing)
+                  (tag "H1.1"))
+          (column (file "${station}-35-bromide.ddf")
+                  (missing missing)
+                  (tag "H1.2"))
+          (column (file "${station}-35-bromide.ddf")
+                  (missing missing)
+                  (tag "H1.3"))))
+
+(defgnuplot drain plottime
+  (extra &old [set format x ""])
+  (where "fig/${station}-drain.pdf")
+  (begin 2000 05 01)
+  (end 2002 07 01)
+  (ymin 0 [mm/d])
+  (ymax 25 [mm/d])
+  (source (arithmetic (missing "none")
+                      (file "log/${station}-field-water-daily.dlf")
+                      (expr (/ (+ "Soil drain flow" "Surface drain flow")
+                               1 [d]))
+                      (title "Sim"))
+          (arithmetic (file "${station}-drainflow.ddf")
+                      (expr (/ "drain" 1 [d]))
+                      (style 2)
+                      (title "Obs"))))
+
+(defgnuplot drain-acc plottime
+  (begin 2000 05 01)
+  (end 2002 07 01)
+  (ymax 1400 [mm])
+  (legend nw)
+  (where "fig/${station}-drain-acc.pdf")
+  (source (arithmetic (missing "none")
+                      (file "log/${station}-field-water-daily.dlf")
+                      (expr (+ "Soil drain flow" "Surface drain flow"))
+                      (accumulate true)
+                      (timestep d)
+                      (title "Sim"))
+          (column (file "${station}-drainflow.ddf")
+                  (accumulate true)
+                  (timestep d)
+                  (tag "drain")
+                  (style 2)
+                  (with lines)
+                  (title "Obs"))
+          (arithmetic (file "log/${station}-field-water-daily.dlf")
+                      (expr (- "Precipitation" "Actual evapotranspiration"))
+                      (accumulate true)
+                      (timestep d)
+                      (style 3)
+                      (with lines)
+                      (title "Net precip"))
+          (column (file "log/${station}-field-water-daily.dlf")
+                  (tag "Matrix percolation")
+                  (accumulate true)
+                  (timestep d)
+                  (style 4)
+                  (with lines))))
+
+(defgnuplot biopore plottime
+  (begin 1999 08 30) (end 2002 4 1)
+  (where "fig/${station}-biopore.pdf")
+  (title "Biopore flow")
+  (source (arithmetic (file "log/${station}-drain.dlf")
+                      (expr (/ "Surface water tertiary" 1.0 [h]))
+                      (title "Above surface"))
+          (arithmetic (file "log/${station}-drain.dlf")
+                      (expr (/ "Ap03 water tertiary" 1.0 [h]))
+                      (title "0-3 cm"))
+          (arithmetic (file "log/${station}-drain.dlf")
+                      (expr (/ "Ap water tertiary" 1.0 [h]))
+                      (title "Ap"))
+          (arithmetic (file "log/${station}-drain.dlf")
+                      (expr (/ "Bplow water tertiary" 1.0 [h]))
+                      (title "Plow pan"))
+          (arithmetic (file "log/${station}-drain.dlf")
+                      (expr (/ "B50 water tertiary" 1.0 [h]))
+                      (title "B50"))))
+
+(defgnuplot biopore-acc plottime
+  (begin 1999 08 30) (end 2002 4 1)
+  (where "fig/${station}-biopore-acc.pdf")
+  (title "Accumulated biopore flow")
+  (legend nw)
+  (source (column (file "log/${station}-drain.dlf")
+                  (accumulate true)
+                  (tag "Surface water tertiary")
+                  (title "Above surface"))
+          (column (file "log/${station}-drain.dlf")
+                  (accumulate true)
+                  (tag "Ap03 water tertiary")
+                  (title "0-3 cm"))
+          (column (file "log/${station}-drain.dlf")
+                  (accumulate true)
+                  (tag "Ap water tertiary")
+                  (title "Ap"))
+          (column (file "log/${station}-drain.dlf")
+                  (accumulate true)
+                  (tag "Bplow water tertiary")
+                  (title "Plow pan"))
+          (column (file "log/${station}-drain.dlf")
+                  (accumulate true)
+                  (tag "B50 water tertiary")
+                  (title "B50"))))
+
+(defgnuplot biopore-drain plottime
+  (begin 1999 08 30) (end 2002 4 1)
+  (where "fig/${station}-biopore-drain.pdf")
+  (title "Biopore drain flow")
+  (source (arithmetic (file "log/${station}-drain.dlf")
+                      (expr (/ "Surface water" 1.0 [h]))
+                      (title "Above surface"))
+          (arithmetic (file "log/${station}-drain.dlf")
+                      (expr (/ "Ap03 water" 1.0 [h]))
+                      (title "0-3 cm"))
+          (arithmetic (file "log/${station}-drain.dlf")
+                      (expr (/ "Ap water" 1.0 [h]))
+                      (title "Ap"))
+          (arithmetic (file "log/${station}-drain.dlf")
+                      (expr (/ "Bplow water" 1.0 [h]))
+                      (title "Plow pan"))
+          (arithmetic (file "log/${station}-drain.dlf")
+                      (expr (/ "B50 water" 1.0 [h]))
+                      (title "B50"))))
+
+(defgnuplot biopore-drain-acc plottime
+  (begin 1999 08 30) (end 2002 4 1)
+  (where "fig/${station}-biopore-drain-acc.pdf")
+  (title "Accumulated biopore drain flow")
+  (source (column (file "log/${station}-drain.dlf")
+                  (accumulate true)
+                  (tag "Surface water")
+                  (title "Above surface"))
+          (column (file "log/${station}-drain.dlf")
+                  (accumulate true)
+                  (tag "Ap03 water")
+                  (title "0-3 cm"))
+          (column (file "log/${station}-drain.dlf")
+                  (accumulate true)
+                  (tag "Ap water")
+                  (title "Ap"))
+          (column (file "log/${station}-drain.dlf")
+                  (accumulate true)
+                  (tag "Bplow water")
+                  (title "Plow pan"))
+          (column (file "log/${station}-drain.dlf")
+                  (accumulate true)
+                  (tag "B50 water")
+                  (title "B50"))))
+
+(defgnuplot drainmass-sim plottime
+  (declare chemical String "Name of chemical to plot")
+  ;; (begin 2000 10 1) (end 2002 4 1)
+  (where "fig/${station}-${chemical}-weekly.pdf")
+  (title "${chemical}")
+  (ymin 0) 
+  (ymax 1 [g/ha/w])
+  (source (arithmetic (missing "none")
+                      (file "log/${station}-field-${chemical}-weekly.dlf")
+                      (expr (/ (+ "Soil-Drain" "Surface-Drain") 1 [w]))
+                      (with lines)
+                      (title "${chemical}"))))
+
+(defgnuplot drainmass-acc-sim plottime
+  (declare chemical String "Name of chemical to plot")
+  ;; (begin 2000 10 1) (end 2002 4 1)
+  (where "fig/${station}-${chemical}-acc.pdf")
+  (title "${chemical}")
+  (ymin 0)
+  (ymax 2 [g/ha])
+  (source (arithmetic (missing "none")
+                      (file "log/${station}-field-${chemical}.dlf")
+                      (expr (+ "Soil-Drain" "Surface-Drain"))
+                      (with lines)
+                      (accumulate true)
+                      (title "${chemical}"))))
+
+(defgnuplot drainmass drainmass-sim
+  (declare area Number [ha] "Area to plot.")
+  (source &old
+          (arithmetic (file "${station}-drainmass.ddf")
+                      (missing missing)
+                      (expr (/ (convert (/ "${chemical}" area) [g/ha]) 1 [w]))
+                      (with points)
+                      (style 2)
+                      (title "Obs"))))
+
+(defgnuplot drainmass-acc drainmass-acc-sim
+  (declare area Number [ha] "Area to plot.")
+  (legend nw)
+  (source &old
+          (arithmetic (file "${station}-drainmass.ddf")
+                      (missing missing)
+                      (accumulate true)
+                      (expr (convert (/ "${chemical}" area) [g/ha]))
+                      (with points)
+                      (style 2)
+                      (title "Obs"))))
+
+(defgnuplot colloids plottime
+  (declare chemical String "Name of chemical to plot")
+  (chemical colloid)
+  (begin 2000 05 01)
+  (end 2002 07 01)
+  (where "fig/${station}-${chemical}.pdf")
+  (ymin 0)
+  (ymax 250)
+  (y2min 0)
+  (y2max 15000)
+  (source (arithmetic (missing "none")
+                      (file "log/${station}-soil-${chemical}.dlf")
+                      (expr (/ Drain 1 [h]))
+                      (with points)
+                      (title "Hourly"))
+          (column (missing "none")
+                  (file "log/${station}-soil-${chemical}.dlf")
+                  (tag Drain)
+                  (with lines)
+                  (accumulate true)
+                  (title "Accumulated"))))
+
+(defgnuplot Station multi
+  (declare station String "Name of station to plot.")
+  (declare area Number [ha] "Area to plot.")
+  (graph sc-bromide 
+         (leak150bromide (legend nw))
+         drain drain-acc
+         biopore biopore-acc biopore-drain biopore-drain-acc
+         ))
+
+;; Sites
+
+(input file "silstrup.dai")
+(input file "estrup.dai")
+
+(defprogram plothydro gnuplot
+  (graph Silstrup-hydraulics
+         Estrup-hydraulics
+         ))
+         
+(defprogram plotall gnuplot
+  (graph Silstrup
+         Estrup
+         plot2d
+         ))
+         
+;;; vap-common.dai ends here.

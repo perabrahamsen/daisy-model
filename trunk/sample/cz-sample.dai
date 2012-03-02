@@ -1,0 +1,21 @@
+;;; cz-sample.dai -- Sample Czech setup file.
+
+(input file "fertilizer.dai")
+(input file "crop.dai")
+(input file "tillage.dai")
+(input file "cz-soil.dai")
+(input file "cz-management.dai")
+
+(defprogram "WP1 CZ RISWC 2004" Daisy
+  "Czeck WP1 data for 2004."
+  (time 1991 1 2 0)
+  (stop 2004 6 1 0)
+  (column "Valecov_PG")
+  (manager "WP1 CZ RISWC 2004 WARMUP")
+  (weather default "cz-valecov.dwf")
+  (output harvest))
+
+(run "WP1 CZ RISWC 2004")
+
+;;; it-sample.dai ends here.
+

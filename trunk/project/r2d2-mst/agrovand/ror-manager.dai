@@ -1,0 +1,35 @@
+;;; management information for the Agrovand project.
+
+(input file "crop.dai")
+(input file "tillage.dai")
+(input file "fertilizer.dai") 	;;
+
+(defcrop "WWheat" "Winter Wheat"
+  (Root (MaxPen 150 [cm]))
+  (Canopy (EpFac 1.14 [])
+          (EpFacDS (0.355 0.386)(0.566 1)(1.381 1)(1.699 0.386)) ;; 0.44/1.14=0.386
+          (IntcpCap 0.05 [mm])))
+
+;; Winter wheat setup.
+(defaction "Agrovand_management" activity
+  (wait (at 1997 9 23 12)) (seed_bed_preparation) (sow "WWheat") 
+  (wait (at 1998 4 16 12)) (fertilize (NPK01 (weight 138 [kg N/ha]))) 
+  (wait (at 1998 8 20 12)) (harvest "WWheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+  (wait (at 1998 9 15 12)) (plowing)
+  (wait (at 1998 9 23 12)) (seed_bed_preparation) (sow "WWheat")
+  (wait (at 1998 11 24 12)) (spray "Bromide" 34000 [g/ha])
+  (wait (at 1999 4 14 12)) (fertilize (NPK01 (weight 132 [kg N/ha])))
+  (wait (at 1999 8 20 12)) (harvest "WWheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+  (wait (at 1999 9 15 12)) (plowing)
+  (wait (at 1999 9 27 12)) (seed_bed_preparation) (sow "WWheat")
+  (wait (at 1999 11 16 12)) (spray "Pendimethalin" 2000 [g/ha])
+  (wait (at 2000 4 28 12)) (fertilize (NPK01 (weight 143 [kg N/ha])))
+  (wait (at 2000 8 20 12)) (harvest "WWheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+  (wait (at 2000 9 15 12)) (plowing)
+  (wait (at 2000 10 18 12)) (seed_bed_preparation) (sow "WWheat")
+  (wait (at 2000 11 10 12)) (spray "Pendimethalin" 2000 [g/ha])
+                            (spray "Ioxynil" 200 [g/ha])
+  (wait (at 2001 4 30 12)) (fertilize (NPK01 (weight 143 [kg N/ha])))
+)
+ 
+;;; ror_manager.dai ends here.

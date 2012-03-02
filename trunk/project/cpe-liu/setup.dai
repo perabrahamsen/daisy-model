@@ -1,0 +1,361 @@
+;;; setup.dai -- Bakkegården experiment.
+
+(input file "log.dai")
+(input file "fertilizer.dai")
+(input file "tillage.dai")
+(input file "sbarley.dai")
+
+(defphotosynthesis PotatoFulai FC_C3
+  "Farquhar parameters for potatoes."
+  (cite "ssoc")
+  ;; This is the main calibration effect for unlimited production.
+  (Xn 3.78e-3 [mol/mol/s])               ;Kalibrated med fuld N
+  ;;Farquhar parameters for potatos, calibrated by Fuilai
+  (Kc25 27.24 [Pa])
+  (Ko25 16580 [Pa])
+  (Gamma25 3.74 [Pa])
+  ;; ABA effect on stomata conductance according to Fulai et al., 2005:
+  ;; Molecular weight of ABA (Abscisic Acid) = 264.32 g mol^-1.
+  ;; Molecular weight of ABA (Abscisic Acid) = 264.32e-12 g pmol^-1.
+  (Stomatacon BB
+              (ABA_min 30.45 [ng/cm^3])
+              (beta 0.016889 [cm^3/ng])
+              (b 0.14831 [mol/m^2/s])
+              (m 17.37 []))
+  ;; Intended for avoiding excessive growth for early crops in cold climate.
+  (TempEff (0 1) (100 1)))
+
+
+(defABAproduction "PotatoFulai" uptake
+  (cite "ssoc")
+  (expr (- 30.45 [ug/L] (* ABAfac 690 [ug/L/MPa] (convert h [MPa])))))
+
+(defrootdens SB_PlowPan Depth_Depth
+  (entries ( 10 [?cm] ((  0 [?cm] 1.0000 [])
+                       (  9 [?cm] 1.0000 [])
+                       ( 11 [?cm] 0.0000 [])))
+           ( 33 [?cm] ((  0 [?cm] 1.0000 [])
+                       ( 10 [?cm] 1.0000 [])
+                       ( 33 [?cm] 0.0000 [])))
+           (120 [?cm] ((  0 [?cm] 1.0000 [])
+                       ( 25 [?cm] 1.0000 [])
+                       ( 33 [?cm] 0.0001 [])
+                       (120 [?cm] 0.0000 [])))))
+
+(defrootdens SB_Block Depth_Depth
+  (entries ( 10 [?cm] ((  0 [?cm] 1.0000 [])
+                       (  9 [?cm] 1.0000 [])
+                       ( 11 [?cm] 0.0000 [])))
+           ( 33 [?cm] ((  0 [?cm] 1.0000 [])
+                       ( 10 [?cm] 1.0000 [])
+                       ( 33 [?cm] 0.0000 [])))
+           (120 [?cm] ((  0 [?cm] 1.0000 [])
+                       ( 25 [?cm] 1.0000 [])
+                       ( 33 [?cm] 0.0000 [])
+                       (120 [?cm] 0.0000 [])))))
+
+(defcrop SB "Spring Barley"
+  (declare ABAfac Number [] "Multiply ABA production (above base) with this.")
+  (enable_N_stress false)
+  (water_stress_effect none)
+  (Root (ABAprod "PotatoFulai"))
+  ;; Stomata conductivity is affected by ABA.
+  (LeafPhot "PotatoFulai"))
+
+(defcrop SBLow SB (ABAfac 0.5 []))
+(defcrop SBNormal SB (ABAfac 1.0 []))
+(defcrop SBHigh SB (ABAfac 2.0 []))
+
+(defcrop SBShort SB
+  (Root (rootdens SB_PlowPan)))
+
+(defcrop SBShortLow SBShort (ABAfac 0.5 []))
+(defcrop SBShortNormal SBShort (ABAfac 1.0 []))
+(defcrop SBShortHigh SBShort (ABAfac 2.0 []))
+
+(defaction "SB" activity
+  (wait_mm_dd 4 16)
+  (plowing)
+  (wait_mm_dd 4 17)
+  (seed_bed_preparation)(sow $Crop)
+  (wait_mm_dd 4 20)
+  (fertilize (N25S (weight 100 [kg N/ha])))
+  (wait_mm_dd 6 2)
+  (message "CALIB: Plants have three leaves")
+  (wait_mm_dd 7 7)
+  (message "CALIB: Flowering?")
+  (wait_mm_dd 8 3)
+  (message "CALIB: Led 1 moden")
+  (wait_mm_dd 8 8)
+  (message "CALIB: Resten moden")
+  (wait_mm_dd 8 23)
+  (harvest all (stub 8 [cm])(stem 0) (leaf 0))
+  (stop))
+
+(defhorizon "Rorrende Ap" USDA3
+  (description "3-25 cm")
+  (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.03)
+  (dry_bulk_density 1.49 [g/cm^3]))
+  
+(defhorizon "Overflade Ap" "Rorrende Ap"
+  (description "0-3 cm")
+  (hydraulic original
+             ;; 10%
+             (K_sat 0.173704 [cm/h])))
+
+(defhorizon "Rorrende Bplow layer" USDA3
+  (description "25-33 cm Petersen et al (2004)")
+  (clay 0.148)(silt 0.214)(sand 0.638) (humus 0.016)
+  (dry_bulk_density 1.70 [g/cm^3])
+  (anisotropy 12)
+  (hydraulic M_vG (Theta_res 0.00)
+                  (Theta_sat 0.339353)
+                  (alpha 0.0465371)
+                  (n 1.19395)
+                  (K_sat (* 0.5 [] 0.0925 [cm/h]))
+                  (l -2.92948)))               
+
+(defhorizon "Rorrende Bt" USDA3
+  (description "33-120 cm")
+  (clay 0.222)(silt 0.195)(sand 0.583)(humus 0.016)
+  (dry_bulk_density 1.65 [g/cm^3])
+  (hydraulic M_vG (Theta_res 0.0)
+                  (l -4.0323)
+                  (n 1.14768)
+                  (alpha 0.0565146)
+                  (K_sat (* 0.5 [] 0.537042 [cm/h]))
+                  (Theta_sat 0.356969)))  
+                                          
+(defhorizon "Rorrende C" USDA3
+  (description "120-200 cm")
+  (clay 0.207)(silt 0.235)(sand 0.558) (humus 0.01)
+  (dry_bulk_density 1.69 [g/cm^3])
+  (hydraulic M_vG (Theta_res 0.000)
+                  (Theta_sat 0.348314)
+                  (alpha 0.0476257)
+                  (n 1.15336)  
+                  ;;(K_sat 0.54407 [cm/h])
+                  (K_sat 1.50000 [cm/h])
+                  (l -3.60322)))
+
+(defvegetation BH1 crops
+  ;; Behandling 1, measured LAI.
+  (ForcedLAI (2010 ((130	0.126865346178995)
+                    (138	0.341699606805203)
+                    (139	0.331505397470374)
+                    (145	0.732362900577582)
+                    (149	1.04893322333451)
+                    (154	1.38190243729417)
+                    (159	1.88876407381112)
+                    (165	2.01596625098118)
+                    (169	2.10844172461756)
+                    (174	2.41132224385265)
+                    (181	3.77631417081021)
+                    (197        1.80889828363121) 
+                    (205	1.15122735165227)
+                    (215	0.356163334253353)))))
+
+(defvegetation BH2 crops
+  ;; Behandling 2, measured LAI.
+  (ForcedLAI (2010 ((130	0.113054327543383)
+                    (138	0.249859290199894)
+                    (139	0.219404286204732)
+                    (145	0.480867705944001)
+                    (149	0.690345742029461)
+                    (154	0.952647646382848)
+                    (159	1.47432784912586 )
+                    (165	1.68498395873706 )
+                    (169	1.89090532280082 )
+                    (174	1.99596590752449 )
+                    (181	2.32005205370504 )
+                    (197        1.7890881944939  )
+                    (205	1.21848514913843 )
+                    (215	0.461197576260041)))))
+
+(defvegetation BH3 crops
+  ;; Behandling 3, measured LAI.
+  (ForcedLAI (2010 ((130	0.0695399269384141)
+                    (138	0.209311233493097 )
+                    (139	0.179812881271794 )
+                    (145	0.398793220315028 )
+                    (149	0.539774965074643 )
+                    (154	0.720118564171243 )
+                    (159	1.20256332197327  )
+                    (165	1.45022877244852  )
+                    (169	1.56331217585878  )
+                    (174	1.81697063340985  )
+                    (181	2.07584493035373  )
+                    (197        1.5658323626276   )
+                    (205	1.14339826055821  )
+                    (215	0.475316794266712 )))))
+
+(defvegetation BH4 crops
+  ;; Behandling 4, measured LAI.
+  (ForcedLAI (2010 ((130	0.0807776000555535)
+                    (138	0.201096272103707 )
+                    (139	0.201514396739801 )
+                    (145	0.43031403168066  )
+                    (149	0.596041777848572 )
+                    (154	0.747288227076631 )
+                    (159	1.25302227877605  )
+                    (165	1.54538254844275  )
+                    (169	1.59075090515908  )
+                    (174	1.85729307282682  )
+                    (181	2.0560667361044   )
+                    (197        1.5487887886542   )
+                    (205	1.09725376631662  )
+                    (215	0.45107200094898  )))))
+
+(defcolumn Bakkegaarden default
+  "This is a Rorrende soil with deep drainage."
+  (Bioclimate original
+              (svat SSOC)
+              (raddist sun-shade))
+  (Vegetation $LAIFUN)
+  (Chemistry none)
+  (OrganicMatter none)
+  ;; (OrganicMatter original (init (end -25 [cm]) (input 3000 [kg C/ha/y])))
+  (Soil (MaxRootingDepth 150 [cm])
+        (horizons (-3.00 "Overflade Ap")
+                  (-25.00 "Rorrende Ap")
+                  (-33.00 "Rorrende Bplow layer")
+                  (-120 "Rorrende Bt")
+                  (-200 "Rorrende C")))
+  (Groundwater deep))
+
+(defweather Dry default
+  "dk-taastrup-jrj.dwf"
+  (PrecipScale 0.8 0.8 0.8 0.8  0.8 0.8 0.8 0.8  0.8 0.8 0.8 0.8))
+  
+(defweather Normal default
+  "dk-taastrup-jrj.dwf"
+  (PrecipScale 1.0 1.0 1.0 1.0  1.0 1.0 1.0 1.0  1.0 1.0 1.0 1.0))
+  
+(defweather Wet default
+  "dk-taastrup-jrj.dwf"
+  (PrecipScale 1.2 1.2 1.2 1.2  1.2 1.2 1.2 1.2  1.2 1.2 1.2 1.2))
+  
+(defprogram Bakkegaarden Daisy
+  (declare Crop crop "Crop to sow.")
+  (declare LAIFUN vegetation "LAI growth function.")
+  (LAIFUN crops)
+  (manager SB)
+  (column Bakkegaarden)
+  (weather Normal)
+  (time 2010 1 2)
+  (stop 2010 9 19)
+  (output harvest "Field water" "Crop Production"))
+
+(defprogram DSH Bakkegaarden
+  (weather Dry)
+  (Crop SBShortHigh)
+  (log_prefix "log/DSH-"))
+
+(defprogram DSN Bakkegaarden
+  (weather Dry)
+  (Crop SBShortNormal)
+  (log_prefix "log/DSN-"))
+
+(defprogram DSL Bakkegaarden
+  (weather Dry)
+  (Crop SBShortLow)
+  (log_prefix "log/DSL-"))
+
+(defprogram DNH Bakkegaarden
+  (weather Dry)
+  (Crop SBHigh)
+  (log_prefix "log/DNH-"))
+
+(defprogram DNN Bakkegaarden
+  (weather Dry)
+  (Crop SBNormal)
+  (log_prefix "log/DNN-"))
+
+(defprogram DNL Bakkegaarden
+  (weather Dry)
+  (Crop SBLow)
+  (log_prefix "log/DNL-"))
+
+(defprogram NSH Bakkegaarden
+  (weather Normal)
+  (Crop SBShortHigh)
+  (log_prefix "log/NSH-"))
+
+(defprogram NSN Bakkegaarden
+  (weather Normal)
+  (Crop SBShortNormal)
+  (log_prefix "log/NSN-"))
+
+(defprogram NSL Bakkegaarden
+  (weather Normal)
+  (Crop SBShortLow)
+  (log_prefix "log/NSL-"))
+
+(defprogram NNH Bakkegaarden
+  (weather Normal)
+  (Crop SBHigh)
+  (log_prefix "log/NNH-"))
+
+(defprogram NNN Bakkegaarden
+  (weather Normal)
+  (Crop SBNormal)
+  (log_prefix "log/NNN-"))
+
+(defprogram NNL Bakkegaarden
+  (weather Normal)
+  (Crop SBLow)
+  (log_prefix "log/NNL-"))
+
+(defprogram WSH Bakkegaarden
+  (weather Wet)
+  (Crop SBShortHigh)
+  (log_prefix "log/WSH-"))
+
+(defprogram WSN Bakkegaarden
+  (weather Wet)
+  (Crop SBShortNormal)
+  (log_prefix "log/WSN-"))
+
+(defprogram WSL Bakkegaarden
+  (weather Wet)
+  (Crop SBShortLow)
+  (log_prefix "log/WSL-"))
+
+(defprogram WNH Bakkegaarden
+  (weather Wet)
+  (Crop SBHigh)
+  (log_prefix "log/WNH-"))
+
+(defprogram WNN Bakkegaarden
+  (weather Wet)
+  (Crop SBNormal)
+  (log_prefix "log/WNN-"))
+
+(defprogram WNL Bakkegaarden
+  (weather Wet)
+  (Crop SBLow)
+  (log_prefix "log/WNL-"))
+
+(defprogram BH1 NNN
+  (LAIFUN BH1)
+  (log_prefix "log/BH1-"))
+
+(defprogram BH2 NNN
+  (LAIFUN BH2)
+  (log_prefix "log/BH2-"))
+
+(defprogram BH3 NNN
+  (LAIFUN BH3)
+  (log_prefix "log/BH3-"))
+
+(defprogram BH4 NNN
+  (LAIFUN BH4)
+  (log_prefix "log/BH4-"))
+
+
+;;(run batch (run DSH DSN DSL DNH DNN DNL NSH NSN NSL NNH NNN NNL WSH WSN WSL WNH WNN WNL ))
+;;(run NNN)
+
+(run batch (run BH1 BH2 BH3 BH4))
+
+;; setup.dai ends here.
