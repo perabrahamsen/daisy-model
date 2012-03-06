@@ -162,6 +162,7 @@ struct ChemicalStandard : public Chemical
   double C_below () const; // Concentration in groundwater [g/cm^3]
   double C_secondary (size_t) const;
   double C_primary (size_t) const;
+  double C_average (size_t) const;
   double M_primary (size_t) const;
   double M_secondary (size_t) const;
   double M_total (size_t) const;
@@ -176,9 +177,10 @@ struct ChemicalStandard : public Chemical
   void set_primary (const Soil& soil, const SoilWater& soil_water,
                     const std::vector<double>& M,
                     const std::vector<double>& J);
-  void set_secondarM (const Soil& soil, const SoilWater& soil_water,
+  void set_secondary (const Soil& soil, const SoilWater& soil_water,
                       const std::vector<double>& M,
                       const std::vector<double>& J);
+  void update_matrix (const Soil& soil, const SoilWater& soil_water);
   void set_tertiary_full (const std::vector<double>& S_p, 
                           const std::vector<double>& J_p);
   void set_tertiary_top (const std::vector<double>& S_p, 
@@ -317,6 +319,10 @@ ChemicalStandard::C_primary (const size_t i) const
 { return C_primary_[i]; }
 
 double 
+ChemicalStandard::C_average (const size_t i) const
+{ return C_avg_[i]; }
+
+double 
 ChemicalStandard::M_secondary (const size_t i) const
 { return M_secondary_[i]; }
 
@@ -350,10 +356,12 @@ ChemicalStandard::set_primary (const Soil& soil, const SoilWater& soil_water,
                                const std::vector<double>& M,
                                const std::vector<double>& J)
 {
-  // Update cells.
-  daisy_assert (M_primary_.size () == M.size ());
   const size_t cell_size = M.size ();
+  daisy_assert (M_primary_.size () == cell_size);
+  daisy_assert (M_error.size () == cell_size);
+
   M_primary_ = M;
+  J_primary = J;
 
   for (size_t c = 0; c < cell_size; c++)
     {
@@ -367,43 +375,38 @@ ChemicalStandard::set_primary (const Soil& soil, const SoilWater& soil_water,
           M_primary_[c] = 0.0;
         }
       const double Theta_primary = soil_water.Theta_primary (c);
-      const double Theta_secondary = soil_water.Theta_secondary (c);
-      const double Theta_matrix = Theta_primary + Theta_secondary;
-      M_total_[c] = M_primary_[c] + M_secondary_[c];
       C_primary_[c] 
         = adsorption_->M_to_C1 (soil, Theta_primary, c, M_primary_[c]);
-      C_avg_[c] 
-        = (Theta_primary * C_primary_[c]
-           + Theta_secondary * C_secondary_[c]) / Theta_matrix;
-      if (iszero (Theta_secondary))
-        C_secondary_[c] = C_primary_[c];
     }
 
-  // Update fluxes.
-  const size_t edge_size = J.size ();
-  daisy_assert (J_primary.size () == edge_size);
-  daisy_assert (J_secondary.size () == edge_size);
-  J_primary = J;
-  for (size_t e = 0; e < edge_size; e++)
-    J_matrix[e] = J_primary[e] + J_secondary[e];
-
+  update_matrix (soil, soil_water);
 }
 
 void 
-ChemicalStandard::set_secondarM (const Soil& soil, const SoilWater& soil_water,
+ChemicalStandard::set_secondary (const Soil& soil, const SoilWater& soil_water,
                                  const std::vector<double>& M,
                                  const std::vector<double>& J)
 {
+  M_secondary_ = M;
+  J_secondary = J;
+  update_matrix (soil, soil_water);
+}
+
+void 
+ChemicalStandard::update_matrix (const Soil& soil, const SoilWater& soil_water)
+{
   // Update cells.
-  const size_t cell_size = M.size ();
+  const size_t cell_size = M_total_.size ();
+  daisy_assert (C_avg_.size () == cell_size);
+  daisy_assert (C_primary_.size () == cell_size);
+  daisy_assert (M_primary_.size () == cell_size);
   daisy_assert (C_secondary_.size () == cell_size);
   daisy_assert (M_secondary_.size () == cell_size);
-  M_secondary_ = M;
 
   for (size_t c = 0; c < cell_size; c++)
     {
-      daisy_assert (M[c] >= 0.0);
       daisy_assert (M_primary_[c] >= 0.0);
+      daisy_assert (M_secondary_[c] >= 0.0);
       M_total_[c] = M_primary_[c] + M_secondary_[c];
       daisy_assert (M_total_[c] >= 0.0);
       
@@ -422,14 +425,11 @@ ChemicalStandard::set_secondarM (const Soil& soil, const SoilWater& soil_water,
         / Theta_matrix;
     }
 
-  // Update fluxes.
-  const size_t edge_size = J.size ();
+  const size_t edge_size = J_matrix.size ();
   daisy_assert (J_primary.size () == edge_size);
   daisy_assert (J_secondary.size () == edge_size);
-  J_secondary = J;
   for (size_t e = 0; e < edge_size; e++)
     J_matrix[e] = J_primary[e] + J_secondary[e];
-
 }
 
 void 
@@ -1259,7 +1259,8 @@ ChemicalStandard::uptake (const Soil& soil,
   const double rate = 1.0 - crop_uptake_reflection_factor;
   
   for (unsigned int i = 0; i < soil.size (); i++)
-    uptaken[i] = C_secondary (i) * soil_water.S_root (i) * rate;
+    // We need to use C_average in case secondary domain is emptied.
+    uptaken[i] = C_average (i) * soil_water.S_root (i) * rate;
   
   add_to_root_sink (uptaken);
 }

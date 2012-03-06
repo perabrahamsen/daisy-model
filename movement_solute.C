@@ -271,7 +271,7 @@ MovementSolute::secondary_transport (const Geometry& geo,
         }
       daisy_assert (std::isfinite (S_extra[c]));
     }
-  solute.set_secondarM (soil, soil_water, Mn, J);
+  solute.set_secondary (soil, soil_water, Mn, J);
 }
 
 void
@@ -354,13 +354,15 @@ MovementSolute::primary_transport (const Geometry& geo, const Soil& soil,
           tmp << "M[" << c << "] = " << M[c] 
               << " @ " << geo.cell_name (c)
               << ", C = " << C[c]
+              << ", M_new = " << M[c]
               << ", M_old = " << solute.M_primary (c) << ", dt " << dt
+              << ", S = " << S[c] 
               << ", S_extra = " << S_extra[c] 
               << ", S1 = " << solute.S_primary (c)
               << ", S2 = " << solute.S_secondary (c)
               << ", S3 = " << solute.S_tertiary (c)
               << ", Theta_old " << Theta_old[c]
-              << ", new " << Theta_new[c]
+              << ", Theta_new " << Theta_new[c]
               << ", root " << soil_water.S_root (c)
               << ", drain " << soil_water.S_drain (c)
               << ", bio " << soil_water.S_p (c)

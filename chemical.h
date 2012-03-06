@@ -74,6 +74,7 @@ public:
   virtual double C_below () const = 0; // Concentration in groundwater [g/cm^3]
   virtual double C_secondary (size_t i) const = 0;
   virtual double C_primary (size_t i) const = 0;
+  virtual double C_average (size_t i) const = 0;
   virtual double M_primary (size_t i) const = 0;
   virtual double M_secondary (size_t i) const = 0;
   virtual double M_total (size_t i) const = 0;
@@ -88,7 +89,7 @@ public:
   virtual void set_primary (const Soil& soil, const SoilWater& soil_water,
                             const std::vector<double>& M,
                             const std::vector<double>& J) = 0;
-  virtual void set_secondarM (const Soil& soil, const SoilWater& soil_water,
+  virtual void set_secondary (const Soil& soil, const SoilWater& soil_water,
                               const std::vector<double>& M,
                               const std::vector<double>& J) = 0;
   virtual void set_tertiary_full (const std::vector<double>& S_p, 
