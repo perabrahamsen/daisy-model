@@ -1,3 +1,8 @@
+2012-03-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* reaction_sorption.C (tick_soil): Clear out
+	'S_sorption_secondary'.
+
 2012-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 5.03 released.

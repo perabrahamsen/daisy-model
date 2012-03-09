@@ -251,6 +251,7 @@ struct ChemicalStandard : public Chemical
                   const Soil&, const SoilWater&, const SoilHeat&, 
                   const OrganicMatter&, Chemistry&, double dt, Treelog&);
   void output (Log&) const;
+  void debug_cell (std::ostream&, const size_t c) const;
 
   // Create.
   bool check (const Units&, const Scope&, 
@@ -759,8 +760,9 @@ ChemicalStandard::tick_source (const Scope& scope, const Geometry& geo,
       const bool has_secondary =  Theta_secondary > 1e-9 * Theta;
       const double S = soil_water.S_forward_sink (c);
       const double C = this->C_secondary (c);
+      const double C_avg = this->C_average (c);
       const double M_total = this->M_total (c);
-      const double M_solute = C * Theta;
+      const double M_solute = C_avg * Theta;
       const double M_secondary = has_secondary 
         ? this->M_secondary (c)
         : 0.0;
@@ -1432,6 +1434,34 @@ ChemicalStandard::output (Log& log) const
       output_value (sink_dt, "dt", log);
       output_variable (sink_cell, log);
     }
+}
+
+void 
+ChemicalStandard::debug_cell (std::ostream& out, const size_t c) const
+{
+  out << ", C_avg_ = " << C_avg_[c]
+      << ", C_secondary_" << C_secondary_[c]
+      << ", C_primary_ = " << C_primary_[c]
+      << ", M_secondary_ = " << M_secondary_[c]
+      << ", M_primary_ = " << M_primary_[c]
+      << ", M_total_ = " << M_total_[c]
+      << ", M_error = " << M_error[c]
+      << ", S_secondary_ = " << S_secondary_[c]
+      << ", S_primary_ = " << S_primary_[c]
+      << ", S_tertiary_ = " << S_tertiary_[c]
+      << ", S_exchange = " << S_exchange[c]
+      << ", S_drain = " << S_drain[c]
+      << ", S_external = " << S_external[c]
+      << ", S_permanent = " << S_permanent[c]
+      << ", S_root = " << S_root[c]
+      << ", S_decompose = " << S_decompose[c]
+      << ", S_decompose_primary = " << S_decompose_primary[c]
+      << ", S_decompose_secondary = " << S_decompose_secondary[c]
+      << ", S_transform = " << S_transform[c]
+      << ", tillage = " << tillage[c]
+      << ", lag = " << lag[c]
+      << ", sink_dt = " << sink_dt
+      << ", sink_cell = " << sink_cell;
 }
 
 bool 

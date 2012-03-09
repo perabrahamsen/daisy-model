@@ -26,6 +26,7 @@
 
 #include "model_framed.h"
 #include <vector>
+#include <iosfwd>
 
 class Geometry;
 class Soil;
@@ -162,6 +163,7 @@ public:
                           const OrganicMatter&, Chemistry&, double dt,
 			  Treelog& msg) = 0;
   virtual void output (Log&) const = 0;
+  virtual void debug_cell (std::ostream&, const size_t c) const = 0;
 
   // Create and Destroy.
 public:

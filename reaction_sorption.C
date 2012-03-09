@@ -97,42 +97,52 @@ struct ReactionSorption : public Reaction
         
         // Primary domain.
         {
-          const double Theta = soil_water.Theta_primary_old (c);
-          daisy_assert (Theta > 0.0);
+          const double Theta_old = soil_water.Theta_primary_old (c);
+          daisy_assert (Theta_old > 0.0);
+          const double Theta_new = soil_water.Theta_primary (c);
+          daisy_assert (Theta_new > 0.0);
           const double rho_b = colloid
             ? colloid->M_primary (c) * soil_enrichment_factor
             : soil.dry_bulk_density (c);
 
-          const double C = solute.M_primary (c) / Theta;
+          const double C_old = solute.M_primary (c) / Theta_old;
+          const double C_new = solute.M_primary (c) / Theta_new;
           const double A = sorbed.M_primary (c);
-          const double S = find_rate (rho_f1, rho_b, clay, humus, Theta, A, C);
+          const double S_old = find_rate (rho_f1, rho_b, clay, humus, Theta_old, A, C_old);
+          const double S_new = find_rate (rho_f1, rho_b, clay, humus, Theta_new, A, C_new);
+          const double S = (std::fabs (S_old) > std::fabs (S_new))
+            ? S_new
+            : S_old;
           S_sorption_primary[c] = S;
           S_sorption[c] = S;
         }
         // Secondary domain.
         {
-          const double Theta = soil_water.Theta_secondary_old (c);
-          if (Theta > 1e-9)
+          const double Theta_old = soil_water.Theta_secondary_old (c);
+          const double Theta_new = soil_water.Theta_secondary (c);
+          if (Theta_old > 1e-9 && Theta_new > 1e-9)
             {
               const double rho_b = colloid
                 ? colloid->M_secondary (c)  * soil_enrichment_factor
                 : soil.dry_bulk_density (c);
-              const double C = solute.M_secondary (c) / Theta;
+              const double C_old = solute.M_secondary (c) / Theta_old;
+              const double C_new = solute.M_secondary (c) / Theta_new;
               const double A = sorbed.M_secondary (c);
-              const double S = find_rate (1.0 - rho_f1, 
-                                          rho_b, clay, humus, Theta, A, C);
-#if 0
-          if (std::isnormal (C))
-            {
-              std::ostringstream tmp;
-              tmp << c << ": " << "C = " << C << ", A = " << A 
-                  << ", S = " << S << ", f = " << f;
-              msg.message (tmp.str ());
-            }
-#endif
+              const double S_old = find_rate (1.0 - rho_f1, 
+                                              rho_b, clay, humus, Theta_old, 
+                                              A, C_old);
+              const double S_new = find_rate (1.0 - rho_f1, 
+                                              rho_b, clay, humus, Theta_new,
+                                              A, C_new);
+              const double S = (std::fabs (S_old) > std::fabs (S_new))
+                ? S_new
+                : S_old;
+
               S_sorption_secondary[c] = S;
               S_sorption[c] += S;
             }
+          else 
+            S_sorption_secondary[c] = 0.0;
         }
       }
     // Make the source/sink official.
@@ -148,7 +158,6 @@ struct ReactionSorption : public Reaction
                      Chemistry& chemistry, const double /* dt */, Treelog& msg)
   { 
     TREELOG_MODEL (msg);
-
     const double m2_per_cm2 = 0.01 * 0.01 ; // [m^2/cm^2]
     const double pond = std::max (surf.ponding_average (), 0.0);
     const double z_mixing = surf.mixing_depth ();
@@ -207,6 +216,8 @@ struct ReactionSorption : public Reaction
                     const double A, const double C)
   {
     daisy_assert (Theta > 0.0);
+    daisy_assert (f >= 0.0);
+    daisy_assert (f <= 1.0);
     const double has_sorbed = A;
     const double has_solute = C * Theta;
 
@@ -216,11 +227,34 @@ struct ReactionSorption : public Reaction
     // M = C (K rho_b + Theta) => C = M / (K rho_b + Theta)
     const double equil_C = M / (f * K * rho_b + Theta);
     const double want_solute = equil_C * Theta;
+    daisy_assert (want_solute >= 0.0);
     const double want_sorbed = M - want_solute;
-    
+    daisy_assert (std::isfinite (want_sorbed));
+    if (want_sorbed < 0.0)
+      {
+        if (!approximate (M, want_solute))
+          {
+            std::ostringstream tmp;
+            tmp << "want_sorbed = " << want_sorbed
+                << ", has_sorbed = " << has_sorbed
+                << ", f = " << f
+                << ", rho_b = " << rho_b
+                << ", clay = " << clay
+                << ", humus = " << humus
+                << ", Theta = " << Theta
+                << ", A = " << A
+                << ", C = " << C
+                << ", equil_C = " << equil_C
+                << ", has_solute = " << has_solute
+                << ", want_solute = " << want_solute
+                << ", M = " << M
+                << ", K = " << K;
+            daisy_bug (tmp.str ());
+          }
+      }
     return (has_solute > want_solute)
       ? k_sorption * (has_solute - want_solute)
-      : -k_desorption * (has_sorbed - want_sorbed);
+      : k_desorption * (has_solute - want_solute);
   }
 
 

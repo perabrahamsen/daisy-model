@@ -357,11 +357,9 @@ MovementSolute::primary_transport (const Geometry& geo, const Soil& soil,
               << ", M_new = " << M[c]
               << ", M_old = " << solute.M_primary (c) << ", dt " << dt
               << ", S = " << S[c] 
-              << ", S_extra = " << S_extra[c] 
-              << ", S1 = " << solute.S_primary (c)
-              << ", S2 = " << solute.S_secondary (c)
-              << ", S3 = " << solute.S_tertiary (c)
-              << ", Theta_old " << Theta_old[c]
+              << ", S_extra = " << S_extra[c];
+          solute.debug_cell (tmp, c);
+          tmp << ", Theta_old " << Theta_old[c]
               << ", Theta_new " << Theta_new[c]
               << ", root " << soil_water.S_root (c)
               << ", drain " << soil_water.S_drain (c)
