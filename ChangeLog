@@ -1,3 +1,7 @@
+2012-03-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 5.04 released.
+
 2012-03-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* reaction_sorption.C (tick_soil): Clear out
