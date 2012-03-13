@@ -1,3 +1,7 @@
+2012-03-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 5.05 released.
+
 2012-03-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* transport_Mollerup.C (stabilizing_method): New parameter.
