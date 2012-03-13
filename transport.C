@@ -95,7 +95,8 @@ Transport::check (const Geometry&, Treelog&) const
 { return true; }
 
 Transport::Transport (const BlockModel& al)
-  : Model ()
+  : Model (),
+    objid (al.type_name ())
 { }
 
 Transport::~Transport ()

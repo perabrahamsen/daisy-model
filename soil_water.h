@@ -84,7 +84,7 @@ private:
 public:
   void clear ();
   void freeze (const Soil&, size_t c, double rate /* [h^-1] */);
-  void drain (const std::vector<double>&);
+  void drain (const std::vector<double>&, Treelog&);
   void forward_sink (const std::vector<double>& total, 
                      const std::vector<double>& sink);
   void root_uptake (const std::vector<double>&);

@@ -49,6 +49,7 @@ public:
 
   static const char *const component;
   symbol library_id () const;
+  const symbol objid;
 
   // Simulation.
 public:

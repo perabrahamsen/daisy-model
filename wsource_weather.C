@@ -66,6 +66,7 @@ struct WSourceWeather::Implementation
 
   // Parameters.
   const PLF snow_fraction;
+  const double max_rain;
 
   double NH4WetDep;
   double NH4DryDep;
@@ -599,7 +600,17 @@ WSourceWeather::Implementation::suggest_dt () const // [h]
   // Suggest running until we get new data.
   for (size_t i = 0; i < when.size (); i++)
     if (when[i] > next)
-      return (when[i] - next).total_hours ();
+      {
+        const double data_dt = (when[i] - next).total_hours (); // [h]
+        daisy_assert (data_dt > 0.0);
+        if (max_rain > 0.0 && my_rain > 0.0)
+          {
+            const double rain_dt = max_rain / my_rain;
+            daisy_assert (rain_dt > 0.0);
+            return std::min (rain_dt, data_dt);
+          }
+        return data_dt;
+      }
   
   // No applicable weather data.  
   return NAN;
@@ -1197,6 +1208,7 @@ WSourceWeather::Implementation::Implementation (const Weather& w,
     units (al.units ()),
     source (s),
     snow_fraction (al.plf ("snow_fraction")),
+    max_rain (al.number ("max_rain", -1.0)),
     NH4WetDep (NAN),
     NH4DryDep (NAN),
     NO3WetDep (NAN),
@@ -1491,7 +1503,9 @@ Fraction of precipitation that falls as snow as function of air temperature.");
     snow_fraction.add (-2.0, 1.0);
     snow_fraction.add (2.0, 0.0);
     frame.set ("snow_fraction", snow_fraction);
-
+    frame.declare ("max_rain", "mm", Attribute::OptionalConst,
+                   "Largest amount of rain in one timestep.\n\
+By default, no limit on rain.");
     // Logs.
     frame.declare ("air_temperature", "dg C", Attribute::LogOnly,
                    "Temperature this hour.");

@@ -592,7 +592,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
     soil_water.set_content (cell, h (cell), Theta (cell));
   
   soil_water.add_tertiary_sink (S_matrix_sum);
-  soil_water.drain (S_drain_sum);
+  soil_water.drain (S_drain_sum, msg);
 
 
   for (size_t edge = 0; edge != edge_size; ++edge) 
@@ -600,7 +600,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       daisy_assert (std::isfinite (q[edge]));
       soil_water.set_flux (edge, q[edge]);
     }
-  soil_water.drain (S_drain);
+  soil_water.drain (S_drain, msg);
 
   // End of large time step.
 }

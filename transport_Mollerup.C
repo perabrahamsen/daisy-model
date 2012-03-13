@@ -31,6 +31,7 @@
 #include "mathlib.h"
 #include "treelog.h"
 #include "block_model.h"
+#include "vcheck.h"
 #include <sstream>
 
 // Uncomment for fast code that does not catches bugs.
@@ -46,6 +47,25 @@ namespace ublas = boost::numeric::ublas;
 
 struct TransportMollerup : public Transport
 {
+  struct StabilizingMethod
+  {
+    // Enum in a namespace.
+    enum stabilizing_method_t { None, Timestep_reduction, Streamline_diffusion };
+  private:
+    stabilizing_method_t value;
+    static stabilizing_method_t symbol2stabilizing_method (symbol s);
+  public:
+    operator stabilizing_method_t () const
+    { return value; }
+    StabilizingMethod (stabilizing_method_t v)
+      : value (v)
+    { }
+    StabilizingMethod (symbol s)
+      : value (symbol2stabilizing_method (s))
+    { }
+  };
+  const StabilizingMethod stabilizing_method;
+
   // Keep track of edge types in small time steps.
   enum edge_type_t { Unhandled, Internal, Neumann_explicit_upper,
                      Neumann_explicit_lower, Neumann_implicit, Dirichlet };
@@ -185,6 +205,25 @@ struct TransportMollerup : public Transport
   TransportMollerup (const BlockModel& al);
   ~TransportMollerup ();
 };
+
+TransportMollerup::StabilizingMethod::stabilizing_method_t
+TransportMollerup::StabilizingMethod::symbol2stabilizing_method (symbol s)
+{
+  static struct sym_set_t : std::map<symbol, stabilizing_method_t>
+  {
+    sym_set_t ()
+    {
+      insert (std::pair<symbol,stabilizing_method_t> ("Streamline_diffusion",
+                                                      Streamline_diffusion));
+      insert (std::pair<symbol,stabilizing_method_t> ("Timestep_reduction", 
+                                                      Timestep_reduction));
+      insert (std::pair<symbol,stabilizing_method_t> ("None", None));
+    } 
+  } sym_set;
+  sym_set_t::const_iterator i = sym_set.find (s);
+  daisy_assert (i != sym_set.end ());
+  return (*i).second;
+}  
 
 void
 TransportMollerup::cell_based_flux (const Geometry& geo,  
@@ -1022,10 +1061,6 @@ TransportMollerup::flow (const Geometry& geo_base,
  
       
   //Begin small timestep stuff  
-  enum stabilizing_method_t { None, Timestep_reduction, Streamline_diffusion };
-  // const stabilizing_method_t stabilizing_method = Streamline_diffusion;
-  //const stabilizing_method_t stabilizing_method = Timestep_reduction;
-  const stabilizing_method_t stabilizing_method = None;
   const double ddt_min = 1e-10;
   const double gamma_stabilization = 2;
 
@@ -1037,7 +1072,7 @@ TransportMollerup::flow (const Geometry& geo_base,
 
   switch (stabilizing_method)
     {
-    case None:
+    case StabilizingMethod::None:
       {
         //No stabilization!!!
         ddt = dt;
@@ -1045,7 +1080,7 @@ TransportMollerup::flow (const Geometry& geo_base,
         break;
       }
 
-    case Timestep_reduction:
+    case StabilizingMethod::Timestep_reduction:
       {
         //Use smaller time steps
                 
@@ -1100,7 +1135,7 @@ TransportMollerup::flow (const Geometry& geo_base,
 
         break;
       }
-    case Streamline_diffusion:
+    case StabilizingMethod::Streamline_diffusion:
       {
         //Add some ekstra diffusion in the streamline 
         ddt = dt;
@@ -1119,6 +1154,8 @@ TransportMollerup::flow (const Geometry& geo_base,
           }
         break;
       }
+    default:
+      daisy_notreached ();
     } 
 
   
@@ -1351,6 +1388,7 @@ This primary solute transport model only works with 'rectangle' movement");
 
 TransportMollerup::TransportMollerup (const BlockModel& al)
   : Transport (al),
+    stabilizing_method (al.name ("stabilizing_method")),
     solver (Librarian::build_item<Solver> (al, "solver")),
     enable_boundary_diffusion (al.flag ("enable_boundary_diffusion")),
     debug (al.integer ("debug")),
@@ -1375,6 +1413,20 @@ See Mollerup 2007 for details.")
   { }
   void load_frame (Frame& frame) const
   {
+    frame.declare_string ("stabilizing_method", Attribute::OptionalConst, "\
+Method used for stabilizing results. Must be one of these:\n\
+\n\
+None: No stabilizing method applied\n\
+\n\
+Timestep_reduction: Reduce timesteps.\n\
+\n\
+Streamline_diffusion: Increase diffusion.");
+    static VCheck::Enum stable_check ("None", "Timestep_reduction", 
+                                      "Streamline_diffusion");
+    frame.set_check ("stabilizing_method", stable_check);
+    frame.set ("stabilizing_method", "Timestep_reduction");
+
+
     frame.declare_object ("solver", Solver::component, 
                       Attribute::Const, Attribute::Singleton, "\
 Model used for solving matrix equation system.");

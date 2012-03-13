@@ -71,7 +71,7 @@ SoilWater::freeze (const Soil&, const size_t c, const double rate /* [h^-1] */)
 }
 
 void
-SoilWater::drain (const std::vector<double>& v)
+SoilWater::drain (const std::vector<double>& v, Treelog& msg)
 {
   forward_sink (v, v);
 
@@ -83,7 +83,7 @@ SoilWater::drain (const std::vector<double>& v)
         {
           std::ostringstream tmp;
           tmp << "draining " << v[i] << " [h^-1] from cell " << i;
-          daisy_bug (tmp.str ());
+          msg.debug (tmp.str ());
         }
       S_sum_[i] += v[i];
       S_drain_[i] += v[i];

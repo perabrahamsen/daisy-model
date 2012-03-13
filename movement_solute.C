@@ -369,7 +369,15 @@ MovementSolute::primary_transport (const Geometry& geo, const Soil& soil,
               << ", sum " << soil_water.S_sum (c)
               << ", v1 " << soil_water.velocity_cell_primary (geo, c)
               << ", v2 " << soil_water.velocity_cell_secondary (geo, c);
+          const std::vector<size_t>& edges = geo.cell_edges (c);
+          for (size_t i = 0; i < edges.size (); i++)
+            {
+              const size_t e = edges[i];
+              tmp  << "\n" << geo.edge_name (e) 
+                   << ": q = " << q[e] << ", J = " << J[e];
+            }
           msg.debug (tmp.str ());
+          throw "Negative concentration";
         }
     }
 
@@ -670,7 +678,7 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
     {
       solute_attempt (i);
       static const symbol solute_name ("solute");
-      Treelog::Open nest (msg, solute_name, i, matrix_solute[i]->library_id ());
+      Treelog::Open nest (msg, solute_name, i, matrix_solute[i]->objid);
       try
         {
           primary_transport (geometry (), soil, soil_water, 

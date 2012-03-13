@@ -461,7 +461,7 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
 
   // Make it official.
   soil_water.add_tertiary_sink (S_matrix);
-  soil_water.drain (S_drain);
+  soil_water.drain (S_drain, msg);
 
   // Fake tertiary flux by mass balance ignoring tertiary storage.
   for (size_t i = 0; i < edge_above_size; i++)

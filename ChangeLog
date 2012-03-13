@@ -1,3 +1,12 @@
+2012-03-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* transport_Mollerup.C (stabilizing_method): New parameter.
+	* wsource_weather.C (max_rain): New parameter.
+	* movement_solute.C (primary_transport): Fail in case of negative
+	solution.
+	* soil_water.C (drain): Downgrade negative drain message to debug.
+	* all: Update callers.
+
 2012-03-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 5.04 released.

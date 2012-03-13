@@ -73,7 +73,7 @@ void
 DrainLateral::tick (const Geometry& geo, const Soil& soil, 
                     const SoilHeat& soil_heat, const Surface& surface, 
                     SoilWater& soil_water, 
-                    Treelog&)
+                    Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
 
@@ -112,7 +112,7 @@ DrainLateral::tick (const Geometry& geo, const Soil& soil,
   // Find sink term.
   EqDrnFlow = EquilibriumDrainFlow (geo, soil, soil_heat);   
   DrainFlow= geo.total_surface (S);
-  soil_water.drain (S);
+  soil_water.drain (S, msg);
 }
 
 void 
