@@ -75,7 +75,7 @@ struct UZRectMollerup : public UZRect
   ublas::vector<double> Kedge;
 
   // Interface.
-  void tick (const GeometryRect&, std::vector<size_t>& drain_cell,
+  void tick (const GeometryRect&, const std::vector<size_t>& drain_cell,
 	     const Soil&, SoilWater&, const SoilHeat&, 
              const Surface&, const Groundwater&, 
              double dt, Treelog&);
@@ -161,7 +161,7 @@ struct UZRectMollerup : public UZRect
 };
 
 void 
-UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
+UZRectMollerup::tick (const GeometryRect& geo, const std::vector<size_t>& drain_cell,
                 const Soil& soil, 
                 SoilWater& soil_water, const SoilHeat& soil_heat,
                 const Surface& surface, const Groundwater& groundwater,
@@ -1160,7 +1160,7 @@ Model for calculating average vertical K between cells.");
     frame.set ("K_average", "arithmetic");
     frame.declare_integer ("max_time_step_reductions", Attribute::Const, "\
 Number of times we may reduce the time step before giving up");
-    frame.set ("max_time_step_reductions", 4);
+    frame.set ("max_time_step_reductions", 16);
     frame.declare_integer ("time_step_reduction", Attribute::Const, 
                 "Divide the time step with this at each reduction.");
     frame.set ("time_step_reduction", 4);
@@ -1174,7 +1174,7 @@ Multiply 'max_iterations' with this factor for each timestep reduction.");
     frame.set ("max_iterations_timestep_reduction_factor", 0);
     frame.declare_integer ("max_number_of_small_time_steps", Attribute::Const, "\
 Maximum number of small time steps in a large time step.");
-    frame.set ("max_number_of_small_time_steps", 1000);  
+    frame.set ("max_number_of_small_time_steps", 100000);  
     frame.declare_integer ("msg_number_of_small_time_steps", Attribute::Const, "\
 Number of small time steps in a large time step between message.");
     frame.set ("msg_number_of_small_time_steps", 100);  

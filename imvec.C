@@ -104,7 +104,7 @@ IMvec::add_syntax (Frame& frame,
 {
   frame.declare_string ("name", cat, "Name of chemical.");
   frame.set_check ("name", Chemical::check_library ());
-  frame.declare ("value", dimension, Check::non_negative (), cat,
+  frame.declare ("value", dimension, Check::none/*_negative*/ (), cat,
              Attribute::Variable, "Value for chemical.");
   frame.order ("name", "value");
 }

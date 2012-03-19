@@ -166,9 +166,6 @@ UZRichard::richard (Treelog& msg,
   const double h_lim = geo.zplus (last) - geo.cell_z (last);
   daisy_assert (h_lim < 0.0);
 
-  // Check when we last switched top.
-  double switched_top_last = dt * 2.0;
-
   // Keep track of water going to the top.
   double top_water = 0.0;
   double available_water;
@@ -195,6 +192,7 @@ UZRichard::richard (Treelog& msg,
   copy (&h_old[first], &h_old[last + 1], h.begin ());
   copy (&Theta_old[first], &Theta_old[last + 1], Theta.begin ());
 
+  bool switched_top = false;  // Switched top this timestep?
   double time_left = dt;	// How much of the large time step left.
   double ddt = dt;		// We start with small == large time step.
   int number_of_time_step_reductions = 0;
@@ -219,6 +217,9 @@ UZRichard::richard (Treelog& msg,
       if (!flux && top_type != Surface::soil)
 	h[0] = h_top - geo.cell_z (first) + top_water;
 
+      // Amount of water we put into the top this small time step.
+      double delta_top_water = 88.0e88;
+
       // Bottom flux.
       double q_bottom = 42.42e42;
       daisy_assert (size > 0);
@@ -241,10 +242,25 @@ UZRichard::richard (Treelog& msg,
         default:
           daisy_panic ("Unknown bottom type");
         }
+
       do
 	{
 	  h_conv = h;
 	  iterations_used++;
+
+          if (iterations_used > max_iterations)
+            {
+              if (debug > 1)
+                {
+                  std::ostringstream tmp;
+                  tmp << "Too many iterations: "
+                      << "available_water = " << available_water 
+                      << ", time left = " << time_left
+                      << ", ddt = " << ddt;
+                  msg.message (tmp.str ());
+                }
+              goto failure;
+            }
 
 	  // Calculate parameters.
 	  for (unsigned int i = 0; i < size; i++)
@@ -379,52 +395,73 @@ UZRichard::richard (Treelog& msg,
                   tmp << "ABSURD: h[0] = " << h[0] << " h[1] = " << h[1] 
                       << " h[" << (size-1) << "] = " << h[size-1]
                       << " stepping down";
-                  msg.debug (tmp.str ());
+                  msg.message (tmp.str ());
                 }
-	      iterations_used = max_iterations + 42;
-	      break;
+              goto failure;
 	    }
 	}
-      while (   !converges (h_conv, h)
-	     && iterations_used <= max_iterations);
+      while (!converges (h_conv, h));
+      
+      // Calculate new water content.
+      for (unsigned int i = 0; i < size; i++)
+        Theta[i] = soil.Theta (first + i, h[i], h_ice[first + i]);
 
-      if (iterations_used > max_iterations)
-	{
-          if (debug > 1)
+      if (flux)
+        {
+          if (h[0] > 0.0)
             {
-              std::ostringstream tmp;
-              tmp << "Too many iterations: "
-                  << "available_water = " << available_water 
-                  << ", time left = " << time_left
-                  << ", ddt = " << ddt;
-              msg.message (tmp.str ());
+              if (debug > 0)
+                msg.message ("Flux top with saturated soil");
+
+              goto failure;
             }
-        try_again:
-	  number_of_time_step_reductions++;
+          
+          // Yeah, it worked!
+          delta_top_water = -(available_water / time_left) * ddt;
+        }
+      else 
+        {
+          daisy_assert (!flux);
 
-	  if (number_of_time_step_reductions > max_time_step_reductions)
-	    {
-	      if (approximate (switched_top_last, time_left))
-                {
-                  if (debug > 1)
-                    msg.message ("Been there, tried that.");
-                  return false;
-                }
-	      else 
-                flux = !flux;
+          // Find flux.
+          switch (bottom_type)
+            {
+            case Groundwater::forced_flux:
+            case Groundwater::free_drainage:
+              q[last + 1] = q_bottom;
+              for (int i = last; i >= first; i--)
+                q[i] = - (((Theta[i - first] 
+                            - Theta_previous[i-first]) / ddt) + S[i])
+                  * geo.dz (i) + q[i + 1];
+              break;
+            case Groundwater::pressure:
+            case Groundwater::lysimeter:
+              q_darcy (geo, first, last, h_previous, h, 
+                       Theta_previous, Theta, Kplus, S, ddt, q);
+              break;
+            default:
+              daisy_panic ("Unknown bottom type");
+            }
 
+          // We take water from flux pond first.
+          delta_top_water = q[first] * ddt;
+
+          if (available_water + delta_top_water < -1e-30)
+            // We don't have more water in the pressure top.
+            {
               if (debug > 1)
                 {
                   std::ostringstream tmp;
-                  if (flux)
-                    tmp << "Trying flux top";
-                  else
-                    tmp << "Trying pressure top";
+                  tmp << "Couldn't accept top flux: "
+                      << "available_water = " << available_water 
+                      << ", delta_top_water = " << delta_top_water
+                      << ", time left = " << time_left
+                      << ", ddt = " << ddt;
                   if (debug > 2)
                     {
                       tmp << "\nh =";
                       for (size_t c = 0; c < size; c++)
-                        tmp << "\t" << h_previous[c];
+                        tmp << "\t" << h[c];
                       tmp << "\nTheta =";
                       for (size_t c = 0; c < size; c++)
                         tmp << "\t" << Theta[c];
@@ -437,145 +474,73 @@ UZRichard::richard (Treelog& msg,
                     }
                   msg.message (tmp.str ());
                 }
-	      switched_top_last = time_left;
-	      ddt = time_left;
-	      number_of_time_step_reductions = 0;
-	    }
-	  else
-	    ddt /= time_step_reduction;
-	  h = h_previous;
-	}
-      else
-	{
-	  // Calculate new water content.
-	  for (unsigned int i = 0; i < size; i++)
-	    Theta[i] = soil.Theta (first + i, h[i], h_ice[first + i]);
-
-	  bool accepted = true;	// Could the top accept the results?
-	  // Amount of water we put into the top this small time step.
-	  double delta_top_water = 88.0e88;
-	  if (!flux)
-	    {
-	      // Find flux.
-	      switch (bottom_type)
-                {
-                case Groundwater::forced_flux:
-                case Groundwater::free_drainage:
-		  q[last + 1] = q_bottom;
-		  for (int i = last; i >= first; i--)
-		    q[i] = - (((Theta[i - first] 
-				- Theta_previous[i-first]) / ddt) + S[i])
-		      * geo.dz (i) + q[i + 1];
-                  break;
-                case Groundwater::pressure:
-                case Groundwater::lysimeter:
-                  q_darcy (geo, first, last, h_previous, h, 
-                           Theta_previous, Theta, Kplus, S, ddt, q);
-                  break;
-                default:
-                  daisy_panic ("Unknown bottom type");
-		}
-
-	      // We take water from flux pond first.
-	      delta_top_water = q[first] * ddt;
-
-	      if (available_water + delta_top_water < -1e-30)
-		// We don't have more water in the pressure top.
-		{
-		  if (approximate (switched_top_last, time_left))
-		    {
-                      if (debug > 1)
-                        {
-                          std::ostringstream tmp;
-                          tmp << "Couldn't accept top flux: "
-                              << "available_water = " << available_water 
-                              << ", delta_top_water = " << delta_top_water
-                              << ", time left = " << time_left
-                              << ", ddt = " << ddt;
-                          if (debug > 2)
-                            {
-                              tmp << "\nh =";
-                              for (size_t c = 0; c < size; c++)
-                                tmp << "\t" << h[c];
-                              tmp << "\nTheta =";
-                              for (size_t c = 0; c < size; c++)
-                                tmp << "\t" << Theta[c];
-                              tmp << "\nS =";
-                              for (size_t c = 0; c < size; c++)
-                                tmp << "\t" << S[first + c];
-                              tmp << "\nK =";
-                              for (size_t c = 0; c < size; c++)
-                                tmp << "\t" << K[c];
-                            }
-                          msg.message (tmp.str ());
-                        }
-                      Theta = Theta_previous;
-                      goto try_again;
-		    }
-		  else
-		    {
-                      if (debug > 0)
-                        msg.debug ("Emptied pond, switching to flux top");
-		      flux = true;
-		      accepted = false;
-		    }
-		}
-	    }
-	  else if (h[0] <= 0)
-	    // We have a flux top, and unsaturated soil.
-	    {
-              delta_top_water = -(available_water / time_left) * ddt;
-	    }
-	  else if (q_top > 0.0)
-	    {
-	      // We have a saturated soil, with an upward flux.
-	      throw ("Saturated soil with an upward flux");
-	    }
-	  else if (switched_top_last < time_left + ddt / 2.0)
-            {
-              if (debug > 0)
-                {
-                  std::ostringstream tmp;
-                  tmp << "last: " << switched_top_last 
-                      << "; time left: " << time_left << "; h[" << first 
-                      << "] = " << h[first] <<"; q = " << q_top;
-                  msg.debug (tmp.str ());
-                }
-	      Theta = Theta_previous;
-              goto try_again;
+              goto failure;
             }
-	  else
-	    // We have saturated soil, make it a pressure top.
-	    {
-              if (debug > 0)
-                msg.debug ("Saturated soil, switching to pressure top");
-	      flux = false;
-	      accepted = false;
-	    }
+          // Yeah, it works!
+        }
 
-	  if (accepted)
-	    {
-	      top_water += delta_top_water;
-              available_water += delta_top_water;
-	      time_left -= ddt;
-	      iterations_with_this_time_step++;
+      // Acceptance mode.
+      top_water += delta_top_water;
+      available_water += delta_top_water;
+      time_left -= ddt;
+      switched_top = false;
+      iterations_with_this_time_step++;
 
-	      if (iterations_with_this_time_step > time_step_reduction)
-		{
-		  number_of_time_step_reductions--;
-		  iterations_with_this_time_step = 0;
-		  ddt *= time_step_reduction;
-		}
-	    }
-	  else
-	    {
-              if (debug > 0)
-                msg.debug ("Not accepted, mark switched top");
-	      switched_top_last = time_left;
-	      Theta = Theta_previous;
-	      h = h_previous;
-	    }
-	}
+      if (iterations_with_this_time_step > time_step_reduction)
+        {
+          number_of_time_step_reductions--;
+          iterations_with_this_time_step = 0;
+          ddt *= time_step_reduction;
+        }
+      continue;
+
+      // Failure mode.
+    failure:
+      number_of_time_step_reductions++;
+
+      if (number_of_time_step_reductions > max_time_step_reductions)
+        {
+          if (switched_top)
+            {
+              if (debug > 1)
+                msg.message ("Been there, tried that.");
+              return false;
+            }
+          flux = !flux;
+
+          if (debug > 1)
+            {
+              std::ostringstream tmp;
+              if (flux)
+                tmp << "Trying flux top";
+              else
+                tmp << "Trying pressure top";
+              if (debug > 2)
+                {
+                  tmp << "\nh =";
+                  for (size_t c = 0; c < size; c++)
+                    tmp << "\t" << h_previous[c];
+                  tmp << "\nTheta =";
+                  for (size_t c = 0; c < size; c++)
+                    tmp << "\t" << Theta[c];
+                  tmp << "\nS =";
+                  for (size_t c = 0; c < size; c++)
+                    tmp << "\t" << S[first + c];
+                  tmp << "\nK =";
+                  for (size_t c = 0; c < size; c++)
+                    tmp << "\t" << K[c];
+                }
+              msg.message (tmp.str ());
+            }
+          switched_top = true;
+          ddt = time_left;
+          number_of_time_step_reductions = 0;
+        }
+      else
+        ddt /= time_step_reduction;
+          
+      Theta = Theta_previous;
+      h = h_previous;
     }
 
   // Make it official.

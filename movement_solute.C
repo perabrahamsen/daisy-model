@@ -263,12 +263,15 @@ MovementSolute::secondary_transport (const Geometry& geo,
   std::vector<double> C (cell_size);
   for (size_t c = 0; c < cell_size; c++)
     {
-      Mn[c] = A[c] + Mf[c];
+      Mn[c] = A[c] + Mf[c] + S_extra[c] * dt;
       if (Mn[c] < 0.0 || Theta_new[c] < 1e-6)
         {
-          S_extra[c] += Mn[c] / dt;
+          S_extra[c] = Mn[c] / dt;
           Mn[c] = 0.0;
         }
+      else
+        S_extra[c] = 0.0;
+
       daisy_assert (std::isfinite (S_extra[c]));
     }
   solute.set_secondary (soil, soil_water, Mn, J);
@@ -278,6 +281,7 @@ void
 MovementSolute::primary_transport (const Geometry& geo, const Soil& soil,
                                    const SoilWater& soil_water,
                                    const Transport& transport,
+                                   const size_t transport_iteration,
                                    const std::map<size_t, double>& J_forced,
                                    const std::map<size_t, double>& C_border,
                                    Chemical& solute, 
@@ -377,7 +381,8 @@ MovementSolute::primary_transport (const Geometry& geo, const Soil& soil,
                    << ": q = " << q[e] << ", J = " << J[e];
             }
           msg.debug (tmp.str ());
-          throw "Negative concentration";
+          if (transport_iteration == 0)
+            throw "Negative concentration";
         }
     }
 
@@ -576,6 +581,7 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
 {
   daisy_assert (std::isfinite (J_above));
   const size_t cell_size = geometry ().cell_size ();
+  const size_t edge_size = geometry ().edge_size ();
 
   // Source term transfered from secondary to primary domain.
   std::vector<double> S_extra (cell_size, 0.0);
@@ -652,11 +658,7 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
   // Tertiary transport.
   tertiary->solute (geometry (), soil_water, J_tertiary, dt, chemical, msg);
 
-  // Secondary transport activated.
-  secondary_transport (geometry (), soil, soil_water, J_secondary, C_border,
-                       chemical, S_extra, dt, scope, msg);
-
-  // Fully adsorbed primary transport.
+  // Fully adsorbed.
   if (chemical.adsorption ().full ())
     {
       static const symbol solid_name ("immobile transport");
@@ -667,37 +669,63 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
           tmp << "J_above = " << J_above << ", expected 0 for full sorbtion";
           msg.error (tmp.str ());
         }
+
+      // Secondary "transport".
+      std::vector<double> J2 (edge_size, 0.0); // Flux delivered by flow.
+      std::vector<double> Mn (cell_size); // New content.
+      for (size_t c = 0; c < cell_size; c++)
+        {
+          Mn[c] = chemical.M_secondary (c) + chemical.S_secondary (c) * dt;
+          if (Mn[c] < 0.0)
+            {
+              S_extra[c] = Mn[c] / dt;
+              Mn[c] = 0.0;
+            }
+          else
+            S_extra[c] = 0.0;
+        }
+      chemical.set_secondary (soil, soil_water, Mn, J2);
+
+      // Primary "transport".
       primary_transport (geometry (), soil, soil_water,
-                         *matrix_solid, J_primary, C_border,
+                         *matrix_solid, 0, J_primary, C_border,
                          chemical, S_extra, dt, scope, msg);
       return;
     }
 
+  // Secondary transport activated.
+  secondary_transport (geometry (), soil, soil_water, J_secondary, C_border,
+                       chemical, S_extra, dt, scope, msg);
+
   // Solute primary transport.
-  for (size_t i = 0; i < matrix_solute.size (); i++)
-    {
-      solute_attempt (i);
-      static const symbol solute_name ("solute");
-      Treelog::Open nest (msg, solute_name, i, matrix_solute[i]->objid);
-      try
-        {
-          primary_transport (geometry (), soil, soil_water, 
-                             *matrix_solute[i], J_primary, C_border,
-                             chemical, S_extra, dt, scope, msg);
-          if (i > 0)
-            msg.debug ("Succeeded");
-          return;
-        }
-      catch (const char* error)
-        {
-          msg.debug (std::string ("Solute problem: ") + error);
-        }
-      catch (const std::string& error)
-        {
-          msg.debug(std::string ("Solute trouble: ") + error);
-        }
-      solute_failure (i);
-    }
+  for (size_t transport_iteration = 0; 
+       transport_iteration < 2; 
+       transport_iteration++)
+    for (size_t i = 0; i < matrix_solute.size (); i++)
+      {
+        solute_attempt (i);
+        static const symbol solute_name ("solute");
+        Treelog::Open nest (msg, solute_name, i, matrix_solute[i]->objid);
+        try
+          {
+            primary_transport (geometry (), soil, soil_water, 
+                               *matrix_solute[i], transport_iteration,
+                               J_primary, C_border,
+                               chemical, S_extra, dt, scope, msg);
+            if (i > 0)
+              msg.debug ("Succeeded");
+            return;
+          }
+        catch (const char* error)
+          {
+            msg.debug (std::string ("Solute problem: ") + error);
+          }
+        catch (const std::string& error)
+          {
+            msg.debug(std::string ("Solute trouble: ") + error);
+          }
+        solute_failure (i);
+      }
   throw "Matrix solute transport failed";
 }
 

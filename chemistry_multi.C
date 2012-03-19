@@ -337,8 +337,11 @@ ChemistryMulti::find_dt (const double S, const double C,
   if (M_secondary > 0.0)
     min_M = std::min (min_M, max_sink_secondary * M_secondary);
 
+  if (!std::isnormal (S) || !std::isnormal (C))
+    return 0.0;
+  
   const double dt = std::max (min_sink_total * M_total, min_M) / (S * C);
-
+  daisy_assert (std::isnormal (dt));
   if (dt < 0.0)
     return 0.0;
 

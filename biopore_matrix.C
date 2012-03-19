@@ -807,7 +807,7 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
         }
       
       // Matrix concentration.
-      const double C = chemical.C_secondary (c); // [g/cm^3 W]
+      const double C = chemical.C_to_drain (c); // [g/cm^3 W]
       daisy_assert (C >= 0.0);
 
       // Add to solute sink.

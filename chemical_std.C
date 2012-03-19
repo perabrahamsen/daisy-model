@@ -163,6 +163,7 @@ struct ChemicalStandard : public Chemical
   double C_secondary (size_t) const;
   double C_primary (size_t) const;
   double C_average (size_t) const;
+  double C_to_drain (size_t) const;
   double M_primary (size_t) const;
   double M_secondary (size_t) const;
   double M_total (size_t) const;
@@ -322,6 +323,12 @@ ChemicalStandard::C_primary (const size_t i) const
 double 
 ChemicalStandard::C_average (const size_t i) const
 { return C_avg_[i]; }
+
+double 
+ChemicalStandard::C_to_drain (const size_t i) const
+{ return drain_secondary
+    ? C_secondary (i) 
+    : C_average (i); }
 
 double 
 ChemicalStandard::M_secondary (const size_t i) const
@@ -547,6 +554,7 @@ ChemicalStandard::add_to_decompose_sink (const std::vector<double>& v)
   daisy_assert (S_decompose_primary.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
+      daisy_assert (v[i] >= 0.0);
       S_decompose[i] -= v[i];
       S_decompose_primary[i] -= v[i];
     }
@@ -560,6 +568,7 @@ ChemicalStandard::add_to_decompose_sink_secondary (const std::vector<double>& v)
   daisy_assert (S_decompose_secondary.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
+      daisy_assert (v[i] >= 0.0);
       S_decompose[i] -= v[i];
       S_decompose_secondary[i] -= v[i];
     }
@@ -753,6 +762,7 @@ ChemicalStandard::tick_source (const Scope& scope, const Geometry& geo,
   const size_t cell_size = geo.cell_size ();
 
   sink_dt = 0.0;
+  sink_cell = Geometry::cell_error;
   for (size_t c = 0; c < cell_size; c++)
     {
       const double Theta = soil_water.Theta (c);
@@ -770,8 +780,9 @@ ChemicalStandard::tick_source (const Scope& scope, const Geometry& geo,
       const double dt 
         = chemistry.find_dt (S, C, M_secondary, M_solute, M_total);
       if (std::isnormal (dt)
-          && (!std::isnormal (sink_dt) || dt < sink_dt))
+          && (!std::isnormal (sink_dt) || std::fabs (sink_dt) > std::fabs (dt)))
         {
+          daisy_assert (dt > 0);
           sink_dt = dt;
           sink_cell = c;
         }
@@ -1080,12 +1091,8 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
     {
       // We really should go down in timesteps here instead.
       const double S_min = -0.5 * M_total_[c] / dt;
-      if (drain_secondary)
-        S_drain[c] = std::max (-soil_water.S_drain (c) * C_secondary_[c],
-                               S_min);
-      else
-        S_drain[c] = std::max (-soil_water.S_drain (c) * C_avg_[c],
-                               S_min);
+      S_drain[c] = std::max (-soil_water.S_drain (c) * C_to_drain (c),
+                             S_min);
     }
   add_to_source_secondary (S_drain); 
 

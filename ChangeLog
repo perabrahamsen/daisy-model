@@ -1,3 +1,11 @@
+2012-03-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* uzrichard.C (richard): Cleanup logic and bug fix.
+
+	* uzrect_Mollerup.C (max_time_step_reductions): Increased default
+	value to 16.
+	(max_number_of_small_time_steps): Increased default value to 100000.
+
 2012-03-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 5.05 released.

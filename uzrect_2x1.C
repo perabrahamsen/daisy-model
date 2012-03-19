@@ -53,7 +53,8 @@ struct UZRect2x1 : public UZRect
   const std::vector<UZ1D*> horizontal;
 
   // Interface.
-  void tick (const GeometryRect&, std::vector<size_t>& drain_cell,
+  void tick (const GeometryRect&, 
+             const std::vector<size_t>& drain_cell,
 	     const Soil&, SoilWater&, 
              const SoilHeat&, const Surface&, const Groundwater&, 
              double dt, Treelog&);
@@ -156,7 +157,7 @@ UZRect2x1::output (Log&) const
 { }
 
 void 
-UZRect2x1::tick (const GeometryRect& geo, std::vector<size_t>&, 
+UZRect2x1::tick (const GeometryRect& geo, const std::vector<size_t>&, 
 		 const Soil& soil, 
                  SoilWater& soil_water, const SoilHeat& soil_heat,
                  const Surface& surface, const Groundwater& groundwater, 

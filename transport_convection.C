@@ -65,7 +65,7 @@ TransportConvection::flow (const Geometry& geo,
                               std::vector<double>& C, 
                               std::vector<double>& J, 
                               double /* diffusion_coefficient */, double dt,
-                              Treelog& /* msg */) const
+                              Treelog& msg) const
 {
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
@@ -133,7 +133,12 @@ TransportConvection::flow (const Geometry& geo,
 
       // Update C.
       for (size_t c = 0; c < cell_size; c++)
-        C[c] = M[c] / Theta[c];
+        {
+          daisy_assert (Theta[c] > 0.0);
+          daisy_assert (std::isfinite (M[c]));
+          C[c] = M[c] / Theta[c];
+          daisy_assert (std::isfinite (C[c]));
+        }
 
       // Find fluxes using new values (more stable).
       std::vector<double> dJ (edge_size);
@@ -144,6 +149,7 @@ TransportConvection::flow (const Geometry& geo,
             // Forced flux.
             {
               dJ[e] = (*i).second;
+              daisy_assert (std::isfinite (dJ[e]));
               continue;
             }
 
@@ -154,38 +160,57 @@ TransportConvection::flow (const Geometry& geo,
           double C_flux_from = -42.42e42;
 
           if (geo.cell_is_internal (flux_from))
-            // Internal cell, use its concentration.
-            C_flux_from = C[flux_from];
+            {
+              // Internal cell, use its concentration.
+              C_flux_from = C[flux_from];
+              daisy_assert (std::isfinite (C[flux_from]));
+            }
           else
             {
               i = C_border.find (e);
               if (i != C_border.end ())
-                // Specified by C_border.
-                C_flux_from = (*i).second;
+                {
+                  // Specified by C_border.
+                  C_flux_from = (*i).second;
+                  daisy_assert (std::isfinite ((*i).second));
+                }
               else
                 // Assume no gradient.
                 {
                   const int flux_to = in_flux ? edge_to : edge_from;
+                  daisy_assert (geo.cell_is_internal (flux_to));
                   C_flux_from = C[flux_to];
+                  daisy_assert (std::isfinite (C[flux_to]));
                 }
             }
 
           // Convection.
+          daisy_assert (std::isfinite (q[e]));
+          daisy_assert (std::isfinite (C_flux_from));
           dJ[e] = q[e] * C_flux_from;
+          daisy_assert (std::isfinite (dJ[e]));
         }
 
       // Update values for fluxes.
       for (size_t e = 0; e < edge_size; e++)
         {
           const double value = ddt * dJ[e] * geo.edge_area (e);
+          daisy_assert (std::isfinite (value));
 
           const int from = geo.edge_from (e);
           if (geo.cell_is_internal (from))
-            M[from] -= value / geo.cell_volume (from);
+            {
+              M[from] -= value / geo.cell_volume (from);
+              daisy_assert (std::isfinite (M[from]));
+
+            }
 
           const int to = geo.edge_to (e);
           if (geo.cell_is_internal (to))
-            M[to] += value / geo.cell_volume (to);
+            {
+              M[to] += value / geo.cell_volume (to);
+              daisy_assert (std::isfinite (M[to]));
+            }
 
           daisy_assert (std::isfinite (J[e]));
           daisy_assert (std::isfinite (dJ[e]));
@@ -195,17 +220,44 @@ TransportConvection::flow (const Geometry& geo,
       // Update time left.
       time_left -= ddt;
 
+      if (time_left < 0.1 * min_timestep_factor * dt)
+        break;
+
+      const double time_spend = dt - time_left;
+
       // Interpolate Theta.
       for (size_t c = 0; c < cell_size; c++)
         {
-          const double time_spend = dt - time_left;
           Theta[c] = (time_left * Theta_old[c] + time_spend * Theta_new[c])
             / dt;
+          daisy_assert (Theta[c] > 0.0);
+          daisy_assert (std::isfinite (Theta[c]));
         }
 
       // Update C.
       for (size_t c = 0; c < cell_size; c++)
-        C[c] = M[c] / Theta[c];
+        {
+          daisy_assert (std::isfinite (M[c]));
+          daisy_assert (Theta[c] > 0.0);
+          daisy_assert (std::isfinite (Theta[c]));
+          C[c] = M[c] / Theta[c];
+          if (!std::isfinite (C[c]))
+            {
+              std::ostringstream tmp;
+              tmp << geo.cell_name (c)
+                  << ": C[" << c << "] = " << C[c]
+                  << ", M[" << c << "] = " << M[c]
+                  << ", Theta[" << c << "] = " << Theta[c]
+                  << ", dt = " << dt
+                  << ", ddt = " << ddt
+                  << ", time_left = " << time_left
+                  << ", Theta_old = " << Theta_old[c] 
+                  << ", time_spend = " << time_spend
+                  << ", Theta_new = " << Theta_new[c];
+              msg.error (tmp.str ());
+              C[c] = 0.0;
+            }
+        }
     }
 }
 

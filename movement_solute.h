@@ -56,7 +56,8 @@ private:
                                    const Scope& scope, Treelog& msg);
   static void primary_transport (const Geometry& geo,
                                  const Soil& soil, const SoilWater& soil_water,
-                                 const Transport&,
+                                 const Transport&, 
+                                 const size_t transport_iteration,
                                  const std::map<size_t, double>& J_forced,
                                  const std::map<size_t, double>& C_border,
                                  Chemical& solute, 
