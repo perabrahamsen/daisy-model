@@ -1174,7 +1174,7 @@ Multiply 'max_iterations' with this factor for each timestep reduction.");
     frame.set ("max_iterations_timestep_reduction_factor", 0);
     frame.declare_integer ("max_number_of_small_time_steps", Attribute::Const, "\
 Maximum number of small time steps in a large time step.");
-    frame.set ("max_number_of_small_time_steps", 100000);  
+    frame.set ("max_number_of_small_time_steps", 20000);  
     frame.declare_integer ("msg_number_of_small_time_steps", Attribute::Const, "\
 Number of small time steps in a large time step between message.");
     frame.set ("msg_number_of_small_time_steps", 100);  

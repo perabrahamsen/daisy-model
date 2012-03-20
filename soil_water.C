@@ -263,8 +263,6 @@ SoilWater::tick_source (const Geometry& geo, const Soil& soil, Treelog& msg)
       const double S = S_forward_total (c);
       if (!std::isnormal (S))
         continue;
-      if (S < 0.0)
-        continue;
       static const double h_wp = -15000.0;
       static const double h_sat = 0.0;
       const double h_ice = this->h_ice (c);
@@ -274,7 +272,7 @@ SoilWater::tick_source (const Geometry& geo, const Soil& soil, Treelog& msg)
       if (Theta_max < 0.01)
         // Mostly ice?
         continue;
-      const double dt = Theta_max * max_sink_change / S;
+      const double dt = Theta_max * max_sink_change / std::fabs (S);
       if (std::isnormal (dt)
           && (!std::isnormal (sink_dt) || std::fabs (sink_dt) > std::fabs (dt)))
         {

@@ -44,6 +44,8 @@ class UZRichard : public UZmodel
   const int max_time_step_reductions;
   const int time_step_reduction;
   const int max_iterations;
+  const int max_number_of_small_time_steps;
+  const int msg_number_of_small_time_steps;
   const double max_absolute_difference;
   const double max_relative_difference;
   std::auto_ptr<const Average> K_average;
@@ -197,6 +199,7 @@ UZRichard::richard (Treelog& msg,
   double ddt = dt;		// We start with small == large time step.
   int number_of_time_step_reductions = 0;
   int iterations_with_this_time_step = 0;
+  int n_small_time_steps = 0;
 
   while (time_left > 0.0)
     {
@@ -204,6 +207,28 @@ UZRichard::richard (Treelog& msg,
       int iterations_used = 0;
       if (ddt > time_left)
 	ddt = time_left;
+
+      std::auto_ptr<Treelog::Open> nest;
+
+      if (n_small_time_steps > 0
+          && (n_small_time_steps%msg_number_of_small_time_steps) == 0)
+        {
+          std::ostringstream tmp_ddt;
+          tmp_ddt << "Time t = " << (dt - time_left) 
+                  << "; ddt = " << ddt
+                  << "; steps " << n_small_time_steps 
+                  << "; time left = " << time_left;
+          nest.reset (new Treelog::Open (msg, tmp_ddt.str ()));
+          msg.touch ();
+          msg.flush ();
+        }
+      
+      n_small_time_steps++;
+      if (n_small_time_steps > max_number_of_small_time_steps) 
+        {
+          msg.debug ("Too many small timesteps");
+          throw "Too many small timesteps";
+        }
 
       for (unsigned int i = 0; i < size; i++)
 	{
@@ -732,6 +757,8 @@ UZRichard::UZRichard (const BlockModel& al)
     max_time_step_reductions (al.integer ("max_time_step_reductions")),
     time_step_reduction (al.integer ("time_step_reduction")),
     max_iterations (al.integer ("max_iterations")),
+    max_number_of_small_time_steps (al.integer ("max_number_of_small_time_steps")),
+    msg_number_of_small_time_steps (al.integer ("msg_number_of_small_time_steps")),
     max_absolute_difference (al.number ("max_absolute_difference")),
     max_relative_difference (al.number ("max_relative_difference")),
     K_average (al.check ("K_average")
@@ -767,6 +794,12 @@ Number of times we may reduce the time step before giving up");
 Maximum number of iterations when seeking convergence before reducing\n\
 the time step.");
     frame.set ("max_iterations", 25);
+    frame.declare_integer ("max_number_of_small_time_steps", Attribute::Const, "\
+Maximum number of small time steps in a large time step.");
+    frame.set ("max_number_of_small_time_steps", 200000);  
+    frame.declare_integer ("msg_number_of_small_time_steps", Attribute::Const, "\
+Number of small time steps in a large time step between message.");
+    frame.set ("msg_number_of_small_time_steps", 5000);  
     frame.declare ("max_absolute_difference", "cm", Attribute::Const, "\
 Maximum absolute difference in 'h' values for convergence.");
     frame.set ("max_absolute_difference", 0.02);

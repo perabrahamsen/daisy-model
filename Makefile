@@ -340,7 +340,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = program_optimize.C summary_Rsqr.C \
+MODELS = gnuplot_vector.C program_optimize.C summary_Rsqr.C \
 	log_table.C xysource_profile.C program_rootmatch.C program_hmovie.C \
 	wsource_std.C wsource_time.C wsource_combine.C wsource_indirect.C\
 	wsource_table.C wsource_const.C \
@@ -1596,6 +1596,11 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+gnuplot_vector${OBJ}: gnuplot_vector.C gnuplot_base.h gnuplot.h model.h \
+ symbol.h block_model.h block_nested.h block.h scope.h attribute.h \
+ treelog.h frame_model.h frame.h lexer_flux.h lexer_table.h mathlib.h \
+ assertion.h librarian.h time.h units.h memutils.h submodeler.h \
+ block_submodel.h frame_submodel.h check.h vcheck.h geometry.h
 program_optimize${OBJ}: program_optimize.C program.h model.h symbol.h run.h \
  block_top.h block.h scope.h attribute.h block_model.h block_nested.h \
  treelog.h frame_model.h frame.h block_submodel.h frame_submodel.h \
@@ -1786,7 +1791,7 @@ transport_Mollerup${OBJ}: transport_Mollerup.C transport.h model.h symbol.h \
  log.h time.h border.h model_framed.h model_logable.h frame.h scope.h \
  submodeler.h block_submodel.h block_nested.h block.h treelog.h \
  frame_submodel.h memutils.h librarian.h mathlib.h assertion.h \
- block_model.h frame_model.h
+ block_model.h frame_model.h vcheck.h
 transport_Hansen${OBJ}: transport_Hansen.C transport.h model.h symbol.h \
  block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
  frame_model.h frame.h geometry1d.h geometry_vert.h geometry.h soil.h \
