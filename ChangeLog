@@ -1,3 +1,7 @@
+2012-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 5.07 released.
+
 2012-03-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* daisy.C (previous_dt): New variable.
