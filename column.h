@@ -150,7 +150,7 @@ public:
   virtual void tick_source (const Scope&, const Time&, Treelog&) = 0;
   virtual double suggest_dt () const = 0;
   virtual void tick_move (const Metalib& metalib, 
-                          const Time&, double dt, const Weather*, 
+                          const Time&, const Time&, double dt, const Weather*, 
                           const Scope&, Treelog&) = 0;
   virtual bool check (const Weather* global_weather,
 		      const Time& from, const Time& to, 

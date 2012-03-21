@@ -116,7 +116,7 @@ public:
   void tick_source (const Scope&, const Time&, Treelog&);
   double suggest_dt () const;
   void tick_move (const Metalib& metalib, 
-                  const Time&, double dt, const Weather*, 
+                  const Time&, const Time&, double dt, const Weather*, 
                   const Scope&, Treelog&);
 
   // Find a specific column.
@@ -615,17 +615,17 @@ Field::Implementation::clear ()
 
 void 
 Field::Implementation::tick_source (const Scope& parent_scope, 
-                                    const Time& time, Treelog& msg)
+                                    const Time& time_end, Treelog& msg)
 {
   if (columns.size () == 1)
-    (*(columns.begin ()))->tick_source (parent_scope, time, msg);
+    (*(columns.begin ()))->tick_source (parent_scope, time_end, msg);
   else
     for (ColumnList::const_iterator i = columns.begin ();
          i != columns.end ();
          i++)
       {
         Treelog::Open nest (msg, "Column " + (*i)->objid);
-        (*i)->tick_source (parent_scope, time, msg);
+        (*i)->tick_source (parent_scope, time_end, msg);
       }
 }
 
@@ -650,19 +650,21 @@ Field::Implementation::suggest_dt () const
 
 void 
 Field::Implementation::tick_move (const Metalib& metalib, 
-                                  const Time& time, const double dt, 
+                                  const Time& time, const Time& time_end,
+                                  const double dt, 
                                   const Weather* weather, const Scope& scope,
                                   Treelog& msg)
 {
   if (columns.size () == 1)
-    (*(columns.begin ()))->tick_move (metalib, time, dt, weather, scope, msg);
+    (*(columns.begin ()))->tick_move (metalib, time, time_end, dt,
+                                      weather, scope, msg);
   else
     for (ColumnList::const_iterator i = columns.begin ();
          i != columns.end ();
          i++)
       {
         Treelog::Open nest (msg, "Column " + (*i)->objid);
-        (*i)->tick_move (metalib, time, dt, weather, scope, msg);
+        (*i)->tick_move (metalib, time, time_end, dt, weather, scope, msg);
       }
 }
 
@@ -947,8 +949,9 @@ Field::clear ()
 { impl->clear (); }
 
 void
-Field::tick_source (const Scope& parent_scope, const Time& time, Treelog& msg)
-{ impl->tick_source (parent_scope, time, msg); }
+Field::tick_source (const Scope& parent_scope, const Time& time_end,
+                    Treelog& msg)
+{ impl->tick_source (parent_scope, time_end, msg); }
 
 double
 Field::suggest_dt () const
@@ -956,9 +959,10 @@ Field::suggest_dt () const
 
 void
 Field::tick_move (const Metalib& metalib, 
-                  const Time& time, const double dt, const Weather* weather, 
+                  const Time& time, const Time& time_end, const double dt,
+                  const Weather* weather, 
                   const Scope& scope, Treelog& msg)
-{ impl->tick_move (metalib, time, dt, weather, scope, msg); }
+{ impl->tick_move (metalib, time, time_end, dt, weather, scope, msg); }
 
 void 
 Field::output (Log& log) const

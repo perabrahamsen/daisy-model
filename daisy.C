@@ -67,7 +67,6 @@ struct Daisy::Implementation
   const double min_dt;
   double small_dt;
   double current_dt;
-  double previous_dt;
   Time time;
   Time previous;
   Time next_large;
@@ -250,7 +249,6 @@ struct Daisy::Implementation
       min_dt (minimal_timestep.total_hours ()),
       small_dt (max_dt),
       current_dt (max_dt),
-      previous_dt (NAN),
       time (al.submodel ("time")),
       previous (al.check ("previous")
                 ? Time (al.submodel ("previous"))
@@ -279,11 +277,13 @@ void
 Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
 { 
   // Initial logs.
-  output_log->initial_logs (daisy, previous, msg);
+  output_log->initial_logs (daisy, time, msg);
 
   // Weather and management.
+
   if (weather.get ())
-    weather->weather_tick (time, msg);
+    weather->weather_tick (time + timestep, msg);
+
   action->tick (daisy, scope (), msg);
   action->doIt (daisy, scope (), msg);
 
@@ -377,7 +377,11 @@ Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
         }
     }
     
-  field->tick_move (metalib, time, current_dt, weather.get (), scope (), msg);
+  if (weather.get ())
+    weather->weather_tick (next_time, msg);
+
+  field->tick_move (metalib, time, next_time, current_dt, weather.get (),
+                    scope (), msg);
 
   // Update time.
   previous = time;
@@ -386,8 +390,7 @@ Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
     running = false;
 
   // Log values.
-  output_log->tick (daisy, previous, previous_dt, msg);
-  previous_dt = current_dt;
+  output_log->tick (daisy, time, current_dt, msg);
 
   // Clear values for next timestep.
   field->clear ();

@@ -93,8 +93,9 @@ struct WSourceWeather::Implementation
   // Current values.
   double max_timestep (const Time& previous, const Time& next, symbol) const;
   double max_timestep (symbol) const;
-  double number_average (const Time& previous, const Time& next,
-                         symbol) const;
+  double find_sum_dt (const Time& from, const double goal, 
+                      const symbol key) const;
+  double number_average (const Time& previous, const Time& next, symbol) const;
   double number_average (symbol) const;
   void extract_average (const Time& previous, const Time& next,
                         symbol, double&, Treelog&) const;
@@ -146,6 +147,8 @@ struct WSourceWeather::Implementation
   // Simulation.
   Time previous;
   Time next;
+  double data_dt () const;      // [h]
+  double rain_dt () const;      // [h]
   double suggest_dt () const;   // [h]
   void tick (const Time& time, Treelog&);
   void check_state (const symbol key, const double value, Treelog& msg);
@@ -209,7 +212,68 @@ WSourceWeather::Implementation::max_timestep (const symbol key) const
 { return max_timestep (previous, next, key); }
 
 double 
-WSourceWeather::Implementation::number_average (const Time& from, const Time& to,
+WSourceWeather::Implementation::find_sum_dt (const Time& from,
+                                             const double goal,
+                                             const symbol key) const
+{
+  // Find the timestep (dt) so that the time weighted sum of a
+  // parameter (key) is equal to the stated goal (goal).  This is
+  // intended to be used with precipitation to find the timestep
+  // needed to reach max_rain.
+  
+  // Available data.
+  const number_map_t::const_iterator e = numbers.find (key);
+  if (e == numbers.end ())
+    return NAN;
+
+  daisy_assert (e != numbers.end ());
+  const std::deque<double>& values = e->second;
+  const size_t data_size = when.size ();
+  daisy_assert (values.size () == data_size);
+
+  switch (data_size)
+    {
+    case 0:
+      throw "No weather data";
+    case 1:
+      if (values[0] > 0.0)
+        return goal / values[0];
+      return NAN;
+    }
+
+  // Find start.
+  size_t i = 0;
+  while (i < data_size && when[i] <= from)
+    i++;
+  
+  if (i == data_size)
+    return NAN;
+  
+  // Aggregate complete values.
+  double missing = goal;
+  double sum_hours = 0.0;
+  Time time = from;
+  
+  while (i < data_size)
+    {
+      const double hours = Time::fraction_hours_between (time, when[i]);
+      const double delta = hours * values[i];
+      if (delta >= missing)
+        {
+          daisy_assert (values[i] > 0.0);
+          return sum_hours + missing / values[i];
+        }
+      sum_hours += hours;
+      missing -= delta;
+      time = when[i];
+      i++;
+    }
+  return NAN;
+}
+    
+double 
+WSourceWeather::Implementation::number_average (const Time& from, 
+                                                const Time& to,
                                                 const symbol key) const
 {
   // This function considers the source data constant within the
@@ -594,26 +658,40 @@ WSourceWeather::Implementation::T_normal (const Time& time, double delay) const
     * cos (2.0 * M_PI * displacement + delay);
 }
 
-double 
-WSourceWeather::Implementation::suggest_dt () const // [h]
+double
+WSourceWeather::Implementation::data_dt () const // [h]
 { 
   // Suggest running until we get new data.
   for (size_t i = 0; i < when.size (); i++)
-    if (when[i] > next)
-      {
-        const double data_dt = (when[i] - next).total_hours (); // [h]
-        daisy_assert (data_dt > 0.0);
-        if (max_rain > 0.0 && my_rain > 0.0)
-          {
-            const double rain_dt = max_rain / my_rain;
-            daisy_assert (rain_dt > 0.0);
-            return std::min (rain_dt, data_dt);
-          }
-        return data_dt;
-      }
+    if (when[i] > previous)
+      return (when[i] - previous).total_hours ();
   
   // No applicable weather data.  
   return NAN;
+}
+
+double
+WSourceWeather::Implementation::rain_dt () const // [h]
+{ 
+  if (max_rain <= 0.0)
+    return NAN;
+    
+  return find_sum_dt (previous, max_rain, Weatherdata::Precip ()); 
+}
+
+double 
+WSourceWeather::Implementation::suggest_dt () const // [h]
+{ 
+  const double data_dt = this->data_dt ();
+  const double rain_dt = this->rain_dt ();
+
+  if (!std::isfinite (data_dt))
+    return rain_dt;
+
+  if (!std::isfinite (rain_dt))
+    return data_dt;
+
+  return std::min (data_dt, rain_dt);
 }
 
 void 
@@ -921,6 +999,7 @@ WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
 
   // Rain and snow.
   const double new_precipitation = number_average (Weatherdata::Precip ());
+
   // TODO PrecipCorrect PrecipScale.
   if (std::isfinite (new_precipitation))
     {

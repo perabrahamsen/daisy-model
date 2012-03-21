@@ -1,10 +1,15 @@
+2012-03-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* field.h, field.C, column.h, column_std.C (tick_source)
+	(tick_move): New "end" parameter for weather.
+	* daisy.C (tick): Use it.
+
+	* wsource_weather.C (find_sum_dt, data_dt, rain_dt): New functions.
+	(suggest_dt): use it.
+
 2012-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 5.07 released.
-
-2012-03-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
-
-	* daisy.C (previous_dt): New variable.
 
 2012-03-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
 

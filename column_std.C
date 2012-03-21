@@ -168,7 +168,7 @@ public:
   void tick_source (const Scope&, const Time&, Treelog&);
   double suggest_dt () const;
   void tick_move (const Metalib& metalib, 
-                  const Time&, double dt, const Weather*, 
+                  const Time&, const Time&, double dt, const Weather*, 
                   const Scope&, Treelog&);
   bool check (const Weather* global_weather,
               const Time& from, const Time& to, 
@@ -574,11 +574,11 @@ ColumnStandard::clear ()
 
 void
 ColumnStandard::tick_source (const Scope& parent_scope, 
-                             const Time& time, Treelog& msg)
+                             const Time& time_end, Treelog& msg)
 { 
   // Weather.
   if (weather.get ())
-    weather->weather_tick (time, msg);
+    weather->weather_tick (time_end, msg);
 
   // Find forward sink.
   drain->tick (geometry, *soil, *soil_heat, surface, *soil_water, msg);
@@ -624,7 +624,8 @@ ColumnStandard::suggest_dt () const
 }
 
 void
-ColumnStandard::tick_move (const Metalib& metalib, const Time& time, 
+ColumnStandard::tick_move (const Metalib& metalib, 
+                           const Time& time, const Time& time_end,
                            const double dt,
                            const Weather *const global_weather,
                            const Scope& parent_scope,
@@ -633,6 +634,9 @@ ColumnStandard::tick_move (const Metalib& metalib, const Time& time,
   // Scope.
   daisy_assert (extern_scope);
   ScopeMulti scope (*extern_scope, parent_scope);
+
+  if (weather.get ())
+    weather->weather_tick (time_end, msg);
 
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
   const double T_bottom = movement->bottom_heat (time, my_weather);
