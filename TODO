@@ -1,20 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Silstrup
+* Vejr
 
-** NW: max 1% change plus max_rain plus grov geometri
+* Dokumenter 5.00 - 5.06
 
-** NE: NW + bioporer til dræn overlapper ikke drænnode
-
-** SW: NE + ingen dræn, kun bioporer
-
-* Carsten
-
-Læs rettelser i 
-
-* Signe 
-
-Check opsætning med små tidsskridt
+* Dokumenter gnuplot vector
 
 * Søren
 

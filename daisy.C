@@ -67,6 +67,7 @@ struct Daisy::Implementation
   const double min_dt;
   double small_dt;
   double current_dt;
+  double previous_dt;
   Time time;
   Time previous;
   Time next_large;
@@ -249,6 +250,7 @@ struct Daisy::Implementation
       min_dt (minimal_timestep.total_hours ()),
       small_dt (max_dt),
       current_dt (max_dt),
+      previous_dt (NAN),
       time (al.submodel ("time")),
       previous (al.check ("previous")
                 ? Time (al.submodel ("previous"))
@@ -286,7 +288,7 @@ Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
   action->doIt (daisy, scope (), msg);
 
   // Find sources.
-  field->tick_source (scope (), msg); 
+  field->tick_source (scope (), time, msg); 
 
   // Find next timestep.
   Time next_time = Time::null ();
@@ -384,7 +386,8 @@ Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
     running = false;
 
   // Log values.
-  output_log->tick (daisy, previous, current_dt, msg);
+  output_log->tick (daisy, previous, previous_dt, msg);
+  previous_dt = current_dt;
 
   // Clear values for next timestep.
   field->clear ();

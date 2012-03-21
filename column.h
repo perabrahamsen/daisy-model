@@ -147,7 +147,7 @@ public:
 
   // Simulation.
   virtual void clear () = 0;
-  virtual void tick_source (const Scope&, Treelog&) = 0;
+  virtual void tick_source (const Scope&, const Time&, Treelog&) = 0;
   virtual double suggest_dt () const = 0;
   virtual void tick_move (const Metalib& metalib, 
                           const Time&, double dt, const Weather*, 
