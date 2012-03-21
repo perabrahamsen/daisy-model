@@ -8,17 +8,44 @@ release.
 
 * 5.08
 
-** Bug fixes.
+** Bug fixes, mostly affecting variable timesteps.
 
 * 5.07
 
 ** New "vector" gnuplot model.
 
+This model will plot 2D flux values as a vector field.
 
+  (defgnuplot MyVector vector
+    (when 2000 1 1) ; At point
+    ;; (begin 2000 1 1) (end 2001 1 1) ; Sum in interval.
+    (factor 0.4) ; Adjust lenght of vectors.
+    (legend none)
+    (file "matrix_water_flux.dlf"))
+  
+* 5.06 
+
+** Numeric adjustment of water movement and solute transport.
+
+* 5.05 
+
+** New 'stabilizing_method' in the Mollerup transport method.
+
+** New 'max_rain' weather parameter.
+
+Set this to decrease timestep under heavy rain.
+
+* 5.04 
+
+** Bug fix in secondary domain sorption.
+
+* 5.03 
+
+** Stabilizing secondary domain solute transport.
 
 * 5.02 
 
-** Numeric adjustment of water transport.
+** Numeric adjustment of water movement.
 
 * 5.01
 
