@@ -265,6 +265,9 @@ WSourceWeather::Implementation::find_sum_dt (const Time& from,
         }
       sum_hours += hours;
       missing -= delta;
+      if (missing < goal * 0.01)
+        // Avoid numeric problems with small numbers.
+        return sum_hours;
       time = when[i];
       i++;
     }
