@@ -828,7 +828,7 @@ Matrix solute transport model used for fully sorbed constituents.");
     frame.set ("matrix_solid", "none");
     frame.declare_boolean ("sink_sorbed", Attribute::Const,
                            "Substract sink term from sorbed matter.");
-    frame.set ("sink_sorbed", false);
+    frame.set ("sink_sorbed", true);
   }
 } MovementSolute_syntax;
 
