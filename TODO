@@ -1,9 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Mathias rootartikel
-
-
-
 * Søren
 
 Split q_tertiary i q_direct og q_b2m
@@ -74,20 +70,6 @@ Samme med Field nitrogen?
 
 * Make "chemistry multi" model obsolete by making column Chemistry a list 
 
-* 2D roots
-
-** beskriv dataset
-
-** vælg data
-
-** udtræk data
-
-** lav opsætning
-
-** kør opsætning
-
-** grafer og tabeller med resultater
-
 ** diskussion
 
 * Artikler
@@ -95,10 +77,6 @@ Samme med Field nitrogen?
 ** Artikel om ABA integration
 
 SHA: Verificering 
-
-** Artikel om 2D rødder
-
-SHA: Vent på Seyed artikel.
 
 ** Test dk-taastrup-hourly.dwf mod RS-Weather.dwf
 

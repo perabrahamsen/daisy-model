@@ -1,3 +1,8 @@
+2012-03-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* movement_solute.C, movement_solute.h (sink_sorbed): New
+	parameter.
+
 2012-03-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 5.09 released.

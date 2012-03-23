@@ -34,6 +34,7 @@ class MovementSolute : public Movement
 private:
   const auto_vector<Transport*> matrix_solute;
   const boost::scoped_ptr<Transport> matrix_solid;
+  const bool sink_sorbed;
   static void secondary_flow (const Geometry& geo, 
                               const std::vector<double>& Theta_old,
                               const std::vector<double>& Theta_new,
@@ -57,6 +58,7 @@ private:
   static void primary_transport (const Geometry& geo,
                                  const Soil& soil, const SoilWater& soil_water,
                                  const Transport&, 
+                                 const bool sink_sorbed,
                                  const size_t transport_iteration,
                                  const std::map<size_t, double>& J_forced,
                                  const std::map<size_t, double>& C_border,

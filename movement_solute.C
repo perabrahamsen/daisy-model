@@ -281,6 +281,7 @@ void
 MovementSolute::primary_transport (const Geometry& geo, const Soil& soil,
                                    const SoilWater& soil_water,
                                    const Transport& transport,
+                                   const bool sink_sorbed,
                                    const size_t transport_iteration,
                                    const std::map<size_t, double>& J_forced,
                                    const std::map<size_t, double>& C_border,
@@ -331,6 +332,17 @@ MovementSolute::primary_transport (const Geometry& geo, const Soil& soil,
         }
       daisy_assert (A[c] >= 0.0);
       S[c] = solute.S_primary (c) + S_extra[c];
+      if (sink_sorbed && S[c] < 0.0)
+        {
+          A[c] += S[c] * dt;
+          S[c] = 0.0;
+          if (A[c] < 0.0)
+            {
+              S[c] = A[c] / dt;
+              A[c] = 0.0;
+            }
+        }
+
       daisy_assert (std::isfinite (S[c]));
     }
   
@@ -358,6 +370,7 @@ MovementSolute::primary_transport (const Geometry& geo, const Soil& soil,
           tmp << "M[" << c << "] = " << M[c] 
               << " @ " << geo.cell_name (c)
               << ", C = " << C[c]
+              << ", A = " << A[c]
               << ", M_new = " << M[c]
               << ", M_old = " << solute.M_primary (c) << ", dt " << dt
               << ", S = " << S[c] 
@@ -688,7 +701,7 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
 
       // Primary "transport".
       primary_transport (geometry (), soil, soil_water,
-                         *matrix_solid, 0, J_primary, C_border,
+                         *matrix_solid, sink_sorbed, 0, J_primary, C_border,
                          chemical, S_extra, dt, scope, msg);
       return;
     }
@@ -709,7 +722,8 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
         try
           {
             primary_transport (geometry (), soil, soil_water, 
-                               *matrix_solute[i], transport_iteration,
+                               *matrix_solute[i], sink_sorbed, 
+                               transport_iteration,
                                J_primary, C_border,
                                chemical, S_extra, dt, scope, msg);
             if (i > 0)
@@ -791,7 +805,8 @@ MovementSolute::check_derived (Treelog& msg) const
 MovementSolute::MovementSolute (const BlockModel& al)
   : Movement (al),
     matrix_solute (Librarian::build_vector<Transport> (al, "matrix_solute")),
-    matrix_solid (Librarian::build_item<Transport> (al, "matrix_solid"))
+    matrix_solid (Librarian::build_item<Transport> (al, "matrix_solid")),
+    sink_sorbed (al.flag ("sink_sorbed"))
 { }
 
 static struct MovementSoluteSyntax : public DeclareBase
@@ -811,6 +826,9 @@ If none succeeds, the simulation ends.");
                        Attribute::Const, Attribute::Singleton, "\
 Matrix solute transport model used for fully sorbed constituents.");
     frame.set ("matrix_solid", "none");
+    frame.declare_boolean ("sink_sorbed", Attribute::Const,
+                           "Substract sink term from sorbed matter.");
+    frame.set ("sink_sorbed", false);
   }
 } MovementSolute_syntax;
 
