@@ -237,6 +237,9 @@ static const class CheckTable : public VCheck
       }
     return true;
   }
+ public:
+  CheckTable () 
+  { }
 } check_table;
 
 static struct DepthPLFSyntax : public DeclareModel
