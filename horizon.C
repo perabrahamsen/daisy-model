@@ -328,6 +328,9 @@ static const class SOM_fractions_check_type : public VCheck
       }
     return true;
   };
+ public:
+  SOM_fractions_check_type ()
+    { }
 } SOM_fractions_check;
 
 Horizon::Horizon (const BlockModel& al)
