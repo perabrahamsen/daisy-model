@@ -83,7 +83,7 @@ private:
   // Sink.
 public:
   void clear ();
-  void freeze (const Soil&, size_t c, double rate /* [h^-1] */);
+  void freeze (const Soil&, std::size_t c, double rate /* [h^-1] */);
   void drain (const std::vector<double>&, Treelog&);
   void forward_sink (const std::vector<double>& total, 
                      const std::vector<double>& sink);
@@ -91,56 +91,56 @@ public:
 
   // Queries
 public:
-  double h (size_t i) const
+  double h (std::size_t i) const
   { return h_[i]; }
-  double h_old (size_t i) const
+  double h_old (std::size_t i) const
   { return h_old_[i]; }
-  double Theta (size_t i) const
+  double Theta (std::size_t i) const
   { return Theta_[i]; }
-  double Theta_old (size_t i) const
+  double Theta_old (std::size_t i) const
   { return Theta_old_[i]; }
-  double Theta_primary (size_t i) const
+  double Theta_primary (std::size_t i) const
   { return Theta_primary_[i]; }
-  double Theta_primary_old (size_t i) const
+  double Theta_primary_old (std::size_t i) const
   { return Theta_primary_old_[i]; }
-  double Theta_secondary (size_t i) const
+  double Theta_secondary (std::size_t i) const
   { return Theta_secondary_[i]; }
-  double Theta_secondary_old (size_t i) const
+  double Theta_secondary_old (std::size_t i) const
   { return Theta_secondary_old_[i]; }
   double content_surface (const Geometry&, 
                           double from, double to) const; // [cm]
-  double S_root (size_t i) const
+  double S_root (std::size_t i) const
   { return S_root_[i]; }
-  double S_drain (size_t i) const
+  double S_drain (std::size_t i) const
   { return S_drain_[i]; }
-  double S_p (size_t i) const
+  double S_p (std::size_t i) const
   { return S_p_[i]; }
-  double S_ice_water (size_t i) const
+  double S_ice_water (std::size_t i) const
   { return S_ice_water_[i]; }
-  double S_forward_total (size_t i) const
+  double S_forward_total (std::size_t i) const
   { return S_forward_total_[i]; }
-  double S_forward_sink (size_t i) const
+  double S_forward_sink (std::size_t i) const
   { return S_forward_sink_[i]; }
-  double S_sum (size_t i) const
+  double S_sum (std::size_t i) const
   { return S_sum_[i]; }
-  double h_ice (size_t i) const
+  double h_ice (std::size_t i) const
   { return h_ice_[i]; }
-  double X_ice (size_t i) const
+  double X_ice (std::size_t i) const
   { return X_ice_[i]; }
-  double X_ice_total (size_t i) const
+  double X_ice_total (std::size_t i) const
   { return std::max (X_ice_[i] + X_ice_buffer_[i], 0.0); }
-  double q_matrix (size_t i) const
+  double q_matrix (std::size_t i) const
   { return q_matrix_[i]; }
-  double q_primary (size_t i) const
+  double q_primary (std::size_t i) const
   { return q_primary_[i]; }
-  double q_secondary (size_t i) const
+  double q_secondary (std::size_t i) const
   { return q_secondary_[i]; }
-  double q_tertiary (size_t i) const
+  double q_tertiary (std::size_t i) const
   { return q_tertiary_[i]; } 
-  double velocity_cell_primary (const Geometry& geo, size_t i) const;
-  double velocity_cell_secondary (const Geometry& geo, size_t i) const;
-  double Theta_ice (const Soil&, size_t i, double h) const;
-  double K_cell (size_t i) const
+  double velocity_cell_primary (const Geometry& geo, std::size_t i) const;
+  double velocity_cell_secondary (const Geometry& geo, std::size_t i) const;
+  double Theta_ice (const Soil&, std::size_t i, double h) const;
+  double K_cell (std::size_t i) const
   { return K_cell_[i]; }
 
   const std::vector<double>& h_all () const
@@ -148,8 +148,8 @@ public:
 
   // Modify.
 public:
-  void set_content (size_t cell, double h, double Theta);
-  void set_flux (size_t edge, double q);
+  void set_content (std::size_t cell, double h, double Theta);
+  void set_flux (std::size_t edge, double q);
   void set_matrix (const std::vector<double>& h,
                    const std::vector<double>& Theta,
                    const std::vector<double>& q);
@@ -178,12 +178,12 @@ public:
                double from, double middle, double to, Treelog&);
   double overflow (const Geometry&, const Soil&, const SoilHeat&, 
                    Treelog& msg);
-  bool check (size_t n, Treelog& err) const;
+  bool check (std::size_t n, Treelog& err) const;
   void output (Log& log) const;
 
   // Communication with surface.
 public:
-  double MaxExfiltration (const Geometry&, size_t edge, 
+  double MaxExfiltration (const Geometry&, std::size_t edge, 
                           const Soil&, double T) const;
   double infiltration (const Geometry&) const; // [mm/h]
 
