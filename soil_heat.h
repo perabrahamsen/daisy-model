@@ -63,10 +63,10 @@ private:
   std::vector<double> conductivity_;
 public:
   double T_top () const;	// [dg C]
-  double freezing_rate (const size_t c) const;
-  double T (size_t c) const	// [dg C]
+  double freezing_rate (const std::size_t c) const;
+  double T (std::size_t c) const	// [dg C]
   { return T_[c]; }
-  double conductivity (size_t c) const
+  double conductivity (std::size_t c) const
   { return conductivity_[c]; }
   double top_flux (const Geometry& geo,
                    const Soil&, const SoilWater&) const;
@@ -77,8 +77,8 @@ public:
                    const Soil& soil, const SoilWater& soil_water, 
                    double from, double to, double energy);
   void swap (const Geometry& geo, double from, double middle, double to);
-  double source (const Geometry&, const SoilWater&, size_t c) const;
-  void set_source (const size_t c, const double value); // [erg/cm^3/h]
+  double source (const Geometry&, const SoilWater&, std::size_t c) const;
+  void set_source (const std::size_t c, const double value); // [erg/cm^3/h]
 private:
   static double T_pseudo (const Geometry& geo,
 			  const int cell,
@@ -100,19 +100,19 @@ private:
 public:
   void tick (const Geometry&, const Soil&, SoilWater&, const double T_bottom, 
              const Movement&, const Surface& surface, double dt, Treelog& msg);
-  void tick_after (const size_t cell_size, 
+  void tick_after (const std::size_t cell_size, 
                    const Soil&, const SoilWater&, Treelog&);
   
   // Transport.
 private:
   void set_T_top (const double value);
-  void set_temperature (const size_t c, const double value);
-  void set_flux (const size_t e, const double value);
+  void set_temperature (const std::size_t c, const double value);
+  void set_flux (const std::size_t e, const double value);
 
   // Solve.
 private:
-  double capacity (const Soil&, const SoilWater&, size_t i) const;
-  double capacity_apparent (const Soil&, const SoilWater&, size_t i) const;
+  double capacity (const Soil&, const SoilWater&, std::size_t i) const;
+  double capacity_apparent (const Soil&, const SoilWater&, std::size_t i) const;
   void update_freezing_points (const Soil& soil,
                                const SoilWater& soil_water);
   bool update_state (const Geometry& geo,
@@ -133,7 +133,7 @@ private:
   // Create and destroy.
 public:
   void output (Log&) const;
-  bool check (size_t n, Treelog&) const;
+  bool check (std::size_t n, Treelog&) const;
   static void load_syntax (Frame&);
   SoilHeat (const Block&);
   void initialize (const FrameSubmodel&, const Geometry& geo, 
