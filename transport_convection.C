@@ -79,7 +79,7 @@ TransportConvection::flow (const Geometry& geo,
     Theta[c] = Theta_old[c];
 
   // Small timesteps.
-  for (;;)
+  while (time_left > 0.0)
     {
       // Solute M.
       std::vector<double> M (cell_size);
@@ -221,7 +221,7 @@ TransportConvection::flow (const Geometry& geo,
       time_left -= ddt;
 
       if (time_left < 0.1 * min_timestep_factor * dt)
-        break;
+        time_left = 0.0;
 
       const double time_spend = dt - time_left;
 

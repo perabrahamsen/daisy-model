@@ -1,3 +1,7 @@
+2012-04-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* transport_convection.C (flow): Update C after last small timestep.
+
 2012-03-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 5.10 released.
