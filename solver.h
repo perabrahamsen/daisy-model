@@ -47,7 +47,7 @@ public:
 
   // Types.
 public:
-  typedef boost::numeric::ublas::generalized_vector_of_vector<double, boost::numeric::ublas::row_major, boost::numeric::ublas::vector<boost::numeric::ublas::coordinate_vector<double> > > build_matrix;
+  typedef boost::numeric::ublas::generalized_vector_of_vector<double, boost::numeric::ublas::row_major, boost::numeric::ublas::vector<boost::numeric::ublas::mapped_vector<double> > > build_matrix;
   typedef boost::numeric::ublas::vector<double> Vector;
   struct Matrix : public SMatrix_type
   {
