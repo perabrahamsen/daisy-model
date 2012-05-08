@@ -7,10 +7,8 @@
 # The following envirnoment variables are used:
 #
 # HOSTTYPE
-#	i386-linux	Create code for ia32 / Linux.
-#	win32		Create code for Win32 / Pentium.
-#	cygwin		Create code for Cygwin / Pentium.
-#	mingw		Create code for Mingw / Pentium.
+#	unix		Native exe for Ubunta
+#	mingw		Generic code for Mingw
 
 # All makefiles should have these.
 #
@@ -20,33 +18,26 @@ MAKEFLAGS =
 # HOSTTYPE is not defined in the native win32 Emacs.
 #
 ifeq ($(OS),Windows_NT)
-#	HOSTTYPE = cygwin
 	HOSTTYPE = mingw
-#	HOSTTYPE = win32
 else
-	HOSTTYPE = x86_64
+	HOSTTYPE = unix
 endif
 
-# HOSTTYPE .
-#
 # Some non-local files and directories.
 
-ifeq ($(HOSTTYPE),x86_64)
+ifeq ($(HOSTTYPE),unix)
 SRCDIR = $(HOME)/daisy
 OBJHOME =  $(SRCDIR)/obj
 NATIVEHOME = $(OBJHOME)
 NATIVEEXE = daisy daisyw
 USE_GUI = Q4
-BOOSTINC = #-isystem $(HOME)/boost/include/boost-1_35/
+BOOSTINC = 
 else
 SRCDIR = ..
 OBJHOME = obj
 NATIVEHOME = $(OBJHOME)
 NATIVEEXE = daisy.exe daisyw.exe
 USE_GUI = Q4
-#BOOSTINC = -isystem $(CYGHOME)/usr/include/boost-1_33_1
-#BOOSTINC = -isystem /cygdrive/c/boostcvs
-#BOOSTINC = -isystem /cygdrive/c/boostsvn/boost-sandbox
 BOOSTINC = -isystem $(CYGHOME)/home/abraham/boost_1_46_0
 SETUPDIR = /home/abraham/daisy/install
 MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
@@ -58,45 +49,18 @@ SVNROOT = https://daisy-model.googlecode.com/svn
 # Set USE_GUI to Q4 or none, depending on what GUI you want.
 #
 
-# Set USE_OPTIMIZE to `true' if you want a fast executable.
+# Set USE_OPTIMIZE to 'native', 'portable' or 'none'.
 #
-USE_OPTIMIZE = true
-#USE_OPTIMIZE = false
+USE_OPTIMIZE = native
 
 # Set USE_PROFILE if you want to profile the executable
 #
 #USE_PROFILE = true
 USE_PROFILE = false
 
-# Set COMPILER according to which compiler you use.
-#	gcc		Use the GNU compiler.
-#	borland		Use the Borland compiler.
-#
-ifeq ($(HOSTTYPE),i386-linux)
-	COMPILER = gcc
-endif
-ifeq ($(HOSTTYPE),x86_64)
-	COMPILER = gcc
-endif
-ifeq ($(HOSTTYPE),win32)
-	COMPILER = borland
-endif
-ifeq ($(HOSTTYPE),mingw)
-	COMPILER = gcc
-endif
-
-# Microsoft lacks some common Unix functions.
-#
-#MSSRC = win32_unistd.c
-MSSRC =
-
 WINSRC = w32reg.c
 WINOBJ = w32reg.o
 WINHDR = w32reg.h
-
-ifeq ($(COMPILER),ms)
-SYSSOURCES = $(MSSRC)
-endif
 
 ifeq ($(HOSTTYPE),mingw)
 SYSSOURCES = $(WINSRC)
@@ -110,100 +74,50 @@ ALLSYSHDR = $(WINHDR)
 # Find the profile flags.
 #
 ifeq ($(USE_PROFILE),true)
-	ifneq ($(COMPILER),borland)
-		PROFILE = -pg
-	endif
+	PROFILE = -pg
 endif
 
 # Find the optimize flags.
 #
-ifeq ($(USE_OPTIMIZE),true)
-	ifeq ($(COMPILER),gcc)
-		OPTIMIZE = -O3 -ffast-math -fno-finite-math-only 
-		ifeq ($(HOSTTYPE),i386-linux)
-		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mtune=generic -march=pentium
-	        endif
-		ifeq ($(HOSTTYPE),x86_64)
-		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mtune=native  -march=native
-	        endif
-		ifeq ($(HOSTTYPE),cygwin)
-		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mtune=generic -march=pentium
-		endif
-		ifeq ($(HOSTTYPE),mingw)
-		  OPTIMIZE = -O3 -ffast-math -fno-finite-math-only -mtune=generic -march=pentium
-		endif
-	endif
-	ifeq ($(COMPILER),icc)
-		OPTIMIZE = -O2
-	endif
-else
-	ifeq ($(COMPILER),icc)
-		OPTIMIZE = -O0
-	endif
+ifeq ($(USE_OPTIMIZE),portable)
+	OPTEXTRA = -mtune=generic -march=pentium
 endif
 
-# Do we want to create a dynamic library?
-#
-ifeq ($(HOSTTYPE),i386-linux)
-	USE_DYNLIB = false
-endif
-ifeq ($(HOSTTYPE),x86_64)
-	USE_DYNLIB = false
-endif
-ifeq ($(HOSTTYPE),win32)
-	USE_DYNLIB = false
-endif
-ifeq ($(HOSTTYPE),cygwin)
-	USE_DYNLIB = false
-endif
-ifeq ($(HOSTTYPE),mingw)
-	USE_DYNLIB = false
+ifeq ($(USE_OPTIMIZE),native)
+	OPTEXTRA = -mtune=native  -march=native
 endif
 
-# Create the right compile command.
-#
-ifeq ($(USE_DYNLIB),true)
-	DYNSEARCH = -R`pwd`
+ifneq ($(USE_OPTIMIZE),none)
+	OPTIMIZE = -O3 -ffast-math -fno-finite-math-only $(OPTEXTRA)
 endif
 
-GCC = gcc
-CROSSGCC = /cygdrive/c/MinGW/bin/gcc.exe
+PREFIX =
 
 STRIP = strip
 
-ifeq ($(COMPILER),gcc)
 #	New warning flags in GCC 4.4
-	WAR4    = -Wlogical-op -Wstrict-null-sentinel -Wvariadic-macros -Wvla \
-		  -Wmissing-declarations -Wfloat-equal -Wcast-qual 
+WAR4    = -Wlogical-op -Wstrict-null-sentinel -Wvariadic-macros -Wvla \
+	  -Wmissing-declarations -Wfloat-equal -Wcast-qual 
 #	GCC 3 had gave uninitialized warnings during initialization.
-	WAR3	= -Wno-uninitialized -Wno-unknown-pragmas 
+WAR3	= -Wno-uninitialized -Wno-unknown-pragmas 
 
-	ifeq ($(HOSTTYPE),i386-linux)
-		OSFLAGS = 
-		DEBUG = -g
-	endif
-	ifeq ($(HOSTTYPE),x86_64)
-		WAREXTRA = $(WAR4)
-		OSFLAGS = 
-		DEBUG = -g
-	endif
-	ifeq ($(HOSTTYPE),cygwin)
-		OSFLAGS =
-		DEBUG = -g
-	endif
-	ifeq ($(HOSTTYPE),mingw)
-		WAREXTRA = $(WAR3)
-		OSFLAGS = -DMINGW -mno-cygwin
-#		          -I/home/mingw/include -L/home/mingw/lib
-		DEBUG = -g
-	endif
+ifeq ($(HOSTTYPE),unix)
+	WAREXTRA = $(WAR4)
+	OSFLAGS = 
+	DEBUG = -g
+endif
+ifeq ($(HOSTTYPE),mingw)
+	WAREXTRA = $(WAR3)
+	OSFLAGS = -DMINGW
+	DEBUG = -g
+endif
 
-	WARNING = -Wall -Wextra $(WAREXTRA) \
-		  -Woverloaded-virtual -Wundef -Wpointer-arith -Wwrite-strings \
-		  -Wcast-align -Wmissing-format-attribute \
-		  -Wold-style-cast -Wformat=2 -Winit-self \
-		  -Wsign-promo -Wredundant-decls \
-		  -Wno-unused-parameter -Wno-sign-compare 
+WARNING = -Wall -Wextra $(WAREXTRA) \
+	  -Woverloaded-virtual -Wundef -Wpointer-arith -Wwrite-strings \
+	  -Wcast-align -Wmissing-format-attribute \
+	  -Wold-style-cast -Wformat=2 -Winit-self \
+	  -Wsign-promo -Wredundant-decls \
+	  -Wno-unused-parameter -Wno-sign-compare 
 
 
 # I use these a lot:
@@ -212,30 +126,14 @@ ifeq ($(COMPILER),gcc)
 # This one doesn't work (gcc 4.4 linux/amd64):
 #   -Wunreachable-code: triggered by constructors?
 
-	COMPILE = $(GCC) -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
-	CCOMPILE = $(COMPILE)
-	CPPLIB = -lstdc++
-endif
-ifeq ($(COMPILER),borland)
-	WARNFLAGS = -w-csu -wdef -wnod -wamb -w-par -w-hid
-	COMPILE = $(BORLAND)Bin/bcc32 -P -v $(WARNFLAGS)
-	CCOMPILE = $(BORLAND)Bin/bcc32 -P- -v $(WARNFLAGS)
-endif
-ifeq ($(COMPILER),icc)
-	COMPILE = /opt/intel/compiler70/ia32/bin/icc -Xc -x c++ -g -w1
-	CCOMPILE = /opt/intel/compiler70/ia32/bin/icc -Xc -x c -g -w1
-endif
+COMPILE = $(PREFIX)gcc -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
+CCOMPILE = $(COMPILE)
+CPPLIB = -lstdc++
 
 CSHARP = /cygdrive/C/WINDOWS/Microsoft.NET/Framework/v2.0.50727/csc.exe
 
 csdaisy.exe:	csmain.cs csdaisy.netmodule
 	$(CSHARP) /out:csdaisy.exe /addmodule:csdaisy.netmodule csmain.cs
-
-#csdaisydll.exe:	csmain.cs csdaisy.dll
-#	$(CSHARP) /out:csdaisy.exe /r:csdaisy.dll csmain.cs 
-
-#csdaisy.dll: csdaisy.cs
-#	$(CSHARP) /target:library csdaisy.cs
 
 .cs.netmodule:
 	$(CSHARP) /target:module $<
@@ -244,77 +142,30 @@ csdaisy.exe:	csmain.cs csdaisy.netmodule
 #
 CC = $(COMPILE) $(OPTIMIZE) $(PROFILE)
 
-# Find the rigth math library.
-#
-ifeq ($(HOSTTYPE),i386-linux)
-	MATHLIB =
-endif
-ifeq ($(HOSTTYPE),x86_64)
-	MATHLIB =
-endif
-ifeq ($(HOSTTYPE),win32)
-	MATHLIB =
-endif
-ifeq ($(HOSTTYPE),cygwin)
-	MATHLIB =
-endif
-ifeq ($(HOSTTYPE),mingw)
-	MATHLIB =
-endif
-
 # Locate the CSSparse lib
 CXSPARSELIB = -L../libdeps -lcxsparse
 CXSPARSEHEAD = ublas_cxsparse.h cs.h UFconfig.h
 
-# Locate the Qt library.
-#
-ifeq ($(HOSTTYPE),i386-linux)
-# Locate the Qt library.
-#
-QTINCLUDE	= -I/usr/include/qt
-QTLIB		= -lqt -L/usr/X11R6/lib -lX11 -lm
-QTMOC		= moc
-else
-QTINCLUDE	= -I/pack/qt/include -I/usr/openwin/include
-QTLIB		= -L/pack/qt/lib -R/pack/qt/lib -lqt \
-		  -L/usr/openwin/lib -R/usr/openwin/lib \
-		  -lXext -lX11 -lsocket -lnsl -lm
-QTMOC		= /pack/qt/bin/moc
 # Locate Qt 4
 Q4INCLUDE	= -isystem /usr/include/qt4 
 Q4LIB		= -lQtGui -lQtCore
 Q4MOC		= moc
-endif
 
 ifeq ($(HOSTTYPE),mingw)
 Q4HOME = /cygdrive/c/Qt/4.5.2
 Q4INCLUDE	= -isystem $(Q4HOME)/include
-ifeq (false,true)
-Q4SYS		= -lGDI32 -lole32 -lOleaut32 -luuid -lImm32 -lwinmm \
-		  -lWinspool -lWs2_32 -lcomdlg32
-Q4LIB		= -L$(Q4HOME)/lib -lQtGui -lQtCore $(Q4SYS) 
-else
 Q4LIB		= -L$(Q4HOME)/lib -lQtGui4 -lQtCore4
-endif
 Q4MOC		= $(Q4HOME)/bin/moc
 endif
 
 # Find the right file extension.
 #
-ifeq ($(HOSTTYPE),win32)
-	OBJ = .obj
+OBJ = .o
+ifeq ($(HOSTTYPE),unix)
+	EXE =
+endif
+ifeq ($(HOSTTYPE),mingw)
 	EXE = .exe
-else
-	OBJ = .o
-	ifeq ($(HOSTTYPE),cygwin)
-		EXE = .exe
-	else
-		ifeq ($(HOSTTYPE),mingw)
-			EXE = .exe
-		else
-			EXE =
-		endif
-	endif
 endif
 
 ifeq ($(HOSTTYPE),mingw)
@@ -325,16 +176,7 @@ endif
 
 # Figure out how to link.
 #
-ifeq ($(COMPILER),borland)
-	LINK = $(BORLAND)Bin/BCC32 -lw-dup -e
-	DLLLINK = $(BORLAND)Bin/BCC32 -WD -lTpd -lw-dup -e
-endif
-ifeq ($(COMPILER),gcc)
-	LINK = $(CC) $(DYNSEARCH) $(DEBUG) -o
-endif
-ifeq ($(COMPILER),icc)
-	LINK = /opt/intel/compiler70/ia32/bin/icc -g -o
-endif
+LINK = $(PREFIX)g++ $(DEBUG) -o
 NOLINK = -c
 
 # Select the C files that doesn't have a corresponding header file.
@@ -577,25 +419,25 @@ all:
 # Create a DLL.
 #
 daisy.dll: $(LIBOBJ) 
-	$(CC) -shared -o $@ $^ $(CPPLIB) $(MATHLIB) $(CXSPARSELIB) -Wl,--out-implib,libdaisy.a 
+	$(LINK)$@ -shared $^ $(CPPLIB) $(CXSPARSELIB) -Wl,--out-implib,libdaisy.a 
 
 daisy_Qt.dll: $(Q4OBJECTS) daisy.dll
-	$(CC) -shared -o $@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy_Qt.a 
+	$(LINK)$@ -shared $^ $(GUILIB) $(CPPLIB) -Wl,--out-implib,libdaisy_Qt.a 
 
 
 # Create the main executable.
 #
 daisy.exe:	main${OBJ} daisy.dll
-	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB)
+	$(LINK)$@ $^ $(CPPLIB)
 
 daisyw.exe:	$(GUIOBJECTS) daisy.dll
-	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) -Wl,--enable-runtime-pseudo-reloc -mwindows
+	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) -Wl,--enable-runtime-pseudo-reloc -mwindows
 
 daisy:	main${OBJ} $(LIBOBJ)
-	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB)  $(CXSPARSELIB)
+	$(LINK)$@ $^ $(CPPLIB)  $(CXSPARSELIB)
 
 daisyw:	$(GUIOBJECTS) $(LIBOBJ)
-	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB)  $(CXSPARSELIB)
+	$(LINK)$@ $^ $(GUILIB) $(CPPLIB)  $(CXSPARSELIB)
 
 exp:	
 	(cd $(OBJHOME)/exp \
@@ -605,6 +447,16 @@ linux:
 	(mkdir -p $(NATIVEHOME) \
 	 && cd $(NATIVEHOME) \
          && time $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile $(NATIVEEXE))
+
+win32:	
+	(mkdir -p x86_64-w64-mingw32 \
+	 && cd x86_64-w64-mingw32 \
+         && time $(MAKE) "BOOSTINC=-isystem ../../boost_1_49_0" PREFIX="x86_64-w64-mingw32-" VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile daisy.exe)
+
+win64:	
+	(mkdir -p i686-w64-mingw32 \
+	 && cd i686-w64-mingw32 \
+         && time $(MAKE) "BOOSTINC=-isystem ../../boost_1_49_0" PREFIX="i686-w64-mingw32-" VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile daisy.exe)
 
 native:	
 	(cd OpenMI && time $(MAKE) all ) \
@@ -621,23 +473,23 @@ cross:
 	(cd obj \
          && $(MAKE) "PATH=/cygdrive/c/MinGW/bin:$(PATH)" \
 		    "CYGHOME=C:/cygwin" Q4HOME=c:/Qt/4.5.2\
-	            GCC=$(CROSSGCC) VPATH=$(SRCDIR) \
+	            VPATH=$(SRCDIR) USE_OPTIMIZE=portable \
                     -f $(SRCDIR)/Makefile daisy${EXE} daisyw.exe)
 
 # Create manager test executable.
 #
 mandaisy${EXE}:	manmain${OBJ} daisy.so
-	$(LINK)$@  $^ $(MATHLIB)
+	$(LINK)$@  $^
 
 # Create bug test executable.
 #
 bugdaisy${EXE}:	bugmain${OBJ} daisy.so
-	$(LINK)$@  $^ $(MATHLIB)
+	$(LINK)$@  $^
 
 # Create executable with embedded tcl/tk.
 #
 tkdaisy${EXE}:	tkmain${OBJ} daisy.so
-	$(LINK)$@ $^ $(TKLIB) $(MATHLIB)
+	$(LINK)$@ $^ $(TKLIB)
 
 # Create executable with Gtk--.
 #
@@ -652,23 +504,23 @@ qdaisy${EXE}:	$(QTOBJECTS) daisy.so
 # Create the C main executable.
 #
 cdaisy${EXE}:  cmain${OBJ} daisy.dll
-	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB)
+	$(LINK)$@ $^ $(CPPLIB)
 
 ddaisy${EXE}:  main${OBJ} daisy.dll $(GUIOBJECTS) 
-	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB)
+	$(LINK)$@ $^ $(GUILIB) $(CPPLIB)
 
 cdaisy-mshe${EXE}:  cmain-mshe${OBJ} daisy.so
-	$(LINK)$@ cmain-mshe${OBJ} `pwd`/daisy.so $(MATHLIB)
+	$(LINK)$@ cmain-mshe${OBJ} `pwd`/daisy.so
 
 # Create the C main executable for testing.
 #
 cdaisy_test${EXE}:  cmain_test${OBJ} daisy.so
-	$(LINK)$@ $^ $(MATHLIB)
+	$(LINK)$@ $^
 
 # Create a shared library.
 #
 daisy.so: $(LIBOBJ)
-	$(CC) -shared -o daisy.so $^ $(MATHLIB)
+	$(CC) -shared -o daisy.so $^
 
 # toplevel.o cdaisy.o:
 #	 $(CC) $(NOLINK) -DBUILD_DLL $<
@@ -677,12 +529,12 @@ daisy.so: $(LIBOBJ)
 # Boost test
 
 btest${EXE}: btest.C
-	$(LINK)$@ -isystem /usr/include/boost-1_33_1/ $< $(CPPLIB) $(MATHLIB)
+	$(LINK)$@ -isystem /usr/include/boost-1_33_1/ $< $(CPPLIB)
 
 # Create the MMM executable.
 
 mmm${EXE}:	$(MOBJECTS)
-	$(LINK)$@  $^ $(MATHLIB)
+	$(LINK)$@  $^
 
 # Count the size of daisy.
 #
@@ -728,7 +580,7 @@ UTESTSRC = ut_iterative.C ut_units.C ut_scope_exchange.C
 UTESTOBJ = $(UTESTSRC:.C=${OBJ})
 
 utest${EXE}: $(UTESTOBJ) $(LIBOBJ)
-	$(CC) -o $@ $^ $(GTESTLIB) $(CPPLIB) $(MATHLIB) $(CXSPARSELIB) 
+	$(CC) -o $@ $^ $(GTESTLIB) $(CPPLIB) $(CXSPARSELIB) 
 
 unittest:
 	(mkdir -p $(NATIVEHOME) \
