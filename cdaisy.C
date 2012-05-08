@@ -51,9 +51,7 @@
 
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
 
-#ifdef MINGW
 #ifdef __unix
-#error "Unix?"
 #define EXPORT /* Nothing */
 #elif defined (BUILD_DLL)
 /* DLL export */
@@ -61,9 +59,6 @@
 #else
 /* EXE import */
 #define EXPORT __declspec(dllimport)
-#endif
-#else // !MINGW
-#define EXPORT
 #endif
 
 #define DAISY_CATCH_BLOCK(toplevel) \
