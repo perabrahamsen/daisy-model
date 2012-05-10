@@ -386,7 +386,8 @@ HEADERS = $(INTERFACES:.C=.h) $(HEADONLY)
 
 # Find all printable files.
 #
-TEXT =  control-shared.txt ChangeLog.3 ChangeLog.2 ChangeLog.1 setup.nsi \
+TEXT =  setup-native.nsi \
+	control-shared.txt ChangeLog.3 ChangeLog.2 ChangeLog.1 setup.nsi \
 	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB  $(DISABLED) \
 	$(HEADERS) $(SOURCES) $(ALLSYSHDR) $(ALLSYSSRC) \
 	$(ALLGUIHDR) $(ALLGUISRC) $(UTESTSRC)
@@ -727,6 +728,23 @@ upload:
 		-s "Daisy version $(TAG) installer for MS Windows" \
 		-l Type-Installer,OpSys-Windows,Featured \
 		daisy-$(TAG)-setup.exe
+
+setup-native: 
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	$(MAKE) win64
+	rm -rf $(SETUPDIR)
+	mkdir $(SETUPDIR)
+	cp ChangeLog NEWS $(SETUPDIR)
+	mkdir $(SETUPDIR)/src
+	cp $(TEXT) $(SETUPDIR)/src
+	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
+	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
+	mkdir $(SETUPDIR)/bin
+	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe i686-w64-mingw32/daisy.exe
+	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll i686-w64-mingw32/daisy.dll
+	cp /usr/i686-w64-mingw32/sys-root/bin/libgcc_s_sjlj_1.dll $(SETUPDIR)/bin
+	cp /usr/i686-w64-mingw32/sys-root/bin/libstdc++-6.dll $(SETUPDIR)/bin
+	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
 
 debiannosvn: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi

@@ -1,3 +1,9 @@
+2012-05-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* solver.h (Solver::build_matrix): Use mapped vector instead of
+	coordinate vector, to circumvent ublas bug exposed by newer
+	compilers.
+
 2012-04-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 5.11 released.
