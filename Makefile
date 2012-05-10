@@ -740,7 +740,7 @@ setup-native:
 	$(STRIP) -o install/bin/daisy.dll i686-w64-mingw32/daisy.dll
 	cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libgcc_s_sjlj-1.dll install/bin
 	cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libstdc++-6.dll install/bin
-	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
+	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup-native.nsi
 
 debiannosvn: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
