@@ -41,6 +41,7 @@ USE_GUI = Q4
 BOOSTINC = -isystem $(CYGHOME)/home/abraham/boost_1_46_0
 SETUPDIR = /home/abraham/daisy/install
 MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
+MAKENSIS = "/cygdrive/c/Program Files (x86)/NSIS/makensis.exe"
 MINGWHOME = /cygdrive/c/MinGW
 endif
 
@@ -449,11 +450,6 @@ linux:
 	 && cd $(NATIVEHOME) \
          && time $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile $(NATIVEEXE))
 
-win32:	
-	(mkdir -p x86_64-w64-mingw32 \
-	 && cd x86_64-w64-mingw32 \
-         && time $(MAKE) "BOOSTINC=-isystem ../../boost_1_49_0" PREFIX="x86_64-w64-mingw32-" VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile daisy.exe)
-
 win64:	
 	(mkdir -p i686-w64-mingw32 \
 	 && cd i686-w64-mingw32 \
@@ -732,18 +728,18 @@ upload:
 setup-native: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	$(MAKE) win64
-	rm -rf $(SETUPDIR)
-	mkdir $(SETUPDIR)
-	cp ChangeLog NEWS $(SETUPDIR)
-	mkdir $(SETUPDIR)/src
-	cp $(TEXT) $(SETUPDIR)/src
-	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
-	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
-	mkdir $(SETUPDIR)/bin
-	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe i686-w64-mingw32/daisy.exe
-	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll i686-w64-mingw32/daisy.dll
-	cp /usr/i686-w64-mingw32/sys-root/bin/libgcc_s_sjlj_1.dll $(SETUPDIR)/bin
-	cp /usr/i686-w64-mingw32/sys-root/bin/libstdc++-6.dll $(SETUPDIR)/bin
+	rm -rf install
+	mkdir install
+	cp ChangeLog NEWS install
+	mkdir install/src
+	cp $(TEXT) install/src
+	(cd lib && $(MAKE) SETUPDIR=../install TAG=$(TAG) setup)
+	(cd sample && $(MAKE) SETUPDIR=../install TAG=$(TAG) setup)
+	mkdir install/bin
+	$(STRIP) -o install/bin/daisy.exe i686-w64-mingw32/daisy.exe
+	$(STRIP) -o install/bin/daisy.dll i686-w64-mingw32/daisy.dll
+	cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libgcc_s_sjlj-1.dll install/bin
+	cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libstdc++-6.dll install/bin
 	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
 
 debiannosvn: 
