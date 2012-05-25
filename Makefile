@@ -41,7 +41,7 @@ USE_GUI = Q4
 BOOSTINC = -isystem $(CYGHOME)/home/abraham/boost_1_46_0
 SETUPDIR = /home/abraham/daisy/install
 MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
-MAKENSIS = "/cygdrive/c/Program Files (x86)/NSIS/makensis.exe"
+#MAKENSIS = "/cygdrive/c/Program Files (x86)/NSIS/makensis.exe"
 MINGWHOME = /cygdrive/c/MinGW
 endif
 
@@ -143,8 +143,10 @@ csdaisy.exe:	csmain.cs csdaisy.netmodule
 #
 CC = $(COMPILE) $(OPTIMIZE) $(PROFILE)
 
-# Locate the CSSparse lib
-CXSPARSELIB = -L../libdeps -lcxsparse
+# Locate the CSSparse lib -L../libdeps
+#CXSPARSELIB = -L../libdeps -lcxsparse
+CXSPARSELIB = /usr/lib/libcxsparse.so.2.2.3
+
 CXSPARSEHEAD = ublas_cxsparse.h cs.h UFconfig.h
 
 # Locate Qt 4
@@ -183,7 +185,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = gnuplot_vector.C program_optimize.C summary_Rsqr.C \
+MODELS = rootdens_growth.C gnuplot_vector.C program_optimize.C summary_Rsqr.C \
 	log_table.C xysource_profile.C program_rootmatch.C program_hmovie.C \
 	wsource_std.C wsource_time.C wsource_combine.C wsource_indirect.C\
 	wsource_table.C wsource_const.C \
@@ -1462,6 +1464,11 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+rootdens_growth${OBJ}: rootdens_growth.C rootdens.h model_framed.h \
+ model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
+ scope.h attribute.h treelog.h frame_model.h frame.h geometry.h log.h \
+ time.h border.h check.h mathlib.h assertion.h librarian.h iterative.h \
+ metalib.h library.h
 gnuplot_vector${OBJ}: gnuplot_vector.C gnuplot_base.h gnuplot.h model.h \
  symbol.h block_model.h block_nested.h block.h scope.h attribute.h \
  treelog.h frame_model.h frame.h lexer_flux.h lexer_table.h mathlib.h \

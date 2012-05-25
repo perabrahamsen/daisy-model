@@ -812,7 +812,7 @@ ColumnStandard::check (const Weather* global_weather,
   }
   {
     Treelog::Open nest (msg, "Vegetation");
-    if (!vegetation->check (units, msg))
+    if (!vegetation->check (units, geometry, msg))
       ok = false;
   }
   {

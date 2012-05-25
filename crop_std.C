@@ -210,7 +210,7 @@ struct CropStandard : public Crop
   void initialize_shared (const Metalib& metalib, 
                           const Geometry&, OrganicMatter&, 
                           double SoilLimit, const Time&, Treelog&);
-  bool check (const Units&, Treelog&) const;
+  bool check (const Units&, const Geometry&, Treelog&) const;
   CropStandard (const BlockModel& vl);
   ~CropStandard ();
 };
@@ -303,14 +303,15 @@ CropStandard::initialize_shared (const Metalib& metalib, const Geometry& geo,
 }
 
 bool
-CropStandard::check (const Units& units, Treelog& msg) const
+CropStandard::check (const Units& units, const Geometry& geo, 
+                     Treelog& msg) const
 {
   TREELOG_MODEL (msg);
 
   bool ok = true;
   if (!seed->check (msg))
     ok = false;
-  if (!root_system->check (units, msg))
+  if (!root_system->check (units, geo, msg))
     ok = false;
   if (seed->initial_N () <= 0.0 && production.NCrop <= 0.0)
     {

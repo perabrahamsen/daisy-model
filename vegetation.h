@@ -167,7 +167,7 @@ public:
                            const Units&, const Time&, const Geometry& geo,
                            const Soil& soil, OrganicMatter&,
                            Treelog&) = 0;
-  virtual bool check (const Units&, Treelog& msg) const = 0;
+  virtual bool check (const Units&, const Geometry&, Treelog& msg) const = 0;
   explicit Vegetation (const BlockModel&);
   ~Vegetation ();
 };

@@ -158,7 +158,7 @@ public:
                            double row_width, double row_pos, double seed,
                            OrganicMatter&, 
                            double SoilLimit, const Time& now, Treelog&) = 0;
-  virtual bool check (const Units&, Treelog& msg) const = 0;
+  virtual bool check (const Units&, const Geometry&, Treelog& msg) const = 0;
 protected:
   Crop (const BlockModel&);
 public:

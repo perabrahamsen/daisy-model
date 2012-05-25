@@ -221,7 +221,7 @@ struct VegetationCrops : public Vegetation
                    const Units&, const Time&, const Geometry& geo,
                    const Soil& soil, OrganicMatter&,
                    Treelog& msg);
-  bool check (const Units& units, Treelog& msg) const;
+  bool check (const Units& units, const Geometry&, Treelog& msg) const;
   static CropList build_crops (const BlockModel& block, const std::string& key);
   VegetationCrops (const BlockModel&);
   ~VegetationCrops ();
@@ -875,7 +875,7 @@ If you want two " + name + " you should rename one of them");
   crop->initialize (metalib, 
                     units, geo, row_width, row_pos, seed, organic_matter,
                     SoilLimit, time, msg);
-  if (!crop->check (units, msg))
+  if (!crop->check (units, geo, msg))
     {
       msg.error ("Sow failed");
       return;
@@ -910,13 +910,14 @@ VegetationCrops::initialize (const Metalib& metalib,
 }
 
 bool 
-VegetationCrops::check (const Units& units, Treelog& msg) const
+VegetationCrops::check (const Units& units, const Geometry& geo,
+                        Treelog& msg) const
 {
   bool ok = true;
   for (size_t i = 0; i < crops.size (); i++)
     {
       Treelog::Open nest (msg, "crop:' " + crops[i]->objid + "'");
-      crops[i]->check (units, msg);
+      crops[i]->check (units, geo, msg);
     }
   return ok;
 }

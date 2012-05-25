@@ -502,11 +502,20 @@ RootSystem::initialize (const Units& units, const Geometry& geo, Treelog& msg)
 }
 
 bool
-RootSystem::check (const Units& units, Treelog& msg) const
+RootSystem::check (const Units& units, const Geometry& geo, Treelog& msg) const
 {
+  const size_t cell_size = geo.cell_size ();
   bool ok = true;
   if (!ABAprod->check (units, msg))
     ok = false;
+  if (Density.size () > 0 && Density.size () != cell_size)
+    {
+      std::ostringstream tmp;
+      tmp << "Density has " << Density.size () 
+          << " cells, soil has " << cell_size << " cells";
+      msg.error (tmp.str ());
+      ok = false;
+    }
   return ok;
 }
 
@@ -563,7 +572,7 @@ RootSystem::load_syntax (Frame& frame)
   frame.declare ("Depth", "cm", Check::non_negative (), Attribute::OptionalState,
                  "Rooting Depth.");
   frame.declare ("Density", "cm/cm^3", Check::non_negative (),
-                 Attribute::LogOnly, Attribute::SoilCells,
+                 Attribute::OptionalState, Attribute::SoilCells,
                  "Root density in soil layers.");
   frame.declare ("H2OExtraction", "cm^3/cm^3/h", Check::non_negative (), 
                  Attribute::LogOnly, Attribute::SoilCells,
@@ -641,6 +650,9 @@ RootSystem::RootSystem (const Block& al)
     Rxylem (al.number ("Rxylem")),
     PotRtDpt (get_PotRtDpt (al)),
     Depth (al.check ("Depth") ? al.number ("Depth") : al.number ("DptEmr")),
+    Density (al.check ("Density")
+             ? al.number_sequence ("Density")
+             : std::vector<double> ()),
     ABAConc (al.number ("ABAConc")),
     h_x (al.number ("h_x")),
     partial_soil_temperature (al.number ("partial_soil_temperature")),
@@ -661,3 +673,5 @@ RootSystem::~RootSystem ()
 static DeclareSubmodel 
 root_system_submodel (RootSystem::load_syntax, "RootSystem", "\
 Standard root system model.");
+
+// root_system.C ends here.

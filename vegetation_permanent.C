@@ -205,7 +205,7 @@ struct VegetationPermanent : public Vegetation
                    const Units&, const Time& time, const Geometry& geo,
                    const Soil& soil, OrganicMatter&, 
                    Treelog&);
-  bool check (const Units&, Treelog&) const;
+  bool check (const Units&, const Geometry&, Treelog&) const;
   VegetationPermanent (const BlockModel&);
   ~VegetationPermanent ();
 };
@@ -386,10 +386,11 @@ VegetationPermanent::initialize (const Metalib& metalib,
 }
 
 bool 
-VegetationPermanent::check (const Units& units, Treelog& msg) const 
+VegetationPermanent::check (const Units& units,
+                            const Geometry& geo, Treelog& msg) const 
 { 
   bool ok = true;
-  if (!root_system->check (units, msg))
+  if (!root_system->check (units, geo, msg))
     ok = false;
   return ok;
 }

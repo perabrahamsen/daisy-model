@@ -54,6 +54,8 @@ struct BioclimateStandard : public Bioclimate
 { 
   const Metalib& metalib;
 
+  static const double reference_height; // [m]
+
   // Canopy State.
   const long No;                // No of intervals in canopy discretization.
   double LAI_;                  // Total LAI of all crops on this column. [0-]
@@ -377,6 +379,9 @@ struct BioclimateStandard : public Bioclimate
   ~BioclimateStandard ();
 };
 
+const double
+BioclimateStandard::reference_height = 0.12; // [m]
+
 void 
 BioclimateStandard::initialize (const Weather& weather, Treelog& msg)
 {
@@ -444,6 +449,16 @@ BioclimateStandard::check (const Weather& weather, Treelog& msg) const
     ok = false;
   if (!svat->check (weather, msg))
     ok = false;
+  if (weather.surface () != Weatherdata::field
+      && weather.screen_height () < reference_height)
+    {
+      std::ostringstream tmp;
+      tmp << "Weather ScreenHeight is " << weather.screen_height ()
+          << " m, should be > " << reference_height << " m";
+      msg.error (tmp.str ());
+      ok = false;
+    }
+
   return ok;
 }
 
@@ -1163,7 +1178,7 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   wind_speed_weather =  weather.wind ();//[m/s]
 
   const double h = Height[0]/100.0; // [m]
-  const double h0 = 0.12; // reference height [m]
+  const double h0 = reference_height; // reference height [m]
 
   if (weather.surface () == Weatherdata::field || h < h0)
     wind_speed_field_ = wind_speed_weather;

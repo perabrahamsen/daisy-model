@@ -175,7 +175,7 @@ public:
   void initialize (const Metalib& metalib, 
                    const Units&, const Geometry& geo, 
                    OrganicMatter&, double SoilLimit, const Time&, Treelog&);
-  bool check (const Units& units, Treelog&) const;
+  bool check (const Units& units, const Geometry& geo, Treelog&) const;
   CropSimple (const BlockModel& vl);
   ~CropSimple ();
 };
@@ -436,10 +436,10 @@ CropSimple::initialize (const Metalib& metalib,
 }
 
 bool
-CropSimple::check (const Units& units, Treelog& msg) const
+CropSimple::check (const Units& units, const Geometry& geo, Treelog& msg) const
 {
   bool ok = true;
-  if (!root_system->check (units, msg))
+  if (!root_system->check (units, geo, msg))
     ok = false;
   return ok;
 }
