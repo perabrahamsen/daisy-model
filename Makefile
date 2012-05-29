@@ -144,8 +144,8 @@ csdaisy.exe:	csmain.cs csdaisy.netmodule
 CC = $(COMPILE) $(OPTIMIZE) $(PROFILE)
 
 # Locate the CSSparse lib -L../libdeps
-#CXSPARSELIB = -L../libdeps -lcxsparse
-CXSPARSELIB = /usr/lib/libcxsparse.so.2.2.3
+CXSPARSELIB = -L../libdeps -lcxsparse
+#CXSPARSELIB = /usr/lib/libcxsparse.so.2.2.3
 
 CXSPARSEHEAD = ublas_cxsparse.h cs.h UFconfig.h
 

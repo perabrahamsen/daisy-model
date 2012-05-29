@@ -81,103 +81,117 @@ RootdensGrowth::set_density (const Geometry& geo,
       LastDepth = CropDepth;
       LastWidth = CropWidth;
       LastWRoot = WRoot;
-      const double seed_radius = 1.0; // [cm]
-      const double top = std::min (0.0, -CropDepth + seed_radius);
-      const double bottom = std::max (-SoilDepth, -CropDepth -seed_radius);
-      for (size_t c = 0; c < cell_size; c++)
-        Density[c] = geo.fraction_in_z_interval (c, top, bottom);
-      const double sum = geo.total_surface (Density); // [m/m^2]
-      daisy_assert (sum > 0.0);
-      const double root_length = WRoot * SpRtLength;  // [m/m^2]
-      const double factor = root_length / sum;        // []
-      for (size_t c = 0; c < cell_size; c++)
-        Density[c] *= factor;
+      const double top = 0.0;
+      const double bottom = std::max (-SoilDepth, -CropDepth);
+      daisy_assert (top > bottom);
+      const double cm_per_m = 0.01;       // [cm/m]
+      const double root_length            // [cm/cm^2]
+        = WRoot                           // [g/m^2]
+        * cm_per_m * cm_per_m             // [cm^2/m^2]
+        * SpRtLength                      // [m/m^2]
+        / cm_per_m;                       // [cm/m]
+
+      geo.set_surface (Density, top, bottom, root_length);
       daisy_approximate (root_length, geo.total_surface (Density));
-      return;
     }
-
-  // Change.
-  const double DeltaDepth = CropDepth - LastDepth;
-  const double RelWRoot = WRoot / LastWRoot;
-
-  if (RelWRoot <= 1.0)
-    // Decrease.
+  else
     {
-      for (size_t c = 0; c < cell_size; c++)
-        Density[c] *= RelWRoot;
-      return;
-    }
+      // Change.
+      const double DeltaDepth = (CropDepth - LastDepth);
+      const double RelWRoot = WRoot / LastWRoot;
 
-  // Increase.
-  std::vector<double> Extra (cell_size, 0.0);
-  
-  for (size_t c = 0; c < cell_size; c++)
-    {
-      const double old_top = geo.cell_top (c);
-      const double old_bottom = std::max (geo.cell_bottom (c), 
-                                          -std::min (LastDepth, SoilDepth));
-      const double old_height = old_top - old_bottom;
-      if (old_height <= 0)
-        continue;
-      const double new_top = std::min (0.0, old_top + DeltaDepth);
-      const double new_bottom = std::max (geo.cell_bottom (c) - DeltaDepth,
-                                          -std::min (CropDepth, SoilDepth));
-      const double new_height = new_top - new_bottom;
-      if (new_height <= 0)
-        continue;
-
-      // Divide it.
-      const double cell_fraction = old_height / new_height;
-      const double top_fraction = (new_top - old_top) / new_height;
-      const double bottom_fraction = (old_bottom - new_bottom) / new_height;
-#if 0
-      std::ostringstream tmp;
-      tmp << "top[0] = " << geo.cell_top (0);
-      tmp << ", bottom[0] = " << geo.cell_bottom (0);
-      tmp << ", top[1] = " << geo.cell_top (1);
-      tmp << ", bottom[1] = " << geo.cell_bottom (1) << "\n";
-      tmp << ", top[c] = " << geo.cell_top (c);
-      tmp << ", bottom[c] = " << geo.cell_bottom (c) << "\n";
-      tmp << "old_top = " << old_top;
-      tmp << ", old_bottom = " << old_bottom;
-      tmp << ", old_height = " << old_height;
-      tmp << ", new_top = " << new_top;
-      tmp << ", new_bottom = " << new_bottom;
-      tmp << ", new_height = " << new_height << "\n";
-      tmp << "cell = " << cell_fraction << ", top = " << top_fraction << ", bottom = " << bottom_fraction;
-      msg.message (tmp.str ());
-#endif
-      daisy_approximate (cell_fraction + top_fraction + bottom_fraction, 1.0);
-
-      // Find growth.
-      const double cell_volume = geo.cell_volume (c); // [cm^3]
-      const double cell_growth                        // [cm]
-        = Density[c] * (RelWRoot - 1.0) * cell_volume;
-
-      // Contribution within cell.
-      Extra[c] += cell_growth * cell_fraction / cell_volume;
-
-      // Add remaining to neighbor cells.
-      const std::vector<size_t>& edges = geo.cell_edges (c);
-      for (size_t i = 0; i < edges.size (); i++)
+      if (RelWRoot <= 1.0)
+        // Decrease.
         {
-          const size_t e = edges[i];
-          if (!geo.edge_is_internal (e))
-            continue;
-     
-          const size_t o = geo.edge_other (e, c);
-          const double o_volume = geo.cell_volume (o);
-          if (geo.cell_z (o) > geo.cell_z (c))
-            Extra[o] += cell_growth * top_fraction / o_volume;
-          else if (geo.cell_z (o) < geo.cell_z (c))
-            Extra[o] += cell_growth * bottom_fraction / o_volume;
+          for (size_t c = 0; c < cell_size; c++)
+            Density[c] *= RelWRoot;
+        }
+      else
+        // Increase.
+        {
+          std::vector<double> Extra (cell_size, 0.0);
+
+          for (size_t c = 0; c < cell_size; c++)
+            {
+              const double old_top = geo.cell_top (c);
+              const double old_bottom = std::max (geo.cell_bottom (c), 
+                                                  -std::min (LastDepth, SoilDepth));
+              const double old_height = old_top - old_bottom;
+              if (old_height <= 0)
+                continue;
+              const double new_top = std::min (0.0, old_top + DeltaDepth);
+              const double new_bottom = std::max (geo.cell_bottom (c) - DeltaDepth,
+                                                  -std::min (CropDepth, SoilDepth));
+              const double new_height = new_top - new_bottom;
+              if (new_height <= 0)
+                continue;
+
+              // Divide it.
+              const double cell_fraction = old_height / new_height;
+              const double top_fraction = (new_top - old_top) / new_height;
+              const double bottom_fraction = (old_bottom - new_bottom) / new_height;
+#if 0
+              std::ostringstream tmp;
+              tmp << "top[0] = " << geo.cell_top (0);
+              tmp << ", bottom[0] = " << geo.cell_bottom (0);
+              tmp << ", top[1] = " << geo.cell_top (1);
+              tmp << ", bottom[1] = " << geo.cell_bottom (1) << "\n";
+              tmp << ", top[c] = " << geo.cell_top (c);
+              tmp << ", bottom[c] = " << geo.cell_bottom (c) << "\n";
+              tmp << "old_top = " << old_top;
+              tmp << ", old_bottom = " << old_bottom;
+              tmp << ", old_height = " << old_height;
+              tmp << ", new_top = " << new_top;
+              tmp << ", new_bottom = " << new_bottom;
+              tmp << ", new_height = " << new_height << "\n";
+              tmp << "cell = " << cell_fraction << ", top = " << top_fraction << ", bottom = " << bottom_fraction;
+              msg.message (tmp.str ());
+#endif
+              daisy_approximate (cell_fraction + top_fraction + bottom_fraction, 1.0);
+
+              // Find growth.
+              const double cell_volume = geo.cell_volume (c); // [cm^3]
+              const double cell_growth                        // [cm]
+                = Density[c] * (RelWRoot - 1.0) * cell_volume;
+
+              // Contribution within cell.
+              Extra[c] += cell_growth * cell_fraction / cell_volume;
+
+              // Add remaining to neighbor cells.
+              const std::vector<size_t>& edges = geo.cell_edges (c);
+              for (size_t i = 0; i < edges.size (); i++)
+                {
+                  const size_t e = edges[i];
+                  if (!geo.edge_is_internal (e))
+                    continue;
+
+                  const size_t o = geo.edge_other (e, c);
+                  const double o_volume = geo.cell_volume (o);
+                  if (geo.cell_z (o) > geo.cell_z (c))
+                    Extra[o] += cell_growth * top_fraction / o_volume;
+                  else if (geo.cell_z (o) < geo.cell_z (c))
+                    Extra[o] += cell_growth * bottom_fraction / o_volume;
+                }
+            }
+
+          for (size_t c = 0; c < cell_size; c++)
+            Density[c] += Extra[c];
         }
     }
-
-  for (size_t c = 0; c < cell_size; c++)
-    Density[c] += Extra[c];
-
   // Remember values.
+  {
+    std::ostringstream tmp;
+    const double cm_per_m = 0.01;       // [cm/m]
+    const double root_length            // [cm/cm^2]
+      = WRoot                           // [g/m^2]
+      * cm_per_m * cm_per_m             // [cm^2/m^2]
+      * SpRtLength                      // [m/m^2]
+      / cm_per_m;                       // [cm/m]
+    tmp << "WRoot: " << WRoot << " [g DM/m^2], root length = "
+        << root_length << " [cm/cm^2], or "<< geo.total_surface (Density) << " [cm/cm^2]";
+    msg.message (tmp.str ());
+  }
+
   LastDepth = CropDepth;
   LastWidth = CropWidth;
   LastWRoot = WRoot;
