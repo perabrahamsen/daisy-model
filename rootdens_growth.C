@@ -116,21 +116,28 @@ RootdensGrowth::set_density (const Geometry& geo,
       const double old_top = geo.cell_top (c);
       const double old_bottom = std::max (geo.cell_bottom (c), 
                                           -std::min (LastDepth, SoilDepth));
-      const double old_height = old_bottom - old_top;
+      const double old_height = old_top - old_bottom;
       if (old_height <= 0)
         continue;
       const double new_top = std::min (0.0, old_top + DeltaDepth);
       const double new_bottom = std::max (geo.cell_bottom (c) - DeltaDepth,
                                           -std::min (CropDepth, SoilDepth));
-      const double new_height = new_bottom - new_top;
+      const double new_height = new_top - new_bottom;
       if (new_height <= 0)
         continue;
 
       // Divide it.
       const double cell_fraction = old_height / new_height;
-      const double top_fraction = (old_top - new_top) / new_height;
+      const double top_fraction = (new_top - old_top) / new_height;
       const double bottom_fraction = (old_bottom - new_bottom) / new_height;
+#if 0
       std::ostringstream tmp;
+      tmp << "top[0] = " << geo.cell_top (0);
+      tmp << ", bottom[0] = " << geo.cell_bottom (0);
+      tmp << ", top[1] = " << geo.cell_top (1);
+      tmp << ", bottom[1] = " << geo.cell_bottom (1) << "\n";
+      tmp << ", top[c] = " << geo.cell_top (c);
+      tmp << ", bottom[c] = " << geo.cell_bottom (c) << "\n";
       tmp << "old_top = " << old_top;
       tmp << ", old_bottom = " << old_bottom;
       tmp << ", old_height = " << old_height;
@@ -139,6 +146,7 @@ RootdensGrowth::set_density (const Geometry& geo,
       tmp << ", new_height = " << new_height << "\n";
       tmp << "cell = " << cell_fraction << ", top = " << top_fraction << ", bottom = " << bottom_fraction;
       msg.message (tmp.str ());
+#endif
       daisy_approximate (cell_fraction + top_fraction + bottom_fraction, 1.0);
 
       // Find growth.
