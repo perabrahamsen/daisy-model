@@ -38,12 +38,18 @@
 struct RootdensGrowth : public Rootdens
 {
   // Parameters.
+  const double row_position;	// Horizontal position of row crops. [cm]
+  const double row_distance;	// Distance betweeen rows. [cm]
   const double DensRtTip;	// Root density at (pot) pen. depth. [cm/cm^3]
 
   // State.
-  double LastDepth;
-  double LastWidth;
-  double LastWRoot;
+  double LastDepth;             // [cm]
+  double LastWidth;             // [cm]
+  double LastWRoot;             // [g DM/m^2]
+
+  // Utility.
+  double find_row (const double x /* [cm] */) const; // [cm]
+  double find_length (const double WRoot /* [g DM/m^2] */) const; // [cm/cm^2]
 
   // simulation.
   void set_density (const Geometry& geo, 
@@ -57,6 +63,34 @@ struct RootdensGrowth : public Rootdens
                    double row_width, double row_pos, Treelog&);
   explicit RootdensGrowth (const BlockModel&);
 };
+
+double // [cm/cm^2]
+RootdensGrowth::find_length (const double WRoot /* [g DM/m^2] */) const 
+{
+
+  const double cm_per_m = 0.01;       // [cm/m]
+  const double root_length            // [cm/cm^2]
+    = WRoot                           // [g/m^2]
+    * cm_per_m * cm_per_m             // [cm^2/m^2]
+    * SpRtLength                      // [m/m^2]
+    / cm_per_m;                       // [cm/m]
+  return root_length;                 // [cm/cm^2]
+}
+
+double 
+RootdensGrowth::find_row (const double x /* [cm] */) const // [cm]
+{
+  if (row_distance < 0.0)
+    // Not a row crop.
+    return 0.0;
+
+  // Relative to row.
+  double p = x - row_position;
+  p -= std::floor (p / row_distance) * row_distance;
+  p = std::min (p, row_distance - p);
+  daisy_assert (p >= 0 && p <= 0.50001 * row_distance);
+  return p;
+}
 
 void
 RootdensGrowth::set_density (const Geometry& geo, 
@@ -84,98 +118,76 @@ RootdensGrowth::set_density (const Geometry& geo,
       const double top = 0.0;
       const double bottom = std::max (-SoilDepth, -CropDepth);
       daisy_assert (top > bottom);
-      const double cm_per_m = 0.01;       // [cm/m]
-      const double root_length            // [cm/cm^2]
-        = WRoot                           // [g/m^2]
-        * cm_per_m * cm_per_m             // [cm^2/m^2]
-        * SpRtLength                      // [m/m^2]
-        / cm_per_m;                       // [cm/m]
-
+      const double root_length = find_length (WRoot);            // [cm/cm^2]
       geo.set_surface (Density, top, bottom, root_length);
       daisy_approximate (root_length, geo.total_surface (Density));
     }
   else
     {
-      // Change.
-      const double DeltaDepth = (CropDepth - LastDepth);
-      const double RelWRoot = WRoot / LastWRoot;
-
-      if (RelWRoot <= 1.0)
+      if (WRoot <= LastWRoot)
         // Decrease.
         {
+          const double RelWRoot = WRoot / LastWRoot;
           for (size_t c = 0; c < cell_size; c++)
             Density[c] *= RelWRoot;
         }
       else
         // Increase.
         {
-          std::vector<double> Extra (cell_size, 0.0);
+          // What is available?
+          const double new_root 
+            = find_length (WRoot - LastWRoot) * geo.surface_area (); // [cm]
 
+          // What is needed to fill the root zone?
+          double missing = 0.0; // [cm]
+
+          // What is already in the root zone?
+          double total = 0.0;   // [cm]
+          
+          // Find it.
           for (size_t c = 0; c < cell_size; c++)
             {
-              const double old_top = geo.cell_top (c);
-              const double old_bottom = std::max (geo.cell_bottom (c), 
-                                                  -std::min (LastDepth, SoilDepth));
-              const double old_height = old_top - old_bottom;
-              if (old_height <= 0)
-                continue;
-              const double new_top = std::min (0.0, old_top + DeltaDepth);
-              const double new_bottom = std::max (geo.cell_bottom (c) - DeltaDepth,
-                                                  -std::min (CropDepth, SoilDepth));
-              const double new_height = new_top - new_bottom;
-              if (new_height <= 0)
-                continue;
+              // Cell position relative to root.
+              const double z = -geo.cell_z (c);
+              const double x = find_row (geo.cell_x (c));
+              const double V =  geo.cell_volume (c); // [cm^3]
 
-              // Divide it.
-              const double cell_fraction = old_height / new_height;
-              const double top_fraction = (new_top - old_top) / new_height;
-              const double bottom_fraction = (old_bottom - new_bottom) / new_height;
-#if 0
-              std::ostringstream tmp;
-              tmp << "top[0] = " << geo.cell_top (0);
-              tmp << ", bottom[0] = " << geo.cell_bottom (0);
-              tmp << ", top[1] = " << geo.cell_top (1);
-              tmp << ", bottom[1] = " << geo.cell_bottom (1) << "\n";
-              tmp << ", top[c] = " << geo.cell_top (c);
-              tmp << ", bottom[c] = " << geo.cell_bottom (c) << "\n";
-              tmp << "old_top = " << old_top;
-              tmp << ", old_bottom = " << old_bottom;
-              tmp << ", old_height = " << old_height;
-              tmp << ", new_top = " << new_top;
-              tmp << ", new_bottom = " << new_bottom;
-              tmp << ", new_height = " << new_height << "\n";
-              tmp << "cell = " << cell_fraction << ", top = " << top_fraction << ", bottom = " << bottom_fraction;
-              msg.message (tmp.str ());
-#endif
-              daisy_approximate (cell_fraction + top_fraction + bottom_fraction, 1.0);
+              if (x/CropWidth + z/CropDepth < 1.0
+                  && z < SoilDepth
+                  && Density[c] < DensRtTip)
+                missing += (DensRtTip - Density[c]) * V;
+              else
+                total += Density[c] * V;
+            }
+          
+          // To each according to need.
+          const double fill_factor = missing > new_root
+            ? new_root / missing
+            : 1.0;
 
-              // Find growth.
-              const double cell_volume = geo.cell_volume (c); // [cm^3]
-              const double cell_growth                        // [cm]
-                = Density[c] * (RelWRoot - 1.0) * cell_volume;
+          // To those who have shall be given.
+          const double growth_factor = missing < new_root
+            ? (new_root - missing) / total
+            : 1.0;
 
-              // Contribution within cell.
-              Extra[c] += cell_growth * cell_fraction / cell_volume;
+          // Fill it.
+          for (size_t c = 0; c < cell_size; c++)
+            {
+              // Cell position relative to root.
+              const double z = -geo.cell_z (c);
+              const double x = find_row (geo.cell_x (c));
 
-              // Add remaining to neighbor cells.
-              const std::vector<size_t>& edges = geo.cell_edges (c);
-              for (size_t i = 0; i < edges.size (); i++)
-                {
-                  const size_t e = edges[i];
-                  if (!geo.edge_is_internal (e))
-                    continue;
-
-                  const size_t o = geo.edge_other (e, c);
-                  const double o_volume = geo.cell_volume (o);
-                  if (geo.cell_z (o) > geo.cell_z (c))
-                    Extra[o] += cell_growth * top_fraction / o_volume;
-                  else if (geo.cell_z (o) < geo.cell_z (c))
-                    Extra[o] += cell_growth * bottom_fraction / o_volume;
-                }
+              if (x/CropWidth + z/CropDepth < 1.0
+                  && z < SoilDepth
+                  && Density[c] < DensRtTip)
+                Density[c] += (DensRtTip - Density[c]) * fill_factor;
+              else
+                Density[c] *= growth_factor;
             }
 
-          for (size_t c = 0; c < cell_size; c++)
-            Density[c] += Extra[c];
+          // Check.
+          const double old_root = find_length (LastWRoot) * geo.surface_area ();
+          daisy_approximate (old_root + new_root, geo.total_surface (Density));
         }
     }
   // Remember values.
@@ -210,13 +222,39 @@ RootdensGrowth::initialize (const Geometry& geo,
                            const double row_width, const double row_pos,
                            Treelog& msg)
 { 
-  if (!iszero (row_width))
-    msg.warning ("Row width not supported for '" + objid 
-                 + "' root density model");
+  TREELOG_MODEL (msg);
+
+  const double geo_width = geo.right () - geo.left ();
+  daisy_assert (row_width > 0.0);
+  const double half_rows = geo_width / (0.5 * row_width);
+  if (!approximate (half_rows, static_cast<int> (half_rows)))
+    {
+      std::ostringstream tmp;
+      tmp << "Geometry width (" << geo_width 
+          << ") should be an integral number of half rows (" 
+          << 0.5 * row_width << ")";
+      msg.warning (tmp.str ());
+    }
+  if (!approximate (row_distance, row_width))
+    {
+      std::ostringstream tmp;
+      tmp << "Row width (" << row_width << ") does not match root distance ("
+          << row_distance << ")";
+      msg.warning (tmp.str ());
+    }
+  if (!approximate (row_position, row_pos))
+    {
+      std::ostringstream tmp;
+      tmp << "Row position (" << row_pos << ") does not match root position ("
+          << row_position << ")";
+      msg.warning (tmp.str ());
+    }
 }
 
 RootdensGrowth::RootdensGrowth (const BlockModel& al)
   : Rootdens (al),
+    row_position (al.number ("row_position")),
+    row_distance (al.number ("row_distance", -1.0)),
     DensRtTip (al.number ("DensRtTip")),
     LastDepth (al.number ("Depth", -1.0)),
     LastWidth (al.number ("Width", 0.0)),
@@ -233,6 +271,12 @@ Dynamic root growth model.")
   { }
   void load_frame (Frame& frame) const
   {
+    frame.declare ("row_position", "cm", Check::non_negative (),
+                   Attribute::State, "\
+Horizontal position of row crops.");
+    frame.set ("row_position", 0.0);
+    frame.declare ("row_distance", "cm", Attribute::OptionalState, 
+                   "Distance between rows of crops.");
     frame.declare ("DensRtTip", "cm/cm^3", Check::positive (), Attribute::Const,
                 "Root density at (potential) penetration depth.");
     frame.set ("DensRtTip", 0.1);
