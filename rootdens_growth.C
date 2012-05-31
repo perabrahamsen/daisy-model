@@ -68,12 +68,13 @@ double // [cm/cm^2]
 RootdensGrowth::find_length (const double WRoot /* [g DM/m^2] */) const 
 {
 
-  const double cm_per_m = 0.01;       // [cm/m]
+  const double cm_per_m = 100.0;       // [cm/m]
+  const double m_per_cm = 0.01;       // [m/cm]
   const double root_length            // [cm/cm^2]
     = WRoot                           // [g/m^2]
-    * cm_per_m * cm_per_m             // [cm^2/m^2]
-    * SpRtLength                      // [m/m^2]
-    / cm_per_m;                       // [cm/m]
+    * m_per_cm * m_per_cm             // [m^2/cm^2]
+    * SpRtLength                      // [m/g]
+    * cm_per_m;                       // [cm/m]
   return root_length;                 // [cm/cm^2]
 }
 
@@ -151,24 +152,25 @@ RootdensGrowth::set_density (const Geometry& geo,
               const double z = -geo.cell_z (c);
               const double x = find_row (geo.cell_x (c));
               const double V =  geo.cell_volume (c); // [cm^3]
+              total += Density[c] * V;
 
               if (x/CropWidth + z/CropDepth < 1.0
                   && z < SoilDepth
                   && Density[c] < DensRtTip)
                 missing += (DensRtTip - Density[c]) * V;
-              else
-                total += Density[c] * V;
             }
-          
+          daisy_approximate (total, geo.total_soil (Density));
+
           // To each according to need.
           const double fill_factor = missing > new_root
             ? new_root / missing
             : 1.0;
 
           // To those who have shall be given.
+          daisy_assert (total > 0.0);
           const double growth_factor = missing < new_root
             ? (new_root - missing) / total
-            : 1.0;
+            : 0.0;
 
           // Fill it.
           for (size_t c = 0; c < cell_size; c++)
@@ -176,29 +178,33 @@ RootdensGrowth::set_density (const Geometry& geo,
               // Cell position relative to root.
               const double z = -geo.cell_z (c);
               const double x = find_row (geo.cell_x (c));
+              const double old = Density[c];
+              Density[c] += old * growth_factor;
 
               if (x/CropWidth + z/CropDepth < 1.0
                   && z < SoilDepth
-                  && Density[c] < DensRtTip)
-                Density[c] += (DensRtTip - Density[c]) * fill_factor;
-              else
-                Density[c] *= growth_factor;
+                  && old < DensRtTip)
+                Density[c] += (DensRtTip - old) * fill_factor;
             }
 
           // Check.
           const double old_root = find_length (LastWRoot) * geo.surface_area ();
+          std::ostringstream tmp;
+          tmp << "old root = " << old_root << ", new root = " << new_root;
+          msg.message (tmp.str ());
           daisy_approximate (old_root + new_root, geo.total_surface (Density));
         }
     }
   // Remember values.
   {
     std::ostringstream tmp;
-    const double cm_per_m = 0.01;       // [cm/m]
+    const double cm_per_m = 100.0;       // [cm/m]
+    const double m_per_cm = 0.01;       // [m/cm]
     const double root_length            // [cm/cm^2]
       = WRoot                           // [g/m^2]
-      * cm_per_m * cm_per_m             // [cm^2/m^2]
-      * SpRtLength                      // [m/m^2]
-      / cm_per_m;                       // [cm/m]
+      * m_per_cm * m_per_cm             // [m^2/cm^2]
+      * SpRtLength                      // [m/g]
+      * cm_per_m;                       // [cm/m]
     tmp << "WRoot: " << WRoot << " [g DM/m^2], root length = "
         << root_length << " [cm/cm^2], or "<< geo.total_surface (Density) << " [cm/cm^2]";
     msg.message (tmp.str ());
@@ -222,6 +228,14 @@ RootdensGrowth::initialize (const Geometry& geo,
                            const double row_width, const double row_pos,
                            Treelog& msg)
 { 
+  if (row_width <= 0)
+    {
+      if (row_distance >= 0)
+        msg.bug ("Is this a row crop?");
+      // Not a row crop.
+      return;
+    }
+
   TREELOG_MODEL (msg);
 
   const double geo_width = geo.right () - geo.left ();
