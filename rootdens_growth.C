@@ -173,9 +173,6 @@ RootdensGrowth::set_density (const Geometry& geo,
 
           // Check.
           const double old_root = find_length (LastWRoot) * geo.surface_area ();
-          std::ostringstream tmp;
-          tmp << "old root = " << old_root << ", new root = " << new_root;
-          msg.message (tmp.str ());
           daisy_approximate (old_root + new_root, geo.total_soil (Density));
         }
     }
