@@ -43,8 +43,6 @@ struct RootdensGrowth : public Rootdens
   const double DensRtTip;	// Root density at (pot) pen. depth. [cm/cm^3]
 
   // State.
-  double LastDepth;             // [cm]
-  double LastWidth;             // [cm]
   double LastWRoot;             // [g DM/m^2]
 
   // Utility.
@@ -110,20 +108,6 @@ RootdensGrowth::set_density (const Geometry& geo,
   daisy_assert (CropDepth > 0);
   daisy_assert (WRoot > 0);
 
-  if (LastDepth < 0.0)
-    // Initialize.
-    {
-      LastDepth = CropDepth;
-      LastWidth = CropWidth;
-      LastWRoot = WRoot;
-      const double top = 0.0;
-      const double bottom = std::max (-SoilDepth, -CropDepth);
-      daisy_assert (top > bottom);
-      const double root_length = find_length (WRoot);            // [cm/cm^2]
-      geo.set_surface (Density, top, bottom, root_length);
-      daisy_approximate (root_length, geo.total_surface (Density));
-    }
-  else
     {
       if (WRoot <= LastWRoot)
         // Decrease.
@@ -167,8 +151,7 @@ RootdensGrowth::set_density (const Geometry& geo,
             : 1.0;
 
           // To those who have shall be given.
-          daisy_assert (total > 0.0);
-          const double growth_factor = missing < new_root
+          const double growth_factor = (total > 0 && missing < new_root)
             ? (new_root - missing) / total
             : 0.0;
 
@@ -185,6 +168,7 @@ RootdensGrowth::set_density (const Geometry& geo,
                   && z < SoilDepth
                   && old < DensRtTip)
                 Density[c] += (DensRtTip - old) * fill_factor;
+              
             }
 
           // Check.
@@ -192,34 +176,16 @@ RootdensGrowth::set_density (const Geometry& geo,
           std::ostringstream tmp;
           tmp << "old root = " << old_root << ", new root = " << new_root;
           msg.message (tmp.str ());
-          daisy_approximate (old_root + new_root, geo.total_surface (Density));
+          daisy_approximate (old_root + new_root, geo.total_soil (Density));
         }
     }
   // Remember values.
-  {
-    std::ostringstream tmp;
-    const double cm_per_m = 100.0;       // [cm/m]
-    const double m_per_cm = 0.01;       // [m/cm]
-    const double root_length            // [cm/cm^2]
-      = WRoot                           // [g/m^2]
-      * m_per_cm * m_per_cm             // [m^2/cm^2]
-      * SpRtLength                      // [m/g]
-      * cm_per_m;                       // [cm/m]
-    tmp << "WRoot: " << WRoot << " [g DM/m^2], root length = "
-        << root_length << " [cm/cm^2], or "<< geo.total_surface (Density) << " [cm/cm^2]";
-    msg.message (tmp.str ());
-  }
-
-  LastDepth = CropDepth;
-  LastWidth = CropWidth;
   LastWRoot = WRoot;
 }
 
 void 
 RootdensGrowth::output (Log& log) const
 {
-  output_value (LastDepth, "Depth", log);
-  output_value (LastWidth, "Width", log);
   output_value (LastWRoot, "WRoot", log);
 }
 
@@ -231,7 +197,7 @@ RootdensGrowth::initialize (const Geometry& geo,
   if (row_width <= 0)
     {
       if (row_distance >= 0)
-        msg.bug ("Is this a row crop?");
+        msg.error ("Is this a row crop?");
       // Not a row crop.
       return;
     }
@@ -270,8 +236,6 @@ RootdensGrowth::RootdensGrowth (const BlockModel& al)
     row_position (al.number ("row_position")),
     row_distance (al.number ("row_distance", -1.0)),
     DensRtTip (al.number ("DensRtTip")),
-    LastDepth (al.number ("Depth", -1.0)),
-    LastWidth (al.number ("Width", 0.0)),
     LastWRoot (al.number ("WRoot", 0.0))
 { }
 
