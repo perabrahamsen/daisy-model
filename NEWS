@@ -6,6 +6,37 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.12
+
+** New "growth" root density model.
+
+Use it like this:
+
+    (sow ("Spring Barley" (Root (rootdens growth))))
+
+Or for row crops, like this:
+
+    (sow ("Spring Barley" (Root (rootdens growth (row_distance 80 [cm]))))
+         ("row_width" 80 [cm]))
+
+The models works like this:
+
+When the root mass is growing, new roots are distributed equally in
+the root zone up to DensRtTip (default 0.1 [cm/cm^3]), and any
+additional roots are distributed according to the existing root mass.
+
+When the root mass is shrinking, roots are lost proportional to the
+existing root mass.
+
+Unlike the existing models, this model is dynamic, that is, the
+spatial distribution of the roots will depend on the history. If most
+root mass is added while the root zone is small, the roots will be
+concentrated in the initial root zone. If the root mass is mainly
+added when the root zone is fully developed, the roots will be more
+equally distributed within the root zone.
+
+** Bug fixes.
+
 * 5.08
 
 ** Bug fixes, mostly affecting variable timesteps.
