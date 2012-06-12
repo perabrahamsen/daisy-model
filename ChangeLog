@@ -1,6 +1,12 @@
+2012-06-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* volume_poly.C: New model.
+	* Makefile (MODELS): Added.
+
 2012-05-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* rootdens_growth.C: New model.
+	* Makefile (MODELS): Added.
 
 2012-05-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
 

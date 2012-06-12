@@ -185,7 +185,8 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = rootdens_growth.C gnuplot_vector.C program_optimize.C summary_Rsqr.C \
+MODELS = volume_poly.C \
+	rootdens_growth.C gnuplot_vector.C program_optimize.C summary_Rsqr.C \
 	log_table.C xysource_profile.C program_rootmatch.C program_hmovie.C \
 	wsource_std.C wsource_time.C wsource_combine.C wsource_indirect.C\
 	wsource_table.C wsource_const.C \
