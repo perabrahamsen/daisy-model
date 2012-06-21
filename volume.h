@@ -47,12 +47,12 @@ private:
 
   // Use.
 public:
-  virtual void limit_top (double) = 0;
-  virtual void limit_bottom (double) = 0;
   virtual double volume () const = 0;
   virtual double height (const double low, const double high) const = 0;
   virtual double width (const double low, const double high) const = 0;
   virtual double depth (const double low, const double high) const = 0;
+  virtual void limit_top (double) = 0;
+  virtual void limit_bottom (double) = 0;
   virtual bool limit (const Volume&, Treelog& msg) = 0;
   virtual bool check_border (const Border& border, 
                              Treelog& msg) const = 0;

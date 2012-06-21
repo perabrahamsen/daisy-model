@@ -48,6 +48,7 @@ class Scope;
 class Geometry;
 class Vegetation;
 class Soil;
+class XYPoint;
 
 class Column : public ModelFramed
 {
@@ -57,20 +58,10 @@ public:
   symbol library_id () const;
 
   // Location.
-public:
-  struct Point
-  {
-    const double x;
-    const double y;
-
-    static void load_syntax (Frame&);
-    Point (const Block&);
-    ~Point ();
-  };
 private:
-  const std::vector<const Point*> location_;
+  const std::vector<const XYPoint*> location_;
 public:
-  const std::vector<const Point*>& location () const;
+  const std::vector<const XYPoint*>& location () const;
 
   virtual const Horizon& horizon_at (double z, double x, double y) const = 0;
 

@@ -28,6 +28,7 @@
 #include "frame.h"
 #include "submodeler.h"
 #include "check.h"
+#include "point.h"
 #include <map>
 
 const char *const Column::component = "column";
@@ -39,23 +40,7 @@ Column::library_id () const
   return id;
 }
 
-void
-Column::Point::load_syntax (Frame& frame)
-{ 
-  frame.declare ("x", Attribute::Unknown (), Attribute::Const, "X-Coordinate.");
-  frame.declare ("y", Attribute::Unknown (), Attribute::Const, "Y-Coordinate.");
-  frame.order ("x", "y");
-}
-
-Column::Point::Point (const Block& al)
-  : x (al.number ("x")),
-    y (al.number ("y"))
-{ }
-
-Column::Point::~Point ()
-{ }
-
-const std::vector<const Column::Point*>&
+const std::vector<const XYPoint*>&
 Column::location () const
 { return location_; }
 
@@ -68,7 +53,7 @@ Column::output (Log& log) const
 Column::Column (const BlockModel& al)
   : ModelFramed (al),
     area (al.number ("area")),
-    location_ (map_submodel_const<Point> (al, "location"))
+    location_ (map_submodel_const<XYPoint> (al, "location"))
 { }
 
 Column::~Column ()
@@ -91,7 +76,7 @@ The meaning depends on the number of point in the sequence.\n\
 0 points: The column has no specific location.\n\
 1 point: The column has a location, but no specific area.\n\
 3 or more points: The column represents the area specified by a\n\
-polygon with the specified corner points.", Column::Point::load_syntax);
+polygon with the specified corner points.", XYPoint::load_syntax);
     frame.set_empty ("location");
   }
   ColumnInit ()

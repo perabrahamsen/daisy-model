@@ -42,6 +42,7 @@
 #include "treelog.h"
 #include "mathlib.h"
 #include "block_model.h"
+#include "point.h"
 
 struct MovementRect : public MovementSolute
 {
@@ -55,8 +56,7 @@ struct MovementRect : public MovementSolute
   void summarize (Treelog& msg) const;
 
   // Drains
-  struct Point;
-  const auto_vector<const Point*> drain_position;
+  const auto_vector<const ZXPoint*> drain_position;
   std::vector<size_t> drain_cell;
 
   // Water.
@@ -126,24 +126,6 @@ MovementRect::summarize (Treelog& msg) const
       matrix_water[i]->summarize (msg);
     }
 }
-
-struct MovementRect::Point 
-{
-  const double z;
-  const double x;
-  static void load_syntax (Frame& frame)
-  {
-    frame.declare ("z", "cm", Check::negative (), Attribute::Const, 
-		"Vertical position.");
-    frame.declare ("x", "cm", Check::positive (), Attribute::Const,
-		"Horizontal position.");
-    frame.order ("z", "x");
-  }
-  Point (const FrameSubmodel& al)
-    : z (al.number ("z")),
-      x (al.number ("x"))
-  { }
-};
 
 void
 MovementRect::ridge (Surface&, const Soil&, const SoilWater&, 
@@ -306,14 +288,14 @@ MovementRect::initialize_derived (const Soil&, const Groundwater&,
 MovementRect::MovementRect (const BlockModel& al)
   : MovementSolute (al),
     geo (submodel<GeometryRect> (al, "Geometry")),
-    drain_position (map_construct_const<Point> 
-                    (al.submodel_sequence ("drainpoints"))),
+    drain_position (map_submodel_const<ZXPoint> 
+                    (al, "drainpoints")),
     matrix_water (Librarian::build_vector<UZRect> (al, "matrix_water")),
     heatrect (Librarian::build_item<Heatrect> (al, "heat"))
 { 
   for (size_t i = 0; i < drain_position.size (); i++)
     {
-      const Point& point = *drain_position[i];
+      const ZXPoint& point = *drain_position[i];
       const double z = point.z;
       const double x = point.x;
       const double y = 0.5;
@@ -347,7 +329,7 @@ static struct MovementRectSyntax : DeclareModel
                           GeometryRect::load_syntax);
     frame.declare_submodule_sequence ("drainpoints", Attribute::Const,
 				   "Location of cells with drain pipes.",
-				   MovementRect::Point::load_syntax);
+				   ZXPoint::load_syntax);
     frame.set_empty ("drainpoints");
     frame.declare_object ("matrix_water", UZRect::component, 
                           Attribute::State, Attribute::Variable,

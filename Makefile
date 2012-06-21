@@ -289,7 +289,7 @@ COMPONENTS = wsource.C solute.C drain.C \
 
 # Submodels are combined models and components.
 #
-SUBMODELS = irrigate.C \
+SUBMODELS = point.C irrigate.C \
 	fetch_pretty.C toplevel.C timestep.C geometry_rect.C doe.C \
         geometry1d.C fetch.C horheat.C time.C \
 	som.C smb.C aom.C dom.C crpn.C vernalization.C \

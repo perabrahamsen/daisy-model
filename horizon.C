@@ -516,7 +516,7 @@ initialization.");
     static const BelowOrEqual max_1 (1.0);
     frame.declare ("SOM_fractions",  Attribute::None (), max_1,
                    Attribute::OptionalConst, Attribute::Variable, "\
-Fraction of humus in each SOM pool, from slowest to fastest.\n\
+Fraction of humus in each SOM pool, typically slow, fast and inert.\n\
 Negative numbers mean unspecified, let Daisy find appropriate values.");
     frame.set_check ("SOM_fractions", SOM_fractions_check);
 

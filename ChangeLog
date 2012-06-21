@@ -1,3 +1,10 @@
+2012-06-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* point.C, point.h: New utility.
+	* Makefile (SUBMODELS): Added.
+	* movement_rect.C, column.h, column.C: Use it.
+	* cdaisy.C: include it.
+
 2012-06-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* volume_poly.C: New model.

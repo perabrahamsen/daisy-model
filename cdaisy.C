@@ -46,6 +46,7 @@
 #include "frame_model.h"
 #include "frame_submodel.h"
 #include "filepos.h"
+#include "point.h"
 #include <string>
 #include <typeinfo>
 

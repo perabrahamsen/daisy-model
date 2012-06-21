@@ -73,42 +73,46 @@
   is therefore desirable.
   
   \emph{Methods} An empirical model of vertical root density
-  distribution is extended to two dimensions, and the parameters are
+  distribution was extended to two dimensions, and the parameters were
   derived in terms of root mass and root zone width and depth. Root
   density for potatoes (\textit{Solanum tuberosum} L.) and tomatoes
-  (\textit{Solanum lycopersicum} L.) are measured at two sites.  Both
-  the original and the extended model are fitted to these datasets. An
-  F-test is used to determine whether the extended model is
+  (\textit{Solanum lycopersicum} L.) were measured at two sites.  Both
+  the original and the extended model were fitted to these datasets. An
+  F-test was used to determine whether the extended model was
   significantly better than the original model.
 
-  \emph{Results} The extended model is superior when the root zone
-  width is less than the distance between rows.  The median of the
-  coefficient of determination for all the examined datasets is 0.86,
+  \emph{Results} The extended model was superior when the root zone
+  width was less than the distance between rows.  The median of the
+  coefficient of determination for all the examined datasets was 0.86,
   and a visual inspection confirms that the model catches both the
   horizontal and vertical root density variation.
 
-  \emph{Conclusions} We are able to adequately describe the measured
+  \emph{Conclusions} We were able to adequately describe the measured
   data using a simple root density model, relying on three quantities,
   all physically meaningful.
 \end{abstract}
 
+\keywords{Root length density \and Root modeling \and Row crops 
+  \and \textit{Solanum tuberosum} \and \textit{Solanum lycopersicum} 
+  \and Partial root zone drying}
+
 \section{Introduction}
 
-With alternate partial root zone drying (PRD) irrigation, the
+With alternate side partial root zone drying (PRD) irrigation, the
 transpiration will depend on the spatial distribution of the roots and
 water in the soil, due to the reliance of root signals. It has been
 shown that the concentration of xylem ABA from the roots of plants can
 be described as a function of water potential of the dry and wet
 zones. \citep{liu2008measurement,dodd2008accounting}. Several root
-models suitable for PRD exists, e.g.\@~\cite{vrugt2001calibration}
+models suitable for PRD exists. E.g.\@~\cite{vrugt2001calibration}
 proposes a flexible, empirical \twod{} root model with a radial
-geometry, which \cite{apri} successfully use to model PRD irrigation
+geometry, which \cite{apri} successfully used to model PRD irrigation
 of a vineyard.  A static description of the root density based on
 measurements was used in the later application.  For perennial plants
 using a static description of the root system during the irrigation
 season can make sense, but for annual plants, such as most vegetables,
-the root system must be considered dynamic.  A dynamic root growth model
-for row crops based on diffusion theory was proposed
+the root system must be considered dynamic.  A dynamic root growth
+model for row crops based on diffusion theory was proposed
 in~\cite{acock1996convective}. In general this model required a
 numerical solution, but analytical solutions for special cases were
 found by~\cite{willigen2002two}.
@@ -127,8 +131,8 @@ structure and branches of the roots.  See \cite{wang2004modelling} for
 an overview of existing \oned{}, \twod{}, and \threed{} root models,
 both parametric and architectural.
 
-For looking at the root zone of a single plant, radial coordinates are
-a good choise.  But when the root zones of the plants overlap, the
+Radial coordinates are a natural choise for looking at the root zone
+of a single plant.  But when the root zones of the plants overlap, the
 problem becomes \threed{}.  Solving Richards equation in \threed{} is
 complex and results in long simulation times.  Finding a \twod{}
 approximation is therefore desirable.  In this paper we therefore
@@ -143,21 +147,21 @@ the root zone.
 
 The new root model was used in the SAFIR (SAFe IRrigation) EU project
 \citep{ssoc,safir2010} as part of the Daisy agro-ecological model
-\citep{daisy-fertilizer,daisy-ems}.  The SAFIR project had two
-aspects, the first being assessment of the risk for human health with
-regard to use of waster water for irrigation
-\citep{Forslund2010440,Surdyk2010451}, and the second water saving
-irrigation techniques, in particular PRD \citep{Jensen2010403}.  There
-were five experimental sites, three in Europe, and two in China, and
-three crops, potatoes, fresh tomatoes, and processing tomatoes.  For
-the two Chinese sites root density was measured. The original Daisy
-soil water model was extended from \oned{} to \twod{} \citep{1dvs2d},
-and used for modelling the experiments.  The original Daisy crop model
-\citep{eupotato} calculates root dry mass and root zone depth, and
-assumes a root density distribution following the model by
-\cite{gp74}.  With the \twod{} extension root zone width was added to
-the crop model, as well as the root density distribution model
-discussed in this paper.
+\citep{daisy-fertilizer,daisy-ems,daisy2012} for calculation of water and solute
+uptake \citep{daisyN}.  The SAFIR project had two aspects, the first
+being assessment of the risk for human health with regard to use of
+waster water for irrigation \citep{Forslund2010440,Surdyk2010451}, and
+the second water saving irrigation techniques, in particular PRD
+\citep{Jensen2010403}.  There were five experimental sites, three in
+Europe, and two in China, and three crops, potatoes, fresh tomatoes,
+and processing tomatoes.  For the two Chinese sites root density was
+measured. The original Daisy soil water model was extended from
+\oned{} to \twod{}, and used for modelling the
+experiments.  The original Daisy crop model \citep{eupotato}
+calculates root dry mass and root zone depth, and assumes a root
+density distribution following the model by \cite{gp74}.  With the
+\twod{} extension root zone width was added to the crop model, as well
+as the root density distribution model discussed in this paper.
 
 \section{Materials and Methods}
 
@@ -245,13 +249,14 @@ row.  Our second dimension $x$ is horizontal, orthogonal to the row.
 The root density at a specific point can be denoted $L\, (x,z)$, and
 we choose a coordinate system where $L\, (0,0)$ (also denoted
 $L_{0,0}$) is the root density in the top center of the row.  We then
-define the following root distribution
+define the following root distribution for a single row as
 \begin{equation}
   L\, (x,z) = L_{0,0}\, e^{-a_z z} e^{-a_x |x|}
   \label{eq:Lxz}
 \end{equation}
 where $a_z$ and $a_x$ control the density decrease in the two
-dimensions.
+dimensions. This is comparable to the approach taken in
+\citet{pedersen2010modelling}.
 
 To estimate values for the parameters $a_z$, $a_x$ and $L_{0,0}$, we
 assume as before that the root depth and mass are known, and now
@@ -392,7 +397,7 @@ By setting $L^* (z) = L\, (z)$ and inserting \MyEq{eq:Lxz} and
   \begin{array}{rcl}
     L_0\, e^{-a z} &=& \frac{1}{D} \int_{-\infty}^{\infty} L_{0,0}\, e^{-a_z z} e^{-a_x |x|} dx\\
                  &=& \frac{2 L_{0,0}\, e^{-a_z z}}{D} \int_{0}^{\infty} e^{-a_x x} dx\\
-                 &=& L_{0,0}\, e^{-a_z z} \frac{0 - 1}{-a_x}\\
+%%                 &=& L_{0,0}\, e^{-a_z z} \frac{0 - 1}{-a_x}\\
                  &=& \frac{2 L_{0,0}}{D a_x} e^{-a_z z}\\
   \end{array}
   \label{eq:1d2d}
@@ -406,9 +411,9 @@ distribution as \MyEq{eq:Lxzstar}.
 Software to estimate root mass and root zone depth from \oned{} root
 density data, and in addition root zone width from \twod{} root
 density data, can be found at \url{http://www.daisy-model.org/} (look
-under \texttt{Wiki}, \texttt{\textsc{gp2d}}).  Also supported is
-estimating root density distribution from root mass, root zone depth,
-and optionally, root zone width.  The program code is written in
+under \texttt{Wiki}, \texttt{\textsc{gp2d}}).  Estimating of root
+density distribution from root mass, root zone depth, and optionally,
+root zone width, is also supported.  The program code is written in
 \cplusplus{} and is covered by on open source license (\textsc{gnu
   lgpl}), so it can be freely incorporated in other models.
 
@@ -424,10 +429,10 @@ were grown at the CAAS site, while the CAU site were growing tomatoes
 
 \subsubsection{Treatments}
 
-The SAFIR project had two main aspects, the first was the reuse of
-waste water for irrigation, with emphasis on human safety.  All
-treatments were fertilized, so the constituents of the waste water
-would be unlikely to affect crop growth.  Hence, for crop growth the
+The SAFIR project had two main aspects. The first aspect was the reuse
+of waste water for irrigation, with emphasis on human safety.  All
+treatments were fully fertilized, and the constituents of the waste
+water were unlikely to harm crop growth.  Hence, for crop growth the
 different irrigation sources could be seen as replicates.  The second
 aspect was how the design of the irrigation system could save water.
 Two irrigation methods and three irrigation strategies were
@@ -438,10 +443,10 @@ rootzone drying (like deficit, but application on alternating sides of
 the crop).
 
 At the CAAS site, root density sampling was performed in 2006 and
-2008.  Unfortunately, the 2006 harvest failed, so we have discarded
-that data set.  All treatments were done with three replicates, but
-due to the labour intensive nature of root density sampling, that was
-only performed on selected plots as outlined in
+2008.  Unfortunately, the 2006 harvest failed, so we discarded that
+data set.  All treatments were done with three replicates, but due to
+the labour intensive nature of root density sampling, that was only
+performed on selected plots as outlined in
 table~\ref{tab:caas2008treatments}. At CAU, root density sampling was
 performed in 2007 and 2008 at selected plots, see
 table~\ref{tab:cautreatments}.
@@ -450,7 +455,7 @@ table~\ref{tab:cautreatments}.
   \caption{CAAS 2008 treatments with root density measurements.  
     All treatments used secondary treated wastewater.  Some treatments
     also used a sand filter (SF), addition plus removal of heavy
-    metals (HM), or ultraviolet light (UV).}
+    metals (HM), or ultraviolet light (UV). \citep{battilani2010decentralised}}
   \label{tab:caas2008treatments}
   \begin{tabular}{llll}\\\hline
 Plot	& Source	& Method	& Strategy\\\hline
@@ -483,7 +488,7 @@ Plot	& Method	& Strategy	& Plot	& Method	& Strategy\\\hline
 
 \subsubsection{Root sampling}
 
-Both sites used ridge systems.  To describe it, we use a coordinate
+Both sites used ridge systems.  To describe it, we used a coordinate
 system with the x-axis orthogonal to the ridges with $x$ = 0 cm
 representing the top of the ridge, the y-axis along the ridges with
 $y$ = 0 cm representing the plant position, and the z-axis
@@ -772,7 +777,7 @@ figure~\ref{fig:tworows}.  The tendency is partly supported by the
 
 A major source of uncertainty is the mapping of the 3D ridge geometry
 to a 2D flat surface.  For both sites, we ignore the root mass that
-are placed in the top of the ridge.  We also ignore that the ridge
+is placed in the top of the ridge.  We also ignore that the ridge
 valley does not contain any soil.  For the CAU site we furthermore
 ignore the third dimension, using only measurements at y = 0 cm where
 the root density is highest.  These systematic errors affect the
@@ -808,8 +813,6 @@ the difference between plots for the present experiment.
 \bibliographystyle{elsart-harv}
 \bibliography{../daisy}
 
-%% \end{document}
-
 \vfill{}\section*{List of symbols}
 
 \begin{tabular}{lll}
@@ -818,7 +821,6 @@ $a$     & L$^{-1}$ & Root density distribution parameter\\
 $a_z$   & L$^{-1}$ & Vertical root density distribution\\
 $a_x$   & L$^{-1}$ & Horizontal root density distribution\\
 $d_c$   & L       & Crop potential root depth\\
-$d_s$   & L       & Soil maximum root depth\\ 
 $D$     & L       & Distance between rows\\
 $l_r$   & L/L$^2$ & Total root length per area\\ 
 $l_R$   & L/L     & Total root length per length of row\\ 
@@ -840,268 +842,5 @@ $y$     & L       & Horizontal position along row \\
 $z$     & L       & Soil depth \\
 \end{tabular}
 \vfill{}
-
-\end{document}
-
-
-\pagebreak
-\section*{Questions}
-
-\begin{itemize}
-\item CAU: What is the ridge geometry?  And zero level?
-\item Are there any publication on the Chinese experiments?  Yields,
-  effect of treatment, whatever?
-\end{itemize}
-
-\pagebreak
-\section*{Removed}
-
-\subsection*{Introduction}
-
-\begin{em}
-  Too much about PRD.
-\end{em}
-
-Partial root zone drying (PRD) is an irrigation technique where
-irrigation is applied on only part of the root zone, dividing it into
-a wet and a dry zone.  The idea is then that root signals from the dry
-zone will lower the hydraulic conductivity through of the stomata, and
-thus reduce the transpiration from the wet zone.  Used properly, the
-technique has been shown to provide significant water savings
-(MNA-TODO: REF).  For PRD to work, the irrigation scheme must
-alternate between what part of the root zone is wet, and what part is
-kept dry. (MNA-TODO: REF-SAFIR/Fulai) recommends that (MNA-TODO:
-SAFIR/Fulai strategy).  When these conditions are fulfilled is
-determined by both the movement of water through the soil matrix from
-the wet zone to the dry zone, and by the water uptake through the
-plant roots.  The established solution to the first is based on
-Richards equation \citep{richardseq}.  The formulation must be at
-least \twod{} to include both the vertical and a horizontal component.
-
-The issue of water uptake from the soil matrix through the roots can
-be broken into the total uptake (approximately equal to the
-transpiration), and the spatial distribution within the root zone.
-
-\subsection*{Model theory}
-
-\subsubsection{Limited growth}
-\label{sec:soillim}
-
-\begin{em}
-  Not really used.
-\end{em}
-
-The distribution in \MyEq{eq:g+p} implies a gradual decrease of roots
-going towards but never reaching zero.  For some soils this doesn't
-match what we observe, rather than a gradual decrease, there is sharp
-decrease at a specific depth, as the roots are unable to penetrate
-further down.  To handle this, we can divide the root depth into a
-crop specific and soil independent potential root depth $d_c$, and
-soil specific and crop independent maximum root depth $d_s$.  The
-actual root depth $d_a$ is then the shallowest of these two.
-\begin{equation}
-  d_a = \min (d_c, d_s)
-  \label{eq:actual-depth}
-\end{equation}
-
-We now create a modified root density function $L^\prime (z)$ by
-defining it to zero below $d_a$, and scaled to preserve mass balance
-above.
-\begin{equation}
-  L^\prime (z) =
-  \begin{cases}
-    k^\prime L\, (z) & \text{for $z \leq d_a$}\\
-    0 & \text{for $z > d_a$}
-  \end{cases}
-  \label{eq:limited-depth}
-\end{equation}
-\begin{equation}
-  k^\prime = \frac{l_r}{\int_0^{d_a} L\, (z) \, dz}
-          = \frac{l_r\; a}{L_0 - L_0  \; e^{-a\; d_a}}
-  \label{eq:scale-factor}
-\end{equation}
-
-\begin{em}
-  The W and Q equations aren't that complex, their solutions doesn't
-  warrent as much text and figures.
-\end{em}
-
-\subsubsection*{Numeric solution to $W$}
-
-The expression on the left hand side of the equation is depicted on
-figure~\ref{fig:W}.
-\begin{figure}[htbp]
-  \input{rootdens_W}
-  \caption{The Lambert-W expression ($W e^W$).}
-  \label{fig:W}
-\end{figure}
-
-The solution to this equation with regard to
-$W$ happens to be the definition of the Lambert-W function
-\citep{lambert58,euler83}.
-
-In order to solve \MyEq{eq:Lambert} with regard to $W$, we first
-divide the expression into monotonic intervals by finding the
-derivative
-\begin{equation}
-  \frac{d \, (W e^W)}{dW} = e^W + W e^W
-  \label{eq:derived-W}
-\end{equation}
-The equation
-\begin{equation}
-  e^W + W e^W = 0
-  \label{eq:derived-W-solutions}
-\end{equation}
-has one solution, $W=-1$. The expression $W\, e^W$ is decreasing below
-$-1$ and increasing above $-1$.  Thus, a global minimum is obtained
-for $W=-1$.
-
-Since $\lim_{W\to-\infty} W\,e^W=0$ we get a single solution
-to~\MyEq{eq:Lambert} when $-L_m \frac{d_c}{l_r}$ is exactly at the
-bottom point ($-1 e^{-1}$), two when it is above (it is never
-positive), and none when it is below.  The later situation corresponds
-to the case where there is insufficient root $l_r$ to satisfy the
-minimal root density $L_m$ within the given root zone $d_c$.
-
-Both solutions are valid, but represent different distributions.
-\begin{itemize} 
-\item The solution for $W < -1$ represents a large $a$ parameter. From
-  \MyEq{eq:L0-found} we see this also means $L_0$ is large.  Thus,
-  the solution corresponds to a root zone with a high density near the
-  top that decreases rapidly to $L_m$ at the bottom of the root zone,
-  and continues to decrease so only a small contribution to the total
-  root length come from below the root zone.
-\item The solution for $W > -1$ (and thus small values of $a$ and
-  $L_0$) corresponds to a low root density near the top that
-  decreases slowly, and thus gives a larger contribution to the total
-  root length from below the root zone.
-\end{itemize}
-As the total root length increases, pressing $W$ towards $0$ or
-$-\infty$, the difference between the solutions grow.  When there is
-just enough roots to satisfy the constraints at $W = -1$, the two
-solutions converges to one.  As we like our roots to stay mostly
-within the root zone, we choose the solution for $W < -1$.  We can
-thus find $W$ numerically using Newton's method and an initial guess
-of $-2$.
-
-\subsubsection*{Numeric solution to $Q$}
-
-\begin{figure}[htbp]
-  \input{rootdens_Q}
-  \caption{The Q expression ($Q^2 e^Q$).}
-  \label{fig:Q}
-\end{figure}
-
-We know $Q^2\, e^Q$ and want to find $Q$.  We start by dividing the
-expression into monotonic intervals by finding the derivative
-\begin{equation}
-  \frac{d (Q^2\, e^Q)}{dQ} = 2 Q e^Q + Q^2 e^Q
-  \label{eq:derived}
-\end{equation}
-The equation
-\begin{equation}
-  2 Q e^Q + Q^2 e^Q = 0
-  \label{eq:derived-solutions}
-\end{equation}
-has two solutions, $Q=0$ and $Q=-2$, and the expression $Q^2\, e^Q$ is
-increasing below $-2$, decreasing between $-2$ and $0$, and increasing
-above $0$. Thus, $Q=0$ is a local (and in this case also global)
-minimum, and $Q=-2$ is a local maximum.
-
-We are not interested in positive values for $Q$, they correspond to
-negative values for $a_z$, the simplification in
-\MyEq{eq:root-integral2} are only valid if $a_z > 0$. Since
-$\lim_{Q\to-\infty} Q^2\,e^Q=0$ we get a single negative solution when
-$L_m \frac{d_c \, w_c}{l_R}$ is exactly at the top point ($2^2 e^{-2}$),
-two when it is smaller (it is never negative), and none when it is
-larger.  
-
-Both negative solutions are valid, but represent different
-distributions.  The solution for $Q > -2$ corresponds to a root
-distribution with a large fraction of the root length being located
-from outside the root zone, hence we choose the solution for $Q < -2$.
-We can find $Q$ numerically using Newton's method and an initial guess
-of $-3$.
-
-\subsection*{Results}
-
-\begin{em}
-  Too much space for stuff we don't use.
-\end{em}
-
-The phenological data is shown together with the root sampling dates on
-table~\ref{tab:caas-phenology} and~\ref{tab:cau-phenology}.  Note that
-the 2008 sampling were later than the 2007 sampling at the CAU site.
-Final yield are shown on figure~\ref{tab:yield}, and are above Chinese
-average in all cases except plot 21 for the CAAS site.
-
-\begin{table}[htbp]
-  \caption{CAAS phenology and root sampling.}
-  \label{tab:caas-phenology}
-  \begin{tabular}{ll}\\\hline
-Date & Stage\\\hline
-2008-03-15	& Sprouting/Bud development\\
-2008-03-25	& Emergence\\
-2008-04-10	& Tuber initiation\\
-2008-04-15	& First individual buds\\
-2008-04-20	& Beginning of flowering\\
-2008-05-20	& First berries visible\\
-2008-06-03	& Beginning of leaf yellowing\\
-2008-06-10   & \textbf{Root density sample}\\
-2008-06-26	& Final harvest\\
-  \end{tabular}
-\end{table}
-
-\begin{table}[htbp]
-  \caption{CAU phenology and root sampling.}
-  \label{tab:cau-phenology}
-  \begin{tabular}{lll}\\\hline
-Date & Date & Stage\\\hline
-2007-04-20	& 2008-03-10	& Leaf development\\
-2007-05-10	& 2008-04-27	& Leaf development\\
-2007-05-25	& 2008-05-12	& Leaf development\\
-2007-05-30	& 	& \textbf{Root density sample}\\
-2007-06-08	& 2008-05-21	& Inflorescence emergence\\
-2007-06-11	& 2008-05-25	& Flowering\\
-2007-06-14	& 2008-05-29	& Development of fruit\\
-2007-06-16	& 2008-06-07	& Inflorescence emergence\\
-2007-06-20	& 2008-06-12	& Flowering\\
-	& 2008-06-15 & \textit{\textbf{Root density sample}}\\
-2007-06-23	& 2008-06-20	& Development of fruit\\
-2007-06-27	& 2008-06-30	& Inflorescence emergence\\
-2007-07-01	& 2008-07-03	& Flowering\\
-2007-07-05	& 	& \textbf{Root density sample}\\
-2007-07-10	& 2008-07-16	& Ripening of fruit and seed\\
-2007-07-20	& 2008-07-24	& Ripening of fruit and seed\\
-	& 2008-07-24 & \textit{\textbf{Root density sample}}\\
-2007-07-25	& 2008-08-01	& Ripening of fruit and seed\\
-  \end{tabular}
-\end{table}
-
-\begin{table}[htbp]
-  \caption{Final yield.  All numbers are wet weight.  The ``China''
-    number is the average Chinese yield that year, as reported by FAO 
-    (\url{http://faostat.fao.org/}).  The ``Average'' number is the 
-    average yield for the listed plots.  Yield information is missing 
-    for CAU 2008 plot 15.}
-  \label{tab:yield}
-
-  \begin{tabular}{llllll}\\\hline
-\multicolumn{2}{c}{CAAS 2008} & \multicolumn{2}{c}{CAU 2007} & \multicolumn{2}{c}{CAU 2008} \\
-Plot	& Mg/ha	& Plot	& Mg/ha	& Plot	& Mg/ha\\\hline
-China	& 14.8	& China	& 23.1	& China	& 23.3\\\hline
-Average	& 19.9	& Average	& 44.3	& Average	& 46.9\\
-3	& 20.6	& 1	& 41.8	& 3	& 45.1\\
-6	& 23.2	& 2	& 43.5	& 6	& 41.8\\
-9	& 18.3	& 3	& 51.5	& 9	& 48.8\\
-12	& 20.0	& 4	& 41.7	& 12	& 51.9\\
-15	& 18.0	& 5	& 43.0	& 15	& n/a\\
-18	& 22.4	& 	& 	& 	& \\
-21	& 14.4	& 	& 	& 	& \\
-24	& 22.5	& 	& 	& 	& 
-  \end{tabular}
-\end{table}
-
-
 
 \end{document}
