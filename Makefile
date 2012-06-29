@@ -31,7 +31,7 @@ OBJHOME =  $(SRCDIR)/obj
 NATIVEHOME = $(OBJHOME)
 NATIVEEXE = daisy daisyw
 USE_GUI = Q4
-BOOSTINC = 
+BOOSTINC = -isystem $(HOME)/boost_1_49_0
 else
 SRCDIR = ..
 OBJHOME = obj
