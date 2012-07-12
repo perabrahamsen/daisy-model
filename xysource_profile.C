@@ -90,9 +90,12 @@ XYSourceProfile::load (const Units& units, Treelog& msg)
 
   // Array.
   symbol tag = lex.soil_tag ();
-  if (lex.soil_x ().size () > 0)
+  if (lex.soil_xplus ().size () > 1)
     {
-      msg.error ("Two dimensional data");
+      std::ostringstream tmp;
+      tmp << lex.soil_xplus ().size () << " x values and "
+          << lex.soil_zplus ().size () << " z values, two dimensional data";
+      msg.error (tmp.str ());
       return false;
     }
 

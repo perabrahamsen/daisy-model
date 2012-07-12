@@ -1,3 +1,7 @@
+2012-07-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lexer_table.C (read_keywords): Trim non-text strings.
+
 2012-06-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* point.C, point.h: New utility.

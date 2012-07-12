@@ -370,6 +370,8 @@
                  text = keywords.name (key) + "\n";
                while (lex->good () && lex->peek () != '\n')
                  text += lex->get ();
+               if (!keywords.is_text (key))
+                 boost::algorithm::trim (text);
                keywords.set (key, text);
              }
              break;

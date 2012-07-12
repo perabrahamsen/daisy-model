@@ -215,7 +215,7 @@ set pm3d corners2color c4\n";
     case smooth:
       out << "\
 set pm3d map\n\
-set samples " << samples << "\n                  \
+set samples " << samples << "\n\
 set isosamples " << samples << "\n";
       break;
     case contour:
@@ -267,7 +267,11 @@ set size ratio -1\n";
   if (type == contour || type == surface)
     out << "with lines ";
 
-  out << "title \"" << dimension << "\"\n";
+  // Removed 2012-07-10: Used?
+  if (false)
+    out << "title \"" << dimension << "\"\n";
+  else
+    out << "title \"" << "" << "\"\n";
   
   // Data.
   daisy_assert (value.size () == xplus.size () * zplus.size ());
@@ -277,9 +281,11 @@ set size ratio -1\n";
     { 
     case block:
       // Cell corners only.
-      out << "0 0 " << vmaxf << "\n";
+      daisy_assert (value.size () > 0);
+      out << "0 0 " << value[0] << "\n";
+      daisy_assert (value.size () >= zplus.size ());
       for (size_t iz = 0; iz < zplus.size (); iz++)
-        out << zplus[iz] << " 0 " << vmaxf << "\n";
+        out << zplus[iz] << " 0 " << value[iz] << "\n";
       for (size_t ix = 0; ix < xplus.size (); ix++)
         {
           out << "\n0 " << xplus[ix] << " " << vmaxf << "\n";
