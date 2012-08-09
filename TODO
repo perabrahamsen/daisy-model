@@ -1,26 +1,43 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Hooghoudt
+* Ny zone component
 
-** Få figurer fra MMO
+** zone box model (erstatter volume box)
 
-** Læs artikel.
+** brug zone i Soil zones
 
-** Ret artikel
+** zone polygon
 
-** Få MMO til at sende den ind igen.
+* Polygon volume model.
 
 * Rootart
 
-** Vent 2012-8-6
+** DONE Vent 2012-8-6
 
 ** Find 5 reviewers.
 
-** Forbered filer: Fig1.eps
+*** mna's forslag
+*** ligungs forslag
+
+frantisek
+simunek
+wang? review artikel
+chr. richard
+anders pedersen
+
+** DONE Forbered filer: Fig1.eps
 
 ** Submit!
 
-* Polygon volume model.
+* Hooghoudt
+
+** DONE Få figurer fra MMO
+
+** DONE Læs artikel.
+
+** DONE Ret artikel
+
+** Få MMO til at sende den ind igen.
 
 * Søren
 
