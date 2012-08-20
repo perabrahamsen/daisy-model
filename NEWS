@@ -8,6 +8,20 @@ release.
 
 * 5.12
 
+** New "polygon" soil zone model.
+
+When using 2D geomerties you can now specify soil zones with arbitrary
+polygons. Specifically, the "zones" Soil parameter now accept "zone"
+models. The "box" model works as before, but the "polygon" model
+allows you to specify an arbitrary polygon. E.g. 
+
+    (defcolumn Andeby default
+      (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+            (zones ((polygon (outer (0 0) (0 10) (-10 0))) HorX)
+                   ((box  (top finite -3 [cm]) (bottom finite -24 [cm])
+                          (left finite 0 [cm]) (right finite 25 [cm]))
+                    HorY))
+
 ** New "growth" root density model.
 
 Use it like this:

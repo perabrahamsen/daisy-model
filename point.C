@@ -50,9 +50,9 @@ XYPoint::~XYPoint ()
 void
 ZXPoint::load_syntax (Frame& frame)
 { 
-  frame.declare ("z", "cm", Check::negative (), Attribute::Const, 
+  frame.declare ("z", "cm", Check::non_positive (), Attribute::Const, 
                  "Vertical position.");
-  frame.declare ("x", "cm", Check::positive (), Attribute::Const,
+  frame.declare ("x", "cm", Check::non_negative (), Attribute::Const,
                  "Horizontal position.");
   frame.order ("z", "x");
 }

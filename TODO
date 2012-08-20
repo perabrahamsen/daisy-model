@@ -1,6 +1,8 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Ny zone component
+* Zone
+
+** DONE zone component
 
 ** zone box model (erstatter volume box)
 
@@ -9,25 +11,6 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 ** zone polygon
 
 * Polygon volume model.
-
-* Rootart
-
-** DONE Vent 2012-8-6
-
-** Find 5 reviewers.
-
-*** mna's forslag
-*** ligungs forslag
-
-frantisek
-simunek
-wang? review artikel
-chr. richard
-anders pedersen
-
-** DONE Forbered filer: Fig1.eps
-
-** Submit!
 
 * Hooghoudt
 

@@ -41,7 +41,7 @@
 #include "memutils.h"
 #include "mathlib.h"
 #include "secondary.h"
-#include "volume.h"
+#include "zone.h"
 #include "water.h"
 #include <sstream>
 
@@ -81,11 +81,11 @@ struct Soil::Implementation
   auto_vector<const Layer*> layers;
   const size_t original_layer_size; // Size before adding aquitard, for logging.
 
-  // Zones.
-  struct Zone
+  // Regions.
+  struct Region
   {
     // Content.
-    std::auto_ptr<Volume> volume;
+    std::auto_ptr<Zone> volume;
     std::auto_ptr<Horizon> horizon;
 
     // Simulation.
@@ -95,20 +95,20 @@ struct Soil::Implementation
     // Create and Destroy.
     static void load_syntax (Frame& frame)
     { 
-      frame.declare_object ("volume", Volume::component, 
+      frame.declare_object ("volume", Zone::component, 
                          "Volume covered by this zone.");
       frame.declare_object ("horizon", Horizon::component, 
                          "Soil properties of this zone.");
       frame.order ("volume", "horizon");
     }
-    Zone (const Block& al)
-      : volume (Librarian::build_item<Volume> (al, "volume")),
+    Region (const Block& al)
+      : volume (Librarian::build_item<Zone> (al, "volume")),
 	horizon (Librarian::build_item<Horizon> (al, "horizon"))
     { }
-    ~Zone ()
+    ~Region ()
     { }
   };
-  const auto_vector<const Zone*> zones;
+  const auto_vector<const Region*> zones;
 
   // Parameters
   /* const */ double MaxRootingDepth;
@@ -157,7 +157,7 @@ struct Soil::Implementation
   Implementation (const Block& al)
     : layers (map_submodel_const<Layer> (al, "horizons")),
       original_layer_size (layers.size ()),
-      zones (map_submodel_const<Zone> (al, "zones")),
+      zones (map_submodel_const<Region> (al, "zones")),
       MaxRootingDepth (al.number ("MaxRootingDepth")),
       dispersivity (al.number ("dispersivity")),
       dispersivity_transversal (al.number ("dispersivity_transversal",
@@ -174,7 +174,7 @@ A location and content of a soil layer.\n\
 The layers apply to the soil section not covered by the 'zones' parameter.");
 
 static DeclareSubmodel 
-soil_zone_submodel (Soil::Implementation::Zone::load_syntax, "SoilZone", "\
+soil_zone_submodel (Soil::Implementation::Region::load_syntax, "SoilRegion", "\
 A location and content of a soil zone.\n\
 If several zones cover the same soil, the first one listed is used.\n\
 If no zones cover the soil, the 'horizons' parameter is used.\n\
@@ -540,9 +540,9 @@ be added below the one specified here if you do not also specify an explicit\n\
 geometry.",
 				 Implementation::Layer::load_syntax);
   frame.declare_submodule_sequence ("zones", Attribute::State, "\
-Zones with special soil properties.\n\
+Regions with special soil properties.\n\
 This overrules the 'horizons' paramter.",
-				 Implementation::Zone::load_syntax);
+				 Implementation::Region::load_syntax);
   frame.set_empty ("zones");
   frame.declare ("MaxRootingDepth", "cm", Check::positive (), Attribute::Const,
 	      "Depth at the end of the root zone (a positive number).");

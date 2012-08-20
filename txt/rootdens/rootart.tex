@@ -11,17 +11,21 @@
 \usepackage{amsmath}
 \usepackage{hyperref}
 \usepackage{upgreek}
+\usepackage[misc]{ifsym}
 
 %%\usepackage{natbib}
 \usepackage[left,running]{lineno}
-\input{macro}
 
 \newcommand{\attmark}[1]{\mbox{$^{\mbox{\footnotesize #1}}$}}
 \newcommand{\twod}{\textsc{2d}}
 \newcommand{\oned}{\textsc{1d}}
 \newcommand{\threed}{\textsc{3d}}
+\newcommand{\cplusplus}%
+{{\leavevmode{\rm{\hbox{C\hskip -0.1ex\raise 0.5ex\hbox{\tiny ++}}}}}}
 
 \newcommand{\MyEq}[1]{Eq.~\ref{#1}}
+
+\setcounter{secnumdepth}{0}
 
 \begin{document}
 
@@ -34,7 +38,7 @@
   \and Xuebin Qi \and Dongmei Qiao \and Ping Li 
   \and Guitong Li \and Søren Hansen}
 
-\institute{Per Abrahamsen \and Søren Hansen 
+\institute{Per Abrahamsen (\Letter) \and Søren Hansen 
   \at Department of Basic Sciences and Environment,\\
       Faculty of Life Sciences, 
       University of Copenhagen,\\

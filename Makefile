@@ -185,7 +185,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = volume_poly.C \
+MODELS = zone_poly.C zone_box.C \
 	rootdens_growth.C gnuplot_vector.C program_optimize.C summary_Rsqr.C \
 	log_table.C xysource_profile.C program_rootmatch.C program_hmovie.C \
 	wsource_std.C wsource_time.C wsource_combine.C wsource_indirect.C\
@@ -271,7 +271,7 @@ DISABLED = depend.C \
 	hydraulic_old.C hydraulic_old2.C 
 # A component is a common interface to a number of models.
 # 
-COMPONENTS = wsource.C solute.C drain.C \
+COMPONENTS = zone.C wsource.C solute.C drain.C \
 	draineqd.C condedge.C rainergy.C ponddamp.C scope_model.C seed.C \
 	stomatacon.C tertiary.C biopore.C secondary.C heatrect.C unit_model.C \
 	ABAprod.C solver.C element.C ui.C reaction.C scopesel.C \
@@ -398,7 +398,7 @@ TEXT =  setup-native.nsi \
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = none
+REMOVE = volume_poly.C 
 
 REMOVED = ABAeffect_exp.C ABAeffect.C ABAeffect.h \
 	stomatacon_Leuning.C stomatacon_BB.C \
@@ -820,6 +820,7 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
  block.h scope.h attribute.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
+zone${OBJ}: zone.C zone.h model.h symbol.h librarian.h
 wsource${OBJ}: wsource.C wsource_weather.h wsource.h weather.h weatherdata.h \
  symbol.h model_derived.h model_logable.h model.h scope.h attribute.h \
  time.h librarian.h assertion.h
@@ -1014,7 +1015,7 @@ column${OBJ}: column.C column.h model_framed.h model_logable.h model.h \
  symbol.h irrigate.h memutils.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h log.h time.h \
  border.h librarian.h submodeler.h block_submodel.h frame_submodel.h \
- check.h
+ check.h point.h
 crop${OBJ}: crop.C crop.h model_framed.h model_logable.h model.h symbol.h \
  time.h om.h plf.h block_model.h block_nested.h block.h scope.h \
  attribute.h treelog.h frame_model.h frame.h mathlib.h assertion.h \
@@ -1080,6 +1081,8 @@ vegetation${OBJ}: vegetation.C vegetation.h model_derived.h model_logable.h \
  model.h symbol.h log.h time.h border.h model_framed.h frame.h scope.h \
  attribute.h block_model.h block_nested.h block.h treelog.h frame_model.h \
  librarian.h
+point${OBJ}: point.C point.h block.h scope.h attribute.h symbol.h frame.h \
+ check.h
 irrigate${OBJ}: irrigate.C irrigate.h symbol.h memutils.h volume.h \
  model_derived.h model_logable.h model.h im.h attribute.h soil_water.h \
  bioclimate.h model_framed.h chemistry.h chemical.h frame.h scope.h \
@@ -1176,7 +1179,7 @@ soil${OBJ}: soil.C soil.h symbol.h horizon.h model_derived.h model_logable.h \
  groundwater.h metalib.h frame.h scope.h library.h frame_submodel.h \
  mathlib.h assertion.h librarian.h submodeler.h block_submodel.h \
  block_nested.h block.h treelog.h log.h time.h border.h model_framed.h \
- check.h vcheck.h memutils.h secondary.h volume.h water.h
+ check.h vcheck.h memutils.h secondary.h zone.h water.h
 surface${OBJ}: surface.C surface.h uzmodel.h model.h symbol.h geometry1d.h \
  geometry_vert.h geometry.h attribute.h soil.h soil_water.h log.h time.h \
  border.h model_framed.h model_logable.h mathlib.h assertion.h \
@@ -1462,9 +1465,16 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  model_framed.h model_logable.h memutils.h time.h toplevel.h \
  parser_file.h parser.h field.h irrigate.h border.h column.h weather.h \
  weatherdata.h action.h horizon.h model_derived.h printer_file.h \
- printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h
+ printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h \
+ point.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+zone_poly${OBJ}: zone_poly.C zone.h model.h symbol.h librarian.h \
+ block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
+ frame_model.h frame.h frame_submodel.h vcheck.h assertion.h point.h
+zone_box${OBJ}: zone_box.C zone.h model.h symbol.h bound.h model_derived.h \
+ model_logable.h librarian.h block_model.h block_nested.h block.h scope.h \
+ attribute.h treelog.h frame_model.h frame.h
 rootdens_growth${OBJ}: rootdens_growth.C rootdens.h model_framed.h \
  model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h geometry.h log.h \
@@ -1725,7 +1735,7 @@ movement_rect${OBJ}: movement_rect.C movement_solute.h movement.h \
  adsorption.h log.h time.h border.h check.h frame_submodel.h frame.h \
  scope.h submodeler.h block_submodel.h block_nested.h block.h treelog.h \
  tertiary.h librarian.h anystate.h mathlib.h assertion.h block_model.h \
- frame_model.h
+ frame_model.h point.h
 chemistry_multi${OBJ}: chemistry_multi.C chemistry.h model_framed.h \
  model_logable.h model.h symbol.h chemical.h log.h time.h border.h \
  block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
