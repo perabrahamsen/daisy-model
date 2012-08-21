@@ -398,7 +398,7 @@ TEXT =  setup-native.nsi \
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = volume_poly.C 
+REMOVE = none
 
 REMOVED = ABAeffect_exp.C ABAeffect.C ABAeffect.h \
 	stomatacon_Leuning.C stomatacon_BB.C \

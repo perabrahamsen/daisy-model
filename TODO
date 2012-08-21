@@ -1,16 +1,15 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Zone
+* Plot soil profile
 
-** DONE zone component
+** celle til navn
 
-** zone box model (erstatter volume box)
+Ok vi har har en metode til at hente celle til horizont.
 
-** brug zone i Soil zones
+** gnuplot soil
 
-** zone polygon
-
-* Polygon volume model.
+Hver horisont har en farve, lad skala skifte pludseligt af hensyn til
+colorbox.
 
 * Hooghoudt
 
