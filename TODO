@@ -2,14 +2,15 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Plot soil profile
 
-** celle til navn
+** Initialize column
 
-Ok vi har har en metode til at hente celle til horizont.
+** Test
 
 ** gnuplot soil
 
-Hver horisont har en farve, lad skala skifte pludseligt af hensyn til
-colorbox.
+Hver horisont har en farve
+
+Hvordan klarer vi legend?
 
 * Hooghoudt
 

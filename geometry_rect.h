@@ -62,7 +62,6 @@ public:
   { return x_[n]; }
   inline double dx (size_t n) const // Horizontal width of cell [cm]
   { return dx_[n]; }
-private:
   double xplus (size_t n) const; // Right side of cell [cm].
   double xminus (size_t n) const; // Left side of cell [cm].
 public:
