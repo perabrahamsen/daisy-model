@@ -27,8 +27,6 @@
 #include "column.h"
 #include "horizon.h"
 #include "hydraulic.h"
-#include "wsource.h"
-#include "output.h"
 #include "time.h"
 #include "librarian.h"
 #include "scope.h"
@@ -112,18 +110,7 @@ struct NumberByDepth : public Number
       h (Librarian::build_item<Number> (al, "h")),
       z (Librarian::build_item<Number> (al, "z"))
   { 
-    Output output;
-    Time time (9999, 1, 1, 0);
-    const Library& wlib = al.metalib ().library (WSource::component);
-    const double T = 10.0;
-    FrameModel frame (wlib.model ("const"), Frame::parent_link);
-    frame.set ("average", T);
-    frame.set ("amplitude", 0.0);
-    frame.set ("air_temperature", T);
-    std::auto_ptr<WSource> weather (Librarian::build_frame<WSource>
-                                    (al, frame, "initialize"));
-    column->initialize (al, output.scopes (),
-                        time, weather.get (), Scope::null ());
+    column->initialize (al);
     max_depth = column->bottom ();
   }
 };

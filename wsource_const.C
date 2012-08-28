@@ -24,6 +24,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "time.h"
+#include "frame.h"
 
 struct WSourceConst : public WSourceBase
 {

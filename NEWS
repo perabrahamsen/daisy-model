@@ -22,6 +22,19 @@ allows you to specify an arbitrary polygon. E.g.
                           (left finite 0 [cm]) (right finite 25 [cm]))
                     HorY))
 
+** You can now plot 2D soil type profile.
+
+To plot the soil type profile of the column Andeby: 
+
+    (defgnuplot PlotMe profile
+      (where "andeby-soil.pdf")
+      (column Andeby))
+  
+    (defprogram RunMe gnuplot
+      (graph PlotMe))
+  
+    (run RunMe)
+
 ** New "growth" root density model.
 
 Use it like this:

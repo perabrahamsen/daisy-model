@@ -182,7 +182,8 @@ public:
   // Create and Destroy.
   static Movement* build_vertical (const BlockModel& al);
   ColumnStandard (const BlockModel& al);
-  bool initialize (const Block&, const std::vector<const Scope*> scopes,
+  void initialize (const Block& al);
+  bool initialize (const Block&, const std::vector<const Scope*>& scopes,
                    const Time&, const Weather*, const Scope& scope);
   void summarize (Treelog& msg) const;
   ~ColumnStandard ();
@@ -957,9 +958,21 @@ ColumnStandard::ColumnStandard (const BlockModel& al)
     tillage_age = al.number_sequence ("tillage_age");
 }
 
+void
+ColumnStandard::initialize (const Block& al)
+{
+  const std::vector<const Scope*> scopes;
+  Time time (9999, 1, 1, 0);
+  std::auto_ptr<WSource> weather (Librarian:: build_stock<WSource>
+                                  (al.metalib (), al.msg (),
+                                   "const", "initialize"));
+  initialize (al, scopes,
+              time, weather.get (), Scope::null ());
+}
+
 bool
 ColumnStandard::initialize (const Block& block, 
-                            const std::vector<const Scope*> scopes,
+                            const std::vector<const Scope*>& scopes,
                             const Time& time, 
                             const Weather* global_weather,
                             const Scope& parent_scope)

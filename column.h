@@ -156,7 +156,9 @@ public:
 protected:
   explicit Column (const BlockModel&);
 public:
-  virtual bool initialize (const Block&, const std::vector<const Scope*> scopes,
+  virtual void initialize (const Block& al) = 0;
+  virtual bool initialize (const Block&,
+                           const std::vector<const Scope*>& scopes,
                            const Time&, const Weather*, const Scope&) = 0;
   virtual void summarize (Treelog& msg) const = 0;
   ~Column ();

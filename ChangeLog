@@ -1,6 +1,14 @@
+2012-08-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* column.h, column_std.C (initialize): Overloaded with version
+	taking fewer arguments.
+
+	* number_soil.C (NumberByDepth): Use it.
+
 2012-08-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* gnuplot_profile.C: New model.
+	* Makefile (MODELS): Added.
 
 2012-08-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
