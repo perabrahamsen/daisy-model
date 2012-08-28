@@ -1469,6 +1469,11 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  point.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+gnuplot_profile${OBJ}: gnuplot_profile.C gnuplot_base.h gnuplot.h model.h \
+ symbol.h column.h model_framed.h model_logable.h irrigate.h memutils.h \
+ soil.h horizon.h model_derived.h geometry_rect.h geometry_vert.h \
+ geometry.h attribute.h treelog.h assertion.h librarian.h block_model.h \
+ block_nested.h block.h scope.h frame_model.h frame.h
 zone_poly${OBJ}: zone_poly.C zone.h model.h symbol.h librarian.h \
  block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
  frame_model.h frame.h frame_submodel.h vcheck.h assertion.h point.h
@@ -1543,7 +1548,8 @@ wsource_table${OBJ}: wsource_table.C wsource_table.h wsource_base.h \
  assertion.h mathlib.h
 wsource_const${OBJ}: wsource_const.C wsource_base.h wsource_weather.h \
  wsource.h weather.h weatherdata.h symbol.h model_derived.h \
- model_logable.h model.h scope.h attribute.h librarian.h treelog.h time.h
+ model_logable.h model.h scope.h attribute.h librarian.h treelog.h time.h \
+ frame.h
 groundwater_source${OBJ}: groundwater_source.C groundwater.h model_derived.h \
  model_logable.h model.h symbol.h source.h time.h timestep.h vcheck.h \
  units.h memutils.h assertion.h block_model.h block_nested.h block.h \
@@ -1921,8 +1927,7 @@ boolean_string${OBJ}: boolean_string.C boolean.h model.h symbol.h \
 number_soil${OBJ}: number_soil.C number.h symbol.h model.h metalib.h frame.h \
  scope.h attribute.h library.h block_model.h block_nested.h block.h \
  treelog.h frame_model.h column.h model_framed.h model_logable.h \
- irrigate.h memutils.h horizon.h model_derived.h hydraulic.h plf.h \
- wsource.h weather.h weatherdata.h output.h condition.h time.h \
+ irrigate.h memutils.h horizon.h model_derived.h hydraulic.h plf.h time.h \
  librarian.h units.h
 organic_none${OBJ}: organic_none.C organic.h model_derived.h model_logable.h \
  model.h symbol.h geometry.h attribute.h librarian.h frame.h scope.h
