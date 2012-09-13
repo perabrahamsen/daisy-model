@@ -8,6 +8,11 @@ release.
 
 * 5.12
 
+** "AOM Pools" and "Organic Matter" log models should work again.
+
+Individual pools (SOM1, SOM2, SOM3) is refered to by name (SOM-SLOW,
+SOM-FAST, SOM-INERT) rather than numbers.
+
 ** New "polygon" soil zone model.
 
 When using 2D geomerties you can now specify soil zones with arbitrary

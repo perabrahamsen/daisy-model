@@ -2564,51 +2564,51 @@ Use \"*\" to log all added organic matter matter.")
   "Log content of all pools in specific added organic matter."
   (where "${colfid}aom-pools.dlf")
   (when hourly)
-  (entries (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "0" N)
+  (entries (interval (path column "${column}" OrganicMatter "*" am "${aom}" om AOM-SLOW N)
                      (tag "SOIL1-N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "0" C) 
+           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om AOM-SLOW C) 
                      (tag "SOIL1-C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (number (path column "${column}" OrganicMatter "*" am "${aom}" om "0" top_N)
+           (number (path column "${column}" OrganicMatter "*" am "${aom}" om AOM-SLOW top_N)
                    (tag "TOP1-N")
                    (dimension "kg N/ha")
                    (factor 1e5))        ;g/cm^2 -> kg/ha
-           (number (path column "${column}" OrganicMatter "*" am "${aom}" om "0" top_C)
+           (number (path column "${column}" OrganicMatter "*" am "${aom}" om AOM-SLOW top_C)
                    (tag "TOP1-C")
                    (dimension "kg C/ha")
                    (factor 1e5))        ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "1" N)
+           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om AOM-FAST N)
                      (tag "SOIL2-N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "1" C) 
+           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om AOM-FAST C) 
                      (tag "SOIL2-C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (number (path column "${column}" OrganicMatter "*" am "${aom}" om "1" top_N)
+           (number (path column "${column}" OrganicMatter "*" am "${aom}" om AOM-FAST top_N)
                    (tag "TOP2-N")
                    (dimension "kg N/ha")
                    (factor 1e5))        ;g/cm^2 -> kg/ha
-           (number (path column "${column}" OrganicMatter "*" am "${aom}" om "1" top_C)
+           (number (path column "${column}" OrganicMatter "*" am "${aom}" om AOM-FAST top_C)
                    (tag "TOP2-C")
                    (dimension "kg C/ha")
                    (factor 1e5))        ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "2" N)
+           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om AOM-DIRECT N)
                      (tag "SOIL3-N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "2" C) 
+           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om AOM-DIRECT C) 
                      (tag "SOIL3-C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (number (path column "${column}" OrganicMatter "*" am "${aom}" om "2" top_N)
+           (number (path column "${column}" OrganicMatter "*" am "${aom}" om AOM-DIRECT top_N)
                    (tag "TOP3-N")
                    (dimension "kg N/ha")
                    (factor 1e5))        ;g/cm^2 -> kg/ha
-           (number (path column "${column}" OrganicMatter "*" am "${aom}" om "2" top_C)
+           (number (path column "${column}" OrganicMatter "*" am "${aom}" om AOM-DIRECT top_C)
                    (tag "TOP3-C")
                    (dimension "kg C/ha")
                    (factor 1e5))        ;g/cm^2 -> kg/ha
@@ -2618,67 +2618,67 @@ Use \"*\" to log all added organic matter matter.")
   "Information about all organic matter pools."
   (where "${colfid}organic-matter.dlf")
   (when hourly)
-  (entries (interval (path column "${column}" OrganicMatter "*" som "0" N)
+  (entries (interval (path column "${column}" OrganicMatter "*" som SOM-SLOW N)
                      (tag "SOM1-N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" som "0" C)
+           (interval (path column "${column}" OrganicMatter "*" som SOM-SLOW C)
                      (tag "SOM1-C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" som "1" N)
+           (interval (path column "${column}" OrganicMatter "*" som SOM-FAST N)
                      (tag "SOM2-N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" som "1" C)
+           (interval (path column "${column}" OrganicMatter "*" som SOM-FAST C)
                      (tag "SOM2-C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" som "2" N)
+           (interval (path column "${column}" OrganicMatter "*" som SOM-INERT N)
                      (tag "SOM3-N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" som "2" C)
+           (interval (path column "${column}" OrganicMatter "*" som SOM-INERT C)
                      (tag "SOM3-C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" smb "0" N)
+           (interval (path column "${column}" OrganicMatter "*" smb SMB-SLOW N)
                      (tag "SMB1-N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" smb "0" C)
+           (interval (path column "${column}" OrganicMatter "*" smb SMB-SLOW C)
                      (tag "SMB1-C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" smb "1" N)
+           (interval (path column "${column}" OrganicMatter "*" smb SMB-FAST N)
                      (tag "SMB2-N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" smb "1" C)
+           (interval (path column "${column}" OrganicMatter "*" smb SMB-FAST C)
                      (tag "SMB2-C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" am "*" om "0" N)
+           (interval (path column "${column}" OrganicMatter "*" am "*" om AOM-SLOW N)
                      (tag "AOM1-N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" am "*" om "0" C)
+           (interval (path column "${column}" OrganicMatter "*" am "*" om AOM-SLOW C)
                      (tag "AOM1-C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" am "*" om "1" N)
+           (interval (path column "${column}" OrganicMatter "*" am "*" om AOM-FAST N)
                      (tag "AOM2-N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" am "*" om "1" C)
+           (interval (path column "${column}" OrganicMatter "*" am "*" om AOM-FAST C)
                      (tag "AOM2-C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" am "*" om "2" N)
+           (interval (path column "${column}" OrganicMatter "*" am "*" om AOM-DIRECT N)
                      (tag "AOM3-N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" am "*" om "2" C)
+           (interval (path column "${column}" OrganicMatter "*" am "*" om AOM-DIRECT C)
                      (tag "AOM3-C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha

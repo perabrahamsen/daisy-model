@@ -367,6 +367,26 @@ Fast AOM pool parameterization by Sander Bruun.")
   }
 } AOMFast_syntax;
 
+static struct AOMDirectSyntax : public DeclareParam
+{
+  AOMDirectSyntax ()
+    : DeclareParam (AOM::component, "AOM-DIRECT", root_name (), "\
+Third AOM pool of already decomposed material.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    std::vector<double> efficiency1;
+    efficiency1.push_back (1.00);
+    frame.set ("efficiency", efficiency1);
+    frame.set ("turnover_rate", 1.0);
+    std::vector<double> fractions1;
+    fractions1.push_back (0.00);
+    fractions1.push_back (0.00);
+    fractions1.push_back (1.00);
+    frame.set ("fractions", fractions1);
+  }
+} AOMDirect_syntax;
+
 static struct AOMSlowCropSyntax : public DeclareParam
 {
   AOMSlowCropSyntax ()

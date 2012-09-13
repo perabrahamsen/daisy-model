@@ -1,26 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Plot soil profile
-
-** Initialize column
-
-** Test
-
-** gnuplot soil
-
-Hver horisont har en farve
-
-Hvordan klarer vi legend?
-
-* Hooghoudt
-
-** DONE Få figurer fra MMO
-
-** DONE Læs artikel.
-
-** DONE Ret artikel
-
-** Få MMO til at sende den ind igen.
+* PESTPORE opsætning
 
 * Søren
 
@@ -61,8 +41,6 @@ Konklusion:  Kør langtidssimuleringer med din model før du gør det.
 
 Opstillingen af ligningssystemet skal så komprimeres, da det ikke
 længere er en genial ny ide vi præsenterer.
-
-* Ryd op på Joy.
 
 * Prøv 2D med MACRO hydraulics
 

@@ -1,3 +1,10 @@
+2012-09-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* aom.C ("AOM-DIRECT"): New pool name.
+	* lib/log.dai ("AOM Pools"): Use named pools.
+	("Organic Matter"): Ditto.
+	* lib/fertilizer.dai (slurry): Ditto.
+
 2012-08-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* column.h, column_std.C (initialize): Overloaded with version
