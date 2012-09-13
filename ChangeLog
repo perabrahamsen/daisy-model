@@ -1,3 +1,7 @@
+2012-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 5.12 released.
+
 2012-09-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* aom.C ("AOM-DIRECT"): New pool name.
