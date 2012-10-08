@@ -1,5 +1,42 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Klima?
+
+* UI?
+
+** uifilter
+
+*** Opt description
+
+** uigroup
+
+*** Opt filter
+
+*** Opt component & model
+
+*** Opt name
+
+*** Opt description
+
+*** order (list of parameters and groups)
+
+*** parameters (list of par & uiparameter)
+
+** uiparameter
+
+*** Opt filter
+
+*** Opt spec
+
+*** Opt name
+
+*** Opt description
+
+subttype for Attribute::Type, 
+
+"More detailed type"
+
+
 * PESTPORE opsætning
 
 * Søren

@@ -271,7 +271,7 @@ DISABLED = depend.C \
 	hydraulic_old.C hydraulic_old2.C 
 # A component is a common interface to a number of models.
 # 
-COMPONENTS = zone.C wsource.C solute.C drain.C \
+COMPONENTS = uifilter.C zone.C wsource.C solute.C drain.C \
 	draineqd.C condedge.C rainergy.C ponddamp.C scope_model.C seed.C \
 	stomatacon.C tertiary.C biopore.C secondary.C heatrect.C unit_model.C \
 	ABAprod.C solver.C element.C ui.C reaction.C scopesel.C \

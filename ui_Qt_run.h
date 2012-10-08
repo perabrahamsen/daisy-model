@@ -45,7 +45,7 @@ class UIRun : public QWidget, public UIQt
   QPointer<QLabel> qt_name;
   QPointer<QLabel> qt_file;
   QPointer<QLabel> qt_description;               
-  QPointer<QPushButton> qt_stop;
+  QPointer<QPushButton> qt_runstop;
   QPointer<VisQtProgress> qt_progress;
 
   // Logs.
@@ -66,6 +66,11 @@ private slots:
   // Use.
 public:
   void attach (Toplevel& toplevel);
+private:
+  void attach_tab_file (Toplevel&, QTabWidget&);
+  void attach_tab_edit (Toplevel&, QTabWidget&);
+  void attach_tab_run (Toplevel&, QTabWidget&);
+public:
   void run (Toplevel& toplevel);
   void failure (Toplevel& toplevel);
 
@@ -75,7 +80,14 @@ private:
 
   // Actions.
 private slots:
+  void new_setup ();
   void open_setup ();
+  void save_setup ();
+  void save_setup_as ();
+
+  // Track simulation.
+public slots:
+  void new_state (Toplevel::state_t);
 
   // Create.
 private:

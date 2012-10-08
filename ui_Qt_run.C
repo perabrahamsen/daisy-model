@@ -42,6 +42,9 @@
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
 #include <QtGui/QCheckBox>
+#include <QtGui/QTabWidget>
+#include <QtGui/QGroupBox>
+#include <QtGui/QComboBox>
 
 
 void
@@ -109,30 +112,177 @@ UIRun::attach (Toplevel& toplevel)
     build_log (toplevel.metalib (), block, "QtTime");   
   }
 
-  // Fetch data.
-  const Frame& frame = toplevel.program_frame ();
-  
-  // Attach menubar.
-  QMenuBar* menuBar = qt_main.menuBar ();
+  // Organize tabs.
+  QTabWidget *const tab_widget = new QTabWidget (&qt_main);
+  attach_tab_file (toplevel, *tab_widget);
+  attach_tab_edit (toplevel, *tab_widget);
+  attach_tab_run (toplevel, *tab_widget);
 
-  // Create File menu.
-  QMenu* fileMenu = menuBar->addMenu ("&File");
+  // All of this in our central widget.
+  qt_main.setCentralWidget (tab_widget);
+
+  // The title.
+  const std::vector<std::string> files = toplevel.files_found ();
+  if (files.size () == 1)
+    qt_main.set_file_name (files[0].c_str ());
+  else
+    qt_main.set_file_name ("");
+  qt_main.set_title ();
+
+  // Show it all.
+  qt_main.show ();
+}
+
+void 
+UIRun::attach_tab_file (Toplevel& toplevel, QTabWidget& tab_widget)
+{
+  // We organize items in a boxes.
+  QWidget *const file_center = new QWidget ();
+  QVBoxLayout *const layout = new QVBoxLayout (file_center);
+  
+  // The Setup file.
+  std::string file_label;
+  const std::vector<std::string> files = toplevel.files_found ();
+  switch (files.size ())
+    { 
+    case 0:
+      file_label = "No file loaded";
+      break;
+    case 1:
+      file_label = "Setup file: " + files[0];
+      break;
+    default:
+      file_label = "Multiple files loaded";
+    }
+
+  QGroupBox *const file_box = new QGroupBox (file_label.c_str ());
+  QHBoxLayout *const file_layout = new QHBoxLayout ();
+  file_box->setLayout (file_layout);
+  layout->addWidget (file_box);
+ 
 
   // Open setup.
-  QAction* openAction = new QAction ("&Open setup...", this);
-  openAction->setToolTip ("Open a setup file");
-  connect (openAction, SIGNAL(triggered()), this, SLOT(open_setup()));
-  fileMenu->addAction (openAction);
+  QPointer<QPushButton> qt_new = new QPushButton ("New");
+  daisy_assert (!qt_new.isNull ());
+  qt_new->setToolTip ("Start a new Daisy setup.");
+  file_layout->addWidget (qt_new);
+  QObject::connect(qt_new, SIGNAL(clicked ()),
+		   this, SLOT(new_setup ())); 
 
-  // Run setup.
-  QAction* runAction = new QAction ("&Run", this);
-  runAction->setToolTip ("Run the selected program.");
-  connect (runAction, SIGNAL(triggered()), this, SLOT(run_program()));
-  fileMenu->addAction (runAction);
+  QPointer<QPushButton> qt_open = new QPushButton ("Open...");
+  daisy_assert (!qt_open.isNull ());
+  qt_open->setToolTip ("Open a Daisy setup file.");
+  file_layout->addWidget (qt_open);
+  QObject::connect(qt_open, SIGNAL(clicked ()),
+		   this, SLOT(open_setup ())); 
 
+
+  QPointer<QPushButton> qt_save = new QPushButton ("Save");
+  daisy_assert (!qt_save.isNull ());
+  qt_save->setToolTip ("Save the Daisy setup to the currect file.");
+  file_layout->addWidget (qt_save);
+  QObject::connect(qt_save, SIGNAL(clicked ()),
+		   this, SLOT(save_setup ())); 
+
+  QPointer<QPushButton> qt_save_as = new QPushButton ("Save as...");
+  daisy_assert (!qt_save_as.isNull ());
+  qt_save_as->setToolTip ("Save the Daisy setup to a new file");
+  file_layout->addWidget (qt_save_as);
+  file_layout->addStretch ();
+  QObject::connect(qt_save, SIGNAL(clicked ()),
+		   this, SLOT(save_setup_as ())); 
+
+  // The program.
+  QGroupBox *const program_box = new QGroupBox ("Program");
+  QHBoxLayout *const program_layout = new QHBoxLayout ();
+  program_box->setLayout (program_layout);
+  layout->addWidget (program_box);
+
+  const Frame& frame = toplevel.program_frame ();
+  const symbol program_name = frame.type_name ();
+  QPointer<QComboBox> qt_select_program = new QComboBox ();
+  daisy_assert (!qt_select_program.isNull ());
+  qt_select_program->setToolTip ("Select program to run");
+  const Metalib& metalib = toplevel.metalib ();
+  const Library& proglib = metalib.library (Program::component);
+  std::vector<symbol> progs;
+  proglib.entries (progs);
+  qt_select_program->addItem (Attribute::None ().name ().c_str ());
+  size_t found = progs.size ();
+  for (size_t i = 0; i < progs.size (); i++)
+    {
+      if (progs[i] == program_name)
+        found = i;
+      qt_select_program->addItem (progs[i].name ().c_str ());
+    }
+  if (found < progs.size ())
+    qt_select_program->setCurrentIndex (found + 1);
+  else
+    qt_select_program->setCurrentIndex (0);
+  program_layout->addWidget (qt_select_program);
+  program_layout->addStretch ();
+
+  // The working directory.
+  QGroupBox *const directory_box = new QGroupBox ("Working directory");
+  QHBoxLayout *const directory_layout = new QHBoxLayout ();
+  directory_box->setLayout (directory_layout);
+  layout->addWidget (directory_box);
+
+  // The file path.
+  QGroupBox *const path_box = new QGroupBox ("File path");
+  QHBoxLayout *const path_layout = new QHBoxLayout ();
+  path_box->setLayout (path_layout);
+  layout->addWidget (path_box);
+
+  // The inputs path.
+  QGroupBox *const input_box = new QGroupBox ("Inputs");
+  QHBoxLayout *const input_layout = new QHBoxLayout ();
+  input_box->setLayout (input_layout);
+  layout->addWidget (input_box);
+  layout->addStretch ();
+
+  // Organize tabs.
+  tab_widget.addTab (file_center, "File");
+}
+
+void 
+UIRun::attach_tab_edit (Toplevel& toplevel, QTabWidget& tab_widget)
+{
   // We organize items in a boxes.
-  QWidget *const center = new QWidget (&qt_main);
-  QVBoxLayout *const layout = new QVBoxLayout (center);
+  QWidget *const edit_center = new QWidget ();
+  QVBoxLayout *const layout = new QVBoxLayout (edit_center);
+  
+  // The Setup file.
+  std::string file_label;
+  const std::vector<std::string> files = toplevel.files_found ();
+  switch (files.size ())
+    { 
+    case 0:
+      file_label = "No file loaded";
+      break;
+    case 1:
+      file_label = "Setup file: " + files[0];
+      break;
+    default:
+      file_label = "Multiple files loaded";
+    }
+
+  QGroupBox *const file_box = new QGroupBox (file_label.c_str ());
+  QHBoxLayout *const file_layout = new QHBoxLayout ();
+  file_box->setLayout (file_layout);
+  layout->addWidget (file_box);
+ 
+
+  // Organize tabs.
+  tab_widget.addTab (edit_center, "Edit");
+}
+
+void 
+UIRun::attach_tab_run (Toplevel& toplevel, QTabWidget& tab_widget)
+{
+  // We organize items in a boxes.
+  QWidget *const run_center = new QWidget ();
+  QVBoxLayout *const layout = new QVBoxLayout (run_center);
   
   // The top line.
   QHBoxLayout *const top_layout = new QHBoxLayout;
@@ -143,11 +293,9 @@ UIRun::attach (Toplevel& toplevel)
   QFont font = qt_name->font ();
   font.setBold (true);
   qt_name->setFont (font);
+  const Frame& frame = toplevel.program_frame ();
   const symbol type_name = frame.type_name ();
-  if (type_name != Attribute::None ())
-    qt_name->setText (type_name.name ().c_str ());
-  else
-    qt_name->setText ("No program");
+  qt_name->setText (type_name.name ().c_str ());
   top_layout->addWidget (qt_name /* , Qt::AlignLeft */);
   top_layout->addStretch ();
 
@@ -208,17 +356,27 @@ UIRun::attach (Toplevel& toplevel)
   layout->addWidget (qt_vis);
 
   // The bottom line
-  QWidget *const bottom = new QWidget (center);
+  QWidget *const bottom = new QWidget (run_center);
   QHBoxLayout *const bottom_layout = new QHBoxLayout (bottom);
   layout->addWidget (bottom);
 
-  // Emergency stop.
-  qt_stop = new QPushButton ("Stop");
-  qt_stop->setToolTip ("Press here to stop the program.");
-  qt_stop->setDisabled (true);
-  bottom_layout->addWidget (qt_stop);
-  bottom_layout->addStretch ();
-  daisy_assert (!qt_stop.isNull ());                                                
+  // Start and stop program.
+  qt_runstop = new QPushButton ("Run");
+  daisy_assert (!qt_runstop.isNull ());
+  qt_runstop->setToolTip ("Press here to run the program.");
+  bottom_layout->addWidget (qt_runstop);
+  // bottom_layout->addStretch ();
+  QObject::connect(qt_runstop, SIGNAL(clicked ()),
+		   this, SLOT(run_program ())); 
+
+  // A progress bar in the bottom.
+  qt_progress = new VisQtProgress;
+  qt_progress->setToolTip ("Display progress of program.");
+  QObject::connect(tlog->tracker (), SIGNAL(error_occured ()),
+                   qt_progress, SLOT(found_error ())); 
+  qt_progress->new_state (toplevel.state ());
+  bottom_layout->addWidget (qt_progress);
+
   // Track newest messages.
   QCheckBox *const qt_track = new QCheckBox ("Track");
   qt_track->setToolTip ("Check this box to always show new text.");
@@ -227,39 +385,20 @@ UIRun::attach (Toplevel& toplevel)
   qt_track->setCheckState (Qt::Checked);
   bottom_layout->addWidget (qt_track /* , Qt::AlignCenter */);
     
-  // Dismiss window.
-  QPushButton *const qt_dismiss = new QPushButton ("Dismiss");
-  qt_dismiss->setToolTip ("Press here to end the application.");
-  QObject::connect(qt_dismiss, SIGNAL(clicked ()),
-                   &qt_main, SLOT(close ())); 
-  bottom_layout->addStretch ();
-  bottom_layout->addWidget (qt_dismiss);
-    
-  // All of this in our central widget.
-  qt_main.setCentralWidget (center);
-
-  // A progress bar in the bottom.
-  qt_progress = new VisQtProgress;
-  qt_progress->setToolTip ("Display progress of program.");
-  QObject::connect(tlog->tracker (), SIGNAL(error_occured ()),
-                   qt_progress, SLOT(found_error ())); 
-  qt_progress->new_state (toplevel.state ());
-  qt_main.statusBar ()->addPermanentWidget (qt_progress);
-
-  // The title.
-  if (files.size () == 1)
-    qt_main.set_file_name (files[0].c_str ());
-  else
-    qt_main.set_file_name ("");
-  qt_main.set_title ();
-
-  // Show it all.
-  qt_main.show ();
+  // Organize tabs.
+  tab_widget.addTab (run_center, "Run");
 }
 
 void 
 UIRun::run_program ()
 { 
+  if (!qt_run.isNull ())
+    // Thread already running. Stop it.
+    {
+      stop_program ();
+      return;
+    }
+
   // New thread.
   daisy_assert (qt_run.isNull ());
   qt_run = new RunQtMain (*top_level, all_logs);
@@ -277,16 +416,11 @@ UIRun::run_program ()
 		   &qt_main, SLOT(new_progress (double))); 
   QObject::connect(qt_run, SIGNAL(progress_state (Toplevel::state_t)),
 		   &qt_main, SLOT(new_state (Toplevel::state_t))); 
+  QObject::connect(qt_run, SIGNAL(progress_state (Toplevel::state_t)),
+		   this, SLOT(new_state (Toplevel::state_t))); 
   QObject::connect(&qt_main, SIGNAL(stop_program ()),
 		   this, SLOT(stop_program ())); 
 
-
-  // Stop button.
-  daisy_assert (!qt_stop.isNull ());
-  QObject::connect(qt_run, SIGNAL(is_now_running (bool)),
-		   qt_stop, SLOT(setEnabled (bool))); 
-  QObject::connect(qt_stop, SIGNAL(clicked ()),
-		   qt_run, SLOT(stop ())); 
 
   // Start thread.
   qt_run->start (QThread::QThread::IdlePriority);
@@ -302,6 +436,7 @@ UIRun::stop_program ()
       daisy_assert (qt_run->isFinished ());
       delete qt_run;
       qt_run = NULL;
+      daisy_assert (qt_run.isNull ());
     }
   if (!qt_run.isNull ())
     daisy_bug ("qt_run should be NULL after process has been stopped");
@@ -372,6 +507,10 @@ You can drag a setup file to the Daisy icon to run a simulation.");
 }
 
 void 
+UIRun::new_setup ()
+{ }
+
+void 
 UIRun::open_setup ()
 {
   QString fileName 
@@ -393,6 +532,30 @@ UIRun::open_setup ()
         { 
           qt_main.statusBar ()->showMessage ("Failed!");
         }
+    }
+}
+
+void 
+UIRun::save_setup ()
+{ }
+
+void 
+UIRun::save_setup_as ()
+{ }
+
+void 
+UIRun::new_state (Toplevel::state_t ns)
+{
+  // Stop button.
+  if (ns == Toplevel::is_running)
+    {
+      qt_runstop->setText ("Stop");
+      qt_runstop->setDisabled (false);
+      qt_runstop->setToolTip ("Press here to stop the program.");
+    }
+  else
+    {
+      qt_runstop->setDisabled (true);
     }
 }
 

@@ -1,3 +1,11 @@
+2012-10-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* uifilter.C: New component.
+	* Makefile (COMPONENTS): Add it.
+
+	* ui_Qt_run.C, ui_Qt_run.h: New features.
+	* run_Qt.C: Cleanup.
+
 2012-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 5.12 released.

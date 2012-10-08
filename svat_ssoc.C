@@ -28,7 +28,6 @@
 #include "fao.h"
 #include "soil_heat.h"
 #include "bioclimate.h"
-#include "soil.h"
 #include "geometry.h"
 #include "weather.h"
 #include "vegetation.h"
@@ -313,7 +312,7 @@ const double SVAT_SSOC::c_p = 1010.;     //Specific heat of air.[J/kg/K^1]
 // Simulation.
 void
 SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
-                 const Geometry& geo, const Soil& soil, 
+                 const Geometry& geo, const Soil&, 
                  const SoilHeat& soil_heat, const SoilWater&, 
                  const Bioclimate& bio, Treelog& msg)
 {
