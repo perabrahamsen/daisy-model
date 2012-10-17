@@ -32,6 +32,7 @@
 #include "path.h"
 #include "treelog.h"
 #include "frame_submodel.h"
+#include "uifilter.h"
 #include <sstream>
 
 #include <QtGui/QMenuBar>
@@ -45,7 +46,9 @@
 #include <QtGui/QTabWidget>
 #include <QtGui/QGroupBox>
 #include <QtGui/QComboBox>
-
+#include <QtGui/QLineEdit>
+#include <QtGui/QSplitter>
+#include <QtGui/QSizePolicy>
 
 void
 UIRun::build_log (Metalib& metalib, Block& block, const std::string& name)
@@ -248,33 +251,121 @@ UIRun::attach_tab_file (Toplevel& toplevel, QTabWidget& tab_widget)
 void 
 UIRun::attach_tab_edit (Toplevel& toplevel, QTabWidget& tab_widget)
 {
-  // We organize items in a boxes.
-  QWidget *const edit_center = new QWidget ();
-  QVBoxLayout *const layout = new QVBoxLayout (edit_center);
-  
-  // The Setup file.
-  std::string file_label;
-  const std::vector<std::string> files = toplevel.files_found ();
-  switch (files.size ())
-    { 
-    case 0:
-      file_label = "No file loaded";
-      break;
-    case 1:
-      file_label = "Setup file: " + files[0];
-      break;
-    default:
-      file_label = "Multiple files loaded";
-    }
+  // We organize items in two panes.
+  const QPointer<QSplitter> edit_center = new QSplitter;
+  const QPointer<QWidget> left_pane_widget = new QWidget;
+  const QPointer<QVBoxLayout> left_pane = new QVBoxLayout;
+  left_pane_widget->setLayout (left_pane);
+  edit_center->addWidget (left_pane_widget);
 
-  QGroupBox *const file_box = new QGroupBox (file_label.c_str ());
-  QHBoxLayout *const file_layout = new QHBoxLayout ();
-  file_box->setLayout (file_layout);
-  layout->addWidget (file_box);
+  const QPointer<QWidget> right_pane_widget = new QWidget;
+#if 0
+  const QPointer<QHBoxLayout> right_pane = new QHBoxLayout;
+  right_pane->addWidget (new QLabel ("Right pane"));
+  right_pane_widget->setLayout (right_pane);
+#endif
+  right_pane_widget->sizePolicy ().setHorizontalPolicy (QSizePolicy::Maximum);
+  edit_center->addWidget (right_pane_widget);
+
+  // Select filter.
+  QPointer<QGroupBox> qt_select_filter_box = new QGroupBox ("Filter");
+  left_pane->addWidget (qt_select_filter_box);
+  daisy_assert (!qt_select_filter.isNull ());
+  qt_select_filter->setToolTip ("Select user interface.");
+  const Metalib& metalib = toplevel.metalib ();
+  const Library& filterlib = metalib.library (UIFilter::component);
+  std::vector<symbol> filters;
+  filterlib.entries (filters);
+  size_t index = 0;
+  size_t found = filters.size ();
+  for (size_t i = 0; i < filters.size (); i++)
+    {
+      const symbol filter = filters[i];
+      if (!filterlib.complete (metalib, filter))
+        continue;
+      if (filter == selected_filter)
+        found = index;
+      index++;
+      qt_select_filter->addItem (filter.name ().c_str ());
+    }
+  daisy_assert (found < index);
+  qt_select_filter->setCurrentIndex (found);
+  QPointer<QVBoxLayout> qt_select_filter_layout = new QVBoxLayout;
+  qt_select_filter_box->setLayout (qt_select_filter_layout); 
+  qt_select_filter_layout->addWidget (qt_select_filter);
+  QObject::connect(qt_select_filter, SIGNAL(activated (const QString&)),
+                   this, SLOT(select_filter (const QString&))); 
+
+  // Select component.
+  QPointer<QGroupBox> qt_select_component_box = new QGroupBox ("Component");
+  left_pane->addWidget (qt_select_component_box);
+  daisy_assert (!qt_select_component.isNull ());
+  qt_select_component->setToolTip ("Select component.");
+  QPointer<QVBoxLayout> qt_select_component_layout = new QVBoxLayout;
+  qt_select_component_box->setLayout (qt_select_component_layout); 
+  qt_select_component_layout->addWidget (qt_select_component);
+  QObject::connect(qt_select_component, SIGNAL(activated (const QString&)),
+                   this, SLOT(select_component (const QString&))); 
+
+  // Select model.
+  QPointer<QGroupBox> qt_select_model_box = new QGroupBox ("Model");
+  left_pane->addWidget (qt_select_model_box);
+  daisy_assert (!qt_select_model.isNull ());
+  qt_select_model->setToolTip ("Select model.");
+  QPointer<QVBoxLayout> qt_select_model_layout = new QVBoxLayout;
+  qt_select_model_box->setLayout (qt_select_model_layout); 
+  qt_select_model_layout->addWidget (qt_select_model);
+  QObject::connect(qt_select_model, SIGNAL(activated (const QString&)),
+                   this, SLOT(select_model (const QString&))); 
  
+  // The Save button.
+  QPointer<QPushButton> qt_save = new QPushButton ("Save");
+  daisy_assert (!qt_save.isNull ());
+  qt_save->setToolTip ("Save current model.");
+  QPointer<QHBoxLayout> qt_save_layout = new QHBoxLayout;
+  qt_save_layout->addWidget (qt_save);
+  // qt_save_layout->addStretch ();
+  qt_select_model_layout->addLayout (qt_save_layout);
+
+  // The Reset button.
+  QPointer<QPushButton> qt_reset = new QPushButton ("Reset");
+  daisy_assert (!qt_reset.isNull ());
+  qt_reset->setToolTip ("Reset current model.");
+  QPointer<QHBoxLayout> qt_reset_layout = new QHBoxLayout;
+  qt_reset_layout->addWidget (qt_reset);
+  // qt_reset_layout->addStretch ();
+  qt_select_model_layout->addLayout (qt_reset_layout);
+
+  // The Delete button.
+  QPointer<QPushButton> qt_delete = new QPushButton ("Delete");
+  daisy_assert (!qt_delete.isNull ());
+  qt_delete->setToolTip ("Delete current model.");
+  QPointer<QHBoxLayout> qt_delete_layout = new QHBoxLayout;
+  qt_delete_layout->addWidget (qt_delete);
+  // qt_delete_layout->addStretch ();
+  qt_select_model_layout->addLayout (qt_delete_layout);
+  
+  // The New button.
+  QPointer<QGroupBox> qt_new_box = new QGroupBox ("New model");
+  left_pane->addWidget (qt_new_box);
+  QPointer<QVBoxLayout> qt_new_layout = new QVBoxLayout;
+  qt_new_box->setLayout (qt_new_layout); 
+  QPointer<QLineEdit> qt_new_field = new QLineEdit ();
+  qt_new_layout->addWidget (qt_new_field);
+  qt_new_field->setToolTip ("Enter name of new model here.");
+  QPointer<QPushButton> qt_new = new QPushButton ("Derive");
+  daisy_assert (!qt_new.isNull ());
+  qt_new->setToolTip ("Add a new model.");
+  qt_new_layout->addWidget (qt_new);
+
+  // Empty space at bottom.
+  left_pane->addStretch ();
 
   // Organize tabs.
   tab_widget.addTab (edit_center, "Edit");
+
+  // Select filter.
+  select_filter (selected_filter);
 }
 
 void 
@@ -544,6 +635,87 @@ UIRun::save_setup_as ()
 { }
 
 void 
+UIRun::select_filter (const QString& name)
+{ select_filter (name.toStdString ()); }
+
+void 
+UIRun::select_component (const QString& name)
+{ select_component (name.toStdString ()); }
+
+void 
+UIRun::select_model (const QString& name)
+{ select_model (name.toStdString ()); }
+
+void 
+UIRun::select_filter (const symbol name)
+{ 
+  // Create filter.
+  daisy_assert (top_level);
+  const Metalib& metalib = top_level->metalib ();
+  filter.reset (Librarian::build_stock<UIFilter> (metalib, Treelog::null (),
+                                                  name, __FUNCTION__));
+  daisy_assert (filter.get ());
+
+  // Remember filter.
+  selected_filter = name;
+
+  // Fill component box.
+  std::vector<symbol> all;
+  filter->find_components (metalib, all);
+  qt_select_component->clear ();
+  for (size_t i = 0; i < all.size (); i++)
+    qt_select_component->addItem (all[i].name ().c_str ());
+
+  // Check if old component is still available.
+  if (std::find (all.begin (), all.end (), selected_component) == all.end ())
+    selected_component = filter->default_component (metalib);
+
+  // Update the component index (and model).
+  select_component (selected_component);
+}
+
+void 
+UIRun::select_component (const symbol name)
+{ 
+  // Check state.
+  daisy_assert (top_level);
+  const Metalib& metalib = top_level->metalib ();
+  daisy_assert (filter.get ());
+
+  // Update combobox.
+  int index = qt_select_component->findText (name.name ().c_str ());
+  qt_select_component->setCurrentIndex (index);
+
+  // Remember choice.
+  selected_component = name;
+
+  // Fill model box.
+  std::vector<symbol> all;
+  filter->find_models (metalib, name, all);
+  qt_select_model->clear ();
+  for (size_t i = 0; i < all.size (); i++)
+    qt_select_model->addItem (all[i].name ().c_str ());
+
+  // Check if old model is still available.
+  if (std::find (all.begin (), all.end (), selected_model) == all.end ())
+    selected_model = filter->default_model (metalib, selected_component);
+
+  // Update model index.
+  select_model (selected_model);
+}
+
+void 
+UIRun::select_model (const symbol name)
+{ 
+  // Update combobox.
+  int index = qt_select_model->findText (name.name ().c_str ());
+  qt_select_model->setCurrentIndex (index);
+
+  // Remember choice.
+  selected_model = name;
+}
+
+void 
 UIRun::new_state (Toplevel::state_t ns)
 {
   // Stop button.
@@ -565,6 +737,12 @@ UIRun::UIRun (const BlockModel& al)
     qt_name (new QLabel),
     qt_file (new QLabel),
     qt_description (new QLabel),
+    qt_select_filter (new QComboBox),
+    qt_select_component (new QComboBox),
+    qt_select_model (new QComboBox),
+    selected_filter ("default"),
+    selected_component ("program"),
+    selected_model ("Daisy"),
     has_loaded_log_file (false),
     top_level (NULL)
 { }

@@ -4,6 +4,18 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * UI?
 
+** ui: default skal være default . Fjern <none>.
+
+** spørg uif om components (alle + evt default). Fjern <none>
+
+** spørg uif om models (alle + evt default). Fjern <none>
+
+** 
+
+** uigroup og uiparameter slås sammen
+
+
+
 ** uifilter
 
 *** Opt description

@@ -1,3 +1,9 @@
+2012-10-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log.dai ("Vegetation"): Updated.
+
+	* vegetation.C (output): Remove duplicate entry.
+
 2012-10-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* uifilter.C: New component.

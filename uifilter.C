@@ -23,17 +23,63 @@
 #include "uifilter.h"
 #include "block_model.h"
 #include "librarian.h"
+#include "program.h"
+#include "metalib.h"
+#include "library.h"
 
 // The 'uifilter' component.
 
 const char *const
 UIFilter::component = "uifilter";
 
-symbol 
-UIFilter::library_id () const
-{ 
-  static const symbol name = component;
+symbol
+UIFilter::default_component (const Metalib&) const
+{
+  static const symbol name = Program::component;
   return name;
+}
+
+void
+UIFilter::find_components (const Metalib& metalib, 
+                           std::vector<symbol>& components) const
+{ metalib.all (components); }
+
+symbol
+UIFilter::default_model (const Metalib& metalib, const symbol component) const
+{
+  // Hard coded.
+  if (component == Program::component)
+    {
+      static const symbol daisy_name = "Daisy";
+      return daisy_name;
+    }
+
+  // Use the one named "default" as default, if buildable.
+  const Library& library = metalib.library (component);
+  static const symbol default_name = "default";
+  if (library.check (default_name) && library.model (default_name).buildable ())
+    return default_name;
+
+  // Just use the first.
+  std::vector<symbol> models;
+  find_models (metalib, component, models);
+  if (models.size () > 0)
+    return models[0];
+  
+  // No suitable models.
+  return Attribute::None ();
+}
+
+void
+UIFilter::find_models (const Metalib& metalib, const symbol component, 
+                       std::vector<symbol>& models) const
+{ 
+  const Library& library = metalib.library (component);
+  std::vector<symbol> all;
+  library.entries (all);
+  for (size_t i = 0; i < all.size (); i++)
+    if (library.model (all[i]).buildable ())
+      models.push_back (all[i]);
 }
 
 UIFilter::UIFilter (const BlockModel& al)

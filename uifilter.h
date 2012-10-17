@@ -23,8 +23,10 @@
 
 #include "model.h"
 #include "symbol.h"
+#include <vector>
 
 class BlockModel;
+class Metalib;
 
 class UIFilter : public Model
 {
@@ -32,8 +34,17 @@ class UIFilter : public Model
 public:
   const symbol name;
   static const char *const component;
-  symbol library_id () const;
 
+  // Use.
+public:
+  virtual symbol default_component (const Metalib& metalib) const;
+  virtual void find_components (const Metalib& metalib, 
+                                std::vector<symbol>& components) const;
+  virtual symbol default_model (const Metalib& metalib,
+                                symbol component) const;
+  virtual void find_models (const Metalib& metalib, symbol component, 
+                            std::vector<symbol>& models) const;
+  
   // Create and Destroy.
 protected:
   explicit UIFilter (const BlockModel&);

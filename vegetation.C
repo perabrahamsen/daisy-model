@@ -64,7 +64,6 @@ Vegetation::output (Log& log) const
   output_value (ACExt_NIR (), "ACExt_NIR", log);
   output_value (ACRef_NIR (), "ACRef_NIR", log);
   output_value (ARExt (), "ARExt", log);
-  output_value (ARExt (), "ARExt", log);
   output_value (EpFactorDry (), "EpFactorDry", log);
   output_value (EpFactorWet (), "EpFactorWet", log);
   output_value (albedo (), "albedo", log);

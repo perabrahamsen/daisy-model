@@ -26,15 +26,18 @@
 #include "toplevel.h"
 #include "memutils.h"
 #include <map>
+#include <boost/scoped_ptr.hpp>
 
 #include <QtCore/QPointer>
+
+class QPushButton;
+class QLabel;
+class QComboBox;
 
 class Topelevel;
 class Block;
 class RunQtMain;
-
-class QPushButton;
-class QLabel;
+class UIFilter;
 
 class UIRun : public QWidget, public UIQt
 {
@@ -47,6 +50,17 @@ class UIRun : public QWidget, public UIQt
   QPointer<QLabel> qt_description;               
   QPointer<QPushButton> qt_runstop;
   QPointer<VisQtProgress> qt_progress;
+
+  // Edit Widgets
+  QPointer<QComboBox> qt_select_filter;
+  QPointer<QComboBox> qt_select_component;
+  QPointer<QComboBox> qt_select_model;
+
+  // Edit state.
+  boost::scoped_ptr<UIFilter> filter;
+  symbol selected_filter;
+  symbol selected_component;
+  symbol selected_model;
 
   // Logs.
   bool has_loaded_log_file;
@@ -78,12 +92,23 @@ public:
 private:
   void reset ();
 
-  // Actions.
+  // File actions.
 private slots:
   void new_setup ();
   void open_setup ();
   void save_setup ();
   void save_setup_as ();
+
+  // Edit actions.
+private slots:
+  void select_filter (const QString&);
+  void select_component (const QString&);
+  void select_model (const QString&);
+
+private:
+  void select_filter (symbol);
+  void select_component (symbol);
+  void select_model (symbol);
 
   // Track simulation.
 public slots:
