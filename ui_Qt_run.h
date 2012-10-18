@@ -43,7 +43,7 @@ class UIRun : public QWidget, public UIQt
 {
   Q_OBJECT
 
-  // Widgets.
+  // Run widgets.
   VisQtMain qt_main;
   QPointer<QLabel> qt_name;
   QPointer<QLabel> qt_file;
@@ -57,6 +57,7 @@ class UIRun : public QWidget, public UIQt
   QPointer<QComboBox> qt_select_model;
 
   // Edit state.
+  symbol selected_file;
   boost::scoped_ptr<UIFilter> filter;
   symbol selected_filter;
   symbol selected_component;
@@ -91,6 +92,8 @@ public:
   // Update.
 private:
   void reset ();
+  void reset_tab_edit ();
+  void reset_tab_run ();
 
   // File actions.
 private slots:
@@ -106,6 +109,7 @@ private slots:
   void select_model (const QString&);
 
 private:
+  void select_file (symbol);
   void select_filter (symbol);
   void select_component (symbol);
   void select_model (symbol);

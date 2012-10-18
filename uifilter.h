@@ -35,14 +35,19 @@ public:
   const symbol name;
   static const char *const component;
 
+  // Utilities.
+  static symbol default_filter ();
+
   // Use.
 public:
-  virtual symbol default_component (const Metalib& metalib) const;
-  virtual void find_components (const Metalib& metalib, 
+  virtual symbol default_component (const Metalib& metalib, 
+                                    const symbol file) const;
+  virtual void find_components (const Metalib& metalib, const symbol file,
                                 std::vector<symbol>& components) const;
-  virtual symbol default_model (const Metalib& metalib,
+  virtual symbol default_model (const Metalib& metalib, const symbol file,
                                 symbol component) const;
-  virtual void find_models (const Metalib& metalib, symbol component, 
+  virtual void find_models (const Metalib& metalib, const symbol file,
+                            symbol component, 
                             std::vector<symbol>& models) const;
   
   // Create and Destroy.

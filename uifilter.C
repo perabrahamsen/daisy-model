@@ -26,6 +26,7 @@
 #include "program.h"
 #include "metalib.h"
 #include "library.h"
+#include "filepos.h"
 
 // The 'uifilter' component.
 
@@ -33,36 +34,61 @@ const char *const
 UIFilter::component = "uifilter";
 
 symbol
-UIFilter::default_component (const Metalib&) const
+UIFilter::default_filter ()
 {
-  static const symbol name = Program::component;
+  static const symbol name = "default";
   return name;
 }
 
+symbol
+UIFilter::default_component (const Metalib& metalib, const symbol file) const
+{
+  std::vector<symbol> all;
+  find_components (metalib, file, all);
+  
+  // Use program if it exists.
+  static const symbol name = Program::component;
+  if (std::find (all.begin (), all.end (), name) != all.end ())
+    return name;
+  
+  // Else use first, if there is more than one.
+  if (all.size () > 0)
+    return all[0];
+
+  // Nothing.
+  return Attribute::None ();
+}
+
 void
-UIFilter::find_components (const Metalib& metalib, 
+UIFilter::find_components (const Metalib& metalib, const symbol file,
                            std::vector<symbol>& components) const
-{ metalib.all (components); }
+{ 
+  std::vector<symbol> all;
+  metalib.all (all); 
+  for (size_t i = 0; i < all.size (); i++)
+    {
+      const symbol component = all[i];
+      std::vector<symbol> models;
+      find_models (metalib, file, component, models);
+      if (models.size () > 0)
+        components.push_back (component);
+    }
+}
 
 symbol
-UIFilter::default_model (const Metalib& metalib, const symbol component) const
+UIFilter::default_model (const Metalib& metalib, const symbol file, 
+                         const symbol component) const
 {
-  // Hard coded.
-  if (component == Program::component)
-    {
-      static const symbol daisy_name = "Daisy";
-      return daisy_name;
-    }
+  // All suitable models.
+  std::vector<symbol> models;
+  find_models (metalib, file, component, models);
 
-  // Use the one named "default" as default, if buildable.
-  const Library& library = metalib.library (component);
+  // Use the one named "default" as default, if there.
   static const symbol default_name = "default";
-  if (library.check (default_name) && library.model (default_name).buildable ())
+  if (std::find (models.begin (), models.end (), default_name) != models.end ())
     return default_name;
 
-  // Just use the first.
-  std::vector<symbol> models;
-  find_models (metalib, component, models);
+  // Otherwise, use the first if there is any.
   if (models.size () > 0)
     return models[0];
   
@@ -71,15 +97,22 @@ UIFilter::default_model (const Metalib& metalib, const symbol component) const
 }
 
 void
-UIFilter::find_models (const Metalib& metalib, const symbol component, 
+UIFilter::find_models (const Metalib& metalib, const symbol file,
+                       const symbol component, 
                        std::vector<symbol>& models) const
 { 
   const Library& library = metalib.library (component);
+
   std::vector<symbol> all;
   library.entries (all);
   for (size_t i = 0; i < all.size (); i++)
-    if (library.model (all[i]).buildable ())
-      models.push_back (all[i]);
+    {
+      const FrameModel& model = library.model (all[i]);
+      if ((file == Attribute::None () && model.buildable ())
+          || (file != Attribute::None ()
+              && model.inherited_position ().filename () == file))
+        models.push_back (all[i]);
+    }
 }
 
 UIFilter::UIFilter (const BlockModel& al)

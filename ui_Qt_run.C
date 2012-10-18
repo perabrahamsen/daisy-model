@@ -365,7 +365,7 @@ UIRun::attach_tab_edit (Toplevel& toplevel, QTabWidget& tab_widget)
   tab_widget.addTab (edit_center, "Edit");
 
   // Select filter.
-  select_filter (selected_filter);
+  reset_tab_edit ();
 }
 
 void 
@@ -553,6 +553,25 @@ UIRun::failure (Toplevel& toplevel)
 void
 UIRun::reset ()
 {
+  reset_tab_edit ();
+  reset_tab_run ();
+}
+
+void
+UIRun::reset_tab_edit ()
+{
+  // Fetch data.
+  daisy_assert (top_level);
+  const std::vector<std::string> files = top_level->files_found ();
+  if (files.size () == 1)
+    select_file (files[0]);
+  else
+    select_file (Attribute::None ());
+}
+
+void
+UIRun::reset_tab_run ()
+{
   // Fetch data.
   daisy_assert (top_level);
   const Frame& frame = top_level->program_frame ();
@@ -569,11 +588,11 @@ UIRun::reset ()
   switch (files.size ())
     {
     case 0:
-      qt_file->setToolTip ("No setup file has been loaded.");
+       qt_file->setToolTip ("No setup file has been loaded.");
       qt_file->setText ("No file");
       break;
     case 1:
-      qt_file->setToolTip ("This is the name of the loaded setup file.");
+       qt_file->setToolTip ("This is the name of the loaded setup file.");
       qt_file->setText (Path::nodir (files[0]).name ().c_str ());
       break;
     default:
@@ -647,6 +666,13 @@ UIRun::select_model (const QString& name)
 { select_model (name.toStdString ()); }
 
 void 
+UIRun::select_file (const symbol name)
+{ 
+  selected_file = name;
+  select_filter (selected_filter);
+}
+
+void 
 UIRun::select_filter (const symbol name)
 { 
   // Create filter.
@@ -661,14 +687,14 @@ UIRun::select_filter (const symbol name)
 
   // Fill component box.
   std::vector<symbol> all;
-  filter->find_components (metalib, all);
+  filter->find_components (metalib, selected_file, all);
   qt_select_component->clear ();
   for (size_t i = 0; i < all.size (); i++)
     qt_select_component->addItem (all[i].name ().c_str ());
 
   // Check if old component is still available.
   if (std::find (all.begin (), all.end (), selected_component) == all.end ())
-    selected_component = filter->default_component (metalib);
+    selected_component = filter->default_component (metalib, selected_file);
 
   // Update the component index (and model).
   select_component (selected_component);
@@ -691,14 +717,15 @@ UIRun::select_component (const symbol name)
 
   // Fill model box.
   std::vector<symbol> all;
-  filter->find_models (metalib, name, all);
+  filter->find_models (metalib, selected_file, name, all);
   qt_select_model->clear ();
   for (size_t i = 0; i < all.size (); i++)
     qt_select_model->addItem (all[i].name ().c_str ());
 
   // Check if old model is still available.
   if (std::find (all.begin (), all.end (), selected_model) == all.end ())
-    selected_model = filter->default_model (metalib, selected_component);
+    selected_model = filter->default_model (metalib, selected_file, 
+                                            selected_component);
 
   // Update model index.
   select_model (selected_model);
@@ -713,6 +740,27 @@ UIRun::select_model (const symbol name)
 
   // Remember choice.
   selected_model = name;
+
+  // Get data.
+  daisy_assert (top_level);
+  const Metalib& metalib = top_level->metalib ();
+  daisy_assert (metalib.exist (selected_component));
+  const Library& library = metalib.library (selected_component);
+  daisy_assert (library.check (selected_model));
+  const FrameModel& model = library.model (selected_model);
+
+  // Get items.
+  daisy_assert (filter.get ());
+#if 0
+  auto_vector<const UIItem*> items;
+  filter->find_items (metalib, selected_file,
+                      selected_component, selected_model, items);
+  for (size_t i = 0; i < items.size (); i++)
+    {
+      qt_edit_layout->add_widget (build_item (metalib, model, 
+                                              filter, items[i]));
+    }
+#endif
 }
 
 void 
@@ -740,7 +788,8 @@ UIRun::UIRun (const BlockModel& al)
     qt_select_filter (new QComboBox),
     qt_select_component (new QComboBox),
     qt_select_model (new QComboBox),
-    selected_filter ("default"),
+    selected_file (Attribute::None ()),
+    selected_filter (UIFilter::default_filter ()),
     selected_component ("program"),
     selected_model ("Daisy"),
     has_loaded_log_file (false),

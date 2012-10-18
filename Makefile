@@ -816,10 +816,13 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
  log.h border.h model_framed.h model_logable.h destination.h scope.h \
  attribute.h run_Qt.h run.h treelog_text.h treelog.h program.h metalib.h \
  frame.h library.h librarian.h block_top.h block.h assertion.h path.h \
- frame_submodel.h
+ frame_submodel.h uifilter.h
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
  block.h scope.h attribute.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
+uifilter${OBJ}: uifilter.C uifilter.h model.h symbol.h block_model.h \
+ block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
+ frame.h librarian.h program.h run.h metalib.h library.h
 zone${OBJ}: zone.C zone.h model.h symbol.h librarian.h
 wsource${OBJ}: wsource.C wsource_weather.h wsource.h weather.h weatherdata.h \
  symbol.h model_derived.h model_logable.h model.h scope.h attribute.h \
@@ -1626,7 +1629,7 @@ program_GP2D${OBJ}: program_GP2D.C program.h model.h symbol.h run.h \
 svat_ssoc${OBJ}: svat_ssoc.C svat.h model_derived.h model_logable.h model.h \
  symbol.h block_model.h block_nested.h block.h scope.h attribute.h \
  treelog.h frame_model.h frame.h librarian.h resistance.h fao.h \
- soil_heat.h bioclimate.h model_framed.h soil.h geometry.h weather.h \
+ soil_heat.h bioclimate.h model_framed.h geometry.h weather.h \
  weatherdata.h vegetation.h assertion.h log.h time.h border.h mathlib.h \
  solver.h iterative.h
 reaction_Jarvis99${OBJ}: reaction_Jarvis99.C reaction_colgen.h reaction.h \
