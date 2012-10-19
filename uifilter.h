@@ -28,9 +28,19 @@
 class BlockModel;
 class Metalib;
 
+#ifdef __unix
+#define EXPORT /* Nothing */
+#elif defined (BUILD_DLL)
+/* DLL export */
+#define EXPORT __declspec(dllexport)
+#else
+/* EXE import */
+#define EXPORT __declspec(dllimport)
+#endif
+
 // The 'UIItem' interface. 
 
-class UIItem
+class EXPORT UIItem
 {
   // Content.
 public:
@@ -46,7 +56,7 @@ public:
 
 // The 'uifilter' component.
 
-class UIFilter : public Model
+class EXPORT UIFilter : public Model
 {
   // Content.
 public:
