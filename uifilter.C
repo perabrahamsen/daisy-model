@@ -27,6 +27,88 @@
 #include "metalib.h"
 #include "library.h"
 #include "filepos.h"
+#include "memutils.h"
+#include "assertion.h"
+#include <map>
+
+// The 'UIItem' interface.
+
+const char *const
+UIItem::component = "uiitem";
+
+UIItem::UIItem (const symbol n)
+  : name (n)
+{ }
+
+UIItem::~UIItem ()
+{ }
+
+// The UIItemSimple class
+
+struct UIItemSimple : public UIItem
+{
+  UIItemSimple (const symbol n)
+    : UIItem (n)
+  { }
+};
+
+// The 'uiitem' component.
+
+class UIItemModel : public Model, public UIItem
+{
+  // Content.
+public:
+  const symbol name;
+
+  // Create and Destroy.
+protected:
+  explicit UIItemModel (const BlockModel&);
+public:
+  virtual ~UIItemModel ();
+};
+  
+UIItemModel::UIItemModel (const BlockModel& al)
+  : UIItem (al.name ("name"))
+{ }
+
+UIItemModel::~UIItemModel ()
+{ }
+
+static struct UIItemInit : public DeclareComponent 
+{
+  UIItemInit ()
+    : DeclareComponent (UIItem::component, "\
+User interface information about a item.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.declare_string ("name", Attribute::Const,
+                          "Name of user interface unit.");
+  }
+} UIItem_init;
+
+// The 'default' uiitem model.
+
+struct UIItemStandard : UIItemModel
+{
+  UIItemStandard (const BlockModel& al)
+    : UIItemModel (al)
+  { }
+  ~UIItemStandard ()
+  { }
+};
+
+static struct UIItem_StandardSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new UIItemStandard (al); }
+  UIItem_StandardSyntax ()
+    : DeclareModel (UIItem::component, "default", "\
+Standard item for the user interface.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} UIItemStandard_syntax;
 
 // The 'uifilter' component.
 
@@ -134,12 +216,79 @@ Presentation of data in the user interface.")
 
 struct UIFilterStandard : UIFilter
 {
-  UIFilterStandard (const BlockModel& al)
-    : UIFilter (al)
-  { }
-  ~UIFilterStandard ()
-  { }
+  // Content.
+  typedef std::vector<const UIItem*> item_vec_t;
+  typedef std::map<symbol, item_vec_t> item_map_t;
+  typedef std::map<symbol, item_map_t> model_map_t;
+  model_map_t model_map;
+
+  // Use.
+  const std::vector<const UIItem*>& 
+  /**/ find_items (const Metalib& metalib, symbol file,
+                   symbol component, symbol model);
+
+  // Create and Destroy.
+  UIFilterStandard (const BlockModel& al);
+  ~UIFilterStandard ();
 };
+
+const std::vector<const UIItem*>& 
+UIFilterStandard::find_items (const Metalib& metalib, symbol file,
+                              symbol component, symbol model)
+{
+  // Look up component.
+  if (model_map.find (component) == model_map.end ())
+    {
+      item_map_t empty;
+      model_map[component] = empty;
+    }
+  item_map_t& item_map = model_map[component];
+
+  // Look up model.
+  if (item_map.find (model) == item_map.end ())
+    {
+      item_vec_t empty;
+      item_map[model] = empty;
+    }
+  item_vec_t& items = item_map[model];
+
+  if (items.size () == 0)
+    {
+      daisy_assert (metalib.exist (component));
+      const Library& library = metalib.library (component);
+      daisy_assert (library.check (model));
+      const FrameModel& frame = library.model (model);
+      std::set<symbol> entries;
+      frame.entries (entries);
+      for (std::set<symbol>::const_iterator i = entries.begin (); 
+           i != entries.end ();
+           i++)
+        items.push_back (new UIItemSimple (*i));
+    }
+  return items;
+}
+
+
+UIFilterStandard::UIFilterStandard (const BlockModel& al)
+  : UIFilter (al)
+{ }
+
+UIFilterStandard::~UIFilterStandard ()
+{
+  for (model_map_t::iterator i = model_map.begin ();
+       i != model_map.end ();
+       i++)
+    {
+      item_map_t item_map = (*i).second;
+      for (item_map_t::iterator j = item_map.begin (); 
+           j != item_map.end ();
+           j++)
+        {
+          item_vec_t items = (*j).second;
+          sequence_delete (items.begin (), items.end ());
+        }
+    }
+}
 
 static struct UIFilter_StandardSyntax : public DeclareModel
 {
@@ -153,134 +302,5 @@ Standard filter for the user interface.")
   { }
 } UIFilterStandard_syntax;
 
-// The 'uigroup' component.
-
-class UIGroup : public Model
-{
-  // Content.
-public:
-  const symbol name;
-  static const char *const component;
-  symbol library_id () const;
-
-  // Create and Destroy.
-protected:
-  explicit UIGroup (const BlockModel&);
-public:
-  virtual ~UIGroup ();
-};
-
-const char *const
-UIGroup::component = "uigroup";
-
-symbol 
-UIGroup::library_id () const
-{ 
-  static const symbol name = component;
-  return name;
-}
-
-UIGroup::UIGroup (const BlockModel& al)
-  : name (al.type_name ())
-{ }
-
-UIGroup::~UIGroup ()
-{ }
-
-static struct UIGroupInit : public DeclareComponent 
-{
-  UIGroupInit ()
-    : DeclareComponent (UIGroup::component, "\
-User interface information about a group of parameters.")
-  { }
-} UIGroup_init;
-
-// The 'default' uigroup model.
-
-struct UIGroupStandard : UIGroup
-{
-  UIGroupStandard (const BlockModel& al)
-    : UIGroup (al)
-  { }
-  ~UIGroupStandard ()
-  { }
-};
-
-static struct UIGroup_StandardSyntax : public DeclareModel
-{
-  Model* make (const BlockModel& al) const
-  { return new UIGroupStandard (al); }
-  UIGroup_StandardSyntax ()
-    : DeclareModel (UIGroup::component, "default", "\
-Standard group for the user interface.")
-  { }
-  void load_frame (Frame&) const
-  { }
-} UIGroupStandard_syntax;
-
-// The 'uiparameter' component.
-
-class UIParameter : public Model
-{
-  // Content.
-public:
-  const symbol name;
-  static const char *const component;
-  symbol library_id () const;
-
-  // Create and Destroy.
-protected:
-  explicit UIParameter (const BlockModel&);
-public:
-  virtual ~UIParameter ();
-};
-
-const char *const
-UIParameter::component = "uiparameter";
-
-symbol 
-UIParameter::library_id () const
-{ 
-  static const symbol name = component;
-  return name;
-}
-
-UIParameter::UIParameter (const BlockModel& al)
-  : name (al.type_name ())
-{ }
-
-UIParameter::~UIParameter ()
-{ }
-
-static struct UIParameterInit : public DeclareComponent 
-{
-  UIParameterInit ()
-    : DeclareComponent (UIParameter::component, "\
-User interface information about a parameter.")
-  { }
-} UIParameter_init;
-
-// The 'default' uiparameter model.
-
-struct UIParameterStandard : UIParameter
-{
-  UIParameterStandard (const BlockModel& al)
-    : UIParameter (al)
-  { }
-  ~UIParameterStandard ()
-  { }
-};
-
-static struct UIParameter_StandardSyntax : public DeclareModel
-{
-  Model* make (const BlockModel& al) const
-  { return new UIParameterStandard (al); }
-  UIParameter_StandardSyntax ()
-    : DeclareModel (UIParameter::component, "default", "\
-Standard parameter for the user interface.")
-  { }
-  void load_frame (Frame&) const
-  { }
-} UIParameterStandard_syntax;
 
 // uifilter.C ends here.

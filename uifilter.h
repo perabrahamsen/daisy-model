@@ -28,6 +28,24 @@
 class BlockModel;
 class Metalib;
 
+// The 'UIItem' interface. 
+
+class UIItem
+{
+  // Content.
+public:
+  static const char *const component;
+  const symbol name;
+
+  // Create and Destroy.
+protected:
+  UIItem (const symbol name);
+public:
+  virtual ~UIItem ();
+};
+
+// The 'uifilter' component.
+
 class UIFilter : public Model
 {
   // Content.
@@ -49,13 +67,15 @@ public:
   virtual void find_models (const Metalib& metalib, const symbol file,
                             symbol component, 
                             std::vector<symbol>& models) const;
-  
+  virtual const std::vector<const UIItem*>& 
+  /**/ find_items (const Metalib& metalib, symbol file,
+                   symbol component, symbol model) = 0;
+
   // Create and Destroy.
 protected:
   explicit UIFilter (const BlockModel&);
 public:
   virtual ~UIFilter ();
 };
-
 
 #endif // UIFILTER_H

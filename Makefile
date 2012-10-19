@@ -822,7 +822,8 @@ ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
 uifilter${OBJ}: uifilter.C uifilter.h model.h symbol.h block_model.h \
  block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
- frame.h librarian.h program.h run.h metalib.h library.h
+ frame.h librarian.h program.h run.h metalib.h library.h filepos.h \
+ memutils.h assertion.h
 zone${OBJ}: zone.C zone.h model.h symbol.h librarian.h
 wsource${OBJ}: wsource.C wsource_weather.h wsource.h weather.h weatherdata.h \
  symbol.h model_derived.h model_logable.h model.h scope.h attribute.h \

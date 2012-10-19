@@ -752,9 +752,9 @@ UIRun::select_model (const symbol name)
   // Get items.
   daisy_assert (filter.get ());
 #if 0
-  auto_vector<const UIItem*> items;
-  filter->find_items (metalib, selected_file,
-                      selected_component, selected_model, items);
+  std::vector<const UIItem*>& items
+    = filter->find_items (metalib, selected_file,
+                          selected_component, selected_model);
   for (size_t i = 0; i < items.size (); i++)
     {
       qt_edit_layout->add_widget (build_item (metalib, model, 
