@@ -263,7 +263,11 @@ UIFilterStandard::find_items (const Metalib& metalib, symbol file,
       for (std::set<symbol>::const_iterator i = entries.begin (); 
            i != entries.end ();
            i++)
-        items.push_back (new UIItemSimple (*i));
+        {
+          const symbol name = *i;
+          if (!frame.is_log (name));
+          items.push_back (new UIItemSimple (name));
+        }
     }
   return items;
 }

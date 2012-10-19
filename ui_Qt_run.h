@@ -33,11 +33,14 @@
 class QPushButton;
 class QLabel;
 class QComboBox;
+class QVBoxLayout;
 
 class Topelevel;
 class Block;
 class RunQtMain;
 class UIFilter;
+class FrameModel;
+class UIItem;
 
 class UIRun : public QWidget, public UIQt
 {
@@ -52,6 +55,7 @@ class UIRun : public QWidget, public UIQt
   QPointer<VisQtProgress> qt_progress;
 
   // Edit Widgets
+  QPointer<QVBoxLayout> qt_edit_pane;
   QPointer<QComboBox> qt_select_filter;
   QPointer<QComboBox> qt_select_component;
   QPointer<QComboBox> qt_select_model;
@@ -113,6 +117,9 @@ private:
   void select_filter (symbol);
   void select_component (symbol);
   void select_model (symbol);
+  QPointer<QWidget>
+  build_item (const Metalib& metalib, const FrameModel& model, 
+              const UIFilter& filter, const UIItem& item);
 
   // Track simulation.
 public slots:

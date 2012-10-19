@@ -49,6 +49,7 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QSplitter>
 #include <QtGui/QSizePolicy>
+#include <QtGui/QScrollArea>
 
 void
 UIRun::build_log (Metalib& metalib, Block& block, const std::string& name)
@@ -251,21 +252,10 @@ UIRun::attach_tab_file (Toplevel& toplevel, QTabWidget& tab_widget)
 void 
 UIRun::attach_tab_edit (Toplevel& toplevel, QTabWidget& tab_widget)
 {
-  // We organize items in two panes.
-  const QPointer<QSplitter> edit_center = new QSplitter;
+  // Left pane
   const QPointer<QWidget> left_pane_widget = new QWidget;
   const QPointer<QVBoxLayout> left_pane = new QVBoxLayout;
   left_pane_widget->setLayout (left_pane);
-  edit_center->addWidget (left_pane_widget);
-
-  const QPointer<QWidget> right_pane_widget = new QWidget;
-#if 0
-  const QPointer<QHBoxLayout> right_pane = new QHBoxLayout;
-  right_pane->addWidget (new QLabel ("Right pane"));
-  right_pane_widget->setLayout (right_pane);
-#endif
-  right_pane_widget->sizePolicy ().setHorizontalPolicy (QSizePolicy::Maximum);
-  edit_center->addWidget (right_pane_widget);
 
   // Select filter.
   QPointer<QGroupBox> qt_select_filter_box = new QGroupBox ("Filter");
@@ -360,6 +350,26 @@ UIRun::attach_tab_edit (Toplevel& toplevel, QTabWidget& tab_widget)
 
   // Empty space at bottom.
   left_pane->addStretch ();
+
+  // Right pane.
+  const QPointer<QWidget> right_pane_widget = new QWidget;
+  right_pane_widget->setLayout (qt_edit_pane);
+  const QPointer<QScrollArea> right_pane_area = new QScrollArea;
+  right_pane_area->setWidgetResizable (true);
+  right_pane_area->setWidget (right_pane_widget);
+
+  // SPlit between panes.
+  QSizePolicy left_policy = left_pane_widget->sizePolicy ();
+  left_policy.setHorizontalPolicy (QSizePolicy::Preferred);
+  left_pane_widget->setSizePolicy (left_policy);
+  QSizePolicy right_policy = right_pane_area->sizePolicy ();
+  right_policy.setHorizontalPolicy (QSizePolicy::MinimumExpanding);
+  right_policy.setHorizontalStretch (1);
+  right_pane_area->setSizePolicy (right_policy);
+
+  const QPointer<QSplitter> edit_center = new QSplitter;
+  edit_center->addWidget (left_pane_widget);
+  edit_center->addWidget (right_pane_area);
 
   // Organize tabs.
   tab_widget.addTab (edit_center, "Edit");
@@ -751,16 +761,31 @@ UIRun::select_model (const symbol name)
 
   // Get items.
   daisy_assert (filter.get ());
-#if 0
-  std::vector<const UIItem*>& items
+  const std::vector<const UIItem*>& items
     = filter->find_items (metalib, selected_file,
                           selected_component, selected_model);
-  for (size_t i = 0; i < items.size (); i++)
+
+  // Delete old content.
+  QLayoutItem *child;
+  while ((child = qt_edit_pane->takeAt(0)) != 0) 
     {
-      qt_edit_layout->add_widget (build_item (metalib, model, 
-                                              filter, items[i]));
+      delete child->widget();
+      delete child;
     }
-#endif
+
+  // Indert new items.
+  for (size_t i = 0; i < items.size (); i++)
+    qt_edit_pane->addWidget (build_item (metalib, model, *filter, *items[i]));
+
+  qt_edit_pane->addStretch ();
+}
+
+QPointer<QWidget>
+UIRun::build_item (const Metalib& metalib, const FrameModel& model, 
+                   const UIFilter& filter, const UIItem& item)
+{
+  QPointer<QWidget> label = new QLabel (item.name.name ().c_str ());
+  return label;
 }
 
 void 
@@ -785,6 +810,7 @@ UIRun::UIRun (const BlockModel& al)
     qt_name (new QLabel),
     qt_file (new QLabel),
     qt_description (new QLabel),
+    qt_edit_pane (new QVBoxLayout),
     qt_select_filter (new QComboBox),
     qt_select_component (new QComboBox),
     qt_select_model (new QComboBox),
