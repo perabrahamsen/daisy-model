@@ -77,6 +77,9 @@ public:
   virtual void find_models (const Metalib& metalib, const symbol file,
                             symbol component, 
                             std::vector<symbol>& models) const;
+  virtual void find_parents (const Metalib& metalib, const symbol file,
+                             symbol component, 
+                             std::vector<symbol>& models) const;
   virtual const std::vector<const UIItem*>& 
   /**/ find_items (const Metalib& metalib, symbol file,
                    symbol component, symbol model) = 0;

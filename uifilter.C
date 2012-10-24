@@ -29,6 +29,7 @@
 #include "filepos.h"
 #include "memutils.h"
 #include "assertion.h"
+#include "frame_submodel.h"
 #include <map>
 
 // The 'UIItem' interface.
@@ -87,28 +88,28 @@ User interface information about a item.")
   }
 } UIItem_init;
 
-// The 'default' uiitem model.
+// The 'raw' uiitem model.
 
-struct UIItemStandard : UIItemModel
+struct UIItemRaw : UIItemModel
 {
-  UIItemStandard (const BlockModel& al)
+  UIItemRaw (const BlockModel& al)
     : UIItemModel (al)
   { }
-  ~UIItemStandard ()
+  ~UIItemRaw ()
   { }
 };
 
-static struct UIItem_StandardSyntax : public DeclareModel
+static struct UIItem_RawSyntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
-  { return new UIItemStandard (al); }
-  UIItem_StandardSyntax ()
-    : DeclareModel (UIItem::component, "default", "\
-Standard item for the user interface.")
+  { return new UIItemRaw (al); }
+  UIItem_RawSyntax ()
+    : DeclareModel (UIItem::component, "raw", "\
+Raw item for the user interface.")
   { }
   void load_frame (Frame&) const
   { }
-} UIItemStandard_syntax;
+} UIItemRaw_syntax;
 
 // The 'uifilter' component.
 
@@ -118,7 +119,7 @@ UIFilter::component = "uifilter";
 symbol
 UIFilter::default_filter ()
 {
-  static const symbol name = "default";
+  static const symbol name = "raw";
   return name;
 }
 
@@ -197,6 +198,23 @@ UIFilter::find_models (const Metalib& metalib, const symbol file,
     }
 }
 
+void
+UIFilter::find_parents (const Metalib& metalib, const symbol file,
+                        const symbol component, 
+                        std::vector<symbol>& models) const
+{ 
+  const Library& library = metalib.library (component);
+
+  std::vector<symbol> all;
+  library.entries (all);
+  for (size_t i = 0; i < all.size (); i++)
+    {
+      const FrameModel& model = library.model (all[i]);
+      if (model.buildable ())
+        models.push_back (all[i]);
+    }
+}
+
 UIFilter::UIFilter (const BlockModel& al)
   : name (al.type_name ())
 { }
@@ -212,9 +230,9 @@ Presentation of data in the user interface.")
   { }
 } UIFilter_init;
 
-// The 'default' uifilter model.
+// The 'raw' uifilter model.
 
-struct UIFilterStandard : UIFilter
+struct UIFilterRaw : UIFilter
 {
   // Content.
   typedef std::vector<const UIItem*> item_vec_t;
@@ -228,13 +246,13 @@ struct UIFilterStandard : UIFilter
                    symbol component, symbol model);
 
   // Create and Destroy.
-  UIFilterStandard (const BlockModel& al);
-  ~UIFilterStandard ();
+  UIFilterRaw (const BlockModel& al);
+  ~UIFilterRaw ();
 };
 
 const std::vector<const UIItem*>& 
-UIFilterStandard::find_items (const Metalib& metalib, symbol file,
-                              symbol component, symbol model)
+UIFilterRaw::find_items (const Metalib& metalib, const symbol file,
+                         const symbol component, const symbol model)
 {
   // Look up component.
   if (model_map.find (component) == model_map.end ())
@@ -265,19 +283,19 @@ UIFilterStandard::find_items (const Metalib& metalib, symbol file,
            i++)
         {
           const symbol name = *i;
-          if (!frame.is_log (name));
-          items.push_back (new UIItemSimple (name));
+          if (!frame.is_log (name))
+            items.push_back (new UIItemSimple (name));
         }
     }
   return items;
 }
 
 
-UIFilterStandard::UIFilterStandard (const BlockModel& al)
+UIFilterRaw::UIFilterRaw (const BlockModel& al)
   : UIFilter (al)
 { }
 
-UIFilterStandard::~UIFilterStandard ()
+UIFilterRaw::~UIFilterRaw ()
 {
   for (model_map_t::iterator i = model_map.begin ();
        i != model_map.end ();
@@ -294,17 +312,145 @@ UIFilterStandard::~UIFilterStandard ()
     }
 }
 
-static struct UIFilter_StandardSyntax : public DeclareModel
+static struct UIFilter_RawSyntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
-  { return new UIFilterStandard (al); }
-  UIFilter_StandardSyntax ()
-    : DeclareModel (UIFilter::component, "default", "\
-Standard filter for the user interface.")
+  { return new UIFilterRaw (al); }
+  UIFilter_RawSyntax ()
+    : DeclareModel (UIFilter::component, "raw", "\
+Raw filter for the user interface.")
   { }
   void load_frame (Frame&) const
   { }
-} UIFilterStandard_syntax;
+} UIFilterRaw_syntax;
+
+// The 'simple' uifilter model.
+
+struct UIFilterSimple : UIFilter
+{
+  typedef std::vector<const UIItem*> item_vec_t;
+  typedef std::map<symbol, item_vec_t> item_map_t;
+  typedef std::map<symbol, item_map_t> model_map_t;
+  model_map_t model_map;
+
+  // Use.
+  const std::vector<const UIItem*>& 
+  /**/ find_items (const Metalib& metalib, symbol file,
+                   symbol component, symbol model);
+
+  // Create and Destroy.
+  UIFilterSimple (const BlockModel& al);
+  ~UIFilterSimple ();
+};
+
+const std::vector<const UIItem*>& 
+UIFilterSimple::find_items (const Metalib& metalib, const symbol file,
+                            const symbol component, const symbol model)
+{
+  // Look up component.
+  if (model_map.find (component) == model_map.end ())
+    {
+      item_map_t empty;
+      model_map[component] = empty;
+    }
+  item_map_t& item_map = model_map[component];
+
+  // Look up model.
+  if (item_map.find (model) == item_map.end ())
+    {
+      item_vec_t empty;
+      item_map[model] = empty;
+    }
+  item_vec_t& items = item_map[model];
+  return items;
+}
+
+
+UIFilterSimple::UIFilterSimple (const BlockModel& al)
+  : UIFilter (al)
+{ 
+  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&
+    uicomp = al.submodel_sequence ("all");
+  for (size_t i = 0; i < uicomp.size (); i++)
+    {
+      const symbol component = uicomp[i]->name ("name");
+      if (model_map.find (component) == model_map.end ())
+        {
+          item_map_t empty;
+          model_map[component] = empty;
+        }
+      item_map_t& item_map = model_map[component];
+      const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&
+        uimodel = uicomp[i]->submodel_sequence ("all");
+      for (size_t j = 0; j < uimodel.size (); j++)
+        {
+          const symbol model = uimodel[j]->name ("name");
+          if (item_map.find (model) == item_map.end ())
+            {
+              item_vec_t empty;
+              item_map[model] = empty;
+            }
+          item_vec_t& items = item_map[model];
+          const std::vector<symbol>& pars 
+            = uimodel[j]->name_sequence ("all");
+          for (size_t k = 0; k < pars.size (); k++)
+            {
+              const symbol name = pars[k];
+              items.push_back (new UIItemSimple (name));
+            }
+        }
+    }
+}
+
+UIFilterSimple::~UIFilterSimple ()
+{
+  for (model_map_t::iterator i = model_map.begin ();
+       i != model_map.end ();
+       i++)
+    {
+      item_map_t item_map = (*i).second;
+      for (item_map_t::iterator j = item_map.begin (); 
+           j != item_map.end ();
+           j++)
+        {
+          item_vec_t items = (*j).second;
+          sequence_delete (items.begin (), items.end ());
+        }
+    }
+}
+
+static struct UIFilter_SimpleSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new UIFilterSimple (al); }
+  UIFilter_SimpleSyntax ()
+    : DeclareModel (UIFilter::component, "simple", "\
+Simple filter for the user interface.")
+  { }
+  static void load_model (Frame& frame)
+  { 
+    frame.declare_string ("name", Attribute::Const, "\
+Name of this model.");
+    frame.declare_string ("all", Attribute::Const, Attribute::Variable, "\
+List of parameters to support.");
+    frame.order ("name", "all");
+  }
+  static void load_component (Frame& frame)
+  { 
+    frame.declare_string ("name", Attribute::Const, "\
+Name of this component.");
+    frame.declare_submodule_sequence ("all", Attribute::Const, "\
+List of models to support.", load_model);
+    frame.order ("name", "all");
+  }
+  void load_frame (Frame& frame) const
+  { 
+    frame.declare_string ("default", Attribute::Const, "\
+Name of default component.");
+    frame.declare_submodule_sequence ("all", Attribute::Const, "\
+List of components to support.", load_component);
+  }
+} UIFilterSimple_syntax;
 
 
 // uifilter.C ends here.

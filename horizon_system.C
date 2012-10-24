@@ -193,7 +193,7 @@ static const struct USDA7_type : public HorizonSystem::System
     add ("fine_sand", 250.0);
     add ("medium_sand", 500.0);
     add ("coarse_sand", 1000.0);
-    add ("very_corase_sand", 2000.0);
+    add ("very_coarse_sand", 2000.0);
   }
 } USDA7;
 

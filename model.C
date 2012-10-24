@@ -28,7 +28,7 @@
 void 
 Model::load_model (Frame& frame)
 { 
-  frame.declare_string ("description", Attribute::OptionalConst, "\
+  frame.declare_text ("description", Attribute::OptionalConst, "\
 Description of this model or parameterization.\n\
 The value will appear in the reference manual, and may also appear in some \
 GUI front ends.");

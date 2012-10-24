@@ -59,6 +59,7 @@ class UIRun : public QWidget, public UIQt
   QPointer<QComboBox> qt_select_filter;
   QPointer<QComboBox> qt_select_component;
   QPointer<QComboBox> qt_select_model;
+  QPointer<QComboBox> qt_select_parent;
 
   // Edit state.
   symbol selected_file;
@@ -118,7 +119,8 @@ private:
   void select_component (symbol);
   void select_model (symbol);
   QPointer<QWidget>
-  build_item (const Metalib& metalib, const FrameModel& model, 
+  build_item (const Metalib& metalib, 
+              const symbol component, const symbol model,
               const UIFilter& filter, const UIItem& item);
 
   // Track simulation.
