@@ -1,55 +1,28 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* PESTPORE opsætning
+
+** Begynd på opsætning...
+
+* Rodartikel.
+
+** Læs første reviewers kommentater, og ret ind.
+
+** Gør det klart hvad det nye i modellen er.
+
+** Forklar deskriptiv, vs predektiv model.
+
 * Klima?
 
-* UI?
+* UI
 
-** ui: default skal være default . Fjern <none>.
+** Vælg component seperat i "New model."
 
-** spørg uif om components (alle + evt default). Fjern <none>
+overvej: deriveable/editable division in API.
 
-** spørg uif om models (alle + evt default). Fjern <none>
+** "simple" filter skal angive base classes, ikke leaf classes.
 
-** 
-
-** uigroup og uiparameter slås sammen
-
-
-
-** uifilter
-
-*** Opt description
-
-** uigroup
-
-*** Opt filter
-
-*** Opt component & model
-
-*** Opt name
-
-*** Opt description
-
-*** order (list of parameters and groups)
-
-*** parameters (list of par & uiparameter)
-
-** uiparameter
-
-*** Opt filter
-
-*** Opt spec
-
-*** Opt name
-
-*** Opt description
-
-subttype for Attribute::Type, 
-
-"More detailed type"
-
-
-* PESTPORE opsætning
+** Overvej at forene datastruktur for raw og simple filter.
 
 * Søren
 
