@@ -68,18 +68,26 @@ public:
 
   // Use.
 public:
-  virtual symbol default_component (const Metalib& metalib, 
-                                    const symbol file) const;
-  virtual void find_components (const Metalib& metalib, const symbol file,
-                                std::vector<symbol>& components) const;
-  virtual symbol default_model (const Metalib& metalib, const symbol file,
+  virtual symbol default_component_all (const Metalib& metalib, 
+                                        const symbol file) const;
+  virtual void find_components_all (const Metalib& metalib, const symbol file,
+                                    std::vector<symbol>& components) const;
+  virtual symbol default_model_all (const Metalib& metalib, const symbol file,
                                 symbol component) const;
-  virtual void find_models (const Metalib& metalib, const symbol file,
-                            symbol component, 
-                            std::vector<symbol>& models) const;
-  virtual void find_parents (const Metalib& metalib, const symbol file,
-                             symbol component, 
-                             std::vector<symbol>& models) const;
+  virtual void find_models_all (const Metalib& metalib, const symbol file,
+                                symbol component, 
+                                std::vector<symbol>& models) const;
+  virtual symbol default_component_editable (const Metalib& metalib, 
+                                             const symbol file) const;
+  virtual void find_components_editable (const Metalib& metalib, 
+                                         const symbol file,
+                                         std::vector<symbol>& components) const;
+  virtual symbol default_model_editable (const Metalib& metalib,
+                                         const symbol file,
+                                         symbol component) const;
+  virtual void find_models_editable (const Metalib& metalib, const symbol file,
+                                     symbol component, 
+                                     std::vector<symbol>& models) const;
   virtual const std::vector<const UIItem*>& 
   /**/ find_items (const Metalib& metalib, symbol file,
                    symbol component, symbol model) = 0;

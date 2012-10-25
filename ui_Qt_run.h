@@ -59,7 +59,8 @@ class UIRun : public QWidget, public UIQt
   QPointer<QComboBox> qt_select_filter;
   QPointer<QComboBox> qt_select_component;
   QPointer<QComboBox> qt_select_model;
-  QPointer<QComboBox> qt_select_parent;
+  QPointer<QComboBox> qt_new_component;
+  QPointer<QComboBox> qt_new_parent;
 
   // Edit state.
   symbol selected_file;
@@ -67,6 +68,8 @@ class UIRun : public QWidget, public UIQt
   symbol selected_filter;
   symbol selected_component;
   symbol selected_model;
+  symbol selected_new_component;
+  symbol selected_new_parent;
 
   // Logs.
   bool has_loaded_log_file;
@@ -112,6 +115,8 @@ private slots:
   void select_filter (const QString&);
   void select_component (const QString&);
   void select_model (const QString&);
+  void select_new_component (const QString&);
+  void select_new_parent (const QString&);
 
 private:
   void select_file (symbol);
@@ -122,6 +127,8 @@ private:
   build_item (const Metalib& metalib, 
               const symbol component, const symbol model,
               const UIFilter& filter, const UIItem& item);
+  void select_new_component (symbol);
+  void select_new_parent (symbol);
 
   // Track simulation.
 public slots:

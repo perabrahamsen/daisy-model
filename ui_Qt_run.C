@@ -291,24 +291,18 @@ UIRun::attach_tab_edit (Toplevel& toplevel, QTabWidget& tab_widget)
   QObject::connect(qt_select_filter, SIGNAL(activated (const QString&)),
                    this, SLOT(select_filter (const QString&))); 
 
-  // Select component.
-  QPointer<QGroupBox> qt_select_component_box = new QGroupBox ("Component");
-  left_pane->addWidget (qt_select_component_box);
-  daisy_assert (!qt_select_component.isNull ());
-  qt_select_component->setToolTip ("Select component.");
-  QPointer<QVBoxLayout> qt_select_component_layout = new QVBoxLayout;
-  qt_select_component_box->setLayout (qt_select_component_layout); 
-  qt_select_component_layout->addWidget (qt_select_component);
-  QObject::connect(qt_select_component, SIGNAL(activated (const QString&)),
-                   this, SLOT(select_component (const QString&))); 
-
-  // Select model.
-  QPointer<QGroupBox> qt_select_model_box = new QGroupBox ("Model");
+  // Select component and model.
+  QPointer<QGroupBox> qt_select_model_box = new QGroupBox ("Edit model");
   left_pane->addWidget (qt_select_model_box);
-  daisy_assert (!qt_select_model.isNull ());
-  qt_select_model->setToolTip ("Select model.");
   QPointer<QVBoxLayout> qt_select_model_layout = new QVBoxLayout;
   qt_select_model_box->setLayout (qt_select_model_layout); 
+  daisy_assert (!qt_select_component.isNull ());
+  qt_select_component->setToolTip ("Select component.");
+  qt_select_model_layout->addWidget (qt_select_component);
+  QObject::connect(qt_select_component, SIGNAL(activated (const QString&)),
+                   this, SLOT(select_component (const QString&))); 
+  daisy_assert (!qt_select_model.isNull ());
+  qt_select_model->setToolTip ("Select model.");
   qt_select_model_layout->addWidget (qt_select_model);
   QObject::connect(qt_select_model, SIGNAL(activated (const QString&)),
                    this, SLOT(select_model (const QString&))); 
@@ -349,8 +343,14 @@ UIRun::attach_tab_edit (Toplevel& toplevel, QTabWidget& tab_widget)
   left_pane->addWidget (qt_derive_box);
   QPointer<QVBoxLayout> qt_derive_layout = new QVBoxLayout;
   qt_derive_box->setLayout (qt_derive_layout); 
-  qt_select_parent->setToolTip ("Choose an existing model to derive from.");
-  qt_derive_layout->addWidget (qt_select_parent);
+  qt_new_component->setToolTip ("Choose a component to derive from.");
+  qt_derive_layout->addWidget (qt_new_component);
+  QObject::connect(qt_new_component, SIGNAL(activated (const QString&)),
+                   this, SLOT(select_new_component (const QString&))); 
+  qt_new_parent->setToolTip ("Choose an existing model to derive from.");
+  qt_derive_layout->addWidget (qt_new_parent);
+  QObject::connect(qt_new_parent, SIGNAL(activated (const QString&)),
+                   this, SLOT(select_new_parent (const QString&))); 
   QPointer<QLineEdit> qt_derive_field = new QLineEdit ();
   qt_derive_layout->addWidget (qt_derive_field);
   qt_derive_field->setToolTip ("Enter name of new model here.");
@@ -688,6 +688,14 @@ UIRun::select_model (const QString& name)
 { select_model (name.toStdString ()); }
 
 void 
+UIRun::select_new_component (const QString& name)
+{ select_new_component (name.toStdString ()); }
+
+void 
+UIRun::select_new_parent (const QString& name)
+{ select_new_parent (name.toStdString ()); }
+
+void 
 UIRun::select_file (const symbol name)
 { 
   selected_file = name;
@@ -708,24 +716,48 @@ UIRun::select_filter (const symbol name)
   selected_filter = name;
 
   // Fill component box.
-  std::vector<symbol> all;
-  filter->find_components (metalib, selected_file, all);
+  std::vector<symbol> editable;
+  filter->find_components_editable (metalib, selected_file, editable);
   qt_select_component->clear ();
-  for (size_t i = 0; i < all.size (); i++)
+  for (size_t i = 0; i < editable.size (); i++)
     {
-      qt_select_component->addItem (all[i].name ().c_str ());
-      daisy_assert (metalib.exist (all[i]));
-      const Library& library = metalib.library (all[i]);
+      qt_select_component->addItem (editable[i].name ().c_str ());
+      daisy_assert (metalib.exist (editable[i]));
+      const Library& library = metalib.library (editable[i]);
       qt_select_component->setItemData 
         (i, library.description ().name ().c_str (), Qt::ToolTipRole);
     }
 
   // Check if old component is still available.
-  if (std::find (all.begin (), all.end (), selected_component) == all.end ())
-    selected_component = filter->default_component (metalib, selected_file);
+  if (std::find (editable.begin (), editable.end (), selected_component) 
+      == editable.end ())
+    selected_component 
+      = filter->default_component_editable (metalib, selected_file);
 
   // Update the component index (and model).
   select_component (selected_component);
+
+  // Fill new component box.
+  std::vector<symbol> all;
+  filter->find_components_all (metalib, selected_file, all);
+  qt_new_component->clear ();
+  for (size_t i = 0; i < all.size (); i++)
+    {
+      qt_new_component->addItem (all[i].name ().c_str ());
+      daisy_assert (metalib.exist (all[i]));
+      const Library& library = metalib.library (all[i]);
+      qt_new_component->setItemData 
+        (i, library.description ().name ().c_str (), Qt::ToolTipRole);
+    }
+
+  // Check if old component is still available.
+  if (std::find (all.begin (), all.end (), selected_new_component) 
+      == all.end ())
+    selected_new_component 
+      = filter->default_component_all (metalib, selected_file);
+
+  // Update the component index (and model).
+  select_new_component (selected_new_component);
 }
 
 void 
@@ -747,46 +779,27 @@ UIRun::select_component (const symbol name)
   selected_component = name;
 
   // Fill model box.
-  {
-    std::vector<symbol> all;
-    filter->find_models (metalib, selected_file, name, all);
-    qt_select_model->clear ();
-    for (size_t i = 0; i < all.size (); i++)
-      {
-        qt_select_model->addItem (all[i].name ().c_str ());
-        daisy_assert (library.check (all[i]));
-        const FrameModel& frame = library.model (all[i]);
-        qt_select_model->setItemData 
-          (i, frame.description ().name ().c_str (), Qt::ToolTipRole);
-      }
+  std::vector<symbol> all;
+  filter->find_models_editable (metalib, selected_file, name, all);
+  qt_select_model->clear ();
+  for (size_t i = 0; i < all.size (); i++)
+    {
+      qt_select_model->addItem (all[i].name ().c_str ());
+      daisy_assert (library.check (all[i]));
+      const FrameModel& frame = library.model (all[i]);
+      qt_select_model->setItemData 
+        (i, frame.description ().name ().c_str (), Qt::ToolTipRole);
+    }
 
-    // Check if old model is still available.
-    if (std::find (all.begin (), all.end (), selected_model) == all.end ())
-      selected_model = filter->default_model (metalib, selected_file, 
-                                              selected_component);
+  // Check if old model is still available.
+  if (std::find (all.begin (), all.end (), selected_model) == all.end ())
+    selected_model = filter->default_model_editable (metalib, selected_file, 
+                                                     selected_component);
 
-    // Update model index.
-    select_model (selected_model);
-  }
-
-  // Fill parent box.
-  {
-    std::vector<symbol> all;
-    filter->find_parents (metalib, selected_file, name, all);
-    qt_select_parent->clear ();
-    for (size_t i = 0; i < all.size (); i++)
-      {
-        qt_select_parent->addItem (all[i].name ().c_str ());
-        daisy_assert (library.check (all[i]));
-        const FrameModel& frame = library.model (all[i]);
-        qt_select_parent->setItemData 
-          (i, frame.description ().name ().c_str (), Qt::ToolTipRole);
-      }
-
-    int index = qt_select_parent->findText (selected_model.name ().c_str ());
-    qt_select_parent->setCurrentIndex (index);
-  }
+  // Update model index.
+  select_model (selected_model);
 }
+
 void 
 UIRun::select_model (const symbol name)
 { 
@@ -894,6 +907,50 @@ UIRun::build_item (const Metalib& metalib,
 }
 
 void 
+UIRun::select_new_component (const symbol name)
+{ 
+  // Check state.
+  daisy_assert (top_level);
+  const Metalib& metalib = top_level->metalib ();
+  daisy_assert (metalib.exist (name));
+  const Library& library = metalib.library (name);
+  daisy_assert (filter.get ());
+
+
+  // Update combobox.
+  int index = qt_new_component->findText (name.name ().c_str ());
+  qt_new_component->setCurrentIndex (index);
+
+  // Remember choice.
+  selected_new_component = name;
+
+  // Fill parent box.
+  std::vector<symbol> all;
+  filter->find_models_all (metalib, selected_file, name, all);
+  qt_new_parent->clear ();
+  for (size_t i = 0; i < all.size (); i++)
+    {
+      qt_new_parent->addItem (all[i].name ().c_str ());
+      daisy_assert (library.check (all[i]));
+      const FrameModel& frame = library.model (all[i]);
+      qt_new_parent->setItemData 
+        (i, frame.description ().name ().c_str (), Qt::ToolTipRole);
+    }
+
+  // Check if old parent is still available.
+  if (std::find (all.begin (), all.end (), selected_new_parent) == all.end ())
+    selected_new_parent = filter->default_model_all (metalib, selected_file, 
+                                                     selected_new_component);
+
+  // Update model index.
+  select_new_parent (selected_new_parent);
+}
+
+void 
+UIRun::select_new_parent (const symbol name)
+{ selected_new_parent = name; }
+  
+void 
 UIRun::new_state (Toplevel::state_t ns)
 {
   // Stop button.
@@ -919,11 +976,14 @@ UIRun::UIRun (const BlockModel& al)
     qt_select_filter (new QComboBox),
     qt_select_component (new QComboBox),
     qt_select_model (new QComboBox),
-    qt_select_parent (new QComboBox),
+    qt_new_component (new QComboBox),
+    qt_new_parent (new QComboBox),
     selected_file (Attribute::None ()),
     selected_filter (UIFilter::default_filter ()),
     selected_component ("program"),
     selected_model ("Daisy"),
+    selected_new_component ("program"),
+    selected_new_parent ("Daisy"),
     has_loaded_log_file (false),
     top_level (NULL)
 { }

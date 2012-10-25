@@ -124,10 +124,11 @@ UIFilter::default_filter ()
 }
 
 symbol
-UIFilter::default_component (const Metalib& metalib, const symbol file) const
+UIFilter::default_component_all (const Metalib& metalib, 
+                                 const symbol file) const
 {
   std::vector<symbol> all;
-  find_components (metalib, file, all);
+  find_components_all (metalib, file, all);
   
   // Use program if it exists.
   static const symbol name = Program::component;
@@ -143,8 +144,8 @@ UIFilter::default_component (const Metalib& metalib, const symbol file) const
 }
 
 void
-UIFilter::find_components (const Metalib& metalib, const symbol file,
-                           std::vector<symbol>& components) const
+UIFilter::find_components_all (const Metalib& metalib, const symbol file,
+                               std::vector<symbol>& components) const
 { 
   std::vector<symbol> all;
   metalib.all (all); 
@@ -152,19 +153,20 @@ UIFilter::find_components (const Metalib& metalib, const symbol file,
     {
       const symbol component = all[i];
       std::vector<symbol> models;
-      find_models (metalib, file, component, models);
+      find_models_all (metalib, file, component, models);
       if (models.size () > 0)
         components.push_back (component);
     }
+  std::sort (components.begin (), components.end (), symbol::alphabetical);
 }
 
 symbol
-UIFilter::default_model (const Metalib& metalib, const symbol file, 
-                         const symbol component) const
+UIFilter::default_model_all (const Metalib& metalib, const symbol file, 
+                             const symbol component) const
 {
   // All suitable models.
   std::vector<symbol> models;
-  find_models (metalib, file, component, models);
+  find_models_all (metalib, file, component, models);
 
   // Use the one named "default" as default, if there.
   static const symbol default_name = "default";
@@ -180,28 +182,9 @@ UIFilter::default_model (const Metalib& metalib, const symbol file,
 }
 
 void
-UIFilter::find_models (const Metalib& metalib, const symbol file,
-                       const symbol component, 
-                       std::vector<symbol>& models) const
-{ 
-  const Library& library = metalib.library (component);
-
-  std::vector<symbol> all;
-  library.entries (all);
-  for (size_t i = 0; i < all.size (); i++)
-    {
-      const FrameModel& model = library.model (all[i]);
-      if ((file == Attribute::None () && model.buildable ())
-          || (file != Attribute::None ()
-              && model.inherited_position ().filename () == file))
-        models.push_back (all[i]);
-    }
-}
-
-void
-UIFilter::find_parents (const Metalib& metalib, const symbol file,
-                        const symbol component, 
-                        std::vector<symbol>& models) const
+UIFilter::find_models_all (const Metalib& metalib, const symbol file,
+                           const symbol component, 
+                           std::vector<symbol>& models) const
 { 
   const Library& library = metalib.library (component);
 
@@ -213,7 +196,86 @@ UIFilter::find_parents (const Metalib& metalib, const symbol file,
       if (model.buildable ())
         models.push_back (all[i]);
     }
+  std::sort (models.begin (), models.end (), symbol::alphabetical);
 }
+
+
+symbol
+UIFilter::default_component_editable (const Metalib& metalib, 
+                                      const symbol file) const
+{
+  std::vector<symbol> all;
+  find_components_editable (metalib, file, all);
+  
+  // Use program if it exists.
+  static const symbol name = Program::component;
+  if (std::find (all.begin (), all.end (), name) != all.end ())
+    return name;
+  
+  // Else use first, if there is more than one.
+  if (all.size () > 0)
+    return all[0];
+
+  // Nothing.
+  return Attribute::None ();
+}
+
+void
+UIFilter::find_components_editable (const Metalib& metalib, const symbol file,
+                                    std::vector<symbol>& components) const
+{ 
+  std::vector<symbol> all;
+  metalib.all (all); 
+  for (size_t i = 0; i < all.size (); i++)
+    {
+      const symbol component = all[i];
+      std::vector<symbol> models;
+      find_models_editable (metalib, file, component, models);
+      if (models.size () > 0)
+        components.push_back (component);
+    }
+  std::sort (components.begin (), components.end (), symbol::alphabetical);
+}
+
+symbol
+UIFilter::default_model_editable (const Metalib& metalib, const symbol file, 
+                                  const symbol component) const
+{
+  // All suitable models.
+  std::vector<symbol> models;
+  find_models_editable (metalib, file, component, models);
+
+  // Use the one named "default" as default, if there.
+  static const symbol default_name = "default";
+  if (std::find (models.begin (), models.end (), default_name) != models.end ())
+    return default_name;
+
+  // Otherwise, use the first if there is any.
+  if (models.size () > 0)
+    return models[0];
+  
+  // No suitable models.
+  return Attribute::None ();
+}
+
+void
+UIFilter::find_models_editable (const Metalib& metalib, const symbol file,
+                                const symbol component, 
+                                std::vector<symbol>& models) const
+{ 
+  const Library& library = metalib.library (component);
+
+  std::vector<symbol> all;
+  find_models_all (metalib, file, component, all);
+  for (size_t i = 0; i < all.size (); i++)
+    {
+      const FrameModel& model = library.model (all[i]);
+      if (model.inherited_position ().filename () == file)
+        models.push_back (all[i]);
+    }
+}
+
+
 
 UIFilter::UIFilter (const BlockModel& al)
   : name (al.type_name ())
@@ -276,15 +338,14 @@ UIFilterRaw::find_items (const Metalib& metalib, const symbol file,
       const Library& library = metalib.library (component);
       daisy_assert (library.check (model));
       const FrameModel& frame = library.model (model);
-      std::set<symbol> entries;
-      frame.entries (entries);
-      for (std::set<symbol>::const_iterator i = entries.begin (); 
-           i != entries.end ();
-           i++)
+      std::set<symbol> entries_set;
+      frame.entries (entries_set);
+      std::vector<symbol> entries (entries_set.begin (), entries_set.end ());
+      std::sort (entries.begin (), entries.end (), symbol::alphabetical);
+      for (size_t i = 0; i < entries.size (); i++)
         {
-          const symbol name = *i;
-          if (!frame.is_log (name))
-            items.push_back (new UIItemSimple (name));
+          if (!frame.is_log (entries[i]))
+            items.push_back (new UIItemSimple (entries[i]));
         }
     }
   return items;
