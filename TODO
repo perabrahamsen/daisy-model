@@ -16,13 +16,20 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * UI
 
-** Vælg component seperat i "New model."
-
-overvej: deriveable/editable division in API.
-
 ** "simple" filter skal angive base classes, ikke leaf classes.
 
 ** Overvej at forene datastruktur for raw og simple filter.
+
+Måske en "reset_filter" som bygger fælles datastruktur?
+
+Og lad find/default funktioner bruge den struktur?
+
+
+** En frame/parent_frame -> edit widget funktion
+
+skal kunne bruges nested til submodels
+
+** Måske skal "file" tab kunne anvende den?
 
 * Søren
 

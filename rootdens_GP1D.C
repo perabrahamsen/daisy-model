@@ -293,13 +293,11 @@ static struct Rootdens_GP1DSyntax : public DeclareModel
   { return new Rootdens_GP1D (al); }
   Rootdens_GP1DSyntax ()
     : DeclareModel (Rootdens::component, "GP1D", 
-	       "Use exponential function for root density.\n\
-\n\
-See Gerwitz, S. and E.R. Page (1974): An empirical mathematical model\n\
-to describe plant root systems.  J. Appl. Ecol. 11, 773-781.")
+	       "Use exponential function for root density.")
   { }
   void load_frame (Frame& frame) const
   {
+    frame.set_strings ("cite", "gp74");
     frame.declare ("DensRtTip", "cm/cm^3", Check::positive (), Attribute::Const,
                 "Root density at (potential) penetration depth.");
     frame.set ("DensRtTip", 0.1);

@@ -123,160 +123,6 @@ UIFilter::default_filter ()
   return name;
 }
 
-symbol
-UIFilter::default_component_all (const Metalib& metalib, 
-                                 const symbol file) const
-{
-  std::vector<symbol> all;
-  find_components_all (metalib, file, all);
-  
-  // Use program if it exists.
-  static const symbol name = Program::component;
-  if (std::find (all.begin (), all.end (), name) != all.end ())
-    return name;
-  
-  // Else use first, if there is more than one.
-  if (all.size () > 0)
-    return all[0];
-
-  // Nothing.
-  return Attribute::None ();
-}
-
-void
-UIFilter::find_components_all (const Metalib& metalib, const symbol file,
-                               std::vector<symbol>& components) const
-{ 
-  std::vector<symbol> all;
-  metalib.all (all); 
-  for (size_t i = 0; i < all.size (); i++)
-    {
-      const symbol component = all[i];
-      std::vector<symbol> models;
-      find_models_all (metalib, file, component, models);
-      if (models.size () > 0)
-        components.push_back (component);
-    }
-  std::sort (components.begin (), components.end (), symbol::alphabetical);
-}
-
-symbol
-UIFilter::default_model_all (const Metalib& metalib, const symbol file, 
-                             const symbol component) const
-{
-  // All suitable models.
-  std::vector<symbol> models;
-  find_models_all (metalib, file, component, models);
-
-  // Use the one named "default" as default, if there.
-  static const symbol default_name = "default";
-  if (std::find (models.begin (), models.end (), default_name) != models.end ())
-    return default_name;
-
-  // Otherwise, use the first if there is any.
-  if (models.size () > 0)
-    return models[0];
-  
-  // No suitable models.
-  return Attribute::None ();
-}
-
-void
-UIFilter::find_models_all (const Metalib& metalib, const symbol file,
-                           const symbol component, 
-                           std::vector<symbol>& models) const
-{ 
-  const Library& library = metalib.library (component);
-
-  std::vector<symbol> all;
-  library.entries (all);
-  for (size_t i = 0; i < all.size (); i++)
-    {
-      const FrameModel& model = library.model (all[i]);
-      if (model.buildable ())
-        models.push_back (all[i]);
-    }
-  std::sort (models.begin (), models.end (), symbol::alphabetical);
-}
-
-
-symbol
-UIFilter::default_component_editable (const Metalib& metalib, 
-                                      const symbol file) const
-{
-  std::vector<symbol> all;
-  find_components_editable (metalib, file, all);
-  
-  // Use program if it exists.
-  static const symbol name = Program::component;
-  if (std::find (all.begin (), all.end (), name) != all.end ())
-    return name;
-  
-  // Else use first, if there is more than one.
-  if (all.size () > 0)
-    return all[0];
-
-  // Nothing.
-  return Attribute::None ();
-}
-
-void
-UIFilter::find_components_editable (const Metalib& metalib, const symbol file,
-                                    std::vector<symbol>& components) const
-{ 
-  std::vector<symbol> all;
-  metalib.all (all); 
-  for (size_t i = 0; i < all.size (); i++)
-    {
-      const symbol component = all[i];
-      std::vector<symbol> models;
-      find_models_editable (metalib, file, component, models);
-      if (models.size () > 0)
-        components.push_back (component);
-    }
-  std::sort (components.begin (), components.end (), symbol::alphabetical);
-}
-
-symbol
-UIFilter::default_model_editable (const Metalib& metalib, const symbol file, 
-                                  const symbol component) const
-{
-  // All suitable models.
-  std::vector<symbol> models;
-  find_models_editable (metalib, file, component, models);
-
-  // Use the one named "default" as default, if there.
-  static const symbol default_name = "default";
-  if (std::find (models.begin (), models.end (), default_name) != models.end ())
-    return default_name;
-
-  // Otherwise, use the first if there is any.
-  if (models.size () > 0)
-    return models[0];
-  
-  // No suitable models.
-  return Attribute::None ();
-}
-
-void
-UIFilter::find_models_editable (const Metalib& metalib, const symbol file,
-                                const symbol component, 
-                                std::vector<symbol>& models) const
-{ 
-  const Library& library = metalib.library (component);
-
-  std::vector<symbol> all;
-  find_models_all (metalib, file, component, all);
-  for (size_t i = 0; i < all.size (); i++)
-    {
-      const FrameModel& model = library.model (all[i]);
-      if (model.inherited_position ().filename () == file)
-        models.push_back (all[i]);
-    }
-}
-
-
-
 UIFilter::UIFilter (const BlockModel& al)
   : name (al.type_name ())
 { }
@@ -292,71 +138,55 @@ Presentation of data in the user interface.")
   { }
 } UIFilter_init;
 
-// The 'raw' uifilter model.
+// The 'base' uifilter base model.
 
-struct UIFilterRaw : UIFilter
+struct UIFilterBase : UIFilter
 {
   // Content.
   typedef std::vector<const UIItem*> item_vec_t;
   typedef std::map<symbol, item_vec_t> item_map_t;
   typedef std::map<symbol, item_map_t> model_map_t;
   model_map_t model_map;
-
+  std::vector<symbol> buildable_components;
+  symbol buildable_components_default;
+  std::map<symbol, std::vector<symbol>/**/> buildable_models;
+  std::map<symbol, symbol> buildable_models_default;
+  std::vector<symbol> editable_components;
+  symbol editable_components_default;
+  std::map<symbol, std::vector<symbol>/**/> editable_models;
+  std::map<symbol, symbol> editable_models_default;
+  
   // Use.
-  const std::vector<const UIItem*>& 
-  /**/ find_items (const Metalib& metalib, symbol file,
-                   symbol component, symbol model);
+  symbol default_component_all () const
+  { return buildable_components_default; }
+  const std::vector<symbol>& find_components_all () const
+  { return buildable_components; }
+  symbol default_model_all (const symbol component) const
+  { return buildable_models_default.find (component)->second; }
+  const std::vector<symbol>& find_models_all (const symbol component) const
+  { return buildable_models.find (component)->second; }
+  symbol default_component_editable () const
+  { return editable_components_default; }
+  const std::vector<symbol>& find_components_editable () const
+  { return editable_components; }
+  symbol default_model_editable (const symbol component) const
+  { return editable_models_default.find (component)->second; }
+  const std::vector<symbol>& find_models_editable (const symbol component) const
+  { return editable_models.find (component)->second; }
+  const std::vector<const UIItem*>& find_items (const symbol component,
+                                                const symbol model)
+  { return model_map[component][model]; }
 
   // Create and Destroy.
-  UIFilterRaw (const BlockModel& al);
-  ~UIFilterRaw ();
+  UIFilterBase (const BlockModel& al);
+  ~UIFilterBase ();
 };
 
-const std::vector<const UIItem*>& 
-UIFilterRaw::find_items (const Metalib& metalib, const symbol file,
-                         const symbol component, const symbol model)
-{
-  // Look up component.
-  if (model_map.find (component) == model_map.end ())
-    {
-      item_map_t empty;
-      model_map[component] = empty;
-    }
-  item_map_t& item_map = model_map[component];
-
-  // Look up model.
-  if (item_map.find (model) == item_map.end ())
-    {
-      item_vec_t empty;
-      item_map[model] = empty;
-    }
-  item_vec_t& items = item_map[model];
-
-  if (items.size () == 0)
-    {
-      daisy_assert (metalib.exist (component));
-      const Library& library = metalib.library (component);
-      daisy_assert (library.check (model));
-      const FrameModel& frame = library.model (model);
-      std::set<symbol> entries_set;
-      frame.entries (entries_set);
-      std::vector<symbol> entries (entries_set.begin (), entries_set.end ());
-      std::sort (entries.begin (), entries.end (), symbol::alphabetical);
-      for (size_t i = 0; i < entries.size (); i++)
-        {
-          if (!frame.is_log (entries[i]))
-            items.push_back (new UIItemSimple (entries[i]));
-        }
-    }
-  return items;
-}
-
-
-UIFilterRaw::UIFilterRaw (const BlockModel& al)
+UIFilterBase::UIFilterBase (const BlockModel& al)
   : UIFilter (al)
 { }
 
-UIFilterRaw::~UIFilterRaw ()
+UIFilterBase::~UIFilterBase ()
 {
   for (model_map_t::iterator i = model_map.begin ();
        i != model_map.end ();
@@ -373,12 +203,144 @@ UIFilterRaw::~UIFilterRaw ()
     }
 }
 
+static struct UIFilter_BaseSyntax : public DeclareBase
+{
+  UIFilter_BaseSyntax ()
+    : DeclareBase (UIFilter::component, "base", "\
+Base filter for the user interface.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} UIFilterBase_syntax;
+
+// The 'raw' uifilter model.
+
+struct UIFilterRaw : UIFilterBase
+{
+  // Use.
+  void reset (const Metalib& metalib, const symbol file);
+
+  // Create and Destroy.
+  UIFilterRaw (const BlockModel& al);
+  ~UIFilterRaw ();
+};
+
+void
+UIFilterRaw::reset (const Metalib& metalib, const symbol file)
+{
+  static const symbol default_name = "default";
+
+  // For all components.
+  std::vector<symbol> all_components;
+  metalib.all (all_components);
+  for (size_t c = 0; c < all_components.size (); c++)
+    {
+      const symbol component = all_components[c];
+      const Library& library = metalib.library (component);
+
+      // For all models.
+      std::vector<symbol> all_models;
+      library.entries (all_models);
+      for (size_t m = 0; m < all_models.size (); m++)
+        {
+          const symbol model = all_models[m];
+          const FrameModel& frame = library.model (model);
+
+          // Buildable?
+          if (!frame.buildable ())
+            continue;
+          buildable_models[component].push_back (model);
+
+          // Editable?
+          if (frame.inherited_position ().filename () != file)
+            continue;
+          editable_models[component].push_back (model);
+
+          // Add items.
+          std::set<symbol> entries_set;
+          frame.entries (entries_set);
+          std::vector<symbol> entries (entries_set.begin (), 
+                                       entries_set.end ());
+          std::sort (entries.begin (), entries.end (), symbol::alphabetical);
+          item_vec_t& items = model_map[component][model];          
+          for (size_t i = 0; i < entries.size (); i++)
+            if (!frame.is_log (entries[i]))
+              items.push_back (new UIItemSimple (entries[i]));
+        }
+
+      // Buildable models.
+      if (buildable_models.find (component) != buildable_models.end ())
+        {
+          std::sort (buildable_models[component].begin (), 
+                     buildable_models[component].end (),
+                     symbol::alphabetical);
+
+          if (std::find (buildable_models[component].begin (), 
+                         buildable_models[component].end (),
+                         default_name) != buildable_models[component].end ())
+            buildable_models_default[component] = default_name;
+          else if (buildable_models[component].size () > 0)
+            buildable_models_default[component] 
+              = buildable_models[component][0];
+          else
+            buildable_models_default[component] = Attribute::None ();
+
+          buildable_components.push_back (component);
+        }
+
+      // Editable models.
+      if (editable_models.find (component) != editable_models.end ())
+        {
+          std::sort (editable_models[component].begin (), 
+                     editable_models[component].end (),
+                     symbol::alphabetical);
+
+          if (std::find (editable_models[component].begin (), 
+                         editable_models[component].end (),
+                         default_name) != editable_models[component].end ())
+            editable_models_default[component] = default_name;
+          else if (editable_models[component].size () > 0)
+            editable_models_default[component] 
+              = editable_models[component][0];
+          else
+            editable_models_default[component] = Attribute::None ();
+
+          editable_components.push_back (component);
+        }
+    }
+
+  // Buildable components.
+  if (std::find (buildable_components.begin (), buildable_components.end (),
+                 default_name) != buildable_components.end ())
+    buildable_components_default = default_name;
+  else if (buildable_components.size () > 0)
+    buildable_components_default = buildable_components[0];
+  else
+    buildable_components_default = Attribute::None ();
+
+  // Editable components.
+  if (std::find (editable_components.begin (), editable_components.end (),
+                 default_name) != editable_components.end ())
+    editable_components_default = default_name;
+  else if (editable_components.size () > 0)
+    editable_components_default = editable_components[0];
+  else
+    editable_components_default = Attribute::None ();
+}
+
+UIFilterRaw::UIFilterRaw (const BlockModel& al)
+  : UIFilterBase (al)
+{ }
+
+UIFilterRaw::~UIFilterRaw ()
+{ }
+
 static struct UIFilter_RawSyntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
   { return new UIFilterRaw (al); }
   UIFilter_RawSyntax ()
-    : DeclareModel (UIFilter::component, "raw", "\
+    : DeclareModel (UIFilter::component, "raw", "base", "\
 Raw filter for the user interface.")
   { }
   void load_frame (Frame&) const
@@ -387,105 +349,165 @@ Raw filter for the user interface.")
 
 // The 'simple' uifilter model.
 
-struct UIFilterSimple : UIFilter
+struct UIFilterSimple : UIFilterBase
 {
-  typedef std::vector<const UIItem*> item_vec_t;
-  typedef std::map<symbol, item_vec_t> item_map_t;
-  typedef std::map<symbol, item_map_t> model_map_t;
-  model_map_t model_map;
-
-  // Use.
-  const std::vector<const UIItem*>& 
-  /**/ find_items (const Metalib& metalib, symbol file,
-                   symbol component, symbol model);
+  // Content.
+  std::vector<symbol> known_components;
+  symbol known_components_default;
+  std::map<symbol, std::vector<symbol>/**/> known_models;
+  std::map<symbol, std::map<symbol, std::vector<symbol>/**/>/**/> known_params;
 
   // Create and Destroy.
+  void reset (const Metalib& metalib, const symbol file);
   UIFilterSimple (const BlockModel& al);
   ~UIFilterSimple ();
 };
 
-const std::vector<const UIItem*>& 
-UIFilterSimple::find_items (const Metalib& metalib, const symbol file,
-                            const symbol component, const symbol model)
+void 
+UIFilterSimple::reset (const Metalib& metalib, const symbol file)
 {
-  // Look up component.
-  if (model_map.find (component) == model_map.end ())
-    {
-      item_map_t empty;
-      model_map[component] = empty;
-    }
-  item_map_t& item_map = model_map[component];
+  static const symbol default_name = "default";
 
-  // Look up model.
-  if (item_map.find (model) == item_map.end ())
+  // For all components.
+  for (size_t c = 0; c < known_components.size (); c++)
     {
-      item_vec_t empty;
-      item_map[model] = empty;
+      const symbol component = known_components[c];
+      const Library& library = metalib.library (component);
+
+      // For all models.
+      std::vector<symbol> knowns = known_models[component];
+      std::vector<symbol> all_models;
+      library.entries (all_models);
+      for (size_t m = 0; m < all_models.size (); m++)
+        {
+          const symbol model = all_models[m];
+
+          // Check for known ancestor.
+          symbol sponsor = Attribute::None ();
+          for (size_t k = 0; k < knowns.size (); k++)
+            if (library.is_derived_from (model, knowns[k]))
+              {
+                sponsor = knowns[k];
+                break;
+              }
+
+          if (sponsor == Attribute::None ())
+            continue;
+
+          const FrameModel& frame = library.model (model);
+
+          // Buildable?
+          if (!frame.buildable ())
+            continue;
+          buildable_models[component].push_back (model);
+
+          // Editable?
+          if (frame.inherited_position ().filename () != file)
+            continue;
+          editable_models[component].push_back (model);
+
+          // Add items.
+          const std::vector<symbol>& entries = known_params[component][sponsor];
+          item_vec_t& items = model_map[component][model];
+          for (size_t i = 0; i < entries.size (); i++)
+            {
+              if (!frame.is_log (entries[i]))
+                items.push_back (new UIItemSimple (entries[i]));
+            }
+        }
+
+      // Buildable models.
+      if (buildable_models.find (component) != buildable_models.end ())
+        {
+          std::sort (buildable_models[component].begin (), 
+                     buildable_models[component].end (),
+                     symbol::alphabetical);
+
+          if (std::find (buildable_models[component].begin (), 
+                         buildable_models[component].end (),
+                         default_name) != buildable_models[component].end ())
+            buildable_models_default[component] = default_name;
+          else if (buildable_models[component].size () > 0)
+            buildable_models_default[component] 
+              = buildable_models[component][0];
+          else
+            buildable_models_default[component] = Attribute::None ();
+
+          buildable_components.push_back (component);
+        }
+
+      // Editable models.
+      if (editable_models.find (component) != editable_models.end ())
+        {
+          std::sort (editable_models[component].begin (), 
+                     editable_models[component].end (),
+                     symbol::alphabetical);
+
+          if (std::find (editable_models[component].begin (), 
+                         editable_models[component].end (),
+                         default_name) != editable_models[component].end ())
+            editable_models_default[component] = default_name;
+          else if (editable_models[component].size () > 0)
+            editable_models_default[component] 
+              = editable_models[component][0];
+          else
+            editable_models_default[component] = Attribute::None ();
+
+          editable_components.push_back (component);
+        }
     }
-  item_vec_t& items = item_map[model];
-  return items;
+
+  // Buildable components.
+  if (std::find (buildable_components.begin (), buildable_components.end (),
+                 known_components_default) != buildable_components.end ())
+    buildable_components_default = known_components_default;
+  else if (buildable_components.size () > 0)
+    buildable_components_default = buildable_components[0];
+  else
+    buildable_components_default = Attribute::None ();
+
+  // Editable components.
+  if (std::find (editable_components.begin (), editable_components.end (),
+                 known_components_default) != editable_components.end ())
+    editable_components_default = known_components_default;
+  else if (editable_components.size () > 0)
+    editable_components_default = editable_components[0];
+  else
+    editable_components_default = Attribute::None ();
 }
 
 
 UIFilterSimple::UIFilterSimple (const BlockModel& al)
-  : UIFilter (al)
+  : UIFilterBase (al)
 { 
   const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&
     uicomp = al.submodel_sequence ("all");
+  known_components_default = al.name ("default");
   for (size_t i = 0; i < uicomp.size (); i++)
     {
       const symbol component = uicomp[i]->name ("name");
-      if (model_map.find (component) == model_map.end ())
-        {
-          item_map_t empty;
-          model_map[component] = empty;
-        }
-      item_map_t& item_map = model_map[component];
+      known_components.push_back (component);
+
       const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&
         uimodel = uicomp[i]->submodel_sequence ("all");
       for (size_t j = 0; j < uimodel.size (); j++)
         {
           const symbol model = uimodel[j]->name ("name");
-          if (item_map.find (model) == item_map.end ())
-            {
-              item_vec_t empty;
-              item_map[model] = empty;
-            }
-          item_vec_t& items = item_map[model];
-          const std::vector<symbol>& pars 
-            = uimodel[j]->name_sequence ("all");
-          for (size_t k = 0; k < pars.size (); k++)
-            {
-              const symbol name = pars[k];
-              items.push_back (new UIItemSimple (name));
-            }
+          known_models[component].push_back (model);
+          known_params[component][model] = uimodel[j]->name_sequence ("all");
         }
     }
 }
 
 UIFilterSimple::~UIFilterSimple ()
-{
-  for (model_map_t::iterator i = model_map.begin ();
-       i != model_map.end ();
-       i++)
-    {
-      item_map_t item_map = (*i).second;
-      for (item_map_t::iterator j = item_map.begin (); 
-           j != item_map.end ();
-           j++)
-        {
-          item_vec_t items = (*j).second;
-          sequence_delete (items.begin (), items.end ());
-        }
-    }
-}
+{ }
 
 static struct UIFilter_SimpleSyntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
   { return new UIFilterSimple (al); }
   UIFilter_SimpleSyntax ()
-    : DeclareModel (UIFilter::component, "simple", "\
+    : DeclareModel (UIFilter::component, "simple", "base", "\
 Simple filter for the user interface.")
   { }
   static void load_model (Frame& frame)
@@ -504,8 +526,73 @@ Name of this component.");
 List of models to support.", load_model);
     frame.order ("name", "all");
   }
+  static bool check_alist (const Metalib& metalib, 
+                           const Frame& al, Treelog& msg)
+  { 
+    bool ok = true;
+
+    const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&
+      uicomp = al.submodel_sequence ("all");
+    for (size_t i = 0; i < uicomp.size (); i++)
+      {
+        const symbol component = uicomp[i]->name ("name");
+        if (!metalib.exist (component))
+          {
+            ok = false;
+            msg.error ("'" + component.name () + "': unknown component");
+            continue;
+          }
+        const Library& library = metalib.library (component);
+        const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&
+          uimodel = uicomp[i]->submodel_sequence ("all");
+        for (size_t j = 0; j < uimodel.size (); j++)
+          {
+            const symbol model = uimodel[j]->name ("name");
+            if (!library.check (model))
+              {
+                ok = false;
+                msg.error ("'" + component.name () + "' model '" 
+                           + model.name () + "' not known");
+                continue;
+              }
+            const FrameModel& frame = library.model (model);
+            if (!frame.buildable ())
+              {
+                ok = false;
+                msg.error ("'" + component.name () + "' model '" 
+                           + model.name () + "' not buildable");
+                continue;
+              }
+            const std::vector<symbol>& uipar
+              = uimodel[j]->name_sequence ("all");
+            for (size_t k = 0; k < uipar.size (); k++)
+              {
+                const symbol par = uipar[k];
+                if (frame.lookup (par) == Attribute::Error)
+                  {
+                    ok = false;
+                    msg.error ("'" + component.name () + "' model '" 
+                               + model.name () + "' parameter '"
+                               + par.name () + "' unknown");
+                    continue;
+                  }
+                if (frame.is_log (par))
+                  {
+                    ok = false;
+                    msg.error ("'" + component.name () + "' model '" 
+                               + model.name () + "' parameter '"
+                               + par.name () + "' is for logging only");
+                    continue;
+                  }
+              }
+          }
+      }
+    return ok;
+  }
+
   void load_frame (Frame& frame) const
   { 
+    frame.add_check (check_alist);
     frame.declare_string ("default", Attribute::Const, "\
 Name of default component.");
     frame.declare_submodule_sequence ("all", Attribute::Const, "\

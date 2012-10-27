@@ -711,13 +711,13 @@ UIRun::select_filter (const symbol name)
   filter.reset (Librarian::build_stock<UIFilter> (metalib, Treelog::null (),
                                                   name, __FUNCTION__));
   daisy_assert (filter.get ());
+  filter->reset (metalib, selected_file);
 
   // Remember filter.
   selected_filter = name;
 
   // Fill component box.
-  std::vector<symbol> editable;
-  filter->find_components_editable (metalib, selected_file, editable);
+  const std::vector<symbol>& editable = filter->find_components_editable ();
   qt_select_component->clear ();
   for (size_t i = 0; i < editable.size (); i++)
     {
@@ -732,14 +732,13 @@ UIRun::select_filter (const symbol name)
   if (std::find (editable.begin (), editable.end (), selected_component) 
       == editable.end ())
     selected_component 
-      = filter->default_component_editable (metalib, selected_file);
+      = filter->default_component_editable ();
 
   // Update the component index (and model).
   select_component (selected_component);
 
   // Fill new component box.
-  std::vector<symbol> all;
-  filter->find_components_all (metalib, selected_file, all);
+  const std::vector<symbol>& all = filter->find_components_all ();
   qt_new_component->clear ();
   for (size_t i = 0; i < all.size (); i++)
     {
@@ -753,8 +752,7 @@ UIRun::select_filter (const symbol name)
   // Check if old component is still available.
   if (std::find (all.begin (), all.end (), selected_new_component) 
       == all.end ())
-    selected_new_component 
-      = filter->default_component_all (metalib, selected_file);
+    selected_new_component = filter->default_component_all ();
 
   // Update the component index (and model).
   select_new_component (selected_new_component);
@@ -763,14 +761,6 @@ UIRun::select_filter (const symbol name)
 void 
 UIRun::select_component (const symbol name)
 { 
-  // Check state.
-  daisy_assert (top_level);
-  const Metalib& metalib = top_level->metalib ();
-  daisy_assert (metalib.exist (name));
-  const Library& library = metalib.library (name);
-  daisy_assert (filter.get ());
-
-
   // Update combobox.
   int index = qt_select_component->findText (name.name ().c_str ());
   qt_select_component->setCurrentIndex (index);
@@ -778,9 +768,21 @@ UIRun::select_component (const symbol name)
   // Remember choice.
   selected_component = name;
 
+  // Check state.
+  daisy_assert (top_level);
+  const Metalib& metalib = top_level->metalib ();
+  if (!metalib.exist (name))
+    {
+      qt_select_model->setEnabled (false);
+      return;
+    }
+  qt_select_model->setEnabled (true);
+  const Library& library = metalib.library (name);
+  daisy_assert (filter.get ());
+
+
   // Fill model box.
-  std::vector<symbol> all;
-  filter->find_models_editable (metalib, selected_file, name, all);
+  const std::vector<symbol>& all = filter->find_models_editable (name);
   qt_select_model->clear ();
   for (size_t i = 0; i < all.size (); i++)
     {
@@ -793,8 +795,7 @@ UIRun::select_component (const symbol name)
 
   // Check if old model is still available.
   if (std::find (all.begin (), all.end (), selected_model) == all.end ())
-    selected_model = filter->default_model_editable (metalib, selected_file, 
-                                                     selected_component);
+    selected_model = filter->default_model_editable (selected_component);
 
   // Update model index.
   select_model (selected_model);
@@ -820,8 +821,7 @@ UIRun::select_model (const symbol name)
   // Get items.
   daisy_assert (filter.get ());
   const std::vector<const UIItem*>& items
-    = filter->find_items (metalib, selected_file,
-                          selected_component, selected_model);
+    = filter->find_items (selected_component, selected_model);
 
   // Delete old content.
   QLayoutItem *child;
@@ -909,14 +909,6 @@ UIRun::build_item (const Metalib& metalib,
 void 
 UIRun::select_new_component (const symbol name)
 { 
-  // Check state.
-  daisy_assert (top_level);
-  const Metalib& metalib = top_level->metalib ();
-  daisy_assert (metalib.exist (name));
-  const Library& library = metalib.library (name);
-  daisy_assert (filter.get ());
-
-
   // Update combobox.
   int index = qt_new_component->findText (name.name ().c_str ());
   qt_new_component->setCurrentIndex (index);
@@ -924,9 +916,19 @@ UIRun::select_new_component (const symbol name)
   // Remember choice.
   selected_new_component = name;
 
+  daisy_assert (top_level);
+  const Metalib& metalib = top_level->metalib ();
+  if (!metalib.exist (name))
+    {
+      qt_new_parent->setEnabled (false);
+      return;
+    }
+  qt_new_parent->setEnabled (true);
+  const Library& library = metalib.library (name);
+  daisy_assert (filter.get ());
+
   // Fill parent box.
-  std::vector<symbol> all;
-  filter->find_models_all (metalib, selected_file, name, all);
+  const std::vector<symbol>& all = filter->find_models_all (name);
   qt_new_parent->clear ();
   for (size_t i = 0; i < all.size (); i++)
     {
@@ -939,8 +941,7 @@ UIRun::select_new_component (const symbol name)
 
   // Check if old parent is still available.
   if (std::find (all.begin (), all.end (), selected_new_parent) == all.end ())
-    selected_new_parent = filter->default_model_all (metalib, selected_file, 
-                                                     selected_new_component);
+    selected_new_parent = filter->default_model_all (selected_new_component);
 
   // Update model index.
   select_new_parent (selected_new_parent);

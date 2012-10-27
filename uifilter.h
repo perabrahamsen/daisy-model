@@ -68,31 +68,22 @@ public:
 
   // Use.
 public:
-  virtual symbol default_component_all (const Metalib& metalib, 
-                                        const symbol file) const;
-  virtual void find_components_all (const Metalib& metalib, const symbol file,
-                                    std::vector<symbol>& components) const;
-  virtual symbol default_model_all (const Metalib& metalib, const symbol file,
-                                symbol component) const;
-  virtual void find_models_all (const Metalib& metalib, const symbol file,
-                                symbol component, 
-                                std::vector<symbol>& models) const;
-  virtual symbol default_component_editable (const Metalib& metalib, 
-                                             const symbol file) const;
-  virtual void find_components_editable (const Metalib& metalib, 
-                                         const symbol file,
-                                         std::vector<symbol>& components) const;
-  virtual symbol default_model_editable (const Metalib& metalib,
-                                         const symbol file,
-                                         symbol component) const;
-  virtual void find_models_editable (const Metalib& metalib, const symbol file,
-                                     symbol component, 
-                                     std::vector<symbol>& models) const;
+  virtual symbol default_component_all () const = 0;
+  virtual const std::vector<symbol>& find_components_all () const = 0;
+  virtual symbol default_model_all (symbol component) const = 0;
+  virtual const std::vector<symbol>&
+    find_models_all (symbol component) const = 0;
+  virtual symbol default_component_editable () const = 0;
+  virtual const std::vector<symbol>& find_components_editable () const = 0;
+  virtual symbol default_model_editable (symbol component) const = 0;
+  virtual const std::vector<symbol>& 
+    find_models_editable (symbol component) const = 0;
   virtual const std::vector<const UIItem*>& 
-  /**/ find_items (const Metalib& metalib, symbol file,
-                   symbol component, symbol model) = 0;
+    find_items (symbol component, symbol model) = 0;
 
   // Create and Destroy.
+public:
+  virtual void reset (const Metalib& metalib, symbol file) = 0;
 protected:
   explicit UIFilter (const BlockModel&);
 public:
