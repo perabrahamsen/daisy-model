@@ -1,0 +1,98 @@
+;;; setup.dai -- setup file for calibrating bioash.
+
+(input file "data.dai")                 ;Column data.
+(input file "dk-soil.dai")              ;Jyndevad soil.
+
+;;; Soil.
+
+(defhorizon Ap "Jyndevad Ap"
+  (dry_bulk_density 1.15 [g/cm^3]))
+
+(defhorizon B "Jyndevad C"
+  (dry_bulk_density 1.30 [g/cm^3])
+  (hydraulic M_C                        ;Campbell with Mualem thery.
+             (K_sat $B_K_sat)        ;Our free variable!
+             (h_b -5 [cm])
+             (b 2.38 [])
+             (Theta_sat 0.406 [])))
+
+(defhorizon C "Jyndevad C"
+  (dry_bulk_density 1.31 [g/cm^3]))
+
+(defcolumn common default
+  (OrganicMatter none)                  ;Disable organic matter.
+  (Chemistry none)                      ;Disable nitrogen.
+  (Soil (MaxRootingDepth 50 [cm])       ;Not used.
+        (horizons ( -26 [cm] Ap)
+                  (-100 [cm] B)
+                  (-127 [cm] C)))
+  (Movement original 
+            (Geometry (zplus -5 -10 -15 -20 -25 -26 -30 -35 -40 -45 -50 -55 -60
+                             -65 -70 -75 -80 -85 -90 -95 -100 -105
+                             -110 -115 -120 -125 -127 [cm])))
+  (SoilWater (h 0))                     ;Saturated soil.
+  (Groundwater lysimeter))
+
+;;; Log.
+
+(defselect theta interval
+  (path column default SoilWater Theta)
+  (spec fixed SoilWater Theta)
+  (density true)
+  (expr (dim x [g/cm^3]))
+  ;;(factor 1.3)
+  (dimension "dry soil fraction")                  ;Weight based
+  ;;(dimension "")
+  )
+
+(deflog "Soil Intervals" table
+  (summary compare)
+  (where "soil_intervals.dlf")
+  (when true)
+  (entries (theta (tag "0-10") (from 0 [cm]) (to -10 [cm]))
+           (theta (tag "10-20") (from -10 [cm]) (to -20 [cm]))
+           (theta (tag "20-30") (from -20 [cm]) (to -30 [cm]))
+           (theta (tag "35-40") (from -35 [cm]) (to -40 [cm]))
+           (theta (tag "40-45") (from -40 [cm]) (to -45 [cm]))
+           (theta (tag "45-50") (from -45 [cm]) (to -50 [cm]))
+           (theta (tag "50-55") (from -50 [cm]) (to -55 [cm]))
+           (theta (tag "55-60") (from -55 [cm]) (to -60 [cm]))
+           (theta (tag "60-65") (from -60 [cm]) (to -65 [cm]))
+           (theta (tag "65-70") (from -65 [cm]) (to -70 [cm]))
+           (theta (tag "70-75") (from -70 [cm]) (to -75 [cm]))
+           (theta (tag "80-85") (from -80 [cm]) (to -85 [cm]))
+           (theta (tag "85-90") (from -85 [cm]) (to -90 [cm]))
+           (theta (tag "90-95") (from -90 [cm]) (to -95 [cm]))
+           (theta (tag "95-125") (from -95 [cm]) (to -125 [cm]))))
+
+;;; Program.
+
+(defprogram MySim Daisy
+  (declare B_K_sat Number [cm/h] "Saturated water conductivity in B horizon.")
+  ;;(B_K_sat 10 [cm/h])                   ;Dummy value, not used.
+  ;;(B_K_sat 2.53833 [cm/h])
+  (B_K_sat 0.398064 [cm/h])
+  (weather none)
+  (column common)
+  (manager nil)
+  (time 2012 8 1 8)                     ;Start of experiment.
+  (stop 2012 8 8 17)
+  (timestep (minutes 30))               ;Haldf hour timestep.
+
+  (output "Soil Intervals"))
+
+(defprogram mytest minimize
+  (parameter B_K_sat)
+  (simplex (0.05) (0.10))
+  (limit (> B_K_sat 0 [cm/h]))
+  (scope name compare)
+  (expr (- R2))
+  (run MySim)
+  (epsilon 0.0)
+  (min_iter 5)
+  (max_iter 80))
+
+;;(run mytest)
+(run MySim)
+
+;;; setup.dai ends here.

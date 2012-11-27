@@ -35,6 +35,7 @@ class HydraulicM_C : public Hydraulic
   // Content.
   const double h_b;
   const double b;
+  const double l;
 
   // Use.
 public:
@@ -61,7 +62,7 @@ HydraulicM_C::Theta (const double h) const
 double 
 HydraulicM_C::K (const double h) const
 {
-  return K_sat * pow (Sr (h), (2 + 2.5/b) * b);
+  return K_sat * pow (Sr (h), 2 * b + 2 + l);
 }
 
 double 
@@ -86,7 +87,7 @@ double
 HydraulicM_C::M (double h) const
 {
   if (h <= h_b)
-    return K_sat * (-h_b / (1 + 2.5/b)) * pow (h_b / h, 1 + 2.5/b);
+    return K_sat * (-h_b / (1 + (2.0 + l)/b)) * pow (h_b / h, 1 + (2.0 + l)/b);
   else
     return M (h_b) + K_sat * (h - h_b);
 }
@@ -103,7 +104,8 @@ HydraulicM_C::Sr (double h) const
 HydraulicM_C::HydraulicM_C (const BlockModel& al)
   : Hydraulic (al),
     h_b (al.number ("h_b")),
-    b (al.number ("b"))
+    b (al.number ("b")),
+    l (al.number ("l"))
 { }
 
 HydraulicM_C::~HydraulicM_C ()
@@ -129,9 +131,11 @@ static struct HydraulicM_CSyntax : public DeclareModel
     Hydraulic::load_K_sat (frame);
     frame.declare ("h_b", "cm", Check::negative (), Attribute::Const,
 		"Bubbling pressure.");
-    frame.declare ("b", Attribute::None (), Check::positive (), Attribute::Const,
-		"Campbell parameter.");
-
+    frame.declare ("b", Attribute::None (), Check::positive (), 
+                   Attribute::Const, "Campbell parameter.");
+    frame.declare ("l", Attribute::None (), Check::none (), Attribute::Const,
+                   "Mualem form parameter.");
+    frame.set ("l", 0.5);
   }
 } hydraulicM_C_syntax;
 

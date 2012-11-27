@@ -312,6 +312,9 @@ WSourceTable::source_tick (Treelog& msg)
     }
   timestep_hours = Time::fraction_hours_between (timestep_begin, timestep_end);
   daisy_assert (timestep_hours > 0.0);
+
+  if (done ())
+    msg.message ("source done");
 }
   
 void 

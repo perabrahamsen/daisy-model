@@ -29,6 +29,7 @@
 struct WSourceConst : public WSourceBase
 {
   const double timestep_hours;        // [h]
+  bool is_done;
   double timestep () const
   { return timestep_hours; }
   bool end_check (symbol key) const
@@ -39,9 +40,9 @@ struct WSourceConst : public WSourceBase
   { return name (key); }
 
   void source_tick (Treelog&)
-  { }
+  { is_done = true; }
   bool done () const
-  { return true; }
+  { return is_done; }
   void source_initialize (Treelog&)
   { }
   bool source_check (Treelog& msg) const
@@ -57,7 +58,8 @@ struct WSourceConst : public WSourceBase
   }
   WSourceConst (const BlockModel& al)
     : WSourceBase (al),
-      timestep_hours (Time::fraction_hours_between (begin (), end ()))
+      timestep_hours (Time::fraction_hours_between (begin (), end ())),
+      is_done (false)
   { }
   ~WSourceConst ()
   { }
@@ -74,5 +76,34 @@ Weather that does not change during the simulation.")
   void load_frame (Frame&) const
   { }
 } WSourceConst_syntax;
+
+static struct WSourceNoneSyntax : public DeclareParam
+{ 
+  WSourceNoneSyntax ()
+    : DeclareParam (WSource::component, "none", "const", "\
+No weather.\n\
+No precipitation or global radiation, temperature is 10 dg Celcius.\n\
+The static information is taken from a climate station operated\n\
+by Copenhagen University, and located in Taastrup, Denmark.\n\
+You can overwrite any parameters to simulate an experiment under \n\
+controled, constant weather conditions.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set ("Station", "Taastrup");
+    frame.set ("Elevation", 30.0);
+    frame.set ("Longitude", 12.0);
+    frame.set ("Latitude", 56.0);
+    frame.set ("TimeZone", 15.0);
+    frame.set ("Surface", "reference");
+    frame.set ("ScreenHeight", 2.0);
+    frame.set ("TAverage", 7.8);
+    frame.set ("TAmplitude", 8.5);
+    frame.set ("MaxTDay", 209.0);
+    frame.set ("Precip", 0.0);
+    frame.set ("GlobRad", 0.0);
+    frame.set ("AirTemp", 10.0);
+  }
+} WSourceNone_syntax;
 
 // wsource_const.C ends here.

@@ -128,10 +128,10 @@ struct WSourceCombine : public WSourceWeather
   { return find_meta_end (key, meta).end_name (meta); }
   
   // Simulation.
-  mutable bool ok;              // More data available.
+  mutable bool more_data_available;
   void source_tick (Treelog& msg);
   bool done () const
-  { return !ok; }
+  { return !more_data_available; }
   
   // Create and Destroy.
   void source_initialize (Treelog&);
@@ -399,7 +399,7 @@ WSourceCombine::entries (std::set<symbol>& result) const
 void 
 WSourceCombine::source_tick (Treelog& msg)
 {
-  if (!ok)
+  if (!more_data_available)
     return;
   
   my_begin = my_end;
@@ -429,7 +429,7 @@ WSourceCombine::source_tick (Treelog& msg)
       all_done = false;
     }
   if (all_done)
-    ok = false;
+    more_data_available = false;
 
   my_timestep = Time::fraction_hours_between (my_begin, my_end);
   daisy_assert (my_timestep > 0.0);
@@ -438,7 +438,7 @@ WSourceCombine::source_tick (Treelog& msg)
 void 
 WSourceCombine::source_initialize (Treelog& msg)
 {
-  ok = true;
+  more_data_available = true;
 
   for (size_t i = 0; i < entry.size (); i++)
     {
@@ -479,24 +479,24 @@ WSourceCombine::source_check (Treelog& msg) const
     {
       msg.error ("Bad initial timestep from " + my_begin.print () 
                  + " to " + my_end.print ());
-      ok = false;
+      more_data_available = false;
     }
 
   if (my_data_end <= my_data_begin)
     {
       msg.error ("Bad data interval from " + my_data_begin.print () 
                  + " to " + my_data_end.print ());
-      ok = false;
+      more_data_available = false;
     }
 
   for (size_t i = 0; i < entry.size (); i++)
     {
       Treelog::Open nest (msg, "source", i, entry[i]->source->objid);
       if (!entry[i]->source->source_check (msg))
-        ok = false;
+        more_data_available = false;
     }
 
-  return ok;
+  return more_data_available;
 }
 
 static struct WSourceCombineSyntax : public DeclareModel
@@ -514,7 +514,7 @@ List of weather sources.", WSourceCombine::Entry::load_syntax);
   frame.declare_object ("reserve", WSource::component,
                         Attribute::State, Attribute::Singleton, "\
 Reserve weather model to use when no source match.");
-  frame.set ("reserve", "null");
+  frame.set ("reserve", "none");
   }
 } WSourceCombine_syntax;
 

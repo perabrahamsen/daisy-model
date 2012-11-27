@@ -142,8 +142,8 @@ static struct PhenologyStandardSyntax : public DeclareModel
     // Parameters.
     frame.declare ("EmrTSum", "dg C d", Attribute::Const,
                    "Soil temperature sum at emergence.");
-    frame.declare ("EmrSMF", "cm", "d", Attribute::Const,
-                   "Soil moisture (h-function) effect on emergense.");
+    frame.declare ("EmrSMF", "cm", Attribute::None (), Attribute::Const,
+                   "Soil moisture (h-function) effect on emergence.");
     PLF SMF;
     SMF.add (-1000.0, 1.00);
     SMF.add (-150.0, 1.00);

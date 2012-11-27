@@ -32,6 +32,7 @@ class HydraulicB_C : public Hydraulic
   // Content.
   const double h_b;
   const double b;
+  const double l;
 
   // Use.
 public:
@@ -58,7 +59,7 @@ HydraulicB_C::Theta (const double h) const
 double 
 HydraulicB_C::K (const double h) const
 {
-  return K_sat * pow (Sr (h), (2 + 3.0 / b) * b);
+  return K_sat * pow (Sr (h), 2 * b + 1 + l);
 }
 
 double 
@@ -83,7 +84,7 @@ double
 HydraulicB_C::M (double h) const
 {
   if (h <= h_b)
-    return K_sat * (-h_b / (1.0 + 3.0 / b)) * pow (h_b / h, 1.0 + 3.0 / b);
+    return K_sat * (-h_b / (1.0 + (1.0 + l) / b)) * pow (h_b / h, 1.0 + (1.0 + l) / b);
   else
     return M (h_b) + K_sat * (h - h_b);
 }
@@ -100,7 +101,8 @@ HydraulicB_C::Sr (double h) const
 HydraulicB_C::HydraulicB_C (const BlockModel& al)
   : Hydraulic (al),
     h_b (al.number ("h_b")),
-    b (al.number ("b"))
+    b (al.number ("b")),
+    l (al.number ("l"))
 { }
 
 HydraulicB_C::~HydraulicB_C ()
@@ -128,6 +130,9 @@ static struct HydraulicB_CSyntax : public DeclareModel
 		  "Bubbling pressure.");
       frame.declare ("b", Attribute::None (), Check::positive (), Attribute::Const,
 		  "Campbell parameter.");
+    frame.declare ("l", Attribute::None (), Check::none (), Attribute::Const,
+                   "Burdine form parameter.");
+    frame.set ("l", 2.0);
 
     }
 } hydraulicB_C_syntax;

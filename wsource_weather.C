@@ -701,10 +701,7 @@ void
 WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
 {
   if (source.done ())
-    {
-      msg.error ("No weather data");
-      return;
-    }
+    return;
 
   // Update time interval
   bool new_day = false;

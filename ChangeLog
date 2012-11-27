@@ -1,3 +1,7 @@
+2012-11-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* hydraulic_B_C.C, hydraulic_M_C.C (l): New parameter.
+
 2012-10-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* lib/log.dai ("Vegetation"): Updated.
