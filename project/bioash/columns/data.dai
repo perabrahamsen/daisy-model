@@ -1,10 +1,10 @@
 ;; data.dai -- Data for calibrating bioash columns.
 
 (defsummary compare Rsqr
-  (measure ;;((time 2012 08 08 14 (minute 00))
-           ;; (data ("0-10" 0.142)
-           ;;       ("10-20" 0.145)
-           ;;       ("20-30" 0.149)))
+  (measure ((time 2012 08 08 14 (minute 00))
+            (data ("0-10" 0.142)
+                  ("10-20" 0.145)
+                  ("20-30" 0.149)))
            ((time 2012 08 08 15 (minute 00))
             (data ("35-40" 0.157)
                   ("40-45" 0.163)
@@ -18,7 +18,7 @@
             (data ("80-85" 0.174)
                   ("85-90" 0.187)
                   ("90-95" 0.202)
-                  ;;("95-125" 0.183)
+                  ("95-125" 0.183)
                   ))))
 
 ;;; data.dai ends here.

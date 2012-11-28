@@ -210,6 +210,7 @@ struct Daisy::Implementation
         msg.error ("Extern scope not found");
         ok = false;
       }
+#if 0
     if (!approximate (max_dt, 1.0))
       {
         std::ostringstream tmp;
@@ -217,6 +218,7 @@ struct Daisy::Implementation
             << timestep.print ();
         msg.warning (tmp.str ());
       }
+#endif
     // Check actions.
     {
       Treelog::Open nest (msg, "manager");

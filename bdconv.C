@@ -60,7 +60,7 @@ BD_convert::BD_convert (const Units& units, const symbol has, const symbol want,
     out (units.get_convertion (Units::dry_soil_fraction (), want)),
     bulk (-42.42e42)
 { 
-#if 1
+#if 0
   std::ostringstream tmp;
   tmp << "has = " << has << ", bulk_unit = " << bulk_unit
       << ", dsf = " << Units::dry_soil_fraction () << ", want = " << want;

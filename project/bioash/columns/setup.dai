@@ -6,18 +6,23 @@
 ;;; Soil.
 
 (defhorizon Ap "Jyndevad Ap"
-  (dry_bulk_density 1.15 [g/cm^3]))
+  (dry_bulk_density 1.15 [g/cm^3])
+  (hydraulic original
+             (K_sat $Ap_K_sat)))
 
 (defhorizon B "Jyndevad C"
   (dry_bulk_density 1.30 [g/cm^3])
   (hydraulic M_C                        ;Campbell with Mualem thery.
-             (K_sat $B_K_sat)        ;Our free variable!
+             (K_sat $B_K_sat)
+             (l $B_l)
              (h_b -5 [cm])
              (b 2.38 [])
              (Theta_sat 0.406 [])))
 
 (defhorizon C "Jyndevad C"
-  (dry_bulk_density 1.31 [g/cm^3]))
+  (dry_bulk_density 1.31 [g/cm^3])
+  (hydraulic original
+             (K_sat $C_K_sat)))
 
 (defcolumn common default
   (OrganicMatter none)                  ;Disable organic matter.
@@ -39,7 +44,7 @@
   (path column default SoilWater Theta)
   (spec fixed SoilWater Theta)
   (density true)
-  (expr (dim x [g/cm^3]))
+  (expr (dim x [g/cm^3] (warn_known false)))
   ;;(factor 1.3)
   (dimension "dry soil fraction")                  ;Weight based
   ;;(dimension "")
@@ -68,22 +73,32 @@
 ;;; Program.
 
 (defprogram MySim Daisy
+  (declare Ap_K_sat Number [cm/h] "Saturated water conductivity in Ap horizon.")
   (declare B_K_sat Number [cm/h] "Saturated water conductivity in B horizon.")
-  ;;(B_K_sat 10 [cm/h])                   ;Dummy value, not used.
-  ;;(B_K_sat 2.53833 [cm/h])
-  (B_K_sat 0.398064 [cm/h])
+  (declare C_K_sat Number [cm/h] "Saturated water conductivity in C horizon.")
+  (declare B_l Number [] "l parameter in B horizon.")
+  (Ap_K_sat 10 [cm/h])                  ;Dummy value, not used.
+  (B_K_sat 10 [cm/h])                   ;Dummy value, not used.
+  (C_K_sat 10 [cm/h])                   ;Dummy value, not used.
+  (B_l 0.5 [])                          ;Dummy value, not used.
+
   (weather none)
   (column common)
   (manager nil)
-  (time 2012 8 1 8)                     ;Start of experiment.
+  (time 2012 8 8 10)                     ;Start of experiment.
   (stop 2012 8 8 17)
   (timestep (minutes 30))               ;Haldf hour timestep.
 
   (output "Soil Intervals"))
 
 (defprogram mytest minimize
-  (parameter B_K_sat)
-  (simplex (0.05) (0.10))
+  (parameter Ap_K_sat B_K_sat C_K_sat B_l)
+  (simplex (10 10 10 1) 
+           (1 10 10 1) 
+           (10 1 10 1) 
+           (10 10 1 1) 
+           (10 10 10 -1) 
+           )
   (limit (> B_K_sat 0 [cm/h]))
   (scope name compare)
   (expr (- R2))
@@ -92,7 +107,7 @@
   (min_iter 5)
   (max_iter 80))
 
-;;(run mytest)
-(run MySim)
+(run mytest)
+;;(run MySim)
 
 ;;; setup.dai ends here.
