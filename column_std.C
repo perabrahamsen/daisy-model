@@ -581,16 +581,17 @@ ColumnStandard::tick_source (const Scope& parent_scope,
   if (weather.get ())
     weather->weather_tick (time_end, msg);
 
+  // Scope.
+  daisy_assert (extern_scope);
+  ScopeMulti scope (*extern_scope, parent_scope);
+
   // Find forward sink.
-  drain->tick (geometry, *soil, *soil_heat, surface, *soil_water, msg);
+  drain->tick (time_end, scope, 
+               geometry, *soil, *soil_heat, surface, *soil_water, msg);
   movement->tick_source (*soil, *soil_heat, *soil_water, msg);
 
   // Find water based limit.
   soil_water->tick_source (geometry, *soil, msg);
-
-  // Scope.
-  daisy_assert (extern_scope);
-  ScopeMulti scope (*extern_scope, parent_scope);
 
   // Find solute based limit.
   chemistry->tick_source (scope, geometry, *soil, *soil_water, *soil_heat, 
@@ -709,7 +710,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
                         *chemistry, dt, msg);
   litter->update (organic_matter->top_DM ());
   // Transport.
-  groundwater->tick (units, geometry, *soil, *soil_water, 
+  groundwater->tick (geometry, *soil, *soil_water, 
                      surface.ponding_average () * 0.1, 
                      *soil_heat, time, scope, msg);
   soil_heat->tick (geometry, *soil, *soil_water, T_bottom, *movement, 
@@ -770,7 +771,7 @@ ColumnStandard::check (const Weather* global_weather,
   }
   {
     Treelog::Open nest (msg, "Drain");
-    if (!drain->check (msg))
+    if (!drain->check (scope, msg))
       ok = false;
   }
   {
@@ -780,7 +781,7 @@ ColumnStandard::check (const Weather* global_weather,
   }
   {
     Treelog::Open nest (msg, "Groundwater: " + groundwater->objid);
-    if (!groundwater->check (units, geometry, scope, msg))
+    if (!groundwater->check (geometry, scope, msg))
       ok = false;
   }
   {
@@ -1004,8 +1005,8 @@ ColumnStandard::initialize (const Block& block,
                         cell_size - tillage_age.size (), 
                         tillage_age.back ());
 
-  groundwater->initialize (units, geometry, time, scope, msg);
-  drain->initialize (geometry, msg);
+  groundwater->initialize (geometry, time, scope, msg);
+  drain->initialize (time, scope, geometry, msg);
 
   // Movement depends on soil and groundwater
   movement->initialize (units, *soil, *groundwater,  scope, msg);

@@ -34,6 +34,8 @@ class SoilHeat;
 class Surface;
 class Treelog;
 class Log;
+class Time;
+class Scope;
 
 class Drain : public ModelDerived
 {
@@ -44,7 +46,8 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Geometry&, const Soil&, const SoilHeat&,
+  virtual void tick (const Time&, const Scope&, 
+                     const Geometry&, const Soil&, const SoilHeat&,
                      const Surface&, SoilWater&, Treelog&) = 0;
 
 public:
@@ -52,8 +55,9 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Geometry&, Treelog&) = 0;
-  virtual bool check (Treelog&) const = 0;
+  virtual void initialize (const Time&, const Scope&, 
+                           const Geometry&, Treelog&) = 0;
+  virtual bool check (const Scope&, Treelog&) const = 0;
 protected:
   explicit Drain (const BlockModel& al);
 public:

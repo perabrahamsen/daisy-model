@@ -35,6 +35,7 @@ class GroundwaterExtern : public Groundwater
 {
   // Content.
 private:
+  const Units& units;
   const std::auto_ptr<Number> expr;
   bool has_table;
   double depth;
@@ -48,8 +49,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Units& units,
-             const Geometry&,
+  void tick (const Geometry&,
              const Soil&, SoilWater&, double, 
 	     const SoilHeat&, const Time&, const Scope& scope, Treelog& msg)
   { has_table = expr->tick_value (units, depth, Units::cm (), scope, msg); }
@@ -58,13 +58,11 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Units& units,
-                   const Geometry&, const Time&, const Scope& scope,
+  void initialize (const Geometry&, const Time&, const Scope& scope,
                    Treelog& msg)
   { expr->initialize (units, scope, msg); }
 
-  bool check (const Units& units,
-              const Geometry&, const Scope& scope, Treelog& msg) const
+  bool check (const Geometry&, const Scope& scope, Treelog& msg) const
   {
     bool ok = true;
     if (!expr->check_dim (units, scope, Units::cm (), msg))
@@ -74,6 +72,7 @@ public:
       
   GroundwaterExtern (const BlockModel& al)
     : Groundwater (al),
+      units (al.units ()),
       expr (Librarian::build_item<Number> (al, "table")),
       has_table (al.check ("initial_table")),
       depth (al.number ("initial_table", -42.42e42))

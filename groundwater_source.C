@@ -32,6 +32,7 @@
 #include "librarian.h"
 #include "frame.h"
 #include "mathlib.h"
+#include "units.h"
 #include <boost/scoped_ptr.hpp>
 #include <sstream>
 
@@ -39,6 +40,7 @@ class GroundwaterSource : public Groundwater
 {
   // Data.
 private:
+  const Units& units;
   boost::scoped_ptr<Source> source;
   size_t index;
   bool is_ok;
@@ -57,19 +59,17 @@ public:
 
   // Simulation.
 public:
-  void tick (const Units& units, const Geometry&,
+  void tick (const Geometry&,
              const Soil&, SoilWater&, double, const SoilHeat&,
 	     const Time& time, const Scope&, Treelog& msg)
-  { tick (units, time, msg); }
-  void tick (const Units&, const Time&, Treelog&);
+  { tick (time, msg); }
+  void tick (const Time&, Treelog&);
   double table () const;
 
   // Create and Destroy.
 public:
-  void initialize (const Units& units,
-                   const Geometry&, const Time& time, const Scope&, Treelog&);
-  bool check (const Units& units, const Geometry&, const Scope&,
-              Treelog& msg) const
+  void initialize (const Geometry&, const Time& time, const Scope&, Treelog&);
+  bool check (const Geometry&, const Scope&, Treelog& msg) const
   { 
     bool ok = is_ok;
     if (!units.can_convert (source->dimension (), Units::cm (), msg))
@@ -86,7 +86,7 @@ GroundwaterSource::bottom_type () const
 { return pressure; }
 
 void
-GroundwaterSource::tick (const Units& units, const Time& time, Treelog& msg)
+GroundwaterSource::tick (const Time& time, Treelog& msg)
 {
   TREELOG_MODEL (msg);
 
@@ -141,8 +141,7 @@ GroundwaterSource::table () const
 }
 
 void
-GroundwaterSource::initialize (const Units& units,
-                               const Geometry&, const Time& time, const Scope&, 
+GroundwaterSource::initialize (const Geometry&, const Time& time, const Scope&, 
                                Treelog& msg)
 {
   std::ostringstream tmp;
@@ -158,12 +157,13 @@ GroundwaterSource::initialize (const Units& units,
     }
   Time prev = time;
   prev.tick_hour (-1);
-  tick (units, prev, msg); 
-  tick (units, time, msg); 
+  tick (prev, msg); 
+  tick (time, msg); 
 }
 
 GroundwaterSource::GroundwaterSource (const BlockModel& al)
   : Groundwater (al),
+    units (al.units ()),
     source (Librarian::build_item<Source> (al, "source")),
     index (0),
     is_ok (false),

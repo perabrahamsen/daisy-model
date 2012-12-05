@@ -40,8 +40,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Units&,
-             const Geometry&,
+  void tick (const Geometry&,
              const Soil&, SoilWater&, double, 
 	     const SoilHeat&, const Time&, const Scope&, Treelog&)
   { }
@@ -50,10 +49,9 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Units&,
-                   const Geometry&, const Time&, const Scope&, Treelog&)
+  void initialize (const Geometry&, const Time&, const Scope&, Treelog&)
   { }
-  bool check (const Units&, const Geometry&, const Scope&, Treelog&) const
+  bool check (const Geometry&, const Scope&, Treelog&) const
   { return true; }
   GroundwaterFlux (const BlockModel& al)
     : Groundwater (al),

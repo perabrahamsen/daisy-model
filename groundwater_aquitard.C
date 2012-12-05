@@ -64,13 +64,12 @@ struct GroundwaterAquitard : public Groundwater
   }
     
   // Simulation.
-  void tick (const Units& units, const Geometry& geo,
-             const Soil&, SoilWater& soil_water, double, 
+  void tick (const Geometry& geo, const Soil&, SoilWater& soil_water, double, 
 	     const SoilHeat&, const Time& time, 
              const Scope& scope, Treelog& msg)
   { 
     // Virtual pressure table.
-    pressure_table->tick (units, time, scope, msg);
+    pressure_table->tick (time, scope, msg);
     set_h_aquifer (geo);
 
     // Deep percolation.
@@ -129,35 +128,23 @@ struct GroundwaterAquitard : public Groundwater
   { return pressure_table->operator()(); }
 
   // Create and Destroy.
-  void initialize (const Units& units, const Geometry& geo, const Time& time,
+  void initialize (const Geometry& geo, const Time& time,
                    const Scope& scope, Treelog& msg)
   {
     if (!pressure_table.get ())
       pressure_table.reset (Depth::create ((geo.bottom () - Z_aquitard)
                                            + h_aquifer));
-    pressure_table->initialize (units, scope, msg);
-    if (!pressure_table->check (units, scope, msg))
-      return;
-    Time prev = time;
-    prev.tick_hour (-1);
-    pressure_table->tick (units, prev, scope, msg);
-    pressure_table->tick (units, time, scope, msg);
+    pressure_table->initialize (time, scope, msg);
+
     // Pressure below aquitard.
-    if (pressure_table->check (units, scope, msg))
+    if (pressure_table->check (scope, msg))
       set_h_aquifer (geo);
-    else
-      pressure_table.reset (NULL);
   }
-  bool check (const Units& units, const Geometry& geo, const Scope& scope,
+  bool check (const Geometry& geo, const Scope& scope,
               Treelog& msg) const
-  {
+  { 
     bool ok = true;
-    if (!pressure_table.get ())
-      {
-        ok = false;
-        msg.error ("No pressure table");
-      }
-    else if (!pressure_table->check (units, scope, msg))
+    if (!pressure_table->check (scope, msg))
       ok = false;
     return ok;
   }

@@ -1,4 +1,4 @@
-// summary_Rsqr.C --- Calculate coefficient of determination.
+// summary_RsqrW.C --- Calculate weighted coefficient of determination.
 // 
 // Copyright 2011 KU.
 //
@@ -37,11 +37,12 @@
 #include <sstream>
 #include <map>
 
-struct SummaryRsqr : public Summary
+struct SummaryRsqrW : public Summary
 {
   // Content.
   struct Data
   {
+    const double weight;
     const symbol tag;
     const std::vector<double> value;
 
@@ -68,7 +69,7 @@ struct SummaryRsqr : public Summary
   struct Compare : public Destination
   {
     const symbol tag;
-    SummaryRsqr& summary;
+    SummaryRsqrW& summary;
 
     // Destination.
     void missing ()
@@ -80,7 +81,7 @@ struct SummaryRsqr : public Summary
     void add (const symbol value) NORETURN
     { daisy_notreached (); }
 
-    Compare (SummaryRsqr& sum, const symbol key)
+    Compare (SummaryRsqrW& sum, const symbol key)
       : tag (key),
         summary (sum)
     { }
@@ -95,7 +96,7 @@ struct SummaryRsqr : public Summary
 
   const struct MyScope : public Scope
   {
-    const SummaryRsqr& summary;
+    const SummaryRsqrW& summary;
     std::map<symbol, const double*> all;
     static const struct DescMap : public std::map<symbol, symbol>
     { 
@@ -140,7 +141,7 @@ struct SummaryRsqr : public Summary
     double number (const symbol key) const
     { return *(*all.find (key)).second; }
     
-    static std::map<symbol, const double*> build_all (const SummaryRsqr& s)
+    static std::map<symbol, const double*> build_all (const SummaryRsqrW& s)
     {
       std::map<symbol, const double*> all;
       all["R2"] = &s.R2;
@@ -150,7 +151,7 @@ struct SummaryRsqr : public Summary
       return all;
     }   
 
-    MyScope (const SummaryRsqr& s)
+    MyScope (const SummaryRsqrW& s)
       : summary (s),
         all (build_all (s))
     { }
@@ -170,11 +171,11 @@ struct SummaryRsqr : public Summary
   static double find_SStot (const std::vector<const Measure*>&, double average);
   static bool by_time (const Measure* a, const Measure* b);
   static std::vector<const Measure*> find_measure (const BlockModel&);
-  explicit SummaryRsqr (const BlockModel&);
+  explicit SummaryRsqrW (const BlockModel&);
   void summarize (Treelog&) const;
 };
 
-SummaryRsqr::MyScope::DescMap::DescMap ()
+SummaryRsqrW::MyScope::DescMap::DescMap ()
 {
   (*this)["R2"] = "Coefficient of determination.";
   (*this)["average"] = "Average measured value.";
@@ -182,27 +183,30 @@ SummaryRsqr::MyScope::DescMap::DescMap ()
   (*this)["SSerr"] = "Residual sum of squares.";
 }
 
-const SummaryRsqr::MyScope::DescMap SummaryRsqr::MyScope::descriptions;
+const SummaryRsqrW::MyScope::DescMap SummaryRsqrW::MyScope::descriptions;
 
 void
-SummaryRsqr::Data::load_syntax (Frame& frame)
+SummaryRsqrW::Data::load_syntax (Frame& frame)
 {
+  frame.declare ("weight", Attribute::None (), Attribute::Const, "\
+Weight given this measurement.");
   frame.declare_string ("tag", Attribute::Const, "\
 Name of simulated data to compare with.");
   frame.declare ("value", Attribute::Unknown (), 
                  Attribute::Const, Attribute::Variable, "\
 Measured data.");
   frame.set_check ("value", VCheck::min_size_1 ());
-  frame.order ("tag", "value");
+  frame.order ("weight", "tag", "value");
 }
 
-SummaryRsqr::Data::Data (const BlockSubmodel& al)
-  : tag (al.name ("tag")),
+SummaryRsqrW::Data::Data (const BlockSubmodel& al)
+  : weight (al.number ("weight")),
+    tag (al.name ("tag")),
     value (al.number_sequence ("value"))
 { }
 
 void
-SummaryRsqr::Measure::load_syntax (Frame& frame)
+SummaryRsqrW::Measure::load_syntax (Frame& frame)
 {
   frame.declare_submodule ("time", Attribute::OptionalConst, "\
 Time of measurement.\n\
@@ -215,7 +219,7 @@ Data measured at this time.", Data::load_syntax);
   frame.set_check ("data", VCheck::min_size_1 ());
 }
 
-SummaryRsqr::Measure::Measure (const BlockSubmodel& al)
+SummaryRsqrW::Measure::Measure (const BlockSubmodel& al)
   : time (al.check ("time") 
           ? submodel_value<Time> (al, "time")
           : Time::null ()),
@@ -223,7 +227,7 @@ SummaryRsqr::Measure::Measure (const BlockSubmodel& al)
 { }
 
 void 
-SummaryRsqr::compare (const symbol tag, const double value)
+SummaryRsqrW::compare (const symbol tag, const double value)
 {
   if (!active)
     return;
@@ -233,9 +237,10 @@ SummaryRsqr::compare (const symbol tag, const double value)
   for (size_t i = 0; i < m.data.size (); i++)
     if (m.data[i]->tag == tag)
       {
+        const double weight = m.data[i]->weight;
         const std::vector<double>& v = m.data[i]->value;
         for (size_t j = 0; j < v.size (); j++)
-          SSerr += sqr (value - v[j]);
+          SSerr += weight * sqr (value - v[j]);
         if (print_data)
           {
             pds << "\n" << m.time.print () << "\t" << tag << "\t" << value;
@@ -249,7 +254,7 @@ SummaryRsqr::compare (const symbol tag, const double value)
 }   
 
 void 
-SummaryRsqr::tick (const Time& time)
+SummaryRsqrW::tick (const Time& time)
 { 
   if (active)
     current++;
@@ -258,11 +263,11 @@ SummaryRsqr::tick (const Time& time)
 }
 
 void
-SummaryRsqr::clear ()
+SummaryRsqrW::clear ()
 { }
 
 void
-SummaryRsqr::initialize (std::vector<Select*>& select, Treelog& msg)
+SummaryRsqrW::initialize (std::vector<Select*>& select, Treelog& msg)
 { 
   std::set<symbol> tags;
   for (size_t i = 0; i < measure.size (); i++)
@@ -306,7 +311,7 @@ SummaryRsqr::initialize (std::vector<Select*>& select, Treelog& msg)
 }
 
 bool 
-SummaryRsqr::check (Treelog& msg) const
+SummaryRsqrW::check (Treelog& msg) const
 {
   TREELOG_MODEL (msg);
   bool ok = true;
@@ -314,7 +319,7 @@ SummaryRsqr::check (Treelog& msg) const
 }
 
 double 
-SummaryRsqr::find_average (const std::vector<const Measure*>& measure)
+SummaryRsqrW::find_average (const std::vector<const Measure*>& measure)
 { 
   size_t count = 0;
   double sum = 0.0;
@@ -332,25 +337,28 @@ SummaryRsqr::find_average (const std::vector<const Measure*>& measure)
 }
 
 double 
-SummaryRsqr::find_SStot (const std::vector<const Measure*>& measure,
+SummaryRsqrW::find_SStot (const std::vector<const Measure*>& measure,
                          double average)
 {
   double sum = 0.0;
   
   for (size_t i = 0; i < measure.size (); i++)
-    for (size_t j = 0; j < measure[i]->data.size (); j++)
-      for (size_t k = 0; k < measure[i]->data[j]->value.size (); k++)
-        sum += sqr (measure[i]->data[j]->value[k] - average);
+    {
+      const Measure& m = *measure[i];
+      for (size_t j = 0; j < m.data.size (); j++)
+        for (size_t k = 0; k < m.data[j]->value.size (); k++)
+          sum += m.data[j]->weight * sqr (m.data[j]->value[k] - average);
+    }
 
  return sum;
 }
 
 bool
-SummaryRsqr::by_time (const Measure* a, const Measure* b)
+SummaryRsqrW::by_time (const Measure* a, const Measure* b)
 { return a->time < b->time; }
 
-std::vector<const SummaryRsqr::Measure*>
-SummaryRsqr::find_measure (const BlockModel& al)
+std::vector<const SummaryRsqrW::Measure*>
+SummaryRsqrW::find_measure (const BlockModel& al)
 {
   std::vector<const Measure*> result 
     = map_submodel_const<Measure> (al, "measure");
@@ -358,7 +366,7 @@ SummaryRsqr::find_measure (const BlockModel& al)
   return result;
 }
 
-SummaryRsqr::SummaryRsqr (const BlockModel& al)
+SummaryRsqrW::SummaryRsqrW (const BlockModel& al)
   : Summary (al),
     measure (find_measure (al)),
     print_data (al.flag ("print_data")),
@@ -376,7 +384,7 @@ SummaryRsqr::SummaryRsqr (const BlockModel& al)
 }
 
 void 
-SummaryRsqr::summarize (Treelog& msg) const
+SummaryRsqrW::summarize (Treelog& msg) const
 {
   TREELOG_MODEL (msg);
   if (print_data)
@@ -388,12 +396,12 @@ SummaryRsqr::summarize (Treelog& msg) const
   msg.message (pds.str ());
 }
 
-static struct SummaryRsqrSyntax : public DeclareModel
+static struct SummaryRsqrWSyntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
-  { return new SummaryRsqr (al); }
-  SummaryRsqrSyntax ()
-    : DeclareModel (Summary::component, "Rsqr", "\
+  { return new SummaryRsqrW (al); }
+  SummaryRsqrWSyntax ()
+    : DeclareModel (Summary::component, "RsqrW", "\
 Calculate coefficient of determination.")
   { }
   static bool check_alist (const Metalib&, const Frame& frame, Treelog& msg)
@@ -427,12 +435,12 @@ Calculate coefficient of determination.")
     frame.add_check (check_alist);
     frame.declare_submodule_sequence ("measure", Attribute::Const, "\
 Measured data.", 
-                                      SummaryRsqr::Measure::load_syntax);
+                                      SummaryRsqrW::Measure::load_syntax);
     frame.set_check ("measure", VCheck::min_size_1 ());
     frame.declare_boolean ("print_data", Attribute::Const, "\
 Print a table with all data in the summary.");
     frame.set ("print_data", false);
   }
-} SummaryRsqr_syntax;
+} SummaryRsqrW_syntax;
 
-// summary_Rsqr.C ends here.
+// summary_RsqrW.C ends here.

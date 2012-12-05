@@ -58,16 +58,17 @@ Lateral transport of water.")
 struct DrainNone : public Drain
 {
   // Simulation.
-  void tick (const Geometry&, const Soil&, const SoilHeat&, const Surface&, 
+  void tick (const Time&, const Scope&, 
+             const Geometry&, const Soil&, const SoilHeat&, const Surface&, 
              SoilWater&, Treelog&)
   { }
   void output (Log&) const
   { }
 
   // Create and Destroy.
-  void initialize (const Geometry&, Treelog&)
+  void initialize (const Time&, const Scope&, const Geometry&, Treelog&)
   { }
-  bool check (Treelog&) const
+  bool check (const Scope&, Treelog&) const
   { return true; }
   DrainNone (const BlockModel& al)
     : Drain (al)

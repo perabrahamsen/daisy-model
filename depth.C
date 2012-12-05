@@ -67,13 +67,13 @@ struct DepthConst : public Depth
 {
   const double value;
   
-  void tick (const Units&, const Time&, const Scope&, Treelog&)
+  void tick (const Time&, const Scope&, Treelog&)
   { }
   double operator()() const
   { return value; }
-  void initialize (const Units&, const Scope&, Treelog&)
+  void initialize (const Time&, const Scope&, Treelog&)
   { }
-  virtual bool check (const Units&, const Scope&, Treelog&) const
+  virtual bool check (const Scope&, Treelog&) const
   { return true; }
   DepthConst (const BlockModel& al)
     : Depth (al),
@@ -111,10 +111,11 @@ static struct DepthConstSyntax : public DeclareModel
 struct DepthExtern : public Depth
 {
   // Content.
+  const Units& units;
   const std::auto_ptr<Number> expr;
   double value;
 
-  void tick (const Units& units, const Time&, const Scope& scope, Treelog& msg)
+  void tick (const Time&, const Scope& scope, Treelog& msg)
   { 
     if (!expr->tick_value (units, value, Units::cm (), scope, msg))
       if (!approximate (value, 42.0))
@@ -127,11 +128,10 @@ struct DepthExtern : public Depth
   double operator()() const
   { return value; }
     
-  void initialize (const Units& units, const Scope& scope, Treelog& msg)
+  void initialize (const Time&, const Scope& scope, Treelog& msg)
   { expr->initialize (units, scope, msg); }
 
-  virtual bool check (const Units& units, const Scope& scope,
-                      Treelog& msg) const
+  virtual bool check (const Scope& scope, Treelog& msg) const
   { 
     
     bool ok = true;
@@ -141,6 +141,7 @@ struct DepthExtern : public Depth
   }
   DepthExtern (const BlockModel& al)
     : Depth (al),
+      units (al.units ()),
       expr (Librarian::build_item<Number> (al, "value")),
       value (al.number ("initial_value", -42.42e42))
   { }
@@ -175,16 +176,16 @@ struct DepthPLF : public Depth
   PLF value;
   double current_value;
 
-  void  tick (const Units&, const Time& time, const Scope&, Treelog&)
+  void  tick (const Time& time, const Scope&, Treelog&)
   { current_value = value (Time::fraction_hours_between (start, time)); }
 
   double operator()() const
   { return current_value; }
 
   
-  void initialize (const Units&, const Scope&, Treelog&)
-  { }
-  virtual bool check (const Units&, const Scope&, Treelog&) const
+  void initialize (const Time& time, const Scope& scope, Treelog& msg)
+  { tick (time, scope, msg); }
+  virtual bool check (const Scope&, Treelog&) const
   { return true; }
   static PLF convert_to_plf (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& table)
   {
@@ -287,7 +288,7 @@ struct DepthFile : public Depth
   PLF value;
   double current_value;
 
-  void tick (const Units&, const Time& time, const Scope&, Treelog&)
+  void tick (const Time& time, const Scope&, Treelog&)
   { 
     daisy_assert (state == State::ok);
     current_value = value (Time::fraction_hours_between (start, time)); 
@@ -322,7 +323,7 @@ struct DepthFile : public Depth
       time = Time (year, month, day, 23);
       return true;
   }
-  void initialize (const Units&, const Scope&, Treelog& msg)
+  void initialize (const Time& time, const Scope& scope, Treelog& msg)
   { 
     daisy_assert (state == State::uninitialized);
     std::auto_ptr<std::istream> input_stream = path.open_file (file.name ());
@@ -374,8 +375,11 @@ struct DepthFile : public Depth
       }
     else 
       state = State::ok;
+
+    if (state == State::ok)
+      tick (time, scope, msg);
   }
-  virtual bool check (const Units&, const Scope&, Treelog&) const
+  virtual bool check (const Scope&, Treelog&) const
   { return state == State::ok; }
   DepthFile (const BlockModel& al)
     : Depth (al),

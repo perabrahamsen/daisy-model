@@ -57,7 +57,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Units&, const Geometry&,
+  void tick (const Geometry&,
              const Soil&, SoilWater&, double, const SoilHeat&,
 	     const Time& time, const Scope&, Treelog& msg)
   { tick (time, msg); }
@@ -66,9 +66,8 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Units& units,
-                   const Geometry&, const Time& time, const Scope&, Treelog&);
-  bool check (const Units&, const Geometry&, const Scope&, Treelog&) const
+  void initialize (const Geometry&, const Time& time, const Scope&, Treelog&);
+  bool check (const Geometry&, const Scope&, Treelog&) const
   { return true; }
   GroundwaterFile (const BlockModel&);
   ~GroundwaterFile ();
@@ -156,8 +155,7 @@ GroundwaterFile::table () const
 }
 
 void
-GroundwaterFile::initialize (const Units&,
-                             const Geometry&, const Time& time, const Scope&, 
+GroundwaterFile::initialize (const Geometry&, const Time& time, const Scope&, 
 			     Treelog& msg)
 {
   daisy_assert (!owned_stream.get ());

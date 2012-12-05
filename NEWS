@@ -6,6 +6,22 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.13
+
+** New 'pipe_outlet' parameter for the 'lateral' drain model.
+
+This allows (partial) simulation of high water level in drain outlet.
+
+** New "Drain lateral" log to keep track of above.
+
+** New 'RsqrW' model for weighted opservations.
+
+** The 'B_C' and 'M_C' hydraulic models now takes an 'l' parameter.
+
+** Some fixes in weather support, might have broken stuff.
+
+** Some prototype work on the GUI.
+
 * 5.12
 
 ** "AOM Pools" and "Organic Matter" log models should work again.

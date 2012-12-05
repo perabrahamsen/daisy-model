@@ -3744,4 +3744,24 @@ parameter in the 'default' bioclimate model.  By default, 30."))
                    (spec chemical default sink_cell))
            ))
 
+(deflog "Drain lateral" column
+  "Keep track of lateral drains."
+  (where "drain_lateral.dlf")
+  (when true)
+  (entries (number (path column "${column}" Drain lateral pipe_level)
+                   (spec drain lateral pipe_level)
+                   (handle current))
+           (number (path column "${column}" Drain lateral height)
+                   (spec drain lateral height)
+                   (handle current))
+           (number (path column "${column}" Drain lateral DrainFlow)
+                   (spec drain lateral DrainFlow)
+                   (handle sum))
+           (number (path column "${column}" Drain lateral EqDrnFlow)
+                   (spec drain lateral EqDrnFlow)
+                   (handle sum))
+           (volume (path column "${column}" Drain lateral S)
+                   (spec drain lateral S)
+                   (handle sum))))
+
 ;;; log.dai ends here

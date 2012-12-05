@@ -1,3 +1,21 @@
+2012-12-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* groundwater_aquitard.C, groundwater.C, groundwater_deep.C:
+	* groundwater_extern.C, groundwater_file.C, groundwater_fixed.C:
+	* groundwater_flux.C, groundwater.h, groundwater_lysimeter.C:
+	* groundwater_pipe.C, groundwater_source.C, groundwater_static.C:
+	* depth.h, depth.C (tick, check, initialize): Removed 'units' parameter.
+	* column_std.C (tick_source, check, initialize): Update callers.
+
+2012-12-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* summary_RsqrW.C: New model.
+
+2012-11-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* summary_Rsqr.C (print_flag): New parameter.
+	(measure): Sort, check for duplicates.
+
 2012-11-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* hydraulic_B_C.C, hydraulic_M_C.C (l): New parameter.

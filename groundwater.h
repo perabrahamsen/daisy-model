@@ -35,7 +35,6 @@ class SoilWater;
 class SoilHeat;
 class BlockModel;
 class Scope;
-class Units;
 
 class Groundwater : public ModelDerived
 {
@@ -59,7 +58,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Units&, const Geometry& geo,
+  virtual void tick (const Geometry& geo,
                      const Soil&, SoilWater&, double h_surface /* [cm] */,
 		     const SoilHeat&, const Time&, const Scope&, Treelog&) = 0;
   virtual void output (Log&) const;
@@ -71,10 +70,9 @@ public:
     // Create and Destroy.
 public:
   static void load_syntax (Frame&);
-  virtual void initialize (const Units&, const Geometry&, const Time&, 
+  virtual void initialize (const Geometry&, const Time&, 
 			   const Scope&, Treelog&) = 0;
-  virtual bool check (const Units&, 
-                      const Geometry&, const Scope&, Treelog&) const = 0;
+  virtual bool check (const Geometry&, const Scope&, Treelog&) const = 0;
 protected:
   Groundwater (const BlockModel& al);
 public:

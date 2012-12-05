@@ -32,7 +32,7 @@
 #include "log.h"
 #include "check.h"
 #include "draineqd.h"
-
+#include "depth.h"
 
 struct DrainLateral : public Drain
 {
@@ -42,15 +42,20 @@ struct DrainLateral : public Drain
   const double rad;             // Inner radius of drain pipes. [cm]
   const double x;               // Distance to nearest pipe. [cm]
   const double pipe_position;   // Height pipes are placed above surface. [cm]
+  std::auto_ptr<Depth> pipe_outlet; // Water level at pipe outlet. [cm]
   const double K_to_pipes_;     // Horizontal sat. conductivity. [cm h^-1]
 
   // Data.
+  double pipe_level;            // Highest if pipe_position & pipe_outlet.
   double height;                // Groundwater table height above surface. [cm]
   double EqDrnFlow;
   double DrainFlow;             // Drain flow [cm/h]
   std::vector<double> S;        // Pipe drainage. [cm^3/cm^3/h]
 
-  void tick (const Geometry& geo, const Soil& soil, 
+  void set_pipe_level ()
+  { pipe_level = std::max (pipe_position, pipe_outlet->operator()()); }
+
+  void tick (const Time&, const Scope&, const Geometry& geo, const Soil& soil, 
              const SoilHeat& soil_heat, const Surface& surface, 
              SoilWater& soil_water, Treelog& msg);
   void output (Log&) const;
@@ -63,18 +68,22 @@ struct DrainLateral : public Drain
                                const Soil&, const SoilHeat&);
     
   // Create and Destroy.
-  void initialize (const Geometry&, Treelog& msg);
-  bool check (Treelog&) const
-  { return true; }
+  void initialize (const Time&, const Scope&, const Geometry&, Treelog&);
+  bool check (const Scope&, Treelog&) const;
   DrainLateral (const BlockModel& al);
 };
 
 void 
-DrainLateral::tick (const Geometry& geo, const Soil& soil, 
+DrainLateral::tick (const Time& time, const Scope& scope, 
+                    const Geometry& geo, const Soil& soil, 
                     const SoilHeat& soil_heat, const Surface& surface, 
                     SoilWater& soil_water, 
                     Treelog& msg)
 {
+  // Current pipe level.
+  pipe_outlet->tick (time, scope, msg);
+  set_pipe_level ();
+
   const size_t cell_size = geo.cell_size ();
 
   // Empty source.
@@ -118,6 +127,7 @@ DrainLateral::tick (const Geometry& geo, const Soil& soil,
 void 
 DrainLateral::output (Log& log) const
 {
+  output_variable (pipe_level, log);
   output_variable (height, log);
   output_variable (DrainFlow, log);
   output_variable (EqDrnFlow, log);
@@ -143,7 +153,7 @@ DrainLateral::EquilibriumDrainFlow (const Geometry& geo,
 {
   
   // If groundwater table is below pipes, there is no flow.
-  if (height <= pipe_position)
+  if (height <= pipe_level)
     return 0.0;
 
   const size_t cell_size = geo.cell_size ();
@@ -173,12 +183,12 @@ DrainLateral::EquilibriumDrainFlow (const Geometry& geo,
 
       // Find fraction above and below pipes.
       const double f_above = 
-        (z_top > pipe_position)
-        ? geo.fraction_in_z_interval (i, z_top, pipe_position)
+        (z_top > pipe_level)
+        ? geo.fraction_in_z_interval (i, z_top, pipe_level)
         : 0.0;
       const double f_below =
-        (z_bottom < pipe_position)
-        ? geo.fraction_in_z_interval (i, pipe_position, z_bottom)
+        (z_bottom < pipe_level)
+        ? geo.fraction_in_z_interval (i, pipe_level, z_bottom)
         : 0.0;
 
 #if 1
@@ -193,7 +203,7 @@ DrainLateral::EquilibriumDrainFlow (const Geometry& geo,
       Kb += f_below * volume * K;
     }
   
-  // There may be no nodes with pipe_position < z < height.
+  // There may be no nodes with pipe_level < z < height.
   if (iszero (Ha))
     return 0.0;
 
@@ -249,12 +259,12 @@ DrainLateral::EquilibriumDrainFlow (const Geometry& geo,
       // double Deltaz = z_top - z_bottom;
    
       double f_above = 
-        (z_top > pipe_position)
-        ? geo.fraction_in_z_interval (i, z_top, pipe_position)
+        (z_top > pipe_level)
+        ? geo.fraction_in_z_interval (i, z_top, pipe_level)
         : 0.0;
       double f_below =
-        (z_bottom < pipe_position)
-        ? geo.fraction_in_z_interval (i, pipe_position, z_bottom)
+        (z_bottom < pipe_level)
+        ? geo.fraction_in_z_interval (i, pipe_level, z_bottom)
         : 0.0;
             
       S[i] = Flow_a * f_above *  K_to_pipes (i, soil, soil_heat) / (Ka*Ha);
@@ -275,10 +285,25 @@ DrainLateral::EquilibriumDrainFlow (const Geometry& geo,
 
 
 void
-DrainLateral::initialize (const Geometry& geo, Treelog&)
+DrainLateral::initialize (const Time& time, const Scope& scope, 
+                          const Geometry& geo, Treelog& msg)
 {
+  pipe_outlet->initialize (time, scope, msg);
+
+  if (pipe_outlet->check (scope, msg))
+    set_pipe_level ();
+
   const size_t cell_size = geo.cell_size ();
   S.insert (S.end (), cell_size, 0.0);
+}
+
+bool 
+DrainLateral::check (const Scope& scope, Treelog& msg) const
+{ 
+  bool ok = true;
+  if (!pipe_outlet->check (scope, msg))
+    ok = false;
+  return ok;
 }
 
 DrainLateral::DrainLateral (const BlockModel& al)
@@ -288,7 +313,11 @@ DrainLateral::DrainLateral (const BlockModel& al)
     rad (al.number ("rad")),
     x (al.number ("x", L / 2.0)),
     pipe_position (al.number ("pipe_position")),
+    pipe_outlet (al.check ("pipe_outlet")
+                 ? Librarian::build_item<Depth> (al, "pipe_outlet")
+                 : Depth::create (pipe_position)),
     K_to_pipes_ (al.number ("K_to_pipes", -1.0)),
+    pipe_level (pipe_position),
     height (al.number ("height", pipe_position))
 { }
 
@@ -319,11 +348,26 @@ By default, this is 1/2 L.");
     frame.declare ("pipe_position", "cm", Check::negative (), Attribute::Const,
                    "Height pipes are placed in the soil (a negative number).");
     frame.set ("pipe_position", -110.0);
+    frame.declare_object ("pipe_outlet", Depth::component,
+                          Attribute::OptionalConst, Attribute::Singleton, "\
+Water table in drain pipe outlet.\n\
+\n\
+By default this will be identical to `pipe_position', meaning free\n\
+flow of water through drains. Specifying a lower water level will not\n\
+affect the simulation. Specifying a higher water level is functionally\n\
+equivalent to temporarily increasing the 'pipe_position', lowering the\n\
+ability of the drain system to drain the soil.\n\
+\n\
+Currently, there is no posibility of water flowing from the pipe\n\
+outlet to soil.");
     frame.declare ("K_to_pipes", "cm/h", Check::non_negative (), 
                    Attribute::OptionalConst,
                    "Horizontal conductivity in saturated soil.\n\
 By default this is calculated from the horizontal conductivity and the\n\
 anisotropy of the horizon.");
+    frame.declare ("pipe_level", "cm", Check::non_positive (), 
+                   Attribute::OptionalState,
+                   "Current effective pipe position (a negative number).");
     frame.declare ("height", "cm", Check::non_positive (), 
                    Attribute::OptionalState,
                    "Current groundwater level (a negative number).");
