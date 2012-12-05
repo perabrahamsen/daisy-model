@@ -12,6 +12,14 @@ release.
 
 This allows (partial) simulation of high water level in drain outlet.
 
+  (Drain lateral
+         (pipe_outlet PLF 
+                      ;; ((YEAR MONTH DAY) WATER_LEVEL)
+                      ((1987  9 1) -200 [cm]) ;; Interpolates between values.
+                      ((1987 10 1)  -50 [cm]) ;; So mid-September is -125 cm.
+                      ((1988  2 1)  -50 [cm])
+                      ((1988  3 1) -200 [cm]))))
+
 ** New "Drain lateral" log to keep track of above.
 
 ** New 'RsqrW' model for weighted opservations.
