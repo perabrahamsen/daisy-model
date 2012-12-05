@@ -67,7 +67,7 @@ namespace Attribute
   enum type 
   { Number, Submodel, PLF, Boolean, String,
     Integer, Model, Scalar, Reference, Error };
-  symbol type_name (type);
+  symbol type_name (type) EXPORT;
   type type_number (symbol name);
     
   // The requirements with regard to input and output varies with each
