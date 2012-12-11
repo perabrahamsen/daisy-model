@@ -1,3 +1,7 @@
+2012-12-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 5.14 released.
+
 2012-12-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* surface.C: Allow 'pond_section' values up to 10 times
