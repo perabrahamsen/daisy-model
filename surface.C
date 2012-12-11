@@ -137,7 +137,7 @@ Surface::Implementation::q_top (const Geometry& geo, const size_t edge,
   pond_map::const_iterator i = pond_edge.find (edge);
   daisy_assert (i != pond_edge.end ());
   const size_t c = (*i).second;
-  daisy_assert (pond_section[c] < 1000.0);
+  daisy_assert (pond_section[c] < std::max (1000.0, 10.0 * DetentionCapacity));
   daisy_assert (pond_section[c] > -1000.0);
   return -pond_section[c] * 0.1 / dt /* [h] */; // mm -> cm/h.
 }
@@ -238,10 +238,10 @@ Surface::Implementation::exfiltrate (const Geometry& geo, const size_t edge,
       return;
     }
 
-  daisy_assert (pond_section[c] < 1000.0);
+  daisy_assert (pond_section[c] < std::max(1000.0, 10.0 * DetentionCapacity));
   daisy_assert (pond_section[c] > -1000.0);
   pond_section[c] += water;
-  daisy_assert (pond_section[c] < 1000.0);
+  daisy_assert (pond_section[c] < std::max (1000.0, 10.0 * DetentionCapacity));
   daisy_assert (pond_section[c] > -1000.0);
 }
 
@@ -330,6 +330,7 @@ Surface::Implementation::tick (Treelog& msg,
         {
           const double runoff_section 
             = (pond_section[c] - DetentionCapacity) * ReservoirConstant;
+          runoff += area * runoff_section;
           runoff_fraction += area * runoff_section / pond_section[c];
           pond_section[c] -= runoff_section * dt;
         }
@@ -337,7 +338,7 @@ Surface::Implementation::tick (Treelog& msg,
   runoff /= total_area;
   runoff_fraction /= total_area;
   update_pond_average (geo);
-  daisy_balance (old_pond_average, pond_average, runoff);
+  daisy_balance (old_pond_average, pond_average, -runoff);
 
   // Runoff internal.
   const double local_pond_average = pond_average;
@@ -447,7 +448,8 @@ Surface::Implementation::tick (Treelog& msg,
       EvapSoilTotal += evap * area;    // [mm cm^2/h]
 
       pond_section[c] += flux_in * dt - evap * dt;
-      daisy_assert (pond_section[c] < 1000.0);
+      daisy_assert (pond_section[c]
+                    < std::max (1000.0, 10.0 * DetentionCapacity));
       daisy_assert (pond_section[c] > -1000.0);
       daisy_assert (evap < 1000.0);
 

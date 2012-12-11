@@ -1,3 +1,9 @@
+2012-12-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* surface.C: Allow 'pond_section' values up to 10 times
+	'DetentionCapacity'.
+	(tick): Fix bug calculating runoff.
+
 2012-12-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 5.13 released.
