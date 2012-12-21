@@ -1,0 +1,56 @@
+;;; Setup for the PESTPORE project.
+;;
+;; 
+
+(defhorizon H1 DGF7
+  "0.1 m.u.t."
+  (clay         5.82 [%])
+  (fine_silt    7.20 [%])
+  (medium_silt 10.93 [%])
+  (coarse_silt 12.47 [%])
+  (fine_sand   35.70 [%])
+  (medium_sand 17.78 [%])
+  (coarse_sand  5.14 [%])
+  (large        4.95 [%])
+  (humus       (/ 0.78 [%] 0.587 [])))
+
+(defhorizon H2 DGF7
+  "1.5 m.u.t"
+  (clay        10.23 [%])
+  (fine_silt   12.05 [%])
+  (medium_silt 14.94 [%])
+  (coarse_silt 12.33 [%])
+  (fine_sand   28.05 [%])
+  (medium_sand 14.41 [%])
+  (coarse_sand  5.29 [%])
+  (large        2.70 [%])
+  (humus       (/ 0.06 [%] 0.587 [])))
+
+(defhorizon H3 DGF7
+  "3.0 m.u.t"
+  (clay        10.14 [%])
+  (fine_silt   10.25 [%])
+  (medium_silt 13.18 [%])
+  (coarse_silt 13.05 [%])
+  (fine_sand   28.76 [%])
+  (medium_sand 13.77 [%])
+  (coarse_sand  5.02 [%])
+  (large        5.83 [%])
+  (humus       (/ 0.05 [%] 0.587 [])))
+
+(defhorizon H4 DGF7
+  "6.0 m.u.t"
+  (clay        12.49 [%])
+  (fine_silt   17.86 [%])
+  (medium_silt 10.56 [%])
+  (coarse_silt 10.82 [%])
+  (fine_sand   26.15 [%])
+  (medium_sand 12.76 [%])
+  (coarse_sand  4.53 [%])
+  (large        4.85 [%])
+  (humus       (/ 0.17 [%] 0.587 [])))
+
+(run (write (what "Hello")))
+
+;;; setup.dai ends here.
+

@@ -119,6 +119,11 @@ HorizonSystem::System::load_frame (Frame& frame) const
 
       frame.declare_fraction (names[i], Attribute::Const, tmp.str ());
     }
+  frame.declare_fraction ("large", Attribute::Const,
+                          "Mineral soil components larger than sand.\n\
+Only include this if the sum of the texture components are otherwise\n\
+less than 1.");
+  frame.set ("large", 0.0);
   frame.declare_fraction ("humus", Attribute::Const,
                        "Humus content of soil.");
   frame.declare_boolean ("normalize", Attribute::Const, "\
@@ -132,7 +137,7 @@ HorizonSystem::System::check_shared (const Frame& al, Treelog& err) const
 {
   bool ok = true;
 
-  double sum = 0.0;
+  double sum = al.number ("large");
   for (unsigned int i = 0; i < names.size (); i++)
     sum += al.number (names[i]);
   
@@ -308,6 +313,27 @@ static const struct BSI7_type : public HorizonSystem::System
 bool 
 BSI7_type::check_alist (const Metalib&, const Frame& al, Treelog& err)
 { return BSI7.check_shared (al, err); }
+
+static const struct DGF7_type : public HorizonSystem::System
+{
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err);
+
+  DGF7_type ()
+    : System ("DGF7", check_alist)
+  {
+    add ("clay", 2.0);
+    add ("fine_silt", 6.0);
+    add ("medium_silt", 20.0);
+    add ("coarse_silt", 63.0);
+    add ("fine_sand", 200.0);
+    add ("medium_sand", 600.0);
+    add ("coarse_sand", 2000.0);
+  }
+} DGF7;
+
+bool 
+DGF7_type::check_alist (const Metalib&, const Frame& al, Treelog& err)
+{ return DGF7.check_shared (al, err); }
 
 static const struct DIN5_type : public HorizonSystem::System
 {
