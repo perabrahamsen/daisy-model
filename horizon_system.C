@@ -119,11 +119,12 @@ HorizonSystem::System::load_frame (Frame& frame) const
 
       frame.declare_fraction (names[i], Attribute::Const, tmp.str ());
     }
-  frame.declare_fraction ("large", Attribute::Const,
-                          "Mineral soil components larger than sand.\n\
-Only include this if the sum of the texture components are otherwise\n\
-less than 1.");
-  frame.set ("large", 0.0);
+  frame.declare_fraction ("other", Attribute::Const,
+                          "Other soil components.\n\
+Typically larger mineral components (stones, pebbles).\n\
+These will be ignored by Daisy, but can be included here\n\
+to ensure the sum is 1.0.");
+  frame.set ("other", 0.0);
   frame.declare_fraction ("humus", Attribute::Const,
                        "Humus content of soil.");
   frame.declare_boolean ("normalize", Attribute::Const, "\
@@ -137,7 +138,7 @@ HorizonSystem::System::check_shared (const Frame& al, Treelog& err) const
 {
   bool ok = true;
 
-  double sum = al.number ("large");
+  double sum = al.number ("other");
   for (unsigned int i = 0; i < names.size (); i++)
     sum += al.number (names[i]);
   
@@ -314,12 +315,12 @@ bool
 BSI7_type::check_alist (const Metalib&, const Frame& al, Treelog& err)
 { return BSI7.check_shared (al, err); }
 
-static const struct DGF7_type : public HorizonSystem::System
+static const struct GEUS7_type : public HorizonSystem::System
 {
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err);
 
-  DGF7_type ()
-    : System ("DGF7", check_alist)
+  GEUS7_type ()
+    : System ("GEUS7", check_alist)
   {
     add ("clay", 2.0);
     add ("fine_silt", 6.0);
@@ -329,11 +330,11 @@ static const struct DGF7_type : public HorizonSystem::System
     add ("medium_sand", 600.0);
     add ("coarse_sand", 2000.0);
   }
-} DGF7;
+} GEUS7;
 
 bool 
-DGF7_type::check_alist (const Metalib&, const Frame& al, Treelog& err)
-{ return DGF7.check_shared (al, err); }
+GEUS7_type::check_alist (const Metalib&, const Frame& al, Treelog& err)
+{ return GEUS7.check_shared (al, err); }
 
 static const struct DIN5_type : public HorizonSystem::System
 {
