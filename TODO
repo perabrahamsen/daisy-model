@@ -2,69 +2,44 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * TF
 
-Figur 7 a og b bør have ens akser
-
-Mineralsk gødede behandlinger har 
-  målt konstant C, faldene N
-  simuleret faldende C, faldene N
-
-MSShigh har 
-  målt stigende C og faldende N
-  simuleret konstant C og svagt stigende N
-
-MSSlow er midt imellem
-
-SOM_fractions er kalibreret efter C indhold i mineralsk gødede plots.
-SOM_C_per_N er 9 9 9 
-C_per_N er 8.66
-
-content vs change
-
-----
-
 1. Soil organic carbon and nitrogen 
 
 1.1. My summary.
 
-1.1.1 calibration.
+1.1.1 Calibration.
 
 We only look at the dynamics of top soil.
 
-SOM_fractions have been calibrated from the carbon content in 1999,
-2003, and 2007 for the plots with mineral fertilizer.
+SOM_fractions have been calibrated from the carbon content in 1999, 2003, and 2007 for the plots with mineral fertilizer.
 
 The C_per_N ratio was set to 8.66 from measured numbes.
 
-The SOM_C_per_N ratio, which is the "long term goal" of the SOM pools,
-were lowered from the default 11 to 9 for all three SOM pools.
+The SOM_C_per_N ratio, which is the "long term goal" of the SOM pools, were lowered from the default 11 to 9 for all three SOM pools.
 
 1.1.2 Validation
 
-For the mineral fertilized plots, we measure a rougly constant level
-of carbon, but a loss of nitrogen around 10%, while we simulate a loss
-of both carbon and nitrogen of about 10%
+For the mineral fertilized plots, we measure a rougly constant level of carbon, but a loss of nitrogen around 10%, while we simulate a loss of both carbon and nitrogen of about 10%
 
-For the high slurry fertilized plot, we observe an increase in carbon
-and a decrease in nitrogen, while both are roughly constant in the
-simulation.
+For the high slurry fertilized plot, we observe an increase in carbon and a decrease in nitrogen, while both are roughly constant in the simulation.
 
-The low slurry fertilized plot lies between the mineral and high
-fertilized plot, in both measured and simulated data, as we would
-expect.
+The low slurry fertilized plot lies between the mineral and high fertilized plot, in both measured and simulated data, as we would expect.
 
 1.2 Questions and comments
 
-1.2.1 Figure 7a and 7b should have identical axes, to make it easier to
-compare C and N dynamics.
+1.2.1 Figure 7a and 7b should have identical axes, to make it easier to compare C and N dynamics.
 
-1.2.2 You compare both C and N /content/, and C and N /change/. Am I
-correct in guessing that these are actually the same numbers, just
-presented as absolute values (content) and relative to first
-measurement (change).
+1.2.2 You compare both C and N /content/, and C and N /change/. Am I correct in guessing that these are actually the same numbers, just presented as absolute values (content) and relative to first measurement (change).
 
-If so, I'm not sure how to interpret that one is good and the other is bad.
+If so, I'm not sure how to interpret that one is good and the other is bad,a nd it is not really discussed in the article.
 
-1.2.3. 
+If not, what are they?
+
+1.2.3. The SOM were calibrated for C, yet get a poor match on C on the same plots, but a good match for N on the same plots. I don't understand that. You should be able to calibrate a better match on C.
+
+How exactly was it calibrated? Automatic or manual procedure?
+
+1.2.4. The measurements shows an increase in the C/N ration. The simulation does not. The reason the simulation does not show an increase in C/N is that you have set SOM_C_per_N to 9, close to (I guess) the initial measured value of 8.66, leaving little room for the ration to increase. The default value of 11 would give more room for an increase. It would also lead to larger mineralization, and thus higher N uptake in the low fertilizer plots.
+
 
 * TF Daisy artikel
 
