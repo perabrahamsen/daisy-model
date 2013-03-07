@@ -127,62 +127,66 @@ the model by \cite{gp74} for row crops, where the root density
 decreased exponentially with the horizontal distance to the row.  The
 assumption is that the roots are sufficiently dense in the direction
 of the rows for us to ignore that dimension.  Like \cite{gp74}, it is
-a static, empircal model. This model was validated indirectly, through
+a static, empirical model. This model was validated indirectly, through
 the use of soil water measurements. In the present paper we suggest a
 similar model, with the following improvements: 1) The new model will
 handle overlapping root zones from multiple rows; 2) The model
 parameters will be calculated from physical rather than empirical
 quantities; 3) The model will be tested on two independent sets of
-directly measured root density.  The proposed model is static in that it
-doesn't include root growth, but it can be parametrized dynamically
-based on root mass and the depth and width of the root zone.
+directly measured root densities.  The proposed model is static in
+that it doesn't include root growth, but it can be parametrized
+dynamically based on root mass and the depth and width of the root
+zone when combined with a suitable crop growth model.
 
 The new root model was used in the SAFIR (SAFe IRrigation) EU project
-\citep{ssoc,safir2010} as part of the Daisy agro-ecological model
-\citep{daisy-fertilizer,daisy-ems,daisy2012} for calculation of water and solute
-uptake \citep{daisyN}.  The SAFIR project had two aspects, the first
-being assessment of the risk for human health with regard to use of
-wastewater for irrigation \citep{Forslund2010440,Surdyk2010451}, and
-the second was water saving irrigation techniques, in particular PRD
+\citep{safir2010} as part of the Daisy agro-ecological model
+\citep{daisy-fertilizer,daisy2012} for calculation of water and solute
+uptake.  The SAFIR project had two aspects, the first being assessment
+of the risk for human health with regard to use of wastewater for
+irrigation \citep{Forslund2010440,Surdyk2010451}, and the second was
+water saving irrigation techniques, in particular PRD
 \citep{Jensen2010403}.  There were five experimental sites, three in
 Europe, and two in China, and three crops, potatoes, fresh tomatoes,
 and processing tomatoes.  For the two Chinese sites root density was
 measured. The original Daisy soil water model was extended from
-\oned{} to \twod{}, and used for modelling the
-experiments.  The original Daisy crop model \citep{eupotato}
-calculates root dry mass and root zone depth, and assumes a vertical root
-density distribution following the model by \cite{gp74}.  With the
-\twod{} extension, root zone width was added to the crop model, as well
-as the root density distribution model discussed in this paper.
+\oned{} to \twod{}, and used for modelling the experiments.  The
+original Daisy crop model \citep{eupotato} calculates root dry mass
+and root zone depth, and assumes a vertical root density distribution
+following the model by \cite{gp74}.  With the \twod{} extension, root
+zone width was added to the crop model, as well as the root density
+distribution model discussed in this paper.
 
-The new \twod{} root density model implemented in Daisy and used in
-the SAFIR project has not been presented in any of the previous
-papers, nor has the root density measurement from the two Chinese
-sites been published before. Only the static root distribution model
-will be described and tested in this paper, the predictive crop growth
-model in Daisy has been described elsewhere, and is outside the scope
-of this paper.
+Daisy facilitates replaceable descriptions of the physical processes in
+the system, as described in \citet{daisy-ems}. The main relevant
+processes of the specific setup used in SAFIR is depicted on
+Fig.~\ref{fig:daisy}. The crop growth and uptake modules are described
+in \citet{daisyN}, and the SVAT model in \citet{ssoc}. The new \twod{}
+root density model, the topic of this paper, has not been presented in
+any of the previous papers, nor has the root density measurement from
+the two Chinese sites been published before. 
 
 \begin{figure}[htbp]
   \begin{center}
     \input{daisy-rootdens.latex}
   \end{center}
-  \caption{The root density model in the context of Daisy as applied
-    in the SAFIR project. The crop growth module delivers the total
-    root mass($M_r$), root zone depth ($d_c$), and root zone width
-    ($w_c$) to the root density module, which delivers a spatial
-    distribution of root density ($L$) to the uptake module. The
-    uptake module is driven by potential transpiration and N demand,
-    which come from the Soil-Vegetation-Atmosphere transfer (SVAT)
-    module and the crop growth module, respectively.  Using the root
-    density, the actual uptake is then calculated the hydraulic
-    conductivity ($K$), the pressure head ($h$), and the nitrogen
-    solute concentration ($C_N$) of nitrate and ammonium.  The later
-    three are delivered by the soil module, which recieve sink terms
-    for water and nitrogen ($S_\Theta$ and $S_N$) in return. The crop
-    growth is mainly driven by assimilated CO$_2$, which is calculated
-    by the SVAT module, based on weather data, actual transpiration,
-    and the leaf area (LAI) and nitrogen status of leafs (RuBisCO-N).}
+  \caption{The root density model (red) in the context of Daisy as
+    applied in the SAFIR project. Boxes represent modules, arrows
+    represent information flow. Only a subset of both have been
+    included. The crop growth module delivers the total root mass
+    ($M_r$), root zone depth ($d_c$), and root zone width ($w_c$) to
+    the root density module, which delivers a spatial distribution of
+    root density ($L$) to the uptake module. The uptake module is
+    driven by potential transpiration and N demand, which come from
+    the Soil-Vegetation-Atmosphere transfer (SVAT) module and the crop
+    growth module, respectively.  Using the root density, the actual
+    uptake is then calculated the hydraulic conductivity ($K$), the
+    pressure head ($h$), and the nitrogen solute concentration ($C_N$)
+    of nitrate and ammonium.  The later three are delivered by the
+    soil module, which receive sink terms for water and nitrogen
+    ($S_\Theta$ and $S_N$) in return. The crop growth is mainly driven
+    by assimilated CO$_2$, which is calculated by the SVAT module,
+    based on weather data, actual transpiration, and the leaf area
+    (LAI) and nitrogen status of leafs (Leaf-N).}
   \label{fig:daisy}
 \end{figure}
 
@@ -513,7 +517,7 @@ between 22 and 23 Mg/ha, while the deficit and PRD treatments had
 yields from 18 to 21 Mg/ha, with the exception of plot 21 where the
 yield was 14 Mg/ha.  For comparison, FAOSTAT reports Chinese national
 average for 2008 as 15 Mg/ha.  For the CAU site, yield were between 42
-and 52 Mg/ha (Chinese average 23 Mg/ha).  There were no clear link
+and 52 Mg/ha (Chinese average 23 Mg/ha).  There was no clear link
 between yield and treatment. See~\citet{Jensen2010403} for further
 discussion.
 
@@ -809,7 +813,86 @@ sampling was performed earlier.
   \label{fig:tworows}
 \end{figure}
 
-\section{Discussion}
+\section{Discussion and concluding remarks}
+
+\subsection{New}
+We have presented a simple and robust \twod{} root density model for
+row crops, which supports overlapping root zones from multiple rows,
+and have shown how the model can be parametrized based on physically
+meaningful quantities. We have also shown that the \twod{} model is a
+generalized version of a well know and tested \oned{} model.
+
+To test the new model, we have fitted both the original \oned{} model
+and the generalized \twod{} model to datasets spanning two years data
+from two sites (CAAS and CAU) with different crops, and performed a
+statistical test to determine if the \twod{} model can provide a
+significantly better fit than the \oned{} model.
+
+Both sites were using ridge systems and had \threed{} datasets. Our
+\twod{} model, which assumes flat soil, were thus not an obvious
+match. However, since the root density model was intended to be used
+in conjunction with Daisy, and the soil module of Daisy is \twod{} and
+assumes a flat soil surface, the root density model had to have the
+same properties. However the geometry mapping represents an additional
+uncertainty, especially in conjunction with the estimated physical
+quantities, $d_c$, $w_c$, and $M_r$.
+
+For the CAAS datasets, the \twod{} model fit in general estimates a
+wide root zone, which we believe explains why the \oned{} model can
+provide a good match (R$^2 \geq 0.69$ for the individual plots). The
+R$^2$ values for the \twod{} are always equal or higher than for the
+\oned{} model, as must be the case one model is a generalization of
+another. For half the individual plots the improvement is
+statistically significant. When looking at dataset containing all
+plots, the improvement is small (0.61 vs 0.60), but significant due to
+the number of data points. For the CAU datasets, a much comparable
+narrow root zone is estimated by the \twod{} model fit, and as a
+result, we generally get a worse fit for the \oned{} model.
+
+The \twod{} model performs significantly better for most individual
+plots, and for all combined datasets. Since the combined datasets
+contain observations from multiple plots, they are less susceptible to
+random variations in local soil conditions, and therefore more
+trustworthy. Furthermore, visual inspection of observed data vs.\@
+model fit (Fig.~\ref{fig:caas2008},~\ref{fig:cau2007},
+and~\ref{fig:cau2008}) shows that the model provides a good
+description of both the horizontal and vertical variation in root
+density.
+
+The root distribution is changing over the lifetime of the crop. We
+expert the \twod{} model in general to perform better in the early
+vegetative phase where the root system is not yet fully developed, and
+for some crops based on the CAU results also in the late reproductive
+phase. However, for a fully developed root zone the \oned{} model may
+be adequate to describe the root density distribution. More temporal
+data points would be needed to confirm this.
+
+We see the primary application of the \twod{} model to be when
+modelling water or solute uptake from row crops. The use of the
+\twod{} model may only be relevant for the early and perhaps late
+phase of the crop development. Even though the improvement provided by
+the \twod{} model for the CAAS data was statistically significant, it
+is plausible that the precision of the \oned{} model (R$^2$ = 0.60)
+would be adequate at this stage of the crop development.  
+
+The secondary application we see is inverse modelling, where you go
+from root density sampling, to the model parameters, as we have done
+in this paper. This approach provides a large data reduction, which
+can be useful for getting an overview of the results.
+
+Compared to more advanced models, the main advantage of the simple
+\twod{} model described in this paper is that it can be parametrised
+based on very few data, namely estimates of root mass, and root zone
+depth and width, so it is useful in the common case where limited root
+data is available.  For a project where the focus is specifically on
+the root development rather than above ground production or water and
+nitrogen balances, the model is inadequate.  In particular, a dynamic
+root density model would be needed to explore how the development is
+affected by the local soil conditions, such as mechanical resistance,
+or availability of water and nutrients.
+
+\subsection{Old}
+
 
 A major source of uncertainty is the remapping of the 3D ridge
 geometry to a 2D flat surface.  For both sites, we ignore the root
