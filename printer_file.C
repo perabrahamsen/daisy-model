@@ -196,7 +196,12 @@ PrinterFile::Implementation::print_dimension (const Frame& frame,
   else if (dim == Attribute::None () || dim == Attribute::Fraction ())
     out << " []";
   else if (dim == Attribute::User ())
-    out << " [" << frame.name (key) << "]";
+    {
+      if (frame.check (key))
+        out << " [" << frame.name (key) << "]";
+      else
+        out << " [<missing>]";
+    }
   else
     out << " [" << dim << "]";
 }
@@ -612,38 +617,33 @@ PrinterFile::Implementation
                               bool print_description)
 {
   Library& library = metalib.library (library_name);
-  std::auto_ptr<FrameModel> frame (&library.model (name).clone ());
-  daisy_assert (frame.get ());
-  if (frame->type_name () != name)
+  const FrameModel& frame = library.model (name);
+  if (frame.type_name () != name)
     {
-      daisy_bug ("Asking for '" + name + "' getting '" + frame->type_name ()
-                 + "' (base " + frame->base_name () + ")");
+      daisy_bug ("Asking for '" + name + "' getting '" + frame.type_name ()
+                 + "' (base " + frame.base_name () + ")");
     }
-#if 0
-  if (!print_description && frame->alist ().check ("description"))
-    frame->alist ().remove ("description");
-#endif
   const FrameModel& root = library.model ("component");
 
   out << "(def" << library_name << " ";
   print_symbol (name);
   out << " ";
-  const symbol super = frame->base_name ();
+  const symbol super = frame.base_name ();
   if (super != Attribute::None ())
     {
       print_symbol (super);
       if (!library.check (super))
 	{
 	  out << " ;; unknown superclass\n ";
-	  print_alist (*frame, &root, 2, true);
+	  print_alist (frame, &root, 2, true);
 	}
       else
-        print_alist (*frame, &library.model (super), 2, true);
+        print_alist (frame, &library.model (super), 2, true);
     }
   else
     {
       out << "<unknown>\n  ";
-      print_alist (*frame, &root, 2, true);
+      print_alist (frame, &root, 2, true);
     }
   out << ")\n";
 }

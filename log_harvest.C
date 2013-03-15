@@ -29,6 +29,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
+#include "format.h"
 #include <sstream>
 #include <fstream>
 #include <time.h>
@@ -221,6 +222,100 @@ struct LogHarvest : public Log
 
 static struct LogHarvestSyntax : public DeclareModel
 {
+  static void entry (Format& format, const symbol name, const symbol dim,
+                     const symbol description)
+  {
+    Format::Item item (format, name);  
+    format.special ("nbsp");
+    format.text ("[");
+    format.bold (dim);
+    format.text ("]");
+    format.hard_linebreak ();
+    format.text (description);
+    format.soft_linebreak ();
+  }
+  static void document_entries (Format& format, const Metalib&, 
+                         Treelog& msg, const symbol name)
+  {
+    if (name != "harvest")
+      return;
+    
+    format.bold ("Table columns (common):");
+    {
+      Format::List dummy (format);
+      entry (format, "stem_DM", "Mg DM/ha", "\
+Stem dry matter removed by harvest.");
+      entry (format, "dead_DM", "Mg DM/ha", "\
+Yeallow leaves dry matter removed by harvest.");
+      entry (format, "leaf_DM", "Mg DM/ha", "\
+Green leaves dry matter removed by harvest.");
+      entry (format, "sorg_DM", "Mg DM/ha", "\
+Storage organ (grains or tuber) dry matter removed by harvest.\n\
+For some crops, only the economicly important part of the storage organ\n\
+is counted.");
+    }
+    format.soft_linebreak ();
+
+    format.bold ("Table columns (if print_N is set):");
+    {
+      Format::List dummy (format);
+      entry (format, "stem_N", "kg N/ha", "\
+Stem nitrogen removed by harvest.");
+      entry (format, "dead_N", "kg N/ha", "\
+Yeallow leaves nitrogen removed by harvest.");
+      entry (format, "leaf_N", "kg N/ha", "\
+Green leaves nitrogen removed by harvest.");
+      entry (format, "sorg_N", "kg N/ha", "\
+Storage organ (grains or tuber) nitrogen removed by harvest.");
+    }
+    format.soft_linebreak ();
+      
+    format.bold ("Table columns (if print_C is set):");
+    {
+      Format::List dummy (format);
+      entry (format, "stem_C", "kg C/ha", "\
+Stem carbon removed by harvest.");
+      entry (format, "dead_C", "kg C/ha", "\
+Yeallow leaves carbon removed by harvest.");
+      entry (format, "leaf_C", "kg C/ha", "\
+Green leaves carbon removed by harvest.");
+      entry (format, "sorg_C", "kg C/ha", "\
+Storage organ (grains or tuber) carbon removed by harvest.");
+    }
+    format.soft_linebreak ();
+
+    format.bold ("Table columns (common):");
+    {
+      Format::List dummy (format);
+      
+      entry (format, "WStress", "d", "\
+Number of days worth of production lost due to water stress.\n\
+\n\
+This is just a rough measure. It is calculated by weighting the water\n\
+stress variation over the day with the amount of global radiation\n\
+received in the same period. So water stress at noon with high\n\
+radiation counts a lot more than water stress near sunset with low\n\
+radiation. All days are counted the same, so water stress a day with\n\
+low radiation is counted the same as water stress a day with high\n\
+radiation.");
+      entry (format, "NStress", "d", "\
+Number of days worth of production lost due to nitrogen stress.\n\
+\n\
+This is just a rough measure. It is calculated by weighting the nitrogen\n\
+stress variation over the day with the amount of global radiation\n\
+received in the same period. So nitrogen stress at noon with high\n\
+radiation counts a lot more than nitrogen stress near sunset with low\n\
+radiation. All days are counted the same, so nitrogen stress a day with\n\
+low radiation is counted the same as nitrogen stress a day with high\n\
+radiation.");
+      entry (format, "WP_ET", "kg/m^3", "\
+A measure for water usage efficiency.\n\
+Specifically the economic yield (storage organ) divided by the total\n\
+evapotranspiration in the period from emergence to maturity or\n\
+harvest.");
+    }
+  }
+
   Model* make (const BlockModel& al) const
   { return new LogHarvest (al); }
 
@@ -245,6 +340,7 @@ static struct LogHarvestSyntax : public DeclareModel
 		"Print carbon content of harvest.");
     frame.set ("print_C", false);
     frame.set ("print_dimension", true);
+    Librarian::add_doc_fun (Log::component, document_entries);
   }
 } LogHarvest_syntax;
 

@@ -409,8 +409,7 @@ OrganicStandard::Initialization::
 }
 
 void
-OrganicStandard::Initialization::
-/**/ load_syntax (Frame& frame)
+OrganicStandard::Initialization::load_syntax (Frame& frame)
 {
   frame.declare ("input", "kg C/ha/y", Check::non_negative (),
 	      Attribute::OptionalConst, "\

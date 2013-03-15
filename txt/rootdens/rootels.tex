@@ -815,21 +815,19 @@ sampling was performed earlier.
 
 \section{Discussion and concluding remarks}
 
-\subsection{New}
 We have presented a simple and robust \twod{} root density model for
 row crops, which supports overlapping root zones from multiple rows,
 and have shown how the model can be parametrized based on physically
 meaningful quantities. We have also shown that the \twod{} model is a
-generalized version of a well know and tested \oned{} model.
-
-To test the new model, we have fitted both the original \oned{} model
-and the generalized \twod{} model to datasets spanning two years data
-from two sites (CAAS and CAU) with different crops, and performed a
-statistical test to determine if the \twod{} model can provide a
-significantly better fit than the \oned{} model.
+generalized version of a well know and tested \oned{} model. To test
+the new model, we have fitted both the original \oned{} model and the
+generalized \twod{} model to datasets spanning two years data from two
+sites (CAAS and CAU) with different crops, and performed a statistical
+test to determine if the \twod{} model can provide a significantly
+better fit than the \oned{} model.
 
 Both sites were using ridge systems and had \threed{} datasets. Our
-\twod{} model, which assumes flat soil, were thus not an obvious
+\twod{} model, which assumes flat soil, was thus not an obvious
 match. However, since the root density model was intended to be used
 in conjunction with Daisy, and the soil module of Daisy is \twod{} and
 assumes a flat soil surface, the root density model had to have the
@@ -845,9 +843,9 @@ R$^2$ values for the \twod{} are always equal or higher than for the
 another. For half the individual plots the improvement is
 statistically significant. When looking at dataset containing all
 plots, the improvement is small (0.61 vs 0.60), but significant due to
-the number of data points. For the CAU datasets, a much comparable
-narrow root zone is estimated by the \twod{} model fit, and as a
-result, we generally get a worse fit for the \oned{} model.
+the number of data points. For the CAU datasets, a comparable narrow
+root zone is estimated by the \twod{} model fit, and as a result, we
+generally get a worse fit for the \oned{} model.
 
 The \twod{} model performs significantly better for most individual
 plots, and for all combined datasets. Since the combined datasets
@@ -855,14 +853,14 @@ contain observations from multiple plots, they are less susceptible to
 random variations in local soil conditions, and therefore more
 trustworthy. Furthermore, visual inspection of observed data vs.\@
 model fit (Fig.~\ref{fig:caas2008},~\ref{fig:cau2007},
-and~\ref{fig:cau2008}) shows that the model provides a good
+and~\ref{fig:cau2008}) confirms that the model provides a good
 description of both the horizontal and vertical variation in root
-density.
+density. 
 
 The root distribution is changing over the lifetime of the crop. We
-expert the \twod{} model in general to perform better in the early
+expect the \twod{} model in general to perform better in the early
 vegetative phase where the root system is not yet fully developed, and
-for some crops based on the CAU results also in the late reproductive
+for some crops (based on the CAU results) also in the late reproductive
 phase. However, for a fully developed root zone the \oned{} model may
 be adequate to describe the root density distribution. More temporal
 data points would be needed to confirm this.
@@ -885,49 +883,12 @@ Compared to more advanced models, the main advantage of the simple
 based on very few data, namely estimates of root mass, and root zone
 depth and width, so it is useful in the common case where limited root
 data is available.  For a project where the focus is specifically on
-the root development rather than above ground production or water and
-nitrogen balances, the model is inadequate.  In particular, a dynamic
-root density model would be needed to explore how the development is
-affected by the local soil conditions, such as mechanical resistance,
-or availability of water and nutrients.
-
-\subsection{Old}
-
-
-A major source of uncertainty is the remapping of the 3D ridge
-geometry to a 2D flat surface.  For both sites, we ignore the root
-mass that is placed in the top of the ridge.  We also ignore that the
-ridge valley does not contain any soil.  For the CAU site we
-furthermore ignore the third dimension, using only measurements at y =
-0 cm where the root density is highest.  These systematic errors
-affect the estimate of all three parameters, but especially the root
-dry mass.  However, a comparison between plots at the same site should
-still be valid.
-
-The statistical analysis (Table~\ref{tab:ftest-caas}
-and~\ref{tab:ftest-caas}) shows us that the presented \twod{} model
-constitutes a significant improvement over the \oned{} model,
-especially in the cases where the root zone from the individual row is
-narrow.  Furthermore, visual inspection of observed data vs.\@
-predicted data (Fig.~\ref{fig:caas2008},~\ref{fig:cau2007},
-and~\ref{fig:cau2008}) shows that the model provides a good match for
-both the horizontal and vertical variation in root density.
-
-Additionally, we believe that conversion of root density measurements
-to general crop parameters (root dry mass, root zone depth, and root
-zone width) will be useful when analysing the effect of treatments,
-climate, or soil type on root development.  Such an analysis is
-outside the scope of this paper, but the numbers presented on
-Table~\ref{tab:ftest-cau} and~\ref{tab:ftest-caas} do not give a clear
-indication of the difference in treatments being the main factor in
-the difference between plots for the present experiment.
-
-In conclusion, we managed to introduce a simple \twod{} extension to
-the \oned{} descriptive root density model of \citet{gp74},
-reformulate both the original and the extended models for meaningful
-physical quantities suitable for use with mechanistic crop growth
-models, and show that the extended model gives a significantly better
-match for row crops than the original for two independent datasets.
+the below ground development rather than above ground production or
+water and nitrogen balances, the model is inadequate.  In particular,
+for solute and water uptake, a dynamic root density model would be
+needed to explore how the development is affected by the local soil
+conditions, such as mechanical resistance, aeration, or availability
+of water and nutrients.
 
 \section*{Acknowledgements}
 

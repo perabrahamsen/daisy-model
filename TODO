@@ -1,67 +1,34 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* TF
+* Hooghardt artikel 
 
-1. Soil organic carbon and nitrogen 
+Skriv undskyldning for ikke at have bioporer med.
 
-1.1. My summary.
+** Udskriv referencer
 
-1.1.1 Calibration.
+** Conventionally, AD has been used
 
-We only look at the dynamics of top soil.
+(list use cases)
 
-SOM_fractions have been calibrated from the carbon content in 1999, 2003, and 2007 for the plots with mineral fertilizer.
+** A growing body of evidence suggests
 
-The C_per_N ratio was set to 8.66 from measured numbes.
+Referencer to macroporer, både vores, og reviewers. 
 
-The SOM_C_per_N ratio, which is the "long term goal" of the SOM pools, were lowered from the default 11 to 9 for all three SOM pools.
+** However, in this article we use AD
 
-1.1.2 Validation
+Hvis HDM ikke er god nok til AD, er den næppe god nok til
+dobbelt-porøsistet transport.
 
-For the mineral fertilized plots, we measure a rougly constant level of carbon, but a loss of nitrogen around 10%, while we simulate a loss of both carbon and nitrogen of about 10%
+Kvælstof er måske god nok (referencer).
 
-For the high slurry fertilized plot, we observe an increase in carbon and a decrease in nitrogen, while both are roughly constant in the simulation.
+Bromide er en tracer med lignende egenskaber til NO3, men som ikke
+i samme grad er integreret i omsætning.
 
-The low slurry fertilized plot lies between the mineral and high fertilized plot, in both measured and simulated data, as we would expect.
-
-1.2 Questions and comments
-
-1.2.1 Figure 7a and 7b should have identical axes, to make it easier to compare C and N dynamics.
-
-1.2.2 You compare both C and N /content/, and C and N /change/. Am I correct in guessing that these are actually the same numbers, just presented as absolute values (content) and relative to first measurement (change).
-
-If so, I'm not sure how to interpret that one is good and the other is bad,a nd it is not really discussed in the article.
-
-If not, what are they?
-
-1.2.3. The SOM were calibrated for C, yet get a poor match on C on the same plots, but a good match for N on the same plots. I don't understand that. You should be able to calibrate a better match on C.
-
-How exactly was it calibrated? Automatic or manual procedure?
-
-1.2.4. The measurements shows an increase in the C/N ration. The simulation does not. The reason the simulation does not show an increase in C/N is that you have set SOM_C_per_N to 9, close to (I guess) the initial measured value of 8.66, leaving little room for the ration to increase. The default value of 11 would give more room for an increase. It would also lead to larger mineralization, and thus higher N uptake in the low fertilizer plots.
-
-
-* TF Daisy artikel
-
-** 1.3: Initialization of SOM
-
-** 1.7: Soil N and C
-
-We need to analyze this.
+Tidsskala.
 
 * PESTPORE opsætning
 
 ** Testopsætning?
-
-* Rodartikel.
-
-** elsevier latex template
-
-** Læs første reviewers kommentater, og ret ind.
-
-** Gør det klart hvad det nye i modellen er.
-
-** Forklar deskriptiv, vs predektiv model.
 
 * Klima?
 

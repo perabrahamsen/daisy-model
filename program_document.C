@@ -78,6 +78,7 @@ struct ProgramDocument : public Program
                            bool last);
 
   // Print parts of it.
+  static void ignore_entries (std::set<symbol>& entries);
   static void own_entries (const Metalib&,
                            const Library& library, const symbol name, 
                            std::set<symbol>& entries, 
@@ -712,6 +713,31 @@ ProgramDocument::print_sample_entry (const symbol name,
 }
 
 void
+ProgramDocument::ignore_entries (std::set<symbol>& entries)
+{
+  static struct Ignored : public std::set<symbol>
+  {
+    Ignored ()
+    {
+      this->insert ("cite");
+      this->insert ("description");
+    }
+  } ignored;
+  
+  for (std::set<symbol>::const_iterator i = ignored.begin (); 
+       i != ignored.end (); 
+       i++)
+    {
+      const symbol key = *i;
+      
+      const std::set<symbol>::iterator j 
+        = find (entries.begin (), entries.end (), key);
+      if (j != entries.end ())
+        entries.erase (j);
+    }
+}
+
+void
 ProgramDocument::own_entries (const Metalib& metalib,
                               const Library& library, const symbol name, 
 			      std::set<symbol>& entries,
@@ -720,6 +746,7 @@ ProgramDocument::own_entries (const Metalib& metalib,
   const FrameModel& frame = library.model (name);
 
   frame.entries (entries);
+  ignore_entries (entries);
 
   // Remove base entries.
   const symbol base_model = frame.base_name ();
@@ -735,10 +762,17 @@ ProgramDocument::own_entries (const Metalib& metalib,
            i++)
         {
           const symbol key = *i;
+
           if (new_only
               || key == "description"
+              || key == "cite"
               || frame.subset (metalib, base_frame, key))
-            entries.erase (find (entries.begin (), entries.end (), key));
+            {
+              const std::set<symbol>::iterator j 
+                = find (entries.begin (), entries.end (), key);
+              if (j != entries.end ())
+                entries.erase (j);
+            }
         }
     }
 }
@@ -756,6 +790,7 @@ ProgramDocument::inherited_entries (const Metalib& metalib,
     {
       const FrameModel& base_frame = library.model (base_model);
       base_frame.entries (entries);
+      ignore_entries (entries);
       for (std::set<symbol>::const_iterator i = entries.begin ();
            i != entries.end (); 
            i++)
@@ -790,7 +825,8 @@ ProgramDocument::print_sample (const symbol name, const Library& library)
   std::set<symbol> own;
   own_entries (metalib, library, name, own);
   std::set<symbol> base;
-  inherited_entries (metalib, library, name, base);
+  if (frame.own_position () == Filepos::none ())
+    inherited_entries (metalib, library, name, base);
 
   print_sample_entries (name, frame, order, own, 
                         library.name (), base, true);
@@ -1096,6 +1132,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
   format->index (name);
       
   const symbol type = frame.base_name ();
+  const Filepos& pos = frame.own_position ();
   if (type != root_name)
     {
       format->text ("A `" + type + "' ");
@@ -1104,7 +1141,6 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       else
         format->text ("base model ");
       format->see_page ("model", current_component + "-" + type);
-      const Filepos& pos = frame.own_position ();
       if (pos != Filepos::none ())
 	format->text (" defined in `" + pos.filename () + "'.\n");
       else
@@ -1127,6 +1163,18 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       print_submodel_entries (name, 0, 
                               frame, entries, 
                               library.name ());
+    }
+  else if (pos == Filepos::none ())
+    {
+      std::set<symbol> all;
+      own_entries (metalib, library, name, all, false);
+      if (all.size () > 0)
+        {
+          const std::vector<symbol>& order = frame.order ();
+          const std::set<symbol> base;
+          print_sample_entries (name, frame, order, all, "dummy", base, 
+                                false);
+        }
     }
 
   const std::vector<Library::doc_fun>& doc_funs = library.doc_funs ();
@@ -1236,7 +1284,7 @@ ProgramDocument::print_component (const Library& library, Treelog& msg)
   daisy_assert (library.check (root_name));
   std::set<symbol> my_entries;
   own_entries (metalib, library, root_name, my_entries);
-  if (my_entries.size () > 0.0)
+  if (my_entries.size () > 0)
     {
       const FrameModel& frame = library.model (root_name);
       print_sample (root_name, library);
