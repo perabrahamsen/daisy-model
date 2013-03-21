@@ -1,5 +1,21 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Undskyldning
+
+For catchment scale simulations, the soil is usually by necessity
+considered homogenious at field scale, apart for a division into
+horizons, due to lack of data at a finer scale. Finite (difference,
+volume, or element) method based solutions to Richard's equation and
+the advection-dispertion advection-dispersion equation are
+conventionally used for calculating water movement and solute
+transport within the soil. Examples include ******.
+
+A growing body of evidence suggest that in particular the
+advection-dispersion equation might be inadquate for solute transport
+in many, if not most, soils. ******
+
+Difficult to parametrize in large scala (Köhne, 2009a?)
+
 * Hooghardt artikel 
 
 Skriv undskyldning for ikke at have bioporer med.

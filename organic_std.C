@@ -820,7 +820,7 @@ OrganicStandard::output (Log& log) const
 	  const symbol name = (*item)->real_name ();
 	  if (log.check_entry (name, AM::component))
 	    {
-	      Log::NamedEntry named_entry (log, objid, (*item)->objid,
+	      Log::NamedEntry named_entry (log, name, (*item)->objid,
 					   (*item)->frame ());
 	      (*item)->output (log);
 	    }
@@ -1117,7 +1117,7 @@ OrganicStandard::tick (const Geometry& geo,
   const double old_N = total_N (geo);
   const double old_C = total_C (geo);
 
-  // Create an array of all AM dk:puljer, sorted by their C_per_N.
+  // Create an array of all AM pools, sorted by their C_per_N.
   const int all_am_size = am.size ();
   std::vector<AOM*> added;
   for (int i = 0; i < all_am_size; i++)
@@ -3091,10 +3091,10 @@ If no value is given, tillage will have no influence.");
     frame.declare ("min_AM_C", "g C/m^2", Check::non_negative (), Attribute::Const, 
                "Minimal amount of carbon in AOM ensuring it is not removed.");
     frame.set ("min_AM_C", 0.5);
-    //  We require 5 kg C / Ha in order to keep an AM dk:pulje.
+    //  We require 5 kg C / Ha in order to keep an AM pool.
     frame.declare ("min_AM_N", "g N/m^2", Check::non_negative (), Attribute::Const, 
-               "Minimal amount of nitrogen in AOM ensuring it is not removed.");
-    // We require ½ kg N / Ha in order to keep an AM dk:pulje.
+                   "Minimal amount of nitrogen in AOM ensuring it is not removed.");
+    // We require ½ kg N / Ha in order to keep an AM pool.
     frame.set ("min_AM_N", 0.05);
     frame.declare_submodule ("init", Attribute::Const, "\
 Parameters for initialization of the SOM and SMB pools.\n\
