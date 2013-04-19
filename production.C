@@ -926,3 +926,5 @@ Production::~Production ()
 static DeclareSubmodel 
 production_submodel (Production::load_syntax, "Production", "\
 Crop production in the default crop model.");
+
+// production.C ends here.
