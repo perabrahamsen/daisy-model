@@ -1,29 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Abstract
+
+
 * Undskyldning
 
-We test the hypotheses with solutions to Richard's equation and the
-ADE for a simple setup with three horizontally homegenious soil
-layers, a fixed lower boundary, and a dynamic upper boundary, both
-boundaries are horizontally homegenious. The horizontal homogeneity is
-implicit in the ***1D*** solutions, and also reflects the problems of
-parameterizing small scale soil heterogeniouty in large scale
-simulations.
-
-The main uncertainty related to the use of the ADE for solute
-transport. A growing body of evidence suggest that the ADE is
-inadquate for many soil and compounds, e.g. ***REF***. Several models
-to address this problem have been developed. Typically these models
-will include multiple flow domains, with limited exchange of solutes
-between them. Köhne et al (2009a,2009b) provide an overview of
-applications of such models. We have chosen to focus on the ADE here
-for two reasons. Firstly, it is used as a component of most of the
-multi-domain models, hence if we can reject the hypotheses for the
-ADE, it is unlikely that the ***1D*** solution will be viable for the
-multi-domain models. Secondly, the ADE is still used for large scale
-simulations, partly because the alternative models have proven
-difficult to parameterize and validate at the large scale (Köhne et
-al, 2009a).
 
 * Hooghardt artikel 
 
