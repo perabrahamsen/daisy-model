@@ -17,7 +17,7 @@
  \newcommand{\cplusplus}%
 {{\leavevmode{\rm{\hbox{C\hskip -0.1ex\raise 0.5ex\hbox{\tiny ++}}}}}}
 
-\newcommand{\MyEq}[1]{Eq.~\ref{#1}}
+\newcommand{\MyEq}[1]{Eq.~(\ref{#1})}
 
 
 \begin{document}
@@ -56,17 +56,16 @@
   Water saving techniques such as alternating partial root zone
   techniques can be evaluated by mechanistic modelling of soil water
   and plant growth. This requires knowledge of the root density
-  distribution, which is expensive to measure. The objective of this
-  paper is to present a simple and robust model of root density
-  distribution for row crops, based on physical quantities that can be
-  estimated by a plant growth model.
+  distribution. The objective of this paper is to present a simple and
+  robust model of root density distribution for row crops, based on
+  physical quantities that can be estimated by a plant growth model.
   
   An empirical model of vertical root density distribution is extended
   to two dimensions, and the parameters are derived in terms of root
   mass and root zone width and depth. Root density for potatoes and
   tomatoes were measured at two sites.  Both the original and the
   extended model are fitted to these datasets. An F-test is used to
-  determine is the extended model is significantly better than the
+  determine if the extended model is significantly better than the
   original model.  The extended model is superior in the cases where
   the root zone width is less than the distance between rows.  The
   median of the coefficient of determination (R$^2$) for all the
@@ -86,7 +85,7 @@
 
 \section{Introduction}
 
-With alternate side partial root zone drying (PRD) irrigation,
+With alternate partial root zone drying (PRD) irrigation,
 transpiration will depend on the spatial distribution of the roots and
 water in the soil, due to root signals. Several root models
 suitable for PRD exists. \@~\cite{vrugt2001calibration} e.g.\ proposes
@@ -107,8 +106,8 @@ include only a single plant.  In contrast, \oned{} models by their
 nature are concerned with a whole population, like a forest or a field
 crop.  An example of the latter would be the model of~\cite{gp74}
 based on a meta-analysis, where they found an exponential decrease
-with depth to capture the field observations.  These root models 
-are parametric, with the roots described as a density function $L\,
+with depth to capture the field observations.  These root models are
+parametric, with the roots described as a density function, e.g.\ $L\,
 (x,z)$, where the independent variables are horizontal distance to the
 plant $x$ and vertical distance to the soil surface $z$.  In contrast,
 architectural root models track the structure and branches of the
@@ -132,7 +131,7 @@ the use of soil water measurements. In the present paper we suggest a
 similar model, with the following improvements: 1) The new model will
 handle overlapping root zones from multiple rows; 2) The model
 parameters will be calculated from physical rather than empirical
-quantities; 3) The model will be tested on two independent sets of
+quantities. The model will be tested on two independent sets of
 directly measured root densities.  The proposed model is static in
 that it doesn't include root growth, but it can be parametrized
 dynamically based on root mass and the depth and width of the root
@@ -158,11 +157,11 @@ distribution model discussed in this paper.
 
 Daisy facilitates replaceable descriptions of the physical processes in
 the system, as described in \citet{daisy-ems}. The main relevant
-processes of the specific setup used in SAFIR is depicted on
+processes of the specific setup used in SAFIR are depicted on
 Fig.~\ref{fig:daisy}. The crop growth and uptake modules are described
 in \citet{daisyN}, and the SVAT model in \citet{ssoc}. The new \twod{}
 root density model, the topic of this paper, has not been presented in
-any of the previous papers, nor has the root density measurement from
+any of the previous papers, nor has the root density measurements from
 the two Chinese sites been published before. 
 
 \begin{figure}[htbp]
@@ -179,29 +178,21 @@ the two Chinese sites been published before.
     driven by potential transpiration and N demand, which come from
     the Soil-Vegetation-Atmosphere transfer (SVAT) module and the crop
     growth module, respectively.  Using the root density, the actual
-    uptake is then calculated the hydraulic conductivity ($K$), the
-    pressure head ($h$), and the nitrogen solute concentration ($C_N$)
-    of nitrate and ammonium.  The later three are delivered by the
-    soil module, which receive sink terms for water and nitrogen
-    ($S_\Theta$ and $S_N$) in return. The crop growth is mainly driven
-    by assimilated CO$_2$, which is calculated by the SVAT module,
-    based on weather data, actual transpiration, and the leaf area
-    (LAI) and nitrogen status of leafs (Leaf-N).}
+    uptake is then calculated based on the hydraulic conductivity
+    ($K$), the pressure head ($h$), and the nitrogen solute
+    concentration ($C_N$) of nitrate and ammonium.  The later three
+    are delivered by the soil module, which receive sink terms for
+    water and nitrogen ($S_\Theta$ and $S_N$) in return. The crop
+    growth is mainly driven by assimilated CO$_2$ from photosynthesis,
+    which is calculated by the SVAT module, based on weather data,
+    actual transpiration, and the leaf area (LAI) and nitrogen status
+    of leafs (Leaf-N).}
   \label{fig:daisy}
 \end{figure}
 
 \section{Materials and Methods}
 
 \subsection{Model theory}
-
-Our goal is to describe the two dimensional root density distribution
-for row crops based on root dry mass, root zone depth, and root zone
-width.  These values can be provided by a general crop growth model
-(like the one found in Daisy), and furthermore have the advantage that
-they all have a physical meaning.  However, first we will describe a
-traditional one dimensional root density distribution in terms of root
-dry mass and root zone depth.  This will provide a reference for later
-comparison.
 
 \subsubsection{Densely populated fields}
 \label{sec:model-1d}
@@ -230,11 +221,7 @@ this relation in \MyEq{eq:g+p}, we get
   \label{eq:root-depth}
 \end{equation}
 We convert the root mass to root length $l_r$ by assuming the specific
-root length $S_r$ is a known constant
-\begin{equation}
-  l_r = S_r \, M_r
-  \label{eq:root-length}
-\end{equation}
+root length $S_r$ is a known constant $l_r = S_r \, M_r$.
 The total root length is also the integral of the root density over
 the profile
 \begin{equation}
@@ -245,28 +232,24 @@ the profile
 \end{equation}
 By inserting the expression we get for $L_0$ from
 \MyEq{eq:root-integral} in \MyEq{eq:root-depth} we get
-\begin{equation}
-  L_m = l_r \, a \, e^{-a \, d_c}
-  \label{eq:a-only}
-\end{equation}
+%%\begin{equation}
+$L_m = l_r \, a \, e^{-a \, d_c}$.
+%%  \label{eq:a-only}
+%%\end{equation}
 If we substitute $W = -a \, d_c$ and isolate the known values on the right
 side this gives us
 \begin{equation}
    W e^W = - L_m \frac{d_c}{l_r}
   \label{eq:Lambert}
 \end{equation}
-If the root length is suffiently high the equation will have multiple
+If the root length is suffiently high the equation will have two
 solutions, the solution for $W\le-1$ corresponds to a high density
 near the surface that decreases sharply with depth, and is more
 realistic than the solution for $W>-1$ which has a comparable flat
 root profile, where more of the roots lie outside the root zone.  The
 solution can be found using Newton's method and an initial quess of
-$-2$.  After finding a value for $W$, we can find the desired density
-parameters $L_0$ and $a$ by substituting back
-\begin{eqnarray}
-   a   &=& -W / d_c\\\label{eq:a-solved}
-   L_0 &=& \frac{L_m}{e^{-a \, d_c}} = L_m e^{a \, d_c}\label{eq:L0-found}
-\end{eqnarray}
+$W = -2$.  After finding a value for $W$, we can find the desired density
+parameters $a = -W / d_c$ and $L_0 = L_m e^{a \, d_c}$.
 
 \subsubsection{Row crops}
 \label{sec:model-2d}
@@ -287,7 +270,7 @@ dimensions. Here, root density decrease horizontally with both depth
 ($z$) and horizontal distance to the row ($|x|$).
 
 To estimate values for the parameters $a_z$, $a_x$ and $L_{0,0}$, we
-assume as before that the root zone depth and mass are known, and now
+assume as before that the root zone depth and root mass are known, and now
 additionally that the root zone width at soil surface $w_c$ is known.
 We define the root zone depth $d_c$ to be the depth right below the
 row ($x = 0$) where the root density is $L_m$.  As $x=0$ is the place
@@ -333,33 +316,24 @@ By using \MyEq{eq:axz} in \MyEq{eq:minroot} we get
   L_m &=& l_R\, a_z\, a_x \, e^{-a_z d_c} \\\label{eq:Ld0}
   L_m &=& l_R\, a_z\, a_x \, e^{-a_x w_c}\label{eq:L0r}
 \end{eqnarray}
-Thus $e^{-a_z d_c} = e^{-a_x w_c}$ or
-\begin{equation}
-  a_x = \frac{d_c}{w_c} a_z
-  \label{eq:aztoax}
-\end{equation}
-By inserting \MyEq{eq:aztoax} in \MyEq{eq:Ld0} we get
+Thus $e^{-a_z d_c} = e^{-a_x w_c}$ or $a_x = a_z d_c / w_c $.
+By inserting this in \MyEq{eq:Ld0} we get
 \begin{equation}
   L_m = l_R\, a_z\, \frac{d_c}{w_c} a_z \, e^{-a_z d_c}
   \label{eq:azeq1}
 \end{equation}
-If we substitute 
-\begin{equation}
-  Q = -a_z d_c
-  \label{eq:Qaz}
-\end{equation}
-and isolate the known values on the right side, this gives us:
+If we substitute $Q = -a_z d_c$ and isolate the known values on the
+right side, this gives us:
 \begin{equation}
   Q^2\, e^Q = L_m \frac{d_c \, w_c}{l_R}
   \label{eq:logsquare}
 \end{equation}
-The equation can have multiple solutions, using reasoning similar to
+The equation can have three solutions, using reasoning similar to
 $W$ (\MyEq{eq:Lambert}) we find that only the solution for $Q\leq -2$
 is meaningful (i.e.\@ represents a situation where the majority of the
 roots are found within the root zone).  The solution can be found
-using Newton's method with an initial guess of $-3$. Knowing $Q$ we
-can find $a_z$~\MyEq{eq:Qaz}, $a_x$~\MyEq{eq:aztoax}, and
-$L_{0,0}$~\MyEq{eq:root-integral2}.
+using Newton's method with an initial guess of $Q = -3$. Knowing $Q$ we
+can find $a_z$, $a_x$, and $L_{0,0}$.
 
 If the rows are close, the root systems will overlap as shown on
 Fig.~\ref{fig:zigzag}. In theory, all the rows on the field will
@@ -462,13 +436,12 @@ while the CAU site were growing tomatoes (\textit{Solanum
 All SAFIR treatments were designed with the goal that the constituents
 of the wastewater should not affect crop growth.  Hence, for crop
 growth the different irrigation sources could be seen as replicates.
-The second aspect was how the design of the irrigation system could
-best utilize the water.  Two irrigation methods and three irrigation
-strategies were considered.  The irrigation methods were subsurface
-drip irrigation and furrow irrigation.  The irrigation strategies were
-full irrigation (equivalent to potential evapotranspiration), deficit
-irrigation (70\% of full irrigation), and partial rootzone drying
-(like deficit, but application on alternating sides of the crop).
+Two irrigation methods and three irrigation strategies were
+considered.  The irrigation methods were subsurface drip irrigation
+and furrow irrigation.  The irrigation strategies were full irrigation
+(equivalent to potential evapotranspiration), deficit irrigation (70\%
+of full irrigation), and partial rootzone drying (like deficit, but
+application on alternating sides of the crop).
 
 At the CAAS site, root density was successfully sampled in 2008 on one
 plot for each treatment, as outlined in
@@ -492,23 +465,22 @@ Plot	& Source	& Method	& Strategy\\\hline
 15	& SF + HM	& Subsurface	& Partial rootzone drying\\
 18	& SF + HM	& Subsurface	& Full irrigated\\
 21	& 	& Furrow	& Partial rootzone drying\\
-24	& 	& Furrow	& Full irrigated
+24	& 	& Furrow	& Full irrigated\\\hline
   \end{tabular}
 \end{table}
 
 \begin{table}[htbp]
   \caption{CAU treatments with root density measurements.  
-    All treatments used tap water.  The strategy used was either 
-    partial rootzone drying (PRD) or full irrigation (FI).}
+    All treatments used tap water.}
   \label{tab:cautreatments}
   \begin{tabular}{llllll}\\\hline
 \multicolumn{3}{c}{2007} & \multicolumn{3}{c}{2008}\\
 Plot	& Method	& Strategy	& Plot	& Method	& Strategy\\\hline
-1	& Subsurface	& PRD	& 3	& Subsurface	& PRD\\
-2	& Subsurface	& PRD	& 6	& Subsurface	& FI\\
-3	& Subsurface	& PRD	& 9	& Furrow	& PRD\\
-4	& Subsurface	& FI	& 12	& Furrow	& FI\\
-5	& Subsurface	& FI	& 15	& Subsurface	& FI\\
+1	& Subsurface	& Partial rootzone drying	& 3	& Subsurface	& Partial rootzone drying\\
+2	& Subsurface	& Partial rootzone drying	& 6	& Subsurface	& Full irrigation\\
+3	& Subsurface	& Partial rootzone drying	& 9	& Furrow	& Partial rootzone drying\\
+4	& Subsurface	& Full irrigation	& 12	& Furrow	& Full irrigation\\
+5	& Subsurface	& Full irrigation	& 15	& Subsurface	& Full irrigation\\\hline
 \end{tabular}
 \end{table}
 
@@ -672,7 +644,7 @@ datasets, and all but three of the CAU datasets.
 \begin{table}[htbp]
   \caption{The best fit for root zone depth ($d_c$),
     root zone diameter ($2 w_c$), and total root dry matter ($M_r$) is show
-    for each plot at CAAS.  The `All' plot indicate a dataset containing all
+    for each plot at CAAS.  The `All' plot indicates a dataset containing all
     the individual plots.  Furthermore, the R$^2$ for both the \oned{}
     and \twod{} fits are listed, as well as an F test indicating whether
     the \twod{} model provides significantly better fit (\textbf{bold}).} 
@@ -689,14 +661,14 @@ All	& 93	& 216	& 0.65	& 0.61	& 0.60	& \textbf{5.42}	& 3.88\\
 15	& 87	& $\infty$	& 0.91	& 0.75	& 0.75	& 0.00	& 4.14\\
 18	& 87	& 82	& 0.22	& 0.88	& 0.79	& \textbf{23.80}	& 4.14\\
 21	& 88	& 99	& 0.28	& 0.86	& 0.79	& \textbf{16.53}	& 4.14\\
-24	& 132	& 164	& 0.74	& 0.73	& 0.69	& 4.10	& 4.14\\
+24	& 132	& 164	& 0.74	& 0.73	& 0.69	& 4.10	& 4.14\\\hline
   \end{tabular}
 \end{table}
 
 \begin{table}[htbp]
   \caption{The best fit for root zone depth ($d_c$),
     root zone diameter ($2 w_c$), and total root dry matter ($M_r$) is show
-    for each plot at CAU.  The `All' plot indicate a dataset containing all
+    for each plot at CAU.  The `All' plot indicates a dataset containing all
     the individual plots.  Furthermore, the R$^2$ for both the \oned{}
     and \twod{} fits are listed, as well as an F test indicating whether
     the \twod{} model provides significantly better fit (\textbf{bold}).} 
@@ -731,7 +703,7 @@ All	& 108	& 45	& 0.25	& 0.92	& 0.13	& \textbf{894.32}	& 3.95\\
 6	& 95	& 44	& 0.22	& 0.96	& 0.17	& \textbf{281.54}	& 4.54\\
 9	& 115	& 53	& 0.28	& 0.94	& 0.15	& \textbf{184.84}	& 4.54\\
 12	& 101	& 40	& 0.23	& 0.96	& 0.17	& \textbf{282.93}	& 4.60\\
-15	& 113	& 47	& 0.26	& 0.89	& 0.11	& \textbf{101.73}	& 4.60\\
+15	& 113	& 47	& 0.26	& 0.89	& 0.11	& \textbf{101.73}	& 4.60\\\hline
   \end{tabular}
 \end{table}
 
@@ -830,14 +802,13 @@ sites (CAAS and CAU) with different crops, and performed a statistical
 test to determine if the \twod{} model can provide a significantly
 better fit than the \oned{} model.
 
-Both sites were using ridge systems and had \threed{} datasets. Our
-\twod{} model, which assumes flat soil, was thus not an obvious
-match. However, since the root density model was intended to be used
-in conjunction with Daisy, and the soil module of Daisy is \twod{} and
-assumes a flat soil surface, the root density model had to have the
-same properties. However the geometry mapping represents an additional
-uncertainty, especially in conjunction with the estimated physical
-quantities, $d_c$, $w_c$, and $M_r$.
+Both sites were using ridge systems and had \threed{}
+datasets. However, since the root density model was intended to be
+used in conjunction with Daisy, and the soil module of Daisy is
+\twod{} and assumes a flat soil surface, the root density model had to
+have the same properties. The geometry mapping represents an
+additional uncertainty, especially in conjunction with the estimated
+physical quantities, $d_c$, $w_c$, and $M_r$.
 
 For the CAAS datasets, the \twod{} model fit in general estimates a
 wide root zone, which we believe explains why the \oned{} model can
@@ -849,7 +820,8 @@ statistically significant. When looking at dataset containing all
 plots, the improvement is small (0.61 vs 0.60), but significant due to
 the number of data points. For the CAU datasets, a comparable narrow
 root zone is estimated by the \twod{} model fit, and as a result, we
-generally get a worse fit for the \oned{} model.
+generally get a better fit for the \twod{} model compared to the
+\oned{} model.
 
 The \twod{} model performs significantly better for most individual
 plots, and for all combined datasets. Since the combined datasets
@@ -930,7 +902,7 @@ $w_c$     & L     & Horizontal root zone width\\
 $W$     &         & Substitution variable\\ 
 $x$     & L       & Horizontal position across row \\
 $y$     & L       & Horizontal position along row \\
-$z$     & L       & Soil depth \\
+$z$     & L       & Soil depth \\\hline
 \end{tabular}
 \vfill{}
 

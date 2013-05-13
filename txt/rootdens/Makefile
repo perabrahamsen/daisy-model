@@ -10,7 +10,8 @@ ROOTDENS = rootdens_L.tex rootdens_Q.tex rootdens_W.tex
 
 OTHER = row.tex sample-caas.tex sample-cau.tex
 
-ARTICLE = rootart.tex macro.tex $(OTHER) $(ROOTDENS) $(MULTI) $(COMPARE)
+ARTICLE = rootels.tex rootart.tex rootdens.tex \
+	macro.tex $(OTHER) $(ROOTDENS) $(MULTI) $(COMPARE)
 
 all:	rootart.pdf
 
