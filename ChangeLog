@@ -1,13 +1,12 @@
 2013-06-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* action_crop.C (doIt): Update caller.
-
 	* chemical.h, chemical_std.C (spray, dissipate): Split into
 	'overhead' and 'surface' variants.
 	* chemistry.h, chemistry_std.C, chemistry_multi.C: Same.
 	* irrigate.C (tick): Update caller.
 	* column.h, column.C: update caller.
 	* field.h, field.C (spray): Update caller.
+	* action_crop.C (doIt): Update caller.
 
 2013-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
