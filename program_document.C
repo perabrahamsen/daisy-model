@@ -645,7 +645,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 	  switch (type)
 	    {
 	    case Attribute::Number:
-	      if (frame.value_size (name) < 5)
+	      if (frame.value_size (name) < 10)
 		{
 		  const std::vector<double>& numbers
 		    = frame.number_sequence (name);

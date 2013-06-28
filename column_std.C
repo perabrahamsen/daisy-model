@@ -145,7 +145,8 @@ public:
   void set_porosity (double at, double Theta, Treelog& msg);
   void overflow (const double extra, Treelog& msg);
   void set_heat_source (double at, double value); // [W/m^2]
-  void spray (symbol chemical, double amount, Treelog&); // [g/ha]
+  void spray_overhead (symbol chemical, double amount, Treelog&); // [g/ha]
+  void spray_surface (symbol chemical, double amount, Treelog&); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
 
   // Conditions.
@@ -226,7 +227,7 @@ ColumnStandard::irrigate (const double duration, const double flux,
 
 void
 ColumnStandard::fertilize (const IM& im, Treelog& msg)
-{ chemistry->spray (im, msg); }
+{ chemistry->spray_surface (im, msg); }
 
 void
 ColumnStandard::fertilize (const Metalib& metalib, const FrameModel& al, 
@@ -238,7 +239,7 @@ ColumnStandard::fertilize (const Metalib& metalib, const FrameModel& al,
 
   // Volatilization.
   const double lost_NH4 = AM::get_volatilization (metalib, al);
-  chemistry->dissipate (Chemical::NH4 (), lost_NH4, msg);
+  chemistry->dissipate_surface (Chemical::NH4 (), lost_NH4, msg);
 
   // Add inorganic matter.
   fertilize (AM::get_IM (metalib, units.get_unit (IM::storage_unit ()), al),
@@ -263,7 +264,7 @@ ColumnStandard::fertilize (const Metalib& metalib, const FrameModel& al,
 
   // Volatilization.
   const double lost_NH4 = AM::get_volatilization (metalib, al);
-  chemistry->dissipate (Chemical::NH4 (), lost_NH4, msg);
+  chemistry->dissipate_surface (Chemical::NH4 (), lost_NH4, msg);
 
   // Add inorganic matter.
   const IM im = AM::get_IM (metalib, units.get_unit (IM::storage_unit ()), al);
@@ -285,7 +286,7 @@ ColumnStandard::fertilize (const Metalib& metalib, const FrameModel& al,
 
   // Volatilization.
   const double lost_NH4 = AM::get_volatilization (metalib, al);
-  chemistry->dissipate (Chemical::NH4 (), lost_NH4, msg);
+  chemistry->dissipate_surface (Chemical::NH4 (), lost_NH4, msg);
 
   // Add inorganic matter.
   const IM im = AM::get_IM (metalib, units.get_unit (IM::storage_unit ()), al);
@@ -469,11 +470,20 @@ ColumnStandard::set_heat_source (double at, double value) // [W/m^2]
 }
 
 void 
-ColumnStandard::spray (const symbol chemical, 
-                       const double amount /* [g/ha] */,
-                       Treelog& msg)
+ColumnStandard::spray_overhead (const symbol chemical, 
+                                const double amount /* [g/ha] */,
+                                Treelog& msg)
 {
-  chemistry->spray (chemical, amount / (100.0 * 100.0 /* ha->m^2 */), msg); 
+  chemistry->spray_overhead (chemical, amount / (100.0 * 100.0 /* ha->m^2 */),
+                             msg); 
+}
+
+void 
+ColumnStandard::spray_surface (const symbol chemical, 
+                               const double amount /* [g/ha] */,
+                               Treelog& msg)
+{
+  chemistry->spray_surface (chemical, amount / (100.0 * 100.0 /* ha->m^2 */), msg); 
 }
 
 void 

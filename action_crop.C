@@ -901,7 +901,7 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
       symbol chemical = spray[spray_index]->name;
       const double amount = spray[spray_index]->amount;
       msg.message ("Spraying " + chemical);
-      daisy.field ().spray (chemical, amount, msg); 
+      daisy.field ().spray_overhead (chemical, amount, msg); 
 
       spray_index++;
     }

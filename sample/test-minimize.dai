@@ -1,0 +1,77 @@
+;;; test-minimize.dai -- Automatic parameter calibration.
+
+(description "Demonstrate automatic parameter calibration.")
+
+;; Use standard parameterizations.
+(input file "dk-management.dai")
+(input file "log-std.dai")
+
+(defhorizon Ap FAO3
+  "Andeby top soil."
+  ;; We want to estimate clay content.
+  (clay $Ap_clay)
+  (normalize true) ;Normalize other soil particle fractions.
+  (silt 10.5 [%]) (sand 81.5 [%]) (humus 1.12 [%])
+  (C_per_N 11.0 [g C/g N])
+  (dry_bulk_density 1.5 [g/cm^3]))
+
+(defhorizon C Ap "Andeby C horizon." (humus 0.12 [%]))
+
+(defcolumn Andeby default
+  "Data collected by F.Guf at the B.And farm, Andeby, 2002."
+  (Soil (horizons (-20 Ap) (-2.5 [m] C))
+        (border -1 [m])
+        (MaxRootingDepth 60.0 [cm]))
+  (OrganicMatter none)
+  (Groundwater deep))
+
+;; This is our measured data. Creates an R^2 value for comparison.
+(defsummary compare Rsqr
+  (measure ((time 1986 12 31 23)        ;Measurement time.
+            (data ("Soil water" 480 497) ;Measured values. 
+                  ("Surface water" 6.4 6.5))) ;We may have any number.
+           ((time 1987 1 31 23)
+            (data ("Soil water" 495)
+                  ("Surface water" 7.9 8.0)))))
+           
+(defprogram MySim Daisy
+  ;; We declate Ap_clay as an extern parameter here.
+  (declare Ap_clay Number [<fraction>] "Clay content in Ap horizon.")
+  (Ap_clay 0.1 [<fraction>])
+
+  (weather default "dk-taastrup.dwf")
+  (column Andeby)
+  (time 1986 12 1 1)
+  (stop 1987 2 1 1)
+  (manager "SBarley w. MF")
+  (print_time false)
+  
+  ;; The simulated data is from the "Field water" log.
+  (output ("Field water" (when monthly) (summary compare))))
+
+;; This is our optimization program.
+(defprogram MyOpt minimize
+  ;;We only optimize a single parameter. Could be any number.
+  (parameter Ap_clay)
+  ;; Look up "simplex" in Wikipedia.  
+  ;; With only one variable, we need two points to define a simplex.
+  (simplex (0.05) (0.10))
+  ;; We can put limits on parameters. Here is a simple example.
+  (limit (>= Ap_clay 0.001 []))
+  ;; "compare" was the name of the summary we defined earlier.
+  (scope name compare)
+  (expr (- R2))                         ;We minimize -R^2
+  (run MySim)                           ;The name of out simulation.
+  ;; These are numeric criteria for convergenze.
+  (epsilon 0.0)
+  (min_iter 5)
+  (max_iter 80))
+
+;; We can run the simulation normally.
+;; (run MySim (Ap_clay 0.1 []))
+
+;; Or optimize it.
+(run MyOpt)
+
+
+;;; test-minimize.dai ends here.

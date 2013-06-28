@@ -52,8 +52,10 @@ struct ChemistryStandard : public Chemistry
   // Management.
   void update_C (const Soil& soil, const SoilWater& soil_water);
   void deposit (symbol chem, double flux, Treelog&);
-  void spray (symbol chem, double amount, Treelog&);
-  void dissipate (symbol chem, double amount  /* [g/m^2] */, Treelog&);
+  void spray_overhead (symbol chem, double amount, Treelog&);
+  void spray_surface (symbol chem, double amount, Treelog&);
+  void dissipate_overhead (symbol chem, double amount  /* [g/m^2] */, Treelog&);
+  void dissipate_surface (symbol chem, double amount  /* [g/m^2] */, Treelog&);
   void harvest (double removed, double surface);
   void mix (const Geometry&, const Soil&, const SoilWater&, 
             double from, double to, double penetration);
@@ -162,26 +164,52 @@ ChemistryStandard::deposit (const symbol chem, const double flux, Treelog& msg)
 }
 
 void 
-ChemistryStandard::spray (const symbol chem, 
-                          const double amount, Treelog& msg)
+ChemistryStandard::spray_overhead (const symbol chem, 
+                                   const double amount, Treelog& msg)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
     if (chemicals[c]->objid == chem)
       {
-        chemicals[c]->spray (amount);
+        chemicals[c]->spray_overhead (amount);
         return;
       }
   msg.warning ("Unknwon chemical '" + chem + "' ignored");
 }
 
 void 
-ChemistryStandard::dissipate (const symbol chem, const double amount,
-			      Treelog& msg)
+ChemistryStandard::spray_surface (const symbol chem, 
+                                  const double amount, Treelog& msg)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
     if (chemicals[c]->objid == chem)
       {
-        chemicals[c]->dissipate (amount);
+        chemicals[c]->spray_surface (amount);
+        return;
+      }
+  msg.warning ("Unknwon chemical '" + chem + "' ignored");
+}
+
+void 
+ChemistryStandard::dissipate_overhead (const symbol chem, const double amount,
+                                       Treelog& msg)
+{
+  for (size_t c = 0; c < chemicals.size (); c++)
+    if (chemicals[c]->objid == chem)
+      {
+        chemicals[c]->dissipate_overhead (amount);
+        return;
+      }
+  msg.warning ("Unknwon chemical '" + chem + "' ignored");
+}
+
+void 
+ChemistryStandard::dissipate_surface (const symbol chem, const double amount,
+                                      Treelog& msg)
+{
+  for (size_t c = 0; c < chemicals.size (); c++)
+    if (chemicals[c]->objid == chem)
+      {
+        chemicals[c]->dissipate_surface (amount);
         return;
       }
   msg.warning ("Unknwon chemical '" + chem + "' ignored");

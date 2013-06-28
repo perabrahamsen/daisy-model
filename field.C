@@ -89,7 +89,8 @@ struct Field::Implementation
              const Time&, Treelog&);
   void set_porosity (double at, double Theta, Treelog& msg);
   void set_heat_source (double at, double value);
-  void spray (symbol chemical, double amount, Treelog&); // [g/ha]
+  void spray_overhead (symbol chemical, double amount, Treelog&); // [g/ha]
+  void spray_surface (symbol chemical, double amount, Treelog&); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
 
   // Conditions.
@@ -413,15 +414,29 @@ Field::Implementation::set_heat_source (double at, double value)
 }
 
 void 
-Field::Implementation::spray (const symbol chemical, 
-                              const double amount, Treelog& msg) // [g/ha]
+Field::Implementation::spray_overhead (const symbol chemical, 
+                                       const double amount,
+                                       Treelog& msg) // [g/ha]
 {
   if (selected)
-    selected->spray (chemical, amount, msg);
+    selected->spray_overhead (chemical, amount, msg);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->spray (chemical, amount, msg);
+    (*i)->spray_overhead (chemical, amount, msg);
+}
+
+void 
+Field::Implementation::spray_surface (const symbol chemical, 
+                                       const double amount,
+                                       Treelog& msg) // [g/ha]
+{
+  if (selected)
+    selected->spray_surface (chemical, amount, msg);
+  else for (ColumnList::iterator i = columns.begin ();
+	    i != columns.end ();
+	    i++)
+    (*i)->spray_surface (chemical, amount, msg);
 }
 
 void 
@@ -888,9 +903,14 @@ Field::set_heat_source (double at, double value)
 { impl->set_heat_source (at, value); }
 
 void 
-Field::spray (const symbol chemical, const double amount,
-              Treelog& msg) // [g/ha]
-{ impl->spray (chemical, amount, msg); }
+Field::spray_overhead (const symbol chemical, const double amount,
+                       Treelog& msg) // [g/ha]
+{ impl->spray_overhead (chemical, amount, msg); }
+
+void 
+Field::spray_surface (const symbol chemical, const double amount,
+                      Treelog& msg) // [g/ha]
+{ impl->spray_surface (chemical, amount, msg); }
 
 void 
 Field::set_surface_detention_capacity (double height) // [mm]

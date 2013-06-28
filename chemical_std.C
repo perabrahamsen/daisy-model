@@ -82,8 +82,10 @@ struct ChemicalStandard : public Chemical
 
   // Management.
   double deposit_;
-  double spray_;
-  double dissipate_;
+  double spray_overhead_;
+  double spray_surface_;
+  double dissipate_overhead_;
+  double dissipate_surface_;
   double harvest_;
   double residuals;
   double surface_tillage;
@@ -206,8 +208,10 @@ struct ChemicalStandard : public Chemical
   // Management.
   void update_C (const Soil&, const SoilWater&);
   void deposit (const double flux); // [g/m^2/h]
-  void spray (const double amount); // [g/m^2]
-  void dissipate (const double amount); // [g/m^2]
+  void spray_overhead (const double amount); // [g/m^2]
+  void spray_surface (const double amount); // [g/m^2]
+  void dissipate_overhead (const double amount); // [g/m^2]
+  void dissipate_surface (const double amount); // [g/m^2]
   void harvest (const double removed, const double surface);
   void incorporate (const Geometry&, double amount, double from, double to);
   void incorporate (const Geometry&, double amount, const Volume&);
@@ -469,8 +473,10 @@ void
 ChemicalStandard::clear ()
 {
   deposit_ = 0.0;
-  spray_ = 0.0;
-  dissipate_ = 0.0;
+  spray_overhead_ = 0.0;
+  spray_surface_ = 0.0;
+  dissipate_overhead_ = 0.0;
+  dissipate_surface_ = 0.0;
   harvest_ = 0.0;
   residuals = 0.0;
   surface_tillage = 0.0;
@@ -673,18 +679,26 @@ ChemicalStandard::deposit (const double flux) // [g/m^2/h]
 { deposit_ += flux; }
 
 void 
-ChemicalStandard::spray (const double amount) // [g/m^2]
-{ spray_ += amount; }
+ChemicalStandard::spray_overhead (const double amount) // [g/m^2]
+{ spray_overhead_ += amount; }
 
 void 
-ChemicalStandard::dissipate (const double amount) // [g/m^2]
-{ dissipate_ += amount; }
+ChemicalStandard::spray_surface (const double amount) // [g/m^2]
+{ spray_surface_ += amount; }
+
+void 
+ChemicalStandard::dissipate_overhead (const double amount) // [g/m^2]
+{ dissipate_overhead_ += amount; }
+
+void 
+ChemicalStandard::dissipate_surface (const double amount) // [g/m^2]
+{ dissipate_surface_ += amount; }
 
 void 
 ChemicalStandard::harvest (const double removed, const double surface)
 { 
   const double new_storage 
-    = canopy_storage + spray_ - harvest_ - residuals;
+    = canopy_storage + harvest_ - residuals;
   const double gone = new_storage * removed;
   harvest_ += gone * (1.0 - surface); 
   residuals += gone * surface;
@@ -829,8 +843,10 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   TREELOG_MODEL (msg);
 
   // Fluxify management operations.
-  spray_ /= dt;
-  dissipate_ /= dt;
+  spray_overhead_ /= dt;
+  spray_surface_ /= dt;
+  dissipate_overhead_ /= dt;
+  dissipate_surface_ /= dt;
   harvest_ /= dt;
   residuals /= dt;
   surface_tillage /= dt;
@@ -841,7 +857,7 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   const double old_storage = snow_storage + canopy_storage + litter_storage;
 
   // Snow pack
-  snow_in = spray_ + deposit_;
+  snow_in = spray_overhead_ + deposit_;
   const double old_snow_storage = snow_storage;
   first_order_change (old_snow_storage, snow_in, snow_leak_rate, dt,
                       snow_storage, snow_out);
@@ -868,14 +884,14 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   canopy_out = canopy_washoff + residuals;
 
   // Volatilization bypasses the system.
-  spray_ += dissipate_;
-  snow_in += dissipate_;
-  snow_out += dissipate_;
-  canopy_in += dissipate_;
-  canopy_dissipate += dissipate_;
+  spray_overhead_ += dissipate_overhead_;
+  snow_in += dissipate_overhead_;
+  snow_out += dissipate_overhead_;
+  canopy_in += dissipate_overhead_;
+  canopy_dissipate += dissipate_overhead_;
 
   // Litter
-  const double below_canopy = canopy_out + canopy_bypass;
+  const double below_canopy = canopy_out + canopy_bypass + spray_surface_;
   litter_in = (canopy_out - residuals + canopy_bypass) * litter_cover
     + residuals;
   const double litter_bypass = below_canopy - litter_in;
@@ -918,7 +934,7 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
 
   // Mass balance.
   const double new_storage = snow_storage + canopy_storage + litter_storage;
-  const double input = spray_ + deposit_;
+  const double input = spray_overhead_ + spray_surface_ + deposit_;
   const double output = surface_in + canopy_harvest + canopy_dissipate 
     + litter_decompose;
   if (!approximate (new_storage, old_storage + (input - output) * dt)
@@ -933,6 +949,12 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
           << new_storage - old_storage - (input - output) * dt << " g/ha";
       msg.error (tmp.str ());
     }
+
+  // Surface volatilization also bypass system.
+  spray_surface_ += dissipate_surface_;
+  surface_in += dissipate_overhead_;
+  surface_decompose += dissipate_overhead_;
+
 }
 
 void
@@ -1378,7 +1400,9 @@ ChemicalStandard::output (Log& log) const
 
   // Management and climate fluxes.
   output_value (deposit_, "deposit", log);
-  output_value (spray_, "spray", log);
+  output_value (spray_overhead_, "spray_overhead", log);
+  output_value (spray_surface_, "spray_surface", log);
+  output_value (spray_overhead_ + spray_surface_, "spray", log);
   output_variable (surface_tillage, log);
   output_variable (litter_tillage, log);
 
@@ -1820,8 +1844,10 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
     initial_expr (Librarian::build_item<Number> (al, "initial")),
     adsorption_ (Librarian::build_item<Adsorption> (al, "adsorption")),
     deposit_ (0.0), 
-    spray_ (0.0),
-    dissipate_ (0.0),
+    spray_overhead_ (0.0),
+    spray_surface_ (0.0),
+    dissipate_overhead_ (0.0),
+    dissipate_surface_ (0.0),
     harvest_ (0.0),
     residuals (0.0),
     surface_tillage (0.0),
@@ -2139,6 +2165,10 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
     // Management and climate fluxes.
     frame.declare ("deposit", "g/m^2/h", Attribute::LogOnly,
                    "Amount deposited from the atmosphere.");
+    frame.declare ("spray_overhead", "g/m^2/h", Attribute::LogOnly,
+                   "Amount currently being applied above canopy.");
+    frame.declare ("spray_surface", "g/m^2/h", Attribute::LogOnly,
+                   "Amount currently being applied below canopy.");
     frame.declare ("spray", "g/m^2/h", Attribute::LogOnly,
                    "Amount currently being applied.");
     frame.declare ("surface_tillage", "g/m^2/h", Attribute::LogOnly, 

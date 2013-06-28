@@ -162,11 +162,11 @@ Irrigation::Event::tick (const Unit& u_mm, const Unit& u_storage,
   switch (target)
     {
     case overhead:
-      chemistry.spray (im, msg);
+      chemistry.spray_overhead (im, msg);
       break;
 
     case surface:
-      chemistry.spray (im, msg); // BUG!
+      chemistry.spray_surface (im, msg);
       break;
 
     case subsoil:

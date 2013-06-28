@@ -42,7 +42,7 @@ struct ActionSpray : public Action
     std::ostringstream tmp;
     tmp << "Spraying " << amount << " g " << chemical << "/ha";
     msg.message (tmp.str ());
-    daisy.field ().spray (chemical, amount, msg); 
+    daisy.field ().spray_overhead (chemical, amount, msg); 
   }
 
   void tick (const Daisy&, const Scope&, Treelog&)
@@ -79,5 +79,53 @@ Spray a chemical (typically a pesticide) on the field.")
     frame.order ("chemical", "amount");
   }
 } ActionSpray_syntax;
+
+struct ActionSpraySurface : public Action
+{
+  const symbol chemical;
+  const double amount;
+
+  void doIt (Daisy& daisy, const Scope&, Treelog& msg)
+  {
+    std::ostringstream tmp;
+    tmp << "Spraying " << amount << " g " << chemical << "/ha";
+    msg.message (tmp.str ());
+    daisy.field ().spray_surface (chemical, amount, msg); 
+  }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
+  ActionSpraySurface (const BlockModel& al)
+    : Action (al),
+      chemical (al.name ("chemical")),
+      amount (al.number ("amount"))
+  { }
+};
+
+// Add the ActionSpraySurface syntax to the syntax table.
+static struct ActionSpraySurfaceSyntax : DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ActionSpraySurface (al); }
+
+  ActionSpraySurfaceSyntax ()
+    : DeclareModel (Action::component, "spray_surface", "\
+Spray a chemical (typically a pesticide) on the field below the canopy.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.declare_string ("chemical", Attribute::Const,
+		"Name of pesticide to spray.");
+    frame.set_check ("chemical", Chemical::check_library ());
+    frame.declare ("amount", "g/ha", Check::non_negative (), Attribute::Const,
+		"Amount of pesticide to spray.");
+    frame.order ("chemical", "amount");
+  }
+} ActionSpraySurface_syntax;
 
 // action_spray.C ends here.

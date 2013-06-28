@@ -63,11 +63,16 @@ public:
   void deposit (const IM& im, Treelog&);
   virtual void deposit (symbol chem, double flux /* [g/m^2/h] */,
 			Treelog&) = 0;
-  void spray (const IM& im, Treelog&);
-  virtual void spray (symbol chem, double amount /* [g/m^2] */,
-		      Treelog&) = 0;
-  virtual void dissipate (symbol chem, double amount /* [g/m^2] */, 
-                          Treelog&) = 0;
+  void spray_overhead (const IM& im, Treelog&);
+  void spray_surface (const IM& im, Treelog&);
+  virtual void spray_overhead (symbol chem, double amount /* [g/m^2] */,
+                               Treelog&) = 0;
+  virtual void spray_surface (symbol chem, double amount /* [g/m^2] */,
+                              Treelog&) = 0;
+  virtual void dissipate_overhead (symbol chem, double amount /* [g/m^2] */, 
+                                   Treelog&) = 0;
+  virtual void dissipate_surface (symbol chem, double amount /* [g/m^2] */, 
+                                  Treelog&) = 0;
   virtual void harvest (double removed, double surface) = 0;
   virtual void mix (const Geometry&, const Soil&, const SoilWater&, 
                     double from, double to, double penetration) = 0;

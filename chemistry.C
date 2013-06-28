@@ -51,14 +51,26 @@ Chemistry::deposit (const IM& im, Treelog& msg)
 }
 
 void 
-Chemistry::spray (const IM& im, Treelog& msg)
+Chemistry::spray_overhead (const IM& im, Treelog& msg)
 { 
   const Unit& unit = units.get_unit (Chemical::surface_storage_unit ());
   for (IM::const_iterator i = im.begin (); i != im.end (); i++)
     {
       const symbol chem = *i;
       const double amount = im.get_value (chem, unit);
-      spray (chem, amount, msg);
+      spray_overhead (chem, amount, msg);
+    }
+}
+
+void 
+Chemistry::spray_surface (const IM& im, Treelog& msg)
+{ 
+  const Unit& unit = units.get_unit (Chemical::surface_storage_unit ());
+  for (IM::const_iterator i = im.begin (); i != im.end (); i++)
+    {
+      const symbol chem = *i;
+      const double amount = im.get_value (chem, unit);
+      spray_surface (chem, amount, msg);
     }
 }
 

@@ -57,8 +57,10 @@ struct ChemistryMulti : public Chemistry
   void check_ignore (const symbol chem, Treelog& msg);
   void update_C (const Soil&, const SoilWater&);
   void deposit (symbol chem, double flux, Treelog&);
-  void spray (symbol chem, double amount, Treelog&);
-  void dissipate (symbol chem, double amount, Treelog&);
+  void spray_overhead (symbol chem, double amount, Treelog&);
+  void spray_surface (symbol chem, double amount, Treelog&);
+  void dissipate_overhead (symbol chem, double amount, Treelog&);
+  void dissipate_surface (symbol chem, double amount, Treelog&);
   void harvest (double removed, double surface);
   void mix (const Geometry&, const Soil&, const SoilWater&, 
             double from, double to, double penetration);
@@ -194,7 +196,8 @@ ChemistryMulti::deposit (const symbol chem, const double flux, Treelog& msg)
 }
 
 void 
-ChemistryMulti::spray (const symbol chem, const double amount, Treelog& msg)
+ChemistryMulti::spray_overhead (const symbol chem, const double amount,
+                                Treelog& msg)
 {
   bool found = false;
 
@@ -205,7 +208,7 @@ ChemistryMulti::spray (const symbol chem, const double amount, Treelog& msg)
 	  msg.error ("Duplicate chemical '" + chem + "' detected");
 
 	Chemical& chemical = combine[c]->find (chem);
-        chemical.spray (amount);
+        chemical.spray_overhead (amount);
 	found = true;
       }
   
@@ -216,7 +219,8 @@ ChemistryMulti::spray (const symbol chem, const double amount, Treelog& msg)
 }
 
 void 
-ChemistryMulti::dissipate (const symbol chem, const double amount, Treelog& msg)
+ChemistryMulti::spray_surface (const symbol chem, const double amount,
+                               Treelog& msg)
 {
   bool found = false;
 
@@ -227,7 +231,53 @@ ChemistryMulti::dissipate (const symbol chem, const double amount, Treelog& msg)
 	  msg.error ("Duplicate chemical '" + chem + "' detected");
 
 	Chemical& chemical = combine[c]->find (chem);
-        chemical.dissipate (amount);
+        chemical.spray_surface (amount);
+	found = true;
+      }
+  
+  if (found)
+    return;
+
+  check_ignore (chem, msg);
+}
+
+void 
+ChemistryMulti::dissipate_overhead (const symbol chem, const double amount,
+                                    Treelog& msg)
+{
+  bool found = false;
+
+  for (size_t c = 0; c < combine.size (); c++)
+    if (combine[c]->know (chem))
+      {
+	if (found)
+	  msg.error ("Duplicate chemical '" + chem + "' detected");
+
+	Chemical& chemical = combine[c]->find (chem);
+        chemical.dissipate_overhead (amount);
+	found = true;
+      }
+  
+  if (found)
+    return;
+
+  check_ignore (chem, msg);
+}
+
+void 
+ChemistryMulti::dissipate_surface (const symbol chem, const double amount, 
+                                   Treelog& msg)
+{
+  bool found = false;
+
+  for (size_t c = 0; c < combine.size (); c++)
+    if (combine[c]->know (chem))
+      {
+	if (found)
+	  msg.error ("Duplicate chemical '" + chem + "' detected");
+
+	Chemical& chemical = combine[c]->find (chem);
+        chemical.dissipate_surface (amount);
 	found = true;
       }
   

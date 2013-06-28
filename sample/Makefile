@@ -7,7 +7,8 @@ LIBS 	= cz-sample.dai cz-management.dai \
 SETUPS  = test-organic.dai rootmatch.dai \
 	test-refman.dai genweather.dai test-GP2D.dai test-colloids.dai \
 	test-prd.dai test-aba.dai OpenMI_simple.dai OpenMI_management.dai \
-	heat-properties.dai batch.dai sample.dai test.dai DrainDrying.dai
+	heat-properties.dai batch.dai sample.dai test.dai DrainDrying.dai \
+	test-minimize.dai
 DATA = rootdata.ddf \
 	dk-foulum.dwf dk-jyndevad.dwf cz-valecov.dwf pl-jadwisin.dwf \
 	sk-bratislava.dwf it-bologna.dwf dk-taastrup.dwf example.gwt it-cer.gwt
