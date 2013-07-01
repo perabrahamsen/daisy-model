@@ -6,6 +6,18 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.16 
+
+** New action 'spray_surface'.
+
+Apply chemical directly to surface, ignoring canopy. The
+'irrigate_surface' and 'fertilize' actions now also ignore canopy.
+
+** The 'Freundlich' sorption model changed.
+
+The 'K_OC', 'K_clay', and 'm' parameters now all assumed they have
+been calibrated for 'C' having the unit mg/L, rather g/cm^3 as before.
+
 * 5.14
 
 ** Fix calculation of 'runoff'.
