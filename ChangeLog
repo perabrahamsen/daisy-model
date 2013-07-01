@@ -1,3 +1,7 @@
+2013-07-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 5.16 released.
+
 2013-07-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* adsorption_freundlich.C (C_to_M): 'm' should be based on mg/L.
