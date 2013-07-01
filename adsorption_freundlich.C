@@ -63,7 +63,7 @@ AdsorptionFreundlich::C_to_M (const Soil& soil,
   const double K = soil.clay (i) * K_clay 
     + soil.humus (i) * c_fraction_in_humus * K_OC;
   const double rho = soil.dry_bulk_density (i);
-  const double S = K * pow (C, m);
+  const double S = K * pow (C * 1e6, m) * 1e-6; // C is mg/L for use with m.
   return sf * rho * S + Theta * C;
 }
 
@@ -130,25 +130,26 @@ static struct AdsorptionFreundlichSyntax : DeclareModel
   }
   AdsorptionFreundlichSyntax ()
     : DeclareModel (Adsorption::component, "Freundlich", "\
-M = rho K C^m + Theta C")
+M = rho K C^m + Theta C. C is mg/L, M is mg/kg, or ppm.")
   { }
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.declare ("K_clay", "(g/cm^3)^-m", Check::non_negative (),
+    frame.declare ("K_clay", "(mg/L)^-m", Check::non_negative (),
 		Attribute::OptionalConst, 
 		"Clay dependent distribution parameter.\n\
 It is multiplied with the soil clay fraction to get the clay part of\n\
 the 'K' factor.  If 'K_OC' is specified, 'K_clay' defaults to 0.\n\
 The dimension depends on the 'm' parameter.");
-    frame.declare ("K_OC", "(g/cm^3)^-m", Check::non_negative (), 
+    frame.declare ("K_OC", "(mg/L)^-m", Check::non_negative (), 
 		Attribute::OptionalConst, 
 		"Humus dependent distribution parameter.\n\
 It is multiplied with the soil organic carbon fraction to get the\n\
 carbon part of the 'K' factor.  By default, 'K_OC' is equal to 'K_clay'.\n\
 The dimension depends on the 'm' parameter.");
     frame.declare ("m", Attribute::None (), Check::non_negative (), Attribute::Const,
-		"Freundlich parameter");
+		"Freundlich parameter.\n\
+Based on C having the unit mg/L.");
   }
 } AdsorptionFreundlich_syntax;
 
