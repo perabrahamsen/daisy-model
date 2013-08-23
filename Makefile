@@ -185,7 +185,8 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = summary_RsqrW.C gnuplot_profile.C zone_poly.C zone_box.C \
+MODELS = vegetation_afforestation.C \
+	summary_RsqrW.C gnuplot_profile.C zone_poly.C zone_box.C \
 	rootdens_growth.C gnuplot_vector.C program_optimize.C summary_Rsqr.C \
 	log_table.C xysource_profile.C program_rootmatch.C program_hmovie.C \
 	wsource_std.C wsource_time.C wsource_combine.C wsource_indirect.C\
@@ -816,14 +817,14 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
  log.h border.h model_framed.h model_logable.h destination.h scope.h \
  attribute.h run_Qt.h run.h treelog_text.h treelog.h program.h metalib.h \
  frame.h library.h librarian.h block_top.h block.h assertion.h path.h \
- frame_submodel.h uifilter.h
+ frame_submodel.h uifilter.h frame_model.h
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
  block.h scope.h attribute.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
 uifilter${OBJ}: uifilter.C uifilter.h model.h symbol.h block_model.h \
  block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
  frame.h librarian.h program.h run.h metalib.h library.h filepos.h \
- memutils.h assertion.h
+ memutils.h assertion.h frame_submodel.h
 zone${OBJ}: zone.C zone.h model.h symbol.h librarian.h
 wsource${OBJ}: wsource.C wsource_weather.h wsource.h weather.h weatherdata.h \
  symbol.h model_derived.h model_logable.h model.h scope.h attribute.h \
@@ -1473,6 +1474,18 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  point.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+vegetation_afforestation${OBJ}: vegetation_afforestation.C vegetation.h \
+ model_derived.h model_logable.h model.h symbol.h plf.h mathlib.h \
+ assertion.h log.h time.h border.h model_framed.h root_system.h \
+ rootdens.h ABAprod.h canopy_simple.h geometry.h attribute.h soil.h \
+ crop.h am.h im.h aom.h om.h organic.h submodeler.h block_submodel.h \
+ block_nested.h block.h scope.h treelog.h frame_submodel.h frame.h \
+ check.h librarian.h bioclimate.h soil_heat.h block_model.h frame_model.h
+summary_RsqrW${OBJ}: summary_RsqrW.C summary.h model.h symbol.h destination.h \
+ select.h units.h memutils.h volume.h model_derived.h model_logable.h \
+ attribute.h block_submodel.h block_nested.h block.h scope.h treelog.h \
+ frame_submodel.h frame.h block_model.h frame_model.h librarian.h time.h \
+ submodeler.h mathlib.h assertion.h vcheck.h
 gnuplot_profile${OBJ}: gnuplot_profile.C gnuplot_base.h gnuplot.h model.h \
  symbol.h column.h model_framed.h model_logable.h irrigate.h memutils.h \
  soil.h horizon.h model_derived.h geometry_rect.h geometry_vert.h \
@@ -1599,7 +1612,7 @@ drain_lateral${OBJ}: drain_lateral.C drain.h model_derived.h model_logable.h \
  model.h symbol.h geometry.h attribute.h soil.h soil_water.h soil_heat.h \
  surface.h uzmodel.h librarian.h block_model.h block_nested.h block.h \
  scope.h treelog.h frame_model.h frame.h mathlib.h assertion.h log.h \
- time.h border.h model_framed.h check.h draineqd.h
+ time.h border.h model_framed.h check.h draineqd.h depth.h
 hydraulic_MACRO${OBJ}: hydraulic_MACRO.C hydraulic.h model_derived.h \
  model_logable.h model.h symbol.h plf.h block_model.h block_nested.h \
  block.h scope.h attribute.h treelog.h frame_model.h frame.h mathlib.h \
@@ -2192,7 +2205,7 @@ select_array${OBJ}: select_array.C select.h destination.h symbol.h model.h \
 log_harvest${OBJ}: log_harvest.C log.h time.h symbol.h border.h \
  model_framed.h model_logable.h model.h daisy.h program.h run.h harvest.h \
  block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
- frame_model.h frame.h dlf.h version.h assertion.h librarian.h
+ frame_model.h frame.h dlf.h version.h assertion.h librarian.h format.h
 action_while${OBJ}: action_while.C action.h model_framed.h model_logable.h \
  model.h symbol.h frame.h scope.h attribute.h log.h time.h border.h \
  assertion.h memutils.h librarian.h treelog.h block_model.h \
