@@ -952,8 +952,8 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
 
   // Surface volatilization also bypass system.
   spray_surface_ += dissipate_surface_;
-  surface_in += dissipate_overhead_;
-  surface_decompose += dissipate_overhead_;
+  surface_in += dissipate_surface_;
+  surface_decompose += dissipate_surface_;
 
 }
 

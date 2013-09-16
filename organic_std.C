@@ -36,6 +36,7 @@
 #include "aom.h"
 #include "clayom.h"
 #include "soil.h"
+#include "soilph.h"
 #include "geometry.h"
 #include "soil_water.h"
 #include "soil_heat.h"
@@ -103,6 +104,7 @@ struct OrganicStandard : public OrganicMatter
   } buffer;
   const PLF heat_factor;
   const PLF water_factor;
+  const PLF pH_factor;
   std::vector<double> abiotic_factor;
   std::auto_ptr<ClayOM> clayom;
   const std::vector<boost::shared_ptr<const PLF>/**/> smb_tillage_factor;
@@ -173,12 +175,16 @@ struct OrganicStandard : public OrganicMatter
   double total_C (const Geometry& ) const;
   template<class DAOM>
   const double* find_abiotic (const DAOM& om, // AOM & DOM
+                              const Soil& soil,
+                              const SoilpH& soilph,
 			      const SoilWater& soil_water, 
 			      const SoilHeat& soil_heat,
 			      const std::vector<double>& default_value,
 			      std::vector<double>& scratch) const;
   const double* find_abiotic (const OM& om, // SOM & SMB
-			      const SoilWater& soil_water, 
+                              const Soil& soil,
+                              const SoilpH& soilph,
+  			      const SoilWater& soil_water, 
 			      const SoilHeat& soil_heat,
 			      const std::vector<boost::shared_ptr<const PLF>/**/> tillage_factor,
                               const std::vector<double>& tillage_age,
@@ -188,17 +194,19 @@ struct OrganicStandard : public OrganicMatter
 			      std::vector<double>& scratch) const;
 
   double water_turnover_factor (double h) const;
+  double pH_turnover_factor (double pH) const;
   std::vector<double> clay_turnover_factor;
   std::vector<double> soil_turnover_factor;
   void input_from_am (std::vector<double>& destination, 
-		      double T, double h, const int lay) const;
-  double total_input_from_am (double T, double h, const int lay) const;
-  double abiotic (const OM& om, double T, double h, 
+		      double T, double h, double pH, const int lay) const;
+  double total_input_from_am (double T, double h, double pH, 
+                              const int lay) const;
+  double abiotic (const OM& om, double T, double h, double pH,
 		  bool use_clay, int lay) const;
   static std::vector<double> SOM_limit_normalize (const std::vector<double>& limit, 
                                                   const std::vector<double>& fractions);
   void partition (const std::vector<double>& am_input, double total_input,
-                  double T, double h, 
+                  double T, double h, double pH,
 		  int lay, double total_C, 
 		  int variable_pool, int variable_pool_2, 
 		  double background_mineralization, bool top_soil,
@@ -220,7 +228,7 @@ struct OrganicStandard : public OrganicMatter
 		     const std::vector<double>& SOM_C_per_N_goal,
 		     const std::vector<double>& SMB_results, int lay);
   std::string top_summary (const Geometry& geo,
-                           const Soil&, const Initialization&,
+                           const Soil&, const SoilpH&, const Initialization&,
                            const double zone_delta_N, 
                            const double zone_delta_C) const;
 
@@ -228,7 +236,7 @@ struct OrganicStandard : public OrganicMatter
   void clear ();
   void monthly (const Metalib&, const Geometry&, Treelog&);
   const std::vector<bool>& active () const;
-  void tick (const Geometry& geo,
+  void tick (const Geometry& geo, const Soil& soil, const SoilpH&, 
              const SoilWater&, const SoilHeat&, 
              const std::vector<double>& tillage_age,
 	     Chemistry&, double dt, Treelog& msg);
@@ -265,7 +273,8 @@ struct OrganicStandard : public OrganicMatter
   AM* find_am (symbol sort, symbol part) const;
   void initialize (const Metalib&, 
                    const Units&, const Frame&, const Geometry& geo,
-                   const Soil&, const SoilWater&, const SoilHeat&,
+                   const Soil&, const SoilpH&, 
+                   const SoilWater&, const SoilHeat&,
 		   double T_avg, Treelog&);
   OrganicStandard ();
   OrganicStandard (const OrganicStandard&);
@@ -717,6 +726,15 @@ OrganicStandard::water_turnover_factor (double h) const
   return Abiotic::f_h (h);
 }
 
+double
+OrganicStandard::pH_turnover_factor (double pF) const
+{
+  if (pH_factor.size () > 0)
+    return pH_factor (pF);
+  
+  return 1.0;
+}
+
 void
 OrganicStandard::Buffer::initialize (const Geometry& geo)
 { 
@@ -993,6 +1011,8 @@ OrganicStandard::monthly (const Metalib& metalib, const Geometry& geo,
 template <class DAOM>
 const double*
 OrganicStandard::find_abiotic (const DAOM& om,
+                               const Soil& soil,
+                               const SoilpH& soilph,
                                const SoilWater& soil_water, 
                                const SoilHeat& soil_heat,
                                const std::vector<double>& 
@@ -1022,12 +1042,17 @@ OrganicStandard::find_abiotic (const DAOM& om,
 	scratch[i] *= om.water_factor (h);
       else
 	scratch[i] *= water_turnover_factor (h);
+
+      const double pH = soilph.pH (i);
+      scratch[i] *= pH_turnover_factor (pH);
     }
   return &scratch[0];
 }
 
 const double*
 OrganicStandard::find_abiotic (const OM& om,
+                               const Soil& soil,
+                               const SoilpH& soilph,
                                const SoilWater& soil_water, 
                                const SoilHeat& soil_heat,
                                const std::vector<boost::shared_ptr<const PLF>/**/> tillage_factor,
@@ -1069,6 +1094,9 @@ OrganicStandard::find_abiotic (const OM& om,
 	    scratch[i] *= om.water_factor (h);
 	  else
 	    scratch[i] *= water_turnover_factor (h);
+
+          const double pH = soilph.pH (i);
+          scratch[i] *= pH_turnover_factor (pH);
 	}
     }
   else
@@ -1084,6 +1112,8 @@ OrganicStandard::find_abiotic (const OM& om,
 
 void 
 OrganicStandard::tick (const Geometry& geo,
+                       const Soil& soil,
+                       const SoilpH& soilph,
                        const SoilWater& soil_water, 
                        const SoilHeat& soil_heat,
                        const std::vector<double>& tillage_age,
@@ -1159,7 +1189,9 @@ OrganicStandard::tick (const Geometry& geo,
       const double T = soil_heat.T (i);
       const double heat = Abiotic::f_T0 (T);
       const double water = water_turnover_factor (h);
-      abiotic_factor[i] = heat * water;
+      const double pH = soilph.pH (i);
+      const double pH_factor =  pH_turnover_factor (pH);
+      abiotic_factor[i] = heat * water * pH_factor;
       clay_factor[i] = abiotic_factor[i] * clay_turnover_factor [i];
       soil_factor[i] = abiotic_factor[i] * soil_turnover_factor [i];
     }
@@ -1168,7 +1200,8 @@ OrganicStandard::tick (const Geometry& geo,
   for (size_t j = 0; j < dom.size (); j++)
     {
       const double *const abiotic 
-	= find_abiotic (*dom[j], soil_water, soil_heat, soil_factor, 
+	= find_abiotic (*dom[j], soil, soilph, 
+                        soil_water, soil_heat, soil_factor, 
                         tillage_factor);
       double *const CO2 = dom[j]->turnover_rate > CO2_threshold 
 	? &CO2_fast_[0] 
@@ -1182,7 +1215,7 @@ OrganicStandard::tick (const Geometry& geo,
       const std::vector<double>& default_factor = 
 	use_clay ? clay_factor : soil_factor;
       const double *const abiotic 
-	= find_abiotic (*smb[j], soil_water, soil_heat,
+	= find_abiotic (*smb[j], soil, soilph, soil_water, soil_heat,
 			smb_tillage_factor, tillage_age, j,
 			default_factor, use_clay, tillage_factor);
       double *const CO2 = smb[j]->turnover_rate > CO2_threshold 
@@ -1198,7 +1231,7 @@ OrganicStandard::tick (const Geometry& geo,
       const std::vector<double>& default_factor = 
 	use_clay ? clay_factor : soil_factor;
       const double *const abiotic 
-	= find_abiotic (*som[j], soil_water, soil_heat,
+	= find_abiotic (*som[j], soil, soilph, soil_water, soil_heat,
 			som_tillage_factor, tillage_age, j,
 			default_factor, use_clay, tillage_factor);
       double *const CO2 = som[j]->turnover_rate > CO2_threshold 
@@ -1211,7 +1244,7 @@ OrganicStandard::tick (const Geometry& geo,
   for (size_t j = 0; j < added.size (); j++)
     {
       const double *const abiotic 
-	= find_abiotic (*added[j], soil_water, soil_heat,
+	= find_abiotic (*added[j], soil, soilph, soil_water, soil_heat,
 			soil_factor, tillage_factor);
       double *const CO2 = added[j]->turnover_rate > CO2_threshold 
 	? &CO2_fast_[0] 
@@ -1386,7 +1419,7 @@ OrganicStandard::find_am (const symbol sort,
 
 void
 OrganicStandard::input_from_am (std::vector<double>& destination,
-                                double T, double h,
+                                double T, double h, double pH,
                                 const int lay) const
 {
   // Calculate the input from all aom in soil layer lay to all destinations. 
@@ -1405,7 +1438,7 @@ OrganicStandard::input_from_am (std::vector<double>& destination,
       {
 	daisy_assert (added[i]->fractions.size () == size);
 	const double abiotic_factor 
-	  = abiotic (*added[i], T, h, false, lay);
+	  = abiotic (*added[i], T, h, pH, false, lay);
 	// For SMB pools.
 	for (size_t pool = 0; pool < som_pool ; pool++)
 	  destination[pool] += added[i]->C[lay] 
@@ -1423,7 +1456,7 @@ OrganicStandard::input_from_am (std::vector<double>& destination,
 }
 
 double
-OrganicStandard::total_input_from_am (double T, double h,
+OrganicStandard::total_input_from_am (double T, double h, double pH,
                                       const int lay) const
 {
   const size_t som_pool = smb.size ();
@@ -1438,7 +1471,7 @@ OrganicStandard::total_input_from_am (double T, double h,
     if (added[i]->C.size () > lay)
       {
 	const double abiotic_factor 
-	  = abiotic (*added[i], T, h, false, lay);
+	  = abiotic (*added[i], T, h, pH, false, lay);
 	// For SMB pools.
 	for (size_t pool = 0; pool < som_pool ; pool++)
 	  total += added[i]->C[lay] 
@@ -1457,7 +1490,7 @@ OrganicStandard::total_input_from_am (double T, double h,
 
 				     
 double
-OrganicStandard::abiotic (const OM& om, double T, double h,
+OrganicStandard::abiotic (const OM& om, double T, double h, double pH,
                           bool use_clay, int lay) const
 {
   return ((om.heat_factor.size () > 0) 
@@ -1466,6 +1499,7 @@ OrganicStandard::abiotic (const OM& om, double T, double h,
     * ((om.water_factor.size () > 0)
        ? om.water_factor (h)
        : water_turnover_factor (h))
+    * pH_turnover_factor (pH)
     * (use_clay ? clay_turnover_factor[lay] : soil_turnover_factor[lay]);
 }
 
@@ -1524,7 +1558,7 @@ OrganicStandard::SOM_limit_normalize
 void
 OrganicStandard::partition (const std::vector<double>& am_input,
                             const double total_input,
-                            const double T, const double h,
+                            const double T, const double h, const double pH,
                             const int lay, const double total_C,
                             const int variable_pool,
                             const int variable_pool_2,
@@ -1627,7 +1661,7 @@ OrganicStandard::partition (const std::vector<double>& am_input,
 	  // Add contributions from SMB pools.
 	  for (size_t i = 0; i < smb_size; i++)
 	    {
-	      const double abiotic_factor = abiotic (*smb[i], T, h,
+	      const double abiotic_factor = abiotic (*smb[i], T, h, pH,
 						     clayom->smb_use_clay (i),
 						     lay);
 	      const double out = (i == pool)
@@ -1646,7 +1680,7 @@ OrganicStandard::partition (const std::vector<double>& am_input,
 	  // Add contributions from SOM pools.
 	  for (size_t i = 0; i < som_size; i++)
 	    {
-	      const double abiotic_factor = abiotic (*som[i], T, h,
+	      const double abiotic_factor = abiotic (*som[i], T, h, pH,
 						     clayom->som_use_clay (i),
 						     lay);
 	      const double in = som[i]->turnover_rate 
@@ -1675,7 +1709,7 @@ OrganicStandard::partition (const std::vector<double>& am_input,
 	  // Add contributions from SMB pools.
 	  for (size_t i = 0; i < smb_size; i++)
 	    {
-	      const double abiotic_factor = abiotic (*smb[i], T, h,
+	      const double abiotic_factor = abiotic (*smb[i], T, h, pH,
 						     clayom->smb_use_clay (i),
 						     lay);
 	      const double in = smb[i]->turnover_rate 
@@ -1689,7 +1723,7 @@ OrganicStandard::partition (const std::vector<double>& am_input,
 	  // Add contributions from SOM pools.
 	  for (size_t i = 0; i < som_size; i++)
 	    {
-	      const double abiotic_factor = abiotic (*som[i], T, h,
+	      const double abiotic_factor = abiotic (*som[i], T, h, pH,
 						     clayom->som_use_clay (i), 
 						     lay);
 	      const double out = (i == pool)
@@ -2127,6 +2161,7 @@ Setting additional pool to zero");
 std::string
 OrganicStandard::top_summary (const Geometry& geo,
                               const Soil& soil,
+                              const SoilpH& soilph,
                               const Initialization& init,
                               const double zone_delta_N, 
                               const double zone_delta_C) const
@@ -2247,7 +2282,7 @@ OrganicStandard::top_summary (const Geometry& geo,
       const double total_input 
         = (init.input >= 0)
         ? init.find_total_input (lay)
-        : total_input_from_am (init.T, init.h, lay);
+        : total_input_from_am (init.T, init.h, soilph.pH (lay), lay);
       input += total_input * v * g_per_cm2_per_h_to_kg_per_ha_per_y;
     }
   clay /= volume;
@@ -2361,6 +2396,7 @@ OrganicStandard::initialize (const Metalib& metalib,
                              const Units& units, const Frame& al,
                              const Geometry& geo,
                              const Soil& soil, 
+                             const SoilpH& soilph,
                              const SoilWater& soil_water,
                              const SoilHeat& soil_heat,
                              double T_avg, Treelog& msg)
@@ -2514,11 +2550,11 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
         if (init.input >= 0)
           init.find_input (am_input, lay);
         else
-          input_from_am (am_input, init.T, init.h, lay);
+          input_from_am (am_input, init.T, init.h, soilph.pH (lay), lay);
         const double total_input 
           = (init.input >= 0)
           ? init.find_total_input (lay)
-          : total_input_from_am (init.T, init.h, lay);
+          : total_input_from_am (init.T, init.h, soilph.pH (lay), lay);
       
         const bool top_soil = geo.cell_z (lay) > init.end;
         const double background_mineralization = 
@@ -2528,7 +2564,7 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
           : -42.42e42;
         double delta_C;
         double delta_N;
-        partition (am_input, total_input, init.T, init.h, 
+        partition (am_input, total_input, init.T, init.h, soilph.pH (lay),
                    lay, total_C[lay], init.variable_pool, init.variable_pool_2,
                    background_mineralization, top_soil,
                    soil.SOM_fractions (lay), 
@@ -2587,7 +2623,7 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
   // Print top summary.
   {
     const std::string summary 
-      = top_summary (geo, soil, init, zone_delta_N, zone_delta_C);
+      = top_summary (geo, soil, soilph, init, zone_delta_N, zone_delta_C);
 
     Treelog::Open nest (msg, "Top soil summary");
     if (init.debug_to_screen)
@@ -2625,6 +2661,7 @@ OrganicStandard::OrganicStandard (const BlockModel& al)
     buffer (al.submodel ("buffer")),
     heat_factor (al.plf ("heat_factor")),
     water_factor (al.plf ("water_factor")),
+    pH_factor (al.plf ("pH_factor")),
     clayom (Librarian::build_item<ClayOM> (al, "ClayOM")),
     smb_tillage_factor (al.plf_sequence ("smb_tillage_factor")),
     som_tillage_factor (al.plf_sequence ("som_tillage_factor")),
@@ -3072,6 +3109,10 @@ Default water potential factor, used if not specified by OM pool.\n\
 If the PLF is empty, a build-in PLF of pF will be used instead.\n\
 It is 0.6 at pF < 0, 1.0 at 1.5 < pF < 2.5, and 0 at pF > 6.5.");
     frame.set ("water_factor", PLF::empty ());
+    frame.declare ("pH_factor", "pH", Attribute::None (), 
+                   Check::non_negative (), Attribute::Const, "\
+Soil pH influence on organic matter turnover. By default, pH is ignored.");
+    frame.set ("pH_factor", PLF::empty ());
     frame.declare ("abiotic_factor", Attribute::None (), 
                Attribute::LogOnly, Attribute::SoilCells,
                "Product of current heat and water factors."); 

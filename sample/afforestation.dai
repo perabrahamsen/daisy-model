@@ -1,6 +1,7 @@
 ;;; afforestation.dai -- Sample setup using afforestation.
 
 (input file "dk-soil.dai")
+(input file "log-std.dai")
 
 (defvegetation Oak afforestation
   "A growing oak forest."
@@ -50,7 +51,6 @@
   (rhizodeposition_C_per_N 50 [])
 
   ;; Constant parameters inherited from the 'permanent' model.
-  (LAIfactor 0.5 [])	
   (Canopy (IntcpCap 0.3 [mm])
           (rs_min 70.0)
           (EpFac 1.136 [])))
@@ -58,20 +58,21 @@
 (defcolumn Oak Askov
   (Vegetation Oak)
   ;; Change in pH with depth, as a function of calendar year.
-  (Soil (pH_depth_year (1970 (  0 [cm] 7.0 [pH]) (-100 [cm] 7.0 [pH]))
-                       (1980 (  0 [cm] 6.5 [pH]) ( -10 [cm] 6.5 [pH])
-                             (-20 [cm] 7.0 [pH]) (-100 [cm] 7.0 [pH]))
-                       (2000 (  0 [cm] 6.0 [pH]) ( -10 [cm] 6.0 [pH])
-                             (-20 [cm] 6.8 [pH]) (-100 [cm] 7.0 [pH]))))
+  (SoilpH year
+          (pH_depth_year (1970 ((-100 [cm] 7.0 [pH]) (  0 [cm] 7.0 [pH])))
+                         (1980 ((-100 [cm] 7.0 [pH]) (-20 [cm] 7.0 [pH])
+                                ( -10 [cm] 6.5 [pH]) (  0 [cm] 6.5 [pH])))
+                         (2000 ((-100 [cm] 7.0 [pH]) (-20 [cm] 6.8 [pH])
+                                ( -10 [cm] 6.0 [pH]) (  0 [cm] 6.0 [pH])))))
   ;; Choose a deposition model that depends on vegetation.
   (Bioclimate original 
-              (Deposition Gundersen_et_al))
-  (OrganicMatter none)
-  (Chemistry none)
+              (deposition Gundersen_et_al))
+  (OrganicMatter original
+                 (pH_factor (5 [pH] 0 []) (7 [pH] 1 []) (9 [pH] 0 [])))
   (Groundwater deep))
 
 (defprogram Oak Daisy
-  (weather default "dk-vestskoven.dwf")
+  (weather default "dk-taastrup.dwf")
   (column Oak)
   (time 2000 12 1 23)
   (stop 2002 12 31 0)

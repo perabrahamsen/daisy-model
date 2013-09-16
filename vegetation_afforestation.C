@@ -47,35 +47,30 @@
 
 struct VegetationAfforestation : public Vegetation
 {
-  // Reference time for yearly growth.
+  // Afforestation parameters.
   const Time planting_time;
-  
+  const PLF canopy_height;
+  const PLF root_depth;
+  const PLF LAI_shape;
+  const PLF LAI_min;
+  const PLF LAI_max;
+  const PLF N_nonleaves;
+  const double N_per_LAI;       // kg N/ha
+  const PLF litterfall_shape;   // d -> []
+  const PLF litterfall_total;   // y -> Mg DM/ha
+  const double litterfall_C_per_DM; // kg C/kg DM
+  const double litterfall_C_per_N; // kg C/kg N 
+  const PLF rhizodeposition_shape; // d -> []
+  const PLF rhizodeposition_total;  // y -> Mg C/ha
+  const double rhizodeposition_C_per_N; // kg C/kg N 
+  const double DM_per_LAI;      // Mg DM/ha/LAI
 
-  // *** HERTIL ***
-
-  // Canopy.
-  class YearlyLAI
-  {
-    /* const */ std::vector<int> years;
-    /* const */ std::vector<PLF> LAIvsDAY;
-
-    // use.
-  public:
-    double operator() (int year, int yday);
-    
-    // Create;
-    static void load_syntax (Frame&);
-    YearlyLAI (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& als);
-  } yearly_LAI;
-  const PLF LAIvsDAY;		// LAI as a function of time.
-  const double LAIfactor;       // Multiply by this. []
+  // Vegetation.
   boost::scoped_ptr<CanopySimple> canopy;
   double cover_;		// Fraction of soil covered by crops [0-1]
   PLF HvsLAI_;			// Height with LAI below [f: R -> cm]
 
   // Nitrogen.
-  const double N_per_LAI;	// Pot N content as function of LAI [g N/m^2]
-  const double DM_per_LAI;	// DM as function of LAI [Mg DM/ha]
   double N_demand;		// Current potential N content. [g N/m^2]
   double N_actual;		// Current N content. [g N/m^2]
   AM* AM_litter;                // Dead plant matter.
@@ -153,6 +148,7 @@ struct VegetationAfforestation : public Vegetation
 
   // Simulation.
   void reset_canopy_structure (const Time& time);
+  void reset_canopy_structure (double y, double d);
   double transpiration (const Units&, double potential_transpiration,
 			double canopy_evaporation,
                         const Geometry& geo,
@@ -217,56 +213,29 @@ struct VegetationAfforestation : public Vegetation
   ~VegetationAfforestation ();
 };
 
-double 
-VegetationAfforestation::YearlyLAI::operator() (int year, int yday)
-{
-  for (unsigned int i = 0; i < years.size (); i++)
-    {
-      if (years[i] == year)
-	{
-	  if (yday < LAIvsDAY[i].x (0))
-	    return -1.0;
-
-	  if (yday > LAIvsDAY[i].x (LAIvsDAY[i].size () - 1))
-	    return -1.0;
-
-	  return LAIvsDAY[i](yday);
-	}
-    }
-  return -1.0;
-}
-    
-void 
-VegetationAfforestation::YearlyLAI::load_syntax (Frame& frame)
-{
-  frame.declare_integer ("year", Attribute::Const, "\
-Year for which to use yearly LAI measurements.");
-  frame.declare ("LAIvsDAY", "m^2/m^2", "yday", Attribute::OptionalConst, 
-		"LAI as a function of Julian day.\n\
-\n\
-The default LAI will be used before the first day you specify and\n\
-after the last specified day.  Default LAI will also be used\n\
-whenever 'LAIvsDAY' becomes negative.");
-  frame.order ("year", "LAIvsDAY");
-}
-
-VegetationAfforestation::YearlyLAI::YearlyLAI
-/**/ (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& als)
-{
-  for (unsigned int i = 0; i < als.size (); i++)
-    {
-      years.push_back (als[i]->integer ("year"));
-      LAIvsDAY.push_back (als[i]->plf ("LAIvsDAY"));
-    }
-}
-
 void
 VegetationAfforestation::reset_canopy_structure (const Time& time)
 {
-  canopy->CAI = yearly_LAI (time.year (), time.yday ());
-  if (canopy->CAI < 0.0)
-    canopy->CAI = LAIvsDAY (time.yday ());
-  canopy->CAI *= LAIfactor;
+  const double y = Time::fraction_hours_between (planting_time, time) 
+    / (24.0 * 365.2425);
+  const double d = time.yday () + time.hour () / 24.0;
+  
+  reset_canopy_structure (y, d);
+}
+
+void
+VegetationAfforestation::reset_canopy_structure (const double y, const double d)
+{
+  // Calculate actual LAI (L) from LAI shape (S).
+  const double L_min = LAI_min (y);
+  const double L_max = LAI_max (y);
+  const double S = LAI_shape (d);
+  const double S_min = 1.0;
+  const double S_max = 5.0;
+  const double L = L_min + (S - S_min) * (L_max - L_min) / (S_max - S_min);
+    
+  canopy->Height = canopy_height (y);
+  canopy->CAI = L;
   cover_ =  1.0 - exp (-(canopy->EPext * canopy->CAI));
   daisy_assert (cover_ >= 0.0);
   daisy_assert (cover_ <= 1.0);
@@ -277,20 +246,25 @@ VegetationAfforestation::reset_canopy_structure (const Time& time)
 }
 void
 VegetationAfforestation::tick (const Metalib& metalib,
-                           const Time& time, const Bioclimate& bioclimate, 
-                           const Geometry& geo, const Soil& soil, 
-                           const SoilHeat& soil_heat,
-			   SoilWater& soil_water, Chemistry& chemistry,
-			   OrganicMatter& organic_matter,
-			   double& residuals_DM,
-			   double& residuals_N_top, double& residuals_C_top,
-			   std::vector<double>& /* residuals_N_soil */,
-			   std::vector<double>& /* residuals_C_soil */,
-                           const double dt, Treelog& msg)
+                               const Time& time, const Bioclimate& bioclimate, 
+                               const Geometry& geo, const Soil& soil, 
+                               const SoilHeat& soil_heat,
+                               SoilWater& soil_water, Chemistry& chemistry,
+                               OrganicMatter& organic_matter,
+                               double& residuals_DM,
+                               double& residuals_N_top, double& residuals_C_top,
+                               std::vector<double>& /* residuals_N_soil */,
+                               std::vector<double>& /* residuals_C_soil */,
+                               const double dt, Treelog& msg)
 {
+  // Time.
+  const double y = Time::fraction_hours_between (planting_time, time) 
+    / (24.0 * 365.2425);
+  const double d = time.yday () + time.hour () / 24.0;
+
   // Canopy.
   const double old_LAI = canopy->CAI;
-  reset_canopy_structure (time);
+  reset_canopy_structure (y, d);
 
   // Root system.
   const double day_fraction = bioclimate.day_fraction (dt);
@@ -299,7 +273,7 @@ VegetationAfforestation::tick (const Metalib& metalib,
   root_system->tick_dynamic (T_soil, day_fraction, soil_water, dt);
 
   // Nitrogen uptake.
-  N_demand = canopy->CAI * N_per_LAI;
+  N_demand = canopy->CAI * N_per_LAI + N_nonleaves (y);
   if (N_actual < -1e10)
     N_actual = N_demand;	// Initialization.
   else
@@ -405,14 +379,25 @@ VegetationAfforestation::check (const Units& units,
 VegetationAfforestation::VegetationAfforestation (const BlockModel& al)
   : Vegetation (al),
     planting_time (al.submodel ("planting_time")),
+    canopy_height (al.plf ("canopy_height")),
+    root_depth (al.plf ("root_depth")),
+    LAI_shape (al.plf ("LAI_shape")),
+    LAI_min (al.plf ("LAI_min")),
+    LAI_max (al.plf ("LAI_max")),
+    N_nonleaves (al.plf ("N_nonleaves")),
+    N_per_LAI (al.number ("N_per_LAI")),
+    litterfall_shape (al.plf ("litterfall_shape")), 
+    litterfall_total (al.plf ("litterfall_total")),
+    litterfall_C_per_DM (al.number ("litterfall_C_per_DM")),
+    litterfall_C_per_N (al.number ("litterfall_C_per_N")),
+    rhizodeposition_shape (al.plf ("rhizodeposition_shape")),
+    rhizodeposition_total (al.plf ("rhizodeposition_total")),
+    rhizodeposition_C_per_N (al.number ("rhizodeposition_C_per_N")),
+    DM_per_LAI (al.number ("DM_per_LAI")),
     // *** HERTIL ***
-    yearly_LAI (al.submodel_sequence ("YearlyLAI")),
-    LAIvsDAY (al.plf ("LAIvsDAY")),
-    LAIfactor (al.number ("LAIfactor")),
+
     canopy (submodel<CanopySimple> (al, "Canopy")),
     cover_ (-42.42e42),
-    N_per_LAI (al.number ("N_per_LAI") * 0.1), // [kg N / ha] -> [g N / m^2]
-    DM_per_LAI (al.number ("DM_per_LAI")),
     N_demand (0.0),
     N_actual (al.number ("N_actual", -42.42e42)),
     AM_litter (NULL),
@@ -422,9 +407,7 @@ VegetationAfforestation::VegetationAfforestation (const BlockModel& al)
     root_system (submodel<RootSystem> (al, "Root")),
     WRoot (al.number ("root_DM") * 100.0), // [Mg DM / ha] -> [g DM / m^2]
     albedo_ (al.number ("Albedo"))
-{
-  canopy->Height = al.number ("Height");
-}
+{ }
 
 VegetationAfforestation::~VegetationAfforestation ()
 { }
@@ -529,11 +512,6 @@ Litter AOM parameters.");
     frame.declare ("Albedo", Attribute::None (), Check::positive (), Attribute::Const, 
 		"Reflection factor.");
     frame.set ("Albedo", 0.2);
-
-    frame.declare ("LAIfactor", Attribute::None (), Check::non_negative (),
-                   Attribute::Const, "\
-Multiply calculated LAI with this number for quick scaling.");
-    frame.set ("LAIfactor", 1.0);
     frame.declare_submodule("Canopy", Attribute::State, "Canopy.",
 			 CanopySimple::load_syntax);
 

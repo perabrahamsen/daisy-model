@@ -272,7 +272,8 @@ DISABLED = depend.C \
 	hydraulic_old.C hydraulic_old2.C 
 # A component is a common interface to a number of models.
 # 
-COMPONENTS = uifilter.C zone.C wsource.C solute.C drain.C \
+COMPONENTS = soilph.C \
+	deposition.C uifilter.C zone.C wsource.C solute.C drain.C \
 	draineqd.C condedge.C rainergy.C ponddamp.C scope_model.C seed.C \
 	stomatacon.C tertiary.C biopore.C secondary.C heatrect.C unit_model.C \
 	ABAprod.C solver.C element.C ui.C reaction.C scopesel.C \
@@ -821,6 +822,15 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
  block.h scope.h attribute.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
+soilph${OBJ}: soilph.C soilph.h model_derived.h model_logable.h model.h \
+ symbol.h log.h time.h border.h model_framed.h block_model.h \
+ block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
+ frame.h submodeler.h block_submodel.h frame_submodel.h librarian.h \
+ check.h vcheck.h plf.h memutils.h assertion.h geometry.h
+deposition${OBJ}: deposition.C deposition.h model_derived.h model_logable.h \
+ model.h symbol.h im.h attribute.h log.h time.h border.h model_framed.h \
+ weather.h weatherdata.h block_model.h block_nested.h block.h scope.h \
+ treelog.h frame_model.h frame.h librarian.h
 uifilter${OBJ}: uifilter.C uifilter.h model.h symbol.h block_model.h \
  block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
  frame.h librarian.h program.h run.h metalib.h library.h filepos.h \
@@ -1952,7 +1962,7 @@ organic_std${OBJ}: organic_std.C organic.h model_derived.h model_logable.h \
  model.h symbol.h frame_submodel.h frame.h scope.h attribute.h \
  frame_model.h submodeler.h block_submodel.h block_nested.h block.h \
  treelog.h log.h time.h border.h model_framed.h am.h im.h om.h plf.h \
- som.h smb.h dom.h domsorp.h aom.h clayom.h soil.h geometry.h \
+ som.h smb.h dom.h domsorp.h aom.h clayom.h soil.h soilph.h geometry.h \
  soil_water.h soil_heat.h chemistry.h chemical.h bioincorporation.h \
  abiotic.h mathlib.h assertion.h check_range.h check.h vcheck.h gaussj.h \
  memutils.h librarian.h library.h metalib.h block_model.h column.h \
@@ -2231,12 +2241,12 @@ macro_none${OBJ}: macro_none.C macro.h model.h symbol.h librarian.h frame.h \
 column_std${OBJ}: column_std.C column.h model_framed.h model_logable.h \
  model.h symbol.h irrigate.h memutils.h library.h surface.h uzmodel.h \
  soil_heat.h movement.h model_derived.h drain.h groundwater.h geometry.h \
- attribute.h soil.h soil_water.h vegetation.h litter.h bioclimate.h \
- wsource.h weather.h weatherdata.h scope.h chemistry.h chemical.h \
- organic.h im.h am.h dom.h plf.h time.h log.h border.h submodeler.h \
- block_submodel.h block_nested.h block.h treelog.h frame_submodel.h \
- frame.h scope_multi.h scopesel.h units.h librarian.h assertion.h \
- frame_model.h block_model.h mathlib.h
+ attribute.h soil.h soilph.h soil_water.h vegetation.h litter.h \
+ bioclimate.h wsource.h weather.h weatherdata.h scope.h chemistry.h \
+ chemical.h organic.h im.h am.h dom.h plf.h time.h log.h border.h \
+ submodeler.h block_submodel.h block_nested.h block.h treelog.h \
+ frame_submodel.h frame.h scope_multi.h scopesel.h units.h librarian.h \
+ assertion.h frame_model.h block_model.h mathlib.h
 uzrichard${OBJ}: uzrichard.C uzmodel.h model.h symbol.h block_model.h \
  block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
  frame.h groundwater.h model_derived.h model_logable.h surface.h \
@@ -2369,8 +2379,9 @@ bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h model_framed.h \
  scope.h attribute.h treelog.h frame_model.h frame.h surface.h uzmodel.h \
  weather.h weatherdata.h plf.h geometry.h soil.h soil_heat.h snow.h log.h \
  time.h border.h mathlib.h assertion.h net_radiation.h model_derived.h \
- pet.h difrad.h raddist.h svat.h vegetation.h litter.h units.h memutils.h \
- check.h fao.h librarian.h treelog_store.h resistance.h
+ pet.h difrad.h raddist.h deposition.h im.h svat.h vegetation.h litter.h \
+ units.h memutils.h check.h fao.h librarian.h treelog_store.h \
+ resistance.h
 condition_crop${OBJ}: condition_crop.C condition.h model_framed.h \
  model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h crop.h time.h \

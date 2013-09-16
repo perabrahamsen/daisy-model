@@ -37,6 +37,7 @@
 #include "pet.h"
 #include "difrad.h"
 #include "raddist.h"
+#include "deposition.h"
 #include "svat.h"
 #include "vegetation.h"
 #include "litter.h"
@@ -47,6 +48,7 @@
 #include "librarian.h"
 #include "treelog_store.h"
 #include "resistance.h"
+#include "im.h"
 #include <boost/scoped_ptr.hpp>
 #include <sstream>
 
@@ -192,6 +194,9 @@ struct BioclimateStandard : public Bioclimate
   double atmospheric_CO2_;         // From weather [Pa]
   double atmospheric_O2_;         // From weather [Pa]
   double air_pressure_;         // From weather [Pa]
+
+  // Deposition.
+  boost::scoped_ptr<Deposition> deposition;  // Deposition model.
 
   // Initialization.
   const bool fixed_pet;
@@ -369,6 +374,8 @@ struct BioclimateStandard : public Bioclimate
     
     return litter_water_out / litter_water_old;
   }
+  const IM& deposit () const
+  { return deposition->deposit (); }
 
   // Create.
   void initialize (const Weather&, Treelog&);
@@ -550,6 +557,9 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     atmospheric_CO2_ (-42.42e42),
     atmospheric_O2_ (-42.42e42),
     air_pressure_ (-42.42e42),
+
+    // Deposition.
+    deposition (Librarian::build_item<Deposition> (al, "deposition")),
 
     // For initialization and weather data shifts.
     fixed_pet (pet.get ()),
@@ -1197,6 +1207,8 @@ BioclimateStandard::tick (const Units& units, const Time& time,
       wind_speed_field_ = (u_star / k) * log((ScreenHeight1 - d)/z);
     }
   daisy_assert (wind_speed_field_ >= 0.0);
+
+  deposition->tick (vegetation, weather, msg);
 }
 
 void
@@ -1296,6 +1308,9 @@ BioclimateStandard::output (Log& log) const
   output_variable (incoming_PAR_radiation, log);
   output_variable (incoming_NIR_radiation, log);
   output_variable (incoming_Total_radiation, log);
+
+  // Deposition.
+  output_derived (deposition, "deposition", log);
 }
 
 void
@@ -1593,6 +1608,10 @@ use these (the weather difrad model). Otherwise Daisy wil use the DPF model.");
                    "Incoming NIR radiation");
     frame.declare ("incoming_Total_radiation","W/m^2", Attribute::LogOnly,
                    "Incoming radiation, sum of shortwave and longwave");
+
+    frame.declare_object ("deposition", Deposition::component, 
+                          "Deposition model.");
+    frame.set ("deposition", "weather");
   }
 } BioclimateStandard_syntax;
 

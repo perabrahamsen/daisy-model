@@ -38,7 +38,7 @@ struct OrganicNone : public OrganicMatter
   { }
   const std::vector<bool>& active () const
   { return active_; }
-  void tick (const Geometry&,
+  void tick (const Geometry&, const Soil&, const SoilpH&, 
              const SoilWater&, const SoilHeat&, 
              const std::vector<double>& /* tillage_age */,
 	     Chemistry&, double, Treelog&)
@@ -94,7 +94,8 @@ struct OrganicNone : public OrganicMatter
   { return NULL; }
   void initialize (const Metalib&, 
                    const Units&, const Frame&, const Geometry& geo,
-                   const Soil&, const SoilWater&, const SoilHeat&, 
+                   const Soil&, const SoilpH&, 
+                   const SoilWater&, const SoilHeat&, 
                    double, Treelog&)
   { active_.insert (active_.end (), geo.cell_size (), false); }
   explicit OrganicNone (const BlockModel& al)

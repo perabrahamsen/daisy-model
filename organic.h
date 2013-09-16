@@ -33,6 +33,7 @@ class AM;
 class DOM;
 class Geometry;
 class Soil;
+class SoilpH;
 class SoilWater;
 class SoilHeat;
 class Chemistry;
@@ -55,7 +56,7 @@ public:
   virtual void clear () = 0;
   virtual void monthly (const Metalib&, const Geometry&, Treelog&) = 0;
   virtual const std::vector<bool>& active () const = 0;
-  virtual void tick (const Geometry& geo,
+  virtual void tick (const Geometry& geo, const Soil&, const SoilpH&, 
 		     const SoilWater&, const SoilHeat&, 
                      const std::vector<double>& tillage_age,
 		     Chemistry&, double dt, Treelog& msg) = 0;
@@ -94,7 +95,8 @@ public:
 public:
   virtual void initialize (const Metalib&, const Units&, 
                            const Frame&, const Geometry& geo,
-                           const Soil&, const SoilWater&, const SoilHeat&,
+                           const Soil&, const SoilpH&, 
+                           const SoilWater&, const SoilHeat&,
                            double T_avg, Treelog&) = 0;
 private:
   OrganicMatter ();

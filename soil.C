@@ -582,7 +582,7 @@ Soil::initialize_aquitard (const Block& top,
 }
 
 void
-Soil::initialize (const Block& block, Geometry& geo,
+Soil::initialize (const Block& block, const Time& time, Geometry& geo,
                   Groundwater& groundwater,
                   const int som_size)
 {

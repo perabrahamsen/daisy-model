@@ -36,6 +36,7 @@ class Groundwater;
 class Frame;
 class Block;
 class Treelog;
+class Time;
 
 class Soil : private boost::noncopyable
 {
@@ -119,7 +120,7 @@ public:
   explicit Soil (const Block&);
   double initialize_aquitard (const Block&,
                               double Z_aquitard, double K_aquitard);
-  void initialize (const Block&, Geometry&, Groundwater&, int som_size);
+  void initialize (const Block&, const Time&, Geometry&, Groundwater&, int som_size);
   ~Soil ();
 };
 

@@ -30,6 +30,7 @@
 #include "groundwater.h"
 #include "geometry.h"
 #include "soil.h"
+#include "soilph.h"
 #include "soil_water.h"
 #include "vegetation.h"
 #include "litter.h"
@@ -75,6 +76,7 @@ struct ColumnStandard : public Column
   Surface surface;
   Geometry& geometry;
   std::auto_ptr<Soil> soil;
+  std::auto_ptr<SoilpH> soilph;
   std::auto_ptr<SoilWater> soil_water;
   std::auto_ptr<SoilHeat> soil_heat;
   std::auto_ptr<Chemistry> chemistry;
@@ -653,9 +655,6 @@ ColumnStandard::tick_move (const Metalib& metalib,
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
   const double T_bottom = movement->bottom_heat (time, my_weather);
 
-  // Add deposition. 
-  chemistry->deposit (my_weather.deposit (), msg);
-
   // Irrigation is delayed management.
   irrigation->tick (geometry, *soil_water, *chemistry, *bioclimate, dt, msg);
 
@@ -687,6 +686,9 @@ ColumnStandard::tick_move (const Metalib& metalib,
                     *vegetation, *litter, *movement,
                     geometry, *soil, *soil_water, *soil_heat,
                     dt, msg);
+  // Add deposition. 
+  chemistry->deposit (bioclimate->deposit (), msg);
+
   vegetation->tick (metalib, time, *bioclimate, geometry, *soil, 
                     *soil_heat, *soil_water, *chemistry, *organic_matter, 
                     residuals_DM, residuals_N_top, residuals_C_top, 
@@ -715,8 +717,12 @@ ColumnStandard::tick_move (const Metalib& metalib,
   for (size_t i = 0; i < cell_size; i++)
     tillage_age[i] += dt/24.0;
 
+  // Soil pH.
+  soilph->tick (geometry, time, msg);
+
   // Turnover.
-  organic_matter->tick (geometry, *soil_water, *soil_heat, tillage_age,
+  organic_matter->tick (geometry, *soil, *soilph, 
+                        *soil_water, *soil_heat, tillage_age,
                         *chemistry, dt, msg);
   litter->update (organic_matter->top_DM ());
   // Transport.
@@ -894,6 +900,7 @@ ColumnStandard::output (Log& log) const
   output_submodule (surface, "Surface", log);
   // output_submodule (geometry, "Geometry", log);
   output_submodule (*soil, "Soil", log);
+  output_derived (soilph, "SoilpH", log);
   output_submodule (*soil_water, "SoilWater", log);
   output_submodule (*soil_heat, "SoilHeat", log);
   output_object (chemistry, "Chemistry", log);
@@ -947,6 +954,7 @@ ColumnStandard::ColumnStandard (const BlockModel& al)
     surface (al.submodel ("Surface")),
     geometry (movement->geometry ()),
     soil (submodel<Soil> (al, "Soil")),
+    soilph (Librarian::build_item<SoilpH> (al, "SoilpH")),
     soil_water (submodel<SoilWater> (al, "SoilWater")),
     soil_heat (submodel<SoilHeat> (al, "SoilHeat")),
     chemistry (Librarian::build_item<Chemistry> (al, "Chemistry")),
@@ -994,7 +1002,7 @@ ColumnStandard::initialize (const Block& block,
   extern_scope = scopesel->lookup (scopes, msg); 
   ScopeMulti scope (extern_scope ? *extern_scope : Scope::null (),
                     parent_scope);
-  soil->initialize (block, geometry, *groundwater,
+  soil->initialize (block, time, geometry, *groundwater,
                     organic_matter->som_pools ());
   const size_t cell_size = geometry.cell_size ();
   residuals_N_soil.insert (residuals_N_soil.begin (), cell_size, 0.0);
@@ -1044,12 +1052,16 @@ ColumnStandard::initialize (const Block& block,
   // Solutes depends on water and heat.
   chemistry->initialize (scope, geometry, *soil, *soil_water, *soil_heat, 
                          surface, msg);
-  
+
+  // Soil pH depends on little else.
+  soilph->initialize (geometry, time, msg);
+
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();
   organic_matter->initialize (block.metalib (), 
                               units, frame ().model ("OrganicMatter"), 
-                              geometry, *soil, *soil_water, *soil_heat, 
+                              geometry, *soil, *soilph, 
+                              *soil_water, *soil_heat, 
                               T_avg, msg);
   vegetation->initialize (block.metalib (), 
                           units, time, geometry, *soil, *organic_matter, msg);
@@ -1086,6 +1098,10 @@ Scope to evaluate expessions in.");
     frame.declare_submodule ("Soil", Attribute::State,
                              "The numeric and physical soil properties.",
                              Soil::load_syntax);
+    frame.declare_object ("SoilpH", SoilpH::component,
+                          Attribute::State, Attribute::Singleton,
+                          "The soil pH.");
+    frame.set ("SoilpH", "neutral");
     frame.declare_submodule ("SoilWater", Attribute::State,
                              "Soil water content and transportation.",
                              SoilWater::load_syntax);

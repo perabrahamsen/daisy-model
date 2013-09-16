@@ -1620,7 +1620,7 @@ By default, no limit on rain.");
     frame.declare ("day_length", "h", Attribute::LogOnly,
                    "Number of light hours this day.");
     frame.declare_submodule_sequence ("deposit", Attribute::LogOnly, "\
-Total atmospheric deposition of nitrogen.", load_flux);
+Total atmospheric deposition.", load_flux);
     
   }
 } WSourceWeather_syntax;
