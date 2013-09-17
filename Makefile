@@ -1484,6 +1484,11 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  point.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+program_colsel${OBJ}: program_colsel.C program.h model.h symbol.h run.h \
+ lexer_soil.h lexer_table.h block_model.h block_nested.h block.h scope.h \
+ attribute.h treelog.h frame_model.h frame.h units.h memutils.h time.h \
+ mathlib.h assertion.h submodeler.h block_submodel.h frame_submodel.h \
+ librarian.h check.h
 vegetation_afforestation${OBJ}: vegetation_afforestation.C vegetation.h \
  model_derived.h model_logable.h model.h symbol.h plf.h mathlib.h \
  assertion.h log.h time.h border.h model_framed.h root_system.h \
