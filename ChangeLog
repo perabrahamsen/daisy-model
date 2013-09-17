@@ -1,6 +1,6 @@
 2013-09-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* program_colsel.C: New model.
+	* program_post.C: New model.
 	* Makefile (MODELS): Add it.
 
 2013-09-16  Per Abrahamsen  <per.abrahamsen@gmail.com>

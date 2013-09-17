@@ -185,7 +185,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = program_colsel.C vegetation_afforestation.C \
+MODELS = program_post.C vegetation_afforestation.C \
 	summary_RsqrW.C gnuplot_profile.C zone_poly.C zone_box.C \
 	rootdens_growth.C gnuplot_vector.C program_optimize.C summary_Rsqr.C \
 	log_table.C xysource_profile.C program_rootmatch.C program_hmovie.C \
@@ -1484,7 +1484,7 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  point.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
-program_colsel${OBJ}: program_colsel.C program.h model.h symbol.h run.h \
+program_post${OBJ}: program_post.C program.h model.h symbol.h run.h \
  lexer_soil.h lexer_table.h block_model.h block_nested.h block.h scope.h \
  attribute.h treelog.h frame_model.h frame.h units.h memutils.h time.h \
  mathlib.h assertion.h submodeler.h block_submodel.h frame_submodel.h \

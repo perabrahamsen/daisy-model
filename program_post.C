@@ -1,4 +1,4 @@
-// program_colsel.C -- Select a subset of 2D soil log file.
+// program_post.C -- Select a subset of a soil profile log file.
 // 
 // Copyright 2013 KU.
 //
@@ -31,7 +31,7 @@
 #include <fstream>
 #include <sstream>
 
-struct ProgramColsel : public Program
+struct ProgramPost : public Program
 {
   const Units& units;
   const symbol where;
@@ -52,12 +52,12 @@ struct ProgramColsel : public Program
   { }
   bool check (Treelog&)
   { return true; }
-  explicit ProgramColsel (const BlockModel& al);
-  ~ProgramColsel ();
+  explicit ProgramPost (const BlockModel& al);
+  ~ProgramPost ();
 };
 
 bool
-ProgramColsel::run (Treelog& msg)
+ProgramPost::run (Treelog& msg)
 { 
   // Read header.
   if (!lex.read_header (msg))
@@ -201,7 +201,7 @@ ProgramColsel::run (Treelog& msg)
   return true;
 }
 
-ProgramColsel::ProgramColsel (const BlockModel& al)
+ProgramPost::ProgramPost (const BlockModel& al)
   : Program (al),
     units (al.units ()),
     where  (al.name ("where")),
@@ -215,16 +215,16 @@ ProgramColsel::ProgramColsel (const BlockModel& al)
     dimension (al.name ("dimension", Attribute::Unknown ()))
 { }
 
-ProgramColsel::~ProgramColsel ()
+ProgramPost::~ProgramPost ()
 { }
 
-static struct ProgramColselSyntax : public DeclareModel
+static struct ProgramPostSyntax : public DeclareModel
 
 {
   Model* make (const BlockModel& al) const
-  { return new ProgramColsel (al); }
-  ProgramColselSyntax ()
-    : DeclareModel (Program::component, "colsel", 
+  { return new ProgramPost (al); }
+  ProgramPostSyntax ()
+    : DeclareModel (Program::component, "post-process", 
                     "Extract a subset of a soil profile log file.")
   { }
   void load_frame (Frame& frame) const
@@ -251,6 +251,6 @@ Only include values to the left of this position.");
     frame.declare_string ("dimension", Attribute::OptionalConst, "\
 Dimension for data.  By default, use dimension from file.");
   }
-} ProgramColsel_syntax;
+} ProgramPost_syntax;
 
-// program_colsel.C ends here.
+// program_post.C ends here.
