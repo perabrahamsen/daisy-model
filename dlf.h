@@ -50,6 +50,7 @@ public:
   void interval (std::ostream& out, const Volume&) const;
   void log_description (std::ostream& out, symbol description) const;
   void finish (std::ostream& out, const Metalib&, const FrameModel&);
+  void finish (std::ostream& out);
 
   // Create and destroy.
 private:

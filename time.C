@@ -266,6 +266,46 @@ Time::component_documentation (component_t c)
   daisy_notreached ();
 }
 
+std::vector<Time::component_t>
+Time::find_time_components (const std::vector<symbol>& names)
+{
+  std::vector<Time::component_t> result;
+  
+  for (size_t n = 0; n < names.size (); n++)
+    for (Time::component_t c = Time::First; c <= Time::Last; c++)
+      if (names[n] == Time::component_name (c))
+	result.push_back (c);
+
+  return result;
+}
+
+void
+Time::declare_time_components (Frame& frame, const symbol name,
+                               const Attribute::category cat,
+                               const std::string& doc)
+{
+  static struct ValidComponent : public VCheck::Enum 
+  {
+    ValidComponent ()
+    {
+      for (Time::component_t i = Time::First; i <= Time::Last; i++)
+        add (Time::component_name (i));
+    }
+  } valid_component;
+  
+  std::string log_time_doc = doc + "\n\n" + "Choose between:\n";
+  
+  for (Time::component_t i = Time::First; i <= Time::Last; i++)
+    {
+      const symbol cname = Time::component_name (i);
+      const symbol cdoc = Time::component_documentation (i);
+      log_time_doc += " '" + cname + "': " + cdoc + "\n";
+    }
+  frame.declare_string (name, cat, Attribute::Variable, 
+                        log_time_doc);
+  frame.set_check (name, valid_component);
+}
+
 // Simulate. 
 
 void 
@@ -732,5 +772,9 @@ Time::between (const Time& from, const Time& to) const
     return false;
   return true;
 }
+
+void
+operator++ (Time::component_t& val, int)
+{ val = Time::component_t (val + 1); }
 
 // time.C ends here.

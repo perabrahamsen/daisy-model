@@ -151,6 +151,20 @@ DLF::finish (std::ostream& out,
 }
 
 void
+DLF::finish (std::ostream& out)
+{
+  // No (additional) header.
+  if (value == None)
+    return;
+  
+  // End of header.
+  out << "\n--------------------\n";
+
+  // Only do this once.
+  value = None;
+}
+
+void
 DLF::add_syntax (Frame& frame, const symbol key)
 {
   frame.declare_string (key, Attribute::Const,

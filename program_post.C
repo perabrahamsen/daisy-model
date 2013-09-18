@@ -20,6 +20,7 @@
 
 #define BUILD_DLL
 #include "program.h"
+#include "dlf.h"
 #include "lexer_soil.h"
 #include "units.h"
 #include "time.h"
@@ -27,6 +28,7 @@
 #include "submodeler.h"
 #include "librarian.h"
 #include "check.h"
+#include "filepos.h"
 #include <boost/scoped_ptr.hpp>
 #include <fstream>
 #include <sstream>
@@ -34,13 +36,18 @@
 struct ProgramPost : public Program
 {
   const Units& units;
-  const symbol where;
+  const symbol parsed_from_file;
+  const bool specified_time_columns;
+  std::vector<Time::component_t> time_columns;
+  DLF print_header;		// How much header should be printed?
+  const symbol where;           // Output file.
   const boost::scoped_ptr<Time> after;
   const boost::scoped_ptr<Time> before;
   const double top;
   const double bottom;
   const double left;
   const double right;
+  const symbol file;            // Input file.
   LexerSoil lex;
   symbol dimension;
   
@@ -73,15 +80,25 @@ ProgramPost::run (Treelog& msg)
   const std::vector<double> z = lex.soil_z ();
   const std::vector<double> x = lex.soil_x ();
   const size_t array_size = z.size ();
-  const bool one_dimensional = x.size () == 0;
-  daisy_assert (one_dimensional || array_size == x.size ());
+  const bool source_1D = x.size () == 0;
+  daisy_assert (source_1D || array_size == x.size ());
   if (array_size < 1)
     {
       msg.warning ("Nothing to plot");
       return false;
     }
 
+  // Use time columns of source by default.
+  if (!specified_time_columns)
+    {
+      for (Time::component_t i = Time::First; i <= Time::Last; i++)
+        if (lex.find_tag (Time::component_name (i)) >= 0)
+          time_columns.push_back (i);
+    }
+  
   // Quick check of matching cells.
+  bool sink_1D = true;
+  double last_x = NAN;
   bool found = false;
   std::vector<bool> check;
   for (size_t i = 0; i < array_size; i++)
@@ -90,14 +107,21 @@ ProgramPost::run (Treelog& msg)
         check.push_back (false);
       else if (std::isfinite (bottom) && z[i] < bottom)
         check.push_back (false);
-      else if (!one_dimensional && std::isfinite (left) && x[i] < left)
+      else if (!source_1D && std::isfinite (left) && x[i] < left)
         check.push_back (false);
-      else if (!one_dimensional && std::isfinite (right) && x[i] > right)
+      else if (!source_1D && std::isfinite (right) && x[i] > right)
         check.push_back (false);
       else
         {
           check.push_back (true);
           found = true;
+          if (!source_1D && sink_1D)
+            {
+              if (!std::isfinite (last_x))
+                last_x = x[i];
+              else if (!approximate (last_x, x[i]))
+                sink_1D = false;
+            }
         }
     }
   daisy_assert (check.size () == array_size);
@@ -119,32 +143,69 @@ ProgramPost::run (Treelog& msg)
     }
 
   std::ofstream out (where.name ().c_str ());
+  print_header.start (out, objid, where, parsed_from_file);
+  print_header.parameter (out, "SOURCE", file);
+  print_header.finish (out);
 
   // Tag line.
-  out << "Time";
+  bool first_tag = true;
+
+  for (size_t i = 0; i < time_columns.size (); i++)
+    {
+      if (first_tag)
+        first_tag = false;
+      else
+        out << "\t";
+      
+      out << Time::component_name (time_columns[i]);
+    }
+
   for (size_t i = 0; i < array_size; i++)
     {
       if (!check[i])
         continue;
       
-      out << "\t" << tag << " @ ";
-      if (one_dimensional)
+      if (first_tag)
+        first_tag = false;
+      else
+        out << "\t";
+
+      out << tag << " @ ";
+      if (sink_1D)
         out << z[i];
       else
         out << "(" << z[i] << " " << x[i] << ")";
       found = true;
     }
+  out << "\n";
 
   // Dimensions.
-  out << "\ntime";
+  bool first_dim = true;
+
+  for (size_t i = 0; i < time_columns.size (); i++)
+    {
+      if (first_dim)
+        first_dim = false;
+      else
+        out << "\t";
+    }
+
   for (size_t i = 0; i < array_size; i++)
     {
       if (!check[i])
         continue;
       
+      if (first_dim)
+        first_dim = false;
+      else
+        out << "\t";
+      
       out << dimension;
     }
     
+  // End of header.
+  print_header.finish (out);
+  out << "\n";
 
   // Read data.
   while (lex.good ())
@@ -158,10 +219,21 @@ ProgramPost::run (Treelog& msg)
       if (!lex.get_time (entries, time, 8))
         continue;
 
-      if (time < *after || time > *before)
+      if ((after.get () && time < *after)
+           || (before.get () && time > *before))
         continue;
 
-      out << "\n" << time.print ();
+      bool first_data = true;
+      
+      for (size_t i = 0; i < time_columns.size (); i++)
+        {
+          if (first_data)
+            first_data = false;
+          else
+            out << "\t";
+
+          out << time.component_value (time_columns[i]);
+        }
       
       std::vector<double> value;
       if (!lex.soil_cells (entries, value, msg))
@@ -189,28 +261,44 @@ ProgramPost::run (Treelog& msg)
                 }
               number = units.convert (original, dimension, number);
             }
-          out << "\t" << number;
+          if (first_data)
+            first_data = false;
+          else
+            out << "\t";
+          out << number;
           if (!out.good ())
             {
               msg.error ("'" + where + "': file error");
               return false;
             }
         }
+      out << "\n";
     }
-  out << "\n";
   return true;
 }
 
 ProgramPost::ProgramPost (const BlockModel& al)
   : Program (al),
     units (al.units ()),
+    parsed_from_file (al.frame ().inherited_position ().filename ()),
+    specified_time_columns (al.check ("time_columns")),
+    time_columns (al.check ("time_columns")
+                  ? Time::find_time_components 
+                  (al.name_sequence ("time_columns"))
+                  : std::vector<Time::component_t> ()),
+    print_header (al.name ("print_header")),
     where  (al.name ("where")),
-    after (submodel<Time> (al, "after")),
-    before (submodel<Time> (al, "before")),
+    after ((al.check ("after"))
+           ? submodel<Time> (al, "after")
+           : NULL),
+    before (al.check ("before")
+            ? submodel<Time> (al, "before")
+            : NULL),
     top (al.number ("top", NAN)),
     bottom (al.number ("bottom", NAN)),
     left (al.number ("left", NAN)),
     right (al.number ("right", NAN)),
+    file (al.name ("file")),
     lex (al),
     dimension (al.name ("dimension", Attribute::Unknown ()))
 { }
@@ -229,6 +317,11 @@ static struct ProgramPostSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
+    Time::declare_time_components (frame, "time_columns", 
+                                   Attribute::OptionalConst, "\
+List of time components to include in output.\n\
+By default, use the same as the source.");
+    DLF::add_syntax (frame, "print_header");
     frame.declare_string ("where", Attribute::Const, "\
 Name of output file.");
     frame.declare_submodule ("after", Attribute::OptionalConst, "\

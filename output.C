@@ -32,10 +32,6 @@
 #include "librarian.h"
 #include "scope_model.h"
 
-static void
-operator++ (Time::component_t& val, int)
-{ val = Time::component_t (val + 1); }
-
 void
 Output::initial_logs (const Daisy& daisy, const Time& previous, Treelog& msg)
 {
@@ -175,19 +171,6 @@ Output::find_extern_logs (const std::vector<Log*>& logs,
   return result;
 }
 
-std::vector<Time::component_t>
-Output::find_time_columns (const std::vector<symbol>& names)
-{
-  std::vector<Time::component_t> result;
-  
-  for (size_t n = 0; n < names.size (); n++)
-    for (Time::component_t c = Time::First; c <= Time::Last; c++)
-      if (names[n] == Time::component_name (c))
-	result.push_back (c);
-
-  return result;
-}
-
 Output::Output (const BlockModel& al)
   : logging (false),
     exchanges (Librarian::build_vector<MScope> (al, "exchange")),
@@ -196,7 +179,8 @@ Output::Output (const BlockModel& al)
     active_logs (find_active_logs (logs, *log_all)),
     my_scopes (find_extern_logs (logs, exchanges)),
     activate_output (Librarian::build_item<Condition> (al, "activate_output")),
-    time_columns (find_time_columns (al.name_sequence ("log_time_columns"))),
+    time_columns (Time::find_time_components 
+                  /**/ (al.name_sequence ("log_time_columns"))),
     log_prefix (al.name ("log_prefix"))
 { }
 
@@ -230,22 +214,9 @@ List of exchange items for communicating with external models.");
   frame.set_empty ("exchange");
 
   // The log_time paramater.
-  static VCheck::Enum valid_component;
-  const bool empty_valid = valid_component.size () < 1;
-  std::string log_time_doc = "\
-List of default time components to include in log files. Choose between:\n";
+  Time::declare_time_components (frame, "log_time_columns", Attribute::Const, "\
+List of default time components to include in log files.");
 
-  for (Time::component_t i = Time::First; i <= Time::Last; i++)
-    {
-      const symbol name = Time::component_name (i);
-      const symbol doc = Time::component_documentation (i);
-      log_time_doc += " '" + name + "': " + doc + "\n";
-      if (empty_valid)
-	valid_component.add (name);
-    }
-  frame.declare_string ("log_time_columns", Attribute::Const, Attribute::Variable, 
-                        log_time_doc);
-  frame.set_check ("log_time_columns", valid_component);
   std::vector<symbol> default_time;
   default_time.push_back (symbol ("year"));
   default_time.push_back (symbol ("month"));

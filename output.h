@@ -70,8 +70,6 @@ private:
   static const std::vector<const Scope*> 
   /**/ find_extern_logs (const std::vector<Log*>& logs, 
                          const std::vector<MScope*>& exchanges);
-  static std::vector<Time::component_t>
-  /**/ find_time_columns (const std::vector<symbol>& names);
 public:
   static void load_syntax (Frame& frame);
   explicit Output (const BlockModel&);

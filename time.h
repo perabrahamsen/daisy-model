@@ -23,6 +23,7 @@
 #ifndef TIME_H
 #define TIME_H
 
+#include "attribute.h"
 #include "symbol.h"
 #include <string>
 #include <vector>
@@ -67,6 +68,7 @@ public:
   double year_fraction () const; // Fraction of year since Jan 1.
   double day_fraction () const;  // Fraction of day since midnight.
 
+  // Time components.
   enum component_t {
     Year, Month, Week, Yday, Mday, Wday, Hour, Minute, Second, Microsecond,
     First = Year, Last = Microsecond
@@ -74,6 +76,11 @@ public:
   int component_value (component_t) const;
   static symbol component_name (component_t);
   static symbol component_documentation (component_t);
+  static std::vector<component_t> 
+    find_time_components (const std::vector<symbol>&);
+  static void declare_time_components (Frame&, const symbol name, 
+                                       const Attribute::category cat,
+                                       const std::string& doc);
 
   // Simulate. 
   int tick_generic (const int amount, const int limit, 
@@ -134,5 +141,8 @@ public:
   ~Time ();
   explicit Time ();
 };
+
+void
+operator++ (Time::component_t& val, int);
 
 #endif // TIME_H
