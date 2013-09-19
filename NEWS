@@ -6,6 +6,32 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.17
+
+** New 'post-process' program to convert daisy log files.
+
+The program converts a Daisy log file into a Daisy log file. The main
+function is to select a subset of the data, but it may also convert
+between units.
+
+  (defprogram convert post-process
+    ;; Select a subset of a ldf file.
+    (file "Estrup-content-Bromide.dlf")   ;Input file.
+    (where "post.dlf")                    ;Output file.
+    ;; Limit x position.
+    (left 300 [cm])
+    (right 400 [cm])
+    ;; Limit depth.
+    (top -50 [cm])
+    (bottom -100 [cm])
+    ;; Limit in time.
+    (after 2000 1 1)
+    (before 2001 1 1)
+    ;; Convert unit.
+    (dimension [kg/m^3]))
+  
+  (run convert)
+
 * 5.16 
 
 ** New action 'spray_surface'.

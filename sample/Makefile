@@ -4,7 +4,7 @@ LIBS 	= cz-sample.dai cz-management.dai \
 	  it-management.dai it-soil.dai dk-soil.dai log-sample.dai \
 	  init-soil.dai pedo-soil.dai irrigation.dai dk-management.dai \
 	  dk-veg-man.dai
-SETUPS  = test-organic.dai rootmatch.dai \
+SETUPS  = test-post.dai test-organic.dai rootmatch.dai \
 	test-refman.dai genweather.dai test-GP2D.dai test-colloids.dai \
 	test-prd.dai test-aba.dai OpenMI_simple.dai OpenMI_management.dai \
 	heat-properties.dai batch.dai sample.dai test.dai DrainDrying.dai \
