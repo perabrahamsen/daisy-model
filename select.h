@@ -42,6 +42,7 @@ class Format;
 class Border;
 class Volume;
 class BlockModel;
+class VCheck;
 
 class Select : public Model 
 {
@@ -91,6 +92,8 @@ private:
   std::auto_ptr<Implementation> impl;
 protected:
   MultiDest dest;
+public:
+  static const VCheck& multi_check ();
 public:
   const bool accumulate;	// Accumulate numbers over time.
   Handle handle;

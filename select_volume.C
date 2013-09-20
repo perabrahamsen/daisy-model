@@ -40,6 +40,7 @@
 struct SelectVolume : public SelectValue
 {
   // Content.
+  Select::Multi space;
   const bool density_z;
   const bool density_x;
   const bool density_y;
@@ -189,43 +190,128 @@ SelectVolume::output_array (const std::vector<double>& array)
   const std::vector<size_t>& cell = entry.cell; 
   const std::vector<double>& weight = entry.weight;    
 
-  double sum = 0.0;
-
-  if (min_root_density > 0.0)
+  switch (space)
     {
-      const Column *const column = active->first;
-      daisy_assert (column);
-      const Vegetation& vegetation = column->get_vegetation ();
-      const std::vector<double>& root_density 
-	= (min_root_crop == wildcard)
-	? vegetation.root_density ()
-	: vegetation.root_density (min_root_crop);
+    case Multi::min:
+      {
+        double result = NAN;
+
+        if (min_root_density > 0.0)
+          {
+            const Column *const column = active->first;
+            daisy_assert (column);
+            const Vegetation& vegetation = column->get_vegetation ();
+            const std::vector<double>& root_density 
+              = (min_root_crop == wildcard)
+              ? vegetation.root_density ()
+              : vegetation.root_density (min_root_crop);
       
-      for (size_t i = 0; i < cell.size (); i++)
-	{
-	  const size_t c = cell[i];
+            for (size_t i = 0; i < cell.size (); i++)
+              {
+                const size_t c = cell[i];
 
-	  if (root_density.size () > c)
-	    {
-	      const double density = root_density[c];
+                if (root_density.size () > c
+                    && root_density[c] > min_root_density
+                    && weight[c] > 0.0
+                    && (!std::isfinite (result)
+                        || array[c] < result))
+                  result = array[c];
+              }
+          }
+        else
+          for (size_t i = 0; i < cell.size (); i++)
+              {
+                const size_t c = cell[i];
 
-	      if (density > 0.0)
-		{
-		  const double value = array[c] * weight[i];
+                if (weight[c] > 0.0 && (!std::isfinite (result)
+                                        || array[c] < result))
+                  result = array[c];
+              }
 
-		  if (density < min_root_density)
-		    sum += value * density / min_root_density;
-		  else
-		    sum += value;
-		}
-	    }
-	}
+        add_result (result);
+      }
+      break;
+    case Multi::max:
+      {
+        double result = NAN;
+
+        if (min_root_density > 0.0)
+          {
+            const Column *const column = active->first;
+            daisy_assert (column);
+            const Vegetation& vegetation = column->get_vegetation ();
+            const std::vector<double>& root_density 
+              = (min_root_crop == wildcard)
+              ? vegetation.root_density ()
+              : vegetation.root_density (min_root_crop);
+      
+            for (size_t i = 0; i < cell.size (); i++)
+              {
+                const size_t c = cell[i];
+
+                if (root_density.size () > c
+                    && root_density[c] > min_root_density
+                    && weight[c] > 0.0
+                    && (!std::isfinite (result)
+                        || array[c] > result))
+                  result = array[c];
+              }
+          }
+        else
+          for (size_t i = 0; i < cell.size (); i++)
+              {
+                const size_t c = cell[i];
+
+                if (weight[c] > 0.0 && (!std::isfinite (result)
+                                        || array[c] > result))
+                  result = array[c];
+              }
+
+        add_result (result);
+      }
+      break;
+    case Multi::sum:
+      {
+        double sum = 0.0;
+
+        if (min_root_density > 0.0)
+          {
+            const Column *const column = active->first;
+            daisy_assert (column);
+            const Vegetation& vegetation = column->get_vegetation ();
+            const std::vector<double>& root_density 
+              = (min_root_crop == wildcard)
+              ? vegetation.root_density ()
+              : vegetation.root_density (min_root_crop);
+      
+            for (size_t i = 0; i < cell.size (); i++)
+              {
+                const size_t c = cell[i];
+
+                if (root_density.size () > c)
+                  {
+                    const double density = root_density[c];
+
+                    if (density > 0.0)
+                      {
+                        const double value = array[c] * weight[i];
+
+                        if (density < min_root_density)
+                          sum += value * density / min_root_density;
+                        else
+                          sum += value;
+                      }
+                  }
+              }
+          }
+        else
+          for (size_t i = 0; i < cell.size (); i++)
+            sum += array[cell[i]] * weight[i];
+
+        add_result (sum);
+      }
+      break;
     }
-  else
-    for (size_t i = 0; i < cell.size (); i++)
-      sum += array[cell[i]] * weight[i];
-
-  add_result (sum);
 }
 
 // Create and Destroy.
@@ -270,9 +356,13 @@ SelectVolume::check_border (const Border& border,
   
 SelectVolume::SelectVolume (const BlockModel& al)
   : SelectValue (al),
-    density_z (al.flag ("density") || al.flag ("density_z")),
-    density_x (al.flag ("density") || al.flag ("density_x")),
-    density_y (al.flag ("density") || al.flag ("density_y")),
+    space (al.name ("space")),
+    density_z (space == Multi::sum ||
+               al.flag ("density") || al.flag ("density_z")),
+    density_x (space == Multi::sum ||
+               al.flag ("density") || al.flag ("density_x")),
+    density_y (space == Multi::sum ||
+               al.flag ("density") || al.flag ("density_y")),
     volume (Volume::build_obsolete (al)),
     min_root_density (al.number ("min_root_density")),
     min_root_crop (al.name ("min_root_crop")),
@@ -293,19 +383,35 @@ Shared parameters for volume based logs.")
   { }
   void load_frame (Frame& frame) const
   {
+    frame.declare_string ("space", Attribute::OptionalConst, "\
+This option determine how to handle mutiple cells within the volume.\n\
+\n\
+min: Use smallest value\n\
+\n\
+max: Use largest value\n\
+\n\
+sum: Use the weighted sum of all cells.\n\
+If this is set, the 'density_z', 'density_x', and 'density_y' parameters\n\
+take effect.");
+    frame.set_check ("space", Select::multi_check ());
+    frame.set ("space", "sum");
     frame.declare_boolean ("density", Attribute::Const, 
 		"If true, divide total content with volume.\n\
-Otherwise, obey 'density_z', 'density_x', and 'density_y'.");
+Otherwise, obey 'density_z', 'density_x', and 'density_y'.\n\
+Unly used if 'space' is 'sum'.");
     frame.set ("density", false);
     frame.declare_boolean ("density_z", Attribute::Const, 
 		"If true, divide total content with volume height.\n\
-This parameter is ignored if 'density' is true.");
+This parameter is ignored if 'density' is true.\n\
+Unly used if 'space' is 'sum'.");
     frame.declare_boolean ("density_x", Attribute::Const, 
 		"If true, divide total content with volume width.\n\
-This parameter is ignored if 'density' is true.");
+This parameter is ignored if 'density' is true.\n\
+Unly used if 'space' is 'sum'.");
     frame.declare_boolean ("density_y", Attribute::Const, 
 		"If true, divide total content with volume depth.\n\
-This parameter is ignored if 'density' is true.");
+This parameter is ignored if 'density' is true.\n\
+Unly used if 'space' is 'sum'.");
     frame.declare_object ("volume", Volume::component, 
                        Attribute::Const, Attribute::Singleton,
                        "Soil volume to log.");

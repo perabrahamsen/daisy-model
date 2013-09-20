@@ -273,7 +273,7 @@ VegetationAfforestation::tick (const Metalib& metalib,
   root_system->tick_dynamic (T_soil, day_fraction, soil_water, dt);
 
   // Nitrogen uptake.
-  N_demand = canopy->CAI * N_per_LAI + N_nonleaves (y);
+  N_demand = 0.1 * (canopy->CAI * N_per_LAI + N_nonleaves (y)); // [g/m^2]
   if (N_actual < -1e10)
     N_actual = N_demand;	// Initialization.
   else
@@ -505,16 +505,16 @@ Litter AOM parameters.");
     frame.set_check ("litter_am", AM::check_om_pools ());
     frame.set ("litter_am", AM::default_AM ());
     frame.declare_submodule("Root", Attribute::State, "Root system.",
-			 RootSystem::load_syntax);
+                            RootSystem::load_syntax);
     frame.declare ("root_DM", "Mg DM/ha", Check::positive (), Attribute::Const, 
-		"Afforestation root drymatter.");
+                   "Afforestation root drymatter.");
     frame.set ("root_DM", 2.0);
-    frame.declare ("Albedo", Attribute::None (), Check::positive (), Attribute::Const, 
-		"Reflection factor.");
+    frame.declare ("Albedo", 
+                   Attribute::None (), Check::positive (), Attribute::Const, 
+                   "Reflection factor.");
     frame.set ("Albedo", 0.2);
     frame.declare_submodule("Canopy", Attribute::State, "Canopy.",
-			 CanopySimple::load_syntax);
-
+                            CanopySimple::load_syntax);
   }
 } VegetationAfforestation_syntax;
 

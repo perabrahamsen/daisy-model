@@ -6,6 +6,14 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.18
+
+** You can now log the highest or lowest value in a volume.
+
+The new 'space' parameter of the 'volume' select model has three
+values, 'min', max', and 'sum'. The later is default and enable the
+current behaviour.
+
 * 5.17
 
 ** New 'post-process' program to convert daisy log files.

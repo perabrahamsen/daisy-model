@@ -79,6 +79,13 @@ Select::Multi::symbol2handle (symbol s)
   return (*i).second;
 }  
 
+const VCheck& 
+Select::multi_check ()
+{
+  static VCheck::Enum check ("min", "max", "sum");
+  return check;
+}
+
 const char *const Select::description = "Select part of state.";
 
 const char *const Select::component = "select";
@@ -827,8 +834,7 @@ max: Use largest value\n\
 \n\
 sum: Use the sum of all matches, weighted by relative column area if\n\
 the matches are from different columns.");
-    static VCheck::Enum multi_check ("min", "max", "sum");
-    frame.set_check ("multi", multi_check);
+    frame.set_check ("multi", Select::multi_check ());
     frame.set ("multi", "sum");
     frame.declare_boolean ("interesting_content", Attribute::OptionalConst, "\
 True if the content of this column is interesting enough to warrent an\n\

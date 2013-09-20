@@ -1,3 +1,8 @@
+2013-09-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* select.h, select.C (multi_check): New function.
+	* select_volume.C (space): New parameter.
+
 2013-09-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 5.17 released.
