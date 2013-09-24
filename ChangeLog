@@ -1,3 +1,7 @@
+2013-09-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 5.18 released.
+
 2013-09-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* vegetation.C, vegetation.h (N, N_fixated): New log variables.
