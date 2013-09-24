@@ -93,7 +93,7 @@ Production::total_N () const
 {
   // kg/ha -> g/m^2
   const double conv = 1000.0 / (100.0 * 100.0);
-  return NCrop / conv;
+  return (NCrop + NDead) / conv;
 }
 
 double
@@ -101,7 +101,7 @@ Production::total_C () const
 {
   // kg/ha -> g/m^2
   const double conv = 1000.0 / (100.0 * 100.0);
-  return CCrop / conv;
+  return (CCrop + CDead) / conv;
 }
 
 bool 

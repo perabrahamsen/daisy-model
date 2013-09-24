@@ -8,11 +8,36 @@ release.
 
 * 5.18
 
+** You can now specify pH of soil.
+
+The new 'SoilpH' parameter in the default column model allows you to
+specify a 'soilph' model. Two models are implemented. The default is
+'neutral' which specify a soil pH of seven. The other is named 'year',
+and allows you to specify pH as a function of calendar year and soil
+depth.
+
+** Organic matter turnover can now depend on soil pH.
+
+The new 'pH_factor' parameter in the default organim matter model
+allows you to specify how turnover is affected by pH.
+
+** New 'afforestation' vegetation model.
+
+This is a forced growth model, i.e. not based on any growth factors
+beside time. An example can be found in the 'sample' folder, as
+'afforestation.dai'.
+
 ** You can now log the highest or lowest value in a volume.
 
 The new 'space' parameter of the 'volume' select model has three
 values, 'min', max', and 'sum'. The later is default and enable the
 current behaviour.
+
+** The "Field nitrogen" log parameterization has changed.
+
+Dead leaves are now included as part of the crop nitrogen, instead of
+seperately. The parameterization now works for permanent vegetation as
+well.
 
 * 5.17
 

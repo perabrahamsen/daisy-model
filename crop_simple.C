@@ -161,6 +161,8 @@ public:
   double DS () const;
   double DM (double height) const;
   double SOrg_DM () const;
+  double N_fixated () const
+  { return 0.0; }
   double total_N () const;
   double total_C () const;
   const std::vector<double>& root_density () const
@@ -398,8 +400,8 @@ CropSimple::SOrg_DM () const
 double
 CropSimple::total_N () const
 {
-  // kg/ha -> g/cm^2
-  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
+  // kg/ha -> g/m^2
+  const double conv = 1000.0 / (100.0 * 100.0);
   return N_actual / conv;
 }
 

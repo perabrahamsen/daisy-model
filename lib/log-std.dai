@@ -327,7 +327,7 @@ The total amount of water in the soil interval")
           "Surface-Loss"
           "Harvest")
   (content "Min-Surface" "Min-Soil" "Biopores"
-	   "Org-Surface" "Org-Soil" "Crop" "Dead leaves"))
+	   "Org-Surface" "Org-Soil" "Crop"))
 
 (defsummary "Field mineral nitrogen balance" balance
   "Mineral balance for the complete system."
@@ -347,7 +347,7 @@ The total amount of water in the soil interval")
   (require_top true)
   (input "Seed" Fixated "Crop-Uptake")
   (output "Harvest" "Residuals-Surface" "Residuals-Soil")
-  (content "Crop" "Dead leaves"))
+  (content "Crop"))
 
 (defsummary "Field organic nitrogen balance" balance
   "Organic nitrogen balance for the complete system."
@@ -537,11 +537,12 @@ Loss of NO3 due to denitrification.")
                      (handle sum)
                      (dimension "${unit}")
                      (spec reaction denitrification converted))
-           (number (path column "${column}"
-			 Vegetation crops crops "*" CrpN Fixated)
+           (number (tag Fixated)
+                   (path column "${column}"
+			 Vegetation component N_fixated)
                    (documentation "\
 Atmospheric nitrogen fixated by the crop.")
-                   (spec fixed CrpN Fixated)
+                   (spec vegetation component N_fixated)
                    (handle sum)
                    (dimension "${unit}"))
            (number (path column "${column}" OrganicMatter "*" fertilized_N)
@@ -605,16 +606,8 @@ This does not include nitrogen in living roots.")
            (number (tag "Crop")
                    (documentation "\
 Nitrogen content of the crop, excluding dead leaves.")
-                   (path column "${column}" Vegetation crops crops "*"
-                         Prod NCrop)
-                   (spec fixed Production NCrop)
-                   (dimension "${unit}"))
-           (number (tag "Dead leaves")
-                   (documentation "\
-Nitrogen content of dead leaves that are still sitting on the crop.")
-                   (path column "${column}" Vegetation crops crops "*"
-                         Prod NDead)
-                   (spec fixed Production NDead)
+                   (path column "${column}" Vegetation component N)
+                   (spec vegetation component N)
                    (dimension "${unit}"))))
 
 (defsummary N_balance balance

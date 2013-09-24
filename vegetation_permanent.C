@@ -91,6 +91,14 @@ struct VegetationPermanent : public Vegetation
   { return 1.0 / rs_min (); }
   double sunlit_stomata_conductance () const
   { return 1.0 / rs_min (); }
+  double N () const             // [kg N/ha]
+  { 
+    // kg/ha -> g/m^2
+    const double conv = 1000.0 / (100.0 * 100.0);
+    return N_actual / conv; 
+  }
+  double N_fixated () const     // [kg N/ha/h]
+  { return 0.0; }
   double LAI () const
   { return canopy->CAI; }
   double height () const
@@ -311,10 +319,10 @@ VegetationPermanent::tick (const Metalib& metalib,
       
       const double dLAI = old_LAI - canopy->CAI;
       const double DM = dLAI * DM_per_LAI * g_per_Mg 
-        *ha_per_cm2 / m2_per_cm2; // [g DM/m^2]
-      const double C = DM * C_per_DM; // [g C/m^2]
+        *ha_per_cm2 / m2_per_cm2 / dt; // [g DM/m^2/h]
+      const double C = DM * C_per_DM; // [g C/m^2/h]
 
-      N_litter = N_actual * (dLAI / old_LAI);
+      N_litter = N_actual * (dLAI / old_LAI) / dt;
       if (!AM_litter)
         {
           static const symbol vegetation_symbol ("vegetation");
@@ -326,7 +334,7 @@ VegetationPermanent::tick (const Metalib& metalib,
           organic_matter.add (*AM_litter);
 
         }
-      AM_litter->add (C * m2_per_cm2, N_litter * m2_per_cm2);
+      AM_litter->add (C * m2_per_cm2 * dt, N_litter * m2_per_cm2 * dt);
       residuals_N_top += N_litter;
 
       residuals_DM += DM;
@@ -335,7 +343,7 @@ VegetationPermanent::tick (const Metalib& metalib,
   else 
     N_litter = 0.0;
 
-  N_actual += N_uptake - N_litter;
+  N_actual += (N_uptake - N_litter) * dt;
 }
 
 double
@@ -381,8 +389,8 @@ VegetationPermanent::initialize (const Metalib& metalib,
   root_system->full_grown (geo, soil.MaxRootingHeight (), WRoot, msg);
 
   static const symbol vegetation_symbol ("vegetation");
-  static const symbol litter_symbol ("litter");
-  AM_litter = organic_matter.find_am (vegetation_symbol, litter_symbol);
+  static const symbol dead_symbol ("dead");
+  AM_litter = organic_matter.find_am (vegetation_symbol, dead_symbol);
 }
 
 bool 

@@ -82,7 +82,9 @@ private:
   const double DS_fixate;	// Fixation of atmospheric N. after this DS
   const double DS_cut_fixate;	// Restore fixation this DS after cut.
   const double fixate_factor;	// Fraction of N need covered by fixation.
+public:
   double Fixated;		// N fixation from air. [g/m2/h]
+private:
   double AccFixated;		// Accumulated N fixation from air. [g/m2]
   double DS_start_fixate;	// Start fixation at this DS.
 

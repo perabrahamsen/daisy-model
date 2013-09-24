@@ -357,11 +357,11 @@ SelectVolume::check_border (const Border& border,
 SelectVolume::SelectVolume (const BlockModel& al)
   : SelectValue (al),
     space (al.name ("space")),
-    density_z (space == Multi::sum ||
+    density_z (space != Multi::sum ||
                al.flag ("density") || al.flag ("density_z")),
-    density_x (space == Multi::sum ||
+    density_x (space != Multi::sum ||
                al.flag ("density") || al.flag ("density_x")),
-    density_y (space == Multi::sum ||
+    density_y (space != Multi::sum ||
                al.flag ("density") || al.flag ("density_y")),
     volume (Volume::build_obsolete (al)),
     min_root_density (al.number ("min_root_density")),

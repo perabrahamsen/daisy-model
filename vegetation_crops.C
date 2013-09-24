@@ -45,6 +45,10 @@ struct VegetationCrops : public Vegetation
   // Crops.
   CropList crops;		// The crops themselves.
 
+  // Nitrogen.
+  double N_;                    // [kg N/ha]
+  double N_fixated_;             // [kg N/ha/h]
+
   // Forced LAI
   class ForcedLAI
   {
@@ -102,6 +106,10 @@ struct VegetationCrops : public Vegetation
   { return shadow_stomata_conductance_; }
   double sunlit_stomata_conductance () const	// Stomata conductance [m/s]
   { return sunlit_stomata_conductance_; }
+  double N () const
+  { return N_; }
+  double N_fixated () const
+  { return N_fixated_; }
   double LAI () const
   { return LAI_; }
   double height () const
@@ -494,6 +502,8 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
   shared_light_fraction_= 1.0;
       
   // Reset vegetation state.
+  N_ = 0.0;
+  N_fixated_ = 0.0;
   LAI_ = 0.0;
   height_ = 0.0;
   LAIvsH_.clear ();		
@@ -503,6 +513,10 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
        crop != crops.end(); 
        crop++)
     {
+      // Nitrogen.
+      N_ += (*crop)->total_N ();
+      N_fixated_ += (*crop)->N_fixated ();
+
       // Canopy.
       shared_light_fraction_ -= (*crop)->minimum_light_fraction ();
       const double crop_LAI = (*crop)->LAI ();
@@ -932,6 +946,8 @@ VegetationCrops::build_crops (const BlockModel& al, const std::string& key)
 VegetationCrops::VegetationCrops (const BlockModel& al)
   : Vegetation (al),
     crops (build_crops (al, "crops")),
+    N_ (0.0),
+    N_fixated_ (0.0),
     // deque, so we can't use build_vector.
     forced_LAI (al.submodel_sequence ("ForcedLAI")),
     shared_light_fraction_ (1.0),

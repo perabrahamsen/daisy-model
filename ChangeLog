@@ -1,3 +1,14 @@
+2013-09-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* vegetation.C, vegetation.h (N, N_fixated): New log variables.
+	* vegetation_crops.C, vegetation_permanent.C: Support it.
+	* crop.h, crop_std.C, crop_simple.C: Ditto.
+	* lib/log-std.dai ("Field nitrogen"): Adapt.
+
+2013-09-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* vegetation_permanent.C (tick): Fix assumption that dt = 1h.
+
 2013-09-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* select.h, select.C (multi_check): New function.

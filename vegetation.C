@@ -54,6 +54,8 @@ Vegetation::EpInterchange () const
 void
 Vegetation::output (Log& log) const
 {
+  output_value (N (), "N", log);
+  output_value (N_fixated (), "N_fixated", log);
   output_value (LAI (), "LAI", log);
   output_value (height (), "height", log);
   output_value (cover (), "cover", log);
@@ -91,6 +93,10 @@ That green stuff.")
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
+    frame.declare ("N", "kg N/ha", Attribute::LogOnly,
+                   "Current nitrogen content of vegetation.");
+    frame.declare ("N_fixated", "kg N/ha/h", Attribute::LogOnly,
+                   "Nitrigen fixation rate.");
     frame.declare ("LAI", "m^2/m^2", Attribute::LogOnly,
                 "Total LAI of all crops on this column");
     frame.declare ("height", "cm", Attribute::LogOnly,

@@ -37,17 +37,18 @@
                     (5 [y] 3 [Mg DM/ha]) (10 [y] 4 [Mg DM/ha])
                     (20 [y] 5 [Mg DM/ha]))
   ;; Content of litterfall.
-  (litterfall_C_per_DM 0.5 [])
+  (litterfall_C_per_DM 0.42 [])
   (litterfall_C_per_N 50 [])
 
   ;; Rhizodeposition during a year, 0 representing no rhizodeposition, and 5
   ;; representing the highest rhizodeposition.
   (rhizodeposition_shape (300 [d] 0) (305 [d] 5) (320 [d] 0)) 
   ;; Total rhizodeposition as a function of years after planting.
-  (rhizodeposition_total (0 [y] 0.5 [Mg C/ha]) (1 [y] 1 [Mg C/ha])
-                    (5 [y] 3 [Mg C/ha]) (10 [y] 4 [Mg C/ha])
-                    (20 [y] 5 [Mg C/ha]))
+  (rhizodeposition_total ( 0 [y] 0.5 [Mg DM/ha]) ( 1 [y] 1 [Mg DM/ha])
+                         ( 5 [y] 3   [Mg DM/ha]) (10 [y] 4 [Mg DM/ha])
+                         (20 [y] 5   [Mg DM/ha]))
   ;; Content of rhizodeposition.
+  (rhizodeposition_C_per_DM 0.42 [])
   (rhizodeposition_C_per_N 50 [])
 
   ;; Constant parameters inherited from the 'permanent' model.
@@ -57,6 +58,8 @@
 
 (defcolumn Oak Askov
   (Vegetation Oak)
+  ;; We log the top 30 cm.
+  (Soil (border -30 [cm]))
   ;; Change in pH with depth, as a function of calendar year.
   (SoilpH year
           (pH_depth_year (1970 ((-100 [cm] 7.0 [pH]) (  0 [cm] 7.0 [pH])))
@@ -75,30 +78,28 @@
   "Information relevant for the Afforestation vegetation model."
   (where "${colfid}afforestation.dlf")
   (when monthly)
-  (entries (interval (tag "Min pH 0-30 cm")
+  (summary (balance (input N_uptake) 
+                    (output N_litter N_rhizo)
+                    (content N_actual)))
+  (entries (interval (tag "pH-min")
                      (path column "${column}" SoilpH component pH)
                      (spec soilph component  pH)
                      (handle current)
-                     (density true)
                      (multi min)
-                     (space min)
-                     (from 0 [cm]) (to -30 [cm]))
-           (interval (tag "Avg pH 0-30 cm")
+                     (space min))
+           (interval (tag "pH-max")
                      (path column "${column}" SoilpH component pH)
                      (spec soilph component  pH)
                      (handle current)
-                     (density true)
                      (multi max)
-                     (space max)
-                     (from 0 [cm]) (to -30 [cm]))
-           (interval (tag "Max pH 0-30 cm")
+                     (space max))
+           (interval (tag "pH-avg")
                      (path column "${column}" SoilpH component pH)
                      (spec soilph component pH)
                      (handle current)
                      (density true)
                      (multi sum)
-                     (space sum)
-                     (from 0 [cm]) (to -30 [cm]))
+                     (space sum))
            (number (path column "${column}" Vegetation "*" LAI)
                    (dimension "m2/m2"))
            (number (path column "${column}" Vegetation "*" N_demand)
@@ -112,9 +113,34 @@
                    (dimension "kg N/ha")
                    (factor 10.0))
            (number (path column "${column}" Vegetation "*" N_litter)
+                   (spec vegetation afforestation N_litter) 
                    (dimension "kg N/ha")
-                   (handle sum)
-                   (factor 10.0))))
+                   (handle sum))
+           (number (path column "${column}" Vegetation "*" N_rhizo)
+                   (spec vegetation afforestation N_rhizo) 
+                   (dimension "kg N/ha")
+                   (handle sum))
+           (interval (path column "${column}" OrganicMatter default total_C)
+                     (spec organic default total_C)
+                     (tag "Soil")
+                     (dimension "kg C/ha"))
+           (interval (path column "${column}" OrganicMatter "default"
+                           am "vegetation/root" om "*" C)
+                     (spec AOM component C)
+                     (tag "Root pool")
+                     (dimension "kg C/ha"))
+           (interval (path column "${column}" OrganicMatter "default"
+                           am "bio/incorporation" om "*" C)
+                     (spec AOM component C)
+                     (tag "Leaf pool")
+                     (dimension "kg C/ha"))
+           (number (path column "${column}" OrganicMatter "default" 
+                         am "*" om "*" top_C)
+                   (spec AOM component top_C)
+                   (tag "Surface")
+                   (dimension "kg C/ha"))        ;g/cm^2 -> kg/ha
+
+           ))
 
 (deflog SoilpH column
   "Soil pH profile."
@@ -127,10 +153,11 @@
 (defprogram Oak Daisy
   (weather default "dk-taastrup.dwf")
   (column Oak)
-  (time 2000 12 1 23)
+  (time 1969 12 1 23)
   (stop 2002 12 31 0)
   (manager activity)
-  (output Afforestation SoilpH))
+  (output "Field nitrogen" ("Soil nitrogen" (to -30 [cm])) 
+          (Afforestation (to -30 [cm])) SoilpH))
 
 (run Oak)
 

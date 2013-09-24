@@ -63,6 +63,8 @@ public:
   virtual double shadow_stomata_conductance () const = 0; // Actual conductance [m/s].
   virtual double sunlit_stomata_conductance () const = 0; // Actual conductance [m/s].
   virtual double leaf_width () const = 0; // Leaf width [cm].
+  virtual double N () const = 0; // Nitrogen content of vegetation [kg N/ha]
+  virtual double N_fixated () const = 0; // Nitrogen fixation rate [kg N/ha/h]
   virtual double LAI () const = 0; // Total LAI of all crops [0-]
   virtual double height () const = 0; // Max crop height in canopy [cm]
   virtual double cover () const = 0; // Fraction of soil covered by crops [0-1]

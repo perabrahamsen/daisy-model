@@ -192,6 +192,12 @@ struct CropStandard : public Crop
   { return development->DS; }
   double DM (double height) const;
   double SOrg_DM () const;
+  double N_fixated () const
+  { 
+    // kg/ha -> g/m^2
+    const double conv = 1000.0 / (100.0 * 100.0);
+    return nitrogen.Fixated / conv; 
+  }
   double total_N () const
   { return production.total_N (); }
   double total_C () const

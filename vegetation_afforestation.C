@@ -57,13 +57,15 @@ struct VegetationAfforestation : public Vegetation
   const PLF N_nonleaves;
   const double N_per_LAI;       // kg N/ha
   const PLF litterfall_shape;   // d -> []
+  const double litterfall_integrated;   // [shape days]
   const PLF litterfall_total;   // y -> Mg DM/ha
   const double litterfall_C_per_DM; // kg C/kg DM
   const double litterfall_C_per_N; // kg C/kg N 
   const PLF rhizodeposition_shape; // d -> []
-  const PLF rhizodeposition_total;  // y -> Mg C/ha
+  const double rhizodeposition_integrated;   // [shape days]
+  const PLF rhizodeposition_total;  // y -> Mg DM/ha
+  const double rhizodeposition_C_per_DM; // kg C/ kg DM
   const double rhizodeposition_C_per_N; // kg C/kg N 
-  const double DM_per_LAI;      // Mg DM/ha/LAI
 
   // Vegetation.
   boost::scoped_ptr<CanopySimple> canopy;
@@ -73,10 +75,14 @@ struct VegetationAfforestation : public Vegetation
   // Nitrogen.
   double N_demand;		// Current potential N content. [g N/m^2]
   double N_actual;		// Current N content. [g N/m^2]
-  AM* AM_litter;                // Dead plant matter.
+  AM* AM_litter;                // Dead leaves.
+  AM* AM_root;                  // Dead roots.
   double N_uptake;		// N uptake this hour. [g N/m^2/h]
-  double N_litter;		// N litter this hour. [g N/m^2/h]
-  const std::vector<boost::shared_ptr<const FrameModel>/**/>& litter_am; // Litter AM parameters.
+  double N_litter;		// N litterfall rate. [g N/m^2/h]
+  double N_rhizo;		// N rhizodeposition rate. [g N/m^2/h]
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& litter_am;
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& root_am;
+
   // Root.
   boost::scoped_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
@@ -93,6 +99,14 @@ struct VegetationAfforestation : public Vegetation
   { return 1.0 / rs_min (); }
   double sunlit_stomata_conductance () const
   { return 1.0 / rs_min (); }
+  double N () const             // [kg N/ha]
+  { 
+    // kg/ha -> g/m^2
+    const double conv = 1000.0 / (100.0 * 100.0);
+    return N_actual / conv; 
+  }
+  double N_fixated () const     // [kg N/ha/h]
+  { return 0.0; }
   double LAI () const
   { return canopy->CAI; }
   double height () const
@@ -147,7 +161,6 @@ struct VegetationAfforestation : public Vegetation
   }
 
   // Simulation.
-  void reset_canopy_structure (const Time& time);
   void reset_canopy_structure (double y, double d);
   double transpiration (const Units&, double potential_transpiration,
 			double canopy_evaporation,
@@ -214,16 +227,6 @@ struct VegetationAfforestation : public Vegetation
 };
 
 void
-VegetationAfforestation::reset_canopy_structure (const Time& time)
-{
-  const double y = Time::fraction_hours_between (planting_time, time) 
-    / (24.0 * 365.2425);
-  const double d = time.yday () + time.hour () / 24.0;
-  
-  reset_canopy_structure (y, d);
-}
-
-void
 VegetationAfforestation::reset_canopy_structure (const double y, const double d)
 {
   // Calculate actual LAI (L) from LAI shape (S).
@@ -253,17 +256,23 @@ VegetationAfforestation::tick (const Metalib& metalib,
                                OrganicMatter& organic_matter,
                                double& residuals_DM,
                                double& residuals_N_top, double& residuals_C_top,
-                               std::vector<double>& /* residuals_N_soil */,
-                               std::vector<double>& /* residuals_C_soil */,
+                               std::vector<double>& residuals_N_soil,
+                               std::vector<double>& residuals_C_soil,
                                const double dt, Treelog& msg)
 {
   // Time.
   const double y = Time::fraction_hours_between (planting_time, time) 
     / (24.0 * 365.2425);
-  const double d = time.yday () + time.hour () / 24.0;
+  const double d = time.yday () 
+    + ((time.hour () 
+        + ((time.minute () 
+            + ((time.second () + time.microsecond () / 1e6)
+               / 60.0))
+           / 60.0))
+       / 24.0);
+  const double d_end = d + dt / 24.0;
 
   // Canopy.
-  const double old_LAI = canopy->CAI;
   reset_canopy_structure (y, d);
 
   // Root system.
@@ -274,31 +283,60 @@ VegetationAfforestation::tick (const Metalib& metalib,
 
   // Nitrogen uptake.
   N_demand = 0.1 * (canopy->CAI * N_per_LAI + N_nonleaves (y)); // [g/m^2]
-  if (N_actual < -1e10)
-    N_actual = N_demand;	// Initialization.
-  else
-    daisy_assert (N_actual >= 0.0);
+  daisy_assert (N_actual >= 0.0);
   N_uptake = root_system->nitrogen_uptake (geo, soil, soil_water, 
                                            chemistry, 0.0, 0.0,
                                            N_demand - N_actual, dt);
-  
-  if (canopy->CAI < old_LAI)
-    {
-      // Litter.
-      static const double C_per_DM = 0.420;
-      static const double g_per_Mg = 1.0e6;
-      static const double ha_per_cm2 = 1.0e-8;
-      static const double m2_per_cm2 = 1.0e-4;
-      
-      const double dLAI = old_LAI - canopy->CAI;
-      const double DM = dLAI * DM_per_LAI * g_per_Mg 
-        *ha_per_cm2 / m2_per_cm2; // [g DM/m^2]
-      const double C = DM * C_per_DM; // [g C/m^2]
 
-      N_litter = N_actual * (dLAI / old_LAI);
+  static const symbol vegetation_symbol ("vegetation");
+  static const double g_per_Mg = 1.0e6;
+  static const double ha_per_cm2 = 1.0e-8;
+  static const double m2_per_cm2 = 1.0e-4;
+
+  // Rhizodeposition.
+  if (rhizodeposition_integrated > 0.0)
+    {
+      const double interval = rhizodeposition_shape.integrate (d, d_end);
+      const double amount       // [kg DM/ha]
+        = rhizodeposition_total (y) * interval / rhizodeposition_integrated;
+
+      const double DM = amount  // // [g DM/m^2/h]
+        * g_per_Mg * ha_per_cm2 / m2_per_cm2 / dt; 
+      const double C = DM * rhizodeposition_C_per_DM;
+      const double N = C / rhizodeposition_C_per_N / dt;
+      if (!AM_root)
+        {
+          static const symbol root_symbol ("root");
+
+          AM_root = &AM::create (metalib, geo, time, root_am,
+                                   vegetation_symbol, root_symbol,
+                                   AM::Locked, msg);
+          organic_matter.add (*AM_root);
+
+        }
+      AM_root->add_surface (geo,
+                            C * m2_per_cm2 * dt, N * m2_per_cm2 * dt,
+                            root_system->Density);
+
+      N_rhizo = N;
+      residuals_DM += DM;
+      geo.add_surface (residuals_C_soil, root_system->Density, C * m2_per_cm2);
+      geo.add_surface (residuals_N_soil, root_system->Density, N * m2_per_cm2);
+    }
+  
+  // Litterfall.
+  if (litterfall_integrated > 0.0)
+    {
+      const double interval 
+        = litterfall_shape.integrate (d, d_end);
+      const double amount       // [kg DM/ha]
+        = litterfall_total (y) * interval / litterfall_integrated;
+      const double DM = amount  // // [g DM/m^2/h]
+        * g_per_Mg * ha_per_cm2 / m2_per_cm2 / dt; 
+      const double C = DM * litterfall_C_per_DM;
+      const double N = C / litterfall_C_per_N / dt;
       if (!AM_litter)
         {
-          static const symbol vegetation_symbol ("vegetation");
           static const symbol dead_symbol ("dead");
 
           AM_litter = &AM::create (metalib, geo, time, litter_am,
@@ -307,16 +345,16 @@ VegetationAfforestation::tick (const Metalib& metalib,
           organic_matter.add (*AM_litter);
 
         }
-      AM_litter->add (C * m2_per_cm2, N_litter * m2_per_cm2);
+      AM_litter->add (C * m2_per_cm2 * dt, N * m2_per_cm2 * dt);
+      N_litter = N;
       residuals_N_top += N_litter;
-
       residuals_DM += DM;
       residuals_C_top += C;
+      
+      // TODO
     }
-  else 
-    N_litter = 0.0;
 
-  N_actual += N_uptake - N_litter;
+  N_actual += (N_uptake - N_litter - N_rhizo) * dt;
 }
 
 double
@@ -346,6 +384,7 @@ VegetationAfforestation::output (Log& log) const
   output_variable (N_actual, log);
   output_variable (N_uptake, log);
   output_variable (N_litter, log);
+  output_variable (N_rhizo, log);
   output_submodule (*root_system, "Root", log);
 }
 
@@ -357,13 +396,25 @@ VegetationAfforestation::initialize (const Metalib& metalib,
 				 OrganicMatter& organic_matter,
                                  Treelog& msg)
 {
-  reset_canopy_structure (time);
+  const double y = Time::fraction_hours_between (planting_time, time) 
+    / (24.0 * 365.2425);
+  const double d = time.yday () + time.hour () / 24.0;
+  
+  reset_canopy_structure (y, d);
   root_system->initialize (metalib, geo, 0.0, 0.0, msg);
   root_system->full_grown (geo, soil.MaxRootingHeight (), WRoot, msg);
 
   static const symbol vegetation_symbol ("vegetation");
-  static const symbol litter_symbol ("litter");
-  AM_litter = organic_matter.find_am (vegetation_symbol, litter_symbol);
+  static const symbol dead_symbol ("dead");
+  static const symbol root_symbol ("root");
+  AM_litter = organic_matter.find_am (vegetation_symbol, dead_symbol);
+  AM_root = organic_matter.find_am (vegetation_symbol, root_symbol);
+
+  N_demand = 0.1 * (canopy->CAI * N_per_LAI + N_nonleaves (y)); // [g/m^2]
+  if (N_actual < -1e10)
+    N_actual = N_demand;	// Initialization.
+  else
+    daisy_assert (N_actual >= 0.0);
 }
 
 bool 
@@ -387,23 +438,27 @@ VegetationAfforestation::VegetationAfforestation (const BlockModel& al)
     N_nonleaves (al.plf ("N_nonleaves")),
     N_per_LAI (al.number ("N_per_LAI")),
     litterfall_shape (al.plf ("litterfall_shape")), 
+    litterfall_integrated (litterfall_shape.integrate (0.0, 366.0)),
     litterfall_total (al.plf ("litterfall_total")),
     litterfall_C_per_DM (al.number ("litterfall_C_per_DM")),
     litterfall_C_per_N (al.number ("litterfall_C_per_N")),
     rhizodeposition_shape (al.plf ("rhizodeposition_shape")),
+    rhizodeposition_integrated (rhizodeposition_shape.integrate (0.0, 366.0)),
     rhizodeposition_total (al.plf ("rhizodeposition_total")),
+    rhizodeposition_C_per_DM (al.number ("rhizodeposition_C_per_DM")),
     rhizodeposition_C_per_N (al.number ("rhizodeposition_C_per_N")),
-    DM_per_LAI (al.number ("DM_per_LAI")),
-    // *** HERTIL ***
 
     canopy (submodel<CanopySimple> (al, "Canopy")),
     cover_ (-42.42e42),
     N_demand (0.0),
     N_actual (al.number ("N_actual", -42.42e42)),
     AM_litter (NULL),
+    AM_root (NULL),
     N_uptake (0.0),
     N_litter (0.0),
+    N_rhizo (0.0),
     litter_am (al.model_sequence ("litter_am")),
+    root_am (al.model_sequence ("root_am")),
     root_system (submodel<RootSystem> (al, "Root")),
     WRoot (al.number ("root_DM") * 100.0), // [Mg DM / ha] -> [g DM / m^2]
     albedo_ (al.number ("Albedo"))
@@ -465,6 +520,7 @@ Yearly litterfall as function of years after planting.");
     frame.declare ("litterfall_C_per_DM", Attribute::None (),
                    Check::positive (), Attribute::Const,
                    "Carbon content of litter dry matter.");
+    frame.set ("litterfall_C_per_DM", 0.42);
     frame.declare ("litterfall_C_per_N", Attribute::None (),
                    Check::positive (), Attribute::Const,
                    "C/N ratio in litter.");
@@ -480,30 +536,37 @@ over a year. The rhizodeposition in a specific period is then the\n\
 integration of this parameter over the period, divided by the\n\
 integration of this function over a year, multiplied with the total\n\
 rhizodeposition for that year.");
-    frame.declare ("rhizodeposition_total", "y", "Mg C/ha", 
+    frame.declare ("rhizodeposition_total", "y", "Mg DM/ha", 
                    Check::non_negative (), Attribute::Const, "\
 Yearly rhizodeposition as function of years after planting.");
+    frame.declare ("rhizodeposition_C_per_DM", Attribute::None (),
+                   Check::positive (), Attribute::Const,
+                   "Carbon content of litter dry matter.");
+    frame.set ("rhizodeposition_C_per_DM", 0.42);
     frame.declare ("rhizodeposition_C_per_N", Attribute::None (),
                    Check::positive (), Attribute::Const,
                    "C/N ratio in rhizodeposition.");
 
-    frame.declare ("DM_per_LAI", "Mg DM/ha/LAI", Check::positive (), 
-                Attribute::Const,
-		"DM as function of LAI.");
-    frame.set ("DM_per_LAI", 0.5);
     frame.declare ("N_demand", "g N/m^2", Attribute::LogOnly,
 		"Current potential N content.");
     frame.declare ("N_actual", "g N/m^2", Attribute::OptionalState,
 		"N uptake until now (default: 'N_demand').");
     frame.declare ("N_uptake", "g N/m^2/h", Attribute::LogOnly,
-		"Nitrogen uptake this hour.");
+		"Nitrogen uptake rate.");
     frame.declare ("N_litter", "g N/m^2/h", Attribute::LogOnly,
-		"Nitrogen in litter this hour.");
+		"Nitrogen in litterfall.");
+    frame.declare ("N_rhizo", "g N/m^2/h", Attribute::LogOnly,
+                   "Nitrogen in rhizodeposition.");
     frame.declare_object ("litter_am", AOM::component, 
                       Attribute::Const, Attribute::Variable, "\
 Litter AOM parameters.");
     frame.set_check ("litter_am", AM::check_om_pools ());
     frame.set ("litter_am", AM::default_AM ());
+    frame.declare_object ("root_am", AOM::component, 
+                          Attribute::Const, Attribute::Variable, "\
+Rhizodeposition AOM parameters.");
+    frame.set_check ("root_am", AM::check_om_pools ());
+    frame.set ("root_am", AM::default_AM ());
     frame.declare_submodule("Root", Attribute::State, "Root system.",
                             RootSystem::load_syntax);
     frame.declare ("root_DM", "Mg DM/ha", Check::positive (), Attribute::Const, 
