@@ -151,49 +151,63 @@ DestinationTable::record_start (const std::vector<Time::component_t>& time_colum
             out << field_separator;
 
           const Geometry *const geo = entries[i]->geometry ();
-          const int size = entries[i]->size ();
+          const int value_size = entries[i]->size ();
+          int type_size = entries[i]->type_size ();
           const symbol tag = entries[i]->tag ();
           static const symbol empty_symbol ("");
 
-          if (geo && size >= 0)
+          // Missing spec. Guess from value size. TODO: Should be removed.
+          if (geo && type_size == Attribute::Unspecified)
             {
-              if (geo->cell_size () == size)
+              // TODO: Put in warning?
+              if (geo->cell_size () == value_size)
+                type_size = Attribute::SoilCells;
+              else if (geo->edge_size () == value_size)
+                type_size = Attribute::SoilEdges;
+            }
+          if (!geo)
+            switch (type_size)
+              {
+              case Attribute::SoilCells:
+              case Attribute::SoilEdges:
+                daisy_warning ("Can't log soil values without soil");
+                type_size = Attribute::Variable;
+              }
+
+          switch (type_size)
+            {
+            case Attribute::SoilCells:
+              for (unsigned j = 0; j < geo->cell_size (); j++)
                 {
-                  // Content.
-                  for (unsigned j = 0; j < size; j++)
-                    {
-                      if (j != 0)
-                        out << array_separator;
-                      if (tag != empty_symbol)
-                        out << tag << " @ ";
-                      out << geo->cell_name (j);
-                    }
+                  if (j != 0)
+                    out << array_separator;
+                  if (tag != empty_symbol)
+                    out << tag << " @ ";
+                  out << geo->cell_name (j);
                 }
-              else if (geo->edge_size () == size)
+              break;
+            case Attribute::SoilEdges:
+              for (unsigned j = 0; j < geo->edge_size (); j++)
                 {
-                  // Flux
-                  for (unsigned j = 0; j < size; j++)
-                    {
-                      if (j != 0)
-                        out << array_separator;
-                      if (tag != empty_symbol)
-                        out << tag << " @ ";
-                      out << geo->edge_name (j);
-                    }
+                  if (j != 0)
+                    out << array_separator;
+                  if (tag != empty_symbol)
+                    out << tag << " @ ";
+                  out << geo->edge_name (j);
                 }
-              else
+              break;
+            case Attribute::Singleton:
+              out << entries[i]->tag ();
+              break;
+            default:
+              // Other arrays, use value size 
+              for (unsigned j = 0; j < value_size; j++)
                 {
-                  // Other arrays (buggy if other array have same size as geo.)
-                  for (unsigned j = 0; j < size; j++)
-                    {
-                      if (j != 0)
-                        out << array_separator;
-                      out << tag << "[" << j << "]";
-                    }
+                  if (j != 0)
+                    out << array_separator;
+                  out << tag << "[" << j << "]";
                 }
             }
-          else
-            out << entries[i]->tag ();
         }
       out << record_separator;
       print_tags = false;
@@ -210,24 +224,35 @@ DestinationTable::record_start (const std::vector<Time::component_t>& time_colum
           if (i != 0)
             out << field_separator;
 
-          const int size = entries[i]->size ();
+          const Geometry *const geo = entries[i]->geometry ();
+          int size = entries[i]->size ();
+          const int type_size = entries[i]->type_size ();
+          switch (type_size)
+            {
+            case Attribute::SoilCells:
+              if (geo)
+                size = geo->cell_size ();
+              break;
+            case Attribute::SoilEdges:
+              if (geo)
+                size = geo->edge_size ();
+              break;
+            case Attribute::Singleton:
+              size = 1;
+            }
+          daisy_assert (size >= 0);
           symbol dimension = entries[i]->dimension ().name ();
           if (dimension == Attribute::None () 
               || dimension == Attribute::Unknown ()
               || dimension == Attribute::Fraction ())
             dimension = "";
 
-          if (size >= 0)
+          for (unsigned j = 0; j < size; j++)
             {
-              for (unsigned j = 0; j < size; j++)
-                {
-                  if (j != 0)
-                    out << array_separator;
-                  out << dimension;
-                }
+              if (j != 0)
+                out << array_separator;
+              out << dimension;
             }
-          else
-            out << dimension;
         }
       out << record_separator;
       print_dimension = false;

@@ -1965,6 +1965,7 @@ sum of all chemicals will be logged."
   (when daily)
   (entries (array (path column "${column}" Vegetation crops crops "${crop}" 
                         Root Density)
+                  ;; (spec fixed RootSystem Density)
                   (dimension "cm/cm^3"))))
 
 (deflog "Root form parameter" crop

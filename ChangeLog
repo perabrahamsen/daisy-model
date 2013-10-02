@@ -1,3 +1,9 @@
+2013-10-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* log_table.C (record_start): Use SoilCells and SoilEdges.
+	* select_array.C (print_missing): New function.
+	(done_print): Use it.
+
 2013-09-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 5.18 released.

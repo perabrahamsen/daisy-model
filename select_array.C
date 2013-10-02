@@ -31,6 +31,7 @@
 #include "librarian.h"
 #include "frame.h"
 #include "column.h"
+#include "geometry.h"
 
 struct SelectArray : public Select
 {
@@ -155,13 +156,32 @@ struct SelectArray : public Select
     first_result = true;
   }
 
+  void print_missing ()
+  {
+    const Geometry *const geo = geometry ();
+    int size = 1;
+    switch (type_size ())
+      {
+      case Attribute::SoilCells:
+        if (geo)
+          size = geo->cell_size ();
+        break;
+      case Attribute::SoilEdges:
+        if (geo)
+          size = geo->edge_size ();
+      }
+    daisy_assert (size >= 0);
+    for (size_t i = 0; i < size; i++)
+      dest.missing ();
+  }
+
   // Print result at end of time step.
   void done_print ()
   {
     // Missing value.
     if (first_small)
       {
-        dest.missing ();
+        print_missing ();
         return;
       }
 
@@ -187,7 +207,7 @@ The 'array' select model only handle bulk density for soil sized variables";
                   }
                 break;
               }
-            dest.missing ();
+            print_missing ();
             return;
           default:
             for (size_t i = 0; i < value.size (); i++)
@@ -207,7 +227,7 @@ The 'array' select model only handle bulk density for soil sized variables";
                 result[i] = convert (value[i] / dt);
               break;
             }
-          dest.missing ();
+          print_missing ();
           return;
         default:
           for (size_t i = 0; i < value.size (); i++)
