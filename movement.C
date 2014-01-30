@@ -132,6 +132,10 @@ Movement::clear ()
   solute_failure_level = -1;
 }
 
+double 
+Movement::suggest_dt (const double weather_dt, const double max_pond) const
+{ return tertiary->suggest_dt (weather_dt, max_pond); }
+
 void 
 Movement::output_base (Log& log) const
 { 

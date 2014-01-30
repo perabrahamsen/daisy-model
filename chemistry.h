@@ -69,8 +69,6 @@ public:
                                Treelog&) = 0;
   virtual void spray_surface (symbol chem, double amount /* [g/m^2] */,
                               Treelog&) = 0;
-  virtual void dissipate_overhead (symbol chem, double amount /* [g/m^2] */, 
-                                   Treelog&) = 0;
   virtual void dissipate_surface (symbol chem, double amount /* [g/m^2] */, 
                                   Treelog&) = 0;
   virtual void harvest (double removed, double surface) = 0;

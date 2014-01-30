@@ -79,5 +79,5 @@
 
 (run (write (what "Hello")))
 
-;;; setup.dai ends here.
+;;; geus-texture.dai ends here.
 

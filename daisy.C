@@ -61,6 +61,7 @@ struct Daisy::Implementation
   const Scope* extern_scope;
   const boost::scoped_ptr<Condition> print_time;
   const boost::scoped_ptr<Output> output_log;
+  const bool message_timestep;
   const Timestep timestep;
   const double max_dt;
   const Timestep minimal_timestep;
@@ -241,6 +242,7 @@ struct Daisy::Implementation
       extern_scope (NULL),
       print_time (Librarian::build_item<Condition> (al, "print_time")),
       output_log (new Output (al)),
+      message_timestep (al.flag ("message_timestep")),
       timestep (al.check ("timestep") 
                 ? submodel_value<Timestep> (al, "timestep")
                 : Timestep::hour ()),
@@ -305,17 +307,13 @@ Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
   else
     // Source limited timestep.
     {
-      double suggested_dt = field->suggest_dt (); 
+      const double weather_dt = weather.get () 
+        ? weather->suggest_dt ()
+        : 0.0;
+
+      double suggested_dt = field->suggest_dt (weather_dt); 
       if (!std::isnormal (suggested_dt))
         suggested_dt = max_dt;
-
-      if (weather.get ())
-        {
-          const double w_dt = weather->suggest_dt ();
-          if (std::isnormal (w_dt) 
-              && (!std::isnormal (suggested_dt) || suggested_dt > w_dt))
-            suggested_dt = w_dt;
-        }
 
       if (suggested_dt < min_dt)
         {
@@ -367,15 +365,19 @@ Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
       if (current_dt < small_dt)
         {
           small_dt = current_dt;
-          std::ostringstream tmp;
-          tmp << "Using small timestep: " 
-              << Timestep::build_hours (current_dt).print ();
-          msg.message (tmp.str ());
+          if (message_timestep)
+            {
+              std::ostringstream tmp;
+              tmp << "Using small timestep: " 
+                  << Timestep::build_hours (current_dt).print ();
+              msg.message (tmp.str ());
+            }
         }
       else if (small_dt < max_dt * 0.99 && approximate (current_dt, max_dt))
         {
           small_dt = max_dt;
-          msg.message ("Back to normal size timesteps");
+          if (message_timestep)
+            msg.message ("Back to normal size timesteps");
         }
     }
     
@@ -519,6 +521,9 @@ Current time in the simulation.", Time::load_syntax);
 Previous time in the simulation.", Time::load_syntax);
   frame.declare_submodule ("next_large", Attribute::OptionalState, "\
 End of next large timestep.", Time::load_syntax);
+  frame.declare_boolean ("message_timestep", Attribute::Const, "\
+Show messages about timestep modifications.");
+  frame.set ("message_timestep", true);
   frame.declare_submodule ("timestep", Attribute::OptionalState, "\
 Length of large timestep in simulation.\n\
 The default value is 1 hour, anything else is unlikely to work.",

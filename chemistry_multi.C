@@ -59,7 +59,6 @@ struct ChemistryMulti : public Chemistry
   void deposit (symbol chem, double flux, Treelog&);
   void spray_overhead (symbol chem, double amount, Treelog&);
   void spray_surface (symbol chem, double amount, Treelog&);
-  void dissipate_overhead (symbol chem, double amount, Treelog&);
   void dissipate_surface (symbol chem, double amount, Treelog&);
   void harvest (double removed, double surface);
   void mix (const Geometry&, const Soil&, const SoilWater&, 
@@ -232,29 +231,6 @@ ChemistryMulti::spray_surface (const symbol chem, const double amount,
 
 	Chemical& chemical = combine[c]->find (chem);
         chemical.spray_surface (amount);
-	found = true;
-      }
-  
-  if (found)
-    return;
-
-  check_ignore (chem, msg);
-}
-
-void 
-ChemistryMulti::dissipate_overhead (const symbol chem, const double amount,
-                                    Treelog& msg)
-{
-  bool found = false;
-
-  for (size_t c = 0; c < combine.size (); c++)
-    if (combine[c]->know (chem))
-      {
-	if (found)
-	  msg.error ("Duplicate chemical '" + chem + "' detected");
-
-	Chemical& chemical = combine[c]->find (chem);
-        chemical.dissipate_overhead (amount);
 	found = true;
       }
   

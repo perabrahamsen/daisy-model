@@ -84,7 +84,6 @@ struct ChemicalStandard : public Chemical
   double deposit_;
   double spray_overhead_;
   double spray_surface_;
-  double dissipate_overhead_;
   double dissipate_surface_;
   double harvest_;
   double residuals;
@@ -210,7 +209,6 @@ struct ChemicalStandard : public Chemical
   void deposit (const double flux); // [g/m^2/h]
   void spray_overhead (const double amount); // [g/m^2]
   void spray_surface (const double amount); // [g/m^2]
-  void dissipate_overhead (const double amount); // [g/m^2]
   void dissipate_surface (const double amount); // [g/m^2]
   void harvest (const double removed, const double surface);
   void incorporate (const Geometry&, double amount, double from, double to);
@@ -475,7 +473,6 @@ ChemicalStandard::clear ()
   deposit_ = 0.0;
   spray_overhead_ = 0.0;
   spray_surface_ = 0.0;
-  dissipate_overhead_ = 0.0;
   dissipate_surface_ = 0.0;
   harvest_ = 0.0;
   residuals = 0.0;
@@ -687,10 +684,6 @@ ChemicalStandard::spray_surface (const double amount) // [g/m^2]
 { spray_surface_ += amount; }
 
 void 
-ChemicalStandard::dissipate_overhead (const double amount) // [g/m^2]
-{ dissipate_overhead_ += amount; }
-
-void 
 ChemicalStandard::dissipate_surface (const double amount) // [g/m^2]
 { dissipate_surface_ += amount; }
 
@@ -845,7 +838,6 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   // Fluxify management operations.
   spray_overhead_ /= dt;
   spray_surface_ /= dt;
-  dissipate_overhead_ /= dt;
   dissipate_surface_ /= dt;
   harvest_ /= dt;
   residuals /= dt;
@@ -882,13 +874,6 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
                canopy_washoff_rate, canopy_dissipation_rate,
                canopy_washoff, canopy_dissipate);
   canopy_out = canopy_washoff + residuals;
-
-  // Volatilization bypasses the system.
-  spray_overhead_ += dissipate_overhead_;
-  snow_in += dissipate_overhead_;
-  snow_out += dissipate_overhead_;
-  canopy_in += dissipate_overhead_;
-  canopy_dissipate += dissipate_overhead_;
 
   // Litter
   const double below_canopy = canopy_out + canopy_bypass + spray_surface_;
@@ -1846,7 +1831,6 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
     deposit_ (0.0), 
     spray_overhead_ (0.0),
     spray_surface_ (0.0),
-    dissipate_overhead_ (0.0),
     dissipate_surface_ (0.0),
     harvest_ (0.0),
     residuals (0.0),

@@ -79,6 +79,7 @@ public:
 
   // Communication with bioclimate.
   double ponding_average () const;
+  double ponding_max () const;
   double temperature () const;
   double EpFactor () const;
   double albedo (const Geometry&, const Soil&, const SoilWater&) const;

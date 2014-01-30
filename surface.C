@@ -49,6 +49,7 @@ struct Surface::Implementation
   typedef std::map<size_t, size_t> pond_map;
   pond_map pond_edge;
   double pond_average;
+  double pond_max;
   std::vector<double> pond_section;
   double EvapSoilSurface;
   double Eps;
@@ -250,6 +251,10 @@ Surface::ponding_average () const
 { return impl->pond_average; }
 
 double
+Surface::ponding_max () const
+{ return impl->pond_max; }
+
+double
 Surface::runoff_rate (const double dt) const
 { return impl->runoff_fraction / dt; }
 
@@ -291,6 +296,7 @@ Surface::Implementation::update_pond_average (const Geometry& geo)
   // Find total pond.
   double total_pond = 0.0;      // [mm cm^2]
   double total_area = 0.0;      // [cm^2]
+  pond_max = 0.0;
   for (int i = 0; i < top_edges_size; i++)
     {
       const size_t edge = top_edges[i];
@@ -298,6 +304,8 @@ Surface::Implementation::update_pond_average (const Geometry& geo)
       const double area = geo.edge_area (edge);
       total_area += area;
       total_pond += pond_section[c] * area;
+      if (pond_section[c] > pond_max)
+        pond_max = pond_section[c];
     }
   daisy_approximate (total_area, geo.surface_area ());
   pond_average = total_pond / total_area; // [mm];

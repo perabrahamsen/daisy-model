@@ -81,6 +81,9 @@ struct TertiaryBiopores : public Tertiary
   Anystate get_state () const;
   void set_state (const Anystate&);
 
+  // Timestep.
+  mutable double old_dt;        // Lowest dt suggested by weather for event [h]
+
   // Log variables.
   double water_volume;          // Volume of water stored in biopores.
   double water_height;          // -||- converted to height.
@@ -96,6 +99,7 @@ struct TertiaryBiopores : public Tertiary
   // - For use by column.
   void tick_source (const Geometry&, const Soil&, const SoilHeat&, 
                     SoilWater&, Treelog&);
+  double suggest_dt (double weather_dt, double max_pond) const;
   void tick (const Units&, const Geometry& geo, const Soil& soil, 
              const SoilHeat& soil_heat, const double dt, 
              SoilWater& soil_water, Surface& surface, Treelog& msg);
@@ -310,6 +314,23 @@ TertiaryBiopores::tick_source (const Geometry& geo, const Soil& soil,
     }
 
   soil_water.forward_sink (S_forward_total, S_forward_sink);
+}
+
+double 
+TertiaryBiopores::suggest_dt (const double weather_dt,
+                              const double max_pond) const
+{
+  if (max_pond > pond_max)
+    {
+      if (std::isnormal (weather_dt) && weather_dt < old_dt)
+        old_dt = weather_dt;
+      
+      return old_dt;
+    }
+  else
+    old_dt = weather_dt;
+
+  return 0.0;
 }
 
 static void
@@ -742,6 +763,7 @@ TertiaryBiopores::TertiaryBiopores (const BlockModel& al)
     active (al.check ("active")
             ? al.flag_sequence ("active")
             : std::vector<bool> ()),
+    old_dt (al.number ("old_dt")),
     water_volume (-42.42e42),
     water_height (-42.42e42),
     solute_mass (al.units ().get_unit (IM::mass_unit ())),
@@ -807,6 +829,12 @@ Possible values:\n\
 
     frame.declare_boolean ("active", Attribute::OptionalState,
                 Attribute::SoilCells, "Active biopores in cells.");
+    frame.declare ("old_dt", "cm", Check::non_negative (), Attribute::State, "\
+Lowest dt imposed by weather during current event.\n\
+In case of an event, the biopore module will suggest to keep a timestep\n\
+that corresponds to the lowest suggestion from the weather module during\n\
+the event.");
+    frame.set ("old_dt", 0.0);
     frame.declare ("water_volume", "cm^3", Attribute::LogOnly, "Water volume.");    
     frame.declare ("water_height", "cm", Attribute::LogOnly,
                 "Water volume multiplied with surface area.");

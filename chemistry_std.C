@@ -54,7 +54,6 @@ struct ChemistryStandard : public Chemistry
   void deposit (symbol chem, double flux, Treelog&);
   void spray_overhead (symbol chem, double amount, Treelog&);
   void spray_surface (symbol chem, double amount, Treelog&);
-  void dissipate_overhead (symbol chem, double amount  /* [g/m^2] */, Treelog&);
   void dissipate_surface (symbol chem, double amount  /* [g/m^2] */, Treelog&);
   void harvest (double removed, double surface);
   void mix (const Geometry&, const Soil&, const SoilWater&, 
@@ -184,19 +183,6 @@ ChemistryStandard::spray_surface (const symbol chem,
     if (chemicals[c]->objid == chem)
       {
         chemicals[c]->spray_surface (amount);
-        return;
-      }
-  msg.warning ("Unknwon chemical '" + chem + "' ignored");
-}
-
-void 
-ChemistryStandard::dissipate_overhead (const symbol chem, const double amount,
-                                       Treelog& msg)
-{
-  for (size_t c = 0; c < chemicals.size (); c++)
-    if (chemicals[c]->objid == chem)
-      {
-        chemicals[c]->dissipate_overhead (amount);
         return;
       }
   msg.warning ("Unknwon chemical '" + chem + "' ignored");

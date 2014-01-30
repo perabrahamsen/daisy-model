@@ -52,6 +52,7 @@ public:
   // - For use by Column.
   virtual void tick_source (const Geometry&, const Soil&, const SoilHeat&, 
                             SoilWater&, Treelog&) = 0;
+  virtual double suggest_dt (double weather_dt, double max_pond) const;
   virtual void tick (const Units&, 
                      const Geometry&, const Soil&, const SoilHeat&,
                      const double dt, SoilWater&, Surface&, Treelog&) = 0;

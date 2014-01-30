@@ -115,7 +115,7 @@ public:
   // Simulation.
   void clear ();
   void tick_source (const Scope&, const Time&, Treelog&);
-  double suggest_dt () const;
+  double suggest_dt (const double weather_dt) const;
   void tick_move (const Metalib& metalib, 
                   const Time&, const Time&, double dt, const Weather*, 
                   const Scope&, Treelog&);
@@ -645,17 +645,17 @@ Field::Implementation::tick_source (const Scope& parent_scope,
 }
 
 double
-Field::Implementation::suggest_dt () const
+Field::Implementation::suggest_dt (const double weather_dt) const
 {
   if (columns.size () == 1)
-    return (*(columns.begin ()))->suggest_dt ();
+    return (*(columns.begin ()))->suggest_dt (weather_dt);
   
   double dt = 0.0;
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
     {
-      const double col_dt = (*i)->suggest_dt ();
+      const double col_dt = (*i)->suggest_dt (weather_dt);
       if (std::isnormal (col_dt)
           && (!std::isnormal (dt) || dt > col_dt))
         dt = col_dt;
@@ -974,8 +974,8 @@ Field::tick_source (const Scope& parent_scope, const Time& time_end,
 { impl->tick_source (parent_scope, time_end, msg); }
 
 double
-Field::suggest_dt () const
-{ return impl->suggest_dt (); }
+Field::suggest_dt (const double weather_dt) const
+{ return impl->suggest_dt (weather_dt); }
 
 void
 Field::tick_move (const Metalib& metalib, 

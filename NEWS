@@ -6,6 +6,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.19 
+
+** Volatilization is back in Field nitrogen.
+
 * 5.18
 
 ** You can now specify pH of soil.

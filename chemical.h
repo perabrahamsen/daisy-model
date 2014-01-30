@@ -116,7 +116,6 @@ public:
   virtual void deposit (double flux /* [g/m^2/h] */) = 0;
   virtual void spray_overhead (double amount /* [g/m^2] */) = 0;
   virtual void spray_surface (double amount /* [g/m^2] */) = 0;
-  virtual void dissipate_overhead (double amount /* [g/m^2] */) = 0;
   virtual void dissipate_surface (double amount /* [g/m^2] */) = 0;
   virtual void harvest (double removed, double surface) = 0;
   virtual void incorporate (const Geometry&, double amount /* [g/m^2] */, 

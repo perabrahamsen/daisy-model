@@ -1,14 +1,15 @@
 ;;  Examles of specific Danish Soils 
-(defhorizon "Askov Ap" default
+(defhorizon "Askov Ap" ISSS4
   "Askov 10 & 30 cm soil. Data from O.H. Jacobsen (1989): Umættet
 hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
 2030. Statens Planteavlsforsøg."
-  (clay 0.113)  (silt 0.277) (fine_sand 0.348) (coarse_sand 0.236)
+  (clay 0.113)  (silt 0.277) 
+    (fine_sand 0.348) (coarse_sand 0.236)
   (humus 0.026) (C_per_N 11) (dry_bulk_density 1.55 [g/cm^3])
   (hydraulic M_vG (Theta_res 0.0)(Theta_sat 0.392)
              (alpha 0.0385)(n 1.211)(K_sat 7.52 [cm/h])))
 
-(defhorizon "Askov B" default
+(defhorizon "Askov B" ISSS4
   "Askov 50 & 70 cm soil. Data from O.H. Jacobsen (1989): Umættet
 hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
 2030. Statens Planteavlsforsøg."
@@ -17,7 +18,7 @@ hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
   (hydraulic M_vG (Theta_res 0.0)(Theta_sat 0.445)
              (alpha 0.2605)(n 1.135)(K_sat 14.5[cm/h])))
 
-(defhorizon "Askov C" default
+(defhorizon "Askov C" ISSS4
   "Askov 90 cm soil. Data from O.H. Jacobsen (1989): Umættet
 hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
 2030. Statens Planteavlsforsøg."
@@ -35,7 +36,7 @@ hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
                   (  -80.00 "Askov B")
                   ( -250.00 "Askov C"))))
 
-(defhorizon "Jyndevad Ap" default
+(defhorizon "Jyndevad Ap" ISSS4
   "Jyndevad 15 cm soil. Data from O.H. Jacobsen (1989): Umættet
 hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
 2030. Statens Planteavlsforsøg."
@@ -46,7 +47,7 @@ hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
              (lambda 0.446 []) (h_b -8.4 [cm]) (K_sat 6.76e-5 [m/s])))
 
 
-(defhorizon "Jyndevad C" default
+(defhorizon "Jyndevad C" ISSS4
   "Jyndevad 50 cm soil. Data from O.H. Jacobsen (1989): Umættet
 hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
 2030. Statens Planteavlsforsøg."
@@ -63,7 +64,7 @@ hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
         (horizons (  -30.00 "Jyndevad Ap")
                   ( -250.00 "Jyndevad C"))))
 
-(defhorizon "Foulum AP" default
+(defhorizon "Foulum AP" ISSS4
   "Provided by DJF as part if the FertOrgaNic project."
     (clay 0.115)
     (silt 0.110)
@@ -79,7 +80,7 @@ hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
         (alpha 0.05334)
         (n 1.2870)))
 
-(defhorizon "Foulum B" default
+(defhorizon "Foulum B" ISSS4
   "Provided by DJF as part if the FertOrgaNic project."
     (clay 0.149)
     (silt 0.101)
@@ -95,13 +96,14 @@ hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
         (alpha 0.0398)
         (n 1.2585)))
 
-(defhorizon "Foulum C" default
+(defhorizon "Foulum C" ISSS4
   "Provided by DJF as part if the FertOrgaNic project."
     (clay 0.164)
     (silt 0.106)
     (fine_sand 0.419)
     (coarse_sand 0.310)
     (humus 0.002)
+    (normalize true)
     (C_per_N 9.1)
     (dry_bulk_density 1.55) 
     (hydraulic M_vG

@@ -1,3 +1,21 @@
+2014-01-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* movement.h, movement.C:
+	* tertiary.h, tertiarry.C, tertiary_biopores.C (suggest_dt): New
+	function.
+	* column_std.C (suggest_dt): Use it.
+	* column_std.C, column.h, field.h, field.C (suggest_dt): Take
+	'weather_dt' argument.
+	* daisy.C (tick): Update caller.
+
+2013-12-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log-std.dai ("Field chemical"): Volatilization is
+	'surface_decompose'.
+
+	* chemical_std.C (canopy_dissipate): Removed log variable.
+	* chemical.h, chemistry.h, chemistry_std.C, chemistry_multi.C: Ditto.
+
 2013-10-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* log_table.C (record_start): Use SoilCells and SoilEdges.

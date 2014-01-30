@@ -169,7 +169,7 @@ public:
   // Simulation.
   void clear ();
   void tick_source (const Scope&, const Time&, Treelog&);
-  double suggest_dt () const;
+  double suggest_dt (double) const;
   void tick_move (const Metalib& metalib, 
                   const Time&, const Time&, double dt, const Weather*, 
                   const Scope&, Treelog&);
@@ -611,16 +611,15 @@ ColumnStandard::tick_source (const Scope& parent_scope,
 }
 
 double
-ColumnStandard::suggest_dt () const
+ColumnStandard::suggest_dt (double weather_dt) const
 { 
   double dt = 0.0;
   
   if (weather.get ())
-    {
-      const double w_dt = weather->suggest_dt ();
-      if (std::isnormal (w_dt) && (!std::isnormal (dt) || dt > w_dt))
-        dt = w_dt;
-    }
+    weather_dt = weather->suggest_dt ();
+
+  if (std::isnormal (weather_dt) && (!std::isnormal (dt) || dt > weather_dt))
+    dt = weather_dt;
 
   const double sw_dt = soil_water->suggest_dt ();
   
@@ -633,6 +632,13 @@ ColumnStandard::suggest_dt () const
   if (std::isnormal (chem_dt) 
       && (!std::isnormal (dt) || dt > chem_dt))
     dt = chem_dt;
+
+  const double mov_dt = movement->suggest_dt (weather_dt, 
+                                              surface.ponding_max ());
+
+  if (std::isnormal (mov_dt) 
+      && (!std::isnormal (dt) || dt > mov_dt))
+    dt = mov_dt;
 
   return dt;
 }

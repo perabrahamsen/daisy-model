@@ -438,6 +438,8 @@ WSourceCombine::source_tick (Treelog& msg)
 void 
 WSourceCombine::source_initialize (Treelog& msg)
 {
+  TREELOG_MODEL (msg);
+
   more_data_available = true;
 
   for (size_t i = 0; i < entry.size (); i++)

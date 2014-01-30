@@ -38,6 +38,10 @@ Tertiary::library_id () const
   return id;
 }
 
+double 
+Tertiary::suggest_dt (double, double) const
+{ return 0.0; }
+
 Tertiary::Tertiary (const BlockModel& al)
   : ModelDerived (al.type_name ())
 { }

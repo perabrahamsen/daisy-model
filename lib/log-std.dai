@@ -511,8 +511,8 @@ Nitrogen uptake by the roots.")
                      (handle sum)
                      (dimension "${unit}"))
            (number (path column "${column}" 
-			 Chemistry "*" trace NH4 canopy_dissipate)
-                   (spec chemical default canopy_dissipate)
+			 Chemistry "*" trace NH4 surface_decompose)
+                   (spec chemical default surface_decompose)
                    (handle sum)
                    (documentation "\
 NH4-fertilizer lost during the application.")

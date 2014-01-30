@@ -83,6 +83,7 @@ public:
   virtual void clear ();
   void tick_source (const Soil&, const SoilHeat&, SoilWater&, 
                     Treelog&);
+  double suggest_dt (double weather_dt, double max_pond) const;
   virtual void tick (const Soil&, SoilWater&, const SoilHeat&, Surface&,
                      Groundwater&, const Time&, const Weather&, 
                      double dt, Treelog&) = 0;
