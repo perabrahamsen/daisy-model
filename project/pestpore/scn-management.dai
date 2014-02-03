@@ -1,0 +1,167 @@
+;;; scn-management.dai --- Management to use in Flakkebjerg scenarie
+
+;; Definerer Vårbyg                                             
+(defaction Pure_Spring_Barley activity                         
+	(wait_mm_dd 3 1)
+	(fertilize (pig_slurry (first_year_utilization 100 [%]))(equivalent_weight 121 [kg N/ha]))					;; Silstrup og Rørrende
+	  ;;(fertilize (pig_slurry (first_year_utilization 100 [%]))(equivalent_weight 104 [kg N/ha]))    				;; Jyndevad har en kvote på 104 kgN/ha.
+	(plowing)                                                                                                                                                 
+	(wait_mm_dd 4 4)
+	(seed_bed_preparation)
+	(sow "Spring Barley")
+	  ;;(wait_mm_dd 5 31)
+       	  ;;(spray Lambda-C-1 400 [g/ha])				;; 1. sprøjtning, Pest control, 400 g/ha. Må behandle max 3 gange per år. 
+	  ;;(spray Bromide-10 1000 [g/ha]) 
+	  ;;(wait_mm_dd 7 1)
+	  ;;(spray Lambda-C-1 400 [g/ha])				;; 2. sprøjtning, Pest control, 400 g/ha. Må behandle max 3 gange per år. 
+	  ;;(spray Bromide-10 1000 [g/ha]) 
+	(wait_mm_dd 8 1)
+	(spray Glyphosate-1 1080 [g/ha])               				 ;; Bekæmpelse af kvik før høst. 3,0 L/ha, med en konc. På 360 g/L. senest 10 dage før høst, når kerner er hårde...
+	(spray Bromide-1 1000 [g/ha])  
+	(wait_mm_dd 8 15)                    
+	(harvest "Spring Barley" (sorg 0.99)(leaf 0.7)(stem 0.7)(stub 10)) 
+	(wait_mm_dd 10 3)
+	(spray Glyphosate-2 1440 [g/ha])                             		;; Bekæmpelse af kvik I stub. 4 L/ha, med en konc. På 360 g/L. Må først foretages efter 1/10.   
+	(spray Bromide-2 1000 [g/ha]))                       
+
+
+;; Definerer Vårbyg som skal bruges til opvarmning. Benævnes 0, da der ikke skal udbringes pesticider!!!
+(defaction Pure_Spring_Barley_0 activity                         
+	(wait_mm_dd 3 1)
+	(fertilize (pig_slurry (first_year_utilization 100 [%]))(equivalent_weight 121 [kg N/ha]))		;; Silstrup og Rørrende
+	(plowing)                                                                                                                                                 
+	(wait_mm_dd 4 4)
+	(seed_bed_preparation)
+	(sow "Spring Barley")
+	(wait_mm_dd 8 15)                    
+	(harvest "Spring Barley" (sorg 0.99)(leaf 0.7)(stem 0.7)(stub 10))) 
+
+
+
+
+;; Definerer Vårbyg med udlæg af græs
+(defaction Spring_Barley_w_Grass activity     
+	(wait_mm_dd 3 5)
+	(fertilize (pig_slurry (first_year_utilization 100 [%]))(equivalent_weight 121 [kg N/ha])) 	;; Silstrup og Rørrendegaard har en kvote på 121 kgN/ha.          	
+	  ;;(fertilize (pig_slurry (first_year_utilization 100 [%]))(equivalent_weight 104 [kg N/ha]))      ;; Jyndevad har en kvote på 104 kgN/ha.
+	(plowing)
+	(wait_mm_dd 4 4)
+	(seed_bed_preparation)
+	(sow "Spring Barley")                                                  
+	(sow "Grass")            
+	(wait_mm_dd 4 29)                                               ;; Weed control, 10 weeks before harvest. tjek dato i forhold til vejret!!!     
+	(spray Bentazone-1 600 [g/ha])                            	;; 1.25 L/ha med en concentration på 480 g/L. 
+	(spray Bromide-3 1000 [g/ha])
+	(wait_mm_dd 8 15)                   
+	(harvest "Spring Barley" (sorg 0.99)(leaf 0.7)(stem 0.7)(stub 10)))
+
+
+
+
+
+;; GRÆS (2. 3. og 4. år (01/02/03))
+
+
+
+(defaction Grass_1 activity
+	(wait_mm_dd 3 15)
+	(fertilize (AmmoniumNitrate (weight 160 [kg N/ha])))
+	(wait_mm_dd 5 22)
+	(cut "Grass" (stub 10 [cm]))
+	(wait_mm_dd 5 26)
+	(fertilize (AmmoniumNitrate (weight 80 [kg N/ha])))
+	(wait_mm_dd 6 17)
+	(spray Bentazone-2 960 [g/ha])					;; Weed control. Before sep.1., and no later than 2 weeks before cutting the grass.
+	(spray Bromide-4 1000 [g/ha])					;; 2 L/ha with a concentration of 480 g/L = 960 g/ha 
+	;;(spray Lambda-C-2 400 [g/ha])					;; Pest control. And no later than 2 weeks before cutting the grass.
+	(wait_mm_dd 7 20)
+	(cut "Grass" (stub 10 [cm]))
+	(wait_mm_dd 7 25)
+	(fertilize (AmmoniumNitrate (weight 80 [kg N/ha])))
+	(wait_mm_dd 9 12)
+	(cut "Grass" (stub 10 [cm])))
+
+
+
+(defaction Grass_2 activity
+	(wait_mm_dd 3 15)
+	(fertilize (AmmoniumNitrate (weight 160 [kg N/ha])))
+	(wait_mm_dd 5 22)
+	(cut "Grass" (stub 10 [cm]))
+	(wait_mm_dd 5 26)
+	(fertilize (AmmoniumNitrate (weight 80 [kg N/ha])))
+	(wait_mm_dd 6 17)
+	(spray Bentazone-3 960 [g/ha])					;; Weed control. Before sep.1., and no later than 2 weeks before cutting the grass
+	(spray Bromide-5 1000 [g/ha])					;; 2 L/ha with a concentration of 480 g/L = 960 g/ha
+	;;(spray Lambda-C-3 400 [g/ha])					;; Pest control. And no later than 2 weeks before cutting the grass.
+	(wait_mm_dd 7 20)
+	(cut "Grass" (stub 10 [cm]))
+	(wait_mm_dd 7 25)
+	(fertilize (AmmoniumNitrate (weight 80 [kg N/ha])))
+	(wait_mm_dd 9 12)
+	(cut "Grass" (stub 10 [cm])))
+
+
+
+(defaction Grass_3 activity
+	(wait_mm_dd 3 15)
+	(fertilize (AmmoniumNitrate (weight 160 [kg N/ha])))
+	(wait_mm_dd 5 22)
+	(cut "Grass" (stub 10 [cm]))
+	(wait_mm_dd 5 26)
+	(fertilize (AmmoniumNitrate (weight 80 [kg N/ha])))
+	(wait_mm_dd 6 17)
+	(spray Bentazone-4 960 [g/ha])					;; Weed control. Before sep.1., and no later than 2 weeks before cutting the grass
+	(spray Bromide-6 1000 [g/ha])					;; 2 L/ha with a concentration of 480 g/L = 960 g/ha
+	;;(spray Lambda-C-4 400 [g/ha])					;; Pest control. And no later than 2 weeks before cutting the grass.	
+	(wait_mm_dd 7 20)
+	(cut "Grass" (stub 10 [cm]))
+	(wait_mm_dd 7 25)
+	(fertilize (AmmoniumNitrate (weight 80 [kg N/ha])))
+	(wait_mm_dd 9 12)
+	(cut "Grass" (stub 10 [cm])))
+
+
+
+
+;; Definerer silomajs  
+(defaction Silage_Maize activity                         
+	(wait_mm_dd 4 15)                                               		
+	(fertilize (pig_slurry (first_year_utilization 100 [%]))(equivalent_weight 140 [kg N/ha]))     ;; Jeg giver hele normen (151/146 kgN/ha) før høst, og supplerer indtil videre ikke op med handelsgødning.  
+	(plowing)											;;(fertilize (pig_slurry)(equivalent_weight 102.2 [kg N/ha]))	;; Jyndevad (norm= 146 kgN/ha)                                                                                                                                                                                                                                                               
+	(wait_mm_dd 4 26)
+	(seed_bed_preparation)
+	(sow "Silage Maize")                                             			;; Når jordens temperatur når 8 C
+	(wait_mm_dd 5 25)
+	(spray Bentazone-5 192 [g/ha])
+	(spray Bromide-7 1000 [g/ha])								;; Split weed control 1: 0,4*dosis= 0.4* 1 L/ha, med en konc. På 480 g/L                                                                                
+	(wait_mm_dd 6 6)                                                 
+	(spray Bentazone-5 240 [g/ha])                                  			;; Split weed control 2: 0,5*dosis= 0.5* 1 L/ha, med en konc. På 480 g/L
+	(spray Bromide-7 1000 [g/ha])
+	  ;;(wait_mm_dd 8 14)                                                 
+	  ;;(spray Lambda-C-5 400 [g/ha])                                  			;; Pest control: No later than 60 days before harvest. Only one treatment per year
+	  ;;(spray Bromide-14 1000 [g/ha])                                                                           
+	(wait(or(crop_ds_after "Silage Maize" 2.0)(mm_dd 10 20)))                      
+	(harvest "Silage Maize" (sorg 0.95)(leaf 0.95)(stem 0.95)(stub 20))                             
+	(wait_mm_dd 10 30)
+	(spray Glyphosate-3 1440 [g/ha])                              			;; Bekæmpelse af kvik I stub, skal være efter 1/10.4 L/ha, med en konc. På 360 g/L. 
+	(spray Bromide-8 1000 [g/ha]))      
+      
+      
+  
+  
+  
+(defaction Rotation_0 activity
+	Pure_Spring_Barley_0 Pure_Spring_Barley_0 Pure_Spring_Barley_0)  
+      
+(defaction Rotation_1 activity
+	Pure_Spring_Barley Spring_Barley_w_Grass Grass_1 Grass_2 Grass_3 Silage_Maize)
+      
+(defaction Rotation_2 activity
+	Pure_Spring_Barley_0 Pure_Spring_Barley_0 Pure_Spring_Barley_0 Pure_Spring_Barley_0)        
+
+(defaction Rotation activity 
+  Rotation_0 Rotation_1 Rotation_2)
+      
+;;; scn-management.dai ends here
+

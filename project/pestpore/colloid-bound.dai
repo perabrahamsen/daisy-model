@@ -1,0 +1,1423 @@
+;; colloid-bound.dai
+
+;;; Bromide
+
+(defchemical "Bromide" common
+  (diffusion_coefficient 2.0e-5 [cm^2/s])
+  ;; (crop_uptake_reflection_factor 0.5 [])
+  (crop_uptake_reflection_factor 0.25 [])
+  ;; (crop_uptake_reflection_factor 0.0 []) ; Silstrup
+  (canopy_dissipation_rate 0 [h^-1])
+  (decompose_rate 0 [h^-1])
+  (C_below const 0 [g/cm^3]))
+
+(defchemistry Bromide default
+  (trace Bromide))
+
+
+;;; Bromide-1
+
+(defchemical "Bromide-1" common
+  (diffusion_coefficient 2.0e-5 [cm^2/s])
+  ;; (crop_uptake_reflection_factor 0.5 [])
+  (crop_uptake_reflection_factor 0.25 [])
+  ;; (crop_uptake_reflection_factor 0.0 []) ; Silstrup
+  (canopy_dissipation_rate 0 [h^-1])
+  (decompose_rate 0 [h^-1])
+  (C_below const 0 [g/cm^3]))
+
+(defchemistry Bromide-1 default
+  (trace Bromide-1))
+  
+  
+;;; Bromide-2
+
+(defchemical "Bromide-2" common
+  (diffusion_coefficient 2.0e-5 [cm^2/s])
+  ;; (crop_uptake_reflection_factor 0.5 [])
+  (crop_uptake_reflection_factor 0.25 [])
+  ;; (crop_uptake_reflection_factor 0.0 []) ; Silstrup
+  (canopy_dissipation_rate 0 [h^-1])
+  (decompose_rate 0 [h^-1])
+  (C_below const 0 [g/cm^3]))
+
+(defchemistry Bromide-2 default
+  (trace Bromide-2))
+
+
+
+;;; Bromide-3
+
+(defchemical "Bromide-3" common
+  (diffusion_coefficient 2.0e-5 [cm^2/s])
+  ;; (crop_uptake_reflection_factor 0.5 [])
+  (crop_uptake_reflection_factor 0.25 [])
+  ;; (crop_uptake_reflection_factor 0.0 []) ; Silstrup
+  (canopy_dissipation_rate 0 [h^-1])
+  (decompose_rate 0 [h^-1])
+  (C_below const 0 [g/cm^3]))
+
+(defchemistry Bromide-3 default
+  (trace Bromide-3))
+
+
+
+
+;;; Bromide-4
+
+(defchemical "Bromide-4" common
+  (diffusion_coefficient 2.0e-5 [cm^2/s])
+  ;; (crop_uptake_reflection_factor 0.5 [])
+  (crop_uptake_reflection_factor 0.25 [])
+  ;; (crop_uptake_reflection_factor 0.0 []) ; Silstrup
+  (canopy_dissipation_rate 0 [h^-1])
+  (decompose_rate 0 [h^-1])
+  (C_below const 0 [g/cm^3]))
+
+(defchemistry Bromide-4 default
+  (trace Bromide-4))
+
+
+
+
+;;; Bromide-5
+
+(defchemical "Bromide-5" common
+  (diffusion_coefficient 2.0e-5 [cm^2/s])
+  ;; (crop_uptake_reflection_factor 0.5 [])
+  (crop_uptake_reflection_factor 0.25 [])
+  ;; (crop_uptake_reflection_factor 0.0 []) ; Silstrup
+  (canopy_dissipation_rate 0 [h^-1])
+  (decompose_rate 0 [h^-1])
+  (C_below const 0 [g/cm^3]))
+
+(defchemistry Bromide-5 default
+  (trace Bromide-5))
+
+
+
+
+
+;;; Bromide-6
+
+(defchemical "Bromide-6" common
+  (diffusion_coefficient 2.0e-5 [cm^2/s])
+  ;; (crop_uptake_reflection_factor 0.5 [])
+  (crop_uptake_reflection_factor 0.25 [])
+  ;; (crop_uptake_reflection_factor 0.0 []) ; Silstrup
+  (canopy_dissipation_rate 0 [h^-1])
+  (decompose_rate 0 [h^-1])
+  (C_below const 0 [g/cm^3]))
+
+(defchemistry Bromide-6 default
+  (trace Bromide-6))
+
+
+
+
+
+;;; Bromide-7
+
+(defchemical "Bromide-7" common
+  (diffusion_coefficient 2.0e-5 [cm^2/s])
+  ;; (crop_uptake_reflection_factor 0.5 [])
+  (crop_uptake_reflection_factor 0.25 [])
+  ;; (crop_uptake_reflection_factor 0.0 []) ; Silstrup
+  (canopy_dissipation_rate 0 [h^-1])
+  (decompose_rate 0 [h^-1])
+  (C_below const 0 [g/cm^3]))
+
+(defchemistry Bromide-7 default
+  (trace Bromide-7))
+
+
+
+
+
+;;; Bromide-8
+
+(defchemical "Bromide-8" common
+  (diffusion_coefficient 2.0e-5 [cm^2/s])
+  ;; (crop_uptake_reflection_factor 0.5 [])
+  (crop_uptake_reflection_factor 0.25 [])
+  ;; (crop_uptake_reflection_factor 0.0 []) ; Silstrup
+  (canopy_dissipation_rate 0 [h^-1])
+  (decompose_rate 0 [h^-1])
+  (C_below const 0 [g/cm^3]))
+
+(defchemistry Bromide-8 default
+  (trace Bromide-8))
+
+
+;;; Bromide-9
+
+(defchemical "Bromide-9" common
+  (diffusion_coefficient 2.0e-5 [cm^2/s])
+  ;; (crop_uptake_reflection_factor 0.5 [])
+  (crop_uptake_reflection_factor 0.25 [])
+  ;; (crop_uptake_reflection_factor 0.0 []) ; Silstrup
+  (canopy_dissipation_rate 0 [h^-1])
+  (decompose_rate 0 [h^-1])
+  (C_below const 0 [g/cm^3]))
+
+(defchemistry Bromide-9 default
+  (trace Bromide-9))
+  
+  
+  
+;;; Pure colloids.
+
+(defchemical colloid common
+  "Mobile colloids."
+  (diffusion_coefficient 4.6e-6 [cm^2/s])
+  (decompose_rate 0 [h^-1]))
+
+(defreaction colloid-filter filter_velocity
+  "Filtration of colloids in the soil matrix."
+  (cite "mcgechan2002")
+  (fc_primary 80 [m^-1])              ;Filter coefficient primary domain.
+  (fc_secondary 40 [m^-1])            ;Ditto for secondary domain.
+  (mobile colloid))
+
+(defreaction colloid-generation colgen_Jarvis99
+  "Release of colloids in soil surface from heavy rain."
+  (kd 7.5 [g/J])                       ;Detachment rate coefficient.
+  (kr 0.05 [g/m^2/h])                    ;Replenishment rate coefficient.
+  (zi 0.05 [cm])                         ;Surface layer thickness.
+  (colloid colloid))
+
+(defchemistry colloids default
+  (trace colloid)
+  (reaction colloid-filter colloid-generation))
+
+
+
+
+;;; Fenpropimorph
+
+(defchemical Fenpropimorph-base herbicide
+  "Base parameterization for all Fenpropimorph forms."
+  (cite ppdb20100517)
+  (decompose_halftime 25.5 [d]))
+
+(defchemical Fenpropimorph Fenpropimorph-base
+  "Dissolved fenpropimorph."
+  (adsorption none))
+
+(defchemical Fenpropimorph-immobile Fenpropimorph-base
+  "Fenpropimorph sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction Fenpropimorph-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Fenpropimorph."
+  (sorbed Fenpropimorph-immobile)
+  (solute Fenpropimorph)
+  (cite ppdb20100517)
+  (K_OC 2401 [ml/g])  
+  (k_sorption 0.05 [h^-1]))
+
+(defchemical Fenpropimorph-colloid Fenpropimorph-base
+  "Fenpropimorph sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Fenpropimorph-colloid-sorption Fenpropimorph-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound Fenpropimorph."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Fenpropimorph-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Fenpropimorph-filter colloid-filter
+  "Filtration of colloid-bound fenpropimorph in the soil matrix."
+  (mobile Fenpropimorph-colloid)
+  (immobile Fenpropimorph-immobile))
+
+(defreaction Fenpropimorph-colloid-generation bound_release
+  "Release immobile Fenpropimorph as colloids in mixing layer."
+  (colloid colloid)
+  (immobile Fenpropimorph-immobile)
+  (bound Fenpropimorph-colloid))
+
+(defchemistry Fenpropimorph default
+  "Fenpropimorph in both immobile, solute and colloid form."
+  (trace Fenpropimorph Fenpropimorph-immobile Fenpropimorph-colloid)
+  (reaction Fenpropimorph-immobile-sorption
+            Fenpropimorph-filter 
+            Fenpropimorph-colloid-generation
+            Fenpropimorph-colloid-sorption
+            ))
+
+
+
+
+;;; Bentazone
+
+(defchemical Bentazone-base herbicide
+  "Base parameterization for all Bentazone forms."
+  (cite ppdb20100517)
+  (canopy_dissipation_rate 0.0067 [h^-1])
+  ;;(canopy_dissipation_halftime 75 [h]) ; Source: Eyheraguibel et al. 2009.
+  ;; De opgiver et tal på 30 timer (med konstant stråling på 550 w/m2), som vi omregner til 75 timer, 
+  ;; baseret på middelværdien af globalstråling i juni måned (for alle juni´er i hele vejrfilen), 
+  ;; som har en middelværdi på 220 w/m2. Dvs vi har beregnet antal timer med 220 W/m2, som svarer til 
+  ;; 30 timer med 550 W/m2. (30*550)/220
+  (decompose_halftime 14 [d]))
+
+(defchemical Bentazone Bentazone-base
+  "Dissolved bentazone."
+  (adsorption none))
+
+(defchemical Bentazone-immobile Bentazone-base
+  "Bentazone sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction Bentazone-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Bentazone."
+  (sorbed Bentazone-immobile)
+  (solute Bentazone)
+  (cite ppdb20100517)
+  (K_OC 55.3 [ml/g])  
+  (k_sorption 0.05 [h^-1]))
+
+(defchemical Bentazone-colloid Bentazone-base
+  "Bentazone sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Bentazone-colloid-sorption Bentazone-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound Bentazone."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Bentazone-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Bentazone-filter colloid-filter
+  "Filtration of colloid-bound bentazone in the soil matrix."
+  (mobile Bentazone-colloid)
+  (immobile Bentazone-immobile))
+
+(defreaction Bentazone-colloid-generation bound_release
+  "Release immobile Bentazone as colloids in mixing layer."
+  (colloid colloid)
+  (immobile Bentazone-immobile)
+  (bound Bentazone-colloid))
+
+(defchemistry Bentazone default
+  "Bentazone in both immobile, solute and colloid form."
+  (trace Bentazone Bentazone-immobile Bentazone-colloid)
+  (reaction Bentazone-immobile-sorption
+            Bentazone-filter 
+            Bentazone-colloid-generation
+            Bentazone-colloid-sorption
+            ))
+
+
+
+;;; Bentazone-1 (korriget for Dissipation factor)
+
+(defchemical Bentazone-1-base herbicide
+  "Base parameterization for all Bentazone-1 forms."
+  (cite ppdb20100517)
+  (canopy_dissipation_rate 0.0067 [h^-1])
+  ;;(canopy_dissipation_halftime 75 [h]) ; Source: Eyheraguibel et al. 2009.
+    ;; De opgiver et tal på 30 timer (med konstant stråling på 550 w/m2), som vi omregner til 75 timer, 
+    ;; baseret på middelværdien af globalstråling i juni måned (for alle juni´er i hele vejrfilen), 
+    ;; som har en middelværdi på 220 w/m2. Dvs vi har beregnet antal timer med 220 W/m2, som svarer til 
+  ;; 30 timer med 550 W/m2. (30*550)/220
+  (decompose_halftime 14 [d]))
+
+(defchemical Bentazone-1 Bentazone-1-base
+  "Dissolved fenpropimorph."
+  (adsorption none))
+
+(defchemical Bentazone-1-immobile Bentazone-1-base
+  "Bentazone-1 sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction Bentazone-1-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Bentazone-1."
+  (sorbed Bentazone-1-immobile)
+  (solute Bentazone-1)
+  (cite ppdb20100517)
+  (K_OC 55.3 [ml/g])  
+  (k_sorption 0.05 [h^-1]))
+
+(defchemical Bentazone-1-colloid Bentazone-1-base
+  "Bentazone-1 sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Bentazone-1-colloid-sorption Bentazone-1-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound Bentazone-1."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Bentazone-1-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Bentazone-1-filter colloid-filter
+  "Filtration of colloid-bound fenpropimorph in the soil matrix."
+  (mobile Bentazone-1-colloid)
+  (immobile Bentazone-1-immobile))
+
+(defreaction Bentazone-1-colloid-generation bound_release
+  "Release immobile Bentazone-1 as colloids in mixing layer."
+  (colloid colloid)
+  (immobile Bentazone-1-immobile)
+  (bound Bentazone-1-colloid))
+
+(defchemistry Bentazone-1 default
+  "Bentazone-1 in both immobile, solute and colloid form."
+  (trace Bentazone-1 Bentazone-1-immobile Bentazone-1-colloid)
+  (reaction Bentazone-1-immobile-sorption
+            Bentazone-1-filter 
+            Bentazone-1-colloid-generation
+            Bentazone-1-colloid-sorption
+            ))
+
+
+;;; Bentazone-2 (Korrigeret for dissipation factor)
+
+(defchemical Bentazone-2-base herbicide
+  "Base parameterization for all Bentazone-2 forms."
+  (cite ppdb20100517)
+  (canopy_dissipation_rate 0.0067 [h^-1])
+  ;;(canopy_dissipation_halftime 75 [h]) ; Source: Eyheraguibel et al. 2009.
+    ;; De opgiver et tal på 30 timer (med konstant stråling på 550 w/m2), som vi omregner til 75 timer, 
+    ;; baseret på middelværdien af globalstråling i juni måned (for alle juni´er i hele vejrfilen), 
+    ;; som har en middelværdi på 220 w/m2. Dvs vi har beregnet antal timer med 220 W/m2, som svarer til 
+    ;; 30 timer med 550 W/m2. (30*550)/220
+  (decompose_halftime 14 [d]))
+
+(defchemical Bentazone-2 Bentazone-2-base
+  "Dissolved fenpropimorph."
+  (adsorption none))
+
+(defchemical Bentazone-2-immobile Bentazone-2-base
+  "Bentazone-2 sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction Bentazone-2-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Bentazone-2."
+  (sorbed Bentazone-2-immobile)
+  (solute Bentazone-2)
+  (cite ppdb20100517)
+  (K_OC 55.3 [ml/g])  
+  (k_sorption 0.05 [h^-1]))
+
+(defchemical Bentazone-2-colloid Bentazone-2-base
+  "Bentazone-2 sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Bentazone-2-colloid-sorption Bentazone-2-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound Bentazone-2."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Bentazone-2-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Bentazone-2-filter colloid-filter
+  "Filtration of colloid-bound fenpropimorph in the soil matrix."
+  (mobile Bentazone-2-colloid)
+  (immobile Bentazone-2-immobile))
+
+(defreaction Bentazone-2-colloid-generation bound_release
+  "Release immobile Bentazone-2 as colloids in mixing layer."
+  (colloid colloid)
+  (immobile Bentazone-2-immobile)
+  (bound Bentazone-2-colloid))
+
+(defchemistry Bentazone-2 default
+  "Bentazone-2 in both immobile, solute and colloid form."
+  (trace Bentazone-2 Bentazone-2-immobile Bentazone-2-colloid)
+  (reaction Bentazone-2-immobile-sorption
+            Bentazone-2-filter 
+            Bentazone-2-colloid-generation
+            Bentazone-2-colloid-sorption
+            ))
+            
+            
+            
+;;; Bentazone-3
+
+(defchemical Bentazone-3-base herbicide
+  "Base parameterization for all Bentazone-3 forms."
+  (cite ppdb20100517)
+  (canopy_dissipation_rate 0.0067 [h^-1])
+  ;;(canopy_dissipation_halftime 75 [h]) ; Source: Eyheraguibel et al. 2009.
+    ;; De opgiver et tal på 30 timer (med konstant stråling på 550 w/m2), som vi omregner til 75 timer, 
+    ;; baseret på middelværdien af globalstråling i juni måned (for alle juni´er i hele vejrfilen), 
+    ;; som har en middelværdi på 220 w/m2. Dvs vi har beregnet antal timer med 220 W/m2, som svarer til 
+  ;; 30 timer med 550 W/m2. (30*550)/220
+  (decompose_halftime 14 [d]))
+
+(defchemical Bentazone-3 Bentazone-3-base
+  "Dissolved fenpropimorph."
+  (adsorption none))
+
+(defchemical Bentazone-3-immobile Bentazone-3-base
+  "Bentazone-3 sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction Bentazone-3-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Bentazone-3."
+  (sorbed Bentazone-3-immobile)
+  (solute Bentazone-3)
+  (cite ppdb20100517)
+  (K_OC 55.3 [ml/g])  
+  (k_sorption 0.05 [h^-1]))
+
+(defchemical Bentazone-3-colloid Bentazone-3-base
+  "Bentazone-3 sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Bentazone-3-colloid-sorption Bentazone-3-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound Bentazone-3."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Bentazone-3-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Bentazone-3-filter colloid-filter
+  "Filtration of colloid-bound fenpropimorph in the soil matrix."
+  (mobile Bentazone-3-colloid)
+  (immobile Bentazone-3-immobile))
+
+(defreaction Bentazone-3-colloid-generation bound_release
+  "Release immobile Bentazone-3 as colloids in mixing layer."
+  (colloid colloid)
+  (immobile Bentazone-3-immobile)
+  (bound Bentazone-3-colloid))
+
+(defchemistry Bentazone-3 default
+  "Bentazone-3 in both immobile, solute and colloid form."
+  (trace Bentazone-3 Bentazone-3-immobile Bentazone-3-colloid)
+  (reaction Bentazone-3-immobile-sorption
+            Bentazone-3-filter 
+            Bentazone-3-colloid-generation
+            Bentazone-3-colloid-sorption
+            ))
+            
+            
+;;; Bentazone-4
+
+(defchemical Bentazone-4-base herbicide
+  "Base parameterization for all Bentazone-4 forms."
+  (cite ppdb20100517)
+  (canopy_dissipation_rate 0.0067 [h^-1])
+  ;;(canopy_dissipation_halftime 75 [h]) ; Source: Eyheraguibel et al. 2009.
+    ;; De opgiver et tal på 30 timer (med konstant stråling på 550 w/m2), som vi omregner til 75 timer, 
+    ;; baseret på middelværdien af globalstråling i juni måned (for alle juni´er i hele vejrfilen), 
+    ;; som har en middelværdi på 220 w/m2. Dvs vi har beregnet antal timer med 220 W/m2, som svarer til 
+  ;; 30 timer med 550 W/m2. (30*550)/220
+  (decompose_halftime 14 [d]))
+
+(defchemical Bentazone-4 Bentazone-4-base
+  "Dissolved fenpropimorph."
+  (adsorption none))
+
+(defchemical Bentazone-4-immobile Bentazone-4-base
+  "Bentazone-4 sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction Bentazone-4-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Bentazone-4."
+  (sorbed Bentazone-4-immobile)
+  (solute Bentazone-4)
+  (cite ppdb20100517)
+  (K_OC 55.3 [ml/g])  
+  (k_sorption 0.05 [h^-1]))
+
+(defchemical Bentazone-4-colloid Bentazone-4-base
+  "Bentazone-4 sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Bentazone-4-colloid-sorption Bentazone-4-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound Bentazone-4."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Bentazone-4-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Bentazone-4-filter colloid-filter
+  "Filtration of colloid-bound fenpropimorph in the soil matrix."
+  (mobile Bentazone-4-colloid)
+  (immobile Bentazone-4-immobile))
+
+(defreaction Bentazone-4-colloid-generation bound_release
+  "Release immobile Bentazone-4 as colloids in mixing layer."
+  (colloid colloid)
+  (immobile Bentazone-4-immobile)
+  (bound Bentazone-4-colloid))
+
+(defchemistry Bentazone-4 default
+  "Bentazone-4 in both immobile, solute and colloid form."
+  (trace Bentazone-4 Bentazone-4-immobile Bentazone-4-colloid)
+  (reaction Bentazone-4-immobile-sorption
+            Bentazone-4-filter 
+            Bentazone-4-colloid-generation
+            Bentazone-4-colloid-sorption
+            ))
+
+
+
+
+;;; Bentazone-5
+
+(defchemical Bentazone-5-base herbicide
+  "Base parameterization for all Bentazone-5 forms."
+  (cite ppdb20100517)
+  (canopy_dissipation_rate 0.0067 [h^-1])
+  ;;(canopy_dissipation_halftime 75 [h]) ; Source: Eyheraguibel et al. 2009.
+    ;; De opgiver et tal på 30 timer (med konstant stråling på 550 w/m2), som vi omregner til 75 timer, 
+    ;; baseret på middelværdien af globalstråling i juni måned (for alle juni´er i hele vejrfilen), 
+    ;; som har en middelværdi på 220 w/m2. Dvs vi har beregnet antal timer med 220 W/m2, som svarer til 
+  ;; 30 timer med 550 W/m2. (30*550)/220
+  (decompose_halftime 14 [d]))
+
+(defchemical Bentazone-5 Bentazone-5-base
+  "Dissolved fenpropimorph."
+  (adsorption none))
+
+(defchemical Bentazone-5-immobile Bentazone-5-base
+  "Bentazone-5 sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction Bentazone-5-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Bentazone-5."
+  (sorbed Bentazone-5-immobile)
+  (solute Bentazone-5)
+  (cite ppdb20100517)
+  (K_OC 55.3 [ml/g])  
+  (k_sorption 0.05 [h^-1]))
+
+(defchemical Bentazone-5-colloid Bentazone-5-base
+  "Bentazone-5 sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Bentazone-5-colloid-sorption Bentazone-5-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound Bentazone-5."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Bentazone-5-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Bentazone-5-filter colloid-filter
+  "Filtration of colloid-bound fenpropimorph in the soil matrix."
+  (mobile Bentazone-5-colloid)
+  (immobile Bentazone-5-immobile))
+
+(defreaction Bentazone-5-colloid-generation bound_release
+  "Release immobile Bentazone-5 as colloids in mixing layer."
+  (colloid colloid)
+  (immobile Bentazone-5-immobile)
+  (bound Bentazone-5-colloid))
+
+(defchemistry Bentazone-5 default
+  "Bentazone-5 in both immobile, solute and colloid form."
+  (trace Bentazone-5 Bentazone-5-immobile Bentazone-5-colloid)
+  (reaction Bentazone-5-immobile-sorption
+            Bentazone-5-filter 
+            Bentazone-5-colloid-generation
+            Bentazone-5-colloid-sorption
+            ))
+
+
+
+
+;;; Bentazone-6
+
+(defchemical Bentazone-6-base herbicide
+  "Base parameterization for all Bentazone-6 forms."
+  (cite ppdb20100517)
+  (canopy_dissipation_rate 0.0067 [h^-1])
+  ;;(canopy_dissipation_halftime 75 [h]) ; Source: Eyheraguibel et al. 2009.
+    ;; De opgiver et tal på 30 timer (med konstant stråling på 550 w/m2), som vi omregner til 75 timer, 
+    ;; baseret på middelværdien af globalstråling i juni måned (for alle juni´er i hele vejrfilen), 
+    ;; som har en middelværdi på 220 w/m2. Dvs vi har beregnet antal timer med 220 W/m2, som svarer til 
+  ;; 30 timer med 550 W/m2. (30*550)/220
+  (decompose_halftime 14 [d]))
+
+(defchemical Bentazone-6 Bentazone-6-base
+  "Dissolved fenpropimorph."
+  (adsorption none))
+
+(defchemical Bentazone-6-immobile Bentazone-6-base
+  "Bentazone-6 sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction Bentazone-6-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Bentazone-6."
+  (sorbed Bentazone-6-immobile)
+  (solute Bentazone-6)
+  (cite ppdb20100517)
+  (K_OC 55.3 [ml/g])  
+  (k_sorption 0.05 [h^-1]))
+
+(defchemical Bentazone-6-colloid Bentazone-6-base
+  "Bentazone-6 sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Bentazone-6-colloid-sorption Bentazone-6-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound Bentazone-6."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Bentazone-6-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Bentazone-6-filter colloid-filter
+  "Filtration of colloid-bound fenpropimorph in the soil matrix."
+  (mobile Bentazone-6-colloid)
+  (immobile Bentazone-6-immobile))
+
+(defreaction Bentazone-6-colloid-generation bound_release
+  "Release immobile Bentazone-6 as colloids in mixing layer."
+  (colloid colloid)
+  (immobile Bentazone-6-immobile)
+  (bound Bentazone-6-colloid))
+
+(defchemistry Bentazone-6 default
+  "Bentazone-6 in both immobile, solute and colloid form."
+  (trace Bentazone-6 Bentazone-6-immobile Bentazone-6-colloid)
+  (reaction Bentazone-6-immobile-sorption
+            Bentazone-6-filter 
+            Bentazone-6-colloid-generation
+            Bentazone-6-colloid-sorption
+            ))
+
+
+
+
+
+
+;;; Dimethoate
+
+(defchemical Dimethoate-base herbicide
+  "Base parameterization for all Dimethoate forms."
+  ;;(cite ppdb20100517)
+  ;;(decompose_halftime 7.2 [d])
+  (cite vap2003)                            ;Estrup PLAP measurements.
+  (decompose_halftime 74 [d])           ;80-100 cm
+  (decompose_depth_factor (-80 [cm]  1.0 []) ;80- cm
+                          ;; End of Estrup plow layer is 27 cm
+                          (-27 [cm] 40.0 []))) ;1.85 d
+
+(defchemical Dimethoate Dimethoate-base
+  "Dissolved dimethoate."
+  (adsorption none))
+
+(defchemical Dimethoate-immobile Dimethoate-base
+  "Dimethoate sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction Dimethoate-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Dimethoate."
+  (sorbed Dimethoate-immobile)
+  (solute Dimethoate)
+
+  ;; (cite ppdb20100517)
+  ;; (K_OC 30 [l/kg])
+  (cite vap2003)
+  (K_OC 86 [l/kg])
+  
+  (k_sorption 0.05 [h^-1]))                  ;Sorption rate.
+
+(defchemical Dimethoate-colloid Dimethoate-base
+  "Dimethoate sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Dimethoate-colloid-sorption Dimethoate-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound Dimethoate."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Dimethoate-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Dimethoate-filter colloid-filter
+  "Filtration of colloid-bound dimethoate in the soil matrix."
+  (mobile Dimethoate-colloid)
+  (immobile Dimethoate-immobile))
+
+(defreaction Dimethoate-colloid-generation bound_release
+  "Release immobile Dimethoate as colloids in mixing layer."
+  (colloid colloid)
+  (immobile Dimethoate-immobile)
+  (bound Dimethoate-colloid))
+
+(defchemistry Dimethoate default
+  "Dimethoate in both immobile, solute and colloid form."
+  (trace Dimethoate Dimethoate-immobile Dimethoate-colloid)
+  (reaction Dimethoate-immobile-sorption
+            Dimethoate-filter 
+            Dimethoate-colloid-generation
+            Dimethoate-colloid-sorption
+            ))
+
+;;; Glyphosate (Henvise til Miljøstyrelse markdrænprojekt)
+
+(defchemical Glyphosate-base herbicide
+  "Base parameterization for all Glyphosate forms."
+  (canopy_dissipation_rate 0.00083 [h^-1])
+  (cite ppdb20100517)
+  (decompose_halftime 12 [d]))
+
+(defchemical Glyphosate Glyphosate-base
+  "Dissolved glyphosate."
+  (adsorption none))
+
+(defchemical Glyphosate-immobile Glyphosate-base
+  "Glyphosate sorbed to immobile soil."
+  (adsorption full))
+
+(defchemical Glyphosate-immobile-strong Glyphosate-immobile)
+(defchemical Glyphosate-immobile-weak Glyphosate-immobile)
+
+(defchemical Glyphosate-colloid Glyphosate-base
+  "Glyphosate sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Glyphosate-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Glyphosate."
+  (cite gjettermann2009)
+  (K_d 503 [l/kg])
+  ;; (K_d 10 [l/kg])
+  (solute Glyphosate))
+
+(defreaction Glyphosate-immobile-sorption-strong Glyphosate-immobile-sorption
+  (sorbed Glyphosate-immobile-strong)
+  (K_d 463 [l/kg])
+  ;; (K_d 10 [l/kg])
+  (k_sorption 0.005 [h^-1]))
+
+(defreaction Glyphosate-immobile-sorption-weak Glyphosate-immobile-sorption
+  (sorbed Glyphosate-immobile-weak)
+  (K_d 40 [l/kg])
+  ;; (K_d 1 [l/kg])
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Glyphosate-colloid-sorption Glyphosate-immobile-sorption-weak
+  "Sorption equilibrium between dissolved and colloid-bound Glyphosate."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Glyphosate-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Glyphosate-filter colloid-filter
+  "Filtration of colloid-bound glyphosate in the soil matrix."
+  (mobile Glyphosate-colloid)
+  (immobile Glyphosate-immobile-weak))
+
+(defreaction Glyphosate-colloid-generation bound_release
+  "Release immobile Glyphosate as colloids in mixing layer."
+  (colloid colloid)
+  (bound Glyphosate-colloid))
+
+(defreaction Glyphosate-colloid-generation-strong Glyphosate-colloid-generation 
+  (immobile Glyphosate-immobile-strong))
+
+(defreaction Glyphosate-colloid-generation-weak Glyphosate-colloid-generation 
+  (immobile Glyphosate-immobile-weak))
+
+(defchemistry Glyphosate default
+  "Glyphosate in both immobile, solute and colloid form."
+  (trace Glyphosate Glyphosate-immobile-strong Glyphosate-immobile-weak
+         Glyphosate-colloid)
+  (reaction Glyphosate-immobile-sorption-strong
+            Glyphosate-immobile-sorption-weak
+            Glyphosate-filter 
+            Glyphosate-colloid-generation-strong
+            Glyphosate-colloid-generation-weak
+            Glyphosate-colloid-sorption))
+
+
+;;; Glyphosate-1
+
+(defchemical Glyphosate-1-base herbicide
+  "Base parameterization for all Glyphosate-1 forms."
+  (canopy_dissipation_rate 0.00083 [h^-1])
+  (cite ppdb20100517)
+  (decompose_halftime 12 [d]))
+
+(defchemical Glyphosate-1 Glyphosate-1-base
+  "Dissolved glyphosate."
+  (adsorption none))
+
+(defchemical Glyphosate-1-immobile Glyphosate-1-base
+  "Glyphosate-1 sorbed to immobile soil."
+  (adsorption full))
+
+(defchemical Glyphosate-1-immobile-strong Glyphosate-1-immobile)
+(defchemical Glyphosate-1-immobile-weak Glyphosate-1-immobile)
+
+(defchemical Glyphosate-1-colloid Glyphosate-1-base
+  "Glyphosate-1 sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Glyphosate-1-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Glyphosate-1."
+  (cite gjettermann2009)
+  (K_d 503 [l/kg])
+  ;; (K_d 10 [l/kg])
+  (solute Glyphosate-1))
+
+(defreaction Glyphosate-1-immobile-sorption-strong Glyphosate-1-immobile-sorption
+  (sorbed Glyphosate-1-immobile-strong)
+  (K_d 463 [l/kg])
+  ;; (K_d 10 [l/kg])
+  (k_sorption 0.005 [h^-1]))
+
+(defreaction Glyphosate-1-immobile-sorption-weak Glyphosate-1-immobile-sorption
+  (sorbed Glyphosate-1-immobile-weak)
+  (K_d 40 [l/kg])
+  ;; (K_d 1 [l/kg])
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Glyphosate-1-colloid-sorption Glyphosate-1-immobile-sorption-weak
+  "Sorption equilibrium between dissolved and colloid-bound Glyphosate-1."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Glyphosate-1-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Glyphosate-1-filter colloid-filter
+  "Filtration of colloid-bound glyphosate in the soil matrix."
+  (mobile Glyphosate-1-colloid)
+  (immobile Glyphosate-1-immobile-weak))
+
+(defreaction Glyphosate-1-colloid-generation bound_release
+  "Release immobile Glyphosate-1 as colloids in mixing layer."
+  (colloid colloid)
+  (bound Glyphosate-1-colloid))
+
+(defreaction Glyphosate-1-colloid-generation-strong Glyphosate-1-colloid-generation 
+  (immobile Glyphosate-1-immobile-strong))
+
+(defreaction Glyphosate-1-colloid-generation-weak Glyphosate-1-colloid-generation 
+  (immobile Glyphosate-1-immobile-weak))
+
+(defchemistry Glyphosate-1 default
+  "Glyphosate-1 in both immobile, solute and colloid form."
+  (trace Glyphosate-1 Glyphosate-1-immobile-strong Glyphosate-1-immobile-weak
+         Glyphosate-1-colloid)
+  (reaction Glyphosate-1-immobile-sorption-strong
+            Glyphosate-1-immobile-sorption-weak
+            Glyphosate-1-filter 
+            Glyphosate-1-colloid-generation-strong
+            Glyphosate-1-colloid-generation-weak
+            Glyphosate-1-colloid-sorption))
+
+
+;;; Glyphosate-2
+
+(defchemical Glyphosate-2-base herbicide
+  "Base parameterization for all Glyphosate-2 forms."
+  (canopy_dissipation_rate 0.00083 [h^-1])
+  (cite ppdb20100517)
+  (decompose_halftime 12 [d]))
+
+(defchemical Glyphosate-2 Glyphosate-2-base
+  "Dissolved glyphosate."
+  (adsorption none))
+
+(defchemical Glyphosate-2-immobile Glyphosate-2-base
+  "Glyphosate-2 sorbed to immobile soil."
+  (adsorption full))
+
+(defchemical Glyphosate-2-immobile-strong Glyphosate-2-immobile)
+(defchemical Glyphosate-2-immobile-weak Glyphosate-2-immobile)
+
+(defchemical Glyphosate-2-colloid Glyphosate-2-base
+  "Glyphosate-2 sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Glyphosate-2-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Glyphosate-2."
+  (cite gjettermann2009)
+  (K_d 503 [l/kg])
+  ;; (K_d 10 [l/kg])
+  (solute Glyphosate-2))
+
+(defreaction Glyphosate-2-immobile-sorption-strong Glyphosate-2-immobile-sorption
+  (sorbed Glyphosate-2-immobile-strong)
+  (K_d 463 [l/kg])
+  ;; (K_d 10 [l/kg])
+  (k_sorption 0.005 [h^-1]))
+
+(defreaction Glyphosate-2-immobile-sorption-weak Glyphosate-2-immobile-sorption
+  (sorbed Glyphosate-2-immobile-weak)
+  (K_d 40 [l/kg])
+  ;; (K_d 1 [l/kg])
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Glyphosate-2-colloid-sorption Glyphosate-2-immobile-sorption-weak
+  "Sorption equilibrium between dissolved and colloid-bound Glyphosate-2."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Glyphosate-2-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Glyphosate-2-filter colloid-filter
+  "Filtration of colloid-bound glyphosate in the soil matrix."
+  (mobile Glyphosate-2-colloid)
+  (immobile Glyphosate-2-immobile-weak))
+
+(defreaction Glyphosate-2-colloid-generation bound_release
+  "Release immobile Glyphosate-2 as colloids in mixing layer."
+  (colloid colloid)
+  (bound Glyphosate-2-colloid))
+
+(defreaction Glyphosate-2-colloid-generation-strong Glyphosate-2-colloid-generation 
+  (immobile Glyphosate-2-immobile-strong))
+
+(defreaction Glyphosate-2-colloid-generation-weak Glyphosate-2-colloid-generation 
+  (immobile Glyphosate-2-immobile-weak))
+
+(defchemistry Glyphosate-2 default
+  "Glyphosate-2 in both immobile, solute and colloid form."
+  (trace Glyphosate-2 Glyphosate-2-immobile-strong Glyphosate-2-immobile-weak
+         Glyphosate-2-colloid)
+  (reaction Glyphosate-2-immobile-sorption-strong
+            Glyphosate-2-immobile-sorption-weak
+            Glyphosate-2-filter 
+            Glyphosate-2-colloid-generation-strong
+            Glyphosate-2-colloid-generation-weak
+            Glyphosate-2-colloid-sorption))
+
+
+
+
+
+;;; Glyphosate-3
+
+(defchemical Glyphosate-3-base herbicide
+  "Base parameterization for all Glyphosate-3 forms."
+  (canopy_dissipation_rate 0.00083 [h^-1])
+  (cite ppdb20100517)
+  (decompose_halftime 12 [d]))
+
+(defchemical Glyphosate-3 Glyphosate-3-base
+  "Dissolved glyphosate."
+  (adsorption none))
+
+(defchemical Glyphosate-3-immobile Glyphosate-3-base
+  "Glyphosate-3 sorbed to immobile soil."
+  (adsorption full))
+
+(defchemical Glyphosate-3-immobile-strong Glyphosate-3-immobile)
+(defchemical Glyphosate-3-immobile-weak Glyphosate-3-immobile)
+
+(defchemical Glyphosate-3-colloid Glyphosate-3-base
+  "Glyphosate-3 sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Glyphosate-3-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Glyphosate-3."
+  (cite gjettermann2009)
+  (K_d 503 [l/kg])
+  ;; (K_d 10 [l/kg])
+  (solute Glyphosate-3))
+
+(defreaction Glyphosate-3-immobile-sorption-strong Glyphosate-3-immobile-sorption
+  (sorbed Glyphosate-3-immobile-strong)
+  (K_d 463 [l/kg])
+  ;; (K_d 10 [l/kg])
+  (k_sorption 0.005 [h^-1]))
+
+(defreaction Glyphosate-3-immobile-sorption-weak Glyphosate-3-immobile-sorption
+  (sorbed Glyphosate-3-immobile-weak)
+  (K_d 40 [l/kg])
+  ;; (K_d 1 [l/kg])
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Glyphosate-3-colloid-sorption Glyphosate-3-immobile-sorption-weak
+  "Sorption equilibrium between dissolved and colloid-bound Glyphosate-3."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Glyphosate-3-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Glyphosate-3-filter colloid-filter
+  "Filtration of colloid-bound glyphosate in the soil matrix."
+  (mobile Glyphosate-3-colloid)
+  (immobile Glyphosate-3-immobile-weak))
+
+(defreaction Glyphosate-3-colloid-generation bound_release
+  "Release immobile Glyphosate-3 as colloids in mixing layer."
+  (colloid colloid)
+  (bound Glyphosate-3-colloid))
+
+(defreaction Glyphosate-3-colloid-generation-strong Glyphosate-3-colloid-generation 
+  (immobile Glyphosate-3-immobile-strong))
+
+(defreaction Glyphosate-3-colloid-generation-weak Glyphosate-3-colloid-generation 
+  (immobile Glyphosate-3-immobile-weak))
+
+(defchemistry Glyphosate-3 default
+  "Glyphosate-3 in both immobile, solute and colloid form."
+  (trace Glyphosate-3 Glyphosate-3-immobile-strong Glyphosate-3-immobile-weak
+         Glyphosate-3-colloid)
+  (reaction Glyphosate-3-immobile-sorption-strong
+            Glyphosate-3-immobile-sorption-weak
+            Glyphosate-3-filter 
+            Glyphosate-3-colloid-generation-strong
+            Glyphosate-3-colloid-generation-weak
+            Glyphosate-3-colloid-sorption))
+
+
+
+
+
+;;; Metamitron
+
+(defchemical Metamitron-base herbicide
+  "Base parameterization for all Metamitron forms."
+  ;; 6.6-11.1-22.0
+  ;; 35 too high
+  (decompose_halftime 11.1 [d])
+  )
+
+(defchemical Metamitron Metamitron-base
+  "Dissolved metamitron."
+  (adsorption none))
+
+(defchemical Metamitron-immobile Metamitron-base
+  "Metamitron sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction Metamitron-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Metamitron."
+  ;;(cite lindhardt2001)
+  ;; (K_OC 207 [l/kg])
+  ;; (K_d 1 [l/kg])
+  ;; Kalib:
+  ;; (K_d 4 [l/kg])
+  (cite vap2003) ;; Silstrup PLAP analysis. 
+  (K_OC 160 [l/kg])
+  (k_sorption 0.05 [h^-1])
+  (solute Metamitron)
+  (sorbed Metamitron-immobile)
+  )
+
+(defchemical Metamitron-colloid Metamitron-base
+  "Metamitron sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Metamitron-colloid-sorption Metamitron-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound Metamitron."
+  (colloid colloid)
+  (soil_enrichment_factor 10000 [])
+  (sorbed Metamitron-colloid)
+  (k_sorption 0.05 [h^-1]))
+
+(defreaction Metamitron-filter colloid-filter
+  "Filtration of colloid-bound metamitron in the soil matrix."
+  (mobile Metamitron-colloid)
+  (immobile Metamitron-immobile))
+
+(defreaction Metamitron-colloid-generation bound_release
+  "Release immobile Metamitron as colloids in mixing layer."
+  (colloid colloid)
+  (bound Metamitron-colloid)
+  (immobile Metamitron-immobile))
+
+(defchemistry Metamitron default
+  "Metamitron in both immobile, solute and colloid form."
+  (trace Metamitron Metamitron-immobile Metamitron-colloid)
+  (reaction Metamitron-immobile-sorption
+            Metamitron-filter 
+            Metamitron-colloid-generation
+            Metamitron-colloid-sorption))
+
+(defsummary "Colloid bound sorption" balance
+  "Balance between soil, colloid and solute forms."
+  (precision 3)
+  (require_top true)
+  (input "Solute-Transform")
+  (output "Soil-Transform" "Colloid-Transform")
+  (content))
+
+(defsummary "Colloid bound" balance
+  "Balance for all forms of chemical."
+  (precision 3)
+  (require_top true)
+  (input "Solute-Spray" "Soil-Spray")
+  (output  "Solute-Surface-Loss" "Colloid-Surface-Loss" "Soil-Surface-Loss" 
+           "Solute-Surface-Drain" "Colloid-Surface-Drain"
+           "Solute-Decompose" "Colloid-Decompose" "Soil-Decompose"
+           "Solute-Leak" "Colloid-Leak"
+           "Solute-Drain" "Colloid-Drain")
+  (content "Solute-Surface" "Colloid-Surface" "Soil-Surface"
+           "Solute-Tertiary" "Colloid-Tertiary"
+           "Solute-Matrix" "Colloid-Matrix" "Soil-Matrix"
+           "Solute-Error" "Colloid-Error" "Soil-Error"))
+
+(deflog "Colloid bound" chemical
+  "Information about a chemical that can be bound to colloids."
+
+  ;; Parameters.
+  (declare chemistry string
+           "Name of chemistry handling transformations.")
+  (chemistry identity (value "${chemical}"))
+  (declare solute string
+	   "Name of dissolved form of the chemical.")
+  (solute identity (value "${chemical}"))
+  (declare soil string
+	   "Name of immobile form of the chemical.")
+  (soil identity (value "${chemical}-immobile"))
+  (declare colloid string
+	   "Name of colloid bound form of the chemical.")
+  (colloid identity (value "${chemical}-colloid"))
+  (declare unit String "Base unit.")
+  (unit "g/ha")
+
+  ;; Stuff.
+  (where "${colfid}colloid_${chemfid}.dlf")
+  (summary "Colloid bound sorption" "Colloid bound")
+  (when hourly)
+  (entries (number (path column "${column}" Chemistry "*" trace "${solute}"
+                         spray)
+                   (tag "Solute-Spray")
+                   (handle sum)
+                   (dimension "${unit}")
+                   (spec chemical default spray))
+           (number (path column "${column}" Chemistry "*" trace "${soil}"
+                         spray)
+                   (tag "Soil-Spray")
+                   (handle sum)
+                   (dimension "${unit}")
+                   (spec chemical default spray))
+           (number (path column "${column}" Chemistry "*" trace "${solute}"
+                         top_loss)
+                   (tag "Solute-Surface-Loss")
+                   (handle sum)
+                   (dimension "${unit}")
+                   (spec chemical default top_loss))
+           (number (path column "${column}" Chemistry "*" trace "${colloid}"
+                         top_loss)
+                   (tag "Colloid-Surface-Loss")
+                   (handle sum)
+                   (dimension "${unit}")
+                   (spec chemical default top_loss))
+           (number (path column "${column}" Chemistry "*" trace "${soil}"
+                         top_loss)
+                   (tag "Soil-Surface-Loss")
+                   (handle sum)
+                   (dimension "${unit}")
+                   (spec chemical default top_loss))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores classes drain 
+                         solute_infiltration "${solute}" value)
+                   (spec biopore drain solute_infiltration value)
+                   (tag "Solute-Surface-Drain")
+                   (handle sum)
+                   (dimension "${unit}"))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores classes drain 
+                         solute_infiltration "${colloid}" value)
+                   (spec biopore drain solute_infiltration value)
+                   (tag "Colloid-Surface-Drain")
+                   (handle sum)
+                   (dimension "${unit}"))
+           (number (path column "${column}" Chemistry "*" trace "${solute}"
+                         surface_storage)
+                   (tag "Solute-Surface")
+                   (handle current)
+                   (dimension "${unit}")
+                   (spec chemical default surface_storage))
+           (number (path column "${column}" Chemistry "*" trace "${colloid}"
+                         surface_storage)
+                   (tag "Colloid-Surface")
+                   (handle current)
+                   (dimension "${unit}")
+                   (spec chemical default surface_storage))
+           (number (path column "${column}" Chemistry "*" trace "${soil}"
+                         surface_storage)
+                   (tag "Soil-Surface")
+                   (handle current)
+                   (dimension "${unit}")
+                   (spec chemical default surface_storage))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${solute}" S_transform)
+                     (tag "Solute-Transform")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default S_transform))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${colloid}" S_transform)
+                     (tag "Colloid-Transform")
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_transform))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${soil}" S_transform)
+                     (tag "Soil-Transform")
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_transform))
+           (interval (tag "Soil-Sorption")
+                     (path column "${column}" 
+                           Chemistry multi combine "${chemistry}"
+                           reaction "${chemical}-immobile-sorption"
+                           S_sorption)
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec reaction sorption S_sorption))
+           (interval (tag "Colloid-Sorption")
+                     (path column "${column}" 
+                           Chemistry multi combine "${chemistry}"
+                           reaction "${chemical}-colloid-sorption"
+                           S_sorption)
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec reaction sorption S_sorption))
+           (interval (tag "Colloid-Filter-Primary")
+                     (path column "${column}" 
+                           Chemistry multi combine "${chemistry}"
+                           reaction "${chemical}-filter"
+                           F_primary)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec reaction filter_velocity F_primary))
+           (interval (tag "Colloid-Filter-Secondary")
+                     (path column "${column}" 
+                           Chemistry multi combine "${chemistry}"
+                           reaction "${chemical}-filter"
+                           F_secondary)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec reaction filter_velocity F_secondary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${solute}" S_decompose)
+                     (tag "Solute-Decompose")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default S_decompose))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${colloid}" S_decompose)
+                     (tag "Colloid-Decompose")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default S_decompose))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${soil}" S_decompose)
+                     (tag "Soil-Decompose")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default S_decompose))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${solute}" J_matrix)
+                        (tag "Solute-Leak")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (spec chemical default J_matrix))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${colloid}" J_matrix)
+                        (tag "Colloid-Leak")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (spec chemical default J_matrix))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${solute}" S_drain)
+                     (tag "Solute-Drain")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_drain))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${colloid}" S_drain)
+                     (tag "Colloid-Drain")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_drain))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores solute_storage "${solute}" value)
+                   (spec tertiary biopores solute_storage value)
+                   (tag "Solute-Tertiary")
+                   (dimension "${unit}")
+                   (handle current))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores solute_storage "${colloid}" value)
+                   (spec tertiary biopores solute_storage value)
+                   (tag "Colloid-Tertiary")
+                   (dimension "${unit}")
+                   (handle current))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${solute}" M)
+                     (tag "Solute-Matrix")
+                     (dimension "${unit}")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${colloid}" M)
+                     (tag "Colloid-Matrix")
+                     (dimension "${unit}")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${soil}" M)
+                     (tag "Soil-Matrix")
+                     (dimension "${unit}")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${solute}" M_error)
+                     (tag "Solute-Error")
+                     (dimension "${unit}")
+                     (spec chemical default M_error))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${colloid}" M_error)
+                     (tag "Colloid-Error")
+                     (dimension "${unit}")
+                     (spec chemical default M_error))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${soil}" M_error)
+                     (tag "Soil-Error")
+                     (dimension "${unit}")
+                     (spec chemical default M_error))
+           ))
+
+(deflog "Colloid bound2" "Colloid bound"
+  (entries &old 
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${soil}-strong" M)
+                     (tag "Strong-Matrix")
+                     (dimension "${unit}")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${soil}-weak" M)
+                     (tag "Weak-Matrix")
+                     (dimension "${unit}")
+                     (spec chemical default M))))
+
+;;; colloid-bound.dai ends here.
