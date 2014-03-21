@@ -1483,6 +1483,10 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  point.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+program_KM2${OBJ}: program_KM2.C program.h model.h symbol.h run.h lexer.h \
+ filepos.h librarian.h assertion.h time.h treelog.h path.h block_model.h \
+ block_nested.h block.h scope.h attribute.h frame_model.h frame.h \
+ mathlib.h
 program_post${OBJ}: program_post.C program.h model.h symbol.h run.h dlf.h \
  lexer_soil.h lexer_table.h block_model.h block_nested.h block.h scope.h \
  attribute.h treelog.h frame_model.h frame.h units.h memutils.h time.h \
@@ -2215,7 +2219,7 @@ select_array${OBJ}: select_array.C select.h destination.h symbol.h model.h \
  units.h memutils.h volume.h model_derived.h model_logable.h attribute.h \
  soil.h bdconv.h convert.h block_model.h block_nested.h block.h scope.h \
  treelog.h frame_model.h frame.h mathlib.h assertion.h librarian.h \
- column.h model_framed.h irrigate.h
+ column.h model_framed.h irrigate.h geometry.h
 log_harvest${OBJ}: log_harvest.C log.h time.h attribute.h symbol.h border.h \
  model_framed.h model_logable.h model.h daisy.h program.h run.h harvest.h \
  block_model.h block_nested.h block.h scope.h treelog.h frame_model.h \
