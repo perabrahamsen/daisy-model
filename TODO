@@ -1,16 +1,36 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Auto-calibrate Christians setup
+
+* Læs brev fra Århus Ph.D.
+
 * Jordbehandling 
 
 ** Kig på Agrovand
 
+*** Udtræk data
+
+**** Gem filer i cpedata format
+
+**** ret og kør test-cpe.dai for alle plots
+
+**** Sammenlign gamle plot4 data
+
+*** Kør plot4 simulering
+
+*** Generer grafer 
+
+*** Sammenlign data
+
+*** Ret og kør plot 1-3 simuleringer
+
+*** Generer grafer
+
+*** Sammenlign data
+
 ** Marie infiltration til ledningsevne
 
 ** MAHA fuldtid efter 17/4 
-
-* Signe
-
-** Vent på Lars
 
 * Rodartikel ES&M
 
