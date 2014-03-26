@@ -48,7 +48,7 @@ public:
   size_t last_cell (const Geometry&, size_t edge) const;
 
   // Column.
-  double runoff_rate (double dt) const; // [h^-1]
+  double runoff_rate () const; // [h^-1]
   double mixing_resistance () const; // [h/mm]
   double mixing_depth () const; // [cm]
   
@@ -78,10 +78,10 @@ public:
              double soil_T /* [dg C] */, double dt /* [h] */);
 
   // Communication with bioclimate.
-  double ponding_average () const;
-  double ponding_max () const;
-  double temperature () const;
-  double EpFactor () const;
+  double ponding_average () const; // [mm]
+  double ponding_max () const;     // [mm]
+  double temperature () const;     // [dg C]
+  double EpFactor () const;        // []
   double albedo (const Geometry&, const Soil&, const SoilWater&) const;
   double exfiltration (double dt) const; // [mm/h]
   double evap_soil_surface () const; // [mm/h]

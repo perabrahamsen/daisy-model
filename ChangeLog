@@ -1,3 +1,12 @@
+2014-03-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* surface.C, surface.h: Clarified units.
+	* surface.C, surface.h (runoff_rate): No 'dt' argument.
+	* column_std.C (tick_move): Update caller.
+	* action_surface.C (set_surface_detention_capacity): Unit of 'height'
+	should be mm.
+	* surface.C (tick): Missing 'dt' in balance check.
+
 2014-03-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* program_KM2.C: New model.

@@ -48,17 +48,17 @@ struct Surface::Implementation
   const double forced_flux_value;
   typedef std::map<size_t, size_t> pond_map;
   pond_map pond_edge;
-  double pond_average;
-  double pond_max;
-  std::vector<double> pond_section;
-  double EvapSoilSurface;
-  double Eps;
-  double T;
-  double DetentionCapacity;
-  const double ReservoirConstant;
-  const double LocalDetentionCapacity;
-  double runoff;
-  double runoff_fraction;
+  double pond_average;          // [mm]
+  double pond_max;              // [mm]
+  std::vector<double> pond_section; // [mm]
+  double EvapSoilSurface;       // [mm/h]
+  double Eps;                   // [mm/h]
+  double T;                     // [dg C]
+  double DetentionCapacity;     // [mm]
+  const double ReservoirConstant; // [h^-1]
+  const double LocalDetentionCapacity; // [mm]
+  double runoff;                // [mm/h]
+  double runoff_rate;          // [h^-1]
   const double R_mixing;
   const double z_mixing;
   std::auto_ptr<Ridge> ridge_;
@@ -255,8 +255,8 @@ Surface::ponding_max () const
 { return impl->pond_max; }
 
 double
-Surface::runoff_rate (const double dt) const
-{ return impl->runoff_fraction / dt; }
+Surface::runoff_rate () const
+{ return impl->runoff_rate; }
 
 double
 Surface::mixing_resistance () const
@@ -324,29 +324,34 @@ Surface::Implementation::tick (Treelog& msg,
   // Runoff out of field.
   const double old_pond_average = pond_average;
   runoff = 0.0;
-  runoff_fraction = 0.0;
+  runoff_rate = 0.0;
   double total_area = 0.0;
   for (pond_map::iterator i = pond_edge.begin ();
        i != pond_edge.end ();
        i++)
     {
+      const double runoff_speed = // [h^-1]
+        (ReservoirConstant * dt > 1.0)
+        ? 1.0 / dt
+        : ReservoirConstant;
       const size_t edge = (*i).first;
       const size_t c = (*i).second;
       const double area = geo.edge_area (edge);
       total_area += area;
       if (pond_section[c] > DetentionCapacity)
         {
-          const double runoff_section 
-            = (pond_section[c] - DetentionCapacity) * ReservoirConstant;
-          runoff += area * runoff_section;
-          runoff_fraction += area * runoff_section / pond_section[c];
-          pond_section[c] -= runoff_section * dt;
+          const double runoff_section // [mm/h]
+            = (pond_section[c] - DetentionCapacity) * runoff_speed;
+          runoff += area * runoff_section; // [A mm/h]
+          runoff_rate +=          // [A h^-1]
+            area * runoff_section / pond_section[c]; 
+          pond_section[c] -= runoff_section * dt; // [mm]
         }
     }
-  runoff /= total_area;
-  runoff_fraction /= total_area;
+  runoff /= total_area;         // [mm]
+  runoff_rate /= total_area; // [h^-1]
   update_pond_average (geo);
-  daisy_balance (old_pond_average, pond_average, -runoff);
+  daisy_balance (old_pond_average, pond_average, -runoff * dt);
 
   // Runoff internal.
   const double local_pond_average = pond_average;
@@ -685,7 +690,7 @@ Temperature of water or air directly above the surface.");
 	      Attribute::State, "Amount of ponding the surface can retain.\n\
 If ponding in any part of the surface is above this, exceed will runoff.");
   frame.set ("DetentionCapacity", 1000.0);
-  frame.declare ("ReservoirConstant", "h^-1", Check::fraction (), 
+  frame.declare ("ReservoirConstant", "h^-1", Check::positive (), 
 	      Attribute::Const, "\
 Fraction of ponding above DetentionCapacity that runoffs each hour.");
   frame.set ("ReservoirConstant", 1.0);
@@ -733,7 +738,7 @@ Surface::Implementation::Implementation (const FrameSubmodel& al)
     ReservoirConstant (al.number ("ReservoirConstant")),
     LocalDetentionCapacity (al.number ("LocalDetentionCapacity")),
     runoff (0.0),
-    runoff_fraction (0.0),
+    runoff_rate (0.0),
     R_mixing (al.number ("R_mixing")),
     z_mixing (al.number ("z_mixing")),
     ridge_ (al.check ("ridge") ? new Ridge (al.submodel ("ridge")) : NULL)
