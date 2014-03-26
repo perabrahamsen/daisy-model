@@ -70,6 +70,16 @@ static const double g_per_cm2_per_h_to_kg_per_ha_per_y
 static const double kg_per_ha_per_y_to_g_per_cm2_per_h
 /**/ = 1.0 / g_per_cm2_per_h_to_kg_per_ha_per_y;
 
+static void
+validate_am (const std::vector <AM*>& am)
+{
+  std::vector<AOM*> added;
+  for (int i = 0; i < am.size (); i++)
+    am[i]->append_to (added);
+  for (int i = 0; i < added.size (); i++)
+    daisy_assert (std::isfinite (added[i]->initial_C_per_N));
+}
+
 struct OrganicStandard : public OrganicMatter
 {
   // Content.
@@ -893,6 +903,7 @@ OrganicStandard::add (AM& om)
   for (size_t i = 0; i < am.size (); i++)
     daisy_assert (&om != am[i]);
   am.push_back (&om); 
+  validate_am (am);
 }
 
 void 
@@ -969,13 +980,13 @@ OrganicStandard::monthly (const Metalib& metalib, const Geometry& geo,
       add (*remainder);
     }
 
+  validate_am (am);
   const int am_size = am.size ();
   std::vector<AM*> new_am;
   
   for (int i = 0; i < am_size; i++)
     {
       daisy_assert (am[i]);
-
       bool keep;
       
       if (am[i]->locked ())
@@ -1005,7 +1016,9 @@ OrganicStandard::monthly (const Metalib& metalib, const Geometry& geo,
 	}
       am[i] = NULL;
     }
+  validate_am (new_am);
   am = new_am;
+  validate_am (am);
 }
 
 template <class DAOM>
@@ -1148,11 +1161,13 @@ OrganicStandard::tick (const Geometry& geo,
   const double old_C = total_C (geo);
 
   // Create an array of all AM pools, sorted by their C_per_N.
+  validate_am (am);
   const int all_am_size = am.size ();
   std::vector<AOM*> added;
   for (int i = 0; i < all_am_size; i++)
     am[i]->append_to (added);
   sort (added.begin (), added.end (), aom_compare);
+  validate_am (am);
   
   // Clear logs.
   fill (CO2_slow_.begin (), CO2_slow_.end (), 0.0);
@@ -1429,6 +1444,7 @@ OrganicStandard::input_from_am (std::vector<double>& destination,
   fill (destination.begin (), destination.end (), 0.0);
 
   // Loop over all AOM pools.
+  validate_am (am);
   std::vector<AOM*> added;
   for (size_t i = 0; i < am.size (); i++)
     am[i]->append_to (added);
@@ -1453,6 +1469,7 @@ OrganicStandard::input_from_am (std::vector<double>& destination,
 	  * added[i]->fractions[som_pool]
 	  * abiotic_factor;
       }
+  validate_am (am);
 }
 
 double
@@ -1462,6 +1479,7 @@ OrganicStandard::total_input_from_am (double T, double h, double pH,
   const size_t som_pool = smb.size ();
 
   // Loop over all AOM pools.
+  validate_am (am);
   std::vector<AOM*> added;
   for (size_t i = 0; i < am.size (); i++)
     am[i]->append_to (added);
@@ -1485,6 +1503,7 @@ OrganicStandard::total_input_from_am (double T, double h, double pH,
 	  * added[i]->fractions[som_pool]
 	  * abiotic_factor;
       }
+  validate_am (am);
   return total;
 }
 
@@ -1584,6 +1603,7 @@ OrganicStandard::partition (const std::vector<double>& am_input,
                             const bool debug_to_screen) const
 {
   // Find AOM values.
+  validate_am (am);
   double total_am = 0.0;
   for (size_t i = 0; i < am.size (); i++)
     total_am += am[i]->C_at (lay);
@@ -2169,6 +2189,7 @@ OrganicStandard::top_summary (const Geometry& geo,
   std::ostringstream tmp;
     
   // Max number of AOM pools.
+  validate_am (am);
   size_t aom_max_size = 0;
   for (size_t pool = 0; pool < am.size (); pool++)
     { 
@@ -2176,6 +2197,7 @@ OrganicStandard::top_summary (const Geometry& geo,
       am[pool]->append_to (added);
       aom_max_size = std::max (aom_max_size, added.size ());
     }        
+  validate_am (am);
     
   // Header line.
   tmp << "\t";
@@ -2207,6 +2229,7 @@ OrganicStandard::top_summary (const Geometry& geo,
   for (size_t pool = 0; pool < aom_max_size; pool++)
     { 
       double C = 0.0;
+      validate_am (am);
       for (size_t i = 0; i < am.size (); i++)
         { 
           std::vector<AOM*> added;
@@ -2214,6 +2237,7 @@ OrganicStandard::top_summary (const Geometry& geo,
           if (pool < added.size ())
             C += added[pool]->soil_C (geo, 0.0, init.end);
         }        
+      validate_am (am);
       tmp << C * g_per_cm2_to_kg_per_ha << "\t";
       total_C += C;
     }
@@ -2243,6 +2267,7 @@ OrganicStandard::top_summary (const Geometry& geo,
   for (size_t pool = 0; pool < aom_max_size; pool++)
     { 
       double N = 0.0;
+      validate_am (am);
       for (size_t i = 0; i < am.size (); i++)
         { 
           std::vector<AOM*> added;
@@ -2250,6 +2275,7 @@ OrganicStandard::top_summary (const Geometry& geo,
           if (pool < added.size ())
             N += added[pool]->soil_N (geo, 0.0, init.end);
         }        
+      validate_am (am);
       tmp << N * g_per_cm2_to_kg_per_ha << "\t";
       total_N += N;
     }
@@ -2458,6 +2484,7 @@ OrganicStandard::initialize (const Metalib& metalib,
   // Initialize AM.
   for (size_t i = 0; i < am.size (); i++)
     am[i]->initialize (geo, soil.MaxRootingHeight ());
+  validate_am (am);
 
   // Biological incorporation.
   bioincorporation.initialize (geo, soil);
@@ -2468,6 +2495,7 @@ OrganicStandard::initialize (const Metalib& metalib,
     bioincorporation.set_am (bioam);
   else
     am.push_back (bioincorporation.create_am (metalib, geo, msg)); 
+  validate_am (am);
 
   // Warnings in case of explicit SOM or SMB initialization.
   for (size_t pool = 0; pool < som_size; pool++)

@@ -1,3 +1,7 @@
+2014-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 5.19 released.
+
 2014-03-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* surface.C, surface.h: Clarified units.

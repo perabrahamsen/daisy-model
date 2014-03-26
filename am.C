@@ -439,7 +439,10 @@ void
 AM::Implementation::append_to (std::vector<AOM*>& added)
 {
   for (unsigned i = 0; i < om.size (); i++)
-    added.push_back (om[i]);
+    {
+      daisy_assert (std::isfinite (om[i]->initial_C_per_N));
+      added.push_back (om[i]);
+    }
 }
 
 void
