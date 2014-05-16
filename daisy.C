@@ -170,8 +170,9 @@ struct Daisy::Implementation
       output_log->initialize (metalib, msg);
     }
     extern_scope = scopesel->lookup (output_log->scopes (), msg); 
-    field->initialize (block, output_log->scopes (), time, 
-                             weather.get (), scope ());
+    if (!field->initialize (block, output_log->scopes (), time, 
+                            weather.get (), scope ()))
+      throw "Initialize failed";
     {                       
       Treelog::Open nest (msg, "manager");
       action->initialize (daisy, scope (), msg);

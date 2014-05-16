@@ -1,3 +1,23 @@
+2014-05-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log-std.dai ("Soil water", "Field water"): Include biopore
+	flow directly.
+	* soil_water.C, soil_water.h: Ditto.
+	* tertiary_biopores.C, biopore_matrix.C, biopore_drain.C: Ditto.
+
+2014-05-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log.dai ("Biopore Drain Sink Water"): New model.
+
+	* soil_water.h (S_p_drain): New log variable.
+
+2014-03-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* soil.C, soil.h (Theta_sat): New function.
+	* root_system.C, root_system.h (PenWaterFac): New parameter.
+	(tick_daily): Now takes 'soil_water' parameter.
+	* crop_std.C, crop_simple.C (tick): Update caller.
+
 2014-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 5.19 released.

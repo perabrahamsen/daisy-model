@@ -106,7 +106,8 @@ struct TertiaryBiopores : public Tertiary
 
   // - For use in Richard's Equation.
   void matrix_sink (std::vector<double>& S_matrix,
-                    std::vector<double>& S_drain) const;
+                    std::vector<double>& S_drain,
+                    std::vector<double>& S_tertiary_drain) const;
   
   void update_biopores (const Geometry& geo, 
                         const Soil& soil,  
@@ -134,7 +135,8 @@ struct TertiaryBiopores : public Tertiary
   // Create and Destroy.
 public:
   bool initialize (const Units&, 
-                   const Geometry&, const Soil&, const Scope& parent_scope, 
+                   const Geometry&, const Soil&, SoilWater&, 
+                   const Scope& parent_scope, 
                    const Groundwater&, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
   explicit TertiaryBiopores (const BlockModel& al);
@@ -333,51 +335,6 @@ TertiaryBiopores::suggest_dt (const double weather_dt,
   return 0.0;
 }
 
-static void
-pass_below (const Geometry& geo,
-            const std::vector<double>& S_matrix,
-            const std::vector<double>& S_drain,
-            const size_t edge_above,
-            const int cell_above,
-            std::vector<double>& q_tertiary)
-{
-  const double flux_above = q_tertiary[edge_above];
-  const int cell = geo.edge_other (edge_above, cell_above);
-  if (!geo.cell_is_internal (cell))
-    return;
-  const double S = S_matrix[cell] + S_drain[cell];
-  const double volume = geo.cell_volume (cell);
-  const double area_above = geo.edge_area (edge_above);
-  const double volume_below = flux_above * area_above - S * volume;
-  const std::vector<size_t>& cell_edges = geo.cell_edges (cell);
-  const size_t cell_edges_size = cell_edges.size ();
-  size_t lowest_edge = edge_above;
-  double lowest_z = geo.cell_z (cell);
-  for (size_t i = 0; i < cell_edges_size; i++)
-    {
-      const size_t edge_below = cell_edges[i];
-      const int cell_below = geo.edge_other (edge_below, cell);
-      if (cell_below == Geometry::cell_below)
-        {
-          lowest_edge = edge_below;
-          break;
-        }
-      if (!geo.cell_is_internal (cell_below))
-        continue;
-      const double z = geo.cell_z (cell_below);
-      if (z < lowest_z)
-        {
-          lowest_z = z;
-          lowest_edge = edge_below;
-        }
-    }
-  daisy_assert (iszero (q_tertiary[lowest_edge]));
-  const double area_below = geo.edge_area (lowest_edge);
-  const double flux_below = volume_below / area_below;
-  q_tertiary[lowest_edge] = flux_below;
-  pass_below (geo, S_matrix, S_drain, lowest_edge, cell, q_tertiary);
-}
-
 void
 TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil, 
                         const SoilHeat& soil_heat, const double dt, 
@@ -433,6 +390,7 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   const size_t cell_size = geo.cell_size ();
   std::vector<double> S_drain (cell_size, 0.0);
   std::vector<double> S_matrix (cell_size, 0.0);
+  std::vector<double> S_tertiary_drain (cell_size, 0.0);
 
   // Keep original state.
   const Anystate old_state = get_state ();
@@ -443,7 +401,7 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   find_implicit_water (old_state, geo, soil, h, ddt);
   
   // Limit sink.
-  matrix_sink (S_matrix, S_drain);
+  matrix_sink (S_matrix, S_drain, S_tertiary_drain);
   for (size_t c = 0; c < cell_size; c++)
     {
       const double Theta_loss = (S_drain[c] + S_matrix[c]) * ddt;
@@ -478,30 +436,35 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
       for (size_t b = 0; b < classes.size (); b++)
         classes[b]->scale_sink (scale);
     }
-  matrix_sink (S_matrix, S_drain);
+
+  // Update tertiary water.
+  for (size_t b = 0; b < classes.size (); b++)
+    classes[b]->update_cell_water (geo, dt);
 
   // Make it official.
-  soil_water.add_tertiary_sink (S_matrix);
-  soil_water.drain (S_drain, msg);
+  std::fill (S_matrix.begin (), S_matrix.end (), 0.0);
+  std::fill (S_drain.begin (), S_drain.end (), 0.0);
+  std::fill (S_tertiary_drain.begin (), S_tertiary_drain.end (), 0.0);
+  matrix_sink (S_matrix, S_drain, S_tertiary_drain);
 
-  // Fake tertiary flux by mass balance ignoring tertiary storage.
-  for (size_t i = 0; i < edge_above_size; i++)
-    {
-      const size_t edge = edge_above[i];
-      pass_below (geo, S_matrix, S_drain, edge, Geometry::cell_above,
-                  q_tertiary);
-    }
-  soil_water.set_tertiary_flux (q_tertiary);
+  std::vector<double> Theta_p (cell_size, 0.0);
+  std::vector<double> q_p (edge_size, 0.0);
+  for (size_t b = 0; b < classes.size (); b++)
+    classes[b]->update_soil_tertiary (Theta_p, q_p);
+
+  soil_water.add_tertiary_sink (S_matrix, S_drain, S_tertiary_drain);
+  soil_water.set_tertiary (Theta_p, q_p);
 }
 
 void 
 TertiaryBiopores::matrix_sink (std::vector<double>& S_matrix,
-                               std::vector<double>& S_drain) const
+                               std::vector<double>& S_drain, 
+                               std::vector<double>& S_tertiary_drain) const
 {
   std::fill (S_matrix.begin (), S_matrix.end (), 0.0);
   std::fill (S_drain.begin (), S_drain.end (), 0.0);
   for (size_t b = 0; b < classes.size (); b++)
-    classes[b]->add_to_sink (S_matrix, S_drain);
+    classes[b]->add_to_sink (S_matrix, S_drain, S_tertiary_drain);
 }
 
 void 
@@ -700,20 +663,26 @@ TertiaryBiopores::output (Log& log) const
 bool 
 TertiaryBiopores::initialize (const Units& units,
                               const Geometry& geo, const Soil&, 
+                              SoilWater& soil_water,
                               const Scope& scope,
                               const Groundwater& groundwater, 
                               Treelog& msg)
 { 
   TREELOG_MODEL (msg);
   bool ok = true;
+
+  const size_t cell_size = geo.cell_size ();
+  const size_t edge_size = geo.edge_size ();
+  std::vector<double> Theta_p (cell_size, 0.0);
+  std::vector<double> q_p (edge_size, 0.0);
   for (size_t b = 0; b < classes.size (); b++)
     {
       Treelog::Open nest2 (msg, "classes", b, classes[b]->objid);
       if (!classes[b]->initialize (units, geo, scope, groundwater, msg))
         ok = false;
+      classes[b]->update_soil_tertiary (Theta_p, q_p);
     }
-  const size_t cell_size = geo.cell_size ();
-
+  soil_water.set_tertiary (Theta_p, q_p);
   const double table = groundwater.table () > 0.0
     ? geo.bottom () - 1000.0
     : groundwater.table ();

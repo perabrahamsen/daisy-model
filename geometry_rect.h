@@ -125,6 +125,10 @@ public:
   { return xplus_[cell_size () - 1]; }  
   inline double bottom () const // Bottom of deepest cell [cm]
   { return zplus_[cell_rows_ - 1]; }
+  void add_soil (std::vector<double>& v, 
+                 const double top, const double bottom, 
+                 const double left, const double right,
+                 const double amount) const;
 
   // Utilities.
   void fill_xplus (std::vector<double>&) const;

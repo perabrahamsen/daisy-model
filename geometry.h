@@ -254,7 +254,11 @@ public:
   void mix (std::vector<double>& v, const Volume&,
             std::vector<double>& change) const;
   void add_soil (std::vector<double>& v,
-                 double from, double to, double amount) const;
+                 double top, double bottom, double amount) const;
+  virtual void add_soil (std::vector<double>& v, 
+                         const double top, const double bottom, 
+                         const double left, const double right,
+                         const double amount) const = 0;
   void add_soil (std::vector<double>& v, const Volume&, double amount) const;
   void add_soil (std::vector<double>& v, const std::vector<double>& density,
                  double amount) const;

@@ -87,10 +87,13 @@ void
 Biopore::infiltrate (const Geometry& geo, size_t e,
                      const double amount, const double dt)
 {
+  daisy_assert (e < geo.edge_size ());
   daisy_assert (std::isfinite (amount));
   const double edge_area = geo.edge_area (e);
   const double total_area = geo.surface_area ();
   const double edge_flux = amount / dt;
+  daisy_assert (iszero (q[e]));
+  q[e] -= edge_flux;
   const double total_flux = edge_flux * edge_area / total_area;
   infiltration += total_flux;
 }
@@ -119,6 +122,7 @@ Biopore::top_density (const size_t c) const
 void 
 Biopore::clear ()
 { 
+  std::fill (q.begin (), q.end (), 0.0);
   infiltration = 0.0; 
   solute_infiltration.clear ();
 }
@@ -220,6 +224,7 @@ Biopore::output_base (Log& log) const
   output_variable (M2B, log);
   output_variable (infiltration, log);
   output_submodule (solute_infiltration, "solute_infiltration", log);
+  output_variable (q, log);
 }
 
 bool
@@ -239,6 +244,7 @@ Biopore::initialize_base (const Units& units,
     return false;
 
   const size_t cell_size = geo.cell_size ();
+  const size_t edge_size = geo.edge_size ();
   density_cell.reserve (cell_size);
   double value = -42.42e42;
   bool ok = true;
@@ -260,7 +266,9 @@ Biopore::initialize_base (const Units& units,
 
   // Sink term.
   S.insert (S.begin (), cell_size, 0.0);
-
+  // Flux.
+  q.insert (q.begin (), edge_size, 0.0);
+  
   return ok;
 }
 
@@ -338,6 +346,9 @@ Biopore density [cm^-2] as a function of 'x' [cm].");
 Surface infiltration.");
     frame.declare_submodule_sequence ("solute_infiltration", Attribute::LogOnly, "\
 Rate of solute infiltration through surface.", load_flux);
+    frame.declare ("q", "cm^3/cm^3", 
+                   Attribute::LogOnly, Attribute::SoilEdges, "\
+Water flow in this biopore class.");
   }
 } Biopore_init;
 

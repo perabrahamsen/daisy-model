@@ -238,6 +238,10 @@ Soil::Theta_res (size_t i) const
 { return horizon_[i]->hydraulic->Theta_res; }
 
 double 
+Soil::Theta_sat (size_t i) const
+{ return horizon_[i]->hydraulic->Theta_sat; }
+
+double 
 Soil::h (size_t i, double Theta) const
 { return horizon_[i]->hydraulic->h (Theta); }
 

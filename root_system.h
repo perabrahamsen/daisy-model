@@ -51,6 +51,7 @@ private:
   const double PenPar1;		// Penetration rate parameter, coefficient
   const double PenPar2;		// Penetration rate parameter, threshold
   const PLF PenClayFac;		// Clay influence on penetration, factor.
+  const PLF PenWaterFac;	// Water influence on penetration, factor.
   const double MaxPen;		// Max penetration depth
   const double MaxWidth;        // Max horizontal distance from plant
   const double Rad;		// Root radius [cm]
@@ -127,7 +128,7 @@ private:
 public:
   void tick_dynamic (double T, const double day_fraction, SoilWater&, 
                      double dt);
-  void tick_daily (const Geometry&, const Soil&, 
+  void tick_daily (const Geometry&, const Soil&, const SoilWater&,
 		   double WRoot, bool root_growth, double DS, Treelog&);
   void set_density (const Geometry& geometry, double SoilLimit, 
                     double WRoot, double DS, Treelog&);

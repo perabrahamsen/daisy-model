@@ -6,6 +6,21 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.20
+
+** "Soil water" log now includes biopores.
+** "Field water" log now include biopore percolation.
+
+** New 'PenWaterFac' root parameter.
+
+Allow water content to affect root penetration. 
+
+  (sow ("Spring Barley" (Root (PenWaterFac (0 1) (0.9 1) (1 0)))))
+
+In this example, root penetration will occur at full speed when the
+soil water content is root depth is less than 90% saturated, and stop
+when it fully saturated.
+
 * 5.19 
 
 ** Volatilization is back in Field nitrogen.

@@ -163,14 +163,15 @@ Movement::check (Treelog& msg) const
 
 bool
 Movement::initialize (const Units& units,
-                      const Soil& soil, const Groundwater& groundwater,
+                      const Soil& soil, SoilWater& soil_water, 
+                      const Groundwater& groundwater,
                       const Scope& scope, Treelog& msg)
 {
   bool ok = true;
   
-  // Tertiary transport depends on groundwater and soil.
+  // Tertiary transport depends on groundwater, soil, and soil_water,
   if (!tertiary->initialize (units, geometry (),
-                             soil, scope, groundwater, msg))
+                             soil, soil_water, scope, groundwater, msg))
     ok = false;
   
   initialize_derived (soil, groundwater, tertiary->has_macropores (), msg);

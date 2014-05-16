@@ -69,13 +69,13 @@
 
 (defsummary "Field water balance" balance
   "Water balance for the complete system."
-  (precision 1)
+  (precision 10)
   (require_top true)
   (input "Precipitation" "Irrigation")
   (output "Actual evapotranspiration"
-          "Matrix percolation"
-          "Soil drain flow" "Surface drain flow" "Runoff")
-  (content "Soil water" "Surface water" "Tertiary water"))
+          "Matrix percolation" "Biopore percolation"
+          "Matrix drain flow" "Biopore drain flow" "Runoff")
+  (content "Soil matrix water" "Biopore water" "Surface water"))
 
 (deflog "Field water" column
   "Information about water input, output and content for the system.
@@ -139,26 +139,38 @@ It can be negative if there are cabilary raise.")
                         (handle sum)
                         (negate true)
                         (dimension "mm"))
-           (interval (tag "Soil drain flow")
+           (flux_bottom (tag "Biopore percolation")
+			(documentation "\
+This is the amount of water leaving the system through biopores.")
+                        (path column "${column}" SoilWater q_p)
+                        (spec fixed SoilWater q_p)
+                        (handle sum)
+                        (negate true)
+                        (dimension "mm"))
+           (interval (tag "Matrix drain flow")
 		     (documentation "\
-Amount of water leaving the system to drain pipes.
+Amount of water leaving the system through the soil matrix to drain pipes.
 
 Note that the total amount of water in the drain pipes may be higher
 than this if you have specified the 'to' parameter, as the whole soil
 profile will contribute to the drain flow, and only the contributions
 from the soil interval being logged is counted here.")
-                     (path column "${column}" SoilWater S_drain)
-                     (spec fixed SoilWater S_drain)
+                     (path column "${column}" SoilWater S_soil_drain)
+                     (spec fixed SoilWater S_soil_drain)
                      (handle sum)
                      (dimension "mm"))
-           (number (tag "Surface drain flow")
-                   (documentation "\
-Flux of water from surface to drain through biopores, bypassing the matrix.")
-                   (path column "${column}" Movement "*" 
-                         Tertiary biopores classes drain infiltration)
-                   (spec biopore drain infiltration)
-                   (handle sum)
-                   (dimension "mm"))
+           (interval (tag "Biopore drain flow")
+		     (documentation "\
+Amount of water leaving the system through biopores to drain pipes.
+
+Note that the total amount of water in the drain pipes may be higher
+than this if you have specified the 'to' parameter, as the whole soil
+profile will contribute to the drain flow, and only the contributions
+from the soil interval being logged is counted here.")
+                     (path column "${column}" SoilWater S_p_drain)
+                     (spec fixed SoilWater S_p_drain)
+                     (handle sum)
+                     (dimension "mm"))
            (number (tag "Runoff")
 		   (documentation "\
 Amount of water running of the surface.
@@ -170,19 +182,13 @@ nowhere go to.  For typical setups, this value will be zero.")
                    (spec fixed Surface runoff)
                    (handle sum)
                    (dimension "mm"))
-           (number (tag "Tertiary water")
-                   (documentation "\
-Total amount of water in the biopores.
-
-Note the the biopore system does not keep track of where the
-water is located within the soil, so you will always get the
-total amount, even if you otherwise only log part of the soil.")
-                   (path column "${column}" Movement "*" 
-                         Tertiary biopores water_height)
-                   (spec tertiary biopores water_height)
-                   (handle current)
-                   (dimension "mm"))
-           (interval (tag "Soil water")
+           (interval (tag "Biopore water")
+                     (documentation "\
+The total amount of biopore water in the soil interval")
+                     (path column "${column}" SoilWater Theta_p)
+                     (spec fixed SoilWater Theta_p)
+                     (dimension "mm"))
+           (interval (tag "Soil matrix water")
 		     (documentation "\
 Total water content of the soil.")
                      (path column "${column}" SoilWater Theta)
@@ -197,24 +203,43 @@ the litter layer.")
                    (dimension "mm"))))
 
 (defsummary "Soil water balance" balance
-  "Water balance for the soil matrix.
-
-The intended use of this log is small scale water management, for
-example irrigation optimization.  Above ground water and water in
-biopores is considered external to the system.  The balances
-provided by the log will work on any subset of the soil that
-matches the discretization."
-  (precision 1)
-  (input "Matrix infiltration" "Subsoil irrigation" "Tillage")
-  (output "Matrix percolation" "Tertiary" "Drain flow"
+  "Balance for all water in the soil."
+  (precision 10)
+  (input "Matrix infiltration" "Biopore infiltration" 
+         "Subsoil irrigation" "Tillage")
+  (output "Matrix percolation" "Biopore percolation" 
+          "Matrix direct drain flow" "Biopore drain flow"
           "Root extraction" "Freezing")
-  (content "Soil water"))
+  (content "Matrix water" "Biopore water"))
+
+(defsummary "Biopore water balance" balance
+  "Water balance for the biopore domain alone."
+  (precision 10)
+  (input "Biopore infiltration"
+         "Matrix to biopores" "Matrix indirect drain flow")
+  (output "Biopore percolation" "Biopore drain flow")
+  (content "Biopore water"))
+
+(defsummary "Matrix water balance" balance
+  "Balance for the matrix domain in the soil."
+  (precision 10)
+  (input "Matrix infiltration" "Subsoil irrigation" "Tillage")
+  (output "Matrix percolation" "Matrix to biopores" 
+          "Matrix direct drain flow" "Matrix indirect drain flow" 
+          "Root extraction" "Freezing")
+  (content "Matrix water"))
 
 (deflog "Soil water" column
-  "Information about water input, output and content for the soil."
+  "Information about water input, output and content for the soil.
+
+The intended use of this log is small scale water management, for
+example irrigation optimization.  Above ground water is
+considered external to the system.  The balances provided by the
+log will work on any subset of the soil that matches the
+discretization."
   (where "${colfid}soil_water.dlf")
   (when hourly)
-  (summary "Soil water balance")
+  (summary "Soil water balance" "Biopore water balance" "Matrix water balance")
   (entries (flux_top (tag "Matrix infiltration")
                      (documentation "\
 Amount of water entering the soil through the matrix system.
@@ -235,6 +260,22 @@ This is the normal percolation channel.")
                         (handle sum)
                         (negate true)
                         (dimension "mm"))
+           (flux_top (tag "Biopore infiltration")
+                     (documentation "\
+Amount of water entering the soil through the biopores.")
+                     (path column "${column}" SoilWater q_p)
+                     (spec fixed SoilWater q_p)
+                     (handle sum)
+                     (negate true)
+                     (dimension "mm"))
+           (flux_bottom (tag "Biopore percolation")
+                     (documentation "\
+Amount of water leaving the soil through the biopore system.")
+                        (path column "${column}" SoilWater q_p)
+                        (spec fixed SoilWater q_p)
+                        (handle sum)
+                        (negate true)
+                        (dimension "mm"))
            (interval (tag "Subsoil irrigation")
                      (documentation "\
 mount of water incorporated directly into the soil.
@@ -246,18 +287,11 @@ irectly incorporated into the soil.")
                      (handle sum)
                      (negate true)
                      (dimension "mm"))
-           (interval (tag "Tertiary")
+           (interval (tag "Matrix direct drain flow")
                      (documentation "\
-Net amount of water leaving the soil matrix to the biopores.
+Flow from matrix directly to the drain pipes.
 
-This may be zero if the same amount of water enters and leaves the interval.")
-                     (path column "${column}" SoilWater S_p)
-                     (spec fixed SoilWater S_p)
-                     (handle sum)
-                     (dimension "mm"))
-           (interval (tag "Drain flow")
-                     (documentation "\
-Water in the soil interval that flows to the drain pipes.
+This does not count water that flow to the drain pipes through biopores.
 
 Note that water flow to the drain pipes from all soil layers, both
 above and below the pipes, and even from the automatically inserted
@@ -266,10 +300,35 @@ have specified less than the full soil profile, that is, if you have
 set the 'from' or 'to' parameters, the amount you see logged here will
 be less than the total amount of water in the drain pipes.
 
-If the soil is not drained, that is, if the specified groundwater model
-is not 'pipe', this amount will be zero.")
-                     (path column "${column}" SoilWater S_drain)
-                     (spec fixed SoilWater S_drain)
+If the soil has no drain pipes this amount will be zero.")
+                     (path column "${column}" SoilWater S_soil_drain)
+                     (spec fixed SoilWater S_soil_drain)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "Matrix indirect drain flow")
+                     (documentation "\
+Flow from matrix indirectly to the drain pipes.
+
+This only counts water that flow to the drain pipes through biopores.")
+                     (path column "${column}" SoilWater S_indirect_drain)
+                     (spec fixed SoilWater S_indirect_drain)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "Biopore drain flow")
+                     (documentation "\
+Water in the interval that flows from the biopores to the drain pipes.
+
+Note that water flow to the drain pipes from all soil layers, both
+above and below the pipes, and even from the automatically inserted
+aquitard horizon that lies below the normal soil horizons.  So if you
+have specified less than the full soil profile, that is, if you have
+set the 'from' or 'to' parameters, the amount you see logged here will
+be less than the total amount of water in the drain pipes.
+
+If the soil has no biopores connected directly to the drain, this amount
+will be zero.")
+                     (path column "${column}" SoilWater S_p_drain)
+                     (spec fixed SoilWater S_p_drain)
                      (handle sum)
                      (dimension "mm"))
            (interval (tag "Root extraction")
@@ -305,12 +364,29 @@ the tillage operation.")
                      (spec fixed SoilWater tillage)
                      (handle sum)
                      (dimension "mm"))
-           (interval (tag "Soil water")
+           (interval (tag "Matrix to biopores")
                      (documentation "\
-The total amount of water in the soil interval")
+Net amount of water leaving the soil matrix to the biopores.
+
+This does not include water that flows to drain connected biopores.
+This may be zero if the same amount of water enters and leaves the interval.")
+                     (path column "${column}" SoilWater S_p)
+                     (spec fixed SoilWater S_p)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "Matrix water")
+                     (documentation "\
+The total amount of soil matrix water in the soil interval")
                      (path column "${column}" SoilWater Theta)
                      (spec fixed SoilWater Theta)
-                     (dimension "mm"))))
+                     (dimension "mm"))
+           (interval (tag "Biopore water")
+                     (documentation "\
+The total amount of biopore water in the soil interval")
+                     (path column "${column}" SoilWater Theta_p)
+                     (spec fixed SoilWater Theta_p)
+                     (dimension "mm"))
+           ))
 
 (defsummary "Field nitrogen balance" balance
   "Nitrogen balance for the complete system."

@@ -591,7 +591,9 @@ UZRectMollerup::tick (const GeometryRect& geo, const std::vector<size_t>& drain_
   for (size_t cell = 0; cell != cell_size; ++cell) 
     soil_water.set_content (cell, h (cell), Theta (cell));
   
+#ifdef TEST_OM_DEN_ER_BRUGT
   soil_water.add_tertiary_sink (S_matrix_sum);
+#endif
   soil_water.drain (S_drain_sum, msg);
 
 

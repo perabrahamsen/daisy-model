@@ -1146,7 +1146,7 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
       const double MS2_goal = C_avg * Theta_sec_old;
       const double MS1_loss = alpha * (MS1 - MS1_goal);
       const double MS2_gain = alpha * (MS2_goal - MS2);
-      if (!approximate (MS + MS1_loss, MS + MS2_gain))
+      if (!approximate (MS + MS1_loss * dt, MS + MS2_gain * dt))
         {
           std::ostringstream tmp;
           tmp << "1: Theta = " << Theta_prim_old << "; C = " << C_prim

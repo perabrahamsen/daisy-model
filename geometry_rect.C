@@ -79,6 +79,97 @@ double
 GeometryRect::xminus (size_t n) const
 { return (n < cell_rows_) ? 0.0 : xplus (n-cell_rows_); }
 
+void
+GeometryRect::add_soil (std::vector<double>& v, 
+                        const double top, const double bottom, 
+                        const double left, const double right,
+                        const double amount) const
+// This function must be fast, as it is called once for each biopore
+// row and class.
+{
+  // Pre-conditions.
+  daisy_assert (bottom < top);
+  daisy_assert (left < right);
+
+  // Find cols.
+  const size_t cols = cell_columns ();
+  std::vector<double> col_factor (cols, 0.0);
+  size_t col_first = cols;
+  size_t col_last = 0;
+  for (size_t col = 0; col < cols; col++)
+    {
+      const double cell = cell_index (0, col);
+      const double cell_right = xplus (cell);
+      const double cell_left = xminus (cell);
+
+      if (col < col_first)      // There yet?
+        {
+          if (cell_right <= left) // No.
+            continue;
+
+          col_first = col;
+        }
+      const double cover_left = std::max (left, cell_left);
+      const double cover_right = std::min (right, cell_right);
+      const double cover = (cover_right - cover_left) 
+        / (cell_right - cell_left);
+      daisy_assert (cover >= 0.0);
+      daisy_assert (cover <= 1.0);
+      col_factor[col] = cover;
+
+      if (cell_right >= right)  // Done?
+        {
+          col_last = col;
+          break;
+        }
+    }
+  // Find rows.
+  const size_t rows = cell_rows ();
+  std::vector<double> row_factor (rows, 0.0);
+  size_t row_first = rows;
+  size_t row_last = 0;
+  for (size_t row = 0; row < rows; row++)
+    {
+      const double cell = cell_index (row, 0);
+      const double cell_top = zminus (cell);
+      const double cell_bottom = zplus (cell);
+
+      if (row < row_first)      // There yet?
+        {
+          if (cell_bottom >= top) // No.
+            continue;
+
+          row_first = row;
+        }
+      const double cover_bottom = std::max (bottom, cell_bottom);
+      const double cover_top = std::min (top, cell_top);
+      const double cover = (cover_top - cover_bottom) 
+        / (cell_top - cell_bottom);
+      daisy_assert (cover >= 0.0);
+      daisy_assert (cover <= 1.0);
+      row_factor[row] = cover;
+
+      if (cell_top <= bottom)  // Done?
+        {
+          row_last = row;
+          break;
+        }
+    }
+ 
+ // Add it.
+  const double volume = (bottom - top) * (right - left) * (front () - back ());
+  const double fill = amount / volume;
+  for (size_t row = row_first; row <= row_last; row++)
+    {
+      const double row_add = fill * row_factor[row];
+      for (size_t col = col_first; col <= col_last; col++)
+        {
+          const size_t i = cell_index (row, col);
+          v[i] += row_add * col_factor[col];
+        }
+    }
+}
+
 void 
 GeometryRect::fill_xplus (std::vector<double>& result) const
 { 

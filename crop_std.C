@@ -553,7 +553,7 @@ CropStandard::tick (const Metalib& metalib,
 	  canopy->tick (production.WLeaf, production.WSOrg,
 		       production.WStem, DS, seed_CAI);
 	  nitrogen.content (DS, production, msg);
-	  root_system->tick_daily (geo, soil, production.WRoot, 0.0,
+	  root_system->tick_daily (geo, soil, soil_water, production.WRoot, 0.0,
                                    DS, msg);
 
 	  static const symbol root_symbol ("root");
@@ -637,7 +637,7 @@ CropStandard::tick (const Metalib& metalib,
   development->tick_daily (bioclimate.daily_air_temperature (), 
                            production.shoot_growth (), production, 
                            *vernalization, harvesting->cut_stress, msg);
-  root_system->tick_daily (geo, soil, 
+  root_system->tick_daily (geo, soil, soil_water,
                            production.WRoot, production.root_growth (),
                            DS, msg);
   production.tick_daily ();

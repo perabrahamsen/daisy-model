@@ -68,7 +68,8 @@ struct TertiaryOld : public Tertiary
   // Create and Destroy.
 public:
   bool initialize (const Units&, 
-                   const Geometry&, const Soil&, const Scope& parent_scope, 
+                   const Geometry&, const Soil&, SoilWater&, 
+                   const Scope& parent_scope, 
                    const Groundwater&, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
   TertiaryOld (const BlockModel& al);
@@ -83,12 +84,12 @@ TertiaryOld::tick (const Units&, const Geometry& geo, const Soil& soil,
   const size_t cell_size = geo.cell_size ();
   std::vector<double> S_drain (cell_size, 0.0);
   std::vector<double> S_matrix (cell_size, 0.0);
+  std::vector<double> S_tertiary_drain (cell_size, 0.0);
   const size_t edge_size = geo.edge_size ();
   std::vector<double> q_tertiary (edge_size, 0.0);
   this->tick_water (geo, soil, soil_water, soil_heat, dt, surface,
                     S_drain, S_matrix, q_tertiary, msg);
-  soil_water.drain (S_drain, msg);
-  soil_water.add_tertiary_sink (S_matrix);
+  soil_water.add_tertiary_sink (S_matrix, S_drain, S_tertiary_drain);
   soil_water.set_tertiary_flux (q_tertiary);
 }
 
@@ -173,7 +174,8 @@ TertiaryOld::output (Log&) const
 
 bool 
 TertiaryOld::initialize (const Units&,
-                         const Geometry& geometry, const Soil& soil,
+                         const Geometry& geometry,
+                         const Soil& soil, SoilWater&, 
                          const Scope& scope, const Groundwater& groundwater, 
                          Treelog& msg)
 { 

@@ -76,6 +76,7 @@ struct BioporeMatrix : public Biopore
   int iterations;
   std::vector<double> h3_soil;
   std::vector<double> z3_lowest;
+  std::vector<double> Theta;    // [cm^3/cm^3], cell based water content.
 
   // Utilities.
   /* const */ double dy;                    // [cm]
@@ -148,7 +149,11 @@ struct BioporeMatrix : public Biopore
   void add_water (size_t c, double amount /* [cm^3] */);
   void update_water ();
   double column_water (const size_t col) const;
-  void add_to_sink (std::vector<double>& S_matrix, std::vector<double>&) const;
+  void update_cell_water (const Geometry&, const double dt);
+  void update_soil_tertiary (std::vector<double>& Theta_p,
+                             std::vector<double>& q_p);
+  void add_to_sink (std::vector<double>& S_matrix, std::vector<double>&,
+                    std::vector<double>&) const;
   void add_solute (symbol chem, size_t cell, const double amount /* [g] */);
   void matrix_solute (const Geometry& geo, const double dt, 
                       const Chemical& chemical, std::vector<double>& source_chem,
@@ -751,9 +756,104 @@ double
 BioporeMatrix::column_water (const size_t col) const
 { return height_to_volume (col, h_bottom[col]); }
 
+static void
+pass_below (const Geometry& geo,
+            const std::vector<double>& from_matrix,
+            const std::vector<double>& Theta_old,
+            const std::vector<double>& Theta,
+            const double dt,
+            const size_t edge_above,
+            const int cell_above,
+            std::vector<double>& q)
+{
+  const double flux_above = q[edge_above];
+  const int cell = geo.edge_other (edge_above, cell_above);
+  if (!geo.cell_is_internal (cell))
+    return;
+  const double S = from_matrix[cell] - (Theta[cell] - Theta_old[cell]) / dt;
+  const double volume = geo.cell_volume (cell);
+  const double area_above = geo.edge_area (edge_above);
+  const double volume_below = flux_above * area_above - S * volume;
+  const std::vector<size_t>& cell_edges = geo.cell_edges (cell);
+  const size_t cell_edges_size = cell_edges.size ();
+  size_t lowest_edge = edge_above;
+  double lowest_z = geo.cell_z (cell);
+  for (size_t i = 0; i < cell_edges_size; i++)
+    {
+      const size_t edge_below = cell_edges[i];
+      const int cell_below = geo.edge_other (edge_below, cell);
+      if (cell_below == Geometry::cell_below)
+        {
+          lowest_edge = edge_below;
+          break;
+        }
+      if (!geo.cell_is_internal (cell_below))
+        continue;
+      const double z = geo.cell_z (cell_below);
+      if (z < lowest_z)
+        {
+          lowest_z = z;
+          lowest_edge = edge_below;
+        }
+    }
+  daisy_assert (iszero (q[lowest_edge]));
+  const double area_below = geo.edge_area (lowest_edge);
+  const double flux_below = volume_below / area_below;
+  q[lowest_edge] = flux_below;
+  pass_below (geo, from_matrix, Theta_old, Theta, dt, lowest_edge, cell, q);
+}
+
+void
+BioporeMatrix::update_cell_water (const Geometry& geo, const double dt)
+{
+  const std::vector<double> Theta_old = Theta;
+  const size_t col_size = xplus.size ();
+  daisy_assert (h_bottom.size () == col_size);
+  std::fill (Theta.begin (), Theta.end (), 0.0);
+  double last_x = 0.0;
+  double total_water = 0.0;     // [cm^3]
+  for (size_t col = 0; col < col_size; col++)
+    {
+      const double next_x = xplus[col];
+      if (h_bottom[col] > 0.0)
+        {
+          const double top = height_end + h_bottom[col];
+          const double water = column_water (col);
+          geo.add_soil (Theta, top, height_end, last_x, next_x, water);
+          total_water += water;
+        }
+      last_x = next_x;
+    }
+  daisy_approximate (total_water, geo.total_soil (Theta));
+
+  // Update flux
+  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const size_t edge_above_size = edge_above.size ();
+  for (size_t i = 0; i < edge_above_size; i++)
+    {
+      const size_t edge = edge_above[i];
+      pass_below (geo, S, Theta_old, Theta, dt, edge, Geometry::cell_above, q);
+    }
+}
+
+void
+BioporeMatrix::update_soil_tertiary (std::vector<double>& Theta_p,
+                                     std::vector<double>& q_p)
+{
+  const size_t edge_size = q.size ();
+  daisy_assert (edge_size == q_p.size ());
+  for (size_t i = 0; i < edge_size; i++)
+    q_p[i] += q[i];
+
+  const size_t cell_size = Theta.size ();
+  daisy_assert (cell_size == Theta_p.size ());
+  for (size_t i = 0; i < cell_size; i++)
+    Theta_p[i] += Theta[i];
+}
+
 void 
 BioporeMatrix::add_to_sink (std::vector<double>& S_matrix,
-                            std::vector<double>&) const
+                            std::vector<double>&, std::vector<double>&) const
 {
   const size_t cell_size = S.size ();
   daisy_assert (S_matrix.size () == cell_size);
@@ -903,6 +1003,7 @@ BioporeMatrix::output (Log& log) const
   output_variable (iterations, log);
   output_variable (h3_soil, log);
   output_variable (z3_lowest, log);
+  output_variable (Theta, log);
 }
 
 bool 
@@ -1010,6 +1111,10 @@ BioporeMatrix::initialize (const Units& units,
       xminus = xplus[i];
     }
 
+  // Cell water content.
+  Theta.insert (Theta.begin (), cell_size, 0.0);
+  update_cell_water (geo, 1.0);
+  std::fill (q.begin (), q.end (), 0.0);
   return ok;
 }
 
@@ -1068,6 +1173,9 @@ Chemical concentration in biopore intervals.", load_solute);
     frame.declare ("z3_lowest", "cm", Attribute::LogOnly, Attribute::Variable,
                    "Depth of lowest unsaturated cell in each interval.\n\
 Water may not enter the macropore below this depth.");
+    frame.declare ("Theta", "cm^3/cm^3", 
+                   Attribute::LogOnly, Attribute::SoilCells, "\
+Water content in this biopore class.");
     frame.declare_integer ("max_iterations", Attribute::Const, "\
 Maximum number of iterations when seeking convergence.");
     frame.set ("max_iterations", 50);

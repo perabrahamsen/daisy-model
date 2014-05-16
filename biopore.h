@@ -61,6 +61,7 @@ protected:
   std::vector<double> S;         // Matrix sink term [].
   double infiltration;           // Surface infiltration [cm/h]
   IM solute_infiltration;       // Solute infiltration [g/cm^2/h]
+  std::vector<double> q;        // Water flow [cm/h]
 
   // Utilities.
 protected:
@@ -118,8 +119,12 @@ public:
                                    const double dt) = 0;
   void scale_sink (double scale);
   virtual void add_to_sink (std::vector<double>& S_matrix,
-                            std::vector<double>& S_drain) const = 0;
+                            std::vector<double>& S_drain,
+                            std::vector<double>& S_tertiary_drain) const = 0;
   virtual void update_water () = 0;
+  virtual void update_cell_water (const Geometry&, const double dt) = 0;
+  virtual void update_soil_tertiary (std::vector<double>& Theta_p,
+                                     std::vector<double>& q_p) = 0;
 private:
   virtual void add_solute (symbol chem, 
                            size_t cell, double amount /* [g] */) = 0;

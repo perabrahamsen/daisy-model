@@ -281,13 +281,15 @@ CropSimple::tick (const Metalib&, const Time& time, const Bioclimate& bioclimate
 	  const double this_far = (T - T_emergence) / T_growth;
 	  
 	  canopy->Height = height_max * this_far;
-	  root_system->tick_daily (geo, soil, WRoot * this_far, true, 
+	  root_system->tick_daily (geo, soil, soil_water, 
+                                   WRoot * this_far, true, 
                                    DS (), msg);
 	}
       else if (old_T < T_flowering)
 	{
 	  msg.message ("Flowering");
-	  root_system->tick_daily (geo, soil, WRoot, true, DS (), msg);
+	  root_system->tick_daily (geo, soil, soil_water, 
+                                   WRoot, true, DS (), msg);
 	}
       else if (T < T_ripe)
 	/* do nothing */;

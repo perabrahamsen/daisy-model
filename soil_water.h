@@ -55,11 +55,15 @@ private:
   std::vector<double> Theta_primary_old_;
   std::vector<double> Theta_secondary_;
   std::vector<double> Theta_secondary_old_;
+  std::vector<double> Theta_tertiary_;
   std::vector<double> S_sum_;
   std::vector<double> S_root_;
   std::vector<double> S_drain_;
+  std::vector<double> S_indirect_drain_;
+  std::vector<double> S_soil_drain_;
   std::vector<double> S_incorp_;
   std::vector<double> S_p_;
+  std::vector<double> S_p_drain_;
   std::vector<double> S_permanent_;
   std::vector<double> S_ice_ice;
   std::vector<double> S_ice_water_;
@@ -153,8 +157,12 @@ public:
   void set_matrix (const std::vector<double>& h,
                    const std::vector<double>& Theta,
                    const std::vector<double>& q);
-  void add_tertiary_sink (const std::vector<double>& S_p);
+  void add_tertiary_sink (const std::vector<double>& S_matrix,
+                          const std::vector<double>& S_drain,
+                          const std::vector<double>& S_tertiary_drain);
   void set_tertiary_flux (const std::vector<double>& q_p);
+  void set_tertiary (const std::vector<double>& Theta_p,
+                     const std::vector<double>& q_p);
 
   // Simulation.
 public:

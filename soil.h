@@ -59,6 +59,7 @@ public:
   double Cw2 (size_t i, double h) const;
   double Theta (size_t i, double h, double h_ice) const;
   double Theta_res (size_t i) const;
+  double Theta_sat (size_t i) const;
   double h (size_t i, double Theta) const;
   double M (size_t i, double h) const;
 public:

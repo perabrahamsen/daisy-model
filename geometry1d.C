@@ -97,6 +97,73 @@ Geometry1D::interval_border (double z) const
   return size_;
 }
 
+void
+Geometry1D::add_soil (std::vector<double>& v, 
+                      const double top, const double bottom, 
+                      const double left, const double right,
+                      const double amount) const
+// This function must be fast, as it is called once for each biopore
+// row and class.
+{
+  // Pre-conditions.
+  daisy_assert (bottom < top);
+  daisy_assert (left < right);
+
+  // Find col.
+  const double cell_right = this->right ();
+  const double cell_left = this->left ();
+  const double cover_left = std::max (left, cell_left);
+  const double cover_right = std::min (right, cell_right);
+  const double col_factor = (cover_right - cover_left) 
+    / (right - left);
+  daisy_assert (col_factor >= 0.0);
+  daisy_assert (col_factor <= 1.0);
+
+  // Find rows.
+  const size_t rows = cell_size ();
+  std::vector<double> row_factor (rows, 0.0);
+  size_t row_first = rows;
+  size_t row_last = 0;
+  for (size_t row = 0; row < rows; row++)
+    {
+      const double cell = row;
+      const double cell_top = zminus (cell);
+      const double cell_bottom = zplus (cell);
+
+      if (row < row_first)      // There yet?
+        {
+          if (cell_bottom >= top) // No.
+            {
+              continue;
+            }
+
+          row_first = row;
+        }
+      const double cover_bottom = std::max (bottom, cell_bottom);
+      const double cover_top = std::min (top, cell_top);
+      const double cover = (cover_top - cover_bottom) 
+        / (cell_top - cell_bottom);
+      daisy_assert (cover >= 0.0);
+      daisy_assert (cover <= 1.0);
+      row_factor[row] = cover;
+
+      if (cell_bottom <= bottom)  // Done?
+        {
+          row_last = row;
+          break;
+        }
+    }
+  
+  // Add it.
+
+  const double volume = (bottom - top) * (right - left) * (front () - back ());
+  const double col_add = amount * col_factor / volume;
+  for (size_t row = row_first; row <= row_last; row++)
+    {
+      v[row] += col_add * row_factor[row];
+    }
+}
+
 void 
 Geometry1D::fill_xplus (std::vector<double>& result) const
 { 

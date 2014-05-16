@@ -1032,11 +1032,6 @@ ColumnStandard::initialize (const Block& block,
   groundwater->initialize (geometry, time, scope, msg);
   drain->initialize (time, scope, geometry, msg);
 
-  // Movement depends on soil and groundwater
-  movement->initialize (units, *soil, *groundwater,  scope, msg);
-
-  surface.initialize (geometry);
-
   // Bioclimate and heat depends on weather.
   if (weather.get ())
     weather->weather_initialize (time, msg);
@@ -1058,6 +1053,13 @@ ColumnStandard::initialize (const Block& block,
   // Solutes depends on water and heat.
   chemistry->initialize (scope, geometry, *soil, *soil_water, *soil_heat, 
                          surface, msg);
+
+  // Movement depends on soil, soil_water, and groundwater
+  if (!movement->initialize (units, *soil, *soil_water, *groundwater,
+                             scope, msg))
+    return false;
+
+  surface.initialize (geometry);
 
   // Soil pH depends on little else.
   soilph->initialize (geometry, time, msg);

@@ -127,7 +127,8 @@ private:
 public:
   bool check (Treelog& err) const;
   bool initialize (const Units&,
-                   const Soil&, const Groundwater&, const Scope& scope,
+                   const Soil&, SoilWater&, 
+                   const Groundwater&, const Scope& scope,
                    Treelog& msg);
   static Movement* build_vertical (const BlockModel& al);
 protected:

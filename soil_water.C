@@ -41,9 +41,12 @@ SoilWater::clear ()
 {
   fill (S_sum_.begin (), S_sum_.end (), 0.0);
   fill (S_drain_.begin (), S_drain_.end (), 0.0);
+  fill (S_indirect_drain_.begin (), S_indirect_drain_.end (), 0.0);
+  fill (S_soil_drain_.begin (), S_soil_drain_.end (), 0.0);
   fill (S_root_.begin (), S_root_.end (), 0.0);
   fill (S_incorp_.begin (), S_incorp_.end (), 0.0);
   fill (S_p_.begin (), S_p_.end (), 0.0);
+  fill (S_p_drain_.begin (), S_p_drain_.end (), 0.0);
   fill (tillage_.begin (), tillage_.end (), 0.0);
   fill (S_ice_ice.begin (), S_ice_ice.end (), 0.0);
   fill (S_ice_water_.begin (), S_ice_water_.end (), 0.0);
@@ -77,6 +80,7 @@ SoilWater::drain (const std::vector<double>& v, Treelog& msg)
 
   daisy_assert (S_sum_.size () == v.size ());
   daisy_assert (S_drain_.size () == v.size ());
+  daisy_assert (S_soil_drain_.size () == v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
       if (v[i] < -1e-8)
@@ -87,6 +91,7 @@ SoilWater::drain (const std::vector<double>& v, Treelog& msg)
         }
       S_sum_[i] += v[i];
       S_drain_[i] += v[i];
+      S_soil_drain_[i] += v[i];
     }
 }
 
@@ -234,20 +239,38 @@ SoilWater::set_matrix (const std::vector<double>& h,
 }
 
 void 
-SoilWater::add_tertiary_sink (const std::vector<double>& S_p)
+SoilWater::add_tertiary_sink (const std::vector<double>& S_matrix,
+                              const std::vector<double>& S_drain,
+                              const std::vector<double>& S_tertiary_drain)
 {
-  const size_t cell_size = S_p.size ();
+  const size_t cell_size = S_matrix.size ();
+  daisy_assert (S_drain.size () == cell_size);
+  daisy_assert (S_indirect_drain_.size () == cell_size);
+  daisy_assert (S_tertiary_drain.size () == cell_size);
   daisy_assert (S_sum_.size () == cell_size);
+  daisy_assert (S_p_.size () == cell_size);
+  daisy_assert (S_p_drain_.size () == cell_size);
   for (size_t c = 0; c < cell_size; c++)
     {
-      S_sum_[c] += S_p[c];
-      S_p_[c] += S_p[c];
+      S_sum_[c] += S_matrix[c] + S_drain[c];
+      S_p_[c] += S_matrix[c];
+      S_drain_[c] += S_drain[c];
+      S_indirect_drain_[c] += S_drain[c];
+      S_p_drain_[c] += S_tertiary_drain[c];
     }
 }
 
 void 
 SoilWater::set_tertiary_flux (const std::vector<double>& q_p)
 {
+  q_tertiary_ = q_p;
+}
+
+void 
+SoilWater::set_tertiary (const std::vector<double>& Theta_p,
+                         const std::vector<double>& q_p)
+{
+  Theta_tertiary_ = Theta_p;
   q_tertiary_ = q_p;
 }
 
@@ -377,6 +400,7 @@ SoilWater::tick_after (const Geometry& geo,
   daisy_assert (Theta_.size () == cell_size);
   daisy_assert (Theta_primary_.size () == cell_size);
   daisy_assert (Theta_secondary_.size () == cell_size);
+  daisy_assert (Theta_tertiary_.size () == cell_size);
 
   double z_low = geo.top ();
   table_low = NAN;
@@ -651,12 +675,16 @@ SoilWater::output (Log& log) const
   output_value (Theta_, "Theta", log);
   output_value (Theta_primary_, "Theta_primary", log);
   output_value (Theta_secondary_, "Theta_secondary", log);
+  output_value (Theta_tertiary_, "Theta_p", log);
   output_value (S_sum_, "S_sum", log);
   output_value (S_root_, "S_root", log);
   output_value (S_drain_, "S_drain", log);
+  output_value (S_indirect_drain_, "S_indirect_drain", log);
+  output_value (S_soil_drain_, "S_soil_drain", log);
   output_value (S_incorp_, "S_incorp", log);
   output_value (tillage_, "tillage", log);
   output_value (S_p_, "S_p", log);
+  output_value (S_p_drain_, "S_p_drain", log);
   output_value (S_permanent_, "S_permanent", log);
   output_value (S_ice_ice, "S_ice", log);
   output_value (S_ice_water_, "S_ice_water", log);
@@ -791,18 +819,31 @@ Conventionally, this is the intra-aggregate pores.");
                  Attribute::SoilCells,
                  "Water content in secondary matrix system.\n\
 Conventionally, this is the inter-aggregate pores.");
+  frame.declare ("Theta_p", "cm^3/cm^3", Attribute::LogOnly, 
+                 Attribute::SoilCells,
+                 "Water content in tertiary (biopore) system.");
   frame.declare ("S_sum", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Total water sink (due to root uptake and macropores).");
   frame.declare ("S_root", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Water sink due to root uptake.");
   frame.declare ("S_drain", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
-                 "Water sink due to soil drainage.");
+                 "Matrix water sink due to soil drainage.");
+  frame.declare ("S_indirect_drain", "cm^3/cm^3/h", 
+                 Attribute::LogOnly, Attribute::SoilCells, "\
+Matrix water sink due to soil drainage, only counting biopores.");
+  frame.declare ("S_soil_drain", "cm^3/cm^3/h", 
+                 Attribute::LogOnly, Attribute::SoilCells, "\
+Matrix water sink due to soil drainage, not counting biopores.");
   frame.declare ("S_incorp", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Incorporated water sink, typically from subsoil irrigation.");
   frame.declare ("tillage", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Changes in water content due to tillage operations.");
   frame.declare ("S_p", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
-                 "Water sink (due to macropores).");
+                 "Matrix water sink (due to macropores).");
+  frame.declare ("S_p_drain", "cm^3/cm^3/h", 
+                 Attribute::LogOnly, Attribute::SoilCells,
+                 "Water moving from biopores to drain.\
+This only reflect water in the tertiary domain, not in the matrix.");
   frame.declare ("S_permanent", "cm^3/cm^3/h", Attribute::State, Attribute::SoilCells,
                  "Permanent water sink, e.g. subsoil irrigation.");
   frame.set_empty ("S_permanent");
@@ -963,9 +1004,12 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
   S_sum_.insert (S_sum_.begin (), cell_size, 0.0);
   S_root_.insert (S_root_.begin (), cell_size, 0.0);
   S_drain_.insert (S_drain_.begin (), cell_size, 0.0);
+  S_indirect_drain_.insert (S_indirect_drain_.begin (), cell_size, 0.0);
+  S_soil_drain_.insert (S_soil_drain_.begin (), cell_size, 0.0);
   S_incorp_.insert (S_incorp_.begin (), cell_size, 0.0);
   tillage_.insert (tillage_.begin (), cell_size, 0.0);
   S_p_.insert (S_p_.begin (), cell_size, 0.0);
+  S_p_drain_.insert (S_p_drain_.begin (), cell_size, 0.0);
   if (S_permanent_.size () < cell_size)
     S_permanent_.insert (S_permanent_.end (), cell_size - S_permanent_.size (),
                          0.0);
@@ -983,6 +1027,7 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
   // Update conductivity and primary/secondary water.
   Theta_primary_.insert (Theta_primary_.begin (), cell_size, -42.42e42);
   Theta_secondary_.insert (Theta_secondary_.begin (), cell_size, -42.42e42);
+  Theta_tertiary_.insert (Theta_tertiary_.begin (), cell_size, -42.42e42);
   K_cell_.insert (K_cell_.begin (), cell_size, 0.0);
   tick_after (geo, soil,  soil_heat, true, msg);
 

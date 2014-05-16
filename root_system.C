@@ -406,6 +406,7 @@ RootSystem::tick_dynamic (const double T, const double day_fraction,
 
 void
 RootSystem::tick_daily (const Geometry& geo, const Soil& soil, 
+                        const SoilWater& soil_water,
                         const double WRoot, const bool root_growth,
                         const double DS, Treelog& msg)
 {
@@ -415,7 +416,20 @@ RootSystem::tick_daily (const Geometry& geo, const Soil& soil,
     {
       const double clay = geo.content_height (soil, &Soil::clay, -Depth);
       double clay_fac = PenClayFac (clay);
-      double dp = PenPar1 * clay_fac * std::max (0.0, soil_temperature - PenPar2);
+      const double Theta 
+        = geo.content_height (soil_water, &SoilWater::Theta, -Depth);
+      daisy_assert (Theta >= 0.0);
+      const double Theta_sat 
+        = geo.content_height (soil, &Soil::Theta_sat, -Depth);
+      daisy_assert (Theta_sat > 0.0);
+      daisy_assert (Theta_sat <= 1.0);
+      daisy_assert (Theta <= Theta_sat);
+      const double water = Theta/Theta_sat;
+      daisy_assert (water >= 0.0);
+      daisy_assert (water <= 1.0);
+      double water_fac = PenWaterFac (water);
+      double dp = PenPar1 * clay_fac * water_fac 
+        * std::max (0.0, soil_temperature - PenPar2);
       PotRtDpt = std::min (PotRtDpt + dp, MaxPen);
       /*max depth determined by crop*/
       Depth = std::min (Depth + dp, MaxPen);
@@ -544,10 +558,12 @@ RootSystem::load_syntax (Frame& frame)
   frame.declare ("PenClayFac", Attribute::Fraction (), Attribute::None (),
                  Check::non_negative (), Attribute::Const, 
                  "Clay dependent factor to multiply 'PenPar1' with.");
-  PLF clay;
-  clay.add (0.0, 1.0);
-  clay.add (1.0, 1.0);
-  frame.set ("PenClayFac", clay);
+  frame.set ("PenClayFac", PLF::always_1 ());
+  frame.declare ("PenWaterFac", Attribute::Fraction (), Attribute::None (),
+                 Check::non_negative (), Attribute::Const, 
+                 "Water dependent factor to multiply 'PenPar1' with.\n\
+The factor is a function of relative water content (Theta/Theta_sat).");
+  frame.set ("PenWaterFac", PLF::always_1 ());
   frame.declare ("MaxPen", "cm", Check::positive (), Attribute::Const,
                  "Maximum penetration depth.");
   frame.set ("MaxPen", 100.0);
@@ -643,6 +659,7 @@ RootSystem::RootSystem (const Block& al)
     PenPar1 (al.number ("PenPar1")),
     PenPar2 (al.number ("PenPar2")),
     PenClayFac (al.plf ("PenClayFac")),
+    PenWaterFac (al.plf ("PenWaterFac")),
     MaxPen (al.number ("MaxPen")),
     MaxWidth (al.number ("MaxWidth", MaxPen)),
     Rad (al.number ("Rad")),

@@ -49,6 +49,8 @@ struct BioporeDrain : public Biopore
   void set_state (const Anystate&)
   { }
 
+  std::vector<double> S_from_drain;
+
   // Simulation.
   double total_water () const
   { return 0.0; }
@@ -92,13 +94,162 @@ struct BioporeDrain : public Biopore
                            const double dt);
   void update_water ()
   { }
+  static void pass_below (const Geometry& geo,
+                          const double pipe_position,
+                          const std::vector<double>& from_matrix,
+                          const size_t edge_above,
+                          const int cell_above,
+                          std::vector<double>& q,
+                          std::vector<double>& S_from_drain)
+  {
+    const int cell = geo.edge_other (edge_above, cell_above);
+    if (!geo.cell_is_internal (cell))
+      return;
+    const double flux_above = q[edge_above];
+    const double S = from_matrix[cell];
+    const double volume = geo.cell_volume (cell);
+    const double area_above = geo.edge_area (edge_above);
+    if (geo.cell_bottom (cell) <= pipe_position)
+      // drain cell.
+      {
+        daisy_assert (iszero (S_from_drain[cell]));
+        S_from_drain[cell] -= flux_above * area_above / volume - S;
+        return;
+      }
+    // Not a drain cell.
+    const double volume_below = flux_above * area_above - S * volume;
+    const std::vector<size_t>& cell_edges = geo.cell_edges (cell);
+    const size_t cell_edges_size = cell_edges.size ();
+    size_t lowest_edge = edge_above;
+    double lowest_z = geo.cell_z (cell);
+    for (size_t i = 0; i < cell_edges_size; i++)
+      {
+        const size_t edge_below = cell_edges[i];
+        const int cell_below = geo.edge_other (edge_below, cell);
+        if (cell_below == Geometry::cell_below)
+          {
+            lowest_edge = edge_below;
+            break;
+          }
+        if (!geo.cell_is_internal (cell_below))
+          continue;
+        const double z = geo.cell_z (cell_below);
+        if (z < lowest_z)
+          {
+            lowest_z = z;
+            lowest_edge = edge_below;
+          }
+      }
+    daisy_assert (iszero (q[lowest_edge]));
+    const double area_below = geo.edge_area (lowest_edge);
+    const double flux_below = volume_below / area_below;
+    q[lowest_edge] = flux_below;
+    pass_below (geo, pipe_position, from_matrix, lowest_edge, cell,
+                q, S_from_drain);
+  }
+  static void pass_above (const Geometry& geo,
+                          const double pipe_position,
+                          const std::vector<double>& from_matrix,
+                          const size_t edge_below,
+                          const int cell_below,
+                          std::vector<double>& q,
+                          std::vector<double>& S_from_drain)
+  {
+    const int cell = geo.edge_other (edge_below, cell_below);
+    if (!geo.cell_is_internal (cell))
+      return;
+    const double flux_below = q[edge_below];
+    const double S = from_matrix[cell];
+    const double volume = geo.cell_volume (cell);
+    const double area_below = geo.edge_area (edge_below);
+    if (geo.cell_top (cell) > pipe_position)
+      // drain cell.
+      {
+        // S already counted in pass_below.
+        S_from_drain[cell] -= flux_below * area_below / volume /* - S */;
+        return;
+      }
+    // Not a drain cell.
+    const double volume_above = flux_below * area_below - S * volume;
+    const std::vector<size_t>& cell_edges = geo.cell_edges (cell);
+    const size_t cell_edges_size = cell_edges.size ();
+    size_t highest_edge = edge_below;
+    double highest_z = geo.cell_z (cell);
+    for (size_t i = 0; i < cell_edges_size; i++)
+      {
+        const size_t edge_above = cell_edges[i];
+        const int cell_above = geo.edge_other (edge_above, cell);
+        if (cell_above == Geometry::cell_above)
+          {
+            highest_edge = edge_above;
+            break;
+          }
+        if (!geo.cell_is_internal (cell_above))
+          continue;
+        const double z = geo.cell_z (cell_above);
+        if (z > highest_z)
+          {
+            highest_z = z;
+            highest_edge = edge_above;
+          }
+      }
+    daisy_assert (iszero (q[highest_edge]));
+    const double area_above = geo.edge_area (highest_edge);
+    const double flux_above = volume_above / area_above;
+    q[highest_edge] = flux_above;
+    pass_above (geo, pipe_position, from_matrix, highest_edge, cell,
+                q, S_from_drain);
+  }
+
+  void update_cell_water (const Geometry& geo, const double)
+  {
+    std::fill (S_from_drain.begin (), S_from_drain.end (), 0.0);
+    {
+      // Update flux starting from the top.
+      const std::vector<size_t>& edge_above 
+        = geo.cell_edges (Geometry::cell_above);
+      const size_t edge_above_size = edge_above.size ();
+      for (size_t i = 0; i < edge_above_size; i++)
+        {
+          const size_t edge = edge_above[i];
+          pass_below (geo, pipe_position, S, edge, Geometry::cell_above, q,
+                      S_from_drain);
+        }
+    }
+    {
+      // Update flux starting from the bottom.
+      const std::vector<size_t>& edge_below 
+        = geo.cell_edges (Geometry::cell_below);
+      const size_t edge_below_size = edge_below.size ();
+      for (size_t i = 0; i < edge_below_size; i++)
+        {
+          const size_t edge = edge_below[i];
+          daisy_assert (iszero (q[edge]));
+          pass_above (geo, pipe_position, S, edge, Geometry::cell_below, q,
+                      S_from_drain);
+        }
+    }
+    daisy_approximate (geo.total_surface (S) + infiltration, 
+                       geo.total_surface (S_from_drain));
+  }
+  void update_soil_tertiary (std::vector<double>&, std::vector<double>& q_p)
+  {
+    const size_t edge_size = q.size ();
+    daisy_assert (edge_size == q_p.size ());
+    for (size_t i = 0; i < edge_size; i++)
+      q_p[i] += q[i];
+  }
   void add_to_sink (std::vector<double>&,
-                    std::vector<double>& S_drain) const
+                    std::vector<double>& S_drain,
+                    std::vector<double>& S_tertiary_drain) const
   {
     const size_t cell_size = S.size ();
     daisy_assert (S_drain.size () == cell_size);
     for (size_t c = 0; c < cell_size; c++)
-      S_drain[c] += S[c];
+      {
+        S_drain[c] += S[c];
+        S_tertiary_drain[c] += S_from_drain[c];
+      }
   }
   void add_solute (symbol, size_t, const double)
   { }
@@ -125,6 +276,9 @@ struct BioporeDrain : public Biopore
             ok = false;
           }
       }
+    const size_t cell_size = geo.cell_size ();
+    S_from_drain.insert (S_from_drain.begin (), cell_size, 0.0);
+    daisy_assert (S_from_drain.size () == cell_size);
     return ok;
   }
   bool check (const Geometry& geo, Treelog& msg) const
@@ -221,7 +375,8 @@ Biopores that ends in the drain pipes.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("pipe_position", "cm", Check::negative (), Attribute::Const,
+    frame.declare ("pipe_position", "cm", Check::negative (), 
+                   Attribute::OptionalConst,
                 "Height pipes are placed in the soil (a negative number).\n\
 By default, use the height specified for pipes in the column.");
   }

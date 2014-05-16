@@ -3031,6 +3031,13 @@ Use \"*\" to log all added organic matter matter.")
                   (handle sum)
                   (dimension "g/cm^3"))))
 
+(deflog "Biopore Drain Sink Water" column
+  (where "${colfid}biopore_drain_sink_water.dlf")
+  (when hourly)
+  (entries (array (path column "${column}" SoilWater S_p_drain)
+                  (handle sum)
+                  (dimension "g/cm^3"))))
+
 (deflog "Drain Sink NO3" column
   (where "${colfid}drain_sink_NO3.dlf")
   (when hourly)

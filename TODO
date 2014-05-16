@@ -1,18 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Check Sørens Infiltration
+* Biopore flow LATER
 
-* Signe
+** test om UZ Mollerup virker uden S_macro...
 
-** Se om vi har soil water potential for de nye simuleringer
+** Vi skal have SW_B2M og SW_M2B
 
-*** Vi vil gerne have R7, R2, R3 som de tre vådeste
+** J_p
 
-** Se om vi har logget stof indhold per node for glyfosat. 
+* Kopier X61 HD, sluk maskine
 
-Specifikt om der er en spændende dynamik mellem to 2 øverste noder, og
-mixing lag. Søren mener mere vand sent kan give mere solute og derved mere
-udvaskning.
+* Installar Daisy build på HP.
 
 * Jordbehandling 
 
