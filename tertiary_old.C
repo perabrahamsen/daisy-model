@@ -89,7 +89,16 @@ TertiaryOld::tick (const Units&, const Geometry& geo, const Soil& soil,
   std::vector<double> q_tertiary (edge_size, 0.0);
   this->tick_water (geo, soil, soil_water, soil_heat, dt, surface,
                     S_drain, S_matrix, q_tertiary, msg);
-  soil_water.add_tertiary_sink (S_matrix, S_drain, S_tertiary_drain);
+  std::vector<double> S_B2M (cell_size, 0.0);
+  std::vector<double> S_M2B (cell_size, 0.0);
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      if (S_matrix[c] > 0)
+        S_M2B[c] += S_matrix[c];
+      else
+        S_B2M[c] -= -S_matrix[c];
+    }
+  soil_water.add_tertiary_sink (S_matrix, S_B2M, S_M2B, S_tertiary_drain);
   soil_water.set_tertiary_flux (q_tertiary);
 }
 

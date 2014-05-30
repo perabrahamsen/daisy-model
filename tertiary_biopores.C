@@ -105,7 +105,8 @@ struct TertiaryBiopores : public Tertiary
              SoilWater& soil_water, Surface& surface, Treelog& msg);
 
   // - For use in Richard's Equation.
-  void matrix_sink (std::vector<double>& S_matrix,
+  void matrix_sink (std::vector<double>& S_B2M,
+                    std::vector<double>& S_M2B,
                     std::vector<double>& S_drain,
                     std::vector<double>& S_tertiary_drain) const;
   
@@ -389,7 +390,8 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   // Soil matrix exchange.
   const size_t cell_size = geo.cell_size ();
   std::vector<double> S_drain (cell_size, 0.0);
-  std::vector<double> S_matrix (cell_size, 0.0);
+  std::vector<double> S_B2M (cell_size, 0.0);
+  std::vector<double> S_M2B (cell_size, 0.0);
   std::vector<double> S_tertiary_drain (cell_size, 0.0);
 
   // Keep original state.
@@ -401,10 +403,10 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   find_implicit_water (old_state, geo, soil, h, ddt);
   
   // Limit sink.
-  matrix_sink (S_matrix, S_drain, S_tertiary_drain);
+  matrix_sink (S_B2M, S_M2B, S_drain, S_tertiary_drain);
   for (size_t c = 0; c < cell_size; c++)
     {
-      const double Theta_loss = (S_drain[c] + S_matrix[c]) * ddt;
+      const double Theta_loss = (S_drain[c] + S_M2B[c] - S_B2M[c]) * ddt;
       if (Theta_loss <= 0.01)
         // Less than one percent, ignore it.
         continue;
@@ -442,29 +444,29 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
     classes[b]->update_cell_water (geo, dt);
 
   // Make it official.
-  std::fill (S_matrix.begin (), S_matrix.end (), 0.0);
+  std::fill (S_B2M.begin (), S_B2M.end (), 0.0);
+  std::fill (S_M2B.begin (), S_M2B.end (), 0.0);
   std::fill (S_drain.begin (), S_drain.end (), 0.0);
   std::fill (S_tertiary_drain.begin (), S_tertiary_drain.end (), 0.0);
-  matrix_sink (S_matrix, S_drain, S_tertiary_drain);
+  matrix_sink (S_B2M, S_M2B, S_drain, S_tertiary_drain);
 
   std::vector<double> Theta_p (cell_size, 0.0);
   std::vector<double> q_p (edge_size, 0.0);
   for (size_t b = 0; b < classes.size (); b++)
     classes[b]->update_soil_tertiary (Theta_p, q_p);
 
-  soil_water.add_tertiary_sink (S_matrix, S_drain, S_tertiary_drain);
+  soil_water.add_tertiary_sink (S_B2M, S_M2B, S_drain, S_tertiary_drain);
   soil_water.set_tertiary (Theta_p, q_p);
 }
 
 void 
-TertiaryBiopores::matrix_sink (std::vector<double>& S_matrix,
+TertiaryBiopores::matrix_sink (std::vector<double>& S_B2M,
+                               std::vector<double>& S_M2B,
                                std::vector<double>& S_drain, 
                                std::vector<double>& S_tertiary_drain) const
 {
-  std::fill (S_matrix.begin (), S_matrix.end (), 0.0);
-  std::fill (S_drain.begin (), S_drain.end (), 0.0);
   for (size_t b = 0; b < classes.size (); b++)
-    classes[b]->add_to_sink (S_matrix, S_drain, S_tertiary_drain);
+    classes[b]->add_to_sink (S_B2M, S_M2B, S_drain, S_tertiary_drain);
 }
 
 void 

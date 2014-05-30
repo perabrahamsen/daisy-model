@@ -380,7 +380,8 @@ MovementSolute::primary_transport (const Geometry& geo, const Soil& soil,
               << ", Theta_new " << Theta_new[c]
               << ", root " << soil_water.S_root (c)
               << ", drain " << soil_water.S_drain (c)
-              << ", bio " << soil_water.S_p (c)
+              << ", B2M " << soil_water.S_B2M (c)
+              << ", M2B " << soil_water.S_M2B (c)
               << ", forward_total " << soil_water.S_forward_total (c)
               << ", forward_sink " << soil_water.S_forward_sink (c)
               << ", sum " << soil_water.S_sum (c)

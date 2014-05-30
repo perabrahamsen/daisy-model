@@ -240,6 +240,7 @@ struct BioporeDrain : public Biopore
       q_p[i] += q[i];
   }
   void add_to_sink (std::vector<double>&,
+                    std::vector<double>&,
                     std::vector<double>& S_drain,
                     std::vector<double>& S_tertiary_drain) const
   {

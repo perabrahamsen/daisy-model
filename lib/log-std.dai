@@ -217,13 +217,14 @@ the litter layer.")
   (precision 10)
   (input "Biopore infiltration"
          "Matrix to biopores" "Matrix indirect drain flow")
-  (output "Biopore percolation" "Biopore drain flow")
+  (output "Biopore percolation" "Biopores to matrix" "Biopore drain flow")
   (content "Biopore water"))
 
 (defsummary "Matrix water balance" balance
   "Balance for the matrix domain in the soil."
   (precision 10)
-  (input "Matrix infiltration" "Subsoil irrigation" "Tillage")
+  (input "Matrix infiltration" "Biopores to matrix" 
+         "Subsoil irrigation" "Tillage")
   (output "Matrix percolation" "Matrix to biopores" 
           "Matrix direct drain flow" "Matrix indirect drain flow" 
           "Root extraction" "Freezing")
@@ -366,12 +367,17 @@ the tillage operation.")
                      (dimension "mm"))
            (interval (tag "Matrix to biopores")
                      (documentation "\
-Net amount of water leaving the soil matrix to the biopores.
-
-This does not include water that flows to drain connected biopores.
-This may be zero if the same amount of water enters and leaves the interval.")
-                     (path column "${column}" SoilWater S_p)
-                     (spec fixed SoilWater S_p)
+Amount of water leaving the soil matrix to the biopores.
+This does not include water that flows to drain connected biopores.")
+                     (path column "${column}" SoilWater S_M2B)
+                     (spec fixed SoilWater S_M2B)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "Biopores to matrix")
+                     (documentation "\
+Amount of water leaving the biopores to the matrix.")
+                     (path column "${column}" SoilWater S_B2M)
+                     (spec fixed SoilWater S_B2M)
                      (handle sum)
                      (dimension "mm"))
            (interval (tag "Matrix water")

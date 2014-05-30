@@ -62,7 +62,8 @@ private:
   std::vector<double> S_indirect_drain_;
   std::vector<double> S_soil_drain_;
   std::vector<double> S_incorp_;
-  std::vector<double> S_p_;
+  std::vector<double> S_B2M_;
+  std::vector<double> S_M2B_;
   std::vector<double> S_p_drain_;
   std::vector<double> S_permanent_;
   std::vector<double> S_ice_ice;
@@ -117,8 +118,10 @@ public:
   { return S_root_[i]; }
   double S_drain (std::size_t i) const
   { return S_drain_[i]; }
-  double S_p (std::size_t i) const
-  { return S_p_[i]; }
+  double S_M2B (std::size_t i) const
+  { return S_M2B_[i]; }
+  double S_B2M (std::size_t i) const
+  { return S_B2M_[i]; }
   double S_ice_water (std::size_t i) const
   { return S_ice_water_[i]; }
   double S_forward_total (std::size_t i) const
@@ -157,7 +160,8 @@ public:
   void set_matrix (const std::vector<double>& h,
                    const std::vector<double>& Theta,
                    const std::vector<double>& q);
-  void add_tertiary_sink (const std::vector<double>& S_matrix,
+  void add_tertiary_sink (const std::vector<double>& S_B2M,
+                          const std::vector<double>& S_M2B,
                           const std::vector<double>& S_drain,
                           const std::vector<double>& S_tertiary_drain);
   void set_tertiary_flux (const std::vector<double>& q_p);

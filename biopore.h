@@ -118,7 +118,8 @@ public:
                                    const std::vector<double>& h, 
                                    const double dt) = 0;
   void scale_sink (double scale);
-  virtual void add_to_sink (std::vector<double>& S_matrix,
+  virtual void add_to_sink (std::vector<double>& S_M2B,
+                            std::vector<double>& S_B2M,
                             std::vector<double>& S_drain,
                             std::vector<double>& S_tertiary_drain) const = 0;
   virtual void update_water () = 0;

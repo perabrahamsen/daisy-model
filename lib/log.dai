@@ -3381,12 +3381,20 @@ contains no water."
                   (handle max)
                   (spec biopore matrix h3_soil))))
 
-(deflog "Tertiary water sink" column
-  "Tertiary water sink term."
-  (where "${colfid}tertiary-water-sink.dlf")
+(deflog "Matrix to biopores" column
+  "Water moving from the soil matrix to the biopores, excluding drain."
+  (where "${colfid}M2B-water.dlf")
   (when hourly)
-  (entries (array (path column "${column}" SoilWater S_p)
-                  (spec fixed SoilWater S_p)
+  (entries (array (path column "${column}" SoilWater S_M2B)
+                  (spec fixed SoilWater S_M2B)
+                  (handle sum))))
+
+(deflog "Biopores to matrix" column
+  "Tertiary water sink term."
+  (where "${colfid}B2M-water.dlf")
+  (when hourly)
+  (entries (array (path column "${column}" SoilWater S_B2M)
+                  (spec fixed SoilWater S_B2M)
                   (handle sum))))
 
 (deflog "Tertiary chemical sink" chemical

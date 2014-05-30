@@ -152,7 +152,9 @@ struct BioporeMatrix : public Biopore
   void update_cell_water (const Geometry&, const double dt);
   void update_soil_tertiary (std::vector<double>& Theta_p,
                              std::vector<double>& q_p);
-  void add_to_sink (std::vector<double>& S_matrix, std::vector<double>&,
+  void add_to_sink (std::vector<double>& S_B2M, 
+                    std::vector<double>& S_M2B, 
+                    std::vector<double>&,
                     std::vector<double>&) const;
   void add_solute (symbol chem, size_t cell, const double amount /* [g] */);
   void matrix_solute (const Geometry& geo, const double dt, 
@@ -852,13 +854,20 @@ BioporeMatrix::update_soil_tertiary (std::vector<double>& Theta_p,
 }
 
 void 
-BioporeMatrix::add_to_sink (std::vector<double>& S_matrix,
+BioporeMatrix::add_to_sink (std::vector<double>& S_B2M,
+                            std::vector<double>& S_M2B,
                             std::vector<double>&, std::vector<double>&) const
 {
   const size_t cell_size = S.size ();
-  daisy_assert (S_matrix.size () == cell_size);
+  daisy_assert (S_B2M.size () == cell_size);
+  daisy_assert (S_M2B.size () == cell_size);
   for (size_t c = 0; c < cell_size; c++)
-    S_matrix[c] += S[c];
+    {
+      if (S[c] > 0)
+        S_M2B[c] += S[c];
+      else
+        S_B2M[c] -= S[c];
+    }
 }
 
 void 
