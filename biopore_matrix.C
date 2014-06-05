@@ -758,53 +758,6 @@ double
 BioporeMatrix::column_water (const size_t col) const
 { return height_to_volume (col, h_bottom[col]); }
 
-static void
-pass_below (const Geometry& geo,
-            const std::vector<double>& from_matrix,
-            const std::vector<double>& Theta_old,
-            const std::vector<double>& Theta,
-            const double dt,
-            const size_t edge_above,
-            const int cell_above,
-            std::vector<double>& q)
-{
-  const double flux_above = q[edge_above];
-  const int cell = geo.edge_other (edge_above, cell_above);
-  if (!geo.cell_is_internal (cell))
-    return;
-  const double S = from_matrix[cell] - (Theta[cell] - Theta_old[cell]) / dt;
-  const double volume = geo.cell_volume (cell);
-  const double area_above = geo.edge_area (edge_above);
-  const double volume_below = flux_above * area_above - S * volume;
-  const std::vector<size_t>& cell_edges = geo.cell_edges (cell);
-  const size_t cell_edges_size = cell_edges.size ();
-  size_t lowest_edge = edge_above;
-  double lowest_z = geo.cell_z (cell);
-  for (size_t i = 0; i < cell_edges_size; i++)
-    {
-      const size_t edge_below = cell_edges[i];
-      const int cell_below = geo.edge_other (edge_below, cell);
-      if (cell_below == Geometry::cell_below)
-        {
-          lowest_edge = edge_below;
-          break;
-        }
-      if (!geo.cell_is_internal (cell_below))
-        continue;
-      const double z = geo.cell_z (cell_below);
-      if (z < lowest_z)
-        {
-          lowest_z = z;
-          lowest_edge = edge_below;
-        }
-    }
-  daisy_assert (iszero (q[lowest_edge]));
-  const double area_below = geo.edge_area (lowest_edge);
-  const double flux_below = volume_below / area_below;
-  q[lowest_edge] = flux_below;
-  pass_below (geo, from_matrix, Theta_old, Theta, dt, lowest_edge, cell, q);
-}
-
 void
 BioporeMatrix::update_cell_water (const Geometry& geo, const double dt)
 {
@@ -829,13 +782,12 @@ BioporeMatrix::update_cell_water (const Geometry& geo, const double dt)
   daisy_approximate (total_water, geo.total_soil (Theta));
 
   // Update flux
-  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
-  const size_t edge_above_size = edge_above.size ();
-  for (size_t i = 0; i < edge_above_size; i++)
-    {
-      const size_t edge = edge_above[i];
-      pass_below (geo, S, Theta_old, Theta, dt, edge, Geometry::cell_above, q);
-    }
+  const size_t cell_size = geo.cell_size ();
+  std::vector<double> source (cell_size, 0.0);
+  for (size_t c = 0; c < cell_size; c++)
+    source[c] = S[c] - (Theta[c] - Theta_old[c]) / dt;
+
+  biopore_pass_below (geo, source, q);
 }
 
 void

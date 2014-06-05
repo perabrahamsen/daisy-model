@@ -384,7 +384,6 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   update_water ();
 
   // Update soil and surface water.
-  soil_water.set_tertiary_flux (q_tertiary);
   surface.update_pond_average (geo);
 
   // Soil matrix exchange.
@@ -455,8 +454,8 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   for (size_t b = 0; b < classes.size (); b++)
     classes[b]->update_soil_tertiary (Theta_p, q_p);
 
-  soil_water.add_tertiary_sink (S_B2M, S_M2B, S_drain, S_tertiary_drain);
-  soil_water.set_tertiary (Theta_p, q_p);
+  soil_water.set_tertiary (Theta_p, q_p, 
+                           S_B2M, S_M2B, S_drain, S_tertiary_drain);
 }
 
 void 
@@ -684,7 +683,9 @@ TertiaryBiopores::initialize (const Units& units,
         ok = false;
       classes[b]->update_soil_tertiary (Theta_p, q_p);
     }
-  soil_water.set_tertiary (Theta_p, q_p);
+  const std::vector<double> empty_sink (cell_size, 0.0);
+  soil_water.set_tertiary (Theta_p, q_p, 
+                           empty_sink, empty_sink, empty_sink, empty_sink);
   const double table = groundwater.table () > 0.0
     ? geo.bottom () - 1000.0
     : groundwater.table ();

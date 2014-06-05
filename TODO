@@ -2,6 +2,12 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Biopore flow 
 
+** Calculate "M" for hver celle, biopore klasse, og stof.
+
+** Calculate flux from S (stof), M_old, M_new for hver klasse og stof.
+
+** Add M, flux til stof
+
 ** J_p
 
 * Kopier X61 HD, sluk maskine

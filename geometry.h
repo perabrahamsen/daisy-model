@@ -326,4 +326,23 @@ protected:
   virtual ~Geometry ();
 };
 
+// Utilities.
+
+// Assume 'flux' is specified for all top edges and there is no
+// horizontal flux, calculate vertical flux below from mass balance.
+void
+biopore_pass_below (const Geometry& geo,
+                    const std::vector<double>& from_matrix,
+                    std::vector<double>& flux);
+
+// Assume 'flux' is specified for all top and bottom edges and there
+// is no horizontal flux, calculate vertical flux and pipe source
+// (negative) from mass balance.
+void
+biopore_pass_pipes (const Geometry& geo,
+                    const double pipe_position,
+                    const std::vector<double>& from_matrix,
+                    std::vector<double>& flux,
+                    std::vector<double>& S_from_drain);
+
 #endif // GEOMETRY_H

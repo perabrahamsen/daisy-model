@@ -240,12 +240,16 @@ SoilWater::set_matrix (const std::vector<double>& h,
 }
 
 void 
-SoilWater::add_tertiary_sink (const std::vector<double>& S_B2M,
-                              const std::vector<double>& S_M2B,
-                              const std::vector<double>& S_drain,
-                              const std::vector<double>& S_tertiary_drain)
+SoilWater::set_tertiary (const std::vector<double>& Theta_p,
+                         const std::vector<double>& q_p,
+                         const std::vector<double>& S_B2M,
+                         const std::vector<double>& S_M2B,
+                         const std::vector<double>& S_drain,
+                         const std::vector<double>& S_tertiary_drain)
 {
-  const size_t cell_size = S_B2M.size ();
+  const size_t cell_size = Theta_p.size ();
+  daisy_assert (Theta_tertiary_.size () == cell_size);
+  daisy_assert (q_tertiary_.size () == q_p.size ());
   daisy_assert (S_M2B_.size () == cell_size);
   daisy_assert (S_B2M_.size () == cell_size);
   daisy_assert (S_M2B.size () == cell_size);
@@ -254,6 +258,8 @@ SoilWater::add_tertiary_sink (const std::vector<double>& S_B2M,
   daisy_assert (S_tertiary_drain.size () == cell_size);
   daisy_assert (S_sum_.size () == cell_size);
   daisy_assert (S_p_drain_.size () == cell_size);
+  Theta_tertiary_ = Theta_p;
+  q_tertiary_ = q_p;
   for (size_t c = 0; c < cell_size; c++)
     {
       daisy_assert (S_B2M[c] >= 0.0);
@@ -265,20 +271,6 @@ SoilWater::add_tertiary_sink (const std::vector<double>& S_B2M,
       S_indirect_drain_[c] += S_drain[c];
       S_p_drain_[c] += S_tertiary_drain[c];
     }
-}
-
-void 
-SoilWater::set_tertiary_flux (const std::vector<double>& q_p)
-{
-  q_tertiary_ = q_p;
-}
-
-void 
-SoilWater::set_tertiary (const std::vector<double>& Theta_p,
-                         const std::vector<double>& q_p)
-{
-  Theta_tertiary_ = Theta_p;
-  q_tertiary_ = q_p;
 }
 
 void 

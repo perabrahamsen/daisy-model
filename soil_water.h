@@ -160,13 +160,12 @@ public:
   void set_matrix (const std::vector<double>& h,
                    const std::vector<double>& Theta,
                    const std::vector<double>& q);
-  void add_tertiary_sink (const std::vector<double>& S_B2M,
-                          const std::vector<double>& S_M2B,
-                          const std::vector<double>& S_drain,
-                          const std::vector<double>& S_tertiary_drain);
-  void set_tertiary_flux (const std::vector<double>& q_p);
   void set_tertiary (const std::vector<double>& Theta_p,
-                     const std::vector<double>& q_p);
+                     const std::vector<double>& q_p,
+                     const std::vector<double>& S_B2M,
+                     const std::vector<double>& S_M2B,
+                     const std::vector<double>& S_drain,
+                     const std::vector<double>& S_tertiary_drain);
 
   // Simulation.
 public:

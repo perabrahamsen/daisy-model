@@ -82,6 +82,7 @@ TertiaryOld::tick (const Units&, const Geometry& geo, const Soil& soil,
 {
   TREELOG_MODEL (msg);
   const size_t cell_size = geo.cell_size ();
+  std::vector<double> Theta_p (cell_size, 0.0);
   std::vector<double> S_drain (cell_size, 0.0);
   std::vector<double> S_matrix (cell_size, 0.0);
   std::vector<double> S_tertiary_drain (cell_size, 0.0);
@@ -98,8 +99,8 @@ TertiaryOld::tick (const Units&, const Geometry& geo, const Soil& soil,
       else
         S_B2M[c] -= -S_matrix[c];
     }
-  soil_water.add_tertiary_sink (S_matrix, S_B2M, S_M2B, S_tertiary_drain);
-  soil_water.set_tertiary_flux (q_tertiary);
+  soil_water.set_tertiary (Theta_p, q_tertiary, 
+                           S_matrix, S_B2M, S_M2B, S_tertiary_drain);
 }
 
 void

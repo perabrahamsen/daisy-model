@@ -845,3 +845,208 @@ Geometry::Geometry (const Block&)
 
 Geometry::~Geometry ()
 { }
+
+// Utilities.
+
+static void
+biopore_pass_below (const Geometry& geo,
+                    const std::vector<double>& from_matrix,
+                    const size_t edge_above,
+                    const int cell_above,
+                    std::vector<double>& flux)
+{
+  const double flux_above = flux[edge_above];
+  const int cell = geo.edge_other (edge_above, cell_above);
+  if (!geo.cell_is_internal (cell))
+    return;
+  const double volume = geo.cell_volume (cell);
+  const double area_above = geo.edge_area (edge_above);
+  const double volume_below = flux_above * area_above 
+    - from_matrix[cell] * volume;
+  const std::vector<size_t>& cell_edges = geo.cell_edges (cell);
+  const size_t cell_edges_size = cell_edges.size ();
+  size_t lowest_edge = edge_above;
+  double lowest_z = geo.cell_z (cell);
+  for (size_t i = 0; i < cell_edges_size; i++)
+    {
+      const size_t edge_below = cell_edges[i];
+      const int cell_below = geo.edge_other (edge_below, cell);
+      if (cell_below == Geometry::cell_below)
+        {
+          lowest_edge = edge_below;
+          break;
+        }
+      if (!geo.cell_is_internal (cell_below))
+        continue;
+      const double z = geo.cell_z (cell_below);
+      if (z < lowest_z)
+        {
+          lowest_z = z;
+          lowest_edge = edge_below;
+        }
+    }
+  daisy_assert (iszero (flux[lowest_edge]));
+  const double area_below = geo.edge_area (lowest_edge);
+  const double flux_below = volume_below / area_below;
+  flux[lowest_edge] = flux_below;
+  biopore_pass_below (geo, from_matrix, lowest_edge, cell, flux);
+}
+
+void
+biopore_pass_below (const Geometry& geo,
+                    const std::vector<double>& from_matrix,
+                    std::vector<double>& flux)
+{
+  // Update flux
+  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const size_t edge_above_size = edge_above.size ();
+  for (size_t i = 0; i < edge_above_size; i++)
+    {
+      const size_t edge = edge_above[i];
+      biopore_pass_below (geo, from_matrix, edge, Geometry::cell_above, flux);
+    }
+}
+
+static void 
+biopore_pass_pipe_below (const Geometry& geo,
+                         const double pipe_position,
+                         const std::vector<double>& from_matrix,
+                         const size_t edge_above,
+                         const int cell_above,
+                         std::vector<double>& flux,
+                         std::vector<double>& S_from_drain)
+{
+  const int cell = geo.edge_other (edge_above, cell_above);
+  if (!geo.cell_is_internal (cell))
+    return;
+  const double flux_above = flux[edge_above];
+  const double S = from_matrix[cell];
+  const double volume = geo.cell_volume (cell);
+  const double area_above = geo.edge_area (edge_above);
+  if (geo.cell_bottom (cell) <= pipe_position)
+    // drain cell.
+    {
+      daisy_assert (iszero (S_from_drain[cell]));
+      S_from_drain[cell] -= flux_above * area_above / volume - S;
+      return;
+    }
+  // Not a drain cell.
+  const double volume_below = flux_above * area_above - S * volume;
+  const std::vector<size_t>& cell_edges = geo.cell_edges (cell);
+  const size_t cell_edges_size = cell_edges.size ();
+  size_t lowest_edge = edge_above;
+  double lowest_z = geo.cell_z (cell);
+  for (size_t i = 0; i < cell_edges_size; i++)
+    {
+      const size_t edge_below = cell_edges[i];
+      const int cell_below = geo.edge_other (edge_below, cell);
+      if (cell_below == Geometry::cell_below)
+        {
+          lowest_edge = edge_below;
+          break;
+        }
+      if (!geo.cell_is_internal (cell_below))
+        continue;
+      const double z = geo.cell_z (cell_below);
+      if (z < lowest_z)
+        {
+          lowest_z = z;
+          lowest_edge = edge_below;
+        }
+    }
+  daisy_assert (iszero (flux[lowest_edge]));
+  const double area_below = geo.edge_area (lowest_edge);
+  const double flux_below = volume_below / area_below;
+  flux[lowest_edge] = flux_below;
+  biopore_pass_pipe_below (geo, pipe_position, from_matrix, lowest_edge, cell,
+                           flux, S_from_drain);
+}
+
+static void 
+biopore_pass_pipe_above (const Geometry& geo,
+                         const double pipe_position,
+                         const std::vector<double>& from_matrix,
+                         const size_t edge_below,
+                         const int cell_below,
+                         std::vector<double>& flux,
+                         std::vector<double>& S_from_drain)
+{
+  const int cell = geo.edge_other (edge_below, cell_below);
+  if (!geo.cell_is_internal (cell))
+    return;
+  const double flux_below = flux[edge_below];
+  const double S = from_matrix[cell];
+  const double volume = geo.cell_volume (cell);
+  const double area_below = geo.edge_area (edge_below);
+  if (geo.cell_top (cell) > pipe_position)
+    // drain cell.
+    {
+      // S already counted in pass_below.
+      S_from_drain[cell] -= flux_below * area_below / volume /* - S */;
+      return;
+    }
+  // Not a drain cell.
+  const double volume_above = flux_below * area_below - S * volume;
+  const std::vector<size_t>& cell_edges = geo.cell_edges (cell);
+  const size_t cell_edges_size = cell_edges.size ();
+  size_t highest_edge = edge_below;
+  double highest_z = geo.cell_z (cell);
+  for (size_t i = 0; i < cell_edges_size; i++)
+    {
+      const size_t edge_above = cell_edges[i];
+      const int cell_above = geo.edge_other (edge_above, cell);
+      if (cell_above == Geometry::cell_above)
+        {
+          highest_edge = edge_above;
+          break;
+        }
+      if (!geo.cell_is_internal (cell_above))
+        continue;
+      const double z = geo.cell_z (cell_above);
+      if (z > highest_z)
+        {
+          highest_z = z;
+          highest_edge = edge_above;
+        }
+    }
+  daisy_assert (iszero (flux[highest_edge]));
+  const double area_above = geo.edge_area (highest_edge);
+  const double flux_above = volume_above / area_above;
+  flux[highest_edge] = flux_above;
+  biopore_pass_pipe_above (geo, pipe_position, from_matrix, highest_edge, cell,
+                           flux, S_from_drain);
+}
+
+void
+biopore_pass_pipes (const Geometry& geo,
+                    const double pipe_position,
+                    const std::vector<double>& from_matrix,
+                    std::vector<double>& flux,
+                    std::vector<double>& S_from_drain)
+{
+  // Update flux starting from the top.
+  const std::vector<size_t>& edge_above 
+    = geo.cell_edges (Geometry::cell_above);
+  const size_t edge_above_size = edge_above.size ();
+  for (size_t i = 0; i < edge_above_size; i++)
+    {
+      const size_t edge = edge_above[i];
+      biopore_pass_pipe_below (geo, pipe_position, from_matrix,
+                               edge, Geometry::cell_above,
+                               flux, S_from_drain);
+    }
+  // Update flux starting from the bottom.
+  const std::vector<size_t>& edge_below 
+    = geo.cell_edges (Geometry::cell_below);
+  const size_t edge_below_size = edge_below.size ();
+  for (size_t i = 0; i < edge_below_size; i++)
+    {
+      const size_t edge = edge_below[i];
+      daisy_assert (iszero (flux[edge]));
+      biopore_pass_pipe_above (geo, pipe_position, from_matrix,
+                               edge, Geometry::cell_below, 
+                               flux, S_from_drain);
+    }
+}
+
+// geometry.C ends here.
