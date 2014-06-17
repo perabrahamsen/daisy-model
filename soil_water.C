@@ -1031,7 +1031,7 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
   // Update conductivity and primary/secondary water.
   Theta_primary_.insert (Theta_primary_.begin (), cell_size, -42.42e42);
   Theta_secondary_.insert (Theta_secondary_.begin (), cell_size, -42.42e42);
-  Theta_tertiary_.insert (Theta_tertiary_.begin (), cell_size, -42.42e42);
+  Theta_tertiary_.insert (Theta_tertiary_.begin (), cell_size, 0.0);
   K_cell_.insert (K_cell_.begin (), cell_size, 0.0);
   tick_after (geo, soil,  soil_heat, true, msg);
 

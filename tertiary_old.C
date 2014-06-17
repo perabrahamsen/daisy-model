@@ -33,6 +33,7 @@
 #include "groundwater.h"
 #include "treelog.h"
 #include "frame.h"
+#include "assertion.h"
 #include <sstream>
 
 struct TertiaryOld : public Tertiary
@@ -97,7 +98,7 @@ TertiaryOld::tick (const Units&, const Geometry& geo, const Soil& soil,
       if (S_matrix[c] > 0)
         S_M2B[c] += S_matrix[c];
       else
-        S_B2M[c] -= -S_matrix[c];
+        S_B2M[c] -= S_matrix[c];
     }
   soil_water.set_tertiary (Theta_p, q_tertiary, 
                            S_B2M, S_M2B, S_drain, S_tertiary_drain);
@@ -185,7 +186,7 @@ TertiaryOld::output (Log&) const
 bool 
 TertiaryOld::initialize (const Units&,
                          const Geometry& geometry,
-                         const Soil& soil, SoilWater&, 
+                         const Soil& soil, SoilWater& soil_water, 
                          const Scope& scope, const Groundwater& groundwater, 
                          Treelog& msg)
 { 

@@ -204,7 +204,7 @@ the litter layer.")
 
 (defsummary "Soil water balance" balance
   "Balance for all water in the soil."
-  (precision 10)
+  (precision 1)
   (input "Matrix infiltration" "Biopore infiltration" 
          "Subsoil irrigation" "Tillage")
   (output "Matrix percolation" "Biopore percolation" 
@@ -214,7 +214,7 @@ the litter layer.")
 
 (defsummary "Biopore water balance" balance
   "Water balance for the biopore domain alone."
-  (precision 10)
+  (precision 1)
   (input "Biopore infiltration"
          "Matrix to biopores" "Matrix indirect drain flow")
   (output "Biopore percolation" "Biopores to matrix" "Biopore drain flow")
@@ -222,7 +222,7 @@ the litter layer.")
 
 (defsummary "Matrix water balance" balance
   "Balance for the matrix domain in the soil."
-  (precision 10)
+  (precision 1)
   (input "Matrix infiltration" "Biopores to matrix" 
          "Subsoil irrigation" "Tillage")
   (output "Matrix percolation" "Matrix to biopores" 
