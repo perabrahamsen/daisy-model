@@ -100,7 +100,7 @@ TertiaryOld::tick (const Units&, const Geometry& geo, const Soil& soil,
         S_B2M[c] -= -S_matrix[c];
     }
   soil_water.set_tertiary (Theta_p, q_tertiary, 
-                           S_matrix, S_B2M, S_M2B, S_tertiary_drain);
+                           S_B2M, S_M2B, S_drain, S_tertiary_drain);
 }
 
 void
