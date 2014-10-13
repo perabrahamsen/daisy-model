@@ -1,0 +1,148 @@
+;;; setup.dai -- Bakkegården experiment.
+
+(input file "log.dai")
+(input file "fertilizer.dai")
+(input file "tillage.dai")
+(input file "sbarley.dai")
+
+(defcrop SB "Spring Barley"
+  (Root (MaxPen 2 [m]))
+  (LeafPhot original
+            (DSEff (0.0 1.2) (1.0 1.2)))
+  (enable_N_stress false))
+
+(defaction "SB" activity
+  (wait_mm_dd 4 5)                      ;TODO
+  (seed_bed_preparation)
+  (sow SB)
+  ;;(wait_mm_dd 4 12)             
+  ;;(message "CALIB: Emergence")
+  ;;(wait_mm_dd 6 7)
+  ;;(message "CALIB: Skridning")
+  (wait_mm_dd 8 1)                      ;TODO
+  ;;(message "CALIB: Harvest 6.2 Mg DM/ha")
+  (harvest all (stub 8 [cm])(stem 0) (leaf 0))
+  (stop))
+
+(defhorizon "Rorrende Ap" USDA3
+  (description "3-25 cm")
+  (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.03)
+  (dry_bulk_density 1.49 [g/cm^3]))
+  
+(defhorizon "Overflade Ap" "Rorrende Ap"
+  (description "0-3 cm")
+  (hydraulic original
+             ;; 10%
+             (K_sat 0.173704 [cm/h])))
+
+(defhorizon "Rorrende Bplow layer" USDA3
+  (description "25-33 cm Petersen et al (2004)")
+  (clay 0.148)(silt 0.214)(sand 0.638) (humus 0.016)
+  (dry_bulk_density 1.70 [g/cm^3])
+  (anisotropy 12)
+  (hydraulic M_vG (Theta_res 0.00)
+                  (Theta_sat 0.339353)
+                  (alpha 0.0465371)
+                  (n 1.19395)
+                  (K_sat (* 0.5 [] 0.0925 [cm/h]))
+                  (l -2.92948)))               
+
+(defhorizon "Rorrende Bt" USDA3
+  (description "33-120 cm")
+  (clay 0.222)(silt 0.195)(sand 0.583)(humus 0.016)
+  (dry_bulk_density 1.65 [g/cm^3])
+  (hydraulic M_vG (Theta_res 0.0)
+                  (l -4.0323)
+                  (n 1.14768)
+                  (alpha 0.0565146)
+                  (K_sat (* 0.5 [] 0.537042 [cm/h]))
+                  (Theta_sat 0.356969)))  
+                                          
+(defhorizon "Rorrende C" USDA3
+  (description "120-200 cm")
+  (clay 0.207)(silt 0.235)(sand 0.558) (humus 0.01)
+  (dry_bulk_density 1.69 [g/cm^3])
+  (hydraulic M_vG (Theta_res 0.000)
+                  (Theta_sat 0.348314)
+                  (alpha 0.0476257)
+                  (n 1.15336)  
+                  ;;(K_sat 0.54407 [cm/h])
+                  (K_sat 1.50000 [cm/h])
+                  (l -3.60322)))
+
+;;(defvegetation MyVeg crops                          ;Not used.
+;;  (ForcedLAI (2012 ((107	0.0567201742447946) ;Beh 1
+;;                    (112	0.245093676593986)
+;;                    (122	0.35922866159408)
+;;                    (127	0.706177850788342)
+;;                    (132	1.29348436165139)
+;;                    (135	1.50297524926761)
+;;                    (140	1.90382125796166)
+;;                    (146	2.53194868063228)
+;;                    (154	2.82908561010398)
+;;                    (158	2.84844690034698)
+;;                    (163	3.17402593927536)
+;;                    (171	4.19392194288078)
+;;                    (179	4.26796034033895)
+;;                    (186	2.17563886310154)
+;;                    (191	1.52219853509948)))))
+
+
+
+(defcolumn Bakkegaarden default
+  "This is a Rorrende soil with deep drainage."
+  (Chemistry none)
+  (OrganicMatter none)
+  ;; (Vegetation MyVeg)
+  (Soil (MaxRootingDepth 15 [cm])
+        ;;(MaxRootingDepth 125 [cm])
+        (horizons (-3.00 "Overflade Ap")
+                  (-25.00 "Rorrende Ap")
+                  (-33.00 "Rorrende Bplow layer")
+                  (-120 "Rorrende Bt")
+                  (-200 "Rorrende C")))
+  (Bioclimate original (pet makkink))
+  (Groundwater deep))
+
+(defweather Normal combine
+  (entry ((use Precip)
+          (source table (file "dk-taastrup-cpe.dwf")))
+         ((source table (file "dk-taastrup-jrj.dwf")))
+         ((source time (from 2002) (to 2013)
+                  (source table (file "dk-taastrup.dwf"))))))
+  
+(deflog "MyWeather" column
+  (where "${colfid}my_weather.dlf")
+  (when daily)
+  (summary (simple (fetch ("Ea"))))
+  (entries (number (path weather "*" rain)
+                   (handle sum)
+                   (dimension "mm"))
+           (number (path weather "*" snow)
+                   (handle sum)
+                   (dimension "mm"))
+           (number (path column "${column}" Bioclimate default pet component
+                         reference_evapotranspiration)
+                   (tag "ET0")
+                   (handle sum)
+                   (spec pet component reference_evapotranspiration))
+           (number (path column "${column}" Bioclimate "*" total_ea)
+                   (tag "Ea")            
+                   (handle sum)
+                   (dimension "mm"))
+           (number (path column "${column}" Vegetation "*" LAI)
+                   (dimension "m^2/m^2"))
+           ))
+
+(defprogram Bakkegaarden Daisy
+  (manager SB)
+  (column Bakkegaarden)
+  (weather default "pakning_2014.dwf")
+  (time 2014 4 1)
+  (stop 2014 8 2)
+  (output harvest ;;"Field water"
+          "Crop Production" MyWeather))
+
+(run Bakkegaarden)
+
+;; setup.dai ends here.
