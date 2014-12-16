@@ -82,8 +82,6 @@ public:
 			   Treelog&);
   virtual bool check (Treelog&) const;
   Hydraulic (const BlockModel&);
-  static std::auto_ptr<Hydraulic> create_aquitard (const double K_sat);
-  Hydraulic (symbol name, double K_sat);
   ~Hydraulic ();
 };
 

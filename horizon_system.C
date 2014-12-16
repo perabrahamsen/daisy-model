@@ -70,7 +70,7 @@ struct HorizonSystem : public Horizon
   HorizonSystem (const System& system, const BlockModel& al)
     : Horizon (al),
       texture (system.limits, system.get_fractions (al), 
-               al.number ("humus"), 0.0)
+               al.number ("humus"), al.number ("chalk"))
   { }
   ~HorizonSystem ()
   { }
@@ -127,6 +127,9 @@ to ensure the sum is 1.0.");
   frame.set ("other", 0.0);
   frame.declare_fraction ("humus", Attribute::Const,
                        "Humus content of soil.");
+  frame.declare_fraction ("chalk", Attribute::Const,
+                       "Chalk content of soil.");
+  frame.set ("chalk", 0.0);
   frame.declare_boolean ("normalize", Attribute::Const, "\
 If this is true, normalize the mineral fraction to 1.0.\n\
 Otherwise, give an error if the sum is not 1.0.");
@@ -144,7 +147,9 @@ HorizonSystem::System::check_shared (const Frame& al, Treelog& err) const
   
   if (!al.flag ("normalize")
       && !approximate (sum, 1.0) 
-      && !approximate (sum + al.number ("humus"), 1.0))
+      && !approximate (sum + al.number ("humus"), 1.0)
+      && !approximate (sum + al.number ("chalk"), 1.0)
+      && !approximate (sum + al.number ("humus") + al.number ("chalk"), 1.0))
     {
       err.error ("The sum of all soil components must be 1.0");
       ok = false;

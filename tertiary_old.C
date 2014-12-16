@@ -216,10 +216,6 @@ This tertiary water transport model only works with the 'vertical' movement mode
       // Don't go below 1.5 m.
       double height = std::max (geo.zplus (lay-1), -150.0);
 
-      // Don't go below drain pipes.
-      if (groundwater.is_pipe ())
-        height = std::max (height, groundwater.pipe_height ());
-
       // Add them.
       macro = Macro::create (height);
 

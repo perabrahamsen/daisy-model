@@ -8,6 +8,30 @@ release.
 
 * 5.20
 
+** The 'pipe' Grounwater model removed.
+
+Use 
+
+  (Drain lateral)
+  (Groundwater aquitard)
+
+instead.
+
+** The 'default' horizon model removed.
+
+Please be explicit about the texture classification system.
+'USDA3' is what Daisy used to assume.
+
+** You can now specify chalk content in horizons.
+
+It is currently mostly ignored by the model, but might make it easier
+to make the soil fractions add up to 1.
+
+** Removed "N balance" and "Root Zone Water Balance".
+
+Use "Field nitrogen", "Soil nitrogen", "Field water", eller "Soil
+water" i stedet for.
+
 ** "Soil water" log now includes biopores.
 ** "Field water" log now include biopore percolation.
 

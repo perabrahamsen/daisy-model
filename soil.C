@@ -71,15 +71,10 @@ struct Soil::Implementation
       : end (al.number ("end")),
 	horizon (Librarian::build_item<Horizon> (al, "horizon"))
     { }
-    Layer (const double end_, const double K_sat)
-      : end (end_),
-	horizon (Horizon::create_aquitard (K_sat))
-    { }
     ~Layer ()
     { }
   };
   auto_vector<const Layer*> layers;
-  const size_t original_layer_size; // Size before adding aquitard, for logging.
 
   // Regions.
   struct Region
@@ -156,7 +151,6 @@ struct Soil::Implementation
   // Create and Destroy.
   Implementation (const Block& al)
     : layers (map_submodel_const<Layer> (al, "horizons")),
-      original_layer_size (layers.size ()),
       zones (map_submodel_const<Region> (al, "zones")),
       MaxRootingDepth (al.number ("MaxRootingDepth")),
       dispersivity (al.number ("dispersivity")),
@@ -363,7 +357,7 @@ Soil::output (Log& log) const
   if (log.check_interior (horizons_symbol))
     {
       Log::Open open (log, horizons_symbol);
-      for (size_t i = 0; i < impl->original_layer_size; i++)
+      for (size_t i = 0; i < impl->layers.size (); i++)
 	{
 	  Log::Unnamed unnamed (log);
 	  impl->layers[i]->output (log);
@@ -570,21 +564,6 @@ Soil::Soil (const Block& al)
   : impl (new Implementation (al))
 { }
 
-double
-Soil::initialize_aquitard (const Block& top,
-                           const double Z_aquitard, const double K_aquitard)
-{
-  const double old_end = impl->layers[impl->layers.size () - 1]->end;
-  const double Z_horizon
-    = (Z_aquitard > 5.0) ? floor (Z_aquitard / 3.0)	: (Z_aquitard / 3.0);
-  const double new_end = old_end - Z_horizon;
-
-  impl->layers.push_back (new Implementation::Layer (new_end, K_aquitard));
-
-  // Return the old end of soil.
-  return old_end;
-}
-
 void
 Soil::initialize (const Block& block, const Time& time, Geometry& geo,
                   Groundwater& groundwater,
@@ -592,19 +571,8 @@ Soil::initialize (const Block& block, const Time& time, Geometry& geo,
 {
   Treelog::Open nest (block.msg (), "Soil");
 
-  // Extra aquitard layer.
-  if (groundwater.is_pipe ())
-    {
-      // Find parameters.
-      const double Z_aquitard = groundwater.Z_aquitard ();
-      const double K_aquitard = groundwater.K_aquitard ();
-      const double old_bottom 
-        = initialize_aquitard (block, Z_aquitard, K_aquitard);
-      groundwater.set_original_bottom (old_bottom);
-    }
   const bool volatile_bottom =
-    groundwater.bottom_type () == Groundwater::lysimeter 
-    || groundwater.is_pipe (); 
+    groundwater.bottom_type () == Groundwater::lysimeter; 
 
   const std::vector<const Implementation::Layer*>::const_iterator begin
     = impl->layers.begin ();

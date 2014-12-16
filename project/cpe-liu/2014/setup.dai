@@ -94,7 +94,7 @@
   (Chemistry none)
   (OrganicMatter none)
   ;; (Vegetation MyVeg)
-  (Soil (MaxRootingDepth 15 [cm])
+  (Soil (MaxRootingDepth 120 [cm])
         ;;(MaxRootingDepth 125 [cm])
         (horizons (-3.00 "Overflade Ap")
                   (-25.00 "Rorrende Ap")

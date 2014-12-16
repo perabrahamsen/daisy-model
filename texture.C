@@ -28,7 +28,7 @@
 // Weigth of mineral particles. [g/cm^3]
 static const double rho_mineral = 2.65;	
 static const double rho_humus = 1.3; 
-static const double rho_CaCO3 = 1.612;
+static const double rho_chalk = 1.612;
 
 double 
 Texture::fraction_of_minerals_smaller_than (double size /* [um] */) const
@@ -36,11 +36,11 @@ Texture::fraction_of_minerals_smaller_than (double size /* [um] */) const
 
 double 
 Texture::mineral () const      // Fraction of minerals in dry soil [].
-{ return 1.0 - humus - CaCO3; }
+{ return 1.0 - humus - chalk; }
 
 double
 Texture::rho_soil_particles () const
-{ return mineral () * rho_mineral + humus * rho_humus + CaCO3 * rho_CaCO3; }
+{ return mineral () * rho_mineral + humus * rho_humus + chalk * rho_chalk; }
 
 const PLF
 Texture::build_accumulated (const std::vector<double>& lim,
@@ -59,12 +59,12 @@ Texture::build_accumulated (const std::vector<double>& lim,
 }
 
 Texture::Texture (const std::vector<double>& lim, const std::vector<double>& frac,
-                  double hum, double chalk)
+                  double hum, double chalk_)
   : limit (lim),
     fraction (frac),
     accumulated (build_accumulated (lim, fraction)),
     humus (hum),
-    CaCO3 (chalk)
+    chalk (chalk_)
 {
   daisy_assert (limit.size () == fraction.size ());
   daisy_assert (approximate (accumulate (fraction.begin (), 
@@ -75,3 +75,4 @@ Texture::Texture (const std::vector<double>& lim, const std::vector<double>& fra
 Texture::~Texture ()
 { }
 
+// texture.C ends here.

@@ -1,6 +1,15 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Signe kørsler på Gardar
+* MST Tillage
+
+** Hydraulic WEPP
+
+Stadig kun 1 hydraulic model per horizontt. Vi må have flere
+horizonter hvis vi skal tage hensyn til flere jordbehandlingsdybder.
+
+En horizont bliver "behandlet" hvis den overlapper med jordbehandling.
+
+*** set_hypress_parametre (texture, dry_bi
 
 * Biopore flow 
 

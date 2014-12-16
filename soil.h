@@ -119,8 +119,6 @@ public:
   static void load_syntax (Frame&);
 public:
   explicit Soil (const Block&);
-  double initialize_aquitard (const Block&,
-                              double Z_aquitard, double K_aquitard);
   void initialize (const Block&, const Time&, Geometry&, Groundwater&, int som_size);
   ~Soil ();
 };

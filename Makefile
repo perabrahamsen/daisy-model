@@ -243,7 +243,6 @@ MODELS = program_KM2.C program_post.C vegetation_afforestation.C \
 	vegetation_crops.C crop_simple.C action_ridge.C groundwater_fixed.C \
 	groundwater_deep.C action_heat.C hydraulic_M_vG_compact.C \
 	action_crop.C groundwater_lysimeter.C action_message.C \
-	groundwater_pipe.C \
 	select_index.C select_content.C \
 	select_number.C select_array.C \
 	log_harvest.C action_while.C action_wait.C action_activity.C \
@@ -251,7 +250,7 @@ MODELS = program_KM2.C program_post.C vegetation_afforestation.C \
 	column_std.C  uzrichard.C \
 	hydraulic_yolo.C hydraulic_M_vG.C hydraulic_B_vG.C hydraulic_M_C.C \
 	hydraulic_B_C.C hydraulic_M_BaC.C hydraulic_B_BaC.C \
-	groundwater_static.C horizon_std.C \
+	groundwater_static.C \
 	crop_std.C action_sow.C action_stop.C condition_time.C \
 	condition_logic.C action_irrigate.C action_lisp.C \
 	action_tillage.C \
@@ -400,7 +399,8 @@ TEXT =  setup-native.nsi \
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = none
+REMOVE = groundwater_pipe.C horizon_std.C 
+
 
 REMOVED = ABAeffect_exp.C ABAeffect.C ABAeffect.h \
 	stomatacon_Leuning.C stomatacon_BB.C \
@@ -1690,7 +1690,7 @@ tertiary_old${OBJ}: tertiary_old.C tertiary.h model_derived.h model_logable.h \
  model.h symbol.h geometry1d.h geometry_vert.h geometry.h attribute.h \
  soil.h soil_water.h chemical.h model_framed.h macro.h mactrans.h \
  librarian.h block_model.h block_nested.h block.h scope.h treelog.h \
- frame_model.h frame.h surface.h uzmodel.h groundwater.h
+ frame_model.h frame.h surface.h uzmodel.h groundwater.h assertion.h
 biopore_drain${OBJ}: biopore_drain.C biopore.h model_framed.h model_logable.h \
  model.h symbol.h number.h im.h attribute.h block_model.h block_nested.h \
  block.h scope.h treelog.h frame_model.h frame.h vcheck.h librarian.h \
@@ -2198,11 +2198,6 @@ action_message${OBJ}: action_message.C action.h model_framed.h \
  model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h condition.h log.h \
  time.h border.h daisy.h program.h run.h librarian.h
-groundwater_pipe${OBJ}: groundwater_pipe.C groundwater.h model_derived.h \
- model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
- scope.h attribute.h treelog.h frame_model.h frame.h log.h time.h \
- border.h model_framed.h geometry.h soil.h soil_heat.h soil_water.h \
- depth.h mathlib.h assertion.h check.h librarian.h
 select_index${OBJ}: select_index.C select_value.h select.h destination.h \
  symbol.h model.h units.h memutils.h volume.h model_derived.h \
  model_logable.h attribute.h block_model.h block_nested.h block.h scope.h \
@@ -2292,11 +2287,6 @@ groundwater_static${OBJ}: groundwater_static.C groundwater.h model_derived.h \
  model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h assertion.h \
  librarian.h
-horizon_std${OBJ}: horizon_std.C horizon.h model_derived.h model_logable.h \
- model.h symbol.h block_model.h block_nested.h block.h scope.h \
- attribute.h treelog.h frame_model.h frame.h texture.h plf.h hydraulic.h \
- check.h mathlib.h assertion.h librarian.h intrinsics.h memutils.h \
- library.h
 crop_std${OBJ}: crop_std.C crop.h model_framed.h model_logable.h model.h \
  symbol.h time.h chemistry.h seed.h model_derived.h root_system.h \
  rootdens.h ABAprod.h plf.h canopy_std.h canopy_simple.h harvesting.h \

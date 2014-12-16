@@ -42,26 +42,6 @@ void
 Groundwater::accept_bottom (double, const Geometry& geo, size_t edge)
 { daisy_assert (geo.edge_from (edge) == Geometry::cell_below); }
 
-bool 
-Groundwater::is_pipe () const
-{ return false; }
-
-double 
-Groundwater::pipe_height () const
-{ daisy_notreached (); }
-
-double 
-Groundwater::Z_aquitard () const
-{ daisy_notreached (); }
-
-double 
-Groundwater::K_aquitard () const
-{ daisy_notreached (); }
-
-void 
-Groundwater::set_original_bottom (double)
-{ daisy_notreached (); }
-
 void
 Groundwater::output (Log& log) const
 { 

@@ -1,3 +1,48 @@
+2014-12-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* geometry_rect.h (dimensions): If you only have one row, it is
+	an 1D model.
+
+2014-12-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* groundwater_pipe.C, horizon_std.C: Removed.
+	* Makefile (MODELS): Removed.
+	* soil.h, soil.C: Removed support for the 'pipe' groundwater
+	model.
+	* groundwater.C, groundwater.h: Ditto.
+	* tertiary_old.C (initialize): Ditto.
+	* biopore_drain.C (initialize): Ditto.
+	* biopore_matrix.C (initialize): Ditto-
+	* hydraulic.h, hydraulic.C, hydraulic_hypres.C: Ditto.
+	* horizon.h, horizon.C: Ditto.
+
+2014-12-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* texture.h, texture.C: Renamed CaCO3 to chalk.
+
+	* horizon_numeric.C, horizon_system.C ("chalk"): New parameter.
+
+2014-12-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/wwheat.dai ("Winter Wheat; Foulum"): Restored Leaf partitioning.
+
+2014-11-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/dk-maize.dai ("Silomajs; Foulum"): New crop.
+	* lib/dk-grass.dai ("Red fescue"): New crop.
+	* sample/dk-soil.dai (Taastrup): New soil.
+
+2014-11-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* Makefile (MODELS): Removed 'horizon_std.C'.
+
+2014-11-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log.dai ("N Balance", "NH4 Soil Balance")
+	("NO3 Soil Balance", "Organic Nitrogen Balance")
+	("Crop Nitrogen Balance", "Nitrogen Balance")
+	("Root Zone Water Balance", "Total Water Balance"): Removed.
+
 2014-05-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* lib/log-std.dai ("Soil water", "Field water"): Include biopore

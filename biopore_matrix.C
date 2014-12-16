@@ -995,9 +995,6 @@ BioporeMatrix::initialize (const Units& units,
           z_bottom = groundwater.table ();
           break;
         case Groundwater::forced_flux:
-          if (groundwater.is_pipe ())
-            z_bottom = groundwater.pipe_height ();
-          break;
         case Groundwater::free_drainage:
           break;
         default:

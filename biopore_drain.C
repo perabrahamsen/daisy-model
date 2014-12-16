@@ -137,14 +137,8 @@ struct BioporeDrain : public Biopore
     bool ok = initialize_base (units, geo, scope, msg); 
     if (pipe_position > 0)
       {
-        if (groundwater.is_pipe ())
-          // Pipe height not specified here, use value from column.
-          pipe_position = groundwater.pipe_height ();
-        else
-          {
-            msg.error ("Unknown pipe position");
-            ok = false;
-          }
+        msg.error ("Unknown pipe position");
+        ok = false;
       }
     const size_t cell_size = geo.cell_size ();
     S_from_drain.insert (S_from_drain.begin (), cell_size, 0.0);

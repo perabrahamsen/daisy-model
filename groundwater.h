@@ -49,13 +49,6 @@ public:
   virtual double q_bottom (size_t edge) const = 0;
   virtual void accept_bottom (double amount, const Geometry&, size_t edge);
 
-  // Groundwater.
-  virtual bool is_pipe () const;
-  virtual double pipe_height () const; // [cm]
-  virtual double Z_aquitard () const; // [cm]
-  virtual double K_aquitard () const; // [cm/h]
-  virtual void set_original_bottom (double /* [cm] */);
-
   // Simulation.
 public:
   virtual void tick (const Geometry& geo,

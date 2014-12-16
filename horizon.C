@@ -66,6 +66,7 @@ struct Horizon::Implementation
   const double r_pore_min;             // Smallest pore in soil [um]
   double primary_sorption_fraction;
   HorHeat hor_heat;
+  /* const */ double CEC;                   // [cmolc/kg]
   
   // Create and Detroy.
   void initialize (const Hydraulic&, const Texture& texture, double quarts, 
@@ -78,6 +79,35 @@ struct Horizon::Implementation
   Implementation (const Frame& al);
   ~Implementation ();
 };
+
+static double 
+default_CEC (const Texture& texture) // [cmolc/kg]
+{
+  // Source: Krogh, Lars, Henrik Breuning-Madsen, and Mogens Humlekrog
+  // Greve. "Cation-exchange capacity pedotransfer functions for
+  // Danish soils." Acta Agriculturae Scandinavica, Section B-Plant
+  // Soil Science 50.1 (2000): 1-12.
+
+  const double clay 
+    = 100.0 * texture.fraction_of_minerals_smaller_than (2.0 /* um */); /* % */
+  const double SOM = 100.0 * texture.humus; /* % */
+  const double chalk = 100.0 * texture.chalk; /* % */
+  
+  if (SOM > 10.0)            
+    // Organic soil.
+    return 21.11 + 1.88 * SOM;  // [cmolc/kg]
+
+  if (chalk > 0.1 /* % */)
+    // Calcareous soil.
+    return -0.04 + 2.13 * SOM + 0.42 * clay; // [cmolc/kg]
+
+  if (false)
+    // Podzolic B-horizon
+    return 1.91 + 4.79 * SOM + 0.35 * clay;
+
+  // Other soils.
+  return 0.95 + 2.90 * SOM + 0.53 * clay;
+}
 
 void 
 Horizon::Implementation::initialize (const Hydraulic& hydraulic,
@@ -111,6 +141,15 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic,
     }
 
   hor_heat.initialize (hydraulic, texture, quarts, msg);
+  
+  if (CEC < 0.0)
+    {
+      CEC = default_CEC (texture);
+      std::ostringstream tmp;
+      tmp << "(CEC " << CEC 
+          << " [cmolc/mk]) ; Estimated from clay and humus.";
+      msg.debug (tmp.str ());
+    }
 }
 
 Horizon::Implementation::double_map
@@ -166,7 +205,8 @@ Horizon::Implementation::Implementation (const Frame& al)
     secondary (Secondary::create_none ()),
     r_pore_min (al.number ("r_pore_min")),
     primary_sorption_fraction (NAN),
-    hor_heat (al.submodel ("HorHeat"))
+    hor_heat (al.submodel ("HorHeat")),
+    CEC (al.number ("CEC", -42.42e42))
 { }
 
 Horizon::Implementation::~Implementation ()
@@ -342,15 +382,6 @@ Horizon::Horizon (const BlockModel& al)
     tortuosity (Librarian::build_item<Tortuosity> (al, "tortuosity"))
 { }
 
-Horizon::Horizon (const Frame& al, const double K_sat)
-  : ModelDerived ("aquitard"),
-    impl (new Implementation (al)),
-    fast_clay (-42.42e42),
-    fast_humus (-42.42e42),
-    hydraulic (Hydraulic::create_aquitard (K_sat)),
-    tortuosity (Tortuosity::create_default ())
-{ }
-  
 void 
 Horizon::initialize_base (bool top_soil,
                           int som_size, const Texture& texture, 
@@ -545,6 +576,13 @@ Intended for use with pedotransfer functions.", load_attributes);
     frame.declare ("r_pore_min", "um", Attribute::Const, "\
 Smallest pores in the soil.");
     frame.set ("r_pore_min", 0.1);
+    frame.declare_number_cited ("CEC", "cmolc/kg", Check::positive (),
+                                Attribute::OptionalConst, Attribute::Singleton,
+                                "Cation-Exchange Capacity.\
+By default this will be calculated from a pedotransfer function based on\
+Danish cultivated soils. The pedotransfer function is known to be invalid\
+for podzolic B-horizons.",
+                                "krogh2000cation");
   }
 } Horizon_init;
 

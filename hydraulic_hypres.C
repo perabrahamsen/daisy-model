@@ -289,23 +289,8 @@ HydraulicHypres::HydraulicHypres (const BlockModel& al)
     M_ ()
 { }
 
-HydraulicHypres::HydraulicHypres (const symbol name_, const double K_sat_)
-  : Hydraulic (name_, K_sat_),
-    soil_type (unknown),
-    alpha (-42.42e42),
-    a (-42.42e42),
-    n (-42.42e42),
-    m (-42.42e42),
-    l (-42.42e42),
-    M_ ()
-{ }
-
 HydraulicHypres::~HydraulicHypres ()
 { }
-
-std::auto_ptr<Hydraulic>
-Hydraulic::create_aquitard (const double K_sat)
-{ return std::auto_ptr<Hydraulic> (new HydraulicHypres ("aquitard", K_sat)); }
 
 // Add the HydraulicHypres syntax to the syntax table.
 
@@ -337,3 +322,4 @@ it is the topmost horison in the soil profile.");
   }
 } hydraulicHypres_syntax;
 
+// hydraulic_hypres.C ends here.

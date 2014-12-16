@@ -35,10 +35,10 @@ public:
   double fraction_of_minerals_smaller_than (double size /* [um] */) const;
   double mineral () const;     // Fraction of minerals in dry soil [].
   const double humus;           // Fraction of humus in dry soil [].
-  const double CaCO3;           // Fraction of chalk in dry soil.
-  // Note: mineral + humus + CaCO3 = 1.0
+  const double chalk;           // Fraction of chalk in dry soil.
+  // Note: mineral + humus + chalk = 1.0
   double rho_soil_particles () const;
-  
+
   // Create and destroy.
 private:
   static const PLF build_accumulated (const std::vector<double>& lim,

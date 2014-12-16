@@ -260,29 +260,4 @@ NOTE: Not a real texture class, use 'sand' instead.");
   }
 } HorizonStandard_syntax;
 
-static struct HorizonAquitardSyntax : public DeclareParam
-{ 
-  HorizonAquitardSyntax ()
-    : DeclareParam (Horizon::component, "aquitard", "default", "\
-Tecture for implicit aquitard horizon.")
-  { }
-  void load_frame (Frame& frame) const
-  {
-    frame.set ("clay", 50.0);
-    frame.set ("silt", 20.0);
-    frame.set ("sand", 29.99);
-    frame.set ("humus", 0.01);
-    frame.set ("dry_bulk_density", 2.0);
-  }
-} HorizonAquitard_syntax;
-
-std::auto_ptr<Horizon> 
-Horizon::create_aquitard (double K_sat)
-{
-  const Library& library = Librarian::intrinsics ().library (component);
-  daisy_assert (library.check ("aquitard"));
-  const FrameModel& frame = library.model ("aquitard");
-  return std::auto_ptr<Horizon> (new HorizonStandard (frame, K_sat));
-}
-
 // horizon_std.C ends here.

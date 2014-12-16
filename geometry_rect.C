@@ -436,3 +436,5 @@ GeometryRect::~GeometryRect ()
 static DeclareSubmodel
 geometry_rect_submodel (GeometryRect::load_syntax, "GeometryRect", "\
 A rectangular discretization of the soil.");
+
+// geometry_rect.C ends here.
