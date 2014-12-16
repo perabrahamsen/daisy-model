@@ -1,0 +1,89 @@
+;;; plot.dai --- Focus groundwater scenarious plot.
+
+(defsource MACRO column 
+  (file "${sim}.ddf")
+  (reset_offset true)
+  (title "MACRO")
+  (with lines)
+  (style 3))
+
+(defsource Daisy arithmetic
+  (accumulate true)
+  (title "Daisy")
+  (with lines)
+  (style 1))
+
+(defgnuplot FOCUS time
+  (declare ext String "File extension.")
+  ;;(ext "pdf")
+  (ext "emf")
+  (device "emf")
+  (canvas "350,200")
+  (begin 1974 1 1)
+  (end 1994 1 1)
+  (extra &old
+         "set xtics 24 * 60 * 60 * 365.2425 * 5"
+         "set mxtics 5"
+         [set lmargin 10]
+         [set rmargin 0.5]
+         [set bmargin 0.5]
+         [set tmargin 2.5]  
+         [set format x ""]
+         )
+
+  )
+
+(defgnuplot Leak-Water FOCUS
+  (declare site String "Site to plot.")
+  (where "${ext}/${site}-percolation.${ext}")
+  (title "${site} Percolation")
+  (ymax 10 [m])
+  (source (MACRO (tag "Percolation         mm      Acc. (Total)         ")
+                 (file "${site}A.ddf")
+                 (dimension [m])
+                 (original [mm]))
+          (MACRO (tag "Percolation         mm      Acc. (Total)         ")
+                 (file "${site}B.ddf") (title "")
+                 (dimension [m])
+                 (original [mm]))
+          (MACRO (tag "Percolation         mm      Acc. (Total)         ")
+                 (file "${site}C.ddf") (title "")
+                 (dimension [m])
+                 (original [mm]))
+          (Daisy (file "log/${site}A/field_water.dlf")
+                 (expr (convert "Matrix percolation" [m])))
+          (Daisy (file "log/${site}B/field_water.dlf") (title "")
+                 ;;(style 2)
+                 (expr (convert "Matrix percolation" [m])))
+          (Daisy (file "log/${site}C/field_water.dlf") (title "")
+                 ;; (style 4)
+                 (expr (convert "Matrix percolation" [m])))
+          ))
+
+(defgnuplot Leak-Pest FOCUS
+  (declare sim String "Simulation to plot.")
+  (declare max String "Max val.")
+  (where "${ext}/${sim}-deep-leaching.${ext}")
+  (title "${sim} Deep leaching")
+  ;; (extra &old "set yrange [*:${max}]")
+  (source (MACRO (tag "Solute leaching             Acc.(Total)          ")
+                 (original [mg/m^2])
+                 (dimension [g/ha]))
+          (Daisy (file "log/${sim}/field_pesticide.dlf")
+                 (expr "Leak-Matrix"))
+          ))
+
+(defprogram plot gnuplot
+  (graph (Leak-Water (site Karup))
+         (Leak-Water (site Langvad))
+         (Leak-Pest (sim KarupA) (max "40"))
+         (Leak-Pest (sim KarupB) (max "4"))
+         (Leak-Pest (sim KarupC) (max "250"))
+         (Leak-Pest (sim LangvadA) (max "4"))
+         (Leak-Pest (sim LangvadB) (max "8"))
+         (Leak-Pest (sim LangvadC) (max "2"))
+         ))
+
+(run plot)
+
+;;; plot.dai ends here.

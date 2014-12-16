@@ -1,0 +1,762 @@
+;;; setup.dai Rørrendegård setup for use in MST Smoke project.
+
+(input file "chemistry-base.dai")
+(input file "colloid-bound.dai")
+(input file "crop.dai")
+(input file "tillage.dai")
+(input file "fertilizer.dai")
+(input file "log.dai")
+(input file "smoke-log.dai")
+
+;; Horizons.
+
+(defhorizon common USDA3
+  (r_pore_min $pore_min))
+  
+(defhorizon "Ap1" common                 ;3-24
+  (hydraulic hypres (topsoil true))
+  (clay 0.11)(silt 0.22)(sand 0.67)(humus 0.03)
+  (dry_bulk_density 1.56 [g/cm^3])
+  (secondary_domain pressure 
+                    (h_lim $A_lim)
+                    (alpha $X_alpha)))
+
+(defhorizon "Surface" "Ap1"              ;0-3
+  (hydraulic (original (K_sat $S_K)))
+  (secondary_domain pressure
+                    (h_lim $S_lim)
+                    (alpha $S_alpha)))
+
+(defhorizon "Ap2" Ap1                   ;24-30
+  (secondary_domain pressure 
+                    (h_lim $B_lim)
+                    (alpha $X_alpha)) 
+  (dry_bulk_density 1.69 [g/cm^3]))
+
+(defhorizon "A2" common                  ;30-40
+  (hydraulic hypres (topsoil false))
+  (clay 0.13)(silt 0.22)(sand 0.65)(humus 0.03)
+  (dry_bulk_density 1.69 [g/cm^3])
+  (secondary_domain pressure 
+                    (h_lim $B_lim)
+                    (alpha $X_alpha)))
+
+(defhorizon "B1" A2                     ;40-60
+  (dry_bulk_density 1.7 [g/cm^3]))
+
+(defhorizon "Bt" common                 ;60-120
+  (hydraulic hypres)
+  (clay 0.22)(silt 0.20)(sand 0.58)(humus 0.016)
+  (dry_bulk_density 1.7 [g/cm^3])
+  (secondary_domain pressure 
+                    (h_lim $B_lim)
+                    (alpha $X_alpha)))
+
+(defhorizon "C" common                   ;120-
+  (clay 0.16)(silt 0.25)(sand 0.59) (humus 0.01)
+  (dry_bulk_density 1.8 [g/cm^3])
+  (hydraulic M_vG  
+             (Theta_res 0.000)
+             (Theta_sat 0.348314)
+             (alpha 0.0476257)
+             (n 1.15336)  
+             (K_sat 1.50000 [cm/h])
+             (l -3.60322))
+  (secondary_domain pressure 
+                    (h_lim $B_lim)
+                    (alpha $X_alpha)))
+
+(defhorizon "Ap2_Drain" Ap2             ;24-30
+  (dry_bulk_density 1.77 [g/cm^3]))
+
+(defhorizon "A2_Drain" A2               ;30-40
+  (dry_bulk_density 1.77 [g/cm^3]))
+
+  
+(defhorizon "Drain canyon" common        ;40-120
+  (hydraulic hypres)
+  (clay 0.16)(silt 0.20)(sand 0.64)(humus 0.014)
+  (dry_bulk_density 1.70 [g/cm^3])
+  (secondary_domain pressure 
+                    (h_lim $B_lim)
+                    (alpha $X_alpha)))
+
+;; Profile.
+
+(defcolumn Rorrende default
+  (OrganicMatter none)
+  (Chemistry multi (combine Bromide BB))
+  (Soil (MaxRootingDepth 150 [cm])
+        (horizons (-3.00 "Surface")
+                  (-24.00 "Ap1")
+                  (-30.00 "Ap2")
+                  (-40.00 "A2")
+                  (-60.00 "B1")
+                  (-120 "Bt")
+                  (-200 "C")))
+  (Movement original
+            (matrix_water (richards
+                           ;; (K_average harmonic)
+                           (max_time_step_reductions 118)
+                           (max_iterations 1150)
+                           )
+                          ;; lr
+                          )
+            (Geometry (zplus -1 -2 -3 ;; Ap. Sample 1. Surface.
+                             -5 -7 -9 ;; Ap. Sample 1.
+                             -12 -15 -18 ;; Ap. Sample 2.
+                             -20 -22 -24 ;; Ap. Sample 3.
+                             -26 -28 -30 ;; Bt. Plow pan. Sample 4
+                             -32 -35 -40 ;; Bt. Sample 5.
+                             -45 -50 -55 -60 -65 -70 -75 -80 -90 -95
+                             -100 -105 ;; Bt. 
+                             -115 ;; Drain at -110 cm.
+                             -120 ;; Bt.
+                             -125 -130 -135 -140 -145 -150 ;; C. Plot depth.
+                             -160 -170 -180 -190 -200))) ;; C. Sim depth.
+  (Groundwater aquitard
+               (K_aquitard 0.050 [cm/h])
+               (Z_aquitard 200 [cm])
+               (pressure_table (file "aquifer.gwt"))))
+
+(deftertiary Biopores biopores
+  (pressure_end $PE)
+  )
+       
+(defbiopore "surface_to_drain"
+  (drain (height_start 0 [cm])
+         (height_end -110 [cm])
+         (diameter 5 [mm])
+         (pipe_position -110 [cm])
+         ;; 1 per (pi * (3 cm)^2 = 28.27 cm^2) = 354 m^-2
+         (density 354 [m^-2])))
+
+(defcolumn Drain Rorrende
+  "Rorrende soil with biopores to drain"
+  (Soil (MaxRootingDepth 150 [cm])
+        (horizons (-3.00 "Surface")
+                  (-24.00 "Ap1")
+                  (-30.00 "Ap2_Drain")
+                  (-40.00 "A2_Drain")
+                  (-120 "Drain canyon")
+                  (-200 "C")))
+  (Drain none)
+  (Movement original (Tertiary Biopores 
+                               (classes ("surface_to_drain")))))
+ 
+(defcolumn DCD Drain
+  "Pure convection-dispersion"
+  (Soil (MaxRootingDepth 150 [cm])
+        (horizons (-3.00 ("Surface" (secondary_domain none)))
+                  (-24.00 ("Ap1" (secondary_domain none)))
+                  (-30.00 ("Ap2_Drain" (secondary_domain none)))
+                  (-40.00 ("A2_Drain" (secondary_domain none)))
+                  (-120 ("Drain canyon" (secondary_domain none)))
+                  (-200 ("C" (secondary_domain none)))))
+  (Drain lateral
+         (pipe_position -1.1 [m])
+         (x 0.1 [m])
+         (L 18 [m]))
+  (Movement original (Tertiary none)))
+
+(defbiopore "surface_to_matrix"
+  (matrix (K_wall_relative 1 [%])
+          (allow_upward_flow false)
+          (height_start 0 [cm])
+          (height_end -110 [cm])
+          (diameter 5 [mm])
+          ;; 1 per (pi * (3 cm)^2 = 28.27 cm^2) = 354 m^-2
+          (density 354 [m^-2])))
+
+(defbiopore "surface_to_matrix_1"
+  (matrix (K_wall_relative 1 [%])
+          (allow_upward_flow false)
+          (height_start 0 [cm])
+          (height_end -110 [cm])
+          (diameter 1 [mm])
+          ;; 1 per (pi * (3 cm)^2 = 28.27 cm^2) = 354 m^-2
+          (density 354 [m^-2])))
+
+(defcolumn Macro Rorrende
+  "Rorrende soil with biopores to matrix"
+  (Drain lateral
+         (pipe_position -1.1 [m])
+         (x 7 [m])
+         (L 18 [m]))
+  (Movement original (Tertiary Biopores (classes ("surface_to_matrix")))))
+
+(defcolumn MCD Macro
+  "Pure convection-dispersion."
+  (Soil (MaxRootingDepth 150 [cm])
+        (horizons (-3.00 ("Surface" (secondary_domain none)))
+                  (-24.00 ("Ap1" (secondary_domain none)))
+                  (-30.00 ("Ap2" (secondary_domain none)))
+                  (-40.00 ("A2" (secondary_domain none)))
+                  (-60.00 ("B1" (secondary_domain none)))
+                  (-120 ("Bt" (secondary_domain none)))
+                  (-200 ("C" (secondary_domain none)))))
+  (Movement original (Tertiary none)))
+
+(defbiopore "near_surface_to_matrix"
+  (matrix (K_wall_relative 1 [%])
+          (allow_upward_flow false)
+          (height_start -3 [cm])
+          (height_end -110 [cm])
+          (diameter 5 [mm])
+          ;; 1 per (pi * (3 cm)^2 = 28.27 cm^2) = 354 m^-2
+          (density 354 [m^-2])))
+
+(defcolumn Without Rorrende
+  "Rorrende soil without biopores from surface"
+  (Drain lateral
+    	(pipe_position -1.1 [m])
+        (x 3.5 [m])
+  	(L 18 [m]))
+  (Movement original (Tertiary ;;none
+                               biopores (classes ("surface_to_matrix_1"))
+                               ;;(classes ("near_surface_to_matrix"))
+                               )))
+
+(defcolumn UCD Without
+  "Pure convection-dispersion"
+  (Soil (MaxRootingDepth 150 [cm])
+        (horizons (-3.00 ("Surface" (secondary_domain none)))
+                  (-24.00 ("Ap1" (secondary_domain none)))
+                  (-30.00 ("Ap2" (secondary_domain none)))
+                  (-40.00 ("A2" (secondary_domain none)))
+                  (-60.00 ("B1" (secondary_domain none)))
+                  (-120 ("Bt" (secondary_domain none)))
+                  (-200 ("C" (secondary_domain none)))))
+  (Movement original (Tertiary none)))
+
+;; Management.
+
+(defcrop "WWheat" "Winter Wheat"
+  (Root (MaxPen 150 [cm]))
+  (Canopy (EpFac 1.14 [])
+          (EpFacDS (0.355 0.386)(0.566 1)(1.381 1)(1.699 0.386)) ;; 0.44/1.14=0.386
+          (IntcpCap 0.05 [mm])))
+
+(defaction "management" activity
+  (wait (at 2009 9 09 12)) (plowing) 
+  (wait (at 2009 9 30 12)) (seed_bed_preparation)(sow WWheat)
+  (wait (at 2010 8 26 12)) (harvest "WWheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+  (wait (at 2010 10 26 12))  
+  (progn 
+    ;; 5 g KBr per (pi (3 cm)^2
+    ;; = 0.6714 Br/KBr * 5 g KBr per (pi (3 cm)^2)
+    ;; = 0.1187 g Br/cm^2
+    ;; = 11.87 Mg/ha
+    (spray "Bromide" 11.87 [Mg/ha])
+    ;; 5 g BB per (pi (3 cm)^2
+    ;; = 0.1768 g BB/cm^2
+    ;; = 17.68 Mg/ha
+    (spray "BB" $BB_apply)))
+
+(defunit PPM [ppm dry soil])
+
+;; Simulations.
+
+(defunit [mm/5min] [m/s]
+  (factor (/ 1.0 [] (* 1000.0 [] 5.0 [] 60.0 []))))
+
+(defprogram Smoke Daisy
+  "Main Daisy setup for smoke project."
+
+  (declare col String "column to plot.")
+
+  ;; Calibration parameters.
+  (declare S_K Number [cm/h] "")
+  (declare PP_K Number [cm/h] "")
+  (declare BB_K_clay Number [cm^3/g] "")
+  (declare BB_k_sorp Number [h^-1] "")
+  (declare BB_decomp Number [h^-1] "")
+  (declare S_alpha Number [h^-1] "")
+  (declare S_lim Number [cm] "")
+  (declare B_lim Number [cm] "")
+  (declare X_alpha Number [h^-1] "")
+  (declare A_lim Number [cm] "")
+  (declare pore_min Number [um] "")
+  (declare BB_apply Number [g/ha] "")
+  (declare PE Number [cm] "")
+  
+  ;; Fixed.
+  (S_K 1.16454 [cm/h])
+  ;;(S_K 0.00116454 [cm/h])
+  (PP_K 0.410693 [cm/h])
+  (BB_decomp 0 [h^-1])
+  ;; (PE -45 [cm])
+  (PE -30 [cm])
+  (BB_apply 17.68e6 [g/ha])
+  (BB_k_sorp 0.05 [h^-1])
+
+  ;; Combine weather soruces.
+  (weather combine 
+           (entry ((use Precip)
+                   (source table (file "rain-data.dwf")))
+                  ((source table (file "mixed-weather.dwf"))))
+           ;; Disable snow.
+           (snow_fraction (-500 0.0) (500 0.0)))
+
+  ;; Field management.
+  (manager "management")
+  
+  ;; Begining and end of simulation.
+  (time 2009 6 2)
+  (stop 2010 12 13 13)
+  (minimal_timestep (microseconds 1))
+
+  ;; Keep us updated.
+  (print_time periodic)
+  (activate_output (after 2010 10 25))
+  (log_prefix "log/${col}-")
+  (output harvest
+          ;;;; Water
+          ("Field water")                      ;Whole plot.
+          ("Soil Water Potential")
+          ;;;; Bromide
+          ;;("Soil chemical"  (to -30 [cm]) (chemical "Bromide"))
+          ("Chemical Content" (print_initial false) 
+           (chemical Bromide) (unit [PPM]) (when finished))
+          ;; BB
+          ("Soil chemical" (to -40 [cm]) (chemical "BB-base"))
+          ;; ("Soil chemical" (to -30 [cm]) (chemical "BB"))
+          ;; ("Soil chemical" (to -30 [cm]) (chemical "BB-immobile"))
+          ;; ("Primary" (to -30 [cm]) (chemical "BB-immobile"))
+          ;; ("Secondary" (to -30 [cm]) (chemical "BB-immobile"))
+          ;; ("Soil chemical" (to -30 [cm]) (chemical "BB-colloid"))
+          ("Chemical Content" (print_initial false) 
+           (chemical BB-base) (unit [PPM]) (when finished))
+          ("Smoke" (when daily) (chemical "Bromide"))
+          ("Smoke" (when daily) (chemical "BB-base"))
+          ("SmokeProfile" (chemical "Bromide"))         
+          ("SmokeProfile" (chemical "BB-base"))         
+          ))
+
+(defprogram Without Smoke
+  (column Without))
+  
+(defsummary U4-BB-Rsqr Rsqr
+  (measure ((time 2010 12 13 12)
+            (data ("M @ -4.5"  1210	)
+                  ("M @ -13.5" 1690	)
+                  ("M @ -21"   1868	)
+                  ("M @ -27"   373	)
+                  ("M @ -35"   86	)))))
+
+(defsummary U4-Br-Rsqr Rsqr
+  (measure ((time 2010 12 13 12)
+            (data ("M @ -4.5"  29.75)
+                  ("M @ -13.5" 102.87)
+                  ("M @ -21"   356.12)
+                  ("M @ -27"   642.11)
+                  ("M @ -35"   1103.35)))))
+
+(defprogram U4 Without
+  (col "u4")
+
+  ;; Solution, U4, Br, h_end = -45
+  ;; (S_lim -9325.09 [cm])
+  ;; (A_lim -1202.38 [cm])
+  ;; (B_lim -338.895 [cm])
+  ;; (S_alpha 1.44872e-11 [h^-1])
+  ;; (X_alpha 8.33685e-05 [h^-1])
+
+  ;; Solution, U4, BB, R^2 = 0.991
+  ;; (BB_K_clay 7.18551 [cm^3/g])
+  ;; (pore_min 0.1 [um])
+  ;; (BB_apply 9.09419e+06 [g/ha])
+  ;; (BB_k_sorp 0.244831 [h^-1])
+
+  ;; Solution, U4, Br, R^2 = 0.991763, h_end = -30
+  (S_lim -9325.09 [cm])
+  (A_lim -1202.38 [cm])
+  (B_lim -338.895 [cm])
+  (S_alpha 1.44872e-11 [h^-1])
+  (X_alpha 8.33685e-05 [h^-1])
+
+  ;; Solution, U4, BB, R^2 = 0.953404, h_end = -30
+  (BB_K_clay 7.18551 [cm^3/g])
+  (pore_min 0.1 [um])
+  (BB_apply 9.09419e+06 [g/ha])
+  (BB_k_sorp 0.244831 [h^-1])
+
+  (output &old 
+          ("BB Profile"  (summary U4-BB-Rsqr))
+          ("Br Profile"  (summary U4-Br-Rsqr))))
+
+(defprogram UCD U4
+  (column UCD)
+  (log_prefix "log/ucd-"))
+
+(defprogram U4-45 U4
+  (PE -45 [cm])
+  (log_prefix "log/u4-45-"))
+
+(defprogram U4-60 U4
+  (PE -60 [cm])
+  (log_prefix "log/u4-60-"))
+
+(defprogram Macro Smoke
+  (column Macro))
+
+(defsummary M19-Br-Rsqr Rsqr
+  (measure ((time 2010 12 13 12)
+            (data ("M @ -4.5" 9.26	)    
+                  ("M @ -13.5"31.70	)    
+                  ("M @ -21"  141.18	)    
+                  ("M @ -27"  295.79	)    
+                  ("M @ -35"  762.97	)))))
+
+(defsummary M19-BB-Rsqr Rsqr
+  (measure ((time 2010 12 13 12)
+            (data ("M @ -4.5"  50	)    
+                  ("M @ -13.5" 652	)    
+                  ("M @ -21"   1465	)    
+                  ("M @ -27"   1347	)    
+                  ("M @ -35"   455	)))))
+
+(defprogram M19 Macro
+  (col "m19")
+
+  ;; Solution, M19, Br, R² = -0.999541, h_end = -30
+  ;; (S_lim -13775.2 [cm])
+  ;; (A_lim -545.848 [cm])
+  ;; (B_lim -272.606 [cm])
+  ;; (S_alpha 2.27626e-13 [h^-1])
+  ;; (X_alpha 1.77238e-05 [h^-1])
+
+  ;;  Solution, M19, BB, R² = 0.971
+  ;; (BB_K_clay 1.44327 [cm^3/g])
+  ;; (pore_min 0.987659 [um])
+  ;; (BB_apply 6.97091e+06 [g/ha])
+  ;; (BB_k_sorp 1 [h^-1])
+
+  ;; Solution, M19, Br, R² = -0.999541, h_end = -30
+  (S_lim -13217.7 [cm])
+  (A_lim -625.25 [cm])
+  (B_lim -287.067 [cm])
+  (S_alpha 3.48131e-13 [h^-1])
+  (X_alpha 1.96537e-05 [h^-1])
+
+  ;;  Solution, M19, BB, R² = 0.86234, h_end = -30
+  (BB_K_clay 1.33798 [cm^3/g])
+  (pore_min 0.999955 [um])
+  (BB_apply 6.9373e+06 [g/ha])
+  (BB_k_sorp 1 [h^-1])
+
+  (output &old 
+          ("BB Profile" (summary M19-BB-Rsqr))
+          ("Br Profile" (summary M19-Br-Rsqr))))
+
+(defprogram MCD M19
+  (column MCD)
+  (log_prefix "log/mcd-"))
+
+
+(defprogram M19-45 M19
+  (PE -45 [cm])
+  (log_prefix "log/m19-45-"))
+
+(defprogram M19-60 M19
+  (PE -60 [cm])
+  (log_prefix "log/m19-60-"))
+
+(defprogram Drain Smoke
+  (column Drain))
+
+(defsummary D1-Br-Rsqr Rsqr
+  (measure ((time 2010 12 13 12)
+            (data ("M @ -4.5"  9.26	)    
+                  ("M @ -13.5" 31.70	)    
+                  ("M @ -21"   141.18	)    
+                  ("M @ -27"   295.79	)    
+                  ("M @ -35"   762.97	)))))
+
+(defsummary D1-BB-Rsqr Rsqr
+  (measure ((time 2010 12 13 12)
+            (data ("M @ -4.5"  798 )    
+                  ("M @ -13.5" 1230)    
+                  ("M @ -21"   430 )    
+                  ("M @ -27"   0   )    
+                  ("M @ -35"   0   )))))
+
+(defprogram D1 Drain
+  (col "d1")
+
+  ;; Solution, D1, Br, R^2 = 0.999408, h_end = -45
+  ;; (S_lim -5.377046e+13 [cm])
+  ;; (A_lim -429.103 [cm])
+  ;; (B_lim -444.339 [cm])
+  ;; (S_alpha 0.013531 [h^-1])
+  ;; (X_alpha 1.22115e-05 [h^-1])
+
+  ;; Solution, D1, BB, R^2 = 0.967296, h_end = -45
+  ;; (BB_K_clay 5.13366 [cm^3/g])
+  ;; (pore_min 1 [um])
+  ;; (BB_apply 4.68095e+06 [g/ha])
+  ;; (BB_k_sorp 0.914811 [h^-1])
+
+  ;; Solution, D1, Br, R^2 = 0.99937, h_end = -30
+  (S_lim -5.377046e+13 [cm])
+  (A_lim -499.744 [cm])
+  (B_lim -472.721 [cm])
+  (S_alpha 0.00903673 [h^-1])
+  (X_alpha 1.61126e-05 [h^-1])
+
+  ;; Solution, D1, BB, R^2 = 0.98285, h_end = -30
+  (BB_K_clay 4.87589 [cm^3/g])
+  (pore_min 1 [um])
+  (BB_apply 4.60203e+06 [g/ha])
+  (BB_k_sorp 1 [h^-1])
+
+  (output &old 
+          ("BB Profile"  (summary D1-BB-Rsqr))
+          ("Br Profile"  (summary D1-Br-Rsqr))))
+
+(defprogram DCD D1
+  (column DCD)
+  (log_prefix "log/dcd-"))
+
+(defprogram D1-45 D1
+  (PE -45 [cm])
+  (log_prefix "log/d1-45-"))
+
+(defprogram D1-60 D1
+  (PE -60 [cm])
+  (log_prefix "log/d1-60-"))
+
+;; Plot
+
+(defgnuplot plotEnd xy
+  (declare col String "column to plot.")
+  (declare chemical String "Chemical to plot.")
+  (chemical "Bromide")
+  (where "${ext}/${col}-${chemical}-end.${ext}")
+  (xmax 2000 [PPM])
+  (extra "set xtics 500")
+  (legend se)
+  (canvas "400,300")
+  (source (profile (when 2010 12 13)
+                   (title "-30 cm")
+                   (style 1)
+                   (with lines)
+                   (to -130 [cm])
+                   (file "log/${col}-content_${chemical}.dlf"))
+          (profile (when 2010 12 13)
+                   (title "-45 cm")
+                   (style 2)
+                   (with lines)
+                   (to -130 [cm])
+                   (file "log/${col}-45-content_${chemical}.dlf"))
+          (profile (when 2010 12 13)
+                   (title "-60 cm")
+                   (style 4)
+                   (with lines)
+                   (to -130 [cm])
+                   (file "log/${col}-60-content_${chemical}.dlf"))))
+
+(defxysource line inline 
+  (style 0)
+  (title "")
+  (x_dimension [PPM])
+  (y_dimension [cm])
+  (with lines))
+  
+(defgnuplot plotBr xy
+  (declare chemical String "Chemical to plot.")
+  (chemical "Bromide")
+  (where "${ext}/${col}-${chemical}.${ext}")
+  (xmax 2000 [PPM])
+  (extra "set xtics 500")
+  (legend se)
+  (canvas "400,300")
+  (source (profile (when 2010 12 13)
+                   (title "Sim")
+                   (style 1)
+                   (with lines)
+                   (to -130 [cm])
+                   (file "log/${col}-content_${chemical}.dlf"))
+          (profile (when 2010 12 13)
+                   (title "")
+                   (style 1)
+                   (with points)
+                   (to -130 [cm])
+                   (file "log/${col}-smoke-${chemical}-profile.dlf"))
+          (arithmetic (file "${chemical}.ddf")
+                      (style 5)
+                      (title "Obs")
+                      (y Middle)
+                      (x "${col}"))
+          (profile (when 2010 12 13)
+                   (title "CD")
+                   (style 2)
+                   (with lines)
+                   (to -130 [cm])
+                   (file "log/${cdc}-content_${chemical}.dlf"))
+          (line (points (0 -9) (10000 -9)))
+          (line (points (0 -18) (10000 -18)))
+          (line (points (0 -24) (10000 -24)))
+          (line (points (0 -30) (10000 -30)))
+          (line (points (0 -40) (10000 -40)))))
+
+(defgnuplot plotBB plotBr
+  (chemical "BB-base")
+  (source (profile (when 2010 12 13)
+                   (title "Sim")
+                   (style 1)
+                   (with lines)
+                   (to -130 [cm])
+                   (file "log/${col}-content_${chemical}.dlf"))
+          (profile (when 2010 12 13)
+                   (title "")
+                   (style 1)
+                   (with points)
+                   (to -130 [cm])
+                   (file "log/${col}-smoke-${chemical}-profile.dlf"))
+          (arithmetic (file "${chemical}.ddf")
+                      (style 5)
+                      (title "Obs")
+                      (y Middle)
+                      (x "${col}"))
+          (profile (when 2010 12 13)
+                   (title "CD")
+                   (style 2)
+                   (with lines)
+                   (to -130 [cm])
+                   (file "log/${cdc}-content_${chemical}.dlf"))
+          (line (points (0 -9) (10000 -9)))
+          (line (points (0 -18) (10000 -18)))
+          (line (points (0 -24) (10000 -24)))
+          (line (points (0 -30) (10000 -30)))
+          (line (points (0 -40) (10000 -40)))))
+
+(defgnuplot rain time
+  (where "${ext}/rain.${ext}")
+  (source (arithmetic (expr (convert "Precip" [mm/h]))
+                      (with lines)
+                      (title "")
+                      (file "rain-data.dwf"))))
+  
+(defxysource K loop
+  (begin $FROM )
+  (end $TO)
+  (step 0.1 [hPa]))
+
+(defxysource K_Surface K
+  (title "Surface")
+  (y (convert (soil_K (horizon "Surface")
+                      (top_soil true)
+                      (h x))
+              [mm/h])))
+
+(defxysource K_Ap K
+  (title "Ap(1)")
+  (y (convert (soil_K (horizon "Ap1")
+                      (top_soil true)
+                      (h x))
+              [mm/h])))
+
+(defxysource K_Plow_pan K
+  (title "A2")
+  (y (convert (soil_K (horizon "A2")
+                      (top_soil true)
+                      (h x))
+              [mm/h])))
+
+(defxysource K_Bt K
+  (title "Bt")
+  (y (convert (soil_K (horizon "Bt")
+                      (top_soil true)
+                      (h x))
+              [mm/h])))
+
+(defgnuplot K xy
+  (declare FROM Number [<user>] "")
+  (declare TO Number [<user>] "")
+  (source ;; K_Surface 
+          K_Ap ;; K_Plow_pan 
+          K_Bt))
+
+
+(defgnuplot plotall multi
+  (declare col String "column to plot.")
+  (declare cdc String "cd column to compare with.")
+  (graph plotBr 
+         plotBB rain 
+         (K (FROM -50 [hPa]) (TO 0 [hPa]) 
+            (where "${ext}/${col}-conductivity.${ext}"))
+         (K (FROM -80 [hPa]) (TO -20 [hPa])
+            (where "${ext}/${col}-conductivity_2.${ext}")))
+)
+
+(defgnuplot plotPres xy
+  (where "${ext}/Pres.${ext}")
+  (xmax    0.0 [hPa])
+  (xmin -150.0 [hPa])
+  ;; (legend se)
+  (canvas "400,300")
+  (source (profile (when 2010 10 26 12)
+                   (title "U4")
+                   (style 1)
+                   (with lines)
+                   (to -130 [cm])
+                   (dimension [hPa])
+                   (file "log/u4-soil_water_potential.dlf"))
+          (profile (when 2010 10 26 12)
+                   (title "M19")
+                   (style 2)
+                   (with lines)
+                   (to -130 [cm])
+                   (dimension [hPa])
+                   (file "log/m19-soil_water_potential.dlf"))
+          (profile (when 2010 10 26 12)
+                   (title "D1")
+                   (style 4)
+                   (with lines)
+                   (to -130 [cm])
+                   (dimension [hPa])
+                   (file "log/d1-soil_water_potential.dlf"))))
+
+
+(defprogram sims batch
+  (run ;;UCD MCD DCD
+   (U4) (M19) (D1)
+   ;;U4-45 U4-60 M19-45 M19-60 D1-45 D1-60
+       ))
+
+(defgnuplot plots multi
+
+  (declare ext String "File extension to generate.")
+
+  ;; Does not matter.
+  (declare A_lim Number [cm] "")
+  (declare B_lim Number [cm] "")
+  (declare X_alpha Number [h^-1] "")
+  (declare pore_min Number [um] "")
+  (A_lim -1 [cm])
+  (B_lim -1 [cm])
+  (X_alpha 1.0 [h^-1])
+  (pore_min 1.0 [um])
+  
+  ;;(ext "pdf")
+  (ext "emf")
+  (graph plotPres
+         (plotEnd (col u4))
+         (plotEnd (col m19))
+         (plotEnd (col d1))
+         (plotall (cdc ucd) (col u4)) 
+         (plotall (cdc mcd) (col m19))
+         (plotall (cdc dcd) (col d1))
+         )
+)
+
+(defprogram plot batch
+  (run (gnuplot (graph plots))))
+
+(defprogram both batch
+  (run ;;sims
+       plot
+       ))
+
+;; setup.dai ends here.

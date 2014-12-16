@@ -1,0 +1,940 @@
+;;; setup.dai -- setup file for calibrating bioash.
+
+(input file "data.dai")                 ;Column data.
+(input file "dk-soil.dai")              ;Jyndevad soil.
+(input file "log.dai")
+(input file "dk-management.dai")
+
+;;; Soil.
+
+(defhydraulic Ap M_C
+  (K_sat $Ap_K_sat)
+  (l $Ap_l)
+  (h_b $Ap_h_b)
+  (b $Ap_b)
+  (Theta_sat $Ap_Theta_sat)
+  ;; Using humus = 2.5% and rho_b = 1.15 we get the porosity.
+  ;;(Theta_sat 44.5 [%])
+  )
+
+(defhydraulic B_00PM M_C
+             (K_sat $B_00PM_K_sat)
+             (l $B_00PM_l)
+             (h_b $B_00PM_h_b)
+             (b $B_00PM_b)
+             (Theta_sat $B_00PM_Theta_sat)
+             ;; Measured values.
+             ;;(h_b -5 [cm])
+             ;;(b 2.38 [])
+             ;;(Theta_sat 0.406 [])
+             )
+
+(defhydraulic B_05PM M_C
+             (K_sat $B_05PM_K_sat)
+             (l $B_05PM_l)
+             (h_b $B_05PM_h_b)
+             (b $B_05PM_b)
+             (Theta_sat $B_05PM_Theta_sat)
+             ;; Measured values.
+             ;;(h_b -5 [cm])
+             ;;(b 2.48 [])
+             ;;(Theta_sat 0.406 [])
+             )
+
+(defhydraulic B_10PM M_C
+             (K_sat $B_10PM_K_sat)
+             (l $B_10PM_l)
+             (h_b $B_10PM_h_b)
+             (b $B_10PM_b)
+             (Theta_sat $B_10PM_Theta_sat)
+             ;; Measured values.
+             ;;(h_b -7 [cm])
+             ;;(b 2.28 [])
+             ;;(Theta_sat 0.404 [])
+             )
+
+(defhydraulic B_20PM M_C
+             (K_sat $B_20PM_K_sat)
+             (l $B_20PM_l)
+             (h_b $B_20PM_h_b)
+             (b $B_20PM_b)
+             (Theta_sat $B_20PM_Theta_sat)
+             ;; Measured values.
+             ;;(h_b -9 [cm])
+             ;;(b 2.34 [])
+             ;;(Theta_sat 0.401 [])
+             )
+
+(defhydraulic B_40PM M_C
+             (K_sat $B_40PM_K_sat)
+             (l $B_40PM_l)
+             (h_b $B_40PM_h_b)
+             (b $B_40PM_b)
+             (Theta_sat $B_40PM_Theta_sat)
+             ;; Measured values.
+             ;;(h_b -11 [cm])
+             ;;(b 2.78 [])
+             ;;(Theta_sat 0.398 [])
+             )
+
+(defhydraulic B_WOOD M_C
+             (K_sat $B_WOOD_K_sat)
+             (l $B_WOOD_l)
+             (h_b $B_WOOD_h_b)
+             (b $B_WOOD_b)
+             (Theta_sat $B_WOOD_Theta_sat))
+
+(defhorizon Ap "Jyndevad Ap"
+  (dry_bulk_density 1.145 [g/cm^3])
+  ;; porosity < 0.567925
+  (humus 2.5 [%])
+  (hydraulic Ap))
+
+(defhorizon B_00PM "Jyndevad C"
+  (dry_bulk_density 1.389 [g/cm^3])
+  ;; porosity < 0.475849
+  (hydraulic B_00PM))
+
+(defhorizon B_05PM "Jyndevad C"
+  (dry_bulk_density 1.383 [g/cm^3])
+  ;; porosity < 0.478113
+  (hydraulic B_05PM))
+
+(defhorizon B_10PM "Jyndevad C"
+  (dry_bulk_density 1.354 [g/cm^3])
+  ;; porosity < 0.489057
+  (hydraulic B_10PM))
+
+(defhorizon B_20PM "Jyndevad C"
+  (dry_bulk_density 1.348 [g/cm^3])
+  ;; porosity < 0.491321
+  (hydraulic B_20PM))
+
+(defhorizon B_40PM "Jyndevad C"
+  (dry_bulk_density 1.278 [g/cm^3])
+  ;; porosity < 0.517736
+  (hydraulic B_40PM))
+
+(defhorizon B_WOOD "Jyndevad C"
+  (dry_bulk_density 1.309 [g/cm^3])
+  ;; porosity < 0.506038
+  (hydraulic B_WOOD))
+
+(defhorizon C B_00PM)
+
+(defcolumn common default
+  (OrganicMatter none)                  ;Disable organic matter.
+  (Chemistry none)                      ;Disable nitrogen.
+  ;; Disable lr.
+  (Movement original (matrix_water (richards (max_time_step_reductions 20))))
+  (SoilWater (h -10 -9 -8 -7 -6 -5 -4 -3 -2 -1 0)) ;Mostly saturated.
+  (Groundwater lysimeter))              ;Air below.
+
+(defcolumn C00PM common
+  (Soil (MaxRootingDepth 50 [cm])      ;Not used.
+        (horizons ( -27 [cm] Ap)
+                  (-100 [cm] B_00PM)
+                  (-126 [cm] C)))
+  (Movement original 
+            (Geometry (zplus -1 -2 -3 -4 -5 -6 -7 -8 -9 -10 -11 -12 -13 -14 -15 -16 -17 -18 -19 -20 -21 -22 -23 -24 -25 -26 -27 -28 -29 -30 -31 -32 -33 -34 -35 -36 -37 -38 -39 -40 -41 -42 -43 -44 -45 -46 -47 -48 -49 -50 -51 -52 -53 -54 -55 -56 -57 -58 -59 -60 -61 -62 -63 -64 -65 -66 -67 -68 -69 -70 -71 -72 -73 -74 -75 -76 -77 -78 -79 -80 -81 -82 -83 -84 -85 -86 -87 -88 -89 -90 -91 -92 -93 -94 -95 -96 -97 -98 -99 -100 -101 -102 -103 -104 -105 -106 -107 -108 -109 -110 -111 -112 -113 -114 -115 -116 -117 -118 -119 -120 -121 -122 -123 -124 -125 -126 [cm]))))
+
+(defcolumn C05PM common
+  (Soil (MaxRootingDepth 50 [cm])      ;Not used.
+        (horizons ( -27 [cm] Ap)
+                  (-100 [cm] B_05PM)
+                  (-126 [cm] C)))
+  (Movement original 
+            (Geometry (zplus -1 -2 -3 -4 -5 -6 -7 -8 -9 -10 -11 -12 -13 -14 -15 -16 -17 -18 -19 -20 -21 -22 -23 -24 -25 -26 -27 -28 -29 -30 -31 -32 -33 -34 -35 -36 -37 -38 -39 -40 -41 -42 -43 -44 -45 -46 -47 -48 -49 -50 -51 -52 -53 -54 -55 -56 -57 -58 -59 -60 -61 -62 -63 -64 -65 -66 -67 -68 -69 -70 -71 -72 -73 -74 -75 -76 -77 -78 -79 -80 -81 -82 -83 -84 -85 -86 -87 -88 -89 -90 -91 -92 -93 -94 -95 -96 -97 -98 -99 -100 -101 -102 -103 -104 -105 -106 -107 -108 -109 -110 -111 -112 -113 -114 -115 -116 -117 -118 -119 -120 -121 -122 -123 -124 -125 -126 [cm]))))
+
+(defcolumn C10PM common
+  (Soil (MaxRootingDepth 50 [cm])      ;Not used.
+        (horizons ( -27 [cm] Ap)
+                  (-100 [cm] B_10PM)
+                  (-126 [cm] C)))
+  (Movement original 
+            (Geometry (zplus -1 -2 -3 -4 -5 -6 -7 -8 -9 -10 -11 -12 -13 -14 -15 -16 -17 -18 -19 -20 -21 -22 -23 -24 -25 -26 -27 -28 -29 -30 -31 -32 -33 -34 -35 -36 -37 -38 -39 -40 -41 -42 -43 -44 -45 -46 -47 -48 -49 -50 -51 -52 -53 -54 -55 -56 -57 -58 -59 -60 -61 -62 -63 -64 -65 -66 -67 -68 -69 -70 -71 -72 -73 -74 -75 -76 -77 -78 -79 -80 -81 -82 -83 -84 -85 -86 -87 -88 -89 -90 -91 -92 -93 -94 -95 -96 -97 -98 -99 -100 -101 -102 -103 -104 -105 -106 -107 -108 -109 -110 -111 -112 -113 -114 -115 -116 -117 -118 -119 -120 -121 -122 -123 -124 -125 -126 [cm]))))
+
+(defcolumn C20PM common
+  (Soil (MaxRootingDepth 50 [cm])      ;Not used.
+        (horizons ( -26 [cm] Ap)
+                  (-100 [cm] B_20PM)
+                  (-121 [cm] C)))
+  (Movement original 
+            (Geometry (zplus -1 -2 -3 -4 -5 -6 -7 -8 -9 -10 -11 -12 -13 -14 -15 -16 -17 -18 -19 -20 -21 -22 -23 -24 -25 -26 -27 -28 -29 -30 -31 -32 -33 -34 -35 -36 -37 -38 -39 -40 -41 -42 -43 -44 -45 -46 -47 -48 -49 -50 -51 -52 -53 -54 -55 -56 -57 -58 -59 -60 -61 -62 -63 -64 -65 -66 -67 -68 -69 -70 -71 -72 -73 -74 -75 -76 -77 -78 -79 -80 -81 -82 -83 -84 -85 -86 -87 -88 -89 -90 -91 -92 -93 -94 -95 -96 -97 -98 -99 -100 -101 -102 -103 -104 -105 -106 -107 -108 -109 -110 -111 -112 -113 -114 -115 -116 -117 -118 -119 -120 -121 [cm]))))
+
+(defcolumn C40PM common
+  (Soil (MaxRootingDepth 50 [cm])      ;Not used.
+        (horizons ( -26 [cm] Ap)
+                  (-100 [cm] B_40PM)
+                  (-127 [cm] C)))
+  (Movement original 
+            (Geometry (zplus -1 -2 -3 -4 -5 -6 -7 -8 -9 -10 -11 -12 -13 -14 -15 -16 -17 -18 -19 -20 -21 -22 -23 -24 -25 -26 -27 -28 -29 -30 -31 -32 -33 -34 -35 -36 -37 -38 -39 -40 -41 -42 -43 -44 -45 -46 -47 -48 -49 -50 -51 -52 -53 -54 -55 -56 -57 -58 -59 -60 -61 -62 -63 -64 -65 -66 -67 -68 -69 -70 -71 -72 -73 -74 -75 -76 -77 -78 -79 -80 -81 -82 -83 -84 -85 -86 -87 -88 -89 -90 -91 -92 -93 -94 -95 -96 -97 -98 -99 -100 -101 -102 -103 -104 -105 -106 -107 -108 -109 -110 -111 -112 -113 -114 -115 -116 -117 -118 -119 -120 -121 -122 -123 -124 -125 -126 -127 [cm]))))
+
+(defcolumn CWOOD common
+  (Soil (MaxRootingDepth 50 [cm])      ;Not used.
+        ;; BUG! TODO! Mangler de rigtige horisontgrænser.
+        (horizons ( -26 [cm] Ap)
+                  (-100 [cm] B_WOOD)
+                  (-125 [cm] C)))
+  (Movement original 
+            (Geometry (zplus -1 -2 -3 -4 -5 -6 -7 -8 -9 -10 -11 -12 -13 -14 -15 -16 -17 -18 -19 -20 -21 -22 -23 -24 -25 -26 -27 -28 -29 -30 -31 -32 -33 -34 -35 -36 -37 -38 -39 -40 -41 -42 -43 -44 -45 -46 -47 -48 -49 -50 -51 -52 -53 -54 -55 -56 -57 -58 -59 -60 -61 -62 -63 -64 -65 -66 -67 -68 -69 -70 -71 -72 -73 -74 -75 -76 -77 -78 -79 -80 -81 -82 -83 -84 -85 -86 -87 -88 -89 -90 -91 -92 -93 -94 -95 -96 -97 -98 -99 -100 -101 -102 -103 -104 -105 -106 -107 -108 -109 -110 -111 -112 -113 -114 -115 -116 -117 -118 -119 -120 -121 -122 -123 -124 -125 [cm]))))
+
+;;; Log.
+
+(defselect theta interval
+  (declare column String "Name of column to log.")
+  (path column "${column}" SoilWater Theta)
+  (spec fixed SoilWater Theta)
+  (density true)
+  (expr (dim x [g/cm^3] (warn_known false)))
+  (dimension "dry soil fraction"))
+
+(defselect theta00 theta 
+  (column "C00PM"))
+
+(defselect theta05 theta 
+  (column "C05PM"))
+
+(defselect theta10 theta 
+  (column "C10PM"))
+
+(defselect theta20 theta 
+  (column "C20PM"))
+
+(defselect theta40 theta 
+  (column "C40PM"))
+
+(defselect thetaWD theta 
+  (column "CWOOD"))
+
+(deflog "Soil Intervals" table
+  (where "soil_intervals.dlf")
+  (when true)
+  (entries (theta00 (tag "00 0-10") (from 0 [cm]) (to -10 [cm]))
+           (theta00 (tag "00 10-20") (from -10 [cm]) (to -20 [cm]))
+           (theta00 (tag "00 20-30") (from -20 [cm]) (to -30 [cm]))
+           (theta00 (tag "00 30-35") (from -30 [cm]) (to -35 [cm]))
+           (theta00 (tag "00 35-40") (from -35 [cm]) (to -40 [cm]))
+           (theta00 (tag "00 40-45") (from -40 [cm]) (to -45 [cm]))
+           (theta00 (tag "00 45-50") (from -45 [cm]) (to -50 [cm]))
+           (theta00 (tag "00 50-55") (from -50 [cm]) (to -55 [cm]))
+           (theta00 (tag "00 55-60") (from -55 [cm]) (to -60 [cm]))
+           (theta00 (tag "00 60-65") (from -60 [cm]) (to -65 [cm]))
+           (theta00 (tag "00 65-70") (from -65 [cm]) (to -70 [cm]))
+           (theta00 (tag "00 70-75") (from -70 [cm]) (to -75 [cm]))
+           (theta00 (tag "00 75-80") (from -75 [cm]) (to -80 [cm]))
+           (theta00 (tag "00 80-85") (from -80 [cm]) (to -85 [cm]))
+           (theta00 (tag "00 85-90") (from -85 [cm]) (to -90 [cm]))
+           (theta00 (tag "00 90-95") (from -90 [cm]) (to -95 [cm]))
+           (theta00 (tag "00 95-100") (from -90 [cm]) (to -100 [cm]))
+           (theta00 (tag "00 95-") (from -95 [cm]))
+           (theta00 (tag "00 100-") (from -100 [cm]))
+           (theta05 (tag "05 0-10") (from -0 [cm]) (to -10 [cm]))
+           (theta05 (tag "05 10-20") (from -10 [cm]) (to -20 [cm]))
+           (theta05 (tag "05 20-30") (from -20 [cm]) (to -30 [cm]))
+           (theta05 (tag "05 30-35") (from -30 [cm]) (to -35 [cm]))
+           (theta05 (tag "05 35-40") (from -35 [cm]) (to -40 [cm]))
+           (theta05 (tag "05 40-45") (from -40 [cm]) (to -45 [cm]))
+           (theta05 (tag "05 45-50") (from -45 [cm]) (to -50 [cm]))
+           (theta05 (tag "05 50-55") (from -50 [cm]) (to -55 [cm]))
+           (theta05 (tag "05 55-60") (from -55 [cm]) (to -60 [cm]))
+           (theta05 (tag "05 60-65") (from -60 [cm]) (to -65 [cm]))
+           (theta05 (tag "05 65-70") (from -65 [cm]) (to -70 [cm]))
+           (theta05 (tag "05 70-75") (from -70 [cm]) (to -75 [cm]))
+           (theta05 (tag "05 75-80") (from -75 [cm]) (to -80 [cm]))
+           (theta05 (tag "05 80-85") (from -80 [cm]) (to -85 [cm]))
+           (theta05 (tag "05 85-90") (from -85 [cm]) (to -90 [cm]))
+           (theta05 (tag "05 90-95") (from -90 [cm]) (to -95 [cm]))
+           (theta05 (tag "05 95-100") (from -95 [cm]) (to -100 [cm]))
+           (theta05 (tag "05 100-") (from -100 [cm]))
+           (theta10 (tag "10 0-10") (from -0 [cm]) (to -10 [cm]))
+           (theta10 (tag "10 10-20") (from -10 [cm]) (to -20 [cm]))
+           (theta10 (tag "10 20-30") (from -20 [cm]) (to -30 [cm]))
+           (theta10 (tag "10 30-35") (from -30 [cm]) (to -35 [cm]))
+           (theta10 (tag "10 35-40") (from -35 [cm]) (to -40 [cm]))
+           (theta10 (tag "10 40-45") (from -40 [cm]) (to -45 [cm]))
+           (theta10 (tag "10 45-50") (from -45 [cm]) (to -50 [cm]))
+           (theta10 (tag "10 50-55") (from -50 [cm]) (to -55 [cm]))
+           (theta10 (tag "10 55-60") (from -55 [cm]) (to -60 [cm]))
+           (theta10 (tag "10 60-65") (from -60 [cm]) (to -65 [cm]))
+           (theta10 (tag "10 65-70") (from -65 [cm]) (to -70 [cm]))
+           (theta10 (tag "10 70-75") (from -70 [cm]) (to -75 [cm]))
+           (theta10 (tag "10 75-80") (from -75 [cm]) (to -80 [cm]))
+           (theta10 (tag "10 80-85") (from -80 [cm]) (to -85 [cm]))
+           (theta10 (tag "10 85-90") (from -85 [cm]) (to -90 [cm]))
+           (theta10 (tag "10 90-95") (from -90 [cm]) (to -95 [cm]))
+           (theta10 (tag "10 95-100") (from -95 [cm]) (to -100 [cm]))
+           (theta10 (tag "10 100-110") (from -100 [cm]) (to -110 [cm]))
+           (theta10 (tag "10 100-") (from -100 [cm]))
+           (theta10 (tag "10 110-") (from -110 [cm]))
+           (theta20 (tag "20 0-10") (from -0 [cm]) (to -10 [cm]))
+           (theta20 (tag "20 10-20") (from -10 [cm]) (to -20 [cm]))
+           (theta20 (tag "20 20-30") (from -20 [cm]) (to -30 [cm]))
+           (theta20 (tag "20 30-35") (from -30 [cm]) (to -35 [cm]))
+           (theta20 (tag "20 35-40") (from -35 [cm]) (to -40 [cm]))
+           (theta20 (tag "20 40-45") (from -40 [cm]) (to -45 [cm]))
+           (theta20 (tag "20 45-50") (from -45 [cm]) (to -50 [cm]))
+           (theta20 (tag "20 50-55") (from -50 [cm]) (to -55 [cm]))
+           (theta20 (tag "20 55-60") (from -55 [cm]) (to -60 [cm]))
+           (theta20 (tag "20 60-65") (from -60 [cm]) (to -65 [cm]))
+           (theta20 (tag "20 65-70") (from -65 [cm]) (to -70 [cm]))
+           (theta20 (tag "20 70-75") (from -70 [cm]) (to -75 [cm]))
+           (theta20 (tag "20 75-80") (from -75 [cm]) (to -80 [cm]))
+           (theta20 (tag "20 80-85") (from -80 [cm]) (to -85 [cm]))
+           (theta20 (tag "20 85-90") (from -85 [cm]) (to -90 [cm]))
+           (theta20 (tag "20 90-95") (from -90 [cm]) (to -95 [cm]))
+           (theta20 (tag "20 95-100") (from -95 [cm]) (to -100 [cm]))
+           (theta20 (tag "20 100-") (from -100 [cm]))
+           (theta40 (tag "40 0-10") (from -0 [cm]) (to -10 [cm]))
+           (theta40 (tag "40 10-20") (from -10 [cm]) (to -20 [cm]))
+           (theta40 (tag "40 20-30") (from -20 [cm]) (to -30 [cm]))
+           (theta40 (tag "40 30-35") (from -30 [cm]) (to -35 [cm]))
+           (theta40 (tag "40 35-40") (from -35 [cm]) (to -40 [cm]))
+           (theta40 (tag "40 40-45") (from -40 [cm]) (to -45 [cm]))
+           (theta40 (tag "40 45-50") (from -45 [cm]) (to -50 [cm]))
+           (theta40 (tag "40 50-55") (from -50 [cm]) (to -55 [cm]))
+           (theta40 (tag "40 55-60") (from -55 [cm]) (to -60 [cm]))
+           (theta40 (tag "40 60-65") (from -60 [cm]) (to -65 [cm]))
+           (theta40 (tag "40 65-70") (from -65 [cm]) (to -70 [cm]))
+           (theta40 (tag "40 70-75") (from -70 [cm]) (to -75 [cm]))
+           (theta40 (tag "40 75-80") (from -75 [cm]) (to -80 [cm]))
+           (theta40 (tag "40 80-85") (from -80 [cm]) (to -85 [cm]))
+           (theta40 (tag "40 85-90") (from -85 [cm]) (to -90 [cm]))
+           (theta40 (tag "40 90-95") (from -90 [cm]) (to -95 [cm]))
+           (theta40 (tag "40 95-100") (from -95 [cm]) (to -100 [cm]))
+           (theta40 (tag "40 95-") (from -95 [cm]))
+           (theta40 (tag "40 100-") (from -100 [cm]))
+           (thetaWD (tag "WD 0-10") (from -0 [cm]) (to -10 [cm]))
+           (thetaWD (tag "WD 10-20") (from -10 [cm]) (to -20 [cm]))
+           (thetaWD (tag "WD 20-30") (from -20 [cm]) (to -30 [cm]))
+           (thetaWD (tag "WD 30-35") (from -30 [cm]) (to -35 [cm]))
+           (thetaWD (tag "WD 35-40") (from -35 [cm]) (to -40 [cm]))
+           (thetaWD (tag "WD 40-45") (from -40 [cm]) (to -45 [cm]))
+           (thetaWD (tag "WD 45-50") (from -45 [cm]) (to -50 [cm]))
+           (thetaWD (tag "WD 50-55") (from -50 [cm]) (to -55 [cm]))
+           (thetaWD (tag "WD 55-60") (from -55 [cm]) (to -60 [cm]))
+           (thetaWD (tag "WD 60-65") (from -60 [cm]) (to -65 [cm]))
+           (thetaWD (tag "WD 65-70") (from -65 [cm]) (to -70 [cm]))
+           (thetaWD (tag "WD 70-75") (from -70 [cm]) (to -75 [cm]))
+           (thetaWD (tag "WD 75-80") (from -75 [cm]) (to -80 [cm]))
+           (thetaWD (tag "WD 80-85") (from -80 [cm]) (to -85 [cm]))
+           (thetaWD (tag "WD 85-90") (from -85 [cm]) (to -90 [cm]))
+           (thetaWD (tag "WD 90-95") (from -90 [cm]) (to -95 [cm]))
+           (thetaWD (tag "WD 95-100") (from -95 [cm]) (to -100 [cm]))
+           (thetaWD (tag "WD 100-110") (from -100 [cm]) (to -110 [cm]))
+           (thetaWD (tag "WD 100-120") (from -100 [cm]) (to -120 [cm]))
+           (thetaWD (tag "WD 100-") (from -100 [cm]))
+           (thetaWD (tag "WD 110-") (from -110 [cm]))))
+
+;;; Program.
+
+(defprogram MySim Daisy
+  ;; Optimizable parameters.
+  (declare Ap_K_sat Number [cm/h] "Saturated water conductivity in Ap horizon.")
+  (declare Ap_l Number [] "l parameter in Ap horizon.")
+  (declare Ap_h_b Number [cm] "h_b parameter in Ap horizon.")
+  (declare Ap_b Number [] "b parameter in Ap horizon.")
+  (declare Ap_Theta_sat Number [<fraction>] "Porosity in Ap horizon.")
+  (declare B_00PM_K_sat Number [cm/h] "Sat. water conductivity in B horizon.")
+  (declare B_00PM_l Number [] "l parameter in B horizon.")
+  (declare B_00PM_h_b Number [cm] "h_b parameter in B horizon.")
+  (declare B_00PM_b Number [] "b parameter in B horizon.")
+  (declare B_00PM_Theta_sat Number [<fraction>] "Porosity in B horizon.")
+  (declare B_05PM_K_sat Number [cm/h] "Sat. water conductivity in B horizon.")
+  (declare B_05PM_l Number [] "l parameter in B horizon.")
+  (declare B_05PM_h_b Number [cm] "h_b parameter in B horizon.")
+  (declare B_05PM_b Number [] "b parameter in B horizon.")
+  (declare B_05PM_Theta_sat Number [<fraction>] "Porosity in B horizon.")
+  (declare B_10PM_K_sat Number [cm/h] "Sat. water conductivity in B horizon.")
+  (declare B_10PM_l Number [] "l parameter in B horizon.")
+  (declare B_10PM_h_b Number [cm] "h_b parameter in B horizon.")
+  (declare B_10PM_b Number [] "b parameter in B horizon.")
+  (declare B_10PM_Theta_sat Number [<fraction>] "Porosity in B horizon.")
+  (declare B_20PM_K_sat Number [cm/h] "Sat. water conductivity in B horizon.")
+  (declare B_20PM_l Number [] "l parameter in B horizon.")
+  (declare B_20PM_h_b Number [cm] "h_b parameter in B horizon.")
+  (declare B_20PM_b Number [] "b parameter in B horizon.")
+  (declare B_20PM_Theta_sat Number [<fraction>] "Porosity in B horizon.")
+  (declare B_40PM_K_sat Number [cm/h] "Sat. water conductivity in B horizon.")
+  (declare B_40PM_l Number [] "l parameter in B horizon.")
+  (declare B_40PM_h_b Number [cm] "h_b parameter in B horizon.")
+  (declare B_40PM_b Number [] "b parameter in B horizon.")
+  (declare B_40PM_Theta_sat Number [<fraction>] "Porosity in B horizon.")
+  (declare B_WOOD_K_sat Number [cm/h] "Sat. water conductivity in B horizon.")
+  (declare B_WOOD_l Number [] "l parameter in B horizon.")
+  (declare B_WOOD_h_b Number [cm] "h_b parameter in B horizon.")
+  (declare B_WOOD_b Number [] "b parameter in B horizon.")
+  (declare B_WOOD_Theta_sat Number [<fraction>] "Porosity in B horizon.")
+  
+  ;; Program finished after 12 hours, 11 minutes and 30 seconds.
+  ;; 29625 iterations.
+  ;; r^2 = 0.880636
+  (Ap_K_sat 19.0406 [cm/h])
+  (Ap_l 0.999987 [<none>])
+  (Ap_h_b -7.54318 [cm])
+  (Ap_b 1.38329 [<none>])
+  (Ap_Theta_sat 0.419504 [<fraction>])
+  (B_00PM_K_sat 15.6843 [cm/h])
+  (B_00PM_l 0.859714 [<none>])
+  (B_00PM_h_b -8.65112 [cm])
+  (B_00PM_b 1.00115 [<none>])
+  (B_00PM_Theta_sat 0.329962 [<fraction>])
+  (B_05PM_K_sat 23.3968 [cm/h])
+  (B_05PM_l 0.74518 [<none>])
+  (B_05PM_h_b -9.86732 [cm])
+  (B_05PM_b 1.00366 [<none>])
+  (B_05PM_Theta_sat 0.426701 [<fraction>])
+  (B_10PM_K_sat 15.106 [cm/h])
+  (B_10PM_l 0.00118283 [<none>])
+  (B_10PM_h_b -5.22211 [cm])
+  (B_10PM_b 1.5483 [<none>])
+  (B_10PM_Theta_sat 0.41953 [<fraction>])
+  (B_20PM_K_sat 15.6838 [cm/h])
+  (B_20PM_l 0.00179163 [<none>])
+  (B_20PM_h_b -5.81508 [cm])
+  (B_20PM_b 2.22447 [<none>])
+  (B_20PM_Theta_sat 0.378603 [<fraction>])
+  (B_40PM_K_sat 24.1539 [cm/h])
+  (B_40PM_l 0.00067753 [<none>])
+  (B_40PM_h_b -9.09726 [cm])
+  (B_40PM_b 3.01545 [<none>])
+  (B_40PM_Theta_sat 0.370393 [<fraction>])
+  (B_WOOD_K_sat 10.8383 [cm/h])
+  (B_WOOD_l 0.116503 [<none>])
+  (B_WOOD_h_b -7.30667 [cm])
+  (B_WOOD_b 1.29308 [<none>])
+  (B_WOOD_Theta_sat 0.467621 [<fraction>])
+
+  ;; Common stuff.
+  (weather none)
+  (column C00PM C05PM C10PM C20PM C40PM CWOOD)
+  (manager nil)
+  (time 2012 8 8 10)                     ;Start of experiment.
+  (stop 2012 8 15 16)                    ;Last measurement.
+  (timestep (minutes 30))               ;Half hour timestep.
+  (log_time_columns year month mday hour minute)
+  (output ("Soil Intervals" (summary (data
+                                      (print_data true)
+                                      )))))
+
+(defprogram search minimize
+  (parameter Ap_K_sat Ap_l Ap_h_b Ap_b Ap_Theta_sat
+             B_00PM_K_sat B_00PM_l 
+             B_00PM_h_b B_00PM_b 
+             B_00PM_Theta_sat
+             B_05PM_K_sat B_05PM_l 
+             B_05PM_h_b B_05PM_b 
+             B_05PM_Theta_sat
+             B_10PM_K_sat B_10PM_l 
+             B_10PM_h_b B_10PM_b 
+             B_10PM_Theta_sat
+             B_20PM_K_sat B_20PM_l 
+             B_20PM_h_b B_20PM_b 
+             B_20PM_Theta_sat
+             B_40PM_K_sat B_40PM_l 
+             B_40PM_h_b B_40PM_b 
+             B_40PM_Theta_sat
+             B_WOOD_K_sat B_WOOD_l 
+             B_WOOD_h_b B_WOOD_b 
+             B_WOOD_Theta_sat
+             )
+  (simplex 
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (20 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.8 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -9 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 3 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.47 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    20 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.8 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -9 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 3 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.47
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    20 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.8 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -9 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 3 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.47
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    20 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.8 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -9 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 3 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.47
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    20 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.8 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -9 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 3 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.47
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    20 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.8 -6 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -8 2 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 3 0.42
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.47
+    10 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    20 0.5 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.8 -6 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -9 2 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 3 0.42)
+   (10 0.5 -6 2 0.42 
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.42
+    10 0.5 -6 2 0.47)
+   )
+  (limit (and (> Ap_K_sat 1 [cm/h])
+              (< Ap_K_sat 50 [cm/h])
+              (> Ap_l 0 [])
+              (< Ap_l 1 [])
+              (> Ap_h_b -15 [cm])
+              (< Ap_h_b -5 [cm])
+              (> Ap_b 1 [])
+              (< Ap_b 4 [])
+              (> Ap_Theta_sat 0.41 [])
+              (< Ap_Theta_sat 0.57 [])
+              (> B_00PM_K_sat 1 [cm/h])
+              (< B_00PM_K_sat 50 [cm/h])
+              (> B_00PM_l 0 [])
+              (< B_00PM_l 1 [])
+              (> B_00PM_h_b -15 [cm])
+              (< B_00PM_h_b -5 [cm])
+              (> B_00PM_b 1 [])
+              (< B_00PM_b 4 [])
+              (> B_00PM_Theta_sat 0.32 [])
+              (< B_00PM_Theta_sat 0.48 [])
+              (> B_05PM_K_sat 1 [cm/h])
+              (< B_05PM_K_sat 50 [cm/h])
+              (> B_05PM_l 0 [])
+              (< B_05PM_l 1 [])
+              (> B_05PM_h_b -15 [cm])
+              (< B_05PM_h_b -5 [cm])
+              (> B_05PM_b 1 [])
+              (< B_05PM_b 4 [])
+              (> B_05PM_Theta_sat 0.32 [])
+              (< B_05PM_Theta_sat 0.48 [])
+              (> B_10PM_K_sat 1 [cm/h])
+              (< B_10PM_K_sat 50 [cm/h])
+              (> B_10PM_l 0 [])
+              (< B_10PM_l 1 [])
+              (> B_10PM_h_b -15 [cm])
+              (< B_10PM_h_b -5 [cm])
+              (> B_10PM_b 1 [])
+              (< B_10PM_b 4 [])
+              (> B_10PM_Theta_sat 0.33 [])
+              (< B_10PM_Theta_sat 0.49 [])
+              (> B_20PM_K_sat 1 [cm/h])
+              (< B_20PM_K_sat 50 [cm/h])
+              (> B_20PM_l 0 [])
+              (< B_20PM_l 1 [])
+              (> B_20PM_h_b -15 [cm])
+              (< B_20PM_h_b -5 [cm])
+              (> B_20PM_b 1 [])
+              (< B_20PM_b 4 [])
+              (> B_20PM_Theta_sat 0.34 [])
+              (< B_20PM_Theta_sat 0.50 [])
+              (> B_40PM_K_sat 1 [cm/h])
+              (< B_40PM_K_sat 50 [cm/h])
+              (> B_40PM_l 0 [])
+              (< B_40PM_l 1 [])
+              (> B_40PM_h_b -15 [cm])
+              (< B_40PM_h_b -5 [cm])
+              (> B_40PM_b 1 [])
+              (< B_40PM_b 4 [])
+              (> B_40PM_Theta_sat 0.33 [])
+              (< B_40PM_Theta_sat 0.49 [])
+              (> B_WOOD_K_sat 1 [cm/h])
+              (< B_WOOD_K_sat 50 [cm/h])
+              (> B_WOOD_l 0 [])
+              (< B_WOOD_l 1 [])
+              (> B_WOOD_h_b -15 [cm])
+              (< B_WOOD_h_b -5 [cm])
+              (> B_WOOD_b 1 [])
+              (< B_WOOD_b 4 [])
+              (> B_WOOD_Theta_sat 0.36 [])
+              (< B_WOOD_Theta_sat 0.52 [])
+              ))
+  (scope name data)
+  (expr (- R2))
+  (run MySim)
+  (epsilon 0.0)
+  (min_iter 150)
+  (max_iter 80000)
+  )
+
+;; Find Theta_fc.
+(deflog "Theta_fc" table
+  (where "Theta_fc.dlf")
+  (when hourly)
+  (entries (theta00 (tag "C00PM") (from -27 [cm]) (to -100 [cm]))
+           (theta05 (tag "C05PM") (from -27 [cm]) (to -100 [cm]))
+           (theta10 (tag "C10PM") (from -27 [cm]) (to -100 [cm]))
+           (theta20 (tag "C20PM") (from -26 [cm]) (to -100 [cm]))
+           (theta40 (tag "C40PM") (from -26 [cm]) (to -100 [cm]))
+           (thetaWD (tag "CWOOD") (from -26 [cm]) (to -100 [cm]))))
+
+(defselect h content
+  (declare column String "Name of column to log.")
+  (path column "${column}" SoilWater h)
+  (spec fixed SoilWater h)
+  (dimension [pF])
+  (z -50 [cm]))
+
+(deflog "h_fc" table
+  (where "h_fc.dlf")
+  (when hourly)
+  (entries (h (column "C00PM") (tag "C00PM"))
+           (h (column "C05PM") (tag "C05PM"))
+           (h (column "C10PM") (tag "C10PM"))
+           (h (column "C20PM") (tag "C20PM"))
+           (h (column "C40PM") (tag "C40PM"))
+           (h (column "CWOOD") (tag "CWOOD"))))
+
+(defprogram Theta_fc MySim
+  (column C00PM C05PM C10PM C20PM C40PM CWOOD)
+  (manager nil)
+  (time 2012 8 8 10)                     ;Start of experiment.
+  (stop 2012 9 8 10)                    ;Last measurement.
+  (log_time_columns year month mday hour)
+  (output "Theta_fc" "h_fc"))
+
+;; Harvest
+
+(defcolumn scenario default
+  (Movement original
+            (matrix_water (richards (max_time_step_reductions 20)))
+            (Geometry (zplus -1 -2 -3 -4 -5 -6 -7 -8 -9 -10 -11 -12 -13 -14 -15 -16 -17 -18 -19 -20 -21 -22 -23 -24 -25 -26 -27 -28 -29 -30 -31 -32 -33 -34 -35 -36 -37 -38 -39 -40 -41 -42 -43 -44 -45 -46 -47 -48 -49 -50 -51 -52 -53 -54 -55 -56 -57 -58 -59 -60 -61 -62 -63 -64 -65 -66 -67 -68 -69 -70 -71 -72 -73 -74 -75 -76 -77 -78 -79 -80 -81 -82 -83 -84 -85 -86 -87 -88 -89 -90 -91 -92 -93 -94 -95 -96 -97 -98 -99 -100 -101 -102 -103 -104 -105 -106 -107 -108 -109 -110 -111 -112 -113 -114 -115 -116 -117 -118 -119 -120 -121 -122 -123 -124 -125 -126 -127 -128 -129 -130 -131 -132 -133 -134 -135 -136 -137 -139 -140 -141 -142 -143 -144 -145 -146 -147 -148 -149 -150 [cm])))
+  (Groundwater deep))
+  
+(defcolumn Soriginal scenario
+  (Soil (MaxRootingDepth 60 [cm])    
+        (horizons ( -27 [cm] "Jyndevad Ap")
+                  (-100 [cm] B_00PM)
+                  (-150 [cm] "Jyndevad C"))))
+
+(defcolumn S00PM scenario
+  (Soil (MaxRootingDepth 100 [cm])    
+        (horizons ( -27 [cm] "Jyndevad Ap")
+                  (-100 [cm] B_00PM)
+                  (-150 [cm] "Jyndevad C"))))
+
+(defcolumn S05PM scenario
+  (Soil (MaxRootingDepth 100 [cm])    
+        (horizons ( -27 [cm] "Jyndevad Ap")
+                  (-100 [cm] B_05PM)
+                  (-150 [cm] "Jyndevad C"))))
+
+(defcolumn S10PM scenario
+  (Soil (MaxRootingDepth 100 [cm])    
+        (horizons ( -27 [cm] "Jyndevad Ap")
+                  (-100 [cm] B_10PM)
+                  (-150 [cm] "Jyndevad C"))))
+
+(defcolumn S20PM scenario
+  (Soil (MaxRootingDepth 100 [cm])    
+        (horizons ( -27 [cm] "Jyndevad Ap")
+                  (-100 [cm] B_20PM)
+                  (-150 [cm] "Jyndevad C"))))
+
+(defcolumn S40PM scenario
+  (Soil (MaxRootingDepth 100 [cm])    
+        (horizons ( -27 [cm] "Jyndevad Ap")
+                  (-100 [cm] B_40PM)
+                  (-150 [cm] "Jyndevad C"))))
+
+(defcolumn SWOOD scenario
+  (Soil (MaxRootingDepth 100 [cm])    
+        (horizons ( -27 [cm] "Jyndevad Ap")
+                  (-100 [cm] B_WOOD)
+                  (-150 [cm] "Jyndevad C"))))
+
+(defprogram scenario MySim
+  (time 1997 3 1)
+  (stop 2005 11 1)
+  (weather default "dk-jyndevad.dwf")
+  (manager (repeat "SBarley w. MF"))
+  (output harvest ("Field nitrogen" (when (and monthly (month 4)))))
+
+  ;; Revert to default.
+  (column)
+  (timestep (hours 1))
+  (log_time_columns year month mday hour))
+
+(defprogram scenarios batch 
+  (run (scenario (column Jyndevad) (log_prefix "Jyndevad-"))
+       (scenario (column Soriginal) (log_prefix "Soriginal-"))
+       (scenario (column S00PM) (log_prefix "S00PM-"))
+       (scenario (column S05PM) (log_prefix "S05PM-"))
+       (scenario (column S10PM) (log_prefix "S10PM-"))
+       (scenario (column S20PM) (log_prefix "S20PM-"))
+       (scenario (column S40PM) (log_prefix "S40PM-"))
+       (scenario (column SWOOD) (log_prefix "SWOOD-"))
+       ))
+
+;; K_fc
+;;
+(defcolumn K_fc default
+    (SoilWater (h -10))
+  (Movement original
+            (Geometry (zplus -1 -2 -3 -4 -5 -6 -7 -8 -9 -10 -11 -12 -13 -14 -15 -16 -17 -18 -19 -20 -21 -22 -23 -24 -25 -26 -27 -28 -29 -30 -31 -32 -33 -34 -35 -36 -37 -38 -39 -40 -41 -42 -43 -44 -45 -46 -47 -48 -49 -50 -51 -52 -53 -54 -55 -56 -57 -58 -59 -60 -61 -62 -63 -64 -65 -66 -67 -68 -69 -70 -71 -72 -73 -74 -75 -76 -77 -78 -79 -80 -81 -82 -83 -84 -85 -86 -87 -88 -89 -90 -91 -92 -93 -94 -95 -96 -97 -98 -99 -100 -101 -102 -103 -104 -105 -106 -107 -108 -109 -110 -111 -112 -113 -114 -115 -116 -117 -118 -119 -120 -121 -122 -123 -124 -125 -126 -127 -128 -129 -130 -131 -132 -133 -134 -135 -136 -137 -138 -139 -140 -141 -142 -143 -144 -145 -146 -147 -148 -149 -150 -151 -152 -153 -154 -155 -156 -157 -158 -159 -160 -161 -162 -163 -164 -165 -166 -167 -168 -169 -170 -171 -172 -173 -174 -175 -176 -177 -178 -179 -180 -181 -182 -183 -184 -185 -186 -187 -188 -189 -190 -191 -192 -193 -194 -195 -196 -197 -198 -199 -200))
+            (matrix_water (richards (max_time_step_reductions 20))))
+  (Groundwater deep))
+
+(defcolumn K00PM K_fc
+  (Soil (MaxRootingDepth 100 [cm])    
+        (horizons (-200 [cm] B_00PM))))
+
+(defcolumn K05PM K_fc
+  (Soil (MaxRootingDepth 100 [cm])    
+        (horizons (-200 [cm] B_05PM))))
+
+(defcolumn K10PM K_fc
+  (Soil (MaxRootingDepth 100 [cm])    
+        (horizons (-200 [cm] B_10PM))))
+
+(defcolumn K20PM K_fc
+  (Soil (MaxRootingDepth 100 [cm])    
+        (horizons (-200 [cm] B_20PM))))
+
+(defcolumn K40PM K_fc
+  (Soil (MaxRootingDepth 100 [cm])    
+        (horizons (-200 [cm] B_40PM))))
+
+(defcolumn KWOOD K_fc
+  (Soil (MaxRootingDepth 100 [cm])    
+        (horizons (-200 [cm] B_WOOD))))
+
+(defprogram K_fc MySim
+  (log_time_columns mday hour)
+  (timestep (hours 1))
+  (time 1000 1 1 0)
+  (stop 1000 1 8 0)
+  (output "Soil Water Potential" 
+          "Soil Water Content"
+          "Soil Water Potential (pF)"))
+
+(defprogram K_B batch 
+  (run (K_fc (column K00PM) (log_prefix "K00PM-"))
+       (K_fc (column K05PM) (log_prefix "K05PM-"))
+       (K_fc (column K10PM) (log_prefix "K10PM-"))
+       (K_fc (column K20PM) (log_prefix "K20PM-"))
+       (K_fc (column K40PM) (log_prefix "K40PM-"))
+       (K_fc (column KWOOD) (log_prefix "KWOOD-"))
+       ))
+
+;;(run search)
+;;(run MySim)
+;;(run Theta_fc)
+;;(run scenarios)
+(run K_B)
+
+;;; setup.dai ends here.

@@ -1,0 +1,47 @@
+(defsource foo column
+  (tag "Actual evapotranspiration")
+  (accumulate true)
+  ;;(reset_offset true)
+  (missing "00.00")
+  (filter (year "${Year}")))
+
+(defgnuplot plot time
+  (declare Year Integer "Year to plot")
+  (title "${Year}")
+  (where "pdf/${Year}.pdf")
+  (extra &old 
+         [set format x "%m"]
+         [set xtics 30 * 24 * 3600]
+         [set ytics 50])
+  (canvas "10cm, 6cm")
+  (begin &old $Year 6 15 23)
+  (end &old $Year 8 9 23)
+  ;;(end &old $Year 12 30 23)
+  (legend nw)
+  ;; (ymax 600)
+  (ymax 200)
+  (source (foo (file "log/SBN-field_water.dlf")
+               (title "ETc Normal")
+               (tag "Potential evapotranspiration"))
+          (foo (file "log/SBN-field_water.dlf")
+               (title "ETa Normal") )
+          (foo (file "log/SBS-field_water.dlf")
+               (title "ETa Short"))
+          (foo (file "log/SBB-field_water.dlf")
+               (title "ETa Block"))
+         ))
+
+(defprogram plotall gnuplot 
+  (graph (plot (Year 1998))
+         (plot (Year 1999))
+         (plot (Year 2000))
+         (plot (Year 2001))
+         (plot (Year 2002))
+         (plot (Year 2003))
+         (plot (Year 2004))
+         (plot (Year 2005))
+         (plot (Year 2006))
+         (plot (Year 2007))
+         ))
+
+(run plotall)

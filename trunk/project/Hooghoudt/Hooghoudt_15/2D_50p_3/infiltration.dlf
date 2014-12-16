@@ -1,0 +1,11 @@
+dlf-0.0 -- Infiltration (defined in 'C:\cygwin\home\mmo\daisy\Simulations\MST_Taastrup\Hooghoudt_7\2D\Hooghoudt_2D_7.dai').
+
+VERSION: 4.73
+LOGFILE: infiltration.dlf
+RUN: Thu Oct 29 10:50:29 2009
+
+COLUMN: *
+INTERVAL: box none
+
+LOG: Infiltration to matrix, drains and bipores2drain and biopores2matrix.
+

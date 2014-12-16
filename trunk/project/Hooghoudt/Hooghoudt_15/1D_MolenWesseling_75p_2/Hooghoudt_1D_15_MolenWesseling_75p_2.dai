@@ -1,0 +1,442 @@
+;;  This line is a comment as it starts with a ";"
+
+
+
+;;X-tra layer in A-horizon and changing conductivities - higher in upper part
+;;and lower in lower part  same as _1  but the cond in Bplowlayer is changed to 
+;;the value from the resport...
+
+
+;;  Seting working directory
+(path "."
+       "c:/cygwin/home/mmo/daisy/lib"
+       "c:/cygwin/home/mmo/daisy/sample")
+(description "For drainage paper")
+
+
+;;  Here information is retrieved from Daisy library files. 
+;;  As soon as the “input file” is executed all information present
+;;  in the input file is available 
+
+(input file "log.dai")                
+(input file "crop.dai")
+(input file "tillage.dai")
+(input file "fertilizer.dai") 
+;;(input file "rorrendechemicals_2.dai") 
+(input file "hooghoudtchemicals_1.dai") 
+(input file "dk-horizon.dai")		;;For JB6
+
+;;  Here the weather data are read.
+;;  The keyword default tells the model that weather data file format
+;;  is the Daisy weather file (dwf) standard or default
+;;(weather none)
+(weather default "dk-taastrup.dwf")
+          ;;(PrecipScale 1.41 1.42 1.35 1.24 1.13 1.11 1.10 1.10 1.11 1.14 1.23 1.37 []))       
+;;  Here various soil horizons are defined. 
+;;  Textural composition, soil organic matter content, 
+;;  quality of soil organic matter and soil hydraulic properties.
+;;  The keyword M_vG tells the model that the hydraulic properties are 
+;;  described by the Mualem / van Genuchten model
+
+(defcrop "Byg" "Spring Barley"
+  (CrpN (NO3_root_min 2 [ppm])
+        (NH4_root_min 2 [ppm])
+        (PtRootCnc (0.00 0.020)    (1.00 0.012)    (2.00 0.010) )
+        (CrRootCnc (0.00 0.010)    (1.00 0.010)    (2.00 0.008) )
+        (NfRootCnc (0.00 0.007)    (1.00 0.007)    (2.00 0.007) )
+
+        (PtLeafCnc (0.00 0.060)    (1.00 0.040)    (2.00 0.020) )
+        (CrLeafCnc (0.00 0.030)    (1.00 0.030)    (2.00 0.018) )
+        (NfLeafCnc (0.00 0.004)    (1.00 0.004)    (2.00 0.004) )
+
+        (PtStemCnc (0.00 0.020)    (1.00 0.015)    (2.00 0.008) )
+        (CrStemCnc (0.00 0.010)    (1.00 0.010)    (2.00 0.006) )
+        (NfStemCnc (0.00 0.004)    (1.00 0.004)    (2.00 0.004) )
+
+        (PtSOrgCnc (0.00 0.024)    (1.00 0.024)    (2.00 0.024) )
+        (CrSOrgCnc (0.00 0.016)    (1.00 0.016)    (2.00 0.016) )
+        (NfSOrgCnc (0.00 0.014)    (1.00 0.014)    (2.00 0.014) ) )
+  (Root (MaxPen 100 [cm]))
+  (Canopy (IntcpCap 0.05 [mm])))
+
+(defchemical "Bromide_1" "Bromide")
+(defchemical "Bromide_2" "Bromide")
+(defchemical "Bromide_3" "Bromide")
+(defchemical "Bromide_4" "Bromide")
+(defchemical "Bromide_5" "Bromide")
+(defchemical "Bromide_6" "Bromide")
+(defchemical "Bromide_7" "Bromide")
+(defchemical "Bromide_8" "Bromide")
+(defchemical "Bromide_9" "Bromide")
+(defchemical "Bromide_10" "Bromide")
+
+(defchemistry Bromide default
+  "Bromide_x everywhere"
+  (trace Bromide_1 Bromide_2 Bromide_3 Bromide_4 Bromide_5 
+         Bromide_6 Bromide_7 Bromide_8 Bromide_9 Bromide_10))   
+    
+(defaction "SBarley Management" activity
+  (wait_mm_dd 03 05)
+  (fertilize (N25S (weight 100 [kg N/ha])))
+  (plowing)
+  (wait_mm_dd 04 05)
+  (seed_bed_preparation)(sow "Byg")
+  (wait (or (crop_ds_after "Byg" 2.0)(mm_dd 09 01)))
+  (harvest "Byg" (stub 8 [cm])(stem 0.9)(leaf 0.9))
+)
+
+(defaction SBarleyAllYears activity
+  (repeat "SBarley Management"))
+
+(defaction "Bromide_1 spraying" activity
+  (wait_mm_dd 09 01)(spray "Bromide_1" 1000 [g/ha]))
+(defaction "Bromide_2 spraying" activity
+  (wait_mm_dd 09 01)(spray "Bromide_2" 1000 [g/ha]))
+(defaction "Bromide_3 spraying" activity
+  (wait_mm_dd 09 01)(spray "Bromide_3" 1000 [g/ha]))
+(defaction "Bromide_4 spraying" activity
+  (wait_mm_dd 09 01)(spray "Bromide_4" 1000 [g/ha]))
+(defaction "Bromide_5 spraying" activity
+  (wait_mm_dd 09 01)(spray "Bromide_5" 1000 [g/ha]))
+(defaction "Bromide_6 spraying" activity
+  (wait_mm_dd 09 01)(spray "Bromide_6" 1000 [g/ha]))
+(defaction "Bromide_7 spraying" activity
+  (wait_mm_dd 09 01)(spray "Bromide_7" 1000 [g/ha]))
+(defaction "Bromide_8 spraying" activity
+  (wait_mm_dd 09 01)(spray "Bromide_8" 1000 [g/ha]))
+(defaction "Bromide_9 spraying" activity
+  (wait_mm_dd 09 01)(spray "Bromide_9" 1000 [g/ha]))
+(defaction "Bromide_10 spraying" activity
+  (wait_mm_dd 09 01)(spray "Bromide_10" 1000 [g/ha]))
+
+(defaction BromidAllYears activity
+  ("Bromide_1 spraying")
+  ("Bromide_2 spraying")
+  ("Bromide_3 spraying")
+  ("Bromide_4 spraying")
+  ("Bromide_5 spraying")
+  ("Bromide_6 spraying")
+  ("Bromide_7 spraying")
+  ("Bromide_8 spraying")
+  ("Bromide_9 spraying")
+  ("Bromide_10 spraying"))
+
+(defaction SBarleyBrAllYears 
+  (while (SBarleyAllYears)
+         (BromidAllYears)))
+            
+(defcolumn JB6Drainage default
+  "This is a JB6 soil with pipe drains."
+  (OrganicMatter original
+        (init (input 1400 [kg C/ha/y])
+              (background_mineralization 3.0 [kg N/ha/y])))
+  (Chemistry multi (combine N Bromide))
+  (Soil (MaxRootingDepth 100 [cm])
+        (horizons ( -30 "Ap_JB6")
+                  ( -80 "B_JB6")
+                  (-200 "C_JB6")))
+        
+  ;;----------------------------------------             
+  ;;(Movement vertical
+  ;;      (Tertiary none) ;;no macropores
+  ;;      (matrix_solute Hansen convection none)
+  ;;      (matrix_water (richards (max_time_step_reductions 16))
+  ;;                    (lr))   
+  ;;      (Geometry ;;(zplus -1.5 -3 -5 -7 -9 -11 -13 -15 -17 -19 -21 -23 -25 -27 -29 -31 -33 -35 -37 -41 -45 -50 -55 -65 -75
+  ;;                ;;       -90 -105 -120 -140 -160 -180 -200)))                                
+  ;;                (zplus -5 -10 -15 -20 -25 -29 -33 -40 -50 -60 -80 -100 -120 -140 -160 -180 -200)))   
+  ;;-----------------------------------------
+  
+  (Movement rectangle
+          ;;(matrix_solute Mollerup convection none)
+          (matrix_water (Mollerup (max_time_step_reductions 16)
+                                  (max_number_of_small_time_steps 1000000))
+                        (v+h))
+          ;;(matrix_water Mollerup v+h)       
+          (Geometry 
+                 ;;(zplus -1.5 -3 -5 -7 -9 -11 -13 -15 -17 -19 -21 -23 -25 -27 -29 -31 -33 -35 -37 -41 -45 -50 -55 -65 -75
+                 ;;       -90 -105 -120 -140 -160 -180 -200) 
+                 (zplus -5 -10 -15 -20 -25 -30 -35 -40 -50 -60 -70 -80 -90 -100 -105 -115 -120 -130 -140 -150 -160 -170 -180 -190 -200)                              
+                 ;;(xplus 5 10 15 25 35 40 50 75 125 200 275 350 450 550 650 800 [cm])))
+                 (xplus 1 [cm]))
+          ;;(Tertiary pipes 
+          (Drain Hooghoudt
+                 (L 1600 [cm])
+                 ;;(x 800[cm])
+                 (pipe_position -110 [cm])
+                 (rad 3.25 [cm])
+                 (eq_depth MolenWesseling)))
+                 
+  (Groundwater aquitard
+          ;;(K_aquitard 0.010 [cm/h])
+          ;;(K_aquitard 0.002 [cm/h])
+          ;;(K_aquitard 0.00068 [cm/h])
+          (K_aquitard 0.0014 [cm/h])
+          (Z_aquitard 200 [cm])
+          (pressure_table const -200 [cm])))
+ 
+;;  Selecting column
+(column "JB6Drainage")
+
+;; Selecting management
+(manager activity
+  ("SBarley Management")
+  ("SBarley Management")
+  ("SBarley Management")
+  ("SBarley Management")
+  ("SBarley Management") 
+  ("SBarleyBrAllYears")
+)
+
+;; Begining and end of simulation.
+(time 1985 03 01)
+(stop 2000 04 01)
+
+(print_time periodic)
+                             
+(activate_output (after 1990 03 31 23))
+
+(deflog "Hooghoudt" column
+  "Water, Bromide nitrogen drainage and percolation."
+  (declare unit String "Base unit.")
+  (unit "g/ha")
+  (where "hooghoudt_hourly.dlf")
+  (when hourly) 
+  (entries ;; Year Month MDay Hour
+     (number (tag "Precipitation")
+        (path weather "*" precipitation)
+        (spec weather base precipitation)
+        (handle sum)
+        (dimension "mm/&"))
+     (flux_bottom 
+        (tag "Matrix percolation")
+        (path column "${column}" SoilWater q)
+        (spec fixed SoilWater q)
+        (handle sum)
+        (negate true)
+        (dimension "mm/&"))
+     (interval 
+        (tag "Drain flow")
+        (path column "${column}" SoilWater S_drain)
+        (spec fixed SoilWater S_drain)
+        (handle sum)
+        (dimension "mm/&"))
+     (flux_bottom 
+        (path column "${column}" Chemistry "*" trace "Bromide_1" J_matrix)
+        (tag "Leak-Matrix, Br_1")
+        (negate true)
+        (handle sum)
+        (dimension "${unit}/&")
+        (spec chemical default J_matrix))
+     (interval 
+        (path column "${column}" Chemistry "*" trace "Bromide_1" S_drain)
+        (spec chemical default S_drain)
+        (tag "Soil-Drain, Br_1")
+        (handle sum)
+        (negate true)
+        (dimension "${unit}/&"))
+     (flux_bottom 
+        (path column "${column}" Chemistry "*" trace "Bromide_2" J_matrix)
+        (tag "Leak-Matrix Br_2")
+        (negate true)
+        (handle sum)
+        (dimension "${unit}/&")
+        (spec chemical default J_matrix))
+     (interval 
+        (path column "${column}" Chemistry "*" trace "Bromide_2" S_drain)
+        (spec chemical default S_drain)
+        (tag "Soil-Drain, Br_2")
+        (handle sum)
+        (negate true)
+        (dimension "${unit}/&"))    
+     (flux_bottom 
+        (path column "${column}" Chemistry "*" trace "Bromide_3" J_matrix)
+        (tag "Leak-Matrix Br_3")
+        (negate true)
+        (handle sum)
+        (dimension "${unit}/&")
+        (spec chemical default J_matrix))
+     (interval 
+        (path column "${column}" Chemistry "*" trace "Bromide_3" S_drain)
+        (spec chemical default S_drain)
+        (tag "Soil-Drain, Br_3")
+        (handle sum)
+        (negate true)
+        (dimension "${unit}/&"))
+     (flux_bottom 
+        (path column "${column}" Chemistry "*" trace "Bromide_4" J_matrix)
+        (tag "Leak-Matrix Br_4")
+        (negate true)
+        (handle sum)
+        (dimension "${unit}/&")
+        (spec chemical default J_matrix))
+     (interval 
+        (path column "${column}" Chemistry "*" trace "Bromide_4" S_drain)
+        (spec chemical default S_drain)
+        (tag "Soil-Drain, Br_4")
+        (handle sum)
+        (negate true)
+        (dimension "${unit}/&"))
+     (flux_bottom 
+        (path column "${column}" Chemistry "*" trace "Bromide_5" J_matrix)
+        (tag "Leak-Matrix Br_5")
+        (negate true)
+        (handle sum)
+        (dimension "${unit}/&")
+        (spec chemical default J_matrix))
+     (interval 
+        (path column "${column}" Chemistry "*" trace "Bromide_5" S_drain)
+        (spec chemical default S_drain)
+        (tag "Soil-Drain, Br_5")
+        (handle sum)
+        (negate true)
+        (dimension "${unit}/&"))
+     (flux_bottom 
+        (path column "${column}" Chemistry "*" trace "Bromide_6" J_matrix)
+        (tag "Leak-Matrix Br_6")
+        (negate true)
+        (handle sum)
+        (dimension "${unit}/&")
+        (spec chemical default J_matrix))
+     (interval 
+        (path column "${column}" Chemistry "*" trace "Bromide_6" S_drain)
+        (spec chemical default S_drain)
+        (tag "Soil-Drain, Br_6")
+        (handle sum)
+        (negate true)
+        (dimension "${unit}/&"))
+     (flux_bottom 
+        (path column "${column}" Chemistry "*" trace "Bromide_7" J_matrix)
+        (tag "Leak-Matrix Br_7")
+        (negate true)
+        (handle sum)
+        (dimension "${unit}/&")
+        (spec chemical default J_matrix))
+     (interval 
+        (path column "${column}" Chemistry "*" trace "Bromide_7" S_drain)
+        (spec chemical default S_drain)
+        (tag "Soil-Drain, Br_7")
+        (handle sum)
+        (negate true)
+        (dimension "${unit}/&"))
+     (flux_bottom 
+        (path column "${column}" Chemistry "*" trace "Bromide_8" J_matrix)
+        (tag "Leak-Matrix Br_8")
+        (negate true)
+        (handle sum)
+        (dimension "${unit}/&")
+        (spec chemical default J_matrix))
+     (interval 
+        (path column "${column}" Chemistry "*" trace "Bromide_8" S_drain)
+        (spec chemical default S_drain)
+        (tag "Soil-Drain, Br_8")
+        (handle sum)
+        (negate true)
+        (dimension "${unit}/&"))
+     (flux_bottom 
+        (path column "${column}" Chemistry "*" trace "Bromide_9" J_matrix)
+        (tag "Leak-Matrix Br_9")
+        (negate true)
+        (handle sum)
+        (dimension "${unit}/&")
+        (spec chemical default J_matrix))
+     (interval 
+        (path column "${column}" Chemistry "*" trace "Bromide_9" S_drain)
+        (spec chemical default S_drain)
+        (tag "Soil-Drain, Br_9")
+        (handle sum)
+        (negate true)
+        (dimension "${unit}/&"))
+     (flux_bottom 
+        (path column "${column}" Chemistry "*" trace "Bromide_10" J_matrix)
+        (tag "Leak-Matrix Br_10")
+        (negate true)
+        (handle sum)
+        (dimension "${unit}/&")
+        (spec chemical default J_matrix))
+     (interval 
+        (path column "${column}" Chemistry "*" trace "Bromide_10" S_drain)
+        (spec chemical default S_drain)
+        (tag "Soil-Drain, Br_10")
+        (handle sum)
+        (negate true)
+        (dimension "${unit}/&"))
+     (flux_bottom (path column "${column}" Chemistry "*" trace NH4 J_matrix)
+        (spec chemical default J_matrix)
+        (handle sum)
+        (negate true)
+        (tag "NH4-Leak-Matrix")
+        (dimension "${unit}/&"))      
+     (flux_bottom (path column "${column}" Chemistry "*" trace NO3 J_matrix)
+        (spec chemical default J_matrix)
+        (tag "NO3-Leak-Matrix")
+        (handle sum)
+        (negate true)
+        (dimension "${unit}/&"))     
+     (interval (path column "${column}" Chemistry "*" trace NH4 S_drain)
+        (spec chemical default S_drain)
+        (tag "NH4-Soil-Drain")
+        (handle sum)
+        (negate true)
+        (dimension "${unit}/&"))
+     (interval (path column "${column}" Chemistry "*" trace NO3 S_drain)
+        (spec chemical default S_drain)
+        (tag "NO3-Soil-Drain")
+        (handle sum)
+        (negate true)
+        (dimension "${unit}/&"))
+        ))
+
+(output	        
+    ("Soil Water Potential" (when daily))
+    ("harvest") 
+    ("Failure")   ;;log problems with water movement model
+    ("Crop Production")
+    ("Soil water" (when daily))
+    ;;("Chemical Concentration" 
+    ;;       (chemical Bromide) 
+    ;;       ;;(when hourly)
+    ;;       (when daily)
+    ;;       (where "SWC_Bromide.dlf"))
+    ("Hooghoudt")
+    ("Hooghoudt"
+         (when daily)
+         (where "hooghoudt_daily.dlf"))
+    ("Field chemical" 
+           (chemical Bromide_1)
+           (when daily))
+    ("Field chemical" 
+           (chemical Bromide_2)
+           (when daily))
+    ("Field chemical" 
+           (chemical Bromide_3)
+           (when daily))
+    ("Field chemical" 
+           (chemical Bromide_4)
+           (when daily))
+    ("Field chemical" 
+           (chemical Bromide_5)
+           (when daily))
+    ("Field chemical" 
+           (chemical Bromide_6)
+           (when daily))
+    ("Field chemical" 
+           (chemical Bromide_7)
+           (when daily))  
+    ("Field chemical" 
+           (chemical Bromide_8)
+           (when daily))
+    ("Field chemical" 
+           (chemical Bromide_9)
+           (when daily))
+    ("Field chemical" 
+           (chemical Bromide_10)
+           (when daily))
+    ("Soil nitrogen"
+           ;;(when (and (month 3)
+           ;;           (mday 31)
+           ;;           (hour 23))))
+           (when monthly))
+   ("Crop Production")
+)   
+

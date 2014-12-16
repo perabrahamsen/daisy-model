@@ -1,0 +1,43 @@
+* Pesticides
+
+Test compounds 
+
+     1 (KOC=15, DT50=6, 3 kg/ha, Potatoes),
+     2 (KOC=91, DT50=26, 1 kg/ha, Maize) and
+     3 (KOC=1, DT50=1.5, 1 kg/ha, Winter Wheat)
+
+were compared.  We used Daisy defaults for all other pesticide
+properties.
+
+The application dates and amounts from FOCUS were used in both simulations.
+
+* Colloids.
+
+The colloid model and default parameters are identicfal to the
+Rørrendegård setup, adjusted for clay content.  The colloid transport
+model is identical to the Rørrendegård and VAP setup.
+
+* Soil
+
+MACRO parameters were used for the micropores, with one exception.
+The top 8 cm of the first horizon below the plow layer was designated
+a plow pan, and given a conductivity of 10% of the rest of the
+horizons. The biopores module parameterized for Rørrende was used for
+macropores.
+
+* Crop and management
+
+MACRO uses a site specific crop parameterization.  This was abandoned
+in favor of the generic crop parameterizations available in Daisy,
+with two exeptions: Emergence and harvest dates were used in the Daisy
+management module, and a soil imposed max root penetration depth were
+estimated from MACRO parameters.
+
+The irrigation dates and amounts from FOCUS were used in both simulations.
+
+6 years warmup with the same crop and pesticide application were used
+in both simulations.  Irrigation were adjutsed to the weather each
+year.  Crop emergence and harvest was not.
+
+
+

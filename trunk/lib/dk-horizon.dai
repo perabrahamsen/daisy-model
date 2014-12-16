@@ -1,0 +1,361 @@
+; dk-horizon.dai -- Physical and hydraulic parameters for soil horisons
+
+; Indeholder medianværdier for teksturen i A,B og C horisonterne. Data
+; stammer fra jordprofildatabasen (DJF), men er konverteret til USDA
+; teksturklasser ved brug af linear interpolation mellem
+; teksturklasserne 20 og 63 mymeter. Tallene er derefter normaliseret
+; til 100 %.  hydrauliske parametre er genereret med hypres.
+
+(defhorizon Ap_JB1 default
+	(clay 3.9)
+	(silt 6.4)
+	;; (fine_sand 20.4)
+	;; (coarse_sand 66.6)
+        (sand 87.0)
+	(humus 2.8)
+	(C_per_N 14.2)
+	(dry_bulk_density 1.45)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.062)
+	(n 1.445)
+	(K_sat 5.037)
+	(Theta_sat 0.395)
+	(Theta_res 0.0)
+	(l -0.973))) ;; 
+	
+(defhorizon Ap_JB2 default
+	(clay 4.4)
+	(silt 13.0)
+	;; (fine_sand 54.5)
+	;; (coarse_sand 25.5)
+        (sand 80.0)
+	(humus 2.7)
+	(C_per_N 12.8)
+	(dry_bulk_density 1.42)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.054)
+	(n 1.382)
+	(K_sat 3.514)
+	(Theta_sat 0.412)
+	(Theta_res 0.0)
+	(l -0.922))) ;; 
+	
+(defhorizon Ap_JB3 default
+	(clay 6.8)
+	(silt 13.5)
+	;; (fine_sand 25)
+	;; (coarse_sand 51.9)
+        (sand 76.9)
+	(humus 2.8)
+	(C_per_N 13.3)
+	(dry_bulk_density 1.44)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.057)
+	(n 1.337)
+	(K_sat 3.135)
+	(Theta_sat 0.406)
+	(Theta_res 0.0)
+	(l -1.461))) ;; 
+	
+(defhorizon Ap_JB4 default
+	(clay 7.9)
+	(silt 21.5)
+	;; (fine_sand 36.4)
+	;; (coarse_sand 31.6)
+        (sand 68.0)
+	(humus 2.7)
+	(C_per_N 11.6)
+	(dry_bulk_density 1.41)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.048)
+	(n 1.304)
+	(K_sat 2.469)
+	(Theta_sat 0.420)
+	(Theta_res 0.0)
+	(l -1.492))) ;
+	
+(defhorizon Ap_JB5 default
+	(clay 12.3)
+	(silt 22.0)
+	;; (fine_sand 27.0)
+	;; (coarse_sand 36.1)
+        (sand 63.1)
+	(humus 2.5)
+	(C_per_N 12.8)
+	(dry_bulk_density 1.51)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.050)
+	(n 1.251)
+	(K_sat 1.7699)
+	(Theta_sat 0.391)
+	(Theta_res 0.0)
+	(l -2.386))) ;
+	
+(defhorizon Ap_JB6 default
+	(clay 12.4)
+	(silt 24.9)
+	;; (fine_sand 33.6)
+	;; (coarse_sand 26.5)
+        (sand 60.1)
+	(humus 2.5)
+	(C_per_N 11.0)
+	(dry_bulk_density 1.53)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.044)
+	(n 1.246)
+	(K_sat 1.469)
+	(Theta_sat 0.386)
+	(Theta_res 0.0)
+	(l -2.365))) ;
+	
+(defhorizon Ap_JB7 default
+	(clay 17.5)
+	(silt 25.8)
+	;; (fine_sand 30.5)
+	;; (coarse_sand 23.7)
+        (sand 54.2)
+	(humus 2.4)
+	(C_per_N 10.4)
+	(dry_bulk_density 1.54)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.048)
+	(n 1.204)
+	(K_sat 1.351)
+	(Theta_sat 0.386)
+	(Theta_res 0.0)
+	(l -3.197))) ;
+	
+(defhorizon B_JB1 default
+	(clay 3.8)
+	(silt 3.5)
+	;; (fine_sand 18.7)
+	;; (coarse_sand 73.1)
+        (sand 91.8)
+	(humus 0.9)
+	(C_per_N 12.2)
+	(dry_bulk_density 1.50)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.082)
+	(n 1.580)
+	(K_sat 3.756)
+	(Theta_sat 0.377)
+	(Theta_res 0.0)
+	(l -0.335))) ;
+	
+(defhorizon B_JB2 default
+	(clay 4.1)
+	(silt 10.1)
+	;; (fine_sand 55.5)
+	;; (coarse_sand 29.4)
+        (sand 84.9)
+	(humus 0.96)
+	(C_per_N 12.5)
+	(dry_bulk_density 1.45)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.069)
+	(n 1.458)
+	(K_sat 2.662)
+	(Theta_sat 0.405)
+	(Theta_res 0.0)
+	(l -0.3))) ;
+	
+(defhorizon B_JB3 default
+	(clay 6.8)
+	(silt 11.3)
+	;; (fine_sand 24.1)
+	;; (coarse_sand 56.8)
+        (sand 80.9)
+	(humus 1.04)
+	(C_per_N 11.0)
+	(dry_bulk_density 1.55)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.071)
+	(n 1.388)
+	(K_sat 2.433)
+	(Theta_sat 0.409)
+	(Theta_res 0.0)
+	(l -0.937))) ;
+	
+(defhorizon B_JB4 default
+	(clay 7.1)
+	(silt 19.4)
+	;; (fine_sand 39.7)
+	;; (coarse_sand 33.0)
+        (sand 72.7)
+	(humus 0.84)
+	(C_per_N 12.2)
+	(dry_bulk_density 1.51)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.058)
+	(n 1.349)
+	(K_sat 1.737)
+	(Theta_sat 0.395)
+	(Theta_res 0.0)
+	(l -0.717))) ;
+	
+(defhorizon B_JB5 default
+	(clay 11.9)
+	(silt 16.2)
+	;; (fine_sand 27.9)
+	;; (coarse_sand 43.5)
+        (sand 71.4)
+	(humus 0.51)
+	(C_per_N 9.9)
+	(dry_bulk_density 1.62)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.066)
+	(n 1.274)
+	(K_sat 1.118)
+	(Theta_sat 0.362)
+	(Theta_res 0.0)
+	(l -1.504))) ;
+	
+(defhorizon B_JB6 default
+	(clay 12.5)
+	(silt 21.8)
+	;; (fine_sand 36.7)
+	;; (coarse_sand 28.5)
+        (sand 65.2)
+	(humus 0.52)
+	(C_per_N 8.1)
+	(dry_bulk_density 1.64)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.054)
+	(n 1.249)
+	(K_sat 0.9584)
+	(Theta_sat 0.360)
+	(Theta_res 0.0)
+	(l -1.574))) ;
+	
+(defhorizon B_JB7 default
+	(clay 20.0)
+	(silt 22)
+	;; (fine_sand 31.1)
+	;; (coarse_sand 26.4)
+        (sand 57.5)
+	(humus 0.41)
+	(C_per_N 7.5)
+	(dry_bulk_density 1.68)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.053)
+	(n 1.169)
+	(K_sat 0.618)
+	(Theta_sat 0.352)
+	(Theta_res 0.0)
+	(l -2.809))) ;
+	
+(defhorizon C_JB1 default
+	(clay 2.9)
+	(silt 2.0)
+	;; (fine_sand 17.3)
+	;; (coarse_sand 77.6)
+        (sand 94.9)
+	(humus 0.2)
+	(dry_bulk_density 1.56)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.085)
+	(n 1.721)
+	(K_sat 4.046)
+	(Theta_sat 0.355)
+	(Theta_res 0.0)
+	(l 1.180))) ;
+	
+(defhorizon C_JB2 default
+	(clay 3.4)
+	(silt 5.9)
+	;; (fine_sand 59.8)
+	;; (coarse_sand 30.7)
+        (sand 90.5)
+	(humus 0.2)
+	(dry_bulk_density 1.55)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.08)
+	(n 1.557)
+	(K_sat 2.288)
+	(Theta_sat 0.370)
+	(Theta_res 0.0)
+	(l 1.188))) ;
+	
+(defhorizon C_JB3 default
+	(clay 7.5)
+	(silt 11.5)
+	;; (fine_sand 25.8)
+	;; (coarse_sand 54.9)
+        (sand 80.7)
+	(humus 0.21)
+	(dry_bulk_density 1.63)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.075)
+	(n 1.370)
+	(K_sat 1.213)
+	(Theta_sat 0.354)
+	(Theta_res 0.0)
+	(l 0.24))) ;
+	
+(defhorizon C_JB4 default
+	(clay 8.0)
+	(silt 18.6)
+	;; (fine_sand 43.7)
+	;; (coarse_sand 29.4)
+        (sand 73.1)
+	(humus 0.3)
+	(dry_bulk_density 1.65)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.056)
+	(n 1.325)
+	(K_sat 1.0773)
+	(Theta_sat 0.354)
+	(Theta_res 0.0)
+	(l -0.191))) ;
+	
+(defhorizon C_JB5 default
+	(clay 14.9)
+	(silt 22.1)
+	;; (fine_sand 31.0)
+	;; (coarse_sand 31.9)
+        (sand 62.9)
+	(humus 0.24)
+	(dry_bulk_density 1.79)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.043)
+	(n 1.187)
+	(K_sat 0.472)
+	(Theta_sat 0.317)
+	(Theta_res 0.0)
+	(l -1.605))) ;
+	
+(defhorizon C_JB6 default
+	(clay 13.3)
+	(silt 23.8)
+	;; (fine_sand 39.0)
+	;; (coarse_sand 23.6)
+        (sand 62.6)
+	(humus 0.22)
+	(dry_bulk_density 1.72)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.046)
+	(n 1.223)
+	(K_sat 0.6246)
+	(Theta_sat 0.3382)
+	(Theta_res 0.0)
+	(l -0.983))) ;
+	
+(defhorizon C_JB7 default
+	(clay 19.8)
+	(silt 23.8)
+	;; (fine_sand 31.6)
+	;; (coarse_sand 24.6)
+        (sand 56.2)
+	(humus 0.21)
+	(dry_bulk_density 1.73)
+	(hydraulic M_vG	; van Genuchten/Mualem functions
+	(alpha 0.047)
+	(n 1.16)
+	(K_sat 0.4588)
+	(Theta_sat 0.3385)
+	(Theta_res 0.0)
+	(l -2.255))) ;
+
+;;; dk-horizon.dai ends here
+
+

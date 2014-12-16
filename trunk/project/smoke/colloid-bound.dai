@@ -1,0 +1,55 @@
+;; colloid-bound.dai
+
+;;; Bromide.
+
+(defchemical "Bromide" common
+  (diffusion_coefficient 2.0e-5 [cm^2/s])
+  ;; (crop_uptake_reflection_factor 0.5 [])
+  (crop_uptake_reflection_factor 0.25 [])
+  ;; (crop_uptake_reflection_factor 0.0 []) ; Silstrup
+  (canopy_dissipation_rate 0 [h^-1])
+  (decompose_rate 0 [h^-1])
+;;  (drain_secondary true)
+  (C_below const 0 [g/cm^3]))
+
+(defchemistry Bromide default
+  (trace Bromide))
+
+;;; Brilliant Blue
+
+(defchemical BBx common
+  (adsorption linear
+              (K_clay $BB_K_clay)))
+
+(defchemical BB-base common
+  "Base parameterization for all Brilliant Blue forms."
+  (decompose_rate $BB_decomp)
+  ;; (decompose_rate 1 [h^-1])
+  ;;(decompose_heat_factor (0 1) (1 1))
+  )
+
+(defchemical BB BB-base
+  "Dissolved Brilliant Blue."
+  (adsorption none))
+
+(defchemical BB-immobile BB-base
+  "Brilliant Blue sorbed to immobile soil."
+  (adsorption full))
+
+(defreaction BB-immobile-sorption sorption
+  "Sorption equilibrium between dissolved and immobile Brilliant Blue."
+  (cite flury1995tracer)
+  ;; The three examined soils had K_clay of 8, 20, and 23.
+  ;; (K_clay 20 [l/kg])
+  (K_clay $BB_K_clay)
+  (k_sorption $BB_k_sorp)
+  (solute BB)
+  (sorbed BB-immobile)
+  )
+
+(defchemistry BB default
+  "Brilliant Blue in both immobile, solute and colloid form."
+  (trace BB BB-immobile )
+  (reaction BB-immobile-sorption))
+
+;;; colloid-bound.dai ends here.

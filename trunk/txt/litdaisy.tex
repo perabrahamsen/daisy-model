@@ -1,0 +1,49 @@
+\documentclass[a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage[american]{babel}
+\usepackage{csquotes}
+\usepackage{hyperref}
+\usepackage[style=authoryear,dashed=false,maxnames=99,backend=biber]{biblatex}
+\addbibresource{daisy.bib}
+
+\input{macro}
+
+\begin{document}
+
+\nocite{*}
+
+\printbibliography[keyword=daisy,title={Daisy bibliography}]
+
+\section*{Support litterature}
+
+\begin{refsection}
+  The following list some of the independent papers describing models
+  that have been (partly) implemented in Daisy.
+  \begin{description}
+  \item[Root density distribution] \cite{gp74}.
+  \item[Crop growth] \cite{vries-maize,pf1997simple}.
+  \item[Irrigation management] \cite{markvand}.
+  \item[Evapotranspiration] \cite{FAO-PM, kjaersgaard2008crop,hargreaves1985reference}.
+  \item[Stomata conductivity] \cite{bb87, leuning95, gs2002,
+      Ahmadi20091541}.
+  \item[Snow pack] \cite{snow1956}.
+  \item[Litter] \cite{scopel1998, macena2003, scopel2004}.
+  \item[Soil hydraulics] \cite{richardseq, burdine1953,
+      campbell1974simple, mualem1976, hypres, Cosby, MvGp}.
+  \item[Tile drainage]
+    \cite{hooghoudt,molenwesseling,moody,wesseling}.
+  \item[Particle transport] \cite{macro-colloid, mmax, styczen88,
+      EUROSEM, park82, hairsine91, brown87}.
+  \item[Numerics] \cite{nelder1965simplex}.
+  \end{description}
+
+  \printbibliography[heading=subbibliography]
+\end{refsection}
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

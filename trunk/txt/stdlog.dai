@@ -1,0 +1,8 @@
+(input file "log-std.dai")
+
+(run docmodel
+     (where "stdlog.tex")
+     (component "log")
+     (models "harvest" "Field water" "Soil water"
+             "Field nitrogen" "Soil nitrogen"
+             "Field chemical" "Soil chemical"))

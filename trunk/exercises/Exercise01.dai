@@ -1,0 +1,87 @@
+;; Including external library-files
+(input file "tillage.dai")
+(input file "crop.dai")
+(input file "fertilizer.dai")
+(input file "log.dai")
+
+;; Weather data
+(weather default "dk-taastrup.dwf")
+
+;;  Defining soil horizons of a fine sandy loam
+(defhorizon "Ap F.S.L." FAO3
+    "Data from Jacobsen 1983"
+    (dry_bulk_density 1.53 [g/cm^3]) 
+    (clay 0.113 [])
+    (silt 0.277 [])
+    (sand 0.584 [])
+    (humus 0.026 [])
+    (C_per_N 11.0 [g C/g N]))
+
+(defhorizon "B F.S.L." FAO3
+    (dry_bulk_density 1.51 [g/cm^3]) 
+    (clay 0.235 [])
+    (silt 0.253 [])
+    (sand 0.507 [])
+    (humus 0.005 [])
+    (C_per_N 11.0 [g C/g N]))
+
+(defhorizon "C F.S.L." FAO3
+    (dry_bulk_density 1.57 [g/cm^3]) 
+    (clay 0.244 [])
+    (silt 0.283 [])
+    (sand 0.471 [])
+    (humus 0.002 [])
+    (C_per_N  11.0))    ; Note that the dimension is omittet
+
+;;  Parameterisation of column (Fine sandy loam)
+(defcolumn "Fine sandy loam" default
+     (Soil (MaxRootingDepth 100 [cm])
+           (horizons (  -30 [cm] "Ap F.S.L.")
+                     (  -80 [cm] "B F.S.L.")
+                     ( -400 [cm] "C F.S.L.")))
+     (Groundwater deep)
+     (OrganicMatter original (init (input 3000 [kg C/ha/y]))))
+
+;; Spring Barley setup.
+(defaction "SBarley_management" activity
+  (wait_mm_dd 3 20)
+  (plowing)
+  (wait_mm_dd 4 15) 
+  (seed_bed_preparation)
+  (sow "Spring Barley")
+  (wait_mm_dd 4 20) 
+  (fertilize (N25S (weight 95 [kg N/ha])))
+  (wait (or (crop_ds_after "Spring Barley" 2.0) ;Ripe
+            (mm_dd 9 1))) (harvest "Spring Barley"))
+
+;;  Selecting column
+(column "Fine sandy loam")
+
+;; Start and end of simulation.
+(time 1993 1 1)
+(stop 1994 1 1)
+
+;; Selecting management
+(manager activity
+  "SBarley_management"
+)
+;; Selecting output 
+;;  Description that will occur in all output files
+(description "Spring Barley; Soil: Fine sandy loam; Weather: Taastrup")
+
+;(activate_output (after 1993 03 31 23))
+(log_prefix "Ex1/")
+(output harvest
+        ("Crop Production" (when daily))
+;;      Water balance 0-100 cm  
+        ("Field water" (to -100 [cm])(when daily)
+         (where "Daily_FWB.dlf"))  
+;;      Nitrogen balance 0-100 cm  
+        ("Field nitrogen" (to -100 [cm])(when daily)
+          (where "Daily_FNB.dlf"))  
+;;      Soil profile data
+        ("Soil Water Content"       (when daily))
+        ("Soil Water Potential (pF)"(when daily))
+        ("Soil NO3 Concentration"   (when daily))
+)
+

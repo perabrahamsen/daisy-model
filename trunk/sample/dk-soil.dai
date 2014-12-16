@@ -1,0 +1,198 @@
+;;; dk-soil.dai ---  Examles of specific Danish Soils 
+
+;;; Askov 
+
+(defhorizon "Askov Ap" ISSS4
+  "Askov 10 & 30 cm soil. Data from O.H. Jacobsen (1989): Umættet
+hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
+2030. Statens Planteavlsforsøg."
+  (clay 0.113)  (silt 0.277) 
+    (fine_sand 0.348) (coarse_sand 0.236)
+  (humus 0.026) (C_per_N 11) (dry_bulk_density 1.55 [g/cm^3])
+  (hydraulic M_vG (Theta_res 0.0)(Theta_sat 0.392)
+             (alpha 0.0385)(n 1.211)(K_sat 7.52 [cm/h])))
+
+(defhorizon "Askov B" ISSS4
+  "Askov 50 & 70 cm soil. Data from O.H. Jacobsen (1989): Umættet
+hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
+2030. Statens Planteavlsforsøg."
+  (clay 0.235)  (silt 0.253) (fine_sand 0.364) (coarse_sand 0.143)
+  (humus 0.005) (C_per_N 11) (dry_bulk_density 1.48 [g/cm^3])
+  (hydraulic M_vG (Theta_res 0.0)(Theta_sat 0.445)
+             (alpha 0.2605)(n 1.135)(K_sat 14.5[cm/h])))
+
+(defhorizon "Askov C" ISSS4
+  "Askov 90 cm soil. Data from O.H. Jacobsen (1989): Umættet
+hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
+2030. Statens Planteavlsforsøg."
+  (clay 0.244)  (silt 0.283) (fine_sand 0.357) (coarse_sand 0.111)
+  (humus 0.005) (C_per_N 11) (dry_bulk_density 1.57 [g/cm^3])
+  (hydraulic M_vG (Theta_res 0.000)(Theta_sat 0.401)
+             (alpha 0.057)(n 1.131)(K_sat 5.0 [cm/h])))
+
+(defcolumn Askov default
+  "This is a JB6 soil with free drainage macropores."
+  (Groundwater deep)
+  (Soil (MaxRootingDepth 100.00 [cm])
+        (dispersivity  4.00)
+        (horizons (  -27.00 "Askov Ap")
+                  (  -80.00 "Askov B")
+                  ( -250.00 "Askov C"))))
+
+;;; Jyndevad
+
+(defhorizon "Jyndevad Ap" ISSS4
+  "Jyndevad 15 cm soil. Data from O.H. Jacobsen (1989): Umættet
+hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
+2030. Statens Planteavlsforsøg."
+  (clay 0.038)  (silt 0.072) (fine_sand 0.183) (coarse_sand 0.684)
+  (humus 0.023) (C_per_N 13) (dry_bulk_density 1.472 [g/cm^3])
+  (hydraulic "B_BaC"
+             (Theta_res 0.036 []) (Theta_sat 0.435 []) 
+             (lambda 0.446 []) (h_b -8.4 [cm]) (K_sat 6.76e-5 [m/s])))
+
+
+(defhorizon "Jyndevad C" ISSS4
+  "Jyndevad 50 cm soil. Data from O.H. Jacobsen (1989): Umættet
+hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
+2030. Statens Planteavlsforsøg."
+  (clay 0.028)  (silt 0.023) (fine_sand 0.096) (coarse_sand 0.849)
+  (humus 0.004) (C_per_N 13) (dry_bulk_density 1.469 [g/cm^3])
+  (hydraulic "B_BaC"
+             (Theta_res 0.017 []) (Theta_sat 0.443 []) 
+             (lambda 0.687 []) (h_b -8.7 [cm]) (K_sat 1.78e-4 [m/s])))
+
+(defcolumn Jyndevad default
+  "This is a JB1 soil with free drainage"
+  (Groundwater deep)
+  (Soil (MaxRootingDepth 60 [cm])
+        (horizons (  -30.00 "Jyndevad Ap")
+                  ( -250.00 "Jyndevad C"))))
+
+;;; Foulum
+
+(defhorizon "Foulum AP" ISSS4
+  "Provided by DJF as part if the FertOrgaNic project."
+    (clay 0.115)
+    (silt 0.110)
+    (fine_sand 0.420)
+    (coarse_sand 0.332)
+    (humus 0.023)
+    (C_per_N 11.2)
+    (dry_bulk_density 1.45)  
+    (hydraulic M_vG
+        (K_sat 2.995)
+        (Theta_sat 0.46)
+        (Theta_res 0.00)
+        (alpha 0.05334)
+        (n 1.2870)))
+
+(defhorizon "Foulum B" ISSS4
+  "Provided by DJF as part if the FertOrgaNic project."
+    (clay 0.149)
+    (silt 0.101)
+    (fine_sand 0.435)
+    (coarse_sand 0.310)
+    (humus 0.005)
+    (C_per_N 11.3)
+    (dry_bulk_density 1.45) 
+    (hydraulic M_vG
+        (K_sat 1.796)
+        (Theta_sat 0.386)
+        (Theta_res 0.000)
+        (alpha 0.0398)
+        (n 1.2585)))
+
+(defhorizon "Foulum C" ISSS4
+  "Provided by DJF as part if the FertOrgaNic project."
+    (clay 0.164)
+    (silt 0.106)
+    (fine_sand 0.419)
+    (coarse_sand 0.310)
+    (humus 0.002)
+    (normalize true)
+    (C_per_N 9.1)
+    (dry_bulk_density 1.55) 
+    (hydraulic M_vG
+        (K_sat 1.038)
+        (Theta_sat 0.345)
+        (Theta_res 0.00)
+        (alpha 0.0283)
+        (n 1.2200)))
+
+(defcolumn Foulum default
+  "Provided by DJF as part if the FertOrgaNic project."
+  (Soil (MaxRootingDepth 100.00)
+        (horizons (  -30.00 "Foulum AP")
+                  (  -90.00 "Foulum B")	
+                  ( -150.00 "Foulum C")))
+  (OrganicMatter original
+                 (init (input 4411 [kg C/ha/y])
+                 (end -18 [cm])
+                 (root 911 [kg C/ha/y]))))
+
+;;; Taastrup
+
+(defhorizon "Taastrup Ap" USDA3
+  (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.024)
+  (dry_bulk_density 1.45 [g/cm^3]))
+  
+(defhorizon "Taastrup plow pan" USDA3
+  (clay 0.148)(silt 0.214)(sand 0.638) (humus 0.016)
+  (dry_bulk_density 1.78 [g/cm^3])
+  (anisotropy 12)
+  (hydraulic M_vG (Theta_res 0.00)
+                  (Theta_sat 0.339353)
+                  (alpha 0.0465371)
+                  (n 1.19395)
+                  (K_sat (* 0.5 [] 0.0925 [cm/h]))
+                  (l -2.92948)))               
+
+(defhorizon "Taastrup Bt" USDA3
+  (clay 0.222)(silt 0.195)(sand 0.583)(humus 0.016)
+  (dry_bulk_density 1.66 [g/cm^3]) 
+  (hydraulic M_vG (Theta_res 0.0)
+                (l -4.0323)
+                (n 1.14768)
+                (alpha 0.0565146)
+                (K_sat (* 0.5 [] 0.537042 [cm/h]))
+                (Theta_sat 0.356969)))  
+                                          
+(defhorizon "Taastrup C" USDA3
+  (clay 0.207)(silt 0.235)(sand 0.558) (humus 0.01)
+  (dry_bulk_density 1.69 [g/cm^3])
+  (hydraulic M_vG (Theta_res 0.000)
+                  (Theta_sat 0.348314)
+                  (alpha 0.0476257)
+                  (n 1.15336)  
+                  (K_sat 1.50000 [cm/h])
+                  (l -3.60322)))
+
+(defhorizon "Taastrup drain canyon" ISSS4
+  "Used for a 2D setup (not included here)."
+  (clay 0.213)(silt 0.190)(coarse_sand 0.244)(fine_sand  0.339)(humus 0.014)
+  (normalize true)
+  (dry_bulk_density 1.65 [g/cm^3])
+  (hydraulic M_vG (Theta_res 0.00)
+                  (Theta_sat 0.36384)
+                  (alpha 0.0351307)
+                  (n 1.14609)
+                  (K_sat 0.526775 [cm/h])
+                  (l -3.62743)))
+
+(defcolumn Taastrup default
+  "This setup is based on data collected from various projects at the KU 
+research fields in Taastrup.  It represents only the part of the fields
+where drains are active."
+  (cite "mst-agrovand")                 ;Latest published reference.
+  (Groundwater aquitard
+               (K_aquitard 0.050 [cm/h])
+               (Z_aquitard 200 [cm]))
+  (Drain lateral)
+  (Soil (MaxRootingDepth 150 [cm])
+        (horizons (-25.00 "Taastrup Ap")
+                  (-33.00 "Taastrup plow pan")
+                  (-120 "Taastrup Bt")
+                  (-200 "Taastrup C"))))
+
+;;; dk-soil.dai ends here

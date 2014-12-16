@@ -1,0 +1,146 @@
+;;; test-organic.dai -- A new organic matter template.
+
+(input file "sbarley.dai")
+(input file "tillage.dai")
+(input file "dk-soil.dai")
+(input file "log.dai")
+
+;; New SOM and SMB paramaters.
+
+(defSOM NEW-SOM-SLOW component          ;SOM1
+  (turnover_rate 1.79167e-06 [h^-1])
+  (efficiency 0.4 0.4)                  ;60% lost as CO2.
+  ;; Everything to SMB1.
+  (fractions 1 0 0 0 0))
+
+(defSOM NEW-SOM-FAST component          ;SOM2
+  (turnover_rate 5.83333e-06 [h^-1])
+  (efficiency 0.5 0.5)                  ;50% lost as CO2.
+  ;; 70% to SMB1, 30% to SOM1.
+  (fractions 0.7 0 0.3 0 0))
+
+(defSMB NEW-SMB-SLOW component          ;SMB1
+  (C_per_N 6.7)
+  (turnover_rate 7.708e-06 [h^-1])
+  (efficiency 0.6 0.6)                  ;40% lost as CO2.
+  ;; 60% to SMB2, 40% to SOM2.
+  (fractions 0 0.6 0 0.4 0)
+  (maintenance 7.5e-05 [h^-1]))
+
+(defSMB NEW-SMB-FAST component          ;SMB2
+  (C_per_N 6.7)
+  (turnover_rate 0.000416667 [h^-1])
+  (efficiency 0.6 0.6)                  ;40% lost as CO2.
+  ;; 40% to SMB2, 60% to SOM2.
+  (fractions 0 0.4 0 0.6 0)
+  (maintenance 0.000416667 [h^-1]))
+
+;; The new organic matter parameterization.
+(deforganic NewOM default
+  "New OM, same as old OM."
+  ;; Set this flag to turn on mineralization below the root zone.
+  (active_underground false)
+  ;; Maximal immobilization rate for ammonium.
+  (K_NH4 0.5 [d^-1])
+  ;; Maximal immobilization rate for nitrate.
+  (K_NO3 0.5 [d^-1])
+
+  ;; Biological incorporation of litter.
+  (Bioincorporation
+   ;; Maximal speed of incorporation.
+   (R_max 0.5 [g DM/m^2/h])
+   ;; Halflife constant.
+   (k_half 1.0 [g DM/m^2])
+   ;; Limiting factor for high C/N ratio.
+   (C_per_N_factor (50.0 1.0)
+                   (100.0 0.1)
+                   (120.0 0.01))
+   ;; Limiting factor for low temperature.
+   (T_factor (4.0 0.0)
+             (6.0 1.0))
+   ;; Fraction of C lost in respiration.
+   (respiration 0.5 [])
+   ;; Distribution of incorporated matter in the soil.
+   (distribution (-80.0 0.0)
+                 (-18.0 100.0)
+                 (0.0 100.0))
+   ;; Incorporated AM parameters.
+   (AOM "AOM-SLOW-BIOINCORPORATION" "AOM-FAST")
+   ) ;; End Bioincorporation.
+
+  ;; Turnover rate above which pools will contribute to 'CO2_fast'.
+  (CO2_threshold 1e-4 [h^-1]); // SMB2 and default AOM pools.
+  
+  ;; Soil MicroBiomass pools.
+  (smb "NEW-SMB-SLOW" "NEW-SMB-FAST")
+  ;; Soil Organic Matter pools.
+  (som "NEW-SOM-SLOW" "NEW-SOM-FAST" "SOM-INERT")
+  ;; Default heat factor, used if not specified by OM pool.
+  ;; (heat_factor)
+  ;; Default water potential factor, used if not specified by OM pool.
+  ;; (water_factor)
+  ;; Clay effect model.
+  (ClayOM "old")
+  ;; Tillage influence on turnover rates for each SMB pool.
+  ;; (smb_tillage_factor)
+  ;; Tillage influence on SOM turnover rates for each SOM pool.
+  ;; (som_tillage_factor)
+  ) ;; End NewOM.
+
+;; Use the new organic matter module.
+(defcolumn MyColumn Askov
+  (OrganicMatter NewOM)
+  )
+
+;; Redefine crop residuals for spring barley.
+(defAOM NewSB-FAST component
+  "Parameter values for the fast AOM pool of the new spring barley."
+  (turnover_rate 0.002 [h^-1])
+  (efficiency 0.5 0.5 []) ;50% loast as CO2.
+  ;; Everything to SMB2.
+  (fractions 0 1 0 []))
+
+(defAOM NewSB-SLOW component
+  "Parameter values for the slow AOM pool of the new spring barley."
+  (C_per_N 90)
+  (turnover_rate 0.0002 [h^-1])
+  (efficiency 0.5 0.5 []) ;50% loast as CO2.
+  ;; Everything to SMB2.
+  (fractions 0 1 0 [])
+  (initial_fraction 0.8 []))
+
+(defcrop NewSB "Spring Barley"
+  (Harvest (Dead "NewSB-SLOW" "NewSB-FAST")
+           (Stem "NewSB-SLOW" "NewSB-FAST")
+           (Leaf "NewSB-SLOW" "NewSB-FAST")
+           (SOrg "NewSB-SLOW" "NewSB-FAST")
+           (Root "NewSB-SLOW" "NewSB-FAST")))
+
+;; A manager using the new crop parameters.
+(defaction MyMan activity
+  (wait (at 1987 3 20 1))
+  (plowing)
+  (wait (at 1987 4 4 1))
+  (fertilize (mineral (weight 100.0 [kg N/ha])
+                      (NH4_fraction 0.5 [])))
+  (wait (at 1987 4 5 1))
+  (sow "NewSB")
+  (wait (or (crop_ds_after "NewSB" 2.0)
+            (at 1987 9 5 1)))
+  (harvest "NewSB"))
+
+;; Put it all together.
+(defprogram MySim Daisy
+  (column MyColumn)
+  (manager MyMan)
+  (time 1986 12 1 1)
+  (stop 1988 4 1 1)
+  (weather default "dk-taastrup.dwf")
+  (output ("AOM" (aom "NewSB/dead") (where "leaves.dlf"))
+          ("AOM" (aom "NewSB/root") (where "roots.dlf"))
+          (checkpoint (when (at 1987 8 7 6)))))
+
+;; Run it.
+(run MySim)
+
+;; test-organic.dai ends here.
