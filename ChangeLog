@@ -1,3 +1,7 @@
+2014-12-16  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.20f released.
+
 2014-12-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* geometry_rect.h (dimensions): If you only have one row, it is
