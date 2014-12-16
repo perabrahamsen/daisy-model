@@ -71,6 +71,18 @@ namespace CS {
     typedef std::pair<symbolic_type*, numeric_type*> lu_type;
   };
 
+  template <>
+  struct cxsparse_type_traits<double, unsigned long long int>
+  {
+    typedef double  value_type;
+    typedef long long    index_type; // CXSparse always uses signed integers
+    typedef cs_dl_sparse   matrix_type;
+    typedef cs_dl_symbolic symbolic_type;
+    typedef cs_dl_numeric  numeric_type;
+    typedef cs_dl_dmperm_results dmperm_results;
+    typedef std::pair<symbolic_type*, numeric_type*> lu_type;
+  };
+
 
   cxsparse_type_traits<double,int>::symbolic_type
   * cs_sqr_ex(int order, const cxsparse_type_traits<double,int>::matrix_type *A, int qr)

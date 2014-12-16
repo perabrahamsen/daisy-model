@@ -526,10 +526,8 @@ This loss bypasses the soil matrix entirely.")
                    (documentation "\
 Loss of mineral nitrogen stored above surface.
 
-This includes various sources that are usually rare or small,
-such as surface runoff, mineral nitrogen on leaves removed at
-harvest, and chemical transformations.  It does not include
-volatilization or infiltration.")
+This includes volatililzation, surface runoff, mineral nitrogen on
+leaves removed at harvest, and chemical transformations.")
                    (tag "Surface-Loss")
                    (dimension "${unit}"))
            (number (path column "${column}" 

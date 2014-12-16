@@ -85,7 +85,6 @@ inline double sqr (double x)
 
 inline double bound (double a, double x, double b)
 {
-  daisy_assert (a <= b);
   if (x < a)
     return a;
   if (x > b)

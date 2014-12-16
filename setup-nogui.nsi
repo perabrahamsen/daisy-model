@@ -3,7 +3,7 @@
 SetCompressor /FINAL lzma
 Name "Daisy ${VERSION}"
 OutFile "daisy-${VERSION}-setup.exe"
-InstallDir "$PROGRAMFILES\Daisy ${VERSION}"
+InstallDir "$PROGRAMFILES64\Daisy ${VERSION}"
 InstallDirRegKey HKCU "Software\Daisy ${VERSION}" "Install Directory"
 
 !define MUI_ABORTWARNING
@@ -22,6 +22,7 @@ Section "Main Install"
   WriteRegStr HKCU "Software\Daisy ${VERSION}" "Install Directory" $INSTDIR
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   CreateDirectory "$SMPROGRAMS\Daisy ${VERSION}"
+  CreateShortCut "$SMPROGRAMS\Daisy ${VERSION}\ShowDaisyOutput.lnk" "$INSTDIR\bin\ShowDaisyOutput.exe"
   CreateShortCut "$SMPROGRAMS\Daisy ${VERSION}\Home Page.lnk" "http://www.dina.kvl.dk/~daisy/"
   CreateShortCut "$SMPROGRAMS\Daisy ${VERSION}\Explore.lnk" "$INSTDIR"
   CreateShortCut "$SMPROGRAMS\Daisy ${VERSION}\Uninstall.lnk" "$INSTDIR\Uninstall.exe"

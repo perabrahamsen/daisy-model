@@ -253,7 +253,7 @@
   (k_qb 0.3 []))
 
 (defaction MARKVAND markvand 
-  "Markvand map for standard crops."
+  ;;"Markvand map for standard crops."
   (map ("Beet; V1" "roer")
        ("Silomajs" "majs")
        ("Aert" "aerter")

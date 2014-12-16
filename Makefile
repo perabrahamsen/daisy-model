@@ -31,18 +31,25 @@ OBJHOME =  $(SRCDIR)/obj
 NATIVEHOME = $(OBJHOME)
 NATIVEEXE = daisy daisyw
 USE_GUI = Q4
-BOOSTINC = -isystem $(HOME)/boost_1_49_0
+BOOSTINC = -isystem $(HOME)/boost_1_55_0
 else
 SRCDIR = ..
 OBJHOME = obj
 NATIVEHOME = $(OBJHOME)
 NATIVEEXE = daisy.exe daisyw.exe
 USE_GUI = Q4
-BOOSTINC = -isystem $(CYGHOME)/home/abraham/boost_1_51_0
-SETUPDIR = /home/abraham/daisy/install
-MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
-#MAKENSIS = "/cygdrive/c/Program Files (x86)/NSIS/makensis.exe"
-MINGWHOME = /cygdrive/c/MinGW
+BOOSTINC = -isystem $(CYGHOME)/home/xvs108/boost_1_55_0
+SETUPDIR = /home/xvs108/daisy/install
+#MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
+MAKENSIS = "/cygdrive/c/Program Files (x86)/NSIS/makensis.exe"
+#MINGWHOME = /cygdrive/c/MinGW
+MINGWHOME = /cygdrive/c/Program Files/mingw-w64/x86_64-4.9.0-posix-seh-rt_v3-rev2/mingw64/
+MINGWBIN=$(MINGWHOME)/bin
+MINGWDLL = "$(MINGWBIN)/"libgcc_s_seh-1.dll \
+	"$(MINGWBIN)/"libstdc++-6.dll \
+	"$(MINGWBIN)/"libwinpthread-1.dll
+
+
 endif
 
 SVNROOT = https://daisy-model.googlecode.com/svn
@@ -81,7 +88,7 @@ endif
 # Find the optimize flags.
 #
 ifeq ($(USE_OPTIMIZE),portable)
-	OPTEXTRA = -mtune=generic -march=pentium
+	OPTEXTRA = -mtune=generic 
 endif
 
 ifeq ($(USE_OPTIMIZE),native)
@@ -91,8 +98,6 @@ endif
 ifneq ($(USE_OPTIMIZE),none)
 	OPTIMIZE = -O3 -ffast-math -fno-finite-math-only $(OPTEXTRA)
 endif
-
-PREFIX =
 
 STRIP = strip
 
@@ -127,7 +132,7 @@ WARNING = -Wall -Wextra $(WAREXTRA) \
 # This one doesn't work (gcc 4.4 linux/amd64):
 #   -Wunreachable-code: triggered by constructors?
 
-COMPILE = $(PREFIX)gcc -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
+COMPILE = gcc -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
 CCOMPILE = $(COMPILE)
 CPPLIB = -lstdc++
 
@@ -179,7 +184,7 @@ endif
 
 # Figure out how to link.
 #
-LINK = $(PREFIX)g++ $(DEBUG) -o
+LINK = g++ $(DEBUG) -o
 NOLINK = -c
 
 # Select the C files that doesn't have a corresponding header file.
@@ -391,7 +396,7 @@ HEADERS = $(INTERFACES:.C=.h) $(HEADONLY)
 
 # Find all printable files.
 #
-TEXT =  setup-native.nsi \
+TEXT =  setup-nogui.nsi \
 	control-shared.txt ChangeLog.3 ChangeLog.2 ChangeLog.1 setup.nsi \
 	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB  $(DISABLED) \
 	$(HEADERS) $(SOURCES) $(ALLSYSHDR) $(ALLSYSSRC) \
@@ -456,10 +461,22 @@ linux:
 	 && cd $(NATIVEHOME) \
          && time $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile $(NATIVEEXE))
 
-win64:	
-	(mkdir -p i686-w64-mingw32 \
-	 && cd i686-w64-mingw32 \
-         && time $(MAKE) "BOOSTINC=-isystem ../../boost_1_49_0" PREFIX="i686-w64-mingw32-" VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile daisy.exe)
+
+make-win64-native:
+	(mkdir -p win64-native \
+	 && cd win64-native \
+         && $(MAKE) "PATH=$(MINGWBIN):$(PATH)" \
+		    "CYGHOME=C:/cygwin64" Q4HOME=c:/Qt/4.5.2\
+	            VPATH=$(SRCDIR) USE_OPTIMIZE=native \
+                    -f $(SRCDIR)/Makefile daisy${EXE})
+
+make-win64-portable:
+	(mkdir -p win64-portable \
+	 && cd win64-portable \
+         && $(MAKE) "PATH=$(MINGWBIN):$(PATH)" \
+		    "CYGHOME=C:/cygwin64" Q4HOME=c:/Qt/4.5.2\
+	            VPATH=$(SRCDIR) USE_OPTIMIZE=portable \
+                    -f $(SRCDIR)/Makefile daisy${EXE})
 
 native:	
 	(cd OpenMI && time $(MAKE) all ) \
@@ -473,11 +490,11 @@ cnative:
          && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile cdaisy.exe)
 
 cross:
-	(cd obj \
-         && $(MAKE) "PATH=/cygdrive/c/MinGW/bin:$(PATH)" \
-		    "CYGHOME=C:/cygwin" Q4HOME=c:/Qt/4.5.2\
+	(cd $(OBJHOME) \
+         && $(MAKE) "PATH=$(MINGWBIN):$(PATH)" \
+		    "CYGHOME=C:/cygwin64" Q4HOME=c:/Qt/4.5.2\
 	            VPATH=$(SRCDIR) USE_OPTIMIZE=portable \
-                    -f $(SRCDIR)/Makefile daisy${EXE} daisyw.exe)
+                    -f $(SRCDIR)/Makefile daisy${EXE})
 
 # Create manager test executable.
 #
@@ -657,7 +674,7 @@ svnci: $(TEXT)
 	$(MAKE) version.C
 	cp ChangeLog ChangeLog.old
 	echo `date "+%Y-%m-%d "` \
-	     " Per Abrahamsen  <abraham@dina.kvl.dk>" > ChangeLog
+	     " Per Abrahamsen  <pa@plen.ku.dk>" > ChangeLog
 	echo >> ChangeLog
 	echo "	* Version" $(TAG) released. >> ChangeLog
 	echo >> ChangeLog
@@ -695,7 +712,7 @@ setup:	svnci
 	$(MAKE) upload
 
 setupdocs: 
-	(cd txt && $(MAKE) PATH="$(PATH):$(Q4HOME)/bin" \
+	(cd txt && $(MAKE) PATH="$(SETUPDIR)/bin:$(PATH)" \
 		           DAISYEXE=$(SRCDIR)/$(OBJHOME)/$(DAISYEXE) \
 			   SETUPDIR=$(SETUPDIR) \
 			   DAISYPATH=".;$(SRCDIR)/lib;$(SRCDIR)/sample" setup)
@@ -708,10 +725,6 @@ setupnosvn:
 	cp ChangeLog NEWS $(SETUPDIR)
 	mkdir $(SETUPDIR)/src
 	cp $(TEXT) $(SETUPDIR)/src
-	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
-	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
-	$(MAKE) setupdocs
-	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
 	mkdir $(SETUPDIR)/bin
 	cp libdeps/ShowDaisyOutput.exe $(SETUPDIR)/bin
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
@@ -720,9 +733,34 @@ setupnosvn:
 	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
 	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
 	cp $(MINGWHOME)/bin/mingwm10.dll $(SETUPDIR)/bin
+	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
+	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
+	$(MAKE) setupdocs
+	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
 	(cd OpenMI && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
 
+setupnogui: 
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	rm -f version.C
+	$(MAKE) version.C
+	$(MAKE) cross
+	rm -rf $(SETUPDIR)
+	mkdir $(SETUPDIR)
+	cp ChangeLog NEWS $(SETUPDIR)
+	mkdir $(SETUPDIR)/src
+	cp $(TEXT) $(SETUPDIR)/src
+	mkdir $(SETUPDIR)/bin
+	cp libdeps/ShowDaisyOutput.exe $(SETUPDIR)/bin
+	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
+	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll $(OBJHOME)/daisy.dll
+	cp $(MINGWDLL) $(SETUPDIR)/bin
+	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
+	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
+	$(MAKE) setupdocs
+	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
+	(cd OpenMI && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
+	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup-nogui.nsi
 
 upload:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
@@ -731,22 +769,8 @@ upload:
 		-l Type-Installer,OpSys-Windows,Featured \
 		daisy-$(TAG)-setup.exe
 
-setup-native: 
-	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	$(MAKE) win64
-	rm -rf install
-	mkdir install
-	cp ChangeLog NEWS install
-	mkdir install/src
-	cp $(TEXT) install/src
-	(cd lib && $(MAKE) SETUPDIR=../install TAG=$(TAG) setup)
-	(cd sample && $(MAKE) SETUPDIR=../install TAG=$(TAG) setup)
-	mkdir install/bin
-	$(STRIP) -o install/bin/daisy.exe i686-w64-mingw32/daisy.exe
-	$(STRIP) -o install/bin/daisy.dll i686-w64-mingw32/daisy.dll
-	cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libgcc_s_sjlj-1.dll install/bin
-	cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libstdc++-6.dll install/bin
-	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup-native.nsi
+setup-win64: 
+	make setupnogui OBJHOME=win64-portable
 
 debiannosvn: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi

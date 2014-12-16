@@ -820,6 +820,14 @@ BioclimateStandard::WaterDistribution (const Units& units,
   const double below_canopy_ep = below_snow_ep - canopy_ep;
   const double canopy_ep_dry = total_ep_dry * canopy_cover;
   const double below_canopy_ep_dry = total_ep_dry - canopy_ep_dry;
+  if (below_canopy_ep_dry < 0.0 || !std::isfinite (below_canopy_ep_dry))
+    {
+      std::ostringstream tmp;
+      tmp << "below_canopy_ep_dry = " << below_canopy_ep_dry
+	  << ", total_ep_dry = " << total_ep_dry 
+	  << ", canopy_cover = " << canopy_cover;
+      daisy_warning (tmp.str ());
+    }
 
   daisy_assert (canopy_ep >= 0.0);
   if (snow_water_out < 0.0)
@@ -971,7 +979,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
   // 6 Soil
 
-  soil_ep = bound (0.0, pond_ep - pond_ea_, below_canopy_ep_dry);
+  soil_ep = bound (0.0, pond_ep - pond_ea_, 
+		   std::max (0.0, below_canopy_ep_dry));
   soil_ea_ = surface.exfiltration (dt);
   daisy_assert (soil_ea_ >= 0.0);
   total_ea_ += soil_ea_;

@@ -23,6 +23,7 @@
 
 #include "mathlib.h"
 #include "assertion.h"
+#include <sstream>
 
 #if !defined (__unix)
 // Apparently not provided on Borland C++ 5.0 or 5.5.
@@ -77,7 +78,18 @@ first_order_change (const double old_storage /* [M] */,
   const double gain = I * dt;
 
   // Now we can check mass balance
-  daisy_approximate (S1 - S0, gain - loss);
+  if (!approximate (S1 - S0, gain - loss)
+      && !approximate (S1, S0))
+    {
+      std::ostringstream tmp;
+      tmp << "S0 = " << S0;
+      tmp << "; S1 = " << S1;
+      tmp << "; loss = " << loss;
+      tmp << "; gain = " << gain;
+      tmp << "\nS1 - S0 = " << S1 - S0;
+      tmp << "; gain - loss = " << gain - loss;
+      daisy_warning (tmp.str ());
+    }
 
   if (S1 >= 0)
     {

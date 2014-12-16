@@ -1,6 +1,4 @@
-TODO --- things that needs to be done with Daisy -*- org -*-
-
-* MST Tillage
+TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** Hydraulic WEPP
 
@@ -11,6 +9,24 @@ En horizont bliver "behandlet" hvis den overlapper med jordbehandling.
 
 *** set_hypress_parametre (texture, dry_bi
 
+* Emacs
+
+
+** (export DAISYHOME)
+
+** (export PATH ... libdeps?)
+
+* Oversæt på HP
+
+** Skal vi have to udgaver, 32 generisk og 64 bit native? 
+
+** Qt 4? 
+
+* Kopier X61 HD, sluk maskine
+
+* Installar Daisy build på HP.
+
+
 * Biopore flow 
 
 ** Calculate "M" for hver celle, biopore klasse, og stof.
@@ -20,38 +36,6 @@ En horizont bliver "behandlet" hvis den overlapper med jordbehandling.
 ** Add M, flux til stof
 
 ** J_p
-
-* Kopier X61 HD, sluk maskine
-
-* Installar Daisy build på HP.
-
-* Jordbehandling 
-
-** Kig på Agrovand
-
-*** Udtræk data
-
-**** Gem filer i cpedata format
-
-**** ret og kør test-cpe.dai for alle plots
-
-**** Sammenlign gamle plot4 data
-
-*** Kør plot4 simulering
-
-*** Generer grafer 
-
-*** Sammenlign data
-
-*** Ret og kør plot 1-3 simuleringer
-
-*** Generer grafer
-
-*** Sammenlign data
-
-** Marie infiltration til ledningsevne
-
-** MAHA fuldtid efter 17/4 
 
 * Rodartikel ES&M
 
