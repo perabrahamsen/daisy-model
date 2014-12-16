@@ -399,10 +399,11 @@ TEXT =  setup-native.nsi \
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = groundwater_pipe.C horizon_std.C 
+REMOVE = 
 
 
-REMOVED = ABAeffect_exp.C ABAeffect.C ABAeffect.h \
+REMOVED = groundwater_pipe.C horizon_std.C \
+	ABAeffect_exp.C ABAeffect.C ABAeffect.h \
 	stomatacon_Leuning.C stomatacon_BB.C \
 	select_pF.C avalue.C alist.C avalue.h alist.h syntax.h syntax.C \
 	msoltranrect_2x1.C msoltranrect_forward.C\
