@@ -1,0 +1,49 @@
+* Focus GW
+
+** MACRO runs
+
+10 A Karup
+11 B Karup
+12 A Langvad
+13 B Langvad
+14 C Langvad
+15 C Karup
+
+** Crop 
+
+Winter Cereals
+
+Sow jday 265
+Harvest jday 233
+
+** Application
+
+1 kg/ha Nov-20 (jday 315)
+Koc	halflife	tref	vap	VpTemp	name	pf	expb	tresp	freund	inform	diffusion	fstar	fext	candeg	FOCUStest
+103	60	20	0.0000001	20	GW-A	2	0.7	0.079	0.9	FOCUS GW test	5E-10	0.5	0.01	0.2	-1
+17	20	20	0.1	20	GW-B	2	0.7	0.079	0.9	FOCUS GW test	5E-10	0.5	0.01	0.2	-1
+172	20	20	0.0000001	20	GW-C	2	0.7	0.079	0.9	FOCUS GW test	5E-10	0.5	0.01	0.2	-1
+
+** Langvad
+
+MaxPen 1.2
+Drain depth 1.3 m, distance 2 * 12 m
+Tamp = 8, TAvg = 8
+
+soil	horizon	z	ksatmin	ksm	tporv	xmpor	wilt	resid	zlamb	ascale	cten	gamma	zn	za	zm	zp	oc	ph	id	desig	texture	structure	divhor
+Langvad	1	20	90	0.5	45	43	14	4	0.15	20	10	1.5	5	1	1	0	2.1	-99	10	Ap	sandy loam	moderate medium blocky	5
+Langvad	2	20	360	0.1	36	34	12	4	0.15	20	12	1.65	5	1	1	0	1.42	-99	10	Eb	sandy loam	weak medium blocky	2
+Langvad	3	30	360	0.1	36	34	12	4	0.15	20	12	1.7	5	1	1	0	0.5	-99	10	Ebg	sandy loam	weak medium blocky	2
+Langvad	4	180	26	0.08	34	33	15	3	0.15	20	25	1.76	5	1	1	0	0.26	-99	10	BCg	sandy loam	weak coarse prismatic	6
+
+** Karup
+
+MaxPen 0.8
+free drainage
+Tamp = 7.8, TAvg = 8
+
+soil	horizon	z	ksatmin	ksm	tporv	xmpor	wilt	resid	zlamb	ascale	cten	gamma	zn	za	zm	zp	oc	ph	id	desig	texture	structure	divhor
+Karup	1	20	200	1	42	34	10	0	0.2	1	15	1.51	6	1	1	0	2.2	-99	11	Ap	loamy sand	weak fine granular	5
+Karup	2	20	125	2	42	32	6	0	0.29	1	15	1.55	6	1	1	0	1.74	-99	11	B1	sand	structureless	2
+Karup	3	30	125	2	42	32	6	0	0.29	1	15	1.55	6	1	1	0	0.3	-99	11	B2	sand	structureless	2
+Karup	4	180	720	10	42	32	4	2.5	0.72	1	10	1.53	6	1	0.8	0	0.2	-99	11	BC	sand	structureless	6

@@ -1,0 +1,51 @@
+;;; setup.dai --- Biochar effect evaluation
+
+(input file "log-std.dai")
+(input file "dk-management.dai")
+(input file "dk-soil.dai")
+
+(defcolumn J Jyndevad)
+
+(defcolumn J50 J
+  (Soil (MaxRootingDepth 50 [cm])
+        (horizons (  -30.00 "Jyndevad Ap")
+                  ( -250.00 "Jyndevad C"))
+        ))
+
+(defhydraulic Biochar "B_BaC"
+  (Theta_res 0.017 []) (Theta_sat 0.443 []) 
+  (lambda 0.555 []) (h_b -8.7 [cm]) (K_sat (* 0.38 [] 1.78e-4 [m/s])))
+
+(defhorizon "Jyndevad B*" "Jyndevad C"
+  (hydraulic Biochar))
+
+(defcolumn J100 J
+  (Soil (MaxRootingDepth 100 [cm])
+        (horizons (  -30.00 "Jyndevad Ap")
+                  ( -100.00 "Jyndevad B*")
+                  ( -250.00 "Jyndevad C"))))
+
+(defprogram SBarley Daisy
+  (time 1997 3 1)
+  (stop 2005 11 1)
+  (column J50 J100)
+  (weather default "dk-jyndevad.dwf")
+  (manager (repeat "SBarley w. MF"))
+  (output harvest 
+          ("Field nitrogen" (column J50) (when (and monthly (month 4))))
+          ("Field nitrogen" (column J100) (when (and monthly (month 4))))))
+
+(defprogram WWheat SBarley
+  (manager (repeat "WWheat w. MF")))
+
+(defprogram HTAB hydraulic
+  "Jyndevad B*"
+  (top_soil false))
+
+(run SBarley)
+
+;;(run WWheat)
+
+;;(run HTAB)
+
+;;; setup.dai ends here.

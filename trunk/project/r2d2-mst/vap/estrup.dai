@@ -1,0 +1,683 @@
+;;; estrup.dai -- Estrup VAP area -- data from GEUS.
+
+;; Chemistry
+
+(defchemistry Estrup multi
+  (combine Bromide 
+           colloids Glyphosate Dimethoate Fenpropimorph
+           ))
+
+;; Soil 
+
+(defhorizon Estrup_Ap_base VAP_Ap
+  (clay 14.6 [%]) (silt 23.33 [%])(sand 62.07 [%])
+  (humus (C2OM (C 3.248 [%]))) (dry_bulk_density 1.51 [g/cm^3])
+  (hydraulic MACRO 
+             (Theta_b 36 [%]) (Theta_res 0.0 [%])
+             (n 1.16 []) 
+             ;; (K_b 0.1 [mm/h])
+             (K_b 0.5 [mm/h])
+             (l 0.5 []) (alpha 0.02 [cm^-1])
+             (Theta_sat 41 [%]) (K_sat 238 [mm/h]) (h_b -5 [cm]) (n_ma 4 [])))
+  
+(defhorizon Estrup_Ap Estrup_Ap_base
+  (hydraulic original
+             (enable_Theta_macro false)
+             (enable_K_macro false)))
+
+(defhorizon Estrup_Ap_hypres Estrup_Ap_base
+  (hydraulic hypres) (secondary_domain none))
+
+(defhorizon Estrup_Ap_MACRO Estrup_Ap_base
+  (hydraulic original (K_b 0.1 [mm/h]))
+  (secondary_domain none))
+
+;;(defhorizon Estrup_Ap_surface Estrup_Ap
+;;  (hydraulic original
+;;             ;; 50%
+;;             (K_b 0.05 [mm/h])))
+
+(defhorizon Estrup_Ap_surface Estrup_Ap
+  (hydraulic M_vG_compact
+             (Theta_sat 0.363337 [])
+             (ref_n 1.16 []) 
+             (ref_K_sat 0.507772 [cm/h])
+             (mod_alpha (0 1) (1 1))
+             (mod_n  (0 1) (1 1))
+             (mod_K_sat  (0.3 0.001) (0.363337 1))
+             (Theta_res 0 [%])
+             (ref_alpha 0.02 [cm^-1])))
+
+
+(defhorizon Estrup_B_base VAP_B
+  (clay 21.7 [%]) (silt 17.87 [%])(sand 60.43 [%])
+  (humus (C2OM (C 0.812 [%]))) (dry_bulk_density 1.68 [g/cm^3])
+  (hydraulic MACRO
+             (Theta_b 35 [%]) (Theta_res 0.0 [%])
+             (n 1.14 []) (K_b 0.3 [mm/h]) (l 0.5 []) (alpha 0.01 [cm^-1])
+             (Theta_sat 37 [%]) (K_sat 10 [mm/h]) (h_b -15 [cm]) (n_ma 4 [])))
+
+(defhorizon Estrup_B Estrup_B_base
+  (secondary_domain vap_nocracks)
+  (hydraulic original
+             (enable_Theta_macro false)
+             (enable_K_macro false)))
+
+(defhorizon Estrup_B_hypres Estrup_B_base
+  (hydraulic hypres) (secondary_domain none))
+
+(defhorizon Estrup_B_MACRO Estrup_B_base
+  (secondary_domain none))
+
+(defhorizon Estrup_B_plow_pan Estrup_B
+  ;; 10% of B.
+  (hydraulic original (K_b 0.03 [mm/h])))
+
+(defhorizon Estrup_C1_base VAP_C
+  (secondary_domain vap_nocracks)
+  (clay 26.75 [%]) (silt 14.23 [%])(sand 59.02 [%])
+  (humus (C2OM (C 0.203 [%]))) (dry_bulk_density 1.73 [g/cm^3])
+  (hydraulic MACRO
+             (Theta_b 32 [%]) (Theta_res 0.0 [%])
+             (n 1.1 []) (K_b 0.3 [mm/h])
+             (l 0.5 []) (alpha 0.01 [cm^-1])
+             (Theta_sat 34 [%]) (K_sat 12 [mm/h]) (h_b -12 [cm]) (n_ma 4 [])))
+
+(defhorizon Estrup_C1 Estrup_C1_base
+  (hydraulic original
+             (enable_Theta_macro false)
+             (enable_K_macro false)))
+
+(defhorizon Estrup_C1_hypres Estrup_C1_base
+  (hydraulic hypres) (secondary_domain none))
+
+(defhorizon Estrup_C1_MACRO Estrup_C1_base
+  (secondary_domain none))
+
+(defhorizon Estrup_C2_base VAP_C
+  (secondary_domain vap_nocracks)
+  (clay 25.7 [%]) (silt 22.2 [%])(sand 52.1 [%])
+  (humus (C2OM (C 0.233 [%]))) (dry_bulk_density 1.64 [g/cm^3])
+  (hydraulic MACRO
+             (Theta_b 39 [%]) (Theta_res 0.0 [%])
+             (n 1.1 []) (K_b 0.16 [mm/h])
+             (l 0.5 []) (alpha 0.005 [cm^-1])
+             (Theta_sat 40 [%]) (K_sat 0.5 [mm/h]) (h_b -10 [cm]) (n_ma 4 [])))
+
+(defhorizon Estrup_C2 Estrup_C2_base
+  (hydraulic original
+             (enable_Theta_macro false)
+             (enable_K_macro false)))
+
+(defhorizon Estrup_C2_hypres Estrup_C2_base
+  (hydraulic hypres) (secondary_domain none))
+
+(defhorizon Estrup_C2_MACRO Estrup_C2_base
+  (secondary_domain none))
+
+(defcolumn Estrup VAP
+  (Surface (LocalDetentionCapacity 5 [cm]))
+  (Groundwater file "dk-estrup.gwt"
+               ;; GWT is measured at top of terrain.
+               ;; Offset is calibrated based on drainage measurments.
+               ;; -2 cm is too high, -10 cm is too low
+               (offset -5 [cm]))
+  (Chemistry Estrup)
+  (Soil (horizons (  -3.00 Estrup_Ap_surface)
+                  ( -27.00 (Estrup_Ap (anisotropy 100)))
+                  ( -35.00 Estrup_B_plow_pan)
+                  ( -55.00 Estrup_B)
+                  (-105.00 Estrup_C1)
+                  (-500.00 Estrup_C2))
+        (MaxRootingDepth 150 [cm])))
+
+(defcolumn Estrup-1D Estrup
+  (Drain lateral
+         (L 13 [m])
+         (pipe_position -110.0 [cm])))
+
+(defcolumn Estrup-2D Estrup
+  (Movement Rorrende-2D
+            (Tertiary (VAP
+                       (classes ("matrix_0cm" (height_end -27 [cm])) 
+                                ("matrix_2cm")
+                                ("drain_2cm")
+                                ("matrix_30cm" (height_start -30 [cm]))
+                                ("drain_30cm" (height_start -30 [cm])))))
+            (Geometry (zplus -1.5 -3
+                             -5 -10 -20 -25 -27 
+                             -30 -35 -40 -50 
+                             -70 -90 -105 
+                             -115 -150 -200 -275 -350 -425 -500 [cm])
+                      (xplus 10 25 50 100 150 200 300 400 500 650 [cm]))))
+
+(defcolumn Estrup-1C-Drain Estrup
+  (area 20 [cm^2])
+  (Movement original 
+            (Tertiary (VAP 
+                       (classes ("matrix_0cm" (height_end -27 [cm])) 
+                                ("drain_2cm" (density 23 [m^-2]))
+                                ("drain_30cm" 
+                                 (density 7 [m^-2])
+                                 (height_start -30 [cm])))))))
+
+(defcolumn Estrup-1C-Center Estrup
+  (area 630 [cm^2])
+  (Drain lateral
+         (L 13 [m])
+         (x 325 [cm])
+         (pipe_position -110.0 [cm]))
+  (Movement original 
+            (Tertiary (VAP 
+                       (classes ("matrix_0cm" (height_end -27 [cm]))
+                                ("matrix_2cm" (density 23 [m^-2]))
+                                ("matrix_30cm" 
+                                 (density 7 [m^-2])
+                                 (height_start -30 [cm])))))))
+
+;; Management.
+
+(defaction Estrup activity
+  (wait (at 2000 04 11))
+    ;; Ploughed depth 22 cm
+    (plowing (depth -22 [cm]))
+    ;; Sedbed preparation and harrowed and packed
+    (seed_bed_preparation)
+    (disk_harrowing)
+  (wait (at 2000 04 12))
+    ;; Spring barley sown -cultivare Barke - 
+    ;; seeding ratte 160 kg/ha sowing depth 4 cm. rowdistance 12 cm - 306/m2
+    (sow "Spring Barley")
+  ;; 2000=04=25	BBCH stage 09 - emergence
+  (wait (at 2000 04 27))
+    ;; Fertilization 131 N, 19 P, 63 K, kg/ha
+    (fertilize (NPK01 (weight 131 [kg/ha])))
+  ;; 2000=05=04	Rolled
+  ;; 2000=05=12	BBCH stage 13
+  ;; 2000=05=15	BBCH stage 14
+  ;; 2000=05=15	Ally (metsulfuron methyl) - weeds - 1 tablet/ha
+  ;; 2000=05=15	Manganes sulfate - 2.0 l/ha
+  (wait (at 2000 05 15))
+    ;; Potassium bromide molar mass 119.002 g/mol
+    ;; Bromine atomic weight 79.904 g/mol
+    ;; 30 kg potassium bromide = 30 * (79.904 / 119.002) = 20.14 kg bromine
+    (spray Bromide 20.14 [kg/ha])
+  ;; 2000=05=22	BBCH stage 22
+  ;; 2000=05=31	BBCH stage 32
+  ;; 2000=05=31	Biomass  68 g/m2 - 100% DM
+  ;; 2000=05=31	Barnon Plus 3 - (flamprop-M-isopropyl) - weeds - 3.0 l/ha
+  ;; 2000=06=06	BBCH stage 35
+  ;; 2000=06=07	Fertilization manganes sulfate - 3.0 l/ha
+  ;; 2000=06=13	BBCH stage 39
+  (wait (at 2000 06 15))
+    ;; Tilt Top (propiconazol + fenpropimorph) - fungi - 0.5  l/ha
+    ;; Tilt Top: 375  g/l  fenpropimorph
+    (spray Fenpropimorph 187.5 [g/ha])
+    ;; Perfektion 500 S (dimethoat) - pests - 0.4 l/ha
+    ;; Perfekthion 500 S: 500  g/l  dimethoat
+    (spray Dimethoate 200.0 [g/ha])
+  ;; 2000=06=20	BBCH stage 49
+  ;; 2000=06=20	Biomass 342 g/m2 - 100% DM
+  ;; 2000=06=27	BBCH stage 57
+  ;; 2000=07=04	BBCH stage 69
+  (wait (at 2000 07 05))
+    ;; Tilt Top (propiconazol + fenpropimorph) - fungi - 0.5  l/ha
+    ;; Tilt Top: 375  g/l  fenpropimorph
+    (spray Fenpropimorph 187.5 [g/ha])
+    ;; Perfektion 500 S (dimethoat) - pests - 0.4 l/ha
+    ;; Perfekthion 500 S: 500  g/l  dimethoat
+    (spray Dimethoate 200.0 [g/ha])
+  ;; 2000=07=11	BBCH stage 75
+  ;; 2000=07=12	Biomass 733 g/m2 - 100% DM
+  ;; 2000=07=18	BBCH stage 78
+  ;; 2000=07=25	BBCH stage 83
+  ;; 2000=08=01	BBCH stage 85
+  ;; 2000=08=08	BBCH stage 88
+  ;; 2000=08=15	BBCH stage 90
+  ;; 2000=08=22	BBCH stage 93
+  ;; 2000=08=25	BBCH stage 97
+  (wait (at 2000 08 28))
+    ;; BBCH stage 99
+    ;; Harvest.Stubleheight 10 cm 
+    ;; Grain yield  52.60 hkg/ha 85% DM, strawyield 13.05 hkg/ha 100% DM
+    (harvest "Spring Barley" (stub 10 [cm]) (leaf 0.3 []) (stem 0.3 []))
+    ;;(set_porosity (depth -1 [cm]) (porosity 0.3))
+  (wait (at 2000 10 13))
+    ;; Roundup Bio - weeds - 4.0 l/ha 
+    ;; 360 g/l * 4.0 l/ha = 1440 g/ha
+    (spray Glyphosate 1440 [g/ha])
+  (wait (at 2000 10 23))
+    ;; Ploughed - depth 20 cm
+    (plowing (depth -20 [cm]))
+    ;;(set_porosity (depth -1 [cm]) (porosity 0.363337))
+  ;; 2001=05=01	Fertilization 20 P, 105 K, kg/ha
+  (wait (at 2001 05 02))
+    ;; Seed bed preparation depth 9-10 cm
+    (seed_bed_preparation -9.5 [cm])
+  (wait (at 2001 05 02))
+    ;; Sowing peas - cultivare Julia - depth 4 cm rowdistance 12 cm 
+    ;; seeding rate 230 kg/ha. Final plantnumber 130/m2
+    (sow Pea)
+  ;; 2001=05=03	Rolled with Cambridge roller
+  ;; 2001=05=13	Emergemce - BBCH stage 9
+  ;; 2001=05=18	BBCH stage 11
+  ;; 2001=05=22	BBCH stage 33
+  ;; 2001=05=22	Biomass 116 g/m2 - 100% DM
+  ;; 2001=05=22	Basagran 480 (bentazon)  - weeds - 1.0 l/ha
+  ;; 2001=05=22	Stomp (pendimethalin) - weeds - 1.5 l/ha
+  ;; 2001=06=05	BBCH stage 37-39
+  ;; 2001=06=19	BBCH stage 46-47
+  ;; 2001=06=27	BBCH stage 53
+  ;; 2001=06=27	Pirimor G (pirimicarb) - pests - 0.25 kg/ha
+  ;; 2001=07=02	BBCH stage 60
+  ;; 2001=07=02	Biomass 458,6 g/m2 - 100% DM
+  ;; 2001=07=19	BBCH stage 69
+  ;; 2001=07=19	Biomass 951.4 g/m2 - 100% DM
+  ;; 2001=08=01	BBCH stage 76
+  ;; 2001=08=15	BBCH stage 81
+  ;; 2001=08=15	Biomass 1032.5 g/m2 - 100% DM
+  ;; 2001=08=22	BBCH stage 90
+  (wait (at 2001 08 22))
+    ;; Harvest of peas. Seed yield 51.8 hkg/ha 86% dry matter.
+    ;; 2001=08=30	Spreading of pea straw
+    ;; Daisy: We leave stem and leaf rather than remove it and return it.
+    (harvest Pea (stem 0.0) (leaf 0.0))
+  (wait (at 2001 10 18))
+    ;; Ploughed - depth 20 cm
+    (plowing (depth -20 [cm]))
+  (wait (at 2001 10 19))
+    ;; Winter wheat sown cv.Ritmo. depth 4.0 cm 
+    ;; rowdistance 12 cm seeding rate 280 kg/ha. final plantnumber 556/m2 
+    (sow "Winter Wheat")
+  ;; 2001=10=31	Emergence - BBCH stage 09
+  ;; 2001=11=20	BBCH stage 11-12
+  ;; 2001=11=20	Oxitril CM (ioxynil-bromoxynil) - weeds - 1.0 l/ha
+  (wait (at 2002 03 22))
+    ;; Fertilization 73.5 N, 10.5 P, 35 K, kg/ha
+    (fertilize (NPK01 (weight 73.5 [kg/ha])))
+  ;; 2002=04=02	BBCH stage 20
+  ;; 2002=04=09	BBCH stage 21
+  ;; 2002=04=16	BBCH stage 22
+  ;; 2002=04=22	BBCH stage 23
+  ;; 2002=04=22	Biomass 73.2 g/m2 - 100% DM
+  (wait (at 2002 04 24))
+    ;; Fertilization 73.5 N, 10.5 P, 35 K, kg/ha
+    (fertilize (NPK01 (weight 73.5 [kg/ha])))
+  ;; 2002=04=25	Gratil 75 WP (amidosulfuron) - weeds - 0.02 kg/ha
+  ;; 2002=04=30	BBCH stage 30
+  ;; 2002=05=07	BBCH stage 32
+  ;; 2002=05=13	Metaxon (MCPA) - weeds - 2.0 l/ha 
+  ;; 2002=05=14	BBCH stage 34
+  ;; 2002=05=21	BBCH stage 36
+  ;; 2002=05=27	BBCH stage 37
+  ;; 2002=05=27	Tilt 250 EC (propiconazol) - fungi - 0.25 l/ha
+  ;; 2002=05=28	BBCH stage 37
+  ;; 2002=06=04	BBCH stage 45
+  ;; 2002=06=07	BBCH stage 51
+  ;; 2002=06=07	Biomass 1022.7 g/m2 - 100% DM
+  ;; 2002=06=11	BBCH stage 57
+  ;; 2002=06=17	BBCH stage 65
+  ;; 2002=06=17	Tilt 250 EC (propiconazol) - fungi - 0.25 l/ha
+  ;; 2002=06=18	BBCH stage 65
+  ;; 2002=06=24	Pirimor G (pirimicarb) - pests - 0.25 kg/ha
+  ;; 2002=06=25	BBCH stage 69
+    )
+
+;; Output
+
+(deflog "Estrup Drain" column
+  (column "Estrup")
+  (where "log/Estrup-drain.dlf")
+  (when hourly)
+  (entries (number (tag "Surface water")
+                   (description "\
+Flux of water from surface to drain through biopores, bypassing the matrix.")
+                   (path column "${column}" Movement "*" 
+                         Tertiary biopores classes drain infiltration)
+                   (spec biopore drain infiltration)
+                   (handle sum)
+                   (dimension "mm"))
+           (interval (tag "Ap03 water")
+                     (from 0 [cm])
+                     (to -3 [cm])
+                     (path column "${column}" SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "Ap water")
+                     (from -3 [cm])
+                     (to -27 [cm])
+                     (path column "${column}" SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "Bplow water")
+                     (from -27 [cm])
+                     (to -35 [cm])
+                     (path column "${column}" SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "B50 water")
+                     (from -35 [cm])
+                     (to -50 [cm])
+                     (path column "${column}" SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm"))
+           (number (tag "Surface water tertiary")
+                   (path column "${column}" Movement "*" 
+                         Tertiary biopores classes matrix infiltration)
+                   (spec biopore matrix infiltration)
+                   (handle sum)
+                   (dimension "mm"))
+           (interval (tag "Ap03 water tertiary")
+                     (from 0 [cm])
+                     (to -3 [cm])
+                     (path column "${column}" SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "Ap water tertiary")
+                     (from -3 [cm])
+                     (to -27 [cm])
+                     (path column "${column}" SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "Bplow water tertiary")
+                     (from -27 [cm])
+                     (to -35 [cm])
+                     (path column "${column}" SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "B50 water tertiary")
+                     (from -35 [cm])
+                     (to -50 [cm])
+                     (path column "${column}" SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm"))))
+
+(deflog "Estrup Content" "VAP Content"
+  (where "log/Estrup-content.dlf")
+  (when daily)
+  (entries &old))
+
+;; Program
+
+(defprogram Estrup VAP
+  "Simulation for the Estrup PLAP station."
+  (station "Estrup")
+  (manager Estrup)
+  (weather default "dk-Estrup-hourly.dwf"
+           (PrecipScale 1.41 1.42 1.35 1.24 1.13 1.11
+                        1.10 1.10 1.11 1.14 1.23 1.37 []))
+  
+  (time 1999 9 1)
+  (stop 2002 4 13)
+
+  (output &old
+          ("Estrup Drain")
+          ("Estrup Content")))
+
+(defprogram Estrup-1D Estrup
+  (column Estrup-1D))
+
+(defprogram Estrup-2D Estrup
+  (column Estrup-2D))
+
+(defprogram Estrup-1C-Center Estrup
+  (column Estrup-1C-Center))
+
+(defprogram Estrup-1C-Drain Estrup
+  (column Estrup-1C-Drain))
+
+(defprogram Estrup-2C Estrup
+  (column Estrup-1C-Drain Estrup-1C-Center))
+
+;; Plots
+
+(defxysource "Retention Ap Estrup Daisy" "Retention Daisy" 
+  (y (convert (soil_Theta (horizon "Estrup_Ap")
+                          (top_soil true)
+                          (h x))
+              [%])))
+
+(defxysource "Retention Ap Estrup MACRO" "Retention MACRO" 
+  (y (convert (soil_Theta (horizon "Estrup_Ap_MACRO")
+                          (top_soil true)
+                          (h x))
+              [%])))
+
+(defxysource "Retention Ap Estrup HYPRES" "Retention HYPRES"
+  (y (convert (soil_Theta (horizon "Estrup_Ap_hypres")
+                          (top_soil true)
+                          (h x))
+              [%])))
+
+(defxysource "Conductivity Ap Estrup Daisy" "Conductivity Daisy" 
+  (y (convert (soil_K (horizon "Estrup_Ap")
+                      (top_soil true)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity Ap Estrup MACRO" "Conductivity MACRO" 
+  (y (convert (soil_K (horizon "Estrup_Ap_MACRO") 
+                      (top_soil true)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity Ap Estrup HYPRES" "Conductivity HYPRES"
+  (y (convert (soil_K (horizon "Estrup_Ap_hypres")
+                      (top_soil true)
+                      (h x))
+              [cm/d])))
+
+(defgnuplot "Retention Ap Estrup" "Retention All"
+  (hor "Ap")
+  (source "Retention Ap Estrup HYPRES"
+          "Retention Ap Estrup Daisy"
+          "Retention Ap Estrup MACRO"))
+
+(defgnuplot "Conductivity Ap Estrup" "Conductivity All"
+  (hor "Ap")
+  (source "Conductivity Ap Estrup HYPRES"
+          "Conductivity Ap Estrup Daisy"
+          "Conductivity Ap Estrup MACRO"))
+
+(defxysource "Retention B Estrup Daisy" "Retention Daisy" 
+  (y (convert (soil_Theta (horizon "Estrup_B")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Retention B Estrup MACRO" "Retention MACRO" 
+  (y (convert (soil_Theta (horizon "Estrup_B_MACRO")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Retention B Estrup HYPRES" "Retention HYPRES"
+  (y (convert (soil_Theta (horizon "Estrup_B_hypres")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Conductivity B Estrup Daisy" "Conductivity Daisy" 
+  (y (convert (soil_K (horizon "Estrup_B")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity B Estrup MACRO" "Conductivity MACRO" 
+  (y (convert (soil_K (horizon "Estrup_B_MACRO")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity B Estrup HYPRES" "Conductivity HYPRES"
+  (y (convert (soil_K (horizon "Estrup_B_hypres")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defgnuplot "Retention B Estrup" "Retention All"
+  (hor "B")
+  (source "Retention B Estrup HYPRES"
+          "Retention B Estrup Daisy"
+          "Retention B Estrup MACRO"))
+
+(defgnuplot "Conductivity B Estrup" "Conductivity All"
+  (hor "B")
+  (source "Conductivity B Estrup HYPRES"
+          "Conductivity B Estrup Daisy"
+          "Conductivity B Estrup MACRO"))
+
+(defxysource "Retention C1 Estrup Daisy" "Retention Daisy" 
+  (y (convert (soil_Theta (horizon "Estrup_C1")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Retention C1 Estrup MACRO" "Retention MACRO" 
+  (y (convert (soil_Theta (horizon "Estrup_C1_MACRO")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Retention C1 Estrup HYPRES" "Retention HYPRES"
+  (y (convert (soil_Theta (horizon "Estrup_C1_hypres")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Conductivity C1 Estrup Daisy" "Conductivity Daisy" 
+  (y (convert (soil_K (horizon "Estrup_C1")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity C1 Estrup MACRO" "Conductivity MACRO" 
+  (y (convert (soil_K (horizon "Estrup_C1_MACRO")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity C1 Estrup HYPRES" "Conductivity HYPRES"
+  (y (convert (soil_K (horizon "Estrup_C1_hypres")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defgnuplot "Retention C1 Estrup" "Retention All"
+  (hor "C1")
+  (source "Retention C1 Estrup HYPRES"
+          "Retention C1 Estrup Daisy"
+          "Retention C1 Estrup MACRO"))
+
+(defgnuplot "Conductivity C1 Estrup" "Conductivity All"
+  (hor "C1")
+  (source "Conductivity C1 Estrup HYPRES"
+          "Conductivity C1 Estrup Daisy"
+          "Conductivity C1 Estrup MACRO"))
+
+(defxysource "Retention C2 Estrup Daisy" "Retention Daisy" 
+  (y (convert (soil_Theta (horizon "Estrup_C2")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Retention C2 Estrup MACRO" "Retention MACRO" 
+  (y (convert (soil_Theta (horizon "Estrup_C2_MACRO")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Retention C2 Estrup HYPRES" "Retention HYPRES"
+  (y (convert (soil_Theta (horizon "Estrup_C2_hypres")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Conductivity C2 Estrup Daisy" "Conductivity Daisy" 
+  (y (convert (soil_K (horizon "Estrup_C2")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity C2 Estrup MACRO" "Conductivity MACRO" 
+  (y (convert (soil_K (horizon "Estrup_C2_MACRO")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity C2 Estrup HYPRES" "Conductivity HYPRES"
+  (y (convert (soil_K (horizon "Estrup_C2_hypres")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defgnuplot "Retention C2 Estrup" "Retention All"
+  (hor "C2")
+  (source "Retention C2 Estrup HYPRES"
+          "Retention C2 Estrup Daisy"
+          "Retention C2 Estrup MACRO"))
+
+(defgnuplot "Conductivity C2 Estrup" "Conductivity All"
+  (hor "C2")
+  (source "Conductivity C2 Estrup HYPRES"
+          "Conductivity C2 Estrup Daisy"
+          "Conductivity C2 Estrup MACRO"))
+
+(defgnuplot est-drainmass drainmass (area 1.26 [ha]))
+(defgnuplot est-drainmass-acc drainmass-acc (area 1.26 [ha]))
+
+(defgnuplot Estrup-hydraulics Station
+  (station Estrup)
+  (area 1.26 [ha])
+  (graph "Retention Ap Estrup"
+         "Conductivity Ap Estrup"
+         "Retention B Estrup"
+         "Conductivity B Estrup"
+         "Retention C1 Estrup"
+         "Conductivity C1 Estrup"
+         "Retention C2 Estrup"
+         "Conductivity C2 Estrup"))
+
+(defgnuplot Estrup Station
+  (station Estrup)
+  (area 1.26 [ha])
+  (graph &old
+         (gw (legend none))
+         (weather (legend none))
+         colloids
+         "Retention Ap Estrup"
+         "Conductivity Ap Estrup"
+         "Retention B Estrup"
+         "Conductivity B Estrup"
+         "Retention C1 Estrup"
+         "Conductivity C1 Estrup"
+         "Retention C2 Estrup"
+         "Conductivity C2 Estrup"
+         (theta (depth "SW025cm"))
+         horizontal horizontal-bromide leak150 leak150acc
+         ;; First measurement 2000-05-26.
+         (drain (begin 2000 05 26))
+         (drain-acc (begin 2000 05 26))
+         ;; First application: Bromide 2000-05-22
+         ;; Last application: Glyphosate 2000-10-13
+         (est-drainmass (ymax 800 [g/ha/w])
+                        (begin 2000 05 26) (chemical Bromide))
+         (drainmass-sim (begin 2000 05 26)(chemical Dimethoate))
+         (drainmass-sim (begin 2000 05 26)(chemical Fenpropimorph))
+         (est-drainmass (begin 2000 05 26) (chemical Glyphosate))
+         (est-drainmass-acc (ymax 6000 [g/ha])
+                            (begin 2000 05 26) (chemical Bromide))
+         (drainmass-acc-sim (begin 2000 05 26) (chemical Dimethoate))
+         (drainmass-acc-sim (begin 2000 05 26) (chemical Fenpropimorph))
+         (est-drainmass-acc (begin 2000 05 26) (chemical Glyphosate))
+         ))
+
+;;; estrup.dai ends here.

@@ -1,0 +1,183 @@
+Has DAISYHOME environment variable
+Using '/home/abraham/daisy' as daisy home.
+Reseting current directory to '/home/abraham/daisy/project/cpe-liu/2013'
+Daisy crop/soil simulation version 5.18. (Sep 25 2013)
+Copyright 1996 - 2012 Per Abrahamsen, Søren Hansen and KU.
+In directory '/home/abraham/daisy/project/cpe-liu/2013':
+Looking for file 'setup.dai'
+Trying '/home/abraham/daisy/project/cpe-liu/2013/setup.dai' (cwd) success!
+* Parsing file: 'setup.dai'
+** input
+*** file
+In directory '/home/abraham/daisy/project/cpe-liu/2013':
+Looking for file 'log.dai'
+Trying '/home/abraham/daisy/project/cpe-liu/2013/log.dai' (cwd)
+Trying '/home/abraham/daisy/lib/log.dai' success!
+** Parsing file: 'log.dai'
+*** input
+**** file
+In directory '/home/abraham/daisy/project/cpe-liu/2013':
+Looking for file 'log-std.dai'
+Trying '/home/abraham/daisy/project/cpe-liu/2013/log-std.dai' (cwd)
+Trying '/home/abraham/daisy/lib/log-std.dai' success!
+** input
+*** file
+In directory '/home/abraham/daisy/project/cpe-liu/2013':
+Looking for file 'fertilizer.dai'
+Trying '/home/abraham/daisy/project/cpe-liu/2013/fertilizer.dai' (cwd)
+Trying '/home/abraham/daisy/lib/fertilizer.dai' success!
+** input
+*** file
+In directory '/home/abraham/daisy/project/cpe-liu/2013':
+Looking for file 'tillage.dai'
+Trying '/home/abraham/daisy/project/cpe-liu/2013/tillage.dai' (cwd)
+Trying '/home/abraham/daisy/lib/tillage.dai' success!
+** input
+*** file
+In directory '/home/abraham/daisy/project/cpe-liu/2013':
+Looking for file 'sbarley.dai'
+Trying '/home/abraham/daisy/project/cpe-liu/2013/sbarley.dai' (cwd)
+Trying '/home/abraham/daisy/lib/sbarley.dai' success!
+Command line: /home/abraham/daisy/obj/daisy setup.dai
+Storing 'daisy.log' in '/home/abraham/daisy/project/cpe-liu/2013'
+* weather: Normal weather_initialize
+** source[0]: table
+*** source_initialize
+In directory '/home/abraham/daisy/project/cpe-liu/2013':
+Looking for file 'dk-taastrup-cpe.dwf'
+Trying '/home/abraham/daisy/project/cpe-liu/2013/dk-taastrup-cpe.dwf' (cwd) success!
+** source[1]: table
+*** source_initialize
+In directory '/home/abraham/daisy/project/cpe-liu/2013':
+Looking for file 'dk-taastrup-jrj.dwf'
+Trying '/home/abraham/daisy/project/cpe-liu/2013/dk-taastrup-jrj.dwf' (cwd) success!
+** source[2]: time
+*** weather: time source_initialize
+**** source_initialize
+In directory '/home/abraham/daisy/project/cpe-liu/2013':
+Looking for file 'dk-taastrup.dwf'
+Trying '/home/abraham/daisy/project/cpe-liu/2013/dk-taastrup.dwf' (cwd)
+Trying '/home/abraham/daisy/lib/dk-taastrup.dwf'
+Trying '/home/abraham/daisy/sample/dk-taastrup.dwf' success!
+* column: Bakkegaarden initialize
+** Soil
+*** Horizons
+**** horizon: Overflade Ap initialize_base
+***** hydraulic: hypres initialize
+;; clay = 10.379, silt = 21.534, sand = 65.087, humus = 3, rho_b = 1.49 (topsoil) 
+M_vG
+(l -2.05473)
+;; (m 0.209861)
+(n 1.2656)
+(alpha 0.04769 [cm^-1])
+(K_sat 0.173704 [cm/h])
+(Theta_sat 0.395489)
+Quartz = 0.606511 []
+h	h	Theta	K
+cm	pF		cm/h
+0		0.395489	0.173704
+-1	0	0.393748	0.0542492
+-10	1	0.368983	0.01093
+-100	2	0.25417	0.00031063
+-1000	3	0.141469	3.53741e-06
+-15848.9	4.2	0.0680145	1.4743e-08
+**** horizon: Rorrende Ap initialize_base
+***** hydraulic: hypres initialize
+;; clay = 10.379, silt = 21.534, sand = 65.087, humus = 3, rho_b = 1.49 (subsoil)
+M_vG
+(l -2.05473)
+;; (m 0.197771)
+(n 1.24653)
+(alpha 0.053886 [cm^-1])
+(K_sat 1.02425 [cm/h])
+(Theta_sat 0.399073)
+Quartz = 0.606511 []
+h	h	Theta	K
+cm	pF		cm/h
+0		0.399073	1.02425
+-1	0	0.397034	0.275354
+-10	1	0.370161	0.0495457
+-100	2	0.257511	0.00128666
+-1000	3	0.149142	1.44798e-05
+-15848.9	4.2	0.075569	6.01531e-08
+**** horizon: Rorrende Bplow layer initialize_base
+Quartz = 0.593639 []
+h	h	Theta	K
+cm	pF		cm/h
+0		0.339353	0.04625
+-1	0	0.337959	0.00950761
+-10	1	0.321257	0.00183546
+-100	2	0.245863	6.70527e-05
+-1000	3	0.160867	1.11827e-06
+-15848.9	4.2	0.0942791	7.37554e-09
+**** horizon: Rorrende Bt initialize_base
+Quartz = 0.554928 []
+h	h	Theta	K
+cm	pF		cm/h
+0		0.356969	0.268521
+-1	0	0.355305	0.0332968
+-10	1	0.33826	0.00555153
+-100	2	0.271879	0.000216178
+-1000	3	0.196485	4.64474e-06
+-15848.9	4.2	0.130807	4.2617e-08
+**** horizon: Rorrende C initialize_base
+Quartz = 0.563646 []
+h	h	Theta	K
+cm	pF		cm/h
+0		0.348314	1.5
+-1	0	0.346954	0.214499
+-10	1	0.33229	0.0392431
+-100	2	0.268648	0.00154988
+-1000	3	0.192305	3.0002e-05
+-15848.9	4.2	0.126066	2.37324e-07
+*** Geometry
+(zplus -1 -2 -3 -5.5 -10.5 -17 -25 -27 -30 -33 -43 -53 -63 -73 -83 -91 -100 -106 -113 -120 -130 -140 -150 -160 -170 -180 -190 -200); 28 cells.
+** tertiary: old initialize
+Adding macropores to -150 cm
+** bioclimate: default initialize
+Difrad choosen: DPF
+Program started Mon Oct  7 16:08:19 2013, 2 seconds ago.
+* Running
+** 2013-04-01T00:00:00
+Begin simulation
+Start logging
+Fate of 'NO3' will not be traced
+Fate of 'NH4' will not be traced
+** 2013-04-19T08:00:00
+Sowing SB
+*** Bakkegaarden
+**** sow
+***** SB
+Water stress calculated from energy balance
+** 2013-05-02T00:00:00
+*** crop: SB tick
+Emerging
+** 2013-05-10T13:00:00
+*** crop: SB tick
+Luxury nitrogen uptake initiated
+** 2013-06-16T00:00:00
+*** crop: SB tick
+Flowering
+** 2013-08-04T00:00:00
+*** crop: SB tick
+Ripe
+** 2013-08-05T08:00:00
+*** Bakkegaarden
+delta Crop = -5795.97
+top residuals = 3240.56
+soil residuals = 405.27
+harvest = 1898.33
+balance = -251.804 (error)
+Harvesting all, removing 4.12379 Mg DM/ha
+End simulation
+* Summary
+** log: MyWeather summarize
+LOGFILE: my_weather.dlf
+VOLUME: box none
+TIME: 2013-04-01T00:00:00 to 2013-08-05T09:00:00
+*** summary: simple summarize
+ Ea = 272.10 [mm]
+-----------------
+Sum = 272.10 [mm]
+      ======
+Program finished after 3 seconds.

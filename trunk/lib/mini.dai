@@ -1,0 +1,16 @@
+;;; mini.dai --- MiniDaisy default parameters.
+
+(defadsorption "mini-Freundlich" Freundlich
+  (K_clay 10.0e5)
+  (m 1.0))
+
+(defhorizon "mini" default
+  (description "MiniDaisy default horizon parameters."))
+
+(defcolumn "mini" default
+  (description "MiniDaisy default column parameters.")
+  (Bioclimate default))
+
+(defweather "mini" file)
+
+;;; mini.dai ends here.

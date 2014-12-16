@@ -1,0 +1,17 @@
+ddf-0.0 -- Fake root density observations for rootmatch.dai
+
+# We have fake-measured root density in two intervals. The top
+# interval is between 10 and 20 cm below surface and the bottom
+# interval is between 25 and 35 cm below surface. This has been done
+# at the center of the row, 10 cm from the row, and 20 cm from the
+# row. Six measurements total.
+
+---
+z-min	z-max	x	density
+cm	cm	cm	cm/cm^3
+10	20	0	7.7
+25	35	0	3.9
+10	20	10	3.6
+25	35	10	1.8
+10	20	20	1.8
+25	35	20	0.9

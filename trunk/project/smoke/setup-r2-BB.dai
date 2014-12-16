@@ -1,0 +1,109 @@
+;;; setup-r2.dai Rørrendegård setup for use in MST Smoke project.
+
+(input file "setup.dai")
+
+(defprogram BB-Rsqr Smoke
+  (column Without)
+  (print_time false)
+  (output ("SmokeProfile" (when finished) (chemical "BB-base")
+           (summary Without-BB-Rsqr)))
+  (log_prefix "log/BB-Rsqr-"))
+
+(defprogram MakeCP BB-Rsqr
+  (output (checkpoint (when (at 2010 10 25 12)))))
+
+(defprogram "MakeCP Checkpoint" BB-Rsqr
+
+  (harvest ((time 2010 8 26 12)
+            (crop WWheat)
+            (column Without)
+            (water_stress_days 0 [d])
+            (nitrogen_stress_days 0 [d])
+            (stem_DM 0 [g/m^2])
+            (stem_N 0 [g/m^2])
+            (stem_C 0 [g/m^2])
+            (dead_DM 0 [g/m^2])
+            (dead_N 0 [g/m^2])
+            (dead_C 0 [g/m^2])
+            (leaf_DM 0 [g/m^2])
+            (leaf_N 0 [g/m^2])
+            (leaf_C 0 [g/m^2])
+            (sorg_DM 951.903 [g/m^2])
+            (sorg_N 33.5094 [g/m^2])
+            (sorg_C 438.196 [g/m^2])
+            (water_productivity 3.82044 [kg DM/m^3 H2O])))
+  (time 2010 10 25 12)
+  (column (original (SoilHeat (T 8.9509 8.81858 8.68942 8.50383 8.27928 8.091 7.91687 7.80095 7.77687 7.81238 7.86786 7.94056 8.02236 8.10845 8.19742 8.28708 8.3972 8.56296 8.74591 8.90067 9.02919 9.13536 9.22405 9.2997 9.36614 9.42651 9.50963 9.58942 9.64264 9.69629 9.77741 9.85824 9.91194 9.96573 10.0188 10.0709 10.122 10.1719 10.2441 10.3346 10.4175 10.4921 10.5584 [dg C])
+                              (T_top 9.0175 [dg C]))
+                    (SoilWater (h -28.1582 -26.8818 -25.8006 -24.4261 -23.1138 -22.1493 -21.1861 -20.1267 -18.8524 -17.5055 -16.2539 -14.8452 -13.7108 -15.9224 -18.5964 -21.9161 -27.2667 -38.7694 -54.121 -65.0622 -69.3975 -69.7258 -68.4821 -66.8018 -65.062 -63.2909 -60.2746 -55.3386 -50.4669 -43.6976 -31.4736 -17.338 -11.3283 -5.81931 -0.624932 4.41713 9.44185 14.4665 22.0035 32.0527 42.1017 52.1507 62.1995 [cm])
+                               (Theta 0.309163 0.311116 0.312809 0.315015 0.317179 0.318806 0.320463 0.322322 0.324611 0.327093 0.329457 0.332184 0.316072 0.313465 0.310504 0.307093 0.302128 0.293206 0.283891 0.278485 0.276556 0.276414 0.276954 0.277698 0.278485 0.279305 0.280748 0.283247 0.2859 0.289947 0.29862 0.311873 0.330302 0.338944 0.347518 0.348314 0.348314 0.348314 0.348314 0.348314 0.348314 0.348314 0.348314 [])
+                               (S_permanent 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 [cm^3/cm^3/h])
+                               (X_ice 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 [])
+                               (X_ice_buffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 []))
+                    (Surface (pond_section 8.67362e-19 [mm]))
+                    (Bioclimate original (pet FAO_PM)
+                                         (difrad DPF))
+                    (Drain original (height -130.634 [cm]))
+                    (Groundwater original (h_aquifer 290 [cm]))
+                    (tillage_age 390 390 390 390 390 411 411 411 411 610.5 610.5 610.5 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 37034.7 [d])))
+  (manager original (original (original (2010 10 26 12)))
+                    (progn (spray Bromide 1.187e+07 [g/ha])
+                           (spray BB 1.768e+07 [g/ha])))
+  (previous 2010 10 25 11
+            (minute 55))
+  (next_large 2010 10 25 13))
+
+(defprogram mytest minimize
+  (parameter S_lim Ap_lim PP_lim B_lim S_alpha Ap_alpha PP_alpha B_alpha )
+  (simplex (-10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-3)
+           (-1000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-3)
+           (-10000 -10000 -1000 -100 1e-6 1e-5 1e-4 1e-3)
+           (-10000 -1000 -100 -100 1e-6 1e-5 1e-4 1e-3)
+           (-10000 -1000 -1000 -1000 1e-6 1e-5 1e-4 1e-3)
+           (-10000 -1000 -1000 -100 1e-5 1e-5 1e-4 1e-3)
+           (-10000 -1000 -1000 -100 1e-6 1e-4 1e-4 1e-3)
+           (-10000 -1000 -1000 -100 1e-6 1e-5 1e-5 1e-3)
+           (-10000 -1000 -1000 -100 1e-6 1e-5 1e-4 1e-4))
+  (limit (and (>= S_alpha 0 [h^-1]) (<= S_alpha 1 [h^-1]) 
+              (>= Ap_alpha 0 [h^-1]) (<= Ap_alpha 1 [h^-1]) 
+              (>= PP_alpha 0 [h^-1]) (<= PP_alpha 1 [h^-1]) 
+              (>= B_alpha 0 [h^-1]) (<= B_alpha 1 [h^-1]) 
+              (< S_lim 0 [cm]) (< Ap_lim 0 [cm]) (< PP_lim 0 [cm]) (< B_lim 0 [cm])))
+  (scope name Without-BB-Rsqr)
+  (expr (- R2))
+  (run ("MakeCP Checkpoint"))
+  (epsilon 0.0)
+  (min_iter 20)
+  (max_iter 18000))
+
+(defprogram Test3Par "MakeCP Checkpoint"
+  (declare X_alpha Number [h^-1] "")
+  (X_alpha 1e-4)
+  (declare A_lim Number [cm] "")
+  (A_lim -300)
+  (Ap_lim $A_lim)
+  (PP_lim $A_lim)
+  (Ap_alpha $X_alpha)
+  (PP_alpha $X_alpha)
+  (B_alpha $X_alpha))
+  
+(defprogram mytest3 minimize
+  (parameter A_lim B_lim X_alpha)
+  (simplex (-500 -20 0.0001)
+           (-1500 -200 0.00001)
+           (-50 -5 0.001)
+           (-500 -100 0.0001))
+  (limit (and (>= X_alpha 0 [h^-1]) (<= X_alpha 1 [h^-1]) 
+              (< A_lim 0 [cm]) (< B_lim 0 [cm])))
+  (scope name Without-BB-Rsqr)
+  (expr (- R2))
+  (run (Test3Par))
+  (epsilon 0.0)
+  (min_iter 20)
+  (max_iter 18000))
+
+(run mytest3)
+
+;; setup-r2.dai ends here.
+
+

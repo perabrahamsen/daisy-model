@@ -1,0 +1,107 @@
+\documentclass[a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage[american]{babel}
+\usepackage{csquotes}
+\usepackage{hyperref}
+\usepackage[sorting=ydnt,style=authoryear,dashed=false,maxnames=99,backend=biber]{biblatex}
+\addbibresource{daisy.bib}
+
+\input{macro}
+\setcounter{secnumdepth}{-1} 
+
+\newcommand{\daisykey}[2]{
+\defbibfilter{daisy-#1}{keyword=daisy and keyword=#1}
+\printbibliography[heading=subbibliography,%
+filter=daisy-#1,title={#2}]
+}
+\newcommand{\daisytype}[2]{
+\defbibfilter{daisy-#1}{keyword=daisy and type=#1 and not keyword=popular and not keyword=report}
+\printbibliography[heading=subbibliography,%
+filter=daisy-#1,title={#2}]
+}
+\newcommand{\daisyconf}[1]{
+\defbibfilter{daisy-conf}{keyword=daisy and ( type=inproceedings or type=conference ) and not keyword=popular and not keyword=report}
+\printbibliography[heading=subbibliography,%
+filter=daisy-conf,title={#1}]
+}
+\newcommand{\daisyreport}[1]{
+\defbibfilter{daisy-report}{keyword=daisy and ( type=report or keyword=report ) and not keyword=popular}
+\printbibliography[heading=subbibliography,%
+filter=daisy-report,title={#1}]
+}
+\newcommand{\daisyproject}[2]{
+\defbibfilter{daisy-#1}{( keyword=daisy  or keyword=project ) and keyword=#1}
+\printbibliography[heading=subbibliography,%
+filter=daisy-#1,title={#2}]
+}
+
+\begin{document}
+
+\title{Daisy literature}
+\author{Per Abrahamsen}
+
+\maketitle{}
+
+This note is intended to provide an overview of papers that concerns
+Daisy.  The papers are listed up to three times, first organized by type,
+then organized by subject area, and finally organized by funding
+project.  The papers are listed in reverse chronological order.  Only
+papers that represent a signficant deployment or development of the
+model are included. Still, most papers are likely missing.  Please
+send missing references to daisy@daisy-model.dk.
+
+\nocite{*}
+
+\section*{Overview by type}
+
+\daisytype{article}{Peer reviewed articles}
+\daisytype{incollection}{Book chapters}
+\daisyconf{Conference and workshop proceedings}
+\daisytype{thesis}{Thesises and dissertations}
+\daisyreport{Reports}
+\daisykey{popular}{Popular articles}
+\defbibfilter{daisy-other}{keyword=daisy and not keyword=popular and not type=article and not type=incollection and not type=inproceedings and not type=thesis and not type=report}
+\printbibliography[heading=subbibliography,%
+filter=daisy-other,title={Other sources}]
+
+\section*{Overview by subject}
+
+Daisy litterature divided by subject.  As some papers covers multiple
+subjects, there will be some overlap.
+
+\daisykey{description}{Model descriptions}
+\daisykey{pesticides}{Pesticide fate}
+\daisykey{climate}{Climate change}
+\daisykey{rs}{Remote sensing}
+\daisykey{svat}{Soil vegetation atmosphere transfer and evapotranspiration}
+\daisykey{hydrology}{Soil hydrology}
+\daisykey{usecase}{Use cases}
+\daisykey{nleach}{Nitrogen leaching}
+\daisykey{som}{Soil organic matter}
+\daisykey{dss}{Decision  support}
+\daisykey{farming}{Farming}
+\daisykey{organic}{Organic farming}
+\daisykey{crop}{Crop modelling}
+\daisykey{intercrop}{Intercropping}
+\daisykey{software}{Model software}
+\daisykey{danish}{Danish language}
+
+\section{Overview by project}
+
+Daisy litterature divided by associated project.  As some papers
+describe worked funded by multiple projects, there are some overlap.
+Most papers have not yet been classified by project.
+
+\daisyproject{mst-tiledrain}{MST-Markdræn}
+\daisyproject{safir}{SAFIR}
+\daisyproject{fertorganic}{FertOrgaNic}
+\daisyproject{rsmodel}{RS-Model}
+\daisyproject{sdss}{SDSS}
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

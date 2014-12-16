@@ -1,0 +1,794 @@
+\newcommand{\figsilstrupl}[1]{\figl\includegraphics[trim=8mm 0mm 12mm 7mm,clip]{fig/#1}}
+\newcommand{\figsilstrup}[1]{\includegraphics[trim=8mm 0mm 12mm 7mm,clip]{fig/#1}}
+\newcommand{\fluxtop}[1]{\figl\includegraphics[trim=0mm 10mm 0mm 0mm,clip]{fig/#1}}
+\newcommand{\figestrupl}[1]{\hspace*{-1cm}\includegraphics[trim=12mm 0mm 17mm 9mm,clip]{fig/#1}}
+\newcommand{\figestrup}[1]{\includegraphics[trim=12mm 0mm 17mm 9mm,clip]{fig/#1}}
+
+\chapter{2D plots}
+\label{app:plot-2d}
+
+In this appendix we present simulated 2D plots for water, bromide,
+glyphosate, and metamitron.  There are no measurements to compare
+with, a major caveat for both the results and discussion.  We use two
+kinds of graphs to capture the 2D structure.
+
+The first kind depict static distribution in the soil.  Each graph has
+horizontal distance from drain on the x-axis and height above surface
+on the y-axis, using the same scale for both axes.  The graph
+represents the the computational soil area used in the simulation.
+The right side is the center between two drains (9 meter for Silstrup
+and 6.5 meter Estrup), and the bottom is 5 meter, where we use the
+measured groundwater pressure table as the lower boundary.  The graphs
+are color coded, where specific colors represent specific values for
+the soil at the end of the month indicated by the graph title.  Each
+numeric cell in the computation has a color representing the value
+within that cell.  Since cells are rectangular, the graphs appear
+blocky.
+
+The second kind of graph depicts horizontal or vertical movement.  For
+the graphs depicting horizontal movement, the y-axis specifies height
+above surface (negative number) and the x-axis movement away from
+drain (usually also negative).  The horizontal movement at different
+distances from the drain pipes are shown as separate plots on each
+graph.  For the graphs depicting vertical movement, the axes are
+swapped.  The individual plots represent different depths.  We use the
+same flow units as we used for the original input, so e.g.\ pesticide
+transport is given in g/ha.
+
+\FloatBarrier
+\section{Water}
+
+\subsection{Distribution}
+
+The Silstrup soil water pressure potential
+(figure~\ref{fig:Silstrup-pF-2000} and~\ref{fig:Silstrup-pF-2001})
+rarely show any horizontal gradients, in contrast to Estrup
+(figure~\ref{fig:Estrup-pF-2000} and~\ref{fig:Estrup-pF-2001}) where
+there is a clear horizontal gradient in the drain season.  This
+reflects the much higher conductivity of the Silstrup soil, where the
+soil down to 3.5 m all have a high saturated horizontal conductivity
+due to cracks.  The exception is the plow pan, on top of which we
+several times see a build up of water.  The plow pan also acts as a
+barrier the other direction, where we at Silstrup (unlike Estrup) see
+the plow layer dry out to near wilting point both summers.
+
+\subsection{Flow}
+
+For both sites we see, unsurprisingly, large horizontal flow near the
+drain in direction of the drains
+(figure~\ref{fig:Silstrup-water-horizontal}
+and~\ref{fig:Estrup-water-horizontal}).  For Estrup we also see an
+even larger horizontal flow in the plow layer, largest one meter from
+the drain.  At Estrup only the plow layer has a good horizontal
+conductivity.  For Silstrup, the vertical flow graphs
+(figure~\ref{fig:Silstrup-water-2000}
+and~\ref{fig:Silstrup-water-2001}) show us that:
+\begin{itemize}
+\item The deep percolation (the -150 and -200 cm plots, top graph) are
+  pretty much unaffected by the position of the drain pipes.
+\item The effect of surface flow can be seen on the biopore activity
+  (the 0 cm plot, bottom graph).
+\item The plow pan contribute relatively little to the total biopore
+  activity (-50 cm compared to 0 cm, bottom graph).
+\item The area near the drain is far more active than the rest of the
+  field for vertical movement, almost exclusively due to the biopores.
+\end{itemize}
+
+In contrast, on Estrup (figure~\ref{fig:Estrup-water-2000}
+and~\ref{fig:Estrup-water-2001}) the higher groundwater means we get
+significant contributions to the drains from below, there is no
+significant surface flow or biopore activation on surface, and the
+plow pan seems to be an important factor for biopore activation.  The
+area above the drain is still much more active than the rest of the
+field, and the biopores play a large role in this.
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figsilstrupl{Silstrup-pF-2000-5} & 
+    \figsilstrup{Silstrup-pF-2000-6} & 
+    \figsilstrup{Silstrup-pF-2000-7} \\
+    \figsilstrupl{Silstrup-pF-2000-8} & 
+    \figsilstrup{Silstrup-pF-2000-9} & 
+    \figsilstrup{Silstrup-pF-2000-10} \\
+    \figsilstrupl{Silstrup-pF-2000-11} & 
+    \figsilstrup{Silstrup-pF-2000-12} & 
+    \figsilstrup{Silstrup-pF-2001-1} \\
+    \figsilstrupl{Silstrup-pF-2001-2} & 
+    \figsilstrup{Silstrup-pF-2001-3} & 
+    \figsilstrup{Silstrup-pF-2001-4}
+  \end{tabular}
+  
+  \caption{Silstrup soil water pressure potential at the end of each
+    month since first application of bromide.  The y-axis denotes
+    depth, the x-axis distance from drain.  There are tick marks for
+    every meter.  Blue denotes pF<0, white pF=1, yellow pF=2, orange
+    pF=3, red pF=4, and black pF>5.}
+\label{fig:Silstrup-pF-2000}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figsilstrupl{Silstrup-pF-2001-5} & 
+    \figsilstrup{Silstrup-pF-2001-6} & 
+    \figsilstrup{Silstrup-pF-2001-7} \\
+    \figsilstrupl{Silstrup-pF-2001-8} & 
+    \figsilstrup{Silstrup-pF-2001-9} & 
+    \figsilstrup{Silstrup-pF-2001-10} \\
+    \figsilstrupl{Silstrup-pF-2001-11} & 
+    \figsilstrup{Silstrup-pF-2001-12} & 
+    \figsilstrup{Silstrup-pF-2002-1} \\
+    \figsilstrupl{Silstrup-pF-2002-2} & &
+  \end{tabular}
+  
+  \caption{Silstrup soil water pressure potential at the end of each
+    month second year after application of bromide.  The y-axis
+    denotes depth, the x-axis distance from drain.  There are tick
+    marks for every meter.  Blue denotes pF<0, white pF=1, yellow
+    pF=2, orange pF=3, red pF=4, and black pF>5.}
+\label{fig:Silstrup-pF-2001}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figestrupl{Estrup-pF-2000-5} & 
+    \figestrup{Estrup-pF-2000-6} & 
+    \figestrup{Estrup-pF-2000-7} \\
+    \figestrupl{Estrup-pF-2000-8} & 
+    \figestrup{Estrup-pF-2000-9} & 
+    \figestrup{Estrup-pF-2000-10} \\
+    \figestrupl{Estrup-pF-2000-11} & 
+    \figestrup{Estrup-pF-2000-12} & 
+    \figestrup{Estrup-pF-2001-1} \\
+    \figestrupl{Estrup-pF-2001-2} & 
+    \figestrup{Estrup-pF-2001-3} & 
+    \figestrup{Estrup-pF-2001-4}
+  \end{tabular}
+  
+  \caption{Estrup soil water pressure potential at the end of each
+    month since first application of bromide.  The y-axis denotes
+    depth, the x-axis distance from drain.  There are tick marks for
+    every meter.  Blue denotes pF<0, white pF=1, yellow pF=2, orange
+    pF=3, red pF=4, and black pF>5.}
+\label{fig:Estrup-pF-2000}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figestrupl{Estrup-pF-2001-5} & 
+    \figestrup{Estrup-pF-2001-6} & 
+    \figestrup{Estrup-pF-2001-7} \\
+    \figestrupl{Estrup-pF-2001-8} & 
+    \figestrup{Estrup-pF-2001-9} & 
+    \figestrup{Estrup-pF-2001-10} \\
+    \figestrupl{Estrup-pF-2001-11} & 
+    \figestrup{Estrup-pF-2001-12} & 
+    \figestrup{Estrup-pF-2002-1} \\
+    \figestrupl{Estrup-pF-2002-2} & 
+    \figestrup{Estrup-pF-2002-3} & 
+    \figestrup{Estrup-pF-2002-4}
+  \end{tabular}
+  
+  \caption{Estrup soil water pressure potential at the end of each
+    month second year after application of bromide.  The y-axis
+    denotes depth, the x-axis distance from drain.  There are tick
+    marks for every meter.  Blue denotes pF<0, white pF=1, yellow
+    pF=2, orange pF=3, red pF=4, and black pF>5.}
+\label{fig:Estrup-pF-2001}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Silstrup-water-horizontal-2000}
+  \fig{Silstrup-water-horizontal-2001}
+  
+  \caption{Silstrup total horizontal water flux between 2000-5-1 and
+    2001-5-1 (top) and between 2001-5-1 and 2002-3-1 (bottom).  The
+    flux is shown on the x-axis (positive away from drain) as a
+    function of depth shown on the y-axis.  The graph labels are the
+    distance from drain in centimeters.}
+  \label{fig:Silstrup-water-horizontal}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Estrup-water-horizontal-2000}
+  \fig{Estrup-water-horizontal-2001}
+  
+  \caption{Estrup total horizontal water flux between 2000-5-1 and
+    2001-5-1 (top) and between 2001-5-1 and 2002-5-1 (bottom).  The
+    flux is shown on the x-axis (positive away from drain) as a
+    function of depth shown on the y-axis.  The graph labels are the
+    distance from drain in centimeters.}
+  \label{fig:Estrup-water-horizontal}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Silstrup-water-2000}
+  \fig{Silstrup-water-biopore-2000}
+  
+  \caption{Silstrup vertical water flux between 2000-5-1 and
+    2001-5-1.  Top graph show total flux, bottom graph only biopores.  The flux is shown on the y-axis (positive up) as a
+    function of distance from drain shown on the x-axis.  The graph
+    labels are depths in centimeters above surface.}
+  \label{fig:Silstrup-water-2000}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Silstrup-water-2001}
+  \fig{Silstrup-water-biopore-2001}
+  
+  \caption{Silstrup vertical water flux between 2001-5-1 and 2002-3-1.
+    Top graph show total flux, bottom graph only biopores.  The flux
+    is shown on the y-axis (positive up) as a function of distance
+    from drain shown on the x-axis.  The graph labels are depths in
+    centimeters above surface.}
+  \label{fig:Silstrup-water-2001}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Estrup-water-2000}
+  \fig{Estrup-water-biopore-2000}
+  
+  \caption{Estrup vertical water flux between 2000-5-1 and 2001-5-1.
+    Top graph show total flux, bottom graph only biopores. The flux is
+    shown on the y-axis (positive up) as a function of distance from
+    drain shown on the x-axis.  The graph labels are depths in
+    centimeters above surface.}
+  \label{fig:Estrup-water-2000}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Estrup-water-2001}
+  \fig{Estrup-water-biopore-2001}
+  
+  \caption{Estrup vertical water flux between 2001-5-1 and 2002-5-1.
+    Top graph show total flux, bottom graph only biopores. The flux is
+    shown on the y-axis (positive up) as a function of distance from
+    drain shown on the x-axis.  The graph labels are depths in
+    centimeters above surface.}
+  \label{fig:Estrup-water-2001}
+\end{figure}
+
+\FloatBarrier
+\section{Bromide}
+
+\subsection{Distribution}
+
+Like for water, there is hardly any horizontal gradients worth
+speaking of for bromide at Silstrup
+(figure~\ref{fig:Silstrup-Bromide-2000}
+and~\ref{fig:Silstrup-Bromide-2001}).  The bromide is mostly contained
+within the plow layer the first summer, but at the end of the drain
+season, the bromide is everywhere.  Estrup shows a different pattern
+(figure~\ref{fig:Estrup-Bromide-2000}
+and~\ref{fig:Estrup-Bromide-2001}).  At the end of summer, most of the
+bromide has left the plow layer, and the upward direction of the water
+flow below the drain pipes keep that part of the soil relatively clear
+of bromide.  In the second year, the horizontal flow of of water in
+the plow layer is resulting in the soil above drain pipes also being
+cleared of bromide.
+
+\subsection{Transport}
+
+The most interesting thing to note about the horizontal bromide
+transport is that the rather small horizontal flow of water depicted
+on the top graph of figure~\ref{fig:Silstrup-water-horizontal}
+translate into a much more significant transport of bromide shown on
+figure~\ref{fig:Silstrup-Bromide-horizontal}.  This indicates that the
+horizontal water flow happens early, when the bromide concentration of
+the plow layer is still high.  The bottom graph of
+figures~\ref{fig:Silstrup-Bromide-horizontal}
+and~\ref{fig:Estrup-Bromide-horizontal} both show less horizontal transport
+the second year, especially in the plow layer.
+
+Figure~\ref{fig:Silstrup-Bromide-2000-vertical} shows us that all the
+bromide enter through the matrix, and only half the bromide leaver the
+top 25 cm.  We also see the biopores being activated between -25 and
+-50 cm, indicating the plow pan being significant.  The drain pipes
+only visibly affect the transport right on top of them (-100 cm),
+where most of the transport is through biopores.  The second year
+(figure~\ref{fig:Silstrup-Bromide-2001-vertical}) does not show much
+transport at all, except right above the pipes like the year before.  For
+Estrup, we see a strong matrix transport with right above the pipes, with
+some contributions from biopores
+(figure~\ref{fig:Estrup-Bromide-2000-vertical}).  The bromide leaching
+from the top 25 cm is slightly higher than for Silstrup, and dominated
+by matrix transport.  The second year
+(figure~\ref{fig:Estrup-Bromide-2001-vertical}) we get contribution to
+the drains from both above and below, almost exclusively through
+matrix transport.
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figsilstrupl{Silstrup-M-Bromide-2000-5} & 
+    \figsilstrup{Silstrup-M-Bromide-2000-6} & 
+    \figsilstrup{Silstrup-M-Bromide-2000-7} \\
+    \figsilstrupl{Silstrup-M-Bromide-2000-8} & 
+    \figsilstrup{Silstrup-M-Bromide-2000-9} & 
+    \figsilstrup{Silstrup-M-Bromide-2000-10} \\
+    \figsilstrupl{Silstrup-M-Bromide-2000-11} & 
+    \figsilstrup{Silstrup-M-Bromide-2000-12} & 
+    \figsilstrup{Silstrup-M-Bromide-2001-1} \\
+    \figsilstrupl{Silstrup-M-Bromide-2001-2} & 
+    \figsilstrup{Silstrup-M-Bromide-2001-3} & 
+    \figsilstrup{Silstrup-M-Bromide-2001-4}
+  \end{tabular}
+  
+  \caption{Silstrup bromide soil content at the end of each month
+    since first application of bromide.  The y-axis denotes depth, the
+    x-axis distance from drain.  There are tick marks for every
+    meter. The color scale is white<10 pg/l, yellow=1 ng/l, orange=0.1
+    $\mu$g/l, red=10 $\mu$g/l, and black>1 mg/l}
+\label{fig:Silstrup-Bromide-2000}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figsilstrupl{Silstrup-M-Bromide-2001-5} & 
+    \figsilstrup{Silstrup-M-Bromide-2001-6} & 
+    \figsilstrup{Silstrup-M-Bromide-2001-7} \\
+    \figsilstrupl{Silstrup-M-Bromide-2001-8} & 
+    \figsilstrup{Silstrup-M-Bromide-2001-9} & 
+    \figsilstrup{Silstrup-M-Bromide-2001-10} \\
+    \figsilstrupl{Silstrup-M-Bromide-2001-11} & 
+    \figsilstrup{Silstrup-M-Bromide-2001-12} & 
+    \figsilstrup{Silstrup-M-Bromide-2002-1} \\
+    \figsilstrupl{Silstrup-M-Bromide-2002-2} &  & 
+  \end{tabular}
+  
+  \caption{Silstrup bromide soil content at the end of each month
+    second year after application of bromide.  The y-axis denotes
+    depth, the x-axis distance from drain.  There are tick marks for
+    every meter. The color scale is white<10 pg/l, yellow=1 ng/l,
+    orange=0.1 $\mu$g/l, red=10 $\mu$g/l, and black>1 mg/l}
+\label{fig:Silstrup-Bromide-2001}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figestrupl{Estrup-M-Bromide-2000-5} & 
+    \figestrup{Estrup-M-Bromide-2000-6} & 
+    \figestrup{Estrup-M-Bromide-2000-7} \\
+    \figestrupl{Estrup-M-Bromide-2000-8} & 
+    \figestrup{Estrup-M-Bromide-2000-9} & 
+    \figestrup{Estrup-M-Bromide-2000-10} \\
+    \figestrupl{Estrup-M-Bromide-2000-11} & 
+    \figestrup{Estrup-M-Bromide-2000-12} & 
+    \figestrup{Estrup-M-Bromide-2001-1} \\
+    \figestrupl{Estrup-M-Bromide-2001-2} & 
+    \figestrup{Estrup-M-Bromide-2001-3} & 
+    \figestrup{Estrup-M-Bromide-2001-4}
+  \end{tabular}
+  
+  \caption{Estrup bromide soil content at the end of each month since
+    first application of bromide.  The y-axis denotes depth, the x-axis distance from drain.  There are tick marks for every
+    meter. The color scale is white<10 pg/l, yellow=1 ng/l,
+    orange=0.1 $\mu$g/l, red=10 $\mu$g/l, and black>1 mg/l}
+\label{fig:Estrup-Bromide-2000}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figestrupl{Estrup-M-Bromide-2001-5} & 
+    \figestrup{Estrup-M-Bromide-2001-6} & 
+    \figestrup{Estrup-M-Bromide-2001-7} \\
+    \figestrupl{Estrup-M-Bromide-2001-8} & 
+    \figestrup{Estrup-M-Bromide-2001-9} & 
+    \figestrup{Estrup-M-Bromide-2001-10} \\
+    \figestrupl{Estrup-M-Bromide-2001-11} & 
+    \figestrup{Estrup-M-Bromide-2001-12} & 
+    \figestrup{Estrup-M-Bromide-2002-1} \\
+    \figestrupl{Estrup-M-Bromide-2002-2} & 
+    \figestrup{Estrup-M-Bromide-2002-3} & 
+    \figestrup{Estrup-M-Bromide-2002-4}
+  \end{tabular}
+  
+  \caption{Estrup bromide soil content at the end of each month second
+    year after application of bromide.  The y-axis denotes depth, the
+    x-axis distance from drain.  There are tick marks for every
+    meter. The color scale is white<10 pg/l, yellow=1 ng/l, orange=0.1
+    $\mu$g/l, red=10 $\mu$g/l, and black>1 mg/l}
+\label{fig:Estrup-Bromide-2001}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Silstrup-Bromide-horizontal-2000}
+  \fig{Silstrup-Bromide-horizontal-2001}
+  
+  \caption{Silstrup total horizontal bromide transport between 2000-5-1 and
+    2001-5-1 (top) and between 2001-5-1 and 2002-3-1 (bottom).  The
+    transport is shown on the x-axis (positive away from drain) as a
+    function of depth shown on the y-axis.  The graph labels are the
+    distance from drain in centimeters.}
+  \label{fig:Silstrup-Bromide-horizontal}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Estrup-Bromide-horizontal-2000}
+  \fig{Estrup-Bromide-horizontal-2001}
+  
+  \caption{Estrup total horizontal bromide transport between 2000-5-1 and
+    2001-5-1 (top) and between 2001-5-1 and 2002-5-1 (bottom).  The
+    transport is shown on the x-axis (positive away from drain) as a
+    function of depth shown on the y-axis.  The graph labels are the
+    distance from drain in centimeters.}
+  \label{fig:Estrup-Bromide-horizontal}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Silstrup-Bromide-2000}
+  \fig{Silstrup-Bromide-biopore-2000}
+  
+  \caption{Silstrup total (top) and biopores (bottom) vertical bromide
+    transport between 2000-5-1 and 2001-5-1.  The transport is shown on the
+    y-axis (positive up) as a function of distance from drain shown on
+    the x-axis.  The graph labels are depths in centimeters above
+    surface.}
+  \label{fig:Silstrup-Bromide-2000-vertical}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Silstrup-Bromide-2001}
+  \fig{Silstrup-Bromide-biopore-2001}
+  
+  \caption{Silstrup total (too) and biopore (bottom) vertical bromide
+    transport between 2001-5-1 and 2002-3-1.  The transport is shown on the
+    y-axis (positive up) as a function of distance from drain shown on
+    the x-axis.  The graph labels are depths in centimeters above
+    surface.}
+  \label{fig:Silstrup-Bromide-2001-vertical}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Estrup-Bromide-2000}
+  \fig{Estrup-Bromide-biopore-2000}
+  
+  \caption{Estrup total (top) and biopore (bottom) vertical bromide
+    transport between 2000-5-1 and 2001-5-1.  The transport is shown on the
+    y-axis (positive up) as a function of distance from drain shown on
+    the x-axis.  The graph labels are depths in centimeters above
+    surface.}
+  \label{fig:Estrup-Bromide-2000-vertical}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Estrup-Bromide-2001}
+  \fig{Estrup-Bromide-biopore-2001}
+  
+  \caption{Estrup total (top) and biopore (bottom) vertical bromide
+    transport between 2001-5-1 and 2002-5-1.  The transport is shown on the
+    y-axis (positive up) as a function of distance from drain shown on
+    the x-axis.  The graph labels are depths in centimeters above
+    surface.}
+  \label{fig:Estrup-Bromide-2001-vertical}
+\end{figure}
+
+\FloatBarrier
+\section{Metamitron}
+
+\subsection{Distribution}
+
+Figure~\ref{fig:Silstrup-M-Metamitron-2000} shows the metamitron
+entering first the plow layer, and later being transported to the end
+of the biopores, indicating that the plow pan could be important for
+metamitron dynamics.  The metamitron eventually disappear from the
+plow layer, but linger at the end of the biopores (where there is no
+degradation).  It is more likely diluted than removed.
+Figure~\ref{fig:Silstrup-C-Metamitron-2000} shows concentration in soil
+water, where four months after application only the soil near the end
+of the biopores show concentrations near the limit for drinking water
+(0.1 $\mu$g/l).
+
+\subsection{Transport}
+
+
+Figure~\ref{fig:Silstrup-Metamitron-2000-vertical} shows that most of
+the metamitron enter the soil through the matrix, and only above the
+drains are there a significant contribution from the biopores. We can
+also see that the vertical movement within the soil is almost
+exclusively through biopores.  Since Daisy does not have a model for
+transport of solutes on the surface, the reason for the decline in
+metamitron entering the soil away from the drain pipes must be surface
+degradation.
+
+Figure~\ref{fig:Silstrup-Metamitron-2000-horizontal} shows the largest
+horizontal transport near the top of the soil.  Likely because the majority
+of the metamitron enters the soil through the matrix, and does not
+move much further down.
+
+\begin{figure}[htbp]
+  \centering
+  \fig{Silstrup-Metamitron-horizontal-2000}
+  
+  \caption{Silstrup total horizontal metamitron transport between 2000-5-1 and
+    2001-5-1.  The transport is shown on the x-axis (positive away from
+    drain) as a function of depth shown on the y-axis.  The graph
+    labels are the distance from drain in centimeters.}
+  \label{fig:Silstrup-Metamitron-2000-horizontal}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figsilstrupl{Silstrup-M-Metamitron-2000-5} & 
+    \figsilstrup{Silstrup-M-Metamitron-2000-6} & 
+    \figsilstrup{Silstrup-M-Metamitron-2000-7} \\
+    \figsilstrupl{Silstrup-M-Metamitron-2000-8} & 
+    \figsilstrup{Silstrup-M-Metamitron-2000-9} & 
+    \figsilstrup{Silstrup-M-Metamitron-2000-10} \\
+    \figsilstrupl{Silstrup-M-Metamitron-2000-11} & 
+    \figsilstrup{Silstrup-M-Metamitron-2000-12} & 
+    \figsilstrup{Silstrup-M-Metamitron-2001-1} \\
+    \figsilstrupl{Silstrup-M-Metamitron-2001-2} & 
+    \figsilstrup{Silstrup-M-Metamitron-2001-3} & 
+    \figsilstrup{Silstrup-M-Metamitron-2001-4}
+  \end{tabular}
+  
+  \caption{Silstrup metamitron soil content at the end of each month
+    since first application of bromide.  The y-axis denotes depth, the
+    x-axis distance from drain.  There are tick marks for every
+    meter. The color scale is white<10 pg/l, yellow=1 ng/l, orange=0.1
+    $\mu$g/l, red=10 $\mu$g/l, and black>1 mg/l}
+\label{fig:Silstrup-M-Metamitron-2000}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figsilstrupl{Silstrup-C-Metamitron-2000-5} & 
+    \figsilstrup{Silstrup-C-Metamitron-2000-6} & 
+    \figsilstrup{Silstrup-C-Metamitron-2000-7} \\
+    \figsilstrupl{Silstrup-C-Metamitron-2000-8} & 
+    \figsilstrup{Silstrup-C-Metamitron-2000-9} & 
+    \figsilstrup{Silstrup-C-Metamitron-2000-10} \\
+    \figsilstrupl{Silstrup-C-Metamitron-2000-11} & 
+    \figsilstrup{Silstrup-C-Metamitron-2000-12} & 
+    \figsilstrup{Silstrup-C-Metamitron-2001-1} \\
+    \figsilstrupl{Silstrup-C-Metamitron-2001-2} & 
+    \figsilstrup{Silstrup-C-Metamitron-2001-3} & 
+    \figsilstrup{Silstrup-C-Metamitron-2001-4}
+  \end{tabular}
+  
+  \caption{Silstrup metamitron soil water concentration at the end of
+    each month since first application of bromide.  The y-axis denotes
+    depth, the x-axis distance from drain.  There are tick marks for
+    every meter. The color scale is white<10 pg/l, yellow=1 ng/l, orange=0.1
+    $\mu$g/l, red=10 $\mu$g/l, and black>1 mg/l}
+\label{fig:Silstrup-C-Metamitron-2000}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Silstrup-Metamitron-2000} 
+  \fig{Silstrup-Metamitron-biopore-2000}
+ 
+  \caption{Silstrup total (top) and biopore (bottom) vertical
+    metamitron transport between 2000-5-1 and 2001-5-1.  The transport is shown
+    on the y-axis (positive up) as a function of distance from drain
+    shown on the x-axis.  The graph labels are depths in centimeters
+    above surface.}
+  \label{fig:Silstrup-Metamitron-2000-vertical}
+\end{figure}
+
+\FloatBarrier
+\section{Glyphosate}
+
+Unfortunately, the glyphosate was applied on different years for the
+sites, making them less comparable.  Nonetheless, comparing with the
+rest of the data, the differences seem to be more a result of the
+respective soils than difference in weather.
+
+\subsection{Distribution}
+
+On figure~\ref{fig:Silstrup-M-Glyphosate-2001} (Silstrup) we can see
+the glyphosate entering the soil in three different places.  The soil
+surface, the bottom of the short biopores that end right above the
+plow pan, and the end of the deep biopores than end 1.2 meter below
+the surface.  The glyphosate within the plow layer is then mixed by a
+soil tillage operation.  The leaching below 2 meter is hardly visible,
+but there is clearly some redistribution within the biopore active
+soil.  If we look at the concentration in soil
+water~\ref{fig:Silstrup-C-Glyphosate-2001} we see a clear decrease in
+the plow layer, which can be explained by a combination of degradation
+and dilution as the water content is increasing (see
+figure~\ref{fig:Silstrup-pF-2001}).
+
+At Estrup, the glyphosate hardly even move out of the plow layer
+(figure~\ref{fig:Estrup-M-Glyphosate-2000}).  If we look at the soil
+water concentration (figure~\ref{fig:Estrup-M-Glyphosate-2000}), it is
+only above the limit for drinking water within the plow layer, except
+for the first month where it is near the limit in a area above the
+drain pipes.  The reason for this is that the water table at the time
+is lower above the drain pipes (see figure~\ref{fig:Estrup-pF-2000}),
+and the biopores will mainly empty in unsaturated soil.  Looking one
+year further ahead (figure~\ref{fig:Estrup-C-Glyphosate-2001}) we see
+the glyphosate above 1 meter being degraded, and the glyphosate below
+1 meter going nowhere.
+
+\subsection{Transport}
+
+The horizontal transport (figure~\ref{fig:Glyphosate-horizontal}) reflect
+the location in the soil, at Silstrup we see some horizontal transport at
+the top of the soil, at the bottom of the short biopores, and at the
+bottom of the deep biopores.  At Estrup, we plow shortly after
+application.  The plow operation as defined in Daisy distributes the
+glyphosate from the surface to the bottom half of the plow layer.
+Which is where we see the horizontal transport.
+
+At Silstrup (figure~\ref{fig:Silstrup-Glyphosate-2001-vertical}) most
+of the glyphosate enters the soil through the matrix, but only the
+part entering the soil through biopores is transported further down.
+Unlike for metamitron
+(figure~\ref{fig:Silstrup-Metamitron-2000-vertical}), less glyphosate
+enter the soil above the drain pipes, indicating that the glyphosate
+spend more time on the surface.  For Estrup
+(figure~\ref{fig:Estrup-Glyphosate-2000}) there is no horizontal
+variation in how much glyphosate enter the soil, none of it does so
+through the biopores.  There is some matrix transport 25 cm below surface
+(the plowing operation put most glyphosate 22 cm below surface),
+further down there is some biopore facilitated transport above the
+drains.
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figsilstrupl{Silstrup-M-Glyphosate-2001-5} & 
+    \figsilstrup{Silstrup-M-Glyphosate-2001-6} & 
+    \figsilstrup{Silstrup-M-Glyphosate-2001-7} \\
+    \figsilstrupl{Silstrup-M-Glyphosate-2001-8} & 
+    \figsilstrup{Silstrup-M-Glyphosate-2001-9} & 
+    \figsilstrup{Silstrup-M-Glyphosate-2001-10} \\
+    \figsilstrupl{Silstrup-M-Glyphosate-2001-11} & 
+    \figsilstrup{Silstrup-M-Glyphosate-2001-12} & 
+    \figsilstrup{Silstrup-M-Glyphosate-2002-1} \\
+    \figsilstrupl{Silstrup-M-Glyphosate-2002-2} & & 
+  \end{tabular}
+  
+  \caption{Silstrup glyphosate soil content at the end of each month
+    since one year after the first application of bromide.  The y-axis
+    denotes depth, the x-axis distance from drain.  There are tick
+    marks for every meter. The color scale is white<10 pg/l, yellow=1
+    ng/l, orange=0.1 $\mu$g/l, red=10 $\mu$g/l, and black>1 mg/l}
+\label{fig:Silstrup-M-Glyphosate-2001}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figsilstrupl{Silstrup-C-Glyphosate-2001-5} & 
+    \figsilstrup{Silstrup-C-Glyphosate-2001-6} & 
+    \figsilstrup{Silstrup-C-Glyphosate-2001-7} \\
+    \figsilstrupl{Silstrup-C-Glyphosate-2001-8} & 
+    \figsilstrup{Silstrup-C-Glyphosate-2001-9} & 
+    \figsilstrup{Silstrup-C-Glyphosate-2001-10} \\
+    \figsilstrupl{Silstrup-C-Glyphosate-2001-11} & 
+    \figsilstrup{Silstrup-C-Glyphosate-2001-12} & 
+    \figsilstrup{Silstrup-C-Glyphosate-2002-1} \\
+    \figsilstrupl{Silstrup-C-Glyphosate-2002-2} &  & 
+  \end{tabular}
+  
+  \caption{Silstrup glyphosate soil water concentration at the end of
+    each month since one year after first application of bromide.  The
+    y-axis denotes depth, the x-axis distance from drain.  There are
+    tick marks for every meter. The color scale is white<10 pg/l,
+    yellow=1 ng/l, orange=0.1 $\mu$g/l, red=10 $\mu$g/l, and black>1
+    mg/l}
+\label{fig:Silstrup-C-Glyphosate-2001}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figestrupl{Estrup-M-Glyphosate-2000-5} & 
+    \figestrup{Estrup-M-Glyphosate-2000-6} & 
+    \figestrup{Estrup-M-Glyphosate-2000-7} \\
+    \figestrupl{Estrup-M-Glyphosate-2000-8} & 
+    \figestrup{Estrup-M-Glyphosate-2000-9} & 
+    \figestrup{Estrup-M-Glyphosate-2000-10} \\
+    \figestrupl{Estrup-M-Glyphosate-2000-11} & 
+    \figestrup{Estrup-M-Glyphosate-2000-12} & 
+    \figestrup{Estrup-M-Glyphosate-2001-1} \\
+    \figestrupl{Estrup-M-Glyphosate-2001-2} & 
+    \figestrup{Estrup-M-Glyphosate-2001-3} & 
+    \figestrup{Estrup-M-Glyphosate-2001-4}
+  \end{tabular}
+  
+  \caption{Estrup glyphosate soil content at the end of each month
+    since first application of bromide.  The y-axis denotes depth, the
+    x-axis distance from drain.  There are tick marks for every
+    meter. The color scale is white<10 pg/l, yellow=1 ng/l, orange=0.1
+    $\mu$g/l, red=10 $\mu$g/l, and black>1 mg/l}
+\label{fig:Estrup-M-Glyphosate-2000}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figestrupl{Estrup-C-Glyphosate-2000-5} & 
+    \figestrup{Estrup-C-Glyphosate-2000-6} & 
+    \figestrup{Estrup-C-Glyphosate-2000-7} \\
+    \figestrupl{Estrup-C-Glyphosate-2000-8} & 
+    \figestrup{Estrup-C-Glyphosate-2000-9} & 
+    \figestrup{Estrup-C-Glyphosate-2000-10} \\
+    \figestrupl{Estrup-C-Glyphosate-2000-11} & 
+    \figestrup{Estrup-C-Glyphosate-2000-12} & 
+    \figestrup{Estrup-C-Glyphosate-2001-1} \\
+    \figestrupl{Estrup-C-Glyphosate-2001-2} & 
+    \figestrup{Estrup-C-Glyphosate-2001-3} & 
+    \figestrup{Estrup-C-Glyphosate-2001-4}
+  \end{tabular}
+  
+  \caption{Estrup glyphosate soil water concentration at the end of
+    each month since first application of bromide.  The y-axis denotes
+    depth, the x-axis distance from drain.  There are tick marks for
+    every meter. The color scale is white<10 pg/l, yellow=1 ng/l, orange=0.1
+    $\mu$g/l, red=10 $\mu$g/l, and black>1 mg/l}
+\label{fig:Estrup-C-Glyphosate-2000}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+  \begin{tabular}{ccc}
+    \figestrupl{Estrup-C-Glyphosate-2001-5} & 
+    \figestrup{Estrup-C-Glyphosate-2001-6} & 
+    \figestrup{Estrup-C-Glyphosate-2001-7} \\
+    \figestrupl{Estrup-C-Glyphosate-2001-8} & 
+    \figestrup{Estrup-C-Glyphosate-2001-9} & 
+    \figestrup{Estrup-C-Glyphosate-2001-10} \\
+    \figestrupl{Estrup-C-Glyphosate-2001-11} & 
+    \figestrup{Estrup-C-Glyphosate-2001-12} & 
+    \figestrup{Estrup-C-Glyphosate-2002-1} \\
+    \figestrupl{Estrup-C-Glyphosate-2002-2} & 
+    \figestrup{Estrup-C-Glyphosate-2002-3} & 
+    \figestrup{Estrup-C-Glyphosate-2002-4}
+  \end{tabular}
+  
+  \caption{Estrup glyphosate soil water concentration at the end of
+    each month since first application of bromide.  The y-axis denotes
+    depth, the x-axis distance from drain.  There are tick marks for
+    every meter. The color scale is white<10 pg/l, yellow=1 ng/l, orange=0.1
+    $\mu$g/l, red=10 $\mu$g/l, and black>1 mg/l}
+\label{fig:Estrup-C-Glyphosate-2001}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \fig{Silstrup-Glyphosate-horizontal-2001}
+  \fig{Estrup-Glyphosate-horizontal-2000}
+  
+  \caption{Silstrup total horizontal glyphosate transport between 2001-5-1
+    and 2002-3-1 and Estrup total horizontal glyphosate transport between
+    2000-5-1 and 2001-5-1. The transport is shown on the x-axis (positive
+    away from drain) as a function of depth shown on the y-axis.  The
+    graph labels are the distance from drain in centimeters.}
+  \label{fig:Glyphosate-horizontal}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Silstrup-Glyphosate-2001}
+  \fig{Silstrup-Glyphosate-biopore-2001}
+  
+  \caption{Silstrup total (top) and biopore (bottom) vertical
+    glyphosate transport between 2001-5-1 and 2002-3-1.  The transport is shown
+    on the y-axis (positive up) as a function of distance from drain
+    shown on the x-axis.  The graph labels are depths in centimeters
+    above surface.}
+  \label{fig:Silstrup-Glyphosate-2001-vertical}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \figtop{Estrup-Glyphosate-2000}
+  \fig{Estrup-Glyphosate-biopore-2000}
+  
+  \caption{Estrup total (top) and biopore (bottom) vertical glyphosate
+    transport between 2000-5-1 and 2001-5-1.  The transport is shown on the
+    y-axis (positive up) as a function of distance from drain shown on
+    the x-axis.  The graph labels are depths in centimeters above
+    surface.}
+  \label{fig:Estrup-Glyphosate-2000}
+\end{figure}

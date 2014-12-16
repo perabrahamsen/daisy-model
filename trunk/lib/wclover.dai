@@ -1,0 +1,117 @@
+(defAOM Wclover-SLOW CROP-SLOW
+  "Slow AOM pool modified for Wclover."
+  (initial_fraction 0.50)
+  (C_per_N 50.0))
+
+(defcrop Wclover default (description "v.30 Developed by Henning Høgh Jensen")
+;; this crop has been develeped to be grown in mixtures with grass. It is proper validated on clayey loams but not on sandy soils
+
+  (min_light_fraction 0.01) ; in agreement with a patchy environment, clover is pre-allocated a proportion of the light
+  (Devel default
+         (EmrTSum 50)
+	 (DS_Emr 0.05)
+	 (DSRate1 0.025)
+	 (TempEff1 (0 0.001) (4 0.005) (11 0.35) (17 0.7) (20 0.80) (32 1.00) (39 1.20))
+	 (PhotEff1 (00 0.10) (10 0.29) (11 0.55) (12 0.75) (13 0.89) (14 1.00)
+		   (15 1.08) (16 1.14) (17 1.18) (24 1.18))
+	 (DSRate2 0.020)
+	 (TempEff2 (0 0.001) (5 0.015) (14 0.4) (20 0.8) (24 0.90) (29 1.00) (39 1.20))
+	 (defined_until_ds 2.0))
+  (Vernal default
+          (DSLim 0.33)
+	  (TaLim  5.0)
+	  (TaSum  -50.0))
+  (LeafPhot original (Qeff 0.0600)	; change from 0.065 
+	    (Fm   1.80)	  ; from 3.00
+	    (TempEff (-20 0.0001) (6.5 0.100) (8.0 0.30) (12 0.8) (16 1.00)
+		     (20 1.00) (33 1.00)(37 0.03) (50 0.0))) ;°C
+  (Seed LAI (DSLAI05 0.3)
+        ;; Added by pa 2014-07-18 to make it grow.
+        (SpLAIfac (0.0 100) (1.0 100)))
+  (Canopy   
+	  (SpLAI 0.0175)                ; (m²/m²)/(g/m²) ~170 cm2/g  (Fabricius, 2000)
+	  (HvsDS (0 001) (0.25 5) (0.4 8)(0.7 16) (1 22) (2 30))
+	  (LeafAIMod (0.0 1.0) (1.0 1.0)(2.0 0.75))
+	  (SpStemAI 0.0030)             ;Fabricius, 2000
+	  (StemAIMod (0.0 1.0) (1.0 1.0) (2.0 1.00))
+	  (StemPhotEff 1.00)
+	  (LAIDist0 0.00 0.00 1.00)
+	  (LAIDist1 0.0 0.60 0.90)
+	  (PARref 0.06)
+	  (PARext 0.70)
+	  (EPext 0.80)                    ; a k-value of 0.7 was given in Høgh-Jensen, 1997, PhD thesis, KVL
+	  				  ; McKensie et al 2000 show on p 33 a k-value of 0.9-1.0 New Zealand Pasture and Crop Science (eds. White and Hodgson) Oxford Uni Press, Melbourne
+	  (EpFac 1.0)
+	  (IntcpCap 0.5)
+	 	  )
+        
+  (Root (DptEmr 2)
+	(PenPar1 0.25)
+	(PenPar2 4.0)
+	(MaxPen 100)    ; se Høgh-Jensen og Schjoerring 1997          
+	(rootdens "Gerwitz+Page74"
+		(SpRtLength 90.0)
+		(DensRtTip 0.1))
+	(Rad 0.0140)
+	(h_wp -15000)
+	(Rxylem 10)
+	(MxNH4Up 1e-011)  ; clover has much lower affinity for NH4 than ryegrass (Høgh-Jensen & Schjoerring, 1997)
+	(MxNO3Up 1e-08)) 
+
+  (Partit (RSR  (0.00 0.50) (1.00 0.30) (2.00 0.20))
+	  (Root (0.00 0.95) (0.33 0.95) (0.53 0.85) (1.00 0.75) (2.00 0.50))
+	  (Leaf (0.00 0.65) (0.33 0.55)	(0.43 0.50) (0.63 0.40) (0.95 0.25) (1.2 0.20)(1.45 0.12) (2.00 0.0))
+	  (Stem (0.00 0.35) (0.33 0.45) (0.43 0.50) (0.63 0.60) (0.95 0.75) (1.2 0.70)(1.45 0.60) (2.00 0.0)))
+
+
+  (Prod	(NCrop 0.04)
+	(E_Root 0.69)
+	(E_Leaf 0.68)
+	(E_Stem 0.66)
+	(E_SOrg 0.57)
+	(r_Root 0.025) 			 ; up from 0.10 (kropff & Laar, 1993, p.51) due to N2 fixation            ; 
+	(r_Leaf 0.030)                   ; kropff & Laar, 1993, p.51
+	(r_Stem 0.005)
+	(r_SOrg 0.005)                   ; Hansen et al., 1993, p.109
+	(ShldResC 0.30)			 ; fraction of stem DM shielded
+        (ReMobilDS 1.00)		 ; Remobilization, Initial DS
+	(ReMobilRt 0.1)			 ; Remobilization, release rate
+	(LfDR (0.00 0.00) (0.80 0.004) (1.00 0.010) (1.4 0.1) (2.00 0.25))
+	(RtDR (0.00 0.00) (0.50 0.00) (0.70 0.010) (2.00 0.15))
+        (Large_RtDR 0.030)
+        (RtDR_T_factor (0.0 0.0) (5.0 1.0) ) )	; this stop root death at 0.0 dg C and reach full at 5 dg C
+        					; partly after Gill & Jackson (2000) New Phytol 147:13-31
+         	
+ (CrpN 	(DS_fixate 0.10) (DS_cut_fixate 0.15) (fixate_factor 0.02) ; fixate from 0.45
+	(PtRootCnc (0.00 0.025) (1.00 0.025) (2.00 0.025))
+	(CrRootCnc (0.00 0.015) (1.00 0.013) (2.00 0.011))
+	(NfRootCnc (0.00 0.008) (2.00 0.008))
+
+	(PtLeafCnc (0.00 0.048) (1.00 0.046) (2.00 0.043))
+	(CrLeafCnc (0.00 0.035) (1.00 0.035) (2.00 0.035))
+	(NfLeafCnc (0.00 0.030) (2.00 0.030))
+
+	(PtStemCnc (0.00 0.020) (1.00 0.020) (2.00 0.020))
+	(CrStemCnc (0.00 0.016) (1.00 0.016) (2.00 0.016))
+	(NfStemCnc (0.00 0.015) (1.00 0.015) (2.00 0.015))
+
+        (PtSOrgCnc (0.00 0.030) (1.00 0.030) (2.00 0.030))
+	(CrSOrgCnc (0.00 0.028) (1.00 0.028) (2.00 0.028))
+	(NfSOrgCnc (0.00 0.022) (2.00 0.022))
+	
+	(TLLeafEff (0.00 0.900) (2.00 0.900))
+	(TLRootEff (0.00 0.100) (2.00 0.100)))
+ 
+ (Harvest (Dead  "Wclover-SLOW" "CROP-FAST") ; all going into SMB2
+	   (Stem "Wclover-SLOW" "CROP-FAST")
+	   (Leaf "Wclover-SLOW" "CROP-FAST")
+	   (SOrg (Wclover-SLOW (initial_fraction 0.9))
+		 "CROP-FAST")
+	   (Root  "Wclover-SLOW" "CROP-FAST")
+	    (DSmax 2.0)
+	    (DSnew 0.27) 
+	    (cut_delay (500 10) (1000 35) (2000 45) (7000 75)) ; kg dm/ha gives delay in days
+
+		)
+
+ )

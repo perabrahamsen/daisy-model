@@ -1,0 +1,85 @@
+2D Daisy
+========
+
+Thoughts and time estimates of the developing of support for 2
+dimensional water transport in the soil matrix and in macropores.  The
+support must coexist and integrate with the existing 1D model.
+
+Prototypical applications.
+==========================
+
+There are many potential uses, the two that will be used for design
+are: 
+
+1. Crops growing in rows.
+2. Preferential flow directed to pipe drains.
+
+Model thoughts.
+==============
+
+For the first version, we will reuse the existing 1D bioclimnate
+model, even though we know it is inadequate for crops in rows.
+
+The remaining work can be divided into upper boundary (soil surface),
+lower boundary (groundwater), content (including a soil description),
+transport, roots, and turnover.
+
+Turnover and content.
+---------------------
+
+We how the current models for turnover (mineralization, nitrification,
+etc.) can be reused, but the turnover code has to be divided from the
+code managing the state (content).  We hope initially to be able to
+reuse the 1D static description of the soil profile.
+
+Roots.
+------
+
+A 2D root growth and uptake model must be developed.  
+
+Surface.
+--------
+
+We don't actually know what to do here, in particular for a surface
+with a slope, nor how to connect the 1D upper boundary of the soil
+with the 0D lower boundary of the bioclimate.
+
+Groundwater model.
+------------------
+
+Need to be updated to serve as a 1D boundary, but we assume all
+boundaries will be uniform, except the pipe drain boundary which will
+be reimplemented as a (very large) macropore.
+
+Matrix.
+-------
+
+A finite-volume based model with a rectangular grid and a generic
+source/sink term.  Should exist both for water and for solute.
+
+Macropores.
+-----------
+
+We need to develop a 2D model which interact with the matrix through
+the source/sink term.  Should exist both for water and solute.  The
+macropores also need to act as a container, unlike the current 1D
+model.  
+
+Time Estimate:
+==============
+
+Mikkel: Total 2 years: 1 year matrix flow prototype in mathlab, 1/2
+year C++ reimplementation, 1/2 year developing macropore model and
+code.
+
+Per: Total 2 years: 1/2 year on each of turnover and content
+reorganization, root model implementation, the new boundaries, and
+help with C++ implementation.
+
+Total time estimate 4 years, which will give a working (non-prototype)
+integrated tool that can solve one of the initial problems, and serve
+as a base for the other.
+
+We still need help developing the macropore model and root model.
+
+

@@ -1,0 +1,12 @@
+dlf-0.0 -- harvest
+
+VERSION: 5.18
+LOGFILE: harvest.dlf
+RUN: Mon Oct  7 16:08:21 2013
+
+SIMFILE: setup.dai
+
+--------------------
+year	month	day	column	crop	stem_DM	dead_DM	leaf_DM	sorg_DM	stem_N	dead_N	leaf_N	sorg_N	WStress	NStress	WP_ET
+					Mg DM/ha	Mg DM/ha	Mg DM/ha	Mg DM/ha	kg N/ha	kg N/ha	kg N/ha	kg N/ha	d	d	kg/m^3
+2013	8	5	Bakkegaarden	SB	0	0	0	4.12379	0	0	0	117.665	15.2892	0	2.14689

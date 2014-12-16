@@ -1,0 +1,158 @@
+(defcrop "Silomajs" default
+  "Majs med årsudbytter der svarer til gennemsnittet for dansk landbrug.
+Skabt af Christian Thirup for Daisy standardiseringsprojektet.
+Baseret på Roskilde 74-76 ukendt varietet."
+  (Devel default
+      (EmrTSum  300)
+      (DS_Emr   0.01)
+      (DSRate1  0.0160)
+     (TempEff1 (0. 0.30) (10. 0.30) (15. 0.75) (25. 1.00) (35.  1.20))
+     (PhotEff1 (0. 0.90) (12. 1.00) (14. 0.95) (16. 0.90) (24.  0.90))
+      (DSRate2  0.021)
+      (TempEff2 (0. 0.30) (10. 0.30) (15. 0.75) (25. 1.00) (35.  1.20)))
+
+  (LeafPhot original 
+      (Fm 5.00); oprindelig 6.00
+      (DSEff (0.0 1.0) (0.3 1.0) (1.0 1.00)(2.0 1.00));N-udbytteniveau korrigeres ved forholdsmæssig op eller nedjustering af værdierne ved DS 1.0 og 2.0
+      (Qeff   0.0400)
+    (TempEff (-20.0 0.001) (6.0 0.10) (10.0 1.00) (15.0 1.00) (20.0 1.00)))
+
+  (Seed LAI (DSLAI05   0.25))
+  (Canopy
+      
+      (SpLAI     0.010)
+      (LeafAIMod (0.0 1.0) (2.0 1.0))
+      (SpStemAI 0.005)
+      (StemAIMod (0.0 1.0) (1.6 0.0) (2.0 0.0))
+      (StemPhotEff 0.20)
+      (SpSOrgAI 0.005)
+      (SOrgAIMod (0.0 1.0) (1.6 0.0) (2.0 0.0))
+      (SOrgPhotEff 0.20)
+      (LAIDist0 0.00 1.00 1.00)
+      (LAIDist1 0.10 0.80 1.00)
+      (PARref   0.06)
+      (PARext   0.80)
+      (EPext    0.50)
+      (HvsDS   (0.00 1) (0.20 50) (0.50 150) (1.00  200) (2.00  200)))
+
+  (Root
+      (DptEmr     10)
+      (PenPar1    0.25)
+      (PenPar2     4.0)
+      (MaxPen      100)
+      (Rad        0.05)
+      (h_wp       -15000)
+      (Rxylem     10.0)
+      (MxNH4Up     9.0E-0009)
+      (MxNO3Up     9.0E-0009))
+
+  (Partit
+      (Root (0.00 0.60) (0.67 0.35) (1.37 0.10) (1.60 0.10) (2.00 0.05))
+      (Leaf (0.35 0.70) (0.67 0.50) (1.00 0.15) (1.18 0.05)(1.85 0.05) (2.00 0.05)) 
+      (Stem (0.35 0.30) (0.67 0.50) (1.00 0.85) (1.18 0.05)(1.80 0.00)(2.00 0.00))
+      (RSR  (0.00 0.50) (1.00 0.25) (2.00 0.25)))
+
+  (Prod
+       (NCrop     0.20)
+       (E_Root     0.69)
+       (E_Leaf     0.68)
+       (E_Stem     0.66)
+       (E_SOrg     0.68)
+       (r_Root     0.015)
+       (r_Leaf     0.025)
+       (r_Stem     0.010)
+       (r_SOrg     0.030)
+       (ShldResC   0.00)
+       (ReMobilDS  1.40)
+       (ReMobilRt  0.02)
+       (Large_RtDR 0.05)
+       (ExfoliationFac 0.5)
+       (LfDR (0.00 0.00) (0.10 0.00) (1.50 0.005) (2.00 0.005))
+       (RtDR (0.00 0.00) (0.20 0.00) (1.20 0.010) (2.00 0.01)))
+ 
+ (CrpN 
+      (PtRootCnc (0.00 0.0200)    (1.00 0.0200)    (2.00 0.0100))
+      (CrRootCnc (0.00 0.0100)    (1.00 0.0100)    (2.00 0.0050))
+      (NfRootCnc (0.00 0.0070)    (1.00 0.0070)    (2.00 0.0070))
+
+      (PtLeafCnc (0.000 0.044) (0.367 0.044) (0.500 0.040) (1.00 0.030) (1.500 0.020)(1.800 0.018))
+      (CrLeafCnc (0.000 0.010) (0.367 0.010) (0.500 0.009) (1.00 0.008) (1.500 0.008) (1.800 0.008))
+      (NfLeafCnc (0.000 0.004) (1.00 0.004) (2.00 0.004))
+
+      (PtStemCnc (0.838 0.020)    (1.057 0.015)  (1.244 0.014))
+      (CrStemCnc (0.838 0.010)    (1.057 0.010)  (1.244 0.008))
+      (NfStemCnc (0.838 0.004)    (1.057 0.004)  (1.244 0.004))
+
+      (PtSOrgCnc (1.057 0.0200)  (1.244 0.018) (2.00 0.018))
+      (CrSOrgCnc (1.057 0.0160)  (1.244 0.012) (2.00 0.012))
+      (NfSOrgCnc (1.057 0.0140)  (1.244 0.010) (2.00 0.010))
+ 
+;original       (PtLeafCnc (0.000 0.044) (0.367 0.044) (0.500 0.040) (1.00 0.030) (1.500 0.018)(1.800 0.015))
+;original       (CrLeafCnc (0.000 0.010) (0.367 0.010) (0.500 0.009) (1.00 0.008) (1.500 0.008) (1.800 0.008))
+;original       (NfLeafCnc (0.000 0.004) (1.00 0.004) (2.00 0.004))
+ 
+;original       (PtStemCnc (0.838 0.020)    (1.057 0.014)  (1.244 0.011))
+;original       (CrStemCnc (0.838 0.010)    (1.057 0.010)  (1.244 0.008))
+;original       (NfStemCnc (0.838 0.004)    (1.057 0.004)  (1.244 0.004))
+ 
+;original       (PtSOrgCnc (1.057 0.0200)  (1.244 0.015) (2.00 0.015))
+;original       (CrSOrgCnc (1.057 0.0160)  (1.244 0.012) (2.00 0.012))
+;original       (NfSOrgCnc (1.057 0.0140)  (1.244 0.010) (2.00 0.010))
+
+      ))
+
+(defcrop "Silomajs; Foulum" "Silomajs"
+"Maize (var. Patrick) for silage. Created by Kiril Manevski for his PhD project at AU Foulum.
+Based on maize experiments from Nortic field trials at Foulum & Jyndevad 2009-2011 (Ib S. Kristensen)"
+  (cite "redfescue")
+  (Devel original
+      (EmrTSum  180)    ;def. 300
+      (DSRate1  0.020)  ;def. 0.0160
+      (DSRate2  0.021))
+ 
+  (LeafPhot original 
+     (Fm 6.5) ;def. 5.0; may vary between 6-7 (calibration)
+     (DSEff (0.0 1.0) (0.3 1.0) (1.0 1.0)(2.0 0.6))) ;at DS=2.0 the value of DSEff may vary between 0.4-0.8 (calibration)
+  
+  (Canopy
+      (SpLAI     0.020)  ;def. 0.01 (measured range throught growth season was 0.015–0.022)
+      (LeafAIMod (0.0  0.35)  (0.4 0.45) (0.5 0.50) (0.6 0.55) (0.7 0.58) (0.8 0.62) (0.9 0.75) (1.05 0.90) (1.08 1.00) 
+                 (1.11 1.05)  (1.2 1.08) (1.3 1.10) (1.4 1.10) (1.5 1.10) (1.6 1.00) (1.7 0.90) (1.80 0.50) (2.00 0.40)))
+      ;LeafAIMod values have a "fitting range" (year/treatment variations in SpLAI and LAI);
+  
+  (Root    (MxNH4Up     8.0E-0008)   ;;;def. 9.0E-0009
+           (MxNO3Up     8.0E-0008))  ;;;def. 9.0E-0009
+
+  (Partit   
+      (RSR  (0.00 0.50) 				    (1.00 0.25) 						(2.00 0.25))
+      (Root (0.00 0.60) 	    (0.67 0.30) 			(1.37 0.10) (1.60 0.10) (2.00 0.05))
+      (Leaf (0.35 0.63) (0.49 0.54) (0.67 0.34) (0.90 0.32) (1.00 0.30) (1.11 0.30) (1.20 0.10) (1.30 0.00) (1.80 0.00) (2.00 0.00)) 
+      (Stem (0.35 0.37) (0.49 0.46) (0.67 0.66) (0.90 0.68) (1.00 0.70) (1.11 0.00) (1.20 0.00) (1.30 0.00) (1.80 0.00) (2.00 0.00)))
+
+  (Prod
+       (E_Leaf     0.75)   ;def. 0.68; may vary between 0.68-0.82 (de Vries, 1989) 
+       (E_Stem     0.78)   ;def. 0.68; may vary between 0.68-0.82 (de Vries, 1989) 
+       (E_SOrg     0.80)   ;def. 0.68; may vary between 0.68-0.82 (de Vries, 1989) 
+       (r_Root     0.010)  ;def. 0.015; found with calibration i.e. lowered to obtain more biomass (comparison with measured root biomass)
+       (r_Leaf     0.010)  ;def. 0.025; found with calibration i.e. lowered to obtain more biomass 
+       (r_Stem     0.010)
+       (r_SOrg     0.010)) ;def. 0.030; found with calibration  i.e. lowered to obtain more biomass
+
+   (CrpN 
+      (PtRootCnc (0.00 0.0200)    			    (1.00 0.0200)    			(2.00 0.0100))
+      (CrRootCnc (0.00 0.0100)    			    (1.00 0.0100)    			(2.00 0.0070))
+      (NfRootCnc (0.00 0.0070)    			    (1.00 0.0070)    			(2.00 0.0050))
+
+      (PtLeafCnc (0.000 0.027) (0.367 0.028) (0.500 0.029) (0.800 0.030) (0.900 0.031) (1.00 0.034) (1.10 0.034) (1.20 0.034) (1.30 0.034) (1.400 0.030) (1.500 0.025) (1.800 0.015))
+      (CrLeafCnc (0.000 0.009) (0.367 0.009) (0.500 0.009) (0.800 0.009) (0.900 0.009) (1.00 0.010) (1.10 0.015) (1.20 0.017) (1.30 0.010) (1.400 0.009) (1.500 0.009) (1.800 0.009))
+      (NfLeafCnc (0.000 0.004)                             (0.800 0.004) (0.900 0.004) (1.00 0.006) (1.10 0.008) (1.20 0.009) (1.30 0.006) (1.400 0.004) (1.500 0.004) (1.800 0.004) (2.00 0.004))
+
+      (PtStemCnc (0.000 0.022) (0.367 0.022) (0.500 0.022) (0.800 0.022) (0.90 0.022)  (1.0 0.018) (1.10 0.018) (1.20 0.016) (1.30 0.012) (1.40 0.011) (1.50 0.010))
+      (CrStemCnc (0.000 0.010) (0.367 0.010) (0.500 0.010) (0.800 0.010) (0.90 0.010)  (1.0 0.008) (1.10 0.008) (1.20 0.008) (1.30 0.008) (1.40 0.008) (1.50 0.008))
+      (NfStemCnc (0.000 0.004) (0.367 0.004) (0.500 0.004) (0.800 0.004) (0.90 0.004)  (1.0 0.004) (1.10 0.004) (1.20 0.004) (1.30 0.004) (1.40 0.004) (1.50 0.004))
+
+      (PtSOrgCnc 					    (1.057 0.0200)  (1.244 0.015) (2.00 0.012))
+      (CrSOrgCnc 					    (1.057 0.0160)  (1.244 0.012) (2.00 0.011))
+      (NfSOrgCnc 					    (1.057 0.0140)  (1.244 0.010) (2.00 0.010)))
+      ;PtLeafCnc and PtStemCnc values have a "fitting range" due to climate/development variations between years of maize fertilized with ample N     
+ )

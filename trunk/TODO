@@ -1,0 +1,1225 @@
+TODO --- things that needs to be done with Daisy -*- outline -*-
+
+** Hydraulic WEPP
+
+Stadig kun 1 hydraulic model per horizontt. Vi må have flere
+horizonter hvis vi skal tage hensyn til flere jordbehandlingsdybder.
+
+En horizont bliver "behandlet" hvis den overlapper med jordbehandling.
+
+*** set_hypress_parametre (texture, dry_bi
+
+* Emacs
+
+
+** (export DAISYHOME)
+
+** (export PATH ... libdeps?)
+
+* Oversæt på HP
+
+** Skal vi have to udgaver, 32 generisk og 64 bit native? 
+
+** Qt 4? 
+
+* Kopier X61 HD, sluk maskine
+
+* Installar Daisy build på HP.
+
+
+* Biopore flow 
+
+** Calculate "M" for hver celle, biopore klasse, og stof.
+
+** Calculate flux from S (stof), M_old, M_new for hver klasse og stof.
+
+** Add M, flux til stof
+
+** J_p
+
+* Rodartikel ES&M
+
+** Data and software availability
+
+** Expand on software
+
+* Ny ligning for 3to1 fra Søren
+
+* Ny version af Hypres ark
+
+* Klimafil Windows 7?
+
+* Klima?
+
+* UI
+
+** "simple" filter skal angive base classes, ikke leaf classes.
+
+** Overvej at forene datastruktur for raw og simple filter.
+
+Måske en "reset_filter" som bygger fælles datastruktur?
+
+Og lad find/default funktioner bruge den struktur?
+
+
+** En frame/parent_frame -> edit widget funktion
+
+skal kunne bruges nested til submodels
+
+** Måske skal "file" tab kunne anvende den?
+
+* Søren
+
+Split q_tertiary i q_direct og q_b2m
+
+Hvad hvis der er forskellige drændybder?
+
+* Vestskoven
+
+Osvaldo setup is in project/osvaldo/Nitrogen
+
+From what I remember I should add to the setup (or Daisy):
+
+1) N uptake and C+N in litter for permanent vegetation
+
+2) Use bioincorporation to get the litter in the soil.  For the oak, we have earth worms, for the sprouce, we don't.  For the later, litter should be added to the top 5 cm of the soil, and no "transport loss" of C.
+
+3) Decrease organic matter turnover in soil.
+
+4) Create a nitrogen balance.  Get Per G and Søren to agree that it doesn't look totally wrong.
+
+Then add key parameters for optimization.  These would be:
+
+5) organic matter turnover factor
+
+6) C/N ratio in leaves (is it constant over a season?)
+
+7) SpLAI in leaves (is it constant over a season?)
+
+Then turn the setup back to Osvaldo for Monte Carlo generation.
+
+* Snak med SH om org.matter artikel.
+
+Kan den måske publiseres hvis den bliver drejet til en "diskussion af brug af
+ækvilibrium og semi-ækvilibrium antagelser for initialisering af OM".
+
+Konklusion:  Kør langtidssimuleringer med din model før du gør det.
+
+Opstillingen af ligningssystemet skal så komprimeres, da det ikke
+længere er en genial ny ide vi præsenterer.
+
+* Prøv 2D med MACRO hydraulics
+
+Specielt pressure secondary domain.  MACRO har mere vand i det domæne.
+
+VIRKER IKKE!  failure 50% af tiden
+
+* Optimize
+
+** reserver space for coordinate matrix
+
+Måske også for andre?  Og mellem tidsskridt?  Nulstil efter brug?
+
+Hvis vi sætter hvert element til 0 bør strukturen bevares.
+
+* Standard log
+
+** Field water skal have "interne" strømme med
+
+Samme med Field nitrogen?
+
+** Skeln mellen sink og source for bioporer.
+
+* biopore log
+
+** adskild "in" og "ud" 
+
+* Make "chemistry multi" model obsolete by making column Chemistry a list 
+
+** diskussion
+
+* Artikler
+
+** Artikel om ABA integration
+
+SHA: Verificering 
+
+** Test dk-taastrup-hourly.dwf mod RS-Weather.dwf
+
+* Agricultural Water Management
+
+5-6 pages, SAFIR, end of year
+
+Framework for testing stomata models
+Integrating ABA production in the root zone (Fulai + Finn/Bo)
+
+Title: A physical based approach to integration of ABA production
+under heterogenious moisture conditions
+
+Abrahamsen et al
+
+* gs
+
+** gs_expr
+
+** rs_min / rs_max i pet_PM
+
+* irrigate
+
+frame.order ("value")
+
+value type is Attribute::User ()
+
+skal være enten [mm] eller [mm/h]
+
+udregn flux og remaining_time hvis ikke angivet
+
+* Cleanup
+
+** fjern flere "clone", brug shared_ptr
+
+* frame + lib
+
+** define_model
+
+* Regression testing
+
+** ? Log: akkumulerede værdier skal ikke være per tid.
+
+** LogDLF::done skal fortælle fetch om tidsskridt
+
+** Divide fetch in "basic" and "pretty"
+
+Flyt pretty print til pretty.
+
+** omskriv log_regress.C til kun at udregne og udskrive en linie
+
+dato version revision værdier
+
+** indlæs gamle værdier
+
+** merge med advarsler  
+
+** opdater "make check"
+
+skal klare filhåntering.
+
+* installer solver
+
+* Aflever udlægsblanket
+
+* Serbia DONE
+
+** max exfiltration gradient
+
+** seed + orlean
+
+** shared data between years
+
+** speed up simulation
+
+* Serbia TODO
+
+** hourly data
+
+** biometrics & soil water for full irrigation, three years
+
+** calibrate soil
+
+** calibrate crop (Xn)
+
+** prd setups
+
+** compare rs
+
+* serbian soil
+
+
+* C_below læst fra tidsserie
+
+Number::tick skal tage tid some argument.  Eller Daisy?
+
+Number::File (NumberSource)?
+
+* Artikler
+
+** OMinit
+
+*** pløjelag 1 m eller 30 cm?
+
+*** Inkluder SH ændringer 
+
+** Managing the farmer (SH)
+
+Dropped
+
+** 2D G&P (SH)
+
+* SAFIR 
+
+** Løsning?
+
+** OpenMI?
+
+* Omskriv wiki side om kolloider.
+
+* Kolloider og kolloidfascilitetert transport.
+
+** Kolloider
+
+Kolloider modeleres i Daisy som et ikke adsorberende stof, med to
+eller tre processer tilknyttet.
+
+Den første process er generering, og den foregår i det øverste
+jordlag, styret af regnintensitet.  Den anden process er filtrering,
+som foregår overalt i jormatricen, og er styret af vandhastighed.  Der
+er flere modeller for generering, og en enkelt for filtrering.  Se
+[Jarvis99] og [MST-kolloid] for en beskrivelse af disse.  En tredje
+process er desorbtion.  Denne process foregår også overalt i
+jormatricen, men er ikke inkluderet i Daisy i denne omgang.
+
+Til transport af kolloider bliver der brugt samme algoritme som til
+kvælstof og opløste pesticider.  Kolloiderne har deres egen
+diffusionskoefficent.  Se [stoftransport].
+
+** Kolloidfaciliteret transport
+
+For kolloidfaciliteret transport fordeles det adsorberede stof mellem
+immobilt jord og kolloider.  Det adsorbede stof på kolloiderne bliver
+transporteret med samme algoritme som bliver brugt til kolloiderne og
+til opløst stof.  Diffusionskoefficienten for kolloider benyttes til
+transportprocessen.
+
+*** Ligevægtsfordeling
+
+Fordelingen af adsorberet stof mellem immobilt jord og kolloiderne
+antages at gå mod en ligevægt, som kan beskrives ud fra forholdet
+mellem immobilt jord og kolloider.  Da kolloiderne generelt regnes for
+lettere tilgængelige end det immobile jord, ganges dog en
+berigelsesesfaktor på først.
+
+A_kolloid_eq = A_total * M_kolloid * B_faktor /(rho_b + M_kolloid * B_faktor)
+A_immobil_eq = A_total - A_kolloid_eq
+
+A_kolloid_eq: adsorberet til kolloid ved ligevægt [M L^-3]
+A_immobil_eq: adsorberet til immobil jord ved ligevægt [M L^-3]
+A_total: total mængde adsorberet stof [M L^-3]
+M_kolloid: massen af kolloider i det aktuelle jordvolumen [M L^-3]
+B_factor: Berigelsesfaktor []
+rho_b: Tør jords volumenmasse [M L^-3]
+
+Ligevægten mellem A_total og opløst stof (C_eq) bestemmes med en af de
+allerede implementerede adsorptionsmodeller (lineær, Freundlich,
+Langmuir).
+
+*** Dynamisk fordeling
+
+For stoffer der opnår ligevægt hurtigt i forhold længden af tidsskridt
+i Daisy vil stof bliver fordelt mellem opløst, kolloidadsorberet og
+immobilt straks efter udregning af transport af de to førstnævnte.
+
+**** Adsorption og desorption
+
+For stoffer hvor ligevægt kun opnås relativt langsomt bruges
+adsorptions- eller desorptionsrate der ganges på afstanden til
+ligevægtspunktet.
+
+A_immobile > A_immobile_eq
+  S_adsorption_immobile = (A_immobile_eq - A_immobile) * k_adsorption_immobile
+
+A_immobile < A_immobile_eq
+  S_adsorption_immobile = (A_immobile_eq - A_immobile) * k_desorption_immobile
+
+A_kolloid > A_kolloid_eq
+  S_adsorption_kolloid = (A_kolloid_eq - A_kolloid) * k_adsorption_kolloid
+
+A_kolloid < A_kolloid_eq
+  S_adsorption_kolloid = (A_kolloid_eq - A_kolloid) * k_desorption_kolloid
+
+A_immobile: Aktuel mængde af stof adsorberet til immobil jord [M L^-3]
+A_kolloid: Aktuel mængde af stof adsorberet til kolloider [M L^-3]
+S_adsorption_immobile: Adsorptionsrate til immobil jord [M L^-3 T^-1]
+S_adsorption_kolloid: Adsorptionsrate til kolloider [M L^-3 T^-1]
+k_adsorption_immobile: Relativ adsorptionrate til immobil jord [T^-1]
+k_adsorption_kolloid: Relativ adsorptionrate til kolloider [T^-1]
+k_desorption_immobile: Relativ desorptionrate fra immobil jord [T^-1]
+k_desorption_kolloid: Relativ desorptionrate fra kolloider [T^-1]
+
+S_adsorption_immobile og S_adsorption_kolloid ingår som sink term i
+løsning af transportligningen for opløst stof.  S_adsorption_kolloid
+indgår som en del af sourcetermen i ligningen for kolloidfaciliteret
+transport S_adsorption_immobile (ganget med tidsskridtet) trækkes fra
+A_immobile forbindelse med at de to transportligninger løses.
+
+*** Generering og filtrering
+
+Udvekslingen mellem A_kolloid og A_immobile puljerne følger generering
+og frigivelse af kolloider.
+
+f_generate = S_generate / rho_b
+f_filter = S_filter / M_kolloid
+
+S_soil = f_gen * A_immobile - f_filter * A_kolloid
+
+S_generate: frigivelse af kolloider fra jordmartix [M L^-3 T^-1]
+S_filter: filtrering af kolloider i jordmatrix [M L^-3 T^-1]
+f_generate: relativ frigivelse af kolloider [T^-1]
+f_filter: relativ filtrering af kolloider [T^-1]
+S_soil: mobilisering af adsoreret stof [M L^-3 T^-1]
+
+S_soil lægges til source termen i løsningen af transportligningen for
+kolloider, og trækkes fra (ganget med tidsskridt) A_immobile samtidig
+med transportligningerne løses.
+
+* Kolloider
+* Artikler
+
+rootdens: seyed, pa, sha, mmo
+ominit: pa, bgj, sha
+farmer: pa, sha
+
+Farquhar: bgj, sha; pa
+svat: bgj, sha; pa
+
+1d vs 2d dræn: ; sha
+
+rørrende vand: mmo, cpe, nabi, maha, sha, pa
+stof?  
+
+[2d, makro, sekundært domæne, kolloid ]
+
+vap
+
+* OpenMI
+
+** Enheder?
+
+* SVAT
+
+** Check initialisering af soil_heat
+
+* daisy.bib
+
+** Tilføj N bog
+
+* Tertiary 
+
+** Små tidsskridt
+
+Er stoftransport i klasser korrekt med små tidsskridt?
+
+Eller bruger den S termen fra sidste lille tidsskridt?
+
+** Option to disable in top nodes.
+
+Kun matrix -> biopore ?
+
+* edge baseret kode til rect solute og vand
+
+* Frame
+
+* Treelog send (severity, location, text);
+
+* DOMÆNER
+
+stof i mobil vand, immobil vand, makropore 1, 2, og n.
+
+* 1D vs 2D drænvand artiklel
+
+søren, carsten
+marie, nanna, birgitte
+per, mikkel
+
+* ABA
+
+** ABA container in soil for every cell
+
+production function, decompose function 
+
+** Cycly broken by using ABAxylem for previous hour
+
+E_a = f (g_s)
+g_s = f (ABA_xylem)
+ABA_xylem = f (h, E_a)
+
+** Would like to calculate ABAxylem for night with "minimum transpiration".
+
+This gets the first light hour less wrong.
+
+* opdater spreadsheet.
+
+* OM init artikeltop  
+
+** Formål
+
+dynamic systems, static initialization, warmup period, too long,
+examine assumtions, variable input and climate (N limitation).
+Climate vary over a day, a year, between years both random and trend.
+Input varies over a year, in a crop rotation, and with climate.
+
+** Static description
+
+Equation system
+
+* Sorption
+
+Check sample/*.dai
+Check dokumentaion
+
+Udskudt:
+
+- decompose reaction
+- fjern decompose
+- elements
+
+- horizon attributes skal være parametre
+geo skal i ScopeSoil, så man kan spørge på z
+slet transform?  Kan ikke, bruges af domsorp...
+Gør DOM til DOM-C og DOM-N ?
+
+* function
+
+(defnumber sqr function
+  "Find the square of a number."
+  (parameters (x [D]))
+  (order x)
+  (value (* x x))
+  (dimension (* U U)))
+
+(sqr 7 [cm])
+
+* Rootdens
+
+** Real crop width.
+
+** rootdens.tex
+
+*** Skitse af system.
+
+*** Figur af L*_xz (conturplot)
+
+*** Nævn software
+
+*** Implementation in Daisy.
+
+* MiniOM init
+
+Pool 
+  input 
+  turnover*
+  content
+
+Turnover
+  base rate
+  factor*
+  target* 
+
+Target
+  pool
+  fraction 
+  efficiency
+
+Factor
+  expr
+
+MiniOM
+  Pool*
+
+* Overfør h_lim til OpenMI 
+
+Eller hvad?  Tabeller i Daisy?
+
+* 2D gnuplot?
+
+* Qt
+
+** Vi skal have en tabel med
+
+widget active-states active-desc inactive-desc inform-when-active-change?
+
+** Vi skal oplyse i Treelog når top-level fil bliver loaded
+
+* OpenMI
+
+** Læs vejr fra OpenMI.
+
+vejr multi
+
+vejr extern
+
+vejr table?
+
+vejr scope?
+
+ny vejr?
+
+---
+
+læs frem?
+
+læs al ind?
+
+min max daily average?
+
+day cycle?
+
+reset bioclimate?
+
+* Artikler:
+
+** Daisy: An open... (published, PA + SH)
+
+** flexible management... (submitted, PA + SH)
+
+** Flexible selection of model state... (idea, PA + ?SH)
+
+** Flexible exchange of data through OpenMI (idea, PA + BGJ + SH?)
+
+** Initializing OM (revise, PA, BGJ, SH)
+
+Divide?
+
+*** Evolution of the OM in Daisy (PA, SH)
+
+*** Initializing OM (PA, BGJ, SH)
+
+** A semi-analytical solution to OM evolution (PA, MMO, SH)
+
+* Lav Rect2x1 stoftransport komponent.
+
+** Flyt surface/groundwater opdatering til MovementRect?
+
+* R2D2
+
+** stoftransport
+
+** varmetransport
+
+** makroporer
+
+* Farquhar
+
+** omregn vind fra reference til aktuel overflade
+
+* setup.exe
+
+** .nsi fil eller section til at konfigurere textpad?
+
+* Artikler
+
+** OM init
+
+H(t) : t -> R^n
+
+H'(t) = A H(t) + k; A konstant n x n matrix
+
+H'(inf) = 0
+
+H(inf) er kendt
+
+H' er monotont faldene
+
+H_i er monoton eller konstant
+
+ENTEN
+
+  H(0) er kendt; langtidssimulering fra gammelt ækvilibrium
+
+ELLER 
+
+  sum H(t0) er kendt, init fra ukendt præhistorie
+
+* Distribution
+
+** Indsæt mmo grøntsager i lib (og sample?).
+
+* Programmering
+
+** FAO_PM: Fix "wet"
+
+** Unit
+
+*** Vi skal have en "rigtig" multiply.
+
+*** Det kræver en GenUnit klasse til at gemme mellemregninger.
+
+GenUnit *= Unit
+
+const Unit& GenUnit::find_named (Unitc&),
+
+*** Og vi skal nok have en Number::unit () til spørge efter den.
+
+Den skal på sigt erstatte Number::dimension ()
+
+*** Fjern "units.h"
+
+*** Substance component
+
+**** SubstanceCompound:  (Element count)*
+
+Et kemisk stof defineret ud fra atom-antal.
+
+**** SubstanceName: identifier
+
+Et stof defineret alene ud fra et navn
+
+*** UnitSI::substances
+
+(substance dimension [subsubstance])*
+
+subsubstance er hvis vi kun tæller en del af substance med
+
+Vi kan konvertere fra enheder med substance til enheder uden, og
+tilbage igen.  Men hvis begge enheder har substance, skal de matche.
+
+*** units doc
+
+*** kapitel med konverteringer til ref.manual
+
+*** Foreslå aternativer ved fejl? (højde i pF?)
+
+** Q4
+
+*** ui run
+
+stop menu skal være kameleon: 
+
+load / check / run / stop / reset 
+
+run skal være seperat "action"
+
+menu bar 
+
+load, check, run, stop, reset ?
+
+**** edit
+
+Vælg program.
+
+save
+
+*** ui load
+
+*** Læs .dlf (.ddf, .dwf), plot data (tidsakse???)
+
+*** Gem opsætning
+
+*** Far out
+
+**** UI user
+
+Liste af "top level" attributter ui-brugeren kan sætte
+
+Disse "top level" attributer vil være defineret af setup-brugeren
+
+På den måde kan man lave en simpel "form" til undervisningsbrug.
+
+** Metalib
+
+*** Bør build flyttes til metalib/block?
+
+** NO3 og NH4 til chemical parameteriseringer.
+
+** Håndter domain errors i expr i select.
+
+** Plante
+
+Ny EmrDate parameter, overskriver EmrTSum, bruges for kartofler hvis
+fremspriring afhænger af opbevaring.
+
+** Generering af zplus
+
+Det skal kun være tre intervaller mellem hver "border", hvis de
+representerer horizonter.  Ikke hvis de representer log grænser.
+
+** block
+
+*** program_document should include local variables in parameterizations.
+
+** command
+
+Hav et command bibliotek, hvis elementer bliver kørt straks af
+parseren.  For eksempel 'directory', 'input', 'run' og 'path' kunne
+være kommandoer.
+
+Måske skal command bare være program?
+
+Hvis en attribut ikke er fundet i syntaksen, prøv at se om det er
+navnet på et program.  Og i så fald, kør der.
+
+Vi har måske brug for to sådanne biblioteker, et der kun virker på
+top-level, og et der virker alle steder (til "declare", "append")?
+
+** gnuplot
+
+*** Vælg y-akse efter hvad brugeren har specificeret af dim i ymax
+
+*** lmargin, rmargin?
+
+*** automatisk find passende "ticks" på x-akse
+
+*** monochrome?
+
+*** Escape string for tex output
+
+Use FormatLaTeX to escape dimensions and tags in plot when outputting
+LaTeX.
+
+*** Generelt fascilitet til at læse dwf/dlf/ddf filer?
+
+** Program document
+
+*** Support bibliography attribute...
+
+** Logging
+
+*** log_arithmetics
+
+En log model der bygger på log select, men hvor man i stedet for at
+skrive select ud direkte, har en "efterbehandlingssystem, en liste af
+output columns der har select column tags og værdier i en Scope, og
+laver beregninger på dem med en Number.
+
+*** from og to support for select_array
+
+*** output column weather
+
+Weather should always be a column property for log purposes.
+
+Eller skal søjlerne summeres op til > 1? 
+
+*** check border
+
+check kun de søjler der matcher log'en.
+
+*** Vi skal have en måde at ændre log options globalt.  
+
+Det gælder også udskrivning af tid i excel format.
+
+
+*** Det skal være muligt at logge indhold i dynamisk rodzone.
+
+Rodzonen afhænger af roddybden.
+
+*** Gør det muligt at skifte enhed i en log fil.
+
+*** Oprydning af log filer
+
+**** Solute log 
+
+C -> Vl (Volume liquid) [g/cm^3]
+
+M -> Vs (Volume soil)   [g/cm^3]
+
+     Ms (Mass soil)     []
+
+**** lib/log-general.dai
+
+{ System, Soil } x { Pesticides, Carbon, Nitrogen, Water }
+
+{ Content, Flux } x { Water, NH4-N, NO3-N, NO3, Pest }
+
+Water Pressure, Water Pressure (pF)
+
+Crop Production
+
+**** lib/log-extra.dai
+
+Crop Extra
+  Carbon
+  day_length
+
+AOM
+DOM 
+Bioclimate
+Weather
+
+**** sample/log-measured.dai
+
+Water Content in intervals
+
+Water Pressure in intervals
+
+N content in intervals (per soil)
+
+** Inkluder liste af filer (og dato) i daisy.log
+
+** Automisk udregning af partitioning?
+
+Angiv stem/leaf/sorg på forskellige datoer
+
+** action fertigate
+
+(irrigate (duration 12 [h])
+          (flux 10 [mm/h])
+          (water amount 120 [mm])
+          (water target_content 100 [mm] (from 0 [cm]) (to 50 [cm]))
+          (type overhead)
+          (type surface)
+          (type subsoil (from -5 [cm]) (to -10 [cm]))
+          (N concentration 1 [mg N/l])
+          (N amount 20 [kg N/ha])
+          (N target 80 [kg N/ha] (from 0 [cm]) (to 50 [cm]))
+          (NH4 concentration 1 [mg N/l])
+          (NH4 fraction 100 [%])
+          (NO3 concentration 0 [mg N/l])
+          (NO3 fraction 0 [%])
+          )
+
+** min_intensity parameter for default weather
+
+Hvis dagsregn er mindre end 24 * min_intensity, start timeregn med
+min_intensite kl. 8 
+
+** crop simple med nit
+
+** Add user defineable convertions.
+
+** memutils.h -- add auto_vector
+
+Derived from vector, deletes its content on destruction.
+
+* Dokumentation
+
+** Reference
+
+*** Dokumenter '&old' keyword.
+
+** Tutorial
+
+*** Dokumenter groundwater file og pressure table
+
+Omskriv dem evt. til at bruge source.
+
+*** Batch programming
+
+*** hydraulic table program
+
+*** Dokumenter source combine.
+
+** Organic Matter Article
+
+*** Status
+
+Tilsyneladende er input nu rigtigt 
+
+(med aom -> som2 = 0 
+ & bioinc + root + tillage målt i zone 
+ & numerisk lag ved zone)
+
+Gennemsnitlig abiotic (vand + temp) er målt
+
+høj input giver for høj humus på både ler og sand
+
+lav input giver for lav humus på både ler og sand
+
+*** næste ting
+
+prøv at køre med "rigeligt mineralsk kvælstof", så der aldrig er
+kvælstofbegrænsning (måske en "disable N om stress")
+
+prøv at disable abitioc factors...
+
+prøv at køre ler med sandsædskifte, og sand med lersædskift.
+
+*** Forsøg emperisk sammenhæng mellem input/humus -> som1/som2
+
+Virker ikke!  Afhænger af startniveau!
+
+*** Plot initialisering med background_mineralization = 0.
+
+*** Find referencer.
+
+*** Publicer.
+
+** Agronomy for Daisy Users  / Model overview
+
+New chapter for reference manual?  
+
+=== OLD STUFF ===
+
+* Ny phenology model 
+
+En liste af stages, hver med sit eget navn og egne parametre.
+
+* Irrigation
+
+** Deficit
+
+Start ved specifik dato.
+
+* Partit komponent
+
+Skal kunne være afhængig af kvælstof og temperatur.
+
+* Lav superklimafil
+
+** SH: forklaring
+
+* DOM/SOM equilibrium (bgj)
+
+** Brug i adsorbtion?
+
+** Generaliser til Number med ScopeSoil?
+
+* separate harvest and cut actions
+
+* SH: Salg af referencemanual på www-siden?
+
+* UZmodel top_t
+
+* Carbon balance.
+
+Få den til at passe ved høst.
+
+* Select::method { current, sum, max, min, average }
+
+Use by summary.
+
+* SH: PowerPoint validation slides på hjemmeside.
+
+* Cleanup: Get rid of Path:Output and Path:Input
+
+or use them everywhere.
+
+* Gør det muligt at udefinere parametre 
+
+(deffoo super default
+  (bar 42))
+
+(deffoo sub super
+  ;; Undo the setting of bar.
+  (bar &undef))
+
+* Dokumentation for output filer.
+
+* SH: genvækst af græs
+
+* WWW: make seperate page for programmers.
+
+Move cvs, dll, cdaisy, api, programmers guide, header, source.
+
+Explain about different compilers, and making me update.
+
+* saml check.? og check_range.?
+
+* Check af PLF'er.
+
+** LeafAIMod skal altid være > 0.0
+
+* User Manual
+
+** Tillage
+
+*** Soil Compaction
+
+** Pesticides
+
+*** To partielle parameteriseringer, "canopy" og "soil"?
+
+SH: Streiby.
+
+*** New pesticides.
+
+*** SH: file name change?
+
+*** Transform
+
+** Log parameterizations.
+
+Udbyg.
+
+*** Transform
+
+** Appendix listing features not mentioned otherwise.
+
+*** Gennemgå referencemanualen og kig efter ting der bør listes.
+
+** Permanent vegetation
+
+** Simple Crop Types
+
+* New 'spec' log model.
+
+Select attribute with
+
+    library type submodel* attribute
+
+Use filters like
+
+    library type
+
+cutting of branch if it encounter an object from library not derived
+from type.
+
+* N respiration
+
+En standard parameterisering på
+
+    N_fixate_respiration    6.5 [g CH2O-C/g N]
+    NO3_uptake_respiration  3.0 [g CH2O-C/g NO3-N]
+
+ville være biologisk korrekt.
+
+Henning Hoeg.
+
+Bloker for begge når der ikke er assimilat nok.
+
+    NO3_uptake_respiration  0.0 [g CH2O-C/g NO3-N]
+
+for nogen planter, i følge Søren.
+
+* QDaisy.
+
+** Copy/Inherit: Rebuild model.
+
+** Menu -> Edit -> Inputs
+
+Tilføj inputs til træ?
+
+** Insert child, insert after.
+
+** Menu -> File -> Run
+
+Maybe show events in tree, like BCC?
+
+** Filter setup
+
+Only show a few buildin libraries and models.
+
+** Treelog_Qt
+
+** EditPLFs
+
+** Specialiced model view.
+
+** View model as text.
+
+** Interest groups
+
+libraries, models, parameterizations and parameters should belong to a
+number of "interest groups", which can be use by QDaisy for filtering.
+
+** Make drag and drop of "file.dai" work.
+
+** Use radio buttons for filters in menu.
+
+** Move Filters from QDaisy to Daisy.
+
+** Redirect error messages
+
+for weather std, file, hourly, and for hydraulic old, old2
+
+** Beskriv fordele ved min GUI implementation.
+
+- Virker med næsten alle `.dai' filer.
+
+- Automatisk up-to-date med seneste daisy version.
+
+* Daisy new user guide.
+
+* CVS
+
+** Nyt `misc' katalog med de to dhi scripts.
+
+* Cloning.
+
+** Check af clone af vegetation virker.
+
+** Sørg for at cdaisy bruger de nye funktion til clone og merge.
+
+** Implementer merge.
+
+* Døde blade skal tælle med i lysfordelingen.
+
+* Daisy som subsystem
+
+** System til rename af duplicate object ved parsing.
+
+** daisy_alist_check skal ikke altid skrive fejl ud på cout.
+
+* Native GUI 
+
+** Try out "SWIFT"
+
+** Plot retentionskurve fra gdaisy.
+
+** tkdaisy:
+
+  Create pseudo TkDaisyEntry top level as an syntax+alist containing a
+  single "daisy" element.  Use this make the step function always
+  contain the syntax/alist whe name belongs to.
+
+  Lav function til at browse en syntax, alist par.
+
+  Lav function til at loade en dai fil
+
+  Lav function(er) til at instantiere, test, og køre daisy object.
+
+  Lav filter/log som sender data tilbage til tcl.
+
+  Lav functioner der viser data statisk og dynamisk.
+
+* Make it possible to specify Soil geometry with dz.
+
+* Output syntax.
+
+Having multiple output statements that all added to a single list
+might be nice.  Create a Syntax::size `Multiple' for this.  Use it on
+Input as well to be consistent.  
+
+Consider how this fits into the desired ability to add rules to a
+Manager. 
+
+* Make PLF::find use binary search.
+
+* Rename Daisy to Simulation.
+
+This will allow us to ship Condition and Action as part of the Daisy
+independent library.
+
+* Flyt astronomic utilities til seperat fil.
+
+* IM
+
+Brugerfladen vil bestå af standardiserede opsætninger af Daisy for
+konkrete typer af anvendelser.  For hver anvendelsestype vil der være
+Excel ark der på baggrund af information fra brugeren tilpasser disse
+standard opsætninger til den specifikke situation, samt integrerer og
+fortolker de af Daisy beregnede resulater for den valgte
+anvendelsestype.
+
+1. Idenfikation af et antal kontrete anvendelsestyper hvor brug af
+   modellering med Daisy vil resultere i højere værdi for LR's
+   kunder.
+
+2. Opstilling af en testopsætning for den valgte anvendelsestype.
+
+3. Identifikation af de områder hvor opsætningen må forventes at
+   variere mellem specikke anvendelser indenfor den givne anvendelsestype.
+
+4. Udvikling af Excel ark hvor brugeren kan indtaste de specifikke
+   data for den givne anvendelsestype, og som vil generere en
+   modificeret opsætningsfil for Daisy for den specifikke anvendelse.
+
+5. Udvikling af Excel ark som vil tage de af Daisy genererede
+   resultater og opsumere hvad der er relevant for den givne
+   anvendelsestype.
+
+Arbejdet vil blive delt mellem LR (2/3) og KU (1/3), hvor LR vil være
+hovedansvarlig for identifikation af anvendelsestype, identifikation
+af områder der varierer, udviklingen af Excel ark, og KU
+hovedansvarlig for udviklingen af standardopsætninger.  Men begge
+organisationer vil bidrage til alle delopgaver.
+
+
+
+Identify key areas where modelling could help LR
+
+For each area
+
+- Create a sample setup
+- Identify constants, variable, and desired results
+- Create a generic setup
+- Create an Excel spreadsheet to allow user to enter variables and extract results.
+

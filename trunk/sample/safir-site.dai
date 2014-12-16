@@ -1,0 +1,355 @@
+;; Description that will occur in all output files
+(description "Simulation for my site.")
+
+;; Setting "working directory"
+;; If the working directory is set correctly the output files and the daisy.log-file
+;; will be found here:
+;;(directory "C:/Daisy-2D/output")
+
+;; Here Daisy can find the weather file, library files and daisy.exe:
+;;(path "C:/Daisy-2D/input" 
+;;      "C:/Programmer/Daisy/daisy-src/lib" 
+;;      "C:/Programmer/Daisy/daisy-src/sample")
+
+;; Geometry - The x-axes.
+;;
+;; We assume the drip poins are 30 cm apart. This means that the
+;; left dripper is at 0 [cm], the right dripper is 30 [cm], and the
+;; tuber at 15 [cm].  The drip line is placed 7 [cm] below soil
+;; surface. We inject the water in a box volume 5 [cm] around the
+;; drip point.
+
+(defvolume drip-depth box
+  "The depth of the drip point."
+  (top finite -2 [cm])
+  (bottom finite -12 [cm]))
+
+;; "Good enough" for crop calibration and full irrigation.
+(defmovement "Fast" rectangle
+  ;; The soil is divided into a 2D rectangular grid.  
+  ;; The 'xplus' and 'zplus' specifies the horisontal and
+  ;; vertical grid lines, respectively:
+  (Geometry (xplus 15 30 [cm])
+            (zplus -1.5 -3 -5 -7 -9 -12 -16 -20 -25 -30 -35 -40 -45
+                   -50 -60 -70 -80 -90 -100 -120
+                   -140 -160 -180 -200 [cm])))
+
+;; We need a fine discretization for PRD.
+(defmovement "Medium" rectangle
+  (Geometry (xplus 3 6 9 12 15 18 21 24 27 30 [cm])
+            (zplus -1.5 -3 -5 -7 -9 -12 -16 -20 -25 -30 -35 -40 -45
+                   -50 -60 -70 -80 -90 -100 -120
+                   -140 -160 -180 -200 [cm])))
+
+;; For final run, we need to be sure the primary water transport model is 
+;; used.
+(defmovement Precise Medium
+  (matrix_water (Mollerup (max_time_step_reductions 16)
+                          (max_number_of_small_time_steps 1000000))
+                (v+h)))
+
+;; Choose whether to use a fast, medium or precise movement.
+(defmovement "SiteMovement" "Fast")
+
+;; Including external settings- or library-files
+(input file "safir-common.dai")
+
+;; Volumes for logging TDR
+(defvolume "left-TDR" box
+  (top finite 0 [cm])
+  (bottom finite -60 [cm])
+  (left finite 0 [cm])
+  (right finite 5 [cm]))
+
+(defvolume "right-TDR" box
+  (top finite 0 [cm])
+  (bottom finite -60 [cm])
+  (left finite 25 [cm])
+  (right finite 30 [cm]))
+
+(deflog "TDR" crop
+  "Water content of each side of the root zone."
+  (when hourly)
+  (where "TDR.dlf")
+  (entries (volume (tag "left-tdr")
+                   (path column "${column}" SoilWater Theta)
+                   (spec fixed SoilWater Theta)
+                   (volume left-TDR)
+                   (density true))
+           (volume (tag "right-tdr")
+                   (path column "${column}" SoilWater Theta)
+                   (spec fixed SoilWater Theta)
+                   (volume right-TDR)
+                   (density true))))
+
+;;  Defining soil horizons of the site.
+(defhorizon A USDA3
+   (clay 18.9 [%])
+   (silt 42.7 [%])
+   (sand 38.4 [%])
+   (humus 4.4 [%])  
+   (dry_bulk_density 1.6 [g/cm^3]))
+
+(defhorizon B USDA3
+   (clay 19.2 [%])
+   (silt 39.1 [%])
+   (sand 41.7 [%])
+   (humus 0.1 [%])  
+   (dry_bulk_density 1.58 [g/cm^3]))
+
+(defhorizon C USDA3
+   (clay 11.2 [%])
+   (silt 41.96 [%])
+   (sand 46.84 [%])
+   (humus 0.1 [%]) 
+   (dry_bulk_density 1.53 [g/cm^3]))
+
+;; If you make any changes to the crop, they should go here.
+(defcrop "SiteCrop" "Potato; Folva; SAFIR" 
+  "The crop paramterization used in my experiment."
+  ;; Step 1: Get the phenology right.
+  (Devel original 
+         ;;(EmrTSum 330 [dg C d])
+         ;;(DSRate1 0.055 [DS/d])
+         ;;(DSRate2 0.011 [DS/d])
+         )
+  ;; Step 2: Fill in measured leaf area to leaf weight ratio.
+  (Canopy ;;(SpLAI  0.020 [(m^2/m^2)/(g DM/m^2)])
+          ;;(LeafAIMod (0.0 2.2) (0.4 1.1)(1.5 1.1)(2.0 0.3))
+          )
+
+  ;; Step 3: Fill in measured root data.
+  ;; This can be indirectly measured, through soil water.
+  (Root ;;(DptEmr     20 [cm])
+        ;;(PenPar1    0.30 [cm/dg C/d])
+        ;;(PenPar2     4.0 [dg C])
+        ;;(MaxPen       50 [cm])
+   )
+
+  ;; Step 4: Get total production right.
+  (LeafPhot original
+            ;; (Xn 1.0e-3 [mol/mol/s])
+            )
+
+  ;; Step 5: Get partitioning right.
+  (Partit ;;(Root (0.00 0.20) (1.00 0.20) (1.36 0.00))
+          ;;(Leaf (0.00 0.95) (1.00 0.80) (1.05 0.20) (1.25 0.15) (1.35 0.00))
+          ;;(Stem (0.00 0.05) (1.00 0.20) (1.05 0.35) (1.25 0.00) (1.35 0.00))
+          ;;(nitrogen_stress_limit 0.01)
+          )
+  
+  ;; Step 6: Get crop nitrogen right. 
+  ;; This might involve repeating Step 4 and 5.
+  (CrpN ;;(PtLeafCnc (0.00 0.0600) (1.00 0.0500) (1.30 0.0400) (1.50 0.025) (2.00 0.020))
+        ;;(CrLeafCnc (0.00 0.0450) (1.00 0.0400) (1.30 0.0300) (1.50 0.020) (2.00 0.010))
+        ;;(NfLeafCnc (0.00 0.0100) (1.00 0.0100) (2.00 0.0100))
+        ;;(PtStemCnc (0.00 0.0400) (1.00 0.0350) (1.30 0.0200) (1.50 0.010) (2.00 0.010))
+        ;;(CrStemCnc (0.00 0.0200) (1.00 0.0150) (1.30 0.0100) (1.50 0.005) (2.00 0.005))
+        ;;(PtSOrgCnc (0.00 0.0200) (1.30 0.0150) (2.00 0.0100))
+        ;;(CrSOrgCnc (0.00 0.0080) (1.30 0.0080) (2.00 0.0070))
+        ;;(NfSOrgCnc (1.00 0.004) (2.00 0.004))
+        ;; Look at soil N to adjust these:
+        ;;(NH4_root_min 1E-8 [g N/cm^3])
+        ;;(NO3_root_min 1E-8 [g N/cm^3])
+        )
+  )
+
+(defvegetation SiteVegetation crops
+  ;; BEFORE calibrating the rest of the system, FORCE LAI to confirm
+  ;; to measurements.
+  ;; (ForcedLAI (2006 (100 0) (200 5.0) (300 0.2)))
+  ;; AFTER calibrating the soil water and crop, REMOVE ForcedLAI again.
+  ;; Relying on ForcedLAI means the crop can't be used for scenarious.
+  )
+
+;;  Parameterisation of the column called "Silty clay"
+(defcolumn "SiteSoil" default
+  (Bioclimate original
+              ;; soil vegetation atmosphere transfer model SSOC
+              (svat SSOC)
+              (raddist sun-shade))
+  (Vegetation SiteVegetation)
+  (Soil (MaxRootingDepth 200 [cm])
+        (horizons (  -30 [cm] "A")
+                  (  -60 [cm] "B")
+                  ( -110 [cm] "C")
+                  ( -400 [cm] "C"))) ;; No data below 110 cm 
+  (Movement SiteMovement)
+  (OrganicMatter original (init (input 3000 [kg C/ha/y])))
+  (Groundwater deep)) ;; free drainage by gravitational forces
+
+;; Warmup management.
+(defcrop Lettuce Potato)                ;No Lettuce in Daisy.
+
+(defaction Lettuce_management activity
+  (wait_mm_dd 10 18)  
+  (plowing)
+  (wait_mm_dd 4 18)
+  (seed_bed_preparation)  
+  (wait_mm_dd 5 5)
+  (sow ("Lettuce"))
+  (wait_mm_dd 7 21)
+  (fertilize (mineral    
+              ;; Weight of total N (sum of NO3 and NH4).
+              (weight 89.68 [kg N/ha]) 
+              ;; Fraction of NH4 of total N.
+              (NH4_fraction 0.5 [])))
+  
+  (wait_mm_dd 8 1)
+  (fertilize (mineral  
+              (weight 89.68 [kg N/ha])   
+              (NH4_fraction 0.5 [])))      
+  
+  (wait_mm_dd 8 18)
+  (fertilize (mineral 
+              (weight 89.68 [kg N/ha])   
+              (NH4_fraction 0.5 [])))    
+  (wait_mm_dd 9 25)
+  (harvest "Lettuce"))
+
+;; Warmup period (2005)
+(defaction warmup 
+  (Lettuce_management))
+  
+;; management for the experiment.
+
+(defaction Crop_management activity
+  (wait_mm_dd 10 18)  
+  (plowing)
+  (wait_mm_dd 4 18)
+  (seed_bed_preparation)  
+  (wait_mm_dd 5 5)
+  (sow ("SiteCrop") 
+       (seed 2765 [kg w.w./ha])
+       (plant_distance 0.30 [m]))
+  (wait_mm_dd 9 25)
+  (harvest "SiteCrop"))
+
+  
+(defaction irrigation_subsoil_full activity
+  "Fully irrigated soil."
+  (wait_mm_dd 7 21 (hour 10))
+  (progn
+    (irrigate_subsoil 2.6 [mm/h] (remaining_time 5.0 [h]) 
+                      (solute (NO3 1.725 [kg N/ha/mm])
+                              (NH4 1.725 [kg N/ha/mm]))
+                      (volume left-drip))
+    (irrigate_subsoil 2.6 [mm/h] (remaining_time 5.0 [h])
+                      (solute (NO3 1.725 [kg N/ha/mm])
+                              (NH4 1.725 [kg N/ha/mm]))
+                      (volume right-drip)))
+  (wait_mm_dd 7 26 (hour 10))
+  (progn
+    (irrigate_subsoil 2.6 [mm/h] (remaining_time 5.0 [h])
+                      (volume left-drip)) 
+    (irrigate_subsoil 2.6 [mm/h] (remaining_time 5.0 [h]) 
+                      (volume right-drip)))
+  (wait_mm_dd 7 28 (hour 10))
+  (progn
+    (irrigate_subsoil 2.75 [mm/h] (remaining_time 5.0 [h]) 
+                      (volume left-drip)) 
+    (irrigate_subsoil 2.75 [mm/h] (remaining_time 5.0 [h]) 
+                      (volume right-drip)))
+  (wait_mm_dd 8 1 (hour 10))
+  (progn
+    (irrigate_subsoil 2.6 [mm/h] (remaining_time 5.0 [h]) 
+                      (solute (NO3 1.725 [kg N/ha/mm])
+                              (NH4 1.725 [kg N/ha/mm]))
+                      (volume left-drip)) 
+    (irrigate_subsoil 2.6 [mm/h] (remaining_time 5.0 [h]) 
+                      (solute (NO3 1.725 [kg N/ha/mm])
+                              (NH4 1.725 [kg N/ha/mm]))
+                      (volume right-drip)))
+  (wait_mm_dd 8 18 (hour 10)) 
+  (progn
+    (irrigate_subsoil 2.6 [mm/h] (remaining_time 5.0 [h])
+                      (solute (NO3 1.725 [kg N/ha/mm])
+                              (NH4 1.725 [kg N/ha/mm]))
+                      (volume left-drip)) 
+    (irrigate_subsoil 2.6 [mm/h] (remaining_time 5.0 [h]) 
+                      (solute (NO3 1.725 [kg N/ha/mm])
+                              (NH4 1.725 [kg N/ha/mm]))
+                      (volume right-drip))))
+
+(defaction irrigation_subsoil_PRD_left activity
+  "PRD irrigated soil, left side."
+  (wait_mm_dd 7 21 (hour 10))          
+  (irrigate_subsoil 3 [mm/h] (remaining_time 6.0 [h])
+                    (solute (NO3 1.25 [kg N/ha/mm])
+                            (NH4 1.25 [kg N/ha/mm]))
+                    (volume left-drip))
+  (wait_mm_dd 7 28 (hour 10))
+  (irrigate_subsoil 3.5 [mm/h] (remaining_time 2.0 [h])
+                    (volume left-drip))
+  (wait_mm_dd 8 1 (hour 10))
+  (irrigate_subsoil 2.7 [mm/h] (remaining_time 4.0 [h])
+                    (solute (NO3 2.076 [kg N/ha/mm])
+                            (NH4 2.076 [kg N/ha/mm]))
+                    (volume left-drip))
+  (wait_mm_dd 8 11 (hour 10))
+  (irrigate_subsoil 2.7 [mm/h] (remaining_time 4.0 [h])
+                    (solute (NO3 2.076 [kg N/ha/mm])
+                            (NH4 2.076 [kg N/ha/mm]))
+                    (volume left-drip)))
+
+(defaction irrigation_subsoil_PRD_right activity
+  "PRD irrigated soil, right side."
+  (wait_mm_dd 7 21 (hour 10))          
+  (irrigate_subsoil 3 [mm/h] (remaining_time 6.0 [h])
+                    (solute (NO3 1.25 [kg N/ha/mm])
+                            (NH4 1.25 [kg N/ha/mm]))
+                    (volume right-drip))
+  (wait_mm_dd 7 26 (hour 10))
+  (irrigate_subsoil 3 [mm/h] (remaining_time 6.0 [h])
+                    (volume right-drip))
+  (wait_mm_dd 8 1 (hour 10))
+  (irrigate_subsoil 2.7 [mm/h] (remaining_time 4.0 [h])
+                    (solute (NO3 2.076 [kg N/ha/mm])
+                            (NH4 2.076 [kg N/ha/mm]))
+                    (volume right-drip))
+  (wait_mm_dd 8 11 (hour 10))
+  (irrigate_subsoil 2.7 [mm/h] (remaining_time 4.0 [h])
+                    (solute (NO3 2.076 [kg N/ha/mm])
+                            (NH4 2.076 [kg N/ha/mm]))
+                    (volume right-drip)))
+
+(defprogram Field-2006 Safir
+  "2006 experiment."
+
+  ;; Weather data
+  (weather default "Safir-weather.dwf")
+  
+  ;;  Selecting column
+  (column "SiteSoil")
+  
+  ;; Start of simulation.
+  (time 2004 10 1)
+  (stop 2006 9 30)
+  (activate_output (after 2005 10 1))
+  
+  ;; Additional output files
+  (output &old                          ;Reuse output from safir-common.dai.
+          (checkpoint (when (at 2006 05 1 8)))
+          TDR))
+
+(defprogram Crop-Subsoil-Full Field-2006
+  "Year 2006, subsoil full."
+  (manager activity
+    (warmup)
+    (while Crop_management
+      irrigation_subsoil_full)))
+
+
+(defprogram Crop-Subsoil-PRD Field-2006 
+  "Year 2006, subsoil PRD."
+  (manager activity
+    (warmup)
+    (while Crop_management
+      irrigation_subsoil_PRD_left         
+      irrigation_subsoil_PRD_right)))
+
+(run batch
+     (run (batch (run Crop-Subsoil-Full) (directory "subsoil_Full"))
+          (batch (run Crop-Subsoil-PRD ) (directory "subsoil_PRD"))))
+
+;;; safir-site.dai ends here.

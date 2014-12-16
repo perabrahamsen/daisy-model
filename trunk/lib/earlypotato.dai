@@ -1,0 +1,133 @@
+;Mikkel Mollerup, KVL
+;for AArhus County, 2004/2005
+;$Revision 1.0, 2005/16/11: "LeafPhot" -> "LeafPhot original"
+;
+;Documentation in "Parameteriseringer af grønsager til Daisy, 2005"
+
+
+
+(defcrop "Potato; SCRI - AArhus" default
+  "Potate paramterized by sha@kvl.dk -- 2003.
+   It is based on experimental data from SCRI from 1983 and 1984."
+
+ 
+  (Devel default (EmrTSum 425 [dg C d])
+      (DS_Emr   0.01)
+      (DSRate1  0.070)     	; Spitters et al 1989
+      (TempEff1 (02 0.00) (13 1.00) (19 1.00) (29 0.00))
+      (PhotEff1 (12 1.00) (16 1.00))
+      (DSRate2  0.0090)
+      (TempEff2 (02 0.00) (13 1.00) (19 1.00) (29 0.00)))
+
+  (LeafPhot original                 	; Spitters et al 1989
+      (Fm 3.0 [g CO2/m^2/h])  
+      (DSEff (0.0 1.2) (0.3 1.2) (1.0 1.0) (1.60 0.75) (2.0 0.75))
+      (Qeff   0.045)
+      (TempEff (3 0.01)(10 0.75)(15 1.00)(20 1.00)(26 0.75)(33 0.01)))
+
+  (Seed LAI (DSLAI05   0.15))
+         
+  (Canopy 
+      (SpLAI    0.033 [(m^2/m^2)/(g DM/m^2)])
+      (LAIDist0 0.00 0.00 1.00)
+      (LAIDist1 0.00 0.20 0.90)
+      (PARref   0.06)
+      (PARext   0.50)
+      (EPext    0.50)
+      (HvsDS   (0.00 1) (1.00 20) (1.25 35)))
+
+  (Root (DptEmr     20)
+      (PenPar1    0.30)
+      (PenPar2     4.0)
+      (MaxPen       50)
+      (Rad        0.05)
+      (h_wp       -15000)
+      (Rxylem     10.0)
+      (MxNH4Up     2.5E-0007)
+      (MxNO3Up     2.5E-0007)
+      (rootdens "Gerwitz+Page74" 
+      (SpRtLength 200 [m/g])
+      (DensRtTip 0.2 [cm/cm^3])))
+
+  (Partit 
+     (Root (0.00 0.20) (1.00 0.20) (1.36 0.00))
+     (Leaf (0.00 0.95) (1.00 0.75) (1.05 0.20) (1.25 0.18) (1.60 0.00))
+     (Stem (0.00 0.05) (1.00 0.25) (1.05 0.50) (1.25 0.20) (1.60 0.03) 
+           (2.00 0.00))
+     (RSR  (0.00 0.50) (0.75 0.50) (2.00 0.25)))
+
+  (Prod (NCrop 0.4 [g N/m^2])
+     (E_Root     0.72)
+     (E_Leaf     0.66)
+     (E_Stem     0.72)
+     (E_SOrg     0.85)
+     (r_Root     0.010)
+     (r_Leaf     0.030)
+     (r_Stem     0.015)
+     (r_SOrg     0.0045)
+     (ShldResC   0.10)
+     (ReMobilDS  1.50)
+     (ReMobilRt  0.01)
+     (Large_RtDR 0.05)
+     (LfDR (0.00 0.00) (1.60 0.00) (1.75 0.02) (2.00 0.10))
+     (RtDR (0.00 0.00) (1.60 0.00) (2.00 0.00))
+     (ExfoliationFac 0.0))
+ 
+  (CrpN (PtRootCnc (0.00 0.0200) (1.00 0.0200) (2.00 0.0100))
+     (CrRootCnc (0.00 0.0100) (1.00 0.0100) (2.00 0.0080))
+     (NfRootCnc (0.00 0.0070) (1.00 0.0070) (2.00 0.0070))
+     (PtLeafCnc (0.00 0.060) (1.00 0.060) (1.25 0.050) (2.00 0.035))
+     (CrLeafCnc (0.00 0.045) (1.00 0.045) (1.25 0.040) (2.00 0.030))
+     (NfLeafCnc (0.00 0.010) (1.00 0.010) (2.00 0.010))
+     (PtStemCnc (0.00 0.040) (1.00 0.040) (1.60 0.016) (2.00 0.013))
+     (CrStemCnc (0.00 0.012) (1.25 0.012) (2.00 0.010))
+     (NfStemCnc (0.00 0.004) (2.00 0.004))
+     (PtSOrgCnc (1.00 0.020) (1.25 0.015) (2.00 0.012))
+     (CrSOrgCnc (1.00 0.008) (1.25 0.008) (2.00 0.0075))
+     (NfSOrgCnc (1.00 0.004) (2.00 0.004))
+     (TLLeafEff  (1.09 1.00) (2.00 1.00)))
+
+  (Harvest (DSmax 0.0)
+     (sorg_height -10.0 [cm]))
+)
+
+
+
+(defcrop "Early potato" "Potato; SCRI - AArhus"
+  
+  (description "For AArhus County - Samsoe Project")
+
+  (Devel original (EmrTSum 275 [dg C d]) 	
+     (DS_Emr   0.01)
+     (DSRate1 0.0590)		
+     (TempEff1 (07 0.01) (18 1.00) (29 0.01))
+     (PhotEff1 (0 0.0) (8 1.0) (16 1.0) (24 0.9))
+     (DSRate2 0.0225)
+     (TempEff2 (7 0.0) (18 1.0) (29 0.0)))  
+  
+  (LeafPhot original                            
+     (Fm 3.2 [g CO2/m^2/h])  
+     (DSEff (0.0 1.0) (0.3 1.0) (1.0 1.0) (1.60 1.00) (2.0 1.00))
+     (Qeff   0.045)
+     (TempEff (3 0.01)(12 0.75)(15 1.00)(20 1.00)(26 0.75)(33 0.01))) 
+     
+  (Seed LAI (DSLAI05   0.15))
+  (Canopy 
+     (SpLAI    0.024 [(m^2/m^2)/(g DM/m^2)]) 
+     (LAIDist0 0.00 0.00 1.00)
+     (LAIDist1 0.00 0.20 0.90)
+     (PARref   0.06)
+     (PARext   0.65)
+     (EPext    0.50)
+     (HvsDS   (0.0 0) (1.0 60) (2.1 60)))
+         
+  (Partit    
+     (Root (0.00 0.50) (0.37 0.32) (0.83 0.09) (1.00 0.00) (1.14 0.00) 
+           (1.35 0.00) (1.57 0.00) (2.10 0.00))
+     (Leaf (0.00 0.77) (0.37 0.67) (0.83 0.39) (1.00 0.23) (1.14 0.10) 
+           (1.35 0.00) (1.57 0.00) (2.10 0.00))
+     (Stem (0.00 0.16) (0.37 0.15) (0.83 0.16) (1.00 0.16) (1.14 0.15) 
+           (1.35 0.02) (1.57 0.00) (2.10 0.00))
+     (RSR  (0.00 0.50) (0.75 0.50) (2.00 0.25)))
+)
+

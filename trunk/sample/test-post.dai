@@ -1,0 +1,21 @@
+;;; test-post.dai --- Test Daisy post processing of dlf files.
+
+(defprogram convert post-process
+  ;; Select a subset of a ldf file.
+  (file "Estrup-content-Bromide.dlf")   ;Input file.
+  (where "post.dlf")                    ;Output file.
+  ;; Limit x position.
+  (left 300 [cm])
+  (right 400 [cm])
+  ;; Limit depth.
+  (top -50 [cm])
+  (bottom -100 [cm])
+  ;; Limit in time.
+  (after 2000 1 1)
+  (before 2001 1 1)
+  ;; Convert unit.
+  (dimension [kg/m^3]))
+
+(run convert)
+
+;;; test-post.dai ends her.

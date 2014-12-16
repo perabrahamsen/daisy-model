@@ -1,0 +1,39 @@
+Alle scenarier er kørt med Rørrendegård jord (fra MST projekt)
+modificeret til fri afdræning, standard vårbyg management modificeret
+med ABA produktion og stomata-conductivity fra SAFIR artikel, og vejr
+målt fra JRJ station modificeret efter nedbør fra taastrup station.
+
+Scenarier kendetegnet af tre bogstaver.
+
+Første bogstav:  Vejr
+D: Dry: 80% af målt nedbør
+N: Normal: 100% målt nedbør
+W: Wet: 120% af målt nedbør
+
+Andet bogstav: Rodfordeling
+N: Normal: Standard (G+P) rodfordeling
+S: Short: Rodfordeling fra Silstrup (MST) projekt, få rødder under pløjesål.
+
+Tredje bogstav: ABA produktion
+H: High: Dobbelt production af ABA som respons på tør jord.
+N: Normal: Normal produktion af ABA som respons på tør jord.
+L: Low: Lav  produktion af ABA som respons på tør jord.
+
+DNH	4.94372
+DNL	5.44511
+DNN	5.147
+DSH	4.81096
+DSL	4.89126
+DSN	4.84575
+NNH	5.1998
+NNL	5.79739
+NNN	5.53859
+NSH	4.83941
+NSL	4.93635
+NSN	4.89227
+WNH	5.45007
+WNL	5.91068
+WNN	5.75184
+WSH	4.89221
+WSL	4.98279
+WSN	4.94514

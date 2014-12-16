@@ -1,0 +1,14 @@
+;;; ui-Qt.dai --- Logs for communications with the Qt GUI library.
+
+(deflog QtTime Qt
+  "Let Qt UI know the simulation time."
+  (when (or (every (hours 7)) finished))
+  (where "Qt-time-dummy.dlf")
+  (entries (number (path time year))
+           (number (path time month))
+           (number (path time mday))
+           (number (path time hour))
+           (number (path time minute))
+           (number (path time second))))
+
+;;; ui-Qt.dai ends here.
