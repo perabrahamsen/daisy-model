@@ -494,7 +494,7 @@ cross:
          && $(MAKE) "PATH=$(MINGWBIN):$(PATH)" \
 		    "CYGHOME=C:/cygwin64" Q4HOME=c:/Qt/4.5.2\
 	            VPATH=$(SRCDIR) USE_OPTIMIZE=portable \
-                    -f $(SRCDIR)/Makefile daisy${EXE} daisyw${EXE})
+                    -f $(SRCDIR)/Makefile daisy${EXE})
 
 # Create manager test executable.
 #
@@ -728,7 +728,7 @@ setupnosvn:
 	mkdir $(SETUPDIR)/bin
 	cp libdeps/ShowDaisyOutput.exe $(SETUPDIR)/bin
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
-	$(STRIP) -o $(SETUPDIR)/bin/daisyw.exe $(OBJHOME)/daisyw.exe
+#	$(STRIP) -o $(SETUPDIR)/bin/daisyw.exe $(OBJHOME)/daisyw.exe
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll $(OBJHOME)/daisy.dll
 	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
 	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
