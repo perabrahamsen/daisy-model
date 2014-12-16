@@ -730,8 +730,8 @@ setupnosvn:
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
 #	$(STRIP) -o $(SETUPDIR)/bin/daisyw.exe $(OBJHOME)/daisyw.exe
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll $(OBJHOME)/daisy.dll
-	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
-	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
+#	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
+#	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
 	cp $(MINGWHOME)/bin/mingwm10.dll $(SETUPDIR)/bin
 	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
