@@ -494,7 +494,7 @@ cross:
          && $(MAKE) "PATH=$(MINGWBIN):$(PATH)" \
 		    "CYGHOME=C:/cygwin64" Q4HOME=c:/Qt/4.5.2\
 	            VPATH=$(SRCDIR) USE_OPTIMIZE=portable \
-                    -f $(SRCDIR)/Makefile daisy${EXE})
+                    -f $(SRCDIR)/Makefile daisy${EXE} daisyw${EXE})
 
 # Create manager test executable.
 #
