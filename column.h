@@ -105,7 +105,7 @@ public:
                       std::vector<const Harvest*>& harvest, 
                       Treelog& msg) = 0;
   virtual void mix (const Metalib&, double from, double to, double penetration, 
-                    const Time&, Treelog&) = 0;
+                    double surface_loose, const Time&, Treelog&) = 0;
   virtual void swap (const Metalib&, double from, double middle, double to, 
                      const Time&, Treelog&) = 0;
   virtual void set_porosity (double at, double Theta, Treelog&) = 0;

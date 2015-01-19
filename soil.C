@@ -110,6 +110,7 @@ struct Soil::Implementation
   const double dispersivity;
   const double dispersivity_transversal;
   const std::vector<double> border;
+  const double frozen_water_K_factor; // []
 
   // Cache.
   std::vector<double> anisotropy_edge;
@@ -148,6 +149,34 @@ struct Soil::Implementation
     return !missing;
   }
   
+  void tillage (const Geometry& geo, const double from, const double to,
+                const double surface_loose)
+  {
+    // Horizons.
+    double top = 0.0;
+    for (size_t i = 0; i < layers.size (); i++)
+      {
+        const double bottom = layers[i]->end;
+
+        if (top <= to)
+          // Horizon start below zone.
+          break;
+        
+        if (bottom < from)
+          // overlap
+          layers[i]->horizon->hydraulic->tillage (surface_loose);
+
+        top = bottom;
+      }
+
+    // Zones.
+    for (size_t i = 0; i < zones.size (); i++)
+      {
+        if (zones[i]->volume->overlap_interval (from, to))
+          zones[i]->horizon->hydraulic->tillage (surface_loose);
+      }
+  }
+
   // Create and Destroy.
   Implementation (const Block& al)
     : layers (map_submodel_const<Layer> (al, "horizons")),
@@ -156,7 +185,8 @@ struct Soil::Implementation
       dispersivity (al.number ("dispersivity")),
       dispersivity_transversal (al.number ("dispersivity_transversal",
 					   dispersivity * 0.1)),
-      border (al.number_sequence ("border"))
+      border (al.number_sequence ("border")),
+      frozen_water_K_factor (al.number ("frozen_water_K_factor"))
   { }
   ~Implementation ()
   { }
@@ -200,7 +230,9 @@ Soil::K (size_t i, double h, double h_ice, double T) const
     }
   } viscosity_factor;
 
-  const double T_factor = viscosity_factor (T);
+  const double T_factor = (T < 0.0)
+    ? impl->frozen_water_K_factor
+    : viscosity_factor (T);
   const double h_water = std::min (h, h_ice);
   return horizon_[i]->K (h_water) * T_factor;
 }
@@ -254,6 +286,11 @@ Soil::dispersivity (size_t) const
 double 
 Soil::dispersivity_transversal (size_t c) const 
 { return impl->dispersivity_transversal; } 
+
+void 
+Soil::tillage (const Geometry& geo, const double from, const double to,
+               const double surface_loose)
+{ impl->tillage (geo, from, to, surface_loose); }
 
 void
 Soil::set_porosity (size_t i, double Theta)
@@ -558,6 +595,12 @@ This attribute is ignored if the geometry is specified explicitly.");
   std::vector<double> default_borders;
   default_borders.push_back (-100.0);
   frame.set ("border", default_borders);
+  frame.declare ("frozen_water_K_factor", Attribute::None (), 
+                 Check::positive (), 
+                 Attribute::OptionalConst, "\
+Hydraulic conductivity for water below 0 dg C compared to 20 dg C.\n\
+The default value, 0.561, corresponds to 0 dg C water viscosity.");
+  frame.set ("frozen_water_K_factor", 0.561);
 }
   
 Soil::Soil (const Block& al)

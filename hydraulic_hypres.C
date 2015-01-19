@@ -66,7 +66,7 @@ private:
 public:
   HydraulicHypres (const BlockModel&);
   HydraulicHypres (symbol name, double K_sat);
-  void initialize (const Texture&, double rho_b, bool top_soil,
+  void initialize (const Texture&, double rho_b, bool top_soil, double CEC,
 		   Treelog& msg);
 public:
   ~HydraulicHypres ();
@@ -140,7 +140,8 @@ HydraulicHypres::Se (double h) const
 
 void
 HydraulicHypres::initialize (const Texture& texture,
-                             double rho_b, bool top_soil, Treelog& msg)
+                             double rho_b, bool top_soil, double CEC,
+                             Treelog& msg)
 {
   TREELOG_MODEL (msg);
 
@@ -256,7 +257,7 @@ pedotransfer function");
   a = -alpha;
   m = 1.0 - 1.0 / n;
 
-  Hydraulic::initialize (texture, rho_b, top_soil, msg);
+  Hydraulic::initialize (texture, rho_b, top_soil, CEC, msg);
   daisy_assert (K_sat > 0.0);
 
 
@@ -314,6 +315,8 @@ Parameters specified by the HYPRES transfer function.")
     frame.set_strings ("cite", "hypres");
     frame.add_check (check_alist);
     Hydraulic::load_K_sat_optional (frame);
+    frame.declare_fraction ("Theta_res", Attribute::Const, "Soil residual water.");
+    frame.set ("Theta_res", 0.01);
     frame.declare_boolean ("topsoil", Attribute::OptionalConst, "\
 If set true this horizon will be initialized as a topsoil (i.e. the\n\
 plowing layer), if set false it will be initialized as a subsoil.\n\

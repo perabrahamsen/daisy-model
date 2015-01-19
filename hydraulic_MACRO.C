@@ -79,9 +79,10 @@ private:
   
   // Create and Destroy.
   void initialize (const Texture& texture, double rho_b, bool top_soil,
+                   double CEC,
                    Treelog& msg)
   {
-    Hydraulic::initialize (texture, rho_b, top_soil, msg);
+    Hydraulic::initialize (texture, rho_b, top_soil, CEC, msg);
     std::stringstream tmp;
     tmp << "Theta_sat_fict = " << Theta_sat_fict << " []";
     tmp << "\nK_sat_fict = " << K_sat_fict << " [cm/h]";

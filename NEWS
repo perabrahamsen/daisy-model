@@ -8,6 +8,10 @@ release.
 
 * 5.20
 
+** Theta_res now defaults to 0.01 in the hypres hydraulic model.
+
+Old value was 0.
+
 ** The 'pipe' Grounwater model removed.
 
 Use 

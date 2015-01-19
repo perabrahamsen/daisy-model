@@ -95,7 +95,7 @@ public:
               double stem_harvest, double leaf_harvest, double sorg_harvest,
               std::vector<const Harvest*>&, Treelog&);
   void mix (const Metalib& metalib, 
-            double from, double to, double penetration, 
+            double from, double to, double penetration, double surface_loose,
             const Time&, Treelog&);
   void swap (const Metalib& metalib, 
              double from, double middle, double to, 

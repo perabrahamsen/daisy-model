@@ -55,6 +55,7 @@ public:
   inline double porosity () const
   { return Theta_sat; }
   virtual void set_porosity (double Theta);
+  virtual void tillage (double surface_loose);
 
   // Convertion functions.
 public:
@@ -79,7 +80,7 @@ public:
   static void load_K_sat_optional (Frame&);
   static void load_K_sat (Frame&);
   virtual void initialize (const Texture&, double rho_b, bool top_soil,
-			   Treelog&);
+                           double CEC, Treelog&);
   virtual bool check (Treelog&) const;
   Hydraulic (const BlockModel&);
   ~Hydraulic ();

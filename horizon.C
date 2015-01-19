@@ -69,8 +69,8 @@ struct Horizon::Implementation
   /* const */ double CEC;                   // [cmolc/kg]
   
   // Create and Detroy.
-  void initialize (const Hydraulic&, const Texture& texture, double quarts, 
-                   int som_size, Treelog& msg);
+  void initialize (Hydraulic&, const Texture& texture, double quarts, 
+                   int som_size, bool top_soil, Treelog& msg);
   static double_map get_attributes
   /**/ (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& frames);
   static symbol_map get_dimensions 
@@ -110,12 +110,23 @@ default_CEC (const Texture& texture) // [cmolc/kg]
 }
 
 void 
-Horizon::Implementation::initialize (const Hydraulic& hydraulic,
+Horizon::Implementation::initialize (Hydraulic& hydraulic,
                                      const Texture& texture, 
                                      const double quarts,
                                      int som_size,
+                                     const bool top_soil,
                                      Treelog& msg)
 {
+  if (CEC < 0.0)
+    {
+      CEC = default_CEC (texture);
+      std::ostringstream tmp;
+      tmp << "(CEC " << CEC 
+          << " [cmolc/mk]) ; Estimated from clay and humus.";
+      msg.debug (tmp.str ());
+    }
+
+  hydraulic.initialize (texture, dry_bulk_density, top_soil, CEC, msg);
   if (som_size > 0)
     {
       // Fill out SOM_fractions and SOM_C_per_N.
@@ -142,14 +153,6 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic,
 
   hor_heat.initialize (hydraulic, texture, quarts, msg);
   
-  if (CEC < 0.0)
-    {
-      CEC = default_CEC (texture);
-      std::ostringstream tmp;
-      tmp << "(CEC " << CEC 
-          << " [cmolc/mk]) ; Estimated from clay and humus.";
-      msg.debug (tmp.str ());
-    }
 }
 
 Horizon::Implementation::double_map
@@ -391,9 +394,8 @@ Horizon::initialize_base (bool top_soil,
   const double clay_lim = texture_below ( 2.0 /* [um] USDA Clay */);
   fast_clay = texture.mineral () * clay_lim;
   fast_humus = texture.humus;
-  hydraulic->initialize (texture, impl->dry_bulk_density, top_soil, msg);
   impl->initialize (*hydraulic, texture, quartz () * texture.mineral (),
-                    som_size, msg); 
+                    som_size, top_soil, msg); 
   impl->secondary->initialize (msg);
 
   std::ostringstream tmp;

@@ -140,7 +140,8 @@ public:
               Treelog& msg);
 
   void add_residuals (std::vector<AM*>& residuals);
-  void mix (const Metalib&, double from, double to, double penetration, 
+  void mix (const Metalib&, double from, double to, 
+            double penetration, double surface_loose,
             const Time&, Treelog&);
   void swap (const Metalib&, double from, double middle, double to, 
              const Time&, Treelog&);
@@ -331,7 +332,7 @@ ColumnStandard::harvest (const Metalib& metalib, const Time& time,
                        combine, msg); 
   add_residuals (residuals);
   if (min_height < 0.0)
-    mix (metalib, 0.0, min_height, 0.0, time, msg);
+    mix (metalib, 0.0, min_height, 0.0, 0.0, time, msg);
 
   // Chemicals removed by harvest.  BUG: We assume chemicals are above stub.
   const double new_LAI = vegetation->LAI ();
@@ -388,13 +389,15 @@ ColumnStandard::add_residuals (std::vector<AM*>& residuals)
 
 void 
 ColumnStandard::mix (const Metalib& metalib, const double from, const double to,
-                     const double penetration, const Time& time, Treelog& msg)
+                     const double penetration, const double surface_loose,
+                     const Time& time, Treelog& msg)
 {
   std::vector<AM*> residuals;
   vegetation->kill_all (metalib, objid, time, geometry, residuals, 
                         residuals_DM, residuals_N_top, residuals_C_top, 
                         residuals_N_soil, residuals_C_soil, msg);
   add_residuals (residuals);
+  soil->tillage (geometry, from, to, surface_loose);
   const double energy 
     = soil_heat->energy (geometry, *soil, *soil_water, from, to);
   const double extra 
@@ -420,8 +423,8 @@ ColumnStandard::swap (const Metalib& metalib,
                       const double from, const double middle, const double to,
                       const Time& time, Treelog& msg)
 {
-  mix (metalib, from, middle, 1.0, time, msg);
-  mix (metalib, middle, to, 0.0, time, msg);
+  mix (metalib, from, middle, 1.0, 1.0, time, msg);
+  mix (metalib, middle, to, 0.0, 0.0, time, msg);
   const double extra 
     = soil_water->swap (geometry, *soil, *soil_heat, from, middle, to, msg);
   overflow (extra, msg);

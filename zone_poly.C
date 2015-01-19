@@ -38,12 +38,19 @@ struct ZonePoly : public Zone
 {
   // Content.
   const polygon_2d polygon;
+  const double top;
+  const double bottom;
 
   // Use.
   bool contain_point (double z, double x, double y) const;
+  bool overlap_interval (const double from, const double to) const;
 
   // Create and Destroy.
   static polygon_2d make_polygon 
+  /**/ (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&);
+  static double find_top 
+  /**/ (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&);
+  static double find_bottom
   /**/ (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&);
   ZonePoly (const BlockModel& al);
   ~ZonePoly ();
@@ -54,6 +61,19 @@ ZonePoly::contain_point (double z, double x, double) const
 { 
   const point_2d p (x, z);
   return boost::geometry::within (p, polygon);
+}
+
+bool 
+ZonePoly::overlap_interval (const double from, const double to) const
+{
+  if (to >= top)
+    // Entire zone is below interval.
+    return false;
+  if (from <= bottom)
+    // Entire zone is above interval.
+    return false;
+
+  return true;
 }
 
 polygon_2d 
@@ -72,9 +92,39 @@ ZonePoly::make_polygon (const std::vector<boost::shared_ptr<const FrameSubmodel>
   return polygon;
 }
 
+double
+ZonePoly::find_top (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& seq)
+{
+  double top = NAN;
+  for (size_t i = 0; i < seq.size (); i++)
+    {
+      const Frame& frame = *seq[i];
+      const double z = frame.number ("z");
+      if (i == 0 || z > top)
+        top = z;
+    }      
+  return top;
+}
+
+double
+ZonePoly::find_bottom (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& seq)
+{
+  double bottom = NAN;
+  for (size_t i = 0; i < seq.size (); i++)
+    {
+      const Frame& frame = *seq[i];
+      const double z = frame.number ("z");
+      if (i == 0 || z < bottom)
+        bottom = z;
+    }      
+  return bottom;
+}
+
 ZonePoly::ZonePoly (const BlockModel& al)
   : Zone (al),
-    polygon (make_polygon (al.submodel_sequence ("outer")))
+    polygon (make_polygon (al.submodel_sequence ("outer"))),
+    top (find_top (al.submodel_sequence ("outer"))),
+    bottom (find_bottom (al.submodel_sequence ("outer")))
 { }
   
 ZonePoly::~ZonePoly ()
@@ -121,4 +171,4 @@ Points surrounding the polygon in clockwise order.",
   }
 } ZonePoly_syntax;
 
-// zone_box.C ends here.
+// zone_poly.C ends here.

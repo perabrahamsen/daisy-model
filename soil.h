@@ -66,6 +66,8 @@ public:
   double primary_sorption_fraction (size_t c) const;
   double dispersivity (size_t) const;
   double dispersivity_transversal (size_t) const;  
+  void tillage (const Geometry& geo, const double from, const double to,
+                const double surface_loose);
   void set_porosity (size_t i, double Theta);
   // Activation pressure for secondary domain. [cm] 
   double h_secondary (size_t i) const;

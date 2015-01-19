@@ -1,16 +1,43 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-** Hydraulic WEPP
+* WEPP
 
-Stadig kun 1 hydraulic model per horizontt. Vi må have flere
+** DONE Hydraulic WEPP kopi af hydraulic hypres
+
+** DONE test opsætning med hydraulic wepp i stedet for hydraulic hypress
+
+** DONE Gør alle hypess beregnede parametre til log variable
+
+** DONE log dem
+
+** DONE K_fc Theta_fc K_wp Theta_wp log variable
+
+** DONE tilføj consolidated bulk density
+
+** DONE Ny hydraulic wepp log variabel: dry_bulk_density
+
+** DONE initialiser den til consolidated dry_bulk density
+
+** DONE log den 
+
+** tilføj tillage
+
+Soil::tillage
+
+find ud af hvilke horizonter (og zoner?) der er påvirket.
+
+** tilføj regn + tid
+
+** tilføj frys/tø
+
+Stadig kun 1 hydraulic model per horizont. Vi må have flere
 horizonter hvis vi skal tage hensyn til flere jordbehandlingsdybder.
 
 En horizont bliver "behandlet" hvis den overlapper med jordbehandling.
 
-*** set_hypress_parametre (texture, dry_bi
+*** set_hypress_parametre (texture, dry_bd)
 
 * Emacs
-
 
 ** (export DAISYHOME)
 

@@ -39,6 +39,7 @@ struct ZoneBox : public Zone
   static bool in_interval (const double point, 
                            const Bound& from, const Bound& to);
   bool contain_point (double z, double x, double y) const;
+  bool overlap_interval (const double from, const double to) const;
 
   // Create and Destroy.
   ZoneBox (const BlockModel& al);
@@ -62,10 +63,23 @@ ZoneBox::in_interval (const double point, const Bound& from, const Bound& to)
 }
 
 bool 
-ZoneBox::contain_point (double z, double x, double y) const
+ZoneBox::contain_point (const double z, const double x, const double y) const
 { return in_interval (z, *bottom, *top)
     && in_interval (x, *left, *right)
     && in_interval (y, *front, *back);
+}
+
+bool 
+ZoneBox::overlap_interval (const double from, const double to) const
+{
+  if (top->type () == Bound::finite && to >= top->value ())
+    // Entire zone is below interval.
+    return false;
+  if (bottom->type () == Bound::finite && from <= bottom->value ())
+    // Entire zone is above interval.
+    return false;
+
+  return true;
 }
 
 ZoneBox::ZoneBox (const BlockModel& al)

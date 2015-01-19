@@ -82,7 +82,7 @@ struct Field::Implementation
               double sorg_harvest,
               std::vector<const Harvest*>&, Treelog&);
   void mix (const Metalib& metalib, 
-            double from, double to, double penetration, 
+            double from, double to, double penetration, double surface_loose,
             const Time&, Treelog&);
   void swap (const Metalib& metalib, 
              double from, double middle, double to, 
@@ -353,20 +353,21 @@ Field::Implementation::pluck (const Metalib& metalib,
 void 
 Field::Implementation::mix (const Metalib& metalib, 
                             const double from, const double to,
-                            double penetration, const Time& time,
+                            double penetration, double surface_loose, 
+                            const Time& time,
 			    Treelog& msg)
 {
   if (selected)
     {
       Treelog::Open nest (msg, selected->objid); 
-      selected->mix (metalib, from, to, penetration, time, msg);
+      selected->mix (metalib, from, to, penetration, surface_loose, time, msg);
     }
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
     {
       Treelog::Open nest (msg, (*i)->objid);
-      (*i)->mix (metalib, from, to, penetration, time, msg);
+      (*i)->mix (metalib, from, to, penetration, surface_loose, time, msg);
     }
 }
 
@@ -884,9 +885,9 @@ Field::pluck (const Metalib& metalib,
 void 
 Field::mix (const Metalib& metalib, 
             const double from, const double to, 
-            const double penetration, 
+            const double penetration, const double surface_loose, 
             const Time& time, Treelog& msg)
-{ impl->mix (metalib, from, to, penetration, time, msg); }
+{ impl->mix (metalib, from, to, penetration, surface_loose, time, msg); }
 
 void 
 Field::swap (const Metalib& metalib, 

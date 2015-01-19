@@ -81,6 +81,10 @@ Hydraulic::set_porosity (double Theta)
   Theta_sat = Theta; 
 }
 
+void
+Hydraulic::tillage (double)
+{ }
+
 void 
 Hydraulic::output (Log& log) const
 {
@@ -199,7 +203,8 @@ Hydraulic::load_K_sat (Frame& frame)
 
 void
 Hydraulic::initialize (const Texture&, 
-                       double /* rho_b */, bool /* top_soil */, Treelog&)
+                       double /* rho_b */, bool /* top_soil */, 
+                       double /* CEC */, Treelog&)
 {
   if (K_init)
     {

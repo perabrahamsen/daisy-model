@@ -35,14 +35,16 @@ struct ActionMix : public Action
   const Metalib& metalib;
 
   // Content.
-  const double depth;
-  const double penetration;
+  const double depth;           // [cm]
+  const double penetration;     // [0.1]
+  const double surface_loose;   // [0-1]
 
   // Simulation.
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
     {
       TREELOG_MODEL (msg);
-      daisy.field ().mix (metalib, 0.0, depth, penetration, daisy.time (),  msg);
+      daisy.field ().mix (metalib, 0.0, depth, penetration, surface_loose, 
+                          daisy.time (),  msg);
     }
 
   void tick (const Daisy&, const Scope&, Treelog&)
@@ -56,7 +58,8 @@ struct ActionMix : public Action
     : Action (al),
       metalib (al.metalib ()),
       depth (al.number ("depth")),
-      penetration (al.number ("penetration"))
+      penetration (al.number ("penetration")),
+      surface_loose (al.number ("surface_loose"))
     { }
 };
 
@@ -80,6 +83,9 @@ the interval.")
 Fraction of organic matter on surface that are incorporated in the soil\n\
 by this operation.");
       frame.set ("penetration", 1.0);
+      frame.declare_fraction ("surface_loose", Attribute::OptionalConst, "\
+Fraction of surface beeing loosened by opretation.\n\
+By defeault, this is equal to 'penetration'.");
     }
 } ActionMix_syntax;
 
