@@ -2,31 +2,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * WEPP
 
-** DONE Hydraulic WEPP kopi af hydraulic hypres
-
-** DONE test opsætning med hydraulic wepp i stedet for hydraulic hypress
-
-** DONE Gør alle hypess beregnede parametre til log variable
-
-** DONE log dem
-
-** DONE K_fc Theta_fc K_wp Theta_wp log variable
-
-** DONE tilføj consolidated bulk density
-
-** DONE Ny hydraulic wepp log variabel: dry_bulk_density
-
-** DONE initialiser den til consolidated dry_bulk density
-
-** DONE log den 
-
-** tilføj tillage
-
-Soil::tillage
-
-find ud af hvilke horizonter (og zoner?) der er påvirket.
-
-** tilføj regn + tid
+*** kald hydraulic::tick_daily (rain) daily
 
 ** tilføj frys/tø
 

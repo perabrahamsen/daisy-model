@@ -33,60 +33,7 @@
 #include "librarian.h"
 #include "frame.h"
 #include "log.h"
-
-// Bulk density at 330 cm, after consolidation. [g/cm^3]
-static double 
-consolidated_bulk_density (const Texture& texture, 
-                           const double CEC /* [cmolc/kg] */)
-{
-  // Extract USDA3 texture.
-  const double mineral = texture.mineral (); // [g mineral/g soil]
-  const double clay = mineral                // [g clay/g soil]
-    * texture.fraction_of_minerals_smaller_than (2.0 /* [um] */);
-  daisy_assert (clay >= 0.0);
-  const double silt = mineral                // [g clay/g soil]
-    * texture.fraction_of_minerals_smaller_than (50.0 /* [um] */)
-    - clay;
-  daisy_assert (silt >= 0.0);
-  const double sand = mineral                // [g clay/g soil]
-    * texture.fraction_of_minerals_smaller_than (2000.0 /* [um] */)
-    - clay - silt;
-  daisy_assert (sand >= 0.0);
-  const double om = texture.humus;           // [g om/g soil]
-  daisy_assert (clay + silt + sand + om < 1.001);
-
-  // From Danish soil pedotrasfer [krogh2000cation]
-  const double CECr_sane = 50.0;     // [cmolc/kg clay] 
-  // Apparently there is a mistake in WEPP: CECr is really mmol/g, 
-  // not per mmol/100g. Source: Merete Styczen personal correspondance.
-  const double CECr = CECr_sane * 0.01; // [mmolc/g clay]
-
-  // CECc is the part of CEC originating from clay.
-  const double CECc = CECr_sane * clay; // [cmolc/kg soil]
-  
-  // Consolidated bulk density.
-  const double p_c = (1.514 + 0.25 * sand -  13.0 * sand * om -  6.0 * clay * om
-                      - 0.48 * clay * CECr) * 1000.0; // [kg / m^3]
-  return p_c;
-}
-
-// Bulk density after tillage. [kg/m^3]
-static double
-bulk_density_after_tillage (const double p_tm1, // [kg/m^3]
-                            const double p_c,   // [kg/m^3]
-                            const double T_ds,  // []
-                            const double consolidate_factor // []
-                            )
-// p_tm1 is the bulk density before tillage
-// p_c is consolidated bulk density.
-// T_ds is fraction of surface being affected.
-// consolidate_factor is the ratio between consolidated and loose bulk density.
-// consolidate_factor should default to 0.667, as it is used in wepp.
-{
-  // p_tet is is bulk density after tillage.
-  const double p_tet = p_tm1 - (p_tm1 - consolidate_factor * p_c) * T_ds;
-  return p_tet;
-}
+#include "check.h"
 
 class HydraulicWEPP : public Hydraulic
 {
@@ -100,9 +47,17 @@ class HydraulicWEPP : public Hydraulic
 
   // Static wepp properties, calculated on initialization.
   double p_c;                   // consolidated_bulk_density [kg/m^3]
+  double delta_pmx_clay;        // static rain bulk density change [kg/m^3]
 
-  // Danymic properties calculated by wepp.
-  double rho_b;       // [g/cm^3]
+  // Properties calculated by wepp after tillage.
+  double p_t;                   // dry bulk density after tillage. [kg/m^3]
+  double delta_pmx;             // rain bulk density change [kg/m^3]
+  double delta_pc;             // time bulk density change [kg/m^3]
+
+  // Properties calculated by wepp daily.
+  double day_count;             // Number of days since tillage. [d]
+  double R_c;                   // Accumulated rain since tillage. [m]
+  double rho_b;                 // Current dry bulk density [g/cm^3]
 
   // Dynamic M_vG parameters calculated by hypres.
   double alpha;
@@ -121,20 +76,9 @@ public:
   void set_porosity (double)
   { throw ("Can't change porosity for WEPP hydraulic model"); }
   void tillage (const double T_ds);
-  void tick_daily (const double rain);
-  void output (Log& log) const
-  {
-    output_variable (rho_b, log);
-    output_variable (alpha, log);
-    output_variable (n, log);
-    output_variable (l, log);
-    output_variable (K_sat, log);
-    output_variable (K_fc, log);
-    output_variable (K_wp, log);
-    output_variable (Theta_sat, log);
-    output_variable (Theta_fc, log);
-    output_variable (Theta_wp, log);
-  };
+  void calculate_rho_b ();
+  void tick (const double dt, const double rain);
+  void output (Log& log) const;
 
   // Use.
 public:
@@ -150,6 +94,8 @@ private:
 public:
   HydraulicWEPP (const BlockModel&);
   HydraulicWEPP (symbol name, double K_sat);
+  void initialize_wepp (const Texture& texture, 
+                        const double CEC /* [cmolc/kg] */);
   void initialize (const Texture&, double rho_b, bool top_soil, double CEC,
 		   Treelog& msg);
 private:
@@ -163,11 +109,65 @@ HydraulicWEPP::tillage (const double T_ds)
 {
   daisy_assert (T_ds >= 0.0 && T_ds <= 1.0);
   const double p_tm1 = rho_b * (100.0 * 100.0 * 100.0) / 1000.0; // [kg/m^3]
-  const double p_t = bulk_density_after_tillage (p_tm1, p_c, T_ds,
-                                                 consolidate_factor);
-  rho_b = p_t * 1000.0 / (100.0 * 100.0 * 100.0); // [g/cm^3]
+  // wepp:7.7.1
+  p_t = p_tm1 - (p_tm1 - consolidate_factor * p_c) * T_ds;
+  // wepp:7.7.10
+  delta_pmx = std::max (0.0, delta_pmx_clay - 0.92 * p_t); // [kg/m^3]
+  
+  // Dry bulk density after 100 mm (0.1 m) of rain.
+  const double p_t01m = p_t + delta_pmx * (0.1 / 0.01 + 0.1);
+  if (p_t01m > p_c)
+    delta_pc = 0.0;
+  else
+    delta_pc = p_c - p_t01m;
 
+  day_count = 0.0;                                // [d]
+  R_c = 0.0;                                      // [m]
   hypres ();
+}
+
+void
+HydraulicWEPP::calculate_rho_b ()
+{
+  // Fraction of time loosening effect until now. wepp:7.712
+  const double F_dc = 1.0 - std::exp (-0.005 * day_count); // []
+  // Loosening due to time. wepp:7.7.12
+  const double delta_pwt = delta_pc * F_dc; 
+  // Loosening due to rain. wepp:7.7.9
+  const double delta_prf = delta_pmx * (R_c / (0.01 + R_c)); // [kg/m^3]
+  // New dry bulk density. wepp:7.7.14
+  const double p_new = p_t + delta_prf + delta_pwt; // [kg/m^3]
+  // TODO: use R_c og delta_pmx
+  rho_b = p_new * 1000.0 / (100.0 * 100.0 * 100.0); // [g/cm^3]
+}
+
+void 
+HydraulicWEPP::tick (const double dt /* [h] */, const double rain /* [mm] */)
+{
+  day_count += dt / 24.0;       // [d]
+  R_c += rain * 0.001;          // [m]
+  hypres ();
+}
+
+void 
+HydraulicWEPP::output (Log& log) const
+{
+  output_variable (p_t, log);
+  output_variable (delta_pmx, log);
+  output_variable (delta_pc, log);
+  output_variable (day_count, log);
+  output_variable (R_c, log);
+  output_variable (rho_b, log);
+  output_variable (delta_pmx, log);
+  output_variable (alpha, log);
+  output_variable (n, log);
+  output_variable (l, log);
+  output_variable (K_sat, log);
+  output_variable (K_fc, log);
+  output_variable (K_wp, log);
+  output_variable (Theta_sat, log);
+  output_variable (Theta_fc, log);
+  output_variable (Theta_wp, log);
 }
 
 double 
@@ -232,6 +232,44 @@ HydraulicWEPP::Se (double h) const
 }
 
 void
+HydraulicWEPP::initialize_wepp (const Texture& texture, 
+                                const double CEC /* [cmolc/kg] */)
+{
+  // Extract USDA3 texture.
+  const double mineral = texture.mineral (); // [g mineral/g soil]
+  const double clay = mineral                // [g clay/g soil]
+    * texture.fraction_of_minerals_smaller_than (2.0 /* [um] */);
+  daisy_assert (clay >= 0.0);
+  const double silt = mineral                // [g clay/g soil]
+    * texture.fraction_of_minerals_smaller_than (50.0 /* [um] */)
+    - clay;
+  daisy_assert (silt >= 0.0);
+  const double sand = mineral                // [g clay/g soil]
+    * texture.fraction_of_minerals_smaller_than (2000.0 /* [um] */)
+    - clay - silt;
+  daisy_assert (sand >= 0.0);
+  const double om = texture.humus;           // [g om/g soil]
+  daisy_assert (clay + silt + sand + om < 1.001);
+
+  // From Danish soil pedotrasfer [krogh2000cation]
+  const double CECr_sane = 50.0;     // [cmolc/kg clay] 
+  // Apparently there is a mistake in WEPP: CECr is really mmol/g, 
+  // not per mmol/100g. Source: Merete Styczen personal correspondance.
+  const double CECr = CECr_sane * 0.01; // [mmolc/g clay]
+
+  // CECc is the part of CEC originating from clay.
+  const double CECc = CECr_sane * clay; // [cmolc/kg soil]
+  
+  // Consolidated bulk density. wepp:7.7.2
+  p_c = (1.514 + 0.25 * sand -  13.0 * sand * om -  6.0 * clay * om
+                      - 0.48 * clay * CECr) * 1000.0; // [kg / m^3]
+
+  // Fixed contribution to maximum soil bulk density change due to rain.
+  // wepp:7.7.10 (first part)
+  delta_pmx_clay = 1650.0 - 2900.0 * clay + 3000 * clay * clay; // [kg/m^3]
+}
+
+void
 HydraulicWEPP::initialize (const Texture& texture,
                            double, const bool, const double CEC, Treelog& msg)
 {
@@ -273,13 +311,14 @@ HydraulicWEPP::initialize (const Texture& texture,
       msg.error (tmp.str ());
     }
 
-  p_c = consolidated_bulk_density (texture, CEC);
+  initialize_wepp (texture, CEC);
   {
     std::ostringstream tmp;
     tmp << "Consolidated bulk density " << p_c << " kg/m^3";
     msg.debug (tmp.str ());
   }
-  rho_b = p_c * 1000.0 / (100.0 * 100.0 * 100.0); // [g/cm^3]
+  if (p_t < 0.0)
+    p_t = p_c;
   hypres ();
   M_.clear ();
   K_to_M (M_, 500);
@@ -288,6 +327,7 @@ HydraulicWEPP::initialize (const Texture& texture,
 void
 HydraulicWEPP::hypres ()
 {
+  calculate_rho_b ();
   daisy_assert (rho_b > 0.0);
   // WEPP is only for surface.
   const bool top_soil = true;
@@ -363,6 +403,17 @@ HydraulicWEPP::hypres ()
 HydraulicWEPP::HydraulicWEPP (const BlockModel& al)
   : Hydraulic (al),
     consolidate_factor (al.number ("consolidate_factor")),
+    clay (-42.42e42),
+    silt (-42.42e42),
+    humus (-42.42e42),
+    p_c (-42.42e42),
+    delta_pmx_clay (-42.42e42),
+    p_t (al.number ("p_t", -42.42e42)),
+    delta_pmx (al.number ("delta_pmx")),
+    delta_pc (al.number ("delta_pc")),
+    day_count (al.number ("day_count")),
+    R_c (al.number ("R_c")),
+    rho_b (-42.42e42),
     alpha (-42.42e42),
     a (-42.42e42),
     n (-42.42e42),
@@ -403,8 +454,23 @@ Tillage and weather dynamics from WEPP.")
     frame.declare_fraction ("consolidate_factor", Attribute::Const, "\
 The ratio between consolidated and loose bulk density.");
     frame.set ("consolidate_factor", 0.667);
+    frame.declare ("p_t", "kg/m^3", Attribute::OptionalState,
+                   "Dry bulk density after last tillage.\n\
+By default, this will be consolidated dry bulk density per wepp.");
+    frame.declare ("delta_pmx", "kg/m^3", Attribute::State,
+                   "Potential dry bulk density change due to rain.");
+    frame.set ("delta_pmx", 0.0);
+    frame.declare ("delta_pc", "kg/m^3", Attribute::State,
+                   "Potential dry bulk density change due to time.");
+    frame.set ("delta_pc", 0.0);
+    frame.declare ("day_count", "d", Check::non_negative (), Attribute::State, 
+                   "Number of days since last tillage.");
+    frame.set ("day_count", 0.0);
+    frame.declare ("R_c", "m", Check::non_negative (), Attribute::State, 
+                   "Rain since last tillage.");
+    frame.set ("R_c", 0.0);
     frame.declare ("rho_b", "g/cm^3", Attribute::LogOnly,
-                   "Dry bulk density.");
+                   "Current dry bulk density.");
     frame.declare ("alpha", "cm^-1", Attribute::LogOnly,
                    "van Genuchten alpha.");
     frame.declare ("n", Attribute::None (), Attribute::LogOnly,

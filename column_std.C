@@ -767,6 +767,9 @@ ColumnStandard::tick_move (const Metalib& metalib,
   // Once a month we clean up old AM from organic matter.
   if (time.hour () == 13 && time.mday () == 13)
     organic_matter->monthly (metalib, geometry, msg);
+
+  // Soil properties.
+  soil->tick (dt, my_weather.rain ());
 }
 
 bool

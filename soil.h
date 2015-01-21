@@ -68,6 +68,7 @@ public:
   double dispersivity_transversal (size_t) const;  
   void tillage (const Geometry& geo, const double from, const double to,
                 const double surface_loose);
+  void tick (const double dt /* [h] */, const double rain /* [mm] */);
   void set_porosity (size_t i, double Theta);
   // Activation pressure for secondary domain. [cm] 
   double h_secondary (size_t i) const;

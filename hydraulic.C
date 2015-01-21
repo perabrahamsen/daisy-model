@@ -86,6 +86,10 @@ Hydraulic::tillage (double)
 { }
 
 void 
+Hydraulic::tick (const double, const double)
+{ }
+
+void 
 Hydraulic::output (Log& log) const
 {
   output_variable (Theta_sat, log); 

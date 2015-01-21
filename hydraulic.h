@@ -56,6 +56,7 @@ public:
   { return Theta_sat; }
   virtual void set_porosity (double Theta);
   virtual void tillage (double surface_loose);
+  virtual void tick (const double dt /* [h] */, const double rain /* [m] */);
 
   // Convertion functions.
 public:

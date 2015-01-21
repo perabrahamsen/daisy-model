@@ -59,7 +59,7 @@ struct ActionMix : public Action
       metalib (al.metalib ()),
       depth (al.number ("depth")),
       penetration (al.number ("penetration")),
-      surface_loose (al.number ("surface_loose"))
+      surface_loose (al.number ("surface_loose", penetration))
     { }
 };
 

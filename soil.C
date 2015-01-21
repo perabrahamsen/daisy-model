@@ -176,6 +176,16 @@ struct Soil::Implementation
           zones[i]->horizon->hydraulic->tillage (surface_loose);
       }
   }
+  void tick (const double dt, const double rain)
+  {
+    // Horizons.
+    for (size_t i = 0; i < layers.size (); i++)
+      layers[i]->horizon->hydraulic->tick (dt, rain);
+
+    // Zones.
+    for (size_t i = 0; i < zones.size (); i++)
+      zones[i]->horizon->hydraulic->tick (dt, rain);
+  }
 
   // Create and Destroy.
   Implementation (const Block& al)
@@ -291,6 +301,10 @@ void
 Soil::tillage (const Geometry& geo, const double from, const double to,
                const double surface_loose)
 { impl->tillage (geo, from, to, surface_loose); }
+
+void
+Soil::tick (const double dt, const double rain)
+{ impl->tick (dt, rain); }
 
 void
 Soil::set_porosity (size_t i, double Theta)
