@@ -773,9 +773,15 @@ BioporeMatrix::update_cell_water (const Geometry& geo, const double dt)
       if (h_bottom[col] > 0.0)
         {
           const double top = height_end + h_bottom[col];
-          const double water = column_water (col);
-          geo.add_soil (Theta, top, height_end, last_x, next_x, water);
-          total_water += water;
+          if (top > height_end)
+            {
+              const double water = column_water (col);
+              geo.add_soil (Theta, top, height_end, last_x, next_x, water);
+              total_water += water;
+            }
+          else
+            // May happen if abs(h[bottom]) << abs(height_end);
+            isequal (top, height_end);
         }
       last_x = next_x;
     }
