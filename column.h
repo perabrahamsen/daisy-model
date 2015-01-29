@@ -158,9 +158,10 @@ protected:
   explicit Column (const BlockModel&);
 public:
   virtual void initialize (const Block& al) = 0;
-  virtual bool initialize (const Block&,
+  virtual bool initialize (const Metalib&,
                            const std::vector<const Scope*>& scopes,
-                           const Time&, const Weather*, const Scope&) = 0;
+                           const Time&, const Weather*, const Scope&,
+                           Treelog&) = 0;
   virtual void summarize (Treelog& msg) const = 0;
   ~Column ();
 };

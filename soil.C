@@ -622,11 +622,11 @@ Soil::Soil (const Block& al)
 { }
 
 void
-Soil::initialize (const Block& block, const Time& time, Geometry& geo,
+Soil::initialize (const Time& time, Geometry& geo,
                   Groundwater& groundwater,
-                  const int som_size)
+                  const int som_size, Treelog& msg)
 {
-  Treelog::Open nest (block.msg (), "Soil");
+  Treelog::Open nest (msg, "Soil");
 
   const bool volatile_bottom =
     groundwater.bottom_type () == Groundwater::lysimeter; 
@@ -640,13 +640,17 @@ Soil::initialize (const Block& block, const Time& time, Geometry& geo,
 
   // Initialize zone horizons.
   for (int i = 0; i < impl->zones.size (); i++)
-    // BUGLET: top_soil is always false.
-    impl->zones[i]->horizon->initialize (false, som_size, block.msg ());
+    {
+      const Zone& zone = *impl->zones[i]->volume;
+      const double center_z = zone.center_z ();
+      const bool top_soil = center_z > -20; // Center of zone within plow layer
+      impl->zones[i]->horizon->initialize (top_soil, som_size, center_z, msg);
+    }
 
   // Initialize geometry and layer horizons.
   std::vector<double> fixed;
   {
-    Treelog::Open nest (block.msg (), "Horizons");
+    Treelog::Open nest (msg, "Horizons");
     double last = 0.0;
     size_t next_border = 0;
     for (layer = begin; layer != end; layer++)
@@ -655,7 +659,8 @@ Soil::initialize (const Block& block, const Time& time, Geometry& geo,
 	daisy_assert (current < last);
 
 	const bool top_soil = (layer == begin);
-	(*layer)->horizon->initialize (top_soil, som_size, block.msg ());
+        const double center_z = 0.5 * (current + last); // center of layer.
+	(*layer)->horizon->initialize (top_soil, som_size, center_z, msg);
 
         while (next_border < impl->border.size ()
                && current < impl->border[next_border])
@@ -672,7 +677,7 @@ Soil::initialize (const Block& block, const Time& time, Geometry& geo,
       impl->MaxRootingDepth = -last;
   }
   geo.initialize_zplus (volatile_bottom, fixed, -impl->MaxRootingDepth, 
-                        2 * impl->dispersivity, block.msg ());
+                        2 * impl->dispersivity, msg);
   const size_t cell_size = geo.cell_size ();
 
   // Initialize horizons.
@@ -719,7 +724,7 @@ Soil::initialize (const Block& block, const Time& time, Geometry& geo,
       std::ostringstream tmp;
       tmp << "cell[" << i << "] of " << cell_size
           << " z = " << geo.cell_z (i) << ", last = " << last;
-      Treelog::Open nest (block.msg (), tmp.str ());
+      Treelog::Open nest (msg, tmp.str ());
       daisy_assert (horizon_[i] != NULL);
     }
 

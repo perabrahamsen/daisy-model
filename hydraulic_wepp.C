@@ -38,7 +38,11 @@
 class HydraulicWEPP : public Hydraulic
 {
   // WEPP parametre.
-  const double consolidate_factor; // [0-1];
+  const double consolidate_factor; // [0-1]
+  const double delta_pmx_fixed;    // [kg/m^3] forced value of delta_pmx.
+  const double average_depth;      // [cm]
+  const double CECr_fixed;         // Fixed value for CECr.
+  double p_c;                   // consolidated_bulk_density [kg/m^3]
 
   // Static soil properties, calculated on initialization.
   double clay;                  // [%]
@@ -46,7 +50,6 @@ class HydraulicWEPP : public Hydraulic
   double humus;                 // [%]
 
   // Static wepp properties, calculated on initialization.
-  double p_c;                   // consolidated_bulk_density [kg/m^3]
   double delta_pmx_clay;        // static rain bulk density change [kg/m^3]
 
   // Properties calculated by wepp after tillage.
@@ -95,8 +98,11 @@ public:
   HydraulicWEPP (const BlockModel&);
   HydraulicWEPP (symbol name, double K_sat);
   void initialize_wepp (const Texture& texture, 
-                        const double CEC /* [cmolc/kg] */);
+                        const double CEC /* [cmolc/kg] */,
+                        const double center_z /* [cm] */,
+                        Treelog& msg);
   void initialize (const Texture&, double rho_b, bool top_soil, double CEC,
+                   double center_z,
 		   Treelog& msg);
 private:
   void hypres ();
@@ -111,8 +117,13 @@ HydraulicWEPP::tillage (const double T_ds)
   const double p_tm1 = rho_b * (100.0 * 100.0 * 100.0) / 1000.0; // [kg/m^3]
   // wepp:7.7.1
   p_t = p_tm1 - (p_tm1 - consolidate_factor * p_c) * T_ds;
-  // wepp:7.7.10
-  delta_pmx = std::max (0.0, delta_pmx_clay - 0.92 * p_t); // [kg/m^3]
+
+  if (delta_pmx_fixed > 0)
+    // Merete Styczen want is as a calibration parameter.
+    delta_pmx = delta_pmx_fixed;
+  else
+    // wepp:7.7.10
+    delta_pmx = std::max (0.0, delta_pmx_clay - 0.92 * p_t); // [kg/m^3]
   
   // Dry bulk density after 100 mm (0.1 m) of rain.
   const double p_t01m = p_t + delta_pmx * (0.1 / 0.01 + 0.1);
@@ -233,7 +244,9 @@ HydraulicWEPP::Se (double h) const
 
 void
 HydraulicWEPP::initialize_wepp (const Texture& texture, 
-                                const double CEC /* [cmolc/kg] */)
+                                const double CEC /* [cmolc/kg] */,
+                                const double center_z /* [cm] */,
+                                Treelog& msg)
 {
   // Extract USDA3 texture.
   const double mineral = texture.mineral (); // [g mineral/g soil]
@@ -251,19 +264,43 @@ HydraulicWEPP::initialize_wepp (const Texture& texture,
   const double om = texture.humus;           // [g om/g soil]
   daisy_assert (clay + silt + sand + om < 1.001);
 
-  // From Danish soil pedotrasfer [krogh2000cation]
-  const double CECr_sane = 50.0;     // [cmolc/kg clay] 
-  // Apparently there is a mistake in WEPP: CECr is really mmol/g, 
-  // not per mmol/100g. Source: Merete Styczen personal correspondance.
-  const double CECr = CECr_sane * 0.01; // [mmolc/g clay]
+  if (p_c < 0.0)
+    {
+      std::ostringstream tmp;
+      double CECr_sane;             // [cmolc/kg soil]
+      if (CECr_fixed > 0.0)
+        // User specified value.
+        CECr_sane = CECr_fixed;
+      else
+        {
+          double Dg;            // [m]
+          if (average_depth > 0.0)
+            Dg = average_depth / 100.0;
+          else if (center_z < 0.0)
+            Dg = -center_z / 100.0;
+          else
+            {
+              msg.error ("'average_depth' unspecified, assuming 10 cm");
+              Dg = 0.1;
+            }
+          const double CECc                    // [cmolc/kg clay]
+            = CEC - om * (142.0 + 170.0 * Dg); // wepp:7.7.3
+          daisy_assert (clay > 0.0);
+          CECr_sane = CECc / clay;
+          tmp << "CECr = " << CECr_sane << " cmolc/kg clay\n";
+        }
 
-  // CECc is the part of CEC originating from clay.
-  const double CECc = CECr_sane * clay; // [cmolc/kg soil]
+      // Apparently there is a mistake in WEPP: CECr is really mmol/g, 
+      // not per mmol/100g. Source: Merete Styczen personal correspondance.
+      const double CECr = CECr_sane * 0.01; // [mmolc/g clay]
+
   
-  // Consolidated bulk density. wepp:7.7.2
-  p_c = (1.514 + 0.25 * sand -  13.0 * sand * om -  6.0 * clay * om
-                      - 0.48 * clay * CECr) * 1000.0; // [kg / m^3]
-
+      // Consolidated bulk density. wepp:7.7.2
+      p_c = (1.514 + 0.25 * sand -  13.0 * sand * om -  6.0 * clay * om
+             - 0.48 * clay * CECr) * 1000.0; // [kg / m^3]
+      tmp << "Consolidated bulk density " << p_c << " kg/m^3";
+      msg.debug (tmp.str ());
+    }
   // Fixed contribution to maximum soil bulk density change due to rain.
   // wepp:7.7.10 (first part)
   delta_pmx_clay = 1650.0 - 2900.0 * clay + 3000 * clay * clay; // [kg/m^3]
@@ -271,7 +308,8 @@ HydraulicWEPP::initialize_wepp (const Texture& texture,
 
 void
 HydraulicWEPP::initialize (const Texture& texture,
-                           double, const bool, const double CEC, Treelog& msg)
+                           double, const bool, const double CEC, 
+                           const double center_z, Treelog& msg)
 {
   const double clay_lim 
     = texture.fraction_of_minerals_smaller_than ( 2.0 /* [um] USDA Clay */);
@@ -311,12 +349,8 @@ HydraulicWEPP::initialize (const Texture& texture,
       msg.error (tmp.str ());
     }
 
-  initialize_wepp (texture, CEC);
-  {
-    std::ostringstream tmp;
-    tmp << "Consolidated bulk density " << p_c << " kg/m^3";
-    msg.debug (tmp.str ());
-  }
+  initialize_wepp (texture, CEC, center_z, msg);
+
   if (p_t < 0.0)
     p_t = p_c;
   hypres ();
@@ -403,10 +437,13 @@ HydraulicWEPP::hypres ()
 HydraulicWEPP::HydraulicWEPP (const BlockModel& al)
   : Hydraulic (al),
     consolidate_factor (al.number ("consolidate_factor")),
+    delta_pmx_fixed (al.number ("delta_pmx_fixed", -42.42e42)),
+    average_depth (al.number ("average_depth", -42.42e42)),
+    CECr_fixed (al.number ("CECr", -42.42e42)),
+    p_c (al.number ("consolidated_bulk_density", -42.42e42)),
     clay (-42.42e42),
     silt (-42.42e42),
     humus (-42.42e42),
-    p_c (-42.42e42),
     delta_pmx_clay (-42.42e42),
     p_t (al.number ("p_t", -42.42e42)),
     delta_pmx (al.number ("delta_pmx")),
@@ -433,7 +470,7 @@ static struct HydraulicWEPPSyntax : public DeclareModel
   Model* make (const BlockModel& al) const
   { return new HydraulicWEPP (al); }
 
-  static bool check_alist (const Metalib&, const Frame&, Treelog&)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& msg)
   {
     bool ok = true;
     return ok;
@@ -442,7 +479,7 @@ static struct HydraulicWEPPSyntax : public DeclareModel
     : DeclareModel (Hydraulic::component, "wepp", 
                     "van Genuchten retention curve model with Mualem theory.\n\
 Parameters specified by the HYPRES transfer function.\n\
-Tillage and weather dynamics from WEPP.")
+Tillage and weather dynamics from WEPP. CECr from Krogh et al.")
   { }
   void load_frame (Frame& frame) const
   { 
@@ -454,6 +491,28 @@ Tillage and weather dynamics from WEPP.")
     frame.declare_fraction ("consolidate_factor", Attribute::Const, "\
 The ratio between consolidated and loose bulk density.");
     frame.set ("consolidate_factor", 0.667);
+    frame.declare ("delta_pmx_fixed", "kg/m^3", Check::non_negative (), 
+                   Attribute::OptionalConst, "\
+Fixed value for 'delta_pmx'.\n\
+By default 'delta_pmx' will be calculated from clay content and\n\
+dry bulk density.");
+    frame.declare ("average_depth", "cm", Check::positive (), 
+                   Attribute::OptionalConst, "\
+Average depth of horizon (positive).\n\
+Used for estimating 'CECr' iff unspecified.\n\
+If unspecified, the value from 'Soil' is used.");
+    frame.declare ("CECr", "cmolc/kg clay", Check::positive (), 
+                   Attribute::OptionalConst, "\
+Ratio of the cation exchange content of the clay (CECc) to the clay content.\n\
+Used for calculating 'consolidated_bulk_density', iff unspecified.\n\
+By default calculated from 'average_depth', CEC, and texture.\n\
+\n\
+If you have not specified 'CEC' in the horizon, setting 'CECr' to 50.0\n\
+will make most sense due to the way CEC is estimated from texture.");
+    frame.declare ("consolidated_bulk_density", "kg/m^3", 
+                   Attribute::OptionalConst,
+                   "Consolidated dry bulk density after rain and time.\n\
+By default, this will be calculated from texture, CEC, and depth.");
     frame.declare ("p_t", "kg/m^3", Attribute::OptionalState,
                    "Dry bulk density after last tillage.\n\
 By default, this will be consolidated dry bulk density per wepp.");
@@ -491,5 +550,20 @@ By default, this will be consolidated dry bulk density per wepp.");
                             "Water content at wilting point (pF 4.2).");
   }
 } hydraulicWEPP_syntax;
+
+// The 'Styczen' parametrization.
+
+static struct HydraulicStyczenSyntax : public DeclareParam
+{ 
+  HydraulicStyczenSyntax ()
+    : DeclareParam (Hydraulic::component, "Styczen", "wepp", "\
+Parameterization of for Danish soils.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set_cited ("CECr", 50.0, "Average value for examined Danish soils.", 
+                     "krogh2000cation");
+  }
+} HydraulicStyczen_syntax;
 
 // hydraulic_wepp.C ends here.

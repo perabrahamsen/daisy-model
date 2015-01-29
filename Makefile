@@ -1545,7 +1545,7 @@ zone_poly${OBJ}: zone_poly.C zone.h model.h symbol.h librarian.h \
  frame_model.h frame.h frame_submodel.h vcheck.h assertion.h point.h
 zone_box${OBJ}: zone_box.C zone.h model.h symbol.h bound.h model_derived.h \
  model_logable.h librarian.h block_model.h block_nested.h block.h scope.h \
- attribute.h treelog.h frame_model.h frame.h
+ attribute.h treelog.h frame_model.h frame.h mathlib.h assertion.h
 rootdens_growth${OBJ}: rootdens_growth.C rootdens.h model_framed.h \
  model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h geometry.h log.h \

@@ -65,8 +65,8 @@ struct HorizonSystem : public Horizon
   { return texture.fraction_of_minerals_smaller_than (size); }
 
   // Create and Destroy.
-  void initialize (bool top_soil, int som_size, Treelog& msg)
-  { initialize_base (top_soil, som_size, texture, msg); }
+  void initialize (bool top_soil, int som_size, double center_z, Treelog& msg)
+  { initialize_base (top_soil, som_size, center_z, texture, msg); }
   HorizonSystem (const System& system, const BlockModel& al)
     : Horizon (al),
       texture (system.limits, system.get_fractions (al), 

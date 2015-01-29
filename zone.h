@@ -38,6 +38,7 @@ public:
 public:
   virtual bool contain_point (double z, double x, double y) const = 0;
   virtual bool overlap_interval (double from, double to) const = 0;
+  virtual double center_z () const = 0;
 
   // Create and Destroy.
 public:

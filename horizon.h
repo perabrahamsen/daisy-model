@@ -91,9 +91,10 @@ void output (Log&) const;
   // Create and Destroy.
 public:
   explicit Horizon (const BlockModel&);
-  virtual void initialize (bool top_soil, int som_size, Treelog&) = 0;
+  virtual void initialize (bool top_soil, int som_size, double center_z, 
+                           Treelog&) = 0;
 protected:
-  void initialize_base (bool top_soil, int som_size, const Texture& texture, 
+  void initialize_base (bool top_soil, int som_size, double center_z, const Texture& texture, 
                         Treelog&);
 public:
   ~Horizon ();

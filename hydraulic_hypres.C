@@ -67,7 +67,7 @@ public:
   HydraulicHypres (const BlockModel&);
   HydraulicHypres (symbol name, double K_sat);
   void initialize (const Texture&, double rho_b, bool top_soil, double CEC,
-		   Treelog& msg);
+                   double center_z, Treelog& msg);
 public:
   ~HydraulicHypres ();
 };
@@ -140,8 +140,8 @@ HydraulicHypres::Se (double h) const
 
 void
 HydraulicHypres::initialize (const Texture& texture,
-                             double rho_b, bool top_soil, double CEC,
-                             Treelog& msg)
+                             double rho_b, bool top_soil, double CEC, 
+                             double center_z, Treelog& msg)
 {
   TREELOG_MODEL (msg);
 
@@ -257,7 +257,7 @@ pedotransfer function");
   a = -alpha;
   m = 1.0 - 1.0 / n;
 
-  Hydraulic::initialize (texture, rho_b, top_soil, CEC, msg);
+  Hydraulic::initialize (texture, rho_b, top_soil, CEC, center_z, msg);
   daisy_assert (K_sat > 0.0);
 
 

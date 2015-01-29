@@ -38,12 +38,14 @@ struct ZonePoly : public Zone
 {
   // Content.
   const polygon_2d polygon;
-  const double top;
-  const double bottom;
+  const double my_top;
+  const double my_bottom;
 
   // Use.
   bool contain_point (double z, double x, double y) const;
   bool overlap_interval (const double from, const double to) const;
+  double center_z () const
+  { return 0.5 * (my_top + my_bottom); }
 
   // Create and Destroy.
   static polygon_2d make_polygon 
@@ -66,10 +68,10 @@ ZonePoly::contain_point (double z, double x, double) const
 bool 
 ZonePoly::overlap_interval (const double from, const double to) const
 {
-  if (to >= top)
+  if (to >= my_top)
     // Entire zone is below interval.
     return false;
-  if (from <= bottom)
+  if (from <= my_bottom)
     // Entire zone is above interval.
     return false;
 
@@ -95,36 +97,36 @@ ZonePoly::make_polygon (const std::vector<boost::shared_ptr<const FrameSubmodel>
 double
 ZonePoly::find_top (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& seq)
 {
-  double top = NAN;
+  double my_top = NAN;
   for (size_t i = 0; i < seq.size (); i++)
     {
       const Frame& frame = *seq[i];
       const double z = frame.number ("z");
-      if (i == 0 || z > top)
-        top = z;
+      if (i == 0 || z > my_top)
+        my_top = z;
     }      
-  return top;
+  return my_top;
 }
 
 double
 ZonePoly::find_bottom (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& seq)
 {
-  double bottom = NAN;
+  double my_bottom = NAN;
   for (size_t i = 0; i < seq.size (); i++)
     {
       const Frame& frame = *seq[i];
       const double z = frame.number ("z");
-      if (i == 0 || z < bottom)
-        bottom = z;
+      if (i == 0 || z < my_bottom)
+        my_bottom = z;
     }      
-  return bottom;
+  return my_bottom;
 }
 
 ZonePoly::ZonePoly (const BlockModel& al)
   : Zone (al),
     polygon (make_polygon (al.submodel_sequence ("outer"))),
-    top (find_top (al.submodel_sequence ("outer"))),
-    bottom (find_bottom (al.submodel_sequence ("outer")))
+    my_top (find_top (al.submodel_sequence ("outer"))),
+    my_bottom (find_bottom (al.submodel_sequence ("outer")))
 { }
   
 ZonePoly::~ZonePoly ()

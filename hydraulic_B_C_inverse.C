@@ -97,7 +97,7 @@ struct HydraulicB_C_inverse : public Hydraulic
   }
   void initialize (const Texture& texture,
                    double rho_b, const bool top_soil, const double CEC,
-                   Treelog& msg)
+                   const double center_z, Treelog& msg)
   {
     TREELOG_MODEL (msg);
     std::ostringstream tmp;
@@ -148,7 +148,7 @@ struct HydraulicB_C_inverse : public Hydraulic
     msg.debug (tmp.str ());
 
     // Must be called last (K_init depends on the other parameters).
-    Hydraulic::initialize (texture, rho_b, top_soil, CEC, msg);
+    Hydraulic::initialize (texture, rho_b, top_soil, CEC, center_z, msg);
   }    
                            
   HydraulicB_C_inverse (const BlockModel& al)

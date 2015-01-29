@@ -208,7 +208,7 @@ Hydraulic::load_K_sat (Frame& frame)
 void
 Hydraulic::initialize (const Texture&, 
                        double /* rho_b */, bool /* top_soil */, 
-                       double /* CEC */, Treelog&)
+                       double /* CEC */, double /* center_z */, Treelog&)
 {
   if (K_init)
     {
@@ -294,7 +294,8 @@ struct ProgramHydraulic_table : public Program
   void initialize (Block& al)
   { 
     Treelog& msg = al.msg ();
-    horizon->initialize (top_soil, 2, msg);
+    const double center_z = top_soil ? -10.0 : -50.0;
+    horizon->initialize (top_soil, 2, center_z, msg);
   };
   bool check (Treelog&)
   { return true; }

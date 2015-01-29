@@ -122,7 +122,7 @@ public:
   static void load_syntax (Frame&);
 public:
   explicit Soil (const Block&);
-  void initialize (const Block&, const Time&, Geometry&, Groundwater&, int som_size);
+  void initialize (const Time&, Geometry&, Groundwater&, int som_size, Treelog& msg);
   ~Soil ();
 };
 

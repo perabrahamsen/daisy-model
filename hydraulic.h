@@ -81,7 +81,7 @@ public:
   static void load_K_sat_optional (Frame&);
   static void load_K_sat (Frame&);
   virtual void initialize (const Texture&, double rho_b, bool top_soil,
-                           double CEC, Treelog&);
+                           double CEC, double center_z, Treelog&);
   virtual bool check (Treelog&) const;
   Hydraulic (const BlockModel&);
   ~Hydraulic ();

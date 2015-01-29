@@ -2,16 +2,54 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * WEPP
 
-*** kald hydraulic::tick_daily (rain) daily
+** Prøv forfra...
 
-** tilføj frys/tø
+*** consolidated dry bulk density: parameter
 
-Stadig kun 1 hydraulic model per horizont. Vi må have flere
-horizonter hvis vi skal tage hensyn til flere jordbehandlingsdybder.
+*** max loosen effect: parameter
 
-En horizont bliver "behandlet" hvis den overlapper med jordbehandling.
+*** max rain consolidation: parameter
 
-*** set_hypress_parametre (texture, dry_bd)
+*** max time consolidation: derived
+
+*** time consolidation function / parameters
+
+*** rain colsolidation function / parameters
+
+*** pedotranspher function for some parameters
+
+
+
+
+** CEC komponent?
+
+**** Gør det valgfrit om man bruger CECr_fixed
+
+Ellers regnes CECr ud efter wepp
+
+**** Så kan vi køre en "ren" wepp
+
+** Soil::tillage
+
+for each cell
+
+  volume[cell->horizon] += cell.volume
+  water[cell->horizon] += cell.Theta * cell.volume
+  if overlap (tillage.volume, cell.volume)
+    active.add (cell->horizon)
+
+for each horizon in active
+  Theta = Theta[horizon] / water[horizon]
+  horizon->hydraulic->tillage (surface_loose, Theta, alpha)
+
+* WEPP
+
+** jordvand ved behandling "alpha?"
+
+** maksimal nedbørskorrigering
+
+** frost/tø
+
 
 * Emacs
 

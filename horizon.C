@@ -70,13 +70,13 @@ struct Horizon::Implementation
   
   // Create and Detroy.
   void initialize (Hydraulic&, const Texture& texture, double quarts, 
-                   int som_size, bool top_soil, Treelog& msg);
+                   int som_size, bool top_soil, const double center_z, 
+                   Treelog& msg);
   static double_map get_attributes
   /**/ (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& frames);
   static symbol_map get_dimensions 
   /**/ (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& frames);
   Implementation (const BlockModel& al);
-  Implementation (const Frame& al);
   ~Implementation ();
 };
 
@@ -115,6 +115,7 @@ Horizon::Implementation::initialize (Hydraulic& hydraulic,
                                      const double quarts,
                                      int som_size,
                                      const bool top_soil,
+                                     const double center_z,
                                      Treelog& msg)
 {
   if (CEC < 0.0)
@@ -122,11 +123,11 @@ Horizon::Implementation::initialize (Hydraulic& hydraulic,
       CEC = default_CEC (texture);
       std::ostringstream tmp;
       tmp << "(CEC " << CEC 
-          << " [cmolc/mk]) ; Estimated from clay and humus.";
+          << " [cmolc/kg]) ; Estimated from clay and humus.";
       msg.debug (tmp.str ());
     }
 
-  hydraulic.initialize (texture, dry_bulk_density, top_soil, CEC, msg);
+  hydraulic.initialize (texture, dry_bulk_density, top_soil, CEC, center_z, msg);
   if (som_size > 0)
     {
       // Fill out SOM_fractions and SOM_C_per_N.
@@ -188,24 +189,6 @@ Horizon::Implementation::Implementation (const BlockModel& al)
     dimensions (get_dimensions (al.submodel_sequence ("attributes"))),
     nitrification (Librarian::build_item<Nitrification> (al, "Nitrification")),
     secondary (Librarian::build_item<Secondary> (al, "secondary_domain")),
-    r_pore_min (al.number ("r_pore_min")),
-    primary_sorption_fraction (NAN),
-    hor_heat (al.submodel ("HorHeat"))
-{ }
-
-Horizon::Implementation::Implementation (const Frame& al)
-  : dry_bulk_density (al.number ("dry_bulk_density", -42.42e42)),
-    SOM_C_per_N (al.number_sequence ("SOM_C_per_N")),
-    C_per_N (al.number ("C_per_N", -42.42e42)),
-    SOM_fractions (al.check ("SOM_fractions") 
-                   ? al.number_sequence ("SOM_fractions")
-                   : std::vector<double> ()),
-    turnover_factor (al.number ("turnover_factor")),
-    anisotropy (al.number ("anisotropy")),
-    attributes (get_attributes (al.submodel_sequence ("attributes"))),
-    dimensions (get_dimensions (al.submodel_sequence ("attributes"))),
-    nitrification (Nitrification::create_default ()),
-    secondary (Secondary::create_none ()),
     r_pore_min (al.number ("r_pore_min")),
     primary_sorption_fraction (NAN),
     hor_heat (al.submodel ("HorHeat")),
@@ -386,16 +369,16 @@ Horizon::Horizon (const BlockModel& al)
 { }
 
 void 
-Horizon::initialize_base (bool top_soil,
-                          int som_size, const Texture& texture, 
-                          Treelog& msg)
+Horizon::initialize_base (const bool top_soil,
+                          const int som_size, const double center_z, 
+                          const Texture& texture, Treelog& msg)
 { 
   TREELOG_MODEL (msg);
   const double clay_lim = texture_below ( 2.0 /* [um] USDA Clay */);
   fast_clay = texture.mineral () * clay_lim;
   fast_humus = texture.humus;
   impl->initialize (*hydraulic, texture, quartz () * texture.mineral (),
-                    som_size, top_soil, msg); 
+                    som_size, top_soil, center_z, msg); 
   impl->secondary->initialize (msg);
 
   std::ostringstream tmp;

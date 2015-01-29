@@ -187,8 +187,8 @@ public:
   static Movement* build_vertical (const BlockModel& al);
   ColumnStandard (const BlockModel& al);
   void initialize (const Block& al);
-  bool initialize (const Block&, const std::vector<const Scope*>& scopes,
-                   const Time&, const Weather*, const Scope& scope);
+  bool initialize (const Metalib&, const std::vector<const Scope*>& scopes,
+                   const Time&, const Weather*, const Scope& scope, Treelog&);
   void summarize (Treelog& msg) const;
   ~ColumnStandard ();
 };
@@ -997,25 +997,25 @@ ColumnStandard::initialize (const Block& al)
   std::auto_ptr<WSource> weather (Librarian:: build_stock<WSource>
                                   (al.metalib (), al.msg (),
                                    "const", "initialize"));
-  initialize (al, scopes,
-              time, weather.get (), Scope::null ());
+  initialize (al.metalib (), scopes,
+              time, weather.get (), Scope::null (), al.msg ());
 }
 
 bool
-ColumnStandard::initialize (const Block& block, 
+ColumnStandard::initialize (const Metalib& metalib, 
                             const std::vector<const Scope*>& scopes,
                             const Time& time, 
                             const Weather* global_weather,
-                            const Scope& parent_scope)
+                            const Scope& parent_scope,
+                            Treelog& msg)
 {
   bool ok = true;
-  Treelog& msg = block.msg ();
   TREELOG_MODEL (msg);
   extern_scope = scopesel->lookup (scopes, msg); 
   ScopeMulti scope (extern_scope ? *extern_scope : Scope::null (),
                     parent_scope);
-  soil->initialize (block, time, geometry, *groundwater,
-                    organic_matter->som_pools ());
+  soil->initialize (time, geometry, *groundwater,
+                    organic_matter->som_pools (), msg);
   const size_t cell_size = geometry.cell_size ();
   residuals_N_soil.insert (residuals_N_soil.begin (), cell_size, 0.0);
   daisy_assert (residuals_N_soil.size () == cell_size);
@@ -1072,12 +1072,12 @@ ColumnStandard::initialize (const Block& block,
 
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();
-  organic_matter->initialize (block.metalib (), 
+  organic_matter->initialize (metalib, 
                               units, frame ().model ("OrganicMatter"), 
                               geometry, *soil, *soilph, 
                               *soil_water, *soil_heat, 
                               T_avg, msg);
-  vegetation->initialize (block.metalib (), 
+  vegetation->initialize (metalib, 
                           units, time, geometry, *soil, *organic_matter, msg);
   litter->initialize (organic_matter->top_DM ());
 

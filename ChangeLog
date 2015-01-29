@@ -1,3 +1,11 @@
+2015-01-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* all: Make sure hydraulic models have center_z.
+
+	* soil.C, soil.h (initialize): Explicit msg parameter instead of block.
+	* column_std.C (initialize): Update caller.
+	* field.C (initialize): Update caller.
+
 2015-01-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* biopore_matrix.C (update_cell_water): Numeric bug for very small

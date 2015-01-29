@@ -777,7 +777,7 @@ Field::Implementation::initialize (const Block& block,
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    if (!(*i)->initialize (block, scopes, time, weather, scope))
+    if (!(*i)->initialize (block.metalib (), scopes, time, weather, scope, block.msg ()))
       ok = false;
   return ok;
 }

@@ -58,7 +58,7 @@ private:
   // Create and Destroy.
 public:
   void initialize (const Texture&, double rho_b, bool top_soil, double CEC, 
-                   Treelog&);
+                   double center_z, Treelog&);
   Hydraulic_Cosby (const BlockModel&);
   ~Hydraulic_Cosby ();
 };
@@ -123,7 +123,8 @@ Hydraulic_Cosby::Sr (double h) const
 
 void
 Hydraulic_Cosby::initialize (const Texture& texture, double rho_b,
-			     bool top_soil, double CEC, Treelog& msg)
+			     bool top_soil, double CEC, double center_z, 
+                             Treelog& msg)
 {
   TREELOG_MODEL (msg);
 
@@ -151,7 +152,7 @@ Hydraulic_Cosby::initialize (const Texture& texture, double rho_b,
   daisy_assert (Theta_sat > 0.0);
   daisy_assert (Theta_sat < 1.0);
 
-  Hydraulic::initialize (texture, rho_b, top_soil, CEC, msg);
+  Hydraulic::initialize (texture, rho_b, top_soil, CEC, center_z, msg);
 
   // Debug messages.
   std::ostringstream tmp;

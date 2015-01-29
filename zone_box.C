@@ -23,6 +23,7 @@
 #include "bound.h"
 #include "librarian.h"
 #include "block_model.h"
+#include "mathlib.h"
 
 class Bound;
 
@@ -40,6 +41,7 @@ struct ZoneBox : public Zone
                            const Bound& from, const Bound& to);
   bool contain_point (double z, double x, double y) const;
   bool overlap_interval (const double from, const double to) const;
+  double center_z () const;
 
   // Create and Destroy.
   ZoneBox (const BlockModel& al);
@@ -80,6 +82,14 @@ ZoneBox::overlap_interval (const double from, const double to) const
     return false;
 
   return true;
+}
+
+double 
+ZoneBox::center_z () const
+{
+  if (top->type () == Bound::finite && bottom->type () == Bound::finite)
+    return 0.5 * (top->value () + bottom->value ());
+  return NAN;
 }
 
 ZoneBox::ZoneBox (const BlockModel& al)
