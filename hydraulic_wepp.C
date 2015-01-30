@@ -148,7 +148,7 @@ HydraulicWEPP::calculate_rho_b ()
   const double delta_prf = delta_pmx * (R_c / (0.01 + R_c)); // [kg/m^3]
   // New dry bulk density. wepp:7.7.14
   const double p_new = p_t + delta_prf + delta_pwt; // [kg/m^3]
-  // TODO: use R_c og delta_pmx
+  // Convert to Daisy units.
   rho_b = p_new * 1000.0 / (100.0 * 100.0 * 100.0); // [g/cm^3]
 }
 

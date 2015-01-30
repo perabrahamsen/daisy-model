@@ -2,33 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * WEPP
 
-** Prøv forfra...
-
-*** consolidated dry bulk density: parameter
-
-*** max loosen effect: parameter
-
-*** max rain consolidation: parameter
-
-*** max time consolidation: derived
-
-*** time consolidation function / parameters
-
-*** rain colsolidation function / parameters
-
-*** pedotranspher function for some parameters
-
-
-
-
-** CEC komponent?
-
-**** Gør det valgfrit om man bruger CECr_fixed
-
-Ellers regnes CECr ud efter wepp
-
-**** Så kan vi køre en "ren" wepp
-
 ** Soil::tillage
 
 for each cell
@@ -49,7 +22,6 @@ for each horizon in active
 ** maksimal nedbørskorrigering
 
 ** frost/tø
-
 
 * Emacs
 

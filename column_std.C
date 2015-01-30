@@ -770,6 +770,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
 
   // Soil properties.
   soil->tick (dt, my_weather.rain ());
+  overflow (soil_water->overflow (geometry, *soil, *soil_heat, msg), msg);
 }
 
 bool
