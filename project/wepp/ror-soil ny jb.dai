@@ -1,0 +1,201 @@
+;;; ror-soil.dai -- soil for Agrovand experiments.
+
+(input file "biopores.dai")
+(input file "chemistry.dai")
+
+(defsecondary overflade_Ap pressure ;;imobile-mobil transport
+ (h_lim 4.0 [pF])
+ (alpha 0.00001 [h^-1]))
+ 
+ (defsecondary Ap pressure ;;3-30 cm fra røgforsøget 
+  (h_lim 2.8[pF])
+ (alpha 0.00001 [h^-1]))
+
+(defsecondary PlowPan pressure
+ (h_lim 3.0 [pF])
+ (alpha 0.00003 [h^-1]))
+
+(defsecondary Bt pressure
+ (h_lim 2.5 [pF])
+ (alpha 0.00001 [h^-1]))
+
+ (defsecondary agrovand pressure 
+  (h_lim 2.0 [pF])
+  (alpha 0.0001 [h^-1]))
+  
+(defhorizon "Rorrende Ap_1" USDA3
+  (description "3-25 cm")
+  (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.022)
+  (hydraulic original (topsoil true))
+  (dry_bulk_density 1.59 [g/cm^3])
+  (secondary_domain Ap))
+  
+(defhorizon "Overflade Ap_1" "Rorrende Ap_1"
+  (description "0-3 cm")
+  (humus 0.034)
+  (dry_bulk_density 1.25 [g/cm^3])
+  (hydraulic Styczen 
+             (consolidate_factor 0.81 [])
+             (consolidate_factor_water 0.0 [])))
+             
+  
+(defhorizon "Rorrende Bplow layer_1" USDA3
+  (description "25-33 cm Petersen et al (2004)")
+  (clay 0.148)(silt 0.214)(sand 0.638) (humus 0.016)
+  (dry_bulk_density 1.74 [g/cm^3])
+  (anisotropy 12)
+  (secondary_domain PlowPan))
+
+(defhorizon "Rorrende Ap_2" USDA3
+  (description "3-25 cm")
+  (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.021)
+  (dry_bulk_density 1.55 [g/cm^3])
+  (hydraulic original (topsoil true)))
+
+(defhorizon "Overflade Ap_2" "Rorrende Ap_2"
+  (description "0-3 cm")
+  (humus 0.021) (dry_bulk_density 1.37 [g/cm^3])
+  (hydraulic Styczen 
+             (consolidate_factor 0.845 [])
+             (consolidate_factor_water 0.0 []))
+  (secondary_domain overflade_Ap))
+
+(defhorizon "Rorrende Bplow layer_2" USDA3
+  (description "25-33 cm Petersen et al (2004)")
+  (clay 0.148)(silt 0.214)(sand 0.638) (humus 0.016)
+  (dry_bulk_density 1.76 [g/cm^3])
+  (anisotropy 12)
+  (secondary_domain PlowPan))
+
+(defhorizon "Rorrende Ap_3" USDA3
+  (description "3-25 cm")
+  (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.025)
+  (dry_bulk_density 1.42 [g/cm^3])
+  (hydraulic original (topsoil true))
+  (secondary_domain Ap))
+  
+(defhorizon "Overflade Ap_3" "Rorrende Ap_3"
+  (description "0-3 cm")
+  (dry_bulk_density 1.32 [g/cm^3])
+  (hydraulic Styczen 
+             (consolidate_factor 0.845 [])
+             (consolidate_factor_water -0.093 []))
+  (secondary_domain overflade_Ap))
+  
+(defhorizon "Rorrende Bplow layer_3" USDA3
+  (description "25-33 cm Petersen et al (2004)")
+  (clay 0.148)(silt 0.214)(sand 0.638) (humus 0.016)
+  (dry_bulk_density 1.75 [g/cm^3])
+  (anisotropy 12)
+    (secondary_domain PlowPan))
+  
+(defhorizon "Rorrende Ap_4" USDA3
+  (description "3-25 cm")
+  (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.024)
+  (dry_bulk_density 1.49 [g/cm^3])
+  (hydraulic original (topsoil true))
+  (secondary_domain Ap))
+  
+(defhorizon "Overflade Ap_4" "Rorrende Ap_4"
+  (description "0-3 cm")
+  (dry_bulk_density 1.33 [g/cm^3])
+  (hydraulic Styczen 
+             (consolidate_factor 0.88 [])
+             (consolidate_factor_water -0.069 [])))
+          
+(defhorizon "Rorrende Bplow layer_4" USDA3
+  (description "25-33 cm Petersen et al (2004)")
+  (clay 0.148)(silt 0.214)(sand 0.638) (humus 0.016)
+  (dry_bulk_density 1.78 [g/cm^3])
+  (anisotropy 12)
+  (secondary_domain PlowPan))
+
+(defhorizon "Rorrende Bt" USDA3
+  (description "33-120 cm")
+  (clay 0.222)(silt 0.195)(sand 0.583)(humus 0.016)
+  (dry_bulk_density 1.65 [g/cm^3])
+   (secondary_domain Bt))
+
+(defhorizon "Rorrende C" USDA3
+  (description "120-200 cm")
+  (clay 0.207)(silt 0.235)(sand 0.558) (humus 0.01)
+  (dry_bulk_density 1.69 [g/cm^3])
+  (secondary_domain agrovand))
+
+(defcolumn Rorrende_led3 default;; led 3
+  "This is a Rorrende soil with pipe drains."
+  (OrganicMatter none)
+  (Chemistry none)
+    (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_3")
+            (-25.00 "Rorrende Ap_3")
+            (-33.00 "Rorrende Bplow layer_3")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C")))
+  (Groundwater aquitard
+        (K_aquitard 0.050 [cm/h])
+        (Z_aquitard 200 [cm]))
+
+  (SoilHeat (enable_ice true))
+  (Movement original
+  (Tertiary 
+  (biopores (classes ("matrix_0cm") 
+                     ("matrix_halfway")
+                     ("matrix_2cm")
+                     ("drain_2cm_S")
+                     ("drain_2cm_W")
+                     ("matrix_30cm")
+                     ("drain_30cm"))))))
+                     
+  (defcolumn Rorrende_fd3 Rorrende_led3
+	"Rorrende soil with free drainiage."
+	(Groundwater deep))         
+
+
+(defcolumn Rorrende_led1 Rorrende_led3
+  (Soil 
+  (horizons (-3.00 "Overflade Ap_1")
+            (-25.00 "Rorrende Ap_1")
+            (-33.00 "Rorrende Bplow layer_1")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C")))
+  (Movement original
+  (Tertiary 
+  (biopores (classes ("matrix_0cm") 
+                     ("matrix_2cm_R")
+                     ("drain_2cm_S_R")
+                     ("drain_2cm_W_R")
+                     ("matrix_30cm")
+                     ("drain_30cm"))))))          
+ 
+ (defcolumn Rorrende_fd1 Rorrende_led1
+  	"Rorrende soil with free drainiage."
+	(Groundwater deep))
+	
+(defcolumn Rorrende_led2 Rorrende_led1
+  (Soil 
+  (horizons (-3.00 "Overflade Ap_2")
+            (-25.00 "Rorrende Ap_2")
+            (-33.00 "Rorrende Bplow layer_2")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C"))))
+ 
+ (defcolumn Rorrende_fd2 Rorrende_led2
+ 	"Rorrende soil with free drainiage."
+ 	(Groundwater deep))
+
+ 
+(defcolumn Rorrende_led4 Rorrende_led3
+  (Soil 
+  (horizons (-3.00 "Overflade Ap_4")
+            (-25.00 "Rorrende Ap_4")
+            (-33.00 "Rorrende Bplow layer_4")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C"))))
+
+
+(defcolumn Rorrende_fd4 Rorrende_led4
+	"Rorrende soil with free drainiage."
+	(Groundwater deep))
+	
+;; ror-soil.dai ends here.

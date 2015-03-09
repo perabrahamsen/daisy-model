@@ -1,0 +1,93 @@
+;;; log_wepp.dai -- log variables associated with the WEPP model.
+
+(deflog horizon column
+  "A log table for a specific horizon."
+  (declare horizon String
+	   "Name of horizon to log.  Use \"*\" to log all horizons.")
+  (horizon "*")
+  ;; Add it to the log files.
+  (parameter_names &old horizon)
+  ;; Use horizon name as part of file name.
+  (declare horfid string
+           "File component name indicating horizon logged.")
+  (horfid (cond ((string-equal "${horizon}" "*")
+                 "")
+                (true
+                 "${horizon}_"))))
+
+(deflog "WEPP" horizon
+  (where "${colfid}${horfid}wepp.dlf")
+  (when daily)
+  (entries (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp p_t)
+                   (handle current)
+                   (spec hydraulic wepp p_t)
+                   (dimension "g/cm^3"))
+           (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp delta_pmx)
+                   (handle current)
+                   (spec hydraulic wepp delta_pmx)
+                   (dimension "g/cm^3"))
+           (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp delta_pc)
+                   (handle current)
+                   (spec hydraulic wepp delta_pc)
+                   (dimension "g/cm^3"))
+           (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp day_count)
+                   (handle current)
+                   (spec hydraulic wepp day_count))
+           (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp R_c)
+                   (handle current)
+                   (spec hydraulic wepp R_c)
+                   (dimension "mm"))
+           (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp rho_b)
+                   (handle current)
+                   (spec hydraulic wepp rho_b))
+           (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp alpha)
+                   (handle current)
+                   (spec hydraulic wepp alpha))
+           (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp n)
+                   (handle current)
+                   (spec hydraulic wepp n))
+           (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp l)
+                   (handle current)
+                   (spec hydraulic wepp l))
+           (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp K_sat)
+                   (handle current)
+                   (spec hydraulic wepp K_sat))
+           (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp K_fc)
+                   (handle current)
+                   (spec hydraulic wepp K_fc))
+           (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp K_wp)
+                   (handle current)
+                   (spec hydraulic wepp K_wp))
+           (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp Theta_sat)
+                   (handle current)
+                   (spec hydraulic wepp Theta_sat))
+           (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp Theta_fc)
+                   (handle current)
+                   (spec hydraulic wepp Theta_fc))
+           (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp Theta_wp)
+                   (handle current)
+                   (spec hydraulic wepp Theta_wp))))
+
+(deflog "Soil Ice Content" column
+  (where "${colfid}soil_ice_content.dlf")
+  (when hourly)
+  (entries (array (path column "${column}" SoilWater X_ice)
+                  (handle current)
+                  (spec fixed SoilWater X_ice))))
+
+;;; log-wepp.dai ends here.

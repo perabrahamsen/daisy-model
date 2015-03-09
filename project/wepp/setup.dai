@@ -1,0 +1,194 @@
+;;; setup.dai --- Test dry bulk density change over time.
+
+;; Use standard parameterizations.
+(input file "crop.dai")
+(input file "log.dai")
+
+;; Proect specific files.
+(input file "ror-soil ny jb.dai")
+(input file "log_wepp.dai")
+
+;; Shared management.
+(defaction plowing_ror swap 
+  (middle -12.5)
+  (depth -25.0))
+
+(defaction stubble_cultivation_ror mix -6.0
+  (surface_loose 1.0 [])
+  (penetration 0.6))
+
+(defaction seed_bed_preparation_ror mix -6.0 
+  (penetration 0.6)
+  (surface_loose 1.0 []))
+
+(defaction rotavation mix -5.0
+  (surface_loose 1.0 []))
+ 
+(defaction sow_tillage mix -1.0
+  (penetration 0.0 [])
+  (surface_loose 0.4 []))
+
+;; Common for all plots.
+(defprogram WEPP Daisy
+  (weather default "taastrup-2012-2014.dwf")
+  (time 2012 09 1)
+  (stop 2014 08 27)
+  (output harvest
+          ("Soil Ice Content" (when daily))
+          ("Soil Water Content" (when daily))
+          ("Soil Water Potential (pF)" (when daily))
+          ("Soil Temperature" (when daily))
+          ("Crop Production" (when daily))
+          ("Field water")
+          ("Field chemical" (chemical colloid))
+          ("Vegetation" (when daily))
+          (checkpoint (when (at 2013 11 12 6)))))
+
+;; Plot 1.
+(defaction led1 activity
+  (wait (at 2012 10 2)) (stubble_cultivation_ror)
+                        (sow "Winter Wheat")
+  (wait (at 2013 08 20)) (harvest "Winter Wheat" 
+                                  (stub 8.0 [cm])
+                                  (stem 1.00 []))
+  (wait (at 2013 10 3)) (stubble_cultivation_ror)
+                        (sow "Winter Wheat")
+  (wait   (at 2014 08 26))
+  (harvest "Winter Wheat"
+           (stub 8.0 [cm])
+           (stem 1.00 [])))
+
+(defprogram led1 WEPP
+  (column Rorrende_led1)
+  (manager led1)
+  (log_prefix "log/L1-")
+  (output &old
+          (WEPP (horizon "Overflade Ap_1") (where "wepp.dlf"))))
+
+;;; Plot 2.
+
+(defaction led2 activity
+  (wait (at 2012 10 2)) (sow_tillage) (sow "Winter Wheat")
+  (wait (at 2013 08 20)) (harvest "Winter Wheat"
+                                  (stub 8.0 [cm])
+                                  (stem 1.00 []))
+  (wait (at 2013 10 3)) (sow_tillage) (sow "Winter Wheat")
+  (wait (at 2014 08 26))
+  (harvest "Winter Wheat"
+           (stub 8.0 [cm])
+           (stem 1.00 [])))
+
+(defprogram led2 WEPP
+  (column Rorrende_led2)
+  (manager led2)
+  (log_prefix "log/L2-")
+  (timestep (minutes 10))
+  (output &old
+          (WEPP (horizon "Overflade Ap_2") (where "wepp.dlf"))))
+
+;;; Plot 3.
+
+ (defaction led3 activity
+   (wait (at 2012 10 1)) (plowing_ror)
+   (wait (at 2012 10 2)) (rotavation) (sow "Winter Wheat")
+   (wait (at 2013 08 20)) (harvest "Winter Wheat"
+                                   (stub 8.0 [cm])
+                                   (stem 1.00 []))
+   (wait (at 2013 10 1)) (plowing_ror)
+   (wait (at 2013 10 3)) (rotavation) (sow "Winter Wheat")
+   (wait (at 2014 08 26)) (harvest "Winter Wheat"
+                                   (stub 8.0 [cm])
+                                   (stem 1.00 [])))
+
+(defprogram led3 WEPP
+  (column Rorrende_led3)
+  (manager led3)
+  (log_prefix "log/L3-")
+  (output &old
+          (WEPP (horizon "Overflade Ap_3") (where "wepp.dlf"))))
+
+;;; Plot 4.
+
+(defaction led4 activity
+  (wait (at 2012 10 1)) (plowing_ror)
+  (wait (at 2012 10 2)) (seed_bed_preparation_ror) (sow "Winter Wheat")
+  (wait (at 2013 08 20)) (harvest "Winter Wheat"
+                                  (stub 8.0 [cm])
+                                  (stem 1.00 []))
+  (wait (at 2013 10 1)) (plowing_ror)
+  (wait (at 2013 10 3)) (seed_bed_preparation_ror) (sow "Winter Wheat")
+  (wait   (at 2014 08 26))
+  (harvest "Winter Wheat"
+           (stub 8.0 [cm])
+           (stem 1.00 [])))
+  	
+(defprogram led4 WEPP
+  (column Rorrende_led4)
+  (manager led4)
+  (log_prefix "log/L4-")
+  (timestep (minutes 10))
+  (output &old
+          (WEPP (horizon "Overflade Ap_4") (where "wepp.dlf"))))
+
+;; Run them
+
+(defprogram sims batch
+  (run ;;led1 
+       ;;led2
+       ;;led3 
+   led4
+       ))
+
+;; Plot
+
+(defunit [g/L] [kg/m^3]
+  (factor 1.0 []))
+
+(defgnuplot plottime time
+  (declare L String "Plot to plot")
+  (L "1")
+  (extra &old 
+         "set xtics 24 * 60 * 60 * 30 * 3 rotate"        
+         "set format x \"%y-%m-%d\""))
+
+(defgnuplot rho_b plottime
+  (where "fig/rho_b_L${L}.pdf")
+  (title "Plot ${L} dry bulk density")
+  (ymax 1.5 [g/cm^3])
+  (ymin 1.0 [g/cm^3])
+  (source (column (file "log/L${L}-wepp.dlf")
+                  (tag "rho_b")
+                  (dimension "g/cm^3")
+                  (style 1)
+                  (title "WEPP"))
+          (column (file "rho_b.ddf")
+                  (tag "led${L}")
+                  (dimension "g/cm^3")
+                  (style 3)
+                  (title "Obs"))
+          ))
+
+(defgnuplot plots multi
+  (graph (rho_b (L "1"))
+         (rho_b (L "2"))
+         (rho_b (L "3"))
+         (rho_b (L "4"))
+         ))
+
+(defprogram plot gnuplot
+  (graph plots))
+
+;;; Program
+
+
+(defprogram both batch
+  (run sims plot))
+
+;;(run sims)
+
+;(run plot)
+
+(run both)
+
+
+;;; setup.dai ends here.

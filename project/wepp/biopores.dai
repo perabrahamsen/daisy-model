@@ -1,0 +1,101 @@
+;;; biopores.dai -- 2D specific information for VAP setups
+
+(defbiopore common matrix
+  (K_wall_relative 1 [%])
+  (allow_upward_flow false))
+
+(defbiopore "matrix_0cm"
+   (common (height_start 0 [cm])
+           (height_end -25 [cm])
+           (density 100 [m^-2])
+           (diameter 2 [mm])))
+           
+(defbiopore "matrix_2cm";;led  3 og 4
+   (common (height_start 0 [cm])
+           (height_end -120 [cm])
+           (diameter 4 [mm])
+           (density 23 [m^-2])))       
+           
+                   
+(defbiopore "drain_2cm_W" ;;led  3 og 4
+   (drain  (height_start 0 [cm])
+           (height_end -100 [cm])
+           (diameter 3 [mm])
+           (pipe_position -110 [cm])
+           (density 2 [m^-2])
+           ;;(density (plf x (range [m^-2])
+           ;;                (domain [cm])
+           ;;                (points (40 2)
+           ;;                        (60 0))))
+           ))
+(defbiopore "drain_2cm_S" ;; led 3 og 4
+   (drain  (height_start 0 [cm])
+           (height_end -100 [cm])
+           (diameter 6 [mm])
+           (pipe_position -110 [cm])
+           (density 0.5 [m^-2])
+           ;;(density (plf x (range [m^-2])
+           ;;                (domain [cm])
+           ;;                (points (40 0.5)
+           ;;                        (60 0))))
+           ))   
+
+(defbiopore "matrix_2cm_R";; led 1 og 2
+   (common (height_start 0 [cm])
+           (height_end -120 [cm])
+           (diameter 4 [mm])
+           (density 45 [m^-2])))       
+           
+                   
+(defbiopore "drain_2cm_W_R"
+   (drain  (height_start 0 [cm])
+           (height_end -100 [cm])
+           (diameter 3 [mm])
+           (pipe_position -110 [cm])
+           (density 6 [m^-2])
+           ;;(density (plf x (range [m^-2])
+           ;;                (domain [cm])
+           ;;                (points (40 6)
+           ;;                        (60 0))))
+           ))
+(defbiopore "drain_2cm_S_R"
+   (drain  (height_start 0 [cm])
+           (height_end -100 [cm])
+           (diameter 6 [mm])
+           (pipe_position -110 [cm])
+           (density 1 [m^-2])
+           ;;(density (plf x (range [m^-2])
+           ;;                (domain [cm])
+           ;;                (points (40 1)
+           ;;                        (60 0))))
+           ))  
+(defbiopore "matrix_30cm"
+   (common (height_start -30 [cm])
+           (height_end -120 [cm])
+           (diameter 4 [mm])
+           (density 7 [m^-2])
+           ;;(density (plf x (range [m^-2])
+           ;;                (domain [cm])
+           ;;                (points (20 3.5)
+           ;;                        (30 7))))
+           ))      
+           
+(defbiopore "drain_30cm"
+   (drain  (height_start -30 [cm])
+           (height_end -100 [cm])
+           (diameter 4 [mm])
+           (pipe_position -110 [cm])
+           (density 3.5 [m^-2])
+           ;;(density (plf x (range [m^-2])
+           ;;                (domain [cm])
+           ;;                (points (20 3.5)
+           ;;                        (30 0))))
+           ))
+
+(defbiopore "matrix_halfway"
+   (common (height_start 0 [cm])
+           (height_end -60 [cm])
+           (diameter 4 [mm])
+           (density 23 [m^-2])))
+
+;;; biopores.dai
