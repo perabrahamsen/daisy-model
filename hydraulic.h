@@ -55,8 +55,9 @@ public:
   inline double porosity () const
   { return Theta_sat; }
   virtual void set_porosity (double Theta);
-  virtual void tillage (double surface_loose);
-  virtual void tick (const double dt /* [h] */, const double rain /* [m] */);
+  virtual void tillage (double surface_loose, double Theta);
+  virtual void tick (const double dt /* [h] */, const double rain /* [m] */,
+                     const double ice /* */, Treelog& msg);
 
   // Convertion functions.
 public:

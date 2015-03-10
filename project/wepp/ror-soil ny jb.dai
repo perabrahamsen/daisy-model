@@ -35,6 +35,7 @@
   (humus 0.034)
   (dry_bulk_density 1.25 [g/cm^3])
   (hydraulic Styczen 
+             (time_consolidation 0.0223 [d^-1])
              (consolidate_factor 0.81 [])
              (consolidate_factor_water 0.0 [])))
              
@@ -54,9 +55,13 @@
 
 (defhorizon "Overflade Ap_2" "Rorrende Ap_2"
   (description "0-3 cm")
-  (humus 0.021) (dry_bulk_density 1.37 [g/cm^3])
+  (humus 0.034)
+  (dry_bulk_density 1.37 [g/cm^3])
   (hydraulic Styczen 
-             (consolidate_factor 0.845 [])
+             (time_consolidation 2.5e-3 [d^-1])
+             ;; (p_t 1.49 [g/cm^3])
+             ;; (consolidate_factor 0.845 [])
+             (consolidate_factor 1.0 [])
              (consolidate_factor_water 0.0 []))
   (secondary_domain overflade_Ap))
 
@@ -78,6 +83,7 @@
   (description "0-3 cm")
   (dry_bulk_density 1.32 [g/cm^3])
   (hydraulic Styczen 
+             (time_consolidation 0.014 [d^-1])
              (consolidate_factor 0.845 [])
              (consolidate_factor_water -0.093 []))
   (secondary_domain overflade_Ap))
@@ -100,6 +106,7 @@
   (description "0-3 cm")
   (dry_bulk_density 1.33 [g/cm^3])
   (hydraulic Styczen 
+             (time_consolidation 0.0073 [d^-1])
              (consolidate_factor 0.88 [])
              (consolidate_factor_water -0.069 [])))
           

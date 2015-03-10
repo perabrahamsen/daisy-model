@@ -28,6 +28,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "frame.h"
+#include "check.h"
 
 class HydraulicB_BaC : public Hydraulic
 {
@@ -126,7 +127,7 @@ static struct HydraulicB_BaCSyntax : public DeclareModel
     Hydraulic::load_K_sat (frame);
     frame.declare ("lambda", Attribute::None (), Attribute::Const,
                 "Pore size index.");
-    frame.declare ("h_b", "cm", Attribute::Const,
+    frame.declare ("h_b", "cm", Check::negative (), Attribute::Const,
                 "Bubbling pressure.");
 
   }

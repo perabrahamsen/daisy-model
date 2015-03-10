@@ -26,7 +26,8 @@
  
 (defaction sow_tillage mix -1.0
   (penetration 0.0 [])
-  (surface_loose 0.4 []))
+  (surface_loose 0.4 [])
+  )
 
 ;; Common for all plots.
 (defprogram WEPP Daisy
@@ -134,9 +135,9 @@
 
 (defprogram sims batch
   (run ;;led1 
-       ;;led2
+       led2
        ;;led3 
-   led4
+       ;;led4
        ))
 
 ;; Plot

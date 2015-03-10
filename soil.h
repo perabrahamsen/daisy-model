@@ -23,6 +23,7 @@
 #ifndef SOIL_H
 #define SOIL_H
 
+#include "soil_water.h"
 #include "symbol.h"
 #include <vector>
 #include <set>
@@ -44,14 +45,10 @@ class Soil : private boost::noncopyable
 public:
   struct Implementation;
   std::auto_ptr<Implementation> impl;
-private:
-  // Cache for fast inline access.
-  /* const */ std::vector<Horizon*> horizon_;
 
 public:
   size_t size () const;
-  const Horizon& horizon (size_t i) const
-  { return *horizon_[i]; }
+  const Horizon& horizon (size_t i) const;
 
   // Water.
   double K (size_t i, double h, double h_ice, double T) const;
@@ -67,8 +64,9 @@ public:
   double dispersivity (size_t) const;
   double dispersivity_transversal (size_t) const;  
   void tillage (const Geometry& geo, const double from, const double to,
-                const double surface_loose);
-  void tick (const double dt /* [h] */, const double rain /* [mm] */);
+                const double surface_loose, const SoilWater& soil_water);
+  void tick (const double dt /* [h] */, const double rain /* [mm] */,
+             const Geometry& geo, const SoilWater& soil_water, Treelog&);
   void set_porosity (size_t i, double Theta);
   // Activation pressure for secondary domain. [cm] 
   double h_secondary (size_t i) const;

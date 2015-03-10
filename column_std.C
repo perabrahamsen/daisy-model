@@ -397,7 +397,7 @@ ColumnStandard::mix (const Metalib& metalib, const double from, const double to,
                         residuals_DM, residuals_N_top, residuals_C_top, 
                         residuals_N_soil, residuals_C_soil, msg);
   add_residuals (residuals);
-  soil->tillage (geometry, from, to, surface_loose);
+  soil->tillage (geometry, from, to, surface_loose, *soil_water);
   const double energy 
     = soil_heat->energy (geometry, *soil, *soil_water, from, to);
   const double extra 
@@ -769,7 +769,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
     organic_matter->monthly (metalib, geometry, msg);
 
   // Soil properties.
-  soil->tick (dt, my_weather.rain ());
+  soil->tick (dt, my_weather.rain (), geometry, *soil_water, msg);
   overflow (soil_water->overflow (geometry, *soil, *soil_heat, msg), msg);
 }
 

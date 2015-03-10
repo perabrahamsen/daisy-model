@@ -2,26 +2,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * WEPP
 
-** Soil::tillage
-
-for each cell
-
-  volume[cell->horizon] += cell.volume
-  water[cell->horizon] += cell.Theta * cell.volume
-  if overlap (tillage.volume, cell.volume)
-    active.add (cell->horizon)
-
-for each horizon in active
-  Theta = Theta[horizon] / water[horizon]
-  horizon->hydraulic->tillage (surface_loose, Theta, alpha)
-
-* WEPP
-
-** jordvand ved behandling "alpha?"
-
-** maksimal nedbørskorrigering
-
-** frost/tø
+** K
 
 * Emacs
 

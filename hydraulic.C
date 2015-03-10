@@ -82,11 +82,11 @@ Hydraulic::set_porosity (double Theta)
 }
 
 void
-Hydraulic::tillage (double)
+Hydraulic::tillage (double, double)
 { }
 
 void 
-Hydraulic::tick (const double, const double)
+Hydraulic::tick (const double, const double, const double, Treelog&)
 { }
 
 void 

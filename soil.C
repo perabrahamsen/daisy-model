@@ -105,6 +105,12 @@ struct Soil::Implementation
   };
   const auto_vector<const Region*> zones;
 
+  // Access.
+  std::vector<Horizon*> horizon_;
+
+  // Volume
+  std::map<const Horizon*, double> volume;
+
   // Parameters
   /* const */ double MaxRootingDepth;
   const double dispersivity;
@@ -150,41 +156,44 @@ struct Soil::Implementation
   }
   
   void tillage (const Geometry& geo, const double from, const double to,
-                const double surface_loose)
+                const double surface_loose, const SoilWater& soil_water)
   {
-    // Horizons.
-    double top = 0.0;
-    for (size_t i = 0; i < layers.size (); i++)
+    // Water content.
+    std::map<const Horizon*, double> water;
+    for (std::size_t c = 0; c < geo.cell_size (); c++)
+      if (geo.fraction_in_z_interval (c, from, to) > 0.01)
+        water[horizon_[c]] += soil_water.Theta (c) * geo.cell_volume (c);
+
+    for (std::map<const Horizon*, double>::const_iterator i = water.begin ();
+         i != water.end ();
+         i++)
       {
-        const double bottom = layers[i]->end;
-
-        if (top <= to)
-          // Horizon start below zone.
-          break;
-        
-        if (bottom < from)
-          // overlap
-          layers[i]->horizon->hydraulic->tillage (surface_loose);
-
-        top = bottom;
-      }
-
-    // Zones.
-    for (size_t i = 0; i < zones.size (); i++)
-      {
-        if (zones[i]->volume->overlap_interval (from, to))
-          zones[i]->horizon->hydraulic->tillage (surface_loose);
+        const Horizon *const hor = (*i).first;
+        const double total_water = (*i).second;
+        const double total_volume = volume[hor];
+        daisy_assert (total_water < total_volume);
+        const double Theta = total_water / total_volume;
+        hor->hydraulic->tillage (surface_loose, Theta);
       }
   }
-  void tick (const double dt, const double rain)
+  void tick (const double dt, const double rain, const Geometry& geo,
+             const SoilWater& soil_water, Treelog& msg)
   {
-    // Horizons.
-    for (size_t i = 0; i < layers.size (); i++)
-      layers[i]->horizon->hydraulic->tick (dt, rain);
-
-    // Zones.
-    for (size_t i = 0; i < zones.size (); i++)
-      zones[i]->horizon->hydraulic->tick (dt, rain);
+    // Ice content.
+    std::map<const Horizon*, double> ice;
+    for (std::size_t c = 0; c < geo.cell_size (); c++)
+      ice[horizon_[c]] += soil_water.X_ice_total (c) * geo.cell_volume (c);
+    
+    for (std::map<const Horizon*, double>::const_iterator i = ice.begin ();
+         i != ice.end ();
+         i++)
+      {
+        const Horizon *const hor = (*i).first;
+        const double total_ice = (*i).second;
+        const double total_volume = volume[hor];
+        const double Ice = total_ice / total_volume;
+        hor->hydraulic->tick (dt, rain, Ice, msg);
+      }
   }
 
   // Create and Destroy.
@@ -218,7 +227,11 @@ be of the soil found in the cell center.");
 
 size_t 
 Soil::size () const
-{ return horizon_.size (); }
+{ return impl->horizon_.size (); }
+
+const Horizon& 
+Soil::horizon (size_t i) const
+{ return *impl->horizon_[i]; }
 
 double 
 Soil::K (size_t i, double h, double h_ice, double T) const
@@ -244,7 +257,7 @@ Soil::K (size_t i, double h, double h_ice, double T) const
     ? impl->frozen_water_K_factor
     : viscosity_factor (T);
   const double h_water = std::min (h, h_ice);
-  return horizon_[i]->K (h_water) * T_factor;
+  return horizon (i).K (h_water) * T_factor;
 }
 
 double 
@@ -254,7 +267,7 @@ Soil::Cw1 (size_t i, double h, double h_ice) const
 double
 Soil::Cw2 (size_t i, double h) const
 { 
-  const double answer = horizon_[i]->hydraulic->Cw2 (h); 
+  const double answer = horizon (i).hydraulic->Cw2 (h); 
   if (answer > 0.0)
     return answer;
   // We divide with this.
@@ -264,30 +277,30 @@ Soil::Cw2 (size_t i, double h) const
 double Soil::Theta (size_t i, double h, double h_ice) const
 { 
   if (h < h_ice)
-    return horizon_[i]->hydraulic->Theta (h);
+    return horizon (i).hydraulic->Theta (h);
   else
-    return horizon_[i]->hydraulic->Theta (h_ice);
+    return horizon (i).hydraulic->Theta (h_ice);
 }
 
 double 
 Soil::Theta_res (size_t i) const
-{ return horizon_[i]->hydraulic->Theta_res; }
+{ return horizon (i).hydraulic->Theta_res; }
 
 double 
 Soil::Theta_sat (size_t i) const
-{ return horizon_[i]->hydraulic->Theta_sat; }
+{ return horizon (i).hydraulic->Theta_sat; }
 
 double 
 Soil::h (size_t i, double Theta) const
-{ return horizon_[i]->hydraulic->h (Theta); }
+{ return horizon (i).hydraulic->h (Theta); }
 
 double 
 Soil::M (size_t i, double h) const
-{ return horizon_[i]->hydraulic->M (h); }
+{ return horizon (i).hydraulic->M (h); }
 
 double
 Soil::primary_sorption_fraction (size_t c) const
-{ return horizon_[c]->primary_sorption_fraction (); }
+{ return horizon (c).primary_sorption_fraction (); }
 
 double 
 Soil::dispersivity (size_t) const
@@ -299,32 +312,33 @@ Soil::dispersivity_transversal (size_t c) const
 
 void 
 Soil::tillage (const Geometry& geo, const double from, const double to,
-               const double surface_loose)
-{ impl->tillage (geo, from, to, surface_loose); }
+               const double surface_loose, const SoilWater& soil_water)
+{ impl->tillage (geo, from, to, surface_loose, soil_water); }
 
 void
-Soil::tick (const double dt, const double rain)
-{ impl->tick (dt, rain); }
+Soil::tick (const double dt, const double rain, const Geometry& geo,
+            const SoilWater& soil_water, Treelog& msg)
+{ impl->tick (dt, rain, geo, soil_water, msg); }
 
 void
 Soil::set_porosity (size_t i, double Theta)
-{ horizon_[i]->hydraulic->set_porosity (Theta); }
+{ horizon (i).hydraulic->set_porosity (Theta); }
 
 double              // Activation pressure for secondary domain. [cm] 
 Soil::h_secondary (size_t i) const
-{ return horizon_[i]->secondary_domain ().h_lim (); }
+{ return horizon (i).secondary_domain ().h_lim (); }
 
 double  // Exchange rate between primary and secondary water.  [h^-1] 
 Soil::alpha (size_t i) const
-{ return horizon_[i]->secondary_domain ().alpha (); }
+{ return horizon (i).secondary_domain ().alpha (); }
 
 double 
 Soil::tortuosity_factor (size_t i, double Theta) const
-{ return horizon_[i]->tortuosity->factor (*horizon_[i]->hydraulic, Theta); }
+{ return horizon (i).tortuosity->factor (*horizon (i).hydraulic, Theta); }
 
 double 
 Soil::anisotropy_cell (size_t c) const
-{ return horizon_[c]->anisotropy (); }
+{ return horizon (c).anisotropy (); }
 
 double 
 Soil::anisotropy_edge (size_t e) const
@@ -335,47 +349,47 @@ Soil::anisotropy_edge (size_t e) const
 
 double 
 Soil::dry_bulk_density (size_t i) const
-{ return horizon_[i]->dry_bulk_density (); }
+{ return horizon (i).dry_bulk_density (); }
 
 double 
 Soil::clay (size_t i) const
-{ return horizon_[i]->clay (); }
+{ return horizon (i).clay (); }
 
 double 
 Soil::texture_below (size_t i, double size) const
-{ return horizon_[i]->texture_below (size); }
+{ return horizon (i).texture_below (size); }
 
 double 
 Soil::humus (size_t i) const
-{ return horizon_[i]->humus (); }
+{ return horizon (i).humus (); }
 
 double 
 Soil::humus_C (size_t i) const
-{ return horizon_[i]->humus_C (); }
+{ return horizon (i).humus_C (); }
 
 const std::vector<double>& 
 Soil::SOM_fractions (size_t i) const
-{ return horizon_[i]->SOM_fractions (); }
+{ return horizon (i).SOM_fractions (); }
 
 const std::vector<double>& 
 Soil::SOM_C_per_N (size_t i) const
-{ return horizon_[i]->SOM_C_per_N (); }
+{ return horizon (i).SOM_C_per_N (); }
 
 double
 Soil::C_per_N (size_t i) const
-{ return horizon_[i]->C_per_N (); }
+{ return horizon (i).C_per_N (); }
 
 double 
 Soil::turnover_factor (size_t i) const
-{ return horizon_[i]->turnover_factor (); }
+{ return horizon (i).turnover_factor (); }
 
 double 
 Soil::heat_conductivity (size_t i, double Theta, double Ice) const
-{ return horizon_[i]->heat_conductivity (Theta, Ice); }
+{ return horizon (i).heat_conductivity (Theta, Ice); }
 
 double 
 Soil::heat_capacity (size_t i, double Theta, double Ice) const
-{ return horizon_[i]->heat_capacity (Theta, Ice); }
+{ return horizon (i).heat_capacity (Theta, Ice); }
 
 bool
 Soil::has_attribute (const symbol name, Treelog& msg) const
@@ -387,19 +401,19 @@ Soil::has_attribute (const symbol name) const
 
 bool 
 Soil::has_attribute (size_t i, const symbol name) const
-{ return horizon_[i]->has_attribute (name); }
+{ return horizon (i).has_attribute (name); }
 
 double 
 Soil::get_attribute (size_t i, const symbol name) const
-{ return horizon_[i]->get_attribute (name); }
+{ return horizon (i).get_attribute (name); }
 
 symbol
 Soil::get_dimension (size_t i, const symbol name) const
-{ return horizon_[i]->get_dimension (name); }
+{ return horizon (i).get_dimension (name); }
 
 void 
 Soil::append_attributes (size_t i, std::set<symbol>& all) const
-{ horizon_[i]->append_attributes (all); }
+{ horizon (i).append_attributes (all); }
 
 void
 Soil::output (Log& log) const
@@ -431,7 +445,7 @@ Soil::nitrification (const size_t i,
                      const double M, const double C, 
                      const double h, const double T,
                      double& NH4, double& N2O, double& NO3) const
-{ horizon_[i]->nitrification (M, C, h,  T, NH4, N2O, NO3); }
+{ horizon (i).nitrification (M, C, h,  T, NH4, N2O, NO3); }
 
 double
 Soil::MaxRootingHeight () const
@@ -508,7 +522,7 @@ Soil::check (const int som_size, Geometry& geo, Treelog& err) const
 
   bool geo_ok = true;
   for (size_t i = 0; i < geo.cell_size (); i++)
-    if (horizon_[i] == NULL)
+    if (impl->horizon_[i] == NULL)
       geo_ok = false;
 
   if (!geo_ok)
@@ -681,8 +695,8 @@ Soil::initialize (const Time& time, Geometry& geo,
   const size_t cell_size = geo.cell_size ();
 
   // Initialize horizons.
-  horizon_.insert (horizon_.end (), cell_size, NULL);
-  daisy_assert (horizon_.size () == cell_size);
+  impl->horizon_.insert (impl->horizon_.end (), cell_size, NULL);
+  daisy_assert (impl->horizon_.size () == cell_size);
 
   // Check zones first.
   for (size_t c = 0; c < cell_size; c++)
@@ -691,8 +705,8 @@ Soil::initialize (const Time& time, Geometry& geo,
         if (impl->zones[i]->volume->contain_point (geo.cell_z (c), 
                                                   geo.cell_x (c), geo.cell_y (c)))
           {
-            daisy_assert (horizon_[c] == NULL);
-            horizon_[c] = impl->zones[i]->horizon.get ();
+            daisy_assert (impl->horizon_[c] == NULL);
+            impl->horizon_[c] = impl->zones[i]->horizon.get ();
             break;
           }
     }
@@ -706,26 +720,49 @@ Soil::initialize (const Time& time, Geometry& geo,
 
       for (size_t i = 0; i < cell_size; i++)
         {
-          if (horizon_[i] != NULL)
+          if (impl->horizon_[i] != NULL)
             // Already defined by a zone.
             continue;
 
           const double z = geo.cell_z (i);
           if (last > z && z >= next)
             { 
-              daisy_assert (horizon_[i] == NULL);
-              horizon_[i] = h;
+              daisy_assert (impl->horizon_[i] == NULL);
+              impl->horizon_[i] = h;
             }
         }
       last = next;
     }
   for (size_t i = 0; i < cell_size; i++)
     {
+      // Sanity check.
       std::ostringstream tmp;
       tmp << "cell[" << i << "] of " << cell_size
           << " z = " << geo.cell_z (i) << ", last = " << last;
       Treelog::Open nest (msg, tmp.str ());
-      daisy_assert (horizon_[i] != NULL);
+      daisy_assert (impl->horizon_[i] != NULL);
+
+      // Count volume for all horizons.
+      impl->volume[impl->horizon_[i]] +=geo.cell_volume (i);
+    }
+
+  for (int i = 0; i < impl->zones.size (); i++)
+    {
+      const Horizon* h = impl->zones[i]->horizon.get ();
+      if (impl->volume[h] > 0.0)
+        continue;
+      std::ostringstream tmp;
+      tmp << "zone '" << h->objid << "' has volume of " << impl->volume[h];
+      msg.warning (tmp.str ());
+    }
+  for (layer = begin; layer != end; layer++)
+    {
+      const Horizon* h = (*layer)->horizon.get ();
+      if (impl->volume[h] > 0.0)
+        continue;
+      std::ostringstream tmp;
+      tmp << "horizon '" << h->objid << "' has volume of " << impl->volume[h];
+      msg.warning (tmp.str ());
     }
 
   // anisotropy_edge.

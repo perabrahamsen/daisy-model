@@ -39,9 +39,13 @@ class HydraulicWEPP : public Hydraulic
 {
   // WEPP parametre.
   const double consolidate_factor; // [0-1]
+  const double consolidate_factor_water; // [0-1]
   const double delta_pmx_fixed;    // [kg/m^3] forced value of delta_pmx.
+  const double time_consolidation; // [d^-1] how fast the soil consolidates
   const double average_depth;      // [cm]
   const double CECr_fixed;         // Fixed value for CECr.
+  const bool allow_negative_delta_pc; // delta_pc can be < 0
+
   double p_c;                   // consolidated_bulk_density [kg/m^3]
 
   // Static soil properties, calculated on initialization.
@@ -56,11 +60,17 @@ class HydraulicWEPP : public Hydraulic
   double p_t;                   // dry bulk density after tillage. [kg/m^3]
   double delta_pmx;             // rain bulk density change [kg/m^3]
   double delta_pc;             // time bulk density change [kg/m^3]
-
+  
   // Properties calculated by wepp daily.
   double day_count;             // Number of days since tillage. [d]
   double R_c;                   // Accumulated rain since tillage. [m]
   double rho_b;                 // Current dry bulk density [g/cm^3]
+
+  // Frost.
+  const double freeze_effect;   // Max effect of frost [kg/m^3]
+  const double freeze_on;       // Ice content for entering frozen state. []
+  const double freeze_off;      // Ice content for leaving frozen state. []
+  bool frozen;                  // Frozen state active.
 
   // Dynamic M_vG parameters calculated by hypres.
   double alpha;
@@ -78,9 +88,9 @@ class HydraulicWEPP : public Hydraulic
 public:
   void set_porosity (double)
   { throw ("Can't change porosity for WEPP hydraulic model"); }
-  void tillage (const double T_ds);
+  void tillage (const double T_ds, const double Theta);
   void calculate_rho_b ();
-  void tick (const double dt, const double rain);
+  void tick (const double dt, const double rain, const double ice, Treelog& msg);
   void output (Log& log) const;
 
   // Use.
@@ -111,12 +121,17 @@ public:
 };
 
 void 
-HydraulicWEPP::tillage (const double T_ds)
+HydraulicWEPP::tillage (const double T_ds, const double Theta)
 {
   daisy_assert (T_ds >= 0.0 && T_ds <= 1.0);
   const double p_tm1 = rho_b * (100.0 * 100.0 * 100.0) / 1000.0; // [kg/m^3]
+
+  // Relative water content.
+  const double Se = (Theta - Theta_res) / (Theta_sat - Theta_res);
+  const double K1 = consolidate_factor + Se * consolidate_factor_water;
+
   // wepp:7.7.1
-  p_t = p_tm1 - (p_tm1 - consolidate_factor * p_c) * T_ds;
+  p_t = p_tm1 - (p_tm1 - K1 * p_c) * T_ds;
 
   if (delta_pmx_fixed > 0)
     // Merete Styczen want is as a calibration parameter.
@@ -126,11 +141,31 @@ HydraulicWEPP::tillage (const double T_ds)
     delta_pmx = std::max (0.0, delta_pmx_clay - 0.92 * p_t); // [kg/m^3]
   
   // Dry bulk density after 100 mm (0.1 m) of rain.
-  const double p_t01m = p_t + delta_pmx * (0.1 / 0.01 + 0.1);
+  const double p_t01m = p_t + delta_pmx * (0.1 / (0.01 + 0.1));
+  std::ostringstream tmp;
   if (p_t01m > p_c)
-    delta_pc = 0.0;
+    {
+      tmp << "negative delta_pc ";
+      if (allow_negative_delta_pc)
+        {
+          // delta_pc = p_t - p_c;
+          delta_pc = p_c - p_t01m;
+          tmp << "activated";
+        }
+      else
+        delta_pc = 0.0;
+      tmp << "\n";
+    }
   else
     delta_pc = p_c - p_t01m;
+  tmp << "delta_pc = " << delta_pc << "; p_c = " << p_c
+      << "; p_t01m = " << p_t01m  << "; R_c = " << R_c << "; p_t = " << p_t 
+      << "; delta_pmx = " << delta_pmx 
+      << ";  delta_pmx_clay = " <<  delta_pmx_clay 
+      << "; delta_pmx_fixed = " << delta_pmx_fixed
+      << "; T_ds = " << T_ds << "; Se = " << Se << "; Theta = " << Theta 
+      << "; K1 = " << K1;
+  Assertion::message (tmp.str ());
 
   day_count = 0.0;                                // [d]
   R_c = 0.0;                                      // [m]
@@ -141,7 +176,7 @@ void
 HydraulicWEPP::calculate_rho_b ()
 {
   // Fraction of time loosening effect until now. wepp:7.712
-  const double F_dc = 1.0 - std::exp (-0.005 * day_count); // []
+  const double F_dc = 1.0 - std::exp (- time_consolidation * day_count); // []
   // Loosening due to time. wepp:7.7.12
   const double delta_pwt = delta_pc * F_dc; 
   // Loosening due to rain. wepp:7.7.9
@@ -153,10 +188,33 @@ HydraulicWEPP::calculate_rho_b ()
 }
 
 void 
-HydraulicWEPP::tick (const double dt /* [h] */, const double rain /* [mm] */)
+HydraulicWEPP::tick (const double dt /* [h] */, const double rain /* [mm] */,
+                     const double ice /* [] */, Treelog& msg)
 {
   day_count += dt / 24.0;       // [d]
   R_c += rain * 0.001;          // [m]
+  if (ice > freeze_on && !frozen)
+    {
+      frozen = true;
+
+      // Loosening due to rain. wepp:7.7.9
+      const double delta_prf = delta_pmx * (R_c / (0.01 + R_c)); // [kg/m^3]
+      if (delta_prf < freeze_effect)
+        R_c = 0.0;
+      else
+        {
+          R_c = (-0.01 * freeze_effect) / (-delta_pmx + freeze_effect);
+          const double new_delta_prf = delta_pmx * (R_c / (0.01 + R_c));
+          daisy_approximate (delta_prf - freeze_effect, new_delta_prf);
+        }
+
+      msg.message ("Surface freezes");
+    }
+  else if (ice < freeze_off && frozen)
+    {
+      frozen = false;
+      msg.message ("Surface thaws");
+    }
   hypres ();
 }
 
@@ -437,9 +495,12 @@ HydraulicWEPP::hypres ()
 HydraulicWEPP::HydraulicWEPP (const BlockModel& al)
   : Hydraulic (al),
     consolidate_factor (al.number ("consolidate_factor")),
+    consolidate_factor_water (al.number ("consolidate_factor_water")),
     delta_pmx_fixed (al.number ("delta_pmx_fixed", -42.42e42)),
+    time_consolidation (al.number ("time_consolidation")),
     average_depth (al.number ("average_depth", -42.42e42)),
     CECr_fixed (al.number ("CECr", -42.42e42)),
+    allow_negative_delta_pc (al.flag ("allow_negative_delta_pc")),
     p_c (al.number ("consolidated_bulk_density", -42.42e42)),
     clay (-42.42e42),
     silt (-42.42e42),
@@ -451,6 +512,10 @@ HydraulicWEPP::HydraulicWEPP (const BlockModel& al)
     day_count (al.number ("day_count")),
     R_c (al.number ("R_c")),
     rho_b (-42.42e42),
+    freeze_effect (al.number ("freeze_effect")),
+    freeze_on (al.number ("freeze_on")),
+    freeze_off (al.number ("freeze_off")),
+    frozen (al.flag ("frozen")),
     alpha (-42.42e42),
     a (-42.42e42),
     n (-42.42e42),
@@ -488,14 +553,26 @@ Tillage and weather dynamics from WEPP. CECr from Krogh et al.")
                             Attribute::Const, "Soil residual water.");
     frame.set ("Theta_res", 0.01);
     frame.add_check (check_alist);
-    frame.declare_fraction ("consolidate_factor", Attribute::Const, "\
+    frame.declare ("consolidate_factor", 
+                   Attribute::None (), Attribute::Const, "\
 The ratio between consolidated and loose bulk density.");
     frame.set ("consolidate_factor", 0.667);
+    frame.declare ("consolidate_factor_water", 
+                   Attribute::None (), Attribute::Const, "\
+An additinal water dependent consolitdate factor.\n\
+This is multiplied with the relative water content [0-1] at tillage,\n\
+and added to `consolidate_factor'.");
+    frame.set ("consolidate_factor_water", 0.0);
     frame.declare ("delta_pmx_fixed", "kg/m^3", Check::non_negative (), 
                    Attribute::OptionalConst, "\
 Fixed value for 'delta_pmx'.\n\
 By default 'delta_pmx' will be calculated from clay content and\n\
 dry bulk density.");
+    frame.declare ("time_consolidation", "d^-1", Attribute::Const, "\
+Controls consolidation as a function of passing time.\n\
+consolidation = max * (1 - exp (- time_consolidation * day_count))\n\
+Larger values, faster consolidation.");
+    frame.set ("time_consolidation", 0.005);
     frame.declare ("average_depth", "cm", Check::positive (), 
                    Attribute::OptionalConst, "\
 Average depth of horizon (positive).\n\
@@ -522,6 +599,9 @@ By default, this will be consolidated dry bulk density per wepp.");
     frame.declare ("delta_pc", "kg/m^3", Attribute::State,
                    "Potential dry bulk density change due to time.");
     frame.set ("delta_pc", 0.0);
+    frame.declare_boolean ("allow_negative_delta_pc", Attribute::Const, "\
+Allow 'delta_pc' to be negative after tillage.");
+    frame.set ("allow_negative_delta_pc", false);
     frame.declare ("day_count", "d", Check::non_negative (), Attribute::State, 
                    "Number of days since last tillage.");
     frame.set ("day_count", 0.0);
@@ -530,6 +610,26 @@ By default, this will be consolidated dry bulk density per wepp.");
     frame.set ("R_c", 0.0);
     frame.declare ("rho_b", "g/cm^3", Attribute::LogOnly,
                    "Current dry bulk density.");
+    frame.declare ("freeze_effect", "kg/m^3", Check::non_negative (),
+                   Attribute::Const, "\
+Maximum decrease of bulk density from frost.\n\
+The freeze effect works by decreasing `R_c'. `R_c' will never be\n\
+decreased below zero.");
+    frame.set ("freeze_effect", 0.0);
+    frame.declare_fraction ("freeze_on", Attribute::Const, "\
+Volumetric ice content above this will activate the frozen state.\n\
+The freeze effect will be activated if the soil is not already frozen.");
+    frame.set ("freeze_on", 1.0);
+    frame.declare_fraction ("freeze_off", Attribute::Const, "\
+Volumetric ice content below this will deactivate frozen state.");
+    frame.set ("freeze_off", 0.0);
+    frame.declare_boolean ("frozen", Attribute::State, "\
+True if the soil is considered frozen.\n\
+The soil will be considered frozen after the volumetric ice content\n\
+reaches above `freeze_on', and will stay frozen until the volumetric\n\
+ice content fall below `freeze_off'. When the soil enter the frozen state\n\
+the `freeze_effect' trigger.");
+    frame.set ("frozen", false);
     frame.declare ("alpha", "cm^-1", Attribute::LogOnly,
                    "van Genuchten alpha.");
     frame.declare ("n", Attribute::None (), Attribute::LogOnly,
@@ -563,6 +663,11 @@ Parameterization of for Danish soils.")
   {
     frame.set_cited ("CECr", 50.0, "Average value for examined Danish soils.", 
                      "krogh2000cation");
+    frame.set ("allow_negative_delta_pc", true);
+    frame.set ("delta_pmx_fixed", 80.0);
+    frame.set ("freeze_effect", 100.0);
+    frame.set ("freeze_on", 0.19);
+    frame.set ("freeze_off", 0.01);
   }
 } HydraulicStyczen_syntax;
 

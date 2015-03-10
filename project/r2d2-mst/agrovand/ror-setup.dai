@@ -1,4 +1,4 @@
-;;; ror-setup.dai main setup file for Agrovand simulations.
+;;; Ror-setup.dai main setup file for Agrovand simulations.
 
 (input file "ror-log.dai")                
 

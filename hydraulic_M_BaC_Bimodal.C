@@ -146,7 +146,7 @@ Bimodal hydraulic conductivity curve.")
                 "Water conductivity of saturated soil.");
     frame.declare ("lambda", Attribute::None (), Attribute::Const,
                 "Pore size index.");
-    frame.declare ("h_b", "cm", Attribute::Const,
+    frame.declare ("h_b", "cm", Check::negative (), Attribute::Const,
                 "Bubbling pressure.");
     frame.declare ("Theta_b", Attribute::None (), Attribute::Const,
                 "Water content at 'h_b'.");

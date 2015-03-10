@@ -325,6 +325,7 @@ SoilWater::tick_before (const Geometry& geo, const Soil& soil,
   for (size_t i = 0; i < cell_size; i++)
     {
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
+      const double Theta_res = soil.Theta_res (i);
 
       X_ice_[i] -= S_ice_ice[i];
 
@@ -332,7 +333,6 @@ SoilWater::tick_before (const Geometry& geo, const Soil& soil,
       const double total_ice = X_ice_[i] + X_ice_buffer_[i];
       if (total_ice > 0.0)
         {
-          const double Theta_res = soil.Theta_res (i);
           if (Theta_[i] < Theta_res)
             {
               std::ostringstream tmp;
@@ -349,7 +349,7 @@ SoilWater::tick_before (const Geometry& geo, const Soil& soil,
               X_ice_[i] = available_space;
               X_ice_buffer_[i] = total_ice - available_space;
             }
-          else if (X_ice_buffer_[i] > 0.0)
+          else
             {
               X_ice_[i] = total_ice;
               X_ice_buffer_[i] = 0.0;
@@ -360,7 +360,6 @@ SoilWater::tick_before (const Geometry& geo, const Soil& soil,
           X_ice_[i] = 0.0;
           X_ice_buffer_[i] = total_ice;
         }
-
       // Update ice pressure.
       h_ice_[i] = soil.h (i, Theta_sat - X_ice_[i]);
     }
