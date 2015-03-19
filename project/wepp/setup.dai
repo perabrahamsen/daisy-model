@@ -83,7 +83,7 @@
   (column Rorrende_led2)
   (manager led2)
   (log_prefix "log/L2-")
-  (timestep (minutes 10))
+  ;;(timestep (minutes 10))
   (output &old
           (WEPP (horizon "Overflade Ap_2") (where "wepp.dlf"))))
 
@@ -127,17 +127,17 @@
   (column Rorrende_led4)
   (manager led4)
   (log_prefix "log/L4-")
-  (timestep (minutes 10))
+  ;;(timestep (minutes 10))
   (output &old
           (WEPP (horizon "Overflade Ap_4") (where "wepp.dlf"))))
 
 ;; Run them
 
 (defprogram sims batch
-  (run ;;led1 
+  (run led1 
        led2
-       ;;led3 
-       ;;led4
+       led3 
+       led4
        ))
 
 ;; Plot
@@ -169,11 +169,37 @@
                   (title "Obs"))
           ))
 
+(defgnuplot K plottime
+  (where "fig/K_L${L}.pdf")
+  (title "Plot ${L} hydraulic conductivity")
+  (ymax 30 [mm/h])
+  (ymin 0 [mm/h])
+  (source (column (file "log/L${L}-wepp.dlf")
+                  (tag "K_sat")
+                  (dimension "mm/h")
+                  (style 4)
+                  (title "Hypres K (-15 mm)"))
+          (column (file "log/L${L}-wepp.dlf")
+                  (tag "K_15")
+                  (dimension "mm/h")
+                  (style 1)
+                  (title "Hypres K_sat"))
+          (column (file "K.ddf")
+                  (tag "led${L}")
+                  (dimension "mm/h")
+                  (style 3)
+                  (title "Obs inf @ -15"))
+          ))
+
 (defgnuplot plots multi
   (graph (rho_b (L "1"))
-         (rho_b (L "2"))
-         (rho_b (L "3"))
-         (rho_b (L "4"))
+         (rho_b (L "2") (legend none))
+         (rho_b (L "3") (legend none))
+         (rho_b (L "4") (legend none))
+         (K (L "1") (legend ne))
+         (K (L "2") (legend none))
+         (K (L "3") (legend none))
+         (K (L "4") (legend none))
          ))
 
 (defprogram plot gnuplot
@@ -185,11 +211,12 @@
 (defprogram both batch
   (run sims plot))
 
+(run led4)
 ;;(run sims)
 
-;(run plot)
+;;(run plot)
 
-(run both)
+;;(run both)
 
 
 ;;; setup.dai ends here.

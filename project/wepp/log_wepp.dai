@@ -63,6 +63,10 @@
                    (handle current)
                    (spec hydraulic wepp K_sat))
            (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp K_15)
+                   (handle current)
+                   (spec hydraulic wepp K_15))
+           (number (path column "${column}" Soil 
                          horizons horizon "${horizon}" hydraulic wepp K_fc)
                    (handle current)
                    (spec hydraulic wepp K_fc))

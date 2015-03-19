@@ -1,3 +1,8 @@
+2015-03-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log.dai ("Groundwater"): Fix select model for 'table_low'
+	and 'table_high'.
+
 2015-01-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* all: Make sure hydraulic models have center_z.

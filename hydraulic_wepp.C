@@ -55,6 +55,7 @@ class HydraulicWEPP : public Hydraulic
 
   // Static wepp properties, calculated on initialization.
   double delta_pmx_clay;        // static rain bulk density change [kg/m^3]
+  double K_b;                   // baseline effective conductivity [mm/h]
 
   // Properties calculated by wepp after tillage.
   double p_t;                   // dry bulk density after tillage. [kg/m^3]
@@ -79,6 +80,7 @@ class HydraulicWEPP : public Hydraulic
   double m;		// 1 - 1/n
   double l;         // tortuosity parameter
   PLF M_;
+  double K_15;
   double K_fc;
   double K_wp;
   double Theta_fc;
@@ -216,6 +218,10 @@ HydraulicWEPP::tick (const double dt /* [h] */, const double rain /* [mm] */,
       msg.message ("Surface thaws");
     }
   hypres ();
+
+#if 0
+  K_bare = K_b * (CF + (1.0 - CF) * std::exp (-C * Ea * (1.0 - RRt / 0.04)));
+#endif
 }
 
 void 
@@ -232,6 +238,7 @@ HydraulicWEPP::output (Log& log) const
   output_variable (n, log);
   output_variable (l, log);
   output_variable (K_sat, log);
+  output_variable (K_15, log);
   output_variable (K_fc, log);
   output_variable (K_wp, log);
   output_variable (Theta_sat, log);
@@ -322,9 +329,9 @@ HydraulicWEPP::initialize_wepp (const Texture& texture,
   const double om = texture.humus;           // [g om/g soil]
   daisy_assert (clay + silt + sand + om < 1.001);
 
+  std::ostringstream tmp;
   if (p_c < 0.0)
     {
-      std::ostringstream tmp;
       double CECr_sane;             // [cmolc/kg soil]
       if (CECr_fixed > 0.0)
         // User specified value.
@@ -356,12 +363,25 @@ HydraulicWEPP::initialize_wepp (const Texture& texture,
       // Consolidated bulk density. wepp:7.7.2
       p_c = (1.514 + 0.25 * sand -  13.0 * sand * om -  6.0 * clay * om
              - 0.48 * clay * CECr) * 1000.0; // [kg / m^3]
-      tmp << "Consolidated bulk density " << p_c << " kg/m^3";
-      msg.debug (tmp.str ());
+      tmp << "Consolidated bulk density " << p_c << " kg/m^3\n";
     }
   // Fixed contribution to maximum soil bulk density change due to rain.
   // wepp:7.7.10 (first part)
   delta_pmx_clay = 1650.0 - 2900.0 * clay + 3000 * clay * clay; // [kg/m^3]
+
+  // Baseline hydraulic conductivity 
+  if (CEC <= 1.0)
+    {
+      msg.debug ("CEC should be > 1 meq/100g");
+      K_b = 10.0;
+    }
+  else if (clay < 0.4)
+    K_b = -0.265 + 0.0086 * std::pow (100.0 * sand, 1.8) 
+      + 11.46 * std::pow (CEC, -0.75);
+  else
+    K_b = 0.0066 * std::exp (2.44 / clay);
+  tmp << "K_b = " << K_b << " mm/h";
+  msg.debug (tmp.str ());
 }
 
 void
@@ -463,28 +483,26 @@ HydraulicWEPP::hypres ()
     + 0.0488 * rho_b * humus;
   l = (10.0 * exp (l_star) - 10.0) / (1.0 + exp (l_star));
   
-  if (K_sat < 0.0 && K_init == NULL)
+  double K_sat_star 
+    = 7.755 + 0.0352 * silt - 0.967 * rho_b * rho_b 
+    - 0.000484 * clay * clay 
+    - 0.000322 * silt * silt + 0.001 / silt - 0.0748 / humus
+    - 0.643 * log (silt) - 0.01398 * rho_b * clay - 0.1673 * rho_b * humus
+    ;
+  if (top_soil)
     {
-      double K_sat_star 
-	= 7.755 + 0.0352 * silt - 0.967 * rho_b * rho_b 
-	- 0.000484 * clay * clay 
-	- 0.000322 * silt * silt + 0.001 / silt - 0.0748 / humus
-	- 0.643 * log (silt) - 0.01398 * rho_b * clay - 0.1673 * rho_b * humus
-	;
-      if (top_soil)
-	{
-	  K_sat_star += 0.93;
-	  K_sat_star += 0.02986 * clay;
-	  K_sat_star -= 0.03305 * silt;
-	}
-      K_sat = exp (K_sat_star) / 24.0;
+      K_sat_star += 0.93;
+      K_sat_star += 0.02986 * clay;
+      K_sat_star -= 0.03305 * silt;
     }
+  K_sat = exp (K_sat_star) / 24.0;
   
   a = -alpha;
   m = 1.0 - 1.0 / n;
 
   const double h_fc = -100.0;
   const double h_wp = -15000.0;
+  K_15 = K (-1.5);
   K_fc = K (h_fc);
   K_wp = K (h_wp);
   Theta_fc = Theta (h_fc);
@@ -506,6 +524,7 @@ HydraulicWEPP::HydraulicWEPP (const BlockModel& al)
     silt (-42.42e42),
     humus (-42.42e42),
     delta_pmx_clay (-42.42e42),
+    K_b (-42.42e42),
     p_t (al.number ("p_t", -42.42e42)),
     delta_pmx (al.number ("delta_pmx")),
     delta_pc (al.number ("delta_pc")),
@@ -638,6 +657,8 @@ the `freeze_effect' trigger.");
                    "tortuosity parameter.");
     frame.declare ("K_sat", "cm/h", Attribute::LogOnly,
                    "Water conductivity of saturated soil.");
+    frame.declare ("K_15", "cm/h", Attribute::LogOnly,
+                   "Water conductivity for h = -1.5 cm.");
     frame.declare ("K_fc", "cm/h", Attribute::LogOnly,
                    "Water conductivity at field capaicy (pF 2).");
     frame.declare ("K_wp", "cm/h", Attribute::LogOnly,

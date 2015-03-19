@@ -133,7 +133,7 @@ evapotranspiration when the available water is insufficient.")
            (flux_bottom (tag "Matrix percolation")
 			(documentation "\
 This is the amount of water leaving the system through the soil bottom.
-It can be negative if there are cabilary raise.")
+It can be negative if there is cabilary rise.")
                         (path column "${column}" SoilWater q)
                         (spec fixed SoilWater q)
                         (handle sum)
