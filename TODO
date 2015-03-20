@@ -1,10 +1,28 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Signe filer
+
+** RS timefil 3000 år
+
+*** timefil 3000 år med dato (dwf format)
+
+*** dagsfil 100*30 år. konverter skudår
+
+** WG dagsfil 100*30 år
+
+*** DWF fil 3000 år. konverter skudår
+
 * WEPP
+
+** Marie data
 
 ** K
 
-*** plots
+*** K_bare
+
+* Pestpore
+
+** Opsætning af pesticideksperiment (minimal 1D opsætning). Plots
 
 * Emacs
 

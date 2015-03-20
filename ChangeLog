@@ -1,3 +1,7 @@
+2015-03-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* program_sbrdata.C: New model.
+
 2015-03-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* lib/log.dai ("Groundwater"): Fix select model for 'table_low'
