@@ -42,6 +42,8 @@ struct ProgramRS2WG : public Program
   const symbol rshourly_file;
   const symbol rsdaily_file;
   const symbol dwfhourly_file;
+  const symbol hint_file;
+  const std::vector<double> hlim;
 
   // Use.
   bool run (Treelog& msg)
@@ -77,9 +79,28 @@ dwf-0.0 -- " << rshourly_file << "\n\
 --------\n\
 Date	Precip\n\
 date	mm\n";
+
+    std::vector<int> hcount (hlim.size (), 0);
+    std::ofstream hint (hint_file.name ().c_str ());
+    if (!hint.good ())
+      {
+        msg.error (std::string ("Problems opening '")
+                   + hint_file + "' for writing");
+        return false;
+      }
+    hint << "ddf-0.0 -- " << rshourly_file << "\n---------\n\
+Year\tMonth\tR_max_H";
+    for (size_t i = 0; i < hlim.size (); i++)
+      hint << "\t" << hlim[i];
+    hint << "\nyear\tmonth\tmm";
+    for (size_t i = 0; i < hlim.size (); i++)
+      hint << "\th";
+    hint << "\n";
+
     Time time = rshourly_origin;
     Time cycle_time = wgcycle_begin;
 
+    double R_max_H = 0.0;       // Max hourly rainfall [mm]
     double daily = 0.0;
     do
       {
@@ -88,6 +109,19 @@ date	mm\n";
           break;
         dwf_hourly << time.print () << "\t" << value << "\n";
         daily += value;
+
+        // Intervals.
+        for (size_t i = 0; i < hlim.size (); i++)
+          if (value <= hlim[i])
+            {
+              hcount[i]++;
+              break;
+            }
+
+        // Max.
+        if (value > R_max_H)
+          R_max_H = value;
+
         Time next = time;
         next.tick_hour (1);
         if (next.mday () != time.mday ()) 
@@ -126,6 +160,16 @@ date	mm\n";
 
             daily = 0.0;
           }
+        if (time.month () != next.month ())
+          {
+            hint << time.year () << "\t" << time.month () << "\t" << R_max_H;
+            for (size_t i = 0; i < hcount.size (); i++)
+              hint << "\t" << hcount[i];
+            hint << "\n";
+            std::fill (hcount.begin (), hcount.end (), 0);
+            R_max_H = 0.0;
+          }
+
         if (time.year () / 100 != next.year () / 100)
           msg.message (next.print ());
         time = next;
@@ -167,7 +211,9 @@ date	mm\n";
                    1, 1, 0),
       rshourly_file (al.name ("rshourly_file")),
       rsdaily_file (al.name ("rsdaily_file")),
-      dwfhourly_file (al.name ("dwfhourly_file"))
+      dwfhourly_file (al.name ("dwfhourly_file")),
+      hint_file (al.name ("hint_file")),
+      hlim (al.number_sequence ("hlim"))
   { }
   ~ProgramRS2WG ()
   { }
@@ -195,6 +241,10 @@ Name of file with hourly data from RainSim.");
 Name of file with daily precipitation for the Weather Generator.");
     frame.declare_string ("dwfhourly_file", Attribute::Const, "\
 Daisy weather file with hourly data from RainSim.");
+    frame.declare_string ("hint_file", Attribute::Const, "\
+Hourly precipitation interval file.");
+    frame.declare ("hlim", "mm", Attribute::Const, Attribute::Variable, "\
+Upper limits for each precipitation interval.");
   }
 } ProgramRS2WG_syntax;
 
@@ -208,7 +258,73 @@ struct ProgramWG2DWF : public Program
   const Time wgcycle_end;
   const symbol wg_file;
   const symbol dwfdaily_file;
+  const symbol monthly_file;
+  const symbol yearly_file;
+  const symbol dint_file;
+  const std::vector<double> dlim;
   const symbol header;
+
+  // Daily data.
+  int year;
+  int month;
+  int mday;
+  double Precip;
+  double Tmin;
+  double Tmax;
+  double Vp;
+  double rh;
+  double wind;
+  double ss;
+  double diffrad;
+  double direct;
+  double pet;
+  
+  // Monthly data.
+  double R_max_D;               // Max daily rainfall [mm]
+  double RD_MR;                 // Total rainfall in days with more than 1 mm
+  int RD;                       // Number of days with more than 1 mm rain
+  int WD;                       // Number of days with more than 10 mm rain
+  double MR;                    // Total rainfall [mm]
+
+  // Yearly data.
+  int FD;                       // Days where T_min < 0 [dg C]
+  int T25days;                  // Current heatwave length.
+  int HWT25;                    // Heat wave days [3 days where T_avg > 25 dg C
+  int T28days;                  // Current heatwave length.
+  int HWT28;                    // Heat wave days [3 days where T_avg > 28 dg C
+  double T_warm;                // Hottest day in the year (avg) [dg C]
+  double T_cold;                // Coldest day in the year (avg) [dg C]
+  int last_DFAF;                // Day of first frost [jday]
+  int last_DLAF;                // Day of last frost [jday]
+  int DFAF;                     // Day of first frost [jday]
+  int DLAF;                     // Day of last frost [jday]
+  double GROW;                  // Number of days where T_avg > 5 dg C.
+  double R_max_DY;              // Greatest daily rainfall [mm]
+  double RD_AD;                 // Rain on raindays (> 1 mm) [mm]
+  double AR;                    // Annual rainfall. [mm]
+
+  void reset_monthly ()
+  {
+    R_max_D = 0.0;
+    RD_MR = 0.0;
+    RD = 0;
+    WD = 0;
+    MR = 0.0;
+  }
+  void reset_yearly ()
+  {
+    FD = 0;
+    T25days = 0;
+    HWT25 = 0;
+    T28days = 0;
+    HWT28 = 0;
+    T_warm = -42.42e42;
+    T_cold = 42.42e42;
+    GROW = 0;
+    R_max_DY = 0.0;
+    RD_AD = 0.0;
+    AR = 0.0;
+  }
 
   // Use.
   bool run (Treelog& msg)
@@ -222,8 +338,6 @@ struct ProgramWG2DWF : public Program
         msg.error (std::string ("Problems opening '") + wg_file + "'");
         return false;
       }
-    wg.skip_line ();
-    wg.next_line ();
   
     std::ofstream dwf_daily (dwfdaily_file.name ().c_str ());
     if (!dwf_daily.good ())
@@ -235,8 +349,50 @@ struct ProgramWG2DWF : public Program
       
     dwf_daily << "\
 dwf-0.0 -- " << wg_file << "\n" << header << "\n----\n\
-Year	Month	Day	Precip	T_min	T_max	VapPres	Wind	DiffRad	GlobRad	RefEvap\n\
-year	month	day	mm/d	dgC	dgC	Pa	m/s	W/m^2	W/m^2	mm/d\n";
+Year\tMonth\tDay\tPrecip\tT_min\tT_max\tVapPres\tWind\tDiffRad\tGlobRad\tRefEvap\n\
+year\tmonth\tday\tmm/d\tdgC\tdgC\tPa\tm/s\tMJ/d\tMJ/d\tmm/d\n";
+
+
+    reset_monthly ();
+    std::ofstream monthly (monthly_file.name ().c_str ());
+    if (!monthly.good ())
+      {
+        msg.error (std::string ("Problems opening '")
+                   + monthly_file + "' for writing");
+        return false;
+      }
+    monthly << "ddf-0.0 -- " << wg_file << "\n---------\n\
+Year\tMonth\tR_max_D\tSDII\tRD\tWD\tMR\n\
+year\tmonth\tmm\tmm/d\td\td\tMR\n";
+      
+    reset_yearly ();
+    std::ofstream yearly (yearly_file.name ().c_str ());
+    if (!yearly.good ())
+      {
+        msg.error (std::string ("Problems opening '")
+                   + yearly_file + "' for writing");
+        return false;
+      }
+    yearly << "ddf-0.0 -- " << wg_file << "\n---------\n\
+Year\tFD\tHWT25\tHWT28\tT_warm\tT_cold\tDFAF\tDLAF\tGROW\tR_max_DY\tAR\n\
+Year\td\td\td\tdG C\tdg C\tjday\tjday\td\tmm\tmm\n";
+
+    std::vector<int> dcount (dlim.size (), 0);
+    std::ofstream dint (dint_file.name ().c_str ());
+    if (!dint.good ())
+      {
+        msg.error (std::string ("Problems opening '")
+                   + dint_file + "' for writing");
+        return false;
+      }
+    dint << "ddf-0.0 -- " << wg_file << "\n---------\n\
+Year\tMonth";
+    for (size_t i = 0; i < dlim.size (); i++)
+      dint << "\t" << dlim[i];
+    dint << "\nyear\tmonth";
+    for (size_t i = 0; i < dlim.size (); i++)
+      dint << "\td";
+    dint << "\n";
 
     Time time = rshourly_origin;
     Time cycle_time = wgcycle_begin;
@@ -245,35 +401,35 @@ year	month	day	mm/d	dgC	dgC	Pa	m/s	W/m^2	W/m^2	mm/d\n";
       {
         (void) wg.get_cardinal ();
         wg.skip_space ();
-        const int year = wg.get_cardinal ();
+        year = wg.get_cardinal ();
         wg.skip_space ();
-        const int month = wg.get_cardinal ();
+        month = wg.get_cardinal ();
         wg.skip_space ();
-        const int mday = wg.get_cardinal ();
-        wg.skip_space ();
-        (void) wg.get_cardinal ();
+        mday = wg.get_cardinal ();
         wg.skip_space ();
         (void) wg.get_cardinal ();
         wg.skip_space ();
-        const double Precip = wg.get_number ();
+        (void) wg.get_cardinal ();
         wg.skip_space ();
-        const double Tmin = wg.get_number ();
+        Precip = wg.get_number ();
         wg.skip_space ();
-        const double Tmax = wg.get_number ();
+        Tmin = wg.get_number ();
         wg.skip_space ();
-        const double Vp = wg.get_number ();
+        Tmax = wg.get_number ();
         wg.skip_space ();
-        const double rh = wg.get_number ();
+        Vp = wg.get_number ();
         wg.skip_space ();
-        const double wind = wg.get_number ();
+        rh = wg.get_number ();
         wg.skip_space ();
-        const double ss = wg.get_number ();
+        wind = wg.get_number ();
         wg.skip_space ();
-        const double diffrad = wg.get_number ();
+        ss = wg.get_number ();
         wg.skip_space ();
-        const double direct = wg.get_number ();
+        diffrad = wg.get_number ();
         wg.skip_space ();
-        const double pet = wg.get_number ();
+        direct = wg.get_number ();
+        wg.skip_space ();
+        pet = wg.get_number ();
         wg.next_line ();
 
         daisy_assert (year == cycle_time.year ());
@@ -314,14 +470,106 @@ year	month	day	mm/d	dgC	dgC	Pa	m/s	W/m^2	W/m^2	mm/d\n";
             daisy_notreached ();
           }
 
+        // Monthly 
+        if (Precip > R_max_D)
+          R_max_D = Precip;
+        if (Precip > 1.0)
+          {
+            RD_MR += Precip;
+            RD++;
+          }
+        if (Precip > 10.0)
+          WD++;
+        MR += Precip;
+
+        // Yearly.
+        if (Tmin < 0.0)
+          FD++;
+        const double Tavg = (Tmin + Tmax) / 2.0;
+        if (Tavg > 25.0)
+          {
+            T25days++;
+            if (T25days >= 3)
+              HWT25++;
+          }
+        else
+          T25days = 0;
+        if (Tavg > 28.0)
+          {
+            T28days++;
+            if (T28days >= 3)
+              HWT28++;
+          }
+        else
+          T28days = 0;
+        if (Tavg > T_warm)
+          T_warm = Tavg;
+        if (Tavg < T_cold)
+          T_cold = Tavg;
+        if (DFAF < 0 && Tmin < 0)
+          DFAF = time.yday ();
+        if (Tmin < 0)
+          DLAF = time.yday ();
+        if (Tavg > 5.0)
+          GROW++;
+        if (Precip > R_max_DY)
+          R_max_DY = Precip;
+        if (Precip > 1.0)
+          RD_AD += Precip;
+        AR += Precip;
+
+        // Intervals.
+        for (size_t i = 0; i < dlim.size (); i++)
+          if (Precip <= dlim[i])
+            {
+              dcount[i]++;
+              break;
+            }
+
+        // Next day a new month or year?
+        Time next = time;
+        next.tick_day ();
+
+        // Winter season.
+        if (next.month () == 8 && time.month () == 7)
+          {
+            last_DFAF = DFAF;
+            last_DLAF = DLAF;
+            DFAF = -9999;
+            DLAF = -9999;
+          }
+
+        // Monthly index.
+        if (next.month () != time.month ()) 
+          {
+            monthly << time.year () << "\t" << time.month () 
+                    << "\t" << R_max_D 
+                    << "\t" << (RD_AD / (RD + 0.0)) // SDII
+                    << "\t" << RD 
+                    << "\t" << WD << "\t" << MR << "\n";
+            reset_monthly ();
+
+            dint << time.year () << "\t" << time.month ();
+            for (size_t i = 0; i < dcount.size (); i++)
+              dint << "\t" << dcount[i];
+            dint << "\n";
+            std::fill (dcount.begin (), dcount.end (), 0);
+          }
+
+        // Yearly index.
+        if (next.year () != time.year ()) 
+          {
+            yearly << time.year () << "\t" << FD << "\t" << HWT25 
+                   << "\t" << HWT28 << "\t" << T_warm << "\t" << T_cold 
+                   << "\t" << last_DFAF << "\t" << last_DLAF << "\t" << GROW 
+                   << "\t" << R_max_DY << "\t" << AR << "\n";
+            reset_yearly ();
+          }
         // Next day.
-        time.tick_day ();
+        time = next;
         cycle_time.tick_day ();
         if (cycle_time == wgcycle_end)
           cycle_time = wgcycle_begin;
-
-
-
       }
 
     if (!dwf_daily.good ())
@@ -352,7 +600,15 @@ year	month	day	mm/d	dgC	dgC	Pa	m/s	W/m^2	W/m^2	mm/d\n";
                    1, 1, 0),
       wg_file (al.name ("wg_file")),
       dwfdaily_file (al.name ("dwfdaily_file")),
-      header (al.name ("header"))
+      monthly_file (al.name ("monthly_file")),
+      yearly_file (al.name ("yearly_file")),
+      dint_file (al.name ("dint_file")),
+      dlim (al.number_sequence ("dlim")),
+      header (al.name ("header")),
+      last_DFAF (-9999),
+      last_DLAF (-9999),
+      DFAF (-9999),
+      DLAF (-9999)
   { }
   ~ProgramWG2DWF ()
   { }
@@ -378,6 +634,14 @@ Length (in years) of weather cycle for Weather Generator.");
 Name of file generated by the Weather Generator.");
     frame.declare_string ("dwfdaily_file", Attribute::Const, "\
 Daisy weather file with daily data from Weather Generator.");
+    frame.declare_string ("monthly_file", Attribute::Const, "\
+Montly index file.");
+    frame.declare_string ("yearly_file", Attribute::Const, "\
+Yearly index file..");
+    frame.declare_string ("dint_file", Attribute::Const, "\
+Daily precipitation interval file.");
+    frame.declare ("dlim", "mm", Attribute::Const, Attribute::Variable, "\
+Upper limits for each precipitation interval.");
     frame.declare_string ("header", Attribute::Const, "\
 Stuff to put in the Daisy weather file header.");
   }

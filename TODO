@@ -2,15 +2,9 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Signe filer
 
-** RS timefil 3000 år
+** hourly indexes
 
-*** timefil 3000 år med dato (dwf format)
-
-*** dagsfil 100*30 år. konverter skudår
-
-** WG dagsfil 100*30 år
-
-*** DWF fil 3000 år. konverter skudår
+** hourly intervals
 
 * WEPP
 
