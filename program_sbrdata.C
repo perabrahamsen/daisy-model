@@ -350,7 +350,7 @@ struct ProgramWG2DWF : public Program
     dwf_daily << "\
 dwf-0.0 -- " << wg_file << "\n" << header << "\n----\n\
 Year\tMonth\tDay\tPrecip\tT_min\tT_max\tVapPres\tWind\tDiffRad\tGlobRad\tRefEvap\n\
-year\tmonth\tday\tmm/d\tdgC\tdgC\tPa\tm/s\tMJ/d\tMJ/d\tmm/d\n";
+year\tmonth\tday\tmm/d\tdgC\tdgC\thPa\tm/s\tW/m^2\tW/m^2\tmm/d\n";
 
 
     reset_monthly ();

@@ -172,9 +172,14 @@
 (defgnuplot K plottime
   (where "fig/K_L${L}.pdf")
   (title "Plot ${L} hydraulic conductivity")
-  (ymax 30 [mm/h])
-  (ymin 0 [mm/h])
+  ;;(ymax 30 [mm/h])
+  ;;(ymin 0 [mm/h])
   (source (column (file "log/L${L}-wepp.dlf")
+                  (tag "K_bare")
+                  (dimension "mm/h")
+                  (style 5)
+                  (title "K_bare"))
+          (column (file "log/L${L}-wepp.dlf")
                   (tag "K_sat")
                   (dimension "mm/h")
                   (style 4)
@@ -196,10 +201,10 @@
          (rho_b (L "2") (legend none))
          (rho_b (L "3") (legend none))
          (rho_b (L "4") (legend none))
-         (K (L "1") (legend ne))
-         (K (L "2") (legend none))
-         (K (L "3") (legend none))
-         (K (L "4") (legend none))
+         (K (L "1"));; (legend ne))
+         (K (L "2"));; (legend none))
+         (K (L "3"));; (legend none))
+         (K (L "4"));; (legend none))
          ))
 
 (defprogram plot gnuplot
@@ -211,10 +216,10 @@
 (defprogram both batch
   (run sims plot))
 
-(run led4)
+;;(run led4)
 ;;(run sims)
 
-;;(run plot)
+(run plot)
 
 ;;(run both)
 

@@ -47,6 +47,14 @@
                    (handle current)
                    (spec hydraulic wepp rho_b))
            (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp E_a)
+                   (handle current)
+                   (spec hydraulic wepp E_a))
+           (number (path column "${column}" Soil 
+                         horizons horizon "${horizon}" hydraulic wepp K_bare)
+                   (handle current)
+                   (spec hydraulic wepp K_bare))
+           (number (path column "${column}" Soil 
                          horizons horizon "${horizon}" hydraulic wepp alpha)
                    (handle current)
                    (spec hydraulic wepp alpha))

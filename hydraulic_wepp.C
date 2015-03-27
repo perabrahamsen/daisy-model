@@ -45,6 +45,7 @@ class HydraulicWEPP : public Hydraulic
   const double average_depth;      // [cm]
   const double CECr_fixed;         // Fixed value for CECr.
   const bool allow_negative_delta_pc; // delta_pc can be < 0
+  const double crust_thickness;       // [m]
 
   double p_c;                   // consolidated_bulk_density [kg/m^3]
 
@@ -56,16 +57,27 @@ class HydraulicWEPP : public Hydraulic
   // Static wepp properties, calculated on initialization.
   double delta_pmx_clay;        // static rain bulk density change [kg/m^3]
   double K_b;                   // baseline effective conductivity [mm/h]
+  double SC;                    // Subsoil crust correction fact. [?] wepp:7.9.5
+  double Psi;                   // Cap. pot at crust/subc intf. [?] wepp:7.9.6
+  double C;                     // Soil stability factor [m^2/J] wepp:7.9.8
+  double b;                     // RR coeff. [mm] wepp:7.5.4
+  double L_sand;                // Sand contribution to L. [m]
+  double L_clay;                // Clay factor for L. [m^4/kg]
 
   // Properties calculated by wepp after tillage.
   double p_t;                   // dry bulk density after tillage. [kg/m^3]
   double delta_pmx;             // rain bulk density change [kg/m^3]
   double delta_pc;             // time bulk density change [kg/m^3]
+  double RRi;                  // Random roughness after last tillage [m]
+
   
   // Properties calculated by wepp daily.
-  double day_count;             // Number of days since tillage. [d]
-  double R_c;                   // Accumulated rain since tillage. [m]
+  double day_count;             // Number of days since tillage [d]
+  double R_c;                   // Accumulated rain since tillage [m]
   double rho_b;                 // Current dry bulk density [g/cm^3]
+  double E_a;                   // Accumulated rainergy since tillage [J/m^2]
+  double RRt;                   // Random roughness [m]
+  double K_bare;                // Dynamic base soil conductivity.
 
   // Frost.
   const double freeze_effect;   // Max effect of frost [kg/m^3]
@@ -161,7 +173,8 @@ HydraulicWEPP::tillage (const double T_ds, const double Theta)
   else
     delta_pc = p_c - p_t01m;
   tmp << "delta_pc = " << delta_pc << "; p_c = " << p_c
-      << "; p_t01m = " << p_t01m  << "; R_c = " << R_c << "; p_t = " << p_t 
+      << "; p_t01m = " << p_t01m  << "; R_c = " << R_c << "; E_a = " << E_a
+      << "; p_t = " << p_t 
       << "; delta_pmx = " << delta_pmx 
       << ";  delta_pmx_clay = " <<  delta_pmx_clay 
       << "; delta_pmx_fixed = " << delta_pmx_fixed
@@ -169,8 +182,13 @@ HydraulicWEPP::tillage (const double T_ds, const double Theta)
       << "; K1 = " << K1;
   Assertion::message (tmp.str ());
 
+  // Random roughness.
+  const double RR0 = 0.013;              // [m] TODO: should be in tillage file
+  RRi = RR0 * T_ds + RRt * (1.0 - T_ds); // [m]
+
   day_count = 0.0;                                // [d]
   R_c = 0.0;                                      // [m]
+  E_a = 0.0;
   hypres ();
 }
 
@@ -195,6 +213,13 @@ HydraulicWEPP::tick (const double dt /* [h] */, const double rain /* [mm] */,
 {
   day_count += dt / 24.0;       // [d]
   R_c += rain * 0.001;          // [m]
+  const double I = rain / dt;   // [mm/h]
+  const double E_i = (I > 0.0) 
+    ? std::max ((11.9 + 8.73 * std::log10 (I)) * rain, 0.0)
+    : 0.0; // [J/m^2]
+  E_a += E_i;                   // [J/m^2]
+  
+                       
   if (ice > freeze_on && !frozen)
     {
       frozen = true;
@@ -219,9 +244,19 @@ HydraulicWEPP::tick (const double dt /* [h] */, const double rain /* [mm] */,
     }
   hypres ();
 
-#if 0
-  K_bare = K_b * (CF + (1.0 - CF) * std::exp (-C * Ea * (1.0 - RRt / 0.04)));
-#endif
+  // TODO: Hvad tæller med her: Alle AOM puljer, eller hvad der
+  // blev begravet i sidste jorbehandling? Og hvis AOM, er den så dynamisk?
+  const double br = 0.3;
+
+  const double Cbr = 1.0 - 0.5 * br; // [] wepp:7.5.3
+  const double p_b = rho_b 
+    * (100.0 * 100.0 * 100.0) / 1000.0; // wepp units: [kg/m^3]
+  const double L = std::max (crust_thickness, L_sand - L_clay * p_b); // wepp:7.9.7 [m]
+  const double CF = SC / (1.0 + Psi / (100.0 * L));    // [?] wepp:7.9.4
+
+  RRt = RRi * std::exp (-Cbr * std::pow (R_c / b, 0.6));  // [m] wepp:7.5.2
+  // wepp:7.9.3
+  K_bare = K_b * (CF + (1.0 - CF) * std::exp (-C * E_a * (1.0 - RRt / 0.04)));
 }
 
 void 
@@ -230,9 +265,13 @@ HydraulicWEPP::output (Log& log) const
   output_variable (p_t, log);
   output_variable (delta_pmx, log);
   output_variable (delta_pc, log);
+  output_variable (RRi, log);
   output_variable (day_count, log);
   output_variable (R_c, log);
   output_variable (rho_b, log);
+  output_variable (E_a, log);
+  output_variable (K_bare, log);
+  output_variable (RRt, log);
   output_variable (delta_pmx, log);
   output_variable (alpha, log);
   output_variable (n, log);
@@ -369,6 +408,16 @@ HydraulicWEPP::initialize_wepp (const Texture& texture,
   // wepp:7.7.10 (first part)
   delta_pmx_clay = 1650.0 - 2900.0 * clay + 3000 * clay * clay; // [kg/m^3]
 
+  // For calculating K_bare.
+  SC = 0.736 + 0.19 * sand;                               // [?] wepp:7.9.5
+  Psi = 45.19 - 46.68 * SC;                               // [?] wepp:7.9.6
+  C = bound (0.0001, -0.0028 + 0.0113 * sand + 0.125 * clay / CEC,
+             0.01);        // wepp:7.9.8
+  b = 63.0 + 62.7 * std::log (50.0 * humus) + 1570.0 * clay
+    + 2500 * clay * clay;       // [mm] wepp:7.5.4
+  L_sand = 0.147 - 0.15 * sand * sand;
+  L_clay = 0.0003 * clay;
+
   // Baseline hydraulic conductivity 
   if (CEC <= 1.0)
     {
@@ -381,6 +430,7 @@ HydraulicWEPP::initialize_wepp (const Texture& texture,
   else
     K_b = 0.0066 * std::exp (2.44 / clay);
   tmp << "K_b = " << K_b << " mm/h";
+  K_bare = K_b;
   msg.debug (tmp.str ());
 }
 
@@ -519,18 +569,29 @@ HydraulicWEPP::HydraulicWEPP (const BlockModel& al)
     average_depth (al.number ("average_depth", -42.42e42)),
     CECr_fixed (al.number ("CECr", -42.42e42)),
     allow_negative_delta_pc (al.flag ("allow_negative_delta_pc")),
+    crust_thickness (al.number ("crust_thickness")),
     p_c (al.number ("consolidated_bulk_density", -42.42e42)),
     clay (-42.42e42),
     silt (-42.42e42),
     humus (-42.42e42),
     delta_pmx_clay (-42.42e42),
     K_b (-42.42e42),
+    SC (-42.42e42),
+    Psi (-42.42e42),
+    C (-42.42e42),
+    b (-42.42e42),
+    L_sand (-42.42e42),
+    L_clay (-42.42e42),
     p_t (al.number ("p_t", -42.42e42)),
     delta_pmx (al.number ("delta_pmx")),
     delta_pc (al.number ("delta_pc")),
+    RRi (al.number ("RRi")),
     day_count (al.number ("day_count")),
     R_c (al.number ("R_c")),
     rho_b (-42.42e42),
+    E_a (al.number ("E_a")),
+    RRt (al.number ("RRt")),
+    K_bare (-42.42e42),
     freeze_effect (al.number ("freeze_effect")),
     freeze_on (al.number ("freeze_on")),
     freeze_off (al.number ("freeze_off")),
@@ -618,9 +679,16 @@ By default, this will be consolidated dry bulk density per wepp.");
     frame.declare ("delta_pc", "kg/m^3", Attribute::State,
                    "Potential dry bulk density change due to time.");
     frame.set ("delta_pc", 0.0);
+    frame.declare ("RRi", "kg/m^3", Attribute::State,
+                   "Random roughness after last tillage.");
+    frame.set ("RRi", 0.0);
     frame.declare_boolean ("allow_negative_delta_pc", Attribute::Const, "\
 Allow 'delta_pc' to be negative after tillage.");
     frame.set ("allow_negative_delta_pc", false);
+    frame.declare ("crust_thickness", "m",
+                   Check::positive (), Attribute::Const, 
+                   "Thickness of soil layer that form crust after rain.");
+    frame.set ("crust_thickness", 0.005);
     frame.declare ("day_count", "d", Check::non_negative (), Attribute::State, 
                    "Number of days since last tillage.");
     frame.set ("day_count", 0.0);
@@ -629,6 +697,14 @@ Allow 'delta_pc' to be negative after tillage.");
     frame.set ("R_c", 0.0);
     frame.declare ("rho_b", "g/cm^3", Attribute::LogOnly,
                    "Current dry bulk density.");
+    frame.declare ("E_a", "J/m^2", Check::non_negative (), Attribute::State, 
+                   "Energy in rain since last tillage.");
+    frame.set ("E_a", 0.0);
+    frame.declare ("K_bare", "mm/h", Attribute::LogOnly, 
+                   "Bare soil conductivity.");
+    frame.declare ("RRt", "m", Check::positive (), Attribute::State, 
+                   "Random roughness.");
+    frame.set ("RRt", 0.013);
     frame.declare ("freeze_effect", "kg/m^3", Check::non_negative (),
                    Attribute::Const, "\
 Maximum decrease of bulk density from frost.\n\
