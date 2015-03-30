@@ -99,7 +99,7 @@ public:
                      std::vector<double>& residuals_C_soil,
                      double dt, Treelog&) = 0;
   virtual void emerge () = 0;
-  virtual const Harvest& harvest (const Metalib&, symbol column_name,
+  virtual const Harvest& harvest (symbol column_name,
 				  const Time&, const Geometry&, 
 				  double stub_length,
 				  double stem_harvest,
@@ -114,7 +114,7 @@ public:
 				  std::vector<double>& residuals_C_soil,
                                   bool combine,
 				  Treelog&) = 0;
-  virtual const Harvest& pluck (const Metalib&, const symbol column_name,
+  virtual const Harvest& pluck (const symbol column_name,
                                 const Time& time,
                                 const Geometry& geometry,
                                 const double stem_harvest,
@@ -127,7 +127,7 @@ public:
                                 std::vector<double>& residuals_N_soil,
                                 std::vector<double>& residuals_C_soil,
                                 Treelog& msg);
-  void kill (const Metalib&, symbol, const Time&, const Geometry&,
+  void kill (symbol, const Time&, const Geometry&,
 	     std::vector<AM*>& residuals, 
 	     double& residuals_DM, 
 	     double& residuals_N_top, double& residuals_C_top,

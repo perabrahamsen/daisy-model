@@ -49,6 +49,7 @@ static const double m2_per_cm2 = 0.0001;
 
 class CropSimple : public Crop
 {
+  const Metalib& metalib;
 public:
   // Canopy.
   const PLF LAIvsT;		// LAI as a function of time.
@@ -141,8 +142,7 @@ public:
       day = std::max (day, T_emergence - 0.1);
 
   }
-  const Harvest& harvest (const Metalib&, 
-                          symbol column_name,
+  const Harvest& harvest (symbol column_name,
 			  const Time&, const Geometry&, 
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
@@ -310,8 +310,7 @@ CropSimple::tick (const Metalib&, const Time& time, const Bioclimate& bioclimate
 }
 
 const Harvest&
-CropSimple::harvest (const Metalib& metalib, 
-                     const symbol column_name,
+CropSimple::harvest (const symbol column_name,
 		     const Time& time,
 		     const Geometry& geo,
 		     double /* stub_length */,
@@ -449,7 +448,8 @@ CropSimple::check (const Units& units, const Geometry& geo, Treelog& msg) const
 }
 
 CropSimple::CropSimple (const BlockModel& al)
-  : Crop (al),
+  : metalib (al.metalib ()),
+    Crop (al),
     LAIvsT (al.check ("LAIvsTS") ? al.plf ("LAIvsTS") : al.plf ("LAIvsDay")),
     forced_LAI (al.number ("forced_LAI")),
     canopy (submodel<CanopySimple> (al, "Canopy")),

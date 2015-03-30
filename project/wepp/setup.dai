@@ -10,21 +10,26 @@
 
 ;; Shared management.
 (defaction plowing_ror swap 
+  (random_roughness 24 [mm])
   (middle -12.5)
   (depth -25.0))
 
 (defaction stubble_cultivation_ror mix -6.0
+  (random_roughness 15 [mm])
   (surface_loose 1.0 [])
   (penetration 0.6))
 
 (defaction seed_bed_preparation_ror mix -6.0 
+  (random_roughness 12 [mm])
   (penetration 0.6)
   (surface_loose 1.0 []))
 
 (defaction rotavation mix -5.0
+  (random_roughness 15 [mm])
   (surface_loose 1.0 []))
  
 (defaction sow_tillage mix -1.0
+  (random_roughness 12 [mm])
   (penetration 0.0 [])
   (surface_loose 0.4 [])
   )
@@ -219,9 +224,9 @@
 ;;(run led4)
 ;;(run sims)
 
-(run plot)
+;;(run plot)
 
-;;(run both)
+(run both)
 
 
 ;;; setup.dai ends here.

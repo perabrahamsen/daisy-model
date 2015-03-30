@@ -2,15 +2,17 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * WEPP
 
-** Marie data
-
 ** K
 
-*** RR0 til tillage.dai
+*** Udregn AOM15 i soil.C
 
-*** Spørg mes om br
+*** planter
 
-*** K_bare
+** Marie data
+
+* Check FAO_PM
+
+Signe fik alt for høje RefEvap-Used og lave udbytter med FAO_PM.
 
 * Pestpore
 
@@ -30,7 +32,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Kopier X61 HD, sluk maskine
 
-* Installar Daisy build på HP.
+* Installer Daisy build på HP.
 
 
 * Biopore flow 

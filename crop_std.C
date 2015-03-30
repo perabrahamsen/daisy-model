@@ -155,8 +155,7 @@ struct CropStandard : public Crop
              double dt, Treelog&);
   void emerge ()
   { development->DS = -1e-10; }
-  const Harvest& harvest (const Metalib& metalib, 
-                          symbol column_name,
+  const Harvest& harvest (symbol column_name,
 			  const Time&, const Geometry&,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
@@ -168,8 +167,7 @@ struct CropStandard : public Crop
 			  std::vector<double>& residuals_C_soil,
                           const bool combine,
 			  Treelog&);
-  const Harvest& pluck (const Metalib& metalib, 
-                        const symbol column_name,
+  const Harvest& pluck (const symbol column_name,
                         const Time& time,
                         const Geometry& geometry,
                         const double stem_harvest,
@@ -644,8 +642,7 @@ CropStandard::tick (const Metalib& metalib,
 }
 
 const Harvest&
-CropStandard::harvest (const Metalib& metalib, 
-                       const symbol column_name,
+CropStandard::harvest (const symbol column_name,
 		       const Time& time,
 		       const Geometry& geometry,
 		       const double stub_length,
@@ -688,7 +685,7 @@ CropStandard::harvest (const Metalib& metalib,
     }
 
   const Harvest& harvest 
-    = harvesting->harvest (metalib, column_name, objid, 
+    = harvesting->harvest (column_name, objid, 
                            root_system->Density,
                            time, geometry, production, development->DS,
                            stem_harvest, leaf_harvest, 1.0,
@@ -738,8 +735,7 @@ CropStandard::harvest (const Metalib& metalib,
 }
 
 const Harvest&
-CropStandard::pluck (const Metalib& metalib, 
-                     const symbol column_name,
+CropStandard::pluck (const symbol column_name,
                      const Time& time,
                      const Geometry& geometry,
                      const double stem_harvest,
@@ -759,7 +755,7 @@ CropStandard::pluck (const Metalib& metalib,
 
   // Harvest.
   const Harvest& harvest 
-    = harvesting->harvest (metalib, column_name, objid, 
+    = harvesting->harvest (column_name, objid, 
                            root_system->Density,
                            time, geometry, production, development->DS,
                            stem_harvest, leaf_harvest, sorg_harvest,

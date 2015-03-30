@@ -111,7 +111,7 @@ public:
                      std::vector<double>& residuals_C_soil,
                      double dt, Treelog&) = 0;
   virtual void force_production_stress  (double pstress) = 0;
-  virtual void kill_all (const Metalib&, symbol, const Time&, const Geometry&,
+  virtual void kill_all (symbol, const Time&, const Geometry&,
 			 std::vector<AM*>& residuals, 
 			 double& residuals_DM,
 			 double& residuals_N_top, double& residuals_C_top,
@@ -119,7 +119,7 @@ public:
 			 std::vector<double>& residuals_C_soil,
 			 Treelog&) = 0;
   virtual void emerge (symbol crop_name, Treelog&) = 0;
-  virtual void harvest (const Metalib&, symbol column_name,
+  virtual void harvest (symbol column_name,
 			symbol crop_name,
 			const Time&, const Geometry&, 
 			double stub_length,
@@ -137,7 +137,7 @@ public:
 			std::vector<double>& residuals_C_soil,
                         const bool combine,
 			Treelog&) = 0;
-  virtual void pluck (const Metalib&, symbol column_name,
+  virtual void pluck (symbol column_name,
                       symbol crop_name,
                       const Time&, const Geometry&, 
                       double stem_harvest,

@@ -47,8 +47,7 @@ static double DM_to_C_factor (double E)
 }
 
 const Harvest&
-Harvesting::harvest (const Metalib& metalib, 
-                     const symbol column_name,
+Harvesting::harvest (const symbol column_name,
                      const symbol crop_name,
                      const std::vector<double>& density,
                      const Time& time,
@@ -586,7 +585,8 @@ above ground.");
 }
 
 Harvesting::Harvesting (const Block& al)
-  : Stem (al.model_sequence ("Stem")),
+  : metalib (al.metalib ()),
+    Stem (al.model_sequence ("Stem")),
     Leaf (al.model_sequence ("Leaf")),
     Dead (al.model_sequence ("Dead")),
     SOrg (al.model_sequence ("SOrg")),

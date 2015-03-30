@@ -258,11 +258,9 @@ struct OrganicStandard : public OrganicMatter
   double CO2 (size_t i) const;	// [g C/cm設
   double CO2_fast (size_t i) const;	// [g C/cm設
   void mix (const Geometry&, const Soil&, const SoilWater&,
-	    double from, double to, double penetration,
-	    const Time& time);
+	    double from, double to, double penetration);
   void swap (const Geometry&, const Soil&, const SoilWater&, 
-	     double from, double middle, double to,
-	     const Time& time);
+	     double from, double middle, double to);
 
   // Communication with external model.
   double get_smb_c_at (size_t i) const; // [g C/cm設
@@ -1367,8 +1365,7 @@ void
 OrganicStandard::mix (const Geometry& geo, const Soil& soil,
                       const SoilWater& soil_water,
                       const double from, const double to, 
-                      const double penetration,
-                      const Time&)
+                      const double penetration)
 {
   buffer.mix (geo, from, to);
   for (size_t i = 0; i < am.size (); i++)
@@ -1402,8 +1399,7 @@ OrganicStandard::get_smb_c_at (size_t i) const // [g C/cm設
 void 
 OrganicStandard::swap (const Geometry& geo, const Soil& soil,
                        const SoilWater& soil_water,
-                       const double from, const double middle, const double to,
-                       const Time&)
+                       const double from, const double middle, const double to)
 {
   buffer.swap (geo, from, middle, to);
   for (size_t i = 0; i < am.size (); i++)

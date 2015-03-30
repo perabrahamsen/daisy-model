@@ -43,6 +43,8 @@
 #include "secondary.h"
 #include "zone.h"
 #include "water.h"
+#include "soil_water.h"
+#include "organic.h"
 #include <sstream>
 
 struct Soil::Implementation
@@ -156,13 +158,17 @@ struct Soil::Implementation
   }
   
   void tillage (const Geometry& geo, const double from, const double to,
-                const double surface_loose, const SoilWater& soil_water)
+                const double surface_loose, const double RR0, 
+                const SoilWater& soil_water, 
+                const OrganicMatter& organic_matter)
   {
     // Water content.
     std::map<const Horizon*, double> water;
     for (std::size_t c = 0; c < geo.cell_size (); c++)
       if (geo.fraction_in_z_interval (c, from, to) > 0.01)
         water[horizon_[c]] += soil_water.Theta (c) * geo.cell_volume (c);
+
+    const double AOM15 = 0.3;   // [kg/m^2] TODO: beregn
 
     for (std::map<const Horizon*, double>::const_iterator i = water.begin ();
          i != water.end ();
@@ -173,7 +179,7 @@ struct Soil::Implementation
         const double total_volume = volume[hor];
         daisy_assert (total_water < total_volume);
         const double Theta = total_water / total_volume;
-        hor->hydraulic->tillage (surface_loose, Theta);
+        hor->hydraulic->tillage (surface_loose, RR0, Theta, AOM15);
       }
   }
   void tick (const double dt, const double rain, const Geometry& geo,
@@ -312,8 +318,11 @@ Soil::dispersivity_transversal (size_t c) const
 
 void 
 Soil::tillage (const Geometry& geo, const double from, const double to,
-               const double surface_loose, const SoilWater& soil_water)
-{ impl->tillage (geo, from, to, surface_loose, soil_water); }
+               const double surface_loose, const double RR0, 
+               const SoilWater& soil_water,
+               const OrganicMatter& organic_matter)
+{ impl->tillage (geo, from, to, surface_loose, RR0, 
+                 soil_water, organic_matter); }
 
 void
 Soil::tick (const double dt, const double rain, const Geometry& geo,

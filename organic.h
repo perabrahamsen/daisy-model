@@ -69,11 +69,9 @@ public:
   virtual double CO2 (size_t i) const = 0;	// [g C/cm^3/h]
   virtual double CO2_fast (size_t i) const = 0;	// [g C/cm^3/h]
   virtual void mix (const Geometry&, const Soil&, const SoilWater&,
-                    double from, double to, double penetration,
-                    const Time& time) = 0;
+                    double from, double to, double penetration) = 0;
   virtual void swap (const Geometry&, const Soil&, const SoilWater&, 
-                     double from, double middle, double to,
-                     const Time& time) = 0;
+                     double from, double middle, double to) = 0;
 
   // Communication with external model.
   virtual double get_smb_c_at (size_t i) const = 0; // [g C/cm³]

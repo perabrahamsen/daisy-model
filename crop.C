@@ -70,7 +70,7 @@ Crop::albedo () const
 { return 0.20; }
 
 const Harvest&
-Crop::pluck (const Metalib&, const symbol, const Time&, const Geometry&,
+Crop::pluck (const symbol, const Time&, const Geometry&,
              const double, const double, const double,
              std::vector<AM*>& residuals,
              double& residuals_DM,
@@ -82,18 +82,14 @@ Crop::pluck (const Metalib&, const symbol, const Time&, const Geometry&,
 { throw objid + " is unpluckable"; }
 
 void
-Crop::kill (const Metalib& metalib, 
-            const symbol name, const Time& time, const Geometry& geo,
+Crop::kill (const symbol name, const Time& time, const Geometry& geo,
 	    std::vector<AM*>& residuals, double& residuals_DM,
 	    double& residuals_N_top, double& residuals_C_top,
 	    std::vector<double>& residuals_N_soil, 
             std::vector<double>& residuals_C_soil,
 	    Treelog& out)
 { 
-#if defined (_MSC_VER)  
-  const Harvest& dummy = // MS Visual C++ 2003 sucks.
-#endif 
-    harvest (metalib, name, time, geo, 
+    harvest (name, time, geo, 
              0.0, 0.0, 0.0, 0.0, true, residuals, 
              residuals_DM, residuals_N_top, residuals_C_top, 
              residuals_N_soil, residuals_C_soil, false, out); 

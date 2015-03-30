@@ -263,7 +263,9 @@ WSourceCombine::find_source (const symbol key) const
     }
 
   // Nope.
-  // Assertion::message ("No source found for '" + key + "'");
+#if 0
+  Assertion::message (" source found for '" + key + "'");
+#endif
   return *reserve;
 }
 
@@ -292,7 +294,9 @@ WSourceCombine::find_end (const symbol key) const
     }
 
   // Nope.
-  // Assertion::message ("No end source found for '" + key + "'");
+#if 0
+  Assertion::message ("No end source found for '" + key + "'");
+#endif
   return *reserve;
 }
 
@@ -516,7 +520,7 @@ List of weather sources.", WSourceCombine::Entry::load_syntax);
   frame.declare_object ("reserve", WSource::component,
                         Attribute::State, Attribute::Singleton, "\
 Reserve weather model to use when no source match.");
-  frame.set ("reserve", "none");
+  frame.set ("reserve", "null");
   }
 } WSourceCombine_syntax;
 

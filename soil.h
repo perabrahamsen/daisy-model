@@ -23,7 +23,6 @@
 #ifndef SOIL_H
 #define SOIL_H
 
-#include "soil_water.h"
 #include "symbol.h"
 #include <vector>
 #include <set>
@@ -38,6 +37,8 @@ class Frame;
 class Block;
 class Treelog;
 class Time;
+class SoilWater;
+class OrganicMatter;
 
 class Soil : private boost::noncopyable
 {
@@ -64,7 +65,8 @@ public:
   double dispersivity (size_t) const;
   double dispersivity_transversal (size_t) const;  
   void tillage (const Geometry& geo, const double from, const double to,
-                const double surface_loose, const SoilWater& soil_water);
+                const double surface_loose, const double RR0, 
+                const SoilWater& soil_water, const OrganicMatter&);
   void tick (const double dt /* [h] */, const double rain /* [mm] */,
              const Geometry& geo, const SoilWater& soil_water, Treelog&);
   void set_porosity (size_t i, double Theta);

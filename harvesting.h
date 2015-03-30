@@ -41,6 +41,8 @@ class Treelog;
 
 class Harvesting 
 {
+  const Metalib& metalib;
+
   // Parameters.
 private:
   const std::vector<boost::shared_ptr<const FrameModel>/**/>& Stem; // Stem AM parameters.
@@ -72,7 +74,7 @@ public:
                                 // plant and imply a mix operation.
   // Simulation.
 public:
-  const Harvest& harvest (const Metalib&, symbol column_name,
+  const Harvest& harvest (symbol column_name,
                           symbol crop_name,
                           const std::vector<double>& density,
                           const Time& time,

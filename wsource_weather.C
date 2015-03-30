@@ -744,9 +744,10 @@ WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
            i++)
         { 
           const symbol meta = i->first;
+          daisy_assert (meta != Attribute::None ());
           const symbol key = Weatherdata::meta_key (meta);
           std::deque<double>& data = i->second;
-          if (key == Attribute::Unknown ())
+          if (key == Attribute::None ())
             {
               if (source.end_check (meta))
                 data.push_back (source.end_number (meta));
@@ -783,7 +784,7 @@ WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
           const symbol meta = i->first;
           const symbol key = Weatherdata::meta_key (meta);
           std::deque<symbol>& data = i->second;
-          if (key == Attribute::Unknown ())
+          if (key == Attribute::None ())
             {
               if (source.end_check (meta))
                 data.push_back (source.end_name (meta));

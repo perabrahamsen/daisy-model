@@ -60,10 +60,10 @@ struct OrganicNone : public OrganicMatter
   double CO2_fast (size_t) const	// [g C/cm³]
   { return 0.0; }
   void mix (const Geometry&, const Soil&, const SoilWater&,
-	    double, double, double, const Time&)
+	    double, double, double)
   { }
   void swap (const Geometry&, const Soil&, const SoilWater&, 
-	     double, double, double, const Time&)
+	     double, double, double)
   { }
 
   // Communication with external model.

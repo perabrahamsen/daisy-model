@@ -67,26 +67,22 @@ struct Field::Implementation
                   const Time&, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (symbol crop, Treelog&);
-  void harvest (const Metalib& metalib, 
-                const Time&, symbol name,
+  void harvest (const Time&, symbol name,
 		double stub_length, 
 		double stem_harvest, 
 		double leaf_harvest, 
 		double sorg_harvest,
                 const bool combine,
 		std::vector<const Harvest*>&, Treelog&);
-  void pluck (const Metalib& metalib, 
-              const Time&, symbol name,
+  void pluck (const Time&, symbol name,
               double stem_harvest, 
               double leaf_harvest, 
               double sorg_harvest,
               std::vector<const Harvest*>&, Treelog&);
-  void mix (const Metalib& metalib, 
-            double from, double to, double penetration, double surface_loose,
-            const Time&, Treelog&);
-  void swap (const Metalib& metalib, 
-             double from, double middle, double to, 
-             const Time&, Treelog&);
+  void mix (double from, double to, double penetration, double surface_loose,
+            const double RR0, const Time&, Treelog&);
+  void swap (double from, double middle, double to, 
+             const double RR0, const Time&, Treelog&);
   void set_porosity (double at, double Theta, Treelog& msg);
   void set_heat_source (double at, double value);
   void spray_overhead (symbol chemical, double amount, Treelog&); // [g/ha]
@@ -285,8 +281,7 @@ Field::Implementation::emerge (symbol name, Treelog& out)
 }
 
 void
-Field::Implementation::harvest (const Metalib& metalib, 
-                                const Time& time, 
+Field::Implementation::harvest (const Time& time, 
                                 const symbol name,
 				const double stub_length, 
 				const double stem_harvest, 
@@ -299,7 +294,7 @@ Field::Implementation::harvest (const Metalib& metalib,
   if (selected)
     {
       Treelog::Open nest (out, selected->objid);
-      selected->harvest (metalib, time, name,
+      selected->harvest (time, name,
 			 stub_length,
 			 stem_harvest, leaf_harvest, sorg_harvest, combine, 
                          total, out);
@@ -311,7 +306,7 @@ Field::Implementation::harvest (const Metalib& metalib,
 	   i++)
 	{
 	  Treelog::Open nest (out, (*i)->objid);
-	  (*i)->harvest (metalib, time, name,
+	  (*i)->harvest (time, name,
 			 stub_length,
 			 stem_harvest, leaf_harvest, sorg_harvest, combine,
                          total, out);
@@ -320,8 +315,7 @@ Field::Implementation::harvest (const Metalib& metalib,
 }
 
 void
-Field::Implementation::pluck (const Metalib& metalib, 
-                              const Time& time, 
+Field::Implementation::pluck (const Time& time, 
                               const symbol name,
                               const double stem_harvest, 
                               const double leaf_harvest, 
@@ -332,7 +326,7 @@ Field::Implementation::pluck (const Metalib& metalib,
   if (selected)
     {
       Treelog::Open nest (out, selected->objid);
-      selected->pluck (metalib, time, name,
+      selected->pluck (time, name,
                        stem_harvest, leaf_harvest, sorg_harvest, 
                        total, out);
     }
@@ -343,7 +337,7 @@ Field::Implementation::pluck (const Metalib& metalib,
 	   i++)
 	{
 	  Treelog::Open nest (out, (*i)->objid);
-	  (*i)->pluck (metalib, time, name,
+	  (*i)->pluck (time, name,
                        stem_harvest, leaf_harvest, sorg_harvest, 
                        total, out);
 	}
@@ -351,43 +345,43 @@ Field::Implementation::pluck (const Metalib& metalib,
 }
 
 void 
-Field::Implementation::mix (const Metalib& metalib, 
-                            const double from, const double to,
-                            double penetration, double surface_loose, 
-                            const Time& time,
+Field::Implementation::mix (const double from, const double to,
+                            const double penetration,
+                            const double surface_loose, 
+                            const double RR0, const Time& time,
 			    Treelog& msg)
 {
   if (selected)
     {
       Treelog::Open nest (msg, selected->objid); 
-      selected->mix (metalib, from, to, penetration, surface_loose, time, msg);
+      selected->mix (from, to, penetration, surface_loose, RR0, 
+                     time, msg);
     }
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
     {
       Treelog::Open nest (msg, (*i)->objid);
-      (*i)->mix (metalib, from, to, penetration, surface_loose, time, msg);
+      (*i)->mix (from, to, penetration, surface_loose, RR0, time, msg);
     }
 }
 
 void 
-Field::Implementation::swap (const Metalib& metalib, 
-                             const double from, const double middle, 
+Field::Implementation::swap (const double from, const double middle, 
                              const double to, 
-                             const Time& time, Treelog& msg)
+                             const double RR0, const Time& time, Treelog& msg)
 {
   if (selected)
     {
       Treelog::Open nest (msg, selected->objid);
-      selected->swap (metalib, from, middle, to, time, msg);
+      selected->swap (from, middle, to, RR0, time, msg);
     }
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
     {
       Treelog::Open nest (msg, (*i)->objid);
-      (*i)->swap (metalib, from, middle, to, time, msg);
+      (*i)->swap (from, middle, to, RR0, time, msg);
     }
 }
 
@@ -858,42 +852,36 @@ Field::emerge (symbol name, Treelog& msg)
 { impl->emerge (name, msg); }
 
 void
-Field::harvest (const Metalib& metalib, 
-                const Time& time, const symbol name,
+Field::harvest (const Time& time, const symbol name,
 		const double stub_length, 
 		const double stem_harvest, 
 		const double leaf_harvest, 
 		const double sorg_harvest,
                 const bool combine,
 		std::vector<const Harvest*>& total, Treelog& msg)
-{ impl->harvest (metalib, time, name,
-		stub_length,
+{ impl->harvest (time, name, stub_length,
 		stem_harvest, leaf_harvest, sorg_harvest, combine, 
                 total, msg); }
 
 void
-Field::pluck (const Metalib& metalib, 
-              const Time& time, const symbol name,
+Field::pluck (const Time& time, const symbol name,
               const double stem_harvest, 
               const double leaf_harvest, 
               const double sorg_harvest,
               std::vector<const Harvest*>& total, Treelog& msg)
-{ impl->pluck (metalib, time, name,
-               stem_harvest, leaf_harvest, sorg_harvest, 
+{ impl->pluck (time, name, stem_harvest, leaf_harvest, sorg_harvest, 
                total, msg); }
 
 void 
-Field::mix (const Metalib& metalib, 
-            const double from, const double to, 
+Field::mix (const double from, const double to, 
             const double penetration, const double surface_loose, 
-            const Time& time, Treelog& msg)
-{ impl->mix (metalib, from, to, penetration, surface_loose, time, msg); }
+            const double RR0, const Time& time, Treelog& msg)
+{ impl->mix (from, to, penetration, surface_loose, RR0, time, msg); }
 
 void 
-Field::swap (const Metalib& metalib, 
-             const double from, const double middle, const double to, 
-             const Time& time, Treelog& msg)
-{ impl->swap (metalib, from, middle, to, time, msg); }
+Field::swap (const double from, const double middle, const double to, 
+             const double RR0, const Time& time, Treelog& msg)
+{ impl->swap (from, middle, to, RR0, time, msg); }
 
 void 
 Field::set_porosity (const double at, const double Theta, Treelog& msg)

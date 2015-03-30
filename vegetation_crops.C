@@ -176,7 +176,7 @@ struct VegetationCrops : public Vegetation
              double dt,
              Treelog&);
   void force_production_stress  (double pstress);
-  void kill_all (const Metalib&, symbol, const Time&, const Geometry&,
+  void kill_all (symbol, const Time&, const Geometry&,
                  std::vector<AM*>& residuals, 			 
 		 double& residuals_DM,
 		 double& residuals_N_top, double& residuals_C_top,
@@ -184,7 +184,7 @@ struct VegetationCrops : public Vegetation
 		 std::vector<double>& residuals_C_soil,
 		 Treelog&);
   void emerge (symbol crop_name, Treelog&);
-  void harvest (const Metalib&, symbol column_name, symbol crop_name,
+  void harvest (symbol column_name, symbol crop_name,
 		const Time&, const Geometry&,
 		double stub_length,
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
@@ -197,7 +197,7 @@ struct VegetationCrops : public Vegetation
 		std::vector<double>& residuals_C_soil,
                 const bool combine,
 		Treelog&);
-  void pluck (const Metalib&, symbol column_name,
+  void pluck (symbol column_name,
               symbol crop_name,
               const Time&, const Geometry&, 
               double stem_harvest,
@@ -652,8 +652,7 @@ VegetationCrops::force_production_stress (double pstress)
 }
 
 void
-VegetationCrops::kill_all (const Metalib& metalib, 
-                           symbol name, const Time& time, 
+VegetationCrops::kill_all (symbol name, const Time& time, 
 			   const Geometry& geo, 
 			   std::vector<AM*>& residuals,
 			   double& residuals_DM,
@@ -666,7 +665,7 @@ VegetationCrops::kill_all (const Metalib& metalib,
        crop != crops.end(); 
        crop++)
     {
-      (*crop)->kill (metalib, name, time, geo, residuals, 
+      (*crop)->kill (name, time, geo, residuals, 
 		     residuals_DM, residuals_N_top, residuals_C_top,
 		     residuals_N_soil, residuals_C_soil, msg);
       delete *crop;
@@ -690,8 +689,7 @@ VegetationCrops::emerge (const symbol crop_name, Treelog&)
 
 
 void
-VegetationCrops::harvest (const Metalib& metalib,
-                          const symbol column_name,
+VegetationCrops::harvest (const symbol column_name,
 			  const symbol crop_name,
 			  const Time& time, 
 			  const Geometry& geo, 
@@ -726,7 +724,7 @@ VegetationCrops::harvest (const Metalib& metalib,
         const bool root_fruit = (sorg_height < 0.0);
         min_height = std::min (min_height, sorg_height);
 	const Harvest& mine = 
-	  (*crop)->harvest (metalib, column_name, time, 
+	  (*crop)->harvest (column_name, time, 
 			    geo, 
 			    stub_length, stem_harvest,
 			    leaf_harvest, sorg_harvest, 
@@ -766,7 +764,7 @@ VegetationCrops::harvest (const Metalib& metalib,
 }
 
 void 
-VegetationCrops::pluck (const Metalib& metalib, symbol column_name,
+VegetationCrops::pluck (symbol column_name,
                         symbol crop_name,
                         const Time& time, const Geometry& geo, 
                         double stem_harvest,
@@ -797,7 +795,7 @@ VegetationCrops::pluck (const Metalib& metalib, symbol column_name,
         const double old_residuals_C 
           = old_residuals_C_top + old_residuals_C_soil;
 	const Harvest& mine 
-          = (*crop)->pluck (metalib, column_name, time, geo, 
+          = (*crop)->pluck (column_name, time, geo, 
                             stem_harvest, leaf_harvest, sorg_harvest, 
                             residuals, 
                             residuals_DM, residuals_N_top, residuals_C_top,

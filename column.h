@@ -90,24 +90,24 @@ public:
                           const Time&, Treelog& msg) = 0;
   virtual void clear_second_year_utilization () = 0;
   virtual void emerge (symbol crop, Treelog&) = 0;
-  virtual void harvest (const Metalib&, const Time&, symbol name,
+  virtual void harvest (const Time&, symbol name,
 			double stub_length, 
 			double stem_harvest, 
 			double leaf_harvest, 
 			double sorg_harvest, 
                         const bool combine,
 			std::vector<const Harvest*>& harvest, Treelog&) = 0;
-  virtual void pluck (const Metalib&, 
-                      const Time& time, const symbol crop_name,
+  virtual void pluck (const Time& time, const symbol crop_name,
                       const double stem_harvest,
                       const double leaf_harvest,
                       const double sorg_harvest,
                       std::vector<const Harvest*>& harvest, 
                       Treelog& msg) = 0;
-  virtual void mix (const Metalib&, double from, double to, double penetration, 
-                    double surface_loose, const Time&, Treelog&) = 0;
-  virtual void swap (const Metalib&, double from, double middle, double to, 
-                     const Time&, Treelog&) = 0;
+  virtual void mix (double from, double to, double penetration, 
+                    double surface_loose, double RR0, 
+                    const Time&, Treelog&) = 0;
+  virtual void swap (double from, double middle, double to, 
+                     double RR0, const Time&, Treelog&) = 0;
   virtual void set_porosity (double at, double Theta, Treelog&) = 0;
   virtual void set_heat_source (double at, double value) = 0; // [W/m^2]
   virtual void spray_overhead (symbol chemical, double amount, Treelog&) = 0; // [g/ha]

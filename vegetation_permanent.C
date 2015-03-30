@@ -175,11 +175,11 @@ struct VegetationPermanent : public Vegetation
   { }
   void emerge (const symbol, Treelog&)
   { }
-  void kill_all (const Metalib&, symbol, const Time&, const Geometry&,
+  void kill_all (symbol, const Time&, const Geometry&,
 		 std::vector<AM*>&, double&, double&, double&, 
 		 std::vector<double>&, std::vector<double>&, Treelog&)
   { }
-  void harvest (const Metalib&, symbol, symbol,
+  void harvest (symbol, symbol,
 		const Time&, const Geometry&, 
 		double, double, double, double, 
 		std::vector<const Harvest*>&,
@@ -191,7 +191,7 @@ struct VegetationPermanent : public Vegetation
                 const bool,
 		Treelog&)
   { }
-  void pluck (const Metalib&, symbol, symbol,
+  void pluck (symbol, symbol,
               const Time&, const Geometry&, 
               double, double, double,
               std::vector<const Harvest*>&,

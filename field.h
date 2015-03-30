@@ -84,21 +84,17 @@ public:
                   const Time&, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (symbol crop, Treelog&);
-  void harvest (const Metalib& metalib, 
-                const Time&, symbol name,
+  void harvest (const Time&, symbol name,
 		double stub_length, 
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
                 bool combine,
 		std::vector<const Harvest*>&, Treelog&);
-  void pluck (const Metalib& metalib, 
-              const Time&, symbol name,
+  void pluck (const Time&, symbol name,
               double stem_harvest, double leaf_harvest, double sorg_harvest,
               std::vector<const Harvest*>&, Treelog&);
-  void mix (const Metalib& metalib, 
-            double from, double to, double penetration, double surface_loose,
-            const Time&, Treelog&);
-  void swap (const Metalib& metalib, 
-             double from, double middle, double to, 
+  void mix (double from, double to, double penetration, double surface_loose,
+            double RR0, const Time&, Treelog&);
+  void swap (double from, double middle, double to, double RR0,
              const Time&, Treelog&);
   void set_porosity (double at, double Theta, Treelog& msg);
   void set_heat_source (double at, double value); // [W/m^2]

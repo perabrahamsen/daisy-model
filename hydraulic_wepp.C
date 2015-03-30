@@ -69,7 +69,7 @@ class HydraulicWEPP : public Hydraulic
   double delta_pmx;             // rain bulk density change [kg/m^3]
   double delta_pc;             // time bulk density change [kg/m^3]
   double RRi;                  // Random roughness after last tillage [m]
-
+  double br;                   // Burried residue 0-15 cm. [kg DM/m^2]
   
   // Properties calculated by wepp daily.
   double day_count;             // Number of days since tillage [d]
@@ -102,7 +102,8 @@ class HydraulicWEPP : public Hydraulic
 public:
   void set_porosity (double)
   { throw ("Can't change porosity for WEPP hydraulic model"); }
-  void tillage (const double T_ds, const double Theta);
+  void tillage (const double T_ds, const double RR0, const double Theta,
+                const double AOM15);
   void calculate_rho_b ();
   void tick (const double dt, const double rain, const double ice, Treelog& msg);
   void output (Log& log) const;
@@ -135,7 +136,8 @@ public:
 };
 
 void 
-HydraulicWEPP::tillage (const double T_ds, const double Theta)
+HydraulicWEPP::tillage (const double T_ds, const double RR0, const double Theta,
+                        const double AOM15)
 {
   daisy_assert (T_ds >= 0.0 && T_ds <= 1.0);
   const double p_tm1 = rho_b * (100.0 * 100.0 * 100.0) / 1000.0; // [kg/m^3]
@@ -183,8 +185,10 @@ HydraulicWEPP::tillage (const double T_ds, const double Theta)
   Assertion::message (tmp.str ());
 
   // Random roughness.
-  const double RR0 = 0.013;              // [m] TODO: should be in tillage file
   RRi = RR0 * T_ds + RRt * (1.0 - T_ds); // [m]
+  static const double c_fraction_in_humus = 0.587;
+  br = std::min (AOM15 / c_fraction_in_humus,
+                 0.3); // [kg DM/m^2]
 
   day_count = 0.0;                                // [d]
   R_c = 0.0;                                      // [m]
@@ -244,10 +248,6 @@ HydraulicWEPP::tick (const double dt /* [h] */, const double rain /* [mm] */,
     }
   hypres ();
 
-  // TODO: Hvad tæller med her: Alle AOM puljer, eller hvad der
-  // blev begravet i sidste jorbehandling? Og hvis AOM, er den så dynamisk?
-  const double br = 0.3;
-
   const double Cbr = 1.0 - 0.5 * br; // [] wepp:7.5.3
   const double p_b = rho_b 
     * (100.0 * 100.0 * 100.0) / 1000.0; // wepp units: [kg/m^3]
@@ -266,6 +266,7 @@ HydraulicWEPP::output (Log& log) const
   output_variable (delta_pmx, log);
   output_variable (delta_pc, log);
   output_variable (RRi, log);
+  output_variable (br, log);
   output_variable (day_count, log);
   output_variable (R_c, log);
   output_variable (rho_b, log);
@@ -586,6 +587,7 @@ HydraulicWEPP::HydraulicWEPP (const BlockModel& al)
     delta_pmx (al.number ("delta_pmx")),
     delta_pc (al.number ("delta_pc")),
     RRi (al.number ("RRi")),
+    br (al.number ("br")),
     day_count (al.number ("day_count")),
     R_c (al.number ("R_c")),
     rho_b (-42.42e42),
@@ -682,6 +684,9 @@ By default, this will be consolidated dry bulk density per wepp.");
     frame.declare ("RRi", "kg/m^3", Attribute::State,
                    "Random roughness after last tillage.");
     frame.set ("RRi", 0.0);
+    frame.declare ("br", "kg DM/m^2", Attribute::State,
+                   "Burried residue 0-15 cm at last tillage.");
+    frame.set ("br", 0.3);
     frame.declare_boolean ("allow_negative_delta_pc", Attribute::Const, "\
 Allow 'delta_pc' to be negative after tillage.");
     frame.set ("allow_negative_delta_pc", false);

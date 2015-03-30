@@ -106,4 +106,15 @@ controled, constant weather conditions.")
   }
 } WSourceNone_syntax;
 
+static struct WSourceMissingSyntax : public DeclareParam
+{ 
+  WSourceMissingSyntax ()
+    : DeclareParam (WSource::component, "null", "const", "\
+Missing weather data.\n\
+Use for indicating no weather data available.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} WSourceMissing_syntax;
+
 // wsource_const.C ends here.

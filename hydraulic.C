@@ -82,7 +82,7 @@ Hydraulic::set_porosity (double Theta)
 }
 
 void
-Hydraulic::tillage (double, double)
+Hydraulic::tillage (double, double, double, double)
 { }
 
 void 
