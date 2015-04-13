@@ -448,8 +448,8 @@ CropSimple::check (const Units& units, const Geometry& geo, Treelog& msg) const
 }
 
 CropSimple::CropSimple (const BlockModel& al)
-  : metalib (al.metalib ()),
-    Crop (al),
+  : Crop (al),
+    metalib (al.metalib ()),
     LAIvsT (al.check ("LAIvsTS") ? al.plf ("LAIvsTS") : al.plf ("LAIvsDay")),
     forced_LAI (al.number ("forced_LAI")),
     canopy (submodel<CanopySimple> (al, "Canopy")),

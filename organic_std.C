@@ -261,6 +261,19 @@ struct OrganicStandard : public OrganicMatter
 	    double from, double to, double penetration);
   void swap (const Geometry&, const Soil&, const SoilWater&, 
 	     double from, double middle, double to);
+  double AOM_C (const Geometry& geo, const double from, const double to) const
+  {
+    const size_t all_am_size = am.size ();
+    std::vector<AOM*> added;
+    for (size_t i = 0; i < all_am_size; i++)
+      am[i]->append_to (added);
+
+    double C = 0.0;
+    const size_t all_added_size = added.size ();
+    for (size_t i = 0; i < all_added_size; i++)
+      C += added[i]->soil_C (geo, from, to);
+    return C;
+  }
 
   // Communication with external model.
   double get_smb_c_at (size_t i) const; // [g C/cm³]

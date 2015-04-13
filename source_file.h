@@ -38,7 +38,8 @@ private:
 public:
   const symbol timestep;
 private:
-  bool use_sum;
+  const bool use_sum;
+  const bool use_all;
   int default_hour;
   const Timestep time_offset;
 protected:

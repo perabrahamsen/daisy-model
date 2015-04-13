@@ -32,15 +32,26 @@
 void
 SourceFile::add_entry (const Time& time, std::vector<double>& vals)
 {
+  const Time modified = time + time_offset;
+
   const double total = std::accumulate (vals.begin (), vals.end (), 0.0);
   if (use_sum)
     {
+      times.push_back (modified);
       values.push_back (total);
       ebars.push_back (0.0);
     }
+  else if (use_all)
+    {
+      for (size_t i = 0; i < vals.size (); i++)
+        {
+          times.push_back (modified);
+          values.push_back (vals[i]);
+          ebars.push_back (0.0);
+        }
+    }
   else
     {
-
       if (vals.size () > 1 && !explicit_with)
         with_ = "errorbars";
 
@@ -54,11 +65,10 @@ SourceFile::add_entry (const Time& time, std::vector<double>& vals)
         }
       variance /= N;
       const double std_deviation = sqrt (variance);
+      times.push_back (modified);
       values.push_back (mean);
       ebars.push_back (std_deviation);
     }
-  const Time modified = time + time_offset;
-  times.push_back (modified);
   daisy_assert (times.size () == values.size ());
   daisy_assert (values.size () == ebars.size ());
   vals.clear ();
@@ -115,9 +125,11 @@ Accumulate values.");
   frame.declare_string ("handle", Attribute::Const, "\
 Determine how to handle multiple simultaniously.  Possible values are:\n\
 \n\
+all: show all values.\n\
+\n\
 sum: use the sum of the values.\n\
 \n\
-normal: use the arithemetic average of the values, and calculate the\n\
+normal: use the arithmetic average of the values, and calculate the\n\
 standard deviation.");
   frame.declare_integer ("default_hour", Attribute::Const, "\
 Hour to assume when nothing else is specified;");
@@ -127,7 +139,7 @@ Hour to assume when nothing else is specified;");
 Add this to time from sources.\n\
 By default, use unmodified times.",
                            Timestep::load_syntax);
-  static VCheck::Enum handle_check ("sum", "normal");
+  static VCheck::Enum handle_check ("sum", "normal", "all");
   frame.set_check ("handle", handle_check);
   frame.set ("handle", "normal");
   frame.declare_string ("timestep", Attribute::Const, "\
@@ -144,6 +156,7 @@ SourceFile::SourceFile (const BlockModel& al)
     accumulate_ (al.flag ("accumulate")),
     timestep (al.name ("timestep")),
     use_sum (al.name ("handle") == "sum"),
+    use_all (al.name ("handle") == "all"),
     default_hour (al.integer ("default_hour")),
     time_offset (submodel_value<Timestep> (al, "time_offset"))
 { }

@@ -65,6 +65,8 @@ struct OrganicNone : public OrganicMatter
   void swap (const Geometry&, const Soil&, const SoilWater&, 
 	     double, double, double)
   { }
+  double AOM_C (const Geometry&, double, double) const
+  { return 0.0; }
 
   // Communication with external model.
   double get_smb_c_at (size_t) const // [g C/cm³]

@@ -60,6 +60,7 @@ private:
   std::vector<double> T_;
   std::vector<double> S;
   std::vector<double> capacity_old;
+  std::vector<double> capacity_apparent_;
   std::vector<double> conductivity_;
 public:
   double T_top () const;	// [dg C]

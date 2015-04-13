@@ -398,9 +398,9 @@ ColumnStandard::mix (const double from, const double to,
                         residuals_DM, residuals_N_top, residuals_C_top, 
                         residuals_N_soil, residuals_C_soil, msg);
   add_residuals (residuals);
+  mix_it (from, to, penetration, msg);
   soil->tillage (geometry, from, to, surface_loose, RR0, 
                  *soil_water, *organic_matter);
-  mix_it (from, to, penetration, msg);
   surface.unridge ();
   litter->update (organic_matter->top_DM ());
 }

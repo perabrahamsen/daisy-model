@@ -168,7 +168,12 @@ struct Soil::Implementation
       if (geo.fraction_in_z_interval (c, from, to) > 0.01)
         water[horizon_[c]] += soil_water.Theta (c) * geo.cell_volume (c);
 
-    const double AOM15 = 0.3;   // [kg/m^2] TODO: beregn
+    static const double c_fraction_in_humus = 0.587;
+    static const double aom_from = 0.0; // [cm]
+    static const double aom_to = -15.0; // [cm]
+    const double AOM_C = organic_matter.AOM_C (geo, aom_from, aom_to)
+      / geo.surface_area ();    // [g C/cm^2]
+    const double AOM15 = 10.0 * AOM_C / c_fraction_in_humus;   // [kg/m^2]
 
     for (std::map<const Horizon*, double>::const_iterator i = water.begin ();
          i != water.end ();

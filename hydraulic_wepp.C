@@ -93,6 +93,9 @@ class HydraulicWEPP : public Hydraulic
   double l;         // tortuosity parameter
   PLF M_;
   double K_15;
+  double K_30;
+  double K_60;
+  double K_120;
   double K_fc;
   double K_wp;
   double Theta_fc;
@@ -174,7 +177,7 @@ HydraulicWEPP::tillage (const double T_ds, const double RR0, const double Theta,
     }
   else
     delta_pc = p_c - p_t01m;
-  tmp << "delta_pc = " << delta_pc << "; p_c = " << p_c
+  tmp << "AOM15 = " << AOM15 << "; delta_pc = " << delta_pc << "; p_c = " << p_c
       << "; p_t01m = " << p_t01m  << "; R_c = " << R_c << "; E_a = " << E_a
       << "; p_t = " << p_t 
       << "; delta_pmx = " << delta_pmx 
@@ -186,9 +189,7 @@ HydraulicWEPP::tillage (const double T_ds, const double RR0, const double Theta,
 
   // Random roughness.
   RRi = RR0 * T_ds + RRt * (1.0 - T_ds); // [m]
-  static const double c_fraction_in_humus = 0.587;
-  br = std::min (AOM15 / c_fraction_in_humus,
-                 0.3); // [kg DM/m^2]
+  br = std::min (AOM15, 0.3); // [kg DM/m^2]
 
   day_count = 0.0;                                // [d]
   R_c = 0.0;                                      // [m]
@@ -279,6 +280,9 @@ HydraulicWEPP::output (Log& log) const
   output_variable (l, log);
   output_variable (K_sat, log);
   output_variable (K_15, log);
+  output_variable (K_30, log);
+  output_variable (K_60, log);
+  output_variable (K_120, log);
   output_variable (K_fc, log);
   output_variable (K_wp, log);
   output_variable (Theta_sat, log);
@@ -554,6 +558,9 @@ HydraulicWEPP::hypres ()
   const double h_fc = -100.0;
   const double h_wp = -15000.0;
   K_15 = K (-1.5);
+  K_30 = K (-3.0);
+  K_60 = K (-6.0);
+  K_120 = K (-12.0);
   K_fc = K (h_fc);
   K_wp = K (h_wp);
   Theta_fc = Theta (h_fc);
@@ -740,6 +747,12 @@ the `freeze_effect' trigger.");
                    "Water conductivity of saturated soil.");
     frame.declare ("K_15", "cm/h", Attribute::LogOnly,
                    "Water conductivity for h = -1.5 cm.");
+    frame.declare ("K_30", "cm/h", Attribute::LogOnly,
+                   "Water conductivity for h = -3.0 cm.");
+    frame.declare ("K_60", "cm/h", Attribute::LogOnly,
+                   "Water conductivity for h = -6.0 cm.");
+    frame.declare ("K_120", "cm/h", Attribute::LogOnly,
+                   "Water conductivity for h = -12.0 cm.");
     frame.declare ("K_fc", "cm/h", Attribute::LogOnly,
                    "Water conductivity at field capaicy (pF 2).");
     frame.declare ("K_wp", "cm/h", Attribute::LogOnly,

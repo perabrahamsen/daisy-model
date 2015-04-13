@@ -241,7 +241,6 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
   std::vector<double> S_water (cell_size);
   std::vector<double> T (cell_size);
   std::vector<double> S_heat (cell_size);
-  std::vector<double> capacity_apparent (cell_size);
   for (size_t c = 0; c < cell_size; c++)
     {
       // Fixed.
@@ -255,14 +254,14 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
 #endif
       // Changes with ice state.
       T[c] = this->T (c);
-      capacity_apparent[c] = this->capacity_apparent (soil, soil_water, c);
+      capacity_apparent_[c] = this->capacity_apparent (soil, soil_water, c);
       S_heat[c] = this->source (geo, soil_water, c);
     }
 
   // Solve with old state.
   const std::vector<double> T_old = T;
   movement.heat (q_water, S_water, S_heat, 
-		 capacity_apparent, conductivity,
+		 capacity_apparent_, conductivity,
 		 T_top_old, T_top_new, T_bottom, T, dt, msg);
 
   // Update ice state according to new temperatures.
@@ -276,13 +275,13 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
 	  // Solve again with new state.
 	  for (size_t c = 0; c < cell_size; c++)
 	    {
-	      capacity_apparent[c]
+	      capacity_apparent_[c]
 		= this->capacity_apparent (soil, soil_water, c);
 	      S[c] = this->source (geo, soil_water, c);
 	    }
 	  T = T_old;
 	  movement.heat (q_water, S_water, S_heat,
-			 capacity_apparent, conductivity,
+			 capacity_apparent_, conductivity,
 			 T_top_old, T_top_new, T_bottom, T, dt, msg);
 
 	  // Check if state match new temperatures.
@@ -661,6 +660,7 @@ SoilHeat::output (Log& log) const
 {
   output_value (T_, "T", log); 
   output_value (capacity_old, "capacity", log); 
+  output_value (capacity_apparent_, "capacity_apparent", log); 
   output_value (conductivity_, "conductivity", log); 
   output_value (T_top_, "T_top", log);
   output_value (T_freezing, "T_freezing", log);
@@ -708,11 +708,13 @@ SoilHeat::load_syntax (Frame& frame)
 { 
   Geometry::add_layer (frame, Attribute::OptionalState, "T", load_T);
   frame.declare ("S", "erg/cm^3/h", Attribute::OptionalState, 
-              "External heat source, by default zero.");
+                 "External heat source, by default zero.");
   frame.declare ("conductivity", "erg/cm/dg C/h", Attribute::LogOnly, 
-              "Heat conductivity.");
+                 "Heat conductivity.");
   frame.declare ("capacity", "erg/cm^3/dg C", Attribute::LogOnly, 
-              "Heat capacity.");
+                 "Heat capacity.");
+  frame.declare ("capacity_apparent", "erg/cm^3/dg C", Attribute::LogOnly, 
+                 "Apparent heat capacity, including freezing.");
   frame.declare ("h_frozen", "cm^-1", Attribute::Const,
               "Pressure below which no more water will freeze.");
   frame.set ("h_frozen", -15000.0);
@@ -753,6 +755,7 @@ SoilHeat::initialize (const FrameSubmodel& al, const Geometry& geo,
   while (S.size () < cell_size)
     S.push_back (0.0);
   capacity_old.insert (capacity_old.begin (), cell_size, -42.42e42);
+  capacity_apparent_.insert (capacity_apparent_.begin (), cell_size, -42.42e42);
   conductivity_.insert (conductivity_.begin (), cell_size, -42.42e42);
 
   // Freezing point.
