@@ -79,6 +79,7 @@ private:
   std::vector<double> q_secondary_;
   std::vector<double> q_tertiary_;
   std::vector<double> K_cell_;
+  std::vector<double> Cw2_;
   std::vector<double> K_edge_;
   double sink_dt;
   int sink_cell;

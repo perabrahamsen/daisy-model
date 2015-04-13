@@ -392,6 +392,7 @@ SoilWater::tick_after (const Geometry& geo,
   // Update cells.
   const size_t cell_size = geo.cell_size ();
   daisy_assert (K_cell_.size () == cell_size);
+  daisy_assert (Cw2_.size () == cell_size);
   daisy_assert (h_.size () == cell_size);
   daisy_assert (h_ice_.size () == cell_size);
   daisy_assert (K_old.size () == cell_size);
@@ -434,6 +435,9 @@ SoilWater::tick_after (const Geometry& geo,
       // Conductivity.
       K_cell_[c] = soil.K (c, h_[c], h_ice_[c], soil_heat.T (c));
       
+      // Specific water capacity.
+      Cw2_[c] = soil.Cw2 (c, h_[c]);
+
       // Primary and secondary water.
       if (Theta_[c] <= 0.0)
         {
@@ -697,6 +701,7 @@ SoilWater::output (Log& log) const
   output_value (q_secondary_, "q_secondary", log);
   output_value (q_tertiary_, "q_p", log);
   output_value (K_cell_, "K", log);
+  output_value (Cw2_, "Cw2", log);
   if (std::isnormal (sink_dt))
     {
       output_value (sink_dt, "dt", log);
@@ -888,6 +893,8 @@ Secondary domain water flux (positive numbers mean upward).");
                  "Water flux in macro pores (positive numbers mean upward).");
   frame.declare ("K", "cm/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Hydraulic conductivity.");
+  frame.declare ("Cw2", "cm^-1", Attribute::LogOnly, Attribute::SoilCells,
+                 "Specific water capacity.");
   frame.declare ("dt", "h", Attribute::LogOnly, "\
 Suggested timestep length (based on S_forward).\n\
 The absolute value is used, negative numbers indicate source based limits.");
@@ -1032,6 +1039,7 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
   Theta_secondary_.insert (Theta_secondary_.begin (), cell_size, -42.42e42);
   Theta_tertiary_.insert (Theta_tertiary_.begin (), cell_size, 0.0);
   K_cell_.insert (K_cell_.begin (), cell_size, 0.0);
+  Cw2_.insert (Cw2_.begin (), cell_size, -42.42e42);
   tick_after (geo, soil,  soil_heat, true, msg);
 
   // We just assume no changes.
