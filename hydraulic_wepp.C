@@ -213,12 +213,12 @@ HydraulicWEPP::calculate_rho_b ()
 }
 
 void 
-HydraulicWEPP::tick (const double dt /* [h] */, const double rain /* [mm] */,
+HydraulicWEPP::tick (const double dt /* [h] */, const double rain /* [mm/h] */,
                      const double ice /* [] */, Treelog& msg)
 {
   day_count += dt / 24.0;       // [d]
-  R_c += rain * 0.001;          // [m]
-  const double I = rain / dt;   // [mm/h]
+  R_c += rain * dt * 0.001;          // [m]
+  const double I = rain;   // [mm/h]
   const double E_i = (I > 0.0) 
     ? std::max ((11.9 + 8.73 * std::log10 (I)) * rain, 0.0)
     : 0.0; // [J/m^2]

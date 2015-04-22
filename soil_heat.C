@@ -388,10 +388,10 @@ SoilHeat::update_freezing_points (const Soil& soil,
       const double h_melt = std::max (h_ice, h);
 
       T_thawing[i] 
-        = std::min (0.0, 273. *  h_melt / (latent_heat_of_fussion /gravity - h_melt));
+        = std::min (0.0, 273. *  h_melt / (latent_heat_of_fussion /gravity));
       T_freezing[i] 
         = std::min (T_thawing[i] - 0.01, 
-                    273. *  h / (latent_heat_of_fussion / gravity - h));
+                    273. *  h / (latent_heat_of_fussion / gravity));
       daisy_assert (T_freezing[i] <= T_thawing[i]);
 
       switch (state[i])
@@ -545,8 +545,8 @@ SoilHeat::calculate_freezing_rate (const Geometry& geo,
   daisy_assert (i < cell_size);
   daisy_assert (T.size () == cell_size);
   daisy_assert (T_old.size () == cell_size);
-  const double T_mean = (T[i] + T_old[i]) / 2.0;
   const double dT = T[i] - T_old[i];
+  const double h = soil_water.h (i);
 
   const size_t edge_size = geo.edge_size ();
   daisy_assert (q.size () == edge_size);
@@ -564,15 +564,8 @@ SoilHeat::calculate_freezing_rate (const Geometry& geo,
         dq -= q[edge] * area;
     }
   
-
   const double vol = geo.cell_volume (i);
-  const double S 
-    = soil_water.S_sum (i) - soil_water.S_ice_water (i);
-  const double Sh
-    = water_heat_capacity * rho_water * S * T_mean;
-  const double cap = capacity (soil, soil_water, i);
-  return (1.0 / (latent_heat_of_fussion * rho_ice))
-    * (cap * dT / dt + dq / vol + Sh);
+  return rho_water/rho_ice * (- dq / vol - latent_heat_of_fussion / (273 * gravity) * soil.Cw2 (i, h) * dT / dt);
 }
 
 bool

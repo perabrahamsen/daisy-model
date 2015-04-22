@@ -1,0 +1,83 @@
+;;; Setup for the PESTPORE project.
+;;
+;; ;; Measured texture numbers.
+
+(defhorizon H1 GEUS7
+  "0.1 m.u.t."
+  (clay         5.82 [%])
+  (fine_silt    7.20 [%])
+  (medium_silt 10.93 [%])
+  (coarse_silt 12.47 [%])
+  (fine_sand   35.70 [%])
+  (medium_sand 17.78 [%])
+  (coarse_sand  5.14 [%])
+  (other        4.95 [%])
+  (humus       (/ 0.78 [%] 0.587 [])))
+
+(defhorizon H2 GEUS7
+  "1.5 m.u.t"
+  (clay        10.23 [%])
+  (fine_silt   12.05 [%])
+  (medium_silt 14.94 [%])
+  (coarse_silt 12.33 [%])
+  (fine_sand   28.05 [%])
+  (medium_sand 14.41 [%])
+  (coarse_sand  5.29 [%])
+  (other        2.70 [%])
+  (humus       (/ 0.06 [%] 0.587 [])))
+
+(defhorizon H3 GEUS7
+  "3.0 m.u.t"
+  (clay        10.14 [%])
+  (fine_silt   10.25 [%])
+  (medium_silt 13.18 [%])
+  (coarse_silt 13.05 [%])
+  (fine_sand   28.76 [%])
+  (medium_sand 13.77 [%])
+  (coarse_sand  5.02 [%])
+  (other        5.83 [%])
+  (humus       (/ 0.05 [%] 0.587 [])))
+
+(defhorizon H4 GEUS7
+  "6.0 m.u.t"
+  (clay        12.49 [%])
+  (fine_silt   17.86 [%])
+  (medium_silt 10.56 [%])
+  (coarse_silt 10.82 [%])
+  (fine_sand   26.15 [%])
+  (medium_sand 12.76 [%])
+  (coarse_sand  4.53 [%])
+  (other        4.85 [%])
+  (humus       (/ 0.17 [%] 0.587 [])))
+
+;; We have a mesaurement in the Ap horizon, lets use it.
+(defhorizon Ap H1
+  "Top 40 cm of PESTPORE experimental plot.")
+
+;; We have three measurements in the C horizon. The vertical variation
+;; is in line with what we would expect from the horizontal variation,
+;; so we treat them as a single, homegenious horizon.
+;; Of the three, the 1.5 m.u.t. seems most "median". So we use it.
+(defhorizon C H2
+  "PESTPORE C horizon.")
+
+;; We know nothing of the B horison. However the sample drills
+;; indicates that the Ap horizon is in the range 30-50 cm, with 40 cm
+;; the most common value. If we assume the B horizon ends at 1 m.u.t,
+;; it makes that horizon 60 cm.  The Ap horizon has (as expected) a
+;; lower clay content than the C horizon. 
+;;     10.23 % - 5.82 % = 4.41 %.
+;; If we assume this ended up in the B horizon we get an increase of
+;;     40 cm / 60 cm * 4.41 % = 2.94 %
+;; We assume the B horizon is identical to the C horizon, with this
+;; amount of added clay.
+(defhorizon B C
+  (clay (+ 10.23 [%] 2.94 [%]))
+  ;; We normalize, meaning the extra clay is taken equally from all
+  ;; fraction, including clay.
+  (normalize true))
+
+(run (write (what "Hello")))
+
+;;; geus-texture.dai ends here.
+

@@ -57,7 +57,7 @@ public:
   virtual void set_porosity (double Theta);
   virtual void tillage (double surface_loose, double RR0, 
                         double Theta, double AOM15);
-  virtual void tick (const double dt /* [h] */, const double rain /* [m] */,
+  virtual void tick (const double dt /* [h] */, const double rain /* [mm/h] */,
                      const double ice /* */, Treelog& msg);
 
   // Convertion functions.

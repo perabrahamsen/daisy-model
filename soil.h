@@ -67,7 +67,7 @@ public:
   void tillage (const Geometry& geo, const double from, const double to,
                 const double surface_loose, const double RR0, 
                 const SoilWater& soil_water, const OrganicMatter&);
-  void tick (const double dt /* [h] */, const double rain /* [mm] */,
+  void tick (const double dt /* [h] */, const double rain /* [mm/h] */,
              const Geometry& geo, const SoilWater& soil_water, Treelog&);
   void set_porosity (size_t i, double Theta);
   // Activation pressure for secondary domain. [cm] 

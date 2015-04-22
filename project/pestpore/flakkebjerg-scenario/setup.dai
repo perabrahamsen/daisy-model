@@ -1,0 +1,798 @@
+;;; setup.dai -- setup for the PESTPORE project.
+
+(input file "fertilizer.dai")
+(input file "crop.dai")
+(input file "tillage.dai")
+(input file "chemistry-base.dai")
+(input file "log.dai")
+
+(input file "colloid-bound.dai")
+(input file "scn-management.dai")
+
+;;; Biopore classes.
+
+(defbiopore common matrix
+  (K_wall_relative 1 [%])
+  (allow_upward_flow false))
+
+;; Found 16 large and 100 small biopores.
+;; Drain pipe is 20 m long. High concentration is within 50 cm, 
+;; 25 cm each side of drain.
+;; Meaning 1.6 large and 10 small per square meter.
+
+(defbiopore "small_matrix"
+   (common (height_start 0 [cm])
+           (height_end -200 [cm])
+           (density 10 [m^-2])
+           (diameter 2 [mm])))
+
+(defbiopore "large_matrix"
+   (common (height_start 0 [cm])
+           (height_end -200 [cm])
+           (density 1.6 [m^-2])
+           (diameter 4 [mm])))
+           
+;; With 16 meters between drain
+
+(defbiopore "small_drain"
+   (drain  (height_start 0 [cm])
+           (height_end -200 [cm])
+           (diameter 2 [mm])
+           (pipe_position -110 [cm])
+           (density 0.28 [m^-2])))
+
+(defbiopore "large_drain"
+   (drain  (height_start 0 [cm])
+           (height_end -200 [cm])
+           (diameter 4 [mm])
+           (pipe_position -110 [cm])
+           (density 0.045 [m^-2])))
+
+(defbiopore "deep_connected"
+   (common (height_start 0 [cm])
+           (height_end -450 [cm])
+           (density 0.1 [m^-2])
+           (diameter 4 [mm])))
+
+(defbiopore "deep_unconnected"
+   (common (height_start -180 [cm])
+           (height_end -450 [cm])
+           (density 1 [m^-2])
+           (diameter 4 [mm])))
+           
+;;; Soil 
+
+(input file "dk-soil.dai")
+
+(defhorizon Danish numeric
+  "Classification used in some Danish sites."
+  (limits 2 20 63 125 200 500 2000 [um]))
+
+;; Based on profile 3 on the VAP Establishment report for Faardrup.
+;; This was the closest match to the OK labs measurement at the site.
+
+(defhorizon Ap Danish
+  "Faardrup, profile 3, Ap"
+  (fractions 15.7 13.3 12.4 21.8 13.4 16.4 4.6 [%])
+;;  (secondary_domain pressure 
+;;                    (h_lim -6 [cm])
+;;                    (K (* 4.0 [] 1.65205 [cm/h]))
+;;                    (alpha 1.0 [h^-1]))
+  (humus 2.4 [%])
+  (dry_bulk_density 1.52 [g/cm^3]))
+  
+(defhorizon B Danish
+  "Faardrup, profile 3, Bvt"
+  (fractions 17.5 12.5 13.8 19.6 12.4 17.2 6.8 [%])
+  (humus 0.2 [%])
+  (dry_bulk_density 1.70 [g/cm^3]))
+
+(defhorizon C Danish
+  "Faardrup, profile 3, Cc(g)"
+  (fractions 12.5 12.0 12.8 13.6 12.8 11.3 3.7 [%])
+  ;; (chalk 21.0 [%])
+  (normalize true)
+  (humus 0.1 [%])
+  (dry_bulk_density 1.83 [g/cm^3]))
+
+;;; Sand
+
+(defhorizon Sand Danish
+  "Hals, 70 cm, Ole Hørbye"
+  (fractions 1.5 0.5 1.7 20.2 66.3 7.3 1.0 [%])
+  (humus 0.2 [%])
+  ;; (chalk 1.5 [%])
+  (normalize true)
+  (dry_bulk_density 1.507 [g/cm^3]))
+
+;;; Columns
+
+(defcolumn Flakkebjerg default
+  (Groundwater fixed -110 [cm])
+  (Drain lateral)
+  (Chemistry multi
+             (combine colloids
+                      Bromide-1 Glyphosate-1 
+                      Bromide-2 Glyphosate-2
+                      Bromide-3 Bentazone-1))
+  (Soil (horizons ( -25 [cm] Ap)
+                  (-100 [cm] B)
+                  (-400 [cm] C)
+                  (-500 [cm] "Jyndevad C"))
+        (MaxRootingDepth 150 [cm])))
+
+(defcolumn Direct Flakkebjerg
+  "Flakkebjerg soil with biopores that connect surface with aquifer."
+  (Movement original
+            (Tertiary (biopores 
+                       (active_msg none)
+                       (classes ("large_matrix") 
+                                ("small_matrix")
+                                ("large_drain")
+                                ("small_drain")
+                                ("deep_unconnected")
+                                ("deep_connected"))))))
+  
+(defcolumn Sand Flakkebjerg
+  "Flakkebjerg soil with a sand layer at 180-200 cm."
+  (Movement original
+            (Tertiary (biopores 
+                       (active_msg none)
+                       (classes ("large_matrix") 
+                                ("small_matrix")
+                                ("large_drain")
+                                ("small_drain")
+                                ("deep_unconnected")))))
+  (Soil (horizons ( -25 [cm] Ap)
+                  (-100 [cm] B)
+                  (-180 [cm] C)
+                  (-200 [cm] Sand)
+                  (-400 [cm] C)
+                  (-500 [cm] "Jyndevad C"))
+        (MaxRootingDepth 150 [cm])))
+
+(defcolumn Clay Flakkebjerg
+  "Flakkebjerg soil with no connection between biopore domains."
+  (Movement original
+            (Tertiary (biopores 
+                       (active_msg none)
+                       (classes ("large_matrix") 
+                                ("small_matrix")
+                                ("large_drain")
+                                ("small_drain")
+                                ("deep_unconnected"))))))
+
+(defcolumn None Flakkebjerg
+  "Flakkebjerg soil with no deep biopores."
+  (Movement original
+            (Tertiary (biopores 
+                       (active_msg none)
+                       (classes ("large_matrix") 
+                                ("small_matrix")
+                                ("large_drain")
+                                ("small_drain"))))))
+
+
+;; Weather
+
+(defweather Flakkebjerg table
+  (file "dk-flakkebjerg.dwf")
+  (missing missing))
+
+(defweather baseline combine 
+  (max_rain 0.1 [mm]))
+
+(defweather R0 baseline
+  (entry ((end   2004 1 1 0)
+          ;; Før 2004 skal den tage data fra linien under                    
+          (source time (from 2005) (to 2004)
+                  ;; Her skal den i 2004 benytte data fra 2005.
+                  (source Flakkebjerg))) 
+         ((begin   2012 12 29 0)
+          ;; I 2013 skal den tage data fra linien under
+          (source time (from 2012) (to 2013) 
+                  ;; Her skal den i 2013 benytte data fra 2012.
+                  (source Flakkebjerg))) 
+         ;; Standard time.
+         ((source Flakkebjerg))))  
+
+(defweather R1 baseline
+  (entry ((end   2004 1 1 0)
+          ;; Før 2004 skal den tage data fra linien under                    
+          (source time (from 2005) (to 2004)
+                  ;; Her skal den i 2004 benytte data fra 2005.
+                  (source Flakkebjerg))) 
+         ((begin   2012 12 29 0)
+          ;; I 2013 skal den tage data fra linien under
+          (source time (from 2012) (to 2013) 
+                  ;; Her skal den i 2013 benytte data fra 2012.
+                  (source Flakkebjerg))) 
+         ;; Rot 1
+         ((begin 2012 1 1 0)
+          (source time (from 2004) (to 2012)
+                  ;; Use 2004 weather from 2012.
+                  (source Flakkebjerg)))
+         ((source time (from 2005) (to 2004)
+                  ;; Use 2005 weather from 2004.
+                  (source Flakkebjerg)))))
+
+(defweather R2 baseline
+  (entry ((end   2004 1 1 0)
+          ;; Før 2004 skal den tage data fra linien under                    
+          (source time (from 2005) (to 2004)
+                  ;; Her skal den i 2004 benytte data fra 2005.
+                  (source Flakkebjerg))) 
+         ((begin   2012 12 29 0)
+          ;; I 2013 skal den tage data fra linien under
+          (source time (from 2012) (to 2013) 
+                  ;; Her skal den i 2013 benytte data fra 2012.
+                  (source Flakkebjerg))) 
+         ;; Rot 2
+         ((begin 2011 1 1 0)
+          (source time (from 2004) (to 2011)
+                  ;; Use 2004 weather from 2011.
+                  (source Flakkebjerg)))
+         ((source time (from 2006) (to 2004)
+                  ;; Use 2006 weather from 2004.
+                  (source Flakkebjerg)))))
+
+(defweather R3 baseline
+  (entry ((end   2004 1 1 0)
+          ;; Før 2004 skal den tage data fra linien under                    
+          (source time (from 2005) (to 2004)
+                  ;; Her skal den i 2004 benytte data fra 2005.
+                  (source Flakkebjerg))) 
+         ((begin   2012 12 29 0)
+          ;; I 2013 skal den tage data fra linien under
+          (source time (from 2012) (to 2013) 
+                  ;; Her skal den i 2013 benytte data fra 2012.
+                  (source Flakkebjerg))) 
+         ;; Rot 3
+         ((begin 2010 1 1 0)
+          (source time (from 2004) (to 2010)
+                  ;; Use 2004 weather from 2010.
+                  (source Flakkebjerg)))
+         ((source time (from 2007) (to 2004)
+                  ;; Use 2007 weather from 2004.
+                  (source Flakkebjerg)))))
+
+(defweather R4 baseline
+  (entry ((end   2004 1 1 0)
+          ;; Før 2004 skal den tage data fra linien under                    
+          (source time (from 2005) (to 2004)
+                  ;; Her skal den i 2004 benytte data fra 2005.
+                  (source Flakkebjerg))) 
+         ((begin   2012 12 29 0)
+          ;; I 2013 skal den tage data fra linien under
+          (source time (from 2012) (to 2013) 
+                  ;; Her skal den i 2013 benytte data fra 2012.
+                  (source Flakkebjerg))) 
+         ;; Rot 4
+         ((begin 2009 1 1 0)
+          (source time (from 2004) (to 2009)
+                  ;; Use 2004 weather from 2009.
+                  (source Flakkebjerg)))
+         ((source time (from 2008) (to 2004)
+                  ;; Use 2008 weather from 2004.
+                  (source Flakkebjerg)))))
+
+(defweather R5 baseline
+  (entry ((end   2004 1 1 0)
+          ;; Før 2004 skal den tage data fra linien under                    
+          (source time (from 2005) (to 2004)
+                  ;; Her skal den i 2004 benytte data fra 2005.
+                  (source Flakkebjerg))) 
+         ((begin   2012 12 29 0)
+          ;; I 2013 skal den tage data fra linien under
+          (source time (from 2012) (to 2013) 
+                  ;; Her skal den i 2013 benytte data fra 2012.
+                  (source Flakkebjerg))) 
+         ;; Rot 5
+         ((begin 2008 1 1 0)
+          (source time (from 2004) (to 2008)
+                  ;; Use 2004 weather from 2008.
+                  (source Flakkebjerg)))
+         ((source time (from 2009) (to 2004)
+                  ;; Use 2009 weather from 2004.
+                  (source Flakkebjerg)))))
+
+(defweather R6 baseline
+  (entry ((end   2004 1 1 0)
+          ;; Før 2004 skal den tage data fra linien under                    
+          (source time (from 2005) (to 2004)
+                  ;; Her skal den i 2004 benytte data fra 2005.
+                  (source Flakkebjerg))) 
+         ((begin   2012 12 29 0)
+          ;; I 2013 skal den tage data fra linien under
+          (source time (from 2012) (to 2013) 
+                  ;; Her skal den i 2013 benytte data fra 2012.
+                  (source Flakkebjerg))) 
+         ;; Rot 6
+         ((begin 2007 1 1 0)
+          (source time (from 2004) (to 2007)
+                  ;; Use 2004 weather from 2007.
+                  (source Flakkebjerg)))
+         ((source time (from 2010) (to 2004)
+                  ;; Use 2010 weather from 2004.
+                  (source Flakkebjerg)))))
+
+(defweather R7 baseline
+  (entry ((end   2004 1 1 0)
+          ;; Før 2004 skal den tage data fra linien under                    
+          (source time (from 2005) (to 2004)
+                  ;; Her skal den i 2004 benytte data fra 2005.
+                  (source Flakkebjerg))) 
+         ((begin   2012 12 29 0)
+          ;; I 2013 skal den tage data fra linien under
+          (source time (from 2012) (to 2013) 
+                  ;; Her skal den i 2013 benytte data fra 2012.
+                  (source Flakkebjerg))) 
+         ;; Rot 7
+         ((begin 2006 1 1 0)
+          (source time (from 2004) (to 2006)
+                  ;; Use 2004 weather from 2006.
+                  (source Flakkebjerg)))
+         ((source time (from 2011) (to 2004)
+                  ;; Use 2011 weather from 2004.
+                  (source Flakkebjerg)))))
+
+(defweather R8 baseline
+  (entry ((end   2004 1 1 0)
+          ;; Før 2004 skal den tage data fra linien under                    
+          (source time (from 2005) (to 2004)
+                  ;; Her skal den i 2004 benytte data fra 2005.
+                  (source Flakkebjerg))) 
+         ((begin   2012 12 29 0)
+          ;; I 2013 skal den tage data fra linien under
+          (source time (from 2012) (to 2013) 
+                  ;; Her skal den i 2013 benytte data fra 2012.
+                  (source Flakkebjerg))) 
+         ;; Rot 7
+         ((begin 2005 1 1 0)
+          (source time (from 2004) (to 2005)
+                  ;; Use 2004 weather from 2005.
+                  (source Flakkebjerg)))
+         ((source time (from 2012) (to 2004)
+                  ;; Use 2012 weather from 2004.
+                  (source Flakkebjerg)))))
+
+;;; Log files
+
+(deflog "Signe water" column
+  (entries (flux_top (tag "Matrix infiltration")
+                     (path column "${column}" SoilWater q)
+                     (spec fixed SoilWater q)
+                     (handle sum)
+                     (negate true)
+                     (dimension "mm"))
+           (flux_bottom (tag "Matrix percolation")
+                        (path column "${column}" SoilWater q)
+                        (spec fixed SoilWater q)
+                        (handle sum)
+                        (negate true)
+                        (dimension "mm"))
+           (flux_top (tag "Tertiary infiltration")
+                     (path column "${column}" SoilWater q_p)
+                     (spec fixed SoilWater q_p)
+                     (handle sum)
+                     (negate true)
+                     (dimension "mm"))
+           (flux_bottom (tag "Tertiary percolation")
+                        (path column "${column}" SoilWater q_p)
+                        (spec fixed SoilWater q_p)
+                        (handle sum)
+                        (negate true)
+                        (dimension "mm"))
+           (interval (tag "Tertiary sink")
+                     (path column "${column}" SoilWater S_p)
+                     (spec fixed SoilWater S_p)
+                     (handle sum)
+                     (dimension "mm"))
+           (number (tag "Tertiary content")
+                   (path column "${column}" Movement "*" 
+                         Tertiary biopores water_height)
+                   (spec tertiary biopores water_height)
+                   (handle current)
+                   (dimension "mm"))
+           (number (tag "Surface drain flow")
+                   (documentation "\
+Flux of water from surface to drain through biopores, bypassing the matrix.")
+                   (path column "${column}" Movement "*" 
+                         Tertiary biopores classes drain infiltration)
+                   (spec biopore drain infiltration)
+                   (handle sum)
+                   (dimension "mm"))
+           (interval (tag "Soil drain flow")
+                     (path column "${column}" SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "Root extraction")
+                     (path column "${column}" SoilWater S_root)
+                     (spec fixed SoilWater S_root)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "Soil water")
+                     (path column "${column}" SoilWater Theta)
+                     (spec fixed SoilWater Theta)
+                     (dimension "mm"))))
+
+(deflog "Signe water 0-30" "Signe water"
+  (where "${colfid}signe_water_0-30.dlf")
+  (from 0 [cm]) (to -30 [cm]))
+
+(deflog "Signe water 30-100" "Signe water"
+  (where "${colfid}signe_water_30-100.dlf")
+  (from -30 [cm]) (to -100 [cm]))
+
+(deflog "Signe water 100-200" "Signe water"
+  (where "${colfid}signe_water_100-200.dlf")
+  (from -100 [cm]) (to -200 [cm]))
+
+(deflog "Signe water 0-400" "Signe water"
+  (where "${colfid}signe_water_0-400.dlf")
+  (from -0 [cm]) (to -400 [cm]))
+
+(deflog "Signe water 0-30 hourly" "Signe water"
+  (where "${colfid}signe_water_0-30_hourly.dlf")
+  (from 0 [cm]) (to -30 [cm]))
+
+(deflog "Signe water 0-30 daily" "Signe water"
+  (where "${colfid}signe_water_0-30_daily.dlf")
+  (when daily)
+  (from 0 [cm]) (to -30 [cm]))
+
+(deflog "Signe chemical" chemical
+  (declare unit String "Base unit.")
+  (unit "g/ha")
+  
+  (entries ;; Year Month MDay Hour
+           (flux_top (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" J_matrix)
+                     (tag "In-Matrix")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default J_matrix))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_matrix)
+                        (tag "Leak-Matrix")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (spec chemical default J_matrix))
+           (flux_top (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" J_tertiary)
+                     (tag "In-Tertiary")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default J_tertiary))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_tertiary)
+                        (tag "Leak-Tertiary")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}")
+                        (spec chemical default J_tertiary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_tertiary)
+                     (tag "Tertiary-sink")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_tertiary))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores solute_storage "${chemical}" value)
+                   (spec tertiary biopores solute_storage value)
+                   (documentation "\
+Amount stored in the biopores.")
+                   (tag "Tertiary-content")
+                   (dimension "${unit}")
+                   (handle current))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_drain)
+                     (tag "Soil-drain")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}")
+                     (spec chemical default S_drain))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores classes drain 
+                         solute_infiltration "${chemical}" value)
+                   (spec biopore drain solute_infiltration value)
+                   (tag "Surface-Drain")
+                   (handle sum)
+                   (dimension "${unit}"))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_root)
+                     (tag "Uptake")
+                     (handle sum)
+		     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default S_root))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_decompose)
+                     (tag "Decompose")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}")
+                     (spec chemical default S_decompose))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (documentation "\
+Total amount in the specified soil interval.")
+                     (tag "Soil content")
+                     (dimension "${unit}")
+                     (spec chemical default M))))
+
+(deflog "Signe chemical 0-30" "Signe chemical"
+  (where "${colfid}signe_${chemfid}_0-30.dlf")
+  (from 0 [cm]) (to -30 [cm]))
+
+(deflog "Signe chemical 30-100" "Signe chemical"
+  (where "${colfid}signe_${chemfid}_30-100.dlf")
+  (from -30 [cm]) (to -100 [cm]))
+
+(deflog "Signe chemical 100-200" "Signe chemical"
+  (where "${colfid}signe_${chemfid}_100-200.dlf")
+  (from -100 [cm]) (to -200 [cm]))
+
+(deflog "Signe chemical 0-400" "Signe chemical"
+  (where "${colfid}signe_${chemfid}_0-400.dlf")
+  (from 0 [cm]) (to -400 [cm]))
+
+(deflog "Signe chemical 0-30 hourly" "Signe chemical"
+  (where "${colfid}signe_${chemfid}_0-30_hourly.dlf")
+  (from 0 [cm]) (to -30 [cm]))
+
+(deflog "Signe chemical 0-30 daily" "Signe chemical"
+  (where "${colfid}signe_${chemfid}_0-30_daily.dlf")
+  (when daily)
+  (from 0 [cm]) (to -30 [cm]))
+
+;;; Setup
+
+(defprogram Flakkebjerg Daisy
+  (column Flakkebjerg)
+  (manager Rotation)
+  (time 2004 1 1)
+  (stop 2012 5 1)
+
+  (message_timestep false)
+  (minimal_timestep (microseconds 1))
+  (timestep (minutes 60))
+
+  (output
+   ;; 2007 01 01 Glyphosate application.
+   ("Signe chemical 0-400" (chemical Bromide-1) (when (or (at 2007 08 01 0) (at 2011 08 1 0))))
+   ("Signe chemical 0-400" (chemical Glyphosate-1-base) (when (or (at 2007 08 01 0) (at 2011 08 01 0))))
+   ("Signe water 0-400" (when (or (at 2007 08 01 0) (at 2011 08 01 0))))
+
+   ;; 2007 10 03 Glyphosate application.
+   ("Signe chemical 0-400" (chemical Bromide-2) (when (or (at 2007 10 03 0) (at 2011 08 1 0))))
+   ("Signe chemical 0-400" (chemical Glyphosate-2-base) (when (or (at 2007 10 03 0) (at 2011 10 03 0))))
+   ("Signe water 0-400" (when (or (at 2007 10 03 0) (at 2011 10 03 0))))
+
+   ;; 2008 04 29 Glyphosate application.
+   ("Signe chemical 0-400" (chemical Bromide-3) (when (or (at 2008 04 29 0) (at 2012 04 29 0))))
+   ("Signe chemical 0-400" (chemical Bentazone-1) (when (or (at 2008 04 29 0) (at 2012 04 29 0))))
+   ("Signe water 0-400" (when (or (at 2008 04 29 0) (at 2012 04 29 0))))
+             ))
+
+(defprogram Direct Flakkebjerg
+  (column Direct))
+
+(defprogram R0Direct Direct
+  (log_prefix R0Direct)
+  (weather R0))
+
+(defprogram R1Direct Direct
+  (log_prefix R1Direct)
+  (weather R1))
+
+(defprogram R2Direct Direct
+  (log_prefix R2Direct)
+  (weather R2))
+
+(defprogram R3Direct Direct
+  (log_prefix R3Direct)
+  (weather R3))
+
+(defprogram R4Direct Direct
+  (log_prefix R4Direct)
+  (weather R4))
+
+(defprogram R5Direct Direct
+  (log_prefix R5Direct)
+  (weather R6))
+
+(defprogram R6Direct Direct
+  (log_prefix R6Direct)
+  (weather R6))
+
+(defprogram R7Direct Direct
+  (log_prefix R7Direct)
+  (weather R7))
+
+(defprogram R8Direct Direct
+  (log_prefix R8Direct)
+  (weather R8))
+
+(defprogram Sand Flakkebjerg
+  (column Sand))
+  
+(defprogram R0Sand Sand
+  (log_prefix R0Sand)
+  (weather R0))
+
+(defprogram R1Sand Sand
+  (log_prefix R1Sand)
+  (weather R1))
+
+(defprogram R2Sand Sand
+  (log_prefix R2Sand)
+  (weather R2))
+
+(defprogram R3Sand Sand
+  (log_prefix R3Sand)
+  (weather R3))
+
+(defprogram R4Sand Sand
+  (log_prefix R4Sand)
+  (weather R4))
+
+(defprogram R5Sand Sand
+  (log_prefix R5Sand)
+  (weather R6))
+
+(defprogram R6Sand Sand
+  (log_prefix R6Sand)
+  (weather R6))
+
+(defprogram R7Sand Sand
+  (log_prefix R7Sand)
+  (weather R7))
+
+(defprogram R8Sand Sand
+  (log_prefix R8Sand)
+  (weather R8))
+
+(defprogram Clay Flakkebjerg
+  (column Clay))
+  
+(defprogram R0Clay Clay
+  (log_prefix R0Clay)
+  (weather R0))
+
+(defprogram R1Clay Clay
+  (log_prefix R1Clay)
+  (weather R1))
+
+(defprogram R2Clay Clay
+  (log_prefix R2Clay)
+  (weather R2))
+
+(defprogram R3Clay Clay
+  (log_prefix R3Clay)
+  (weather R3))
+
+(defprogram R4Clay Clay
+  (log_prefix R4Clay)
+  (weather R4))
+
+(defprogram R5Clay Clay
+  (log_prefix R5Clay)
+  (weather R6))
+
+(defprogram R6Clay Clay
+  (log_prefix R6Clay)
+  (weather R6))
+
+(defprogram R7Clay Clay
+  (log_prefix R7Clay)
+  (weather R7))
+
+(defprogram R8Clay Clay
+  (log_prefix R8Clay)
+  (weather R8))
+
+(defprogram None Flakkebjerg
+  (column None))
+
+(defprogram R0None None
+  (log_prefix R0None)
+  (weather R0))
+
+(defprogram R1None None
+  (log_prefix R1None)
+  (weather R1))
+
+(defprogram R2None None
+  (log_prefix R2None)
+  (weather R2))
+
+(defprogram R3None None
+  (log_prefix R3None)
+  (weather R3))
+
+(defprogram R4None None
+  (log_prefix R4None)
+  (weather R4))
+
+(defprogram R5None None
+  (log_prefix R5None)
+  (weather R6))
+
+(defprogram R6None None
+  (log_prefix R6None)
+  (weather R6))
+
+(defprogram R7None None
+  (log_prefix R7None)
+  (weather R7))
+
+(defprogram R8None None
+  (log_prefix R8None)
+  (weather R8))
+
+(defprogram R0 batch
+  (run R0Direct
+       R0Sand
+       R0Clay
+       R0None))
+
+(defprogram R1 batch
+  (run R1Direct
+       R1Sand
+       R1Clay
+       R1None))
+
+(defprogram R2 batch
+  (run R2Direct
+       R2Sand
+       R2Clay
+       R2None))
+
+(defprogram R3 batch
+  (run R3Direct
+       R3Sand
+       R3Clay
+       R3None))
+
+(defprogram R4 batch
+  (run R4Direct
+       R4Sand
+       R4Clay
+       R4None))
+
+(defprogram R5 batch
+  (run R5Direct
+       R5Sand
+       R5Clay
+       R5None))
+
+(defprogram R6 batch
+  (run R6Direct
+       R6Sand
+       R6Clay
+       R6None))
+
+(defprogram R7 batch
+  (run R7Direct
+       R7Sand
+       R7Clay
+       R7None))
+
+(defprogram R8 batch
+  (run R8Direct
+       R8Sand
+       R8Clay
+       R8None))
+
+(defprogram all batch
+  (run R0 R1 R2 R3 R4 R5 R6 R7 R8))
+
+(run all)
+
+;;; setup.dai ends here.
