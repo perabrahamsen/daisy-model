@@ -5,7 +5,7 @@
 (input file "log.dai")
 
 ;; Proect specific files.
-(input file "ror-soil ny jb.dai")
+(input file "wepp-soil.dai")
 (input file "log_wepp.dai")
 
 ;; Shared management.
@@ -24,6 +24,11 @@
   (penetration 0.6)
   (surface_loose 1.0 []))
 
+(defaction seed_bed_preparation_karl mix -10.0 
+  (random_roughness 12 [mm])
+  (penetration 0.6)
+  (surface_loose 1.0 []))
+
 (defaction rotavation mix -5.0
   (random_roughness 15 [mm])
   (surface_loose 1.0 []))
@@ -36,9 +41,6 @@
 
 ;; Common for all plots.
 (defprogram WEPP Daisy
-  (weather default "taastrup-2012-2014.dwf")
-  (time 2012 09 1)
-  (stop 2014 08 27)
   (output harvest
           ("Soil Ice Content" (when daily))
           ("Soil Water Content" (when daily))
@@ -49,6 +51,34 @@
           ("Field chemical" (chemical colloid))
           ("Vegetation" (when daily))
           (checkpoint (when (at 2013 11 12 6)))))
+
+
+(defprogram Taastrup WEPP
+  (weather default "taastrup-2012-2014.dwf")
+  (time 2012 09 1)
+  (stop 2014 08 27))
+
+(defprogram Karlslunde WEPP
+  (weather combine
+           (entry ((begin 2012 09 01 00)
+                   (end   2014 09 30 23)
+                   (use Precip)
+                   (source table (file "hourly_Karlslunde.dwf")))
+                  ((source table (file "daily_Karlslunde.dwf")))))
+                
+  (time 2012 09 05)
+  (stop 2014 09 25))
+
+(defprogram Soroe WEPP 
+  (weather combine
+             (entry ((begin 2012 09 01 00)
+                     (end   2014 09 30 23)
+                     (use Precip)
+                     (source table (file "hourly_Soroe.dwf")))
+                     ((source table (file "daily_Soroe.dwf")))
+                  ))
+  (time 2012 09 02)
+  (stop 2014 08 26))
 
 ;; Plot 1.
 (defaction led1 activity
@@ -64,7 +94,7 @@
            (stub 8.0 [cm])
            (stem 1.00 [])))
 
-(defprogram led1 WEPP
+(defprogram led1 Taastrup
   (column Rorrende_led1)
   (manager led1)
   (log_prefix "log/L1-")
@@ -84,7 +114,7 @@
            (stub 8.0 [cm])
            (stem 1.00 [])))
 
-(defprogram led2 WEPP
+(defprogram led2 Taastrup
   (column Rorrende_led2)
   (manager led2)
   (log_prefix "log/L2-")
@@ -106,7 +136,7 @@
                                    (stub 8.0 [cm])
                                    (stem 1.00 [])))
 
-(defprogram led3 WEPP
+(defprogram led3 Taastrup
   (column Rorrende_led3)
   (manager led3)
   (log_prefix "log/L3-")
@@ -128,7 +158,7 @@
            (stub 8.0 [cm])
            (stem 1.00 [])))
   	
-(defprogram led4 WEPP
+(defprogram led4 Taastrup
   (column Rorrende_led4)
   (manager led4)
   (log_prefix "log/L4-")
@@ -136,14 +166,147 @@
   (output &old
           (WEPP (horizon "Overflade Ap_4") (where "wepp.dlf"))))
 
-;; Run them
+;; N1.
+(defaction N1 activity
+  (wait (at 2012 09 18)) (seed_bed_preparation_ror)
+                         (sow "Winter Wheat")
+  (wait (at 2013 08 20)) (harvest "Winter Wheat"
+	              (stub 8.0 [cm])
+	              (stem 0.00 [])
+	              (leaf 0.00[]))
+  (wait (at 2013 08 20)) (seed_bed_preparation_ror)
+  (wait (at 2013 08 22)) (seed_bed_preparation_karl)
+                         (sow "Winter Rape")
+  (wait (at 2014 08 26)) (harvest "Winter Rape"
+	              (stub 8.0 [cm])
+	              (stem 0.00 [])
+	              (leaf 0.00[]))
+  (wait (at 2014 07 27)) (seed_bed_preparation_ror)
+  (wait (at 2014 09 19)) (seed_bed_preparation_karl)
+                         (sow "Winter Wheat"))
 
-(defprogram sims batch
-  (run led1 
-       led2
-       led3 
-       led4
-       ))
+(defprogram N1 Karlslunde
+  (column Karlslunde_N1)
+  (manager N1)
+  (log_prefix "log/N1-")
+  (timestep (minutes 20))
+  (output &old
+          (WEPP (horizon "Overflade Ap_N1") (where "wepp.dlf"))))
+          
+;;; N2.
+(defaction N2 activity
+ (wait (at 2013 04 21)) (seed_bed_preparation_ror)
+                         (sow "Spring Barley")
+  (wait (at 2013 08 20)) (harvest "Spring Barley"
+	              (stub 8.0 [cm])
+	              (stem 0.00 [])
+	              (leaf 0.00[]))
+  (wait (at 2013 08 22)) (seed_bed_preparation_ror)
+  (wait (at 2013 08 22)) (seed_bed_preparation_karl)
+                         (sow "Winter Rape")
+  (wait (at 2014 08 23)) (harvest "Winter Rape"
+	              (stub 8.0 [cm])
+	              (stem 0.00 [])
+	              (leaf 0.00[]))
+  (wait (at 2014 07 26)) (seed_bed_preparation_ror)
+  (wait (at 2014 09 19)) (seed_bed_preparation_karl)
+                         (sow "Winter Wheat"))
+
+
+(defprogram N2 Karlslunde
+  (column Karlslunde_N2)
+  (manager N2)
+  (log_prefix "log/N2-")
+  (timestep (minutes 20))
+  (output &old
+          (WEPP (horizon "Overflade Ap_N2") (where "wepp.dlf"))))
+
+;;; K3.
+ (defaction K3 activity
+   (wait (at 2012 09 06)) (seed_bed_preparation_ror)
+                            (sow "Winter Rape")
+     (wait (at 2013 08 03)) (harvest "Winter Rape"
+   	              (stub 8.0 [cm])
+   	              (stem 0.00 [])
+   	              (leaf 0.00[]))
+     (wait (at 2013 08 21)) (seed_bed_preparation_ror)
+     (wait (at 2013 10 09)) (seed_bed_preparation_karl)
+                            (sow "Winter Wheat")
+     (wait (at 2014 08 03)) (harvest "Winter Wheat"
+   	              (stub 8.0 [cm])
+   	              (stem 0.00 [])
+   	              (leaf 0.00[]))
+     (wait (at 2014 08 13)) (seed_bed_preparation_ror)
+     (wait (at 2014 09 20)) (seed_bed_preparation_karl)
+                         (sow "Winter Wheat"))
+
+(defprogram K3 Karlslunde
+  (column Karlslunde_K3)
+  (manager K3)
+  (log_prefix "log/K3-")
+ ;; (timestep (minutes 10))
+  (output &old
+          (WEPP (horizon "Overflade Ap_K3") (where "wepp.dlf"))))
+
+;;; S8
+
+(defaction S8 activity
+  (wait (at 2012 09 13)) (sow_tillage) (sow "Wclover");; efterafgrøde
+  (wait (at 2013 04 20)) (harvest "Wclover"
+  	              (stub 5.0 [cm])
+	              (stem 0.00 [])
+                                  (leaf 0.00[]))
+  (wait (at 2013 04 21)) (sow_tillage) (sow "Spring Barley")
+  (wait (at 2013 08 21)) (harvest "Spring Barley"
+                                  (stub 8.0 [cm])
+                                  (stem 0.00 [])
+                                  (leaf 0.00[]))
+  (wait (at 2013 09 20)) (sow_tillage) (sow "Winter Wheat")
+  (wait (at 2014 07 28)) (harvest "Winter Wheat"
+ 	              (stub 8.0 [cm])
+ 	              (stem 0.00 [])
+ 	              (leaf 0.00[]))
+  (wait (at 2014 09 20)) (sow_tillage)(sow "Wclover"))	              
+  	
+(defprogram S8 Soroe
+  (column Soroe_S8);; her skal der gøres noget
+  (manager S8)
+  (log_prefix "log/S8-")
+  ;;(timestep (minutes 10))
+  (output &old
+          (WEPP (horizon "Overflade Ap_S8") (where "wepp.dlf"))))
+
+;;; S9
+(defaction S9 activity
+  (wait (at 2012 09 13)) (sow_tillage) (sow "Winter Wheat")
+  (wait (at 2013 08 09)) (harvest "Winter Wheat"
+                                  (stub 8.0 [cm])
+                                  (stem 0.00 [])
+                                  (leaf 0.00[]))
+  (wait (at 2013 08 13)) (sow_tillage) (sow "Wclover");; efterafgrøde
+  (wait (at 2014 04 03)) (harvest "Wclover"
+    	              (stub 5.0 [cm])
+  	              (stem 0.00 [])
+                                  (leaf 0.00[]))
+  (wait (at 2013 04 04)) (sow_tillage) (sow "Spring Barley")
+  (wait (at 2013 08 05)) (harvest "Spring Barley"
+                                  (stub 8.0 [cm])
+                                  (stem 0.00 [])
+                                  (leaf 0.00[]))
+  (wait (at 2013 09 20)) (sow_tillage) (sow "Winter Wheat")
+  (wait (at 2014 07 28)) (harvest "Winter Wheat"
+ 	              (stub 8.0 [cm])
+ 	              (stem 0.00 [])
+ 	              (leaf 0.00[]))
+(wait (at 2014 09 20)) (sow_tillage) (sow "Winter Wheat"))
+  	
+(defprogram S9 Soroe
+  (column Soroe_S9);; her skal der gøres noget
+  (manager S9)
+  (log_prefix "log/S9-")
+  ;;(timestep (minutes 10))
+  (output &old
+          (WEPP (horizon "Overflade Ap_S9") (where "wepp.dlf"))))
 
 ;; Plot
 
@@ -156,22 +319,70 @@
          "set xtics 24 * 60 * 60 * 30 * 3 rotate"        
          "set format x \"%y-%m-%d\""))
 
-(defgnuplot rho_b plottime
+(defunit [m^2/m^2] [<fraction>]
+  (factor 1.0))
+
+(defgnuplot rho_b_base plottime
   (where "fig/rho_b_${L}.pdf")
   (title "Plot ${L} dry bulk density")
+  (declare obs String "")
   (ymax 1.5 [g/cm^3])
   (ymin 1.0 [g/cm^3])
+  (y2max 100 [%])
+  (y2min 0 [%])
   (source (column (file "log/${L}-wepp.dlf")
                   (tag "rho_b")
                   (dimension "g/cm^3")
                   (style 1)
                   (title "WEPP"))
-          (column (file "rho_b.ddf")
+          (column (file "${obs}")
                   (tag "${L}")
+                  (handle all)
                   (dimension "g/cm^3")
                   (style 3)
                   (title "Obs"))
           ))
+
+(defgnuplot rho_b_T rho_b_base
+  (obs "rho_b.ddf"))
+
+(defgnuplot rho_b_R rho_b_base
+  (obs "rho_b_R.ddf"))
+
+(defgnuplot rho_b_cover plottime
+  (where "fig/rho_b_cover_${L}.pdf")
+  (title "Plot ${L} dry bulk density")
+  (declare obs String "")
+  (ymax 1.5 [g/cm^3])
+  (ymin 1.0 [g/cm^3])
+  (y2max 100 [%])
+  (y2min 0 [%])
+  (source (column (file "log/${L}-wepp.dlf")
+                  (tag "rho_b")
+                  (dimension "g/cm^3")
+                  (style 1)
+                  (title "WEPP"))
+          (column (file "${obs}")
+                  (tag "${L}")
+                  ;; (handle all)
+                  (dimension "g/cm^3")
+                  (style 3)
+                  (title "Obs"))
+          (column (file "log/${L}-wepp.dlf")
+                  (tag "Canopy")
+                  (style 2)
+                  (dimension "%"))
+          (column (file "log/${L}-wepp.dlf")
+                  (tag "Litter")
+                  (style 4)
+                  (dimension "%"))
+          ))
+
+(defgnuplot rho_b_cover_T rho_b_cover
+  (obs "rho_b.ddf"))
+
+(defgnuplot rho_b_cover_R rho_b_cover
+  (obs "rho_b_R.ddf"))
 
 (defgnuplot K15 plottime
   (where "fig/K15_${L}.pdf")
@@ -194,6 +405,7 @@
                   (style 4)
                   (title "Hypres K_sat"))
           (column (file "K15${L}.ddf")
+                  (handle all)
                   (tag "Inf")
                   (dimension "mm/h")
                   (style 3)
@@ -286,11 +498,15 @@
           ))
 
 
-(defgnuplot plots multi
-  (graph (rho_b (L "L1"))
-         (rho_b (L "L2") (legend none))
-         (rho_b (L "L3") (legend none))
-         (rho_b (L "L4") (legend none))
+(defgnuplot T_plots multi
+  (graph (rho_b_T (L "L1"))
+         (rho_b_T (L "L2") (legend none))
+         (rho_b_T (L "L3") (legend none))
+         (rho_b_T (L "L4") (legend none))
+         (rho_b_cover_T (L "L1"))
+         (rho_b_cover_T (L "L2") (legend none))
+         (rho_b_cover_T (L "L3") (legend none))
+         (rho_b_cover_T (L "L4") (legend none))
          (K15 (L "L1"));; (legend ne))
          (K15 (L "L2"));; (legend none))
          (K15 (L "L3"));; (legend none))
@@ -317,21 +533,108 @@
          (K15root (L "L4"));; (legend none))
          ))
 
+(defgnuplot K_plots multi
+  (graph (rho_b_R (L "K3") (legend none))
+         (rho_b_R (L "N2") (legend none))
+         (rho_b_R (L "N1") (legend none))
+         (rho_b_cover_R (L "K3") (legend none))
+         (rho_b_cover_R (L "N2") (legend none))
+         (rho_b_cover_R (L "N1") (legend none))
+         (K15 (L "K3"));; (legend none))
+         (K15 (L "N2"));; (legend none))
+         (K15 (L "N1"));; (legend none))
+         (K30 (L "K3"));; (legend none))
+         (K30 (L "N2"));; (legend none))
+         (K30 (L "N1"));; (legend none))
+         (K60 (L "K3"));; (legend none))
+         (K60 (L "N2"));; (legend none))
+         (K60 (L "N1"));; (legend none))
+         (K120 (L "K3"));; (legend none))
+         (K120 (L "N2"));; (legend none))
+         (K120 (L "N1"));; (legend none))
+         (KM (L "K3"));; (legend none))
+         (KM (L "N2"));; (legend none))
+         (KM (L "N1"));; (legend none))
+         (K15root (L "K3"));; (legend none))
+         (K15root (L "N2"));; (legend none))
+         (K15root (L "N1"));; (legend none))
+         ))
+
+(defgnuplot S_plots multi
+  (graph (rho_b_R (L "S8") (legend none))
+         (rho_b_R (L "S9") (legend none))
+         (rho_b_cover_R (L "S8") (legend none))
+         (rho_b_cover_R (L "S9") (legend none))
+         (K15 (L "S8"));; (legend none))
+         (K15 (L "S9"));; (legend none))
+         (K30 (L "S8"));; (legend none))
+         (K30 (L "S9"));; (legend none))
+         (K60 (L "S8"));; (legend none))
+         (K60 (L "S9"));; (legend none))
+         (K120 (L "S8"));; (legend none))
+         (K120 (L "S9"));; (legend none))
+         (KM (L "S8"));; (legend none))
+         (KM (L "S9"));; (legend none))
+         (K15root (L "S8"));; (legend none))
+         (K15root (L "S9"));; (legend none))
+         ))
+
+(defprogram T_plot gnuplot
+  (graph T_plots))
+
+(defprogram K_plot gnuplot
+  (graph K_plots))
+
+(defprogram S_plot gnuplot
+  (graph S_plots))
+
 (defprogram plot gnuplot
-  (graph plots))
+  (graph T_plots K_plots S_plots))
+
+;; Run them
+
+(defprogram T_sims batch
+  (run led1 
+       led2
+       led3 
+       led4
+       ))
+
+(defprogram K_sims batch
+  (run N1
+       N2
+       K3       
+       ))
+
+(defprogram S_sims batch
+  (run S8
+       S9
+       ))
+
+(defprogram sims batch
+  (run T_sims 
+       K_sims 
+       S_sims
+       ))
 
 ;;; Program
 
+(defprogram T_both batch
+  (run T_sims T_plot))
 
-(defprogram both batch
-  (run sims plot))
+(defprogram K_both batch
+  (run K_sims K_plot))
+
+(defprogram S_both batch
+  (run S_sims S_plot))
 
 ;;(run led4)
 ;;(run sims)
 
 (run plot)
 
-;;(run both)
+;;(run K_both)
 
+;;(run batch (run sims plot))
 
 ;;; setup.dai ends here.

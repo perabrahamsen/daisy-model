@@ -113,7 +113,14 @@
            (number (path column "${column}" Soil 
                          horizons horizon "${horizon}" hydraulic wepp Theta_wp)
                    (handle current)
-                   (spec hydraulic wepp Theta_wp))))
+                   (spec hydraulic wepp Theta_wp))
+           (number (path column "${column}" Vegetation component cover)
+                   (tag "Canopy")
+                   (spec vegetation component cover))
+           (number (path column "${column}" Litter component cover)
+                   (tag "Litter")
+                   (spec litter component cover))
+           ))
 
 (deflog "Soil Ice Content" column
   (where "${colfid}soil_ice_content.dlf")

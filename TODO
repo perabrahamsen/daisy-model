@@ -1,26 +1,52 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* WEPP
+* JB: Prøv wepp + Sorøer / Karlslunde med en anden Ea model som tager hensyn til canopy/litter
 
-** Hvorfor crasher maries kørsel?
+* PP: Sink til prøve
 
-** Genkør Taastrup wepp med rettelser.
+** Tillad negativ subsoil irrigation
 
+** Kopier S_DRAIN for stoftransport
 
+** Lav setup
 
-*** planter
+** Test setup
 
-**** plot Inf, K15, og rodvækst
+** Lav ny version
 
-** Få stoftransport til at virke!
+* JB: Få stoftransport til at virke med WEPP
+
+* JB: Opsætning med wepp + "ikke gennemtrængbar" overflade.
+
+* JB: Is
+
+* Den store flyttedag!
+
+** Ubuntu
+
+*** Kopi af PC på extern HD.
+
+*** Opgrader ubuntu
+
+** Daisy Model
+
+*** Kopi af daisy-model på extern HD
+
+*** Migrer til github
+
+*** Hvad med hjemmside?
+
+** Automatiser windows
+
+*** commit / update github
+
+*** Byg 32 bit version
+
+*** Publiser 32 bit version
 
 * Check FAO_PM
 
 Signe fik alt for høje RefEvap-Used og lave udbytter med FAO_PM.
-
-* Pestpore
-
-** Opsætning af pesticideksperiment (minimal 1D opsætning). Plots
 
 * Emacs
 

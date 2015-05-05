@@ -119,6 +119,8 @@ public:
   { return S_root_[i]; }
   double S_drain (std::size_t i) const
   { return S_drain_[i]; }
+  double S_incorp (std::size_t i) const
+  { return S_incorp_[i]; }
   double S_M2B (std::size_t i) const
   { return S_M2B_[i]; }
   double S_B2M (std::size_t i) const

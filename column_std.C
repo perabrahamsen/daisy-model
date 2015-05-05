@@ -927,6 +927,7 @@ ColumnStandard::output (Log& log) const
   output_submodule (*soil_heat, "SoilHeat", log);
   output_object (chemistry, "Chemistry", log);
   output_derived (vegetation, "Vegetation", log);
+  output_derived (litter, "Litter", log);
   output_derived (organic_matter, "OrganicMatter", log);
   output_value (second_year_utilization_, "second_year_utilization", log);
   output_variable (tillage_age, log);

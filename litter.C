@@ -25,6 +25,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "check.h"
+#include "log.h"
 
 // The 'litter' component.
 
@@ -37,7 +38,14 @@ Litter::library_id () const
   return id;
 }
 
-Litter::Litter ()
+void
+Litter::output (Log& log) const
+{
+  output_value (cover (), "cover", log);
+}
+
+Litter::Litter  (const BlockModel& al)
+  : ModelDerived (al.type_name ())
 { }
 
 Litter::~Litter ()
@@ -50,7 +58,11 @@ static struct LitterInit : public DeclareComponent
 Litter, surface residuals, or mulch below canopy.")
   { }
   void load_frame (Frame& frame) const
-  { Model::load_model (frame); }
+  { 
+    Model::load_model (frame); 
+    frame.declare_fraction ("cover", Attribute::LogOnly, "\
+Fraction of surface area covered by litter.");
+  }
 } Litter_init;
 
 // The 'none' model.
@@ -72,7 +84,8 @@ struct LitterNone : public Litter
   // Create and Destroy.
   void initialize (const double)
   { }
-  LitterNone (const BlockModel&)
+  LitterNone (const BlockModel& al)
+    : Litter (al)
   { }
   ~LitterNone ()
   { }
@@ -115,7 +128,8 @@ struct LitterPermanent : public Litter
   void initialize (const double)
   { }
   LitterPermanent (const BlockModel& al)
-    : vapor_flux_factor_ (al.number ("vapor_flux_factor")),
+    : Litter (al),
+      vapor_flux_factor_ (al.number ("vapor_flux_factor")),
       interception_capacity (al.number ("interception_capacity")),
       albedo_ (al.number ("albedo", -1.0))
   { }
@@ -177,7 +191,8 @@ struct LitterResidue : public Litter
   void initialize (const double top_DM /* [kg DM/m^2] */)
   { DM = top_DM; }
   LitterResidue (const BlockModel& al)
-    : water_capacity_ (al.number ("water_capacity")),
+    : Litter (al),
+      water_capacity_ (al.number ("water_capacity")),
       vapor_flux_factor_ (al.number ("vapor_flux_factor")),
       specific_AI (al.number ("specific_AI")),
       extinction_coefficent (al.number ("extinction_coefficent")),

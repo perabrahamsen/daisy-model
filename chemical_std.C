@@ -1091,6 +1091,21 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
   // Permanent source.
   for (size_t c = 0; c < cell_size; c++)
     S_external[c] += S_permanent[c];
+
+  // Pumping water.
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double S_pump = soil_water.S_incorp (c);
+      if (S_pump < 0.0)
+        continue;
+
+      // We really should go down in timesteps here instead.
+      const double S_min = -0.5 * M_total_[c] / dt;
+      S_external[c] += std::max (-S_pump * C_to_drain (c),
+                                 S_min);
+    }
+  
+  // Tillage + pumping + external source.
   add_to_source_secondary (S_external); 
  
   // Drainage.

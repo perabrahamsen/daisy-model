@@ -237,7 +237,20 @@ HydraulicWEPP::tick (const double dt /* [h] */, const double rain /* [mm/h] */,
         {
           R_c = (-0.01 * freeze_effect) / (-delta_pmx + freeze_effect);
           const double new_delta_prf = delta_pmx * (R_c / (0.01 + R_c));
-          daisy_approximate (delta_prf - freeze_effect, new_delta_prf);
+          if (!approximate (delta_prf - freeze_effect, new_delta_prf))
+            {
+              std::ostringstream tmp;
+              tmp << "ice = " << ice
+                  << "; freeze_on = " << freeze_on
+                  << "; frozen = " << frozen
+                  << "; R_c = " << R_c
+                  << "; new_delta_prf = " << new_delta_prf
+                  << "; freeze_effect = " << freeze_effect
+                  << "; delta_prf = " << delta_prf
+                  << "; delta_pmx = " << delta_pmx
+                  << "; rho_b = " << rho_b;
+              msg.error (tmp.str ());
+            }
         }
 
       msg.message ("Surface freezes");

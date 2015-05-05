@@ -1,3 +1,7 @@
+2015-04-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* litter.h: Make 'cover' logable.
+
 2015-03-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* program_sbrdata.C: New model.

@@ -22,12 +22,12 @@
 #ifndef LITTER_H
 #define LITTER_H
 
-#include "model.h"
+#include "model_derived.h"
 #include "symbol.h"
 
 class BlockModel;
 
-class Litter : public Model
+class Litter : public ModelDerived
 {
   // Content.
 public:
@@ -36,6 +36,8 @@ public:
 
   // Simulation.
 public:
+  void output (Log& log) const;
+  
   virtual void update (double top_DM /* [kg DM/m^2] */) = 0;
   virtual double cover () const = 0; // Fraction of surface covered [0-1]
   virtual double vapor_flux_factor () const = 0; // Affect on soil evap. []
@@ -46,7 +48,7 @@ public:
 public:
   virtual void initialize (double top_DM /* [kg DM/m^2] */) = 0;
 protected:
-  Litter ();
+  Litter (const BlockModel&);
 public:
   ~Litter ();
 };

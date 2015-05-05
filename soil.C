@@ -193,7 +193,7 @@ struct Soil::Implementation
     // Ice content.
     std::map<const Horizon*, double> ice;
     for (std::size_t c = 0; c < geo.cell_size (); c++)
-      ice[horizon_[c]] += soil_water.X_ice_total (c) * geo.cell_volume (c);
+      ice[horizon_[c]] += soil_water.X_ice (c) * geo.cell_volume (c);
     
     for (std::map<const Horizon*, double>::const_iterator i = ice.begin ();
          i != ice.end ();
