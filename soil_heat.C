@@ -33,6 +33,7 @@
 #include "treelog.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "vcheck.h"
 #include <sstream>
 
 static const double rho_water = 1.0; // [g/cm^3]
@@ -387,19 +388,23 @@ SoilHeat::update_freezing_points (const Soil& soil,
       const double h_ice = soil_water.h_ice (i);
       const double h_melt = std::max (h_ice, h);
 
-#ifdef SHAFIX
-      T_thawing[i] 
-        = std::min (0.0, 273. *  h_melt / (latent_heat_of_fussion /gravity));
-      T_freezing[i] 
-        = std::min (T_thawing[i] - 0.01, 
-                    273. *  h / (latent_heat_of_fussion / gravity));
-#else
-      T_thawing[i] 
-        = std::min (0.0, 273. *  h_melt / (latent_heat_of_fussion /gravity - h_melt));
-      T_freezing[i] 
-        = std::min (T_thawing[i] - 0.01, 
-                    273. *  h / (latent_heat_of_fussion / gravity - h));
-#endif
+      if (experimental)
+        {
+          T_thawing[i] 
+            = std::min (0.0, 
+                        273. *  h_melt / (latent_heat_of_fussion /gravity));
+          T_freezing[i] 
+            = std::min (T_thawing[i] - T_thawing_epsilon, 
+                        273. *  h / (latent_heat_of_fussion / gravity));
+        }
+      else
+        {
+          T_thawing[i] 
+            = std::min (0.0, 273. *  h_melt / (latent_heat_of_fussion /gravity - h_melt));
+          T_freezing[i] 
+            = std::min (T_thawing[i] - T_thawing_epsilon, 
+                        273. *  h / (latent_heat_of_fussion / gravity - h));
+        }
       daisy_assert (T_freezing[i] <= T_thawing[i]);
 
       switch (state[i])
@@ -553,9 +558,7 @@ SoilHeat::calculate_freezing_rate (const Geometry& geo,
   daisy_assert (i < cell_size);
   daisy_assert (T.size () == cell_size);
   daisy_assert (T_old.size () == cell_size);
-#ifndef SHAFIX
   const double T_mean = (T[i] + T_old[i]) / 2.0;
-#endif
   const double dT = T[i] - T_old[i];
   const double h = soil_water.h (i);
 
@@ -577,9 +580,9 @@ SoilHeat::calculate_freezing_rate (const Geometry& geo,
   
   const double vol = geo.cell_volume (i);
 
-#ifdef SHAFIX
-  return rho_water/rho_ice * (- dq / vol - latent_heat_of_fussion / (273 * gravity) * soil.Cw2 (i, h) * dT / dt);
-#else
+  if (experimental)
+    return rho_water/rho_ice * (- dq / vol - latent_heat_of_fussion / (273 * gravity) * soil.Cw2 (i, h) * dT / dt);
+
   const double S 
     = soil_water.S_sum (i) - soil_water.S_ice_water (i);
   const double Sh
@@ -587,7 +590,7 @@ SoilHeat::calculate_freezing_rate (const Geometry& geo,
   const double cap = capacity (soil, soil_water, i);
   return (1.0 / (latent_heat_of_fussion * rho_ice))
     * (cap * dT / dt + dq / vol + Sh);
-#endif
+
 }
 
 bool
@@ -733,15 +736,20 @@ SoilHeat::load_syntax (Frame& frame)
   frame.declare ("h_frozen", "cm^-1", Attribute::Const,
               "Pressure below which no more water will freeze.");
   frame.set ("h_frozen", -15000.0);
-  frame.declare_boolean ("enable_ice", Attribute::Const,
-              "Disable this to prevent water from freezing.");
-  frame.set ("enable_ice", false);
+  frame.declare_string ("enable_ice", Attribute::Const,
+                        "Set this to 'false', 'true', or 'experimental.");
+  static VCheck::Enum ice_check ("false", "true", "experimental");
+  frame.set_check ("enable_ice", ice_check);
+  frame.set ("enable_ice", "false");
   frame.declare ("T_top", "dg C", Attribute::OptionalState, 
               "Surface temperature at previous time step.");
   frame.declare ("T_freezing", "dg C", Attribute::LogOnly, Attribute::SoilCells,
               "Freezing point depression for freezing.");
   frame.declare ("T_thawing", "dg C", Attribute::LogOnly, Attribute::SoilCells,
               "Freezing point depression for thawing.");
+  frame.declare ("T_thawing_epsilon", "dg C", Attribute::Const, 
+                 "Subtract this from T_thawing for stability.");
+  frame.set ("T_thawing_epsilon", 0.01);
   frame.declare ("q", "erg/cm^2/h", Attribute::LogOnly, Attribute::SoilEdges,
               "Heat flux.");
   frame.declare ("state", Attribute::Unknown (), Attribute::LogOnly, Attribute::SoilCells,
@@ -750,7 +758,9 @@ SoilHeat::load_syntax (Frame& frame)
 
 SoilHeat::SoilHeat (const Block& al)
   : h_frozen (al.number ("h_frozen")),
-    enable_ice (al.flag ("enable_ice")),
+    enable_ice (al.name ("enable_ice") != symbol ("false")),
+    experimental (al.name ("enable_ice") == symbol ("experimental")),
+    T_thawing_epsilon (al.number ("T_thawing_epsilon")),
     T_top_ (al.number ("T_top", -500.0))
 {
   if (al.check ("S"))

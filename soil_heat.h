@@ -47,7 +47,8 @@ class SoilHeat : private boost::noncopyable
 private:
   const double h_frozen;
   const bool enable_ice;
-
+  const bool experimental;      // Enable 2015 changes.
+  const double T_thawing_epsilon; // [dg C]
   // State
 private:
   double T_top_;

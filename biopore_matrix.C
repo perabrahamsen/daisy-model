@@ -214,6 +214,7 @@ BioporeMatrix::volume_to_height (const size_t col,
       daisy_assert (iszero (water_volume));
       return 0.0;
     }
+  daisy_assert (density > 0.0);
 
   const double xminus = col == 0 ? 0.0 : xplus[col-1];
   const double radius = diameter * 0.5;       // [cm]
@@ -368,6 +369,7 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
       const double wall_top = std::min (z_air, high_point);
       const double wall_fraction
         = (wall_top - low_point) / (cell_top - cell_bottom);
+      daisy_assert (std::isfinite (wall_fraction));
 
       // The resistence to be overcome for water leaving the biopore is
       // different in the primary and secondary domain, in general we
@@ -377,9 +379,11 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
                                                               K_wall_relative,
                                                               M_c, r_c,
                                                               h, h3_cell);
+      daisy_assert (std::isfinite (S1));
       const double S2 = (K_crack < 0.0)
         ? 0.0
         : - wall_fraction * biopore_to_secondary (K_crack, M_c, r_c, h3_cell);
+      daisy_assert (std::isfinite (S2));
       S = std::min (S1, S2);
     }
   else if ((allow_upward_flow || cell_z > z3_lowest) 
@@ -390,6 +394,7 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
       const double h3_suck = std::max (h3_cell, h + pressure_limit);
       S = matrix_to_biopore (K_xx, M_c, r_c, h, h3_suck)
         * geo.fraction_in_z_interval (c, height_start, height_end);
+      daisy_assert (std::isfinite (S));
     }
   else 
     S = 0.0;
@@ -413,9 +418,11 @@ BioporeMatrix::find_matrix_sink (const Geometry& geo,
     {
       const size_t col = column[c];
       const double M_c = density_column[col]; // [cm^-2]
+      daisy_assert (std::isfinite (S3[c]));
       S3[c] += matrix_biopore_matrix (c, geo, active[c], h_barrier, M_c,
                                       pressure_limit, K[c], K_crack[c],
                                       z3_lowest[col], h3_bottom[col], h[c]);
+      daisy_assert (std::isfinite (S3[c]));
     }
 }
 
@@ -485,6 +492,8 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
   // removed water volume per column.
   const size_t col_size = xplus.size ();
   const size_t cell_size = geo.cell_size ();
+
+  daisy_assert (S.size () == cell_size);
 
   // Initial guess and interval.
   std::vector<double> h3_min (col_size, 0.0);
@@ -626,12 +635,16 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
   std::vector<double> vol_removed (col_size, 0.0);
   for (size_t c = 0; c < cell_size; c++)
     {
+      daisy_assert (std::isfinite (S[c]));
       const double vol = S[c] * dt * geo.cell_volume (c);
       const size_t col = column[c];
       if (S[c] > 0.0)
         vol_added[col] += vol;
-      else
+      else if (S[c] < 0.0)
         vol_removed[col] -= vol;
+      else
+        daisy_assert (iszero (S[c]));
+      
     }
 
   // Find number to multiply sink and sources with, in order to avoid
@@ -644,6 +657,8 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
     {
       const double h_added = volume_to_height (col, vol_added[col]);
       daisy_assert (h_added >= 0.0);
+      daisy_assert (std::isfinite (vol_removed[col]));
+      daisy_assert (vol_removed[col] >= 0.0);
       const double h_removed = volume_to_height (col, vol_removed[col]);
       daisy_assert (h_removed >= 0.0);
       const double h_new = h_bottom[col] + h_added - h_removed;
@@ -701,10 +716,12 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
   for (size_t c = 0; c < cell_size; c++)
     {
       const size_t col = column[c];
+      daisy_assert (std::isfinite (S[c]));
       if (S[c] > 0.0)
         S[c] *= scale_added[col];
       else
         S[c] *= scale_removed[col];
+      daisy_assert (std::isfinite (S[c]));
     }
 
   // Test results.
@@ -821,10 +838,15 @@ BioporeMatrix::add_to_sink (std::vector<double>& S_B2M,
   daisy_assert (S_M2B.size () == cell_size);
   for (size_t c = 0; c < cell_size; c++)
     {
+      daisy_assert (std::isfinite (S[c]));
+      daisy_assert (S_M2B[c] >= 0.0);
+      daisy_assert (S_B2M[c] >= 0.0);
       if (S[c] > 0)
         S_M2B[c] += S[c];
       else
         S_B2M[c] -= S[c];
+      daisy_assert (S_M2B[c] >= 0.0);
+      daisy_assert (S_B2M[c] >= 0.0);
     }
 }
 

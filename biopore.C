@@ -153,7 +153,11 @@ Biopore::biopore_to_primary (const double K_matrix,
                              const double M_c, const double r_c,
                              const double h, const double h_3)
 {
+  daisy_assert (std::isfinite (h));
+  daisy_assert (r_c > 0.0);
   const double r_matrix = std::pow (M_PI * M_c, -0.5);
+  daisy_assert (r_matrix > 0.0);
+  
   const double a1 = 1.1;  // Relative biopore wall size: r_i / r_c [] 
   const double a2 = K_wall_rel; // Relative biopore wall conductivity []
   const double A1 
@@ -163,7 +167,7 @@ Biopore::biopore_to_primary (const double K_matrix,
   const double K = B1 * K_matrix;
   const double S = -M_c * 2.0 * M_PI * K * (h_3 - h)
     / std::log (r_c / r_matrix);
-  if (S < 0.0)
+  if (S < 0.0 || !std::isfinite (S))
     {
       std::ostringstream tmp;
       tmp << "K_matrix = " << K_matrix << " [cm/h]\n"
@@ -180,6 +184,7 @@ Biopore::biopore_to_primary (const double K_matrix,
           << "r_matrix = " << r_matrix << " [cm]\n"
           << "S = " << S << " [] (expected >= 0)";
       daisy_bug (tmp.str ());
+      return 0.0;
     }
   return S;
 }
@@ -203,9 +208,14 @@ Biopore::biopore_to_secondary (const double K_crack,
 void 
 Biopore::scale_sink (const double scale)
 {
+  daisy_assert (std::isfinite (scale));
   const size_t cell_size = S.size ();
   for (size_t c = 0; c < cell_size; c++)
-    S[c] *= scale;
+    {
+      daisy_assert (std::isfinite (S[c]));
+      S[c] *= scale;
+      daisy_assert (std::isfinite (S[c]));
+    }
 }
 
 void 

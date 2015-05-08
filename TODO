@@ -1,18 +1,20 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* JB: Prøv wepp + Sorøer / Karlslunde med en anden Ea model som tager hensyn til canopy/litter
+* T_thawing - 0.01 
 
-* PP: Sink til prøve
+Gør 0.01 til en option.
 
-** Tillad negativ subsoil irrigation
+* Pump?
 
-** Kopier S_DRAIN for stoftransport
+** Hvordan gik det at ændre K_wall_relative?
 
-** Lav setup
+Hvis ikke det virker, sæt den tilbage.
 
-** Test setup
+** Prøv at sætte sprækkedomæne ind
 
-** Lav ny version
+SH siger ok.
+
+** Tag direkte fra bioporer?
 
 * JB: Få stoftransport til at virke med WEPP
 

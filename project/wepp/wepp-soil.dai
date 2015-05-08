@@ -111,7 +111,8 @@
   (hydraulic Styczen 
              (time_consolidation 0.0073 [d^-1])
              (consolidate_factor 0.88 [])
-             (consolidate_factor_water -0.069 [])))
+             (consolidate_factor_water -0.069 []))
+  )
           
 (defhorizon "Rorrende Bplow layer_4" USDA3
   (description "25-33 cm Petersen et al (2004)")
@@ -135,7 +136,7 @@
 (defcolumn Rorrende_led3 WEPP;; led 3
   "This is a Rorrende soil with pipe drains."
 ;;  (OrganicMatter none)
-  (Chemistry none)
+  ;;(Chemistry none)
     (Soil (MaxRootingDepth 150 [cm])
   (horizons (-3.00 "Overflade Ap_3")
             (-25.00 "Rorrende Ap_3")
