@@ -48,6 +48,7 @@
           ("Soil Temperature" (when daily))
           ("Crop Production" (when daily))
           ("Field water")
+          ("Soil water" (to -1 [m]))
           ("Field chemical" (chemical colloid))
           ("Vegetation" (when daily))
           (checkpoint (when (at 2013 11 12 6)))))

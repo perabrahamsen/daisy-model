@@ -327,7 +327,7 @@ SoilWater::tick_before (const Geometry& geo, const Soil& soil,
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
       const double Theta_res = soil.Theta_res (i);
 
-      X_ice_[i] -= S_ice_ice[i];
+      X_ice_[i] -= S_ice_ice[i] * dt;
 
       // Move extra ice to buffer.
       const double total_ice = X_ice_[i] + X_ice_buffer_[i];
@@ -340,7 +340,8 @@ SoilWater::tick_before (const Geometry& geo, const Soil& soil,
                   << ", less than Theta_res = " << Theta_res;
               daisy_warning (tmp.str ());
             }
-          const double Theta_lim = std::max (Theta_res, Theta_[i]);
+          const double Theta_lim = std::max (Theta_res, 
+                                             Theta_[i] - S_ice_water_[i] * dt);
 
           const double available_space = std::max (Theta_sat - Theta_lim - 1e-9,
                                                    0.0);

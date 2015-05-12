@@ -297,7 +297,6 @@ TertiaryBiopores::tick_source (const Geometry& geo, const Soil& soil,
       else
         K_crack[c] = soil.K (c, h_lim + 0.001, h_ice, T) * anisotropy;
     }
-
   // Prepare classes and find forward source.
   std::vector<double> S_forward_total (cell_size, 0.0);
   std::vector<double> S_forward_sink (cell_size, 0.0);

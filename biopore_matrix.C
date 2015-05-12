@@ -385,6 +385,23 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
         : - wall_fraction * biopore_to_secondary (K_crack, M_c, r_c, h3_cell);
       daisy_assert (std::isfinite (S2));
       S = std::min (S1, S2);
+
+      if (h < -100000)
+        {
+          std::ostringstream tmp;
+          tmp << "S1 = " << S1
+              << "\nS2  = " << S2
+              << "\nS  = " << S
+              << "\nK_xx  = " << K_xx
+              << "\nK_crack  = " << K_crack
+              << "\nK_wall_relative  = " << K_wall_relative
+              << "\nwall_fraction  = " << wall_fraction
+              << "\nM_c  = " << M_c
+              << "\nr_c  = " << r_c
+              << "\nh  = " << h
+              << "\nh3_cell  = " << h3_cell;
+          Assertion::message (tmp.str ());
+        }
     }
   else if ((allow_upward_flow || cell_z > z3_lowest) 
            && active && h>h3_cell + h_barrier)

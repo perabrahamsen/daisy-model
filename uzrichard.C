@@ -600,6 +600,15 @@ UZRichard::richard (Treelog& msg,
 	* geo.dz (i) + q[i];
     }
 
+  for (unsigned int i = 0; i < size; i++)
+    if (!std::isfinite (h[i]))
+      {
+        std::ostringstream tmp;
+        tmp << "h[" << i << "] = " << h[i];
+        msg.error (tmp.str ());
+        return false;
+      }
+
   return true;
 }
 

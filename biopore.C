@@ -148,44 +148,27 @@ Biopore::matrix_to_biopore (double K_xx, double M_c, double r_c,
 }
 
 double 
-Biopore::biopore_to_primary (const double K_matrix,
-                             const double K_wall_rel, //  K_wall_rel []
-                             const double M_c, const double r_c,
-                             const double h, const double h_3)
+Biopore::biopore_to_primary (const double K_matrix,   // Matrix conduc. [cm/h]
+                             const double K_wall_rel, // Relative wall cond. []
+                             const double M_c, // density [cm^2]
+                             const double r_c, // biopore radius [cm]
+                             const double h, // Pressure in matrix [hPa]
+                             const double h_3 // Pressure in biopore [hPa]
+                             )
 {
   daisy_assert (std::isfinite (h));
   daisy_assert (r_c > 0.0);
   const double r_matrix = std::pow (M_PI * M_c, -0.5);
   daisy_assert (r_matrix > 0.0);
   
-  const double a1 = 1.1;  // Relative biopore wall size: r_i / r_c [] 
-  const double a2 = K_wall_rel; // Relative biopore wall conductivity []
-  const double A1 
-    = a2 * (std::log (r_matrix / r_c) - std::log (a1))
-    / std::log (a1);
-  const double B1 = A1 / (1.0 + A1);
-  const double K = B1 * K_matrix;
-  const double S = -M_c * 2.0 * M_PI * K * (h_3 - h)
-    / std::log (r_c / r_matrix);
-  if (S < 0.0 || !std::isfinite (S))
-    {
-      std::ostringstream tmp;
-      tmp << "K_matrix = " << K_matrix << " [cm/h]\n"
-          << "K_wall_rel = " << K_wall_rel << " []\n"
-          << "M_c = " << M_c << " [cm^-2]\n"
-          << "r_c = " << r_c << " [cm]\n"
-          << "h = " << h << " [cm]\n"
-          << "h_3 = " << h_3 << " [cm]\n"
-          << "a1 = " << a1 << " []\n"
-          << "a2 = " << a2 << " []\n"
-          << "A1 = " << A1 << " []\n"
-          << "B1 = " << B1 << " []\n"
-          << "K = " << K << " [cm/h]\n"
-          << "r_matrix = " << r_matrix << " [cm]\n"
-          << "S = " << S << " [] (expected >= 0)";
-      daisy_bug (tmp.str ());
-      return 0.0;
-    }
+  const double r_wall_rel = 1.1;  // Relative biopore wall size: r_i / r_c [] 
+  const double a = K_wall_rel * (std::log (r_matrix / r_c) 
+                                 - std::log (r_wall_rel))
+    / std::log (r_wall_rel);
+  const double S = (2.0 * M_PI * M_c * K_matrix * (h_3 - h)
+                    / (std::log (r_matrix / r_c) - std::log (r_wall_rel)))
+    * (a / (1.0 + a));
+
   return S;
 }
 
