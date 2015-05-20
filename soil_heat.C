@@ -34,6 +34,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "vcheck.h"
+#include "mathlib.h"
 #include <sstream>
 
 static const double rho_water = 1.0; // [g/cm^3]
@@ -114,7 +115,7 @@ double
 SoilHeat::source (const Geometry& geo, const SoilWater& soil_water,
 		  size_t c) const
 {
-  double v = S[c];
+  double v = 0.0;
 
   if (state[c] == SoilHeat::freezing || state[c] == SoilHeat::thawing)
     {
@@ -135,10 +136,6 @@ SoilHeat::source (const Geometry& geo, const SoilWater& soil_water,
 
   return v;
 }
-
-void 
-SoilHeat::set_source (const size_t c, const double value) // [erg/cm^3/h]
-{ S[c] = value; }
 
 double 
 SoilHeat::T_pseudo (const Geometry& geo,
@@ -214,6 +211,21 @@ SoilHeat::calculate_heat_flux (const Geometry& geo,
     }
 }
 
+double
+SoilHeat::suggest_dt (const double T_air) const
+{
+  if (!enable_ice)
+    return NAN;
+  const size_t cell_size = T_.size ();
+  if (T_air <= 0.0)
+    return ice_dt;
+  for (size_t c = 0; c < cell_size; c++)
+    if (T_[c] <= 0.0)
+      return ice_dt;
+
+  return NAN;
+}
+
 void 
 SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
 		const double T_bottom, 
@@ -249,6 +261,7 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
       const double X_ice = soil_water.X_ice (c);
       conductivity[c] = soil.heat_conductivity (c, Theta, X_ice);
 #if 1
+      daisy_assert (iszero (soil_water.S_ice_water (c)));
       S_water[c] = soil_water.S_sum (c) - soil_water.S_ice_water (c);
 #else
       S_water[c] = 0.0;
@@ -278,7 +291,7 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
 	    {
 	      capacity_apparent_[c]
 		= this->capacity_apparent (soil, soil_water, c);
-	      S[c] = this->source (geo, soil_water, c);
+	      S_heat[c] = this->source (geo, soil_water, c);
 	    }
 	  T = T_old;
 	  movement.heat (q_water, S_water, S_heat,
@@ -388,23 +401,11 @@ SoilHeat::update_freezing_points (const Soil& soil,
       const double h_ice = soil_water.h_ice (i);
       const double h_melt = std::max (h_ice, h);
 
-      if (experimental)
-        {
-          T_thawing[i] 
-            = std::min (0.0, 
-                        273. *  h_melt / (latent_heat_of_fussion /gravity));
-          T_freezing[i] 
-            = std::min (T_thawing[i] - T_thawing_epsilon, 
-                        273. *  h / (latent_heat_of_fussion / gravity));
-        }
-      else
-        {
-          T_thawing[i] 
-            = std::min (0.0, 273. *  h_melt / (latent_heat_of_fussion /gravity - h_melt));
-          T_freezing[i] 
-            = std::min (T_thawing[i] - T_thawing_epsilon, 
-                        273. *  h / (latent_heat_of_fussion / gravity - h));
-        }
+      T_thawing[i] 
+        = std::min (0.0, 273. *  h_melt / (latent_heat_of_fussion /gravity - h_melt));
+      T_freezing[i] 
+        = std::min (T_thawing[i] - T_thawing_epsilon, 
+                    273. *  h / (latent_heat_of_fussion / gravity - h));
       daisy_assert (T_freezing[i] <= T_thawing[i]);
 
       switch (state[i])
@@ -560,7 +561,6 @@ SoilHeat::calculate_freezing_rate (const Geometry& geo,
   daisy_assert (T_old.size () == cell_size);
   const double T_mean = (T[i] + T_old[i]) / 2.0;
   const double dT = T[i] - T_old[i];
-  const double h = soil_water.h (i);
 
   const size_t edge_size = geo.edge_size ();
   daisy_assert (q.size () == edge_size);
@@ -579,9 +579,6 @@ SoilHeat::calculate_freezing_rate (const Geometry& geo,
     }
   
   const double vol = geo.cell_volume (i);
-
-  if (experimental)
-    return rho_water/rho_ice * (- dq / vol - latent_heat_of_fussion / (273 * gravity) * soil.Cw2 (i, h) * dT / dt);
 
   const double S 
     = soil_water.S_sum (i) - soil_water.S_ice_water (i);
@@ -706,14 +703,6 @@ SoilHeat::check (const size_t n, Treelog& err) const
       err.entry (tmp.str ());
       ok = false;
     }
-  if (S.size () != n)
-    {
-      std::ostringstream tmp;
-      tmp << "You have " << n << " intervals but " 
-          << S.size () << " sink values";
-      err.entry (tmp.str ());
-      ok = false;
-    }
   return ok;
 }
 
@@ -725,8 +714,6 @@ void
 SoilHeat::load_syntax (Frame& frame)
 { 
   Geometry::add_layer (frame, Attribute::OptionalState, "T", load_T);
-  frame.declare ("S", "erg/cm^3/h", Attribute::OptionalState, 
-                 "External heat source, by default zero.");
   frame.declare ("conductivity", "erg/cm/dg C/h", Attribute::LogOnly, 
                  "Heat conductivity.");
   frame.declare ("capacity", "erg/cm^3/dg C", Attribute::LogOnly, 
@@ -737,10 +724,14 @@ SoilHeat::load_syntax (Frame& frame)
               "Pressure below which no more water will freeze.");
   frame.set ("h_frozen", -15000.0);
   frame.declare_string ("enable_ice", Attribute::Const,
-                        "Set this to 'false', 'true', or 'experimental.");
-  static VCheck::Enum ice_check ("false", "true", "experimental");
+                        "Set this to 'false' or 'true'");
+  static VCheck::Enum ice_check ("false", "true");
   frame.set_check ("enable_ice", ice_check);
   frame.set ("enable_ice", "false");
+  frame.declare ("ice_dt", "h", Attribute::Const, 
+                 "Timestep to use when ice is enabled.\n\
+This applies when there are subzero temperatures in the profile.");
+  frame.set ("ice_dt", 5.0 / 60.0);
   frame.declare ("T_top", "dg C", Attribute::OptionalState, 
               "Surface temperature at previous time step.");
   frame.declare ("T_freezing", "dg C", Attribute::LogOnly, Attribute::SoilCells,
@@ -759,13 +750,10 @@ SoilHeat::load_syntax (Frame& frame)
 SoilHeat::SoilHeat (const Block& al)
   : h_frozen (al.number ("h_frozen")),
     enable_ice (al.name ("enable_ice") != symbol ("false")),
-    experimental (al.name ("enable_ice") == symbol ("experimental")),
+    ice_dt (al.number ("ice_dt")),
     T_thawing_epsilon (al.number ("T_thawing_epsilon")),
     T_top_ (al.number ("T_top", -500.0))
-{
-  if (al.check ("S"))
-    S = al.number_sequence ("S");
-}
+{ }
 
 void 
 SoilHeat::initialize (const FrameSubmodel& al, const Geometry& geo,
@@ -777,8 +765,6 @@ SoilHeat::initialize (const FrameSubmodel& al, const Geometry& geo,
 
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
-  while (S.size () < cell_size)
-    S.push_back (0.0);
   capacity_old.insert (capacity_old.begin (), cell_size, -42.42e42);
   capacity_apparent_.insert (capacity_apparent_.begin (), cell_size, -42.42e42);
   conductivity_.insert (conductivity_.begin (), cell_size, -42.42e42);

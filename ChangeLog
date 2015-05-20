@@ -1,3 +1,7 @@
+2015-05-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* Makefile (MODELS): Removed 'action_heat.C'.
+
 2015-04-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* litter.h: Make 'cover' logable.

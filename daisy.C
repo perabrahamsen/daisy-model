@@ -311,8 +311,11 @@ Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
       const double weather_dt = weather.get () 
         ? weather->suggest_dt ()
         : 0.0;
+      const double T_air = weather.get () 
+        ? weather->air_temperature ()
+        : 42.42e42;
 
-      double suggested_dt = field->suggest_dt (weather_dt); 
+      double suggested_dt = field->suggest_dt (weather_dt, T_air); 
       if (!std::isnormal (suggested_dt))
         suggested_dt = max_dt;
 

@@ -379,8 +379,6 @@ Movement1D::tick (const Soil& soil, SoilWater& soil_water,
 
   TREELOG_MODEL (msg);
 
-  soil_water.tick_before (*geo, soil, dt, msg);
-
   // Cells.
   std::vector<double> S_sum (cell_size);
   std::vector<double> h_old (cell_size);

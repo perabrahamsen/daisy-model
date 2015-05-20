@@ -176,9 +176,13 @@ public:
   void tick_source (const Geometry&, const Soil&, Treelog&);
   double suggest_dt ();
 
-  // Before water movement.
+  // Before heat.
   void tick_before (const Geometry&, const Soil& soil, 
                     double dt, Treelog& msg);
+
+  // After heat, before water movement.
+  void tick_ice (const Geometry&, const Soil& soil, double dt, Treelog& msg);
+
   // After water movement.
   void tick_after (const Geometry&, 
                    const Soil& soil, const SoilHeat& soil_heat, 

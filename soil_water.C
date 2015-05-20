@@ -321,10 +321,32 @@ SoilWater::tick_before (const Geometry& geo, const Soil& soil,
   for (size_t i = 0; i < cell_size; i++)
     tillage_[i] /= dt;
 
+  // External sink.
+  for (size_t i = 0; i < cell_size; i++)
+    {
+      S_incorp_[i] += S_permanent_[i];
+      S_sum_[i] += S_incorp_[i];
+    }
+
+  // Remember old values.
+  h_old_ = h_;
+  Theta_old_ = Theta_;
+  Theta_primary_old_ = Theta_primary_;
+  Theta_secondary_old_ = Theta_secondary_;
+}
+
+void
+SoilWater::tick_ice (const Geometry& geo, const Soil& soil, 
+                     const double dt, Treelog& msg)
+{
+  TREELOG_SUBMODEL (msg, "SoilWater");
+
+  const size_t cell_size = geo.cell_size ();
+
   // Ice first.
   for (size_t i = 0; i < cell_size; i++)
     {
-      const double Theta_sat = soil.Theta (i, 0.0, 0.0);
+      const double porosity = soil.Theta (i, 0.0, 0.0);
       const double Theta_res = soil.Theta_res (i);
 
       X_ice_[i] -= S_ice_ice[i] * dt;
@@ -343,7 +365,7 @@ SoilWater::tick_before (const Geometry& geo, const Soil& soil,
           const double Theta_lim = std::max (Theta_res, 
                                              Theta_[i] - S_ice_water_[i] * dt);
 
-          const double available_space = std::max (Theta_sat - Theta_lim - 1e-9,
+          const double available_space = std::max (porosity - Theta_lim - 1e-9,
                                                    0.0);
           if (available_space < total_ice)
             {
@@ -362,21 +384,8 @@ SoilWater::tick_before (const Geometry& geo, const Soil& soil,
           X_ice_buffer_[i] = total_ice;
         }
       // Update ice pressure.
-      h_ice_[i] = soil.h (i, Theta_sat - X_ice_[i]);
+      h_ice_[i] = soil.h (i, porosity - X_ice_[i]);
     }
-
-  // External sink.
-  for (size_t i = 0; i < cell_size; i++)
-    {
-      S_incorp_[i] += S_permanent_[i];
-      S_sum_[i] += S_incorp_[i];
-    }
-
-  // Remember old values.
-  h_old_ = h_;
-  Theta_old_ = Theta_;
-  Theta_primary_old_ = Theta_primary_;
-  Theta_secondary_old_ = Theta_secondary_;
 }
 
 void

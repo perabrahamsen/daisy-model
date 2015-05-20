@@ -39,6 +39,7 @@
 struct Surface::Implementation
 {
   // Content.
+  const double temperature_change_rate; // [h^-1]
   const double EpFactor;
   const double albedo_wet;
   const double albedo_dry;
@@ -424,7 +425,7 @@ Surface::Implementation::tick (Treelog& msg,
   update_pond_average (geo);
   daisy_approximate (local_pond_average, pond_average);
   
-  // Remember potential evaopration
+  // Remember potential evaporation
   Eps = PotSoilEvaporationWet;
 
   double EvapSoilTotal = 0.0;   // [mm cm^2/h]
@@ -477,17 +478,24 @@ Surface::Implementation::tick (Treelog& msg,
   update_pond_average (geo);
 
   // Temperature
-  if (pond_average < 1e-6)
-    T = temp;
+  double new_T = T;
+  if (old_pond_average < 1e-6)
+    new_T = temp;
   else if (flux_in < 0.0)
     {
-      if (pond_average - EvapSoilSurface * dt + flux_in * dt < 1e-6)
-        T = temp;
+      if (old_pond_average - EvapSoilSurface * dt + flux_in * dt < 1e-6)
+        new_T = temp;
       // else use old temperature.
     }
   else
-    T = (T * pond_average + temp * flux_in * dt)
-      / (pond_average + flux_in * dt);
+    new_T = (T * old_pond_average + temp * flux_in * dt)
+      / (old_pond_average + flux_in * dt);
+
+  // Slow down changes to surface temperature.
+  if (temperature_change_rate > 0.0)
+    T += (new_T - T) * std::min (temperature_change_rate * dt, 1.0);
+  else 
+    T = new_T;
 
   daisy_assert (T > -100.0 && T < 50.0);
 }
@@ -649,6 +657,13 @@ void
 Surface::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
+  frame.declare ("temperature_change_rate", "h^-1", Check::positive (),
+                 Attribute::OptionalConst,
+                 "Relative change of surface temperature.\n\
+By default, surface temperature will replect temperature of incomming\n\
+water or ponded water, if any, snow, if any, or air temperature.\n\
+Set this parameter to dampen changes. Especially useful if you feed\n\
+the model with daily weather data and average temperature.");
   frame.declare ("EpFactor", Attribute::None (), Check::non_negative (), 
 	      Attribute::Const,
 	      "Convertion of reference evapotranspiration to\n\
@@ -720,7 +735,8 @@ Surface::Surface (const FrameSubmodel& al)
 { }
 
 Surface::Implementation::Implementation (const FrameSubmodel& al)
-  : EpFactor (al.number ("EpFactor")),
+  : temperature_change_rate (al.number ("temperature_change_rate", -1.0)),
+    EpFactor (al.number ("EpFactor")),
     albedo_wet (al.number ("albedo_wet")),
     albedo_dry (al.number ("albedo_dry")),
     use_forced_pressure (al.check ("forced_pressure")),

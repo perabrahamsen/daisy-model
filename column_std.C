@@ -148,7 +148,6 @@ public:
              const double RR0, const Time&, Treelog&);
   void set_porosity (double at, double Theta, Treelog& msg);
   void overflow (const double extra, Treelog& msg);
-  void set_heat_source (double at, double value); // [W/m^2]
   void spray_overhead (symbol chemical, double amount, Treelog&); // [g/ha]
   void spray_surface (symbol chemical, double amount, Treelog&); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
@@ -171,7 +170,7 @@ public:
   // Simulation.
   void clear ();
   void tick_source (const Scope&, const Time&, Treelog&);
-  double suggest_dt (double) const;
+  double suggest_dt (double, double) const;
   void tick_move (const Metalib& metalib, 
                   const Time&, const Time&, double dt, const Weather*, 
                   const Scope&, Treelog&);
@@ -468,22 +467,6 @@ ColumnStandard::overflow (const double extra, Treelog& msg)
 }
 
 void 
-ColumnStandard::set_heat_source (double at, double value) // [W/m^2]
-{
-  const size_t cell_size = geometry.cell_size ();
-  for (size_t i = 0; i < cell_size; i++)
-    if (geometry.contain_z (i, at))
-      {
-        const double V = geometry.cell_volume (i);
-        value *= 10^3;          // [W/m^2] -> [erg/cm^2/s]
-        value *= 3600;          // [erg/cm^2/s] -> [erg/cm^2/h]
-        value /= V;              // [erg/cm^2/h] -> [erg/cm^3/h]
-
-        soil_heat->set_source (i, value);
-      }
-}
-
-void 
 ColumnStandard::spray_overhead (const symbol chemical, 
                                 const double amount /* [g/ha] */,
                                 Treelog& msg)
@@ -623,12 +606,15 @@ ColumnStandard::tick_source (const Scope& parent_scope,
 }
 
 double
-ColumnStandard::suggest_dt (double weather_dt) const
+ColumnStandard::suggest_dt (double weather_dt, double T_air) const
 { 
   double dt = 0.0;
   
   if (weather.get ())
-    weather_dt = weather->suggest_dt ();
+    {
+      weather_dt = weather->suggest_dt ();
+      T_air = weather->air_temperature ();
+    }
 
   if (std::isnormal (weather_dt) && (!std::isnormal (dt) || dt > weather_dt))
     dt = weather_dt;
@@ -638,6 +624,12 @@ ColumnStandard::suggest_dt (double weather_dt) const
   if (std::isnormal (sw_dt) 
       && (!std::isnormal (dt) || dt > sw_dt))
     dt = sw_dt;
+
+  const double sh_dt = soil_heat->suggest_dt (T_air);
+  
+  if (std::isnormal (sh_dt) 
+      && (!std::isnormal (dt) || dt > sh_dt))
+    dt = sh_dt;
 
   const double chem_dt = chemistry->suggest_dt ();
 
@@ -747,8 +739,10 @@ ColumnStandard::tick_move (const Metalib& metalib,
   groundwater->tick (geometry, *soil, *soil_water, 
                      surface.ponding_average () * 0.1, 
                      *soil_heat, time, scope, msg);
+  soil_water->tick_before (geometry, *soil, dt, msg); 
   soil_heat->tick (geometry, *soil, *soil_water, T_bottom, *movement, 
                    surface, dt, msg);
+  soil_water->tick_ice (geometry, *soil, dt, msg); 
   movement->tick (*soil, *soil_water, *soil_heat,
                   surface, *groundwater, time, my_weather, 
                   dt, msg);

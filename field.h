@@ -97,7 +97,6 @@ public:
   void swap (double from, double middle, double to, double RR0,
              const Time&, Treelog&);
   void set_porosity (double at, double Theta, Treelog& msg);
-  void set_heat_source (double at, double value); // [W/m^2]
   void spray_overhead (symbol chemical, double amount, Treelog&); // [g/ha]
   void spray_surface (symbol chemical, double amount, Treelog&); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
@@ -123,7 +122,7 @@ public:
   // Simulation.
   void clear ();
   void tick_source (const Scope&, const Time&, Treelog&);
-  double suggest_dt (double weather_dt) const;
+  double suggest_dt (double weather_dt, double T_air) const;
   void tick_move (const Metalib& metalib, 
                   const Time&, const Time&, double dt, const Weather*, 
                   const Scope&, Treelog&);

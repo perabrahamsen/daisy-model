@@ -111,7 +111,7 @@ public:
   // Simulation.
   void clear ();
   void tick_source (const Scope&, const Time&, Treelog&);
-  double suggest_dt (const double weather_dt) const;
+  double suggest_dt (const double weather_dt, const double T_air) const;
   void tick_move (const Metalib& metalib, 
                   const Time&, const Time&, double dt, const Weather*, 
                   const Scope&, Treelog&);
@@ -398,17 +398,6 @@ Field::Implementation::set_porosity (const double at, const double Theta,
 }
 
 void 
-Field::Implementation::set_heat_source (double at, double value)
-{
-  if (selected)
-    selected->set_heat_source (at, value);
-  else for (ColumnList::iterator i = columns.begin ();
-	    i != columns.end ();
-	    i++)
-    (*i)->set_heat_source (at, value);
-}
-
-void 
 Field::Implementation::spray_overhead (const symbol chemical, 
                                        const double amount,
                                        Treelog& msg) // [g/ha]
@@ -640,17 +629,18 @@ Field::Implementation::tick_source (const Scope& parent_scope,
 }
 
 double
-Field::Implementation::suggest_dt (const double weather_dt) const
+Field::Implementation::suggest_dt (const double weather_dt,
+                                   const double T_air) const
 {
   if (columns.size () == 1)
-    return (*(columns.begin ()))->suggest_dt (weather_dt);
+    return (*(columns.begin ()))->suggest_dt (weather_dt, T_air);
   
   double dt = 0.0;
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
     {
-      const double col_dt = (*i)->suggest_dt (weather_dt);
+      const double col_dt = (*i)->suggest_dt (weather_dt, T_air);
       if (std::isnormal (col_dt)
           && (!std::isnormal (dt) || dt > col_dt))
         dt = col_dt;
@@ -888,10 +878,6 @@ Field::set_porosity (const double at, const double Theta, Treelog& msg)
 { impl->set_porosity (at, Theta, msg); }
 
 void 
-Field::set_heat_source (double at, double value)
-{ impl->set_heat_source (at, value); }
-
-void 
 Field::spray_overhead (const symbol chemical, const double amount,
                        Treelog& msg) // [g/ha]
 { impl->spray_overhead (chemical, amount, msg); }
@@ -963,8 +949,8 @@ Field::tick_source (const Scope& parent_scope, const Time& time_end,
 { impl->tick_source (parent_scope, time_end, msg); }
 
 double
-Field::suggest_dt (const double weather_dt) const
-{ return impl->suggest_dt (weather_dt); }
+Field::suggest_dt (const double weather_dt, const double T_air) const
+{ return impl->suggest_dt (weather_dt, T_air); }
 
 void
 Field::tick_move (const Metalib& metalib, 

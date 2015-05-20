@@ -1,6 +1,18 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* SH is / vand præcis rækkefølge af beregninger
+* is
+
+** DONE Blød T_top
+
+** ned i dt ved temperaturer under 0
+
+** dC/dt
+
+** is + vand > porosity
+
+** max heat flux over overflade
+
+** SH is / vand præcis rækkefølge af beregninger
 
 * JB: Få stoftransport til at virke med WEPP
 

@@ -47,7 +47,7 @@ class SoilHeat : private boost::noncopyable
 private:
   const double h_frozen;
   const bool enable_ice;
-  const bool experimental;      // Enable 2015 changes.
+  const double ice_dt;            // [h]
   const double T_thawing_epsilon; // [dg C]
   // State
 private:
@@ -59,7 +59,6 @@ private:
   std::vector<state_t> state;
   std::vector<double> q;
   std::vector<double> T_;
-  std::vector<double> S;
   std::vector<double> capacity_old;
   std::vector<double> capacity_apparent_;
   std::vector<double> conductivity_;
@@ -80,7 +79,6 @@ public:
                    double from, double to, double energy);
   void swap (const Geometry& geo, double from, double middle, double to);
   double source (const Geometry&, const SoilWater&, std::size_t c) const;
-  void set_source (const std::size_t c, const double value); // [erg/cm^3/h]
 private:
   static double T_pseudo (const Geometry& geo,
 			  const int cell,
@@ -100,6 +98,7 @@ private:
                                    double T_bottom,
                                    std::vector<double>& q);
 public:
+  double suggest_dt (const double T_air) const;
   void tick (const Geometry&, const Soil&, SoilWater&, const double T_bottom, 
              const Movement&, const Surface& surface, double dt, Treelog& msg);
   void tick_after (const std::size_t cell_size, 
