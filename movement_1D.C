@@ -322,11 +322,14 @@ Movement1D::solve_heat (const Geometry1D& geo,
         + conductivity_cell / dz_both * (1.0 / dz_next + 1.0 / dz_prev);
       c[i] = - conductivity_cell / dz_both / dz_next - Cx / 2.0 / dz_both;
       const double x2 = dT_next / dz_next - dT_prev/ dz_prev;
+#if 1
+      // Why do we need this special case?
       if (i == 0)
         d[i] = T[i] * capacity_cell / dt
           + conductivity_cell / geo.cell_z (1) * (x2 + T_top_new / geo.cell_z (0))
           + Cx * (T[1] - T_top + T_top_new) / (2.0 * geo.cell_z (1));
       else
+#endif
         d[i] = T[i] * capacity_cell / dt + (conductivity_cell / dz_both) * x2
           + Cx * dT_both / dz_both / 2.0;
 

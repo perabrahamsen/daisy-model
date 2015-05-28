@@ -6,13 +6,13 @@
 ; teksturklasserne 20 og 63 mymeter. Tallene er derefter normaliseret
 ; til 100 %.  hydrauliske parametre er genereret med hypres.
 
-(defhorizon Ap_JB1 default
-	(clay 3.9)
-	(silt 6.4)
+(defhorizon Ap_JB1 USDA3 (normalize true)
+	(clay 3.9 [%])
+	(silt 6.4 [%])
 	;; (fine_sand 20.4)
 	;; (coarse_sand 66.6)
-        (sand 87.0)
-	(humus 2.8)
+        (sand 87.0 [%])
+	(humus 2.8 [%])
 	(C_per_N 14.2)
 	(dry_bulk_density 1.45)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
@@ -23,13 +23,13 @@
 	(Theta_res 0.0)
 	(l -0.973))) ;; 
 	
-(defhorizon Ap_JB2 default
-	(clay 4.4)
-	(silt 13.0)
+(defhorizon Ap_JB2 USDA3 (normalize true)
+	(clay 4.4 [%])
+	(silt 13.0 [%])
 	;; (fine_sand 54.5)
 	;; (coarse_sand 25.5)
-        (sand 80.0)
-	(humus 2.7)
+        (sand 80.0 [%])
+	(humus 2.7 [%])
 	(C_per_N 12.8)
 	(dry_bulk_density 1.42)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
@@ -40,13 +40,13 @@
 	(Theta_res 0.0)
 	(l -0.922))) ;; 
 	
-(defhorizon Ap_JB3 default
-	(clay 6.8)
-	(silt 13.5)
+(defhorizon Ap_JB3 USDA3 (normalize true)
+	(clay 6.8 [%])
+	(silt 13.5 [%])
 	;; (fine_sand 25)
 	;; (coarse_sand 51.9)
-        (sand 76.9)
-	(humus 2.8)
+        (sand 76.9 [%])
+	(humus 2.8 [%])
 	(C_per_N 13.3)
 	(dry_bulk_density 1.44)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
@@ -57,13 +57,13 @@
 	(Theta_res 0.0)
 	(l -1.461))) ;; 
 	
-(defhorizon Ap_JB4 default
-	(clay 7.9)
-	(silt 21.5)
+(defhorizon Ap_JB4 USDA3 (normalize true)
+	(clay 7.9 [%])
+	(silt 21.5 [%])
 	;; (fine_sand 36.4)
 	;; (coarse_sand 31.6)
-        (sand 68.0)
-	(humus 2.7)
+        (sand 68.0 [%])
+	(humus 2.7 [%])
 	(C_per_N 11.6)
 	(dry_bulk_density 1.41)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
@@ -74,13 +74,13 @@
 	(Theta_res 0.0)
 	(l -1.492))) ;
 	
-(defhorizon Ap_JB5 default
-	(clay 12.3)
-	(silt 22.0)
+(defhorizon Ap_JB5 USDA3 (normalize true)
+	(clay 12.3 [%])
+	(silt 22.0 [%])
 	;; (fine_sand 27.0)
 	;; (coarse_sand 36.1)
-        (sand 63.1)
-	(humus 2.5)
+        (sand 63.1 [%])
+	(humus 2.5 [%])
 	(C_per_N 12.8)
 	(dry_bulk_density 1.51)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
@@ -91,13 +91,13 @@
 	(Theta_res 0.0)
 	(l -2.386))) ;
 	
-(defhorizon Ap_JB6 default
-	(clay 12.4)
-	(silt 24.9)
+(defhorizon Ap_JB6 USDA3 (normalize true)
+	(clay 12.4 [%])
+	(silt 24.9 [%])
 	;; (fine_sand 33.6)
 	;; (coarse_sand 26.5)
-        (sand 60.1)
-	(humus 2.5)
+        (sand 60.1 [%])
+	(humus 2.5 [%])
 	(C_per_N 11.0)
 	(dry_bulk_density 1.53)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
@@ -108,13 +108,13 @@
 	(Theta_res 0.0)
 	(l -2.365))) ;
 	
-(defhorizon Ap_JB7 default
-	(clay 17.5)
-	(silt 25.8)
+(defhorizon Ap_JB7 USDA3 (normalize true)
+	(clay 17.5 [%])
+	(silt 25.8 [%])
 	;; (fine_sand 30.5)
 	;; (coarse_sand 23.7)
-        (sand 54.2)
-	(humus 2.4)
+        (sand 54.2 [%])
+	(humus 2.4 [%])
 	(C_per_N 10.4)
 	(dry_bulk_density 1.54)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
@@ -125,13 +125,13 @@
 	(Theta_res 0.0)
 	(l -3.197))) ;
 	
-(defhorizon B_JB1 default
-	(clay 3.8)
-	(silt 3.5)
+(defhorizon B_JB1 USDA3 (normalize true)
+	(clay 3.8 [%])
+	(silt 3.5 [%])
 	;; (fine_sand 18.7)
 	;; (coarse_sand 73.1)
-        (sand 91.8)
-	(humus 0.9)
+        (sand 91.8 [%])
+	(humus 0.9 [%])
 	(C_per_N 12.2)
 	(dry_bulk_density 1.50)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
@@ -142,13 +142,13 @@
 	(Theta_res 0.0)
 	(l -0.335))) ;
 	
-(defhorizon B_JB2 default
-	(clay 4.1)
-	(silt 10.1)
+(defhorizon B_JB2 USDA3 (normalize true)
+	(clay 4.1 [%])
+	(silt 10.1 [%])
 	;; (fine_sand 55.5)
 	;; (coarse_sand 29.4)
-        (sand 84.9)
-	(humus 0.96)
+        (sand 84.9 [%])
+	(humus 0.96 [%])
 	(C_per_N 12.5)
 	(dry_bulk_density 1.45)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
@@ -159,13 +159,13 @@
 	(Theta_res 0.0)
 	(l -0.3))) ;
 	
-(defhorizon B_JB3 default
-	(clay 6.8)
-	(silt 11.3)
+(defhorizon B_JB3 USDA3 (normalize true)
+	(clay 6.8 [%])
+	(silt 11.3 [%])
 	;; (fine_sand 24.1)
 	;; (coarse_sand 56.8)
-        (sand 80.9)
-	(humus 1.04)
+        (sand 80.9 [%])
+	(humus 1.04 [%])
 	(C_per_N 11.0)
 	(dry_bulk_density 1.55)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
@@ -176,13 +176,13 @@
 	(Theta_res 0.0)
 	(l -0.937))) ;
 	
-(defhorizon B_JB4 default
-	(clay 7.1)
-	(silt 19.4)
+(defhorizon B_JB4 USDA3 (normalize true)
+	(clay 7.1 [%])
+	(silt 19.4 [%])
 	;; (fine_sand 39.7)
 	;; (coarse_sand 33.0)
-        (sand 72.7)
-	(humus 0.84)
+        (sand 72.7 [%])
+	(humus 0.84 [%])
 	(C_per_N 12.2)
 	(dry_bulk_density 1.51)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
@@ -193,13 +193,13 @@
 	(Theta_res 0.0)
 	(l -0.717))) ;
 	
-(defhorizon B_JB5 default
-	(clay 11.9)
-	(silt 16.2)
+(defhorizon B_JB5 USDA3 (normalize true)
+	(clay 11.9 [%])
+	(silt 16.2 [%])
 	;; (fine_sand 27.9)
 	;; (coarse_sand 43.5)
-        (sand 71.4)
-	(humus 0.51)
+        (sand 71.4 [%])
+	(humus 0.51 [%])
 	(C_per_N 9.9)
 	(dry_bulk_density 1.62)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
@@ -210,13 +210,13 @@
 	(Theta_res 0.0)
 	(l -1.504))) ;
 	
-(defhorizon B_JB6 default
-	(clay 12.5)
-	(silt 21.8)
+(defhorizon B_JB6 USDA3 (normalize true)
+	(clay 12.5 [%])
+	(silt 21.8 [%])
 	;; (fine_sand 36.7)
 	;; (coarse_sand 28.5)
-        (sand 65.2)
-	(humus 0.52)
+        (sand 65.2 [%])
+	(humus 0.52 [%])
 	(C_per_N 8.1)
 	(dry_bulk_density 1.64)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
@@ -227,13 +227,13 @@
 	(Theta_res 0.0)
 	(l -1.574))) ;
 	
-(defhorizon B_JB7 default
-	(clay 20.0)
-	(silt 22)
+(defhorizon B_JB7 USDA3 (normalize true)
+	(clay 20.0 [%])
+	(silt 22 [%])
 	;; (fine_sand 31.1)
 	;; (coarse_sand 26.4)
-        (sand 57.5)
-	(humus 0.41)
+        (sand 57.5 [%])
+	(humus 0.41 [%])
 	(C_per_N 7.5)
 	(dry_bulk_density 1.68)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
@@ -244,13 +244,13 @@
 	(Theta_res 0.0)
 	(l -2.809))) ;
 	
-(defhorizon C_JB1 default
-	(clay 2.9)
-	(silt 2.0)
+(defhorizon C_JB1 USDA3 (normalize true)
+	(clay 2.9 [%])
+	(silt 2.0 [%])
 	;; (fine_sand 17.3)
 	;; (coarse_sand 77.6)
-        (sand 94.9)
-	(humus 0.2)
+        (sand 94.9 [%])
+	(humus 0.2 [%])
 	(dry_bulk_density 1.56)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
 	(alpha 0.085)
@@ -260,13 +260,13 @@
 	(Theta_res 0.0)
 	(l 1.180))) ;
 	
-(defhorizon C_JB2 default
-	(clay 3.4)
-	(silt 5.9)
+(defhorizon C_JB2 USDA3 (normalize true)
+	(clay 3.4 [%])
+	(silt 5.9 [%])
 	;; (fine_sand 59.8)
 	;; (coarse_sand 30.7)
-        (sand 90.5)
-	(humus 0.2)
+        (sand 90.5 [%])
+	(humus 0.2 [%])
 	(dry_bulk_density 1.55)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
 	(alpha 0.08)
@@ -276,13 +276,13 @@
 	(Theta_res 0.0)
 	(l 1.188))) ;
 	
-(defhorizon C_JB3 default
-	(clay 7.5)
-	(silt 11.5)
+(defhorizon C_JB3 USDA3 (normalize true)
+	(clay 7.5 [%])
+	(silt 11.5 [%])
 	;; (fine_sand 25.8)
 	;; (coarse_sand 54.9)
-        (sand 80.7)
-	(humus 0.21)
+        (sand 80.7 [%])
+	(humus 0.21 [%])
 	(dry_bulk_density 1.63)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
 	(alpha 0.075)
@@ -292,13 +292,13 @@
 	(Theta_res 0.0)
 	(l 0.24))) ;
 	
-(defhorizon C_JB4 default
-	(clay 8.0)
-	(silt 18.6)
+(defhorizon C_JB4 USDA3 (normalize true)
+	(clay 8.0 [%])
+	(silt 18.6 [%])
 	;; (fine_sand 43.7)
 	;; (coarse_sand 29.4)
-        (sand 73.1)
-	(humus 0.3)
+        (sand 73.1 [%])
+	(humus 0.3 [%])
 	(dry_bulk_density 1.65)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
 	(alpha 0.056)
@@ -308,13 +308,13 @@
 	(Theta_res 0.0)
 	(l -0.191))) ;
 	
-(defhorizon C_JB5 default
-	(clay 14.9)
-	(silt 22.1)
+(defhorizon C_JB5 USDA3 (normalize true)
+	(clay 14.9 [%])
+	(silt 22.1 [%])
 	;; (fine_sand 31.0)
 	;; (coarse_sand 31.9)
-        (sand 62.9)
-	(humus 0.24)
+        (sand 62.9 [%])
+	(humus 0.24 [%])
 	(dry_bulk_density 1.79)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
 	(alpha 0.043)
@@ -324,13 +324,13 @@
 	(Theta_res 0.0)
 	(l -1.605))) ;
 	
-(defhorizon C_JB6 default
-	(clay 13.3)
-	(silt 23.8)
+(defhorizon C_JB6 USDA3 (normalize true)
+	(clay 13.3 [%])
+	(silt 23.8 [%])
 	;; (fine_sand 39.0)
 	;; (coarse_sand 23.6)
-        (sand 62.6)
-	(humus 0.22)
+        (sand 62.6 [%])
+	(humus 0.22 [%])
 	(dry_bulk_density 1.72)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
 	(alpha 0.046)
@@ -340,13 +340,13 @@
 	(Theta_res 0.0)
 	(l -0.983))) ;
 	
-(defhorizon C_JB7 default
-	(clay 19.8)
-	(silt 23.8)
+(defhorizon C_JB7 USDA3 (normalize true)
+	(clay 19.8 [%])
+	(silt 23.8 [%])
 	;; (fine_sand 31.6)
 	;; (coarse_sand 24.6)
-        (sand 56.2)
-	(humus 0.21)
+        (sand 56.2 [%])
+	(humus 0.21 [%])
 	(dry_bulk_density 1.73)
 	(hydraulic M_vG	; van Genuchten/Mualem functions
 	(alpha 0.047)

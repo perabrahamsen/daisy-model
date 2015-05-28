@@ -45,13 +45,14 @@ class SoilHeat : private boost::noncopyable
 {
   // Parameters
 private:
+  const double q_lim;           // [erg/cm^2/h]
   const double h_frozen;
   const bool enable_ice;
   const double ice_dt;            // [h]
   const double T_thawing_epsilon; // [dg C]
   // State
 private:
-  double T_top_;
+  double T_limited;
   std::vector<double> T_freezing;
   std::vector<double> T_thawing;
   std::vector<double> freezing_rate_;
@@ -59,11 +60,12 @@ private:
   std::vector<state_t> state;
   std::vector<double> q;
   std::vector<double> T_;
-  std::vector<double> capacity_old;
+  std::vector<double> capacity_;
   std::vector<double> capacity_apparent_;
   std::vector<double> conductivity_;
 public:
-  double T_top () const;	// [dg C]
+  double T_top () const
+  { return T_limited; }
   double freezing_rate (const std::size_t c) const;
   double T (std::size_t c) const	// [dg C]
   { return T_[c]; }
@@ -71,6 +73,12 @@ public:
   { return conductivity_[c]; }
   double top_flux (const Geometry& geo,
                    const Soil&, const SoilWater&) const;
+  double top_flux (const Geometry& geo) const;
+private:
+  double limit_T_top (const Geometry& geo,
+                      const Soil& soil, const SoilWater& soil_water,
+                      const double T_surface) const;
+public:
   double energy (const Geometry& geo, const Soil& soil,
                  const SoilWater& soil_water,
                  const double from, const double to) const;
@@ -106,13 +114,13 @@ public:
   
   // Transport.
 private:
-  void set_T_top (const double value);
   void set_temperature (const std::size_t c, const double value);
   void set_flux (const std::size_t e, const double value);
 
   // Solve.
 private:
-  double capacity (const Soil&, const SoilWater&, std::size_t i) const;
+  double capacity_new (const Soil&, const SoilWater&, std::size_t i) const;
+  double capacity_old (const Soil&, const SoilWater&, std::size_t i) const;
   double capacity_apparent (const Soil&, const SoilWater&, std::size_t i) const;
   void update_freezing_points (const Soil& soil,
                                const SoilWater& soil_water);

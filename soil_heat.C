@@ -232,6 +232,9 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
                 const Movement& movement, const Surface& surface, 
 		const double dt, Treelog& msg)
 {
+  
+
+
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
 
@@ -239,8 +242,9 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
   this->update_freezing_points (soil, soil_water);
 
   // Borders.
-  double T_top_old = this->T_top ();
-  const double T_top_new = surface.temperature ();
+  double T_top_old = T_limited;
+  T_limited = limit_T_top (geo, soil, soil_water, surface.temperature ());
+  const double T_top_new = T_limited;
   if (T_top_old < -400.0)
     T_top_old = T_top_new;
 
@@ -319,7 +323,6 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
   calculate_heat_flux (geo, soil, soil_water, T_old, T_prev, T, T_bottom, q);
 
   // Update soil heat.
-  this->set_T_top (T_top_new);
   for (size_t c = 0; c < cell_size; c++)
     this->set_temperature (c, T[c]);
   for (size_t e = 0; e < edge_size; e++)
@@ -336,14 +339,10 @@ SoilHeat::tick_after (const size_t cell_size,
       conductivity_[i]
         = soil.heat_conductivity (i,
                                   soil_water.Theta (i), soil_water.X_ice (i));
-      capacity_old[i]
+      capacity_[i]
         = soil.heat_capacity (i, soil_water.Theta (i), soil_water.X_ice (i));
     }
 }
-
-void 
-SoilHeat::set_T_top (const double value)
-{ T_top_ = value; }
 
 void 
 SoilHeat::set_temperature (const size_t c, const double value)
@@ -354,12 +353,22 @@ SoilHeat::set_flux (const size_t e, const double value)
 { q[e] = value; }
 
 double 
-SoilHeat::capacity (const Soil& soil, 
-                    const SoilWater& soil_water,
-                    const size_t i) const
+SoilHeat::capacity_new (const Soil& soil, 
+                        const SoilWater& soil_water,
+                        const size_t i) const
 { 
   const double Theta = soil_water.Theta (i);
   const double X_ice = soil_water.X_ice (i);
+  return soil.heat_capacity (i, Theta, X_ice); 
+}
+
+double 
+SoilHeat::capacity_old (const Soil& soil, 
+                        const SoilWater& soil_water,
+                        const size_t i) const
+{ 
+  const double Theta = soil_water.Theta_old (i);
+  const double X_ice = soil_water.X_ice_old (i);
   return soil.heat_capacity (i, Theta, X_ice); 
 }
 
@@ -369,7 +378,7 @@ SoilHeat::capacity_apparent
 { 
   const double h = soil_water.h (i);
   const double h_ice = soil_water.h_ice (i);
-  double cap = capacity (soil, soil_water, i);
+  double cap = capacity_new (soil, soil_water, i);
 
   switch (state[i])
     {
@@ -580,13 +589,17 @@ SoilHeat::calculate_freezing_rate (const Geometry& geo,
   
   const double vol = geo.cell_volume (i);
 
+  daisy_assert (iszero (soil_water.S_ice_water (i)));
   const double S 
     = soil_water.S_sum (i) - soil_water.S_ice_water (i);
   const double Sh
     = water_heat_capacity * rho_water * S * T_mean;
-  const double cap = capacity (soil, soil_water, i);
+  const double cap_new = capacity_new (soil, soil_water, i);
+  const double cap_old = capacity_old (soil, soil_water, i);
+  const double cap = 0.5 * (cap_new + cap_old);
+  const double dC = (cap_new - cap_old);
   return (1.0 / (latent_heat_of_fussion * rho_ice))
-    * (cap * dT / dt + dq / vol + Sh);
+    * (cap * dT / dt + (dC / dt) * T_mean + dq / vol + Sh);
 
 }
 
@@ -656,10 +669,6 @@ SoilHeat::freezing_rate (const size_t c) const
 { return freezing_rate_[c]; }
 
 double 
-SoilHeat::T_top () const	// [dg C]
-{ return T_top_; }
-
-double 
 SoilHeat::top_flux (const Geometry& geo,
                     const Soil& soil, const SoilWater& soil_water) const
 {
@@ -670,14 +679,89 @@ SoilHeat::top_flux (const Geometry& geo,
   return k * (T (0) - T (1)) / (geo.cell_z (0) - geo.cell_z (1));
 }
 
+double 
+SoilHeat::top_flux (const Geometry& geo) const
+{
+  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const size_t edge_above_size = edge_above.size ();
+  daisy_assert (edge_above_size > 0U);
+  double total_area = 0.0;
+  double total_q = 0.0;
+  for (size_t i = 0; i < edge_above_size; i++)
+    {
+      const size_t edge = edge_above[i];
+      const double area = geo.edge_area (edge);
+      total_area += area;
+      daisy_assert (q.size () > edge);
+      total_q += area * q[edge];
+    }
+  total_q /= total_area;
+  total_q *= 2.778e-7;          // [erg/cm^2/h] -> [W/m^2]
+  return total_q;
+}
+
+double 
+SoilHeat::limit_T_top (const Geometry& geo,
+                       const Soil& soil, const SoilWater& soil_water,
+                       const double T_surface) const
+{
+  if (q_lim <= 0.0)
+    return T_surface;
+
+  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const size_t edge_above_size = edge_above.size ();
+  daisy_assert (edge_above_size > 0U);
+  double total_area = 0.0;
+  double total_l = 0.0;
+  double total_T = 0.0;
+  double total_K = 0.0;
+  for (size_t i = 0; i < edge_above_size; i++)
+    {
+      const size_t edge = edge_above[i];
+      const int cell = geo.edge_other (edge, Geometry::cell_above);
+      const double area = geo.edge_area (edge);
+      total_area += area;
+      total_l += - area * geo.cell_z (cell);
+      daisy_assert (T_.size () > cell);
+      total_T += area * T_[cell];
+      total_K += area * soil.heat_conductivity (cell, 
+                                                soil_water.Theta (cell),
+                                                soil_water.X_ice (cell));
+    }
+  daisy_assert (total_area > 0.0);
+  const double dz = total_l / total_area;
+  const double T_soil = total_T / total_area;
+  const double K = total_K / total_area;
+  const double q = K * (T_soil - T_surface) / dz;
+#if 0
+  std::ostringstream tmp;
+  tmp << "q = " << q << "; q_lim = " << q_lim
+      << "; dz = " << dz
+      << "; T_soil  = " << T_soil
+      << "; K = " << K
+      << "; T_surface = " << T_surface;
+  Assertion::message (tmp.str ());
+#endif
+  if (std::fabs (q) < q_lim)
+    return T_surface;
+
+  const double sign = q / std::fabs (q);
+  daisy_assert (std::isfinite (sign));
+  daisy_approximate (std::fabs (sign), 1.0);
+  const double T_limited = T_soil - sign * q_lim * dz / K;
+  const double q_limited = K * (T_soil - T_limited) / dz;
+  daisy_approximate (std::fabs (q_limited), q_lim);
+  return T_limited;
+}
+
 void
 SoilHeat::output (Log& log) const
 {
   output_value (T_, "T", log); 
-  output_value (capacity_old, "capacity", log); 
+  output_value (capacity_, "capacity", log); 
   output_value (capacity_apparent_, "capacity_apparent", log); 
   output_value (conductivity_, "conductivity", log); 
-  output_value (T_top_, "T_top", log);
+  output_variable (T_limited, log);
   output_value (T_freezing, "T_freezing", log);
   output_value (T_thawing, "T_thawing", log);
   output_value (q, "q", log);
@@ -713,6 +797,8 @@ load_T (Frame& frame)
 void
 SoilHeat::load_syntax (Frame& frame)
 { 
+  frame.declare ("q_lim", "erg/cm^2/h", Attribute::OptionalConst, "\
+Limit surface flux to this value.");
   Geometry::add_layer (frame, Attribute::OptionalState, "T", load_T);
   frame.declare ("conductivity", "erg/cm/dg C/h", Attribute::LogOnly, 
                  "Heat conductivity.");
@@ -732,8 +818,8 @@ SoilHeat::load_syntax (Frame& frame)
                  "Timestep to use when ice is enabled.\n\
 This applies when there are subzero temperatures in the profile.");
   frame.set ("ice_dt", 5.0 / 60.0);
-  frame.declare ("T_top", "dg C", Attribute::OptionalState, 
-              "Surface temperature at previous time step.");
+  frame.declare ("T_limited", "dg C", Attribute::OptionalState, 
+                 "Surface temperature limited by 'q_lim'.");
   frame.declare ("T_freezing", "dg C", Attribute::LogOnly, Attribute::SoilCells,
               "Freezing point depression for freezing.");
   frame.declare ("T_thawing", "dg C", Attribute::LogOnly, Attribute::SoilCells,
@@ -748,11 +834,12 @@ This applies when there are subzero temperatures in the profile.");
 }
 
 SoilHeat::SoilHeat (const Block& al)
-  : h_frozen (al.number ("h_frozen")),
+  : q_lim (al.number ("q_lim", -42.42e42)),
+    h_frozen (al.number ("h_frozen")),
     enable_ice (al.name ("enable_ice") != symbol ("false")),
     ice_dt (al.number ("ice_dt")),
     T_thawing_epsilon (al.number ("T_thawing_epsilon")),
-    T_top_ (al.number ("T_top", -500.0))
+    T_limited (al.number ("T_limited", -500.0))
 { }
 
 void 
@@ -765,7 +852,7 @@ SoilHeat::initialize (const FrameSubmodel& al, const Geometry& geo,
 
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
-  capacity_old.insert (capacity_old.begin (), cell_size, -42.42e42);
+  capacity_.insert (capacity_.begin (), cell_size, -42.42e42);
   capacity_apparent_.insert (capacity_apparent_.begin (), cell_size, -42.42e42);
   conductivity_.insert (conductivity_.begin (), cell_size, -42.42e42);
 
@@ -788,8 +875,8 @@ SoilHeat::initialize (const FrameSubmodel& al, const Geometry& geo,
   // May be larger if user initialized it wrongly.  Checked in "check".
   daisy_assert (T_.size () >= cell_size);
 
-  if (T_top_ < -400)
-    T_top_ = geo.content_hood (*this, &SoilHeat::T, Geometry::cell_above);
+  if (T_limited < -400)
+    T_limited = geo.content_hood (*this, &SoilHeat::T, Geometry::cell_above);
 }
 
 SoilHeat::~SoilHeat ()

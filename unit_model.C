@@ -705,6 +705,9 @@ Connvert to SI base units by multiplying with a factor.")
     add ("MJ/m^2/h", p_M / u_h,
          0, 1, -3, 0, 0, 0, 0,
          "Megajoule per square meter per hour.");
+    add ("erg/cm^2/h", 2.778e-7,
+         0, 1, -3, 0, 0, 0, 0,
+         "erg per square centimer per hour.");
   }
   void load_frame (Frame& frame) const
   {

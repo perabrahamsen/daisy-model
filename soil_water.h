@@ -72,6 +72,7 @@ private:
   std::vector<double> S_forward_sink_;
   std::vector<double> tillage_;
   std::vector<double> X_ice_;
+  std::vector<double> X_ice_old_;
   std::vector<double> X_ice_buffer_;
   std::vector<double> h_ice_;
   std::vector<double> q_matrix_;
@@ -137,6 +138,8 @@ public:
   { return h_ice_[i]; }
   double X_ice (std::size_t i) const
   { return X_ice_[i]; }
+  double X_ice_old (std::size_t i) const
+  { return X_ice_old_[i]; }
   double X_ice_total (std::size_t i) const
   { return std::max (X_ice_[i] + X_ice_buffer_[i], 0.0); }
   double q_matrix (std::size_t i) const
@@ -179,6 +182,7 @@ public:
   // Before heat.
   void tick_before (const Geometry&, const Soil& soil, 
                     double dt, Treelog& msg);
+  void reset_old ();
 
   // After heat, before water movement.
   void tick_ice (const Geometry&, const Soil& soil, double dt, Treelog& msg);

@@ -158,9 +158,9 @@
                      ("matrix_30cm")
                      ("drain_30cm"))))))
                      
-  (defcolumn Rorrende_fd3 Rorrende_led3
-	"Rorrende soil with free drainiage."
-	(Groundwater deep))         
+(defcolumn Rorrende_fd3 Rorrende_led3
+  "Rorrende soil with free drainiage."
+  (Groundwater deep))         
 
 
 (defcolumn Rorrende_led1 Rorrende_led3

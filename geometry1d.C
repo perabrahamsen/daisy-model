@@ -175,8 +175,11 @@ void
 Geometry1D::build_edges ()
 {
   // Distance from surface to first cell center.
+#if 1
+  edge_length_.push_back (-cell_z (0));
+#else
   edge_length_.push_back (-zplus (0));
-
+#endif
   // Distance between internal cell centers.
   for (int c = 1; c < cell_size (); c++)
     edge_length_.push_back (cell_z (c-1) - cell_z (c));

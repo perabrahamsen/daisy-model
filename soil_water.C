@@ -327,12 +327,17 @@ SoilWater::tick_before (const Geometry& geo, const Soil& soil,
       S_incorp_[i] += S_permanent_[i];
       S_sum_[i] += S_incorp_[i];
     }
+}
 
+void
+SoilWater::reset_old ()
+{
   // Remember old values.
   h_old_ = h_;
   Theta_old_ = Theta_;
   Theta_primary_old_ = Theta_primary_;
   Theta_secondary_old_ = Theta_secondary_;
+  X_ice_old_ = X_ice_;
 }
 
 void
@@ -365,24 +370,17 @@ SoilWater::tick_ice (const Geometry& geo, const Soil& soil,
           const double Theta_lim = std::max (Theta_res, 
                                              Theta_[i] - S_ice_water_[i] * dt);
 
-          const double available_space = std::max (porosity - Theta_lim - 1e-9,
-                                                   0.0);
-          if (available_space < total_ice)
-            {
-              X_ice_[i] = available_space;
-              X_ice_buffer_[i] = total_ice - available_space;
-            }
-          else
-            {
-              X_ice_[i] = total_ice;
-              X_ice_buffer_[i] = 0.0;
-            }
+          const double available_space = porosity - Theta_lim - 1e-9;
+          X_ice_[i] = std::min (available_space, total_ice);
+          X_ice_buffer_[i] = total_ice - X_ice_[i];
         }
       else
         {
           X_ice_[i] = 0.0;
           X_ice_buffer_[i] = total_ice;
         }
+      daisy_approximate (X_ice_[i] + X_ice_buffer_[i], total_ice);
+
       // Update ice pressure.
       h_ice_[i] = soil.h (i, porosity - X_ice_[i]);
     }
@@ -1055,6 +1053,7 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
   // We just assume no changes.
   h_old_ = h_;
   Theta_old_ = Theta_;
+  X_ice_old_ = X_ice_;
 }
 
 SoilWater::SoilWater (const Block& al)

@@ -742,6 +742,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
   soil_water->tick_before (geometry, *soil, dt, msg); 
   soil_heat->tick (geometry, *soil, *soil_water, T_bottom, *movement, 
                    surface, dt, msg);
+  soil_water->reset_old ();
   soil_water->tick_ice (geometry, *soil, dt, msg); 
   movement->tick (*soil, *soil_water, *soil_heat,
                   surface, *groundwater, time, my_weather, 

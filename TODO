@@ -1,18 +1,45 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* is
+* wepp figurer
+
+wepp figurer
+
+* Spørg Søren om SoilHeat
+
+** HVORFOR GIVER (q_lim 50) en grænse på 25?
+
+** Skal vi iterere T_limited på plads?
+
+Hvorfor er der så stor forskel på den T_limited Daisy estimerer for at
+komme under q_lim, og den q_lim vi får bagefter?
+
+** Lave tidsskridt en dag efter frost
+
+** Skal G / top_flux i PM inkludere vand?
+
+** Skal q_lim includere vand?
+
+** Jeg syntes T_limited ændrer sig alt for langsomt :-(
+
+** SoilHeat::T_top skal måske bruge avg T i øverste jordlag
 
 ** DONE Blød T_top
 
-** ned i dt ved temperaturer under 0
+** DONE ned i dt ved temperaturer under 0
 
 ** dC/dt
 
-** is + vand > porosity
+** DONE is + vand > porosity
 
 ** max heat flux over overflade
 
 ** SH is / vand præcis rækkefølge af beregninger
+
+* Gør dette default
+
+  (minimal_timestep (microseconds 1))
+
+Vi skal nok også have (enable_ice true) som default.
 
 * JB: Få stoftransport til at virke med WEPP
 
