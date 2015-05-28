@@ -122,7 +122,7 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."  (Devel original
 		   
 		   
   (Root (MxNH4Up 1.2e-7) ;oprindelig:	(MxNH4Up 2.5e-7)
-	(MxNO3Up 1.2e-8));oprindelig:	(MxNO3Up 2.5e-8))
+	(MxNO3Up 1.2e-8)));oprindelig:	(MxNO3Up 2.5e-8))
 )
 
 (defcrop "Red fescue" "Froegraes"       ;Rødsvingel.
@@ -155,5 +155,5 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."  (Devel original
   ;def.	(CrLeafCnc (0.00 0.040) (0.60 0.040) (1.00 0.030) (2.00 0.015))
   ;def.	(NfLeafCnc (0.00 0.004) (0.60 0.004) (2.00 0.004))
   )		   
-		   
-;; dk-grass.dai ends here.
+
+;;; dk-grass.dai ends here.

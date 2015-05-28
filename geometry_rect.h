@@ -118,7 +118,7 @@ public:
   // Operations on whole volume.
 public:
   inline int dimensions () const
-  { return cell_rows () == 1 ? 1 : 2; }
+  { return cell_columns () == 1 ? 1 : 2; }
   inline double surface_area () const // Total surface area [cm^2].
   { return right () * back (); }
   double right () const

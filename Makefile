@@ -152,7 +152,7 @@ CC = $(COMPILE) $(OPTIMIZE) $(PROFILE)
 CXSPARSELIB = -L../libdeps -lcxsparse
 #CXSPARSELIB = /usr/lib/libcxsparse.so.2.2.3
 
-CXSPARSEHEAD = ublas_cxsparse.h cs.h UFconfig.h
+CXSPARSEHEAD = ublas_cxsparse.h cs.h SuiteSparse_config.h
 
 # Locate Qt 4
 Q4INCLUDE	= -isystem /usr/include/qt4 
@@ -729,11 +729,11 @@ setupnosvn:
 	mkdir $(SETUPDIR)/bin
 	cp libdeps/ShowDaisyOutput.exe $(SETUPDIR)/bin
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
-#	$(STRIP) -o $(SETUPDIR)/bin/daisyw.exe $(OBJHOME)/daisyw.exe
+	$(STRIP) -o $(SETUPDIR)/bin/daisyw.exe $(OBJHOME)/daisyw.exe
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll $(OBJHOME)/daisy.dll
-#	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
-#	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
-	cp $(MINGWHOME)/bin/mingwm10.dll $(SETUPDIR)/bin
+	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
+	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
+	cp "$(MINGWHOME)/bin/mingwm10.dll" $(SETUPDIR)/bin
 	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	$(MAKE) setupdocs
@@ -765,10 +765,7 @@ setupnogui:
 
 upload:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	./libdeps/googlecode_upload.py -p daisy-model \
-		-s "Daisy version $(TAG) installer for MS Windows" \
-		-l Type-Installer,OpSys-Windows,Featured \
-		daisy-$(TAG)-setup.exe
+	cp -p daisy-$(TAG)-setup.exe "/cygdrive/c/Users/xvs108/Google\ Drev/public/"
 
 setup-win64: 
 	make setupnogui OBJHOME=win64-portable
