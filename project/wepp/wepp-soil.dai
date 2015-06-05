@@ -23,7 +23,36 @@
   (h_lim 2.0 [pF])
   (alpha 0.0001 [h^-1]))
   
+;;; Pure colloids.
+
+(defchemical colloid common
+  "Mobile colloids."
+  (diffusion_coefficient 4.6e-6 [cm^2/s])
+  (decompose_rate 0 [h^-1]))
+
+(defreaction colloid-filter filter_velocity
+  "Filtration of colloids in the soil matrix."
+  (cite "mcgechan2002")
+  (fc_primary 80 [m^-1])              ;Filter coefficient primary domain.
+  (fc_secondary 40 [m^-1])            ;Ditto for secondary domain.
+  (mobile colloid))
+
+(defreaction colloid-generation colgen_Jarvis99
+  "Release of colloids in soil surface from heavy rain."
+  ;; (kd 7.5 [g/J])                       ;Detachment rate coefficient.
+  (kd 15 [g/J])                       ;Detachment rate coefficient.
+  ;; (kr 0.05 [g/m^2/h])                    ;Replenishment rate coefficient.
+  (kr 0.1 [g/m^2/h])
+  ;; (zi 0.05 [cm])                         ;Surface layer thickness.
+  (zi 0.1 [cm])
+  (colloid colloid))
+
+(defchemistry colloids default
+  (trace colloid)
+  (reaction colloid-filter colloid-generation))
+
 (defcolumn WEPP default
+  (Chemistry multi (combine N colloids))
   (Litter Maize))
 
 (defhorizon "Rorrende Ap_1" USDA3
@@ -135,9 +164,7 @@
 
 (defcolumn Rorrende_led3 WEPP;; led 3
   "This is a Rorrende soil with pipe drains."
-;;  (OrganicMatter none)
-  ;;(Chemistry none)
-    (Soil (MaxRootingDepth 150 [cm])
+  (Soil (MaxRootingDepth 150 [cm])
   (horizons (-3.00 "Overflade Ap_3")
             (-25.00 "Rorrende Ap_3")
             (-33.00 "Rorrende Bplow layer_3")
@@ -147,7 +174,6 @@
         (K_aquitard 0.050 [cm/h])
         (Z_aquitard 200 [cm]))
 
-  (SoilHeat (enable_ice true))
   (Movement original
   (Tertiary 
   (biopores (classes ("matrix_0cm") 
@@ -304,8 +330,6 @@
           
 (defcolumn Karlslunde_N1 WEPP
   "This is a Rorrende soil with pipe drains."
-;;  (OrganicMatter none)
-  (Chemistry none)
     (Soil (MaxRootingDepth 150 [cm])
   (horizons (-3.00 "Overflade Ap_N1")
             (-25.00 "Karlslunde Ap_N1")
@@ -316,7 +340,6 @@
         (K_aquitard 0.050 [cm/h])
         (Z_aquitard 200 [cm]))
 
-  (SoilHeat (enable_ice true))
   (Movement original
   (Tertiary 
    (biopores (classes ("matrix_0cm") 

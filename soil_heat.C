@@ -797,8 +797,11 @@ load_T (Frame& frame)
 void
 SoilHeat::load_syntax (Frame& frame)
 { 
-  frame.declare ("q_lim", "erg/cm^2/h", Attribute::OptionalConst, "\
-Limit surface flux to this value.");
+  frame.declare ("q_lim", "erg/cm^2/h", Attribute::Const, "\
+Limit surface flux to this value.\n\
+Negative for no limit.");
+  frame.set ("q_lim",
+             75.0 /* [W/m^2] */ / 2.778e-7 /* erg/cm^2/h] -> [W/m^2] */);
   Geometry::add_layer (frame, Attribute::OptionalState, "T", load_T);
   frame.declare ("conductivity", "erg/cm/dg C/h", Attribute::LogOnly, 
                  "Heat conductivity.");
@@ -813,11 +816,11 @@ Limit surface flux to this value.");
                         "Set this to 'false' or 'true'");
   static VCheck::Enum ice_check ("false", "true");
   frame.set_check ("enable_ice", ice_check);
-  frame.set ("enable_ice", "false");
+  frame.set ("enable_ice", "true");
   frame.declare ("ice_dt", "h", Attribute::Const, 
                  "Timestep to use when ice is enabled.\n\
 This applies when there are subzero temperatures in the profile.");
-  frame.set ("ice_dt", 5.0 / 60.0);
+  frame.set ("ice_dt", 3.0 / 60.0);
   frame.declare ("T_limited", "dg C", Attribute::OptionalState, 
                  "Surface temperature limited by 'q_lim'.");
   frame.declare ("T_freezing", "dg C", Attribute::LogOnly, Attribute::SoilCells,
@@ -826,7 +829,7 @@ This applies when there are subzero temperatures in the profile.");
               "Freezing point depression for thawing.");
   frame.declare ("T_thawing_epsilon", "dg C", Attribute::Const, 
                  "Subtract this from T_thawing for stability.");
-  frame.set ("T_thawing_epsilon", 0.01);
+  frame.set ("T_thawing_epsilon", 0.001);
   frame.declare ("q", "erg/cm^2/h", Attribute::LogOnly, Attribute::SoilEdges,
               "Heat flux.");
   frame.declare ("state", Attribute::Unknown (), Attribute::LogOnly, Attribute::SoilCells,

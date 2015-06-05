@@ -657,13 +657,16 @@ void
 Surface::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
-  frame.declare ("temperature_change_rate", "h^-1", Check::positive (),
-                 Attribute::OptionalConst,
+  frame.declare ("temperature_change_rate", "h^-1",
+                 Attribute::Const,
                  "Relative change of surface temperature.\n\
-By default, surface temperature will replect temperature of incomming\n\
-water or ponded water, if any, snow, if any, or air temperature.\n\
-Set this parameter to dampen changes. Especially useful if you feed\n\
-the model with daily weather data and average temperature.");
+If you set this to a negative value, surface temperature will\n\
+reflect temperature of incomming water or ponded water, if any,\n\
+snow, if any, or air temperature.\n\
+Set this parameter to a positive value to dampen changes.\n\
+Especially useful if you feed the model with daily weather data\n\
+and average temperature.");
+  frame.set ("temperature_change_rate", 0.5);
   frame.declare ("EpFactor", Attribute::None (), Check::non_negative (), 
 	      Attribute::Const,
 	      "Convertion of reference evapotranspiration to\n\

@@ -561,25 +561,27 @@ Connvert to SI base units by multiplying with a factor.")
     // Mass per volume.
     add ("kg/m^3", p_k * u_g, -3, 1, 0, 0, 0, 0, 0,
          "Base mass per volume.");
-    add ("ug/l", p_u * u_g / u_l,
-         -3, 1, 0, 0, 0, 0, 0,
-         "Low solute concentration.");
-    add ("ng/l", p_n * u_g / u_l,
-         -3, 1, 0, 0, 0, 0, 0,
-         "Lower solute concentration.");
     add ("ng/cm^3", p_n * u_g / p_c_3,
          -3, 1, 0, 0, 0, 0, 0,
          "Low solute concentration.");
     add ("ug/m^3", p_u * u_g, -3, 1, 0, 0, 0, 0, 0,
          "Mass per volume.");
+    add ("g/l", u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
+         "Concentration.");
+    add ("g/L", u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
+         "Concentration.");
     add ("mg/l", p_m * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
          "Concentration.");
     add ("mg/L", p_m * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
          "Concentration.");
     add ("ug/L", p_u * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
          "Concentration.");
+    add ("ug/l", p_u * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
+         "Low solute concentration.");
     add ("ng/L", p_n * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
          "Concentration.");
+    add ("ng/l", p_n * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
+         "Lower solute concentration.");
     add ("pg/L", p_p * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
          "Concentration.");
     add ("fg/L", p_f * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
@@ -616,9 +618,23 @@ Connvert to SI base units by multiplying with a factor.")
          "Volume per mass.");
     add ("L/kg", u_l, 3, -1, 0, 0, 0, 0, 0,
          "Volume per mass.");
+    add ("l/g", u_l / u_g, 3, -1, 0, 0, 0, 0, 0,
+         "Volume per mass.");
+    add ("L/g", u_l / u_g, 3, -1, 0, 0, 0, 0, 0,
+         "Volume per mass.");
+    add ("l/mg", u_l / (p_m * u_g), 3, -1, 0, 0, 0, 0, 0,
+         "Volume per mass.");
+    add ("L/mg", u_l / (p_m * u_g), 3, -1, 0, 0, 0, 0, 0,
+         "Volume per mass.");
     add ("cm^3/g", p_c_3 / u_g, 3, -1, 0, 0, 0, 0, 0,
          "Volume per mass.");
     add ("ml/g", p_c_3 / u_g, 3, -1, 0, 0, 0, 0, 0,
+         "Volume per mass.");
+    add ("mL/g", p_c_3 / u_g, 3, -1, 0, 0, 0, 0, 0,
+         "Volume per mass.");
+    add ("ml/kg", p_c_3, 3, -1, 0, 0, 0, 0, 0,
+         "Volume per mass.");
+    add ("mL/kg", p_c_3, 3, -1, 0, 0, 0, 0, 0,
          "Volume per mass.");
     add ("cm^3/ng", p_c_3 / (p_n * u_g),
          3, -1, 0, 0, 0, 0, 0,

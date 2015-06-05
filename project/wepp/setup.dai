@@ -629,8 +629,8 @@
 (defprogram S_both batch
   (run S_sims S_plot))
 
-(run led4)
-;;(run sims)
+;;(run led4)
+(run sims)
 
 ;;(run plot)
 

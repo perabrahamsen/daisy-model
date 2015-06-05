@@ -6,6 +6,24 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.21 
+
+** Ice enabled by default.
+
+This makes simulations much slower, use
+
+  (SoilHeat (enable_ice false))
+
+to disable.
+
+** 'minimal_timestep' changed to 1 microsecond.
+
+Use 
+
+  (minimal_timestep (hours 1))
+
+to go back to 1 hour timesteps.
+
 * 5.20
 
 ** Theta_res now defaults to 0.01 in the hypres hydraulic model.

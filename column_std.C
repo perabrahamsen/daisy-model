@@ -459,9 +459,11 @@ ColumnStandard::overflow (const double extra, Treelog& msg)
 {
   if (extra > 0.0)
     {
+#if 0
       std::ostringstream tmp;
       tmp << "Adding " << extra << " [mm] overflow to surface";
       msg.message (tmp.str ());
+#endif
       bioclimate->add_tillage_water (extra);
     }
 }
@@ -736,6 +738,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
                         *chemistry, dt, msg);
   litter->update (organic_matter->top_DM ());
   // Transport.
+  chemistry->mass_balance (geometry, *soil_water);
   groundwater->tick (geometry, *soil, *soil_water, 
                      surface.ponding_average () * 0.1, 
                      *soil_heat, time, scope, msg);
@@ -743,6 +746,8 @@ ColumnStandard::tick_move (const Metalib& metalib,
   soil_heat->tick (geometry, *soil, *soil_water, T_bottom, *movement, 
                    surface, dt, msg);
   soil_water->reset_old ();
+  chemistry->mass_balance (geometry, *soil_water);
+  // Her sættes Theta_old til Theta
   soil_water->tick_ice (geometry, *soil, dt, msg); 
   movement->tick (*soil, *soil_water, *soil_heat,
                   surface, *groundwater, time, my_weather, 
@@ -750,6 +755,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
   soil_water->tick_after (geometry, *soil, *soil_heat, false, msg);
   soil_water->mass_balance (geometry, dt, msg);
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
+  // HER er Theta_old * C != M
   chemistry->tick_soil (scope, geometry, 
                         surface.ponding_average (),
                         surface.mixing_resistance (),
@@ -773,8 +779,16 @@ ColumnStandard::tick_move (const Metalib& metalib,
     organic_matter->monthly (metalib, geometry, msg);
 
   // Soil properties.
+  chemistry->mass_balance (geometry, *soil_water);
   soil->tick (dt, my_weather.rain (), geometry, *soil_water, msg);
-  overflow (soil_water->overflow (geometry, *soil, *soil_heat, msg), msg);
+  const double extra = soil_water->overflow (geometry, *soil, *soil_heat, msg);
+  if (extra > 0.0)
+    {
+      overflow (extra, msg);
+      chemistry->mass_balance (geometry, *soil_water);
+    }
+  chemistry->update_C (*soil, *soil_water);
+  chemistry->mass_balance (geometry, *soil_water);
 }
 
 bool

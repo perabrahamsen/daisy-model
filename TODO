@@ -1,47 +1,26 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* wepp figurer
+* asorption Freundlich
 
-wepp figurer
+Hvorfor bliver M 58700.1 i stedet for 100000.1
 
-* Spørg Søren om SoilHeat
+C_in_humus ?
 
-** HVORFOR GIVER (q_lim 50) en grænse på 25?
+* JB
 
-** Skal vi iterere T_limited på plads?
+** Skriv introducerende afsnit til 3.0 om opbygning
 
-Hvorfor er der så stor forskel på den T_limited Daisy estimerer for at
-komme under q_lim, og den q_lim vi får bagefter?
+** Skriv afsnit 3.2 til rapporten.
 
-** Lave tidsskridt en dag efter frost
+*** Beskriv hvilke dele vi tager med
 
-** Skal G / top_flux i PM inkludere vand?
+*** Implementation af frost (SH)
 
-** Skal q_lim includere vand?
+*** dry bulk density + hypres
 
-** Jeg syntes T_limited ændrer sig alt for langsomt :-(
+*** andre marker
 
-** SoilHeat::T_top skal måske bruge avg T i øverste jordlag
-
-** DONE Blød T_top
-
-** DONE ned i dt ved temperaturer under 0
-
-** dC/dt
-
-** DONE is + vand > porosity
-
-** max heat flux over overflade
-
-** SH is / vand præcis rækkefølge af beregninger
-
-* Gør dette default
-
-  (minimal_timestep (microseconds 1))
-
-Vi skal nok også have (enable_ice true) som default.
-
-* JB: Få stoftransport til at virke med WEPP
+*** MaHa kalibrering
 
 * JB: Opsætning med wepp + "ikke gennemtrængbar" overflade.
 

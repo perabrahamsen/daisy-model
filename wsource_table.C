@@ -184,12 +184,14 @@ WSourceTable::end_number (const symbol key) const
 { 
   const double raw = raw_end_number (key);
 
+  // If timestep begin and ends in different months, we want the
+  // correction factor for the timestep where it begins.
   if (key == Weatherdata::Precip ())
-    return raw * precip_correct (timestep_end);
+    return raw * precip_correct (timestep_begin);
   else if (key == Weatherdata::AirTemp ()
            || key == Weatherdata::T_min ()
            || key == Weatherdata::T_max ())
-    return raw + temp_offset (timestep_end);
+    return raw + temp_offset (timestep_begin);
 
   return raw;
 }

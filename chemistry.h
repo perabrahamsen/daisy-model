@@ -60,6 +60,7 @@ public:
 
 public:
   virtual void update_C (const Soil&, const SoilWater&) = 0;
+  virtual void mass_balance (const Geometry&, const SoilWater&) const = 0;
   void deposit (const IM& im, Treelog&);
   virtual void deposit (symbol chem, double flux /* [g/m^2/h] */,
 			Treelog&) = 0;

@@ -56,6 +56,8 @@ struct ChemistryMulti : public Chemistry
   // Management.
   void check_ignore (const symbol chem, Treelog& msg);
   void update_C (const Soil&, const SoilWater&);
+  void mass_balance (const Geometry& geo, 
+                     const SoilWater& soil_water) const;
   void deposit (symbol chem, double flux, Treelog&);
   void spray_overhead (symbol chem, double amount, Treelog&);
   void spray_surface (symbol chem, double amount, Treelog&);
@@ -170,6 +172,14 @@ ChemistryMulti::update_C (const Soil& soil, const SoilWater& soil_water)
 {
   for (size_t c = 0; c < combine.size (); c++)
     combine[c]->update_C (soil, soil_water); 
+}
+
+void 
+ChemistryMulti::mass_balance (const Geometry& geo, 
+                              const SoilWater& soil_water) const
+{
+  for (size_t c = 0; c < combine.size (); c++)
+    combine[c]->mass_balance (geo, soil_water); 
 }
 
 void 

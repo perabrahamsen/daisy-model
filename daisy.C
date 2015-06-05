@@ -250,7 +250,7 @@ struct Daisy::Implementation
       max_dt (timestep.total_hours ()),
       minimal_timestep (al.check ("minimal_timestep")
                         ? submodel_value<Timestep> (al, "minimal_timestep")
-                        : timestep),
+                        : Timestep::microsecond ()),
       min_dt (minimal_timestep.total_hours ()),
       small_dt (max_dt),
       current_dt (max_dt),

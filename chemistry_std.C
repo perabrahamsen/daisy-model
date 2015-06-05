@@ -51,6 +51,7 @@ struct ChemistryStandard : public Chemistry
  
   // Management.
   void update_C (const Soil& soil, const SoilWater& soil_water);
+  void mass_balance (const Geometry& geo, const SoilWater& soil_water) const;
   void deposit (symbol chem, double flux, Treelog&);
   void spray_overhead (symbol chem, double amount, Treelog&);
   void spray_surface (symbol chem, double amount, Treelog&);
@@ -151,6 +152,27 @@ ChemistryStandard::update_C (const Soil& soil, const SoilWater& soil_water)
 }
 
 void 
+ChemistryStandard::mass_balance (const Geometry& geo, 
+                                 const SoilWater& soil_water) const
+{
+  const size_t cell_size = geo.cell_size ();
+
+  for (size_t i = 0; i < chemicals.size (); i++)
+    {
+      const Chemical& sol = *chemicals[i];
+      for (size_t c = 0; c < cell_size; c++)
+        {
+          const double Theta = soil_water.Theta_primary (c);
+          const double C = sol.C_primary (c);
+          const double M = sol.M_primary (c);
+          const double A = M - Theta * C;
+          if (A < 0.0)
+            daisy_approximate (M,  C * Theta);
+        }
+    }
+}
+
+void 
 ChemistryStandard::deposit (const symbol chem, const double flux, Treelog& msg)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
@@ -159,7 +181,7 @@ ChemistryStandard::deposit (const symbol chem, const double flux, Treelog& msg)
         chemicals[c]->deposit (flux);
         return;
       }
-  msg.warning ("Unknwon chemical '" + chem + "' ignored");
+  msg.warning ("Unknown chemical '" + chem + "' ignored");
 }
 
 void 
