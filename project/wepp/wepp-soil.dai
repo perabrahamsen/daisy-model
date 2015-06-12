@@ -52,7 +52,8 @@
   (reaction colloid-filter colloid-generation))
 
 (defcolumn WEPP default
-  (Chemistry multi (combine N colloids))
+  ;; (Chemistry multi (combine N colloids))
+  (Chemistry none)
   (Litter Maize))
 
 (defhorizon "Rorrende Ap_1" USDA3
@@ -65,7 +66,15 @@
 (defhorizon "Overflade Ap_1" "Rorrende Ap_1"
   (description "0-3 cm")
   (humus 0.034)
-  (dry_bulk_density 1.25 [g/cm^3])
+  (dry_bulk_density 1.25 [g/cm^3]))
+             
+(defhorizon "Overflade Ap_1 WEPP" "Overflade Ap_1"
+  (hydraulic wepp))
+             
+(defhorizon "Overflade Ap_1 Styczen" "Overflade Ap_1"
+  (hydraulic Styczen))
+             
+(defhorizon "Overflade Ap_1 Calib" "Overflade Ap_1"
   (hydraulic Styczen 
              (time_consolidation 0.0223 [d^-1])
              (consolidate_factor 0.81 [])
@@ -88,14 +97,21 @@
 (defhorizon "Overflade Ap_2" "Rorrende Ap_2"
   (description "0-3 cm")
   (humus 0.034)
-  (dry_bulk_density 1.37 [g/cm^3])
+  (dry_bulk_density 1.37 [g/cm^3]))
+
+(defhorizon "Overflade Ap_2 WEPP" "Overflade Ap_2"
+  (hydraulic wepp))
+
+(defhorizon "Overflade Ap_2 Styczen" "Overflade Ap_2"
+  (hydraulic Styczen))
+
+(defhorizon "Overflade Ap_2 Calib" "Overflade Ap_2"
   (hydraulic Styczen 
              (time_consolidation 2.5e-3 [d^-1])
              ;; (p_t 1.49 [g/cm^3])
              ;; (consolidate_factor 0.845 [])
              (consolidate_factor 1.0 [])
-             (consolidate_factor_water 0.0 []))
-  (secondary_domain overflade_Ap))
+             (consolidate_factor_water 0.0 [])))
 
 (defhorizon "Rorrende Bplow layer_2" USDA3
   (description "25-33 cm Petersen et al (2004)")
@@ -112,6 +128,16 @@
   (secondary_domain Ap))
   
 (defhorizon "Overflade Ap_3" "Rorrende Ap_3"
+  (description "0-3 cm")
+  (dry_bulk_density 1.32 [g/cm^3]))
+
+(defhorizon "Overflade Ap_3 WEPP" "Overflade Ap_3"
+  (hydraulic wepp))
+
+(defhorizon "Overflade Ap_3 Styczen" "Overflade Ap_3"
+  (hydraulic Styczen))
+
+(defhorizon "Overflade Ap_3 Calib" "Overflade Ap_3"
   (description "0-3 cm")
   (dry_bulk_density 1.32 [g/cm^3])
   (hydraulic Styczen 
@@ -136,7 +162,15 @@
   
 (defhorizon "Overflade Ap_4" "Rorrende Ap_4"
   (description "0-3 cm")
-  (dry_bulk_density 1.33 [g/cm^3])
+  (dry_bulk_density 1.33 [g/cm^3]))
+
+(defhorizon "Overflade Ap_4 WEPP" "Overflade Ap_4"
+  (hydraulic wepp))
+
+(defhorizon "Overflade Ap_4 Styczen" "Overflade Ap_4"
+  (hydraulic Styczen))
+
+(defhorizon "Overflade Ap_4 Calib" "Overflade Ap_4"
   (hydraulic Styczen 
              (time_consolidation 0.0073 [d^-1])
              (consolidate_factor 0.88 [])
@@ -162,18 +196,11 @@
   (dry_bulk_density 1.69 [g/cm^3])
   (secondary_domain agrovand))
 
-(defcolumn Rorrende_led3 WEPP;; led 3
+(defcolumn Rorrende WEPP
   "This is a Rorrende soil with pipe drains."
-  (Soil (MaxRootingDepth 150 [cm])
-  (horizons (-3.00 "Overflade Ap_3")
-            (-25.00 "Rorrende Ap_3")
-            (-33.00 "Rorrende Bplow layer_3")
-            (-120 "Rorrende Bt")
-            (-200 "Rorrende C")))
   (Groundwater aquitard
         (K_aquitard 0.050 [cm/h])
         (Z_aquitard 200 [cm]))
-
   (Movement original
   (Tertiary 
   (biopores (classes ("matrix_0cm") 
@@ -183,58 +210,103 @@
                      ("drain_2cm_W")
                      ("matrix_30cm")
                      ("drain_30cm"))))))
-                     
-(defcolumn Rorrende_fd3 Rorrende_led3
-  "Rorrende soil with free drainiage."
-  (Groundwater deep))         
-
-
-(defcolumn Rorrende_led1 Rorrende_led3
-  (Soil 
-  (horizons (-3.00 "Overflade Ap_1")
+  
+(defcolumn Rorrende_led1_wepp Rorrende
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_1 WEPP")
             (-25.00 "Rorrende Ap_1")
             (-33.00 "Rorrende Bplow layer_1")
             (-120 "Rorrende Bt")
-            (-200 "Rorrende C")))
-  (Movement original
-  (Tertiary 
-  (biopores (classes ("matrix_0cm") 
-                     ("matrix_2cm_R")
-                     ("drain_2cm_S_R")
-                     ("drain_2cm_W_R")
-                     ("matrix_30cm")
-                     ("drain_30cm"))))))          
- 
- (defcolumn Rorrende_fd1 Rorrende_led1
-  	"Rorrende soil with free drainiage."
-	(Groundwater deep))
-	
-(defcolumn Rorrende_led2 Rorrende_led1
-  (Soil 
-  (horizons (-3.00 "Overflade Ap_2")
+            (-200 "Rorrende C"))))
+
+(defcolumn Rorrende_led1_styczen Rorrende
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_1 Styczen")
+            (-25.00 "Rorrende Ap_1")
+            (-33.00 "Rorrende Bplow layer_1")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C"))))
+
+(defcolumn Rorrende_led1_calib Rorrende
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_1 Calib")
+            (-25.00 "Rorrende Ap_1")
+            (-33.00 "Rorrende Bplow layer_1")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C"))))
+
+(defcolumn Rorrende_led2_wepp Rorrende
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_2 WEPP")
+            (-25.00 "Rorrende Ap_2")
+            (-33.00 "Rorrende Bplow layer_2")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C"))))
+
+(defcolumn Rorrende_led2_styczen Rorrende
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_2 Styczen")
+            (-25.00 "Rorrende Ap_2")
+            (-33.00 "Rorrende Bplow layer_2")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C"))))
+
+(defcolumn Rorrende_led2_calib Rorrende
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_2 Calib")
             (-25.00 "Rorrende Ap_2")
             (-33.00 "Rorrende Bplow layer_2")
             (-120 "Rorrende Bt")
             (-200 "Rorrende C"))))
  
- (defcolumn Rorrende_fd2 Rorrende_led2
- 	"Rorrende soil with free drainiage."
- 	(Groundwater deep))
-
- 
-(defcolumn Rorrende_led4 Rorrende_led3
-  (Soil 
-  (horizons (-3.00 "Overflade Ap_4")
+(defcolumn Rorrende_led3_wepp Rorrende
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_3 WEPP")
+            (-25.00 "Rorrende Ap_3")
+            (-33.00 "Rorrende Bplow layer_3")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C"))))
+                     
+(defcolumn Rorrende_led3_styczen Rorrende
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_3 Styczen")
+            (-25.00 "Rorrende Ap_3")
+            (-33.00 "Rorrende Bplow layer_3")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C"))))
+                     
+(defcolumn Rorrende_led3_calib Rorrende
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_3 Calib")
+            (-25.00 "Rorrende Ap_3")
+            (-33.00 "Rorrende Bplow layer_3")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C"))))
+                     
+(defcolumn Rorrende_led4_wepp Rorrende
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_4 WEPP")
             (-25.00 "Rorrende Ap_4")
             (-33.00 "Rorrende Bplow layer_4")
             (-120 "Rorrende Bt")
             (-200 "Rorrende C"))))
 
+(defcolumn Rorrende_led4_styczen Rorrende
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_4 Styczen")
+            (-25.00 "Rorrende Ap_4")
+            (-33.00 "Rorrende Bplow layer_4")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C"))))
 
-(defcolumn Rorrende_fd4 Rorrende_led4
-	"Rorrende soil with free drainiage."
-	(Groundwater deep))
-	
+(defcolumn Rorrende_led4_calib Rorrende
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_4 Calib")
+            (-25.00 "Rorrende Ap_4")
+            (-33.00 "Rorrende Bplow layer_4")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C"))))
+
 (defhorizon "Karlslunde Ap_N1" ISSS3 
   (description "3-25 cm")
   (clay 0.209)(silt 0.194)(sand 0.597)(humus 0.027)
@@ -355,7 +427,7 @@
 
 
 (defcolumn Karlslunde_N2 Karlslunde_N1
-  (Soil 
+  (Soil (MaxRootingDepth 150 [cm])
   (horizons (-3.00 "Overflade Ap_N2")
             (-25.00 "Karlslunde Ap_N2")
             (-33.00 "Rorrende Bplow layer_1")
@@ -367,7 +439,7 @@
 	(Groundwater deep))
 	
 (defcolumn Karlslunde_K3 Karlslunde_N1
-  (Soil 
+  (Soil (MaxRootingDepth 150 [cm])
   (horizons (-3.00 "Overflade Ap_K3")
             (-25.00 "Karlslunde Ap_K3")
             (-33.00 "Rorrende Bplow layer_2")
@@ -380,7 +452,7 @@
 
  
 (defcolumn Soroe_S8 Karlslunde_N1
-  (Soil 
+  (Soil (MaxRootingDepth 150 [cm])
   (horizons (-3.00 "Overflade Ap_S8")
             (-25.00 "Soroe Ap_S8")
             (-33.00 "Rorrende Bplow layer_4")
@@ -393,7 +465,7 @@
 	(Groundwater deep))
 	
 (defcolumn Soroe_S9 Karlslunde_N1
-  (Soil 
+  (Soil (MaxRootingDepth 150 [cm])
   (horizons (-3.00 "Overflade Ap_S9")
             (-25.00 "Soroe Ap_S9")
             (-33.00 "Rorrende Bplow layer_4")

@@ -29,6 +29,8 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
+#include "field.h"
+#include "check.h"
 
 struct ActionAssert : public Action
 {
@@ -246,6 +248,72 @@ Write a error message to the user and stop the simulation.")
       frame.order ("message");
   }
 } ActionPanic_syntax;
+
+// The 'sorption_table' action mode.
+
+struct ActionSorptionTable : public Action
+{
+  const size_t cell;
+  const double Theta;
+  const double start;
+  const double factor;
+  const int intervals;
+
+  void doIt (Daisy& daisy, const Scope&, Treelog& msg)
+  { 
+    daisy.field ().sorption_table (cell, Theta, start, factor, intervals, msg);
+  }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
+  ActionSorptionTable (const BlockModel& al)
+    : Action (al),
+      cell (al.integer ("cell")),
+      Theta (al.number ("Theta")),
+      start (al.number ("start")),
+      factor (al.number ("factor")),
+      intervals (al.integer ("intervals"))
+  { }
+
+  ~ActionSorptionTable ()
+  { }
+};
+
+static struct ActionSorptionTableSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ActionSorptionTable (al); }
+  ActionSorptionTableSyntax ()
+    : DeclareModel (Action::component, "sorption_table", "\
+Print a sorption table for all chemicals.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.declare_integer ("cell", Attribute::Const, "\
+Numeric cell to use for soil information.");
+    frame.set ("cell", 0);
+    frame.declare_fraction ("Theta", Attribute::Const, "\
+Soil water content.");
+    frame.set ("Theta", 0.5);
+    frame.declare ("start", "g/cm^3", Check::positive (), Attribute::Const, "\
+Lowest solute concentration in table.");
+    frame.set ("start", 1e-10);
+    frame.declare ("factor", Attribute::None (), Check::non_negative (),
+                   Attribute::Const, "\
+Multiply C with this number for the next entry in the table.\n\
+If zero, instead add start to C for the next entry in the table.");
+    frame.set ("factor", 10.0);
+    frame.declare_integer ("intervals", Attribute::Const, "\
+Number of entries in the table.");
+    frame.set ("intervals", 10);
+  }
+} ActionSorptionTable_syntax;
+
 
 // action_message.C ends here.
 

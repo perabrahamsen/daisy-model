@@ -68,7 +68,7 @@
                   ((source table (file "daily_Karlslunde.dwf")))))
                 
   (time 2012 09 05)
-  (stop 2014 09 25))
+  (stop 2014 12 25))
 
 (defprogram Soroe WEPP 
   (weather combine
@@ -79,7 +79,7 @@
                      ((source table (file "daily_Soroe.dwf")))
                   ))
   (time 2012 09 02)
-  (stop 2014 08 26))
+  (stop 2014 12 25))
 
 ;; Plot 1.
 (defaction led1 activity
@@ -96,11 +96,21 @@
            (stem 1.00 [])))
 
 (defprogram led1 Taastrup
-  (column Rorrende_led1)
   (manager led1)
-  (log_prefix "log/L1-")
   (output &old
           (WEPP (horizon "Overflade Ap_1") (where "wepp.dlf"))))
+
+(defprogram led1_wepp led1
+  (column Rorrende_led1_wepp)
+  (log_prefix "log/L1-WEPP-"))
+
+(defprogram led1_styczen led1
+  (column Rorrende_led1_styczen)
+  (log_prefix "log/L1-Styczen-"))
+
+(defprogram led1_calib led1
+  (column Rorrende_led1_calib)
+  (log_prefix "log/L1-Calib-"))
 
 ;;; Plot 2.
 
@@ -116,12 +126,23 @@
            (stem 1.00 [])))
 
 (defprogram led2 Taastrup
-  (column Rorrende_led2)
   (manager led2)
-  (log_prefix "log/L2-")
-  ;;(timestep (minutes 10))
   (output &old
           (WEPP (horizon "Overflade Ap_2") (where "wepp.dlf"))))
+
+(defprogram led2_wepp led2
+  (column Rorrende_led2_wepp)
+  (log_prefix "log/L2-WEPP-"))
+
+(defprogram led2_styczen led2
+  (column Rorrende_led2_styczen)
+  (log_prefix "log/L2-Styczen-"))
+
+(defprogram led2_calib led2
+  (column Rorrende_led2_calib)
+  (log_prefix "log/L2-Calib-"))
+
+
 
 ;;; Plot 3.
 
@@ -138,11 +159,21 @@
                                    (stem 1.00 [])))
 
 (defprogram led3 Taastrup
-  (column Rorrende_led3)
   (manager led3)
-  (log_prefix "log/L3-")
   (output &old
           (WEPP (horizon "Overflade Ap_3") (where "wepp.dlf"))))
+
+(defprogram led3_wepp led3
+  (column Rorrende_led3_wepp)
+  (log_prefix "log/L3-WEPP-"))
+
+(defprogram led3_styczen led3
+  (column Rorrende_led3_styczen)
+  (log_prefix "log/L3-Styczen-"))
+
+(defprogram led3_calib led3
+  (column Rorrende_led3_calib)
+  (log_prefix "log/L3-Calib-"))
 
 ;;; Plot 4.
 
@@ -160,12 +191,23 @@
            (stem 1.00 [])))
   	
 (defprogram led4 Taastrup
-  (column Rorrende_led4)
   (manager led4)
-  (log_prefix "log/L4-")
-  ;;(timestep (minutes 10))
   (output &old
           (WEPP (horizon "Overflade Ap_4") (where "wepp.dlf"))))
+
+(defprogram led4_wepp led4
+  (column Rorrende_led4_wepp)
+  (log_prefix "log/L4-WEPP-"))
+
+(defprogram led4_styczen led4
+  (column Rorrende_led4_styczen)
+  (log_prefix "log/L4-Styczen-"))
+
+(defprogram led4_calib led4
+  (column Rorrende_led4_calib)
+  (log_prefix "log/L4-Calib-"))
+
+
 
 ;; N1.
 (defaction N1 activity
@@ -311,9 +353,6 @@
 
 ;; Plot
 
-(defunit [g/L] [kg/m^3]
-  (factor 1.0 []))
-
 (defgnuplot plottime time
   (declare L String "Plot to plot")
   (extra &old 
@@ -323,102 +362,60 @@
 (defunit [m^2/m^2] [<fraction>]
   (factor 1.0))
 
+
+
 (defgnuplot rho_b_base plottime
-  (where "fig/rho_b_${L}.pdf")
+  (where "fig/rho_b_${L}.emf")
+  (device "emf size 400,400")
   (title "Plot ${L} dry bulk density")
-  (declare obs String "")
   (ymax 1.5 [g/cm^3])
   (ymin 1.0 [g/cm^3])
   (y2max 100 [%])
-  (y2min 0 [%])
-  (source (column (file "log/${L}-wepp.dlf")
-                  (tag "rho_b")
-                  (dimension "g/cm^3")
-                  (style 1)
-                  (title "WEPP"))
-          (column (file "${obs}")
-                  (tag "${L}")
-                  (handle all)
-                  (dimension "g/cm^3")
-                  (style 3)
-                  (title "Obs"))
-          ))
+  (y2min 0 [%]))
 
 (defgnuplot rho_b_T rho_b_base
-  (obs "rho_b.ddf"))
+  (source (column (file "log/${L}-WEPP-wepp.dlf")
+                  (tag "rho_b")
+                  (dimension "g/cm^3")
+                  (style 1)
+                  (title "WEPP"))
+;;          (column (file "log/${L}-Styczen-wepp.dlf")
+;;                  (tag "rho_b")
+;;                  (dimension "g/cm^3")
+;;                  (style 4)
+;;                  (title "Styczen"))
+          (column (file "log/${L}-Calib-wepp.dlf")
+                  (tag "rho_b")
+                  (dimension "g/cm^3")
+                  (style 2)
+                  (title "Calib"))
+          (column (file "rho_b.ddf")
+                  (tag "${L}")
+                  (handle all)
+                  (dimension "g/cm^3")
+                  (style 3)
+                  (title "Obs"))))
 
 (defgnuplot rho_b_R rho_b_base
-  (obs "rho_b_R.ddf"))
-
-(defgnuplot rho_b_cover plottime
-  (where "fig/rho_b_cover_${L}.pdf")
-  (title "Plot ${L} dry bulk density")
-  (declare obs String "")
-  (ymax 1.5 [g/cm^3])
-  (ymin 1.0 [g/cm^3])
-  (y2max 100 [%])
-  (y2min 0 [%])
   (source (column (file "log/${L}-wepp.dlf")
                   (tag "rho_b")
                   (dimension "g/cm^3")
                   (style 1)
                   (title "WEPP"))
-          (column (file "${obs}")
+          (column (file "rho_b_R.ddf")
                   (tag "${L}")
-                  ;; (handle all)
+                  (handle all)
                   (dimension "g/cm^3")
                   (style 3)
-                  (title "Obs"))
-          (column (file "log/${L}-wepp.dlf")
-                  (tag "Canopy")
-                  (style 2)
-                  (dimension "%"))
-          (column (file "log/${L}-wepp.dlf")
-                  (tag "Litter")
-                  (style 4)
-                  (dimension "%"))
-          ))
-
-(defgnuplot rho_b_cover_T rho_b_cover
-  (obs "rho_b.ddf"))
-
-(defgnuplot rho_b_cover_R rho_b_cover
-  (obs "rho_b_R.ddf"))
-
-(defgnuplot K15 plottime
-  (where "fig/K15_${L}.pdf")
-  (title "Plot ${L} hydraulic conductivity")
-  (ymax 50 [mm/h])
-  (ymin 0 [mm/h])
-  (source (column (file "log/${L}-wepp.dlf")
-                  (tag "K_bare")
-                  (dimension "mm/h")
-                  (style 5)
-                  (title "K_bare"))
-          (column (file "log/${L}-wepp.dlf")
-                  (tag "K_15")
-                  (dimension "mm/h")
-                  (style 1)
-                  (title "Hypres K (-15 mm)"))
-          (column (file "log/${L}-wepp.dlf")
-                  (tag "K_sat")
-                  (dimension "mm/h")
-                  (style 4)
-                  (title "Hypres K_sat"))
-          (column (file "K15${L}.ddf")
-                  (handle all)
-                  (tag "Inf")
-                  (dimension "mm/h")
-                  (style 3)
-                  (title "Obs inf @ -15"))
-          ))
+                  (title "Obs"))))
 
 (defgnuplot KU plottime
   (declare U String "Underpressure")
-  (where "fig/K${U}_${L}.pdf")
+  (where "fig/K${U}_${L}.emf")
+  (device "emf size 400,400")
   (title "Plot ${L} hydraulic conductivity")
   (ymin 0 [mm/h])
-  (source (column (file "log/${L}-wepp.dlf")
+  (source (column (file "log/${L}-${hydro}wepp.dlf")
                   (tag "K_${U}")
                   (dimension "mm/h")
                   (style 1)
@@ -432,6 +429,10 @@
                   (title "Obs inf @ -${U}"))
           ))
 
+(defgnuplot K15 KU
+  (ymax 50 [mm/h])
+  (U "15"))
+
 (defgnuplot K30 KU
   (ymax 25 [mm/h])
   (U "30"))
@@ -444,140 +445,64 @@
   (ymax 6 [mm/h])
   (U "120"))
 
-(defgnuplot KM plottime
-  (where "fig/KM_${L}.pdf")
-  (title "Plot ${L} hydraulic conductivity")
-  (ymin 0 [mm/h])
-  (ymax 20 [mm/h])
-  (source (column (file "log/${L}-wepp.dlf")
-                  (tag "K_15")
-                  (dimension "mm/h")
-                  (style 1)
-                  (title "Hypres K (-15 mm)"))
-          (column (file "log/${L}-wepp.dlf")
-                  (tag "K_30")
-                  (dimension "mm/h")
-                  (style 4)
-                  (title "Hypres K (-30 mm)"))
-          (column (file "log/${L}-wepp.dlf")
-                  (tag "K_60")
-                  (dimension "mm/h")
-                  (style 5)
-                  (title "Hypres K (-60 mm)"))
-          (column (file "log/${L}-wepp.dlf")
-                  (tag "K_120")
-                  (dimension "mm/h")
-                  (style 2)
-                  (title "Hypres K (-120 mm)"))
-          ))
-
-(defgnuplot K15root plottime
-  (where "fig/K15_${L}_root.pdf")
-  (title "Plot ${L} Infiltrability vs root mass")
-  (ymax 50 [mm/h])
-  (ymin 0 [mm/h])
-  (source (column (file "log/${L}-wepp.dlf")
-                  (tag "K_15")
-                  (dimension "mm/h")
-                  (style 1)
-                  (title "Hypres K (-15 mm)"))
-          (column (file "log/${L}-wepp.dlf")
-                  (tag "K_bare")
-                  (dimension "mm/h")
-                  (style 5)
-                  (title "K_bare"))
-          (column (file "K15${L}.ddf")
-                  (tag "Inf")
-                  (dimension "mm/h")
-                  (style 3)
-                  (title "Obs inf @ -15"))
-          (column (file "log/${L}-crop_prod.dlf")
-                  (tag "WRoot")
-                  (title "Root")
-                  (style 2)
-                  (dimension "kg/ha"))
-          ))
-
-
 (defgnuplot T_plots multi
-  (graph (rho_b_T (L "L1"))
-         (rho_b_T (L "L2") (legend none))
+  (declare hydro String "Parameterization")
+  (hydro "Calib-")
+  (graph (rho_b_T (L "L1") (legend none))
+         (rho_b_T (L "L2"))
          (rho_b_T (L "L3") (legend none))
          (rho_b_T (L "L4") (legend none))
-         (rho_b_cover_T (L "L1"))
-         (rho_b_cover_T (L "L2") (legend none))
-         (rho_b_cover_T (L "L3") (legend none))
-         (rho_b_cover_T (L "L4") (legend none))
          (K15 (L "L1"));; (legend ne))
-         (K15 (L "L2"));; (legend none))
-         (K15 (L "L3"));; (legend none))
-         (K15 (L "L4"));; (legend none))
+         (K15 (L "L2") (legend none))
+         (K15 (L "L3") (legend none))
+         (K15 (L "L4") (legend none))
          (K30 (L "L1"));; (legend ne))
-         (K30 (L "L2"));; (legend none))
-         (K30 (L "L3"));; (legend none))
-         (K30 (L "L4"));; (legend none))
+         (K30 (L "L2") (legend none))
+         (K30 (L "L3") (legend none))
+         (K30 (L "L4") (legend none))
          (K60 (L "L1"));; (legend ne))
-         (K60 (L "L2"));; (legend none))
-         (K60 (L "L3"));; (legend none))
-         (K60 (L "L4"));; (legend none))
+         (K60 (L "L2") (legend none))
+         (K60 (L "L3") (legend none))
+         (K60 (L "L4") (legend none))
          (K120 (L "L1"));; (legend ne))
-         (K120 (L "L2"));; (legend none))
-         (K120 (L "L3"));; (legend none))
-         (K120 (L "L4"));; (legend none))
-         (KM (L "L1"));; (legend ne))
-         (KM (L "L2"));; (legend none))
-         (KM (L "L3"));; (legend none))
-         (KM (L "L4"));; (legend none))
-         (K15root (L "L1"));; (legend ne))
-         (K15root (L "L2"));; (legend none))
-         (K15root (L "L3"));; (legend none))
-         (K15root (L "L4"));; (legend none))
+         (K120 (L "L2") (legend none))
+         (K120 (L "L3") (legend none))
+         (K120 (L "L4") (legend none))
          ))
 
 (defgnuplot K_plots multi
+  (declare hydro String "Parameterization")
+  (hydro "")
   (graph (rho_b_R (L "K3") (legend none))
          (rho_b_R (L "N2") (legend none))
-         (rho_b_R (L "N1") (legend none))
-         (rho_b_cover_R (L "K3") (legend none))
-         (rho_b_cover_R (L "N2") (legend none))
-         (rho_b_cover_R (L "N1") (legend none))
-         (K15 (L "K3"));; (legend none))
-         (K15 (L "N2"));; (legend none))
-         (K15 (L "N1"));; (legend none))
-         (K30 (L "K3"));; (legend none))
-         (K30 (L "N2"));; (legend none))
-         (K30 (L "N1"));; (legend none))
-         (K60 (L "K3"));; (legend none))
-         (K60 (L "N2"));; (legend none))
-         (K60 (L "N1"));; (legend none))
-         (K120 (L "K3"));; (legend none))
-         (K120 (L "N2"));; (legend none))
-         (K120 (L "N1"));; (legend none))
-         (KM (L "K3"));; (legend none))
-         (KM (L "N2"));; (legend none))
-         (KM (L "N1"));; (legend none))
-         (K15root (L "K3"));; (legend none))
-         (K15root (L "N2"));; (legend none))
-         (K15root (L "N1"));; (legend none))
+         (rho_b_R (L "N1"));; (legend none))
+         ;;(K15 (L "K3"));; (legend none))
+         ;;(K15 (L "N2"));; (legend none))
+         ;;(K15 (L "N1"));; (legend none))
+         ;;(K30 (L "K3"));; (legend none))
+         ;;(K30 (L "N2"));; (legend none))
+         ;;(K30 (L "N1"));; (legend none))
+         ;;(K60 (L "K3"));; (legend none))
+         ;;(K60 (L "N2"));; (legend none))
+         ;;(K60 (L "N1"));; (legend none))
+         ;;(K120 (L "K3"));; (legend none))
+         ;;(K120 (L "N2"));; (legend none))
+         ;;(K120 (L "N1"));; (legend none))
          ))
 
 (defgnuplot S_plots multi
+  (declare hydro String "Parameterization")
+  (hydro "")
   (graph (rho_b_R (L "S8") (legend none))
          (rho_b_R (L "S9") (legend none))
-         (rho_b_cover_R (L "S8") (legend none))
-         (rho_b_cover_R (L "S9") (legend none))
-         (K15 (L "S8"));; (legend none))
-         (K15 (L "S9"));; (legend none))
-         (K30 (L "S8"));; (legend none))
-         (K30 (L "S9"));; (legend none))
-         (K60 (L "S8"));; (legend none))
-         (K60 (L "S9"));; (legend none))
-         (K120 (L "S8"));; (legend none))
-         (K120 (L "S9"));; (legend none))
-         (KM (L "S8"));; (legend none))
-         (KM (L "S9"));; (legend none))
-         (K15root (L "S8"));; (legend none))
-         (K15root (L "S9"));; (legend none))
+         ;;(K15 (L "S8"));; (legend none))
+         ;;(K15 (L "S9"));; (legend none))
+         ;;(K30 (L "S8"));; (legend none))
+         ;;(K30 (L "S9"));; (legend none))
+         ;;(K60 (L "S8"));; (legend none))
+         ;;(K60 (L "S9"));; (legend none))
+         ;;(K120 (L "S8"));; (legend none))
+         ;;(K120 (L "S9"));; (legend none))
          ))
 
 (defprogram T_plot gnuplot
@@ -595,10 +520,18 @@
 ;; Run them
 
 (defprogram T_sims batch
-  (run led1 
-       led2
-       led3 
-       led4
+  (run led1_wepp 
+       led1_styczen
+       led1_calib
+       led2_wepp 
+       led2_styczen
+       led2_calib
+       led3_wepp 
+       led3_styczen
+       led3_calib
+       led4_wepp 
+       led4_styczen
+       led4_calib
        ))
 
 (defprogram K_sims batch
@@ -629,10 +562,9 @@
 (defprogram S_both batch
   (run S_sims S_plot))
 
-;;(run led4)
-(run sims)
+;;(run sims)
 
-;;(run plot)
+(run plot)
 
 ;;(run K_both)
 

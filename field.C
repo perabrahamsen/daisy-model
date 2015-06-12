@@ -50,6 +50,10 @@ struct Field::Implementation
   void unrestrict ();
 
   // Actions.
+  void sorption_table (const size_t cell, 
+                       const double Theta, const double start,
+                       const double factor, const int intervals,
+                       Treelog& msg) const;
   void sow (const Metalib&, const FrameModel& crop, 
             double row_width, double row_pos, double seed,
             const Time& time, Treelog&);
@@ -149,6 +153,29 @@ Field::Implementation::unrestrict ()
 {
   daisy_assert (selected);
   selected = NULL;
+}
+
+void 
+Field::Implementation::sorption_table (const size_t cell, 
+                                       const double Theta, const double start,
+                                       const double factor, const int intervals,
+                                       Treelog& msg) const
+{
+  if (selected)
+    {
+      Treelog::Open nest (msg, selected->objid);
+      selected->sorption_table (cell, Theta, start, factor, intervals, msg);
+    }
+  else 
+    {
+      for (ColumnList::const_iterator i = columns.begin ();
+	   i != columns.end ();
+	   i++)
+	{
+	  Treelog::Open nest (msg, (*i)->objid);
+	  (*i)->sorption_table (cell, Theta, start, factor, intervals, msg);
+	}
+    }
 }
 
 void 
@@ -798,6 +825,13 @@ Field::Restrict::Restrict (Field& f, symbol name)
 
 Field::Restrict::~Restrict ()
 { field.impl->unrestrict (); }
+
+void 
+Field::sorption_table (const size_t cell, 
+                       const double Theta, const double start,
+                       const double factor, const int intervals,
+                       Treelog& msg) const
+{ impl->sorption_table (cell, Theta, start, factor, intervals, msg); }
 
 void 
 Field::sow (const Metalib& metalib, const FrameModel& crop,

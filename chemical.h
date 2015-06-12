@@ -60,6 +60,13 @@ public:
   static const symbol surface_storage_unit (); // [g/m^2]
   static const symbol surface_flux_unit (); // [g/m^2/h]
 
+  // Table.
+public:
+  virtual void sorption_table (const Soil& soil, const size_t cell, 
+                               const double Theta, const double start,
+                               const double factor, const int intervals,
+                               Treelog& msg) const = 0;
+
   // Soil.
 public:
   virtual const Adsorption& adsorption () const = 0;

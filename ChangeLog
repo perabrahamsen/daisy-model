@@ -1,3 +1,7 @@
+2015-06-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* all (sortption_table): New action model.
+
 2015-05-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* Makefile (MODELS): Removed 'action_heat.C'.

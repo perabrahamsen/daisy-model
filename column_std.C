@@ -111,6 +111,10 @@ public:
   const Horizon& horizon_at (double z, double x, double y) const;
 
   // Actions.
+  void sorption_table (const size_t cell, 
+                       const double Theta, const double start,
+                       const double factor, const int intervals,
+                       Treelog& msg) const;
   void sow (const Metalib&, const FrameModel&, 
             double row_width, double row_pos, double seed,
             const Time&, Treelog&);
@@ -203,6 +207,14 @@ const Horizon&
 ColumnStandard::horizon_at (const double z, 
                             const double x, const double y) const
 { return soil->horizon (geometry.cell_at (z, x, y)); }
+
+void 
+ColumnStandard::sorption_table (const size_t cell, 
+                                const double Theta, const double start,
+                                const double factor, const int intervals,
+                                Treelog& msg) const
+{ chemistry->sorption_table (*soil, cell, Theta, start, factor, intervals,
+                             msg); }
 
 void 
 ColumnStandard::sow (const Metalib& metalib, const FrameModel& al, 

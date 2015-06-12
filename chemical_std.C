@@ -150,6 +150,11 @@ struct ChemicalStandard : public Chemical
   std::vector<double> static_decompose_rate; // Depth adusted decompose rate.
   bool need_fake_tertiary;      // If J_p should be faked.
 
+  void sorption_table (const Soil& soil, const size_t cell, const double Theta, 
+                       const double start, const double factor,
+                       const int intervals,
+                       Treelog& msg) const;
+
   // Solute.
   const Adsorption& adsorption () const;
   double diffusion_coefficient () const;
@@ -283,6 +288,43 @@ ChemicalStandard::Product::Product (const Block& al)
   : fraction (al.number ("fraction")),
     chemical (al.name ("chemical"))
 { }
+
+void 
+ChemicalStandard::sorption_table (const Soil& soil, const size_t cell, 
+                                  const double Theta, 
+                                  const double start, const double factor,
+                                  const int intervals,
+                                  Treelog& msg) const
+{
+  std::ostringstream tmp;
+  tmp << "Sorption table for " << objid << " cell " << cell << "\n"
+      << "Theta = " << Theta << " []"
+      << "; clay = " << soil.clay (cell) << " []"
+      << "; OC = " << soil.humus_C (cell) << " []"
+      << "; rho_b = " << soil.dry_bulk_density (cell) << " [g/cm^3]\n"
+      << "----\n"
+      << "C\tM\n"
+      << "g/cm^3\tg/cm^3";
+  if (cell < soil.size ())
+    {
+      double C = start;
+      for (int i = 0; i < intervals; i++)
+        {
+          const double M = adsorption_->C_to_M_total (soil, Theta, cell, C);
+          tmp << "\n" << C << "\t" << M;
+          if (std::isnormal (factor))
+            C *= factor;
+          else 
+            C += start;
+        }
+      msg.message (tmp.str ());
+    }
+  else
+    {
+      tmp << "\nNo such cell";
+      msg.error (tmp.str ());
+    }
+}
 
 const Adsorption&
 ChemicalStandard::adsorption () const

@@ -48,6 +48,10 @@ struct ChemistryStandard : public Chemistry
   bool ignored (symbol chem) const;
   Chemical& find (symbol chem); 
   const std::vector<Chemical*>& all () const;
+  void sorption_table (const Soil& soil, const size_t cell, 
+                       const double Theta, const double start,
+                       const double factor, const int intervals,
+                       Treelog& msg) const;
  
   // Management.
   void update_C (const Soil& soil, const SoilWater& soil_water);
@@ -143,6 +147,17 @@ ChemistryStandard::find (symbol chem)
 const std::vector<Chemical*>& 
 ChemistryStandard::all () const
 { return chemicals; }
+
+void 
+ChemistryStandard::sorption_table (const Soil& soil, const size_t cell, 
+                                   const double Theta, const double start,
+                                   const double factor, const int intervals,
+                                   Treelog& msg) const
+{
+  for (size_t c = 0; c < chemicals.size (); c++)
+    chemicals[c]->sorption_table (soil, cell, Theta, start, factor, intervals,
+                                  msg); 
+}
 
 void 
 ChemistryStandard::update_C (const Soil& soil, const SoilWater& soil_water)

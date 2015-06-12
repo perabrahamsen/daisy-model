@@ -2227,7 +2227,8 @@ groundwater_lysimeter${OBJ}: groundwater_lysimeter.C groundwater.h \
 action_message${OBJ}: action_message.C action.h model_framed.h \
  model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h condition.h log.h \
- time.h border.h daisy.h program.h run.h librarian.h
+ time.h border.h daisy.h program.h run.h librarian.h field.h irrigate.h \
+ memutils.h check.h
 select_index${OBJ}: select_index.C select_value.h select.h destination.h \
  symbol.h model.h units.h memutils.h volume.h model_derived.h \
  model_logable.h attribute.h block_model.h block_nested.h block.h scope.h \
@@ -2393,7 +2394,8 @@ tortuosity_linear${OBJ}: tortuosity_linear.C tortuosity.h model.h symbol.h \
 adsorption_freundlich${OBJ}: adsorption_freundlich.C adsorption.h \
  model_derived.h model_logable.h model.h symbol.h block_model.h \
  block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
- frame.h soil.h check.h mathlib.h assertion.h librarian.h
+ frame.h soil.h check.h mathlib.h assertion.h librarian.h units.h \
+ memutils.h metalib.h
 adsorption_linear${OBJ}: adsorption_linear.C adsorption.h model_derived.h \
  model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h check.h soil.h \

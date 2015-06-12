@@ -73,6 +73,10 @@ public:
 
   // Actions.
 public:
+  virtual void sorption_table (const size_t cell, 
+                               const double Theta, const double start,
+                               const double factor, const int intervals,
+                               Treelog& msg) const = 0;
   virtual void sow (const Metalib&, const FrameModel& crop, 
                     double row_width, double row_pos, double seed,
                     const Time&, Treelog&) = 0;

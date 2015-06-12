@@ -58,6 +58,13 @@ public:
   virtual Chemical& find (symbol chem) = 0;
   virtual const std::vector<Chemical*>& all () const = 0;
 
+  // Table.
+public:
+  virtual void sorption_table (const Soil& soil, const size_t cell, 
+                               const double Theta, const double start,
+                               const double factor, const int intervals,
+                               Treelog& msg) const = 0;
+
 public:
   virtual void update_C (const Soil&, const SoilWater&) = 0;
   virtual void mass_balance (const Geometry&, const SoilWater&) const = 0;

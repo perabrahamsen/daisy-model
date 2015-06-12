@@ -52,6 +52,10 @@ struct ChemistryMulti : public Chemistry
   bool ignored (symbol chem) const;
   Chemical& find (symbol chem);
   const std::vector<Chemical*>& all () const;
+  void sorption_table (const Soil& soil, const size_t cell, 
+                       const double Theta, const double start,
+                       const double factor, const int intervals,
+                       Treelog& msg) const;
   
   // Management.
   void check_ignore (const symbol chem, Treelog& msg);
@@ -156,6 +160,17 @@ ChemistryMulti::find (symbol chem)
 const std::vector<Chemical*>& 
 ChemistryMulti::all () const
 { return chemicals; }
+
+void 
+ChemistryMulti::sorption_table (const Soil& soil, const size_t cell, 
+                                const double Theta, const double start,
+                                const double factor, const int intervals,
+                                Treelog& msg) const
+{
+  for (size_t c = 0; c < combine.size (); c++)
+    combine[c]->sorption_table (soil, cell, Theta, start, factor, intervals,
+                                msg); 
+}
 
 void 
 ChemistryMulti::check_ignore (const symbol chem, Treelog& msg)
