@@ -316,31 +316,39 @@
   
 (defhorizon "Overflade Ap_N1" "Karlslunde Ap_N1"
   (description "0-3 cm")
-  (humus 0.04)
-  (dry_bulk_density 1.13 [g/cm^3])
-  (hydraulic wepp) 
-;; (hydraulic Styczen ;;led1
-;;            (time_consolidation 0.0223 [d^-1])
-;;            (consolidate_factor 0.81 [])
-;;            (consolidate_factor_water 0.0 []))
-  (secondary_domain overflade_Ap))
+  (humus 0.037)
+  (dry_bulk_density 1.13 [g/cm^3]))
+
+
+(defhorizon "Overflade Ap_N1 WEPP" "Overflade Ap_N1" 
+  (hydraulic wepp))
+
+(defhorizon "Overflade Ap_N1 Calib" "Overflade Ap_N1" 
+  (hydraulic Styczen
+            (time_consolidation 0.0223 [d^-1])
+            (consolidate_factor 0.81 [])
+            (consolidate_factor_water 0.0 [])))
   
 (defhorizon "Karlslunde Ap_N2" ISSS3
   (description "3-25 cm")
+  (secondary_domain overflade_Ap)
   (clay 0.147)(silt 0.175)(sand 0.678)(humus 0.027)
   (dry_bulk_density 1.60 [g/cm^3]);; som K3 i 15
   (hydraulic original (topsoil true)))
 
 (defhorizon "Overflade Ap_N2" "Karlslunde Ap_N2"
   (description "0-3 cm")
-  (humus 0.031)
-  (dry_bulk_density 1.21 [g/cm^3])
-  (hydraulic wepp)
-;; (hydraulic Styczen ;;led1
-;;            (time_consolidation 0.0223 [d^-1])
-;;            (consolidate_factor 0.81 [])
-;;            (consolidate_factor_water 0.0 []))
-   (secondary_domain overflade_Ap))
+  (humus 0.033)
+  (dry_bulk_density 1.21 [g/cm^3]))
+
+(defhorizon "Overflade Ap_N2 WEPP" "Overflade Ap_N2" 
+  (hydraulic wepp))
+
+(defhorizon "Overflade Ap_N2 Calib" "Overflade Ap_N2" 
+ (hydraulic Styczen
+            (time_consolidation 0.0223 [d^-1])
+            (consolidate_factor 0.81 [])
+            (consolidate_factor_water 0.0 [])))
 
 (defhorizon "Karlslunde Ap_K3" ISSS3
   (description "3-25 cm")
@@ -352,14 +360,18 @@
 (defhorizon "Overflade Ap_K3" "Karlslunde Ap_K3"
   (description "0-3 cm")
   (humus 0.033)
-  (dry_bulk_density 1.18 [g/cm^3])
-  (hydraulic wepp)
-;; (hydraulic Styczen ;;led1
-;;            (time_consolidation 0.0223 [d^-1])
-;;            (consolidate_factor 0.81 [])
-;;            (consolidate_factor_water 0.0 []))
-  (secondary_domain overflade_Ap))
-  
+  (dry_bulk_density 1.18 [g/cm^3]))
+
+
+(defhorizon "Overflade Ap_K3 WEPP" "Overflade Ap_K3"
+   (hydraulic wepp))
+
+(defhorizon "Overflade Ap_K3 Calib" "Overflade Ap_K3"
+  (hydraulic Styczen ;;led1
+             (time_consolidation 0.0223 [d^-1])
+             (consolidate_factor 0.81 [])
+             (consolidate_factor_water 0.0 [])))
+
 (defhorizon "Soroe Ap_S8" ISSS3
   (description "3-25 cm")
   (clay 0.116)(silt 0.167)(sand 0.717)(humus 0.028)
@@ -369,16 +381,19 @@
   
 (defhorizon "Overflade Ap_S8" "Soroe Ap_S8"
   (description "0-3 cm")
-  (humus 0.038)
-  (dry_bulk_density 1.22 [g/cm^3])
-  (hydraulic wepp)
-;; (hydraulic Styczen ;;led2
-;;            (time_consolidation 2.5e-3 [d^-1])
+  (humus 0.037)
+  (dry_bulk_density 1.22 [g/cm^3]))
+
+(defhorizon "Overflade Ap_S8 WEPP" "Overflade Ap_S8"
+  (hydraulic wepp))
+
+(defhorizon "Overflade Ap_S8 Calib" "Overflade Ap_S8"
+ (hydraulic Styczen ;;led2
+            (time_consolidation 2.5e-3 [d^-1])
             ;; (p_t 1.49 [g/cm^3])
             ;; (consolidate_factor 0.845 [])
-;;            (consolidate_factor 1.0 [])
-;;           (consolidate_factor_water 0.0 []))
-(secondary_domain overflade_Ap))
+            (consolidate_factor 1.0 [])
+            (consolidate_factor_water 0.0 [])))
 
 (defhorizon "Soroe Ap_S9" ISSS3
   (description "3-25 cm")
@@ -391,27 +406,25 @@
   (description "0-3 cm")
   (humus 0.057)
   (dry_bulk_density 1.15 [g/cm^3])
-  (hydraulic wepp)
-;; (hydraulic Styczen ;;led2
-;;            (time_consolidation 2.5e-3 [d^-1])
+  (secondary_domain overflade_Ap))
+
+(defhorizon "Overflade Ap_S9 WEPP" "Overflade Ap_S9" 
+  (hydraulic wepp))
+
+(defhorizon "Overflade Ap_S9 Calib" "Overflade Ap_S9" 
+ (hydraulic Styczen ;;led2
+            (time_consolidation 2.5e-3 [d^-1])
             ;; (p_t 1.49 [g/cm^3])
             ;; (consolidate_factor 0.845 [])
-;;            (consolidate_factor 1.0 [])
-;;           (consolidate_factor_water 0.0 []))
+            (consolidate_factor 1.0 [])
+            (consolidate_factor_water 0.0 []))
 (secondary_domain overflade_Ap))
+
           
-(defcolumn Karlslunde_N1 WEPP
-  "This is a Rorrende soil with pipe drains."
-    (Soil (MaxRootingDepth 150 [cm])
-  (horizons (-3.00 "Overflade Ap_N1")
-            (-25.00 "Karlslunde Ap_N1")
-            (-33.00 "Rorrende Bplow layer_3")
-            (-120 "Rorrende Bt")
-            (-200 "Rorrende C")))
+(defcolumn Reduced WEPP
   (Groundwater aquitard
         (K_aquitard 0.050 [cm/h])
         (Z_aquitard 200 [cm]))
-
   (Movement original
   (Tertiary 
    (biopores (classes ("matrix_0cm") 
@@ -420,61 +433,87 @@
                       ("drain_2cm_W_R")
                       ("matrix_30cm")
                       ("drain_30cm"))))))
-                     
-  (defcolumn Karlslunde_fdN1 Karlslunde_N1
-	"Karlslunde soil with free drainiage."
-	(Groundwater deep))         
 
-
-(defcolumn Karlslunde_N2 Karlslunde_N1
+(defcolumn Karlslunde_N1_wepp Reduced
   (Soil (MaxRootingDepth 150 [cm])
-  (horizons (-3.00 "Overflade Ap_N2")
+        (horizons (-3.00 "Overflade Ap_N1 WEPP")
+                  (-25.00 "Karlslunde Ap_N1")
+                  (-33.00 "Rorrende Bplow layer_3")
+                  (-120 "Rorrende Bt")
+                  (-200 "Rorrende C"))))
+
+
+(defcolumn Karlslunde_N2_wepp Reduced
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_N2 WEPP")
             (-25.00 "Karlslunde Ap_N2")
             (-33.00 "Rorrende Bplow layer_1")
             (-120 "Rorrende Bt")
             (-200 "Rorrende C"))))          
  
- (defcolumn Karlslunde_fdN2 Karlslunde_N2
-  	"Karlslunde soil with free drainiage."
-	(Groundwater deep))
-	
-(defcolumn Karlslunde_K3 Karlslunde_N1
+(defcolumn Karlslunde_K3_wepp Reduced
   (Soil (MaxRootingDepth 150 [cm])
-  (horizons (-3.00 "Overflade Ap_K3")
+  (horizons (-3.00 "Overflade Ap_K3 WEPP")
             (-25.00 "Karlslunde Ap_K3")
             (-33.00 "Rorrende Bplow layer_2")
             (-120 "Rorrende Bt")
             (-200 "Rorrende C"))))
- 
- (defcolumn Karlslunde_fdK3 Karlslunde_K3
- 	"Karlslunde soil with free drainiage."
- 	(Groundwater deep))
 
- 
-(defcolumn Soroe_S8 Karlslunde_N1
+(defcolumn Soroe_S8_wepp Reduced
   (Soil (MaxRootingDepth 150 [cm])
-  (horizons (-3.00 "Overflade Ap_S8")
+  (horizons (-3.00 "Overflade Ap_S8 WEPP")
             (-25.00 "Soroe Ap_S8")
             (-33.00 "Rorrende Bplow layer_4")
             (-120 "Rorrende Bt")
             (-200 "Rorrende C"))))
 
-
-(defcolumn Soroe_fdS8 Soroe_S8
-	"Soroe soil with free drainiage."
-	(Groundwater deep))
-	
-(defcolumn Soroe_S9 Karlslunde_N1
+(defcolumn Soroe_S9_wepp Reduced
   (Soil (MaxRootingDepth 150 [cm])
-  (horizons (-3.00 "Overflade Ap_S9")
+  (horizons (-3.00 "Overflade Ap_S9 WEPP")
             (-25.00 "Soroe Ap_S9")
             (-33.00 "Rorrende Bplow layer_4")
             (-120 "Rorrende Bt")
             (-200 "Rorrende C"))))
 
+(defcolumn Karlslunde_N1_calib Reduced
+  (Soil (MaxRootingDepth 150 [cm])
+        (horizons (-3.00 "Overflade Ap_N1 Calib")
+                  (-25.00 "Karlslunde Ap_N1")
+                  (-33.00 "Rorrende Bplow layer_3")
+                  (-120 "Rorrende Bt")
+                  (-200 "Rorrende C"))))
 
-(defcolumn Soroe_fdS9 Soroe_S9
-	"Soroe soil with free drainiage."
-	(Groundwater deep))
 
-;; ror-soil.dai ends here.
+(defcolumn Karlslunde_N2_calib Reduced
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_N2 Calib")
+            (-25.00 "Karlslunde Ap_N2")
+            (-33.00 "Rorrende Bplow layer_1")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C"))))          
+ 
+(defcolumn Karlslunde_K3_calib Reduced
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_K3 Calib")
+            (-25.00 "Karlslunde Ap_K3")
+            (-33.00 "Rorrende Bplow layer_2")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C"))))
+
+(defcolumn Soroe_S8_calib Reduced
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_S8 Calib")
+            (-25.00 "Soroe Ap_S8")
+            (-33.00 "Rorrende Bplow layer_4")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C"))))
+
+(defcolumn Soroe_S9_calib Reduced
+  (Soil (MaxRootingDepth 150 [cm])
+  (horizons (-3.00 "Overflade Ap_S9 Calib")
+            (-25.00 "Soroe Ap_S9")
+            (-33.00 "Rorrende Bplow layer_4")
+            (-120 "Rorrende Bt")
+            (-200 "Rorrende C"))))
+
+;; wepp-soil.dai ends here.

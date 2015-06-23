@@ -229,12 +229,20 @@
                          (sow "Winter Wheat"))
 
 (defprogram N1 Karlslunde
-  (column Karlslunde_N1)
-  (manager N1)
-  (log_prefix "log/N1-")
-  (timestep (minutes 20))
+  (manager N1))
+
+(defprogram N1_wepp N1
+  (column Karlslunde_N1_wepp)
+  (log_prefix "log/N1-WEPP-")
   (output &old
-          (WEPP (horizon "Overflade Ap_N1") (where "wepp.dlf"))))
+          (WEPP (horizon "Overflade Ap_N1 WEPP") (where "wepp.dlf"))))
+
+(defprogram N1_calib N1
+  (column Karlslunde_N1_calib)
+  (manager N1)
+  (log_prefix "log/N1-Calib-")
+  (output &old
+          (WEPP (horizon "Overflade Ap_N1 Calib") (where "wepp.dlf"))))
           
 ;;; N2.
 (defaction N2 activity
@@ -257,12 +265,19 @@
 
 
 (defprogram N2 Karlslunde
-  (column Karlslunde_N2)
-  (manager N2)
-  (log_prefix "log/N2-")
-  (timestep (minutes 20))
+  (manager N2))
+
+(defprogram N2_wepp N2
+  (column Karlslunde_N2_wepp)
+  (log_prefix "log/N2-WEPP-")
   (output &old
-          (WEPP (horizon "Overflade Ap_N2") (where "wepp.dlf"))))
+          (WEPP (horizon "Overflade Ap_N2 WEPP") (where "wepp.dlf"))))
+
+(defprogram N2_calib N2
+  (column Karlslunde_N2_calib)
+  (log_prefix "log/N2-Calib-")
+  (output &old
+          (WEPP (horizon "Overflade Ap_N2 Calib") (where "wepp.dlf"))))
 
 ;;; K3.
  (defaction K3 activity
@@ -284,12 +299,19 @@
                          (sow "Winter Wheat"))
 
 (defprogram K3 Karlslunde
-  (column Karlslunde_K3)
-  (manager K3)
-  (log_prefix "log/K3-")
- ;; (timestep (minutes 10))
+  (manager K3))
+
+(defprogram K3_wepp K3
+  (column Karlslunde_K3_wepp)
+  (log_prefix "log/K3-WEPP-")
   (output &old
-          (WEPP (horizon "Overflade Ap_K3") (where "wepp.dlf"))))
+          (WEPP (horizon "Overflade Ap_K3 WEPP") (where "wepp.dlf"))))
+
+(defprogram K3_calib K3
+  (column Karlslunde_K3_calib)
+  (log_prefix "log/K3-Calib-")
+  (output &old
+          (WEPP (horizon "Overflade Ap_K3 Calib") (where "wepp.dlf"))))
 
 ;;; S8
 
@@ -312,12 +334,19 @@
   (wait (at 2014 09 20)) (sow_tillage)(sow "Wclover"))	              
   	
 (defprogram S8 Soroe
-  (column Soroe_S8);; her skal der gøres noget
-  (manager S8)
-  (log_prefix "log/S8-")
-  ;;(timestep (minutes 10))
+  (manager S8))
+
+(defprogram S8_wepp S8
+  (column Soroe_S8_wepp);; her skal der gøres noget
+  (log_prefix "log/S8-WEPP-")
   (output &old
-          (WEPP (horizon "Overflade Ap_S8") (where "wepp.dlf"))))
+          (WEPP (horizon "Overflade Ap_S8 WEPP") (where "wepp.dlf"))))
+
+(defprogram S8_calib S8
+  (column Soroe_S8_calib);; her skal der gøres noget
+  (log_prefix "log/S8-Calib-")
+  (output &old
+          (WEPP (horizon "Overflade Ap_S8 Calib") (where "wepp.dlf"))))
 
 ;;; S9
 (defaction S9 activity
@@ -344,12 +373,19 @@
 (wait (at 2014 09 20)) (sow_tillage) (sow "Winter Wheat"))
   	
 (defprogram S9 Soroe
-  (column Soroe_S9);; her skal der gøres noget
-  (manager S9)
-  (log_prefix "log/S9-")
-  ;;(timestep (minutes 10))
+  (manager S9))
+
+(defprogram S9_wepp S9
+  (column Soroe_S9_wepp);; her skal der gøres noget
+  (log_prefix "log/S9-WEPP-")
   (output &old
-          (WEPP (horizon "Overflade Ap_S9") (where "wepp.dlf"))))
+          (WEPP (horizon "Overflade Ap_S9 WEPP") (where "wepp.dlf"))))
+
+(defprogram S9_calib S9
+  (column Soroe_S9_calib);; her skal der gøres noget
+  (log_prefix "log/S9-Calib-")
+  (output &old
+          (WEPP (horizon "Overflade Ap_S9 Calib") (where "wepp.dlf"))))
 
 ;; Plot
 
@@ -397,11 +433,16 @@
                   (title "Obs"))))
 
 (defgnuplot rho_b_R rho_b_base
-  (source (column (file "log/${L}-wepp.dlf")
+  (source (column (file "log/${L}-WEPP-wepp.dlf")
                   (tag "rho_b")
                   (dimension "g/cm^3")
                   (style 1)
                   (title "WEPP"))
+          (column (file "log/${L}-Calib-wepp.dlf")
+                  (tag "rho_b")
+                  (dimension "g/cm^3")
+                  (style 2)
+                  (title "Calib"))
           (column (file "rho_b_R.ddf")
                   (tag "${L}")
                   (handle all)
@@ -493,7 +534,7 @@
 (defgnuplot S_plots multi
   (declare hydro String "Parameterization")
   (hydro "")
-  (graph (rho_b_R (L "S8") (legend none))
+  (graph (rho_b_R (L "S8"));; (legend none))
          (rho_b_R (L "S9") (legend none))
          ;;(K15 (L "S8"));; (legend none))
          ;;(K15 (L "S9"));; (legend none))
@@ -515,7 +556,8 @@
   (graph S_plots))
 
 (defprogram plot gnuplot
-  (graph T_plots K_plots S_plots))
+  (graph ;;T_plots 
+         K_plots S_plots))
 
 ;; Run them
 
@@ -535,19 +577,24 @@
        ))
 
 (defprogram K_sims batch
-  (run N1
-       N2
-       K3       
+  (run N1_wepp
+       N2_wepp
+       K3_wepp       
+       N1_calib
+       N2_calib
+       K3_calib
        ))
 
 (defprogram S_sims batch
-  (run S8
-       S9
+  (run S8_wepp
+       S9_wepp
+       S8_calib
+       S9_calib
        ))
 
 (defprogram sims batch
-  (run T_sims 
-       K_sims 
+  (run ;;T_sims 
+       ;;K_sims 
        S_sims
        ))
 
@@ -562,9 +609,9 @@
 (defprogram S_both batch
   (run S_sims S_plot))
 
-;;(run sims)
-
 (run plot)
+
+;;(run S8_wepp)
 
 ;;(run K_both)
 
