@@ -1,0 +1,1 @@
+DaisyGIS is far more complete than the primitive GUI bundled with the standard Daisy distribution, but may not always be able to be used with the latest Daisy releases.  DaisyGIS is sold by [DHI](DHI.md).

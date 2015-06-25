@@ -1,0 +1,1 @@
+The code for converting between dimensional units can be found in [units.h](http://code.google.com/p/daisy-model/source/browse/trunk/units.h).

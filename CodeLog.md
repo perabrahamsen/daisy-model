@@ -1,0 +1,1 @@
+The interface for the log component can be found in [log.h](http://code.google.com/p/daisy-model/source/browse/trunk/log.h).

@@ -1,0 +1,7 @@
+[DHI](DHI.md) har været tov-holder for et projekt til standardisering af brug af Daisy til miljøgodkendelser.  Resultatet af det projekt var blandt andet en tyk rapport med en detaljeret beskrivelse af hvordan Daisy skal bruges og hvordan resultaterne skal fortolkes.
+
+Hent [rapporten](http://daisy-model.googlecode.com/files/daisystaabirapport_240406.pdf) og [appendiks](http://daisy-model.googlecode.com/files/daisystaabiappendix121206.pdf).
+
+De almindelige afgrøderparameteriseringer (med engelske navne) i Daisy er kalibreret efter markforsøg.  Dette udgør et problem når de bruges til evaluering af produktionsbrug, da forsøgsmarker generelt giver større udbytte end marker udlagt til normal produktion.  Dette skyldes blandt andet at man ved markforsøg bruger uforholdsmæssigt mange ressourcer på at eliminere alle andre produktionsbegrænsende faktorer, end dem man netop ønsker at afprøve ved forsøget.
+
+I filen "dk-crop.dai" der er placeret i underfolderen "lib" hvor du har installeret Daisy, er der defineret en række populære danske afgrøder med danske navne.  Disse afgrøder har fået produktionen justeret ned i forhold til deres engelske brødre, så udbytterne nu svarer til danske landsgennesnit.  De kan derfor give et mere realistisk bud på konsekvenserne når man ændrer på produktionen.

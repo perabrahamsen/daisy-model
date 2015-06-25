@@ -1,0 +1,6 @@
+Most of the information on these pages are directed towards using Daisy on "Wintel" machines, that is, computers based on Intel main architecture (IA32) running MS Windows.  However, Daisy has very few hardware dependencies, and relies only on a few widely ported software libraries.   And in fact, our main development environment is Cygnus, a Unix emulation layer, and now also Ubuntu (Linux) on AMD64.
+
+Both Linux and MacOS are examples of Unix (or Unix-like) systems which it should be relatively easy to get Daisy to run un.  Other examples include Solaris from Sun Microsystems, and various versions of AIX from IBM.
+
+
+So what do to if you have a computer with one of these Unixen, and want to run Daisy on it?    If you are running Linux on PC-hardware, you basically have two options.  One is to ask us to compile the latest version of Daisy for Linux.  The other is to compile it yourself.  If you have any other Unix, only the later option is available.   To compile it yourself, you might want to look at the [documentation for programmers](Programmers.md).

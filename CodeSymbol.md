@@ -1,0 +1,3 @@
+The `symbol` type defined in [symbol.h](http://code.google.com/p/daisy-model/source/browse/trunk/symbol.h) is an alternative to `const std::string` where comparison and copying are both O(1), in fact, as fast as comparing or copying integers, but all substring operations are prohibited.
+
+Their main purpose is for [logging](CodeLog.md), which depends heavily on fast comparison of identifies, but are also used in other situations where immutable, unique identifiers are called for.  [Unit dimensions](CodeUnit.md) are typically symbols as well.
