@@ -74,7 +74,7 @@
 (defhorizon "Overflade Ap_1 Styczen" "Overflade Ap_1"
   (hydraulic Styczen))
              
-(defhorizon "Overflade Ap_1 Calib" "Overflade Ap_1"
+(defhorizon "Overflade Ap_1 Kalib" "Overflade Ap_1"
   (hydraulic Styczen 
              (time_consolidation 0.0223 [d^-1])
              (consolidate_factor 0.81 [])
@@ -105,7 +105,7 @@
 (defhorizon "Overflade Ap_2 Styczen" "Overflade Ap_2"
   (hydraulic Styczen))
 
-(defhorizon "Overflade Ap_2 Calib" "Overflade Ap_2"
+(defhorizon "Overflade Ap_2 Kalib" "Overflade Ap_2"
   (hydraulic Styczen 
              (time_consolidation 2.5e-3 [d^-1])
              ;; (p_t 1.49 [g/cm^3])
@@ -137,7 +137,7 @@
 (defhorizon "Overflade Ap_3 Styczen" "Overflade Ap_3"
   (hydraulic Styczen))
 
-(defhorizon "Overflade Ap_3 Calib" "Overflade Ap_3"
+(defhorizon "Overflade Ap_3 Kalib" "Overflade Ap_3"
   (description "0-3 cm")
   (dry_bulk_density 1.32 [g/cm^3])
   (hydraulic Styczen 
@@ -170,7 +170,7 @@
 (defhorizon "Overflade Ap_4 Styczen" "Overflade Ap_4"
   (hydraulic Styczen))
 
-(defhorizon "Overflade Ap_4 Calib" "Overflade Ap_4"
+(defhorizon "Overflade Ap_4 Kalib" "Overflade Ap_4"
   (hydraulic Styczen 
              (time_consolidation 0.0073 [d^-1])
              (consolidate_factor 0.88 [])
@@ -229,7 +229,7 @@
 
 (defcolumn Rorrende_led1_calib Rorrende
   (Soil (MaxRootingDepth 150 [cm])
-  (horizons (-3.00 "Overflade Ap_1 Calib")
+  (horizons (-3.00 "Overflade Ap_1 Kalib")
             (-25.00 "Rorrende Ap_1")
             (-33.00 "Rorrende Bplow layer_1")
             (-120 "Rorrende Bt")
@@ -253,7 +253,7 @@
 
 (defcolumn Rorrende_led2_calib Rorrende
   (Soil (MaxRootingDepth 150 [cm])
-  (horizons (-3.00 "Overflade Ap_2 Calib")
+  (horizons (-3.00 "Overflade Ap_2 Kalib")
             (-25.00 "Rorrende Ap_2")
             (-33.00 "Rorrende Bplow layer_2")
             (-120 "Rorrende Bt")
@@ -277,7 +277,7 @@
                      
 (defcolumn Rorrende_led3_calib Rorrende
   (Soil (MaxRootingDepth 150 [cm])
-  (horizons (-3.00 "Overflade Ap_3 Calib")
+  (horizons (-3.00 "Overflade Ap_3 Kalib")
             (-25.00 "Rorrende Ap_3")
             (-33.00 "Rorrende Bplow layer_3")
             (-120 "Rorrende Bt")
@@ -301,7 +301,7 @@
 
 (defcolumn Rorrende_led4_calib Rorrende
   (Soil (MaxRootingDepth 150 [cm])
-  (horizons (-3.00 "Overflade Ap_4 Calib")
+  (horizons (-3.00 "Overflade Ap_4 Kalib")
             (-25.00 "Rorrende Ap_4")
             (-33.00 "Rorrende Bplow layer_4")
             (-120 "Rorrende Bt")
@@ -323,7 +323,7 @@
 (defhorizon "Overflade Ap_N1 WEPP" "Overflade Ap_N1" 
   (hydraulic wepp))
 
-(defhorizon "Overflade Ap_N1 Calib" "Overflade Ap_N1" 
+(defhorizon "Overflade Ap_N1 Kalib" "Overflade Ap_N1" 
   (hydraulic Styczen
             (time_consolidation 0.0223 [d^-1])
             (consolidate_factor 0.81 [])
@@ -344,7 +344,7 @@
 (defhorizon "Overflade Ap_N2 WEPP" "Overflade Ap_N2" 
   (hydraulic wepp))
 
-(defhorizon "Overflade Ap_N2 Calib" "Overflade Ap_N2" 
+(defhorizon "Overflade Ap_N2 Kalib" "Overflade Ap_N2" 
  (hydraulic Styczen
             (time_consolidation 0.0223 [d^-1])
             (consolidate_factor 0.81 [])
@@ -366,7 +366,7 @@
 (defhorizon "Overflade Ap_K3 WEPP" "Overflade Ap_K3"
    (hydraulic wepp))
 
-(defhorizon "Overflade Ap_K3 Calib" "Overflade Ap_K3"
+(defhorizon "Overflade Ap_K3 Kalib" "Overflade Ap_K3"
   (hydraulic Styczen ;;led1
              (time_consolidation 0.0223 [d^-1])
              (consolidate_factor 0.81 [])
@@ -387,7 +387,7 @@
 (defhorizon "Overflade Ap_S8 WEPP" "Overflade Ap_S8"
   (hydraulic wepp))
 
-(defhorizon "Overflade Ap_S8 Calib" "Overflade Ap_S8"
+(defhorizon "Overflade Ap_S8 Kalib" "Overflade Ap_S8"
  (hydraulic Styczen ;;led2
             (time_consolidation 2.5e-3 [d^-1])
             ;; (p_t 1.49 [g/cm^3])
@@ -411,7 +411,7 @@
 (defhorizon "Overflade Ap_S9 WEPP" "Overflade Ap_S9" 
   (hydraulic wepp))
 
-(defhorizon "Overflade Ap_S9 Calib" "Overflade Ap_S9" 
+(defhorizon "Overflade Ap_S9 Kalib" "Overflade Ap_S9" 
  (hydraulic Styczen ;;led2
             (time_consolidation 2.5e-3 [d^-1])
             ;; (p_t 1.49 [g/cm^3])
@@ -477,7 +477,7 @@
 
 (defcolumn Karlslunde_N1_calib Reduced
   (Soil (MaxRootingDepth 150 [cm])
-        (horizons (-3.00 "Overflade Ap_N1 Calib")
+        (horizons (-3.00 "Overflade Ap_N1 Kalib")
                   (-25.00 "Karlslunde Ap_N1")
                   (-33.00 "Rorrende Bplow layer_3")
                   (-120 "Rorrende Bt")
@@ -486,7 +486,7 @@
 
 (defcolumn Karlslunde_N2_calib Reduced
   (Soil (MaxRootingDepth 150 [cm])
-  (horizons (-3.00 "Overflade Ap_N2 Calib")
+  (horizons (-3.00 "Overflade Ap_N2 Kalib")
             (-25.00 "Karlslunde Ap_N2")
             (-33.00 "Rorrende Bplow layer_1")
             (-120 "Rorrende Bt")
@@ -494,7 +494,7 @@
  
 (defcolumn Karlslunde_K3_calib Reduced
   (Soil (MaxRootingDepth 150 [cm])
-  (horizons (-3.00 "Overflade Ap_K3 Calib")
+  (horizons (-3.00 "Overflade Ap_K3 Kalib")
             (-25.00 "Karlslunde Ap_K3")
             (-33.00 "Rorrende Bplow layer_2")
             (-120 "Rorrende Bt")
@@ -502,7 +502,7 @@
 
 (defcolumn Soroe_S8_calib Reduced
   (Soil (MaxRootingDepth 150 [cm])
-  (horizons (-3.00 "Overflade Ap_S8 Calib")
+  (horizons (-3.00 "Overflade Ap_S8 Kalib")
             (-25.00 "Soroe Ap_S8")
             (-33.00 "Rorrende Bplow layer_4")
             (-120 "Rorrende Bt")
@@ -510,7 +510,7 @@
 
 (defcolumn Soroe_S9_calib Reduced
   (Soil (MaxRootingDepth 150 [cm])
-  (horizons (-3.00 "Overflade Ap_S9 Calib")
+  (horizons (-3.00 "Overflade Ap_S9 Kalib")
             (-25.00 "Soroe Ap_S9")
             (-33.00 "Rorrende Bplow layer_4")
             (-120 "Rorrende Bt")

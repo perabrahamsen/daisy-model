@@ -1,6 +1,6 @@
 ddf-0.0 --- measured dry bulk density at four plots
 ---------
-Day	Month	Year	L1	L2	L3	L4	L2tr	L4tr
+Day	Month	Year	F1	F2	F3	F4	F2tr	F4tr
 mday	month	year	g/cm^3	g/cm^3	g/cm^3	g/cm^3	g/cm^3	g/cm^3
 10	10	2012	1.13	1.41	1.13	1.22	1.47	1.63
 10	10	2012	1.10	1.36	1.10	1.19	1.37	1.61
