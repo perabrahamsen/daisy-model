@@ -1,101 +1,18 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Flyt repo from google code to github
+* ret plot "15 cm" til "15-20 cm" for reduceret statisk hydraulisk cond. 
 
-** KOPI af SVN repo: Gem på H drev
-
-** upload nyeste version af Daisy til github
-
-** lær git kommandoer
-
-* JB: Snak med Marie om hvor vi går videre herfra.
-
-** Kopier dektop data over på shared drev.
-
-** Prøv live CD
-
-** Installer Ubuntu
-
-** Kopier Daisy til github
-
-** Ny hjemmeside?
+* Ny hjemmeside?
 
 * JB: Nye grafer :-( Men vent på Marie
 
-* JB: Opsætning med wepp + "ikke gennemtrængbar" overflade.
+* Hvad med hjemmside?
 
-Jeg har snakket med Søren.  Jeg tror vi deler hvert led op i to for
-den statiske løsning, en med høj ledninsevne, en med lav.
+* Automatiser windows
 
-For "høj" bruger vi hypres og "non-zero" median for 60 mm (1.7, 1.3,
-2.4, 2.4) mm/h for L1 til L4 henholdsvis. Det sættes som
+** commit / update github
 
-(hydraulic original (K_at_h -60 [mm] 1.7 [mm/h]))
-
-Vi skal så have plottet hypres kurven sammen med non-zero medianer for
-de 4 målepunkter for hvert led.
-
-For "lav" bruger vi en fast lav værdi. F.eks. 0.1 [mm/h]. (K_at_h -60
-[mm] 0.1 [mm/h]). KIG PÅ MINDSTE MÅLINGER!
-
-Vi får så 12 resultater. "lav", "høj", og et vægtet gennemsnit. Daisy
-kan lave vægtningen, eller du kan gøre det i Excel bagefter.  Daisy
-vil vægte to søjler hvis man angiver det som:
-
-(column L1_low L1_high)
-
-I selve søjlerne skal man så have angivet en "area" som angiver vægten:
-
-(defcolumn L1_low L1
-  (area 50 [ha])
-
-Det angivne areal betyder ikke noget i sig selv, kun relativt til det
-samlede area.
-
-I output skal man så angive tre udgaver af hver log
-
- (output ("Field water" (column "L1_low"))
-         ("Field water" (column "L1_high"))
-         ("Field water") ; Vægtet gennemsnit.
-
-Filnavne vil inkludere column automatisk i de to første.
-
-Jeg tror vi skal vægte de to niveauer 50-50. Der er lidt mere høj end
-lav i snit, men til gengæld er hjulsporende alle "lav".
-
-Der er ikke statistisk signifikant forskel på fordelingen mellem høj
-og lav på de foskellige led ved 120 mm (p = 0.18 mellem L2 og L4). Ved
-60 mm er der, men kun lige akkurat (p = 0.042 for forskel mellem L2 og
-L4). Søren syntes ikke det var basis nok for at adskille dem.
-
-Jeg håber det er forståeligt, ellers er det ok, så må vi tale om det
-når du er tilbage. Jeg har til dels skrevet det for min egen skyld.
-
-Og jeg håber det går bedre med ryggen!
-
-* JB: Is
-
-* Den store flyttedag!
-
-** Ubuntu
-
-*** Kopi af PC på extern HD.
-
-*** Opgrader ubuntu
-
-** Daisy Model
-
-*** Kopi af daisy-model på extern HD
-
-*** Migrer til github
-
-*** Hvad med hjemmside?
-
-** Automatiser windows
-
-*** commit / update github
-
-*** Byg 32 bit version
+** Byg 32 bit version
 
 *** Publiser 32 bit version
 
@@ -109,15 +26,8 @@ Signe fik alt for høje RefEvap-Used og lave udbytter med FAO_PM.
 
 ** (export PATH ... libdeps?)
 
-* Oversæt på HP
 
-** Skal vi have to udgaver, 32 generisk og 64 bit native? 
 
-** Qt 4? 
-
-* Kopier X61 HD, sluk maskine
-
-* Installer Daisy build på HP.
 
 
 * Biopore flow 
