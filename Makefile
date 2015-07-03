@@ -679,7 +679,7 @@ checkin: $(TEXT)
 	(cd txt; $(MAKE) checkin);
 	-git add $(TEXT)
 	rm -f $(REMOVE) 
-	-git remove $(REMOVE) 
+	-git rm $(REMOVE) 
 	git commit -a -m "Version $(TAG)"
 	git tag -a release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
 	git push origin --tags
