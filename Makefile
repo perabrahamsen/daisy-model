@@ -689,7 +689,6 @@ checkin: $(TEXT)
 add:
 	(cd sample && make add)
 	git add $(TEXT)
-	git rm $(REMOVE)
 
 update:
 	git pull
