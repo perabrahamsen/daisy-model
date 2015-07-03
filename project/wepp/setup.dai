@@ -316,7 +316,7 @@
 ;;; S8
 
 (defaction S8 activity
-  (wait (at 2012 09 13)) (sow_tillage) (sow "Wclover");; efterafgrÃ¸de
+  (wait (at 2012 09 13)) (sow_tillage) (sow "Wclover");; efterafgrøde
   (wait (at 2013 04 20)) (harvest "Wclover"
   	              (stub 5.0 [cm])
 	              (stem 0.00 [])
@@ -337,13 +337,13 @@
   (manager S8))
 
 (defprogram S8_wepp S8
-  (column Soroe_S8_wepp);; her skal der gÃ¸res noget
+  (column Soroe_S8_wepp);; her skal der gøres noget
   (log_prefix "log/S8-WEPP-")
   (output &old
           (WEPP (horizon "Overflade Ap_S8 WEPP") (where "wepp.dlf"))))
 
 (defprogram S8_calib S8
-  (column Soroe_S8_calib);; her skal der gÃ¸res noget
+  (column Soroe_S8_calib);; her skal der gøres noget
   (log_prefix "log/S8-Kalib-")
   (output &old
           (WEPP (horizon "Overflade Ap_S8 Kalib") (where "wepp.dlf"))))
@@ -355,7 +355,7 @@
                                   (stub 8.0 [cm])
                                   (stem 0.00 [])
                                   (leaf 0.00[]))
-  (wait (at 2013 08 13)) (sow_tillage) (sow "Wclover");; efterafgrÃ¸de
+  (wait (at 2013 08 13)) (sow_tillage) (sow "Wclover");; efterafgrøde
   (wait (at 2014 04 03)) (harvest "Wclover"
     	              (stub 5.0 [cm])
   	              (stem 0.00 [])
@@ -376,13 +376,13 @@
   (manager S9))
 
 (defprogram S9_wepp S9
-  (column Soroe_S9_wepp);; her skal der gÃ¸res noget
+  (column Soroe_S9_wepp);; her skal der gøres noget
   (log_prefix "log/S9-WEPP-")
   (output &old
           (WEPP (horizon "Overflade Ap_S9 WEPP") (where "wepp.dlf"))))
 
 (defprogram S9_calib S9
-  (column Soroe_S9_calib);; her skal der gÃ¸res noget
+  (column Soroe_S9_calib);; her skal der gøres noget
   (log_prefix "log/S9-Kalib-")
   (output &old
           (WEPP (horizon "Overflade Ap_S9 Kalib") (where "wepp.dlf"))))
@@ -403,7 +403,7 @@
 (defgnuplot rho_b_base plottime
   (where "fig/rho_b_${F}.emf")
   (device "emf size 400,400")
-  (title "Plot ${F} tÃ¸r volumenvÃ¦gt")
+  (title "Plot ${F} tør volumenvægt")
   (ymax 1.5 [g/cm^3])
   (ymin 1.0 [g/cm^3])
   (y2max 100 [%])

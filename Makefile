@@ -52,8 +52,6 @@ MINGWDLL = "$(MINGWBIN)/"libgcc_s_seh-1.dll \
 
 endif
 
-SVNROOT = https://daisy-model.googlecode.com/svn
-
 # Set USE_GUI to Q4 or none, depending on what GUI you want.
 #
 
@@ -101,24 +99,19 @@ endif
 
 STRIP = strip
 
-#	New warning flags in GCC 4.4
-WAR4    = -Wlogical-op -Wstrict-null-sentinel -Wvariadic-macros -Wvla \
-	  -Wmissing-declarations -Wfloat-equal -Wcast-qual 
-#	GCC 3 had gave uninitialized warnings during initialization.
-WAR3	= -Wno-uninitialized -Wno-unknown-pragmas 
-
 ifeq ($(HOSTTYPE),unix)
-	WAREXTRA = $(WAR4)
 	OSFLAGS = 
 	DEBUG = -g
 endif
 ifeq ($(HOSTTYPE),mingw)
-	WAREXTRA = $(WAR3)
 	OSFLAGS = -DMINGW
 	DEBUG = -g
 endif
 
-WARNING = -Wall -Wextra $(WAREXTRA) \
+# Warnings up to GCC 4.4
+WARNING = -Wall -Wextra -Wlogical-op -Wstrict-null-sentinel -Wvariadic-macros \
+	   -Wvla \
+	  -Wmissing-declarations -Wfloat-equal -Wcast-qual \
 	  -Woverloaded-virtual -Wundef -Wpointer-arith -Wwrite-strings \
 	  -Wcast-align -Wmissing-format-attribute \
 	  -Wold-style-cast -Wformat=2 -Winit-self \
@@ -403,7 +396,7 @@ TEXT =  setup-nogui.nsi \
 	$(HEADERS) $(SOURCES) $(ALLSYSHDR) $(ALLSYSSRC) \
 	$(ALLGUIHDR) $(ALLGUISRC) $(UTESTSRC)
 
-# Select files to be removed by the next svn update.
+# Select files to be removed by the next commit.
 #
 REMOVE = action_heat.C 
 
@@ -667,9 +660,9 @@ version.C:
 	echo "extern const char *const version = \"$(TAG)\";" >> version.C
 	echo "extern const char *const version_date = __DATE__;" >> version.C
 
-# Update the SVN repository.
+# Update the repository.
 #
-svnci: $(TEXT)
+checkin: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	rm -f version.C
 	$(MAKE) version.C
@@ -680,36 +673,37 @@ svnci: $(TEXT)
 	echo "	* Version" $(TAG) released. >> ChangeLog
 	echo >> ChangeLog
 	cat ChangeLog.old >> ChangeLog
-	(cd OpenMI; $(MAKE) svnci);
-	(cd lib; $(MAKE) svnci);
-	(cd sample; $(MAKE) svnci);
-	(cd txt; $(MAKE) svnci);
-	-svn add $(TEXT)
+	(cd OpenMI; $(MAKE) checkin);
+	(cd lib; $(MAKE) checkin);
+	(cd sample; $(MAKE) checkin);
+	(cd txt; $(MAKE) checkin);
+	-git add $(TEXT)
 	rm -f $(REMOVE) 
-	-svn remove $(REMOVE) 
-	svn commit -m "Version $(TAG)"
-	-svn copy $(SVNROOT)/trunk \
-	  $(SVNROOT)/tags/release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
+	-git remove $(REMOVE) 
+	git commit -a -m "Version $(TAG)"
+	git tag -a release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
+	git push origin --tags
 
 .IGNORE: add
 
 add:
 	(cd sample && make add)
 	(cd project && make add)
-	svn add $(TEXT)
-	-svn remove $(REMOVE)
+	git add $(TEXT)
+	git remove $(REMOVE)
 
 update:
-	svn update
+	git pull
 
 commit:
-	svn commit -m make
+	git commit -a -m make
+	git push origin
 
 done:	update add commit
 
 
-setup:	svnci
-	$(MAKE) setupnosvn
+setup:	checkin
+	$(MAKE) setupnoci
 	$(MAKE) upload
 
 setupdocs: 
@@ -718,7 +712,7 @@ setupdocs:
 			   SETUPDIR=$(SETUPDIR) \
 			   DAISYPATH=".;$(SRCDIR)/lib;$(SRCDIR)/sample" setup)
 
-setupnosvn: 
+setupnoci: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	$(MAKE) cross
 	rm -rf $(SETUPDIR)
@@ -770,7 +764,7 @@ upload:
 setup-win64: 
 	make setupnogui OBJHOME=win64-portable
 
-debiannosvn: 
+debiannoci: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	$(MAKE) linux
 	rm -rf debian

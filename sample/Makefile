@@ -42,17 +42,17 @@ setup:
 	mkdir $(SETUPDIR)/sample
 	cp $(TEXT) $(SETUPDIR)/sample
 
-# Update the SVN repository.
+# Update the repository.
 #
-svnci: $(TEXT) 
+checkin: $(TEXT) 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	-svn add $(TEXT) 
+	-git add $(TEXT) 
 	rm -f $(REMOVE) 
-	-svn remove $(REMOVE) 
-	svn commit -m "$(TAG)" # "Version $(TAG)"
+	-git rm $(REMOVE) 
+	git commit -a -m "$(TAG)" # "Version $(TAG)"
 
 add:
-	svn add $(TEXT)
+	git add $(TEXT)
 
 # Check
 #

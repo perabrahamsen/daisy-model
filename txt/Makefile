@@ -89,18 +89,18 @@ setup: reference.pdf reference.ps tutorial.pdf exercises.pdf
 	mkdir $(SETUPDIR)/src/txt
 	cp $(TEXT) $(SETUPDIR)/src/txt
 
-svnci: $(TEXT)
+checkin: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	-svn add $(TEXT)
+	-git add $(TEXT)
 	rm -f $(REMOVE) 
-	-svn remove $(REMOVE) 
-	svn commit -m "$(TAG)" # "Version $(TAG)"
+	-git rm $(REMOVE) 
+	git commit -a -m "$(TAG)" # "Version $(TAG)"
 
 commit: $(TEXT)
-	-svn add $(TEXT)
+	-git add $(TEXT)
 	rm -f $(REMOVE) 
-	-svn remove $(REMOVE) 
-	svn commit -m "commit" # "Version $(TAG)"
+	-git rm $(REMOVE) 
+	git commit -a -m "$(TAG)" # "Version $(TAG)"
 
 clean:
 	rm -f *.aux *.log *.out *.bbl *.blg

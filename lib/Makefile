@@ -45,10 +45,10 @@ setup:
 
 # Update the SVN repository.
 #
-svnci: $(DAISY) $(TEXT)
+checkin: $(DAISY) $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	-svn add $(DAISY) $(TEXT)
+	-git add $(DAISY) $(TEXT)
 	rm -f $(REMOVE) 
-	-svn remove $(REMOVE) 
-	svn commit -m "$(TAG)" # "Version $(TAG)"
+	-git rm $(REMOVE) 
+	git commit -a -m "$(TAG)" # "Version $(TAG)"
 

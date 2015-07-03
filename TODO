@@ -1,13 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* ret plot "15 cm" til "15-20 cm" for reduceret statisk hydraulisk cond. 
-
-* Ny hjemmeside?
-
-* JB: Nye grafer :-( Men vent på Marie
-
-* Hvad med hjemmside?
-
 * Automatiser windows
 
 ** commit / update github
@@ -15,6 +7,16 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 ** Byg 32 bit version
 
 *** Publiser 32 bit version
+
+* Ny hjemmeside?
+
+* agrovand
+
+** K frozen + enable_ice : ok
+
+** K_frozen : ingen kolloider
+
+** enable_ice : ingen vand
 
 * Check FAO_PM
 
