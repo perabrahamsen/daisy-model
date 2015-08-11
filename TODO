@@ -1,6 +1,147 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Jorbehandling scenarier
+
+** Skriv nedenstående til rapport?
+
+** Jord
+
+Vælg to jorde, en fra Sorø og en fra Karlslunde. Dem vi har målinger fra.
+
+Parametriser hydrauliske egenskaber efter måletal.
+
+Underjord som drænet del af Tåstrup
+
+Bioporer og sprækker som i Tåstrup modelleringen.
+
+** Behandlinger
+
+Udvælg hvilke behandlinger vi tager med, og hvilke der skal beskrives
+med statiske parametre og hvilke med wepp (og hvilke wepp params)
+
+Plus en konventionel der beskrives med "minimal indtrængning" hydraulik
+
+Skriv behandlinger, tilføj wepp parametre.
+
+Vi "gentager" behandling i opvarmning og sporingsperiode. 4
+drænsæsoner efter applikation.
+
+** Pesticider
+
+Find ud af hvilke pesticider der skal tilføjes i hvilke mængder og hvornår.
+
+** Lav output fil.
+
+*** Hvad
+
+Input til system (hvor meget er sprøjtet)
+
+Input til jord (matrix + biopore infiltation)
+
+Indhold i jord i biopore zone.
+
+Udvaskning under biopore zone
+
+Udvaskning til dræn
+
+Samme for vand
+
+*** Hvornår
+
+Efter 10 dage
+
+Efter 4 år
+
+*** Koncentrationer? Max koncentrationer? (tror ikke)
+
+** Runfil
+
+300 gentagelser af 6 scenarier (2 jorde x (3+1) behandlinger)
+
+** Udtræk og analyse.
+
+stor tabel med gennemsnit, 50, og 95 % fraktil dyb og dræn udvaskning
+af hvert persticid efter 10 dage og efter 4 år, for hvert scenarie.
+
+Hvor meget af variationen mellem behandlinger (uden "lav
+ledningsevne") kan forklares med tilført mængde?
+
+Vi kan ikke skelne mellem hydraulik og tidspunkt :-(
+
+skiller "lav ledninsgevne" sig meget ud?
+
+
+
+
+* Pestpore scenarier
+
+Hej alle.
+
+I projektbeskrivelsen til PESTPORE scenarieberegning har vi lover at estimere udvaskning ved udvalgte hændelser, på en rekalibreret opsætning for Langvad (FOCUS) og Tåstrup, når der tilføres i system med dybe bioporer baseret på hvad der er målt i resten af PESTPORE.
+
+Når der står "rekalibrering" er det fordi det oprindeligt var VAP markerne Silstrup og Estrup, som nok kunne bruge en rekalibrering i forhold det oprindelige projekt. FOCUS scenariet Langvad er ikke på samme måde baseret på måletal, og behøver derfor ikke en rekalibrering. For Tåstrup har vi en helt frisk kalibrering fra JB projektet.
+
+Når der står "udvalgte hændelser" er det fordi vi ikke regnede med at have vejrdata nok til at kunne lave statistisk analyse.
+
+I mellemtiden er der så sket det at vi har fået en 3000 år vejrserie med timedata for nedbør i forbindelse med en ph.d. Den er baseret på en 30 års serie, og forlængeret så alle 3000 år har samme statistiske egenskaber som de 30 år. En artikel der beskriver tilblivelsen er undervejs.
+
+I samme ph.d har vi også defineret et standardiseret sædskifte (ensidig majs) med en forårs- og en sommer-, og en efterårsapplikation af pesticider, samt en matrix af ni "test pesticider" med kombinationer af tre niveauer for sorption og for nedbrydning (lav, mellem, høj). De tre applikationer svarer til lavt, højt, og intet plantedække.
+
+Mit forslag er at vi bygger videre på dette arbejde. Det betyder at vi får 300 simuleringer for hvert scenarie, hvilket er nok til at lave statistik.
+
+Specifikt:
+
+For jord tages udgangspunkt i de eksisterende opsætninger for Langvad og Tåstrup. Søjlen udvides så den er fem meter dyb. Nederste meter er grov sand, som i de oprindelige Flakkebjerg scenarier. Nedre rand vil være en aquitard med standard (default) parametre. Vi bruger en 1D opsætning på grund af de mange simuleringer. Vi bruger den samme bioporeopsætning som er brugt i modeleringen af Flakkebjerg forsøget.
+
+Til sammenligning har vi en identisk udgave af de to jorde, hvor de dybe bioporer ikke er medtaget. I alt har vi 4 scenarier.
+
+Der bruges den samme behandling som i ph.d. projektet. Det giver 27 komibnationer af sorption,
+
+Vi kører 300 forskellige vejr igennem, alle taget fra den 3000 års serie.
+
+Vi logger flux og flow 0, 1, 2, 3, 4, og 5 meter under terrain, samt indhold i hvert af de fem lag. Det sker 1, 2, 3, og 4 vintre efter pesticidudbringning.
+
+Søren har software til at samle de mange resultatfiler i et enkelt Excel ark.
+
+I analysen kunne jeg forestille mig en stor tabel med gennemsnit, 50%, og 95% fraktil udvaskning for hver af de 4 scenerier gange 9 pesticider gange 3 udbringstidspunkter.
+
+Tabelen skal angive værdier for 4 meters dybde og efter 4 sæsoner.
+
+Vi vil derefter prøve at finde den relative betydningen af jord (2 jorde), dybe bioporer (med og uden), sorption (3 niveauer), nedbrydning (3 niveauer), udbringninstispunkt (3 forskellige) vejr (300 simuleringer).
+
+Konklusionen vil sandsynligvis være at de alle har stor betydning, men de dybe bioporer har den største.
+
+* Main tasks
+
+** Signe Ph.D.
+
+** Daisy maintenance
+
+*** 32 bit Daisy
+
+*** Automatic build and upload
+
+*** New Daisy homepage
+
+** Help Merete (Daisy center)
+
+** Organisering af I drev?
+
+** Jordbearbejdning
+
+*** Scenarier
+
+** PestPore
+
+*** Scenarier
+
+
+
+
+
 * Automatiser windows
+
+** evt test cross compile ubuntu -> win32
 
 ** Byg 32 bit version
 
