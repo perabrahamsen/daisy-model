@@ -8,13 +8,14 @@ release.
 
 * 5.21 
 
-** Ice enabled by default.
+** You can now specify seasonal variation in aquifer pressure.
 
-This makes simulations much slower, use
-
-  (SoilHeat (enable_ice false))
-
-to disable.
+  (Drain lateral)
+  (Groundwater aquitard
+               (pressure_table season
+                               ((1 [d] -10 [cm])
+                                (100 [d] -100 [cm])
+                                (361 [d] -10 [cm])))))
 
 ** 'minimal_timestep' changed to 1 microsecond.
 

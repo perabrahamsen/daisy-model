@@ -68,6 +68,10 @@ public:
   static const VCheck& sum_equal_0 ();
   static const VCheck& sum_equal_1 ();
 
+  // PLF or PLF sequence.
+public:
+  static const VCheck& season ();
+
   // Any sequence.
 public:
   static const VCheck& min_size_1 ();

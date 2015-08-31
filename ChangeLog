@@ -1,3 +1,9 @@
+2015-08-31  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* depth.C (season): New model.
+
+	* vcheck.C, vcheck.h (Season): New check.
+
 2015-06-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* all (sortption_table): New action model.
