@@ -816,7 +816,7 @@ Negative for no limit.");
                         "Set this to 'false' or 'true'");
   static VCheck::Enum ice_check ("false", "true");
   frame.set_check ("enable_ice", ice_check);
-  frame.set ("enable_ice", "true");
+  frame.set ("enable_ice", "false");
   frame.declare ("ice_dt", "h", Attribute::Const, 
                  "Timestep to use when ice is enabled.\n\
 This applies when there are subzero temperatures in the profile.");

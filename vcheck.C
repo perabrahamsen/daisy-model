@@ -272,6 +272,69 @@ struct Decreasing : public LocalOrder
   }
 };
 
+struct Season : public VCheck
+{
+  bool valid (const PLF& plf, Treelog& msg) const
+  {
+    if (plf.size () < 1)
+      {
+        msg.error ("PLF must be non-empty");
+        return false;
+      }
+    const size_t first = 0;
+    const size_t last = plf.size () - 1;
+    const double first_x = plf.x (first);
+    const double first_y = plf.y (first); 
+    const double last_x = plf.x (last);
+    const double last_y = plf.y (last);
+
+    if (first_x < 1 || last_x > 366)
+      {
+        msg.error ("Julian day must be between 1 and 366");
+        return false;
+      }
+    if (!approximate (first_y, last_y))
+      {
+        std::ostringstream tmp;
+        tmp << "First (" << first_y << ") and last (" << last_y
+            << ") value must be identical";
+        msg.error (tmp.str ());
+        return false;
+      }
+    return true;
+  }
+
+  bool verify (const Metalib&, const Frame& frame, 
+               const symbol key, Treelog& msg) const
+  {
+    daisy_assert (frame.check (key));
+    daisy_assert (!frame.is_log (key));
+
+    switch (frame.lookup (key))
+      {
+      case Attribute::PLF:
+        if (frame.type_size (key) == Attribute::Singleton)
+          return valid (frame.plf (key), msg);
+        {
+          const std::vector<boost::shared_ptr<const PLF>/**/> plfs 
+            = frame.plf_sequence (key);
+          bool ok = true;
+          for (unsigned int i = 0; i < plfs.size (); i++)
+            if (!valid (*plfs[i], msg))
+              ok = false;
+          return ok;
+        }
+        break;
+      default:
+        daisy_notreached ();
+      }
+  }
+
+  Season ()
+  { }
+};
+
+
 const VCheck& 
 VCheck::valid_year ()
 {
@@ -383,6 +446,13 @@ VCheck::sum_equal_1 ()
 {
   static SumEqual sum_equal (1.0);
   return sum_equal;
+}
+
+const VCheck& 
+VCheck::season ()
+{
+  static Season season;
+  return season;
 }
 
 const VCheck& 

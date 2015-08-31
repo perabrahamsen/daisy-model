@@ -69,7 +69,7 @@ double
 HydraulicM_C::Cw2 (const double h) const
 {
   if (h < h_b)
-    return -(Theta_sat*(pow(h_b / h, 1 / b - 1)*h_b) / (pow(h, 2)*b));
+    return -(Theta_sat*(pow(h_b / h, 1.0 / b - 1.0)*h_b) / (pow(h, 2.0)*b));
   else
     return 0.0;
 }

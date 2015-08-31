@@ -1,77 +1,32 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Jorbehandling scenarier
+* PESTPORE
 
-** Skriv nedenstående til rapport?
+** Nedre rand
 
-** Jord
+*** Variabel nedre rand.
 
-Vælg to jorde, en fra Sorø og en fra Karlslunde. Dem vi har målinger fra.
+Søren har et bud.
 
-Parametriser hydrauliske egenskaber efter måletal.
+** Scenarier
 
-Underjord som drænet del af Tåstrup
+Som flakkebjerg, evt uden "ler"
 
-Bioporer og sprækker som i Tåstrup modelleringen.
+** Bioporer
 
-** Behandlinger
+*** Dybe fra modelering, men skel til flakkebjerg scenarier
 
-Udvælg hvilke behandlinger vi tager med, og hvilke der skal beskrives
-med statiske parametre og hvilke med wepp (og hvilke wepp params)
+*** Shallow: Langvad = Flakkebjerg, Tåstrup = Tåstrup
 
-Plus en konventionel der beskrives med "minimal indtrængning" hydraulik
+** Vi skal have 8 columns, en for hver jord gange en for hver nedre rand
 
-Skriv behandlinger, tilføj wepp parametre.
+** Vi skal auto generere directories og run filer, som for Jordb_signe_2
 
-Vi "gentager" behandling i opvarmning og sporingsperiode. 4
-drænsæsoner efter applikation.
+** Start simuleringer?
 
-** Pesticider
+** Start på rapport
 
-Find ud af hvilke pesticider der skal tilføjes i hvilke mængder og hvornår.
-
-** Lav output fil.
-
-*** Hvad
-
-Input til system (hvor meget er sprøjtet)
-
-Input til jord (matrix + biopore infiltation)
-
-Indhold i jord i biopore zone.
-
-Udvaskning under biopore zone
-
-Udvaskning til dræn
-
-Samme for vand
-
-*** Hvornår
-
-Efter 10 dage
-
-Efter 4 år
-
-*** Koncentrationer? Max koncentrationer? (tror ikke)
-
-** Runfil
-
-300 gentagelser af 6 scenarier (2 jorde x (3+1) behandlinger)
-
-** Udtræk og analyse.
-
-stor tabel med gennemsnit, 50, og 95 % fraktil dyb og dræn udvaskning
-af hvert persticid efter 10 dage og efter 4 år, for hvert scenarie.
-
-Hvor meget af variationen mellem behandlinger (uden "lav
-ledningsevne") kan forklares med tilført mængde?
-
-Vi kan ikke skelne mellem hydraulik og tidspunkt :-(
-
-skiller "lav ledninsgevne" sig meget ud?
-
-
-
+*** Vi starter evt med Flakkebjerg scenarie.
 
 * Pestpore scenarier
 
@@ -110,6 +65,8 @@ Tabelen skal angive værdier for 4 meters dybde og efter 4 sæsoner.
 Vi vil derefter prøve at finde den relative betydningen af jord (2 jorde), dybe bioporer (med og uden), sorption (3 niveauer), nedbrydning (3 niveauer), udbringninstispunkt (3 forskellige) vejr (300 simuleringer).
 
 Konklusionen vil sandsynligvis være at de alle har stor betydning, men de dybe bioporer har den største.
+
+* Test hvad der går galt med Freundlich 
 
 * Main tasks
 

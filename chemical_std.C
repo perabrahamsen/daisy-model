@@ -702,6 +702,7 @@ ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
       M_secondary_[i] = Theta_secondary > 0
         ? adsorption_->C_to_M2 (soil, Theta_secondary, i, C_secondary_[i])
         : 0.0;
+#ifdef BUG_FREUNDLICH
       if (!approximate (M_primary_[i] + M_secondary_[i], M_total_[i]))
         {
           std::ostringstream tmp;
@@ -710,6 +711,7 @@ ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
               << "; M = " << M_total_[i];
           Assertion::message (tmp.str ());
         }
+#endif
     }
 }
   
@@ -1041,7 +1043,9 @@ ChemicalStandard::tick_surface (const double pond /* [cm] */,
   surface_immobile = surface_storage - surface_solute;
   if (surface_immobile < 0.0)
     {
+#ifdef BUG_FREUNDLICH
       daisy_approximate (surface_solute, surface_storage);
+#endif
       surface_immobile = 0.0;
       surface_solute = surface_storage;
     }

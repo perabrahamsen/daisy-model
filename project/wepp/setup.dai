@@ -36,8 +36,7 @@
 (defaction sow_tillage mix -1.0
   (random_roughness 12 [mm])
   (penetration 0.0 [])
-  (surface_loose 0.4 [])
-  )
+  (surface_loose 0.4 []))
 
 ;; Common for all plots.
 (defprogram WEPP Daisy

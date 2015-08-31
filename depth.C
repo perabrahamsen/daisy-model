@@ -272,6 +272,58 @@ in the list will be used.", entry_syntax);
   }
 } DepthPLF_syntax;
 
+// The 'season' model.
+
+struct DepthSeason : public Depth
+{
+  const PLF season;
+  double current_value;
+
+  void  tick (const Time& time, const Scope&, Treelog&)
+  {
+    const Time newyear (time.year (), 1, 1, 0);
+    const double jday
+      = Time::fraction_hours_between (newyear, time) / 24.0 + 1.0;
+    daisy_assert (jday >= 1.0);
+    daisy_assert (jday <= 367.0);
+    current_value = season (jday);
+  }
+
+  double operator()() const
+  { return current_value; }
+
+  
+  void initialize (const Time& time, const Scope& scope, Treelog& msg)
+  { tick (time, scope, msg); }
+  virtual bool check (const Scope&, Treelog&) const
+  { return true; }
+  DepthSeason (const BlockModel& al)
+    : Depth (al),
+      season (al.plf ("season")),
+      current_value (-42.42e42)
+  { }
+  ~DepthSeason ()
+  { }
+};
+
+static struct DepthSeasonSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new DepthSeason (al); }
+  DepthSeasonSyntax ()
+    : DeclareModel (Depth::component, "season", "\
+Linear interpolation of depth within a year.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.declare ("season", "d", "cm", Attribute::Const, 
+                   "Depth as a function of Julian day.\n\
+First and last entry must be identical.");
+    frame.set_check ("season", VCheck::season ());
+    frame.order ("season");
+  }
+} DepthSeason_syntax;
+
 // file model.
 
 namespace State 
