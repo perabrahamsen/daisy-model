@@ -109,7 +109,7 @@
    {
      for (size_t i = 0; i < allowed.size (); i++)
        {
-         if (allowed[i] == value)
+         if (allowed[i].name () == value)
            return true;
          // Try to pad out our allowed value with spaces...
          if (value.size () <= allowed[i].name ().size ())

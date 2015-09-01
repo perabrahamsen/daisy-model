@@ -1,5 +1,8 @@
 2015-08-31  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* wsource* (skip_ahead): Fast skipping of weather data for very
+	long weather series.
+
 	* depth.C (season): New model.
 
 	* vcheck.C, vcheck.h (Season): New check.

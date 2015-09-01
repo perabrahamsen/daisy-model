@@ -380,6 +380,13 @@ WSourceTable::rewind (const Time& time, Treelog& msg)
   super::rewind (time, msg);
 }
 
+void
+WSourceTable::skip_ahead (const Time& begin, Treelog& msg)
+{
+  while (timestep_end < begin && ok)
+    read_line ();
+}
+
 WSourceTable::WSourceTable (const BlockModel& al)
   : WSourceBase (al),
     units (al.units ()),
