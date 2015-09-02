@@ -66,6 +66,7 @@ public:
   bool done () const;
 
   void source_initialize (Treelog&);
+  void skip_ahead (const Time&, Treelog&);
   bool source_check (Treelog&) const;
 
   // Create and destroy.

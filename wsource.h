@@ -87,6 +87,7 @@ public:
   virtual bool weather_check (const Time& from, const Time& to,
                               Treelog&) const = 0;
   virtual void weather_initialize (const Time& time, Treelog& msg) = 0;
+  virtual void skip_ahead (const Time& time, Treelog& msg) = 0;
 protected:
   explicit WSource (const symbol name);
 public:

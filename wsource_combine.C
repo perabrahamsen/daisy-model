@@ -135,6 +135,7 @@ struct WSourceCombine : public WSourceWeather
   
   // Create and Destroy.
   void source_initialize (Treelog&);
+  void skip_ahead (const Time& begin, Treelog& msg);
   bool source_check (Treelog&) const;
   WSourceCombine (const BlockModel& al)
     : WSourceWeather (al),
@@ -475,6 +476,19 @@ WSourceCombine::source_initialize (Treelog& msg)
         my_end = source.end ();
     }
   my_timestep = Time::fraction_hours_between (my_begin, my_end);
+}
+
+void
+WSourceCombine::skip_ahead (const Time& begin, Treelog& msg)
+{
+  for (size_t i = 0; i < entry.size (); i++)
+    {
+      Entry& e = *(entry[i]);
+      daisy_assert (e.source.get ());
+      WSource& source = *(e.source);
+      Treelog::Open nest (msg, "source", i, source.objid);
+      source.skip_ahead (begin, msg);
+    }
 }
 
 bool 

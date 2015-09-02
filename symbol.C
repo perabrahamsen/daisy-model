@@ -76,6 +76,8 @@ symbol::DB::DB ()
 symbol::DB* symbol::data = NULL;
 const int symbol::DB::fast_ints = 100;
 
+#include <iostream>
+
 int 
 symbol::DB::name2id (const std::string& name)
 {

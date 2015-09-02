@@ -79,6 +79,7 @@ private:
   { return !ok; }
 
   void source_initialize (Treelog& msg);
+  void skip_ahead (const Time&, Treelog&);
 protected:
   bool source_check (Treelog&) const;
   void rewind (const Time&, Treelog&);

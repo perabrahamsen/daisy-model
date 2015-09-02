@@ -45,6 +45,8 @@ struct WSourceConst : public WSourceBase
   { return is_done; }
   void source_initialize (Treelog&)
   { }
+  void skip_ahead (const Time&, Treelog&)
+  { }
   bool source_check (Treelog& msg) const
   { 
     Treelog::Open nest (msg, __FUNCTION__);

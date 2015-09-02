@@ -139,6 +139,10 @@ void
 WSourceIndirect::source_initialize (Treelog& msg)
 { source->source_initialize (msg); }
 
+void
+WSourceIndirect::skip_ahead (const Time& begin, Treelog& msg)
+{ source->skip_ahead (begin, msg); }
+
 bool
 WSourceIndirect::source_check (Treelog& msg) const
 { return source->source_check (msg); }

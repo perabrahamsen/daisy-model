@@ -1199,6 +1199,11 @@ WSourceWeather::Implementation::initialize_two (const Time& time, Treelog& msg)
       msg.error (tmp.str ());
     }
 
+  // Fast skip.
+  Time a_week_ago = time;
+  a_week_ago.tick_day (-7);
+  source.skip_ahead (a_week_ago, msg);
+  
   // Initialize previous, next
   next = Time (time.year (), time.month (), time.mday (), 0);
   if (time == next)
