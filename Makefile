@@ -42,6 +42,7 @@ BOOSTINC = -isystem $(CYGHOME)/home/xvs108/boost_1_55_0
 SETUPDIR = /home/xvs108/daisy/install
 #MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
 MAKENSIS = "/cygdrive/c/Program Files (x86)/NSIS/makensis.exe"
+NSISFILE = setup-nogui.nsi
 #MINGWHOME = /cygdrive/c/MinGW
 MINGWHOME = /cygdrive/c/Program Files/mingw-w64/x86_64-4.9.0-posix-seh-rt_v3-rev2/mingw64/
 MINGWBIN=$(MINGWHOME)/bin
@@ -108,6 +109,9 @@ ifeq ($(HOSTTYPE),mingw)
 	DEBUG = -g
 endif
 
+# For cross compiling (-m32) on w64.
+TARGET =
+
 # Warnings up to GCC 4.4
 WARNING = -Wall -Wextra -Wlogical-op -Wstrict-null-sentinel -Wvariadic-macros \
 	   -Wvla \
@@ -139,7 +143,7 @@ csdaisy.exe:	csmain.cs csdaisy.netmodule
 
 # Construct the compile command.
 #
-CC = $(COMPILE) $(OPTIMIZE) $(PROFILE)
+CC = $(COMPILE) $(OPTIMIZE) $(PROFILE) $(TARGET)
 
 # Locate the CSSparse lib -L../libdeps
 CXSPARSELIB = -L../libdeps -lcxsparse
@@ -390,7 +394,7 @@ HEADERS = $(INTERFACES:.C=.h) $(HEADONLY)
 
 # Find all printable files.
 #
-TEXT =  setup-nogui.nsi \
+TEXT =  setup-w32.nsi setup-nogui.nsi \
 	control-shared.txt ChangeLog.3 ChangeLog.2 ChangeLog.1 setup.nsi \
 	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB  $(DISABLED) \
 	$(HEADERS) $(SOURCES) $(ALLSYSHDR) $(ALLSYSSRC) \
@@ -470,6 +474,14 @@ make-win64-portable:
          && $(MAKE) "PATH=$(MINGWBIN):$(PATH)" \
 		    "CYGHOME=C:/cygwin64" Q4HOME=c:/Qt/4.5.2\
 	            VPATH=$(SRCDIR) USE_OPTIMIZE=portable \
+                    -f $(SRCDIR)/Makefile daisy${EXE})
+
+make-win32-portable:
+	(mkdir -p win32-portable \
+	 && cd win32-portable \
+         && $(MAKE) "PATH=$(MINGWBIN):$(PATH)" \
+		    "CYGHOME=C:/cygwin64" Q4HOME=c:/Qt/4.5.2\
+	            VPATH=$(SRCDIR) USE_OPTIMIZE=portable TARGET=-m32 \
                     -f $(SRCDIR)/Makefile daisy${EXE})
 
 native:	
@@ -753,7 +765,7 @@ setupnogui:
 	$(MAKE) setupdocs
 	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
 	(cd OpenMI && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
-	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup-nogui.nsi
+	$(MAKENSIS) /V2 /DVERSION=$(TAG) $(NSISFILE)
 
 upload:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
@@ -761,6 +773,9 @@ upload:
 
 setup-win64: 
 	make setupnogui OBJHOME=win64-portable
+
+setup-win32: 
+	make setupnogui OBJHOME=win32-portable TARGET=-m32 NSISFILE=setup-w32.nsi
 
 debiannoci: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
