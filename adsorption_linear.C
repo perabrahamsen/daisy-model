@@ -33,6 +33,7 @@ static const double c_fraction_in_humus = 0.587;
 class AdsorptionLinearOld : public AdsorptionLinear
 {
   // Parameters.
+  const double K_d;
   const double K_clay;
   const double K_OC;
 
@@ -40,6 +41,9 @@ class AdsorptionLinearOld : public AdsorptionLinear
 public:
   double K (const Soil& soil, size_t c) const
   { 
+    if (K_d >= 0.0)
+      return K_d;
+
     return soil.clay (c) * K_clay 
       + soil.humus (c) * c_fraction_in_humus * K_OC;
   }
@@ -63,6 +67,7 @@ public:
 public:
   AdsorptionLinearOld (const BlockModel& al)
     : AdsorptionLinear (al),
+      K_d (al.number ("K_d", -1.0)),
       K_clay (al.number ("K_clay", 0.0)),
       K_OC (al.check ("K_OC") ? al.number ("K_OC") : al.number ("K_clay"))
   { }
@@ -79,12 +84,13 @@ static struct AdsorptionLinearOldSyntax : DeclareModel
   {
     bool ok = true;
 
+    const bool has_K_d = al.check ("K_d");
     const bool has_K_clay = al.check ("K_clay");
     const bool has_K_OC = al.check ("K_OC");
       
     if (!has_K_clay && !has_K_OC)
       {
-	err.entry ("You must specify either 'K_clay' or 'K_OC'");
+	err.entry ("You must specify either 'K_d', 'K_clay' or 'K_OC'");
 	ok = false;
       }
     return ok;
@@ -95,16 +101,20 @@ static struct AdsorptionLinearOldSyntax : DeclareModel
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
+    frame.declare ("K_d", "cm^3/g", Check::non_negative (), 
+		Attribute::OptionalConst, 
+		"Soil dependent distribution parameter.\n\
+By default, it will be calculated from 'K_OC' and 'K_clay'.");
     frame.declare ("K_clay", "cm^3/g", Check::non_negative (), 
 		Attribute::OptionalConst, 
 		"Clay dependent distribution parameter.\n\
 It is multiplied with the soil clay fraction to get the clay part of\n\
-the 'K' factor.  If 'K_OC' is specified, 'K_clay' defaults to 0.");
+the 'K_d' factor.  If 'K_OC' is specified, 'K_clay' defaults to 0.");
     frame.declare ("K_OC", "cm^3/g", Check::non_negative (), 
 		Attribute::OptionalConst, 
 		"Humus dependent distribution parameter.\n\
 It is multiplied with the soil organic carbon fraction to get the\n\
-carbon part of the 'K' factor.  By default, 'K_OC' is equal to 'K_clay'.");
+carbon part of the 'K_d' factor.  By default, 'K_OC' is equal to 'K_clay'.");
 
   }
 } AdsorptionLinearOld_syntax;
