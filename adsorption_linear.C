@@ -69,7 +69,7 @@ public:
     : AdsorptionLinear (al),
       K_d (al.number ("K_d", -1.0)),
       K_clay (al.number ("K_clay", 0.0)),
-      K_OC (al.check ("K_OC") ? al.number ("K_OC") : al.number ("K_clay"))
+      K_OC (al.check ("K_OC") ? al.number ("K_OC") : K_clay)
   { }
 };
 
@@ -88,7 +88,7 @@ static struct AdsorptionLinearOldSyntax : DeclareModel
     const bool has_K_clay = al.check ("K_clay");
     const bool has_K_OC = al.check ("K_OC");
       
-    if (!has_K_clay && !has_K_OC)
+    if (!has_K_d && !has_K_clay && !has_K_OC)
       {
 	err.entry ("You must specify either 'K_d', 'K_clay' or 'K_OC'");
 	ok = false;
