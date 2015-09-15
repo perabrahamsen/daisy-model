@@ -29,7 +29,7 @@ ifeq ($(HOSTTYPE),unix)
 SRCDIR = $(HOME)/daisy
 OBJHOME =  $(SRCDIR)/obj
 NATIVEHOME = $(OBJHOME)
-NATIVEEXE = daisy daisyw
+NATIVEEXE = daisy #daisyw
 USE_GUI = Q4
 BOOSTINC = -isystem $(HOME)/boost_1_55_0
 else
