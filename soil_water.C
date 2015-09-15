@@ -429,7 +429,10 @@ SoilWater::tick_after (const Geometry& geo,
                 table_low = table;
             }
           else if (z < z_low)
-            table_low = table;
+            {
+              z_low = z;
+              table_low = table;
+            }
         }
       else if (approximate (z, z_high))
         {
@@ -438,7 +441,10 @@ SoilWater::tick_after (const Geometry& geo,
             table_high = table;
         }
       else if (z > z_high)
-        table_high = table;
+        {
+          table_high = table;
+          z_high = z;
+        }
 
       // Conductivity.
       K_cell_[c] = soil.K (c, h_[c], h_ice_[c], soil_heat.T (c));
@@ -485,19 +491,20 @@ SoilWater::tick_after (const Geometry& geo,
         }
     }
 
+#if 0
   if (!std::isnormal (table_high))
     {
       // No saturated cell, use lowest unsaturated.
-      daisy_assert (std::isnormal (table_low));
+      // daisy_assert (std::isnormal (table_low));
       table_high = table_low;
     }
   else if (!std::isnormal (table_low))
     {
       // No unsaturated cell, use highest saturated.
-      daisy_assert (std::isnormal (table_high));
+      // daisy_assert (std::isnormal (table_high));
       table_low = table_high;
     }
-
+#endif
   // Initialize
   if (initial)
     {
