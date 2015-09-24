@@ -1,4 +1,15 @@
-2015-09-02    <xvs108@PB08624>
+2015-09-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* bioclimate_std.C (canopy_cover): New log variable.
+	* lib/log.dai ("Surface water"): Litter cover and canopy cover now
+	also logged.
+
+2015-09-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* xysource_freq.C: New model.
+	* Makefile (MODELS): Add it.
+
+2015-09-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* adsorption_linear.C (K_d): New parameter.
 

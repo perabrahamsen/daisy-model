@@ -1262,6 +1262,7 @@ BioclimateStandard::output (Log& log) const
   output_variable (snow_water_out, log);
   output_value (snow_water_out_temperature, 
                 "snow_water_out_temperature", log);
+  output_value (cover_, "canopy_cover", log);
   output_variable (canopy_ep, log);
   output_value (canopy_ea_, "canopy_ea", log);
   output_variable (canopy_water_capacity, log);
@@ -1454,6 +1455,8 @@ The intended use is colloid generation.");
                    "Temperature of water leaving snow pack.");
 
     // Water intercepted on canopy.
+    frame.declare_fraction ("canopy_cover", Attribute::LogOnly,
+			    "Fraction of ground covered by canopy.");
     frame.declare ("canopy_ep", "mm/h", Attribute::LogOnly,
                    "Potential canopy evaporation.");
     frame.declare ("canopy_ea", "mm/h", Attribute::LogOnly,

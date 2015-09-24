@@ -187,7 +187,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = program_sbrdata.C hydraulic_wepp.C \
+MODELS = xysource_freq.C program_sbrdata.C hydraulic_wepp.C \
 	program_KM2.C program_post.C vegetation_afforestation.C \
 	summary_RsqrW.C gnuplot_profile.C zone_poly.C zone_box.C \
 	rootdens_growth.C gnuplot_vector.C program_optimize.C summary_Rsqr.C \
