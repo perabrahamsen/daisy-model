@@ -1,3 +1,10 @@
+2015-09-25    <xvs108@PB08624>
+
+	* intrinsics.C (instantiate): Better error message.
+
+	* program_extract.C: New model.
+	* Makefile (MODELS): Added it.
+
 2015-09-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* bioclimate_std.C (canopy_cover): New log variable.

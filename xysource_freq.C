@@ -42,8 +42,10 @@ class XYSourceFreq : public XYSource
   const std::auto_ptr<Number> plot_expr;
   const std::auto_ptr<Boolean> valid;
   const symbol title_;
-  symbol dim;
-  
+  const bool sort_on_x;
+  symbol sort_dim;
+  symbol plot_dim;
+
   // Interface.
 public:
   symbol title () const
@@ -58,11 +60,13 @@ public:
   { return style_; }
   symbol x_dimension () const 
   { 
+    if (sort_on_x)
+      return sort_dim;
     static const symbol percent = "%";
     return percent; 
   }
   symbol y_dimension () const 
-  { return dim; }
+  { return plot_dim; }
 
   // Read.
 private:
@@ -120,7 +124,8 @@ XYSourceFreq::load (const Units& units, Treelog& msg)
         ok = false;
       }
     sort_expr->tick (units, scope, msg);
-
+    sort_dim = sort_expr->dimension (scope);
+    
     if (!plot_expr->initialize (units, scope, msg)
         || !plot_expr->check (units, scope, msg))
       {
@@ -128,7 +133,7 @@ XYSourceFreq::load (const Units& units, Treelog& msg)
         ok = false;
       }
     plot_expr->tick (units, scope, msg);
-    dim = plot_expr->dimension (scope);
+    plot_dim = plot_expr->dimension (scope);
 
     if (!valid->initialize (units, scope, msg)
         || !valid->check (units, scope, msg))
@@ -178,7 +183,10 @@ XYSourceFreq::load (const Units& units, Treelog& msg)
   for (size_t i = 0; i < values.size (); i++)
     {
       const double c = i + 1.0;
-      xs.push_back (100.0 * c / count);
+      if (sort_on_x)
+	xs.push_back (values[i].sort);
+      else
+	xs.push_back (100.0 * c / count);
       ys.push_back (values[i].plot);
     }
   daisy_assert (xs.size () == values.size ());
@@ -199,7 +207,9 @@ XYSourceFreq::XYSourceFreq (const BlockModel& al)
 	       :  Librarian::build_item<Number> (al, "sort")),
     valid (Librarian::build_item<Boolean> (al, "valid")),
     title_ (al.name ("title", plot_expr->title ())),
-    dim ("UNINITIALIZED")
+    sort_on_x (al.flag ("sort_on_x")),
+    sort_dim ("UNINITIALIZED"),
+    plot_dim ("UNINITIALIZED")
 { }
 
 XYSourceFreq::~XYSourceFreq ()
@@ -226,14 +236,17 @@ By default the name of the tag.");
 Expression for calculating the sorting value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");
-    frame.declare_object ("y", Number::component, 
-                       Attribute::OptionalConst, Attribute::Singleton, "\
-Expression for calculating the y value for this source for each row.\n\
+    frame.declare_object ("plot", Number::component, 
+			  Attribute::OptionalConst, Attribute::Singleton, "\
+Expression for calculating the y value for this source for each row.\n	\
 By default, this will be identical to 'sort'.");
     frame.declare_object ("valid", Boolean::component, 
                           Attribute::Const, Attribute::Singleton, "\
 Ignore entries if this boolean expression is false.");
     frame.set ("valid", "true");
+    frame.declare_boolean ("sort_on_x", Attribute::Const, "\
+Show 'sort' value on x axes instead of accumulated frequency.");
+    frame.set ("sort_on_x", false);
   }
 } XYSourceFreq_syntax;
 

@@ -26,6 +26,7 @@
 #include "memutils.h"
 #include "frame_submodel.h"
 #include "librarian.h"
+#include <sstream>
 
 std::map<symbol, Library*> 
 Intrinsics::clone () const
@@ -137,6 +138,14 @@ Intrinsics::instantiate (const symbol component, const symbol model) const
         daisy_panic ("Intrinsic model '" + model
                      + "' not found for component '" + component + "'");
       return;
+    }
+  else if (decls.size () > 1)
+    {
+      std::ostringstream tmp;
+      tmp << "Multiple decls";
+      for (size_t i = 0; i < decls.size (); i++)
+	tmp << " (" << decls[i]->component << " " << decls[i]->name << ")";
+      daisy_panic (tmp.str ());
     }
   daisy_assert (decls.size () == 1);
   const Declare& declare = *decls[0];
