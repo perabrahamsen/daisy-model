@@ -32,6 +32,7 @@
 #include "memutils.h"
 #include "assertion.h"
 #include "vcheck.h"
+#include "mathlib.h"
 #include <sstream>
 
 // The 'listsum' Component.
@@ -156,7 +157,7 @@ struct ListsumMin : public Listsum
   // Simulation.
   void add (double value)
   { 
-    if (min < 0.0 || value < min)
+    if (!std::isfinite (min) || value < min)
       min = value;
     }
   double result () const
@@ -164,7 +165,7 @@ struct ListsumMin : public Listsum
 
   // Create and Destroy.
   ListsumMin (const BlockModel&)
-    : min (0.0)
+    : min (NAN)
   { }
   ~ListsumMin ()
   { }

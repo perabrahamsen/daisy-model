@@ -1,78 +1,61 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Fredag
+* Jorbearbejdning
 
-** begynd at skrive program til at udtrække data fra JB
+** Seneste kørsler (10 års værdier) findes her: 
 
-** gnuplot?
+I:\SCIENCE-PLEN-ECP-AGRO\Filudveksling\PLEN-Linux\hirse06
 
-* PESTPORE
+** timeværdier findes her
 
-** Nedre rand
+I:\SCIENCE-PLEN-ECP-AGRO\Projekter\Jordbearbejdning\Scenarier\hourly_drain
 
-*** Variabel nedre rand.
+** scripts til at udtrække data findes her:
 
-Søren har et bud.
+I:\SCIENCE-PLEN-ECP-AGRO\Filudveksling\PLEN-Linux\combi\plot
 
-** Scenarier
+** excel ark med tabeller (til opdatering) findes her:
 
-Som flakkebjerg, evt uden "ler"
+I:\SCIENCE-PLEN-ECP-AGRO\Filudveksling\PLEN-Linux\Pest tables.xlxs
 
-** Bioporer
+** scripts til at lave summary filer findes her:
 
-*** Dybe fra modelering, men skel til flakkebjerg scenarier
+I:\SCIENCE-PLEN-ECP-AGRO\Filudveksling\PLEN-Linux\combi\pickme.sh
 
-*** Shallow: Langvad = Flakkebjerg, Tåstrup = Tåstrup
+** At gøre
 
-** Vi skal have 8 columns, en for hver jord gange en for hver nedre rand
+Brug "pickme" til at samle relaterede .dlf filer. 
+Pas på water/nitrogen ikke kommer med i pest filer.
 
-** Vi skal auto generere directories og run filer, som for Jordb_signe_2
+brug
 
-** Start simuleringer?
+LC_COLLATE=C
 
-** Start på rapport
+og ./pickme.sh field_[A-Z]*.dlf
 
-*** Vi starter evt med Flakkebjerg scenarie.
+Fjern headers.
 
-* Pestpore scenarier
+Check at rækkefølgen er den samme i pest filene.
 
-Hej alle.
+Check at der er lige mange linjer.
 
-I projektbeskrivelsen til PESTPORE scenarieberegning har vi lover at estimere udvaskning ved udvalgte hændelser, på en rekalibreret opsætning for Langvad (FOCUS) og Tåstrup, når der tilføres i system med dybe bioporer baseret på hvad der er målt i resten af PESTPORE.
+Brug "paste" til at samle field, soil 0-3 og soil 0-200 filerne
 
-Når der står "rekalibrering" er det fordi det oprindeligt var VAP markerne Silstrup og Estrup, som nok kunne bruge en rekalibrering i forhold det oprindelige projekt. FOCUS scenariet Langvad er ikke på samme måde baseret på måletal, og behøver derfor ikke en rekalibrering. For Tåstrup har vi en helt frisk kalibrering fra JB projektet.
+all-water.ddf og all-pest.ddf
 
-Når der står "udvalgte hændelser" er det fordi vi ikke regnede med at have vejrdata nok til at kunne lave statistisk analyse.
+Ret field navne til (skal inkludere 0-3 og 0-200)
 
-I mellemtiden er der så sket det at vi har fået en 3000 år vejrserie med timedata for nedbør i forbindelse med en ph.d. Den er baseret på en 30 års serie, og forlængeret så alle 3000 år har samme statistiske egenskaber som de 30 år. En artikel der beskriver tilblivelsen er undervejs.
+Indsæt tom header.
 
-I samme ph.d har vi også defineret et standardiseret sædskifte (ensidig majs) med en forårs- og en sommer-, og en efterårsapplikation af pesticider, samt en matrix af ni "test pesticider" med kombinationer af tre niveauer for sorption og for nedbrydning (lav, mellem, høj). De tre applikationer svarer til lavt, højt, og intet plantedække.
+Kør extract.dai og plot.dai til at generere tabeller og grafer
 
-Mit forslag er at vi bygger videre på dette arbejde. Det betyder at vi får 300 simuleringer for hvert scenarie, hvilket er nok til at lave statistik.
+Kopier tabeller ind i Pest tables.xlxs
 
-Specifikt:
+Kopier data og udtræk ind under Projekter
 
-For jord tages udgangspunkt i de eksisterende opsætninger for Langvad og Tåstrup. Søjlen udvides så den er fem meter dyb. Nederste meter er grov sand, som i de oprindelige Flakkebjerg scenarier. Nedre rand vil være en aquitard med standard (default) parametre. Vi bruger en 1D opsætning på grund af de mange simuleringer. Vi bruger den samme bioporeopsætning som er brugt i modeleringen af Flakkebjerg forsøget.
+Send Carsten mail om hvor de findes.
 
-Til sammenligning har vi en identisk udgave af de to jorde, hvor de dybe bioporer ikke er medtaget. I alt har vi 4 scenarier.
-
-Der bruges den samme behandling som i ph.d. projektet. Det giver 27 komibnationer af sorption,
-
-Vi kører 300 forskellige vejr igennem, alle taget fra den 3000 års serie.
-
-Vi logger flux og flow 0, 1, 2, 3, 4, og 5 meter under terrain, samt indhold i hvert af de fem lag. Det sker 1, 2, 3, og 4 vintre efter pesticidudbringning.
-
-Søren har software til at samle de mange resultatfiler i et enkelt Excel ark.
-
-I analysen kunne jeg forestille mig en stor tabel med gennemsnit, 50%, og 95% fraktil udvaskning for hver af de 4 scenerier gange 9 pesticider gange 3 udbringstidspunkter.
-
-Tabelen skal angive værdier for 4 meters dybde og efter 4 sæsoner.
-
-Vi vil derefter prøve at finde den relative betydningen af jord (2 jorde), dybe bioporer (med og uden), sorption (3 niveauer), nedbrydning (3 niveauer), udbringninstispunkt (3 forskellige) vejr (300 simuleringer).
-
-Konklusionen vil sandsynligvis være at de alle har stor betydning, men de dybe bioporer har den største.
-
-* Test hvad der går galt med Freundlich 
+Evt begynd at rette figurer til.
 
 * Main tasks
 
