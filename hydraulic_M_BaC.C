@@ -35,6 +35,8 @@ class HydraulicM_BaC : public Hydraulic
   // Content.
   const double lambda;
   const double h_b;
+  const double p;		// Used by 'K'
+  const double a;		// Used by 'M'
 
   // Use.
 public:
@@ -61,7 +63,7 @@ HydraulicM_BaC::Theta (const double h) const
 double 
 HydraulicM_BaC::K (const double h) const
 {
-  return K_sat * pow (Se (h), (2 + 2.5 * lambda) /lambda);
+  return K_sat * pow (Se (h), p);
 }
 
 double 
@@ -87,7 +89,7 @@ double
 HydraulicM_BaC::M (double h) const
 {
   if (h <= h_b)
-    return K_sat * (-h_b / (1 + 2.5*lambda)) * pow (h_b / h, 1 + 2.5*lambda);
+    return (h_b * K_sat / (a + 1.0)) * std::pow (h_b/h, -a - 1.0);
   else
     return M (h_b) + K_sat * (h - h_b);
 }
@@ -109,7 +111,9 @@ HydraulicM_BaC::Se (double h) const
 HydraulicM_BaC::HydraulicM_BaC (const BlockModel& al)
   : Hydraulic (al),
     lambda (al.number ("lambda")),
-    h_b (al.number ("h_b"))
+    h_b (al.number ("h_b")),
+    p (al.number ("p", al.number ("l")+2+2.0/lambda)),
+    a (-lambda * p)
 { }
 
 HydraulicM_BaC::~HydraulicM_BaC ()
@@ -126,6 +130,19 @@ static struct HydraulicM_BaCSyntax : public DeclareModel
     : DeclareModel (Hydraulic::component, "M_BaC", 
                "Brooks and Corey retention curve model with Mualem theory.")
   { }
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& msg)
+  { 
+    bool ok = true;
+    const double lambda = al.number ("lambda");
+    const double p = al.number ("p", al.number ("l")+2+2.0/lambda);
+
+    if (p * lambda <= 1.0)
+      {
+	msg.error ("p * lambda must be larger than 1");
+	ok = false;
+      }
+    return ok;
+  }
   void load_frame (Frame& frame) const
   { 
     Hydraulic::load_Theta_res (frame);
@@ -134,7 +151,12 @@ static struct HydraulicM_BaCSyntax : public DeclareModel
                 "Pore size index.");
     frame.declare ("h_b", "cm", Check::negative (), Attribute::Const,
                 "Bubbling pressure.");
-
+    frame.declare ("l", Attribute::None (), Check::none (), Attribute::Const,
+		   "Burdine form parameter. Ignored if 'p' is set.");
+    frame.set ("l", 0.5);
+    frame.declare ("p", Attribute::None (), Check::none (),
+		   Attribute::OptionalConst, "\
+Hydraulic conductivity form parameter. By default p=l+2+2/lambda.");
   }
 } hydraulicM_BaC_syntax;
 

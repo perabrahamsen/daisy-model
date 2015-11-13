@@ -1,61 +1,9 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Jorbearbejdning
+* Ret modelunc "Pløjet, Min" figur til
 
-** Seneste kørsler (10 års værdier) findes her: 
+Der skal kun være A, B, og, C. Figurtekst til begge.
 
-I:\SCIENCE-PLEN-ECP-AGRO\Filudveksling\PLEN-Linux\hirse06
-
-** timeværdier findes her
-
-I:\SCIENCE-PLEN-ECP-AGRO\Projekter\Jordbearbejdning\Scenarier\hourly_drain
-
-** scripts til at udtrække data findes her:
-
-I:\SCIENCE-PLEN-ECP-AGRO\Filudveksling\PLEN-Linux\combi\plot
-
-** excel ark med tabeller (til opdatering) findes her:
-
-I:\SCIENCE-PLEN-ECP-AGRO\Filudveksling\PLEN-Linux\Pest tables.xlxs
-
-** scripts til at lave summary filer findes her:
-
-I:\SCIENCE-PLEN-ECP-AGRO\Filudveksling\PLEN-Linux\combi\pickme.sh
-
-** At gøre
-
-Brug "pickme" til at samle relaterede .dlf filer. 
-Pas på water/nitrogen ikke kommer med i pest filer.
-
-brug
-
-LC_COLLATE=C
-
-og ./pickme.sh field_[A-Z]*.dlf
-
-Fjern headers.
-
-Check at rækkefølgen er den samme i pest filene.
-
-Check at der er lige mange linjer.
-
-Brug "paste" til at samle field, soil 0-3 og soil 0-200 filerne
-
-all-water.ddf og all-pest.ddf
-
-Ret field navne til (skal inkludere 0-3 og 0-200)
-
-Indsæt tom header.
-
-Kør extract.dai og plot.dai til at generere tabeller og grafer
-
-Kopier tabeller ind i Pest tables.xlxs
-
-Kopier data og udtræk ind under Projekter
-
-Send Carsten mail om hvor de findes.
-
-Evt begynd at rette figurer til.
 
 * Main tasks
 

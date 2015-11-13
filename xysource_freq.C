@@ -36,13 +36,15 @@ class XYSourceFreq : public XYSource
   LexerTable lex;
   const symbol with_;
   const int style_;
-  std::vector<double> xs;
-  std::vector<double> ys;
+  std::vector<double> sorts;
+  std::vector<double> plots;
   const std::auto_ptr<Number> sort_expr;
   const std::auto_ptr<Number> plot_expr;
   const std::auto_ptr<Boolean> valid;
   const symbol title_;
-  const bool sort_on_x;
+  const symbol percent;
+  const bool use_sort_value;
+  const bool plot_on_x;
   symbol sort_dim;
   symbol plot_dim;
 
@@ -51,22 +53,41 @@ public:
   symbol title () const
   { return title_; }
   const std::vector<double>& x () const
-  { return xs; }
+  { 
+    if (plot_on_x)
+      return plots;
+    else 
+      return sorts; 
+  }
   const std::vector<double>& y () const
-  { return ys; }
+  { 
+    if (plot_on_x)
+      return sorts;
+    else 
+      return plots; 
+  }
   symbol with () const
   { return with_; }
   int style () const 
   { return style_; }
   symbol x_dimension () const 
   { 
-    if (sort_on_x)
+    if (plot_on_x)
+      return plot_dim;
+    else if (use_sort_value)
       return sort_dim;
-    static const symbol percent = "%";
-    return percent; 
+    else
+      return percent;
   }
   symbol y_dimension () const 
-  { return plot_dim; }
+  {
+    if (!plot_on_x)
+      return plot_dim;
+    else if (use_sort_value)
+      return sort_dim;
+    else
+      return percent;
+  }
 
   // Read.
 private:
@@ -183,14 +204,14 @@ XYSourceFreq::load (const Units& units, Treelog& msg)
   for (size_t i = 0; i < values.size (); i++)
     {
       const double c = i + 1.0;
-      if (sort_on_x)
-	xs.push_back (values[i].sort);
+      if (use_sort_value)
+	sorts.push_back (values[i].sort);
       else
-	xs.push_back (100.0 * c / count);
-      ys.push_back (values[i].plot);
+	sorts.push_back (100.0 * c / count);
+      plots.push_back (values[i].plot);
     }
-  daisy_assert (xs.size () == values.size ());
-  daisy_assert (xs.size () == ys.size ());
+  daisy_assert (sorts.size () == values.size ());
+  daisy_assert (sorts.size () == plots.size ());
 
   // Done.
   return true;
@@ -207,7 +228,9 @@ XYSourceFreq::XYSourceFreq (const BlockModel& al)
 	       :  Librarian::build_item<Number> (al, "sort")),
     valid (Librarian::build_item<Boolean> (al, "valid")),
     title_ (al.name ("title", plot_expr->title ())),
-    sort_on_x (al.flag ("sort_on_x")),
+    percent (al.name ("percent")),
+    use_sort_value (al.flag ("use_sort_value")),
+    plot_on_x (al.flag ("plot_on_x")),
     sort_dim ("UNINITIALIZED"),
     plot_dim ("UNINITIALIZED")
 { }
@@ -238,15 +261,21 @@ The expression can refer to the value in a specific column by the tag\n\
 for that column.");
     frame.declare_object ("plot", Number::component, 
 			  Attribute::OptionalConst, Attribute::Singleton, "\
-Expression for calculating the y value for this source for each row.\n	\
+Expression for calculating the plot value for this source for each row.\n\
 By default, this will be identical to 'sort'.");
     frame.declare_object ("valid", Boolean::component, 
                           Attribute::Const, Attribute::Singleton, "\
 Ignore entries if this boolean expression is false.");
     frame.set ("valid", "true");
-    frame.declare_boolean ("sort_on_x", Attribute::Const, "\
-Show 'sort' value on x axes instead of accumulated frequency.");
-    frame.set ("sort_on_x", false);
+    frame.declare_string ("percent", Attribute::Const, "\
+Symbol to use for percent.");
+    frame.set ("percent", "%");
+    frame.declare_boolean ("use_sort_value", Attribute::Const, "\
+Show 'sort' value instead of accumulated frequency.");
+    frame.set ("use_sort_value", false);
+    frame.declare_boolean ("plot_on_x", Attribute::Const, "\
+Show plot values on x axis.");
+    frame.set ("plot_on_x", true);
   }
 } XYSourceFreq_syntax;
 

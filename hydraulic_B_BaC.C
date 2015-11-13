@@ -35,6 +35,8 @@ class HydraulicB_BaC : public Hydraulic
   // Content.
   const double lambda;
   const double h_b;
+  const double p;		// Used by 'K'
+  const double a;		// Used by 'M'
 
   // Use.
 public:
@@ -61,7 +63,7 @@ HydraulicB_BaC::Theta (const double h) const
 double 
 HydraulicB_BaC::K (const double h) const
 {
-  return K_sat * pow (Se (h), (2 + 3 * lambda) / lambda);
+  return K_sat * pow (Se (h), p);
 }
 
 double 
@@ -87,7 +89,7 @@ double
 HydraulicB_BaC::M (double h) const
 {
   if (h <= h_b)
-    return K_sat * (-h_b / (1 + 3*lambda)) * pow (h_b / h, 1 + 3*lambda);
+    return (h_b * K_sat / (a + 1.0)) * std::pow (h_b/h, -a - 1.0);
   else
     return M (h_b) + K_sat * (h - h_b);
 }
@@ -104,7 +106,9 @@ HydraulicB_BaC::Se (double h) const
 HydraulicB_BaC::HydraulicB_BaC (const BlockModel& al)
   : Hydraulic (al),
     lambda (al.number ("lambda")),
-    h_b (al.number ("h_b"))
+    h_b (al.number ("h_b")),
+    p (al.number ("p", al.number ("l")+1+2.0/lambda)),
+    a (-lambda * p)
 { }
 
 HydraulicB_BaC::~HydraulicB_BaC ()
@@ -121,7 +125,19 @@ static struct HydraulicB_BaCSyntax : public DeclareModel
     : DeclareModel (Hydraulic::component, "B_BaC",
                "Brooks and Corey retention curve model with Burdine theory.")
   { }
-  void load_frame (Frame& frame) const
+   static bool check_alist (const Metalib&, const Frame& al, Treelog& msg)
+  { 
+    bool ok = true;
+    const double lambda = al.number ("lambda");
+    const double p = al.number ("p", al.number ("l")+1+2.0/lambda);
+    if (p * lambda <= 1.0)
+      {
+	msg.error ("p * lambda must be larger than 1");
+	ok = false;
+      }
+    return ok;
+  }
+ void load_frame (Frame& frame) const
   { 
     Hydraulic::load_Theta_res (frame);
     Hydraulic::load_K_sat (frame);
@@ -129,6 +145,13 @@ static struct HydraulicB_BaCSyntax : public DeclareModel
                 "Pore size index.");
     frame.declare ("h_b", "cm", Check::negative (), Attribute::Const,
                 "Bubbling pressure.");
-
+    frame.declare ("l", Attribute::None (), Check::none (), Attribute::Const,
+		   "Burdine form parameter. Ignored if 'p' is set.");
+    frame.set ("l", 2.0);
+    frame.declare ("p", Attribute::None (), Check::none (),
+		   Attribute::OptionalConst, "\
+Hydraulic conductivity form parameter. By default p=l+1+2/lambda.");
   }
 } hydraulicB_BaC_syntax;
+
+// hydraulic_B_BaC.C ends here.

@@ -35,7 +35,8 @@ class HydraulicM_C : public Hydraulic
   // Content.
   const double h_b;
   const double b;
-  const double l;
+  const double p;		// Used by 'K'
+  const double a;		// Used by 'M'
 
   // Use.
 public:
@@ -62,7 +63,7 @@ HydraulicM_C::Theta (const double h) const
 double 
 HydraulicM_C::K (const double h) const
 {
-  return K_sat * pow (Sr (h), 2 * b + 2 + l);
+  return K_sat * pow (Sr (h), p);
 }
 
 double 
@@ -87,7 +88,7 @@ double
 HydraulicM_C::M (double h) const
 {
   if (h <= h_b)
-    return K_sat * (-h_b / (1 + (2.0 + l)/b)) * pow (h_b / h, 1 + (2.0 + l)/b);
+    return (h_b * K_sat / (a + 1.0)) * std::pow (h_b/h, -a - 1.0);
   else
     return M (h_b) + K_sat * (h - h_b);
 }
@@ -105,7 +106,8 @@ HydraulicM_C::HydraulicM_C (const BlockModel& al)
   : Hydraulic (al),
     h_b (al.number ("h_b")),
     b (al.number ("b")),
-    l (al.number ("l"))
+    p (al.number ("p", al.number ("l")+2+2*b)),
+    a (-p/b)
 { }
 
 HydraulicM_C::~HydraulicM_C ()
@@ -124,8 +126,21 @@ static struct HydraulicM_CSyntax : public DeclareModel
     : DeclareModel (Hydraulic::component, "M_C", 
 	       "Campbell retention curve model with Mualem theory.")
   { }
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& msg)
+  { 
+    bool ok = true;
+    const double b = al.number ("b");
+    const double p = al.number ("p", al.number ("l")+2+2*b);
+    if (p <= b)
+      {
+	msg.error ("'p' must be larger than 'b'");
+	ok = false;
+      }
+    return ok;
+  }
   void load_frame (Frame& frame) const
   { 
+    frame.add_check (check_alist);
     frame.set_strings ("cite", "campbell1974simple", "mualem1976");
     Hydraulic::load_Theta_sat (frame);
     Hydraulic::load_K_sat (frame);
@@ -134,8 +149,12 @@ static struct HydraulicM_CSyntax : public DeclareModel
     frame.declare ("b", Attribute::None (), Check::positive (), 
                    Attribute::Const, "Campbell parameter.");
     frame.declare ("l", Attribute::None (), Check::none (), Attribute::Const,
-                   "Mualem form parameter.");
+		   "Burdine form parameter. Ignored if 'p' is set.");
     frame.set ("l", 0.5);
+    frame.declare ("p", Attribute::None (), Check::none (),
+		   Attribute::OptionalConst, "\
+Hydraulic conductivity form parameter. By default p=l+2+2*b.");
   }
 } hydraulicM_C_syntax;
 
+// hydraulic_M_C.C ends here.

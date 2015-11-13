@@ -457,7 +457,7 @@ static struct ProgramExtractSyntax : public DeclareModel
   { return new ProgramExtract (al); }
   ProgramExtractSyntax ()
     : DeclareModel (Program::component, "extract", "\
-Extract data from a Daisy file.")
+Extract data from a data file.")
   { }
   void load_frame (Frame& frame) const
   { 

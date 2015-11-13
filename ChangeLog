@@ -1,4 +1,9 @@
-2015-09-25    <xvs108@PB08624>
+2015-11-13  Per Abrahamsen  <per.abrahamsen@gmal.com>
+
+	* hydraulic_B_C.C, hydraulic_M_C.C, hydraulic_M_BaC.C:
+	* hydraulic_B_BaC.C (l, p): New parameters.
+
+2015-09-25  Per Abrahamsen  <per.abrahamsen@gmal.com>
 
 	* intrinsics.C (instantiate): Better error message.
 
