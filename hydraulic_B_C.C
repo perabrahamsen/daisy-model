@@ -128,9 +128,15 @@ static struct HydraulicB_CSyntax : public DeclareModel
     bool ok = true;
     const double b = al.number ("b");
     const double p = al.number ("p", al.number ("l")+1+2*b);
-    if (p <= b)
+    const double a = -p/b;
+    if (p <= 0.0)
       {
-	msg.error ("'p' must be larger than 'b'");
+	msg.error ("l must be larger than -1 - 2b");
+	ok = false;
+      }
+    if (!std::isnormal (a))
+      {
+	msg.error ("-p/b must not be zero");
 	ok = false;
       }
     return ok;
@@ -148,7 +154,7 @@ static struct HydraulicB_CSyntax : public DeclareModel
       frame.declare ("l", Attribute::None (), Check::none (), Attribute::Const,
 		     "Burdine form parameter. Ignored if 'p' is set.");
       frame.set ("l", 2.0);
-      frame.declare ("p", Attribute::None (), Check::none (),
+      frame.declare ("p", Attribute::None (), Check::positive (),
 		     Attribute::OptionalConst, "\
 Hydraulic conductivity form parameter. By default p=l+1+2*b.");
     }

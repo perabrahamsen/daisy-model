@@ -1105,7 +1105,7 @@ TransportMollerup::flow (const Geometry& geo_base,
         if (ddt_PeCr_min < ddt_max)
           ddt_max = ddt_PeCr_min;
         
-        if (!C_border.size () > 0 && enable_boundary_diffusion)
+        if (!(C_border.size () > 0) && enable_boundary_diffusion)
           {
             double ddt_dir 
               = Dirichlet_timestep (geo, ThetaD_xx_zz_avg, ddt_max);

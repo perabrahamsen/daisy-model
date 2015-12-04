@@ -33,7 +33,7 @@
   (Root (DptEmr     10)
       (PenPar1    0.20)
       (PenPar2     4.0)
-      (MaxPen       70)
+      (MaxPen       200)
       (SpRtLength  100)
       (DensRtTip  0.10)
       (Rad        0.005)

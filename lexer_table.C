@@ -758,10 +758,10 @@ LexerTable::Implementation::get_time (const std::string& entry, Time& time,
   else
     return false;
 
-  if (!Time::valid (year, month, mday, hour))
+  if (!Time::valid (year, month, mday, hour, minute, second, microsecond))
     return false;
 
-  time = Time (year, month, mday, hour);
+  time = Time (year, month, mday, hour, minute, second, microsecond);
   return true;
 }
 

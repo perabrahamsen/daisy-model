@@ -1,8 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Ret modelunc "Pløjet, Min" figur til
-
-Der skal kun være A, B, og, C. Figurtekst til begge.
+* "make setup" skal automatisk lave både 32 og 64 bit version for Windows.
 
 
 * Main tasks
@@ -13,25 +11,17 @@ Der skal kun være A, B, og, C. Figurtekst til begge.
 
 *** 32 bit Daisy
 
+*** Mac
+
 *** Automatic build and upload
 
 *** New Daisy homepage
 
+Sites
+
+Identificer hvad der skal flyttes.
+
 ** Help Merete (Daisy center)
-
-** Organisering af I drev?
-
-** Jordbearbejdning
-
-*** Scenarier
-
-** PestPore
-
-*** Scenarier
-
-
-
-
 
 * Automatiser windows
 

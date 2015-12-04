@@ -44,11 +44,13 @@ SETUPDIR = /home/xvs108/daisy/install
 MAKENSIS = "/cygdrive/c/Program Files (x86)/NSIS/makensis.exe"
 NSISFILE = setup-nogui.nsi
 #MINGWHOME = /cygdrive/c/MinGW
-MINGWHOME = /cygdrive/c/Program Files/mingw-w64/x86_64-4.9.0-posix-seh-rt_v3-rev2/mingw64/
+MINGWHOME64 = /cygdrive/c/Program Files/mingw-w64/x86_64-4.9.0-posix-seh-rt_v3-rev2/mingw64
+MINGWHOME32 = /cygdrive/c/Program Files (x86)/mingw-w64/i686-5.2.0-posix-dwarf-rt_v4-rev1/mingw32
 MINGWBIN=$(MINGWHOME)/bin
-MINGWDLL = "$(MINGWBIN)/"libgcc_s_seh-1.dll \
-	"$(MINGWBIN)/"libstdc++-6.dll \
-	"$(MINGWBIN)/"libwinpthread-1.dll
+MINGWBIN64=$(MINGWHOME64)/bin
+MINGWBIN32=$(MINGWHOME32)/bin
+MINGWDLL64 = libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll
+MINGWDLL32 = libgcc_s_dw2-1.dll libstdc++-6.dll libwinpthread-1.dll
 
 
 endif
@@ -146,7 +148,7 @@ csdaisy.exe:	csmain.cs csdaisy.netmodule
 CC = $(COMPILE) $(OPTIMIZE) $(PROFILE) $(TARGET)
 
 # Locate the CSSparse lib -L../libdeps
-CXSPARSELIB = -L../libdeps -lcxsparse
+CXSPARSELIB = libcxsparse.a
 #CXSPARSELIB = /usr/lib/libcxsparse.so.2.2.3
 
 CXSPARSEHEAD = ublas_cxsparse.h cs.h SuiteSparse_config.h
@@ -181,7 +183,7 @@ endif
 
 # Figure out how to link.
 #
-LINK = g++ $(DEBUG) -o
+LINK = g++ $(TARGET) $(DEBUG) -o
 NOLINK = -c
 
 # Select the C files that doesn't have a corresponding header file.
@@ -463,7 +465,8 @@ linux:
 make-win64-native:
 	(mkdir -p win64-native \
 	 && cd win64-native \
-         && $(MAKE) "PATH=$(MINGWBIN):$(PATH)" \
+         && $(MAKE) "MINGWHOME=$(MINGWHOME64)" \
+                    "PATH=$(MINGWHOME64)/bin:$(PATH)" \
 		    "CYGHOME=C:/cygwin64" Q4HOME=c:/Qt/4.5.2\
 	            VPATH=$(SRCDIR) USE_OPTIMIZE=native \
                     -f $(SRCDIR)/Makefile daisy${EXE})
@@ -471,7 +474,8 @@ make-win64-native:
 make-win64-portable:
 	(mkdir -p win64-portable \
 	 && cd win64-portable \
-         && $(MAKE) "PATH=$(MINGWBIN):$(PATH)" \
+         && $(MAKE) "MINGWHOME=$(MINGWHOME64)" \
+                    "PATH=$(MINGWHOME64)/bin:$(PATH)" \
 		    "CYGHOME=C:/cygwin64" Q4HOME=c:/Qt/4.5.2\
 	            VPATH=$(SRCDIR) USE_OPTIMIZE=portable \
                     -f $(SRCDIR)/Makefile daisy${EXE})
@@ -479,9 +483,10 @@ make-win64-portable:
 make-win32-portable:
 	(mkdir -p win32-portable \
 	 && cd win32-portable \
-         && $(MAKE) "PATH=$(MINGWBIN):$(PATH)" \
+         && $(MAKE) "MINGWHOME=$(MINGWHOME32)" \
+                    "PATH=$(MINGWHOME32)/bin:$(PATH)" \
 		    "CYGHOME=C:/cygwin64" Q4HOME=c:/Qt/4.5.2\
-	            VPATH=$(SRCDIR) USE_OPTIMIZE=portable TARGET=-m32 \
+	            VPATH=$(SRCDIR) USE_OPTIMIZE=portable \
                     -f $(SRCDIR)/Makefile daisy${EXE})
 
 native:	
@@ -494,13 +499,6 @@ cnative:
 	(mkdir -p $(NATIVEHOME) \
 	 && cd $(NATIVEHOME) \
          && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile cdaisy.exe)
-
-cross:
-	(cd $(OBJHOME) \
-         && $(MAKE) "PATH=$(MINGWBIN):$(PATH)" \
-		    "CYGHOME=C:/cygwin64" Q4HOME=c:/Qt/4.5.2\
-	            VPATH=$(SRCDIR) USE_OPTIMIZE=portable \
-                    -f $(SRCDIR)/Makefile daisy${EXE})
 
 # Create manager test executable.
 #
@@ -731,7 +729,7 @@ setupnoci:
 	mkdir $(SETUPDIR)/src
 	cp $(TEXT) $(SETUPDIR)/src
 	mkdir $(SETUPDIR)/bin
-	cp libdeps/ShowDaisyOutput.exe $(SETUPDIR)/bin
+	cp libdeps32/ShowDaisyOutput.exe $(SETUPDIR)/bin
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
 	$(STRIP) -o $(SETUPDIR)/bin/daisyw.exe $(OBJHOME)/daisyw.exe
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll $(OBJHOME)/daisy.dll
@@ -746,20 +744,16 @@ setupnoci:
 	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
 
 setupnogui: 
-	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	rm -f version.C
-	$(MAKE) version.C
-	$(MAKE) cross
 	rm -rf $(SETUPDIR)
 	mkdir $(SETUPDIR)
 	cp ChangeLog NEWS $(SETUPDIR)
 	mkdir $(SETUPDIR)/src
 	cp $(TEXT) $(SETUPDIR)/src
 	mkdir $(SETUPDIR)/bin
-	cp libdeps/ShowDaisyOutput.exe $(SETUPDIR)/bin
+	cp libdeps32/ShowDaisyOutput.exe $(SETUPDIR)/bin
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll $(OBJHOME)/daisy.dll
-	cp $(MINGWDLL) $(SETUPDIR)/bin
+	(cd "$(MINGWBIN)"; cp $(MINGWDLL) $(SETUPDIR)/bin)
 	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	$(MAKE) setupdocs
@@ -772,10 +766,18 @@ upload:
 	cp -p daisy-$(TAG)-setup.exe "/cygdrive/c/Users/xvs108/Google\ Drev/public/"
 
 setup-win64: 
-	make setupnogui OBJHOME=win64-portable
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	rm -f version.C
+	$(MAKE) version.C
+	$(MAKE) make-win64-portable
+	make setupnogui MINGWHOME="$(MINGWHOME64)" MINGWDLL="$(MINGWDLL64)" OBJHOME=win64-portable
 
 setup-win32: 
-	make setupnogui OBJHOME=win32-portable TARGET=-m32 NSISFILE=setup-w32.nsi
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	rm -f version.C
+	$(MAKE) version.C
+	$(MAKE) make-win32-portable
+	make setupnogui MINGWHOME="$(MINGWHOME32)" MINGWDLL="$(MINGWDLL32)" OBJHOME=win32-portable NSISFILE=setup-w32.nsi
 
 debiannoci: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi

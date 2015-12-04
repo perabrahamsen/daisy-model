@@ -80,4 +80,7 @@ public:
   ~PLF ();
 };
 
+bool operator< (const PLF& a, const PLF& b);
+bool operator<= (const PLF& a, const PLF& b);
+
 #endif // PLF_H

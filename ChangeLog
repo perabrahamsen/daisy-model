@@ -1,3 +1,35 @@
+2015-12-04  Per Abrahamsen  <per.abrahamsen@gmal.com>
+
+	* lib/dk-maize.dai ("Silomajs"): Changed NfRootCnc at
+	DS=2.0 from 0.7 % to 0.4 %, mainly in order to get below the
+	CrRootCnd which is 0.5 %.
+
+2015-12-02  Per Abrahamsen  <per.abrahamsen@gmal.com>
+
+	* volume_box.C (check_border): Fix logic error.
+
+	* lexer_table.C (get_time): Allow minutes, seconds, and microseconds.
+
+	* plf.C, plf.h (operator<, operator<=): New operators.
+	* crpn.C (check_n_less): New function.
+	(check_alist): Check that Pt >= Cr >= Nf N concentration.
+	* lib/wwheat.dai ("Winter Wheat; Eest"): Removed.
+	* lib/sugarbeet.dai ("Sugar Beet"): 
+	* lib/potato.dai ("Potato; Koege"): 
+	* lib/maize.dai ("Maize", "Pioneer Maize"): Changed NfRootCnc at
+	DS=2.0 from 0.7 % to 0.4 %, mainly in order to get below the
+	CrRootCnd which is 0.5 %.
+
+2015-11-25  Per Abrahamsen  <per.abrahamsen@gmal.com>
+
+	* hydraulic_B_C.C, hydraulic_M_C.C:
+	* hydraulic_B_BaC.C, hydraulic_M_BaC.C (check_alist): Fix check for p.
+
+2015-11-19  Per Abrahamsen  <per.abrahamsen@gmal.com>
+
+	* lib/sugarbeet.dai, lib/sbeet.dai, lib/fodderbeet.dai (MaxPen):
+	Changed from 70 to 200.
+
 2015-11-13  Per Abrahamsen  <per.abrahamsen@gmal.com>
 
 	* hydraulic_B_C.C, hydraulic_M_C.C, hydraulic_M_BaC.C:

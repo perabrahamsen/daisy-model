@@ -189,15 +189,36 @@ CrpN::output (Log& log) const
   output_variable (DS_start_fixate, log);
 }
 
+static void check_n_less (const symbol a, const symbol b, const Frame& al,
+			  Treelog& err, bool& ok)
+{
+  if (!(al.plf (a) <= al.plf (b)))
+    {
+      err.error ("'" + a + "' should never be larger than '" + b + "'");
+      ok = false;
+    }
+}
+
 bool 
 CrpN::check_alist (const Metalib&, const Frame& al, Treelog& err)
 {
-  return true;
+  bool ok = true;
+  check_n_less ("CrLeafCnc", "PtLeafCnc", al, err, ok);
+  check_n_less ("NfLeafCnc", "CrLeafCnc", al, err, ok);
+  check_n_less ("CrStemCnc", "PtStemCnc", al, err, ok);
+  check_n_less ("NfStemCnc", "CrStemCnc", al, err, ok);
+  check_n_less ("CrSOrgCnc", "PtSOrgCnc", al, err, ok);
+  check_n_less ("NfSOrgCnc", "CrSOrgCnc", al, err, ok);
+  check_n_less ("CrRootCnc", "PtRootCnc", al, err, ok);
+  check_n_less ("NfRootCnc", "CrRootCnc", al, err, ok);
+  
+  return ok;
 }
 
 void 
 CrpN::load_syntax (Frame& frame)
 {
+  frame.add_check (check_alist);
 
   // Content.
   frame.declare ("PtLeafCnc", "DS", " g N/g DM", Check::non_negative (),

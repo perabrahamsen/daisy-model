@@ -192,7 +192,7 @@ VolumeBox::check_border (const Border& border, Treelog& msg) const
   for (size_t i = 0; i < bounds_size; i++)
     {
       const Bound& bound = *(this->*(bounds[i].bound));
-      if (!bound.type () != Bound::finite)
+      if (bound.type () != Bound::finite)
         continue;
       if (!((border.*(bounds[i].check_border)) (bound.value (), msg)))
         ok = false;

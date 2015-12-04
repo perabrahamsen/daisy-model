@@ -135,10 +135,15 @@ static struct HydraulicM_BaCSyntax : public DeclareModel
     bool ok = true;
     const double lambda = al.number ("lambda");
     const double p = al.number ("p", al.number ("l")+2+2.0/lambda);
-
-    if (p * lambda <= 1.0)
+    const double a = -lambda * p;
+    if (p <= 0.0)
       {
-	msg.error ("p * lambda must be larger than 1");
+	msg.error ("l must be larger than -2 - 2/lambda");
+	ok = false;
+      }
+    if (!std::isnormal (a))
+      {
+	msg.error ("-lambda * p must not be zero");
 	ok = false;
       }
     return ok;
@@ -147,14 +152,15 @@ static struct HydraulicM_BaCSyntax : public DeclareModel
   { 
     Hydraulic::load_Theta_res (frame);
     Hydraulic::load_K_sat (frame);
-    frame.declare ("lambda", Attribute::None (), Attribute::Const,
+    frame.declare ("lambda", Attribute::None (), Check::non_zero (),
+		   Attribute::Const,
                 "Pore size index.");
     frame.declare ("h_b", "cm", Check::negative (), Attribute::Const,
                 "Bubbling pressure.");
     frame.declare ("l", Attribute::None (), Check::none (), Attribute::Const,
 		   "Burdine form parameter. Ignored if 'p' is set.");
     frame.set ("l", 0.5);
-    frame.declare ("p", Attribute::None (), Check::none (),
+    frame.declare ("p", Attribute::None (), Check::positive (),
 		   Attribute::OptionalConst, "\
 Hydraulic conductivity form parameter. By default p=l+2+2/lambda.");
   }

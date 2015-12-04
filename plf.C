@@ -476,3 +476,27 @@ PLF::~PLF ()
   delete &impl;
 }
 
+bool operator< (const PLF& a, const PLF& b)
+{
+  for (size_t i = 0; i < a.size (); i++)
+    if (!(a.y (i) < b (a.x (i))))
+      return false;
+  for (size_t i = 0; i < b.size (); i++)
+    if (!(a (b.x (i)) < b.y (i)))
+      return false;
+
+  return true;
+}
+
+bool operator<= (const PLF& a, const PLF& b)
+{
+  for (size_t i = 0; i < a.size (); i++)
+    if (!(a.y (i) <= b (a.x (i))))
+      return false;
+  for (size_t i = 0; i < b.size (); i++)
+    if (!(a (b.x (i)) <= b.y (i)))
+      return false;
+
+  return true;
+}
+
