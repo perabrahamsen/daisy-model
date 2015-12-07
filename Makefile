@@ -42,7 +42,6 @@ BOOSTINC = -isystem $(CYGHOME)/home/xvs108/boost_1_55_0
 SETUPDIR = /home/xvs108/daisy/install
 #MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
 MAKENSIS = "/cygdrive/c/Program Files (x86)/NSIS/makensis.exe"
-NSISFILE = setup-nogui.nsi
 #MINGWHOME = /cygdrive/c/MinGW
 MINGWHOME64 = /cygdrive/c/Program Files/mingw-w64/x86_64-4.9.0-posix-seh-rt_v3-rev2/mingw64
 MINGWHOME32 = /cygdrive/c/Program Files (x86)/mingw-w64/i686-5.2.0-posix-dwarf-rt_v4-rev1/mingw32
@@ -51,9 +50,9 @@ MINGWBIN64=$(MINGWHOME64)/bin
 MINGWBIN32=$(MINGWHOME32)/bin
 MINGWDLL64 = libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll
 MINGWDLL32 = libgcc_s_dw2-1.dll libstdc++-6.dll libwinpthread-1.dll
-
-
 endif
+
+DISTDIR=c:/Users/xvs108/Google\ Drev/public/
 
 # Set USE_GUI to Q4 or none, depending on what GUI you want.
 #
@@ -396,7 +395,7 @@ HEADERS = $(INTERFACES:.C=.h) $(HEADONLY)
 
 # Find all printable files.
 #
-TEXT =  setup-w32.nsi setup-nogui.nsi \
+TEXT =  setup-w32.nsi setup-w64.nsi \
 	control-shared.txt ChangeLog.3 ChangeLog.2 ChangeLog.1 setup.nsi \
 	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB  $(DISABLED) \
 	$(HEADERS) $(SOURCES) $(ALLSYSHDR) $(ALLSYSSRC) \
@@ -427,7 +426,7 @@ REMOVED = groundwater_pipe.C horizon_std.C \
 # Create all the executables.
 #
 all:
-	@echo 'Use "make native" to create a native Daisy executable.'
+	@echo 'Use "make <platform>" to create a native Daisy executable.'
 
 # Create a DLL.
 #
@@ -452,9 +451,6 @@ daisy:	main${OBJ} $(LIBOBJ)
 daisyw:	$(GUIOBJECTS) $(LIBOBJ)
 	$(LINK)$@ $^ $(GUILIB) $(CPPLIB)  $(CXSPARSELIB)
 
-exp:	
-	(cd $(OBJHOME)/exp \
-         && $(MAKE) VPATH=$(SRCDIR) USE_PROFILE=true -f $(SRCDIR)/Makefile daisy)
 
 linux:	
 	(mkdir -p $(NATIVEHOME) \
@@ -500,47 +496,13 @@ cnative:
 	 && cd $(NATIVEHOME) \
          && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile cdaisy.exe)
 
-# Create manager test executable.
-#
-mandaisy${EXE}:	manmain${OBJ} daisy.so
-	$(LINK)$@  $^
-
-# Create bug test executable.
-#
-bugdaisy${EXE}:	bugmain${OBJ} daisy.so
-	$(LINK)$@  $^
-
-# Create executable with embedded tcl/tk.
-#
-tkdaisy${EXE}:	tkmain${OBJ} daisy.so
-	$(LINK)$@ $^ $(TKLIB)
-
-# Create executable with Gtk--.
-#
-gdaisy${EXE}:	gmain${OBJ} daisy.so
-	$(LINK)$@ $^ $(GTKMMLIB)
-
-# Create executable with Qt 3.
-#
-qdaisy${EXE}:	$(QTOBJECTS) daisy.so
-	$(LINK)$@ $(QTOBJECTS) `pwd`/daisy.so $(QTLIB)
-
 # Create the C main executable.
 #
 cdaisy${EXE}:  cmain${OBJ} daisy.dll
 	$(LINK)$@ $^ $(CPPLIB)
 
-ddaisy${EXE}:  main${OBJ} daisy.dll $(GUIOBJECTS) 
-	$(LINK)$@ $^ $(GUILIB) $(CPPLIB)
-
-cdaisy-mshe${EXE}:  cmain-mshe${OBJ} daisy.so
-	$(LINK)$@ cmain-mshe${OBJ} `pwd`/daisy.so
-
 # Create the C main executable for testing.
 #
-cdaisy_test${EXE}:  cmain_test${OBJ} daisy.so
-	$(LINK)$@ $^
-
 # Create a shared library.
 #
 daisy.so: $(LIBOBJ)
@@ -549,16 +511,6 @@ daisy.so: $(LIBOBJ)
 # toplevel.o cdaisy.o:
 #	 $(CC) $(NOLINK) -DBUILD_DLL $<
 
-
-# Boost test
-
-btest${EXE}: btest.C
-	$(LINK)$@ -isystem /usr/include/boost-1_33_1/ $< $(CPPLIB)
-
-# Create the MMM executable.
-
-mmm${EXE}:	$(MOBJECTS)
-	$(LINK)$@  $^
 
 # Count the size of daisy.
 #
@@ -614,11 +566,6 @@ unittest:
 
 # utest: utest.exe
 
-xtest:	test/test.dai daisy
-	(cd test \
-         && ../daisy test.dai \
-	 && diff -u harvest_weather.log harvest.log)
-
 ps:	txt/reference.ps
 
 
@@ -654,45 +601,12 @@ depend: $(GUISOURCES) $(SOURCES)
 	sed -e '/^# AUTOMATIC/q' < Makefile.old > Makefile
 	$(CC) -I. -MM $^ | sed -e 's/\.o:/$${OBJ}:/' >> Makefile
 
-# Create a ZIP file with all the sources.
-#
-daisy-src.zip:	$(TEXT)
-	rm -f daisy-src.zip
-	zip daisy-src.zip $(TEXT) daisy.ide
-
-# Move it to ftp.
-#
-
 version.C:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	echo "// version.C -- automatically generated file" > version.C
 	echo " " >> version.C
 	echo "extern const char *const version = \"$(TAG)\";" >> version.C
 	echo "extern const char *const version_date = __DATE__;" >> version.C
-
-# Update the repository.
-#
-checkin: $(TEXT)
-	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	rm -f version.C
-	$(MAKE) version.C
-	cp ChangeLog ChangeLog.old
-	echo `date "+%Y-%m-%d "` \
-	     " Per Abrahamsen  <pa@plen.ku.dk>" > ChangeLog
-	echo >> ChangeLog
-	echo "	* Version" $(TAG) released. >> ChangeLog
-	echo >> ChangeLog
-	cat ChangeLog.old >> ChangeLog
-	(cd OpenMI; $(MAKE) checkin);
-	(cd lib; $(MAKE) checkin);
-	(cd sample; $(MAKE) checkin);
-	(cd txt; $(MAKE) checkin);
-	-git add $(TEXT)
-	rm -f $(REMOVE) 
-	-git rm $(REMOVE) 
-	git commit -a -m "Version $(TAG)"
-	git tag -a release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
-	git push origin --tags
 
 .IGNORE: add
 
@@ -710,40 +624,24 @@ commit:
 done:	update add commit
 
 
-setup:	checkin
-	$(MAKE) setupnoci
-	$(MAKE) upload
+docs: 
+	(cd txt && $(MAKE) PATH="$(SETUPDIR)/bin:$(PATH)" \
+		           DAISYEXE=$(SRCDIR)/$(OBJHOME)/$(DAISYEXE) \
+			   SETUPDIR=$(SETUPDIR) \
+			   DAISYPATH=".;$(SRCDIR)/lib;$(SRCDIR)/sample" docs)
 
 setupdocs: 
 	(cd txt && $(MAKE) PATH="$(SETUPDIR)/bin:$(PATH)" \
 		           DAISYEXE=$(SRCDIR)/$(OBJHOME)/$(DAISYEXE) \
 			   SETUPDIR=$(SETUPDIR) \
-			   DAISYPATH=".;$(SRCDIR)/lib;$(SRCDIR)/sample" setup)
+			   DAISYPATH=".;$(SRCDIR)/lib;$(SRCDIR)/sample" docs)
 
-setupnoci: 
-	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	$(MAKE) cross
-	rm -rf $(SETUPDIR)
-	mkdir $(SETUPDIR)
-	cp ChangeLog NEWS $(SETUPDIR)
-	mkdir $(SETUPDIR)/src
-	cp $(TEXT) $(SETUPDIR)/src
-	mkdir $(SETUPDIR)/bin
-	cp libdeps32/ShowDaisyOutput.exe $(SETUPDIR)/bin
-	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
-	$(STRIP) -o $(SETUPDIR)/bin/daisyw.exe $(OBJHOME)/daisyw.exe
-	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll $(OBJHOME)/daisy.dll
-	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
-	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
-	cp "$(MINGWHOME)/bin/mingwm10.dll" $(SETUPDIR)/bin
-	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
-	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
-	$(MAKE) setupdocs
-	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
-	(cd OpenMI && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
-	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
+# GUI setup
+#	$(STRIP) -o $(SETUPDIR)/bin/daisyw.exe $(OBJHOME)/daisyw.exe
+#	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
+#	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
 
-setupnogui: 
+setupcommon: 
 	rm -rf $(SETUPDIR)
 	mkdir $(SETUPDIR)
 	cp ChangeLog NEWS $(SETUPDIR)
@@ -754,30 +652,44 @@ setupnogui:
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll $(OBJHOME)/daisy.dll
 	(cd "$(MINGWBIN)"; cp $(MINGWDLL) $(SETUPDIR)/bin)
+	(cd txt && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
 	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
-	$(MAKE) setupdocs
 	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
 	(cd OpenMI && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	$(MAKENSIS) /V2 /DVERSION=$(TAG) $(NSISFILE)
 
-upload:
-	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	cp -p daisy-$(TAG)-setup.exe "/cygdrive/c/Users/xvs108/Google\ Drev/public/"
-
-setup-win64: 
+setup:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	rm -f version.C
 	$(MAKE) version.C
-	$(MAKE) make-win64-portable
-	make setupnogui MINGWHOME="$(MINGWHOME64)" MINGWDLL="$(MINGWDLL64)" OBJHOME=win64-portable
-
-setup-win32: 
-	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	rm -f version.C
-	$(MAKE) version.C
+	cp ChangeLog ChangeLog.old
+	echo `date "+%Y-%m-%d "` \
+	     " Per Abrahamsen  <pa@plen.ku.dk>" > ChangeLog
+	echo >> ChangeLog
+	echo "	* Version" $(TAG) released. >> ChangeLog
+	echo >> ChangeLog
+	cat ChangeLog.old >> ChangeLog
 	$(MAKE) make-win32-portable
-	make setupnogui MINGWHOME="$(MINGWHOME32)" MINGWDLL="$(MINGWDLL32)" OBJHOME=win32-portable NSISFILE=setup-w32.nsi
+	$(MAKE) make-win64-portable
+	$(MAKE) docs OBJHOME=win64-portable
+	make setupcommon MINGWHOME="$(MINGWHOME32)" MINGWDLL="$(MINGWDLL32)" OBJHOME=win32-portable NSISFILE=setup-w32.nsi
+	make setupcommon MINGWHOME="$(MINGWHOME64)" MINGWDLL="$(MINGWDLL64)" OBJHOME=win64-portable NSISFILE=setup-w64.nsi
+
+
+part2:
+	cp -p daisy-$(TAG)-setup-w32.exe daisy-$(TAG)-setup-w64.exe $(DISTDIR)
+	(cd txt && $(MAKE) dist DISTDIR="$(DISTDIR)" TAG=$(TAG))
+	(cd OpenMI && $(MAKE) checkin);
+	(cd lib && $(MAKE) checkin);
+	(cd sample && $(MAKE) checkin);
+	(cd txt && $(MAKE) checkin);
+	-git add $(TEXT)
+	rm -f $(REMOVE) 
+	-git rm $(REMOVE) 
+	git commit -a -m "Version $(TAG)"
+	git tag -a release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
+	git push origin --tags
 
 debiannoci: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi

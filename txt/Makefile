@@ -74,20 +74,25 @@ tutorial.pdf:	reference.pdf tutorial.tex stdlog.tex $(LIBS)
 	bibtex tutorial
 	pdflatex tutorial.tex < /dev/null
 
-dist: reference.pdf reference.ps tutorial.pdf exercises.pdf
-	cp -f reference.pdf $(FTPDIR)/daisy-ref.pdf
-	cp -f reference.ps $(FTPDIR)/daisy-ref.ps
-	cp -f tutorial.pdf $(FTPDIR)/daisy-tut.pdf
-	cp -f exercises.pdf $(FTPDIR)/
+dist:
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	cp -f reference.pdf $(DISTDIR)/daisy-ref-$(TAG).pdf
+	cp -f reference.ps $(DISTDIR)/daisy-ref-$(TAG).ps
+	cp -f tutorial.pdf $(DISTDIR)/daisy-tut-$(TAG).pdf
+	cp -f exercises.pdf $(DISTDIR)/exercises-$(TAG).pdf
 
-setup: reference.pdf reference.ps tutorial.pdf exercises.pdf
-	-mkdir $(SETUPDIR)/doc
+docs: reference.pdf reference.ps tutorial.pdf exercises.pdf
+
+setup:
+	mkdir $(SETUPDIR)/doc
 	cp -f reference.pdf $(SETUPDIR)/doc
 	cp -f reference.ps $(SETUPDIR)/doc
 	cp -f tutorial.pdf $(SETUPDIR)/doc
 	cp -f exercises.pdf $(SETUPDIR)/doc
 	mkdir $(SETUPDIR)/src/txt
 	cp $(TEXT) $(SETUPDIR)/src/txt
+
+
 
 checkin: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi

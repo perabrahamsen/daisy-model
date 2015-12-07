@@ -2,9 +2,9 @@
 
 SetCompressor /FINAL lzma
 Name "Daisy ${VERSION}"
-OutFile "daisy-${VERSION}-setup.exe"
+OutFile "daisy-${VERSION}-setup-w64.exe"
 InstallDir "$PROGRAMFILES64\Daisy ${VERSION}"
-InstallDirRegKey HKCU "Software\Daisy ${VERSION}" "Install Directory"
+InstallDirRegKey HKCU "Software\Daisy ${VERSION} (w64)" "Install Directory"
 
 !define MUI_ABORTWARNING
 
@@ -19,7 +19,7 @@ InstallDirRegKey HKCU "Software\Daisy ${VERSION}" "Install Directory"
 Section "Main Install"
   SetOutPath $INSTDIR
   File /r "install\*.*"
-  WriteRegStr HKCU "Software\Daisy ${VERSION}" "Install Directory" $INSTDIR
+  WriteRegStr HKCU "Software\Daisy ${VERSION} (w64)" "Install Directory" $INSTDIR
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   CreateDirectory "$SMPROGRAMS\Daisy ${VERSION}"
   CreateShortCut "$SMPROGRAMS\Daisy ${VERSION}\ShowDaisyOutput.lnk" "$INSTDIR\bin\ShowDaisyOutput.exe"
@@ -31,8 +31,8 @@ SectionEnd
 Section "Uninstall"
   Delete "$INSTDIR\Uninstall.exe"
   RMDir /r "$INSTDIR"
-  DeleteRegValue HKCU "Software\Daisy ${VERSION}" "Install Directory"
-  DeleteRegKey /ifempty HKCU "Software\Daisy ${VERSION}"
+  DeleteRegValue HKCU "Software\Daisy ${VERSION} (w64)" "Install Directory"
+  DeleteRegKey /ifempty HKCU "Software\Daisy ${VERSION} (w64)"
   Delete "$SMPROGRAMS\Daisy ${VERSION}\Daisy.lnk"
   Delete "$SMPROGRAMS\Daisy ${VERSION}\Home Page.lnk"
   Delete "$SMPROGRAMS\Daisy ${VERSION}\Explore.lnk"

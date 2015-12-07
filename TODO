@@ -2,6 +2,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * "make setup" skal automatisk lave både 32 og 64 bit version for Windows.
 
+Bør også "uploade" dem automatisk (kopier til Google Drive).
 
 * Main tasks
 
