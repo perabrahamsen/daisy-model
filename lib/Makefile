@@ -41,6 +41,5 @@ setup:
 checkin: $(DAISY) $(TEXT)
 	-git add $(DAISY) $(TEXT)
 	-rm -f $(REMOVE) 
-
-#	-git rm $(REMOVE) 
+	-git rm $(REMOVE) 
 

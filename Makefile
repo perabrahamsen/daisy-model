@@ -685,12 +685,12 @@ part2:
 	(cd sample && $(MAKE) checkin);
 	(cd txt && $(MAKE) checkin);
 	-git add $(TEXT)
-	rm -f $(REMOVE) 
+	-rm -f $(REMOVE) 
+	-git rm $(REMOVE) 
 	git commit -a -m "Version $(TAG)"
 	git tag -a release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
 	git push origin --tags
 
-#	-git rm $(REMOVE) 
 
 debiannoci: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
