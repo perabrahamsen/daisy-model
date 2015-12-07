@@ -37,7 +37,7 @@ checkin: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	git pull
 	-git add $(TEXT)
-	rm -f $(REMOVE) 
+	-rm -f $(REMOVE) 
 	-git rm $(REMOVE) 
 	git commit -a -m "$(TAG)" # "Version $(TAG)"
 	git push origin
@@ -45,7 +45,7 @@ checkin: $(TEXT)
 commit: $(TEXT)
 	git pull
 	-git add $(TEXT)
-	rm -f $(REMOVE) 
+	-rm -f $(REMOVE) 
 	-git rm $(REMOVE) 
 	git commit -a -m "$(TAG)" # "Version $(TAG)"
 

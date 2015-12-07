@@ -48,7 +48,7 @@ setup:
 checkin: $(DAISY) $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	-git add $(DAISY) $(TEXT)
-	rm -f $(REMOVE) 
+	-rm -f $(REMOVE) 
 	-git rm $(REMOVE) 
 	git commit -a -m "$(TAG)" # "Version $(TAG)"
 
