@@ -36,7 +36,8 @@ setup: install
 checkin: $(TEXT)
 	-git add $(TEXT)
 	-rm -f $(REMOVE) 
-	-git rm $(REMOVE) 
+
+#	-git rm $(REMOVE) 
 
 daisy_dotnet.dll: $(DOTNETSRC)
 	$(CSHARP) /target:library /out:$@ $<
