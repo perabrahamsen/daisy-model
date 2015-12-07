@@ -32,13 +32,6 @@ daisy-lib.zip:	$(DAISY) $(TEXT)
 
 # Move it to ftp.
 #
-dist:
-	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	$(MAKE) daisy-lib.zip
-	mv -f daisy-lib.zip $(FTPDIR)/daisy-lib/daisy-lib-$(TAG).zip
-	rm -f $(FTPDIR)/daisy-lib.zip
-	(cd $(FTPDIR); ln -s daisy-lib/daisy-lib-$(TAG).zip daisy-lib.zip)
-
 setup:
 	mkdir $(SETUPDIR)/lib
 	cp $(DAISY) $(TEXT) $(SETUPDIR)/lib
@@ -46,9 +39,7 @@ setup:
 # Update the SVN repository.
 #
 checkin: $(DAISY) $(TEXT)
-	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	-git add $(DAISY) $(TEXT)
 	-rm -f $(REMOVE) 
 	-git rm $(REMOVE) 
-	git commit -a -m "$(TAG)" # "Version $(TAG)"
 

@@ -34,20 +34,9 @@ setup: install
 .IGNORE: checkin
 
 checkin: $(TEXT)
-	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	git pull
 	-git add $(TEXT)
 	-rm -f $(REMOVE) 
 	-git rm $(REMOVE) 
-	git commit -a -m "$(TAG)" # "Version $(TAG)"
-	git push origin
-
-commit: $(TEXT)
-	git pull
-	-git add $(TEXT)
-	-rm -f $(REMOVE) 
-	-git rm $(REMOVE) 
-	git commit -a -m "$(TAG)" # "Version $(TAG)"
 
 daisy_dotnet.dll: $(DOTNETSRC)
 	$(CSHARP) /target:library /out:$@ $<
