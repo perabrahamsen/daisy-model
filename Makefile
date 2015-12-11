@@ -675,9 +675,6 @@ setup:
 	$(MAKE) docs OBJHOME=win64-portable
 	make setupcommon MINGWHOME="$(MINGWHOME32)" MINGWDLL="$(MINGWDLL32)" OBJHOME=win32-portable NSISFILE=setup-w32.nsi
 	make setupcommon MINGWHOME="$(MINGWHOME64)" MINGWDLL="$(MINGWDLL64)" OBJHOME=win64-portable NSISFILE=setup-w64.nsi
-
-
-part2:
 	cp -p daisy-$(TAG)-setup-w32.exe daisy-$(TAG)-setup-w64.exe $(DISTDIR)
 	(cd txt && $(MAKE) dist DISTDIR="$(DISTDIR)" TAG=$(TAG))
 	(cd OpenMI && $(MAKE) checkin);

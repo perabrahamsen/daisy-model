@@ -31,9 +31,15 @@
   (declare cropfid string
            "File component name indicating crop logged.")
   (cropfid (cond ((string-equal "${crop}" "*")
-                  "crops")
+                  "crop")
                  (true
-                  "${crop}"))))
+                  "${crop}")))
+  (declare cropfid2 string "\
+File component name indicating crop logged. Empty if not specified.")
+  (cropfid2 (cond ((string-equal "${crop}" "*")
+		   "")
+		  (true
+		   "${crop}_"))))
 
 (deflog chemical column 
   "A log table for a specific chemical."
