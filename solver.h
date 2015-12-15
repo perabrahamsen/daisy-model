@@ -25,7 +25,8 @@
 #include "symbol.h"
 
 #include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/vector_of_vector.hpp>
+// #include <boost/numeric/ublas/vector_of_vector.hpp>
+#include "fixed_vector_of_vector.hpp"
 
 #ifdef USE_DENSE_MATRIX
 #include <boost/numeric/ublas/matrix.hpp>

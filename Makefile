@@ -102,7 +102,7 @@ endif
 STRIP = strip
 
 ifeq ($(HOSTTYPE),unix)
-	OSFLAGS = 
+	OSFLAGS = -D__unix
 	DEBUG = -g
 endif
 ifeq ($(HOSTTYPE),mingw)
@@ -114,14 +114,24 @@ endif
 TARGET =
 
 # Warnings up to GCC 4.4
-WARNING = -Wall -Wextra -Wlogical-op -Wstrict-null-sentinel -Wvariadic-macros \
+# WARNING = -Wall -Wextra -Wlogical-op -Wstrict-null-sentinel -Wvariadic-macros \
+# 	   -Wvla \
+# 	  -Wmissing-declarations -Wfloat-equal -Wcast-qual \
+# 	  -Woverloaded-virtual -Wundef -Wpointer-arith -Wwrite-strings \
+# 	  -Wcast-align -Wmissing-format-attribute \
+# 	  -Wold-style-cast -Wformat=2 -Winit-self \
+# 	  -Wsign-promo -Wredundant-decls \
+# 	  -Wno-unused-parameter -Wno-sign-compare 
+
+# clang warnings
+WARNING = -Wall -Wextra -Wvariadic-macros \
 	   -Wvla \
 	  -Wmissing-declarations -Wfloat-equal -Wcast-qual \
 	  -Woverloaded-virtual -Wundef -Wpointer-arith -Wwrite-strings \
 	  -Wcast-align -Wmissing-format-attribute \
 	  -Wold-style-cast -Wformat=2 -Winit-self \
 	  -Wsign-promo -Wredundant-decls \
-	  -Wno-unused-parameter -Wno-sign-compare 
+	  -Wno-unused-parameter -Wno-sign-compare -Wno-mismatched-tags 
 
 
 # I use these a lot:
