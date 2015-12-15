@@ -1006,7 +1006,7 @@ sum of all chemicals will be logged."
                    (dimension "dg C"))           ))
 
 (deflog "Crop Photosynthesis" crop
-  (where "${colfid}crop_phot.dlf")
+  (where "${colfid}$[cropfid}_phot.dlf")
   (when hourly)
   (entries (number (path column "${column}" Vegetation crops crops "${crop}"
                          Prod NetPhotosynthesis)
@@ -1041,7 +1041,7 @@ sum of all chemicals will be logged."
            ))
 
 (deflog "Crop Production" crop
-  (where "${colfid}crop_prod.dlf")
+  (where "${colfid}$[cropfid}_prod.dlf")
   (when (hour 12))                      ;When the stress is highest.
   (entries (number (path column "${column}" Vegetation crops crops "${crop}"
                          Devel "*" DS)
@@ -1183,7 +1183,7 @@ sum of all chemicals will be logged."
            ))
 
 (deflog "Forced LAI" crop
-  (where "${colfid}forced_lai.dlf")
+  (where "${colfid}${cropfid2}forced_lai.dlf")
   (when (hour 12))                      ;When the stress is highest.
   (entries (number (path column "${column}" Vegetation crops crops "${crop}"
                          Devel "*" DS)
@@ -1213,7 +1213,7 @@ sum of all chemicals will be logged."
                    (factor 0.01))))
 
 (deflog "Simple Crop Production" crop
-  (where "${colfid}simple_crop_prod.dlf")
+  (where "${colfid}simple_${cropfid}_prod.dlf")
   (when (hour 12))
   (entries (number (path column "${column}"
 			 Vegetation crops crops "${crop}" T_sum)
@@ -1339,7 +1339,7 @@ sum of all chemicals will be logged."
                    (factor 10.0))))
 
 (deflog "Root Density" crop
-  (where "${colfid}rootdens.dlf")
+  (where "${colfid}${cropfid2}rootdens.dlf")
   (when daily)
   (entries (array (path column "${column}" Vegetation crops crops "${crop}" 
                         Root Density)
@@ -1347,7 +1347,7 @@ sum of all chemicals will be logged."
                   (dimension "cm/cm^3"))))
 
 (deflog "Root form parameter" crop
-  (where "${colfid}rootform.dlf")
+  (where "${colfid}${cropfid2}rootform.dlf")
   (when daily)
   (entries (number (path column "${column}" Vegetation crops crops "${crop}" 
                          Prod WRoot)
@@ -2606,7 +2606,7 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
   (precision 0))
 
 (deflog "Carbon Balance" crop
-  (where "${colfid}C_Bal.dlf")
+  (where "${colfid}${cropfid2}C_Bal.dlf")
   (when hourly)
   (summary "Total Carbon Balance" "Crop Carbon Balance" 
            "Litter Carbon Balance" "Soil Carbon Balance" "C Input")
@@ -3083,7 +3083,7 @@ parameter in the 'default' bioclimate model.  By default, 30."))
 
 (deflog Stomatacon LeafPhot
   "Stomata conductivity related state."
-  (where "sc-${fraction}-${layer}.dlf")
+  (where "${cropfid2}sc-${fraction}-${layer}.dlf")
   (when hourly)
   (entries (index (path column "${column}" Vegetation crops crops "${crop}"
                         "${fraction}" "*" LAI_vector)

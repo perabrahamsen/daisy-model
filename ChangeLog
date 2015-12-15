@@ -1,3 +1,11 @@
+2015-12-08  Per Abrahamsen  <per.abrahamsen@gmal.com>
+
+	* lib/log-std.dai (crop): Define 'cropfid2'.
+	* lib/log.dai ("Crop Photosynthesis", "Crop Production")
+	("Forced LAI", "Simple Crop Production", "Root Density")
+	("Carbon Balance", "Root form parameter", Stomatacon): Add crop
+	name to file name if specified.
+
 2015-12-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.21 released.
