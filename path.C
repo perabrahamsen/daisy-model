@@ -119,7 +119,7 @@ Path::get_daisy_home ()
 	    }
 #else // !MS WINDOWS
 	  Assertion::debug ("Using standard Unix home.");
-	  daisy_home =  "/opt/daisy";
+	  daisy_home =  "/usr/local/daisy";
 #endif // !MS WINDOWS
 	}
     }

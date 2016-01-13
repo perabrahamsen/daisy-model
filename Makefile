@@ -157,7 +157,8 @@ csdaisy.exe:	csmain.cs csdaisy.netmodule
 CC = $(COMPILE) $(OPTIMIZE) $(PROFILE) $(TARGET)
 
 # Locate the CSSparse lib -L../libdeps
-CXSPARSELIB = libcxsparse.a
+CXSPARSELIB = -lcxsparse
+#CXSPARSELIB = libcxsparse.a
 #CXSPARSELIB = /usr/lib/libcxsparse.so.2.2.3
 
 CXSPARSEHEAD = ublas_cxsparse.h cs.h SuiteSparse_config.h
@@ -723,10 +724,34 @@ debiannoci:
 	cat control-shared.txt >> debian/DEBIAN/control
 	dpkg -b debian daisy_$(TAG)_amd64.deb
 
+OSXDEST=osx-pkg/usr/local/daisy
+
+macos:
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	$(MAKE) linux
+	rm -rf $(OSXDEST)
+	mkdir -p $(OSXDEST)
+	mkdir $(OSXDEST)/bin $(OSXDEST)/doc $(OSXDEST)/src
+	cp ChangeLog NEWS $(OSXDEST)/doc
+	cp $(TEXT) $(OSXDEST)/src
+	(cd lib && $(MAKE) SETUPDIR=../$(OSXDEST) TAG=$(TAG) setup)
+	(cd sample && $(MAKE) SETUPDIR=../$(OSXDEST) TAG=$(TAG) setup)
+#	$(MAKE) setupdocs
+#	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
+	$(STRIP) -o $(OSXDEST)/bin/daisy $(OBJHOME)/daisy
+	rm -rf pkg1
+	mkdir pkg1
+	pkgbuild --root osx-pkg --identifier org.daisy-model.daisy \
+		 --version $(TAG) --ownership recommended pkg1/output.pkg
+	productbuild --distribution resources/distribution.xml \
+		     --resources resources --package-path pkg1 \
+		     --version $(TAG) daisy-$(TAG)-setup-osx.pkg
+
+
 
 # How to compile a C++ file.
 #
-.C${OBJ}:
+ .C${OBJ}:
 	$(CC) $(NOLINK) $<
 
 # How to compile a C file.
