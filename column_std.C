@@ -762,7 +762,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
   // Her sættes Theta_old til Theta
   soil_water->tick_ice (geometry, *soil, dt, msg); 
   movement->tick (*soil, *soil_water, *soil_heat,
-                  surface, *groundwater, time, my_weather, 
+                  surface, *groundwater, time, scope, my_weather, 
                   dt, msg);
   soil_water->tick_after (geometry, *soil, *soil_heat, false, msg);
   soil_water->mass_balance (geometry, dt, msg);
@@ -1094,7 +1094,7 @@ ColumnStandard::initialize (const Metalib& metalib,
 
   // Movement depends on soil, soil_water, and groundwater
   if (!movement->initialize (units, *soil, *soil_water, *groundwater,
-                             scope, msg))
+                             time, scope, msg))
     return false;
 
   surface.initialize (geometry);

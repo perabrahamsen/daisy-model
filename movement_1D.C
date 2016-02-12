@@ -44,8 +44,6 @@
 #include "block_model.h"
 #include <sstream>
 
-static const double rho_water = 1.0; // [g/cm^3]
-
 struct Movement1D : public MovementSolute
 {
   // Geometry.
@@ -107,12 +105,13 @@ struct Movement1D : public MovementSolute
   // Simulation.
   void tick (const Soil& soil, SoilWater& soil_water, const SoilHeat& soil_heat,
              Surface& surface, Groundwater& groundwater,
-             const Time& time, const Weather& weather, double dt, 
+             const Time& time, const Scope&, const Weather& weather, double dt, 
              Treelog& msg);
   void output (Log&) const;
 
   // Create.
-  void initialize_derived (const Soil& soil, const Groundwater& groundwater,
+  void initialize_derived (const Time&, const Scope&,
+			   const Soil& soil, const Groundwater& groundwater,
                            bool has_macropores, 
                            Treelog&);
   Movement1D (const BlockModel& al);
@@ -374,7 +373,7 @@ void
 Movement1D::tick (const Soil& soil, SoilWater& soil_water, 
                   const SoilHeat& soil_heat,
                   Surface& surface, Groundwater& groundwater,
-                  const Time& time, const Weather& weather, 
+                  const Time& time, const Scope&, const Weather& weather, 
                   const double dt, Treelog& msg) 
 {
   const size_t edge_size = geo->edge_size ();
@@ -424,7 +423,7 @@ Movement1D::output (Log& log) const
 }
 
 void 
-Movement1D::initialize_derived (const Soil& soil,
+Movement1D::initialize_derived (const Time&, const Scope&, const Soil& soil,
                                 const Groundwater& groundwater,
                                 bool has_macropores, Treelog& msg)
 {

@@ -1,24 +1,33 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Mac
+* Debian version?
 
-** Google hvordan bundles distribueres.
+* "Myndighed?" grødeskæring
 
-** Ret Daisy bundle til
+** Opsætning
 
-** Upload daisy setup
+*** Læs vivede.ddf
 
-** Upload zip fil
+**** Test om den drain_h > 0 means drain_cell_on = true virker
 
-** Skriv vejledning
+**** Test om det virker uden drain_h
 
-*** Installer Daisy
+*** Kør igen
 
-*** Installer TextMate
+*** Lav logfil, snak med Kasper
 
-*** Installer Daisy bundle
+*** Prøv at køre med ændret OFFSET
 
-* N�ste projekt
+*** Sammenlign resultat
+
+* FAO_PM
+
+** Lav testopsætning med vinterhvede og valg mellem time og dagsværdier
+
+** Beregne begge med makking og med FAO_PM
+
+
+* "Promillefondprojekt" forklar lavere N indhold i kerner.
 
 * Vejledning 
 
@@ -38,6 +47,10 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** J_p
 
+* Litteratur
+
+** Groenendijk P, Heinen M, Klammler G, Fank J, Kupfersberger H, Pisinaras V, Gemitzi A, Peña-Haro S, García-Prats A, Pulido-Velazquez M, Perego A, Acutis M, Trevisan M (2014) Performance assessment of nitrate leaching models for highly vulnerable soils used in low-input farming based on lysimeter data. Sci Total Environ 499:463–480, Elsevier. doi: 10.​1016/​j.​scitotenv.​2014.​07.​002
+
 * Artikler
 
 ** Rodartikel ES&M
@@ -46,11 +59,11 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Ny version af Hypres ark
 
-* Ny version af Charlottes afdr�ningstest.
+* Ny version af Charlottes afdræningstest.
 
-* Tidlig v�kst
+* Tidlig vækst
 
-Erstat DSLAI05 med Seed baseret tidlig v�kst. S�ren havde en formel,
+Erstat DSLAI05 med Seed baseret tidlig vækst. Søren havde en formel,
 men vi skal have en test setup.
 
 * Regression test
@@ -63,12 +76,12 @@ Forbered kursus
 
 ** FAO_PM
 
-Signe fik alt for h�je RefEvap-Used og lave udbytter med FAO_PM.
+Signe fik alt for høje RefEvap-Used og lave udbytter med FAO_PM.
 
-** Problem med massebalance for carbon i afgr�der ved h�st.
+** Problem med massebalance for carbon i afgrøder ved høst.
 
 ** En simpel log til at erstatte/supplere Crop Production
 
-** DMI's nye "nedb�rskorrigering"
+** DMI's nye "nedbørskorrigering"
 
-** Ny ligning for biopore til matrix flow fra S�ren
+** Ny ligning for biopore til matrix flow fra Søren

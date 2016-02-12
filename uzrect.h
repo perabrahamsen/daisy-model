@@ -46,7 +46,8 @@ public:
 public:
   virtual bool obey_surface ();
   virtual void tick (const GeometryRect&, 
-                     const std::vector<size_t>& drain_cell, 
+                     const std::vector<size_t>& drain_cell,
+		     const double drain_water_level, // [cm]
 		     const Soil&, SoilWater&, 
                      const SoilHeat&, const Surface&, const Groundwater&, 
                      double dt, Treelog&) = 0;

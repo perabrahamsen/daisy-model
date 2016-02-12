@@ -38,6 +38,7 @@ struct UZRectConst : public UZRect
   bool obey_surface ()
   { return false; }
   void tick (const GeometryRect&, const std::vector<size_t>& drain_cell,
+	     const double drain_water_level,
 	     const Soil&, SoilWater&, const SoilHeat&, 
              const Surface&, const Groundwater&,
              double dt, Treelog&);
@@ -56,6 +57,7 @@ struct UZRectConst : public UZRect
 
 void 
 UZRectConst::tick (const GeometryRect& geo, const std::vector<size_t>&,
+		   const double,
                    const Soil&, 
                    SoilWater& soil_water, const SoilHeat&,
                    const Surface&, const Groundwater&, 

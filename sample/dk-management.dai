@@ -4,9 +4,9 @@
 ;; with common Danish practice
 
 ;; Including external library-files
-(input file "tillage.dai")
-(input file "crop.dai")
-(input file "fertilizer.dai")
+;;(input file "tillage.dai")
+;;(input file "crop.dai")
+;;(input file "fertilizer.dai")
 ;------------------------------------------------------------------------------
 ;; This section contains information on growing Spring Barley using 
 ;; mineral fertiliser (in the present case a fertilizer called N25S, 

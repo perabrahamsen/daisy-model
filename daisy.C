@@ -212,15 +212,10 @@ struct Daisy::Implementation
         msg.error ("Extern scope not found");
         ok = false;
       }
-#if 0
-    if (!approximate (max_dt, 1.0))
-      {
-        std::ostringstream tmp;
-        tmp << "Daisy is designed for a timestep of 1h, you specified " 
-            << timestep.print ();
-        msg.warning (tmp.str ());
-      }
-#endif
+    if (stop != Time::null () && stop <= time)
+      msg.warning ("Simulation set to stop at " + stop.print ()
+		   + " before it starts at " + time.print ());
+
     // Check actions.
     {
       Treelog::Open nest (msg, "manager");

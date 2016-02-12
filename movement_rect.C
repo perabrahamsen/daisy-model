@@ -43,6 +43,7 @@
 #include "mathlib.h"
 #include "block_model.h"
 #include "point.h"
+#include "depth.h"
 
 struct MovementRect : public MovementSolute
 {
@@ -58,6 +59,7 @@ struct MovementRect : public MovementSolute
   // Drains
   const auto_vector<const ZXPoint*> drain_position;
   std::vector<size_t> drain_cell;
+  std::auto_ptr<Depth> pipe_outlet; // Water level at pipe outlet. [cm]
 
   // Water.
   const auto_vector<UZRect*> matrix_water;
@@ -86,12 +88,13 @@ struct MovementRect : public MovementSolute
 
   // Simulation.
   void tick (const Soil& soil, SoilWater& soil_water, const SoilHeat& soil_heat,
-             Surface& surface, Groundwater& groundwater, const Time&,
+             Surface& surface, Groundwater&, const Time&, const Scope&, 
              const Weather&, double dt, Treelog& msg);
   void output (Log& log) const;
 
   // Create.
-  void initialize_derived (const Soil&, const Groundwater&, 
+  void initialize_derived (const Time&, const Scope&,
+			   const Soil&, const Groundwater&, 
                            bool has_macropores, Treelog&);
   MovementRect (const BlockModel& al);
   ~MovementRect ();
@@ -219,10 +222,13 @@ void
 MovementRect::tick (const Soil& soil, SoilWater& soil_water, 
                     const SoilHeat& soil_heat,
                     Surface& surface, Groundwater& groundwater, 
-                    const Time& time,
+                    const Time& time, const Scope& scope, 
                     const Weather& weather, 
                     const double dt, Treelog& msg) 
 {
+  pipe_outlet->tick (time, scope, msg);
+  const double dwl = pipe_outlet->operator ()();
+  
   const size_t edge_size = geo->edge_size ();
 
   for (size_t i = 0; i < matrix_water.size (); i++)
@@ -231,7 +237,8 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
       Treelog::Open nest (msg, matrix_water[i]->objid);
       try
         {
-          matrix_water[i]->tick (*geo, drain_cell, soil, soil_water, soil_heat,
+          matrix_water[i]->tick (*geo, drain_cell, dwl,
+				 soil, soil_water, soil_heat,
                                  surface, groundwater, dt, msg);
 	  const bool obey_surface = matrix_water[i]->obey_surface ();
 
@@ -276,9 +283,12 @@ MovementRect::output (Log& log) const
 }
 
 void 
-MovementRect::initialize_derived (const Soil&, const Groundwater&, 
-                                  const bool has_macropores, Treelog&)
+MovementRect::initialize_derived (const Time& time, const Scope& scope,
+				  const Soil&, const Groundwater&, 
+                                  const bool has_macropores, Treelog& msg)
 {
+  pipe_outlet->initialize (time, scope, msg);
+
   for (size_t i = 0; i < matrix_water.size (); i++)
     matrix_water[i]->initialize (geometry (), has_macropores);
 }
@@ -288,6 +298,7 @@ MovementRect::MovementRect (const BlockModel& al)
     geo (submodel<GeometryRect> (al, "Geometry")),
     drain_position (map_submodel_const<ZXPoint> 
                     (al, "drainpoints")),
+    pipe_outlet (Librarian::build_item<Depth> (al, "pipe_outlet")),
     matrix_water (Librarian::build_vector<UZRect> (al, "matrix_water")),
     heatrect (Librarian::build_item<Heatrect> (al, "heat"))
 { 
@@ -329,6 +340,14 @@ static struct MovementRectSyntax : DeclareModel
 				   "Location of cells with drain pipes.",
 				   ZXPoint::load_syntax);
     frame.set_empty ("drainpoints");
+    frame.declare_object ("pipe_outlet", Depth::component,
+                          Attribute::Const, Attribute::Singleton, "\
+Water table in drain pipe outlet.\n\
+\n\
+By default this will be considered deep enough to ensure free\n\
+flow of water out of drains. If higher than the drain pipes,\n\
+water may flow either way depending on the pressure in the soil.");
+    frame.set ("pipe_outlet", "deep");
     frame.declare_object ("matrix_water", UZRect::component, 
                           Attribute::State, Attribute::Variable,
                        "Matrix water transport models.\n\

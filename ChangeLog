@@ -1,3 +1,8 @@
+2016-01-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* uzrect_Mollerup.C (drain): Support 'pipe_outlet'.
+	(tick): Update caller.
+
 2015-12-08  Per Abrahamsen  <per.abrahamsen@gmal.com>
 
 	* lib/log-std.dai (crop): Define 'cropfid2'.

@@ -85,7 +85,7 @@ public:
                     Treelog&);
   double suggest_dt (double weather_dt, double max_pond) const;
   virtual void tick (const Soil&, SoilWater&, const SoilHeat&, Surface&,
-                     Groundwater&, const Time&, const Weather&, 
+                     Groundwater&, const Time&, const Scope&, const Weather&, 
                      double dt, Treelog&) = 0;
   virtual void solute (const Soil&, const SoilWater&, 
                        const double J_above, Chemical&,
@@ -122,13 +122,14 @@ public:
   // Create and Destroy.
 private:
   virtual bool check_derived (Treelog& err) const = 0;
-  virtual void initialize_derived (const Soil&, const Groundwater&, 
+  virtual void initialize_derived (const Time&, const Scope&,
+				   const Soil&, const Groundwater&, 
                                    bool has_macropores, Treelog& msg) = 0;
 public:
   bool check (Treelog& err) const;
   bool initialize (const Units&,
                    const Soil&, SoilWater&, 
-                   const Groundwater&, const Scope& scope,
+                   const Groundwater&, const Time&, const Scope& scope,
                    Treelog& msg);
   static Movement* build_vertical (const BlockModel& al);
 protected:

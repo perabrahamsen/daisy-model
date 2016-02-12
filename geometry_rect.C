@@ -117,11 +117,9 @@ GeometryRect::add_soil (std::vector<double>& v,
       daisy_assert (cover <= 1.0);
       col_factor[col] = cover;
 
+      col_last = col;
       if (cell_right >= right)  // Done?
-        {
-          col_last = col;
-          break;
-        }
+	break;
     }
   // Find rows.
   const size_t rows = cell_rows ();
@@ -141,6 +139,7 @@ GeometryRect::add_soil (std::vector<double>& v,
 
           row_first = row;
         }
+
       const double cover_bottom = std::max (bottom, cell_bottom);
       const double cover_top = std::min (top, cell_top);
       const double cover = (cover_top - cover_bottom) 
@@ -149,16 +148,15 @@ GeometryRect::add_soil (std::vector<double>& v,
       daisy_assert (cover <= 1.0);
       row_factor[row] = cover;
 
-      if (cell_top <= bottom)  // Done?
-        {
-          row_last = row;
-          break;
-        }
+      row_last = row;
+      if (cell_bottom <= bottom)  // Done?
+	break;
     }
- 
- // Add it.
+
+  // Add it.
   const double volume = (bottom - top) * (right - left) * (front () - back ());
   const double fill = amount / volume;
+
   for (size_t row = row_first; row <= row_last; row++)
     {
       const double row_add = fill * row_factor[row];

@@ -891,7 +891,7 @@ void
 LexerTable::load_syntax (Frame& frame)
 {
   frame.declare_string ("file", Attribute::Const, "\
-Name of Daisy log file where data is found.");
+Name of Daisy file where data is found.");
   frame.declare_string ("missing", Attribute::Const, Attribute::Variable, "\
 List of strings indicating missing values.");
   std::vector<symbol> misses;

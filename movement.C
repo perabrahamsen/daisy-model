@@ -165,7 +165,7 @@ bool
 Movement::initialize (const Units& units,
                       const Soil& soil, SoilWater& soil_water, 
                       const Groundwater& groundwater,
-                      const Scope& scope, Treelog& msg)
+                      const Time& time, const Scope& scope, Treelog& msg)
 {
   bool ok = true;
   
@@ -174,7 +174,7 @@ Movement::initialize (const Units& units,
                              soil, soil_water, scope, groundwater, msg))
     ok = false;
   
-  initialize_derived (soil, groundwater, tertiary->has_macropores (), msg);
+  initialize_derived (time, scope, soil, groundwater, tertiary->has_macropores (), msg);
 
   return ok;
 }

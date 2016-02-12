@@ -36,6 +36,7 @@
 #include "mathlib.h"
 #include "path.h"
 #include "frame_submodel.h"
+#include "lexer_table.h"
 #include <string>
 #include <sstream>
 
@@ -60,6 +61,14 @@ Depth::Depth (const symbol n)
 
 Depth::~Depth ()
 { }
+
+static struct DepthInit : public DeclareComponent 
+{
+  DepthInit ()
+    : DeclareComponent (Depth::component, "\
+Depth below soil surface.")
+  { }
+} Depth_init;
 
 // const model.
 
@@ -105,6 +114,20 @@ static struct DepthConstSyntax : public DeclareModel
     frame.order ("value");
   }
 } DepthConst_syntax;
+
+// deep param.
+
+static struct DepthDeepSyntax : public DeclareParam
+{ 
+  DepthDeepSyntax ()
+    : DeclareParam (Depth::component, "deep", "const", "\
+Way down.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set ("value", -1000.0 * 100.0); // 1 km below ground.
+  }
+} DepthDeep_syntax;
 
 // extern model.
 
@@ -464,12 +487,166 @@ Linear interpolation is used between the datapoints.");
   }
 } DepthFile_syntax;
 
-static struct DepthInit : public DeclareComponent 
+// table model.
+
+struct DepthTable : public Depth
 {
-  DepthInit ()
-    : DeclareComponent (Depth::component, "\
-Find the depth of two numbers.")
+  const Units& units;
+  const double offset;		// [cm]
+  LexerTable lex;
+  int level_c;			// Column with level data.
+  symbol file_unit;		// Unit specified for level in file.
+  int entry_count;	        // Number of entries read. -1 uninitialized.
+  
+  // Interpolate.
+  Time prev_time;
+  double prev_value;
+  Time next_time;
+  double next_value;
+  double current_value;
+
+  void tick (const Time& time, const Scope&, Treelog& msg)
+  { 
+    read_line (time);
+
+    switch (entry_count)
+      {
+      case -2:
+	// End of file.
+	break;
+      case -1:
+	daisy_panic ("uninitialized");
+      case 0:
+	msg.error ("No depth data, using 0 cm");
+	current_value = 0.0;
+	entry_count = -2;
+	break;
+      case 1:
+	current_value = next_value;
+	break;
+      default:
+	// Interpolate.
+	daisy_assert (prev_time < next_time);
+	daisy_assert (prev_time <= time);
+	daisy_assert (time <= next_time);
+	const double fraction_time
+	  = Time::fraction_hours_between (prev_time, time)
+	  / Time::fraction_hours_between (prev_time, next_time);;
+	daisy_assert (fraction_time >= 0.0);
+	daisy_assert (fraction_time <= 1.0);
+	current_value = prev_value + (next_value - prev_value) * fraction_time;
+      }
+  }
+
+  double operator()() const
+  {
+    return current_value + offset;
+  }
+
+  void read_line (const Time& time)
+  {
+    std::vector<std::string> entries;
+
+    while (next_time < time)
+      {
+
+	prev_time = next_time;
+	prev_value = next_value;
+
+	if (!lex.good ())
+	  {
+	    if (entry_count > 0 )
+	      {
+		lex.error ("End of file, reusing last value");
+		entry_count = -2;
+		current_value = next_value;
+	      }
+	    return;
+	  }
+	entry_count++;
+	
+	lex.get_entries (entries);
+	lex.get_time (entries, next_time, 12);
+
+	if (entry_count > 1 && next_time <= prev_time)
+	  {
+	    std::ostringstream tmp;
+	    tmp << "Entries should be in chronological order, "
+		<< prev_time.print ()
+		<< " is not before " << next_time.print ();
+	    lex.error (tmp.str ());
+	  }
+
+	next_value = lex.convert_to_double (entries[level_c]);
+	if (units.can_convert (file_unit, Units::cm (), next_value))
+	  next_value = units.convert (file_unit, Units::cm (), next_value);
+	else
+	  {
+	    std::ostringstream tmp;
+	    tmp << "Can't convert " << next_value << "[" << file_unit
+		<< "] to [cm]";
+	    lex.error (tmp.str ());
+	  }
+      }
+  }
+    
+  void initialize (const Time& time, const Scope& scope, Treelog& msg)
+  { 
+    TREELOG_SUBMODEL (msg, "depth table");
+    daisy_assert (entry_count == -1);
+
+    if (!lex.read_header (msg))
+      return;
+
+    level_c = lex.find_tag ("Level");
+    if (level_c < 0)
+      {
+	lex.error ("'Level' not found");
+	return;
+      }
+    file_unit = lex.dimension (level_c);
+    if (!units.can_convert (file_unit, Units::cm (), msg))
+      return;
+    entry_count = 0;
+    tick (time, scope, msg);
+  }
+  virtual bool check (const Scope&, Treelog&) const
+  { return entry_count >= 0; }
+
+  DepthTable (const BlockModel& al)
+    : Depth (al),
+      units (al.units ()),
+      offset (al.number ("offset")),
+      lex (al),
+      level_c (-1),
+      file_unit (Units::cm ()),
+      entry_count (-1),
+      prev_time (9999,1,1,1),
+      prev_value (-42.42e42),
+      next_time (1,1,1,1),
+      next_value (42.42e42),
+      current_value (-100.0)
+      { }
+  ~DepthTable ()
   { }
-} Depth_init;
+};
+
+static struct DepthTableSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new DepthTable (al); }
+
+  DepthTableSyntax ()
+    : DeclareModel (Depth::component, "table", "\
+Linear interpolation of depth read from file.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    LexerTable::load_syntax (frame);
+    frame.declare ("offset", Units::cm (), Attribute::Const, "\
+Add this number to the Level read from the table.");
+    frame.set ("offset", 0.0);
+  }
+} DepthTable_syntax;
 
 // depth.C ends here.

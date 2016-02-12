@@ -313,9 +313,7 @@ DrainLateral::DrainLateral (const BlockModel& al)
     rad (al.number ("rad")),
     x (al.number ("x", L / 2.0)),
     pipe_position (al.number ("pipe_position")),
-    pipe_outlet (al.check ("pipe_outlet")
-                 ? Librarian::build_item<Depth> (al, "pipe_outlet")
-                 : Depth::create (pipe_position)),
+    pipe_outlet (Librarian::build_item<Depth> (al, "pipe_outlet")),
     K_to_pipes_ (al.number ("K_to_pipes", -1.0)),
     pipe_level (pipe_position),
     height (al.number ("height", pipe_position))
@@ -349,7 +347,7 @@ By default, this is 1/2 L.");
                    "Height pipes are placed in the soil (a negative number).");
     frame.set ("pipe_position", -110.0);
     frame.declare_object ("pipe_outlet", Depth::component,
-                          Attribute::OptionalConst, Attribute::Singleton, "\
+                          Attribute::Const, Attribute::Singleton, "\
 Water table in drain pipe outlet.\n\
 \n\
 By default this will be identical to `pipe_position', meaning free\n\
@@ -360,6 +358,7 @@ ability of the drain system to drain the soil.\n\
 \n\
 Currently, there is no posibility of water flowing from the pipe\n\
 outlet to soil.");
+    frame.set ("pipe_outlet", "deep");
     frame.declare ("K_to_pipes", "cm/h", Check::non_negative (), 
                    Attribute::OptionalConst,
                    "Horizontal conductivity in saturated soil.\n\

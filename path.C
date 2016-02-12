@@ -118,8 +118,13 @@ Path::get_daisy_home ()
 	      daisy_home = "C:/daisy";
 	    }
 #else // !MS WINDOWS
+#ifdef __APPLE__
+	  Assertion::debug ("OSX conventional home.");
+	  daisy_home =  "/Library/Daisy";
+#else
 	  Assertion::debug ("Using standard Unix home.");
 	  daisy_home =  "/usr/local/daisy";
+#endif
 #endif // !MS WINDOWS
 	}
     }

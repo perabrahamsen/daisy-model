@@ -37,6 +37,7 @@
 struct GnuplotSoil : public GnuplotBase
 {
   // Ranges.
+  const double sizeratio;
   const boost::scoped_ptr<Time> when;
   const double top;
   const double bottom;
@@ -231,7 +232,7 @@ set cntrparam levels " << samples << "\n";
 
   // Same size axes.
   out << "\
-set size ratio -1\n";
+set size ratio " << sizeratio << "\n";
 
   // Legend.
   if (legend != "auto")
@@ -386,6 +387,7 @@ set size ratio -1\n";
 
 GnuplotSoil::GnuplotSoil (const BlockModel& al)
   : GnuplotBase (al),
+    sizeratio (al.number ("sizeratio")),
     when (submodel<Time> (al, "when")),
     top (al.number ("top")),
     bottom (al.number ("bottom", NAN)),
@@ -413,6 +415,11 @@ static struct GnuplotSoilSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
+    frame.declare ("sizeratio", Attribute::None (), Check::none (),
+		   Attribute::Const, "\
+If positive, ratio of y-axes length to x-axis length.\n\
+If negative, use same ratio for units on the two axes.");
+    frame.set ("sizeratio", -1.0);
     frame.declare_submodule ("when", Attribute::Const, "\
 Use value closest to this time.", Time::load_syntax);
     frame.declare ("top", "cm", Check::non_positive (),

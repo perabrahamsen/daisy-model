@@ -76,6 +76,7 @@ struct UZRectMollerup : public UZRect
 
   // Interface.
   void tick (const GeometryRect&, const std::vector<size_t>& drain_cell,
+	     const double drain_water_level, // [cm]
 	     const Soil&, SoilWater&, const SoilHeat&, 
              const Surface&, const Groundwater&, 
              double dt, Treelog&);
@@ -131,6 +132,7 @@ struct UZRectMollerup : public UZRect
                              Treelog& msg, const double BIG_DT);
   static void drain (const GeometryRect& geo,
                      const std::vector<size_t>& drain_cell,
+		     const double drain_water_level,
                      const ublas::vector<double>& h,
                      const ublas::vector<double>& Theta_previous,
                      const ublas::vector<double>& Theta,
@@ -161,11 +163,13 @@ struct UZRectMollerup : public UZRect
 };
 
 void 
-UZRectMollerup::tick (const GeometryRect& geo, const std::vector<size_t>& drain_cell,
-                const Soil& soil, 
-                SoilWater& soil_water, const SoilHeat& soil_heat,
-                const Surface& surface, const Groundwater& groundwater,
-                const double dt, Treelog& msg)
+UZRectMollerup::tick (const GeometryRect& geo,
+		      const std::vector<size_t>& drain_cell,
+		      const double drain_water_level,
+		      const Soil& soil, 
+		      SoilWater& soil_water, const SoilHeat& soil_heat,
+		      const Surface& surface, const Groundwater& groundwater,
+		      const double dt, Treelog& msg)
 
 {
   daisy_assert (K_average.get ());
@@ -397,7 +401,8 @@ UZRectMollerup::tick (const GeometryRect& geo, const std::vector<size_t>& drain_
 				      + prod (Qmat, Theta_previous-Theta));
 
 	  // Force active drains to zero h.
-          drain (geo, drain_cell, h, Theta_previous, Theta, S_vol, S_macro,
+          drain (geo, drain_cell, drain_water_level,
+		 h, Theta_previous, Theta, S_vol, S_macro,
                  dq, ddt, drain_cell_on, A, b, debug, msg);  
           
           try {
@@ -912,6 +917,7 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 void 
 UZRectMollerup::drain (const GeometryRect& geo,
                        const std::vector<size_t>& drain_cell,
+		       const double drain_water_level,
                        const ublas::vector<double>& h,
                        const ublas::vector<double>& Theta_previous,
                        const ublas::vector<double>& Theta,
@@ -931,6 +937,9 @@ UZRectMollerup::drain (const GeometryRect& geo,
   for (size_t d = 0; d < drain_size; d++)
     {
       const size_t cell = drain_cell[d];
+
+      // Pressure in drain cell [cm].
+      const double drain_h = drain_water_level - geo.cell_z (cell); 
       
       if (drain_cell_on[d])    //drain on
         {
@@ -958,12 +967,11 @@ UZRectMollerup::drain (const GeometryRect& geo,
           if (drain_sink <= 0.0)
             drain_cell_on[d] = false;
         }
-      else   // drain off
-        if (h (cell) > 0.0)
-          drain_cell_on[d] = true;   
-
+      else			// drain off
+	if (h (cell) > 0.0)
+	  drain_cell_on[d] = true;   	
           
-      if (drain_cell_on[d] == true)
+      if (drain_h > 0.0 || drain_cell_on[d] == true)
         {
           const std::vector<size_t>& edges = geo.cell_edges (cell);
           const size_t edge_size = edges.size ();
@@ -979,7 +987,7 @@ UZRectMollerup::drain (const GeometryRect& geo,
               A (cell, other) = 0.0;
             }
           A (cell, cell) = 1.0;
-          b (cell) = 0.0;
+          b (cell) = std::max (drain_h, 0.0);
         }
     }
 }
