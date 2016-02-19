@@ -158,7 +158,7 @@ csdaisy.exe:	csmain.cs csdaisy.netmodule
 CC = $(COMPILE) $(OPTIMIZE) $(PROFILE) $(TARGET)
 
 # Locate the CSSparse lib -L../libdeps
-CXSPARSELIB = -lcxsparse
+CXSPARSELIB = -L../libdeps -lcxsparse
 #CXSPARSELIB = libcxsparse.a
 #CXSPARSELIB = /usr/lib/libcxsparse.so.2.2.3
 
@@ -717,7 +717,7 @@ debiannoci:
 #	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
 	mkdir debian/opt/daisy/bin
 	$(STRIP) -o debian/opt/daisy/bin/daisy $(OBJHOME)/daisy
-	$(STRIP) -o debian/opt/daisy/bin/daisyw $(OBJHOME)/daisyw
+#	$(STRIP) -o debian/opt/daisy/bin/daisyw $(OBJHOME)/daisyw
 	mkdir debian/DEBIAN
 	echo "Version: $(TAG)" > debian/DEBIAN/control
 	echo -n "Installed-Size: " >> debian/DEBIAN/control

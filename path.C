@@ -123,7 +123,7 @@ Path::get_daisy_home ()
 	  daisy_home =  "/Library/Daisy";
 #else
 	  Assertion::debug ("Using standard Unix home.");
-	  daisy_home =  "/usr/local/daisy";
+	  daisy_home =  "/opt/daisy";
 #endif
 #endif // !MS WINDOWS
 	}
