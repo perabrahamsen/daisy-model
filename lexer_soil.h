@@ -33,6 +33,8 @@ private:
   std::vector<int> array_c;
   std::vector<double> array_z;
   std::vector<double> array_x;
+  std::vector<double> array_dz;
+  std::vector<double> array_dx;
   std::vector<double> matrix_zplus;
   std::vector<double> matrix_xplus;
 public:
@@ -41,13 +43,17 @@ public:
   { return array_name; }
   symbol soil_dimension () const
   { return array_dimension; }
-  const std::vector<double>& soil_z () const
+  const std::vector<double>& cell_z () const // index: cell
   { return array_z; }
-  const std::vector<double>& soil_x () const
+  const std::vector<double>& cell_x () const // index: cell
   { return array_x; }
-  const std::vector<double>& soil_zplus () const
+  const std::vector<double>& cell_dz () const // index: cell
+  { return array_dz; }
+  const std::vector<double>& cell_dx () const // index: cell
+  { return array_dx; }
+  const std::vector<double>& soil_zplus () const // index: row
   { return matrix_zplus; }
-  const std::vector<double>& soil_xplus () const
+  const std::vector<double>& soil_xplus () const // index: column
   { return matrix_xplus; }
   bool soil_cells (const std::vector<std::string>& entries,
                    std::vector<double>& values,

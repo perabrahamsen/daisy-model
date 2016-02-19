@@ -32,6 +32,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <fstream>
 #include <sstream>
+#include <numeric>
 
 struct ProgramPost : public Program
 {
@@ -63,25 +64,44 @@ struct ProgramPost : public Program
   ~ProgramPost ();
 };
 
+double map_sum (const std::map<double,double>& m)
+{
+  double sum = 0.0;
+  for (auto i : m)
+    sum += i.second;
+  return sum;
+}
+
 bool
 ProgramPost::run (Treelog& msg)
 { 
   // Read header.
   if (!lex.read_header (msg))
-    return false;
+    {
+      msg.error ("Couldn't read header");
+      return false;
+    }
   if (!lex.read_soil (msg))
     return false;
 
   if (!lex.good ())
     return false;
 
+  enum handle_t { all, sum, average };
+  const handle_t handle_x = average;
+  const handle_t handle_z = all;
+
   // Array.
   const symbol tag = lex.soil_tag ();
-  const std::vector<double> z = lex.soil_z ();
-  const std::vector<double> x = lex.soil_x ();
-  const size_t array_size = z.size ();
-  const bool source_1D = x.size () == 0;
-  daisy_assert (source_1D || array_size == x.size ());
+  const std::vector<double> soil_zplus = lex.soil_zplus ();
+  const std::vector<double> soil_xplus = lex.soil_xplus ();
+  const std::vector<double> cell_z = lex.cell_z ();
+  const std::vector<double> cell_x = lex.cell_x ();
+  const std::vector<double> cell_dz = lex.cell_dz ();
+  const std::vector<double> cell_dx = lex.cell_dx ();
+  const size_t array_size = cell_z.size ();
+  const bool source_1D = cell_x.size () == 0;
+  daisy_assert (source_1D || array_size == cell_x.size ());
   if (array_size < 1)
     {
       msg.warning ("Nothing to plot");
@@ -97,37 +117,56 @@ ProgramPost::run (Treelog& msg)
     }
   
   // Quick check of matching cells.
-  bool sink_1D = true;
-  double last_x = NAN;
   bool found = false;
   std::vector<bool> check;
+  std::map<double,double> dx_x;
+  std::map<double,double> dz_z;
+  std::set<double> used_x;
+  std::set<double> used_z;
+  
   for (size_t i = 0; i < array_size; i++)
     {
-      if (std::isfinite (top) && z[i] > top)
+      if (std::isfinite (top) && cell_z[i] > top)
         check.push_back (false);
-      else if (std::isfinite (bottom) && z[i] < bottom)
+      else if (std::isfinite (bottom) && cell_z[i] < bottom)
         check.push_back (false);
-      else if (!source_1D && std::isfinite (left) && x[i] < left)
+      else if (!source_1D && std::isfinite (left) && cell_x[i] < left)
         check.push_back (false);
-      else if (!source_1D && std::isfinite (right) && x[i] > right)
+      else if (!source_1D && std::isfinite (right) && cell_x[i] > right)
         check.push_back (false);
       else
         {
           check.push_back (true);
           found = true;
-          if (!source_1D && sink_1D)
-            {
-              if (!std::isfinite (last_x))
-                last_x = x[i];
-              else if (!approximate (last_x, x[i]))
-                sink_1D = false;
-            }
+	  dz_z[cell_z[i]] = cell_dz[i];
+	  used_z.insert (cell_z[i]);
+          if (!source_1D)
+	    {
+	      used_x.insert (cell_x[i]);
+	      dx_x[cell_x[i]] = cell_dx[i];
+	    }
         }
     }
   daisy_assert (check.size () == array_size);
-  if (!found)
+  if (dz_z.size () < 1)
     lex.warning ("No matching data");
+  const bool sink_1D = dx_x.size () == 0;
 
+  const double height = map_sum (dz_z);
+  daisy_assert (height > 0.0);
+  const double width = map_sum (dx_x);
+  daisy_assert (sink_1D || width > 0.0);
+  
+  double size_factor = 1.0;
+  if (handle_z == average)
+    size_factor /= height;
+  if (handle_x == average && !sink_1D)
+    size_factor /= width;
+
+  std::ostringstream tmp;
+  tmp << "Height: " << height << ", width: " << width;
+  msg.message (tmp.str ());
+  
   // Dimension.
   const symbol original (lex.soil_dimension ());
 
@@ -160,22 +199,62 @@ ProgramPost::run (Treelog& msg)
       out << Time::component_name (time_columns[i]);
     }
 
-  for (size_t i = 0; i < array_size; i++)
+  int count_columns = 0;
+  if (handle_x == all && handle_z == all)
+    for (size_t i = 0; i < array_size; i++)
+      {
+	if (!check[i])
+	  continue;
+
+	count_columns++;
+	
+	if (first_tag)
+	  first_tag = false;
+	else
+	  out << "\t";
+
+	out << tag << " @ ";
+	if (sink_1D)
+	  out << cell_z[i];
+	else
+	  out << "(" << cell_z[i] << " " << cell_x[i] << ")";
+	found = true;
+      }
+  else if (handle_x == all && handle_z != all)
+    for (auto x : used_x)
+      {
+	count_columns++;
+	if (first_tag)
+	  first_tag = false;
+	else
+	  out << "\t";
+	
+	out << tag << " @ " << x;
+	found = true;
+      }
+  else if (handle_x != all && handle_z == all)
+    for (std::set<double>::reverse_iterator i = used_z.rbegin ();
+	 i != used_z.rend ();
+	 i++)
+      {
+	count_columns++;
+	if (first_tag)
+	  first_tag = false;
+	else
+	  out << "\t";
+	
+	out << tag << " @ " << *i;
+	found = true;
+      }
+  else
     {
-      if (!check[i])
-        continue;
-      
+      count_columns++;
       if (first_tag)
         first_tag = false;
       else
         out << "\t";
 
-      out << tag << " @ ";
-      if (sink_1D)
-        out << z[i];
-      else
-        out << "(" << z[i] << " " << x[i] << ")";
-      found = true;
+      out << tag;
     }
   out << "\n";
 
@@ -190,11 +269,8 @@ ProgramPost::run (Treelog& msg)
         out << "\t";
     }
 
-  for (size_t i = 0; i < array_size; i++)
+  for (size_t i = 0; i < count_columns; i++)
     {
-      if (!check[i])
-        continue;
-      
       if (first_dim)
         first_dim = false;
       else
@@ -242,13 +318,37 @@ ProgramPost::run (Treelog& msg)
           return false;
         }
 
+      // Projections.
+      std::map<double,double> x_sum;
+      std::map<double,double> z_sum;
+      double  sum = 0.0;
+      
       for (size_t i = 0; i < array_size; i++)
         {
           if (!check[i])
             continue;
           
-          // Convert
+          if (!out.good ())
+            {
+              msg.error ("'" + where + "': file error");
+              return false;
+            }
+
           double number = value[i];
+
+	  // Projections.
+	  const double dz = cell_dz[i];
+	  const double z = cell_z[i];
+	  const double dx = source_1D ? 1.0 : cell_dx[i];
+	  const double x = source_1D ? 0.0 : cell_x[i];
+	  x_sum[x] += number * dz;
+	  z_sum[z] += number * dx;
+	  sum += number * dx * dz;
+	  
+	  if (handle_z != all || handle_x != all)
+	    continue;
+	  
+	  // Convert
           if (dimension != original)
             {
               if (!units.can_convert (original, dimension, number))
@@ -266,12 +366,44 @@ ProgramPost::run (Treelog& msg)
           else
             out << "\t";
           out << number;
-          if (!out.good ())
-            {
-              msg.error ("'" + where + "': file error");
-              return false;
-            }
         }
+
+      if (handle_x == all && handle_z != all)
+	{
+	  for (auto x : used_x)
+	    {
+	      if (first_tag)
+		first_tag = false;
+	      else
+		out << "\t";
+	
+	      out << x_sum[x] * size_factor;
+	    }
+	}
+      else if (handle_x != all && handle_z == all)
+	{
+	  for (std::set<double>::reverse_iterator i = used_z.rbegin ();
+	       i != used_z.rend ();
+	       i++)
+	    {
+	      if (first_tag)
+		first_tag = false;
+	      else
+		out << "\t";
+
+	      out << z_sum[*i] * size_factor;
+	    }
+	}
+      else
+	{
+          if (first_data)
+            first_data = false;
+          else
+            out << "\t";
+          out << sum * size_factor;
+	}
+	
+
       out << "\n";
     }
   return true;

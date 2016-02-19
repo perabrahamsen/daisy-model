@@ -44,6 +44,7 @@
 #include "block_model.h"
 #include "point.h"
 #include "depth.h"
+#include <sstream>
 
 struct MovementRect : public MovementSolute
 {
@@ -313,7 +314,14 @@ MovementRect::MovementRect (const BlockModel& al)
 	  || y < geo->front () || y >= geo->back ())
 	al.error ("Drain cell placed at or outside soil boundary");
       else
-	drain_cell.push_back (geo->cell_at (z, x, y));
+	{
+	  const int cell = geo->cell_at (z, x, y);
+	  std::ostringstream tmp;
+	  tmp << "cell[" << cell << "] named " << geo->cell_name (cell)
+	      << " at (" << z << ", " << x << ", " << y << ") is a drain cell";
+	  al.msg ().debug (tmp.str ());
+	  drain_cell.push_back (cell);
+	}
     }
 }
 

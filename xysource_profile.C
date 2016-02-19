@@ -99,7 +99,7 @@ XYSourceProfile::load (const Units& units, Treelog& msg)
       return false;
     }
 
-  ys = lex.soil_z ();
+  ys = lex.cell_z ();
   const size_t array_size = ys.size ();
   if (array_size < 1)
     {

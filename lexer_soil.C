@@ -89,30 +89,40 @@ LexerSoil::read_soil (Treelog& msg)
 
   // Find interval ends.
   bool done_z = false;
-  double last_z = 0.0;
+  double last_zp = 0.0;
+  double last_xp = 0.0;
   double last_x = 0.0;
+  double dx = -42.42e42;
   for (size_t i = 0; i < array_size; i++)
     {
       const double z = array_z[i];
-      if (done_z)
-        /* Do nothing. */;
-      else if (z > last_z)
-        done_z = true;
-      else
-        {
-          last_z += (z - last_z) * 2.0;
-          matrix_zplus.push_back (last_z);
-        }
+      if (z > last_zp)
+	{
+	  last_zp = 0.0;
+	  done_z = true;
+	}
+      const double dz = (last_zp - z) * 2.0;
+      array_dz.push_back (dz);
+      last_zp -= dz;
+      if (!done_z)
+	matrix_zplus.push_back (last_zp);
 
       if (!has_x)
         continue;
       
       const double x = array_x[i];
+
+      if (x < last_x)
+	msg.error ("x values should increase");
+
       if (x > last_x)
-        {
-          last_x += (x - last_x) * 2.0;
-          matrix_xplus.push_back (last_x);
-        }
+	{
+	  dx = (x - last_xp) * 2.0;
+	  last_xp += dx;
+	  matrix_xplus.push_back (last_xp);
+	}
+      last_x = x;
+      array_dx.push_back (dx);
     }
 
   if (has_x 
@@ -126,6 +136,8 @@ LexerSoil::read_soil (Treelog& msg)
       msg.error (tmp.str ());
       return false;
     }
+  daisy_assert (array_dz.size () == array_size);
+  daisy_assert (!has_x || array_dx.size () == array_size);
 
   return true;
 }

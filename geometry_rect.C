@@ -36,16 +36,16 @@ size_t
 GeometryRect::cell_at (const double z, const double x, const double) const
 { 
   size_t cell = 0;
-  while (zplus_[cell] > z)
-    {
-      cell++;
-      daisy_assert (cell < cell_size ());
-    }
   while (xplus_[cell] < x)
     { 
       cell += cell_columns_;
       daisy_assert (cell < cell_size ());
     }      
+  while (zplus_[cell] > z)
+    {
+      cell++;
+      daisy_assert (cell < cell_size ());
+    }
   return cell;
 }
 

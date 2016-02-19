@@ -1,6 +1,8 @@
 ;;; test-refman.dai -- Sample file using the Daisy libraries.
 
 (input file "dk-soil.dai")
+(input file "tillage.dai")
+(input file "fertilizer.dai")
 (input file "dk-management.dai")
 
 (defprogram RefSim Daisy

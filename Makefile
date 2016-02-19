@@ -131,7 +131,8 @@ WARNING = -Wall -Wextra -Wvariadic-macros \
 	  -Wcast-align -Wmissing-format-attribute \
 	  -Wold-style-cast -Wformat=2 -Winit-self \
 	  -Wsign-promo -Wredundant-decls \
-	  -Wno-unused-parameter -Wno-sign-compare -Wno-mismatched-tags 
+	  -Wno-unused-parameter -Wno-sign-compare -Wno-mismatched-tags \
+	  -Wno-c++11-extensions
 
 
 # I use these a lot:

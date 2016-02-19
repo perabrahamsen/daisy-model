@@ -1,6 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Debian version?
+* Lav plot af vandindholf i mm som funktion af afstand til åen (x)
+
+** program_post.C
+
+*** Gør handle_x og handle_z til parametre.
+
+*** Konverter dimension (gang original med cm hvis "handle" er "sum").
+
+*** Check at boundaries ligger på interval grænser.
+
+** Lav graf for 1 marts for +00 og -20, samt forskel mellem dem.
 
 * "Myndighed?" grødeskæring
 
