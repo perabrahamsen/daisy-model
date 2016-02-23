@@ -1,41 +1,18 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Lav plot af vandindholf i mm som funktion af afstand til åen (x)
+* daisy.ku.dk
 
-** program_post.C
+** About skal skrives om.
 
-*** Gør handle_x og handle_z til parametre.
+** Gettign started skal nedlægges
 
-*** Konverter dimension (gang original med cm hvis "handle" er "sum").
-
-*** Check at boundaries ligger på interval grænser.
-
-** Lav graf for 1 marts for +00 og -20, samt forskel mellem dem.
-
-* "Myndighed?" grødeskæring
-
-** Opsætning
-
-*** Læs vivede.ddf
-
-**** Test om den drain_h > 0 means drain_cell_on = true virker
-
-**** Test om det virker uden drain_h
-
-*** Kør igen
-
-*** Lav logfil, snak med Kasper
-
-*** Prøv at køre med ændret OFFSET
-
-*** Sammenlign resultat
+** Download omdøbes til Software and Tools.
 
 * FAO_PM
 
 ** Lav testopsætning med vinterhvede og valg mellem time og dagsværdier
 
 ** Beregne begge med makking og med FAO_PM
-
 
 * "Promillefondprojekt" forklar lavere N indhold i kerner.
 

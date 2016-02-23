@@ -76,6 +76,21 @@ DLF::parameter (std::ostream& out,
 }
 
 void
+DLF::parameter (std::ostream& out, 
+                const symbol name, const double value, const symbol dim) const
+{
+  if (this->value == DLF::None)
+    return;
+
+  std::string id = name.name ();
+  std::transform (id.begin (), id.end (), id.begin (), ::toupper);
+  out << id << ": " << value;
+  if (dim != Attribute::None ())
+    out <<" " << dim;
+  out << "\n"; 
+}
+
+void
 DLF::interval (std::ostream& out, const Volume& volume) const
 {
   if (value == DLF::None)

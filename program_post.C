@@ -28,6 +28,7 @@
 #include "submodeler.h"
 #include "librarian.h"
 #include "check.h"
+#include "vcheck.h"
 #include "filepos.h"
 #include <boost/scoped_ptr.hpp>
 #include <fstream>
@@ -36,6 +37,28 @@
 
 struct ProgramPost : public Program
 {
+  // The Handle subtype.
+  struct Handle
+  {
+    // Enum in a namespace.
+    enum handle_t { all, sum, average };
+    handle_t value;
+    static handle_t symbol2handle (symbol s);
+    operator handle_t () const
+    { return value; }
+    static const VCheck& check ();
+    static void add_syntax (Frame&, const symbol name, const symbol value);
+    Handle (handle_t v)
+      : value (v)
+    { }
+    Handle (symbol s)
+      : value (symbol2handle (s))
+    { }
+  };
+  const Handle handle_z;
+  const Handle handle_x;
+  
+  // Content.
   const Units& units;
   const symbol parsed_from_file;
   const bool specified_time_columns;
@@ -64,12 +87,85 @@ struct ProgramPost : public Program
   ~ProgramPost ();
 };
 
-double map_sum (const std::map<double,double>& m)
+ProgramPost::Handle::handle_t
+ProgramPost::Handle::symbol2handle (symbol s)
+{
+  static struct sym_set_t : std::map<symbol, handle_t>
+  {
+    sym_set_t ()
+    {
+      insert (std::pair<symbol,handle_t> ("all", all));
+      insert (std::pair<symbol,handle_t> ("sum", sum));
+      insert (std::pair<symbol,handle_t> ("average", average));
+    } 
+  } sym_set;
+  sym_set_t::const_iterator i = sym_set.find (s);
+  daisy_assert (i != sym_set.end ());
+  return (*i).second;
+}  
+
+const VCheck& 
+ProgramPost::Handle::check ()
+{
+  static VCheck::Enum check ("all", "sum", "average");
+  return check;
+}
+
+void
+ProgramPost::Handle::add_syntax (Frame& frame, const symbol name, const symbol value)
+{
+  (void) symbol2handle (value);	// Check that value is valid.
+  frame.declare_string (name, Attribute::Const, "\
+How to handle multiple values for specified dimension.\n\
+Legal values are:\n\
+all: output all values.\n\
+sum: output the sum of the values, multiplied by the length of the cell\n\
+average: output the lenbth weighted average content of the cells.");
+  frame.set_check (name, check ());
+  frame.set (name, value);
+}
+
+static double map_sum (const std::map<double,double>& m)
 {
   double sum = 0.0;
   for (auto i : m)
     sum += i.second;
   return sum;
+}
+
+static const char* tab (bool& first)
+{
+  if (first)
+    {
+      first = false;
+      return "";
+    }
+  return "\t";
+}
+
+static void check_boundary (const symbol name, const double value,
+			    const std::vector<double>& bounds, Treelog& msg)
+{
+  if (!std::isnormal (value) || bounds.size () == 0)
+    return;
+  double closest_bound = 0.0;
+  double closest_dist = std::abs (value);
+  for (auto bound : bounds)
+    {
+      const double dist = std::abs (value - bound);
+      if (dist < closest_dist)
+	{
+	  closest_dist = dist;
+	  closest_bound = bound;
+	}
+    }
+  if (closest_dist > 1e-42)
+    {
+      std::ostringstream tmp;
+      tmp << name << ": No boundary at " << value
+	  << ", closest at "  << closest_bound;
+      msg.warning (tmp.str ());
+    }
 }
 
 bool
@@ -87,10 +183,6 @@ ProgramPost::run (Treelog& msg)
   if (!lex.good ())
     return false;
 
-  enum handle_t { all, sum, average };
-  const handle_t handle_x = average;
-  const handle_t handle_z = all;
-
   // Array.
   const symbol tag = lex.soil_tag ();
   const std::vector<double> soil_zplus = lex.soil_zplus ();
@@ -107,7 +199,11 @@ ProgramPost::run (Treelog& msg)
       msg.warning ("Nothing to plot");
       return false;
     }
-
+  check_boundary ("left", left, soil_xplus, msg);
+  check_boundary ("right", right, soil_xplus, msg);
+  check_boundary ("top", top, soil_zplus, msg);
+  check_boundary ("bottom", bottom, soil_zplus, msg);
+  
   // Use time columns of source by default.
   if (!specified_time_columns)
     {
@@ -158,9 +254,9 @@ ProgramPost::run (Treelog& msg)
   daisy_assert (sink_1D || width > 0.0);
   
   double size_factor = 1.0;
-  if (handle_z == average)
+  if (handle_z == Handle::average)
     size_factor /= height;
-  if (handle_x == average && !sink_1D)
+  if (handle_x == Handle::average && !sink_1D)
     size_factor /= width;
 
   std::ostringstream tmp;
@@ -168,8 +264,14 @@ ProgramPost::run (Treelog& msg)
   msg.message (tmp.str ());
   
   // Dimension.
-  const symbol original (lex.soil_dimension ());
-
+  const symbol lex_original (lex.soil_dimension ());
+  const symbol original =
+    (handle_z == Handle::sum && handle_x == Handle::sum)
+    ? Units::multiply (lex_original, Units::cm2 ())
+    : (handle_z == Handle::sum || handle_x == Handle::sum)
+    ? Units::multiply (lex_original, Units::cm ())
+    : lex_original;
+  
   if (dimension == Attribute::Unknown ())
     dimension = original;
   else if (!units.can_convert (original, dimension))
@@ -184,23 +286,18 @@ ProgramPost::run (Treelog& msg)
   std::ofstream out (where.name ().c_str ());
   print_header.start (out, objid, where, parsed_from_file);
   print_header.parameter (out, "SOURCE", file);
+  print_header.parameter (out, "WIDTH", width, Units::cm ());
+  print_header.parameter (out, "HEIGHT", height, Units::cm ());
   print_header.finish (out);
 
   // Tag line.
   bool first_tag = true;
 
   for (size_t i = 0; i < time_columns.size (); i++)
-    {
-      if (first_tag)
-        first_tag = false;
-      else
-        out << "\t";
-      
-      out << Time::component_name (time_columns[i]);
-    }
+    out << tab (first_tag) << Time::component_name (time_columns[i]);
 
   int count_columns = 0;
-  if (handle_x == all && handle_z == all)
+  if (handle_x == Handle::all && handle_z == Handle::all)
     for (size_t i = 0; i < array_size; i++)
       {
 	if (!check[i])
@@ -208,53 +305,34 @@ ProgramPost::run (Treelog& msg)
 
 	count_columns++;
 	
-	if (first_tag)
-	  first_tag = false;
-	else
-	  out << "\t";
-
-	out << tag << " @ ";
+	out << tab (first_tag) << tag << " @ ";
 	if (sink_1D)
 	  out << cell_z[i];
 	else
 	  out << "(" << cell_z[i] << " " << cell_x[i] << ")";
 	found = true;
       }
-  else if (handle_x == all && handle_z != all)
+  else if (handle_x == Handle::all && handle_z != Handle::all)
     for (auto x : used_x)
       {
 	count_columns++;
-	if (first_tag)
-	  first_tag = false;
-	else
-	  out << "\t";
-	
-	out << tag << " @ " << x;
+	out << tab (first_tag) << tag << " @ " << x;
 	found = true;
       }
-  else if (handle_x != all && handle_z == all)
+  else if (handle_x != Handle::all && handle_z == Handle::all)
     for (std::set<double>::reverse_iterator i = used_z.rbegin ();
 	 i != used_z.rend ();
 	 i++)
       {
 	count_columns++;
-	if (first_tag)
-	  first_tag = false;
-	else
-	  out << "\t";
-	
-	out << tag << " @ " << *i;
+	out << tab (first_tag) << tag << " @ " << *i;
 	found = true;
       }
   else
     {
+      daisy_assert (handle_x != Handle::all && handle_z != Handle::all);
       count_columns++;
-      if (first_tag)
-        first_tag = false;
-      else
-        out << "\t";
-
-      out << tag;
+      out << tab (first_tag) << tag;
     }
   out << "\n";
 
@@ -262,22 +340,10 @@ ProgramPost::run (Treelog& msg)
   bool first_dim = true;
 
   for (size_t i = 0; i < time_columns.size (); i++)
-    {
-      if (first_dim)
-        first_dim = false;
-      else
-        out << "\t";
-    }
+    out << tab (first_dim);
 
   for (size_t i = 0; i < count_columns; i++)
-    {
-      if (first_dim)
-        first_dim = false;
-      else
-        out << "\t";
-      
-      out << dimension;
-    }
+    out << tab (first_dim) << dimension;
     
   // End of header.
   print_header.finish (out);
@@ -303,12 +369,7 @@ ProgramPost::run (Treelog& msg)
       
       for (size_t i = 0; i < time_columns.size (); i++)
         {
-          if (first_data)
-            first_data = false;
-          else
-            out << "\t";
-
-          out << time.component_value (time_columns[i]);
+          out << tab (first_data) << time.component_value (time_columns[i]);
         }
       
       std::vector<double> value;
@@ -318,6 +379,23 @@ ProgramPost::run (Treelog& msg)
           return false;
         }
 
+      auto print_number = [&](double number) -> void
+	{
+          if (dimension != original)
+            {
+              if (!units.can_convert (original, dimension, number))
+                {
+                  std::ostringstream tmp;
+                  tmp << "Can't convert " << number << " from [" << original 
+                      << "] to [" << dimension << "]";
+                  lex.error (tmp.str ());
+                }
+              number = units.convert (original, dimension, number);
+            }
+          out << tab (first_data) << number;
+	};
+	
+      
       // Projections.
       std::map<double,double> x_sum;
       std::map<double,double> z_sum;
@@ -345,64 +423,27 @@ ProgramPost::run (Treelog& msg)
 	  z_sum[z] += number * dx;
 	  sum += number * dx * dz;
 	  
-	  if (handle_z != all || handle_x != all)
+	  if (handle_z != Handle::all || handle_x != Handle::all)
 	    continue;
 	  
 	  // Convert
-          if (dimension != original)
-            {
-              if (!units.can_convert (original, dimension, number))
-                {
-                  std::ostringstream tmp;
-                  tmp << "Can't convert " << number << " from [" << original 
-                      << "] to [" << dimension << "]";
-                  msg.error (tmp.str ());
-                  return false;
-                }
-              number = units.convert (original, dimension, number);
-            }
-          if (first_data)
-            first_data = false;
-          else
-            out << "\t";
-          out << number;
+	  print_number (number);
         }
 
-      if (handle_x == all && handle_z != all)
+      if (handle_x == Handle::all && handle_z != Handle::all)
 	{
 	  for (auto x : used_x)
-	    {
-	      if (first_tag)
-		first_tag = false;
-	      else
-		out << "\t";
-	
-	      out << x_sum[x] * size_factor;
-	    }
+	    print_number (x_sum[x] * size_factor);
 	}
-      else if (handle_x != all && handle_z == all)
+      else if (handle_x != Handle::all && handle_z == Handle::all)
 	{
 	  for (std::set<double>::reverse_iterator i = used_z.rbegin ();
 	       i != used_z.rend ();
 	       i++)
-	    {
-	      if (first_tag)
-		first_tag = false;
-	      else
-		out << "\t";
-
-	      out << z_sum[*i] * size_factor;
-	    }
+	    print_number (z_sum[*i] * size_factor);
 	}
       else
-	{
-          if (first_data)
-            first_data = false;
-          else
-            out << "\t";
-          out << sum * size_factor;
-	}
-	
+	print_number (sum * size_factor);
 
       out << "\n";
     }
@@ -411,6 +452,8 @@ ProgramPost::run (Treelog& msg)
 
 ProgramPost::ProgramPost (const BlockModel& al)
   : Program (al),
+    handle_z (Handle::symbol2handle (al.name ("handle_z"))),
+    handle_x (Handle::symbol2handle (al.name ("handle_x"))),
     units (al.units ()),
     parsed_from_file (al.frame ().inherited_position ().filename ()),
     specified_time_columns (al.check ("time_columns")),
@@ -449,6 +492,8 @@ static struct ProgramPostSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
+    ProgramPost::Handle::add_syntax (frame, "handle_z", "all");
+    ProgramPost::Handle::add_syntax (frame, "handle_x", "all");
     Time::declare_time_components (frame, "time_columns", 
                                    Attribute::OptionalConst, "\
 List of time components to include in output.\n\
@@ -474,7 +519,7 @@ Only incluce values to the right of this position.");
 Only include values to the left of this position.");
     LexerSoil::load_syntax (frame);
     frame.declare_string ("dimension", Attribute::OptionalConst, "\
-Dimension for data.  By default, use dimension from file.");
+Dimension for data output.  By default, use dimension from file.");
   }
 } ProgramPost_syntax;
 

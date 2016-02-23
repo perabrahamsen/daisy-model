@@ -131,9 +131,7 @@ WARNING = -Wall -Wextra -Wvariadic-macros \
 	  -Wcast-align -Wmissing-format-attribute \
 	  -Wold-style-cast -Wformat=2 -Winit-self \
 	  -Wsign-promo -Wredundant-decls \
-	  -Wno-unused-parameter -Wno-sign-compare -Wno-mismatched-tags \
-	  -Wno-c++11-extensions
-
+	  -Wno-unused-parameter -Wno-sign-compare -Wno-mismatched-tags
 
 # I use these a lot:
 #   -Wconversion -Wsign-compare -Wno-unused-parameter
@@ -141,7 +139,7 @@ WARNING = -Wall -Wextra -Wvariadic-macros \
 # This one doesn't work (gcc 4.4 linux/amd64):
 #   -Wunreachable-code: triggered by constructors?
 
-COMPILE = gcc -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
+COMPILE = gcc -std=c++11 -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
 CCOMPILE = $(COMPILE)
 CPPLIB = -lstdc++
 

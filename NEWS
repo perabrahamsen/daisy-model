@@ -6,6 +6,62 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.23
+
+** New 'handle_z' and 'handle_x' parameters in the 'post-process' program.
+
+These allows you to turn a 2D log file into a 1D or 0D log file. The
+valid values are 'sum' and 'average' to either add or average the
+values for the dimension you want to collapse, wighted by the length
+of the numeric cells in the same dimension. The default value for both
+is 'all', which will not collapse the dimension.
+
+E.g.
+
+(defprogram test post-process
+  (top -0 [cm])
+  (bottom -100 [cm])
+  (file "soil_water_content.dlf")
+  (handle_z sum)
+  (handle_x average)
+  (dimension [mm])
+  (where "average_swc.dlf"))
+
+(run test)
+
+will give you to average water content in mm
+in the top meter of the soil
+for each timestep.
+
+* 5.22
+
+** Fix compability problems with OSX.
+
+** New 'pipe_outlet' parameter for 2D description of drains.
+
+  (Movement rectangle
+            (pipe_outlet PLF 
+                         ;; ((YEAR MONTH DAY) WATER_LEVEL)
+                         ((1987  9 1) -200 [cm]) ;; Interpolates between values.
+                         ((1987 10 1)  -50 [cm]) ;; So mid-September is -125 cm.
+                         ((1988  2 1)  -50 [cm])
+                         ((1988  3 1) -200 [cm])))
+
+Any drain points specified with 'drainpoints' that are located below
+the pipe outlet will have the specified pressure. This means that the
+drain points may act as a subsoil irrigation system. The intention is
+to simulate drain outlets that are located below the water level in
+the recepient.
+
+Note that this is different from the similarly named 'pipe_outlet' in
+the 'lateral' drain model, where submerged drains will simply cease to
+be active.
+
+** New 'crop' log parameter.
+
+All the relevant log parameterizations in 'log.dai' now support a
+'crop' parameter, with the name of the crop to log.
+
 * 5.21 
 
 ** You can now specify seasonal variation in aquifer pressure.

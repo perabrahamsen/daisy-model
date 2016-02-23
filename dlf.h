@@ -47,6 +47,9 @@ public:
               const symbol file, const symbol parsed_from_file) const;
   void parameter (std::ostream& out,
                   const symbol name, const symbol value) const;
+  void parameter (std::ostream& out,
+                  const symbol name, const double value,
+		  const symbol dim) const;
   void interval (std::ostream& out, const Volume&) const;
   void log_description (std::ostream& out, symbol description) const;
   void finish (std::ostream& out, const Metalib&, const FrameModel&);

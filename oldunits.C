@@ -341,10 +341,15 @@ Oldunits::get_convertion (const symbol from, const symbol to)
 
 symbol
 Oldunits::multiply (const symbol one, const symbol two)
-{ 
-  if (one == Attribute::None () || one == Attribute::Fraction ())
+{
+  static const symbol empty = "";
+  if (one == Attribute::None ()
+      || one == Attribute::Fraction ()
+      || one == empty)
     return two;
-  if (two == Attribute::None () || two == Attribute::Fraction ())
+  if (two == Attribute::None ()
+      || two == Attribute::Fraction ()
+      || two == empty)
     return one;
   if (one == Attribute::Unknown () || two == Attribute::Unknown ())
     return Attribute::Unknown ();
