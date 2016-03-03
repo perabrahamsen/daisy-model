@@ -41,5 +41,5 @@ setup:
 checkin: $(DAISY) $(TEXT)
 	-git add $(DAISY) $(TEXT)
 	-rm -f $(REMOVE) 
-	-git rm -f $(REMOVE) 
+	-git rm -f --ignore-unmatch $(REMOVE) 
 

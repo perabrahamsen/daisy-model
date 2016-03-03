@@ -48,7 +48,7 @@ checkin: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	-git add $(TEXT) 
 	-rm -f $(REMOVE) 
-	-git rm -f --ignore-unmatched $(REMOVE) 
+	-git rm -f --ignore-unmatch $(REMOVE) 
 
 
 add:
