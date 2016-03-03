@@ -95,13 +95,13 @@ checkin: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	-git add $(TEXT)
 	-rm -f $(REMOVE) 
-	-git rm $(REMOVE) 
+	-git rm -f $(REMOVE) 
 	git commit -a -m "$(TAG)" # "Version $(TAG)"
 
 commit: $(TEXT)
 	-git add $(TEXT)
 	rm -f $(REMOVE) 
-	-git rm $(REMOVE) 
+	-git rm -f $(REMOVE) 
 	git commit -a -m "$(TAG)" # "Version $(TAG)"
 
 clean:
