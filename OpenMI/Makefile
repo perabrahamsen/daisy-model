@@ -28,8 +28,6 @@ install: $(TARGETS)
 	( cd "$(OPENMIASS)" && cp $(OPENMIDLL) $(SETUPDIR)/bin )
 
 setup: install
-	mkdir $(SETUPDIR)/src/OpenMI
-	cp $(TEXT) $(SETUPDIR)/src/OpenMI
 
 .IGNORE: checkin
 
