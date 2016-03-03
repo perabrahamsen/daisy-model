@@ -1,3 +1,14 @@
+2016-03-03  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.23 released.
+
+2016-03-03  Per Abrahamsen  <per.abrahamsen@gmal.com>
+
+	* geometry.C (add_layer, initialize_layer): Support specifying
+	initial values with a PLF.
+
+	* Makefile: No longer include source with binary distributions.
+
 2016-02-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* program_post.C (handle_x, handle_z): New parameters.

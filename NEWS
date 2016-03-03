@@ -8,6 +8,21 @@ release.
 
 * 5.23
 
+** You can now specify initial values of soil variables with a PLF.
+
+E.g. to specify initial value of h that is at field capacy near the
+soil surface and two meter below ground, but at -50 cm one meter
+below, write this:
+
+(defcolumn Test Askov
+   (SoilWater (initial_h_plf (-2 [m] -100 [cm]) 
+                             (-100 [cm] -50 [cm]) 
+                             (0 [m] 2 [pF]))))
+
+As all PLF's, values between the specified point will be interpolated,
+so the pressure 1.5 meter below ground is -75 cm. The numeric cells
+will be initialized so the center of the cell has the specified value.
+
 ** New 'handle_z' and 'handle_x' parameters in the 'post-process' program.
 
 These allows you to turn a 2D log file into a 1D or 0D log file. The

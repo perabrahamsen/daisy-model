@@ -1,16 +1,18 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* daisy.ku.dk
+* function
 
-** About skal skrives om.
+(initial_h plf () () ())
+(initial_h layer () () ())
+(initial_h number (arg z) (+ 
 
-** Gettign started skal nedlægges
+FunctionPLF
 
-** Download omdøbes til Software and Tools.
+* initial_h_plf
 
 * FAO_PM
 
-** Lav testopsætning med vinterhvede og valg mellem time og dagsværdier
+** Lav testopsætning med vinterhvede og valg mellem time og dagsærdier
 
 ** Beregne begge med makking og med FAO_PM
 
@@ -19,8 +21,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 * Vejledning 
 
 ** Signe
-
-** Mathias 
 
 ** Kasper
 
@@ -33,10 +33,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 ** Add M, flux til stof
 
 ** J_p
-
-* Litteratur
-
-** Groenendijk P, Heinen M, Klammler G, Fank J, Kupfersberger H, Pisinaras V, Gemitzi A, Peña-Haro S, García-Prats A, Pulido-Velazquez M, Perego A, Acutis M, Trevisan M (2014) Performance assessment of nitrate leaching models for highly vulnerable soils used in low-input farming based on lysimeter data. Sci Total Environ 499:463–480, Elsevier. doi: 10.​1016/​j.​scitotenv.​2014.​07.​002
 
 * Artikler
 

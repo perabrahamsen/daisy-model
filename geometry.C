@@ -29,6 +29,7 @@
 #include "assertion.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "plf.h"
 #include <sstream>
 
 const int Geometry::cell_above;
@@ -737,15 +738,28 @@ Geometry::add_layer (Frame& frame, const Attribute::category cat,
   const FrameSubmodel& child = *Librarian::submodel_frame (load_syntax).get ();
   const symbol description = child.description ("value");
   const symbol dimension = child.dimension ("value");
-  
+
+  // initial_X
   const std::string iname = "initial_" + name;
   frame.declare_submodule_sequence (iname, Attribute::OptionalConst, "\
 Initial value of the '" + name + "' parameter.\n\
-The initial value is given as a sequence of (END VALUE) pairs, starting\n \
+The initial value is given as a sequence of (END VALUE) pairs, starting\n\
 from the top and going down.  The parameter will be initialized to\n\
-VALUE from the END of the previous layer, to the END of the current layer.",
-                                load_syntax);
+VALUE from the END of the previous layer, to the END of the current layer.\n\
+Only used if '" + name + "' is unspecified.",
+				    load_syntax);
   frame.set_check (iname, check_layers);
+
+  // initial_X_plf
+  const std::string pname = "initial_" + name + "_plf";
+  frame.declare (pname, "cm", dimension,  Attribute::OptionalConst, "\
+Initial value of the '" + name + "' parameter.\n\
+The initial value is given as a sequence of (DEPTH VALUE) pairs, starting\n\
+from the bottom and going up.  The parameter will be initialized to the\n\
+the value of the PLF at the center of the cell.\n\
+Only used if '" + name + "' and '" + iname + "' are unspecified.");
+
+  // X
   if (dimension == Attribute::Fraction ())
     frame.declare_fraction (name, cat, Attribute::SoilCells, description);
   else
@@ -756,8 +770,10 @@ void
 Geometry::initialize_layer (std::vector<double>& array, 
                             const Frame& al, symbol name, Treelog& out) const
 {
-  const std::string initial = std::string ("initial_") + name.name ();
+  const std::string initial = std::string ("initial_") + name;
+  const std::string initial_plf = std::string ("initial_") + name + "_plf";
   daisy_assert (array.size () == 0);
+  array.reserve (cell_size ());
   if (al.check (name))
     // Specified by user.
     array = al.number_sequence (name);
@@ -794,6 +810,14 @@ Geometry::initialize_layer (std::vector<double>& array,
             }
 	  last = next;
 	}
+    }
+  else if (al.check (initial_plf))
+    {
+      // Initialize by layers.
+      const PLF plf = al.plf (initial_plf);
+      for (size_t cell = 0; cell < cell_size (); cell++)
+	array.push_back (plf (cell_z (cell)));
+      daisy_assert (array.size () == cell_size ());
     }
   // We must leave any remaining values unspecified, the
   // initialization of Theta and h in SoilWater depends on that.

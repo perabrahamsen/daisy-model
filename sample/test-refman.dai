@@ -3,6 +3,7 @@
 (input file "dk-soil.dai")
 (input file "tillage.dai")
 (input file "fertilizer.dai")
+(input file "crop.dai")
 (input file "dk-management.dai")
 
 (defprogram RefSim Daisy

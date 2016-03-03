@@ -32,6 +32,7 @@ NATIVEHOME = $(OBJHOME)
 NATIVEEXE = daisy #daisyw
 USE_GUI = Q4
 BOOSTINC = -isystem $(HOME)/boost_1_55_0
+CXSPARSELIB = -lcxsparse
 else
 SRCDIR = ..
 OBJHOME = obj
@@ -39,6 +40,7 @@ NATIVEHOME = $(OBJHOME)
 NATIVEEXE = daisy.exe daisyw.exe
 USE_GUI = Q4
 BOOSTINC = -isystem $(CYGHOME)/home/xvs108/boost_1_55_0
+CXSPARSELIB = libcxsparse.a
 SETUPDIR = /home/xvs108/daisy/install
 #MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
 MAKENSIS = "/cygdrive/c/Program Files (x86)/NSIS/makensis.exe"
@@ -154,11 +156,6 @@ csdaisy.exe:	csmain.cs csdaisy.netmodule
 # Construct the compile command.
 #
 CC = $(COMPILE) $(OPTIMIZE) $(PROFILE) $(TARGET)
-
-# Locate the CSSparse lib -L../libdeps
-CXSPARSELIB = -L../libdeps -lcxsparse
-#CXSPARSELIB = libcxsparse.a
-#CXSPARSELIB = /usr/lib/libcxsparse.so.2.2.3
 
 CXSPARSEHEAD = ublas_cxsparse.h cs.h SuiteSparse_config.h
 
@@ -655,8 +652,6 @@ setupcommon:
 	rm -rf $(SETUPDIR)
 	mkdir $(SETUPDIR)
 	cp ChangeLog NEWS $(SETUPDIR)
-	mkdir $(SETUPDIR)/src
-	cp $(TEXT) $(SETUPDIR)/src
 	mkdir $(SETUPDIR)/bin
 	cp libdeps32/ShowDaisyOutput.exe $(SETUPDIR)/bin
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
@@ -686,6 +681,8 @@ setup:
 	make setupcommon MINGWHOME="$(MINGWHOME32)" MINGWDLL="$(MINGWDLL32)" OBJHOME=win32-portable NSISFILE=setup-w32.nsi
 	make setupcommon MINGWHOME="$(MINGWHOME64)" MINGWDLL="$(MINGWDLL64)" OBJHOME=win64-portable NSISFILE=setup-w64.nsi
 	cp -p daisy-$(TAG)-setup-w32.exe daisy-$(TAG)-setup-w64.exe $(DISTDIR)
+
+foo:
 	(cd txt && $(MAKE) dist DISTDIR="$(DISTDIR)" TAG=$(TAG))
 	(cd OpenMI && $(MAKE) checkin);
 	(cd lib && $(MAKE) checkin);
@@ -707,8 +704,6 @@ debiannoci:
 	mkdir debian/opt
 	mkdir debian/opt/daisy
 	cp ChangeLog NEWS debian/opt/daisy
-	mkdir debian/opt/daisy/src
-	cp $(TEXT) debian/opt/daisy/src
 	(cd lib && $(MAKE) SETUPDIR=../debian/opt/daisy TAG=$(TAG) setup)
 	(cd sample && $(MAKE) SETUPDIR=../debian/opt/daisy TAG=$(TAG) setup)
 #	$(MAKE) setupdocs
@@ -730,9 +725,8 @@ macos:
 	$(MAKE) linux
 	rm -rf $(OSXDEST)
 	mkdir -p $(OSXDEST)
-	mkdir $(OSXDEST)/bin $(OSXDEST)/doc $(OSXDEST)/src
+	mkdir $(OSXDEST)/bin $(OSXDEST)/doc
 	cp ChangeLog NEWS $(OSXDEST)/doc
-	cp $(TEXT) $(OSXDEST)/src
 	(cd lib && $(MAKE) SETUPDIR=../$(OSXDEST) TAG=$(TAG) setup)
 	(cd sample && $(MAKE) SETUPDIR=../$(OSXDEST) TAG=$(TAG) setup)
 #	$(MAKE) setupdocs

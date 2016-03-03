@@ -89,9 +89,6 @@ setup:
 	cp -f reference.ps $(SETUPDIR)/doc
 	cp -f tutorial.pdf $(SETUPDIR)/doc
 	cp -f exercises.pdf $(SETUPDIR)/doc
-	mkdir $(SETUPDIR)/src/txt
-	cp $(TEXT) $(SETUPDIR)/src/txt
-
 
 
 checkin: $(TEXT)
