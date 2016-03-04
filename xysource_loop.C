@@ -38,8 +38,8 @@ class XYSourceLoop : public XYSource
   const int style_;
   std::vector<double> xs;
   std::vector<double> ys;
-  const std::auto_ptr<Number> x_expr;
-  const std::auto_ptr<Number> y_expr;
+  const std::unique_ptr<Number> x_expr;
+  const std::unique_ptr<Number> y_expr;
   const symbol title_;
   symbol x_dimension_;
   symbol y_dimension_;

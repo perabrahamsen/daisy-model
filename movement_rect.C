@@ -49,7 +49,7 @@
 struct MovementRect : public MovementSolute
 {
   // Geometry.
-  std::auto_ptr<GeometryRect> geo;
+  std::unique_ptr<GeometryRect> geo;
   Geometry& geometry () const;
 
   // Failures.
@@ -60,7 +60,7 @@ struct MovementRect : public MovementSolute
   // Drains
   const auto_vector<const ZXPoint*> drain_position;
   std::vector<size_t> drain_cell;
-  std::auto_ptr<Depth> pipe_outlet; // Water level at pipe outlet. [cm]
+  std::unique_ptr<Depth> pipe_outlet; // Water level at pipe outlet. [cm]
 
   // Water.
   const auto_vector<UZRect*> matrix_water;
@@ -69,7 +69,7 @@ struct MovementRect : public MovementSolute
   void ridge (Surface&, const Soil&, const SoilWater&, const FrameSubmodel&);
 
   // Heat.
-  std::auto_ptr<Heatrect> heatrect;
+  std::unique_ptr<Heatrect> heatrect;
 
   /* const */ double delay;	// Period delay [ cm/rad ??? ]
   double bottom_heat (const Time&, const Weather&) const ;

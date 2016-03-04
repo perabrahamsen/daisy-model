@@ -52,7 +52,7 @@ protected:
   explicit Secondary (const BlockModel& al);
   explicit Secondary (const symbol name);
 public:
-  static std::auto_ptr<Secondary> create_none ();
+  static std::unique_ptr<Secondary> create_none ();
   ~Secondary ();
 };
 

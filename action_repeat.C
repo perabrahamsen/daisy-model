@@ -34,8 +34,8 @@ struct ActionRepeat : public Action
 {
   const Metalib& metalib;
   FrameModel modified_frame;
-  const std::auto_ptr<FrameModel> repeat;
-  std::auto_ptr<Action> action;
+  const std::unique_ptr<FrameModel> repeat;
+  std::unique_ptr<Action> action;
 
   const FrameModel& frame () const
   { return modified_frame; }

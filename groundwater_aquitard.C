@@ -41,7 +41,7 @@ struct GroundwaterAquitard : public Groundwater
   // Parameters
   const double K_aquitard;  // Conductivity of the aquitard. [cm h^-1]
   const double Z_aquitard;    // Vertical length of the aquitard. [cm]
-  std::auto_ptr<Depth> pressure_table; // Virtual groundwater height. [cm]
+  std::unique_ptr<Depth> pressure_table; // Virtual groundwater height. [cm]
   double h_aquifer;          // Pressure potential in the aquifer [cm]
 
   // Utility.

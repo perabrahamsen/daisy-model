@@ -26,7 +26,6 @@
 #include "symbol.h"
 #include <string>
 #include <vector>
-#include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
 class Frame;
@@ -38,7 +37,7 @@ class LexerTable : private boost::noncopyable
   // Content.
 private:
   class Implementation;
-  boost::scoped_ptr<Implementation> impl;
+  const std::unique_ptr<Implementation> impl;
 
   // Use.
 public:

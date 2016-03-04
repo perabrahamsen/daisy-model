@@ -58,10 +58,10 @@ struct WSE_full : public WSE
   { }
 };
 
-std::auto_ptr<WSE> 
+std::unique_ptr<WSE> 
 WSE::create_full ()
 {
-  std::auto_ptr<WSE> full (new WSE_full ());
+  std::unique_ptr<WSE> full (new WSE_full ());
   return full;
 }
 
@@ -142,10 +142,10 @@ struct WSE_none : public WSE
   { }
 };
 
-std::auto_ptr<WSE> 
+std::unique_ptr<WSE> 
 WSE::create_none ()
 {
-  std::auto_ptr<WSE> none (new WSE_none ());
+  std::unique_ptr<WSE> none (new WSE_none ());
   return none;
 }
 
@@ -166,7 +166,7 @@ static struct WSE_noneSyntax : public DeclareModel
 
 struct ProgramWSE_table : public Program
 {
-  const std::auto_ptr<WSE> wse;
+  const std::unique_ptr<WSE> wse;
   const int intervals;
 
   bool run (Treelog& msg)

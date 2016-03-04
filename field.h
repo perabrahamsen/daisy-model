@@ -51,7 +51,7 @@ class Field : public Border
 { 
   // Top secret internal state.
   struct Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
 
 public:
   // Restrict operations to selected columns.

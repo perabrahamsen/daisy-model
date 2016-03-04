@@ -35,7 +35,7 @@
 
 struct ConditionBoolean : public Condition
 {
-  std::auto_ptr<Boolean> expr;
+  std::unique_ptr<Boolean> expr;
   
   // State.
   mutable enum { isfalse, istrue, missing, uninitialized, error } state;

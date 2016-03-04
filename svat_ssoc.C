@@ -228,7 +228,7 @@ struct SVAT_SSOC : public SVAT
     { }
   };
   FixpointSSOC fix;
-  const std::auto_ptr<Solver> solver;
+  const std::unique_ptr<Solver> solver;
   bool is_stable;
 
   bool initialized_soil; 

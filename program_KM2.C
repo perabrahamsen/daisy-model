@@ -29,7 +29,6 @@
 #include "path.h"
 #include "block_model.h"
 #include "mathlib.h"
-#include <boost/scoped_ptr.hpp>
 #include <sstream>
 #include <cctype>
 
@@ -37,8 +36,8 @@ struct ProgramKM2 : public Program
 {
   const Path& path;
   const symbol filename;
-  std::auto_ptr<std::istream> owned_stream;
-  boost::scoped_ptr<Lexer> lex;
+  std::unique_ptr<std::istream> owned_stream;
+  std::unique_ptr<Lexer> lex;
 
   std::string pretty (int c) const
   {
@@ -269,8 +268,8 @@ struct ProgramKM2 : public Program
     : Program (al),
       path (al.path ()),
       filename (al.name ("file")),
-      owned_stream (NULL),
-      lex (NULL)
+      owned_stream (),
+      lex ()
   { }
   ~ProgramKM2 ()
   { }

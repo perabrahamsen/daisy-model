@@ -37,9 +37,9 @@
 
 struct ConditionExtern : public Condition
 {
-  const std::auto_ptr<Scopesel> scopesel;
+  const std::unique_ptr<Scopesel> scopesel;
   mutable const Scope* extern_scope;
-  std::auto_ptr<Boolean> expr;
+  std::unique_ptr<Boolean> expr;
   
   void tick (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   {

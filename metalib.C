@@ -40,7 +40,7 @@ struct Metalib::Implementation
   // Content.
   const Frame::load_frame_t load_frame;
   Path path;
-  std::auto_ptr<Units> units;
+  std::unique_ptr<Units> units;
 
   typedef std::map<symbol, Library*> library_map;
   library_map all;

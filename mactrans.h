@@ -60,7 +60,7 @@ protected:
   Mactrans (const symbol name);
 public:
   ~Mactrans ();
-  static std::auto_ptr<Mactrans> create_default ();
+  static std::unique_ptr<Mactrans> create_default ();
 };
 
 #endif // MACTRANS_H

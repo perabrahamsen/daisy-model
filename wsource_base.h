@@ -22,13 +22,12 @@
 #define WSOURCE_BASE_H
 
 #include "wsource_weather.h"
-#include <boost/scoped_ptr.hpp>
 
 class WSourceBase : public WSourceWeather
 {
 private:
   struct Implementation;
-  boost::scoped_ptr<Implementation> impl;
+  const std::unique_ptr<Implementation> impl;
 
   // Scope interface.
 public:

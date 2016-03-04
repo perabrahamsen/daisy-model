@@ -43,10 +43,10 @@ private:
   bool logging;
   const auto_vector<MScope*> exchanges;
   const auto_vector<Log*> logs;
-  const std::auto_ptr<LogAll> log_all;
+  const std::unique_ptr<LogAll> log_all;
   std::vector<Log*> active_logs;
   const std::vector<const Scope*> my_scopes;
-  const std::auto_ptr<Condition> activate_output;
+  const std::unique_ptr<Condition> activate_output;
   const std::vector<Time::component_t> time_columns;
   const symbol log_prefix;
 

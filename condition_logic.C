@@ -83,9 +83,9 @@ struct ConditionTrue : public Condition
   { }
 };
 
-std::auto_ptr<Condition> 
+std::unique_ptr<Condition> 
 Condition::create_true ()
-{ return std::auto_ptr<Condition> (new ConditionTrue (__FUNCTION__)); }
+{ return std::unique_ptr<Condition> (new ConditionTrue (__FUNCTION__)); }
 
 struct ConditionOperands : public Condition
 {
@@ -181,7 +181,7 @@ struct ConditionAnd : public ConditionOperands
 
 struct ConditionNot : public Condition
 {
-  std::auto_ptr<Condition> condition;
+  std::unique_ptr<Condition> condition;
 
   bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   { return !condition->match (daisy, scope, msg); }
@@ -209,9 +209,9 @@ struct ConditionNot : public Condition
 
 struct ConditionIf : public Condition
 {
-  std::auto_ptr<Condition> if_c;
-  std::auto_ptr<Condition> then_c;
-  std::auto_ptr<Condition> else_c;
+  std::unique_ptr<Condition> if_c;
+  std::unique_ptr<Condition> then_c;
+  std::unique_ptr<Condition> else_c;
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 

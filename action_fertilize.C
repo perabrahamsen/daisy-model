@@ -45,7 +45,7 @@ struct ActionFertilize : public Action
   const Metalib& metalib;
 
   // Parameters.
-  std::auto_ptr<FrameModel> am;
+  std::unique_ptr<FrameModel> am;
   const bool second_year_compensation;
   const double minimum_weight;
 
@@ -62,7 +62,7 @@ struct ActionFertilize : public Action
     Precision (const FrameSubmodel& al);
     ~Precision ();
   };
-  const std::auto_ptr<Precision> precision;
+  const std::unique_ptr<Precision> precision;
 
   // Simulation.
   void common_doIt (Daisy& daisy, double& water, Treelog& msg);

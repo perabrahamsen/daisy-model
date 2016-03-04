@@ -54,7 +54,7 @@ struct Soil::Implementation
   {
     // Content.
     const double end;
-    std::auto_ptr<Horizon> horizon;
+    std::unique_ptr<Horizon> horizon;
 
     // Simulation.
     void output (Log& log) const
@@ -78,12 +78,20 @@ struct Soil::Implementation
   };
   auto_vector<const Layer*> layers;
 
+  static std::vector<double> endpoints (const std::vector<const Layer*>& layers)
+  {
+    std::vector<double> result;
+    for (const Layer* layer : layers)
+      result.push_back (layer->end);
+    return result;
+  }
+
   // Regions.
   struct Region
   {
     // Content.
-    std::auto_ptr<Zone> volume;
-    std::auto_ptr<Horizon> horizon;
+    std::unique_ptr<Zone> volume;
+    std::unique_ptr<Horizon> horizon;
 
     // Simulation.
     void output (Log& log) const
@@ -215,7 +223,9 @@ struct Soil::Implementation
       dispersivity (al.number ("dispersivity")),
       dispersivity_transversal (al.number ("dispersivity_transversal",
 					   dispersivity * 0.1)),
-      border (al.number_sequence ("border")),
+      border (al.check ("border")
+	      ? al.number_sequence ("border")
+	      : endpoints (layers)),
       frozen_water_K_factor (al.number ("frozen_water_K_factor"))
   { }
   ~Implementation ()
@@ -562,8 +572,10 @@ Soil::check_z_border (const double value, Treelog& err) const
     {
       std::ostringstream tmp;
       tmp << "No soil border near " << value
-          << " [cm], log results may be inexact";
-      err.warning (tmp.str ());
+          << " [cm], log results may be inexact.\n\
+Use (Soil (border ... " << value << " ... [cm]) ... ) to correct";
+      err.error (tmp.str ());
+      
     }
   return ok;
 }
@@ -630,13 +642,10 @@ This overrules the 'horizons' paramter.",
 	      Attribute::OptionalConst, "Transversal dispersion length.\n\
 By default, this is 0.1 times the dispersivity.");
   frame.declare ("border", "cm", Check::negative (), 
-              Attribute::Const, Attribute::Variable, "\
+              Attribute::OptionalConst, Attribute::Variable, "\
 List of flux depths where a mass balance should be possible when logging.\n\
-This attribute is ignored if the geometry is specified explicitly.");
+By default, this is the endpoint of each horizon.");
   frame.set_check ("border", VCheck::decreasing ());
-  std::vector<double> default_borders;
-  default_borders.push_back (-100.0);
-  frame.set ("border", default_borders);
   frame.declare ("frozen_water_K_factor", Attribute::None (), 
                  Check::positive (), 
                  Attribute::OptionalConst, "\

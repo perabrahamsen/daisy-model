@@ -33,12 +33,11 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include <sstream>
-#include <boost/scoped_ptr.hpp>
 
 struct XYSourceProfile : public XYSource
 { 
   // Profile parameters.
-  const boost::scoped_ptr<Time> when;
+  const std::unique_ptr<Time> when;
   double plot_z;
   symbol dimension;
   const symbol pos_dim;

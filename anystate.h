@@ -35,11 +35,11 @@ public:
   class Content : private boost::noncopyable
   {
   public:
-    virtual std::auto_ptr<Content> clone () const = 0;
+    virtual std::unique_ptr<Content> clone () const = 0;
     Content ();
     virtual ~Content ();
   };
-  std::auto_ptr<Content> content;
+  std::unique_ptr<Content> content;
   const Content& inspect () const;
 
   // Create and Destroy.
@@ -50,7 +50,7 @@ private:
 public:
   Anystate& operator= (const Anystate&);
   Anystate (const Anystate&);
-  Anystate (std::auto_ptr<Content>);
+  Anystate (std::unique_ptr<Content>);
   ~Anystate ();
 };
 

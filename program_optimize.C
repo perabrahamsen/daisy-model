@@ -37,7 +37,6 @@
 #include "iterative.h"
 #include "check.h"
 #include "vcheck.h"
-#include <boost/scoped_ptr.hpp>
 #include <vector>
 #include <sstream>
 #include <limits>
@@ -102,10 +101,10 @@ Value of each parameter.");
   const Metalib& metalib;
   const Units& units;
   const std::vector<symbol> parameter;
-  boost::scoped_ptr<Boolean> limit;
+  const std::unique_ptr<Boolean> limit;
   boost::shared_ptr<const FrameModel> original;
-  boost::scoped_ptr<Scopesel> scopesel;
-  boost::scoped_ptr<Number> expr;
+  const std::unique_ptr<Scopesel> scopesel;
+  const std::unique_ptr<Number> expr;
   Iterative::Simplex simplex;
   LimScope lim_scope;
   const double epsilon;
@@ -135,7 +134,7 @@ Value of each parameter.");
     for (size_t i = 0; i < point.size (); i++)
       modified.set (parameter[i], point[i]);
 
-    boost::scoped_ptr<Program> program
+    const std::unique_ptr<Program> program
       (Librarian::build_frame<Program> (metalib, msg, modified, "run"));
 
     const Scope *const scope = scopesel->lookup (program->scopes (), msg);

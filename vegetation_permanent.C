@@ -40,7 +40,6 @@
 #include "bioclimate.h"
 #include "soil_heat.h"
 #include "block_model.h"
-#include <boost/scoped_ptr.hpp>
 #include <sstream>
 #include <deque>
 
@@ -62,7 +61,7 @@ struct VegetationPermanent : public Vegetation
   } yearly_LAI;
   const PLF LAIvsDAY;		// LAI as a function of time.
   const double LAIfactor;       // Multiply by this. []
-  boost::scoped_ptr<CanopySimple> canopy;
+  const std::unique_ptr<CanopySimple> canopy;
   double cover_;		// Fraction of soil covered by crops [0-1]
   PLF HvsLAI_;			// Height with LAI below [f: R -> cm]
 
@@ -76,7 +75,7 @@ struct VegetationPermanent : public Vegetation
   double N_litter;		// N litter this hour. [g N/m^2/h]
   const std::vector<boost::shared_ptr<const FrameModel>/**/>& litter_am; // Litter AM parameters.
   // Root.
-  boost::scoped_ptr<RootSystem> root_system;
+  const std::unique_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
 
   // Radiation.

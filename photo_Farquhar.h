@@ -49,8 +49,8 @@ protected:
   const double Xn; //Slope of relationship between leaf N and Vm [mmol/mol/s]
   const double Gamma25;//CO2 compensation point of photosynthesis
   const double Ea_Gamma; // Activation energy for Gamma
-  std::auto_ptr<RubiscoNdist> rubiscoNdist;// Crop N distribution model.
-  std::auto_ptr<StomataCon> Stomatacon;// Stomata conductance.
+  std::unique_ptr<RubiscoNdist> rubiscoNdist;// Crop N distribution model.
+  std::unique_ptr<StomataCon> Stomatacon;// Stomata conductance.
 
   // Log variable.
   std::vector<double> ci_vector; // Stomata CO2 pressure

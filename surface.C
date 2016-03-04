@@ -62,7 +62,7 @@ struct Surface::Implementation
   double runoff_rate;          // [h^-1]
   const double R_mixing;
   const double z_mixing;
-  std::auto_ptr<Ridge> ridge_;
+  std::unique_ptr<Ridge> ridge_;
 
   // UZ top.
   Surface::top_t top_type (const Geometry& geo, size_t edge) const;

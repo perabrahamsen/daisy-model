@@ -94,7 +94,7 @@ struct IntegerCond : public Integer
   // Parameters.
   struct Clause
   {
-    const std::auto_ptr<Boolean> condition;
+    const std::unique_ptr<Boolean> condition;
     const int value;
     static void load_syntax (Frame& frame)
     {

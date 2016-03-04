@@ -44,10 +44,10 @@
 struct ActionTable : public Action
 {
   const Metalib& metalib;
-  const std::auto_ptr<Action> sow;
-  const std::auto_ptr<Action> emerge;
-  const std::auto_ptr<Action> harvest;
-  const std::auto_ptr<FrameModel> am;
+  const std::unique_ptr<Action> sow;
+  const std::unique_ptr<Action> emerge;
+  const std::unique_ptr<Action> harvest;
+  const std::unique_ptr<FrameModel> am;
 
   std::set<Time> sow_dates;
   std::set<Time> emerge_dates;

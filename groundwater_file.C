@@ -46,8 +46,8 @@ private:
 
   // File.
   const symbol file_name;
-  std::auto_ptr<std::istream> owned_stream;
-  std::auto_ptr<LexerData> lex;
+  std::unique_ptr<std::istream> owned_stream;
+  std::unique_ptr<LexerData> lex;
   
   // Groundwater.
 public:
@@ -177,9 +177,9 @@ GroundwaterFile::GroundwaterFile (const BlockModel& al)
     previous_depth (-42.42e42),
     next_depth (-42.42e42),
     depth (-42.42e42),
-    file_name (al.name ("file")),
-    owned_stream (NULL),
-    lex (NULL)
+    file_name (al.name ("file"))
+    // , owned_stream (NULL)
+    // , lex (NULL)
 { }
 
 GroundwaterFile::~GroundwaterFile ()

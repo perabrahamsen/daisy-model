@@ -47,7 +47,7 @@
 struct Movement1D : public MovementSolute
 {
   // Geometry.
-  std::auto_ptr<Geometry1D> geo;
+  std::unique_ptr<Geometry1D> geo;
   Geometry& geometry () const;
 
   // Water.

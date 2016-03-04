@@ -41,8 +41,8 @@ public:
 
   // Create and Destroy.
 public:
-  static std::auto_ptr<WSE> create_none ();
-  static std::auto_ptr<WSE> create_full ();
+  static std::unique_ptr<WSE> create_none ();
+  static std::unique_ptr<WSE> create_full ();
   WSE ();
   ~WSE ();
 };

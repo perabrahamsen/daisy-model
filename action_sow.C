@@ -34,7 +34,7 @@
 struct ActionSow : public Action
 {
   const Metalib& metalib;
-  const std::auto_ptr<FrameModel> crop;
+  const std::unique_ptr<FrameModel> crop;
   const double row_width;
   const double row_pos;
   const double seed;

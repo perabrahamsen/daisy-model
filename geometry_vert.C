@@ -43,8 +43,8 @@ GeometryVert::check_z_border (const double value, Treelog& err) const
     {
       std::ostringstream tmp;
       tmp << "No geometric border near " << value 
-          << " [cm]on z-axis, log results will be inexact";
-      err.warning (tmp.str ());
+          << " [cm] on z-axis, log results will be inexact";
+      err.error (tmp.str ());
     }
   return ok;
 }

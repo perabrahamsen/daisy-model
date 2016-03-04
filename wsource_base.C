@@ -35,8 +35,8 @@
 
 struct WSourceBase::Implementation : public FrameSubmodelValue
 {
-  boost::scoped_ptr<Time> begin;
-  boost::scoped_ptr<Time> end;
+  const std::unique_ptr<Time> begin;
+  const std::unique_ptr<Time> end;
 
   Implementation (const BlockModel& al)
     : FrameSubmodelValue (*Librarian::submodel_frame 

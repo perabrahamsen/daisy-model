@@ -135,7 +135,7 @@ struct DepthExtern : public Depth
 {
   // Content.
   const Units& units;
-  const std::auto_ptr<Number> expr;
+  const std::unique_ptr<Number> expr;
   double value;
 
   void tick (const Time&, const Scope& scope, Treelog& msg)
@@ -401,7 +401,7 @@ struct DepthFile : public Depth
   void initialize (const Time& time, const Scope& scope, Treelog& msg)
   { 
     daisy_assert (state == State::uninitialized);
-    std::auto_ptr<std::istream> input_stream = path.open_file (file.name ());
+    std::unique_ptr<std::istream> input_stream = path.open_file (file.name ());
     LexerData lex (file.name (), *input_stream, msg);
     lex.skip_space ();
     if (lex.peek () == '#')

@@ -299,7 +299,7 @@ MacroStandard::tick (const Geometry1D& geo,
     }
 }
 
-std::auto_ptr<Macro> 
+std::unique_ptr<Macro> 
 Macro::create (const double depth)
 { 
   daisy_assert (depth < 0.0);
@@ -314,7 +314,7 @@ Macro::create (const double depth)
     distribution.add (depth * 0.99, 0.0);
   distribution.add (0.0, 0.0);
 
-  return std::auto_ptr<Macro> (new MacroStandard (distribution)); 
+  return std::unique_ptr<Macro> (new MacroStandard (distribution)); 
 }
 
 

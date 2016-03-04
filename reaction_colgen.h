@@ -31,7 +31,7 @@ class ReactionColgen : public Reaction
   // Parameters.
 protected:
   const symbol colloid_name;
-  const std::auto_ptr<Ponddamp> ponddamp;
+  const std::unique_ptr<Ponddamp> ponddamp;
 
   // Log variable.
 protected:

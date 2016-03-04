@@ -38,9 +38,9 @@ class XYSourceFreq : public XYSource
   const int style_;
   std::vector<double> sorts;
   std::vector<double> plots;
-  const std::auto_ptr<Number> sort_expr;
-  const std::auto_ptr<Number> plot_expr;
-  const std::auto_ptr<Boolean> valid;
+  const std::unique_ptr<Number> sort_expr;
+  const std::unique_ptr<Number> plot_expr;
+  const std::unique_ptr<Boolean> valid;
   const symbol title_;
   const symbol percent;
   const bool use_sort_value;

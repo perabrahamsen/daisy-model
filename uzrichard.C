@@ -48,7 +48,7 @@ class UZRichard : public UZmodel
   const int msg_number_of_small_time_steps;
   const double max_absolute_difference;
   const double max_relative_difference;
-  std::auto_ptr<const Average> K_average;
+  std::unique_ptr<const Average> K_average;
 
   // Simulate.
 private:
@@ -208,7 +208,7 @@ UZRichard::richard (Treelog& msg,
       if (ddt > time_left)
 	ddt = time_left;
 
-      std::auto_ptr<Treelog::Open> nest;
+      std::unique_ptr<Treelog::Open> nest;
 
       if (n_small_time_steps > 0
           && (n_small_time_steps%msg_number_of_small_time_steps) == 0)

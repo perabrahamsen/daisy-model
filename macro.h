@@ -61,7 +61,7 @@ public:
 
   // Create and Destroy.
 public:
-  static std::auto_ptr<Macro> create (double depth); // Defined in macro_std.C.
+  static std::unique_ptr<Macro> create (double depth); // Defined in macro_std.C.
 protected:
   Macro (const BlockModel& al);
   Macro (symbol id);

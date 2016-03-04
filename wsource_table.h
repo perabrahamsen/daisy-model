@@ -25,7 +25,6 @@
 #include "time.h"
 #include "lexer_table.h"
 #include "frame_submodel.h"
-#include <boost/scoped_ptr.hpp>
 #include <map>
 
 class Units;

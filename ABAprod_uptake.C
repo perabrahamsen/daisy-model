@@ -42,7 +42,7 @@ struct ABAProdUptake : public ABAProd
 
   // Parameters.
   mutable ScopeID scope;
-  const std::auto_ptr<Number> expr;
+  const std::unique_ptr<Number> expr;
   
   // Solve.
   void production (const Units&, const Geometry&, const SoilWater&,

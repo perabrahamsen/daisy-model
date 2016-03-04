@@ -30,7 +30,6 @@
 #include "check.h"
 #include "vcheck.h"
 #include "filepos.h"
-#include <boost/scoped_ptr.hpp>
 #include <fstream>
 #include <sstream>
 #include <numeric>
@@ -65,8 +64,8 @@ struct ProgramPost : public Program
   std::vector<Time::component_t> time_columns;
   DLF print_header;		// How much header should be printed?
   const symbol where;           // Output file.
-  const boost::scoped_ptr<Time> after;
-  const boost::scoped_ptr<Time> before;
+  const std::unique_ptr<Time> after;
+  const std::unique_ptr<Time> before;
   const double top;
   const double bottom;
   const double left;

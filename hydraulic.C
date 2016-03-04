@@ -266,7 +266,7 @@ properties.")
 
 struct ProgramHydraulic_table : public Program
 {
-  const std::auto_ptr<Horizon> horizon;
+  const std::unique_ptr<Horizon> horizon;
   const int intervals;
   const bool top_soil;
 

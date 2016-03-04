@@ -149,7 +149,7 @@ struct ActionCond : public Action
 {
   struct clause
   {
-    std::auto_ptr<Condition> condition;
+    std::unique_ptr<Condition> condition;
     std::vector<Action*> actions;
     void output (Log& log) const
     { 
@@ -258,9 +258,9 @@ struct ActionCond : public Action
 
 struct ActionIf : public Action
 {
-  std::auto_ptr<Condition> if_c;
-  std::auto_ptr<Action> then_a;
-  std::auto_ptr<Action> else_a;
+  std::unique_ptr<Condition> if_c;
+  std::unique_ptr<Action> then_a;
+  std::unique_ptr<Action> else_a;
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& msg)
   { 

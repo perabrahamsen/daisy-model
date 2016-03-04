@@ -37,12 +37,12 @@
 struct DrainLateral : public Drain
 {
   // Parameters
-  std::auto_ptr<const Draineqd> eq_depth; 
+  std::unique_ptr<const Draineqd> eq_depth; 
   const double L;               // Distance between pipes. [cm]
   const double rad;             // Inner radius of drain pipes. [cm]
   const double x;               // Distance to nearest pipe. [cm]
   const double pipe_position;   // Height pipes are placed above surface. [cm]
-  std::auto_ptr<Depth> pipe_outlet; // Water level at pipe outlet. [cm]
+  std::unique_ptr<Depth> pipe_outlet; // Water level at pipe outlet. [cm]
   const double K_to_pipes_;     // Horizontal sat. conductivity. [cm h^-1]
 
   // Data.

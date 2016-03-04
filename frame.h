@@ -54,7 +54,7 @@ class EXPORT Frame : public WScope
   // Content.
   struct Implementation;
  public:
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
   virtual symbol type_name () const;
   symbol base_name () const;
   virtual symbol description () const;

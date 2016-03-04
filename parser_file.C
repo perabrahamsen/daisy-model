@@ -62,9 +62,9 @@ struct ParserFile::Implementation
 
   // Lexer.
   const symbol file;
-  std::auto_ptr<std::istream> owned_stream;
-  std::auto_ptr<Lexer> lexer;
-  std::auto_ptr<Treelog::Open> nest;
+  std::unique_ptr<std::istream> owned_stream;
+  std::unique_ptr<Lexer> lexer;
+  std::unique_ptr<Treelog::Open> nest;
 
   int get ()
   { return lexer->get (); }
@@ -251,7 +251,7 @@ ParserFile::Implementation::get_integer ()
              + treelog.str () + "---");
       return -42;
     }
-  std::auto_ptr<Integer> integer 
+  std::unique_ptr<Integer> integer 
     (Librarian::build_frame<Integer> (metalib (), treelog, *frame, "integer"));
   if (!integer.get ()
       || !integer->initialize (metalib ().units (), Scope::null (), treelog)
@@ -358,7 +358,7 @@ ParserFile::Implementation::get_number (const symbol syntax_dim)
              + treelog.str () + "---");
       return -42.42e42;
     }
-  std::auto_ptr<Number> number 
+  std::unique_ptr<Number> number 
     (Librarian::build_frame<Number> (metalib (), msg, *frame, "number"));
   const Units& units = metalib ().units ();
   if (!number.get ()
@@ -1088,7 +1088,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                 /* Do nothing */;
 	      else if (lib.name () == symbol (Parser::component))
 		{
-		  std::auto_ptr<Parser> parser 
+		  std::unique_ptr<Parser> parser 
                     (Librarian::build_frame<Parser> (metalib (), msg, *child,
                                                      name));
                   if (!parser.get ())

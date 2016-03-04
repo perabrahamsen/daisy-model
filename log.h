@@ -56,7 +56,7 @@ class EXPORT Log : public ModelFramed
   // Content.
 private:
   struct Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
 public:
   static const char *const component;
   symbol library_id () const;

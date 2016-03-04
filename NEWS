@@ -8,6 +8,18 @@ release.
 
 * 5.23
 
+** You now need to specify Soil border when logging to a specific depth.
+
+E.g. you need 
+
+(Soil (border -75 -150 [cm]))
+
+in the column definition, for
+
+(output ("Field water" (from -75 [cm]) (to -150 [cm])))
+
+to work.
+
 ** You can now specify initial values of soil variables with a PLF.
 
 E.g. to specify initial value of h that is at field capacy near the

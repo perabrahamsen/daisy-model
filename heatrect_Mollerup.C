@@ -313,7 +313,7 @@ fluxes (const GeometryRect& geo,
 struct HeatrectMollerup : public Heatrect
 {
   // Content.
-  const std::auto_ptr<Solver> solver;
+  const std::unique_ptr<Solver> solver;
   const int debug;
   
   // Use.

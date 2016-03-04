@@ -59,7 +59,7 @@ public:
 public:
   Nitrification (const BlockModel& al);
   Nitrification (const Frame& al);
-  static std::auto_ptr<Nitrification> create_default ();
+  static std::unique_ptr<Nitrification> create_default ();
 public:
   ~Nitrification ();
 };

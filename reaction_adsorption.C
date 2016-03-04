@@ -44,9 +44,9 @@ struct ReactionAdsorption : public Reaction
   // Parameters.
   const symbol name_solute;
   const symbol name_sorbed;
-  const std::auto_ptr<Adsorption> equilibrium;
-  const std::auto_ptr<Number> adsorption_rate;
-  const std::auto_ptr<Number> desorption_rate;
+  const std::unique_ptr<Adsorption> equilibrium;
+  const std::unique_ptr<Number> adsorption_rate;
+  const std::unique_ptr<Number> desorption_rate;
   
   // Output.
   std::vector<double> adsorption_source;

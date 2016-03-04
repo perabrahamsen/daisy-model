@@ -35,7 +35,7 @@ class Treelog;
 class Surface
 {
   struct Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
 
 public:
   // Communication with soil water.

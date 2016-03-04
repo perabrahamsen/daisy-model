@@ -54,8 +54,8 @@ struct UZRectMollerup : public UZRect
   enum top_state { top_undecided, top_flux, top_pressure };
 
   // Parameters.  
-  const std::auto_ptr<Solver> solver;
-  std::auto_ptr<const Condedge> K_average;  
+  const std::unique_ptr<Solver> solver;
+  std::unique_ptr<const Condedge> K_average;  
   const int max_time_step_reductions;
   const int time_step_reduction;
   const int max_iterations; 

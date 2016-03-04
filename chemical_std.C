@@ -75,10 +75,10 @@ struct ChemicalStandard : public Chemical
   const auto_vector<const Product*> product;
 
   const bool drain_secondary;
-  const std::auto_ptr<Number> C_below_expr;
+  const std::unique_ptr<Number> C_below_expr;
   double C_below_value;
-  const std::auto_ptr<Number> initial_expr;
-  const std::auto_ptr<Adsorption> adsorption_;
+  const std::unique_ptr<Number> initial_expr;
+  const std::unique_ptr<Adsorption> adsorption_;
 
   // Management.
   double deposit_;

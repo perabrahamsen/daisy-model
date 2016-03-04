@@ -67,8 +67,8 @@ public:
 
   // Create and Destroy.
 public:
-  static std::auto_ptr<Volume> build_obsolete (const BlockModel&);
-  static std::auto_ptr<Volume> build_none ();
+  static std::unique_ptr<Volume> build_obsolete (const BlockModel&);
+  static std::unique_ptr<Volume> build_none ();
   Volume (const BlockModel&);
   Volume (const char* id);
   ~Volume ();

@@ -41,11 +41,11 @@ class XYSourceExpr : public XYSource
   std::vector<double> ys;
   std::vector<double> xbars;
   std::vector<double> ybars;
-  const std::auto_ptr<Number> x_expr;
-  const std::auto_ptr<Number> y_expr;
-  const std::auto_ptr<Number> xbar_expr;
-  const std::auto_ptr<Number> ybar_expr;
-  const std::auto_ptr<Boolean> valid;
+  const std::unique_ptr<Number> x_expr;
+  const std::unique_ptr<Number> y_expr;
+  const std::unique_ptr<Number> xbar_expr;
+  const std::unique_ptr<Number> ybar_expr;
+  const std::unique_ptr<Boolean> valid;
   const symbol title_;
   symbol x_dimension_;
   symbol y_dimension_;

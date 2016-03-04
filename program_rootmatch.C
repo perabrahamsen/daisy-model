@@ -175,7 +175,7 @@ By default identical to `dx'.");
         dz (al.number ("dz", dx))
     { }
   };
-  boost::scoped_ptr<Gnuplot> gnuplot;
+  const std::unique_ptr<Gnuplot> gnuplot;
 
   // Utils
   double get_value (const symbol from, const symbol to, std::string& entry)

@@ -40,10 +40,10 @@ struct NumberByDepth : public Number
   const Units& units;
 
   // Parameters.
-  const std::auto_ptr<Column> column;
+  const std::unique_ptr<Column> column;
   /* const */ double max_depth;
-  const std::auto_ptr<Number> h;
-  const std::auto_ptr<Number> z;
+  const std::unique_ptr<Number> h;
+  const std::unique_ptr<Number> z;
 
   // Simulation.
   void tick (const Units& units, const Scope& scope, Treelog& msg)
@@ -205,8 +205,8 @@ struct NumberByTension : public Number
   const Units& units;
 
   // Parameters.
-  const std::auto_ptr<Horizon> horizon;
-  const std::auto_ptr<Number> h;
+  const std::unique_ptr<Horizon> horizon;
+  const std::unique_ptr<Number> h;
 
   // Simulation.
   void tick (const Units& units, const Scope& scope, Treelog& msg)
@@ -403,8 +403,8 @@ struct NumberTensionByTheta : public Number
   const Units& units;
 
   // Parameters.
-  const std::auto_ptr<Horizon> horizon;
-  const std::auto_ptr<Number> Theta;
+  const std::unique_ptr<Horizon> horizon;
+  const std::unique_ptr<Number> Theta;
 
   // Simulation.
   void tick (const Units& units, const Scope& scope, Treelog& msg)

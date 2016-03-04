@@ -89,7 +89,7 @@ public:
   const symbol name;
   struct Implementation;
 private:
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
 protected:
   MultiDest dest;
 public:

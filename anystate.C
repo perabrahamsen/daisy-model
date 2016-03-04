@@ -38,15 +38,15 @@ Anystate::none ()
 {
   struct ContentNone : public Content
   {
-    std::auto_ptr<Content> clone () const
+    std::unique_ptr<Content> clone () const
     { 
-      std::auto_ptr<Content> copy (new ContentNone ());
+      std::unique_ptr<Content> copy (new ContentNone ());
       return copy; 
     }
   };
   
-  std::auto_ptr<Content> copy (new ContentNone ());
-  return Anystate (copy);
+  std::unique_ptr<Content> copy (new ContentNone ());
+  return Anystate (std::move (copy));
 }
 
 Anystate& 
@@ -63,7 +63,7 @@ Anystate::Anystate (const Anystate& other)
   content = other.content->clone ();
 }
 
-Anystate::Anystate (const std::auto_ptr<Content> other)
+Anystate::Anystate (const std::unique_ptr<Content> other)
 { 
   daisy_assert (content.get () != other.get ());
   content = other->clone (); 

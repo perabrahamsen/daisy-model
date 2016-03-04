@@ -97,7 +97,7 @@ Path::get_daisy_home ()
 	  // Check MS Windows registry
 #if defined (_WIN32) || defined (__CYGWIN32__)
 	  const std::string key = "Software\\Daisy " + std::string (version)
-#ifdef __LLP64__
+#ifdef _WIN64
 	    + " (w64)"
 #else
 	    + " (w32)"
@@ -114,6 +114,7 @@ Path::get_daisy_home ()
 	    }
 	  else
 	    {
+	      Assertion::debug ("'" + key + "' not found.");
 	      Assertion::debug ("Using standard MS Windows home.");
 	      daisy_home = "C:/daisy";
 	    }
@@ -182,7 +183,7 @@ Path::nodir (symbol name_s)
   return result;
 }
 
-std::auto_ptr<std::istream> 
+std::unique_ptr<std::istream> 
 Path::open_file (symbol name_s) const
 {
   const std::string& name = name_s.name ();
@@ -194,7 +195,7 @@ Path::open_file (symbol name_s) const
   } tmp;
   tmp << "In directory '" << get_directory () << "':";
 
-  std::auto_ptr<std::istream> in;
+  std::unique_ptr<std::istream> in;
 
   // Absolute filename.
   if (name[0] == '.' || name[0] == '/'

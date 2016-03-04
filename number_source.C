@@ -32,9 +32,9 @@
 
 struct NumberSource : public Number
 {
-  const std::auto_ptr<Source> source;
-  const std::auto_ptr<const Time> begin;
-  const std::auto_ptr<const Time> end;
+  const std::unique_ptr<Source> source;
+  const std::unique_ptr<const Time> begin;
+  const std::unique_ptr<const Time> end;
   enum { uninitialized, error, is_missing, has_value } state;
   double val;
 

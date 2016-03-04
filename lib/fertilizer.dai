@@ -39,7 +39,7 @@ Added by <sha@kvl.dk>, 2000.")
   (description "Average based on numbers provided by Torben Bonde, Danish
 Environmental Protection Agency, approximately 1991.
 Added by <sha@kvl.dk>, 2000.")
-  (volatilization 0.15 [])
+  (volatilization 0.0 [])
   (om (AOM-SLOW (initial_fraction 0.72 [])
                 (C_per_N 100 [(g C/cm^3)/(g N/cm^3)])
                 (turnover_rate 2.0e-4 [h^-1])

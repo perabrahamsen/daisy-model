@@ -56,7 +56,7 @@ class EXPORT Toplevel : private boost::noncopyable
   //Content.
 private:
   struct Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
 public:
   static const char *const default_description;
 

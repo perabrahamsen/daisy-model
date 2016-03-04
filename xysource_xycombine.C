@@ -35,7 +35,7 @@ struct XYSourceXYCombine : public XYSource
 {
   // Content.
   ScopeXYSources scope;
-  const std::auto_ptr<Number> expr;
+  const std::unique_ptr<Number> expr;
   const symbol title_;
   symbol x_dimension_;
   symbol y_dimension_;

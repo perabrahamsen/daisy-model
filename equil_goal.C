@@ -37,8 +37,8 @@ struct EquilibriumGoal_A : public Equilibrium
   static const symbol goal_unit;
 
   // Parameters.
-  std::auto_ptr<Number> goal_A_expr;
-  std::auto_ptr<Number> min_B_expr;
+  std::unique_ptr<Number> goal_A_expr;
+  std::unique_ptr<Number> min_B_expr;
   const bool A_solute;
   const bool B_solute;
   const int debug_cell;

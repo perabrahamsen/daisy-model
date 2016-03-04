@@ -40,7 +40,7 @@ struct ReactionMorgan98 : public ReactionColgen
   /* const */ double surface_soil; // Soil on surface layer. [g/m^2]
 
   // Parameters.
-  const std::auto_ptr<Rainergy> rainergy; // Energy in rain [J/cm^2/h]
+  const std::unique_ptr<Rainergy> rainergy; // Energy in rain [J/cm^2/h]
   const double kd;                        // Detachment rate coefficient [g/J]
 
   // Log variable.

@@ -33,14 +33,13 @@
 #include "vcheck.h"
 #include "geometry.h"
 #include <sstream>
-#include <boost/scoped_ptr.hpp>
 
 struct GnuplotVector : public GnuplotBase
 {
   // Ranges.
-  const boost::scoped_ptr<Time> when;
-  const boost::scoped_ptr<Time> begin;
-  const boost::scoped_ptr<Time> end;
+  const std::unique_ptr<Time> when;
+  const std::unique_ptr<Time> begin;
+  const std::unique_ptr<Time> end;
   const double top;
   double bottom;
   const double left;

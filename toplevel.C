@@ -48,8 +48,8 @@ struct Toplevel::Implementation : boost::noncopyable
 {
   const symbol preferred_ui;
   const std::string program_name;
-  std::auto_ptr<Program> program;
-  std::auto_ptr<FrameModel> program_frame_owner;
+  std::unique_ptr<Program> program;
+  std::unique_ptr<FrameModel> program_frame_owner;
 
   TreelogServer msg;
   
@@ -63,7 +63,7 @@ struct Toplevel::Implementation : boost::noncopyable
 
   std::vector<std::string> files_found;
   bool ran_user_interface;
-  std::auto_ptr<UI> ui;
+  std::unique_ptr<UI> ui;
   void add_daisy_ui (Toplevel& toplevel);
 
   bool has_daisy_log;
@@ -167,7 +167,7 @@ Toplevel::Implementation::Implementation (Metalib::load_frame_t load_syntax,
                                           const std::string& pref_ui)
   : preferred_ui (pref_ui),
     program_name ("daisy"),
-    program (NULL),
+    // program (NULL),
     reg (msg),
     metalib (load_syntax),
     start_time (std::time (NULL)),
@@ -390,7 +390,7 @@ Toplevel::initialize ()
           {
             const Library& library = metalib ().library (Program::component);
             const FrameModel& old_frame = library.model ("Daisy");
-            std::auto_ptr<FrameModel> frame 
+            std::unique_ptr<FrameModel> frame 
               (new FrameModel (old_frame, Frame::parent_link));
             // Frame::overwrite only gives us the values, not the
             // types.  This means we avoid all the extra crap in
@@ -399,7 +399,7 @@ Toplevel::initialize ()
             frame->overwrite_values (metalib ());
             impl->program.reset (Librarian::build_frame<Program> (block, *frame,
                                                                   "toplevel"));
-            impl->program_frame_owner = frame;
+            impl->program_frame_owner = std::move (frame);
           }
         if (!block.ok ())
           throw EXIT_FAILURE;

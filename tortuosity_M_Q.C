@@ -47,9 +47,9 @@ public:
   { }
 };
 
-std::auto_ptr<Tortuosity>
+std::unique_ptr<Tortuosity>
 Tortuosity::create_default ()
-{ return std::auto_ptr<Tortuosity> (new TortuosityM_Q ());  }
+{ return std::unique_ptr<Tortuosity> (new TortuosityM_Q ());  }
 
 static struct TortuosityM_QSyntax : public DeclareModel
 {

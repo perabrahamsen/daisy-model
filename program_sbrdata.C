@@ -49,7 +49,7 @@ struct ProgramRS2WG : public Program
   bool run (Treelog& msg)
   {
     // Open files.
-    std::auto_ptr<std::istream> rsin = path.open_file (rshourly_file);
+    std::unique_ptr<std::istream> rsin = path.open_file (rshourly_file);
     daisy_assert (rsin.get ());
     LexerData rs_hourly (rshourly_file, *(rsin.get ()), msg);
     if (!rs_hourly.good ())
@@ -330,7 +330,7 @@ struct ProgramWG2DWF : public Program
   bool run (Treelog& msg)
   {
     // Open files.
-    std::auto_ptr<std::istream> wgin = path.open_file (wg_file);
+    std::unique_ptr<std::istream> wgin = path.open_file (wg_file);
     daisy_assert (wgin.get ());
     LexerData wg (wg_file, *(wgin.get ()), msg);
     if (!wg.good ())

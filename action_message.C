@@ -34,7 +34,7 @@
 
 struct ActionAssert : public Action
 {
-  std::auto_ptr<Condition> condition;
+  std::unique_ptr<Condition> condition;
   const symbol message;
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& out)

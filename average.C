@@ -72,9 +72,9 @@ Arithmetic average '(a+b)/2'.")
 } AverageArithmetic_syntax;
 
 
-std::auto_ptr<const Average>
+std::unique_ptr<const Average>
 Average::build_arithmetic ()
-{ return std::auto_ptr<const Average> (new AverageArithmetic (__FUNCTION__)); }
+{ return std::unique_ptr<const Average> (new AverageArithmetic (__FUNCTION__)); }
 
 // harmonic model.
 
@@ -130,9 +130,9 @@ Geometric average 'sqrt(a*b)'.")
   { }
 } AverageGeometric_syntax;
 
-std::auto_ptr<const Average>
+std::unique_ptr<const Average>
 Average::build_geometric ()
-{ return std::auto_ptr<const Average> (new AverageGeometric (__FUNCTION__)); }
+{ return std::unique_ptr<const Average> (new AverageGeometric (__FUNCTION__)); }
 
 static struct AverageInit : public DeclareComponent 
 {

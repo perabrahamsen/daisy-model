@@ -42,7 +42,7 @@ struct rubiscoNdist_forced : public RubiscoNdist
 
   // Parameters.
 private:
-  const std::auto_ptr<Number> expr;
+  const std::unique_ptr<Number> expr;
   ScopeExchange scope;
   
   // Simulation.

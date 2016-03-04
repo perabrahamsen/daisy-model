@@ -94,9 +94,9 @@ struct SecondaryNone : public Secondary
   {}
 };
 
-std::auto_ptr<Secondary>
+std::unique_ptr<Secondary>
 Secondary::create_none ()
-{ return std::auto_ptr<Secondary> (new SecondaryNone ());  }
+{ return std::unique_ptr<Secondary> (new SecondaryNone ());  }
 
 static struct SecondaryNoneSyntax : public DeclareModel
 {

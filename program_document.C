@@ -48,7 +48,7 @@ struct ProgramDocument : public Program
   XRef xref;
   const symbol where;
   std::ofstream out;
-  std::auto_ptr<Format> format;
+  std::unique_ptr<Format> format;
   const bool print_parameterizations;
   // remember this for models.
   symbol current_component;
@@ -1367,7 +1367,7 @@ struct ProgramDocmodel : public Program
   const Metalib& metalib;
   const symbol where;
   std::ofstream out;
-  std::auto_ptr<Format> format;
+  std::unique_ptr<Format> format;
   const std::vector<symbol> models;
   const symbol current_component;
 

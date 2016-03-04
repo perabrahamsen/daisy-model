@@ -41,7 +41,6 @@
 #include "bioclimate.h"
 #include "soil_heat.h"
 #include "block_model.h"
-#include <boost/scoped_ptr.hpp>
 #include <sstream>
 #include <deque>
 
@@ -68,7 +67,7 @@ struct VegetationAfforestation : public Vegetation
   const double rhizodeposition_C_per_N; // kg C/kg N 
 
   // Vegetation.
-  boost::scoped_ptr<CanopySimple> canopy;
+  const std::unique_ptr<CanopySimple> canopy;
   double cover_;		// Fraction of soil covered by crops [0-1]
   PLF HvsLAI_;			// Height with LAI below [f: R -> cm]
 
@@ -84,7 +83,7 @@ struct VegetationAfforestation : public Vegetation
   const std::vector<boost::shared_ptr<const FrameModel>/**/>& root_am;
 
   // Root.
-  boost::scoped_ptr<RootSystem> root_system;
+  const std::unique_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
 
   // Radiation.

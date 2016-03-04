@@ -33,7 +33,6 @@
 #include "frame.h"
 #include "mathlib.h"
 #include "units.h"
-#include <boost/scoped_ptr.hpp>
 #include <sstream>
 
 class GroundwaterSource : public Groundwater
@@ -41,7 +40,7 @@ class GroundwaterSource : public Groundwater
   // Data.
 private:
   const Units& units;
-  boost::scoped_ptr<Source> source;
+  const std::unique_ptr<Source> source;
   size_t index;
   bool is_ok;
   const double offset;

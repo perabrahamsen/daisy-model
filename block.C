@@ -136,7 +136,7 @@ Block::expand_string (const symbol value_s, std::set<symbol>& outer) const
                         const symbol component = frame.component (key);
                         if (component == Stringer::component)
                           {
-                            const std::auto_ptr<Stringer> stringer 
+                            const std::unique_ptr<Stringer> stringer 
                               (Librarian::build_frame<Stringer> (*this,
                                                                  obj, key));
                             if (!ok () 
@@ -150,7 +150,7 @@ Block::expand_string (const symbol value_s, std::set<symbol>& outer) const
                           }
                         else if (component == Number::component)
                           {
-                            const std::auto_ptr<Number> number 
+                            const std::unique_ptr<Number> number 
                               (Librarian::build_frame<Number> (*this, 
                                                                obj, key));
                             if (!ok () 
@@ -314,7 +314,7 @@ Block::can_extract_as (const symbol key, Attribute::type other_type) const
         if (!frame.check (*this))
           return false;
         
-        std::auto_ptr<Number> number (Librarian::build_frame<Number>
+        std::unique_ptr<Number> number (Librarian::build_frame<Number>
                                       (*this, frame.model (key), key));
         if (!number.get ())
           return false;
@@ -332,7 +332,7 @@ Block::can_extract_as (const symbol key, Attribute::type other_type) const
         if (!frame.check (*this))
           return false;
         
-        std::auto_ptr<Stringer> stringer (Librarian::build_frame<Stringer>
+        std::unique_ptr<Stringer> stringer (Librarian::build_frame<Stringer>
                                       (*this, frame.model (key), key));
         if (!stringer.get ())
           return false;
@@ -350,7 +350,7 @@ Block::can_extract_as (const symbol key, Attribute::type other_type) const
         if (!frame.check (*this))
           return false;
         
-        std::auto_ptr<Boolean> boolean (Librarian::build_frame<Boolean>
+        std::unique_ptr<Boolean> boolean (Librarian::build_frame<Boolean>
                                       (*this, frame.model (key), key));
         if (!boolean.get ())
           return false;
@@ -424,7 +424,7 @@ Block::number (const symbol key) const
   daisy_assert (type == Attribute::Model);
   daisy_assert (frame.component (key) == Number::component);
   daisy_assert (frame.check (*this));
-  std::auto_ptr<Number> number (Librarian::build_frame<Number> 
+  std::unique_ptr<Number> number (Librarian::build_frame<Number> 
                                 (*this, frame.model (key), key));
   daisy_assert (number.get ());
   daisy_assert (number->initialize (units (), *this, msg ()));
@@ -460,7 +460,7 @@ Block::name (const symbol key) const
   daisy_assert (type == Attribute::Model);
   daisy_assert (frame.component (key) == Stringer::component);
   daisy_assert (frame.check (*this));
-  std::auto_ptr<Stringer> stringer (Librarian::build_frame<Stringer> 
+  std::unique_ptr<Stringer> stringer (Librarian::build_frame<Stringer> 
                                 (*this, frame.model (key), key));
   daisy_assert (stringer.get ());
   daisy_assert (stringer->initialize (units (), *this, msg ()));
@@ -496,7 +496,7 @@ Block::flag (const symbol key) const
   daisy_assert (type == Attribute::Model);
   daisy_assert (frame.component (key) == Boolean::component);
   daisy_assert (frame.check (*this));
-  std::auto_ptr<Boolean> boolean (Librarian::build_frame<Boolean> 
+  std::unique_ptr<Boolean> boolean (Librarian::build_frame<Boolean> 
                                 (*this, frame.model (key), key));
   daisy_assert (boolean.get ());
   daisy_assert (boolean->initialize (units (), *this, msg ()));

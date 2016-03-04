@@ -38,7 +38,7 @@ struct ReactionStandard : public Reaction
   // Parameters.
   const symbol name_A;
   const symbol name_B;
-  const std::auto_ptr<Transform> transform;
+  const std::unique_ptr<Transform> transform;
   
   // Output.
   std::vector<double> S_AB;

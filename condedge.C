@@ -83,9 +83,9 @@ Use the arithmetic average of the conductivity in the two cells.")
 } CondedgeArithmetic_syntax;
 
 
-std::auto_ptr<const Condedge>
+std::unique_ptr<const Condedge>
 Condedge::build_arithmetic ()
-{ return std::auto_ptr<const Condedge> (new CondedgeArithmetic (__FUNCTION__)); }
+{ return std::unique_ptr<const Condedge> (new CondedgeArithmetic (__FUNCTION__)); }
 
 // The 'harmonic' model.
 
@@ -147,9 +147,9 @@ Geometric average 'sqrt(a*b)'.")
   { }
 } CondedgeGeometric_syntax;
 
-std::auto_ptr<const Condedge>
+std::unique_ptr<const Condedge>
 Condedge::build_geometric ()
-{ return std::auto_ptr<const Condedge> (new CondedgeGeometric (__FUNCTION__)); }
+{ return std::unique_ptr<const Condedge> (new CondedgeGeometric (__FUNCTION__)); }
 
 // The 'pressure' model.
 

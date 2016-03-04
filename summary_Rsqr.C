@@ -32,7 +32,6 @@
 #include "submodeler.h"
 #include "mathlib.h"
 #include "vcheck.h"
-#include <boost/scoped_ptr.hpp>
 #include <numeric>
 #include <sstream>
 #include <map>

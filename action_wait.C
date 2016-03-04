@@ -35,7 +35,7 @@
 
 struct ActionWait : public Action
 {
-  std::auto_ptr<Condition> condition;
+  std::unique_ptr<Condition> condition;
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { condition->tick (daisy, scope, out); }

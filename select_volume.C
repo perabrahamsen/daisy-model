@@ -45,12 +45,12 @@ struct SelectVolume : public SelectValue
   const bool density_x;
   const bool density_y;
   int dimensions () const;
-  std::auto_ptr<Volume> volume;
+  std::unique_ptr<Volume> volume;
   const double min_root_density;
   const symbol min_root_crop;
 
   // Bulk density convertions.
-  std::auto_ptr<BD_convert> bd_convert;
+  std::unique_ptr<BD_convert> bd_convert;
   const Convert* special_convert (const Units&, 
                                   const symbol has, const symbol want);
 
@@ -220,13 +220,13 @@ SelectVolume::output_array (const std::vector<double>& array)
           }
         else
           for (size_t i = 0; i < cell.size (); i++)
-              {
-                const size_t c = cell[i];
+	    {
+	      const size_t c = cell[i];
 
-                if (weight[c] > 0.0 && (!std::isfinite (result)
-                                        || array[c] < result))
-                  result = array[c];
-              }
+	      if (weight[c] > 0.0 && (!std::isfinite (result)
+				      || array[c] < result))
+		result = array[c];
+	    }
 
         add_result (result);
       }
@@ -259,13 +259,13 @@ SelectVolume::output_array (const std::vector<double>& array)
           }
         else
           for (size_t i = 0; i < cell.size (); i++)
-              {
-                const size_t c = cell[i];
+	    {
+	      const size_t c = cell[i];
 
-                if (weight[c] > 0.0 && (!std::isfinite (result)
-                                        || array[c] > result))
-                  result = array[c];
-              }
+	      if (weight[c] > 0.0 && (!std::isfinite (result)
+				      || array[c] > result))
+		result = array[c];
+	    }
 
         add_result (result);
       }
@@ -366,7 +366,7 @@ SelectVolume::SelectVolume (const BlockModel& al)
     volume (Volume::build_obsolete (al)),
     min_root_density (al.number ("min_root_density")),
     min_root_crop (al.name ("min_root_crop")),
-    bd_convert (NULL),
+    // bd_convert (NULL),
     active (colcache.end ())
 { }
   

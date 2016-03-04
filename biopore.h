@@ -51,7 +51,7 @@ public:
 
   // Parameters.
 protected:
-  std::auto_ptr<Number> density_expr; // Biopore density [cm -> m^-2]
+  std::unique_ptr<Number> density_expr; // Biopore density [cm -> m^-2]
   const double height_start;          // Height biopores start [cm]
   const double height_end;            // Height biopores end [cm]
   const double diameter;              // [cm]

@@ -56,13 +56,13 @@ struct BioporeMatrix : public Biopore
 
   // State.
   std::vector<double> h_bottom; // [cm]
-  std::auto_ptr<IMvec> solute;  // [g]
+  std::unique_ptr<IMvec> solute;  // [g]
   struct MyContent : public Anystate::Content
   {
     std::vector<double> h_bottom;
-    std::auto_ptr<Anystate::Content> clone () const
+    std::unique_ptr<Anystate::Content> clone () const
     { 
-      std::auto_ptr<Anystate::Content> copy (new MyContent (h_bottom)); 
+      std::unique_ptr<Anystate::Content> copy (new MyContent (h_bottom)); 
       return copy;
     }
     MyContent (const std::vector<double> (h))
@@ -175,8 +175,8 @@ struct BioporeMatrix : public Biopore
 Anystate
 BioporeMatrix::get_state () const
 {
-  std::auto_ptr<Anystate::Content> copy (new MyContent (h_bottom));
-  return Anystate (copy);
+  std::unique_ptr<Anystate::Content> copy (new MyContent (h_bottom));
+  return Anystate (std::move (copy));
 }
  
 void 

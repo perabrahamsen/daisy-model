@@ -24,14 +24,14 @@
 
 #include "wsource.h"
 #include "weatherdata.h"
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 class IM;
 
 class WSourceWeather : public WSource
 {
   class Implementation;
-  const boost::scoped_ptr<Implementation> impl;
+  const std::unique_ptr<Implementation> impl;
 
   // Location.
 public:

@@ -1,18 +1,8 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* function
-
-(initial_h plf () () ())
-(initial_h layer () () ())
-(initial_h number (arg z) (+ 
-
-FunctionPLF
-
-* initial_h_plf
-
 * FAO_PM
 
-** Lav testopsÃ¦tning med vinterhvede og valg mellem time og dagsÃ¦rdier
+** Lav testopsætning med vinterhvede og valg mellem time og dagsværdier
 
 ** Beregne begge med makking og med FAO_PM
 

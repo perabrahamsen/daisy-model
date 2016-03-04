@@ -36,7 +36,7 @@ class PrinterFile : public Printer
   // Content.
 private:
   struct Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
 
   // Interface.
 public:

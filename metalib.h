@@ -46,7 +46,7 @@ class EXPORT Metalib : public Frame
 {
   // Content.
   class Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
 
   // Interface.
 public:

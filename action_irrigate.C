@@ -46,7 +46,7 @@ struct ActionIrrigate : public Action
   const int hours;
   const double remaining_time;
 
-  const std::auto_ptr<Number> expr_flux;
+  const std::unique_ptr<Number> expr_flux;
   double flux;
   const double temp;
   const IM sm;

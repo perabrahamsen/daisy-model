@@ -155,7 +155,7 @@ Librarian::build_frame (const symbol component, const Metalib& metalib,
   // Build.
   BlockTop parent (metalib, msg, frame);
   const symbol type = frame.type_name ();
-  std::auto_ptr<Model> m (frame.construct (parent, type)); 
+  std::unique_ptr<Model> m (frame.construct (parent, type)); 
   if (!parent.ok ())
     return NULL;
   return m.release ();

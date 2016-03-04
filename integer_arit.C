@@ -34,7 +34,7 @@
 struct IntegerOperand : public Integer
 {
   // Parameters.
-  const std::auto_ptr<Integer> operand;
+  const std::unique_ptr<Integer> operand;
 
   // Simulation.
   bool missing (const Scope& scope) const 

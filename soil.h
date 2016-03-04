@@ -45,7 +45,7 @@ class Soil : private boost::noncopyable
   // Content.
 public:
   struct Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
 
 public:
   size_t size () const;

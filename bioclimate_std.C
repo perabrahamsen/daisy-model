@@ -49,7 +49,6 @@
 #include "treelog_store.h"
 #include "resistance.h"
 #include "im.h"
-#include <boost/scoped_ptr.hpp>
 #include <sstream>
 
 struct BioclimateStandard : public Bioclimate
@@ -75,8 +74,8 @@ struct BioclimateStandard : public Bioclimate
   void CanopyStructure (const Vegetation&);
 
   // External water sinks and sources.
-  boost::scoped_ptr<NetRadiation> net_radiation;
-  boost::scoped_ptr<Pet> pet;       // Potential Evapotranspiration model.
+  const std::unique_ptr<NetRadiation> net_radiation;
+  std::unique_ptr<Pet> pet;       // Potential Evapotranspiration model.
   double total_ep_;             // Potential evapotranspiration [mm/h]
   double total_ea_;             // Actual evapotranspiration [mm/h]
   double direct_rain_;          // Rain hitting soil directly [mm/h]
@@ -130,7 +129,7 @@ struct BioclimateStandard : public Bioclimate
   const double max_svat_absolute_difference; // Max difference. [mm/h]
   const double maxTdiff;                     // Max temperature diff. [dg C]
   const double maxEdiff;                     // Max pressure diff [Pa]
-  boost::scoped_ptr<SVAT> svat;     // Soil Vegetation Atmosphere model.
+  const std::unique_ptr<SVAT> svat;     // Soil Vegetation Atmosphere model.
   size_t svat_fail;             // Number of times the svat loop failed.
   size_t svat_total;            // Total number of times the swat loop entered.
   double crop_ep_;              // Potential transpiration. [mm/h]
@@ -156,10 +155,10 @@ struct BioclimateStandard : public Bioclimate
                              const Surface& surface, 
                              const Geometry&, const Soil&, const SoilWater&);
   double albedo;                  // Reflection factor []
-  boost::scoped_ptr<Raddist> raddist;// Radiation distribution model.
+  const std::unique_ptr<Raddist> raddist;// Radiation distribution model.
   const double min_sin_beta_;     // Sinus to lowest sun angle for some models.
   void RadiationDistribution (const Vegetation&, double sin_beta, Treelog&);
-  boost::scoped_ptr<Difrad> difrad;  // Diffuse radiation model.
+  std::unique_ptr<Difrad> difrad;  // Diffuse radiation model.
   double difrad0;                // Diffuse radiation above canopy [W/m2]
 
   double absorbed_total_PAR_canopy; // Canopy absorbed PAR (sun+shade) [W/m2]
@@ -196,7 +195,7 @@ struct BioclimateStandard : public Bioclimate
   double air_pressure_;         // From weather [Pa]
 
   // Deposition.
-  boost::scoped_ptr<Deposition> deposition;  // Deposition model.
+  const std::unique_ptr<Deposition> deposition;  // Deposition model.
 
   // Initialization.
   const bool fixed_pet;

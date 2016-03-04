@@ -1,8 +1,21 @@
-2016-03-03  Per Abrahamsen  <pa@plen.ku.dk>
+2016-03-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* Version 5.23 released.
+	* log_select.C (check): Make missing border an error.
 
-2016-03-03  Per Abrahamsen  <per.abrahamsen@gmal.com>
+	* geometry1d.C (initialize_zplus): Complain if zplus doesn't
+	contain fixed.
+
+	* soil.C (border): Use horizon endpoints as default value.
+
+	* all: Replaced 'boost::scoped_ptr' and 'std::auto_ptr' with
+	'std::unique_ptr'.
+
+	* lib/fertilizer.dai (slurry): Changed default volatilization from
+	15 % to 0 %.
+
+	* path.C (get_daisy_home): Use the right featuture test for W64.
+
+2016-03-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* geometry.C (add_layer, initialize_layer): Support specifying
 	initial values with a PLF.

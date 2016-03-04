@@ -116,7 +116,7 @@ struct OrganicStandard : public OrganicMatter
   const PLF water_factor;
   const PLF pH_factor;
   std::vector<double> abiotic_factor;
-  std::auto_ptr<ClayOM> clayom;
+  std::unique_ptr<ClayOM> clayom;
   const std::vector<boost::shared_ptr<const PLF>/**/> smb_tillage_factor;
   const std::vector<boost::shared_ptr<const PLF>/**/> som_tillage_factor;
   const double min_AM_C;	// Minimal amount of C in an AM. [g/m²]

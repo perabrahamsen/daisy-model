@@ -36,8 +36,8 @@ struct EquilibriumLangmuir : public Equilibrium
   static const symbol base_unit;
 
   // Parameters.
-  std::auto_ptr<Number> K_expr;
-  std::auto_ptr<Number> my_max_expr;
+  std::unique_ptr<Number> K_expr;
+  std::unique_ptr<Number> my_max_expr;
 
   // Simulation.
   void find (const Units& units, const Scope&, int, double has_A, double has_B, 

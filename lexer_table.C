@@ -47,8 +47,8 @@
    const Units& units;
    const Path& path;
    const symbol filename;  
-   std::auto_ptr<std::istream> owned_stream;
-   boost::scoped_ptr<LexerData> lex;
+   std::unique_ptr<std::istream> owned_stream;
+   std::unique_ptr<LexerData> lex;
    Filepos end_of_header;
    std::string field_sep;
    std::string type_;
@@ -249,8 +249,8 @@
      units (al.units ()),
      path (al.path ()),
      filename (al.name ("file")),
-     owned_stream (NULL),
-     lex (NULL),
+     owned_stream (),
+     lex (),
      field_sep ("UNINITIALIZED"),
      type_ ("UNINITIALIZED"),
      missing (s2s_v (al.name_sequence ("missing"))),
@@ -278,7 +278,7 @@
      return true;
 
    // Close file descriptor after first problem.
-   lex.reset (NULL);
+   lex.reset ();
    return false;
  }
 

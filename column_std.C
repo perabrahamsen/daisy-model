@@ -64,26 +64,26 @@ struct ColumnStandard : public Column
   static const symbol field_flux_unit;
   
   const Units& units;
-  const std::auto_ptr<Scopesel> scopesel;
+  const std::unique_ptr<Scopesel> scopesel;
   const Scope* extern_scope;
-  std::auto_ptr<Movement> movement;
-  std::auto_ptr<Drain> drain;
-  std::auto_ptr<Groundwater> groundwater;
-  std::auto_ptr<WSource> weather;
-  std::auto_ptr<Vegetation> vegetation;
-  std::auto_ptr<Litter> litter;
-  std::auto_ptr<Bioclimate> bioclimate;
+  std::unique_ptr<Movement> movement;
+  std::unique_ptr<Drain> drain;
+  std::unique_ptr<Groundwater> groundwater;
+  std::unique_ptr<WSource> weather;
+  std::unique_ptr<Vegetation> vegetation;
+  std::unique_ptr<Litter> litter;
+  std::unique_ptr<Bioclimate> bioclimate;
   Surface surface;
   Geometry& geometry;
-  std::auto_ptr<Soil> soil;
-  std::auto_ptr<SoilpH> soilph;
-  std::auto_ptr<SoilWater> soil_water;
-  std::auto_ptr<SoilHeat> soil_heat;
-  std::auto_ptr<Chemistry> chemistry;
-  std::auto_ptr<OrganicMatter> organic_matter;
+  std::unique_ptr<Soil> soil;
+  std::unique_ptr<SoilpH> soilph;
+  std::unique_ptr<SoilWater> soil_water;
+  std::unique_ptr<SoilHeat> soil_heat;
+  std::unique_ptr<Chemistry> chemistry;
+  std::unique_ptr<OrganicMatter> organic_matter;
   double second_year_utilization_;
   std::vector<double> tillage_age;
-  std::auto_ptr<Irrigation> irrigation;
+  std::unique_ptr<Irrigation> irrigation;
 
   // Log variables.
   double harvest_DM;
@@ -1026,9 +1026,9 @@ ColumnStandard::initialize (const Block& al)
 {
   const std::vector<const Scope*> scopes;
   Time time (9999, 1, 1, 0);
-  std::auto_ptr<WSource> weather (Librarian:: build_stock<WSource>
-                                  (al.metalib (), al.msg (),
-                                   "const", "initialize"));
+  std::unique_ptr<WSource> weather (Librarian:: build_stock<WSource>
+				    (al.metalib (), al.msg (),
+				     "const", "initialize"));
   initialize (al.metalib (), scopes,
               time, weather.get (), Scope::null (), al.msg ());
 }

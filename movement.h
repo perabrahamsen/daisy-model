@@ -72,7 +72,7 @@ public:
 
   // Tertiary transport.
 protected:
-  std::auto_ptr<Tertiary> tertiary;
+  std::unique_ptr<Tertiary> tertiary;
 public:
   void tick_tertiary (const Units&,
                       const Geometry&, const Soil&, const SoilHeat&,

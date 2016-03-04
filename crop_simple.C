@@ -42,7 +42,6 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
-#include <boost/scoped_ptr.hpp>
 
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
@@ -54,7 +53,7 @@ public:
   // Canopy.
   const PLF LAIvsT;		// LAI as a function of time.
   double forced_LAI;		// Minimum LAI to use until exceeded by LAIvsTS
-  boost::scoped_ptr<CanopySimple> canopy;
+  const std::unique_ptr<CanopySimple> canopy;
   const double height_max;	// Max height of canopy [cm]
 
   // Temperature sum and day.
@@ -73,7 +72,7 @@ public:
   const double spring_LAI;	// LAI to use after T is zeroed.
 
   // Root.
-  std::auto_ptr<RootSystem> root_system;
+  std::unique_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
   const double NRoot;		// Root nitrogen weight [g N/m^2]
   const std::vector<boost::shared_ptr<const FrameModel>/**/>& root_am; // Root AM parameters.

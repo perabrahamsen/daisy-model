@@ -36,7 +36,7 @@ struct SourceCombine : public Source
 
   // Content.
   ScopeSources scope;
-  const std::auto_ptr<Number> expr;
+  const std::unique_ptr<Number> expr;
   const symbol title_;
   symbol dimension_;
   symbol with_;

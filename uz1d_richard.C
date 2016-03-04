@@ -39,7 +39,7 @@ struct UZ1DRichard : public UZ1D
   const int max_iterations;
   const double max_absolute_difference;
   const double max_relative_difference;
-  std::auto_ptr<Average> K_average;
+  std::unique_ptr<Average> K_average;
 
   // Interface.
   void tick (SMM1D&, double gravity, double dt, Treelog&);

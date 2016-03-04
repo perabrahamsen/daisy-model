@@ -63,8 +63,8 @@ ModelFramed::ModelFramed (const BlockModel& al)
 { daisy_assert (my_frame.get ());  }
 
 ModelFramed::ModelFramed (const symbol n)
-  : ModelLogable (n),
-    my_frame (NULL)
+  : ModelLogable (n)
+    // , my_frame (NULL)
 { }
 
 ModelFramed::~ModelFramed ()

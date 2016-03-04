@@ -61,8 +61,8 @@ struct Horizon::Implementation
   const double_map attributes;
   typedef std::map<symbol, symbol> symbol_map;
   const symbol_map dimensions;
-  const std::auto_ptr<Nitrification> nitrification;
-  const std::auto_ptr<Secondary> secondary;
+  const std::unique_ptr<Nitrification> nitrification;
+  const std::unique_ptr<Secondary> secondary;
   const double r_pore_min;             // Smallest pore in soil [um]
   double primary_sorption_fraction;
   HorHeat hor_heat;

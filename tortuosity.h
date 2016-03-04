@@ -47,7 +47,7 @@ protected:
   explicit Tortuosity (const BlockModel&);
   explicit Tortuosity (const symbol name);
 public:
-  static std::auto_ptr<Tortuosity> create_default ();
+  static std::unique_ptr<Tortuosity> create_default ();
   ~Tortuosity ();
 };
 

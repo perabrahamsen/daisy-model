@@ -39,7 +39,7 @@ private:
 
   // Use.
 public:
-  std::auto_ptr<std::istream> open_file (symbol name) const;
+  std::unique_ptr<std::istream> open_file (symbol name) const;
   bool set_directory (symbol directory);
   symbol get_directory () const;
   void set_path (const std::vector<symbol>& path);

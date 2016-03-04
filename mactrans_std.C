@@ -52,9 +52,9 @@ struct MactransStandard : public Mactrans
     { }
 };
 
-std::auto_ptr<Mactrans> 
+std::unique_ptr<Mactrans> 
 Mactrans::create_default ()
-{ return std::auto_ptr<Mactrans> (new MactransStandard (symbol ("default"))); }
+{ return std::unique_ptr<Mactrans> (new MactransStandard (symbol ("default"))); }
 
 void 
 MactransStandard::tick (const Geometry1D& geo, const SoilWater& soil_water,

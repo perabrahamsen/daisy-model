@@ -35,7 +35,7 @@ class ParserFile : public Parser
   // Content.
 private:
   struct Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
 
   // Use.
 private:

@@ -40,7 +40,7 @@
 class PetFAO_PM : public Pet
 {
   // Parameters.
-  std::auto_ptr<NetRadiation> net_radiation;
+  std::unique_ptr<NetRadiation> net_radiation;
   const bool use_wet;
   const double rb;
 

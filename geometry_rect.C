@@ -199,7 +199,7 @@ GeometryRect::check_x_border (const double value, Treelog& err) const
     {
       std::ostringstream tmp;
       tmp << "No geometric border near " << value 
-          << " [cm]on x-axis, log results will be inexact";
+          << " [cm] on x-axis, log results will be inexact";
       err.warning (tmp.str ());
     }
   return ok;

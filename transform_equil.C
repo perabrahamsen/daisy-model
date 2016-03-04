@@ -41,9 +41,9 @@
 struct TransformEquilibrium : public Transform
 {
   // Parameters.
-  std::auto_ptr<Equilibrium> equilibrium;
-  std::auto_ptr<Number> k_AB_expr;
-  std::auto_ptr<Number> k_BA_expr;
+  std::unique_ptr<Equilibrium> equilibrium;
+  std::unique_ptr<Number> k_AB_expr;
+  std::unique_ptr<Number> k_BA_expr;
 
   // Simulation.
   void tick (const Units&, const Geometry&, 

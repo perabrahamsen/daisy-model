@@ -389,7 +389,7 @@ Rootdens_GP2D::Rootdens_GP2D (const BlockModel& al)
     k (-42.42e42)
 { }
 
-std::auto_ptr<Rootdens> 
+std::unique_ptr<Rootdens> 
 Rootdens::create_row (const Metalib& metalib, Treelog& msg,
                       const double row_width, const double row_position,
                       const bool debug)
@@ -400,7 +400,7 @@ Rootdens::create_row (const Metalib& metalib, Treelog& msg,
   frame.set ("row_position", row_position);
   frame.set ("row_distance", row_width);
   frame.set ("debug", debug ? 1 : 0);
-  return std::auto_ptr<Rootdens> (Librarian::build_frame<Rootdens> (metalib, msg, frame, "row")); 
+  return std::unique_ptr<Rootdens> (Librarian::build_frame<Rootdens> (metalib, msg, frame, "row")); 
 }
 
 static struct Rootdens_GP2DSyntax : public DeclareModel

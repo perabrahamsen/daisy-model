@@ -47,7 +47,7 @@ struct ProgramOsvaldo : public Program
   bool read_measure (Treelog& msg)
   {
     Treelog::Open next (msg, measured_file);
-    std::auto_ptr<std::istream> measure = path.open_file (measured_file);
+    std::unique_ptr<std::istream> measure = path.open_file (measured_file);
     if (!measure.get ())
       {
         msg.error ("Could not open file");
@@ -108,7 +108,7 @@ struct ProgramOsvaldo : public Program
         Treelog::Open next (msg, "Reading " + par_file_name);
 
         // Read data.
-        std::auto_ptr<std::istream> par_file = path.open_file (par_file_name);
+        std::unique_ptr<std::istream> par_file = path.open_file (par_file_name);
         if (!par_file.get ())
           {
             msg.error ("Could not open file");

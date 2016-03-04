@@ -59,7 +59,7 @@ struct StringerCond : public Stringer
   // Parameters.
   struct Clause
   {
-    const std::auto_ptr<Boolean> condition;
+    const std::unique_ptr<Boolean> condition;
     const symbol  value;
     static void load_syntax (Frame& frame)
     {
@@ -148,7 +148,7 @@ List of clauses to match for.",
 struct StringerNumber : public Stringer
 {
   // Parameters.
-  std::auto_ptr<Number> number;
+  std::unique_ptr<Number> number;
 
   // Simulation.
   void tick (const Units& units, const Scope& scope, Treelog& msg)

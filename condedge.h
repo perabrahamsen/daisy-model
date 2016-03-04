@@ -46,8 +46,8 @@ public:
   
   // Create and Destroy.
 public:
-  static std::auto_ptr<const Condedge> build_arithmetic ();
-  static std::auto_ptr<const Condedge> build_geometric ();
+  static std::unique_ptr<const Condedge> build_arithmetic ();
+  static std::unique_ptr<const Condedge> build_geometric ();
 protected:
   Condedge ();
 public:

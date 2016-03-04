@@ -46,7 +46,7 @@ class AM : public ModelFramed
   // Content.
 public:
   struct Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
   friend class Implementation;
   static const char *const component;
   symbol library_id () const;

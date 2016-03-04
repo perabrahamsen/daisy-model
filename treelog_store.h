@@ -31,7 +31,7 @@ class TreelogStore : public Treelog
   // Content.
 private:
   struct Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
 
   // Nesting.
 public:

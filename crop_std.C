@@ -52,27 +52,26 @@
 #include "treelog.h"
 #include "frame.h"
 #include "block_model.h"
-#include <boost/scoped_ptr.hpp>
 #include <sstream>
 #include <numeric>
 
 struct CropStandard : public Crop
 {
   // Content.
-  const boost::scoped_ptr<Seed> seed;
-  const boost::scoped_ptr<RootSystem> root_system;
-  const boost::scoped_ptr<CanopyStandard> canopy;
-  boost::scoped_ptr<Harvesting> harvesting;
+  const std::unique_ptr<Seed> seed;
+  const std::unique_ptr<RootSystem> root_system;
+  const std::unique_ptr<CanopyStandard> canopy;
+  std::unique_ptr<Harvesting> harvesting;
   Production production;
-  boost::scoped_ptr<Time> last_time;
-  boost::scoped_ptr<Phenology> development;
+  std::unique_ptr<Time> last_time;
+  std::unique_ptr<Phenology> development;
   const Partition partition;
-  boost::scoped_ptr<Vernalization> vernalization;
-  const boost::scoped_ptr<Photo> shadow;
-  const boost::scoped_ptr<Photo> sunlit;
-  const boost::scoped_ptr<Photo> reserved;
+  std::unique_ptr<Vernalization> vernalization;
+  const std::unique_ptr<Photo> shadow;
+  const std::unique_ptr<Photo> sunlit;
+  const std::unique_ptr<Photo> reserved;
   CrpN nitrogen;
-  const boost::scoped_ptr<WSE> water_stress_effect;
+  const std::unique_ptr<WSE> water_stress_effect;
   const bool enable_N_stress;
   const double min_light_fraction;
 
@@ -817,11 +816,11 @@ CropStandard::output (Log& log) const
   output_submodule (nitrogen, "CrpN", log);
 }
 
-static std::auto_ptr<WSE> 
+static std::unique_ptr<WSE> 
 find_WSE (const BlockModel& al, Photo& photo)
 {
   if (al.check ("water_stress_effect"))
-    return std::auto_ptr<WSE> 
+    return std::unique_ptr<WSE> 
       (Librarian::build_item<WSE> (al, "water_stress_effect"));
   Treelog& msg = al.msg ();
   if (photo.handle_water_stress ())

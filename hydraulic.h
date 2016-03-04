@@ -25,7 +25,6 @@
 
 #include "model_derived.h"
 #include "plf.h"
-#include <boost/scoped_ptr.hpp>
 #include <memory>
 
 class Log;
@@ -45,7 +44,7 @@ public:
 private:
   struct K_at_h;
 protected:
-  const boost::scoped_ptr<K_at_h>  K_init;
+  const std::unique_ptr<K_at_h>  K_init;
 
   // Standard parameters.
 public:

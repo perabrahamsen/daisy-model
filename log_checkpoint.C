@@ -44,7 +44,7 @@ struct LogCheckpoint : public LogSubmodel
   const symbol file;		// Name of file to write checkpoint in.
   const symbol description;	// Comment to go to the start of the file.
   symbol log_dir;               // File prefix.
-  std::auto_ptr<Condition> condition; // Should we print a log now?
+  std::unique_ptr<Condition> condition; // Should we print a log now?
   Time time;			// Time of current checkpoint.
   const Metalib* global_frame; // All attributes.
 

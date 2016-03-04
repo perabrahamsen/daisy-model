@@ -42,7 +42,7 @@ struct rubiscoNdist_expr : public RubiscoNdist
   // Parameters.
 private:
   const double f_photo; //Fraction of photosynthetically active N in canopy
-  const std::auto_ptr<Number> expr;
+  const std::unique_ptr<Number> expr;
   ScopeExchange scope;
   
   // Simulation.

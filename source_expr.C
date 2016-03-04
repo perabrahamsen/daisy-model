@@ -32,8 +32,8 @@ struct SourceExpr : public SourceFile
   const Units& units;
 
   // Content.
-  const std::auto_ptr<Number> expr;
-  const std::auto_ptr<Boolean> valid;
+  const std::unique_ptr<Number> expr;
+  const std::unique_ptr<Boolean> valid;
   const symbol title_;
   symbol dimension_;
 

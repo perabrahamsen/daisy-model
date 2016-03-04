@@ -47,7 +47,7 @@ class ModelFramed : public ModelLogable
 {
   // Content.
 private:
-  std::auto_ptr<const FrameModel> my_frame; // Remember for checkpoint.
+  std::unique_ptr<const FrameModel> my_frame; // Remember for checkpoint.
 public:
   virtual const FrameModel& frame () const EXPORT;
 

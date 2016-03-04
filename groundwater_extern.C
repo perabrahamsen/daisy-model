@@ -36,7 +36,7 @@ class GroundwaterExtern : public Groundwater
   // Content.
 private:
   const Units& units;
-  const std::auto_ptr<Number> expr;
+  const std::unique_ptr<Number> expr;
   bool has_table;
   double depth;
   

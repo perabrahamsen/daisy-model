@@ -38,7 +38,7 @@
 
 class PetPM : public Pet
 {
-  std::auto_ptr<NetRadiation> net_radiation;
+  std::unique_ptr<NetRadiation> net_radiation;
   const double rb;
 
 public:

@@ -43,8 +43,8 @@ class RootSystem
 {
   // Components.
 private:
-  std::auto_ptr<Rootdens> rootdens; // Root density calculation.
-  std::auto_ptr<ABAProd> ABAprod; // Root density calculation.
+  std::unique_ptr<Rootdens> rootdens; // Root density calculation.
+  std::unique_ptr<ABAProd> ABAprod; // Root density calculation.
 
   // Parameters.
 private:

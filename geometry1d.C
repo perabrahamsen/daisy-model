@@ -390,6 +390,20 @@ Can't automatically make discretizations less than 1 [cm], needed at "
 	}
     }
 
+  // Test all members of 'fixed' are in 'zplus'
+  size_t z = 0;
+  for (size_t f = 0; f < fixed.size (); f++)
+    {
+      while (z < zplus_.size () && zplus_[z] > fixed[f] + 0.00001)
+	z++;
+      if (z == zplus_.size () || !approximate (zplus_[z], fixed[f]))
+	{
+	  std::ostringstream tmp;
+	  tmp << "No zplus near " << fixed[f] << " [cm]";
+	  msg.warning (tmp.str ());
+	}
+    }
+
   // Update z and dz from zplus.
   initialize_intervals (zplus_, z_, dz_);
 

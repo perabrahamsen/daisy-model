@@ -56,7 +56,7 @@ struct TertiaryBiopores : public Tertiary
   const enum active_msg_t { msg_cell, msg_range, msg_none } active_msg;
 
   // Helper.
-  std::auto_ptr<Scalar> per_surface_area;
+  std::unique_ptr<Scalar> per_surface_area;
   std::vector<double> K;        // Adjusted matrix2biopore conductivity [cm/h]
   std::vector<double> K_crack;  // Secondary domain conductivity [cm/h]
 
@@ -69,9 +69,9 @@ struct TertiaryBiopores : public Tertiary
   struct MyContent : public Anystate::Content
   {
     std::vector<Anystate> states;
-    std::auto_ptr<Anystate::Content> clone () const
+    std::unique_ptr<Anystate::Content> clone () const
     { 
-      std::auto_ptr<Anystate::Content> copy (new MyContent (states)); 
+      std::unique_ptr<Anystate::Content> copy (new MyContent (states)); 
       return copy;
     }
     MyContent (const std::vector<Anystate>& s)
@@ -151,8 +151,8 @@ TertiaryBiopores::get_state () const
   for (size_t b = 0; b < classes_size; b++)
     biopore_state.push_back (classes[b]->get_state ());
 
-  std::auto_ptr<Anystate::Content> copy (new MyContent (biopore_state));
-  return Anystate (copy);
+  std::unique_ptr<Anystate::Content> copy (new MyContent (biopore_state));
+  return Anystate (std::move (copy));
 }
  
 void 

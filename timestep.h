@@ -23,7 +23,6 @@
 
 #include "time.h"
 #include "vcheck.h"
-#include <boost/scoped_ptr.hpp>
 #include <string>
 
 class Frame;
@@ -35,7 +34,7 @@ class Timestep
   // Content.
 private:
   struct Implementation;
-  const boost::scoped_ptr<Implementation> impl;
+  const std::unique_ptr<Implementation> impl;
 
   // Prebuild values.
 public:

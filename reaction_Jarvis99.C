@@ -41,7 +41,7 @@
 struct ReactionJarvis99 : public ReactionColgen
 {
   // Parameters.
-  const std::auto_ptr<Rainergy> rainergy; // Energy in rain [J/cm^2/h]
+  const std::unique_ptr<Rainergy> rainergy; // Energy in rain [J/cm^2/h]
   const bool tillage_replenish_all;       // Ms = Mmax after tillage.
   /* const */ double Mmax;            // Max colloid pool [g C/g S]
   const PLF Mmax_tillage_factor; // Modification factor for tillage age.

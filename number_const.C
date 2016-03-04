@@ -337,13 +337,13 @@ struct NumberFetchGet : public Number
 struct NumberFetch : public Number
 {
   // Parameters.
-  const std::auto_ptr<Number> child;
+  const std::unique_ptr<Number> child;
   symbol title () const
   { return child->title (); }
 
-  static std::auto_ptr<Number> fetch_child (const BlockModel& al, const symbol key)
+  static std::unique_ptr<Number> fetch_child (const BlockModel& al, const symbol key)
   {
-    std::auto_ptr<Number> result;
+    std::unique_ptr<Number> result;
     Attribute::type type = al.lookup (key);
     switch (type)
       {
@@ -464,7 +464,7 @@ static struct NumberFetchSyntax : public DeclareModel
 struct NumberChild : public Number
 {
   // Parameters.
-  const std::auto_ptr<Number> child;
+  const std::unique_ptr<Number> child;
 
   // Simulation.
   void tick (const Units& units, const Scope& scope, Treelog& msg)

@@ -32,13 +32,12 @@
 #include "check.h"
 #include "vcheck.h"
 #include <sstream>
-#include <boost/scoped_ptr.hpp>
 
 struct GnuplotSoil : public GnuplotBase
 {
   // Ranges.
   const double sizeratio;
-  const boost::scoped_ptr<Time> when;
+  const std::unique_ptr<Time> when;
   const double top;
   const double bottom;
   const double left;

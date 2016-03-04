@@ -324,9 +324,9 @@ VolumeBox::VolumeBox (const char *const id,
 VolumeBox::~VolumeBox ()
 { }
 
-std::auto_ptr<Volume> 
+std::unique_ptr<Volume> 
 Volume::build_none ()
-{ return std::auto_ptr<Volume> (new VolumeBox ("none")); }
+{ return std::unique_ptr<Volume> (new VolumeBox ("none")); }
 
 static struct Volume_BoxSyntax : public DeclareModel
 {

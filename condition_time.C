@@ -407,7 +407,7 @@ public:
 
 struct ConditionTimestep : public Condition
 {
-  std::auto_ptr<Condition> condition;
+  std::unique_ptr<Condition> condition;
   const symbol dt;
 
   symbol timestep ()

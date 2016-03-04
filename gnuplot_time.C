@@ -33,8 +33,8 @@
 struct GnuplotTime : public GnuplotBase
 {
   // Ranges.
-  std::auto_ptr<Time> begin;
-  std::auto_ptr<Time> end;
+  std::unique_ptr<Time> begin;
+  std::unique_ptr<Time> end;
   const bool ymin_flag;
   const double ymin;
   const bool ymax_flag;

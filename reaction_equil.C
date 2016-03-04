@@ -49,9 +49,9 @@ struct ReactionEquilibrium : public Reaction
   // Parameters.
   const symbol name_A;
   const symbol name_B;
-  const std::auto_ptr<Equilibrium> equilibrium;
-  const std::auto_ptr<Number> k_AB;
-  const std::auto_ptr<Number> k_BA;
+  const std::unique_ptr<Equilibrium> equilibrium;
+  const std::unique_ptr<Number> k_AB;
+  const std::unique_ptr<Number> k_BA;
   const symbol name_colloid;
   const bool primary;
   const bool secondary;

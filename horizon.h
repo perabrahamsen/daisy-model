@@ -42,7 +42,7 @@ class Horizon : public ModelDerived
   // Content.
 private:
   struct Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
   double fast_clay;
   double fast_humus;
 public:
@@ -51,7 +51,7 @@ public:
 
   // Water.
 public:
-  std::auto_ptr<Hydraulic> hydraulic;
+  std::unique_ptr<Hydraulic> hydraulic;
   double anisotropy () const;
   double heat_conductivity (double Theta, double Ice) const; // [erg/cm/h/dg C]
   double heat_capacity (double Theta, double Ice) const; // [erg/cm^3/dg C]
@@ -61,7 +61,7 @@ public:
 
   // Texture.
 public:
-  std::auto_ptr<Tortuosity> tortuosity;
+  std::unique_ptr<Tortuosity> tortuosity;
   double dry_bulk_density () const;
   virtual double texture_below (double size /* [um] */) const = 0;
   double clay () const;

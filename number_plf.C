@@ -59,7 +59,7 @@ struct NumberPLF : public Number
   };
 
   // Parameters.
-  const std::auto_ptr<Number> operand;
+  const std::unique_ptr<Number> operand;
   const symbol domain;
   const symbol range;
   const PLF plf;

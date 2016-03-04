@@ -38,7 +38,7 @@ struct DomsorpStandard : public Domsorp
   // Parameters.
   const size_t dom_pool;
   const size_t som_pool;
-  const std::auto_ptr<Transform> transform;
+  const std::unique_ptr<Transform> transform;
   
   // Output.
   std::vector<double> S_C;

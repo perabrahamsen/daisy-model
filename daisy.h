@@ -24,8 +24,8 @@
 #define DAISY_H
 
 #include "program.h"
-#include <boost/scoped_ptr.hpp>
 #include <vector>
+#include <memory>
 
 class Harvest;
 class Log;
@@ -47,7 +47,7 @@ public:
   // Content.
 private:
   class Implementation;
-  const boost::scoped_ptr<Implementation> impl;
+  const std::unique_ptr<Implementation> impl;
 public:
   const FrameModel& frame () const;
   const std::vector<const Scope*>& scopes () const;

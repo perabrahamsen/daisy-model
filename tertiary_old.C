@@ -39,8 +39,8 @@
 struct TertiaryOld : public Tertiary
 {
   // Parameters.
-  std::auto_ptr<Macro> macro;   // Water transport model in macropores.
-  std::auto_ptr<Mactrans> mactrans; // Solute transport model in macropores.
+  std::unique_ptr<Macro> macro;   // Water transport model in macropores.
+  std::unique_ptr<Mactrans> mactrans; // Solute transport model in macropores.
 
   // Identity.
   bool has_macropores ()

@@ -49,7 +49,7 @@ struct SelectArray : public Select
   const Column* last_column;
 
   // Bulk density convertions.
-  std::auto_ptr<BD_convert> bd_convert;
+  std::unique_ptr<BD_convert> bd_convert;
   const Convert* special_convert (const Units& units, 
                                   const symbol has, const symbol want)
   {
@@ -259,8 +259,8 @@ The 'array' select model only handle bulk density for soil sized variables";
     : Select (al),
       found (false),
       dt (0.0),
-      last_column (NULL),
-      bd_convert (NULL)
+      last_column (NULL)
+      // , bd_convert (NULL)
   { }
 };
 

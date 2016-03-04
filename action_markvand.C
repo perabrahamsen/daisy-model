@@ -355,7 +355,7 @@ struct ActionMarkvand : public Action
   const double flux;         // Application speed [mm/h]
 
   // Soil & Crop.
-  const std::auto_ptr<MV_Soil> soil;
+  const std::unique_ptr<MV_Soil> soil;
   const struct crop_map_t : public std::map<symbol, const MV_Crop*>
   {
     static void load_syntax (Frame&);

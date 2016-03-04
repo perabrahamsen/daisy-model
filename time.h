@@ -49,7 +49,7 @@ class EXPORT Time
   // Content.
 private:
   struct Implementation;
-  const std::auto_ptr<Implementation> impl;
+  const std::unique_ptr<Implementation> impl;
     
   // Extract.
 public:

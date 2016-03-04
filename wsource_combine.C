@@ -30,13 +30,12 @@
 #include "vcheck.h"
 #include "assertion.h"
 #include "mathlib.h"
-#include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <sstream>
 
 struct WSourceCombine : public WSourceWeather
 {
-  const boost::scoped_ptr<WSource> reserve;
+  const std::unique_ptr<WSource> reserve;
 
   // Const.
   static symbol Any ();
@@ -44,7 +43,7 @@ struct WSourceCombine : public WSourceWeather
   // Entries.
   struct Entry : private boost::noncopyable
   {
-    boost::scoped_ptr<WSource> source;
+    const std::unique_ptr<WSource> source;
     Time begin;
     Time end;
     const std::set<symbol> use;

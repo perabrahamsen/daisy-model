@@ -71,7 +71,7 @@ struct TransportMollerup : public Transport
                      Neumann_explicit_lower, Neumann_implicit, Dirichlet };
 
   // Parameters.
-  const std::auto_ptr<Solver> solver;
+  const std::unique_ptr<Solver> solver;
   const bool enable_boundary_diffusion;
   const int debug;
   const double upstream_weight;

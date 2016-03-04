@@ -57,10 +57,10 @@ struct Daisy::Implementation
   // Content.
   const Metalib& metalib;
   const FrameModel& frame;
-  const boost::scoped_ptr<Scopesel> scopesel;
+  const std::unique_ptr<Scopesel> scopesel;
   const Scope* extern_scope;
-  const boost::scoped_ptr<Condition> print_time;
-  const boost::scoped_ptr<Output> output_log;
+  const std::unique_ptr<Condition> print_time;
+  const std::unique_ptr<Output> output_log;
   const bool message_timestep;
   const Timestep timestep;
   const double max_dt;
@@ -73,11 +73,11 @@ struct Daisy::Implementation
   Time next_large;
   const Time stop;
   double duration;
-  const boost::scoped_ptr<Action> action;
-  const boost::scoped_ptr<WSource> weather;
+  const std::unique_ptr<Action> action;
+  const std::unique_ptr<WSource> weather;
   bool initialized;
   bool running;
-  const boost::scoped_ptr<Field> field;
+  const std::unique_ptr<Field> field;
   auto_vector<const Harvest*> harvest;
 
   const Scope& scope ()

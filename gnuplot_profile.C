@@ -30,7 +30,6 @@
 #include "librarian.h"
 #include "block_model.h"
 
-#include <boost/scoped_ptr.hpp>
 
 #include <vector>
 #include <map>
@@ -38,7 +37,7 @@
 struct GnuplotProfile : public GnuplotBase
 {
   //Content.
-  boost::scoped_ptr<Column> column;
+  const std::unique_ptr<Column> column;
 
   // Plot.
   std::vector<double> zplus;

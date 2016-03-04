@@ -124,7 +124,7 @@ struct Select::Implementation
     Spec (const Block&);
     ~Spec ();
   };
-  std::auto_ptr<Spec> spec;
+  std::unique_ptr<Spec> spec;
 
   // We need a scope for the expression.
   static const symbol x_symbol;
@@ -132,7 +132,7 @@ struct Select::Implementation
     
   // Content.
   const Convert* spec_conv; // Convert value.
-  std::auto_ptr<Number> expr;   // - || -
+  std::unique_ptr<Number> expr;   // - || -
   const bool negate;            // - || -
   double convert (double) const; // - || -
   const symbol tag;             // Name of this entry.

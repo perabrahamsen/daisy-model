@@ -53,7 +53,7 @@ Volume::density (const Geometry& geo) const
   return densities[&geo];
 }
 
-std::auto_ptr<Volume>
+std::unique_ptr<Volume>
 Volume::build_obsolete (const BlockModel& al)
 {
   Volume *const vol = Librarian::build_item<Volume> (al, "volume");
@@ -70,7 +70,7 @@ Volume::build_obsolete (const BlockModel& al)
       if (to < 0)
         vol->limit_bottom (to);
     }
-  return std::auto_ptr<Volume> (vol);
+  return std::unique_ptr<Volume> (vol);
 }
 
 Volume::Volume (const BlockModel& al)

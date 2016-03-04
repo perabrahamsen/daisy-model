@@ -22,12 +22,11 @@
 #define WSOURCE_INDIRECT_H
 
 #include "wsource_weather.h"
-#include <boost/scoped_ptr.hpp>
 
 class WSourceIndirect : public WSourceWeather
 {
 public:
-  boost::scoped_ptr<WSource> source;
+  std::unique_ptr<WSource> source;
 
   // Scope interface.
 public:

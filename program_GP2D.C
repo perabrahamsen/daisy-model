@@ -37,7 +37,7 @@
 struct ProgramGP2D : public Program
 {
   const Metalib& metalib;
-  std::auto_ptr<GeometryRect> geo;
+  std::unique_ptr<GeometryRect> geo;
   const double row_width;
   const double row_position;
   const double soil_depth;
@@ -84,7 +84,7 @@ struct ProgramGP2D : public Program
   bool run (Treelog& msg)
   {
     // Find it.
-    std::auto_ptr<Rootdens> rootdens 
+    std::unique_ptr<Rootdens> rootdens 
       = Rootdens::create_row (metalib, msg, row_width, row_position, true);
     rootdens->initialize (*geo, row_width, row_position, msg);
     std::vector<double> Density (geo->cell_size ());

@@ -36,7 +36,7 @@
 struct NumberOperand : public Number
 {
   // Parameters.
-  const std::auto_ptr<Number> operand;
+  const std::unique_ptr<Number> operand;
 
   // Simulation.
   void tick (const Units& units, const Scope& scope, Treelog& msg)
@@ -239,8 +239,8 @@ static struct NumberSqrSyntax : public DeclareModel
 struct NumberPow : public Number
 {
   // Parameters.
-  const std::auto_ptr<Number> base;
-  const std::auto_ptr<Number> exponent;
+  const std::unique_ptr<Number> base;
+  const std::unique_ptr<Number> exponent;
 
   // Simulation.
   void tick (const Units& units, const Scope& scope, Treelog& msg)

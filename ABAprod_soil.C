@@ -41,7 +41,7 @@ struct ABAProdSoil : public ABAProd
 
   // Parameters.
   mutable ScopeExchange scope;
-  const std::auto_ptr<Number> expr;
+  const std::unique_ptr<Number> expr;
   
   // Solve.
   void production (const Units&, const Geometry&, const SoilWater&,

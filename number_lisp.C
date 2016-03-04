@@ -44,7 +44,7 @@ struct NumberLet : public Number
     struct Clause
     {
       symbol id;
-      std::auto_ptr<Number> expr;
+      std::unique_ptr<Number> expr;
 
       static void load_syntax (Frame& frame)
       {
@@ -157,7 +157,7 @@ List of identifiers and values to bind in this scope.", Clause::load_syntax);
     ~ScopeClause ()
     { sequence_delete (clause.begin (), clause.end ()); }
   } scope_clause;
-  std::auto_ptr<Number> expr;
+  std::unique_ptr<Number> expr;
 
   bool missing (const Scope& inherit_scope) const 
   { 
@@ -227,9 +227,9 @@ Expression to evaluate.");
 
 struct NumberIf : public Number
 {
-  std::auto_ptr<Boolean> if_b;
-  std::auto_ptr<Number> then_n;
-  std::auto_ptr<Number> else_n;
+  std::unique_ptr<Boolean> if_b;
+  std::unique_ptr<Number> then_n;
+  std::unique_ptr<Number> else_n;
 
   bool missing (const Scope& scope) const 
   { 

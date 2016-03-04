@@ -262,8 +262,8 @@ struct ProgramExtract : public Program
   const Metalib& metalib;
   const Units& units;
   LexerTable lex;
-  const std::auto_ptr<Number> expr;
-  const std::auto_ptr<Boolean> valid;
+  const std::unique_ptr<Number> expr;
+  const std::unique_ptr<Boolean> valid;
   const symbol handle;
   const std::vector<symbol> columns;
   const std::vector<symbol> rows;

@@ -120,13 +120,13 @@ with nitrification based on total ammonium content.")
   }
 } NitrificationSoil_syntax;
 
-std::auto_ptr<Nitrification> 
+std::unique_ptr<Nitrification> 
 Nitrification::create_default ()
 {
   const Library& library = Librarian::intrinsics ().library (component);
   daisy_assert (library.check ("soil"));
   const FrameModel& frame = library.model ("soil");
-  return std::auto_ptr<Nitrification> (new NitrificationSoil (frame));
+  return std::unique_ptr<Nitrification> (new NitrificationSoil (frame));
 }
 
 // nitrification_soil.C ends here.

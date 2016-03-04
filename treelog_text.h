@@ -40,7 +40,7 @@ class EXPORT TreelogText : public Treelog
   // Content.
 private:
   struct Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
 
   // Output.
 protected:
@@ -82,7 +82,7 @@ class TreelogString : public TreelogText
   // Implement.
 private:
   struct Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
 private:
   void write (const std::string&);
   void debug (const std::string&);
@@ -104,7 +104,7 @@ class TreelogFile : public TreelogText
   // Content.
 private:
   struct Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::unique_ptr<Implementation> impl;
   void write (const std::string&);
   void debug (const std::string&);
   void touch ();

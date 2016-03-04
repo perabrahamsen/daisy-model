@@ -69,7 +69,7 @@ struct ActionCrop : public Action
   {
     // Parameters.
     const MM_DD date;
-    const std::auto_ptr<const FrameModel> crop;
+    const std::unique_ptr<const FrameModel> crop;
     
     // State.
     bool done;
@@ -145,7 +145,7 @@ struct ActionCrop : public Action
   {
     const int month;
     const int day;
-    const std::auto_ptr<const FrameModel> what;
+    const std::unique_ptr<const FrameModel> what;
     
     static bool check_alist (const Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
@@ -162,7 +162,7 @@ struct ActionCrop : public Action
     // Content.
     const int month;
     const int day;
-    std::auto_ptr<Action> operation;
+    std::unique_ptr<Action> operation;
 
     // Simulation.
     void output (Log&) const;

@@ -67,7 +67,7 @@ UIRun::build_log (Metalib& metalib, Block& block, const std::string& name)
   if (!library.complete (metalib, id))
     return;
   
-  std::auto_ptr<Log> log_raw 
+  std::unique_ptr<Log> log_raw 
     (Librarian::build_stock<Log> (metalib, msg, id, __FUNCTION__));
   LogQt *const log = dynamic_cast<LogQt*> (log_raw.get ());
   if (log)

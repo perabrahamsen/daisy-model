@@ -46,9 +46,9 @@
 
 struct ActionExtern : public Action
 {
-  const std::auto_ptr<Scopesel> scopesel;
+  const std::unique_ptr<Scopesel> scopesel;
   mutable const Scope* extern_scope;
-  const std::auto_ptr<Action> child;
+  const std::unique_ptr<Action> child;
 
   void tick (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   {
@@ -135,18 +135,18 @@ Scope to evaluate expessions in.");
 struct ActionExternFertigation : public Action
 {
   const Metalib& metalib;
-  const std::auto_ptr<Scopesel> scopesel;
+  const std::unique_ptr<Scopesel> scopesel;
   mutable const Scope* extern_scope;
 
-  const std::auto_ptr<Number> surface_expr;
+  const std::unique_ptr<Number> surface_expr;
   double surface_value;
-  const std::auto_ptr<Number> subsoil_expr;
+  const std::unique_ptr<Number> subsoil_expr;
   double subsoil_value;
-  const std::auto_ptr<Number> overhead_expr;
+  const std::unique_ptr<Number> overhead_expr;
   double overhead_value;
-  const std::auto_ptr<Number> NO3_expr;
+  const std::unique_ptr<Number> NO3_expr;
   double NO3_value;
-  const std::auto_ptr<Number> NH4_expr;
+  const std::unique_ptr<Number> NH4_expr;
   double NH4_value;
   const boost::shared_ptr<Volume> volume;
 
@@ -365,10 +365,10 @@ Height where you want to end the incorporation (a negative number).");
 
 struct ActionExternSubsoil : public Action
 {
-  const std::auto_ptr<Scopesel> scopesel;
+  const std::unique_ptr<Scopesel> scopesel;
   mutable const Scope* extern_scope;
 
-  const std::auto_ptr<Number> expr_flux;
+  const std::unique_ptr<Number> expr_flux;
   double flux;
   
   const std::vector<symbol> constituents;

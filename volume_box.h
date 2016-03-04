@@ -29,16 +29,16 @@ class Border;
 class VolumeBox : public Volume
 {
 private:
-  std::auto_ptr<Bound> bottom;
-  std::auto_ptr<Bound> top;
-  std::auto_ptr<Bound> left;
-  std::auto_ptr<Bound> right;
-  std::auto_ptr<Bound> front;
-  std::auto_ptr<Bound> back;
+  std::unique_ptr<Bound> bottom;
+  std::unique_ptr<Bound> top;
+  std::unique_ptr<Bound> left;
+  std::unique_ptr<Bound> right;
+  std::unique_ptr<Bound> front;
+  std::unique_ptr<Bound> back;
 
   struct bounds_t
   { 
-    std::auto_ptr<Bound> VolumeBox::* bound;
+    std::unique_ptr<Bound> VolumeBox::* bound;
     bool (Border::*check_border) (double, Treelog&) const;
   };
   static const bounds_t bounds[];

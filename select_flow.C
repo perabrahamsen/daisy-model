@@ -41,7 +41,7 @@ class SelectFlow : public SelectValue
 private:
   
   const bool density;
-  std::auto_ptr<Volume> volume;
+  std::unique_ptr<Volume> volume;
 
   // Column cache.
   struct colweight
