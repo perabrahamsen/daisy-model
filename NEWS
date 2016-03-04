@@ -8,6 +8,10 @@ release.
 
 * 5.23
 
+** No slurry volatilization by default.
+
+Specify 'volatilization" manually.
+ 
 ** You now need to specify Soil border when logging to a specific depth.
 
 E.g. you need 
