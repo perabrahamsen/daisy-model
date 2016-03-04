@@ -30,11 +30,6 @@
 #include "assertion.h"
 #include "mathlib.h"
 #include "submodeler.h"
-
-#ifdef MINGW // Needed by fisher_f.hpp
-//int swprintf (wchar_t *, size_t, const wchar_t *, ...);
-#endif
-
 #include <boost/math/distributions/fisher_f.hpp>
 
 #include <sstream>

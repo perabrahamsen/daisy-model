@@ -693,6 +693,10 @@ setup:
 	git tag -a release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
 	git push origin --tags
 
+setup2:
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	git tag -a release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
+	git push origin --tags
 
 debiannoci: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
