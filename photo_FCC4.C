@@ -200,7 +200,7 @@ C4 photosynthesis and stomatal conductance model by Collatz et al., 1992.")
     frame.set ("Q10rd", 2.0);
 
     frame.declare ("kj", Attribute::Unknown (), Check::positive (), Attribute::Const,
-                "Initial slope of photosynthetic CO2 response, kj = 0.6 mol/m²/s (Collatz et al., 1992)");
+                "Initial slope of photosynthetic CO2 response, kj = 0.6 mol/m^2/s (Collatz et al., 1992)");
     frame.set ("kj", 0.6);
 
     frame.declare ("alpha", "mol/mol", Check::positive (), Attribute::Const,

@@ -852,7 +852,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                   {
                     dim = get_symbol ();
                     if (dim == error_symbol)
-                      dim == Attribute::Unknown ();
+                      dim = Attribute::Unknown ();
                     if (dim.name ().size () == 0)
                       dim = Attribute::None ();
                   }

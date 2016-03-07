@@ -36,9 +36,6 @@ private:
   const symbol dep_par;
   const symbol dep_super;
 
-  // The parameterization we currently test.
-  bool found;
-
   // Create & Destroy.
 public:
   TraverseDelete (Metalib&, symbol component, symbol parameterization);
@@ -194,8 +191,7 @@ TraverseDelete::TraverseDelete (Metalib& mlib,
   : Traverse (mlib),
     dep_lib (component),
     dep_par (parameterization),
-    dep_super (find_super (mlib, component, parameterization)),
-    found (false)
+    dep_super (find_super (mlib, component, parameterization))
 { }
 
 TraverseDelete::~TraverseDelete ()

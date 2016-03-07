@@ -117,7 +117,7 @@ static const double C_to_DM = 1.0 / DM_to_C;
 static const double m2_per_cm2 = 0.0001;
 static const double cm2_per_m2 = 1.0 / m2_per_cm2;
 static const double surface_to_soil = DM_to_C * m2_per_cm2;
-static const double soil_to_surface = 1.0 / surface_to_soil;
+// static const double soil_to_surface = 1.0 / surface_to_soil;
 
 void
 Bioincorporation::Implementation::tick (const Geometry& geo, 

@@ -286,7 +286,7 @@ Toplevel::copyright ()
   msg ().message (std::string ("Daisy crop/soil simulation version ")
                   + version + ". (" + version_date + ")\n"
                   "Copyright 1996 - 2012 Per Abrahamsen, "
-                  "Søren Hansen and KU.");
+                  u8"S\00D8ren Hansen and KU.");
 }
 
 void

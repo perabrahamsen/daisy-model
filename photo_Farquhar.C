@@ -335,7 +335,7 @@ PhotoFarquhar::assimilate (const Units& units,
             {
               std::stringstream tmp;
               tmp << "Negative brutto photosynthesis (" << pn_ 
-                  << " [g CO2/m²leaf/h])" << " pn " << pn << " rd " << rd
+                  << " [g CO2/m^2 leaf/h])" << " pn " << pn << " rd " << rd
                   << " CO2_atm " << CO2_atm << "  O2_atm " <<  O2_atm 
                   << "  Ptot " <<  Ptot << "  pn " <<  pn << "  ci " <<  ci 
                   << "  dPAR " <<  dPAR << "  gsw " <<  gsw 

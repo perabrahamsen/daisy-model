@@ -44,8 +44,8 @@
 #include <map>
 
 // Weight of humus. [g/cm^3]
-static const double rho_water = 1.0; // [g/cm^3]
-static const double rho_ice = 0.917; // [g/cm^3]
+// static const double rho_water = 1.0; // [g/cm^3]
+// static const double rho_ice = 0.917; // [g/cm^3]
 static const double c_fraction_in_humus = 0.587;
 
 struct Horizon::Implementation

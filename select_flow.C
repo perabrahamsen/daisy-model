@@ -53,8 +53,6 @@ private:
   colcache_t colcache;
   colcache_t::const_iterator active;
 
-  const Column* last_column;
-
   // Use.
 protected:
   virtual bool use_edge (const Geometry&, int out, int in) const = 0;

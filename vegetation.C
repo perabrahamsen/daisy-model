@@ -132,9 +132,9 @@ Canopy adsorbtion fraction of unreached potential soil evaporation.");
     frame.declare ("interception_capacity", "mm", Attribute::LogOnly,
                 "Canopy water storage capacity");
     frame.declare ("shadow_stomata_conductance", "m/s", Attribute::LogOnly,
-                   "Field based stomata´conductance of shadow leaves.");
+                   "Field based stomata conductance of shadow leaves.");
     frame.declare ("sunlit_stomata_conductance", "m/s", Attribute::LogOnly,
-                   "Field based stomata´conductance of sunlit leaves.");
+                   "Field based stomata conductance of sunlit leaves.");
   }
 } Vegetation_init;
 

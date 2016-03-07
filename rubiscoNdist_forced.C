@@ -29,7 +29,7 @@
 #include "scope_exchange.h"
 #include "frame.h"
 
-static const double Mw = 14.0; //The molecular weight for N [g mol¯1]
+// static const double Mw = 14.0; //The molecular weight for N [g mol¯1]
 static const symbol LAI_symbol = symbol("LAI");
 static const symbol distance_from_top_symbol = symbol("distance_from_top"); // [cm]
 static const symbol relative_LAI_symbol = symbol("relative_LAI");
