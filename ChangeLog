@@ -1,3 +1,10 @@
+2016-03-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* phenology_std.C (tick_daily): Don't clear production here.
+	* crop_std.C (tick): Clear it here instead.
+
+	* production.C ("WCrop"): New log variable.
+
 2016-03-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* toplevel.C (copyright): Make 'Søren Hansen' UTF-8.

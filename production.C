@@ -485,7 +485,6 @@ Production::tick (const double AirT, const double SoilT,
 
   const double old_CCrop = CCrop;
   update_carbon ();
-  CCrop = CLeaf + CStem + CSOrg + CRoot + CDead + CH2OPool * 12./30.;
   const double error 
     = (old_CCrop 
        + (dt * (NetPhotosynthesis *  12./44. - C_Loss)
@@ -572,6 +571,7 @@ Production::output (Log& log) const
   output_variable (WRoot, log);
   output_variable (WSOrg, log);
   output_variable (WDead, log);
+  output_value (WLeaf + WStem + WRoot + WSOrg + WDead, "WCrop", log);
   output_variable (CLeaf, log);
   output_variable (CStem, log);
   output_variable (CRoot, log);
@@ -704,6 +704,8 @@ Production::load_syntax (Frame& frame)
   frame.declare ("WDead", "g DM/m^2", Attribute::State,
 	      "Dead leaves dry matter weight.");
   frame.set ("WDead", 0.000);
+  frame.declare ("WCrop", "g DM/m^2", Attribute::LogOnly, "\
+Total crop dry matter, including roots and dead leaves.");
   frame.declare ("CLeaf", "g C/m^2", Attribute::LogOnly, "Leaf C weight.");
   frame.declare ("CStem", "g C/m^2", Attribute::LogOnly, "Stem C weight.");
   frame.declare ("CRoot", "g C/m^2", Attribute::LogOnly, "Root C weight.");

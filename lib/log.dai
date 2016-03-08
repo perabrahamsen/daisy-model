@@ -2513,13 +2513,12 @@ Use \"*\" to log all added organic matter matter.")
              (mday 31)
              (hour 23))))
 
-
 (defsummary "Crop Carbon Balance" simple
   "Carbon balance for the crops.
 
 Warning: This balance is not finished.
 
-Note that negative deltas means the amount of water increases."
+Note that negative deltas means the amount increases."
   (precision 3)
   (fetch (Seed_C  (name "Seed"))
          (CLeaf (name "Leaves") (factor -1))

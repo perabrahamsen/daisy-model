@@ -388,6 +388,7 @@ Harvesting::harvest (const symbol column_name,
 	}
       else
 	{
+	  Assertion::warning ("No root density");
 	  production.AM_root->add (Root_C, Root_N);
 	  residuals_N_top += production.NRoot + extra_N;
 	  residuals_C_top += production.WRoot * C_C_Root + extra_C;

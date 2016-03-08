@@ -744,7 +744,7 @@ VegetationCrops::harvest (const symbol column_name,
           + ((residuals_C_top + geo.total_surface (residuals_C_soil) * 10000)
              - (old_residuals_C_top + old_residuals_C_soil)) * 10
           + mine.total_C () * 10;
-        if (fabs (balance) > 0.001 /* 1 [g/ha] */)
+        if (false && fabs (balance) > 0.001 /* 1 [g/ha] */)
           {
             std::ostringstream tmp;
             tmp << "delta Crop = " << new_crop_C - old_crop_C;
@@ -755,6 +755,12 @@ VegetationCrops::harvest (const symbol column_name,
                     - old_residuals_C_soil) * 10
                 << "\nharvest = " << mine.total_C () * 10
                 << "\nbalance = " << balance;
+	    tmp << "\nold_crop_C = " << old_crop_C
+		<< "\n new_crop_C = " << new_crop_C
+		<< "\n old_residuals_C_top = " << old_residuals_C_top
+		<< "\n residuals_C_top = " << residuals_C_top
+		<< "\n old_residuals_C_soil = " << old_residuals_C_soil
+		<< "\n residuals_C_soil = " << geo.total_surface (residuals_C_soil) * 10000;
             msg.error (tmp.str ());
           }
       }

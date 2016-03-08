@@ -1,14 +1,8 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Build på OSX
-
-* Annoncer
-
 * FAO_PM
 
-** Lav testopsætning med vinterhvede og valg mellem time og dagsværdier
-
-** Beregne begge med makking og med FAO_PM
+** Hvad siger Søren?
 
 * "Promillefondprojekt" forklar lavere N indhold i kerner.
 
@@ -36,11 +30,11 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Ny version af Hypres ark
 
-* Ny version af Charlottes afdrÃ¦ningstest.
+* Ny version af Charlottes afdræningstest.
 
-* Tidlig vÃ¦kst
+* Tidlig vækst
 
-Erstat DSLAI05 med Seed baseret tidlig vÃ¦kst. SÃ¸ren havde en formel,
+Erstat DSLAI05 med Seed baseret tidlig vækst. Søren havde en formel,
 men vi skal have en test setup.
 
 * Regression test
@@ -51,14 +45,8 @@ Forbered kursus
 
 * Daisy problemer
 
-** FAO_PM
-
-Signe fik alt for hÃ¸je RefEvap-Used og lave udbytter med FAO_PM.
-
-** Problem med massebalance for carbon i afgrÃ¸der ved hÃ¸st.
-
 ** En simpel log til at erstatte/supplere Crop Production
 
-** DMI's nye "nedbÃ¸rskorrigering"
+** DMI's nye "nedbørskorrigering"
 
-** Ny ligning for biopore til matrix flow fra SÃ¸ren
+** Ny ligning for biopore til matrix flow fra Søren
