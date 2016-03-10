@@ -1,5 +1,7 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Test of Sørens biopore opsætning crasher.
+
 * FAO_PM
 
 ** Hvad siger Søren?
@@ -15,6 +17,8 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 * Biopore flow 
 
 ** Calculate "M" for hver celle, biopore klasse, og stof.
+
+En "IMvec" i hver biopore_matrix
 
 ** Calculate flux from S (stof), M_old, M_new for hver klasse og stof.
 
