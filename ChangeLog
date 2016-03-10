@@ -1,3 +1,14 @@
+2016-03-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* Makefile (debian-setup): Renamed from 'debian', handle
+	dependencies.
+
+2016-03-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* Makefile (BOOSTINC, CXSPARSELIB): Use system version under Unix.
+
+	* program_post.C (run): Removed unused variable.
+
 2016-03-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* phenology_std.C (tick_daily): Don't clear production here.

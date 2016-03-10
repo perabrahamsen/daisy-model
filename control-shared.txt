@@ -1,7 +1,0 @@
-Package: daisy
-Priority: optional
-Section: science
-Maintainer: Per Abrahamsen <daisy@daisy-model.org>
-Architecture: amd64
-Depends: libqtgui4 (>= 4:4.6.2)
-Description: A soil plant atmosphere system model.

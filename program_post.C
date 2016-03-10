@@ -212,7 +212,6 @@ ProgramPost::run (Treelog& msg)
     }
   
   // Quick check of matching cells.
-  bool found = false;
   std::vector<bool> check;
   std::map<double,double> dx_x;
   std::map<double,double> dz_z;
@@ -232,7 +231,6 @@ ProgramPost::run (Treelog& msg)
       else
         {
           check.push_back (true);
-          found = true;
 	  dz_z[cell_z[i]] = cell_dz[i];
 	  used_z.insert (cell_z[i]);
           if (!source_1D)
@@ -309,14 +307,12 @@ ProgramPost::run (Treelog& msg)
 	  out << cell_z[i];
 	else
 	  out << "(" << cell_z[i] << " " << cell_x[i] << ")";
-	found = true;
       }
   else if (handle_x == Handle::all && handle_z != Handle::all)
     for (auto x : used_x)
       {
 	count_columns++;
 	out << tab (first_tag) << tag << " @ " << x;
-	found = true;
       }
   else if (handle_x != Handle::all && handle_z == Handle::all)
     for (std::set<double>::reverse_iterator i = used_z.rbegin ();
@@ -325,7 +321,6 @@ ProgramPost::run (Treelog& msg)
       {
 	count_columns++;
 	out << tab (first_tag) << tag << " @ " << *i;
-	found = true;
       }
   else
     {

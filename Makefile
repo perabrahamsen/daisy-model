@@ -31,7 +31,7 @@ OBJHOME =  $(SRCDIR)/obj
 NATIVEHOME = $(OBJHOME)
 NATIVEEXE = daisy #daisyw
 USE_GUI = Q4
-BOOSTINC = -isystem $(HOME)/boost_1_55_0
+#BOOSTINC = -isystem $(HOME)/boost_1_55_0
 CXSPARSELIB = -lcxsparse
 else
 SRCDIR = ..
@@ -698,27 +698,25 @@ setup2:
 	git tag -a release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
 	git push origin --tags
 
-debiannoci: 
+debian-setup: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	$(MAKE) linux
-	rm -rf debian
-	mkdir debian
-	mkdir debian/opt
-	mkdir debian/opt/daisy
-	cp ChangeLog NEWS debian/opt/daisy
-	(cd lib && $(MAKE) SETUPDIR=../debian/opt/daisy TAG=$(TAG) setup)
-	(cd sample && $(MAKE) SETUPDIR=../debian/opt/daisy TAG=$(TAG) setup)
+	rm -rf debian/tmp
+	mkdir debian/tmp
+	mkdir debian/tmp/opt
+	mkdir debian/tmp/opt/daisy
+	cp ChangeLog NEWS debian/tmp/opt/daisy
+	(cd lib && $(MAKE) SETUPDIR=../debian/tmp/opt/daisy TAG=$(TAG) setup)
+	(cd sample && $(MAKE) SETUPDIR=../debian/tmp/opt/daisy TAG=$(TAG) setup)
 #	$(MAKE) setupdocs
 #	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
-	mkdir debian/opt/daisy/bin
-	$(STRIP) -o debian/opt/daisy/bin/daisy $(OBJHOME)/daisy
-#	$(STRIP) -o debian/opt/daisy/bin/daisyw $(OBJHOME)/daisyw
-	mkdir debian/DEBIAN
-	echo "Version: $(TAG)" > debian/DEBIAN/control
-	echo -n "Installed-Size: " >> debian/DEBIAN/control
-	du -sk debian | sed -e 's/\t.*//' >> debian/DEBIAN/control
-	cat control-shared.txt >> debian/DEBIAN/control
-	dpkg -b debian daisy_$(TAG)_amd64.deb
+	mkdir debian/tmp/opt/daisy/bin
+	$(STRIP) -o debian/tmp/opt/daisy/bin/daisy $(OBJHOME)/daisy
+#	$(STRIP) -o debian/tmp/opt/daisy/bin/daisyw $(OBJHOME)/daisyw
+	mkdir debian/tmp/DEBIAN
+	dpkg-shlibdeps debian/tmp/opt/daisy/bin/daisy
+	dpkg-gencontrol -USource -UPriority -v$(TAG)
+	(cd debian && fakeroot dpkg-deb --build tmp daisy_$(TAG)_amd64.deb)
 
 OSXDEST=osx-pkg/Library/Daisy
 
