@@ -169,9 +169,9 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const double /* Rn */,
      frame.declare_boolean ("use_wet", Attribute::Const,
                             "Use wet PM for wet surface.\n\
 \n\
-This flag is for compatibility with older version of Daisy, which always\n\
-used dry PM (and which overestimated the effect of wet PM).");
-     frame.set ("use_wet", true);
+This will give significantly higher potential evapotranspiration\n\
+especially when feed with daily weather data.");
+     frame.set ("use_wet", false);
      frame.declare ("rb", "s/m", Attribute::Const, 
                     "Boundary layer resistance for wet surface.");
      frame.set ("rb", 20.0);

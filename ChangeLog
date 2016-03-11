@@ -1,3 +1,9 @@
+2016-03-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* fao.C (RefPenmanMonteith): Added units in comments.
+
+	* pet_FAO_PM.C (use_wet): Changed default to 'false'.
+
 2016-03-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* Makefile (debian-setup): Renamed from 'debian', handle
