@@ -4,7 +4,7 @@
 
 2016-03-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* biopore_matrix.C (update_cell_water): Add tiny number to top to
+	* biopore_matrix.C (update_cell_water): Add tiny number to 'top' to
 	avoid numeric noise.
 
 	* lexer_table.C (get_time_dh_do): Forgot to set 'date_only'.

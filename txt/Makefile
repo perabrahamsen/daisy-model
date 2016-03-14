@@ -96,7 +96,7 @@ checkin: $(TEXT)
 	-git add $(TEXT)
 	-rm -f $(REMOVE) 
 	-git rm -f --ignore-unmatch $(REMOVE) 
-	git commit -a -m "$(TAG)" # "Version $(TAG)"
+#	git commit -a -m "$(TAG)" # "Version $(TAG)"
 
 commit: $(TEXT)
 	-git add $(TEXT)
