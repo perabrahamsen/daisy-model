@@ -6,6 +6,15 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.24
+
+** FAO_PM now assume dry surface by default.
+
+This what most people would expect. Use (pet (FAO_PM (use_wet true)))
+to get higher potential evapotranspiration for wet surfaces.
+
+** Bug fixes.
+
 * 5.23
 
 ** No slurry volatilization by default.
