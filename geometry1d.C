@@ -106,6 +106,14 @@ Geometry1D::add_soil (std::vector<double>& v,
 // row and class.
 {
   // Pre-conditions.
+  daisy_assert (std::isfinite (bottom));
+  daisy_assert (std::isfinite (top));
+  if (!(bottom < top))
+    {
+      std::ostringstream tmp;
+      tmp << "top = " << top << " bottom = " << bottom;
+      Assertion::message (tmp.str ());
+    }
   daisy_assert (bottom < top);
   daisy_assert (left < right);
 

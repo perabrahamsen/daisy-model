@@ -806,9 +806,13 @@ BioporeMatrix::update_cell_water (const Geometry& geo, const double dt)
       const double next_x = xplus[col];
       if (h_bottom[col] > 0.0)
         {
-          const double top = height_end + h_bottom[col];
+          double top = height_end + h_bottom[col];
           if (top > height_end)
             {
+	      // Avoid too tiny interval for numerical reasons.
+	      if (height_end - top < 1e-10)
+		top = height_end + 1e-10;
+
               const double water = column_water (col);
               geo.add_soil (Theta, top, height_end, last_x, next_x, water);
               total_water += water;

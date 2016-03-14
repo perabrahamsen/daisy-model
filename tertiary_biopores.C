@@ -271,6 +271,8 @@ TertiaryBiopores::tick_source (const Geometry& geo, const Soil& soil,
                                const SoilHeat& soil_heat, 
                                SoilWater& soil_water, Treelog& msg)
 {
+  TREELOG_MODEL (msg);
+
   // Clear old infiltration.
   clear ();
 

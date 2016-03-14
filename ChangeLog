@@ -1,5 +1,8 @@
 2016-03-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* biopore_matrix.C (update_cell_water): Add tiny number to top to
+	avoid numeric noise.
+
 	* lexer_table.C (get_time_dh_do): Forgot to set 'date_only'.
 
 	* lexer_table.h, lexer_table.C (get_time_dh, get_time_do):
@@ -43,7 +46,7 @@
 
 2016-03-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* toplevel.C (copyright): Make 'Søren Hansen' UTF-8.
+	* toplevel.C (copyright): Make 'S{\o}ren Hansen' UTF-8.
 
 	* all: slang warnings cleanup.
 
@@ -3420,7 +3423,7 @@
 2007-12-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* solver.C: Made it a component.
-	* Makefile (COMPONENTS): Added ít.
+	* Makefile (COMPONENTS): Added it.
 	(OTHER): Remove it.
 	* solver_ublas.C, solver_cxsparse.C, solver_none.C: New models.
 	(MODELS): Added them.
