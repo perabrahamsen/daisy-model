@@ -1,3 +1,16 @@
+2016-03-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lexer_table.C (get_time_dh_do): Forgot to set 'date_only'.
+
+	* lexer_table.h, lexer_table.C (get_time_dh, get_time_do):
+	(get_time_dh_do): Split from overloaded 'get_time'.
+	* xysource_profile.C (load):
+	* program_post.C (run):
+	* gnuplot_vector.C (load_when, load_interval):
+	* depth.C (Depth):
+	* source_file.C (read_entry):
+	* xysource_flux.C (load_when, load_interval): Update caller
+
 2016-03-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* condedge.C (Condedge): Commented out set but nut used variables.

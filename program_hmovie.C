@@ -149,7 +149,7 @@ struct ProgramHMovie : public Program
             continue;
           }
         Time time;
-        if (!lex.get_time (entries, time, 8))
+        if (!lex.get_time_dh (entries, time, 8))
           {
             lex.warning ("bad time");
             continue;
