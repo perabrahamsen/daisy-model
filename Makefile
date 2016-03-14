@@ -404,7 +404,7 @@ HEADERS = $(INTERFACES:.C=.h) $(HEADONLY)
 # Find all printable files.
 #
 TEXT =  setup-w32.nsi setup-w64.nsi \
-	control-shared.txt ChangeLog.3 ChangeLog.2 ChangeLog.1 setup.nsi \
+	ChangeLog.3 ChangeLog.2 ChangeLog.1 setup.nsi \
 	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB  $(DISABLED) \
 	$(HEADERS) $(SOURCES) $(ALLSYSHDR) $(ALLSYSSRC) \
 	$(ALLGUIHDR) $(ALLGUISRC) $(UTESTSRC)
