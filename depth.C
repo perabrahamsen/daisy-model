@@ -566,7 +566,7 @@ struct DepthTable : public Depth
 	entry_count++;
 	
 	lex.get_entries (entries);
-	lex.get_time (entries, next_time, 12);
+	lex.get_time_dh (entries, next_time, 12);
 
 	if (entry_count > 1 && next_time <= prev_time)
 	  {

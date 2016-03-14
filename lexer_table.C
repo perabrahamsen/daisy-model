@@ -83,10 +83,10 @@
    bool read_header_with_keywords (Frame& keywords, Treelog& msg);
    int find_tag (const symbol tag) const;
    bool get_entries (std::vector<std::string>& entries) const;
-   static bool get_time (const std::string& entry, Time& time, 
-                         int default_hour, bool& date_only); 
-   bool get_time (const std::vector<std::string>& entries, Time& time, 
-                  int default_hour, bool& date_only) const;
+   static bool get_time_dh_do (const std::string& entry, Time& time, 
+                               int default_hour, bool& date_only); 
+   bool get_time_dh_do (const std::vector<std::string>& entries, Time& time, 
+                        int default_hour, bool& date_only) const;
    bool is_missing (const std::string& value) const;
    double convert_to_double (const std::string& value) const;
 
@@ -684,8 +684,9 @@ LexerTable::is_time (symbol tag)
 }
       
 bool
-LexerTable::Implementation::get_time (const std::string& entry, Time& time,
-                                      int default_hour, bool& date_only)
+LexerTable::Implementation::get_time_dh_do (const std::string& entry,
+                                            Time& time,
+                                            int default_hour, bool& date_only)
 {
   std::istringstream in (entry);
 
@@ -766,25 +767,29 @@ LexerTable::Implementation::get_time (const std::string& entry, Time& time,
 }
 
 bool
-LexerTable::get_time (const std::string& entry, Time& time, int default_hour) 
+LexerTable::get_time_dh (const std::string& entry,
+                         Time& time, int default_hour) 
 { 
   bool date_only;
-  return Implementation::get_time (entry, time, default_hour, date_only); 
+  return Implementation::get_time_dh_do (entry, time, default_hour, date_only); 
 }
 
 bool
-LexerTable::get_time (const std::string& entry, Time& time,
-                      bool& date_only)
-{ return Implementation::get_time (entry, time, 0, date_only); }
+LexerTable::get_time_do (const std::string& entry, Time& time,
+                         bool& date_only)
+{ return Implementation::get_time_dh_do (entry, time, 0, date_only); }
 
 bool
-LexerTable::Implementation::get_time (const std::vector<std::string>& entries,
-                                      Time& time, const int default_hour,
-                                      bool& date_only) const
+LexerTable::Implementation::get_time_dh_do
+/**/ (const std::vector<std::string>& entries,
+      Time& time, const int default_hour,
+      bool& date_only) const
 {
   // Extract date.
   if (time_c < 0)
     {
+      date_only = (hour_c < 0);
+      
       int year = get_date_component (entries, year_c, 1000);
       int month = get_date_component (entries, month_c, 1);
       int mday = get_date_component (entries, mday_c, 1);
@@ -816,7 +821,7 @@ LexerTable::Implementation::get_time (const std::vector<std::string>& entries,
     }
   else 
     {
-      if (!get_time (entries[time_c], time, default_hour, date_only))
+      if (!get_time_dh_do (entries[time_c], time, default_hour, date_only))
         {
           warning (entries[time_c] + ": invalid time");
           return false;
@@ -828,17 +833,17 @@ LexerTable::Implementation::get_time (const std::vector<std::string>& entries,
 }
 
 bool
-LexerTable::get_time (const std::vector<std::string>& entries,
-                      Time& time, const int default_hour) const
+LexerTable::get_time_dh (const std::vector<std::string>& entries,
+                         Time& time, const int default_hour) const
 { 
   bool date_only;
-  return impl->get_time (entries, time, default_hour, date_only);
+  return impl->get_time_dh_do (entries, time, default_hour, date_only);
 }
 
 bool
-LexerTable::get_time (const std::vector<std::string>& entries,
-                      Time& time, bool& date_only) const
-{ return impl->get_time (entries, time, 0, date_only); }
+LexerTable::get_time_do (const std::vector<std::string>& entries,
+                         Time& time, bool& date_only) const
+{ return impl->get_time_dh_do (entries, time, 0, date_only); }
 
 bool
 LexerTable::Implementation::is_missing (const std::string& value) const

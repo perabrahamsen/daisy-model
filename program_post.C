@@ -352,7 +352,7 @@ ProgramPost::run (Treelog& msg)
       // Read entries.
       if (!lex.get_entries (entries))
         continue;
-      if (!lex.get_time (entries, time, 8))
+      if (!lex.get_time_dh (entries, time, 8))
         continue;
 
       if ((after.get () && time < *after)
