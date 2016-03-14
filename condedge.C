@@ -185,52 +185,52 @@ struct CondedgePressure : public Condedge
     const double z1 = geo.cell_z (c1);
     const double z2 = geo.cell_z (c2);
     
-    size_t c_top;
-    double h_top;
+    // size_t c_top;
+    // double h_top;
     double K_top;
-    double z_top;
-    double h_top_ice;
+    // double z_top;
+    //double h_top_ice;
     double h_top_old;
-    double T_top;
+    // double T_top;
     size_t c_bottom;
     double h_bottom;
     double K_bottom;
-    double z_bottom;
+    // double z_bottom;
     double h_bottom_ice;
-    double h_bottom_old;
+    // double h_bottom_old;
     double T_bottom;
     if (z1 > z2)
       {
-        c_top = c1;
-        h_top = h1;
+        // c_top = c1;
+        // h_top = h1;
         K_top = K1;
-        z_top = z1;
-        h_top_ice = h1_ice;
+        // z_top = z1;
+        // h_top_ice = h1_ice;
         h_top_old = h1_old;
-        T_top = T1;
+        // T_top = T1;
         c_bottom = c2;
         h_bottom = h2;
         K_bottom = K2;
-        z_bottom = z2;
+        // z_bottom = z2;
         h_bottom_ice = h2_ice;
-        h_bottom_old = h2_old;
+        // h_bottom_old = h2_old;
         T_bottom = T2;
       }
     else
       {
-        c_top = c2;
-        h_top = h2;
+        // c_top = c2;
+        // h_top = h2;
         K_top = K2;
-        z_top = z2;
-        h_top_ice = h2_ice;
+        // z_top = z2;
+        // h_top_ice = h2_ice;
         h_top_old = h2_old;
-        T_top = T2;
+        // T_top = T2;
         c_bottom = c1;
         h_bottom = h1;
         K_bottom = K1;
-        z_bottom = z1;
+        // z_bottom = z1;
         h_bottom_ice = h1_ice;
-        h_bottom_old = h1_old;
+        // h_bottom_old = h1_old;
         T_bottom = T1;
       }
 
@@ -255,32 +255,32 @@ struct CondedgePressure : public Condedge
       return K_harmonic;
 
     // Then we test for saturated pressure induced flow.
-    size_t c_max;
-    double h_max;
+    // size_t c_max;
+    // double h_max;
     double K_max;
     double z_max;
-    double h_max_ice;
+    // double h_max_ice;
     double h_max_old;
-    double T_max;
+    // double T_max;
     size_t c_min;
-    double h_min;
-    double K_min;
+    // double h_min;
+    //double K_min;
     double z_min;
     double h_min_ice;
     double h_min_old;
     double T_min;
     if (h1 > h2)
       {
-        c_max = c1;
-        h_max = h1;
+        // c_max = c1;
+        // h_max = h1;
         K_max = K1;
         z_max = z1;
-        h_max_ice = h1_ice;
+        // h_max_ice = h1_ice;
         h_max_old = h1_old;
-        T_max = T1;
+        // T_max = T1;
         c_min = c2;
-        h_min = h2;
-        K_min = K2;
+        // h_min = h2;
+        // K_min = K2;
         z_min = z2;
         h_min_ice = h2_ice;
         h_min_old = h2_old;
@@ -288,16 +288,16 @@ struct CondedgePressure : public Condedge
       }
     else
       {
-        c_max = c2;
-        h_max = h2;
+        // c_max = c2;
+        // h_max = h2;
         K_max = K2;
         z_max = z2;
-        h_max_ice = h2_ice;
+        // h_max_ice = h2_ice;
         h_max_old = h2_old;
-        T_max = T2;
+        // T_max = T2;
         c_min = c1;
-        h_min = h1;
-        K_min = K1;
+        // h_min = h1;
+        // K_min = K1;
         z_min = z1;
         h_min_ice = h1_ice;
         h_min_old = h1_old;

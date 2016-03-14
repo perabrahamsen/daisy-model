@@ -1,5 +1,11 @@
 2016-03-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* condedge.C (Condedge): Commented out set but nut used variables.
+
+	* toplevel.C (copyright): Fix copyright date. Use Latin1 oslash on Windows.
+
+	* setup-w32.nsi, setup-w64.nsi: Update Daisy homepage.
+
 	* fao.C (RefPenmanMonteith): Added units in comments.
 
 	* pet_FAO_PM.C (use_wet): Changed default to 'false'.
