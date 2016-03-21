@@ -34,6 +34,7 @@
 #include "frame.h"
 #include "assertion.h"
 #include "mathlib.h"
+#include "log.h"
 #include <sstream>
 
 // The 'drain' model.
@@ -49,7 +50,8 @@ struct BioporeDrain : public Biopore
   void set_state (const Anystate&)
   { }
 
-  std::vector<double> S_from_drain;
+  std::vector<double> S_to_drain;
+  IMvec S_chem_to_drain;
 
   // Simulation.
   double total_water () const
@@ -73,6 +75,8 @@ struct BioporeDrain : public Biopore
                                bool active, 
                                const double h_barrier, double pressure_limit,
                                double K_xx, double h) const;
+  void update_cell_solute (const Geometry& geo, const symbol chem, 
+			   const double dt);
   void forward_sink (const Geometry& geo,    
                      const std::vector<bool>& active,
                      const std::vector<double>& K, 
@@ -96,10 +100,10 @@ struct BioporeDrain : public Biopore
   { }
   void update_cell_water (const Geometry& geo, const double)
   {
-    std::fill (S_from_drain.begin (), S_from_drain.end (), 0.0);
-    biopore_pass_pipes (geo, pipe_position, S, q, S_from_drain);
+    std::fill (S_to_drain.begin (), S_to_drain.end (), 0.0);
+    geo.biopore_pass_pipes (pipe_position, S, q, S_to_drain);
     daisy_approximate (geo.total_surface (S) + infiltration, 
-                       geo.total_surface (S_from_drain));
+                       geo.total_surface (S_to_drain));
   }
   void update_soil_tertiary (std::vector<double>&, std::vector<double>& q_p)
   {
@@ -118,17 +122,20 @@ struct BioporeDrain : public Biopore
     for (size_t c = 0; c < cell_size; c++)
       {
         S_drain[c] += S[c];
-        S_tertiary_drain[c] += S_from_drain[c];
+        S_tertiary_drain[c] += S_to_drain[c];
       }
   }
   void add_solute (symbol, size_t, const double)
   { }
   void matrix_solute (const Geometry&, const double, 
                       const Chemical&, std::vector<double>&,
-                      Treelog&)
-  { /* Handled by S_drain. */ }
+                      Treelog&);
   void output (Log& log) const
-  { output_base (log); }
+  { 
+    output_base (log); 
+    output_variable (S_to_drain, log);
+    output_submodule (S_chem_to_drain, "S_chem_to_drain", log);
+  }
 
   // Create and Destroy.
   bool initialize (const Units& units, const Geometry& geo, const Scope& scope,
@@ -141,8 +148,8 @@ struct BioporeDrain : public Biopore
         ok = false;
       }
     const size_t cell_size = geo.cell_size ();
-    S_from_drain.insert (S_from_drain.begin (), cell_size, 0.0);
-    daisy_assert (S_from_drain.size () == cell_size);
+    S_to_drain.insert (S_to_drain.begin (), cell_size, 0.0);
+    daisy_assert (S_to_drain.size () == cell_size);
     return ok;
   }
   bool check (const Geometry& geo, Treelog& msg) const
@@ -223,9 +230,57 @@ BioporeDrain::update_matrix_sink (const Geometry& geo,
   forward_sink (geo, active, K, K_crack, h_barrier, pressure_limit, h, S);
 }
 
+void 
+BioporeDrain::matrix_solute (const Geometry& geo, const double dt, 
+			     const Chemical& chemical,
+			     std::vector<double>& source_chem,
+			     Treelog& msg)
+{
+  TREELOG_MODEL (msg);
+  const symbol chem = chemical.objid;
+  const size_t cell_size = geo.cell_size ();
+  daisy_assert (source_chem.size () == cell_size);
+  std::vector<double>& sink_chem = S_chem.get_array (chem);
+  sink_chem.resize (cell_size);
+  std::fill (sink_chem.begin (), sink_chem.end (), 0.0);
+
+  // From matrix to biopore.
+  for (size_t c = 0; c < cell_size; c++)
+    sink_chem[c] = S[c] * chemical.C_to_drain (c); // [g/cm^3 S/h]
+  
+#if 0
+  // Export.
+  for (size_t c = 0; c < cell_size; c++)
+    source_chem[c] -= sink_chem[c];
+#endif
+
+  update_cell_solute (geo, chem, dt);
+}
+
+void
+BioporeDrain::update_cell_solute (const Geometry& geo, const symbol chem,
+				  const double dt)
+{
+
+  const size_t cell_size = geo.cell_size ();
+  const size_t edge_size = geo.edge_size ();
+  std::vector<double>& Sc_to_drain = S_chem_to_drain.get_array (chem);
+  Sc_to_drain.resize (cell_size);
+  std::fill (Sc_to_drain.begin (), Sc_to_drain.end (), 0.0);
+  const std::vector<double>& Sc = S_chem.get_array (chem);
+  std::vector<double>& Jc = J.get_array (chem);
+  Jc.resize (edge_size);
+  const double infiltrationc = solute_infiltration.get_value_raw (chem);
+
+  geo.biopore_pass_pipes (pipe_position, Sc, Jc, Sc_to_drain);
+  daisy_approximate (geo.total_surface (Sc) + infiltrationc, 
+		     geo.total_surface (Sc_to_drain));
+}  
+
 BioporeDrain::BioporeDrain (const BlockModel& al)
   : Biopore (al),
-    pipe_position (al.number ("pipe_position", 42.42e42))
+    pipe_position (al.number ("pipe_position", 42.42e42)),
+    S_chem_to_drain (al, "S_chem_to_drain")
 { }
 
 static struct BioporeDrainSyntax : DeclareModel
@@ -237,11 +292,20 @@ static struct BioporeDrainSyntax : DeclareModel
     : DeclareModel (Biopore::component, "drain", "\
 Biopores that ends in the drain pipes.")
   { }
+  static void load_S_chem (Frame& frame)
+  { IMvec::add_syntax (frame, Attribute::LogOnly, Attribute::SoilCells, 
+		       IM::sink_unit ()); }
   void load_frame (Frame& frame) const
   { 
+    frame.declare ("S_to_drain", "cm^3/cm^3/h",
+		   Attribute::LogOnly, Attribute::SoilCells,
+		   "Total stream from biopore to drain.");
+    frame.declare_submodule_sequence ("S_chem_to_drain",
+				      Attribute::LogOnly, "\
+Biopore to drain term for solutes.", load_S_chem);
     frame.declare ("pipe_position", "cm", Check::negative (), 
                    Attribute::OptionalConst,
-                "Height pipes are placed in the soil (a negative number).\n\
+		   "Height pipes are placed in the soil (a negative number).\n\
 By default, use the height specified for pipes in the column.");
   }
 } BioporeDrain_syntax;

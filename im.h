@@ -69,6 +69,8 @@ public:
   static symbol mass_unit (); // [g]
   static symbol storage_unit (); // [g/cm^2]
   static symbol flux_unit ();    // [g/cm^2/h]
+  static symbol sink_unit ();    // [g/cm^3/h]
+  static symbol soil_unit ();    // [g/cm^3]
   static symbol solute_unit ();  // [g/cm^2/mm]
 
   // Content.
@@ -82,9 +84,9 @@ public:
   double get_value (symbol chem, const Unit&) const;
   void set_value (symbol chem, const Unit&, double value);
   void add_value (symbol chem, const Unit&, double value);
-private:
   double get_value_raw (symbol chem) const;
   void set_value_raw (symbol chem, double value);
+  void add_value_raw (symbol chem, double value);
 
   // Iterate.
 public:

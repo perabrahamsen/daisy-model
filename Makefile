@@ -822,7 +822,7 @@ stomatacon${OBJ}: stomatacon.C stomatacon.h model_logable.h model.h symbol.h \
 tertiary${OBJ}: tertiary.C tertiary.h model_derived.h model_logable.h model.h \
   symbol.h geometry.h soil_water.h block_model.h block_nested.h block.h \
   scope.h treelog.h frame_model.h frame.h librarian.h
-biopore${OBJ}: biopore.C biopore.h model_framed.h model_logable.h model.h \
+biopore${OBJ}: biopore.C biopore.h imvec.h model_framed.h model_logable.h model.h \
   symbol.h number.h im.h block_model.h block_nested.h block.h scope.h \
   treelog.h frame_model.h frame.h librarian.h scope_multi.h scope_id.h \
   units.h memutils.h check.h geometry.h log.h border.h assertion.h \
@@ -1636,19 +1636,19 @@ tertiary_old${OBJ}: tertiary_old.C tertiary.h model_derived.h model_logable.h \
   soil_water.h chemical.h model_framed.h macro.h mactrans.h librarian.h \
   block_model.h block_nested.h block.h scope.h treelog.h frame_model.h \
   frame.h surface.h uzmodel.h groundwater.h assertion.h
-biopore_drain${OBJ}: biopore_drain.C biopore.h model_framed.h model_logable.h \
+biopore_drain${OBJ}: biopore_drain.C biopore.h imvec.h model_framed.h model_logable.h \
   model.h symbol.h number.h im.h block_model.h block_nested.h block.h \
   scope.h treelog.h frame_model.h frame.h vcheck.h librarian.h \
   submodeler.h block_submodel.h frame_submodel.h check.h geometry.h \
   soil.h anystate.h chemical.h groundwater.h model_derived.h assertion.h \
   mathlib.h
 tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model_derived.h \
-  model_logable.h model.h symbol.h biopore.h model_framed.h number.h \
+  model_logable.h model.h symbol.h biopore.h imvec.h model_framed.h number.h \
   im.h memutils.h librarian.h block_model.h block_nested.h block.h \
   scope.h treelog.h frame_model.h frame.h check.h vcheck.h geometry.h \
   soil.h soil_water.h soil_heat.h log.h border.h anystate.h surface.h \
   uzmodel.h chemical.h groundwater.h units.h assertion.h mathlib.h
-biopore_matrix${OBJ}: biopore_matrix.C biopore.h model_framed.h \
+biopore_matrix${OBJ}: biopore_matrix.C biopore.h imvec.h model_framed.h \
   model_logable.h model.h symbol.h number.h im.h imvec.h block_model.h \
   block_nested.h block.h scope.h treelog.h frame_model.h frame.h \
   vcheck.h librarian.h submodeler.h block_submodel.h frame_submodel.h \

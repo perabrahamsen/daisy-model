@@ -48,9 +48,12 @@ public:
   const Unit& unit () const
   { return unit_; }
   const std::vector<double>& get_array (symbol chem) const;
+  std::vector<double>& get_array (symbol chem);
   void set_array (symbol chem, const std::vector<double>& value);
   double get_value (symbol chem, size_t index) const;
   void add_value (symbol chem, size_t index, double value);
+  void clear ();
+  void multiply (double factor);
 
   // Iterate.
 public:
@@ -78,11 +81,12 @@ public:
   // Operations.
 public:
   void output (Log&) const;
+  const std::string print () const;
 
   // Create and Destroy. 
 public:
   static void add_syntax (Frame& parent,
-			  Attribute::category cat, 
+			  Attribute::category cat, int size,
 			  const symbol dimension);
   explicit IMvec (const BlockModel&, const char*);
   ~IMvec ();

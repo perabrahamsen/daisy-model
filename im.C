@@ -61,6 +61,20 @@ IM::flux_unit ()
 }
 
 symbol
+IM::sink_unit ()
+{
+  static const symbol unit ("g/cm^3/h");
+  return unit;
+}
+
+symbol
+IM::soil_unit ()
+{
+  static const symbol unit ("g/cm^3");
+  return unit;
+}
+
+symbol
 IM::solute_unit ()
 {
   static const symbol unit ("g/cm^2/mm");
@@ -108,6 +122,10 @@ IM::get_value_raw (const symbol chem) const
 void 
 IM::set_value_raw (const symbol chem, const double value)
 { content[chem] = value; }
+
+void 
+IM::add_value_raw (const symbol chem, const double value)
+{ content[chem] += value; }
 
 void
 IM::output (Log& log) const

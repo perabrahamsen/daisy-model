@@ -26,6 +26,7 @@
 #include "symbol.h"
 #include "number.h"
 #include "im.h"
+#include "imvec.h"
 #include <memory>
 #include <vector>
 
@@ -37,7 +38,6 @@ class Anystate;
 class Chemical;
 class Units;
 class Groundwater;
-class IM;
 
 class Biopore : public ModelFramed
 {
@@ -58,10 +58,12 @@ protected:
 
   // Log variables.
 protected:
-  std::vector<double> S;         // Matrix sink term [].
+  std::vector<double> S;         // Matrix sink term [h^-1].
+  IMvec S_chem;			 // Solute matrix sink term [g/cm^3/h].
   double infiltration;           // Surface infiltration [cm/h]
   IM solute_infiltration;       // Solute infiltration [g/cm^2/h]
   std::vector<double> q;        // Water flow [cm/h]
+  IMvec J;			// Solute flow [g/cm^2/h]
 
   // Utilities.
 protected:

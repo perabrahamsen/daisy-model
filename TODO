@@ -1,7 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Test of Sørens biopore opsætning crasher.
-
 * "Promillefondprojekt" forklar lavere N indhold i kerner.
 
 * Vejledning 
@@ -12,15 +10,27 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Biopore flow 
 
-** Calculate "M" for hver celle, biopore klasse, og stof.
+** IMvec::output (som BioporeMatrix::output håndterer M)
 
-En "IMvec" i hver biopore_matrix
+Check om den virker med checkpoint (gør "M" midlertidigt til state variabel)
 
-** Calculate flux from S (stof), M_old, M_new for hver klasse og stof.
+** Brug IMvec::output generelt
 
-** Add M, flux til stof
+Overvej om det skal være en standard del af log.h?
 
-** J_p
+** Færdiggør "Biopore chemical" balance
+
+** Få den til at virke for både matrix og dræn
+
+** Overfør evt. til log.dai
+
+** Overfør variable til ChemicalStandard.
+
+** Ny "Soil chemical2" balance
+
+** Få den til at virke
+
+** Juster Field/Soil chemical/nitrogen logs så de følger water m.h.t. tertiary
 
 * Artikler
 

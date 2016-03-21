@@ -1,3 +1,44 @@
+2016-03-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* biopore_matrix.C (M): New state variable.
+	* biopore_drain.C (S_chem_to_drain): New log variable.
+	(S_to_drain): Renamed from 'S_from_drain'.
+	* biopore.h, biopore.C (S_chem, J): New log variables.
+	* lib/log.dai (biopore-chemical, "Biopore content")
+	("Biopore chemical", "Biopore water"): Log individial biopore
+	classes.
+
+	* imvec.C (output): Allow inheritance for chemicals, e.g. 'N'
+	matching both 'NO3' and 'NH4'.
+
+2016-03-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* im.C, im.h (soil_unit): New function.
+
+	* geometry.C (biopore_pass_pipes, biopore_pass_below): Made them
+	members of 'Geometry'.
+
+2016-03-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* imvec.C, imvec.h (clear, print, multiply): New functions.
+	* im.C, im.h (sink_unit): New function.
+
+2016-03-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* imvec.h, imvec.C (get_array): Added non-const version.
+	(clear): New function.
+
+	* im.C, im.h (add_value_raw): New function.
+	(get_value_raw, set_value_raw): Made public.
+
+2016-03-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* imvec.C, imvec.h (add_syntax): Add 'size' argument.
+	(clear): New function.
+
+	* biopore_matrix.C (load_solute): Update caller.
+	(solute): Changed from pointer to member.
+
 2016-03-14  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.24 released.

@@ -3176,4 +3176,114 @@ parameter in the 'default' bioclimate model.  By default, 30."))
                    (spec drain lateral S)
                    (handle sum))))
 
+(deflog biopore-chemical chemical
+  "Log chemicals in biopores."
+  (declare biopore String
+	   "Name of biopore to log.")
+  (biopore "*")
+  ;; Add it to the log files.
+  (parameter_names &old biopore)
+  ;; Use chemical name as part of file name.
+  (declare bioporefid string
+           "File name component indicating biopore logged.")
+  (bioporefid (cond ((string-equal "${biopore}" "*")
+		"biopore")
+	       (true
+		"${biopore}"))))
+  
+(defsummary "Biopore content" balance
+  (input "From matrix"
+	 "From above")
+  (output "To below" "To drain")
+  (content "Content"))
+
+(deflog "Biopore chemical" biopore-chemical
+  (declare unit String "Base unit.")
+  (unit "g/ha")
+  (where "${colfid}tertiary-${bioporefid}-${chemfid}.dlf")
+  (when hourly)
+  (summary "Biopore content")
+  (entries (interval (path column "${column}" Movement "*"
+			   Tertiary biopores classes "${biopore}"
+			   M "${chemical}" value)
+		     (handle current)
+		     (tag "Content")
+		     (dimension "${unit}")
+		     (spec biopore matrix M value))
+	   (interval (path column "${column}" Movement "*"
+			   Tertiary biopores classes "${biopore}"
+			   S_chem "${chemical}" value)
+		     (handle sum)
+		     (tag "From matrix")
+		     (dimension "${unit}")
+		     (spec biopore matrix S_chem value))
+	   (interval (path column "${column}" Movement "*"
+			   Tertiary biopores classes "${biopore}"
+			   S_chem_to_drain "${chemical}" value)
+		     (handle sum)
+		     (tag "To drain")
+		     (dimension "${unit}")
+		     (spec biopore drain S_chem_to_drain value))
+           (flux_top (tag "From above")
+                     (path column "${column}"  Movement "*"
+			   Tertiary biopores classes "${biopore}"
+			   J "${chemical}" value)
+		     (dimension "${unit}")
+                     (spec biopore matrix J value)
+                     (handle sum)
+                     (negate true))
+           (flux_bottom (tag "To below")
+			(path column "${column}"  Movement "*"
+			      Tertiary biopores classes "${biopore}"
+			      J "${chemical}" value)
+			(dimension "${unit}")
+			(spec biopore matrix J value)
+			(handle sum)
+			(negate true))
+	   ))
+
+(deflog "Biopore water" biopore
+  (declare unit String "Base unit.")
+  (unit "mm")
+  (where "${colfid}tertiary-${bioporefid}-water.dlf")
+  (when hourly)
+  (summary "Biopore content")
+  (entries (interval (path column "${column}" Movement "*"
+			   Tertiary biopores classes "${biopore}" Theta)
+		     (handle current)
+		     (tag "Content")
+		     (dimension "${unit}")
+		     (spec biopore matrix Theta))
+	   (interval (path column "${column}" Movement "*"
+			   Tertiary biopores classes "${biopore}"
+			   S)
+		     (handle sum)
+		     (tag "From matrix")
+		     (dimension "${unit}")
+		     (spec biopore matrix S))
+	   (interval (path column "${column}" Movement "*"
+			   Tertiary biopores classes "${biopore}"
+			   S_to_drain)
+		     (handle sum)
+		     (tag "To drain")
+		     (dimension "${unit}")
+		     (spec biopore drain S_to_drain))
+           (flux_top (tag "From above")
+                     (path column "${column}"  Movement "*"
+			   Tertiary biopores classes "${biopore}"
+			   q)
+                     (dimension "${unit}")
+                     (spec biopore component q)
+		     (handle sum)
+                     (negate true))
+           (flux_bottom (tag "To below")
+			(path column "${column}"  Movement "*"
+			      Tertiary biopores classes "${biopore}"
+			      q)
+			(dimension "${unit}")
+			(spec biopore component q)
+			(handle sum)
+			(negate true))
+	   ))
+
 ;;; log.dai ends here

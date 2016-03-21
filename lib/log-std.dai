@@ -744,7 +744,6 @@ Nitrogen content of the crop, excluding dead leaves.")
 (defsummary "Soil N balance" balance
   "Nitrogen balance for a soil interval."
   (precision 3)
-  (require_top true)
   (input "NO3-In" "NH4-In" "NO3-Incorp" "NH4-Incorp"
          "NO3-Tillage" "NH4-Tillage"
 	 "Residuals-N" "Tillage-Org_N" "Bioincorporation")
