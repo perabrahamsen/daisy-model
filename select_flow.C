@@ -187,6 +187,9 @@ SelectFlow::set_column (const Column& column, Treelog& msg)
 void
 SelectFlow::output_array (const std::vector<double>& array)
 { 
+  if (array.size () == 0)
+    return;
+
   if (active == colcache.end ())
     throw "Needs soil to log flow";
   

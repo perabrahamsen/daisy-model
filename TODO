@@ -1,5 +1,11 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Biopore flow 
+
+** commit
+
+** PÅSKE!
+
 * "Promillefondprojekt" forklar lavere N indhold i kerner.
 
 * Vejledning 
@@ -7,30 +13,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 ** Signe
 
 ** Kasper
-
-* Biopore flow 
-
-** IMvec::output (som BioporeMatrix::output håndterer M)
-
-Check om den virker med checkpoint (gør "M" midlertidigt til state variabel)
-
-** Brug IMvec::output generelt
-
-Overvej om det skal være en standard del af log.h?
-
-** Færdiggør "Biopore chemical" balance
-
-** Få den til at virke for både matrix og dræn
-
-** Overfør evt. til log.dai
-
-** Overfør variable til ChemicalStandard.
-
-** Ny "Soil chemical2" balance
-
-** Få den til at virke
-
-** Juster Field/Soil chemical/nitrogen logs så de følger water m.h.t. tertiary
 
 * Artikler
 

@@ -133,9 +133,7 @@ private:
                            size_t cell, double amount /* [g] */) = 0;
 public:
   virtual void matrix_solute (const Geometry& geo, double dt, 
-                              const Chemical& chemical, 
-                              std::vector<double>& source_chem,
-                              Treelog& msg) = 0;
+                              Chemical& chemical, Treelog& msg) = 0;
 
 protected:
   void output_base (Log&) const;

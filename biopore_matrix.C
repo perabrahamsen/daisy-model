@@ -159,9 +159,7 @@ struct BioporeMatrix : public Biopore
                     std::vector<double>&) const;
   void add_solute (symbol chem, size_t cell, const double amount /* [g] */);
   void matrix_solute (const Geometry& geo, const double dt, 
-                      const Chemical& chemical, 
-		      std::vector<double>& source_chem,
-                      Treelog& msg);
+                      Chemical& chemical, Treelog& msg);
   void update_cell_solute (const Geometry& geo, const symbol chem, 
 			   const double dt);
 
@@ -879,14 +877,11 @@ BioporeMatrix::add_solute (const symbol chem,
 
 void 
 BioporeMatrix::matrix_solute (const Geometry& geo, const double dt, 
-                              const Chemical& chemical,
-                              std::vector<double>& source_chem,
-                              Treelog& msg)
+                              Chemical& chemical, Treelog& msg)
 {
   TREELOG_MODEL (msg);
   const symbol chem = chemical.objid;
   const size_t cell_size = geo.cell_size ();
-  daisy_assert (source_chem.size () == cell_size);
   std::vector<double>& sink_chem = S_chem.get_array (chem);
   sink_chem.resize (cell_size);
   std::fill (sink_chem.begin (), sink_chem.end (), 0.0);
@@ -973,9 +968,6 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
     }
 
   // Export.
-  for (size_t c = 0; c < cell_size; c++)
-    source_chem[c] -= sink_chem[c];
-
   double total_in = 0.0;
   double total_out = 0.0;
   for (size_t c = 0; c < cell_size; c++)
@@ -1002,6 +994,12 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
     }
 
   update_cell_solute (geo, chem, dt);
+  const std::vector<double> empty_cell (cell_size, 0.0);
+  const std::vector<double>& M_array = M.get_array (chem);
+  const std::vector<double>& M_S = S_chem.get_array (chem);
+  const std::vector<double>& Jc = J.get_array (chem);
+  if (M_array.size () > 0)
+    chemical.add_tertiary (M_array, Jc, M_S, empty_cell, empty_cell);
 }
 
 void

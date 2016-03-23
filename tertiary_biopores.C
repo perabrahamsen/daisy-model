@@ -623,13 +623,8 @@ TertiaryBiopores::solute (const Geometry& geo, const SoilWater& soil_water,
     }
 
   // Matrix exchange.
-  const size_t cell_size = geo.cell_size ();
-  std::vector<double> source_chem (cell_size, 0.0); // [g/cm^3 S/h]
   for (size_t b = 0; b < classes.size (); b++)
-    classes[b]->matrix_solute (geo, dt, chemical, source_chem, msg);
-
-  // Make it official.
-  chemical.set_tertiary_top (source_chem, J_chem);
+    classes[b]->matrix_solute (geo, dt, chemical, msg);
 }
 
 double

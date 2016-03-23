@@ -1,4 +1,30 @@
+2016-03-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log.dai ("Soil Chemicals", "Tertiary chemical sink"): Removed.
+	("Groundwater"): Removed N.
+	("Drain Sink NO3", "Drain Sink NH4"): Matrix sink only.
+	("Colloids balance", "Colloids"): Updated.
+
+2016-03-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* select_volume.C, select_flow.C (output_array): Ignore empty arrays.
+	* chemical_std.C (M_tertiary, S_p_drain, S_soil_drain, S_B2M)
+	(S_M2B): New log variables.
+	(S_drain, S_tertirary): Removed.
+	* chemical_std.C, chemical.h (add_tertiary): New function.
+	* biopore_drain.C, biopore_matrix.C, biopore.h (matrix_solute):
+	Change argument list.
+	* tertiary_biopores.C (solute): Update caller.
+	* lib/log-std.dai ("Soil chemical", "Field chemical"):
+	("Soil nitrogen", "Field nitrogen"): Use new log variables.
+
 2016-03-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C, chemical.h (set_tertiary): Merged
+	'set_tertiary_full' and 'set_tertiary_top'.
+	(need_fake_tertiary): Removed.
+	(tick_after): Update caller.
+	(pass_below): Removed.
 
 	* biopore_matrix.C (M): New state variable.
 	* biopore_drain.C (S_chem_to_drain): New log variable.

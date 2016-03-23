@@ -128,8 +128,7 @@ struct BioporeDrain : public Biopore
   void add_solute (symbol, size_t, const double)
   { }
   void matrix_solute (const Geometry&, const double, 
-                      const Chemical&, std::vector<double>&,
-                      Treelog&);
+                      Chemical&, Treelog&);
   void output (Log& log) const
   { 
     output_base (log); 
@@ -232,14 +231,11 @@ BioporeDrain::update_matrix_sink (const Geometry& geo,
 
 void 
 BioporeDrain::matrix_solute (const Geometry& geo, const double dt, 
-			     const Chemical& chemical,
-			     std::vector<double>& source_chem,
-			     Treelog& msg)
+			     Chemical& chemical, Treelog& msg)
 {
   TREELOG_MODEL (msg);
   const symbol chem = chemical.objid;
   const size_t cell_size = geo.cell_size ();
-  daisy_assert (source_chem.size () == cell_size);
   std::vector<double>& sink_chem = S_chem.get_array (chem);
   sink_chem.resize (cell_size);
   std::fill (sink_chem.begin (), sink_chem.end (), 0.0);
@@ -248,13 +244,14 @@ BioporeDrain::matrix_solute (const Geometry& geo, const double dt,
   for (size_t c = 0; c < cell_size; c++)
     sink_chem[c] = S[c] * chemical.C_to_drain (c); // [g/cm^3 S/h]
   
-#if 0
-  // Export.
-  for (size_t c = 0; c < cell_size; c++)
-    source_chem[c] -= sink_chem[c];
-#endif
-
   update_cell_solute (geo, chem, dt);
+
+  const std::vector<double> empty_cell (cell_size, 0.0);
+  const std::vector<double>& Jc = J.get_array (chem);
+  const std::vector<double>& S_indirect_drain = S_chem.get_array (chem);
+  const std::vector<double>& S_p_drain = S_chem_to_drain.get_array (chem);
+  chemical.add_tertiary (empty_cell, Jc, empty_cell,
+			 S_indirect_drain, S_p_drain);
 }
 
 void

@@ -826,75 +826,6 @@ sum of all chemicals will be logged."
                    (dimension "g/ha")
                    (spec chemical default surface_decompose))))
 
-(deflog "Soil Chemicals" chemical
-  "Summary information about chemicals in the soil."
-  (where "${colfid}soil_chemical.dlf")
-  (summary (balance (precision 3)
-                    (input "In" "External" "Transform")
-                    (output "Decompose" "Leak-Matrix" "Leak-Macro" "Drain" 
-                            "Uptake")
-                    (content "Content")))
-  (when hourly)
-  (entries (flux_top (path column "${column}" Chemistry "*" 
-                           trace "${chemical}" J_matrix)
-                     (tag "In")
-                     (handle sum)
-                     (negate true)
-                     (dimension "g/ha")
-                     (spec chemical default J_matrix))
-           (flux_bottom (path column "${column}" Chemistry "*" 
-                              trace "${chemical}" J_matrix)
-                        (tag "Leak-Matrix")
-                        (negate true)
-                        (handle sum)
-                        (dimension "g/ha")
-                        (spec chemical default J_matrix))
-           (flux_bottom (path column "${column}" Chemistry "*" 
-                              trace "${chemical}" J_tertiary)
-                        (tag "Leak-Macro")
-                        (negate true)
-                        (handle sum)
-                        (dimension "g/ha")
-                        (spec chemical default J_tertiary))
-           (interval (path column "${column}" Chemistry "*" 
-                           trace "${chemical}" S_drain)
-                     (tag "Drain")
-                     (negate true)
-                     (handle sum)
-                     (dimension "g/ha")
-                     (spec chemical default S_drain))
-           (interval (path column "${column}" Chemistry "*" 
-                           trace "${chemical}" S_external)
-                     (tag "External")
-                     (handle sum)
-                     (dimension "g/ha")
-                     (spec chemical default S_external))
-           (interval (path column "${column}" Chemistry "*" 
-                           trace "${chemical}" S_root)
-                     (tag "Uptake")
-                     (handle sum)
-		     (negate true)
-                     (dimension "g/ha")
-                     (spec chemical default S_root))
-           (interval (path column "${column}" Chemistry "*" 
-                           trace "${chemical}" S_decompose)
-                     (tag "Decompose")
-                     (negate true)
-                     (handle sum)
-                     (dimension "g/ha")
-                     (spec chemical default S_decompose))
-           (interval (path column "${column}" Chemistry "*" 
-                           trace "${chemical}" S_transform)
-                     (tag "Transform")
-                     (handle sum)
-                     (dimension "g/ha")
-                     (spec chemical default S_transform))
-           (interval (path column "${column}" Chemistry "*" 
-                           trace "${chemical}" M)
-                     (tag "Content")
-                     (dimension "g/ha")
-                     (spec chemical default M))))
-
 ;; We need two new log models.
 (deflog "Chemical Content" chemical
   "Amount of chemicals in each numeric soil layer."
@@ -1848,32 +1779,7 @@ It can be negative if there is cabilary rise.")
            (number (path column "${column}" Drain lateral DrainFlow)
                    (handle sum)
                    (dimension "mm")
-                   (factor 10))
-           (interval (path column "${column}"
-			   Chemistry "*" trace NH4 S_drain)
-                     (tag "NH4-Drain")
-                     (handle sum)
-                     (negate true)
-                     (dimension "kg N/ha"))
-           (flux_bottom (path column "${column}" 
-			      Chemistry "*" trace NH4 J_matrix)
-			(spec chemical default J_matrix)
-                        (tag "NH4-Perc-Matrix")
-                        (handle sum)
-                        (negate true)
-                        (dimension "kg N/ha"))
-           (interval (path column "${column}" Chemistry "*" trace NO3 S_drain)
-		     (spec chemical default S_drain)
-                     (tag "NO3-Drain")
-                     (handle sum)
-                     (negate true)
-                     (dimension "kg N/ha"))
-           (flux_bottom (path column "${column}" Chemistry "*" trace NO3 J_matrix)
-			(spec chemical default J_matrix)
-                        (tag "NO3-Perc-Matrix")
-                        (handle sum)
-                        (negate true)
-                        (dimension "kg N/ha"))))
+                   (factor 10))))
 
 (deflog Bioincorporation column
   (where "${colfid}bioincorporation.dlf")
@@ -2431,8 +2337,8 @@ Use \"*\" to log all added organic matter matter.")
 (deflog "Drain Sink NO3" column
   (where "${colfid}drain_sink_NO3.dlf")
   (when hourly)
-  (entries (array (path column "${column}" Chemistry "*" trace NO3 S_drain)
-		  (spec chemical default S_drain)
+  (entries (array (path column "${column}" Chemistry "*" trace NO3 S_soil_drain)
+		  (spec chemical default S_soil_drain)
                   (handle sum)
 		  (negate true)
                   (dimension "g/cm^3"))))
@@ -2440,11 +2346,11 @@ Use \"*\" to log all added organic matter matter.")
 (deflog "Drain Sink NH4" column
   (where "${colfid}drain_sink_NH4.dlf")
   (when hourly)
-  (entries (array (path column "${column}" Chemistry "*" trace NH4 S_drain)
-		     (spec chemical default S_drain)
+  (entries (array (path column "${column}" Chemistry "*" trace NH4 S_soil_drain)
+		     (spec chemical default S_soil_drain)
                   (handle sum)
 		  (negate true)
-                  (dimension "cm^3/cm^3"))))
+                  (dimension "g/cm^3"))))
 
 (deflog "Soil Water Content" column
   (where "${colfid}soil_water_content.dlf")
@@ -2786,15 +2692,6 @@ contains no water."
                   (spec fixed SoilWater S_B2M)
                   (handle sum))))
 
-(deflog "Tertiary chemical sink" chemical
-  "Tertiary chemical sink term."
-  (where "${colfid}tertiary-${chemfid}-sink.dlf")
-  (when hourly)
-  (entries (array (path column "${column}" Chemistry "*" 
-                        trace "${chemical}" S_tertiary)
-                  (spec chemical default S_tertiary)
-                  (handle sum))))
-
 (defsummary "Surface water balance" balance
   "Above ground water balance."
   (precision 1)
@@ -2942,7 +2839,7 @@ nowhere go to.  For typical setups, this value will be zero.")
   (precision 3)
   (require_top true)
   (input Generate)
-  (output Filter Surface-Drain Soil-Drain Leak)
+  (output Filter Biopiore-Drain Soil-Drain Matrix-Leak Biopores-Leak)
   (content Surface Soil Biopores Error))
 
 (defsummary "Colloids pool balance" balance
@@ -2981,11 +2878,10 @@ nowhere go to.  For typical setups, this value will be zero.")
                      (dimension "${unit}")
                      (spec chemical default M))
            (number (tag "Biopores")
-                   (path column "${column}" Movement "*" 
-                         Tertiary biopores solute_storage colloid value)
-                   (spec tertiary biopores solute_storage value)
-                   (dimension "${unit}")
-                   (handle current))
+                     (path column "${column}" Chemistry "*"
+			   trace colloid M_tertiary)
+                     (dimension "${unit}")
+                     (spec chemical default M_tertiary))
            (interval (tag "Filter")
                      (path column "${column}" Chemistry "*" trace 
                            colloid S_transform)
@@ -2993,24 +2889,30 @@ nowhere go to.  For typical setups, this value will be zero.")
                      (dimension "${unit}")
                      (negate true)
                      (handle sum))
-           (number (path column "${column}" Movement "*" 
-                         Tertiary biopores classes drain 
-                         solute_infiltration colloid value)
-                   (spec biopore drain solute_infiltration value)
-                   (tag "Surface-Drain")
-                   (handle sum)
-                   (dimension "${unit}"))
            (interval (tag "Soil-Drain")
-                     (path column "${column}" Chemistry "*" trace colloid
-                           S_drain)
-                     (spec chemical default S_drain)
+                     (path column "${column}" Chemistry "*"
+			   trace colloid S_soil_drain)
+                     (spec chemical default S_soil_drain)
                      (dimension "${unit}")
                      (handle sum)
                      (negate true))
-           (flux_bottom (tag "Leak")
+           (interval (tag "Biopore-Drain")
+                     (path column "${column}" Chemistry "*" 
+			   trace colloid S_p_drain)
+                     (spec chemical default S_p_drain)
+                     (dimension "${unit}")
+                     (handle sum))
+           (flux_bottom (tag "Matrix-Leak")
                         (path column "${column}" Chemistry "*" trace collodid
                               J_matrix)
                         (spec chemical default J_matrix)
+                        (dimension "${unit}")
+                        (handle sum)
+                        (negate true))
+           (flux_bottom (tag "Biopore-Leak")
+                        (path column "${column}" Chemistry "*" trace collodid
+                              J_tertiary)
+                        (spec chemical default J_tertiary)
                         (dimension "${unit}")
                         (handle sum)
                         (negate true))
@@ -3192,6 +3094,7 @@ parameter in the 'default' bioclimate model.  By default, 30."))
 		"${biopore}"))))
   
 (defsummary "Biopore content" balance
+  (precision 3)
   (input "From matrix"
 	 "From above")
   (output "To below" "To drain")
