@@ -498,8 +498,22 @@ void
 ChemicalStandard::set_tertiary (const std::vector<double>& S_p, 
 				const std::vector<double>& J_p)
 {
-  daisy_assert (S_B2M.size () == S_p.size ());
-  S_B2M = S_p;
+  const size_t cell_size = S_p.size ();
+  daisy_assert (S_B2M.size () == cell_size);
+  daisy_assert (S_M2B.size () == cell_size);
+  for (size_t i = 0; i < cell_size; i++)
+    {
+      if (S_p[i] > 0)
+	{
+	  S_B2M[i] = S_p[i];
+	  S_M2B[i] = 0.0;
+	}
+      else
+	{
+	  S_B2M[i] = 0.0;
+	  S_M2B[i] = -S_p[i];
+	}	
+    }
   add_to_source_secondary (S_p);
   daisy_assert (J_tertiary.size () == J_p.size ());
   J_tertiary = J_p;
