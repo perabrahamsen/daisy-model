@@ -15,7 +15,7 @@ logs, the same way biopore percolation has been included in the
 Soil/Field water logs. You can now also seperate drain flow from soil
 matrix or biopores, and seperate input and output from biopores,
 rather than just the net exchange.
-
+ 
 You no longer need to include the bottom of the biopore zone in order
 to balance Field nitrogen and Field chemical. You still need to
 include the entire root zone though.
