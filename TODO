@@ -1,6 +1,104 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+*** summary fractils
+
+Udskriv data
+
+Spredning?
+
+
+* NYield
+
+** DONE Lav test opsætning med ensidigt vinterhvede
+
+** DONE Kopier vejrdata
+
+** Lav log med balance
+
+*** gnuplot: Plot data + normalfordeling
+
+*** summary fractils
+
+*** Hvordan logger man høst af en enklet afgrøde i et sædskifte?
+
+** Konstant SOM
+
+*** Ny "fixed_content" OM parameter (defaul false)
+
+*** Ny SOM parameterizationer med fixed_content true
+
+*** Ny OM fixed parameterization
+
+** Test betydning
+
+** Log Carbon med og uden
+
+** Vælg den rigtige jord
+
+** Valg det rigtige sædskifte
+
 * "Promillefondprojekt" forklar lavere N indhold i kerner.
+
+Hvorfor falder protein indeholdet i kerner.
+
+Forklaringer:
+
+- Lavere gødningsnormer
+- Nye sorter optimeret lavere N
+- Lavere deposition
+- Faldende baggrundsmineralisering
+- Andre sædskifter efterlader ikke så meget
+-- N når ikke ned til de dybe røder, som er vigtige ved kernefyldning
+- Bruges på flere jordtyper
+
+Isoler effekter
+
+** 100 års "random" vejrdata
+
+*** 2xklima (øst og vest)
+
+Vest ny?
+
+** Jorde defineret fra dk-horizon.dai
+
+*** Vælg "typiske" kombinationer af horisonter for hvededyrkning
+
+Vær sikker på at få nogle "nye" jorde med
+
+Nedre rand?
+
+** Forskelligt humus indhold, 30-70, 50-50, 70-30 som
+
+Konstant indhold i SOM1? SOM2?
+
+** Ren vinterhvede med forskellige normer
+
+** "Typiske" sædskifter (nye og gamle) med forskellige normer.
+
+** Forskellige sorter
+
+* udvikling
+
+** Lås SOM1 og SOM2
+
+** Ref setup
+
+1 jord, dybt grundvand, ensidig hvede, 100 år øst vejr, 1
+gødningsniveau, log (kerne-)harvest, standard 50-50 humus
+
+Plot fordeling
+
+** Implementer "seed"
+
+Sammenlign fordeling
+
+** Prøv med dybe røder
+
+Sammenlig fordeling
+
+** Log og plot N optag vs DS
+
+Sammenlign uden dybe rødder
 
 * Vejledning 
 
