@@ -1,12 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-*** summary fractils
-
-Udskriv data
-
-Spredning?
-
-
 * NYield
 
 ** DONE Lav test opsætning med ensidigt vinterhvede
@@ -15,19 +8,41 @@ Spredning?
 
 ** Lav log med balance
 
-*** gnuplot: Plot data + normalfordeling
+*** DONE gnuplot: Plot data + normalfordeling
 
-*** summary fractils
+*** DONE summary fractils
 
 *** Hvordan logger man høst af en enklet afgrøde i et sædskifte?
 
+VegetationCrops
+
+Gem hver "harvest" for det nuværende tidsskridt, slet før næste.
+
+output_list (lige som med crops)
+
+Skal vi have residuals på samme måde?
+
 ** Konstant SOM
 
-*** Ny "fixed_content" OM parameter (defaul false)
+*** "Save SOM" og "Restore SOM" actions?
 
-*** Ny SOM parameterizationer med fixed_content true
+**** stored_som_C og stored_som_N i organic std.
 
-*** Ny OM fixed parameterization
+**** store_SOM og restore_SOM management ops.
+
+**** Soil carbon log ?
+
+Har vi en ?
+
+Vi har brug for external_org_N og external_org_C.
+
+**** Soil carbon
+
+SOM1 SOM2 SOM3 SMB Roots Shoot Fert
+
+**** Soil organic nitrogen log ?
+
+**** Hvordan skal "restore" indgå i balancen?
 
 ** Test betydning
 

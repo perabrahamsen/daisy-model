@@ -8,6 +8,8 @@ release.
 
 * 5.25
 
+** Made duplicate definitions errors instead of warnings.
+
 ** Better logging of biopores.
 
 Biopore leaching is now included in the Soil/Field Nitrogen/Chemical

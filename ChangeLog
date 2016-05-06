@@ -1,3 +1,23 @@
+2016-05-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* vegetation_crops.C (my_harvest): New log variable ('harvest').
+	(harvest, pluck, output, load_frame): Support it.
+
+2016-05-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* parser_file.C (load_list, add_derived): Made duplicate
+	definitions errors instead of warnings.
+
+2016-05-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* organic_std.C (update_pools): Allow for zero N.
+
+2016-05-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* vegetation_crops.C, vegetation_permanent.C:
+	* vegetation_afforestation.C, vegetation.h (clear): New function.
+	* column_std.C (clear): Call it.
+
 2016-04-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* summary_fractiles.C: New model.

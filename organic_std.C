@@ -2417,12 +2417,17 @@ OrganicStandard::update_pools
       const double total_C = AOM_C + SMB_C + SOM_C;
       const double total_N = total_C / total_C_per_N;
       const double SOM_N = total_N - AOM_N - SMB_N;
-      daisy_assert (SOM_N > 0.0);
-      const double SOM_C_per_N = SOM_C / SOM_N;
-
-      for (size_t pool = 0; pool < som.size (); pool++)
-	if (som[pool]->N.size () == lay)
-	  som[pool]->N.push_back (som[pool]->C[lay] / SOM_C_per_N);
+      if (SOM_N > 0.0)
+        {
+          const double SOM_C_per_N = SOM_C / SOM_N;
+          
+          for (size_t pool = 0; pool < som.size (); pool++)
+            if (som[pool]->N.size () == lay)
+              som[pool]->N.push_back (som[pool]->C[lay] / SOM_C_per_N);
+        }
+      else for (size_t pool = 0; pool < som.size (); pool++)
+             if (som[pool]->N.size () == lay)
+               som[pool]->N.push_back (0.0);
     }
 }
 

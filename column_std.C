@@ -576,7 +576,8 @@ ColumnStandard::clear ()
   bioclimate->clear ();
   soil_water->clear ();
   chemistry->clear ();
-
+  vegetation->clear ();
+  
   harvest_DM = 0.0;
   harvest_N = 0.0;
   harvest_C = 0.0;
