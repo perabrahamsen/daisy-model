@@ -1,3 +1,10 @@
+2016-05-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* field.h, field.C, column.h, column_std.C, organic.h, organic_std.C: 
+	* action_tillage.C (store_SOM, restore_SOM): New actions.
+	* organic.h, organic_std.C (stored_SOM_C, stored_SOM_M): New state
+	parables.
+
 2016-05-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* vegetation_crops.C (my_harvest): New log variable ('harvest').

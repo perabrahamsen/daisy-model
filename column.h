@@ -112,6 +112,8 @@ public:
                     const Time&, Treelog&) = 0;
   virtual void swap (double from, double middle, double to, 
                      double RR0, const Time&, Treelog&) = 0;
+  virtual void store_SOM (Treelog& msg) = 0;
+  virtual void restore_SOM (Treelog& msg) = 0;
   virtual void set_porosity (double at, double Theta, Treelog&) = 0;
   virtual void spray_overhead (symbol chemical, double amount, Treelog&) = 0; // [g/ha]
   virtual void spray_surface (symbol chemical, double amount, Treelog&) = 0; // [g/ha]

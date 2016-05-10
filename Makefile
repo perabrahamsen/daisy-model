@@ -142,7 +142,7 @@ WARNING = -Wall -Wextra -Wvariadic-macros \
 # This one doesn't work (gcc 4.4 linux/amd64):
 #   -Wunreachable-code: triggered by constructors?
 
-COMPILE = gcc -std=c++11 -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
+COMPILE = gcc -std=c++14 -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
 CCOMPILE = $(COMPILE)
 CPPLIB = -lstdc++
 

@@ -1,4 +1,4 @@
-TODO --- things that needs to be done with Daisy -*- outline -*-
+TODO ---things that needs to be done with Daisy -*- outline -*-
 
 * NYield
 
@@ -12,13 +12,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 *** DONE summary fractils
 
-*** Hvordan logger man høst af en enklet afgrøde i et sædskifte?
-
-VegetationCrops
-
-Gem hver "harvest" for det nuværende tidsskridt, slet før næste.
-
-output_list (lige som med crops)
+*** DONE Hvordan logger man høst af en enklet afgrøde i et sædskifte?
 
 Skal vi have residuals på samme måde?
 
@@ -26,9 +20,11 @@ Skal vi have residuals på samme måde?
 
 *** "Save SOM" og "Restore SOM" actions?
 
-**** stored_som_C og stored_som_N i organic std.
+**** DONE stored_som_C og stored_som_N i organic std.
 
-**** store_SOM og restore_SOM management ops.
+**** DONE store_SOM og restore_SOM management ops.
+
+**** Test at de virker
 
 **** Soil carbon log ?
 
