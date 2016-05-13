@@ -15,11 +15,12 @@
 	  (factor 41.67))
 
 (defsummary NYield fractiles
-  (tags "Matrix-Leaching" kurt)
+  (tags "Matrix-Leaching" sorg_N sorg_DM)
   (fractiles 10 50 90 [%]))
   
 (deflog NYield crop
-  (declare unit String "Base unit.")
+  (declare N_unit String "Base nitrogen unit.")
+  (declare DM_unit String "Base dry matter unit.")
   (N_unit "kg N/ha")
   (DM_unit "Mg DM/ha")
   (where "${colfid}${cropfid}-nyield.dlf")

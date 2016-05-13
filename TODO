@@ -2,6 +2,14 @@ TODO ---things that needs to be done with Daisy -*- outline -*-
 
 * NYield
 
+** harvest.C
+
+*** Alle? enheder skal være fluxe (/h)
+
+*** tag dt argument, divider.
+
+*** hvad med log_harvest?
+
 ** DONE Lav test opsætning med ensidigt vinterhvede
 
 ** DONE Kopier vejrdata
