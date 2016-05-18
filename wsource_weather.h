@@ -76,6 +76,7 @@ public:
   bool has_reference_evapotranspiration () const;
   bool has_vapor_pressure () const;
   bool has_wind () const;
+  bool has_CO2 () const;
   bool has_min_max_temperature () const;
   bool has_diffuse_radiation () const;
   double timestep () const; // [d]

@@ -124,6 +124,12 @@ PhotoFarquhar::assimilate (const Units& units,
 			   Phenology& development,
 			   Treelog& msg) 
 {
+  if (CO2_atm <= 0.0)
+    {
+      msg.error ("You must specify atmospheric CO2 to use Farquhar");
+      return 0.0;
+    }
+
   const double h_x = std::fabs (psi_c) * 1.0e-4  /* [MPa/cm] */; // MPa
   // sugar production [gCH2O/m2/h] by canopy photosynthesis.
   const PLF& LAIvsH = canopy.LAIvsH;

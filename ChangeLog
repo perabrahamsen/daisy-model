@@ -1,3 +1,15 @@
+2016-05-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* photo_Farquhar.C (assimilate): Test CO2_atm is positive.
+	* weatherdata.C, weatherdata.h (CO2): New token.
+	* wsource.h, wsource_weather.h (CO2, has_CO2): New function.
+	* wsource_weather.C (my_CO2, tick, CO2, has_CO2, output, co2): Use is.
+
+2016-05-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* select.h, select.C (Handle::content_sum): New handle.
+	* select_array.C, select_value.C (done_small): Support it.
+
 2016-05-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* field.h, field.C, column.h, column_std.C, organic.h, organic_std.C: 

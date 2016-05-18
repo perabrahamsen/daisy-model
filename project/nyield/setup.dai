@@ -28,12 +28,12 @@
   (when yearly)
   (entries (number (path column "${column}" Vegetation crops
                          harvest "${crop}" sorg_N)
-                   (handle sum)
+                   (handle content_sum)
                    (dimension "${N_unit}")
                    (spec fixed Harvest sorg_N))
            (number (path column "${column}" Vegetation crops
                          harvest "${crop}" sorg_DM)
-                   (handle sum)
+                   (handle content_sum)
                    (dimension "${DM_unit}")
                    (spec fixed Harvest sorg_DM))
            (flux_bottom (path column "${column}"
