@@ -1457,6 +1457,11 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
  point.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+summary_fractiles${OBJ}: summary_fractiles.C summary.h model.h symbol.h \
+ destination.h select.h units.h memutils.h volume.h model_derived.h \
+ model_logable.h attribute.h block_submodel.h block_nested.h block.h \
+ scope.h treelog.h frame_submodel.h frame.h block_model.h frame_model.h \
+ librarian.h time.h submodeler.h mathlib.h assertion.h vcheck.h
 program_extract${OBJ}: program_extract.C program.h model.h symbol.h run.h \
  lexer_table.h block_model.h block_nested.h block.h scope.h attribute.h \
  treelog.h frame_model.h frame.h scope_table.h number.h boolean.h \
