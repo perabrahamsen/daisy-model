@@ -45,6 +45,9 @@ struct VegetationCrops : public Vegetation
   // Crops.
   CropList crops;		// The crops themselves.
 
+  // Harvest.
+  std::vector<const Harvest*> my_harvest;
+
   // Nitrogen.
   double N_;                    // [kg N/ha]
   double N_fixated_;             // [kg N/ha/h]
@@ -175,6 +178,10 @@ struct VegetationCrops : public Vegetation
              std::vector<double>& residuals_C_soil,
              double dt,
              Treelog&);
+  void clear ()
+  {
+    my_harvest.clear ();
+  }
   void force_production_stress  (double pstress);
   void kill_all (symbol, const Time&, const Geometry&,
                  std::vector<AM*>& residuals, 			 
@@ -736,6 +743,7 @@ VegetationCrops::harvest (const symbol column_name,
 	harvest_C += mine.total_C ();
 
 	harvest.push_back (&mine);
+	my_harvest.push_back (&mine);
 
         const double new_crop_C = Crop::ds_remove (*crop) 
           ? 0.0 
@@ -811,6 +819,7 @@ VegetationCrops::pluck (symbol column_name,
 	harvest_C += mine.total_C ();
 
 	harvest.push_back (&mine);
+	my_harvest.push_back (&mine);
 
         const double new_crop_C = Crop::ds_remove (*crop) 
           ? 0.0 
@@ -909,6 +918,24 @@ VegetationCrops::output (Log& log) const
 {
   Vegetation::output (log);
   output_list (crops, "crops", log, Crop::component);
+
+  static const symbol harvest_symbol ("harvest");
+  static const symbol croplib (Crop::component);
+  if (log.check_interior (harvest_symbol))
+    {
+      Log::Open open (log, harvest_symbol);
+      for (const auto i : my_harvest)
+        {
+          const symbol crop = (*i).crop;
+          Assertion::message (crop.name ());
+          if (!log.check_entry (crop, croplib))
+            continue;
+          Assertion::message ("found");
+
+          Log::Shallow named (log, crop, croplib);
+          (*i).output (log);
+        }
+    }
 }
 
 void
@@ -1009,6 +1036,8 @@ emerged.  If no crops have emerged on the field, it will be ignored.",
                        Attribute::State, Attribute::Variable,
                        "List of crops growing in the field");
     frame.set_empty ("crops");
+    frame.declare_submodule_sequence ("harvest", Attribute::LogOnly, "\
+Harvest current timestep.", Harvest::load_syntax);
   }
 } VegetationCrops_syntax;
 

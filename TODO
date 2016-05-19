@@ -1,6 +1,123 @@
-TODO --- things that needs to be done with Daisy -*- outline -*-
+TODO ---things that needs to be done with Daisy -*- outline -*-
+
+* NYield
+
+** harvest.C
+
+*** Alle? enheder skal være fluxe (/h)
+
+*** tag dt argument, divider.
+
+*** hvad med log_harvest?
+
+** DONE Lav test opsætning med ensidigt vinterhvede
+
+** DONE Kopier vejrdata
+
+** Lav log med balance
+
+*** DONE gnuplot: Plot data + normalfordeling
+
+*** DONE summary fractils
+
+*** DONE Hvordan logger man høst af en enklet afgrøde i et sædskifte?
+
+Skal vi have residuals på samme måde?
+
+** Konstant SOM
+
+*** "Save SOM" og "Restore SOM" actions?
+
+**** DONE stored_som_C og stored_som_N i organic std.
+
+**** DONE store_SOM og restore_SOM management ops.
+
+**** Test at de virker
+
+**** Soil carbon log ?
+
+Har vi en ?
+
+Vi har brug for external_org_N og external_org_C.
+
+**** Soil carbon
+
+SOM1 SOM2 SOM3 SMB Roots Shoot Fert
+
+**** Soil organic nitrogen log ?
+
+**** Hvordan skal "restore" indgå i balancen?
+
+** Test betydning
+
+** Log Carbon med og uden
+
+** Vælg den rigtige jord
+
+** Valg det rigtige sædskifte
 
 * "Promillefondprojekt" forklar lavere N indhold i kerner.
+
+Hvorfor falder protein indeholdet i kerner.
+
+Forklaringer:
+
+- Lavere gødningsnormer
+- Nye sorter optimeret lavere N
+- Lavere deposition
+- Faldende baggrundsmineralisering
+- Andre sædskifter efterlader ikke så meget
+-- N når ikke ned til de dybe røder, som er vigtige ved kernefyldning
+- Bruges på flere jordtyper
+
+Isoler effekter
+
+** 100 års "random" vejrdata
+
+*** 2xklima (øst og vest)
+
+Vest ny?
+
+** Jorde defineret fra dk-horizon.dai
+
+*** Vælg "typiske" kombinationer af horisonter for hvededyrkning
+
+Vær sikker på at få nogle "nye" jorde med
+
+Nedre rand?
+
+** Forskelligt humus indhold, 30-70, 50-50, 70-30 som
+
+Konstant indhold i SOM1? SOM2?
+
+** Ren vinterhvede med forskellige normer
+
+** "Typiske" sædskifter (nye og gamle) med forskellige normer.
+
+** Forskellige sorter
+
+* udvikling
+
+** Lås SOM1 og SOM2
+
+** Ref setup
+
+1 jord, dybt grundvand, ensidig hvede, 100 år øst vejr, 1
+gødningsniveau, log (kerne-)harvest, standard 50-50 humus
+
+Plot fordeling
+
+** Implementer "seed"
+
+Sammenlign fordeling
+
+** Prøv med dybe røder
+
+Sammenlig fordeling
+
+** Log og plot N optag vs DS
+
+Sammenlign uden dybe rødder
 
 * Vejledning 
 

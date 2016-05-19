@@ -67,6 +67,10 @@ struct OrganicNone : public OrganicMatter
   { }
   double AOM_C (const Geometry&, double, double) const
   { return 0.0; }
+  void store_SOM ()
+  { }
+  void restore_SOM ()
+  { }
 
   // Communication with external model.
   double get_smb_c_at (size_t) const // [g C/cm³]

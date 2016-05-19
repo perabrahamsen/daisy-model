@@ -6,7 +6,11 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.26 
+
 * 5.25
+
+** Made duplicate definitions errors instead of warnings.
 
 ** Better logging of biopores.
 

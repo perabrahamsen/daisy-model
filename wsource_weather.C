@@ -119,6 +119,7 @@ struct WSourceWeather::Implementation
   double my_diffuse_radiation;
   double my_reference_evapotranspiration;
   double my_wind;
+  double my_CO2;
   double my_air_temperature;
   double my_vapor_pressure;
   double my_relative_humidity;
@@ -953,7 +954,8 @@ WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
     my_reference_evapotranspiration *= day_cycle;
 
   my_wind = number_average (Weatherdata::Wind ());
-
+  my_CO2 = number_average (Weatherdata::CO2 ());
+  
   const double new_air_temperature = number_average (Weatherdata::AirTemp ());
   if (std::isfinite (new_air_temperature))
     my_air_temperature = new_air_temperature;
@@ -1318,6 +1320,7 @@ WSourceWeather::Implementation::Implementation (const Weather& w,
     my_diffuse_radiation (NAN),
     my_reference_evapotranspiration (NAN),
     my_wind (NAN),
+    my_CO2 (NAN),
     my_air_temperature (NAN),
     my_vapor_pressure (NAN),
     my_relative_humidity (NAN),
@@ -1430,8 +1433,7 @@ WSourceWeather::wind () const
 double
 WSourceWeather::CO2 () const
 { 
-  static const double standard_pressure = FAO::AtmosphericPressure (0.0);
-  return 35.0 * air_pressure () / standard_pressure; 
+  return has_CO2 () ? impl->my_CO2 * air_pressure () : -42.42e42; 
 }
 
 double
@@ -1456,6 +1458,10 @@ WSourceWeather::has_vapor_pressure () const
 bool
 WSourceWeather::has_wind () const
 { return std::isfinite (impl->my_wind); }
+
+bool
+WSourceWeather::has_CO2 () const
+{ return std::isfinite (impl->my_CO2); }
 
 bool
 WSourceWeather::has_min_max_temperature () const
@@ -1521,6 +1527,8 @@ WSourceWeather::output (Log& log) const
   output_value (air_pressure (), "air_pressure", log);
   output_value (diffuse_radiation (), "diffuse_radiation", log);
   output_value (wind (), "wind", log);
+  if (has_CO2 ())
+    output_value (CO2 (), "co2", log);
   output_value (day_length (), "day_length", log);
   output_submodule (deposit (), "deposit", log);
 }
@@ -1624,6 +1632,7 @@ By default, no limit on rain.");
                    Attribute::LogOnly, "Relative humidity.");
     frame.declare ("air_pressure", "Pa", Attribute::LogOnly, "Air pressure.");
     frame.declare ("wind", "m/s", Attribute::LogOnly, "Wind speed.");
+    frame.declare ("co2", "Pa", Attribute::LogOnly, "Atmospheric CO2 pressure.");
     frame.declare ("day_length", "h", Attribute::LogOnly,
                    "Number of light hours this day.");
     frame.declare_submodule_sequence ("deposit", Attribute::LogOnly, "\

@@ -150,6 +150,8 @@ public:
   void mix_it (double from, double to, double penetration, Treelog&);
   void swap (double from, double middle, double to, 
              const double RR0, const Time&, Treelog&);
+  void store_SOM (Treelog& msg);
+  void restore_SOM (Treelog& msg);
   void set_porosity (double at, double Theta, Treelog& msg);
   void overflow (const double extra, Treelog& msg);
   void spray_overhead (symbol chemical, double amount, Treelog&); // [g/ha]
@@ -454,6 +456,14 @@ ColumnStandard::swap (const double from, const double middle, const double to,
   organic_matter->swap (geometry, *soil, *soil_water, from, middle, to);
 }
 
+void
+ColumnStandard::store_SOM (Treelog&)
+{ organic_matter->store_SOM (); }
+
+void
+ColumnStandard::restore_SOM (Treelog&)
+{ organic_matter->restore_SOM (); }
+
 void 
 ColumnStandard::set_porosity (const double at, const double Theta, Treelog& msg)
 { 
@@ -576,7 +586,8 @@ ColumnStandard::clear ()
   bioclimate->clear ();
   soil_water->clear ();
   chemistry->clear ();
-
+  vegetation->clear ();
+  
   harvest_DM = 0.0;
   harvest_N = 0.0;
   harvest_C = 0.0;

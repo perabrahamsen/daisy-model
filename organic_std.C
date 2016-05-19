@@ -95,6 +95,8 @@ struct OrganicStandard : public OrganicMatter
   std::vector <AM*> am;		// Added Organic Matter.
   const std::vector<SMB*> smb;	// Living Organic Matter.
   const std::vector<SOM*> som;	// Soil Organic Matter.
+  std::vector<double> stored_SOM_C; // For store/restore SOM
+  std::vector<double> stored_SOM_N; // "management" actions.
   const std::vector<DOM*> dom;	// Dissolved Organic Matter.
   const std::vector<Domsorp*> domsorp; // SOM <-> DOM transfer.
   struct Buffer
@@ -274,6 +276,8 @@ struct OrganicStandard : public OrganicMatter
       C += added[i]->soil_C (geo, from, to);
     return C;
   }
+  void store_SOM ();
+  void restore_SOM ();
 
   // Communication with external model.
   double get_smb_c_at (size_t i) const; // [g C/cm³]
@@ -867,6 +871,8 @@ OrganicStandard::output (Log& log) const
     }
   output_list (smb, "smb", log, SMB::component);
   output_list (som, "som", log, SOM::component);
+  output_variable (stored_SOM_C, log);
+  output_variable (stored_SOM_N, log);
   output_ordered (dom, "dom", log);
   output_list (domsorp, "domsorp", log, Domsorp::component);
   output_submodule (buffer, "buffer", log);
@@ -1395,6 +1401,41 @@ OrganicStandard::mix (const Geometry& geo, const Soil& soil,
     dom[i]->mix (geo, soil, soil_water, from, to);
 
   // Leave CO2 alone.
+}
+
+void
+OrganicStandard::store_SOM ()
+{
+  stored_SOM_C.clear ();
+  stored_SOM_N.clear ();
+  for (size_t i = 0; i < som.size (); i++)
+    {
+      stored_SOM_C.insert(stored_SOM_C.end(),
+                          som[i]->C.begin(), som[i]->C.end());
+      stored_SOM_N.insert(stored_SOM_N.end(),
+                          som[i]->N.begin(), som[i]->N.end());
+    }
+}
+
+void
+OrganicStandard::restore_SOM ()
+{
+  const size_t stored_size = stored_SOM_C.size ();
+  daisy_assert (stored_size == stored_SOM_N.size ());
+  size_t stored_index = 0;
+  for (auto s : som)
+    {
+      const size_t soil_cells = s->N.size ();
+      daisy_assert (s->N.size () == soil_cells);
+      daisy_assert (stored_index + soil_cells <= stored_size);
+      for (size_t i = 0; i < soil_cells; i++)
+        {
+          s->C[i] = stored_SOM_C[stored_index + i];
+          s->N[i] = stored_SOM_N[stored_index + i];
+        }
+      stored_index += soil_cells;
+    }
+  daisy_assert (stored_index == stored_size);
 }
 
 double 
@@ -2417,12 +2458,17 @@ OrganicStandard::update_pools
       const double total_C = AOM_C + SMB_C + SOM_C;
       const double total_N = total_C / total_C_per_N;
       const double SOM_N = total_N - AOM_N - SMB_N;
-      daisy_assert (SOM_N > 0.0);
-      const double SOM_C_per_N = SOM_C / SOM_N;
-
-      for (size_t pool = 0; pool < som.size (); pool++)
-	if (som[pool]->N.size () == lay)
-	  som[pool]->N.push_back (som[pool]->C[lay] / SOM_C_per_N);
+      if (SOM_N > 0.0)
+        {
+          const double SOM_C_per_N = SOM_C / SOM_N;
+          
+          for (size_t pool = 0; pool < som.size (); pool++)
+            if (som[pool]->N.size () == lay)
+              som[pool]->N.push_back (som[pool]->C[lay] / SOM_C_per_N);
+        }
+      else for (size_t pool = 0; pool < som.size (); pool++)
+             if (som[pool]->N.size () == lay)
+               som[pool]->N.push_back (0.0);
     }
 }
 
@@ -2636,6 +2682,11 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
   for (size_t i = 0; i < domsorp.size (); i++)
     domsorp[i]->initialize (units, geo, soil, soil_water, soil_heat, msg);
 
+  // Initial value of "stored SOM".
+  daisy_assert (stored_SOM_C.size () == stored_SOM_N.size ());
+  if (stored_SOM_C.size () == 0)
+    store_SOM ();
+  
   // Summary.
   {
     Treelog::Open nest (msg, "Total soil summary");
@@ -2693,6 +2744,8 @@ OrganicStandard::OrganicStandard (const BlockModel& al)
     am (Librarian::build_vector<AM> (al, "am")),
     smb (Librarian::build_vector<SMB> (al, "smb")),
     som (Librarian::build_vector<SOM> (al, "som")),
+    stored_SOM_C (al.number_sequence ("stored_SOM_C")),
+    stored_SOM_N (al.number_sequence ("stored_SOM_N")),
     dom (map_submodel<DOM> (al, "dom")),
     domsorp (Librarian::build_vector<Domsorp> (al, "domsorp")),
     buffer (al.submodel ("buffer")),
@@ -3123,9 +3176,18 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.");
     frame.declare_object ("som", SOM::component, Attribute::State, Attribute::Variable,
                       "Soil Organic Matter pools.");
     frame.set_strings ("som", "SOM-SLOW", "SOM-FAST", "SOM-INERT");
-  
     frame.declare_submodule_sequence ("initial_SOM", Attribute::OptionalConst, "\
 Layered initialization of soil SOM content.", load_layer);
+    frame.declare ("stored_SOM_C", "g C/cm^3", Check::non_negative (),
+                   Attribute::State, Attribute::Variable, "\
+Stored SOM C content for all pools and all cells.\n\
+By default, this is equivalent to the initial C content of the SOM pools.");
+    frame.set_empty ("stored_SOM_C");
+    frame.declare ("stored_SOM_N", "g N/cm^3", Check::non_negative (),
+                   Attribute::State, Attribute::Variable, "\
+Stored SOM N content for all pools and all cells.\n\
+By default, this is equivalent to the initial N content of the SOM pools.");
+    frame.set_empty ("stored_SOM_N");
 
     frame.declare_submodule_sequence ("dom", Attribute::State, 
                                   "Dissolved Organic Matter pools.",

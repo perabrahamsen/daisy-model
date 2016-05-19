@@ -212,4 +212,72 @@ A point in the horizon to modify.");
   }
 } ActionSetPorosity_syntax;
 
+struct ActionStoreSOM : public Action
+{
+  // Simulation.
+  void doIt (Daisy& daisy, const Scope&, Treelog& msg)
+  {
+    msg.message ("Storing SOM pools.");
+    daisy.field ().store_SOM (msg);
+  }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
+
+  ActionStoreSOM (const BlockModel& al)
+    : Action (al)
+  { }
+};
+
+static struct ActionStoreSOMSyntax : DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ActionStoreSOM (al); }
+
+  ActionStoreSOMSyntax ()
+    : DeclareModel (Action::component, "store_SOM", "\
+Store the content of the soil organic matter pools.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
+} ActionStoreSOM_syntax;
+
+struct ActionRestoreSOM : public Action
+{
+  // Simulation.
+  void doIt (Daisy& daisy, const Scope&, Treelog& msg)
+  {
+    msg.message ("Storing SOM pools.");
+    daisy.field ().restore_SOM (msg);
+  }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
+
+  ActionRestoreSOM (const BlockModel& al)
+    : Action (al)
+  { }
+};
+
+static struct ActionRestoreSOMSyntax : DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ActionRestoreSOM (al); }
+
+  ActionRestoreSOMSyntax ()
+    : DeclareModel (Action::component, "restore_SOM", "\
+Restore the content of the soil organic matter pools.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
+} ActionRestoreSOM_syntax;
+
 // action_tillage.C ends here.

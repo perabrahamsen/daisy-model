@@ -100,6 +100,8 @@ public:
             double RR0, const Time&, Treelog&);
   void swap (double from, double middle, double to, double RR0,
              const Time&, Treelog&);
+  void store_SOM (Treelog& msg);
+  void restore_SOM (Treelog& msg);
   void set_porosity (double at, double Theta, Treelog& msg);
   void spray_overhead (symbol chemical, double amount, Treelog&); // [g/ha]
   void spray_surface (symbol chemical, double amount, Treelog&); // [g/ha]

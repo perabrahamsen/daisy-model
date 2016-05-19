@@ -110,6 +110,7 @@ public:
                      std::vector<double>& residuals_N_soil,
                      std::vector<double>& residuals_C_soil,
                      double dt, Treelog&) = 0;
+  virtual void clear () = 0;
   virtual void force_production_stress  (double pstress) = 0;
   virtual void kill_all (symbol, const Time&, const Geometry&,
 			 std::vector<AM*>& residuals, 
