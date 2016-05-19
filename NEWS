@@ -8,6 +8,41 @@ release.
 
 * 5.26 
 
+** Duplicate definitions are now an error instead of a warning.
+
+** New 'fractiles' summary model.
+
+Calculate fractiles for specific log variables.
+
+(defsummary NYield fractiles
+  (tags "Matrix-Leaching" sorg_N sorg_DM)
+  (fractiles 10 50 90 [%]))
+
+** New harvest log variable.
+
+This allows you to add details from the harvest log into normal log files.
+
+(deflog MyHarvest crop
+  (where "myharvest.dlf")
+  (when true)
+  (entries (number (path column "${column}" Vegetation crops
+                         harvest "${crop}" sorg_DM)
+                   (handle content_sum)
+                   (spec fixed Harvest sorg_DM))))
+
+(output (MyHarvest (crop Grass) (when monthly)))
+
+** New 'store_SOM' and 'restore_SOM' management actions.
+
+This will store / restore the state of the SOM pools. Intended use for
+long run scenarios to test short term effects of weather without long
+term effects of changes to SOM pools.
+
+** Atmospheric 'CO2' can now be specified in weather file.
+
+Currently this is only used in conjunction with the Farquhar
+photosynthesis model, where it is required.
+
 * 5.25
 
 ** Made duplicate definitions errors instead of warnings.
