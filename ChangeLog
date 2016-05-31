@@ -2,6 +2,9 @@
 
 	* condition_crop.C (with): New condition.
 	* log_select.C (active): New parameter.
+2016-05-19  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.26 released.
 
 2016-05-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
