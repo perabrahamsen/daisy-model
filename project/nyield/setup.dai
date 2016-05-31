@@ -2,11 +2,10 @@
 
 (path "${install_directory}/climate" &old)
 
-(input file "dk-soil.dai")
+(input file "dk-horizon.dai")
 (input file "tillage.dai")
 (input file "fertilizer.dai")
 (input file "crop.dai")
-(input file "dk-management.dai")
 (input file "log-std.dai")
 
 (defunit [kWh/d/m^2] SIfactor 
@@ -14,18 +13,112 @@
 	  (time -3)
 	  (factor 41.67))
 
-(defsummary NYield fractiles
-  (tags "Matrix-Leaching" sorg_N sorg_DM)
-  (fractiles 10 50 90 [%]))
+(defsummary NSoil fractiles
+  (tags "Matrix-Leaching" "N-Soil-Drain" "Min-Surface-Fertilizer"
+        "Min-Soil-Fertilizer" "Org-Fertilizer" "NH4-Mineralization"
+        "NO3-Immobilization" "Denitrification" "Uptake"
+        "Matrix percolation" "Matrix drain flow")
+  (fractiles 10 50 90 [%])
+  (first "${column}"))
   
-(deflog NYield crop
+;; Every 5 years.
+(defcondition rotation_length (every (days 1826) (hours 5)))
+
+(deflog NSoil column
+  (declare N_unit String "Base nitrogen unit.")
+  (declare W_unit String "Base water unit.")
+  (N_unit "kg N/ha")
+  (W_unit "mm")
+  (where "${colfid}nyield.dlf")
+  (summary NSoil)
+  (when rotation_length)
+  (entries (flux_bottom (path column "${column}"
+                              Chemistry "*" trace N J_matrix)
+                        (spec chemical default J_matrix)
+                        (handle sum)
+                        (negate true)
+                        (tag "Matrix-Leaching")
+                        (dimension "${N_unit}"))
+           (interval (path column "${column}" Chemistry "*" 
+			   trace N S_soil_drain)
+                     (tag "N-Soil-Drain")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${N_unit}")
+                     (spec chemical default S_soil_drain))
+           (number (path column "${column}" 
+			 Chemistry "*" trace N spray)
+                   (spec chemical default spray)
+		   (handle sum)
+                   (tag "Min-Surface-Fertilizer")
+                   (dimension "${N_unit}"))
+           (interval (path column "${column}"
+			   Chemistry "*" trace N S_external)
+                     (spec chemical default S_external)
+                     (tag "Min-Soil-Fertilizer")
+                     (handle sum)
+                     (dimension "${N_unit}"))           
+           (number (path column "${column}" OrganicMatter "*" fertilized_N)
+                   (spec organic default fertilized_N)
+                   (handle sum)
+                   (documentation "\
+Organically bound nitrogen supplied by fertilizers.")
+                   (tag "Org-Fertilizer")
+                   (dimension "${N_unit}"))
+           (interval (path column "${column}" OrganicMatter "*" NH4_source)
+                     (spec organic default NH4_source)
+                     (tag "NH4-Mineralization")
+                     (handle sum)
+                     (dimension "${N_unit}"))
+           (interval (path column "${column}" OrganicMatter "*" NO3_source)
+                     (spec organic default NO3_source)
+                     (documentation "\
+NO3-N removed by the organic matter turnover processes.")
+                     (tag "NO3-Immobilization")
+		     (negate true)
+                     (handle sum)
+                     (dimension "${N_unit}"))
+	   (interval (path column "${column}" Chemistry "*"
+                           combine "N" reaction denitrification converted)
+                     (tag "Denitrification")
+                     (handle sum)
+                     (dimension "${N_unit}")
+                     (spec reaction denitrification converted))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace N S_root)
+                     (documentation "\
+NO3-N removed by plant roots.")
+                     (tag "Uptake")
+                     (handle sum)
+		     (negate true)
+                     (dimension "${N_unit}")
+                     (spec chemical default S_root))
+           (flux_bottom (tag "Matrix percolation")
+                        (path column "${column}" SoilWater q)
+                        (spec fixed SoilWater q)
+                        (handle sum)
+                        (negate true)
+                        (dimension "${W_unit}"))
+           (interval (tag "Matrix drain flow")
+                     (path column "${column}" SoilWater S_soil_drain)
+                     (spec fixed SoilWater S_soil_drain)
+                     (handle sum)
+                     (dimension "${W_unit}"))
+           ))
+
+(defsummary NCrop fractiles
+  (tags sorg_N sorg_DM water_stress_days nitrogen_stress_days)
+  (fractiles 10 50 90 [%])
+  (first "${column}\t${crop}"))
+  
+(deflog NCrop crop
   (declare N_unit String "Base nitrogen unit.")
   (declare DM_unit String "Base dry matter unit.")
   (N_unit "kg N/ha")
   (DM_unit "Mg DM/ha")
   (where "${colfid}${cropfid}-nyield.dlf")
-  (summary NYield)
-  (when yearly)
+  (when rotation_length)
+  (summary NCrop)
   (entries (number (path column "${column}" Vegetation crops
                          harvest "${crop}" sorg_N)
                    (handle content_sum)
@@ -36,42 +129,408 @@
                    (handle content_sum)
                    (dimension "${DM_unit}")
                    (spec fixed Harvest sorg_DM))
-           (flux_bottom (path column "${column}"
-                              Chemistry "*" trace N J_matrix)
-                        (spec chemical default J_matrix)
-                        (handle sum)
-                        (negate true)
-                        (documentation "\
-Loss from leaching through the soil matrix below the specified depth.  
-This can be negative in case of cabilary rise.")
-                        (tag "Matrix-Leaching")
-                        (dimension "${N_unit}"))))
+           (number (path column "${column}" Vegetation crops
+                         harvest "${crop}" water_stress_days)
+                   (handle content_sum)
+                   (spec fixed Harvest water_stress_days))
+           (number (path column "${column}" Vegetation crops
+                         harvest "${crop}" nitrogen_stress_days)
+                   (handle content_sum)
+                   (spec fixed Harvest nitrogen_stress_days))
+           ))
+
+(defsummary Uptake fractiles
+  (tags "NH4 000-050" "NO3 000-050" "H2O 000-050" "NH4 050-100" "NO3 050-100"
+        "H2O 050-100" "NH4 100-150" "NO3 100-150" "H2O 100-150" "NH4 150-200"
+        "NO3 150-200" "H2O 150-200" "NH4 200-250" "NO3 200-250" "H2O 200-250")
+  (fractiles 10 50 90 [%]))
+  
+(deflog mycrop column
+  "A log table for a specific crop."
+  ;; Let the user choose a crop.
+  (declare mycrop String
+	   "Name of crop to log.  Use \"*\" to log all crops.")
+  (mycrop "*")
+  ;; Add it to the log files.
+  (parameter_names &old mycrop)
+  ;; Use crop name as part of file name.
+  (declare cropfid string
+           "File component name indicating crop logged.")
+  (cropfid (cond ((string-equal "${mycrop}" "*")
+                  "crop")
+                 (true
+                  "${mycrop}")))
+  (declare cropfid2 string "\
+File component name indicating crop logged. Empty if not specified.")
+  (cropfid2 (cond ((string-equal "${mycrop}" "*")
+		   "")
+		  (true
+		   "${mycrop}_"))))
+
+(deflog Uptake mycrop
+  (declare unit String "Base unit.")
+  (unit "kg N/ha")
+  (when rotation_length)
+  (entries (interval (tag "NH4 000-050")
+                     (from -000 [cm])
+                     (to   -050 [cm])
+                     (path column "${column}" Vegetation crops crops
+                           "${mycrop}" Root NH4Extraction)
+                     (spec fixed RootSystem NH4Extraction)
+                     (handle sum)
+                     (dimension "${unit}"))
+           (interval (tag "NO3 000-050")
+                     (from -000 [cm])
+                     (to   -050 [cm])
+                     (path column "${column}" Vegetation crops crops
+                           "${mycrop}" Root NO3Extraction)
+                     (spec fixed RootSystem NO3Extraction)
+                     (handle sum)
+                     (dimension "${unit}"))
+           (interval (tag "H2O 000-050")
+                     (from -000 [cm])
+                     (to   -050 [cm])
+                     (path column "${column}" Vegetation crops crops
+                           "${mycrop}" Root H2OExtraction)
+                     (spec fixed RootSystem H2OExtraction)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "NH4 050-100")
+                     (from -050 [cm])
+                     (to   -100 [cm])
+                     (path column "${column}" Vegetation crops crops
+                           "${mycrop}" Root NH4Extraction)
+                     (spec fixed RootSystem NH4Extraction)
+                     (handle sum)
+                     (dimension "${unit}"))
+           (interval (tag "NO3 050-100")
+                     (from -050 [cm])
+                     (to   -100 [cm])
+                     (path column "${column}" Vegetation crops crops
+                           "${mycrop}" Root NO3Extraction)
+                     (spec fixed RootSystem NO3Extraction)
+                     (handle sum)
+                     (dimension "${unit}"))
+           (interval (tag "H2O 050-100")
+                     (from -050 [cm])
+                     (to   -100 [cm])
+                     (path column "${column}" Vegetation crops crops
+                           "${mycrop}" Root H2OExtraction)
+                     (spec fixed RootSystem H2OExtraction)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "NH4 100-150")
+                     (from -100 [cm])
+                     (to   -150 [cm])
+                     (path column "${column}" Vegetation crops crops
+                           "${mycrop}" Root NH4Extraction)
+                     (spec fixed RootSystem NH4Extraction)
+                     (handle sum)
+                     (dimension "${unit}"))
+           (interval (tag "NO3 100-150")
+                     (from -100 [cm])
+                     (to   -150 [cm])
+                     (path column "${column}" Vegetation crops crops
+                           "${mycrop}" Root NO3Extraction)
+                     (spec fixed RootSystem NO3Extraction)
+                     (handle sum)
+                     (dimension "${unit}"))
+           (interval (tag "H2O 100-150")
+                     (from -100 [cm])
+                     (to   -150 [cm])
+                     (path column "${column}" Vegetation crops crops
+                           "${mycrop}" Root H2OExtraction)
+                     (spec fixed RootSystem H2OExtraction)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "NH4 150-200")
+                     (from -150 [cm])
+                     (to   -200 [cm])
+                     (path column "${column}" Vegetation crops crops
+                           "${mycrop}" Root NH4Extraction)
+                     (spec fixed RootSystem NH4Extraction)
+                     (handle sum)
+                     (dimension "${unit}"))
+           (interval (tag "NO3 150-200")
+                     (from -150 [cm])
+                     (to   -200 [cm])
+                     (path column "${column}" Vegetation crops crops
+                           "${mycrop}" Root NO3Extraction)
+                     (spec fixed RootSystem NO3Extraction)
+                     (handle sum)
+                     (dimension "${unit}"))
+           (interval (tag "H2O 150-200")
+                     (from -150 [cm])
+                     (to   -200 [cm])
+                     (path column "${column}" Vegetation crops crops
+                           "${mycrop}" Root H2OExtraction)
+                     (spec fixed RootSystem H2OExtraction)
+                     (handle sum)
+                     (dimension "mm"))
+           (interval (tag "NH4 200-250")
+                     (from -200 [cm])
+                     (to   -250 [cm])
+                     (path column "${column}" Vegetation crops crops
+                           "${mycrop}" Root NH4Extraction)
+                     (spec fixed RootSystem NH4Extraction)
+                     (handle sum)
+                     (dimension "${unit}"))
+           (interval (tag "NO3 200-250")
+                     (from -200 [cm])
+                     (to   -250 [cm])
+                     (path column "${column}" Vegetation crops crops
+                           "${mycrop}" Root NO3Extraction)
+                     (spec fixed RootSystem NO3Extraction)
+                     (handle sum)
+                     (dimension "${unit}"))
+           (interval (tag "H2O 200-250")
+                     (from -200 [cm])
+                     (to   -250 [cm])
+                     (path column "${column}" Vegetation crops crops
+                           "${mycrop}" Root H2OExtraction)
+                     (spec fixed RootSystem H2OExtraction)
+                     (handle sum)
+                     (dimension "mm"))))
+
+(deflog RootVeg Uptake
+  (where "${colfid}${cropfid}-veg-uptake.dlf")
+  (summary (Uptake (first "${column}\t${mycrop}\tVeg")))
+  (active (with "${column}"
+                (and (crop_ds_after "${mycrop}" 0.0)
+                     (not (crop_ds_after "${mycrop}" 1.0)))))
+  )
+
+(deflog RootRep Uptake
+  (where "${colfid}${cropfid}-rep-uptake.dlf")
+  (summary (Uptake (first "${column}\t${mycrop}\tRep")))
+  (active (with "${column}" (crop_ds_after "${mycrop}" 1.0))))
+
+(defcolumn NYield default)
+
+(defcolumn JB4 NYield
+  (Groundwater deep)
+  (Soil (MaxRootingDepth 250 [cm])
+        (horizons ( -25 "Ap_JB4")
+                  ( -80 "B_JB4")
+                  (-250 "C_JB4"))))
+
+(defcolumn JB6 NYield
+  (Drain lateral)
+  (Groundwater (aquitard (K_aquitard 6e-2 [cm/d]))) ;Calib: 32 % to drain
+  (Soil (MaxRootingDepth 250 [cm])
+        (horizons ( -25 "Ap_JB6")
+                  ( -80 "B_JB6")
+                  (-250 "C_JB6"))))
+
+(defcolumn JB7 NYield
+  (Drain lateral)
+  (Groundwater (aquitard (K_aquitard 3.5e-2 [cm/d]))) ; Calib: 55 % to drain
+  (Soil (MaxRootingDepth 250 [cm])
+        (horizons ( -25 "Ap_JB7")
+                  ( -80 "B_JB7")
+                  (-250 "C_JB7"))))
+
+(defaction "SBarley w. MF" activity
+  (wait_mm_dd 3 05)
+  (fertilize (N25S (weight 115 [kg N/ha])))
+  (plowing)
+  (wait_mm_dd 4 05)
+  (seed_bed_preparation)(sow "Spring Barley")
+  (wait (or (crop_ds_after "Spring Barley" 2.0)(mm_dd 08 20)))
+  (harvest "Spring Barley" (stub 8 [cm])(stem 0.70))
+)
+
+(defcrop "WW-SB" "Winter Wheat")
+
+(defaction "WWheat w. MF after SB" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-SB")
+  (wait_mm_dd 04 05)(fertilize (N25S (weight 060 [kg N/ha]))) 
+  (wait_mm_dd 05 05)(fertilize (N25S (weight 100 [kg N/ha])))  
+  (wait (or (crop_ds_after "WW-SB" 2.0)(mm_dd 8 18)))
+  (harvest "WW-SB" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+)
+
+(defaction "WRape w. MF" activity
+  (wait_mm_dd 8 19)(plowing)
+  (wait_mm_dd 8 20)(fertilize (N25S (weight 25 [kg N/ha])))
+  (seed_bed_preparation)(sow "Winter Rape")
+  (wait_mm_dd 3 05)(fertilize (N25S (weight 130 [kg N/ha])))
+  (wait (or (crop_ds_after "Winter Rape" 2.0)(mm_dd 8 9)))
+  (harvest "Winter Rape" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+)
+
+(defcrop "WW-WR" "Winter Wheat")
+
+(defaction "WWheat w. MF after WR" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WR")
+  (wait_mm_dd 04 05)(fertilize (N25S (weight 060 [kg N/ha]))) 
+  (wait_mm_dd 05 05)(fertilize (N25S (weight 100 [kg N/ha])))  
+  (wait (or (crop_ds_after "WW-WR" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WR" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+)
+
+(defcrop "WW-WW" "Winter Wheat")
+
+(defaction "WWheat w. MF after WW" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WW")
+  (wait_mm_dd 04 05)(fertilize (N25S (weight 060 [kg N/ha]))) 
+  (wait_mm_dd 05 05)(fertilize (N25S (weight 100 [kg N/ha])))  
+  (wait (or (crop_ds_after "WW-WW" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WW" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+  (wait_mm_dd 9 02)(plowing)
+  (sow "Grass")
+)
+
+(defaction ROT activity
+  "SBarley w. MF" "WWheat w. MF after SB" "WRape w. MF"
+  "WWheat w. MF after WR" "WWheat w. MF after WW")
 
 (defprogram REF Daisy
   "Reference simulation."
   (weather default "Control_daily_daisy.dwf")
-  (column Askov)
-  (manager (repeat "WWheat w. MF"))
-  (time 2000 9 1 1)
-  ;; (stop 2100 9 1 1)
-  (stop 2010 9 1 1)
-  (output NYield harvest))
+  (column JB4
+          JB6 JB7)
+  (manager ROT ROT
+           (store_SOM)
+           (message "SOM stored")
+           (repeat (activity ROT restore_SOM)))
+  (time 1990 9 1 1)
+  (activate_output (after 2000 9 1 1))
+  (stop 2500 10 1 1)
+  ;;(stop 2025 10 1 1)
+  (output harvest
+          (NSoil (column JB4))
+          (NSoil (column JB6))
+          (NSoil (column JB7))
+          (NCrop (column JB4) (crop "Spring Barley"))
+          (NCrop (column JB6) (crop "Spring Barley"))
+          (NCrop (column JB7) (crop "Spring Barley"))
+          (NCrop (column JB4) (crop WW-SB))
+          (NCrop (column JB6) (crop WW-SB))
+          (NCrop (column JB7) (crop WW-SB))
+          (NCrop (column JB4) (crop "Winter Rape"))
+          (NCrop (column JB6) (crop "Winter Rape"))
+          (NCrop (column JB7) (crop "Winter Rape"))
+          (NCrop (column JB4) (crop WW-WR))
+          (NCrop (column JB6) (crop WW-WR))
+          (NCrop (column JB7) (crop WW-WR))
+          (NCrop (column JB4) (crop WW-WW))
+          (NCrop (column JB6) (crop WW-WW))
+          (NCrop (column JB7) (crop WW-WW))
+          (RootVeg (column JB4) (mycrop "Spring Barley"))
+          (RootVeg (column JB6) (mycrop "Spring Barley"))
+          (RootVeg (column JB7) (mycrop "Spring Barley"))
+          (RootVeg (column JB4) (mycrop WW-SB))
+          (RootVeg (column JB6) (mycrop WW-SB))
+          (RootVeg (column JB7) (mycrop WW-SB))
+          (RootVeg (column JB4) (mycrop "Winter Rape"))
+          (RootVeg (column JB6) (mycrop "Winter Rape"))
+          (RootVeg (column JB7) (mycrop "Winter Rape"))
+          (RootVeg (column JB4) (mycrop WW-WR))
+          (RootVeg (column JB6) (mycrop WW-WR))
+          (RootVeg (column JB7) (mycrop WW-WR))
+          (RootVeg (column JB4) (mycrop WW-WW))
+          (RootVeg (column JB6) (mycrop WW-WW))
+          (RootVeg (column JB7) (mycrop WW-WW))
+          (RootRep (column JB4) (mycrop "Spring Barley"))
+          (RootRep (column JB6) (mycrop "Spring Barley"))
+          (RootRep (column JB7) (mycrop "Spring Barley"))
+          (RootRep (column JB4) (mycrop WW-SB))
+          (RootRep (column JB6) (mycrop WW-SB))
+          (RootRep (column JB7) (mycrop WW-SB))
+          (RootRep (column JB4) (mycrop "Winter Rape"))
+          (RootRep (column JB6) (mycrop "Winter Rape"))
+          (RootRep (column JB7) (mycrop "Winter Rape"))
+          (RootRep (column JB4) (mycrop WW-WR))
+          (RootRep (column JB6) (mycrop WW-WR))
+          (RootRep (column JB7) (mycrop WW-WR))
+          (RootRep (column JB4) (mycrop WW-WW))
+          (RootRep (column JB6) (mycrop WW-WW))
+          (RootRep (column JB7) (mycrop WW-WW))
+          ))
 
-(defgnuplot plot xy
-  (source (frequency (sort sorg_DM)
-                     (file "harvest.dlf"))
+(defgnuplot plot_N xy
+  (where "N-yield.pdf")
+  (source (frequency (sort sorg_N)
+                     (title "JB4")
+                     (file "JB4_crop-nyield.dlf"))
           (frequency (sort sorg_N)
-                     ;;(sort sorg_DM)
-                     (with points)
-                     (style 2)
-                     (file "harvest.dlf"))))
+                     (title "JB6")
+                     (file "JB6_crop-nyield.dlf"))
+          (frequency (sort sorg_N)
+                     (title "JB7")
+                     (file "JB7_crop-nyield.dlf"))))
+
+(defgnuplot plot_DM xy
+  (where "DM-yield.pdf")
+  (source (frequency (sort sorg_DM)
+                     (title "JB4")
+                     (file "JB4_crop-nyield.dlf"))
+          (frequency (sort sorg_DM)
+                     (title "JB6")
+                     (file "JB6_crop-nyield.dlf"))
+          (frequency (sort sorg_DM)
+                     (title "JB7")
+                     (file "JB7_crop-nyield.dlf"))))
+
+(defgnuplot plot_Npercent xy
+  (where "N-percent.pdf")
+  (source (frequency (sort (/ sorg_N sorg_DM))
+                     (title "JB4")
+                     (file "JB4_crop-nyield.dlf"))
+          (frequency (sort (/ sorg_N sorg_DM))
+                     (title "JB6")
+                     (file "JB6_crop-nyield.dlf"))
+          (frequency (sort (/ sorg_N sorg_DM))
+                     (title "JB7")
+                     (file "JB7_crop-nyield.dlf"))))
+
+(defgnuplot plot_DM_N xy
+  (where "DM-N_yield.pdf")
+  (source (arithmetic (x sorg_DM)
+                      (y sorg_N)
+                      (with points)
+                      (title "JB4")
+                      (file "JB4_crop-nyield.dlf"))
+          (arithmetic (x sorg_DM)
+                      (y sorg_N)
+                      (with points)
+                      (title "JB6")
+                      (file "JB6_crop-nyield.dlf"))
+          (arithmetic (x sorg_DM)
+                      (y sorg_N)
+                      (with points)
+                      (title "JB7")
+                      (file "JB7_crop-nyield.dlf"))))
+
+(defgnuplot plot_N_DM xy
+  (where "N-DM_yield.pdf")
+  (source (arithmetic (y sorg_DM)
+                      (x sorg_N)
+                      (with points)
+                      (title "JB4")
+                      (file "JB4_crop-nyield.dlf"))
+          (arithmetic (y sorg_DM)
+                      (x sorg_N)
+                      (with points)
+                      (title "JB6")
+                      (file "JB6_crop-nyield.dlf"))
+          (arithmetic (y sorg_DM)
+                      (x sorg_N)
+                      (with points)
+                      (title "JB7")
+                      (file "JB7_crop-nyield.dlf"))))
+
+
+
 
 (defprogram plot gnuplot
-  (graph plot))
+  (graph plot_N plot_DM ;; plot_N_DM plot_DM_N plot_Npercent
+         ))
 
 (run REF)
 
-;; (run plot)
+;;(run plot)
 
 ;;; setup.dai ends here.
 

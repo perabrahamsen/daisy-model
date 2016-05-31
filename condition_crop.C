@@ -33,6 +33,77 @@
 #include "librarian.h"
 #include "frame.h"
 
+// The 'with' condition.
+
+struct ConditionWith : public Condition
+{
+  const symbol where;
+  std::unique_ptr<Condition> condition;
+
+  bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
+  {
+    Field::Restrict restriction (daisy.field (), where);
+    return !condition->match (daisy, scope, msg);
+  }
+
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
+  {
+    Field::Restrict restriction (daisy.field (), where);
+    condition->tick (daisy, scope, out);
+  }
+
+  void output (Log&) const
+  { }
+
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
+  {
+    Field::Restrict restriction (daisy.field (), where);
+    condition->initialize (daisy, scope, msg);
+  }
+
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
+  {
+    Treelog::Open nest (msg, std::string ("with") + where);
+  
+    bool ok = condition->check (daisy, scope, msg);
+
+    if (!daisy.field ().find (where))
+      {
+	msg.entry (std::string ("No column '") + where + "'");
+	ok = false;
+      }
+    return ok;
+  }
+
+  ConditionWith (const BlockModel& al)
+    : Condition (al),
+      where (al.name ("where")),
+      condition (Librarian::build_item<Condition> (al, "condition"))
+  { }
+
+  ~ConditionWith ()
+  { }
+};
+
+static struct ConditionWithSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ConditionWith (al); }
+
+  ConditionWithSyntax ()
+    : DeclareModel (Condition::component, "with", "\
+Test condition for specific column.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.declare_string ("where", Attribute::Const, 
+                          "Name of column to test condition on.");
+    frame.declare_object ("condition", Condition::component,
+                          "Condition to test on the specified column.");
+    frame.order ("where", "condition");
+  }
+} ConditionWith_syntax;
+
 // The 'crop_ds_after' condition.
 
 struct ConditionDSAfter : public Condition

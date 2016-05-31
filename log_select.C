@@ -64,15 +64,18 @@ LogSelect::check_derived (symbol field, const symbol /* name */,
 bool 
 LogSelect::match (const Daisy& daisy, Treelog& out)
 {
+  active->tick (daisy, Scope::null (), out);
+  const bool log_active = active->match (daisy, Scope::null (), out);
   condition->tick (daisy, Scope::null (), out);
   is_printing = condition->match (daisy, Scope::null (), out);
   is_active = is_printing;
 
-  for (std::vector<Select*>::const_iterator i = entries.begin (); 
-       i < entries.end (); 
-       i++)
-    if ((*i)->match (is_printing))
-      is_active = true;
+  if (log_active)
+    for (std::vector<Select*>::const_iterator i = entries.begin (); 
+         i < entries.end (); 
+         i++)
+      if ((*i)->match (is_printing))
+        is_active = true;
 
   return is_active;
 }
@@ -103,6 +106,7 @@ LogSelect::initial_match (const Daisy& daisy, const Time& previous, Treelog&)
 
   begin = daisy.time ();
 
+  active->initiate_log (daisy, previous);
   condition->initiate_log (daisy, previous);
 
   if (print_initial)
@@ -312,6 +316,7 @@ LogSelect::LogSelect (const BlockModel& al)
     file (al.name ("where")),
     parameters (build_parameters (al)),
     condition (Librarian::build_item<Condition> (al, "when")),
+    active (Librarian::build_item<Condition> (al, "active")),
     entries (Librarian::build_vector<Select> (al, "entries")),
     volume (Volume::build_obsolete (al)),
     print_initial (al.flag ("print_initial", default_print_initial (entries))),
@@ -360,6 +365,7 @@ LogSelect::LogSelect (const char *const id)
     description ("Build in log select use."),
     file (id),
     condition (Condition::create_true ()),
+    active (Condition::create_true ()),
     entries (std::vector<Select*> ()),
     volume (Volume::build_none ()),
     print_initial (false)
@@ -456,6 +462,10 @@ header by specifying '(names column crop)'.");
     frame.set_empty ("parameter_names");
     frame.declare_object ("when", Condition::component, "\
 Add entries to the log file when this condition is true.");
+    frame.declare_object ("active", Condition::component, "\
+Add data when this condition is true.\n\
+E.g. count percolation only when there is no crop.");
+    frame.set ("active", "true");
     frame.declare_object ("entries", Select::component, 
                           Attribute::State, Attribute::Variable,
                           "What to log in each column.");

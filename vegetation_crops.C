@@ -927,10 +927,8 @@ VegetationCrops::output (Log& log) const
       for (const auto i : my_harvest)
         {
           const symbol crop = (*i).crop;
-          Assertion::message (crop.name ());
           if (!log.check_entry (crop, croplib))
             continue;
-          Assertion::message ("found");
 
           Log::Shallow named (log, crop, croplib);
           (*i).output (log);

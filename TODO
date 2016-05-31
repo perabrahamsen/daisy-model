@@ -2,59 +2,44 @@ TODO ---things that needs to be done with Daisy -*- outline -*-
 
 * NYield
 
-** harvest.C
+** 4 rotationer
 
-*** Alle? enheder skal være fluxe (/h)
+*** Mineralsk, 1990
 
-*** tag dt argument, divider.
+*** Husdyr, 1990
 
-*** hvad med log_harvest?
+*** Mineralsk, 2015
 
-** DONE Lav test opsætning med ensidigt vinterhvede
+*** Hysyr, 2015
 
-** DONE Kopier vejrdata
+*** x 3 jorde
 
-** Lav log med balance
+*** hver med 5 afgrøder
 
-*** DONE gnuplot: Plot data + normalfordeling
+** To vejr
 
-*** DONE summary fractils
+*** 1990 deposition
 
-*** DONE Hvordan logger man høst af en enklet afgrøde i et sædskifte?
+*** 2015 deposition
 
-Skal vi have residuals på samme måde?
+** Kør 1990 Husdyr + 1990 vejr
 
-** Konstant SOM
 
-*** "Save SOM" og "Restore SOM" actions?
 
-**** DONE stored_som_C og stored_som_N i organic std.
+** Gødning
 
-**** DONE store_SOM og restore_SOM management ops.
+Første gødning ved traficability (første 50 kg)
 
-**** Test at de virker
+Anden gødning en måned senere (resten)
 
-**** Soil carbon log ?
 
-Har vi en ?
+** Husdyrgødning
 
-Vi har brug for external_org_N og external_org_C.
+Ved traficability
 
-**** Soil carbon
+** Deposition
 
-SOM1 SOM2 SOM3 SMB Roots Shoot Fert
 
-**** Soil organic nitrogen log ?
-
-**** Hvordan skal "restore" indgå i balancen?
-
-** Test betydning
-
-** Log Carbon med og uden
-
-** Vælg den rigtige jord
-
-** Valg det rigtige sædskifte
 
 * "Promillefondprojekt" forklar lavere N indhold i kerner.
 

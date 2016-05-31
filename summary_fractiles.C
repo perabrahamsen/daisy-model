@@ -41,6 +41,7 @@ struct SummaryFractiles : public Summary
   struct Data : public Destination
   {
     const symbol tag;
+    symbol dimension;
     mutable std::vector<double> data;
     
     // Destination.
@@ -54,11 +55,13 @@ struct SummaryFractiles : public Summary
     { daisy_notreached (); }
 
     explicit Data (const symbol key)
-      : tag (key)
+      : tag (key),
+        dimension (Attribute::Unknown ())
     { }
   };
   std::vector<Data> data;
   const std::vector<double> fractiles;
+  const symbol first;
   
   // Create and Destroy.
   void clear ();
@@ -68,9 +71,11 @@ struct SummaryFractiles : public Summary
   explicit SummaryFractiles (const BlockModel& al)
     : Summary (al),
       data (find_data (al)),
-      fractiles (al.number_sequence ("fractiles"))
+      fractiles (al.number_sequence ("fractiles")),
+      first (al.name ("first", Attribute::None ()))
   { }
   static double find_fractile (const double f, const std::vector<double>& data);
+  static double find_average (const std::vector<double>& data);
   void summarize (Treelog&) const;
 };
 
@@ -96,6 +101,7 @@ SummaryFractiles::initialize (std::vector<Select*>& select, Treelog& msg)
         msg.warning ("Duplicate tag '" + tag + "'");
       else
         found.insert (tag);
+      i->second->dimension = s->dimension ();
       s->add_dest (i->second);
       all.erase (i);
     }
@@ -133,19 +139,36 @@ SummaryFractiles::find_fractile (const double f,
   return data[i];
 }
 
+double
+SummaryFractiles::find_average (const std::vector<double>& data)
+{
+  const double n = data.size ();
+  if (n < 0.5)
+    return NAN;
+  const double sum = std::accumulate (data.begin (), data.end (), 0.0);
+  return sum / n;
+}
+
 void 
 SummaryFractiles::summarize (Treelog& msg) const
 {
   TREELOG_MODEL (msg);
   std::ostringstream tmp;
-  tmp << "\tn";
+  if (first != Attribute::None ())
+    tmp << first << "\t";
+  tmp << "Name\tDim\tSample\tAvg";
   for (auto fractile : fractiles)
     tmp << "\t" << fractile;
   for (auto& datum : data)
     {
       std::sort (datum.data.begin (), datum.data.end ());
       const size_t n = datum.data.size ();
-      tmp << "\n" << datum.tag << "\t" << n;
+      tmp << "\n";
+      if (first != Attribute::None ())
+        tmp << first << "\t";
+      tmp << datum.tag << "\t" << datum.dimension << "\t" << n
+          << "\t" << find_average (datum.data);
+      
       for (size_t i = 0; i < fractiles.size (); i++)
         if (n > 0)
           tmp << "\t" << find_fractile (fractiles[i], datum.data);
@@ -170,6 +193,8 @@ List of tags to summarize.");
     frame.declare_fraction ("fractiles",
                             Attribute::Const, Attribute::Variable, "\
 List of fractiles to summarize.");
+    frame.declare_string ("first", Attribute::OptionalConst, "\
+If set, put this in the first column of the summary.");
   }
 } SummaryFractiles_syntax;
 
