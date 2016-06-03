@@ -8,10 +8,25 @@
 (input file "crop.dai")
 (input file "log-std.dai")
 
+(input file "management.dai")
+
 (defunit [kWh/d/m^2] SIfactor 
 	  (mass 1)
 	  (time -3)
 	  (factor 41.67))
+
+(defweather D1990 default "Control_daily_daisy.dwf"
+  (NH4WetDep 1.10 [ppm])
+  (NH4DryDep 5.04 [kg N/ha/y])
+  (NO3WetDep 1.10 [ppm])
+  (NO3DryDep 3.36 [kg N/ha/y]))
+
+(defweather D2014 default "Control_daily_daisy.dwf"
+  (NH4WetDep 0.51 [ppm])
+  (NH4DryDep 4.02 [kg N/ha/y])
+  (NO3WetDep 0.51 [ppm])
+  (NO3DryDep 2.68 [kg N/ha/y]))
+
 
 (defsummary NSoil fractiles
   (tags "Matrix-Leaching" "N-Soil-Drain" "Min-Surface-Fertilizer"
@@ -84,6 +99,12 @@ NO3-N removed by the organic matter turnover processes.")
                      (handle sum)
                      (dimension "${N_unit}")
                      (spec reaction denitrification converted))
+           (number (tag "Harvest")
+                   (path column "${column}" Vegetation crops
+                         harvest component sorg_N)
+                   (handle content_sum)
+                   (dimension "${N_unit}")
+                   (spec fixed Harvest sorg_N))
            (interval (path column "${column}" Chemistry "*" 
                            trace N S_root)
                      (documentation "\
@@ -330,123 +351,35 @@ File component name indicating crop logged. Empty if not specified.")
                   ( -80 "B_JB7")
                   (-250 "C_JB7"))))
 
-(defaction "SBarley w. MF" activity
-  (wait_mm_dd 3 05)
-  (fertilize (N25S (weight 115 [kg N/ha])))
-  (plowing)
-  (wait_mm_dd 4 05)
-  (seed_bed_preparation)(sow "Spring Barley")
-  (wait (or (crop_ds_after "Spring Barley" 2.0)(mm_dd 08 20)))
-  (harvest "Spring Barley" (stub 8 [cm])(stem 0.70))
-)
-
-(defcrop "WW-SB" "Winter Wheat")
-
-(defaction "WWheat w. MF after SB" activity
-  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-SB")
-  (wait_mm_dd 04 05)(fertilize (N25S (weight 060 [kg N/ha]))) 
-  (wait_mm_dd 05 05)(fertilize (N25S (weight 100 [kg N/ha])))  
-  (wait (or (crop_ds_after "WW-SB" 2.0)(mm_dd 8 18)))
-  (harvest "WW-SB" (stub 8 [cm])(stem 0.0)(leaf 0.0))
-)
-
-(defaction "WRape w. MF" activity
-  (wait_mm_dd 8 19)(plowing)
-  (wait_mm_dd 8 20)(fertilize (N25S (weight 25 [kg N/ha])))
-  (seed_bed_preparation)(sow "Winter Rape")
-  (wait_mm_dd 3 05)(fertilize (N25S (weight 130 [kg N/ha])))
-  (wait (or (crop_ds_after "Winter Rape" 2.0)(mm_dd 8 9)))
-  (harvest "Winter Rape" (stub 8 [cm])(stem 0.0)(leaf 0.0))
-)
-
-(defcrop "WW-WR" "Winter Wheat")
-
-(defaction "WWheat w. MF after WR" activity
-  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WR")
-  (wait_mm_dd 04 05)(fertilize (N25S (weight 060 [kg N/ha]))) 
-  (wait_mm_dd 05 05)(fertilize (N25S (weight 100 [kg N/ha])))  
-  (wait (or (crop_ds_after "WW-WR" 2.0)(mm_dd 9 1)))
-  (harvest "WW-WR" (stub 8 [cm])(stem 0.0)(leaf 0.0))
-)
-
-(defcrop "WW-WW" "Winter Wheat")
-
-(defaction "WWheat w. MF after WW" activity
-  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WW")
-  (wait_mm_dd 04 05)(fertilize (N25S (weight 060 [kg N/ha]))) 
-  (wait_mm_dd 05 05)(fertilize (N25S (weight 100 [kg N/ha])))  
-  (wait (or (crop_ds_after "WW-WW" 2.0)(mm_dd 9 1)))
-  (harvest "WW-WW" (stub 8 [cm])(stem 0.0)(leaf 0.0))
-  (wait_mm_dd 9 02)(plowing)
-  (sow "Grass")
-)
-
-(defaction ROT activity
-  "SBarley w. MF" "WWheat w. MF after SB" "WRape w. MF"
-  "WWheat w. MF after WR" "WWheat w. MF after WW")
-
 (defprogram REF Daisy
   "Reference simulation."
-  (weather default "Control_daily_daisy.dwf")
-  (column JB4
-          JB6 JB7)
-  (manager ROT ROT
+  (weather D1990)
+  (column JB4)
+  (manager ROT_JB4_2014_Org ROT_JB4_2014_Org
            (store_SOM)
            (message "SOM stored")
-           (repeat (activity ROT restore_SOM)))
+           (repeat (activity ROT_JB4_2014_Org restore_SOM)))
   (time 1990 9 1 1)
   (activate_output (after 2000 9 1 1))
   (stop 2500 10 1 1)
   ;;(stop 2025 10 1 1)
   (output harvest
           (NSoil (column JB4))
-          (NSoil (column JB6))
-          (NSoil (column JB7))
           (NCrop (column JB4) (crop "Spring Barley"))
-          (NCrop (column JB6) (crop "Spring Barley"))
-          (NCrop (column JB7) (crop "Spring Barley"))
           (NCrop (column JB4) (crop WW-SB))
-          (NCrop (column JB6) (crop WW-SB))
-          (NCrop (column JB7) (crop WW-SB))
           (NCrop (column JB4) (crop "Winter Rape"))
-          (NCrop (column JB6) (crop "Winter Rape"))
-          (NCrop (column JB7) (crop "Winter Rape"))
           (NCrop (column JB4) (crop WW-WR))
-          (NCrop (column JB6) (crop WW-WR))
-          (NCrop (column JB7) (crop WW-WR))
           (NCrop (column JB4) (crop WW-WW))
-          (NCrop (column JB6) (crop WW-WW))
-          (NCrop (column JB7) (crop WW-WW))
           (RootVeg (column JB4) (mycrop "Spring Barley"))
-          (RootVeg (column JB6) (mycrop "Spring Barley"))
-          (RootVeg (column JB7) (mycrop "Spring Barley"))
           (RootVeg (column JB4) (mycrop WW-SB))
-          (RootVeg (column JB6) (mycrop WW-SB))
-          (RootVeg (column JB7) (mycrop WW-SB))
           (RootVeg (column JB4) (mycrop "Winter Rape"))
-          (RootVeg (column JB6) (mycrop "Winter Rape"))
-          (RootVeg (column JB7) (mycrop "Winter Rape"))
           (RootVeg (column JB4) (mycrop WW-WR))
-          (RootVeg (column JB6) (mycrop WW-WR))
-          (RootVeg (column JB7) (mycrop WW-WR))
           (RootVeg (column JB4) (mycrop WW-WW))
-          (RootVeg (column JB6) (mycrop WW-WW))
-          (RootVeg (column JB7) (mycrop WW-WW))
           (RootRep (column JB4) (mycrop "Spring Barley"))
-          (RootRep (column JB6) (mycrop "Spring Barley"))
-          (RootRep (column JB7) (mycrop "Spring Barley"))
           (RootRep (column JB4) (mycrop WW-SB))
-          (RootRep (column JB6) (mycrop WW-SB))
-          (RootRep (column JB7) (mycrop WW-SB))
           (RootRep (column JB4) (mycrop "Winter Rape"))
-          (RootRep (column JB6) (mycrop "Winter Rape"))
-          (RootRep (column JB7) (mycrop "Winter Rape"))
           (RootRep (column JB4) (mycrop WW-WR))
-          (RootRep (column JB6) (mycrop WW-WR))
-          (RootRep (column JB7) (mycrop WW-WR))
           (RootRep (column JB4) (mycrop WW-WW))
-          (RootRep (column JB6) (mycrop WW-WW))
-          (RootRep (column JB7) (mycrop WW-WW))
           ))
 
 (defgnuplot plot_N xy

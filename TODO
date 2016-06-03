@@ -1,30 +1,16 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* Check om "Crop Production" laver parserfejl.
+
 * NYield
 
-** 4 rotationer
+** Org Rot 1994
 
-*** Mineralsk, 1990
+Kig i gødningsnormer.xlsx
 
-*** Husdyr, 1990
-
-*** Mineralsk, 2015
-
-*** Hysyr, 2015
-
-*** x 3 jorde
-
-*** hver med 5 afgrøder
+** Lav setup.dai program for hver serie af 100 rotationer.
 
 ** To vejr
-
-*** 1990 deposition
-
-*** 2015 deposition
-
-** Kør 1990 Husdyr + 1990 vejr
-
-
 
 ** Gødning
 
@@ -35,9 +21,18 @@ Anden gødning en måned senere (resten)
 
 ** Husdyrgødning
 
-Ved traficability
+*** V.Raps org
 
-** Deposition
+1.februar + trafficable al organisk
+
+1.april al mineralsk
+
+*** V.Hvede org
+
+1.marts + trafficable al organisk
+
+en måned senere al mineralsk
+
 
 
 

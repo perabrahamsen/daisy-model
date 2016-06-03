@@ -6,6 +6,14 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.27
+
+** The 'with' condition allows you to restrict a test to a specific column.
+
+** The 'active' log parameter allows you to conditionally log flux variables.
+
+E.g. only log root uptake when DS > 1.0.
+
 * 5.26
 
 ** Duplicate definitions are now an error instead of a warning.

@@ -1,7 +1,12 @@
+2016-06-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* symbol.C: Changed <map> to <unordered_map>.
+
 2016-05-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* condition_crop.C (with): New condition.
 	* log_select.C (active): New parameter.
+
 2016-05-19  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.26 released.
