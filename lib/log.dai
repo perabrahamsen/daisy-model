@@ -937,7 +937,7 @@ sum of all chemicals will be logged."
                    (dimension "dg C"))           ))
 
 (deflog "Crop Photosynthesis" crop
-  (where "${colfid}$[cropfid}_phot.dlf")
+  (where "${colfid}${cropfid}_phot.dlf")
   (when hourly)
   (entries (number (path column "${column}" Vegetation crops crops "${crop}"
                          Prod NetPhotosynthesis)
@@ -972,7 +972,7 @@ sum of all chemicals will be logged."
            ))
 
 (deflog "Crop Production" crop
-  (where "${colfid}$[cropfid}_prod.dlf")
+  (where "${colfid}${cropfid}_prod.dlf")
   (when (hour 12))                      ;When the stress is highest.
   (entries (number (path column "${column}" Vegetation crops crops "${crop}"
                          Devel "*" DS)

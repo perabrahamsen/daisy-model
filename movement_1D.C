@@ -28,7 +28,6 @@
 #include "surface.h"
 #include "weather.h"
 #include "chemical.h"
-#include "doe.h"
 #include "transport.h"
 #include "adsorption.h"
 #include "log.h"

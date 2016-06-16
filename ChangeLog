@@ -1,3 +1,8 @@
+2016-06-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log.dai ("Crop Production", "Crop Photosynthesis"): Fix "$["
+	error.
+
 2016-06-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* symbol.C: Changed <map> to <unordered_map>.

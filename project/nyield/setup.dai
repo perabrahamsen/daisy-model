@@ -5,8 +5,27 @@
 (input file "dk-horizon.dai")
 (input file "tillage.dai")
 (input file "fertilizer.dai")
-(input file "crop.dai")
 (input file "log-std.dai")
+
+(input file "sbarley.dai")
+(input file "wrape.dai")
+(input file "wwheat.dai")
+(input file "grass.dai")
+
+(defcrop "Winter Wheat; SHA" "Winter Wheat"
+  "Søren Hansen recalib."
+  (Devel original 
+    (DSRate1  0.0180 [DS/d])
+    (DSRate2  0.0220 [DS/d]))
+  (Root 
+    (MaxPen   120 [cm]))
+  (Partit                                                                           
+      (Root (0.00 0.50) (0.33 0.50) (0.53 0.45) (1.00 0.00) (2.00 0.00))
+      (Leaf (0.00 0.70) (0.40 0.70) (0.55 0.70) (0.62 0.50) (0.77 0.20) (0.95 0.10)             (1.38 0.05) (2.00 0.00))
+      (Stem (0.00 0.30) (0.40 0.30) (0.55 0.30) (0.62 0.50) (0.77 0.80) (0.95 0.90) (1.00 0.00) (1.38 0.00) (2.00 0.00))
+      (RSR  (0.00 0.50) (1.00 0.50) (2.00 0.25))))
+
+(defcrop "WW" "Winter Wheat; SHA")
 
 (input file "management.dai")
 
@@ -31,10 +50,10 @@
 (defsummary NSoil fractiles
   (tags "Matrix-Leaching" "N-Soil-Drain" "Min-Surface-Fertilizer"
         "Min-Soil-Fertilizer" "Org-Fertilizer" "NH4-Mineralization"
-        "NO3-Immobilization" "Denitrification" "Uptake"
+        "NO3-Immobilization" "Denitrification" "Uptake" "Surface-Loss"
         "Matrix percolation" "Matrix drain flow")
   (fractiles 10 50 90 [%])
-  (first "${column}"))
+  (first "NSOIL\t${period}\t${fert}\t${column}"))
   
 ;; Every 5 years.
 (defcondition rotation_length (every (days 1826) (hours 5)))
@@ -114,6 +133,12 @@ NO3-N removed by plant roots.")
 		     (negate true)
                      (dimension "${N_unit}")
                      (spec chemical default S_root))
+           (number (path column "${column}" 
+			 Chemistry "*" trace N top_loss)
+                   (spec chemical default top_loss)
+                   (handle sum)
+                   (tag "Surface-Loss")
+                   (dimension "${N_unit}"))
            (flux_bottom (tag "Matrix percolation")
                         (path column "${column}" SoilWater q)
                         (spec fixed SoilWater q)
@@ -130,7 +155,7 @@ NO3-N removed by plant roots.")
 (defsummary NCrop fractiles
   (tags sorg_N sorg_DM water_stress_days nitrogen_stress_days)
   (fractiles 10 50 90 [%])
-  (first "${column}\t${crop}"))
+  (first "NCROP\t${period}\t${fert}\t${column}\t${crop}"))
   
 (deflog NCrop crop
   (declare N_unit String "Base nitrogen unit.")
@@ -315,7 +340,7 @@ File component name indicating crop logged. Empty if not specified.")
 
 (deflog RootVeg Uptake
   (where "${colfid}${cropfid}-veg-uptake.dlf")
-  (summary (Uptake (first "${column}\t${mycrop}\tVeg")))
+  (summary (Uptake (first "NROOT\t${period}\t${fert}\t${column}\t${mycrop}\tVeg")))
   (active (with "${column}"
                 (and (crop_ds_after "${mycrop}" 0.0)
                      (not (crop_ds_after "${mycrop}" 1.0)))))
@@ -323,7 +348,7 @@ File component name indicating crop logged. Empty if not specified.")
 
 (deflog RootRep Uptake
   (where "${colfid}${cropfid}-rep-uptake.dlf")
-  (summary (Uptake (first "${column}\t${mycrop}\tRep")))
+  (summary (Uptake (first "NROOT\t${period}\t${fert}\t${column}\t${mycrop}\tRep")))
   (active (with "${column}" (crop_ds_after "${mycrop}" 1.0))))
 
 (defcolumn NYield default)
@@ -331,7 +356,7 @@ File component name indicating crop logged. Empty if not specified.")
 (defcolumn JB4 NYield
   (Groundwater deep)
   (Soil (MaxRootingDepth 250 [cm])
-        (horizons ( -25 "Ap_JB4")
+        (horizons ( -25 ("Ap_JB4" (SOM_fractions 0.49 0.51)))
                   ( -80 "B_JB4")
                   (-250 "C_JB4"))))
 
@@ -339,7 +364,7 @@ File component name indicating crop logged. Empty if not specified.")
   (Drain lateral)
   (Groundwater (aquitard (K_aquitard 6e-2 [cm/d]))) ;Calib: 32 % to drain
   (Soil (MaxRootingDepth 250 [cm])
-        (horizons ( -25 "Ap_JB6")
+        (horizons ( -25 ("Ap_JB6"  (SOM_fractions 0.49 0.51)))
                   ( -80 "B_JB6")
                   (-250 "C_JB6"))))
 
@@ -347,40 +372,168 @@ File component name indicating crop logged. Empty if not specified.")
   (Drain lateral)
   (Groundwater (aquitard (K_aquitard 3.5e-2 [cm/d]))) ; Calib: 55 % to drain
   (Soil (MaxRootingDepth 250 [cm])
-        (horizons ( -25 "Ap_JB7")
+        (horizons ( -25 ("Ap_JB7" (SOM_fractions 0.49 0.51)))
                   ( -80 "B_JB7")
                   (-250 "C_JB7"))))
 
 (defprogram REF Daisy
   "Reference simulation."
-  (weather D1990)
+  (declare mycol String
+	   "Name of column to log.")
+  (declare period String
+	   "Name of period.")
+  (declare fert String
+	   "Name of fertilizer regime.")
+  (time 1990 9 1 1)
+  (log_prefix "${period}-${fert}-")
+  (activate_output (after 2000 9 1 1))
+  (stop 2500 10 1 1)
+  ;; (stop 2025 10 1 1)
+  (output harvest
+          (NSoil (column "${mycol}"))
+          (NCrop (column "${mycol}") (crop "Spring Barley"))
+          (NCrop (column "${mycol}") (crop WW-SB))
+          (NCrop (column "${mycol}") (crop "Winter Rape"))
+          (NCrop (column "${mycol}") (crop WW-WR))
+          (NCrop (column "${mycol}") (crop WW-WW))
+          (RootVeg (column "${mycol}") (mycrop "Spring Barley"))
+          (RootVeg (column "${mycol}") (mycrop WW-SB))
+          (RootVeg (column "${mycol}") (mycrop "Winter Rape"))
+          (RootVeg (column "${mycol}") (mycrop WW-WR))
+          (RootVeg (column "${mycol}") (mycrop WW-WW))
+          (RootRep (column "${mycol}") (mycrop "Spring Barley"))
+          (RootRep (column "${mycol}") (mycrop WW-SB))
+          (RootRep (column "${mycol}") (mycrop "Winter Rape"))
+          (RootRep (column "${mycol}") (mycrop WW-WR))
+          (RootRep (column "${mycol}") (mycrop WW-WW))
+          ))
+
+(defprogram JB4_2014_Min REF
+  (fert "Min")
+  (weather D2014) (period "2014")
+  (mycol JB4)
+  (column JB4)
+  (manager ROT_JB4_2014_Min ROT_JB4_2014_Min
+           (store_SOM)
+           (message "SOM stored")
+           (repeat (activity ROT_JB4_2014_Min restore_SOM))))
+
+(defprogram JB6_2014_Min REF
+  (fert "Min")
+  (weather D2014) (period "2014")
+  (mycol JB6)
+  (column JB6)
+  (manager ROT_JB6_2014_Min ROT_JB6_2014_Min
+           (store_SOM)
+           (message "SOM stored")
+           (repeat (activity ROT_JB6_2014_Min restore_SOM))))
+
+(defprogram JB7_2014_Min REF
+  (fert "Min")
+  (weather D2014) (period "2014")
+  (mycol JB7)
+  (column JB7)
+  (manager ROT_JB7_2014_Min ROT_JB7_2014_Min
+           (store_SOM)
+           (message "SOM stored")
+           (repeat (activity ROT_JB7_2014_Min restore_SOM))))
+
+(defprogram JB4_2014_Org REF
+  (fert "Org")
+  (weather D2014) (period "2014")
+  (mycol JB4)
   (column JB4)
   (manager ROT_JB4_2014_Org ROT_JB4_2014_Org
            (store_SOM)
            (message "SOM stored")
-           (repeat (activity ROT_JB4_2014_Org restore_SOM)))
-  (time 1990 9 1 1)
-  (activate_output (after 2000 9 1 1))
-  (stop 2500 10 1 1)
-  ;;(stop 2025 10 1 1)
-  (output harvest
-          (NSoil (column JB4))
-          (NCrop (column JB4) (crop "Spring Barley"))
-          (NCrop (column JB4) (crop WW-SB))
-          (NCrop (column JB4) (crop "Winter Rape"))
-          (NCrop (column JB4) (crop WW-WR))
-          (NCrop (column JB4) (crop WW-WW))
-          (RootVeg (column JB4) (mycrop "Spring Barley"))
-          (RootVeg (column JB4) (mycrop WW-SB))
-          (RootVeg (column JB4) (mycrop "Winter Rape"))
-          (RootVeg (column JB4) (mycrop WW-WR))
-          (RootVeg (column JB4) (mycrop WW-WW))
-          (RootRep (column JB4) (mycrop "Spring Barley"))
-          (RootRep (column JB4) (mycrop WW-SB))
-          (RootRep (column JB4) (mycrop "Winter Rape"))
-          (RootRep (column JB4) (mycrop WW-WR))
-          (RootRep (column JB4) (mycrop WW-WW))
-          ))
+           (repeat (activity ROT_JB4_2014_Org restore_SOM))))
+
+(defprogram JB6_2014_Org REF
+  (fert "Org")
+  (weather D2014) (period "2014")
+  (mycol JB6)
+  (column JB6)
+  (manager ROT_JB6_2014_Org ROT_JB6_2014_Org
+           (store_SOM)
+           (message "SOM stored")
+           (repeat (activity ROT_JB6_2014_Org restore_SOM))))
+
+(defprogram JB7_2014_Org REF
+  (fert "Org")
+  (weather D2014) (period "2014")
+  (mycol JB7)
+  (column JB7)
+  (manager ROT_JB7_2014_Org ROT_JB7_2014_Org
+           (store_SOM)
+           (message "SOM stored")
+           (repeat (activity ROT_JB7_2014_Org restore_SOM))))
+
+(defprogram JB4_1994_Min REF
+  (fert "Min")
+  (weather D1990) (period "1994")
+  (mycol JB4)
+  (column JB4)
+  (manager ROT_JB4_1994_Min ROT_JB4_1994_Min
+           (store_SOM)
+           (message "SOM stored")
+           (repeat (activity ROT_JB4_1994_Min restore_SOM))))
+
+(defprogram JB6_1994_Min REF
+  (fert "Min")
+  (weather D1990) (period "1994")
+  (mycol JB6)
+  (column JB6)
+  (manager ROT_JB6_1994_Min ROT_JB6_1994_Min
+           (store_SOM)
+           (message "SOM stored")
+           (repeat (activity ROT_JB6_1994_Min restore_SOM))))
+
+(defprogram JB7_1994_Min JB6_1994_Min
+  (fert "Min")
+  (weather D1990) (period "1994")
+  (mycol JB7)
+  (column JB7))
+
+(defprogram JB4_1994_Org REF
+  (fert "Org")
+  (weather D1990) (period "1994")
+  (mycol JB4)
+  (column JB4)
+  (manager ROT_JB4_1994_Org ROT_JB4_1994_Org
+           (store_SOM)
+           (message "SOM stored")
+           (repeat (activity ROT_JB4_1994_Org restore_SOM))))
+
+(defprogram JB6_1994_Org REF
+  (fert "Org")
+  (weather D1990) (period "1994")
+  (mycol JB6)
+  (column JB6)
+  (manager ROT_JB6_1994_Org ROT_JB6_1994_Org
+           (store_SOM)
+           (message "SOM stored")
+           (repeat (activity ROT_JB6_1994_Org restore_SOM))))
+
+(defprogram JB7_1994_Org JB6_1994_Org
+  (fert "Org")
+  (weather D1990) (period "1994")
+  (mycol JB7)
+  (column JB7))
+
+(defprogram sim-2014-min batch
+  (run JB4_2014_Min JB6_2014_Min JB7_2014_Min))
+
+(defprogram sim-2014-org batch
+  (run JB4_2014_Org JB6_2014_Org JB7_2014_Org))
+
+(defprogram sim-1994-min batch
+  (run JB4_1994_Min JB6_1994_Min JB7_1994_Min))
+
+(defprogram sim-1994-org batch
+  (run JB4_1994_Org JB6_1994_Org JB7_1994_Org))
+
+(defprogram sims batch
+  (run sim-2014-min sim-2014-org sim-1994-min sim-1994-org))
 
 (defgnuplot plot_N xy
   (where "N-yield.pdf")
@@ -461,9 +614,11 @@ File component name indicating crop logged. Empty if not specified.")
   (graph plot_N plot_DM ;; plot_N_DM plot_DM_N plot_Npercent
          ))
 
-(run REF)
+(run sims)
 
 ;;(run plot)
+
+;;(run JB6_1994_Org)
 
 ;;; setup.dai ends here.
 

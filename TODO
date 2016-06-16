@@ -1,40 +1,34 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Check om "Crop Production" laver parserfejl.
+* "REF" har SOM 70 30 og SH param
 
 * NYield
 
-** Org Rot 1994
+** Ref WW
 
-Kig i gødningsnormer.xlsx
+*** DONE Vårbyg / græs pløjning 1 november
 
-** Lav setup.dai program for hver serie af 100 rotationer.
+*** Højere vårbyg udbytte
 
-** To vejr
+*** JB4 laverede MaxRootDepth
 
-** Gødning
+*** WW SH param
 
-Første gødning ved traficability (første 50 kg)
+*** WW Såsæd
 
-Anden gødning en måned senere (resten)
+*** WW højere MaxPen (Thorup)
 
+MaxPen 1.75 (irene)
 
-** Husdyrgødning
+pen hastighed 1 mm/(dg C d)
 
-*** V.Raps org
+*** WR 10 % højere udbytte?
 
-1.februar + trafficable al organisk
+*** OM init
 
-1.april al mineralsk
+(SOM_fractions 49 51)
 
-*** V.Hvede org
-
-1.marts + trafficable al organisk
-
-en måned senere al mineralsk
-
-
-
+** WW med 10 % lavere SOrgCrN
 
 * "Promillefondprojekt" forklar lavere N indhold i kerner.
 
@@ -57,14 +51,6 @@ Isoler effekter
 *** 2xklima (øst og vest)
 
 Vest ny?
-
-** Jorde defineret fra dk-horizon.dai
-
-*** Vælg "typiske" kombinationer af horisonter for hvededyrkning
-
-Vær sikker på at få nogle "nye" jorde med
-
-Nedre rand?
 
 ** Forskelligt humus indhold, 30-70, 50-50, 70-30 som
 
