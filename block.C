@@ -170,8 +170,8 @@ Block::expand_string (const symbol value_s, std::set<symbol>& outer) const
                               result << " [" << dim << "]";
                           }
                         else
-                          throw "Unhandled object type '"
-                            + component.name () + "'";
+                          result << type;
+                        
                         break;
                       }
                     default:

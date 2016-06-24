@@ -7,3 +7,6 @@ fgrep -h NSOIL *.TXT | fgrep -v Name | sort  -t$'\t' -k5,5 -k3,3 -k4,4 -k2,2 >> 
 # 1:NROOT 2:PERIOD 3:FERT 4:SOIL 5:CROP 6:STAGE 7:WHAT 8:DIM
 fgrep -h NROOT *.TXT | fgrep Name -m1 > NROOT.TAB
 fgrep -h NROOT *.TXT | fgrep -v Name | sort  -t$'\t' -k5,5 -k6,6 -k3,3 -k4,4 -k2,2 -k7,7 >> NROOT.TAB
+# 1:NStress 2:PERIOD 3:FERT 4:SOIL 5:CROP 6:STAGE 7:WHAT 8:DIM
+fgrep -h NStress *.TXT | fgrep Name -m1 > NSTRESS.TAB
+fgrep -h NStress *.TXT | fgrep -v Name | sort  -t$'\t' -k5,5 -k6,6 -k3,3 -k4,4 -k2,2 -k7,7 >> NSTRESS.TAB

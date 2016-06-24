@@ -1,3 +1,15 @@
+2016-06-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* vernalization.C, seed_LAI.C (load_frame): Fix units.
+	* canopy_std.C, crpn.C, production.C (load_syntax): Ditto.
+
+2016-06-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* harvest.C (sorg_N_per_DM): New log variable.
+
+	* block.C (expand_string): "${model}" expand into the name of the
+	model for model types other than Number and Stringer.
+
 2016-06-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* lib/log.dai ("Crop Production", "Crop Photosynthesis"): Fix "$["

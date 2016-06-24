@@ -1,34 +1,84 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* "REF" har SOM 70 30 og SH param
+* NYield
+
+** Kør alt i en setup
+
+Ny summary søjle: Setup
+
+** Vi skal cropmodel (til simulering) og cropname (til summary) variable
+
+** Setups
+
+alle tre jorde køres i alle simuleringer hvor ikke andet angives
+
+1994 og 2014 køres med
+- reference afgrøder
+- SOM ligevægt
+- nutidigt klima
+
+Name: REF
+
+1994 køres med original vinterhvede
+
+Name: WWORG
+
+2014 køres med crncnc vinterhvede+spring barley
+
+Name: CRN
+
+2014 køres med 70-30 og 30-70 SOM (tal med MES om 
+
+Name: SOM7030
+Name: SOM3070
+
+2014 køres med varmere klima
+
+Name: WARM
+
+2014 køres med vådere klima
+
+Name: WET
+
+1994 jb6 og jb7 køres med "byttet" nedre rand.
+
+Name: DRAIN
+
+1994 jb4 køres med/used root zone begrænsning (find ud af hvilken er ref)
+
+Name: ROOTZONE
+
+* Lav "Forskelsark" hvis to simuleringer sammenlignes.
+
+% forskel
 
 * NYield
 
 ** Ref WW
 
-*** DONE Vårbyg / græs pløjning 1 november
-
 *** Højere vårbyg udbytte
 
-*** JB4 laverede MaxRootDepth
+*** WR 10 % højere udbytte?
 
-*** WW SH param
+*** NEXT WW med 10 % lavere SOrgCrN
 
-*** WW Såsæd
+*** DOING WW Såsæd
 
-*** WW højere MaxPen (Thorup)
+*** DONE Vårbyg / græs pløjning 1 november
+
+*** ???? JB4 lavere MaxRootDepth
+
+*** DONE WW SH param
+
+*** DONE WW højere MaxPen (Thorup)
 
 MaxPen 1.75 (irene)
 
 pen hastighed 1 mm/(dg C d)
 
-*** WR 10 % højere udbytte?
-
-*** OM init
+*** DONE OM init
 
 (SOM_fractions 49 51)
-
-** WW med 10 % lavere SOrgCrN
 
 * "Promillefondprojekt" forklar lavere N indhold i kerner.
 

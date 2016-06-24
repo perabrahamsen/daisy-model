@@ -43,7 +43,7 @@ struct ConditionWith : public Condition
   bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   {
     Field::Restrict restriction (daisy.field (), where);
-    return !condition->match (daisy, scope, msg);
+    return condition->match (daisy, scope, msg);
   }
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
@@ -63,14 +63,19 @@ struct ConditionWith : public Condition
 
   bool check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   {
-    Treelog::Open nest (msg, std::string ("with") + where);
+    Treelog::Open nest (msg, std::string ("with ") + where);
   
-    bool ok = condition->check (daisy, scope, msg);
+    bool ok = true;
 
     if (!daisy.field ().find (where))
       {
 	msg.entry (std::string ("No column '") + where + "'");
 	ok = false;
+      }
+    else
+      {
+        Field::Restrict restriction (daisy.field (), where);
+        ok = condition->check (daisy, scope, msg);
       }
     return ok;
   }

@@ -66,16 +66,24 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
 {
   active->tick (daisy, Scope::null (), out);
   const bool log_active = active->match (daisy, Scope::null (), out);
+      
   condition->tick (daisy, Scope::null (), out);
   is_printing = condition->match (daisy, Scope::null (), out);
   is_active = is_printing;
 
   if (log_active)
+    {
+      for (std::vector<Select*>::const_iterator i = entries.begin (); 
+           i < entries.end (); 
+           i++)
+        if ((*i)->match (is_printing))
+          is_active = true;
+    }
+  else
     for (std::vector<Select*>::const_iterator i = entries.begin (); 
          i < entries.end (); 
          i++)
-      if ((*i)->match (is_printing))
-        is_active = true;
+      (*i)->is_active = is_printing;
 
   return is_active;
 }

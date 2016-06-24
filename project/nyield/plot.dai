@@ -77,3 +77,5 @@
   (graph plot_N plot_DM ;; plot_N_DM plot_DM_N plot_Npercent
          ))
 
+(run plot)
+

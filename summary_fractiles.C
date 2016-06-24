@@ -62,6 +62,7 @@ struct SummaryFractiles : public Summary
   std::vector<Data> data;
   const std::vector<double> fractiles;
   const symbol first;
+
   
   // Create and Destroy.
   void clear ();
@@ -175,6 +176,7 @@ SummaryFractiles::summarize (Treelog& msg) const
         else
           tmp << "\tn/a";
     }
+
   msg.message (tmp.str ());
 }
 

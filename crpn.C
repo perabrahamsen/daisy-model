@@ -221,40 +221,40 @@ CrpN::load_syntax (Frame& frame)
   frame.add_check (check_alist);
 
   // Content.
-  frame.declare ("PtLeafCnc", "DS", " g N/g DM", Check::non_negative (),
+  frame.declare ("PtLeafCnc", "DS", "g N/g DM", Check::non_negative (),
 	      Attribute::Const,
 	      "Upper limit for N-concentration in leaves.");
-  frame.declare ("CrLeafCnc", "DS", " g N/g DM", Check::non_negative (),
+  frame.declare ("CrLeafCnc", "DS", "g N/g DM", Check::non_negative (),
 	      Attribute::Const,
 	      "Critical limit for N-concentration in leaves.");
-  frame.declare ("NfLeafCnc", "DS", " g N/g DM", Check::non_negative (),
+  frame.declare ("NfLeafCnc", "DS", "g N/g DM", Check::non_negative (),
 	      Attribute::Const, "\
 Non-functional limit for N-concentration in leaves.");
-  frame.declare ("PtStemCnc", "DS", " g N/g DM", Check::non_negative (),
+  frame.declare ("PtStemCnc", "DS", "g N/g DM", Check::non_negative (),
               Attribute::Const,
 	      "Upper limit for N-concentration in stem.");
-  frame.declare ("CrStemCnc", "DS", " g N/g DM", Check::non_negative (),
+  frame.declare ("CrStemCnc", "DS", "g N/g DM", Check::non_negative (),
               Attribute::Const,
 	      "Critical limit for N-concentration in stem.");
-  frame.declare ("NfStemCnc", "DS", " g N/g DM", Check::non_negative (),
+  frame.declare ("NfStemCnc", "DS", "g N/g DM", Check::non_negative (),
               Attribute::Const, "\
 Non-functional limit for N-concentration in stem.");
-  frame.declare ("PtSOrgCnc", "DS", " g N/g DM", Check::non_negative (),
+  frame.declare ("PtSOrgCnc", "DS", "g N/g DM", Check::non_negative (),
               Attribute::Const, "\
 Upper limit for N-concentration in storage organ.");
-  frame.declare ("CrSOrgCnc", "DS", " g N/g DM", Check::non_negative (),
+  frame.declare ("CrSOrgCnc", "DS", "g N/g DM", Check::non_negative (),
               Attribute::Const, "\
 Critical limit for N-concentration in storage organ.");
-  frame.declare ("NfSOrgCnc", "DS", " g N/g DM", Check::non_negative (),
+  frame.declare ("NfSOrgCnc", "DS", "g N/g DM", Check::non_negative (),
               Attribute::Const, "\
 Non-functional limit for N-concentration in storage organ.");
-  frame.declare ("PtRootCnc", "DS", " g N/g DM", Check::non_negative (),
+  frame.declare ("PtRootCnc", "DS", "g N/g DM", Check::non_negative (),
               Attribute::Const,
 	      "Upper limit for N-concentration in roots.");
-  frame.declare ("CrRootCnc", "DS", " g N/g DM", Check::non_negative (),
+  frame.declare ("CrRootCnc", "DS", "g N/g DM", Check::non_negative (),
               Attribute::Const,
 	      "Critical limit for N-concentration in roots.");
-  frame.declare ("NfRootCnc", "DS", " g N/g DM", Check::non_negative (),
+  frame.declare ("NfRootCnc", "DS", "g N/g DM", Check::non_negative (),
               Attribute::Const, "\
 Non-functional lim for N-concentration in roots.");
   frame.declare ("TLLeafEff", "DS", Attribute::Fraction (), Check::fraction (),

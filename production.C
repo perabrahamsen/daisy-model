@@ -626,7 +626,7 @@ Production::load_syntax (Frame& frame)
   frame.declare ("ShldResC", Attribute::Fraction (), Attribute::Const,
 	      "Capacity of shielded reserves (fraction of stem DM).");
   frame.set ("ShldResC", 0.0);
-  frame.declare ("ReMobilDS", Attribute::None (), Attribute::Const,
+  frame.declare ("ReMobilDS", "DS", Attribute::Const,
 	      "Remobilization, Initial DS.");
   frame.set ("ReMobilDS", 1.20);
   frame.declare ("ReMobilRt", "d^-1", Attribute::Const,
@@ -640,18 +640,18 @@ Production::load_syntax (Frame& frame)
   frame.declare ("CH2OReleaseRate", "h^-1", Attribute::Const,
 	      "CH2O Release Rate constant.");
   frame.set ("CH2OReleaseRate", 0.04);
-  frame.declare ("E_Root", Attribute::None (), Attribute::Const,
+  frame.declare ("E_Root", "g DM-C/g Ass-C", Attribute::Const,
 	      "Conversion efficiency, root.");
   frame.set ("E_Root", 0.69);
-  frame.declare ("E_Leaf", Attribute::None (), Attribute::Const,
+  frame.declare ("E_Leaf", "g DM-C/g Ass-C", Attribute::Const,
 	      "Conversion efficiency, leaf.");
   frame.set ("E_Leaf", 0.68);
-  frame.declare ("E_Stem", Attribute::None (), Attribute::Const,
+  frame.declare ("E_Stem", "g DM-C/g Ass-C", Attribute::Const,
 	      "Conversion efficiency, stem.");
   frame.set ("E_Stem", 0.66);
-  frame.declare ("E_SOrg", Attribute::None (), Attribute::Const,
+  frame.declare ("E_SOrg", "g DM-C/g Ass-C", Attribute::Const,
 	      "Conversion efficiency, storage organ.");
-  frame.declare ("r_Root", Attribute::None (), Attribute::Const,
+  frame.declare ("r_Root", "d^-1", Attribute::Const,
 	      "Maintenance respiration coefficient, root.");
   frame.set ("r_Root", 0.015);
   frame.declare ("r_Leaf", "d^-1", Attribute::Const,
@@ -663,9 +663,9 @@ Production::load_syntax (Frame& frame)
   frame.declare ("ExfoliationFac", Attribute::None (), Attribute::Const,
 	      "Exfoliation factor, 0-1.");
   frame.set ("ExfoliationFac", 1.0);
-  frame.declare ("LfDR", "DS", " d^-1", Attribute::Const,
+  frame.declare ("LfDR", "DS", "d^-1", Attribute::Const,
 	      "Death rate of Leafs.");
-  frame.declare ("RtDR", "DS", " d^-1", Attribute::Const,
+  frame.declare ("RtDR", "DS", "d^-1", Attribute::Const,
 	      "Death rate of Roots.");
   frame.declare ("Large_RtDR", "d^-1", Attribute::Const,
 	      "Extra death rate for large root/shoot.");
