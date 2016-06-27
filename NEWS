@@ -14,6 +14,8 @@ release.
 
 E.g. only log root uptake when DS > 1.0.
 
+** Fix various units.
+
 * 5.26
 
 ** Duplicate definitions are now an error instead of a warning.
