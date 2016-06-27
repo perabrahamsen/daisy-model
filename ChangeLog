@@ -1,3 +1,7 @@
+2016-06-27  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.27 released.
+
 2016-06-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* vernalization.C, seed_LAI.C (load_frame): Fix units.
