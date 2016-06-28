@@ -80,6 +80,7 @@ File component name indicating crop logged. Empty if not specified.")
   (entries (number (path column "${column}" Vegetation crops crops "${crop}"
                          Devel component DS)
                    (spec phenology component DS)
+		   (dimension [DS])
                    (documentation "\
 Development stage of the crop. 0 is emergence, 1 is flowering, 2 is ripe."))
            (number (path column "${column}" Vegetation crops crops "${crop}"
@@ -92,6 +93,7 @@ Height of crop."))
                          Canopy CAI)
                    (tag "LAI")
                    (spec fixed CanopyStandard CAI)
+		   (dimension [m^2/m^2])
                    (documentation "\
 Leaf area index."))
            (number (path column "${column}" Vegetation crops crops "${crop}"
@@ -171,6 +173,7 @@ Nitrogen content of the roots."))
            (number (path column "${column}" Vegetation crops crops "${crop}"
                          Root water_stress)
                    (spec fixed RootSystem water_stress)
+		   (dimension [])
                    (handle max)
                    (documentation "\
 Highest water stress experienced in the period.
@@ -183,6 +186,7 @@ The value is between 0 (no water stress) and 1 (no production)."))
                          CrpN nitrogen_stress)
                    (handle max)
                    (spec fixed CrpN nitrogen_stress)
+		   (dimension [])
                    (documentation "\
 Highest nitrogen stress experienced in the period.
 

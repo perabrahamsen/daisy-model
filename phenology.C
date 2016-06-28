@@ -88,8 +88,8 @@ The development process.")
     // Variables.
     frame.declare ("DAP", "d", Attribute::State, "Days after planting.");
     frame.set ("DAP", 0.0);
-    frame.declare ("DS", Attribute::None (), Attribute::State,
-                "Development Stage.");
+    frame.declare ("DS", "DS", Attribute::State,
+                "Development stage [-1:2], 0 is emergence, 1 is flowering.");
     frame.set ("DS", -1.0);
     frame.declare ("partial_day_length", "h", Attribute::State,
                 "Number of light hours this day, so far.");

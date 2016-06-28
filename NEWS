@@ -6,6 +6,15 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.28
+
+** New 'Crop' log parameterization in log-std.dai.
+
+This is a simplified version of "Crop Production", and documented in
+the tutorial.
+
+** Bug fixes.
+
 * 5.27
 
 ** The 'with' condition allows you to restrict a test to a specific column.

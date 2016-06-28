@@ -1,3 +1,7 @@
+2016-06-28  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.28 released.
+
 2016-06-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* lib/log-std.dai ("Crop"): New log parameterization.
