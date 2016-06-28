@@ -73,6 +73,124 @@ File component name indicating crop logged. Empty if not specified.")
                     (true
                      "${biopore}"))))
 
+(deflog "Crop" crop
+  "Crop development and production."
+  (where "${colfid}${cropfid}.dlf")
+  (when daily)
+  (entries (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Devel component DS)
+                   (spec phenology component DS)
+                   (documentation "\
+Development stage of the crop. 0 is emergence, 1 is flowering, 2 is ripe."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Canopy Height)
+                   (spec fixed CanopyStandard Height)
+                   (dimension "cm")
+                   (documentation "\
+Height of crop."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Canopy CAI)
+                   (tag "LAI")
+                   (spec fixed CanopyStandard CAI)
+                   (documentation "\
+Leaf area index."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Root Depth)
+                   (spec fixed RootSystem Depth)
+                   (negate true)
+                   (dimension "cm")
+                   (documentation "\
+Effective depths of root zone."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod WLeaf)
+                   (dimension "Mg DM/ha")
+                   (spec fixed Production WLeaf)
+                   (documentation "\
+Dry matter content of leaves."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod WDead)
+                   (dimension "Mg DM/ha")
+                   (spec fixed Production WDead)
+                   (documentation "\
+Dry matter content of dead (yellow) leaves still on crop."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod WStem)
+                   (dimension "Mg DM/ha")
+                   (spec fixed Production WStem)
+                   (documentation "\
+Dry matter content of stem."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod WSOrg)
+                   (dimension "Mg DM/ha")
+                   (spec fixed Production WSOrg)
+                   (documentation "\
+Dry matter content of storage organ (grain, tubber)."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod WRoot)
+                   (dimension "Mg DM/ha")
+                   (spec fixed Production WRoot)
+                   (documentation "\
+Dry matter content of roots."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         CrpN Fixated)
+                   (handle sum)
+                   (spec fixed CrpN Fixated)
+                   (dimension "kg N/ha")
+                   (documentation "\
+Atmospheric nitrogen fixated by the crop (root biome)."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod NLeaf)
+                   (dimension "kg N/ha")
+                   (spec fixed Production NLeaf)
+                   (documentation "\
+Nitrogen content of the leaves."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod NDead)
+                   (dimension "kg N/ha")
+                   (spec fixed Production NDead)
+                   (documentation "\
+Nitrogen content of dead (yellow) leaves still on the crop."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod NStem)
+                   (dimension "kg N/ha")
+                   (spec fixed Production NStem)
+                   (documentation "\
+Nitrogen content of the stem."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod NSOrg)
+                   (dimension "kg N/ha")
+                   (spec fixed Production NSOrg)
+                   (documentation "\
+Nitrogen content of the storage organ (grain or tubber)."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod NRoot)
+                   (dimension "kg N/ha")
+                   (spec fixed Production NRoot)
+                   (documentation "\
+Nitrogen content of the roots."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Root water_stress)
+                   (spec fixed RootSystem water_stress)
+                   (handle max)
+                   (documentation "\
+Highest water stress experienced in the period.
+
+When the root system cannot fullfil the demand of water from the canopy, 
+the crop experience water stress, and production suffers.
+
+The value is between 0 (no water stress) and 1 (no production)."))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         CrpN nitrogen_stress)
+                   (handle max)
+                   (spec fixed CrpN nitrogen_stress)
+                   (documentation "\
+Highest nitrogen stress experienced in the period.
+
+When the crop nitrogen content is below a critical level, crop
+experience nitrogen stress, and production suffers.
+
+The value is between 0 (no nitrogen stress) and 1 (no production)."))))
+
 (defsummary "Field water balance" balance
   "Water balance for the complete system."
   (precision 1)

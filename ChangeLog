@@ -1,3 +1,9 @@
+2016-06-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log-std.dai ("Crop"): New log parameterization.
+
+	* production.C (tick): Clear 'Respiration'.
+
 2016-06-27  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.27 released.

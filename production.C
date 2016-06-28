@@ -207,7 +207,7 @@ Production::tick (const double AirT, const double SoilT,
   daisy_assert (std::isfinite (RMLeaf));
   const double RM =             // [g CH2O/m^2/h]
     RMLeaf + RMStem + RMSOrg + RMRoot + ReMobilResp;
-  Respiration += RM;
+  Respiration = RM;
   MaintRespiration = RM;
   daisy_assert (std::isfinite (RM));
   NetAss -= RM;
