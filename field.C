@@ -87,6 +87,8 @@ struct Field::Implementation
             const double RR0, const Time&, Treelog&);
   void swap (double from, double middle, double to, 
              const double RR0, const Time&, Treelog&);
+  void store_SOM (Treelog& msg);
+  void restore_SOM (Treelog& msg);
   void set_porosity (double at, double Theta, Treelog& msg);
   void set_heat_source (double at, double value);
   void spray_overhead (symbol chemical, double amount, Treelog&); // [g/ha]
@@ -410,6 +412,31 @@ Field::Implementation::swap (const double from, const double middle,
       Treelog::Open nest (msg, (*i)->objid);
       (*i)->swap (from, middle, to, RR0, time, msg);
     }
+}
+
+  void store_SOM (Treelog& msg);
+  void restore_SOM (Treelog& msg);
+
+void 
+Field::Implementation::store_SOM (Treelog& msg)
+{
+  if (selected)
+    selected->store_SOM (msg);
+  else for (ColumnList::iterator i = columns.begin ();
+	    i != columns.end ();
+	    i++)
+         (*i)->store_SOM (msg);
+}
+
+void 
+Field::Implementation::restore_SOM (Treelog& msg)
+{
+  if (selected)
+    selected->restore_SOM (msg);
+  else for (ColumnList::iterator i = columns.begin ();
+	    i != columns.end ();
+	    i++)
+         (*i)->restore_SOM (msg);
 }
 
 void 
@@ -906,6 +933,14 @@ void
 Field::swap (const double from, const double middle, const double to, 
              const double RR0, const Time& time, Treelog& msg)
 { impl->swap (from, middle, to, RR0, time, msg); }
+
+void 
+Field::store_SOM (Treelog& msg)
+{ impl->store_SOM (msg); }
+
+void 
+Field::restore_SOM (Treelog& msg)
+{ impl->restore_SOM (msg); }
 
 void 
 Field::set_porosity (const double at, const double Theta, Treelog& msg)

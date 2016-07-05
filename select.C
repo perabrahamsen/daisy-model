@@ -54,6 +54,7 @@ Select::Handle::symbol2handle (symbol s)
       insert (std::pair<symbol,handle_t> ("max", max));
       insert (std::pair<symbol,handle_t> ("average", average));
       insert (std::pair<symbol,handle_t> ("sum", sum));
+      insert (std::pair<symbol,handle_t> ("content_sum", content_sum));
       insert (std::pair<symbol,handle_t> ("current", current));
     } 
   } sym_set;
@@ -816,13 +817,16 @@ average: Log the arithmetic average value seen since last time the\n\
 variable was logged.\n\
 If 'accumulate' is true, use the average of all values.\n\
 \n\
-sum: Accumulate value since last time the variable was logged.\n\
+sum: Accumulate flux value since last time the variable was logged.\n\
+If 'accumulate' is true, accumulate since the start of the log.\n\
+\n\
+sum: Accumulate content value since last time the variable was logged.\n\
 If 'accumulate' is true, accumulate since the start of the log.\n\
 \n\
 current: Log the current value for the variable.\n\
 If 'accumulate' is true, the printed values will be accumulated.");
     static VCheck::Enum handle_check ("min", "max", "average", 
-                                      "sum", "current");
+                                      "sum", "content_sum", "current");
     frame.set_check ("handle", handle_check);
     frame.declare_string ("multi", Attribute::OptionalConst, "\
 This option determine how to handle mutiple matches within a timestep.\n\

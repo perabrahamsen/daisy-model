@@ -1,0 +1,576 @@
+;;; management.dai --- Management for NYield scenarious.
+
+;;; 2014 Min
+
+(defcrop "WW-SB" "WW")
+
+(defcrop "WW-WR" "WW")
+
+(defcrop "WW-WW" "WW")
+
+(defam PS1994 pig_slurry
+  (first_year_utilization 100 [%])
+  (volatilization 15 [%]))
+
+(defam PS2014 pig_slurry
+  (first_year_utilization 100 [%])
+  (volatilization 0 [%]))
+
+(defaction "JB4_2014_Min_SB" activity
+  (wait_mm_dd 3 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 50 [kg N/ha])))
+  (plowing)
+  (seed_bed_preparation)(sow "SB")
+  (wait_days 30)
+  (fertilize (N25S (weight 43 [kg N/ha])))
+  (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
+  (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
+
+(defaction "JB6_2014_Min_SB" activity
+  (wait_mm_dd 3 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 50 [kg N/ha])))
+  (plowing)
+  (seed_bed_preparation)(sow "SB")
+  (wait_days 30)
+  (fertilize (N25S (weight 49 [kg N/ha])))
+  (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
+  (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
+
+(defaction "JB7_2014_Min_SB" activity
+  (wait_mm_dd 3 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 50 [kg N/ha])))
+  (plowing)
+  (seed_bed_preparation)(sow "SB")
+  (wait_days 30)
+  (fertilize (N25S (weight 62 [kg N/ha])))
+  (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
+  (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
+  
+(defaction "JB4_2014_Min_WW-SB" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-SB")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 50 [kg N/ha])))
+  (wait_days 30)
+  (fertilize (N25S (weight 88 [kg N/ha])))
+  (wait (or (crop_ds_after "WW-SB" 2.0)(mm_dd 8 18)))
+  (harvest "WW-SB" (stub 10 [cm])(stem 0.7)(leaf 0.7)))
+
+(defaction "JB6_2014_Min_WW-SB" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-SB")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 50 [kg N/ha])))
+  (wait_days 30)
+  (fertilize (N25S (weight 106 [kg N/ha])))
+  (wait (or (crop_ds_after "WW-SB" 2.0)(mm_dd 8 18)))
+  (harvest "WW-SB" (stub 10 [cm])(stem 0.7)(leaf 0.7)))
+
+(defaction "JB7_2014_Min_WW-SB" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-SB")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 50 [kg N/ha])))
+  (wait_days 30)
+  (fertilize (N25S (weight 117 [kg N/ha])))
+  (wait (or (crop_ds_after "WW-SB" 2.0)(mm_dd 8 18)))
+  (harvest "WW-SB" (stub 10 [cm])(stem 0.7)(leaf 0.7)))
+
+(defaction "JB4_2014_Min_WR" activity
+  (wait_mm_dd 8 19)(plowing)
+  (wait_mm_dd 8 20)(fertilize (N25S (weight 25 [kg N/ha])))
+  (seed_bed_preparation)(sow "WR")
+  (wait_mm_dd 2 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 150 [kg N/ha])))
+  (wait (or (crop_ds_after "WR" 2.0)(mm_dd 8 9)))
+  (harvest "WR" (stub 10 [cm])(stem 0.01)(leaf 0.01))
+)
+
+(defaction "JB6_2014_Min_WR" activity
+  (wait_mm_dd 8 19)(plowing)
+  (wait_mm_dd 8 20)(fertilize (N25S (weight 25 [kg N/ha])))
+  (seed_bed_preparation)(sow "WR")
+  (wait_mm_dd 2 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 156 [kg N/ha])))
+  (wait (or (crop_ds_after "WR" 2.0)(mm_dd 8 9)))
+  (harvest "WR" (stub 10 [cm])(stem 0.01)(leaf 0.01))
+)
+
+(defaction "JB7_2014_Min_WR" activity
+  (wait_mm_dd 8 19)(plowing)
+  (wait_mm_dd 8 20)(fertilize (N25S (weight 25 [kg N/ha])))
+  (seed_bed_preparation)(sow "WR")
+  (wait_mm_dd 2 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 158 [kg N/ha])))
+  (wait (or (crop_ds_after "WR" 2.0)(mm_dd 8 9)))
+  (harvest "WR" (stub 10 [cm])(stem 0.01)(leaf 0.01))
+)
+
+(defaction "JB4_2014_Min_WW-WR" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WR")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 50 [kg N/ha])))
+  (wait_days 30)
+  (fertilize (N25S (weight 79 [kg N/ha])))
+  (wait (or (crop_ds_after "WW-WR" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WR" (stub 10 [cm])(stem 0.7)(leaf 0.7))
+  (wait_mm_dd 9 02)(plowing))
+
+(defaction "JB6_2014_Min_WW-WR" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WR")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 50 [kg N/ha])))
+  (wait_days 30)
+  (fertilize (N25S (weight 97 [kg N/ha])))
+  (wait (or (crop_ds_after "WW-WR" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WR" (stub 10 [cm])(stem 0.7)(leaf 0.7))
+  (wait_mm_dd 9 02)(plowing))
+
+(defaction "JB7_2014_Min_WW-WR" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WR")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 50 [kg N/ha])))
+  (wait_days 30)
+  (fertilize (N25S (weight 108 [kg N/ha])))
+  (wait (or (crop_ds_after "WW-WR" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WR" (stub 10 [cm])(stem 0.7)(leaf 0.7))
+  (wait_mm_dd 9 02)(plowing))
+
+(defaction "JB4_2014_Min_WW-WW" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WW")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 50 [kg N/ha])))
+  (wait_days 30)
+  (fertilize (N25S (weight 88 [kg N/ha])))
+  (wait (or (crop_ds_after "WW-WW" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WW" (stub 10 [cm])(stem 0.7)(leaf 0.7))
+  (wait_mm_dd 9 02)(plowing)
+  (sow Grass)
+  (wait_mm_dd 11 1)
+  (plowing))
+
+(defaction "JB6_2014_Min_WW-WW" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WW")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 50 [kg N/ha])))
+  (wait_days 30)
+  (fertilize (N25S (weight 106 [kg N/ha])))
+  (wait (or (crop_ds_after "WW-WW" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WW" (stub 10 [cm])(stem 0.7)(leaf 0.7))
+  (wait_mm_dd 9 02)(plowing)
+  (sow Grass)
+  (wait_mm_dd 11 1)
+  (plowing))
+
+(defaction "JB7_2014_Min_WW-WW" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WW")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 50 [kg N/ha])))
+  (wait_days 30)
+  (fertilize (N25S (weight 117 [kg N/ha])))
+  (wait (or (crop_ds_after "WW-WW" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WW" (stub 10 [cm])(stem 0.7)(leaf 0.7))
+  (wait_mm_dd 9 02)(plowing)
+  (sow Grass)
+  (wait_mm_dd 11 1)
+  (plowing))
+
+(defaction ROT_JB4_2014_Min activity
+  JB4_2014_Min_SB    JB4_2014_Min_WW-SB JB4_2014_Min_WR
+  JB4_2014_Min_WW-WR JB4_2014_Min_WW-WW)
+
+(defaction ROT_JB6_2014_Min activity
+  JB6_2014_Min_SB    JB6_2014_Min_WW-SB JB6_2014_Min_WR
+  JB6_2014_Min_WW-WR JB6_2014_Min_WW-WW)
+
+(defaction ROT_JB7_2014_Min activity
+  JB7_2014_Min_SB    JB7_2014_Min_WW-SB JB7_2014_Min_WR
+  JB7_2014_Min_WW-WR JB7_2014_Min_WW-WW)
+
+;;; 1994 Min
+
+(defaction "JB4_1994_Min_SB" activity
+  (wait_mm_dd 3 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 125 [kg N/ha])))
+  (plowing)
+  (seed_bed_preparation)(sow "SB")
+  (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
+  (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
+
+(defaction "JB6_1994_Min_SB" activity
+  (wait_mm_dd 3 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 115 [kg N/ha])))
+  (plowing)
+  (seed_bed_preparation)(sow "SB")
+  (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
+  (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
+
+(defaction "JB4_1994_Min_WW-SB" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-SB")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 190 [kg N/ha])))
+  (wait (or (crop_ds_after "WW-SB" 2.0)(mm_dd 8 18)))
+  (harvest "WW-SB" (stub 10 [cm])(stem 0.7)(leaf 0.7)))
+
+(defaction "JB6_1994_Min_WW-SB" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-SB")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 197 [kg N/ha])))
+  (wait (or (crop_ds_after "WW-SB" 2.0)(mm_dd 8 18)))
+  (harvest "WW-SB" (stub 10 [cm])(stem 0.7)(leaf 0.7)))
+
+(defaction "JB4_1994_Min_WR" activity
+  (wait_mm_dd 8 19)(plowing)
+  (wait_mm_dd 8 20)(fertilize (N25S (weight 25 [kg N/ha])))
+  (seed_bed_preparation)(sow "WR")
+  (wait_mm_dd 2 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 175 [kg N/ha])))
+  (wait (or (crop_ds_after "WR" 2.0)(mm_dd 8 9)))
+  (harvest "WR" (stub 10 [cm])(stem 0.01)(leaf 0.01))
+)
+
+(defaction "JB6_1994_Min_WR" activity
+  (wait_mm_dd 8 19)(plowing)
+  (wait_mm_dd 8 20)(fertilize (N25S (weight 25 [kg N/ha])))
+  (seed_bed_preparation)(sow "WR")
+  (wait_mm_dd 2 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 175 [kg N/ha])))
+  (wait (or (crop_ds_after "WR" 2.0)(mm_dd 8 9)))
+  (harvest "WR" (stub 10 [cm])(stem 0.01)(leaf 0.01))
+)
+
+(defaction "JB4_1994_Min_WW-WR" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WR")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 165 [kg N/ha])))
+  (wait (or (crop_ds_after "WW-WR" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WR" (stub 10 [cm])(stem 0.7)(leaf 0.7))
+  (wait_mm_dd 9 02)(plowing))
+
+(defaction "JB6_1994_Min_WW-WR" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WR")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 172 [kg N/ha])))
+  (wait (or (crop_ds_after "WW-WR" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WR" (stub 10 [cm])(stem 0.7)(leaf 0.7))
+  (wait_mm_dd 9 02)(plowing))
+
+(defaction "JB4_1994_Min_WW-WW" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WW")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 190 [kg N/ha])))
+  (wait (or (crop_ds_after "WW-WW" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WW" (stub 10 [cm])(stem 0.7)(leaf 0.7))
+  (wait_mm_dd 9 02)(plowing)
+  (sow Grass)
+  (wait_mm_dd 11 1)
+  (plowing))
+
+(defaction "JB6_1994_Min_WW-WW" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WW")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 187 [kg N/ha])))
+  (wait (or (crop_ds_after "WW-WW" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WW" (stub 10 [cm])(stem 0.7)(leaf 0.7))
+  (wait_mm_dd 9 02)(plowing)
+  (sow Grass)
+  (wait_mm_dd 11 1)
+  (plowing))
+
+(defaction ROT_JB4_1994_Min activity
+  JB4_1994_Min_SB    JB4_1994_Min_WW-SB JB4_1994_Min_WR
+  JB4_1994_Min_WW-WR JB4_1994_Min_WW-WW)
+
+(defaction ROT_JB6_1994_Min activity
+  JB6_1994_Min_SB    JB6_1994_Min_WW-SB JB6_1994_Min_WR
+  JB6_1994_Min_WW-WR JB6_1994_Min_WW-WW)
+
+
+;;; 2014 Org
+
+(defaction "JB4_2014_Org_SB" activity
+  (wait_mm_dd 3 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize PS2014 (equivalent_weight 124 [kg N/ha]))
+  (plowing)
+  (seed_bed_preparation)(sow "SB")
+  (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
+  (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
+
+(defaction "JB6_2014_Org_SB" activity
+  (wait_mm_dd 3 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize PS2014 (equivalent_weight 132 [kg N/ha]))
+  (plowing)
+  (seed_bed_preparation)(sow "SB")
+  (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
+  (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
+
+(defaction "JB7_2014_Org_SB" activity
+  (wait_mm_dd 3 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize PS2014 (equivalent_weight 123 [kg N/ha]))
+  (plowing)
+  (seed_bed_preparation)(sow "SB")
+  (wait_days 30)
+  (fertilize (N25S (weight 20 [kg N/ha])))
+  (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
+  (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
+
+(defaction "JB4_2014_Org_WW-SB" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-SB")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 44 [kg N/ha])))
+  (wait_days 30)
+  (fertilize PS2014 (equivalent_weight 125 [kg N/ha]))
+  (wait (or (crop_ds_after "WW-SB" 2.0)(mm_dd 8 18)))
+  (harvest "WW-SB" (stub 10 [cm])(stem 0.7)(leaf 0.7)))
+
+(defaction "JB6_2014_Org_WW-SB" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-SB")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 66 [kg N/ha])))
+  (wait_days 30)
+  (fertilize PS2014 (equivalent_weight 120 [kg N/ha]))
+  (wait (or (crop_ds_after "WW-SB" 2.0)(mm_dd 8 18)))
+  (harvest "WW-SB" (stub 10 [cm])(stem 0.7)(leaf 0.7)))
+
+(defaction "JB7_2014_Org_WW-SB" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-SB")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 72 [kg N/ha])))
+  (wait_days 30)
+  (fertilize PS2014 (equivalent_weight 127 [kg N/ha]))
+  (wait (or (crop_ds_after "WW-SB" 2.0)(mm_dd 8 18)))
+  (harvest "WW-SB" (stub 10 [cm])(stem 0.7)(leaf 0.7)))
+
+(defaction "JB4_2014_Org_WR" activity
+  (wait_mm_dd 8 19)(plowing)
+  (wait_mm_dd 8 20)(fertilize (N25S (weight 25 [kg N/ha])))
+  (seed_bed_preparation)(sow "WR")
+  (wait_mm_dd 2 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize PS2014 (equivalent_weight 125 [kg N/ha]))
+  (fertilize (N25S (weight 56 [kg N/ha])))
+  (wait (after_mm_dd 04 01))
+  (wait (or (crop_ds_after "WR" 2.0)(mm_dd 8 9)))
+  (harvest "WR" (stub 10 [cm])(stem 0.01)(leaf 0.01))
+)
+
+(defaction "JB6_2014_Org_WR" activity
+  (wait_mm_dd 8 19)(plowing)
+  (wait_mm_dd 8 20)(fertilize (N25S (weight 25 [kg N/ha])))
+  (seed_bed_preparation)(sow "WR")
+  (wait_mm_dd 2 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize PS2014 (equivalent_weight 124 [kg N/ha]))
+  (wait (after_mm_dd 04 01))
+  (fertilize (N25S (weight 63 [kg N/ha])))
+  (wait (or (crop_ds_after "WR" 2.0)(mm_dd 8 9)))
+  (harvest "WR" (stub 10 [cm])(stem 0.01)(leaf 0.01))
+)
+
+(defaction "JB7_2014_Org_WR" activity
+  (wait_mm_dd 8 19)(plowing)
+  (wait_mm_dd 8 20)(fertilize (N25S (weight 25 [kg N/ha])))
+  (seed_bed_preparation)(sow "WR")
+  (wait_mm_dd 2 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize PS2014 (equivalent_weight 124 [kg N/ha]))
+  (wait (after_mm_dd 04 01))
+  (fertilize (N25S (weight 65 [kg N/ha])))
+  (wait (or (crop_ds_after "WR" 2.0)(mm_dd 8 9)))
+  (harvest "WR" (stub 10 [cm])(stem 0.01)(leaf 0.01))
+)
+
+(defaction "JB4_2014_Org_WW-WR" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WR")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 35.25 [kg N/ha])))
+  (wait_days 30)
+  (fertilize PS2014 (equivalent_weight 125 [kg N/ha]))
+  (wait (or (crop_ds_after "WW-WR" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WR" (stub 10 [cm])(stem 0.7)(leaf 0.7)))
+
+(defaction "JB6_2014_Org_WW-WR" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WR")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 54 [kg N/ha])))
+  (wait_days 30)
+  (fertilize PS2014 (equivalent_weight 124 [kg N/ha]))
+  (wait (or (crop_ds_after "WW-WR" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WR" (stub 10 [cm])(stem 0.7)(leaf 0.7)))
+
+(defaction "JB7_2014_Org_WW-WR" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WR")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 64 [kg N/ha])))
+  (wait_days 30)
+  (fertilize PS2014 (equivalent_weight 125 [kg N/ha]))
+  (wait (or (crop_ds_after "WW-WR" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WR" (stub 10 [cm])(stem 0.7)(leaf 0.7)))
+
+(defaction "JB4_2014_Org_WW-WW" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WW")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 44 [kg N/ha])))
+  (wait_days 30)
+  (fertilize PS2014 (equivalent_weight 125 [kg N/ha]))
+  (wait (or (crop_ds_after "WW-WW" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WW" (stub 10 [cm])(stem 0.7)(leaf 0.7))
+  (wait_mm_dd 9 02)(plowing)
+  (sow Grass)
+  (wait_mm_dd 11 1)
+  (plowing))
+
+(defaction "JB6_2014_Org_WW-WW" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WW")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 62.25 [kg N/ha])))
+  (wait_days 30)
+  (fertilize PS2014 (equivalent_weight 125 [kg N/ha]))
+  (wait (or (crop_ds_after "WW-WW" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WW" (stub 10 [cm])(stem 0.7)(leaf 0.7))
+  (wait_mm_dd 9 02)(plowing)
+  (sow Grass)
+  (wait_mm_dd 11 1)
+  (plowing))
+
+(defaction "JB7_2014_Org_WW-WW" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WW")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 72.25 [kg N/ha])))
+  (wait_days 30)
+  (fertilize PS2014 (equivalent_weight 126 [kg N/ha]))
+  (wait (or (crop_ds_after "WW-WW" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WW" (stub 10 [cm])(stem 0.7)(leaf 0.7))
+  (wait_mm_dd 9 02)(plowing)
+  (sow Grass)
+  (wait_mm_dd 11 1)
+  (plowing))
+
+(defaction ROT_JB4_2014_Org activity
+  JB4_2014_Org_SB    JB4_2014_Org_WW-SB JB4_2014_Org_WR
+  JB4_2014_Org_WW-WR JB4_2014_Org_WW-WW)
+
+(defaction ROT_JB6_2014_Org activity
+  JB6_2014_Org_SB    JB6_2014_Org_WW-SB JB6_2014_Org_WR
+  JB6_2014_Org_WW-WR JB6_2014_Org_WW-WW)
+
+(defaction ROT_JB7_2014_Org activity
+  JB7_2014_Org_SB    JB7_2014_Org_WW-SB JB7_2014_Org_WR
+  JB7_2014_Org_WW-WR JB7_2014_Org_WW-WW)
+
+;;; 1994 Org
+
+(defaction "JB4_1994_Org_SB" activity
+  (wait_mm_dd 3 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize PS1994 (equivalent_weight 158 [kg N/ha]))
+  (fertilize (N25S (weight 38.1 [kg N/ha])))
+  (plowing)
+  (seed_bed_preparation)(sow "SB")
+  (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
+  (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
+
+(defaction "JB6_1994_Org_SB" activity
+  (wait_mm_dd 3 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize PS1994 (equivalent_weight 158 [kg N/ha]))
+  (fertilize (N25S (weight 28.1 [kg N/ha])))
+  (plowing)
+  (seed_bed_preparation)(sow "SB")
+  (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
+  (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
+
+(defaction "JB4_1994_Org_WW-SB" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-SB")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 150 [kg N/ha])))
+  (fertilize PS1994 (equivalent_weight 158 [kg N/ha]))
+  (wait (or (crop_ds_after "WW-SB" 2.0)(mm_dd 8 18)))
+  (harvest "WW-SB" (stub 10 [cm])(stem 0.7)(leaf 0.7)))
+
+(defaction "JB6_1994_Org_WW-SB" "JB4_1994_Org_WW-SB")
+
+(defaction "JB4_1994_Org_WR" activity
+  (wait_mm_dd 8 19)(plowing)
+  (wait_mm_dd 8 20)
+  (fertilize PS1994 (equivalent_weight 158 [kg N/ha]))
+  (fertilize (N25S (weight 113.1 [kg N/ha])))
+  (seed_bed_preparation)(sow "WR")
+  (wait_mm_dd 2 01)
+  (wait (after_mm_dd 04 01))
+  (wait (or (crop_ds_after "WR" 2.0)(mm_dd 8 9)))
+  (harvest "WR" (stub 10 [cm])(stem 0.01)(leaf 0.01))
+  )
+
+(defaction "JB6_1994_Org_WR" "JB4_1994_Org_WR")
+
+(defaction "JB4_1994_Org_WW-WR" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WR")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 150 [kg N/ha])))
+  (fertilize PS1994 (equivalent_weight 158 [kg N/ha]))
+  (wait (or (crop_ds_after "WW-WR" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WR" (stub 10 [cm])(stem 0.7)(leaf 0.7)))
+
+(defaction "JB6_1994_Org_WW-WR" "JB4_1994_Org_WW-WR")
+
+(defaction "JB4_1994_Org_WW-WW" activity
+  (wait_mm_dd 09 10)(seed_bed_preparation)(sow "WW-WW")
+  (wait_mm_dd 03 01)
+  (wait (or trafficable (mm_dd 04 01)))
+  (fertilize (N25S (weight 150 [kg N/ha])))
+  (fertilize PS1994 (equivalent_weight 158 [kg N/ha]))
+  (wait (or (crop_ds_after "WW-WW" 2.0)(mm_dd 9 1)))
+  (harvest "WW-WW" (stub 10 [cm])(stem 0.7)(leaf 0.7))
+  (wait_mm_dd 9 02)(plowing)
+  (sow Grass)
+  (wait_mm_dd 11 1)
+  (plowing))
+
+(defaction "JB6_1994_Org_WW-WW" "JB4_1994_Org_WW-WW")
+
+(defaction ROT_JB4_1994_Org activity
+  JB4_1994_Org_SB    JB4_1994_Org_WW-SB JB4_1994_Org_WR
+  JB4_1994_Org_WW-WR JB4_1994_Org_WW-WW)
+
+(defaction ROT_JB6_1994_Org activity
+  JB6_1994_Org_SB    JB6_1994_Org_WW-SB JB6_1994_Org_WR
+  JB6_1994_Org_WW-WR JB6_1994_Org_WW-WW)
+
+;;; management.dai ends here.

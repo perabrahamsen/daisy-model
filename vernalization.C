@@ -97,7 +97,7 @@ Temperature sum dependent vernalization.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("DSLim", Attribute::None (), Attribute::Const,
+    frame.declare ("DSLim", "DS", Attribute::Const,
                "Development stage at vernalization.");
     frame.declare ("TaLim", "dg C", Attribute::Const,
                "Vernalization temperature threshold.");

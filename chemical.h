@@ -91,7 +91,6 @@ public:
   				double from, double to) const = 0; // [g/cm^2]
   virtual double S_secondary (size_t i) const = 0;
   virtual double S_primary (size_t i) const = 0;
-  virtual double S_tertiary (size_t i) const = 0;
   
   // Transport.
 public:
@@ -101,10 +100,13 @@ public:
   virtual void set_secondary (const Soil& soil, const SoilWater& soil_water,
                               const std::vector<double>& M,
                               const std::vector<double>& J) = 0;
-  virtual void set_tertiary_full (const std::vector<double>& S_p, 
-                                  const std::vector<double>& J_p) = 0;
-  virtual void set_tertiary_top (const std::vector<double>& S_p, 
-                                 const std::vector<double>& J_p) = 0;
+  virtual void set_tertiary (const std::vector<double>& S_p, 
+			     const std::vector<double>& J_p) = 0;
+  virtual void  add_tertiary (const std::vector<double>& M,
+			      const std::vector<double>& J,
+			      const std::vector<double>& S_M2B,
+			      const std::vector<double>& S_indirect_drain,
+			      const std::vector<double>& S_p_drain) = 0;
 
   // Sink.
 public:

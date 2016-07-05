@@ -103,7 +103,7 @@ SourceFile::read_entry (std::vector<std::string>& entries, Time& time)
   if (!lex.get_entries (entries))
     return false;
 
-  if (!lex.get_time (entries, time, default_hour))
+  if (!lex.get_time_dh (entries, time, default_hour))
     return false;
 
   // If we survived here, everything is fine.

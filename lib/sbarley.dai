@@ -1,3 +1,5 @@
+;;; sbarley.dai - spring barley
+
 (defcrop "Spring Barley" default
 
   (Devel default 
@@ -142,3 +144,5 @@
 
    )
 )
+
+;;; sbarley.dai ends here.

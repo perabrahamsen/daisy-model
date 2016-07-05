@@ -293,6 +293,21 @@ public:
   double total_surface (const std::vector<double>& v, 
                         const double from, const double to) const;
 
+  // Utilities.
+public:
+  // Assume 'flux' is specified for all top edges and there is no
+  // horizontal flux, calculate vertical flux below from mass balance.
+  void biopore_pass_below (const std::vector<double>& from_matrix,
+			   std::vector<double>& flux) const;
+
+  // Assume 'flux' is specified for all top and bottom edges and there
+  // is no horizontal flux, calculate vertical flux and pipe source
+  // (negative) from mass balance.
+  void biopore_pass_pipes (const double pipe_position,
+			   const std::vector<double>& from_matrix,
+			   std::vector<double>& flux,
+			   std::vector<double>& S_from_drain) const;
+
   // Layers -- Support initializing soil arrays layer by layer.
   typedef void (*load_syntax_t) (Frame&);
 public:
@@ -325,24 +340,5 @@ protected:
   Geometry (const Block&);
   virtual ~Geometry ();
 };
-
-// Utilities.
-
-// Assume 'flux' is specified for all top edges and there is no
-// horizontal flux, calculate vertical flux below from mass balance.
-void
-biopore_pass_below (const Geometry& geo,
-                    const std::vector<double>& from_matrix,
-                    std::vector<double>& flux);
-
-// Assume 'flux' is specified for all top and bottom edges and there
-// is no horizontal flux, calculate vertical flux and pipe source
-// (negative) from mass balance.
-void
-biopore_pass_pipes (const Geometry& geo,
-                    const double pipe_position,
-                    const std::vector<double>& from_matrix,
-                    std::vector<double>& flux,
-                    std::vector<double>& S_from_drain);
 
 #endif // GEOMETRY_H

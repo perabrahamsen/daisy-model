@@ -51,6 +51,7 @@ struct EXPORT LogSelect : public Log
   const symbol file;       // Filename.
   const std::vector<std::pair<symbol, symbol>/**/> parameters;      // Par vals.
   std::unique_ptr<Condition> condition;	// Should we print a log now?
+  std::unique_ptr<Condition> active;	// Should we look at data now?
   auto_vector<Select*> entries;
   std::unique_ptr<const Volume> volume;
   const bool print_initial;     // Set if initial values should be printed.

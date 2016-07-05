@@ -576,10 +576,10 @@ ParserFile::Implementation::add_derived (Library& lib)
       const Frame& old = lib.model (name);
       const Filepos& pos = old.own_position ();
       if (pos != Filepos::none ())
-	warning (name + " is already defined in " 
+	error (name + " is already defined in " 
 		 + pos.filename () + ", overwriting");
       else
-	warning (name + " is already defined, overwriting");
+	error (name + " is already defined, overwriting");
       lib.remove (name);
     }
   static const symbol const_symbol ("const");
@@ -929,7 +929,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 
       // Duplicate warning.
       if (found.find (name) != found.end ())
-	warning (name + " specified twice, last takes precedence");
+	error (name + " specified twice, last takes precedence");
       else if (frame.lookup (name) != Attribute::Model // (input file )
                || frame.component (name) != Parser::component)
 	found.insert (name);

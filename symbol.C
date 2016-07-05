@@ -23,7 +23,7 @@
 #include "symbol.h"
 #include "assertion.h"
 #include <sstream>
-#include <map>
+#include <unordered_map>
 #include <ostream>
 
 struct symbol::DB
@@ -31,9 +31,9 @@ struct symbol::DB
   static symbol::DB* data;
   static const int fast_ints;
 
-  typedef std::map<std::string, int> name_map_t;
-  typedef std::map<int, int> int_map_t;
-  typedef std::map<int, std::string> reverse_map_t;
+  typedef std::unordered_map<std::string, int> name_map_t;
+  typedef std::unordered_map<int, int> int_map_t;
+  typedef std::unordered_map<int, std::string> reverse_map_t;
   name_map_t name_map;
   int_map_t int_map;
   reverse_map_t reverse_map;

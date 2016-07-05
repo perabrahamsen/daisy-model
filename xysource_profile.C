@@ -131,7 +131,7 @@ XYSourceProfile::load (const Units& units, Treelog& msg)
       // Read entries.
       if (!lex.get_entries (entries))
         continue;
-      if (!lex.get_time (entries, time, 8))
+      if (!lex.get_time_dh (entries, time, 8))
         continue;
 
       double distance = std::fabs (Time::fraction_hours_between (time, *when));

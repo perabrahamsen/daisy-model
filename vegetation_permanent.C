@@ -170,6 +170,8 @@ struct VegetationPermanent : public Vegetation
              std::vector<double>& residuals_C_soil,
              double dt,
              Treelog&);
+  void clear ()
+  { }
   void force_production_stress  (double)
   { }
   void emerge (const symbol, Treelog&)

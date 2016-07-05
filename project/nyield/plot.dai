@@ -1,0 +1,81 @@
+(defgnuplot plot_N xy
+  (where "N-yield.pdf")
+  (source (frequency (sort sorg_N)
+                     (title "JB4")
+                     (file "JB4_crop-nyield.dlf"))
+          (frequency (sort sorg_N)
+                     (title "JB6")
+                     (file "JB6_crop-nyield.dlf"))
+          (frequency (sort sorg_N)
+                     (title "JB7")
+                     (file "JB7_crop-nyield.dlf"))))
+
+(defgnuplot plot_DM xy
+  (where "DM-yield.pdf")
+  (source (frequency (sort sorg_DM)
+                     (title "JB4")
+                     (file "JB4_crop-nyield.dlf"))
+          (frequency (sort sorg_DM)
+                     (title "JB6")
+                     (file "JB6_crop-nyield.dlf"))
+          (frequency (sort sorg_DM)
+                     (title "JB7")
+                     (file "JB7_crop-nyield.dlf"))))
+
+(defgnuplot plot_Npercent xy
+  (where "N-percent.pdf")
+  (source (frequency (sort (/ sorg_N sorg_DM))
+                     (title "JB4")
+                     (file "JB4_crop-nyield.dlf"))
+          (frequency (sort (/ sorg_N sorg_DM))
+                     (title "JB6")
+                     (file "JB6_crop-nyield.dlf"))
+          (frequency (sort (/ sorg_N sorg_DM))
+                     (title "JB7")
+                     (file "JB7_crop-nyield.dlf"))))
+
+(defgnuplot plot_DM_N xy
+  (where "DM-N_yield.pdf")
+  (source (arithmetic (x sorg_DM)
+                      (y sorg_N)
+                      (with points)
+                      (title "JB4")
+                      (file "JB4_crop-nyield.dlf"))
+          (arithmetic (x sorg_DM)
+                      (y sorg_N)
+                      (with points)
+                      (title "JB6")
+                      (file "JB6_crop-nyield.dlf"))
+          (arithmetic (x sorg_DM)
+                      (y sorg_N)
+                      (with points)
+                      (title "JB7")
+                      (file "JB7_crop-nyield.dlf"))))
+
+(defgnuplot plot_N_DM xy
+  (where "N-DM_yield.pdf")
+  (source (arithmetic (y sorg_DM)
+                      (x sorg_N)
+                      (with points)
+                      (title "JB4")
+                      (file "JB4_crop-nyield.dlf"))
+          (arithmetic (y sorg_DM)
+                      (x sorg_N)
+                      (with points)
+                      (title "JB6")
+                      (file "JB6_crop-nyield.dlf"))
+          (arithmetic (y sorg_DM)
+                      (x sorg_N)
+                      (with points)
+                      (title "JB7")
+                      (file "JB7_crop-nyield.dlf"))))
+
+
+
+
+(defprogram plot gnuplot
+  (graph plot_N plot_DM ;; plot_N_DM plot_DM_N plot_Npercent
+         ))
+
+(run plot)
+

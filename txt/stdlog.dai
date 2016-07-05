@@ -3,6 +3,6 @@
 (run docmodel
      (where "stdlog.tex")
      (component "log")
-     (models "harvest" "Field water" "Soil water"
+     (models "harvest" "Crop" "Field water" "Soil water"
              "Field nitrogen" "Soil nitrogen"
              "Field chemical" "Soil chemical"))

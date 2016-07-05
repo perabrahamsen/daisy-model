@@ -47,6 +47,7 @@ namespace Weatherdata
   symbol DiffRad ();
   symbol RelHum ();
   symbol Wind ();
+  symbol CO2 ();
 
   // Stationary symbols.
   symbol Latitude ();

@@ -1,0 +1,9 @@
+Source: daisy
+Priority: optional
+Maintainer: Per Abrahamsen <per.abrahamsen@gmail.com>
+Homepage: http://daisy.ku.dk
+
+Package: daisy
+Architecture: amd64
+Depends: ${shlibs:Depends}
+Description: Simulated plant production and environmental effects.

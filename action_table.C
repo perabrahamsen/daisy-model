@@ -90,7 +90,7 @@ ActionTable::read_event (const LexerTable& lex,
     return;
 
   Time time (9999, 1, 1, 0);
-  if (!lex.get_time (entries, time, 8))
+  if (!lex.get_time_dh (entries, time, 8))
     return;
 
   const double value = lex.convert_to_double (val);
@@ -117,7 +117,7 @@ ActionTable::read_model (const LexerTable& lex,
       return;
     }
   Time time (9999, 1, 1, 0);
-  if (!lex.get_time (entries, time, 8))
+  if (!lex.get_time_dh (entries, time, 8))
     return;
 
   alists[time] = &library.model (symbol (val));
@@ -137,7 +137,7 @@ ActionTable::read_date (const LexerTable& lex,
     return;
 
   Time time (9999, 1, 1, 0);
-  if (!LexerTable::get_time (val, time, 8))
+  if (!LexerTable::get_time_dh (val, time, 8))
     return;
   
   dates.insert (time);

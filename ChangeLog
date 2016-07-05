@@ -1,6 +1,214 @@
+2016-06-28  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.28 released.
+
+2016-06-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log-std.dai ("Crop"): New log parameterization.
+
+	* production.C (tick): Clear 'Respiration'.
+
+2016-06-27  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.27 released.
+
+2016-06-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* vernalization.C, seed_LAI.C (load_frame): Fix units.
+	* canopy_std.C, crpn.C, production.C (load_syntax): Ditto.
+
+2016-06-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* harvest.C (sorg_N_per_DM): New log variable.
+
+	* block.C (expand_string): "${model}" expand into the name of the
+	model for model types other than Number and Stringer.
+
+2016-06-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log.dai ("Crop Production", "Crop Photosynthesis"): Fix "$["
+	error.
+
+2016-06-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* symbol.C: Changed <map> to <unordered_map>.
+
+2016-05-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* condition_crop.C (with): New condition.
+	* log_select.C (active): New parameter.
+
+2016-05-19  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.26 released.
+
+2016-05-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* photo_Farquhar.C (assimilate): Test CO2_atm is positive.
+	* weatherdata.C, weatherdata.h (CO2): New token.
+	* wsource.h, wsource_weather.h (CO2, has_CO2): New function.
+	* wsource_weather.C (my_CO2, tick, CO2, has_CO2, output, co2): Use is.
+
+2016-05-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* select.h, select.C (Handle::content_sum): New handle.
+	* select_array.C, select_value.C (done_small): Support it.
+
+2016-05-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* field.h, field.C, column.h, column_std.C, organic.h, organic_std.C: 
+	* action_tillage.C (store_SOM, restore_SOM): New actions.
+	* organic.h, organic_std.C (stored_SOM_C, stored_SOM_M): New state
+	parables.
+
+2016-05-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* vegetation_crops.C (my_harvest): New log variable ('harvest').
+	(harvest, pluck, output, load_frame): Support it.
+
+2016-05-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* parser_file.C (load_list, add_derived): Made duplicate
+	definitions errors instead of warnings.
+
+2016-05-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* organic_std.C (update_pools): Allow for zero N.
+
+2016-05-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* vegetation_crops.C, vegetation_permanent.C:
+	* vegetation_afforestation.C, vegetation.h (clear): New function.
+	* column_std.C (clear): Call it.
+
+2016-04-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* summary_fractiles.C: New model.
+
+2016-04-04  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.25 released.
+
+2016-03-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log.dai ("Soil Chemicals", "Tertiary chemical sink"): Removed.
+	("Groundwater"): Removed N.
+	("Drain Sink NO3", "Drain Sink NH4"): Matrix sink only.
+	("Colloids balance", "Colloids"): Updated.
+
+2016-03-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* select_volume.C, select_flow.C (output_array): Ignore empty arrays.
+	* chemical_std.C (M_tertiary, S_p_drain, S_soil_drain, S_B2M)
+	(S_M2B): New log variables.
+	(S_drain, S_tertirary): Removed.
+	* chemical_std.C, chemical.h (add_tertiary): New function.
+	* biopore_drain.C, biopore_matrix.C, biopore.h (matrix_solute):
+	Change argument list.
+	* tertiary_biopores.C (solute): Update caller.
+	* lib/log-std.dai ("Soil chemical", "Field chemical"):
+	("Soil nitrogen", "Field nitrogen"): Use new log variables.
+
+2016-03-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C, chemical.h (set_tertiary): Merged
+	'set_tertiary_full' and 'set_tertiary_top'.
+	(need_fake_tertiary): Removed.
+	(tick_after): Update caller.
+	(pass_below): Removed.
+
+	* biopore_matrix.C (M): New state variable.
+	* biopore_drain.C (S_chem_to_drain): New log variable.
+	(S_to_drain): Renamed from 'S_from_drain'.
+	* biopore.h, biopore.C (S_chem, J): New log variables.
+	* lib/log.dai (biopore-chemical, "Biopore content")
+	("Biopore chemical", "Biopore water"): Log individial biopore
+	classes.
+
+	* imvec.C (output): Allow inheritance for chemicals, e.g. 'N'
+	matching both 'NO3' and 'NH4'.
+
+2016-03-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* im.C, im.h (soil_unit): New function.
+
+	* geometry.C (biopore_pass_pipes, biopore_pass_below): Made them
+	members of 'Geometry'.
+
+2016-03-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* imvec.C, imvec.h (clear, print, multiply): New functions.
+	* im.C, im.h (sink_unit): New function.
+
+2016-03-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* imvec.h, imvec.C (get_array): Added non-const version.
+	(clear): New function.
+
+	* im.C, im.h (add_value_raw): New function.
+	(get_value_raw, set_value_raw): Made public.
+
+2016-03-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* imvec.C, imvec.h (add_syntax): Add 'size' argument.
+	(clear): New function.
+
+	* biopore_matrix.C (load_solute): Update caller.
+	(solute): Changed from pointer to member.
+
+2016-03-14  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.24 released.
+
+2016-03-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* biopore_matrix.C (update_cell_water): Add tiny number to 'top' to
+	avoid numerical noise.
+
+	* lexer_table.C (get_time_dh_do): Forgot to set 'date_only'.
+
+	* lexer_table.h, lexer_table.C (get_time_dh, get_time_do):
+	(get_time_dh_do): Split from overloaded 'get_time'.
+	* xysource_profile.C (load):
+	* program_post.C (run):
+	* gnuplot_vector.C (load_when, load_interval):
+	* depth.C (Depth):
+	* source_file.C (read_entry):
+	* xysource_flux.C (load_when, load_interval): Update caller
+
+2016-03-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* condedge.C (Condedge): Commented out set but nut used variables.
+
+	* toplevel.C (copyright): Fix copyright date. Use Latin1 oslash on Windows.
+
+	* setup-w32.nsi, setup-w64.nsi: Update Daisy homepage.
+
+	* fao.C (RefPenmanMonteith): Added units in comments.
+
+	* pet_FAO_PM.C (use_wet): Changed default to 'false'.
+
+2016-03-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* Makefile (debian-setup): Renamed from 'debian', handle
+	dependencies.
+
+2016-03-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* Makefile (BOOSTINC, CXSPARSELIB): Use system version under Unix.
+
+	* program_post.C (run): Removed unused variable.
+
+2016-03-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* phenology_std.C (tick_daily): Don't clear production here.
+	* crop_std.C (tick): Clear it here instead.
+
+	* production.C ("WCrop"): New log variable.
+
 2016-03-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* toplevel.C (copyright): Make 'Søren Hansen' UTF-8.
+	* toplevel.C (copyright): Make 'S{\o}ren Hansen' UTF-8.
 
 	* all: slang warnings cleanup.
 
@@ -3377,7 +3585,7 @@
 2007-12-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* solver.C: Made it a component.
-	* Makefile (COMPONENTS): Added ít.
+	* Makefile (COMPONENTS): Added it.
 	(OTHER): Remove it.
 	* solver_ublas.C, solver_cxsparse.C, solver_none.C: New models.
 	(MODELS): Added them.

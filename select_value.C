@@ -66,6 +66,9 @@ SelectValue::done_small (const double ddt)
     case Handle::sum:
       value += small_value * ddt;
       break;
+    case Handle::content_sum:
+      value += small_value;
+      break;
     case Handle::min:
       if (first_small)
         value = small_value;
@@ -112,6 +115,7 @@ SelectValue::done_small (const double ddt)
          }
        break;
      case Handle::sum:
+     case Handle::content_sum:
      case Handle::min:
      case Handle::max:
      case Handle::current:

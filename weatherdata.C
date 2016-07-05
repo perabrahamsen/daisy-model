@@ -94,6 +94,9 @@ namespace Weatherdata
   symbol Wind ()
   { static const symbol name ("Wind"); return name; }
 
+  symbol CO2 ()
+  { static const symbol name ("CO2"); return name; }
+
   // Stationary symbols.
   symbol Latitude ()
   { static const symbol name ("Latitude"); return name; }
@@ -231,6 +234,8 @@ Reference evapotranspiration.", "mm/h", -10, 20);
       (*this)["DiffRad"] = DDT ("Diffuse radiation.", "W/m^2", 0, 1400);
       (*this)["RelHum"] = DDT ("Relative humidity.", "fraction", 0, 5000);
       (*this)["Wind"] = DDT ("Wind speed.", "m/s", 0, 40);
+      (*this)["CO2"] = DDT ("Atmospheric CO2 level.", Attribute::Fraction (),
+                            100, 2000);
       (*this)["Latitude"] = DDT ("\
 Location of station (north-south).", "dgNorth", -90, 90);
       (*this)["Longitude"] = DDT ("\

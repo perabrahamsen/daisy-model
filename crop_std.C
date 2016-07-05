@@ -585,7 +585,10 @@ CropStandard::tick (const Metalib& metalib,
       return;
     }
   if (development->mature ())
-    return;
+    {
+      production.none ();
+      return;
+    }
 
   daisy_assert (production.AM_root);
   daisy_assert (production.AM_leaf);

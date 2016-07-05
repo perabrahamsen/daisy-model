@@ -98,7 +98,6 @@ PhenologyStandard::tick_daily (const double Ta, const bool leaf_growth,
         {
           out.message ("Ripe");
           DS = DSMature;
-          production.none ();
         }
     }
   daisy_assert (DS <= defined_until_ds);

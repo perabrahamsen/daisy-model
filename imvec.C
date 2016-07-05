@@ -30,6 +30,7 @@
 #include "block_model.h"
 #include "units.h"
 #include "frame_submodel.h"
+#include <sstream>
 
 const std::vector<double>& 
 IMvec::get_array (symbol chem) const
@@ -41,10 +42,13 @@ IMvec::get_array (symbol chem) const
   return empty;
 }
 
+std::vector<double>& 
+IMvec::get_array (symbol chem)
+{ return content[chem]; }
+
 void
 IMvec::set_array (symbol chem, const std::vector<double>& array)
 { content[chem] = array; }
-
 
 double 
 IMvec::get_value (symbol chem, size_t index) const
@@ -73,10 +77,32 @@ IMvec::add_value (symbol chem, size_t index, double value)
   else
     {
       std::vector<double>& array = (*i).second;
-      while (array.size () < index + 1)
-        array.push_back (0.0);
+      if (array.size () < index + 1)
+	array.resize (index + 1);
       array[index] += value;
     }
+}
+
+void
+IMvec::clear ()
+{
+  for (map_type::iterator i = content.begin (); 
+       i != content.end ();
+       i++)
+    {
+      std::vector<double>& array = (*i).second;
+      std::fill (array.begin (), array.end (), 0.0);
+    }
+}
+
+void
+IMvec::multiply (const double factor)
+{
+  for (map_type::iterator i = content.begin (); 
+       i != content.end ();
+       i++)
+    for (auto& v : (*i).second)
+      v *= factor;
 }
 
 void
@@ -87,7 +113,7 @@ IMvec::output (Log& log) const
        i++)
     {
       const symbol name = (*i).first;
-      if (!log.check_interior (name))
+      if (!log.check_entry (name, Chemical::component))
 	continue;
 
       Log::Named named (log, name);
@@ -97,15 +123,39 @@ IMvec::output (Log& log) const
     }
 }
 
+const std::string 
+IMvec::print () const
+{
+  std::ostringstream tmp;
+  tmp << "(imvec";
+  for (map_type::const_iterator i = content.begin (); 
+       i != content.end ();
+       i++)
+    {
+      const symbol name = (*i).first;
+      const std::vector<double>& value = (*i).second;
+      tmp << " (" << name;
+      for (auto v : value)
+	tmp << " " << v;
+      tmp << ")";
+    }
+  tmp << ")";
+  return tmp.str ();
+}
+
+
 void 
 IMvec::add_syntax (Frame& frame,
-                   Attribute::category cat, 
+                   const Attribute::category cat, 
+		   const int size,
                    const symbol dimension)
 {
+  daisy_assert (size != Attribute::Singleton);
+  daisy_assert (size != Attribute::Unspecified);
   frame.declare_string ("name", cat, "Name of chemical.");
   frame.set_check ("name", Chemical::check_library ());
   frame.declare ("value", dimension, Check::none/*_negative*/ (), cat,
-             Attribute::Variable, "Value for chemical.");
+		 size, "Value for chemical.");
   frame.order ("name", "value");
 }
 
@@ -122,6 +172,9 @@ find_unit (const BlockModel& parent, const char* key)
 IMvec::IMvec (const BlockModel& parent, const char* key)
   : unit_ (find_unit (parent, key))
 {
+  if (!parent.check (key))
+    return;
+
   const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& alists
     = parent.submodel_sequence (key);
   for (size_t i = 0; i < alists.size (); i++)

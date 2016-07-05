@@ -395,7 +395,9 @@ Oldunits::multiply (const symbol one, const symbol two)
         { "g/cm^2/h", "h", "g/cm^2"},
         { "g", "cm^-2", "g/cm^2"},
         { "mg/m^2", "mm^-1", "ppm"},
-        { "g/cm^2", "h^-1", "g/cm^2/h"},    
+        { "g/cm^2", "h^-1", "g/cm^2/h"},
+        // bioclimate.C
+        { "W/m^2", "h", "Wh/m^2"},
       };
       for (unsigned int i = 0; i < sizeof (table) / sizeof (multiply_table); i++)
         {

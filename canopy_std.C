@@ -249,7 +249,7 @@ Used only after the intital phase.");
 	      "Relative photosynthetic efficiency of stem.\n\
 Used only after the intital phase.");
   frame.set ("StemPhotEff", 1.0);
-  frame.declare ("HvsDS", Attribute::None (), "cm", Attribute::Const,
+  frame.declare ("HvsDS", "DS", "cm", Attribute::Const,
 	      "Crop height as function of DS.");
   PLF HvsStem;
   HvsStem.add (0.00 , 0.10);

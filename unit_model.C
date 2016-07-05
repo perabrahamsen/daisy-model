@@ -700,7 +700,19 @@ Connvert to SI base units by multiplying with a factor.")
     add ("W", 1.0, 2, 1, -3, 0, 0, 0, 0,
          "Watt.");
 
-    // Energy flux per area.
+    // Energy per area,
+    add ("J/m^2", 1.0, 2, 1, -2, 0, 0, 0, 0,
+         "Joule per square meter.");
+    add ("kJ/m^2", p_k, 2, 1, -2, 0, 0, 0, 0,
+         "Kilojoule per square meter.");
+    add ("MJ/m^2", p_M, 2, 1, -2, 0, 0, 0, 0,
+         "Megajoule per square meter.");
+    add ("Wh/m^2", u_h, 2, 1, -2, 0, 0, 0, 0,
+         "Watthours per square meter.");
+    add ("kWh/m^2", p_k * u_h, 2, 1, -2, 0, 0, 0, 0,
+         "Kilowatthours per square meter.");
+    
+         // Energy flux per area.
     add ("W/m^2", 1.0, 0, 1, -3, 0, 0, 0, 0,
          "Watt per square meter.");
     add ("W m^-2", 1.0, 0, 1, -3, 0, 0, 0, 0,

@@ -85,7 +85,7 @@ Biopore::max_infiltration_rate (const Geometry& geo, size_t e) const // [cm/h]
 
 void 
 Biopore::infiltrate (const Geometry& geo, size_t e,
-                     const double amount, const double dt)
+                     const double amount /* [cm] */, const double dt)
 {
   daisy_assert (e < geo.edge_size ());
   daisy_assert (std::isfinite (amount));
@@ -105,9 +105,11 @@ Biopore::solute_infiltrate (const symbol chem,
                             const double dt)
 {
   daisy_assert (std::isfinite (amount));
+  const double edge_area = geo.edge_area (e);
   const double total_area = geo.surface_area ();
   solute_infiltration.add_value (chem, solute_infiltration.unit (), 
                                  amount / total_area / dt);
+  J.add_value (chem, e, amount / edge_area / dt);
 }
 
 double 
@@ -123,6 +125,7 @@ void
 Biopore::clear ()
 { 
   std::fill (q.begin (), q.end (), 0.0);
+  J.clear ();
   infiltration = 0.0; 
   solute_infiltration.clear ();
 }
@@ -194,11 +197,7 @@ Biopore::scale_sink (const double scale)
   daisy_assert (std::isfinite (scale));
   const size_t cell_size = S.size ();
   for (size_t c = 0; c < cell_size; c++)
-    {
-      daisy_assert (std::isfinite (S[c]));
-      S[c] *= scale;
-      daisy_assert (std::isfinite (S[c]));
-    }
+    S[c] *= scale;
 }
 
 void 
@@ -213,11 +212,13 @@ Biopore::output_base (Log& log) const
     else 
       B2M[c] = S[c];
   output_variable (S, log);
+  output_submodule (S_chem, "S_chem", log);
   output_variable (B2M, log);
   output_variable (M2B, log);
   output_variable (infiltration, log);
   output_submodule (solute_infiltration, "solute_infiltration", log);
   output_variable (q, log);
+  output_submodule (J, "J", log);
 }
 
 bool
@@ -300,8 +301,10 @@ Biopore::Biopore (const BlockModel& al)
     height_start (al.number ("height_start")),
     height_end (al.number ("height_end")),
     diameter (al.number ("diameter")),
+    S_chem (al, "S_chem"),
     infiltration (0.0),
-    solute_infiltration (al.units ().get_unit (IM::flux_unit ()))
+    solute_infiltration (al.units ().get_unit (IM::flux_unit ())),
+    J (al, "J")
 { }
 
 Biopore::~Biopore ()
@@ -313,9 +316,14 @@ static struct BioporeInit : public DeclareComponent
     : DeclareComponent (Biopore::component, "\
 A single class of biopores.")
   { }
+  static void load_S_chem (Frame& frame)
+  { IMvec::add_syntax (frame, Attribute::LogOnly, Attribute::SoilCells, 
+		       IM::sink_unit ()); }
   static void load_flux (Frame& frame)
   { IM::add_syntax (frame, Attribute::LogOnly, IM::flux_unit ()); }
-
+  static void load_J (Frame& frame)
+  { IMvec::add_syntax (frame, Attribute::LogOnly, Attribute::SoilEdges, 
+		       IM::flux_unit ()); }
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("density", Number::component, 
@@ -329,6 +337,8 @@ Biopore density [cm^-2] as a function of 'x' [cm].");
                 Attribute::Const, "Biopore diameter.");
     frame.declare ("S", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                 "Total stream from matrix domain to biopore.");
+    frame.declare_submodule_sequence ("S_chem", Attribute::LogOnly, "\
+Matrix to biopore term for solutes.", load_S_chem);
     frame.declare ("M2B", "cm^3/cm^3/h", 
                    Attribute::LogOnly, Attribute::SoilCells,
                    "Strem from matrix domain to biopore.  Never negative.");
@@ -339,9 +349,11 @@ Biopore density [cm^-2] as a function of 'x' [cm].");
 Surface infiltration.");
     frame.declare_submodule_sequence ("solute_infiltration", Attribute::LogOnly, "\
 Rate of solute infiltration through surface.", load_flux);
-    frame.declare ("q", "cm^3/cm^3", 
+    frame.declare ("q", "cm/h", 
                    Attribute::LogOnly, Attribute::SoilEdges, "\
 Water flow in this biopore class.");
+    frame.declare_submodule_sequence ("J", Attribute::LogOnly, "\
+Solute flux between cells.", load_J);
   }
 } Biopore_init;
 

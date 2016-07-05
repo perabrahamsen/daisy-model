@@ -233,7 +233,7 @@ WSourceTable::read_line ()
   std::vector<std::string> entries;
   bool date_only;
   if (!lex.get_entries (entries)
-      || !lex.get_time (entries, timestep_end, date_only))
+      || !lex.get_time_do (entries, timestep_end, date_only))
     {
       lex.warning ("No more weather data.");
       ok = false;

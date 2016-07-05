@@ -121,7 +121,7 @@ Initial crop growth is governed by a forced LAI function.")
   void load_frame (Frame& frame) const
   {
     // Parameters.
-    frame.declare ("DSLAI05", Attribute::None (), Attribute::Const,
+    frame.declare ("DSLAI05", "DS", Attribute::Const,
                 "DS at CAI=0.5; initial phase.");
     frame.set ("DSLAI05", 0.15);
     frame.declare ("SpLAIfac", "DS", Attribute::None (), Attribute::Const, "\

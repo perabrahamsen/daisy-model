@@ -132,6 +132,10 @@ struct SelectArray : public Select
         for (size_t i = 0; i < small_value.size (); i++)
           value[i] += small_value[i] * ddt;
         break;
+      case Handle::content_sum:
+        for (size_t i = 0; i < small_value.size (); i++)
+          value[i] += small_value[i];
+        break;
       case Handle::min:
         if (first_small)
           value = small_value;

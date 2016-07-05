@@ -56,7 +56,7 @@ struct BioporeMatrix : public Biopore
 
   // State.
   std::vector<double> h_bottom; // [cm]
-  std::unique_ptr<IMvec> solute;  // [g]
+  IMvec solute;			// [g]
   struct MyContent : public Anystate::Content
   {
     std::vector<double> h_bottom;
@@ -77,6 +77,7 @@ struct BioporeMatrix : public Biopore
   std::vector<double> h3_soil;
   std::vector<double> z3_lowest;
   std::vector<double> Theta;    // [cm^3/cm^3], cell based water content.
+  IMvec M;			// [g/cm^3], cell based solute content.
 
   // Utilities.
   /* const */ double dy;                    // [cm]
@@ -158,8 +159,10 @@ struct BioporeMatrix : public Biopore
                     std::vector<double>&) const;
   void add_solute (symbol chem, size_t cell, const double amount /* [g] */);
   void matrix_solute (const Geometry& geo, const double dt, 
-                      const Chemical& chemical, std::vector<double>& source_chem,
-                      Treelog& msg);
+                      Chemical& chemical, Treelog& msg);
+  void update_cell_solute (const Geometry& geo, const symbol chem, 
+			   const double dt);
+
   void output (Log&) const;
 
   // Create and Destroy.
@@ -240,12 +243,12 @@ BioporeMatrix::total_water () const
 void
 BioporeMatrix::get_solute (IM& im) const
 {
-  const Unit& my_unit = solute->unit ();
+  const Unit& my_unit = solute.unit ();
   const size_t col_size = xplus.size ();
-  for (IMvec::const_iterator i = solute->begin (); i != solute->end (); ++i)
+  for (IMvec::const_iterator i = solute.begin (); i != solute.end (); ++i)
     {
       const symbol chem = *i;
-      const std::vector<double>& array = solute->get_array (chem);
+      const std::vector<double>& array = solute.get_array (chem);
       daisy_assert (array.size () <= col_size);
       const double sum = std::accumulate (array.begin (), array.end (), 0.0);
       im.add_value (chem, my_unit, sum);
@@ -795,39 +798,35 @@ BioporeMatrix::column_water (const size_t col) const
 void
 BioporeMatrix::update_cell_water (const Geometry& geo, const double dt)
 {
+  const size_t cell_size = geo.cell_size ();
   const std::vector<double> Theta_old = Theta;
   const size_t col_size = xplus.size ();
   daisy_assert (h_bottom.size () == col_size);
   std::fill (Theta.begin (), Theta.end (), 0.0);
+  daisy_assert (Theta.size () == cell_size);
   double last_x = 0.0;
   double total_water = 0.0;     // [cm^3]
+
   for (size_t col = 0; col < col_size; col++)
     {
       const double next_x = xplus[col];
       if (h_bottom[col] > 0.0)
         {
-          const double top = height_end + h_bottom[col];
-          if (top > height_end)
-            {
-              const double water = column_water (col);
-              geo.add_soil (Theta, top, height_end, last_x, next_x, water);
-              total_water += water;
-            }
-          else
-            // May happen if abs(h[bottom]) << abs(height_end);
-            isequal (top, height_end);
+          double top = height_end + std::max (h_bottom[col], 1e-10);
+	  const double water = column_water (col);
+	  geo.add_soil (Theta, top, height_end, last_x, next_x, water);
+	  total_water += water;
         }
       last_x = next_x;
     }
   daisy_approximate (total_water, geo.total_soil (Theta));
 
   // Update flux
-  const size_t cell_size = geo.cell_size ();
   std::vector<double> source (cell_size, 0.0);
   for (size_t c = 0; c < cell_size; c++)
     source[c] = S[c] - (Theta[c] - Theta_old[c]) / dt;
 
-  biopore_pass_below (geo, source, q);
+  geo.biopore_pass_below (source, q);
 }
 
 void
@@ -873,23 +872,22 @@ BioporeMatrix::add_solute (const symbol chem,
 {
   daisy_assert (cell < column.size ());
   const size_t col = column[cell];
-  solute->add_value (chem, col, amount);
+  solute.add_value (chem, col, amount);
 }
 
 void 
 BioporeMatrix::matrix_solute (const Geometry& geo, const double dt, 
-                              const Chemical& chemical,
-                              std::vector<double>& source_chem,
-                              Treelog& msg)
+                              Chemical& chemical, Treelog& msg)
 {
   TREELOG_MODEL (msg);
   const symbol chem = chemical.objid;
   const size_t cell_size = geo.cell_size ();
-  daisy_assert (source_chem.size () == cell_size);
-  std::vector<double> sink_chem (cell_size, 0.0);
+  std::vector<double>& sink_chem = S_chem.get_array (chem);
+  sink_chem.resize (cell_size);
+  std::fill (sink_chem.begin (), sink_chem.end (), 0.0);
 
   // Old content.
-  const std::vector<double>& old_array = solute->get_array (chem);
+  const std::vector<double>& old_array = solute.get_array (chem);
   const double old_content
     = std::accumulate (old_array.begin (), old_array.end (), 0.0);
 
@@ -951,7 +949,7 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
           continue;
         }
       daisy_assert (total_water > 0.0);
-      const double M = solute->get_value (chem, col); // [g]
+      const double M = solute.get_value (chem, col); // [g]
       if (M <= 0.0)
         continue;
       const double C = M / total_water; // [g/cm^3 W]
@@ -970,9 +968,6 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
     }
 
   // Export.
-  for (size_t c = 0; c < cell_size; c++)
-    source_chem[c] -= sink_chem[c];
-
   double total_in = 0.0;
   double total_out = 0.0;
   for (size_t c = 0; c < cell_size; c++)
@@ -983,7 +978,7 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
       else 
         total_out -= amount;
     }
-  const std::vector<double>& new_array = solute->get_array (chem);
+  const std::vector<double>& new_array = solute.get_array (chem);
   const double new_content
     = std::accumulate (new_array.begin (), new_array.end (), 0.0);
   const double growth = total_in - total_out;
@@ -997,6 +992,61 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
           << ", gain: " << error;
       msg.message (tmp.str ());
     }
+
+  update_cell_solute (geo, chem, dt);
+  const std::vector<double> empty_cell (cell_size, 0.0);
+  const std::vector<double>& M_array = M.get_array (chem);
+  const std::vector<double>& M_S = S_chem.get_array (chem);
+  const std::vector<double>& Jc = J.get_array (chem);
+  if (M_array.size () > 0)
+    chemical.add_tertiary (M_array, Jc, M_S, empty_cell, empty_cell);
+}
+
+void
+BioporeMatrix::update_cell_solute (const Geometry& geo, const symbol chem,
+				   const double dt)
+{
+  const std::vector<double>& solute_array 
+    = solute.get_array (chem);
+  if (solute_array.size () == 0)
+    return;
+
+  const size_t cell_size = geo.cell_size ();
+  const size_t col_size = xplus.size ();
+  daisy_assert (solute_array.size () == col_size);
+  
+  std::vector<double>& M_array = M.get_array (chem);
+  M_array.resize (cell_size, 0.0);
+  std::vector<double> M_old = M_array;
+  std::fill (M_array.begin (), M_array.end (), 0.0);
+
+  double last_x = 0.0;
+  double total_M = 0.0;     // [g]
+  for (size_t col = 0; col < col_size; col++)
+    {
+      const double next_x = xplus[col];
+
+      const double amount = solute_array[col];
+      if (amount > 0.0)
+	{
+	  double top = height_end + std::max (h_bottom[col], 1e-10);
+	  geo.add_soil (M_array, top, height_end, last_x, next_x, 
+			amount);
+	  total_M += amount;
+	}
+    }
+  daisy_approximate (total_M, geo.total_soil (M_array));
+
+  // Update flux
+
+  std::vector<double>& J_array = J.get_array (chem);
+  const size_t edge_size = geo.edge_size ();
+  J_array.resize (edge_size);
+  const std::vector<double>& M_S = S_chem.get_array (chem);
+  std::vector<double> M_source (cell_size, 0.0);
+  for (size_t c = 0; c < cell_size; c++)
+    M_source[c] = M_S[c] - (M_array[c] - M_old[c]) / dt;
+  geo.biopore_pass_below (M_source, J_array);
 }
 
 void
@@ -1004,12 +1054,13 @@ BioporeMatrix::output (Log& log) const
 {
   output_base (log);
   output_variable (h_bottom, log);
-  output_submodule (*solute, "solute", log);
+  output_submodule (solute, "solute", log);
   output_lazy (total_water (), "water", log);
   output_variable (iterations, log);
   output_variable (h3_soil, log);
   output_variable (z3_lowest, log);
   output_variable (Theta, log);
+  output_submodule (M, "M", log);
 }
 
 bool 
@@ -1135,7 +1186,8 @@ BioporeMatrix::BioporeMatrix (const BlockModel& al)
     h_bottom (al.check ("h_bottom") 
               ? al.number_sequence ("h_bottom") 
               : std::vector<double> ()),
-    solute (new IMvec (al, "solute"))
+    solute (al, "solute"),
+    M (al, "M")
 { }
 
 static struct BioporeMatrixSyntax : DeclareModel
@@ -1148,7 +1200,11 @@ static struct BioporeMatrixSyntax : DeclareModel
 Biopores that ends in the matrix.")
   { }
   static void load_solute (Frame& frame)
-  { IMvec::add_syntax (frame, Attribute::OptionalState, IM::mass_unit ()); }
+  { IMvec::add_syntax (frame, Attribute::OptionalState, Attribute::Variable,
+		       IM::mass_unit ()); }
+  static void load_M (Frame& frame)
+  { IMvec::add_syntax (frame, Attribute::LogOnly, Attribute::SoilCells,
+		       IM::soil_unit ()); }
   void load_frame (Frame& frame) const
   { 
     frame.declare ("xplus", "cm", Check::positive (), 
@@ -1179,6 +1235,8 @@ Water may not enter the macropore below this depth.");
     frame.declare ("Theta", "cm^3/cm^3", 
                    Attribute::LogOnly, Attribute::SoilCells, "\
 Water content in this biopore class.");
+    frame.declare_submodule_sequence ("M", Attribute::LogOnly, "\
+Chemical content in soil cells.", load_M);
     frame.declare_integer ("max_iterations", Attribute::Const, "\
 Maximum number of iterations when seeking convergence.");
     frame.set ("max_iterations", 50);

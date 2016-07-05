@@ -873,7 +873,7 @@ Geometry::~Geometry ()
 // Utilities.
 
 static void
-biopore_pass_below (const Geometry& geo,
+biopore_pass_below5 (const Geometry& geo,
                     const std::vector<double>& from_matrix,
                     const size_t edge_above,
                     const int cell_above,
@@ -913,21 +913,21 @@ biopore_pass_below (const Geometry& geo,
   const double area_below = geo.edge_area (lowest_edge);
   const double flux_below = volume_below / area_below;
   flux[lowest_edge] = flux_below;
-  biopore_pass_below (geo, from_matrix, lowest_edge, cell, flux);
+  biopore_pass_below5 (geo, from_matrix, lowest_edge, cell, flux);
 }
 
 void
-biopore_pass_below (const Geometry& geo,
-                    const std::vector<double>& from_matrix,
-                    std::vector<double>& flux)
+Geometry::biopore_pass_below (const std::vector<double>& from_matrix,
+			      std::vector<double>& flux) const
 {
   // Update flux
-  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const std::vector<size_t>& edge_above = cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
   for (size_t i = 0; i < edge_above_size; i++)
     {
       const size_t edge = edge_above[i];
-      biopore_pass_below (geo, from_matrix, edge, Geometry::cell_above, flux);
+      biopore_pass_below5 (*this, from_matrix, edge, 
+			   Geometry::cell_above, flux);
     }
 }
 
@@ -1042,32 +1042,31 @@ biopore_pass_pipe_above (const Geometry& geo,
 }
 
 void
-biopore_pass_pipes (const Geometry& geo,
-                    const double pipe_position,
-                    const std::vector<double>& from_matrix,
-                    std::vector<double>& flux,
-                    std::vector<double>& S_from_drain)
+Geometry::biopore_pass_pipes (const double pipe_position,
+			      const std::vector<double>& from_matrix,
+			      std::vector<double>& flux,
+			      std::vector<double>& S_from_drain) const
 {
   // Update flux starting from the top.
   const std::vector<size_t>& edge_above 
-    = geo.cell_edges (Geometry::cell_above);
+    = cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
   for (size_t i = 0; i < edge_above_size; i++)
     {
       const size_t edge = edge_above[i];
-      biopore_pass_pipe_below (geo, pipe_position, from_matrix,
+      biopore_pass_pipe_below (*this, pipe_position, from_matrix,
                                edge, Geometry::cell_above,
                                flux, S_from_drain);
     }
   // Update flux starting from the bottom.
   const std::vector<size_t>& edge_below 
-    = geo.cell_edges (Geometry::cell_below);
+    = cell_edges (Geometry::cell_below);
   const size_t edge_below_size = edge_below.size ();
   for (size_t i = 0; i < edge_below_size; i++)
     {
       const size_t edge = edge_below[i];
       daisy_assert (iszero (flux[edge]));
-      biopore_pass_pipe_above (geo, pipe_position, from_matrix,
+      biopore_pass_pipe_above (*this, pipe_position, from_matrix,
                                edge, Geometry::cell_below, 
                                flux, S_from_drain);
     }

@@ -60,6 +60,8 @@ Harvest::output (Log& log) const
   output_variable (water_stress_days, log);
   output_variable (nitrogen_stress_days, log);
   output_variable (water_productivity, log);
+  if (sorg_DM > 0.0)
+    output_value (sorg_N / sorg_DM, "sorg_N_per_DM", log);
 }
 
 void 
@@ -101,6 +103,8 @@ Harvest::load_syntax (Frame& frame)
               "Production days lost due to water stress.");
   frame.declare ("water_productivity", "kg DM/m^3 H2O", Attribute::State, 
               "Storage organ harvested per evapotranspiration.");
+  frame.declare_fraction ("sorg_N_per_DM", Attribute::LogOnly, "\
+Nitrogen fraction is storage dy matter.");
 }
 
 Harvest::Harvest (const Block& alist)

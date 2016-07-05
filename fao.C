@@ -213,18 +213,23 @@ FAO::PenmanMonteith (double CropHeight, double ScreenHeight,
   return (E1 + E2);
 }
 
-double
-FAO::RefPenmanMonteith (double Rn, double G, double Temp, double ea,
-			double U2, double AtmPressure)
+double					   // [kg/m^2/s]
+FAO::RefPenmanMonteith (double Rn, // [W/m^2]
+			double G,  // [W/m^2]
+			double Temp, // [dg C]
+			double ea,   // [Pa]
+			double U2, // [m/s]
+			double AtmPressure // [Pa]
+			)
 {
-  const double s = SlopeVapourPressureCurve (Temp);
-  const double gamma = PsychrometricConstant (AtmPressure, Temp);
-  const double e_sat = SaturationVapourPressure (Temp);
+  const double s = SlopeVapourPressureCurve (Temp); // [Pa/K]
+  const double gamma = PsychrometricConstant (AtmPressure, Temp); // [Pa/K]
+  const double e_sat = SaturationVapourPressure (Temp);		  // [Pa]
   double E3 = 0.03525 * s * (Rn - G) +
     gamma * 0.9 / (Temp + 273) * U2 *
     (e_sat - ea);
   E3 /= s + gamma * (1 + 0.34 * U2);
-  const double value = E3 / 86400.0; // [kg/m2/s]
+  const double value = E3 / 86400.0; // [kg/m^2/s]
 #if 0
   std::ostringstream tmp;
   tmp << "Rn = " << Rn << ", G = " << G << ", Temp = " << Temp

@@ -125,11 +125,24 @@ struct ChemicalStandard : public Chemical
   std::vector<double> M_primary_; // Content in primary domain [g/cm^3]
   std::vector<double> M_total_; // Concentration in soil [g/cm^3]
   std::vector<double> M_error; // Accumulated error [g/cm^3]
+  std::vector<double> M_tertiary_; // Content in tertiary domain [g/cm^3]
   std::vector<double> S_secondary_;  // Secondary domain source term.
   std::vector<double> S_primary_;// Primary domain source term.
-  std::vector<double> S_tertiary_;      // Source term for macropores only.
   std::vector<double> S_exchange;       // Exchange from primary to secondary.
-  std::vector<double> S_drain;  // Source term for soil drainage only.
+  // Added to the soil matrix from drains indirectly via biopores.
+  // This can be non-zero whereever there are drain connected biopores.
+  std::vector<double> S_indirect_drain;
+  // Added to the soil matrix from drains directly, not via biopores.
+  // This is only non-zero in drain nodes.
+  std::vector<double> S_soil_drain;
+  // Removed from the biopores to the drain. 
+  // This is only non-zero in drain nodes.
+  std::vector<double> S_p_drain;
+  // Biopores to matrix. 
+  std::vector<double> S_B2M;
+  // Matrix to biopores (negative matrix source).
+  // Does not count flow to drain connected biopores.
+  std::vector<double> S_M2B;
   std::vector<double> S_external; // External source term, e.g. incorp. fert.
   std::vector<double> S_permanent; // Permanent external source term.
   std::vector<double> S_root;   // Root uptake source term (negative).
@@ -148,7 +161,6 @@ struct ChemicalStandard : public Chemical
 
   // Cache.
   std::vector<double> static_decompose_rate; // Depth adusted decompose rate.
-  bool need_fake_tertiary;      // If J_p should be faked.
 
   void sorption_table (const Soil& soil, const size_t cell, const double Theta, 
                        const double start, const double factor,
@@ -177,7 +189,6 @@ struct ChemicalStandard : public Chemical
                         double from, double to) const; // [g/cm^2]
   double S_secondary (size_t) const;
   double S_primary (size_t) const;
-  double S_tertiary (size_t) const;
   
   // Transport.
   void set_macro_flux (size_t e, double value);
@@ -188,10 +199,13 @@ struct ChemicalStandard : public Chemical
                       const std::vector<double>& M,
                       const std::vector<double>& J);
   void update_matrix (const Soil& soil, const SoilWater& soil_water);
-  void set_tertiary_full (const std::vector<double>& S_p, 
-                          const std::vector<double>& J_p);
-  void set_tertiary_top (const std::vector<double>& S_p, 
-                         const std::vector<double>& J_p);
+  void set_tertiary (const std::vector<double>& S_p, 
+		     const std::vector<double>& J_p);
+  void add_tertiary (const std::vector<double>& pM,
+		     const std::vector<double>& pJ,
+		     const std::vector<double>& pS_B2M,
+		     const std::vector<double>& pS_indirect_drain,
+		     const std::vector<double>& pS_p_drain);
 
   // Sink.
   void clear ();
@@ -399,10 +413,6 @@ double
 ChemicalStandard::S_primary (size_t i) const
 { return S_primary_[i]; }
 
-double 
-ChemicalStandard::S_tertiary (size_t i) const
-{ return S_tertiary_[i]; }
-
 void 
 ChemicalStandard::set_primary (const Soil& soil, const SoilWater& soil_water,
                                const std::vector<double>& M,
@@ -485,29 +495,66 @@ ChemicalStandard::update_matrix (const Soil& soil, const SoilWater& soil_water)
 }
 
 void 
-ChemicalStandard::set_tertiary_full (const std::vector<double>& S_p, 
-                                     const std::vector<double>& J_p)
+ChemicalStandard::set_tertiary (const std::vector<double>& S_p, 
+				const std::vector<double>& J_p)
 {
-  daisy_assert (S_tertiary_.size () == S_p.size ());
-  S_tertiary_ = S_p;
+  const size_t cell_size = S_p.size ();
+  daisy_assert (S_B2M.size () == cell_size);
+  daisy_assert (S_M2B.size () == cell_size);
+  for (size_t i = 0; i < cell_size; i++)
+    {
+      if (S_p[i] > 0)
+	{
+	  S_B2M[i] = S_p[i];
+	  S_M2B[i] = 0.0;
+	}
+      else
+	{
+	  S_B2M[i] = 0.0;
+	  S_M2B[i] = -S_p[i];
+	}	
+    }
   add_to_source_secondary (S_p);
   daisy_assert (J_tertiary.size () == J_p.size ());
   J_tertiary = J_p;
-  need_fake_tertiary = false;
 }
 
 void 
-ChemicalStandard::set_tertiary_top (const std::vector<double>& S_p, 
-                                    const std::vector<double>& J_p)
+ChemicalStandard::add_tertiary (const std::vector<double>& pM,
+				const std::vector<double>& pJ,
+				const std::vector<double>& pS_M2B,
+				const std::vector<double>& pS_indirect_drain,
+				const std::vector<double>& pS_p_drain)
 {
-  daisy_assert (S_tertiary_.size () == S_p.size ());
-  S_tertiary_ = S_p;
-  add_to_source_secondary (S_p);
-  daisy_assert (J_tertiary.size () == J_p.size ());
-  J_tertiary = J_p;
-  need_fake_tertiary = true;
-}
+  const size_t cell_size = M_tertiary_.size ();
+  const size_t edge_size = J_tertiary.size ();
+  daisy_assert (pM.size () == cell_size);
+  daisy_assert (pJ.size () == edge_size);
+  daisy_assert (pS_M2B.size () == cell_size);
+  daisy_assert (pS_indirect_drain.size () == cell_size);
+  daisy_assert (S_p_drain.size () == cell_size);
+  daisy_assert (M_tertiary_.size () == cell_size);
+  daisy_assert (J_tertiary.size () == edge_size);
+  daisy_assert (S_B2M.size () == cell_size);
+  daisy_assert (S_indirect_drain.size () == cell_size);
+  daisy_assert (S_p_drain.size () == cell_size);
+  add_to_sink_secondary (pS_M2B);
+  add_to_sink_secondary (pS_indirect_drain);
+  for (size_t i = 0; i < cell_size; i++)
+    {
+      M_tertiary_[i] += pM[i];
+      const double M2B = pS_M2B[i];
+      if (M2B < 0.0)
+	S_B2M[i] -= M2B;
+      else
+	S_M2B[i] += M2B;
+      S_indirect_drain[i] += pS_indirect_drain[i];
+      S_p_drain[i] += pS_p_drain[i];
+    }
 
+  for (size_t i = 0; i < edge_size; i++)
+    J_tertiary[i] += pJ[i];
+}
 
 void
 ChemicalStandard::clear ()
@@ -522,6 +569,7 @@ ChemicalStandard::clear ()
   litter_tillage = 0.0;
   surface_transform = 0.0;
   surface_release = 0.0;
+  std::fill (M_tertiary_.begin (), M_tertiary_.end (), 0.0);
   std::fill (S_secondary_.begin (), S_secondary_.end (), 0.0);
   std::fill (S_primary_.begin (), S_primary_.end (), 0.0);
   std::fill (S_external.begin (), S_external.end (), 0.0);
@@ -1058,52 +1106,6 @@ ChemicalStandard::tick_surface (const double pond /* [cm] */,
     daisy_approximate (surface_storage, surface_solute);
 }
 
-
-static void
-pass_below (const Geometry& geo,
-            const std::vector<double>& S_matrix,
-            const std::vector<double>& S_drain,
-            const size_t edge_above,
-            const int cell_above,
-            std::vector<double>& q_tertiary)
-{
-  const double flux_above = q_tertiary[edge_above];
-  const int cell = geo.edge_other (edge_above, cell_above);
-  if (!geo.cell_is_internal (cell))
-    return;
-  const double S = -(S_matrix[cell] + S_drain[cell]); // SOURCE, water is sink.
-  const double volume = geo.cell_volume (cell);
-  const double area_above = geo.edge_area (edge_above);
-  const double volume_below = flux_above * area_above - S * volume;
-  const std::vector<size_t>& cell_edges = geo.cell_edges (cell);
-  const size_t cell_edges_size = cell_edges.size ();
-  size_t lowest_edge = edge_above;
-  double lowest_z = geo.cell_z (cell);
-  for (size_t i = 0; i < cell_edges_size; i++)
-    {
-      const size_t edge_below = cell_edges[i];
-      const int cell_below = geo.edge_other (edge_below, cell);
-      if (cell_below == Geometry::cell_below)
-        {
-          lowest_edge = edge_below;
-          break;
-        }
-      if (!geo.cell_is_internal (cell_below))
-        continue;
-      const double z = geo.cell_z (cell_below);
-      if (z < lowest_z)
-        {
-          lowest_z = z;
-          lowest_edge = edge_below;
-        }
-    }
-  daisy_assert (iszero (q_tertiary[lowest_edge]));
-  const double area_below = geo.edge_area (lowest_edge);
-  const double flux_below = volume_below / area_below;
-  q_tertiary[lowest_edge] = flux_below;
-  pass_below (geo, S_matrix, S_drain, lowest_edge, cell, q_tertiary);
-}
-
 void                            // Called just before solute movement.
 ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
                              const Soil& soil,
@@ -1122,7 +1124,12 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
     C_below_value = -1.0;
 
   // Initialize.
-  std::fill (S_tertiary_.begin (), S_tertiary_.end (), 0.0);
+  std::fill (M_tertiary_.begin (), M_tertiary_.end (), 0.0);
+  std::fill (S_indirect_drain.begin (), S_indirect_drain.end (), 0.0);
+  std::fill (S_soil_drain.begin (), S_soil_drain.end (), 0.0);
+  std::fill (S_p_drain.begin (), S_p_drain.end (), 0.0);
+  std::fill (S_B2M.begin (), S_B2M.end (), 0.0);
+  std::fill (S_M2B.begin (), S_M2B.end (), 0.0);
   std::fill (J_tertiary.begin (), J_tertiary.end (), 0.0);
 
   // Fluxify management operations.
@@ -1159,10 +1166,10 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
     {
       // We really should go down in timesteps here instead.
       const double S_min = -0.5 * M_total_[c] / dt;
-      S_drain[c] = std::max (-soil_water.S_drain (c) * C_to_drain (c),
-                             S_min);
+      S_soil_drain[c] = std::max (-soil_water.S_soil_drain (c) * C_to_drain (c),
+				  S_min);
     }
-  add_to_source_secondary (S_drain); 
+  add_to_source_secondary (S_soil_drain); 
 
   // Exchange between primary and secondary domains.
   std::fill (S_exchange.begin (), S_exchange.end (), 0.0);
@@ -1229,22 +1236,8 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
 }
 
 void
-ChemicalStandard::tick_after (const Geometry& geo, Treelog&)
-{
-  if (!need_fake_tertiary)
-    return;
-  
-  // Fake tertiary flux by mass balance ignoring tertiary storage.
-  const std::vector<size_t>& edge_above 
-    = geo.cell_edges (Geometry::cell_above);
-  const size_t edge_above_size = edge_above.size ();
-  for (size_t i = 0; i < edge_above_size; i++)
-    {
-      const size_t edge = edge_above[i];
-      pass_below (geo, S_tertiary_, S_drain, edge, Geometry::cell_above,
-                  J_tertiary);
-    }
-}
+ChemicalStandard::tick_after (const Geometry&, Treelog&)
+{ }
 
 void 
 ChemicalStandard::mixture (const Geometry& geo,
@@ -1488,11 +1481,15 @@ ChemicalStandard::output (Log& log) const
   output_value (M_secondary_, "M_secondary", log);
   output_value (M_primary_, "M_primary", log);
   output_value (M_error, "M_error", log);
+  output_value (M_tertiary_, "M_tertiary", log);
   output_value (S_secondary_, "S_secondary", log);
   output_value (S_primary_, "S_primary", log);
-  output_value (S_tertiary_, "S_tertiary", log);
   output_variable (S_exchange, log);
-  output_variable (S_drain, log);
+  output_variable (S_indirect_drain, log);
+  output_variable (S_soil_drain, log);
+  output_variable (S_p_drain, log);
+  output_variable (S_B2M, log);
+  output_variable (S_M2B, log);
   output_variable (S_external, log);
   output_variable (S_permanent, log);
   output_variable (S_root, log);
@@ -1523,11 +1520,15 @@ ChemicalStandard::debug_cell (std::ostream& out, const size_t c) const
       << ", M_primary_ = " << M_primary_[c]
       << ", M_total_ = " << M_total_[c]
       << ", M_error = " << M_error[c]
+      << ", M_tertiary = " << M_tertiary_[c]
       << ", S_secondary_ = " << S_secondary_[c]
       << ", S_primary_ = " << S_primary_[c]
-      << ", S_tertiary_ = " << S_tertiary_[c]
       << ", S_exchange = " << S_exchange[c]
-      << ", S_drain = " << S_drain[c]
+      << ", S_indirect_drain = " << S_indirect_drain[c]
+      << ", S_soil_drain = " << S_soil_drain[c]
+      << ", S_p_drain = " << S_p_drain[c]
+      << ", S_B2M = " << S_B2M[c]
+      << ", S_M2B = " << S_M2B[c]
       << ", S_external = " << S_external[c]
       << ", S_permanent = " << S_permanent[c]
       << ", S_root = " << S_root[c]
@@ -1825,28 +1826,28 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
   daisy_assert (M_primary_.size () == cell_size);
   daisy_assert (M_total_.size () == cell_size);
   M_error.insert (M_error.begin (), cell_size, 0.0);
-  S_secondary_.insert (S_secondary_.begin (), cell_size, 0.0);
-  S_primary_.insert (S_primary_.begin (), cell_size, 0.0);
-  S_tertiary_.insert (S_tertiary_.begin (), cell_size, 0.0);
-  S_exchange.insert (S_exchange.begin (), cell_size, 0.0);
-  S_drain.insert (S_drain.begin (), cell_size, 0.0);
-  S_external.insert (S_external.begin (), cell_size, 0.0);
-  if (S_permanent.size () < cell_size)
-    S_permanent.insert (S_permanent.end (), 
-                        cell_size - S_permanent.size (),
-                        0.0);
-  S_root.insert (S_root.begin (), cell_size, 0.0);
-  S_decompose.insert (S_decompose.begin (), cell_size, 0.0);
-  S_decompose_primary.insert (S_decompose_primary.begin (), cell_size, 0.0);
-  S_decompose_secondary.insert (S_decompose_secondary.begin (), cell_size, 0.0);
-  S_transform.insert (S_transform.begin (), cell_size, 0.0);
-  J_primary.insert (J_primary.begin (), edge_size, 0.0);
-  J_secondary.insert (J_secondary.begin (), edge_size, 0.0);
-  J_matrix.insert (J_matrix.begin (), edge_size, 0.0);
-  J_tertiary.insert (J_tertiary.begin (), edge_size, 0.0);
-  tillage.insert (tillage.begin (), cell_size, 0.0);
-  daisy_assert (tillage.size () == cell_size);
-  lag.insert (lag.end (), cell_size - lag.size (), 0.0);
+  M_tertiary_.resize (cell_size, 0.0);
+  S_secondary_.resize (cell_size, 0.0);
+  S_primary_.resize (cell_size, 0.0);
+  S_exchange.resize (cell_size, 0.0);
+  S_indirect_drain.resize (cell_size, 0.0);
+  S_soil_drain.resize (cell_size, 0.0);
+  S_p_drain.resize (cell_size, 0.0);
+  S_B2M.resize (cell_size, 0.0);
+  S_M2B.resize (cell_size, 0.0);
+  S_external.resize (cell_size, 0.0);
+  S_permanent.resize (cell_size, 0.0);
+  S_root.resize (cell_size, 0.0);
+  S_decompose.resize (cell_size, 0.0);
+  S_decompose_primary.resize (cell_size, 0.0);
+  S_decompose_secondary.resize (cell_size, 0.0);
+  S_transform.resize (cell_size, 0.0);
+  J_primary.resize (edge_size, 0.0);
+  J_secondary.resize (edge_size, 0.0);
+  J_matrix.resize (edge_size, 0.0);
+  J_tertiary.resize (edge_size, 0.0);
+  tillage.resize (cell_size, 0.0);
+  lag.resize (cell_size, 0.0);
 
   for (size_t c = 0; c < cell_size; c++)
     static_decompose_rate.push_back (decompose_rate 
@@ -2310,16 +2311,33 @@ which can be negative.");
                    "Mass in secondary domain.");
     frame.declare ("M_error", "g/cm^3", Attribute::LogOnly, Attribute::SoilCells, 
                    "Mass substracted to avoid negative values.");
+    frame.declare ("M_tertiary", "g/cm^3", Attribute::LogOnly, Attribute::SoilCells, 
+                   "Mass in tertiary domain (biopores).");
     frame.declare ("S_secondary", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                    "Secondary matrix source term.");
     frame.declare ("S_primary", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                    "Primary matrix source term.");
-    frame.declare ("S_tertiary", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
-                   "Source term for tertiary (macropore) domain.");
     frame.declare ("S_exchange", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                    "Exchange from primary to secondary domain.");
-    frame.declare ("S_drain", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
-                   "Source term (soil drainage only).");
+    frame.declare ("S_indirect_drain", "g/cm^3/h",
+		   Attribute::LogOnly, Attribute::SoilCells, "\
+Added to the soil matrix from drains indirectly via biopores.\n\
+This can be non-zero whereever there are drain connected biopores.");
+    frame.declare ("S_soil_drain", "g/cm^3/h",
+		   Attribute::LogOnly, Attribute::SoilCells, "\
+Added to the soil matrix from drains directly, not via biopores.\n\
+This is only non-zero in drain nodes.");
+    frame.declare ("S_p_drain", "g/cm^3/h",
+		   Attribute::LogOnly, Attribute::SoilCells, "\
+Removed from the biopores to the drain.\n\
+This is only non-zero in drain nodes.");
+    frame.declare ("S_B2M", "g/cm^3/h",
+		   Attribute::LogOnly, Attribute::SoilCells, "\
+Biopores to matrix.");
+    frame.declare ("S_M2B", "g/cm^3/h",
+		   Attribute::LogOnly, Attribute::SoilCells, "\
+Matrix to biopores (negative matrix source).\n\
+Does not count flow to drain connected biopores.");
     frame.declare ("S_external", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                    "External source, such as incorporated fertilizer.");
     frame.declare ("S_permanent", "g/cm^3/h", Attribute::State, Attribute::SoilCells,
