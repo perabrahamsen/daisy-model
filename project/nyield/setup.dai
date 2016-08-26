@@ -9,6 +9,7 @@
 
 (input file "sbarley.dai")
 (input file "wrape.dai")
+(input file "dk-wrape.dai")
 (input file "wwheat.dai")
 (input file "grass.dai")
 
@@ -519,11 +520,12 @@ File component name indicating crop logged. Empty if not specified.")
 
 
 (defcolumn NYield default
-  (Tertiary original
-            (macro original
-                   (distribution (-175 [cm] 100 [%]) ; Same as WW.
-                                 ( -80 [cm]   0 [%])
-                                 (   0 [cm]   0 [%])))))
+  (Movement original 
+            (Tertiary original
+                      (macro default
+                             (distribution (-175 [cm] 100 [%]) ; Same as WW.
+                                           ( -80 [cm]   0 [%])
+                                           (   0 [cm]   0 [%]))))))
 
 (defhorizon B_JB4_plowpan B_JB4
   ;; 10 % of original.
@@ -762,19 +764,7 @@ File component name indicating crop logged. Empty if not specified.")
   (WWMOD "Winter Wheat; NCnc"))
   
 
-;;(run sims)
-
-(run (JB6_1994_Org
-      (activate_output true)
-      (output (RootVeg (column "${mycol}") (mycrop "WR"))
-              (RootRep (column "${mycol}") (mycrop "WR"))
-              (RootFull (column "${mycol}") (mycrop "WR"))
-              (StressVernWR (column "${mycol}") (mycrop "WR"))
-              (StressVegWR (column "${mycol}") (mycrop "WR"))
-              (StressRep (column "${mycol}") (mycrop "WR"))
-              (StressFull (column "${mycol}") (mycrop "WR"))
-              )
-      (stop 2000 10 1 1)))
+(run REF-2014-min)
 
 ;;; setup.dai ends here.
 

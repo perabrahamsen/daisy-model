@@ -1,20 +1,34 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Kursus
-
-** Udskriv præsentation (med noter?)
-
-** Udskriv opgave
-
-** Upload præsentation
-
-* Ryd skrivebord.
-
 * NYield
+
+** Torsdag
+
+*** DONE Kør REF-2014-min
+
+*** omskriv management.dai og setup.dai så WWMOD bruges
+
+*** Kør REF-2014-min igen
+
+*** Test af resultater er de samme
+
+*** Sørg for at WWMOD skrives i resulat tabel.
+
+** Fredag
+
+*** Gør WR til en parameter
+
+*** Kør DK WR simulering
+
+*** Sammenlign
+
+*** Vis resultat til Merete.
+
+** SB?
 
 ** WRape
 
-*** Prøv DK-Vinterraps
+*** Kør ref simulering og simulering med DK-Vinterraps
 
 *** Juster andel der høstes ned.
 
