@@ -1,53 +1,34 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Sommerkursus
-
-** Kig på indhold
-
-*** Fleksibel: Lær nogen koncepter først
-
-*** Concept læs og skriv filer
-
-setup.dai   -> Daisy -> crop.dlf
-weather.dwf ->       -> field_nitrogen.dlf
-
-TextPad (eller TextMate ...)
-Excel (eller LibreOffice ...)
-ShowDaisyOutput 
-
-*** daisy.ku.dk
-
-Download
-  Windows (+ TextPad)
-  Mac (+ TextMate)
-  Linux 
-
-*** Syntax (var val dim) ;; comment
-
-Eksempel
-
-
-*** Model vs Parameterization
-
-Eksempel
-
-*** Navngivne parameterizationer
-
-Eksempel (VinterHvede)
-
-*** Filstruktur
-
-Fra opgaver
-
-*** Excersizes.
-
-beskriv
-
 * NYield
+
+** Torsdag
+
+*** DONE Kør REF-2014-min
+
+*** omskriv management.dai og setup.dai så WWMOD bruges
+
+*** Kør REF-2014-min igen
+
+*** Test af resultater er de samme
+
+*** Sørg for at WWMOD skrives i resulat tabel.
+
+** Fredag
+
+*** Gør WR til en parameter
+
+*** Kør DK WR simulering
+
+*** Sammenlign
+
+*** Vis resultat til Merete.
+
+** SB?
 
 ** WRape
 
-*** Prøv DK-Vinterraps
+*** Kør ref simulering og simulering med DK-Vinterraps
 
 *** Juster andel der høstes ned.
 

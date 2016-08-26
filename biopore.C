@@ -109,7 +109,7 @@ Biopore::solute_infiltrate (const symbol chem,
   const double total_area = geo.surface_area ();
   solute_infiltration.add_value (chem, solute_infiltration.unit (), 
                                  amount / total_area / dt);
-  J.add_value (chem, e, amount / edge_area / dt);
+  J.add_value (chem, e, -amount / edge_area / dt);
 }
 
 double 
