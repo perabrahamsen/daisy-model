@@ -1,3 +1,7 @@
+2016-08-26  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.29 released.
+
 2016-08-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* biopore.C (solute_infiltrate): Positive is up (sign error).
