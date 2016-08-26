@@ -1,47 +1,14 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Sommerkursus
+* Kursus
 
-** Kig på indhold
+** Udskriv præsentation (med noter?)
 
-*** Fleksibel: Lær nogen koncepter først
+** Udskriv opgave
 
-*** Concept læs og skriv filer
+** Upload præsentation
 
-setup.dai   -> Daisy -> crop.dlf
-weather.dwf ->       -> field_nitrogen.dlf
-
-TextPad (eller TextMate ...)
-Excel (eller LibreOffice ...)
-ShowDaisyOutput 
-
-*** daisy.ku.dk
-
-Download
-  Windows (+ TextPad)
-  Mac (+ TextMate)
-  Linux 
-
-*** Syntax (var val dim) ;; comment
-
-Eksempel
-
-
-*** Model vs Parameterization
-
-Eksempel
-
-*** Navngivne parameterizationer
-
-Eksempel (VinterHvede)
-
-*** Filstruktur
-
-Fra opgaver
-
-*** Excersizes.
-
-beskriv
+* Ryd skrivebord.
 
 * NYield
 
