@@ -1,3 +1,7 @@
+2016-09-01  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.30 released.
+
 2016-09-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* chemical_std.C (clear): Don't clear 'M_tertiary' here, it is
