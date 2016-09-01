@@ -999,7 +999,7 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
   const std::vector<double>& M_S = S_chem.get_array (chem);
   const std::vector<double>& Jc = J.get_array (chem);
   if (M_array.size () > 0)
-    chemical.add_tertiary (M_array, Jc, M_S, empty_cell, empty_cell);
+      chemical.add_tertiary (M_array, Jc, M_S, empty_cell, empty_cell);
 }
 
 void

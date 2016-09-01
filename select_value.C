@@ -54,6 +54,49 @@ SelectValue::add_result (double result)
 }
 
 void 
+SelectValue::done_initial ()
+{
+  if (first_result)
+    return;
+
+  switch (handle)
+    {
+    case Handle::average:
+    case Handle::sum:
+      break;
+    case Handle::content_sum:
+      value += small_value;
+      first_small = false;
+      break;
+    case Handle::min:
+      if (first_small)
+        value = small_value;
+      else
+        {
+          value = std::min (value, small_value);
+          first_small = false;
+        }
+      break;
+    case Handle::max:
+      if (first_small)
+        value = small_value;
+      else
+        {
+          value = std::max (value, small_value);
+          first_small = false;
+        }
+       break;
+     case Handle::current:
+       value = small_value;
+       first_small = false;
+       break;
+     }
+
+  small_value = 0.0;
+  first_result = true;
+ }
+
+void 
 SelectValue::done_small (const double ddt)
 {
   dt += ddt;
@@ -68,6 +111,7 @@ SelectValue::done_small (const double ddt)
       break;
     case Handle::content_sum:
       value += small_value;
+      first_small = false;
       break;
     case Handle::min:
       if (first_small)
@@ -80,15 +124,15 @@ SelectValue::done_small (const double ddt)
         value = small_value;
       else
         value = std::max (value, small_value);
-       break;
+      break;
      case Handle::current:
        value = small_value;
        break;
      }
 
   small_value = 0.0;
-  first_small = false;
   first_result = true;
+  first_small = false;
  }
 
  void 
