@@ -140,7 +140,7 @@ LogSelect::initial_done (const std::vector<Time::component_t>& time_columns,
   for (std::vector<Select*>::const_iterator i = entries.begin (); 
        i < entries.end (); 
        i++)
-    (*i)->done_small (0.0);
+    (*i)->done_initial ();
   begin = time;
 
   if (is_printing)

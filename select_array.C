@@ -129,34 +129,95 @@ struct SelectArray : public Select
       {
       case Handle::average:
       case Handle::sum:
-        for (size_t i = 0; i < small_value.size (); i++)
-          value[i] += small_value[i] * ddt;
+        if (ddt > 0.0)
+          {
+            for (size_t i = 0; i < small_value.size (); i++)
+              value[i] += small_value[i] * ddt;
+            first_small = false;
+          }
         break;
       case Handle::content_sum:
         for (size_t i = 0; i < small_value.size (); i++)
           value[i] += small_value[i];
+        first_small = false;
         break;
       case Handle::min:
         if (first_small)
           value = small_value;
-        else 
-          for (size_t i = 0; i < small_value.size (); i++)
-            value[i] = std::min (value[i], small_value[i]);
+        else
+          {
+            for (size_t i = 0; i < small_value.size (); i++)
+              value[i] = std::min (value[i], small_value[i]);
+            first_small = false;
+          }
         break;
       case Handle::max:
         if (first_small)
           value = small_value;
         else
-          for (size_t i = 0; i < small_value.size (); i++)
-            value[i] = std::max (value[i], small_value[i]);
+          {
+            for (size_t i = 0; i < small_value.size (); i++)
+              value[i] = std::max (value[i], small_value[i]);
+            first_small = false;
+          }
         break;
       case Handle::current:
         value = small_value;
+        first_small = false;
         break;
       }
     
     std::fill (small_value.begin (), small_value.end (), 0.0);
-    first_small = false;
+    first_result = true;
+  }
+
+  void done_initial ()
+  {
+    if (first_result)
+      return;
+
+    if (small_value.size () > value.size ())
+      value.insert (value.end (), 
+		    small_value.size () - value.size (),
+		    0.0);
+
+    switch (handle)
+      {
+      case Handle::average:
+      case Handle::sum:
+        break;
+      case Handle::content_sum:
+        for (size_t i = 0; i < small_value.size (); i++)
+          value[i] += small_value[i];
+        first_small = false;
+        break;
+      case Handle::min:
+        if (first_small)
+          value = small_value;
+        else
+          {
+            for (size_t i = 0; i < small_value.size (); i++)
+              value[i] = std::min (value[i], small_value[i]);
+            first_small = false;
+          }
+        break;
+      case Handle::max:
+        if (first_small)
+          value = small_value;
+        else
+          {
+            for (size_t i = 0; i < small_value.size (); i++)
+              value[i] = std::max (value[i], small_value[i]);
+            first_small = false;
+          }
+        break;
+      case Handle::current:
+        value = small_value;
+        first_small = false;
+        break;
+      }
+    
+    std::fill (small_value.begin (), small_value.end (), 0.0);
     first_result = true;
   }
 

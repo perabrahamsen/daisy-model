@@ -1,3 +1,10 @@
+2016-09-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C (clear): Don't clear 'M_tertiary' here, it is
+	needed for initial line later.
+
+	* select_array.C, select_value (done_small): Handle ddt == 0.0.
+
 2016-08-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* biopore.C (solute_infiltrate): Positive is up (sign error).
