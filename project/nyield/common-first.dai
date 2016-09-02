@@ -1,0 +1,59 @@
+;;; common-first.dai --- Common stuff before we choose crops.
+
+(path "${install_directory}/climate" &old)
+
+(input file "dk-horizon.dai")
+(input file "tillage.dai")
+(input file "fertilizer.dai")
+(input file "log-std.dai")
+
+(input file "sbarley.dai")
+(input file "wrape.dai")
+(input file "dk-wrape.dai")
+(input file "wwheat.dai")
+(input file "grass.dai")
+
+(defcrop "Winter Wheat; SHA" "Winter Wheat"
+  "Søren Hansen recalib."
+  (Devel original 
+    (DSRate1  0.0180 [DS/d])
+    (DSRate2  0.0220 [DS/d]))
+  (Root 
+    (MaxPen   120 [cm]))
+  (Partit                                                                           
+      (Root (0.00 0.50) (0.33 0.50) (0.53 0.45) (1.00 0.00) (2.00 0.00))
+      (Leaf (0.00 0.70) (0.40 0.70) (0.55 0.70) (0.62 0.50) (0.77 0.20) (0.95 0.10)             (1.38 0.05) (2.00 0.00))
+      (Stem (0.00 0.30) (0.40 0.30) (0.55 0.30) (0.62 0.50) (0.77 0.80) (0.95 0.90) (1.00 0.00) (1.38 0.00) (2.00 0.00))
+      (RSR  (0.00 0.50) (1.00 0.50) (2.00 0.25))))
+
+(defunit [mm/dg C/d] SIfactor
+  (length 1)
+  (thermodynamic_temperature -1)
+  (time -1)
+  (factor 1.157e-8))
+
+(defunit [cm/dg C/d] SIfactor
+  (length 1)
+  (thermodynamic_temperature -1)
+  (time -1)
+  (factor 1.157e-7))
+
+(defcrop "Winter Wheat; Roots" "Winter Wheat; SHA"
+  "Longer, faster roots."
+  (Root (PenPar1 1.0 [mm/dg C/d])
+        (PenPar2 0.0 [dg C])
+        (MaxPen 175 [cm])))
+
+(defcrop "Winter Wheat; Seed" "Winter Wheat; Roots"
+  (Seed release
+        (initial_weight 160 [kg/ha])
+        (DM_fraction 87 [%])
+        (C_fraction 45 [%])
+        (N_fraction 2 [%])
+        (rate 0.2 [d^-1])))
+
+(defcrop "Winter Wheat; NCnc" "Winter Wheat; Seed"
+  (CrpN (CrSOrgCnc (1.12 0.0135) (2.00 0.0135))
+        (NfSOrgCnc (1.12 0.0125) (2.00 0.0125))))
+
+;;; common-first.dai ends here.

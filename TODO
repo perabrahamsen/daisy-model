@@ -1,44 +1,35 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* SH massebalance
-
-** Check resultat
-
-** commit og push på linux
-
-** pull på windows
-
-** make setup
-
-** bed SH teste
-
-** upload
-
 * NYield
 
-** Torsdag
+** vi skal have $setup global variabel som skal med i output
 
-*** DONE Kør REF-2014-min
+*** declare
 
-*** omskriv management.dai og setup.dai så WWMOD bruges
+*** dlf filenavn
 
-*** Kør REF-2014-min igen
+*** fractiles first
 
-*** Test af resultater er de samme
+*** extract
 
-*** Sørg for at WWMOD skrives i resulat tabel.
+** setup runfil for hver kombination af afgrødeparameteriseringer.
 
-** Fredag
+*** run-ref.dai
 
-*** Gør WR til en parameter
+*** common-first.dai: input file crops
 
-*** Kør DK WR simulering
+*** defcrop WW WR SB
 
-*** Sammenlign
+*** common-last.dai: 
 
-*** Vis resultat til Merete.
+**** input file management.dai
 
-** SB?
+**** input file programs
+
+*** run programs
+
+** .sh fil der kører alle run filer
+
 
 ** WRape
 
