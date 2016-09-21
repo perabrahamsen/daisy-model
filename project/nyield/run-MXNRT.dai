@@ -1,0 +1,24 @@
+;;; run-MXNRT.dai --- run N1994 scenarios with max N uptake rate.
+
+(input file "common-first.dai")
+
+(scn "MXNRT")
+
+(defcrop "WW" "Winter Wheat; N1994"
+  (Root (MxNH4Up     7.5E-9)
+        (MxNO3Up     7.5E-9)))
+     
+(defcrop "SB" "Spring Barley; N1994"
+  (Root (MxNH4Up     7.5E-9)
+        (MxNO3Up     7.5E-9)))
+
+(defcrop "WR" "Winter Rape"
+  (Root (MxNH4Up     7.5E-9)
+        (MxNO3Up     7.5E-9)))
+
+(input file "common-last.dai")
+
+(run All)
+
+;;; run-MXNRT.dai ends here.
+

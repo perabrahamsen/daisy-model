@@ -1,34 +1,8 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Logging
-
-** Virker checkpoint?
-
-** Kan man logge ("Field chemical" (chemical "N"))
-
 * NYield
 
-** DOING PA sort
-
-ORIG + Seed + Roots + DSrate2 op + DSeff efter artikel + kalibrer DS
-
-
-DSeff ((1.0 1.0) (1.5 1.0) (2.0 0.75))
-
-*** Check modenhed
-
-Første uge af august?
-
-*** Check udbytter
-
-??? 8 12 ca ???
-
-** DONE Få denit log til at virke
-
-** DONE Begræns VB på JB4 til 85 cm.
-
-** Kører ORIG, PA, N1994, N2014
-
+** Kører MXNRT, N1R80, SOMSLOW, SOMFAST
 
 ** Gør DS1_name til en parameter
 

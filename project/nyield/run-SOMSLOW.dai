@@ -1,0 +1,18 @@
+;;; run-SOMSLOW.dai --- run N1994 scenarios with max N uptake rate.
+
+(input file "common-first.dai")
+
+(scn "SOMSLOW")
+
+(SOM_fracs 0.7 0.3)
+
+(defcrop "WW" "Winter Wheat; N1994")
+(defcrop "SB" "Spring Barley; N1994")
+(defcrop "WR" "Winter Rape")
+
+(input file "common-last.dai")
+
+(run All)
+
+;;; run-SOMSLOW.dai ends here.
+

@@ -1,0 +1,18 @@
+;;; run-ORIG.dai --- run scenarios with original crop params.
+
+(input file "common-first.dai")
+
+(scn "ORIG")
+
+(defcrop "WW" "Winter Wheat")
+     
+(defcrop "SB" "Spring Barley")
+(defcrop "WR" "Winter Rape")
+
+(input file "common-last.dai")
+
+;;(run JB4_1994_Org)
+(run All)
+
+;;; run-ORIG.dai ends here.
+

@@ -1,0 +1,18 @@
+;;; run-DENIT.dai --- run N1994 scenarios with old denitrification.
+
+(input file "common-first.dai")
+
+(scn "DENIT")
+
+(denit low_denit)
+
+(defcrop "WW" "Winter Wheat; N1994")
+(defcrop "SB" "Spring Barley; N1994")
+(defcrop "WR" "Winter Rape")
+
+(input file "common-last.dai")
+
+(run JB6_1994_Org)
+
+;;; run-DENIT.dai ends here.
+
