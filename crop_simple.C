@@ -354,7 +354,9 @@ CropSimple::harvest (const symbol column_name,
   double wsd = -1.0;
   double nsd = -1.0;
 
-  return *new Harvest (column_name, time, objid,
+  return *new Harvest (column_name, Time::null (), Time::null (),
+                       Time::null (), Time::null (),
+                       time, objid,
 		       0.0, 0.0, 0.0, 
 		       0.0, 0.0, 0.0, 
 		       0.0, 0.0, 0.0, 

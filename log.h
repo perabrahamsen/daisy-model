@@ -401,27 +401,4 @@ output_ordered_ (T const& items, const symbol name, Log& log)
     }
 }
 
-// Output a list of unnamed and unordered alists.
-#define output_vector(items, key, log) \
-do { \
-  static const symbol MACRO_name (key); \
-  output_ordered_ ((items), MACRO_name, (log)); \
-} while (false)
-
-template <class T> void
-output_vector_ (T const& items, const symbol name, Log& log)
-{
-  if (log.check_interior (name))
-    {
-      Log::Open open (log, name);
-      for (typename T::const_iterator item = items.begin ();
-	   item != items.end ();
-	   item++)
-	{
-	  Log::Unnamed unnamed (log);
-	  (*item)->output (log);
-	}
-    }
-}
-
 #endif // LOG_H

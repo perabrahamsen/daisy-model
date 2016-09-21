@@ -1032,9 +1032,9 @@ ParserFile::Implementation::load_list (Frame& frame)
 		  if (ok)
 		    plf.add (x, y);
 		}
-	      if (count < 2)
+	      if (count < 1)
 		{
-		  error ("Need at least 2 points");
+		  error ("Need at least 1 point");
 		  ok = false;
 		}
 	      if (ok)

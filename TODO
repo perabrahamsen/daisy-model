@@ -1,48 +1,46 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* Logging
+
+** Virker checkpoint?
+
+** Kan man logge ("Field chemical" (chemical "N"))
+
 * NYield
 
-** vi skal have $setup global variabel som skal med i output
+** DOING PA sort
 
-*** declare
-
-*** dlf filenavn
-
-*** fractiles first
-
-*** extract
-
-** setup runfil for hver kombination af afgrødeparameteriseringer.
-
-*** run-ref.dai
-
-*** common-first.dai: input file crops
-
-*** defcrop WW WR SB
-
-*** common-last.dai: 
-
-**** input file management.dai
-
-**** input file programs
-
-*** run programs
-
-** .sh fil der kører alle run filer
+ORIG + Seed + Roots + DSrate2 op + DSeff efter artikel + kalibrer DS
 
 
-** WRape
+DSeff ((1.0 1.0) (1.5 1.0) (2.0 0.75))
 
-*** Kør ref simulering og simulering med DK-Vinterraps
+*** Check modenhed
 
-*** Juster andel der høstes ned.
+Første uge af august?
+
+*** Check udbytter
+
+??? 8 12 ca ???
+
+** DONE Få denit log til at virke
+
+** DONE Begræns VB på JB4 til 85 cm.
+
+** Kører ORIG, PA, N1994, N2014
 
 
-** Kør alt i en setup
+** Gør DS1_name til en parameter
 
-Ny summary søjle: Setup
+flowering, tuberization, dk:skridning
 
-** Vi skal cropmodel (til simulering) og cropname (til summary) variable
+** Kig på resutater
+
+*** Ny extract script
+
+Lav filer i det rigtige format til at paste ind i excel ark.
+
+*** Kopier ind i Excel, skriv ud
 
 ** Setups
 

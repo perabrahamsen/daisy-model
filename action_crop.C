@@ -937,9 +937,9 @@ ActionCrop::output (Log& log) const
   if (harvest_perennial)
     output_submodule (*harvest_perennial, "harvest_perennial", log);
   output_variable (fertilize_at_index, log);
-  output_vector (tillage, "tillage", log);
+  output_ordered (tillage, "tillage", log);
   output_variable (tillage_index, log);
-  output_vector (spray, "spray", log);
+  output_ordered (spray, "spray", log);
   output_variable (spray_index, log);
   if (irrigation_year >= 0)
     output_variable (irrigation_year, log);

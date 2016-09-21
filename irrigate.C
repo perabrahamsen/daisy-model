@@ -330,7 +330,7 @@ Irrigation::tick (const Geometry& geo, SoilWater& soil_water,
 
 void 
 Irrigation::output (Log& log) const
-{ output_vector (event, "event", log); }
+{ output_ordered (event, "event", log); }
 
 void
 Irrigation::cleanup (Treelog& msg)

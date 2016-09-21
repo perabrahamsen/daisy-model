@@ -21,7 +21,7 @@
   (wait (or trafficable (mm_dd 04 01)))
   (fertilize (N25S (weight 50 [kg N/ha])))
   (plowing)
-  (seed_bed_preparation)(sow "SB")
+  (seed_bed_preparation)(sow ("SB" (Root (MaxPen 85 [cm]))))
   (wait_days 30)
   (fertilize (N25S (weight 43 [kg N/ha])))
   (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
@@ -206,7 +206,7 @@
   (wait (or trafficable (mm_dd 04 01)))
   (fertilize (N25S (weight 125 [kg N/ha])))
   (plowing)
-  (seed_bed_preparation)(sow "SB")
+  (seed_bed_preparation)(sow ("SB" (Root (MaxPen 85 [cm]))))
   (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
   (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
 
@@ -315,7 +315,7 @@
   (wait (or trafficable (mm_dd 04 01)))
   (fertilize PS2014 (equivalent_weight 124 [kg N/ha]))
   (plowing)
-  (seed_bed_preparation)(sow "SB")
+  (seed_bed_preparation)(sow ("SB" (Root (MaxPen 85 [cm]))))
   (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
   (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
 
@@ -500,7 +500,7 @@
   (fertilize PS1994 (equivalent_weight 158 [kg N/ha]))
   (fertilize (N25S (weight 38.1 [kg N/ha])))
   (plowing)
-  (seed_bed_preparation)(sow "SB")
+  (seed_bed_preparation)(sow ("SB" (Root (MaxPen 85 [cm]))))
   (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
   (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
 

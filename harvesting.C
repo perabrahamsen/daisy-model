@@ -50,7 +50,11 @@ const Harvest&
 Harvesting::harvest (const symbol column_name,
                      const symbol crop_name,
                      const std::vector<double>& density,
-                     const Time& time,
+                     const Time& sow_time,
+                     const Time& emerge_time,
+                     const Time& flowering_time,
+                     const Time& ripe_time,
+                     const Time& harvest_time,
                      const Geometry& geo,
                      Production& production,
                      double& DS,
@@ -229,7 +233,8 @@ Harvesting::harvest (const symbol column_name,
 
   // Add crop remains to the soil.
   static const symbol stem_symbol ("stem");
-  AM& AM_stem = AM::create (metalib, geo, time, Stem, crop_name, stem_symbol,
+  AM& AM_stem = AM::create (metalib, geo, harvest_time,
+                            Stem, crop_name, stem_symbol,
                             AM::Unlocked, msg);
   residuals.push_back (&AM_stem);
   if (Stem_W_Loss > 0.0)
@@ -246,7 +251,8 @@ Harvesting::harvest (const symbol column_name,
     {
       static const symbol dead_symbol ("dead");
       production.AM_leaf
-	= &AM::create (metalib, geo, time, Dead, crop_name, dead_symbol, 
+	= &AM::create (metalib, geo, harvest_time,
+                       Dead, crop_name, dead_symbol, 
 		       AM::Unlocked /* no organic matter */, msg);
     }
   if (Dead_W_Loss > 0.0)
@@ -260,7 +266,8 @@ Harvesting::harvest (const symbol column_name,
     }
 
   static const symbol leaf_symbol ("leaf");
-  AM& AM_leaf = AM::create (metalib, geo, time, Leaf, crop_name, leaf_symbol, 
+  AM& AM_leaf = AM::create (metalib, geo, harvest_time,
+                            Leaf, crop_name, leaf_symbol, 
                             AM::Unlocked, msg);
   residuals.push_back (&AM_leaf);
   if (Leaf_W_Loss > 0.0)
@@ -274,8 +281,8 @@ Harvesting::harvest (const symbol column_name,
     }
 
   static const symbol sorg_symbol ("sorg");
-  AM& AM_sorg = AM::create (metalib, geo,
-                            time, SOrg, crop_name, sorg_symbol, AM::Unlocked, msg);
+  AM& AM_sorg = AM::create (metalib, geo, harvest_time,
+                            SOrg, crop_name, sorg_symbol, AM::Unlocked, msg);
   residuals.push_back (&AM_sorg);
   if (SOrg_W_Loss > 0.0)
     {
@@ -312,7 +319,7 @@ Harvesting::harvest (const symbol column_name,
       // Cut delay.
       const double removed_DM = old_DM - production.DM ();
       production_delay = cut_delay (removed_DM);
-      last_cut = time;
+      last_cut = harvest_time;
     }
   else
     {
@@ -321,7 +328,7 @@ Harvesting::harvest (const symbol column_name,
       // Create root AM if missing.
       static const symbol root_symbol ("root");
       if (!production.AM_root)
-	production.AM_root = &AM::create (metalib, geo, time, Root,
+	production.AM_root = &AM::create (metalib, geo, harvest_time, Root,
 					  crop_name, root_symbol, 
 					  AM::Unlocked /* inorganic */, msg);
 
@@ -459,7 +466,9 @@ Harvesting::harvest (const symbol column_name,
 
   // Return harvest.
   if (combine)
-    return *new Harvest (column_name, time, crop_name,
+    return *new Harvest (column_name,
+                         sow_time, emerge_time, flowering_time, ripe_time,
+                         harvest_time, crop_name,
                          Stem_W_Yield + Dead_W_Yield + Leaf_W_Yield + WEYRm,
                          Stem_N_Yield + Dead_N_Yield + Leaf_N_Yield + NEYRm, 
                          Stem_C_Yield + Dead_C_Yield + Leaf_C_Yield + CEYRm,
@@ -468,7 +477,9 @@ Harvesting::harvest (const symbol column_name,
                          0.0, 0.0, 0.0,
                          wsd, nsd, wp_et);
   else
-    return *new Harvest (column_name, time, crop_name,
+    return *new Harvest (column_name,
+                         sow_time, emerge_time, flowering_time, ripe_time,
+                         harvest_time, crop_name,
                          Stem_W_Yield, Stem_N_Yield, Stem_C_Yield,
                          Dead_W_Yield, Dead_N_Yield, Dead_C_Yield,
                          Leaf_W_Yield, Leaf_N_Yield, Leaf_C_Yield,

@@ -9,22 +9,10 @@
 
 (input file "sbarley.dai")
 (input file "wrape.dai")
-(input file "dk-wrape.dai")
 (input file "wwheat.dai")
 (input file "grass.dai")
 
-(defcrop "Winter Wheat; SHA" "Winter Wheat"
-  "Søren Hansen recalib."
-  (Devel original 
-    (DSRate1  0.0180 [DS/d])
-    (DSRate2  0.0220 [DS/d]))
-  (Root 
-    (MaxPen   120 [cm]))
-  (Partit                                                                           
-      (Root (0.00 0.50) (0.33 0.50) (0.53 0.45) (1.00 0.00) (2.00 0.00))
-      (Leaf (0.00 0.70) (0.40 0.70) (0.55 0.70) (0.62 0.50) (0.77 0.20) (0.95 0.10)             (1.38 0.05) (2.00 0.00))
-      (Stem (0.00 0.30) (0.40 0.30) (0.55 0.30) (0.62 0.50) (0.77 0.80) (0.95 0.90) (1.00 0.00) (1.38 0.00) (2.00 0.00))
-      (RSR  (0.00 0.50) (1.00 0.50) (2.00 0.25))))
+(declare scn String "Name of NYield crop scenarie.")
 
 (defunit [mm/dg C/d] SIfactor
   (length 1)
@@ -38,22 +26,61 @@
   (time -1)
   (factor 1.157e-7))
 
-(defcrop "Winter Wheat; Roots" "Winter Wheat; SHA"
-  "Longer, faster roots."
-  (Root (PenPar1 1.0 [mm/dg C/d])
-        (PenPar2 0.0 [dg C])
-        (MaxPen 175 [cm])))
-
-(defcrop "Winter Wheat; Seed" "Winter Wheat; Roots"
+(defcrop "Winter Wheat; PA" "Winter Wheat"
+  (Devel original
+         (DSRate2  0.020 [DS/d]))
+  (LeafPhot original
+            (Fm 4.4 [g CO2/m^2/h])
+            (DSEff (0.0 [DS] 100 [%]) (1.0 [DS] 100 [%])
+                   (1.5 [DS] 100 [%]) (2.0 [DS]  75 [%])))
   (Seed release
         (initial_weight 160 [kg/ha])
         (DM_fraction 87 [%])
         (C_fraction 45 [%])
         (N_fraction 2 [%])
-        (rate 0.2 [d^-1])))
+        (rate 0.2 [d^-1]))  
+  (Root (PenPar1 1.0 [mm/dg C/d])
+        (PenPar2 0.0 [dg C])
+        (MaxPen 175 [cm])))
 
-(defcrop "Winter Wheat; NCnc" "Winter Wheat; Seed"
-  (CrpN (CrSOrgCnc (1.12 0.0135) (2.00 0.0135))
-        (NfSOrgCnc (1.12 0.0125) (2.00 0.0125))))
+(defcrop "Winter Wheat; NCnc" "Winter Wheat; PA"
+  (CrpN (PtStemCnc (0.50 0.0200) (1.12 0.0125) (1.28 0.0093) ;Same or original
+                   (1.53 0.0090))                            ;New
+        (CrStemCnc (0.50 0.0064) (1.12 0.0049) ;Same as original.
+                   (1.28 0.0045))))            ;New
+
+(defcrop "Winter Wheat; N1994" "Winter Wheat; NCnc"
+  (CrpN (PtSOrgCnc (2.0 [DS] 0.023 [g N/g DM]))
+        (CrSOrgCnc (2.0 [DS] 0.015 [g N/g DM]))
+        (NfSOrgCnc (2.0 [DS] 0.011 [g N/g DM]))))
+
+(defcrop "Winter Wheat; N2014" "Winter Wheat; NCnc"
+  (CrpN (PtSOrgCnc (2.0 [DS] 0.022 [g N/g DM]))
+        (CrSOrgCnc (2.0 [DS] 0.014 [g N/g DM]))
+        (NfSOrgCnc (2.0 [DS] 0.009 [g N/g DM]))))
+
+(defcrop "Spring Barley; N1994" "Spring Barley"
+  (CrpN (PtSOrgCnc (2.0 [DS] 0.021 [g N/g DM]))
+        (CrSOrgCnc (2.0 [DS] 0.014 [g N/g DM]))
+        (NfSOrgCnc (2.0 [DS] 0.011 [g N/g DM]))))
+
+(defcrop "Spring Barley; N2014" "Spring Barley"
+  (CrpN (PtSOrgCnc (2.0 [DS] 0.019 [g N/g DM]))
+        (CrSOrgCnc (2.0 [DS] 0.014 [g N/g DM]))
+        (NfSOrgCnc (2.0 [DS] 0.010 [g N/g DM]))))
+
+(defchemistry high_denit multi
+  (combine N))
+
+(defchemistry low_denit multi
+  (combine (N (reaction nitrification
+                        (denitrification
+                         (water_factor (0.8 0.0) (0.9 0.2) (1.0 1.0)))))))
+
+(declare denit chemistry "Chemistry model to use.")
+(denit high_denit)
+
+(declare SOM_fracs [] Number [<none>] "SOM partitioning for Ap horizon.")
+(SOM_fracs 0.49 0.51)
 
 ;;; common-first.dai ends here.

@@ -1,3 +1,21 @@
+2016-09-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* log.h (output_vector): Removed.
+	* action_crop.C, daisy.C (output): Update callers.
+
+2016-09-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* summary_fractiles.C (find_fractile): Allow 100 % fractile.
+
+	* harvest.C, harvest.h (time_sow, time_emerge, time_flowering):
+	(time_ripe): New members.
+	(time_harvest): Renamed from 'time'.
+	* harvesting.C, harvesting.h (harvest): Update caller.
+	* log_harvest.C (match): Ditto.
+	* crop_simple.C (harvest): Ditto.
+	* crop_std.C (sow_time, emerge_time, flowering_time, ripe_time):
+	New state variables. Update callers.
+
 2016-09-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* chemical_std.C (clear): Don't clear 'M_tertiary' here, it is

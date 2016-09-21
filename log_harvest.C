@@ -84,9 +84,9 @@ struct LogHarvest : public Log
     for (; last_size < daisy.harvest ().size (); last_size++)
       {
 	const Harvest& harvest = *(daisy.harvest ()[last_size]);
-	out << harvest.time.year ()
-	    << "\t" << harvest.time.month ()
-	    << "\t" << harvest.time.mday ()
+	out << harvest.harvest_time.year ()
+	    << "\t" << harvest.harvest_time.month ()
+	    << "\t" << harvest.harvest_time.mday ()
 	    << "\t" << harvest.column
 	    << "\t" << harvest.crop
 	    << "\t" << harvest.stem_DM * 0.01
