@@ -6,8 +6,8 @@
 
 (defcrop "WW" "Winter Wheat; PA")
      
-(defcrop "SB" "Spring Barley")
-(defcrop "WR" "Winter Rape")
+(defcrop "SB" "Spring Barley; PA")
+(defcrop "WR" "Winter Rape; PA")
 
 (input file "common-last.dai")
 

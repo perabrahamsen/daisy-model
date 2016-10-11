@@ -26,11 +26,18 @@
   (time -1)
   (factor 1.157e-7))
 
+(defcrop "Spring Barley; PA" "Spring Barley"
+  (Root (MxNH4Up     2.5E-8)
+        (MxNO3Up     2.5E-8)))
+
+(defcrop "Winter Rape; PA" "Winter Rape"
+  (Root (MxNH4Up     2.5E-8)
+        (MxNO3Up     2.5E-8)))
+
 (defcrop "Winter Wheat; PA" "Winter Wheat"
   (Devel original
          (DSRate2  0.020 [DS/d]))
   (LeafPhot original
-            (Fm 4.4 [g CO2/m^2/h])
             (DSEff (0.0 [DS] 100 [%]) (1.0 [DS] 100 [%])
                    (1.5 [DS] 100 [%]) (2.0 [DS]  75 [%])))
   (Seed release
@@ -38,10 +45,13 @@
         (DM_fraction 87 [%])
         (C_fraction 45 [%])
         (N_fraction 2 [%])
-        (rate 0.2 [d^-1]))  
+        (rate 0.4 [d^-1]))  
   (Root (PenPar1 1.0 [mm/dg C/d])
         (PenPar2 0.0 [dg C])
-        (MaxPen 175 [cm])))
+        (MaxPen 175 [cm])
+        (MxNH4Up 2.5E-8)
+        (MxNO3Up 2.5E-8))
+  (Canopy (HvsDS (0 [DS] 1 [cm]) (1 [DS] 80 [cm]) (2 [DS] 80 [cm]))))
 
 (defcrop "Winter Wheat; NCnc" "Winter Wheat; PA"
   (CrpN (PtStemCnc (0.50 0.0200) (1.12 0.0125) (1.28 0.0093) ;Same or original
@@ -50,21 +60,23 @@
                    (1.28 0.0045))))            ;New
 
 (defcrop "Winter Wheat; N1994" "Winter Wheat; NCnc"
-  (CrpN (PtSOrgCnc (2.0 [DS] 0.023 [g N/g DM]))
+  (LeafPhot original (Fm 3.9 [g CO2/m^2/h]))
+  (CrpN (PtSOrgCnc (2.0 [DS] 0.020 [g N/g DM]))
         (CrSOrgCnc (2.0 [DS] 0.015 [g N/g DM]))
         (NfSOrgCnc (2.0 [DS] 0.011 [g N/g DM]))))
 
 (defcrop "Winter Wheat; N2014" "Winter Wheat; NCnc"
-  (CrpN (PtSOrgCnc (2.0 [DS] 0.022 [g N/g DM]))
+  (LeafPhot original (Fm 4.4 [g CO2/m^2/h]))
+  (CrpN (PtSOrgCnc (2.0 [DS] 0.020 [g N/g DM]))
         (CrSOrgCnc (2.0 [DS] 0.014 [g N/g DM]))
         (NfSOrgCnc (2.0 [DS] 0.009 [g N/g DM]))))
 
-(defcrop "Spring Barley; N1994" "Spring Barley"
-  (CrpN (PtSOrgCnc (2.0 [DS] 0.021 [g N/g DM]))
+(defcrop "Spring Barley; N1994" "Spring Barley; PA"
+  (CrpN (PtSOrgCnc (2.0 [DS] 0.019 [g N/g DM]))
         (CrSOrgCnc (2.0 [DS] 0.014 [g N/g DM]))
         (NfSOrgCnc (2.0 [DS] 0.011 [g N/g DM]))))
 
-(defcrop "Spring Barley; N2014" "Spring Barley"
+(defcrop "Spring Barley; N2014" "Spring Barley; PA"
   (CrpN (PtSOrgCnc (2.0 [DS] 0.019 [g N/g DM]))
         (CrSOrgCnc (2.0 [DS] 0.014 [g N/g DM]))
         (NfSOrgCnc (2.0 [DS] 0.010 [g N/g DM]))))

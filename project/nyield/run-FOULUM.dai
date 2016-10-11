@@ -1,0 +1,18 @@
+;;; run-FOULUM.dai --- run scenarios with RS-Model crops changes.
+
+(input file "common-first.dai")
+
+(scn "FOULUM")
+
+(defcrop "WW" "Winter Wheat; Foulum")
+     
+(defcrop "SB" "Spring Barley; Foulum")
+(defcrop "WR" "Winter Rape; PA")
+
+(input file "common-last.dai")
+
+;(run (JB4_1994_Org (stop 2015)))
+(run All)
+
+;;; run-FOULUM.dai ends here.
+

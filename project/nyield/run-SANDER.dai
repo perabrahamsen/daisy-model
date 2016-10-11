@@ -1,0 +1,22 @@
+;;; run-SANDER.dai --- run scenarios with Sanders crops changes.
+
+(input file "common-first.dai")
+
+(input file "Crop-WWheat.dai")
+(input file "Crop-SBarley.dai")
+(input file "Crop-WRape.dai")
+
+(scn "SANDER")
+
+(defcrop "WW" "Vinterhvede1")
+     
+(defcrop "SB" "Vaarbyg1")
+(defcrop "WR" "Vinterraps1")
+
+(input file "common-last.dai")
+
+;(run (JB4_1994_Org (stop 2015)))
+(run All)
+
+;;; run-SANDER.dai ends here.
+

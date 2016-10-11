@@ -1,18 +1,20 @@
-;;; run-N1R80.dai --- run N1994 scenarios with 80% root speed.
+;;; run-MXNRTWW.dai --- run N1994 scenarios with max N uptake rate on WW only.
 
 (input file "common-first.dai")
 
-(scn "N1R80")
+(scn "MXNRTWW")
 
 (defcrop "WW" "Winter Wheat; N1994"
-  (Root (PenPar1 0.80 [mm/dg C/d])))
+  (Root (MxNH4Up     1.0E-8)
+        (MxNO3Up     1.0E-8)))
      
 (defcrop "SB" "Spring Barley; N1994")
+
 (defcrop "WR" "Winter Rape; PA")
 
 (input file "common-last.dai")
 
 (run All)
 
-;;; run-N1R80.dai ends here.
+;;; run-MXNRTWW.dai ends here.
 

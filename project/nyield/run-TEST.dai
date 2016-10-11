@@ -6,14 +6,19 @@
 
 ;;(denit low_denit)
 
-(defcrop "WW" "Winter Wheat; PA")
+(defcrop "WW" "Winter Wheat; N1994")
      
-(defcrop "SB" "Spring Barley")
-(defcrop "WR" "Winter Rape")
+;;(defcrop "SB" "Spring Barley; N1994"
+;;  (LeafPhot original 
+;;            (Fm 5.00)))
+
+(defcrop "SB" "Spring Barley; N1994")
+
+(defcrop "WR" "Winter Rape; PA")
 
 (input file "common-last.dai")
 
-(run (JB4_1994_Org (stop 2015) (activate_output true)))
+(run (JB6_1994_Org (stop 2015) (activate_output true)))
 
 ;;(run All)
 

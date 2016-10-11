@@ -543,7 +543,7 @@ File component name indicating crop logged. Empty if not specified.")
   (declare fert String
 	   "Name of fertilizer regime.")
   (time 1990 9 1 1)
-  (log_prefix "${scn}-${period}-${fert}-")
+  (log_prefix "dlf/${scn}-${period}-${fert}-")
   (activate_output (after 2000 9 1 1))
   (stop 2500 10 1 1)
   (output harvest

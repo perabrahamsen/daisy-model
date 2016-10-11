@@ -8,12 +8,8 @@
 (scn "DANSK")
 
 (defcrop "WW" "Vinterhvede")
-     
 (defcrop "SB" "Vaarbyg")
-
-;; We decided on the original winter rape.
-;; (defcrop "WR" "Vinterraps")
-(defcrop "WR" "Winter Rape")
+(defcrop "WR" "Vinterraps")
 
 (input file "common-last.dai")
 
