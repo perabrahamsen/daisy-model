@@ -1,3 +1,19 @@
+2016-10-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* assertion.h (daisy_soft_assert): New macro.
+
+	* mathlib.C: Removed old exception code.
+
+2016-09-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log.dai ("Surface Water Balance"): Removed. 
+	("Evapotranspiration"): Ditto.
+
+2016-09-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* uzrect_Mollerup.C (S_macro, S_macro_sum, S_drain, S_drain_sum):
+	Removed unused variables.
+
 2016-09-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* log.h (output_vector): Removed.

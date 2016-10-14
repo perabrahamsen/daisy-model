@@ -1,8 +1,32 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* SH fejl
+
+** Brug massebalance til at udregne (vertical) flux fra bunden.
+
+Husk drænnoder!
+
+** DONE Plot hydrauliske kurver
+
+Vis dem til Søren.
+
 * NYield
 
-** Kører MXNRT, N1R80, SOMSLOW, SOMFAST
+** Vårbyg
+
+*** Tokkerup
+
+**** Høstudbytte. Spørg Kasper.
+
+**** Plot LAI, WS, NS
+
+**** latex side med alle plots
+
+**** Prøv forskellige vårbyg
+
+***** ORIG + PA (+ Kasper)
+
+**** Excel akr hvor høstudbytte sammenlignes
 
 ** Gør DS1_name til en parameter
 

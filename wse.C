@@ -94,7 +94,8 @@ struct WSE_partial : public WSE
       = 1.0 - ((fabs (divisor) < 1e-10) 
                ? 0.0 
                : y_half / divisor);
-    return 1.0 + factor * (1.0 - y_half) / (2.0 * y_half - 1.0); 
+    const double effect = 1.0 + factor * (1.0 - y_half) / (2.0 * y_half - 1.0);
+    return bound (0.0, effect, 1.0);
   }
 
   WSE_partial (const BlockModel& al)

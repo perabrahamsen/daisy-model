@@ -137,7 +137,9 @@ struct UZRectMollerup : public UZRect
                      const ublas::vector<double>& Theta_previous,
                      const ublas::vector<double>& Theta,
                      const ublas::vector<double>& S_vol,
+#ifdef TEST_OM_DEN_ER_BRUGT
                      const ublas::vector<double>& S_macro,
+#endif
                      const ublas::vector<double>& dq,
                      const double& ddt,
                      std::vector<bool>& drain_cell_on,
@@ -185,11 +187,13 @@ UZRectMollerup::tick (const GeometryRect& geo,
   ublas::vector<double> h_ice (cell_size); // 
   ublas::vector<double> S (cell_size); // sink term
   ublas::vector<double> S_vol (cell_size); // sink term
+#ifdef TEST_OM_DEN_ER_BRUGT
   ublas::vector<double> S_macro (cell_size);  // sink term
   std::vector<double> S_drain (cell_size, 0.0); // matrix-> macro -> drain flow 
   std::vector<double> S_drain_sum (cell_size, 0.0); // For large timestep
-  std::vector<double> S_matrix (cell_size, 0.0);  // matrix -> macro 
-  std::vector<double> S_matrix_sum (cell_size, 0.0); // for large timestep   
+  const std::vector<double> S_matrix (cell_size, 0.0);  // matrix -> macro 
+  std::vector<double> S_matrix_sum (cell_size, 0.0); // for large timestep
+#endif
   ublas::vector<double> T (cell_size); // temperature 
   ublas::vector<double> Kold (edge_size); // old hydraulic conductivity
   ublas::vector<double> Ksum (edge_size); // Hansen hydraulic conductivity
@@ -369,19 +373,25 @@ UZRectMollerup::tick (const GeometryRect& geo,
           //ublas vector -> std vector 
           std::copy(h.begin (), h.end (), h_std.begin ());
 
+#ifdef TEST_OM_DEN_ER_BRUGT
           for (size_t cell = 0; cell != cell_size ; ++cell) 
             {				
               S_macro (cell) = (S_matrix[cell] + S_drain[cell]) 
                 * geo.cell_volume (cell);
             }
-                              
+#endif
+
 	  //Initialize sum matrix
 	  Solver::Matrix summat (cell_size);  
 	  noalias (summat) = diff + Dm_mat;
 
 	  //Initialize sum vector
 	  ublas::vector<double> sumvec (cell_size);  
-	  sumvec = grav + B + Gm + Dm_vec - S_vol - S_macro; 
+	  sumvec = grav + B + Gm + Dm_vec - S_vol
+#ifdef TEST_OM_DEN_ER_BRUGT
+            - S_macro
+#endif
+            ; 
 
 	  // QCw is shorthand for Qmatrix * Cw
 	  Solver::Matrix Q_Cw (cell_size);
@@ -402,14 +412,17 @@ UZRectMollerup::tick (const GeometryRect& geo,
 
 	  // Force active drains to zero h.
           drain (geo, drain_cell, drain_water_level,
-		 h, Theta_previous, Theta, S_vol, S_macro,
+		 h, Theta_previous, Theta, S_vol,
+#ifdef TEST_OM_DEN_ER_BRUGT
+                 S_macro,
+#endif
                  dq, ddt, drain_cell_on, A, b, debug, msg);  
           
           try {
             solver->solve (A, b, h); // Solve Ah=b with regard to h.
           } catch (const char *const error) {
               std::ostringstream tmp;
-              tmp << "Could not solve equation sysmem: " << error;
+              tmp << "Could not solve equation system: " << error;
               msg.warning (tmp.str ());
               // Try smaller timestep.
               iterations_used = max_loop_iter + 100;
@@ -482,13 +495,14 @@ UZRectMollerup::tick (const GeometryRect& geo,
                          dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg, dt);
           Darcy (geo, Kedge, h, dq);
 
+#ifdef TEST_OM_DEN_ER_BRUGT
           // update macropore flow components 
           for (int c = 0; c < cell_size; c++)
             {
               S_drain_sum[c] += S_drain[c] * ddt/dt;
               S_matrix_sum[c] += S_matrix[c] * ddt/dt;
             }
-          
+#endif
 
           std::vector<double> h_std_new (cell_size);
           std::copy(h.begin (), h.end (), h_std_new.begin ());
@@ -544,8 +558,10 @@ UZRectMollerup::tick (const GeometryRect& geo,
   // 0 = Old - New - S * dt + q_in * dt - q_out * dt + Error
   Theta_error -= Theta;         // Old - New
   Theta_error -= S * dt;
+#ifdef TEST_OM_DEN_ER_BRUGT
   for (size_t c = 0; c < cell_size; c++)
     Theta_error (c) -= (S_matrix_sum[c] + S_drain_sum[c]) * dt;
+#endif
   
   for (size_t edge = 0; edge != edge_size; ++edge) 
     {
@@ -559,7 +575,11 @@ UZRectMollerup::tick (const GeometryRect& geo,
     }
 
   // Find drain sink from mass balance.
+#ifdef TEST_OM_DEN_ER_BRUGT
   std::fill(S_drain.begin (), S_drain.end (), 0.0);
+#else
+  std::vector<double> S_drain (cell_size);
+#endif
   for (size_t i = 0; i < drain_cell.size (); i++)
     {
       const size_t cell = drain_cell[i];
@@ -598,8 +618,8 @@ UZRectMollerup::tick (const GeometryRect& geo,
   
 #ifdef TEST_OM_DEN_ER_BRUGT
   soil_water.add_tertiary_sink (S_matrix_sum);
-#endif
   soil_water.drain (S_drain_sum, msg);
+#endif
 
 
   for (size_t edge = 0; edge != edge_size; ++edge) 
@@ -607,6 +627,7 @@ UZRectMollerup::tick (const GeometryRect& geo,
       daisy_assert (std::isfinite (q[edge]));
       soil_water.set_flux (edge, q[edge]);
     }
+
   soil_water.drain (S_drain, msg);
 
   // End of large time step.
@@ -876,7 +897,6 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
             else			// Pressure
               {
                 state[i] = top_pressure;
-
                 if (debug > 0 && q_in_pot < 0.0)
                   {
                     std::ostringstream tmp;
@@ -922,7 +942,9 @@ UZRectMollerup::drain (const GeometryRect& geo,
                        const ublas::vector<double>& Theta_previous,
                        const ublas::vector<double>& Theta,
                        const ublas::vector<double>& S_vol,
+#ifdef TEST_OM_DEN_ER_BRUGT
                        const ublas::vector<double>& S_macro,
+#endif
                        const ublas::vector<double>& dq,
                        const double& ddt,
                        std::vector<bool>& drain_cell_on,
@@ -947,7 +969,11 @@ UZRectMollerup::drain (const GeometryRect& geo,
           
           double drain_sink = Theta_previous (cell);
           drain_sink -= Theta (cell);
-          drain_sink -= ddt * (S_vol (cell) + S_macro (cell))/
+          drain_sink -= ddt * (S_vol (cell)
+#ifdef TEST_OM_DEN_ER_BRUGT
+                               + S_macro (cell)
+#endif
+                               )/
             geo.cell_volume (cell);
                     
           const std::vector<size_t>& edges = geo.cell_edges (cell);

@@ -617,8 +617,20 @@ CropStandard::tick (const Metalib& metalib,
   if (enable_N_stress)
     Ass *= (1.0 - nitrogen_stress);
   Ass *= (1.0 - harvesting->cut_stress);
-  production.CanopyAss = Ass;
+  if (!(Ass >= 0.0))
+    {
+      std::ostringstream tmp;
+      tmp << "Ass = " << Ass << "; PotCanopyAss = " << production.PotCanopyAss
+          << "; water stress = " << water_stress
+          << "; water stress effect = "
+               << water_stress_effect->factor (water_stress)
+          << ";nitrogen stress = " << nitrogen_stress
+          << ";cut stress = " << harvesting->cut_stress;
+      msg.bug (tmp.str ());
+      Ass = 0.0;
+    }
   daisy_assert (Ass >= 0.0);
+  production.CanopyAss = Ass;
 
   const double T_soil_3 
     = geo.content_height (soil_heat, &SoilHeat::T, -root_system->Depth/3.0);
