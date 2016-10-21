@@ -1,0 +1,180 @@
+(defunit [m^2/m^2] [none])
+
+(defgnuplot LAI time
+  (title "LAI All years")
+  (where "fig/LAI.pdf")
+  (ymin 0 [m^2/m^2])
+  (ymax 6 [m^2/m^2])
+  (begin 2009 6 1 0)
+  (extra &old 
+         [set format x "%y"])
+  (source (column (file "crop_prod.dlf")
+                  (tag "Crop AI")
+                  (title "Daisy CAI")
+                  (dimension [m^2/m^2]))
+          (column (file "crop_prod.dlf")
+                  (tag "Leaf AI")
+                  (title "Daisy LAI")
+                  (dimension [m^2/m^2]))
+          ;;(column (file "crop.dlf")
+          ;;        (tag "LAI")
+          ;;        (title "Daisy LAI2"))
+          (column (file "LAI.ddf")
+                  (tag "LAI")
+                  (style 3)
+                  (title "RVI"))
+          ))
+
+(defgnuplot LAI_year LAI
+  (extra &old 
+         [set format x "%m"])
+  (y2min 0 [])
+  (y2max 1 [])
+  (source &old 
+          (column (file "crop_prod.dlf")
+                  (style 4)
+                  (tag "water_stress")
+                  (title "WS"))
+          (column (file "crop_prod.dlf")
+                  (style 5)
+                  (tag "nitrogen_stress")
+                  (title "NS"))
+;;          (column (file "crop_prod.dlf")
+;;                  (style 4)
+;;                  (tag "DS"))
+          ))
+
+(defgnuplot LAI-2010 LAI_year
+  (title "LAI 2010")
+  (where "fig/LAI-2010.pdf")
+  (begin 2010 3 1)
+  (end 2010 9 1))
+
+(defgnuplot LAI-2011 LAI_year
+  (title "LAI 2011")
+  (where "fig/LAI-2011.pdf")
+  (begin 2011 3 1)
+  (end 2011 9 1))
+
+(defgnuplot LAI-2012 LAI_year
+  (title "LAI 2012")
+  (where "fig/LAI-2012.pdf")
+  (begin 2012 3 1)
+  (end 2012 9 1))
+
+(defgnuplot LAI-2013 LAI_year
+  (title "LAI 2013")
+  (where "fig/LAI-2013.pdf")
+  (begin 2013 3 1)
+  (end 2013 9 1))
+
+(defgnuplot LAI-2014 LAI_year
+  (title "LAI 2014")
+  (where "fig/LAI-2014.pdf")
+  (begin 2014 3 1)
+  (end 2014 9 1))
+
+(defgnuplot LAI-2015 LAI_year
+  (title "LAI 2015")
+  (where "fig/LAI-2015.pdf")
+  (begin 2015 3 1)
+  (end 2015 9 1))
+
+(defgnuplot LAI-2016 LAI_year
+  (title "LAI 2016")
+  (where "fig/LAI-2016.pdf")
+  (begin 2016 3 1)
+  (end 2016 9 1))
+
+(defgnuplot RZ time
+  (title "RZ All years")
+  (where "fig/RZ.pdf")
+  ;; (ymin 0 [m^2/m^2])
+  ;; (ymax 6 [m^2/m^2])
+  (begin 2009 6 1 0)
+  (extra &old 
+         [set format x "%y"])
+  (y2min 0 [])
+  (y2max 1 [])
+;;  (source (arithmetic (file "field_water.dlf")
+;;                      (expr (- Precipitation "Actual evapotranspiration"))
+;;                      (title "NetPrecip"))
+;;          (arithmetic (file "rz_water.dlf")
+;;                      (expr (- "RZ Theta" "RZ Theta_wp"))
+;;                      (title "RZ water")))
+  (source (column (file "rz_water.dlf")
+                  (tag "RZ Theta_sat"))
+          (column (file "rz_water.dlf")
+                  (tag "RZ Theta_fc"))
+          (column (file "rz_water.dlf")
+                  (tag "RZ Theta_wp"))
+          (column (file "rz_water.dlf")
+                  (tag "RZ Theta"))
+          (column (file "crop_prod.dlf")
+                  (tag "water_stress")
+                  (title "Stress"))
+          ))
+
+(defgnuplot RZ_year RZ
+  (extra &old 
+         [set format x "%m"])
+  ;; (y2min 0 [])
+  ;; (y2max 1 [])
+  )
+
+(defgnuplot RZ-2010 RZ_year
+  (title "RZ 2010")
+  (where "fig/RZ-2010.pdf")
+  (begin 2010 3 1)
+  (end 2010 9 1))
+
+(defgnuplot RZ-2011 RZ_year
+  (title "RZ 2011")
+  (where "fig/RZ-2011.pdf")
+  (begin 2011 3 1)
+  (end 2011 9 1))
+
+(defgnuplot RZ-2012 RZ_year
+  (title "RZ 2012")
+  (where "fig/RZ-2012.pdf")
+  (begin 2012 3 1)
+  (end 2012 9 1))
+
+(defgnuplot RZ-2013 RZ_year
+  (title "RZ 2013")
+  (where "fig/RZ-2013.pdf")
+  (begin 2013 3 1)
+  (end 2013 9 1))
+
+(defgnuplot RZ-2014 RZ_year
+  (title "RZ 2014")
+  (where "fig/RZ-2014.pdf")
+  (begin 2014 3 1)
+  (end 2014 9 1))
+
+(defgnuplot RZ-2015 RZ_year
+  (title "RZ 2015")
+  (where "fig/RZ-2015.pdf")
+  (begin 2015 3 1)
+  (end 2015 9 1))
+
+(defgnuplot RZ-2016 RZ_year
+  (title "RZ 2016")
+  (where "fig/RZ-2016.pdf")
+  (begin 2016 3 1)
+  (end 2016 9 1))
+
+(defgnuplot all_LAI multi
+  (graph LAI LAI-2010 LAI-2011 LAI-2012 LAI-2013 LAI-2014 LAI-2015 LAI-2016))
+
+(defgnuplot all_RZ multi
+  (graph RZ RZ-2010 RZ-2011 RZ-2012 RZ-2013 RZ-2014 RZ-2015 RZ-2016))
+
+(defgnuplot all multi
+  (graph all_LAI all_RZ))
+
+(defprogram all gnuplot
+  (graph all))
+
+(run all)
+

@@ -1,0 +1,191 @@
+(input file "soil.dai")
+
+(defxysource "Hydraulic" loop
+  "Plot hydraulic properties as function of pF."
+  (begin 0 [pF])
+  (end 5 [pF])
+  (step 0.1 [pF]))
+
+(defxysource "Retention Daisy" Hydraulic
+  "Retention curve used by Daisy."
+  (title "Daisy"))
+
+(defxysource "Retention HYPRES" Hydraulic
+  "The retention curve according to HYPRES."
+  (title "HYPRES"))
+
+(defxysource "Conductivity Daisy" Hydraulic
+  "Conductivity curve used by Daisy."
+  (title "Daisy"))
+
+(defxysource "Conductivity HYPRES" Hydraulic
+  "The conductivity curve according to HYPRES."
+  (title "HYPRES"))
+
+(defgnuplot "Hydraulic" xy
+  ;; (canvas "9cm, 5.5cm")
+  ;;(extra &old
+  ;;       [set lmargin 9]
+  ;;       [set rmargin 1]
+  ;;       [set bmargin 3]
+  ;;       [set tmargin 3])
+  )
+
+(defgnuplot "Retention All" "Hydraulic"
+  "Plot retention curve."
+  (ymax 50 [])
+  (ymin  0 [])
+  (declare hor String "Name of horizon.")
+  (where "fig/${hor}-Theta.pdf")
+  (title "${hor} retention curve"))
+
+(defgnuplot "Conductivity All" "Hydraulic"
+  "Plot conductivity curve."
+  (extra &old
+         [set format x "%g"]
+         [set format y "%.0e"]
+         "set logscale y")
+  (ymax 1e4 [])
+  (ymin 1e-10 [])
+  (declare hor String "Name of horizon.")
+  (where "fig/${hor}-K.pdf")
+  (title "${hor} conductivity curve"))
+
+
+(defxysource "Retention" arithmetic
+  (x "Pressure")
+  (file "retention.ddf"))
+
+(defxysource "Retention 0-25 Daisy" "Retention Daisy" 
+  (y (convert (soil_Theta (horizon "H0-25")
+                          (top_soil true)
+                          (h x))
+              [%])))
+
+(defxysource "Retention 0-25 HYPRES" "Retention HYPRES"
+  (y (convert (soil_Theta (horizon ("H0-25" (hydraulic hypres)))
+                          (top_soil true)
+                          (h x))
+              [%])))
+
+(defxysource "Conductivity 0-25 Daisy" "Conductivity Daisy" 
+  (y (convert (soil_K (horizon "H0-25")
+                      (top_soil true)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity 0-25 HYPRES" "Conductivity HYPRES"
+  (y (convert (soil_K (horizon ("H0-25" (hydraulic hypres)))
+                      (top_soil true)
+                      (h x))
+              [cm/d])))
+
+(defgnuplot "Retention 0-25" "Retention All"
+  (hor "H0-25")
+  (legend ne)
+  (source "Retention 0-25 HYPRES"
+          (Retention (y "30-1") (title "30-1"))
+          (Retention (y "30-2") (title "30-2"))
+          (Retention (y "30-3") (title "30-3"))))
+
+(defgnuplot "Conductivity 0-25" "Conductivity All"
+  (hor "H0-25")
+  (source "Conductivity 0-25 HYPRES"))
+
+(defxysource "Retention 25-50 Daisy" "Retention Daisy" 
+  (y (convert (soil_Theta (horizon "H25-50")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Retention 25-50 HYPRES" "Retention HYPRES"
+  (y (convert (soil_Theta (horizon ("H25-50" (hydraulic hypres)))
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Conductivity 25-50 Daisy" "Conductivity Daisy" 
+  (y (convert (soil_K (horizon "H25-50")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity 25-50 HYPRES" "Conductivity HYPRES"
+  (y (convert (soil_K (horizon ("H25-50" (hydraulic hypres)))
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defgnuplot "Retention 25-50" "Retention All"
+  (hor "H25-50")
+  (legend ne)
+  (source "Retention 25-50 HYPRES"
+          "Retention 25-50 Daisy"
+          (Retention (y "30-1") (title "30-1"))
+          (Retention (y "30-2") (title "30-2"))
+          (Retention (y "30-3") (title "30-3"))
+          (Retention (y "50-1") (title "50-1"))
+          (Retention (y "50-2") (title "50-2"))
+          (Retention (y "50-3") (title "50-3") (style 8))))
+
+(defgnuplot "Conductivity 25-50" "Conductivity All"
+  (hor "H25-50")
+  (source "Conductivity 25-50 HYPRES"
+          "Conductivity 25-50 Daisy"))
+
+(defxysource "Retention 50-100 Daisy" "Retention Daisy" 
+  (y (convert (soil_Theta (horizon "H50-100")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Retention 50-100 HYPRES" "Retention HYPRES"
+  (y (convert (soil_Theta (horizon ("H50-100" (hydraulic hypres)))
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Conductivity 50-100 Daisy" "Conductivity Daisy" 
+  (y (convert (soil_K (horizon "H50-100")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity 50-100 HYPRES" "Conductivity HYPRES"
+  (y (convert (soil_K (horizon ("H50-100" (hydraulic hypres)))
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defgnuplot "Retention 50-100" "Retention All"
+  (hor "H50-100")
+  (legend ne)
+  (source "Retention 50-100 HYPRES"
+          "Retention 50-100 Daisy"
+          (Retention (y "50-1") (title "50-1"))
+          (Retention (y "50-2") (title "50-2"))
+          (Retention (y "50-3") (title "50-3"))
+          (Retention (y "80-1") (title "80-1"))
+          (Retention (y "80-2") (title "80-2"))
+          (Retention (y "80-3") (title "80-3") (style 8))
+          ))
+
+(defgnuplot "Conductivity 50-100" "Conductivity All"
+  (hor "H50-100")
+  (source "Conductivity 50-100 HYPRES"
+          "Conductivity 50-100 Daisy"))
+
+(defgnuplot hydraulics multi
+  (graph "Retention 0-25"
+         "Conductivity 0-25"
+         "Retention 25-50"
+         "Conductivity 25-50"
+         "Retention 50-100"
+         "Conductivity 50-100"
+         ))
+
+(defprogram plothydro gnuplot
+  (graph hydraulics
+         ))
+
+(run plothydro)

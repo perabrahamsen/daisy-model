@@ -5,6 +5,7 @@
 (scn "MXNRTWW")
 
 (defcrop "WW" "Winter Wheat; N1994"
+  (CrpN (CrSOrgCnc (2.0 [DS] 0.0155 [g N/g DM])))
   (Root (MxNH4Up     1.0E-8)
         (MxNO3Up     1.0E-8)))
      

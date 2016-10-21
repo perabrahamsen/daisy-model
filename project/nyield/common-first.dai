@@ -27,8 +27,45 @@
   (factor 1.157e-7))
 
 (defcrop "Spring Barley; PA" "Spring Barley"
+  (Devel original
+         ;; Kalib. CPE tal.
+         (DSRate1  0.028)
+         (DSRate2  0.024)
+         )
+  (Seed release
+        (initial_weight 140 [kg/ha])    ;CPE
+        ;; Som hvede.
+        (DM_fraction 87 [%])
+        (C_fraction 45 [%])
+        (N_fraction 2 [%])
+        (rate 0.4 [d^-1]))  
+  ;; Fra hvedekalib.
   (Root (MxNH4Up     2.5E-8)
-        (MxNO3Up     2.5E-8)))
+        (MxNO3Up     2.5E-8))
+  ;; Fra Foulum param.
+  (Canopy (SpSOrgAI 0.005)
+          (SOrgAIMod (0.0 1.0) (1.7 1.0) (2.0 0.0))
+          (SOrgPhotEff 0.50))
+  (Prod (LfDR (0.00 0.00) (1.00 0.00) (1.20 0.02) (1.30 0.08) (2.00 0.10)))
+
+  (Partit
+   ;; Fra Jozef.
+   (Root (0.00 0.5) (0.5 0.45) (0.7 0.15) (0.95 0.05) (2.00 0.00))
+   ;; Calib CPE tal
+   (Leaf (0.00 1.00) (0.25 0.45) (0.31 0.23) (0.60 0.23) (0.72 0.23)
+         (0.83 0.23) (0.95 0.45) (1.21 0.00) (2.00 0.00))
+   (Stem (0.00 0.00) (0.25 0.55) (0.31 0.77) (0.60 0.77) (0.72 0.77)
+         (0.83 0.77) (0.95 0.55) (1.21 0.00) (2.00 0.00)))
+
+  ;; Fra Foulum.
+  (CrpN (PtLeafCnc (0.00 0.060)    (0.80 0.040) (2.00 0.020) )
+        (CrLeafCnc (0.00 0.030)    (0.80 0.030) (2.00 0.015) )
+        (NfLeafCnc (0.00 0.004)    (0.80 0.004) (2.00 0.004) )
+
+        (PtStemCnc (0.50 0.060)    (1.00 0.020)    (2.00 0.010) )
+        ;; Change 0.006 to 0.005 from Vaarbyg.
+        (CrStemCnc (0.50 0.010)    (1.00 0.010)    (2.00 0.005) )
+        (NfStemCnc (0.50 0.004)    (1.00 0.004)    (2.00 0.004) )))
 
 (defcrop "Winter Rape; PA" "Winter Rape"
   (Root (MxNH4Up     2.5E-8)
