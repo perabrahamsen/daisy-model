@@ -168,7 +168,7 @@ Value of each parameter.");
         return false;
       }
     expr->tick (units, *scope, msg);
-    const symbol dimension = expr->dimension (*scope);
+    // const symbol dimension = expr->dimension (*scope);
 
     if (expr->missing (*scope))
       return false;

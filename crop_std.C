@@ -74,7 +74,7 @@ struct CropStandard : public Crop
   const std::unique_ptr<Photo> shadow;
   const std::unique_ptr<Photo> sunlit;
   const std::unique_ptr<Photo> reserved;
-  CrpN nitrogen;
+  const std::unique_ptr<CrpN> nitrogen;
   const std::unique_ptr<WSE> water_stress_effect;
   const bool enable_N_stress;
   const double min_light_fraction;
@@ -197,7 +197,7 @@ struct CropStandard : public Crop
   { 
     // kg/ha -> g/m^2
     const double conv = 1000.0 / (100.0 * 100.0);
-    return nitrogen.Fixated / conv; 
+    return nitrogen->Fixated / conv; 
   }
   double total_N () const
   { return production.total_N (); }
@@ -307,7 +307,7 @@ CropStandard::initialize_shared (const Metalib& metalib, const Geometry& geo,
 		   //  until midnight (small error).
 		   seed_CAI);
       root_system->set_density (geo, SoilLimit, production.WRoot, DS, msg);
-      nitrogen.content (DS, production, msg);
+      nitrogen->content (DS, production, msg);
     }
 }
 
@@ -407,9 +407,9 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
   // photosynthesis.  N content above critical is considered
   // luxury, and also not used in photosynthesis.
   const double N_at_Nf 
-    = canopy->corresponding_WLeaf (DS) * nitrogen.NfLeafCnc (DS);
+    = canopy->corresponding_WLeaf (DS) * nitrogen->NfLeafCnc (DS);
   const double N_at_Cr
-    = canopy->corresponding_WLeaf (DS) * nitrogen.CrLeafCnc (DS);
+    = canopy->corresponding_WLeaf (DS) * nitrogen->CrLeafCnc (DS);
   const double N_above_Nf = production.NLeaf - N_at_Nf;
   const double rubiscoN = bound (0.0, N_above_Nf, N_at_Cr - N_at_Nf);
   daisy_assert (rubiscoN >= 0.0);
@@ -520,7 +520,7 @@ CropStandard::tick (const Metalib& metalib,
   root_system->tick_dynamic (T_soil, day_fraction, soil_water, dt);
 
   // Clear nitrogen.
-  nitrogen.clear ();
+  nitrogen->clear ();
 
   // Update age.
   development->DAP += dt/24.0;
@@ -555,7 +555,7 @@ CropStandard::tick (const Metalib& metalib,
           const double seed_CAI = seed->forced_CAI (WLeaf, SpLAI, DS);
 	  canopy->tick (production.WLeaf, production.WSOrg,
 		       production.WStem, DS, seed_CAI);
-	  nitrogen.content (DS, production, msg);
+	  nitrogen->content (DS, production, msg);
 	  root_system->tick_daily (geo, soil, soil_water, production.WRoot, 0.0,
                                    DS, msg);
 
@@ -599,14 +599,14 @@ CropStandard::tick (const Metalib& metalib,
   daisy_assert (production.AM_root);
   daisy_assert (production.AM_leaf);
   
-  nitrogen.update (production.NCrop, DS, 
+  nitrogen->update (production.NCrop, DS, 
                    geo, soil, soil_water, chemistry,
                    bioclimate.day_fraction (dt),
                    *root_system, dt);
 
   harvesting->water_use (bioclimate.total_ea () * dt);
 
-  const double nitrogen_stress = nitrogen.nitrogen_stress;
+  const double nitrogen_stress = nitrogen->nitrogen_stress;
   const double water_stress = root_system->water_stress;
 
   double Ass = production.PotCanopyAss;
@@ -638,11 +638,11 @@ CropStandard::tick (const Metalib& metalib,
   const double seed_C = seed->release_C (dt);
   production.tick (bioclimate.daily_air_temperature (), T_soil_3,
 		   root_system->Density, geo, DS, 
-		   canopy->CAImRat, nitrogen, nitrogen_stress, seed_C, 
+		   canopy->CAImRat, *nitrogen, nitrogen_stress, seed_C, 
                    partition, 
 		   residuals_DM, residuals_N_top, residuals_C_top,
 		   residuals_N_soil, residuals_C_soil, dt, msg);
-  nitrogen.content (DS, production, msg);
+  nitrogen->content (DS, production, msg);
   if (!new_day)
     return;
 
@@ -685,7 +685,7 @@ CropStandard::harvest (const symbol column_name,
   TREELOG_MODEL (msg);
 
   // Update nitrogen content.
-  nitrogen.content (development->DS, production, msg);
+  nitrogen->content (development->DS, production, msg);
 
   // Leave stem and leaf below stub alone.
   double stem_harvest;
@@ -721,11 +721,11 @@ CropStandard::harvest (const symbol column_name,
                            residuals_N_soil, residuals_C_soil,
                            combine,
                            root_system->water_stress_days, 
-                           nitrogen.nitrogen_stress_days, msg);
+                           nitrogen->nitrogen_stress_days, msg);
 
   if (!approximate (development->DS, DSremove))
     {
-      nitrogen.cut (development->DS); // Stop fixation.
+      nitrogen->cut (development->DS); // Stop fixation.
 
       if (development->DS > 0.0)
 	{
@@ -776,7 +776,7 @@ CropStandard::pluck (const symbol column_name,
   TREELOG_MODEL (msg);
   
   // Update nitrogen content.
-  nitrogen.content (development->DS, production, msg);
+  nitrogen->content (development->DS, production, msg);
 
   // Harvest.
   const Harvest& harvest 
@@ -791,12 +791,12 @@ CropStandard::pluck (const symbol column_name,
                            residuals_N_soil, residuals_C_soil,
                            false,
                            root_system->water_stress_days, 
-                           nitrogen.nitrogen_stress_days, msg);
+                           nitrogen->nitrogen_stress_days, msg);
 
   // Phenology may be affected.
   if (!approximate (development->DS, DSremove))
     {
-      nitrogen.cut (development->DS); // Stop fixation.
+      nitrogen->cut (development->DS); // Stop fixation.
 
       if (development->DS > 0.0)
 	{
@@ -843,7 +843,7 @@ CropStandard::output (Log& log) const
   output_derived (shadow, "LeafPhot", log);
   output_derived (sunlit, "sunlit", log);
   output_derived (reserved, "reserved", log);
-  output_submodule (nitrogen, "CrpN", log);
+  output_submodule (*nitrogen, "CrpN", log);
 }
 
 static std::unique_ptr<WSE> 
@@ -890,7 +890,7 @@ CropStandard::CropStandard (const BlockModel& al)
     shadow (Librarian::build_item<Photo> (al, "LeafPhot")),
     sunlit (Librarian::build_item<Photo> (al, "LeafPhot")),
     reserved (Librarian::build_item<Photo> (al, "LeafPhot")),
-    nitrogen (al.submodel ("CrpN")),
+    nitrogen (submodel<CrpN> (al, "CrpN")),
     water_stress_effect (find_WSE (al, *shadow)),
     enable_N_stress (al.flag ("enable_N_stress", !shadow->handle_N_stress ())),
     min_light_fraction (al.number ("min_light_fraction"))

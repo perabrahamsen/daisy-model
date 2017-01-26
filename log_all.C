@@ -175,7 +175,7 @@ LogAll::open_derived_type (const symbol key, const symbol component)
   active_leafs.push (std::vector<Select*> ());
   std::vector<Select*>& leafs = active_leafs.top ();
 
-  const Library& library = metalib ().library (symbol (component));
+  const Library& library = metalib ().library (component);
   const std::set<symbol>& ancestors = library.ancestors (key);
 
   for (std::vector<Select*>::const_iterator i = old.begin (); 

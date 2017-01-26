@@ -597,8 +597,8 @@ Oldunits::Oldunits ()
 
 Oldunits::~Oldunits ()
 {
-  daisy_assert (content);
-  daisy_assert (count > 0);
+  daisy_safe_assert (content);
+  daisy_safe_assert (count > 0);
   count--;
   if (count < 1)
     {

@@ -2,12 +2,14 @@
 
 (defhorizon Danish numeric
   "Classification used in some Danish sites."
+  ("tortuosity" "linear")
   (limits 2 20 63 200 2000 [um]))
 
 (defhorizon H0-25 Danish
   (cite "jordpakning")
   (humus 2.13 [%])
   (normalize true)
+  ;;(SOM_fractions 0.3 0.7)
   (dry_bulk_density 1.66711 [g/cm^3]) ; Estimated from porosity and texture.
   (fractions 12.4 13.3 13.7 26.5 32.0 [%]))
 

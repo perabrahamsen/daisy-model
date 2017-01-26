@@ -164,7 +164,7 @@ Total amount of water entering the system as rain and snow.")
            ))
 
 (defsummary NCrop fractiles
-  (tags sorg_N sorg_DM sorg_N_per_DM leaf_N leaf_DM stem_N stem_DM water_stress_days nitrogen_stress_days sow emerge flowering ripe harvest)
+  (tags sorg_N sorg_DM sorg_N_per_DM leaf_N leaf_DM stem_N stem_DM water_stress_days nitrogen_stress_days sow emerge flowering ripe harvest harvest_index)
   (fractiles 0 10 50 90 100 [%])
   (first "NCROP\t${scn}\t${period}\t${fert}\t${column}\t${crop}"))
   
@@ -244,6 +244,11 @@ Total amount of water entering the system as rain and snow.")
                    (tag "harvest")
                    (dimension [jday])
                    (handle content_sum))
+           (number (path column "${column}" Vegetation crops
+                         harvest "${crop}" harvest_index)
+                   (handle content_sum)
+                   (dimension "%")
+                   (spec fixed Harvest harvest_index))
            ))
 
 (defsummary Uptake fractiles
@@ -691,6 +696,36 @@ File component name indicating crop logged. Empty if not specified.")
   (mycol JB7)
   (column JB7))
 
+(defprogram JB4_Low_Min REF
+  (fert "Min")
+  (weather D2014) (period "low")
+  (mycol JB4)
+  (column JB4)
+  (manager ROT_JB4_2014_Min ROT_JB4_2014_Min
+           (store_SOM)
+           (message "SOM stored")
+           (repeat (activity ROT_JB4_Low_Min restore_SOM))))
+
+(defprogram JB6_Low_Min REF
+  (fert "Min")
+  (weather D2014) (period "low")
+  (mycol JB6)
+  (column JB6)
+  (manager ROT_JB6_2014_Min ROT_JB6_2014_Min
+           (store_SOM)
+           (message "SOM stored")
+           (repeat (activity ROT_JB6_Low_Min restore_SOM))))
+
+(defprogram JB7_Low_Min REF
+  (fert "Min")
+  (weather D2014) (period "low")
+  (mycol JB7)
+  (column JB7)
+  (manager ROT_JB7_2014_Min ROT_JB7_2014_Min
+           (store_SOM)
+           (message "SOM stored")
+           (repeat (activity ROT_JB7_Low_Min restore_SOM))))
+
 (defprogram All_2014_Min batch
   (run JB4_2014_Min JB6_2014_Min JB7_2014_Min))
 
@@ -703,8 +738,12 @@ File component name indicating crop logged. Empty if not specified.")
 (defprogram All_1994_Org batch
   (run JB4_1994_Org JB6_1994_Org JB7_1994_Org))
 
+(defprogram All_Low_Min batch
+  (run JB4_Low_Min JB6_Low_Min JB7_Low_Min))
+
 (defprogram All batch
-  (run All_2014_Min All_2014_Org All_1994_Min All_1994_Org))
+  (run All_2014_Min All_2014_Org All_1994_Min All_1994_Org
+       All_Low_Min))
 
 ;;; commom-last.dai ends here.
 

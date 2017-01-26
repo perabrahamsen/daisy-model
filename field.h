@@ -46,6 +46,7 @@ class Block;
 class Metalib;
 class Scope;
 class Volume;
+class Crop;
 
 class Field : public Border
 { 
@@ -72,6 +73,9 @@ public:
                        const double factor, const int intervals,
                        Treelog& msg) const;
   void sow (const Metalib&, const FrameModel& crop, 
+            double row_width, double row_pos, double seed,
+            const Time&, Treelog&);
+  void sow (const Metalib&, Crop& crop, 
             double row_width, double row_pos, double seed,
             const Time&, Treelog&);
   void ridge (const FrameSubmodel& ridge);

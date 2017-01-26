@@ -1,5 +1,31 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* Scenarier
+
+* Inden jul
+
+** DONE Denit valgt
+
+** DONE Uptake valgt
+
+** Carsten kørsler ser ok ud
+
+** DOING Høstindex
+
+** DOING DM Udbytter
+
+** N udbytter
+
+** Dokumentation
+
+* SolUpt
+
+** Kør stor test med NYield opsætninger
+
+** Kører N1994, N1F10, N1F25, N2014, N2F10, N2F25
+
+* vap-figs.pdf til hjemmeside (og rørrende bilag)
+
 * SH fejl
 
 ** Brug massebalance til at udregne (vertical) flux fra bunden.
@@ -7,6 +33,21 @@ TODO ---things that needs to be done with Daisy -*- outline -*-
 Husk drænnoder!
 
 * NYield
+
+** Prøv at regne uptake ud manuelt
+
+200 ppm, C_root = 0, andre tal fra plot_nlux.dai
+
+** DENIT8 denitrifikation
+
+** logge høstindex direkte
+
+** I stedet for "low" N0-N6
+
+** Få høstindex på plads
+
+Passer vist godt 1994, skidt for 2014
+
 
 ** Vårbyg
 

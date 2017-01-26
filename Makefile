@@ -281,10 +281,11 @@ MODELS = summary_fractiles.C \
 
 DISABLED = depend.C \
 	crop_old.C crop_sold.C log_clone.C action_merge.C action_divide.C \
-	hydraulic_old.C hydraulic_old2.C 
+	hydraulic_old.C hydraulic_old2.C cdaisy.C
+
 # A component is a common interface to a number of models.
 # 
-COMPONENTS = soilph.C \
+COMPONENTS = solupt.C soilph.C \
 	deposition.C uifilter.C zone.C wsource.C solute.C drain.C \
 	draineqd.C condedge.C rainergy.C ponddamp.C scope_model.C seed.C \
 	stomatacon.C tertiary.C biopore.C secondary.C heatrect.C unit_model.C \
@@ -341,7 +342,7 @@ OTHER = treelog_child.C GP2D.C weather.C astronomy.C weatherdata.C \
 	check.C check_range.C path.C traverse_delete.C \
 	traverse.C treelog.C \
 	lexer_data.C lexer.C daisy.C library.C plf.C \
-	mathlib.C cdaisy.C nrutil.C version.C
+	mathlib.C nrutil.C version.C
 
 # Utilities in header or source alone.
 HEADONLY = submodeler.h memutils.h $(CXSPARSEHEAD)
@@ -465,7 +466,6 @@ linux:
 	(mkdir -p $(NATIVEHOME) \
 	 && cd $(NATIVEHOME) \
          && time $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile $(NATIVEEXE))
-
 
 make-win64-native:
 	(mkdir -p win64-native \

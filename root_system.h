@@ -22,8 +22,6 @@
 #ifndef ROOT_SYSTEM_H
 #define ROOT_SYSTEM_H
 
-#include "rootdens.h"
-#include "ABAprod.h"
 #include "plf.h"
 #include <vector>
 #include <memory>
@@ -32,19 +30,24 @@ class Frame;
 class Geometry;
 class Soil;
 class SoilWater;
-class Chemical;
 class Chemistry;
 class Log;
 class Metalib;
 class Units;
 class Block;
+class Rootdens;
+class ABAProd;
+class Solupt;
+class Treelog;
 
 class RootSystem
 {
   // Components.
 private:
   std::unique_ptr<Rootdens> rootdens; // Root density calculation.
-  std::unique_ptr<ABAProd> ABAprod; // Root density calculation.
+  std::unique_ptr<ABAProd> ABAprod;   // Root density calculation.
+  std::unique_ptr<Solupt> NH4_uptake; // Ammonium uptake.
+  std::unique_ptr<Solupt> NO3_uptake; // Nitrate uptake.
 
   // Parameters.
 private:
@@ -107,11 +110,6 @@ public:
                        const Geometry&,
 		       const Soil& soil, const SoilWater& soil_water,
                        double EvapInterception, double dt, Treelog&);
-private:
-  double solute_uptake (const Geometry&, 
-                        const Soil&, const SoilWater&, Chemical&,
-			double PotNUpt, std::vector<double>& uptake,
-			double i_max, double C_root_min, double dt);
 public:
   double nitrogen_uptake (const Geometry&,
                           const Soil& soil,
@@ -119,8 +117,7 @@ public:
 			  Chemistry& chemistry,
 			  double NH4_root_min,
 			  double NO3_root_min,
-			  double PotNUpt,
-                          double dt);
+			  double PotNUpt);
 
   // Simulation.
 private:

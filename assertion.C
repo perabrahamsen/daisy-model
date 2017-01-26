@@ -217,8 +217,8 @@ Assertion::Register::~Register ()
                       &treelog)
                 != logs ().end ());
   logs ().erase (find (logs ().begin (), logs ().end (), &treelog));
-  daisy_assert (find (logs ().begin (), logs ().end (), &treelog)
-                == logs ().end ());
+  daisy_safe_assert (find (logs ().begin (), logs ().end (), &treelog)
+                     == logs ().end ());
 }
 
 // assertion.C ends here.

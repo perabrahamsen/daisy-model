@@ -67,7 +67,7 @@ struct LogHarvest : public Log
 	  out << "\tstem_N\tdead_N\tleaf_N\tsorg_N";
 	if (print_C)
 	  out << "\tstem_C\tdead_C\tleaf_C\tsorg_C";
-	out << "\tWStress\tNStress\tWP_ET\n";
+	out << "\tWStress\tNStress\tWP_ET\tHI\n";
 	print_tags = false;
       }
     if (print_dimension)
@@ -78,7 +78,7 @@ struct LogHarvest : public Log
 	  out << "\tkg N/ha\tkg N/ha\tkg N/ha\tkg N/ha";
 	if (print_C)
 	  out << "\tkg C/ha\tkg C/ha\tkg C/ha\tkg C/ha";
-	out << "\td\td\tkg/m^3\n";
+	out << "\td\td\tkg/m^3\t\n";
 	print_dimension = false;
       }
     for (; last_size < daisy.harvest ().size (); last_size++)
@@ -106,6 +106,7 @@ struct LogHarvest : public Log
 	out << "\t" << harvest.water_stress_days
             << "\t" << harvest.nitrogen_stress_days
             << "\t" << harvest.water_productivity
+            << "\t" << harvest.harvest_index
             << "\n";
 	out.flush ();
       }

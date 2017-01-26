@@ -327,7 +327,7 @@ Connvert to SI base units by multiplying with a factor.")
          "Square centimeter.");
     add ("ha", u_ha, 2, 0, 0, 0, 0, 0, 0,
          "Hectare.");
-
+         
     add ("m^3", 1.0, 3, 0, 0, 0, 0, 0, 0,
          "Cube meter.");
     add ("cm^3", p_c_3, 3, 0, 0, 0, 0, 0, 0,
@@ -344,6 +344,8 @@ Connvert to SI base units by multiplying with a factor.")
          "Per aquare meter.");
     add ("cm^-2", 1.0 / p_c_2, -2, 0, 0, 0, 0, 0, 0,
          "Per aquare centimeter.");
+    add ("cm R/cm^3", p_c / p_c_3, -2, 0, 0, 0, 0, 0, 0,
+         "Root length per cubic centimeter.");
     
     // Mass.
     add ("kg", p_k * u_g, 0, 1, 0, 0, 0, 0, 0,
@@ -416,6 +418,14 @@ Connvert to SI base units by multiplying with a factor.")
     add ("kg/m", 1e0, -1, 1, 0, 0, 0, 0, 0,
          "Base mass per length.");
 
+    // Mass per time.
+    add ("kg/s", 1e0, 0, 1, -1, 0, 0, 0, 0,
+         "Base mass per time.");
+    add ("g/h", u_g / u_h, 0, 1, -1, 0, 0, 0, 0,
+         "Gram per hour.");
+    add ("kg/h", 1.0 / u_h, 0, 1, -1, 0, 0, 0, 0,
+         "Kilogram per hour.");
+    
     // Mass per length flux.
     add ("kg/m/s", p_k * u_g, -1, 1, -1, 0, 0, 0, 0,
          "Base mass per length flux.");
@@ -424,8 +434,11 @@ Connvert to SI base units by multiplying with a factor.")
          "Mass per length flux.");
     add ("g/cm/h", u_g / p_c / u_h,
          -1, 1, -1, 0, 0, 0, 0,
-         "Base mass per length flux.");
-    
+         "Mass per length flux.");
+    add ("g/cm R/h", u_g / p_c / u_h,
+         -1, 1, -1, 0, 0, 0, 0,
+         "Gram per centimeter root per hour.");
+      
     // Mass per area.
     add ("kg/m^2", p_k * u_g, -2, 1, 0, 0, 0, 0, 0,
          "Base mass per area.");
@@ -489,7 +502,7 @@ Connvert to SI base units by multiplying with a factor.")
          -2, 1, 0, 0, 0, 0, 0,
          "Wet weight per area.");
 
-    // Mass per area flux.
+      // Mass per area flux.
     add ("kg/m^2/s", p_k * u_g, -2, 1, -1, 0, 0, 0, 0,
          "Base mass per area flux.");
     add (Unit::mass_per_area_per_time ().name (),
@@ -611,6 +624,17 @@ Connvert to SI base units by multiplying with a factor.")
          -3, 1, 0, 0, 0, 0, 0,
          "gram per hectare per millimeter.");
     
+    add ("g/cm^3/h", u_g / p_c_3 / u_h, -3, 1, -1, 0, 0, 0, 0,
+         "Gram per cubic centimeter per hour.");
+    
+    // Area per time.
+    add ("m^2/s", 1.0, 2, 0, -1, 0, 0, 0, 0,
+         "Base area per time unit.");
+    add ("cm^2/s", p_c_2 / u_s, 2, 0, -1, 0, 0, 0, 0,
+         "Square centimeters per second.");
+    add ("cm^2/h", p_c_2 / u_h, 2, 0, -1, 0, 0, 0, 0,
+         "Square centimeters per hour.");
+      
     // Volume per mass.
     add ("m^3/kg", 1e0, 3, -1, 0, 0, 0, 0, 0,
          "Base volume per mass.");
@@ -736,6 +760,12 @@ Connvert to SI base units by multiplying with a factor.")
     add ("erg/cm^2/h", 2.778e-7,
          0, 1, -3, 0, 0, 0, 0,
          "erg per square centimer per hour.");
+
+    // Lenght per temperature per time.
+    add ("mm/dg C/d", p_m / u_d, 1, 0, -1, 0, -1, 0, 0,
+         "Root growth.");
+    add ("cm/dg C/d", p_c / u_d, 1, 0, -1, 0, -1, 0, 0,
+         "Root growth.");
   }
   void load_frame (Frame& frame) const
   {

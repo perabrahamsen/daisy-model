@@ -2815,34 +2815,27 @@ OrganicStandard::check_am (const FrameModel& am, Treelog& err) const
 	  std::ostringstream tmp;
 	  tmp << "[" << i << "]";
 	  Treelog::Open nest (err, tmp.str ());
-	  bool om_ok = true;
-	  if (om_ok)
-	    {
-	      std::vector<double> fractions
-		= om_alist[i]->number_sequence ("fractions");
-	      if (fractions.size () != smb.size () + 1 + dom.size ()
-		  && fractions.size () != smb.size () + 1)
-		{
-		  std::ostringstream tmp;
-		  tmp << "You have " << fractions.size ()
-                      << " fractions but " << smb.size ()
-                      << " smb, 1 som buffer and " << dom.size () 
-                      << " dom";
-		  err.entry (tmp.str ());
-		  ok = false;
-		}
-	      double sum
-		= accumulate (fractions.begin (), fractions.end (), 0.0);
-	      if (fabs (sum - 1.0) > 0.0001)
-		{
-		  std::ostringstream tmp;
-		  tmp << "The sum of all fractions is " << sum;
-		  err.entry (tmp.str ());
-		  ok = false;
-		}
-	    }
-	  else 
-            ok = false;
+          std::vector<double> fractions
+            = om_alist[i]->number_sequence ("fractions");
+          if (fractions.size () != smb.size () + 1 + dom.size ()
+              && fractions.size () != smb.size () + 1)
+            {
+              std::ostringstream tmp;
+              tmp << "You have " << fractions.size ()
+                  << " fractions but " << smb.size ()
+                  << " smb, 1 som buffer and " << dom.size () 
+                  << " dom";
+              err.entry (tmp.str ());
+              ok = false;
+            }
+          double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
+          if (fabs (sum - 1.0) > 0.0001)
+            {
+              std::ostringstream tmp;
+              tmp << "The sum of all fractions is " << sum;
+              err.entry (tmp.str ());
+              ok = false;
+            }
 	}
     }
   return ok;

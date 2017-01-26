@@ -86,6 +86,16 @@ Harvesting::harvest (const symbol column_name,
   daisy_assert (approximate (total_old_N,
                              production.NCrop + production.NDead));
 
+  // Harvest index.
+  const double shoot_old_DM = production.WStem + production.WLeaf
+    + production.WSOrg + production.WDead;
+  const double economic_SOrg_DM = production.WSOrg * EconomicYield_W;
+  if (economic_SOrg_DM > 0.0)
+    daisy_assert (shoot_old_DM > 0.0);
+  const double harvest_index = (shoot_old_DM > 0.0)
+    ? economic_SOrg_DM / shoot_old_DM
+    : 0.0;
+
   // Find C concentrations.
   const double C_C_Stem = DM_to_C_factor (production.E_Stem);
   const double C_C_Leaf = DM_to_C_factor (production.E_Leaf);
@@ -475,7 +485,7 @@ Harvesting::harvest (const symbol column_name,
                          0.0, 0.0, 0.0,
                          0.0, 0.0, 0.0,
                          0.0, 0.0, 0.0,
-                         wsd, nsd, wp_et);
+                         wsd, nsd, wp_et, harvest_index);
   else
     return *new Harvest (column_name,
                          sow_time, emerge_time, flowering_time, ripe_time,
@@ -483,7 +493,7 @@ Harvesting::harvest (const symbol column_name,
                          Stem_W_Yield, Stem_N_Yield, Stem_C_Yield,
                          Dead_W_Yield, Dead_N_Yield, Dead_C_Yield,
                          Leaf_W_Yield, Leaf_N_Yield, Leaf_C_Yield,
-                         WEYRm, NEYRm, CEYRm, wsd, nsd, wp_et);
+                         WEYRm, NEYRm, CEYRm, wsd, nsd, wp_et, harvest_index);
 }
 
 void

@@ -24,7 +24,7 @@
 #include "crpn.h"
 #include "production.h"
 #include "root_system.h"
-#include "frame_submodel.h"
+#include "block_submodel.h"
 #include "treelog.h"
 #include "log.h"
 #include "plf.h"
@@ -151,12 +151,18 @@ CrpN::update (double& NCrop, const double DS,
 	      RootSystem& root_system,
               const double dt)
 {
+  const double one_hour = 1.0;  // [h]
   double PotNUpt = (PtNCnt - NCrop);
 
-  const double NUpt = root_system.nitrogen_uptake (geo, soil, soil_water, 
-						   chemistry,
-						   NH4_root_min, NO3_root_min,
-						   PotNUpt, dt) * dt;
+  const double NUpt = (NCrop < CrNCnt || DS < 1.0)
+    ? root_system.nitrogen_uptake (geo, soil, soil_water, 
+                                   chemistry,
+                                   NH4_root_min, NO3_root_min,
+                                   PotNUpt / one_hour) * dt
+    : root_system.nitrogen_uptake (geo, soil, soil_water, 
+                                   chemistry,
+                                   NH4_root_min_luxury, NO3_root_min_luxury,
+                                   PotNUpt / one_hour) * dt;
   NCrop += NUpt;
   PotNUpt -= NUpt;
 
@@ -288,6 +294,15 @@ Minimum nitrate concentration near roots for uptake.");
 Minimum ammonium concentration near roots for uptake.");
   frame.set ("NH4_root_min", 0.0);
 
+  frame.declare ("NO3_root_min_luxury", "g N/cm^3", Check::non_negative (), 
+	      Attribute::OptionalConst, "\
+Minimum nitrate concentration near roots for luxury uptake.\n\
+Unly used in reproductive phase. By default identical to 'NO3_root_min'.");
+  frame.declare ("NH4_root_min_luxury", "g N/cm^3", Check::non_negative (),
+	      Attribute::OptionalConst, "\
+Minimum ammonium concentration near roots for luxury_uptake.\n\
+Unly used in reproductive phase. By default identical to 'NH4_root_min'.");
+
   // Stress.
   frame.declare ("nitrogen_stress", Attribute::None (), Check::fraction (),
 	      Attribute::LogOnly,
@@ -318,7 +333,7 @@ action of the radition of that day that was received that hour.");
 	      "Development stage at which to restart fixation after a cut.");
 }
 
-CrpN::CrpN (const FrameSubmodel& al)
+CrpN::CrpN (const BlockSubmodel& al)
   : PtLeafCnc (al.plf ("PtLeafCnc")),
     CrLeafCnc (al.plf ("CrLeafCnc")),
     NfLeafCnc (al.plf ("NfLeafCnc")),
@@ -338,6 +353,8 @@ CrpN::CrpN (const FrameSubmodel& al)
     NfNCnt (0.0),
     NO3_root_min (al.number ("NO3_root_min")),
     NH4_root_min (al.number ("NH4_root_min")),
+    NO3_root_min_luxury (al.number ("NO3_root_min_luxury", NO3_root_min)),
+    NH4_root_min_luxury (al.number ("NH4_root_min_luxury", NH4_root_min)),
     nitrogen_stress (0.0),
     nitrogen_stress_days (al.number ("nitrogen_stress_days")),
     state (N_uninitialized),
@@ -357,3 +374,5 @@ CrpN::~CrpN ()
 static DeclareSubmodel 
 crpn_submodel (CrpN::load_syntax, "CrpN", "\
 Default crop nitrogen parameters.");
+
+// crpn.C ends here.

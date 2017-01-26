@@ -451,6 +451,7 @@ Time::wday_number (symbol name)
 int
 Time::mday2yday (int year, int month, int mday)
 {
+  daisy_assert (1 <= month && month <= 12);
   bool ly = leap (year) && (month > 2);
   return Implementation::mlen[month] + mday + ly;
 }

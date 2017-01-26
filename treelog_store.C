@@ -188,7 +188,7 @@ public:
   {
     add (is_close, ""); 
     level--;
-    daisy_assert (level >= 0);
+    daisy_safe_assert (level >= 0);
   }
   void debug (const std::string& text)
   { add (is_debug, text); }

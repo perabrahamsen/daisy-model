@@ -3,67 +3,60 @@
 (input file "log.dai")
 (input file "fertilizer.dai")
 (input file "tillage.dai")
-(input file "sbarley.dai")
+(input file "soil.dai")
+(input file "../../nyield/ncrop.dai")
 (input file "dk-sbarley.dai")
 (input file "sbarley-kasper.dai")
 (input file "SBarley Tolar.dai")
-(input file "soil.dai")
 
-(defcrop "Spring Barley; PA" "Spring Barley"
-  (Devel original
-         ;; Kalib.
-         (DSRate1  0.028)
-         (DSRate2  0.024)
-         )
-  (Seed release
-        (initial_weight 140 [kg/ha])    ;CPE
-        ;; Som hvede.
-        (DM_fraction 87 [%])
-        (C_fraction 45 [%])
-        (N_fraction 2 [%])
-        (rate 0.4 [d^-1]))  
-  ;; Fra hvedekalib.
-  (Root (MxNH4Up     2.5E-8)
-        (MxNO3Up     2.5E-8))
-  ;; Fra Foulum param.
-  (Canopy (SpSOrgAI 0.005)
-          (SOrgAIMod (0.0 1.0) (1.7 1.0) (2.0 0.0))
-          (SOrgPhotEff 0.50))
-  (Prod (LfDR (0.00 0.00) (1.00 0.00) (1.20 0.02) (1.30 0.08) (2.00 0.10)))
+(defcrop "Spring Barley; Tokkerup" "Spring Barley; PA"
+  ;; wwheat
+  (LeafPhot original (Fm 5.00)
+            (Qeff   0.0500))
+  (CrpN
+      (PtLeafCnc (0.34 0.0600) (0.50 0.0360) (1.28 0.0330) (1.52 0.0288) (1.93 0.0194))
+      (CrLeafCnc (0.34 0.0210) (0.50 0.0210) (1.28 0.0210) (1.52 0.0190) (1.93 0.0183))
+      (NfLeafCnc (0.34 0.0080) (0.50 0.0080) (1.28 0.0080) (1.52 0.0080) (1.93 0.0080))
 
+      (PtStemCnc (0.50 0.0200) (1.12 0.0125) (1.28 0.0093) (1.53 0.0085) (1.93 0.0057))
+      (CrStemCnc (0.50 0.0064) (1.12 0.0049) (1.28 0.0043) (1.53 0.0041) (1.93 0.0035))
+      (NfStemCnc (0.50 0.0030) (1.12 0.0030) (1.28 0.0030) (1.53 0.0030) (1.93 0.0030))
+      )
+  (Canopy
+   ;; (SOrgAIMod (0.0 1.0) (1.7 1.0) (2.0 0.0)) ;; Opr
+   (SOrgAIMod (1.0 1.0) (2.0 0.0))
+   (SpLAI    0.023) ; Foulum
+   (LeafAIMod (0.0 1.0) (1.0 1.35))
+   )
+  ;; (enable_N_stress false)
+  ;; Calib CPE tal
   (Partit
-   ;; Fra Jozef.
-   (Root (0.00 0.5) (0.5 0.45) (0.7 0.15) (0.95 0.05) (2.00 0.00))
-   ;; Calib CPE tal
-   (Leaf (0.00 1.00) (0.25 0.45) (0.31 0.23) (0.60 0.23) (0.72 0.23)
+   (Leaf (0.00 1.00) (0.25 1.00) (0.31 0.23) (0.60 0.23) (0.72 0.23)
          (0.83 0.23) (0.95 0.45) (1.21 0.00) (2.00 0.00))
-   (Stem (0.00 0.00) (0.25 0.55) (0.31 0.77) (0.60 0.77) (0.72 0.77)
+   (Stem (0.00 0.00) (0.25 0.00) (0.31 0.77) (0.60 0.77) (0.72 0.77)
          (0.83 0.77) (0.95 0.55) (1.21 0.00) (2.00 0.00)))
+)
 
-  ;; Fra Foulum.
-  (CrpN (PtLeafCnc (0.00 0.060)    (0.80 0.040) (2.00 0.020) )
-        (CrLeafCnc (0.00 0.030)    (0.80 0.030) (2.00 0.015) )
-        (NfLeafCnc (0.00 0.004)    (0.80 0.004) (2.00 0.004) )
-
-        (PtStemCnc (0.50 0.060)    (1.00 0.020)    (2.00 0.010) )
-        ;; Change 0.006 to 0.005 from Vaarbyg.
-        (CrStemCnc (0.50 0.010)    (1.00 0.010)    (2.00 0.005) )
-        (NfStemCnc (0.50 0.004)    (1.00 0.004)    (2.00 0.004) )
-
-        ;; Fra landsforsøg.
-        (PtSOrgCnc (2.0 [DS] 0.019 [g N/g DM]))
-        (CrSOrgCnc (2.0 [DS] 0.014 [g N/g DM]))
-        (NfSOrgCnc (2.0 [DS] 0.010 [g N/g DM]))))
-
-(defcrop SB "Spring Barley; PA")
+;;(defcrop SB "Spring Barley; Tokkerup")
 ;;(defcrop SB "Spring Barley; Kasper")
 ;;(defcrop SB "Vaarbyg")
 ;;(defcrop SB "Spring Barley; Foulum")
 ;(defcrop SB "Spring Barley Tolar")
 ;;(defcrop SB "Spring Barley")
+;;(defcrop SB "Spring Barley; N1994")
+(defcrop SB "Spring Barley; N2014")
 
 (defaction SBHARVEST 
   (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
+
+(defaction "SB-generic" activity
+  (wait_mm_dd 3 05)
+  (fertilize (N25S (weight 115 [kg N/ha])))
+  (plowing)
+  (wait_mm_dd 4 05)
+  (seed_bed_preparation)(sow "SB")
+  (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
+  (SBHARVEST))
 
 (defaction "SB-2010" activity
   (wait_mm_dd 4 16)
@@ -146,6 +139,7 @@
   (SBHARVEST))
 
 (defaction "SB-all" activity
+  "SB-generic" "SB-generic"
   "SB-2010" "SB-2011" "SB-2012" "SB-2013" "SB-2014" "SB-2015" "SB-2016")
 
 (defweather Taastrup combine
@@ -185,12 +179,19 @@
 		   (dimension "mm")
 		   (min_root_density 0.1 [cm/cm^3]))))
   
+(defchemistry low_denit multi
+  (combine (N (reaction nitrification
+                        (denitrification
+                         (water_factor (0.8 0.0) (0.9 0.2) (1.0 1.0)))))))
+
 (defprogram Bakkegaarden Daisy
   (manager SB-all)
-  (column (Bakkegaarden (Soil (border -120 [cm]))))
+  (column (Bakkegaarden (Soil (border -120 [cm]))
+                        (Chemistry low_denit)))
   (weather Taastrup)
-  (time 2010 1 2)
+  (time 2008 1 2)
   (stop 2016 8 20)
+  (log_prefix "mx8/")
   (output harvest
           "Field water" "Field nitrogen"
           ("Soil water" (to -120 [cm]) (where "soil_water_120.dfl"))

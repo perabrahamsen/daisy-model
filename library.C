@@ -153,7 +153,7 @@ Library::Implementation::clear_parsed ()
       const Frame& frame = *((*i).second);
       if (frame.own_position () != Filepos::none ())
 	{
-	  const symbol key = (*i).first;
+	  // const symbol key = (*i).first;
 	  frames.erase (i);
 	  goto retry;
 	}

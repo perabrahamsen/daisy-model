@@ -153,7 +153,7 @@ IMvec::add_syntax (Frame& frame,
   daisy_assert (size != Attribute::Singleton);
   daisy_assert (size != Attribute::Unspecified);
   frame.declare_string ("name", cat, "Name of chemical.");
-  frame.set_check ("name", Chemical::check_library ());
+  frame.set_check ("name", Chemical::check_buildable ());
   frame.declare ("value", dimension, Check::none/*_negative*/ (), cat,
 		 size, "Value for chemical.");
   frame.order ("name", "value");

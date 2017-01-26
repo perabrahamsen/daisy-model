@@ -69,6 +69,7 @@ Harvest::output (Log& log) const
   output_variable (water_stress_days, log);
   output_variable (nitrogen_stress_days, log);
   output_variable (water_productivity, log);
+  output_variable (harvest_index, log);
   if (sorg_DM > 0.0)
     output_value (sorg_N / sorg_DM, "sorg_N_per_DM", log);
 }
@@ -122,6 +123,8 @@ Time of sowing or planting of crop.",
               "Production days lost due to water stress.");
   frame.declare ("water_productivity", "kg DM/m^3 H2O", Attribute::State, 
               "Storage organ harvested per evapotranspiration.");
+  frame.declare_fraction ("harvest_index", Attribute::State, 
+                          "Economic yield as fraction of total shoot.");
   frame.declare_fraction ("sorg_N_per_DM", Attribute::LogOnly, "\
 Nitrogen fraction is storage dy matter.");
 }
@@ -148,7 +151,8 @@ Harvest::Harvest (const Block& alist)
     sorg_C (alist.number ("sorg_C")),
     water_stress_days (alist.number ("water_stress_days")),
     nitrogen_stress_days (alist.number ("nitrogen_stress_days")),
-    water_productivity (alist.number ("water_productivity"))
+    water_productivity (alist.number ("water_productivity")),
+    harvest_index (alist.number ("water_productivity"))
 { }
   
 
@@ -163,7 +167,7 @@ Harvest::Harvest (const symbol col,
 		  double dDM, double dN, double dC,
 		  double lDM, double lN, double lC, 
 		  double oDM, double oN, double oC, 
-                  double wsd, double nsd, double wp_et)
+                  double wsd, double nsd, double wp_et, double hi)
   : column (col),
     sow_time (sow_t),
     emerge_time (emerge_t),
@@ -185,7 +189,8 @@ Harvest::Harvest (const symbol col,
     sorg_C (oC),
     water_stress_days (wsd),
     nitrogen_stress_days (nsd),
-    water_productivity (wp_et)
+    water_productivity (wp_et),
+    harvest_index (hi)
 { }
 
 static DeclareSubmodel 

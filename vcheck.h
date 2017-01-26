@@ -93,6 +93,7 @@ public:
   static const VCheck& fraction ();
   class Enum;
   class InLibrary;
+  class Buildable;
 
   // Sequence.
 public:
@@ -303,17 +304,29 @@ public:
 class VCheck::InLibrary : public VCheck
 {
   // Parameters.
-private:
+protected:
   const symbol lib_name;
 
   // Use.
 private:
   bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
+protected:
   bool valid (const Metalib&, const symbol value, Treelog&) const;
 
   // Create and Destroy.
 public:
   InLibrary (const symbol lib);
+};
+
+class VCheck::Buildable : public VCheck::InLibrary
+{
+  // Use.
+private:
+  bool valid (const Metalib&, const symbol value, Treelog&) const;
+
+  // Create and Destroy.
+public:
+  Buildable (const symbol lib);
 };
 
 class VCheck::MultiSize : public VCheck

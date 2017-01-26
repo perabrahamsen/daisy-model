@@ -498,7 +498,7 @@ hydraulic model");
     frame.set ("hydraulic", "hypres");
     frame.declare_object ("tortuosity", Tortuosity::component, 
                           "The soil tortuosity.");
-    frame.set ("tortuosity", "M_Q");
+    frame.set ("tortuosity", "linear");
     frame.declare ("anisotropy", Attribute::None (),
                    Check::non_negative (), Attribute::Const, "\
 Horizontal saturated water conductivity relative to vertical saturated\n\

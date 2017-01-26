@@ -85,6 +85,9 @@ namespace Assertion
 #define daisy_soft_assert(condition) \
   while (!(condition)) \
     Assertion::warning (__FILE__, __LINE__, __FUNCTION__, #condition)
+#define daisy_safe_assert(condition) \
+  while (!(condition)) \
+    Assertion::bug (__FILE__, __LINE__, __FUNCTION__, #condition)
 #define daisy_bug(msg) Assertion::bug (__FILE__, __LINE__, __FUNCTION__, msg)
 #define daisy_warning(msg) \
   Assertion::warning (__FILE__, __LINE__, __FUNCTION__, msg)

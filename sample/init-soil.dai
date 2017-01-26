@@ -59,7 +59,7 @@
 
 ;; The default value for soil heat is calculated from the average
 ;; temperature properties specified by the weather module, and the
-;; termic properties of the soil, which is usually calcluaed from the
+;; termic properties of the soil, which is usually calculated from the
 ;; texture information.
 
 ;;; init-soil.dai ends here.

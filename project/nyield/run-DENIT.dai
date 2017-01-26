@@ -1,4 +1,4 @@
-;;; run-DENIT.dai --- run N1994 scenarios with old denitrification.
+;;; run-DENIT.dai --- run N2014 scenarios with old denitrification.
 
 (input file "common-first.dai")
 
@@ -6,11 +6,8 @@
 
 (denit low_denit)
 
-(defcrop "WW" "Winter Wheat; N1994"
-  (CrpN (CrSOrgCnc (2.0 [DS] 0.0155 [g N/g DM])))
-  (Root (MxNH4Up     1.0E-8)
-        (MxNO3Up     1.0E-8)))
-(defcrop "SB" "Spring Barley; N1994")
+(defcrop "WW" "Winter Wheat; N2014")
+(defcrop "SB" "Spring Barley; N2014")
 (defcrop "WR" "Winter Rape; PA")
 
 (input file "common-last.dai")

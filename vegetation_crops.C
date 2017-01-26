@@ -33,11 +33,14 @@
 #include "metalib.h"
 #include "treelog.h"
 #include "frame_submodel.h"
+#include "library.h"
 #include <sstream>
 #include <deque>
 
 struct VegetationCrops : public Vegetation
 {
+  const Library& library;
+
   // Types.
   typedef std::deque <Crop*> CropList;
   typedef double (Crop::*CropFun) () const;
@@ -229,6 +232,14 @@ struct VegetationCrops : public Vegetation
             double SoilLimit,
             double& seed_N /* kg/ha */, double& seed_C /* kg/ha */,
             const Time&, Treelog&);
+  void sow (const Metalib&, Crop& crop, 
+            const double row_width /* [cm] */,
+            const double row_pos /* [cm] */,
+            const double seed /* [kg w.w./ha] */,
+            const Geometry&, OrganicMatter&, 
+            double SoilLimit,
+            double& seed_N /* kg/ha */, double& seed_C /* kg/ha */,
+            const Time&, Treelog&);
   void output (Log&) const;
 
   // Create and destroy.
@@ -332,10 +343,11 @@ VegetationCrops::DS_by_name (symbol name) const
 
       return DS;
     }
+
   for (CropList::const_iterator crop = crops.begin ();
        crop != crops.end ();
        crop++)
-    if ((*crop)->objid == name)
+    if (library.is_derived_from ((*crop)->objid,  name))
       return (*crop)->DS ();
   return Crop::DSremove;
 }
@@ -354,13 +366,13 @@ VegetationCrops::DM_by_name (symbol name, double height) const
 
       return sum;
     }
-  
+  double sum = 0.0;
   for (CropList::const_iterator crop = crops.begin();
        crop != crops.end();
        crop++)
-    if ((*crop)->objid == name)
-      return (*crop)->DM (height);
-  return 0.0;
+    if (library.is_derived_from ((*crop)->objid, name))
+      sum += (*crop)->DM (height);
+  return sum;
 }
 
 double 
@@ -378,12 +390,13 @@ VegetationCrops::SOrg_DM_by_name (symbol name) const
       return sum;
     }
   
+  double sum = 0.0;
   for (CropList::const_iterator crop = crops.begin();
        crop != crops.end();
        crop++)
-    if ((*crop)->objid == name)
-      return (*crop)->SOrg_DM ();
-  return 0.0;
+    if (library.is_derived_from ((*crop)->objid, name))
+      sum += (*crop)->SOrg_DM ();
+  return sum;
 }
 
 std::string
@@ -690,7 +703,7 @@ VegetationCrops::emerge (const symbol crop_name, Treelog&)
   for (CropList::iterator crop = crops.begin();
        crop != crops.end();
        crop++)
-    if (all || (*crop)->objid == crop_name)
+    if (all || library.is_derived_from ((*crop)->objid, crop_name))
       (*crop)->emerge ();
 }
 
@@ -721,7 +734,7 @@ VegetationCrops::harvest (const symbol column_name,
   for (CropList::iterator crop = crops.begin();
        crop != crops.end();
        crop++)
-    if (all || (*crop)->objid == crop_name)
+    if (all || library.is_derived_from ((*crop)->objid, crop_name))
       {
         const double old_crop_C = (*crop)->total_C ();
         const double old_residuals_C_top = residuals_C_top;
@@ -800,7 +813,7 @@ VegetationCrops::pluck (symbol column_name,
   for (CropList::iterator crop = crops.begin();
        crop != crops.end();
        crop++)
-    if (all || (*crop)->objid == crop_name)
+    if (all || library.is_derived_from ((*crop)->objid, crop_name))
       {
         const double old_crop_C = (*crop)->total_C ();
         const double old_residuals_C_top = residuals_C_top;
@@ -856,7 +869,7 @@ VegetationCrops::cleanup_canopy (const symbol crop_name, Treelog& msg)
       for (CropList::iterator crop = crops.begin();
 	   crop != crops.end();
 	   crop++)
-	if (all || (*crop)->objid == crop_name)
+	if (all || library.is_derived_from ((*crop)->objid, crop_name))
 	  {
 	    if (Crop::ds_remove (*crop))
 	      {
@@ -891,7 +904,22 @@ VegetationCrops::sow (const Metalib& metalib, const FrameModel& al,
       msg.error ("Sowing failed");
       return;
     }
-  const symbol name = crop->objid;
+  sow (metalib, *crop, row_width, row_pos, seed, geo, organic_matter,
+       SoilLimit, seed_N, seed_C, time, msg);
+}
+
+void
+VegetationCrops::sow (const Metalib& metalib, Crop& crop,
+                      const double row_width,
+                      const double row_pos,
+                      const double seed,
+		      const Geometry& geo,
+		      OrganicMatter& organic_matter, 
+                      const double SoilLimit,
+                      double& seed_N, double& seed_C, const Time& time, 
+                      Treelog& msg)
+{
+  const symbol name = crop.objid;
   for (CropList::iterator i = crops.begin();
        i != crops.end();
        i++)
@@ -899,17 +927,17 @@ VegetationCrops::sow (const Metalib& metalib, const FrameModel& al,
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
   const Units& units = metalib.units ();
-  crop->initialize (metalib, 
+  crop.initialize (metalib, 
                     units, geo, row_width, row_pos, seed, organic_matter,
                     SoilLimit, time, msg);
-  if (!crop->check (units, geo, msg))
+  if (!crop.check (units, geo, msg))
     {
       msg.error ("Sow failed");
       return;
     }
-  crops.push_back (crop);
-  seed_N += crop->total_N ();
-  seed_C += crop->total_C ();
+  crops.push_back (&crop);
+  seed_N += crop.total_N ();
+  seed_C += crop.total_C ();
   reset_canopy_structure (msg);
 }
 
@@ -974,6 +1002,7 @@ VegetationCrops::build_crops (const BlockModel& al, const std::string& key)
 
 VegetationCrops::VegetationCrops (const BlockModel& al)
   : Vegetation (al),
+    library (al.metalib ().library (Crop::component)),
     crops (build_crops (al, "crops")),
     N_ (0.0),
     N_fixated_ (0.0),

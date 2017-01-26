@@ -624,7 +624,10 @@ WSourceWeather::Implementation::name_first (const symbol key) const
   // Available data.
   const name_map_t::const_iterator e = names.find (key);
   if (e == names.end ())
-    daisy_bug ("Weather source for '" + key.name () + "' not found");
+    {
+      daisy_bug ("Weather source for '" + key.name () + "' not found");
+      return Attribute::Unknown ();
+    }
   const std::deque<symbol>& values = e->second;
   const size_t data_size = when.size ();
   daisy_assert (values.size () == data_size);

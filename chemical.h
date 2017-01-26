@@ -178,7 +178,7 @@ public:
 
   // Create and Destroy.
 public:
-  static const VCheck& check_library ();
+  static const VCheck& check_buildable ();
   virtual bool check (const Units&, const Scope&, 
                       const Geometry&, const Soil&, const SoilWater&,
 		      const Chemistry&, Treelog&) const = 0;

@@ -49,8 +49,6 @@ public:
   // Create and Destroy.
 public:
   static const Filepos& none ();
-  const Filepos& operator= (const Filepos&);
-  Filepos (const Filepos&);
   Filepos (const symbol file, int line, int column);
   Filepos ();
   ~Filepos ();

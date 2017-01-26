@@ -303,8 +303,7 @@ CropSimple::tick (const Metalib&, const Time& time, const Bioclimate& bioclimate
 				* exp (- N_c * (T - T_emergence)));
       N_actual += root_system->nitrogen_uptake (geo, soil, soil_water, 
                                                 chemistry, 0.0, 0.0,
-                                                N_demand - N_actual,
-                                                dt);
+                                                (N_demand - N_actual) / 1.0);
     }
 }
 
@@ -361,7 +360,7 @@ CropSimple::harvest (const symbol column_name,
 		       0.0, 0.0, 0.0, 
 		       0.0, 0.0, 0.0, 
 		       0.0, N_actual - NRoot, 0.0,
-		       wsd, nsd, -1.0);
+		       wsd, nsd, -1.0, -1.0);
 }
 
 void
@@ -480,7 +479,7 @@ CropSimple::CropSimple (const BlockModel& al)
 { }
 
 CropSimple::~CropSimple ()
-{ delete &canopy; }
+{ }
 
 static struct CropSimpleSyntax : public DeclareModel
 {

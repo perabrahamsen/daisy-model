@@ -45,6 +45,7 @@ class Treelog;
 class BlockModel;
 class FrameModel;
 class Units;
+class Crop;
 
 class Vegetation : public ModelDerived
 { 
@@ -155,6 +156,14 @@ public:
                       std::vector<double>& residuals_C_soil,
                       Treelog&) = 0;
   virtual void sow (const Metalib&, const FrameModel& al, 
+                    double row_width /* [cm] */, double row_pos /* [cm] */, 
+                    double seed /* kg w.w./ha */,
+                    const Geometry&, OrganicMatter&, 
+                    double SoilLimit /* [cm] */,
+                    double& seed_N /* [kg N/ha] */,
+                    double& seed_C /* [kg C/ha] */,
+                    const Time&, Treelog& msg) = 0;
+  virtual void sow (const Metalib&, Crop&, 
                     double row_width /* [cm] */, double row_pos /* [cm] */, 
                     double seed /* kg w.w./ha */,
                     const Geometry&, OrganicMatter&, 

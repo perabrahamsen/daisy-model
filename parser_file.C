@@ -942,7 +942,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 
       if (type == Attribute::Error)
         {
-          error (std::string("Unknown attribute '") + name + "'");
+          error (std::string("Unknown attribute '") + name + "', did you miss a ')'?");
           skip_to_end ();
         }
       else if (looking_at ('$'))

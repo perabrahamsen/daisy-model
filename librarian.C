@@ -242,11 +242,11 @@ Librarian::Librarian (const symbol component, const symbol description)
 
 Librarian::~Librarian ()
 { 
-  daisy_assert (content);
-  daisy_assert (content->count > 0);
+  daisy_safe_assert (content);
+  daisy_safe_assert (content->count > 0);
   content->count--;
 
-  if (content->count == 0)
+  if (content->count == 0 && content)
     {
       delete content;
       content = NULL;

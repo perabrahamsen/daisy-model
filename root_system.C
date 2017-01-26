@@ -23,6 +23,8 @@
 
 #include "root_system.h"
 #include "rootdens.h"
+#include "ABAprod.h"
+#include "solupt.h"
 #include "librarian.h"
 #include "geometry.h"
 #include "soil_heat.h"
@@ -224,128 +226,12 @@ RootSystem::water_uptake (const Units& units, double Ept_,
 }
 
 double
-RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
-                           const SoilWater& soil_water,
-                           Chemical& solute,
-                           double PotNUpt,
-                           std::vector<double>& uptake,
-                           const double I_max,      // [g/cm R/h]
-                           const double C_root_min, // [g/cm^3 W]
-                           const double dt)
-{
-  if (PotNUpt <= 0.0)
-    {
-      fill (uptake.begin (), uptake.end (), 0.0);
-      return 0.0;
-    }
-
-  daisy_assert (PotNUpt > 0.0);
-  PotNUpt /= 1.0e4;             // g/m^2/h -> g/cm^2/h
-  PotNUpt *= geo.surface_area (); // [g/h]
-  const int size = soil.size ();
-  // I: Uptake per root length.
-  // I = I_zero - B_zero * C_root
-  std::vector<double> I_zero (size, 0.0); // [g/cm R/h]
-  std::vector<double> B_zero (size, 0.0); // [cm^3 W/cm R/h] 
-
-  double U_zero = 0.0;          // [g/h] Total uptake a C_root_min
-  double B = 0.0;               // [cm^3 W/h]
-
-  for (int i = 0; i < size; i++)
-    {
-      const double C_l = solute.C_secondary (i);     // [g/cm^3 W]
-      const double Theta = soil_water.Theta_old (i); // [cm^3 W/cm^3 S]
-      const double L = Density[i];                   // [cm R/cm^3 S]
-      if (L > 0 && soil_water.h (i) <= 0.0)
-        {
-          // [cm^3 W/cm R/h] = [cm^3 W/cm^3 S/h] / [cm R/cm^3 S]
-          const double q_r = H2OExtraction[i] / L;
-          // [cm^2/h] = [cm^2/h] * [cm^3/cm^3] * [cm^3 W/cm^3 S]
-          const double D = solute.diffusion_coefficient ()
-            * soil.tortuosity_factor (i, Theta)
-            * Theta;
-          // [] = [cm^3 W/cm R/h] / [cm^2/h]
-          const double alpha = q_r / ( 2 * M_PI * D);
-          // [] = [] / ([cm] * sqrt ([cm^-2]))
-          const double beta = 1.0 / (Rad * sqrt (M_PI * L));
-          // [] = [] * []
-          const double beta_squared = beta * beta;
-          if (alpha < 1e-10)
-            {
-              // [cm^3 W/cm R/h] = [cm^2/h] / ([] * log ([]/[]) - [])
-              B_zero[i] = 4.0 * M_PI * D
-                / (beta_squared * log (beta_squared) / (beta_squared - 1.0)
-                   - 1.0);
-              // [g/cm R/h] = [cm^3 W/cm R/h] * [g/cm^3 W]
-              I_zero[i] = B_zero[i] * C_l;
-            }
-          else
-            { 
-              const double divisor // []
-                = ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
-                   - (pow (beta, 2.0 - alpha) - 1.0));
-              
-              if (std::isnormal (divisor))
-                {
-                  // [cm^3 W/cm R/h] = [cm^3 W/cm R/h]
-                  B_zero[i] = q_r * (pow (beta, 2.0 - alpha) - 1.0)
-                    / divisor;
-                  // [g/cm R/h] = [cm^3 W/cm R/h] * [g/cm^3 W]
-                  I_zero[i] = q_r * (beta_squared - 1.0) * (1.0 - 0.5 * alpha)
-                    * C_l / divisor;
-                }
-              else              
-                {
-                  daisy_assert (approximate (alpha, 2.0));
-                  const double div2 // []
-                    = ((beta_squared - 1.0) - log (beta_squared));
-                  daisy_assert (std::isnormal (div2));
-                  // [cm^3 W/cm R/h] = [cm^3 W/cm R/h]
-                  B_zero[i] = q_r * log (beta_squared) / div2;
-                  // [g/cm R/h] = [cm^3 W/cm R/h] * [g/cm^3 W]
-                  I_zero[i] = q_r * (beta_squared - 1.0) * C_l / div2;
-                }
-            }
-          daisy_assert (std::isfinite (I_zero[i]));
-          daisy_assert (std::isfinite (B_zero[i]));
-          // [cm^3 W/h] = [cm R/cm^3 S] * [cm^3 S] * [cm^3 W/cm R/h]
-          B += L * geo.cell_volume (i) * B_zero[i];
-          // [g/h] = [cm R/cm^3 S] * [cm^3 S]
-          //       * ([g/cm R/h] - [cm^3 W/cm R/h] * [g/cm^3 W], [g/cm R/h])
-          U_zero += L * geo.cell_volume (i) 
-            * bound (0.0, I_zero[i] - B_zero[i] * C_root_min, I_max);
-        }
-    }
-  double C_root = C_root_min;   // [g/cm^3 W]
-  if (U_zero > PotNUpt)
-    // [g/cm^3 W] = max (([g/h] - [g/h]) / [cm^3 W/h], [g/cm^3 W])
-    C_root = std::max ((U_zero - PotNUpt) / B, C_root_min);
-
-  for (int i = 0; i < size; i++)
-    {
-      const double L = Density[i]; // [cm R/cm^3 S]
-      if (L > 0 && soil_water.h (i) <= 0.0)
-        // [g/cm^3 S/h]
-        //  = [cm R/cm^3 S] * ([g/cm R/h] - [cm^3 W/cm R/h] * [g/cm^3 W])
-        uptake[i] = std::max (0.0, L * (std::min (I_zero[i], I_max)
-                                        - B_zero[i] * C_root));
-      else
-        uptake[i] = 0.0;
-      daisy_assert (uptake[i] >= 0.0);
-    }
-  solute.add_to_root_sink (uptake);
-
-  // gN/cm³/h -> gN/m²/h
-  return geo.total_surface (uptake) * 1.0e4;
-}
-
-double
 RootSystem::nitrogen_uptake (const Geometry& geo, const Soil& soil,
                              const SoilWater& soil_water,
                              Chemistry& chemistry,
                              const double NH4_root_min,
                              const double NO3_root_min,
-                             const double PotNUpt, double dt)
+                             const double PotNUpt)
 {
   if (PotNUpt <= 0.0)           
     // No uptake needed.
@@ -361,12 +247,14 @@ RootSystem::nitrogen_uptake (const Geometry& geo, const Soil& soil,
       Chemical& soil_NH4 = chemistry.find (Chemical::NH4 ());
       Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
 
-      NH4Upt = solute_uptake (geo, soil, soil_water, soil_NH4, 
-                              PotNUpt, NH4Extraction,
-                              MxNH4Up, NH4_root_min, dt);
-      NO3Upt = solute_uptake (geo, soil, soil_water, soil_NO3, 
-                              PotNUpt - NH4Upt, NO3Extraction, 
-                              MxNO3Up, NO3_root_min, dt);
+      NH4Upt = NH4_uptake->value (geo, soil, soil_water,
+                                  Density, H2OExtraction, Rad,
+                                  soil_NH4, PotNUpt, NH4Extraction,
+                                  MxNH4Up, NH4_root_min);
+      NO3Upt = NO3_uptake->value (geo, soil, soil_water,
+                                  Density, H2OExtraction, Rad,
+                                  soil_NO3, PotNUpt - NH4Upt, NO3Extraction, 
+                                  MxNO3Up, NO3_root_min);
     }
   else 
     // If we don't track inorganic N, assume we have enough.
@@ -462,6 +350,8 @@ RootSystem::output (Log& log) const
 {
   output_object (rootdens, "rootdens", log);
   output_derived (ABAprod, "ABAprod", log);
+  output_derived (NH4_uptake, "NH4_uptake", log);
+  output_derived (NO3_uptake, "NO3_uptake", log);
   output_variable (PotRtDpt, log);
   output_variable (Depth, log);
   output_variable (Density, log);
@@ -505,6 +395,8 @@ RootSystem::initialize (const Units& units, const Geometry& geo, Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
   ABAprod->initialize (units, msg);
+  NH4_uptake->initialize (geo, msg);
+  NO3_uptake->initialize (geo, msg);
   while (Density.size () < cell_size)
     Density.push_back (0.0);
   while (H2OExtraction.size () < cell_size)
@@ -545,7 +437,12 @@ RootSystem::load_syntax (Frame& frame)
 
   frame.declare_object ("ABAprod", ABAProd::component, "ABA production model.");
   frame.set ("ABAprod", "none");
-
+  frame.declare_object ("NH4_uptake", Solupt::component,
+                        Attribute::OptionalState, Attribute::Singleton, "\
+NH4 uptake model.\n\
+By default, this will be identical to the NO3 uptake model.");
+  frame.declare_object ("NO3_uptake", Solupt::component, "NO3 uptake model.");
+  frame.set ("NO3_uptake", "fixed_sink");
   frame.declare ("DptEmr", "cm", Check::non_negative (), Attribute::Const,
                  "Penetration at emergence.");
   frame.set ("DptEmr", 10.0);
@@ -656,6 +553,10 @@ RootSystem::RootSystem (const Block& al)
               ? Librarian::build_item<Rootdens> (al, "rootdens")
               : NULL),
     ABAprod (Librarian::build_item<ABAProd> (al, "ABAprod")),
+    NH4_uptake (al.check ("NH4_uptake")
+                ? Librarian::build_item<Solupt> (al, "NH4_uptake")
+                : Librarian::build_item<Solupt> (al, "NO3_uptake")),
+    NO3_uptake (Librarian::build_item<Solupt> (al, "NO3_uptake")),
     PenPar1 (al.number ("PenPar1")),
     PenPar2 (al.number ("PenPar2")),
     PenClayFac (al.plf ("PenClayFac")),

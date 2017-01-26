@@ -120,7 +120,6 @@ public:
   IM operator+ (const IM&) const;
   void multiply_assign (const Scalar&, const Unit& result);
   IM multiply (const Scalar&, const Unit& result) const;
-  IM& operator= (const IM&);
   void clear ();
 
   // Create. 
@@ -129,7 +128,6 @@ public:
 			  const symbol dimension);
   explicit IM (const Block&, const char* key);
   explicit IM ();
-  IM (const IM& im);
   explicit IM (const Unit&);
   explicit IM (const Unit&, const IM&);
   ~IM ();
