@@ -1,3 +1,7 @@
+2017-01-26  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.31 released.
+
 2017-01-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* program_optimize.C (Program): Comment out unused 'dimension'.
@@ -39,13 +43,9 @@
 2017-01-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* crop_simple.C (~CropSimple): Coverity: Don't delete 'canopy'.
-
 	* program_KM2.C (run): Coverity: Check resolution == 0.
-
 	* organic_std.C (check_am): Coverity: Remove unused 'om_ok' code.
-
 	* Makefile (DISABLED, OTHER): Coverity: Disable 'cdaisy.C'.
-
 	* wsource_combine.C (Entry::Entry): Coverity: Fix memory leak.
 
 	* svat_pmsw.C (tick): Coverity: swap tair and tcan_prev.
@@ -61,7 +61,7 @@
 
 2016-11-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* solupt.C: New component.
+	* solupt.C, solupt.h: New component.
 	* Makefile (COMPONENTS): Add it.
 
 2016-11-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
@@ -73,8 +73,6 @@
 	* action_sow (sow_object): New action.
 
 2016-10-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
-
-	* assertion.h (daisy_soft_assert): New macro.
 
 	* mathlib.C: Removed old exception code.
 

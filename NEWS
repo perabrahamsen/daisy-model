@@ -6,6 +6,41 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.31
+
+** Bug fixes and removal of dead or unused code.
+
+** New 'variable_sink' model for nitrogen uptake through roots.
+
+Nitrate uptake through roots in Daisy has been limited by convection
+and diffusion towards the root in the soil matrix. The diffusion
+component has assumed a zero sink, that is no nitrate at the root
+surfaces. This has been limited demand, as well as by a maximum rate,
+given by the 'MxNO3Up' parameter.
+
+With the 'variable_sink' uptake model, the uptake is further limited
+by nitrate concentration at root surface, meaning diffusion will no
+longer be calculated from a zero sink. The model will find a
+concentration near root surface where the uptake in the roots and
+diffusion towards the roots are equal.
+
+The effect of using the new model is that nitrogen uptake is much
+slower, especiacially with low concentrations in the soil.
+
+It is enabled with by setting 'NO3_uptake' to 'variable sink' in the
+'Root' part of the crop parameterization. The 'NH4_uptake' parameter
+controls ammonium uptake. The old model is called 'fixed_sink', and is
+still default.
+
+** New 'HI' column in harvest log file.
+
+It contains the harvest index.
+
+** New 'sow_object' action.
+
+Works like 'sow', except it cannot be used within a 'repeat' action,
+but is is does allow optimizing crop parameters. 
+
 * 5.29
 
 ** Default tortosity model changed from 'M_Q' to 'linear'.
