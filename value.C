@@ -42,7 +42,11 @@ Value::description () const
 
 double 
 Value::number () const
-{ daisy_notreached (); }
+{
+  if (is_reference ())
+    throw "Unhandled reference: '" + name () + "'";
+  daisy_notreached ();
+}
 
 symbol 
 Value::name () const

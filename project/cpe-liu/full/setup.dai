@@ -1,0 +1,203 @@
+;;; setup.dai -- Bakkegården experiment.
+
+(input file "log.dai")
+(input file "fertilizer.dai")
+(input file "tillage.dai")
+(input file "soil.dai")
+(input file "../../nyield/ncrop.dai")
+(input file "dk-sbarley.dai")
+(input file "sbarley-kasper.dai")
+(input file "SBarley Tolar.dai")
+
+(defcrop "Spring Barley; Tokkerup" "Spring Barley; PA"
+  ;; wwheat
+  (LeafPhot original (Fm 5.00)
+            (Qeff   0.0500))
+  (CrpN
+      (PtLeafCnc (0.34 0.0600) (0.50 0.0360) (1.28 0.0330) (1.52 0.0288) (1.93 0.0194))
+      (CrLeafCnc (0.34 0.0210) (0.50 0.0210) (1.28 0.0210) (1.52 0.0190) (1.93 0.0183))
+      (NfLeafCnc (0.34 0.0080) (0.50 0.0080) (1.28 0.0080) (1.52 0.0080) (1.93 0.0080))
+
+      (PtStemCnc (0.50 0.0200) (1.12 0.0125) (1.28 0.0093) (1.53 0.0085) (1.93 0.0057))
+      (CrStemCnc (0.50 0.0064) (1.12 0.0049) (1.28 0.0043) (1.53 0.0041) (1.93 0.0035))
+      (NfStemCnc (0.50 0.0030) (1.12 0.0030) (1.28 0.0030) (1.53 0.0030) (1.93 0.0030))
+      )
+  (Canopy
+   ;; (SOrgAIMod (0.0 1.0) (1.7 1.0) (2.0 0.0)) ;; Opr
+   (SOrgAIMod (1.0 1.0) (2.0 0.0))
+   (SpLAI    0.023) ; Foulum
+   (LeafAIMod (0.0 1.0) (1.0 1.35))
+   )
+  ;; (enable_N_stress false)
+  ;; Calib CPE tal
+  (Partit
+   (Leaf (0.00 1.00) (0.25 1.00) (0.31 0.23) (0.60 0.23) (0.72 0.23)
+         (0.83 0.23) (0.95 0.45) (1.21 0.00) (2.00 0.00))
+   (Stem (0.00 0.00) (0.25 0.00) (0.31 0.77) (0.60 0.77) (0.72 0.77)
+         (0.83 0.77) (0.95 0.55) (1.21 0.00) (2.00 0.00)))
+)
+
+;;(defcrop SB "Spring Barley; Tokkerup")
+;;(defcrop SB "Spring Barley; Kasper")
+;;(defcrop SB "Vaarbyg")
+;;(defcrop SB "Spring Barley; Foulum")
+;(defcrop SB "Spring Barley Tolar")
+;;(defcrop SB "Spring Barley")
+;;(defcrop SB "Spring Barley; N1994")
+(defcrop SB "Spring Barley; N2014")
+
+(defaction SBHARVEST 
+  (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
+
+(defaction "SB-generic" activity
+  (wait_mm_dd 3 05)
+  (fertilize (N25S (weight 115 [kg N/ha])))
+  (plowing)
+  (wait_mm_dd 4 05)
+  (seed_bed_preparation)(sow "SB")
+  (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
+  (SBHARVEST))
+
+(defaction "SB-2010" activity
+  (wait_mm_dd 4 16)
+  (plowing)
+  (wait_mm_dd 4 17)
+  (seed_bed_preparation)(sow SB)
+  (wait_mm_dd 4 20)
+  (fertilize (N25S (weight 110 [kg N/ha])))
+  (wait_mm_dd 6 2)
+  (message "CALIB: Plants have three leaves")
+  (wait_mm_dd 7 7)
+  (message "CALIB: Flowering?")
+  (wait_mm_dd 8 3)
+  (message "CALIB: Led 1 moden")
+  (wait_mm_dd 8 8)
+  (message "CALIB: Resten moden")
+  (wait_mm_dd 8 23)
+  (SBHARVEST))
+
+(defaction "SB-2011" activity
+  (wait_mm_dd 4 5)
+  (seed_bed_preparation)(sow SB)
+  (fertilize (N25S (weight 110 [kg N/ha])))
+  (wait_mm_dd 4 20)
+  (message "CALIB: Emergence")
+  (wait_mm_dd 8 1)
+  (message "CALIB: Harvest 6.0 - 6.1 Mg DM/ha")
+  (SBHARVEST))
+
+(defaction "SB-2012" activity
+  (wait_mm_dd 3 21)                      ;TODO
+  (seed_bed_preparation)
+  (wait_mm_dd 3 23)                      ;TODO
+  (sow SB)
+  (fertilize (N25S (weight 110 [kg N/ha])))
+  (wait_mm_dd 4 12)             
+  (message "CALIB: Emergence")
+  (wait_mm_dd 6 7)
+  (message "CALIB: Skridning")
+  (wait_mm_dd 8 14)                      ;TODO
+  (message "CALIB: Harvest 6.2 Mg DM/ha")
+  (SBHARVEST))
+
+(defaction "SB-2013" activity
+  (wait_mm_dd 4 19)                      ;TODO
+  (seed_bed_preparation)
+  (sow SB)
+  (fertilize (N25S (weight 110 [kg N/ha])))
+  (wait_mm_dd 8 5)                      ;TODO
+  (SBHARVEST))
+
+(defaction "SB-2014" activity
+  (wait_mm_dd 4 5)                      ;TODO
+  (seed_bed_preparation)
+  (sow SB)
+  (wait_days 3)
+  (fertilize (N25S (weight 110 [kg N/ha])))
+  (wait_mm_dd 8 1)                      ;TODO
+  (SBHARVEST))
+
+(defaction "SB-2015" activity
+  (wait_mm_dd 3 17)                      ;TODO
+  (seed_bed_preparation)
+  (wait_days 14)                        ;CALIB
+  (sow SB)
+  (fertilize (N25S (weight 110 [kg N/ha])))
+  (wait_mm_dd 4 14)             
+  (message "CALIB: Emergence")
+  (wait_mm_dd 6 25)
+  (message "CALIB: Skridning")
+  (wait_mm_dd 8 10)                      ;TODO
+  (SBHARVEST))
+
+(defaction "SB-2016" activity
+  (wait_mm_dd 4 4)                      ;TODO
+  (seed_bed_preparation)
+  (sow SB)
+  (fertilize (N25S (weight 110 [kg N/ha])))
+  (wait_mm_dd 8 5)                      ;TODO
+  (SBHARVEST))
+
+(defaction "SB-all" activity
+  "SB-generic" "SB-generic"
+  "SB-2010" "SB-2011" "SB-2012" "SB-2013" "SB-2014" "SB-2015" "SB-2016")
+
+(defweather Taastrup combine
+  (entry ((end   2016 1 3 0)
+          (source table (file "dk-taastrup-long.dwf")))
+         ((source table (file "taastrup-2016.dwf")))))
+
+(deflog "RZ water" column
+  (where "${colfid}rz_water.dlf")
+  (when hourly)
+  (entries
+   (interval (tag "RZ Theta")
+	     (documentation "Actual water content of the root zone.")
+	     (path column "${column}" SoilWater Theta)
+	     (spec fixed SoilWater Theta)
+	     (dimension "mm")
+	     (min_root_density 0.1 [cm/cm^3]))
+   (water_interval (tag "RZ Theta_sat")
+		   (h 0 [cm])
+		   (documentation "Saturated root zone water capacity.")
+		   (path column "${column}" SoilWater Theta)
+		   (spec fixed SoilWater Theta)
+		   (dimension "mm")
+		   (min_root_density 0.1 [cm/cm^3]))
+   (water_interval (tag "RZ Theta_fc")
+		   (h 2 [pF])
+		   (documentation "Root zone water content at field capacity.")
+		   (path column "${column}" SoilWater Theta)
+		   (spec fixed SoilWater Theta)
+		   (dimension "mm")
+		   (min_root_density 0.1 [cm/cm^3]))
+   (water_interval (tag "RZ Theta_wp")
+		   (h -15000.0 [cm])
+		   (documentation "Root zone water content at wilting point.")
+		   (path column "${column}" SoilWater Theta)
+		   (spec fixed SoilWater Theta)
+		   (dimension "mm")
+		   (min_root_density 0.1 [cm/cm^3]))))
+  
+(defchemistry low_denit multi
+  (combine (N (reaction nitrification
+                        (denitrification
+                         (water_factor (0.8 0.0) (0.9 0.2) (1.0 1.0)))))))
+
+(defprogram Bakkegaarden Daisy
+  (manager SB-all)
+  (column (Bakkegaarden (Soil (border -120 [cm]))
+                        (Chemistry low_denit)))
+  (weather Taastrup)
+  (time 2008 1 2)
+  (stop 2016 8 20)
+  (log_prefix "mx8/")
+  (output harvest
+          "Field water" "Field nitrogen"
+          ("Soil water" (to -120 [cm]) (where "soil_water_120.dfl"))
+          ("RZ water")
+          "Crop" "Crop Production"))
+
+(run Bakkegaarden)
+
+;; setup.dai ends here.

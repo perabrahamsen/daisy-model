@@ -73,7 +73,7 @@ Spray a chemical (typically a pesticide) on the field.")
   { 
     frame.declare_string ("chemical", Attribute::Const,
 		"Name of pesticide to spray.");
-    frame.set_check ("chemical", Chemical::check_library ());
+    frame.set_check ("chemical", Chemical::check_buildable ());
     frame.declare ("amount", "g/ha", Check::non_negative (), Attribute::Const,
 		"Amount of pesticide to spray.");
     frame.order ("chemical", "amount");
@@ -121,7 +121,7 @@ Spray a chemical (typically a pesticide) on the field below the canopy.")
   { 
     frame.declare_string ("chemical", Attribute::Const,
 		"Name of pesticide to spray.");
-    frame.set_check ("chemical", Chemical::check_library ());
+    frame.set_check ("chemical", Chemical::check_buildable ());
     frame.declare ("amount", "g/ha", Check::non_negative (), Attribute::Const,
 		"Amount of pesticide to spray.");
     frame.order ("chemical", "amount");

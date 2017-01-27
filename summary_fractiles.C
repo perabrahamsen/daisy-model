@@ -135,7 +135,9 @@ SummaryFractiles::find_fractile (const double f,
                                  const std::vector<double>& data)
 {
   daisy_assert (f >= 0.0 && f <= 1.0);
-  const size_t i = f * data.size ();
+  daisy_assert (data.size () > 0);
+  const double last = data.size () - 1.0;
+  const size_t i = (f < 1.0) ? (f * last) : data.size () - 1;
   daisy_assert (i < data.size ());
   return data[i];
 }
@@ -159,7 +161,7 @@ SummaryFractiles::summarize (Treelog& msg) const
     tmp << first << "\t";
   tmp << "Name\tDim\tSample\tAvg";
   for (auto fractile : fractiles)
-    tmp << "\t" << fractile;
+    tmp << "\tF" << (fractile * 100.0) << " %";
   for (auto& datum : data)
     {
       std::sort (datum.data.begin (), datum.data.end ());

@@ -473,7 +473,7 @@ Ignore entries if this boolean expression is false.");
     frame.set ("valid", "true");
     frame.declare_string ("handle", Attribute::Const, "\
 How to handle extracted data.");
-    static const VCheck::InLibrary is_handle (Listsum::component);
+    static const VCheck::Buildable is_handle (Listsum::component);
     frame.set_check ("handle", is_handle);
     frame.declare_string ("columns", Attribute::Const, Attribute::Variable, "\
 List of entries to show as columns in the table.\n\

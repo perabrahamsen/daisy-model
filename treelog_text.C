@@ -36,8 +36,8 @@ struct TreelogText::Implementation
   { }
   ~Implementation ()
   {
-    daisy_assert (path.size () == 0);
-    daisy_assert (touched.size () == 0);
+    daisy_safe_assert (path.size () == 0);
+    daisy_safe_assert (touched.size () == 0);
   }
 };
 

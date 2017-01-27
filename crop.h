@@ -47,6 +47,7 @@ class Treelog;
 class BlockModel;
 class Units;
 class Metalib;
+class VCheck;
 
 class Crop : public ModelFramed
 {
@@ -151,6 +152,9 @@ public:
 
   // Create and Destroy.
 public:
+  static const VCheck& check_all ();
+  static const VCheck& check_library ();
+  static const VCheck& check_buildable ();
   virtual void initialize (const Metalib& metalib, 
                            const Units&, const Geometry&, OrganicMatter&, 
                            double SoilLimit, const Time& now, Treelog&) = 0;

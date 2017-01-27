@@ -172,8 +172,8 @@ TraverseXRef::enter_library (Library&, symbol component)
 void
 TraverseXRef::leave_library ()
 { 
-  daisy_assert (type == is_invalid);
-  daisy_assert (path.empty ());
+  daisy_safe_assert (type == is_invalid);
+  daisy_safe_assert (path.empty ());
 }
 
 bool
@@ -193,9 +193,9 @@ TraverseXRef::enter_model (Frame& frame,
 void
 TraverseXRef::leave_model (const symbol component, const symbol name)
 { 
-  daisy_assert (path.empty ());
-  daisy_assert (component == current_component);
-  daisy_assert (name == current_model);
+  daisy_safe_assert (path.empty ());
+  daisy_safe_assert (component == current_component);
+  daisy_safe_assert (name == current_model);
   type = is_invalid;
 }
 
@@ -236,7 +236,7 @@ TraverseXRef::leave_submodel_default ()
   if (path.empty ())
     {
       // Top level submodel.
-      daisy_assert (type == is_submodel);
+      daisy_safe_assert (type == is_submodel);
       type = is_invalid;
     }
 }
@@ -335,8 +335,8 @@ TraverseXRef::TraverseXRef (const Metalib& mlib, XRef& xr)
 
 TraverseXRef::~TraverseXRef ()
 { 
-  daisy_assert (type == is_invalid); 
-  daisy_assert (path.empty ());
+  daisy_safe_assert (type == is_invalid); 
+  daisy_safe_assert (path.empty ());
 }
 
 bool

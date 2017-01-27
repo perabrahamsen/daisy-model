@@ -154,7 +154,7 @@ struct Daisy::Implementation
       output_derived (weather, "weather", log);
     output_object (action, "manager", log);
     output_submodule (*field, "column", log);
-    output_vector (harvest, "harvest", log);
+    output_ordered (harvest, "harvest", log);
 
   }
 

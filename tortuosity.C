@@ -55,4 +55,8 @@ moved in absolute coordinates, when it has moved a given distance\n\
 along the curved line.  This component is responsible for calculating\n\
 the soils tortuosity factor.")
   { }
+  void load_frame (Frame& frame) const
+  {
+    Model::load_model (frame);
+  }  
 } Tortuosity_init;

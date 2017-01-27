@@ -1,0 +1,65 @@
+;;; soil.dai --- Parameterization of Bakkegaarden soil.
+
+(defhorizon Danish numeric
+  "Classification used in some Danish sites."
+  ("tortuosity" "linear")
+  (limits 2 20 63 200 2000 [um]))
+
+(defhorizon H0-25 Danish
+  (cite "jordpakning")
+  (humus 2.13 [%])
+  (normalize true)
+  ;;(SOM_fractions 0.3 0.7)
+  (dry_bulk_density 1.66711 [g/cm^3]) ; Estimated from porosity and texture.
+  (fractions 12.4 13.3 13.7 26.5 32.0 [%]))
+
+(defhorizon H25-50 Danish
+  (cite "jordpakning")
+  (humus 0.67 [%])
+  (dry_bulk_density 1.57665 [g/cm^3]) ; Estimated from porosity and texture.
+  (normalize true)
+  (hydraulic M_vG
+             (l 1)
+             ;; (K_sat 0.98456 [cm/h])
+             (K_sat 4 [cm/d])
+             (n 1.1780066805)
+             (alpha 0.5753026973 [m^-1])
+             (Theta_sat 0.3346700373))
+  (fractions 17.2 13.1 12.7 25.4 31.0 [%]))
+
+(defhorizon H50-100 Danish
+  (cite "jordpakning")
+  (humus 0.24 [%])
+  (normalize true)
+  (dry_bulk_density 1.67275 [g/cm^3]) ; Estimated from porosity and texture.
+  (hydraulic M_vG
+             (l 1.5)
+             (K_sat 8 [cm/d])
+             ;; (K_sat 0.57165 [cm/h])
+             (n 1.1391711115)
+             (alpha 0.685352021 [m^-1])
+             (Theta_sat 0.3607126284))
+  (fractions 20.5 12.8 11.4 25.8 29.2 [%]))
+
+(defcolumn Bakkegaarden default
+;;  (Groundwater aquitard
+;;    (K_aquitard 0.001 [cm/h])
+;;    (Z_aquitard 200 [cm])
+  ;;    (pressure_table const -2.5 [m]))
+  (Groundwater deep)
+  (Drain lateral)
+  (Soil (MaxRootingDepth 200 [cm])
+        (horizons (-25 [cm] H0-25)
+                  (-50 [cm] H25-50)
+                  (-100 [cm] H50-100)
+                  (-200 [cm] H50-100))))
+
+(defprogram dummy Daisy
+  (weather none)
+  (manager stop)
+  (time 2000 1 1 0)
+  (stop 2000 1 1 1)
+  (column Bakkegaarden)
+  (output))
+
+;;; soil.dai ends here.          

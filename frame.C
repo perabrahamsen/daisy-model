@@ -490,11 +490,13 @@ Frame::unregister_child (const Frame* child) const
 {
   const Implementation::child_set::const_iterator i 
     = impl->children.find (child);
-  daisy_assert (i != impl->children.end ());
+  daisy_safe_assert (i != impl->children.end ());
+  if (i == impl->children.end ())
+    return;
   impl->children.erase (i);
   const Implementation::child_set::const_iterator j 
     = impl->children.find (child);
-  daisy_assert (j == impl->children.end ());
+  daisy_safe_assert (j == impl->children.end ());
 }
 
 void 

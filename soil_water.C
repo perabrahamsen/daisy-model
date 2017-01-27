@@ -598,12 +598,16 @@ SoilWater::mass_balance (const Geometry& geo, double dt, Treelog& msg)
     }
   total_boundary_input /= geo.surface_area ();
   total_boundary_input *= 10;
-  if (!balance (total_old, total_new, total_boundary_input - total_sink))
+  const double total_expected 
+    = total_old - total_sink + total_boundary_input;
+  const double total_error = total_expected - total_new;
+  const double total_error_rate = total_error / dt;
+  const double max_error = total_old * 1e-6;
+  const double max_error_rate = 0.001;
+  if (std::fabs (total_error) > max_error
+      || std::fabs (total_error_rate) > max_error_rate)
     {
-      const double total_expected 
-        = total_old - total_sink + total_boundary_input;
       const double total_diff = total_new - total_old;
-      const double total_error = total_expected - total_new;
       static double accumulated_error = 0.0;
       accumulated_error += total_error;
       std::ostringstream tmp;
@@ -612,11 +616,18 @@ SoilWater::mass_balance (const Geometry& geo, double dt, Treelog& msg)
           << ") + boundary input (" << total_boundary_input
           << ") != " << total_expected << " mm, got " << total_new 
           << " mm, difference is " << total_diff 
-          << " mm, error is " << (total_expected - total_new) 
-          << " mm, accumulated " << accumulated_error << " mm";
+          << " mm, error is " << total_error
+          << " mm, accumulated " << accumulated_error
+          << " mm, dt = " << dt
+          << " h, error rate is " << total_error_rate
+          << " mm/h";
       for (size_t e = 0; e < edge_size; e++)
         {
           if (geo.edge_is_internal (e))
+            continue;
+          if (iszero (q_primary_[e])
+              && iszero (q_secondary_[e])
+              && iszero (q_matrix_[e]))
             continue;
           tmp << "\nedge " << geo.edge_name (e)
               << ": primary " << q_primary_[e]

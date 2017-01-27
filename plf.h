@@ -76,6 +76,7 @@ public:
   void operator += (const PLF&);
   void operator = (const PLF&);
   PLF (const PLF&);
+  PLF (PLF&&) = default;
   PLF ();
   ~PLF ();
 };

@@ -53,13 +53,6 @@ Filepos::none ()
   return none;
 }
 
-const Filepos& 
-Filepos::operator= (const Filepos& pos)
-{ file_ = pos.file_; line_ = pos.line_; column_ = pos.column_; return *this; }
-
-Filepos::Filepos (const Filepos& pos)
-{ *this = pos; }
-
 Filepos::Filepos (const symbol f, int l, int c)
   : file_ (f),
     line_ (l),

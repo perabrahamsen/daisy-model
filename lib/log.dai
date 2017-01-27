@@ -312,9 +312,21 @@ flow to drain pipes, and subsoil irrigation."
          ("Evaporation of soil water"))
   (print_sum false))
 
+(defsummary "Surface water balance2"
+  (balance (precision 3)
+           (input rain snow "Overhead irrigation" "Surface irrigation")
+           (output "Matrix infiltration" "Macropore infiltration"
+                   "Surface runoff"
+                   "Evaporation from canopy" "Evaporation from snow"
+                   "Evaporation from litter" "Evaporation from ponded water"
+                   "Evaporation of soil water")
+           
+           (content "Interception storage" "Snow storage"
+                    "Litter storage" "Surface ponding")))
+
 (deflog "Surface Water Balance" column
   "Enough information to create a water balance for the soil surface."
-  (summary "Evapotranspiration")
+  (summary "Evapotranspiration" "Surface water balance2")
   (where "${colfid}surface_water_balance.dlf")
   (when hourly)
   (entries (number (path weather "*" rain)
@@ -409,6 +421,9 @@ flow to drain pipes, and subsoil irrigation."
                    (dimension "mm"))
            (number (path column "${column}" Bioclimate "*" Snow Ssnow)
                    (tag "Snow storage")
+                   (dimension "mm"))
+           (number (path column "${column}" Bioclimate "*" litter_water_storage)
+                   (tag "Litter storage")            
                    (dimension "mm"))
            (number (path column "${column}" Bioclimate "*" production_stress))))
 
@@ -3188,5 +3203,23 @@ parameter in the 'default' bioclimate model.  By default, 30."))
 			(handle sum)
 			(negate true))
 	   ))
+
+(deflog "M2B" biopore
+  (where "${colfid}B2M-${bioporefid}.dlf")
+  (when true)
+  (entries (array (path column "${column}" Movement "*"
+                        Tertiary biopores classes "${biopore}"
+                        B2M)
+                  (handle sum)
+                  (spec biopore component B2M))))
+
+(deflog "B2M" biopore
+  (where "${colfid}M2B-${bioporefid}.dlf")
+  (when true)
+  (entries (array (path column "${column}" Movement "*"
+                        Tertiary biopores classes "${biopore}"
+                        M2B)
+                  (handle sum)
+                  (spec biopore component M2B))))
 
 ;;; log.dai ends here

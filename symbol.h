@@ -77,11 +77,13 @@ public:
   symbol (const char*) EXPORT;
   symbol (const std::string&) EXPORT;
   explicit symbol (int) EXPORT;
+#if 0
   symbol (const symbol& other)
     : id (other.id)
   { }
   void operator= (const symbol other)
   { id = other.id; }
+#endif
   ~symbol ()
   { }
 };

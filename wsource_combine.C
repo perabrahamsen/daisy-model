@@ -231,10 +231,11 @@ WSourceCombine::Entry::vector2set (const std::vector<symbol>& v)
 
 WSourceCombine::Entry::Entry (const BlockSubmodel& al)
   : source (Librarian::build_item<WSource> (al, "source")),
-    begin (al.check ("begin") ? *submodel<Time> (al, "begin") : Time::null ()),
-    end (al.check ("end") ? *submodel<Time> (al, "end") : Time::null ()),
+    begin (submodel_value<Time> (al, "begin")),
+    end (submodel_value<Time> (al, "end")),
     use (vector2set (al.name_sequence ("use")))
 { 
+
   daisy_assert (source.get ());
 }
 
@@ -323,6 +324,7 @@ WSourceCombine::entries (std::set<symbol>& result) const
 { 
   for (size_t i = 0; i < entry.size (); i++)
     {
+      Assertion::message ("hello");
       Entry& e = *(entry[i]);
 
 #if 0
@@ -331,7 +333,7 @@ WSourceCombine::entries (std::set<symbol>& result) const
 #endif
 
       // Within period?
-      if (my_begin < e.begin || my_end > e.end)
+      if (my_end < e.begin || my_begin > e.end)
         continue;
 
       daisy_assert (e.source.get ());

@@ -25,6 +25,7 @@
 #include "block_model.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "vcheck.h"
 
 const double Crop::DSremove = -5001.0;
 
@@ -108,6 +109,42 @@ Crop::find_stomata_conductance (const Units&, const Time& time,
 bool
 Crop::ds_remove (const Crop* crop)
 { return approximate (crop->DS (), Crop::DSremove); }
+
+const VCheck& 
+Crop::check_all ()
+{
+  static const struct CheckAll : public VCheck::InLibrary
+  {
+    bool valid (const Metalib& metalib, const symbol type, Treelog& msg) const
+    {
+      static const symbol all = "all";
+      if (type == all)
+        return true;
+      if (type.name ().substr (0, 1) == "$")
+        return true;
+      
+      return VCheck::InLibrary::valid (metalib, type, msg);
+    }
+    CheckAll ()
+      : InLibrary (component)
+    { } 
+  } check_me;
+  return check_me;
+}
+
+const VCheck& 
+Crop::check_library ()
+{
+  static const VCheck::InLibrary in_library (component);
+  return in_library;
+}
+
+const VCheck& 
+Crop::check_buildable ()
+{
+  static const VCheck::Buildable buildable (component);
+  return buildable;
+}
 
 Crop::Crop (const BlockModel& al)
   : ModelFramed (al)

@@ -56,9 +56,11 @@ Format::push (const symbol name)
 void
 Format::pop (const symbol name)
 {
-  daisy_assert (!nest.empty ());
-  daisy_assert (nest.top () == name);
-  nest.pop ();
+  // May be called from destructor, don't use 'daisy_assert'!
+  daisy_safe_assert (!nest.empty ());
+  daisy_safe_assert (nest.top () == name);
+  if (!nest.empty ())
+    nest.pop ();
 }
 
 Format::List::List (Format& f)
@@ -188,7 +190,7 @@ Format::Document::~Document ()
 { 
   format.pop ("document");
   format.document_close (where); 
-  daisy_assert (format.nest.empty ());
+  daisy_safe_assert (format.nest.empty ());
 }
 
 void
@@ -223,7 +225,7 @@ Format::Format (const BlockModel& al)
 { }
 
 Format::~Format ()
-{ daisy_assert (nest.empty ()); }
+{ daisy_safe_assert (nest.empty ()); }
 
 static struct FormatInit : public DeclareComponent 
 {
@@ -232,3 +234,5 @@ static struct FormatInit : public DeclareComponent
 Text formatting component.")
   { }
 } Format_init;
+
+// format.C ends here.

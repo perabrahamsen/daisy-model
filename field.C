@@ -57,6 +57,9 @@ struct Field::Implementation
   void sow (const Metalib&, const FrameModel& crop, 
             double row_width, double row_pos, double seed,
             const Time& time, Treelog&);
+  void sow (const Metalib&, Crop& crop, 
+            double row_width, double row_pos, double seed,
+            const Time& time, Treelog&);
   void ridge (const FrameSubmodel& ridge);
   void irrigate (const double duration, const double flux, 
                  const double temp, Irrigation::target_t target,
@@ -153,7 +156,7 @@ Field::Implementation::restrict (symbol name)
 void 
 Field::Implementation::unrestrict ()
 {
-  daisy_assert (selected);
+  daisy_safe_assert (selected);
   selected = NULL;
 }
 
@@ -182,6 +185,29 @@ Field::Implementation::sorption_table (const size_t cell,
 
 void 
 Field::Implementation::sow (const Metalib& metalib, const FrameModel& crop, 
+                            const double row_width, const double row_pos,
+                            const double seed,
+                            const Time& time, Treelog& msg)
+{
+  if (selected)
+    {
+      Treelog::Open nest (msg, selected->objid);
+      selected->sow (metalib, crop, row_width, row_pos, seed, time, msg);
+    }
+  else 
+    {
+      for (ColumnList::iterator i = columns.begin ();
+	   i != columns.end ();
+	   i++)
+	{
+	  Treelog::Open nest (msg, (*i)->objid);
+	  (*i)->sow (metalib, crop, row_width, row_pos, seed, time, msg);
+	}
+    }
+}
+
+void 
+Field::Implementation::sow (const Metalib& metalib, Crop& crop, 
                             const double row_width, const double row_pos,
                             const double seed,
                             const Time& time, Treelog& msg)
@@ -840,7 +866,7 @@ Field::Implementation::summarize (Treelog& msg) const
 
 Field::Implementation::~Implementation ()
 {
-  daisy_assert (selected == NULL);
+  daisy_safe_assert (selected == NULL);
   sequence_delete (columns.begin (), columns.end ()); 
 }
 
@@ -862,6 +888,12 @@ Field::sorption_table (const size_t cell,
 
 void 
 Field::sow (const Metalib& metalib, const FrameModel& crop,
+            const double row_width, const double row_pos, const double seed,
+            const Time& time, Treelog& msg)
+{ impl->sow (metalib, crop, row_width, row_pos, seed, time, msg); }
+
+void 
+Field::sow (const Metalib& metalib, Crop& crop,
             const double row_width, const double row_pos, const double seed,
             const Time& time, Treelog& msg)
 { impl->sow (metalib, crop, row_width, row_pos, seed, time, msg); }

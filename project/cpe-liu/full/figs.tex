@@ -1,0 +1,58 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{natbib}
+
+\usepackage[top=3cm,bottom=2cm]{geometry}
+%% \usepackage[left=1cm,top=1cm,right=1cm,nohead,nofoot]{geometry}
+
+\newcommand{\figl}{\hspace*{-2cm}}
+\newcommand{\figright}[1]{\includegraphics[scale=0.7]{fig/#1}}
+\newcommand{\fig}[1]{\figl\figright{#1}}
+\newcommand{\figtop}[1]{\figl\includegraphics[trim=0mm 5mm 0mm 0mm,clip,scale=0.7]{fig/#1}}
+\newcommand{\figctop}[1]{\hspace*{-1cm}\figright{#1}} 
+\newcommand{\figc}[1]{\vspace*{-1.5cm}\figctop{#1}}
+
+\newcommand{\Hypres}{\textsc{Hypres}}
+\newcommand{\MyID}{\today:~}
+
+%%\pagestyle{fancy}
+%%\lhead{\today}
+
+\begin{document}
+
+% \newgeometry{left=1cm,top=1cm,right=1cm,bottom=1cm,nohead,nofoot}
+% \pagestyle{empty}
+
+%% \begin{figure}[htbp] 
+%%   \fig{H0-25-Theta}\figright{H0-25-K}\\
+%%   \fig{H25-50-Theta}\figright{H25-50-K}\\
+%%   \fig{H50-100-Theta}\figright{H50-100-K}
+%%   \caption{\MyID{}HYPRES and measured data.}
+%% \end{figure}
+
+\begin{figure}[htbp] 
+  \fig{LAI}\figright{LAI-2010}\\
+  \fig{LAI-2011}\figright{LAI-2012}\\
+  \fig{LAI-2013}\figright{LAI-2014}\\
+  \fig{LAI-2015}\figright{LAI-2016}
+  \caption{\MyID{}Simulated vs RVI estimate of LAI.}
+\end{figure}
+
+\begin{figure}[htbp] 
+  \fig{RZ}\figright{RZ-2010}\\
+  \fig{RZ-2011}\figright{RZ-2012}\\
+  \fig{RZ-2013}\figright{RZ-2014}\\
+  \fig{RZ-2015}\figright{RZ-2016}
+  \caption{\MyID{}Simulated vs RVI estimate of RZ.}
+\end{figure}
+
+%% \begin{figure}[htbp] 
+%%   \fig{MQL}\figright{MQL-2010}\\
+%%   \fig{MQL-2011}\figright{MQL-2012}\\
+%%   \fig{MQL-2013}\figright{MQL-2014}\\
+%%   \fig{MQL-2015}\figright{MQL-2016}
+%%   \caption{\MyID{}Nitroges stress using two different tortuosity models.}
+%% \end{figure}
+
+\end{document}

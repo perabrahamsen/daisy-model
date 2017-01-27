@@ -63,14 +63,18 @@ struct CropStandard : public Crop
   const std::unique_ptr<CanopyStandard> canopy;
   std::unique_ptr<Harvesting> harvesting;
   Production production;
-  std::unique_ptr<Time> last_time;
+  Time last_time;
+  Time sow_time;
+  Time emerge_time;
+  Time flowering_time;
+  Time ripe_time;
   std::unique_ptr<Phenology> development;
   const Partition partition;
   std::unique_ptr<Vernalization> vernalization;
   const std::unique_ptr<Photo> shadow;
   const std::unique_ptr<Photo> sunlit;
   const std::unique_ptr<Photo> reserved;
-  CrpN nitrogen;
+  const std::unique_ptr<CrpN> nitrogen;
   const std::unique_ptr<WSE> water_stress_effect;
   const bool enable_N_stress;
   const double min_light_fraction;
@@ -193,7 +197,7 @@ struct CropStandard : public Crop
   { 
     // kg/ha -> g/m^2
     const double conv = 1000.0 / (100.0 * 100.0);
-    return nitrogen.Fixated / conv; 
+    return nitrogen->Fixated / conv; 
   }
   double total_N () const
   { return production.total_N (); }
@@ -281,8 +285,10 @@ CropStandard::initialize_shared (const Metalib& metalib, const Geometry& geo,
                                  const double SoilLimit,
                                  const Time& now, Treelog& msg)
 {
-  if (!last_time.get ())
-    last_time.reset (new Time (now));
+  if (sow_time == Time::null ())
+    sow_time = now;
+  if (last_time == Time::null ())
+    last_time = now;
   production.initialize (seed->initial_N ());
 
   const double DS = development->DS;
@@ -301,7 +307,7 @@ CropStandard::initialize_shared (const Metalib& metalib, const Geometry& geo,
 		   //  until midnight (small error).
 		   seed_CAI);
       root_system->set_density (geo, SoilLimit, production.WRoot, DS, msg);
-      nitrogen.content (DS, production, msg);
+      nitrogen->content (DS, production, msg);
     }
 }
 
@@ -401,9 +407,9 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
   // photosynthesis.  N content above critical is considered
   // luxury, and also not used in photosynthesis.
   const double N_at_Nf 
-    = canopy->corresponding_WLeaf (DS) * nitrogen.NfLeafCnc (DS);
+    = canopy->corresponding_WLeaf (DS) * nitrogen->NfLeafCnc (DS);
   const double N_at_Cr
-    = canopy->corresponding_WLeaf (DS) * nitrogen.CrLeafCnc (DS);
+    = canopy->corresponding_WLeaf (DS) * nitrogen->CrLeafCnc (DS);
   const double N_above_Nf = production.NLeaf - N_at_Nf;
   const double rubiscoN = bound (0.0, N_above_Nf, N_at_Cr - N_at_Nf);
   daisy_assert (rubiscoN >= 0.0);
@@ -514,18 +520,17 @@ CropStandard::tick (const Metalib& metalib,
   root_system->tick_dynamic (T_soil, day_fraction, soil_water, dt);
 
   // Clear nitrogen.
-  nitrogen.clear ();
+  nitrogen->clear ();
 
   // Update age.
   development->DAP += dt/24.0;
 
   // New day?
-  daisy_assert (last_time.get ());
-  const Timestep daystep = time - *last_time;
-  const bool new_day = (time.yday () != last_time->yday ()
-                        || time.year () != last_time->year ());
+  const Timestep daystep = time - last_time;
+  const bool new_day = (time.yday () != last_time.yday ()
+                        || time.year () != last_time.year ());
   if (new_day)
-    *last_time = time;
+    last_time = time;
 
   // Emergence.
   const double& DS = development->DS;
@@ -543,13 +548,14 @@ CropStandard::tick (const Metalib& metalib,
                               daystep.total_hours ());
       if (DS >= 0)
 	{
+          emerge_time = time;
 	  msg.message ("Emerging");
           const double WLeaf = production.WLeaf;
           const double SpLAI = canopy->specific_LAI (DS);
           const double seed_CAI = seed->forced_CAI (WLeaf, SpLAI, DS);
 	  canopy->tick (production.WLeaf, production.WSOrg,
 		       production.WStem, DS, seed_CAI);
-	  nitrogen.content (DS, production, msg);
+	  nitrogen->content (DS, production, msg);
 	  root_system->tick_daily (geo, soil, soil_water, production.WRoot, 0.0,
                                    DS, msg);
 
@@ -593,14 +599,14 @@ CropStandard::tick (const Metalib& metalib,
   daisy_assert (production.AM_root);
   daisy_assert (production.AM_leaf);
   
-  nitrogen.update (production.NCrop, DS, 
+  nitrogen->update (production.NCrop, DS, 
                    geo, soil, soil_water, chemistry,
                    bioclimate.day_fraction (dt),
                    *root_system, dt);
 
   harvesting->water_use (bioclimate.total_ea () * dt);
 
-  const double nitrogen_stress = nitrogen.nitrogen_stress;
+  const double nitrogen_stress = nitrogen->nitrogen_stress;
   const double water_stress = root_system->water_stress;
 
   double Ass = production.PotCanopyAss;
@@ -611,8 +617,20 @@ CropStandard::tick (const Metalib& metalib,
   if (enable_N_stress)
     Ass *= (1.0 - nitrogen_stress);
   Ass *= (1.0 - harvesting->cut_stress);
-  production.CanopyAss = Ass;
+  if (!(Ass >= 0.0))
+    {
+      std::ostringstream tmp;
+      tmp << "Ass = " << Ass << "; PotCanopyAss = " << production.PotCanopyAss
+          << "; water stress = " << water_stress
+          << "; water stress effect = "
+               << water_stress_effect->factor (water_stress)
+          << ";nitrogen stress = " << nitrogen_stress
+          << ";cut stress = " << harvesting->cut_stress;
+      msg.bug (tmp.str ());
+      Ass = 0.0;
+    }
   daisy_assert (Ass >= 0.0);
+  production.CanopyAss = Ass;
 
   const double T_soil_3 
     = geo.content_height (soil_heat, &SoilHeat::T, -root_system->Depth/3.0);
@@ -620,11 +638,11 @@ CropStandard::tick (const Metalib& metalib,
   const double seed_C = seed->release_C (dt);
   production.tick (bioclimate.daily_air_temperature (), T_soil_3,
 		   root_system->Density, geo, DS, 
-		   canopy->CAImRat, nitrogen, nitrogen_stress, seed_C, 
+		   canopy->CAImRat, *nitrogen, nitrogen_stress, seed_C, 
                    partition, 
 		   residuals_DM, residuals_N_top, residuals_C_top,
 		   residuals_N_soil, residuals_C_soil, dt, msg);
-  nitrogen.content (DS, production, msg);
+  nitrogen->content (DS, production, msg);
   if (!new_day)
     return;
 
@@ -637,6 +655,10 @@ CropStandard::tick (const Metalib& metalib,
   development->tick_daily (bioclimate.daily_air_temperature (), 
                            production.shoot_growth (), production, 
                            *vernalization, harvesting->cut_stress, msg);
+  if (DS >= 1.0 && flowering_time == Time::null ())
+    flowering_time = time;
+  if (DS >= 2.0 && ripe_time == Time::null ())
+    ripe_time = time;
   root_system->tick_daily (geo, soil, soil_water,
                            production.WRoot, production.root_growth (),
                            DS, msg);
@@ -663,7 +685,7 @@ CropStandard::harvest (const symbol column_name,
   TREELOG_MODEL (msg);
 
   // Update nitrogen content.
-  nitrogen.content (development->DS, production, msg);
+  nitrogen->content (development->DS, production, msg);
 
   // Leave stem and leaf below stub alone.
   double stem_harvest;
@@ -689,6 +711,7 @@ CropStandard::harvest (const symbol column_name,
   const Harvest& harvest 
     = harvesting->harvest (column_name, objid, 
                            root_system->Density,
+                           sow_time, emerge_time, flowering_time, ripe_time,
                            time, geometry, production, development->DS,
                            stem_harvest, leaf_harvest, 1.0,
                            stem_harvest_frac, leaf_harvest_frac,
@@ -698,11 +721,11 @@ CropStandard::harvest (const symbol column_name,
                            residuals_N_soil, residuals_C_soil,
                            combine,
                            root_system->water_stress_days, 
-                           nitrogen.nitrogen_stress_days, msg);
+                           nitrogen->nitrogen_stress_days, msg);
 
   if (!approximate (development->DS, DSremove))
     {
-      nitrogen.cut (development->DS); // Stop fixation.
+      nitrogen->cut (development->DS); // Stop fixation.
 
       if (development->DS > 0.0)
 	{
@@ -753,12 +776,13 @@ CropStandard::pluck (const symbol column_name,
   TREELOG_MODEL (msg);
   
   // Update nitrogen content.
-  nitrogen.content (development->DS, production, msg);
+  nitrogen->content (development->DS, production, msg);
 
   // Harvest.
   const Harvest& harvest 
     = harvesting->harvest (column_name, objid, 
                            root_system->Density,
+                           sow_time, emerge_time, flowering_time, ripe_time,
                            time, geometry, production, development->DS,
                            stem_harvest, leaf_harvest, sorg_harvest,
                            1.0, 1.0, 1.0,
@@ -767,12 +791,12 @@ CropStandard::pluck (const symbol column_name,
                            residuals_N_soil, residuals_C_soil,
                            false,
                            root_system->water_stress_days, 
-                           nitrogen.nitrogen_stress_days, msg);
+                           nitrogen->nitrogen_stress_days, msg);
 
   // Phenology may be affected.
   if (!approximate (development->DS, DSremove))
     {
-      nitrogen.cut (development->DS); // Stop fixation.
+      nitrogen->cut (development->DS); // Stop fixation.
 
       if (development->DS > 0.0)
 	{
@@ -809,14 +833,17 @@ CropStandard::output (Log& log) const
 #else
   output_submodule (production, "Prod", log);
 #endif
-  daisy_assert (last_time.get ());
-  output_submodule (*last_time, "last_time", log);
+  output_submodule (last_time, "last_time", log);
+  output_submodule (sow_time, "sow_time", log);
+  output_submodule (emerge_time, "emerge_time", log);
+  output_submodule (flowering_time, "flowering_time", log);
+  output_submodule (ripe_time, "ripe_time", log);
   output_derived (development, "Devel", log);
   output_derived (vernalization, "Vernal", log);
   output_derived (shadow, "LeafPhot", log);
   output_derived (sunlit, "sunlit", log);
   output_derived (reserved, "reserved", log);
-  output_submodule (nitrogen, "CrpN", log);
+  output_submodule (*nitrogen, "CrpN", log);
 }
 
 static std::unique_ptr<WSE> 
@@ -843,15 +870,27 @@ CropStandard::CropStandard (const BlockModel& al)
     harvesting (submodel<Harvesting> (al, "Harvest")),
     production (al.submodel ("Prod")),
     last_time (al.check ("last_time")
-               ? new Time (al.submodel ("last_time"))
-               : NULL),
+               ? Time (al.submodel ("last_time"))
+               : Time::null ()),
+    sow_time (al.check ("sow_time")
+               ? Time (al.submodel ("sow_time"))
+               : Time::null ()),
+    emerge_time (al.check ("emerge_time")
+               ? Time (al.submodel ("emerge_time"))
+               : Time::null ()),
+    flowering_time (al.check ("flowering_time")
+               ? Time (al.submodel ("flowering_time"))
+               : Time::null ()),
+    ripe_time (al.check ("ripe_time")
+               ? Time (al.submodel ("ripe_time"))
+               : Time::null ()),
     development (Librarian::build_item<Phenology> (al, "Devel")),
     partition (al.submodel ("Partit")),
     vernalization (Librarian::build_item<Vernalization> (al, "Vernal")),
     shadow (Librarian::build_item<Photo> (al, "LeafPhot")),
     sunlit (Librarian::build_item<Photo> (al, "LeafPhot")),
     reserved (Librarian::build_item<Photo> (al, "LeafPhot")),
-    nitrogen (al.submodel ("CrpN")),
+    nitrogen (submodel<CrpN> (al, "CrpN")),
     water_stress_effect (find_WSE (al, *shadow)),
     enable_N_stress (al.flag ("enable_N_stress", !shadow->handle_N_stress ())),
     min_light_fraction (al.number ("min_light_fraction"))
@@ -891,8 +930,25 @@ static struct CropStandardSyntax : public DeclareModel
     frame.declare_submodule ("Prod", Attribute::State,
                           "Production.", Production::load_syntax);
     frame.declare_submodule ("last_time", Attribute::OptionalState,
-                          "The time of the previous timestep.",
-                          Time::load_syntax);
+                             "The time of the previous timestep.\n\
+Don't set, calculated by Daisy.",
+                             Time::load_syntax);
+    frame.declare_submodule ("sow_time", Attribute::OptionalState,
+                             "The time the crop was sown.\n\
+Don't set, calculated by Daisy.",
+                             Time::load_syntax);
+    frame.declare_submodule ("emerge_time", Attribute::OptionalState,
+                             "The time the crop emerged.\n\
+Don't set, calculated by Daisy.",
+                             Time::load_syntax);
+    frame.declare_submodule ("flowering_time", Attribute::OptionalState,
+                             "The time the crop flowered.\n\
+Don't set, calculated by Daisy.",
+                             Time::load_syntax);
+    frame.declare_submodule ("ripe_time", Attribute::OptionalState,
+                             "The time the crop became ripe.\n\
+Don't set, calculated by Daisy.",
+                             Time::load_syntax);
     frame.declare_object ("Devel", Phenology::component, 
                        "Development and phenology.");
     frame.declare_submodule ("Partit", Attribute::Const,

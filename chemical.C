@@ -67,10 +67,10 @@ Chemical::surface_flux_unit ()
 }
 
 const VCheck& 
-Chemical::check_library ()
+Chemical::check_buildable ()
 {
-  static const VCheck::InLibrary in_library ((symbol (component)));
-  return in_library;
+  static const VCheck::Buildable buildable (component);
+  return buildable;
 }
 
 Chemical::Chemical (const BlockModel& al)

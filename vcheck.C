@@ -868,6 +868,9 @@ bool
 VCheck::InLibrary::valid (const Metalib& metalib, const symbol type, 
                           Treelog& msg) const
 {
+  if (type.name ().substr (0, 1) == "$")
+    return true;
+
   daisy_assert (metalib.exist (lib_name));
   const Library& library = metalib.library (lib_name);
   
@@ -876,7 +879,24 @@ VCheck::InLibrary::valid (const Metalib& metalib, const symbol type,
       msg.error ("Unknown '" + lib_name + "' type '" + type + "'");
       return false;
     }
+  return true;
+}
 
+VCheck::InLibrary::InLibrary (const symbol lib)
+  : lib_name (lib)
+{ }
+
+bool
+VCheck::Buildable::valid (const Metalib& metalib, const symbol type, 
+                          Treelog& msg) const
+{
+  if (type.name ().substr (0, 1) == "$")
+    return true;
+
+  if (!InLibrary::valid (metalib, type, msg))
+    return false;
+
+  const Library& library = metalib.library (lib_name);
   const FrameModel& frame = library.model (type);
   if (!frame.check (metalib, Treelog::null ()))
     {
@@ -886,8 +906,8 @@ VCheck::InLibrary::valid (const Metalib& metalib, const symbol type,
   return true;
 }
 
-VCheck::InLibrary::InLibrary (const symbol lib)
-  : lib_name (lib)
+VCheck::Buildable::Buildable (const symbol lib)
+  : InLibrary (lib)
 { }
 
 template<class T> 

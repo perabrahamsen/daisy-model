@@ -1,0 +1,18 @@
+;;; run-TOLAR.dai --- run scenarios with Jozef params.
+
+(input file "common-first.dai")
+(input file "SBarley Tolar.dai")
+
+(scn "TOLAR")
+
+(defcrop "WW" "Winter Wheat; N1994")
+     
+(defcrop "SB" "Spring Barley Tolar")
+(defcrop "WR" "Winter Rape; PA")
+
+(input file "common-last.dai")
+
+(run All)
+
+;;; run-TOLAR.dai ends here.
+

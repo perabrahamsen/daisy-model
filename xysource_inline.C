@@ -93,7 +93,7 @@ XYSourceInline::XYSourceInline (const BlockModel& al)
     with_ (al.name ("with")),
     style_ (al.integer ("style", -1)),
     plf (al.plf ("points")),
-    title_ (al.name ("title")),
+    title_ (al.name ("title", "")),
     x_dimension_ (al.name ("x_dimension")),
     y_dimension_ (al.name ("y_dimension"))
 { }
@@ -116,7 +116,7 @@ static struct XYSourceInlineSyntax : public DeclareModel
     GnuplotUtil::load_style (frame, "", "\
 By default the name of the 'x' and 'y' objects.");
     frame.declare ("points", Attribute::Unknown (), Attribute::Unknown (), 
-		Attribute::Const, Attribute::Singleton, "\
+                   Attribute::Const, Attribute::Singleton, "\
 List of (x y) pairs.");
     frame.declare_string ("x_dimension", Attribute::Const, "\
 Dimension for x points.");

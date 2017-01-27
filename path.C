@@ -56,7 +56,10 @@ get_cwd ()
   char buffer[BUFFER_SIZE];
   char *wd = getcwd (buffer, BUFFER_SIZE);
   if (!wd)
-    throw "Current directory path is too long";
+    {
+      daisy_bug ("Current directory path is too long");
+      return ".";
+    }
   return wd;
 }
 

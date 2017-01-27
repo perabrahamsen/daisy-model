@@ -150,7 +150,7 @@ GnuplotVector::initialize (const Units& units, Treelog& msg)
     return false;
 
   // Array.
-  symbol tag = lex.flux_tag ();
+  // symbol tag = lex.flux_tag ();
   if (lex.edge_z ().size () > 0)
     {
       msg.error ("One dimensional data");

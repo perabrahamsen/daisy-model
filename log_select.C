@@ -140,7 +140,7 @@ LogSelect::initial_done (const std::vector<Time::component_t>& time_columns,
   for (std::vector<Select*>::const_iterator i = entries.begin (); 
        i < entries.end (); 
        i++)
-    (*i)->done_small (0.0);
+    (*i)->done_initial ();
   begin = time;
 
   if (is_printing)
@@ -300,6 +300,18 @@ LogSelect::build_parameters (const Block& al)
       const symbol key = pars[i];
       if (al.can_extract_as (key, Attribute::String))
         result.push_back (std::pair<symbol, symbol> (key, al.name (key)));
+      else if (al.can_extract_as (key, Attribute::Integer))
+        {
+          std::ostringstream tmp;
+          tmp << al.integer (key);
+          result.push_back (std::pair<symbol, symbol> (key, tmp.str ()));
+        }
+      else if (al.can_extract_as (key, Attribute::Number))
+        {
+          std::ostringstream tmp;
+          tmp << al.number  (key) << "[" << al.dimension (key) << "]";
+          result.push_back (std::pair<symbol, symbol> (key, tmp.str ()));
+        }
       else
         al.msg ().warning ("Parameter name '" + key + "' not found"); 
     }

@@ -207,6 +207,11 @@ struct VegetationPermanent : public Vegetation
             const Geometry&, OrganicMatter&, const double, 
             double&, double&, const Time&, Treelog&)
   { throw "Can't sow on permanent vegetation"; }
+  void sow (const Metalib&, Crop&, 
+            const double, const double, const double,
+            const Geometry&, OrganicMatter&, const double, 
+            double&, double&, const Time&, Treelog&)
+  { throw "Can't sow on permanent vegetation"; }
   void output (Log&) const;
 
   // Create and destroy.
@@ -308,7 +313,7 @@ VegetationPermanent::tick (const Metalib& metalib,
     daisy_assert (N_actual >= 0.0);
   N_uptake = root_system->nitrogen_uptake (geo, soil, soil_water, 
                                            chemistry, 0.0, 0.0,
-                                           N_demand - N_actual, dt);
+                                           (N_demand - N_actual) / 1.0);
   
   if (canopy->CAI < old_LAI)
     {

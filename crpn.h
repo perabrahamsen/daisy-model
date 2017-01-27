@@ -29,7 +29,7 @@ class SoilWater;
 class Chemistry;
 class RootSystem;
 class Frame;
-class FrameSubmodel;
+class BlockSubmodel;
 class Log;
 class PLF;
 class Treelog;
@@ -67,6 +67,8 @@ private:
 private:
   double NO3_root_min;		// Minimum NO3 conc near roots [g N/cm^3]
   double NH4_root_min;		// Minimum NH4 conc near roots [g N/cm^3]
+  double NO3_root_min_luxury;   // Same for luxury uptake [g N/cm^3]
+  double NH4_root_min_luxury;	// Same for luxury uptake [g N/cm^3]
 
   // Stress
 public:
@@ -105,7 +107,7 @@ private:
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err);
 public:
   static void load_syntax (Frame&);
-  CrpN (const FrameSubmodel&);
+  CrpN (const BlockSubmodel&);
   ~CrpN ();
 };
 

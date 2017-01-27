@@ -272,7 +272,8 @@ double fraction_within (const double from, const double to,
       const double width = to - from;
       const double overlap = to - begin;
       daisy_assert (overlap > 0.0);
-      daisy_assert (width > overlap);
+      daisy_assert (width > 0.0);
+      daisy_soft_assert (width >= overlap);
       return overlap / width;
     }
   if (from >= begin)
@@ -281,7 +282,8 @@ double fraction_within (const double from, const double to,
       const double width = to - from;
       const double overlap = end - from;
       daisy_assert (overlap > 0.0);
-      daisy_assert (width > overlap);
+      daisy_assert (width > 0.0);
+      daisy_soft_assert (width >= overlap);
       return overlap / width;
     }
 
@@ -289,77 +291,8 @@ double fraction_within (const double from, const double to,
   const double width = to - from;
   const double overlap = end - begin;
   daisy_assert (overlap > 0.0);
-  daisy_assert (width > overlap);
+  daisy_soft_assert (width >= overlap);
   return overlap / width;
 }
 
-// extern "C" int matherr (struct exception *exc) 
-// {
-  
-//   abort ();
-// }
-
-#if 0
-// A GNU extension, requires a new glibc.
-#include <fenv.h>
-
-struct set_gnu99_exceptions
-{
-  set_gnu99_exceptions ()
-  {
-    int rc;
-#ifdef FE_DIVBYZERO
-    rc = feenableexcept (FE_DIVBYZERO);
-    daisy_assert (rc);
-#endif
-#ifdef FE_OVERFLOW
-    rc = feenableexcept (FE_OVERFLOW);
-    daisy_assert (rc);
-#endif
-#ifdef FE_INVALID
-    rc = feenableexcept (FE_INVALID);
-    daisy_assert (rc);
-#endif
-  }
-}  set_gnu99_exceptions_dummy;
-#endif
-
-#ifdef __sparc__
-
-#include <sys/fsr.h>
-extern "C" int set_exceptions (...);
-
-struct set_sparc_exceptions
-{
-  set_sparc_exceptions ()
-  {
-    set_exceptions(FSR_TEM_DZ);
-  }
-}  set_sparc_exceptions_dummy;
-
-/*
-
-If you only have gcc you don't have that function.  This assembly
-language function can be used to enable floating point exceptions.  It
-may not work on the new UltraSPARC processors.  Use the FSR_TEM_*
-macros in <sys/fsr.h> as arguments, e.g. set_exceptions(FSR_TEM_DZ).
-
-	.global set_exceptions
-	.type set_exceptions,#function
-	.align 8
-set_exceptions:
-	save %sp,-104,%sp
-	st %fsr,[%fp-8]
-	set (0x1f<<23),%i2
-	ld [%fp-8],%i1
-	and %i0,%i2,%i0
-	andn %i1,%i2,%i1
-	or %i0,%i1,%i0
-	st %i0,[%fp-8]
-	ld [%fp-8],%fsr
-	ret
-	restore
-
-*/
-#endif /* __sparc */
-
+// mathlib.C ends here.

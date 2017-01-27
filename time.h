@@ -136,6 +136,7 @@ public:
   static Time now ();
   const Time& operator= (const Time&);
   Time (const Time&);
+  Time (Time&&) = default;
   Time (int year, int month, int mday, int hour,
         int minute = 0, int second = 0, int microsecond = 0);
   ~Time ();

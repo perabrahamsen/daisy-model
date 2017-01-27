@@ -275,7 +275,7 @@ Intrinsics::Intrinsics ()
 
 Intrinsics::~Intrinsics ()
 { 
-  daisy_assert (count == 0); 
+  daisy_safe_assert (count == 0); 
 }
 
 // intrinsics.C ends here

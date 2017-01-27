@@ -37,12 +37,14 @@
 
 struct ConditionExtern : public Condition
 {
+  bool initialized_ok;
   const std::unique_ptr<Scopesel> scopesel;
   mutable const Scope* extern_scope;
   std::unique_ptr<Boolean> expr;
   
   void tick (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   {
+    daisy_assert (initialized_ok);
     daisy_assert (extern_scope);
     ScopeMulti multi (*extern_scope, parent_scope);
     expr->tick (daisy.units (), multi, msg);  
@@ -50,6 +52,7 @@ struct ConditionExtern : public Condition
 
   bool match (const Daisy&, const Scope& parent_scope, Treelog& msg) const
   { 
+    daisy_assert (initialized_ok);
     daisy_assert (extern_scope);
 
     TREELOG_MODEL (msg);
@@ -65,18 +68,25 @@ struct ConditionExtern : public Condition
   { }
 
   void initialize (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
-  { 
+  {
+    initialized_ok = true;
     daisy_assert (!extern_scope);
     extern_scope = scopesel->lookup (daisy.scopes (), msg); 
     if (!extern_scope)
       return;
     ScopeMulti multi (*extern_scope, parent_scope);
-    expr->initialize (daisy.units (), multi, msg);    
+    if (!expr->initialize (daisy.units (), multi, msg))
+      initialized_ok = false;
   }
 
   bool check (const Daisy& daisy, const Scope& parent_scope, 
               Treelog& msg) const
-  { 
+  {
+    if (!initialized_ok)
+      {
+        msg.error ("Initialized failed");
+        return false;
+      }
     if (!extern_scope)
       {
         msg.error ("Extern scope not found");
@@ -89,6 +99,7 @@ struct ConditionExtern : public Condition
 
   ConditionExtern (const BlockModel& al)
     : Condition (al),
+      initialized_ok (false),
       scopesel (Librarian::build_item<Scopesel> (al, "scope")),
       extern_scope (NULL),
       expr (Librarian::build_item<Boolean> (al, "expr"))

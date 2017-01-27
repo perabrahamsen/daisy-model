@@ -445,7 +445,7 @@ struct NumberTensionByTheta : public Number
     : Number (al),
       units (al.units ()),
       horizon (Librarian::build_item<Horizon> (al, "horizon")),
-               Theta (Librarian::build_item<Number> (al, "Theta"))
+      Theta (Librarian::build_item<Number> (al, "Theta"))
   { horizon->initialize (al.flag ("top_soil"), 2,
                          al.flag ("top_soil") ? -10.0 : -50.0,
                          al.msg ()); }

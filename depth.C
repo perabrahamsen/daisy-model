@@ -563,10 +563,13 @@ struct DepthTable : public Depth
 	      }
 	    return;
 	  }
+	if (!lex.get_entries (entries))
+          continue;
+
+	if (!lex.get_time_dh (entries, next_time, 12))
+          continue;
+
 	entry_count++;
-	
-	lex.get_entries (entries);
-	lex.get_time_dh (entries, next_time, 12);
 
 	if (entry_count > 1 && next_time <= prev_time)
 	  {

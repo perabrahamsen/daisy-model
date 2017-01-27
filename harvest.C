@@ -43,7 +43,16 @@ void
 Harvest::output (Log& log) const
 {
   output_variable (column, log);
-  output_submodule (time, "time", log);
+  if (sow_time != Time::null ())
+    output_submodule (sow_time, "sow_time", log);
+  if (emerge_time != Time::null ())
+  output_submodule (emerge_time, "emerge_time", log);
+  if (flowering_time != Time::null ())
+  output_submodule (flowering_time, "flowering_time", log);
+  if (ripe_time != Time::null ())
+  output_submodule (ripe_time, "ripe_time", log);
+  if (harvest_time != Time::null ())
+  output_submodule (harvest_time, "harvest_time", log);
   output_variable (crop, log);
   output_variable (stem_DM, log);
   output_variable (stem_N, log);
@@ -60,6 +69,7 @@ Harvest::output (Log& log) const
   output_variable (water_stress_days, log);
   output_variable (nitrogen_stress_days, log);
   output_variable (water_productivity, log);
+  output_variable (harvest_index, log);
   if (sorg_DM > 0.0)
     output_value (sorg_N / sorg_DM, "sorg_N_per_DM", log);
 }
@@ -69,8 +79,18 @@ Harvest::load_syntax (Frame& frame)
 {
   frame.declare_string ("column", Attribute::State,
 	      "Name of column where the yield were harvested.");
-  frame.declare_submodule ("time", Attribute::State,
-			"Time of the harvest operation.", Time::load_syntax);
+  frame.declare_submodule ("sow_time", Attribute::State, "\
+Time of sowing or planting of crop.",
+                           Time::load_syntax);
+  frame.declare_submodule ("emerge_time", Attribute::State,
+                           "Time the crop emerge on the field.",
+                           Time::load_syntax);
+  frame.declare_submodule ("flowering_time", Attribute::State,
+                           "Time of flowering.", Time::load_syntax);
+  frame.declare_submodule ("ripe_time", Attribute::State,
+                           "Time the crop became ripe.", Time::load_syntax);
+  frame.declare_submodule ("harvest_time", Attribute::State,
+                           "Time of the harvest operation.", Time::load_syntax);
   frame.declare_string ("crop", Attribute::State,
 	      "Name of crop that was harvested.");
   frame.declare ("stem_DM", "g/m^2", Attribute::State,
@@ -103,13 +123,19 @@ Harvest::load_syntax (Frame& frame)
               "Production days lost due to water stress.");
   frame.declare ("water_productivity", "kg DM/m^3 H2O", Attribute::State, 
               "Storage organ harvested per evapotranspiration.");
+  frame.declare_fraction ("harvest_index", Attribute::State, 
+                          "Economic yield as fraction of total shoot.");
   frame.declare_fraction ("sorg_N_per_DM", Attribute::LogOnly, "\
 Nitrogen fraction is storage dy matter.");
 }
 
 Harvest::Harvest (const Block& alist)
   : column (alist.name ("column")),
-    time (alist.submodel ("time")),
+    sow_time (alist.submodel ("sow_time")),
+    emerge_time (alist.submodel ("emerge_time")),
+    flowering_time (alist.submodel ("flowering_time")),
+    ripe_time (alist.submodel ("ripe_time")),
+    harvest_time (alist.submodel ("harvest_time")),
     crop (alist.name ("crop")),
     stem_DM (alist.number ("stem_DM")),
     stem_N (alist.number ("stem_N")),
@@ -125,18 +151,29 @@ Harvest::Harvest (const Block& alist)
     sorg_C (alist.number ("sorg_C")),
     water_stress_days (alist.number ("water_stress_days")),
     nitrogen_stress_days (alist.number ("nitrogen_stress_days")),
-    water_productivity (alist.number ("water_productivity"))
+    water_productivity (alist.number ("water_productivity")),
+    harvest_index (alist.number ("water_productivity"))
 { }
   
 
-Harvest::Harvest (const symbol col, Time t, const symbol crp, 
+Harvest::Harvest (const symbol col, 
+                  const Time& sow_t,
+                  const Time& emerge_t,
+                  const Time& flowering_t,
+                  const Time& ripe_t,
+                  const Time& harvest_t,
+                  const symbol crp, 
 		  double sDM, double sN, double sC, 
 		  double dDM, double dN, double dC,
 		  double lDM, double lN, double lC, 
 		  double oDM, double oN, double oC, 
-                  double wsd, double nsd, double wp_et)
+                  double wsd, double nsd, double wp_et, double hi)
   : column (col),
-    time (t),
+    sow_time (sow_t),
+    emerge_time (emerge_t),
+    flowering_time (flowering_t),
+    ripe_time (ripe_t),
+    harvest_time (harvest_t),
     crop (crp),
     stem_DM (sDM),
     stem_N (sN),
@@ -152,7 +189,8 @@ Harvest::Harvest (const symbol col, Time t, const symbol crp,
     sorg_C (oC),
     water_stress_days (wsd),
     nitrogen_stress_days (nsd),
-    water_productivity (wp_et)
+    water_productivity (wp_et),
+    harvest_index (hi)
 { }
 
 static DeclareSubmodel 

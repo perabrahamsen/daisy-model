@@ -289,6 +289,7 @@ daisy_frame_set_flag_at (Frame* frame, const char* name,
 }
 #endif
 
+#if 0
 extern "C" void EXPORT
 daisy_frame_set_number_at (Frame* frame, const char* name,
 			   double value, unsigned int index)
@@ -301,8 +302,9 @@ daisy_frame_set_number_at (Frame* frame, const char* name,
       v.push_back (value);
   else
     v[index] = value;
-  frame->set (name, v);
+  frame->set (name, v);         // Coverity: memory leak
 }
+#endif
 
 /* @ The daisy_library Type.
  * 

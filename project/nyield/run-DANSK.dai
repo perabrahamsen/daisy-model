@@ -1,0 +1,19 @@
+;;; run-DANSK.dai --- run scenarios with original crop params.
+
+(input file "dk-wwheat.dai")
+(input file "dk-sbarley.dai")
+
+(input file "common-first.dai")
+
+(scn "DANSK")
+
+(defcrop "WW" "Vinterhvede")
+(defcrop "SB" "Vaarbyg")
+(defcrop "WR" "Vinterraps")
+
+(input file "common-last.dai")
+
+(run All)
+
+;;; run-DANSK.dai ends here.
+

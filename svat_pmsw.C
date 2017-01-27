@@ -1545,7 +1545,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
 
       // r_aa with stability correction, following Mahrt & Ek (1984)
       // stressed conditions
-      RAASTAB_1 (z_ref, u,tcan_prev,tair,h,LAI,c_d,z_0s,z0_def,d_aa,z0_aa,
+      RAASTAB_1 (z_ref, u,tair,tcan_prev,h,LAI,c_d,z_0s,z0_def,d_aa,z0_aa,
                  C,C_q,R_i,r_aastab1,ustar_raastab1);
 
       // r_aa with stability correction, following Dolman (1993)

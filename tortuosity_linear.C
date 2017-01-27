@@ -66,6 +66,7 @@ static struct TortuosityLinearSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
+    frame.set_strings ("cite", "nye1977solute");
     frame.declare ("a", "cm^3/cm^3", Attribute::OptionalConst, "\
 Theta offset.  By default, this corresponds to the wilting point.");
     frame.declare ("b", Attribute::None (), Attribute::Const, "Theta factor.");

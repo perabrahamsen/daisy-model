@@ -1,0 +1,17 @@
+;;; run-N2014.dai --- run scenarios with sorg n conc after 2014 data.
+
+(input file "common-first.dai")
+
+(scn "N2014")
+
+(defcrop "WW" "Winter Wheat; N2014")
+     
+(defcrop "SB" "Spring Barley; N2014")
+(defcrop "WR" "Winter Rape; PA")
+
+(input file "common-last.dai")
+
+(run All)
+
+;;; run-N2014.dai ends here.
+

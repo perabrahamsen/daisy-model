@@ -79,6 +79,35 @@ GnuplotXY::initialize (const Units& units, Treelog& msg)
   return ok;
 }
 
+static void adjust_range (double& min, double& max)
+{
+  if (max > min)
+    return;
+  
+  const double delta = std::abs (max * 0.1);
+  min -= delta;
+  max += delta;
+
+  if (max > min)
+    return;
+
+  std::swap (max, min);
+  
+  if (max > min)
+    return;
+
+  min -= 1.0;
+  max += 1.0;
+  
+  if (max > min)
+    return;
+
+  min = -42e42;
+  max = -42e42;
+
+  daisy_assert (min < max);
+}
+
 bool
 GnuplotXY::plot (std::ostream& out, Treelog& msg)
 { 
@@ -210,15 +239,11 @@ set style data lines\n";
   if (y2max_flag)
     soft_y2max = y2max;
 
-  // Avouid empty range.
-  if (soft_xmax <= soft_xmin)
-    soft_xmax = soft_xmin + 1.0;
-  if (soft_x2max <= soft_x2min)
-    soft_x2max = soft_x2min + 1.0;
-  if (soft_ymax <= soft_ymin)
-    soft_ymax = soft_ymin + 1.0;
-  if (soft_y2max <= soft_y2min)
-    soft_y2max = soft_y2min + 1.0;
+  // Avoid empty range.
+  adjust_range (soft_xmin, soft_xmax);
+  adjust_range (soft_x2min, soft_x2max);
+  adjust_range (soft_ymin, soft_ymax);
+  adjust_range (soft_y2min, soft_y2max);
 
   // Legend.
   if (legend == "auto")

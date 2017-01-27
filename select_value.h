@@ -38,6 +38,7 @@ protected:
 
   // Output routines.
 public:
+  void done_initial ();
   void done_small (double ddt);
   void done_print ();
 

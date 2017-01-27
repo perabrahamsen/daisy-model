@@ -1,3 +1,130 @@
+2017-01-26  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.31 released.
+
+2017-01-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* program_optimize.C (Program): Comment out unused 'dimension'.
+	* library.C (clear_parsed): Comment out unused 'key'.
+	* gnuplot_vector.C (initialize): Comment out unused 'tag'.
+
+	* plf.h (PLF): Coverity: Added default move constructor.
+	* time.h (Time): Ditto.
+	* symbol.h (symbol): Coverity: Remove copy constructor and assigment
+	operator in order to get default move constructor.
+	* filepos.h, filepos.C (Filepos): Ditto.
+	* im.h, im.C (IM): Ditto.
+	* time.C (mday2yday): Coverity: bounds check for month.
+	* assertion.h (daisy_safe_assert): New macro.
+	* format.C (pop, ~Document): Coverity: Use it to avoid throwing
+	from constructors.
+	* assertion.C (~Register): Ditto.
+	* xref.C (leave_library, leave_model, leave_submodel_default):
+	Coverity: Make them safe to call from destructors.
+	* treelog_store.C (close): Coverity: Make is safe to call from
+	destructors.
+	* frame.C (unregister_child): Ditto.
+	* path.C (get_cwd): Ditto.
+	* field.C (unrestrict): Ditto.
+	* xref.C (~TraverseXRef): Coverity. Use 'daisy_safe_assert'.
+	* im.C (~IM): Ditto.
+	* field.C (~Implementation): Ditto.
+	* treelog_text.C (~Implementation): Ditto.
+	* librarian.C (~Librarian): Ditto.
+	* intrinsics.C (~Intrinsics): Ditto.
+	* symbol.C (~Init): Ditto.
+	* oldunits.C (~Oldunits): Ditto.
+	* condition_extern.C (initialized_ok): Coverity: New variable.
+	* depth.C (DepthTable::read_line): Coverity: Check get_entries
+	and get_time_dh return values.
+	* wsource_weather.C (name_first): Coverity: Don't dereference
+	unknown source.
+
+2017-01-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* crop_simple.C (~CropSimple): Coverity: Don't delete 'canopy'.
+	* program_KM2.C (run): Coverity: Check resolution == 0.
+	* organic_std.C (check_am): Coverity: Remove unused 'om_ok' code.
+	* Makefile (DISABLED, OTHER): Coverity: Disable 'cdaisy.C'.
+	* wsource_combine.C (Entry::Entry): Coverity: Fix memory leak.
+
+	* svat_pmsw.C (tick): Coverity: swap tair and tcan_prev.
+
+2017-01-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* wsource_combine.C (entries): Fix check for period overlap.
+
+2016-12-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* harvest.h, harvest.C (harvest_index): New parameter.
+	* log_harvest.C, harvesting.C, crop_simple.C: Update caller.
+
+2016-11-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* solupt.C, solupt.h: New component.
+	* Makefile (COMPONENTS): Add it.
+
+2016-11-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* vegetation_afforestation.C:
+	* field.C, field.h, column.h, column_std.C:
+	* vegetation.h, vegetation_permanent.C:
+	* vegetation_crops.C (sow): Take instantiated crop object.
+	* action_sow (sow_object): New action.
+
+2016-10-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* mathlib.C: Removed old exception code.
+
+2016-09-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log.dai ("Surface Water Balance"): Removed. 
+	("Evapotranspiration"): Ditto.
+
+2016-09-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* uzrect_Mollerup.C (S_macro, S_macro_sum, S_drain, S_drain_sum):
+	Removed unused variables.
+
+2016-09-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* log.h (output_vector): Removed.
+	* action_crop.C, daisy.C (output): Update callers.
+
+2016-09-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* summary_fractiles.C (find_fractile): Allow 100 % fractile.
+
+	* harvest.C, harvest.h (time_sow, time_emerge, time_flowering):
+	(time_ripe): New members.
+	(time_harvest): Renamed from 'time'.
+	* harvesting.C, harvesting.h (harvest): Update caller.
+	* log_harvest.C (match): Ditto.
+	* crop_simple.C (harvest): Ditto.
+	* crop_std.C (sow_time, emerge_time, flowering_time, ripe_time):
+	New state variables. Update callers.
+
+2016-09-01  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.30 released.
+
+2016-09-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C (clear): Don't clear 'M_tertiary' here, it is
+	needed for initial line later.
+
+	* select_array.C, select_value (done_small): Handle ddt == 0.0.
+
+2016-08-26  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.29 released.
+
+2016-08-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* biopore.C (solute_infiltrate): Positive is up (sign error).
+
+	* tertiary_biopores.C (solute): Removed dead variable.
+
 2016-06-28  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.28 released.

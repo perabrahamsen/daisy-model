@@ -156,7 +156,7 @@ symbol::Init::Init ()
 
 symbol::Init::~Init ()
 {
-  daisy_assert (count > 0);
+  daisy_safe_assert (count > 0);
   count--;
   if (count == 0)
     {

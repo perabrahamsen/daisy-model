@@ -1,62 +1,81 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Sommerkursus
+* Scenarier
 
-** Kig på indhold
+* Inden jul
 
-*** Fleksibel: Lær nogen koncepter først
+** DONE Denit valgt
 
-*** Concept læs og skriv filer
+** DONE Uptake valgt
 
-setup.dai   -> Daisy -> crop.dlf
-weather.dwf ->       -> field_nitrogen.dlf
+** Carsten kørsler ser ok ud
 
-TextPad (eller TextMate ...)
-Excel (eller LibreOffice ...)
-ShowDaisyOutput 
+** DOING Høstindex
 
-*** daisy.ku.dk
+** DOING DM Udbytter
 
-Download
-  Windows (+ TextPad)
-  Mac (+ TextMate)
-  Linux 
+** N udbytter
 
-*** Syntax (var val dim) ;; comment
+** Dokumentation
 
-Eksempel
+* SolUpt
 
+** Kør stor test med NYield opsætninger
 
-*** Model vs Parameterization
+** Kører N1994, N1F10, N1F25, N2014, N2F10, N2F25
 
-Eksempel
+* vap-figs.pdf til hjemmeside (og rørrende bilag)
 
-*** Navngivne parameterizationer
+* SH fejl
 
-Eksempel (VinterHvede)
+** Brug massebalance til at udregne (vertical) flux fra bunden.
 
-*** Filstruktur
-
-Fra opgaver
-
-*** Excersizes.
-
-beskriv
+Husk drænnoder!
 
 * NYield
 
-** WRape
+** Prøv at regne uptake ud manuelt
 
-*** Prøv DK-Vinterraps
+200 ppm, C_root = 0, andre tal fra plot_nlux.dai
 
-*** Juster andel der høstes ned.
+** DENIT8 denitrifikation
+
+** logge høstindex direkte
+
+** I stedet for "low" N0-N6
+
+** Få høstindex på plads
+
+Passer vist godt 1994, skidt for 2014
 
 
-** Kør alt i en setup
+** Vårbyg
 
-Ny summary søjle: Setup
+*** Tokkerup
 
-** Vi skal cropmodel (til simulering) og cropname (til summary) variable
+**** Høstudbytte. Spørg Kasper.
+
+**** Plot LAI, WS, NS
+
+**** latex side med alle plots
+
+**** Prøv forskellige vårbyg
+
+***** ORIG + PA (+ Kasper)
+
+**** Excel akr hvor høstudbytte sammenlignes
+
+** Gør DS1_name til en parameter
+
+flowering, tuberization, dk:skridning
+
+** Kig på resutater
+
+*** Ny extract script
+
+Lav filer i det rigtige format til at paste ind i excel ark.
+
+*** Kopier ind i Excel, skriv ud
 
 ** Setups
 

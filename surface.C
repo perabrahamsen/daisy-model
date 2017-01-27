@@ -221,6 +221,7 @@ Surface::Implementation::exfiltrate (const Geometry& geo, const size_t edge,
     return;
 
   const size_t c = pond_edge[edge];
+#ifdef NO_NEGATIVE_POND
   if (pond_section[c] + water < 0.0)
     // - std::max (fabs (pond_edge[edge]), fabs (water)) / 100.0)
     {
@@ -239,7 +240,8 @@ Surface::Implementation::exfiltrate (const Geometry& geo, const size_t edge,
       pond_section[c] = 0.0;
       return;
     }
-
+#endif
+  
   daisy_assert (pond_section[c] < std::max(1000.0, 10.0 * DetentionCapacity));
   daisy_assert (pond_section[c] > -1000.0);
   pond_section[c] += water;
@@ -446,13 +448,15 @@ Surface::Implementation::tick (Treelog& msg,
                  PotSoilEvaporationDry); 
 
       const double epond = pond_section[c]; // [mm]
+
+#ifdef NO_NEGATIVE_POND
       if (epond < 0.0)
         {
           std::ostringstream tmp;
           tmp << "pond_edge[" << edge << "] = "<< pond_section[c];
           msg.warning (tmp.str ());
         }
-
+#endif
       double evap;              // [mm/h]
       if (epond + flux_in * dt + MaxExfiltration * dt < Eps * dt)
         evap = epond / dt + flux_in + MaxExfiltration;
@@ -590,6 +594,7 @@ double
 Surface::evap_pond (const double dt, Treelog& msg) const	// [mm/h]
 { 
   const double ep = evap_soil_surface () - exfiltration (dt); 
+
   if (ep >= 0.0)
     return ep;
   if (ep < -1e-13)

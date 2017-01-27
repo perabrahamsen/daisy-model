@@ -1,0 +1,25 @@
+;;; run-TEST2.dai --- run experiemental scenarios.
+
+(input file "common-first.dai")
+
+(scn "TEST2")
+
+;;(denit low_denit)
+
+(defcrop "WW" "Winter Wheat; N2014")
+     
+(defcrop "SB" "Spring Barley; N2014"
+  (LeafPhot original 
+            (Fm 6.00)))
+
+(defcrop "WR" "Winter Rape; PA")
+  
+
+(input file "common-last.dai")
+
+(run (JB6_1994_Org (stop 2015) (activate_output true)))
+
+;;(run All)
+
+;;; run-TEST2.dai ends here.
+

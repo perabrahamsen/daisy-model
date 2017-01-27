@@ -569,7 +569,7 @@ ChemicalStandard::clear ()
   litter_tillage = 0.0;
   surface_transform = 0.0;
   surface_release = 0.0;
-  std::fill (M_tertiary_.begin (), M_tertiary_.end (), 0.0);
+  // Don't clear M_tertiary here, it may be needed for initial log content.
   std::fill (S_secondary_.begin (), S_secondary_.end (), 0.0);
   std::fill (S_primary_.begin (), S_primary_.end (), 0.0);
   std::fill (S_external.begin (), S_external.end (), 0.0);

@@ -215,6 +215,11 @@ struct VegetationAfforestation : public Vegetation
             const Geometry&, OrganicMatter&, const double, 
             double&, double&, const Time&, Treelog&)
   { throw "Can't sow on afforestation vegetation"; }
+  void sow (const Metalib&, Crop&, 
+            const double, const double, const double,
+            const Geometry&, OrganicMatter&, const double, 
+            double&, double&, const Time&, Treelog&)
+  { throw "Can't sow on afforestation vegetation"; }
   void output (Log&) const;
 
   // Create and destroy.
@@ -287,7 +292,7 @@ VegetationAfforestation::tick (const Metalib& metalib,
   daisy_assert (N_actual >= 0.0);
   N_uptake = root_system->nitrogen_uptake (geo, soil, soil_water, 
                                            chemistry, 0.0, 0.0,
-                                           N_demand - N_actual, dt);
+                                           (N_demand - N_actual) / 1.0);
 
   static const symbol vegetation_symbol ("vegetation");
   static const double g_per_Mg = 1.0e6;

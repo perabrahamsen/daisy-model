@@ -179,6 +179,7 @@ public:
     return is_active;
   }
   // Print result at end of time step.
+  virtual void done_initial () = 0;
   virtual void done_small (double ddt) = 0;
   virtual void done_print () = 0;
   bool print_initial () const

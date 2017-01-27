@@ -30,6 +30,7 @@
 #include "vegetation.h"
 #include "treelog.h"
 #include "frame.h"
+#include "crop.h"
 #include <sstream>
 
 // The 'emerge' action model.
@@ -87,6 +88,7 @@ If you specify 'all', all crops will emerge.\n\
 If there are no crop on the field with the specified name,\n\
 nothing will happen.");
     frame.set ("crop", Vegetation::all_crops ());
+    frame.set_check ("crop", Crop::check_all ());
     frame.order ("crop");
   }
 } ActionEmerge_syntax;
@@ -107,6 +109,7 @@ If you specify 'all', all crops will be harvested.\n\
 If there are no crop on the field with the specified name,\n\
 nothing will happen.");
     frame.set ("crop", Vegetation::all_crops ());
+    frame.set_check ("crop", Crop::check_all ());
     frame.declare ("stub", "cm", Attribute::Const, "\
 Leave stem and leafs below this height on the field.");
     frame.set ("stub", 0.0);
@@ -304,6 +307,7 @@ If you specify 'all', all crops will be plucked.\n\
 If there are no crop on the field with the specified name,\n\
 nothing will happen.");
     frame.set ("crop", Vegetation::all_crops ());
+    frame.set_check ("crop", Crop::check_all ());
     frame.declare_fraction ("stem", Attribute::Const, "\
 Fraction of stem to pluck.");
     frame.set ("stem", 0.0);

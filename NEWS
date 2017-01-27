@@ -6,6 +6,87 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.31
+
+** Bug fixes and removal of dead or unused code.
+
+** New 'variable_sink' model for nitrogen uptake through roots.
+
+Nitrate uptake through roots in Daisy has been limited by convection
+and diffusion towards the root in the soil matrix. The diffusion
+component has assumed a zero sink, that is no nitrate at the root
+surfaces. This has been limited demand, as well as by a maximum rate,
+given by the 'MxNO3Up' parameter.
+
+With the 'variable_sink' uptake model, the uptake is further limited
+by nitrate concentration at root surface, meaning diffusion will no
+longer be calculated from a zero sink. The model will find a
+concentration near root surface where the uptake in the roots and
+diffusion towards the roots are equal.
+
+The effect of using the new model is that nitrogen uptake is much
+slower, especiacially with low concentrations in the soil.
+
+It is enabled with by setting 'NO3_uptake' to 'variable sink' in the
+'Root' part of the crop parameterization. The 'NH4_uptake' parameter
+controls ammonium uptake. The old model is called 'fixed_sink', and is
+still default.
+
+** New 'HI' column in harvest log file.
+
+It contains the harvest index.
+
+** New 'sow_object' action.
+
+Works like 'sow', except it cannot be used within a 'repeat' action,
+but is is does allow optimizing crop parameters. 
+
+* 5.29
+
+** Default tortosity model changed from 'M_Q' to 'linear'.
+
+The linear model is less sensitive to water content for nitrate
+uptake, but overall the effect is expcected to be modest.
+
+Add
+
+  (Tortosity M_Q)
+
+to your horizons to switch back to the old model.
+
+** New 'NO3_uptake' and 'NH4_uptake' parameters.
+
+By default, 'NH4_uptake' use the same model as 'NO3_uptake', by
+default 'fixed_sink'.
+
+For N to move from the soil int the crop, it has to move to the root
+surface (by advection or diffusuion), and then enter the roots. The
+concentration at the root surface (C_root) is a limiting factor for
+both processes.
+
+The old ('fixed_sink') model ignored the limit for entering the roots
+(up to a maximum rate), and allowed C_root to be zero in order to
+maximize diffusion towards the root surface. The new model
+('variable_sink') don't, and instead find a value for 'C_root' where
+the two rates are equal.
+
+The new model use a double Michaelis-Menten kinetics to predict the
+rate N enter the roots.
+
+ I = F1 C_root / (K1 + C_root) + F2 C_root / (K2 + C_root)
+
+K1 and K2 can be specified directly. F1 and F2 are specified
+indirectly, through the 'MxNO3Upt' and 'MxNH4Upt' root system
+parameter, and the 'F_relative' parameter.
+
+ F1 = F_relative * MxNO3Upt
+ F2 = MxNO3Upt - F1
+
+and similar for NH4 uptake.
+
+The effect of switching to the new model is that N uptake is slower,
+especielly for low N concentration is the soil.
+
 * 5.28
 
 ** New 'Crop' log parameterization in log-std.dai.

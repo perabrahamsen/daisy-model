@@ -1,0 +1,33 @@
+;;; common-first.dai --- Common stuff before we choose crops.
+
+(path "${install_directory}/climate" &old)
+
+(input file "dk-horizon.dai")
+(input file "tillage.dai")
+(input file "fertilizer.dai")
+(input file "log-std.dai")
+
+(input file "ncrop.dai")
+
+(declare scn String "Name of NYield crop scenarie.")
+
+(defchemistry high_denit multi
+  (combine N))
+
+(defchemistry low_denit multi
+  (combine (N (reaction nitrification
+                        (denitrification
+                         (water_factor (0.8 0.0) (0.9 0.2) (1.0 1.0)))))))
+
+(defchemistry denit8 multi
+  (combine (N (reaction nitrification
+                        (denitrification
+                         (water_factor (0.8 0.0) (1.0 1.0)))))))
+
+(declare denit chemistry "Chemistry model to use.")
+(denit denit8)
+
+(declare SOM_fracs [] Number [<none>] "SOM partitioning for Ap horizon.")
+(SOM_fracs 0.49 0.51)
+
+;;; common-first.dai ends here.

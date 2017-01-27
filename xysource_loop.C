@@ -84,6 +84,8 @@ public:
 bool
 XYSourceLoop::load (const Units& units, Treelog& msg)
 {
+  scope.set (tag, begin);
+
   bool ok = true;
   if (!x_expr->initialize (units, scope, msg)
       || !x_expr->check (units, scope, msg))
@@ -106,10 +108,12 @@ XYSourceLoop::load (const Units& units, Treelog& msg)
 
   // Read data.
   daisy_assert (xs.size () == ys.size ());
-  for (scope.set (tag, begin); 
-       (step > 0.0) ? (scope.number (tag) < end) : (scope.number (tag) > end); 
+  for (; 
+       (step > 0.0) ? (scope.number (tag) <= end) : (scope.number (tag) >= end); 
        scope.set (tag, scope.number (tag) + step))
     {
+      x_expr->tick (units, scope, msg);
+      y_expr->tick (units, scope, msg);
       // Missing value.
       if (x_expr->missing (scope) || y_expr->missing (scope))
 	continue;
@@ -154,12 +158,12 @@ static struct XYSourceLoopSyntax : public DeclareModel
     bool ok = true;
     if (alist.name ("end") != alist.name ("begin"))
       {
-        msg.error ("'begin' and 'end' should have the same dimension.");
+        msg.error ("'begin' and 'end' should have the same dimension");
         ok = false;
       }
     if (alist.name ("step") != alist.name ("begin"))
       {
-        msg.error ("'begin' and 'step' should have the same dimension.");
+        msg.error ("'begin' and 'step' should have the same dimension");
         ok = false;
       }
     const double step = alist.number ("step");
@@ -200,9 +204,9 @@ Expression for calculating the y value.");
 Start of interval.");
     frame.declare ("end", Attribute::User (), Attribute::Const, "\
 End of interval.");
-    frame.declare ("step", Attribute::User (), Check::non_zero (), Attribute::Const, "\
+    frame.declare ("step", Attribute::User (), Check::non_zero (),
+                   Attribute::Const, "\
 Disretization within interval.");
-    
     frame.declare_string ("tag", Attribute::Const, "\
 Name of free variable to calculate the 'x' and 'y' expressions from.");
     frame.set ("tag", "x");

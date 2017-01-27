@@ -198,14 +198,6 @@ IM::multiply (const Scalar& s, const Unit& u) const
   return result;
 }
 
-IM& 
-IM::operator= (const IM& im)
-{
-  unit_ = im.unit_;
-  content = im.content;
-  return *this;
-}
-
 void
 IM::clear ()
 {
@@ -241,11 +233,6 @@ IM::IM ()
   : unit_ (NULL)
 { }
 
-IM::IM (const IM& im)
-  : unit_ (im.unit_),
-    content (im.content)
-{ }
-
 IM::IM (const Unit& u)
   : unit_ (&u)
 { }
@@ -258,7 +245,7 @@ IM::IM (const Unit& u, const IM& im)
 }
 
 IM::~IM ()
-{ daisy_assert (unit_);  }
+{ daisy_safe_assert (unit_);  }
 
 void
 IM::add_syntax (Frame& frame,
@@ -266,7 +253,7 @@ IM::add_syntax (Frame& frame,
 		const symbol dimension)
 {
   frame.declare_string ("name", cat, "Name of chemical.");
-  frame.set_check ("name", Chemical::check_library ());
+  frame.set_check ("name", Chemical::check_buildable ());
   frame.declare ("value", dimension, Check::non_negative (), cat, 
              "Value for chemical.");
   frame.order ("name", "value");

@@ -1,0 +1,18 @@
+;;; run-PA.dai --- run scenarios with pa changes.
+
+(input file "common-first.dai")
+
+(scn "PA")
+
+(defcrop "WW" "Winter Wheat; PA")
+     
+(defcrop "SB" "Spring Barley; PA")
+(defcrop "WR" "Winter Rape; PA")
+
+(input file "common-last.dai")
+
+;(run (JB4_1994_Org (stop 2015)))
+(run All)
+
+;;; run-PA.dai ends here.
+

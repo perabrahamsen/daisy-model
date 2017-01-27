@@ -162,8 +162,16 @@ struct ProgramKM2 : public Program
         // 30-31
         const int resolution = get_integer (2);
 
-        if (resolution != 1)
-          lex->warning ("resolution != 1");
+        switch (resolution)
+          {
+          case 0:
+            lex->error ("resolution == 0");
+            return false;
+          case 1:
+            break;
+          default:
+            lex->warning ("resolution != 1");
+          }
 
         // 32-38
         const double total = get_double (7);

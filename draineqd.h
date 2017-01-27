@@ -1,4 +1,4 @@
-// draineqd.h --- Find the draineqd of two numbers.
+// draineqd.h --- Equivalent drain depth.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.

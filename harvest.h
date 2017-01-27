@@ -35,7 +35,11 @@ class Harvest
   // Content:
 public:
   const symbol column;
-  const Time time;
+  const Time sow_time;
+  const Time emerge_time;
+  const Time flowering_time;
+  const Time ripe_time;
+  const Time harvest_time;
   const symbol crop;
   const double stem_DM;
   const double stem_N;
@@ -52,6 +56,7 @@ public:
   const double water_stress_days;
   const double nitrogen_stress_days;
   const double water_productivity;
+  const double harvest_index;
   double total_N () const;
   double total_C () const;
   double total_DM () const;
@@ -64,10 +69,16 @@ public:
 public:
   static void load_syntax (Frame&);
   Harvest (const Block& al);
-  Harvest (symbol col, Time t, symbol crp, 
+  Harvest (symbol col,
+           const Time& sow_t,
+           const Time& emerge_t,
+           const Time& flowering_t,
+           const Time& ripe_t,
+           const Time& harvest_t,
+           symbol crp, 
 	   double sDM, double sN, double sC, double dDM, double dN, double dC,
 	   double lDM, double lN, double lC, double oDM, double oN, double oC,
-           double wsd, double nsd, double wp_et);
+           double wsd, double nsd, double wp_et, double hi);
 };      
 
 #endif // HARVEST_H

@@ -578,9 +578,8 @@ TertiaryBiopores::solute (const Geometry& geo, const SoilWater& soil_water,
                           Chemical& chemical, Treelog& msg)
 {
   const symbol chem = chemical.objid;
+
   // Surface infiltration.
-  const size_t edge_size = geo.edge_size ();
-  std::vector<double> J_chem (edge_size, 0.0);
   const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
 
@@ -591,9 +590,6 @@ TertiaryBiopores::solute (const Geometry& geo, const SoilWater& soil_water,
       std::map<size_t, double>::const_iterator p = J_tertiary.find (edge);
       if (p == J_tertiary.end ())
         continue;               // Nothing to do.
-
-      // Store it.
-      J_chem[edge] = p->second;
 
       // Find total amount.
       const double in_sign 
