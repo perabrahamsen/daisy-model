@@ -2,24 +2,6 @@
 
 (input file "management.dai")
 
-(defunit [kWh/d/m^2] SIfactor 
-	  (mass 1)
-	  (time -3)
-	  (factor 41.67))
-
-(defweather D1990 default "Control_daily_daisy.dwf"
-  (NH4WetDep 1.10 [ppm])
-  (NH4DryDep 5.04 [kg N/ha/y])
-  (NO3WetDep 1.10 [ppm])
-  (NO3DryDep 3.36 [kg N/ha/y]))
-
-(defweather D2014 default "Control_daily_daisy.dwf"
-  (NH4WetDep 0.51 [ppm])
-  (NH4DryDep 4.02 [kg N/ha/y])
-  (NO3WetDep 0.51 [ppm])
-  (NO3DryDep 2.68 [kg N/ha/y]))
-
-
 (defsummary NSoil fractiles
   (tags "Matrix-Leaching" "N-Soil-Drain" "Min-Surface-Fertilizer"
         "Min-Soil-Fertilizer" "Org-Fertilizer" "Deposition" "NH4-Mineralization"
@@ -507,8 +489,8 @@ File component name indicating crop logged. Empty if not specified.")
                                            ( -80 [cm]   0 [%])
                                            (   0 [cm]   0 [%])))))
   (Groundwater deep)
-  (Soil (MaxRootingDepth 150 [cm])
-        (horizons ( -25 ("Ap_JB4" (SOM_fractions $SOM_fracs)))
+  (Soil (MaxRootingDepth $JB4_root)
+        (horizons ( -25 $my_JB4_Ap)
                   ( -35 "B_JB4_plowpan")
                   ( -80 "B_JB4")
                   (-250 "C_JB4"))))
@@ -520,8 +502,8 @@ File component name indicating crop logged. Empty if not specified.")
 (defcolumn JB6 NYield
   (Drain lateral)
   (Groundwater (aquitard (K_aquitard 6e-2 [cm/d]))) ;Calib: 32 % to drain
-  (Soil (MaxRootingDepth 250 [cm])
-        (horizons ( -25 ("Ap_JB6"  (SOM_fractions $SOM_fracs)))
+  (Soil (MaxRootingDepth $JB6_root)
+        (horizons ( -25 $my_JB6_Ap)
                   ( -35 "B_JB6_plowpan")
                   ( -80 "B_JB6")
                   (-250 "C_JB6"))))
@@ -533,8 +515,8 @@ File component name indicating crop logged. Empty if not specified.")
 (defcolumn JB7 NYield
   (Drain lateral)
   (Groundwater (aquitard (K_aquitard 3.5e-2 [cm/d]))) ; Calib: 55 % to drain
-  (Soil (MaxRootingDepth 250 [cm])
-        (horizons ( -25 ("Ap_JB7" (SOM_fractions $SOM_fracs)))
+  (Soil (MaxRootingDepth $JB7_root)
+        (horizons ( -25 $my_JB7_Ap)
                   ( -35 "B_JB7_plowpan")
                   ( -80 "B_JB7")
                   (-250 "C_JB7"))))
@@ -586,7 +568,7 @@ File component name indicating crop logged. Empty if not specified.")
 
 (defprogram JB4_2014_Min REF
   (fert "Min")
-  (weather D2014) (period "2014")
+  (weather $my_D2014) (period "2014")
   (mycol JB4)
   (column JB4)
   (manager ROT_JB4_2014_Min ROT_JB4_2014_Min
@@ -596,7 +578,7 @@ File component name indicating crop logged. Empty if not specified.")
 
 (defprogram JB6_2014_Min REF
   (fert "Min")
-  (weather D2014) (period "2014")
+  (weather $my_D2014) (period "2014")
   (mycol JB6)
   (column JB6)
   (manager ROT_JB6_2014_Min ROT_JB6_2014_Min
@@ -606,7 +588,7 @@ File component name indicating crop logged. Empty if not specified.")
 
 (defprogram JB7_2014_Min REF
   (fert "Min")
-  (weather D2014) (period "2014")
+  (weather $my_D2014) (period "2014")
   (mycol JB7)
   (column JB7)
   (manager ROT_JB7_2014_Min ROT_JB7_2014_Min
@@ -616,7 +598,7 @@ File component name indicating crop logged. Empty if not specified.")
 
 (defprogram JB4_2014_Org REF
   (fert "Org")
-  (weather D2014) (period "2014")
+  (weather $my_D2014) (period "2014")
   (mycol JB4)
   (column JB4)
   (manager ROT_JB4_2014_Org ROT_JB4_2014_Org
@@ -626,7 +608,7 @@ File component name indicating crop logged. Empty if not specified.")
 
 (defprogram JB6_2014_Org REF
   (fert "Org")
-  (weather D2014) (period "2014")
+  (weather $my_D2014) (period "2014")
   (mycol JB6)
   (column JB6)
   (manager ROT_JB6_2014_Org ROT_JB6_2014_Org
@@ -636,7 +618,7 @@ File component name indicating crop logged. Empty if not specified.")
 
 (defprogram JB7_2014_Org REF
   (fert "Org")
-  (weather D2014) (period "2014")
+  (weather $my_D2014) (period "2014")
   (mycol JB7)
   (column JB7)
   (manager ROT_JB7_2014_Org ROT_JB7_2014_Org
@@ -646,7 +628,7 @@ File component name indicating crop logged. Empty if not specified.")
 
 (defprogram JB4_1994_Min REF
   (fert "Min")
-  (weather D1990) (period "1994")
+  (weather $my_D1994) (period "1994")
   (mycol JB4)
   (column JB4)
   (manager ROT_JB4_1994_Min ROT_JB4_1994_Min
@@ -656,7 +638,7 @@ File component name indicating crop logged. Empty if not specified.")
 
 (defprogram JB6_1994_Min REF
   (fert "Min")
-  (weather D1990) (period "1994")
+  (weather $my_D1994) (period "1994")
   (mycol JB6)
   (column JB6)
   (manager ROT_JB6_1994_Min ROT_JB6_1994_Min
@@ -666,13 +648,13 @@ File component name indicating crop logged. Empty if not specified.")
 
 (defprogram JB7_1994_Min JB6_1994_Min
   (fert "Min")
-  (weather D1990) (period "1994")
+  (weather $my_D1994) (period "1994")
   (mycol JB7)
   (column JB7))
 
 (defprogram JB4_1994_Org REF
   (fert "Org")
-  (weather D1990) (period "1994")
+  (weather $my_D1994) (period "1994")
   (mycol JB4)
   (column JB4)
   (manager ROT_JB4_1994_Org ROT_JB4_1994_Org
@@ -682,7 +664,7 @@ File component name indicating crop logged. Empty if not specified.")
 
 (defprogram JB6_1994_Org REF
   (fert "Org")
-  (weather D1990) (period "1994")
+  (weather $my_D1994) (period "1994")
   (mycol JB6)
   (column JB6)
   (manager ROT_JB6_1994_Org ROT_JB6_1994_Org
@@ -692,13 +674,13 @@ File component name indicating crop logged. Empty if not specified.")
 
 (defprogram JB7_1994_Org JB6_1994_Org
   (fert "Org")
-  (weather D1990) (period "1994")
+  (weather $my_D1994) (period "1994")
   (mycol JB7)
   (column JB7))
 
 (defprogram JB4_Low_Min REF
   (fert "Min")
-  (weather D2014) (period "low")
+  (weather $my_D2014) (period "low")
   (mycol JB4)
   (column JB4)
   (manager ROT_JB4_2014_Min ROT_JB4_2014_Min
@@ -708,7 +690,7 @@ File component name indicating crop logged. Empty if not specified.")
 
 (defprogram JB6_Low_Min REF
   (fert "Min")
-  (weather D2014) (period "low")
+  (weather $my_D2014) (period "low")
   (mycol JB6)
   (column JB6)
   (manager ROT_JB6_2014_Min ROT_JB6_2014_Min
@@ -718,7 +700,7 @@ File component name indicating crop logged. Empty if not specified.")
 
 (defprogram JB7_Low_Min REF
   (fert "Min")
-  (weather D2014) (period "low")
+  (weather $my_D2014) (period "low")
   (mycol JB7)
   (column JB7)
   (manager ROT_JB7_2014_Min ROT_JB7_2014_Min

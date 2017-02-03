@@ -7,7 +7,7 @@
 # The following envirnoment variables are used:
 #
 # HOSTTYPE
-#	unix		Native exe for Ubunta
+#	unix		Native exe for Ubuntu
 #	mingw		Generic code for Mingw
 
 # All makefiles should have these.
