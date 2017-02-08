@@ -45,6 +45,30 @@
 (declare my_JB7_Ap horizon "JB7 horizon to use.")
 (my_JB7_Ap Ap_JB7)
 
+(defdrain JB4 none)
+(declare JB4_drain drain "Drain to use for JB4 soil.")
+(JB4_drain JB4)
+
+(defgroundwater JB4 deep)
+(declare JB4_groundwater groundwater "Groundwater to use for JB4 soil.")
+(JB4_groundwater JB4)
+
+(defdrain JB6 lateral)
+(declare JB6_drain drain "Drain to use for JB6 soil.")
+(JB6_drain JB6)
+
+(defgroundwater JB6 aquitard (K_aquitard 6e-2 [cm/d])) ;Calib: 32 % to drain)
+(declare JB6_groundwater groundwater "Groundwater to use for JB6 soil.")
+(JB6_groundwater JB6)
+
+(defdrain JB7 lateral)
+(declare JB7_drain drain "Drain to use for JB7 soil.")
+(JB7_drain JB7)
+
+(defgroundwater JB7 aquitard (K_aquitard 3.5e-2 [cm/d])) ; Calib: 55 % to drain
+(declare JB7_groundwater groundwater "Groundwater to use for JB7 soil.")
+(JB7_groundwater JB7)
+
 (defunit [kWh/d/m^2] SIfactor 
 	  (mass 1)
 	  (time -3)

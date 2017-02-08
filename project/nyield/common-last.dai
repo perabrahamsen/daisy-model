@@ -488,7 +488,8 @@ File component name indicating crop logged. Empty if not specified.")
                              (distribution (-150 [cm] 100 [%]) ; Same as WW.
                                            ( -80 [cm]   0 [%])
                                            (   0 [cm]   0 [%])))))
-  (Groundwater deep)
+  (Drain $JB4_drain)
+  (Groundwater $JB4_groundwater)
   (Soil (MaxRootingDepth $JB4_root)
         (horizons ( -25 $my_JB4_Ap)
                   ( -35 "B_JB4_plowpan")
@@ -500,8 +501,8 @@ File component name indicating crop logged. Empty if not specified.")
   (hydraulic original (K_sat 0.9584 [mm/h])))
 
 (defcolumn JB6 NYield
-  (Drain lateral)
-  (Groundwater (aquitard (K_aquitard 6e-2 [cm/d]))) ;Calib: 32 % to drain
+  (Drain $JB6_drain)
+  (Groundwater $JB6_groundwater)
   (Soil (MaxRootingDepth $JB6_root)
         (horizons ( -25 $my_JB6_Ap)
                   ( -35 "B_JB6_plowpan")
@@ -513,8 +514,8 @@ File component name indicating crop logged. Empty if not specified.")
   (hydraulic original (K_sat 0.618 [mm/h])))
 
 (defcolumn JB7 NYield
-  (Drain lateral)
-  (Groundwater (aquitard (K_aquitard 3.5e-2 [cm/d]))) ; Calib: 55 % to drain
+  (Drain $JB7_drain)
+  (Groundwater $JB7_groundwater)
   (Soil (MaxRootingDepth $JB7_root)
         (horizons ( -25 $my_JB7_Ap)
                   ( -35 "B_JB7_plowpan")

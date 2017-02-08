@@ -1,0 +1,26 @@
+;;; run-N2WEST.dai --- N2014 crop with Foulum climate.
+
+(input file "common-first.dai")
+
+(scn "N2WEST")
+
+(defcrop "WW" "Winter Wheat; N2014")
+     
+(defcrop "SB" "Spring Barley; N2014")
+(defcrop "WR" "Winter Rape; PA")
+
+(defweather D1990WEST D1990 "Control_daily_daisy.dwf"
+  (PrecipScale 1.39 1.30 1.34 1.59 0.82 0.91 0.98 0.91 1.33 1.22 1.18 1.05))
+
+(defweather D2014WEST D2014 "Control_daily_daisy.dwf"
+  (PrecipScale 1.39 1.30 1.34 1.59 0.82 0.91 0.98 0.91 1.33 1.22 1.18 1.05))
+
+(my_D1994 D1990WEST)
+(my_D2014 D2014WEST)
+
+(input file "common-last.dai")
+
+(run All)
+
+;;; run-N2WEST.dai ends here.
+
