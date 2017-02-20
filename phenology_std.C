@@ -50,7 +50,7 @@ private:
   const double DSRepeat;        // DS where DS is set back (perennial crops)
   const double DSSetBack;       // DS set back at DSRepeat
   const double defined_until_ds; // Model invalid after this DS.
-
+  const symbol DS1_name;         // Name of DS 1->2 transition.
 
   // Simulation.
 private:
@@ -85,7 +85,7 @@ PhenologyStandard::tick_daily (const double Ta, const bool leaf_growth,
       vernalization (Ta, DS);
 
       if (DS >= 1.0)
-        out.message ("Flowering");
+        out.message (DS1_name);
     }
   else
     {
@@ -174,6 +174,8 @@ static struct PhenologyStandardSyntax : public DeclareModel
     frame.declare ("defined_until_ds", "DS", Attribute::Const, "\
 This parameterization is only valid until the specified development state.");
     frame.set ("defined_until_ds", 2.0);
-
+    frame.declare_string ("DS1_name", Attribute::Const, "\
+Name of development stage 1 to 2 transition.");
+    frame.set ("DS1_name", "Flowering");
   }
 } PhenologyStandard_syntax;
