@@ -85,7 +85,7 @@ PhenologyStandard::tick_daily (const double Ta, const bool leaf_growth,
       vernalization (Ta, DS);
 
       if (DS >= 1.0)
-        out.message (DS1_name);
+        out.message (DS1_name.name ());
     }
   else
     {
@@ -124,7 +124,8 @@ PhenologyStandard::PhenologyStandard (const BlockModel& al)
     DSMature (al.number ("DSMature")),
     DSRepeat (al.number ("DSRepeat")),
     DSSetBack (al.number ("DSSetBack")),
-    defined_until_ds (al.number ("defined_until_ds"))
+    defined_until_ds (al.number ("defined_until_ds")),
+    DS1_name ("DS1_name")
 { }
 
 static struct PhenologyStandardSyntax : public DeclareModel
