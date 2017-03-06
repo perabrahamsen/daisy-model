@@ -7,6 +7,9 @@
 
 	* vegetation_permanent.C (LAIvsDAY): Switched domain and range
 	dimensions.
+2017-02-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* phenology_std.C (DS1_name): New parameter.
 
 2017-01-26  Per Abrahamsen  <pa@plen.ku.dk>
 

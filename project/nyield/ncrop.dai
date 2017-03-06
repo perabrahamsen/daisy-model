@@ -59,7 +59,8 @@
 
 (defcrop "Winter Wheat; PA" "Winter Wheat"
   (Devel original
-         (DSRate2  0.020 [DS/d]))
+         (DSRate2  0.020 [DS/d])
+         (DS1_name "Heading"))
   (LeafPhot original
             (DSEff (0.0 [DS] 100 [%]) (1.0 [DS] 100 [%])
                    (1.5 [DS] 100 [%]) (2.0 [DS]  75 [%])))
@@ -95,7 +96,7 @@
 (defcrop "Winter Wheat; N2014" "Winter Wheat; NCnc"
   ;; (LeafPhot original (Fm 4.4 [g CO2/m^2/h]))
   ;; Calibration of harvest index.
-  (LeafPhot original (Fm 3.25 [g CO2/m^2/h]))
+  (LeafPhot original (Fm 3.00 [g CO2/m^2/h]))
   (Partit (Stem (0.00 0.30) (0.40 0.30) (0.55 0.30) (0.62 0.50) (0.77 0.80) (0.95 0.90)
                 (1.20 0.00) (1.38 0.00) (2.00 0.00)))
   ;; From landsforsøg.
