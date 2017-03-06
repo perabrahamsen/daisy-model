@@ -97,7 +97,7 @@ double
 HydraulicM_C::Sr (double h) const
 {
   if (h < h_b)
-    return pow (h_b / h, 1 / b);
+    return pow (h_b / h, 1.0 / b);
   else
     return 1;
 }
@@ -155,7 +155,7 @@ static struct HydraulicM_CSyntax : public DeclareModel
     frame.declare ("b", Attribute::None (), Check::positive (), 
                    Attribute::Const, "Campbell parameter.");
     frame.declare ("l", Attribute::None (), Check::none (), Attribute::Const,
-		   "Burdine form parameter. Ignored if 'p' is set.");
+		   "Mualem form parameter. Ignored if 'p' is set.");
     frame.set ("l", 0.5);
     frame.declare ("p", Attribute::None (), Check::positive (),
 		   Attribute::OptionalConst, "\
