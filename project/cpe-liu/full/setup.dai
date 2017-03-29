@@ -191,7 +191,7 @@
   (weather Taastrup)
   (time 2008 1 2)
   (stop 2016 8 20)
-  (log_prefix "mx8/")
+  (log_prefix "n2014/")
   (output harvest
           "Field water" "Field nitrogen"
           ("Soil water" (to -120 [cm]) (where "soil_water_120.dfl"))

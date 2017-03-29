@@ -231,8 +231,12 @@ WSourceCombine::Entry::vector2set (const std::vector<symbol>& v)
 
 WSourceCombine::Entry::Entry (const BlockSubmodel& al)
   : source (Librarian::build_item<WSource> (al, "source")),
-    begin (submodel_value<Time> (al, "begin")),
-    end (submodel_value<Time> (al, "end")),
+    begin (al.check ("begin")
+           ? submodel_value<Time> (al, "begin")
+           : Time::null ()),
+    end (al.check ("end")
+         ? submodel_value<Time> (al, "end")
+         : Time::null ()),
     use (vector2set (al.name_sequence ("use")))
 { 
 
