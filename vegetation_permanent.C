@@ -445,7 +445,7 @@ Permanent (non-crop) vegetation.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("LAIvsDAY", "m^2/m^2", "yday", Check::non_negative (),
+    frame.declare ("LAIvsDAY", "yday", "m^2/m^2", Check::non_negative (),
                 Attribute::Const, 
 		"LAI as a function of Julian day.\n\
 These numbers are used when there are no yearly numbers (YearlyLAI).");

@@ -127,8 +127,7 @@ RootSystem::water_uptake (const Units& units, double Ept_,
       if (next < total)
         {
           // We are past the top of the curve. 
-          // NOTE: This should never happen, as potential_water_uptake (h) 
-          // is monotonic. 
+          // NOTE: potential_water_uptake (h) is not monotonic. 
           if (step <= min_step)
             // We cannot go any closer to the top, skip it.
             {

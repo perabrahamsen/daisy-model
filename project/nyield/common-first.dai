@@ -27,7 +27,70 @@
 (declare denit chemistry "Chemistry model to use.")
 (denit denit8)
 
-(declare SOM_fracs [] Number [<none>] "SOM partitioning for Ap horizon.")
-(SOM_fracs 0.49 0.51)
+(declare JB4_root Number [cm] "Max root depth on JB4.")
+(JB4_root 150 [cm])
+
+(declare JB6_root Number [cm] "Max root depth on JB6.")
+(JB6_root 175 [cm])
+
+(declare JB7_root Number [cm] "Max root depth on JB7.")
+(JB7_root 175 [cm])
+
+(declare my_JB4_Ap horizon "JB4 horizon to use.")
+(my_JB4_Ap Ap_JB4)
+
+(declare my_JB6_Ap horizon "JB6 horizon to use.")
+(my_JB6_Ap Ap_JB6)
+
+(declare my_JB7_Ap horizon "JB7 horizon to use.")
+(my_JB7_Ap Ap_JB7)
+
+(defdrain JB4 none)
+(declare JB4_drain drain "Drain to use for JB4 soil.")
+(JB4_drain JB4)
+
+(defgroundwater JB4 deep)
+(declare JB4_groundwater groundwater "Groundwater to use for JB4 soil.")
+(JB4_groundwater JB4)
+
+(defdrain JB6 lateral)
+(declare JB6_drain drain "Drain to use for JB6 soil.")
+(JB6_drain JB6)
+
+(defgroundwater JB6 aquitard (K_aquitard 6e-2 [cm/d])) ;Calib: 32 % to drain)
+(declare JB6_groundwater groundwater "Groundwater to use for JB6 soil.")
+(JB6_groundwater JB6)
+
+(defdrain JB7 lateral)
+(declare JB7_drain drain "Drain to use for JB7 soil.")
+(JB7_drain JB7)
+
+(defgroundwater JB7 aquitard (K_aquitard 3.5e-2 [cm/d])) ; Calib: 55 % to drain
+(declare JB7_groundwater groundwater "Groundwater to use for JB7 soil.")
+(JB7_groundwater JB7)
+
+(defunit [kWh/d/m^2] SIfactor 
+	  (mass 1)
+	  (time -3)
+	  (factor 41.67))
+
+(defweather D1990 default "Control_daily_daisy.dwf"
+  (NH4WetDep 1.10 [ppm])
+  (NH4DryDep 5.04 [kg N/ha/y])
+  (NO3WetDep 1.10 [ppm])
+  (NO3DryDep 3.36 [kg N/ha/y]))
+
+(defweather D2014 default "Control_daily_daisy.dwf"
+  (NH4WetDep 0.51 [ppm])
+  (NH4DryDep 4.02 [kg N/ha/y])
+  (NO3WetDep 0.51 [ppm])
+  (NO3DryDep 2.68 [kg N/ha/y]))
+
+(declare my_D1994 weather "Weather to use for 1994 management.")
+(my_D1994 D1990)
+
+(declare my_D2014 weather "Weather to use for 2014 management.")
+(my_D2014 D2014)
+
 
 ;;; common-first.dai ends here.

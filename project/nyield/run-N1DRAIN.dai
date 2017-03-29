@@ -1,0 +1,23 @@
+;;; run-N1DRAIN.dai --- run scenarios with sorg n conc after 1994 data.
+
+(input file "common-first.dai")
+
+(scn "N1DRAIN")
+
+(JB4_drain JB6)
+(JB4_groundwater JB6)
+(JB6_drain JB7)
+(JB6_groundwater JB7)
+(JB7_drain JB6)
+(JB7_groundwater JB6)
+
+(defcrop "WW" "Winter Wheat; N1994")
+(defcrop "SB" "Spring Barley; N1994")
+(defcrop "WR" "Winter Rape; PA")
+
+(input file "common-last.dai")
+
+(run All)
+
+;;; run-N1DRAIN.dai ends here.
+

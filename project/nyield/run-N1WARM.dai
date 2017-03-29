@@ -1,0 +1,28 @@
+;;; run-N1WARM.dai --- N1994 crop with warmer and wetter climate.
+
+(input file "common-first.dai")
+
+(scn "N1WARM")
+
+(defcrop "WW" "Winter Wheat; N1994")
+     
+(defcrop "SB" "Spring Barley; N1994")
+(defcrop "WR" "Winter Rape; PA")
+
+(defweather D1990WARM D1990 "Control_daily_daisy.dwf"
+  (TempOffset 0.5)
+  (PrecipScale 1.1))
+
+(defweather D2014WARM D2014 "Control_daily_daisy.dwf"
+  (TempOffset 0.5)
+  (PrecipScale 1.1))
+
+(my_D1994 D1990WARM)
+(my_D2014 D2014WARM)
+
+(input file "common-last.dai")
+
+(run All)
+
+;;; run-N1WARM.dai ends here.
+

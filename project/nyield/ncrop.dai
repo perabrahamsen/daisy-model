@@ -1,0 +1,128 @@
+;; ncrop.dai --- Crop definitions from the nyield project.
+
+(input file "sbarley.dai")
+(input file "wwheat.dai")
+(input file "wrape.dai")
+(input file "grass.dai")
+
+(defcrop "Spring Barley; PA" "Spring Barley"
+  (Devel original
+         ;; Kalib. CPE tal.
+         (DSRate1  0.028)
+         (DSRate2  0.024)
+         )
+  (Seed release
+        (initial_weight 140 [kg/ha])    ;CPE
+        ;; Som hvede.
+        (DM_fraction 87 [%])
+        (C_fraction 45 [%])
+        (N_fraction 2 [%])
+        (rate 0.4 [d^-1]))  
+  (Root (NO3_uptake variable_sink (F_relative 10 [%]))
+        (MxNO3Up     2.00E-0008))
+  ;; Fra Foulum param.
+  (Canopy (SpSOrgAI 0.005)
+          (SOrgAIMod (0.0 1.0) (1.7 1.0) (2.0 0.0))
+          (SOrgPhotEff 0.50))
+  (Prod (LfDR (0.00 0.00) (1.00 0.00) (1.20 0.02) (1.30 0.08) (2.00 0.10)))
+
+  (Partit
+   ;; Fra Jozef.
+   (Root (0.00 0.5) (0.5 0.45) (0.7 0.15) (0.95 0.05) (2.00 0.00))
+   ;; Calib CPE tal
+   (Leaf (0.00 1.00) (0.25 0.45) (0.31 0.23) (0.60 0.23) (0.72 0.23)
+         (0.83 0.23) (0.95 0.45) (1.21 0.00) (2.00 0.00))
+   (Stem (0.00 0.00) (0.25 0.55) (0.31 0.77) (0.60 0.77) (0.72 0.77)
+         (0.83 0.77) (0.95 0.55) (1.21 0.00) (2.00 0.00)))
+
+  ;; Fra Foulum.
+  (CrpN (PtLeafCnc (0.00 0.060)    (0.80 0.040) (2.00 0.020) )
+        (CrLeafCnc (0.00 0.030)    (0.80 0.030) (2.00 0.015) )
+        (NfLeafCnc (0.00 0.004)    (0.80 0.004) (2.00 0.004) )
+
+        (PtStemCnc (0.50 0.060)    (1.00 0.020)    (2.00 0.010) )
+        ;; Change 0.006 to 0.005 from Vaarbyg.
+        (CrStemCnc (0.50 0.010)    (1.00 0.010)    (2.00 0.005) )
+        (NfStemCnc (0.50 0.004)    (1.00 0.004)    (2.00 0.004) )
+
+        ))
+
+(defcrop "Winter Rape; PA" "Winter Rape"
+  (Root (NO3_uptake variable_sink (F_relative 10 [%]))
+        (MxNO3Up     2.00E-0008))
+  )
+
+(defcrop "Grass; PA" "Grass"
+  (Root (NO3_uptake variable_sink (F_relative 10 [%]))
+        (MxNO3Up     2.00E-0008))
+  )
+
+(defcrop "Winter Wheat; PA" "Winter Wheat"
+  (Devel original
+         (DSRate2  0.020 [DS/d])
+         (DS1_name "Heading"))
+  (LeafPhot original
+            (DSEff (0.0 [DS] 100 [%]) (1.0 [DS] 100 [%])
+                   (1.5 [DS] 100 [%]) (2.0 [DS]  75 [%])))
+  (Seed release
+        (initial_weight 160 [kg/ha])
+        (DM_fraction 87 [%])
+        (C_fraction 45 [%])
+        (N_fraction 2 [%])
+        (rate 0.4 [d^-1]))  
+  (Root (PenPar1 1.0 [mm/dg C/d])
+        (PenPar2 0.0 [dg C])
+        (MaxPen 175 [cm])
+;;;        (MxNH4Up 2.5E-8)
+;;;        (MxNO3Up 2.5E-8)
+        (NO3_uptake variable_sink (F_relative 10 [%]))
+        (MxNO3Up     2.00E-0008))
+  (Canopy (HvsDS (0 [DS] 1 [cm]) (1 [DS] 80 [cm]) (2 [DS] 80 [cm]))))
+
+(defcrop "Winter Wheat; NCnc" "Winter Wheat; PA"
+  (CrpN (PtStemCnc (0.50 0.0200) (1.12 0.0125) (1.28 0.0093) ;Same or original
+                   (1.53 0.0090))                            ;New
+        (CrStemCnc (0.50 0.0064) (1.12 0.0049) ;Same as original.
+                   (1.28 0.0045))))            ;New
+
+(defcrop "Winter Wheat; N1994" "Winter Wheat; NCnc"
+  (LeafPhot original (Fm 3.4 [g CO2/m^2/h]))
+  (CrpN (PtSOrgCnc (2.0 [DS] 0.020 [g N/g DM]))
+        (CrSOrgCnc (2.0 [DS] 0.015 [g N/g DM]))
+        ;;(NfSOrgCnc (2.0 [DS] 0.011 [g N/g DM]))
+        (NfSOrgCnc (2.0 [DS] 0.006 [g N/g DM]))
+        ))
+
+(defcrop "Winter Wheat; N2014" "Winter Wheat; NCnc"
+  ;; (LeafPhot original (Fm 4.4 [g CO2/m^2/h]))
+  ;; Calibration of harvest index.
+  (LeafPhot original (Fm 3.00 [g CO2/m^2/h]))
+  (Partit (Stem (0.00 0.30) (0.40 0.30) (0.55 0.30) (0.62 0.50) (0.77 0.80) (0.95 0.90)
+                (1.20 0.00) (1.38 0.00) (2.00 0.00)))
+  ;; From landsforsøg.
+  (CrpN (PtSOrgCnc (2.0 [DS] 0.020 [g N/g DM]))
+        (CrSOrgCnc (2.0 [DS] 0.014 [g N/g DM]))
+        ;;(NfSOrgCnc (2.0 [DS] 0.009 [g N/g DM]))
+        (NfSOrgCnc (2.0 [DS] 0.004 [g N/g DM]))
+        ))
+
+(defcrop "Spring Barley; N1994" "Spring Barley; PA"
+  ;; Calibrated for lower average harvest index and yield.
+  (LeafPhot original
+            (DSEff (0.0 [DS] 100 [%]) (1.0 [DS] 120 [%]) (1.5 [DS] 100 [%]) (2.0 [DS]  10 [%])))
+  ;; From experiments.
+  (CrpN (PtSOrgCnc (2.0 [DS] 0.019 [g N/g DM]))
+        (CrSOrgCnc (2.0 [DS] 0.014 [g N/g DM]))
+        ;;(NfSOrgCnc (2.0 [DS] 0.011 [g N/g DM]))
+        (NfSOrgCnc (2.0 [DS] 0.004 [g N/g DM]))
+        ))
+        
+
+(defcrop "Spring Barley; N2014" "Spring Barley; PA"
+  (CrpN (PtSOrgCnc (2.0 [DS] 0.019 [g N/g DM]))
+        (CrSOrgCnc (2.0 [DS] 0.014 [g N/g DM]))
+        ;;(NfSOrgCnc (2.0 [DS] 0.010 [g N/g DM]))
+        (NfSOrgCnc (2.0 [DS] 0.001 [g N/g DM]))
+        ))
+
+;;; ncrop.dai ends here.

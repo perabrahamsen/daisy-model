@@ -1,0 +1,20 @@
+;;; run-N1RL.dai --- run N1994 scenarios with smaller root zone.
+
+(input file "common-first.dai")
+
+(scn "N1RL")
+
+(defcrop "WW" "Winter Wheat; N1994")
+(defcrop "SB" "Spring Barley; N1994")
+(defcrop "WR" "Winter Rape; PA")
+
+(input file "common-last.dai")
+
+(JB4_root 120 [cm])
+(JB6_root 140 [cm])
+(JB7_root 140 [cm])
+
+(run All)
+
+;;; run-N1RL.dai ends here.
+
