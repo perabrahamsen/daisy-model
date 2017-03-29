@@ -148,6 +148,14 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
   daisy_assert (kb > 0.0);
 
 
+  // clang crashes without volatile here
+  volatile
+  // Apple LLVM version 8.1.0 (clang-802.0.38)
+  // Target: x86_64-apple-darwin16.4.0
+  // Thread model: posix
+  // InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+
+
   // Diffuse transmission coefficeint, Tau_d.
   // Assuming homogen distributed in the hemisphere of diffuse radiation
   double Tau_d = 0.;
