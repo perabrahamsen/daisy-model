@@ -1,3 +1,7 @@
+2017-03-29  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.32 released.
+
 2017-03-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* wsource_combine.C (Entry): handle missing "begin" or "end".
