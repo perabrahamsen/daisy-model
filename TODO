@@ -1,216 +1,28 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Kort tid
+* NYield: Nye kørsler
 
-** NYield: crop param dokument
+** KØRER: CATCH: vinterraps i stedet for græs
 
-** NYield: Nye kørsler
+scn = CATCH
 
-** Ryd op på skrivebord
+* NYield: crop param dokument
 
-** DONE Bestil PC til Omar
+* Lang tid
 
-* NYIELD
+** AA2 kursus med Merete
 
-** Running: all N2* sims
+** AA1 kursus opdater med Carsten
 
-** Opsætning til test af gødningsniveauer fra landsforsøg
+** Specialestuderende: Line, Erik, Malte
 
-*** to gange standard rotation 2014 min
+** PhD studerende: Kasper, biotoxin, Kineser?
 
-*** tredje rotation med varierende gødning
-
-*** Taastrup vejr. Taastrup jord?
-
-*** Prøv evt med 1994 org gødning i opvarmning
-
-*** Evt vejrrotation
-
-* vap-figs.pdf til hjemmeside (og rørrende bilag)
-
-* SH fejl
+* Mollerup mass flow fejl
 
 ** Brug massebalance til at udregne (vertical) flux fra bunden.
 
 Husk drænnoder!
-
-* NYield
-
-** Prøv at regne uptake ud manuelt
-
-200 ppm, C_root = 0, andre tal fra plot_nlux.dai
-
-** DENIT8 denitrifikation
-
-** logge høstindex direkte
-
-** I stedet for "low" N0-N6
-
-** Få høstindex på plads
-
-Passer vist godt 1994, skidt for 2014
-
-
-** Vårbyg
-
-*** Tokkerup
-
-**** Høstudbytte. Spørg Kasper.
-
-**** Plot LAI, WS, NS
-
-**** latex side med alle plots
-
-**** Prøv forskellige vårbyg
-
-***** ORIG + PA (+ Kasper)
-
-**** Excel akr hvor høstudbytte sammenlignes
-
-** Gør DS1_name til en parameter
-
-flowering, tuberization, dk:skridning
-
-** Kig på resutater
-
-*** Ny extract script
-
-Lav filer i det rigtige format til at paste ind i excel ark.
-
-*** Kopier ind i Excel, skriv ud
-
-** Setups
-
-alle tre jorde køres i alle simuleringer hvor ikke andet angives
-
-1994 og 2014 køres med
-- reference afgrøder
-- SOM ligevægt
-- nutidigt klima
-
-Name: REF
-
-1994 køres med original vinterhvede
-
-Name: WWORG
-
-2014 køres med crncnc vinterhvede+spring barley
-
-Name: CRN
-
-2014 køres med 70-30 og 30-70 SOM (tal med MES om 
-
-Name: SOM7030
-Name: SOM3070
-
-2014 køres med varmere klima
-
-Name: WARM
-
-2014 køres med vådere klima
-
-Name: WET
-
-1994 jb6 og jb7 køres med "byttet" nedre rand.
-
-Name: DRAIN
-
-1994 jb4 køres med/used root zone begrænsning (find ud af hvilken er ref)
-
-Name: ROOTZONE
-
-* Lav "Forskelsark" hvis to simuleringer sammenlignes.
-
-% forskel
-
-* NYield
-
-** Ref WW
-
-*** Højere vårbyg udbytte
-
-*** WR 10 % højere udbytte?
-
-*** NEXT WW med 10 % lavere SOrgCrN
-
-*** DOING WW Såsæd
-
-*** DONE Vårbyg / græs pløjning 1 november
-
-*** ???? JB4 lavere MaxRootDepth
-
-*** DONE WW SH param
-
-*** DONE WW højere MaxPen (Thorup)
-
-MaxPen 1.75 (irene)
-
-pen hastighed 1 mm/(dg C d)
-
-*** DONE OM init
-
-(SOM_fractions 49 51)
-
-* "Promillefondprojekt" forklar lavere N indhold i kerner.
-
-Hvorfor falder protein indeholdet i kerner.
-
-Forklaringer:
-
-- Lavere gødningsnormer
-- Nye sorter optimeret lavere N
-- Lavere deposition
-- Faldende baggrundsmineralisering
-- Andre sædskifter efterlader ikke så meget
--- N når ikke ned til de dybe røder, som er vigtige ved kernefyldning
-- Bruges på flere jordtyper
-
-Isoler effekter
-
-** 100 års "random" vejrdata
-
-*** 2xklima (øst og vest)
-
-Vest ny?
-
-** Forskelligt humus indhold, 30-70, 50-50, 70-30 som
-
-Konstant indhold i SOM1? SOM2?
-
-** Ren vinterhvede med forskellige normer
-
-** "Typiske" sædskifter (nye og gamle) med forskellige normer.
-
-** Forskellige sorter
-
-* udvikling
-
-** Lås SOM1 og SOM2
-
-** Ref setup
-
-1 jord, dybt grundvand, ensidig hvede, 100 år øst vejr, 1
-gødningsniveau, log (kerne-)harvest, standard 50-50 humus
-
-Plot fordeling
-
-** Implementer "seed"
-
-Sammenlign fordeling
-
-** Prøv med dybe røder
-
-Sammenlig fordeling
-
-** Log og plot N optag vs DS
-
-Sammenlign uden dybe rødder
-
-* Vejledning 
-
-** Signe
-
-** Kasper
 
 * Artikler
 
