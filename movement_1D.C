@@ -430,6 +430,11 @@ Movement1D::initialize_derived (const Time&, const Scope&, const Soil& soil,
 
   for (size_t i = 0; i < matrix_water.size (); i++)
     matrix_water[i]->has_macropores (has_macropores);
+
+  std::ostringstream tmp;
+  tmp << "Bottom heat delay = " << delay;
+  msg.debug (tmp.str ());
+  
 }
 
 Movement1D::Movement1D (const BlockModel& al)
