@@ -67,7 +67,7 @@ struct SVAT_SSOC : public SVAT
 
   // - Lower boundary 
   double z0;             // Depth of top cell [m]
-  double k_h;            // Heat conductivity in soil [?]  
+  double k_h;            // Heat conductivity in soil [W/m/K]  
   double T_z0;           // Soil temperature in top cell [K]
   double E_soil;         // Evaporation of water from soil [kg/m^2/s]
 

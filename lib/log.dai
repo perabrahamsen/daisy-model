@@ -1775,7 +1775,7 @@ sum of all chemicals will be logged."
                   (spec svat SSOC T_z0)
                   (handle current)
 		  (dimension "${T_unit}"))
-          (number (path column "${column}" Bioclimate "*" svat SSOC )
+          (number (path column "${column}" Bioclimate "*" svat SSOC E_soil)
                   (spec svat SSOC E_soil)
                   (handle sum)
 		  (dimension "${E_unit}"))
