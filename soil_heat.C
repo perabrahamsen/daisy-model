@@ -675,7 +675,7 @@ SoilHeat::top_flux (const Geometry& geo,
   // BUG: Geometry1D only.
   const double k 
     = soil.heat_conductivity (0, soil_water.Theta (0), soil_water.X_ice (0))
-    * 1e-7 * 1e4 / 3600.0;	// erg/h/ cm/ K -> W/m^2/K
+    * 1e-7 * 1e4 / 3600.0;	// erg/h/ cm/ K -> W/m^2/K/cm
   return k * (T (0) - T (1)) / (geo.cell_z (0) - geo.cell_z (1));
 }
 

@@ -1,3 +1,18 @@
+2017-06-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* unit_model.C (create_convertion): Only make simple convertion
+	between compatible base types.
+
+2017-06-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* sample/test-prd.dai ("KarJyn_C"): Specify texture class.
+
+2017-05-31  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* svat_ssoc.C (tick): Fix unit convertion for k_h.
+
+	* soil_heat.C (top_flux): Fix unit in comment.
+
 2017-05-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* movement_1D.C (initialize_derived): Add 'delay' to daisy.log

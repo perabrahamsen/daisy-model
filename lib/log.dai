@@ -1730,7 +1730,7 @@ sum of all chemicals will be logged."
            (number (path column "${column}" Bioclimate "*" svat SSOC E_trans)
                    (spec svat SSOC E_trans)
                    (dimension "${E_unit}")
-                   (handle sum))
+                   (handle average))
            (number (path column "${column}" Bioclimate "*" svat SSOC R_eq_abs_soil)
                    (spec svat SSOC R_eq_abs_soil)
                    (dimension "${R_unit}")
@@ -1777,8 +1777,9 @@ sum of all chemicals will be logged."
 		  (dimension "${T_unit}"))
           (number (path column "${column}" Bioclimate "*" svat SSOC E_soil)
                   (spec svat SSOC E_soil)
-                  (handle sum)
-		  (dimension "${E_unit}"))
+                  (handle average)
+		  (dimension "${E_unit}")
+		  )
            ))
 
 (deflog "Groundwater" column

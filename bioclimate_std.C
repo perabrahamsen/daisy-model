@@ -1511,10 +1511,10 @@ Maximum absolute difference in svat ea values for convergence.");
     frame.set ("max_svat_absolute_difference", 0.01);
     frame.declare ("maxTdiff", "K", Attribute::Const, "\
 Largest temperature difference for convergence.");
-    frame.set ("maxTdiff", 1.0);
+    frame.set ("maxTdiff", 0.02);
     frame.declare ("maxEdiff", "Pa", Attribute::Const, "\
 Largest humidity difference for convergence.");
-    frame.set ("maxEdiff", 5.0);
+    frame.set ("maxEdiff", 1.0);
 
     frame.declare_object ("svat", SVAT::component, 
                           "Soil Vegetation Atmosphere component.");
