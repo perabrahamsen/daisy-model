@@ -1,3 +1,7 @@
+2017-06-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* svat_ssoc.C (tick): T_z0 should be top soil, not previous border.
+
 2017-06-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* unit_model.C (create_convertion): Only make simple convertion

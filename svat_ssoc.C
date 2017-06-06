@@ -337,7 +337,7 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   e_a = weather.vapor_pressure (); // [Pa]
   s = FAO::SlopeVapourPressureCurve (T_a - TK); // [Pa/K]
   lambda = FAO::LatentHeatVaporization (T_a - TK); // [J/kg]
-  T_z0 = soil_heat.T_top() + TK;     // [K]
+  T_z0 = geo.content_hood (soil_heat, &SoilHeat::T, Geometry::cell_above) + TK;     // [K]
   E_soil =bio.soil_surface_ea () / 3600.; // [mm/h]->[kg m^-2 s^-1]
   k_h = geo.content_hood(soil_heat, &SoilHeat::conductivity, Geometry::cell_above)
     * 1e-7 * 100.0 / 3600.0; // [erg/cm/h/dg C] -> [W/m/K]
