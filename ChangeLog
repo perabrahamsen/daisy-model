@@ -1,5 +1,8 @@
 2017-06-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
+	* surface.C (set_svat_temperature): Set surface temperature if
+	there is no ponding.
+
 	* svat_ssoc.C (tick): T_z0 should be top soil, not previous border.
 
 2017-06-02  Per Abrahamsen  <per.abrahamsen@gmail.com>

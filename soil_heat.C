@@ -228,7 +228,7 @@ SoilHeat::suggest_dt (const double T_air) const
 
 void 
 SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
-		const double T_bottom, 
+		const double T_bottom,
                 const Movement& movement, const Surface& surface, 
 		const double dt, Treelog& msg)
 {

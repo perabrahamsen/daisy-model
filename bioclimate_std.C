@@ -1126,6 +1126,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
   production_stress = svat->production_stress ();
   vegetation.force_production_stress (production_stress);
 
+  surface.set_svat_temperature (svat->SoilSurfaceTemperature ());
+  
   // Total evapotranspiration.
   total_ea_ += crop_ea_;
   daisy_assert (total_ea_ >= 0.0);

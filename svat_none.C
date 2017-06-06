@@ -75,6 +75,9 @@ struct SVAT_none : public SVAT
     return -1.0; 
   }
 
+  double SoilSurfaceTemperature () const
+  { return T_a; }  // [dg C]
+
   // Create.
   bool check (const Weather&, Treelog&) const
   { return true; }

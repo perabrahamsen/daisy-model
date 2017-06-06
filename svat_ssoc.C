@@ -286,6 +286,9 @@ struct SVAT_SSOC : public SVAT
   double ShadowBoundaryLayerWaterConductivity () const
   { return gb_W_shadow; }
 
+  double SoilSurfaceTemperature () const
+  { return T_s - TK; }  // [dg C]
+
   void output(Log& log) const;
 
   // Create.

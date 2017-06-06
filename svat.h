@@ -68,7 +68,8 @@ public:
   virtual double CanopyVapourPressure () const = 0;  // [Pa]
   virtual double SunBoundaryLayerWaterConductivity () const = 0; // [m/s]
   virtual double ShadowBoundaryLayerWaterConductivity () const = 0; // [m/s]
-
+  virtual double SoilSurfaceTemperature () const = 0; // [dg C]
+  
   // Create and Destroy.
 public:
   virtual bool check (const Weather& weather, Treelog& msg) const = 0;

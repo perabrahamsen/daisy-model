@@ -107,7 +107,7 @@ private:
                                    std::vector<double>& q);
 public:
   double suggest_dt (const double T_air) const;
-  void tick (const Geometry&, const Soil&, SoilWater&, const double T_bottom, 
+  void tick (const Geometry&, const Soil&, SoilWater&, const double T_bottom,
              const Movement&, const Surface& surface, double dt, Treelog& msg);
   void tick_after (const std::size_t cell_size, 
                    const Soil&, const SoilWater&, Treelog&);

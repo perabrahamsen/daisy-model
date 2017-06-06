@@ -1335,6 +1335,7 @@ public:
   double CanopyVapourPressure () const;  // [Pa]
   double SunBoundaryLayerWaterConductivity () const; // [m/s]
   double ShadowBoundaryLayerWaterConductivity () const; // [m/s]
+  double SoilSurfaceTemperature () const; // [dg C]
 
 
   void solve (const double gs_shadow /* stomata cond. [m/s]*/, 
@@ -1404,6 +1405,10 @@ SVAT_PMSW::ShadowBoundaryLayerWaterConductivity () const
   // Leave it to the bioclimate module.
   return -1.0; 
 }
+
+double
+SVAT_PMSW::SoilSurfaceTemperature () const
+{ return tsurf_pm; }  // [dg C]
 
 void 
 SVAT_PMSW::solve (double, double, double, double, Treelog&) 

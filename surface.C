@@ -624,6 +624,14 @@ Surface::put_ponding (double p)	// [mm]
   impl->pond_average = p; 
 }
 
+void
+Surface::set_svat_temperature (double T_surface /* dg C */)
+{ 
+  if (impl->pond_average < 1e-5)
+    impl->T = T_surface;
+}
+  
+
 static bool
 check_alist (const Metalib&, const Frame& al, Treelog& msg)
 {
