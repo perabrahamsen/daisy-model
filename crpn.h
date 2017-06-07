@@ -74,6 +74,7 @@ private:
 public:
   double nitrogen_stress;	// Fraction of requested nitrogen didn't got.
   double nitrogen_stress_days;	// Accumulated nitrogen stress.
+  double NNI; 			// Nitrogen nutrition index.
 
   // State
 private:

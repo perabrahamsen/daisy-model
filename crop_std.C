@@ -69,7 +69,7 @@ struct CropStandard : public Crop
   Time flowering_time;
   Time ripe_time;
   std::unique_ptr<Phenology> development;
-  const Partition partition;
+  Partition partition;
   std::unique_ptr<Vernalization> vernalization;
   const std::unique_ptr<Photo> shadow;
   const std::unique_ptr<Photo> sunlit;
@@ -608,6 +608,7 @@ CropStandard::tick (const Metalib& metalib,
 
   const double nitrogen_stress = nitrogen->nitrogen_stress;
   const double water_stress = root_system->water_stress;
+  const double NNI = nitrogen->NNI;
 
   double Ass = production.PotCanopyAss;
   if (root_system->production_stress >= 0.0)
@@ -638,7 +639,7 @@ CropStandard::tick (const Metalib& metalib,
   const double seed_C = seed->release_C (dt);
   production.tick (bioclimate.daily_air_temperature (), T_soil_3,
 		   root_system->Density, geo, DS, 
-		   canopy->CAImRat, *nitrogen, nitrogen_stress, seed_C, 
+		   canopy->CAImRat, *nitrogen, nitrogen_stress, NNI, seed_C, 
                    partition, 
 		   residuals_DM, residuals_N_top, residuals_C_top,
 		   residuals_N_soil, residuals_C_soil, dt, msg);
@@ -839,6 +840,7 @@ CropStandard::output (Log& log) const
   output_submodule (flowering_time, "flowering_time", log);
   output_submodule (ripe_time, "ripe_time", log);
   output_derived (development, "Devel", log);
+  output_submodule (partition, "Partition", log);
   output_derived (vernalization, "Vernal", log);
   output_derived (shadow, "LeafPhot", log);
   output_derived (sunlit, "sunlit", log);
@@ -951,7 +953,7 @@ Don't set, calculated by Daisy.",
                              Time::load_syntax);
     frame.declare_object ("Devel", Phenology::component, 
                        "Development and phenology.");
-    frame.declare_submodule ("Partit", Attribute::Const,
+    frame.declare_submodule ("Partit", Attribute::State,
                           "Assimilate partitioning.", Partition::load_syntax);
     frame.declare_object ("Vernal", Vernalization::component, 
                       Attribute::State, Attribute::Singleton, "\

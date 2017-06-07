@@ -138,8 +138,9 @@ Production::tick (const double AirT, const double SoilT,
 		  const double DS, const double CAImRat,
 		  const CrpN& nitrogen,
                   const double nitrogen_stress,
+		  const double NNI,
                   const double seed_C,
-		  const Partition& partition,
+		  Partition& partition,
 		  double& residuals_DM,
 		  double& residuals_N_top, double& residuals_C_top,
 		  std::vector<double>& residuals_N_soil,
@@ -233,8 +234,8 @@ Production::tick (const double AirT, const double SoilT,
       // Partition growth.
       double f_Leaf, f_Stem, f_SOrg, f_Root;
 
-      partition (DS, RSR (), nitrogen_stress, 
-                 f_Leaf, f_Stem, f_Root, f_SOrg);
+      partition.tick (DS, RSR (), nitrogen_stress, NNI,
+		      f_Leaf, f_Stem, f_Root, f_SOrg);
       if (ReleaseOfRootReserves)
         {
           f_Leaf += f_Root;
@@ -281,6 +282,8 @@ Production::tick (const double AirT, const double SoilT,
     }
   else
     {
+      partition.tick_none ();
+
       // Too little assimilate to cover respiration.  
       // Give assimilate to most important parts first.
 

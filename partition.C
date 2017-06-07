@@ -28,12 +28,14 @@
 #include "check.h"
 #include "mathlib.h"
 #include "treelog.h"
+#include "log.h"
 #include <sstream>
 
 void
-Partition::operator() (double DS, double current_RSR, double nitrogen_stress,
-		       double& f_Leaf, double& f_Stem,
-		       double& f_Root, double& f_SOrg) const
+Partition::tick (double DS, double current_RSR, double nitrogen_stress,
+		 double NNI,
+		 double& f_Leaf, double& f_Stem,
+		 double& f_Root, double& f_SOrg)
 {
   if (nitrogen_stress > nitrogen_stress_limit && DS > 1.0)
     {
@@ -49,13 +51,33 @@ Partition::operator() (double DS, double current_RSR, double nitrogen_stress,
   f_Leaf = (1 - f_Root) * Leaf (DS);
   f_Stem = (1 - f_Root) * Stem (DS);
   f_SOrg = std::max (0.0, 1 - f_Root - f_Leaf - f_Stem);
+
+  // NNI 
+  if (NNI < NNI_crit && DS < 1.0)
+    {
+      const double f_Shoot = f_Leaf + f_Stem;
+      cf = 1.0 + (NNI_crit - NNI) * NNI_inc;
+      f_Stem *= cf;
+      if (f_Stem < f_Shoot)
+	f_Leaf = f_Shoot - f_Stem;
+      else
+	{
+	  f_Stem = f_Shoot;
+	  f_Leaf = 0.0;
+	}
+      daisy_approximate (f_Shoot, f_Leaf + f_Stem);
+    }
+  else
+    cf = 1.0;
+  
+  // Numeric weirdness.
   daisy_assert (f_SOrg > -1e-5);
   if (f_SOrg < 1e-5)
     {
       f_Root += f_SOrg;
       f_SOrg = 0.0;
     }
-  daisy_assert (approximate (f_Root + f_Leaf + f_Stem + f_SOrg, 1.0));
+  daisy_approximate (f_Root + f_Leaf + f_Stem + f_SOrg, 1.0);
   daisy_assert (0.0 <= f_Leaf && f_Leaf <= 1.0);
   daisy_assert (0.0 <= f_Stem && f_Stem <= 1.0);
   daisy_assert (0.0 <= f_Root && f_Root <= 1.0);
@@ -83,6 +105,14 @@ static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   return ok;
 }
 
+void
+Partition::tick_none ()
+{ cf = 1.0; }
+
+void 
+Partition::output (Log& log) const
+{ output_variable (cf, log); }
+
 void 
 Partition::load_syntax (Frame& frame)
 {
@@ -106,6 +136,20 @@ If the root/shoot ratio is above this, the roots will start dying.");
 	      "If nitrogen stress is above this number and DS is above 1,\n\
 allocate all assimilate to the storage organ.");
   frame.set ("nitrogen_stress_limit", 1.0);
+  frame.declare ("NNI_crit", Attribute::None (), Check::non_negative (),
+		 Attribute::Const, "\
+When NNI is below this value, modify Stem/Leaf partitioning.");
+  frame.set ("NNI_crit", 0.0);
+  frame.declare ("NNI_inc", Attribute::None (), Check::none (),
+		 Attribute::Const, "\
+Stem/Leaf partitioning modifier for low NNI.");
+  frame.set ("NNI_inc", 0.0);
+  frame.declare ("cf", Attribute::None (), Check::non_negative (),
+		 Attribute::LogOnly, "\
+Stem/Leaf partitioning modifier for low NNI when DS < 1.0.\n\
+cf = 1 + (NNI_crit - NNI)* NNI_inc.\n\
+Stem assimilate partitioning is increased with cf, which is taken from the\n\
+amount allocated to leafs.");
 }
 
 Partition::Partition (const FrameSubmodel& al)
@@ -113,7 +157,10 @@ Partition::Partition (const FrameSubmodel& al)
     Leaf (al.plf ("Leaf")),
     Stem (al.plf ("Stem")),
     RSR (al.plf ("RSR")),
-    nitrogen_stress_limit (al.number ("nitrogen_stress_limit"))
+    nitrogen_stress_limit (al.number ("nitrogen_stress_limit")),
+    NNI_crit (al.number ("NNI_crit")),
+    NNI_inc (al.number ("NNI_inc")),
+    cf (1.0)
 { }
 
 Partition::~Partition ()

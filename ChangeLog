@@ -1,3 +1,12 @@
+2017-06-07  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.37 released.
+
+2017-06-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* action_harvest.C (doIt): Seperate storage organ from total yield
+	message.
+
 2017-06-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* surface.C (set_svat_temperature): Set surface temperature if
