@@ -136,20 +136,22 @@ If the root/shoot ratio is above this, the roots will start dying.");
 	      "If nitrogen stress is above this number and DS is above 1,\n\
 allocate all assimilate to the storage organ.");
   frame.set ("nitrogen_stress_limit", 1.0);
-  frame.declare ("NNI_crit", Attribute::None (), Check::non_negative (),
-		 Attribute::Const, "\
-When NNI is below this value, modify Stem/Leaf partitioning.");
+  frame.declare_number_cited ("NNI_crit", 
+			      Attribute::None (), Check::non_negative (),
+			      Attribute::Const, Attribute::Singleton, "\
+When NNI is below this value, modify Stem/Leaf partitioning.",
+		 "leafstem");
   frame.set ("NNI_crit", 0.0);
-  frame.declare ("NNI_inc", Attribute::None (), Check::none (),
-		 Attribute::Const, "\
-Stem/Leaf partitioning modifier for low NNI.");
+  frame.declare_number_cited ("NNI_inc", Attribute::None (), Check::none (),
+			      Attribute::Const, Attribute::Singleton, "\
+Stem/Leaf partitioning modifier for low NNI.", "leafstem");
   frame.set ("NNI_inc", 0.0);
-  frame.declare ("cf", Attribute::None (), Check::non_negative (),
-		 Attribute::LogOnly, "\
+  frame.declare_number_cited ("cf", Attribute::None (), Check::non_negative (),
+			      Attribute::LogOnly, Attribute::Singleton, "\
 Stem/Leaf partitioning modifier for low NNI when DS < 1.0.\n\
 cf = 1 + (NNI_crit - NNI)* NNI_inc.\n\
 Stem assimilate partitioning is increased with cf, which is taken from the\n\
-amount allocated to leafs.");
+amount allocated to leafs.", "leafstem");
 }
 
 Partition::Partition (const FrameSubmodel& al)
