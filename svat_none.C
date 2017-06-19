@@ -39,7 +39,7 @@ struct SVAT_none : public SVAT
 	     const SoilWater&, const Bioclimate& bio, Treelog&)
   { 
     crop_ea = bio.crop_ea();
-    T_a = bio.daily_air_temperature ();
+    T_a = weather.air_temperature ();
     e_c = weather.vapor_pressure ();
   }
   double production_stress () const

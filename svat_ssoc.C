@@ -45,9 +45,6 @@
 
 struct SVAT_SSOC : public SVAT
 {
-  // Model parameters.
-  const bool use_soil_flux_surface; // Use T_s instead of T_a for down flux.
-
   // Constants.
   static const double epsilon; // Emmision of Longwave rad == SurEmiss [] 
   static const double sigma;   // Stefan Boltzman constant [W m^-2 K^-4]
@@ -765,51 +762,21 @@ SVAT_SSOC:: calculate_temperatures(Treelog& msg)
 
   else // bare soil
     {
-#if 0
-      T_s =((R_eq_abs_soil + G_R_soil * (T_a - T_a) + G_H_a * (T_a - T_a) 
-             + k_h / z0 * (T_z0 - T_a) - (lambda * E_soil))
-            / (G_R_soil + G_H_a +  k_h / z0))
-        + T_a;  //[K]
-#elif 0
-      // EDIT: replace (T_a - T_a) with T_a.
-      T_s =((R_eq_abs_soil + G_R_soil * T_a + G_H_a * T_a
-             + k_h / z0 * (T_z0 - T_a) - (lambda * E_soil))
-            / (G_R_soil + G_H_a +  k_h / z0))
-        + T_a;  //[K]
-#else
-      if (use_soil_flux_surface)
-	// The bare soil equation (soil flux based on surface temperature).
-	// 
-	// R_eq_abs_soil - G_R_soil * (T_s - T_a)
-	// = (k_h / z0) * (T_s - T_z0) + G_H_a * (T_s - T_a) + lambda * E_soil
-	// 
-	// <=>
-	//
-	// R_eq_abs_soil + G_R_soil * T_a 
-	// + (k_h / z0) * T_z0 + G_H_a * T_a - lambda * E_soil
-	// = (G_R_soil + (k_h / z0) + G_H_a) * T_s
-	// 
-	// <=>
-	T_s = (R_eq_abs_soil + G_R_soil * T_a + G_H_a * T_a
-	       + k_h / z0 * T_z0 - lambda * E_soil)
-	  / (G_R_soil + G_H_a +  k_h / z0);
-      else
-	// The bare soil equation (soil flux based on air temperature).
-	// 
-	// R_eq_abs_soil - G_R_soil * (T_s - T_a)
-	// = (k_h / z0) * (T_a - T_z0) + G_H_a * (T_s - T_a) + lambda * E_soil
-	// 
-	// <=>
-	//
-	// R_eq_abs_soil + G_R_soil * T_a 
-	// - (k_h / z0) * (T_a - T_z0) + G_H_a * T_a - lambda * E_soil
-	// = (G_R_soil + G_H_a) * T_s
-	// 
-	// <=>
-	T_s = (R_eq_abs_soil + G_R_soil * T_a + G_H_a * T_a
-	       - k_h / z0 * (T_a - T_z0) - lambda * E_soil)
-	  / (G_R_soil + G_H_a);
-#endif
+      // The bare soil equation (soil flux based on surface temperature).
+      // 
+      // R_eq_abs_soil - G_R_soil * (T_s - T_a)
+      // = (k_h / z0) * (T_s - T_z0) + G_H_a * (T_s - T_a) + lambda * E_soil
+      // 
+      // <=>
+      //
+      // R_eq_abs_soil + G_R_soil * T_a 
+      // + (k_h / z0) * T_z0 + G_H_a * T_a - lambda * E_soil
+      // = (G_R_soil + (k_h / z0) + G_H_a) * T_s
+      // 
+      // <=>
+      T_s = (R_eq_abs_soil + G_R_soil * T_a + G_H_a * T_a
+	     + k_h / z0 * T_z0 - lambda * E_soil)
+	/ (G_R_soil + G_H_a +  k_h / z0);
       T_sun = T_shadow = T_c = T_a;
       e_c = e_a;
     }
@@ -962,7 +929,6 @@ SVAT_SSOC::output(Log& log) const
 
 SVAT_SSOC::SVAT_SSOC (const BlockModel& al)
   : SVAT (al), 
-    use_soil_flux_surface (al.flag ("use_soil_flux_surface")),
     hypostomatous (al.flag ("hypostomatous")),
     z_0b (al.number ("z_0b")),
     Ptot (-42.42e42),
@@ -1045,12 +1011,6 @@ static struct SVAT_SSOCSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
     frame.set_strings ("cite", "ssoc");
-    frame.declare_boolean ("use_soil_flux_surface", Attribute::Const,
-                "\
-Use soil surface temperature ('T_s') to estimate downward flux.\n\
-Otherwise, use air temperature ('T_a').\n\
-CURRENTLY ONLY APPLIES TO BARE SOIL.");
-    frame.set ("use_soil_flux_surface", true);
     frame.declare_object ("solver", Solver::component, 
                        Attribute::Const, Attribute::Singleton, "\
 Model used for solving the energy balance equation system.");

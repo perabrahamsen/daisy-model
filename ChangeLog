@@ -1,3 +1,8 @@
+2017-06-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* svat_none.C (tick): Use current air temperature, not daily
+	average.
+
 2017-06-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* gnuplot_time.C (timeform, plot): Support timesteps smaller than 1 hour.
