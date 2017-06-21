@@ -52,6 +52,7 @@ struct Horizon::Implementation
 {
   // Content.
   double dry_bulk_density;
+  double quartz;
   /* const */ std::vector<double> SOM_C_per_N;
   const double C_per_N;
   /* const */ std::vector<double> SOM_fractions;
@@ -69,7 +70,7 @@ struct Horizon::Implementation
   /* const */ double CEC;                   // [cmolc/kg]
   
   // Create and Detroy.
-  void initialize (Hydraulic&, const Texture& texture, double quarts, 
+  void initialize (Hydraulic&, const Texture& texture, 
                    int som_size, bool top_soil, const double center_z, 
                    Treelog& msg);
   static double_map get_attributes
@@ -112,7 +113,6 @@ default_CEC (const Texture& texture) // [cmolc/kg]
 void 
 Horizon::Implementation::initialize (Hydraulic& hydraulic,
                                      const Texture& texture, 
-                                     const double quarts,
                                      int som_size,
                                      const bool top_soil,
                                      const double center_z,
@@ -151,9 +151,24 @@ Horizon::Implementation::initialize (Hydraulic& hydraulic,
           << " [g/cm^3]) ; Estimated from porosity and texture.";
       msg.debug (tmp.str ());
     }
-
-  hor_heat.initialize (hydraulic, texture, quarts, msg);
   
+  // Did we specify 'dry_bulk_density'?  Else calculate it now.
+  if (quartz < 0.0)
+    {
+      const double clay 
+	= texture.fraction_of_minerals_smaller_than ( 2.0 /*[um]*/);
+      const double silt 
+	= texture.fraction_of_minerals_smaller_than (20.0 /*[um]*/) - clay;
+      const double sand = 1.0 - clay - silt;
+      
+      // Data adopted from Møberg et al. 1988 (Tinglev & Roskilde Soil)
+      quartz =  clay * 0.15 + silt * 0.6 + sand * 0.7;
+
+      std::ostringstream tmp;
+      tmp << "(quartz " << quartz << " []) ; Estimated from texture.";
+      msg.debug (tmp.str ());
+    }
+  hor_heat.initialize (hydraulic, texture, quartz, msg);
 }
 
 Horizon::Implementation::double_map
@@ -178,6 +193,7 @@ Horizon::Implementation::get_dimensions
 
 Horizon::Implementation::Implementation (const BlockModel& al)
   : dry_bulk_density (al.number ("dry_bulk_density", -42.42e42)),
+    quartz (al.number ("quartz", -42.42e42)),
     SOM_C_per_N (al.number_sequence ("SOM_C_per_N")),
     C_per_N (al.number ("C_per_N", -42.42e42)),
     SOM_fractions (al.check ("SOM_fractions") 
@@ -238,17 +254,6 @@ Horizon::C_per_N () const
 double
 Horizon::turnover_factor () const
 { return impl->turnover_factor; }
-
-double
-Horizon::quartz () const
-{ 
-  const double clay = texture_below ( 2.0 /*[um]*/);
-  const double silt = texture_below (20.0 /*[um]*/) - clay;
-  const double sand = 1.0 - clay - silt;
-
-  // Data adopted from Møberg et al. 1988 (Tinglev & Roskilde Soil)
-  return clay * 0.15 + silt * 0.6 + sand * 0.7;
-}
 
 double
 Horizon::anisotropy () const
@@ -377,7 +382,7 @@ Horizon::initialize_base (const bool top_soil,
   const double clay_lim = texture_below ( 2.0 /* [um] USDA Clay */);
   fast_clay = texture.mineral () * clay_lim;
   fast_humus = texture.humus;
-  impl->initialize (*hydraulic, texture, quartz () * texture.mineral (),
+  impl->initialize (*hydraulic, texture,
                     som_size, top_soil, center_z, msg); 
   impl->secondary->initialize (msg);
 
@@ -505,9 +510,17 @@ Horizontal saturated water conductivity relative to vertical saturated\n\
 water conductivity.  The higher this value, the faster the water will\n\
 move towards drain pipes.");
     frame.set ("anisotropy", 1.0);
-    frame.declare ("dry_bulk_density", "g/cm^3", Attribute::OptionalConst,
+    frame.declare ("dry_bulk_density", "g/cm^3", Check::positive (), 
+		   Attribute::OptionalConst,
                    "The soils dry bulk density.\n\
 By default, this is calculated from the soil constituents.");
+    frame.declare_number_cited ("quartz", Attribute::Fraction (),
+				Check::fraction (), Attribute::OptionalConst,
+				Attribute::Singleton, 
+				"Fraction of quartz in soil minerals.\n\
+By default, this is calculated from the soil constituents.\n\
+quartz = clay * 0.15 + silt * 0.6 + sand * 0.7",
+				"moberg1988constituents");
     frame.declare ("SOM_C_per_N", "g C/g N", Check::non_negative (), 
                    Attribute::Const, Attribute::Variable,
                    "C/N ratio for each SOM pool in this soil.\n\

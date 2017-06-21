@@ -71,7 +71,6 @@ public:
   const std::vector<double>& SOM_C_per_N () const;
   double C_per_N () const;
   double turnover_factor () const;
-  virtual double quartz () const; // Quartz fraction of minerals [0;1].
 
   // Chemistry.
 public:

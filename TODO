@@ -1,14 +1,70 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* TORSDAG
+* Agrohydrologi 2
 
-** Husk pladsbillet!
+** Dag 1 (PA): Introduktion og N Leaching
 
-** Udskriv NYield rapport
+*** Døde fisk
 
-** Udskriv MES Agrohydrologi 2 plan
+*** Model: Leaching = Fertilizer - Harvest
 
-* Billet Lars
+Good? Correct?
+
+*** Daisy 
+
+Water + Carbon + Nitrogen (+ pesticides)
+
+*** Weather + Groundwater + Soil + Management
+
+*** Language: Process + Models + Parameterizations + Derived
+
+*** Language: "(" parameter value ")"
+
+*** Language: "(def" + process + name + parameters + ")"
+
+model og sprog
+
+vand og N balance
+
+*** Virkemidler
+
+*** Projekter: Tidlig såning ...
+
+** Dag 2 (MES): Modelering og valg af rande
+
+** Dag 3: Afgrødeparameterisering
+
+Måletal?
+
+Harvest index og udbytter?
+
+*** Projekter: FertOrgaNic, SAFIR, Tidlig såning, NYIELD
+
+** Dag 4: Pesticider
+
+Silstrup event
+
+*** Projekter: Agrovand, VAP, R2D2, Røg, PESTPORE
+
+** Dag 5: Jeres data
+
+* Tirsdag
+
+** Søren her
+
+** Læs Line rapport
+
+* Onsdag:
+
+** Billet Lars
+
+* Torsdag
+
+** Jens
+
+* Fredag 
+
+** Lars
 
 * Opgaver
 

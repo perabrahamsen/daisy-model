@@ -39,6 +39,8 @@ HorHeat::heat_conductivity (double Theta, double Ice) const
   const int entry = int ((Theta + Ice) * intervals);
   daisy_assert (entry >= 0);
   daisy_assert (entry < intervals);
+  daisy_assert (entry < K_ice.size ());
+  daisy_assert (entry < K_water.size ());
   return ((K_ice[entry] * Ice + K_water[entry] * Theta) 
           / (Theta + Ice))
     * 3600;                     // erg/s / cm / K -> erg/h / cm / K
@@ -71,12 +73,12 @@ Number of numeric intervals to use in the heat coductivity table.");
 By default, this is calculated from the soil constituents.");
   frame.declare ("K_water",
                  "erg/s/cm/dg C", Check::positive (),
-                 Attribute::OptionalConst, Attribute::SoilCells,
+                 Attribute::OptionalConst, Attribute::Variable,
                  "Heat conductivity table for water in soil.\n\
 By default, this is calculated from the soil constituents.");
   frame.declare ("K_ice",
                  "erg/s/cm/dg C", Check::positive (),
-                 Attribute::OptionalConst, Attribute::SoilCells,
+                 Attribute::OptionalConst, Attribute::Variable,
                  "Heat conductivity table for solid frozen soil.\n\
 By default, this is calculated from the soil constituents.");
 }
@@ -86,8 +88,10 @@ HorHeat::initialize (const Hydraulic& hydraulic, const Texture& texture,
                      const double quarts, Treelog& msg)
 {
   // Already initialized.
-  if (K_water.size () != 0)
+  if (K_water.size () == intervals && K_ice.size () == intervals)
     return;
+  if (K_water.size () != 0 || K_ice.size () != 0)
+    daisy_panic ("Wrong number of elements in 'K_water' or 'K_ice'");
 
   // The particles are not in a real continuous medium.  Try to correct.
   const double continuum_correction_factor = 1.25;
@@ -102,11 +106,6 @@ HorHeat::initialize (const Hydraulic& hydraulic, const Texture& texture,
   // Water that won't freeze.
   const double LiquidWater = Theta_pF_high; 
   
-  // Quarts content in soil.
-  std::ostringstream tmp;
-  tmp << "Quartz = " << quarts << " []";
-  msg.debug (tmp.str ());
-
   // Relative content of various constituents in soil.
   content[Quarts] = quarts * (1.0 - hydraulic.Theta_sat);
   content[Minerals] = (texture.mineral () - quarts) 
@@ -297,7 +296,7 @@ HorHeat::HorHeat (const FrameSubmodel& al)
   : quarts_form_factor (al.number ("quarts_form_factor")),
     mineral_form_factor (al.number ("mineral_form_factor")),
     C_soil (al.number ("C_soil", -42.42e42)),
-    K_water (al.check ("C_soil")
+    K_water (al.check ("K_water")
              ? al.number_sequence ("K_water") 
              : std::vector<double> ()),
     K_ice (al.check ("K_ice")

@@ -840,7 +840,7 @@ CropStandard::output (Log& log) const
   output_submodule (flowering_time, "flowering_time", log);
   output_submodule (ripe_time, "ripe_time", log);
   output_derived (development, "Devel", log);
-  output_submodule (partition, "Partition", log);
+  output_submodule (partition, "Partit", log);
   output_derived (vernalization, "Vernal", log);
   output_derived (shadow, "LeafPhot", log);
   output_derived (sunlit, "sunlit", log);
