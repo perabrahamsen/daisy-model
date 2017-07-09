@@ -58,11 +58,11 @@ HorHeat::load_syntax (Frame& frame)
 
   frame.declare ("quarts_form_factor", Attribute::None (), Check::positive (), 
                  Attribute::Const,
-                 "Gemetry factor used for conductivity calculation.");
+                 "Geometry factor used for conductivity calculation.");
   frame.set ("quarts_form_factor", 2.0);
   frame.declare ("mineral_form_factor", Attribute::None (), Check::positive (), 
                  Attribute::Const,
-                 "Gemetry factor used for conductivity calculation.");
+                 "Geometry factor used for conductivity calculation.");
   frame.set ("mineral_form_factor", 4.0);
   frame.declare_integer ("intervals", Attribute::Const, "\
 Number of numeric intervals to use in the heat coductivity table.");

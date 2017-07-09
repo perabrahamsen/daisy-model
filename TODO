@@ -1,5 +1,15 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* Sommer
+
+** NYIELD
+
+** AH2 
+
+** Kasper tidsskridt
+
+* soil_heat inde i bioclimate / svat iteration
+
 * Agrohydrologi 2
 
 ** Dag 1 (PA): Introduktion og N Leaching
@@ -48,23 +58,59 @@ Silstrup event
 
 ** Dag 5: Jeres data
 
-* Tirsdag
+* Interview
 
-** Søren her
+** Opgaver
 
-** Læs Line rapport
+*** BCS: Validation track
 
-* Onsdag:
+**** Extract information from reports
 
-** Billet Lars
+**** Setup daisy simulation
 
-* Torsdag
+**** Compare
 
-** Jens
+**** Improve
 
-* Fredag 
+**** Optimize application and compare
 
-** Lars
+**** Write report
+
+**** Presentation for meeting
+
+*** BCS: Optimization track
+
+**** Get information and pesticide properties and typical management
+
+**** Setup Daisy : soil, weather, management
+
+**** Get information from pestsurf about impact criteria
+
+**** Prepare 1000? simulations
+
+**** Get access to supercomputer
+
+**** Run 1000? Simulations on supercomputer
+
+**** Extract and present data
+
+**** Develop algorithm for optimal management
+
+**** Iterate 100? simulations on supercomputer
+
+**** Present results in february
+
+**** Get new optimization criteria
+
+**** New optimization
+
+**** Write report
+
+*** COMMIT
+
+**** Root model? 
+
+**** Målinger?
 
 * Opgaver
 

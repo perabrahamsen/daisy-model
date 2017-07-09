@@ -6,9 +6,23 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
-* 5.32
+* 5.40
+
+** You can now specify the quartz fraction directly.
+
+This is part of the horizon.
+
+  (quartz 80 [%])
+
+specifies that 80 % of the minerals in the horizon are quartz.
+
+This affects heat transport.
+
+
+** NNI  stem/leaf partit
 
 ** 
+
 
 * 5.31
 
