@@ -744,8 +744,8 @@
          (obs-sb2 (Nf 0.1 [%]) (Cr 1.4 [%]) (Pt 1.9 [%]))
          (obs-ww1 (Nf 0.6 [%]) (Cr 1.5 [%]) (Pt 2.0 [%]))
          (obs-ww2 (Nf 0.4 [%]) (Cr 1.4 [%]) (Pt 2.0 [%]))
-         ;;plot_N plot_DM plot_N_DM plot_DM_N plot_N-percent plot_N-percent_DM
-         ;; plot_N-percent_DM_JB4-N2014-SB
+         plot_N plot_DM plot_N_DM plot_DM_N plot_N-percent plot_N-percent_DM
+          plot_N-percent_DM_JB4-N2014-SB
          (plot_N-percent_DM_all-SB
           (scn N2014) (Nf 0.1 [%]) (Cr 1.4 [%]) (Pt 1.9 [%]))
          (plot_N-percent_DM_all-WW
@@ -754,10 +754,6 @@
           (scn N1994) (Nf 0.4 [%]) (Cr 1.4 [%]) (Pt 1.9 [%]))
          (plot_N-percent_DM_all-WW
           (scn N1994) (Nf 0.6 [%]) (Cr 1.5 [%]) (Pt 2.0 [%]))
-         ;;(plot_N-percent_DM_all-SB
-         ;; (scn NLUX) (Nf 0.1 [%]) (Cr 1.4 [%]) (Pt 1.9 [%]))
-         ;;(plot_N-percent_DM_all-WW
-         ;; (scn NLUX)  (Nf 0.4 [%]) (Cr 1.4 [%]) (Pt 2.0 [%]))
          ))
 
 (run plot)
