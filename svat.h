@@ -38,6 +38,7 @@ class Pet;
 class Bioclimate;
 class BlockModel;
 class Treelog;
+class Movement;
 
 class SVAT : public ModelDerived
 {
@@ -50,15 +51,18 @@ public:
 public:
   virtual void tick (const Weather&, const Vegetation&,
 		     const Geometry&, 
-                     const Soil&, const SoilHeat&, 
+                     const Soil&, const SoilHeat&, const double T_bottom,
 		     const SoilWater&, 
-                     const Bioclimate&, Treelog&) = 0;
+                     const Bioclimate&,
+		     const Movement&, 
+		     const double dt /* [h] */,
+		     const double max_T /* [dg C] */, 
+		     const double max_ec /* [Pa] */,
+		     Treelog&) = 0;
   virtual void output (Log&) const;
   virtual double production_stress () const = 0; // []
   virtual void solve (const double /* shadow stomata cond. [m/s]*/, 
                       const double /* sunlit stomata cond. [m/s]*/, 
-                      const double max_T /* [dg C] */, 
-                      const double max_ec /* [Pa] */,
                       Treelog&) = 0;
   virtual bool stable () const;                      // Stable solution found?
   virtual double transpiration () const = 0; // [mm/h]
@@ -68,7 +72,8 @@ public:
   virtual double CanopyVapourPressure () const = 0;  // [Pa]
   virtual double SunBoundaryLayerWaterConductivity () const = 0; // [m/s]
   virtual double ShadowBoundaryLayerWaterConductivity () const = 0; // [m/s]
-
+  virtual double SoilSurfaceTemperature () const = 0; // [dg C]
+  
   // Create and Destroy.
 public:
   virtual bool check (const Weather& weather, Treelog& msg) const = 0;

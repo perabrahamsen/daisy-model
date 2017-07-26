@@ -87,7 +87,8 @@ public:
   double evap_soil_surface () const; // [mm/h]
   double evap_pond (double dt, Treelog&) const; // [mm/h]
   void put_ponding (double pond);	// [mm]
-
+  void set_svat_temperature (double T /* dg C */);
+  
   // Create.
   void initialize (const Geometry&);
   static void load_syntax (Frame&);

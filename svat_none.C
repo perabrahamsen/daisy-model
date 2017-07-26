@@ -35,17 +35,18 @@ struct SVAT_none : public SVAT
 
   // Simulation.
   void tick (const Weather& weather, const Vegetation&,
-	     const Geometry&, const Soil&, const SoilHeat&,
-	     const SoilWater&, const Bioclimate& bio, Treelog&)
+	     const Geometry&, const Soil&, const SoilHeat&, double,
+	     const SoilWater&, const Bioclimate& bio, const Movement&,
+	     double, double, double, Treelog&)
   { 
     crop_ea = bio.crop_ea();
-    T_a = bio.daily_air_temperature ();
+    T_a = weather.air_temperature ();
     e_c = weather.vapor_pressure ();
   }
   double production_stress () const
   { return -1; }
   
-  void solve(const double, const double, const double, const double, Treelog&)  
+  void solve(const double, const double, Treelog&)  
   { }
 
   double transpiration() const 
@@ -74,6 +75,9 @@ struct SVAT_none : public SVAT
     // Leave it to the bioclimate module.
     return -1.0; 
   }
+
+  double SoilSurfaceTemperature () const
+  { return T_a; }  // [dg C]
 
   // Create.
   bool check (const Weather&, Treelog&) const

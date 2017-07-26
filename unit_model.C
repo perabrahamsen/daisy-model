@@ -169,6 +169,9 @@ struct UnitSIFactor : public UnitSI
     if (!to_si_factor)
       return NULL;
     
+    if (base_name () != to_si_factor->base_name ())
+      return NULL;
+
     struct ConvertFactor : public Convert
     {
       const double factor;

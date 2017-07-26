@@ -61,8 +61,7 @@ std::string
 GnuplotTime::timeform (const Time& time)
 {
   std::ostringstream tmp;
-  tmp << "\"" << time.year () << "-" << time.month () << "-" << time.mday ()
-      << "T" << time.hour () << "\"";
+  tmp << "\"" << time.print () << "\"";
   return tmp.str ();
 }
 
@@ -93,7 +92,7 @@ GnuplotTime::plot (std::ostream& out, Treelog& msg)
 set xtics nomirror autofreq\n\
 set ytics nomirror\n\
 set xdata time\n\
-set timefmt \"%Y-%m-%dT%H\"\n\
+set timefmt \"%Y-%m-%dT%H:%M:%S\"\n\
 set style data lines\n";
 
   // Removed: set format x "%m-%y"
@@ -330,8 +329,7 @@ set style data lines\n";
             last += value;
           else
             last = value;
-          out << time.year () << "-" << time.month () << "-" << time.mday ()
-              << "T" << time.hour () << "\t" << last;
+          out << time.print () << "\t" << last;
 	  if (use_ebars)
 	    out << "\t" << source[i]->ebar ()[j];
 	  out << "\n";

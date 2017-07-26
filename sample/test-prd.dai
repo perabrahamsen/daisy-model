@@ -115,7 +115,7 @@ Based on data collected by Fulai Liu, 2007."
              (n 1.870)
              (l 0.5)))
 
-(defhorizon "KarJyn_C" default
+(defhorizon "KarJyn_C" USDA3
     (clay 0.043)
     (silt 0.008)
     (sand 0.946)
@@ -364,7 +364,7 @@ Based on data collected by Fulai Liu, 2007."
                  Vegetation crops crops "${crop}" Root ABAConc)
            (spec fixed RootSystem ABAConc))
    (number (tag "H2OUpt")
-           (dimension "mm/h")
+           (dimension "mm")
            (path column "${column}" 
                  Vegetation crops crops "${crop}" Root H2OUpt)
            (spec fixed RootSystem H2OUpt)
@@ -524,7 +524,8 @@ Based on data collected by Fulai Liu, 2007."
                      (path column "${column}" 
                            Vegetation crops crops "${crop}" Root H2OExtraction)
                      (spec fixed RootSystem H2OExtraction)
-                     (dimension "mm/h"))
+		     (handle sum)
+                     (dimension "mm"))
            (interval (tag "Actual")
                      (description "Actual water content of the root zone.")
                      (path column "${column}" SoilWater Theta)

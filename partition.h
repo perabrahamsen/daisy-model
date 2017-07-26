@@ -40,12 +40,18 @@ public:
   const PLF RSR;		// Root/Shoot ratio.
 private:
   const double nitrogen_stress_limit; // Allocate all ass. to SOrg above this.
+  const double NNI_crit;	// Modify Stem/Leaf below this NNI.
+  const double NNI_inc;		// How much to modify Stem/Leaf.
+  double cf;			// Stem factor due to low NNI.
 
-  // Utilities.
+  // Simulation.
 public:
-  void operator () (double DS, double current_RSR, double nitrogen_stress,
-		    double& f_Leaf, double& f_Stem,
-		    double& f_Root, double& f_SOrg) const;
+  void tick (double DS, double current_RSR, double nitrogen_stress,
+	     double NNI,
+	     double& f_Leaf, double& f_Stem,
+	     double& f_Root, double& f_SOrg);
+  void tick_none ();
+  void output (Log& log) const;
 
   // Create and Destroy.
 public:

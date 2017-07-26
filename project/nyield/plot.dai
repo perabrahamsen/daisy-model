@@ -756,5 +756,23 @@
           (scn N1994) (Nf 0.6 [%]) (Cr 1.5 [%]) (Pt 2.0 [%]))
          ))
 
-(run plot)
+(defgnuplot denit xy
+  (where "fig/denit.pdf")
+  (source (inline (title "Old")
+		  (with lines)
+		  (x_dimension Theta)
+		  (y_dimension [%])
+		  (points (0 0) (0.7 0) (1.0 100)))
+	  (inline (title "New")
+		  (with lines)
+		  (x_dimension Theta)
+		  (y_dimension [%])
+		  (points (0 0) (0.8 0) (1.0 100)))))
+
+(defprogram denit gnuplot
+  (graph denit))
+
+(run denit)
+
+;(run plot)
 

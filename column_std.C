@@ -731,8 +731,9 @@ ColumnStandard::tick_move (const Metalib& metalib,
     = bioclimate->get_snow_storage () + surface.ponding_average ();
   bioclimate->tick (units, time, surface, my_weather,
                     *vegetation, *litter, *movement,
-                    geometry, *soil, *soil_water, *soil_heat,
+                    geometry, *soil, *soil_water, *soil_heat, T_bottom,
                     dt, msg);
+
   // Add deposition. 
   chemistry->deposit (bioclimate->deposit (), msg);
 
@@ -772,6 +773,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
                         *soil_water, *soil_heat, tillage_age,
                         *chemistry, dt, msg);
   litter->update (organic_matter->top_DM ());
+
   // Transport.
   chemistry->mass_balance (geometry, *soil_water);
   groundwater->tick (geometry, *soil, *soil_water, 
@@ -779,7 +781,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
                      *soil_heat, time, scope, msg);
   soil_water->tick_before (geometry, *soil, dt, msg); 
   soil_heat->tick (geometry, *soil, *soil_water, T_bottom, *movement, 
-                   surface, dt, msg);
+                   surface.temperature (), dt, msg);
   soil_water->reset_old ();
   chemistry->mass_balance (geometry, *soil_water);
   // Her sættes Theta_old til Theta

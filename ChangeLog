@@ -1,3 +1,61 @@
+2017-06-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* horizon.C: (quartz): New parameter.
+
+	* horheat.C (K_water): Check right parameter when initializing.
+	(heat_conductivity): Check K_water and K_ice sizes.
+	(initialize): Don't specify quarts here.
+
+	* crop_std.C (output): "Partit", not "Partition".
+
+2017-06-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* Version 5.39 released.
+
+	* svat_none.C (tick): Use current air temperature, not daily
+	average.
+
+2017-06-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* Version 5.38 released.
+
+	* gnuplot_time.C (timeform, plot): Support timesteps smaller than 1 hour.
+
+2017-06-07  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.37 released.
+
+2017-06-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* action_harvest.C (doIt): Seperate storage organ from total yield
+	message.
+
+2017-06-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* surface.C (set_svat_temperature): Set surface temperature if
+	there is no ponding.
+
+	* svat_ssoc.C (tick): T_z0 should be top soil, not previous border.
+
+2017-06-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* unit_model.C (create_convertion): Only make simple convertion
+	between compatible base types.
+
+2017-06-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* sample/test-prd.dai ("KarJyn_C"): Specify texture class.
+
+2017-05-31  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* svat_ssoc.C (tick): Fix unit convertion for k_h.
+
+	* soil_heat.C (top_flux): Fix unit in comment.
+
+2017-05-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* movement_1D.C (initialize_derived): Add 'delay' to daisy.log
+
 2017-05-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* lib/log.dai ("SSOC"): Use "handle average" for radiation instead

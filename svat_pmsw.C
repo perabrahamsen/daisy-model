@@ -1335,18 +1335,19 @@ public:
   double CanopyVapourPressure () const;  // [Pa]
   double SunBoundaryLayerWaterConductivity () const; // [m/s]
   double ShadowBoundaryLayerWaterConductivity () const; // [m/s]
+  double SoilSurfaceTemperature () const; // [dg C]
 
 
   void solve (const double gs_shadow /* stomata cond. [m/s]*/, 
               const double gs_sunlit /* stomata cond. [m/s]*/,
-              const double max_T /* [dg C] */, 
-              const double max_ec /* [Pa] */,
               Treelog&);
 
   void tick (const Weather& weather, const Vegetation& crops,
-             const Geometry&, const Soil& soil,
-             const SoilHeat& soil_heat, const SoilWater& soil_water,
-             const Bioclimate& bio, Treelog&);
+             const Geometry&, const Soil& soil, 
+             const SoilHeat& soil_heat, const double T_bottom,
+	     const SoilWater& soil_water,
+             const Bioclimate& bio, const Movement&, 
+	     double, double, double, Treelog&);
   void output (Log& log) const;
 
   // Create and Destroy.
@@ -1405,16 +1406,21 @@ SVAT_PMSW::ShadowBoundaryLayerWaterConductivity () const
   return -1.0; 
 }
 
+double
+SVAT_PMSW::SoilSurfaceTemperature () const
+{ return tsurf_pm; }  // [dg C]
+
 void 
-SVAT_PMSW::solve (double, double, double, double, Treelog&) 
+SVAT_PMSW::solve (double, double, Treelog&) 
 { }
 
 void
 SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
                  const Geometry& geo, const Soil& soil, 
-                 const SoilHeat& soil_heat,
+                 const SoilHeat& soil_heat, const double, 
                  const SoilWater& soil_water,
-                 const Bioclimate& bio, Treelog&)
+                 const Bioclimate& bio, const Movement&, 
+		 double, double, double, Treelog&)
 {
   const double divide_ep = bio.total_ep () - bio.snow_ea();
   const double canopy_ep = divide_ep * crops.cover ();

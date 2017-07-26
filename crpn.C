@@ -134,6 +134,16 @@ CrpN::content (const double DS, Production& production, Treelog& msg)
   daisy_assert (approximate (production.NCrop, 
                              production.NRoot + production.NLeaf 
                              + production.NStem + production.NSOrg));
+  
+  // Update NNI.
+  const double ActNShoot = production.NLeaf 
+    + production.NStem + production.NSOrg; 
+  const double CrNShoot = CrLeafCnc (DS) * production.WLeaf
+    + CrStemCnc (DS) * production.WStem
+    + CrSOrgCnc (DS) * production.WSOrg;
+  NNI = (CrNShoot > 0.0) 
+    ? ActNShoot / CrNShoot
+    : -1.0;
 }
 
 void
@@ -190,6 +200,7 @@ CrpN::output (Log& log) const
   output_variable (NfNCnt, log);
   output_variable (nitrogen_stress, log);
   output_variable (nitrogen_stress_days, log);
+  output_variable (NNI, log);
   output_variable (Fixated, log);
   output_variable (AccFixated, log);
   output_variable (DS_start_fixate, log);
@@ -313,6 +324,13 @@ Unly used in reproductive phase. By default identical to 'NH4_root_min'.");
 This is the sum of nitrogen stress for each hour, multiplied with the\n\
 action of the radition of that day that was received that hour.");
   frame.set ("nitrogen_stress_days", 0.0);
+  frame.declare ("NNI", Attribute::None (), Check::non_negative (),
+		 Attribute::LogOnly,
+		 "Nitrogen nutrition index.\n\
+Actual nitrogen content of shoot divided by critical nitrogen content.\n\
+Will be less than one for a stressed plant.\n\
+For now, the storage organ is counted as part of the shoot.");
+
 
   // Fixation.
   frame.declare ("DS_fixate", Attribute::None (), Attribute::Const,
@@ -357,6 +375,7 @@ CrpN::CrpN (const BlockSubmodel& al)
     NH4_root_min_luxury (al.number ("NH4_root_min_luxury", NH4_root_min)),
     nitrogen_stress (0.0),
     nitrogen_stress_days (al.number ("nitrogen_stress_days")),
+    NNI (-1.0),
     state (N_uninitialized),
     DS_fixate (al.number ("DS_fixate")),
     DS_cut_fixate (al.number ("DS_cut_fixate")),

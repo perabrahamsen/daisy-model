@@ -31,6 +31,7 @@
 #include "treelog.h"
 #include "frame.h"
 #include "crop.h"
+#include "mathlib.h"
 #include <sstream>
 
 // The 'emerge' action model.
@@ -151,21 +152,39 @@ struct ActionHarvest : public Action
 	return;
       }
     double old_DM = 0.0;
+    double old_SOrg = 0.0;
     for (size_t i = 0; i < daisy.harvest ().size (); i++)
-      old_DM += daisy.harvest ()[i]->total_DM ();
+      {
+	old_DM += daisy.harvest ()[i]->total_DM ();
+	old_SOrg += daisy.harvest ()[i]->sorg_DM;
+      }
     daisy.field ().harvest (daisy.time (), 
                             crop, stub, stem, leaf, sorg, combine,
                             daisy.harvest (), msg);
     double new_DM = 0.0;
+    double new_SOrg = 0.0;
     for (size_t i = 0; i < daisy.harvest ().size (); i++)
-      new_DM += daisy.harvest ()[i]->total_DM ();
+      {
+	new_DM += daisy.harvest ()[i]->total_DM ();
+	new_SOrg += daisy.harvest ()[i]->sorg_DM;
+      }
+
     std::ostringstream tmp;
     const bool killed = daisy.field ().crop_ds (crop) < 0.0;
     if (killed)
       tmp << "Harvesting ";
     else
       tmp << "Cutting ";
-    tmp << crop << ", removing " << (new_DM - old_DM) * 0.01 << " Mg DM/ha";
+    tmp << crop;
+    const double total = (new_DM - old_DM) * 0.01;
+    const double sorg = (new_SOrg - old_SOrg) * 0.01;
+    if (total < 1e-5)
+      tmp << ", with no yield :-(";
+    else if (approximate (total, sorg))
+      tmp << ", removing " << total << " Mg DM/ha";
+    else
+      tmp << ", removing " << sorg << " + " << (total - sorg) << " Mg DM/ha";
+    
     msg.message (tmp.str ());
     
     was_killed (killed, msg);

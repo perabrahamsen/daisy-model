@@ -67,9 +67,9 @@ struct SVAT_SSOC : public SVAT
 
   // - Lower boundary 
   double z0;             // Depth of top cell [m]
-  double k_h;            // Heat conductivity in soil [?]  
-  double T_z0;           // Soil temperature in top cell [K]
-  double E_soil;         // Evaporation of water from soil [kg/m2/s]
+  double k_h;            // Heat conductivity in soil [W/m/K]  
+  double T_z0_initial;	 // Soil temperature in top cell [K]
+  double E_soil;         // Evaporation of water from soil [kg/m^2/s]
 
   // - Canopy
   bool has_LAI;          // True if there is a vegetation.
@@ -114,6 +114,9 @@ struct SVAT_SSOC : public SVAT
   // - vapour pressure in canopy
   double e_c;          // Actual vapour pressure of water in the canopy-point [Pa]
 
+  // Temperatures * 1
+  double T_z0;		 // Temperature in top soil. [K]
+
   // - Fluxes
   double H_soil;   // Sensible heat flux from the soil [W m^-2] 
   double H_sun;    // Sensible heat flux from the sunlit leaves to the canopy point
@@ -157,6 +160,14 @@ struct SVAT_SSOC : public SVAT
   // Numeric solvers.
   struct FixpointSSOC : public Fixpoint
   {
+    const Geometry& geo; 
+    const Soil& soil; 
+    const SoilWater& soil_water;
+    const SoilHeat& soil_heat;
+    const double T_bottom; 
+    const Movement& movement;
+    const double dt;     
+
     // Content.
     SVAT_SSOC& ssoc;
     Value initial;
@@ -175,21 +186,23 @@ struct SVAT_SSOC : public SVAT
     }
     void set_value (const Value& x)
     { 
-      daisy_assert (x.size () == 5);
+      daisy_assert (x.size () == 6);
       ssoc.T_c = x[0];
       ssoc.T_s = x[1];
       ssoc.T_sun = x[2];
       ssoc.T_shadow = x[3];
       ssoc.e_c = x[4];
+      ssoc.T_z0 = x[5];
     }
     Value get_value () const
     {
-      Value x (5);
+      Value x (6);
       x[0] = ssoc.T_c;
       x[1] = ssoc.T_s;
       x[2] = ssoc.T_sun;
       x[3] = ssoc.T_shadow;
       x[4] = ssoc.e_c;;
+      x[5] = ssoc.T_z0;
       return x;
     }
 
@@ -200,7 +213,9 @@ struct SVAT_SSOC : public SVAT
     { 
       set_value (x);
       ssoc.calculate_conductances (gs_shadow, gs_sunlit, msg);
-      ssoc.calculate_temperatures (msg);
+      ssoc.calculate_temperatures (geo, soil, soil_water, soil_heat, 
+				   T_bottom, movement, 
+				   dt, msg);
       return get_value ();
     }
     const Value& max_distance () const
@@ -214,20 +229,34 @@ struct SVAT_SSOC : public SVAT
     {
       Value result (4, T);
       result.push_back (e);
+      result.push_back (T);
       max = result;
     }
-    FixpointSSOC (SVAT_SSOC& svat, 
-                  const int max_iteration)
+    FixpointSSOC (const Geometry& g, const Soil& s, 
+		  const SoilWater& sw, const SoilHeat& sh,
+		  const double T_bot,
+		  const Movement& mov, 
+		  const double dt_,
+		  SVAT_SSOC& svat,
+		  const int max_iteration)
       : Fixpoint (max_iteration),
+	geo (g),
+	soil (s),
+	soil_water (sw),
+	soil_heat (sh),
+	T_bottom (T_bot),
+	movement (mov),
+	dt (dt_),
         ssoc (svat),
-        initial (5, -42.42e42),
+        initial (6, -42.42e42),
         gs_shadow (-42.42e42),
         gs_sunlit (-42.42e42)
     { }
     ~FixpointSSOC ()
     { }
   };
-  FixpointSSOC fix;
+  const int max_iteration;
+  std::unique_ptr<FixpointSSOC> fix;
   const std::unique_ptr<Solver> solver;
   bool is_stable;
 
@@ -236,21 +265,27 @@ struct SVAT_SSOC : public SVAT
 
   // Simulation.
   void tick (const Weather&, const Vegetation&,
-	     const Geometry&, const Soil&, const SoilHeat&,
-	     const SoilWater&, const Bioclimate&, Treelog&); 
+	     const Geometry&, const Soil&, const SoilHeat&, 
+	     const double T_bottom,
+	     const SoilWater&, const Bioclimate&, const Movement&,
+	     const double dt /* [h] */, 
+	     const double max_T /* [dg C] */, 
+	     const double max_ec /* [Pa] */,
+	     Treelog&); 
 
   void calculate_conductances (const double gs_shadow /* stomata cond. [m/s]*/, 
                                const double gs_sunlit /* stomata cond. [m/s]*/, 
                                Treelog& msg);
   
-  void calculate_temperatures (Treelog& msg);
+  void calculate_temperatures (const Geometry&, const Soil&, const SoilWater&,
+			       const SoilHeat&, 
+			       const double T_bottom, const Movement&,
+			       const double dt, Treelog& msg);
 
   void calculate_fluxes ();
 
   void solve (const double gs_shadow /* stomata cond. [m/s]*/, 
-              const double gs_sunlit /* stomata cond. [m/s]*/, 
-              const double max_T /* [dg C] */, 
-              const double max_ec /* [Pa] */,
+              const double gs_sunlit /* stomata cond. [m/s]*/,
               Treelog& msg);
 
   bool stable () const
@@ -283,6 +318,9 @@ struct SVAT_SSOC : public SVAT
   double ShadowBoundaryLayerWaterConductivity () const
   { return gb_W_shadow; }
 
+  double SoilSurfaceTemperature () const
+  { return T_s - TK; }  // [dg C]
+
   void output(Log& log) const;
 
   // Create.
@@ -312,9 +350,15 @@ const double SVAT_SSOC::c_p = 1010.;     //Specific heat of air.[J/kg/K^1]
 // Simulation.
 void
 SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
-                 const Geometry& geo, const Soil&, 
-                 const SoilHeat& soil_heat, const SoilWater&, 
-                 const Bioclimate& bio, Treelog& msg)
+                 const Geometry& geo, const Soil& soil, 
+                 const SoilHeat& soil_heat, 
+		 const double T_bottom, const SoilWater& soil_water, 
+                 const Bioclimate& bio, 
+		 const Movement& movement,
+		 const double dt /* [h] */,
+		 const double max_T /* [dg C] */, 
+		 const double max_ec /* [Pa] */,
+		 Treelog& msg)
 {
   TREELOG_MODEL (msg);
 
@@ -334,10 +378,10 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   e_a = weather.vapor_pressure (); // [Pa]
   s = FAO::SlopeVapourPressureCurve (T_a - TK); // [Pa/K]
   lambda = FAO::LatentHeatVaporization (T_a - TK); // [J/kg]
-  T_z0 = soil_heat.T_top() + TK;     // [K]
+  T_z0_initial = geo.content_hood (soil_heat, &SoilHeat::T, Geometry::cell_above) + TK;     // [K]
   E_soil =bio.soil_surface_ea () / 3600.; // [mm/h]->[kg m^-2 s^-1]
   k_h = geo.content_hood(soil_heat, &SoilHeat::conductivity, Geometry::cell_above)
-    * 1e-7 * 3600.0 / 100.0; // [erg/cm/h/dg C] -> [W/m/K]
+    * 1e-7 * 100.0 / 3600.0; // [erg/cm/h/dg C] -> [W/m/K]
   z0 = - geo.content_hood(geo, &Geometry::cell_z, Geometry::cell_above)/100.; //[m]
   R_abs_soil = bio.rad_abs_soil ();           // [W m^-2] 
   R_abs_sun = bio.rad_abs_sun_canopy ();      // [W m^-2]
@@ -377,16 +421,20 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   else 
     initialized_canopy = false;
 
-#if 1
   T_c = T_a; //[K]
-  T_sun = T_shadow = T_s = T_0 = T_c;
+  T_sun = T_shadow = T_s = T_0 = T_c = T_a;
   e_c = e_a;
-#endif
+  T_z0 = T_z0_initial;
 
   gb_W_sun = gb_W_shadow = Resistance::molly2ms (T_a - TK, Ptot, 2.0);
 
   // Remember initial conditions before solve is called multiple times.
-  fix.set_initial ();
+  fix = std::make_unique<FixpointSSOC> (geo, soil, soil_water,
+					soil_heat, T_bottom, 
+					movement, dt, *this, max_iteration),
+
+  fix->set_initial ();
+  fix->set_max (max_T, max_ec);
 }
 
 void 
@@ -528,7 +576,11 @@ SVAT_SSOC::calculate_conductances (const double g_s_sun /* stom cond. [m/s]*/,
 }
 
 void 
-SVAT_SSOC:: calculate_temperatures(Treelog& msg)
+SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil, 
+				   const SoilWater& soil_water,
+				   const SoilHeat& soil_heat, const double T_bottom,
+				   const Movement& movement, double dt,
+				   Treelog& msg)
 {
   // Intermediates variable ------------------------------
 
@@ -759,13 +811,26 @@ SVAT_SSOC:: calculate_temperatures(Treelog& msg)
 
   else // bare soil
     {
-      T_s =((R_eq_abs_soil + G_R_soil * (T_a - T_a) + G_H_a * (T_a - T_a) 
-             + k_h / z0 * (T_z0 - T_a) - (lambda * E_soil))
-            / (G_R_soil + G_H_a +  k_h / z0))
-        + T_a;  //[K]
+      // The bare soil equation (soil flux based on surface temperature).
+      // 
+      // R_eq_abs_soil - G_R_soil * (T_s - T_a)
+      // = (k_h / z0) * (T_s - T_z0) + G_H_a * (T_s - T_a) + lambda * E_soil
+      // 
+      // <=>
+      //
+      // R_eq_abs_soil + G_R_soil * T_a 
+      // + (k_h / z0) * T_z0 + G_H_a * T_a - lambda * E_soil
+      // = (G_R_soil + (k_h / z0) + G_H_a) * T_s
+      // 
+      // <=>
+      T_s = (R_eq_abs_soil + G_R_soil * T_a + G_H_a * T_a
+	     + k_h / z0 * T_z0 - lambda * E_soil)
+	/ (G_R_soil + G_H_a +  k_h / z0);
       T_sun = T_shadow = T_c = T_a;
       e_c = e_a;
     }
+  T_z0 = soil_heat.exptected_T_z0 (geo, soil, soil_water, T_bottom, movement, 
+				   T_s - TK, dt, msg) + TK;
 } 
 
 void
@@ -830,24 +895,21 @@ SVAT_SSOC:: calculate_fluxes()
 void
 SVAT_SSOC::solve (const double gs_shadow /* stomata cond. [m/s]*/, 
                   const double gs_sunlit /* stomata cond. [m/s]*/, 
-                  const double max_T /* [dg C] */, 
-                  const double max_ec /* [Pa] */,
                   Treelog& msg)
 {
   TREELOG_MODEL (msg);
-  fix.set_max (max_T, max_ec);
-  fix.set_gs (gs_shadow, gs_sunlit);
+  fix->set_gs (gs_shadow, gs_sunlit);
   try 
     {
-      Fixpoint::Value solution = fix.solve (msg);
-      fix.set_value (solution);
+      Fixpoint::Value solution = fix->solve (msg);
+      fix->set_value (solution);
       is_stable = true;
     }
   catch (const char *const error)
     {
       msg.warning (error);
       initialized_soil = has_LAI = false; // Prevent log.
-      fix.set_value (fix.initial_guess ());
+      fix->set_value (fix->initial_guess ());
       calculate_conductances (gs_shadow, gs_sunlit, msg);
       is_stable = false;
     }
@@ -871,6 +933,12 @@ SVAT_SSOC::output(Log& log) const
       output_variable (R_abs_soil, log);
       output_variable (R_eq_abs_soil, log);
       output_variable (H_soil, log);
+
+      output_variable (G_R_soil, log);
+      output_variable (G_H_a, log);
+      output_variable (k_h, log);
+      output_variable (T_z0, log);
+      output_variable (E_soil, log);
     }
   if (has_LAI)
     {
@@ -918,7 +986,7 @@ SVAT_SSOC::SVAT_SSOC (const BlockModel& al)
     U_z (-42.42e42),
     z0 (-42.42e42),
     k_h (-42.42e42),
-    T_z0 (-42.42e42),
+    T_z0_initial (-42.42e42),
     E_soil (-42.42e42),
     h_veg (-42.42e42),
     w_l (-42.42e42),
@@ -950,6 +1018,7 @@ SVAT_SSOC::SVAT_SSOC (const BlockModel& al)
     g_H_leaf_c (-42.42e42),
     g_W_leaf_c (-42.42e42),
     e_c (-42.42e42),
+    T_z0 (-42.42e42),
     H_soil (-42.42e42),
     H_sun (-42.42e42),
     H_shadow (-42.42e42),
@@ -974,7 +1043,7 @@ SVAT_SSOC::SVAT_SSOC (const BlockModel& al)
     R_eq_abs_soil (-42.42e42),
     R_eq_abs_sun (-42.42e42),
     R_eq_abs_shadow (-42.42e42),
-    fix (*this, al.integer ("max_iteration")),
+    max_iteration (al.integer ("max_iteration")),
     solver (Librarian::build_item<Solver> (al, "solver")),
     is_stable (false),
     initialized_soil (false), 
@@ -1007,73 +1076,82 @@ Bare soil roughness height for momentum.");
     frame.set ("z_0b", Resistance::default_z_0b);
 
     // For log.
-    frame.declare ("lambda", "J kg^-1", Attribute::LogOnly, "Latent heat of vaporization in atmosphere.");
-    frame.declare ("rho_a", "kg m^-3", Attribute::LogOnly, "Air density.");
-    frame.declare ("gamma", "Pa K^-1", Attribute::LogOnly, "Psychrometric constant.");
+    frame.declare ("lambda", "J/kg", Attribute::LogOnly, "Latent heat of vaporization in atmosphere.");
+    frame.declare ("rho_a", "kg/m^3", Attribute::LogOnly, "Air density.");
+    frame.declare ("gamma", "Pa/K", Attribute::LogOnly, "Psychrometric constant.");
     frame.declare ("T_s", "K", Attribute::LogOnly, "Soil surface temperature.");
     frame.declare ("T_0", "K", Attribute::LogOnly, "Surface temperature (large scale).");
     frame.declare ("T_c", "K", Attribute::LogOnly, "Canopy-point temperature.");
     frame.declare ("T_sun", "K", Attribute::LogOnly, "Temperature of sunlit leaves.");
     frame.declare ("T_shadow", "K", Attribute::LogOnly, "Temperature of shadow leaves.");
-    frame.declare ("g_a", "m s^-1", Attribute::LogOnly, 
+    frame.declare ("g_a", "m/s", Attribute::LogOnly, 
                 "Heat conductance in the atmosphere - from canopy point \n\
 to reference height (screen height).");
-    frame.declare ("g_H_s_c", "m s^-1", Attribute::LogOnly, 
+    frame.declare ("g_H_s_c", "m/s", Attribute::LogOnly, 
                 "Heat conductance from soil surface to canopy point.");
-    frame.declare ("g_H_sun_c", "m s^-1", Attribute::LogOnly, 
+    frame.declare ("g_H_sun_c", "m/s", Attribute::LogOnly, 
                 "Heat conductance from sunlit leaves to canopy point.");
-    frame.declare ("gb_W_sun", "m s^-1", Attribute::LogOnly, 
+    frame.declare ("gb_W_sun", "m/s", Attribute::LogOnly, 
                 "Water conductance for sunlit leaves boundary layer.");
-    frame.declare ("g_W_sun_c", "m s^-1", Attribute::LogOnly, 
+    frame.declare ("g_W_sun_c", "m/s", Attribute::LogOnly, 
                 "Water conductance from sunlit leaves to canopy point.");
-    frame.declare ("G_W_sun_c", "W m^-2 K^-1", Attribute::LogOnly, 
+    frame.declare ("G_W_sun_c", "W/m^2/K", Attribute::LogOnly, 
                 "Scaled water conductance from sunlit leaves to canopy point.");
-    frame.declare ("g_H_shadow_c", "m s^-1", Attribute::LogOnly,
+    frame.declare ("g_H_shadow_c", "m/s", Attribute::LogOnly,
                 "Heat conductance from shadow leaves to canopy point.");
-    frame.declare ("gb_W_shadow", "m s^-1", Attribute::LogOnly, 
+    frame.declare ("gb_W_shadow", "m/s", Attribute::LogOnly, 
                    "Water conductance for shadow leaves boundary layer.");
-    frame.declare ("g_W_shadow_c", "m s^-1", Attribute::LogOnly,
+    frame.declare ("g_W_shadow_c", "m/s", Attribute::LogOnly,
                 "Water conductance from shadow leaves to canopy point.");
     frame.declare ("e_a", "Pa", Attribute::LogOnly, 
                 "Vapour pressure of water in the atmosphere.");  
     frame.declare ("e_sat_air", "Pa", Attribute::LogOnly, 
                 "Saturated vapour pressure of water in the air.");  
-    frame.declare ("s", "Pa K^-1", Attribute::LogOnly, 
+    frame.declare ("s", "Pa/K", Attribute::LogOnly, 
                 "Slope of water vapour pressure curve.");  
     frame.declare ("e_c", "Pa", Attribute::LogOnly, 
                 "Vapour pressure of water in the canopy.");
-    frame.declare ("R_abs_soil", "W m^-2", Attribute::LogOnly, "Absorbed radiation in soil.");
-    frame.declare ("R_eq_abs_soil", "W m^-2", Attribute::LogOnly, 
+    frame.declare ("R_abs_soil", "W/m^2", Attribute::LogOnly, "Absorbed radiation in soil.");
+    frame.declare ("R_eq_abs_soil", "W/m^2", Attribute::LogOnly, 
                 "Absorbed radiation in soil at equilibrium.");
-    frame.declare ("R_abs_sun", "W m^-2", Attribute::LogOnly, 
+    frame.declare ("R_abs_sun", "W/m^2", Attribute::LogOnly, 
                 "Absorbed radiation in sunlit leaves.");
-    frame.declare ("R_eq_abs_sun", "W m^-2", Attribute::LogOnly, 
+    frame.declare ("R_eq_abs_sun", "W/m^2", Attribute::LogOnly, 
                 "Absorbed radiation in sunlit leaves at equilibrium.");
-    frame.declare ("R_abs_shadow", "W m^-2", Attribute::LogOnly, 
+    frame.declare ("R_abs_shadow", "W/m^2", Attribute::LogOnly, 
                 "Absorbed radiation in shadow leaves.");
-    frame.declare ("R_eq_abs_shadow", "W m^-2", Attribute::LogOnly, 
+    frame.declare ("R_eq_abs_shadow", "W/m^2", Attribute::LogOnly, 
                 "Absorbed radiation in shadow leaves at equilibrium."); 
-    frame.declare ("LAI", "m^2 m^-2", Attribute::LogOnly, "Leaf area index.");
+    frame.declare ("LAI", "m^2/m^2", Attribute::LogOnly, "Leaf area index.");
     frame.declare ("sun_LAI_fraction_total","", Attribute::LogOnly, 
                 "Sunlit fraction of leaf area in the canopy.");
     frame.declare ("cover", "", Attribute::LogOnly, "Vegetation cover.");
-    frame.declare ("H_soil", "W m^-2", Attribute::LogOnly, 
+    frame.declare ("H_soil", "W/m^2", Attribute::LogOnly, 
                 "Sensible heat flux from the soil.");
-    frame.declare ("H_sun", "W m^-2", Attribute::LogOnly, 
+    frame.declare ("H_sun", "W/m^2", Attribute::LogOnly, 
                 "Sensible heat flux from the sunlit leaves to the canopy point.");
-    frame.declare ("H_shadow", "W m^-2", Attribute::LogOnly, 
+    frame.declare ("H_shadow", "W/m^2", Attribute::LogOnly, 
                 "Sensible heat flux from the shadow leaves to canopy point.");
-    frame.declare ("H_c_a", "W m^-2", Attribute::LogOnly, 
+    frame.declare ("H_c_a", "W/m^2", Attribute::LogOnly, 
                 "Sensible heat flux from the canopy point to free atmosphere.");
-    frame.declare ("LE_sun", "W m^-2", Attribute::LogOnly, 
+    frame.declare ("LE_sun", "W/m^2", Attribute::LogOnly, 
                 "Latent heat flux from the sunlit leaves to the canopy point.");
-    frame.declare ("LE_shadow", "W m^-2", Attribute::LogOnly, 
+    frame.declare ("LE_shadow", "W/m^2", Attribute::LogOnly, 
                 "Latent heat flux from the shadow leaves to the canopy point.");
-    frame.declare ("LE_atm", "W m^-2", Attribute::LogOnly, 
+    frame.declare ("LE_atm", "W/m^2", Attribute::LogOnly, 
                 "Latent heat flux from the canopy point to the free atmosphere.");
     frame.declare ("E_trans", "mm/h", Attribute::LogOnly, "Leaf transpiration.");
 
-    //  frame.declare ("", "", Attribute::LogOnly, ".");
+    frame.declare ("G_R_soil", "W/m^2/K", Attribute::LogOnly, 
+		   "Radiation 'conductivity' from the soil.");
+    frame.declare ("G_H_a", "W/m^2/K", Attribute::LogOnly, 
+		   "Heat 'conductivity' from soil to free atmosphere.");
+    frame.declare ("k_h", "W/m/K", Attribute::LogOnly,
+		   "Heat conductivity in soil.");
+    frame.declare ("T_z0", "K", Attribute::LogOnly, 
+		   "Soil temperature in top cell.");
+    frame.declare ("E_soil", "kg/m^2/s", Attribute::LogOnly,
+		   "Evaporation of water from soil.");
     }
 } SVAT_ssoc_syntax;
 
