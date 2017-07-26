@@ -794,6 +794,12 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
  block.h scope.h attribute.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
+solupt${OBJ}: solupt.C solupt.h model_derived.h model_logable.h model.h \
+ symbol.h block_model.h block_nested.h block.h scope.h attribute.h \
+ treelog.h frame_model.h frame.h librarian.h mathlib.h assertion.h \
+ geometry.h soil.h soil_water.h chemical.h model_framed.h number.h \
+ scope_multi.h frame_submodel.h units.h memutils.h iterative.h check.h \
+ log.h time.h border.h
 soilph${OBJ}: soilph.C soilph.h model_derived.h model_logable.h model.h \
  symbol.h log.h time.h border.h model_framed.h block_model.h \
  block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
@@ -1007,7 +1013,7 @@ column${OBJ}: column.C column.h model_framed.h model_logable.h model.h \
 crop${OBJ}: crop.C crop.h model_framed.h model_logable.h model.h symbol.h \
  time.h om.h plf.h block_model.h block_nested.h block.h scope.h \
  attribute.h treelog.h frame_model.h frame.h mathlib.h assertion.h \
- librarian.h
+ librarian.h vcheck.h
 action${OBJ}: action.C action.h model_framed.h model_logable.h model.h \
  symbol.h block_model.h block_nested.h block.h scope.h attribute.h \
  treelog.h frame_model.h frame.h librarian.h
@@ -1123,17 +1129,18 @@ dom${OBJ}: dom.C dom.h plf.h doe.h smb.h om.h model_framed.h model_logable.h \
  model.h symbol.h geometry.h attribute.h librarian.h block.h scope.h \
  frame.h soil.h soil_water.h log.h time.h border.h check.h assertion.h \
  mathlib.h
-crpn${OBJ}: crpn.C crpn.h production.h symbol.h root_system.h rootdens.h \
- model_framed.h model_logable.h model.h ABAprod.h model_derived.h plf.h \
- frame_submodel.h frame.h scope.h attribute.h treelog.h log.h time.h \
- border.h mathlib.h assertion.h librarian.h check.h
+crpn${OBJ}: crpn.C crpn.h production.h symbol.h root_system.h plf.h \
+ block_submodel.h block_nested.h block.h scope.h attribute.h treelog.h \
+ frame_submodel.h frame.h log.h time.h border.h model_framed.h \
+ model_logable.h model.h mathlib.h assertion.h librarian.h check.h
 vernalization${OBJ}: vernalization.C vernalization.h model_derived.h \
  model_logable.h model.h symbol.h librarian.h log.h time.h border.h \
  model_framed.h frame.h scope.h attribute.h block_model.h block_nested.h \
  block.h treelog.h frame_model.h
 partition${OBJ}: partition.C partition.h plf.h librarian.h model.h symbol.h \
  frame_submodel.h frame.h scope.h attribute.h check.h mathlib.h \
- assertion.h treelog.h
+ assertion.h treelog.h log.h time.h border.h model_framed.h \
+ model_logable.h
 production${OBJ}: production.C production.h symbol.h crpn.h partition.h plf.h \
  organic.h model_derived.h model_logable.h model.h geometry.h attribute.h \
  am.h model_framed.h im.h log.h time.h border.h treelog.h mathlib.h \
@@ -1152,12 +1159,12 @@ canopy_std${OBJ}: canopy_std.C canopy_std.h canopy_simple.h plf.h log.h \
  time.h border.h model_framed.h model_logable.h model.h symbol.h \
  block_submodel.h block_nested.h block.h scope.h attribute.h treelog.h \
  frame_submodel.h frame.h mathlib.h assertion.h librarian.h
-root_system${OBJ}: root_system.C root_system.h rootdens.h model_framed.h \
- model_logable.h model.h symbol.h ABAprod.h model_derived.h plf.h \
- librarian.h geometry.h attribute.h soil_heat.h soil_water.h soil.h \
- chemical.h chemistry.h log.h time.h border.h check.h block_model.h \
- block_nested.h block.h scope.h treelog.h frame_model.h frame.h mathlib.h \
- assertion.h metalib.h
+root_system${OBJ}: root_system.C root_system.h plf.h rootdens.h \
+ model_framed.h model_logable.h model.h symbol.h ABAprod.h \
+ model_derived.h solupt.h librarian.h geometry.h attribute.h soil_heat.h \
+ soil_water.h soil.h chemical.h chemistry.h log.h time.h border.h check.h \
+ block_model.h block_nested.h block.h scope.h treelog.h frame_model.h \
+ frame.h mathlib.h assertion.h metalib.h
 ridge${OBJ}: ridge.C ridge.h soil.h symbol.h geometry1d.h geometry_vert.h \
  geometry.h attribute.h plf.h librarian.h model.h frame_submodel.h \
  frame.h scope.h mathlib.h assertion.h log.h time.h border.h \
@@ -1179,10 +1186,10 @@ soil_water${OBJ}: soil_water.C soil_water.h geometry.h symbol.h attribute.h \
  log.h time.h border.h model_framed.h librarian.h block.h scope.h check.h \
  treelog.h assertion.h mathlib.h frame_submodel.h frame.h
 soil_heat${OBJ}: soil_heat.C soil_heat.h block.h scope.h attribute.h symbol.h \
- geometry.h soil.h soil_water.h surface.h uzmodel.h model.h movement.h \
- model_derived.h model_logable.h weather.h weatherdata.h frame_submodel.h \
- frame.h log.h time.h border.h model_framed.h treelog.h assertion.h \
- librarian.h vcheck.h mathlib.h
+ geometry.h soil.h soil_water.h movement.h model_derived.h \
+ model_logable.h model.h weather.h weatherdata.h frame_submodel.h frame.h \
+ log.h time.h border.h model_framed.h treelog.h assertion.h librarian.h \
+ vcheck.h mathlib.h
 snow${OBJ}: snow.C snow.h frame_submodel.h frame.h scope.h attribute.h \
  symbol.h log.h time.h border.h model_framed.h model_logable.h model.h \
  geometry.h soil.h soil_water.h soil_heat.h movement.h model_derived.h \
@@ -1447,14 +1454,6 @@ library${OBJ}: library.C library.h symbol.h block_model.h block_nested.h \
  memutils.h filepos.h
 plf${OBJ}: plf.C plf.h assertion.h mathlib.h
 mathlib${OBJ}: mathlib.C mathlib.h assertion.h
-cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
- block_nested.h block.h treelog.h frame_model.h frame.h metalib.h \
- library.h daisy.h program.h model.h run.h output.h condition.h \
- model_framed.h model_logable.h memutils.h time.h toplevel.h \
- parser_file.h parser.h field.h irrigate.h border.h column.h weather.h \
- weatherdata.h action.h horizon.h model_derived.h printer_file.h \
- printer.h version.h chemical.h assertion.h frame_submodel.h filepos.h \
- point.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
 summary_fractiles${OBJ}: summary_fractiles.C summary.h model.h symbol.h \
@@ -1491,10 +1490,10 @@ program_post${OBJ}: program_post.C program.h model.h symbol.h run.h dlf.h \
 vegetation_afforestation${OBJ}: vegetation_afforestation.C vegetation.h \
  model_derived.h model_logable.h model.h symbol.h plf.h mathlib.h \
  assertion.h log.h time.h border.h model_framed.h root_system.h \
- rootdens.h ABAprod.h canopy_simple.h geometry.h attribute.h soil.h \
- crop.h am.h im.h aom.h om.h organic.h submodeler.h block_submodel.h \
- block_nested.h block.h scope.h treelog.h frame_submodel.h frame.h \
- check.h librarian.h bioclimate.h soil_heat.h block_model.h frame_model.h
+ canopy_simple.h geometry.h attribute.h soil.h crop.h am.h im.h aom.h \
+ om.h organic.h submodeler.h block_submodel.h block_nested.h block.h \
+ scope.h treelog.h frame_submodel.h frame.h check.h librarian.h \
+ bioclimate.h soil_heat.h block_model.h frame_model.h
 summary_RsqrW${OBJ}: summary_RsqrW.C summary.h model.h symbol.h destination.h \
  select.h units.h memutils.h volume.h model_derived.h model_logable.h \
  attribute.h block_submodel.h block_nested.h block.h scope.h treelog.h \
@@ -1615,10 +1614,10 @@ program_osvaldo${OBJ}: program_osvaldo.C program.h model.h symbol.h run.h \
 vegetation_permanent${OBJ}: vegetation_permanent.C vegetation.h \
  model_derived.h model_logable.h model.h symbol.h plf.h mathlib.h \
  assertion.h log.h time.h border.h model_framed.h root_system.h \
- rootdens.h ABAprod.h canopy_simple.h geometry.h attribute.h soil.h \
- crop.h am.h im.h aom.h om.h organic.h submodeler.h block_submodel.h \
- block_nested.h block.h scope.h treelog.h frame_submodel.h frame.h \
- check.h librarian.h bioclimate.h soil_heat.h block_model.h frame_model.h
+ canopy_simple.h geometry.h attribute.h soil.h crop.h am.h im.h aom.h \
+ om.h organic.h submodeler.h block_submodel.h block_nested.h block.h \
+ scope.h treelog.h frame_submodel.h frame.h check.h librarian.h \
+ bioclimate.h soil_heat.h block_model.h frame_model.h
 litter${OBJ}: litter.C litter.h model_derived.h model_logable.h model.h \
  symbol.h block_model.h block_nested.h block.h scope.h attribute.h \
  treelog.h frame_model.h frame.h mathlib.h assertion.h librarian.h \
@@ -1723,7 +1722,7 @@ movement_1D${OBJ}: movement_1D.C movement_solute.h movement.h model_derived.h \
  model_logable.h model.h symbol.h memutils.h geometry1d.h geometry_vert.h \
  geometry.h attribute.h soil.h soil_water.h soil_heat.h groundwater.h \
  surface.h uzmodel.h weather.h weatherdata.h chemical.h model_framed.h \
- doe.h transport.h adsorption.h log.h time.h border.h submodeler.h \
+ transport.h adsorption.h log.h time.h border.h submodeler.h \
  block_submodel.h block_nested.h block.h scope.h treelog.h \
  frame_submodel.h frame.h librarian.h tertiary.h assertion.h mathlib.h \
  block_model.h frame_model.h
@@ -2157,14 +2156,14 @@ vegetation_crops${OBJ}: vegetation_crops.C vegetation.h model_derived.h \
  model_logable.h model.h symbol.h crop.h model_framed.h time.h organic.h \
  geometry.h attribute.h soil.h plf.h mathlib.h assertion.h harvest.h \
  block_model.h block_nested.h block.h scope.h treelog.h frame_model.h \
- frame.h log.h border.h librarian.h metalib.h frame_submodel.h
+ frame.h log.h border.h librarian.h metalib.h frame_submodel.h library.h
 crop_simple${OBJ}: crop_simple.C crop.h model_framed.h model_logable.h \
- model.h symbol.h time.h root_system.h rootdens.h ABAprod.h \
- model_derived.h plf.h canopy_simple.h log.h border.h bioclimate.h \
- soil_water.h geometry.h attribute.h soil.h aom.h om.h organic.h \
- soil_heat.h am.h im.h harvest.h block_model.h block_nested.h block.h \
- scope.h treelog.h frame_model.h frame.h submodeler.h block_submodel.h \
- frame_submodel.h mathlib.h assertion.h check.h librarian.h
+ model.h symbol.h time.h root_system.h plf.h canopy_simple.h log.h \
+ border.h bioclimate.h soil_water.h geometry.h attribute.h soil.h aom.h \
+ om.h organic.h model_derived.h soil_heat.h am.h im.h harvest.h \
+ block_model.h block_nested.h block.h scope.h treelog.h frame_model.h \
+ frame.h submodeler.h block_submodel.h frame_submodel.h mathlib.h \
+ assertion.h check.h librarian.h
 action_ridge${OBJ}: action_ridge.C action.h model_framed.h model_logable.h \
  model.h symbol.h block_model.h block_nested.h block.h scope.h \
  attribute.h treelog.h frame_model.h frame.h daisy.h program.h run.h \
@@ -2285,14 +2284,14 @@ groundwater_static${OBJ}: groundwater_static.C groundwater.h model_derived.h \
  scope.h attribute.h treelog.h frame_model.h frame.h assertion.h \
  librarian.h
 crop_std${OBJ}: crop_std.C crop.h model_framed.h model_logable.h model.h \
- symbol.h time.h chemistry.h seed.h model_derived.h root_system.h \
- rootdens.h ABAprod.h plf.h canopy_std.h canopy_simple.h harvesting.h \
- production.h phenology.h partition.h vernalization.h photo.h crpn.h \
- wse.h log.h border.h timestep.h vcheck.h bioclimate.h soil_water.h \
- geometry.h attribute.h soil.h organic.h soil_heat.h am.h im.h \
- submodeler.h block_submodel.h block_nested.h block.h scope.h treelog.h \
- frame_submodel.h frame.h mathlib.h assertion.h librarian.h memutils.h \
- check.h block_model.h frame_model.h
+ symbol.h time.h chemistry.h seed.h model_derived.h root_system.h plf.h \
+ canopy_std.h canopy_simple.h harvesting.h production.h phenology.h \
+ partition.h vernalization.h photo.h crpn.h wse.h log.h border.h \
+ timestep.h vcheck.h bioclimate.h soil_water.h geometry.h attribute.h \
+ soil.h organic.h soil_heat.h am.h im.h submodeler.h block_submodel.h \
+ block_nested.h block.h scope.h treelog.h frame_submodel.h frame.h \
+ mathlib.h assertion.h librarian.h memutils.h check.h block_model.h \
+ frame_model.h
 action_sow${OBJ}: action_sow.C action.h model_framed.h model_logable.h \
  model.h symbol.h block_model.h block_nested.h block.h scope.h \
  attribute.h treelog.h frame_model.h frame.h daisy.h program.h run.h \
@@ -2326,7 +2325,8 @@ action_harvest${OBJ}: action_harvest.C action.h model_framed.h \
  model_logable.h model.h symbol.h daisy.h program.h run.h field.h \
  irrigate.h memutils.h border.h harvest.h time.h block_model.h \
  block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
- frame.h librarian.h vegetation.h model_derived.h
+ frame.h librarian.h vegetation.h model_derived.h crop.h mathlib.h \
+ assertion.h
 action_with${OBJ}: action_with.C action.h model_framed.h model_logable.h \
  model.h symbol.h block_model.h block_nested.h block.h scope.h \
  attribute.h treelog.h frame_model.h frame.h daisy.h program.h run.h \

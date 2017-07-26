@@ -1,15 +1,5 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* soil_heat inde i bioclimate / svat iteration
-
-** DONE: En SoilHeat::tick_soft som beregner T_z0 uden at ændre noget.
-
-** Kald den indefra svat->solve
-
-** Log SSOC:T_z0 og SoilHeat:T[0]
-
-** Sammenlign
-
 * Agrohydrologi 2
 
 ** Dag 1 (PA): Introduktion og N Leaching
