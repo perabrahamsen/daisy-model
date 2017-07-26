@@ -56,6 +56,7 @@ public:
                      const Time&, Surface&, const Weather&, Vegetation&, 
                      const Litter& litter, const Movement&, const Geometry&,
 		     const Soil&, SoilWater&, const SoilHeat&, 
+		     const double T_bottom, 
 		     double dt, Treelog&) = 0;
   virtual void clear () = 0;
   virtual double get_intercepted_water () const = 0; // [mm]

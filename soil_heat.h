@@ -35,7 +35,6 @@ class Geometry;
 class Soil;
 class SoilWater;
 class Movement;
-class Surface;
 class Treelog;
 
 static const double latent_heat_of_fussion = 3.35e9; // [erg/g]
@@ -107,8 +106,11 @@ private:
                                    std::vector<double>& q);
 public:
   double suggest_dt (const double T_air) const;
+  double exptected_T_z0 (const Geometry&, const Soil&, const SoilWater&,
+			 const double T_bottom, const Movement&, 
+			 const double T_surface, double dt, Treelog& msg) const;
   void tick (const Geometry&, const Soil&, SoilWater&, const double T_bottom,
-             const Movement&, const Surface& surface, double dt, Treelog& msg);
+             const Movement&, const double T_surface, double dt, Treelog& msg);
   void tick_after (const std::size_t cell_size, 
                    const Soil&, const SoilWater&, Treelog&);
   

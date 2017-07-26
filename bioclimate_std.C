@@ -148,6 +148,7 @@ struct BioclimateStandard : public Bioclimate
                           const Movement&,
                           const Geometry&, const Soil& soil,
                           const SoilWater& soil_water, const SoilHeat&, 
+			  const double T_bottom,
                           double dt, Treelog&);
 
   // Radiation.
@@ -211,7 +212,7 @@ struct BioclimateStandard : public Bioclimate
   void tick (const Units&, const Time&, Surface&, const Weather&, 
              Vegetation&, const Litter& litter, 
              const Movement&, const Geometry&,
-             const Soil&, SoilWater&, const SoilHeat&, 
+             const Soil&, SoilWater&, const SoilHeat&, const double T_bottom,
              double dt, Treelog&);
   void clear ();
   void output (Log&) const;
@@ -702,6 +703,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
                                        const Soil& soil, 
                                        const SoilWater& soil_water,
                                        const SoilHeat& soil_heat, 
+				       const double T_bottom,
                                        const double dt, Treelog& msg)
 {
   TREELOG_MODEL (msg);
@@ -1009,8 +1011,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
   // Actual transpiration, modified by the SVAT model.
 
   // Let the SVAT model get the boundary conditions.
-  svat->tick (weather, vegetation, geo, soil, soil_heat, soil_water, 
-              *this, msg);
+  svat->tick (weather, vegetation, geo, soil, soil_heat, T_bottom, soil_water, 
+              *this, movement, dt, maxTdiff, maxEdiff, msg);
 
   // Our initial guess for transpiration is based on remaining energy.
   double crop_ea_svat_old = crop_ea_soil;
@@ -1055,8 +1057,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
       // Find expected transpiration from stomate conductance.
       const double max_gs = 0.001; // [m/s]
-      svat->solve (gs_shadow, gs_sunlit,
-                   maxTdiff * 0.5, maxEdiff * 0.5, svat_msg);
+      svat->solve (gs_shadow, gs_sunlit, svat_msg);
       
       const double crop_ea_svat = svat->transpiration ();
 
@@ -1105,7 +1106,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
            << ", gb_shadow = " << old_ShadowBoundaryLayerWaterConductivity
            << ", gs_shadow = " << gs_shadow
            << ", gs_sun = " << gs_sunlit
-           << ", T = " << crop_ea_svat_old;
+           << ", ea = " << crop_ea_svat_old;
 
       crop_ea_svat_old = crop_ea_svat;
 
@@ -1154,6 +1155,7 @@ BioclimateStandard::tick (const Units& units, const Time& time,
                           const Movement& movement,
                           const Geometry& geo, const Soil& soil, 
                           SoilWater& soil_water, const SoilHeat& soil_heat,
+			  const double T_bottom,
                           const double dt, Treelog& msg)
 {
   TREELOG_MODEL (msg);
@@ -1193,7 +1195,8 @@ BioclimateStandard::tick (const Units& units, const Time& time,
 
   // Distribute water among canopy, snow, and soil.
   WaterDistribution (units, time, surface, weather, vegetation, litter,
-                     movement, geo, soil, soil_water, soil_heat, dt, msg);
+                     movement, geo, soil, soil_water, soil_heat, T_bottom, 
+		     dt, msg);
 
   // Convert wind speed to field conditions.
   const double ScreenHeight = weather.screen_height (); //[m]

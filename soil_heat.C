@@ -25,7 +25,6 @@
 #include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
-#include "surface.h"
 #include "movement.h"
 #include "weather.h"
 #include "frame_submodel.h"
@@ -226,10 +225,72 @@ SoilHeat::suggest_dt (const double T_air) const
   return NAN;
 }
 
+double
+SoilHeat::exptected_T_z0 (const Geometry& geo, const Soil& soil,
+			  const SoilWater& soil_water,
+			  const double T_bottom,
+			  const Movement& movement, const double T_surface, 
+			  const double dt, Treelog& msg) const
+{
+  
+
+
+  const size_t cell_size = geo.cell_size ();
+  const size_t edge_size = geo.edge_size ();
+
+  // Borders.
+  double T_top_old = T_limited;
+  const double T_top_new = T_surface;
+  if (T_top_old < -400.0)
+    T_top_old = T_top_new;
+
+  // Edges.
+  std::vector<double> q_water (edge_size);
+  for (size_t e = 0; e < edge_size; e++)
+    q_water[e] = soil_water.q_matrix (e);
+
+  // Cells;
+  std::vector<double> conductivity (cell_size);
+  std::vector<double> S_water (cell_size);
+  std::vector<double> T (cell_size);
+  std::vector<double> capacity (cell_size);
+  std::vector<double> S_heat (cell_size);
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      // Fixed.
+      const double Theta = soil_water.Theta (c);
+      const double X_ice = soil_water.X_ice (c);
+      conductivity[c] = soil.heat_conductivity (c, Theta, X_ice);
+#if 1
+      daisy_assert (iszero (soil_water.S_ice_water (c)));
+      S_water[c] = soil_water.S_sum (c) - soil_water.S_ice_water (c);
+#else
+      S_water[c] = 0.0;
+#endif
+      // Changes with ice state.
+      T[c] = this->T (c);
+      capacity[c] = this->capacity_apparent (soil, soil_water, c);
+      S_heat[c] = this->source (geo, soil_water, c);
+    }
+
+  // Solve with old state.
+  const std::vector<double> T_old = T;
+  movement.heat (q_water, S_water, S_heat, 
+		 capacity_, conductivity,
+		 T_top_old, T_top_new, T_bottom, T, dt, msg);
+
+  // Calculate flux.
+  std::vector<double> q (edge_size, 0.0);
+  const double T_prev = (T_top_old + T_top_new) / 2.0;
+  calculate_heat_flux (geo, soil, soil_water, T_old, T_prev, T, T_bottom, q);
+
+  return geo.content_hood (T, Geometry::cell_above); // [dg C]
+}
+
 void 
 SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
 		const double T_bottom,
-                const Movement& movement, const Surface& surface, 
+                const Movement& movement, const double T_surface, 
 		const double dt, Treelog& msg)
 {
   
@@ -243,7 +304,7 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
 
   // Borders.
   double T_top_old = T_limited;
-  T_limited = limit_T_top (geo, soil, soil_water, surface.temperature ());
+  T_limited = limit_T_top (geo, soil, soil_water, T_surface);
   const double T_top_new = T_limited;
   if (T_top_old < -400.0)
     T_top_old = T_top_new;
