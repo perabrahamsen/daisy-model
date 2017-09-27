@@ -954,17 +954,32 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   const double old_canopy_storage = canopy_storage;
   const double canopy_absolute_input_rate 
     = canopy_in - canopy_harvest - residuals;
-  const double canopy_washoff_rate 
-    = canopy_washoff_coefficient * canopy_leak_rate;
-  double canopy_absolute_loss_rate;
+
   double canopy_washoff;
-  first_order_change (old_canopy_storage, 
-                      canopy_absolute_input_rate, 
-                      canopy_dissipation_rate + canopy_washoff_rate, dt,
-                      canopy_storage, canopy_absolute_loss_rate);
-  divide_loss (canopy_absolute_loss_rate, 
-               canopy_washoff_rate, canopy_dissipation_rate,
-               canopy_washoff, canopy_dissipate);
+  if (canopy_leak_rate < 0.0)
+    {
+      // Special case: No water left on canopy, yet there is overflow.
+      // Wash it all off.
+      TREELOG_MODEL (msg);
+      msg.message ("Evacuating canopy");
+
+      canopy_washoff = canopy_storage / dt;
+      canopy_dissipate = 0.0;
+      canopy_storage = 0.0;
+    }
+  else
+    {
+      const double canopy_washoff_rate 
+	= canopy_washoff_coefficient * canopy_leak_rate;
+      double canopy_absolute_loss_rate;
+      first_order_change (old_canopy_storage, 
+			  canopy_absolute_input_rate, 
+			  canopy_dissipation_rate + canopy_washoff_rate, dt,
+			  canopy_storage, canopy_absolute_loss_rate);
+      divide_loss (canopy_absolute_loss_rate, 
+		   canopy_washoff_rate, canopy_dissipation_rate,
+		   canopy_washoff, canopy_dissipate);
+    }
   canopy_out = canopy_washoff + residuals;
 
   // Litter

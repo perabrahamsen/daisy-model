@@ -982,7 +982,7 @@ sum of all chemicals will be logged."
            (interval (path column "${column}" OrganicMatter "*" CO2)
 		     (spec organic default CO2)
                      (tag "OM_CO2")
-                     (dimension "g CO2/m^2")
+                     ;;(dimension "g CO2/m^2")
                      (handle sum))
            ))
 

@@ -46,13 +46,14 @@
 struct SVAT_SSOC : public SVAT
 {
   // Constants.
-  static const double epsilon; // Emmision of Longwave rad == SurEmiss [] 
   static const double sigma;   // Stefan Boltzman constant [W m^-2 K^-4]
   static const double TK;      // Conversion from dg C to K.
   static const double c_p;     // Specific heat of air [J kg^-1 K^-1]
   //Parameters
   const bool hypostomatous;    // True for hypostomatous leaves;
   const double z_0b;     //Bare soil roughness height for momentum [m]
+  const double epsilon_soil;   // Soil emmisivity long wave rad. []
+  const double epsilon_leaf;   // Leaf emmisivity long wave rad. []
 
   // Driving variables.
   // - Upper boundary
@@ -342,7 +343,6 @@ struct SVAT_SSOC : public SVAT
 
 };
 
-const double SVAT_SSOC::epsilon = 0.98;  //Emmision of Longwave rad == SurEmiss []
 const double SVAT_SSOC::sigma = 5.67e-8; //Stefan Boltzman constant [W/m^2/K^4]
 const double SVAT_SSOC::TK = 273.15;     //Conversion from dg C to K.
 const double SVAT_SSOC::c_p = 1010.;     //Specific heat of air.[J/kg/K^1]
@@ -585,7 +585,7 @@ SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil,
   // Intermediates variable ------------------------------
 
   // Radiation "conductivity"
-  G_R_soil = 4. * epsilon * sigma * pow(T_a, 3.) * (1. - cover); //[W m^-2 K^-1]
+  G_R_soil = 4. * epsilon_soil * sigma * pow(T_a, 3.) * (1. - cover); //[W m^-2 K^-1]
  
   // Sensible heat "conductance" from soil to atmosphere
   G_H_a = c_p * rho_a * g_a;            //[W m^-2 K^-1] 
@@ -593,23 +593,24 @@ SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil,
   G_W_a =  c_p * rho_a * g_a / gamma;  //[m s^-1] 
 
   // Black-body emmission:
-  const double BB = epsilon * sigma * pow(T_a , 4.); //[W m^-2]
+  const double BB_leaf = epsilon_leaf * sigma * pow(T_a , 4.); //[W m^-2]
+  const double BB_soil = epsilon_soil * sigma * pow(T_a , 4.); //[W m^-2]
   // "Temperature equilibrium" net-radiation absorbed by the soil
-  R_eq_abs_soil = R_abs_soil - BB * (1. - cover);           //[W m^-2]
+  R_eq_abs_soil = R_abs_soil - BB_soil * (1. - cover);           //[W m^-2]
 
   
   if (has_LAI && has_light) // canopy and soil during daytime
     {
       // Radiation "conductivity"
-      G_R_sun = 4. * epsilon * sigma * pow(T_a, 3.) * cover 
+      G_R_sun = 4. * epsilon_leaf * sigma * pow(T_a, 3.) * cover 
         * sun_LAI_fraction_total; //[W m^-2 K^-1]
-      G_R_shadow = 4. * epsilon * sigma * pow(T_a, 3.) * cover
+      G_R_shadow = 4. * epsilon_leaf * sigma * pow(T_a, 3.) * cover
         * (1. - sun_LAI_fraction_total); //[W m^-2 K^-1]
       
       // Equilibrium net-radiation absorbed by the sunlit leaves
-      R_eq_abs_sun = R_abs_sun - BB * cover * sun_LAI_fraction_total; //[W m^-2]
+      R_eq_abs_sun = R_abs_sun - BB_leaf * cover * sun_LAI_fraction_total; //[W m^-2]
       // Equilibrium net-radiation absorbed by the shadow leaves
-      R_eq_abs_shadow = R_abs_shadow - BB * cover * (1.- sun_LAI_fraction_total);
+      R_eq_abs_shadow = R_abs_shadow - BB_leaf * cover * (1.- sun_LAI_fraction_total);
                         //[W m^-2]
    
       // Sensible heat "conductance" between soil and canopy point
@@ -745,10 +746,10 @@ SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil,
   else if (has_LAI && !has_light) // canopy and soil during night time
     {
       // Radiation "conductivity"
-      G_R_leaf = 4. * epsilon * sigma * pow(T_a, 3.) * cover; //[W m^-2 K^-1]
+      G_R_leaf = 4. * epsilon_leaf * sigma * pow(T_a, 3.) * cover; //[W m^-2 K^-1]
 
       // Equilibrium net-radiation absorbed by the leaves
-      R_eq_abs_shadow = R_abs_shadow + R_abs_sun  - BB * cover; //[W m^-2]
+      R_eq_abs_shadow = R_abs_shadow + R_abs_sun  - BB_leaf * cover; //[W m^-2]
    
       // Sensible heat "conductance" between soil and canopy point
       G_H_s_c =  c_p * rho_a * g_H_s_c; //*(1.- cover);       //[W m^-2 K^-1] 
@@ -979,6 +980,8 @@ SVAT_SSOC::SVAT_SSOC (const BlockModel& al)
   : SVAT (al), 
     hypostomatous (al.flag ("hypostomatous")),
     z_0b (al.number ("z_0b")),
+    epsilon_soil (al.number ("epsilon_soil")),
+    epsilon_leaf (al.number ("epsilon_leaf")),
     Ptot (-42.42e42),
     T_a (-42.42e42),
     z_r (-42.42e42),
@@ -1074,6 +1077,12 @@ Largest number of iterations before giving up on convergence.");
     frame.declare ("z_0b", "m", Attribute::Const, "\
 Bare soil roughness height for momentum.");
     frame.set ("z_0b", Resistance::default_z_0b);
+    frame.declare_fraction ("epsilon_leaf", Attribute::Const, "\
+Leaf emmisivity for long wave radiation.");
+    frame.set ("epsilon_leaf", 0.98);
+    frame.declare_fraction ("epsilon_soil", Attribute::Const, "\
+Soil emmisivity for long wave radiation.");
+    frame.set ("epsilon_soil", 0.95);
 
     // For log.
     frame.declare ("lambda", "J/kg", Attribute::LogOnly, "Latent heat of vaporization in atmosphere.");

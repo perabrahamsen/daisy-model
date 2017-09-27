@@ -310,10 +310,9 @@ RootSystem::tick_daily (const Geometry& geo, const Soil& soil,
         = geo.content_height (soil, &Soil::Theta_sat, -Depth);
       daisy_assert (Theta_sat > 0.0);
       daisy_assert (Theta_sat <= 1.0);
-      daisy_assert (Theta <= Theta_sat);
       const double water = Theta/Theta_sat;
       daisy_assert (water >= 0.0);
-      daisy_assert (water <= 1.0);
+      daisy_assert (water <= 1.01);
       double water_fac = PenWaterFac (water);
       double dp = PenPar1 * clay_fac * water_fac 
         * std::max (0.0, soil_temperature - PenPar2);

@@ -1,3 +1,19 @@
+2017-09-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* svat_ssoc.C (epsilon_soil, epsilon_leaf): New parameters,
+	replace 'epsilon' constant.
+
+2017-09-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* bioclimate_std.C (canopy_leak_rate): Fix rate to be base on
+	storage at end of timestep. -1 if there is no water at the end of the
+	timetep.
+	* chemical_std.C (tick_top): Update caller.
+
+2017-08-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* phenology_std.C (DS1_name): Use parameter value, not parameter name.
+
 2017-06-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* horizon.C: (quartz): New parameter.

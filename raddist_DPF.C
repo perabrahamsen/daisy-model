@@ -178,7 +178,10 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
     // Tau_d can only be large if LAI is small.
     kd = 1.0;
   else
-    kd = -log(Tau_d)/LAI; //note: log == ln i C++
+    {
+      daisy_assert (Tau_d > 0.0);
+      kd = -log(Tau_d)/LAI; //note: log == ln i C++
+    }
   daisy_assert (kd >= 0.0);
 
   // ------------------------------------------------

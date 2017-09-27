@@ -276,7 +276,7 @@ void VegetationCrops::ForcedLAI::load_syntax (Frame& frame)
 {
   frame.declare_integer ("year", Attribute::Const, "\
 Year for which to use forced LAI.");
-  frame.declare ("LAIvsDAY", "m^2/m^2", "yday", Attribute::OptionalConst, 
+  frame.declare ("LAIvsDAY", "m^2/m^2", "yday", Attribute::Const, 
 		"LAI as a function of Julian day.\n\
 \n\
 The simulated LAI will be used before the first day you specify and\n\

@@ -352,14 +352,20 @@ struct BioclimateStandard : public Bioclimate
   }
   double canopy_leak_rate (const double dt) const
   {
-    if (canopy_water_out < 1e-8)
+    const double epsilon_storage = 1e-8; // [mm]
+    const double epsilon_out = 1e-8 / dt; // [mm/h]
+
+    if (canopy_water_out < epsilon_out)
       return 0.0;
-    if (canopy_water_storage < 0.01 * canopy_water_out * dt)
-      return 1.0 / dt;
-    const double canopy_water_old
-      = canopy_water_storage + canopy_water_out * dt;
-    
-    return canopy_water_out / canopy_water_old;
+
+    if (canopy_water_storage < epsilon_storage)
+      return -1.0;
+
+    // Should be storage at "end of timestep" because of the way the
+    // rate is used.
+    const double clr = canopy_water_out / canopy_water_storage;
+    daisy_assert (clr > 0.0);
+    return clr;
   }
   double canopy_leak () const                     // [mm/h]
   { return canopy_water_out; }

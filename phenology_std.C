@@ -125,7 +125,7 @@ PhenologyStandard::PhenologyStandard (const BlockModel& al)
     DSRepeat (al.number ("DSRepeat")),
     DSSetBack (al.number ("DSSetBack")),
     defined_until_ds (al.number ("defined_until_ds")),
-    DS1_name ("DS1_name")
+    DS1_name (al.name ("DS1_name"))
 { }
 
 static struct PhenologyStandardSyntax : public DeclareModel

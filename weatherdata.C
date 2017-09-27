@@ -235,7 +235,7 @@ Reference evapotranspiration.", "mm/h", -10, 20);
       (*this)["RelHum"] = DDT ("Relative humidity.", "fraction", 0, 5000);
       (*this)["Wind"] = DDT ("Wind speed.", "m/s", 0, 40);
       (*this)["CO2"] = DDT ("Atmospheric CO2 level.", Attribute::Fraction (),
-                            100, 2000);
+                            100e-6, 2000e-6);
       (*this)["Latitude"] = DDT ("\
 Location of station (north-south).", "dgNorth", -90, 90);
       (*this)["Longitude"] = DDT ("\
