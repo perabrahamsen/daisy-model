@@ -40,6 +40,8 @@
 #include "frame.h"
 #include "weather.h"
 #include "iterative.h"
+#include "plf.h"
+#include "soil_water.h"
 #include <memory>
 #include <sstream>
 
@@ -53,6 +55,7 @@ struct SVAT_SSOC : public SVAT
   const bool hypostomatous;    // True for hypostomatous leaves;
   const double z_0b;     //Bare soil roughness height for momentum [m]
   const double epsilon_soil;   // Soil emmisivity long wave rad. []
+  const PLF epsilon_soil_SWE;  // Effect of soil water on emmisivity [pF] -> []
   const double epsilon_leaf;   // Leaf emmisivity long wave rad. []
 
   // Driving variables.
@@ -585,7 +588,10 @@ SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil,
   // Intermediates variable ------------------------------
 
   // Radiation "conductivity"
-  G_R_soil = 4. * epsilon_soil * sigma * pow(T_a, 3.) * (1. - cover); //[W m^-2 K^-1]
+  const double pF 
+    = h2pF (geo.content_hood (soil_water, &SoilWater::h, Geometry::cell_above));
+  const double eps_soil = epsilon_soil * epsilon_soil_SWE (pF);
+  G_R_soil = 4. * eps_soil * sigma * pow(T_a, 3.) * (1. - cover); //[W m^-2 K^-1]
  
   // Sensible heat "conductance" from soil to atmosphere
   G_H_a = c_p * rho_a * g_a;            //[W m^-2 K^-1] 
@@ -594,7 +600,7 @@ SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil,
 
   // Black-body emmission:
   const double BB_leaf = epsilon_leaf * sigma * pow(T_a , 4.); //[W m^-2]
-  const double BB_soil = epsilon_soil * sigma * pow(T_a , 4.); //[W m^-2]
+  const double BB_soil = eps_soil * sigma * pow(T_a , 4.); //[W m^-2]
   // "Temperature equilibrium" net-radiation absorbed by the soil
   R_eq_abs_soil = R_abs_soil - BB_soil * (1. - cover);           //[W m^-2]
 
@@ -981,6 +987,7 @@ SVAT_SSOC::SVAT_SSOC (const BlockModel& al)
     hypostomatous (al.flag ("hypostomatous")),
     z_0b (al.number ("z_0b")),
     epsilon_soil (al.number ("epsilon_soil")),
+    epsilon_soil_SWE (al.plf ("epsilon_soil_SWE")),
     epsilon_leaf (al.number ("epsilon_leaf")),
     Ptot (-42.42e42),
     T_a (-42.42e42),
@@ -1083,6 +1090,10 @@ Leaf emmisivity for long wave radiation.");
     frame.declare_fraction ("epsilon_soil", Attribute::Const, "\
 Soil emmisivity for long wave radiation.");
     frame.set ("epsilon_soil", 0.95);
+    frame.declare ("epsilon_soil_SWE",
+		   "pF", Attribute::None (), Attribute::Const, "\
+Effect of soil water on epsilon_soil.");
+    frame.set ("epsilon_soil_SWE", PLF::always_1 ());
 
     // For log.
     frame.declare ("lambda", "J/kg", Attribute::LogOnly, "Latent heat of vaporization in atmosphere.");

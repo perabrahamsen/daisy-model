@@ -1,3 +1,9 @@
+2017-09-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* rubiscoN.C: New component.
+	* Makefile (COMPONENTS): Add it.
+	* crop_std.C (RubiscoN): Add parameter.
+
 2017-09-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* svat_ssoc.C (epsilon_soil, epsilon_leaf): New parameters,

@@ -52,7 +52,7 @@ public:
 		     std::vector <double>& total_NIR,
                      double global_radiation, double diffuse_radiation, 
                      double min_sin_beta, double sin_beta,
-                     const Vegetation&, 
+                     const Vegetation&, const double pF, 
 		     Treelog&) = 0;
 
 

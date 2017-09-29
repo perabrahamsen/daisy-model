@@ -29,7 +29,7 @@
 #include "librarian.h"
 #include "log.h"
 #include "frame.h"
-
+#include "plf.h"
 #include <sstream>
 
 struct RaddistDPF : public Raddist
@@ -40,6 +40,8 @@ private:
   const double sigma_NIR;//  Leaf scattering coefficient of NIR []
   const double Ps_PAR;  // Soil reflection coefficient of PAR []
   const double Ps_NIR;  // Soil reflection coefficient of NIR []
+  const PLF Ps_PAR_SWE;	// Soil water effect on PAR, [pF] -> []
+  const PLF Ps_NIR_SWE;	// Soil water effect on PAR, [pF] -> []
 
 public:
   // Log variables
@@ -67,7 +69,7 @@ public:
              std::vector <double>& sun_NIR, std::vector <double>& total_NIR, 
              const double global_radiation, const double diffuse_radiation, 
              const double min_sin_beta, const double sin_beta,
-             const Vegetation&, Treelog&);
+             const Vegetation&, const double pF, Treelog&);
 
   void output(Log& log) const;
 
@@ -78,6 +80,8 @@ public:
       sigma_NIR (al.number ("sigma_NIR")),
       Ps_PAR (al.number ("Ps_PAR")),
       Ps_NIR (al.number ("Ps_NIR")),
+      Ps_PAR_SWE (al.plf ("Ps_PAR_SWE")),
+      Ps_NIR_SWE (al.plf ("Ps_NIR_SWE")),
       IRb0(-42.42e42),
       IRd0(-42.42e42),
       Ph_PAR(-42.42e42),
@@ -101,6 +105,7 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
                        const double min_sin_beta,
                        const double sin_beta,
 		       const Vegetation& vegetation,
+		       const double pF,
 		       Treelog&)
 {
   daisy_assert (std::isfinite (diffuse_radiation));
@@ -201,9 +206,11 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
   Pcb_PAR = 1. - exp((-2. * Ph_PAR * kb) / (1. + kb));
   daisy_assert (Pcb_PAR >= 0.0);
 
+  // Include effect of soil water.
+  const double Ps_PAR1 = Ps_PAR * Ps_PAR_SWE (pF);
   // Canopy-soil reflection coefficeint of beam irradiance for 
   // uniform leaf-angel distribution, Pscb
-  const double aa_PAR = (Pcb_PAR - Ps_PAR)/(Pcb_PAR * Ps_PAR - 1.);
+  const double aa_PAR = (Pcb_PAR - Ps_PAR1)/(Pcb_PAR * Ps_PAR1 - 1.);
   const double bb_PAR = exp(-2. * sqrt(1.0-sigma_PAR) * kb * LAI);
   Pscb_PAR = (Pcb_PAR + aa_PAR * bb_PAR)/(1. + Pcb_PAR * aa_PAR * bb_PAR);
   daisy_assert (Pscb_PAR >= 0.0);
@@ -273,9 +280,13 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
   Pcb_NIR = 1. - exp((-2. * Ph_NIR * kb) / (1. + kb));
   daisy_assert (Pcb_NIR >= 0.0);
 
+  // Include effect of soil water.
+  const double Ps_NIR1 = Ps_NIR * Ps_NIR_SWE (pF);
+
   // Canopy-soil reflection coefficeint of beam irradiance for 
   // uniform leaf-angel distribution, Pscb
-  const double aa_NIR = (Pcb_NIR - Ps_NIR)/(Pcb_NIR * Ps_NIR - 1.);
+  const double aa_NIR = (Pcb_NIR - Ps_NIR1)/(Pcb_NIR * Ps_NIR1 - 1.);
+  
   const double bb_NIR = exp(-2. * sqrt(1.0-sigma_NIR) * kb * LAI);
   Pscb_NIR = (Pcb_NIR + aa_NIR * bb_NIR)/(1. + Pcb_NIR * aa_NIR * bb_NIR);
   daisy_assert (Pscb_NIR >= 0.0);
@@ -384,6 +395,12 @@ static struct RaddistDPFSyntax : public DeclareModel
     frame.declare ("Ps_NIR", Attribute::None (), Check::positive (), Attribute::Const,
                 "Soil reflection coefficient of NIR, Ps_NIR = 0.18 (Houborg, 2006)");
     frame.set ("Ps_NIR", 0.18);
+    frame.declare ("Ps_PAR_SWE", "pF", Attribute::None (), Attribute::Const, "\
+Effect of soil water on Ps_PAR.");
+    frame.set ("Ps_PAR_SWE", PLF::always_1 ());
+    frame.declare ("Ps_NIR_SWE", "pF", Attribute::None (), Attribute::Const, "\
+Effect of soil water on Ps_BIR.");
+    frame.set ("Ps_NIR_SWE", PLF::always_1 ());
  
     frame.declare ("IRb0", "W m^-2", Attribute::LogOnly, "Beam radiation above the canopy");
     frame.declare ("IRd0", "W m^-2", Attribute::LogOnly,

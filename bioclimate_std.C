@@ -49,6 +49,7 @@
 #include "treelog_store.h"
 #include "resistance.h"
 #include "im.h"
+#include "soil_water.h"
 #include <sstream>
 
 struct BioclimateStandard : public Bioclimate
@@ -158,7 +159,7 @@ struct BioclimateStandard : public Bioclimate
   double albedo;                  // Reflection factor []
   const std::unique_ptr<Raddist> raddist;// Radiation distribution model.
   const double min_sin_beta_;     // Sinus to lowest sun angle for some models.
-  void RadiationDistribution (const Vegetation&, double sin_beta, Treelog&);
+  void RadiationDistribution (const Vegetation&, double pF, double sin_beta, Treelog&);
   std::unique_ptr<Difrad> difrad;  // Diffuse radiation model.
   double difrad0;                // Diffuse radiation above canopy [W/m2]
 
@@ -649,14 +650,14 @@ BioclimateStandard::find_albedo (const Vegetation& crops, const Litter& litter,
 }
 
 void 
-BioclimateStandard::RadiationDistribution (const Vegetation& vegetation, 
+BioclimateStandard::RadiationDistribution (const Vegetation& vegetation, const double pF,
                                            const double sin_beta_, Treelog& msg)
 {
   TREELOG_MODEL (msg);
 
   raddist->tick(sun_LAI_fraction_, sun_PAR_, total_PAR_, sun_NIR_, total_NIR_,
                 global_radiation (), difrad0, min_sin_beta_, sin_beta_, 
-                vegetation, msg);
+                vegetation, pF, msg);
 
   //Absorbed PAR in the canopy and the soil:
   incoming_PAR_radiation = total_PAR_[0]; // [W/m2]
@@ -1195,9 +1196,12 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   difrad0 = difrad->value (time, weather, msg) * global_radiation_;
   //daisy_assert (difrad0 >= 0.0);
 
+  const double pF 
+    = h2pF (geo.content_hood (soil_water, &SoilWater::h, Geometry::cell_above));
+
   sin_beta_ = weather.sin_solar_elevation_angle (time);
   // Calculate total canopy, divide it into intervals, and distribute PAR.
-  RadiationDistribution (vegetation, sin_beta_, msg);
+  RadiationDistribution (vegetation, pF, sin_beta_, msg);
 
   // Distribute water among canopy, snow, and soil.
   WaterDistribution (units, time, surface, weather, vegetation, litter,

@@ -6,6 +6,26 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.42
+
+** New Ps_PAR_SWE and Ps_NIR_SWE attributes in sun-shade raddist.
+
+
+** svat SSOC epsilon split into epsilon_soil and epsilon_leaf.
+
+default value for soil is 0.95, down from 0.98.
+
+** svat SSOC epsilon_soil_SWE.
+
+These allows soil water to affect the value. Is is a PLF of pF.
+Default value is 1 (no effect).
+
+** Fix bug in canopy washoff.
+
+** New 'RubiscoN' component.
+
+For calculating amount of rubisco N in leaves.
+
 * 5.40
 
 ** You can now specify the quartz fraction directly.

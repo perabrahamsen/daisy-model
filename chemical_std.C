@@ -960,10 +960,12 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
     {
       // Special case: No water left on canopy, yet there is overflow.
       // Wash it all off.
-      TREELOG_MODEL (msg);
-      msg.message ("Evacuating canopy");
-
-      canopy_washoff = canopy_storage / dt;
+      if (canopy_storage > 1e-1)
+	{
+	  TREELOG_MODEL (msg);
+	  msg.message ("Evacuating canopy");
+	}
+      canopy_washoff = old_canopy_storage / dt + canopy_absolute_input_rate;
       canopy_dissipate = 0.0;
       canopy_storage = 0.0;
     }
