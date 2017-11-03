@@ -1169,6 +1169,12 @@ to reference height (screen height).");
 
     frame.declare ("G_R_soil", "W/m^2/K", Attribute::LogOnly, 
 		   "Radiation 'conductivity' from the soil.");
+    frame.declare ("G_R_sun", "W/m^2/K", Attribute::LogOnly, 
+		   "Radiation 'conductivity' from sunlit leaves.");
+    frame.declare ("G_R_shadow", "W/m^2/K", Attribute::LogOnly, 
+		   "Radiation 'conductivity' from shadow leaves.");
+    frame.declare ("G_R_leaf", "W/m^2/K", Attribute::LogOnly, 
+		   "Radiation 'conductivity' from the leaves at night.");
     frame.declare ("G_H_a", "W/m^2/K", Attribute::LogOnly, 
 		   "Heat 'conductivity' from soil to free atmosphere.");
     frame.declare ("k_h", "W/m/K", Attribute::LogOnly,
