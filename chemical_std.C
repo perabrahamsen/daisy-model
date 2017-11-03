@@ -51,6 +51,7 @@ struct ChemicalStandard : public Chemical
   static const symbol g_per_cm3;
 
   // Parameters.
+  const double molar_mass_;
   const double solubility;
   const double solubility_infiltration_factor;
   const double crop_uptake_reflection_factor;
@@ -170,6 +171,9 @@ struct ChemicalStandard : public Chemical
   // Solute.
   const Adsorption& adsorption () const;
   double diffusion_coefficient () const;
+
+  double molar_mass () const
+  { return molar_mass_; }
 
   // Surface content.
   double surface_release_fraction () const; // []
@@ -292,7 +296,10 @@ void
 ChemicalStandard::Product::load_syntax (Frame& frame)
 {
   frame.declare ("fraction", Attribute::Fraction (), Attribute::Const,
-                 "Fraction of decomposed matter that become this chemcial.");
+                 "Fraction of decomposed matter that become this chemcial.\n\
+\n\
+If both chemicals have molar_mass specified, the fraction will be mole\n\
+based, otherwise it will be mass based.");
   frame.declare_string ("chemical", Attribute::Const, 
                  "Chemical product of decomposed matter.");
   frame.order ("fraction", "chemical");
@@ -1435,12 +1442,17 @@ ChemicalStandard::decompose (const Geometry& geo,
         {
           Chemical& chemical = chemistry.find (name);
           const double fraction = product[i]->fraction;
+	  const double factor = fraction *
+	    ((molar_mass () > 0.0 && chemical.molar_mass () > 0.0)
+	     ? chemical.molar_mass () / molar_mass ()
+	     : 1.0);
+
           std::vector<double> created_primary = decomposed_primary;
           std::vector<double> created_secondary = decomposed_secondary;
           for (size_t c = 0; c < cell_size; c++)
             {
-              created_primary[c] *= fraction;
-              created_secondary[c] *= fraction;
+              created_primary[c] *= factor;
+              created_secondary[c] *= factor;
             }
           chemical.add_to_transform_source (created_primary);
           chemical.add_to_transform_source_secondary (created_secondary);
@@ -1566,6 +1578,8 @@ ChemicalStandard::check (const Units& units, const Scope& scope,
                          const Chemistry& chemistry,
                          Treelog& msg) const
 {
+  TREELOG_MODEL (msg);
+
   const size_t cell_size = geo.cell_size ();
 
   // Warn against untraced chemicals.
@@ -1575,9 +1589,21 @@ ChemicalStandard::check (const Units& units, const Scope& scope,
     for (size_t i = 0; i < product.size (); i++)
       {
         const symbol chemical = product[i]->chemical;
+	Treelog::Open nest (msg, chemical);
         if (!chemistry.know (chemical) && !chemistry.ignored (chemical))
-          msg.warning ("Decompose product '" + chemical.name () 
-                       + "' will not be traced");
+          msg.warning ("Decompose product will not be traced");
+	else
+	  {
+	    const Chemical& product = chemistry.find (chemical);
+	    
+	    if (molar_mass () < 0.0 && product.molar_mass () < 0.0)
+	      msg.debug ("Decompose product convertion will be mass based");
+	    else if (molar_mass () > 0.0 && product.molar_mass () > 0.0)
+	      msg.debug ("Decompose product convertion will be mole based");
+	    else
+	      msg.warning ("Decompose product convertion will be mass based, because molar mass is only specified for one of the chemicals");
+	    
+	  }
       }
 
   bool ok = true;
@@ -1874,6 +1900,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
 
 ChemicalStandard::ChemicalStandard (const BlockModel& al)
   : Chemical (al),
+    molar_mass_ (al.number ("molar_mass", -1.0)),
     solubility (al.number ("solubility")),
     solubility_infiltration_factor
     /**/ (al.number ("solubility_infiltration_factor")),
@@ -2118,6 +2145,9 @@ Only for initialization of the 'M' parameter."); }
     Model::load_model (frame);
 
     // Surface parameters.
+    frame.declare ("molar_mass", "g/mol",
+		   Check::non_negative (), Attribute::OptionalConst, "\
+Molar mass of the chemical.");
     frame.declare ("solubility", "g/cm^3", 
                    Check::non_negative (), Attribute::Const, "\
 Maximal concentration in water at 20 dg C.");

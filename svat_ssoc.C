@@ -143,7 +143,7 @@ struct SVAT_SSOC : public SVAT
   double G_R_soil;  // Radiation "conductivity" from the soil [W m^-2 K^-1]
   double G_R_sun;   // Radiation "conductivity" from sun leaves [W m^-2 K^-1]
   double G_R_shadow;// Radiation "conductivity" from shadow leaves [W m^-2 K^-1]
-  double G_R_leaf;// Radiation "conductivity" from shadow leaves [W m^-2 K^-1]
+  double G_R_leaf;// Radiation "conductivity" from leaves at night [W m^-2 K^-1]
   double G_H_a;     // Heat "conductivity" from soil to free atmosphere [W m^-2 K^-1]
   double G_W_a;     // Water "conductivity" from soil to free atmosphere [m s^-1]
   double G_H_s_c;   // Heat "conductance" from soil to canopy point [W m^-2 K^-1]
@@ -962,7 +962,12 @@ SVAT_SSOC::output(Log& log) const
           output_variable (g_H_shadow_c, log);
           output_variable (gb_W_shadow, log);
           output_variable (g_W_shadow_c, log);      
+	  output_variable (G_R_sun, log);
+	  output_variable (G_R_shadow, log);
         }
+      else
+	output_variable (G_R_leaf, log);
+
       output_variable (R_abs_sun, log);
       output_variable (R_abs_shadow, log);
       if (has_light)

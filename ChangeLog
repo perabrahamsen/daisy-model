@@ -1,3 +1,27 @@
+2017-11-03  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.43 released.
+
+2017-11-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* raddist_DPF.C (tick): Warn if we have significant global
+	radiation at night.
+
+2017-10-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* photo_Farquhar.C (PhotoFarquhar::PhotoFarquhar): Clear log
+	variables.
+
+2017-10-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* soil_water.C (output, tick_after): table_low and table_high can be 0.
+
+2017-10-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C, chemical.h (molar_mass): New parameter and
+	function.
+	(decompose, check): Use it.
+
 2017-09-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* rubiscoN.C: New component.

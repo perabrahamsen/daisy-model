@@ -103,11 +103,12 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
                        const double global_radiation, 
 		       const double diffuse_radiation,
                        const double min_sin_beta,
-                       const double sin_beta,
+                       double sin_beta,
 		       const Vegetation& vegetation,
 		       const double pF,
-		       Treelog&)
+		       Treelog& msg)
 {
+  TREELOG_MODEL (msg);
   daisy_assert (std::isfinite (diffuse_radiation));
   daisy_assert (std::isfinite (global_radiation));
   const size_t No = fraction_sun_LAI.size ();
@@ -117,12 +118,22 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
   if (sin_beta < min_sin_beta)
     // Ingen SUNLIT
     {
-      std::fill(fraction_sun_LAI.begin (), fraction_sun_LAI.end (), 0.0);
-      std::fill( sun_PAR.begin (), sun_PAR.end (), 0.0);      
-      std::fill( total_PAR.begin (), total_PAR.end (), 0.0);
-      std::fill( sun_NIR.begin (), sun_NIR.end (), 0.0);
-      std::fill( total_NIR.begin (), total_NIR.end (), 0.0);
-      return;
+      if (global_radiation < 5.0)
+	{
+	  std::fill(fraction_sun_LAI.begin (), fraction_sun_LAI.end (), 0.0);
+	  std::fill( sun_PAR.begin (), sun_PAR.end (), 0.0);      
+	  std::fill( total_PAR.begin (), total_PAR.end (), 0.0);
+	  std::fill( sun_NIR.begin (), sun_NIR.end (), 0.0);
+	  std::fill( total_NIR.begin (), total_NIR.end (), 0.0);
+	  return;
+	}
+      if (global_radiation > 25)
+	{
+	  std::ostringstream tmp;
+	  tmp << "Global radiation is " << global_radiation << " W/m^2 while sun is near or below the horizon;  sun angle = " << (std::asin (sin_beta) * 180.0 / M_PI) << " dg, which is less than " << (std::asin (min_sin_beta) * 180.0 / M_PI) << " dg; Pretenting sun angle is " << (std::asin (min_sin_beta) * 180.0 / M_PI);
+	  msg.warning (tmp.str ());
+	}
+      sin_beta = min_sin_beta;
     }
 
   const double LAI = vegetation.LAI ();

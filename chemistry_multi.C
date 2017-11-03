@@ -51,6 +51,7 @@ struct ChemistryMulti : public Chemistry
   bool know (symbol chem) const;
   bool ignored (symbol chem) const;
   Chemical& find (symbol chem);
+  const Chemical& find (symbol chem) const;
   const std::vector<Chemical*>& all () const;
   void sorption_table (const Soil& soil, const size_t cell, 
                        const double Theta, const double start,
@@ -149,6 +150,16 @@ ChemistryMulti::know (const symbol chem) const
 
 Chemical& 
 ChemistryMulti::find (symbol chem)
+{
+  for (size_t c = 0; c < chemicals.size (); c++)
+    if (chemicals[c]->objid == chem)
+      return *chemicals[c];
+
+  daisy_notreached ();
+}
+
+const Chemical& 
+ChemistryMulti::find (symbol chem) const
 {
   for (size_t c = 0; c < chemicals.size (); c++)
     if (chemicals[c]->objid == chem)

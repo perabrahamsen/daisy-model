@@ -199,7 +199,7 @@ Specify 'Any' to use all present weather data.");
       daisy_assert (!frame.is_log (key));
       daisy_assert (frame.type_size (key) == Attribute::Variable);
       const std::vector<symbol>& names = frame.name_sequence (key);
-      if (names.size () == 1 && names[0] == Any ())
+      if (names.size () == 1 && names[0] == WSourceCombine::Any ())
         return true;
       static const Frame& keywords 
         = *Librarian::submodel_frame (Weatherdata::load_syntax);

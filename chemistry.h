@@ -56,6 +56,7 @@ public:
   virtual bool know (symbol chem) const = 0;
   virtual bool ignored (symbol chem) const = 0;
   virtual Chemical& find (symbol chem) = 0;
+  virtual const Chemical& find (symbol chem) const = 0;
   virtual const std::vector<Chemical*>& all () const = 0;
 
   // Table.

@@ -8,6 +8,12 @@ release.
 
 * 5.42
 
+** New 'molar_mass' chemical parameter.
+
+This affects metabolites. If both the parent compound and the
+metabolite have molar_mass specified, the generated fraction is
+assumed to be mole based instead of weight based.
+
 ** New Ps_PAR_SWE and Ps_NIR_SWE parameters in sun-shade raddist.
 ** New svat SSOC epsilon_soil_SWE parameter.
 

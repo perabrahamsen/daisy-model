@@ -1,12 +1,33 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Mac version til Malte og Kasper
+* Fredag
 
-* DONE Bestil 24" monitor
+** Nye G_sun G_shadow log til Kasper
 
-* Malte adgang I: drev
+** Skriv noget om pesticid status
 
-* Tidsplan / Status seminar
+
+* Pesticid
+
+** DONE Switch to N2014 variants
+
+** Make SB setup
+
+** Do we need a "clear_chemical" operation?
+
+Maybe an instant compound -> compound_old transform?
+
+** Figure out washoff coefficient / FOCUS
+
+Document them
+
+** Figure out other FOCUS parameters
+
+* MST møde
+
+* SVAT
+
+Plot Ass og Ass / LAI mod Temp og Lys
 
 * Pestcast 
 

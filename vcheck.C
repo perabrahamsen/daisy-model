@@ -1067,4 +1067,47 @@ VCheck::All::All (const VCheck& a, const VCheck& b, const VCheck& c,
   checks.push_back (&e);
 }
 
+bool
+VCheck::Any::verify (const Metalib& metalib, const Frame& frame, const symbol key,
+                     Treelog& msg) const
+{
+  for (int i = 0; i < checks.size (); i++)
+    if (checks[i]->verify (metalib, frame, key, Treelog::null ()))
+      return true;
+  msg.error ("no criteria fulfilled");
+  return false;
+}
+
+VCheck::Any::Any (const VCheck& a, const VCheck& b)
+{
+  checks.push_back (&a);
+  checks.push_back (&b);
+}
+
+VCheck::Any::Any (const VCheck& a, const VCheck& b, const VCheck& c)
+{
+  checks.push_back (&a);
+  checks.push_back (&b);
+  checks.push_back (&c);
+}
+
+VCheck::Any::Any (const VCheck& a, const VCheck& b, const VCheck& c, 
+		  const VCheck& d)
+{
+  checks.push_back (&a);
+  checks.push_back (&b);
+  checks.push_back (&c);
+  checks.push_back (&d);
+}
+
+VCheck::Any::Any (const VCheck& a, const VCheck& b, const VCheck& c,
+		  const VCheck& d, const VCheck& e)
+{
+  checks.push_back (&a);
+  checks.push_back (&b);
+  checks.push_back (&c);
+  checks.push_back (&d);
+  checks.push_back (&e);
+}
+
 // vcheck.C ends here.

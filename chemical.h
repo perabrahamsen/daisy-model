@@ -72,6 +72,8 @@ public:
   virtual const Adsorption& adsorption () const = 0;
   virtual double diffusion_coefficient () const = 0; // [cm^2/h] in free solute
 
+  virtual double molar_mass () const = 0; // [g/mol], negative = unknown
+
   // Surface content.
   virtual double surface_release_fraction () const = 0; // []
   virtual double surface_storage_amount () const = 0;  // [g/cm^2]

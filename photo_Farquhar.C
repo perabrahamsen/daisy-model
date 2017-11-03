@@ -47,7 +47,9 @@ PhotoFarquhar::PhotoFarquhar (const BlockModel& al)
     Ea_Gamma (al.number ("Ea_Gamma")),
     rubiscoNdist (Librarian::build_item<RubiscoNdist> (al, "N-dist")),
     Stomatacon (Librarian::build_item<StomataCon> (al, "Stomatacon"))
-{ }
+{ 
+  clear ();
+}
 
 PhotoFarquhar::~PhotoFarquhar ()
 { }

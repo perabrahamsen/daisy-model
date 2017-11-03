@@ -7,9 +7,6 @@
 (input file "crop.dai")
 (input file "log.dai")
 
-;; Weather data.
-(weather default "dk-taastrup.dwf")
-
 ;; We have some very sandy soil.
 (defhorizon Ap FAO3
   "Andeby top soil."
@@ -36,43 +33,54 @@
                        (end -20 [cm])))
   (Groundwater deep))
 
+;; Combine it.
+(defprogram AndebyFarm Daisy
+
+  ;; Field to use.
+  (column Andeby)
+
+  ;; Weather data.
+  (weather default "dk-taastrup.dwf")
+
+
+  ;; Simulation start and stop dates.
+  (time 1986 12 1 1)
+  (stop 1988 4 1 1)
+
+  ;; Management activities.
+  (manager activity
+    (wait (at 1987 3 20 1))
+    (plowing)
+    (wait (at 1987 4 4 1))
+    (fertilize (mineral (weight 100.0 [kg N/ha])
+			(NH4_fraction 0.5 [])))
+    (wait (at 1987 4 5 1))
+    (progn
+      (sow "Grass")
+      (sow "Spring Barley"))
+    (wait (or (crop_ds_after "Spring Barley" 2.0)
+	      (at 1987 9 5 1)))
+    (harvest "Spring Barley")
+    (wait (at 1987 9 8 1))
+    (fertilize (mineral (weight 80.0 [kg N/ha])
+			(NH4_fraction 0.5 [])))
+    (wait (at 1987 10 10 1))
+    (cut "Grass"
+	 (stub 8.0 [cm])              ;Leave 8 cm stub.
+	 (stem 1.00 [])))             ;Harvest everything above stub.
+
+  ;; Create these log files.
+  (output harvest
+	  ("Field nitrogen" (when monthly))
+	  ("Soil nitrogen" (when daily) (from 0 [m]) (to -1 [m]))
+	  ("Field water" (when monthly))
+	  ("Soil water" (when daily) (from 0 [m]) (to -1 [m]))
+	  ("Crop Production"
+	   (crop "Spring Barley")
+	   (where "sbarley.dlf"))
+	  (checkpoint (when (at 1987 8 7 6)))))
+
 ;; Use it.
-(column Andeby)
-
-;; Simulation start and stop dates.
-(time 1986 12 1 1)
-(stop 1988 4 1 1)
-
-(manager activity
-  (wait (at 1987 3 20 1))
-  (plowing)
-  (wait (at 1987 4 4 1))
-  (fertilize (mineral (weight 100.0 [kg N/ha])
-                      (NH4_fraction 0.5 [])))
-  (wait (at 1987 4 5 1))
-  (progn
-    (sow "Grass")
-    (sow "Spring Barley"))
-  (wait (or (crop_ds_after "Spring Barley" 2.0)
-            (at 1987 9 5 1)))
-  (harvest "Spring Barley")
-  (wait (at 1987 9 8 1))
-  (fertilize (mineral (weight 80.0 [kg N/ha])
-                      (NH4_fraction 0.5 [])))
-  (wait (at 1987 10 10 1))
-  (cut "Grass"
-       (stub 8.0 [cm])              ;Leave 8 cm stub.
-       (stem 1.00 [])))             ;Harvest everything above stub.
-
-;; Create these log files.
-(output harvest
-        ("Field nitrogen" (when monthly))
-        ("Soil nitrogen" (when daily) (from 0 [m]) (to -1 [m]))
-        ("Field water" (when monthly))
-        ("Soil water" (when daily) (from 0 [m]) (to -1 [m]))
-        ("Crop Production"
-         (crop "Spring Barley")
-         (where "sbarley.dlf"))
-        (checkpoint (when (at 1987 8 7 6))))
+(run AndebyFarm)
 
 ;;; test.dai ends here.

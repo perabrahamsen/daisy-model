@@ -1763,6 +1763,15 @@ sum of all chemicals will be logged."
           (number (path column "${column}" Bioclimate "*" svat SSOC G_R_soil)
                   (spec svat SSOC G_R_soil)
                   (handle current))
+          (number (path column "${column}" Bioclimate "*" svat SSOC G_R_sun)
+                  (spec svat SSOC G_R_sun)
+                  (handle current))
+          (number (path column "${column}" Bioclimate "*" svat SSOC G_R_shadow)
+                  (spec svat SSOC G_R_shadow)
+                  (handle current))
+          (number (path column "${column}" Bioclimate "*" svat SSOC G_R_leaf)
+                  (spec svat SSOC G_R_leaf)
+                  (handle current))
           (number (path column "${column}" Bioclimate "*" svat SSOC G_H_a)
                   (spec svat SSOC G_H_a)
                   (handle current))
@@ -3059,7 +3068,11 @@ parameter in the 'default' bioclimate model.  By default, 30."))
            (number (path column "${column}" Vegetation crops crops "${crop}"
                          "${fraction}" "*" gbw)
                    (spec photosynthesis Farquhar gbw)
-                   (handle current))))
+                   (handle current))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         "${fraction}" "*" Ass)
+                   (spec photosynthesis Farquhar Ass)
+                   (handle sum))))
 
 (deflog "Time" column
   "Keep track of time."
