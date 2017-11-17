@@ -408,6 +408,7 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
       T_s = T_a;
       T_sun = T_shadow = T_0 = T_c;
       e_c = e_a;
+      T_z0 = T_z0_initial;
     }
 
   if(has_LAI)
@@ -424,10 +425,6 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   else 
     initialized_canopy = false;
 
-  T_c = T_a; //[K]
-  T_sun = T_shadow = T_s = T_0 = T_c = T_a;
-  e_c = e_a;
-  T_z0 = T_z0_initial;
 
   gb_W_sun = gb_W_shadow = Resistance::molly2ms (T_a - TK, Ptot, 2.0);
 
@@ -915,10 +912,33 @@ SVAT_SSOC::solve (const double gs_shadow /* stomata cond. [m/s]*/,
   catch (const char *const error)
     {
       msg.warning (error);
-      initialized_soil = has_LAI = false; // Prevent log.
-      fix->set_value (fix->initial_guess ());
-      calculate_conductances (gs_shadow, gs_sunlit, msg);
-      is_stable = false;
+
+      Fixpoint::Value old_initial = fix->initial_guess ();
+
+      try 
+	{
+	  const double T_avg = 0.5 * (T_a + T_z0_initial);
+	  T_s = T_z0 = T_sun = T_shadow = T_c = T_avg ;
+	  e_c = e_a;
+	  fix->set_initial ();
+
+	  Fixpoint::Value solution = fix->solve (msg);
+
+	  // Restore old initial value for next SVAT iteration.
+	  fix->set_value (old_initial);
+	  fix->set_initial ();
+
+	  fix->set_value (solution);
+	  is_stable = true;
+	}
+      catch (const char *const error)
+	{
+	  initialized_soil = has_LAI = false; // Prevent log.
+	  fix->set_value (old_initial);
+	  fix->set_initial ();
+	  calculate_conductances (gs_shadow, gs_sunlit, msg);
+	  is_stable = false;
+	}
     }
   calculate_fluxes ();
 }

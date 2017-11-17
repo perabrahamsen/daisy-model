@@ -132,7 +132,7 @@ struct BioclimateStandard : public Bioclimate
   const double maxEdiff;                     // Max pressure diff [Pa]
   const std::unique_ptr<SVAT> svat;     // Soil Vegetation Atmosphere model.
   size_t svat_fail;             // Number of times the svat loop failed.
-  size_t svat_total;            // Total number of times the swat loop entered.
+  size_t svat_total;            // Total number of times the svat loop entered.
   double crop_ep_;              // Potential transpiration. [mm/h]
   double crop_ea_soil;          // Crop limited transpiration. [mm/h]
   double crop_ea_svat;          // SVAT limited transpiration. [mm/h]

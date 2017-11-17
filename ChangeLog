@@ -1,3 +1,8 @@
+2017-11-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* svat_ssoc.C (solve): Try with both previous values and air
+	temperature.
+
 2017-11-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.44 released.
