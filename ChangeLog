@@ -1,3 +1,9 @@
+2017-11-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* soilfac.C: New component.
+	* Makefile (COMPONENTS): Add it.
+	* chemical_std.C: Use it.
+
 2017-11-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* svat_ssoc.C (solve): Try with both previous values and air

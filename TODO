@@ -1,51 +1,36 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Nu 
-
-** Læge 
-
-** Hubert
-
-* Hubert
-
-** Administrative issues
-
-*** Fixed days for SC meetings
-
-*** Date for February workshop
-
-*** Date for June workshop
-
-*** Expectations for quarterly report
-
-** Status for project
-
-*** 
-
-** Decisions 
-
-*** Public PLAP data validation
-
-*** New strongly sorbing pesticide
-
-
 * Pesticid
-
-** DONE Switch to N2014 variants
 
 ** Make SB setup
 
-** Do we need a "clear_chemical" operation?
+** Implement "clear_chemical" operation.
 
-Maybe an instant compound -> compound_old transform?
+** Document changes to soil degradation of pesticides 
 
-** Figure out washoff coefficient / FOCUS
+*** heat
 
-Document them
+old and new curve
 
-** Figure out other FOCUS parameters
+*** depth 
 
-** Soil water
+unchanged
+
+*** water
+
+Based on Theta instead of h
+
+Plot curves for at least two soil.
+
+*** washoff
+
+Reimplemented in Daisy (more robust)
+
+Show two equations
+
+Argue for 1.5 mm intercept
+
+Plot curves for different LAI values (0.5 1.0, 3 = FOCUS, 5.0)
 
 * MST møde
 
