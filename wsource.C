@@ -37,6 +37,10 @@ WSource::library_id () const
   return id;
 }
 
+symbol 
+WSource::title () const
+{ return objid; }
+
 WSource::WSource (const symbol name)
   : ModelDerived (name)
 { }

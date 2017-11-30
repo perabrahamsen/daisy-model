@@ -127,6 +127,8 @@ struct BioporeDrain : public Biopore
   }
   void add_solute (symbol, size_t, const double)
   { }
+  void remove_solute (symbol)
+  { }
   void matrix_solute (const Geometry&, const double, 
                       Chemical&, Treelog&);
   void output (Log& log) const

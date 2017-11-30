@@ -227,6 +227,7 @@ struct ChemicalStandard : public Chemical
   void release_surface_colloids (double surface_release);
 
   // Management.
+  void remove_all ();
   void update_C (const Soil&, const SoilWater&);
   void deposit (const double flux); // [g/m^2/h]
   void spray_overhead (const double amount); // [g/m^2]
@@ -723,6 +724,21 @@ ChemicalStandard::release_surface_colloids (const double surface_release_value)
   if (std::isnormal (surface_release))
     throw "Multiple reactions setting surface release";
   surface_release = surface_release_value;
+}
+
+void
+ChemicalStandard::remove_all ()
+{
+  snow_storage = 0.0;
+  canopy_storage = 0.0;
+  litter_storage = 0.0;
+  surface_storage = 0.0;
+  std::fill (C_avg_.begin (), C_avg_.end (), 0.0);
+  std::fill (C_secondary_.begin (), C_secondary_.end (), 0.0);
+  std::fill (M_secondary_.begin (), M_secondary_.end (), 0.0);
+  std::fill (M_total_.begin (), M_total_.end (), 0.0);
+  std::fill (M_primary_.begin (), M_primary_.end (), 0.0);
+  std::fill (C_primary_.begin (), C_primary_.end (), 0.0);
 }
 
 void

@@ -37,6 +37,7 @@ class WSource : public ModelDerived, public Scope, public Weather
 public:
   static const char *const component;
   symbol library_id () const;
+  virtual symbol title () const;
 
   // Scope.
 public:

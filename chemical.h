@@ -123,6 +123,7 @@ public:
 
   // Management.
 public:
+  virtual void remove_all () = 0;
   virtual void update_C (const Soil&, const SoilWater&) = 0;
   virtual void deposit (double flux /* [g/m^2/h] */) = 0;
   virtual void spray_overhead (double amount /* [g/m^2] */) = 0;

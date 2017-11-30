@@ -132,6 +132,8 @@ private:
   virtual void add_solute (symbol chem, 
                            size_t cell, double amount /* [g] */) = 0;
 public:
+  virtual void remove_solute (symbol chem) = 0;
+public:
   virtual void matrix_solute (const Geometry& geo, double dt, 
                               Chemical& chemical, Treelog& msg) = 0;
 

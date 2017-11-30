@@ -158,6 +158,7 @@ struct BioporeMatrix : public Biopore
                     std::vector<double>&,
                     std::vector<double>&) const;
   void add_solute (symbol chem, size_t cell, const double amount /* [g] */);
+  void remove_solute (const symbol chem);
   void matrix_solute (const Geometry& geo, const double dt, 
                       Chemical& chemical, Treelog& msg);
   void update_cell_solute (const Geometry& geo, const symbol chem, 
@@ -873,6 +874,13 @@ BioporeMatrix::add_solute (const symbol chem,
   daisy_assert (cell < column.size ());
   const size_t col = column[cell];
   solute.add_value (chem, col, amount);
+}
+
+void 
+BioporeMatrix::remove_solute (const symbol chem)
+{
+  std::vector<double>& array = solute.get_array (chem);
+  std::fill (array.begin (), array.end (), 0.0);
 }
 
 void 

@@ -61,6 +61,8 @@ private:
   symbol name (const symbol key) const;
 
   // WSource.
+public:
+  symbol title () const;
 protected:
   const Time& data_begin () const;
   const Time& data_end () const;

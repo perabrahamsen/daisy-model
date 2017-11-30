@@ -1,3 +1,19 @@
+2017-11-30  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.46 released.
+
+2017-11-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lexer_table.C: Reindent file.
+	* lexer_table.C, lexer_table.h (title): New member function.
+
+2017-11-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C, chemical.h (remove_all): New member function.
+
+	* biopore_matrix.C, biopore_drain.C, biopore.h (remove_solute):
+	New member function.
+
 2017-11-27  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.45 released.
