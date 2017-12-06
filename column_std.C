@@ -160,6 +160,8 @@ public:
   void spray_overhead (symbol chemical, double amount, Treelog&); // [g/ha]
   void spray_surface (symbol chemical, double amount, Treelog&); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
+  void remove_solute (symbol chemical);
+  double total_solute (const symbol chem) const; //[g/ha]
 
   // Conditions.
   double daily_air_temperature () const; // [dg C]
@@ -522,6 +524,19 @@ ColumnStandard::spray_surface (const symbol chemical,
 void 
 ColumnStandard::set_surface_detention_capacity (double height) // [mm]
 { surface.set_detention_capacity (height); }
+
+void 
+ColumnStandard::remove_solute (const symbol chemical)
+{ 
+  movement->remove_solute (chemical);
+  chemistry->remove_solute (chemical);
+}
+
+double				// [g/ha]
+ColumnStandard::total_solute (const symbol chem) const
+{ return (movement->total_solute (geometry, chem)
+	  + chemistry->total_content (geometry, chem))
+    * 10000.0 /* [m^2 / ha] */; }
 
 double 
 ColumnStandard::daily_air_temperature () const

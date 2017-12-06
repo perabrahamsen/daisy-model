@@ -2,35 +2,16 @@ TODO ---things that needs to be done with Daisy -*- outline -*-
 
 * Pesticid
 
+** remove
+
+
+** remove_solute i WW setup
+
+
+
 ** Make SB setup
 
-** Implement "clear_chemical" operation.
-
 ** Document changes to soil degradation of pesticides 
-
-*** heat
-
-old and new curve
-
-*** depth 
-
-unchanged
-
-*** water
-
-Based on Theta instead of h
-
-Plot curves for at least two soil.
-
-*** washoff
-
-Reimplemented in Daisy (more robust)
-
-Show two equations
-
-Argue for 1.5 mm intercept
-
-Plot curves for different LAI values (0.5 1.0, 3 = FOCUS, 5.0)
 
 * MST møde
 

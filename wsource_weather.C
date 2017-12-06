@@ -151,7 +151,7 @@ struct WSourceWeather::Implementation
   double data_dt () const;      // [h]
   double rain_dt () const;      // [h]
   double suggest_dt () const;   // [h]
-  void tick (const Time& time, Treelog&);
+  void tick_weather (const Time& time, Treelog&);
   void check_state (const symbol key, const double value, Treelog& msg);
   void check_state (Treelog& msg);
     
@@ -703,8 +703,10 @@ WSourceWeather::Implementation::suggest_dt () const // [h]
 }
 
 void 
-WSourceWeather::Implementation::tick (const Time& time, Treelog& msg)
+WSourceWeather::Implementation::tick_weather (const Time& time, Treelog& msg)
 {
+  // This function is only called from top level, not on nested wsources.
+
   if (source.done ())
     return;
 
@@ -1128,7 +1130,7 @@ WSourceWeather::Implementation::rewind (const Time& time, Treelog& msg)
   if (initialized_ok)
     {
       try
-        { tick (time, msg); }
+        { tick_weather (time, msg); }
       catch (...)
         { initialized_ok = false; }
     }
@@ -1219,7 +1221,7 @@ WSourceWeather::Implementation::initialize_two (const Time& time, Treelog& msg)
     {
       try
         { 
-          tick (time, msg); 
+          tick_weather (time, msg); 
           return;
         }
       catch (const std::string s)
@@ -1502,8 +1504,9 @@ WSourceWeather::suggest_dt () const
 void 
 WSourceWeather::weather_tick (const Time& time, Treelog& msg)
 {
+  // This function is only called from top level, not on nested wsources.
   TREELOG_MODEL (msg);
-  impl->tick (time, msg); 
+  impl->tick_weather (time, msg); 
 }
 
 void 

@@ -228,6 +228,7 @@ struct ChemicalStandard : public Chemical
 
   // Management.
   void remove_all ();
+  double total_content (const Geometry&) const; // [g/m^2]
   void update_C (const Soil&, const SoilWater&);
   void deposit (const double flux); // [g/m^2/h]
   void spray_overhead (const double amount); // [g/m^2]
@@ -727,7 +728,7 @@ ChemicalStandard::release_surface_colloids (const double surface_release_value)
 }
 
 void
-ChemicalStandard::remove_all ()
+ChemicalStandard::remove_all ()	
 {
   snow_storage = 0.0;
   canopy_storage = 0.0;
@@ -740,6 +741,11 @@ ChemicalStandard::remove_all ()
   std::fill (M_primary_.begin (), M_primary_.end (), 0.0);
   std::fill (C_primary_.begin (), C_primary_.end (), 0.0);
 }
+
+double				// [g/m^2]
+ChemicalStandard::total_content (const Geometry& geo) const
+{ return snow_storage + canopy_storage + litter_storage + surface_storage
+    + geo.total_surface (M_total_) * 10000.0 /* [cm^2/m^2] */; } 
 
 void
 ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)

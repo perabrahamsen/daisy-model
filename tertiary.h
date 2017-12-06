@@ -56,6 +56,9 @@ public:
   virtual void tick (const Units&, 
                      const Geometry&, const Soil&, const SoilHeat&,
                      const double dt, SoilWater&, Surface&, Treelog&) = 0;
+  virtual void remove_solute (const symbol) = 0;
+  virtual double total_solute (const Geometry&,
+			       const symbol chem) const = 0; //[g/m^2]
 
 public:
   // - For use in Movement::solute

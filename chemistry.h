@@ -96,6 +96,10 @@ public:
   virtual void incorporate (const Geometry& geo,
 			    const symbol chem, const double amount,
 			    const Volume&, Treelog& msg) = 0;
+  virtual void remove_solute (const symbol chem) = 0;
+  virtual double total_content (const Geometry&,
+				const symbol chem) const = 0; // [g/m^2]
+
 
   // Simulation.
 public:

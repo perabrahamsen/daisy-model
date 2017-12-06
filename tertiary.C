@@ -74,6 +74,10 @@ class TertiaryNone : public Tertiary
   void tick (const Units&, const Geometry&, const Soil&, const SoilHeat&,
              const double dt, SoilWater&, Surface&, Treelog&)
   { }
+  void remove_solute (const symbol)
+  { }
+  double total_solute (const Geometry&, const symbol) const //[g/m^2]
+  { return 0.0; }
   void solute (const Geometry&, const SoilWater&, 
                const std::map<size_t, double>& J_tertiary,
                const double /* dt */,

@@ -1,3 +1,24 @@
+2017-12-06  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.47 released.
+
+2017-12-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* movement.h, movement.C, column.h, column_std.C, field.h, field.C:
+	* chemistry.h, chemistry_std.C, chemistry_multi.C:
+	* chemical_std.C, chemical.h:
+	* tertiary.h, tertiary.C, tertiary_instant.C, tertiary_old.C:
+	* tertiary_biopores.C (remove_solute): New function.
+	* action_spray.C (remove_solute): Use ir
+
+2017-12-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* movement.h, movement.C, column.h, column_std.C, field.h, field.C:
+	* chemistry.h, chemistry_std.C, chemistry_multi.C:
+	* tertiary.h, tertiary.C, tertiary_instant.C, tertiary_old.C:
+	* tertiary_biopores.C (remove_solute): New function.
+	* action_spray.C (remove_solute): New action.
+
 2017-11-30  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.46 released.

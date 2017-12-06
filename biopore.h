@@ -85,6 +85,8 @@ protected:
   // Interface.
 public:
   virtual double total_water () const = 0;
+  virtual double total_solute (const Geometry&, 
+			       const symbol chem) const = 0; //[g/m^2]
   virtual void get_solute (IM& im) const = 0;
 protected:
   double density (const size_t c) const

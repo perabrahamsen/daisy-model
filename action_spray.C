@@ -128,4 +128,49 @@ Spray a chemical (typically a pesticide) on the field below the canopy.")
   }
 } ActionSpraySurface_syntax;
 
+struct ActionRemoveSolute : public Action
+{
+  const symbol chemical;
+
+  void doIt (Daisy& daisy, const Scope&, Treelog& msg)
+  {
+    std::ostringstream tmp;
+    tmp << "Removing " << daisy.field ().total_solute (chemical)
+	<< " g " << chemical << "/ha from field.";
+    msg.message (tmp.str ());
+    daisy.field ().remove_solute (chemical); 
+  }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
+  ActionRemoveSolute (const BlockModel& al)
+    : Action (al),
+      chemical (al.name ("chemical"))
+  { }
+};
+
+// Add the ActionRemoveSolute syntax to the syntax table.
+static struct ActionRemoveSoluteSyntax : DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ActionRemoveSolute (al); }
+
+  ActionRemoveSoluteSyntax ()
+    : DeclareModel (Action::component, "remove_solute", "\
+Remove a specific chemical from the field.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.declare_string ("chemical", Attribute::Const,
+			  "Name of chemical to remove.");
+    frame.set_check ("chemical", Chemical::check_buildable ());
+    frame.order ("chemical");
+  }
+} ActionRemoveSolute_syntax;
+
 // action_spray.C ends here.

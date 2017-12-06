@@ -73,7 +73,9 @@ struct ChemistryStandard : public Chemistry
   void incorporate (const Geometry& geo,
 		    const symbol chem, const double amount,
                     const Volume&, Treelog& msg);
-  
+  void remove_solute (const symbol chem);
+  double total_content (const Geometry&, const symbol chem) const; //[g/m^2]
+
   // Simulation.
   void tick_source (const Scope&, 
                     const Geometry&, const Soil&, const SoilWater&, 
@@ -303,6 +305,27 @@ ChemistryStandard::incorporate (const Geometry& geo,
         return;
       }
   msg.warning ("Unknwon chemical '" + chem + "' ignored");
+}
+
+void 
+ChemistryStandard::remove_solute (const symbol chem)
+{
+  for (auto c : chemicals)
+    if (c->objid == chem)
+      {
+	c->remove_all ();
+	return;
+      }
+}
+
+double				// [g/m^2]
+ChemistryStandard::total_content (const Geometry& geo, const symbol chem) const
+{
+  double total = 0.0;
+  for (auto c : chemicals)
+    if (c->objid == chem)
+      total += c->total_content (geo);
+  return total;
 }
 
 void 

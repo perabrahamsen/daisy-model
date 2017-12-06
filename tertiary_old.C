@@ -61,6 +61,10 @@ struct TertiaryOld : public Tertiary
                    std::vector<double>& S_matrix, 
                    std::vector<double>& q_tertiary, 
                    Treelog& msg);
+  void remove_solute (const symbol)
+  { }
+  double total_solute (const Geometry&, const symbol) const //[g/m^2]
+  { return 0.0; }
   void solute (const Geometry&, const SoilWater&, 
                const std::map<size_t, double>& J_tertiary,
                const double dt, Chemical&, Treelog&);

@@ -78,6 +78,8 @@ struct ChemistryMulti : public Chemistry
   void incorporate (const Geometry& geo,
 		    const symbol chem, const double amount,
                     const Volume&, Treelog& msg);
+  void remove_solute (const symbol chem);
+  double total_content (const Geometry&, const symbol chem) const; //[g/m^2]
   
   // Simulation.
   void tick_source (const Scope&, 
@@ -374,6 +376,22 @@ ChemistryMulti::incorporate (const Geometry& geo,
     return;
 
   check_ignore (chem, msg);
+}
+
+void 
+ChemistryMulti::remove_solute (const symbol chem)
+{
+  for (auto c : combine)
+    c->remove_solute (chem);
+}
+
+double				// [g/m^2]
+ChemistryMulti::total_content (const Geometry& geo, const symbol chem) const
+{
+  double total = 0.0;
+  for (auto c : combine)
+    total += c->total_content (geo, chem);
+  return total;
 }
 
 void 

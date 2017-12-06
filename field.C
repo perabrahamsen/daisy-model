@@ -97,6 +97,8 @@ struct Field::Implementation
   void spray_overhead (symbol chemical, double amount, Treelog&); // [g/ha]
   void spray_surface (symbol chemical, double amount, Treelog&); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
+  void remove_solute (symbol chemical);
+  double total_solute (symbol chemical) const; // [g/ha]
 
   // Conditions.
 public:
@@ -512,6 +514,28 @@ Field::Implementation::set_surface_detention_capacity (double height) // [mm]
 	    i != columns.end ();
 	    i++)
     (*i)->set_surface_detention_capacity (height);
+}
+
+void 
+Field::Implementation::remove_solute (const symbol chemical)
+{
+  if (selected)
+    selected->remove_solute (chemical);
+  else for (ColumnList::iterator i = columns.begin ();
+	    i != columns.end ();
+	    i++)
+    (*i)->remove_solute (chemical);;
+}
+
+double				// [g/ha]
+Field::Implementation::total_solute (const symbol chemical) const
+{
+  double total = 0.0;
+  if (selected)
+    total = selected->total_solute (chemical);
+  else for (auto c : columns)
+	 total += c->total_solute (chemical);
+  return total;
 }
 
 double 
@@ -991,6 +1015,14 @@ Field::spray_surface (const symbol chemical, const double amount,
 void 
 Field::set_surface_detention_capacity (double height) // [mm]
 { impl->set_surface_detention_capacity (height); }
+
+void 
+Field::remove_solute (const symbol chemical)
+{ impl->remove_solute (chemical); }
+
+double				// [g/ha]
+Field::total_solute (const symbol chemical)
+{ return impl->total_solute (chemical); }
 
 double 
 Field::daily_air_temperature () const  // [dg C]
