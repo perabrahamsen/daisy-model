@@ -1,5 +1,14 @@
 2017-12-07  Per Abrahamsen  <pa@plen.ku.dk>
 
+	* Version 5.49 released.
+
+2017-12-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* biopore_matrix.C (update_cell_solute): col_size may be smaller
+	than max_col_size right after first infiltration.
+
+2017-12-07  Per Abrahamsen  <pa@plen.ku.dk>
+
 	* Version 5.48 released.
 
 2017-12-07  Per Abrahamsen  <per.abrahamsen@gmail.com>

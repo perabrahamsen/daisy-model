@@ -1030,8 +1030,9 @@ BioporeMatrix::update_cell_solute (const Geometry& geo, const symbol chem,
     return;
 
   const size_t cell_size = geo.cell_size ();
-  const size_t col_size = xplus.size ();
-  daisy_assert (solute_array.size () == col_size);
+  const size_t max_col_size = xplus.size ();
+  const size_t col_size = solute_array.size ();
+  daisy_assert (max_col_size >= col_size);
   
   std::vector<double>& M_array = M.get_array (chem);
   M_array.resize (cell_size, 0.0);
