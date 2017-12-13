@@ -44,6 +44,7 @@ struct GnuplotSoil : public GnuplotBase
   const double right;
   const double vmin;
   const double vmax;
+  const bool use_log;
 
   // Data.
   LexerSoil lex;
@@ -187,7 +188,12 @@ GnuplotSoil::initialize (const Units& units, Treelog& msg)
             return false;
           }
         value[i] = units.convert (original, dimension, value[i]);
+	    
       }
+  
+  if (use_log)
+    for (auto& v : value)
+      v = std::log10 (v);
 
   // Done.
   return true;
@@ -394,6 +400,7 @@ GnuplotSoil::GnuplotSoil (const BlockModel& al)
     right (al.number ("right", NAN)),
     vmin (al.number ("min", NAN)),
     vmax (al.number ("max", NAN)),
+    use_log (al.flag ("use_log")),
     lex (al),
     type (symbol2type (al.name ("type"))),
     samples (al.integer ("samples")),
@@ -439,7 +446,8 @@ Maximum x value in plot. By default, derive value from data file.");
 Fixed lowest value.  By default determine this from the data.");
     frame.declare ("max", Attribute::User (), Attribute::OptionalConst, "\
 Fixed highest value.  By default determine this from the data.");
-
+    frame.declare_boolean ("use_log", Attribute::Const, "log10 of each value");
+    frame.set ("use_log", false);
     frame.declare_string ("type", Attribute::State, "Plot type.\n\
 Valid options are 'block' and 'contour'.");
     frame.set ("type", "block");

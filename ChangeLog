@@ -1,3 +1,7 @@
+2017-12-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* gnuplot_soil.C (use_log): New parameter.
+
 2017-12-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.49 released.
