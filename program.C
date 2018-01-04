@@ -74,6 +74,8 @@ Program::~Program ()
 
 static struct ProgramInit : public DeclareComponent
 {
+  void load_frame (Frame& frame) const
+  { Model::load_model (frame); }
   ProgramInit ()
     : DeclareComponent (Program::component, "\
 Run a program.")

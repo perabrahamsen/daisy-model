@@ -753,7 +753,8 @@ SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil,
 
       // Equilibrium net-radiation absorbed by the leaves
       R_eq_abs_shadow = R_abs_shadow + R_abs_sun  - BB_leaf * cover; //[W m^-2]
-   
+      const double R_eq_abs_leaf = R_eq_abs_shadow;
+
       // Sensible heat "conductance" between soil and canopy point
       G_H_s_c =  c_p * rho_a * g_H_s_c; //*(1.- cover);       //[W m^-2 K^-1] 
       // Sensible heat "conductance" between leaves and canopy point
@@ -762,6 +763,106 @@ SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil,
       
       // Latent heat "conductance" between sunlit leaves and canopy point
       G_W_leaf_c =  c_p * rho_a * g_W_leaf_c / gamma;// * cover *  (1.-sun_LAI_fraction_total);  //[m s^-1] 
+
+#if 1
+      // We have an equation system with four unknowns, and four equations.
+
+      // We assign a number and an equation to each unknown.
+      enum { iT_s, iT_c, ie_c, iT_leaf, isize };
+
+      // A x = b
+      Solver::Matrix A (isize); 
+      Solver::Vector b (isize);
+      Solver::Vector x (isize);
+
+      // 1. The soil equation.
+      // 
+      // R_eq_abs_soil - G_R_soil * (T_s - T_a)
+      // = (k_h / z0) * (T_s - T_z0) + G_H_s_c * (T_s - T_c) + lambda * E_soil
+      // 
+      // <=>
+      //
+      // R_eq_abs_soil + G_R_soil * T_a + (k_h / z0) * T_z0 - lambda * E_soil
+      // = (G_R_soil + (k_h / z0) + G_H_s_c) * T_s
+      // - G_H_s_c * T_c
+
+      b (iT_s) = R_eq_abs_soil + G_R_soil * T_a 
+               + (k_h / z0) * T_z0 - lambda * E_soil;
+      A (iT_s, iT_s) = G_R_soil + (k_h / z0) + G_H_s_c;
+      A (iT_s, iT_c) = - G_H_s_c;
+        
+      // 2. The canopy equation.
+      // 
+      // H_atm = H_soil + H_leaf 
+      // 
+      // <=>
+      //
+      // G_H_a * (T_c - T_a) 
+      // = G_H_s_c * (T_s - T_c) + G_H_leaf_c * (T_leaf - T_c)
+      //
+      // <=>
+      //
+      // - G_H_a * T_a
+      // = - (G_H_a + G_H_s_c + G_H_leaf_c) * T_c 
+      // + G_H_s_c * T_s + G_H_leaf_c * T_leaf
+      
+      b (iT_c) = - G_H_a * T_a;
+      A (iT_c, iT_s) = G_H_s_c;
+      A (iT_c, iT_c) = - (G_H_a + G_H_s_c + G_H_leaf_c);
+      A (iT_c, iT_leaf) = G_H_leaf_c;
+
+      // 3. The vapour pressure equation.
+      // 
+      // LE_atm  = LE_soil + LE_leaf
+      // 
+      // <=>
+      //
+      // G_W_a * (e_c - e_a) 
+      // = lambda * E_soil 
+      // + G_W_leaf_c * (s * (T_leaf - T_a) + (e_sat_air - e_c))
+      //
+      // <=>
+      //
+      // G_W_leaf_c * (s * T_a - e_sat_air)
+      // - G_W_a * e_a - lambda * E_soil 
+      // = G_W_leaf_c * s * T_leaf 
+      // - (G_W_a + G_W_leaf_c) * e_c
+      
+      b (ie_c) = G_W_leaf_c * (s * T_a - e_sat_air)
+        - G_W_a * e_a - lambda * E_soil;
+      A (ie_c, ie_c) = - (G_W_a + G_W_leaf_c);
+      A (ie_c, iT_leaf) = G_W_leaf_c * s;
+
+      // 4. The leaves equation.
+      // 
+      // R_abs_leaf = H_leaf_c + lambda * E_leaf_c
+      // 
+      // <=>
+      //
+      // R_eq_abs_leaf - G_R_leaf * (T_leaf - T_a) 
+      // = G_H_leaf_c * (T_leaf - T_c) 
+      // + G_W_leaf_c * (s * (T_leaf - T_a) + (e_sat_air - e_c))
+      // 
+      // <=>
+      //
+      // R_eq_abs_leaf + (G_R_leaf + G_W_leaf_c * s) * T_a - G_W_leaf_c * e_sat_air
+      // = (G_R_leaf + G_H_leaf_c + G_W_leaf_c * s) * T_leaf 
+      // - G_H_leaf_c * T_c - G_W_leaf_c * e_c
+      
+      b (iT_leaf) = R_eq_abs_leaf + (G_R_leaf + G_W_leaf_c * s) * T_a 
+                 - G_W_leaf_c * e_sat_air;
+      A (iT_leaf, iT_c) = - G_H_leaf_c;
+      A (iT_leaf, ie_c) = - G_W_leaf_c;
+      A (iT_leaf, iT_leaf) = (G_R_leaf + G_H_leaf_c + G_W_leaf_c * s);
+
+      // Solve and extract.
+      solver->solve (A, b, x);
+      T_s = x[iT_s];
+      T_c = x[iT_c];
+      T_shadow = T_sun = x[iT_leaf];
+      e_c = x[ie_c];
+
+#else
 
       // inter-inter-intermediate variables
       const double a_soil = ((R_eq_abs_soil + G_R_soil * (T_a - T_a)
@@ -790,7 +891,6 @@ SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil,
                              / (G_R_leaf + G_H_leaf_c * (1. - a_can_leaf)
                                 + G_W_leaf_c * (s - b_can_leaf))/*[W m^-2 K^-1]*/
                              + T_a);//[K]
-
       // -------------------------------------------
       // Temperature of leaves 
       // -------------------------------------------
@@ -810,6 +910,7 @@ SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil,
       // Canopy vapour pressure 
       // -------------------------------------------
       e_c = b_can + b_can_leaf * (T_leaf - T_a) + e_a; //[Pa]
+#endif
 
     }
 

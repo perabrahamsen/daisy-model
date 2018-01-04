@@ -1631,8 +1631,6 @@ By default, no limit on rain.");
                    "Precipitation this hour.");
     frame.declare_fraction ("cloudiness", Attribute::LogOnly,
                             "Fraction of sky covered by clouds [0-1].");
-    frame.declare_fraction ("daily_cloudiness", Attribute::LogOnly,
-                            "Fraction of sky covered by clouds [0-1].");
     frame.declare ("vapor_pressure", "Pa", Attribute::LogOnly, "Humidity.");
     frame.declare ("relative_humidity", Attribute::Fraction (), 
                    Attribute::LogOnly, "Relative humidity.");

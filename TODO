@@ -1,44 +1,14 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Pesticid
+* Læs raport færdig
 
-** Document changes to soil degradation of pesticides 
+* AA opgaver
 
-* MST møde
+* manager
 
-* Pestcast 
 
-** Output 
 
-Snak med Maja og Jacob
 
-Vandindhold (hvilke vejrdata har vi)
-
-* Work tasks
-
-** Præsentation af Bayer projekt
-
-** COMMIT / Regitze
-
-Rodprofiler
-
-** Kasper
-
-*** DONE: SVAT SSOC: Split emissivity soil/leaf
-
-*** SVAT SSOC: Gør soil afhængig af vandindhold (PLF)
-
-*** RADDIST DPF: Gør Ps_PAR og Ps_NIR afhængig af vandindhold (PLF)
-
-** Daniel
-
-*** Læs opsumering
-
-*** Lav sample chemistry
-
-** Jacob 
-
-*** condition based on log variables
 
 * Artikler
 
@@ -56,10 +26,6 @@ Erstat DSLAI05 med Seed baseret tidlig vækst. Søren havde en formel,
 men vi skal have en test setup.
 
 * Regression test
-
-* Agrohydrologi II
-
-Forbered kursus
 
 * Daisy problemer
 
