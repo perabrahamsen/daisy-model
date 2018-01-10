@@ -88,13 +88,13 @@ UIProgress::run (Toplevel& toplevel)
     {
     case Toplevel::is_unloaded:
       toplevel.usage ();
-      /* Not reached*/;
+      /* Not reached*/
     case Toplevel::is_uninitialized:
       toplevel.initialize ();
-      /* Fallthrough */;
+      /* Fallthrough */
     case Toplevel::is_ready:
       toplevel.run ();
-      /* Fallthrough */;
+      /* Fallthrough */
     case Toplevel::is_done:
       throw EXIT_SUCCESS;
     case Toplevel::is_running:
