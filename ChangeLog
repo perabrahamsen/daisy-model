@@ -1,3 +1,15 @@
+2018-01-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* program_optimize.C ("cite"): Add citation.
+
+2018-01-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* pet_FAO_PM_daily.C: New model.
+	* pet_FAO_PM_hourly.C: New model.
+	* Makefile (MODELS): Add them.
+
+	* pet_FAO_PM.C ("cite"): Cite the report.
+
 2017-12-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* program.C (description, cite): New shared parameters. 

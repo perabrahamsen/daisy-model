@@ -1,7 +1,8 @@
-// pet_FAO_PM.C -- FAO potential evopotranspiration using Penman-Monteith.
+// pet_FAO_PM_hourly.C -- FAO ETc using Penman-Monteith with hourly data
 // 
 // Copyright 1996-2001, 2003 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001, 2003 KVL.
+// Copyright 2018 KU.
 //
 // This file is part of Daisy.
 // 
@@ -37,7 +38,7 @@
 #include <sstream>
 #include <memory>
 
-class PetFAO_PM : public Pet
+class PetFAO_PM_hourly : public Pet
 {
   // Parameters.
   std::unique_ptr<NetRadiation> net_radiation;
@@ -79,7 +80,7 @@ public:
       return potential_evapotranspiration_wet; 
     else
       return dry ();
-}
+  }
 
   double dry () const
   { return potential_evapotranspiration_dry; }
@@ -93,7 +94,7 @@ public:
   void initialize (const Weather& weather)
   { }
 
-  PetFAO_PM (const BlockModel& al)
+  PetFAO_PM_hourly (const BlockModel& al)
     : Pet (al),
       net_radiation (Librarian::build_stock<NetRadiation> (al.metalib (),
                                                            al.msg (),
@@ -102,16 +103,16 @@ public:
       rb (al.number ("rb")),
       Rn (-42.42e42)
   { }
-  ~PetFAO_PM ()
+  ~PetFAO_PM_hourly ()
   { }
 };
 
 void
-PetFAO_PM::tick (const Time&, const Weather& weather, const double /* Rn */,
-		 const Vegetation& crops,
-                 const Surface& surface, const Geometry& geo, const Soil& soil,
-                 const SoilHeat& soil_heat, const SoilWater& soil_water,
-                 Treelog& msg)
+PetFAO_PM_hourly::tick (const Time&, const Weather& weather, const double /* Rn */,
+                        const Vegetation& crops,
+                        const Surface& surface, const Geometry& geo, const Soil& soil,
+                        const SoilHeat& soil_heat, const SoilWater& soil_water,
+                        Treelog& msg)
 {
   // Weather.
   const double Temp = weather.air_temperature ();
@@ -130,8 +131,8 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const double /* Rn */,
   Rn = net_radiation->net_radiation ();
 
   reference_evapotranspiration_dry
-    = FAO::RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2,
-                              AtmPressure)
+    = FAO::RefPenmanMonteithAllen2006 (Rn, G, Temp, VaporPressure, U2,
+                                       AtmPressure)
     * 3600;
 
   potential_evapotranspiration_dry
@@ -143,44 +144,45 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const double /* Rn */,
                                  AtmPressure, rb)
     * 3600;
   potential_evapotranspiration_wet
-     = reference_to_potential_wet (crops, surface,
-                                   reference_evapotranspiration_wet);
- }
+    = reference_to_potential_wet (crops, surface,
+                                  reference_evapotranspiration_wet);
+}
 
- static struct PetFAO_PMSyntax : public DeclareModel
- {
-   Model* make (const BlockModel& al) const
-   { return new PetFAO_PM (al); }
-   PetFAO_PMSyntax ()
-     : DeclareModel (Pet::component, "FAO_PM",
-                "Potential evopotranspiration using Penman-Monteith.")
-   { }
-   void load_frame (Frame& frame) const
-   {
-     frame.set_strings ("cite", "FAO-PM");
-     frame.declare ("reference_evapotranspiration_wet",
-                    "mm/h", Attribute::LogOnly, 
-                    "Reference evapotranspiration for a wet system.");
-     frame.declare ("potential_evapotranspiration_wet", 
-                    "mm/h", Attribute::LogOnly, 
-                    "Potential evapotranspiration for a wet system.");
-     frame.declare ("potential_evapotranspiration_dry", 
-                    "mm/h", Attribute::LogOnly, 
-                    "Potential evapotranspiration for a dry system.");
-     frame.declare_boolean ("use_wet", Attribute::Const,
-                            "Use wet PM for wet surface.\n\
+static struct PetFAO_PM_hourlySyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new PetFAO_PM_hourly (al); }
+  PetFAO_PM_hourlySyntax ()
+    : DeclareModel (Pet::component, "FAO_PM_hourly",
+                    "Potential evopotranspiration using Penman-Monteith.\n\
+Modified to work with hourly data.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set_strings ("cite", "FAO-PM", "allen2006recommendation");
+    frame.declare ("reference_evapotranspiration_wet",
+                   "mm/h", Attribute::LogOnly, 
+                   "Reference evapotranspiration for a wet system.");
+    frame.declare ("potential_evapotranspiration_wet", 
+                   "mm/h", Attribute::LogOnly, 
+                   "Potential evapotranspiration for a wet system.");
+    frame.declare ("potential_evapotranspiration_dry", 
+                   "mm/h", Attribute::LogOnly, 
+                   "Potential evapotranspiration for a dry system.");
+    frame.declare_boolean ("use_wet", Attribute::Const,
+                           "Use wet PM for wet surface.\n\
 \n\
 This will give significantly higher potential evapotranspiration\n\
 especially when feed with daily weather data.");
-     frame.set ("use_wet", false);
-     frame.declare ("rb", "s/m", Attribute::Const, 
-                    "Boundary layer resistance for wet surface.");
-     frame.set ("rb", 20.0);
-     frame.declare ("Rn", "W/m^2", Attribute::LogOnly, 
-                    "Reference net radiation.");
-     frame.declare ("G", "W/m^2", Attribute::LogOnly, 
-                    "Soil heat flux.");
-   }
-} PetFAO_PM_syntax;
+    frame.set ("use_wet", false);
+    frame.declare ("rb", "s/m", Attribute::Const, 
+                   "Boundary layer resistance for wet surface.");
+    frame.set ("rb", 20.0);
+    frame.declare ("Rn", "W/m^2", Attribute::LogOnly, 
+                   "Reference net radiation.");
+    frame.declare ("G", "W/m^2", Attribute::LogOnly, 
+                   "Soil heat flux.");
+  }
+} PetFAO_PM_hourly_syntax;
 
-// pet_FAO_PM.C ends here.
+// pet_FAO_PM_hourly.C ends here.
