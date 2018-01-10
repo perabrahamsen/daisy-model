@@ -78,6 +78,10 @@ static struct ProgramInit : public DeclareComponent
     : DeclareComponent (Program::component, "\
 Run a program.")
   { }
+  void load_frame (Frame& frame) const
+  {
+    Model::load_model (frame);
+  }
 } Program_init;
 
 // program.C ends here.

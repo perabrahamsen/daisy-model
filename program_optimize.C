@@ -308,6 +308,7 @@ iterations exceed 'max_iter'.")
   }
   void load_frame (Frame& frame) const
   {
+    frame.set_strings ("cite", "nelder1965simplex");
     frame.add_check (check_alist);
     frame.declare_string ("parameter", Attribute::Const, Attribute::Variable, "\
 List of parameters to optimize.");

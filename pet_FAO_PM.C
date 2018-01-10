@@ -157,6 +157,7 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const double /* Rn */,
    { }
    void load_frame (Frame& frame) const
    {
+     frame.set_strings ("cite", "FAO-PM");
      frame.declare ("reference_evapotranspiration_wet",
                     "mm/h", Attribute::LogOnly, 
                     "Reference evapotranspiration for a wet system.");

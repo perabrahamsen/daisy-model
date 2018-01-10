@@ -1,3 +1,16 @@
+2018-01-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* program.C (load_frame): Call "load_model".
+
+	* program_optimize.C ("cite"): Add citation.
+
+2018-01-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* pet_FAO_PM_daily.C: New model.
+	* pet_FAO_PM_hourly.C: New model.
+
+	* pet_FAO_PM.C ("cite"): Cite the report.
+
 2017-06-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* horizon.C: (quartz): New parameter.
