@@ -12,142 +12,15 @@ average wind, vapor_pressure, atm pressure, cloudiness?
 
 * Agrohydrologi 2
 
-** Dag 1 (PA): Introduktion og N Leaching
+* Læs raport færdig
 
-*** Døde fisk
+* AA opgaver
 
-*** Model: Leaching = Fertilizer - Harvest
+* Manager
 
-Good? Correct?
 
-*** Daisy 
 
-Water + Carbon + Nitrogen (+ pesticides)
 
-*** Weather + Groundwater + Soil + Management
-
-*** Language: Process + Models + Parameterizations + Derived
-
-*** Language: "(" parameter value ")"
-
-*** Language: "(def" + process + name + parameters + ")"
-
-model og sprog
-
-vand og N balance
-
-*** Virkemidler
-
-*** Projekter: Tidlig såning ...
-
-** Dag 2 (MES): Modelering og valg af rande
-
-** Dag 3: Afgrødeparameterisering
-
-Måletal?
-
-Harvest index og udbytter?
-
-*** Projekter: FertOrgaNic, SAFIR, Tidlig såning, NYIELD
-
-** Dag 4: Pesticider
-
-Silstrup event
-
-*** Projekter: Agrovand, VAP, R2D2, Røg, PESTPORE
-
-** Dag 5: Jeres data
-
-* Interview
-
-** Opgaver
-
-*** BCS: Validation track
-
-**** Extract information from reports
-
-**** Setup daisy simulation
-
-**** Compare
-
-**** Improve
-
-**** Optimize application and compare
-
-**** Write report
-
-**** Presentation for meeting
-
-*** BCS: Optimization track
-
-**** Get information and pesticide properties and typical management
-
-**** Setup Daisy : soil, weather, management
-
-**** Get information from pestsurf about impact criteria
-
-**** Prepare 1000? simulations
-
-**** Get access to supercomputer
-
-**** Run 1000? Simulations on supercomputer
-
-**** Extract and present data
-
-**** Develop algorithm for optimal management
-
-**** Iterate 100? simulations on supercomputer
-
-**** Present results in february
-
-**** Get new optimization criteria
-
-**** New optimization
-
-**** Write report
-
-*** COMMIT
-
-**** Root model? 
-
-**** Målinger?
-
-* Opgaver
-
-** Kurser: AH1 og AH2
-
-** M.S: Malte, Line, Emil? Regitze?
-
-** PhD: Kasper, Jacob, Daniel
-
-** Projekter: CPE, Bayer
-
-** Nye ansatte: Jakob, NN, NN1, NN2
-
-** Kalender med opgaver over året
-
-** Plan for hvordan jeg organiserer en uge
-
-** Vinterdepresion?
-
-
-
-
-
-
-
-
-
-
-
-
-* vap-figs.pdf til hjemmeside (og rørrende bilag)
-
-* SH fejl
-
-** Brug massebalance til at udregne (vertical) flux fra bunden.
-
-Husk drænnoder!
 
 * Artikler
 
@@ -166,14 +39,13 @@ men vi skal have en test setup.
 
 * Regression test
 
-* Agrohydrologi II
-
-Forbered kursus
-
 * Daisy problemer
-
-** En simpel log til at erstatte/supplere Crop Production
 
 ** DMI's nye "nedbørskorrigering"
 
 ** Ny ligning for biopore til matrix flow fra Søren
+
+** Brug massebalance til at udregne (vertical) flux fra bunden.
+
+Husk drænnoder!
+

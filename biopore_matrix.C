@@ -95,6 +95,16 @@ struct BioporeMatrix : public Biopore
     return height_end + h_bottom[col]; 
   }
   double total_water () const;
+  double total_solute (const Geometry& geo, 
+		       const symbol chem) const //[g/m^2]
+  {
+    const std::vector<double>& solute_array 
+      = solute.get_array (chem);
+    const double total 		// [g]
+      = std::accumulate (solute_array.begin (), solute_array.end (), 0.0);
+    return total / geo.surface_area ()
+      * 10000.0; // [cm^2/m^2]
+  }
   void get_solute (IM&) const;
 
   // Simulation.
@@ -158,6 +168,7 @@ struct BioporeMatrix : public Biopore
                     std::vector<double>&,
                     std::vector<double>&) const;
   void add_solute (symbol chem, size_t cell, const double amount /* [g] */);
+  void remove_solute (const symbol chem);
   void matrix_solute (const Geometry& geo, const double dt, 
                       Chemical& chemical, Treelog& msg);
   void update_cell_solute (const Geometry& geo, const symbol chem, 
@@ -876,6 +887,13 @@ BioporeMatrix::add_solute (const symbol chem,
 }
 
 void 
+BioporeMatrix::remove_solute (const symbol chem)
+{
+  std::vector<double>& array = solute.get_array (chem);
+  std::fill (array.begin (), array.end (), 0.0);
+}
+
+void 
 BioporeMatrix::matrix_solute (const Geometry& geo, const double dt, 
                               Chemical& chemical, Treelog& msg)
 {
@@ -1012,8 +1030,9 @@ BioporeMatrix::update_cell_solute (const Geometry& geo, const symbol chem,
     return;
 
   const size_t cell_size = geo.cell_size ();
-  const size_t col_size = xplus.size ();
-  daisy_assert (solute_array.size () == col_size);
+  const size_t max_col_size = xplus.size ();
+  const size_t col_size = solute_array.size ();
+  daisy_assert (max_col_size >= col_size);
   
   std::vector<double>& M_array = M.get_array (chem);
   M_array.resize (cell_size, 0.0);

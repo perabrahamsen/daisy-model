@@ -91,7 +91,7 @@ PhotoGL::assimilate (const Units&, const double, const double, const double,
                      const std::vector<double>& PAR,
                      const std::vector<double>& PAR_height,
                      const double PAR_LAI,
-		     const std::vector<double>&,
+		     const std::vector<double>& fraction,
                      const double,
                      CanopyStandard& canopy,
                      Phenology& development,
@@ -149,7 +149,7 @@ PhotoGL::assimilate (const Units&, const double, const double, const double,
 	  // Leaf Photosynthesis [gCO2/m2/h]
 	  const double F = Fm * (1.0 - exp (- (Qeff * dPAR / Fm)));
 
-	  Ass += LA * F;
+	  Ass += /* fraction[i] * */ LA * F;
 	}
     }
   daisy_assert (approximate (accCAI, canopy.CAI));

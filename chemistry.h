@@ -56,6 +56,7 @@ public:
   virtual bool know (symbol chem) const = 0;
   virtual bool ignored (symbol chem) const = 0;
   virtual Chemical& find (symbol chem) = 0;
+  virtual const Chemical& find (symbol chem) const = 0;
   virtual const std::vector<Chemical*>& all () const = 0;
 
   // Table.
@@ -95,6 +96,10 @@ public:
   virtual void incorporate (const Geometry& geo,
 			    const symbol chem, const double amount,
 			    const Volume&, Treelog& msg) = 0;
+  virtual void remove_solute (const symbol chem) = 0;
+  virtual double total_content (const Geometry&,
+				const symbol chem) const = 0; // [g/m^2]
+
 
   // Simulation.
 public:

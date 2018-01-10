@@ -1,15 +1,146 @@
 2018-01-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* program.C (load_frame): Call "load_model".
-
 	* program_optimize.C ("cite"): Add citation.
 
 2018-01-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* pet_FAO_PM_daily.C: New model.
 	* pet_FAO_PM_hourly.C: New model.
+	* Makefile (MODELS): Add them.
 
 	* pet_FAO_PM.C ("cite"): Cite the report.
+
+2017-12-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* program.C (description, cite): New shared parameters. 
+
+2017-12-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* program_optimize.C (load_frame): Add citation.
+
+2017-12-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* gnuplot_soil.C (use_log): New parameter.
+
+2017-12-07  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.49 released.
+
+2017-12-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* biopore_matrix.C (update_cell_solute): col_size may be smaller
+	than max_col_size right after first infiltration.
+
+2017-12-07  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.48 released.
+
+2017-12-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* program_gnuplot.C (run): Delete graph object after use to ensure
+	file handle is closed.
+
+2017-12-06  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.47 released.
+
+2017-12-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* movement.h, movement.C, column.h, column_std.C, field.h, field.C:
+	* chemistry.h, chemistry_std.C, chemistry_multi.C:
+	* chemical_std.C, chemical.h:
+	* tertiary.h, tertiary.C, tertiary_instant.C, tertiary_old.C:
+	* tertiary_biopores.C (remove_solute): New function.
+	* action_spray.C (remove_solute): Use ir
+
+2017-12-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* movement.h, movement.C, column.h, column_std.C, field.h, field.C:
+	* chemistry.h, chemistry_std.C, chemistry_multi.C:
+	* tertiary.h, tertiary.C, tertiary_instant.C, tertiary_old.C:
+	* tertiary_biopores.C (remove_solute): New function.
+	* action_spray.C (remove_solute): New action.
+
+2017-11-30  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.46 released.
+
+2017-11-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lexer_table.C: Reindent file.
+	* lexer_table.C, lexer_table.h (title): New member function.
+
+2017-11-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C, chemical.h (remove_all): New member function.
+
+	* biopore_matrix.C, biopore_drain.C, biopore.h (remove_solute):
+	New member function.
+
+2017-11-27  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.45 released.
+
+2017-11-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* soilfac.C: New component.
+	* Makefile (COMPONENTS): Add it.
+	* chemical_std.C: Use it.
+
+2017-11-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* svat_ssoc.C (solve): Try with both previous values and air
+	temperature.
+
+2017-11-03  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.44 released.
+
+2017-11-03  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.43 released.
+
+2017-11-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* raddist_DPF.C (tick): Warn if we have significant global
+	radiation at night.
+
+2017-10-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* photo_Farquhar.C (PhotoFarquhar::PhotoFarquhar): Clear log
+	variables.
+
+2017-10-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* soil_water.C (output, tick_after): table_low and table_high can be 0.
+
+2017-10-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C, chemical.h (molar_mass): New parameter and
+	function.
+	(decompose, check): Use it.
+
+2017-09-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* rubiscoN.C: New component.
+	* Makefile (COMPONENTS): Add it.
+	* crop_std.C (RubiscoN): Add parameter.
+
+2017-09-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* svat_ssoc.C (epsilon_soil, epsilon_leaf): New parameters,
+	replace 'epsilon' constant.
+
+2017-09-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* bioclimate_std.C (canopy_leak_rate): Fix rate to be base on
+	storage at end of timestep. -1 if there is no water at the end of the
+	timetep.
+	* chemical_std.C (tick_top): Update caller.
+
+2017-08-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* phenology_std.C (DS1_name): Use parameter value, not parameter name.
 
 2017-06-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
 

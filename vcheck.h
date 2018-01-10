@@ -103,6 +103,7 @@ public:
   // Logic.
 public:
   class All;
+  class Any;
   
   // Create and Destroy.
 protected:
@@ -360,6 +361,25 @@ public:
   All (const VCheck& a, const VCheck& b, const VCheck& c);
   All (const VCheck& a, const VCheck& b, const VCheck& c, const VCheck& d);
   All (const VCheck& a, const VCheck& b, const VCheck& c, const VCheck& d, 
+       const VCheck& e);
+};
+
+class VCheck::Any : public VCheck
+{
+  // Parameters.
+private:
+  std::vector<const VCheck*> checks;
+
+  // Use.
+private:
+  bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
+
+  // Create and Destroy.
+public:
+  Any (const VCheck& a, const VCheck& b);
+  Any (const VCheck& a, const VCheck& b, const VCheck& c);
+  Any (const VCheck& a, const VCheck& b, const VCheck& c, const VCheck& d);
+  Any (const VCheck& a, const VCheck& b, const VCheck& c, const VCheck& d, 
        const VCheck& e);
 };
 

@@ -51,6 +51,7 @@ struct ChemistryMulti : public Chemistry
   bool know (symbol chem) const;
   bool ignored (symbol chem) const;
   Chemical& find (symbol chem);
+  const Chemical& find (symbol chem) const;
   const std::vector<Chemical*>& all () const;
   void sorption_table (const Soil& soil, const size_t cell, 
                        const double Theta, const double start,
@@ -77,6 +78,8 @@ struct ChemistryMulti : public Chemistry
   void incorporate (const Geometry& geo,
 		    const symbol chem, const double amount,
                     const Volume&, Treelog& msg);
+  void remove_solute (const symbol chem);
+  double total_content (const Geometry&, const symbol chem) const; //[g/m^2]
   
   // Simulation.
   void tick_source (const Scope&, 
@@ -149,6 +152,16 @@ ChemistryMulti::know (const symbol chem) const
 
 Chemical& 
 ChemistryMulti::find (symbol chem)
+{
+  for (size_t c = 0; c < chemicals.size (); c++)
+    if (chemicals[c]->objid == chem)
+      return *chemicals[c];
+
+  daisy_notreached ();
+}
+
+const Chemical& 
+ChemistryMulti::find (symbol chem) const
 {
   for (size_t c = 0; c < chemicals.size (); c++)
     if (chemicals[c]->objid == chem)
@@ -363,6 +376,22 @@ ChemistryMulti::incorporate (const Geometry& geo,
     return;
 
   check_ignore (chem, msg);
+}
+
+void 
+ChemistryMulti::remove_solute (const symbol chem)
+{
+  for (auto c : combine)
+    c->remove_solute (chem);
+}
+
+double				// [g/m^2]
+ChemistryMulti::total_content (const Geometry& geo, const symbol chem) const
+{
+  double total = 0.0;
+  for (auto c : combine)
+    total += c->total_content (geo, chem);
+  return total;
 }
 
 void 

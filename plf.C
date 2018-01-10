@@ -371,6 +371,8 @@ unsigned int
 PLF::size () const
 { return impl.x.size (); }
 
+#include <sstream>
+
 double 
 PLF::x (unsigned int i) const
 { return impl.x[i]; }

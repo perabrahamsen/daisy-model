@@ -47,7 +47,9 @@ PhotoFarquhar::PhotoFarquhar (const BlockModel& al)
     Ea_Gamma (al.number ("Ea_Gamma")),
     rubiscoNdist (Librarian::build_item<RubiscoNdist> (al, "N-dist")),
     Stomatacon (Librarian::build_item<StomataCon> (al, "Stomatacon"))
-{ }
+{ 
+  clear ();
+}
 
 PhotoFarquhar::~PhotoFarquhar ()
 { }
@@ -125,10 +127,11 @@ PhotoFarquhar::assimilate (const Units& units,
 			   Treelog& msg) 
 {
   if (CO2_atm <= 0.0)
-    {
-      msg.error ("You must specify atmospheric CO2 to use Farquhar");
-      return 0.0;
-    }
+    throw "You must specify atmospheric CO2 to use Farquhar";
+
+  std::ostringstream tmp;
+  tmp << "LAI = " << canopy.CAI;
+  msg.message (tmp.str ());
 
   const double h_x = std::fabs (psi_c) * 1.0e-4  /* [MPa/cm] */; // MPa
   // sugar production [gCH2O/m2/h] by canopy photosynthesis.

@@ -28,6 +28,10 @@
 #include "mathlib.h"
 #include <sstream>
 
+symbol 
+WSourceTable::title () const
+{ return lex.title (); }
+
 double 
 WSourceTable::lookup_month (const Time& time, const symbol key, 
                             const double default_value) const

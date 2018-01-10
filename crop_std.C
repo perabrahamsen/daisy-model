@@ -52,6 +52,7 @@
 #include "treelog.h"
 #include "frame.h"
 #include "block_model.h"
+#include "rubiscoN.h"
 #include <sstream>
 #include <numeric>
 
@@ -78,7 +79,8 @@ struct CropStandard : public Crop
   const std::unique_ptr<WSE> water_stress_effect;
   const bool enable_N_stress;
   const double min_light_fraction;
-
+  const std::unique_ptr<RubiscoN> rubiscoN;
+  
   // Communication with Bioclimate.
   double minimum_light_fraction () const
   { return min_light_fraction; }
@@ -410,9 +412,11 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
     = canopy->corresponding_WLeaf (DS) * nitrogen->NfLeafCnc (DS);
   const double N_at_Cr
     = canopy->corresponding_WLeaf (DS) * nitrogen->CrLeafCnc (DS);
-  const double N_above_Nf = production.NLeaf - N_at_Nf;
-  const double rubiscoN = bound (0.0, N_above_Nf, N_at_Cr - N_at_Nf);
-  daisy_assert (rubiscoN >= 0.0);
+  const double N_at_Pt
+    = canopy->corresponding_WLeaf (DS) * nitrogen->PtLeafCnc (DS);
+  const double rubisco_N = rubiscoN->value (total_LAI, production.NLeaf,
+					    N_at_Nf, N_at_Cr, N_at_Pt);
+  daisy_assert (rubisco_N >= 0.0);
       
   const double ABA_xylem = root_system->ABAConc;
   daisy_assert (std::isfinite (ABA_xylem));
@@ -440,7 +444,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
                                      CO2_atm, O2_atm, Ptot,
                                      bioclimate.daily_air_temperature(), 
                                      T_canopy, T_leaf_shadow,
-                                     rubiscoN, shadow_PAR, PAR_height,
+                                     rubisco_N, shadow_PAR, PAR_height,
                                      total_LAI, fraction_shadow_LAI, dt,
                                      *canopy, *development, msg)
           * bioclimate.shared_light_fraction ();
@@ -457,7 +461,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
                                      CO2_atm, O2_atm, Ptot,
                                      bioclimate.daily_air_temperature(),
                                      T_canopy, T_leaf_sun,
-                                     rubiscoN, sun_PAR,  PAR_height,
+                                     rubisco_N, sun_PAR,  PAR_height,
                                      total_LAI, fraction_sun_LAI, dt,
                                      *canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
@@ -482,7 +486,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
                                    CO2_atm, O2_atm, Ptot,
                                    bioclimate.daily_air_temperature (), 
                                    T_canopy, bioclimate.canopy_temperature(),
-                                   rubiscoN, PAR, PAR_height,
+                                   rubisco_N, PAR, PAR_height,
                                    bioclimate.LAI (), fraction_total_LAI, dt,
                                    *canopy, *development, msg)
         * min_light_fraction;
@@ -895,7 +899,8 @@ CropStandard::CropStandard (const BlockModel& al)
     nitrogen (submodel<CrpN> (al, "CrpN")),
     water_stress_effect (find_WSE (al, *shadow)),
     enable_N_stress (al.flag ("enable_N_stress", !shadow->handle_N_stress ())),
-    min_light_fraction (al.number ("min_light_fraction"))
+    min_light_fraction (al.number ("min_light_fraction")),
+    rubiscoN (Librarian::build_item<RubiscoN> (al, "RubiscoN"))
 { 
   if (!al.check ("enable_N_stress"))
     {
@@ -996,6 +1001,9 @@ by this parameter, and in these patches the crop will not have to\n\
 compete for light.  The crop still needs LAI in order to catch the\n\
 light though.  Competition for water and nutrients are unaffected.");
     frame.set ("min_light_fraction", 0.0);
+    frame.declare_object ("RubiscoN", RubiscoN::component, "\
+Fraction of N in leaves that is photosynthetically active.");
+    frame.set ("RubiscoN", "default");
   }
 } standard_crop_syntax;
 

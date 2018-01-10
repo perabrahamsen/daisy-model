@@ -72,6 +72,8 @@ public:
   virtual const Adsorption& adsorption () const = 0;
   virtual double diffusion_coefficient () const = 0; // [cm^2/h] in free solute
 
+  virtual double molar_mass () const = 0; // [g/mol], negative = unknown
+
   // Surface content.
   virtual double surface_release_fraction () const = 0; // []
   virtual double surface_storage_amount () const = 0;  // [g/cm^2]
@@ -121,6 +123,8 @@ public:
 
   // Management.
 public:
+  virtual void remove_all () = 0;
+  virtual double total_content (const Geometry&) const = 0; // [g/m^2]
   virtual void update_C (const Soil&, const SoilWater&) = 0;
   virtual void deposit (double flux /* [g/m^2/h] */) = 0;
   virtual void spray_overhead (double amount /* [g/m^2] */) = 0;

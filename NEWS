@@ -6,6 +6,32 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.42
+
+** New 'molar_mass' chemical parameter.
+
+This affects metabolites. If both the parent compound and the
+metabolite have molar_mass specified, the generated fraction is
+assumed to be mole based instead of weight based.
+
+** New Ps_PAR_SWE and Ps_NIR_SWE parameters in sun-shade raddist.
+** New svat SSOC epsilon_soil_SWE parameter.
+
+These allows soil water to affect the value. Is is a PLF of pF.
+Default value is 1 (no effect).
+
+** svat SSOC epsilon split into epsilon_soil and epsilon_leaf.
+
+default value for soil is 0.95, down from 0.98.
+
+** New 'RubiscoN' component.
+
+For calculating amount of rubisco N in leaves.
+
+** Fix bug in canopy washoff.
+
+** More bug fixes.
+
 * 5.40
 
 ** You can now specify the quartz fraction directly.

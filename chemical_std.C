@@ -43,6 +43,7 @@
 #include "memutils.h"
 #include "submodeler.h"
 #include "treelog.h"
+#include "soilfac.h"
 #include <sstream>
 
 struct ChemicalStandard : public Chemical
@@ -51,6 +52,7 @@ struct ChemicalStandard : public Chemical
   static const symbol g_per_cm3;
 
   // Parameters.
+  const double molar_mass_;
   const double solubility;
   const double solubility_infiltration_factor;
   const double crop_uptake_reflection_factor;
@@ -59,6 +61,7 @@ struct ChemicalStandard : public Chemical
   const double surface_decompose_rate;
   const double diffusion_coefficient_; 
   const double decompose_rate;
+  const auto_vector<Soilfac*> decompose_soil_factor; // List of soil factors.
   const PLF decompose_heat_factor;
   const PLF decompose_water_factor;
   const PLF decompose_CO2_factor;
@@ -159,9 +162,6 @@ struct ChemicalStandard : public Chemical
   double sink_dt;                            // Suggested timestep [h]
   int sink_cell;                             // Relevant cell.
 
-  // Cache.
-  std::vector<double> static_decompose_rate; // Depth adusted decompose rate.
-
   void sorption_table (const Soil& soil, const size_t cell, const double Theta, 
                        const double start, const double factor,
                        const int intervals,
@@ -170,6 +170,9 @@ struct ChemicalStandard : public Chemical
   // Solute.
   const Adsorption& adsorption () const;
   double diffusion_coefficient () const;
+
+  double molar_mass () const
+  { return molar_mass_; }
 
   // Surface content.
   double surface_release_fraction () const; // []
@@ -224,6 +227,8 @@ struct ChemicalStandard : public Chemical
   void release_surface_colloids (double surface_release);
 
   // Management.
+  void remove_all ();
+  double total_content (const Geometry&) const; // [g/m^2]
   void update_C (const Soil&, const SoilWater&);
   void deposit (const double flux); // [g/m^2/h]
   void spray_overhead (const double amount); // [g/m^2]
@@ -292,7 +297,10 @@ void
 ChemicalStandard::Product::load_syntax (Frame& frame)
 {
   frame.declare ("fraction", Attribute::Fraction (), Attribute::Const,
-                 "Fraction of decomposed matter that become this chemcial.");
+                 "Fraction of decomposed matter that become this chemcial.\n\
+\n\
+If both chemicals have molar_mass specified, the fraction will be mole\n\
+based, otherwise it will be mass based.");
   frame.declare_string ("chemical", Attribute::Const, 
                  "Chemical product of decomposed matter.");
   frame.order ("fraction", "chemical");
@@ -720,6 +728,26 @@ ChemicalStandard::release_surface_colloids (const double surface_release_value)
 }
 
 void
+ChemicalStandard::remove_all ()	
+{
+  snow_storage = 0.0;
+  canopy_storage = 0.0;
+  litter_storage = 0.0;
+  surface_storage = 0.0;
+  std::fill (C_avg_.begin (), C_avg_.end (), 0.0);
+  std::fill (C_secondary_.begin (), C_secondary_.end (), 0.0);
+  std::fill (M_secondary_.begin (), M_secondary_.end (), 0.0);
+  std::fill (M_total_.begin (), M_total_.end (), 0.0);
+  std::fill (M_primary_.begin (), M_primary_.end (), 0.0);
+  std::fill (C_primary_.begin (), C_primary_.end (), 0.0);
+}
+
+double				// [g/m^2]
+ChemicalStandard::total_content (const Geometry& geo) const
+{ return snow_storage + canopy_storage + litter_storage + surface_storage
+    + geo.total_surface (M_total_) * 10000.0 /* [cm^2/m^2] */; } 
+
+void
 ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
 {
   if (adsorption_->full ())
@@ -954,17 +982,34 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   const double old_canopy_storage = canopy_storage;
   const double canopy_absolute_input_rate 
     = canopy_in - canopy_harvest - residuals;
-  const double canopy_washoff_rate 
-    = canopy_washoff_coefficient * canopy_leak_rate;
-  double canopy_absolute_loss_rate;
+
   double canopy_washoff;
-  first_order_change (old_canopy_storage, 
-                      canopy_absolute_input_rate, 
-                      canopy_dissipation_rate + canopy_washoff_rate, dt,
-                      canopy_storage, canopy_absolute_loss_rate);
-  divide_loss (canopy_absolute_loss_rate, 
-               canopy_washoff_rate, canopy_dissipation_rate,
-               canopy_washoff, canopy_dissipate);
+  if (canopy_leak_rate < 0.0)
+    {
+      // Special case: No water left on canopy, yet there is overflow.
+      // Wash it all off.
+      if (canopy_storage > 1e-1)
+	{
+	  TREELOG_MODEL (msg);
+	  msg.message ("Evacuating canopy");
+	}
+      canopy_washoff = old_canopy_storage / dt + canopy_absolute_input_rate;
+      canopy_dissipate = 0.0;
+      canopy_storage = 0.0;
+    }
+  else
+    {
+      const double canopy_washoff_rate 
+	= canopy_washoff_coefficient * canopy_leak_rate;
+      double canopy_absolute_loss_rate;
+      first_order_change (old_canopy_storage, 
+			  canopy_absolute_input_rate, 
+			  canopy_dissipation_rate + canopy_washoff_rate, dt,
+			  canopy_storage, canopy_absolute_loss_rate);
+      divide_loss (canopy_absolute_loss_rate, 
+		   canopy_washoff_rate, canopy_dissipation_rate,
+		   canopy_washoff, canopy_dissipate);
+    }
   canopy_out = canopy_washoff + residuals;
 
   // Litter
@@ -1343,6 +1388,9 @@ ChemicalStandard::decompose (const Geometry& geo,
                              const OrganicMatter& organic_matter,
                              Chemistry& chemistry, const double dt, Treelog&)
 {
+  if (!std::isnormal (decompose_rate))
+    return;
+
   const size_t cell_size = geo.cell_size ();
 
   // Update lag time.
@@ -1372,37 +1420,46 @@ ChemicalStandard::decompose (const Geometry& geo,
   std::vector<double> decomposed_secondary (cell_size, NAN);
 
   // Basic decompose rate.
-  daisy_assert (static_decompose_rate.size () == cell_size);
   for (size_t c = 0; c < cell_size; c++)
     {
       // Basic rate.
-      double rate = static_decompose_rate[c];
-
-      // Adjust for heat.
-      if (decompose_heat_factor.size () < 1)
-        rate *= Abiotic::f_T0 (soil_heat.T (c));
+      double rate = decompose_rate;
+      double rate_primary;
+      double rate_secondary;
+      if (decompose_soil_factor.size () > 0)
+	{
+	  for (size_t i = 0; i < decompose_soil_factor.size (); i++)
+	    rate *= decompose_soil_factor[i]->value (c, geo, soil, 
+						     soil_water, soil_heat,
+						     organic_matter, *this);
+	  rate_primary = rate_secondary = rate;
+	}
       else
-        rate *= decompose_heat_factor (soil_heat.T (c));
+	{
+	  // Adjust for heat.
+	  if (decompose_heat_factor.size () < 1)
+	    rate *= Abiotic::f_T0 (soil_heat.T (c));
+	  else
+	    rate *= decompose_heat_factor (soil_heat.T (c));
 
-      // Adjust for moisture.
-      if (decompose_water_factor.size () < 1)
-        rate *= Abiotic::f_h (soil_water.h (c));
-      else
-        rate *= decompose_water_factor (soil_water.h (c));
+	  // Adjust for moisture.
+	  if (decompose_water_factor.size () < 1)
+	    rate *= Abiotic::f_h (soil_water.h (c));
+	  else
+	    rate *= decompose_water_factor (soil_water.h (c));
 
-      // Adjust for biological activity.
-      if (decompose_CO2_factor.size () > 0)
-        rate *= decompose_CO2_factor (organic_matter.CO2 (c));
+	  // Adjust for biological activity.
+	  if (decompose_CO2_factor.size () > 0)
+	    rate *= decompose_CO2_factor (organic_matter.CO2 (c));
 
-      // Adjust for concentration.
-      double rate_primary = rate;
-      double rate_secondary = rate;
-      if (decompose_conc_factor.size () > 0)
-        {
-          rate_primary *= decompose_conc_factor (C_primary (c));
-          rate_secondary *= decompose_conc_factor (C_secondary (c));
-        }
-
+	  // Adjust for concentration.
+	  rate_primary = rate_secondary = rate;
+	  if (decompose_conc_factor.size () > 0)
+	    {
+	      rate_primary *= decompose_conc_factor (C_primary (c));
+	      rate_secondary *= decompose_conc_factor (C_secondary (c));
+	    }
+	}
       // Decomposition.
       decomposed_primary[c] = M_primary (c) * rate_primary;
       decomposed_secondary[c] = M_secondary (c) * rate_secondary;
@@ -1418,12 +1475,17 @@ ChemicalStandard::decompose (const Geometry& geo,
         {
           Chemical& chemical = chemistry.find (name);
           const double fraction = product[i]->fraction;
+	  const double factor = fraction *
+	    ((molar_mass () > 0.0 && chemical.molar_mass () > 0.0)
+	     ? chemical.molar_mass () / molar_mass ()
+	     : 1.0);
+
           std::vector<double> created_primary = decomposed_primary;
           std::vector<double> created_secondary = decomposed_secondary;
           for (size_t c = 0; c < cell_size; c++)
             {
-              created_primary[c] *= fraction;
-              created_secondary[c] *= fraction;
+              created_primary[c] *= factor;
+              created_secondary[c] *= factor;
             }
           chemical.add_to_transform_source (created_primary);
           chemical.add_to_transform_source_secondary (created_secondary);
@@ -1549,6 +1611,8 @@ ChemicalStandard::check (const Units& units, const Scope& scope,
                          const Chemistry& chemistry,
                          Treelog& msg) const
 {
+  TREELOG_MODEL (msg);
+
   const size_t cell_size = geo.cell_size ();
 
   // Warn against untraced chemicals.
@@ -1558,9 +1622,21 @@ ChemicalStandard::check (const Units& units, const Scope& scope,
     for (size_t i = 0; i < product.size (); i++)
       {
         const symbol chemical = product[i]->chemical;
+	Treelog::Open nest (msg, chemical);
         if (!chemistry.know (chemical) && !chemistry.ignored (chemical))
-          msg.warning ("Decompose product '" + chemical.name () 
-                       + "' will not be traced");
+          msg.warning ("Decompose product will not be traced");
+	else
+	  {
+	    const Chemical& product = chemistry.find (chemical);
+	    
+	    if (molar_mass () < 0.0 && product.molar_mass () < 0.0)
+	      msg.debug ("Decompose product convertion will be mass based");
+	    else if (molar_mass () > 0.0 && product.molar_mass () > 0.0)
+	      msg.debug ("Decompose product convertion will be mole based");
+	    else
+	      msg.warning ("Decompose product convertion will be mass based, because molar mass is only specified for one of the chemicals");
+	    
+	  }
       }
 
   bool ok = true;
@@ -1848,15 +1924,11 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
   J_tertiary.resize (edge_size, 0.0);
   tillage.resize (cell_size, 0.0);
   lag.resize (cell_size, 0.0);
-
-  for (size_t c = 0; c < cell_size; c++)
-    static_decompose_rate.push_back (decompose_rate 
-                                     * decompose_depth_factor (geo.cell_z (c)));
-  daisy_assert (static_decompose_rate.size () == cell_size);
 }
 
 ChemicalStandard::ChemicalStandard (const BlockModel& al)
   : Chemical (al),
+    molar_mass_ (al.number ("molar_mass", -1.0)),
     solubility (al.number ("solubility")),
     solubility_infiltration_factor
     /**/ (al.number ("solubility_infiltration_factor")),
@@ -1878,6 +1950,8 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
     decompose_rate (al.check ("decompose_rate")
                     ? al.number ("decompose_rate")
                     : halftime_to_rate (al.number ("decompose_halftime"))),
+    decompose_soil_factor 
+    /**/(Librarian::build_vector<Soilfac> (al, "decompose_soil_factor")),
     decompose_heat_factor (al.plf ("decompose_heat_factor")),
     decompose_water_factor (al.plf ("decompose_water_factor")),
     decompose_CO2_factor (al.plf ("decompose_CO2_factor")),
@@ -2101,6 +2175,9 @@ Only for initialization of the 'M' parameter."); }
     Model::load_model (frame);
 
     // Surface parameters.
+    frame.declare ("molar_mass", "g/mol",
+		   Check::non_negative (), Attribute::OptionalConst, "\
+Molar mass of the chemical.");
     frame.declare ("solubility", "g/cm^3", 
                    Check::non_negative (), Attribute::Const, "\
 Maximal concentration in water at 20 dg C.");
@@ -2152,6 +2229,13 @@ You must specify it with either 'decompose_rate' or 'decompose_halftime'.");
                    Attribute::OptionalConst,
                    "How fast the chemical is being decomposed in the soil.\n\
 You must specify it with either 'decompose_rate' or 'decompose_halftime'.");
+
+    frame.declare_object ("decompose_soil_factor", Soilfac::component, 
+			  Attribute::Const, Attribute::Variable,
+			  "List of soil factors.\n\
+Setting this will overwrite the individual 'heat', 'water', 'CO2', \n\
+'depth', and 'conc' factors.");
+    frame.set_empty ("decompose_soil_factor");
     frame.declare ("decompose_heat_factor", "dg C", Attribute::None (),
                    Attribute::Const, "Heat factor on decomposition.");
     frame.set ("decompose_heat_factor", PLF::empty ());

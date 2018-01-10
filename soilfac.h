@@ -1,6 +1,6 @@
-// wsource.C -- Selected weather data.
+// soilfac.h --- Find a number for a specific soil cell.
 // 
-// Copyright 2010 KU
+// Copyright 2017 KU
 //
 // This file is part of Daisy.
 // 
@@ -18,43 +18,39 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#define BUILD_DLL
 
-#include "wsource_weather.h"
-#include "weatherdata.h"
-#include "time.h"
-#include "librarian.h"
-#include "assertion.h"
+#ifndef SOILFAC_H
+#define SOILFAC_H
 
-// The "weather" component.
+#include "model.h"
+#include "symbol.h"
 
-const char *const WSource::component = "weather";
+class Geometry;
+class Soil;
+class SoilWater;
+class SoilHeat;
+class OrganicMatter;
+class Chemical;
 
-symbol
-WSource::library_id () const
+class Soilfac : public Model
 {
-  static const symbol id (component);
-  return id;
-}
+  // Content.
+public:
+  static const char *const component;
+  symbol library_id () const;
 
-symbol 
-WSource::title () const
-{ return objid; }
+  // Simulation.
+public:
+  virtual double value(size_t c,
+		       const Geometry&, const Soil&, 
+		       const SoilWater&, const SoilHeat&, 
+		       const OrganicMatter&, const Chemical&) const = 0;
 
-WSource::WSource (const symbol name)
-  : ModelDerived (name)
-{ }
+  // Create and Destroy.
+protected:
+  Soilfac ();
+public:
+  ~Soilfac ();
+};
 
-WSource::~WSource ()
-{ }
-
-static struct WSourceInit : public DeclareComponent
-{
-  WSourceInit ()
-    : DeclareComponent (WSource::component, "\
-A 'wsource' is a source of raw weatherdata.")
-  { }
-} WSource_init;
-
-// wsource.C ends here.
-
+#endif // SOILFAC_H

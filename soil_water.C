@@ -424,7 +424,7 @@ SoilWater::tick_after (const Geometry& geo,
         {
           if (approximate (z, z_low))
             {
-              if (!std::isnormal (table_low)
+              if (!std::isfinite (table_low)
                   || table < table_low)
                 table_low = table;
             }
@@ -436,7 +436,7 @@ SoilWater::tick_after (const Geometry& geo,
         }
       else if (approximate (z, z_high))
         {
-          if (!std::isnormal (table_high)
+          if (!std::isfinite (table_high)
               || table > table_high)
             table_high = table;
         }
@@ -492,16 +492,16 @@ SoilWater::tick_after (const Geometry& geo,
     }
 
 #if 0
-  if (!std::isnormal (table_high))
+  if (!std::isfinite (table_high))
     {
       // No saturated cell, use lowest unsaturated.
-      // daisy_assert (std::isnormal (table_low));
+      // daisy_assert (std::isfinite (table_low));
       table_high = table_low;
     }
-  else if (!std::isnormal (table_low))
+  else if (!std::isfinite (table_low))
     {
       // No unsaturated cell, use highest saturated.
-      // daisy_assert (std::isnormal (table_high));
+      // daisy_assert (std::isfinite (table_high));
       table_low = table_high;
     }
 #endif
@@ -733,9 +733,9 @@ SoilWater::output (Log& log) const
       output_value (sink_dt, "dt", log);
       output_variable (sink_cell, log);
     }
-  if (std::isnormal (table_low))
+  if (std::isfinite (table_low))
     output_variable (table_low, log);
-  if (std::isnormal (table_high))
+  if (std::isfinite (table_high))
     output_variable (table_high, log);
 }
 

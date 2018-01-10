@@ -285,7 +285,7 @@ DISABLED = depend.C \
 
 # A component is a common interface to a number of models.
 # 
-COMPONENTS = solupt.C soilph.C \
+COMPONENTS = soilfac.C rubiscoN.C solupt.C soilph.C \
 	deposition.C uifilter.C zone.C wsource.C solute.C drain.C \
 	draineqd.C condedge.C rainergy.C ponddamp.C scope_model.C seed.C \
 	stomatacon.C tertiary.C biopore.C secondary.C heatrect.C unit_model.C \

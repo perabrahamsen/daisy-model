@@ -130,6 +130,8 @@ struct NumberLet : public Number
           if (!clause[i]->expr->initialize (units, scope, msg))
             ok = false;
         }
+      if (ok)
+	tick (units, scope, msg);
       return ok;
     }
     using Scope::check;

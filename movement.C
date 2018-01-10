@@ -136,6 +136,14 @@ double
 Movement::suggest_dt (const double weather_dt, const double max_pond) const
 { return tertiary->suggest_dt (weather_dt, max_pond); }
 
+void
+Movement::remove_solute (const symbol chem)
+{ tertiary->remove_solute (chem); }
+
+double 
+Movement::total_solute (const Geometry& geo, const symbol chem) const //[g/m^2]
+{ return tertiary->total_solute (geo, chem); }
+
 void 
 Movement::output_base (Log& log) const
 { 

@@ -1,6 +1,7 @@
-// wsource.C -- Selected weather data.
+// rubiscoN.h -- Rubisco N in leaves.
 // 
-// Copyright 2010 KU
+// Copyright 2006 Birgitte Gjettermann, Per Abrahamsen and KVL
+// Copyright 2017 KU.
 //
 // This file is part of Daisy.
 // 
@@ -18,43 +19,31 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#define BUILD_DLL
 
-#include "wsource_weather.h"
-#include "weatherdata.h"
-#include "time.h"
-#include "librarian.h"
-#include "assertion.h"
+#ifndef RUBISCON_H
+#define RUBISCON_H
 
-// The "weather" component.
+#include "model.h"
+#include "symbol.h"
 
-const char *const WSource::component = "weather";
-
-symbol
-WSource::library_id () const
+class RubiscoN : public Model
 {
-  static const symbol id (component);
-  return id;
-}
+  // Content.
+public:
+  static const char *const component;
+  symbol library_id () const;
 
-symbol 
-WSource::title () const
-{ return objid; }
+  // Simulation.
+public:
+  virtual double value (double LAI, double Act, double Nf, double Cr, 
+		      double Pt) = 0;
 
-WSource::WSource (const symbol name)
-  : ModelDerived (name)
-{ }
+  // Create and Destroy.
+protected:
+  RubiscoN ();
 
-WSource::~WSource ()
-{ }
+public:
+  ~RubiscoN ();
+};
 
-static struct WSourceInit : public DeclareComponent
-{
-  WSourceInit ()
-    : DeclareComponent (WSource::component, "\
-A 'wsource' is a source of raw weatherdata.")
-  { }
-} WSource_init;
-
-// wsource.C ends here.
-
+#endif // RUBISCON_H

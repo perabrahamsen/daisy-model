@@ -388,6 +388,10 @@ Connvert to SI base units by multiplying with a factor.")
     // Thermodynamic temperature.
     add ("K", 1.0, 0, 0, 0, 0, 1, 0, 0,
          "Kelvin.");
+    add ("K^-1", -1.0, 0, 0, 0, 0, 1, 0, 0,
+         "Per kelvin.");
+    add ("K^-2", -2.0, 0, 0, 0, 0, 1, 0, 0,
+         "Per kelvin squared.");
 
     // Amount of substance.
     add ("mol", 1.0, 0, 0, 0, 0, 0, 1, 0,

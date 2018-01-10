@@ -103,6 +103,18 @@ struct TertiaryBiopores : public Tertiary
   void tick (const Units&, const Geometry& geo, const Soil& soil, 
              const SoilHeat& soil_heat, const double dt, 
              SoilWater& soil_water, Surface& surface, Treelog& msg);
+  void remove_solute (const symbol chem)
+  { 
+    for (auto b : classes)
+      b->remove_solute (chem);
+  }
+  double total_solute (const Geometry& geo, const symbol chem) const // [g/m^2]
+  { 
+    double total = 0.0;
+    for (auto b : classes)
+      total += b->total_solute (geo, chem);
+    return total;
+  }
 
   // - For use in Richard's Equation.
   void matrix_sink (std::vector<double>& S_B2M,

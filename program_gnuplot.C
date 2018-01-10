@@ -41,7 +41,7 @@ struct ProgramGnuplot : public Program
   const std::vector<symbol> extra;
 
   // Graphs.
-  const std::vector<Gnuplot*> graph;
+  auto_vector<Gnuplot*> graph;
 
   // Use.
   bool run (Treelog& msg);
@@ -58,20 +58,8 @@ struct ProgramGnuplot : public Program
 bool
 ProgramGnuplot::run (Treelog& msg)
 { 
-  // Initialize.
-  {
-    Treelog::Open nest (msg, "Reading");
-    bool ok = true;
-    for (size_t i = 0; i < graph.size(); i++)
-      {
-        Treelog::Open nest (msg, objid.name (), i, graph[i]->objid);
-        msg.touch ();
-        if (!graph[i]->initialize (units, msg))
-          ok = false;
-      }
-    if (!ok)
-      return false;
-  }
+  TREELOG_MODEL (msg);
+  bool ok = true;
 
   // Open file, and change directory.
   const symbol dir = path.get_directory ();
@@ -79,25 +67,35 @@ ProgramGnuplot::run (Treelog& msg)
   if (do_cd)
     out << "cd " << Gnuplot::quote (dir) << "\n";
 
-  // Extra.
-  for (size_t i = 0; i < extra.size (); i++)
-    out << extra[i].name () << "\n";
+  // Process graphs.
+  while (graph.size() > 0)
+    {
+      Gnuplot* gg = graph[0];
+      Treelog::Open nest (msg, gg->objid);
+      msg.touch ();
+      
+      // Initialize
+      if (!gg->initialize (units, msg))
+	{
+	  ok = false;
+	  break;
+	}
 
-  
-  // Plot.
-  {
-    Treelog::Open nest (msg, "Writing");
-    msg.touch ();
-    bool ok = true;
-    for (size_t i = 0; i < graph.size(); i++)
-      {
-        Treelog::Open nest (msg, objid.name (), i, graph[i]->objid);
-        if (!graph[i]->plot (out, msg))
-          ok = false;
-      }
-    if (!ok)
-      return false;
-  }
+      // Extra.
+      for (size_t i = 0; i < extra.size (); i++)
+	out << extra[i].name () << "\n";
+
+      // Plot.
+      if (!gg->plot (out, msg))
+	{
+	  ok = false;
+	  break;
+	}
+      
+      // Cleanup.
+      graph.erase (graph.begin ());
+      delete gg;
+    }
 
   // Done.
   if (!out.good ())
@@ -105,7 +103,7 @@ ProgramGnuplot::run (Treelog& msg)
       msg.error ("Problems writing to temporary file '" + command_file + "'");
       return false;
     }
-  return true;
+  return ok;
 }
 
 ProgramGnuplot::ProgramGnuplot (const BlockModel& al)
@@ -119,7 +117,7 @@ ProgramGnuplot::ProgramGnuplot (const BlockModel& al)
 { }
 
 ProgramGnuplot::~ProgramGnuplot ()
-{ sequence_delete (graph.begin (), graph.end ()); }
+{ }
 
 static struct ProgramGnuplotSyntax : public DeclareModel
 {

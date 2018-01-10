@@ -85,6 +85,8 @@ protected:
   // Interface.
 public:
   virtual double total_water () const = 0;
+  virtual double total_solute (const Geometry&, 
+			       const symbol chem) const = 0; //[g/m^2]
   virtual void get_solute (IM& im) const = 0;
 protected:
   double density (const size_t c) const
@@ -131,6 +133,8 @@ public:
 private:
   virtual void add_solute (symbol chem, 
                            size_t cell, double amount /* [g] */) = 0;
+public:
+  virtual void remove_solute (symbol chem) = 0;
 public:
   virtual void matrix_solute (const Geometry& geo, double dt, 
                               Chemical& chemical, Treelog& msg) = 0;

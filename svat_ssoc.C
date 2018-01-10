@@ -40,19 +40,23 @@
 #include "frame.h"
 #include "weather.h"
 #include "iterative.h"
+#include "plf.h"
+#include "soil_water.h"
 #include <memory>
 #include <sstream>
 
 struct SVAT_SSOC : public SVAT
 {
   // Constants.
-  static const double epsilon; // Emmision of Longwave rad == SurEmiss [] 
   static const double sigma;   // Stefan Boltzman constant [W m^-2 K^-4]
   static const double TK;      // Conversion from dg C to K.
   static const double c_p;     // Specific heat of air [J kg^-1 K^-1]
   //Parameters
   const bool hypostomatous;    // True for hypostomatous leaves;
   const double z_0b;     //Bare soil roughness height for momentum [m]
+  const double epsilon_soil;   // Soil emmisivity long wave rad. []
+  const PLF epsilon_soil_SWE;  // Effect of soil water on emmisivity [pF] -> []
+  const double epsilon_leaf;   // Leaf emmisivity long wave rad. []
 
   // Driving variables.
   // - Upper boundary
@@ -139,7 +143,7 @@ struct SVAT_SSOC : public SVAT
   double G_R_soil;  // Radiation "conductivity" from the soil [W m^-2 K^-1]
   double G_R_sun;   // Radiation "conductivity" from sun leaves [W m^-2 K^-1]
   double G_R_shadow;// Radiation "conductivity" from shadow leaves [W m^-2 K^-1]
-  double G_R_leaf;// Radiation "conductivity" from shadow leaves [W m^-2 K^-1]
+  double G_R_leaf;// Radiation "conductivity" from leaves at night [W m^-2 K^-1]
   double G_H_a;     // Heat "conductivity" from soil to free atmosphere [W m^-2 K^-1]
   double G_W_a;     // Water "conductivity" from soil to free atmosphere [m s^-1]
   double G_H_s_c;   // Heat "conductance" from soil to canopy point [W m^-2 K^-1]
@@ -342,7 +346,6 @@ struct SVAT_SSOC : public SVAT
 
 };
 
-const double SVAT_SSOC::epsilon = 0.98;  //Emmision of Longwave rad == SurEmiss []
 const double SVAT_SSOC::sigma = 5.67e-8; //Stefan Boltzman constant [W/m^2/K^4]
 const double SVAT_SSOC::TK = 273.15;     //Conversion from dg C to K.
 const double SVAT_SSOC::c_p = 1010.;     //Specific heat of air.[J/kg/K^1]
@@ -405,6 +408,7 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
       T_s = T_a;
       T_sun = T_shadow = T_0 = T_c;
       e_c = e_a;
+      T_z0 = T_z0_initial;
     }
 
   if(has_LAI)
@@ -421,10 +425,6 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   else 
     initialized_canopy = false;
 
-  T_c = T_a; //[K]
-  T_sun = T_shadow = T_s = T_0 = T_c = T_a;
-  e_c = e_a;
-  T_z0 = T_z0_initial;
 
   gb_W_sun = gb_W_shadow = Resistance::molly2ms (T_a - TK, Ptot, 2.0);
 
@@ -585,7 +585,10 @@ SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil,
   // Intermediates variable ------------------------------
 
   // Radiation "conductivity"
-  G_R_soil = 4. * epsilon * sigma * pow(T_a, 3.) * (1. - cover); //[W m^-2 K^-1]
+  const double pF 
+    = h2pF (geo.content_hood (soil_water, &SoilWater::h, Geometry::cell_above));
+  const double eps_soil = epsilon_soil * epsilon_soil_SWE (pF);
+  G_R_soil = 4. * eps_soil * sigma * pow(T_a, 3.) * (1. - cover); //[W m^-2 K^-1]
  
   // Sensible heat "conductance" from soil to atmosphere
   G_H_a = c_p * rho_a * g_a;            //[W m^-2 K^-1] 
@@ -593,23 +596,24 @@ SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil,
   G_W_a =  c_p * rho_a * g_a / gamma;  //[m s^-1] 
 
   // Black-body emmission:
-  const double BB = epsilon * sigma * pow(T_a , 4.); //[W m^-2]
+  const double BB_leaf = epsilon_leaf * sigma * pow(T_a , 4.); //[W m^-2]
+  const double BB_soil = eps_soil * sigma * pow(T_a , 4.); //[W m^-2]
   // "Temperature equilibrium" net-radiation absorbed by the soil
-  R_eq_abs_soil = R_abs_soil - BB * (1. - cover);           //[W m^-2]
+  R_eq_abs_soil = R_abs_soil - BB_soil * (1. - cover);           //[W m^-2]
 
   
   if (has_LAI && has_light) // canopy and soil during daytime
     {
       // Radiation "conductivity"
-      G_R_sun = 4. * epsilon * sigma * pow(T_a, 3.) * cover 
+      G_R_sun = 4. * epsilon_leaf * sigma * pow(T_a, 3.) * cover 
         * sun_LAI_fraction_total; //[W m^-2 K^-1]
-      G_R_shadow = 4. * epsilon * sigma * pow(T_a, 3.) * cover
+      G_R_shadow = 4. * epsilon_leaf * sigma * pow(T_a, 3.) * cover
         * (1. - sun_LAI_fraction_total); //[W m^-2 K^-1]
       
       // Equilibrium net-radiation absorbed by the sunlit leaves
-      R_eq_abs_sun = R_abs_sun - BB * cover * sun_LAI_fraction_total; //[W m^-2]
+      R_eq_abs_sun = R_abs_sun - BB_leaf * cover * sun_LAI_fraction_total; //[W m^-2]
       // Equilibrium net-radiation absorbed by the shadow leaves
-      R_eq_abs_shadow = R_abs_shadow - BB * cover * (1.- sun_LAI_fraction_total);
+      R_eq_abs_shadow = R_abs_shadow - BB_leaf * cover * (1.- sun_LAI_fraction_total);
                         //[W m^-2]
    
       // Sensible heat "conductance" between soil and canopy point
@@ -745,11 +749,12 @@ SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil,
   else if (has_LAI && !has_light) // canopy and soil during night time
     {
       // Radiation "conductivity"
-      G_R_leaf = 4. * epsilon * sigma * pow(T_a, 3.) * cover; //[W m^-2 K^-1]
+      G_R_leaf = 4. * epsilon_leaf * sigma * pow(T_a, 3.) * cover; //[W m^-2 K^-1]
 
       // Equilibrium net-radiation absorbed by the leaves
-      R_eq_abs_shadow = R_abs_shadow + R_abs_sun  - BB * cover; //[W m^-2]
-   
+      R_eq_abs_shadow = R_abs_shadow + R_abs_sun  - BB_leaf * cover; //[W m^-2]
+      const double R_eq_abs_leaf = R_eq_abs_shadow;
+
       // Sensible heat "conductance" between soil and canopy point
       G_H_s_c =  c_p * rho_a * g_H_s_c; //*(1.- cover);       //[W m^-2 K^-1] 
       // Sensible heat "conductance" between leaves and canopy point
@@ -758,6 +763,106 @@ SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil,
       
       // Latent heat "conductance" between sunlit leaves and canopy point
       G_W_leaf_c =  c_p * rho_a * g_W_leaf_c / gamma;// * cover *  (1.-sun_LAI_fraction_total);  //[m s^-1] 
+
+#if 1
+      // We have an equation system with four unknowns, and four equations.
+
+      // We assign a number and an equation to each unknown.
+      enum { iT_s, iT_c, ie_c, iT_leaf, isize };
+
+      // A x = b
+      Solver::Matrix A (isize); 
+      Solver::Vector b (isize);
+      Solver::Vector x (isize);
+
+      // 1. The soil equation.
+      // 
+      // R_eq_abs_soil - G_R_soil * (T_s - T_a)
+      // = (k_h / z0) * (T_s - T_z0) + G_H_s_c * (T_s - T_c) + lambda * E_soil
+      // 
+      // <=>
+      //
+      // R_eq_abs_soil + G_R_soil * T_a + (k_h / z0) * T_z0 - lambda * E_soil
+      // = (G_R_soil + (k_h / z0) + G_H_s_c) * T_s
+      // - G_H_s_c * T_c
+
+      b (iT_s) = R_eq_abs_soil + G_R_soil * T_a 
+               + (k_h / z0) * T_z0 - lambda * E_soil;
+      A (iT_s, iT_s) = G_R_soil + (k_h / z0) + G_H_s_c;
+      A (iT_s, iT_c) = - G_H_s_c;
+        
+      // 2. The canopy equation.
+      // 
+      // H_atm = H_soil + H_leaf 
+      // 
+      // <=>
+      //
+      // G_H_a * (T_c - T_a) 
+      // = G_H_s_c * (T_s - T_c) + G_H_leaf_c * (T_leaf - T_c)
+      //
+      // <=>
+      //
+      // - G_H_a * T_a
+      // = - (G_H_a + G_H_s_c + G_H_leaf_c) * T_c 
+      // + G_H_s_c * T_s + G_H_leaf_c * T_leaf
+      
+      b (iT_c) = - G_H_a * T_a;
+      A (iT_c, iT_s) = G_H_s_c;
+      A (iT_c, iT_c) = - (G_H_a + G_H_s_c + G_H_leaf_c);
+      A (iT_c, iT_leaf) = G_H_leaf_c;
+
+      // 3. The vapour pressure equation.
+      // 
+      // LE_atm  = LE_soil + LE_leaf
+      // 
+      // <=>
+      //
+      // G_W_a * (e_c - e_a) 
+      // = lambda * E_soil 
+      // + G_W_leaf_c * (s * (T_leaf - T_a) + (e_sat_air - e_c))
+      //
+      // <=>
+      //
+      // G_W_leaf_c * (s * T_a - e_sat_air)
+      // - G_W_a * e_a - lambda * E_soil 
+      // = G_W_leaf_c * s * T_leaf 
+      // - (G_W_a + G_W_leaf_c) * e_c
+      
+      b (ie_c) = G_W_leaf_c * (s * T_a - e_sat_air)
+        - G_W_a * e_a - lambda * E_soil;
+      A (ie_c, ie_c) = - (G_W_a + G_W_leaf_c);
+      A (ie_c, iT_leaf) = G_W_leaf_c * s;
+
+      // 4. The leaves equation.
+      // 
+      // R_abs_leaf = H_leaf_c + lambda * E_leaf_c
+      // 
+      // <=>
+      //
+      // R_eq_abs_leaf - G_R_leaf * (T_leaf - T_a) 
+      // = G_H_leaf_c * (T_leaf - T_c) 
+      // + G_W_leaf_c * (s * (T_leaf - T_a) + (e_sat_air - e_c))
+      // 
+      // <=>
+      //
+      // R_eq_abs_leaf + (G_R_leaf + G_W_leaf_c * s) * T_a - G_W_leaf_c * e_sat_air
+      // = (G_R_leaf + G_H_leaf_c + G_W_leaf_c * s) * T_leaf 
+      // - G_H_leaf_c * T_c - G_W_leaf_c * e_c
+      
+      b (iT_leaf) = R_eq_abs_leaf + (G_R_leaf + G_W_leaf_c * s) * T_a 
+                 - G_W_leaf_c * e_sat_air;
+      A (iT_leaf, iT_c) = - G_H_leaf_c;
+      A (iT_leaf, ie_c) = - G_W_leaf_c;
+      A (iT_leaf, iT_leaf) = (G_R_leaf + G_H_leaf_c + G_W_leaf_c * s);
+
+      // Solve and extract.
+      solver->solve (A, b, x);
+      T_s = x[iT_s];
+      T_c = x[iT_c];
+      T_shadow = T_sun = x[iT_leaf];
+      e_c = x[ie_c];
+
+#else
 
       // inter-inter-intermediate variables
       const double a_soil = ((R_eq_abs_soil + G_R_soil * (T_a - T_a)
@@ -786,7 +891,6 @@ SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil,
                              / (G_R_leaf + G_H_leaf_c * (1. - a_can_leaf)
                                 + G_W_leaf_c * (s - b_can_leaf))/*[W m^-2 K^-1]*/
                              + T_a);//[K]
-
       // -------------------------------------------
       // Temperature of leaves 
       // -------------------------------------------
@@ -806,6 +910,7 @@ SVAT_SSOC::calculate_temperatures (const Geometry& geo, const Soil& soil,
       // Canopy vapour pressure 
       // -------------------------------------------
       e_c = b_can + b_can_leaf * (T_leaf - T_a) + e_a; //[Pa]
+#endif
 
     }
 
@@ -908,10 +1013,33 @@ SVAT_SSOC::solve (const double gs_shadow /* stomata cond. [m/s]*/,
   catch (const char *const error)
     {
       msg.warning (error);
-      initialized_soil = has_LAI = false; // Prevent log.
-      fix->set_value (fix->initial_guess ());
-      calculate_conductances (gs_shadow, gs_sunlit, msg);
-      is_stable = false;
+
+      Fixpoint::Value old_initial = fix->initial_guess ();
+
+      try 
+	{
+	  const double T_avg = 0.5 * (T_a + T_z0_initial);
+	  T_s = T_z0 = T_sun = T_shadow = T_c = T_avg ;
+	  e_c = e_a;
+	  fix->set_initial ();
+
+	  Fixpoint::Value solution = fix->solve (msg);
+
+	  // Restore old initial value for next SVAT iteration.
+	  fix->set_value (old_initial);
+	  fix->set_initial ();
+
+	  fix->set_value (solution);
+	  is_stable = true;
+	}
+      catch (const char *const error)
+	{
+	  initialized_soil = has_LAI = false; // Prevent log.
+	  fix->set_value (old_initial);
+	  fix->set_initial ();
+	  calculate_conductances (gs_shadow, gs_sunlit, msg);
+	  is_stable = false;
+	}
     }
   calculate_fluxes ();
 }
@@ -955,7 +1083,12 @@ SVAT_SSOC::output(Log& log) const
           output_variable (g_H_shadow_c, log);
           output_variable (gb_W_shadow, log);
           output_variable (g_W_shadow_c, log);      
+	  output_variable (G_R_sun, log);
+	  output_variable (G_R_shadow, log);
         }
+      else
+	output_variable (G_R_leaf, log);
+
       output_variable (R_abs_sun, log);
       output_variable (R_abs_shadow, log);
       if (has_light)
@@ -979,6 +1112,9 @@ SVAT_SSOC::SVAT_SSOC (const BlockModel& al)
   : SVAT (al), 
     hypostomatous (al.flag ("hypostomatous")),
     z_0b (al.number ("z_0b")),
+    epsilon_soil (al.number ("epsilon_soil")),
+    epsilon_soil_SWE (al.plf ("epsilon_soil_SWE")),
+    epsilon_leaf (al.number ("epsilon_leaf")),
     Ptot (-42.42e42),
     T_a (-42.42e42),
     z_r (-42.42e42),
@@ -1074,6 +1210,16 @@ Largest number of iterations before giving up on convergence.");
     frame.declare ("z_0b", "m", Attribute::Const, "\
 Bare soil roughness height for momentum.");
     frame.set ("z_0b", Resistance::default_z_0b);
+    frame.declare_fraction ("epsilon_leaf", Attribute::Const, "\
+Leaf emmisivity for long wave radiation.");
+    frame.set ("epsilon_leaf", 0.98);
+    frame.declare_fraction ("epsilon_soil", Attribute::Const, "\
+Soil emmisivity for long wave radiation.");
+    frame.set ("epsilon_soil", 0.95);
+    frame.declare ("epsilon_soil_SWE",
+		   "pF", Attribute::None (), Attribute::Const, "\
+Effect of soil water on epsilon_soil.");
+    frame.set ("epsilon_soil_SWE", PLF::always_1 ());
 
     // For log.
     frame.declare ("lambda", "J/kg", Attribute::LogOnly, "Latent heat of vaporization in atmosphere.");
@@ -1144,6 +1290,12 @@ to reference height (screen height).");
 
     frame.declare ("G_R_soil", "W/m^2/K", Attribute::LogOnly, 
 		   "Radiation 'conductivity' from the soil.");
+    frame.declare ("G_R_sun", "W/m^2/K", Attribute::LogOnly, 
+		   "Radiation 'conductivity' from sunlit leaves.");
+    frame.declare ("G_R_shadow", "W/m^2/K", Attribute::LogOnly, 
+		   "Radiation 'conductivity' from shadow leaves.");
+    frame.declare ("G_R_leaf", "W/m^2/K", Attribute::LogOnly, 
+		   "Radiation 'conductivity' from the leaves at night.");
     frame.declare ("G_H_a", "W/m^2/K", Attribute::LogOnly, 
 		   "Heat 'conductivity' from soil to free atmosphere.");
     frame.declare ("k_h", "W/m/K", Attribute::LogOnly,

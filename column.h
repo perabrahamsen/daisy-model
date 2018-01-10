@@ -121,6 +121,8 @@ public:
   virtual void spray_overhead (symbol chemical, double amount, Treelog&) = 0; // [g/ha]
   virtual void spray_surface (symbol chemical, double amount, Treelog&) = 0; // [g/ha]
   virtual void set_surface_detention_capacity (double height) = 0; // [mm]
+  virtual void remove_solute (symbol chemical) = 0;
+  virtual double total_solute (const symbol chem) const = 0; //[g/ha]
 
   // Conditions.
 public:

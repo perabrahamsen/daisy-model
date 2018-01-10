@@ -49,6 +49,7 @@
 #include "treelog_store.h"
 #include "resistance.h"
 #include "im.h"
+#include "soil_water.h"
 #include <sstream>
 
 struct BioclimateStandard : public Bioclimate
@@ -131,7 +132,7 @@ struct BioclimateStandard : public Bioclimate
   const double maxEdiff;                     // Max pressure diff [Pa]
   const std::unique_ptr<SVAT> svat;     // Soil Vegetation Atmosphere model.
   size_t svat_fail;             // Number of times the svat loop failed.
-  size_t svat_total;            // Total number of times the swat loop entered.
+  size_t svat_total;            // Total number of times the svat loop entered.
   double crop_ep_;              // Potential transpiration. [mm/h]
   double crop_ea_soil;          // Crop limited transpiration. [mm/h]
   double crop_ea_svat;          // SVAT limited transpiration. [mm/h]
@@ -158,7 +159,7 @@ struct BioclimateStandard : public Bioclimate
   double albedo;                  // Reflection factor []
   const std::unique_ptr<Raddist> raddist;// Radiation distribution model.
   const double min_sin_beta_;     // Sinus to lowest sun angle for some models.
-  void RadiationDistribution (const Vegetation&, double sin_beta, Treelog&);
+  void RadiationDistribution (const Vegetation&, double pF, double sin_beta, Treelog&);
   std::unique_ptr<Difrad> difrad;  // Diffuse radiation model.
   double difrad0;                // Diffuse radiation above canopy [W/m2]
 
@@ -352,14 +353,20 @@ struct BioclimateStandard : public Bioclimate
   }
   double canopy_leak_rate (const double dt) const
   {
-    if (canopy_water_out < 1e-8)
+    const double epsilon_storage = 1e-8; // [mm]
+    const double epsilon_out = 1e-8 / dt; // [mm/h]
+
+    if (canopy_water_out < epsilon_out)
       return 0.0;
-    if (canopy_water_storage < 0.01 * canopy_water_out * dt)
-      return 1.0 / dt;
-    const double canopy_water_old
-      = canopy_water_storage + canopy_water_out * dt;
-    
-    return canopy_water_out / canopy_water_old;
+
+    if (canopy_water_storage < epsilon_storage)
+      return -1.0;
+
+    // Should be storage at "end of timestep" because of the way the
+    // rate is used.
+    const double clr = canopy_water_out / canopy_water_storage;
+    daisy_assert (clr > 0.0);
+    return clr;
   }
   double canopy_leak () const                     // [mm/h]
   { return canopy_water_out; }
@@ -643,14 +650,14 @@ BioclimateStandard::find_albedo (const Vegetation& crops, const Litter& litter,
 }
 
 void 
-BioclimateStandard::RadiationDistribution (const Vegetation& vegetation, 
+BioclimateStandard::RadiationDistribution (const Vegetation& vegetation, const double pF,
                                            const double sin_beta_, Treelog& msg)
 {
   TREELOG_MODEL (msg);
 
   raddist->tick(sun_LAI_fraction_, sun_PAR_, total_PAR_, sun_NIR_, total_NIR_,
                 global_radiation (), difrad0, min_sin_beta_, sin_beta_, 
-                vegetation, msg);
+                vegetation, pF, msg);
 
   //Absorbed PAR in the canopy and the soil:
   incoming_PAR_radiation = total_PAR_[0]; // [W/m2]
@@ -1189,9 +1196,12 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   difrad0 = difrad->value (time, weather, msg) * global_radiation_;
   //daisy_assert (difrad0 >= 0.0);
 
+  const double pF 
+    = h2pF (geo.content_hood (soil_water, &SoilWater::h, Geometry::cell_above));
+
   sin_beta_ = weather.sin_solar_elevation_angle (time);
   // Calculate total canopy, divide it into intervals, and distribute PAR.
-  RadiationDistribution (vegetation, sin_beta_, msg);
+  RadiationDistribution (vegetation, pF, sin_beta_, msg);
 
   // Distribute water among canopy, snow, and soil.
   WaterDistribution (units, time, surface, weather, vegetation, litter,

@@ -110,6 +110,8 @@ public:
   void spray_overhead (symbol chemical, double amount, Treelog&); // [g/ha]
   void spray_surface (symbol chemical, double amount, Treelog&); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
+  void remove_solute (symbol chemical);
+  double total_solute (symbol chemical); // [g/ha]
 
   // Conditions.
 public:

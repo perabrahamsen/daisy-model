@@ -41,6 +41,7 @@ private:
 
   // Use.
 public:
+  symbol title () const;
   bool good ();
   bool read_header (Treelog& msg);
   bool read_header_with_keywords (Frame& keywords, Treelog& msg);

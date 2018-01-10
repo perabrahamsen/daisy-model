@@ -15,7 +15,7 @@ This could be used for comparison with, say, TDR probes."
                      (spec fixed SoilWater Theta)
                      (density true)
                      (dimension "%"))
-           (interval (tag "15-30 cm")
+           (interval (tag "15-40 cm")
                      (from -15 [cm])
                      (to -40 [cm])
                      (path column "${column}" SoilWater Theta)

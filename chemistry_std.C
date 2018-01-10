@@ -47,6 +47,7 @@ struct ChemistryStandard : public Chemistry
   bool know (symbol chem) const;
   bool ignored (symbol chem) const;
   Chemical& find (symbol chem); 
+  const Chemical& find (symbol chem) const; 
   const std::vector<Chemical*>& all () const;
   void sorption_table (const Soil& soil, const size_t cell, 
                        const double Theta, const double start,
@@ -72,7 +73,9 @@ struct ChemistryStandard : public Chemistry
   void incorporate (const Geometry& geo,
 		    const symbol chem, const double amount,
                     const Volume&, Treelog& msg);
-  
+  void remove_solute (const symbol chem);
+  double total_content (const Geometry&, const symbol chem) const; //[g/m^2]
+
   // Simulation.
   void tick_source (const Scope&, 
                     const Geometry&, const Soil&, const SoilWater&, 
@@ -136,6 +139,16 @@ ChemistryStandard::ignored (symbol chem) const
 
 Chemical& 
 ChemistryStandard::find (symbol chem)
+{
+  for (size_t c = 0; c < chemicals.size (); c++)
+    if (chemicals[c]->objid == chem)
+      return *chemicals[c];
+
+  daisy_panic ("Can't find chemical '" + chem + "'");
+}
+
+const Chemical& 
+ChemistryStandard::find (symbol chem) const
 {
   for (size_t c = 0; c < chemicals.size (); c++)
     if (chemicals[c]->objid == chem)
@@ -292,6 +305,27 @@ ChemistryStandard::incorporate (const Geometry& geo,
         return;
       }
   msg.warning ("Unknwon chemical '" + chem + "' ignored");
+}
+
+void 
+ChemistryStandard::remove_solute (const symbol chem)
+{
+  for (auto c : chemicals)
+    if (c->objid == chem)
+      {
+	c->remove_all ();
+	return;
+      }
+}
+
+double				// [g/m^2]
+ChemistryStandard::total_content (const Geometry& geo, const symbol chem) const
+{
+  double total = 0.0;
+  for (auto c : chemicals)
+    if (c->objid == chem)
+      total += c->total_content (geo);
+  return total;
 }
 
 void 
