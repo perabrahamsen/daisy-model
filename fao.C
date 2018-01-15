@@ -229,6 +229,22 @@ FAO::RefPenmanMonteithAllen2006 (double Rn,
   return (E1 + E2);
 }
 
+double
+FAO::RefPenmanMonteith70 (double Rn,
+			  double G, double Temp, double ea, double U2,
+			  double AtmPressure)
+{
+  const double CropHeight = 0.12; // [m]
+  const double ScreenHeight = 2.00; // [m]
+  const double LAI = 24.0 * CropHeight; // []
+  
+  const double ra = AerodynamicResistance (CropHeight, ScreenHeight, U2);
+  const double rc = 70; // [s/m]
+  const double E1 = ETrad (AtmPressure, Temp, Rn, G, ra, rc);
+  const double E2 = ETaero (AtmPressure, Temp, ea, ra, rc);
+  return (E1 + E2);
+}
+
 double					   // [kg/m^2/s]
 FAO::RefPenmanMonteith (double Rn, // [W/m^2]
 			double G,  // [W/m^2]

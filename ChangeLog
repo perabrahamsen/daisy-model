@@ -1,3 +1,19 @@
+2018-01-15  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.51 released.
+
+2018-01-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+
+	* fao.C, fao.h (RefPenmanMonteith70): New function.
+	* pet_FAO_PM_70.C: new model.
+	* Makefile (MODELS): Add it.
+
+2018-01-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* action_BBCH.C: New model.
+	* Makefile (MODELS): Add it.
+
 2018-01-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* program_optimize.C ("cite"): Add citation.

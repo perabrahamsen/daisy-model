@@ -2,17 +2,31 @@ TODO ---things that needs to be done with Daisy -*- outline -*-
 
 * Fordampning
 
-** FAO_PM med døgnværdier og day_cycle
+** Spørg Søren om dagsværdier
+
+FAO_PM med døgnværdier og day_cycle
 
 average wind, vapor_pressure, atm pressure, cloudiness?
 
-** FAO_PM med skiftende rs_min
+* Pestcast app window
 
-** FAO_PM som den er nu
+(while (repeat "crop management")
+  (BBCH (file "foo.cvs")
+        (interval /bbch1/ /bbch2/)
+	(crop "cropname")
+	(do "spray-action")))
+
+* SC notes
+
+** Jeanne PhD
+
+** BBCH 14 mangler, men vi har har 13...
+
+** BBCH interval for "spring applikation" starter i efteråret
 
 * Agrohydrologi 2
 
-* Læs raport færdig
+* Læs pestcast raport færdig
 
 * AA opgaver
 
