@@ -1,3 +1,8 @@
+2018-01-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* pet_FAO_PM_daily.C, pet_FAO_PM_70: Removed.
+	* Makefile (MODELS): Ditto.
+
 2018-01-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.51 released.

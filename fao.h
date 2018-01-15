@@ -81,12 +81,6 @@ namespace FAO
 			 double ea /* [Pa] */,
 			 double U2 /* [m/s] */,
 			 double AtmPressure); // [kg/m2/s]
-  double RefPenmanMonteith70 (double Rn /* [W/m2/] */,
-			      double G /* [W/m2] */,
-			      double Temp /* [dg C] */,
-			      double ea /* [Pa] */,
-			      double U2 /* [m/s] */,
-			      double AtmPressure /* [Pa] */);
   double RefPenmanMonteithAllen2006 (double Rn /* [W/m2/] */,
                                      double G /* [W/m2] */,
                                      double Temp /* [dg C] */,
