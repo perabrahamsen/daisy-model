@@ -131,8 +131,8 @@ PetFAO_PM_70::tick (const Time&, const Weather& weather, const double /* Rn */,
   Rn = net_radiation->net_radiation ();
 
   reference_evapotranspiration_dry
-    = FAO::RefPenmanMonteithAllen2006 (Rn, G, Temp, VaporPressure, U2,
-                                       AtmPressure)
+    = FAO::RefPenmanMonteith70 (Rn, G, Temp, VaporPressure, U2,
+				AtmPressure)
     * 3600;
 
   potential_evapotranspiration_dry
