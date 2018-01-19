@@ -404,7 +404,10 @@ LogSubmodel::open_object (symbol field, symbol type,
   if (is_active)
     {
       const std::string& sfield = field.name ();
-      daisy_assert (frame_entry ().lookup (sfield) == Attribute::Model);
+      if (frame_entry ().lookup (sfield) != Attribute::Model)
+	daisy_panic ("Field '" + sfield + "' should be a Model but is a '" +
+		     Attribute::type_name (frame_entry ().lookup (sfield))
+		     + "'");
       daisy_assert (frame_entry ().type_size (sfield) == Attribute::Singleton);
       const symbol component = frame_entry ().component (sfield);
       const Library& library = metalib ().library (component);

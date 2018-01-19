@@ -314,6 +314,18 @@ Irrigation::add (const double duration /* [h] */,
   msg.message (tmp.str ());
 }
 
+double
+Irrigation::suggest_dt () const
+{
+  double dt = NAN;
+  for (const Event *const e : event)
+    if (std::isnormal (e->time_left)
+	&& (!std::isnormal (dt)
+	    || e->time_left < dt))
+      dt = e->time_left;
+  return dt;
+}
+
 void
 Irrigation::tick (const Geometry& geo, SoilWater& soil_water,
                   Chemistry& chemistry, Bioclimate& bioclimate,

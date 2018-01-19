@@ -838,11 +838,16 @@ CropStandard::output (Log& log) const
 #else
   output_submodule (production, "Prod", log);
 #endif
-  output_submodule (last_time, "last_time", log);
-  output_submodule (sow_time, "sow_time", log);
-  output_submodule (emerge_time, "emerge_time", log);
-  output_submodule (flowering_time, "flowering_time", log);
-  output_submodule (ripe_time, "ripe_time", log);
+  if (last_time != Time::null ())
+    output_submodule (last_time, "last_time", log);
+  if (sow_time != Time::null ())
+    output_submodule (sow_time, "sow_time", log);
+  if (emerge_time != Time::null ())
+    output_submodule (emerge_time, "emerge_time", log);
+  if (flowering_time != Time::null ())
+    output_submodule (flowering_time, "flowering_time", log);
+  if (ripe_time != Time::null ())
+    output_submodule (ripe_time, "ripe_time", log);
   output_derived (development, "Devel", log);
   output_submodule (partition, "Partit", log);
   output_derived (vernalization, "Vernal", log);

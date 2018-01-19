@@ -671,6 +671,12 @@ ColumnStandard::suggest_dt (double weather_dt, double T_air) const
   if (std::isnormal (weather_dt) && (!std::isnormal (dt) || dt > weather_dt))
     dt = weather_dt;
 
+  const double ir_dt = irrigation->suggest_dt ();
+  
+  if (std::isnormal (ir_dt) 
+      && (!std::isnormal (dt) || dt > ir_dt))
+    dt = ir_dt;
+
   const double sw_dt = soil_water->suggest_dt ();
   
   if (std::isnormal (sw_dt) 

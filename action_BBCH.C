@@ -32,6 +32,8 @@
 #include "vcheck.h"
 #include "path.h"
 #include "mathlib.h"
+#include "condition.h"
+#include "log.h"
 #include <istream>
 #include <map>
 
@@ -39,47 +41,18 @@ struct ActionBBCH : public Action
 {
   const Path& path;
   const symbol filename;
-  const std::vector<int> interval;
   const int from;
   const int to;
+  const bool from_start;
+  const bool to_start;
   const symbol crop;
   std::unique_ptr<Action> action;
+  std::unique_ptr<Condition> condition;
 
-  struct When
-  {
-    // Enum in a namespace.
-    enum when_t { first, last };
-  private:
-    when_t value;
-    static when_t symbol2when (symbol s)
-    {
-      static struct sym_set_t : std::map<symbol, when_t>
-      {
-	sym_set_t ()
-	{
-	  insert (std::pair<symbol,when_t> ("first", first));
-	  insert (std::pair<symbol,when_t> ("last", last));
-	} 
-      } sym_set;
-      sym_set_t::const_iterator i = sym_set.find (s);
-      daisy_assert (i != sym_set.end ());
-      return (*i).second;
-    }  
-  public:
-    operator when_t () const
-    { return value; }
-    When (when_t v)
-      : value (v)
-    { }
-    When (symbol s)
-      : value (symbol2when (s))
-    { }
-  };
-  const When when;
-  
   std::unique_ptr<std::istream> in_file;
   std::unique_ptr<LexerData> in_data;
-  Time next;
+  Time begin;
+  Time end;
  
   symbol rest_of_line ()
   {
@@ -89,7 +62,8 @@ struct ActionBBCH : public Action
     return tmp;
   }
 
-  void find_next (const Time& now, Treelog& msg)
+  Time find_next (const Time& now, const int want, const bool start,
+		  Treelog& msg)
   {
     if (!in_data.get ())
       {
@@ -98,15 +72,17 @@ struct ActionBBCH : public Action
 	in_data.reset (new LexerData (filename, *in_file, msg));
 	in_data->skip ("BBCH,startDate,endDate,scale,Crop");
       }
-    const int want = (when == When::first) ? from : to;
     while (in_data->good ())
       {
 	in_data->skip_line ();
 	in_data->skip ("\n");
 	if (in_data->get_cardinal () != want)
 	  continue;
+	Time time_begin;
+	Time time_end;
 	in_data->skip (",");
-	in_data->read_date (next);
+	in_data->read_date (time_begin);
+	time_begin.tick_hour (8);
 	in_data->skip (" 00:00:00,");
 	if (in_data->peek () == '-')
 	  {
@@ -115,57 +91,86 @@ struct ActionBBCH : public Action
 	  }
 	else
 	  {
-	    Time time_end;
 	    in_data->read_date (time_end);
+	    time_end.tick_hour (8);
 	    in_data->skip (" 00:00:00");
-	    if (when == When::last)
-	      next = time_end;
 	  }
-	next.tick_hour (8);
+	const Time next = (start || time_end == Time::null ())
+	  ? time_begin
+	  : time_end;
 	if (next < now)
 	  continue;
 	in_data->skip (",BBCH,");
 	const symbol what = rest_of_line ();
 	if (what == crop)
-	  return;
+	  return next;
       }
     throw "File error";
   }
 
+  void find_interval (const Time& now, Treelog& msg)
+  {
+    begin = find_next (now, from, from_start, msg);
+    end = find_next (now, to, to_start, msg);
+  }
   void doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
   {
-    if (next == Time::null ())
-      find_next (daisy.time (), msg);
-    if (daisy.time () < next)
+    if (begin == Time::null ())
+      find_interval (daisy.time (), msg);
+
+    if (daisy.time () < begin)
       return;
-      
+
+    if (!condition->match (daisy, scope, msg)
+	&& daisy.time () < end)
+      return;
+
     action->doIt (daisy, scope, msg);
-    find_next (daisy.time (), msg);
+    find_interval (daisy.time (), msg);
   }
 
-  void tick (const Daisy&, const Scope&, Treelog&)
-  { }
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& msg)
+  {
+    action->tick (daisy, scope, msg);
+    condition->tick (daisy, scope, msg);
+  }
 
   bool done (const Daisy&, const Scope&, Treelog&) const
   { return false; }
   
-  void initialize (const Daisy&, const Scope&, Treelog&)
-  { }
+  void output (Log& log) const
+  {
+    output_object (action, "do", log);
+    output_object (condition, "when", log);
+  }
 
-  bool check (const Daisy&, const Scope&, Treelog&) const
-  { return true; }
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
+  {
+    action->initialize (daisy, scope, msg);
+    condition->initialize (daisy, scope, msg);
+  }
+
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
+  {
+    bool ok = true; 
+    if (!action->check (daisy, scope, msg))
+      ok = false;
+    if (!condition->check (daisy, scope, msg))
+      ok = false;
+    return ok;
+  }
 
   ActionBBCH (const BlockModel& al)
     : Action (al),
       path (al.path ()),
       filename (al.name ("file")),
-      interval (al.integer_sequence ("interval")),
-      from (interval[0]),
-      to (interval[1]),
+      from (al.integer ("from")),
+      to (al.integer ("to")),
+      from_start (al.flag ("from_start")),
+      to_start (al.flag ("to_start")),
       crop (al.name ("crop")),
       action (Librarian::build_item<Action> (al, "do")),
-      when (al.name ("when")),
-      next (Time::null ())
+      condition (Librarian::build_item<Condition> (al, "when"))
   { }
 };
 
@@ -181,20 +186,28 @@ Management according to external BBCH scale.")
   {
     frame.declare_string ("file", Attribute::Const, "\
 Name of file where data is found.");
-    frame.declare_integer ("interval", Attribute::Const, 2, "\
-Start and end BBCH for action.");
+    frame.declare_integer ("from", Attribute::Const, "\
+BBCH at beginning of interval.");
+    frame.declare_integer ("to", Attribute::Const, "\
+BBCH at end of interval.");
+    frame.declare_boolean ("from_start", Attribute::Const, "\
+If true, the interval begins when the crop enters the specified BBCH.\n\
+Otherwise, the interval begins when the crop leaves the specified BBCH.");
+    frame.set ("from_start", true);
+    frame.declare_boolean ("to_start", Attribute::Const, "\
+If true, the interval ends when the crop enters the specified BBCH.\n\
+Otherwise, the interval ends when the crop leaves the specified BBCH.");
+    frame.set ("to_start", false);
     frame.declare_string ("crop", Attribute::Const, "\
 Name of crop to use BBCH number for.");
     frame.declare_object ("do", Action::component, "\
 Action to perform.");
-    frame.declare_string ("when", Attribute::Const, "\
-When to do the action.\n\
-\n\
-first: First day within the specified interval.\n\
-\n\
-last: Last day within the specified interval");
-    static VCheck::Enum when_check ("first", "last");
-    frame.set_check ("when", when_check);
+    frame.declare_object ("when", Condition::component, 
+			  "When to perform the action.\n\
+It will be performed the first time the condition is true within\n\
+the specified BBCH interval, or at the end of the interval, whichever\n\
+comes first. Use 'true' to perform the action at the start of the interval,\n\
+or 'false' to perform it at the end.");
   }
 } ActionBBCH_syntax;
 

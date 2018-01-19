@@ -46,13 +46,13 @@ Harvest::output (Log& log) const
   if (sow_time != Time::null ())
     output_submodule (sow_time, "sow_time", log);
   if (emerge_time != Time::null ())
-  output_submodule (emerge_time, "emerge_time", log);
+    output_submodule (emerge_time, "emerge_time", log);
   if (flowering_time != Time::null ())
-  output_submodule (flowering_time, "flowering_time", log);
+    output_submodule (flowering_time, "flowering_time", log);
   if (ripe_time != Time::null ())
-  output_submodule (ripe_time, "ripe_time", log);
+    output_submodule (ripe_time, "ripe_time", log);
   if (harvest_time != Time::null ())
-  output_submodule (harvest_time, "harvest_time", log);
+    output_submodule (harvest_time, "harvest_time", log);
   output_variable (crop, log);
   output_variable (stem_DM, log);
   output_variable (stem_N, log);
@@ -79,17 +79,17 @@ Harvest::load_syntax (Frame& frame)
 {
   frame.declare_string ("column", Attribute::State,
 	      "Name of column where the yield were harvested.");
-  frame.declare_submodule ("sow_time", Attribute::State, "\
+  frame.declare_submodule ("sow_time", Attribute::OptionalState, "\
 Time of sowing or planting of crop.",
                            Time::load_syntax);
-  frame.declare_submodule ("emerge_time", Attribute::State,
+  frame.declare_submodule ("emerge_time", Attribute::OptionalState,
                            "Time the crop emerge on the field.",
                            Time::load_syntax);
-  frame.declare_submodule ("flowering_time", Attribute::State,
+  frame.declare_submodule ("flowering_time", Attribute::OptionalState,
                            "Time of flowering.", Time::load_syntax);
-  frame.declare_submodule ("ripe_time", Attribute::State,
+  frame.declare_submodule ("ripe_time", Attribute::OptionalState,
                            "Time the crop became ripe.", Time::load_syntax);
-  frame.declare_submodule ("harvest_time", Attribute::State,
+  frame.declare_submodule ("harvest_time", Attribute::OptionalState,
                            "Time of the harvest operation.", Time::load_syntax);
   frame.declare_string ("crop", Attribute::State,
 	      "Name of crop that was harvested.");
@@ -131,11 +131,21 @@ Nitrogen fraction is storage dy matter.");
 
 Harvest::Harvest (const Block& alist)
   : column (alist.name ("column")),
-    sow_time (alist.submodel ("sow_time")),
-    emerge_time (alist.submodel ("emerge_time")),
-    flowering_time (alist.submodel ("flowering_time")),
-    ripe_time (alist.submodel ("ripe_time")),
-    harvest_time (alist.submodel ("harvest_time")),
+    sow_time (alist.check ("sow_time")
+	      ? Time (alist.submodel ("sow_time"))
+	      : Time::null ()),
+    emerge_time (alist.check ("emerge_time")
+		 ? Time (alist.submodel ("emerge_time"))
+		 : Time::null ()),
+    flowering_time (alist.check ("flowering_time")
+		    ? Time (alist.submodel ("flowering_time"))
+		    : Time::null ()),
+    ripe_time (alist.check ("ripe_time")
+	       ? Time (alist.submodel ("ripe_time"))
+	       : Time::null ()),
+    harvest_time (alist.check ("harvest_time")
+		  ? Time (alist.submodel ("harvest_time"))
+		  : Time::null ()),
     crop (alist.name ("crop")),
     stem_DM (alist.number ("stem_DM")),
     stem_N (alist.number ("stem_N")),

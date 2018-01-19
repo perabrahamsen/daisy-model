@@ -1,3 +1,22 @@
+2018-01-18  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.54 released.
+
+2018-01-18  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.53 released.
+
+2018-01-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* irrigate.C, irrigate.h (suggest_dt): New function.
+	* column_std.C (suggest_dt): Use it.
+
+2018-01-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* harvest.C: Accept null / missing times.
+
+	* crop_std.C (output): Don't log null times.
+
 2018-01-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* pet_FAO_PM_daily.C, pet_FAO_PM_70: Removed.

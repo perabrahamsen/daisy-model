@@ -55,7 +55,7 @@ MINGWDLL64 = libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll
 MINGWDLL32 = libgcc_s_dw2-1.dll libstdc++-6.dll libwinpthread-1.dll
 endif
 
-DISTDIR=c:/Users/xvs108/Google\ Drev/public/
+DISTDIR=c:/Users/xvs108/Google\ Drive/public/
 
 # Set USE_GUI to Q4 or none, depending on what GUI you want.
 #
