@@ -1,3 +1,12 @@
+2018-01-22  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.55 released.
+
+2018-01-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C (update_C): Fix mass balance error with Freundlich.
+	(tick_surface): Enable assertion that was commented out.
+
 2018-01-18  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.54 released.

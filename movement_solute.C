@@ -216,6 +216,11 @@ MovementSolute::secondary_transport (const Geometry& geo,
   std::vector<double> Mf (cell_size); // Content given to flow.
   std::vector<double> S (cell_size); // Source given to flow.
 
+  // Mass balance.
+  double total_A = 0.0;
+  double total_Mf = 0.0;
+  double total_source = 0.0;
+
   for (size_t c = 0; c < cell_size; c++)
     {
       Theta_old[c] = soil_water.Theta_secondary_old (c);
@@ -245,19 +250,44 @@ MovementSolute::secondary_transport (const Geometry& geo,
         S[c] = 0.0;
       
       // Put any remaining source in S_extra.
-      S_extra[c] += source - S[c];
+      daisy_assert (iszero (S_extra[c]));
+      S_extra[c] = source - S[c];
       daisy_assert (std::isfinite (S_extra[c]));
+
+      // Mass Balance;
+      const double V = geo.cell_volume (c);
+      total_Mf += V * Mf[c];
+      total_source += V * source * dt;
+      total_A += V * A[c];
     }
   
   // Flow.
   secondary_flow (geo, Theta_old, Theta_new, q, solute.objid, 
                   S, J_forced, C_border, Mf, J, dt, msg);
 
+  // Mass balance.
+  double total_in = 0.0;
+  double total_out = 0.0;
+
   // Check fluxes.
   for (size_t e = 0; e < edge_size; e++)
-    daisy_assert (std::isfinite (J[e]));
+    {
+      daisy_assert (std::isfinite (J[e]));
 
+      // Mass balance.
+      const int from = geo.edge_from (e);
+      const int to = geo.edge_to (e);
+      const double area = geo.edge_area (e);
+      if (!geo.cell_is_internal (from))
+	total_in += J[e] * area * dt;
+      if (!geo.cell_is_internal (to))
+	total_out += J[e] * area * dt;
+    }
 
+  // Mass balance.
+  double total_extra = 0.0;
+  double total_Mn = 0.0;
+  
   // Negative content should be handled by primary transport.
   std::vector<double> Mn (cell_size); // New content.
   std::vector<double> C (cell_size);
@@ -273,8 +303,40 @@ MovementSolute::secondary_transport (const Geometry& geo,
         S_extra[c] = 0.0;
 
       daisy_assert (std::isfinite (S_extra[c]));
+
+      // Mass balance.
+      const double V = geo.cell_volume (c);
+      total_extra += S_extra[c] * V * dt;
+      total_Mn += Mn[c] * V;
     }
+
   solute.set_secondary (soil, soil_water, Mn, J);
+
+  // Mass balance
+  const double increase = total_Mn - total_A - total_Mf;
+  const double input = total_in + total_source;
+  const double output = total_out + total_extra;
+  const double error = input - increase - output;
+  const double magnitude
+    = std::abs (increase) + std::abs (input) + std::abs (output);
+  if (std::abs (error) > magnitude * 1e-10)
+    {
+      std::ostringstream tmp;
+      tmp << "Mass balance error in secondary transport of " << error
+	  << " g (input - increase - output)\n"
+	  << "dt = " << dt << "h\n"
+	  << "input = " << input << "g (in + source)\n"
+	  << "increase = " << increase << "g (Mn - Mf - A)\n"
+	  << "output = " << output << "g (out + extra)\n"
+	  << "Mf = " << total_Mf << "g (old solute mass)\n"
+	  << "A = " << total_A << "g (old sorbed mass)\n"
+	  << "in = " << total_in << "g (from bottom)\n"
+	  << "out = " << total_out << "g (to top)\n"
+	  << "source = " << total_source << "g\n"
+	  << "extra = " << total_extra << "g (source pass to primary domain)\n"
+	  << "Mn = " << total_Mn << "g (new content)";
+	msg.error (tmp.str ());
+    }
 }
 
 void

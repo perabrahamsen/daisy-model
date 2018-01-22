@@ -487,8 +487,11 @@ ChemicalStandard::update_matrix (const Soil& soil, const SoilWater& soil_water)
       if (Theta_secondary > 0.0)
         C_secondary_[c]
           = adsorption_->M_to_C2 (soil, Theta_secondary, c, M_secondary_[c]);
-      else 
-        C_secondary_[c] = C_primary_[c];
+      else
+	{
+	  daisy_assert (iszero (M_secondary_[c]));
+	  C_secondary_[c] = C_primary_[c];
+	}
 
       C_avg_[c] 
         = (Theta_primary * C_primary_[c] + Theta_secondary * C_secondary_[c]) 
@@ -754,6 +757,34 @@ ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
     // Always zero.
     return;
 
+  const size_t cell_size = M_total_.size ();
+
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double T1 = soil_water.Theta_primary (c);
+      const double T2 = soil_water.Theta_secondary (c);
+      const double M = M_total_[c];
+      const double M2 = (T2 > 0.0)
+	// Water in secondary domain.
+	? std::min (M_secondary_[c], M)
+	// No water in secondary domain.
+	: 0.0;
+      const double M1 = M - M2;
+      daisy_assert (T1 > 0.0);
+      const double C1 = adsorption_->M_to_C1 (soil, T1, c, M1);
+      const double C2 = (T2 > 0.0)
+	? adsorption_->M_to_C2 (soil, T2, c, M2)
+	: C1;
+      const double C = (C1 * T1 + C2 * T2) / (T1 + T2);
+
+      // Update.
+      C_primary_[c] = C1;
+      C_secondary_[c] = C2;
+      C_avg_[c] = C;
+      M_primary_[c] = M1;
+      M_secondary_[c] = M2;
+    }
+#if 0
   for (size_t i = 0; i < C_primary_.size (); i++)
     {
       const double Theta_primary = soil_water.Theta_primary (i);
@@ -778,7 +809,7 @@ ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
       M_secondary_[i] = Theta_secondary > 0
         ? adsorption_->C_to_M2 (soil, Theta_secondary, i, C_secondary_[i])
         : 0.0;
-#ifdef BUG_FREUNDLICH
+      // #ifdef BUG_FREUNDLICH
       if (!approximate (M_primary_[i] + M_secondary_[i], M_total_[i]))
         {
           std::ostringstream tmp;
@@ -787,8 +818,9 @@ ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
               << "; M = " << M_total_[i];
           Assertion::message (tmp.str ());
         }
-#endif
+      // #endif
     }
+#endif
 }
   
 void 
@@ -1136,9 +1168,9 @@ ChemicalStandard::tick_surface (const double pond /* [cm] */,
   surface_immobile = surface_storage - surface_solute;
   if (surface_immobile < 0.0)
     {
-#ifdef BUG_FREUNDLICH
+      // #ifdef BUG_FREUNDLICH
       daisy_approximate (surface_solute, surface_storage);
-#endif
+      // #endif
       surface_immobile = 0.0;
       surface_solute = surface_storage;
     }

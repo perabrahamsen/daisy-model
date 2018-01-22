@@ -1,4 +1,4 @@
-// adsorption_linear.C -- Lininear Freundlich adsorption.
+// adsorption_linear.C -- Lininear adsorption.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
