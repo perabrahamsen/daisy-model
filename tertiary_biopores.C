@@ -534,8 +534,10 @@ TertiaryBiopores::update_active (const Geometry& geo,
   double bottom_act = geo.top () + 1.0;
   double top_dea = geo.bottom () - 1.0;
   double bottom_dea = geo.top () + 1.0;
-  
-  for (size_t c = 0; c < active.size (); c++)
+
+  const size_t cell_size = geo.cell_size ();
+  daisy_assert (active.size () == cell_size);
+  for (size_t c = 0; c < cell_size; c++)
     {
       if (active[c])    // Biopore is active 
         {
@@ -668,7 +670,7 @@ TertiaryBiopores::output (Log& log) const
 bool 
 TertiaryBiopores::initialize (const Units& units,
                               const Geometry& geo, const Soil&, 
-                              SoilWater& soil_water,
+			      SoilWater& soil_water,
                               const Scope& scope,
                               const Groundwater& groundwater, 
                               Treelog& msg)

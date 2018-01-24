@@ -758,7 +758,12 @@ ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
     return;
 
   const size_t cell_size = M_total_.size ();
-
+  daisy_assert (C_primary_.size () == cell_size);
+  daisy_assert (C_secondary_.size () == cell_size);
+  daisy_assert (C_avg_.size () == cell_size);
+  daisy_assert (M_primary_.size () == cell_size);
+  daisy_assert (M_secondary_.size () == cell_size);
+  
   for (size_t c = 0; c < cell_size; c++)
     {
       const double T1 = soil_water.Theta_primary (c);
@@ -771,6 +776,7 @@ ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
 	: 0.0;
       const double M1 = M - M2;
       daisy_assert (T1 > 0.0);
+      daisy_assert (M1 >= 0.0);
       const double C1 = adsorption_->M_to_C1 (soil, T1, c, M1);
       const double C2 = (T2 > 0.0)
 	? adsorption_->M_to_C2 (soil, T2, c, M2)
@@ -784,43 +790,6 @@ ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
       M_primary_[c] = M1;
       M_secondary_[c] = M2;
     }
-#if 0
-  for (size_t i = 0; i < C_primary_.size (); i++)
-    {
-      const double Theta_primary = soil_water.Theta_primary (i);
-      const double M1 
-        = adsorption_->C_to_M1 (soil, Theta_primary, i, C_primary_[i]);
-      const double Theta_secondary = soil_water.Theta_secondary (i);
-      const double M2 = Theta_secondary > 0
-        ? adsorption_->C_to_M2 (soil, Theta_secondary, i, C_secondary_[i])
-        : 0.0;
-
-      if (approximate (M1, M_primary_[i], 0.00001)
-          && approximate (M1 + M2, M_total_[i], 0.00001))
-        continue;
-
-      const double Theta_matrix = soil_water.Theta (i);
-      C_avg_[i] = adsorption_->M_to_C_total (soil, Theta_matrix, 
-                                             i, M_total_[i]);
-      C_primary_[i] = C_avg_[i];
-      C_secondary_[i] = C_avg_[i];
-      M_primary_[i] 
-        = adsorption_->C_to_M1 (soil, Theta_primary, i, C_primary_[i]);
-      M_secondary_[i] = Theta_secondary > 0
-        ? adsorption_->C_to_M2 (soil, Theta_secondary, i, C_secondary_[i])
-        : 0.0;
-      // #ifdef BUG_FREUNDLICH
-      if (!approximate (M_primary_[i] + M_secondary_[i], M_total_[i]))
-        {
-          std::ostringstream tmp;
-          tmp << objid << ": " << i << ": M1 (" << M_primary_[i] << ") + M2 ("
-              << M_secondary_[i] << ") = " << (M_primary_[i] + M_secondary_[i])
-              << "; M = " << M_total_[i];
-          Assertion::message (tmp.str ());
-        }
-      // #endif
-    }
-#endif
 }
   
 void 
