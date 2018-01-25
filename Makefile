@@ -1464,11 +1464,11 @@ plf${OBJ}: plf.C plf.h assertion.h mathlib.h
 mathlib${OBJ}: mathlib.C mathlib.h assertion.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
-pet_FAO_PM_daily${OBJ}: pet_FAO_PM_daily.C pet.h model_framed.h \
- model_logable.h model.h symbol.h fao.h weather.h weatherdata.h soil.h \
- surface.h uzmodel.h soil_heat.h vegetation.h model_derived.h log.h \
- time.h border.h librarian.h frame.h scope.h attribute.h block_model.h \
- block_nested.h block.h treelog.h frame_model.h net_radiation.h
+action_BBCH${OBJ}: action_BBCH.C action.h model_framed.h model_logable.h \
+ model.h symbol.h daisy.h program.h run.h librarian.h lexer_data.h \
+ lexer.h filepos.h block_model.h block_nested.h block.h scope.h \
+ attribute.h treelog.h frame_model.h frame.h time.h assertion.h vcheck.h \
+ path.h mathlib.h condition.h log.h border.h
 pet_FAO_PM_hourly${OBJ}: pet_FAO_PM_hourly.C pet.h model_framed.h \
  model_logable.h model.h symbol.h fao.h weather.h weatherdata.h soil.h \
  surface.h uzmodel.h soil_heat.h vegetation.h model_derived.h log.h \
