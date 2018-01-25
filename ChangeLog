@@ -1,3 +1,7 @@
+2018-01-25  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.56 released.
+
 2018-01-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* tertiary_biopores.C (update_active): Added assertions.
