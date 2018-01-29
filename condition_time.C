@@ -804,7 +804,7 @@ static struct ConditionMonthlySyntax : public DeclareModel
 // The 'yearly' model.
 
 static struct ConditionYearlySyntax : public DeclareModel
-{
+ {
   Model* make (const BlockModel& al) const
   { return new ConditionEnd (al, "y", &Time::year); }
 

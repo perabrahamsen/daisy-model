@@ -1,3 +1,12 @@
+2018-01-29  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.58 released.
+
+2018-01-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* condition_BBCH.C: New condition.
+	* Makefile (MODELS): Add it.
+
 2018-01-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.57 released.

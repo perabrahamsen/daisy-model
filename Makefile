@@ -196,7 +196,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = action_BBCH.C \
+MODELS = condition_walltime.C  action_BBCH.C condition_BBCH.C  \
 	pet_FAO_PM_hourly.C summary_fractiles.C \
 	program_extract.C xysource_freq.C program_sbrdata.C hydraulic_wepp.C \
 	program_KM2.C program_post.C vegetation_afforestation.C \
@@ -232,7 +232,7 @@ MODELS = action_BBCH.C \
 	transport_none.C uzrect_Mollerup.C groundwater_flux.C \
 	rubiscoNdist_uniform.C \
 	uzrect_2x1.C select_flow.C \
-	select_volume.C uz1d_none.C condition_walltime.C uz1d_richard.C \
+	select_volume.C uz1d_none.C uz1d_richard.C \
 	rubiscoNdist_DPF.C raddist_DPF.C raddist_std.C difrad_DPF.C \
         difrad_weather.C number_lisp.C condition_extern.C condition_boolean.C \
 	boolean_number.C boolean_string.C \
@@ -1932,6 +1932,9 @@ uz1d_none${OBJ}: uz1d_none.C uz1d.h model.h geometry_rect.h geometry_vert.h \
  geometry.h symbol.h attribute.h soil.h soil_water.h soil_heat.h \
  librarian.h
 condition_walltime${OBJ}: condition_walltime.C condition.h model_framed.h \
+ model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
+ scope.h attribute.h treelog.h frame_model.h frame.h librarian.h
+condition_BBCH${OBJ}: condition_BBCH.C condition.h model_framed.h \
  model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
  scope.h attribute.h treelog.h frame_model.h frame.h librarian.h
 uz1d_richard${OBJ}: uz1d_richard.C uz1d.h model.h geometry_rect.h \
