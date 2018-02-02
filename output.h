@@ -49,6 +49,7 @@ private:
   const std::unique_ptr<Condition> activate_output;
   const std::vector<Time::component_t> time_columns;
   const symbol log_prefix;
+  const symbol log_suffix;
 
   // Use.
 public:

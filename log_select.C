@@ -257,7 +257,7 @@ LogSelect::output_entry (symbol, const PLF&)
 { daisy_notreached (); }
 
 void
-LogSelect::initialize (const symbol, Treelog& msg)
+LogSelect::initialize (const symbol, const symbol, Treelog& msg)
 {
   for (size_t i = 0; i < summary.size (); i++)
     summary[i]->initialize (entries, msg);

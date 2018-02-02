@@ -867,7 +867,7 @@ sum of all chemicals will be logged."
 
 (deflog "Chemical Content Secondary" "Chemical Content"
   "Amount of chemicals in each numeric soil layer."
-  (where "${colfid}content_${chemfid}.dlf")
+  (where "${colfid}content2_${chemfid}.dlf")
   (entries (array (path column "${column}" Chemistry "*"
                         trace "${chemical}" M_secondary)
                   (handle current)
@@ -876,7 +876,7 @@ sum of all chemicals will be logged."
 
 (deflog "Chemical Concentration Secondary" "Chemical Concentration"
   "Concentration in water of chemicals in each numeric soil layer.  "
-  (where "${colfid}conc_${chemfid}.dlf")
+  (where "${colfid}conc2_${chemfid}.dlf")
   (entries (array (path column "${column}" Chemistry "*" trace "${chemical}" C_secondary)
                   (handle current)
                   (dimension "${unit}")

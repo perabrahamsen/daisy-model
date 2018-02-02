@@ -1,3 +1,15 @@
+2018-02-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* output.h, output.C (log_suffix): New parameter.
+	* log.h (initialize, initialize_common): Use it.
+	* log_table.C, log_select.h, log_harvest.C, log_extern.C:
+	* log_checkpoint.C, log_all.h: Ditto.
+
+2018-02-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log.dai ("Chemical Content Secondary")
+	("Chemical Concentration Secondary"): Avoid filename conflict.
+
 2018-01-29  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.58 released.

@@ -136,7 +136,7 @@ struct EXPORT LogSelect : public Log
   void output_entry (symbol name, const PLF&);
 
   // Create and Destroy.
-  void initialize (const symbol log_dir, Treelog&);
+  void initialize (const symbol log_dir, const symbol suffix, Treelog&);
   bool check (const Border&, Treelog& err) const;
   static void document_entries (Format&, const Metalib&, Treelog&, symbol);
   static std::vector<std::pair<symbol, symbol>/**/>

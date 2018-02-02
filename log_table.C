@@ -75,7 +75,8 @@ public:
 
   // Create and destroy.
 public:
-  void initialize (const symbol log_dir, const symbol objid,
+  void initialize (const symbol log_dir, const symbol suffix,
+		   const symbol objid,
                    const symbol description, const Volume&, 
                    const std::vector<std::pair<symbol, symbol>/**/>&
                    /**/ parameters);
@@ -276,12 +277,13 @@ DestinationTable::record_end ()
 }
 
 void
-DestinationTable::initialize (const symbol log_dir, const symbol objid,
+DestinationTable::initialize (const symbol log_dir, const symbol suffix,
+			      const symbol objid,
                               const symbol description, const Volume& volume,
                               const std::vector<std::pair<symbol, symbol>/**/>&
                               /**/ parameters)
 {
-  const std::string fn = log_dir.name () + file.name ();
+  const std::string fn = log_dir.name () + file.name () + suffix.name ();
   out.open (fn.c_str ());
 
   print_header.start (out, objid, file, parsed_from_file);
@@ -353,7 +355,7 @@ struct LogTable : public LogSelect
 
   // Create and destroy.
   bool check (const Border&, Treelog& msg) const;
-  void initialize (const symbol log_dir, Treelog&);
+  void initialize (const symbol log_dir, const symbol suffix, Treelog&);
   explicit LogTable (const BlockModel& al);
   ~LogTable ();
 };
@@ -393,11 +395,11 @@ LogTable::check (const Border& border, Treelog& msg) const
 }
 
 void
-LogTable::initialize (const symbol log_dir, Treelog& msg)
+LogTable::initialize (const symbol log_dir, const symbol suffix, Treelog& msg)
 {
   TREELOG_MODEL (msg);
-  LogSelect::initialize (log_dir, msg);
-  destination.initialize (log_dir, objid, description, *volume, parameters); 
+  LogSelect::initialize (log_dir, suffix, msg);
+  destination.initialize (log_dir, suffix, objid, description, *volume, parameters); 
 }
 
 LogTable::LogTable (const BlockModel& al)

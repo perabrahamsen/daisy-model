@@ -129,8 +129,8 @@ void
 Output::initialize (const Metalib& metalib, Treelog& msg)
 {
   for (size_t i = 0; i < logs.size (); i++)
-    logs[i]->initialize_common (log_prefix, metalib, msg);
-  log_all->initialize_common (log_prefix, metalib, msg);
+    logs[i]->initialize_common (log_prefix, log_suffix, metalib, msg);
+  log_all->initialize_common (log_prefix, log_suffix, metalib, msg);
 }
 
 void 
@@ -181,7 +181,8 @@ Output::Output (const BlockModel& al)
     activate_output (Librarian::build_item<Condition> (al, "activate_output")),
     time_columns (Time::find_time_components 
                   /**/ (al.name_sequence ("log_time_columns"))),
-    log_prefix (al.name ("log_prefix"))
+    log_prefix (al.name ("log_prefix")),
+    log_suffix (al.name ("log_suffix"))
 { }
 
 Output::Output ()
@@ -190,7 +191,8 @@ Output::Output ()
     logs (std::vector<Log*> ()),
     active_logs (std::vector<Log*> ()),
     my_scopes (std::vector<const Scope*> ()),
-    log_prefix ("")
+    log_prefix (""),
+    log_suffix ("")
 { }
 
 Output::~Output ()
@@ -231,6 +233,9 @@ List of default time components to include in log files.");
    frame.declare_string ("log_prefix", Attribute::Const, "\
 Prefix for log file names.  Set it to 'log/' to put all files in a subdir.");
    frame.set ("log_prefix", "");
+   frame.declare_string ("log_suffix", Attribute::Const, "\
+Suffix for log file names.  Set it to '.csv' to make Excel happy.");
+   frame.set ("log_suffix", "");
 }
 
 // output.C ends here.

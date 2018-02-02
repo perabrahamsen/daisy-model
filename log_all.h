@@ -77,7 +77,7 @@ public:
   void output_entry (symbol name, const PLF&);
 
   // Create and destroy.
-  void initialize (const symbol log_dir, Treelog&);
+  void initialize (const symbol log_dir, const symbol suffix, Treelog&);
 private:
   static Block& get_block ();
 public:

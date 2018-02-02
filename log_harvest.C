@@ -179,9 +179,9 @@ struct LogHarvest : public Log
   { }
 
   // Create and Destroy.
-  void initialize (const symbol log_dir, Treelog&)
+  void initialize (const symbol log_dir, const symbol suffix, Treelog&)
   { 
-    const std::string fn = log_dir.name () + file.name ();
+    const std::string fn = log_dir.name () + file.name () + suffix.name ();
     out.open (fn.c_str ()); 
 
     // Header.

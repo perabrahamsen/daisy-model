@@ -97,7 +97,7 @@ public:
   symbol description (symbol) const;
 
   // Create and destroy.
-  void initialize (const symbol log_dir, Treelog&);
+  void initialize (const symbol log_dir, const symbol suffix, Treelog&);
 public:
   LogExtern (const BlockModel&);
   ~LogExtern ();

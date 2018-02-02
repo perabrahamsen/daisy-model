@@ -44,6 +44,7 @@ struct LogCheckpoint : public LogSubmodel
   const symbol file;		// Name of file to write checkpoint in.
   const symbol description;	// Comment to go to the start of the file.
   symbol log_dir;               // File prefix.
+  symbol suffix;               // File suffix.
   std::unique_ptr<Condition> condition; // Should we print a log now?
   Time time;			// Time of current checkpoint.
   const Metalib* global_frame; // All attributes.
@@ -62,7 +63,7 @@ struct LogCheckpoint : public LogSubmodel
   { daisy_notreached (); }
 
   // Create and Destroy.
-  void initialize (const symbol log_dir, Treelog&);
+  void initialize (const symbol log_dir, const symbol suffix, Treelog&);
   LogCheckpoint (const BlockModel& al);
   ~LogCheckpoint ();
 };
@@ -143,7 +144,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
 
       // Create file name.
       std::ostringstream scratch;
-      scratch << log_dir << file << "-";
+      scratch << log_dir << file << suffix << "-";
       scratch.fill (0);
       scratch.width (2);
       scratch << time.year () << "-" << time.month () 
@@ -216,14 +217,15 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
 }
 
 void 
-LogCheckpoint::initialize (const symbol ld, Treelog&)
-{ log_dir = ld; }
+LogCheckpoint::initialize (const symbol ld, const symbol sx, Treelog&)
+{ log_dir = ld; suffix = sx; }
 
 LogCheckpoint::LogCheckpoint (const BlockModel& al)
   : LogSubmodel (al),
     file (al.name ("where")),
     description (al.frame ().description ()),
     log_dir (Attribute::Unknown ()),
+    suffix (Attribute::Unknown ()),
     condition (Librarian::build_item<Condition> (al, "when")),
     time (1, 1, 1, 1)
 { }

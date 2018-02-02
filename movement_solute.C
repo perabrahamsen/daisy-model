@@ -318,7 +318,13 @@ MovementSolute::secondary_transport (const Geometry& geo,
   const double output = total_out + total_extra;
   const double error = input - increase - output;
   const double magnitude
-    = std::abs (increase) + std::abs (input) + std::abs (output);
+    = std::abs (total_Mn)
+    + std::abs (total_A)
+    + std::abs (total_Mf)
+    + std::abs (total_in)
+    + std::abs (total_source)
+    + std::abs (total_out)
+    + std::abs (total_extra);
   if (std::abs (error) > magnitude * 1e-10)
     {
       std::ostringstream tmp;

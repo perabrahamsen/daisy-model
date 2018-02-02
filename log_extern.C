@@ -252,10 +252,10 @@ LogExtern::name (symbol tag) const
 }
 
 void 
-LogExtern::initialize (const symbol log_dir, Treelog& msg)
+LogExtern::initialize (const symbol log_dir, const symbol suffix, Treelog& msg)
 {
   TREELOG_MODEL (msg);
-  LogSelect::initialize (log_dir, msg);
+  LogSelect::initialize (log_dir, suffix, msg);
   for (size_t i = 0; i < LogSelect::entries.size (); i++)
     {
       const symbol tag = LogSelect::entries[i]->tag ();

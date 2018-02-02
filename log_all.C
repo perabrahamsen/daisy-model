@@ -368,7 +368,7 @@ LogAll::output_entry (symbol, const PLF&)
 { }
 
 void
-LogAll::initialize (const symbol, Treelog&)
+LogAll::initialize (const symbol, const symbol, Treelog&)
 { }
 
 void
