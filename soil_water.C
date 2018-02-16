@@ -840,6 +840,9 @@ calculated sinks (S_forward) alone is less than the specified value.\n\
 Plant available water is defined as the difference between saturation\n\
 and wilting point.");
   frame.set ("max_sink_change", 0.1);
+  frame.declare_boolean ("use_last", Attribute::Const, "\
+Use last value specified for 'h' or 'Theta' for the rest of the profile.");
+  frame.set ("use_last", true);
   Geometry::add_layer (frame, Attribute::OptionalState, "h", load_h);
   Geometry::add_layer (frame, Attribute::OptionalState, "Theta", load_Theta);
   frame.declare ("Theta_primary", "cm^3/cm^3", Attribute::LogOnly, Attribute::SoilCells,
@@ -980,6 +983,7 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
   geo.initialize_layer (Theta_, al, "Theta", msg);
   geo.initialize_layer (h_, al, "h", msg);
 
+  // If both are specified, make sure they are consistent.
   for (size_t i = 0; i < Theta_.size () && i < h_.size (); i++)
     {
       const double Theta_h = soil.Theta (i, h_[i], h_ice (i));
@@ -992,48 +996,46 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
         }
       Theta_[i] = Theta_h;
     }
-  if (Theta_.size () > 0)
-    {
-      while (Theta_.size () < cell_size)
-        Theta_.push_back (Theta_[Theta_.size () - 1]);
-      if (h_.size () == 0)
-        for (size_t i = 0; i < cell_size; i++)
-          h_.push_back (soil.h (i, Theta_[i]));
-    }
-  if (h_.size () > 0)
-    {
-      while (h_.size () < cell_size)
-        h_.push_back (h_[h_.size () - 1]);
-      if (Theta_.size () == 0)
-        for (size_t i = 0; i < cell_size; i++)
-          Theta_.push_back (soil.Theta (i, h_[i], h_ice (i)));
-    }
-  daisy_assert (h_.size () == Theta_.size ());
+
+  size_t h_size = h_.size ();
+  size_t Theta_size = Theta_.size ();
+  
+  // Fill out with last value.
+  if (use_last && Theta_size > 0)
+    while (Theta_.size () < cell_size)
+      Theta_.push_back (Theta_[Theta_.size () - 1]);
+  if (use_last && h_size > 0)
+    while (h_.size () < cell_size)
+      h_.push_back (h_[h_.size () - 1]);
+  h_size = h_.size ();
+  Theta_size = Theta_.size ();
+
+
+  // h based on Theta.
+  for (size_t i = h_size; i < Theta_size; i++)
+    h_.push_back (soil.h (i, Theta_[i]));
+  h_size = h_.size ();
 
   // Groundwater based pressure.
-  if (h_.size () == 0)
+  if (groundwater.table () > 0.0)
     {
-      if (groundwater.table () > 0.0)
-        {
-          const double h_pF2 = -100.0; // pF 2.0;
-          for (size_t i = 0; i < cell_size; i++)
-            {
-              h_.push_back (h_pF2);
-              Theta_.push_back (soil.Theta (i, h_pF2, h_ice_[i]));
-            }
-        }
-      else
-        {
-          const double table = groundwater.table ();
-          
-          for (size_t i = 0; i < cell_size; i++)
-            {
-              h_.push_back (std::max (-100.0, table - geo.cell_z (i)));
-              Theta_.push_back (soil.Theta (i, h_[i], h_ice_[i]));
-            }
-        }
+      const double h_pF2 = -100.0; // pF 2.0;
+      for (size_t i = h_size; i < cell_size; i++)
+	h_.push_back (h_pF2);
     }
+  else
+    {
+      const double table = groundwater.table ();
+
+      for (size_t i = h_size; i < cell_size; i++)
+	h_.push_back (std::max (-100.0, table - geo.cell_z (i)));
+    }                        
   daisy_assert (h_.size () == cell_size);
+
+  // Theta based on h.
+  for (size_t i = Theta_size; i < cell_size; i++)
+    Theta_.push_back (soil.Theta (i, h_[i], h_ice (i)));
+  daisy_assert (Theta_.size () == cell_size);
 
   // Sources.
   S_sum_.insert (S_sum_.begin (), cell_size, 0.0);
@@ -1077,6 +1079,7 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
 SoilWater::SoilWater (const Block& al)
   : max_exfiltration_gradient (al.number ("max_exfiltration_gradient", -1.0)),
     max_sink_change (al.number ("max_sink_change")),
+    use_last (al.flag ("use_last")),
     S_permanent_ (al.number_sequence ("S_permanent")),
     sink_dt (NAN),
     sink_cell (Geometry::cell_error),

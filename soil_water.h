@@ -44,7 +44,8 @@ class SoilWater
 private:
   const double max_exfiltration_gradient; // [cm/cm]
   const double max_sink_change;           // Max change in available water [] 
-
+  const bool use_last;			  // Use last value for init h / Theta
+  
   // Content.
 private:
   std::vector<double> h_;

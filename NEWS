@@ -6,6 +6,13 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.60
+
+** New 'use_last' parameter in SoilWater.
+
+Use it to mix measurements and groundwater based initialization of
+soil water.
+
 * 5.53
 
 ** Short irrigation events will now lower the timestep.
