@@ -139,6 +139,12 @@ struct SVAT_SSOC : public SVAT
   // - Transpiration
   double E_trans; // Leaf transpiration [kg m^-2 s^-1]
 
+  // - Longwave new radiation [W/m^2]
+  double R_soil; 
+  double R_sun;
+  double R_shadow;
+  double R_total;
+  
   // Inter-intermediates variables
   double G_R_soil;  // Radiation "conductivity" from the soil [W m^-2 K^-1]
   double G_R_sun;   // Radiation "conductivity" from sun leaves [W m^-2 K^-1]
@@ -945,8 +951,13 @@ SVAT_SSOC:: calculate_fluxes()
   H_soil = G_H_a * (T_s - T_a) ;         //[W m^-2] 
   E_trans = 0.0; //Bare soil. No vegetation and leaf transpiration  [kg m^-2 s^-1]
 
+  // Net longwave radiation for soil.
+  R_soil = R_eq_abs_soil - G_R_soil * (T_s - T_a);
+
+  
   if (!has_LAI)
     {
+      R_total = R_soil;
       T_0 = Resistance:: T_0 (T_a - TK, T_s - TK, kb, LAI) + TK; //[K] 
       return;
     }
@@ -964,6 +975,11 @@ SVAT_SSOC:: calculate_fluxes()
       H_shadow =  G_H_shadow_c * (T_shadow - T_c); //[W m^-2] 
       // Sensible heat flux from the canopy point to free atmosphere
       H_c_a = G_H_a * (T_c - T_a);      //[W m^-2] 
+
+
+      // New longwave radiation from leaves.
+      R_sun = R_eq_abs_sun - G_R_sun * (T_sun - T_a);
+      R_shadow = R_eq_abs_shadow - G_R_shadow * (T_shadow - T_a);
       
       // Latent heat flux from the sunlit leaves to the canopy point
       LE_sun =  G_W_sun_c * ((s * (T_sun - T_a)) + (e_sat_air - e_c));  // [W m^-2]
@@ -985,6 +1001,10 @@ SVAT_SSOC:: calculate_fluxes()
       // Sensible heat flux from the canopy point to free atmosphere
       H_c_a = G_H_a * (T_c - T_a);      //[W m^-2] 
       
+      // New longwave radiation from leaves.
+      R_shadow = R_eq_abs_shadow - G_R_leaf * (T_shadow - T_a);
+      R_sun = 0.0;
+
       // Latent heat flux from the sunlit leaves to the canopy point
       LE_shadow =  G_W_leaf_c * ((s * (T_shadow - T_a)) + (e_sat_air - e_c));//[W m^-2]
                  
@@ -995,6 +1015,7 @@ SVAT_SSOC:: calculate_fluxes()
       // Transpiration
       E_trans = (LE_shadow) / lambda;        //[kg m^-2 s^-1]==[mm/s]
     }
+  R_total = R_soil + R_sun + R_shadow;
 }
 
 void
@@ -1067,6 +1088,8 @@ SVAT_SSOC::output(Log& log) const
       output_variable (k_h, log);
       output_variable (T_z0, log);
       output_variable (E_soil, log);
+      output_variable (R_soil, log);
+      output_variable (R_total, log);
     }
   if (has_LAI)
     {
@@ -1105,6 +1128,9 @@ SVAT_SSOC::output(Log& log) const
       output_variable (LE_atm, log);
       output_value (E_trans * 3600., "E_trans", log);
       output_variable (e_c, log);
+      output_variable (R_shadow, log);
+      if (has_light)
+	output_variable (R_sun, log);
     }
 }
 
@@ -1304,7 +1330,17 @@ to reference height (screen height).");
 		   "Soil temperature in top cell.");
     frame.declare ("E_soil", "kg/m^2/s", Attribute::LogOnly,
 		   "Evaporation of water from soil.");
-    }
+
+    frame.declare ("R_soil", "W/m^2", Attribute::LogOnly,
+		   "Net longwave radiation from soil.");
+    frame.declare ("R_sun", "W/m^2", Attribute::LogOnly,
+		   "Net longwave radiation from sunlit leaves.");
+    frame.declare ("R_shadow", "W/m^2", Attribute::LogOnly,
+		   "Net longwave radiation from shadow leaves.");
+    frame.declare ("R_total", "W/m^2", Attribute::LogOnly,
+		   "Net longwave radiation from soil and canopy.");
+    
+  }
 } SVAT_ssoc_syntax;
 
 // svat_ssoc.C ends here

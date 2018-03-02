@@ -133,6 +133,7 @@ struct BioclimateStandard : public Bioclimate
   const std::unique_ptr<SVAT> svat;     // Soil Vegetation Atmosphere model.
   size_t svat_fail;             // Number of times the svat loop failed.
   size_t svat_total;            // Total number of times the svat loop entered.
+  bool svat_failed;		// True iff the SVAT loop failed.
   double crop_ep_;              // Potential transpiration. [mm/h]
   double crop_ea_soil;          // Crop limited transpiration. [mm/h]
   double crop_ea_svat;          // SVAT limited transpiration. [mm/h]
@@ -538,6 +539,7 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     svat (Librarian::build_item<SVAT> (al, "svat")),
     svat_fail (0),
     svat_total (0),
+    svat_failed (true),
     crop_ep_ (0.0),
     crop_ea_soil (0.0),
     crop_ea_svat (0.0),
@@ -1029,6 +1031,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
   double gs_shadow_sum = 0.0;
   double gs_sunlit_sum = 0.0;
 
+  svat_failed = false;
   for (int iteration = 0; iteration < max_svat_iterations; iteration++)
     {
       TreelogStore svat_msg;
@@ -1100,7 +1103,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
                 svat_msg.propagate_debug (msg);
               else
                 svat_msg.propagate (msg);
-              svat_fail++;
+              svat_failed = true;
             }
           goto success;
         }
@@ -1126,8 +1129,10 @@ BioclimateStandard::WaterDistribution (const Units& units,
   msg.error ("SVAT transpiration and stomata conductance"
              " loop did not converge");
   msg.debug (lout.str ());
-  svat_fail++;
+  svat_failed = true;
  success:;
+  if (svat_failed)
+    svat_fail++;
   svat_total++;
 
   // Stress calculated by the SVAT model.
@@ -1300,6 +1305,7 @@ BioclimateStandard::output (Log& log) const
   output_value (pond_ea_, "pond_ea", log);
   output_variable (soil_ep, log);
   output_value (soil_ea_, "soil_ea", log);
+  output_value (svat_failed ? 1 : 0, "svat_failed", log);
   output_derived (svat, "svat", log);
   output_value (crop_ep_, "crop_ep", log);
   output_variable (crop_ea_soil, log);
@@ -1335,7 +1341,9 @@ BioclimateStandard::output (Log& log) const
   output_variable (incoming_PAR_radiation, log);
   output_variable (incoming_NIR_radiation, log);
   output_variable (incoming_Total_radiation, log);
-
+  output_value (global_radiation_
+		- incoming_PAR_radiation - incoming_NIR_radiation,
+		"outgoing_Short_radiation", log);
   // Deposition.
   output_derived (deposition, "deposition", log);
 }
@@ -1539,6 +1547,9 @@ Largest humidity difference for convergence.");
     frame.declare ("soil_ea", "mm/h", Attribute::LogOnly,
                    "Actual exfiltration.");
 
+    frame.declare_integer ("svat_failed", Attribute::LogOnly, "\
+'0' if the SVAT model found a solution, '1' otherwise.");
+    
     // Water transpirated through plant roots.
     frame.declare ("crop_ep", "mm/h", Attribute::LogOnly,
                    "Potential transpiration.\n\
@@ -1637,6 +1648,8 @@ use these (the weather difrad model). Otherwise Daisy wil use the DPF model.");
                    "Incoming NIR radiation");
     frame.declare ("incoming_Total_radiation","W/m^2", Attribute::LogOnly,
                    "Incoming radiation, sum of shortwave and longwave");
+    frame.declare ("outgoing_Short_radiation", "W/m^2", Attribute::LogOnly,
+		   "Outgoing shortware radiation.");
 
     frame.declare_object ("deposition", Deposition::component, 
                           "Deposition model.");

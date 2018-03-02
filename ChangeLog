@@ -1,3 +1,12 @@
+2018-03-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* svat_ssoc.C (R_soil, R_sun, R_shadow, R_total): New log variables.
+	* bioclimate_std.C (outgoing_Short_radiation): New log variable.
+
+2018-02-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* bioclimate_std.C (svat_failed): New variable.
+
 2018-02-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* soil_water.C (use_last): New parameter.
