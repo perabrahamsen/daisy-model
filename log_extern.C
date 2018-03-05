@@ -267,8 +267,9 @@ LogExtern::initialize (const symbol log_dir, const symbol suffix, Treelog& msg)
     }
 }
 
-struct LogExtern::NumEntry
+class LogExtern::NumEntry
 {
+public:
   const symbol name;
   const double value;
 

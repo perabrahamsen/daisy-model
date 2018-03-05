@@ -27,14 +27,14 @@
 #include "time.h"
 #include <vector>
 
-struct Log;
-struct LogAll;
-struct Scope;
-struct MScope;
-struct Border;
-struct Block;
-struct Metalib;
-struct Daisy;
+class Log;
+class LogAll;
+class Scope;
+class MScope;
+class Border;
+class Block;
+class Metalib;
+class Daisy;
 
 class Output
 {

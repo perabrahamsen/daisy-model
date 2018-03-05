@@ -59,7 +59,7 @@ namespace Attribute
 
   // A attribute may have a dimension associated.
   symbol Unknown ();
-  symbol None () EXPORT;
+  EXPORT symbol None ();
   symbol Fraction ();
   symbol User ();
 
@@ -67,7 +67,7 @@ namespace Attribute
   enum type 
   { Number, Submodel, PLF, Boolean, String,
     Integer, Model, Scalar, Reference, Error };
-  symbol type_name (type) EXPORT;
+  EXPORT symbol type_name (type);
   type type_number (symbol name);
     
   // The requirements with regard to input and output varies with each

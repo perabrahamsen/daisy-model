@@ -23,7 +23,7 @@
 #ifndef FAO_H
 #define FAO_H
 
-struct Treelog;
+class Treelog;
 
 namespace FAO
 { 

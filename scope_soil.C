@@ -30,6 +30,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include <sstream>
+#include <iterator>
 
 const symbol 
 ScopeSoil::rho_b ("rho_b");

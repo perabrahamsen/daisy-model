@@ -1,3 +1,14 @@
+2018-03-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* all: Missing includes <algortihm> and <iterator>.
+	Changed EXPORT and NORETURN to come before function, not after.
+	Changed many "struct" to "class".
+	All for Visual C++.
+	* Daisy.vcxproj: New file.
+
+	* wsource_weather.C (my_has_min_max_temperature): Initialize to
+	false, not NAN.
+
 2018-03-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* svat_ssoc.C (R_soil, R_sun, R_shadow, R_total): New log variables.

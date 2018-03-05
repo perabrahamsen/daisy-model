@@ -25,14 +25,14 @@
 #include "symbol.h"
 #include <vector>
 
-struct Geometry;
-struct GeometryRect;
-struct Soil;
-struct SoilWater;
-struct SoilHeat;
-struct Surface;
-struct Groundwater;
-struct Treelog;
+class Geometry;
+class GeometryRect;
+class Soil;
+class SoilWater;
+class SoilHeat;
+class Surface;
+class Groundwater;
+class Treelog;
 class BlockModel;
 
 class UZRect : public ModelFramed

@@ -32,6 +32,7 @@
 #include "mathlib.h"
 #include <boost/noncopyable.hpp>
 #include <sstream>
+#include <iterator>
 
 struct WSourceCombine : public WSourceWeather
 {

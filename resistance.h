@@ -22,7 +22,7 @@
 #ifndef RESISTANCE_H
 #define RESISTANCE_H
 
-struct Treelog;
+class Treelog;
 
 namespace Resistance
 {

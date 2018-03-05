@@ -28,11 +28,11 @@
 #include <vector>
 #include <memory>
 
-struct Select;
-struct Condition;
-struct Format;
-struct Volume;
-struct Summary;
+class Select;
+class Condition;
+class Format;
+class Volume;
+class Summary;
 
 #ifdef __unix
 #define EXPORT /* Nothing */

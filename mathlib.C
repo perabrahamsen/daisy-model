@@ -25,11 +25,11 @@
 #include "assertion.h"
 #include <sstream>
 
-#if !defined (__unix)
+// #if !defined (__unix)
 // Apparently not provided on Borland C++ 5.0 or 5.5.
-double cbrt (double x) 
-{ return pow (x, 1.0/3.0); }
-#endif
+// double cbrt (double x) 
+// { return pow (x, 1.0/3.0); }
+// #endif
 
 void 
 first_order_change (const double old_storage /* [M] */,

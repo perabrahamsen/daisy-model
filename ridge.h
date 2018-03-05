@@ -25,12 +25,12 @@
 
 #include <vector>
 
-struct Frame;
-struct FrameSubmodel;
-struct Log;
-struct Geometry1D;
-struct Soil;
-struct SoilWater;
+class Frame;
+class FrameSubmodel;
+class Log;
+class Geometry1D;
+class Soil;
+class SoilWater;
 
 class Ridge
 { 

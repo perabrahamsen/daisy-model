@@ -93,8 +93,8 @@ public:
 
 static TreelogNull nulllog;
 
-Treelog&
-EXPORT Treelog::null () 
+EXPORT Treelog&
+Treelog::null () 
 { return nulllog; }
 
 Treelog::Treelog ()

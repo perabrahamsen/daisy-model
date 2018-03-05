@@ -72,11 +72,11 @@ struct SummaryRsqr : public Summary
     // Destination.
     void missing ()
     { }
-    void add (const std::vector<double>& value) NORETURN
+    NORETURN void add (const std::vector<double>& value) 
     { daisy_notreached (); }
     void add (const double value)
     { summary.compare (tag, value); }
-    void add (const symbol value) NORETURN
+	NORETURN void add (const symbol value)
     { daisy_notreached (); }
 
     Compare (SummaryRsqr& sum, const symbol key)

@@ -25,9 +25,9 @@
 #include "plf.h"
 #include <boost/noncopyable.hpp>
 
-struct Log;
-struct Frame;
-struct BlockSubmodel;
+class Log;
+class Frame;
+class BlockSubmodel;
 
 class CanopySimple : private boost::noncopyable
 {

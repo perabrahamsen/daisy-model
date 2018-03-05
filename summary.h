@@ -26,11 +26,11 @@
 #include "symbol.h"
 #include <vector>
 
-struct Select;
-struct Treelog;
-struct BlockModel;
-struct Time;
-struct Scope;
+class Select;
+class Treelog;
+class BlockModel;
+class Time;
+class Scope;
 
 class Summary : public Model
 {

@@ -55,7 +55,7 @@ public:
 		     const Time&, Treelog&);
 
   // Print line handled by slaves.
-  void done_print (const std::vector<Time::component_t>&, const Time&) NORETURN;
+  NORETURN void done_print (const std::vector<Time::component_t>&, const Time&);
 
   // Open a derived type.
   void open_derived_type (symbol type, symbol library);

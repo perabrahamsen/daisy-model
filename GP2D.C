@@ -29,6 +29,7 @@
 #include "mathlib.h"
 #include "assertion.h"
 #include <sstream>
+#include <algorithm>
 
 // GP1D
 

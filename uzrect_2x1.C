@@ -35,8 +35,9 @@
 #include "block_model.h"
 #include <sstream>
 
-struct UZRect2x1 : public UZRect
+class UZRect2x1 : public UZRect
 {
+public:
   // Failure.
   std::vector<size_t> vertical_fail;
   std::vector<size_t> vertical_total;

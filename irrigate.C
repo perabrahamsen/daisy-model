@@ -49,8 +49,9 @@ Irrigation::conc_flux ("kg/ha/mm");
 const double 
 Irrigation::at_air_temperature = -500.0;
 
-struct Irrigation::Event : private boost::noncopyable
+class Irrigation::Event : private boost::noncopyable
 {
+public:
   // Content.
   double time_left;           // [h]
   const double flux;          // [mm/h]

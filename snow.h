@@ -23,16 +23,16 @@
 #ifndef SNOW_H
 #define SNOW_H
 
-struct Weather;
-struct Bioclimate;
-struct Frame;
-struct FrameSubmodel;
-struct Log;
-struct Movement;
-struct Soil;
-struct SoilWater;
-struct SoilHeat;
-struct Treelog;
+class Weather;
+class Bioclimate;
+class Frame;
+class FrameSubmodel;
+class Log;
+class Movement;
+class Soil;
+class SoilWater;
+class SoilHeat;
+class Treelog;
 
 class Snow
 { 

@@ -52,8 +52,9 @@
 const char *const Daisy::default_description = "\
 The Daisy crop/soil/atmosphere model.";
 
-struct Daisy::Implementation
+class Daisy::Implementation
 {
+public:
   // Content.
   const Metalib& metalib;
   const FrameModel& frame;

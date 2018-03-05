@@ -23,6 +23,7 @@
 #define SOIL_WATER_H
 
 #include <vector>
+#include <algorithm>
 
 class Surface;
 class Groundwater;

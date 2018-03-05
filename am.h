@@ -47,7 +47,7 @@ class AM : public ModelFramed
 public:
   struct Implementation;
   std::unique_ptr<Implementation> impl;
-  friend class Implementation;
+  friend struct Implementation;
   static const char *const component;
   symbol library_id () const;
   void append_to (std::vector<AOM*>& added);

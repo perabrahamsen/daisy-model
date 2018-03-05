@@ -25,11 +25,11 @@
 
 #include <vector>
 
-struct Frame;
-struct FrameSubmodel;
-struct Treelog;
-struct Texture;
-struct Hydraulic;
+class Frame;
+class FrameSubmodel;
+class Treelog;
+class Texture;
+class Hydraulic;
 
 struct HorHeat
 {

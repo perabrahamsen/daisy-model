@@ -47,11 +47,11 @@ struct SummaryFractiles : public Summary
     // Destination.
     void missing ()
     { }
-    void add (const std::vector<double>& value) NORETURN
+	NORETURN void add (const std::vector<double>& value)
     { daisy_notreached (); }
     void add (const double value)
     { data.push_back (value); }
-    void add (const symbol value) NORETURN
+	NORETURN void add (const symbol value)
     { daisy_notreached (); }
 
     explicit Data (const symbol key)

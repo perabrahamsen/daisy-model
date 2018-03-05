@@ -24,8 +24,9 @@
 
 class Treelog;
 
-struct Border
+class Border
 { 
+public:
   virtual bool check_z_border (double, Treelog&) const = 0; 
   virtual bool check_x_border (double, Treelog&) const = 0; 
   virtual bool check_y_border (double, Treelog&) const = 0; 

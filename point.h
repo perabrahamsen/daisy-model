@@ -26,8 +26,9 @@
 class Frame;
 class Block;
 
-struct XYPoint
+class XYPoint
 {
+public:
   const double x;
   const double y;
 

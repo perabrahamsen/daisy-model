@@ -1,0 +1,793 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{ED167EA9-BA56-4BA5-AC9A-C90D28C7C9E1}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\cygwin64\usr\include\boost;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4018;4275;4251;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <AdditionalIncludeDirectories>C:\local\boost_1_66_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>C:\local\cxsparse;C:\local\boost_1_66_0\lib32-msvc-14.1;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libcxsparse.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="ABAprod.C" />
+    <ClCompile Include="ABAprod_root.C" />
+    <ClCompile Include="ABAprod_soil.C" />
+    <ClCompile Include="ABAprod_uptake.C" />
+    <ClCompile Include="abiotic.C" />
+    <ClCompile Include="action.C" />
+    <ClCompile Include="action_activity.C" />
+    <ClCompile Include="action_BBCH.C" />
+    <ClCompile Include="action_crop.C" />
+    <ClCompile Include="action_extern.C" />
+    <ClCompile Include="action_fertilize.C" />
+    <ClCompile Include="action_harvest.C" />
+    <ClCompile Include="action_irrigate.C" />
+    <ClCompile Include="action_lisp.C" />
+    <ClCompile Include="action_markvand.C" />
+    <ClCompile Include="action_message.C" />
+    <ClCompile Include="action_repeat.C" />
+    <ClCompile Include="action_ridge.C" />
+    <ClCompile Include="action_sow.C" />
+    <ClCompile Include="action_spray.C" />
+    <ClCompile Include="action_stop.C" />
+    <ClCompile Include="action_surface.C" />
+    <ClCompile Include="action_table.C" />
+    <ClCompile Include="action_tillage.C" />
+    <ClCompile Include="action_wait.C" />
+    <ClCompile Include="action_while.C" />
+    <ClCompile Include="action_with.C" />
+    <ClCompile Include="adsorption.C" />
+    <ClCompile Include="adsorption_freundlich.C" />
+    <ClCompile Include="adsorption_langmuir.C" />
+    <ClCompile Include="adsorption_linear.C" />
+    <ClCompile Include="adsorption_vS_S.C" />
+    <ClCompile Include="am.C" />
+    <ClCompile Include="anystate.C" />
+    <ClCompile Include="aom.C" />
+    <ClCompile Include="assertion.C" />
+    <ClCompile Include="astronomy.C" />
+    <ClCompile Include="attribute.C" />
+    <ClCompile Include="average.C" />
+    <ClCompile Include="bdconv.C" />
+    <ClCompile Include="bioclimate.C" />
+    <ClCompile Include="bioclimate_std.C" />
+    <ClCompile Include="bioincorporation.C" />
+    <ClCompile Include="biopore.C" />
+    <ClCompile Include="biopore_drain.C" />
+    <ClCompile Include="biopore_matrix.C" />
+    <ClCompile Include="block.C" />
+    <ClCompile Include="block_model.C" />
+    <ClCompile Include="block_nested.C" />
+    <ClCompile Include="block_submodel.C" />
+    <ClCompile Include="block_top.C" />
+    <ClCompile Include="boolean.C" />
+    <ClCompile Include="boolean_number.C" />
+    <ClCompile Include="boolean_string.C" />
+    <ClCompile Include="border.C" />
+    <ClCompile Include="bound.C" />
+    <ClCompile Include="canopy_simple.C" />
+    <ClCompile Include="canopy_std.C" />
+    <ClCompile Include="check.C" />
+    <ClCompile Include="check_range.C" />
+    <ClCompile Include="chemical.C" />
+    <ClCompile Include="chemical_std.C" />
+    <ClCompile Include="chemistry.C" />
+    <ClCompile Include="chemistry_multi.C" />
+    <ClCompile Include="chemistry_std.C" />
+    <ClCompile Include="clayom.C" />
+    <ClCompile Include="clayom_biomod.C" />
+    <ClCompile Include="clayom_old.C" />
+    <ClCompile Include="column.C" />
+    <ClCompile Include="column_std.C" />
+    <ClCompile Include="condedge.C" />
+    <ClCompile Include="condition.C" />
+    <ClCompile Include="condition_BBCH.C" />
+    <ClCompile Include="condition_boolean.C" />
+    <ClCompile Include="condition_crop.C" />
+    <ClCompile Include="condition_daisy.C" />
+    <ClCompile Include="condition_extern.C" />
+    <ClCompile Include="condition_logic.C" />
+    <ClCompile Include="condition_soil.C" />
+    <ClCompile Include="condition_time.C" />
+    <ClCompile Include="condition_walltime.C" />
+    <ClCompile Include="condition_weather.C" />
+    <ClCompile Include="convert.C" />
+    <ClCompile Include="crop.C" />
+    <ClCompile Include="crop_simple.C" />
+    <ClCompile Include="crop_std.C" />
+    <ClCompile Include="crpn.C" />
+    <ClCompile Include="daisy.C" />
+    <ClCompile Include="deposition.C" />
+    <ClCompile Include="depth.C" />
+    <ClCompile Include="destination.C" />
+    <ClCompile Include="difrad.C" />
+    <ClCompile Include="difrad_DPF.C" />
+    <ClCompile Include="difrad_weather.C" />
+    <ClCompile Include="dlf.C" />
+    <ClCompile Include="doe.C" />
+    <ClCompile Include="dom.C" />
+    <ClCompile Include="domsorp.C" />
+    <ClCompile Include="domsorp_std.C" />
+    <ClCompile Include="drain.C" />
+    <ClCompile Include="draineqd.C" />
+    <ClCompile Include="drain_lateral.C" />
+    <ClCompile Include="element.C" />
+    <ClCompile Include="equil.C" />
+    <ClCompile Include="equil_goal.C" />
+    <ClCompile Include="equil_langmuir.C" />
+    <ClCompile Include="equil_linear.C" />
+    <ClCompile Include="fao.C" />
+    <ClCompile Include="fetch.C" />
+    <ClCompile Include="fetch_pretty.C" />
+    <ClCompile Include="field.C" />
+    <ClCompile Include="filepos.C" />
+    <ClCompile Include="format.C" />
+    <ClCompile Include="format_LaTeX.C" />
+    <ClCompile Include="frame.C" />
+    <ClCompile Include="frame_model.C" />
+    <ClCompile Include="frame_submodel.C" />
+    <ClCompile Include="gaussj.C" />
+    <ClCompile Include="geometry.C" />
+    <ClCompile Include="geometry1d.C" />
+    <ClCompile Include="geometry_rect.C" />
+    <ClCompile Include="geometry_vert.C" />
+    <ClCompile Include="gnuplot.C" />
+    <ClCompile Include="gnuplot_base.C" />
+    <ClCompile Include="gnuplot_multi.C" />
+    <ClCompile Include="gnuplot_profile.C" />
+    <ClCompile Include="gnuplot_soil.C" />
+    <ClCompile Include="gnuplot_time.C" />
+    <ClCompile Include="gnuplot_utils.C" />
+    <ClCompile Include="gnuplot_vector.C" />
+    <ClCompile Include="gnuplot_xy.C" />
+    <ClCompile Include="GP2D.C" />
+    <ClCompile Include="groundwater.C" />
+    <ClCompile Include="groundwater_aquitard.C" />
+    <ClCompile Include="groundwater_deep.C" />
+    <ClCompile Include="groundwater_extern.C" />
+    <ClCompile Include="groundwater_file.C" />
+    <ClCompile Include="groundwater_fixed.C" />
+    <ClCompile Include="groundwater_flux.C" />
+    <ClCompile Include="groundwater_lysimeter.C" />
+    <ClCompile Include="groundwater_source.C" />
+    <ClCompile Include="groundwater_static.C" />
+    <ClCompile Include="harvest.C" />
+    <ClCompile Include="harvesting.C" />
+    <ClCompile Include="heatrect.C" />
+    <ClCompile Include="heatrect_linear.C" />
+    <ClCompile Include="heatrect_Mollerup.C" />
+    <ClCompile Include="heatrect_none.C" />
+    <ClCompile Include="horheat.C" />
+    <ClCompile Include="horizon.C" />
+    <ClCompile Include="horizon_numeric.C" />
+    <ClCompile Include="horizon_system.C" />
+    <ClCompile Include="hydraulic.C" />
+    <ClCompile Include="hydraulic_B_BaC.C" />
+    <ClCompile Include="hydraulic_B_BaC_Bimodal.C" />
+    <ClCompile Include="hydraulic_B_C.C" />
+    <ClCompile Include="hydraulic_B_C_inverse.C" />
+    <ClCompile Include="hydraulic_B_vG.C" />
+    <ClCompile Include="hydraulic_Cosby.C" />
+    <ClCompile Include="hydraulic_hypres.C" />
+    <ClCompile Include="hydraulic_MACRO.C" />
+    <ClCompile Include="hydraulic_mod_C.C" />
+    <ClCompile Include="hydraulic_M_BaC.C" />
+    <ClCompile Include="hydraulic_M_BaC_Bimodal.C" />
+    <ClCompile Include="hydraulic_M_C.C" />
+    <ClCompile Include="hydraulic_M_vG.C" />
+    <ClCompile Include="hydraulic_M_vGp.C" />
+    <ClCompile Include="hydraulic_M_vG_compact.C" />
+    <ClCompile Include="hydraulic_wepp.C" />
+    <ClCompile Include="hydraulic_yolo.C" />
+    <ClCompile Include="im.C" />
+    <ClCompile Include="imvec.C" />
+    <ClCompile Include="integer.C" />
+    <ClCompile Include="integer_arit.C" />
+    <ClCompile Include="intrinsics.C" />
+    <ClCompile Include="irrigate.C" />
+    <ClCompile Include="iterative.C" />
+    <ClCompile Include="lexer.C" />
+    <ClCompile Include="lexer_data.C" />
+    <ClCompile Include="lexer_flux.C" />
+    <ClCompile Include="lexer_soil.C" />
+    <ClCompile Include="lexer_table.C" />
+    <ClCompile Include="librarian.C" />
+    <ClCompile Include="library.C" />
+    <ClCompile Include="litter.C" />
+    <ClCompile Include="log.C" />
+    <ClCompile Include="log_alist.C" />
+    <ClCompile Include="log_all.C" />
+    <ClCompile Include="log_checkpoint.C" />
+    <ClCompile Include="log_extern.C" />
+    <ClCompile Include="log_harvest.C" />
+    <ClCompile Include="log_select.C" />
+    <ClCompile Include="log_table.C" />
+    <ClCompile Include="macro.C" />
+    <ClCompile Include="macro_none.C" />
+    <ClCompile Include="macro_std.C" />
+    <ClCompile Include="mactrans.C" />
+    <ClCompile Include="mactrans_std.C" />
+    <ClCompile Include="main.C" />
+    <ClCompile Include="mathlib.C" />
+    <ClCompile Include="metalib.C" />
+    <ClCompile Include="model.C" />
+    <ClCompile Include="model_derived.C" />
+    <ClCompile Include="model_framed.C" />
+    <ClCompile Include="model_logable.C" />
+    <ClCompile Include="movement.C" />
+    <ClCompile Include="movement_1D.C" />
+    <ClCompile Include="movement_rect.C" />
+    <ClCompile Include="movement_solute.C" />
+    <ClCompile Include="net_radiation.C" />
+    <ClCompile Include="nitrification.C" />
+    <ClCompile Include="nitrification_soil.C" />
+    <ClCompile Include="nitrification_solute.C" />
+    <ClCompile Include="nrutil.C" />
+    <ClCompile Include="number.C" />
+    <ClCompile Include="number_arit.C" />
+    <ClCompile Include="number_const.C" />
+    <ClCompile Include="number_lisp.C" />
+    <ClCompile Include="number_plf.C" />
+    <ClCompile Include="number_soil.C" />
+    <ClCompile Include="number_source.C" />
+    <ClCompile Include="oldunits.C" />
+    <ClCompile Include="om.C" />
+    <ClCompile Include="organic.C" />
+    <ClCompile Include="organic_none.C" />
+    <ClCompile Include="organic_std.C" />
+    <ClCompile Include="output.C" />
+    <ClCompile Include="parser.C" />
+    <ClCompile Include="parser_file.C" />
+    <ClCompile Include="partition.C" />
+    <ClCompile Include="path.C" />
+    <ClCompile Include="pet.C" />
+    <ClCompile Include="pet_FAO_PM.C" />
+    <ClCompile Include="pet_FAO_PM_hourly.C" />
+    <ClCompile Include="pet_Hargreaves.C" />
+    <ClCompile Include="pet_makkink.C" />
+    <ClCompile Include="pet_PM.C" />
+    <ClCompile Include="pet_weather.C" />
+    <ClCompile Include="phenology.C" />
+    <ClCompile Include="phenology_std.C" />
+    <ClCompile Include="phenology_TSum.C" />
+    <ClCompile Include="photo.C" />
+    <ClCompile Include="photo_Farquhar.C" />
+    <ClCompile Include="photo_FCC3.C" />
+    <ClCompile Include="photo_FCC4.C" />
+    <ClCompile Include="photo_GL.C" />
+    <ClCompile Include="plf.C" />
+    <ClCompile Include="point.C" />
+    <ClCompile Include="ponddamp.C" />
+    <ClCompile Include="printer.C" />
+    <ClCompile Include="printer_file.C" />
+    <ClCompile Include="production.C" />
+    <ClCompile Include="program.C" />
+    <ClCompile Include="program_batch.C" />
+    <ClCompile Include="program_cpedata.C" />
+    <ClCompile Include="program_document.C" />
+    <ClCompile Include="program_extract.C" />
+    <ClCompile Include="program_file.C" />
+    <ClCompile Include="program_gnuplot.C" />
+    <ClCompile Include="program_GP2D.C" />
+    <ClCompile Include="program_hmovie.C" />
+    <ClCompile Include="program_KM2.C" />
+    <ClCompile Include="program_optimize.C" />
+    <ClCompile Include="program_osvaldo.C" />
+    <ClCompile Include="program_post.C" />
+    <ClCompile Include="program_rootmatch.C" />
+    <ClCompile Include="program_sbrdata.C" />
+    <ClCompile Include="raddist.C" />
+    <ClCompile Include="raddist_DPF.C" />
+    <ClCompile Include="raddist_std.C" />
+    <ClCompile Include="rainergy.C" />
+    <ClCompile Include="reaction.C" />
+    <ClCompile Include="reaction_adsorption.C" />
+    <ClCompile Include="reaction_boundrel.C" />
+    <ClCompile Include="reaction_colgen.C" />
+    <ClCompile Include="reaction_denit.C" />
+    <ClCompile Include="reaction_equil.C" />
+    <ClCompile Include="reaction_filter.C" />
+    <ClCompile Include="reaction_Jarvis99.C" />
+    <ClCompile Include="reaction_Morgan98.C" />
+    <ClCompile Include="reaction_nit.C" />
+    <ClCompile Include="reaction_sorption.C" />
+    <ClCompile Include="reaction_std.C" />
+    <ClCompile Include="reaction_Styczen88.C" />
+    <ClCompile Include="resistance.C" />
+    <ClCompile Include="ridge.C" />
+    <ClCompile Include="rootdens.C" />
+    <ClCompile Include="rootdens_AP.C" />
+    <ClCompile Include="rootdens_GP1D.C" />
+    <ClCompile Include="rootdens_GP2D.C" />
+    <ClCompile Include="rootdens_growth.C" />
+    <ClCompile Include="rootdens_G_P.C" />
+    <ClCompile Include="rootdens_PLF.C" />
+    <ClCompile Include="root_system.C" />
+    <ClCompile Include="rubiscoN.C" />
+    <ClCompile Include="rubiscoNdist.C" />
+    <ClCompile Include="rubiscoNdist_DPF.C" />
+    <ClCompile Include="rubiscoNdist_expr.C" />
+    <ClCompile Include="rubiscoNdist_forced.C" />
+    <ClCompile Include="rubiscoNdist_uniform.C" />
+    <ClCompile Include="run.C" />
+    <ClCompile Include="scope.C" />
+    <ClCompile Include="scopesel.C" />
+    <ClCompile Include="scope_exchange.C" />
+    <ClCompile Include="scope_id.C" />
+    <ClCompile Include="scope_model.C" />
+    <ClCompile Include="scope_multi.C" />
+    <ClCompile Include="scope_soil.C" />
+    <ClCompile Include="scope_sources.C" />
+    <ClCompile Include="scope_table.C" />
+    <ClCompile Include="scope_xysources.C" />
+    <ClCompile Include="secondary.C" />
+    <ClCompile Include="seed.C" />
+    <ClCompile Include="seed_LAI.C" />
+    <ClCompile Include="seed_release.C" />
+    <ClCompile Include="select.C" />
+    <ClCompile Include="select_array.C" />
+    <ClCompile Include="select_content.C" />
+    <ClCompile Include="select_flow.C" />
+    <ClCompile Include="select_index.C" />
+    <ClCompile Include="select_number.C" />
+    <ClCompile Include="select_value.C" />
+    <ClCompile Include="select_volume.C" />
+    <ClCompile Include="smb.C" />
+    <ClCompile Include="snow.C" />
+    <ClCompile Include="soil.C" />
+    <ClCompile Include="soilfac.C" />
+    <ClCompile Include="soilph.C" />
+    <ClCompile Include="soil_heat.C" />
+    <ClCompile Include="soil_water.C" />
+    <ClCompile Include="solupt.C" />
+    <ClCompile Include="solute.C" />
+    <ClCompile Include="solver.C" />
+    <ClCompile Include="solver_cxsparse.C" />
+    <ClCompile Include="solver_none.C" />
+    <ClCompile Include="solver_ublas.C" />
+    <ClCompile Include="som.C" />
+    <ClCompile Include="source.C" />
+    <ClCompile Include="source_combine.C" />
+    <ClCompile Include="source_expr.C" />
+    <ClCompile Include="source_file.C" />
+    <ClCompile Include="source_merge.C" />
+    <ClCompile Include="source_std.C" />
+    <ClCompile Include="stomatacon.C" />
+    <ClCompile Include="stomatacon_SHA.C" />
+    <ClCompile Include="stringer.C" />
+    <ClCompile Include="summary.C" />
+    <ClCompile Include="summary_balance.C" />
+    <ClCompile Include="summary_fractiles.C" />
+    <ClCompile Include="summary_Rsqr.C" />
+    <ClCompile Include="summary_RsqrW.C" />
+    <ClCompile Include="summary_simple.C" />
+    <ClCompile Include="surface.C" />
+    <ClCompile Include="svat.C" />
+    <ClCompile Include="svat_none.C" />
+    <ClCompile Include="svat_pmsw.C" />
+    <ClCompile Include="svat_ssoc.C" />
+    <ClCompile Include="symbol.C" />
+    <ClCompile Include="tertiary.C" />
+    <ClCompile Include="tertiary_biopores.C" />
+    <ClCompile Include="tertiary_old.C" />
+    <ClCompile Include="texture.C" />
+    <ClCompile Include="time.C" />
+    <ClCompile Include="timestep.C" />
+    <ClCompile Include="toplevel.C" />
+    <ClCompile Include="tortuosity.C" />
+    <ClCompile Include="tortuosity_linear.C" />
+    <ClCompile Include="tortuosity_M_Q.C" />
+    <ClCompile Include="transform.C" />
+    <ClCompile Include="transform_equil.C" />
+    <ClCompile Include="transport.C" />
+    <ClCompile Include="transport_convection.C" />
+    <ClCompile Include="transport_Hansen.C" />
+    <ClCompile Include="transport_Mollerup.C" />
+    <ClCompile Include="transport_none.C" />
+    <ClCompile Include="traverse.C" />
+    <ClCompile Include="traverse_delete.C" />
+    <ClCompile Include="treelog.C" />
+    <ClCompile Include="treelog_child.C" />
+    <ClCompile Include="treelog_store.C" />
+    <ClCompile Include="treelog_text.C" />
+    <ClCompile Include="type.C" />
+    <ClCompile Include="ui.C" />
+    <ClCompile Include="uifilter.C" />
+    <ClCompile Include="unit.C" />
+    <ClCompile Include="units.C" />
+    <ClCompile Include="unit_model.C" />
+    <ClCompile Include="uz1d.C" />
+    <ClCompile Include="uz1d_none.C" />
+    <ClCompile Include="uz1d_richard.C" />
+    <ClCompile Include="uzlr.C" />
+    <ClCompile Include="uzmodel.C" />
+    <ClCompile Include="uznone.C" />
+    <ClCompile Include="uzrect.C" />
+    <ClCompile Include="uzrect_2x1.C" />
+    <ClCompile Include="uzrect_const.C" />
+    <ClCompile Include="uzrect_Mollerup.C" />
+    <ClCompile Include="uzrichard.C" />
+    <ClCompile Include="value.C" />
+    <ClCompile Include="vcheck.C" />
+    <ClCompile Include="vegetation.C" />
+    <ClCompile Include="vegetation_afforestation.C" />
+    <ClCompile Include="vegetation_crops.C" />
+    <ClCompile Include="vegetation_permanent.C" />
+    <ClCompile Include="vernalization.C" />
+    <ClCompile Include="version.C" />
+    <ClCompile Include="volume.C" />
+    <ClCompile Include="volume_box.C" />
+    <ClCompile Include="w32reg.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="water.C" />
+    <ClCompile Include="weather.C" />
+    <ClCompile Include="weatherdata.C" />
+    <ClCompile Include="wse.C" />
+    <ClCompile Include="wsource.C" />
+    <ClCompile Include="wsource_base.C" />
+    <ClCompile Include="wsource_combine.C" />
+    <ClCompile Include="wsource_const.C" />
+    <ClCompile Include="wsource_indirect.C" />
+    <ClCompile Include="wsource_std.C" />
+    <ClCompile Include="wsource_table.C" />
+    <ClCompile Include="wsource_time.C" />
+    <ClCompile Include="wsource_weather.C" />
+    <ClCompile Include="xref.C" />
+    <ClCompile Include="xysource.C" />
+    <ClCompile Include="xysource_combine.C" />
+    <ClCompile Include="xysource_expr.C" />
+    <ClCompile Include="xysource_flux.C" />
+    <ClCompile Include="xysource_freq.C" />
+    <ClCompile Include="xysource_inline.C" />
+    <ClCompile Include="xysource_loop.C" />
+    <ClCompile Include="xysource_merge.C" />
+    <ClCompile Include="xysource_profile.C" />
+    <ClCompile Include="xysource_xycombine.C" />
+    <ClCompile Include="zone.C" />
+    <ClCompile Include="zone_box.C" />
+    <ClCompile Include="zone_poly.C" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ABAprod.h" />
+    <ClInclude Include="abiotic.h" />
+    <ClInclude Include="action.h" />
+    <ClInclude Include="adsorption.h" />
+    <ClInclude Include="am.h" />
+    <ClInclude Include="anystate.h" />
+    <ClInclude Include="aom.h" />
+    <ClInclude Include="assertion.h" />
+    <ClInclude Include="astronomy.h" />
+    <ClInclude Include="attribute.h" />
+    <ClInclude Include="average.h" />
+    <ClInclude Include="bdconv.h" />
+    <ClInclude Include="bioclimate.h" />
+    <ClInclude Include="bioincorporation.h" />
+    <ClInclude Include="biopore.h" />
+    <ClInclude Include="block.h" />
+    <ClInclude Include="block_model.h" />
+    <ClInclude Include="block_nested.h" />
+    <ClInclude Include="block_submodel.h" />
+    <ClInclude Include="block_top.h" />
+    <ClInclude Include="boolean.h" />
+    <ClInclude Include="border.h" />
+    <ClInclude Include="bound.h" />
+    <ClInclude Include="canopy_simple.h" />
+    <ClInclude Include="canopy_std.h" />
+    <ClInclude Include="cdaisy.h" />
+    <ClInclude Include="check.h" />
+    <ClInclude Include="check_range.h" />
+    <ClInclude Include="chemical.h" />
+    <ClInclude Include="chemistry.h" />
+    <ClInclude Include="clayom.h" />
+    <ClInclude Include="column.h" />
+    <ClInclude Include="condedge.h" />
+    <ClInclude Include="condition.h" />
+    <ClInclude Include="convert.h" />
+    <ClInclude Include="crop.h" />
+    <ClInclude Include="crpn.h" />
+    <ClInclude Include="cs.h" />
+    <ClInclude Include="daisy.h" />
+    <ClInclude Include="depend.h" />
+    <ClInclude Include="deposition.h" />
+    <ClInclude Include="depth.h" />
+    <ClInclude Include="destination.h" />
+    <ClInclude Include="difrad.h" />
+    <ClInclude Include="dlf.h" />
+    <ClInclude Include="doe.h" />
+    <ClInclude Include="dom.h" />
+    <ClInclude Include="domsorp.h" />
+    <ClInclude Include="drain.h" />
+    <ClInclude Include="draineqd.h" />
+    <ClInclude Include="element.h" />
+    <ClInclude Include="equil.h" />
+    <ClInclude Include="fao.h" />
+    <ClInclude Include="fetch.h" />
+    <ClInclude Include="fetch_pretty.h" />
+    <ClInclude Include="field.h" />
+    <ClInclude Include="filepos.h" />
+    <ClInclude Include="fixed_vector_of_vector.hpp" />
+    <ClInclude Include="format.h" />
+    <ClInclude Include="format_LaTeX.h" />
+    <ClInclude Include="frame.h" />
+    <ClInclude Include="frame_model.h" />
+    <ClInclude Include="frame_submodel.h" />
+    <ClInclude Include="gaussj.h" />
+    <ClInclude Include="geometry.h" />
+    <ClInclude Include="geometry1d.h" />
+    <ClInclude Include="geometry_rect.h" />
+    <ClInclude Include="geometry_vert.h" />
+    <ClInclude Include="gnuplot.h" />
+    <ClInclude Include="gnuplot_base.h" />
+    <ClInclude Include="gnuplot_utils.h" />
+    <ClInclude Include="GP2D.h" />
+    <ClInclude Include="groundwater.h" />
+    <ClInclude Include="harvest.h" />
+    <ClInclude Include="harvesting.h" />
+    <ClInclude Include="heatrect.h" />
+    <ClInclude Include="horheat.h" />
+    <ClInclude Include="horizon.h" />
+    <ClInclude Include="hydraulic.h" />
+    <ClInclude Include="im.h" />
+    <ClInclude Include="imvec.h" />
+    <ClInclude Include="integer.h" />
+    <ClInclude Include="intrinsics.h" />
+    <ClInclude Include="irrigate.h" />
+    <ClInclude Include="iterative.h" />
+    <ClInclude Include="lexer.h" />
+    <ClInclude Include="lexer_data.h" />
+    <ClInclude Include="lexer_flux.h" />
+    <ClInclude Include="lexer_soil.h" />
+    <ClInclude Include="lexer_table.h" />
+    <ClInclude Include="librarian.h" />
+    <ClInclude Include="library.h" />
+    <ClInclude Include="litter.h" />
+    <ClInclude Include="log.h" />
+    <ClInclude Include="log_alist.h" />
+    <ClInclude Include="log_all.h" />
+    <ClInclude Include="log_clone.h" />
+    <ClInclude Include="log_extern.h" />
+    <ClInclude Include="log_Qt.h" />
+    <ClInclude Include="log_select.h" />
+    <ClInclude Include="macro.h" />
+    <ClInclude Include="mactrans.h" />
+    <ClInclude Include="mathlib.h" />
+    <ClInclude Include="memutils.h" />
+    <ClInclude Include="metalib.h" />
+    <ClInclude Include="model.h" />
+    <ClInclude Include="model_derived.h" />
+    <ClInclude Include="model_framed.h" />
+    <ClInclude Include="model_logable.h" />
+    <ClInclude Include="movement.h" />
+    <ClInclude Include="movement_solute.h" />
+    <ClInclude Include="net_radiation.h" />
+    <ClInclude Include="nitrification.h" />
+    <ClInclude Include="nrutil.h" />
+    <ClInclude Include="number.h" />
+    <ClInclude Include="oldunits.h" />
+    <ClInclude Include="om.h" />
+    <ClInclude Include="organic.h" />
+    <ClInclude Include="output.h" />
+    <ClInclude Include="parser.h" />
+    <ClInclude Include="parser_file.h" />
+    <ClInclude Include="partition.h" />
+    <ClInclude Include="path.h" />
+    <ClInclude Include="pet.h" />
+    <ClInclude Include="phenology.h" />
+    <ClInclude Include="photo.h" />
+    <ClInclude Include="photo_Farquhar.h" />
+    <ClInclude Include="plf.h" />
+    <ClInclude Include="point.h" />
+    <ClInclude Include="ponddamp.h" />
+    <ClInclude Include="printer.h" />
+    <ClInclude Include="printer_file.h" />
+    <ClInclude Include="production.h" />
+    <ClInclude Include="program.h" />
+    <ClInclude Include="qmain.h" />
+    <ClInclude Include="qmain_busy.h" />
+    <ClInclude Include="qmain_edit.h" />
+    <ClInclude Include="qmain_item.h" />
+    <ClInclude Include="qmain_populate.h" />
+    <ClInclude Include="qmain_tree.h" />
+    <ClInclude Include="raddist.h" />
+    <ClInclude Include="rainergy.h" />
+    <ClInclude Include="reaction.h" />
+    <ClInclude Include="reaction_colgen.h" />
+    <ClInclude Include="resistance.h" />
+    <ClInclude Include="ridge.h" />
+    <ClInclude Include="rootdens.h" />
+    <ClInclude Include="root_system.h" />
+    <ClInclude Include="rubiscoN.h" />
+    <ClInclude Include="rubiscoNdist.h" />
+    <ClInclude Include="run.h" />
+    <ClInclude Include="run_Qt.h" />
+    <ClInclude Include="scope.h" />
+    <ClInclude Include="scopesel.h" />
+    <ClInclude Include="scope_exchange.h" />
+    <ClInclude Include="scope_id.h" />
+    <ClInclude Include="scope_model.h" />
+    <ClInclude Include="scope_multi.h" />
+    <ClInclude Include="scope_soil.h" />
+    <ClInclude Include="scope_sources.h" />
+    <ClInclude Include="scope_table.h" />
+    <ClInclude Include="scope_xysources.h" />
+    <ClInclude Include="secondary.h" />
+    <ClInclude Include="seed.h" />
+    <ClInclude Include="select.h" />
+    <ClInclude Include="select_value.h" />
+    <ClInclude Include="smb.h" />
+    <ClInclude Include="snow.h" />
+    <ClInclude Include="soil.h" />
+    <ClInclude Include="soilfac.h" />
+    <ClInclude Include="soilph.h" />
+    <ClInclude Include="soil_heat.h" />
+    <ClInclude Include="soil_water.h" />
+    <ClInclude Include="solupt.h" />
+    <ClInclude Include="solute.h" />
+    <ClInclude Include="solver.h" />
+    <ClInclude Include="som.h" />
+    <ClInclude Include="source.h" />
+    <ClInclude Include="source_file.h" />
+    <ClInclude Include="stomatacon.h" />
+    <ClInclude Include="stringer.h" />
+    <ClInclude Include="submodeler.h" />
+    <ClInclude Include="SuiteSparse_config.h" />
+    <ClInclude Include="summary.h" />
+    <ClInclude Include="surface.h" />
+    <ClInclude Include="svat.h" />
+    <ClInclude Include="symbol.h" />
+    <ClInclude Include="tertiary.h" />
+    <ClInclude Include="texture.h" />
+    <ClInclude Include="time.h" />
+    <ClInclude Include="timestep.h" />
+    <ClInclude Include="toplevel.h" />
+    <ClInclude Include="tortuosity.h" />
+    <ClInclude Include="transform.h" />
+    <ClInclude Include="transport.h" />
+    <ClInclude Include="traverse.h" />
+    <ClInclude Include="traverse_delete.h" />
+    <ClInclude Include="treelog.h" />
+    <ClInclude Include="treelog_child.h" />
+    <ClInclude Include="treelog_store.h" />
+    <ClInclude Include="treelog_text.h" />
+    <ClInclude Include="type.h" />
+    <ClInclude Include="ublas_cxsparse.h" />
+    <ClInclude Include="ui.h" />
+    <ClInclude Include="uifilter.h" />
+    <ClInclude Include="ui_Qt.h" />
+    <ClInclude Include="ui_Qt_run.h" />
+    <ClInclude Include="unit.h" />
+    <ClInclude Include="units.h" />
+    <ClInclude Include="unit_model.h" />
+    <ClInclude Include="uz1d.h" />
+    <ClInclude Include="uzmodel.h" />
+    <ClInclude Include="uzrect.h" />
+    <ClInclude Include="value.h" />
+    <ClInclude Include="vcheck.h" />
+    <ClInclude Include="vegetation.h" />
+    <ClInclude Include="vernalization.h" />
+    <ClInclude Include="version.h" />
+    <ClInclude Include="vis_Qt.h" />
+    <ClInclude Include="volume.h" />
+    <ClInclude Include="volume_box.h" />
+    <ClInclude Include="w32reg.h" />
+    <ClInclude Include="water.h" />
+    <ClInclude Include="weather.h" />
+    <ClInclude Include="weatherdata.h" />
+    <ClInclude Include="wse.h" />
+    <ClInclude Include="wsource.h" />
+    <ClInclude Include="wsource_base.h" />
+    <ClInclude Include="wsource_indirect.h" />
+    <ClInclude Include="wsource_table.h" />
+    <ClInclude Include="wsource_weather.h" />
+    <ClInclude Include="xref.h" />
+    <ClInclude Include="xysource.h" />
+    <ClInclude Include="zone.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\conclusion.html" />
+    <None Include="resources\license.html" />
+    <None Include="resources\welcome.html" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

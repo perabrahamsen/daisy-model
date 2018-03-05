@@ -34,7 +34,7 @@
 #define EXPORT __declspec(dllimport)
 #endif
 
-class symbol 
+class EXPORT symbol 
 {
 public:
   class EXPORT Init 
@@ -63,20 +63,20 @@ public:
   { return id != other.id; }
   bool operator< (const symbol other) const
   { return id < other.id; }
-  const std::string& name () const EXPORT;
+  const std::string& name () const;
 
   // Utilities.
 public:
-  static bool alphabetical (symbol, symbol) EXPORT; // Sort function.
+  static bool alphabetical (symbol, symbol); // Sort function.
 
   // Create and destroy.
 public:
   explicit symbol ()
     : id (-1)
   { }
-  symbol (const char*) EXPORT;
-  symbol (const std::string&) EXPORT;
-  explicit symbol (int) EXPORT;
+  symbol (const char*);
+  symbol (const std::string&);
+  explicit symbol (int);
 #if 0
   symbol (const symbol& other)
     : id (other.id)
@@ -88,12 +88,12 @@ public:
   { }
 };
 
-std::string operator+ (symbol, const char*) EXPORT;
-std::string operator+ (const char*, symbol) EXPORT;
-std::string operator+ (symbol, const std::string&) EXPORT;
-std::string operator+ (const std::string&, symbol) EXPORT;
-std::string operator+ (symbol, symbol) EXPORT;
-std::ostream& operator<< (std::ostream&, symbol) EXPORT;
+EXPORT std::string operator+ (symbol, const char*);
+EXPORT std::string operator+ (const char*, symbol);
+EXPORT std::string operator+ (symbol, const std::string&);
+EXPORT std::string operator+ (const std::string&, symbol);
+EXPORT std::string operator+ (symbol, symbol);
+EXPORT std::ostream& operator<< (std::ostream&, symbol);
 
 static const symbol::Init symbol_init;
 

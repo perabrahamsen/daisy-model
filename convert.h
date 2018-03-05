@@ -23,8 +23,9 @@
 
 #include <boost/noncopyable.hpp>
 
-struct Convert : public boost::noncopyable
+class Convert : public boost::noncopyable
 {
+public:
   // Use.
   virtual double operator()(double value) const = 0;
   virtual bool valid (double value) const = 0;

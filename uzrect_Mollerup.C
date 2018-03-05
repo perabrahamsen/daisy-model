@@ -45,6 +45,7 @@
 #include <boost/numeric/ublas/io.hpp>
 
 #include <sstream>
+#include <algorithm>
 
 namespace ublas = boost::numeric::ublas;
 

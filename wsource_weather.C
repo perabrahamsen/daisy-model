@@ -41,8 +41,9 @@
 #include <deque>
 #include <sstream>
 
-struct WSourceWeather::Implementation
+class WSourceWeather::Implementation
 {
+public:
   const Weather& weather;
   const Units& units;
   WSource& source;
@@ -1335,7 +1336,7 @@ WSourceWeather::Implementation::Implementation (const Weather& w,
     my_cloudiness (0.5),           // Wait for light.
     my_day_length (NAN),
     my_sunrise (NAN),
-    my_has_min_max_temperature (NAN),
+    my_has_min_max_temperature (false),
     my_daily_min_air_temperature (NAN),
     my_daily_max_air_temperature (NAN),
     my_daily_air_temperature (NAN),

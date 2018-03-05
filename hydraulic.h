@@ -42,6 +42,7 @@ public:
 
   static double r2h (double r); // Find pressure for pore size.
 private:
+
   struct K_at_h;
 protected:
   const std::unique_ptr<K_at_h>  K_init;

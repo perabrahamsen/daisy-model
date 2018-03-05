@@ -24,6 +24,7 @@
 #include "astronomy.h"
 #include "time.h"
 #include "mathlib.h"
+#include <algorithm>
 
 double
 Astronomy::SolarDeclination (const Time& time) // [rad]
