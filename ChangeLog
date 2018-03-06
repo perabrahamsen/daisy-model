@@ -1,3 +1,12 @@
+2018-03-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* uzrichard.C (richard): Fix iterators in call to copy.
+
+	* raddist_std.C (tick): Use begin/end iteartors for fill.
+
+	* select_flow.C, select_content.C, select_volume.C (set_column):
+	Check that 'active' is set.
+
 2018-03-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* all: Missing includes <algortihm> and <iterator>.

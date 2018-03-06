@@ -65,9 +65,9 @@ void RaddistStandard::tick (std::vector <double>& sun_LAI_fraction,
   const double LAI = vegetation.LAI ();
 
   //Fill empty vectors
-  std::fill (&sun_PAR[0], &sun_PAR[No+1], 0.0); 
-  std::fill (&sun_NIR[0], &sun_NIR[No+1], 0.0); 
-  std::fill (&sun_LAI_fraction[0], &sun_LAI_fraction[No], 0.0);
+  std::fill (sun_PAR.begin (), sun_PAR.end (), 0.0); 
+  std::fill (sun_NIR.begin (), sun_NIR.end (), 0.0); 
+  std::fill (sun_LAI_fraction.begin (), sun_LAI_fraction.end (), 0.0);
 
   // PAR:
   // Average Canopy Extinction coefficient of PAR

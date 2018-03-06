@@ -191,8 +191,9 @@ UZRichard::richard (Treelog& msg,
     }
 
   // First guess is the old value.
-  copy (&h_old[first], &h_old[last + 1], h.begin ());
-  copy (&Theta_old[first], &Theta_old[last + 1], Theta.begin ());
+  std::copy (h_old.begin () + first, h_old.begin () + last + 1, h.begin ());
+  std::copy (Theta_old.begin () + first, Theta_old.begin () + last + 1,
+	     Theta.begin ());
 
   bool switched_top = false;  // Switched top this timestep?
   double time_left = dt;	// How much of the large time step left.

@@ -102,7 +102,7 @@ void
 SelectVolume::set_column (const Column& column, Treelog& msg)
 { 
   // Same as old?
-  if (&column == active->first)
+  if (active != colcache.end () && &column == active->first)
     // Do nothing.
     return;
 
@@ -492,7 +492,7 @@ struct SelectWater : public SelectVolume
   void set_column (const Column& column, Treelog& msg)
   {
     // Same as old?
-    if (&column == active->first)
+    if (active != colcache.end () && &column == active->first)
       // Do nothing.
       return;
 
