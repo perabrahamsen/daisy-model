@@ -1802,7 +1802,7 @@ sum of all chemicals will be logged."
 		  (spec bioclimate default incoming_NIR_radiation)
 		  (handle average)
 		  (dimension "${R_unit}"))
-	  (number (path weather weather global_radiation)
+	  (number (path weather "*" global_radiation)
 		  (spec weather weather global_radiation)
 		  (handle average)
 		  (dimension "${R_unit}"))

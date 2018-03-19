@@ -489,7 +489,15 @@ ChemicalStandard::update_matrix (const Soil& soil, const SoilWater& soil_water)
           = adsorption_->M_to_C2 (soil, Theta_secondary, c, M_secondary_[c]);
       else
 	{
-	  daisy_assert (iszero (M_secondary_[c]));
+	  if (M_secondary_[c] > 1e-90)
+	    {
+	      std::ostringstream tmp;
+	      tmp << "T2[" << c << "] = " << Theta_secondary
+		  << "; M2 = " << M_secondary_[c];
+	      daisy_warning (tmp.str ());
+	    }
+	    
+	    
 	  C_secondary_[c] = C_primary_[c];
 	}
 

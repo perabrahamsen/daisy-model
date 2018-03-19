@@ -1,3 +1,7 @@
+2018-03-19  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.61 released.
+
 2018-03-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* uzrichard.C (richard): Fix iterators in call to copy.
