@@ -2,6 +2,8 @@
 
 	* Version 5.61 released.
 
+	* chemical_std.C (update_matrix): Changed error to warning.
+
 2018-03-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* uzrichard.C (richard): Fix iterators in call to copy.
