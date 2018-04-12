@@ -1,3 +1,29 @@
+2018-04-12  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.62 released.
+
+2018-04-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemistry.h, chemistry_std.C, chemistry_multi.C (tick_top): Take
+	vegetation and bioclimate arguments.
+	* reaction.C, reaction.h (tick_vegetation): New virtual function.
+
+2018-04-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* rate.C: New component.
+	* Makefile (COMPONENTS): Add it.
+
+	* reaction_shoot.C: New model.
+	* Makefile (MODELS): Add it.
+
+	* chemical_std.C (canopy_transform): New log variable.
+	* chemical_std.C, chemical.h (add_to_surface_transform_source): Set it.
+
+2018-04-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C (litter_decompose_rate)
+	(litter_decompose_halftime): New parameters.
+
 2018-03-19  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.61 released.

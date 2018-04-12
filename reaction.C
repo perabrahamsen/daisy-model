@@ -42,11 +42,16 @@ Reaction::tick_top (const double tillage_age /* [d] */,
                     Chemistry& chemistry, const double dt, Treelog&)
 { }
 
+void
+Reaction::tick_vegetation (const Vegetation&, const double dt /* [h] */,
+			   Chemistry&, Treelog&)
+{ }
+
 void 
 Reaction::tick_surface (const Units&, const Geometry&, 
                         const Soil&, const SoilWater&, const SoilHeat&,
                         const Surface&, Chemistry&, const double dt,
-                        Treelog& msg)
+                        Treelog&)
 { }
 
 void 

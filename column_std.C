@@ -767,17 +767,11 @@ ColumnStandard::tick_move (const Metalib& metalib,
     = geometry.content_hood (tillage_age, Geometry::cell_above);
   
   chemistry->tick_top (units, geometry, *soil, *soil_water, *soil_heat, 
-                       tillage_top, surface,
-                       bioclimate->snow_leak_rate (dt), vegetation->cover (),
-                       bioclimate->canopy_leak_rate (dt),
+                       tillage_top, surface, *vegetation, *bioclimate,
                        litter->cover (),
-                       bioclimate->litter_leak_rate (dt), 
                        surface.runoff_rate (),
                        old_pond,
                        my_weather.rain (),
-                       bioclimate->direct_rain (), 
-                       bioclimate->canopy_leak (),
-                       vegetation->height () * 0.01 /* [m] */,
                        *chemistry,
                        dt, msg);
   

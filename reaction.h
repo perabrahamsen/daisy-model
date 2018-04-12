@@ -35,6 +35,7 @@ class Chemistry;
 class Treelog;
 class BlockModel;
 class Units;
+class Vegetation;
 
 class Reaction : public ModelFramed
 {
@@ -51,6 +52,8 @@ public:
                           const double cover, const double h_veg, 
                           const double h_pond,
                           Chemistry& chemistry, const double dt, Treelog&);
+  virtual void tick_vegetation (const Vegetation&, const double dt /* [h] */,
+				Chemistry&, Treelog& msg);
   virtual void tick_surface (const Units&, const Geometry&, 
                              const Soil&, const SoilWater&, const SoilHeat&,
                              const Surface&, Chemistry&, const double dt,

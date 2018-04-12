@@ -41,6 +41,8 @@ class BlockModel;
 class Scope;
 class IM;
 class Units;
+class Vegetation;
+class Bioclimate;
 
 class Chemistry : public ModelFramed
 {
@@ -115,17 +117,12 @@ public:
                          const SoilWater&, const SoilHeat&, 
                          const double tillage_age /* [d] */,
                          const Surface&,
-                         double snow_leak_rate /* [h^-1] */,
-                         double canopy_cover /* [] */,
-                         double canopy_leak_rate /* [h^-1] */,
-                         double litter_cover /* [] */,
-                         double litter_leak_rate /* [h^-1] */,
-                         double surface_runoff_rate /* [h^-1] */,
-                         double surface_water /* [mm] */,
-                         double total_rain /* [mm/h] */,
-                         double direct_rain /* [mm/h] */,
-                         double canopy_drip /* [mm/h] */, 
-                         double h_veg /* [m] */,
+			 const Vegetation& vegetation,
+			 const Bioclimate& bioclimate,
+			 const double litter_cover, // [],
+			 const double surface_runoff_rate, // [h^-1]
+			 const double surface_water /* [mm] */,
+			 const double total_rain /* [mm/h] */,
                          Chemistry& chemistry, 
                          double dt /* [h] */,
 			 Treelog&) = 0;

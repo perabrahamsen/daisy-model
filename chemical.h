@@ -78,6 +78,7 @@ public:
   virtual double surface_release_fraction () const = 0; // []
   virtual double surface_storage_amount () const = 0;  // [g/cm^2]
   virtual double surface_immobile_amount () const = 0;  // [g/cm^2]
+  virtual double canopy_storage_amount () const = 0;	// [g/cm^2]
   
   // Soil content.
 public:
@@ -119,6 +120,7 @@ public:
   virtual void add_to_transform_source_secondary (const std::vector<double>&) = 0;
   virtual void add_to_transform_sink_secondary (const std::vector<double>&) = 0;
   virtual void add_to_surface_transform_source (double amount  /* [g/cm^2/h] */) = 0;
+  virtual void add_to_canopy_transform_source (double amount  /* [g/cm^2/h] */) = 0;
   virtual void release_surface_colloids (double surface_release) = 0;
 
   // Management.

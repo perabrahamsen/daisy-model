@@ -36,6 +36,8 @@
 #include "treelog.h"
 #include "frame.h"
 #include "mathlib.h"
+#include "bioclimate.h"
+#include "vegetation.h"
 
 struct ChemistryStandard : public Chemistry
 {
@@ -87,18 +89,13 @@ struct ChemistryStandard : public Chemistry
   void tick_top (const Units&, const Geometry&, const Soil&, 
                  const SoilWater&, const SoilHeat&, 
                  const double tillage_age /* [d] */,
-                 const Surface&,
-                 const double snow_leak_rate, // [h^-1]
-                 const double canopy_cover, // [],
-                 const double canopy_leak_rate, // [h^-1]
-                 const double litter_cover, // [],
-                 const double litter_leak_rate, // [h^-1]
-                 const double surface_runoff_rate, // [h^-1]
-                 const double surface_water /* [mm] */,
-                 const double total_rain /* [mm/h] */,
-                 const double direct_rain, // [mm/h]
-                 const double canopy_drip /* [mm/h] */, 
-                 const double h_veg /* [m] */,
+		 const Surface&,
+		 const Vegetation& vegetation,
+		 const Bioclimate& bioclimate,
+		 const double litter_cover, // [],
+		 const double surface_runoff_rate, // [h^-1]
+		 const double surface_water /* [mm] */,
+		 const double total_rain /* [mm/h] */,
                  Chemistry& chemistry, 
                  const double dt, // [h]
 		 Treelog&);
@@ -360,23 +357,27 @@ ChemistryStandard::tick_top (const Units& units, const Geometry& geo,
                              const SoilHeat& soil_heat, 
                              const double tillage_age /* [d] */,
                              const Surface& surface,
-                             const double snow_leak_rate, // [h^-1]
-                             const double canopy_cover, // [],
-                             const double canopy_leak_rate, // [h^-1]
+			     const Vegetation& vegetation,
+			     const Bioclimate& bioclimate,
                              const double litter_cover, // [],
-                             const double litter_leak_rate, // [h^-1]
                              const double surface_runoff_rate, // [h^-1]
                              const double surface_water /* [mm] */,
                              const double total_rain /* [mm/h] */,
-                             const double direct_rain, // [mm/h]
-                             const double canopy_drip, // [mm/h]
-                             const double h_veg /* [m] */,
                              Chemistry& chemistry,
                              const double dt, // [h]
 			     Treelog& msg) 
 {
+  const double snow_leak_rate = bioclimate.snow_leak_rate (dt); // [h^-1]
+  const double canopy_cover = vegetation.cover (); // [];
+  const double canopy_leak_rate = bioclimate.canopy_leak_rate (dt); // [h^-1]
+  const double litter_leak_rate = bioclimate.litter_leak_rate (dt); // [h^-1]
+  const double direct_rain = bioclimate.direct_rain (); // [mm/h]
+  const double canopy_drip = bioclimate.canopy_leak (); // [mm/h]
+  const double h_veg = vegetation.height () * 0.01 ;	 // [m]
+
   for (size_t r = 0; r < reactions.size (); r++)
     {
+      reactions[r]->tick_vegetation (vegetation, dt, chemistry, msg);
       reactions[r]->tick_top  (tillage_age, 
                                total_rain, direct_rain, canopy_drip, 
                                canopy_cover, h_veg, surface_water, chemistry, 

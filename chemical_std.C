@@ -59,6 +59,7 @@ struct ChemicalStandard : public Chemical
   const double canopy_dissipation_rate;
   const double canopy_washoff_coefficient;
   const double surface_decompose_rate;
+  const double litter_decompose_rate;
   const double diffusion_coefficient_; 
   const double decompose_rate;
   const auto_vector<Soilfac*> decompose_soil_factor; // List of soil factors.
@@ -103,6 +104,7 @@ struct ChemicalStandard : public Chemical
   double canopy_dissipate;
   double canopy_harvest;
   double canopy_out;
+  double canopy_transform;
 
   double litter_storage;
   double litter_in;
@@ -178,6 +180,7 @@ struct ChemicalStandard : public Chemical
   double surface_release_fraction () const; // []
   double surface_immobile_amount () const;  // [g/cm^2]
   double surface_storage_amount () const;  // [g/cm^2]
+  double canopy_storage_amount () const;  // [g/cm^2]
 
   // Soil content.
   double C_below () const; // Concentration in groundwater [g/cm^3]
@@ -224,6 +227,7 @@ struct ChemicalStandard : public Chemical
   void add_to_transform_source_secondary (const std::vector<double>&);
   void add_to_transform_sink_secondary (const std::vector<double>&);
   void add_to_surface_transform_source (double amount  /* [g/cm^2/h] */);
+  void add_to_canopy_transform_source (double amount  /* [g/cm^2/h] */);
   void release_surface_colloids (double surface_release);
 
   // Management.
@@ -372,6 +376,13 @@ ChemicalStandard::surface_storage_amount () const
 {
   const double m2_per_cm2 = 0.01 * 0.01;
   return surface_storage * m2_per_cm2; 
+}
+
+double 
+ChemicalStandard::canopy_storage_amount () const
+{
+  const double m2_per_cm2 = 0.01 * 0.01;
+  return canopy_storage * m2_per_cm2; 
 }
 
 double 
@@ -586,6 +597,7 @@ ChemicalStandard::clear ()
   residuals = 0.0;
   surface_tillage = 0.0;
   litter_tillage = 0.0;
+  canopy_transform = 0.0;
   surface_transform = 0.0;
   surface_release = 0.0;
   // Don't clear M_tertiary here, it may be needed for initial log content.
@@ -728,6 +740,13 @@ ChemicalStandard::add_to_surface_transform_source (const double amount /* [g/cm^
 {
   const double m2_per_cm2 = 0.01 * 0.01;
   surface_transform += amount / m2_per_cm2;
+}
+
+void 
+ChemicalStandard::add_to_canopy_transform_source (const double amount /* [g/cm^2/h] */)
+{
+  const double m2_per_cm2 = 0.01 * 0.01;
+  canopy_transform += amount / m2_per_cm2;
 }
 
 void
@@ -990,7 +1009,7 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
 
   const double old_canopy_storage = canopy_storage;
   const double canopy_absolute_input_rate 
-    = canopy_in - canopy_harvest - residuals;
+    = canopy_in - canopy_harvest - residuals + canopy_transform;
 
   double canopy_washoff;
   if (canopy_leak_rate < 0.0)
@@ -1030,10 +1049,10 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   const double old_litter_storage = litter_storage;
   double litter_absolute_loss_rate;
   first_order_change (old_litter_storage, litter_in,
-                      litter_leak_rate + surface_decompose_rate, dt,
+                      litter_leak_rate + litter_decompose_rate, dt,
                       litter_storage, litter_absolute_loss_rate);
   divide_loss (litter_absolute_loss_rate, 
-               surface_decompose_rate, litter_leak_rate,
+               litter_decompose_rate, litter_leak_rate,
                litter_decompose, litter_out);
  
   // Surface
@@ -1065,7 +1084,8 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
 
   // Mass balance.
   const double new_storage = snow_storage + canopy_storage + litter_storage;
-  const double input = spray_overhead_ + spray_surface_ + deposit_;
+  const double input
+    = spray_overhead_ + spray_surface_ + deposit_ + canopy_transform;
   const double output = surface_in + canopy_harvest + canopy_dissipate 
     + litter_decompose;
   if (!approximate (new_storage, old_storage + (input - output) * dt)
@@ -1525,6 +1545,7 @@ ChemicalStandard::output (Log& log) const
   output_variable (canopy_dissipate, log);
   output_variable (canopy_harvest, log);
   output_variable (canopy_out, log);
+  output_variable (canopy_transform, log);
   output_variable (litter_storage, log);
   output_variable (litter_in, log);
   output_variable (litter_decompose, log);
@@ -1543,7 +1564,7 @@ ChemicalStandard::output (Log& log) const
                 + litter_storage + surface_storage,
                 "top_storage", log);
   output_value (canopy_dissipate + canopy_harvest + litter_decompose
-                + surface_runoff + surface_decompose - surface_transform,
+                + surface_runoff + surface_decompose - surface_transform - canopy_transform,
                 "top_loss", log);
   output_value (C_avg_, "C", log);
   output_value (C_secondary_, "C_secondary", log);
@@ -1955,6 +1976,11 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
                             : (al.check ("surface_decompose_halftime")
                                ? halftime_to_rate (al.number ("surface_decompose_halftime"))
                                : canopy_dissipation_rate)),
+    litter_decompose_rate (al.check ("litter_decompose_rate")
+                            ? al.number ("litter_decompose_rate")
+                            : (al.check ("litter_decompose_halftime")
+                               ? halftime_to_rate (al.number ("litter_decompose_halftime"))
+                               : surface_decompose_rate)),
     diffusion_coefficient_ (al.number ("diffusion_coefficient") * 3600.0),
     decompose_rate (al.check ("decompose_rate")
                     ? al.number ("decompose_rate")
@@ -1989,6 +2015,7 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
     canopy_dissipate (0.0),
     canopy_harvest (0.0),
     canopy_out (0.0),
+    canopy_transform (0.0),
     litter_storage (al.number ("litter_storage")),
     litter_in (0.0),
     litter_decompose (0.0),
@@ -2131,6 +2158,15 @@ You may not specify both 'surface_decompose_rate' and \
         ok = false;
       }
 
+    if (al.check ("litter_decompose_rate") 
+        && al.check ("litter_decompose_halftime"))
+      {
+        msg.entry ("\
+You may not specify both 'litter_decompose_rate' and \
+'litter_decompose_halftime'");
+        ok = false;
+      }
+
     if (!al.check ("decompose_rate") && !al.check ("decompose_halftime"))
       {
         msg.entry ("\
@@ -2226,6 +2262,18 @@ You must specify it with either 'surface_decompose_halftime' or\n\
 You must specify it with either 'surface_decompose_halftime' or\n\
 'surface_decompose_rate'.  If neither is specified,\n\
 'canopy_dissipation_rate' is used.");
+    frame.declare ("litter_decompose_rate", "h^-1", 
+                   Check::fraction (), Attribute::OptionalConst,
+                   "How fast does the chemical decomposee on litter.\n\
+You must specify it with either 'litter_decompose_halftime' or\n\
+'litter_decompose_rate'.  If neither is specified,\n\
+'surface_decompose_rate' is used.");
+    frame.declare ("litter_decompose_halftime", "h", 
+                   Check::positive (), Attribute::OptionalConst,
+                   "How fast does the chemical decompose on litter.\n\
+You must specify it with either 'litter_decompose_halftime' or\n\
+'litter_decompose_rate'.  If neither is specified,\n\
+'surface_decompose_rate' is used.");
 
     // Soil parameters.
     frame.declare ("diffusion_coefficient", "cm^2/s", Check::non_negative (),
@@ -2333,6 +2381,8 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
                    "Dissipating from canopy.");
     frame.declare ("canopy_out", "g/m^2/h", Attribute::LogOnly, 
                    "Falling through or off the canopy.");
+    frame.declare ("canopy_transform", "g/m^2/h", Attribute::LogOnly, 
+                   "Added through transformation to canopy.");
     frame.declare ("canopy_harvest", "g/m^2/h", Attribute::LogOnly, 
                    "Amount removed with crop harvest.");
 

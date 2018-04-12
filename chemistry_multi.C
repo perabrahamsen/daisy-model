@@ -93,17 +93,12 @@ struct ChemistryMulti : public Chemistry
                  const SoilWater&, const SoilHeat&, 
                  const double tillage_age /* [d] */,
                  const Surface&,
-                 const double snow_leak_rate, // [h^-1]
-                 const double canopy_cover, // [],
-                 const double canopy_leak_rate, // [h^-1]
-                 const double litter_cover, // [],
-                 const double litter_leak_rate, // [h^-1]
-                 const double surface_runoff_rate /* [h^-1] */,
-                 const double surface_water /* [mm] */,
-                 const double total_rain /* [mm/h] */,
-                 const double direct_rain, // [mm/h]
-                 const double canopy_drip /* [mm/h] */, 
-                 const double h_veg /* [m] */,
+		 const Vegetation& vegetation,
+		 const Bioclimate& bioclimate,
+		 const double litter_cover, // [],
+		 const double surface_runoff_rate, // [h^-1]
+		 const double surface_water /* [mm] */,
+		 const double total_rain /* [mm/h] */,
                  Chemistry& chemistry, 
                  const double dt, // [h]
 		 Treelog&);
@@ -449,28 +444,21 @@ ChemistryMulti::tick_top (const Units& units, const Geometry& geo,
                           const SoilHeat& soil_heat, 
                           const double tillage_age /* [d] */,
                           const Surface& surface,
-                          const double snow_leak_rate, // [h^-1]
-                          const double canopy_cover, // [],
-                          const double canopy_leak_rate, // [h^-1]
-                          const double litter_cover, // [],
-                          const double litter_leak_rate, // [h^-1]
-                          const double surface_runoff_rate /* [h^-1] */,
-                          const double surface_water /* [mm] */,
-                          const double total_rain /* [mm/h] */,
-                          const double direct_rain, // [mm/h]
-                          const double canopy_drip /* [mm/h] */, 
-                          const double h_veg /* [m] */,
+			  const Vegetation& vegetation,
+			  const Bioclimate& bioclimate,
+			  const double litter_cover, // [],
+			  const double surface_runoff_rate, // [h^-1]
+			  const double surface_water /* [mm] */,
+			  const double total_rain /* [mm/h] */,
                           Chemistry& chemistry, 
                           const double dt, // [h]
                           Treelog& msg) 
 {
   for (size_t c = 0; c < combine.size (); c++)
     combine[c]->tick_top (units, geo, soil, soil_water, soil_heat,
-                          tillage_age, surface, 
-                          snow_leak_rate, canopy_cover, canopy_leak_rate, 
-                          litter_cover, litter_leak_rate,
-			  surface_runoff_rate, surface_water,
-                          total_rain, direct_rain, canopy_drip, h_veg, 
+                          tillage_age, surface, vegetation, bioclimate,
+                          litter_cover, surface_runoff_rate, surface_water,
+                          total_rain, 
                           chemistry, dt, msg);
 }
 
