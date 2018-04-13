@@ -378,6 +378,7 @@
     <ClCompile Include="raddist_DPF.C" />
     <ClCompile Include="raddist_std.C" />
     <ClCompile Include="rainergy.C" />
+    <ClCompile Include="rate.C" />
     <ClCompile Include="reaction.C" />
     <ClCompile Include="reaction_adsorption.C" />
     <ClCompile Include="reaction_boundrel.C" />
@@ -689,6 +690,7 @@
     <ClInclude Include="qmain_tree.h" />
     <ClInclude Include="raddist.h" />
     <ClInclude Include="rainergy.h" />
+    <ClInclude Include="rate.h" />
     <ClInclude Include="reaction.h" />
     <ClInclude Include="reaction_colgen.h" />
     <ClInclude Include="resistance.h" />
