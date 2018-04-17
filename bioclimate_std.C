@@ -415,7 +415,8 @@ BioclimateStandard::reset_weather (const Weather& weather, Treelog& msg)
   has_min_max_temperature = weather.has_min_max_temperature ();
   has_diffuse_radiation = weather.has_diffuse_radiation ();
   old_surface = weather.surface ();
-
+  const double timestep = weather.timestep ();
+  
   // Potential evapotranspiration model.
   if (!fixed_pet)                      // Explicit.
     {
@@ -427,15 +428,17 @@ BioclimateStandard::reset_weather (const Weather& weather, Treelog& msg)
         {
           if (old_surface == Weatherdata::field)
             type = symbol ("PM");
-          else
-            type = symbol ("FAO_PM");    
+          else if (timestep < 4.0)
+            type = symbol ("FAO_PM_hourly");    
+	  else
+	    type = symbol ("FAO_PM");    
         }
       else if (has_min_max_temperature)
         type = symbol ("Hargreaves");
       else
-        type = symbol ("makkink");
+        type = symbol ("deBruin87");
 
-      msg.debug ("Pet choosen: " + type);
+      msg.message ("Pet choosen: " + type);
       pet.reset (Librarian::build_stock<Pet> (metalib, msg, type, "pet"));
     }
 

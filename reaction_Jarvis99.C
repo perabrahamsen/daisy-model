@@ -35,6 +35,8 @@
 #include "frame.h"
 #include "rainergy.h"
 #include "plf.h"
+#include "vegetation.h"
+#include "bioclimate.h"
 #include <sstream>
 #include <memory>
 
@@ -68,10 +70,10 @@ struct ReactionJarvis99 : public ReactionColgen
                            const double canopy_drip /* [mm/h] */,
                            const double canopy_height /* [m] */,
                            const double dt /* [h] */);
-  void tick_top (const double tillage_age /* [d] */,
-                 const double total_rain, const double direct_rain,
-                 const double canopy_drip,
-                 const double cover, const double h_veg, 
+  void tick_top (const Vegetation& vegetation,
+		 const Bioclimate& bioclimate,
+		 const double tillage_age /* [d] */,
+                 const double total_rain, 
                  const double h_pond,
                  Chemistry& chemistry, const double dt, Treelog&);
                            
@@ -131,13 +133,17 @@ ReactionJarvis99::colloid_generation (const double tillage_age /* [d] */,
 }
 
 void 
-ReactionJarvis99::tick_top (const double tillage_age /* [d] */,
-                            const double total_rain, const double direct_rain,
-                            const double canopy_drip,
-                            const double cover, const double h_veg, 
+ReactionJarvis99::tick_top (const Vegetation& vegetation,
+			    const Bioclimate& bioclimate,
+			    const double tillage_age /* [d] */,
+                            const double total_rain, 
                             const double h_pond,
                             Chemistry& chemistry, const double dt, Treelog&)
 {
+  const double direct_rain = bioclimate.direct_rain (); // [mm/h]
+  const double canopy_drip = bioclimate.canopy_leak (); // [mm/h]
+  const double h_veg = vegetation.height () * 0.01 ;	 // [m]
+
   ReactionColgen::tick_colgen (total_rain, h_pond);
 
   Chemical& colloid = chemistry.find (colloid_name);

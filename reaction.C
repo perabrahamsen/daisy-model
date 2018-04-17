@@ -34,10 +34,9 @@ Reaction::library_id () const
 }
 
 void 
-Reaction::tick_top (const double tillage_age /* [d] */,
-                    const double total_rain, const double direct_rain,
-                    const double canopy_drip,
-                    const double cover, const double h_veg, 
+Reaction::tick_top (const Vegetation&, const Bioclimate&,
+		    const double tillage_age /* [d] */,
+                    const double total_rain, 
                     const double h_pond,
                     Chemistry& chemistry, const double dt, Treelog&)
 { }

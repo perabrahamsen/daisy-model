@@ -36,6 +36,7 @@ class Treelog;
 class BlockModel;
 class Units;
 class Vegetation;
+class Bioclimate;
 
 class Reaction : public ModelFramed
 {
@@ -46,11 +47,9 @@ public:
 
   // Simulation.
 public:
-  virtual void tick_top (const double tillage_age /* [d] */,
-                         const double total_rain, const double direct_rain,
-                          const double canopy_drip,
-                          const double cover, const double h_veg, 
-                          const double h_pond,
+  virtual void tick_top (const Vegetation&, const Bioclimate&,
+			 const double tillage_age /* [d] */,
+                         const double total_rain, const double h_pond,
                           Chemistry& chemistry, const double dt, Treelog&);
   virtual void tick_vegetation (const Vegetation&, const double dt /* [h] */,
 				Chemistry&, Treelog& msg);

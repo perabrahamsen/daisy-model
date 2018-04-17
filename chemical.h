@@ -42,6 +42,8 @@ class Log;
 class BlockModel;
 class Scope;
 class Units;
+class Bioclimate;
+class Vegetation;
 
 class Chemical : public ModelFramed
 {
@@ -149,11 +151,8 @@ public:
                             const SoilHeat&, const OrganicMatter&, 
                             const Chemistry&, Treelog&) = 0;
   virtual double suggest_dt () const = 0;
-  virtual void tick_top (double snow_leak_rate /* [h^-1] */,
-                         double canopy_cover /* [] */,
-                         double canopy_leak_rate /* [h^-1] */,
+  virtual void tick_top (const Vegetation&, const Bioclimate&,
                          double litter_cover /* [] */,
-                         double litter_leak_rate /* [h^-1] */,
                          double surface_runoff_rate /* [h^-1] */,
                          double dt /* [h] */,
                          Treelog&) = 0;

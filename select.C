@@ -468,7 +468,7 @@ Select::Implementation::Implementation (const BlockModel& al)
             // Kludge to negate the meaning of negate for "flux_top".
             != al.metalib ().library (Select::component)
             /**/ .is_derived_from (al.type_name (), flux_top_symbol)),
-    tag (Select::select_get_tag (al.frame ())),
+    tag (Select::select_get_tag (al)),
     dimension (al.check ("dimension")
                ? al.name ("dimension") : Attribute::Unknown ()),
     documentation (al.name ("documentation", Attribute::None ()))
@@ -522,6 +522,21 @@ Select::geometry () const
 int 
 Select::size () const
 { return Attribute::Singleton; }
+
+symbol
+Select::select_get_tag (const BlockModel& al)
+{
+  if (al.check ("tag"))
+    return al.name ("tag");
+
+  std::vector<symbol> path  = al.name_sequence ("path");
+  
+  if (path.size () > 0)
+    return path[path.size () - 1];
+
+  static const symbol none_symbol ("<none>");
+  return none_symbol;
+}
 
 symbol
 Select::select_get_tag (const Frame& al)

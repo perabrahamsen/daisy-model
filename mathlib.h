@@ -55,8 +55,8 @@ first_order_change (const double old_storage /* [M] */,
                     const double absolute_input_rate /* [M/T] */,
                     const double relative_loss_rate /* [T^-1] */,
                     const double dt /* [T] */,
-                    double& new_storage /* [S] */,
-                    double& absolute_loss_rate /* [S] */);
+                    double& new_storage /* [M] */,
+                    double& absolute_loss_rate /* [M/T] */);
 
 void
 tridia (int from,

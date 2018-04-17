@@ -44,6 +44,8 @@
 #include "submodeler.h"
 #include "treelog.h"
 #include "soilfac.h"
+#include "vegetation.h"
+#include "bioclimate.h"
 #include <sstream>
 
 struct ChemicalStandard : public Chemical
@@ -255,11 +257,9 @@ struct ChemicalStandard : public Chemical
   static void divide_loss (const double absolute_loss_rate, 
                            const double first_rate, const double second_rate,
                            double& first, double& second);
-  void tick_top (const double snow_leak_rate, // [h^-1]
-                 const double canopy_cover, // [],
-                 const double canopy_leak_rate, // [h^-1]
+  void tick_top (const Vegetation&,
+		 const Bioclimate&,
                  const double litter_cover, // [],
-                 const double litter_leak_rate,
                  const double surface_runoff_rate, // [h^-1]
                  const double dt, // [h]
                  Treelog& msg);
@@ -972,16 +972,21 @@ ChemicalStandard::divide_loss (const double absolute_loss_rate,
 }
 
 void 
-ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
-                            const double canopy_cover, // [],
-                            const double canopy_leak_rate, // [h^-1]
+ChemicalStandard::tick_top (const Vegetation& vegetation,
+			    const Bioclimate& bioclimate,
                             const double litter_cover, // [],
-                            const double litter_leak_rate, // [h^-1]
                             const double surface_runoff_rate, // [h^-1]
                             const double dt, // [h]
                             Treelog& msg)
 {
   TREELOG_MODEL (msg);
+
+  // Import from vegatation and bioclimate.
+  const double snow_water_storage = bioclimate.get_snow_storage (); // [mm]
+  const double snow_leak_rate = bioclimate.snow_leak_rate (dt); // [h^-1]
+  const double canopy_cover = vegetation.cover (); // [];
+  const double canopy_leak_rate = bioclimate.canopy_leak_rate (dt); // [h^-1]
+  const double litter_leak_rate = bioclimate.litter_leak_rate (dt); // [h^-1]
 
   // Fluxify management operations.
   spray_overhead_ /= dt;
@@ -999,8 +1004,14 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   // Snow pack
   snow_in = spray_overhead_ + deposit_;
   const double old_snow_storage = snow_storage;
-  first_order_change (old_snow_storage, snow_in, snow_leak_rate, dt,
-                      snow_storage, snow_out);
+  if (snow_water_storage > 1e-5)
+    first_order_change (old_snow_storage, snow_in, snow_leak_rate, dt,
+			snow_storage, snow_out);
+  else
+    {
+      snow_storage = 0.0;
+      snow_out = snow_in + old_snow_storage / dt;
+    }
 
   // Canopy.
   canopy_in = snow_out * canopy_cover;
@@ -1151,6 +1162,19 @@ ChemicalStandard::tick_surface (const double pond /* [cm] */,
       total_area += area;
       surface_solute += C * area * Theta;       // [g/cm]
       daisy_assert (surface_solute >= 0.0);
+
+#if 0
+      if (M < 1e-20)
+	continue;
+      
+      std::ostringstream tmp;
+      tmp << "C = " << C
+	  << "; M = " << M
+	  << "; A = " << (M - Theta * C)
+	  << "; Theta = " << Theta
+	  << "; Theta_pond = " << Theta_pond;
+      msg.message (tmp.str ());
+#endif
     }
   
   // Convert solute back to surface dimensions.

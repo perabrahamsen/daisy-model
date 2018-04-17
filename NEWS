@@ -6,6 +6,47 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.63
+
+** New default models for reference evapotranspiration
+
+If the timestep in the weather file is below 4 hours, Daisy will by
+default chose 'FAO_PM_hourly'.
+
+Daisy will now use the 'deBruin87' parameterization og Makkink,
+instead of the old 'makkink' model.
+
+** New models calculating reference evapotranspiration
+
+References to each of them can be found in the reference manual.
+
+*** 'FAO_PM_hourly'
+
+A modification of 'FAO_PM' for use with hourly data.
+
+*** 'Makkink'
+
+A generic implementation of the Makkink model. It must be
+parameterized after local conditions.
+
+*** 'Makkink57' (low wind conditions)
+
+The original parameterization of the Makkink equation, by Makkink himself.
+
+*** 'AslyngHansen82' (high wind conditions)
+
+A Makkink parameterization based on Taastrup data. This is a different
+implementation of the old 'makkink' parameterization.
+
+*** 'deBruin87' (medium wind conditions)
+
+A newer dutch parameterization of Makkink. It is a best fit to modern
+Taastrup climate.
+
+You can choose the model by adding this to the Daisy column:
+
+(Bioclimate original (pet deBruin87))
+
 * 5.62
 
 ** New 'shoot' reaction model.

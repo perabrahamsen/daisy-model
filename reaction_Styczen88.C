@@ -34,6 +34,8 @@
 #include "treelog.h"
 #include "frame.h"
 #include "plf.h"
+#include "vegetation.h"
+#include "bioclimate.h"
 #include <memory>
 
 struct ReactionStyczen88 : public ReactionColgen
@@ -65,10 +67,9 @@ struct ReactionStyczen88 : public ReactionColgen
                            const double h_veg /* [m] */,
                            const double h_pond /* [mm] */,
                            const double dt /* [h] */);
-  void  tick_top (const double tillage_age /* [d] */,
-                  const double total_rain, const double direct_rain,
-                  const double canopy_drip /* [mm/h] */, 
-                  const double cover, const double h_veg, 
+  void  tick_top (const Vegetation&, const Bioclimate&,
+		  const double tillage_age /* [d] */,
+                  const double total_rain, 
                   const double h_pond,
                   Chemistry& chemistry, const double dt, Treelog&);
                            
@@ -221,20 +222,24 @@ ReactionStyczen88::colloid_generation (const double P /* [mm/h] */,
 }
 
 void 
-ReactionStyczen88::tick_top (const double /* tillage_age */,
-                             const double total_rain, const double direct_rain,
-                             double canopy_drip /* [mm/h] */, 
-                             const double cover, const double h_veg, 
+ReactionStyczen88::tick_top (const Vegetation& vegetation,
+			     const Bioclimate& bioclimate,
+			     const double /* tillage_age */,
+                             const double total_rain, 
                              const double h_pond,
                              Chemistry& chemistry, const double dt, Treelog&)
 {
+  const double canopy_cover = vegetation.cover (); // [];
+  const double canopy_drip = bioclimate.canopy_leak (); // [mm/h]
+  const double h_veg = vegetation.height () * 0.01 ;	 // [m]
+
   ReactionColgen::tick_colgen (total_rain, h_pond);
 
   Chemical& colloid = chemistry.find (colloid_name);
   
   const double P = total_rain; // [mm/h]
   const double LD = canopy_drip; // [mm/h]
-  const double f_cov = cover;                 // []
+  const double f_cov = canopy_cover; // []
 
   colloid_generation (P, LD, f_cov, h_veg, h_pond, dt);
 

@@ -69,7 +69,7 @@ public:
   virtual bool has_CO2 () const = 0;
   virtual bool has_min_max_temperature () const = 0;
   virtual bool has_diffuse_radiation () const = 0;
-  virtual double timestep () const = 0; // [d]
+  virtual double timestep () const = 0; // [h]
 
   // Light distribution.
 public:

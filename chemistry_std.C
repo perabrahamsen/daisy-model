@@ -36,8 +36,6 @@
 #include "treelog.h"
 #include "frame.h"
 #include "mathlib.h"
-#include "bioclimate.h"
-#include "vegetation.h"
 
 struct ChemistryStandard : public Chemistry
 {
@@ -367,20 +365,11 @@ ChemistryStandard::tick_top (const Units& units, const Geometry& geo,
                              const double dt, // [h]
 			     Treelog& msg) 
 {
-  const double snow_leak_rate = bioclimate.snow_leak_rate (dt); // [h^-1]
-  const double canopy_cover = vegetation.cover (); // [];
-  const double canopy_leak_rate = bioclimate.canopy_leak_rate (dt); // [h^-1]
-  const double litter_leak_rate = bioclimate.litter_leak_rate (dt); // [h^-1]
-  const double direct_rain = bioclimate.direct_rain (); // [mm/h]
-  const double canopy_drip = bioclimate.canopy_leak (); // [mm/h]
-  const double h_veg = vegetation.height () * 0.01 ;	 // [m]
-
   for (size_t r = 0; r < reactions.size (); r++)
     {
       reactions[r]->tick_vegetation (vegetation, dt, chemistry, msg);
-      reactions[r]->tick_top  (tillage_age, 
-                               total_rain, direct_rain, canopy_drip, 
-                               canopy_cover, h_veg, surface_water, chemistry, 
+      reactions[r]->tick_top  (vegetation, bioclimate, tillage_age, 
+                               total_rain, surface_water, chemistry, 
                                dt, msg);
       reactions[r]->tick_surface  (units, geo, soil, soil_water, soil_heat,
                                    surface, chemistry,  dt, msg);
@@ -391,9 +380,8 @@ ChemistryStandard::tick_top (const Units& units, const Geometry& geo,
   const double pond_rain = std::max (surface.ponding_average (), 0.0);
   for (size_t c = 0; c < chemicals.size (); c++)
     {
-      chemicals[c]->tick_top (snow_leak_rate, canopy_cover, canopy_leak_rate, 
-                              litter_cover, litter_leak_rate, 
-                              surface_runoff_rate, dt, msg);
+      chemicals[c]->tick_top (vegetation, bioclimate, 
+                              litter_cover, surface_runoff_rate, dt, msg);
       chemicals[c]->tick_surface (pond_rain,
                                   geo, soil, soil_water, z_mixing, msg);
     }

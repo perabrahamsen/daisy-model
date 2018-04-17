@@ -1,3 +1,15 @@
+2018-04-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* bioclimate_std.C (reset_weather): New default Pet models.
+
+	* chemical.h, chemical_std.C, reaction.h, reaction.C:
+	* reaction_Jarvis99.C, reaction_Morgan98.C, reaction_Styczen88.C:
+	(tick_top): Take Vegetation and Bioclimate parameters.
+	* chemistry_std.C: Update caller.
+
+	* chemical_std.C (tick_top): Empty snow storage if there is no
+	snow.
+
 2018-04-12  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.62 released.
