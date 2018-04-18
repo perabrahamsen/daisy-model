@@ -102,6 +102,8 @@ This component describes the adsorption of a chemical to the soil,\n\
 which among other things affects how large a fraction can be\n\
 transported with the water.")
   { }
+  void load_frame (Frame& frame) const
+  { Model::load_model (frame); }
 } Adsorption_init;
 
 // "linear" special.

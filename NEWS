@@ -47,6 +47,11 @@ You can choose the model by adding this to the Daisy column:
 
 (Bioclimate original (pet deBruin87))
 
+** The 'Freundlich' adsorption model now takes a 'C_ref' parameter.
+
+This is defined in the FOCUS groundwater scenarious report (page 93),
+and is mandatory.
+
 * 5.62
 
 ** New 'shoot' reaction model.

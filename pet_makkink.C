@@ -214,7 +214,7 @@ Danish calibration.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.set_strings ("cite", "aslyng1982water");
+    frame.set_strings ("cite", "aslyng1982water", "Hansen205");
     frame.set ("beta_M0", 0.0);
     frame.set ("beta_M1", 0.7);
   }

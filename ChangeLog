@@ -1,3 +1,17 @@
+2018-04-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* pet_makkink.C (AslyngHansen82): Added Hansen (1984) reference.
+
+2018-04-18  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.63 released.
+
+2018-04-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* adsorption.C (AdsorptionInit::load_frame): New function.
+
+	* adsorption_freundlich.C (C_ref): New parameter.
+
 2018-04-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* bioclimate_std.C (reset_weather): New default Pet models.

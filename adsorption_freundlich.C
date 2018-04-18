@@ -39,7 +39,7 @@ class AdsorptionFreundlich : public Adsorption
   // Parameters.
   const double K_clay;
   const double K_OC;
-  const double C_factor;
+  const double C_ref;
   const double m;
 
   // Simulation.
@@ -48,31 +48,12 @@ public:
   double M_to_C (const Soil&, double Theta, int, double M, double sf) const;
 
   // Create.
-private:
-  static double find_C_factor (const BlockModel& al)
-  {
-    const bool has_K_clay = al.check ("K_clay");
-    const bool has_K_OC = al.check ("K_OC");
-
-    if (!has_K_clay && !has_K_OC)
-      return -42.42e42;
-    
-    const symbol K_user_unit 
-      = has_K_clay ? al.name ("K_clay") : al.name ("K_OC");
-    const symbol K_base_unit = "cm^3/g";
-    const Units& units = al.units ();
-    if (!units.can_convert (K_user_unit, K_base_unit))
-      return -42.42e42;
-    
-    // TODO: Er det rigtigt?
-    return units.convert (K_user_unit, K_base_unit, 1.0);
-  }
 public:
   AdsorptionFreundlich (const BlockModel& al)
     : Adsorption (al),
       K_clay (al.number ("K_clay", 0.0)),
       K_OC (al.number ("K_OC", K_clay)),
-      C_factor (find_C_factor (al)),
+      C_ref (al.number ("C_ref")),
       m (al.number ("m"))
     { }
 };
@@ -86,8 +67,7 @@ AdsorptionFreundlich::C_to_M (const Soil& soil,
   const double K = soil.clay (i) * K_clay 
     + soil.humus (i) * c_fraction_in_humus * K_OC;
   const double rho = soil.dry_bulk_density (i);
-  const double S = K * pow (C * C_factor, m);
-  return sf * rho * S + Theta * C;
+  return sf * rho * K * C_ref * pow (C / C_ref, m) + Theta * C;
 }
 
 double 
@@ -137,7 +117,7 @@ static struct AdsorptionFreundlichSyntax : DeclareModel
 {
   Model* make (const BlockModel& al) const
   { return new AdsorptionFreundlich (al); }
-  static bool check_alist (const Metalib& metalib, const Frame& al, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   {
     bool ok = true;
 
@@ -149,68 +129,37 @@ static struct AdsorptionFreundlichSyntax : DeclareModel
         err.entry ("You must specify either 'K_clay' or 'K_OC'");
         ok = false;
       }
-    if (has_K_clay && has_K_OC)
-      {
-        const symbol K_clay_unit = al.name ("K_clay");
-        const symbol K_OC_unit = al.name ("K_clay");
-        if (K_clay_unit != K_OC_unit)
-          {
-            err.entry ("K_clay is [" + K_clay_unit + "] and K_OC is ["
-                       + K_OC_unit + "], they must be identical");
-            ok = false;
-          }
-      }
-    const Units& units = metalib.units ();
-    static const symbol base_unit = "cm^3/g";
-    if (has_K_clay)
-      {
-        const symbol unit =  al.name ("K_clay");
-        if (!units.can_convert (unit, base_unit, 1.0))
-          {
-            err.entry ("Can't convert K_clay [" + unit 
-                       + "] to [" + base_unit + "]");
-            ok = false;
-          }
-      }
-    if (has_K_OC)
-      {
-        const symbol unit =  al.name ("K_OC");
-        if (!units.can_convert (unit, base_unit, 1.0))
-          {
-            err.entry ("Can't convert K_OC [" + unit
-                       + "] to [" + base_unit + "]");
-            ok = false;
-          }
-      }
     return ok;
   }
   AdsorptionFreundlichSyntax ()
     : DeclareModel (Adsorption::component, "Freundlich", "\
-M = rho K C^m + Theta C.\n\
-For calculating 'K C^m', C is first converted to the resiprocal\n\
-unit of K, and C^m is considered to have the same unit as C, so\n\
-the expression becomes dimensionless.\n\
-\n\
-WARNING: Because the unit you specify for K (OC and clay) also determines\n\
-the unit used for C, it is important that you specify the origial unit.\n\
-\n\
-K = 1000 mL/g is NOT the same a K = 1 L/g unless m = 1.")
+M = rho K C_ref (C / C_ref)^m + Theta C.\n\
+Formula from FOCUS page 93.")
   { }
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.declare ("K_clay", Attribute::User (), Check::non_negative (),
+    frame.set_strings ("cite", "freundlich1939adsorption", "focus2000");
+    frame.declare ("K_clay", "cm^3/g", Check::non_negative (),
                    Attribute::OptionalConst, 
                    "Clay dependent distribution parameter.\n\
 It is multiplied with the soil clay fraction to get the clay part of\n  \
 the 'K' factor.  If 'K_OC' is specified, 'K_clay' defaults to 0.");
-    frame.declare ("K_OC", Attribute::User (), Check::non_negative (), 
+    frame.declare ("K_OC", "cm^3/g", Check::non_negative (), 
                    Attribute::OptionalConst, 
                    "Humus dependent distribution parameter.\n\
 It is multiplied with the soil organic carbon fraction to get the\n\
 carbon part of the 'K' factor.  By default, 'K_OC' is equal to 'K_clay'.");
-    frame.declare ("m", Attribute::None (), Check::non_negative (), Attribute::Const,
-                   "Freundlich parameter (1/n).");
+    frame.declare_number_cited ("m", Attribute::None (), Check::positive (),
+				Attribute::Const, Attribute::Singleton, "\
+Freundlich parameter (1/n).\n\
+If not known, FOCUS recommend a value of 0.9 (page 93).",
+				"focus2000");
+    frame.declare_number_cited ("C_ref", "g/cm^3", Check::positive (),
+				Attribute::Const, Attribute::Singleton, "\
+Reference concentration for determining the other parameters.\n\
+Accrding to FOCUS, the usual value is 1 mg/L (page 93).",
+				"focus2000");
   }
 } AdsorptionFreundlich_syntax;
 
