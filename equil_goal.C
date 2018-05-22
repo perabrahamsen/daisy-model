@@ -70,6 +70,7 @@ EquilibriumGoal_A::find (const Units& units, const Scope& scope, int cell,
                          const double has_A, const double has_B, 
                          double& want_A, double& want_B, Treelog& msg) const
 {
+  TREELOG_SUBMODEL (msg, "goal_A");
   daisy_assert (has_A >= 0.0);
   daisy_assert (has_B >= 0.0);
   const double M = has_A + has_B;
@@ -144,7 +145,6 @@ bool
 EquilibriumGoal_A::check (const Units& units, 
                           const Scope& scope, Treelog& msg) const
 {
-  Treelog::Open nest (msg, "Equilibrium: 'Goal_A'");
   bool ok = true;
   if (!goal_A_expr->check_dim (units, scope, goal_unit, msg))
     ok = false;

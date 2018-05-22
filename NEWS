@@ -13,7 +13,7 @@ release.
 If the timestep in the weather file is below 4 hours, Daisy will by
 default chose 'FAO_PM_hourly'.
 
-Daisy will now use the 'deBruin87' parameterization og Makkink,
+Daisy will now use the 'deBruin87' parameterization of Makkink,
 instead of the old 'makkink' model.
 
 ** New models calculating reference evapotranspiration

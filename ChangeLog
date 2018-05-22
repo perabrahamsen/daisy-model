@@ -1,3 +1,22 @@
+2018-05-22  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.64 released.
+
+2018-05-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* geometry.C, geometry.g (add_layer): Take 'Check' argument.
+	* chemical_std.C, soil_water.C, soil_heat.C: Update callers.
+
+2018-05-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* rootdens_growth.C (depth_factor): New parameter.
+
+2018-04-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* reaction_std.C (tick_soil): Add TREELOG_MODEL.
+	* transform_equil.C (tick): Ditto.
+	* equil_goal.C (find): Ditto.
+
 2018-04-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* pet_makkink.C (AslyngHansen82): Added Hansen (1984) reference.

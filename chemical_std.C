@@ -1731,11 +1731,12 @@ ChemicalStandard::check (const Units& units, const Scope& scope,
                                                   M_primary),
                             C_primary))
             throw "C_primary does not match M_primary";
-          if (!approximate (M_primary, M - M_secondary))
+          if (!approximate (M_primary, M - M_secondary)
+	      && !approximate (M, M_primary + M_secondary, 0.01))
             throw "M_primary should be M - M_secondary"; 
-          if (M_secondary > M * 1.00001)
+          if (M_secondary > M * 1.0001)
             throw "M_secondary > M";
-          if (M_primary > M  * 1.00001)
+          if (M_primary > M  * 1.0001)
             throw "M_primary > M";
 
           if (iszero (soil_water.Theta_secondary (i)))
@@ -1806,6 +1807,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
                               const SoilHeat& soil_heat,
                               Treelog& msg)
 {
+  TREELOG_MODEL (msg);
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
 
@@ -1855,7 +1857,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
 
   for (size_t i = 0; i < cell_size; i++)
     {
-      Treelog::Open nest (msg, "for", i, "loop");
+      Treelog::Open nest (msg, "cell", i, "loop");
       daisy_assert (M_primary_.size () == i);
 
       const double Theta = soil_water.Theta (i);
@@ -1867,6 +1869,10 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
       const bool has_C_avg  = C_avg_.size () > i;
       const bool has_M_total  = M_total_.size () > i;
       daisy_assert (has_C_avg || has_M_total);
+      daisy_assert (!has_C_avg || C_avg_[i] >= 0);
+      daisy_assert (!has_C_secondary || C_secondary_[i] >= 0);
+      daisy_assert (!has_M_secondary || M_secondary_[i] >= 0);
+      daisy_assert (!has_M_total || M_total_[i] >= 0);
       
       if (iszero (Theta_secondary))
         // No secondary water.
@@ -1887,6 +1893,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
       else if (!has_C_secondary && !has_M_secondary)
         // Secondary water in equilibrium.
         {
+	  Treelog::Open nest (msg, "cell", i, "b");
           daisy_assert (has_C_avg || has_M_total);
 
           if (!has_C_avg)
@@ -1906,6 +1913,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
       else if (has_C_avg)
         // Average and secondary concentrations known.
         {
+	  Treelog::Open nest (msg, "cell", i, "c");
           daisy_assert (has_C_secondary || has_M_secondary);
           if (!has_C_secondary)
             C_secondary_.push_back (adsorption_->M_to_C2 (soil, Theta_secondary,
@@ -1918,9 +1926,10 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
           
           // Theta * C_a = Theta_i * C_i + Theta_m * C_m
           // => C_i = (Theta * C_a - Theta_m * C_m) / Theta_i
-          C_primary_.push_back ((Theta * C_avg_[i]
-                                 - Theta_secondary * C_secondary_[i])
-                                / Theta_primary);
+          C_primary_.push_back (std::max ((Theta * C_avg_[i]
+					   - Theta_secondary * C_secondary_[i])
+					  / Theta_primary,
+					  0.0));
           M_primary_.push_back (adsorption_->C_to_M1 (soil, Theta_primary, i, 
                                                       C_primary_[i]));
           if (!has_M_total)
@@ -1929,6 +1938,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
       else
         // Averarage concentration and total matter known.
         {
+	  Treelog::Open nest (msg, "cell", i, "d");
           daisy_assert (has_C_secondary || has_M_secondary);
           if (!has_C_secondary)
             C_secondary_.push_back (adsorption_->M_to_C2 (soil, Theta_secondary,
@@ -1939,7 +1949,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
                                                           i, 
                                                           C_secondary_[i]));
           daisy_assert (has_M_total);
-          M_primary_.push_back (M_total_[i] - M_secondary_[i]);
+          M_primary_.push_back (std::max (M_total_[i] - M_secondary_[i], 0.0));
           C_primary_.push_back (adsorption_->M_to_C1 (soil, 
                                                       Theta_primary,
                                                       i,
@@ -2208,31 +2218,38 @@ You may not specify both 'decompose_rate' and 'decompose_halftime'");
   }
 
   static void load_C (Frame& frame)
-  { Geometry::add_layer (frame, "g/cm^3", Attribute::Const, "\
+  { Geometry::add_layer (frame, "g/cm^3", Check::non_negative (),
+			 Attribute::Const, "\
 Concentration in water."); }
 
   static void load_C_secondary (Frame& frame)
-  { Geometry::add_layer (frame, "g/cm^3", Attribute::Const, "\
+  { Geometry::add_layer (frame, "g/cm^3", Check::non_negative (),
+			 Attribute::Const, "\
 Concentration in secondary domain."); }
 
   static void load_C_primary (Frame& frame)
-  { Geometry::add_layer (frame, "g/cm^3", Attribute::Const, "\
+  { Geometry::add_layer (frame, "g/cm^3", Check::non_negative (),
+			 Attribute::Const, "\
 Concentration in primary domain."); }
 
   static void load_M (Frame& frame)
-  { Geometry::add_layer (frame, "g/cm^3", Attribute::Const, "\
+  { Geometry::add_layer (frame, "g/cm^3", Check::non_negative (),
+			 Attribute::Const, "\
 Total mass per volume water, soil, and air."); }
 
   static void load_M_secondary (Frame& frame)
-  { Geometry::add_layer (frame, "g/cm^3", Attribute::Const, "\
+  { Geometry::add_layer (frame, "g/cm^3", Check::non_negative (),
+			 Attribute::Const, "\
 Secondary domain mass per volume water, soil, and air."); }
 
   static void load_M_primary (Frame& frame)
-  { Geometry::add_layer (frame, "g/cm^3", Attribute::Const, "\
+  { Geometry::add_layer (frame, "g/cm^3", Check::non_negative (),
+			 Attribute::Const, "\
 Primary domain mass per volume water, soil, and air."); }
 
   static void load_Ms (Frame& frame)
-  { Geometry::add_layer (frame, Attribute::Fraction (), Attribute::Const, "\
+  { Geometry::add_layer (frame, Attribute::Fraction (), Check::none (),
+			 Attribute::Const, "\
 Mass in dry soil.\n\
 This include all matter in both soil and water, relative to the\n\
 dry matter weight.\n\

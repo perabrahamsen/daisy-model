@@ -34,6 +34,7 @@
 #include "librarian.h"
 #include "vcheck.h"
 #include "mathlib.h"
+#include "check.h"
 #include <sstream>
 
 static const double rho_water = 1.0; // [g/cm^3]
@@ -853,7 +854,8 @@ SoilHeat::check (const size_t n, Treelog& err) const
 
 static void
 load_T (Frame& frame)
-{ Geometry::add_layer (frame, "dg C", Attribute::Const, "Soil temperature."); }
+{ Geometry::add_layer (frame, "dg C", Check::none (),
+		       Attribute::Const, "Soil temperature."); }
 
 void
 SoilHeat::load_syntax (Frame& frame)

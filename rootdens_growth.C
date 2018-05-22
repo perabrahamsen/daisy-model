@@ -32,6 +32,7 @@
 #include "frame_model.h"
 #include "metalib.h"
 #include "library.h"
+#include "plf.h"
 
 #include <sstream>
 
@@ -41,6 +42,7 @@ struct RootdensGrowth : public Rootdens
   const double row_position;	// Horizontal position of row crops. [cm]
   const double row_distance;	// Distance betweeen rows. [cm]
   const double DensRtTip;	// Root density at (pot) pen. depth. [cm/cm^3]
+  const PLF depth_factor;	// Depth affect on root growth. [cm] -> []
 
   // State.
   double LastWRoot;             // [g DM/m^2]
@@ -128,7 +130,8 @@ RootdensGrowth::set_density (const Geometry& geo,
 
           // What is already in the root zone?
           double total = 0.0;   // [cm]
-          
+          double total_weight = 0.0;
+	  
           // Find it.
           for (size_t c = 0; c < cell_size; c++)
             {
@@ -137,7 +140,11 @@ RootdensGrowth::set_density (const Geometry& geo,
               const double x = find_row (geo.cell_x (c));
               const double V =  geo.cell_volume (c); // [cm^3]
               total += Density[c] * V;
-
+	      total_weight += Density[c] * V * depth_factor (-z);
+	      
+	      daisy_assert (CropWidth > 0.0);
+	      daisy_assert (CropDepth > 0.0);
+	      
               if (x/CropWidth + z/CropDepth < 1.0
                   && z < SoilDepth
                   && Density[c] < DensRtTip)
@@ -145,6 +152,13 @@ RootdensGrowth::set_density (const Geometry& geo,
             }
           daisy_approximate (total, geo.total_soil (Density));
 
+	  // Relative to zero?
+	  if (total_weight <= 0.0 && total > 0)
+	    {
+	      msg.error ("Weighted root lenght <= 0.0");
+	      return;
+	    }
+	  
           // To each according to need.
           const double fill_factor = missing > new_root
             ? new_root / missing
@@ -152,7 +166,7 @@ RootdensGrowth::set_density (const Geometry& geo,
 
           // To those who have shall be given.
           const double growth_factor = (total > 0 && missing < new_root)
-            ? (new_root - missing) / total
+            ? (new_root - missing) / total_weight
             : 0.0;
 
           // Fill it.
@@ -162,7 +176,7 @@ RootdensGrowth::set_density (const Geometry& geo,
               const double z = -geo.cell_z (c);
               const double x = find_row (geo.cell_x (c));
               const double old = Density[c];
-              Density[c] += old * growth_factor;
+              Density[c] += old * growth_factor * depth_factor (-z);
 
               if (x/CropWidth + z/CropDepth < 1.0
                   && z < SoilDepth
@@ -233,6 +247,7 @@ RootdensGrowth::RootdensGrowth (const BlockModel& al)
     row_position (al.number ("row_position")),
     row_distance (al.number ("row_distance", -1.0)),
     DensRtTip (al.number ("DensRtTip")),
+    depth_factor (al.plf ("depth_factor")),
     LastWRoot (al.number ("WRoot", 0.0))
 { }
 
@@ -255,6 +270,12 @@ Horizontal position of row crops.");
     frame.declare ("DensRtTip", "cm/cm^3", Check::positive (), Attribute::Const,
                 "Root density at (potential) penetration depth.");
     frame.set ("DensRtTip", 0.1);
+    frame.declare ("depth_factor", "cm", Attribute::None (),
+		   Check::non_negative (), Attribute::Const, "\
+Depth (negative) affect on root growth.\n\
+Specify a value less than one to decrease root growth, and larger\n\
+than one to increase root growth at the specified depth.");
+    frame.set ("depth_factor", PLF::always_1 ());
     frame.declare ("Depth", "cm",
                    Check::non_negative (), Attribute::OptionalState,
                    "Expected depth of root zone (positive).");

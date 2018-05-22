@@ -367,7 +367,6 @@ ChemistryStandard::tick_top (const Units& units, const Geometry& geo,
 {
   for (size_t r = 0; r < reactions.size (); r++)
     {
-      reactions[r]->tick_vegetation (vegetation, dt, chemistry, msg);
       reactions[r]->tick_top  (vegetation, bioclimate, tillage_age, 
                                total_rain, surface_water, chemistry, 
                                dt, msg);

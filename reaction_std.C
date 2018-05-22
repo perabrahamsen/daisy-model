@@ -51,7 +51,8 @@ struct ReactionStandard : public Reaction
                   const Soil& soil, const SoilWater& soil_water, 
                   const SoilHeat& soil_heat, const OrganicMatter&,
                   Chemistry& chemistry, const double dt, Treelog& msg)
-  { 
+  {
+    TREELOG_MODEL (msg);
     const size_t cell_size = soil.size ();
     Chemical& A = chemistry.find (name_A);
     Chemical& B = chemistry.find (name_B);

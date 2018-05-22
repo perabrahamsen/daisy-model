@@ -815,11 +815,13 @@ SoilWater::check (const size_t n, Treelog& msg) const
 
 static void
 load_h (Frame& frame)
-{ Geometry::add_layer (frame, "cm", Attribute::Const, "Soil water pressure."); }
+{ Geometry::add_layer (frame, "cm", Check::none (),
+		       Attribute::Const, "Soil water pressure."); }
 
 static void
 load_Theta (Frame& frame)
-{ Geometry::add_layer (frame, Attribute::Fraction (), Attribute::Const, 
+{ Geometry::add_layer (frame, Attribute::Fraction (), Check::none (),
+		       Attribute::Const, 
                        "Soil water content."); }
 
 void

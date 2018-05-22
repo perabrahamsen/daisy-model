@@ -51,8 +51,6 @@ public:
 			 const double tillage_age /* [d] */,
                          const double total_rain, const double h_pond,
                           Chemistry& chemistry, const double dt, Treelog&);
-  virtual void tick_vegetation (const Vegetation&, const double dt /* [h] */,
-				Chemistry&, Treelog& msg);
   virtual void tick_surface (const Units&, const Geometry&, 
                              const Soil&, const SoilWater&, const SoilHeat&,
                              const Surface&, Chemistry&, const double dt,

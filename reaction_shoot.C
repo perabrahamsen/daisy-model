@@ -45,10 +45,9 @@ struct ReactionShoot : public Reaction
   const PLF DS_factor;		// [DS] -> []
 
       // Simulation.
-  void tick_vegetation (const Vegetation& vegetation, const double dt /* [h] */,
-			Chemistry& chemistry,
-			Treelog& msg)
-    
+  void tick_top (const Vegetation& vegetation, const Bioclimate&,
+		 const double, const double, const double,
+		 Chemistry& chemistry, const double dt, Treelog&)
   {
     const double height = 0.0;	// [cm]
     const double DM		// [g/cm^2]

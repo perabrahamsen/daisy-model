@@ -41,11 +41,6 @@ Reaction::tick_top (const Vegetation&, const Bioclimate&,
                     Chemistry& chemistry, const double dt, Treelog&)
 { }
 
-void
-Reaction::tick_vegetation (const Vegetation&, const double dt /* [h] */,
-			   Chemistry&, Treelog&)
-{ }
-
 void 
 Reaction::tick_surface (const Units&, const Geometry&, 
                         const Soil&, const SoilWater&, const SoilHeat&,

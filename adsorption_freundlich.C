@@ -31,6 +31,7 @@
 #include "frame.h"
 #include "units.h"
 #include "metalib.h"
+#include <sstream>
 
 static const double c_fraction_in_humus = 0.587;
 
@@ -62,7 +63,17 @@ double
 AdsorptionFreundlich::C_to_M (const Soil& soil,
 			      double Theta, int i, double C, double sf) const
 {
-  daisy_assert (C >= 0.0);
+  daisy_assert (std::isfinite (C));
+  if (C <= 0.0)
+    {
+      if (C < 0.0)
+	{
+	  std::ostringstream tmp;
+	  tmp << "C = " << C << "; should be >= 0.0";
+	  Assertion::warning (tmp.str ());
+	}
+      return 0.0;
+    }
   daisy_assert (Theta >= 0.0); 
   const double K = soil.clay (i) * K_clay 
     + soil.humus (i) * c_fraction_in_humus * K_OC;
@@ -77,7 +88,8 @@ AdsorptionFreundlich::M_to_C (const Soil& soil,
   // Check for zero.
   if (iszero (M))
     return 0.0;
-
+  daisy_assert (M > 0.0);
+  
   // Guess start boundary.
   double min_C = 0.0;
   double min_M = C_to_M (soil, Theta, i, min_C, sf);
@@ -96,6 +108,7 @@ AdsorptionFreundlich::M_to_C (const Soil& soil,
   while (!approximate (min_M, max_M))
     {
       const double new_C = (min_C + max_C) / 2.0;
+      daisy_assert (new_C >= 0.0);
       const double new_M = C_to_M (soil, Theta, i, new_C, sf);
       if (new_M < M)
 	{

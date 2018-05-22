@@ -76,6 +76,7 @@ TransformEquilibrium::tick (const Units& units,
 			    const std::vector<double>& B,
                             std::vector<double>& S_AB, Treelog& msg) const
 { 
+  TREELOG_SUBMODEL (msg, "equilibrium");
   const size_t cell_size = soil.size ();
   daisy_assert (A.size () == cell_size);
   daisy_assert (B.size () == cell_size);

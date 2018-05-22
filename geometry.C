@@ -30,6 +30,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "plf.h"
+#include "check.h"
 #include <sstream>
 
 const int Geometry::cell_above;
@@ -717,7 +718,7 @@ static struct CheckLayers : public VCheck
 } check_layers;
 
 void 
-Geometry::add_layer (Frame& frame, const symbol dimension,
+Geometry::add_layer (Frame& frame, const symbol dimension, const Check& check,
                      const Attribute::category cat, 
                      const symbol description)
 {
@@ -726,7 +727,7 @@ Geometry::add_layer (Frame& frame, const symbol dimension,
   if (dimension == Attribute::Fraction ())
     frame.declare_fraction ("value", Attribute::Const, description);
   else
-    frame.declare ("value", dimension, Attribute::Const, description);
+    frame.declare ("value", dimension, check, Attribute::Const, description);
   frame.order ("end", "value");
 }
 
