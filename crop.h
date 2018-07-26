@@ -45,9 +45,9 @@ class Harvest;
 class AM;
 class Treelog;
 class BlockModel;
-class Units;
 class Metalib;
 class VCheck;
+class Scope;
 
 class Crop : public ModelFramed
 {
@@ -78,8 +78,7 @@ public:
   virtual double EpFacWet () const = 0; // Convertion to potential evapotransp.
   virtual double albedo () const;
   virtual void CanopyStructure () = 0;
-  virtual double ActualWaterUptake (const Units&,
-                                    double Ept, const Geometry& geo,
+  virtual double ActualWaterUptake (double Ept, const Geometry& geo,
                                     const Soil&, const SoilWater&, 
 				    double EvapInterception, 
                                     double dt, Treelog&) = 0;
@@ -87,10 +86,10 @@ public:
 
   // Simulation.
 public:
-  virtual void find_stomata_conductance (const Units&, const Time& time, 
+  virtual void find_stomata_conductance (const Time& time, 
                                          const Bioclimate&,
                                          double dt, Treelog&);
-  virtual void tick (const Metalib&, 
+  virtual void tick (const Scope&,
                      const Time&, const Bioclimate&, double ForcedCAI, 
                      const Geometry&, const Soil&, const SoilHeat&,
                      SoilWater&, Chemistry&, OrganicMatter&,
@@ -155,15 +154,13 @@ public:
   static const VCheck& check_all ();
   static const VCheck& check_library ();
   static const VCheck& check_buildable ();
-  virtual void initialize (const Metalib& metalib, 
-                           const Units&, const Geometry&, OrganicMatter&, 
+  virtual void initialize (const Scope&, const Geometry&, OrganicMatter&, 
                            double SoilLimit, const Time& now, Treelog&) = 0;
-  virtual void initialize (const Metalib& metalib, 
-                           const Units&, const Geometry&,
+  virtual void initialize (const Scope&, const Geometry&,
                            double row_width, double row_pos, double seed,
                            OrganicMatter&, 
                            double SoilLimit, const Time& now, Treelog&) = 0;
-  virtual bool check (const Units&, const Geometry&, Treelog& msg) const = 0;
+  virtual bool check (const Scope&, const Geometry&, Treelog& msg) const = 0;
 protected:
   Crop (const BlockModel&);
 public:

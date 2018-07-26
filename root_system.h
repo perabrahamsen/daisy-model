@@ -42,6 +42,7 @@ class Treelog;
 
 class RootSystem
 {
+  const Metalib& metalib;
   // Components.
 private:
   std::unique_ptr<Rootdens> rootdens; // Root density calculation.
@@ -106,7 +107,7 @@ private:
 				 const SoilWater& soil_water,
                                  double dt);
 public:
-  double water_uptake (const Units&, double Ept,
+  double water_uptake (double Ept,
                        const Geometry&,
 		       const Soil& soil, const SoilWater& soil_water,
                        double EvapInterception, double dt, Treelog&);
@@ -135,10 +136,10 @@ public:
 
   // Create and Destroy
 public:
-  void initialize (const Metalib&, const Geometry& geo, 
+  void initialize (const Geometry& geo, 
                    double row_width, double row_pos, Treelog& msg);
-  void initialize (const Units&, const Geometry& geo, Treelog& msg);
-  bool check (const Units&, const Geometry& geo, Treelog& msg) const;
+  void initialize (const Geometry& geo, Treelog& msg);
+  bool check (const Geometry& geo, Treelog& msg) const;
   static void load_syntax (Frame&);
   RootSystem (const Block& al);
   ~RootSystem ();

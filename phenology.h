@@ -32,6 +32,7 @@ class Production;
 class Vernalization;
 class Treelog;
 class BlockModel;
+class Scope;
 
 class Phenology : public ModelDerived
 {
@@ -52,15 +53,18 @@ public:
 public:
   void light_time (double dt);
   void tick ();
-  virtual void tick_daily (double Ta, bool leaf_growth, 
+  virtual void tick_daily (const Scope&, double Ta, bool leaf_growth, 
                            Production&, Vernalization&, 
 			   double cut_stress, Treelog&) = 0;
-  virtual void emergence (double h, double T, double dt) = 0;
+  virtual void emergence (const Scope&, double h, double T, double dt,
+			  Treelog&) = 0;
   void output (Log& log) const;
   virtual bool mature () const;
 
   // Create and Destroy.
 public:
+  virtual bool initialize (const Scope&, Treelog& msg);
+  virtual bool check (const Scope&, Treelog&) const;
   Phenology (const BlockModel&);
   ~Phenology ();
 };

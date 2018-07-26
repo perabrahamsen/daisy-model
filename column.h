@@ -77,10 +77,10 @@ public:
                                const double Theta, const double start,
                                const double factor, const int intervals,
                                Treelog& msg) const = 0;
-  virtual void sow (const Metalib&, const FrameModel& crop, 
+  virtual void sow (const Scope&, const FrameModel& crop, 
                     double row_width, double row_pos, double seed,
                     const Time&, Treelog&) = 0;
-  virtual void sow (const Metalib&, Crop& crop, 
+  virtual void sow (const Scope&, Crop& crop, 
                     double row_width, double row_pos, double seed,
                     const Time&, Treelog&) = 0;
   virtual void ridge (const FrameSubmodel& ridge) = 0;

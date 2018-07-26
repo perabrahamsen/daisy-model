@@ -45,6 +45,8 @@
 
 struct VegetationPermanent : public Vegetation
 {
+  const Metalib& metalib;
+
   // Canopy.
   class YearlyLAI
   {
@@ -153,15 +155,15 @@ struct VegetationPermanent : public Vegetation
 
   // Simulation.
   void reset_canopy_structure (const Time& time);
-  double transpiration (const Units&, double potential_transpiration,
+  double transpiration (double potential_transpiration,
 			double canopy_evaporation,
                         const Geometry& geo,
 			const Soil& soil, const SoilWater& soil_water, 
 			double dt, Treelog&);
-  void find_stomata_conductance (const Units&, const Time&, 
+  void find_stomata_conductance (const Time&, 
                                  const Bioclimate&, double, Treelog&)
   { }
-  void tick (const Metalib&, const Time& time, const Bioclimate&, 
+  void tick (const Scope&, const Time& time, const Bioclimate&, 
              const Geometry& geo, const Soil&, const SoilHeat&,
              SoilWater&, Chemistry&, OrganicMatter&,
              double& residuals_DM,
@@ -202,12 +204,12 @@ struct VegetationPermanent : public Vegetation
               std::vector<double>&, std::vector<double>&,
               Treelog&)
   { }
-  void sow (const Metalib&, const FrameModel&, 
+  void sow (const Scope&, const FrameModel&, 
             const double, const double, const double,
             const Geometry&, OrganicMatter&, const double, 
             double&, double&, const Time&, Treelog&)
   { throw "Can't sow on permanent vegetation"; }
-  void sow (const Metalib&, Crop&, 
+  void sow (const Scope&, Crop&, 
             const double, const double, const double,
             const Geometry&, OrganicMatter&, const double, 
             double&, double&, const Time&, Treelog&)
@@ -215,11 +217,10 @@ struct VegetationPermanent : public Vegetation
   void output (Log&) const;
 
   // Create and destroy.
-  void initialize (const Metalib& metalib, 
-                   const Units&, const Time& time, const Geometry& geo,
+  void initialize (const Scope&, const Time& time, const Geometry& geo,
                    const Soil& soil, OrganicMatter&, 
                    Treelog&);
-  bool check (const Units&, const Geometry&, Treelog&) const;
+  bool check (const Scope&, const Geometry&, Treelog&) const;
   VegetationPermanent (const BlockModel&);
   ~VegetationPermanent ();
 };
@@ -283,7 +284,7 @@ VegetationPermanent::reset_canopy_structure (const Time& time)
   HvsLAI_ = canopy->LAIvsH.inverse ();
 }
 void
-VegetationPermanent::tick (const Metalib& metalib,
+VegetationPermanent::tick (const Scope&,
                            const Time& time, const Bioclimate& bioclimate, 
                            const Geometry& geo, const Soil& soil, 
                            const SoilHeat& soil_heat,
@@ -353,8 +354,7 @@ VegetationPermanent::tick (const Metalib& metalib,
 }
 
 double
-VegetationPermanent::transpiration (const Units& units,
-                                    const double potential_transpiration,
+VegetationPermanent::transpiration (const double potential_transpiration,
 				    const double canopy_evaporation,
                                     const Geometry& geo,
 				    const Soil& soil, 
@@ -363,7 +363,7 @@ VegetationPermanent::transpiration (const Units& units,
                                     Treelog& msg)
 {
   if (canopy->CAI > 0.0)
-    return  root_system->water_uptake (units, potential_transpiration, 
+    return  root_system->water_uptake (potential_transpiration, 
                                        geo, soil, soil_water, 
                                        canopy_evaporation, 
                                        dt, msg);
@@ -383,15 +383,14 @@ VegetationPermanent::output (Log& log) const
 }
 
 void
-VegetationPermanent::initialize (const Metalib& metalib, 
-                                 const Units&, const Time& time, 
+VegetationPermanent::initialize (const Scope&, const Time& time, 
                                  const Geometry& geo,
                                  const Soil& soil, 
 				 OrganicMatter& organic_matter,
                                  Treelog& msg)
 {
   reset_canopy_structure (time);
-  root_system->initialize (metalib, geo, 0.0, 0.0, msg);
+  root_system->initialize (geo, 0.0, 0.0, msg);
   root_system->full_grown (geo, soil.MaxRootingHeight (), WRoot, msg);
 
   static const symbol vegetation_symbol ("vegetation");
@@ -400,17 +399,18 @@ VegetationPermanent::initialize (const Metalib& metalib,
 }
 
 bool 
-VegetationPermanent::check (const Units& units,
-                            const Geometry& geo, Treelog& msg) const 
+VegetationPermanent::check (const Scope&,
+			    const Geometry& geo, Treelog& msg) const 
 { 
   bool ok = true;
-  if (!root_system->check (units, geo, msg))
+  if (!root_system->check (geo, msg))
     ok = false;
   return ok;
 }
 
 VegetationPermanent::VegetationPermanent (const BlockModel& al)
   : Vegetation (al),
+    metalib (al.metalib ()),
     yearly_LAI (al.submodel_sequence ("YearlyLAI")),
     LAIvsDAY (al.plf ("LAIvsDAY")),
     LAIfactor (al.number ("LAIfactor")),

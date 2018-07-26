@@ -40,12 +40,12 @@ class Chemistry;
 class PLF;
 class Harvest;
 class AM;
-class Metalib;
 class Treelog;
 class BlockModel;
 class FrameModel;
 class Units;
 class Crop;
+class Scope;
 
 class Vegetation : public ModelDerived
 { 
@@ -95,15 +95,15 @@ public:
   // Simulation
 public:
   virtual double transpiration (// Actual trans. [mm/h]
-				const Units&, double potential_transpiration,	
+				double potential_transpiration,	
 				double canopy_evaporation,
                                 const Geometry& geo,
 				const Soil& soil, const SoilWater& soil_water,
 				double dt, Treelog&) = 0;
-  virtual void find_stomata_conductance (const Units&, const Time& time, 
+  virtual void find_stomata_conductance (const Time& time, 
                                          const Bioclimate&,
                                          double dt, Treelog&) = 0;
-  virtual void tick (const Metalib&, const Time&, const Bioclimate&, 
+  virtual void tick (const Scope&, const Time&, const Bioclimate&, 
                      const Geometry&, const Soil&, const SoilHeat&,
                      SoilWater&, Chemistry&, OrganicMatter&,
                      double& residuals_DM,
@@ -155,7 +155,7 @@ public:
                       std::vector<double>& residuals_N_soil,
                       std::vector<double>& residuals_C_soil,
                       Treelog&) = 0;
-  virtual void sow (const Metalib&, const FrameModel& al, 
+  virtual void sow (const Scope&, const FrameModel& al, 
                     double row_width /* [cm] */, double row_pos /* [cm] */, 
                     double seed /* kg w.w./ha */,
                     const Geometry&, OrganicMatter&, 
@@ -163,7 +163,7 @@ public:
                     double& seed_N /* [kg N/ha] */,
                     double& seed_C /* [kg C/ha] */,
                     const Time&, Treelog& msg) = 0;
-  virtual void sow (const Metalib&, Crop&, 
+  virtual void sow (const Scope&, Crop&, 
                     double row_width /* [cm] */, double row_pos /* [cm] */, 
                     double seed /* kg w.w./ha */,
                     const Geometry&, OrganicMatter&, 
@@ -175,11 +175,10 @@ public:
   
   // Create and Destroy.
 public:
-  virtual void initialize (const Metalib& metalib, 
-                           const Units&, const Time&, const Geometry& geo,
+  virtual void initialize (const Scope&, const Time&, const Geometry& geo,
                            const Soil& soil, OrganicMatter&,
                            Treelog&) = 0;
-  virtual bool check (const Units&, const Geometry&, Treelog& msg) const = 0;
+  virtual bool check (const Scope&, const Geometry&, Treelog& msg) const = 0;
   explicit Vegetation (const BlockModel&);
   ~Vegetation ();
 };

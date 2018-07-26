@@ -41,11 +41,13 @@
 #include "bioclimate.h"
 #include "soil_heat.h"
 #include "block_model.h"
+#include "metalib.h"
 #include <sstream>
 #include <deque>
 
 struct VegetationAfforestation : public Vegetation
 {
+  const Metalib& metalib;
   // Afforestation parameters.
   const Time planting_time;
   const PLF canopy_height;
@@ -161,15 +163,15 @@ struct VegetationAfforestation : public Vegetation
 
   // Simulation.
   void reset_canopy_structure (double y, double d);
-  double transpiration (const Units&, double potential_transpiration,
+  double transpiration (double potential_transpiration,
 			double canopy_evaporation,
                         const Geometry& geo,
 			const Soil& soil, const SoilWater& soil_water, 
 			double dt, Treelog&);
-  void find_stomata_conductance (const Units&, const Time&, 
+  void find_stomata_conductance (const Time&, 
                                  const Bioclimate&, double, Treelog&)
   { }
-  void tick (const Metalib&, const Time& time, const Bioclimate&, 
+  void tick (const Scope&, const Time& time, const Bioclimate&, 
              const Geometry& geo, const Soil&, const SoilHeat&,
              SoilWater&, Chemistry&, OrganicMatter&,
              double& residuals_DM,
@@ -210,24 +212,22 @@ struct VegetationAfforestation : public Vegetation
               std::vector<double>&, std::vector<double>&,
               Treelog&)
   { }
-  void sow (const Metalib&, const FrameModel&, 
+  void sow (const Scope&, const FrameModel&, 
             const double, const double, const double,
             const Geometry&, OrganicMatter&, const double, 
             double&, double&, const Time&, Treelog&)
   { throw "Can't sow on afforestation vegetation"; }
-  void sow (const Metalib&, Crop&, 
-            const double, const double, const double,
+  void sow (const Scope&, Crop&, const double, const double, const double,
             const Geometry&, OrganicMatter&, const double, 
             double&, double&, const Time&, Treelog&)
   { throw "Can't sow on afforestation vegetation"; }
   void output (Log&) const;
 
   // Create and destroy.
-  void initialize (const Metalib& metalib, 
-                   const Units&, const Time& time, const Geometry& geo,
+  void initialize (const Scope&, const Time& time, const Geometry& geo,
                    const Soil& soil, OrganicMatter&, 
                    Treelog&);
-  bool check (const Units&, const Geometry&, Treelog&) const;
+  bool check (const Scope&, const Geometry&, Treelog&) const;
   VegetationAfforestation (const BlockModel&);
   ~VegetationAfforestation ();
 };
@@ -254,8 +254,8 @@ VegetationAfforestation::reset_canopy_structure (const double y, const double d)
   HvsLAI_ = canopy->LAIvsH.inverse ();
 }
 void
-VegetationAfforestation::tick (const Metalib& metalib,
-                               const Time& time, const Bioclimate& bioclimate, 
+VegetationAfforestation::tick (const Scope&,
+			       const Time& time, const Bioclimate& bioclimate, 
                                const Geometry& geo, const Soil& soil, 
                                const SoilHeat& soil_heat,
                                SoilWater& soil_water, Chemistry& chemistry,
@@ -364,17 +364,16 @@ VegetationAfforestation::tick (const Metalib& metalib,
 }
 
 double
-VegetationAfforestation::transpiration (const Units& units,
-                                    const double potential_transpiration,
-				    const double canopy_evaporation,
-                                    const Geometry& geo,
-				    const Soil& soil, 
-				    const SoilWater& soil_water,
-				    const double dt, 
-                                    Treelog& msg)
+VegetationAfforestation::transpiration (const double potential_transpiration,
+					const double canopy_evaporation,
+					const Geometry& geo,
+					const Soil& soil, 
+					const SoilWater& soil_water,
+					const double dt, 
+					Treelog& msg)
 {
   if (canopy->CAI > 0.0)
-    return  root_system->water_uptake (units, potential_transpiration, 
+    return  root_system->water_uptake (potential_transpiration, 
                                        geo, soil, soil_water, 
                                        canopy_evaporation, 
                                        dt, msg);
@@ -395,8 +394,7 @@ VegetationAfforestation::output (Log& log) const
 }
 
 void
-VegetationAfforestation::initialize (const Metalib& metalib, 
-                                 const Units&, const Time& time, 
+VegetationAfforestation::initialize (const Scope&, const Time& time, 
                                  const Geometry& geo,
                                  const Soil& soil, 
 				 OrganicMatter& organic_matter,
@@ -407,7 +405,7 @@ VegetationAfforestation::initialize (const Metalib& metalib,
   const double d = time.yday () + time.hour () / 24.0;
   
   reset_canopy_structure (y, d);
-  root_system->initialize (metalib, geo, 0.0, 0.0, msg);
+  root_system->initialize (geo, 0.0, 0.0, msg);
   root_system->full_grown (geo, soil.MaxRootingHeight (), WRoot, msg);
 
   static const symbol vegetation_symbol ("vegetation");
@@ -424,17 +422,17 @@ VegetationAfforestation::initialize (const Metalib& metalib,
 }
 
 bool 
-VegetationAfforestation::check (const Units& units,
-                            const Geometry& geo, Treelog& msg) const 
+VegetationAfforestation::check (const Scope&, const Geometry& geo, Treelog& msg) const 
 { 
   bool ok = true;
-  if (!root_system->check (units, geo, msg))
+  if (!root_system->check (geo, msg))
     ok = false;
   return ok;
 }
 
 VegetationAfforestation::VegetationAfforestation (const BlockModel& al)
   : Vegetation (al),
+    metalib (al.metalib ()),
     planting_time (al.submodel ("planting_time")),
     canopy_height (al.plf ("canopy_height")),
     root_depth (al.plf ("root_depth")),

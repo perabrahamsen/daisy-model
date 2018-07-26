@@ -44,9 +44,9 @@ private:
 
   // Simulation.
 private:
-  void tick_daily (double Ta, bool leaf_growth, 
+  void tick_daily (const Scope&, double Ta, bool leaf_growth, 
 		   Production&, Vernalization&, double cut_stress, Treelog&);
-  void emergence (double h, double T, double dt);
+  void emergence (const Scope&, double h, double T, double dt, Treelog&);
 
   // Create.
 public:
@@ -54,7 +54,8 @@ public:
 };
 
 void
-PhenologyTSum::tick_daily (const double Ta, const bool /* leaf_growth */, 
+PhenologyTSum::tick_daily (const Scope&,
+			   const double Ta, const bool /* leaf_growth */, 
 			   Production& production, 
 			   Vernalization& vernalization,
 			   const double /*cut_stress*/, Treelog& out)
@@ -90,7 +91,9 @@ PhenologyTSum::tick_daily (const double Ta, const bool /* leaf_growth */,
 }
 
 void
-PhenologyTSum::emergence (const double /*h*/, const double T, const double dt)
+PhenologyTSum::emergence (const Scope&,
+			  const double /*h*/, const double T, const double dt,
+			  Treelog&)
 {
   if (T > EmrThrs)
     DS += dt * T / EmrTSum;

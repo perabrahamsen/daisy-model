@@ -30,11 +30,21 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
+#include "number.h"
+#include "scope_id.h"
+#include "scope_multi.h"
+#include <sstream>
 
 class PhenologyStandard : public Phenology
 {
+  static const symbol DS_name;
+  const Units& units;
+
   // Parameters.
 private:
+  mutable ScopeID DS_scope;
+  std::unique_ptr<Number> modify_DS;
+  double modified_DS;	        // DS modified by 'modify_DS'.
   const double EmrTSum;         // Soil temp sum at emergence
   const PLF& EmrSMF;            // Soil moisture effect on emergence
   const double DS_Emr;          // Development stage (DS) emergence
@@ -54,49 +64,121 @@ private:
 
   // Simulation.
 private:
-  void tick_daily (double Ta, bool leaf_growth, 
+  void adjust_DS (const Scope& parent_scope, Treelog& msg);
+  void tick_daily (const Scope&, double Ta, bool leaf_growth, 
                    Production&, Vernalization&, double cut_stress, Treelog&);
-  void emergence (double h, double T, double dt);
+  void emergence (const Scope&, double h, double T, double dt, Treelog&);
   bool mature () const
   { return DS >= DSMature; }
 
   // Create.
 public:
+  bool initialize (const Scope& parent_scope, Treelog& msg)
+  {
+    if (modify_DS.get ())
+      {
+	DS_scope.set (DS_name, DS);
+	ScopeMulti scope (DS_scope, parent_scope);
+	return modify_DS->initialize (units, scope, msg);
+      }
+    return true;
+  }
+  bool check (const Scope& parent_scope, Treelog& msg) const
+  {
+    if (modify_DS.get ())
+      {
+	DS_scope.set (DS_name, DS);
+	ScopeMulti scope (DS_scope, parent_scope);
+	return modify_DS->check (units, parent_scope, msg);
+      }
+    return true;
+  }
   PhenologyStandard (const BlockModel&);
 };
 
+const symbol
+PhenologyStandard::DS_name = "x";
+
 void
-PhenologyStandard::tick_daily (const double Ta, const bool leaf_growth, 
+PhenologyStandard::adjust_DS (const Scope& scope, Treelog& msg)
+{
+  if (!modify_DS.get ())
+    return;
+
+  const double new_DS = modify_DS->value (scope);
+
+  if (isequal (new_DS, DS))
+    return;
+
+#if 0
+  const double X = scope.number (DS_name);
+  const double Y = scope.number ("BBCH");
+  
+  std::ostringstream tmp;
+  tmp << "Adjusting DS from " << DS << " to " << new_DS << " X = " << X
+  << " Y = " << Y << " Mod = " << modified_DS;
+  msg.message (tmp.str ());
+#endif
+
+  if (!isequal (new_DS, modified_DS))
+    {
+      std::ostringstream tmp;
+      tmp << "Adj DS from " << DS << " to " << new_DS;
+      msg.message (tmp.str ());
+      modified_DS = new_DS;
+    }
+  DS = new_DS;
+}
+
+void
+PhenologyStandard::tick_daily (const Scope& parent_scope,
+			       const double Ta, const bool leaf_growth, 
                                Production& production,
                                Vernalization& vernalization,
-                               const double cut_stress, Treelog& out)
+                               const double cut_stress, Treelog& msg)
 {
   // Update final day length.
   day_length = partial_day_length;
   partial_day_length = 0.0;
 
-  // Update DS.
+    // Update DS.
   if (fmod (DS, 2.0) < 1.0)
     {
       // Only increase DS if assimilate production covers leaf respiration.
       if (leaf_growth)
         DS += (DSRate1 * TempEff1 (Ta) * PhotEff1 (day_length + 1.0))
           * (1.0 - cut_stress);
+
+      if (modify_DS.get ())
+	{
+	  DS_scope.set (DS_name, DS);
+	  ScopeMulti scope (DS_scope, parent_scope);
+	  modify_DS->tick (units, scope, msg);
+	  adjust_DS (scope, msg);
+	}
+
       vernalization (Ta, DS);
 
       if (DS >= 1.0)
-        out.message (DS1_name.name ());
+        msg.message (DS1_name.name ());
     }
   else
     {
       DS += DSRate2 * TempEff2 (Ta) * (1.0 - cut_stress);
+      if (modify_DS.get ())
+	{
+	  DS_scope.set (DS_name, DS);
+	  ScopeMulti scope (DS_scope, parent_scope);
+	  modify_DS->tick (units, scope, msg);
+	  adjust_DS (scope, msg);
+	}
       if (DS > DSRepeat)
         {
           DS -= DSSetBack;
         }
       if (DS > DSMature)
         {
-          out.message ("Ripe");
+          msg.message ("Ripe");
           DS = DSMature;
         }
     }
@@ -104,15 +186,32 @@ PhenologyStandard::tick_daily (const double Ta, const bool leaf_growth,
 }
 
 void
-PhenologyStandard::emergence (const double h, const double T, const double dt)
+PhenologyStandard::emergence (const Scope& parent_scope,
+			      const double h, const double T, const double dt,
+			      Treelog& msg)
 {
   DS += (dt / 24.0) * T / EmrTSum * EmrSMF (h);
+
+  if (modify_DS.get ())
+    {
+      DS_scope.set (DS_name, DS);
+      ScopeMulti scope (DS_scope, parent_scope);
+      modify_DS->tick (units, scope, msg);
+      adjust_DS (scope, msg);
+    }
+
   if (DS > 0)
     DS = DS_Emr;
 }
 
 PhenologyStandard::PhenologyStandard (const BlockModel& al)
   : Phenology (al),
+    units (al.units ()),
+    DS_scope (DS_name, DS_name),
+    modify_DS (al.check ("modify_DS")
+	       ? Librarian::build_item<Number> (al, "modify_DS")
+	       : NULL),
+    modified_DS (DS),
     EmrTSum (al.number ("EmrTSum")),
     EmrSMF (al.plf ("EmrSMF")),
     DS_Emr (al.number ("DS_Emr")),
@@ -140,6 +239,11 @@ static struct PhenologyStandardSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
     // Parameters.
+    frame.declare_object ("modify_DS", Number::component,
+			  Attribute::OptionalConst, Attribute::Singleton, "\
+Expression for modifying DS.\n\
+The original value is available as a free varible named 'x'.\n\
+The expression will be used as a new value for DS.");
     frame.declare ("EmrTSum", "dg C d", Attribute::Const,
                    "Soil temperature sum at emergence.");
     frame.declare ("EmrSMF", "cm", Attribute::None (), Attribute::Const,

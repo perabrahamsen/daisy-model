@@ -34,13 +34,15 @@ class Units;
 class ABAProd : public ModelDerived
 {
   // Content.
+protected:
+  const Units& units;
 public:
   static const char *const component;
   symbol library_id () const;
 
   // Simulation.
 public:
-  virtual void production (const Units&, const Geometry&, const SoilWater&,
+  virtual void production (const Geometry&, const SoilWater&,
 			   const std::vector<double>& S /* [cm^3/cm^3/h] */,
 			   const std::vector<double>& l /* [cm/cm^3] */,
 			   std::vector<double>& ABA /* [g/cm^3/h] */,
@@ -49,8 +51,8 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Units&, Treelog&) = 0;
-  virtual bool check (const Units&, Treelog&) const = 0;
+  virtual void initialize (Treelog&) = 0;
+  virtual bool check (Treelog&) const = 0;
 protected:
   ABAProd (const BlockModel&);
 

@@ -45,7 +45,7 @@ struct ABAProdUptake : public ABAProd
   const std::unique_ptr<Number> expr;
   
   // Solve.
-  void production (const Units&, const Geometry&, const SoilWater&,
+  void production (const Geometry&, const SoilWater&,
 		   const std::vector<double>& S /* [cm^3/cm^3/h] */,
 		   const std::vector<double>& l /* [cm/cm^3] */,
 		   std::vector<double>& ABA /* [g/cm^3/h] */,
@@ -54,8 +54,8 @@ struct ABAProdUptake : public ABAProd
   { }
 
   // Create and Destroy.
-  void initialize (const Units&, Treelog&);
-  bool check (const Units&, Treelog&) const;
+  void initialize (Treelog&);
+  bool check (Treelog&) const;
   ABAProdUptake (const BlockModel& al);
   ~ABAProdUptake ();
 };
@@ -67,8 +67,7 @@ const symbol
 ABAProdUptake::ABA_unit ("g/cm^3");
 
 void
-ABAProdUptake::production (const Units& units,
-                           const Geometry& geo, const SoilWater& soil_water,
+ABAProdUptake::production (const Geometry& geo, const SoilWater& soil_water,
                            const std::vector<double>& S /* [cm^3/cm^3/h] */,
                            const std::vector<double>& /* l [cm/cm^3] */,
                            std::vector<double>& ABA    /* [g/cm^3/h] */,
@@ -111,11 +110,11 @@ ABAProdUptake::production (const Units& units,
 }
 
 void 
-ABAProdUptake::initialize (const Units& units, Treelog& msg)
+ABAProdUptake::initialize (Treelog& msg)
 { expr->initialize (units, scope, msg); }
 
 bool 
-ABAProdUptake::check (const Units& units, Treelog& msg) const
+ABAProdUptake::check (Treelog& msg) const
 {
   bool ok = true;
 

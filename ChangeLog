@@ -1,10 +1,27 @@
+2018-07-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* log_bbch.C: Read BBCH file.
+
+	* phenology_std.C (modify_DS): New parameter.
+
+2018-07-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* sample/test-minimize.dai: Update to changes in other files.
+
+2018-07-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* log_bbch.C: New model.
+	* Makefile (MODELS): Add it.
+
+	* daisy.h: Removed unused forward declarations.
+
 2018-05-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.64 released.
 
 2018-05-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* geometry.C, geometry.g (add_layer): Take 'Check' argument.
+	* geometry.C, geometry.h (add_layer): Take 'Check' argument.
 	* chemical_std.C, soil_water.C, soil_heat.C: Update callers.
 
 2018-05-01  Per Abrahamsen  <per.abrahamsen@gmail.com>

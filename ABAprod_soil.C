@@ -44,7 +44,7 @@ struct ABAProdSoil : public ABAProd
   const std::unique_ptr<Number> expr;
   
   // Solve.
-  void production (const Units&, const Geometry&, const SoilWater&,
+  void production (const Geometry&, const SoilWater&,
 		   const std::vector<double>& S /* [cm^3/cm^3/h] */,
 		   const std::vector<double>& L /* [cm/cm^3] */,
 		   std::vector<double>& ABA /* [g/cm^3/h] */,
@@ -53,8 +53,8 @@ struct ABAProdSoil : public ABAProd
   { }
 
   // Create and Destroy.
-  void initialize (const Units&, Treelog&);
-  bool check (const Units&, Treelog&) const;
+  void initialize (Treelog&);
+  bool check (Treelog&) const;
   ABAProdSoil (const BlockModel& al);
   ~ABAProdSoil ();
 };
@@ -72,8 +72,7 @@ const symbol
 ABAProdSoil::ABA_unit ("g/cm^3/h");
 
 void
-ABAProdSoil::production (const Units& units, 
-                         const Geometry& geo, const SoilWater& soil_water,
+ABAProdSoil::production (const Geometry& geo, const SoilWater& soil_water,
 			 const std::vector<double>& S /* [cm^3/cm^3/h] */,
 			 const std::vector<double>& L /* [cm/cm^3] */,
 			 std::vector<double>& ABA    /* [g/cm^3/h] */,
@@ -104,11 +103,11 @@ ABAProdSoil::production (const Units& units,
 }
 
 void 
-ABAProdSoil::initialize (const Units& units, Treelog& msg)
+ABAProdSoil::initialize (Treelog& msg)
 { expr->initialize (units, scope, msg); }
 
 bool 
-ABAProdSoil::check (const Units& units, Treelog& msg) const
+ABAProdSoil::check (Treelog& msg) const
 {
   bool ok = true;
   

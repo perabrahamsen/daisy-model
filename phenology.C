@@ -64,6 +64,14 @@ bool
 Phenology::mature () const
 { return DS >= 2.0; }
 
+bool
+Phenology::initialize (const Scope&, Treelog&)
+{ return true; }
+
+bool
+Phenology::check (const Scope&, Treelog&) const
+{ return true; }
+
 Phenology::Phenology (const BlockModel& al)
   : ModelDerived (al.type_name ()),
     // State.

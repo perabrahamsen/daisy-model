@@ -53,11 +53,14 @@
 #include "frame.h"
 #include "block_model.h"
 #include "rubiscoN.h"
+#include "metalib.h"
 #include <sstream>
 #include <numeric>
 
 struct CropStandard : public Crop
 {
+  const Metalib& metalib;
+  
   // Content.
   const std::unique_ptr<Seed> seed;
   const std::unique_ptr<RootSystem> root_system;
@@ -136,21 +139,21 @@ struct CropStandard : public Crop
   { return canopy->EpFactorWet (DS ()); }
   void CanopyStructure ()
   { canopy->CanopyStructure (development->DS); }
-  double ActualWaterUptake (const Units& units, double Ept, 
+  double ActualWaterUptake (double Ept, 
                             const Geometry& geo,
 			    const Soil& soil, const SoilWater& soil_water,
 			    const double EvapInterception, const double dt, 
 			    Treelog& msg)
-  { return root_system->water_uptake (units, Ept, geo, soil, soil_water, 
+  { return root_system->water_uptake (Ept, geo, soil, soil_water, 
                                       EvapInterception, 
                                       dt, msg); }
   void force_production_stress  (double pstress)
   { root_system->production_stress = pstress; }
 
   // Simulation.
-  void find_stomata_conductance (const Units&, const Time& time, 
+  void find_stomata_conductance (const Time& time, 
                                  const Bioclimate&, double dt, Treelog&);
-  void tick (const Metalib&, const Time& time, const Bioclimate&, double ForcedCAI,
+  void tick (const Scope&, const Time& time, const Bioclimate&, double ForcedCAI,
              const Geometry& geo, const Soil&, const SoilHeat&,
              SoilWater&, Chemistry&, OrganicMatter&,
              double& residuals_DM,
@@ -209,17 +212,15 @@ struct CropStandard : public Crop
   { return root_system->Density; }
 
   // Create and Destroy.
-  void initialize (const Metalib& metalib, 
-                   const Units&, const Geometry& geometry, 
+  void initialize (const Scope&, const Geometry& geometry, 
                    double row_width, double row_pos, double seed,
                    OrganicMatter&, double SoilLimit, const Time&, Treelog&);
-  void initialize (const Metalib& metalib, 
-                   const Units&, const Geometry&, OrganicMatter&, 
+  void initialize (const Scope&, const Geometry&, OrganicMatter&, 
                    double SoilLimit, const Time&, Treelog&);
-  void initialize_shared (const Metalib& metalib, 
+  void initialize_shared (const Scope&,
                           const Geometry&, OrganicMatter&, 
                           double SoilLimit, const Time&, Treelog&);
-  bool check (const Units&, const Geometry&, Treelog&) const;
+  bool check (const Scope&, const Geometry&, Treelog&) const;
   CropStandard (const BlockModel& vl);
   ~CropStandard ();
 };
@@ -254,8 +255,7 @@ CropStandard::SOrg_DM () const
 { return production.WSOrg * 10.0 /* [g/m^2 -> kg/ha] */;}
 
 void
-CropStandard::initialize (const Metalib& metalib, 
-                          const Units& units, const Geometry& geo, 
+CropStandard::initialize (const Scope& scope, const Geometry& geo, 
                           const double row_width, const double row_pos, 
                           const double seed_w,
                           OrganicMatter& organic_matter,
@@ -263,26 +263,25 @@ CropStandard::initialize (const Metalib& metalib,
                           const Time& now, Treelog& msg)
 {
   TREELOG_MODEL (msg);
-  root_system->initialize (metalib, geo, row_width, row_pos, msg);
+  root_system->initialize (geo, row_width, row_pos, msg);
   seed->initialize (seed_w, msg);
-  initialize_shared (metalib, geo, organic_matter, SoilLimit, now, msg);
+  initialize_shared (scope, geo, organic_matter, SoilLimit, now, msg);
 }
 
 void
-CropStandard::initialize (const Metalib& metalib,
-                          const Units& units, const Geometry& geo, 
+CropStandard::initialize (const Scope& scope, const Geometry& geo, 
                           OrganicMatter& organic_matter,
                           const double SoilLimit,
                           const Time& now, Treelog& msg)
 {
   TREELOG_MODEL (msg);
-  root_system->initialize (units, geo, msg);
+  root_system->initialize (geo, msg);
   seed->initialize (-42.42e42, msg);
-  initialize_shared (metalib, geo, organic_matter, SoilLimit, now, msg);
+  initialize_shared (scope, geo, organic_matter, SoilLimit, now, msg);
 }
 
 void
-CropStandard::initialize_shared (const Metalib& metalib, const Geometry& geo, 
+CropStandard::initialize_shared (const Scope& scope, const Geometry& geo, 
                                  OrganicMatter& organic_matter,
                                  const double SoilLimit,
                                  const Time& now, Treelog& msg)
@@ -314,7 +313,7 @@ CropStandard::initialize_shared (const Metalib& metalib, const Geometry& geo,
 }
 
 bool
-CropStandard::check (const Units& units, const Geometry& geo, 
+CropStandard::check (const Scope&, const Geometry& geo, 
                      Treelog& msg) const
 {
   TREELOG_MODEL (msg);
@@ -322,7 +321,7 @@ CropStandard::check (const Units& units, const Geometry& geo,
   bool ok = true;
   if (!seed->check (msg))
     ok = false;
-  if (!root_system->check (units, geo, msg))
+  if (!root_system->check (geo, msg))
     ok = false;
   if (seed->initial_N () <= 0.0 && production.NCrop <= 0.0)
     {
@@ -334,7 +333,7 @@ You must specify initial N content in either 'Prod' or 'Seed'");
 }
 
 void
-CropStandard::find_stomata_conductance (const Units& units, const Time& time,
+CropStandard::find_stomata_conductance (const Time& time,
                                         const Bioclimate& bioclimate,
                                         const double dt, Treelog& msg)
 {
@@ -438,8 +437,8 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
             = bioclimate.shadow_boundary_layer_water_conductivity ()
             / (total_LAI * (1.0 - sun_LAI_fraction_total));
           
-          Ass += shadow->assimilate (units,
-                                     ABA_xylem, crown_potential, 
+          Ass += shadow->assimilate (metalib.units (),
+				     ABA_xylem, crown_potential, 
                                      canopy_vapour_pressure, gbw_shadow,
                                      CO2_atm, O2_atm, Ptot,
                                      bioclimate.daily_air_temperature(), 
@@ -455,7 +454,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
           const double gbw_sun          // [m/s leaf]
             = bioclimate.sun_boundary_layer_water_conductivity ()
             / (total_LAI * sun_LAI_fraction_total);
-          Ass += sunlit->assimilate (units,
+          Ass += sunlit->assimilate (metalib.units (),
                                      ABA_xylem, crown_potential, 
                                      canopy_vapour_pressure, gbw_sun, 
                                      CO2_atm, O2_atm, Ptot,
@@ -480,7 +479,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
         = (bioclimate.shadow_boundary_layer_water_conductivity ()
            + bioclimate.sun_boundary_layer_water_conductivity ())
         / total_LAI;
-      Ass += reserved->assimilate (units,
+      Ass += reserved->assimilate (metalib.units (),
                                    ABA_xylem, crown_potential, 
                                    canopy_vapour_pressure, gbw_total,
                                    CO2_atm, O2_atm, Ptot,
@@ -496,7 +495,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
 }
 
 void
-CropStandard::tick (const Metalib& metalib, 
+CropStandard::tick (const Scope& scope, 
                     const Time& time, const Bioclimate& bioclimate, 
                     const double ForcedCAI,
                     const Geometry& geo, const Soil& soil, 
@@ -548,8 +547,8 @@ CropStandard::tick (const Metalib& metalib,
       const double h_middle 
         = geo.content_height (soil_water, &SoilWater::h,
                               -root_system->Depth/2.);
-      development->emergence (h_middle, root_system->soil_temperature, 
-                              daystep.total_hours ());
+      development->emergence (scope, h_middle, root_system->soil_temperature, 
+                              daystep.total_hours (), msg);
       if (DS >= 0)
 	{
           emerge_time = time;
@@ -657,7 +656,7 @@ CropStandard::tick (const Metalib& metalib,
   canopy->tick (WLeaf, production.WSOrg, production.WStem, 
                DS, ForcedCAI < 0.0 ? seed_CAI : ForcedCAI);
 
-  development->tick_daily (bioclimate.daily_air_temperature (), 
+  development->tick_daily (scope, bioclimate.daily_air_temperature (), 
                            production.shoot_growth (), production, 
                            *vernalization, harvesting->cut_stress, msg);
   if (DS >= 1.0 && flowering_time == Time::null ())
@@ -875,6 +874,7 @@ find_WSE (const BlockModel& al, Photo& photo)
 
 CropStandard::CropStandard (const BlockModel& al)
   : Crop (al),
+    metalib (al.metalib ()),
     seed (Librarian::build_item<Seed> (al, "Seed")),
     root_system (submodel<RootSystem> (al, "Root")),
     canopy (submodel<CanopyStandard> (al, "Canopy")),

@@ -116,7 +116,7 @@ public:
   { return canopy->EpFactorWet (DS ()); }
   void CanopyStructure ();
   void CropCAI ();
-  double ActualWaterUptake (const Units&, double Ept, const Geometry& geo,
+  double ActualWaterUptake (double Ept, const Geometry& geo,
                             const Soil&, const SoilWater&,
 			    double EvapInterception,
                             double dt, Treelog&);
@@ -124,7 +124,8 @@ public:
 
   // Simulation.
 public:
-  void tick (const Metalib&, const Time& time, const Bioclimate&, double ForcedCAI,
+  void tick (const Scope&,
+	     const Time& time, const Bioclimate&, double ForcedCAI,
              const Geometry& geo, const Soil&, const SoilHeat&,
              SoilWater&, Chemistry&, OrganicMatter&,
              double& residuals_DM,
@@ -169,14 +170,12 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Metalib& metalib, 
-                   const Units&, const Geometry& geo, 
+  void initialize (const Scope&, const Geometry& geo, 
                    double row_width, double row_pos, double seed,
                    OrganicMatter&, double SoilLimit, const Time&, Treelog&);
-  void initialize (const Metalib& metalib, 
-                   const Units&, const Geometry& geo, 
+  void initialize (const Scope&, const Geometry& geo, 
                    OrganicMatter&, double SoilLimit, const Time&, Treelog&);
-  bool check (const Units& units, const Geometry& geo, Treelog&) const;
+  bool check (const Scope&, const Geometry& geo, Treelog&) const;
   CropSimple (const BlockModel& vl);
   ~CropSimple ();
 };
@@ -207,13 +206,13 @@ CropSimple::CropCAI ()
 }
 
 double
-CropSimple::ActualWaterUptake (const Units& units, double Ept,
+CropSimple::ActualWaterUptake (double Ept,
                                const Geometry& geo,
 			       const Soil& soil, const SoilWater& soil_water,
 			       const double EvapInterception, 
                                const double dt, Treelog& msg)
 {
-  return root_system->water_uptake (units, Ept, geo, 
+  return root_system->water_uptake (Ept, geo, 
                                     soil, soil_water, EvapInterception,
                                     dt, msg);
 }
@@ -223,7 +222,7 @@ CropSimple::force_production_stress  (double pstress)
 { root_system->production_stress = pstress; }
 
 void
-CropSimple::tick (const Metalib&, const Time& time, const Bioclimate& bioclimate, 
+CropSimple::tick (const Scope&, const Time& time, const Bioclimate& bioclimate, 
                   const double ForcedCAI,
                   const Geometry& geo, const Soil& soil,
 		  const SoilHeat& soil_heat,
@@ -413,8 +412,7 @@ CropSimple::total_C () const
 }
 
 void
-CropSimple::initialize (const Metalib& metalib, 
-                        const Units& units, const Geometry& geo, 
+CropSimple::initialize (const Scope&, const Geometry& geo, 
                         const double row_width, 
                         const double row_pos, 
                         const double seed,
@@ -424,25 +422,24 @@ CropSimple::initialize (const Metalib& metalib,
   TREELOG_MODEL (msg);
   if (seed >= 0)
     msg.warning ("Seed ignored by simple crop model");
-  root_system->initialize (metalib, geo, row_width, row_pos, msg);
+  root_system->initialize (geo, row_width, row_pos, msg);
   CropCAI ();
 }
 
 void
-CropSimple::initialize (const Metalib& metalib, 
-                        const Units& units, const Geometry& geo, 
+CropSimple::initialize (const Scope&, const Geometry& geo, 
                         OrganicMatter&, double /* SoilLimit */, 
                         const Time&, Treelog& msg)
 {
-  root_system->initialize (units, geo, msg);
+  root_system->initialize (geo, msg);
   CropCAI ();
 }
 
 bool
-CropSimple::check (const Units& units, const Geometry& geo, Treelog& msg) const
+CropSimple::check (const Scope&, const Geometry& geo, Treelog& msg) const
 {
   bool ok = true;
-  if (!root_system->check (units, geo, msg))
+  if (!root_system->check (geo, msg))
     ok = false;
   return ok;
 }

@@ -42,7 +42,6 @@
 #include "vegetation.h"
 #include "litter.h"
 #include "time.h"
-#include "units.h"
 #include "check.h"
 #include "fao.h"
 #include "librarian.h"
@@ -144,7 +143,7 @@ struct BioclimateStandard : public Bioclimate
   double wind_speed_field_;     // wind speed at screen height above the canopy [m/s]
   double wind_speed_weather;    // measured wind speed [m/s]
 
-  void WaterDistribution (const Units&, const Time&,
+  void WaterDistribution (const Time&,
                           Surface& surface, const Weather& weather, 
                           Vegetation& vegetation, const Litter& litter, 
                           const Movement&,
@@ -211,7 +210,7 @@ struct BioclimateStandard : public Bioclimate
   Weatherdata::surface_t old_surface;
 
   // Simulation
-  void tick (const Units&, const Time&, Surface&, const Weather&, 
+  void tick (const Time&, Surface&, const Weather&, 
              Vegetation&, const Litter& litter, 
              const Movement&, const Geometry&,
              const Soil&, SoilWater&, const SoilHeat&, const double T_bottom,
@@ -705,8 +704,7 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation, const d
 }
 
 void
-BioclimateStandard::WaterDistribution (const Units& units,
-                                       const Time& time, Surface& surface,
+BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
                                        const Weather& weather, 
                                        Vegetation& vegetation,
                                        const Litter& litter,
@@ -1015,7 +1013,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
   // Actual transpiration, based on remaining energy.
   crop_ea_
-    = vegetation.transpiration (units, crop_ep_, canopy_ea_, geo, soil,
+    = vegetation.transpiration (crop_ep_, canopy_ea_, geo, soil,
                                 soil_water, dt, msg);
   daisy_assert (crop_ea_ >= 0.0);
   crop_ea_soil = crop_ea_;       // Remember original value.
@@ -1055,7 +1053,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
       // Find stomata conductance based on ABA and crown potential
       // from last attempt at crop transpiration.
-      vegetation.find_stomata_conductance (units, time, *this, dt, svat_msg);
+      vegetation.find_stomata_conductance (time, *this, dt, svat_msg);
       const double new_weight = 0.0;
       const double gs_shadow_new = vegetation.shadow_stomata_conductance ();
       gs_shadow_sum += gs_shadow_new;
@@ -1125,7 +1123,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
       // Calculate new crop transpiration based on latest SVAT guess.
       crop_ea_
-        = vegetation.transpiration (units, crop_ea_svat, canopy_ea_, geo, soil,
+        = vegetation.transpiration (crop_ea_svat, canopy_ea_, geo, soil,
                                     soil_water, dt, msg);
       daisy_assert (crop_ea_ >= 0.0);
     }
@@ -1164,7 +1162,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
 }  
 
 void 
-BioclimateStandard::tick (const Units& units, const Time& time, 
+BioclimateStandard::tick (const Time& time, 
                           Surface& surface, const Weather& weather,  
                           Vegetation& vegetation, const Litter& litter,
                           const Movement& movement,
@@ -1212,7 +1210,7 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   RadiationDistribution (vegetation, pF, sin_beta_, msg);
 
   // Distribute water among canopy, snow, and soil.
-  WaterDistribution (units, time, surface, weather, vegetation, litter,
+  WaterDistribution (time, surface, weather, vegetation, litter,
                      movement, geo, soil, soil_water, soil_heat, T_bottom, 
 		     dt, msg);
 

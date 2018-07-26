@@ -115,10 +115,10 @@ public:
                        const double Theta, const double start,
                        const double factor, const int intervals,
                        Treelog& msg) const;
-  void sow (const Metalib&, const FrameModel&, 
+  void sow (const Scope&, const FrameModel&, 
             double row_width, double row_pos, double seed,
             const Time&, Treelog&);
-  void sow (const Metalib&, Crop&, 
+  void sow (const Scope&, Crop&, 
             double row_width, double row_pos, double seed,
             const Time&, Treelog&);
   void ridge (const FrameSubmodel& al);
@@ -224,22 +224,34 @@ ColumnStandard::sorption_table (const size_t cell,
                              msg); }
 
 void 
-ColumnStandard::sow (const Metalib& metalib, const FrameModel& al, 
+ColumnStandard::sow (const Scope& parent_scope, const FrameModel& al, 
                      const double row_width, const double row_pos,
                      const double seed,
                      const Time& time, Treelog& msg)
-{ vegetation->sow (metalib, al, row_width, row_pos, seed,
+{
+  // Scope.
+  daisy_assert (extern_scope);
+  ScopeMulti scope (*extern_scope, parent_scope);
+
+  vegetation->sow (scope, al, row_width, row_pos, seed,
                    geometry, *organic_matter, -soil->MaxRootingHeight (),
-                   seed_N, seed_C, time, msg); }
+                   seed_N, seed_C, time, msg);
+}
 
 void 
-ColumnStandard::sow (const Metalib& metalib, Crop& crop, 
+ColumnStandard::sow (const Scope& parent_scope, Crop& crop, 
                      const double row_width, const double row_pos,
                      const double seed,
                      const Time& time, Treelog& msg)
-{ vegetation->sow (metalib, crop, row_width, row_pos, seed,
+{
+  // Scope.
+  daisy_assert (extern_scope);
+  ScopeMulti scope (*extern_scope, parent_scope);
+
+  vegetation->sow (scope, crop, row_width, row_pos, seed,
                    geometry, *organic_matter, -soil->MaxRootingHeight (),
-                   seed_N, seed_C, time, msg); }
+                   seed_N, seed_C, time, msg);
+}
 
 
 void 
@@ -750,7 +762,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
 
   const double old_pond 
     = bioclimate->get_snow_storage () + surface.ponding_average ();
-  bioclimate->tick (units, time, surface, my_weather,
+  bioclimate->tick (time, surface, my_weather,
                     *vegetation, *litter, *movement,
                     geometry, *soil, *soil_water, *soil_heat, T_bottom,
                     dt, msg);
@@ -758,7 +770,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
   // Add deposition. 
   chemistry->deposit (bioclimate->deposit (), msg);
 
-  vegetation->tick (metalib, time, *bioclimate, geometry, *soil, 
+  vegetation->tick (scope, time, *bioclimate, geometry, *soil, 
                     *soil_heat, *soil_water, *chemistry, *organic_matter, 
                     residuals_DM, residuals_N_top, residuals_C_top, 
                     residuals_N_soil, residuals_C_soil, dt, msg);
@@ -913,7 +925,7 @@ ColumnStandard::check (const Weather* global_weather,
   }
   {
     Treelog::Open nest (msg, "Vegetation");
-    if (!vegetation->check (units, geometry, msg))
+    if (!vegetation->check (scope, geometry, msg))
       ok = false;
   }
   {
@@ -1149,8 +1161,7 @@ ColumnStandard::initialize (const Metalib& metalib,
                               geometry, *soil, *soilph, 
                               *soil_water, *soil_heat, 
                               T_avg, msg);
-  vegetation->initialize (metalib, 
-                          units, time, geometry, *soil, *organic_matter, msg);
+  vegetation->initialize (scope, time, geometry, *soil, *organic_matter, msg);
   litter->initialize (organic_matter->top_DM ());
 
   // Soil conductivity and capacity logs.

@@ -39,6 +39,7 @@
 
 struct VegetationCrops : public Vegetation
 {
+  const Metalib& metalib;
   const Library& library;
 
   // Types.
@@ -165,14 +166,14 @@ struct VegetationCrops : public Vegetation
 
   // Simulation.
   void reset_canopy_structure (Treelog&);
-  double transpiration (const Units& units, double potential_transpiration,
+  double transpiration (double potential_transpiration,
 			double canopy_evaporation,
                         const Geometry& geo,
 			const Soil& soil, const SoilWater& soil_water, 
 			double dt, Treelog&);
-  void find_stomata_conductance (const Units&, const Time& time, 
+  void find_stomata_conductance (const Time& time, 
                                  const Bioclimate&, double dt, Treelog&);
-  void tick (const Metalib&, const Time& time, const Bioclimate&, 
+  void tick (const Scope&, const Time& time, const Bioclimate&, 
              const Geometry& geo, const Soil&, const SoilHeat&,
              SoilWater&, Chemistry&, OrganicMatter&,
              double& residuals_DM,
@@ -224,7 +225,7 @@ struct VegetationCrops : public Vegetation
               std::vector<double>& residuals_C_soil,
               Treelog&);
   void cleanup_canopy (symbol crop_name, Treelog&);
-  void sow (const Metalib&, const FrameModel& al, 
+  void sow (const Scope&, const FrameModel& al, 
             const double row_width /* [cm] */,
             const double row_pos /* [cm] */,
             const double seed /* [kg w.w./ha] */,
@@ -232,7 +233,7 @@ struct VegetationCrops : public Vegetation
             double SoilLimit,
             double& seed_N /* kg/ha */, double& seed_C /* kg/ha */,
             const Time&, Treelog&);
-  void sow (const Metalib&, Crop& crop, 
+  void sow (const Scope&, Crop& crop, 
             const double row_width /* [cm] */,
             const double row_pos /* [cm] */,
             const double seed /* [kg w.w./ha] */,
@@ -243,11 +244,10 @@ struct VegetationCrops : public Vegetation
   void output (Log&) const;
 
   // Create and destroy.
-  void initialize (const Metalib& metalib, 
-                   const Units&, const Time&, const Geometry& geo,
+  void initialize (const Scope&, const Time&, const Geometry& geo,
                    const Soil& soil, OrganicMatter&,
                    Treelog& msg);
-  bool check (const Units& units, const Geometry&, Treelog& msg) const;
+  bool check (const Scope&, const Geometry&, Treelog& msg) const;
   static CropList build_crops (const BlockModel& block, const std::string& key);
   VegetationCrops (const BlockModel&);
   ~VegetationCrops ();
@@ -432,8 +432,7 @@ VegetationCrops::root_density (symbol name) const
 }
 
 void 
-VegetationCrops::find_stomata_conductance (const Units& units, 
-                                           const Time& time, 
+VegetationCrops::find_stomata_conductance (const Time& time, 
                                            const Bioclimate& bioclimate,
                                            double dt, Treelog& msg)
 {
@@ -447,14 +446,14 @@ VegetationCrops::find_stomata_conductance (const Units& units,
        crop != crops.end();
        crop++)
     {
-      (*crop)->find_stomata_conductance (units, time, bioclimate, dt, msg);
+      (*crop)->find_stomata_conductance (time, bioclimate, dt, msg);
       shadow_stomata_conductance_ += (*crop)->shadow_stomata_conductance ();
       sunlit_stomata_conductance_ += (*crop)->sunlit_stomata_conductance ();
     }
 }
 
 void 
-VegetationCrops::tick (const Metalib& metalib, 
+VegetationCrops::tick (const Scope& scope, 
                        const Time& time, const Bioclimate& bioclimate, 
                        const Geometry& geo, const Soil& soil,
 		       const SoilHeat& soil_heat,
@@ -495,7 +494,7 @@ VegetationCrops::tick (const Metalib& metalib,
       const double my_force = use_force ? (MyLAI / SimLAI) * ForcedLAI : -1.0;
       
       // Tick.
-      (*crop)->tick (metalib, time, bioclimate, my_force, geo, soil, soil_heat, 
+      (*crop)->tick (scope, time, bioclimate, my_force, geo, soil, soil_heat, 
                      soil_water, chemistry, organic_matter, 
                      residuals_DM, residuals_N_top, residuals_C_top,
 		     residuals_N_soil, residuals_C_soil, dt, msg);
@@ -627,8 +626,7 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
 }
 
 double
-VegetationCrops::transpiration (const Units& units,
-                                const double potential_transpiration,
+VegetationCrops::transpiration (const double potential_transpiration,
 				const double canopy_evaporation,
                                 const Geometry& geo,
 				const Soil& soil, 
@@ -650,8 +648,7 @@ VegetationCrops::transpiration (const Units& units,
 	   crop != crops.end();
 	   crop++)
 	{
-	  value += (*crop)->ActualWaterUptake (units,
-                                               pt_per_LAI * (*crop)->LAI (), 
+	  value += (*crop)->ActualWaterUptake (pt_per_LAI * (*crop)->LAI (), 
 					       geo, soil, soil_water, 
 					       canopy_evaporation, 
 					       dt, msg);
@@ -888,7 +885,7 @@ VegetationCrops::cleanup_canopy (const symbol crop_name, Treelog& msg)
 }
 
 void
-VegetationCrops::sow (const Metalib& metalib, const FrameModel& al,
+VegetationCrops::sow (const Scope& scope, const FrameModel& al,
                       const double row_width,
                       const double row_pos,
                       const double seed,
@@ -904,12 +901,12 @@ VegetationCrops::sow (const Metalib& metalib, const FrameModel& al,
       msg.error ("Sowing failed");
       return;
     }
-  sow (metalib, *crop, row_width, row_pos, seed, geo, organic_matter,
+  sow (scope, *crop, row_width, row_pos, seed, geo, organic_matter,
        SoilLimit, seed_N, seed_C, time, msg);
 }
 
 void
-VegetationCrops::sow (const Metalib& metalib, Crop& crop,
+VegetationCrops::sow (const Scope& scope, Crop& crop,
                       const double row_width,
                       const double row_pos,
                       const double seed,
@@ -926,11 +923,9 @@ VegetationCrops::sow (const Metalib& metalib, Crop& crop,
     if ((*i)->objid == name)
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
-  const Units& units = metalib.units ();
-  crop.initialize (metalib, 
-                    units, geo, row_width, row_pos, seed, organic_matter,
-                    SoilLimit, time, msg);
-  if (!crop.check (units, geo, msg))
+  crop.initialize (scope, geo, row_width, row_pos, seed, organic_matter,
+		   SoilLimit, time, msg);
+  if (!crop.check (scope, geo, msg))
     {
       msg.error ("Sow failed");
       return;
@@ -965,30 +960,27 @@ VegetationCrops::output (Log& log) const
 }
 
 void
-VegetationCrops::initialize (const Metalib& metalib, 
-                             const Units& units, 
-                             const Time& time, const Geometry& geo,
+VegetationCrops::initialize (const Scope& scope, const Time& time, const Geometry& geo,
                              const Soil& soil, 
 			     OrganicMatter& organic_matter,
                              Treelog& msg)
 {
   const double SoilLimit = -soil.MaxRootingHeight ();
   for (unsigned int i = 0; i < crops.size (); i++)
-    crops[i]->initialize (metalib, 
-                          units, geo, organic_matter, SoilLimit, time, msg);
+    crops[i]->initialize (scope, geo, organic_matter, SoilLimit, time, msg);
 
   reset_canopy_structure (msg);
 }
 
 bool 
-VegetationCrops::check (const Units& units, const Geometry& geo,
+VegetationCrops::check (const Scope& scope, const Geometry& geo,
                         Treelog& msg) const
 {
   bool ok = true;
   for (size_t i = 0; i < crops.size (); i++)
     {
       Treelog::Open nest (msg, "crop:' " + crops[i]->objid + "'");
-      crops[i]->check (units, geo, msg);
+      crops[i]->check (scope, geo, msg);
     }
   return ok;
 }
@@ -1002,7 +994,8 @@ VegetationCrops::build_crops (const BlockModel& al, const std::string& key)
 
 VegetationCrops::VegetationCrops (const BlockModel& al)
   : Vegetation (al),
-    library (al.metalib ().library (Crop::component)),
+    metalib (al.metalib ()),
+    library (metalib.library (Crop::component)),
     crops (build_crops (al, "crops")),
     N_ (0.0),
     N_fixated_ (0.0),

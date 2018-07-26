@@ -34,7 +34,8 @@ ABAProd::library_id () const
 }
 
 ABAProd::ABAProd (const BlockModel& al)
-  : ModelDerived (al.type_name ())
+  : ModelDerived (al.type_name ()),
+    units (al.units ())
 { }
 
 ABAProd::~ABAProd ()
@@ -53,7 +54,7 @@ The 'ABAproduction' component calculates the prod of ABA in soil.")
 struct ABAProdNone : public ABAProd
 {
   // Solve.
-  void production (const Units&, const Geometry&, const SoilWater&,
+  void production (const Geometry&, const SoilWater&,
 		   const std::vector<double>& /* [cm^3/cm^3] */,
 		   const std::vector<double>& /* [cm/cm^3] */,
 		   std::vector<double>& ABA /* [g/cm/h] */,
@@ -63,9 +64,9 @@ struct ABAProdNone : public ABAProd
   { }
 
   // Create and Destroy.
-  void initialize (const Units&, Treelog&)
+  void initialize (Treelog&)
   { }
-  bool check (const Units&, Treelog&) const
+  bool check (Treelog&) const
   { return true; }
   ABAProdNone (const BlockModel& al)
     : ABAProd (al)

@@ -3,6 +3,9 @@
 (description "Demonstrate automatic parameter calibration.")
 
 ;; Use standard parameterizations.
+(input file "fertilizer.dai")
+(input file "tillage.dai")
+(input file "crop.dai")
 (input file "dk-management.dai")
 (input file "log-std.dai")
 
@@ -28,10 +31,10 @@
 ;; This is our measured data. Creates an R^2 value for comparison.
 (defsummary compare Rsqr
   (measure ((time 1986 12 31 23)        ;Measurement time.
-            (data ("Soil water" 480 497) ;Measured values. 
+            (data ("Soil matrix water" 480 497) ;Measured values. 
                   ("Surface water" 6.4 6.5))) ;We may have any number.
            ((time 1987 1 31 23)
-            (data ("Soil water" 495)
+            (data ("Soil matrix water" 495)
                   ("Surface water" 7.9 8.0)))))
            
 (defprogram MySim Daisy

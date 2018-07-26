@@ -95,7 +95,7 @@ RootSystem::potential_water_uptake (const double h_x,
 }
 
 double
-RootSystem::water_uptake (const Units& units, double Ept_,
+RootSystem::water_uptake (double Ept_,
                           const Geometry& geo,
                           const Soil& soil,
                           const SoilWater& soil_water,
@@ -210,7 +210,7 @@ RootSystem::water_uptake (const Units& units, double Ept_,
     water_stress = 1.0 - (total + EvapInterception) / (Ept + EvapInterception);
 
   // ABA production.
-  ABAprod->production (units, geo, soil_water, H2OExtraction, Density,
+  ABAprod->production (geo, soil_water, H2OExtraction, Density,
                        ABAExtraction, msg);
   const double mm_per_cm = 10.0; // [mm/cm]
   if (H2OUpt > 0.0)
@@ -372,8 +372,7 @@ RootSystem::output (Log& log) const
 }
 
 void
-RootSystem::initialize (const Metalib& metalib, 
-                        const Geometry& geo, const double row_width, 
+RootSystem::initialize (const Geometry& geo, const double row_width, 
                         const double row_pos, Treelog& msg)
 {
   const bool is_row_crop = row_width > 0.0;
@@ -385,14 +384,14 @@ RootSystem::initialize (const Metalib& metalib,
     rootdens = Rootdens::create_uniform (metalib, msg);
 
   rootdens->initialize (geo, row_width, row_pos, msg);
-  initialize (metalib.units (), geo, msg);
+  initialize (geo, msg);
 }
 
 void
-RootSystem::initialize (const Units& units, const Geometry& geo, Treelog& msg)
+RootSystem::initialize (const Geometry& geo, Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
-  ABAprod->initialize (units, msg);
+  ABAprod->initialize (msg);
   NH4_uptake->initialize (geo, msg);
   NO3_uptake->initialize (geo, msg);
   while (Density.size () < cell_size)
@@ -408,11 +407,11 @@ RootSystem::initialize (const Units& units, const Geometry& geo, Treelog& msg)
 }
 
 bool
-RootSystem::check (const Units& units, const Geometry& geo, Treelog& msg) const
+RootSystem::check (const Geometry& geo, Treelog& msg) const
 {
   const size_t cell_size = geo.cell_size ();
   bool ok = true;
-  if (!ABAprod->check (units, msg))
+  if (!ABAprod->check (msg))
     ok = false;
   if (Density.size () > 0 && Density.size () != cell_size)
     {
@@ -547,7 +546,8 @@ get_PotRtDpt (const Block& al)
 }
 
 RootSystem::RootSystem (const Block& al)
-  : rootdens (al.check ("rootdens") 
+  : metalib (al.metalib ()),
+    rootdens (al.check ("rootdens") 
               ? Librarian::build_item<Rootdens> (al, "rootdens")
               : NULL),
     ABAprod (Librarian::build_item<ABAProd> (al, "ABAprod")),

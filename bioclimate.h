@@ -40,7 +40,6 @@ class Time;
 class Treelog;
 class Block;
 class BlockModel;
-class Units;
 class IM;
 
 class Bioclimate : public ModelFramed
@@ -52,8 +51,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Units&, 
-                     const Time&, Surface&, const Weather&, Vegetation&, 
+  virtual void tick (const Time&, Surface&, const Weather&, Vegetation&, 
                      const Litter& litter, const Movement&, const Geometry&,
 		     const Soil&, SoilWater&, const SoilHeat&, 
 		     const double T_bottom, 

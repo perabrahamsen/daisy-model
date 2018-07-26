@@ -101,7 +101,7 @@ Crop::force_production_stress  (double)
 { }
 
 void 
-Crop::find_stomata_conductance (const Units&, const Time& time, 
+Crop::find_stomata_conductance (const Time& time, 
                                 const Bioclimate&,
                                 double dt, Treelog&)
 { }
