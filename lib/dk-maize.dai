@@ -1,7 +1,7 @@
 (defcrop "Silomajs" default
-  "Majs med årsudbytter der svarer til gennemsnittet for dansk landbrug.
+  "Majs med aarsudbytter der svarer til gennemsnittet for dansk landbrug.
 Skabt af Christian Thirup for Daisy standardiseringsprojektet.
-Baseret på Roskilde 74-76 ukendt varietet."
+Baseret paa Roskilde 74-76 ukendt varietet."
   (Devel default
       (EmrTSum  300)
       (DS_Emr   0.01)
@@ -13,7 +13,7 @@ Baseret på Roskilde 74-76 ukendt varietet."
 
   (LeafPhot original 
       (Fm 5.00); oprindelig 6.00
-      (DSEff (0.0 1.0) (0.3 1.0) (1.0 1.00)(2.0 1.00));N-udbytteniveau korrigeres ved forholdsmæssig op eller nedjustering af værdierne ved DS 1.0 og 2.0
+      (DSEff (0.0 1.0) (0.3 1.0) (1.0 1.00)(2.0 1.00));N-udbytteniveau korrigeres ved forholdsmaessig op eller nedjustering af vaerdierne ved DS 1.0 og 2.0
       (Qeff   0.0400)
     (TempEff (-20.0 0.001) (6.0 0.10) (10.0 1.00) (15.0 1.00) (20.0 1.00)))
 

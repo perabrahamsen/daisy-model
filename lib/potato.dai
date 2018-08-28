@@ -25,7 +25,7 @@
 ;; storage of the mother tuber.
 
 (defcrop "Potato; Koege" default
-  "Køge Project"
+  "Koege Project"
   (Devel default (EmrTSum  125)
          (DS_Emr   0.01)
          (DSRate1  0.007)

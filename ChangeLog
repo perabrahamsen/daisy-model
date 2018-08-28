@@ -1,3 +1,7 @@
+2018-08-28  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.65 released.
+
 2018-08-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* log_bbch2.C: New model.

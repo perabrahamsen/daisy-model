@@ -1,5 +1,5 @@
 (defcrop "Spring Wheat" default
-    (description "K›ge Project")
+    (description "Koege Project")
   (Devel default (EmrTSum  100)
       (DS_Emr   0.01)
       (DSRate1  0.040)

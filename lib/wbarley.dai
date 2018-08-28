@@ -95,7 +95,7 @@
 )
 
 (defcrop "Winter Barley; Koge" default
-    (description "Køge Project")
+    (description "Koege Project")
   (Devel default (EmrTSum  200)
       (DS_Emr   0.01)
       (DSRate1  0.022)

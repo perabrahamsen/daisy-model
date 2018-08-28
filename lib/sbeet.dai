@@ -1,5 +1,5 @@
 (defcrop "Sugar Beet" default
-    (description "K›ge Project")
+    (description "Koege Project")
   (Devel (EmrTSum  125)
       (DS_Emr   0.01)
       (DSRate1  0.007)
