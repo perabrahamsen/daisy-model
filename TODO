@@ -1,16 +1,48 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Jacob mini-kontrakt
+* RAINPROOF
 
-** Hvad skal leveres, hvornår skal der betales, hvor meget skal betales.
+** Setup
 
-* Dataflow diagram for RAINPROOF
+*** Check harvest
+
+*** Ret (column Fast)
+
+*** Github clone + add + commit + push
+
+*** Commit Daisy
+
+*** Jacob: git update Daisy on supercomputer
+
+*** Jacob og Jeanne: kør sim
+
+*** Combiner resultater
+
+*** Ecotox extract
+
+** Jacob mini-kontrakt
+
+* Spørg Jeanne og Stathis om fisk.
+
+* Maja PhD
+
+** Svar fra Dieter
+
+** Send til HR
 
 * Næste RAINPROOF SC møde
 
+** Face2face 12 december. Indhold?
+
 ** Milestone 2? Hvad gør vi?
 
-** DFF application window? 0-28
+Trifloxystrobin (forbudt i DK)
+
+Imidacloprid
+
+** DFF application mængde. Afhænger af BBCH.
+
+** DFF application windows SEGES vs etikket vs email
 
 ** Reverse engineer BBCH scale
 

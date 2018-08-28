@@ -151,6 +151,7 @@ struct LogBBCH : public LogDummy,
   // Checking to see if we should log this time step.
   bool match (const Daisy& daisy, Treelog& msg)
   {
+    int bbch_old = bbch_use;
     now = daisy.time ();
 
     while (lex->good () && (time_end == Time::null () || time_end < now))
@@ -177,7 +178,7 @@ struct LogBBCH : public LogDummy,
 	const symbol what = rest_of_line ();
 	
 	if (what != crop)
-	  time_begin = Time::null ();
+	  time_end = Time::null ();
       }
     if (!lex->good ())
       bbch_use = -99;
@@ -185,6 +186,14 @@ struct LogBBCH : public LogDummy,
       bbch_use = bbch_read;
     else
       bbch_use = bbch_read - 1;
+
+    if (bbch_old != bbch_use)
+      {
+	std::ostringstream tmp;
+	tmp << "BBCH = " << bbch_use;
+	msg.message (tmp.str ());
+      }
+
     return false;
   }
 

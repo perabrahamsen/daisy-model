@@ -597,7 +597,7 @@ Surface::evap_pond (const double dt, Treelog& msg) const	// [mm/h]
 
   if (ep >= 0.0)
     return ep;
-  if (ep < -1e-13)
+  if (ep < -1e-5)		// ca = 0.1 mm/y
     {
       Treelog::Open nest (msg, "Surface evap pond");
       std::ostringstream tmp;
