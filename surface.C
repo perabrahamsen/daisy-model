@@ -40,7 +40,9 @@ struct Surface::Implementation
 {
   // Content.
   const double temperature_change_rate; // [h^-1]
-  const double EpFactor;
+  const double EpFactor;		// []
+  const PLF EpFactor_SWE;	// [pF] -> []
+  double EpFactor_current;	// []
   const double albedo_wet;
   const double albedo_dry;
   const bool use_forced_pressure;
@@ -63,7 +65,7 @@ struct Surface::Implementation
   const double R_mixing;
   const double z_mixing;
   std::unique_ptr<Ridge> ridge_;
-
+  
   // UZ top.
   Surface::top_t top_type (const Geometry& geo, size_t edge) const;
   double q_top (const Geometry& geo, size_t edge, const double dt) const;
@@ -502,11 +504,16 @@ Surface::Implementation::tick (Treelog& msg,
     T = new_T;
 
   daisy_assert (T > -100.0 && T < 50.0);
+
+  // Adjust EpFactor after soil water.
+  const double pF 
+    = h2pF (geo.content_hood (soil_water, &SoilWater::h, Geometry::cell_above));
+  EpFactor_current = EpFactor * EpFactor_SWE (pF);
 }
 
 double 
 Surface::EpFactor () const
-{ return impl->EpFactor; }
+{ return impl->EpFactor_current; }
 
 double
 Surface::albedo (const Geometry& geo, 
@@ -690,6 +697,10 @@ See figure 4 in the cited paper.\n\
 The autumn value can be lower, due to muching.  With a crop factor of\n\
 1.2 a combined Kc of 1.15 is reached at LAI=5.",
                    "kjaersgaard2008crop");
+  frame.declare ("EpFactor_SWE",
+		 "pF", Attribute::None (), Attribute::Const, "\
+Effect of soil water on EpFactor.");
+  frame.set ("EpFactor_SWE", PLF::always_1 ());
   frame.declare ("albedo_dry", Attribute::None (), Check::non_negative (),
 	      Attribute::Const,
 	      "Albedo of dry soil (pF >= 3)");
@@ -753,6 +764,8 @@ Surface::Surface (const FrameSubmodel& al)
 Surface::Implementation::Implementation (const FrameSubmodel& al)
   : temperature_change_rate (al.number ("temperature_change_rate", -1.0)),
     EpFactor (al.number ("EpFactor")),
+    EpFactor_SWE (al.plf ("EpFactor_SWE")),
+    EpFactor_current (EpFactor),
     albedo_wet (al.number ("albedo_wet")),
     albedo_dry (al.number ("albedo_dry")),
     use_forced_pressure (al.check ("forced_pressure")),

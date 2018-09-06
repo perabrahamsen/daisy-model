@@ -1,38 +1,58 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* ML
+
+** Neural nodes
+
+** Save and restore model
+
+* Onsdag
+
+** Done Lars Kruse
+
+** DONE Aftal Merete + Bjarne formÃ¸de SC.
+
+** Done Osvaldo
+
+** DONE Maja
+
+** Done Jens
+
 * RAINPROOF
 
 ** Setup
 
 *** Jacob: git update Daisy on supercomputer
 
-*** Jacob og Jeanne: kør sim
+*** Jacob og Jeanne: kÃ¸r sim
 
 *** Combiner resultater
 
 *** Ecotox extract
 
+** ML
+
+*** Neural network
+
+*** Save network
+
 ** Jacob mini-kontrakt
 
-* Spørg Jeanne og Stathis om fisk.
+* NÃ¦ste RAINPROOF SC mÃ¸de
 
-* Maja PhD
+1) Event definitionen â€“ hvor lang recovery time er der? AltsÃ¥ hvor lang tid skal der vÃ¦re mellem to events fÃ¸r det kan defineres som to adskilte events?
 
-** Svar fra Dieter
-
-** Send til HR
-
-* Næste RAINPROOF SC møde
+2) om de har kendskab til diflufenican degradation pÃ¥ jord overfladen? Kan metaboliten AE-B107137 dannes der?
 
 ** Face2face 12 december. Indhold?
 
-** Milestone 2? Hvad gør vi?
+** Milestone 2? Hvad gÃ¸r vi?
 
 Trifloxystrobin (forbudt i DK)
 
 Imidacloprid
 
-** DFF application mængde. Afhænger af BBCH.
+** DFF application mÃ¦ngde. AfhÃ¦nger af BBCH.
 
 ** DFF application windows SEGES vs etikket vs email
 
@@ -44,26 +64,26 @@ Imidacloprid
 
 ** OM init
 
-* Skyethed med timeværdier?
+* Skyethed med timevÃ¦rdier?
 
 * Ny version af Hypres ark
 
-* Ny version af Charlottes afdræningstest.
+* Ny version af Charlottes afdrÃ¦ningstest.
 
-* Tidlig vækst
+* Tidlig vÃ¦kst
 
-Erstat DSLAI05 med Seed baseret tidlig vækst. Søren havde en formel,
+Erstat DSLAI05 med Seed baseret tidlig vÃ¦kst. SÃ¸ren havde en formel,
 men vi skal have en test setup.
 
 * Regression test
 
 * Daisy problemer
 
-** DMI's nye "nedbørskorrigering"
+** DMI's nye "nedbÃ¸rskorrigering"
 
-** Ny ligning for biopore til matrix flow fra Søren
+** Ny ligning for biopore til matrix flow fra SÃ¸ren
 
 ** Brug massebalance til at udregne (vertical) flux fra bunden.
 
-Husk drænnoder!
+Husk drÃ¦nnoder!
 

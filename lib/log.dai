@@ -2421,13 +2421,6 @@ Use \"*\" to log all added organic matter matter.")
                   (tag "C")
                   (spec fixed DOM-Element M))))
 
-(deflog "Drain Sink" column
-  (where "${colfid}drain_sink.dlf")
-  (when hourly)
-  (entries (array (path column "${column}" Groundwater pipe S)
-                  (handle sum)
-                  (dimension "cm^3/cm^3"))))
-
 (deflog "Drain Sink Water" column
   (where "${colfid}drain_sink_water.dlf")
   (when hourly)

@@ -1,3 +1,11 @@
+2018-09-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* lib/log.dai ("Drain Sink"): Removed.
+
+2018-08-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* surface.C (EpFactor_SWE): New parameter.
+
 2018-08-28  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.65 released.
