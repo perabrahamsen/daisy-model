@@ -269,21 +269,30 @@ struct ProgramHydraulic_table : public Program
   const std::unique_ptr<Horizon> horizon;
   const int intervals;
   const bool top_soil;
-
+  const bool print_Cw2;
+  const double max_pF;
+  
   bool run (Treelog& msg)
   {
     std::ostringstream tmp;
     tmp << "pressure\tpressure\tTheta\tK";
+    if (print_Cw2)
+      tmp << "\tCw2";
     tmp << "\n";
     tmp << "pF\tcm\t%\tcm/h";
+    if (print_Cw2)
+      tmp << "\th^-1";
     tmp << "\n";
     for (int i = 0; i <= intervals; i++)
       {
-        const double pF = (5.0 * i) / (intervals + 0.0);
+        const double pF = (max_pF * i) / (intervals + 0.0);
         const double h = pF2h (pF);
         const double Theta = horizon->hydraulic->Theta (h);
         const double K = horizon->hydraulic->K (h);
+	const double Cw2 = horizon->hydraulic->Cw2 (h);
         tmp << pF << "\t" << h << "\t" << Theta * 100 << "\t" << K;
+	if (print_Cw2)
+	  tmp << "\t" << Cw2;
         tmp << "\n";
       }
     msg.message (tmp.str ());
@@ -303,7 +312,9 @@ struct ProgramHydraulic_table : public Program
     : Program (al),
       horizon (Librarian::build_item<Horizon> (al, "horizon")),
       intervals (al.integer ("intervals")),
-      top_soil (al.flag ("top_soil"))
+      top_soil (al.flag ("top_soil")),
+      print_Cw2 (al.flag ("print_Cw2")),
+      max_pF (al.number ("max_pF"))
   { }
   ~ProgramHydraulic_table ()
   { }
@@ -327,6 +338,12 @@ Number of intervals in the table.");
     frame.set ("intervals", 50);
     frame.declare_boolean ("top_soil", Attribute::Const, "\
 Set to true for the plowing layer.");
+    frame.declare_boolean ("print_Cw2", Attribute::Const, "\
+Set to true to include Cw2 to the table.");
+    frame.set ("print_Cw2", false);
+    frame.declare ("max_pF", "pF", Attribute::Const, "\
+Maximal pF in table.");
+    frame.set ("max_pF", 5.0);
     frame.order ("horizon");
   }
 } ProgramHydraulic_table_syntax;

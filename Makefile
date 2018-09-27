@@ -279,11 +279,11 @@ MODELS = log_bbch2.C log_bbch.C reaction_shoot.C \
 	uznone.C condition_daisy.C chemical_std.C \
 	hydraulic_M_BaC_Bimodal.C hydraulic_B_BaC_Bimodal.C \
 	pet_makkink.C pet_weather.C svat_none.C action_spray.C pet_PM.C \
-	svat_pmsw.C action_surface.C
+	svat_pmsw.C action_surface.C hydraulic_old2.C 
 
 DISABLED = depend.C \
 	crop_old.C crop_sold.C log_clone.C action_merge.C action_divide.C \
-	hydraulic_old.C hydraulic_old2.C cdaisy.C
+	hydraulic_old.C cdaisy.C
 
 # A component is a common interface to a number of models.
 # 

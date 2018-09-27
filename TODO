@@ -1,48 +1,72 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* RAINPROOF 
+
 * ML
 
 ** Neural nodes
 
+NN: AUC 0.87 loss = 0.08
+
 ** Save and restore model
-
-* Onsdag
-
-** Done Lars Kruse
-
-** DONE Aftal Merete + Bjarne formøde SC.
-
-** Done Osvaldo
-
-** DONE Maja
-
-** Done Jens
 
 * RAINPROOF
 
-** Setup
-
-*** Jacob: git update Daisy on supercomputer
-
-*** Jacob og Jeanne: kør sim
-
-*** Combiner resultater
-
-*** Ecotox extract
-
-** ML
-
-*** Neural network
-
-*** Save network
+** Afsnit om metode
 
 ** Jacob mini-kontrakt
+
+* RAINPROOF SC Meeting 18/9
+
+** Dutch dataset
+
+** Ecotox presentation
+
+*** DFF criteria
+
+*** Intervals (Maja presentation)
+
+** BBCH scale
+
+Reverse engineer?
+
+** Status for 2018Q3 report
+
+*** Good results for calibration DFF Danish sites
+
+**** Early peek of metabolite? Created on surface?
+
+*** ML delayed
+
+Computer delay
+
+Jeanne has completed a course.
+
+** SC 516 ?
+
+Trifloxystrobin (forbudt i DK)
+
+Imidacloprid
+
+** Conferences
+
+*** 2nd ISMC conference 5-7 November 2018, Wageningen, The Netherlands
+
+**** Can Maja stay one extra day inn Wageningen to discuss dataset?
+
+*** Land Use and Water Quality, 6-9 June 2019, Aarhus, Denmark
+
+*** Plantekongressen, Januar 2020
 
 * Næste RAINPROOF SC møde
 
 1) Event definitionen – hvor lang recovery time er der? Altså hvor lang tid skal der være mellem to events før det kan defineres som to adskilte events?
 
 2) om de har kendskab til diflufenican degradation på jord overfladen? Kan metaboliten AE-B107137 dannes der?
+
+Kan Maja blive en dag ekstra i Wageningen?
+
+Model comparison?
 
 ** Face2face 12 december. Indhold?
 

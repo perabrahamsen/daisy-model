@@ -1,4 +1,4 @@
 // version.C -- automatically generated file
  
-extern const char *const version = "5.65";
+extern const char *const version = "5.66";
 extern const char *const version_date = __DATE__;
