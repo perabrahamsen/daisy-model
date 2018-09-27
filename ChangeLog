@@ -2,6 +2,9 @@
 
 	* Version 5.66 released.
 
+	* hydraulic_old2.C: Resurrected this model.
+	* Makefile (MODELS): Add it.
+
 2018-09-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* lib/log.dai ("Drain Sink"): Removed.
