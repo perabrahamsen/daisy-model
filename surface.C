@@ -506,9 +506,11 @@ Surface::Implementation::tick (Treelog& msg,
   daisy_assert (T > -100.0 && T < 50.0);
 
   // Adjust EpFactor after soil water.
-  const double pF 
-    = h2pF (geo.content_hood (soil_water, &SoilWater::h, Geometry::cell_above));
-  EpFactor_current = EpFactor * EpFactor_SWE (pF);
+  const double h
+    = geo.content_hood (soil_water, &SoilWater::h, Geometry::cell_above);
+  EpFactor_current = (h < 0.0)
+    ? EpFactor * EpFactor_SWE (h2pF (h))
+    : EpFactor;
 }
 
 double 

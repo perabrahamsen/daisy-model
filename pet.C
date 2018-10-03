@@ -28,6 +28,7 @@
 #include "vegetation.h"
 #include "surface.h"
 #include "librarian.h"
+#include "mathlib.h"
 
 const char *const Pet::component = "pet";
 
@@ -43,9 +44,14 @@ Pet::reference_to_potential_dry (const Vegetation& crops,
                                  const Surface& surface,
                                  double ref)
 {
+  daisy_assert (std::isfinite (ref));
   const double cover = crops.cover ();
+  daisy_assert (std::isfinite (cover));
+  daisy_assert (std::isfinite (crops.EpFactorDry ()));
+  daisy_assert (std::isfinite (surface.EpFactor ()));
   const double EpFactor = cover * crops.EpFactorDry ()
     + (1.0 - cover) * surface.EpFactor ();
+  daisy_assert (std::isfinite (EpFactor));
   return EpFactor * std::max (0.0, ref);
 }
 

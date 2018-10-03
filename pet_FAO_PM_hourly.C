@@ -35,6 +35,7 @@
 #include "frame.h"
 #include "block_model.h"
 #include "net_radiation.h"
+#include "mathlib.h"
 #include <sstream>
 #include <memory>
 
@@ -77,13 +78,19 @@ public:
   double wet () const
   { 
     if (use_wet)
-      return potential_evapotranspiration_wet; 
+      {
+	daisy_assert (std::isfinite (potential_evapotranspiration_wet));
+	return potential_evapotranspiration_wet;
+      }
     else
       return dry ();
   }
 
   double dry () const
-  { return potential_evapotranspiration_dry; }
+  {
+    daisy_assert (std::isfinite (potential_evapotranspiration_dry));
+    return potential_evapotranspiration_dry;
+  }
 
   // Create & Destroy.
   bool check (const Weather& weather, Treelog& msg) const
@@ -134,10 +141,12 @@ PetFAO_PM_hourly::tick (const Time&, const Weather& weather, const double /* Rn 
     = FAO::RefPenmanMonteithAllen2006 (Rn, G, Temp, VaporPressure, U2,
                                        AtmPressure)
     * 3600;
+  daisy_assert (std::isfinite (reference_evapotranspiration_dry));
 
   potential_evapotranspiration_dry
     = reference_to_potential_dry (crops, surface, 
                                   reference_evapotranspiration_dry);
+  daisy_assert (std::isfinite (potential_evapotranspiration_dry));
 
   reference_evapotranspiration_wet
     = FAO::RefPenmanMonteithWet (Rn, G, Temp, VaporPressure, U2,

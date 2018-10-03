@@ -234,6 +234,7 @@ FAO::RefPenmanMonteithAllen2006 (double Rn, // [W/m^2]
   const double r_s_per_r_a = r_s * U2 / 208.0;
   E3 /= s + gamma * (1 + r_s_per_r_a);
   const double value = E3 / 86400.0; // [kg/m^2/s]
+  daisy_assert (std::isfinite (value));
   return value;
 }
 

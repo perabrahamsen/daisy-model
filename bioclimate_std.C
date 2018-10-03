@@ -768,6 +768,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     
   const double total_ep_dry = pet->dry ();
 
+  daisy_assert (std::isfinite (total_ep_));
   daisy_assert (total_ep_ >= 0.0);
   total_ea_ = 0.0;              // To be calculated.
 
