@@ -1,30 +1,22 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* RAINPROOF 
+* Metabolite generering på overflade
+
+* VC compile Daisy (igen)
 
 * ML
 
-** Neural nodes
+** Nye data fra Jeanne
 
-NN: AUC 0.87 loss = 0.08
+** Neural nodes ?
 
-** Save and restore model
+** Categorical data ?
+
+** Save and restore model ?
 
 * RAINPROOF
 
 ** Afsnit om metode
-
-** Jacob mini-kontrakt
-
-* RAINPROOF SC Meeting 18/9
-
-** Dutch dataset
-
-** Ecotox presentation
-
-*** DFF criteria
-
-*** Intervals (Maja presentation)
 
 ** BBCH scale
 

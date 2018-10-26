@@ -1,3 +1,13 @@
+2018-10-26  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.68 released.
+
+2018-10-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C, chemical.h (tick_source): New 'Chemistry'
+	function parameter. Handle metabolites on surface.
+	(enable_surface_products): New parameter.
+
 2018-10-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.67 released.
@@ -32,7 +42,7 @@
 
 2018-08-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
-	* surface.C (evap_pond): Increased tollerance for negative ep to
+	* surface.C (evap_pond): Increased tolerance for negative ep to
 	0.1 mm/y.
 
 2018-07-26  Per Abrahamsen  <per.abrahamsen@gmail.com>

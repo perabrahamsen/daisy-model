@@ -379,7 +379,7 @@ ChemistryStandard::tick_top (const Units& units, const Geometry& geo,
   const double pond_rain = std::max (surface.ponding_average (), 0.0);
   for (size_t c = 0; c < chemicals.size (); c++)
     {
-      chemicals[c]->tick_top (vegetation, bioclimate, 
+      chemicals[c]->tick_top (vegetation, bioclimate, chemistry,
                               litter_cover, surface_runoff_rate, dt, msg);
       chemicals[c]->tick_surface (pond_rain,
                                   geo, soil, soil_water, z_mixing, msg);

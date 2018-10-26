@@ -510,7 +510,7 @@ Surface::Implementation::tick (Treelog& msg,
     = geo.content_hood (soil_water, &SoilWater::h, Geometry::cell_above);
   EpFactor_current = (h < 0.0)
     ? EpFactor * EpFactor_SWE (h2pF (h))
-    : EpFactor;
+    : EpFactor * EpFactor_SWE (-99.99);
 }
 
 double 

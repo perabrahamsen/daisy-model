@@ -6,6 +6,25 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.68
+
+** Metabolites is now generated on the soil surface.
+
+Set 'enable_surface_products' to false in the chemical definition to
+disable.
+
+* 5.66
+
+** New 'EpFactor_SWE' surface parameter.
+
+* 5.65
+
+** New 'modify_DS' phenology parameter.
+
+* 5.64
+
+** New 'depth_factor' to the 'growth' root density model.
+
 * 5.63
 
 ** New default models for reference evapotranspiration

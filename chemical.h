@@ -151,7 +151,7 @@ public:
                             const SoilHeat&, const OrganicMatter&, 
                             const Chemistry&, Treelog&) = 0;
   virtual double suggest_dt () const = 0;
-  virtual void tick_top (const Vegetation&, const Bioclimate&,
+  virtual void tick_top (const Vegetation&, const Bioclimate&, Chemistry&,
                          double litter_cover /* [] */,
                          double surface_runoff_rate /* [h^-1] */,
                          double dt /* [h] */,

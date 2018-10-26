@@ -71,6 +71,7 @@ struct ChemicalStandard : public Chemical
   const PLF decompose_conc_factor;
   const PLF decompose_depth_factor;
   const PLF decompose_lag_increment;
+  const bool enable_surface_products;
   struct Product
   {
     const double fraction;
@@ -259,6 +260,7 @@ struct ChemicalStandard : public Chemical
                            double& first, double& second);
   void tick_top (const Vegetation&,
 		 const Bioclimate&,
+		 Chemistry&,
                  const double litter_cover, // [],
                  const double surface_runoff_rate, // [h^-1]
                  const double dt, // [h]
@@ -974,12 +976,14 @@ ChemicalStandard::divide_loss (const double absolute_loss_rate,
 void 
 ChemicalStandard::tick_top (const Vegetation& vegetation,
 			    const Bioclimate& bioclimate,
+			    Chemistry& chemistry,
                             const double litter_cover, // [],
                             const double surface_runoff_rate, // [h^-1]
                             const double dt, // [h]
                             Treelog& msg)
 {
   TREELOG_MODEL (msg);
+  const double m2_per_cm2 = 0.01 * 0.01 ; // [m^2/cm^2]
 
   // Import from vegatation and bioclimate.
   const double snow_water_storage = bioclimate.get_snow_storage (); // [mm]
@@ -1093,6 +1097,28 @@ ChemicalStandard::tick_top (const Vegetation& vegetation,
                surface_decompose_rate, surface_runoff_rate,
                surface_decompose, surface_runoff);
 
+  // Metabolites
+  if (enable_surface_products)
+    for (size_t i = 0; i < product.size (); i++)
+      {
+	const symbol name = product[i]->chemical;
+	if (chemistry.know (name))
+	  {
+	    Chemical& chemical = chemistry.find (name); 
+	    const double fraction = product[i]->fraction; // []
+	    const double factor = fraction *
+	      ((molar_mass () > 0.0 && chemical.molar_mass () > 0.0)
+	       ? chemical.molar_mass () / molar_mass ()
+	       : 1.0);		// []
+
+	    const double created	// [g/cm^2/h] 
+	      = surface_decompose /* [g/m^2/h] */
+	      * factor /* [] */
+	      * m2_per_cm2; /* [m^2/cm^2] */;
+	    chemical.add_to_surface_transform_source (created);
+	  }
+      }
+  
   // Mass balance.
   const double new_storage = snow_storage + canopy_storage + litter_storage;
   const double input
@@ -2027,6 +2053,7 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
     decompose_conc_factor (al.plf ("decompose_conc_factor")),
     decompose_depth_factor (al.plf ("decompose_depth_factor")),
     decompose_lag_increment (al.plf ("decompose_lag_increment")),
+    enable_surface_products (al.flag ("enable_surface_products")),
     product (map_submodel_const<Product> (al, "decompose_products")),
     drain_secondary (al.flag ("drain_secondary")),
     C_below_expr (Librarian::build_item<Number> (al, "C_below")),
@@ -2360,6 +2387,9 @@ concentration each hour.  When lag in any cell reaches 1.0,\n\
 decomposition begins.  It can never be more than 1.0 or less than 0.0.\n\
 By default, there is no lag.");
     frame.set ("decompose_lag_increment", PLF::empty ());
+    frame.declare_boolean ("enable_surface_products", Attribute::Const, "\
+True if metabolites of this chemical can be generated on the surface.");
+    frame.set ("enable_surface_products", true);
     frame.declare_boolean ("drain_secondary", Attribute::Const, "\
 Concentration in secondary soil water user for drainage.\n\
 If you set this to true the concentration in the secondary domain is used\n\
