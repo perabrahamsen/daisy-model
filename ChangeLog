@@ -1,3 +1,14 @@
+2018-10-29  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.69 released.
+
+2018-10-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C (litter_decompose_rate): New defaults to
+	'canopy_dissipation_rate'.
+	(surface_decompose_rate): Now defaults to the average decompose
+	rate of the top soil.
+
 2018-10-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.68 released.

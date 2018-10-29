@@ -6,6 +6,16 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.69
+
+** New defaults for 'litter_decompose_rate' and 'surface_decompose_rate'.
+
+The former will now default to canopy_dissipation_rate, while the
+later by default will be equal to the decompose rate in the top soil.
+
+The "top soil" is the numerical cells that connects to the surface,
+weighted by area.
+
 * 5.68
 
 ** Metabolites is now generated on the soil surface.

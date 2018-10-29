@@ -158,6 +158,8 @@ struct ChemicalStandard : public Chemical
   std::vector<double> S_decompose_primary;      // Decompose, prim. dom.
   std::vector<double> S_decompose_secondary;      // Decompose, sec. dom.
   std::vector<double> S_transform;      // Transform source term.
+  std::vector<double> decompose_factor;      // Soil factor on decompose term.
+  double surface_decompose_factor;	     // ... ditto, near surface.
   std::vector<double> J_primary; // Solute transport in primary matrix water.
   std::vector<double> J_secondary; // Solute transport in secondary matrix.
   std::vector<double> J_matrix;    // Solute transport log in matrix water.
@@ -611,6 +613,7 @@ ChemicalStandard::clear ()
   std::fill (S_decompose_primary.begin (), S_decompose_primary.end (), 0.0);
   std::fill (S_decompose_secondary.begin (), S_decompose_secondary.end (), 0.0);
   std::fill (S_transform.begin (), S_transform.end (), 0.0);
+  std::fill (decompose_factor.begin (), decompose_factor.end (), 1.0);
   std::fill (J_primary.begin (), J_primary.end (), 0.0);
   std::fill (J_secondary.begin (), J_secondary.end (), 0.0);
   std::fill (J_matrix.begin (), J_matrix.end (), 0.0);
@@ -1074,8 +1077,12 @@ ChemicalStandard::tick_top (const Vegetation& vegetation,
   surface_in = litter_out + litter_bypass;
   const double old_surface_storage = surface_storage;
   double surface_absolute_loss_rate;
+  const double decompose_used = (surface_decompose_rate < 0.0)
+    ? ( decompose_rate * surface_decompose_factor)
+    : surface_decompose_rate;
+    
   first_order_change (old_surface_storage, surface_in + surface_transform, 
-                      surface_runoff_rate + surface_decompose_rate, dt,
+                      surface_runoff_rate + decompose_used, dt,
                       surface_storage, surface_absolute_loss_rate);
   if (surface_storage < 0.0)
     {
@@ -1085,6 +1092,8 @@ ChemicalStandard::tick_top (const Vegetation& vegetation,
           << ", surface_transform = " << surface_transform
           << ", surface_runoff_rate = " << surface_runoff_rate 
           << ", surface_decompose_rate = " << surface_decompose_rate
+          << ", surface_decompose_factor = " << surface_decompose_factor
+	  << ", decompose_used = " << decompose_used
           << ", dt = " << dt
           << ", surface_storage = " << surface_storage 
           << ", surface_absolute_loss_rate = " << surface_absolute_loss_rate;
@@ -1094,7 +1103,7 @@ ChemicalStandard::tick_top (const Vegetation& vegetation,
       surface_storage = 0.0;
     }
   divide_loss (surface_absolute_loss_rate,
-               surface_decompose_rate, surface_runoff_rate,
+               decompose_used, surface_runoff_rate,
                surface_decompose, surface_runoff);
 
   // Metabolites
@@ -1502,47 +1511,51 @@ ChemicalStandard::decompose (const Geometry& geo,
   for (size_t c = 0; c < cell_size; c++)
     {
       // Basic rate.
-      double rate = decompose_rate;
+      double factor = decompose_rate;
       double rate_primary;
       double rate_secondary;
       if (decompose_soil_factor.size () > 0)
 	{
 	  for (size_t i = 0; i < decompose_soil_factor.size (); i++)
-	    rate *= decompose_soil_factor[i]->value (c, geo, soil, 
-						     soil_water, soil_heat,
-						     organic_matter, *this);
-	  rate_primary = rate_secondary = rate;
+	    factor *= decompose_soil_factor[i]->value (c, geo, soil, 
+						       soil_water, soil_heat,
+						       organic_matter, *this);
+	  rate_primary = rate_secondary = decompose_rate * factor;
 	}
       else
 	{
 	  // Adjust for heat.
 	  if (decompose_heat_factor.size () < 1)
-	    rate *= Abiotic::f_T0 (soil_heat.T (c));
+	    factor *= Abiotic::f_T0 (soil_heat.T (c));
 	  else
-	    rate *= decompose_heat_factor (soil_heat.T (c));
+	    factor *= decompose_heat_factor (soil_heat.T (c));
 
 	  // Adjust for moisture.
 	  if (decompose_water_factor.size () < 1)
-	    rate *= Abiotic::f_h (soil_water.h (c));
+	    factor *= Abiotic::f_h (soil_water.h (c));
 	  else
-	    rate *= decompose_water_factor (soil_water.h (c));
+	    factor *= decompose_water_factor (soil_water.h (c));
 
 	  // Adjust for biological activity.
 	  if (decompose_CO2_factor.size () > 0)
-	    rate *= decompose_CO2_factor (organic_matter.CO2 (c));
+	    factor *= decompose_CO2_factor (organic_matter.CO2 (c));
 
 	  // Adjust for concentration.
-	  rate_primary = rate_secondary = rate;
+	  rate_primary = rate_secondary = decompose_rate * factor;
 	  if (decompose_conc_factor.size () > 0)
 	    {
 	      rate_primary *= decompose_conc_factor (C_primary (c));
 	      rate_secondary *= decompose_conc_factor (C_secondary (c));
+	      factor *= decompose_conc_factor (C_average (c));
 	    }
 	}
       // Decomposition.
       decomposed_primary[c] = M_primary (c) * rate_primary;
       decomposed_secondary[c] = M_secondary (c) * rate_secondary;
+      decompose_factor[c] = factor;
     }
+  surface_decompose_factor = geo.content_hood (decompose_factor,
+					       Geometry::cell_above);
 
   this->add_to_decompose_sink (decomposed_primary);
   this->add_to_decompose_sink_secondary (decomposed_secondary);
@@ -1639,6 +1652,8 @@ ChemicalStandard::output (Log& log) const
   output_variable (S_decompose_primary, log);
   output_variable (S_decompose_secondary, log);
   output_variable (S_transform, log);
+  output_variable (decompose_factor, log);
+  output_variable (surface_decompose_factor, log);
   output_variable (J_primary, log);
   output_variable (J_secondary, log);
   output_variable (J_matrix, log);
@@ -1678,6 +1693,7 @@ ChemicalStandard::debug_cell (std::ostream& out, const size_t c) const
       << ", S_decompose_primary = " << S_decompose_primary[c]
       << ", S_decompose_secondary = " << S_decompose_secondary[c]
       << ", S_transform = " << S_transform[c]
+      << ", decompose_factor = " << decompose_factor[c]
       << ", tillage = " << tillage[c]
       << ", lag = " << lag[c]
       << ", sink_dt = " << sink_dt
@@ -2008,6 +2024,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
   S_decompose_primary.resize (cell_size, 0.0);
   S_decompose_secondary.resize (cell_size, 0.0);
   S_transform.resize (cell_size, 0.0);
+  decompose_factor.resize (cell_size, 1.0);
   J_primary.resize (edge_size, 0.0);
   J_secondary.resize (edge_size, 0.0);
   J_matrix.resize (edge_size, 0.0);
@@ -2035,12 +2052,12 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
                             ? al.number ("surface_decompose_rate")
                             : (al.check ("surface_decompose_halftime")
                                ? halftime_to_rate (al.number ("surface_decompose_halftime"))
-                               : canopy_dissipation_rate)),
+                               : -1.0)),
     litter_decompose_rate (al.check ("litter_decompose_rate")
                             ? al.number ("litter_decompose_rate")
                             : (al.check ("litter_decompose_halftime")
                                ? halftime_to_rate (al.number ("litter_decompose_halftime"))
-                               : surface_decompose_rate)),
+                               : canopy_dissipation_rate)),
     diffusion_coefficient_ (al.number ("diffusion_coefficient") * 3600.0),
     decompose_rate (al.check ("decompose_rate")
                     ? al.number ("decompose_rate")
@@ -2092,6 +2109,7 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
     surface_transform (0.0),
     surface_release (0.0),
     S_permanent (al.number_sequence ("S_permanent")),
+    surface_decompose_factor (1.0),
     lag (al.check ("lag")
          ? al.number_sequence ("lag")
          : std::vector<double> ()),
@@ -2323,7 +2341,7 @@ Fraction of the chemical that follows the water off the canopy.");
                    "How fast does the chemical decomposee on surface.\n\
 You must specify it with either 'surface_decompose_halftime' or\n\
 'surface_decompose_rate'.  If neither is specified,\n\
-'canopy_dissipation_rate' is used.");
+'decompose_rate' (in soil) is used.");
     frame.declare ("surface_decompose_halftime", "h", 
                    Check::positive (), Attribute::OptionalConst,
                    "How fast does the chemical decompose on surface.\n\
@@ -2335,7 +2353,7 @@ You must specify it with either 'surface_decompose_halftime' or\n\
                    "How fast does the chemical decomposee on litter.\n\
 You must specify it with either 'litter_decompose_halftime' or\n\
 'litter_decompose_rate'.  If neither is specified,\n\
-'surface_decompose_rate' is used.");
+'canopy_dissipation_rate' is used.");
     frame.declare ("litter_decompose_halftime", "h", 
                    Check::positive (), Attribute::OptionalConst,
                    "How fast does the chemical decompose on litter.\n\
@@ -2568,6 +2586,11 @@ Does not count flow to drain connected biopores.");
                    "Source term for decompose in secondary domain, is never positive.");
     frame.declare ("S_transform", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                    "Source term for transformations other than sorption.");
+    frame.declare ("decompose_factor", Attribute::None (), Attribute::LogOnly, Attribute::SoilCells,
+                   "Decompose factor due to soil conditions.");
+    frame.declare ("surface_decompose_factor", Attribute::None (),
+		   Attribute::LogOnly, 
+                   "Decompose factor due to soil conditions near surface.");
     frame.declare ("J_primary", "g/cm^2/h", Attribute::LogOnly, Attribute::SoilEdges,
                    "Transportation in primary matrix water (positive up).");
     frame.declare ("J_secondary", "g/cm^2/h", Attribute::LogOnly, Attribute::SoilEdges,
