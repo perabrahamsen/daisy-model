@@ -273,6 +273,7 @@
     <ClCompile Include="hydraulic_M_BaC_Bimodal.C" />
     <ClCompile Include="hydraulic_M_C.C" />
     <ClCompile Include="hydraulic_M_vG.C" />
+    <ClCompile Include="hydraulic_M_vGip.C" />
     <ClCompile Include="hydraulic_M_vGp.C" />
     <ClCompile Include="hydraulic_M_vG_compact.C" />
     <ClCompile Include="hydraulic_wepp.C" />
@@ -295,6 +296,8 @@
     <ClCompile Include="log.C" />
     <ClCompile Include="log_alist.C" />
     <ClCompile Include="log_all.C" />
+    <ClCompile Include="log_bbch.C" />
+    <ClCompile Include="log_bbch2.C" />
     <ClCompile Include="log_checkpoint.C" />
     <ClCompile Include="log_extern.C" />
     <ClCompile Include="log_harvest.C" />
@@ -389,6 +392,7 @@
     <ClCompile Include="reaction_Jarvis99.C" />
     <ClCompile Include="reaction_Morgan98.C" />
     <ClCompile Include="reaction_nit.C" />
+    <ClCompile Include="reaction_shoot.C" />
     <ClCompile Include="reaction_sorption.C" />
     <ClCompile Include="reaction_std.C" />
     <ClCompile Include="reaction_Styczen88.C" />

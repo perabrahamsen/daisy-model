@@ -1,3 +1,8 @@
+2018-11-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* hydraulic_M_vGip.C: New model.
+	* Makefile (MODELS): Add it.
+
 2018-10-29  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.69 released.
