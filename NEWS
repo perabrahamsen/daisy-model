@@ -4,7 +4,7 @@ This file contains an overview of changes between Daisy releases. When
 you upgrade Daisy, it is recommended that you read at least the
 headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
-release. 
+release.. 
 
 * 5.69
 
@@ -3470,7 +3470,7 @@ organ when there is nitrogen stress in the reproductive phase.
 
 ** Preliminary Ryegrass and Wclover crop parameterizations.
 
-Developed by Henning Høgh Jensen.  These should work in a multicrop
+Developed by Henning HÃ¸gh Jensen.  These should work in a multicrop
 environment on clay soil.  
 
 * 3.42
@@ -3837,7 +3837,7 @@ Coniferous has been updated, Hardwood, Grass and Bush are new.  The
 parameterizations are based on satelite meausrements for all of
 Denmark.
 
-Thanks to Eva Bøgh <Evb@geogr.ku.dk> for the parameterizations.
+Thanks to Eva BÃ¸gh <Evb@geogr.ku.dk> for the parameterizations.
 
 ** Bug fixes.
 
@@ -3969,7 +3969,7 @@ to average Danish yield.
 ** Updated the biomod clayom model.
 
 It should now correspond to the article _CN-SIM - a model for the
-turnover of soil organic matter._ by Bjørn M. Petersen et al,
+turnover of soil organic matter._ by BjÃ¸rn M. Petersen et al,
 submitted to Soil Biology & Biochemistry, 2003.
 
 * 3.10
@@ -4251,7 +4251,7 @@ By default, no chemical denitrification occurs.
 
 * 2.88
 
-** New 'M_vGp' hudraulic model by Børgesen et.al..
+** New 'M_vGp' hudraulic model by BÃ¸rgesen et.al..
 
 Compared to a straight Mualem + van Genuchten, it has two extra
 parameters, 'h_m' which indicated the transition point for macropores,
@@ -4891,7 +4891,7 @@ parameters.
 
 You can see the calculated initial values for the SOM and SMB pools in
 the 'daisy.log' file, and follow their changes with the
-"Organic Matter" log model.
+"OrganicÂ Matter" log model.
 
 If you specify a very high input for a soil with a very low humus
 content, Daisy will be unable to use this method for initialization,
@@ -5070,10 +5070,10 @@ pig_slurry.
 
 ** Fixed assimilate partioning for several crop paramterizations.
 
-Specifically "Winter Wheat" and varieties, "Pea" and "Ikuwala Maize".
+Specifically "Winter Wheat" and varieties, "Pea" and "IkuwalaÂ Maize".
 
 This might cause some changes in yields, possibly apart from
-"Ikuwala Maize" these changes should be insignificant.
+"IkuwalaÂ Maize" these changes should be insignificant.
 
 ** New checks and better descriptions for many parameters.
 
@@ -5145,7 +5145,7 @@ The value of the "Devel" attribute in the "default" crop model should
 now be a parameterization of the new "phenology" component.
 
 In practice, this means "(Devel " should be replaced with
-"(Devel default" in the crop parameterization files.  This has already
+"(DevelÂ default" in the crop parameterization files.  This has already
 been done with the files in the daisy-lib.zip file.
 
 For any derived parameterization where you only changed a few
@@ -5589,7 +5589,7 @@ the precipitation.  The Precip-Correct should be followed by 12
 numbers, each a factor to multiply to the precipitation for that
 month.  The first number corresponds to January, the last to December.
 
-** Made "Soil Temperature" and "Surface Water Balance"log models hourly.
+**Â Made "Soil Temperature" and "Surface Water Balance"log models hourly.
 
 ** Moved "Daily Water Flux" and "Hourly Water Flux" to 'log-old.dai'.
 
@@ -6434,7 +6434,7 @@ Bug found by: SH.
 
 Surface irrigation was ignored.  Now it is applied correctly.
 
-Bug found by: Mette Lægdsmand <Mette.Laegdsmand@agrsci.dk>
+Bug found by: Mette LÃ¦gdsmand <Mette.Laegdsmand@agrsci.dk>
 
 ** Fixed numeric error in the 'default' bioclimate model.
 
