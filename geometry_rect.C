@@ -98,7 +98,7 @@ GeometryRect::add_soil (std::vector<double>& v,
   size_t col_last = 0;
   for (size_t col = 0; col < cols; col++)
     {
-      const double cell = cell_index (0, col);
+      const size_t cell = cell_index (0, col);
       const double cell_right = xplus (cell);
       const double cell_left = xminus (cell);
 
@@ -128,7 +128,7 @@ GeometryRect::add_soil (std::vector<double>& v,
   size_t row_last = 0;
   for (size_t row = 0; row < rows; row++)
     {
-      const double cell = cell_index (row, 0);
+      const size_t cell = cell_index (row, 0);
       const double cell_top = zminus (cell);
       const double cell_bottom = zplus (cell);
 

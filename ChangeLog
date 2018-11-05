@@ -1,3 +1,8 @@
+2018-11-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* geometry1d.C, geometry_rect.C (add_soil):: Make 'cell' size_t
+	instead of double.
+
 2018-11-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* hydraulic_M_vGip.C: New model.

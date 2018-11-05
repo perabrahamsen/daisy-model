@@ -1053,7 +1053,7 @@ SVAT_SSOC::solve (const double gs_shadow /* stomata cond. [m/s]*/,
 	  fix->set_value (solution);
 	  is_stable = true;
 	}
-      catch (const char *const error)
+      catch (const char *const)
 	{
 	  initialized_soil = has_LAI = false; // Prevent log.
 	  fix->set_value (old_initial);

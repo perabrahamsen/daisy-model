@@ -134,7 +134,7 @@ Geometry1D::add_soil (std::vector<double>& v,
   size_t row_last = 0;
   for (size_t row = 0; row < rows; row++)
     {
-      const double cell = row;
+      const size_t cell = row;
       const double cell_top = zminus (cell);
       const double cell_bottom = zplus (cell);
 
