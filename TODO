@@ -1,6 +1,19 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* VC compile Daisy (igen)
+* Andelst
+
+** M_vGip + new
+
+too slow
+
+** M_vG + old
+
+1m30s, 7 fails, error = 1 mm
+
+** M_vGip  + old
+
+too slow
+
 
 * ML
 

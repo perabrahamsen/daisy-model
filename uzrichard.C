@@ -183,11 +183,13 @@ UZRichard::richard (Treelog& msg,
     {
       available_water = h_top;
 
+#if 1
       if (available_water
 	  > soil.K (first, 0.0, h_ice[first], soil_heat.T (first)) * dt
 	  + (soil.Theta (first, 0.0, h_ice[first]) - Theta_old[first])
 	  * geo.dz (first))
 	flux = false;
+#endif
     }
 
   // First guess is the old value.
@@ -201,6 +203,9 @@ UZRichard::richard (Treelog& msg,
   int number_of_time_step_reductions = 0;
   int iterations_with_this_time_step = 0;
   int n_small_time_steps = 0;
+
+  // For potential debug information.
+  std::ostringstream dbg;
 
   while (time_left > 0.0)
     {
@@ -271,22 +276,40 @@ UZRichard::richard (Treelog& msg,
 
       do
 	{
-	  h_conv = h;
-	  iterations_used++;
-
-          if (iterations_used > max_iterations)
+          if (++iterations_used > max_iterations)
             {
               if (debug > 1)
                 {
-                  std::ostringstream tmp;
-                  tmp << "Too many iterations: "
-                      << "available_water = " << available_water 
-                      << ", time left = " << time_left
-                      << ", ddt = " << ddt;
-                  msg.message (tmp.str ());
+                  dbg << "\nToo many iterations: "
+		      << "ddt = " << ddt
+		      << ", available_water = " << available_water 
+		      << ", time left = " << time_left;
+                  if (debug > 2)
+                    {
+                      dbg << "\nh_previous =";
+                      for (size_t c = 0; c < size; c++)
+                        dbg << "\t" << h_previous[c];
+                      dbg << "\nh =";
+                      for (size_t c = 0; c < size; c++)
+                        dbg << "\t" << h[c];
+                      dbg << "\nh_conv =";
+                      for (size_t c = 0; c < size; c++)
+                        dbg << "\t" << h_conv[c];
+                      dbg << "\nS =";
+                      for (size_t c = 0; c < size; c++)
+                        dbg << "\t" << S[first + c];
+                      dbg << "\nK =";
+                      for (size_t c = 0; c < size; c++)
+                        dbg << "\t" << K[c];
+                      dbg << "\nTheta =";
+                      for (size_t c = 0; c < size; c++)
+                        dbg << "\t" << Theta[c];
+                    }
                 }
               goto failure;
             }
+
+	  h_conv = h;
 
 	  // Calculate parameters.
 	  for (unsigned int i = 0; i < size; i++)
@@ -434,6 +457,7 @@ UZRichard::richard (Treelog& msg,
 
       if (flux)
         {
+#if 1
           if (h[0] > 0.0)
             {
               if (debug > 0)
@@ -441,7 +465,7 @@ UZRichard::richard (Treelog& msg,
 
               goto failure;
             }
-          
+#endif
           // Yeah, it worked!
           delta_top_water = -(available_water / time_left) * ddt;
         }
@@ -526,6 +550,13 @@ UZRichard::richard (Treelog& msg,
 
       if (number_of_time_step_reductions > max_time_step_reductions)
         {
+	  if (debug > 1)
+	    {
+	      msg.message ("Past: " + dbg.str ());
+	      dbg.str ("");
+	      msg.message ("Too many timestep reductions, switch top?");
+	    }
+
           if (switched_top)
             {
               if (debug > 1)
