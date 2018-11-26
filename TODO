@@ -1,5 +1,46 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* Disable metabolites on surface, Daisy 5.71
+
+* Maja rettelser i brev til Bayer
+
+* Jeanne: Nye kørsler
+
+
+* RAINPROOF SC møde 14/11
+
+** Decompose om surface
+
+*** Implemented, means we catch the "early metabolite" from PLAP site
+
+*** May also affect the sulfurons
+
+** New optimization criteria for sulfurons
+
+*** We have contacted EPA for a meeting
+
+*** Jeanne is on it, have data
+
+*** We will probably continue with ECOTOX based optimization criteria also
+
+** Multi years run for Daisy
+
+*** Jeanne will do test runs
+
+*** We track each application day individually
+
+*** Some strategies may leave more residuals than others
+
+*** Too many combination of days for optimization
+
+*** Simplify: First year effect + Second year effect + Third year effect
+
+*** We can test strategies afterwards
+
+** Time dependent sorption
+
+*** We have sorption kinetics
+
 * Andelst
 
 ** M_vGip + new

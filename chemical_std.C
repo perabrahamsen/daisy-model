@@ -2407,7 +2407,7 @@ By default, there is no lag.");
     frame.set ("decompose_lag_increment", PLF::empty ());
     frame.declare_boolean ("enable_surface_products", Attribute::Const, "\
 True if metabolites of this chemical can be generated on the surface.");
-    frame.set ("enable_surface_products", true);
+    frame.set ("enable_surface_products", false);
     frame.declare_boolean ("drain_secondary", Attribute::Const, "\
 Concentration in secondary soil water user for drainage.\n\
 If you set this to true the concentration in the secondary domain is used\n\

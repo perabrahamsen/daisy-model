@@ -6,6 +6,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.71
+
+** 'enable_surface_products' is now false by default.
+
 * 5.69
 
 ** New defaults for 'litter_decompose_rate' and 'surface_decompose_rate'.

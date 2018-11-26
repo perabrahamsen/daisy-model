@@ -1,3 +1,11 @@
+2018-11-26  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.71 released.
+
+2018-11-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* Version 5.70 released.
+
 2018-11-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* geometry1d.C, geometry_rect.C (add_soil):: Make 'cell' size_t
