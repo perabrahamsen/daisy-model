@@ -31,6 +31,8 @@
 #include "soil_water.h"
 #include "soil_heat.h"
 
+#include <sstream>
+
 // soilfac component.
 
 const char *const Soilfac::component = "soilfac";

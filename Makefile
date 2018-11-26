@@ -702,6 +702,7 @@ setup:
 	git commit -a -m "Version $(TAG)"
 	git tag -a release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
 	git push origin --tags
+	git push
 
 setup2:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi

@@ -6,6 +6,19 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.72
+
+** Fix decompose_rate.
+
+It was multiplied twice, making slow decomposition very slow.
+
+** Default for 'surface_decompose_rate' is canopy_dissipation_rate again.
+
+** New parameter 'soil_affects_surface_decompose'
+
+Default false. If true, surface decomposition is affect by the same
+heat, moisture, etc factors as decomposition in the top soil.
+
 * 5.71
 
 ** 'enable_surface_products' is now false by default.

@@ -1,5 +1,16 @@
 2018-11-26  Per Abrahamsen  <pa@plen.ku.dk>
 
+	* Version 5.72 released.
+
+2018-11-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C (ChemicalStandard::decompose): Bug fix.
+	(soil_affects_surface_decompose): New parameter.
+	(surface_decompose_rate): Switch back to old default,
+	'canopy_dissipation_rate'.
+
+2018-11-26  Per Abrahamsen  <pa@plen.ku.dk>
+
 	* Version 5.71 released.
 
 2018-11-19  Per Abrahamsen  <per.abrahamsen@gmail.com>

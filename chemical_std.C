@@ -72,6 +72,7 @@ struct ChemicalStandard : public Chemical
   const PLF decompose_depth_factor;
   const PLF decompose_lag_increment;
   const bool enable_surface_products;
+  const bool soil_affects_surface_decompose;
   struct Product
   {
     const double fraction;
@@ -1077,8 +1078,8 @@ ChemicalStandard::tick_top (const Vegetation& vegetation,
   surface_in = litter_out + litter_bypass;
   const double old_surface_storage = surface_storage;
   double surface_absolute_loss_rate;
-  const double decompose_used = (surface_decompose_rate < 0.0)
-    ? ( decompose_rate * surface_decompose_factor)
+  const double decompose_used = (soil_affects_surface_decompose)
+    ? ( surface_decompose_rate * surface_decompose_factor)
     : surface_decompose_rate;
     
   first_order_change (old_surface_storage, surface_in + surface_transform, 
@@ -1511,7 +1512,7 @@ ChemicalStandard::decompose (const Geometry& geo,
   for (size_t c = 0; c < cell_size; c++)
     {
       // Basic rate.
-      double factor = decompose_rate;
+      double factor = 1.0;
       double rate_primary;
       double rate_secondary;
       if (decompose_soil_factor.size () > 0)
@@ -1520,6 +1521,7 @@ ChemicalStandard::decompose (const Geometry& geo,
 	    factor *= decompose_soil_factor[i]->value (c, geo, soil, 
 						       soil_water, soil_heat,
 						       organic_matter, *this);
+          decompose_factor[c] = factor;
 	  rate_primary = rate_secondary = decompose_rate * factor;
 	}
       else
@@ -2052,7 +2054,7 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
                             ? al.number ("surface_decompose_rate")
                             : (al.check ("surface_decompose_halftime")
                                ? halftime_to_rate (al.number ("surface_decompose_halftime"))
-                               : -1.0)),
+                               : canopy_dissipation_rate)),
     litter_decompose_rate (al.check ("litter_decompose_rate")
                             ? al.number ("litter_decompose_rate")
                             : (al.check ("litter_decompose_halftime")
@@ -2071,6 +2073,7 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
     decompose_depth_factor (al.plf ("decompose_depth_factor")),
     decompose_lag_increment (al.plf ("decompose_lag_increment")),
     enable_surface_products (al.flag ("enable_surface_products")),
+    soil_affects_surface_decompose (al.flag ("soil_affects_surface_decompose")),
     product (map_submodel_const<Product> (al, "decompose_products")),
     drain_secondary (al.flag ("drain_secondary")),
     C_below_expr (Librarian::build_item<Number> (al, "C_below")),
@@ -2408,6 +2411,11 @@ By default, there is no lag.");
     frame.declare_boolean ("enable_surface_products", Attribute::Const, "\
 True if metabolites of this chemical can be generated on the surface.");
     frame.set ("enable_surface_products", false);
+    frame.declare_boolean ("soil_affects_surface_decompose",
+			   Attribute::Const, "\
+True if soil conditions affect surface decomposition.");
+    frame.set ("soil_affects_surface_decompose", false);
+    
     frame.declare_boolean ("drain_secondary", Attribute::Const, "\
 Concentration in secondary soil water user for drainage.\n\
 If you set this to true the concentration in the secondary domain is used\n\
