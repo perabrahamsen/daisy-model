@@ -178,7 +178,7 @@ CrpN::update (double& NCrop, const double DS,
 
   if (PotNUpt > 0 && DS > DS_start_fixate)
     {
-      Fixated = fixate_factor * PotNUpt / dt;
+      Fixated = fixate_factor * PotNUpt;
       AccFixated += Fixated * dt;
       NCrop += Fixated * dt;
       // PotNUpt -= auxiliary.Fixated;
@@ -339,8 +339,8 @@ For now, the storage organ is counted as part of the shoot.");
   frame.declare ("DS_cut_fixate", Attribute::None (), Attribute::Const,
 	      "Restore fixation this DS after cut.");
   frame.set ("DS_cut_fixate", 0.0);
-  frame.declare ("fixate_factor", Attribute::None (), Attribute::Const,
-	      "Fraction of needed N fixated by day.");
+  frame.declare ("fixate_factor", "h^-1", Attribute::Const,
+		 "Fraction rate relative to potential N uptake.");
   frame.set ("fixate_factor", 0.8);
   frame.declare ("Fixated", "g N/m^2/h", Attribute::LogOnly,
 	      "N fixation from air.");

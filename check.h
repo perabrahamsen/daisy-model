@@ -43,6 +43,7 @@ public:
   static const Check& negative ();
   static const Check& positive ();
   static const Check& fraction ();
+  static const Check& DS ();
 
   // Create and Destroy.
 protected:

@@ -60,7 +60,6 @@ private:
   const double DSRepeat;        // DS where DS is set back (perennial crops)
   const double DSSetBack;       // DS set back at DSRepeat
   const double defined_until_ds; // Model invalid after this DS.
-  const symbol DS1_name;         // Name of DS 1->2 transition.
 
   // Simulation.
 private:
@@ -159,8 +158,6 @@ PhenologyStandard::tick_daily (const Scope& parent_scope,
 
       vernalization (Ta, DS);
 
-      if (DS >= 1.0)
-        msg.message (DS1_name.name ());
     }
   else
     {
@@ -178,7 +175,6 @@ PhenologyStandard::tick_daily (const Scope& parent_scope,
         }
       if (DS > DSMature)
         {
-          msg.message ("Ripe");
           DS = DSMature;
         }
     }
@@ -223,8 +219,7 @@ PhenologyStandard::PhenologyStandard (const BlockModel& al)
     DSMature (al.number ("DSMature")),
     DSRepeat (al.number ("DSRepeat")),
     DSSetBack (al.number ("DSSetBack")),
-    defined_until_ds (al.number ("defined_until_ds")),
-    DS1_name (al.name ("DS1_name"))
+    defined_until_ds (al.number ("defined_until_ds"))
 { }
 
 static struct PhenologyStandardSyntax : public DeclareModel
@@ -279,8 +274,5 @@ The expression will be used as a new value for DS.");
     frame.declare ("defined_until_ds", "DS", Attribute::Const, "\
 This parameterization is only valid until the specified development state.");
     frame.set ("defined_until_ds", 2.0);
-    frame.declare_string ("DS1_name", Attribute::Const, "\
-Name of development stage 1 to 2 transition.");
-    frame.set ("DS1_name", "Flowering");
   }
 } PhenologyStandard_syntax;

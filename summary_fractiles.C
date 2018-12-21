@@ -29,7 +29,6 @@
 #include "treelog.h"
 #include "time.h"
 #include "memutils.h"
-#include "submodeler.h"
 #include "mathlib.h"
 #include "vcheck.h"
 #include <numeric>

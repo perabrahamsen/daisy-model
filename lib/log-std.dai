@@ -194,7 +194,17 @@ Highest nitrogen stress experienced in the period.
 When the crop nitrogen content is below a critical level, crop
 experience nitrogen stress, and production suffers.
 
-The value is between 0 (no nitrogen stress) and 1 (no production)."))))
+The value is between 0 (no nitrogen stress) and 1 (no production)."))
+	   (number (path column "${column}" Vegetation crops crops "${crop}"
+                         CStage table value)
+		   (tag "Phenology")
+		   (handle current)
+		   (spec cstage table value)
+		   (documentation "\
+Current phenological stage.
+
+For most crops, this is -1 (not yet emerged), 0 (vegetative), 
+1 (reproductive), or 2 (ripe). Some crops may show other scaled, like BBCH."))))
 
 (defsummary "Field water balance" balance
   "Water balance for the complete system."

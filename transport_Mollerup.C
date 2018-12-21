@@ -25,7 +25,6 @@
 #include "solver.h"
 #include "log.h"
 #include "frame.h"
-#include "submodeler.h"
 #include "memutils.h"
 #include "librarian.h"
 #include "mathlib.h"

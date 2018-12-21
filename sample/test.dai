@@ -75,7 +75,7 @@
 	  ("Soil nitrogen" (when daily) (from 0 [m]) (to -1 [m]))
 	  ("Field water" (when monthly))
 	  ("Soil water" (when daily) (from 0 [m]) (to -1 [m]))
-	  ("Crop Production"
+	  ("Crop"
 	   (crop "Spring Barley")
 	   (where "sbarley.dlf"))
 	  (checkpoint (when (at 1987 8 7 6)))))

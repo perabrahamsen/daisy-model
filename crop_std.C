@@ -54,6 +54,7 @@
 #include "block_model.h"
 #include "rubiscoN.h"
 #include "metalib.h"
+#include "cstage.h"
 #include <sstream>
 #include <numeric>
 
@@ -73,6 +74,7 @@ struct CropStandard : public Crop
   Time flowering_time;
   Time ripe_time;
   std::unique_ptr<Phenology> development;
+  std::unique_ptr<CStage> cstage;
   Partition partition;
   std::unique_ptr<Vernalization> vernalization;
   const std::unique_ptr<Photo> shadow;
@@ -549,10 +551,10 @@ CropStandard::tick (const Scope& scope,
                               -root_system->Depth/2.);
       development->emergence (scope, h_middle, root_system->soil_temperature, 
                               daystep.total_hours (), msg);
+      cstage->tick (DS, msg);
       if (DS >= 0)
 	{
           emerge_time = time;
-	  msg.message ("Emerging");
           const double WLeaf = production.WLeaf;
           const double SpLAI = canopy->specific_LAI (DS);
           const double seed_CAI = seed->forced_CAI (WLeaf, SpLAI, DS);
@@ -659,6 +661,7 @@ CropStandard::tick (const Scope& scope,
   development->tick_daily (scope, bioclimate.daily_air_temperature (), 
                            production.shoot_growth (), production, 
                            *vernalization, harvesting->cut_stress, msg);
+  cstage->tick (DS, msg);
   if (DS >= 1.0 && flowering_time == Time::null ())
     flowering_time = time;
   if (DS >= 2.0 && ripe_time == Time::null ())
@@ -745,6 +748,8 @@ CropStandard::harvest (const symbol column_name,
 	    }
 	  else if (development->DS > harvesting->DSnew)
 	    development->DS = harvesting->DSnew;
+
+	  cstage->tick (development->DS, msg);
 	  
 	  // Cut canopy.
 	  canopy->cut (production.WStem, development->DS, stub_length);
@@ -848,6 +853,7 @@ CropStandard::output (Log& log) const
   if (ripe_time != Time::null ())
     output_submodule (ripe_time, "ripe_time", log);
   output_derived (development, "Devel", log);
+  output_derived (cstage, "CStage", log);
   output_submodule (partition, "Partit", log);
   output_derived (vernalization, "Vernal", log);
   output_derived (shadow, "LeafPhot", log);
@@ -896,6 +902,7 @@ CropStandard::CropStandard (const BlockModel& al)
                ? Time (al.submodel ("ripe_time"))
                : Time::null ()),
     development (Librarian::build_item<Phenology> (al, "Devel")),
+    cstage (Librarian::build_item<CStage> (al, "CStage")),
     partition (al.submodel ("Partit")),
     vernalization (Librarian::build_item<Vernalization> (al, "Vernal")),
     shadow (Librarian::build_item<Photo> (al, "LeafPhot")),
@@ -963,6 +970,9 @@ Don't set, calculated by Daisy.",
                              Time::load_syntax);
     frame.declare_object ("Devel", Phenology::component, 
                        "Development and phenology.");
+    frame.declare_object ("CStage", CStage::component, 
+			  "Phenological messages.");
+    frame.set ("CStage", "Daisy");
     frame.declare_submodule ("Partit", Attribute::State,
                           "Assimilate partitioning.", Partition::load_syntax);
     frame.declare_object ("Vernal", Vernalization::component, 

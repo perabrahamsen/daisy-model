@@ -164,6 +164,25 @@ Check::fraction ()
   return fraction;
 }
 
+struct DS_class : public Check
+{
+  bool verify (const double value, Treelog& msg) const
+  {
+    if (value >= -1.0 && value <= 2.0)
+      return true;
+
+    msg.error ("Value must be a DS [-1;2]");
+    return false;
+  }
+};
+
+const Check& 
+Check::DS ()
+{
+  static DS_class DS_check;
+  return DS_check;
+}
+
 Check::Check ()
 { }
 
