@@ -1,0 +1,230 @@
+;; plot-focus.dai --- FOCUS related graphs.
+
+(defxysource depth loop
+  (tag z)
+  (begin 0 [cm])
+  (end -200 [cm])
+  (step -0.01 [cm])
+  (y z)
+  (x (if (<= z -100 [cm])
+	 0 [%]
+       (if (<= z -60 [cm])
+	   30 [%]
+	 (if (< z -30 [cm])
+	     50 [%]
+	   100 [%])))))
+
+(defgnuplot myxy xy
+  (device "emf size 600,400 'Palatino Bold' 10")
+  (declare suffix String "")
+  (suffix "emf"))
+  
+(defgnuplot mytime time
+  (device "emf size 600,400 'Palatino Bold' 10")
+  (declare suffix String "")
+  (suffix "emf"))
+  
+(defgnuplot depth myxy
+  (where "fig/depth.${suffix}")
+  (legend none)
+  (xmax 101 [%])
+  (source (depth)))
+
+(defxysource heath-Daisy loop
+  (title Daisy)
+  (tag T)
+  (begin 0 [dg C])
+  (end 41 [dg C])
+  (step 0.01 [dg C])
+  (x T)
+  (y (if (< T 0.0 [dg C])
+	 0 []
+       (if (< T 20.0 [dg C])
+	   (* 0.1 [K^-1] T)
+	 (if (< T 37.0 [dg C])
+	     (exp (+ 0.47 [] 
+		     (* -0.027 [K^-1] T) 
+		     (* 0.00193 [K^-2] T T)))
+	   (* (exp (+ 0.47 []
+		      (* -0.027 [K^-1] 37.0 [dg C]) 
+		      (* 0.00193 [K^-2] 37.0 [dg C] 37.0 [dg C])))
+	      (- 1.0 [] (/ (- T 37.0 [dg C]) (- 60.0 [dg C] 37.0 [dg C])))))))))
+
+(defxysource heath-FOCUS loop
+  (title FOCUS)
+  (tag T)
+  (begin 0 [dg C])
+  (end 41 [dg C])
+  (step 0.01 [dg C])
+  (x T)
+  (y (if (< T 0.0 [dg C])
+	 0 []
+       (if (> T 5.0 [dg C])
+	   (exp (* 0.0948 [K^-1] (- T 20.0 [dg C])))
+	 (* 0.2 [K^-1] T (exp (* 0.0948 [K^-1] (- 5.0 [dg C] 20.0 [dg C]))))))))
+
+(defxysource heath-Daisy-20 loop
+  (title "Daisy (20 °C)")
+  (tag T)
+  (begin 0 [dg C])
+  (end 41 [dg C])
+  (step 0.01 [dg C])
+  (x T)
+  (y (* 0.5 []
+	(if (< T 0.0 [dg C])
+	    0 []
+	    (if (< T 20.0 [dg C])
+		(* 0.1 [K^-1] T)
+	      (if (< T 37.0 [dg C])
+		  (exp (+ 0.47 [] 
+			  (* -0.027 [K^-1] T) 
+			  (* 0.00193 [K^-2] T T)))
+		(* (exp (+ 0.47 []
+			   (* -0.027 [K^-1] 37.0 [dg C]) 
+			   (* 0.00193 [K^-2] 37.0 [dg C] 37.0 [dg C])))
+		   (- 1.0 [] (/ (- T 37.0 [dg C])
+				(- 60.0 [dg C] 37.0 [dg C]))))))))))
+  
+(defgnuplot heath myxy
+  (where "fig/heat.${suffix}")
+  (extra &old [unset ylabel])
+  (source heath-Daisy heath-FOCUS heath-Daisy-20))
+
+(defxysource water-Daisy loop
+  (title Daisy)
+  (tag h)
+  (begin 0 [pF])
+  (end 7 [pF])
+  (step 0.01 [pF])
+  (x h)
+  (y (if (<= h 0.0 [pF])
+	 0.6 []
+       (if (<= h 1.5 [pF])
+	   (+ 0.6 [] (* 0.4  [] (/ h 1.5 [pF])))
+	 (if (<= h 2.5 [pF])
+	     1.0 []
+	   (if (<= h 6.5 [pF])
+	       (- 1.0 [] (/ (- h 2.5 [pF]) 4 [pF]));
+	     0.0 []))))))
+
+(defhorizon "Rorrende Ap" USDA3
+  (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.024)
+  (dry_bulk_density 1.45 [g/cm^3])
+  (hydraulic hypres (topsoil true)))
+
+(defhorizon "Rorrende C" USDA3
+  (description "120-200 cm")
+  (clay 0.207)(silt 0.235)(sand 0.558) (humus 0.01)
+  (dry_bulk_density 1.69 [g/cm^3]))
+
+(defxysource water-FOCUS_Ap loop
+  (title "FOCUS, Rørrende (Ap)")
+  (tag h0)
+  (begin 0 [pF])
+  (end 7 [pF])
+  (step 0.01 [pF])
+  (x h0)
+  (y (let ((Theta_wp_05 (* 0.5 []
+			   (soil_Theta (horizon "Rorrende Ap")
+				       (top_soil true)
+				       (h -15000 [cm]))))
+	   (Theta_fc (soil_Theta (horizon "Rorrende Ap")
+				 (top_soil true)
+				 (h -100 [cm])))
+	   (Theta (soil_Theta (horizon "Rorrende Ap")
+			      (top_soil true)
+			      (h h0))))
+       (if (< Theta Theta_wp_05)
+	   0.0 []
+	 (if (> Theta Theta_fc)
+	     1.0 []
+	   (dim (pow (/ (- Theta Theta_wp_05) (- Theta_fc Theta_wp_05)) 0.49 []) []))))))
+
+(defxysource water-FOCUS_C loop
+  (title "FOCUS, Rørrende (C)")
+  (tag h0)
+  (begin 0 [pF])
+  (end 7 [pF])
+  (step 0.01 [pF])
+  (x h0)
+  (y (let ((Theta_wp_05 (* 0.5 []
+			   (soil_Theta (horizon "Rorrende C")
+				       (top_soil true)
+				       (h -15000 [cm]))))
+	   (Theta_fc (soil_Theta (horizon "Rorrende C")
+				 (top_soil true)
+				 (h -100 [cm])))
+	   (Theta (soil_Theta (horizon "Rorrende C")
+			      (top_soil true)
+			      (h h0))))
+       (if (< Theta Theta_wp_05)
+	   0.0 []
+	 (if (> Theta Theta_fc)
+	     1.0 []
+	   (dim (pow (/ (- Theta Theta_wp_05) (- Theta_fc Theta_wp_05)) 0.49 []) []))))))
+
+	  
+(defgnuplot water myxy
+  (where "fig/water.${suffix}")
+  (extra &old [unset ylabel])
+  (ymax 1.01 [])
+  (source water-Daisy water-FOCUS_Ap water-FOCUS_C))
+
+(defxysource washoff-FOCUS loop
+  (title "FOCUS, Daisy LAI=3")
+  (tag R)
+  (begin 0 [mm])
+  (end 100 [mm])
+  (step 0.01 [mm])
+  (x R)
+  (y (* 100 [%] (exp (* -0.05 [mm^-1] R)))))
+
+(defxysource washoff-Daisy-LAI50 washoff-FOCUS
+  (title "Daisy LAI=5")
+  (y (* 100 [%] (exp (* (/ 3 [] 5 []) -0.05 [mm^-1] R)))))
+
+(defxysource washoff-Daisy-LAI05 washoff-FOCUS
+  (title "Daisy LAI=½")
+  (y (* 100 [%] (exp (* (/ 3 [] 0.5 []) -0.05 [mm^-1] R)))))
+
+(defgnuplot washoff myxy
+  (where "fig/washoff.${suffix}")
+  (extra &old 
+	 [set xlabel "Dripoff (mm)"]
+	 [set ylabel "Remain on canopy (%)"]
+	 [set format "%g"])
+  (source  washoff-Daisy-LAI05 washoff-FOCUS washoff-Daisy-LAI50))
+
+(defgnuplot Decompose mytime
+  (where "fig/decompose.${suffix}")
+  (title "Soil decompose")
+  (begin 2001 4 1)
+  (end 2001 8 1)
+  (source (arithmetic (file "daisy/field_iodosulfuron-methyl-sodium-spring.dlf")
+		      (title "Daisy")
+		      (expr (convert (/ "Soil Decompose" 1 [h]) [mg/ha/h])))
+          (arithmetic (file "focus/field_iodosulfuron-methyl-sodium-spring.dlf")
+		      (title "FOCUS")
+		      (expr (convert (/ "Soil Decompose" 1 [h]) [mg/ha/h])))))
+
+
+(defgnuplot Soil mytime
+  (where "fig/soil.${suffix}")
+  (title "Soil content")
+  (begin 2001 4 1)
+  (end 2001 8 1)
+  (source (arithmetic (file "daisy/field_iodosulfuron-methyl-sodium-spring.dlf")
+		      (title "Daisy")
+		      (expr "Soil"))
+          (arithmetic (file "focus/field_iodosulfuron-methyl-sodium-spring.dlf")
+		      (title "FOCUS")
+		      (expr "Soil"))))
+
+
+
+(defprogram FOCUS gnuplot
+  (graph Soil Decompose depth heath water washoff))
+
+(run FOCUS)
+
+;; plot-focus.dai ends here.

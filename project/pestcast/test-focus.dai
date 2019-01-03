@@ -1,0 +1,127 @@
+;;; test-focus.dai -- Sample file using the Daisy libraries.
+
+(input file "chemistry-base.dai")
+
+(defchemical iodosulfuron-methyl-sodium herbicide
+  ;; From PPDB.
+  (molar_mass 529.24 [g/mol])
+  ;; From Bayer.
+  (decompose_halftime 3.2 [d])
+  (decompose_products (0.55 [] metsulfuron-methyl))
+  (adsorption Freundlich (K_OC 33.4 [mL/g]) (m 0.87 [])))
+
+(defchemical metsulfuron-methyl metabolite
+  ;; From PPDB.
+  (molar_mass 381.36 [g/mol])
+  ;; From Bayer.
+  (decompose_halftime 13.2 [d])
+  (adsorption Freundlich (K_OC 14.0 [mL/g]) (m 1.0 [])))
+
+(defchemical mesosulfuron-methyl herbicide
+  ;; From PPDB.
+  (molar_mass 503.51 [g/mol])
+  ;; From Bayer.
+  (decompose_halftime 34.1 [d])
+  (adsorption Freundlich (K_OC 64.0 [mL/g]) (m 0.91 [])))
+  
+
+(defchemistry SB default
+  (trace iodosulfuron-methyl-sodium metsulfuron-methyl))
+
+(defchemical iodosulfuron-methyl-sodium-spring iodosulfuron-methyl-sodium
+  (decompose_products (0.55 [] metsulfuron-methyl-spring)))
+  
+(defchemical metsulfuron-methyl-spring metsulfuron-methyl)
+
+(defchemical iodosulfuron-methyl-sodium-autumn iodosulfuron-methyl-sodium
+  (decompose_products (0.55 [] metsulfuron-methyl-autumn)))
+  
+(defchemical metsulfuron-methyl-autumn metsulfuron-methyl)
+
+(defchemistry WW default
+  (trace iodosulfuron-methyl-sodium-autumn metsulfuron-methyl-autumn
+	 iodosulfuron-methyl-sodium-spring metsulfuron-methyl-spring 
+	 mesosulfuron-methyl))
+
+(defunit [L/ha/h] SIfactor
+  (length 1)
+  (time -1)
+  (factor 2.778e-11))
+
+(defaction "Hussar OD; SB" irrigate_overhead 0.035 [L/ha/h]
+  (remaining_time 1 [h])
+  (solute (iodosulfuron-methyl-sodium 100 [g/L])))
+
+(defaction "Atlantis OD; WW; Autumn" irrigate_overhead 0.75 [L/ha/h] 
+  (remaining_time 1 [h])
+  (solute (iodosulfuron-methyl-sodium-autumn 2 [g/L])
+	  (mesosulfuron-methyl 10 [g/L])))
+  
+(defaction "Husar OD; WW; Spring" irrigate_overhead 0.1 [L/ha/h] 
+  (remaining_time 1 [h])
+  (solute (iodosulfuron-methyl-sodium-spring 100 [g/L])))
+  
+
+
+;; Weather data
+(path &old "I:/SCIENCE-PLEN-ECP-AGRO/Data/dwf-Files")
+
+(defunit [kWh/d/m^2] SIfactor 
+  (mass 1)
+  (time -3)
+  (factor 41.67))
+  
+(defweather Hourly combine
+  (entry ((use Precip)
+	  (source table (file "Control_hourly_daisy.dwf")))
+	 ((source table (file "Control_daily_daisy.dwf")))))
+	 
+(input file "tillage.dai")
+(input file "../nyield/ncrop.dai")
+(input file "log-std.dai")
+(input file "dk-soil.dai")
+
+(defcrop "WW" "Winter Wheat; N2014")
+
+(defaction "WW" activity
+  (wait_mm_dd 9 10)(plowing)
+  (wait_mm_dd 09 15)(seed_bed_preparation)(sow "WW")
+  (wait (crop_ds_after "WW" 0.02))
+  ("Atlantis OD; WW; Autumn")
+  (wait (crop_ds_after "WW" 0.4))
+  ("Husar OD; WW; Spring")
+  (wait (or (crop_ds_after "WW" 2.0)(mm_dd 9 05)))
+  (harvest "WW" (stub 8 [cm])(stem 0.7)(leaf 0.7)))
+
+(defcolumn WW Askov
+  (Groundwater aquitard)
+  (Drain lateral)
+  (Chemistry multi (combine WW))
+  (OrganicMatter none))
+
+(defprogram WW Daisy
+  
+  (weather Hourly)
+
+  (time 2000 1 1 1)
+  (stop 2002 1 1 1)
+
+  (column WW)
+  (manager (repeat WW))
+
+  ;; Create these log files.
+  (log_prefix "focus/")
+  (output ("Field chemical" (chemical iodosulfuron-methyl-sodium-autumn))
+	  ("Field chemical" (chemical metsulfuron-methyl-autumn))
+	  ("Field chemical" (chemical iodosulfuron-methyl-sodium-spring))
+	  ("Field chemical" (chemical metsulfuron-methyl-spring))
+	  ("Field chemical" (chemical mesosulfuron-methyl))
+	  ("Soil chemical" (chemical iodosulfuron-methyl-sodium-autumn))
+	  ("Soil chemical" (chemical metsulfuron-methyl-autumn))
+	  ("Soil chemical" (chemical iodosulfuron-methyl-sodium-spring))
+	  ("Soil chemical" (chemical metsulfuron-methyl-spring))
+	  ("Soil chemical" (chemical mesosulfuron-methyl))))
+
+(run WW)
+
+;;; test-focus.dai ends here.
