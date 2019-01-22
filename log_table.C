@@ -171,7 +171,8 @@ DestinationTable::record_start (const std::vector<Time::component_t>& time_colum
               {
               case Attribute::SoilCells:
               case Attribute::SoilEdges:
-                daisy_warning ("Can't log soil values without soil");
+                daisy_warning (file.name ()
+			       + ": Can't log soil values without soil");
                 type_size = Attribute::Variable;
               }
 
