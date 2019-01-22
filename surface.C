@@ -29,7 +29,6 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "plf.h"
-#include "ridge.h"
 #include "check.h"
 #include "treelog.h"
 #include "frame_submodel.h"
@@ -64,16 +63,12 @@ struct Surface::Implementation
   double runoff_rate;          // [h^-1]
   const double R_mixing;
   const double z_mixing;
-  std::unique_ptr<Ridge> ridge_;
   
   // UZ top.
   Surface::top_t top_type (const Geometry& geo, size_t edge) const;
   double q_top (const Geometry& geo, size_t edge, const double dt) const;
 
   // Functions.
-  void ridge (const Geometry1D& geo,
-              const Soil& soil, const SoilWater& soil_water,
-	      const FrameSubmodel&);
   void exfiltrate (const Geometry& geo, size_t edge,
                    double water, double dt, Treelog&);
   void update_pond_average (const Geometry& geo);
@@ -103,9 +98,6 @@ Surface::Implementation::top_type (const Geometry& geo, size_t edge) const
   if (use_forced_flux)
     return forced_flux;
 
-  if (ridge_.get ())
-    return soil;
-
   if (use_forced_pressure)
     return forced_pressure;
   
@@ -134,9 +126,6 @@ Surface::Implementation::q_top (const Geometry& geo, const size_t edge,
   if (use_forced_flux)
     return forced_flux_value * 0.1; // mm/h -> cm/h.
 
-  if (ridge_.get ())
-    return -ridge_->h () / 1.0 /* [h] */;
-
   daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
   pond_map::const_iterator i = pond_edge.find (edge);
   daisy_assert (i != pond_edge.end ());
@@ -160,58 +149,7 @@ Surface::accept_top (double water /* [cm] */,
 { 
   daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
 
-  if (impl->ridge_.get ())
-    return;		// Handled by ridge based on flux.
-
   impl->exfiltrate (geo, edge, water * 10.0, dt, msg); 
-}
-
-size_t 
-Surface::last_cell (const Geometry& geo, size_t edge) const 
-{ 
-  daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
-  daisy_assert (edge == 0);
-  daisy_assert (impl->ridge_.get ());
-  return impl->ridge_->last_cell ();
-}
-
-void
-Surface::update_water (const Geometry1D& geo,
-                       const Soil& soil,
-		       const std::vector<double>& S_,
-		       std::vector<double>& h_,
-		       std::vector<double>& Theta_,
-		       std::vector<double>& q,
-		       const std::vector<double>& q_p, 
-                       const double dt)
-{
-  if (impl->ridge_.get ())
-    impl->ridge_->update_water (geo, soil, S_, h_, Theta_, q, q_p, dt); 
-}
-
-void 
-Surface::ridge (const Geometry1D& geo,
-                const Soil& soil, const SoilWater& soil_water, 
-		const FrameSubmodel& al)
-{ impl->ridge (geo, soil, soil_water, al); }
-
-void 
-Surface::Implementation::ridge (const Geometry1D& geo,
-                                const Soil& soil, const SoilWater& soil_water,
-				const FrameSubmodel& al)
-{
-  // No permanent ponding.
-  daisy_assert (!use_forced_pressure);
-
-  // Create new ridge system.
-  ridge_.reset (new Ridge (al));
-  ridge_->initialize (geo, soil, soil_water);
-}
-
-void 
-Surface::unridge ()
-{ 
-  impl->ridge_.reset (NULL);
 }
 
 void
@@ -472,13 +410,6 @@ Surface::Implementation::tick (Treelog& msg,
                     < std::max (1000.0, 10.0 * DetentionCapacity));
       daisy_assert (pond_section[c] > -1000.0);
       daisy_assert (evap < 1000.0);
-
-      if (ridge_.get ())
-        {
-          const Geometry1D& geo1d = dynamic_cast<const Geometry1D&> (geo);
-          ridge_->tick (geo1d, soil, soil_water, pond_section[c], dt);
-          exfiltrate (geo, edge, ridge_->exfiltration (), dt, msg);
-        }
     }
   EvapSoilSurface = EvapSoilTotal / geo.surface_area (); // [mm/h]
   update_pond_average (geo);
@@ -577,8 +508,6 @@ Surface::Implementation::output (Log& log) const
   output_variable (EvapSoilSurface, log);
   output_variable (Eps, log);
   output_variable (runoff, log);
-  if (ridge_.get ())
-    output_submodule (*ridge_, "ridge", log);
 }
 
 double
@@ -754,9 +683,6 @@ and the surface, especially in connection with intense rainfall.");
   frame.declare ("R_mixing", "h/mm", Check::non_negative (), Attribute::Const, "\
 Resistance to mixing inorganic compounds between soil and ponding.");
   frame.set ("R_mixing", 1.0e9);
-  frame.declare_submodule ("ridge", Attribute::OptionalState, "\
-Active ridge system, if any.",
-			Ridge::load_syntax);
 }
 
 Surface::Surface (const FrameSubmodel& al)
@@ -787,8 +713,7 @@ Surface::Implementation::Implementation (const FrameSubmodel& al)
     runoff (0.0),
     runoff_rate (0.0),
     R_mixing (al.number ("R_mixing")),
-    z_mixing (al.number ("z_mixing")),
-    ridge_ (al.check ("ridge") ? new Ridge (al.submodel ("ridge")) : NULL)
+    z_mixing (al.number ("z_mixing"))
 { }
 
 Surface::~Surface ()

@@ -39,7 +39,7 @@ class Surface
 
 public:
   // Communication with soil water.
-  enum top_t { forced_pressure, forced_flux, limited_water, soil };
+  enum top_t { forced_pressure, forced_flux, limited_water };
   top_t top_type (const Geometry&, size_t edge) const;
   double q_top (const Geometry&, size_t edge, const double dt) const; // [cm/h]
   double h_top (const Geometry&, size_t edge) const; // [cm]
@@ -61,10 +61,6 @@ public:
 
   // Manager.
   void set_detention_capacity (double);
-  void ridge (const Geometry1D& geo,
-              const Soil& soil, const SoilWater& soil_water,
-	      const FrameSubmodel&);
-  void unridge ();
 
   // Simulation.
   void output (Log&) const;

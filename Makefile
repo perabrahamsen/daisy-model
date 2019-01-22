@@ -39,7 +39,7 @@ OBJHOME = obj
 NATIVEHOME = $(OBJHOME)
 NATIVEEXE = daisy.exe daisyw.exe
 USE_GUI = Q4
-BOOSTINC = -isystem $(CYGHOME)/home/xvs108/boost_1_69_0
+BOOSTINC = -isystem $(CYGHOME)/home/xvs108/boost_1_69_0 -isystem $(CYGHOME)/home/xvs108/boost_1_66_0
 CXSPARSELIB = libcxsparse.a
 SETUPDIR = /home/xvs108/daisy/install
 #MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
@@ -196,7 +196,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = hydraulic_M_vGip.C log_bbch2.C log_bbch.C reaction_shoot.C \
+MODELS = uzrichard2.C hydraulic_M_vGip.C reaction_shoot.C \
 	condition_walltime.C  action_BBCH.C condition_BBCH.C  \
 	pet_FAO_PM_hourly.C summary_fractiles.C \
 	program_extract.C xysource_freq.C program_sbrdata.C hydraulic_wepp.C \
@@ -255,7 +255,7 @@ MODELS = hydraulic_M_vGip.C log_bbch2.C log_bbch.C reaction_shoot.C \
 	condition_weather.C \
 	rootdens_PLF.C rootdens_G_P.C groundwater_file.C action_fertilize.C \
 	action_repeat.C \
-	vegetation_crops.C crop_simple.C action_ridge.C groundwater_fixed.C \
+	vegetation_crops.C crop_simple.C groundwater_fixed.C \
 	groundwater_deep.C hydraulic_M_vG_compact.C \
 	action_crop.C groundwater_lysimeter.C action_message.C \
 	select_index.C select_content.C \
@@ -312,7 +312,7 @@ SUBMODELS = point.C irrigate.C \
 	som.C smb.C aom.C dom.C crpn.C vernalization.C \
 	partition.C production.C \
 	harvesting.C canopy_simple.C canopy_std.C root_system.C \
-	ridge.C soil.C surface.C soil_water.C \
+	soil.C surface.C soil_water.C \
 	soil_heat.C \
 	snow.C harvest.C field.C \
 	bioincorporation.C 
@@ -415,10 +415,10 @@ TEXT =  setup-w32.nsi setup-w64.nsi \
 
 # Select files to be removed by the next commit.
 #
-REMOVE = action_heat.C 
+REMOVE = log_bbch2.C log_bbch.C action_heat.C 
 
 
-REMOVED = groundwater_pipe.C horizon_std.C \
+REMOVED = action_ridge.C ridge.C ridge.h groundwater_pipe.C horizon_std.C \
 	ABAeffect_exp.C ABAeffect.C ABAeffect.h \
 	stomatacon_Leuning.C stomatacon_BB.C \
 	select_pF.C avalue.C alist.C avalue.h alist.h syntax.h syntax.C \
@@ -1189,10 +1189,6 @@ root_system${OBJ}: root_system.C root_system.h plf.h rootdens.h \
  soil_water.h soil.h chemical.h chemistry.h log.h time.h border.h check.h \
  block_model.h block_nested.h block.h scope.h treelog.h frame_model.h \
  frame.h mathlib.h assertion.h metalib.h
-ridge${OBJ}: ridge.C ridge.h soil.h symbol.h geometry1d.h geometry_vert.h \
- geometry.h attribute.h plf.h librarian.h model.h frame_submodel.h \
- frame.h scope.h mathlib.h assertion.h log.h time.h border.h \
- model_framed.h model_logable.h soil_water.h check.h
 soil${OBJ}: soil.C soil.h symbol.h horizon.h model_derived.h model_logable.h \
  model.h geometry.h attribute.h hydraulic.h plf.h tortuosity.h \
  groundwater.h metalib.h frame.h scope.h library.h frame_submodel.h \

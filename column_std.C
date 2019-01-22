@@ -121,7 +121,6 @@ public:
   void sow (const Scope&, Crop&, 
             double row_width, double row_pos, double seed,
             const Time&, Treelog&);
-  void ridge (const FrameSubmodel& al);
   void irrigate (const double duration, const double flux, 
                  const double temp, Irrigation::target_t target,
                  const IM& sm, const boost::shared_ptr<Volume> volume,
@@ -253,10 +252,6 @@ ColumnStandard::sow (const Scope& parent_scope, Crop& crop,
                    seed_N, seed_C, time, msg);
 }
 
-
-void 
-ColumnStandard::ridge (const FrameSubmodel& al)
-{ movement->ridge (surface, *soil, *soil_water, al); }
 
 void 
 ColumnStandard::irrigate (const double duration, const double flux, 
@@ -440,7 +435,6 @@ ColumnStandard::mix (const double from, const double to,
   mix_it (from, to, penetration, msg);
   soil->tillage (geometry, from, to, surface_loose, RR0, 
                  *soil_water, *organic_matter);
-  surface.unridge ();
   litter->update (organic_matter->top_DM ());
 }
 

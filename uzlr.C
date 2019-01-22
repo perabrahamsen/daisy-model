@@ -87,45 +87,20 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
   double q_down = 0.0;
   const Surface::top_t top_type = top.top_type (geo, top_edge);
 
-  if (top_type == Surface::soil)
+  // Limit flux by soil capacity.
+  const double K_sat = soil.K (first, 0.0, h_ice[first], 
+			       soil_heat.T (first));
+  daisy_assert (K_sat > 0.0);
+
+  if (top_type == Surface::forced_pressure)
     {
-      // We have a forced pressure top, in the form of a ridge system.
-      // Since LR only works with flux top, we use Darcy to simulate a
-      // flux top between the first cell (with a forced pressure) and
-      // the second cell, and then continue calculating with a flux
-      // top from the second cell.
-      const double dz = geo.cell_z (first) - geo.cell_z (first+1);
-      const double dh = (h_old[first] - h_old[first+1]);
-      const double K = std::min (soil.K (first, h_old[first], h_ice[first],
-                                         soil_heat.T (first)),
-                                 soil.K (first, h_old[first+1], h_ice[first+1],
-                                         soil_heat.T (first+1)));
-      q_up = -K * (dh/dz + 1.0);
-
-      // We can safely ignore S[first], since the ridge system has
-      // already incorporated it.
-      first++;
-
-      // New upper limit.
-      q[first] = q_up;
+      const double dz = 0.0 - geo.cell_z (first);
+      const double dh = top.h_top (geo, top_edge) - h_old[first];
+      q_up = q[first] = -K_sat * (dh/dz + 1.0);
     }
   else
-    {
-      // Limit flux by soil capacity.
-      const double K_sat = soil.K (first, 0.0, h_ice[first], 
-				   soil_heat.T (first));
-      daisy_assert (K_sat > 0.0);
-
-      if (top_type == Surface::forced_pressure)
-	{
-	  const double dz = 0.0 - geo.cell_z (first);
-	  const double dh = top.h_top (geo, top_edge) - h_old[first];
-	  q_up = q[first] = -K_sat * (dh/dz + 1.0);
-	}
-      else
-        // Limited water or forced flux.
-	q_up = q[first] = std::max (top.q_top (geo, top_edge, dt), -K_sat);
-    }
+    // Limited water or forced flux.
+    q_up = q[first] = std::max (top.q_top (geo, top_edge, dt), -K_sat);
 
   //  Use darcy for upward movement in the top.
   const bool use_darcy = (h_old[first] < h_fc) && (q_up > 0.0);

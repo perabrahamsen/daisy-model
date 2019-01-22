@@ -60,7 +60,6 @@ struct Field::Implementation
   void sow (const Metalib&, Crop& crop, 
             double row_width, double row_pos, double seed,
             const Time& time, Treelog&);
-  void ridge (const FrameSubmodel& ridge);
   void irrigate (const double duration, const double flux, 
                  const double temp, Irrigation::target_t target,
                  const IM& sm, const boost::shared_ptr<Volume> volume,
@@ -228,20 +227,6 @@ Field::Implementation::sow (const Metalib& metalib, Crop& crop,
 	  Treelog::Open nest (msg, (*i)->objid);
 	  (*i)->sow (metalib, crop, row_width, row_pos, seed, time, msg);
 	}
-    }
-}
-
-void 
-Field::Implementation::ridge (const FrameSubmodel& ridge)
-{
-  if (selected)
-    selected->ridge (ridge);
-  else 
-    {
-      for (ColumnList::iterator i = columns.begin ();
-	   i != columns.end ();
-	   i++)
-	(*i)->ridge (ridge);
     }
 }
 
@@ -921,10 +906,6 @@ Field::sow (const Metalib& metalib, Crop& crop,
             const double row_width, const double row_pos, const double seed,
             const Time& time, Treelog& msg)
 { impl->sow (metalib, crop, row_width, row_pos, seed, time, msg); }
-
-void 
-Field::ridge (const FrameSubmodel& al)
-{ impl->ridge (al); }
 
 void 
 Field::irrigate (const double duration, const double flux, 

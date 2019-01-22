@@ -83,7 +83,6 @@ public:
   virtual void sow (const Scope&, Crop& crop, 
                     double row_width, double row_pos, double seed,
                     const Time&, Treelog&) = 0;
-  virtual void ridge (const FrameSubmodel& ridge) = 0;
   virtual void irrigate (const double duration, const double flux, 
                          const double temp, Irrigation::target_t target,
                          const IM& sm, const boost::shared_ptr<Volume> volume,

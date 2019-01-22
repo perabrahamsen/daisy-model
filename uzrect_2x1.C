@@ -284,10 +284,8 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
   daisy_assert (geo.edge_to (top_edge) == Geometry::cell_above);
   daisy_assert (q.size () > bottom_cell + 1);
 
-  // Limit for ridging.
-  const size_t first = top_cell +
-    (surface.top_type (geo, top_edge) == Surface::soil
-     ?  surface.last_cell (geo, top_edge) : 0);
+  // Limit for top.
+  const size_t first = top_cell;
 
   // Limit for groundwater table.
   const size_t bottom_edge = bottom_cell + q_offset + 1U;

@@ -103,8 +103,6 @@ public:
                      double T_bottom,
 		     std::vector<double>& T,
 		     const double dt, Treelog&) const = 0;
-  virtual void ridge (Surface&, const Soil&, const SoilWater&, 
-                      const FrameSubmodel&) = 0;
   void remove_solute (const symbol chem);
   double total_solute (const Geometry&, const symbol chem) const; //[g/m^2]
 

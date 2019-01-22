@@ -1,4 +1,4 @@
-// uzrichard.C --- Using Richard's Equation to calculate water flow.
+// uzrichard2.C --- Using Richard's Equation to calculate water flow.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -37,12 +37,14 @@
 #include <sstream>
 #include <memory>
 
-class UZRichard : public UZmodel
+class UZRichard2 : public UZmodel
 {
   // Parameters.
   const int debug;
-  const int max_time_step_reductions;
-  const int time_step_reduction;
+  const double timestep_factor;
+  const double min_timestep;
+  const int low_iterations;
+  const int high_iterations;
   const int max_iterations;
   const int max_number_of_small_time_steps;
   const int msg_number_of_small_time_steps;
@@ -101,12 +103,12 @@ public:
   // Create and Destroy.
 public:
   void has_macropores (bool); // Tell UZ that there is macropores.
-  UZRichard (const BlockModel& par);
-  ~UZRichard ();
+  UZRichard2 (const BlockModel& par);
+  ~UZRichard2 ();
 };
 
 bool
-UZRichard::richard (Treelog& msg,
+UZRichard2::richard (Treelog& msg,
 		    const GeometryVert& geo,
                     const Soil& soil,
 		    const SoilHeat& soil_heat,
@@ -190,8 +192,6 @@ UZRichard::richard (Treelog& msg,
   bool switched_top = false;  // Switched top this timestep?
   double time_left = dt;	// How much of the large time step left.
   double ddt = dt;		// We start with small == large time step.
-  int number_of_time_step_reductions = 0;
-  int iterations_with_this_time_step = 0;
   int n_small_time_steps = 0;
 
   // We switch to pressure top of flux top leave top node saturated. Once.
@@ -219,11 +219,10 @@ UZRichard::richard (Treelog& msg,
           msg.flush ();
         }
       
-      n_small_time_steps++;
-      if (n_small_time_steps > max_number_of_small_time_steps) 
+      if (++n_small_time_steps > max_number_of_small_time_steps) 
         {
           msg.debug ("Too many small timesteps");
-          throw "Too many small timesteps";
+	  return false;
         }
 
       for (unsigned int i = 0; i < size; i++)
@@ -266,7 +265,10 @@ UZRichard::richard (Treelog& msg,
 
       do
 	{
-          if (++iterations_used > max_iterations)
+	  iterations_used++;
+          if ((ddt > min_timestep)
+	      ? (iterations_used > max_iterations)
+	      : (iterations_used > max_iterations * 1))
             {
               if (debug > 1)
                 {
@@ -521,7 +523,7 @@ UZRichard::richard (Treelog& msg,
       available_water += delta_top_water;
       time_left -= ddt;
       switched_top = false;
-      iterations_with_this_time_step++;
+      iterations_used++;
 
       if (debug > 1)
 	{
@@ -531,19 +533,13 @@ UZRichard::richard (Treelog& msg,
 	      << "; iterations = " << iterations_used;
 	  msg.message (tmp.str ());
 	}
-      
-      if (iterations_with_this_time_step > time_step_reduction)
-        {
-          number_of_time_step_reductions--;
-          iterations_with_this_time_step = 0;
-          ddt *= time_step_reduction;
-	  if (debug > 1)
-	    {
-	      std::ostringstream tmp;
-	      tmp << "Increasing timestep to " << ddt;
-	      msg.message (tmp.str ());
-	    }
-        }
+
+      if (iterations_used > high_iterations
+	  && ddt > min_timestep)
+	ddt *= timestep_factor;
+      else if (iterations_used < low_iterations)
+	ddt /= timestep_factor;
+
       continue;
 
       // Convergence problems.
@@ -589,14 +585,7 @@ UZRichard::richard (Treelog& msg,
       
       // Reduce timestep.
     reduce_timestep:
-      if (++number_of_time_step_reductions > max_time_step_reductions)
-        {
-	  if (debug > 1)
-	    msg.message ("Too many timestep reductions");
-
-	  return false;
-        }
-      ddt /= time_step_reduction;
+      ddt *= timestep_factor;
       switched_top = false;
       
       if (debug > 1)
@@ -652,7 +641,7 @@ UZRichard::richard (Treelog& msg,
 }
 
 bool
-UZRichard::converges (const std::vector<double>& previous,
+UZRichard2::converges (const std::vector<double>& previous,
 		      const std::vector<double>& current) const
 {
   size_t size = previous.size ();
@@ -671,7 +660,7 @@ UZRichard::converges (const std::vector<double>& previous,
 }
 
 void 
-UZRichard::internode (const Soil& soil, const SoilHeat& soil_heat,
+UZRichard2::internode (const Soil& soil, const SoilHeat& soil_heat,
 		      int first, int last,
 		      const std::vector<double>& h_ice,
 		      const std::vector<double>& K, 
@@ -693,7 +682,7 @@ UZRichard::internode (const Soil& soil, const SoilHeat& soil_heat,
 }
 
 void
-UZRichard::q_darcy (const GeometryVert& geo,
+UZRichard2::q_darcy (const GeometryVert& geo,
 		    const int first, const int last,
 		    const std::vector<double>& /* h_previous */,
 		    const std::vector<double>& h,
@@ -762,7 +751,7 @@ calculating flow with pressure top.\n";
 }
 
 void
-UZRichard::tick (Treelog& msg, const GeometryVert& geo,
+UZRichard2::tick (Treelog& msg, const GeometryVert& geo,
                  const Soil& soil, const SoilHeat& soil_heat,
                  unsigned int first, const Surface& top, 
                  const size_t top_edge,
@@ -785,7 +774,7 @@ UZRichard::tick (Treelog& msg, const GeometryVert& geo,
 }
 
 void
-UZRichard::has_macropores (const bool has_them)
+UZRichard2::has_macropores (const bool has_them)
 { 
   if (K_average.get ())
     return;
@@ -798,12 +787,14 @@ UZRichard::has_macropores (const bool has_them)
   daisy_assert (K_average.get ());
 }
 
-UZRichard::UZRichard (const BlockModel& al)
+UZRichard2::UZRichard2 (const BlockModel& al)
   : UZmodel (al),
     // Parameters.
     debug (al.integer ("debug")),
-    max_time_step_reductions (al.integer ("max_time_step_reductions")),
-    time_step_reduction (al.integer ("time_step_reduction")),
+    timestep_factor (al.number ("timestep_factor")),
+    min_timestep (al.number ("min_timestep")),
+    low_iterations (al.integer ("low_iterations")),
+    high_iterations (al.integer ("high_iterations")),
     max_iterations (al.integer ("max_iterations")),
     max_number_of_small_time_steps (al.integer ("max_number_of_small_time_steps")),
     msg_number_of_small_time_steps (al.integer ("msg_number_of_small_time_steps")),
@@ -814,17 +805,17 @@ UZRichard::UZRichard (const BlockModel& al)
 	       : NULL)
 { }
 
-UZRichard::~UZRichard ()
+UZRichard2::~UZRichard2 ()
 { }
 
-// Add the UZRichard syntax to the syntax table.
-static struct UZRichardSyntax : DeclareModel
+// Add the UZRichard2 syntax to the syntax table.
+static struct UZRichard2Syntax : DeclareModel
 {
   Model* make (const BlockModel& al) const
-  { return new UZRichard (al); }
+  { return new UZRichard2 (al); }
 
-  UZRichardSyntax ()
-    : DeclareModel (UZmodel::component, "richards", "\
+  UZRichard2Syntax ()
+    : DeclareModel (UZmodel::component, "richards2", "\
 A numerical solution to Richard's Equation.")
   { }
   void load_frame (Frame& frame) const
@@ -832,16 +823,22 @@ A numerical solution to Richard's Equation.")
     frame.declare_integer ("debug", Attribute::Const, "\
 Print additional debug messages, higher numbers means more messages.");
     frame.set ("debug", 0);
-    frame.declare_integer ("max_time_step_reductions", Attribute::Const, "\
-Number of times we may reduce the time step before giving up");
-    frame.set ("max_time_step_reductions", 16);
-    frame.declare_integer ("time_step_reduction", Attribute::Const, 
-               "Divide the time step with this at each reduction.");
-    frame.set ("time_step_reduction", 4);
+    frame.declare ("timestep_factor", Attribute::None (), Attribute::Const, "\
+Multiply timestep with this if less than 'low_iterations' is used.\n\
+Divide timestep with this if more than 'high_iterations' is used.");
+    frame.set ("timestep_factor", 0.7);
+    frame.declare ("min_timestep", Attribute::None (), Attribute::Const, "\
+Smallest timestep before giving up.");
+    frame.set ("min_timestep", 1e-10);
+    frame.declare_integer ("low_iterations", Attribute::Const, "\
+Below this, increase timestep.");
+    frame.set ("low_iterations", 3);
+    frame.declare_integer ("high_iterations", Attribute::Const, "\
+Above this, decrease timestep.");
+    frame.set ("high_iterations", 4);
     frame.declare_integer ("max_iterations", Attribute::Const, "\
-Maximum number of iterations when seeking convergence before reducing\n\
-the time step.");
-    frame.set ("max_iterations", 25);
+Above this, give up convergence.");
+    frame.set ("max_iterations", 10);
     frame.declare_integer ("max_number_of_small_time_steps", Attribute::Const, "\
 Maximum number of small time steps in a large time step.");
     frame.set ("max_number_of_small_time_steps", 200000);  
@@ -860,6 +857,6 @@ Maximum relative difference in 'h' values for convergence.");
 The default model is 'geometric' if there are macropores, and\n\
 'arithmetic' otherwise.");
   }
-} UZRichard_syntax;
+} UZRichard2_syntax;
 
-// uzrichards.C ends here.
+// uzrichards2.C ends here.

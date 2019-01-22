@@ -97,10 +97,6 @@ struct Movement1D : public MovementSolute
              std::vector<double>& T,
              const double dt, Treelog&) const;
 
-  // Management.
-  void ridge (Surface& surface, const Soil& soil, const SoilWater& soil_water,
-              const FrameSubmodel& al);
-
   // Simulation.
   void tick (const Soil& soil, SoilWater& soil_water, const SoilHeat& soil_heat,
              Surface& surface, Groundwater& groundwater,
@@ -144,9 +140,8 @@ Movement1D::tick_water (const Geometry1D& geo,
   size_t last  = soil.size () - 1;
 
   // Limit for ridging.
-  const size_t first = (surface.top_type (geo, 0U) == Surface::soil)
-    ? surface.last_cell (geo, 0U) 
-    : 0U;
+  const size_t first = 0U;
+  
   // Calculate matrix flow next.
 
   for (size_t m = 0; m < matrix_water.size (); m++)
@@ -361,12 +356,6 @@ Movement1D::heat (const std::vector<double>& q_water,
               capacity_new, conductivity,
               T_top, T_top_new, T_bottom, T, dt);
 }
-
-void 
-Movement1D::ridge (Surface& surface, const Soil& soil,
-                   const SoilWater& soil_water,
-                   const FrameSubmodel& al)
-{ surface.ridge (*geo, soil, soil_water, al); }
 
 void 
 Movement1D::tick (const Soil& soil, SoilWater& soil_water, 

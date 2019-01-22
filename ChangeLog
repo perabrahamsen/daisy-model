@@ -1,3 +1,21 @@
+2019-01-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* Makefile (SUBMODELS): Removed ridge.C.
+	(MODELS): Removed action_ridge.C.
+	* ridge.h, ridge.C, action_ridge.C: Removed files.
+	* surface.h (ridge, unridge, top_type::soil): Removed.
+	* surface.C (last_cell, update_water): Removed.
+	* uzlr.C, uzrichards.C, uzrect_Mollerup.C: Updated callers.
+	* column_std.C (ColumnStandard::mix): Update caller.
+	* column.h, column_std.C (ColumnStandard::ridge): Removed.
+	* movement.h, movement_1D.C (ridge): Removed.
+	* field.h, field.C (ridge): Removed.
+
+2019-01-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* log_bbch2.C, log_bbch.C: Removed files.
+	* Makefile (MODELS): Removed.
+
 2018-12-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
 
 	* phenology_std.C (DS1_name): Parameter removed.

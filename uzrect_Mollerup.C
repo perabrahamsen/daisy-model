@@ -927,8 +927,6 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
               }
           }
 	  break;
-	case Surface::soil:
-	  throw "Don't know how to handle this surface type";
 	default:
 	  daisy_panic ("Unknown surface type");
 	}

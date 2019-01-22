@@ -78,7 +78,6 @@ public:
   void sow (const Metalib&, Crop& crop, 
             double row_width, double row_pos, double seed,
             const Time&, Treelog&);
-  void ridge (const FrameSubmodel& ridge);
   void irrigate (const double duration, const double flux, 
                  const double temp, Irrigation::target_t target,
                  const IM& sm, const boost::shared_ptr<Volume> volume,
