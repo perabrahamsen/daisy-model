@@ -198,6 +198,8 @@ struct CropStandard : public Crop
   // Queries.
   double DS () const
   { return development->DS; }
+  double stage () const
+  { return cstage->stage (); }
   double DM (double height) const;
   double SOrg_DM () const;
   double N_fixated () const

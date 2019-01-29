@@ -112,6 +112,9 @@ public:
   // Current development stage for the crop named "crop", or
   // Crop::DSremove if no such crop is present.
   double crop_ds (symbol crop) const; 
+  // Use defined phenological stage for the crop named "crop", or
+  // Crop::DSremove if no such crop is present.
+  double crop_stage (symbol crop) const; 
   // Drymatter in shoot [kg/ha], or negative if no such crop is present
   double crop_dm (symbol crop, double height) const; 
   // Drymatter in sorg [kg/ha], or negative if no such crop is present
@@ -640,6 +643,32 @@ Field::Implementation::crop_ds (symbol crop) const
 } 
 
 double 
+Field::Implementation::crop_stage (symbol crop) const
+{ 
+  if (selected)
+    return selected->crop_stage (crop);
+  
+  double stage = 0.0;
+  double total_area = 0.0;
+  for (ColumnList::const_iterator i = columns.begin ();
+       i != columns.end ();
+       i++)
+    {
+      const double area = (*i)->area;
+      const double this_stage = (*i)->crop_stage (crop);
+      if (!approximate (this_stage, Crop::DSremove))
+        {
+          total_area += area;
+          stage += this_stage;
+        }
+    }
+  if (total_area > 0.0)
+    return stage / total_area;
+
+  return Crop::DSremove;
+} 
+
+double 
 Field::Implementation::crop_dm (const symbol crop, const double height) const
 {
   if (selected)
@@ -1040,6 +1069,10 @@ Field::second_year_utilization () const // [kg N/ha]
 double 
 Field::crop_ds (const symbol crop) const
 { return impl->crop_ds (crop); } 
+
+double 
+Field::crop_stage (const symbol crop) const
+{ return impl->crop_stage (crop); } 
 
 double 
 Field::crop_dm (const symbol crop, const double height) const

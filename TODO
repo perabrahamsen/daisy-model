@@ -2,34 +2,27 @@ TODO ---things that needs to be done with Daisy -*- outline -*-
 
 * TODO
 
+** Andelst sim
+
 ** Make release all platforms
-
-** BBCH (Maja)
-
-** uzrichards upper boundary
-
-** S term øverste celle?
 
 ** AA opgaver
 
 * Implementer BBCH
 
+** Dokumenter (Dekstop/BBCH)
+
 ** SB BBCH eksempel ligger i test-stage.dai
 
 ** Regneark ligger i Dekstop/BBCH
 
-** WW
-
-*** Hvorfor vil den ikke optimere?
-
-*** Tilføj manglende BBCH tal fra Jacobs interpolation
-
-** crop_stage_after condition
-
-** Sammenlign med BASF
+** Sammenlign med BASF (Maja)
 
 * Kik på Andelst 
 
+** uzrichards upper boundary
+
+** S term øverste celle?
 ---
 
 * Andelst
@@ -46,6 +39,16 @@ too slow
 
 too slow
 
+
+* February RP meeting
+
+** Science meeting first week of april
+
+** Brimstone: Need hourly weather. Long series.
+
+** Boarded: Need measurements, has hourly raain. Has DFF.
+
+** We likely only have time to look at one.
 
 * ML
 

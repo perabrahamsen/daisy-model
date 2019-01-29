@@ -156,6 +156,7 @@ struct VegetationCrops : public Vegetation
 
   // Individual crop queries.
   double DS_by_name (symbol name) const;
+  double stage_by_name (symbol name) const;
   double DM_by_name (symbol name, double height) const;
   double SOrg_DM_by_name (symbol name) const;
   std::string crop_names () const;
@@ -349,6 +350,28 @@ VegetationCrops::DS_by_name (symbol name) const
        crop++)
     if (library.is_derived_from ((*crop)->objid,  name))
       return (*crop)->DS ();
+  return Crop::DSremove;
+}
+
+double 
+VegetationCrops::stage_by_name (symbol name) const
+{
+  if (name == Vegetation::all_crops ())
+    {
+      double stage = Crop::DSremove;
+      for (CropList::const_iterator crop = crops.begin ();
+           crop != crops.end ();
+           crop++)
+        stage = std::max (stage, (*crop)->stage ());
+
+      return stage;
+    }
+
+  for (CropList::const_iterator crop = crops.begin ();
+       crop != crops.end ();
+       crop++)
+    if (library.is_derived_from ((*crop)->objid,  name))
+      return (*crop)->stage ();
   return Crop::DSremove;
 }
 

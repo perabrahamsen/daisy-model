@@ -164,6 +164,60 @@ Specify \"all\" to use combined weight of all crops on the field in test.");
   }
 } ConditionCropDS_syntax;
 
+// The 'crop_stage_after' condition.
+
+struct ConditionStageAfter : public Condition
+{
+  const symbol crop;
+  const double stage;
+
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
+  { 
+    const double crop_stage = daisy.field ().crop_stage (crop); 
+    if (!approximate (crop_stage, Crop::DSremove) && crop_stage >= stage)
+      return true;
+    return false;
+  }
+  void output (Log&) const
+  { }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
+  ConditionStageAfter (const BlockModel& al)
+    : Condition (al),
+      crop (al.name ("crop")),
+      stage (al.number ("stage"))
+  { }
+};
+
+static struct ConditionCropStageSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ConditionStageAfter (al); }
+
+  ConditionCropStageSyntax ()
+    : DeclareModel (Condition::component, "crop_stage_after", "\
+True iff the crop has reached development stage 'stage'.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.declare_string ("crop", Attribute::Const,
+                "Name of crop on the field to test.\n\
+Specify \"all\" to use combined weight of all crops on the field in test.");
+    frame.set_check ("crop", Crop::check_all ());
+    frame.declare ("stage", Attribute::None (),  Attribute::Const,
+		   "Crop specific phenological stage.");
+    frame.order ("crop", "stage");
+  }
+} ConditionCropStage_syntax;
+
 // The 'crop_dm_over' condition.
 
 struct ConditionDMOver : public Condition

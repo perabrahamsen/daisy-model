@@ -1,6 +1,14 @@
-2019-01-22  Per Abrahamsen  <pa@plen.ku.dk>
+2019-01-29  Per Abrahamsen  <pa@plen.ku.dk>
 
-	* Version 5.73 released.
+	* Version 5.74 released.
+
+2019-01-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* crop.h, crop.C, crop_std.C (stage): New function.
+	* vegetation_afforestation.C, vegetation_permanent.C:
+	* vegetation.h, vegetation_crops.C (stage_by_name): New function.
+	* column.h, column_std.C, field.h, field.C (crop_stage): New function.
+	* condition_crop.C (crop_stage_after): New model.
 
 2019-01-22  Per Abrahamsen  <pa@plen.ku.dk>
 

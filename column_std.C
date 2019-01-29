@@ -172,6 +172,7 @@ public:
   double soil_inorganic_nitrogen (double from, double to) const; // [kg N/ha]
   double second_year_utilization () const;// [kg N/ha]
   double crop_ds (symbol crop) const; 
+  double crop_stage (symbol crop) const; 
   double crop_dm (symbol crop, double height) const; 
   double crop_sorg_dm (const symbol name) const;
   std::string crop_names () const;
@@ -593,6 +594,10 @@ ColumnStandard::second_year_utilization () const
 double  
 ColumnStandard::crop_ds (const symbol name) const // {[-1:2], Crop::DSremove}
 { return vegetation->DS_by_name (name); }
+
+double  
+ColumnStandard::crop_stage (const symbol name) const // User defined stage.
+{ return vegetation->stage_by_name (name); }
 
 double 
 ColumnStandard::crop_dm (const symbol name, const double height) const

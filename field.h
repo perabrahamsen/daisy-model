@@ -125,6 +125,8 @@ public:
   // Current development stage for the crop named "crop", or
   // Crop::DSremove if no such crop is present.
   double crop_ds (symbol crop) const; 
+  // Phenological stage (could be BBCH, by default DS)
+  double crop_stage (symbol crop) const; 
   // Drymatter in shoot [kg/ha], or negative if no such crop is present
   double crop_dm (symbol crop, double height) const; 
   double crop_sorg_dm (symbol crop) const; 

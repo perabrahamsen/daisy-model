@@ -137,6 +137,8 @@ public:
   // Current development stage for the crop named "crop", or
   // Crop::DSremove if no such crop is present.
   virtual double crop_ds (symbol crop) const = 0; 
+  // Phenological stage (could be BBCH, by default DS)
+  virtual double crop_stage (symbol crop) const = 0; 
   // Drymatter in shoot [kg/ha], or negative if no such crop is present
   virtual double crop_dm (symbol crop, double height) const = 0; 
   // Drymatter in storage organ [kg/ha], or negative if no such crop is present

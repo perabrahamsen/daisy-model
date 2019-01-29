@@ -141,6 +141,7 @@ public:
 public:
   static bool ds_remove (const Crop*);
   virtual double DS () const = 0; // Development stage, [-1:2] or DSremove.
+  virtual double stage () const;
   static const double DSremove;
   virtual double DM (double height) const = 0; // Shoot dry matter, [kg DM/ha].
   virtual double SOrg_DM () const = 0;         // SOrg dry matter [kg DM/ha].

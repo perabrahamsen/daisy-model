@@ -6,6 +6,43 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.74
+
+** Support for converting DS to other models, e.g. BBCH.
+
+You define the convertion like this:
+
+    (defcstage "BBCH; Spring Barley" BBCH
+      ;; Format: (DS BBCH message)
+      (table (0.00   9 "BBCH 09: Emergence")
+             (0.20  21 "BBCH 21: Beginning of tillering")
+             (0.42  30 "BBCH 30: Beginning of stem elongation")
+             (1.03  55 "BBCH 55: Middle of heading")
+             (1.23  65 "BBCH 65: Full flowering")
+             (2.00  89 "BBCH 89: Fully ripe")))
+
+and apply it like this:
+
+    (sow ("Spring Barley" (CStage "BBCH; Spring Barley")))
+
+This has three effects:
+
+1. During simulation, the messages of the table will be printed each
+time DS reached the specified value.
+
+2. The latest stage in the table will be reported in the last column
+in the "Crop" log. So in the expample above it will stay at 9 until DS
+reach 0.20, then change to 21.
+
+3. You can use "crop_stage_after" instead of "crop_ds_after" in
+management, e.g.
+
+(wait (crop_stage_after "Spring Barley" 89))
+(harvest "Spring Barley")
+
+The deault 'cstage' model is just DS and will give a message at DS 0
+(emergence), 1 (flowering), and 2 (ripe).
+
 * 5.72
 
 ** Fix decompose_rate.
@@ -2150,8 +2187,8 @@ specify the new Movement column parameter, like this:
 (defcolumn Andeby2D Andeby
   "Two dimensional setup for Andeby."
   (Movement rectangle
-	    (Geometry (zplus -2.5 -5 -10 -20 -40 -60 -80 -100  -120  -150 [cm])
-		      (xplus 2 4 6 8 10 [cm]))))
+            (Geometry (zplus -2.5 -5 -10 -20 -40 -60 -80 -100  -120  -150 [cm])
+                      (xplus 2 4 6 8 10 [cm]))))
 
 The 2D movement model is called "rectangle", because it is called
 "rectangle", because it is based on a rectangular grid, where you

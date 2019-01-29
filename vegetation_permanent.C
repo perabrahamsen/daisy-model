@@ -138,6 +138,8 @@ struct VegetationPermanent : public Vegetation
   // Individual crop queries.
   double DS_by_name (symbol) const
   {   return Crop::DSremove; }
+  double stage_by_name (symbol) const
+  {   return Crop::DSremove; }
   double DM_by_name (symbol, double) const
   { return 0.0; }
   double SOrg_DM_by_name (symbol) const

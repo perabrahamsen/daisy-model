@@ -110,6 +110,10 @@ bool
 Crop::ds_remove (const Crop* crop)
 { return approximate (crop->DS (), Crop::DSremove); }
 
+double
+Crop::stage () const
+{ return DS (); }
+
 const VCheck& 
 Crop::check_all ()
 {
