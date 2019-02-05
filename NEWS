@@ -10,7 +10,7 @@ release.
 
 ** Support for converting DS to other models, e.g. BBCH.
 
-You define the convertion like this:
+You define the conversion like this:
 
     (defcstage "BBCH; Spring Barley" BBCH
       ;; Format: (DS BBCH message)
@@ -31,7 +31,7 @@ This has three effects:
 time DS reached the specified value.
 
 2. The latest stage in the table will be reported in the last column
-in the "Crop" log. So in the expample above it will stay at 9 until DS
+in the "Crop" log. So in the example above it will stay at 9 until DS
 reach 0.20, then change to 21.
 
 3. You can use "crop_stage_after" instead of "crop_ds_after" in
@@ -53,7 +53,7 @@ It was multiplied twice, making slow decomposition very slow.
 
 ** New parameter 'soil_affects_surface_decompose'
 
-Default false. If true, surface decomposition is affect by the same
+Default false. If true, surface decomposition is affected by the same
 heat, moisture, etc factors as decomposition in the top soil.
 
 * 5.71

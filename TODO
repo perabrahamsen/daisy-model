@@ -2,21 +2,46 @@ TODO ---things that needs to be done with Daisy -*- outline -*-
 
 * TODO
 
-** Andelst sim
-
 ** Make release all platforms
+
+*** Ubuntu
 
 ** AA opgaver
 
-* Implementer BBCH
+** Prepare for running long series med fixed dates.
 
-** Dokumenter (Dekstop/BBCH)
+From 2018-11-14 minutes: 
+DFF 500SC: DFF, overall BBCH 0 - 29, with different application rates in winter and spring
+cereals, 75 or 120 g/ha.
+Action Per, Maja: use these
 
-** SB BBCH eksempel ligger i test-stage.dai
+Hvilke doser bruger vi?
 
-** Regneark ligger i Dekstop/BBCH
+** BBCH PLAP Opsætning?
 
-** Sammenlign med BASF (Maja)
+vejrfiler med grid
+
+hurtig jord
+
+bbch fil
+site,crop,date,bbch
+
+management for hver site
+hvad skal med? crop, fertilize?, spray? tillage?
+(defcrop "PLAP-SB" "Merete's SB par")
+
+yield fil
+site,crop,date,yield
+
+fertilize fil?
+
+spray fil?
+
+tillage fil?
+
+** BBCH doc
+
+Mere om kilder. Cultivars for SB (CPE mail)
 
 * Kik på Andelst 
 

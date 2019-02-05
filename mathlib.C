@@ -68,18 +68,15 @@ first_order_change (const double old_storage /* [M] */,
   const double c1 = S0 - I/L;   // [M]
   
   // Knowing c1, we can find the content at the end of the timestep.
-  
   const double S1 = c1 * std::exp (-L * dt) + I/L; // [M]
   
-  // We can find the loss by integrating S (t) L from 0 to dt
-  const double loss = -c1 * std::exp (-L * dt) + c1 + I * dt;
-
   // The gain is simply the constant input multiplied with the timestep.
   const double gain = I * dt;
 
-  // Now we can check mass balance
-  if (!approximate (S1 - S0, gain - loss)
-      && !approximate (S1, S0))
+  // We find loss from mass balance.
+  const double loss = S0 - S1 + gain;
+
+  if (loss < 0.0)
     {
       std::ostringstream tmp;
       tmp << "S0 = " << S0;
@@ -90,7 +87,7 @@ first_order_change (const double old_storage /* [M] */,
       tmp << "; gain - loss = " << gain - loss;
       daisy_warning (tmp.str ());
     }
-
+  
   if (S1 >= 0)
     {
       new_storage = S1;
