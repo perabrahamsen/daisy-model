@@ -1,5 +1,13 @@
 2019-02-05  Per Abrahamsen  <pa@plen.ku.dk>
 
+	* Version 5.76 released.
+
+2019-02-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* assertion.C (Assertion::approximate): Made it a warning.
+
+2019-02-05  Per Abrahamsen  <pa@plen.ku.dk>
+
 	* Version 5.75 released.
 
 2019-02-05  Per Abrahamsen  <per.abrahamsen@gmail.com>

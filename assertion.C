@@ -177,7 +177,7 @@ Assertion::approximate (const char* file, int line, const char* fun,
     {
       std::ostringstream tmp;
       tmp << a << " != " << b;
-      Assertion::failure (file, line, fun, tmp.str ().c_str ());
+      Assertion::warning (file, line, fun, tmp.str ().c_str ());
     }
     
 }
