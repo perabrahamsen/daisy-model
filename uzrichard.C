@@ -46,6 +46,7 @@ class UZRichard : public UZmodel
   const int max_iterations;
   const int max_number_of_small_time_steps;
   const int msg_number_of_small_time_steps;
+  const bool require_positive_convergence;
   const double max_absolute_difference;
   const double max_relative_difference;
   std::unique_ptr<const Average> K_average;
@@ -660,12 +661,30 @@ UZRichard::converges (const std::vector<double>& previous,
 
   for (unsigned int i = 0; i < size; i++)
     {
-      if (   fabs (current[i] - previous[i]) > max_absolute_difference
-	  && (previous[i] < 0.0 || current[i] < 0.0)
-	  && (   iszero (previous[i])
-	      || (  fabs ((current[i] - previous[i]) / previous[i])
-		  > max_relative_difference)))
+      const double absolute_difference = std::fabs (current[i] - previous[i]);
+      if (absolute_difference < max_absolute_difference)
+	// Small absolute difference, OK.
+	continue;
+
+      const double abs_previous = fabs (previous[i]);
+      if (abs_previous < 0.1)
+	// Pressure close to zero, OK.
+	continue;
+
+      const double relative_difference = absolute_difference / abs_previous;
+      if (relative_difference < max_relative_difference)
+	// Small relative difference, OK.
+	continue;
+
+      if (require_positive_convergence)
+	// We have no exception for positive pressure, NOT OK.
 	return false;
+
+      if (previous[i] >= 0.0 && current[i] >= 0.0)
+	// Positive always OK.
+	continue;
+
+      return false;
     }
   return true;
 }
@@ -733,12 +752,12 @@ calculating flow with pressure top.\n";
           << "last " << last << " ends at " << geo.zplus (last) << " [cm]";
       throw (tmp.str ());
     }
-#ifdef REQUIRE_UNSATURATED_DARCY
   for (; start > first; start--)
     {
       if (h[start - first] < 0.0 && h[start + 1 - first] < 0.0)
 	break;
     }
+#ifdef REQUIRE_UNSATURATED_DARCY
   if (start == first)
     throw ("We couldn't find an unsaturated area.");
 #endif // REQUIRE_UNSATURATED_DARCY
@@ -807,6 +826,7 @@ UZRichard::UZRichard (const BlockModel& al)
     max_iterations (al.integer ("max_iterations")),
     max_number_of_small_time_steps (al.integer ("max_number_of_small_time_steps")),
     msg_number_of_small_time_steps (al.integer ("msg_number_of_small_time_steps")),
+    require_positive_convergence (al.flag ("require_positive_convergence")),
     max_absolute_difference (al.number ("max_absolute_difference")),
     max_relative_difference (al.number ("max_relative_difference")),
     K_average (al.check ("K_average")
@@ -847,7 +867,12 @@ Maximum number of small time steps in a large time step.");
     frame.set ("max_number_of_small_time_steps", 200000);  
     frame.declare_integer ("msg_number_of_small_time_steps", Attribute::Const, "\
 Number of small time steps in a large time step between message.");
-    frame.set ("msg_number_of_small_time_steps", 5000);  
+    frame.set ("msg_number_of_small_time_steps", 5000);
+    frame.declare_boolean ("require_positive_convergence", Attribute::Const, "\
+True if convergense criteria is also used for saturated cells.\n\
+Setting this to false may speed up simulation, but give worse estimate\n\
+of pressure and flow in saturated soil.");
+    frame.set ("require_positive_convergence", true);
     frame.declare ("max_absolute_difference", "cm", Attribute::Const, "\
 Maximum absolute difference in 'h' values for convergence.");
     frame.set ("max_absolute_difference", 0.02);

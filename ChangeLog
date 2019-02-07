@@ -1,3 +1,11 @@
+2019-02-07  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.77 released.
+
+2019-02-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* uzrichard.C (require_positive_convergence): New parameter.
+
 2019-02-05  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.76 released.

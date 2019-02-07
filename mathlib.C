@@ -79,7 +79,10 @@ first_order_change (const double old_storage /* [M] */,
   if (loss < 0.0)
     {
       std::ostringstream tmp;
-      tmp << "S0 = " << S0;
+      tmp << "I = " << I;
+      tmp << "; L = " << L;
+      tmp << "; dt = " << dt;
+      tmp << "; S0 = " << S0;
       tmp << "; S1 = " << S1;
       tmp << "; loss = " << loss;
       tmp << "; gain = " << gain;
