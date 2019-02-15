@@ -1526,6 +1526,9 @@ ChemicalStandard::decompose (const Geometry& geo,
 	}
       else
 	{
+	  // Adjust for depth.
+	  factor *= decompose_depth_factor (geo.cell_z (c));
+	  
 	  // Adjust for heat.
 	  if (decompose_heat_factor.size () < 1)
 	    factor *= Abiotic::f_T0 (soil_heat.T (c));
