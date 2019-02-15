@@ -1,0 +1,55 @@
+Site,Date,Comment
+Tylstrup,17-04-2011,Ploughed - depth 24 cm. Seed bed preparation, 8 cm depth
+Tylstrup,18-04-2011,Rolled with concrete roller
+Tylstrup,19-04-2011,Seed bed preparation, 8 cm depth
+Tylstrup,22-03-2012,Ploughed - depth 24 cm
+Tylstrup,20-09-2012,Ploughed - depth 22 cm
+Tylstrup,26-02-2014,Ploughed - depth 23 cm
+Tylstrup,02-04-2014,Seed bed preparation, 5 cm depth and packed with a roller
+Tylstrup,15-04-2014,Seed bed preparation diagonally - depth 20 cm
+Tylstrup,20-09-2014,Disk harrowed - depth 10 cm
+Tylstrup,20-09-2014,Stubble cultivated - depth 25 cm
+Tylstrup,22-03-2016,Ploughed - depth 23 cm
+Jyndevad,22-03-2011,Ploughed. Depth 24 cm
+Jyndevad,24-03-2011,Rolled with a concrete roller
+Jyndevad,30-03-2012,Ploughed. Depth 22 cm
+Jyndevad,02-04-2012,Rolled with concrete roller
+Jyndevad,06-04-2013,Ploughing - 22 cm depth
+Jyndevad,12-04-2013,Rolled with concrete roller
+Jyndevad,20-08-2013,Stuble cultivation - 8 cm depth
+Jyndevad,22-08-2013,Rotor harrowed - 7 cm depth
+Jyndevad,26-03-2014,Ploughing - 22 cm depth
+Jyndevad,09-04-2014,Rolled with concrete roller
+Jyndevad,01-09-2014,Rotor harrowed - 6 cm depth
+Jyndevad,16-09-2014,Harrowed diagonally - depth 6 cm.
+Jyndevad,20-08-2015,Rotor harrowed, 5-6 cm depth
+Jyndevad,07-03/2016,Ploughing - 22 cm depth
+Jyndevad,21-03-2016,Rolled with concrete roller
+Silstrup,08-10-2012,Ploughed - depth 24 cm – packed
+Silstrup,23-09-2013,Ploughed - depth 24 cm – packed
+Silstrup,19-09-2014,Stubble harrowed, disk harrow (Heva Disc Roller) - depth 5-8 cm (incorporation of straw)
+Silstrup,28-04-2015,Ploughed - 24 cm depth
+Silstrup,30-04-2015,Seedbed preparation, 5-8 cm depth
+Silstrup,05-11-2015,Maiz stubble chrushed with a cutter
+Silstrup,28-04-2016,Stuble cultivated - depth 6 cm
+Silstrup,10-05-2016,Ploughed - 24 cm depth - packed with a ring roller
+Silstrup,12-05-2016,Rotary cultivated - depth 5.0 cm
+Estrup,06-09-2010,Rotor harrowed - depth 5 cm
+Estrup,14-09-2010,Ploughed - depth 20 cm - packed with a ring roller
+Estrup,14-09-2010,Seedbed preparation - depth 5 cm
+Estrup,09-11-2012,Ploughed - depth 20 cm - packed with a Dalbo ring roller
+Estrup,29-03-2012,Rotor harrowed - depth 4 cm
+Estrup,03-04-2012,Rolled with a Cambridge roller
+Estrup,08-03-2013,Ploughed - depth 20 cm - packed with a Dalbo ring roller
+Estrup,23-04-2013,Seedbed preparation - depth 5 cm
+Estrup,23-04-2013,Rolled with a Cambridge roller
+Estrup,29-04-2015,Ploughed - depth 20 cm
+Estrup,11-05-2015,Seedbed preparation - depth 5 cm using a Rabewerke rotary cultivator
+Estrup,05-05-2016,Ploughed - depth 20 cm
+Estrup,06-05-2016,Seedbed preparation - depth 5 cm using a Rabewerke rotary cultivator
+Faardrup,08-11-2011,Ploughing - depth 20 cm
+Faardrup,04-04-2012,Seed bed preparation - depth 7 cm
+Faardrup,29-08-2012,Trimming of stubble
+Faardrup,22-05-2013,Rolled with a concrete roller
+Faardrup,07-10-2013,Ploughed and packed - depth 14 cm
+Faardrup,23-09-2014,Ploughing - 14 cm depth

@@ -1,0 +1,13 @@
+Site,Date,comment
+Tylstrup,15-09-2014,Liming - 4.0 t ha-1
+Jyndevad,04-05-2011,Microcare/Mantrac - 1.0 L ha-1 - manganese 0.368 kg ha-1 + N 0.035 kg ha-1
+Jyndevad,18-06-2014,Microcare - 1.0 L ha-1 - manganese 0.368 kg ha-1 + N 0.035 kg ha-1
+Jyndevad,18-07-2014,Microcare - 1.0 L ha-1 - manganese 0.368 kg ha-1 + N 0.035 kg ha-1
+Silstrup,20-09-2013,Liming 3.2 t ha-1
+Estrup,11-11-2010,manganes sulfate (32%) - 3.0 L ha-1
+Estrup,02-05-2011,manganes sulfate (32%) - 3.0 L ha-1
+Estrup,21-05-2012,manganes nitrate (23,5%) - 2.0 L ha-1
+Estrup,29-05-2012,manganes nitrate (23,5%) - 2.0 L ha-1
+Estrup,14-10-2013,manganes nitrate (23.5%) - 2.0 kg ha-1
+Estrup,22-04-2014,manganes nitrate (23,5%) - 2.0 kg ha-1
+Estrup,12-08-2014,Liming 3.5 t ha-1 magnesium limestone

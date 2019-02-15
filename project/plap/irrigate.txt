@@ -1,0 +1,24 @@
+Site,Date,Water,Comment
+Tylstrup,31-05-2012,24,Started 31/05. Ended 01/05
+Tylstrup,13-06-2014,24,Started 13/06
+Tylstrup,20-06-2014,24,Started 20/06. Ended 20/06
+Tylstrup,04-07-2014,24,Started 04/07. Ended 04/07
+Tylstrup,23-07-2014,24,Started 23/07. Ended 23/07
+Tylstrup,30-07-2014,30,Started 30/07
+Tylstrup,21-07-2015,26,Started 21/7 20:00. Ended 22/7 07:00
+Tylstrup,09-06-2016,27,Started 21/7 20:00. Ended 22/7 07:00
+Jyndevad,02-05-2011,30,Started 02/05. Ended 03/05
+Jyndevad,23-05-2011,32,Started 23/05. Ended 24/05
+Jyndevad,04-07-2011,30,Started 04/07. Ended 05/07
+Jyndevad,06-06-2013,30,Started on eastside 06/06. Ended on westside 07/06
+Jyndevad,09-07-2013,30,Started on eastside 09/07. Ended on westside 10/07
+Jyndevad,14-06-2014,20,Started on eastside 14/06. Ended on westside15/06
+Jyndevad,19-06-2014,25,Started on eastside 19/06. Ended on westside 20/06
+Jyndevad,21-07-2014,25,Started on eastside 21/07. Ended on westside 22/07
+Jyndevad,29-07-2014,25,Started on eastside 29/07. Ended on westside 30/07
+Jyndevad,04-08-2014,25,Started on eastside 04/08. Ended on westside 05/08
+Jyndevad,11-06-2015,27,Started on eastside 11/06. Ended on westside 12/06
+Jyndevad,30-06-2015,30,Started on eastside 30/06. Ended on westside 01/07
+Jyndevad,13-07-2015,30,started on eastside 13/7 ended on westside 14/7
+Jyndevad,03-06-2016,30,started on eastside 4/6 ended on westside 3/6
+Jyndevad,08-06-2016,30,started on eastside 8/6 ended on westside 9/6

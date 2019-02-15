@@ -1,0 +1,7 @@
+Site,Date,Comment
+Silstrup,05-10-2011,Pig slurry application - surface applied - 29.0 t ha-1 - 122,1 Total-N, 72.8 NH4-N,30.2 P, 52.2 K, 14,9 Mg, kg ha-1, 908 g ha-1 CU, (VAP no. 36552)
+Silstrup,28-04-2015,Pig slurry application - accidified at application - hose applied at surface - 28.3 t ha-1 – 126.2 Total-N, 75.6 NH4-N, 44.2 P, 46.7 K, kg ha-1, DM of slurry 5.33%
+Silstrup,09-05-2016,Pig slurry application – acidified at application – trail hose applied at surface – 34 t ha-1 - 150.6 Total-N, 85.0 NH4-N, 70.7 P, 73.4 K, kg ha-1, DM of slurry 4.79%
+Estrup,14-04-2011,Pig slurry application - trail hose (surface) - 42.4 t ha-1, 124 total-N, 90 NH4N, 56 P ha-1, 19 K, kg ha-1
+Estrup,29-04-2015,Pig slurry application - accidified at application from pH 7,15 til 6,82- hose applied at surface - 28.0 t ha-1 - 117.3 Total-N, 76.44 NH4-N, 39.2 P, 47.9 K, kg ha-1, DM of slurry 5.43%
+Estrup,04-05-2016,Pig slurry application - accidified at application trail hose applied at surface - 21.0 t ha-1 - 86.5 Total-N, 56.3 NH4-N, 11.6 P, 29.6 K, kg ha-1, DM of slurry 3.58 %

@@ -1,0 +1,965 @@
+Site,Date,Comment
+Tylstrup,17-04-2011,Ploughed - depth 24 cm. Seed bed preparation, 8 cm depth
+Tylstrup,18-04-2011,Rolled with concrete roller
+Tylstrup,19-04-2011,Fertilisation - 138 N, 20 P, 66 K, kg ha-1
+Tylstrup,19-04-2011,Seed bed preparation, 8 cm depth
+Tylstrup,19-04-2011,Spring barley sown, cv.TamTam, seeding rate 180 kg ha-1, sowing depth 3.3 cm, row distance 12.5 cm. Final plant number 365 m-2
+Tylstrup,26-04-2011,BBCH stage 11
+Tylstrup,10-05-2011,Oxitril CM (ioxynil + bromoxynil) - weeds – 0.4 L ha-1 (not analysed)
+Tylstrup,10-05-2011,BBCH stage 22
+Tylstrup,11-05-2011,BBCH stage 22
+Tylstrup,11-05-2011,Biomass 85.5 g m-2 - 100% DM
+Tylstrup,16-05-2011,BBCH stage 25
+Tylstrup,30-05-2011,BBCH stage 33
+Tylstrup,06-06-2011,BBCH stage 40
+Tylstrup,15-06-2011,Biomass 675.7 g m-2 - 100% DM
+Tylstrup,15-06-2011,BBCH stage 51
+Tylstrup,20-06-2011,BBCH stage 59
+Tylstrup,20-06-2011,Bell (boscalid + epoxiconazole) - fungi - 1.5 L ha-1 (epoxiconazole not analysed)
+Tylstrup,05-07-2011,BBCH stage 75
+Tylstrup,08-07-2011,BBCH stage 77
+Tylstrup,08-07-2011,Biomass 1175.9 g m-2 - 100% DM
+Tylstrup,18-07-2011,BBCH stage 80
+Tylstrup,02-08-2011,BBCH stage 86
+Tylstrup,10-08-2011,BBCH stage 89
+Tylstrup,16-08-2011,Harvest of spring barley. Stubble height 14 cm, grain yield 75.7 hkg ha-1 - 85% DM
+Tylstrup,18-08-2011,Straw remowed, yield 34.6 hkg ha-1 - 100% DM
+Tylstrup,22-03-2012,Ploughed - depth 24 cm
+Tylstrup,24-03-2012,Spring barley sown, cv. TamTam, seeding rate 185 kg ha-1, sowing depth 2.75 cm, row distance 12.5 cm. Using combine driller with a tubular packer roller. Final plant number 344 m-2. Sown with rotor harrow combine sowing machine
+Tylstrup,03-04-2012,BBCH stage 6-7
+Tylstrup,10-04-2012,BBCH stage 09
+Tylstrup,19-04-2012,BBCH stage 11
+Tylstrup,29-04-2012,BBCH stage 12
+Tylstrup,29-04-2012,Fertilisation - 123.9 N, 17.7 P, 59 K, kg ha-1
+Tylstrup,30-04-2012,BBCH stage 12
+Tylstrup,09-05-2012,BBCH stage 14
+Tylstrup,16-05-2012,BBCH stage 20
+Tylstrup,21-05-2012,BBCH stage 22
+Tylstrup,21-05-2012,Biomass 72.2 g m-2 - 100% DM
+Tylstrup,21-05-2012,Fox 480 SC (bifenox) - weeds - 1.2 L ha-1
+Tylstrup,25-05-2012,Mustang forte (aminopyralid/florasulam/2,4-D) - weeds - 0.75 L ha-1
+Tylstrup,25-05-2012,BBCH stage 29
+Tylstrup,31-05-2012,BBCH stage 32
+Tylstrup,31-05-2012,Irrigation 24 mm. Started 31/05. Ended 01/05
+Tylstrup,06-06-2012,BBCH stage 37
+Tylstrup,12-06-2012,BBCH stage 44
+Tylstrup,19-06-2012,BBCH stage 50
+Tylstrup,19-06-2012,Biomass 644.8 g m-2 - 100% DM
+Tylstrup,28-06-2012,BBCH stage 59
+Tylstrup,28-06-2012,Bell (boscalid + epoxiconazole) - fungi - 1.5 L ha-1 (epoxiconazole not analysed)
+Tylstrup,02-07-2012,BBCH stage 61
+Tylstrup,10-07-2012,BBCH stage 79
+Tylstrup,10-07-2012,Biomass 1138.3 g m-2 - 100% DM
+Tylstrup,24-07-2012,BBCH stage 83
+Tylstrup,06-08-2012,BBCH stage 86
+Tylstrup,13-08-2012,BBCH stage 88
+Tylstrup,13-08-2012,Glyfonova 450 Plus (glyphosate) - weeds - 2.4 L ha-1 (not analysed)
+Tylstrup,27-08-2012,BBCH stage 89
+Tylstrup,27-08-2012,Harvest of spring barley. Tubbleheight 15 cm, grain yield 62.0 hkg ha-1 - 85% DM. Straw remowed, yield 37.3 hkg ha-1 - 100% DM
+Tylstrup,31-08-2012,Tracer (potasium bromide), 30 kg ha-1
+Tylstrup,20-09-2012,Ploughed - depth 22 cm
+Tylstrup,23-09-2012,Winter rye sown, cv. Magnifico, seeding rate 64.0 kg ha-1, sowing depth 3.5 cm, row distance 13.0 cm. Final plant number 125 m-2. Sown with rotorharrow combine sowing machine
+Tylstrup,05-10-2012,BBCH stage 9
+Tylstrup,10-10-2012,BBCH stage 11
+Tylstrup,12-10-2012,BBCH stage 12
+Tylstrup,12-10-2012,Boxer (prosulfocarb) - weeds - 4.0 L ha-1
+Tylstrup,22-10-2012,BBCH stage 12
+Tylstrup,05-11-2012,BBCH stage 13
+Tylstrup,14-11-2012,BBCH stage 20
+Tylstrup,26-11-2012,BBCH stage 22
+Tylstrup,26-11-2012,Biomass 7.0 g m-2 - 100% DM
+Tylstrup,04-04-2013,Fertilisation - 56.7 N, 8.1 P, 27 K, kg ha-1
+Tylstrup,04-04-2013,BBCH stage 22
+Tylstrup,02-05-2013,BBCH stage 30-31
+Tylstrup,02-05-2013,Fertilisation - 71.4 N, 10.2 P, 34 K, kg ha-1
+Tylstrup,07-05-2013,BBCH stage 31
+Tylstrup,08-05-2013,Starane XL (fluroxypyr) - weeds - 1.2 L ha-1
+Tylstrup,24-05-2013,BBCH stage 50
+Tylstrup,24-05-2013,Biomass 422.8 g m-2 - 100% DM
+Tylstrup,28-05-2013,BBCH stage 57
+Tylstrup,31-05-2013,BBCH stage 59
+Tylstrup,10-06-2013,BBCH stage 67
+Tylstrup,18-06-2013,BBCH stage 70
+Tylstrup,25-06-2013,BBCH stage 72
+Tylstrup,02-07-2013,Biomass 1275.2 g m-2 - 100% DM
+Tylstrup,02-07-2013,BBCH stage 76
+Tylstrup,09-07-2013,BBCH stage 79
+Tylstrup,18-07-2013,BBCH stage 81
+Tylstrup,05-08-2013,BBCH stage 87
+Tylstrup,13-08-2013,BBCH stage 89
+Tylstrup,20-08-2013,Harvest of winter rye. Stubleheight 15 cm, grainyield 77.4 hkg ha-1 - 85% DM. Straw remowed, yield 33.8 hkg ha-1 - 100% DM
+Tylstrup,26-02-2014,Ploughed - depth 23 cm
+Tylstrup,02-04-2014,Seed bed preparation, 5 cm depth and packed with a roller
+Tylstrup,03-04-2014,Fertilisation - 175.5 N, kg ha-1
+Tylstrup,03-04-2014,Fertilisation - 100 K, kg ha-1
+Tylstrup,15-04-2014,Maxim 100 FS (fludioxonil) - fungi - 250 ml ton-1 potatoes ~ 625 mL ha-1 a sprayed on potatoes before the planting
+Tylstrup,15-04-2014,Seed bed preparation diagonally - depth 20 cm
+Tylstrup,15-04-2014,Planting of potatoes. cv. Kuras rowdistance 75 cm, plantdistance 25 cm, depth 17 cm, final plant number 4 m-2
+Tylstrup,16-04-2014,BBCH stage 00
+Tylstrup,16-04-2014,Command CS (clomazon) - weeds - 0.25 L ha-1 (not included)
+Tylstrup,25-04-2014,BBCH stage 01
+Tylstrup,30-04-2014,BBCH stage 03
+Tylstrup,05-05-2014,BBCH stage 05
+Tylstrup,15-05-2014,BBCH stage 08 to 09
+Tylstrup,15-05-2014,Titus WSB (rimsulfuron) - weeds - 10 g ha-1 (not included in monitoring)
+Tylstrup,17-05-2014,BBCH stage 9 – emergence
+Tylstrup,22-05-2014,Titus WSB (rimsulfuron) + U46 M (MCPA) - weeds - 20 g ha-1 + 100 mL ha-1 (not included in monitoring)
+Tylstrup,22-05-2014,BBCH stage 13
+Tylstrup,27-05-2014,BBCH stage 15
+Tylstrup,04-06-2014,BBCH stage 15
+Tylstrup,10-06-2014,BBCH stage 27
+Tylstrup,13-06-2014,BBCH stage 45
+Tylstrup,13-06-2014,Irrigation 24 mm. Started 13/06
+Tylstrup,18-06-2014,BBCH stage 47
+Tylstrup,18-06-2014,Biomass tubers 119.0 g Top 233.3 g m-2 - 100% DM
+Tylstrup,20-06-2014,BBCH stage 53
+Tylstrup,20-06-2014,Irrigation 24 mm. Started 20/06. Ended 20/06
+Tylstrup,26-06-2014,BBCH stage 59
+Tylstrup,26-06-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1
+Tylstrup,02-07-2014,Biomass tubers 388.9 g. Top 391.2 g m-2 - 100% DM
+Tylstrup,02-07-2014,BBCH stage 60
+Tylstrup,03-07-2014,BBCH stage 60
+Tylstrup,04-07-2014,Irrigation 24 mm. Started 04/07. Ended 04/07
+Tylstrup,04-07-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1
+Tylstrup,14-07-2014,BBCH stage 69
+Tylstrup,14-07-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1
+Tylstrup,23-07-2014,BBCH stage 75?
+Tylstrup,23-07-2014,Irrigation 24 mm. Started 23/07. Ended 23/07
+Tylstrup,24-07-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1
+Tylstrup,24-07-2014,BBCH stage 75?
+Tylstrup,30-07-2014,Irrigation 30 mm. Started 30/07
+Tylstrup,02-08-2014,BBCH stage?
+Tylstrup,02-08-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1
+Tylstrup,11-08-2014,BBCH stage 90?
+Tylstrup,11-08-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1
+Tylstrup,13-08-2014,Biomass tubers 1,270.3 g. Top 266.3 g m-2 - 100% DM
+Tylstrup,13-08-2014,BBCH stage 92
+Tylstrup,18-08-2014,BBCH stage 92
+Tylstrup,18-08-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1
+Tylstrup,25-08-2014,BBCH stage 92
+Tylstrup,25-08-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1
+Tylstrup,12-09-2014,Harvest of potatoes. Tuber yield 107.1 hkg ha-1 - 100% DM
+Tylstrup,15-09-2014,Liming - 4.0 t ha-1
+Tylstrup,20-09-2014,Disk harrowed - depth 10 cm
+Tylstrup,20-09-2014,Stubble cultivated - depth 25 cm
+Tylstrup,22-09-2014,Sowing winter wheat, cv. Mariboss, sowing depth 3.0 cm, seeding rate 190 kg ha-1, row distance 12.5 cm, final plantnumber 248 m-2
+Tylstrup,22-09-2014,BBCH stage 00
+Tylstrup,29-09-2014,BBCH stage 07-08
+Tylstrup,29-09-2014,Fertilisation - 24.5 N, kg ha-1
+Tylstrup,02-10-2014,BBCH stage 09 – emergence
+Tylstrup,09-10-2014,BBCH stage 11
+Tylstrup,13-10-2014,BBCH stage 12
+Tylstrup,22-10-2014,BBCH stage 13
+Tylstrup,30-10-2014,BBCH stage 13
+Tylstrup,30-10-2014,Lexus 50 WG (flupyrsulfuron) - weeds - 10 g ha-1 (i.e. 4.6 g a.i. ha-1)
+Tylstrup,14-11-2014,BBCH stage 14-15
+Tylstrup,14-11-2014,Orius 200 EW (tebuconazole) - fungi – 1.25 L ha-1 (i.e. 250 g a.i. ha-1)
+Tylstrup,17-12-2014,BBCH stage 22
+Tylstrup,17-12-2014,Biomass 16.1 g m-2 - 100% DM
+Tylstrup,24-03-2015,BBCH stage 22
+Tylstrup,24-03-2015,Fertilisation - 49.6 N, 7.1 P, 23.6 K, kg ha-1
+Tylstrup,09-04-2015,BBCH stage 24
+Tylstrup,09-04-2015,Lexus 50 WG (flupyrsulfuron) - weeds - 10 g ha-1 (i.e. 4.6 g a.i. ha-1)
+Tylstrup,22-04-2015,BBCH stage 30
+Tylstrup,30-04-2015,BBCH stage 31
+Tylstrup,05-05-2015,BBCH stage 31
+Tylstrup,05-05-2015,Fertilisation - 105 N, 15 P, 50 K, kg ha-1
+Tylstrup,14-05-2015,BBCH stage 32
+Tylstrup,14-05-2015,Starane XL (fluroxypyr + florasulam) - weeds - 1.2 L ha-1 (i.e.120 g a.i. ha-1 + 3 g a.i. ha-1)
+Tylstrup,14-05-2015,Proline EC 250 (prothioconazole) - fungi - 0.8 L ha-1 (i.e. 200 g a.i. ha-1)
+Tylstrup,26-05-2015,BBCH stage 33
+Tylstrup,12-06-2015,BBCH stage 49
+Tylstrup,12-06-2015,Proline EC 250 (prothioconazole) - fungi - 0.8 L ha-1 (i.e. 200 g a.i. ha-1)
+Tylstrup,15-06-2015,BBCH stage 51
+Tylstrup,15-06-2015,Biomass 890.1 g m-2 - 100% DM
+Tylstrup,13-07-2015,BBCH stage 71
+Tylstrup,21-07-2015,BBCH stage 75
+Tylstrup,21-07-2015,Irrigation 26 mm. Started 21/7 20:00. Ended 22/7 07:00
+Tylstrup,13-08-2015,BBCH stage 82
+Tylstrup,13-08-2015,Biomass 1673 g m-2 – 100% DM
+Tylstrup,20-08-2015,BBCH stage 88
+Tylstrup,20-08-2015,Broadsown a catchcrop of oil seed rape cv. Akiro, 16 kg ha-1 (on top of the soil)
+Tylstrup,20-08-2015,Glyphogan (glyhosate) - weeds - 2.7 l ha-1 (sprayed simultaniously with the sowing of the catchcrop) (i.e. 972 g a.i. ha-1)
+Tylstrup,01-09-2015,BBCH stage 09 – emergence of catch crop
+Tylstrup,08-09-2015,BBCH stage 90
+Tylstrup,08-09-2015,Harvest of winter wheat. Stubleheight 14 cm, grainyield 74.0 hkg ha-1 85% DM
+Tylstrup,10-09-2015,Straw remowed, yield 46.4 hkg ha-1 - 100% DM
+Tylstrup,22-03-2016,Ploughed - depth 23 cm
+Tylstrup,15-04-2016,Spring barley sown, cv.Evergreen, seeding rate 155 kg ha-1, sowing depth 2.8 cm, row distance 13 cm. Final plantnumber 272 m-2 Sown with rotorharrow combine sowing machine
+Tylstrup,15-04-2016,BBCH stage 0
+Tylstrup,18-04-2016,Fertilization – 168 N, 24 P, 80 K, kg ha-1
+Tylstrup,21-04-2016,Undersowing of clover grass catch crop (AgrowGrass 350 MidiMaize) seeding rate 13 kg ha-1, sowing depth 1 cm, row distance 12 cm
+Tylstrup,01-05-2016,BBCH stage 9
+Tylstrup,10-05-2016,BBCH stage 12
+Tylstrup,19-05-2016,BBCH stage 23
+Tylstrup,19-05-2016,Biomass 47.8 g m-2 – 100% DM
+Tylstrup,19-05-2016,Fighter 480 (bentazone) - weeds- 1.5 L ha-1 (i.e. 720 g a.i. ha-1)
+Tylstrup,19-05-2016,Catchcrop – BBCH stage 11-12
+Tylstrup,02-06-2016,BBCH stage 36
+Tylstrup,09-06-2016,BBCH stage 50
+Tylstrup,09-06-2016,Irrigation 27 mm. Started 21/7 20:00. Ended 22/7 07:00
+Tylstrup,10-06-2016,BBCH stage 50
+Tylstrup,10-06-2016,Biomass 414.8 g m-2 – 100% DM
+Tylstrup,24-06-2016,BBCH stage 54
+Jyndevad,22-03-2011,Ploughed. Depth 24 cm
+Jyndevad,23-03-2011,BBCH stage 0
+Jyndevad,23-03-2011,Sowing spring barley cv. Quench, depth 4.0 cm, row distance 12 cm, seed rate 164 kg ha-1, final plant number 301 m-2 - using a combine drill
+Jyndevad,24-03-2011,Rolled with a concrete roller
+Jyndevad,30-03-2011,Fertilization 133.1 N, 18.5 P, 61.6 K, kg ha-1
+Jyndevad,05-04-2011,BBCH stage 9
+Jyndevad,08-04-2011,BBCH stage 10
+Jyndevad,20-04-2011,BBCH stage 13
+Jyndevad,26-04-2011,BBCH stage 21-22
+Jyndevad,26-04-2011,Oxitril CM (bromoxynil + ioxynil) - 0.5 L ha-1 (not analysed)
+Jyndevad,26-04-2011,DFF (diflufenican) - 0.25 L ha-1 - weeds
+Jyndevad,02-05-2011,BBCH stage 26
+Jyndevad,02-05-2011,Irrigation - 30 mm ha-1. Started 02/05. Ended 03/05
+Jyndevad,03-05-2011,Biomass 92.8 g m-2 - 100% DM
+Jyndevad,04-05-2011,BBCH stage 26
+Jyndevad,04-05-2011,Microcare/Mantrac - 1.0 L ha-1 - manganese 0.368 kg ha-1 + N 0.035 kg ha-1
+Jyndevad,18-05-2011,BBCH stage 37
+Jyndevad,23-05-2011,BBCH stage 40
+Jyndevad,23-05-2011,Irrigation - 32 mm ha-1. Started 23/05. Ended 24/05
+Jyndevad,26-05-2011,BBCH stage 50
+Jyndevad,26-05-2011,Biomass 402.0 g m-2 - 100% DM
+Jyndevad,01-06-2011,BBCH stage 59
+Jyndevad,30-06-2011,BBCH stage 75
+Jyndevad,30-06-2011,Biomass 672.6 g m-2 - 100% DM
+Jyndevad,04-07-2011,BBCH stage 76
+Jyndevad,04-07-2011,Irrigation - 30 mm ha-1. Started 04/07. Ended 05/07
+Jyndevad,20-07-2011,BBCH stage 82
+Jyndevad,01-08-2011,BBCH stage 90
+Jyndevad,23-08-2011,Harvest of spring barley. Seed yield 72.4 hkg ha-1 - 85% DM, stubble height 15 cm
+Jyndevad,25-08-2011,Remowal of straw, straw yield 30.2 hkg ha-1 - 100% DM
+Jyndevad,30-03-2012,Ploughed. Depth 22 cm
+Jyndevad,02-04-2012,Rolled with concrete roller
+Jyndevad,30-04-2012,Fertilization 120 K, kg ha-1
+Jyndevad,30-04-2012,Fertilization 140 N, 17.7 P, 65.3 K, kg ha-1
+Jyndevad,03-05-2012,Sowing maize - cultivare Atrium - seed distance 12 cm, row distance 75 cm, depth 6 cm. Seedrate 111,000 seeds ha-1, final plant number 12.8 m-2
+Jyndevad,03-05-2012,Fertilization 29.4 N, 14.7 P, kg ha-1
+Jyndevad,07-05-2012,Tracer (potasium bromide), 30.54 kg ha-1
+Jyndevad,17-05-2012,BBCH stage 9 – emergence
+Jyndevad,22-05-2012,BBCH stage 11
+Jyndevad,26-05-2012,BBCH stage 14-15
+Jyndevad,26-05-2012,Fighter 480 (bentazone) - weeds - 1.0 L ha-1
+Jyndevad,30-05-2012,BBCH stage 13
+Jyndevad,30-05-2012,Biomass 41.7 g m-2 - 100% DM
+Jyndevad,05-06-2012,BBCH stage 15
+Jyndevad,05-06-2012,Callisto (mesotrione) - weeds - 1.5 L ha-1
+Jyndevad,06-06-2012,BBCH stage 15
+Jyndevad,15-06-2012,BBCH stage 16
+Jyndevad,15-06-2012,Tomahawk 180 EC (fluroxypyr) + Catch (florasulam + 2,4 D) -1.5 L ha-1 + 0.06 L ha-1 - weeds - (none analysed)
+Jyndevad,18-06-2012,BBCH stage 17
+Jyndevad,25-06-2012,BBCH stage 19
+Jyndevad,02-07-2012,BBCH stage 31
+Jyndevad,10-07-2012,BBCH stage 35
+Jyndevad,17-07-2012,BBCH stage 51
+Jyndevad,18-07-2012,Biomass 2182.3 g m-2 - 100% DM
+Jyndevad,23-07-2012,BBCH stage 53
+Jyndevad,30-07-2012,BBCH stage 59
+Jyndevad,05-08-2012,BBCH stage 63
+Jyndevad,14-08-2012,BBCH stage 66
+Jyndevad,17-08-2012,BBCH stage 67
+Jyndevad,17-08-2012,Biomass 8241.8 g m-2 - 100% DM
+Jyndevad,20-08-2012,BBCH stage 68
+Jyndevad,27-08-2012,BBCH stage 72
+Jyndevad,03-09-2012,BBCH stage 74
+Jyndevad,13-09-2012,BBCH stage 82
+Jyndevad,19-09-2012,BBCH stage 83
+Jyndevad,24-09-2012,BBCH stage 84
+Jyndevad,24-09-2012,Dry matter content whole plants 25.4%
+Jyndevad,01-10-2012,BBCH stage 87
+Jyndevad,01-10-2012,Dry matter content whole plants 27.5%
+Jyndevad,08-10-2012,BBCH stage 88
+Jyndevad,08-10-2012,Dry matter content whole plants 33.0%
+Jyndevad,08-10-2012,Harvest of maize.Whole crop yield 151.41 hkg ha-1 - 100% DM. Stubble height 25 cm
+Jyndevad,06-04-2013,Ploughing - 22 cm depth
+Jyndevad,12-04-2013,Rolled with concrete roller
+Jyndevad,14-04-2013,Sowing pea cultivare Alvestra, depth 5 cm, row distance 12 cm, seed rate 235 kg ha-1,using a combine drill, final plant number 92 m-2
+Jyndevad,26-04-2013,BBCH stage 9 – emergence
+Jyndevad,03-05-2013,BBCH stage 12
+Jyndevad,07-05-2013,Fighter 480 (bentazone) + Stomp (pendimethalin) 0.4 L ha-1 + 0.6 L ha-1 - weeds (pendimethalin not analysed)
+Jyndevad,07-05-2013,BBCH stage 13-14
+Jyndevad,13-05-2013,BBCH stage 14
+Jyndevad,16-05-2013,BBCH stage 14-15
+Jyndevad,16-05-2013,Bentazon 480 (bentazone) + Stomp (pendimethalin) 0.5 L ha-1 + 0.6 L ha-1 - weeds (pendimethalin not analysed)
+Jyndevad,17-05-2013,Fertilization 16.0 P, 83.2 K, kg ha-1
+Jyndevad,21-05-2013,BBCH stage 25
+Jyndevad,27-05-2013,BBCH stage 30
+Jyndevad,03-06-2013,BBCH stage 37
+Jyndevad,04-06-2013,Biomass 105.7 g m-2 - 100% DM
+Jyndevad,06-06-2013,BBCH stage 38
+Jyndevad,06-06-2013,Irrigation - 30 mm ha-1. Started on eastside 06/06. Ended on westside 07/06
+Jyndevad,10-06-2013,BBCH stage 41
+Jyndevad,17-06-2013,BBCH stage 60
+Jyndevad,21-06-2013,Biomass 393.5 g m-2 - 100% DM
+Jyndevad,25-06-2013,BBCH stage 65
+Jyndevad,01-07-2013,BBCH stage 67
+Jyndevad,09-07-2013,BBCH stage 68
+Jyndevad,09-07-2013,Irrigation - 30 mm ha-1. Started on eastside 09/07. Ended on westside 10/07
+Jyndevad,15-07-2013,BBCH stage 69
+Jyndevad,15-07-2013,Biomass 722.5 g m-2 - 100% DM
+Jyndevad,16-07-2013,Pirimor G (pirimicarb) - pests - 0.25 kg ha-1 (not analysed)
+Jyndevad,22-07-2013,BBCH stage 78
+Jyndevad,29-07-2013,BBCH stage 81
+Jyndevad,05-08-2013,Biomass 737.2 g m-2 - 100% DM
+Jyndevad,05-08-2013,BBCH stage 90
+Jyndevad,07-08-2013,Harvest of pea - western half of the field - interrupted by rain. Seed yield 38.8 hkg ha-1 - 86% DM. Strawyield 30.1 hkg ha-1 - 100% DM, stubble height 10 cm. Straw shreddet at harvest
+Jyndevad,14-08-2013,Harvest of the eastern half of the field - straw shreddet at harvest
+Jyndevad,20-08-2013,Stuble cultivation - 8 cm depth
+Jyndevad,22-08-2013,Rotor harrowed - 7 cm depth
+Jyndevad,26-03-2014,Ploughing - 22 cm depth
+Jyndevad,09-04-2014,Rolled with concrete roller
+Jyndevad,10-04-2014,Fertilization 180.0 N, 38.6 P, 192.9 K kg ha-1
+Jyndevad,10-04-2014,Fertilization 19.7 N, kg ha-1
+Jyndevad,15-04-2014,Planting potatoes. Cv. Oleva, Rowdistance 75 cm plant distance 33 cm, depth 7 cm. Final plant number 4 m-2
+Jyndevad,15-04-2014,Maxim 100 FS (fludioxonil) - fungi - 625 mL ha-1 sprayed at potatoes when planting
+Jyndevad,30-04-2014,BBCH stage 05-08 (crop not emerged yet)
+Jyndevad,30-04-2014,Command CS (clomazon) + Glyphogan (glyphosate) - weeds - 0.25 L ha-1+ 1.5 L ha-1
+Jyndevad,06-05-2014,BBCH stage 08 (crop not emerged yet)
+Jyndevad,06-05-2014,Titus WSB (rimsulfuron) - weeds - 10 g ha-1 (not included in monitoring)
+Jyndevad,14-05-2014,BBCH stage 9 – emergence
+Jyndevad,26-05-2014,BBCH stage 22
+Jyndevad,27-05-2014,Titus WSB (rimsulfuron) - weeds - 20 g ha-1 (not included in monitoring)
+Jyndevad,02-06-2014,BBCH stage 29
+Jyndevad,10-06-2014,BBCH stage 38
+Jyndevad,12-06-2014,BBCH stage 39
+Jyndevad,12-06-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1
+Jyndevad,14-06-2014,BBCH stage 47
+Jyndevad,14-06-2014,Irrigation - 20 mm ha-1. Started on eastside 14/06. Ended on westside15/06
+Jyndevad,16-06-2014,BBCH stage 48
+Jyndevad,18-06-2014,BBCH stage 50
+Jyndevad,18-06-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1 + Mospilan SG (acetamiprid) - pests - 150 g ha-1 (not included)
+Jyndevad,18-06-2014,Microcare - 1.0 L ha-1 - manganese 0.368 kg ha-1 + N 0.035 kg ha-1
+Jyndevad,19-06-2014,BBCH stage 50
+Jyndevad,19-06-2014,Irrigation - 25 mm ha-1. Started on eastside 19/06. Ended on westside 20/06
+Jyndevad,20-06-2014,Biomass tubers 195.3 g m-2 - 100% DM. Top 299.5 g m-2 row - 100% DM
+Jyndevad,23-06-2014,BBCH stage 50
+Jyndevad,27-06-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1 + Mospilan SG (acetamiprid) - pests - 150 g ha-1 (not included)
+Jyndevad,27-06-2014,BBCH stage 65
+Jyndevad,30-06-2014,BBCH stage 66
+Jyndevad,01-07-2014,Biomass knolde 91.3 g m-2 - 100% DM. Top 395.3 g m-2 row - 100% DM
+Jyndevad,04-07-2014,BBCH stage 69
+Jyndevad,04-07-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1
+Jyndevad,08-07-2014,BBCH stage 69
+Jyndevad,12-07-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1
+Jyndevad,12-07-2014,BBCH stage 70
+Jyndevad,18-07-2014,BBCH stage 72
+Jyndevad,18-07-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1
+Jyndevad,18-07-2014,Microcare - 1.0 L ha-1 - manganese 0.368 kg ha-1 + N 0.035 kg ha-1
+Jyndevad,21-07-2014,BBCH stage 79
+Jyndevad,21-07-2014,Irrigation - 25 mm ha-1. Started on eastside 21/07. Ended on westside 22/07
+Jyndevad,24-07-2014,BBCH stage 81
+Jyndevad,24-07-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1
+Jyndevad,29-07-2014,BBCH stage 82
+Jyndevad,29-07-2014,Irrigation - 25 mm ha-1. Started on eastside 29/07. Ended on westside 30/07
+Jyndevad,30-07-2014,Ranman (cyazofamid) - fungi - 0.2 L ha-1
+Jyndevad,30-07-2014,BBCH stage 85
+Jyndevad,04-08-2014,BBCH stage 86
+Jyndevad,04-08-2014,Irrigation - 25 mm ha-1. Started on eastside 04/08. Ended on westside 05/08
+Jyndevad,07-08-2014,BBCH stage 86
+Jyndevad,07-08-2014,Ranman (cyazofamid) - fungi - 0.2 L ha-1
+Jyndevad,11-08-2014,BBCH stage 93
+Jyndevad,12-08-2014,Biomass tubers 1,881.1 g m-2 - 100% DM. Top 211.5 g m-2 row - 100% DM
+Jyndevad,14-08-2014,BBCH stage 93
+Jyndevad,14-08-2014,Dithane NT (mancozeb) - fungi - 2.0 L ha-1
+Jyndevad,01-09-2014,Rotor harrowed - 6 cm depth
+Jyndevad,16-09-2014,Harrowed diagonally - depth 6 cm.
+Jyndevad,18-09-2014,Winterwheat drilled directly in the potato stuble
+Jyndevad,26-09-2014,BBCH 09 – emergence
+Jyndevad,29-09-2014,BBCH 10
+Jyndevad,08-10-2014,BBCH 13
+Jyndevad,22-10-2014,BBCH 14
+Jyndevad,22-10-2014,Lexus 50 WG (flupyrsulfuron) - weeds - 10 g ha-1 (i.e. 4.6 g a.i. ha-1)
+Jyndevad,24-10-2014,BBCH 14
+Jyndevad,27-10-2014,BBCH 15
+Jyndevad,11-11-2014,BBCH 20
+Jyndevad,11-11-2014,Orius 200 EW (tebuconazole) - fungi – 1.25 L ha-1 (i.e. 250 g a.i. ha-1)
+Jyndevad,17-11-2014,BBCH 20
+Jyndevad,27-11-2014,BBCH 21
+Jyndevad,09-03-2015,BBCH 22
+Jyndevad,17-03-2015,BBCH 22
+Jyndevad,18-03-2015,Fertilization 120.0 N, 15 P, 56 K, kg ha-1
+Jyndevad,20-03-2015,BBCH 22
+Jyndevad,20-03-2015,Lexus 50 WG (flupyrsulfuron) - weeds - 10 g ha-1 (i.e. 4.6 g a.i. ha-1)
+Jyndevad,07-04-2015,BBCH 23
+Jyndevad,15-04-2015,BBCH 30
+Jyndevad,15-04-2015,Biomass 64.5 g m-2 - 100% DM
+Jyndevad,16-04-2015,Fertilization 4 P, 20 K, kg ha-1
+Jyndevad,17-04-2015,Fertilization 50.0 N, kg ha-1
+Jyndevad,20-04-2015,BBCH 31
+Jyndevad,28-04-2015,BBCH 32
+Jyndevad,04-05-2015,BBCH 33
+Jyndevad,08-05-2015,BBCH 34
+Jyndevad,08-05-2015,Opus + Comet (epoxiconazole+pyraclostrobin) - fungi - 1.0 L ha-1+1.0 L ha-1 (i.e 125g a.i. ha-1+250g a.i. ha-1)
+Jyndevad,13-05-2015,BBCH 35
+Jyndevad,18-05-2015,BBCH 37
+Jyndevad,26-05-2015,BBCH 43
+Jyndevad,01-06-2015,BBCH 47
+Jyndevad,09-06-2015,BBCH 55
+Jyndevad,09-06-2015,Biomass 949.1 g m-2 - 100% DM
+Jyndevad,11-06-2015,BBCH 57
+Jyndevad,11-06-2015,Irrigation - 27 mm ha-1. Started on eastside 11/06. Ended on westside 12/06
+Jyndevad,16-06-2015,BBCH 59
+Jyndevad,17-06-2015,Proline 250 EC (prothioconazole) - fungi - 0.8 L ha-1 (i.e. 200 g a.i. ha-1)
+Jyndevad,23-06-2015,BBCH 60
+Jyndevad,29-06-2015,BBCH 65
+Jyndevad,30-06-2015,BBCH 65
+Jyndevad,30-06-2015,Irrigation - 30 mm ha-1. Started on eastside 30/06. Ended on westside 01/07
+Jyndevad,06-07-2015,BBCH 75
+Jyndevad,08-07-2015,BBCH 75
+Jyndevad,08-07-2015,Biomass 1358.8 g m-2 - 100% DM
+Jyndevad,13-07-2015,BBCH 79
+Jyndevad,13-07-2015,Irrigation - 30 mm ha-1 started on eastside 13/7 ended on westside 14/7
+Jyndevad,14-07-2015,BBCH 79
+Jyndevad,21-07-2015,BBCH 81
+Jyndevad,03-08-2015,BBCH 83
+Jyndevad,10-08-2015,BBCH 87
+Jyndevad,20-08-2015,Harvest of winter wheat. Grain yield 79.7 hkg ha-1 85% DM, straw yield 71.5 hkg ha-1 100% DM, stubbleheight 15 cm. Straw shredded (left in field) at harvest.
+Jyndevad,20-08-2015,Rotor harrowed, 5-6 cm depth
+Jyndevad,07-03/2016,Ploughing - 22 cm depth
+Jyndevad,21-03-2016,Sowing spring barley cv. KWS Irena, depth 4.0 cm, rowdistance 12 cm, seed rate 170 kg ha-1, final plantnumber 345 m2 - using a combine drill
+Jyndevad,21-03-2016,Rolled with concrete roller
+Jyndevad,21-03-2016,BBCH stage 0
+Jyndevad,30-03-2016,BBCH stage 9
+Jyndevad,04-04-2016,BBCH stage 10
+Jyndevad,05-04-2016,BBCH stage 11
+Jyndevad,05-04-2016,Fertilization 136.0 N, 17 P, 63 K, kg ha-1
+Jyndevad,20-04-2016,BBCH stage 12
+Jyndevad,20-04-2016,Sowing catch crop of grass and clover (Foragemax 42)
+Jyndevad,27-04-2016,BBCH stage 13
+Jyndevad,03-05-2016,BBCH stage 16
+Jyndevad,03-05-2016,Fighter 480 (bentazone) - weeds - 1.5 L ha-1
+Jyndevad,10-05-2015,BBCH stage 20
+Jyndevad,10-05-2016,Emergence of catch crop – BBCH stage 09
+Jyndevad,12-05-2016,Biomass 27.7 g m-2 - 100% DM
+Jyndevad,17-05-2016,BBCH stage 27
+Jyndevad,23-05-2016,BBCH stage 32
+Jyndevad,31-05-2016,BBCH stage 37
+Jyndevad,02-06-2016,BBCH stage 50
+Jyndevad,02-06-2016,Bumper 25 EC (propiconazole) -fungi - 0.5 L ha-1 (i.e. 125 g a.i.ha-1)
+Jyndevad,03-06-2016,Irrigation - 30 mm ha-1 started on eastside 4/6 ended on westside 3/6
+Jyndevad,03-06-2016,BBCH stage 50
+Jyndevad,03-06-2016,Biomass 721.7 g m-2 - 100% DM
+Jyndevad,06-06-2016,BBCH stage 53
+Jyndevad,08-06-2016,BBCH stage 56
+Jyndevad,08-06-2016,Irrigation - 30 mm ha-1 started on eastside 8/6 ended on westside 9/6
+Jyndevad,13-06-2016,BBCH stage 57
+Jyndevad,20-06-2016,BBCH stage 58
+Jyndevad,27-06-2016,BBCH stage 67
+Silstrup,22-07-2010,Red fescue - 2. season
+Silstrup,16-03-2011,Fertilization 50 N, 7 P, 24 K, kg ha-1
+Silstrup,15-04-2011,Hussar OD (iodosulfuron) - weeds - 0.05 L ha-1 (not analysed)
+Silstrup,15-04-2011,BBCH stage 20-25
+Silstrup,19-04-2011,BBCH stage 25
+Silstrup,19-04-2011,Biomass 185.6 g m-2 - 100% DM
+Silstrup,26-04-2011,BBCH stage 25
+Silstrup,26-04-2011,Fusilade Max (fluazifop-P-butyl) - weeds - 1.5 L ha-1
+Silstrup,04-05-2011,BBCH stage 35
+Silstrup,13-05-2011,Biomass 507.9 g m-2 - 100% DM
+Silstrup,13-05-2011,BBCH stage 53
+Silstrup,07-06-2011,BBCH stage 59
+Silstrup,23-06-2011,BBCH stage 68
+Silstrup,04-07-2011,BBCH stage 85
+Silstrup,04-07-2011,Biomass 1,022.7 g m-2 - 100% DM
+Silstrup,21-07-2011,Harvest of grass seed. Yield 15.2 hkg ha-1 - 87% DM
+Silstrup,30-07-2011,Straw removed - straw yield 45.8 hkg ha-1 - 100% DM, stubble height 12 cm
+Silstrup,31-07-2011,Red fescue
+Silstrup,17-08-2011,Trimming of grass - 4-5 cm height
+Silstrup,16-09-2011,BBCH stage 20
+Silstrup,16-09-2011,Fox 480 SC (bifenox) - weeds - 1.5 L ha-1
+Silstrup,29-09-2011,Trimming of grass - 5-6 cm height
+Silstrup,05-10-2011,Pig slurry application - surface applied - 29.0 t ha-1 - 122,1 Total-N, 72.8 NH4-N,30.2 P, 52.2 K, 14,9 Mg, kg ha-1, 908 g ha-1 CU, (VAP no. 36552)
+Silstrup,15-03-2012,Fertilization 60 N, 32 S kg ha-1
+Silstrup,13-04-2012,DFF (diflufenican) - weeds - 0.15 L ha-1
+Silstrup,13-04-2012,BBCH stage 25
+Silstrup,13-04-2012,Biomass 176.5 g m-2 - 100% DM
+Silstrup,19-04-2012,BBCH stage 25
+Silstrup,19-04-2012,Fusilade Max (fluazifop-P-butyl) - weeds - 1.5 L ha-1
+Silstrup,10-05-2012,BBCH stage 41
+Silstrup,15-05-2012,BBCH stage 51
+Silstrup,18-05-2012,BBCH stage 52
+Silstrup,18-05-2012,Folicur (tebuconazole) - fungi - 1.0 L ha-1
+Silstrup,22-05-2012,Biomass 441.9 g m-2 - 100% DM
+Silstrup,22-05-2012,BBCH stage 57
+Silstrup,07-06-2012,BBCH stage 60
+Silstrup,22-06-2012,BBCH stage 67
+Silstrup,03-07-2012,BBCH stage 85
+Silstrup,05-07-2012,BBCH stage 85
+Silstrup,05-07-2012,Biomass 915.3 g m-2 - 100% DM
+Silstrup,25-07-2012,Harvest of grass seed. Yield 14.16 hkg ha-1 - 87% DM
+Silstrup,25-07-2012,Straw removed - straw yield 48.3 hkg ha-1 - 100% DM, stubble height 12 cm
+Silstrup,25-07-2012,BBCH stage 89
+Silstrup,10-09-2012,Tracer (potasium bromide) 30.0 kg ha-1
+Silstrup,10-09-2012,Glyfonova 450 Plus (glyphosate) - weeds (killing the red fescue) - 4.8 L ha-1
+Silstrup,08-10-2012,Ploughed - depth 24 cm – packed
+Silstrup,09-10-2012,Sowing winter wheat cv. Hereford. Depth 2.4 cm, seeding rate 200 kg ha-1, row distance 15.0 cm using a Horch Pronto 6 DC
+Silstrup,17-10-2012,BBCH stage 5
+Silstrup,24-10-2012,BBCH stage 9
+Silstrup,24-10-2012,BBCH stage 9
+Silstrup,31-10-2012,BBCH stage 10
+Silstrup,09-11-2012,BBCH stage 10
+Silstrup,09-11-2012,DFF (diflufenican) + Oxitril CM(ioxynil+bromoxynil - not analysed) - weeds - 0.12 g ha-1 +0.2 Lha-1
+Silstrup,14-11-2012,BBCH stage 11
+Silstrup,28-11-2012,BBCH stage 12
+Silstrup,08-01-2013,BBCH stage 12
+Silstrup,22-02-2013,BBCH stage 12
+Silstrup,22-02-2013,Fertilization 52.5 N, 7.5 P, 25.0 K kg ha-1
+Silstrup,03-05-2013,Sowing spring barlye cv. Quenc, replacing winter wheat injured by frost. Depth 3.8 cm, seeding rate 175 kg ha-1, row distance 15 cm, Horch Pronto 6 DC, final plant number 303 m-2
+Silstrup,03-05-2013,The remaining winter wheat plants incorporated at the sowing of spring barley
+Silstrup,04-05-2013,Fertilization 67.2 N, 9.6 P, 32.0 K kg ha-1
+Silstrup,14-05-2013,BBCH stage 8
+Silstrup,16-05-2013,BBCH stage 9
+Silstrup,22-05-2013,BBCH stage 12
+Silstrup,29-05-2013,BBCH stage 22
+Silstrup,29-05-2013,Biomass 23.3 g m-2 - 100% DM
+Silstrup,30-05-2013,BBCH stage 22
+Silstrup,30-05-2013,Duotril 400 EC (ioxynil+bromoxynil) - weeds - 0.6 L ha-1
+Silstrup,11-06-2013,BBCH stage 30
+Silstrup,25-06-2013,BBCH stage 47
+Silstrup,25-06-2013,Amistar (azoxystrobin) - fungi - 1.0 L ha-1
+Silstrup,01-07-2013,Folicur 250 EC (tebuconazole) - fungi - 1.0 L ha-1
+Silstrup,01-07-2013,BBCH stage 50
+Silstrup,01-07-2013,Biomass 537.0 g m-2 - 100% DM
+Silstrup,09-07-2013,BBCH stage 58
+Silstrup,19-07-2013,BBCH stage 70
+Silstrup,06-08-2013,BBCH stage 80
+Silstrup,06-08-2013,Biomass 1332.1 g m-2 - 100% DM
+Silstrup,14-08-2013,BBCH stage 86
+Silstrup,20-08-2013,Glyfonova 450 Plus (glyphosate) - weeds (killing the grass) - 2.4 L ha-1
+Silstrup,20-08-2013,BBCH stage 87
+Silstrup,30-08-2013,BBCH stage 89
+Silstrup,06-09-2013,Harvest of spring barley. Grain yield 59.8 hkg ha-1 - 85% DM, straw yield 46.0 hkg ha-1 - 100% DM, stubbleheight 14 cm. Straw shredded at harvest
+Silstrup,20-09-2013,Liming 3.2 t ha-1
+Silstrup,23-09-2013,Ploughed - depth 24 cm – packed
+Silstrup,25-09-2013,Sowing winter wheat cv. Hereford. Depth 4 cm, seeding rate 190 kg ha-1, final plant number 346 m-2, row distance 15.0 cm using a Horch Pronto 6 DC
+Silstrup,01-10-2013,BBCH stage 6
+Silstrup,07-10-2013,BBCH stage 9 – emergence
+Silstrup,16-10-2013,BBCH stage 10
+Silstrup,16-10-2013,Oxitril CM (bromoxynil + ioxynil) + DFF (diflufenican) - weeds – 0.08 L ha-1+ 0.2 L ha-1 (bromoxynil and ioxynil not included)
+Silstrup,30-10-2013,BBCH stage 12
+Silstrup,05-11-2013,BBCH stage 13
+Silstrup,20-11-2013,BBCH stage 13
+Silstrup,04-12-2013,BBCH stage 13
+Silstrup,07-04-2014,Fertilization 170.5 N, 23.3 P, 77.5 K kg ha-1
+Silstrup,07-04-2014,BBCH stage 13
+Silstrup,15-04-2014,BBCH stage 20
+Silstrup,25-04-2014,BBCH stage 30
+Silstrup,25-04-2014,Biomass 94.0 g m-2 - 100% DM
+Silstrup,30-04-2014,BBCH stage 30
+Silstrup,15-05-2014,BBCH stage 32
+Silstrup,21-05-2014,BBCH stage 34
+Silstrup,27-05-2014,BBCH stage 41
+Silstrup,02-06-2014,Biomass 962.0 g m-2 - 100% DM
+Silstrup,02-06-2014,BBCH stage 51
+Silstrup,03-06-2014,BBCH stage 53
+Silstrup,04-06-2014,Amistar (azoxystrobin) - fungi - 1.0 L ha-1
+Silstrup,18-06-2014,BBCH stage 63
+Silstrup,23-06-2014,BBCH stage 68
+Silstrup,02-07-2014,Biomass 1776.5 g m-2 - 100% DM
+Silstrup,02-07-2014,BBCH stage 75
+Silstrup,08-07-2014,BBCH stage 76
+Silstrup,16-07-2014,BBCH stage 79
+Silstrup,22-07-2014,BBCH stage 83
+Silstrup,25-07-2014,BBCH stage 87
+Silstrup,25-07-2014,Glyfonova 450 Plus (glyphosate) - weeds - 2.4 L ha-1
+Silstrup,15-08-2014,BBCH stage 90
+Silstrup,16-08-2014,Harvest of winter wheat. Grain yield 83.5 hkg ha-1 - 85% DM, straw yield 113.8 hkg ha-1 - 100% DM, stubbleheight 14 cm. Straw shredded (left in field) at harvest
+Silstrup,19-09-2014,Stubble harrowed, disk harrow (Heva Disc Roller) - depth 5-8 cm (incorporation of straw)
+Silstrup,28-04-2015,Pig slurry application - accidified at application - hose applied at surface - 28.3 t ha-1 – 126.2 Total-N, 75.6 NH4-N, 44.2 P, 46.7 K, kg ha-1, DM of slurry 5.33%
+Silstrup,28-04-2015,Ploughed - 24 cm depth
+Silstrup,30-04-2015,Fertilization 112.5 K kg ha-1
+Silstrup,30-04-2015,Seedbed preparation, 5-8 cm depth
+Silstrup,02-05-2015,Sowing maiz cv. Ambition, depth 3.5 cm, rowdistance 75 cm, seed distance 14 cm seeding rate 10 m2. final plantnumber 7.4 m2 (seeds werer coated with thirame, fludioxonil and metalaxyl-M)
+Silstrup,02-05-2015,Fertilization 30 N, 12.9 P, kg ha-1 (placed at sowing)
+Silstrup,03-05-2015,BBCH 1
+Silstrup,12-05-2015,BBCH 5
+Silstrup,19-05-2015,BBCH 7
+Silstrup,27-05-2015,BBCH 9
+Silstrup,27-05-2015,Callisto (mesotrione) + Harmony SX (thifensulfuron-methyl) - weeds - (0.75 L ha-1+ 5.625 g ha-1) (i.e. 75 g a.i. ha-1 + 2.813 g a.i. ha-1
+Silstrup,06-06-2015,BBCH 12
+Silstrup,09-06-2015,BBCH 12
+Silstrup,09-06-2015,Callisto (mesotrione) + MaisTer (foramsulfuron+iodosulfuron) - weeds - (0.75 L ha-1 + 100 g ha-1) (i.e. 75 g a.i. ha-1 + 30 g a.i. ha-1 + 1 g a.i. ha-1)
+Silstrup,18-06-2015,BBCH 14
+Silstrup,23-06-2015,BBCH 15
+Silstrup,23-06-2015,MaisTer (foramsulfuron+iodosulfuron) - weeds - (50 g ha-1) (i.e. 15 g a.i. ha-1 + 0,5 g a.i. ha-1)
+Silstrup,03-07-2015,BBCH 17-18
+Silstrup,03-07-2015,Biomass 5.8 g m-2 - 100% DM
+Silstrup,14-07-2015,BBCH 19
+Silstrup,22-07-2015,BBCH 31
+Silstrup,12-08-2015,BBCH 51
+Silstrup,13-08-2015,BBCH 51
+Silstrup,13-08-2015,Biomass 303.8 g m-2 - 100% DM
+Silstrup,19-08-2015,BBCH 54
+Silstrup,26-08-2015,BBCH 65
+Silstrup,09-09-2015,BBCH 70
+Silstrup,23-09-2015,BBCH 72
+Silstrup,30-09-2015,BBCH 73
+Silstrup,05-10-2015,BBCH 74
+Silstrup,05-10-2015,Biomass 1086.2 g m-2 - 100% DM
+Silstrup,21-10-2015,BBCH 77
+Silstrup,28-10-2015,BBCH 80
+Silstrup,31-10-2015,Harvest of maiz. Stubble height 25 cm. Total harvested yield 64.98 hkg ha-1100% DM.
+Silstrup,05-11-2015,Maiz stubble chrushed with a cutter
+Silstrup,28-04-2016,Stuble cultivated - depth 6 cm
+Silstrup,09-05-2016,Pig slurry application – acidified at application – trail hose applied at surface – 34 t ha-1 - 150.6 Total-N, 85.0 NH4-N, 70.7 P, 73.4 K, kg ha-1, DM of slurry 4.79%
+Silstrup,10-05-2016,Ploughed - 24 cm depth - packed with a ring roller
+Silstrup,11-05-2016,Fertilization 89.6 K kg ha-1
+Silstrup,12-05-2016,Rotary cultivated - depth 5.0 cm
+Silstrup,13-05-2016,Fertilization 33.4 N, 17.5 P, kg ha-1 (placed at sowing)
+Silstrup,13-05-2016,Sowing maiz cv. Activate, depth 3.5 cm, rowdistance 75 cm, seeddistance 14.7 cm seeding rate 10 m2. final plantnumber 8 m2 (seeds werer coated Mesurol FS 500 - thirame, fludioxonil and metalaxyl-M)
+Silstrup,13-05-2016,BBCH stage 01
+Silstrup,25-05-2016,BBCH stage 07
+Silstrup,30-05-2016,BBCH stage 09 – emergence
+Silstrup,02-06-2016,BBCH stage 12
+Silstrup,06-06-2016,BBCH stage 13-14
+Silstrup,06-06-2016,Callisto (mesotrion) + Harmony SX (thifensulfuron-methyl) - weeds - (0.75 L ha-1 + 5.625 g ha-1) (i.e. 75 g a.i. ha-1 + 2.813 g a.i. ha-1
+Silstrup,08-06-2016,BBCH stage 14
+Silstrup,08-06-2016,Biomass 3.3 g m-2 - 100% DM
+Silstrup,22-06-2016,BBCH stage 16-17
+Silstrup,22-06-2016,Callisto (mesotrion) + MaisTer (foramsulfuron+iodosulfuron) - weeds - (0.75 L ha-1 + 150 g ha-1) (i.e. 75 g a.i. ha-1 + 45 g a.i. ha-1 + 1,5 g a.i. ha-1)
+Silstrup,27-06-2016,BBCH stage 17-18
+Silstrup,29-06-2016,BBCH stage 19-21
+Estrup,06-09-2010,Rotor harrowed - depth 5 cm
+Estrup,14-09-2010,Ploughed - depth 20 cm - packed with a ring roller
+Estrup,14-09-2010,Seedbed preparation - depth 5 cm
+Estrup,14-09-2010,Winter wheat sown cv. Frument. Depth 4.0 cm, rowdistance 12 cm, seeding rate 210 kg ha-1. Final plantnumber 370 m-2
+Estrup,25-09-2010,BBCH stage 09 – emergence
+Estrup,30-09-2010,BBCH stage 10
+Estrup,30-09-2010,Express ST (tribenuron-methyl) - weeds - 1 tablet ha-1
+Estrup,07-10-2010,BBCH stage 11
+Estrup,14-10-2010,BBCH stage 12
+Estrup,28-10-2010,BBCH stage 13
+Estrup,11-11-2010,BBCH stage 20
+Estrup,11-11-2010,Fertilization manganes sulfate (32%) - 3.0 L ha-1
+Estrup,18-11-2010,BBCH stage 21
+Estrup,17-03-2011,BBCH stage 21
+Estrup,17-03-2011,Fertilization 70 N, 9 P, 33 K, kg ha-1
+Estrup,07-04-2011,BBCH stage 22
+Estrup,07-04-2011,Biomass 37.1 g m-2 - 100% DM
+Estrup,14-04-2011,BBCH stage 22
+Estrup,14-04-2011,Pig slurry application - trail hose (surface) - 42.4 t ha-1, 124 total-N, 90 NH4N, 56 P ha-1, 19 K, kg ha-1
+Estrup,19-04-2011,BBCH stage 23
+Estrup,26-04-2011,BBCH stage 29
+Estrup,26-04-2011,Fox 480 SC (bifenox) - weeds - 1.2 L ha-1
+Estrup,02-05-2011,BBCH stage 31
+Estrup,02-05-2011,Fertilization manganes sulfate (32%) - 3.0 L ha-1
+Estrup,05-05-2011,BBCH stage 30
+Estrup,09-05-2011,BBCH stage 31
+Estrup,09-05-2011,Flexity (metrafenon) - fungi - 0.5 L ha-1
+Estrup,12-05-2011,BBCH stage 32
+Estrup,18-05-2011,BBCH stage 37
+Estrup,25-05-2011,BBCH stage 43
+Estrup,31-05-2011,BBCH stage 45
+Estrup,31-05-2011,Biomass 731.6 g m-2 - 100% DM
+Estrup,07-06-2011,BBCH stage 58
+Estrup,07-06-2011,Flexity (metrafenon) - fungi - 0.5 L ha-1
+Estrup,08-06-2011,BBCH stage 58
+Estrup,16-06-2011,BBCH stage 65
+Estrup,23-06-2011,BBCH stage 68
+Estrup,28-06-2011,BBCH stage 70
+Estrup,28-06-2011,Biomass 1201.1 g m-2 - 100% DM
+Estrup,30-06-2011,BBCH stage 70
+Estrup,14-07-2011,BBCH stage 77
+Estrup,21-07-2011,BBCH stage 83
+Estrup,28-07-2011,BBCH stage 87
+Estrup,04-08-2011,BBCH stage 89
+Estrup,22-08-2011,Harvest of winter wheat. Stubleheight 12 cm, grainyield 66.3 hkg ha-1 85% DM,
+Estrup,22-08-2011,Straw shredded at harvest - 53.8 hkg ha-1 100% DM
+Estrup,03-10-2011,Roundup Max (glyphosate) - weeds - 2.0 kg ha-1
+Estrup,09-11-2012,Ploughed - depth 20 cm - packed with a Dalbo ring roller
+Estrup,22-03-2012,Fertilization 117 N, 15 P, 55 K, kg ha-1
+Estrup,29-03-2012,Rotor harrowed - depth 4 cm
+Estrup,30-03-2012,Spring barley sown, cv. Keops, seeding rate 159 kg ha-1, sowing depth 4.3 cm, row distance 12 cm. Final plantnumber 330 m-2
+Estrup,03-04-2012,Rolled with a Cambridge roller
+Estrup,22-04-2012,BBCH 9 – emergence
+Estrup,23-04-2012,BBCH stage 10
+Estrup,26-04-2012,BBCH stage 11
+Estrup,01-05-2012,BBCH stage 12
+Estrup,15-05-2012,BBCH stage 22
+Estrup,15-05-2012,Biomass 30.5 g m-2 - 100% DM
+Estrup,15-05-2012,Fox 480 SC (bifenox) - weeds - 1.2 L ha-1
+Estrup,18-05-2012,BBCH stage 23
+Estrup,18-05-2012,Mustang forte (aminopyralid/florasulam/2,4-D) - weeds - 0.75 L ha-1
+Estrup,21-05-2012,BBCH stage 30
+Estrup,21-05-2012,Fertilization manganes nitrate (23,5%) - 2.0 L ha-1
+Estrup,29-05-2012,BBCH stage 37
+Estrup,29-05-2012,Fertilization manganes nitrate (23,5%) - 2.0 L ha-1
+Estrup,06-06-2012,BBCH stage 40
+Estrup,13-06-2012,BBCH stage 50
+Estrup,13-06-2012,Amistar (azoxystrobin) - fungi - 1.0 L ha-1
+Estrup,14-06-2012,BBCH stage 50
+Estrup,14-06-2012,Biomass 528.5 g m-2 - 100% DM
+Estrup,20-06-2012,BBCH stage 56
+Estrup,27-06-2012,BBCH stage 61
+Estrup,02-07-2012,BBCH stage 70
+Estrup,02-07-2012,Biomass 914.6 g m-2 - 100% DM
+Estrup,11-07-2012,BBCH stage 73
+Estrup,18-07-2012,BBCH stage 77
+Estrup,25-07-2012,BBCH stage 83
+Estrup,01-08-2012,BBCH stage 86
+Estrup,13-08-2012,BBCH stage 89
+Estrup,13-08-2012,Harvest of spring barley. Stuble height 12 cm, grainyield 62.9 hkg ha-1 85% DM.
+Estrup,13-08-2012,Straw shredded at harvest - 41.0 hkg ha-1 100% DM
+Estrup,26-09-2012,Tracer (potasium bromide) - 30 kg ha-1
+Estrup,08-03-2013,Ploughed - depth 20 cm - packed with a Dalbo ring roller
+Estrup,05-04-2013,Fertilization 16 P, 84 K, kg ha-1
+Estrup,23-04-2013,Seedbed preparation - depth 5 cm
+Estrup,23-04-2013,Sowing peas - cultivare Alvesta - depth 5 cm, rowdistance 12 cm, seeding rate 230 kg ha-1. Final plantnumber 82 m-2
+Estrup,23-04-2013,Rolled with a Cambridge roller
+Estrup,25-04-2013,BBCH stage 0
+Estrup,25-04-2013,Command CS (clomazone) - weeds - 0.25 L ha-1
+Estrup,04-05-2013,BBCH 9 – emergence
+Estrup,16-05-2013,BBCH stage 12
+Estrup,16-05-2013,Fighter 480 (bentazone) - weeds - 1.0 L ha-1
+Estrup,16-05-2013,Cyperb (cypermethrin) - pests - 0.3 L ha-1 (not analysed)
+Estrup,22-05-2013,BBCH stage 31
+Estrup,27-05-2013,BBCH stage 33
+Estrup,27-05-2013,Biomass 42.3 g m-2 - 100% DM
+Estrup,06-06-2013,BBCH stage 37
+Estrup,12-06-2013,BBCH stage 40
+Estrup,21-06-2013,BBCH stage 60
+Estrup,21-06-2013,Biomass 357.7 g m-2 - 100% DM
+Estrup,26-06-2013,BBCH stage 62
+Estrup,09-07-2013,BBCH stage 66
+Estrup,12-07-2013,BBCH stage 68
+Estrup,12-07-2013,Biomass 718.1 g m-2 - 100% DM
+Estrup,13-07-2013,BBCH stage 68
+Estrup,13-07-2013,Pirimor G (pirimicarb) - pests - 0.25 kg ha-1
+Estrup,17-07-2013,BBCH stage 79
+Estrup,31-07-2013,BBCH stage 83
+Estrup,05-08-2013,BBCH stage 83
+Estrup,05-08-2013,Biomass 985.3 g m-2 - 100% DM
+Estrup,13-08-2013,BBCH stage 87
+Estrup,20-08-2013,BBCH stage 90
+Estrup,21-08-2013,Glyphonova 450 Plus (glyphosate) - weeds - 2.4 L ha-1
+Estrup,27-08-2013,BBCH stage 93
+Estrup,06-09-2013,Harvest of peas. Stubble height 10 cm, seed yield 49.8 hkg ha-1- 86% dry matter.
+Estrup,06-09-2013,Straw shedded at harvest - 24.38 hkg ha-1 100% DM
+Estrup,13-09-2013,Winter wheat sown cv. Herford. Depth 4.0 cm, rowdistance 12 cm, seeding rate 180 kg ha-1. Final plantnumber 365 m-2 using a combined powerharrow sowing equipment
+Estrup,21-09-2013,BBCH 9 – emergence
+Estrup,25-09-2013,BBCH stage 11
+Estrup,09-10-2013,BBCH stage 12
+Estrup,14-10-2013,BBCH stage 20
+Estrup,14-10-2013,Fertilization manganes nitrate (23.5%) - 2.0 kg ha-1
+Estrup,30-10-2013,BBCH stage 21
+Estrup,11-11-2013,BBCH stage 24
+Estrup,11-11-2013,Oxitril CM (bromoxynil + ioxynil) + DFF (diflufenican) - weeds - 0.2 L ha-1 + 0.24 L ha-1 (bromoxynil and ioxynil not included)
+Estrup,13-11-2013,BBCH stage 24
+Estrup,02-04-2014,BBCH stage 30
+Estrup,04-04-2014,BBCH stage 30
+Estrup,04-04-2014,Fertilization 150 N, 16 P, 60 K, kg ha-1 (liquid fertilizer - applied 1000 L ha-1 with a sprayer)
+Estrup,22-04-2014,BBCH stage 32
+Estrup,22-04-2014,Fluxyr 200 EC - (fluroxypyr) - weeds - 0.7 L ha-1 (not included)
+Estrup,22-04-2014,Fertilization manganes nitrate (23,5%) - 2.0 kg ha-1
+Estrup,07-05-2014,BBCH stage 34
+Estrup,07-05-2014,Biomass 54.0 g m-2 - 100% DM
+Estrup,15-05-2014,BBCH stage 36
+Estrup,15-05-2014,Primus (florasulam) - weeds - 50 mL ha-1
+Estrup,20-05-2014,BBCH stage 38
+Estrup,20-05-2014,Folicur 250 EC (tebuconazole) - fungi - 1.0 L ha-1
+Estrup,27-05-2014,BBCH stage 50
+Estrup,02-06-2014,BBCH stage 59
+Estrup,02-06-2014,Biomass 497.3 g m-2 - 100% DM
+Estrup,02-06-2014,Amistar (azoxystrobin) - fungi - 1.0 L ha-1
+Estrup,11-06-2014,BBCH stage 67
+Estrup,18-06-2014,BBCH stage 71
+Estrup,24-06-2014,BBCH stage 72
+Estrup,24-06-2014,Cyperb (cypermethrin) - pests - 0.25 L ha-1 (not analysed)
+Estrup,02-07-2014,BBCH stage 74
+Estrup,07-07-2014,BBCH stage 75
+Estrup,07-07-2014,Biomass 1557.7 g m-2 - 100% DM
+Estrup,16-07-2014,BBCH stage 82
+Estrup,26-07-2014,BBCH stage 87
+Estrup,26-07-2014,Glyphonova 450 Plus (glyphosate) - weeds – 2.4 L ha-1
+Estrup,06-08-2014,BBCH stage 90
+Estrup,06-08-2014,Harvest of winter wheat. Stubleheight 11 cm, grainyield 69.3 hkg ha-1 85% DM
+Estrup,12-08-2014,Harrowed to 5 cm depth and sown a catch crop of oilseed radish 12 kg ha-1 seed on soil surface
+Estrup,06-08-2014,Straw shredded at harvest - 48.7 hkg ha-1, 100% DM
+Estrup,12-08-2014,Liming 3.5 t ha-1 magnesium limestone
+Estrup,29-04-2015,Pig slurry application - accidified at application from pH 7,15 til 6,82- hose applied at surface - 28.0 t ha-1 - 117.3 Total-N, 76.44 NH4-N, 39.2 P, 47.9 K, kg ha-1, DM of slurry 5.43%
+Estrup,29-04-2015,Ploughed - depth 20 cm
+Estrup,11-05-2015,Seedbed preparation - depth 5 cm using a Rabewerke rotary cultivator
+Estrup,11-05-2015,Fertilization 30.8 N, 4.7 P, 19.0 K, kg ha-1 (placed at sowing)
+Estrup,11-05-2015,Sowing maize cv. Ambition, depth 4 cm, rowdistance 75 cm, seeddistance 12.1 cm seeding rate 11 m2. Final plantnumber 10.5 m2
+Estrup,13-05-2015,Fertilization 55.3 N, 8.5 P, 34.0 K, kg ha-1 (applied with a field sprayer - luiquid fertilizer
+Estrup,27-05-2015,BBCH 09
+Estrup,27-05-2015,Callisto (mesotrione) + Harmony SX (thifensulfuron-methyl) - weeds - (0.75 L ha-1+ 5.625 g ha-1) (i.e. 75 g a.i. ha-1 + 2.813 g a.i. ha-1
+Estrup,03-06-2015,BBCH 12
+Estrup,06-06-2015,BBCH 13
+Estrup,06-06-2015,Callisto (mesotrione) + MaisTer (foramsulfuron+iodosulfuron) - weeds - (0.75 L ha-1 + 100 g ha-1) (i.e. 75 g a.i. ha-1 + 30 g a.i. ha-1 + 1 g a.i. ha-1)
+Estrup,08-06-2015,BBCH 13
+Estrup,08-06-2015,Biomass 0.4 g m-2 - 100% DM
+Estrup,18-06-2015,BBCH 14
+Estrup,23-06-2005,BBCH 16
+Estrup,30-06-2015,BBCH 18
+Estrup,30-06-2015,MaisTer (foramsulfuron+iodosulfuron) + Lodin 200 EC (fluroxypyr) - weeds - (50 g ha-1 + 1.0 L ha-1) (i.e. 15 g a.i. ha-1 + 0,5 g a.i. ha-1 + 180 g a.i. ha-1)
+Estrup,01-07-2015,BBCH 19
+Estrup,09-07-2015,BBCH 22
+Estrup,16-07-2015,BBCH 33
+Estrup,23-07-2015,BBCH 43
+Estrup,30-07-2015,BBCH 51
+Estrup,04-08-2015,BBCH 51
+Estrup,04-08-2015,Biomass 1794 g m-2 - 100% DM
+Estrup,05-08-2015,BBCH 60
+Estrup,13-08-2015,BBCH 65
+Estrup,08-06-2015,Biomass 4159 g m-2 - 100% DM
+Estrup,20-08-2015,BBCH 69
+Estrup,01-09-2015,BBCH 72
+Estrup,15-09-2015,BBCH 73
+Estrup,22-09-2015,BBCH 74
+Estrup,06-10-2015,BBCH 75
+Estrup,13-10-2015,BBCH 78
+Estrup,23-10-2015,BBCH 81
+Estrup,23-10-2015,Harvest of maiz. Stubble height 25 cm. Total harvested yield 105.98 hkg ha-1 100% DM.
+Estrup,04-05-2016,Pig slurry application - accidified at application trail hose applied at surface - 21.0 t ha-1 - 86.5 Total-N, 56.3 NH4-N, 11.6 P, 29.6 K, kg ha-1, DM of slurry 3.58 %
+Estrup,05-05-2016,Ploughed - depth 20 cm
+Estrup,06-05-2016,Seedbed preparation - depth 5 cm using a Rabewerke rotary cultivator
+Estrup,06-05-2016,Fertilization 150 N, 20 P, 60 K, kg ha-1 (20% thereof placed at sowing and 80% harowed into the soil before the sowing )
+Estrup,06-05-2016,Sowing maiz cv. Ambition, depth 4 cm, rowdistance 75 cm, seed distance 12.1 cm, seeding rate 11 m2. Final plantnumber 10.5 m2
+Estrup,14-05-2016,BBCH stage 09
+Estrup,14-05-2016,BBCH stage 11
+Estrup,14-05-2016,BBCH stage 13
+Estrup,01-06-2016,BBCH stage 14
+Estrup,01-06-2016,Callisto (mesotrion) + Harmony SX (thifensulfuron-methyl) - weeds - (0.75 l ha-1 + 5.625 g ha-1) (i.e. 75 g a.i. ha-1 + 2.813 g a.i. ha-1)
+Estrup,05-06-2016,BBCH stage 14
+Estrup,05-06-2015,Biomass 288.5 g m-2 - 100% DM
+Estrup,08-06-2016,BBCH stage 16
+Estrup,11-06-2016,BBCH stage 17
+Estrup,11-06-2016,Callisto (mesotrion) + MaisTer (foramsulfuron+iodosulfuron) - weeds - (0.75 l ha-1 + 100 g ha-1) (i.e. 75 g a.i. ha-1 + 30 g a.i. ha-1 + 1 g a.i. ha-1)
+Estrup,15-06-2016,BBCH stage 18
+Estrup,16-06-2016,BBCH stage 18
+Estrup,16-06-2016,MaisTer (foramsulfuron+iodosulfuron) - weeds - (50 g ha-1) (i.e. 15 g a.i. ha-1 + 0,5 g a.i. ha-1)
+Estrup,22-06-2016,BBCH stage 25-26
+Estrup,29-06-2016,BBCH stage 46-47
+Faardrup,22-08-2010,Red fescue
+Faardrup,06-09-2010,Fertilization 58.5 N, 4.5 P, 15.8 K, kg ha-1
+Faardrup,06-09-2010,BBCH stage 24-29
+Faardrup,25-10-2010,Fox 480 SC (bifenox) - weeds - 1.5 L ha-1
+Faardrup,25-10-2010,BBCH stage 24-29
+Faardrup,07-03-2011,BBCH stage 26-27
+Faardrup,07-03-2011,Fertilization 104 N, 8 P, 28 K, kg ha-1
+Faardrup,15-03-2011,BBCH stage 25-29
+Faardrup,01-04-2011,BBCH stage 25-29
+Faardrup,09-04-2011,BBCH stage 29-30
+Faardrup,19-04-2011,BBCH stage 29-30
+Faardrup,02-05-2011,BBCH stage 29-31
+Faardrup,12-05-2011,BBCH stage 30-32
+Faardrup,12-05-2011,Biomass 423.0 g m-2 - 100% DM
+Faardrup,19-05-2011,BBCH stage 30-55
+Faardrup,21-05-2011,BBCH stage 37-59
+Faardrup,21-05-2011,Fusilade Max (fluazifop-P-butyl) - weeds - 1.5 L ha-1
+Faardrup,24-05-2011,BBCH stage 51-57
+Faardrup,24-05-2011,Biomass 725.8 g m-2 - 100% DM
+Faardrup,01-06-2011,BBCH stage 54-59
+Faardrup,08-06-2011,BBCH stage 55-59
+Faardrup,17-06-2011,BBCH stage 59
+Faardrup,24-06-2011,BBCH stage 73-75
+Faardrup,24-06-2011,Biomass 710.6 g m-2 - 100% DM
+Faardrup,01-07-2011,BBCH stage 77-82
+Faardrup,05-07-2011,Windrowing. Stubble hight 5 cm
+Faardrup,20-07-2011,Straw removed. Straw yield 21.1 hkg ha-1
+Faardrup,20-07-2011,Threshing of grass seed. Yield 7.2 hkg ha-1 - 87% DM, stubble height 5 cm
+Faardrup,03-10-2011,BBCH stage 29
+Faardrup,03-10-2011,Glyphogan (glyphosate) - weeds - 5.0 L ha-1
+Faardrup,08-11-2011,Ploughing - depth 20 cm
+Faardrup,26-03-2012,Fertilization 112 N, 9 P, 30 K, kg ha-1
+Faardrup,04-04-2012,Seed bed preparation - depth 7 cm
+Faardrup,04-04-2012,Sowing spring barley using a mixture of varieties. Depth 3-4 cm, row distance 13 cm, seeding rate 98 kg ha-1. Final plant number 200 m-2. Undersown white clover cv. Liflex, seeding rate 2.0 kg ha-1, depth 2-3 cm, row distance 13 cm
+Faardrup,04-04-2012,Tracer (potasium bromide) 30 kg ha-1
+Faardrup,19-04-2012,BBCH 9 - emergence of spring barley
+Faardrup,23-04-2012,BBCH stage 10
+Faardrup,24-04-2012,BBCH 9 - emergence of white clover
+Faardrup,03-05-2012,BBCH stage 13-21
+Faardrup,16-05-2012,BBCH stage 23-27
+Faardrup,18-05-2012,BBCH stage 24-29
+Faardrup,18-05-2012,Fighter 480 (bentazone) - weeds - 1.25 L ha-1
+Faardrup,23-05-2012,BBCH stage 29-31
+Faardrup,23-05-2012,Biomass 112.7 g m-2 - 100% DM
+Faardrup,01-06-2012,BBCH stage 33-37
+Faardrup,06-06-2012,BBCH stage 39
+Faardrup,06-06-2012,Flexity (metrafenon) - fungi - 0.5 L ha-1
+Faardrup,11-06-2012,BBCH stage 45-51
+Faardrup,11-06-2012,Biomass 592.5 g m-2 - 100% DM
+Faardrup,21-06-2012,BBCH stage 55-57
+Faardrup,05-07-2012,BBCH stage 71
+Faardrup,23-07-2012,BBCH stage 83
+Faardrup,23-07-2012,Biomass 1321.7 g m-2 - 100% DM
+Faardrup,30-07-2012,BBCH stage 85
+Faardrup,12-08-2012,Harvest of spring barley stubble height 15 cm. Grain yield 67.51 hkg ha-1 - 85% DM
+Faardrup,12-08-2012,Straw removed. Straw yield 27.62 hkg ha-1 - 100% DM
+Faardrup,27-08-2012,BBCH stage 22-29 clover vegative growth - formation of side shots
+Faardrup,29-08-2012,Trimming of stubble
+Faardrup,26-01-2013,Kerb 400 SC (propyzamid) - fungi - 1.0 L ha-1
+Faardrup,13-05-2013,Biomass 298.2 g m-2 - 100% DM
+Faardrup,14-05-2013,Fighter 480 (bentazone) - weeds - 3.0 L ha-1
+Faardrup,22-05-2013,Rolled with a concrete roller
+Faardrup,29-05-2013,Biomass 402.9 g m-2 - 100% DM
+Faardrup,31-05-2013,Karate (Lambda-cyhalothrin) - pest - 0.3 L ha-1 (not analysed)
+Faardrup,12-06-2013,Karate (Lambda-cyhalothrin) - pest - 0.3 L ha-1 (not analysed)
+Faardrup,25-06-2013,Biomass 698.3 g m-2 - 100% DM
+Faardrup,22-07-2013,Windrowing. Stubble height 8.0 cm
+Faardrup,28-07-2013,Threshing of white clover. Seed yield fresh 1,560 hkg ha-1. Straw yield fresh 0.96 hkg ha-1
+Faardrup,07-10-2013,Ploughed and packed - depth 14 cm
+Faardrup,07-10-2013,Rotor harrowed at the time of sowing the winter wheat, cv. Mariboss - depth 4 cm, row distance 11 cm, seeding rate 200 kg ha-1 - final plant number 320 m-2
+Faardrup,18-10-2013,BBCH 09 – emergence
+Faardrup,13-03-2014,BBCH 23
+Faardrup,13-03-2014,Fertilization 81 N, 16 P, 61 K, kg ha-1
+Faardrup,09-04-2014,Fertilization 81 N, 16 P, 61 K, kg ha-1
+Faardrup,09-04-2014,BBCH 25
+Faardrup,15-04-2014,BBCH 24
+Faardrup,28-04-2014,Briotril (ioxynil+ bromoxynil) - weeds - 0.6 L ha-1 + Tomahawk 180 EC (fluroxypyr) - weeds - 0.8 L ha-1 (neither included)
+Faardrup,28-04-2014,BBCH 24
+Faardrup,30-04-2014,BBCH 30
+Faardrup,15-05-2014,BBCH 32
+Faardrup,15-05-2014,Amistar (azoxystrobin) - fungi - 1.0 L ha-1 (not included)
+Faardrup,04-06-2014,Biomass 1321 g m-2 - 100% DM
+Faardrup,04-06-2014,BBCH 55
+Faardrup,12-06-2014,BBCH 59
+Faardrup,20-07-2014,BBCH 83
+Faardrup,20-07-2014,Biomass 1995 g m-2 - 100% DM
+Faardrup,25-07-2014,BBCH 87
+Faardrup,30-07-2014,Harvest of winter wheat. Grain yield 56.6 hkg - 85% DM. Stubble height 12 cm
+Faardrup,26-08-2014,Glyfonova Plus (glyphosate) - weeds - 4.0 L ha-1 (not included)
+Faardrup,23-09-2014,Ploughing - 14 cm depth - straw 70 hkg ha-1 (fresh weight) incorporated
+Faardrup,23-09-2014,Sowing winter wheat cv. Mariboss. Depth 3.5 cm, seeding rate 180 kg ha-1, row distance 13.0 cm. Final plant number 375 m-2
+Faardrup,01-10-2014,BBCH 09 – emergence
+Faardrup,20-11-2014,BBCH 23
+Faardrup,20-11-2014,Folicur 250 (tebuconazole) - fungi - 1.0 L ha-1 (i.e. 250g a.i. ha-1)
+Faardrup,30-11-2014,BBCH 23
+Faardrup,30-11-2014,Lexus 50 WG (flupyrsulfuron) - weeds - 10 g ha-1 (i.e. 4.6 g a.i. ha-1)
+Faardrup,30-11-2014,Boxer (prosulfocarb) - weeds - 3.0 L ha-1 (i.e. 2400 g a.i. ha-1)
+Faardrup,10-03-2015,BBCH 25
+Faardrup,10-03-2015,Biomass 44 g m-2 - 100% DM
+Faardrup,13-03-2015,BBCH 25
+Faardrup,13-03-2015,Fertilization 80 N, 18 P, 63 K, kg ha-1
+Faardrup,21-04-2015,BBCH 30
+Faardrup,21-04-2015,Fertilization 94 N, 21 P, 74 K, kg ha-1
+Faardrup,22-04-2015,BBCH 30
+Faardrup,22-04-2015,Lexus 50 WG (flupyrsulfuron) - weeds - 10 g ha-1 (i.e. 4.6 g a.i. ha-1)
+Faardrup,08-05-2015,BBCH 37
+Faardrup,12-05-2015,BBCH 37
+Faardrup,12-05-2015,Starane XL (fluroxypur+ florasulam) - weeds - 1.2 L ha-1 (i.e. 120 g a.i. ha-1 + 3 g a.i. ha-1)
+Faardrup,12-05-2015,Proline 250 EC (prothioconazole) - fungi - 0.8 L ha-1 (i.e. 200 g a.i. ha-1)
+Faardrup,12-06-2015,BBCH 53
+Faardrup,23-06-2015,BBCH 55
+Faardrup,23-06-2015,Biomass 356.5 g m-2 - 100% DM
+Faardrup,12-08-2015,BBCH 55
+Faardrup,12-08-2015,Biomass 443.7 g m-2 – 100 % DM
+Faardrup,28-08-2015,BBCH 89
+Faardrup,02-09-2015,Harvest of winter wheat. Grain yield 79.7 hkg ha-1 85% DM, straw yield 71.5 hkg ha-1 100% DM, stubbleheight 15 cm. Straw shredded (left in field) at harvest.
+Faardrup,11-04-2016,Rotor harrowed at the time of sowing the spring barley. Mixture of varieties. Depth 4 cm, seeding rate 155 kg ha-1, row distance 12.0 cm. Final plant number 315 m-2
+Faardrup,11-04-2016,BBCH stage 0
+Faardrup,11-04-2016,Fertilization 130 N, 26 P, 98 K, kg ha-1
+Faardrup,20-04-2016,BBCH stage 09 – emergence
+Faardrup,02-05-2106,BBCH stage 15
+Faardrup,13-05-2016,BBCH stage 16-21
+Faardrup,13-05-2016,Biomass 60.7 g m-2 – 100% DM
+Faardrup,27-05-2016,BBCH stage 27
+Faardrup,27-05-2016,Starane 180 S + Oxitril (fluroxypyr + bromoxynil and ioxynil ) - weeds - 0.8 L ha-1 + 0.2 L ha-1 (i.e. 144 + 48 + 32 g a.i ha-1 - not included)
+Faardrup,01-06-2016,BBCH stage 31
+Faardrup,08-06-2016,BBCH stage 39
+Faardrup,16-06-2016,BBCH stage 47
+Faardrup,16-06-2016,Bumber 25 EC (propiconazole) - fungi - 0.5 L ha-1 (i.e. 125 g a.i. ha-1)
+Faardrup,16-06-2016,BBCH stage 65
+Faardrup,28-06-2016,BBCH stage 65
