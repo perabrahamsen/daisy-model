@@ -2,42 +2,15 @@ TODO ---things that needs to be done with Daisy -*- outline -*-
 
 * TODO
 
-** Test opsætning med depth factor til maja
-
-** Brev til Maja
-
 ** AA opgaver
-
-** Prepare for running long series med fixed dates.
-
-From 2018-11-14 minutes: 
-DFF 500SC: DFF, overall BBCH 0 - 29, with different application rates in winter and spring
-cereals, 75 or 120 g/ha.
-Action Per, Maja: use these
-
-Hvilke doser bruger vi?
 
 ** BBCH PLAP Opsætning?
 
-vejrfiler med grid
+Script til at generere daisy opsætning
 
-hurtig jord
+Særlig "dato-action" action i Daisy?
 
-bbch fil
-site,crop,date,bbch
-
-management for hver site
-hvad skal med? crop, fertilize?, spray? tillage?
-(defcrop "PLAP-SB" "Merete's SB par")
-
-yield fil
-site,crop,date,yield
-
-fertilize fil?
-
-spray fil?
-
-tillage fil?
+Eller skal sriptet tage en jord og periode?
 
 ** BBCH doc
 

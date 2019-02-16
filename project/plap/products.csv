@@ -3,13 +3,13 @@ Tylstrup,10-05-2011,Oxitril CM (ioxynil + bromoxynil),weeds,0.4,,(not analysed)
 Tylstrup,20-06-2011,Bell (boscalid + epoxiconazole),fungi,1.5,,(epoxiconazole not analysed)
 Tylstrup,31-08-2012,Tracer (potasium bromide),,,30000,
 Tylstrup,21-05-2012,Fox 480 SC (bifenox),weeds,1.2,,
-Tylstrup,25-05-2012,Mustang forte (aminopyralid/florasulam/2,4-D),weeds,0.75,,
+Tylstrup,25-05-2012,Mustang forte (aminopyralid/florasulam/2.4-D),weeds,0.75,,
 Tylstrup,28-06-2012,Bell (boscalid + epoxiconazole),fungi,1.5,,(epoxiconazole not analysed)
 Tylstrup,13-08-2012,Glyfonova 450 Plus (glyphosate),weeds,2.4,,(not analysed)
 Tylstrup,12-10-2012,Boxer (prosulfocarb),weeds,4.0,,
 Tylstrup,08-05-2013,Starane XL (fluroxypyr),weeds,1.2,,
 Tylstrup,15-04-2014,Maxim 100 FS (fludioxonil),fungi,0.625,,250 ml ton-1 potatoes ~ 625 mL ha-1 a sprayed on potatoes before the planting
-Tylstrup,16-04-2014,Command CS (clomazon),weeds,0.25,(not included)
+Tylstrup,16-04-2014,Command CS (clomazon),weeds,0.25,,(not included)
 Tylstrup,15-05-2014,Titus WSB (rimsulfuron),weeds,,10,(not included in monitoring)
 Tylstrup,22-05-2014,Titus WSB (rimsulfuron),weeds,,20,(not included in monitoring)
 Tylstrup,22-05-2014,U46 M (MCPA),weeds,0.1,,(not included in monitoring)
@@ -35,7 +35,7 @@ Jyndevad,07-05-2012,Tracer (potasium bromide),,,30.54,
 Jyndevad,26-05-2012,Fighter 480 (bentazone),weeds,1.0,,
 Jyndevad,05-06-2012,Callisto (mesotrione),weeds,1.5,,
 Jyndevad,15-06-2012,Tomahawk 180 EC (fluroxypyr),weeds,1.5,,(none analysed)
-Jyndevad,15-06-2012,Catch (florasulam + 2,4 D,weeds,0.06,,(none analysed)
+Jyndevad,15-06-2012,Catch (florasulam + 2.4 D),weeds,0.06,,(none analysed)
 Jyndevad,07-05-2013,Fighter 480 (bentazone),weeds,0.4,,(pendimethalin not analysed)
 Jyndevad,07-05-2013,Stomp (pendimethalin),weeds,0.6,,(pendimethalin not analysed)
 Jyndevad,16-05-2013,Bentazon 480 (bentazone),weeds,0.5,,
@@ -86,12 +86,12 @@ Silstrup,04-06-2014,Amistar (azoxystrobin),fungi,1.0,,
 Silstrup,25-07-2014,Glyfonova 450 Plus (glyphosate),weeds,2.4,,
 Silstrup,27-05-2015,Callisto (mesotrione),weeds,0.75,,(i.e. 75 g a.i. ha-1)
 Silstrup,27-05-2015,Harmony SX (thifensulfuron-methyl),weeds,,5.625,(2.813 g a.i. ha-1
-Silstrup,09-06-2015,Callisto (mesotrione),weeds,0.75,(i.e. 75 g a.i. ha-1)
+Silstrup,09-06-2015,Callisto (mesotrione),weeds,0.75,,(i.e. 75 g a.i. ha-1)
 Silstrup,09-06-2015,MaisTer (foramsulfuron+iodosulfuron),weeds,,100,(i.e. 30 g a.i. ha-1 + 1 g a.i. ha-1)
 Silstrup,23-06-2015,MaisTer (foramsulfuron+iodosulfuron),weeds,,50,(i.e. 15 g a.i. ha-1 + 0,5 g a.i. ha-1)
 Silstrup,06-06-2016,Callisto (mesotrion),weeds,0.75,,(i.e. 75 g a.i. ha-1)
 Silstrup,06-06-2016,Harmony SX (thifensulfuron-methyl),weeds,,5.625,(2.813 g a.i. ha-1)
-Silstrup,22-06-2016,Callisto (mesotrion),weeds,0.75,(i.e. 75 g a.i. ha-1)
+Silstrup,22-06-2016,Callisto (mesotrion),weeds,0.75,,(i.e. 75 g a.i. ha-1)
 Silstrup,22-06-2016,MaisTer (foramsulfuron+iodosulfuron),weeds,,150,(45 g a.i. ha-1 + 1,5 g a.i. ha-1)
 Estrup,30-09-2010,Express ST (tribenuron-methyl),weeds,,,1 tablet ha-1
 Estrup,26-04-2011,Fox 480 SC (bifenox),weeds,1.2,,
@@ -99,7 +99,7 @@ Estrup,09-05-2011,Flexity (metrafenon),fungi,0.5,,
 Estrup,07-06-2011,Flexity (metrafenon),fungi,0.5,,
 Estrup,03-10-2011,Roundup Max (glyphosate),weeds,,2000,
 Estrup,15-05-2012,Fox 480 SC (bifenox),weeds,1.2,,
-Estrup,18-05-2012,Mustang forte (aminopyralid/florasulam/2,4-D),weeds,0.75,,
+Estrup,18-05-2012,Mustang forte (aminopyralid/florasulam/2.4-D),weeds,0.75,,
 Estrup,13-06-2012,Amistar (azoxystrobin),fungi,1.0,,
 Estrup,26-09-2012,Tracer (potasium bromide),,,30000,
 Estrup,25-04-2013,Command CS (clomazone),weeds,0.25,,
@@ -109,7 +109,7 @@ Estrup,13-07-2013,Pirimor G (pirimicarb),pests,,250,
 Estrup,21-08-2013,Glyphonova 450 Plus (glyphosate),weeds,2.4,,
 Estrup,11-11-2013,Oxitril CM (bromoxynil + ioxynil),weeds,0.2,,(not included)
 Estrup,11-11-2013,DFF (diflufenican),weeds,0.24,,
-Estrup,22-04-2014,Fluxyr 200 EC,(fluroxypyr),weeds,0.7,,(not included)
+Estrup,22-04-2014,Fluxyr 200 EC (fluroxypyr),weeds,0.7,,(not included)
 Estrup,15-05-2014,Primus (florasulam),weeds,0.050,,
 Estrup,20-05-2014,Folicur 250 EC (tebuconazole),fungi,1.0,,
 Estrup,02-06-2014,Amistar (azoxystrobin),fungi,1.0,,
@@ -134,15 +134,15 @@ Faardrup,18-05-2012,Fighter 480 (bentazone),weeds,1.25,,
 Faardrup,06-06-2012,Flexity (metrafenon),fungi,0.5,,
 Faardrup,26-01-2013,Kerb 400 SC (propyzamid),fungi,1.0,,
 Faardrup,14-05-2013,Fighter 480 (bentazone),weeds,3.0,,
-Faardrup,31-05-2013,Karate (Lambda-cyhalothrin),0.3,,(not analysed)
-Faardrup,12-06-2013,Karate (Lambda-cyhalothrin),0.3,,(not analysed)
+Faardrup,31-05-2013,Karate (Lambda-cyhalothrin),pests,0.3,,(not analysed)
+Faardrup,12-06-2013,Karate (Lambda-cyhalothrin),pests,0.3,,(not analysed)
 Faardrup,28-04-2014,Briotril (ioxynil+ bromoxynil),weeds,0.6,,(neither included)
 Faardrup,28-04-2014,Tomahawk 180 EC (fluroxypyr),weeds,0.8,,(neither included)
 Faardrup,15-05-2014,Amistar (azoxystrobin),fungi,1.0,,(not included)
 Faardrup,26-08-2014,Glyfonova Plus (glyphosate),weeds,4.0,,(not included)
 Faardrup,20-11-2014,Folicur 250 (tebuconazole),fungi,1.0,,(i.e. 250g a.i. ha-1)
 Faardrup,30-11-2014,Lexus 50 WG (flupyrsulfuron),weeds,,10,(i.e. 4.6 g a.i. ha-1)
-Faardrup,30-11-2014,Boxer (prosulfocarb),weeds,3.0,(i.e. 2400 g a.i. ha-1)
+Faardrup,30-11-2014,Boxer (prosulfocarb),weeds,3.0,,(i.e. 2400 g a.i. ha-1)
 Faardrup,22-04-2015,Lexus 50 WG (flupyrsulfuron),weeds,,10,(i.e. 4.6 g a.i. ha-1)
 Faardrup,12-05-2015,Starane XL (fluroxypur+ florasulam),weeds,1.2,,(i.e. 120 g a.i. ha-1 + 3 g a.i. ha-1)
 Faardrup,12-05-2015,Proline 250 EC (prothioconazole),fungi,0.8,,(i.e. 200 g a.i. ha-1)

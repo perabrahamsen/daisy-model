@@ -32,3 +32,6 @@ products:
 	Mass: g/ha
 
 slurry.txt
+
+tillage.txt:
+	Depth: cm
