@@ -1,3 +1,17 @@
+2019-02-22  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.79 released.
+
+2019-02-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* uzrect_2x1.C (vertical): Replace "lr" with "none".
+
+	* soil_water.C, soil_water.h (mass_balance): Made it const.
+
+2019-02-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* action_wait.C ('at'): New model.
+
 2019-02-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.78 released.

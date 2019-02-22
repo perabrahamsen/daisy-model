@@ -30,6 +30,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
+#include "vcheck.h"
 #include <memory>
 #include <sstream>
 
@@ -276,5 +277,104 @@ Wait until a specific month and day in the year.")
     frame.order ("month", "day");
   }
 } ActionWaitMMDD_syntax;
+
+// The 'at' action.
+
+struct ActionAt : public Action
+{
+  const Time time;
+  std::unique_ptr<Action> action;
+
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& msg)
+  { action->tick (daisy, scope, msg); }
+
+  void doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
+  {
+    // msg.message ("doIt");
+    if (time == daisy.time ()){
+      // msg.message ("doIt");
+      action->doIt (daisy, scope, msg);
+    }
+  }
+  bool done (const Daisy& daisy, const Scope& scope, Treelog& msg) const
+  { 
+    // msg.message ("done: " + daisy.time ().print () + " < " + time.print ());
+    if (daisy.time () < time)
+      return false;
+    // msg.message ("done!");
+
+    return action->done (daisy, scope, msg);
+  }
+  void output (Log& log) const
+  { 
+    output_object (action, "do", log);
+  }
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
+  { action->initialize (daisy, scope, msg); }
+
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
+  {
+    bool ok = true; 
+    if (!action->check (daisy, scope, msg))
+      ok = false;
+    return ok;
+  }
+  ActionAt (const BlockModel& al)
+    : Action (al),
+      time (al.integer ("year"), al.integer ("month"), al.integer ("day"),
+	    al.integer ("hour")),
+      action (Librarian::build_item<Action> (al, "do"))
+  { }
+
+  ~ActionAt ()
+  { }
+};
+
+static struct ActionAtSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ActionAt (al); }
+  ActionAtSyntax ()
+    : DeclareModel (Action::component, "at", "\
+Do action at specific time.")
+  { }
+  static bool check_alist (const Metalib&, const Frame& frame, Treelog& err)
+  {
+    bool ok = true;
+
+    const int yy = frame.integer ("year");
+    const int mm = frame.integer ("month");
+    const int dd = frame.integer ("day");
+    const int hh = frame.integer ("hour");
+
+    if (!Time::valid (yy, mm, dd, hh))
+      {
+	err.entry ("Invalid time");
+	ok = false;
+      }
+    return ok;
+  }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_check (check_alist);	
+    frame.declare_integer ("year", Attribute::Const, 
+			   "Perform action this year.");
+    frame.set_check ("year", VCheck::valid_year ());
+    frame.declare_integer ("month", Attribute::Const, 
+			   "Perform action this month.");
+    frame.set_check ("month", VCheck::valid_month ());
+    frame.declare_integer ("day", Attribute::Const, 
+			   "Perform action this day in the month.");
+    frame.set_check ("day", VCheck::valid_mday ());
+    frame.declare_integer ("hour", Attribute::Const, 
+			   "Perform action this hour.");
+    frame.set_check ("hour", VCheck::valid_hour ());
+    frame.set ("hour", 8);
+    frame.declare_object ("do", Action::component, 
+			  "Action to perform at specified tome..");
+
+    frame.order ("year", "month", "day");
+  }
+} ActionAt_syntax;
 
 // action_wait.C ends here.

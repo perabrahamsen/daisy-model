@@ -1,16 +1,16 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* TODO
+* Old
 
 ** AA opgaver
+
+AA3 samme pet?
+
+AA3 time offset?
 
 ** BBCH PLAP Opsætning?
 
 Script til at generere daisy opsætning
-
-Særlig "dato-action" action i Daisy?
-
-Eller skal sriptet tage en jord og periode?
 
 ** BBCH doc
 
@@ -37,14 +37,13 @@ too slow
 
 too slow
 
-
 * February RP meeting
 
 ** Science meeting first week of april
 
 ** Brimstone: Need hourly weather. Long series.
 
-** Boarded: Need measurements, has hourly raain. Has DFF.
+** Boarded: Need measurements, has hourly rain. Has DFF.
 
 ** We likely only have time to look at one.
 
@@ -57,38 +56,6 @@ too slow
 ** Categorical data ?
 
 ** Save and restore model ?
-
-* RAINPROOF
-
-** Afsnit om metode
-
-** BBCH scale
-
-Reverse engineer?
-
-* Næste RAINPROOF SC møde
-
-1) Event definitionen – hvor lang recovery time er der? Altså hvor lang tid skal der være mellem to events før det kan defineres som to adskilte events?
-
-2) om de har kendskab til diflufenican degradation på jord overfladen? Kan metaboliten AE-B107137 dannes der?
-
-Kan Maja blive en dag ekstra i Wageningen?
-
-Model comparison?
-
-** Face2face 12 december. Indhold?
-
-** Milestone 2? Hvad gør vi?
-
-Trifloxystrobin (forbudt i DK)
-
-Imidacloprid
-
-** DFF application mængde. Afhænger af BBCH.
-
-** DFF application windows SEGES vs etikket vs email
-
-** Reverse engineer BBCH scale
 
 * Artikler
 

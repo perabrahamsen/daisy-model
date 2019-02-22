@@ -363,15 +363,13 @@ horizontal.")
                       "Vertical matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
-    frame.set_strings ("vertical", "richards", "lr");
+    frame.set_strings ("vertical", "richards", "none");
     frame.declare_object ("horizontal", UZ1D::component,
                       Attribute::Const, Attribute::Variable,
                       "Horizontal matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends."); 
-#if 0
-    frame.set_strings ("horizontal", "richards", "none");
-#endif
+    // The 'richards' model doesn't work :-(
     frame.set_strings ("horizontal", "none");
   }
 } UZRect2x1_syntax;

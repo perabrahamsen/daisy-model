@@ -32,6 +32,9 @@ products:
 	Mass: g/ha
 
 slurry.txt
+	Weight: Mg w.w./ha
+	DM%: %
+	N ,NH4-N, P, K: kg/ha
 
 tillage.txt:
 	Depth: cm

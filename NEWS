@@ -6,6 +6,32 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.79
+
+** New "at" action.
+
+This action will perform another action at a specified date
+
+(manager activity
+   (at 2017 3 20 (hour 8) (do (plowing)))
+   (at 2017 4 5 (hour 8) (do (sow "Spring Barley")))
+ 
+It is different from
+
+(manager activity
+   (wait (at 2017 3 20 8) (plowing))
+   (wait (at 2017 4 5 8)) (sow "Spring Barley"))
+   
+
+in that it will skip actions in the past, instead of waiting
+indefinitely. E.g. if you start the simulation the first of April
+
+   (time 2017 4 1 8)
+
+the former will skip the plowing and sow the 5th of April, while the
+later will wait forever for the simulation to reach the 20 of March
+2017.
+
 * 5.74
 
 ** Support for converting DS to other models, e.g. BBCH.

@@ -579,7 +579,7 @@ SoilWater::tick_after (const Geometry& geo,
 }
 
 void
-SoilWater::mass_balance (const Geometry& geo, double dt, Treelog& msg)
+SoilWater::mass_balance (const Geometry& geo, double dt, Treelog& msg) const
 {
   const size_t edge_size = geo.edge_size ();
   const double total_sink = 10 * geo.total_surface (S_sum_) * dt;

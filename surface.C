@@ -541,9 +541,6 @@ Surface::evap_pond (const double dt, Treelog& msg) const	// [mm/h]
       std::ostringstream tmp;
       tmp << "evap_pond = " << ep << ", evap_soil_surface = " << evap_soil_surface () << ", exfiltration = " << exfiltration (dt);
       msg.warning (tmp.str ());
-      static int wcount = 10;
-      if (--wcount < 0)
-        throw "Too many evap pond errors, giving up";
     }
   return 0.0;
 }
