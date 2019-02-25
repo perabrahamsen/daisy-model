@@ -1,3 +1,11 @@
+2019-02-25  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.80 released.
+
+2019-02-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* soilfac.C (Maja): New model.
+
 2019-02-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.79 released.
