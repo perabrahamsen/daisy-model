@@ -4,28 +4,30 @@ Tylstrup,24-03-2012,Spring barley,TamTam,185,2.75,12.5,344,Using combine driller
 Tylstrup,23-09-2012,Winter rye,Magnifico,64.0,3.5,13.0,125,Sown with rotorharrow combine sowing machine
 Tylstrup,15-04-2014,Potato,Kuras,,17,75,4,plantdistance 25 cm
 Tylstrup,22-09-2014,Winter wheat,Mariboss,190,3.0,12.5,248,
-Tylstrup,20-08-2015,Oil seed rape,Akiro,16,,,,Broadsown a catchcrop of oil seed rape cv. Akiro, 16 kg ha-1 (on top of the soil)
+Tylstrup,20-08-2015,Oil seed rape,Akiro,16,,,,Broadsown a catchcrop of oil seed rape cv. Akiro. 16 kg ha-1 (on top of the soil)
 Tylstrup,15-04-2016,Spring barley,Evergreen,155,2.8,13,272,Sown with rotorharrow combine sowing machine
-Tylstrup,21-04-2016,Clover+Grass,AgrowGrass 350 MidiMaize,13,1,12,,Catch crop
+Tylstrup,21-04-2016,Clover,AgrowGrass 350 MidiMaize,,1,12,,Undersowing of clover grass catch crop (AgrowGrass 350 MidiMaize) seeding rate 13 kg ha-1
+Tylstrup,21-04-2016,Grass,AgrowGrass 350 MidiMaize,,1,12,,part of the clover grass mixture
 Jyndevad,23-03-2011,Spring barley,Quench,164,4.0,12,301,using a combine drill
-Jyndevad,03-05-2012,Maize,Atrium,,6,75,12.8,seed distance 12 cm. Seedrate 111,000 seeds ha-1
+Jyndevad,03-05-2012,Maize,Atrium,,6,75,12.8,seed distance 12 cm. Seedrate 111.000 seeds ha-1
 Jyndevad,14-04-2013,Pea,Alvestra,235,5,12,92,using a combine drill
 Jyndevad,15-04-2014,Potato,Oleva,,7,75,4,Plant distance 33 cm
 Jyndevad,18-09-2014,Winter wheat,,,,,,drilled directly in the potato stuble
 Jyndevad,21-03-2016,Spring barley,KWS Irena,170,4.0,12,345,using a combine drill
-Jyndevad,20-04-2016,Clover+Grasss,Foragemax 42,,,,,
+Jyndevad,20-04-2016,Clover,Foragemax 42,,,,,
+Jyndevad,20-04-2016,Grass,Foragemax 42,,,,,
 Silstrup,09-10-2012,Winter wheat,Hereford,200,2.4,15.0,,using a Horch Pronto 6 DC
 Silstrup,03-05-2013,Spring barley,Quenc,175,3.8,15,308,replacing winter wheat injured by frost. Horch Pronto 6 DC
 Silstrup,25-09-2013,Winter wheat,Hereford,190,4,15.0,346,using a Horch Pronto 6 DC
-Silstrup,02-05-2015,Maize,Ambition,,3.5,75,7.4,seed distance 14 cm seeding rate 10 m2. final plantnumber 7.4 m2 (seeds werer coated with thirame, fludioxonil and metalaxyl-M)
-Silstrup,13-05-2016,Maize,Activate,,3.5,75,8,seeddistance 14.7 cm seeding rate 10 m2. final plantnumber 8 m2 (seeds werer coated Mesurol FS 500 - thirame, fludioxonil and metalaxyl-M)
+Silstrup,02-05-2015,Maize,Ambition,,3.5,75,7.4,seed distance 14 cm seeding rate 10 m2. final plantnumber 7.4 m2 (seeds werer coated with thirame. fludioxonil and metalaxyl-M)
+Silstrup,13-05-2016,Maize,Activate,,3.5,75,8,seeddistance 14.7 cm seeding rate 10 m2. final plantnumber 8 m2 (seeds werer coated Mesurol FS 500 - thirame. fludioxonil and metalaxyl-M)
 Estrup,14-09-2010,Winter wheat,Frument,210,4.0,12,370,
 Estrup,30-03-2012,Spring barley,Keops,159,4.3,12,330,
 Estrup,23-04-2013,Pea,Alvesta,230,5,12,82,
 Estrup,13-09-2013,Winter wheat,Herford,180,4.0,12,365,using a combined powerharrow sowing equipment
 Estrup,12-08-2014,Oilseed radish,,12,0,,,Harrowed to 5 cm depth and sown a catch crop of oilseed radish 12 kg ha-1 seed on soil surface
 Estrup,11-05-2015,Maize,Ambition,,4,75,10.5,seed distance 12.1 cm seeding rate 11 m2.
-Estrup,06-05-2016,Maize,Ambition,,4,75,10.5,seed distance 12.1 cm, seeding rate 11 m2.
+Estrup,06-05-2016,Maize,Ambition,,4,75,10.5,seed distance 12.1 cm seeding rate 11 m2.
 Faardrup,04-04-2012,Spring barley,mixture of varieties,98,3.5,13,200
 Faardrup,04-04-2012,White clover,Liflex,2.0,2.5,13,,Undersown
 Faardrup,07-10-2013,Winter wheat,Mariboss,200,4,11,320,Rotor harrowed at the time of sowing

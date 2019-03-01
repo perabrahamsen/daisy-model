@@ -1,0 +1,141 @@
+;;; plap-crop.dai -- Crops used for PLAP fields.
+
+(input file "wclover.dai")
+(input file "pea.dai")
+(input file "rye.dai")
+(input file "potato.dai")
+(input file "wrape.dai")
+(input file "grass.dai")
+(input file "maize.dai")
+
+(input file "Springbarley_MES_23.dai")
+(input file "Winter Wheat JG.dai")
+
+(defcstage "BBCH; Spring Barley" BBCH
+  (table (-1.00	 0 "BBCH 00: Dry seed (caryopsis)")
+	 (0.00	 9 "BBCH 09: Emergence")
+	 (0.01	10 "BBCH 10: First leaf through coleoptile")
+	 (0.03	11 "BBCH 11: First leaf unfolded")
+	 (0.08	12 "BBCH 12: 2 leaves unfolded")
+	 (0.15	13 "BBCH 13: 3 leaves unfolded")
+	 (0.19	14 "BBCH 14: 4 leaves unfolded")
+	 (0.20	21 "BBCH 21: Beginning of tillering")
+	 (0.29	22 "BBCH 22: 2 tillers detectable")
+	 (0.33	23 "BBCH 23: 3 tillers detectable")
+	 (0.35	24 "BBCH 24: 4 tillers detectable")
+	 (0.36	25 "BBCH 25: 5 tillers detectable")
+	 (0.39	26 "BBCH 26: 6 tillers detectable")
+	 (0.42	30 "BBCH 30: Beginning of stem elongation")
+	 (0.56	31 "BBCH 31: First node at least 1 cm above tillering node")
+	 (0.73	32 "BBCH 32: Node 2 at least 2 cm above node 1")
+	 (0.75	33 "BBCH 33: Node 3 at least 2 cm above node 2")
+	 (0.80	37 "BBCH 37: Flag leaf just visible, still rolled")
+	 (0.90	43 "BBCH 43: Mid boot stage")
+	 (0.94	47 "BBCH 47: Flag leaf sheath opening")
+	 (0.95	49 "BBCH 49: First awns visible (in awned forms only)")
+	 (0.97	53 "BBCH 53: 30% of inflorescence emerged")
+	 (1.03	55 "BBCH 55: Middle of heading")
+	 (1.10	59 "BBCH 59: End of heading")
+	 (1.15	61 "BBCH 61: Beginning of flowering: first anthers visible")
+	 (1.23	65 "BBCH 65: Full flowering")
+	 (1.25	69 "BBCH 69: End of flowering")
+	 (1.35	71 "BBCH 71: Watery ripe")
+	 (1.49	75 "BBCH 75: Medium milk")
+	 (1.70	85 "BBCH 85: Soft dough")
+	 (1.90	87 "BBCH 87: Hard dough")
+	 (2.00	89 "BBCH 89: Fully ripe")))
+
+(defcstage "BBCH; Winter Wheat" BBCH
+  (table (-1.00	 0 "BBCH 00: Dry seed (caryopsis)")
+	 (0.00	 9 "BBCH 09: Emergence")
+	 (0.01	10 "BBCH 10: First leaf through coleoptile")
+	 (0.02	11 "BBCH 11: First leaf unfolded")
+	 (0.03	12 "BBCH 12: 2 leaves unfolded")
+	 (0.04	13 "BBCH 13: 3 leaves unfolded")
+	 (0.05	14 "BBCH 14: 4 leaves unfolded")
+	 (0.17	20 "BBCH 20: No tillers")
+	 (0.18	21 "BBCH 21: Beginning of tillering")
+	 (0.19	22 "BBCH 22: 2 tillers detectable")
+	 (0.24	23 "BBCH 23: 3 tillers detectable")
+	 (0.30	30 "BBCH 30: Beginning of stem elongation")
+	 (0.38	31 "BBCH 31: First node at least 1 cm above tillering node")
+	 (0.53	32 "BBCH 32: Node 2 at least 2 cm above node 1")
+	 (0.57	33 "BBCH 33: Node 3 at least 2 cm above node 2")
+	 (0.61	34 "BBCH 34: Node 4 at least 2 cm above node 3")
+	 (0.64	37 "BBCH 37: Flag leaf just visible, still rolled")
+	 ;; (0.65	38 "BBCH 38") ;; Not existing
+	 (0.67	39 "BBCH 39: Flag leaf stage")
+	 (0.71	42 "BBCH 42")
+	 (0.75	45 "BBCH 45: Late boot stage")
+	 ;;(0.77	46 "BBCH 46") ;; NOT EXISTING
+	 (0.80	51 "BBCH 51: Beginning of heading")
+	 (0.84	53 "BBCH 53: 30% of inflorescence emerged")
+	 (0.86	57 "BBCH 57: 70% of inflorescence emerged")
+	 (0.89	59 "BBCH 59: End of heading")
+	 ;; (0.94	60 "BBCH 60") ;; NOT EXISTING
+	 (0.95	61 "BBCH 61: Beginning of flowering: first anthers visible")
+	 (1.00	65 "BBCH 65: Full flowering")
+	 ;; (1.09	67 "BBCH 67")	 ;; NOT EXISTING
+	 (1.11	69 "BBCH 69: End of flowering")
+	 ;; (1.14	70 "BBCH 70")  ;; NOT EXISTING
+	 (1.16	71 "BBCH 71: Watery ripe")
+	 ;; (1.20	72 "BBCH 72") ;; NOT EXISTING
+	 (1.21	73 "BBCH 73: Early milk")
+	 (1.25	75 "BBCH 75: Medium milk")
+	 (1.29	77 "BBCH 77:: Late milk")
+	 ;; (1.47	78 "BBCH 78") ;; NOT EXISTING
+	 ;; (1.50	81 "BBCH 81") ;; NOT EXISTING
+	 (1.52	83 "BBCH 83: Early dough")
+	 (1.63	85 "BBCH 85: Soft dough")
+	 (1.74	87 "BBCH 87: Hard dough")
+	 ;; (1.80 88 "BBCH 88") ;; NOT EXISTING
+	 (1.85	89 "BBCH 89: Fully ripe")
+	 (2.00	99 "BBCH 99: Harvested product")
+	 ))
+
+(defcrop "PLAP Spring barley" "SB"
+  (CStage "BBCH; Spring Barley")
+  (water_stress_effect none)
+  (enable_N_stress false))
+
+(defcrop "PLAP Winter wheat" "Winter Wheat JG"
+  (CStage "BBCH; Winter Wheat")
+  (water_stress_effect none)
+  (enable_N_stress false))
+
+(defcrop "PLAP White clover" Wclover
+  (water_stress_effect none))
+
+(defcrop "PLAP Winter rye" "Rye"
+  (water_stress_effect none)
+  (enable_N_stress false))
+  
+(defcrop "PLAP Oil seed rape" "Winter Rape"
+  (water_stress_effect none)
+  (enable_N_stress false))
+  
+(defcrop "PLAP Oilseed radish" "Winter Rape"
+  (water_stress_effect none)
+  (enable_N_stress false))
+  
+(defcrop "PLAP Potato" "Potato"
+  (water_stress_effect none)
+  (enable_N_stress false))
+
+(defcrop "PLAP Clover" "Wclover"
+  (water_stress_effect none))
+
+(defcrop "PLAP Grass" "Grass"
+  (water_stress_effect none)
+  (enable_N_stress false))
+
+(defcrop "PLAP Maize" "Maize"
+  (water_stress_effect none)
+  (enable_N_stress false))
+
+(defcrop "PLAP Pea" Pea
+  (water_stress_effect none))
+  
+  
+;;; plap-crop.dai ends here.
+

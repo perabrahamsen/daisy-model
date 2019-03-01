@@ -1,0 +1,31 @@
+;;; plap-soil.dai -- Soils used for PLAP fields.
+
+(input file "dk-horizon.dai")
+
+(defcolumn "PLAP" default
+  (OrganicMatter none)
+  (Chemistry none))
+
+(defcolumn "PLAP Sand" "PLAP"
+  (Soil (horizons (-25 [cm] Ap_JB1)
+		  (-80 [cm] B_JB1)
+		  (-200 [cm] C_JB1))
+	(MaxRootingDepth 50 [cm]))
+  (Groundwater deep))
+
+(defcolumn "PLAP Clay" "PLAP"
+  (Soil (horizons (-25 [cm] Ap_JB6)
+		  (-80 [cm] B_JB6)
+		  (-200 [cm] C_JB6))
+	(MaxRootingDepth 150 [cm]))
+  (Groundwater aquitard)
+  (Drain lateral))
+
+(defcolumn "Tylstrup" "PLAP Sand")
+(defcolumn "Jyndevad" "PLAP Sand")
+(defcolumn "Silstrup" "PLAP Clay")
+(defcolumn "Estrup" "PLAP Clay")
+(defcolumn "Faardrup" "PLAP Clay")
+
+;;; plap-soil.dai ends here.
+
