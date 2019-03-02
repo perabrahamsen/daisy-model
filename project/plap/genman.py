@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 
 def gen_sow ():
-    sow = pd.read_csv ('sow.csv', parse_dates=['Date'], dayfirst=True,)
+    sow = pd.read_csv ('sow.csv', parse_dates=['Date'], dayfirst=True)
     print (';;; Sow actions')
     site = ''
     for index, row in sow.iterrows ():
