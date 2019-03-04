@@ -11,13 +11,10 @@ except LookupError:
 
 import numpy as np
 import pandas as pd
+from pydaisy.Daisy import *
 
 # Read measured data
 bbch = pd.read_csv ('bbch.csv', parse_dates=['Date'], dayfirst=True)
-sow = pd.read_csv ('sow.csv', parse_dates=['Date'], dayfirst=True)
-
-from datetime import datetime
-from pydaisy.Daisy import *
 
 def find_ds (site, crop):
     Site = site.capitalize ()
@@ -28,8 +25,7 @@ def find_ds (site, crop):
             date = row['Date']
             try:
                 val_bbch = row['Primary']
-                i=dlf.get_index(datetime(date.year,date.month,date.day))
-                val_ds=ds['DS'][i]
+                val_ds=ds['DS'][date]
                 print (f"{val_bbch:.0f},{val_ds},{date:%Y-%m-%d},{Site},{crop}")
             except:
                 dummy=1

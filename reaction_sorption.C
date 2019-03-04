@@ -99,20 +99,14 @@ struct ReactionSorption : public Reaction
         {
           const double Theta_old = soil_water.Theta_primary_old (c);
           daisy_assert (Theta_old > 0.0);
-          const double Theta_new = soil_water.Theta_primary (c);
-          daisy_assert (Theta_new > 0.0);
           const double rho_b = colloid
             ? colloid->M_primary (c) * soil_enrichment_factor
             : soil.dry_bulk_density (c);
 
-          const double C_old = solute.M_primary (c) / Theta_old;
-          const double C_new = solute.M_primary (c) / Theta_new;
-          const double A = sorbed.M_primary (c);
-          const double S_old = find_rate (rho_f1, rho_b, clay, humus, Theta_old, A, C_old);
-          const double S_new = find_rate (rho_f1, rho_b, clay, humus, Theta_new, A, C_new);
-          const double S = (std::fabs (S_old) > std::fabs (S_new))
-            ? S_new
-            : S_old;
+          const double C = solute.C_primary (c);
+	  const double A = sorbed.M_primary (c);
+          const double S
+	    = find_rate (rho_f1, rho_b, clay, humus, Theta_old, A, C);
           S_sorption_primary[c] = S;
           S_sorption[c] = S;
         }
@@ -125,19 +119,11 @@ struct ReactionSorption : public Reaction
               const double rho_b = colloid
                 ? colloid->M_secondary (c)  * soil_enrichment_factor
                 : soil.dry_bulk_density (c);
-              const double C_old = solute.M_secondary (c) / Theta_old;
-              const double C_new = solute.M_secondary (c) / Theta_new;
+              const double C = solute.C_secondary (c);
               const double A = sorbed.M_secondary (c);
-              const double S_old = find_rate (1.0 - rho_f1, 
-                                              rho_b, clay, humus, Theta_old, 
-                                              A, C_old);
-              const double S_new = find_rate (1.0 - rho_f1, 
-                                              rho_b, clay, humus, Theta_new,
-                                              A, C_new);
-              const double S = (std::fabs (S_old) > std::fabs (S_new))
-                ? S_new
-                : S_old;
-
+              const double S = find_rate (1.0 - rho_f1, 
+					  rho_b, clay, humus, Theta_old, 
+                                              A, C);
               S_sorption_secondary[c] = S;
               S_sorption[c] += S;
             }
@@ -350,7 +336,8 @@ Faster than the 'equilibrium' reaction model, more flexible than the\n\
   {
     frame.add_check (check_alist);
     frame.declare_string ("solute", Attribute::Const,
-                          "Name of solute form of chemical.");
+                          "Name of solute form of chemical.\n\
+If this chemical has equilibrium sorption, only the colute part is used.");
     frame.declare_string ("sorbed", Attribute::Const,
                           "Name of sorbed form of chemical.");
     frame.declare ("K_d", "cm^3/g", Check::non_negative (), 

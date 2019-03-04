@@ -808,9 +808,8 @@ ColumnStandard::tick_move (const Metalib& metalib,
   soil_water->tick_before (geometry, *soil, dt, msg); 
   soil_heat->tick (geometry, *soil, *soil_water, T_bottom, *movement, 
                    surface.temperature (), dt, msg);
-  soil_water->reset_old ();
+  soil_water->reset_old (); // Set Theta_old to Theta here.
   chemistry->mass_balance (geometry, *soil_water);
-  // Her sættes Theta_old til Theta
   soil_water->tick_ice (geometry, *soil, dt, msg); 
   movement->tick (*soil, *soil_water, *soil_heat,
                   surface, *groundwater, time, scope, my_weather, 
@@ -818,7 +817,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
   soil_water->tick_after (geometry, *soil, *soil_heat, false, msg);
   soil_water->mass_balance (geometry, dt, msg);
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
-  // HER er Theta_old * C != M
+  // Is Theta_old * C != M here?
   chemistry->tick_soil (scope, geometry, 
                         surface.ponding_average (),
                         surface.mixing_resistance (),

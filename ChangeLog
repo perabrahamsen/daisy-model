@@ -1,3 +1,13 @@
+2019-03-04  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.81 released.
+
+2019-03-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* reaction_sorption.C (tick_soil): Only use solute part of
+	'solute' chemical, allowing the micture of equilibrium and
+	non-equilibrium sorption.
+
 2019-02-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.80 released.
