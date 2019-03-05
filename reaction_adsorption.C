@@ -67,12 +67,13 @@ struct ReactionAdsorption : public Reaction
     for (size_t c = 0; c < cell_size; c++)
       { 
 	scope.set_cell (c);
-	const double Theta = soil_water.Theta (c);
-	const double has_solute = solute.M_primary (c);
+	const double Theta_old = soil_water.Theta_old (c);
+	const double Theta_new = soil_water.Theta (c);
+	const double has_solute = solute.C_primary (c) * Theta_old;
 	const double has_sorbed = sorbed.M_primary (c);
 	const double has_M = has_solute + has_sorbed;
-	const double want_C = equilibrium->M_to_C1 (soil, Theta, c, has_M);
-	const double want_solute = want_C * Theta;
+	const double want_C = equilibrium->M_to_C1 (soil, Theta_new, c, has_M);
+	const double want_solute = want_C * Theta_new;
 	const double want_sorbed = has_M - want_solute;
 
 	daisy_assert (approximate (has_solute + has_sorbed, 

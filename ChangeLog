@@ -1,3 +1,13 @@
+2019-03-05  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.82 released.
+
+2019-03-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* reaction_adsorption.C (tick_soil): Only use solute part of
+	'solute' chemical, and try to be smart about when to use the new
+	and old water content.
+
 2019-03-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.81 released.
