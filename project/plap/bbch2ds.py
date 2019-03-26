@@ -1,5 +1,8 @@
 #! /usr/bin/env python3
 
+import sys
+sys.path.append('/home/xvs108/PyDaisy')
+
 # Cygwin python3 bug workaround
 import codecs
 try:
@@ -11,6 +14,7 @@ except LookupError:
 
 import numpy as np
 import pandas as pd
+
 from pydaisy.Daisy import *
 
 # Read measured data

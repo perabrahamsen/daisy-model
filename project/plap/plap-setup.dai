@@ -32,7 +32,10 @@
 			   (crop_ds_after "PLAP Spring barley" -1.0 []))))))
 
 (defprogram Tylstrup PLAP
-  (weather default "dk-taastrup-long.dwf")
+  (weather combine
+	   (entry ((use AirTemp Precip)
+		   (source table (file "Tylstrup.dwf")))
+		  ((source table (file "dk-taastrup-long.dwf")))))
   (column Tylstrup)
   (time 2011 4 1)
   (stop 2015 9 15)
@@ -40,7 +43,10 @@
   (log_prefix "log/tylstrup-"))
 
 (defprogram Jyndevad PLAP
-  (weather default "dk-taastrup-long.dwf")
+  (weather combine
+	   (entry ((use AirTemp Precip)
+		   (source table (file "Jyndevad.dwf")))
+		  ((source table (file "dk-taastrup-long.dwf")))))
   (column Jyndevad)
   (time 2011 3 15)
   (stop 2015 9 1)
@@ -67,7 +73,10 @@
   (log_prefix "log/estrup-"))
 
 (defprogram Faardrup PLAP
-  (weather default "dk-taastrup-long.dwf")
+  (weather combine
+	   (entry ((use AirTemp Precip)
+		   (source table (file "Faardrup.dwf")))
+		  ((source table (file "dk-taastrup-long.dwf")))))
   (column Faardrup)
   (time 2012 4 1)
   (stop 2015 9 15)
