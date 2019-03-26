@@ -6,6 +6,10 @@ TODO ---things that needs to be done with Daisy -*- outline -*-
 
 * Check Daisy build 32 bit.
 
+* Make daisy compile for Windows...
+
+** SuiteSparse
+
 * 2x_Kf equil + non-equil
 
 * Old
