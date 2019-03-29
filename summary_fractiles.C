@@ -136,7 +136,7 @@ SummaryFractiles::find_fractile (const double f,
   daisy_assert (f >= 0.0 && f <= 1.0);
   daisy_assert (data.size () > 0);
   const double last = data.size () - 1.0;
-  const size_t i = (f < 1.0) ? (f * last) : data.size () - 1;
+  const size_t i = (f < 1.0) ? double2int(f * last) : (data.size () - 1);
   daisy_assert (i < data.size ());
   return data[i];
 }

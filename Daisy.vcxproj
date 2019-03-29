@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{ED167EA9-BA56-4BA5-AC9A-C90D28C7C9E1}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -65,17 +65,17 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\cygwin64\usr\include\boost;$(IncludePath)</IncludePath>
+    <IncludePath>C:\local\boost_1_69_0;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\cygwin64\usr\include\boost;$(IncludePath)</IncludePath>
+    <IncludePath>C:\local\boost_1_69_0;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\cygwin64\usr\include\boost;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\xvs108\boost_1_69_0;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\cygwin64\usr\include\boost;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\xvs108\boost_1_69_0;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -151,7 +151,6 @@
     <ClCompile Include="action_markvand.C" />
     <ClCompile Include="action_message.C" />
     <ClCompile Include="action_repeat.C" />
-    <ClCompile Include="action_ridge.C" />
     <ClCompile Include="action_sow.C" />
     <ClCompile Include="action_spray.C" />
     <ClCompile Include="action_stop.C" />
@@ -221,6 +220,7 @@
     <ClCompile Include="crop_simple.C" />
     <ClCompile Include="crop_std.C" />
     <ClCompile Include="crpn.C" />
+    <ClCompile Include="cstage.C" />
     <ClCompile Include="daisy.C" />
     <ClCompile Include="deposition.C" />
     <ClCompile Include="depth.C" />
@@ -323,8 +323,6 @@
     <ClCompile Include="log.C" />
     <ClCompile Include="log_alist.C" />
     <ClCompile Include="log_all.C" />
-    <ClCompile Include="log_bbch.C" />
-    <ClCompile Include="log_bbch2.C" />
     <ClCompile Include="log_checkpoint.C" />
     <ClCompile Include="log_extern.C" />
     <ClCompile Include="log_harvest.C" />
@@ -424,7 +422,6 @@
     <ClCompile Include="reaction_std.C" />
     <ClCompile Include="reaction_Styczen88.C" />
     <ClCompile Include="resistance.C" />
-    <ClCompile Include="ridge.C" />
     <ClCompile Include="rootdens.C" />
     <ClCompile Include="rootdens_AP.C" />
     <ClCompile Include="rootdens_GP1D.C" />
@@ -620,6 +617,7 @@
     <ClInclude Include="crop.h" />
     <ClInclude Include="crpn.h" />
     <ClInclude Include="cs.h" />
+    <ClInclude Include="cstage.h" />
     <ClInclude Include="daisy.h" />
     <ClInclude Include="depend.h" />
     <ClInclude Include="deposition.h" />
@@ -728,7 +726,6 @@
     <ClInclude Include="reaction.h" />
     <ClInclude Include="reaction_colgen.h" />
     <ClInclude Include="resistance.h" />
-    <ClInclude Include="ridge.h" />
     <ClInclude Include="rootdens.h" />
     <ClInclude Include="root_system.h" />
     <ClInclude Include="rubiscoN.h" />
