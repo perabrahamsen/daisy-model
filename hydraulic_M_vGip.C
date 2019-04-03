@@ -103,7 +103,7 @@ HydraulicM_vGip::K(const double h) const
 double
 HydraulicM_vGip::Cw2(const double h) const
 {
-	if (h < he)
+	if (h < 0.0)
 		return -(1 / Se(he))*((Theta_sat - Theta_res)
 			* (m * (pow(1.0 / (1.0 + pow(a * h, n)), m - 1.0)
 				* (n * (pow(a * h, n - 1.0) * a))))
@@ -136,16 +136,11 @@ HydraulicM_vGip::M(double h) const
 double
 HydraulicM_vGip::Se(double h) const
 {
-	if (h < he)
-	{
 		const double Se_h = pow(1.0 / (1.0 + pow(a * h, n)), m);
 		daisy_assert(Se_h >= 0.0);
 		daisy_assert(Se_h <= 1.0);
 		return Se_h;
 	}
-	else
-		return 1.0;
-}
 
 HydraulicM_vGip::HydraulicM_vGip(const BlockModel& al)
 	: Hydraulic(al),
