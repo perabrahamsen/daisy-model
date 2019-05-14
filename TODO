@@ -1,90 +1,80 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* AA5 part 3
+* RAINPROOF
 
-* BBCH Kasper + PLAP
+** K_factor horizon parameter
 
-* Check Daisy build 32 bit.
+* COMMIT
 
-* Make daisy compile for Windows...
+** python script til sammenligning af simulerede høstudbytte med målt
 
-** SuiteSparse
+** Andre måledata mod simulerede
 
-* 2x_Kf equil + non-equil
+** Kan vi forbedre det med rødderne?
 
-* Old
+Evt en faktor vi ganger på tæthedden til at simulere heterogenitet?
 
-** AA4 opgave?
+* RAINPROOF
 
-** AA5 opgave?
+** Vejr
 
-** BBCH PLAP Opsætning?
+*** Konverter Eelde data til Daisy format
 
-Script til at generere daisy opsætning
+**** Calculate mean/aplitude/max T day
 
-** BBCH doc
+*** Spørg UEA om timeværdier er forløbende
 
-Mere om kilder. Cultivars for SB (CPE mail)
+*** Spørg UEA om Tyske data
 
-* CA
+** Afgrøder
 
-** Litter + Cover
+*** DK
 
-** Leave straws?
+**** Spørg Maja om scripts til applikationsvinduer
 
-** Turnover rate
+**** Kør 3000 år vinterhvede og vårbyg med Eelde vejr
 
-** OM input
+**** Kør 3000 års sim med danske data
 
-*** Roots?
+**** Er applicationsvinduer rimelige
 
-*** Bioincorporation?
+**** Sammenlign sim emergence/flower/harvest data med intervaller fra Bayer
 
-** Soil hydraulics
+*** NL
 
-** Biopores
+**** Tilpas management
 
+**** Tilpas DSrate
 
-* Kik på Andelst 
+**** Find applikationsvinduer
 
-** uzrichards upper boundary
+**** Tilpas log
 
-** S term øverste celle?
----
+*** Opdater dokumentation om fænologi i rapport
 
-* Andelst
+*** Jacob/Jeanne Optimized scripts
 
-** M_vGip + new
+*** Jacob/Maja Model soils
 
-too slow
+**** Extract data for 800 soils
 
-** M_vG + old
+**** Dokument it for report
 
-1m30s, 7 fails, error = 1 mm
+*** Per/Jacob: Combined serups
 
-** M_vGip  + old
+**** Management and log depend on climate
 
-too slow
+**** Random offset
 
-* February RP meeting
+**** Random soil
 
-** Science meeting first week of april
+*** Jacob/Per: Run simulations
 
-** Brimstone: Need hourly weather. Long series.
+** Maja / Per: Validation article 
 
-** Boarded: Need measurements, has hourly rain. Has DFF.
+** 2x_Kf equil + non-equil
 
-** We likely only have time to look at one.
-
-* ML
-
-** Nye data fra Jeanne
-
-** Neural nodes ?
-
-** Categorical data ?
-
-** Save and restore model ?
+** Få Daisy til at oversætte til Windows igen (Fra Linux?)
 
 * Artikler
 

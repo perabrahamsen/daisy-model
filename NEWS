@@ -6,6 +6,33 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.83
+
+** New 'K_factor' horizon paramater.
+
+The conductivity calculated by the hydraulic model is multiplied by
+this number. By default 1.
+
+** New "weather" program.
+
+This deducts the temperature climate parameters used by Daisy weather
+files from the data in a Daisy weather file. Example:
+
+(run weather
+     (weather default "dk-taastrup.dwf")
+     (begin 1990 1 1 0)
+     (end 2000 1 1 0))
+
+outputs
+
+TAvarage: 8.19745 dgC
+TAmplitude: 8.2344dgC
+MaxTDay: 205 yday
+
+Note that if you have less than 10 years data, you should find the
+information from another source. 30 years data is traditional.
+
+
 * 5.79
 
 ** New "at" action.

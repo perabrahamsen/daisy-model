@@ -57,6 +57,7 @@ struct Horizon::Implementation
   const double C_per_N;
   /* const */ std::vector<double> SOM_fractions;
   const double turnover_factor;
+  const double K_factor;
   const double anisotropy;
   typedef std::map<symbol, double> double_map;
   const double_map attributes;
@@ -200,6 +201,7 @@ Horizon::Implementation::Implementation (const BlockModel& al)
                    ? al.number_sequence ("SOM_fractions")
                    : std::vector<double> ()),
     turnover_factor (al.number ("turnover_factor")),
+    K_factor (al.number ("K_factor")),
     anisotropy (al.number ("anisotropy")),
     attributes (get_attributes (al.submodel_sequence ("attributes"))),
     dimensions (get_dimensions (al.submodel_sequence ("attributes"))),
@@ -283,7 +285,7 @@ Horizon::K (const double h /* [cm] */) const         // [cm/h]
 {
   const double K_primary = hydraulic->K (h); 
   const double K_secondary = secondary_domain ().K (h);
-  return std::max (K_primary, K_secondary);
+  return impl->K_factor * std::max (K_primary, K_secondary);
 }
 
 bool
@@ -554,6 +556,10 @@ Negative numbers mean unspecified, let Daisy find appropriate values.");
 Factor multiplied to the turnover rate for all organic matter pools in\n\
 this horizon.");
     frame.set ("turnover_factor", 1.0);
+    frame.declare ("K_factor", Attribute::None (), Check::positive (),
+                   Attribute::Const, "\
+Factor multiplied to the hydraulic conductivity.");
+    frame.set ("K_factor", 1.0);
     frame.declare_object ("Nitrification", Nitrification::component,
                           "The soil nitrification process.");
     frame.set ("Nitrification", "soil");
