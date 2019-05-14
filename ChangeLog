@@ -1,4 +1,6 @@
-2019-05-14  Per Abrahamsen  <pa@plen.ku.com>
+2019-05-14  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* crop_std.C (CropStandard::tick): Call root_system->tick_daily with right type parameters.
 
 	* horizon.C (K_factor): New parameter.
 

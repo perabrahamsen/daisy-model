@@ -563,7 +563,7 @@ CropStandard::tick (const Scope& scope,
 	  canopy->tick (production.WLeaf, production.WSOrg,
 		       production.WStem, DS, seed_CAI);
 	  nitrogen->content (DS, production, msg);
-	  root_system->tick_daily (geo, soil, soil_water, production.WRoot, 0.0,
+	  root_system->tick_daily (geo, soil, soil_water, production.WRoot, false,
                                    DS, msg);
 
 	  static const symbol root_symbol ("root");
