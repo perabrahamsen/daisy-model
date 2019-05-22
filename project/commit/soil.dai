@@ -1,0 +1,252 @@
+;;; soil.dai --- Taastrup soil calibrated for COMMIT project.
+
+(defhorizon Danish numeric
+  "Classification used in some Danish sites."
+  (limits 2 20 63 200 2000 [um])) ; Common to use in Denmark 
+
+(defhorizon "0-25, Block 2, Treatment 0" Danish   
+  (description "0-25 cm")
+  (humus 2.5 [%])				; (Schjønning et al. 2011)
+  (fractions 20.0 18.7 9.0 26.0 23.8 [%]) 	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.57 [g/cm^3]) 		; (Christensen, L. 2011) 
+  (hydraulic hypres)
+  (anisotropy 10 [])
+  )
+(defhorizon "25-35, Block 2, Treatment 0" Danish   
+  (description "25-35 cm")
+  (humus 1.1 [%])				; (Schjønning et al. 2011)
+  (fractions 25.1 17.4 10.1 24.0 22.2 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.67 [g/cm^3]) 		; File from Carsten. Data from spring 2014) 
+  (hydraulic hypres)
+  )  
+(defhorizon "35-55, Block 2, Treatment 0" Danish
+  (description "35-55 cm") 
+  (humus 1.1 [%])				; (Schjønning et al. 2011)
+  (fractions 25.1 17.4 10.1 24.0 22.2 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.60 [g/cm^3])  		; File from Carsten. Data from spring 2014)
+  (hydraulic hypres)
+  )               
+(defhorizon "55-115, Block 2, Treatment 0" Danish 
+  (description "55-115 cm")
+  (humus 0.5 [%])				; (Schjønning et al. 2011)
+  (fractions 23.0 18.0 12.2 20.9 19.6 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.59 [g/cm^3]) 		; File from Carsten. Data from spring 2014) 
+  (hydraulic hypres)
+  ) 
+(defhorizon "115-200, Block 2, Treatment 0" Danish 
+  (description "115-200 cm")
+  (humus 0.5 [%])				; (Schjønning et al. 2011)
+  (fractions 23.0 18.0 12.2 20.9 19.6 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.86 [g/cm^3]) 		; (Christensen, L. 2011) 
+  (hydraulic hypres)
+  )   
+
+
+;; Horizon block 2 treatment 6
+(defhorizon "0-25, Block 2, Treatment 6" Danish   
+  (description "0-25 cm")
+  (humus 2.5 [%])				; (Schjønning et al. 2011)
+  (fractions 20.0 18.7 9.0 26.0 23.8 [%]) 	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.57 [g/cm^3]) 		; (Christensen, L. 2011) 
+  (hydraulic hypres)
+  (anisotropy 10 [])
+  )
+(defhorizon "25-35, Block 2, Treatment 6" Danish   
+  (description "25-35 cm")
+  (humus 1.1 [%])				; (Schjønning et al. 2011)
+  (fractions 25.1 17.4 10.1 24.0 22.2 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.78 [g/cm^3]) 		; File from Carsten. Data from spring 2014) 
+  (hydraulic hypres
+	     (K_sat 0.31 [mm/h])
+	     )
+  )  
+(defhorizon "35-55, Block 2, Treatment 6" Danish
+  (description "35-55 cm") 
+  (humus 1.1 [%])				; (Schjønning et al. 2011)
+  (fractions 25.1 17.4 10.1 24.0 22.2 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.71 [g/cm^3])  		; File from Carsten. Data from spring 2014)
+  (hydraulic hypres
+	     (K_sat 0.40 [mm/h])
+	     )
+  )               
+(defhorizon "55-115, Block 2, Treatment 6" Danish 
+  (description "55-115 cm")
+  (humus 0.5 [%])				; (Schjønning et al. 2011)
+  (fractions 23.0 18.0 12.2 20.9 19.6 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.68 [g/cm^3]) 		; File from Carsten. Data from spring 2014) 
+  (hydraulic hypres)
+  ) 
+(defhorizon "115-200, Block 2, Treatment 6" Danish 
+  (description "115-200 cm")
+  (humus 0.5 [%])				; (Schjønning et al. 2011)
+  (fractions 23.0 18.0 12.2 20.9 19.6 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.86 [g/cm^3]) 		; (Christensen, L. 2011) 
+  (hydraulic hypres)
+  )    
+
+
+;; Horizon block 3 treatment 0
+(defhorizon "0-25, Block 3, Treatment 0" Danish   
+  (description "0-25 cm")
+  (humus 2.6 [%])				; (Schjønning et al. 2011)
+  (fractions 17.6 17.5 11.0 27.1 24.4 [%]) 	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.57 [g/cm^3]) 		; (Christensen, L. 2011) 
+  (hydraulic hypres)
+  (anisotropy 10 [])
+  )
+(defhorizon "25-35, Block 3, Treatment 0" Danish   
+  (description "25-35 cm")
+  (humus 1.6 [%])				; (Schjønning et al. 2011)
+  (fractions 17.8 16.9 11.9 24.6 27.3 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.56 [g/cm^3]) 		; File from Carsten. Data from spring 2014) 
+  (hydraulic hypres)
+  )  
+(defhorizon "35-55, Block 3, Treatment 0" Danish
+  (description "35-55 cm") 
+  (humus 1.6 [%])				; (Schjønning et al. 2011)
+  (fractions 17.8 16.9 11.9 24.6 27.3 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.53 [g/cm^3])  	; File from Carsten. Data from spring 2014)
+  (hydraulic hypres)
+  )               
+(defhorizon "55-115, Block 3, Treatment 0" Danish 
+  (description "55-115 cm")
+  (humus 0.6 [%])				; (Schjønning et al. 2011)
+  (fractions 22.4 17.6 12.7 24.6 22.2 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.65 [g/cm^3]) 		; File from Carsten. Data from spring 2014) 
+  (hydraulic hypres)
+  (anisotropy 40 [])
+  ) 
+(defhorizon "115-200, Block 3, Treatment 0" Danish 
+  (description "115-200 cm")
+  (humus 0.6 [%])				; (Schjønning et al. 2011)
+  (fractions 22.4 17.6 12.7 24.6 22.2 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.86 [g/cm^3]) 		; (Christensen, L. 2011) 
+  (hydraulic hypres)
+  )
+
+;; Horizon block 3 treatment 6
+(defhorizon "0-25, Block 3, Treatment 6" Danish   
+  (description "0-25 cm")
+  (humus 2.6 [%])				; (Schjønning et al. 2011)
+  (fractions 17.6 17.5 11.0 27.1 24.4 [%]) 	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.57 [g/cm^3]) 		; (Christensen, L. 2011) 
+  (hydraulic hypres)
+  (anisotropy 10 [])
+  )
+(defhorizon "25-35, Block 3, Treatment 6" Danish   
+  (description "25-35 cm")
+  (humus 1.6 [%])				; (Schjønning et al. 2011)
+  (fractions 17.8 16.9 11.9 24.6 27.3 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.65 [g/cm^3]) 		; File from Carsten. Data from spring 2014) 
+  (hydraulic hypres
+	     (K_sat 0.56 [mm/h])
+	     )
+  )  
+(defhorizon "35-55, Block 3, Treatment 6" Danish
+  (description "35-55 cm") 
+  (humus 1.6 [%])				; (Schjønning et al. 2011)
+  (fractions 17.8 16.9 11.9 24.6 27.3 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.56 [g/cm^3])  	; File from Carsten. Data from spring 2014)
+  (hydraulic hypres
+	     (K_sat 0.62 [mm/h])
+	     )
+  )               
+(defhorizon "55-115, Block 3, Treatment 6" Danish 
+  (description "55-115 cm")
+  (humus 0.6 [%])				; (Schjønning et al. 2011)
+  (fractions 22.4 17.6 12.7 24.6 22.2 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.62 [g/cm^3]) 		; File from Carsten. Data from spring 2014) 
+  (hydraulic hypres)
+  (anisotropy 40 [])
+  ) 
+(defhorizon "115-200, Block 3, Treatment 6" Danish 
+  (description "115-200 cm")
+  (humus 0.6 [%])				; (Schjønning et al. 2011)
+  (fractions 22.4 17.6 12.7 24.6 22.2 [%])	; (Schjønning et al. 2011)
+  (normalize true)
+  (dry_bulk_density 1.86 [g/cm^3]) 		; (Christensen, L. 2011) 
+  (hydraulic hypres)
+  )
+
+(defgroundwater COMMIT aquitard 
+  (K_aquitard 0.0015 [cm/h])
+  (Z_aquitard 200 [cm]))
+
+(defgroundwater Block2 COMMIT
+  (pressure_table season ((  1 [d]  -80 [cm])    ; Jan 1.
+			  (121 [d]  -80 [cm])    ; May 1.
+			  (182 [d] -200 [cm])    ; Jul 1.
+			  (274 [d] -200 [cm])    ; Oct 1.
+			  (275 [d]  -80 [cm])    ; Oct 2.
+			  (365 [d]  -80 [cm])))) ; Dec 31.
+
+(defgroundwater Block3 COMMIT
+  (pressure_table season ((  1 [d] -110 [cm])    ; Jan 1.
+			  (121 [d] -110 [cm])    ; May 1.
+			  (182 [d] -200 [cm])    ; Jul 1.
+			  (274 [d] -200 [cm])    ; Oct 1.
+			  (275 [d] -110 [cm])    ; Oct 2.
+			  (365 [d] -110 [cm])))) ; Dec 31.
+  
+(defcolumn COMMIT default)
+
+(defcolumn "Block 2" default
+  (Groundwater Block2)
+  (Drain lateral (pipe_position -80 [cm])))
+
+(defcolumn "Block 3" default
+  (Groundwater Block3)
+  (Drain lateral (pipe_position -110 [cm])))
+
+(defcolumn "Block 2, Treatment 0" "Block 2"
+  (Soil (MaxRootingDepth 200 [cm])
+        (horizons ( -25 [cm] "0-25, Block 2, Treatment 0" )	
+                  ( -35 [cm] "25-35, Block 2, Treatment 0")	
+                  ( -55 [cm] "35-55, Block 2, Treatment 0")	
+                  (-115 [cm] "55-115, Block 2, Treatment 0")
+                  (-200 [cm] "115-200, Block 2, Treatment 0"))))
+ 
+(defcolumn "Block 2, Treatment 6" "Block 2"
+   (Soil (MaxRootingDepth 200 [cm])
+        (horizons (-25 [cm] "0-25, Block 2, Treatment 6" )	
+                  (-35 [cm] "25-35, Block 2, Treatment 6")	
+                  (-55 [cm] "35-55, Block 2, Treatment 6")	
+                  (-115 [cm] "55-115, Block 2, Treatment 6")
+                  (-200 [cm] "115-200, Block 2, Treatment 6"))))
+
+(defcolumn "Block 3, Treatment 0" "Block 3"
+  (Soil (MaxRootingDepth 200 [cm])
+        (horizons (-25 [cm] "0-25, Block 3, Treatment 0" )	
+                  (-35 [cm] "25-35, Block 3, Treatment 0")	
+                  (-55 [cm] "35-55, Block 3, Treatment 0")	
+                  (-115 [cm] "55-115, Block 3, Treatment 0")
+                  (-200 [cm] "115-200, Block 3, Treatment 0"))))
+ 
+(defcolumn "Block 3, Treatment 6" "Block 3"
+  (Soil (MaxRootingDepth 200 [cm])
+        (horizons (-25 [cm] "0-25, Block 3, Treatment 6" )	
+                  (-35 [cm] "25-35, Block 3, Treatment 6")	
+                  (-55 [cm] "35-55, Block 3, Treatment 6")	
+                  (-115 [cm] "55-115, Block 3, Treatment 6")
+                  (-200 [cm] "115-200, Block 3, Treatment 6"))))
+
+;;; soil.dai ends here.

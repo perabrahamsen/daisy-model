@@ -1,0 +1,78 @@
+;;; setup.dai -- Bakkegården experiment.
+
+
+(input file "sbarley.dai")
+
+(defcrop "SB MES" "Spring Barley"
+
+  ;; Phenology.
+  (Devel original
+      (EmrTSum  100 [dg C d])
+      (DSRate1  0.036 [DS/d]); 0.0311; opr 0.032
+      (TempEff1 (0.0 [dg C] 0.0 []) 
+		(3.85 [dg C] 0.2 []) ; 
+		(8.00 [dg C] 0.415 []) ; 
+		(18.29 [dg C] 0.7 []) 
+		(20.23 [dg C] 1 []) 
+		(24.0 [dg C] 1.0 [])
+		(30.0 [dg C] 0.01 []))
+      (DSRate2  0.022); 0.021
+;opt21   (TempEff2 (0.0  0.0) (4.0  0.2) (8.0  0.47)(12.0  0.72)(16.0  0.90) (20.0  1.0) (22.0  1.0) (24.0  0.96) (26.0  0.89) (28.0  0.77) (32.0  0.41) (35.0  0.0))
+      (TempEff2 (0.0  0.00)(4.0  0.11) (8.0  0.32)(12.0  0.57) (16.0  0.80) (20 0.96) (22 0.99) (23.0  1.00) (24 0.99) (26 0.95)(28.0  0.85) (30 0.70) (32.0  0.47) (35.0  0.0)); opt 23  grader, max 35
+
+  ) 
+  (Root (PenWaterFac (0 1) (0.989 1) (0.99 0) (1 0))); added by Merete, changed to Kaspers newest values.
+
+
+  ;; Photosynthesis.
+  (LeafPhot original 
+      (Fm 3.50 [g CO2/m^2/h])
+      (Qeff   0.04 [(g CO2/m^2/h)/(W/m^2)])
+      (TempEff (-20.0 [dg C] 0.001 [])
+	       (  0.0 [dg C] 0.01 []) 
+	       (  5.0 [dg C] 0.4 []) 
+	       ( 10.0 [dg C] 0.7 [])
+	       ( 15.0 [dg C] 0.9 [])
+               ( 20.0 [dg C] 1.0 []) 
+	       ( 25.0 [dg C] 1.0 []) 
+	       ( 30.0 [dg C] 0.9 []) 
+	       ( 35.0 [dg C] 0.8 [])
+	       ( 40.0 [dg C] 0.5 [])
+               ( 45.0 [dg C] 0.0 [])))
+
+  (Canopy (SpSOrgAI 0.025); 0.005
+          (SOrgAIMod (0.0 1.0)(1.0 1.0) (1.2 1.0) (1.5 0.0)); indsat punkt 1.0; DS 1.7 ændret til 1.3
+          (SOrgPhotEff 0.50))
+  ;(Prod (LfDR (0.00 0.00) (1.00 0.00) (1.20 0.02) (1.30 0.08) (2.00 0.10)))
+ 
+
+  ;; Partitioning.
+  
+  (Partit
+      ;; Division between root and shoot.
+      (Root (0.00 [DS] 0.65 []) (0.51 [DS] 0.55 []) (0.72 [DS] 0.15 []) (0.95 [DS] 0.05 []) (2.00 [DS] 0.00 []))
+
+      ;; Of shoot fraction, leaf and stem take this much:
+      (Leaf (0.00 [DS] 1.00 []) (0.25 [DS] 1.0 [])(0.35 0.5) (0.51 [DS] 0.25 []) (0.60 [DS] 0.15 []) (0.72[DS]  0.1 [])
+            (0.83 [DS] 0.05 []) (0.95 [DS] 0.03 []) (1.0 0.0) (2.00 [DS] 0.00 []))
+      (Stem (0.00 [DS] 0.00 []) (0.25 [DS] 0.00 [])(0.35 0.5) (0.51 [DS] 0.75 []) (0.60 [DS] 0.85 []) (0.72 [DS] 0.9 [])
+            (0.83 [DS] 0.95[]) (0.95 [DS] 0.87 []) (1.15 [DS] 0.00 []) (2.00 [DS] 0.00 []))
+      ;; Anything left goes to storage organ.
+      )
+
+;;New N-concentrations from NYield
+(CrpN
+	(PtLeafCnc (0.00 0.060) (0.80 0.040) (2.00 0.020) ) 
+	(CrLeafCnc (0.00 0.030) (0.80 0.030) (2.00 0.015) ) 
+	(NfLeafCnc (0.00 0.004) (0.80 0.004) (2.00 0.004) ) 
+
+	(PtStemCnc (0.50 0.060) (1.00 0.020) (2.00 0.010) ) 
+	(CrStemCnc (0.50 0.010) (1.00 0.010) (2.00 0.005) ) 
+	(NfStemCnc (0.50 0.004) (1.00 0.004) (2.00 0.004) )
+
+	(PtSOrgCnc (2.0 [DS] 0.019 [g N/g DM])) 
+	(CrSOrgCnc (2.0 [DS] 0.014 [g N/g DM])) 
+	(NfSOrgCnc (2.0 [DS] 0.001 [g N/g DM]))
+)
+)
+
