@@ -28,11 +28,11 @@
 #include "submodeler.h"
 #include "time.h"
 #include "assertion.h"
+#include "mathlib.h"
 
 #include <memory>
 #include <sstream>
 #include <vector>
-#include <cmath>
 
 struct ProgramWeather : public Program
 {
