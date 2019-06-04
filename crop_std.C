@@ -232,6 +232,8 @@ struct CropStandard : public Crop
 double 
 CropStandard::DM (const double height) const
 {
+  if (!std::isnormal (canopy->Height))
+    return 0.0;
   const double stem_harvest = bound (0.0, (1.0 - height / canopy->Height), 1.0);
   const double leaf_harvest = (canopy->CAI > 0.0 && height < canopy->Height)
     ? bound (0.0, (1.0 - canopy->LAIvsH (height)  / canopy->CAI), 1.0)

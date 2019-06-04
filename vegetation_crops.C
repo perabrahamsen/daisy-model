@@ -387,6 +387,7 @@ VegetationCrops::DM_by_name (symbol name, double height) const
 	   crop++)
 	sum += (*crop)->DM (height);
 
+      daisy_assert (std::isfinite (sum));
       return sum;
     }
   double sum = 0.0;
@@ -395,6 +396,7 @@ VegetationCrops::DM_by_name (symbol name, double height) const
        crop++)
     if (library.is_derived_from ((*crop)->objid, name))
       sum += (*crop)->DM (height);
+  daisy_assert (std::isfinite (sum));
   return sum;
 }
 

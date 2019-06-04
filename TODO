@@ -1,80 +1,48 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* Daniel
+
+**
+
+
+f (DM0, DM1, M0, t0, t1) -> S
+
+M_max_0 = M_max (DM0)
+
+M_max_1 = M_max (DM1)
+
+growth = new_M_max - old_M_max
+
+delta_t = t1 - t0
+
+growth_rate = growth / delta_t
+
+if (M0 + growth >= M_max_1 || M0 >= M_max_1)
+
+  S = (M_max_1 - M0) / delta_t
+
+else
+
+  dM/dt = growth_rate + fill_rate (M_max_1 - M)
+
+  M (t) = C1 exp (- fill_rate * t) + growth_rate / fill_rate + M_max_1
+
+  M0 = C1 + growth_rate / fill_rate + M_max_1
+
+  C1 = M0 - growth_rate / fill_rate - M_max_1
+
+
 * RAINPROOF
 
-** K_factor horizon parameter
+** Få Daisy til at oversætte til Windows igen (Fra Linux?)
 
-* COMMIT
+** Scenarios
 
-** python script til sammenligning af simulerede høstudbytte med målt
 
-** Andre måledata mod simulerede
-
-** Kan vi forbedre det med rødderne?
-
-Evt en faktor vi ganger på tæthedden til at simulere heterogenitet?
-
-* RAINPROOF
-
-** Vejr
-
-*** Konverter Eelde data til Daisy format
-
-**** Calculate mean/aplitude/max T day
-
-*** Spørg UEA om timeværdier er forløbende
-
-*** Spørg UEA om Tyske data
-
-** Afgrøder
-
-*** DK
-
-**** Spørg Maja om scripts til applikationsvinduer
-
-**** Kør 3000 år vinterhvede og vårbyg med Eelde vejr
-
-**** Kør 3000 års sim med danske data
-
-**** Er applicationsvinduer rimelige
-
-**** Sammenlign sim emergence/flower/harvest data med intervaller fra Bayer
-
-*** NL
-
-**** Tilpas management
-
-**** Tilpas DSrate
-
-**** Find applikationsvinduer
-
-**** Tilpas log
-
-*** Opdater dokumentation om fænologi i rapport
-
-*** Jacob/Jeanne Optimized scripts
-
-*** Jacob/Maja Model soils
-
-**** Extract data for 800 soils
-
-**** Dokument it for report
-
-*** Per/Jacob: Combined serups
-
-**** Management and log depend on climate
-
-**** Random offset
-
-**** Random soil
-
-*** Jacob/Per: Run simulations
 
 ** Maja / Per: Validation article 
 
 ** 2x_Kf equil + non-equil
-
-** Få Daisy til at oversætte til Windows igen (Fra Linux?)
 
 * Artikler
 
