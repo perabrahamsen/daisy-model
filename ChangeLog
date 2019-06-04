@@ -1,3 +1,11 @@
+2019-06-04  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.84 released.
+
+2019-05-14  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.83 released.
+
 2019-05-14  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* crop_std.C (CropStandard::tick): Call root_system->tick_daily with right type parameters.
