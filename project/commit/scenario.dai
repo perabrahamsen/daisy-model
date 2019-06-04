@@ -1,0 +1,107 @@
+;; setup.dai -- COMMIT
+
+(path &old "/home/xvs108/RainProof/data" "/home/xvs108/RainProof")
+
+(input file "fertilizer.dai")
+(input file "tillage.dai")
+(input file "log.dai")
+(input file "wrape.dai")
+
+;; From RainProof
+(input file "climate.dai")
+
+;; shared with setup.dai
+(input file "soil.dai")
+
+;; Experimental crop descriptions.
+(input file "Springbarley_MES_23.dai")
+(input file "Winter Wheat JG.dai")
+
+(defcrop "Oilseedrape" "Winter Rape")
+
+(defcrop "SB" "SB MES")
+
+(defcrop "WW" "Winter Wheat JG"
+  (Seed original
+        (initial_weight 100 [kg/ha])))
+
+(defaction SBHARVEST 
+  (harvest "SB" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
+  
+(defaction WWHARVEST 
+  (harvest "WW" (stub 10 [cm])(stem 0.70)(leaf 0.70)))
+
+;;Management
+(defaction "WW" activity
+  (wait_mm_dd 9 8)(plowing)
+  (wait_mm_dd 9 10)(seed_bed_preparation)(sow "WW" (seed 180 [kg w.w./ha]))
+  (wait_mm_dd 4 9)
+  ;; NS 27-4, 150 [kg/ha] = 41[kg N/ha]
+  (fertilize (N25S (weight 41 [kg N/ha])))
+  (wait_mm_dd 4 12)
+  ;; NPKS 10-9-17-5, 208 [kg/ha] = 20[kg N/ha]
+  (fertilize (N25S (weight 20 [kg N/ha])))
+  (wait_mm_dd 4 20)
+  ;; N 34 (amm. Nitrat), 250 [kg/ha] = 86 [kg N/ha]
+  (fertilize (N25S (weight 86 [kg N/ha]))) 
+  (wait (or (crop_ds_after "WW" 2.0)(mm_dd 9 7)))
+  (WWHARVEST))
+  
+(defaction "SB w. CC" activity
+  (wait_mm_dd 3 05)
+  (fertilize (N25S (weight 115 [kg N/ha])))
+  (plowing)
+  (wait_mm_dd 4 05) 
+  (seed_bed_preparation)
+  (sow "SB")
+  (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
+  (SBHARVEST)
+  (wait_days 4)
+  (sow "Oilseedrape")
+  (fertilize (N25S (weight 30 [kg N/ha])))
+  (wait (after_mm_dd 12 1))
+  (plowing))
+
+(defaction "SB" activity
+  (wait_mm_dd 3 05)
+  (fertilize (N25S (weight 115 [kg N/ha])))
+  (plowing)
+  (wait_mm_dd 4 05)
+  (seed_bed_preparation)(sow "SB")
+  (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
+  (SBHARVEST))
+
+(defprogram COMMIT Daisy
+  (weather CPH)
+  (manager activity
+	   ;; Warmup
+	   (WW)
+	   (WW)
+	   (WW)
+	   (store_SOM)
+	   (repeat (activity (WW) (restore_SOM))))
+  (time 2997 09 01 00)
+  (stop 3400 09 01 00)
+  (activate_output (after 3000 09 1 00))
+  (output harvest
+	  ("Field water" (when (and (month 9) (mday 1) (hour 0))))
+	  ("Field nitrogen" (when (and (month 9) (mday 1) (hour 0))))))
+
+(defprogram "Block 2, Treatment 0" COMMIT
+  (column "Block 2, Treatment 0")
+  (log_prefix "scn/B2T0/"))
+
+(defprogram "Block 2, Treatment 6" COMMIT
+  (column "Block 2, Treatment 6")
+  (log_prefix "scn/B2T6/"))
+
+(defprogram "Block 3, Treatment 0" COMMIT
+  (column "Block 3, Treatment 0")
+  (log_prefix "scn/B3T0/"))
+
+(defprogram "Block 3, Treatment 6" COMMIT
+  (column "Block 3, Treatment 6")
+  (log_prefix "scn/B3T6/")) 
+
+;;; scenario.dai ends here.
+
