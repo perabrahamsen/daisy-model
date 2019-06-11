@@ -53,7 +53,7 @@ Partition::tick (double DS, double current_RSR, double nitrogen_stress,
   f_SOrg = std::max (0.0, 1 - f_Root - f_Leaf - f_Stem);
 
   // NNI 
-  if (NNI < NNI_crit && DS < 1.0)
+  if (NNI < NNI_crit)
     {
       const double f_Shoot = f_Leaf + f_Stem;
       cf = 1.0 + (NNI_crit - NNI) * NNI_inc;

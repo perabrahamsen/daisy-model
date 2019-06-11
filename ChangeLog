@@ -1,3 +1,7 @@
+2019-06-11  Per Abrahamsen  <pa@plen.ku.com>
+
+	* partition.C (tick): Make NNI work after DS=1 as well.
+
 2019-06-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.84 released.

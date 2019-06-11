@@ -26,7 +26,7 @@ files from the data in a Daisy weather file. Example:
 outputs
 
 TAvarage: 8.19745 dgC
-TAmplitude: 8.2344dgC
+TAmplitude: 8.2344 dgC
 MaxTDay: 205 yday
 
 Note that if you have less than 10 years data, you should find the

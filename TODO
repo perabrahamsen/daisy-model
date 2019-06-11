@@ -1,44 +1,82 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Daniel
+* Now
 
-**
+** Maja kommentarer
 
+** Stathis paper
 
-f (DM0, DM1, M0, t0, t1) -> S
-
-M_max_0 = M_max (DM0)
-
-M_max_1 = M_max (DM1)
-
-growth = new_M_max - old_M_max
-
-delta_t = t1 - t0
-
-growth_rate = growth / delta_t
-
-if (M0 + growth >= M_max_1 || M0 >= M_max_1)
-
-  S = (M_max_1 - M0) / delta_t
-
-else
-
-  dM/dt = growth_rate + fill_rate (M_max_1 - M)
-
-  M (t) = C1 exp (- fill_rate * t) + growth_rate / fill_rate + M_max_1
-
-  M0 = C1 + growth_rate / fill_rate + M_max_1
-
-  C1 = M0 - growth_rate / fill_rate - M_max_1
-
+** Build Daisy
 
 * RAINPROOF
 
+** Sensitivity
+
+*** Multiple tiers
+
+**** Observed data
+
+**** Calibrated data
+
+**** Simulated data
+
+**** Generated data
+
+**** NNW / RAINPROOF model data
+
+*** RAINPROOF vs Observed data
+
+Compare predicted (by RAINPROOF) M with measurements.
+--> May be difficult because of time resolution
+--> We will only have observations for a single application day
+
+*** RAINRPOOF vs Calibrated data : Validation
+
+We should go more in depth using our validation and optimization sites
+-> We get the time resolution we want.
+-> We can use additional application days
+
+*** RAINRPOOF vs Simulated data
+
+We may take additional well described soils from the database, or we
+can extend the calibrated soils with additional weather and management.
+
+*** RAINPROOF vs Generated data
+
+Basically what Jeanne does with her training and test datasets.
+
+*** RAINPROOF vs RAINPROOF
+
+Compare sensitivety of RAINPROOF predictions.  Feed it two set of data,
+and see the difference.
+
+*** Test how much the performance of RAINPROOF degrades with random data
+
+Crop, subsoil, topsoil, lower boundary, forecast (n days), historical
+weather, product
+
+For categorical features we can pick the others.
+
+For static features, we can choose at random from another generated
+soil.
+
+For historical weather and forecast, we can pick a random other year
+same climate.
+
+All of these are extremes, only really provides information if the
+degradation is minor.
+
+*** Test how much the performance of RAINPROOF degrades with coarse data
+
+Simulate specific well described fields. Look up the fields in
+database (or translate to "soil class"). How much worse is RAINPROOF
+feed with the "coarse" soil, instead of the "detailed" soil?
+
+*** Test how much performace decrease with actual forecast
+
+Unfortuntely, we only have one year. However, we can try different different soils, products, crops, and lower boundaries.
+
 ** Få Daisy til at oversætte til Windows igen (Fra Linux?)
-
-** Scenarios
-
-
 
 ** Maja / Per: Validation article 
 
