@@ -101,7 +101,7 @@ ifneq ($(USE_OPTIMIZE),none)
 	OPTIMIZE = -O3 -ffast-math -fno-finite-math-only $(OPTEXTRA)
 endif
 
-STRIP = strip
+STRIP = /usr/bin/strip
 
 ifeq ($(HOSTTYPE),unix)
 	OSFLAGS = -D__unix
