@@ -39,7 +39,8 @@ OBJHOME = obj
 NATIVEHOME = $(OBJHOME)
 NATIVEEXE = daisy.exe daisyw.exe
 USE_GUI = Q4
-BOOSTINC = -isystem $(CYGHOME)/home/xvs108/boost_1_69_0
+#BOOSTINC = -isystem $(CYGHOME)/home/xvs108/boost_1_69_0
+BOOSTINC = -isystem $(CYGHOME)/home/xvs108/boost
 CXSPARSELIB = libcxsparse.a
 SETUPDIR = /home/xvs108/daisy/install
 #MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
@@ -100,7 +101,7 @@ ifneq ($(USE_OPTIMIZE),none)
 	OPTIMIZE = -O3 -ffast-math -fno-finite-math-only $(OPTEXTRA)
 endif
 
-STRIP = strip
+STRIP = /usr/bin/strip
 
 ifeq ($(HOSTTYPE),unix)
 	OSFLAGS = -D__unix
