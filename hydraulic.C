@@ -221,6 +221,7 @@ Hydraulic::initialize (const Texture&,
     }
 }
 
+#if 0
 bool 
 Hydraulic::check (Treelog& msg) const
 { 
@@ -232,6 +233,7 @@ Hydraulic::check (Treelog& msg) const
     }
   return ok;
 }
+#endif
 
 Hydraulic::Hydraulic (const BlockModel& al)
   : ModelDerived (al.type_name ()),
