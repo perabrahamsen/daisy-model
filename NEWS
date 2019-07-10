@@ -6,6 +6,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.87
+
+** New 'table' hydraulic model.
+
+Reads hydraulic curves from ddf file.
+
 * 5.83
 
 ** New 'K_factor' horizon paramater.
