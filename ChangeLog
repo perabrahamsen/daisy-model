@@ -1,3 +1,7 @@
+2019-08-21  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.88 released.
+
 2019-08-14  Per Abrahamsen  <pa@plen.ku.com>
 
 	* surface.C (q_top): Fix sign error for forced_pressure.
