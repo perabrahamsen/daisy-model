@@ -30,6 +30,8 @@
 #include "assertion.h"
 #include "mathlib.h"
 
+#include <fstream>
+#include <numeric>
 #include <memory>
 #include <sstream>
 #include <vector>
@@ -37,36 +39,120 @@
 struct ProgramWeather : public Program
 {
   // Data.
+  const symbol file;
   const std::unique_ptr<WSource> weather;
   const Time begin;
   const Time end;
+  const std::vector<double> fractiles;
 
+  // Utils.
+  static void print_fractiles (const symbol file,
+			       const symbol key,
+			       const std::vector<double>& fractiles,
+			       const std::vector<std::vector<double>>& all,
+			       bool accumulated)
+  {
+    const std::string name = file.name () + key.name () + ".csv";
+    std::ofstream out (name.c_str ());
+    out << "Day," << key;
+    for (double f: fractiles)
+      out << "," << key << f * 100 << "%";
+
+    daisy_assert (all.size () > 1);
+    const  std::vector<double> zero (all[1].size (), 0.0);
+    std::vector<double> last = zero;
+    for (int day = 1; day < 366; day++)
+      {
+	out << "\n" << day;
+	daisy_assert (day < all.size ());
+	for (size_t i = 0; i < std::min (last.size (), all[day].size ()); i++)
+	  last[i] += all[day][i];
+	std::vector<double> data = last;
+	const double avg = std::accumulate (data.begin (), data.end (), 0.0) / data.size ();
+	out << "," << avg;
+	std::sort (data.begin (), data.end ());
+	const int end = data.size () - 1;
+	daisy_assert (end >= 0);
+	for (double f: fractiles)
+	  out << "," << data[end * f];
+	if (!accumulated)
+	  last = zero;
+      }
+  }
+
+  
   // Use.
   bool run (Treelog& msg)
   {
+    std::vector<double> count (367, 0.0);  
     std::vector<double> T_sum  (367, 0.0);
-    std::vector<double> T_count (367, 0.0);
-
-    for (Time time = begin; time < end; time.tick_day (1))
+    std::vector<double> P_sum (367, 0.0);
+    std::vector<double> ET0_sum (367, 0.0);
+    std::vector<double> N_sum (367, 0.0);
+    std::vector<std::vector<double>> T_all  (367);
+    std::vector<std::vector<double>> P_all (367);
+    std::vector<std::vector<double>> ET0_all (367);
+    std::vector<std::vector<double>> N_all (367);
+  
+    Time time = begin;
+    while (time < end)
       {
-	weather->weather_tick (time, msg);
-	const double T = weather->daily_air_temperature ();
+	double T = 0.0;
+	double P = 0.0;
+	double ET0 = 0.0;
+
+	const int old_day = time.yday ();
+	const int old_hour = time.hour ();
+	const int old_year = time.year ();
+	for (int i = 0; i < 24; i++)
+	  {
+	    time.tick_hour (1);
+	    weather->weather_tick (time, msg);
+	    T += weather->air_temperature ();
+	    P += weather->rain () + weather->snow ();
+	    ET0 += weather->reference_evapotranspiration ();
+	  }
+	T /= 24.0;
+
+	const double N = P - ET0;
+
 	const int yday = time.yday ();
 	daisy_assert (yday > 0 && yday < 367);
+	daisy_assert (yday != old_day);
+	daisy_assert (time.hour () == old_hour);
+	if (time.year () != old_year)
+	  {
+	    std::ostringstream tmp;
+	    tmp << time.year ();
+	    msg.message (tmp.str ());
+	  }
+	count[yday] += 1.0;
 	T_sum[yday] += T;
-	T_count[yday] += 1.0;
+	P_sum[yday] += P;
+	ET0_sum[yday] += ET0;
+	N_sum[yday] += N;
+	T_all[yday].push_back (T);
+	P_all[yday].push_back (P);
+	ET0_all[yday].push_back (ET0);
+	N_all[yday].push_back (N);
       }
+    // Temperature.
     double a0 = 0.0;
     double a1 = 0.0;
     double b1 = 0.0;
+    // Precipitation.
+    double P_yearly = 0.0;
     for (int i = 1; i < 366; i++)
       {
-	daisy_assert (T_count[i] > 0.0);
-	const double p = T_sum[i] / T_count[i];
+	daisy_assert (count[i] > 0.0);
+	// Temperature.
+	const double p = T_sum[i] / count[i];
 	const double t = i;
 	a0 += p * std::cos (2.0 * M_PI * 0.0 * t / 365.0);
 	a1 += p * std::cos (2.0 * M_PI * 1.0 * t / 365.0);
 	b1 += p * std::sin (2.0 * M_PI * 1.0 * t / 365.0);
+	// Precipitation.
+	P_yearly += P_sum[i] / count[i];
       }
     a0 *= 2.0 / 365.0;
     a1 *= 2.0 / 365.0;
@@ -80,9 +166,17 @@ struct ProgramWeather : public Program
     std::ostringstream tmp;
     tmp << "TAverage: " << 0.5 * A0 << " dgC\n"
 	<< "TAmplitude: " << A1 << " dgC\n"
-	<< "MaxTDay: " << std::round (phi * 365.0 / (2.0 * M_PI)) << " yday";
+	<< "MaxTDay: " << std::round (phi * 365.0 / (2.0 * M_PI)) << " yday\n"
+	<< "PAverage: " << (P_yearly * 365.2425 / 365.0) << " mm";
     msg.message (tmp.str ());
 
+    if (file != Attribute::None ())
+      {
+	print_fractiles (file, "T", fractiles, T_all, false);
+	print_fractiles (file, "P", fractiles, P_all, true);
+	print_fractiles (file, "ET0", fractiles, ET0_all, true);
+	print_fractiles (file, "N", fractiles, N_all, true);
+      }
     return true;
   }
   
@@ -111,9 +205,11 @@ struct ProgramWeather : public Program
   
   ProgramWeather (const BlockModel& al)
     : Program (al),
+      file (al.name ("file", Attribute::None ())),
       weather (Librarian::build_item<WSource> (al, "weather")),
       begin (*submodel<Time> (al, "begin")),
-      end (*submodel<Time> (al, "end"))
+      end (*submodel<Time> (al, "end")),
+      fractiles (al.number_sequence ("fractiles"))
   { }
   ~ProgramWeather ()
   { }
@@ -128,7 +224,10 @@ static struct ProgramWeatherSyntax : public DeclareModel
 Weather data from a data file.")
   { }
   void load_frame (Frame& frame) const
-  { 
+  {
+    frame.declare_string ("file", Attribute::OptionalConst, "\
+Base name for files containing daily average data.\n\
+By default, create no such files");
     frame.declare_object ("weather", WSource::component, 
 			  Attribute::Const, Attribute::Singleton, "\
 Weather source to analyse.");
@@ -136,6 +235,9 @@ Weather source to analyse.");
 			     "First date to analyze.", Time::load_syntax);
     frame.declare_submodule ("end", Attribute::Const,
 			     "Last date to analyse.", Time::load_syntax);
+    frame.declare_fraction ("fractiles", Attribute::Const,  Attribute::Variable, "\
+List of fractiles print in 'file'.");
+    frame.set_empty ("fractiles");
   }
 } ProgramWeather_syntax;
 

@@ -1,86 +1,77 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Now
+* OPDATER hydraulic old
 
-** Maja kommentarer
+Lad den tage output fra program hydraulic som input
 
-** Stathis paper
+* RAINPROOF ML
 
-** Build Daisy
+** Læs Jeanne papers
 
-* RAINPROOF
+** Læs pandas med alle data
 
-** Sensitivity
+** Lav ny panda med application windows
 
-*** Multiple tiers
+*** udregn gennemsnit, median, spredning, max, min for hvert vindue 
 
-**** Observed data
+** Udregn app day max relativ til median og average for hver vindue
 
-**** Calibrated data
+** plot max/min vs frekvens for alle vinduer
 
-**** Simulated data
+** plot for subsets: soil classes, product/season, "danger class"
 
-**** Generated data
+danger class er vinduerne opdelt i max per
 
-**** NNW / RAINPROOF model data
+** Udreg korrelation mellem "rel max" og features
 
-*** RAINPROOF vs Observed data
+** Træn ML for udregning af "rel max"
 
-Compare predicted (by RAINPROOF) M with measurements.
---> May be difficult because of time resolution
---> We will only have observations for a single application day
+* RAINPROOF projekt plan
 
-*** RAINRPOOF vs Calibrated data : Validation
+** Før sommerferie
 
-We should go more in depth using our validation and optimization sites
--> We get the time resolution we want.
--> We can use additional application days
+*** Sommerferie
 
-*** RAINRPOOF vs Simulated data
+** Data analyse og ML
 
-We may take additional well described soils from the database, or we
-can extend the calibrated soils with additional weather and management.
+** Skriv Q3 rapport
 
-*** RAINPROOF vs Generated data
+*** Send Q3 rapport
 
-Basically what Jeanne does with her training and test datasets.
+*** Oktober 2 møde
 
-*** RAINPROOF vs RAINPROOF
+*** Skype møde om slutrapport?
 
-Compare sensitivety of RAINPROOF predictions.  Feed it two set of data,
-and see the difference.
+** Sensitivity 
 
-*** Test how much the performance of RAINPROOF degrades with random data
+** Slutrapport
 
-Crop, subsoil, topsoil, lower boundary, forecast (n days), historical
-weather, product
+*** Januar: Plantekongres
 
-For categorical features we can pick the others.
+*** Februar: Præsentation i Monheim
 
-For static features, we can choose at random from another generated
-soil.
+* Jeanne & CPE
 
-For historical weather and forecast, we can pick a random other year
-same climate.
+** Onsdagsmøder
 
-All of these are extremes, only really provides information if the
-degradation is minor.
+** Hjælp til ML (Q3)
 
-*** Test how much the performance of RAINPROOF degrades with coarse data
+** Hjælp til slutrapport (Q4)
 
-Simulate specific well described fields. Look up the fields in
-database (or translate to "soil class"). How much worse is RAINPROOF
-feed with the "coarse" soil, instead of the "detailed" soil?
+* VIP møde evt. med BWS
 
-*** Test how much performace decrease with actual forecast
+* ML
 
-Unfortuntely, we only have one year. However, we can try different different soils, products, crops, and lower boundaries.
+** Prøv udregne "basis" for vindue, "day/basis" per dag. Forudsig den sidste
 
-** Få Daisy til at oversætte til Windows igen (Fra Linux?)
+* RejsUd
 
-** Maja / Per: Validation article 
 
-** 2x_Kf equil + non-equil
+* Få Daisy til at oversætte til Windows igen (Fra Linux?)
+
+* Maja / Per: Validation article 
+
+* 2x_Kf equil + non-equil
 
 * Artikler
 
