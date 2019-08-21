@@ -1,3 +1,16 @@
+2019-08-14  Per Abrahamsen  <pa@plen.ku.com>
+
+	* surface.C (q_top): Fix sign error for forced_pressure.
+
+2019-08-08  Per Abrahamsen  <pa@plen.ku.com>
+
+	* hydraulic_table.C (Cw2): Fix unit [cm^-1] instead of [h^-1].
+	* hydraulic.C (run): Ditto.
+
+2019-07-10  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.87 released.
+
 2019-07-10  Per Abrahamsen  <pa@plen.ku.com>
 
 	* hydraulic_table.C: New model.
