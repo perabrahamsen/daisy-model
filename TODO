@@ -1,8 +1,24 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* OPDATER hydraulic old
+* RAINPROOF
 
-Lad den tage output fra program hydraulic som input
+** DONE Plot BBCH start / end
+
+** Extend window for Atlantis
+
+** DONE Create "CPH-1hourP-dates.csv" and "CPH-8hourP-dates.csv" files
+
+** Value of waiting...
+
+M(today) / min (M (day); day in rest of application window)
+
+Prediction should use BBCH, #day with this BBCH
+
+** Risk of waiting?
+
+** We need to evaluate on complete application windows
+
+** I need to train on application windows that include last day
 
 * RAINPROOF ML
 

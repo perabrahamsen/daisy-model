@@ -104,7 +104,7 @@ HydraulicTable::HydraulicTable (const BlockModel& al)
       throw "hyd table init err6";
     }
   const symbol Cw2_unit = lex.dimension (Cw2_c);
-  if (!units.can_convert (Cw2_unit, "h^-1", msg))
+  if (!units.can_convert (Cw2_unit, "cm^-1", msg))
     throw "hyd table init err7";
   const int K_c = lex.find_tag ("K");
   if (K_c < 0)
@@ -141,8 +141,8 @@ HydraulicTable::HydraulicTable (const BlockModel& al)
 	  throw "hyd table init err11";
 	}
       double Cw2 = lex.convert_to_double (entries[Cw2_c]);
-      if (units.can_convert (Cw2_unit, "h^-1", Cw2))
-	Cw2 = units.convert (Cw2_unit, "h^-1", Cw2);
+      if (units.can_convert (Cw2_unit, "cm^-1", Cw2))
+	Cw2 = units.convert (Cw2_unit, "cm^-1", Cw2);
       else
 	{
 	  lex.error ("Cw2 convert failed");

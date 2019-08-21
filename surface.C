@@ -121,7 +121,7 @@ Surface::Implementation::q_top (const Geometry& geo, const size_t edge,
                                 const double dt) const
 {
   if (use_forced_pressure)
-    return forced_pressure_value * 0.1 / 1.0; // mm -> cm/h.
+    return -forced_pressure_value * 0.1 / 1.0; // mm -> cm/h.
 
   if (use_forced_flux)
     return forced_flux_value * 0.1; // mm/h -> cm/h.
