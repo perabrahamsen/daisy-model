@@ -1,5 +1,44 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* Daisy
+
+** Maja: Stop simulering der overskrider givet tidsforbrug.
+
+** Kasper: Ny DMI korrigering af nedbør
+
+* RAINPROOF
+
+** DONE iv.cvs should contain all days + mark if "in window" and "typical"
+
+** DONE windows.cvs skal indeholde et flag der siger om den er "acceptabel"
+
+** DONE iv-useful.cvs:
+
+Skal indeholde kun indeholde typiske dage i acceptable vinduer
+
+** iv-wait.cvs:
+
+*** Ny søjle: WaitValue
+
+0 if we can't wait
+
+Cm(today) / min (Cm(rest pf windows))
+
+foreach aday
+
+   best = 0
+
+   find window
+
+      for each wday in window
+
+          if wday > aday
+
+	      best = max (Cm (aday) / Cm (wday), best)
+
+   WaitValue = best              
+      
+
 * RAINPROOF
 
 ** DONE Plot BBCH start / end

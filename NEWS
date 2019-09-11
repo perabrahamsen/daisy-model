@@ -6,6 +6,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.88
+
+Bug fixes.
+
 * 5.87
 
 ** New 'table' hydraulic model.
@@ -99,7 +103,7 @@ management, e.g.
 (wait (crop_stage_after "Spring Barley" 89))
 (harvest "Spring Barley")
 
-The deault 'cstage' model is just DS and will give a message at DS 0
+The default 'cstage' model is just DS and will give a message at DS 0
 (emergence), 1 (flowering), and 2 (ripe).
 
 * 5.72

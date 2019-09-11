@@ -1,3 +1,8 @@
+2019-09-11  Per Abrahamsen  <pa@plen.ku.com>
+
+	* condition_walltime.C (walltime): New model.
+	* daisy.C (stop_when): New parameter.
+
 2019-08-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.88 released.
@@ -27,7 +32,7 @@
 	* program_weather.C (run): Also print 'PAverage'.
 	(print_fractiles): New functions.
 	(P_fractiles, T_fractiles): New parameters.
-	(run): Also print daily averages.
+	(run): Also print dabily averages.
 
 2019-06-11  Per Abrahamsen  <pa@plen.ku.dk>
 
