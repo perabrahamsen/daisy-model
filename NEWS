@@ -21,7 +21,7 @@ It can be combined with the simulation time based stop condition
   (stop 1988 4 1 1)
   (stop_when (walltime (seconds 10)))
 
-the simulation will stop when une of the two conditions are fullfiled.
+the simulation will stop when one of the two conditions are fullfiled.
 
 * 5.88
 
