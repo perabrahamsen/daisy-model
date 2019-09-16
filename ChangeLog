@@ -1,3 +1,7 @@
+2019-09-16  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.90 released.
+
 2019-09-16  Per Abrahamsen  <pa@plen.ku.com>
 
 	* action_with.C (done): Also restrict field here.
