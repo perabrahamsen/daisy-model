@@ -283,7 +283,7 @@ struct ProgramHydraulic_table : public Program
     tmp << "\n";
     tmp << "pF\tcm\t%\tcm/h";
     if (print_Cw2)
-      tmp << "\th^-1";
+      tmp << "\tcm^-1";
     tmp << "\n";
     for (int i = 0; i <= intervals; i++)
       {

@@ -6,6 +6,16 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.90
+
+** Made 'with-column' useful for soil tests.
+
+    (with-column Andeby
+		 (wait (soil_water_pressure_above (height -10 [cm])
+						  (potential -50 [cm]))))
+
+works now, didn't before.
+
 * 5.89
 
 ** You can now stop simulation after specified time.
