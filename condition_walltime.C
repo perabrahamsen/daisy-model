@@ -25,7 +25,10 @@
 #include "block_model.h"
 #include "librarian.h"
 #include "frame.h"
+#include "timestep.h"
 #include <ctime>
+
+// The 'period' condition.
 
 struct ConditionPeriodic : public Condition
 {
@@ -75,5 +78,57 @@ it was true.")
     frame.order ("period");
   }
 } ConditionPeriodic_syntax;
+
+// The 'period' condition.
+
+struct ConditionWalltime : public Condition
+{
+  const double period;
+  mutable time_t last;
+public:
+  bool match (const Daisy&, const Scope&, Treelog&) const
+  {
+    const time_t next = time (NULL);
+    if (last == 0)
+      {
+	last = next;
+	return false;
+      }
+    return (next - last >= period);
+  }
+  void output (Log&) const
+  { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+  static double find_period (const BlockModel& al)
+  {
+    Timestep step (al);
+    return step.total_hours () * 3600.0;
+  }
+  ConditionWalltime (const BlockModel& al)
+    : Condition (al),
+      period (find_period(al)),
+      last (0)
+  { }
+};
+
+static struct ConditionWalltimeSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ConditionWalltime (al); }
+  ConditionWalltimeSyntax ()
+    : DeclareModel (Condition::component, "walltime", "\
+True if move than a specified walltime has passed since last time\n\
+it was true.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    Timestep::load_syntax (frame);
+  }
+} ConditionWalltime_syntax;
 
 // condition_walltime.C ends here.

@@ -1,3 +1,24 @@
+2019-09-16  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.90 released.
+
+2019-09-16  Per Abrahamsen  <pa@plen.ku.com>
+
+	* action_with.C (done): Also restrict field here.
+
+2019-09-11  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.89 released.
+
+2019-09-11  Per Abrahamsen  <pa@plen.ku.com>
+
+	* condition_walltime.C (walltime): New model.
+	* daisy.C (stop_when): New parameter.
+
+2019-08-21  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.88 released.
+
 2019-08-14  Per Abrahamsen  <pa@plen.ku.com>
 
 	* surface.C (q_top): Fix sign error for forced_pressure.
@@ -23,7 +44,7 @@
 	* program_weather.C (run): Also print 'PAverage'.
 	(print_fractiles): New functions.
 	(P_fractiles, T_fractiles): New parameters.
-	(run): Also print daily averages.
+	(run): Also print dabily averages.
 
 2019-06-11  Per Abrahamsen  <pa@plen.ku.dk>
 

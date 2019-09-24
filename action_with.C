@@ -64,6 +64,7 @@ public:
   bool done (const Daisy& daisy, const Scope& scope, Treelog& out) const
   {
     bool all_done = true;
+    Field::Restrict restriction (daisy.field (), column);
     Treelog::Open nest (out, column);
     for (std::vector<Action*>::const_iterator i = actions.begin ();
 	 i != actions.end ();

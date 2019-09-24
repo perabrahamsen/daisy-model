@@ -74,6 +74,7 @@ public:
   Time next_large;
   const Time stop;
   double duration;
+  const std::unique_ptr<Condition> stop_when;
   const std::unique_ptr<Action> action;
   const std::unique_ptr<WSource> weather;
   bool initialized;
@@ -108,6 +109,10 @@ public:
             = print_time->match (daisy, scope (), msg);
 
           tick (daisy, msg);
+
+          stop_when->tick (daisy, scope (), msg);
+	  if (stop_when->match (daisy, scope (), msg))
+	    running = false;
 
           if (!running)
             msg.message ("End simulation");
@@ -263,6 +268,7 @@ public:
       duration (al.check ("stop")
                 ? Time::fraction_hours_between (time, stop)
                 :-1),
+      stop_when (Librarian::build_item<Condition> (al, "stop_when")),
       action (Librarian::build_item<Action> (al, "manager")),
       weather (al.check ("weather") 
                ? Librarian::build_item<WSource> (al, "weather")
@@ -539,6 +545,9 @@ Current timestep used by simulation.");
 			"Latest time where the simulation stops.\n\
 By default, the simulation will run until the manager request it to stop.",
                         Time::load_syntax);
+  frame.declare_object ("stop_when", Condition::component,
+			"Stop when this is true.");
+  frame.set ("stop_when", "false");
   frame.declare_object ("column", Column::component, 
                         Attribute::State, Attribute::Variable,
                         "List of columns to use in this simulation.");

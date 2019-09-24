@@ -6,6 +6,37 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.90
+
+** Made 'with-column' useful for soil tests.
+
+    (with-column Andeby
+		 (wait (soil_water_pressure_above (height -10 [cm])
+						  (potential -50 [cm]))))
+
+works now, didn't before.
+
+* 5.89
+
+** You can now stop simulation after specified time.
+
+  (stop_when (walltime (seconds 5)))
+
+You can also specify other time units, e.g.
+
+  (stop_when (walltime (hours 2) (minutes 10) (seconds 1) (microseconds 16)))
+
+It can be combined with the simulation time based stop condition
+
+  (stop 1988 4 1 1)
+  (stop_when (walltime (seconds 10)))
+
+the simulation will stop when one of the two conditions are fullfiled.
+
+* 5.88
+
+Bug fixes.
+
 * 5.87
 
 ** New 'table' hydraulic model.
@@ -99,7 +130,7 @@ management, e.g.
 (wait (crop_stage_after "Spring Barley" 89))
 (harvest "Spring Barley")
 
-The deault 'cstage' model is just DS and will give a message at DS 0
+The default 'cstage' model is just DS and will give a message at DS 0
 (emergence), 1 (flowering), and 2 (ripe).
 
 * 5.72
