@@ -1,10 +1,41 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* RAINPROOF 
+
+** Plan for Q4
+
+Week 40-44: Final tests
+
+Week 45-48: Writing draft of final report.
+29/11 Send draft to BCS and VIP group.
+
+Week 49: Prepare "Plantekongressen".
+6/12 Receive comments from BCS and VIP group.
+
+Week 50-51: Incorporate comments in final raport.
+20/12 Send final report to BCS.
+
+** Letter (Friday)
+
+"attached presentations"
+
+"Plan for Q4"
+
+"Soil profile DB vs Soil DB"
+
+** Start ML tutorial
+
 * Daisy
 
-** DONE Maja: Stop simulering der overskrider givet tidsforbrug.
+** Weather:
 
-** Kasper: Ny DMI korrigering af nedbør
+*** WindHeight [m]
+
+New parameter, mandatory if wind speed is specified
+
+*** Field-Windbreak [dg]
+
+Optional parameter, default 0
 
 * RAINPROOF
 

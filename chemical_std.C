@@ -62,6 +62,7 @@ struct ChemicalStandard : public Chemical
   const double canopy_washoff_coefficient;
   const double surface_decompose_rate;
   const double litter_decompose_rate;
+  const double litter_washoff_coefficient;
   const double diffusion_coefficient_; 
   const double decompose_rate;
   const auto_vector<Soilfac*> decompose_soil_factor; // List of soil factors.
@@ -1066,9 +1067,11 @@ ChemicalStandard::tick_top (const Vegetation& vegetation,
   const double litter_bypass = below_canopy - litter_in;
 
   const double old_litter_storage = litter_storage;
+  const double litter_washoff_rate 
+    = litter_washoff_coefficient * litter_leak_rate;
   double litter_absolute_loss_rate;
   first_order_change (old_litter_storage, litter_in,
-                      litter_leak_rate + litter_decompose_rate, dt,
+		      litter_decompose_rate + litter_washoff_rate, dt,
                       litter_storage, litter_absolute_loss_rate);
   divide_loss (litter_absolute_loss_rate, 
                litter_decompose_rate, litter_leak_rate,
@@ -2063,6 +2066,7 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
                             : (al.check ("litter_decompose_halftime")
                                ? halftime_to_rate (al.number ("litter_decompose_halftime"))
                                : canopy_dissipation_rate)),
+    litter_washoff_coefficient (al.number ("litter_washoff_coefficient")),
     diffusion_coefficient_ (al.number ("diffusion_coefficient") * 3600.0),
     decompose_rate (al.check ("decompose_rate")
                     ? al.number ("decompose_rate")
@@ -2360,6 +2364,9 @@ You must specify it with either 'surface_decompose_halftime' or\n\
 You must specify it with either 'litter_decompose_halftime' or\n\
 'litter_decompose_rate'.  If neither is specified,\n\
 'canopy_dissipation_rate' is used.");
+    frame.declare_fraction ("litter_washoff_coefficient", Attribute::Const, "\
+Fraction of the chemical that follows the water off the litter.");
+    frame.set ("litter_washoff_coefficient", 1.0);
     frame.declare ("litter_decompose_halftime", "h", 
                    Check::positive (), Attribute::OptionalConst,
                    "How fast does the chemical decompose on litter.\n\

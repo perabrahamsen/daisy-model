@@ -6,6 +6,16 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.91
+
+** New 'litter_washoff_coefficient' chimcal parameter.
+
+Control washoff from litter layer, analogue to
+'canopy_washoff_coefficient'. Defaul value is 1, corresponding to
+chemical being fully dissolved in the water. This should give
+identical results as in version 5.90 and before.
+
+
 * 5.90
 
 ** Made 'with-column' useful for soil tests.
