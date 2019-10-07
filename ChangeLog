@@ -1,3 +1,7 @@
+2019-10-07  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.91 released.
+
 2019-10-07  Per Abrahamsen  <pa@plen.ku.com>
 
 	* chemical_std.C (litter_washoff_coefficient): New parameter.
