@@ -706,8 +706,21 @@ setup:
 
 setup2:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	make setupcommon MINGWHOME="$(MINGWHOME32)" MINGWDLL="$(MINGWDLL32)" OBJHOME=win32-portable NSISFILE=setup-w32.nsi
+	make setupcommon MINGWHOME="$(MINGWHOME64)" MINGWDLL="$(MINGWDLL64)" OBJHOME=win64-portable NSISFILE=setup-w64.nsi
+#	cp -p daisy-$(TAG)-setup-w32.exe daisy-$(TAG)-setup-w64.exe $(DISTDIR)
+	(cd txt && $(MAKE) dist DISTDIR="$(DISTDIR)" TAG=$(TAG))
+	(cd OpenMI && $(MAKE) checkin);
+	(cd lib && $(MAKE) checkin);
+	(cd sample && $(MAKE) checkin);
+	(cd txt && $(MAKE) checkin);
+	-git add $(TEXT)
+	-rm -f $(REMOVE) 
+	-git rm -f --ignore-unmatch $(REMOVE) 
+	git commit -a -m "Version $(TAG)"
 	git tag -a release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
 	git push origin --tags
+	git push
 
 debian-setup: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
