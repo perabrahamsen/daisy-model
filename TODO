@@ -15,15 +15,27 @@ Week 49: Prepare "Plantekongressen".
 Week 50-51: Incorporate comments in final raport.
 20/12 Send final report to BCS.
 
-** Letter (Friday)
+** Wait
 
-"attached presentations"
+*** cap numeric features
 
-"Plan for Q4"
+*** normalise numeric features
 
-"Soil profile DB vs Soil DB"
+*** numeric features
 
-** Start ML tutorial
+*** catregorical features: one hot
+
+*** inout layer
+
+*** NN layers
+
+*** train
+
+*** test
+
+*** find probs
+
+*** performance with different thresholds
 
 * Daisy
 

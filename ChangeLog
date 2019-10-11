@@ -1,3 +1,7 @@
+2019-10-11  Per Abrahamsen  <pa@plen.ku.com>
+
+	* heatrect_linear.C (top): New model.
+
 2019-10-07  Per Abrahamsen  <pa@plen.ku.com>
 
 	* chemical_std.C (litter_washoff_coefficient): New parameter.
