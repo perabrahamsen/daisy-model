@@ -1,3 +1,7 @@
+2019-10-11  Per Abrahamsen  <pa@plen.ku.com>
+
+	* heatrect_linear.C (top): New model.
+
 2019-10-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.91 released.

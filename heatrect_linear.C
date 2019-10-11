@@ -25,6 +25,8 @@
 #include "librarian.h"
 #include "frame.h"
 
+// The 'linear' model.
+
 struct HeatrectLinear : public Heatrect
 {
   void solve (const GeometryRect& geo,
@@ -83,5 +85,62 @@ Linear temperature interpolation between top and bottom.")
   void load_frame (Frame&) const
   { }
 } HeatrectLinear_syntax;
+
+// The 'top' model.
+
+struct HeatrectTop : public Heatrect
+{
+  void solve (const GeometryRect& geo,
+              const std::vector<double>& q_water,
+              const std::vector<double>& S_water,
+              const std::vector<double>& S_heat,
+              const std::vector<double>& capacity_new,
+              const std::vector<double>& conductivity,
+              const double T_top,
+              const double T_top_new,
+              const double T_bottom,
+              std::vector<double>& T,
+              const double dt, Treelog&) const;
+  // Create.
+  HeatrectTop (const BlockModel& al)
+    : Heatrect (al)
+  { }
+  ~HeatrectTop ()
+  { }
+};
+
+void
+HeatrectTop::solve (const GeometryRect& geo,
+		    const std::vector<double>& /* q_water */,
+		    const std::vector<double>& /* S_water */,
+		    const std::vector<double>& /* S_heat */,
+		    const std::vector<double>& /* capacity_new */,
+		    const std::vector<double>& /* conductivity */,
+		    const double T_top_old,
+		    const double T_top_new,
+		    const double /* T_bottom */,
+		    std::vector<double>& T,
+		    const double /* dt*/ , Treelog&) const
+{
+  const size_t cell_size = geo.cell_size ();
+  const double T_top = (T_top_new + T_top_old) / 2.0;
+
+  for (size_t c = 0; c < cell_size; c++)
+    T[c] = T_top;
+}
+
+static struct HeatrectTopSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new HeatrectTop (al); }
+
+  HeatrectTopSyntax ()
+    : DeclareModel (Heatrect::component, "top", "\
+Soil temperature is equal to upper boundary.\n\
+This can be used for a poorly isolated soil column.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} HeatrectTop_syntax;
 
 // heatrect_linear.C ends here.

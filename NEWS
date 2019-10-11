@@ -6,6 +6,21 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.92
+
+** New 'top' heatrect model.
+
+This force the entire soil profile to have the temperature of the
+upper boundary, usually the air temperature. Usuful for a colun
+experiment where the column is not isolated.
+
+It only works with 2D setups. Use
+
+  (Movement rectangle
+	    (heat top)
+
+to activate.
+
 * 5.91
 
 ** New 'litter_washoff_coefficient' chimcal parameter.
