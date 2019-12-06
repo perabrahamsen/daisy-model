@@ -6,6 +6,17 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.93
+
+** New 'root_homogeneity' horizon parameter.
+
+The value is multiplied to the effective root density for this
+horizon, affecting water and nitrogen uptake. Is will not affect the
+root mass, or rhizodeposition.
+
+Set it to a value smaller than 1 to emulate the effect of soil
+compaction.
+
 * 5.92
 
 ** New 'top' heatrect model.

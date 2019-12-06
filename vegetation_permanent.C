@@ -147,9 +147,9 @@ struct VegetationPermanent : public Vegetation
   std::string crop_names () const
   { return objid.name (); }
 
-  const std::vector<double>& root_density () const
-  { return root_system->Density; }
-  const std::vector<double>& root_density (symbol crop) const
+  const std::vector<double>& effective_root_density () const
+  { return root_system->effective_density (); }
+  const std::vector<double>& effective_root_density (symbol crop) const
   { 
     static const std::vector<double> empty;
     return empty;
@@ -208,12 +208,12 @@ struct VegetationPermanent : public Vegetation
   { }
   void sow (const Scope&, const FrameModel&, 
             const double, const double, const double,
-            const Geometry&, OrganicMatter&, const double, 
+            const Geometry&, const Soil&, OrganicMatter&, 
             double&, double&, const Time&, Treelog&)
   { throw "Can't sow on permanent vegetation"; }
   void sow (const Scope&, Crop&, 
             const double, const double, const double,
-            const Geometry&, OrganicMatter&, const double, 
+            const Geometry&, const Soil&, OrganicMatter&, 
             double&, double&, const Time&, Treelog&)
   { throw "Can't sow on permanent vegetation"; }
   void output (Log&) const;
@@ -392,8 +392,9 @@ VegetationPermanent::initialize (const Scope&, const Time& time,
                                  Treelog& msg)
 {
   reset_canopy_structure (time);
-  root_system->initialize (geo, 0.0, 0.0, msg);
-  root_system->full_grown (geo, soil.MaxRootingHeight (), WRoot, msg);
+  root_system->initialize (geo, soil, 0.0, 0.0, msg);
+  root_system->
+    full_grown (geo, soil, WRoot, msg);
 
   static const symbol vegetation_symbol ("vegetation");
   static const symbol dead_symbol ("dead");

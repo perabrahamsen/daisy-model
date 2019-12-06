@@ -155,9 +155,9 @@ struct VegetationAfforestation : public Vegetation
   std::string crop_names () const
   { return objid.name (); }
 
-  const std::vector<double>& root_density () const
-  { return root_system->Density; }
-  const std::vector<double>& root_density (symbol crop) const
+  const std::vector<double>& effective_root_density () const
+  { return root_system->effective_density (); }
+  const std::vector<double>& effective_root_density (symbol crop) const
   { 
     static const std::vector<double> empty;
     return empty;
@@ -216,11 +216,11 @@ struct VegetationAfforestation : public Vegetation
   { }
   void sow (const Scope&, const FrameModel&, 
             const double, const double, const double,
-            const Geometry&, OrganicMatter&, const double, 
+            const Geometry&, const Soil&, OrganicMatter&, 
             double&, double&, const Time&, Treelog&)
   { throw "Can't sow on afforestation vegetation"; }
   void sow (const Scope&, Crop&, const double, const double, const double,
-            const Geometry&, OrganicMatter&, const double, 
+            const Geometry&, const Soil&, OrganicMatter&, 
             double&, double&, const Time&, Treelog&)
   { throw "Can't sow on afforestation vegetation"; }
   void output (Log&) const;
@@ -322,14 +322,15 @@ VegetationAfforestation::tick (const Scope&,
           organic_matter.add (*AM_root);
 
         }
+      const std::vector<double>& Density = root_system->actual_density ();
       AM_root->add_surface (geo,
                             C * m2_per_cm2 * dt, N * m2_per_cm2 * dt,
-                            root_system->Density);
+                            Density);
 
       N_rhizo = N;
       residuals_DM += DM;
-      geo.add_surface (residuals_C_soil, root_system->Density, C * m2_per_cm2);
-      geo.add_surface (residuals_N_soil, root_system->Density, N * m2_per_cm2);
+      geo.add_surface (residuals_C_soil, Density, C * m2_per_cm2);
+      geo.add_surface (residuals_N_soil, Density, N * m2_per_cm2);
     }
   
   // Litterfall.
@@ -407,8 +408,8 @@ VegetationAfforestation::initialize (const Scope&, const Time& time,
   const double d = time.yday () + time.hour () / 24.0;
   
   reset_canopy_structure (y, d);
-  root_system->initialize (geo, 0.0, 0.0, msg);
-  root_system->full_grown (geo, soil.MaxRootingHeight (), WRoot, msg);
+  root_system->initialize (geo, soil, 0.0, 0.0, msg);
+  root_system->full_grown (geo, soil, WRoot, msg);
 
   static const symbol vegetation_symbol ("vegetation");
   static const symbol dead_symbol ("dead");

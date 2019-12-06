@@ -1,19 +1,138 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* RAINPROOF
+
+Check desktop computer
+
+* COMMIT - CPE
+
+** Efterafgrøde har positiv effekt, specielt uden pakning
+
+*** Både i Tåstrup og Flakkebjerg
+
+*** Ingen vejrdata for Flakkebjerg
+
+** Hypoteser:
+
+*** Mere denit ved pakning uden efterafgrøder
+
+*** Bedre rodvækst uden pakning med efterafgrøder
+
+** Størst effekt våde år?
+
+** Rodvækst: Heterogenity
+
+Ny horizon parmater: Root heterogenity factor
+Evt soil: Root heterogenity (depth)
+
+Ganges på "density" i alle celler i den horizont.
+
+Simulerer en situation hvor rødderne ikke er perfekte fordelt i horisonten.
+
+** Scenarier
+
+1: Uden compaction
+
+2: Med compaction
+
+3: Med compaction og høj heterogenitet
+
+* Mandag
+
+** Spørg Søren om Monheim
+
+** Bed Gitte bestille biletter
+
+
+
+
+* Now
+
+** Task 0
+
+date based data overview figures and scripts 2 Maja
+
+** Task 1
+
+Description of W model
+
+** Task 2
+
+Weather section in results
+
+
+* RAINPROOF meeting
+
+Draft next Friday 29/11
+
+Comments Friday 7/12
+
+Final report 20/12
+
+** Bill 6/12?
+
+** Conclusion
+
+Locatition needed
+
+* API
+
+** document scripts
+
+** predict_M.py
+
+** predict_WV.py
+
+** dict?
+
+* Introduction
+
+** M model for Rør/Flak
+
+** Virker modelen? Site calib
+
+* RAINPROOF week plan Per
+
+** 45 Highlights
+
+** 46 API
+
+** 47 Introduction + Mat & Met + Results
+
+** 48 Discussion and COnclusions
+
+** 49 COMMIT
+
+** 50 COMMIT 
+
+
+* COMMIT
+
+** Find gammel præsentation
+
+** Opdater nyeste tal
+
+** Har betydning med efterafgrøder? Hvad sker der med ekstra N
+
 * RAINPROOF 
 
-** Plan for Q4
+** Code to call model
 
-Week 40-44: Final tests
+*** Use it on some Rørrendegaard/Flakkebjerg results
 
-Week 45-48: Writing draft of final report.
-29/11 Send draft to BCS and VIP group.
+** How to handle 5 day opt periods?
 
-Week 49: Prepare "Plantekongressen".
-6/12 Receive comments from BCS and VIP group.
+Date based or "5 typical days".
 
-Week 50-51: Incorporate comments in final raport.
-20/12 Send final report to BCS.
+Seem to be a lot of variation.
+
+Try "all"?
+
+Try many, find average?
+
+** Document pa-.py scripts
+
+** SC meeting
 
 ** Wait
 
@@ -23,7 +142,9 @@ Week 50-51: Incorporate comments in final raport.
 
 *** numeric features
 
-*** catregorical features: one hot
+*** categorical features: one hot
+
+BBCH = one_hot?
 
 *** inout layer
 

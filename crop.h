@@ -148,19 +148,20 @@ public:
   virtual double N_fixated () const = 0; // N content [kg N/ha/h]
   virtual double total_N () const = 0; // N content [kg N/ha]
   virtual double total_C () const = 0; // C content [kg C/ha]
-  virtual const std::vector<double>& root_density () const = 0;
+  virtual const std::vector<double>& effective_root_density () const = 0;
 
   // Create and Destroy.
 public:
   static const VCheck& check_all ();
   static const VCheck& check_library ();
   static const VCheck& check_buildable ();
-  virtual void initialize (const Scope&, const Geometry&, OrganicMatter&, 
-                           double SoilLimit, const Time& now, Treelog&) = 0;
-  virtual void initialize (const Scope&, const Geometry&,
+  virtual void initialize (const Scope&, const Geometry&, const Soil&,
+			   OrganicMatter&, 
+                           const Time& now, Treelog&) = 0;
+  virtual void initialize (const Scope&, const Geometry&, const Soil&, 
                            double row_width, double row_pos, double seed,
                            OrganicMatter&, 
-                           double SoilLimit, const Time& now, Treelog&) = 0;
+                           const Time& now, Treelog&) = 0;
   virtual bool check (const Scope&, const Geometry&, Treelog& msg) const = 0;
 protected:
   Crop (const BlockModel&);

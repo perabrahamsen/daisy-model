@@ -206,8 +206,8 @@ SelectVolume::output_array (const std::vector<double>& array)
             const Vegetation& vegetation = column->get_vegetation ();
             const std::vector<double>& root_density 
               = (min_root_crop == wildcard)
-              ? vegetation.root_density ()
-              : vegetation.root_density (min_root_crop);
+              ? vegetation.effective_root_density ()
+              : vegetation.effective_root_density (min_root_crop);
       
             for (size_t i = 0; i < cell.size (); i++)
               {
@@ -245,8 +245,8 @@ SelectVolume::output_array (const std::vector<double>& array)
             const Vegetation& vegetation = column->get_vegetation ();
             const std::vector<double>& root_density 
               = (min_root_crop == wildcard)
-              ? vegetation.root_density ()
-              : vegetation.root_density (min_root_crop);
+              ? vegetation.effective_root_density ()
+              : vegetation.effective_root_density (min_root_crop);
       
             for (size_t i = 0; i < cell.size (); i++)
               {
@@ -284,8 +284,8 @@ SelectVolume::output_array (const std::vector<double>& array)
             const Vegetation& vegetation = column->get_vegetation ();
             const std::vector<double>& root_density 
               = (min_root_crop == wildcard)
-              ? vegetation.root_density ()
-              : vegetation.root_density (min_root_crop);
+              ? vegetation.effective_root_density ()
+              : vegetation.effective_root_density (min_root_crop);
       
             for (size_t i = 0; i < cell.size (); i++)
               {

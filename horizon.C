@@ -57,6 +57,7 @@ struct Horizon::Implementation
   const double C_per_N;
   /* const */ std::vector<double> SOM_fractions;
   const double turnover_factor;
+  const double root_homogeneity;
   const double K_factor;
   const double anisotropy;
   typedef std::map<symbol, double> double_map;
@@ -201,6 +202,7 @@ Horizon::Implementation::Implementation (const BlockModel& al)
                    ? al.number_sequence ("SOM_fractions")
                    : std::vector<double> ()),
     turnover_factor (al.number ("turnover_factor")),
+    root_homogeneity (al.number ("root_homogeneity")),
     K_factor (al.number ("K_factor")),
     anisotropy (al.number ("anisotropy")),
     attributes (get_attributes (al.submodel_sequence ("attributes"))),
@@ -256,6 +258,10 @@ Horizon::C_per_N () const
 double
 Horizon::turnover_factor () const
 { return impl->turnover_factor; }
+
+double
+Horizon::root_homogeneity () const
+{ return impl->root_homogeneity; }
 
 double
 Horizon::anisotropy () const
@@ -556,6 +562,12 @@ Negative numbers mean unspecified, let Daisy find appropriate values.");
 Factor multiplied to the turnover rate for all organic matter pools in\n\
 this horizon.");
     frame.set ("turnover_factor", 1.0);
+    frame.declare ("root_homogeneity", Attribute::None (), Check::non_negative (),
+                   Attribute::Const, "\
+Factor multiplied to the root density of all crops in this horizon.\n\
+The idea is to emulate the effect of roots not being distributed\n\
+evenly in the soil.");
+    frame.set ("root_homogeneity", 1.0);
     frame.declare ("K_factor", Attribute::None (), Check::positive (),
                    Attribute::Const, "\
 Factor multiplied to the hydraulic conductivity.");

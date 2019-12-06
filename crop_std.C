@@ -212,18 +212,18 @@ struct CropStandard : public Crop
   { return production.total_N (); }
   double total_C () const
   { return production.total_C (); }
-  const std::vector<double>& root_density () const
-  { return root_system->Density; }
+  const std::vector<double>& effective_root_density () const
+  { return root_system->effective_density (); }
 
   // Create and Destroy.
-  void initialize (const Scope&, const Geometry& geometry, 
+  void initialize (const Scope&, const Geometry& geometry, const Soil&,
                    double row_width, double row_pos, double seed,
-                   OrganicMatter&, double SoilLimit, const Time&, Treelog&);
-  void initialize (const Scope&, const Geometry&, OrganicMatter&, 
-                   double SoilLimit, const Time&, Treelog&);
+                   OrganicMatter&, const Time&, Treelog&);
+  void initialize (const Scope&, const Geometry&, const Soil&, OrganicMatter&, 
+                   const Time&, Treelog&);
   void initialize_shared (const Scope&,
-                          const Geometry&, OrganicMatter&, 
-                          double SoilLimit, const Time&, Treelog&);
+                          const Geometry&, const Soil&, OrganicMatter&, 
+                          const Time&, Treelog&);
   bool check (const Scope&, const Geometry&, Treelog&) const;
   CropStandard (const BlockModel& vl);
   ~CropStandard ();
@@ -261,35 +261,35 @@ CropStandard::SOrg_DM () const
 { return production.WSOrg * 10.0 /* [g/m^2 -> kg/ha] */;}
 
 void
-CropStandard::initialize (const Scope& scope, const Geometry& geo, 
+CropStandard::initialize (const Scope& scope, const Geometry& geo,
+			  const Soil& soil,
                           const double row_width, const double row_pos, 
                           const double seed_w,
                           OrganicMatter& organic_matter,
-                          const double SoilLimit,
                           const Time& now, Treelog& msg)
 {
   TREELOG_MODEL (msg);
-  root_system->initialize (geo, row_width, row_pos, msg);
+  root_system->initialize (geo, soil, row_width, row_pos, msg);
   seed->initialize (seed_w, msg);
-  initialize_shared (scope, geo, organic_matter, SoilLimit, now, msg);
+  initialize_shared (scope, geo, soil, organic_matter, now, msg);
 }
 
 void
-CropStandard::initialize (const Scope& scope, const Geometry& geo, 
+CropStandard::initialize (const Scope& scope,
+			  const Geometry& geo, const Soil& soil, 
                           OrganicMatter& organic_matter,
-                          const double SoilLimit,
                           const Time& now, Treelog& msg)
 {
   TREELOG_MODEL (msg);
-  root_system->initialize (geo, msg);
+  root_system->initialize (geo, soil, msg);
   seed->initialize (-42.42e42, msg);
-  initialize_shared (scope, geo, organic_matter, SoilLimit, now, msg);
+  initialize_shared (scope, geo, soil, organic_matter, now, msg);
 }
 
 void
-CropStandard::initialize_shared (const Scope& scope, const Geometry& geo, 
+CropStandard::initialize_shared (const Scope& scope, const Geometry& geo,
+				 const Soil& soil,
                                  OrganicMatter& organic_matter,
-                                 const double SoilLimit,
                                  const Time& now, Treelog& msg)
 {
   if (sow_time == Time::null ())
@@ -313,7 +313,7 @@ CropStandard::initialize_shared (const Scope& scope, const Geometry& geo,
 		   // We don't save the forced CAI, use simulated CAI
 		   //  until midnight (small error).
 		   seed_CAI);
-      root_system->set_density (geo, SoilLimit, production.WRoot, DS, msg);
+      root_system->set_density (geo, soil, production.WRoot, DS, msg);
       nitrogen->content (DS, production, msg);
     }
 }
@@ -647,7 +647,7 @@ CropStandard::tick (const Scope& scope,
   daisy_assert (std::isfinite (T_soil_3));
   const double seed_C = seed->release_C (dt);
   production.tick (bioclimate.daily_air_temperature (), T_soil_3,
-		   root_system->Density, geo, DS, 
+		   root_system->actual_density (), geo, DS, 
 		   canopy->CAImRat, *nitrogen, nitrogen_stress, NNI, seed_C, 
                    partition, 
 		   residuals_DM, residuals_N_top, residuals_C_top,
@@ -721,7 +721,7 @@ CropStandard::harvest (const symbol column_name,
 
   const Harvest& harvest 
     = harvesting->harvest (column_name, objid, 
-                           root_system->Density,
+                           root_system->actual_density (),
                            sow_time, emerge_time, flowering_time, ripe_time,
                            time, geometry, production, development->DS,
                            stem_harvest, leaf_harvest, 1.0,
@@ -794,7 +794,7 @@ CropStandard::pluck (const symbol column_name,
   // Harvest.
   const Harvest& harvest 
     = harvesting->harvest (column_name, objid, 
-                           root_system->Density,
+                           root_system->actual_density (),
                            sow_time, emerge_time, flowering_time, ripe_time,
                            time, geometry, production, development->DS,
                            stem_harvest, leaf_harvest, sorg_harvest,

@@ -1,3 +1,12 @@
+2019-12-05  Per Abrahamsen  <pa@plen.ku.com>
+
+	* vegetation_afforestation.C: Update caller.
+
+	* root_system.h (EffectiveDensity): New log variable.
+	(actual_density, effective_density): New accessors.
+
+	* horizon.C, horizon.h, soil.C, soil.h (root_homogenity): New function.
+
 2019-10-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.92 released.

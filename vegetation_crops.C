@@ -162,8 +162,8 @@ struct VegetationCrops : public Vegetation
   std::string crop_names () const;
 
   std::vector<double> total_root_density;
-  const std::vector<double>& root_density () const;
-  const std::vector<double>& root_density (symbol crop) const;
+  const std::vector<double>& effective_root_density () const;
+  const std::vector<double>& effective_root_density (symbol crop) const;
 
   // Simulation.
   void reset_canopy_structure (Treelog&);
@@ -230,16 +230,14 @@ struct VegetationCrops : public Vegetation
             const double row_width /* [cm] */,
             const double row_pos /* [cm] */,
             const double seed /* [kg w.w./ha] */,
-            const Geometry&, OrganicMatter&, 
-            double SoilLimit,
+            const Geometry&, const Soil&, OrganicMatter&, 
             double& seed_N /* kg/ha */, double& seed_C /* kg/ha */,
             const Time&, Treelog&);
   void sow (const Scope&, Crop& crop, 
             const double row_width /* [cm] */,
             const double row_pos /* [cm] */,
             const double seed /* [kg w.w./ha] */,
-            const Geometry&, OrganicMatter&, 
-            double SoilLimit,
+            const Geometry&, const Soil&, OrganicMatter&, 
             double& seed_N /* kg/ha */, double& seed_C /* kg/ha */,
             const Time&, Treelog&);
   void output (Log&) const;
@@ -440,17 +438,17 @@ VegetationCrops::crop_names () const
 }
 
 const std::vector<double>& 
-VegetationCrops::root_density () const
+VegetationCrops::effective_root_density () const
 { return total_root_density; }
 
 const std::vector<double>& 
-VegetationCrops::root_density (symbol name) const
+VegetationCrops::effective_root_density (symbol name) const
 { 
   for (CropList::const_iterator crop = crops.begin();
        crop != crops.end();
        crop++)
     if ((*crop)->objid == name)
-      return (*crop)->root_density ();
+      return (*crop)->effective_root_density ();
 
   static const std::vector<double> empty;
   return empty;
@@ -574,7 +572,7 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
 	}
 
       // Roots.
-      const std::vector<double>& root_density = (*crop)->root_density ();
+      const std::vector<double>& root_density = (*crop)->effective_root_density ();
       for (size_t i = 0; i < root_density.size (); i++)
 	if (total_root_density.size () > i)
 	  total_root_density[i] += root_density[i];
@@ -914,9 +912,8 @@ VegetationCrops::sow (const Scope& scope, const FrameModel& al,
                       const double row_width,
                       const double row_pos,
                       const double seed,
-		      const Geometry& geo,
+		      const Geometry& geo, const Soil& soil, 
 		      OrganicMatter& organic_matter, 
-                      const double SoilLimit,
                       double& seed_N, double& seed_C, const Time& time, 
                       Treelog& msg)
 {
@@ -926,8 +923,8 @@ VegetationCrops::sow (const Scope& scope, const FrameModel& al,
       msg.error ("Sowing failed");
       return;
     }
-  sow (scope, *crop, row_width, row_pos, seed, geo, organic_matter,
-       SoilLimit, seed_N, seed_C, time, msg);
+  sow (scope, *crop, row_width, row_pos, seed, geo, soil, organic_matter,
+       seed_N, seed_C, time, msg);
 }
 
 void
@@ -935,9 +932,8 @@ VegetationCrops::sow (const Scope& scope, Crop& crop,
                       const double row_width,
                       const double row_pos,
                       const double seed,
-		      const Geometry& geo,
+		      const Geometry& geo, const Soil& soil, 
 		      OrganicMatter& organic_matter, 
-                      const double SoilLimit,
                       double& seed_N, double& seed_C, const Time& time, 
                       Treelog& msg)
 {
@@ -948,8 +944,8 @@ VegetationCrops::sow (const Scope& scope, Crop& crop,
     if ((*i)->objid == name)
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
-  crop.initialize (scope, geo, row_width, row_pos, seed, organic_matter,
-		   SoilLimit, time, msg);
+  crop.initialize (scope, geo, soil, row_width, row_pos, seed, organic_matter,
+		   time, msg);
   if (!crop.check (scope, geo, msg))
     {
       msg.error ("Sow failed");
@@ -985,14 +981,13 @@ VegetationCrops::output (Log& log) const
 }
 
 void
-VegetationCrops::initialize (const Scope& scope, const Time& time, const Geometry& geo,
-                             const Soil& soil, 
+VegetationCrops::initialize (const Scope& scope, const Time& time,
+			     const Geometry& geo, const Soil& soil, 
 			     OrganicMatter& organic_matter,
                              Treelog& msg)
 {
-  const double SoilLimit = -soil.MaxRootingHeight ();
   for (unsigned int i = 0; i < crops.size (); i++)
-    crops[i]->initialize (scope, geo, organic_matter, SoilLimit, time, msg);
+    crops[i]->initialize (scope, geo, soil, organic_matter, time, msg);
 
   reset_canopy_structure (msg);
 }

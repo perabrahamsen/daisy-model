@@ -71,6 +71,7 @@ public:
   const std::vector<double>& SOM_C_per_N () const;
   double C_per_N () const;
   double turnover_factor () const;
+  double root_homogeneity () const;
 
   // Chemistry.
 public:

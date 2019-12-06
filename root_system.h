@@ -69,7 +69,14 @@ private:
   double PotRtDpt;	        // Potential Root Penetration Depth [cm]
 public:
   double Depth;			// Rooting Depth [cm]
+private:
   std::vector<double> Density;	// Root density [cm/cm3] in soil layers
+  std::vector<double> EffectiveDensity;	// Effective root density [cm/cm3]
+public:
+  const std::vector<double>& actual_density () const
+  { return Density; }
+  const std::vector<double>& effective_density () const
+  { return EffectiveDensity; }
 private:
   std::vector<double> H2OExtraction; // Extraction of H2O in soil [cm³/cm³/h]
   std::vector<double> NH4Extraction; // Extraction of NH4-N in soil [gN/cm³/h]
@@ -128,17 +135,16 @@ public:
                      double dt);
   void tick_daily (const Geometry&, const Soil&, const SoilWater&,
 		   double WRoot, bool root_growth, double DS, Treelog&);
-  void set_density (const Geometry& geometry, double SoilLimit, 
+  void set_density (const Geometry& geometry, const Soil& soil,
                     double WRoot, double DS, Treelog&);
-  void full_grown (const Geometry&, double max_rooting_depth, double WRoot, 
-                   Treelog&);
+  void full_grown (const Geometry&, const Soil&, double WRoot, Treelog&);
   void output (Log& log) const;
 
   // Create and Destroy
 public:
-  void initialize (const Geometry& geo, 
+  void initialize (const Geometry& geo, const Soil& soil, 
                    double row_width, double row_pos, Treelog& msg);
-  void initialize (const Geometry& geo, Treelog& msg);
+  void initialize (const Geometry& geo, const Soil&, Treelog& msg);
   bool check (const Geometry& geo, Treelog& msg) const;
   static void load_syntax (Frame&);
   RootSystem (const Block& al);

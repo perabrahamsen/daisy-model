@@ -89,8 +89,8 @@ public:
   virtual double DM_by_name (symbol name, double height) const = 0;// Shoot DM [kg/ha]
   virtual double SOrg_DM_by_name (symbol name) const = 0;// SOrg DM [kg/ha]
   virtual std::string crop_names () const = 0;
-  virtual const std::vector<double>& root_density () const = 0;
-  virtual const std::vector<double>& root_density (symbol name) const = 0;
+  virtual const std::vector<double>& effective_root_density () const = 0;
+  virtual const std::vector<double>& effective_root_density (symbol name) const = 0;
   
 
   // Simulation
@@ -159,16 +159,14 @@ public:
   virtual void sow (const Scope&, const FrameModel& al, 
                     double row_width /* [cm] */, double row_pos /* [cm] */, 
                     double seed /* kg w.w./ha */,
-                    const Geometry&, OrganicMatter&, 
-                    double SoilLimit /* [cm] */,
+                    const Geometry&, const Soil&, OrganicMatter&, 
                     double& seed_N /* [kg N/ha] */,
                     double& seed_C /* [kg C/ha] */,
                     const Time&, Treelog& msg) = 0;
   virtual void sow (const Scope&, Crop&, 
                     double row_width /* [cm] */, double row_pos /* [cm] */, 
                     double seed /* kg w.w./ha */,
-                    const Geometry&, OrganicMatter&, 
-                    double SoilLimit /* [cm] */,
+                    const Geometry&, const Soil&, OrganicMatter&, 
                     double& seed_N /* [kg N/ha] */,
                     double& seed_C /* [kg C/ha] */,
                     const Time&, Treelog& msg) = 0;

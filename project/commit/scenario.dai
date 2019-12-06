@@ -85,7 +85,18 @@
   (activate_output (after 3000 09 1 00))
   (output harvest
 	  ("Field water" (when (and (month 9) (mday 1) (hour 0))))
-	  ("Field nitrogen" (when (and (month 9) (mday 1) (hour 0))))))
+	  ("Field nitrogen" (when (and (month 9) (mday 1) (hour 0))))
+	  ("Soil water" (when (and (month 9) (mday 1) (hour 0))))
+	  ("Soil nitrogen" (when (and (month 9) (mday 1) (hour 0))))
+	  ("Soil water" (when (and (month 9) (mday 1) (hour 0)))
+	   (from 0 [cm]) (to -25 [cm]))
+	  ("Soil nitrogen" (when (and (month 9) (mday 1) (hour 0)))
+	   (from 0 [cm]) (to -25 [cm]))
+	  ("Soil water" (when (and (month 9) (mday 1) (hour 0)))
+	   (from -25 [cm]) (to -200 [cm]))
+	  ("Soil nitrogen" (when (and (month 9) (mday 1) (hour 0)))
+	   (from -25 [cm]) (to -200 [cm]))
+	  ))
 
 (defprogram "Block 2, Treatment 0" COMMIT
   (column "Block 2, Treatment 0")
@@ -102,6 +113,14 @@
 (defprogram "Block 3, Treatment 6" COMMIT
   (column "Block 3, Treatment 6")
   (log_prefix "scn/B3T6/")) 
+
+(defprogram "Block 3, Treatment 6, Root 1" COMMIT
+  (column "Block 3, Treatment 6, Root 1")
+  (log_prefix "scn/B3T6R1/")) 
+
+(defprogram "Block 3, Treatment 6, Root 10" COMMIT
+  (column "Block 3, Treatment 6, Root 10")
+  (log_prefix "scn/B3T6R10/")) 
 
 ;;; scenario.dai ends here.
 

@@ -165,16 +165,16 @@ public:
   { return 0.0; }
   double total_N () const;
   double total_C () const;
-  const std::vector<double>& root_density () const
-  { return root_system->Density; }
+  const std::vector<double>& effective_root_density () const
+  { return root_system->effective_density (); }
 
   // Create and Destroy.
 public:
-  void initialize (const Scope&, const Geometry& geo, 
+  void initialize (const Scope&, const Geometry& geo, const Soil&, 
                    double row_width, double row_pos, double seed,
-                   OrganicMatter&, double SoilLimit, const Time&, Treelog&);
-  void initialize (const Scope&, const Geometry& geo, 
-                   OrganicMatter&, double SoilLimit, const Time&, Treelog&);
+                   OrganicMatter&, const Time&, Treelog&);
+  void initialize (const Scope&, const Geometry& geo, const Soil&, 
+                   OrganicMatter&, const Time&, Treelog&);
   bool check (const Scope&, const Geometry& geo, Treelog&) const;
   CropSimple (const BlockModel& vl);
   ~CropSimple ();
@@ -335,16 +335,16 @@ CropSimple::harvest (const symbol column_name,
       static const symbol root_symbol ("root");
       AM& am = AM::create (metalib, geo, time, root_am, objid, root_symbol,
                            AM::Unlocked, msg);
-      daisy_assert (geo.total_soil (root_system->Density) > 0.0);
+      daisy_assert (geo.total_soil (root_system->effective_density ()) > 0.0);
       am.add_surface (geo, 
                       this_far * WRoot * 0.420 * m2_per_cm2,
                       this_far * NRoot * m2_per_cm2,
-                      root_system->Density);
+                      root_system->actual_density ());
       residuals.push_back (&am);
       residuals_DM += this_far * WRoot;
-      geo.add_surface (residuals_N_soil, root_system->Density,
+      geo.add_surface (residuals_N_soil, root_system->actual_density (),
                        this_far * NRoot * m2_per_cm2);
-      geo.add_surface (residuals_C_soil, root_system->Density, 
+      geo.add_surface (residuals_C_soil, root_system->actual_density (), 
                        this_far * WRoot * 0.420 * m2_per_cm2);
     }
 
@@ -412,26 +412,26 @@ CropSimple::total_C () const
 }
 
 void
-CropSimple::initialize (const Scope&, const Geometry& geo, 
+CropSimple::initialize (const Scope&, const Geometry& geo,
+			const Soil & soil,
                         const double row_width, 
                         const double row_pos, 
                         const double seed,
-                        OrganicMatter&, double /* SoilLimit */,
+                        OrganicMatter&, 
                         const Time&, Treelog& msg)
 {
   TREELOG_MODEL (msg);
   if (seed >= 0)
     msg.warning ("Seed ignored by simple crop model");
-  root_system->initialize (geo, row_width, row_pos, msg);
+  root_system->initialize (geo, soil, row_width, row_pos, msg);
   CropCAI ();
 }
 
 void
-CropSimple::initialize (const Scope&, const Geometry& geo, 
-                        OrganicMatter&, double /* SoilLimit */, 
-                        const Time&, Treelog& msg)
+CropSimple::initialize (const Scope&, const Geometry& geo, const Soil& soil, 
+                        OrganicMatter&, const Time&, Treelog& msg)
 {
-  root_system->initialize (geo, msg);
+  root_system->initialize (geo, soil, msg);
   CropCAI ();
 }
 

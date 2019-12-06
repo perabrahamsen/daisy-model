@@ -234,7 +234,7 @@ ColumnStandard::sow (const Scope& parent_scope, const FrameModel& al,
   ScopeMulti scope (*extern_scope, parent_scope);
 
   vegetation->sow (scope, al, row_width, row_pos, seed,
-                   geometry, *organic_matter, -soil->MaxRootingHeight (),
+                   geometry, *soil, *organic_matter, 
                    seed_N, seed_C, time, msg);
 }
 
@@ -249,7 +249,7 @@ ColumnStandard::sow (const Scope& parent_scope, Crop& crop,
   ScopeMulti scope (*extern_scope, parent_scope);
 
   vegetation->sow (scope, crop, row_width, row_pos, seed,
-                   geometry, *organic_matter, -soil->MaxRootingHeight (),
+                   geometry, *soil, *organic_matter,
                    seed_N, seed_C, time, msg);
 }
 

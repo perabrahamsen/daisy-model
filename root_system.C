@@ -27,6 +27,7 @@
 #include "solupt.h"
 #include "librarian.h"
 #include "geometry.h"
+#include "soil.h"
 #include "soil_heat.h"
 #include "soil_water.h"
 #include "soil.h"
@@ -53,7 +54,7 @@ RootSystem::potential_water_uptake (const double h_x,
                                     const SoilWater& soil_water,
                                     const double dt)
 {
-  const std::vector<double>& L = Density;
+  const std::vector<double>& L = EffectiveDensity;
   std::vector<double>& S = H2OExtraction;
   const size_t size = std::min (S.size (), soil.size ());
   daisy_assert (L.size () >= size);
@@ -210,7 +211,7 @@ RootSystem::water_uptake (double Ept_,
     water_stress = 1.0 - (total + EvapInterception) / (Ept + EvapInterception);
 
   // ABA production.
-  ABAprod->production (geo, soil_water, H2OExtraction, Density,
+  ABAprod->production (geo, soil_water, H2OExtraction, EffectiveDensity,
                        ABAExtraction, msg);
   const double mm_per_cm = 10.0; // [mm/cm]
   if (H2OUpt > 0.0)
@@ -247,11 +248,11 @@ RootSystem::nitrogen_uptake (const Geometry& geo, const Soil& soil,
       Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
 
       NH4Upt = NH4_uptake->value (geo, soil, soil_water,
-                                  Density, H2OExtraction, Rad,
+                                  EffectiveDensity, H2OExtraction, Rad,
                                   soil_NH4, PotNUpt, NH4Extraction,
                                   MxNH4Up, NH4_root_min);
       NO3Upt = NO3_uptake->value (geo, soil, soil_water,
-                                  Density, H2OExtraction, Rad,
+                                  EffectiveDensity, H2OExtraction, Rad,
                                   soil_NO3, PotNUpt - NH4Upt, NO3Extraction, 
                                   MxNO3Up, NO3_root_min);
     }
@@ -323,24 +324,31 @@ RootSystem::tick_daily (const Geometry& geo, const Soil& soil,
       /*max depth determined by crop*/
       Depth = std::min (Depth, SoilLimit); /*or by soil conditions*/
     }
-  set_density (geo, SoilLimit, WRoot, DS, msg);
+  set_density (geo, soil, WRoot, DS, msg);
 }
 
 void
-RootSystem::set_density (const Geometry& geo, const double SoilLimit,
+RootSystem::set_density (const Geometry& geo, const Soil& soil,
                          const double WRoot, const double DS, Treelog& msg)
-{ rootdens->set_density (geo, SoilLimit, PotRtDpt, 
+{
+  const double SoilLimit = -soil.MaxRootingHeight ();
+  rootdens->set_density (geo, SoilLimit, PotRtDpt, 
                          PotRtDpt * (MaxWidth / MaxPen),
-                         WRoot, DS, Density, msg); }
+                         WRoot, DS, Density, msg);
+  daisy_assert (EffectiveDensity.size () == Density.size ());
+  daisy_assert (EffectiveDensity.size () == geo.cell_size ());
+  for (size_t c = 0; c < geo.cell_size (); c++)
+    EffectiveDensity[c] = Density[c] * soil.root_homogeneity (c);
+}
 
 void
-RootSystem::full_grown (const Geometry& geo, 
-                        const double max_rooting_depth,
+RootSystem::full_grown (const Geometry& geo, const Soil& soil,
                         const double WRoot, Treelog& msg)
 {
+  const double SoilLimit = -soil.MaxRootingHeight ();
   PotRtDpt = MaxPen;
-  Depth = std::min (MaxPen, -max_rooting_depth);
-  set_density (geo, -max_rooting_depth, WRoot, 1.0, msg);
+  Depth = std::min (MaxPen, SoilLimit);
+  set_density (geo, soil, WRoot, 1.0, msg);
 }
 
 void
@@ -353,6 +361,7 @@ RootSystem::output (Log& log) const
   output_variable (PotRtDpt, log);
   output_variable (Depth, log);
   output_variable (Density, log);
+  output_variable (EffectiveDensity, log);
   output_variable (H2OExtraction, log);
   output_variable (NH4Extraction, log);
   output_variable (NO3Extraction, log);
@@ -372,7 +381,8 @@ RootSystem::output (Log& log) const
 }
 
 void
-RootSystem::initialize (const Geometry& geo, const double row_width, 
+RootSystem::initialize (const Geometry& geo, const Soil& soil,
+			const double row_width, 
                         const double row_pos, Treelog& msg)
 {
   const bool is_row_crop = row_width > 0.0;
@@ -384,11 +394,11 @@ RootSystem::initialize (const Geometry& geo, const double row_width,
     rootdens = Rootdens::create_uniform (metalib, msg);
 
   rootdens->initialize (geo, row_width, row_pos, msg);
-  initialize (geo, msg);
+  initialize (geo, soil, msg);
 }
 
 void
-RootSystem::initialize (const Geometry& geo, Treelog& msg)
+RootSystem::initialize (const Geometry& geo, const Soil& soil, Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
   ABAprod->initialize (msg);
@@ -396,6 +406,10 @@ RootSystem::initialize (const Geometry& geo, Treelog& msg)
   NO3_uptake->initialize (geo, msg);
   while (Density.size () < cell_size)
     Density.push_back (0.0);
+  EffectiveDensity = Density;
+  daisy_assert (EffectiveDensity.size () == cell_size);
+  for (size_t c = 0; c < cell_size; c++)
+    EffectiveDensity[c] = Density[c] * soil.root_homogeneity (c);
   while (H2OExtraction.size () < cell_size)
     H2OExtraction.push_back (0.0);
   while (NH4Extraction.size () < cell_size)
@@ -486,6 +500,10 @@ The factor is a function of relative water content (Theta/Theta_sat).");
   frame.declare ("Density", "cm/cm^3", Check::non_negative (),
                  Attribute::OptionalState, Attribute::SoilCells,
                  "Root density in soil layers.");
+  frame.declare ("EffectiveDensity", "cm/cm^3", Check::non_negative (),
+                 Attribute::LogOnly, Attribute::SoilCells,
+                 "Effective root density in soil layers.\n\
+This takes heterogeneous distribution of roots in soil into account.");
   frame.declare ("H2OExtraction", "cm^3/cm^3/h", Check::non_negative (), 
                  Attribute::LogOnly, Attribute::SoilCells,
                  "Extraction of H2O in soil layers.");
