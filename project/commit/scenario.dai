@@ -122,5 +122,97 @@
   (column "Block 3, Treatment 6, Root 10")
   (log_prefix "scn/B3T6R10/")) 
 
+(defprogram "T0SBCC10" COMMIT
+  (column "Block 3, Treatment 0")
+  (log_prefix "scn/T0SBCC10/")  
+  (time 2997 08 30 00)
+  (stop 4000 09 02 00)
+  (manager activity
+	   ;; Warmup
+	   (WW)
+	   (WW)
+	   (WW)
+	   (store_SOM)
+	   (repeat (activity ("SB w. CC")
+			     ("SB w. CC")
+			     ("SB w. CC")
+			     ("SB w. CC")
+			     ("SB")
+			     ("WW")
+			     ("WW")
+			     ("WW")
+			     ("WW")
+			     ("WW")
+			     (restore_SOM)))))
+
+(defprogram "T0SB10" COMMIT
+  (column "Block 3, Treatment 0")
+  (log_prefix "scn/T0SB10/")  
+  (time 2997 08 30 00)
+  (stop 4000 09 02 00)
+  (manager activity
+	   ;; Warmup
+	   (WW)
+	   (WW)
+	   (WW)
+	   (store_SOM)
+	   (repeat (activity ("SB")
+			     ("SB")
+			     ("SB")
+			     ("SB")
+			     ("SB")
+			     ("WW")
+			     ("WW")
+			     ("WW")
+			     ("WW")
+			     ("WW")
+			     (restore_SOM)))))
+
+(defprogram "T6SBCC10" COMMIT
+  (column "Block 3, Treatment 6, Root 10")
+  (log_prefix "scn/T6SBCC10/")  
+  (time 2997 08 30 00)
+  (stop 4000 09 02 00)
+  (manager activity
+	   ;; Warmup
+	   (WW)
+	   (WW)
+	   (WW)
+	   (store_SOM)
+	   (repeat (activity ("SB w. CC")
+			     ("SB w. CC")
+			     ("SB w. CC")
+			     ("SB w. CC")
+			     ("SB")
+			     ("WW")
+			     ("WW")
+			     ("WW")
+			     ("WW")
+			     ("WW")
+			     (restore_SOM)))))
+
+(defprogram "T6SB10" COMMIT
+  (column "Block 3, Treatment 6, Root 10")
+  (log_prefix "scn/T6SB10/")  
+  (time 2997 08 30 00)
+  (stop 4000 09 02 00)
+  (manager activity
+	   ;; Warmup
+	   (WW)
+	   (WW)
+	   (WW)
+	   (store_SOM)
+	   (repeat (activity ("SB")
+			     ("SB")
+			     ("SB")
+			     ("SB")
+			     ("SB")
+			     ("WW")
+			     ("WW")
+			     ("WW")
+			     ("WW")
+			     ("WW")
+			     (restore_SOM)))))
+
 ;;; scenario.dai ends here.
 

@@ -1,162 +1,62 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* RAINPROOF
+* hysteresis
 
-Check desktop computer
+**
 
-* COMMIT - CPE
+(Soil (Hydraulic ... original original ...))
 
-** Efterafgrøde har positiv effekt, specielt uden pakning
-
-*** Både i Tåstrup og Flakkebjerg
-
-*** Ingen vejrdata for Flakkebjerg
-
-** Hypoteser:
-
-*** Mere denit ved pakning uden efterafgrøder
-
-*** Bedre rodvækst uden pakning med efterafgrøder
-
-** Størst effekt våde år?
-
-** Rodvækst: Heterogenity
-
-Ny horizon parmater: Root heterogenity factor
-Evt soil: Root heterogenity (depth)
-
-Ganges på "density" i alle celler i den horizont.
-
-Simulerer en situation hvor rødderne ikke er perfekte fordelt i horisonten.
-
-** Scenarier
-
-1: Uden compaction
-
-2: Med compaction
-
-3: Med compaction og høj heterogenitet
-
-* Mandag
-
-** Spørg Søren om Monheim
-
-** Bed Gitte bestille biletter
+One for each numeric layer
 
 
+** New state variables
 
+** Mofidy functions
 
-* Now
+*** hyseresis (h_old, h)
 
-** Task 0
+*** set_porosity
 
-date based data overview figures and scripts 2 Maja
-
-** Task 1
-
-Description of W model
-
-** Task 2
-
-Weather section in results
-
-
-* RAINPROOF meeting
-
-Draft next Friday 29/11
-
-Comments Friday 7/12
-
-Final report 20/12
-
-** Bill 6/12?
-
-** Conclusion
-
-Locatition needed
-
-* API
-
-** document scripts
-
-** predict_M.py
-
-** predict_WV.py
-
-** dict?
-
-* Introduction
-
-** M model for Rør/Flak
-
-** Virker modelen? Site calib
-
-* RAINPROOF week plan Per
-
-** 45 Highlights
-
-** 46 API
-
-** 47 Introduction + Mat & Met + Results
-
-** 48 Discussion and COnclusions
-
-** 49 COMMIT
-
-** 50 COMMIT 
+*** tillage
 
 
 * COMMIT
 
-** Find gammel præsentation
+** Plot måletal
 
-** Opdater nyeste tal
+*** Regitze
 
-** Har betydning med efterafgrøder? Hvad sker der med ekstra N
+** Kør simulering
 
-* RAINPROOF 
+** Plot sim tal mod måletal
 
-** Code to call model
+** Dokumenter
 
-*** Use it on some Rørrendegaard/Flakkebjerg results
+** Bud på historien
 
-** How to handle 5 day opt periods?
+Vi ser en klar og permament effekt af 6T på underjorden, men ikke en
+tilsvarende effekt på rvi/udbytter
 
-Date based or "5 typical days".
+Kan vi med modellen forklare den manglende effekt?
 
-Seem to be a lot of variation.
+Er der evt en "skjult forskel"?
 
-Try "all"?
+Hvis der er en "skjult forskel", brug scenarier til at analyse om der
+ville være udbytteeffekt andre år, eller over lang tid.
 
-Try many, find average?
+Overvej at beregne "klimaeffekt", denit * n2o faktor + carbon storage
 
-** Document pa-.py scripts
+**
 
-** SC meeting
+csv file med høstdata (per blok)
 
-** Wait
+run sim per plok
 
-*** cap numeric features
+sammenlign sim høst og 
 
-*** normalise numeric features
+prøv nul flux nedre rand
 
-*** numeric features
-
-*** categorical features: one hot
-
-BBCH = one_hot?
-
-*** inout layer
-
-*** NN layers
-
-*** train
-
-*** test
-
-*** find probs
-
-*** performance with different thresholds
+er grundvandsniveauer rimelige?
 
 * Daisy
 

@@ -1,3 +1,7 @@
+2020-02-03  Per Abrahamsen  <pa@plen.ku.com>
+
+	* geometry.C (biopore_pass_pipes): Allow non-zero bottom flux.
+
 2019-12-05  Per Abrahamsen  <pa@plen.ku.com>
 
 	* vegetation_afforestation.C: Update caller.

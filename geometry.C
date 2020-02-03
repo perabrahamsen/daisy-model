@@ -1066,7 +1066,8 @@ Geometry::biopore_pass_pipes (const double pipe_position,
   for (size_t i = 0; i < edge_below_size; i++)
     {
       const size_t edge = edge_below[i];
-      daisy_assert (iszero (flux[edge]));
+      // May not be zero if drain connected biopores with drain below bottom
+      // daisy_assert (iszero (flux[edge]));
       biopore_pass_pipe_above (*this, pipe_position, from_matrix,
                                edge, Geometry::cell_below, 
                                flux, S_from_drain);
