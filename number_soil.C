@@ -33,6 +33,7 @@
 #include "units.h"
 #include "treelog.h"
 #include "frame_model.h"
+#include "secondary.h"
 #include <memory>
 
 struct NumberByDepth : public Number
@@ -302,10 +303,14 @@ struct NumberSoilK : public NumberByTension
 {
   // Simulation.
   double value (const Scope& scope) const
-  { 
-    return horizon->K (units.convert (h->dimension (scope), 
-                                      Units::cm (), 
-                                      h->value (scope)));
+  {
+    const double h_cm = units.convert (h->dimension (scope), 
+				       Units::cm (), 
+				       h->value (scope));
+    const double K_primary = horizon->hydraulic->K (h_cm); 
+    const double K_secondary = horizon->secondary_domain ().K (h_cm);
+    const double K_factor = horizon->K_factor ();
+    return K_factor * std::max (K_primary, K_secondary);
   }
   symbol dimension (const Scope&) const 
   { return units.cm_per_h (); }

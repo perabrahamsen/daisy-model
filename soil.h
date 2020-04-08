@@ -39,6 +39,7 @@ class Treelog;
 class Time;
 class SoilWater;
 class OrganicMatter;
+class Hydraulic;
 
 class Soil : private boost::noncopyable
 {
@@ -50,8 +51,11 @@ public:
 public:
   size_t size () const;
   const Horizon& horizon (size_t i) const;
-
+private:
+  const Hydraulic& hydraulic (size_t i) const;
+  
   // Water.
+public:
   double K (size_t i, double h, double h_ice, double T) const;
   double Cw1 (size_t i, double h, double h_ice) const;
   double Cw2 (size_t i, double h) const;

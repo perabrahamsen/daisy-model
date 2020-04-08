@@ -1,3 +1,20 @@
+2020-03-02  Per Abrahamsen  <pa@plen.ku.com>
+
+	* hydraulic.h, hydraulic.C: Derived from ModelFramed so it can be
+	used in a list.
+	* soil.C (Hydraulic): New parameter.
+	* hydraulic_linear.C: New model.
+	* horizon.h, horizon.C (CEC): New function.
+	* horizon.h, horizon_system.C, horizon_numeric.C (texture): New
+	function.
+
+2020-02-27  Per Abrahamsen  <pa@plen.ku.com>
+
+	* horizon.C, horizon.h (K): Removed.
+	(K_factor): Added.
+	* number_soil.C (NumberSoilK::value): Update caller.
+	* soil.C (K): Update caller.
+
 2020-02-03  Per Abrahamsen  <pa@plen.ku.com>
 
 	* geometry.C (biopore_pass_pipes): Allow non-zero bottom flux.

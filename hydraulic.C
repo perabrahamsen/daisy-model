@@ -89,6 +89,12 @@ void
 Hydraulic::tick (const double, const double, const double, Treelog&)
 { }
 
+void
+Hydraulic::hysteresis (const double /* [h] */,
+		       const double /* [cm] */,
+		       const double /* [cm] */)
+{ }
+
 void 
 Hydraulic::output (Log& log) const
 {
@@ -236,7 +242,7 @@ Hydraulic::check (Treelog& msg) const
 #endif
 
 Hydraulic::Hydraulic (const BlockModel& al)
-  : ModelDerived (al.type_name ()),
+  : ModelFramed (al),
     K_init (al.check ("K_at_h")
 	    ? submodel<K_at_h> (al, "K_at_h")
 	    : NULL),

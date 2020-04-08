@@ -115,7 +115,8 @@ public:
 };
 
 void
-PetFAO_PM_hourly::tick (const Time&, const Weather& weather, const double /* Rn */,
+PetFAO_PM_hourly::tick (const Time& time, const Weather& weather,
+			const double /* Rn */,
                         const Vegetation& crops,
                         const Surface& surface, const Geometry& geo, const Soil& soil,
                         const SoilHeat& soil_heat, const SoilWater& soil_water,
@@ -125,17 +126,29 @@ PetFAO_PM_hourly::tick (const Time&, const Weather& weather, const double /* Rn 
   const double Temp = weather.air_temperature ();
   const double VaporPressure = weather.vapor_pressure ();
   const double U2 = weather.wind ();
-  const double Cloudiness = weather.cloudiness ();
+  double Cloudiness = weather.cloudiness ();
   const double AtmPressure = weather.air_pressure ();
   const double Si = weather.global_radiation ();
-
-  // Ground heat flux.
-  G = soil_heat.top_flux (geo, soil, soil_water);
 
   // Reference net radiation.
   const double ref_albedo = 0.23; // Reference crop.
   net_radiation->tick (Cloudiness, Temp, VaporPressure, Si, ref_albedo, msg);
   Rn = net_radiation->net_radiation ();
+
+  // Ground heat flux.
+  const bool use_Daisy_G = true;
+  if (use_Daisy_G)
+    G = soil_heat.top_flux (geo, soil, soil_water);
+  else
+    {
+      const double rad = weather.extraterrestrial_radiation (time);
+      const bool is_day = rad > 25.0;
+
+      if (is_day)
+	G = 0.1 * Rn;		// FAO56: Eq 45.
+      else
+	G = 0.5 * Rn;		// FAO56: Eq 46.
+    }
 
   reference_evapotranspiration_dry
     = FAO::RefPenmanMonteithAllen2006 (Rn, G, Temp, VaporPressure, U2,

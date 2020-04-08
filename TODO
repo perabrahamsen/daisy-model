@@ -1,25 +1,5 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* hysteresis
-
-**
-
-(Soil (Hydraulic ... original original ...))
-
-One for each numeric layer
-
-
-** New state variables
-
-** Mofidy functions
-
-*** hyseresis (h_old, h)
-
-*** set_porosity
-
-*** tillage
-
-
 * COMMIT
 
 ** Plot måletal
@@ -57,6 +37,183 @@ sammenlign sim høst og
 prøv nul flux nedre rand
 
 er grundvandsniveauer rimelige?
+
+* cloudiness
+
+New module
+
+Selected from bioclimate
+
+weather
+
+Arid/Humid
+
+Weirdo dif/dir
+
+* hysteresis
+
+** Math:
+
+*** We have two retention curves
+
+Theta_w (h) and Theta_d (h)
+
+*** The two curves must have identical endpoints:
+
+Theta_w (0) = Theta_d (0) = Theta_sat
+
+Theta_w (-inf) = Theta_h (-inf) = Theta_res
+
+*** When we switch from drying to wetting, we scale the curve linearly:
+
+(1) Theta_s (h) = Theta_w (h) * alpha + beta
+
+(2) Theta_s (0) = Theta_sat
+
+(3) Theta_s (h_1) = Theta_1
+
+Where (h_1, Theta_1) are the tension and water content at the point
+where we switched from drying to wetting.
+
+We now have two unknowns (alpha and beta) and known points (2) and (3)
+to find them with.
+
+Theta_sat = Theta_sat * alpha + beta
+
+Theta_1 = Theta_w (h_1) * alpha + beta
+
+==>
+
+beta = Theta_1 - Theta_w (h_1) * alpha
+
+Theta_sat = Theta_sat * alpha + Theta_1 - Theta_w (h_1) * alpha
+
+Theta_sat - Theta_1 = (Theta_sat - Theta_w (h_1)) * alpha
+
+alpha = (Theta_sat - Theta_1) / (Theta_sat - Theta_w (h_1))
+beta = Theta_sat / (Theta_sat * alpha)
+
+** How to find Cw2_s (specific water capacity)
+
+(4) Cw2_s (h) = dTheta_s (h) / dh
+
+Insert (1):
+
+(5) Cw2_s (h) = (dTheta_w (h) * alpha + beta) / dh
+
+==> 
+
+(6) Cw2_s (h) = Cw2_w (h) + alpha
+
+** How to find h_s (Theta)
+
+Theta_s (h) = Theta_w (h) * alpha + beta
+
+==>
+
+Theta_w (h) = (Theta_s (h) - beta) / alpha
+
+h_w (Theta_w (h)) = h_w ((Theta_s (h) - beta) / alpha)
+
+h = h_w ((Theta_s (h) - beta) / alpha)
+
+h = h (!)
+
+h_s (Theta_s) = h_w ((Theta_s - beta) / alpha)
+
+** We need two soil->hydraulic
+
+One for state one for fast access
+
+class HydraulicHysteresis : public Hydraulic
+{
+  // The two curves.
+  const Hydraulic& wetting;
+  const Hydraulic& drying;
+
+  // State
+  bool is_wetting;
+  double Theta_alpha;
+  double Theta_beta;
+  double K_alpha;
+  double K_beta;
+
+  double Theta (double h) const
+  {
+    if (is_wetting)     
+      return wetting.Theta (h) * Theta_alpha + Theta_beta;
+   else 
+      return drying.Theta (h) * Theta_alpha + Theta_beta;
+  }
+
+  double h (double Theta) const
+  {
+    if (is_wetting)     
+      return wetting.h ((Theta - Theta_beta) / Theta_alpha);
+   else 
+      return drying.h ((Theta - Theta_beta) / Theta_alpha);
+  }
+
+  double Cw2 (double h) const
+  {
+    if (is_wetting)     
+      return wetting.Cw2 (h) + Theta_alpha ;
+   else 
+      return drying.Cw2 (h) + Theta_alpha;
+  }
+
+  double K (h) const
+  {
+    if (is_wetting)     
+      return wetting.K (h) * K_alpha + K_beta;
+   else 
+      return drying.K (h) * K_alpha + K_beta;
+  }
+  
+  
+  void tick (double h_old, double h, double dt)
+  {
+    if (is_wetting && h_old > h)
+      {
+         Theta_old = Theta (h_old);
+         set_drying (h_old, Theta_old);
+      }
+    if (!is_wetting && h_old < h)
+      {
+         Theta_old = Theta (h_old);
+         set_wetting (h_old, Theta_old);
+      }
+  }
+      
+  void set_wetting (double h_s, double Theta_s)
+  {
+    Theta_sat = wetting.Theta (0)
+    Theta_alpha = (Theta_sat - Theta_s) / (Theta_sat - wetting.Theta (h_s))
+    Theta_beta = Theta_sat / (Theta_sat * alpha)
+    // TODO: Find K_alpha and K_beta
+    is_wetting = true;
+  }
+
+  void set_drying (double h_s, double Theta_s)
+  {
+    // TODO: Find Theta_alpha and Theta_beta
+    // TODO: Find K_alpha and K_beta
+    is_wetting = false;
+  }
+         
+};  
+  
+
+** New state variables
+
+** Mofidy functions
+
+*** hyseresis (h_old, h, dt)
+
+*** set_porosity
+
+*** tillage
+
 
 * Daisy
 

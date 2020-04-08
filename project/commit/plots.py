@@ -123,12 +123,20 @@ def plot_N (col, dim=None, title=None, where=None):
         plt.show ()
     plt.clf ()
 
-plot_sim_yield (where='sim_yield')
-plot_2018_yield (where='2018_yield')
+def plot_gw ():
+    dlf = DaisyDlf(f"regitze/COMMITManual.ddf")
+    dim = dlf.column_units[col]
 
-plot_scn ('sorg_DM', where='sorg_DM')
-plot_scn ('sorg_N', where='sorg_N')
-plot_scn ('WStress', where='WStress')
-plot_scn ('NStress', where='NStress')
+plot_gw ()
 
-plot_N ('Denitrification', where='Denit')
+#plot_sim_yield (where='sim_yield')
+#plot_2018_yield (where='2018_yield')
+
+#plot_scn ('sorg_DM', where='sorg_DM')
+#plot_scn ('sorg_N', where='sorg_N')
+#plot_scn ('WStress', where='WStress')
+#plot_scn ('NStress', where='NStress')
+
+#plot_N ('Denitrification', where='Denit')
+
+

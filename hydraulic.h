@@ -23,7 +23,7 @@
 #ifndef HYDRAULIC_H
 #define HYDRAULIC_H
 
-#include "model_derived.h"
+#include "model_framed.h"
 #include "plf.h"
 #include <memory>
 
@@ -32,7 +32,7 @@ class Treelog;
 class Texture;
 class BlockModel;
 
-class Hydraulic : public ModelDerived
+class Hydraulic : public ModelFramed
 {
   // Content.
 public:
@@ -50,7 +50,7 @@ protected:
   // Standard parameters.
 public:
   double Theta_sat;
-  const double Theta_res;
+  /*const*/ double Theta_res;
   /*const*/ double K_sat;
   inline double porosity () const
   { return Theta_sat; }
@@ -59,7 +59,10 @@ public:
                         double Theta, double AOM15);
   virtual void tick (const double dt /* [h] */, const double rain /* [mm/h] */,
                      const double ice /* */, Treelog& msg);
-
+  virtual void hysteresis (const double dt /* [h] */,
+			   const double h_old /* [cm] */,
+			   const double h /* [cm] */);
+			   
   // Convertion functions.
 public:
   virtual double Theta (double h) const = 0;

@@ -219,6 +219,13 @@ Horizon::Implementation::~Implementation ()
 { }
 
 double
+Horizon::CEC () const
+{
+  daisy_assert (impl->CEC > 0.0);
+  return impl->CEC;
+}
+
+double
 Horizon::dry_bulk_density () const
 { 
   daisy_assert (impl->dry_bulk_density > 0.0);
@@ -287,12 +294,8 @@ Horizon::primary_sorption_fraction () const
 }
 
 double 
-Horizon::K (const double h /* [cm] */) const         // [cm/h]
-{
-  const double K_primary = hydraulic->K (h); 
-  const double K_secondary = secondary_domain ().K (h);
-  return impl->K_factor * std::max (K_primary, K_secondary);
-}
+Horizon::K_factor () const         // []
+{ return impl->K_factor; }
 
 bool
 Horizon::has_attribute (const symbol name) const
@@ -333,7 +336,7 @@ Horizon::nitrification (const double M, const double C,
 
 void 
 Horizon::output (Log& log) const
-{ output_derived (hydraulic, "hydraulic", log); }
+{ output_object (hydraulic, "hydraulic", log); }
 
 
 static const class SOM_fractions_check_type : public VCheck

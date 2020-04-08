@@ -58,7 +58,9 @@ struct Soil::Implementation
 
     // Simulation.
     void output (Log& log) const
-    { output_derived (horizon, "horizon", log); }
+    {
+      output_derived (horizon, "horizon", log);
+    }
 
     // Create and Destroy.
     static void load_syntax (Frame& frame)
@@ -114,9 +116,11 @@ struct Soil::Implementation
     { }
   };
   const auto_vector<const Region*> zones;
+  const auto_vector<Hydraulic*> hyd_cells;
 
   // Access.
   std::vector<Horizon*> horizon_;
+  std::vector<const Hydraulic*> hydraulic_;
 
   // Volume
   std::map<const Horizon*, double> volume;
@@ -213,12 +217,21 @@ struct Soil::Implementation
         const double Ice = total_ice / total_volume;
         hor->hydraulic->tick (dt, rain, Ice, msg);
       }
+
+    // Hysteresis.
+    for (size_t c = 0; c < hyd_cells.size (); c++)
+      {
+	hyd_cells[c]->hysteresis (dt, soil_water.h_old (c), soil_water.h (c));
+      }
   }
 
   // Create and Destroy.
   Implementation (const Block& al)
     : layers (map_submodel_const<Layer> (al, "horizons")),
       zones (map_submodel_const<Region> (al, "zones")),
+      hyd_cells (al.check ("Hydraulic")
+		 ? Librarian::build_vector<Hydraulic> (al, "Hydraulic")
+		 : std::vector<Hydraulic*> ()),
       MaxRootingDepth (al.number ("MaxRootingDepth")),
       dispersivity (al.number ("dispersivity")),
       dispersivity_transversal (al.number ("dispersivity_transversal",
@@ -254,6 +267,10 @@ const Horizon&
 Soil::horizon (size_t i) const
 { return *impl->horizon_[i]; }
 
+const Hydraulic& 
+Soil::hydraulic (size_t i) const
+{ return *impl->hydraulic_[i]; }
+
 double 
 Soil::K (size_t i, double h, double h_ice, double T) const
 { 
@@ -278,7 +295,12 @@ Soil::K (size_t i, double h, double h_ice, double T) const
     ? impl->frozen_water_K_factor
     : viscosity_factor (T);
   const double h_water = std::min (h, h_ice);
-  return horizon (i).K (h_water) * T_factor;
+
+  const double K_primary = hydraulic (i).K (h_water); 
+  const double K_secondary = horizon (i).secondary_domain ().K (h_water);
+  const double K_factor = horizon (i).K_factor ();
+
+  return T_factor * K_factor * std::max (K_primary, K_secondary);
 }
 
 double 
@@ -288,7 +310,7 @@ Soil::Cw1 (size_t i, double h, double h_ice) const
 double
 Soil::Cw2 (size_t i, double h) const
 { 
-  const double answer = horizon (i).hydraulic->Cw2 (h); 
+  const double answer = hydraulic (i).Cw2 (h); 
   if (answer > 0.0)
     return answer;
   // We divide with this.
@@ -298,26 +320,26 @@ Soil::Cw2 (size_t i, double h) const
 double Soil::Theta (size_t i, double h, double h_ice) const
 { 
   if (h < h_ice)
-    return horizon (i).hydraulic->Theta (h);
+    return hydraulic (i).Theta (h);
   else
-    return horizon (i).hydraulic->Theta (h_ice);
+    return hydraulic (i).Theta (h_ice);
 }
 
 double 
 Soil::Theta_res (size_t i) const
-{ return horizon (i).hydraulic->Theta_res; }
+{ return hydraulic (i).Theta_res; }
 
 double 
 Soil::Theta_sat (size_t i) const
-{ return horizon (i).hydraulic->Theta_sat; }
+{ return hydraulic (i).Theta_sat; }
 
 double 
 Soil::h (size_t i, double Theta) const
-{ return horizon (i).hydraulic->h (Theta); }
+{ return hydraulic (i).h (Theta); }
 
 double 
 Soil::M (size_t i, double h) const
-{ return horizon (i).hydraulic->M (h); }
+{ return hydraulic (i).M (h); }
 
 double
 Soil::primary_sorption_fraction (size_t c) const
@@ -358,7 +380,7 @@ Soil::alpha (size_t i) const
 
 double 
 Soil::tortuosity_factor (size_t i, double Theta) const
-{ return horizon (i).tortuosity->factor (*horizon (i).hydraulic, Theta); }
+{ return horizon (i).tortuosity->factor (hydraulic (i), Theta); }
 
 double 
 Soil::anisotropy_cell (size_t c) const
@@ -466,6 +488,7 @@ Soil::output (Log& log) const
 	  impl->zones[i]->output (log);
 	}
     }
+  output_list (impl->hyd_cells, "Hydraulic", log, Hydraulic::component);
 }
 
 void 
@@ -637,6 +660,11 @@ Regions with special soil properties.\n\
 This overrules the 'horizons' paramter.",
 				 Implementation::Region::load_syntax);
   frame.set_empty ("zones");
+  frame.declare_object ("Hydraulic", Hydraulic::component, 
+			Attribute::OptionalState, Attribute::SoilCells,
+			"Hydraulic properties for each cell.\n\
+Use when the hydraulic properties are dynamic and cells specific.\n\
+For example when implementing hysteresis.");
   frame.declare ("MaxRootingDepth", "cm", Check::positive (), Attribute::Const,
 	      "Depth at the end of the root zone (a positive number).");
   frame.declare ("dispersivity", "cm", Check::positive (), 
@@ -760,6 +788,7 @@ Soil::initialize (const Time& time, Geometry& geo,
         }
       last = next;
     }
+  daisy_assert (impl->hydraulic_.size () == 0);
   for (size_t i = 0; i < cell_size; i++)
     {
       // Sanity check.
@@ -771,7 +800,14 @@ Soil::initialize (const Time& time, Geometry& geo,
 
       // Count volume for all horizons.
       impl->volume[impl->horizon_[i]] +=geo.cell_volume (i);
+
+      assert (impl->hydraulic_.size () == i);
+      if (impl->hyd_cells.size () > i)
+	impl->hydraulic_.push_back (impl->hyd_cells[i]);
+      else
+	impl->hydraulic_.push_back (impl->horizon_[i]->hydraulic.get ());
     }
+  daisy_assert (impl->hydraulic_.size () == cell_size);
 
   for (int i = 0; i < impl->zones.size (); i++)
     {
@@ -827,6 +863,27 @@ Soil::initialize (const Time& time, Geometry& geo,
       impl->anisotropy_edge.push_back (aniso);
     }
   daisy_assert (impl->anisotropy_edge.size () == edge_size);
+
+  if (impl->hyd_cells.size () > 0 && impl->hyd_cells.size () != cell_size)
+    {
+      std::ostringstream tmp;
+      tmp << "You have specified explicit hydraulic properties for "
+	  << impl->hyd_cells.size () << " out of " << cell_size << " cells";
+      msg.warning (tmp.str ());
+    }
+  
+  for (size_t c = 0; c < impl->hyd_cells.size (); c++)
+    {
+      const Horizon& h = horizon (c);
+      const double z = geo.cell_z (c);
+      const bool top_soil = z > 30.0;
+      impl->hyd_cells[c]->initialize (h.texture (),
+				      h.dry_bulk_density (),
+				      top_soil,
+				      h.CEC (),
+				      z,
+				      msg);
+    }
 }
 
 Soil::~Soil ()

@@ -57,10 +57,11 @@ public:
   double heat_capacity (double Theta, double Ice) const; // [erg/cm^3/dg C]
   const Secondary& secondary_domain () const;
   double primary_sorption_fraction () const;
-  double K (double h /* [cm] */) const;          // [cm/h]
 
   // Texture.
 public:
+  virtual const Texture& texture () const = 0;
+  double CEC () const;
   std::unique_ptr<Tortuosity> tortuosity;
   double dry_bulk_density () const;
   virtual double texture_below (double size /* [um] */) const = 0;
@@ -72,6 +73,7 @@ public:
   double C_per_N () const;
   double turnover_factor () const;
   double root_homogeneity () const;
+  double K_factor () const;
 
   // Chemistry.
 public:
