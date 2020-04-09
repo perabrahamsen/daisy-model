@@ -15,6 +15,10 @@
 	* number_soil.C (NumberSoilK::value): Update caller.
 	* soil.C (K): Update caller.
 
+2020-02-03  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.93 released.
+
 2020-02-03  Per Abrahamsen  <pa@plen.ku.com>
 
 	* geometry.C (biopore_pass_pipes): Allow non-zero bottom flux.
