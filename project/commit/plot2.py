@@ -65,6 +65,9 @@ block_color = { 1: "skyblue",
                 3: "red",
                 4: "cyan" }
 
+block_hatch = { 2: "/",
+                3: "\\" }
+
 treatment_color = { 'A': "skyblue",
                     'B': "yellow",
                     'C': "red",
@@ -140,6 +143,72 @@ def plot_ww_by_b (crop, block):
     plt.title (title)
     plt.show ()
 
+def plot_DM (crop):
+    data = pd.read_csv ('data/Harvest_DM_N.csv', sep=';')
+    cd = data[(data["F1"] == crop)]
+    width = 1.0 / 9.5
+    column = "hkg DM/ha"
+    for t in ['A', 'B', 'C', 'D']:
+        ct = data[(data["F1"] == crop) & (data["F2"] == t)]
+        color = treatment_color[t]
+        offset = treatment_offset[t]
+        year = ct["Year"]
+        plt.bar (year - 0.5 + offset * width, ct[column], width=width, label=t,
+                 color=color)
+    for t in ['A', 'C']:
+        color = treatment_color[t]
+        treatment = treatment_value[t]
+        for b in [2, 3]:
+            file = f"log/B{b}T{treatment}/harvest.dlf"
+            dlf = DaisyDlf(file)
+            data = dlf.Data
+            offset = treatment_offset_sim[t] + (b - 2) * 2
+            hatch = block_hatch[b]
+            plt.bar (data.index.year - 0.5 + (offset + 3.5)  * width,
+                     data["sorg_DM"] * 10, width=width,
+                     label=f"{t}{b} Daisy", color=color, hatch=hatch)
+    plt.xlabel ('Year')
+    #plt.xlim ([2009, 2019.5])
+    #plt.ylim ([-200, 0])
+    plt.ylabel ('hkg DM grain/ha')
+    plt.legend (loc="lower left")
+    title = "Grain dry matter " + crop_name[crop] + " field"
+    plt.title (title)
+    plt.show ()
+
+def plot_N (crop):
+    data = pd.read_csv ('data/Harvest_DM_N.csv', sep=';')
+    cd = data[(data["F1"] == crop)]
+    width = 1.0 / 9.5
+    column = "kg N grain/ha"
+    for t in ['A', 'B', 'C', 'D']:
+        ct = data[(data["F1"] == crop) & (data["F2"] == t)]
+        color = treatment_color[t]
+        offset = treatment_offset[t]
+        year = ct["Year"]
+        plt.bar (year - 0.5 + offset * width, ct[column], width=width, label=t,
+                 color=color)
+    for t in ['A', 'C']:
+        color = treatment_color[t]
+        treatment = treatment_value[t]
+        for b in [2, 3]:
+            file = f"log/B{b}T{treatment}/harvest.dlf"
+            dlf = DaisyDlf(file)
+            data = dlf.Data
+            offset = treatment_offset_sim[t] + (b - 2) * 2
+            hatch = block_hatch[b]
+            plt.bar (data.index.year - 0.5 + (offset + 3.5)  * width,
+                     data["sorg_N"], width=width,
+                     label=f"{t}{b} Daisy", color=color, hatch=hatch)
+    plt.xlabel ('Year')
+    #plt.xlim ([2009, 2019.5])
+    #plt.ylim ([-200, 0])
+    plt.ylabel ('kg N grain/ha')
+    plt.legend (loc="lower left")
+    title = "Grain N " + crop_name[crop] + " field"
+    plt.title (title)
+    plt.show ()
+
 
 
 # plot_gw ()
@@ -147,6 +216,7 @@ def plot_ww_by_b (crop, block):
 #plot_ww_by_t (crop=1,treatment='A')
 #plot_ww_by_t (crop=1,treatment='C')
 #plot_ww_by_b (crop=1,block=2)
-plot_ww_by_b (crop=1,block=3)
+#plot_ww_by_b (crop=1,block=3)
 
-
+#plot_DM (crop=1)
+plot_N (crop=1)
