@@ -207,9 +207,45 @@ def plot_N (crop):
     plt.legend (loc="lower left")
     title = "Grain N " + crop_name[crop] + " field"
     plt.title (title)
+    if suffix:
+        plt.savefig (f"fig/N.{suffix}")
+    else:
+        plt.show ()
+
+def plot_straw (crop):
+    data = pd.read_csv ('data/Harvest_DM_N.csv', sep=';')
+    cd = data[(data["F1"] == crop)]
+    width = 1.0 / 9.5
+    column = "hkg straw/ha"
+    for t in ['A', 'B', 'C', 'D']:
+        ct = data[(data["F1"] == crop) & (data["F2"] == t)]
+        color = treatment_color[t]
+        offset = treatment_offset[t]
+        year = ct["Year"]
+        plt.bar (year - 0.5 + offset * width, ct[column], width=width, label=t,
+                 color=color)
+    for t in ['A', 'C']:
+        color = treatment_color[t]
+        treatment = treatment_value[t]
+        for b in [2, 3]:
+            file = f"log/B{b}T{treatment}/harvest.dlf"
+            dlf = DaisyDlf(file)
+            data = dlf.Data
+            offset = treatment_offset_sim[t] + (b - 2) * 2
+            hatch = block_hatch[b]
+            plt.bar (data.index.year - 0.5 + (offset + 3.5)  * width,
+                     (data["leaf_DM"] + data["stem_DM"]) * 10, width=width,
+                     label=f"{t}{b} Daisy DM", color=color, hatch=hatch)
+    plt.xlabel ('Year')
+    #plt.xlim ([2009, 2019.5])
+    #plt.ylim ([-200, 0])
+    plt.ylabel ('hkg straw/ha')
+    plt.legend (loc="lower left")
+    title = "Grain dry matter " + crop_name[crop] + " field"
+    plt.title (title)
     plt.show ()
 
-
+suffix = "pdf"
 
 # plot_gw ()
 

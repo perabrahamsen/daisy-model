@@ -1,0 +1,6 @@
+#! /bin/bash -
+cd fig
+for i in *.svg
+do
+	inkscape -f $i -M ${i%.*}.emf
+done
