@@ -12,8 +12,8 @@
 
 (defweather Taastrup  combine
   (entry ((begin 2014 1 1 1)
-	  (end   2018 8 1 0)
-	  (source table (file "dk-taastrup-hourly2014_2018.dwf")))
+	  (end   2019 9 20 0)
+	  (source table (file "dk-taastrup-2014-2019.dwf")))
 	 ((source table (file "dk-taastrup-long.dwf")))))
 
 (defcrop "Oilseedrape" "Winter Rape")
@@ -73,12 +73,16 @@
   (fertilize (N25S (weight 110 [kg N/ha])))
   (wait_mm_dd 8 5)                      
   (SBHARVEST)
-  (wait_mm_dd 8 13)
-  (sow "Oilseedrape")
-  (fertilize (N25S (weight 30 [kg N/ha])))
   (wait_mm_dd 12 18)
-  (plowing)
-)
+  (plowing))
+
+(defaction "SB-2013-CC"
+  (while "SB-2013"
+    (activity
+     (wait_mm_dd 8 7)
+     (sow "Oilseedrape")
+     (fertilize (N25S (weight 30 [kg N/ha]))))))
+
 (defaction "SB-2014" activity
   (wait_mm_dd 4 5)                      
   (seed_bed_preparation)
@@ -87,12 +91,18 @@
   (fertilize (N25S (weight 110 [kg N/ha])))
   (wait_mm_dd 8 1)                      
   (SBHARVEST)
-  (wait_mm_dd 8 13)
-  (sow "Oilseedrape")
-  (fertilize (N25S (weight 30 [kg N/ha])))
   (wait_mm_dd 12 8)
   (plowing)
 )
+
+(defaction "SB-2014-CC"
+  (while "SB-2014"
+    (activity
+     (wait_mm_dd 8 8)
+     (sow "Oilseedrape")
+     (fertilize (N25S (weight 30 [kg N/ha]))))))
+
+
 (defaction "SB-2015" activity
   (wait_mm_dd 3 17)                     
   (seed_bed_preparation)
@@ -101,12 +111,16 @@
   (fertilize (N25S (weight 110 [kg N/ha])))
   (wait_mm_dd 8 10)                      
   (SBHARVEST)
-  (wait_mm_dd 8 13)
-  (sow "Winter Rape")
-  (fertilize (N25S (weight 30 [kg N/ha])))
-  (wait_mm_dd 2 3)
-  (plowing)
-)
+  (wait_mm_dd 12 11)
+  (plowing))
+
+(defaction "SB-2015-CC"
+  (while "SB-2015"
+    (activity
+     (wait_mm_dd 8 13)
+     (sow "Oilseedrape")
+     (fertilize (N25S (weight 30 [kg N/ha]))))))
+
 (defaction "SB-2016" activity
   (wait_mm_dd 4 4)                      
   (seed_bed_preparation)
@@ -117,6 +131,13 @@
   (wait_mm_dd 11 11)
   (plowing))
  
+(defaction "SB-2016-CC"
+  (while "SB-2016"
+    (activity
+     (wait_mm_dd 8 13)
+     (sow "Oilseedrape")
+     (fertilize (N25S (weight 30 [kg N/ha]))))))
+
 (defaction "SB-2017" activity
   (wait_mm_dd 4 3)
   ;; NPK: 22-3-10, 500 [kg/ha] = 110[kg N/ha]
@@ -144,17 +165,35 @@
   (wait_mm_dd 7 30)			   
   (WWHARVEST))
   
-(defaction "Rotation-all" activity
+(defaction "WW-2019" activity
+  (wait_mm_dd 9 21)
+  (plowing)
+  (seed_bed_preparation)
+  (sow "WW")
+  (wait_mm_dd 3 26)
+  (fertilize (N25S (weight 84 [kg N/ha])))
+  (wait_mm_dd 4 15)
+  (fertilize (N25S (weight 68 [kg N/ha])))
+  (wait_mm_dd 4 20)
+  (wait_mm_dd 8 05)			   
+  (WWHARVEST))
+  
+(defaction "Rotation-NOCC" activity
   "SB-generic" "SB-generic" "SB-generic" "SB-generic" 
   "SB-2010" "SB-2011" "SB-2012" "SB-2013" "SB-2014" "SB-2015" "SB-2016"
-  "SB-2017" "WW-2018")
+  "SB-2017" "WW-2018" "WW-2019")
+
+(defaction "Rotation-CC" activity
+  "SB-generic" "SB-generic" "SB-generic" "SB-generic" 
+  "SB-2010" "SB-2011" "SB-2012"
+  "SB-2013-CC" "SB-2014-CC" "SB-2015-CC" "SB-2016-CC"
+  "SB-2017" "WW-2018" "WW-2019")
 
 (defprogram COMMIT Daisy
   (weather Taastrup)
-  (manager activity "Rotation-all")
   (time 2006 01 01 23)
-  (stop 2018 07 30 23)
-  (activate_output (after 2016 12 31 23))
+  (stop 2019 09 10 23)
+  (activate_output (after 2009 12 31 23))
   (output harvest 
 	  ("Crop"                      (when daily))
 	  ("Field water"               (when daily))
@@ -162,25 +201,52 @@
 	  ("Soil Water Potential (pF)" (when daily))
 	  ("Groundwater")))
 
-(defprogram "Block 2, Treatment 0" COMMIT
+(defprogram COMMIT-NOCC COMMIT 
+  (manager activity "Rotation-NOCC")
+  (activate_output (after 2009 12 31 23)))
+
+(defprogram COMMIT-CC COMMIT 
+  (manager activity "Rotation-CC")
+  (activate_output (after 2013 12 31 23)))
+
+(defprogram "Block 2, Treatment 0" COMMIT-NOCC
   (column "Block 2, Treatment 0")
   (log_prefix "log/B2T0/"))
 
-(defprogram "Block 2, Treatment 6" COMMIT
+(defprogram "Block 2, Treatment 6" COMMIT-NOCC
   (column "Block 2, Treatment 6")
   (log_prefix "log/B2T6/"))
 
-(defprogram "Block 3, Treatment 0" COMMIT
+(defprogram "Block 3, Treatment 0" COMMIT-NOCC
   (column "Block 3, Treatment 0")
   (log_prefix "log/B3T0/"))
 
-(defprogram "Block 3, Treatment 6" COMMIT
+(defprogram "Block 3, Treatment 6" COMMIT-NOCC
   (column "Block 3, Treatment 6")
   (log_prefix "log/B3T6/")) 
 
+(defprogram "Block 2, Treatment 0, CC" COMMIT-CC
+  (column "Block 2, Treatment 0")
+  (log_prefix "log/B2T0CC/"))
+
+(defprogram "Block 2, Treatment 6, CC" COMMIT-CC
+  (column "Block 2, Treatment 6")
+  (log_prefix "log/B2T6CC/"))
+
+(defprogram "Block 3, Treatment 0, CC" COMMIT-CC
+  (column "Block 3, Treatment 0")
+  (log_prefix "log/B3T0CC/"))
+
+(defprogram "Block 3, Treatment 6, CC" COMMIT-CC
+  (column "Block 3, Treatment 6")
+  (log_prefix "log/B3T6CC/")) 
+
 (defprogram all batch
   (run "Block 2, Treatment 0" "Block 2, Treatment 6"
-       "Block 3, Treatment 0" "Block 3, Treatment 6"))
+       "Block 3, Treatment 0" "Block 3, Treatment 6"
+       "Block 2, Treatment 0, CC" "Block 2, Treatment 6, CC"
+       "Block 3, Treatment 0, CC" "Block 3, Treatment 6, CC"
+       ))
 
 (run all)
 

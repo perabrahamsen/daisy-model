@@ -6,6 +6,30 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.94
+
+** New NNI_crit and NNI_pot crop partitioning parameters.
+
+These let N status affect partitioning between leaves and
+stem. Described in the article below.
+
+** Added "Winter Wheat JG" parameterization.
+
+Described here:
+
+Gyldengren, J. G., Abrahamsen, P., Olesen, J. E., Styczen, M., Hansen,
+S., & Gislum, R. (2020). Effects of winter wheat N status on
+assimilate and N partitioning in the mechanistic agroecosystem model
+DAISY. Journal of Agronomy and Crop Science.
+
+This partitioning ais based on new field experiments and knowledge,
+and utilizes the NNI partitioning described above, the NO3_uptake
+parameter described further down, as well as the 'Seed' model for
+initial growth. This also means that the amount of seed needs to be
+specified when sowing.
+
+(sow "Winter Wheat JG" (seed 180 [kg w.w./ha]))
+
 * 5.93
 
 ** New 'root_homogeneity' horizon parameter.
@@ -34,10 +58,10 @@ to activate.
 
 * 5.91
 
-** New 'litter_washoff_coefficient' chimcal parameter.
+** New 'litter_washoff_coefficient' chemical parameter.
 
 Control washoff from litter layer, analogue to
-'canopy_washoff_coefficient'. Defaul value is 1, corresponding to
+'canopy_washoff_coefficient'. Default value is 1, corresponding to
 chemical being fully dissolved in the water. This should give
 identical results as in version 5.90 and before.
 
@@ -319,11 +343,6 @@ This is part of the horizon.
 specifies that 80 % of the minerals in the horizon are quartz.
 
 This affects heat transport.
-
-
-** NNI  stem/leaf partit
-
-** 
 
 
 * 5.31

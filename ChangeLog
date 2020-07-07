@@ -1,3 +1,7 @@
+2020-06-09  Per Abrahamsen  <pa@plen.ku.com>
+
+	* lib/wwheat.dai ("Winter Wheat JG"): New parameterization.
+
 2020-03-02  Per Abrahamsen  <pa@plen.ku.com>
 
 	* hydraulic.h, hydraulic.C: Derived from ModelFramed so it can be
