@@ -1,11 +1,10 @@
-;; setup.dai -- COMMIT
-
-(path &old "/home/xvs108/RainProof/data" "/home/xvs108/RainProof")
+;; scenario.dai -- COMMIT
 
 (input file "fertilizer.dai")
 (input file "tillage.dai")
 (input file "log.dai")
 (input file "wrape.dai")
+(input file "wwheat.dai")
 
 ;; From RainProof
 (input file "climate.dai")
@@ -15,7 +14,6 @@
 
 ;; Experimental crop descriptions.
 (input file "Springbarley_MES_23.dai")
-(input file "Winter Wheat JG.dai")
 
 (defcrop "Oilseedrape" "Winter Rape")
 
@@ -47,7 +45,12 @@
   (wait (or (crop_ds_after "WW" 2.0)(mm_dd 9 7)))
   (WWHARVEST))
   
-(defaction "SB w. CC" activity
+(defaction WW_rot activity
+  ;; Warmup
+  (WW) (WW) (WW) (store_SOM)
+  (repeat (activity (WW) (restore_SOM))))
+
+(defaction "CC" activity
   (wait_mm_dd 3 05)
   (fertilize (N25S (weight 115 [kg N/ha])))
   (plowing)
@@ -62,6 +65,11 @@
   (wait (after_mm_dd 12 1))
   (plowing))
 
+(defaction CC_rot activity
+  ;; Warmup
+  (CC) (CC) (CC) (store_SOM)
+  (repeat (activity (CC) (restore_SOM))))
+
 (defaction "SB" activity
   (wait_mm_dd 3 05)
   (fertilize (N25S (weight 115 [kg N/ha])))
@@ -71,17 +79,14 @@
   (wait (or (crop_ds_after "SB" 2.0)(mm_dd 08 20)))
   (SBHARVEST))
 
+(defaction SB_rot activity
+  ;; Warmup
+  (SB) (SB) (SB) (store_SOM)
+  (repeat (activity (SB) (restore_SOM))))
+
 (defprogram COMMIT Daisy
-  (weather CPH)
-  (manager activity
-	   ;; Warmup
-	   (WW)
-	   (WW)
-	   (WW)
-	   (store_SOM)
-	   (repeat (activity (WW) (restore_SOM))))
   (time 2997 09 01 00)
-  (stop 3400 09 01 00)
+  (stop 3100 09 02 00)
   (activate_output (after 3000 09 1 00))
   (output harvest
 	  ("Field water" (when (and (month 9) (mday 1) (hour 0))))
@@ -98,121 +103,325 @@
 	   (from -25 [cm]) (to -200 [cm]))
 	  ))
 
-(defprogram "Block 2, Treatment 0" COMMIT
+(defprogram WWB2T0 COMMIT
+  (weather CPH)
+  (manager WW_rot)
   (column "Block 2, Treatment 0")
-  (log_prefix "scn/B2T0/"))
+  (log_prefix "scn/WWB2T0/"))
 
-(defprogram "Block 2, Treatment 6" COMMIT
+(defprogram WWB2T6 COMMIT
+  (weather CPH)
+  (manager WW_rot)
   (column "Block 2, Treatment 6")
-  (log_prefix "scn/B2T6/"))
+  (log_prefix "scn/WWB2T6/"))
 
-(defprogram "Block 3, Treatment 0" COMMIT
+(defprogram WWB2T6R1 COMMIT
+  (weather CPH)
+  (manager WW_rot)
+  (column "Block 2, Treatment 6, Root 1")
+  (log_prefix "scn/WWB2T6R1/"))
+
+(defprogram WWB2T6R10 COMMIT
+  (weather CPH)
+  (manager WW_rot)
+  (column "Block 2, Treatment 6, Root 10")
+  (log_prefix "scn/WWB2T6R10/"))
+
+(defprogram WWB3T0 COMMIT
+  (weather CPH)
+  (manager WW_rot)
   (column "Block 3, Treatment 0")
-  (log_prefix "scn/B3T0/"))
+  (log_prefix "scn/WWB3T0/"))
 
-(defprogram "Block 3, Treatment 6" COMMIT
+(defprogram WWB3T6 COMMIT
+  (weather CPH)
+  (manager WW_rot)
   (column "Block 3, Treatment 6")
-  (log_prefix "scn/B3T6/")) 
+  (log_prefix "scn/WWB3T6/")) 
 
-(defprogram "Block 3, Treatment 6, Root 1" COMMIT
+(defprogram WWB3T6R1 COMMIT
+  (weather CPH)
+  (manager WW_rot)
   (column "Block 3, Treatment 6, Root 1")
-  (log_prefix "scn/B3T6R1/")) 
+  (log_prefix "scn/WWB3T6R1/")) 
 
-(defprogram "Block 3, Treatment 6, Root 10" COMMIT
+(defprogram WWB3T6R10 COMMIT
+  (weather CPH)
+  (manager WW_rot)
   (column "Block 3, Treatment 6, Root 10")
-  (log_prefix "scn/B3T6R10/")) 
+  (log_prefix "scn/WWB3T6R10/")) 
 
-(defprogram "T0SBCC10" COMMIT
+(defprogram SBB2T0 COMMIT
+  (weather CPH)
+  (manager SB_rot)
+  (column "Block 2, Treatment 0")
+  (log_prefix "scn/SBB2T0/"))
+
+(defprogram SBB2T6 COMMIT
+  (weather CPH)
+  (manager SB_rot)
+  (column "Block 2, Treatment 6")
+  (log_prefix "scn/SBB2T6/"))
+
+(defprogram SBB2T6R1 COMMIT
+  (weather CPH)
+  (manager SB_rot)
+  (column "Block 2, Treatment 6, Root 1")
+  (log_prefix "scn/SBB2T6R1/"))
+
+(defprogram SBB2T6R10 COMMIT
+  (weather CPH)
+  (manager SB_rot)
+  (column "Block 2, Treatment 6, Root 10")
+  (log_prefix "scn/SBB2T6R10/"))
+
+(defprogram SBB3T0 COMMIT
+  (weather CPH)
+  (manager SB_rot)
   (column "Block 3, Treatment 0")
-  (log_prefix "scn/T0SBCC10/")  
-  (time 2997 08 30 00)
-  (stop 4000 09 02 00)
-  (manager activity
-	   ;; Warmup
-	   (WW)
-	   (WW)
-	   (WW)
-	   (store_SOM)
-	   (repeat (activity ("SB w. CC")
-			     ("SB w. CC")
-			     ("SB w. CC")
-			     ("SB w. CC")
-			     ("SB")
-			     ("WW")
-			     ("WW")
-			     ("WW")
-			     ("WW")
-			     ("WW")
-			     (restore_SOM)))))
+  (log_prefix "scn/SBB3T0/"))
 
-(defprogram "T0SB10" COMMIT
+(defprogram SBB3T6 COMMIT
+  (weather CPH)
+  (manager SB_rot)
+  (column "Block 3, Treatment 6")
+  (log_prefix "scn/SBB3T6/")) 
+
+(defprogram SBB3T6R1 COMMIT
+  (weather CPH)
+  (manager SB_rot)
+  (column "Block 3, Treatment 6, Root 1")
+  (log_prefix "scn/SBB3T6R1/")) 
+
+(defprogram SBB3T6R10 COMMIT
+  (weather CPH)
+  (manager SB_rot)
+  (column "Block 3, Treatment 6, Root 10")
+  (log_prefix "scn/SBB3T6R10/")) 
+
+(defprogram CCB2T0 COMMIT
+  (weather CPH)
+  (manager CC_rot)
+  (column "Block 2, Treatment 0")
+  (log_prefix "scn/CCB2T0/"))
+
+(defprogram CCB2T6 COMMIT
+  (weather CPH)
+  (manager CC_rot)
+  (column "Block 2, Treatment 6")
+  (log_prefix "scn/CCB2T6/"))
+
+(defprogram CCB2T6R1 COMMIT
+  (weather CPH)
+  (manager CC_rot)
+  (column "Block 2, Treatment 6, Root 1")
+  (log_prefix "scn/CCB2T6R1/"))
+
+(defprogram CCB2T6R10 COMMIT
+  (weather CPH)
+  (manager CC_rot)
+  (column "Block 2, Treatment 6, Root 10")
+  (log_prefix "scn/CCB2T6R10/"))
+
+(defprogram CCB3T0 COMMIT
+  (weather CPH)
+  (manager CC_rot)
   (column "Block 3, Treatment 0")
-  (log_prefix "scn/T0SB10/")  
-  (time 2997 08 30 00)
-  (stop 4000 09 02 00)
-  (manager activity
-	   ;; Warmup
-	   (WW)
-	   (WW)
-	   (WW)
-	   (store_SOM)
-	   (repeat (activity ("SB")
-			     ("SB")
-			     ("SB")
-			     ("SB")
-			     ("SB")
-			     ("WW")
-			     ("WW")
-			     ("WW")
-			     ("WW")
-			     ("WW")
-			     (restore_SOM)))))
+  (log_prefix "scn/CCB3T0/"))
 
-(defprogram "T6SBCC10" COMMIT
-  (column "Block 3, Treatment 6, Root 10")
-  (log_prefix "scn/T6SBCC10/")  
-  (time 2997 08 30 00)
-  (stop 4000 09 02 00)
-  (manager activity
-	   ;; Warmup
-	   (WW)
-	   (WW)
-	   (WW)
-	   (store_SOM)
-	   (repeat (activity ("SB w. CC")
-			     ("SB w. CC")
-			     ("SB w. CC")
-			     ("SB w. CC")
-			     ("SB")
-			     ("WW")
-			     ("WW")
-			     ("WW")
-			     ("WW")
-			     ("WW")
-			     (restore_SOM)))))
+(defprogram CCB3T6 COMMIT
+  (weather CPH)
+  (manager CC_rot)
+  (column "Block 3, Treatment 6")
+  (log_prefix "scn/CCB3T6/")) 
 
-(defprogram "T6SB10" COMMIT
+(defprogram CCB3T6R1 COMMIT
+  (weather CPH)
+  (manager CC_rot)
+  (column "Block 3, Treatment 6, Root 1")
+  (log_prefix "scn/CCB3T6R1/")) 
+
+(defprogram CCB3T6R10 COMMIT
+  (weather CPH)
+  (manager CC_rot)
   (column "Block 3, Treatment 6, Root 10")
-  (log_prefix "scn/T6SB10/")  
-  (time 2997 08 30 00)
-  (stop 4000 09 02 00)
-  (manager activity
-	   ;; Warmup
-	   (WW)
-	   (WW)
-	   (WW)
-	   (store_SOM)
-	   (repeat (activity ("SB")
-			     ("SB")
-			     ("SB")
-			     ("SB")
-			     ("SB")
-			     ("WW")
-			     ("WW")
-			     ("WW")
-			     ("WW")
-			     ("WW")
-			     (restore_SOM)))))
+  (log_prefix "scn/CCB3T6R10/")) 
+
+(defprogram WW batch
+  (run WWB2T0 WWB2T6 WWB2T6R1 WWB2T6R10 WWB3T0 WWB3T6 WWB3T6R1 WWB3T6R10))
+
+(defprogram SB batch
+  (run SBB2T0 SBB2T6 SBB2T6R1 SBB2T6R10 SBB3T0 SBB3T6 SBB3T6R1 SBB3T6R10))
+
+(defprogram CC batch
+  (run CCB2T0 CCB2T6 CCB2T6R1 CCB2T6R10 CCB3T0 CCB3T6 CCB3T6R1 CCB3T6R10))
+
+(defprogram CPH batch
+  (run WW SB CC))
+
+(defprogram NFWWB2T0 COMMIT
+  (weather NF)
+  (manager WW_rot)
+  (column "Block 2, Treatment 0")
+  (log_prefix "scn/WWB2T0/"))
+
+(defprogram NFWWB2T6 COMMIT
+  (weather NF)
+  (manager WW_rot)
+  (column "Block 2, Treatment 6")
+  (log_prefix "scn/WWB2T6/"))
+
+(defprogram NFWWB2T6R1 COMMIT
+  (weather NF)
+  (manager WW_rot)
+  (column "Block 2, Treatment 6, Root 1")
+  (log_prefix "scn/WWB2T6R1/"))
+
+(defprogram NFWWB2T6R10 COMMIT
+  (weather NF)
+  (manager WW_rot)
+  (column "Block 2, Treatment 6, Root 10")
+  (log_prefix "scn/WWB2T6R10/"))
+
+(defprogram NFWWB3T0 COMMIT
+  (weather NF)
+  (manager WW_rot)
+  (column "Block 3, Treatment 0")
+  (log_prefix "scn/WWB3T0/"))
+
+(defprogram NFWWB3T6 COMMIT
+  (weather NF)
+  (manager WW_rot)
+  (column "Block 3, Treatment 6")
+  (log_prefix "scn/WWB3T6/")) 
+
+(defprogram NFWWB3T6R1 COMMIT
+  (weather NF)
+  (manager WW_rot)
+  (column "Block 3, Treatment 6, Root 1")
+  (log_prefix "scn/WWB3T6R1/")) 
+
+(defprogram NFWWB3T6R10 COMMIT
+  (weather NF)
+  (manager WW_rot)
+  (column "Block 3, Treatment 6, Root 10")
+  (log_prefix "scn/WWB3T6R10/")) 
+
+(defprogram NFSBB2T0 COMMIT
+  (weather NF)
+  (manager SB_rot)
+  (column "Block 2, Treatment 0")
+  (log_prefix "scn/SBB2T0/"))
+
+(defprogram NFSBB2T6 COMMIT
+  (weather NF)
+  (manager SB_rot)
+  (column "Block 2, Treatment 6")
+  (log_prefix "scn/SBB2T6/"))
+
+(defprogram NFSBB2T6R1 COMMIT
+  (weather NF)
+  (manager SB_rot)
+  (column "Block 2, Treatment 6, Root 1")
+  (log_prefix "scn/SBB2T6R1/"))
+
+(defprogram NFSBB2T6R10 COMMIT
+  (weather NF)
+  (manager SB_rot)
+  (column "Block 2, Treatment 6, Root 10")
+  (log_prefix "scn/SBB2T6R10/"))
+
+(defprogram NFSBB3T0 COMMIT
+  (weather NF)
+  (manager SB_rot)
+  (column "Block 3, Treatment 0")
+  (log_prefix "scn/SBB3T0/"))
+
+(defprogram NFSBB3T6 COMMIT
+  (weather NF)
+  (manager SB_rot)
+  (column "Block 3, Treatment 6")
+  (log_prefix "scn/SBB3T6/")) 
+
+(defprogram NFSBB3T6R1 COMMIT
+  (weather NF)
+  (manager SB_rot)
+  (column "Block 3, Treatment 6, Root 1")
+  (log_prefix "scn/SBB3T6R1/")) 
+
+(defprogram NFSBB3T6R10 COMMIT
+  (weather NF)
+  (manager SB_rot)
+  (column "Block 3, Treatment 6, Root 10")
+  (log_prefix "scn/SBB3T6R10/")) 
+
+(defprogram NFCCB2T0 COMMIT
+  (weather NF)
+  (manager CC_rot)
+  (column "Block 2, Treatment 0")
+  (log_prefix "scn/CCB2T0/"))
+
+(defprogram NFCCB2T6 COMMIT
+  (weather NF)
+  (manager CC_rot)
+  (column "Block 2, Treatment 6")
+  (log_prefix "scn/CCB2T6/"))
+
+(defprogram NFCCB2T6R1 COMMIT
+  (weather NF)
+  (manager CC_rot)
+  (column "Block 2, Treatment 6, Root 1")
+  (log_prefix "scn/CCB2T6R1/"))
+
+(defprogram NFCCB2T6R10 COMMIT
+  (weather NF)
+  (manager CC_rot)
+  (column "Block 2, Treatment 6, Root 10")
+  (log_prefix "scn/CCB2T6R10/"))
+
+(defprogram NFCCB3T0 COMMIT
+  (weather NF)
+  (manager CC_rot)
+  (column "Block 3, Treatment 0")
+  (log_prefix "scn/CCB3T0/"))
+
+(defprogram NFCCB3T6 COMMIT
+  (weather NF)
+  (manager CC_rot)
+  (column "Block 3, Treatment 6")
+  (log_prefix "scn/CCB3T6/")) 
+
+(defprogram NFCCB3T6R1 COMMIT
+  (weather NF)
+  (manager CC_rot)
+  (column "Block 3, Treatment 6, Root 1")
+  (log_prefix "scn/CCB3T6R1/")) 
+
+(defprogram NFCCB3T6R10 COMMIT
+  (weather NF)
+  (manager CC_rot)
+  (column "Block 3, Treatment 6, Root 10")
+  (log_prefix "scn/CCB3T6R10/")) 
+
+(defprogram NFWW batch
+  (run NFWWB2T0 NFWWB2T6 NFWWB2T6R1 NFWWB2T6R10
+       NFWWB3T0 NFWWB3T6 NFWWB3T6R1 NFWWB3T6R10))
+
+(defprogram NFSB batch
+  (run NFSBB2T0 NFSBB2T6 NFSBB2T6R1 NFSBB2T6R10
+       NFSBB3T0 NFSBB3T6 NFSBB3T6R1 NFSBB3T6R10))
+
+(defprogram NFCC batch
+  (run NFCCB2T0 NFCCB2T6 NFCCB2T6R1 NFCCB2T6R10
+       NFCCB3T0 NFCCB3T6 NFCCB3T6R1 NFCCB3T6R10))
+
+(defprogram NF batch
+  (run NFWW NFSB NFCC))
+
+(defprogram all batch
+  (run CPH NF))
+
+(run all)
 
 ;;; scenario.dai ends here.
 

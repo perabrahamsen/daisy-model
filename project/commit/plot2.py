@@ -10,9 +10,11 @@ sys.path.append('/home/xvs108/PyDaisy')
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from datetime import date
+from matplotlib import dates as md
 
 from pydaisy.Daisy import *
+
+import datetime
 
 def plot_fig (fig):
     if suffix:
@@ -34,7 +36,6 @@ def plot_gw ():
     plt.xlim ([date(2017, 10, 1), date(2018, 10, 1)])
     plt.ylim ([-200, 0])
     plt.ylabel ('cm')
-    plt.title ('gw')
     #plt.plot (man["Block1"].multiply (0.1), 'yx', label="B1 manual")
     #plt.plot (man["Block2"].multiply (0.1),
     #          'bx', label="B2 manual", c="darkblue")
@@ -302,6 +303,7 @@ def plot_protein_by_treatment (treatment, crop):
     plt.bar (labels, values, color=colors)
 
 def plot_protein_treatments (crop):
+    plt.figure ()
     fig, axs = plt.subplots (2, 2, sharex='all', sharey='all')
     #fig, axs = plt.subplots (2, 2)
     plt.suptitle ("Grain protein content, " + crop_name[crop])
@@ -355,6 +357,7 @@ def plot_protein_by_block (b, crop):
     #plot_fig (f"protein_B{b}_{CC}")
 
 def plot_protein_blocks (crop):
+    plt.figure ()
     fig, axs = plt.subplots (2, 2, sharex='all', sharey='all')
     #fig, axs = plt.subplots (2, 2)
     plt.suptitle ("Grain protein content, " + crop_name[crop])
@@ -376,10 +379,49 @@ def plot_protein_blocks (crop):
 #suffix = None
 #plot_protein_blocks (1)
 
+
+
+def plot_LAI_year (sim, obs, year):
+    plt.gca ().xaxis.set_major_locator (md.DayLocator (1))
+    begin = datetime.date (year, 3, 1)
+    end = datetime.date (year, 9, 1)
+    plt.xlim([begin, end])
+    plt.ylim([0, 6])
+    plt.title (year)
+    if (year % 2 == 0):
+        plt.ylabel ("LAI")
+    if (year > 2015):
+        plt.gca ().xaxis.set_major_formatter (md.DateFormatter ('%m'))
+        plt.xlabel ("Month")
+    else:
+        plt.gca ().xaxis.set_major_formatter (md.DateFormatter (''))
+    obs = obs[obs["Date"].dt.year == year]
+    sim = sim.loc[begin:end]
+    plt.plot (obs["Date"], obs["LAI"], label="RVI")
+    plt.plot (sim["LAI"], label="Daisy")
+    if (year == 2010):
+        plt.legend ()
+
+def plot_LAI ():
+    plt.figure ()
+    dlf = DaisyDlf("log/B3T0/crop.dlf")
+    sim = dlf.Data
+    sim = sim[sim["LAI"] > 0.0]
+    obs = pd.read_csv ('data/LAI-BBCH.csv', parse_dates=["Date"])
+    fig, axs = plt.subplots (4, 2, sharey=True,figsize=(5, 7.5),dpi=60)
+    years = range (obs["Date"].dt.year.min (), obs["Date"].dt.year.max () + 1)
+    for ax, year in zip (axs.reshape (-1), years):
+        plt.sca(ax)
+        plot_LAI_year (sim, obs, year)
+    fig.tight_layout ()
+    plot_fig ("LAI")
+
 def plot_all ():
     print ("Plotting...")
     print ("Plotting...GW")
     plot_gw ()
+    print ("Plotting...LAI")
+    plot_LAI ()
     for crop in [1, 2]:
         print ("Plotting...WW")
         plot_ww_by_t (crop=crop,treatment='A')

@@ -225,6 +225,30 @@
                   (-115 [cm] "55-115, Block 2, Treatment 0")
                   (-200 [cm] "115-200, Block 2, Treatment 0"))))
  
+(defcolumn "Block 2, Treatment 6, Root 10" "Block 2"
+   (Soil (MaxRootingDepth 200 [cm])
+        (horizons (-25 [cm] "0-25, Block 2, Treatment 6" )	
+                  (-35 [cm] ("25-35, Block 2, Treatment 6"
+			     (root_homogeneity 0.1 [])))
+                  (-55 [cm] ("35-55, Block 2, Treatment 6"
+			     (root_homogeneity 0.1 [])))
+                  (-115 [cm] ("55-115, Block 2, Treatment 6"
+			      (root_homogeneity 0.1 [])))
+                  (-200 [cm] ("115-200, Block 2, Treatment 6"
+			      (root_homogeneity 0.1 []))))))
+
+(defcolumn "Block 2, Treatment 6, Root 1" "Block 2"
+   (Soil (MaxRootingDepth 200 [cm])
+        (horizons (-25 [cm] "0-25, Block 2, Treatment 6" )	
+                  (-35 [cm] ("25-35, Block 2, Treatment 6"
+			     (root_homogeneity 0.01 [])))
+                  (-55 [cm] ("35-55, Block 2, Treatment 6"
+			     (root_homogeneity 0.01 [])))
+                  (-115 [cm] ("55-115, Block 2, Treatment 6"
+			      (root_homogeneity 0.01 [])))
+                  (-200 [cm] ("115-200, Block 2, Treatment 6"
+			      (root_homogeneity 0.01 []))))))
+
 (defcolumn "Block 2, Treatment 6" "Block 2"
    (Soil (MaxRootingDepth 200 [cm])
         (horizons (-25 [cm] "0-25, Block 2, Treatment 6" )	

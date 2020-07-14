@@ -1,0 +1,20 @@
+;;; climate.dai --- Definitions of climate used in COMMIT.
+
+(defunit [kWh/d/m^2] SIfactor 
+  (mass 1)
+  (time -3)
+  (factor 41.67))
+
+;; Weather data
+(defweather CPH combine
+  (entry ((use Precip)
+	  (source table (file "Control_hourly_daisy.dwf")))
+	 ((source table (file "Control_daily_daisy.dwf")))))
+
+(defweather NF combine
+  (entry ((use Precip)
+	  (source table (file "Echam_Racmo_NF_hourly_daisy.dwf")))
+	 ((source table (file "Echam_Racmo_NF_daily_daisy.dwf")))))
+
+;;; climate.dai ends here.
+
