@@ -1,9 +1,5 @@
 #! /usr/bin/env python3
 
-imgext = ".png"
-figlib = "/mnt/c/Temp/fig/"
-#figlib = "fig/"
-
 import sys
 sys.path.append('/home/xvs108/PyDaisy')
 

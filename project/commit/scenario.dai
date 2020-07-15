@@ -263,145 +263,145 @@
   (weather NF)
   (manager WW_rot)
   (column "Block 2, Treatment 0")
-  (log_prefix "scn/WWB2T0/"))
+  (log_prefix "scn/NFWWB2T0/"))
 
 (defprogram NFWWB2T6 COMMIT
   (weather NF)
   (manager WW_rot)
   (column "Block 2, Treatment 6")
-  (log_prefix "scn/WWB2T6/"))
+  (log_prefix "scn/NFWWB2T6/"))
 
 (defprogram NFWWB2T6R1 COMMIT
   (weather NF)
   (manager WW_rot)
   (column "Block 2, Treatment 6, Root 1")
-  (log_prefix "scn/WWB2T6R1/"))
+  (log_prefix "scn/NFWWB2T6R1/"))
 
 (defprogram NFWWB2T6R10 COMMIT
   (weather NF)
   (manager WW_rot)
   (column "Block 2, Treatment 6, Root 10")
-  (log_prefix "scn/WWB2T6R10/"))
+  (log_prefix "scn/NFWWB2T6R10/"))
 
 (defprogram NFWWB3T0 COMMIT
   (weather NF)
   (manager WW_rot)
   (column "Block 3, Treatment 0")
-  (log_prefix "scn/WWB3T0/"))
+  (log_prefix "scn/NFWWB3T0/"))
 
 (defprogram NFWWB3T6 COMMIT
   (weather NF)
   (manager WW_rot)
   (column "Block 3, Treatment 6")
-  (log_prefix "scn/WWB3T6/")) 
+  (log_prefix "scn/NFWWB3T6/")) 
 
 (defprogram NFWWB3T6R1 COMMIT
   (weather NF)
   (manager WW_rot)
   (column "Block 3, Treatment 6, Root 1")
-  (log_prefix "scn/WWB3T6R1/")) 
+  (log_prefix "scn/NFWWB3T6R1/")) 
 
 (defprogram NFWWB3T6R10 COMMIT
   (weather NF)
   (manager WW_rot)
   (column "Block 3, Treatment 6, Root 10")
-  (log_prefix "scn/WWB3T6R10/")) 
+  (log_prefix "scn/NFWWB3T6R10/")) 
 
 (defprogram NFSBB2T0 COMMIT
   (weather NF)
   (manager SB_rot)
   (column "Block 2, Treatment 0")
-  (log_prefix "scn/SBB2T0/"))
+  (log_prefix "scn/NFSBB2T0/"))
 
 (defprogram NFSBB2T6 COMMIT
   (weather NF)
   (manager SB_rot)
   (column "Block 2, Treatment 6")
-  (log_prefix "scn/SBB2T6/"))
+  (log_prefix "scn/NFSBB2T6/"))
 
 (defprogram NFSBB2T6R1 COMMIT
   (weather NF)
   (manager SB_rot)
   (column "Block 2, Treatment 6, Root 1")
-  (log_prefix "scn/SBB2T6R1/"))
+  (log_prefix "scn/NFSBB2T6R1/"))
 
 (defprogram NFSBB2T6R10 COMMIT
   (weather NF)
   (manager SB_rot)
   (column "Block 2, Treatment 6, Root 10")
-  (log_prefix "scn/SBB2T6R10/"))
+  (log_prefix "scn/NFSBB2T6R10/"))
 
 (defprogram NFSBB3T0 COMMIT
   (weather NF)
   (manager SB_rot)
   (column "Block 3, Treatment 0")
-  (log_prefix "scn/SBB3T0/"))
+  (log_prefix "scn/NFSBB3T0/"))
 
 (defprogram NFSBB3T6 COMMIT
   (weather NF)
   (manager SB_rot)
   (column "Block 3, Treatment 6")
-  (log_prefix "scn/SBB3T6/")) 
+  (log_prefix "scn/NFSBB3T6/")) 
 
 (defprogram NFSBB3T6R1 COMMIT
   (weather NF)
   (manager SB_rot)
   (column "Block 3, Treatment 6, Root 1")
-  (log_prefix "scn/SBB3T6R1/")) 
+  (log_prefix "scn/NFSBB3T6R1/")) 
 
 (defprogram NFSBB3T6R10 COMMIT
   (weather NF)
   (manager SB_rot)
   (column "Block 3, Treatment 6, Root 10")
-  (log_prefix "scn/SBB3T6R10/")) 
+  (log_prefix "scn/NFSBB3T6R10/")) 
 
 (defprogram NFCCB2T0 COMMIT
   (weather NF)
   (manager CC_rot)
   (column "Block 2, Treatment 0")
-  (log_prefix "scn/CCB2T0/"))
+  (log_prefix "scn/NFCCB2T0/"))
 
 (defprogram NFCCB2T6 COMMIT
   (weather NF)
   (manager CC_rot)
   (column "Block 2, Treatment 6")
-  (log_prefix "scn/CCB2T6/"))
+  (log_prefix "scn/NFCCB2T6/"))
 
 (defprogram NFCCB2T6R1 COMMIT
   (weather NF)
   (manager CC_rot)
   (column "Block 2, Treatment 6, Root 1")
-  (log_prefix "scn/CCB2T6R1/"))
+  (log_prefix "scn/NFCCB2T6R1/"))
 
 (defprogram NFCCB2T6R10 COMMIT
   (weather NF)
   (manager CC_rot)
   (column "Block 2, Treatment 6, Root 10")
-  (log_prefix "scn/CCB2T6R10/"))
+  (log_prefix "scn/NFCCB2T6R10/"))
 
 (defprogram NFCCB3T0 COMMIT
   (weather NF)
   (manager CC_rot)
   (column "Block 3, Treatment 0")
-  (log_prefix "scn/CCB3T0/"))
+  (log_prefix "scn/NFCCB3T0/"))
 
 (defprogram NFCCB3T6 COMMIT
   (weather NF)
   (manager CC_rot)
   (column "Block 3, Treatment 6")
-  (log_prefix "scn/CCB3T6/")) 
+  (log_prefix "scn/NFCCB3T6/")) 
 
 (defprogram NFCCB3T6R1 COMMIT
   (weather NF)
   (manager CC_rot)
   (column "Block 3, Treatment 6, Root 1")
-  (log_prefix "scn/CCB3T6R1/")) 
+  (log_prefix "scn/NFCCB3T6R1/")) 
 
 (defprogram NFCCB3T6R10 COMMIT
   (weather NF)
   (manager CC_rot)
   (column "Block 3, Treatment 6, Root 10")
-  (log_prefix "scn/CCB3T6R10/")) 
+  (log_prefix "scn/NFCCB3T6R10/")) 
 
 (defprogram NFWW batch
   (run NFWWB2T0 NFWWB2T6 NFWWB2T6R1 NFWWB2T6R10
@@ -420,8 +420,6 @@
 
 (defprogram all batch
   (run CPH NF))
-
-(run all)
 
 ;;; scenario.dai ends here.
 
