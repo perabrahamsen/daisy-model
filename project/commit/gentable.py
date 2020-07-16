@@ -79,7 +79,7 @@ def gen_row ():
                     meta = [climate, crop, treatment, block]
                     clm = "" if climate == "CPH" else "NF"
                     scn = f"{clm}{crop}{block}{treatment}"
-                    harvest = parse_harvest (scn, crop)
+                    harvest = parse_harvest (scn, "SB" if crop == "CC" else crop)
                     nitrogen = parse_nitrogen (scn)
                     yield meta + harvest + nitrogen
 
