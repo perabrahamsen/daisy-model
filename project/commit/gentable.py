@@ -20,7 +20,7 @@ def parse_harvest (scn, crop):
     DM_median = data["sorg_DM"].median ()
     DM_10 = data["sorg_DM"].quantile (0.1)
     WStress = data["WStress"].mean ()
-    NStress = data["WStress"].mean ()
+    NStress = data["NStress"].mean ()
     return [N, DM_mean, DM_median, DM_10, WStress, NStress]
 
 harvest_names =  ['N', 'DM_mean', 'DM_median', 'DM_10', 'WStress', 'NStress']
