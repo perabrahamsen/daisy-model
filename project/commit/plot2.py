@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib import dates as md
+from matplotlib import gridspec
 
 from pydaisy.Daisy import *
 
@@ -14,7 +15,7 @@ import datetime
 
 def plot_fig (fig):
     if suffix:
-        plt.savefig (f"fig/{fig}.{suffix}")
+        plt.savefig (f"fig/{fig}.{suffix}", dpi=600)
         plt.clf ()
     else:
         plt.show ()
@@ -22,14 +23,14 @@ def plot_fig (fig):
 def plot_gw_log (file, c, label):
     dlf = DaisyDlf(file)
     data = dlf.Data
-    plt.plot (data["table_low"], '-', c=c, label=label)
+    plt.plot (data["table_low"], ':', c=c, label=label)
 
 def plot_gw ():
     plt.figure ()
     gw_man_dlf = DaisyDlf(f"data/COMMITManual.ddf")
     man = gw_man_dlf.Data
     plt.xlabel ('Year')
-    plt.xlim ([date(2017, 10, 1), date(2018, 10, 1)])
+    plt.xlim ([datetime.date(2017, 10, 1), datetime.date(2018, 10, 1)])
     plt.ylim ([-200, 0])
     plt.ylabel ('cm')
     #plt.plot (man["Block1"].multiply (0.1), 'yx', label="B1 manual")
@@ -44,14 +45,12 @@ def plot_gw ():
     auto = gw_auto_dlf.Data
 
     plt.plot (auto["Block2_groundwater_level"].multiply (0.1),
-              'b-', label="B2 auto")
+              'b-', label="B2 obs")
     plt.plot (auto["Block3_groundwater_level"].multiply (0.1),
-              'r-', label="B3 auto")
+              'r-', label="B3 obs")
 
-    plot_gw_log ("log/B2T0/groundwater.dlf", c="lavender", label="B2T0 sim")
-#    plot_gw_log ("log/B2T6/groundwater.dlf", c="slateblue", label="B2T6 sim")
-    plot_gw_log ("log/B3T0/groundwater.dlf", c="mistyrose", label="B3T0 sim")
-#    plot_gw_log ("log/B3T6/groundwater.dlf", c="lightcoral", label="B3T6 sim")
+    plot_gw_log ("log/B2T0/groundwater.dlf", c="b", label="B2T0 sim")
+    plot_gw_log ("log/B3T0/groundwater.dlf", c="r", label="B3T0 sim")
     plt.legend ()
     plot_fig ("GW")
 
@@ -71,10 +70,10 @@ treatment_value = { 'A': 0,
                     'C': 6,
                     'D': 8 }
 
-block_color = { 1: "skyblue",
+block_color = { 1: "palegreen",
                 2: "blue",
                 3: "red",
-                4: "cyan" }
+                4: "yellow" }
 
 block_hatch = { 2: "/",
                 3: "\\" }
@@ -93,7 +92,6 @@ treatment_offset_sim = { 'A': 2,
                          'C': 3 }
 
 def plot_ww_by_t (crop, treatment):
-    plt.figure ()
     data = pd.read_csv ('data/Harvest-grain-ww.csv', sep=';')
     ct = data[(data["Crop"] == crop) & (data["Treatment"] == treatment)]
     year = ct["Year"]
@@ -114,15 +112,30 @@ def plot_ww_by_t (crop, treatment):
         plt.bar (data.index.year - 0.5 + (b + 3.5)  * width,
                  data["sorg_DM"] * 10 / dm_fraction, width=width,
                  label=f"{label} Daisy", color=color, hatch="/")
+
+def plot_ww_treatment ():
+    fig, axs = plt.subplots (2, 2, sharey='all', sharex='col',
+                            gridspec_kw={'width_ratios': [7.5, 4.48]})
+    plt.sca(axs[0, 0])
+    plt.title ("No cover crop")
+    plt.ylabel ('hkg w.w. (uncompacted soil)')
+    plt.ylim ([0, 125])
+    plt.xlim ([2009.5, 2019.5])
+    plot_ww_by_t (1, 'A')
+    plt.sca(axs[0, 1])
+    plt.xlim ([2013.5, 2019.5])
+    plt.title ("Cover crop")
+    plot_ww_by_t (2, 'A')
+    plt.legend (loc='lower left', fontsize='xx-small')
+    plt.sca(axs[1, 0])
+    plt.ylabel ('hkg w.w. (compacted soil)')
     plt.xlabel ('Year')
-    plt.xlim (crop_xlim[crop])
-    #plt.ylim ([-200, 0])
-    plt.ylabel ('hkg ww grain/ha')
-    plt.legend (loc="lower left")
-    title = "Grain wet weight " + crop_name[crop] + " " + treatment_name[treatment] + " (" + treatment + ")"
-    plt.title (title)
-    CC = crop_short[crop]
-    plot_fig (f"WW_T{treatment}_{CC}.{suffix}")
+    plot_ww_by_t (1, 'C')
+    plt.sca(axs[1, 1])
+    plt.xlabel ('Year')
+    plot_ww_by_t (2, 'C')
+    fig.tight_layout ()
+    plot_fig (f"WW_by_T")
 
 def plot_ww_by_b (crop, block):
     plt.figure ()
@@ -418,11 +431,10 @@ def plot_all ():
     plot_gw ()
     print ("Plotting...LAI")
     plot_LAI ()
+    print ("Plotting...WW")
+    plot_ww_treatment ()
     for crop in [1, 2]:
         print ("Plotting...WW")
-        plot_ww_by_t (crop=crop,treatment='A')
-        plot_ww_by_t (crop=crop,treatment='C')
-    
         plot_ww_by_b (crop=crop,block=2)
         plot_ww_by_b (crop=crop,block=3)
 
@@ -438,6 +450,8 @@ def plot_all ():
 
     print ("Plotting...done")
 
-suffix = "svg"
+suffix = "png"
 
-plot_all ()
+#plot_all ()
+plot_ww_treatment ()
+print ("Done")
