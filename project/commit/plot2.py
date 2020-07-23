@@ -83,6 +83,9 @@ treatment_color = { 'A': "blue",
                     'C': "red",
                     'D': "palegreen" }
 
+treatment_hatch = { 'A': "/",
+                    'C': "\\" }
+
 treatment_offset = { 'A': 1,
                      'B': 2,
                      'C': 3,
@@ -106,13 +109,13 @@ def plot_ww_by_t (crop, treatment):
     t = treatment_value[treatment]
     for b in [2, 3]:
         label = f"B{b}"
-        color = block_color[b]
         file = f"log/B{b}T{t}{cc}/harvest.dlf"
         dlf = DaisyDlf(file)
         data = dlf.Data
         plt.bar (data.index.year - 0.5 + (b + 3.5)  * width,
                  data["sorg_DM"] * 10 / dm_fraction, width=width,
-                 label=f"{label} sim", color=color, hatch="/")
+                 label=f"{label} sim", color=block_color[b],
+                 hatch=block_hatch[b])
 
 def plot_ww_treatment ():
     fig, axs = plt.subplots (2, 2, sharey='all', sharex='col',
@@ -154,7 +157,6 @@ def plot_ww_by_b (crop, block):
                  label=str(treatment_value[t]) + " Mg obs",
                  color=color)
     for t in ['A', 'C']:
-        color = treatment_color[t]
         treatment = treatment_value[t]
         file = f"log/B{block}T{treatment}{cc}/harvest.dlf"
         dlf = DaisyDlf(file)
@@ -162,7 +164,9 @@ def plot_ww_by_b (crop, block):
         offset = treatment_offset_sim[t]
         plt.bar (data.index.year - 0.5 + (offset + 3.5)  * width,
                  data["sorg_DM"] * 10 / dm_fraction, width=width,
-                 label=f"{treatment} Mg sim", color=color, hatch="/")
+                 label=f"{treatment} Mg sim",
+                 color=treatment_color[t],
+                 hatch=treatment_hatch[t])
 
 def plot_ww_block ():
     fig, axs = plt.subplots (2, 2, sharey='all', sharex='col',
@@ -307,116 +311,117 @@ def plot_field ():
 ww_N2protein = 5.7
 sb_N2protein = 6.25
 
-def gen_p_by_t (treatment, crop, data):
+def plot_protein_by_treatment (treatment, crop):
+    cc = crop_name[crop]
+    data = pd.read_csv ('data/Harvest_blok_protein_percent.csv', sep=';')
     for b in range (1, 5):
         color = block_color[b]
         label = f"B{b} obs"
         entry = data[(data["F2"]==treatment)&(data["F1"]==crop)]
         value = float("nan") if len (entry) == 0 else entry[f"BLOK{b}"].array[0]
-        yield (color, label, value)
+        plt.bar (label, value, color=color)
         t = treatment_value[treatment]
         cc = "" if crop == 1 else "CC"
-        harvest_file = f"log/B{b}T{t}{cc}/harvest.dlf"
+        file = f"log/B{b}T{t}{cc}/harvest.dlf"
         label = f"B{b} sim"
-        if (not os.path.isfile (harvest_file)):
-            yield (color, label, 0)
-            continue
-        file = f"log/B{b}T{t}/harvest.dlf"
-        dlf = DaisyDlf(file)
-        dat = dlf.Data
-        year = 2019
-        entry = dat[(dat.index.year==year)&(dat["crop"]=="WW")]
-        DM = entry["sorg_DM"].array[0]
-        N = entry["sorg_N"].array[0]
-        yield (color, label, ww_N2protein * N / DM / 10)
+        value = 0
+        hatch = ' '
+        if (os.path.isfile (file)):
+            dlf = DaisyDlf(file)
+            dat = dlf.Data
+            year = 2019
+            entry = dat[(dat.index.year==year)&(dat["crop"]=="WW")]
+            DM = entry["sorg_DM"].array[0]
+            N = entry["sorg_N"].array[0]
+            value = ww_N2protein * N / DM / 10
+            hatch = hatch=block_hatch[b]
+        plt.bar (label, value, color=color, hatch=hatch )
 
-def plot_protein_by_treatment (treatment, crop):
-    tt = treatment_name[treatment]
-    cc = crop_name[crop]
-    data = pd.read_csv ('data/Harvest_blok_protein_percent.csv', sep=';')
-    (colors, labels, values) = zip (*gen_p_by_t (treatment, crop, data))
-    
-    plt.title (f"{tt}, {cc}")
-    plt.bar (labels, values, color=colors)
-
-def plot_protein_treatments (crop):
-    plt.figure ()
-    fig, axs = plt.subplots (2, 2, sharex='all', sharey='all')
-    #fig, axs = plt.subplots (2, 2)
-    plt.suptitle ("Grain protein content, " + crop_name[crop])
-
+def plot_protein_treatments ():
+    fig, axs = plt.subplots (4, 2, sharex='all', sharey='all',
+                             figsize=[6.4, 6.8])
     plt.sca(axs[0, 0])
-    plt.ylabel ('%')
-    plot_protein_by_treatment ('A', crop)
+    plt.title ("No cover crop")
+    plt.ylabel ('% (0 Mg)')
+    plot_protein_by_treatment ('A', 1)
     plt.sca(axs[0, 1])
-    plot_protein_by_treatment ('B', crop)
+    plt.title ("Cover crop")
+    plot_protein_by_treatment ('A', 2)
     plt.sca(axs[1, 0])
-    plt.ylabel ('%')
-    plot_protein_by_treatment ('C', crop)
+    plt.ylabel ('% (3 Mg)')
+    plot_protein_by_treatment ('B', 1)
     plt.sca(axs[1, 1])
-    plot_protein_by_treatment ('D', crop)
-
-    CC = crop_short[crop]
-    plot_fig (f"protein_T_{CC}")
-
-def gen_p_by_b (b, crop, data):
-    color = block_color[b]
-    for treatment in ['A', 'B', 'C', 'D']:
-        t = treatment_value[treatment]
-        label = f"T{t}"
-        entry = data[(data["F2"]==treatment)&(data["F1"]==crop)]
-        value = float("nan") if len (entry) == 0 else entry[f"BLOK{b}"].array[0]
-        yield (color, label, value)
-        cc = "" if crop == 1 else "CC"
-        harvest_file = f"log/B{b}T{t}{cc}/harvest.dlf"
-        label = f"T{t}SIM"
-        if (not os.path.isfile (harvest_file)):
-            yield (color, label, 0)
-            continue
-        file = f"log/B{b}T{t}/harvest.dlf"
-        dlf = DaisyDlf(file)
-        dat = dlf.Data
-        year = 2019
-        entry = dat[(dat.index.year==year)&(dat["crop"]=="WW")]
-        DM = entry["sorg_DM"].array[0]
-        N = entry["sorg_N"].array[0]
-        yield (color, label, ww_N2protein * N / DM / 10)
+    plot_protein_by_treatment ('B', 2)
+    plt.sca(axs[2, 0])
+    plt.ylabel ('% (6 Mg)')
+    plot_protein_by_treatment ('C', 1)
+    plt.sca(axs[2, 1])
+    plot_protein_by_treatment ('C', 2)
+    plt.sca(axs[3, 0])
+    plt.xticks (rotation=90)
+    plt.ylabel ('% (8 Mg)')
+    plot_protein_by_treatment ('D', 1)
+    plt.sca(axs[3, 1])
+    plt.xticks (rotation=90)
+    plot_protein_by_treatment ('D', 2)
+    fig.tight_layout ()
+    plot_fig (f"protein_by_T")
 
 def plot_protein_by_block (b, crop):
-    #plt.figure ()
     cc = crop_name[crop]
     data = pd.read_csv ('data/Harvest_blok_protein_percent.csv', sep=';')
-    (colors, labels, values) = zip (*gen_p_by_b (b, crop, data))
-    
-    plt.title (f"Block {b}")
-    plt.bar (labels, values, color=colors)
-    #CC = crop_short[crop]
-    #plot_fig (f"protein_B{b}_{CC}")
+    for treatment in ['A', 'B', 'C', 'D']:
+        t = treatment_value[treatment]
+        color = treatment_color[treatment]
+        label = f"{t} Mg obs"
+        entry = data[(data["F2"]==treatment)&(data["F1"]==crop)]
+        value = float("nan") if len (entry) == 0 else entry[f"BLOK{b}"].array[0]
+        plt.bar (label, value, color=color)
+        cc = "" if crop == 1 else "CC"
+        file = f"log/B{b}T{t}{cc}/harvest.dlf"
+        label = f"{t} Mg sim"
+        value = 0
+        hatch = ' '
+        if (os.path.isfile (file)):
+            dlf = DaisyDlf(file)
+            dat = dlf.Data
+            year = 2019
+            entry = dat[(dat.index.year==year)&(dat["crop"]=="WW")]
+            DM = entry["sorg_DM"].array[0]
+            N = entry["sorg_N"].array[0]
+            value = ww_N2protein * N / DM / 10
+            hatch = hatch=treatment_hatch[treatment]
+        plt.bar (label, value, color=color, hatch=hatch )
 
-def plot_protein_blocks (crop):
-    plt.figure ()
-    fig, axs = plt.subplots (2, 2, sharex='all', sharey='all')
-    #fig, axs = plt.subplots (2, 2)
-    plt.suptitle ("Grain protein content, " + crop_name[crop])
-
+def plot_protein_blocks ():
+    fig, axs = plt.subplots (4, 2, sharex='all', sharey='all',
+                             figsize=[6.4, 6.8])
     plt.sca(axs[0, 0])
-    plt.ylabel ('%')
-    plot_protein_by_block (1, crop)
+    plt.title ("No cover crop")
+    plt.ylabel ('% (block 1)')
+    plot_protein_by_block (1, 1)
     plt.sca(axs[0, 1])
-    plot_protein_by_block (2, crop)
+    plt.title ("Cover crop")
+    plot_protein_by_block (1, 2)
     plt.sca(axs[1, 0])
-    plt.ylabel ('%')
-    plot_protein_by_block (3, crop)
+    plt.ylabel ('% (block 2)')
+    plot_protein_by_block (2, 1)
     plt.sca(axs[1, 1])
-    plot_protein_by_block (4, crop)
-
-    CC = crop_short[crop]
-    plot_fig (f"protein_B_{CC}")
-
-#suffix = None
-#plot_protein_blocks (1)
-
-
+    plot_protein_by_block (2, 2)
+    plt.sca(axs[2, 0])
+    plt.ylabel ('% (block 3)')
+    plot_protein_by_block (3, 1)
+    plt.sca(axs[2, 1])
+    plot_protein_by_block (3, 2)
+    plt.sca(axs[3, 0])
+    plt.xticks (rotation=90)
+    plt.ylabel ('% (block 4)')
+    plot_protein_by_block (4, 1)
+    plt.sca(axs[3, 1])
+    plt.xticks (rotation=90)
+    plot_protein_by_block (4, 2)
+    fig.tight_layout ()
+    plot_fig (f"protein_by_B")
 
 def plot_LAI_year (sim, obs, year):
     plt.gca ().xaxis.set_major_locator (md.DayLocator (1))
@@ -459,20 +464,20 @@ def plot_all ():
     plot_gw ()
     print ("Plotting...LAI")
     plot_LAI ()
-    print ("Plotting...Treatment")
+    print ("Plotting...WW Treatment")
     plot_ww_treatment ()
-    print ("Plotting...Block")
+    print ("Plotting...WW Block")
     plot_ww_block ()
     print ("Plotting...Field")
     plot_field ()
-    for crop in [1, 2]:
-        print ("Plotting...protein " + crop_name[crop])
-        plot_protein_treatments (crop)
-        plot_protein_blocks (crop)
+    print ("Plotting...protein Treatment")
+    plot_protein_treatments ()
+    print ("Plotting...protein Block")
+    plot_protein_blocks ()
 
     print ("Plotting...done")
 
-suffix = "png"
+#suffix = "png"
 
 plot_all ()
 #plot_field ()
