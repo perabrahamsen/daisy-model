@@ -78,10 +78,10 @@ block_color = { 1: "palegreen",
 block_hatch = { 2: "/",
                 3: "\\" }
 
-treatment_color = { 'A': "skyblue",
+treatment_color = { 'A': "blue",
                     'B': "yellow",
                     'C': "red",
-                    'D': "blue" }
+                    'D': "palegreen" }
 
 treatment_offset = { 'A': 1,
                      'B': 2,
@@ -97,28 +97,29 @@ def plot_ww_by_t (crop, treatment):
     year = ct["Year"]
     width = 1.0 / 7.5
     dm_fraction = 0.85
+    cc = "" if crop == 1 else "CC"
     for b in [1, 2, 3, 4]:
         label = f"B{b}"
         color = block_color[b]
-        plt.bar (year - 0.5 + b * width, ct[label], width=width, label=label,
-                 color=color)
+        plt.bar (year - 0.5 + b * width, ct[label], width=width,
+                 label=label + " obs", color=color)
     t = treatment_value[treatment]
     for b in [2, 3]:
         label = f"B{b}"
         color = block_color[b]
-        file = f"log/B{b}T{t}/harvest.dlf"
+        file = f"log/B{b}T{t}{cc}/harvest.dlf"
         dlf = DaisyDlf(file)
         data = dlf.Data
         plt.bar (data.index.year - 0.5 + (b + 3.5)  * width,
                  data["sorg_DM"] * 10 / dm_fraction, width=width,
-                 label=f"{label} Daisy", color=color, hatch="/")
+                 label=f"{label} sim", color=color, hatch="/")
 
 def plot_ww_treatment ():
     fig, axs = plt.subplots (2, 2, sharey='all', sharex='col',
                             gridspec_kw={'width_ratios': [7.5, 4.48]})
     plt.sca(axs[0, 0])
     plt.title ("No cover crop")
-    plt.ylabel ('hkg w.w. (uncompacted soil)')
+    plt.ylabel ('hkg w.w./ha (0 Mg)')
     plt.ylim ([0, 125])
     plt.xlim ([2009.5, 2019.5])
     plot_ww_by_t (1, 'A')
@@ -128,7 +129,7 @@ def plot_ww_treatment ():
     plot_ww_by_t (2, 'A')
     plt.legend (loc='lower left', fontsize='xx-small')
     plt.sca(axs[1, 0])
-    plt.ylabel ('hkg w.w. (compacted soil)')
+    plt.ylabel ('hkg w.w./ha (6 Mg)')
     plt.xlabel ('Year')
     plot_ww_by_t (1, 'C')
     plt.sca(axs[1, 1])
@@ -138,143 +139,170 @@ def plot_ww_treatment ():
     plot_fig (f"WW_by_T")
 
 def plot_ww_by_b (crop, block):
-    plt.figure ()
     data = pd.read_csv ('data/Harvest-grain-ww.csv', sep=';')
     cd = data[(data["Crop"] == crop)]
     width = 1.0 / 7.5
     dm_fraction = 0.85
     column = f"B{block}"
+    cc = "" if crop == 1 else "CC"
     for t in ['A', 'B', 'C', 'D']:
         color = treatment_color[t]
         offset = treatment_offset[t]
         ct=cd[(cd["Treatment"]==t)]
         year = ct["Year"]
-        plt.bar (year - 0.5 + offset * width, ct[column], width=width, label=t,
+        plt.bar (year - 0.5 + offset * width, ct[column], width=width,
+                 label=str(treatment_value[t]) + " Mg obs",
                  color=color)
     for t in ['A', 'C']:
         color = treatment_color[t]
         treatment = treatment_value[t]
-        file = f"log/B{block}T{treatment}/harvest.dlf"
+        file = f"log/B{block}T{treatment}{cc}/harvest.dlf"
         dlf = DaisyDlf(file)
         data = dlf.Data
         offset = treatment_offset_sim[t]
         plt.bar (data.index.year - 0.5 + (offset + 3.5)  * width,
                  data["sorg_DM"] * 10 / dm_fraction, width=width,
-                 label=f"{treatment} Daisy", color=color, hatch="/")
+                 label=f"{treatment} Mg sim", color=color, hatch="/")
+
+def plot_ww_block ():
+    fig, axs = plt.subplots (2, 2, sharey='all', sharex='col',
+                            gridspec_kw={'width_ratios': [7.5, 4.48]})
+    plt.sca(axs[0, 0])
+    plt.title ("No cover crop")
+    plt.ylabel ('hkg w.w./ha (block 2)')
+    plt.ylim ([0, 125])
+    plt.xlim ([2009.5, 2019.5])
+    plot_ww_by_b (1, 2)
+    plt.sca(axs[0, 1])
+    plt.xlim ([2013.5, 2019.5])
+    plt.title ("Cover crop")
+    plot_ww_by_b (2, 2)
+    plt.legend (loc='lower left', fontsize='xx-small')
+    plt.sca(axs[1, 0])
+    plt.ylabel ('hkg w.w./ha (block 3)')
     plt.xlabel ('Year')
-    plt.xlim (crop_xlim[crop])
-    #plt.ylim ([-200, 0])
-    plt.ylabel ('hkg ww grain/ha')
-    plt.legend (loc="lower left")
-    title = "Grain wet weight " + crop_name[crop] + f" B{block}"
-    plt.title (title)
-    CC = crop_short[crop]
-    plot_fig (f"WW_B{block}_{CC}")
+    plot_ww_by_b (1, 3)
+    plt.sca(axs[1, 1])
+    plt.xlabel ('Year')
+    plot_ww_by_b (2, 3)
+    fig.tight_layout ()
+    plot_fig (f"WW_by_B")
 
 def plot_DM (crop):
-    plt.figure ()
     data = pd.read_csv ('data/Harvest_DM_N.csv', sep=';')
     cd = data[(data["F1"] == crop)]
     width = 1.0 / 9.5
     column = "hkg DM/ha"
+    cc = "" if crop == 1 else "CC"
     for t in ['A', 'B', 'C', 'D']:
         ct = data[(data["F1"] == crop) & (data["F2"] == t)]
         color = treatment_color[t]
         offset = treatment_offset[t]
         year = ct["Year"]
-        plt.bar (year - 0.5 + offset * width, ct[column], width=width, label=t,
+        plt.bar (year - 0.5 + offset * width, ct[column], width=width,
+                 label=str (treatment_value[t]) + " Mg obs",
                  color=color)
     for t in ['A', 'C']:
         color = treatment_color[t]
         treatment = treatment_value[t]
         for b in [2, 3]:
-            file = f"log/B{b}T{treatment}/harvest.dlf"
+            file = f"log/B{b}T{treatment}{cc}/harvest.dlf"
             dlf = DaisyDlf(file)
             data = dlf.Data
             offset = treatment_offset_sim[t] + (b - 2) * 2
             hatch = block_hatch[b]
             plt.bar (data.index.year - 0.5 + (offset + 3.5)  * width,
                      data["sorg_DM"] * 10, width=width,
-                     label=f"{t}{b} Daisy", color=color, hatch=hatch)
-    plt.xlabel ('Year')
-    plt.xlim (crop_xlim[crop])
-    #plt.ylim ([-200, 0])
-    plt.ylabel ('hkg DM grain/ha')
-    plt.legend (loc="lower left")
-    title = "Grain dry matter " + crop_name[crop] + " field"
-    plt.title (title)
-    CC = crop_short[crop]
-    plot_fig (f"DM_{CC}")
+                     label=str (treatment_value[t]) + " Mg sim B" + str(b),
+                     color=color, hatch=hatch)
 
 def plot_N (crop):
-    plt.figure ()
     data = pd.read_csv ('data/Harvest_DM_N.csv', sep=';')
     cd = data[(data["F1"] == crop)]
     width = 1.0 / 9.5
     column = "kg N grain/ha"
+    cc = "" if crop == 1 else "CC"
     for t in ['A', 'B', 'C', 'D']:
         ct = data[(data["F1"] == crop) & (data["F2"] == t)]
         color = treatment_color[t]
         offset = treatment_offset[t]
         year= ct["Year"]
-        plt.bar (year - 0.5 + offset * width, ct[column], width=width, label=t,
+        plt.bar (year - 0.5 + offset * width, ct[column], width=width,
+                 label=str (treatment_value[t]) + " Mg obs",
                  color=color)
     for t in ['A', 'C']:
         color = treatment_color[t]
         treatment = treatment_value[t]
         for b in [2, 3]:
-            file = f"log/B{b}T{treatment}/harvest.dlf"
+            file = f"log/B{b}T{treatment}{cc}/harvest.dlf"
             dlf = DaisyDlf(file)
             data = dlf.Data
             offset = treatment_offset_sim[t] + (b - 2) * 2
             hatch = block_hatch[b]
             plt.bar (data.index.year - 0.5 + (offset + 3.5)  * width,
                      data["sorg_N"], width=width,
-                     label=f"{t}{b} Daisy", color=color, hatch=hatch)
-    plt.xlabel ('Year')
-    plt.xlim (crop_xlim[crop])
-    #plt.ylim ([-200, 0])
-    plt.ylabel ('kg N grain/ha')
-    plt.legend (loc="lower left")
-    title = "Grain N " + crop_name[crop] + " field"
-    plt.title (title)
-    CC = crop_short[crop]
-    plot_fig (f"N_{CC}")
+                     label=str (treatment_value[t]) + " Mg sim B" + str(b),
+                     color=color, hatch=hatch)
 
 def plot_straw (crop):
-    plt.figure ()
     data = pd.read_csv ('data/Harvest_DM_N.csv', sep=';')
     cd = data[(data["F1"] == crop)]
     width = 1.0 / 9.5
     column = "hkg straw/ha"
+    cc = "" if crop == 1 else "CC"
     for t in ['A', 'B', 'C', 'D']:
         ct = data[(data["F1"] == crop) & (data["F2"] == t)]
         color = treatment_color[t]
         offset = treatment_offset[t]
         year = ct["Year"]
-        plt.bar (year - 0.5 + offset * width, ct[column], width=width, label=t,
+        plt.bar (year - 0.5 + offset * width, ct[column], width=width,
+                 label=str (treatment_value[t]) + " Mg obs",
                  color=color)
     for t in ['A', 'C']:
         color = treatment_color[t]
         treatment = treatment_value[t]
         for b in [2, 3]:
-            file = f"log/B{b}T{treatment}/harvest.dlf"
+            file = f"log/B{b}T{treatment}{cc}/harvest.dlf"
             dlf = DaisyDlf(file)
             data = dlf.Data
             offset = treatment_offset_sim[t] + (b - 2) * 2
             hatch = block_hatch[b]
             plt.bar (data.index.year - 0.5 + (offset + 3.5)  * width,
                      (data["leaf_DM"] + data["stem_DM"]) * 10, width=width,
-                     label=f"{t}{b} Daisy DM", color=color, hatch=hatch)
+                     label=str (treatment_value[t]) + " Mg sim B" + str(b),
+                     color=color, hatch=hatch)
+
+def plot_field ():
+    fig, axs = plt.subplots (3, 2, sharey='row', sharex='col',
+                             figsize=[6.4, 6.8],
+                             gridspec_kw={'width_ratios': [7.5, 4.48]})
+    plt.sca(axs[0, 0])
+    plt.title ("No cover crop")
+    plt.ylabel ('kg N grain/ha')
+    plt.ylim ([0, 150])
+    plt.xlim ([2009.5, 2019.5])
+    plot_N (1)
+    plt.sca(axs[0, 1])
+    plt.xlim ([2013.5, 2019.5])
+    plt.title ("Cover crop")
+    plot_N (2)
+    plt.sca(axs[1, 0])
+    plt.ylim ([0, 90])
+    plt.ylabel ('hkg DM grain/ha')
+    plot_DM (1)
+    plt.sca(axs[1, 1])
+    plot_DM (2)
+    plt.sca(axs[2, 0])
+    plt.ylim ([0, 90])
+    plt.ylabel ('hkg DM straw/ha')
     plt.xlabel ('Year')
-    plt.xlim (crop_xlim[crop])
-    #plt.ylim ([-200, 0])
-    plt.ylabel ('hkg straw/ha')
-    plt.legend (loc="lower left")
-    title = "Straw " + crop_name[crop] + " field"
-    plt.title (title)
-    CC = crop_short[crop]
-    plot_fig (f"straw_{CC}")
+    plot_straw (1)
+    plt.legend (loc='upper left', fontsize='small', ncol=2)
+    plt.sca(axs[2, 1])
+    plt.xlabel ('Year')
+    plot_straw (2)
+    fig.tight_layout ()
+    plot_fig (f"field")
 
 ww_N2protein = 5.7
 sb_N2protein = 6.25
@@ -282,14 +310,14 @@ sb_N2protein = 6.25
 def gen_p_by_t (treatment, crop, data):
     for b in range (1, 5):
         color = block_color[b]
-        label = f"B{b}"
+        label = f"B{b} obs"
         entry = data[(data["F2"]==treatment)&(data["F1"]==crop)]
         value = float("nan") if len (entry) == 0 else entry[f"BLOK{b}"].array[0]
         yield (color, label, value)
         t = treatment_value[treatment]
         cc = "" if crop == 1 else "CC"
         harvest_file = f"log/B{b}T{t}{cc}/harvest.dlf"
-        label = f"B{b}SIM"
+        label = f"B{b} sim"
         if (not os.path.isfile (harvest_file)):
             yield (color, label, 0)
             continue
@@ -431,20 +459,14 @@ def plot_all ():
     plot_gw ()
     print ("Plotting...LAI")
     plot_LAI ()
-    print ("Plotting...WW")
+    print ("Plotting...Treatment")
     plot_ww_treatment ()
+    print ("Plotting...Block")
+    plot_ww_block ()
+    print ("Plotting...Field")
+    plot_field ()
     for crop in [1, 2]:
-        print ("Plotting...WW")
-        plot_ww_by_b (crop=crop,block=2)
-        plot_ww_by_b (crop=crop,block=3)
-
-        
-        print ("Plotting...harvest")
-        plot_DM (crop=crop)
-        plot_N (crop=crop)
-        plot_straw (crop=crop)
-    
-        print ("Plotting...protein")
+        print ("Plotting...protein " + crop_name[crop])
         plot_protein_treatments (crop)
         plot_protein_blocks (crop)
 
@@ -452,6 +474,6 @@ def plot_all ():
 
 suffix = "png"
 
-#plot_all ()
-plot_ww_treatment ()
+plot_all ()
+#plot_field ()
 print ("Done")
