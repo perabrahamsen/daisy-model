@@ -32,7 +32,7 @@ def plot_gw ():
     plt.xlabel ('Year')
     plt.xlim ([datetime.date(2017, 10, 1), datetime.date(2018, 10, 1)])
     plt.ylim ([-200, 0])
-    plt.ylabel ('cm')
+    plt.ylabel ('cm (depth relative to surface)')
     #plt.plot (man["Block1"].multiply (0.1), 'yx', label="B1 manual")
     #plt.plot (man["Block2"].multiply (0.1),
     #          'bx', label="B2 manual", c="darkblue")
@@ -49,8 +49,8 @@ def plot_gw ():
     plt.plot (auto["Block3_groundwater_level"].multiply (0.1),
               'r-', label="B3 obs")
 
-    plot_gw_log ("log/B2T0/groundwater.dlf", c="b", label="B2 sim (0 Mg)")
-    plot_gw_log ("log/B3T0/groundwater.dlf", c="r", label="B3 sim (0 Mg)")
+    plot_gw_log ("log/B2T0/groundwater.dlf", c="b", label="B2 sim")
+    plot_gw_log ("log/B3T0/groundwater.dlf", c="r", label="B3 sim")
     plt.legend ()
     plot_fig ("GW")
 
