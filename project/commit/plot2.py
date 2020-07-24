@@ -49,22 +49,14 @@ def plot_gw ():
     plt.plot (auto["Block3_groundwater_level"].multiply (0.1),
               'r-', label="B3 obs")
 
-    plot_gw_log ("log/B2T0/groundwater.dlf", c="b", label="B2T0 sim")
-    plot_gw_log ("log/B3T0/groundwater.dlf", c="r", label="B3T0 sim")
+    plot_gw_log ("log/B2T0/groundwater.dlf", c="b", label="B2 sim (0 Mg)")
+    plot_gw_log ("log/B3T0/groundwater.dlf", c="r", label="B3 sim (0 Mg)")
     plt.legend ()
     plot_fig ("GW")
-
-crop_name = { 1: "no cover crop", 2: "cover crop" }
 
 crop_xlim = { 1: [2009.5, 2019.5],
               2: [2013.5, 2019.5] }
 
-crop_short = { 1: "NOCC", 2: "CC" }
-
-treatment_name = { 'A': "no compaction",
-                   'B': "3 Mg wheel load (2010-2013)",
-                   'C': "6 Mg wheel load (2010-2013)",
-                   'D':	"8 ton wheel load (2010)" }
 treatment_value = { 'A': 0,
                     'B': 3,
                     'C': 6,
@@ -312,7 +304,6 @@ ww_N2protein = 5.7
 sb_N2protein = 6.25
 
 def plot_protein_by_treatment (treatment, crop):
-    cc = crop_name[crop]
     data = pd.read_csv ('data/Harvest_blok_protein_percent.csv', sep=';')
     for b in range (1, 5):
         color = block_color[b]
@@ -368,7 +359,6 @@ def plot_protein_treatments ():
     plot_fig (f"protein_by_T")
 
 def plot_protein_by_block (b, crop):
-    cc = crop_name[crop]
     data = pd.read_csv ('data/Harvest_blok_protein_percent.csv', sep=';')
     for treatment in ['A', 'B', 'C', 'D']:
         t = treatment_value[treatment]
