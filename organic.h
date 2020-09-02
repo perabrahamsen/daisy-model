@@ -75,6 +75,7 @@ public:
   virtual double AOM_C (const Geometry&, double from, double to) const = 0;
   virtual void store_SOM () = 0;
   virtual void restore_SOM () = 0;
+  virtual const std::vector <AM*> get_am () const = 0;
 
   // Communication with external model.
   virtual double get_smb_c_at (size_t i) const = 0; // [g C/cm³]

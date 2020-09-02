@@ -600,6 +600,26 @@ symbol
 AM::real_name () const
 { return impl->name; }
 
+bool 
+AM::compare_CN (const AM* a, const AM* b)
+{
+  const double a_top_C = a->top_C ();
+  daisy_assert (a_top_C >= 0);
+  if (iszero (a_top_C))
+    return false;
+
+  const double b_top_C = b->top_C ();
+  daisy_assert (b_top_C >= 0);
+  if (iszero (b_top_C))
+    return true;
+      
+  const double a_top_N = a->top_N ();
+  daisy_assert (a_top_N > 0.0);
+  const double b_top_N = b->top_N ();
+  daisy_assert (b_top_N > 0.0);
+  return a_top_C / a_top_N < b_top_C / b_top_N;
+}
+
 void
 AM::output (Log& log) const
 { impl->output (log); }

@@ -420,7 +420,6 @@ ColumnStandard::add_residuals (std::vector<AM*>& residuals)
        residual != residuals.end ();
        residual++)
     organic_matter->add (*(*residual));
-  litter->update (organic_matter->top_DM ());
 }
 
 void 
@@ -436,7 +435,6 @@ ColumnStandard::mix (const double from, const double to,
   mix_it (from, to, penetration, msg);
   soil->tillage (geometry, from, to, surface_loose, RR0, 
                  *soil_water, *organic_matter);
-  litter->update (organic_matter->top_DM ());
 }
 
 void 
@@ -758,7 +756,8 @@ ColumnStandard::tick_move (const Metalib& metalib,
                            *soil_water, surface, msg);
 
   // Early calculation.
-
+  litter->tick (*bioclimate, geometry, *soil, *soil_water, *soil_heat,
+		*organic_matter, *chemistry, msg);
   const double old_pond 
     = bioclimate->get_snow_storage () + surface.ponding_average ();
   bioclimate->tick (time, surface, my_weather,
@@ -798,7 +797,6 @@ ColumnStandard::tick_move (const Metalib& metalib,
   organic_matter->tick (geometry, *soil, *soilph, 
                         *soil_water, *soil_heat, tillage_age,
                         *chemistry, dt, msg);
-  litter->update (organic_matter->top_DM ());
 
   // Transport.
   chemistry->mass_balance (geometry, *soil_water);
@@ -1160,10 +1158,13 @@ ColumnStandard::initialize (const Metalib& metalib,
                               *soil_water, *soil_heat, 
                               T_avg, msg);
   vegetation->initialize (scope, time, geometry, *soil, *organic_matter, msg);
-  litter->initialize (organic_matter->top_DM ());
 
   // Soil conductivity and capacity logs.
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
+
+  // Litter layer.
+  litter->tick (*bioclimate, geometry, *soil, *soil_water, *soil_heat,
+		*organic_matter, *chemistry, msg);
 
   return ok;
 }

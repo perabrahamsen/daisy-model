@@ -187,6 +187,7 @@ struct ChemicalStandard : public Chemical
   double surface_release_fraction () const; // []
   double surface_immobile_amount () const;  // [g/cm^2]
   double surface_storage_amount () const;  // [g/cm^2]
+  double litter_storage_amount () const;  // [g/cm^2]
   double canopy_storage_amount () const;  // [g/cm^2]
 
   // Soil content.
@@ -382,6 +383,13 @@ ChemicalStandard::surface_storage_amount () const
 {
   const double m2_per_cm2 = 0.01 * 0.01;
   return surface_storage * m2_per_cm2; 
+}
+
+double 
+ChemicalStandard::litter_storage_amount () const
+{
+  const double m2_per_cm2 = 0.01 * 0.01;
+  return litter_storage * m2_per_cm2; 
 }
 
 double 

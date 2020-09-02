@@ -71,6 +71,11 @@ struct OrganicNone : public OrganicMatter
   { }
   void restore_SOM ()
   { }
+  const std::vector <AM*> get_am () const
+  {
+    static std::vector <AM*> am;
+    return am;
+  }
 
   // Communication with external model.
   double get_smb_c_at (size_t) const // [g C/cm³]

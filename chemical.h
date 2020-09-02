@@ -80,6 +80,7 @@ public:
   virtual double surface_release_fraction () const = 0; // []
   virtual double surface_storage_amount () const = 0;  // [g/cm^2]
   virtual double surface_immobile_amount () const = 0;  // [g/cm^2]
+  virtual double litter_storage_amount () const = 0;	// [g/cm^2]
   virtual double canopy_storage_amount () const = 0;	// [g/cm^2]
   
   // Soil content.

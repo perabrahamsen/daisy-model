@@ -52,7 +52,8 @@ public:
   symbol library_id () const;
   void append_to (std::vector<AOM*>& added);
   symbol real_name () const;
-
+  static bool compare_CN (const AM* a, const AM* b);
+  
   // Simulation.
 public:
   void output (Log&) const;

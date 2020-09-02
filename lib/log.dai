@@ -3312,4 +3312,40 @@ parameter in the 'default' bioclimate model.  By default, 30."))
                   (handle sum)
                   (spec biopore component M2B))))
 
+(deflog "Crop uptake" crop
+  (where "${colfid}${cropfid}-uptake.dlf")
+  (declare unit String "Base unit.")
+  (unit "kg N/ha")
+  (when daily)
+  (entries (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Root H2OUpt)
+		   (handle sum)
+		   (dimension "mm")
+                   (spec fixed RootSystem H2OUpt))
+	   (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Root NH4Upt)
+		   (handle sum)
+		   (dimension "${unit}")
+                   (spec fixed RootSystem NO3Upt))
+	   (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Root NO3Upt)
+		   (handle sum)
+		   (dimension "${unit}")
+                   (spec fixed RootSystem NH4Upt))
+	   (interval (path column "${column}" Vegetation crops crops "${crop}"
+			   Root H2OExtraction)
+		     (handle sum)
+		     (dimension "mm")
+		     (spec fixed RootSystem H2OExtraction))
+	   (interval (path column "${column}" Vegetation crops crops "${crop}"
+			   Root NH4Extraction)
+		     (handle sum)
+		     (dimension "${unit}")
+		     (spec fixed RootSystem NH4Extraction))
+	   (interval (path column "${column}" Vegetation crops crops "${crop}"
+			   Root NO3Extraction)
+		     (handle sum)
+		     (dimension "${unit}")
+		     (spec fixed RootSystem NO3Extraction))))
+
 ;;; log.dai ends here

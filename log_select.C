@@ -478,7 +478,7 @@ List of string parameters to print to the table header.\n\
 \n\
 For example, if you have defined 'column' and 'crop' parameters for\n\
 this table log parameterization, you can print them to the log file\n\
-header by specifying '(names column crop)'.");
+header by specifying '(parameter_names column crop)'.");
     frame.set_empty ("parameter_names");
     frame.declare_object ("when", Condition::component, "\
 Add entries to the log file when this condition is true.");

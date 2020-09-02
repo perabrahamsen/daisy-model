@@ -338,6 +338,10 @@ struct BioclimateStandard : public Bioclimate
   { return min_sin_beta_; }
   double get_intercepted_water () const // [mm]
   { return canopy_water_storage; }
+  double get_litter_water () const // [mm]
+  { return litter_water_storage; }
+  double get_litter_temperature () const // [dg C]
+  { return litter_water_temperature; }
   double get_snow_storage () const // [mm]
   { return snow.storage (); }
   double snow_leak_rate (const double dt) const

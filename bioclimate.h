@@ -58,6 +58,8 @@ public:
 		     double dt, Treelog&) = 0;
   virtual void clear () = 0;
   virtual double get_intercepted_water () const = 0; // [mm]
+  virtual double get_litter_water () const = 0; // [mm]
+  virtual double get_litter_temperature () const = 0; // [dg C]
   virtual double get_snow_storage () const = 0; // [mm]
   virtual double snow_leak_rate (double dt) const = 0; // [h^-1]
   virtual double canopy_leak_rate (double dt) const = 0; // [h^-1]

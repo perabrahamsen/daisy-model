@@ -26,6 +26,18 @@
 #include "librarian.h"
 #include "check.h"
 #include "log.h"
+#include "geometry.h"
+#include "soil.h"
+#include "soil_water.h"
+#include "soil_heat.h"
+#include "organic.h"
+#include "chemistry.h"
+#include "mathlib.h"
+#include "chemical.h"
+#include "am.h"
+#include "bioclimate.h"
+#include "abiotic.h"
+#include <sstream>
 
 // The 'litter' component.
 
@@ -70,7 +82,10 @@ Fraction of surface area covered by litter.");
 struct LitterNone : public Litter
 {
   // Simulation.
-  void update (const double)
+  void tick (const Bioclimate&, const Geometry& geo, const Soil& soil,
+	     const SoilWater& soil_water, const SoilHeat& soil_heat,
+	     OrganicMatter& organic, Chemistry& chemistry,
+	     Treelog& msg)
   { }
   double cover () const
   { return 0.0; }
@@ -82,8 +97,6 @@ struct LitterNone : public Litter
   { return -1.0; }
 
   // Create and Destroy.
-  void initialize (const double)
-  { }
   LitterNone (const BlockModel& al)
     : Litter (al)
   { }
@@ -113,7 +126,10 @@ struct LitterPermanent : public Litter
   const double albedo_;
 
   // Simulation.
-  void update (const double)
+  void tick (const Bioclimate&, const Geometry& geo, const Soil& soil,
+	     const SoilWater& soil_water, const SoilHeat& soil_heat,
+	     OrganicMatter& organic, Chemistry& chemistry,
+	     Treelog& msg)
   { }
   double cover () const
   { return 1.0; }
@@ -125,8 +141,6 @@ struct LitterPermanent : public Litter
   { return albedo_; }
 
   // Create and Destroy.
-  void initialize (const double)
-  { }
   LitterPermanent (const BlockModel& al)
     : Litter (al),
       vapor_flux_factor_ (al.number ("vapor_flux_factor")),
@@ -163,33 +177,42 @@ By default, the surface albedo will be used.");
 struct LitterResidue : public Litter
 {
   // Parameters.
-  const double water_capacity_; // Max water in litter DM [L/kg]
-  const double vapor_flux_factor_;        // Ep-reduction []
-  const double specific_AI;            // Spec. litter area [m^2/kg DM]
-  const double extinction_coefficent;  // Beers law for cover []
+  const double water_capacity_;	      // Max water in litter DM [L/kg]
+  const double vapor_flux_factor_;    // Ep-reduction []
+  const double specific_AI;	      // Spec. litter area [m^2/kg DM]
+  const double extinction_coefficent; // Beers law for cover []
   const double albedo_;
   
-  // Variables.
-  double DM;                    // Surface residuals [kg DM/m^2]
+  // Log variables.
+  double mass;                    // Surface residuals [kg DM/m^2]
+  double cover_;		  // Surface residuals [m^2 mulch/m^2 soil]
 
   // Simulation.
-  void update (const double top_DM /* [kg DM/m^2] */)
-  { DM = top_DM; }
-  double cover () const
-  { 
-    const double MAI = DM * specific_AI; 
-    return 1.0 - exp (- MAI * extinction_coefficent);
+  void output (Log& log) const
+  {
+    Litter::output (log);
+    output_variable (mass, log);
   }
+  void tick (const Bioclimate& bioclimate,
+	     const Geometry& geo, const Soil& soil,
+	     const SoilWater& soil_water, const SoilHeat& soil_heat,
+	     OrganicMatter& organic, Chemistry& chemistry,
+	     Treelog& msg)
+  {
+    mass = organic.top_DM ();
+    const double MAI = mass * specific_AI; 
+    cover_ = 1.0 - exp (- MAI * extinction_coefficent);
+  }
+  double cover () const
+  { return cover_; }
   double vapor_flux_factor () const
   { return vapor_flux_factor_; }
   double water_capacity () const
-  { return DM * water_capacity_; }
+  { return mass * water_capacity_; }
   double albedo () const
   { return albedo_; }
 
   // Create and Destroy.
-  void initialize (const double top_DM /* [kg DM/m^2] */)
-  { DM = top_DM; }
   LitterResidue (const BlockModel& al)
     : Litter (al),
       water_capacity_ (al.number ("water_capacity")),
@@ -197,7 +220,8 @@ struct LitterResidue : public Litter
       specific_AI (al.number ("specific_AI")),
       extinction_coefficent (al.number ("extinction_coefficent")),
       albedo_ (al.number ("albedo", -1.0)),
-      DM (-42.42e42)
+      mass (NAN),
+      cover_ (NAN)
   { }
   ~LitterResidue ()
   { }
@@ -220,25 +244,30 @@ index.")
   { 
     frame.set_strings ("cite", "scopel2004");
 
-    frame.declare ("water_capacity", "L/kg", Attribute::Const, "\
+    frame.declare ("water_capacity", "L/kg", Check::non_negative (),
+		   Attribute::Const, "\
 Water holding capacity of surface residulas.");
     frame.declare_fraction ("vapor_flux_factor", Attribute::Const, "\
 Reduction factor for potential evaporation below litter.\n\
 Only area covered by residue is affected.");
     frame.set ("vapor_flux_factor", 0.0);
-    frame.declare ("specific_AI", "m^2/kg DM", Attribute::Const, "\
+    frame.declare ("specific_AI", "m^2/kg DM", Check::non_negative (),
+		   Attribute::Const, "\
 Area covered per litter mass.");
-    frame.declare ("extinction_coefficent", 
-                   Attribute::None (), Attribute::Const, "\
+    frame.declare ("extinction_coefficent", Attribute::None (),
+		   Check::positive (), Attribute::Const, "\
 Beer's law extinction coefficient for litter.");
     frame.declare ("albedo", Attribute::None (), Check::positive (),
                    Attribute::OptionalConst, "Reflection factor.\n\
 By default, the surface albedo will be used.");
+
+    frame.declare ("mass", "kg DM/m^2", Attribute::LogOnly, "\
+Total mass of mulch layer.");
   }
 } LitterResidue_syntax;
 
 // The 'Millet' parameterization.
-
+  
 static struct LitterMilletsyntax : public DeclareParam
 { 
   LitterMilletsyntax ()
@@ -272,5 +301,215 @@ Maize crop residues in La Tinaja.")
     frame.set ("extinction_coefficent", 0.80);
   }
 } LitterMaize_syntax;
+
+// The 'mulch' model.
+
+struct LitterMulch : public LitterResidue 
+{
+  // Parameters.
+  const double density;		 // Density of mulch [kg DM/m^3]
+  const double decompose_height; // Max height of active mulch layer [cm]
+  const double soil_height;	 // Heigh of soil layer providing N [cm]
+  const double Theta_res;	 // Residual water content []
+  const double Theta_sat;	 // Saturated water content []
+  const double h_min;		 // Min. pressure for biological activity [cm]
+  
+  // Log variables.
+  double height;		// Height of mulch layer [cm]
+  double decompose_mass;	// In contact with soil [kg/m^2]
+  double N_avail;		// Available nitrogen [g/cm^2]
+  double water;			// Total water in mulch [cm]
+  double Theta;			// Relative water content []
+  double h;			// Mulch water potential [cm]
+  double h_factor;		// Water potential effect []
+  double T;			// Temeprature of mulch.
+  double T_factor;		// Temperature factor []
+  
+  // Simulation.
+  void tick (const Bioclimate& bioclimate,
+	     const Geometry& geo, const Soil& soil,
+	     const SoilWater& soil_water, const SoilHeat& soil_heat,
+	     OrganicMatter& organic, Chemistry& chemistry,
+	     Treelog& msg)
+  {
+    // Find mass and cover.
+    LitterResidue::tick (bioclimate,
+			 geo, soil, soil_water, soil_heat, organic, chemistry,
+			 msg);
+
+    // Find height of mulch layer.
+    static const double cm_per_m = 100.0;
+    if (cover () > 0.0)
+      height = cm_per_m * mass / cover () / density;
+    else
+      height = 0.0;
+
+    // Find mass of active part of mulch layer.
+    if (decompose_height >= height)
+      decompose_mass = mass;
+    else
+      decompose_mass = mass * decompose_height / height;
+
+    // Water
+    water = bioclimate.get_litter_water () * 0.1; // [mm] -> [cm]
+    if (height > 0.0)
+      Theta = water / height;			  // []
+    else
+      Theta = 0.0;
+
+    if (Theta < Theta_res)
+      h = h_min;
+    else if (Theta > Theta_sat)
+      h = 0.0;
+    else
+      h = -std::pow (-h_min,
+		     1.0-((Theta - Theta_res)
+			  / (2.0 * Theta_sat / 3.0 - Theta_res)));
+    h_factor = Abiotic::f_h (h);
+
+    // Temperature
+    T = bioclimate.get_litter_temperature (); // [dg C]
+    T_factor = Abiotic::f_T0 (T);
+
+    // Nitrogen.
+    const bool has_N = chemistry.know (Chemical::NO3 ())
+      && chemistry.know (Chemical::NH4 ());
+    if (has_N)
+      {
+	Chemical& NO3 = chemistry.find (Chemical::NO3 ());
+	Chemical& NH4 = chemistry.find (Chemical::NH4 ());
+	N_avail		// [g/cm^2]
+	  = NO3.surface_storage_amount () // [g/cm^2]
+	  + NO3.litter_storage_amount () // [g/cm^2]
+	  + NH4.surface_storage_amount () // [g/cm^2]
+	  + NH4.litter_storage_amount () // [g/cm^2]
+	  + ((geo.content_interval (NO3, &Chemical::M_total, 0, soil_height)
+	     + geo.content_interval (NH4, &Chemical::M_total, 0, soil_height))
+	     * std::fabs (soil_height));	// [g/cm^3] * [cm]
+      }
+    else
+      N_avail = NAN;
+    
+
+      // Soil
+    std::vector <AM*> am = organic.get_am ();
+    std::sort (am.begin (), am.end (), AM::compare_CN);
+    
+    
+  }
+  void output (Log& log) const
+  {
+    LitterResidue::output (log);
+    output_variable (height, log);
+    output_variable (decompose_mass, log);
+    if (std::isfinite (N_avail))
+      output_variable (N_avail, log);
+    output_variable (water, log);
+    output_variable (Theta, log);
+    output_variable (h, log);
+    output_variable (h_factor, log);
+    output_variable (T, log);
+    output_variable (T_factor, log);
+  }
+
+  static double find_Theta_sat (const BlockModel& al)
+  {
+    if (al.check ("Theta_sat"))
+      return al.number ("Theta_sat");
+
+    const double density = al.number ("density"); // [kg/m^3]
+    const double water_capacity = al.number ("water_capacity"); // [L/kg]
+    const double L_per_m3 = 1000.0; // [L/m^3]
+    // [m^3/m^3] = [kg/m^3] * [L/kg] / [L/m^3]
+    const double Theta_sat = density * water_capacity / L_per_m3; 
+
+    Treelog& msg = al.msg ();
+    Treelog::Open nest (msg, "mulch layer");
+    std::ostringstream tmp;
+    tmp << "(Theta_sat " << Theta_sat << " [])";
+    msg.debug (tmp.str ());
+
+    return Theta_sat;
+  }
+  
+  // Create and Destroy.
+  LitterMulch (const BlockModel& al)
+    : LitterResidue (al),
+      density (al.number ("density")),
+      decompose_height (al.number ("decompose_height")),
+      soil_height (al.number ("soil_height")),
+      Theta_res (al.number ("Theta_res")),
+      Theta_sat (al.number ("Theta_sat", find_Theta_sat (al))),
+      h_min (al.number ("h_min")),
+      height (NAN),
+      decompose_mass (NAN),
+      N_avail (NAN) 
+  {
+    if (Theta_res > Theta_sat)
+      al.msg ().error ("Theta_res > Theta_sat");
+  }
+  ~LitterMulch ()
+  { }
+};
+
+static struct LitterMulchSyntax : DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new LitterMulch (al); }
+  LitterMulchSyntax ()
+    : DeclareModel (Litter::component, "mulch", "residue", "\
+A decomposing mulch layer.\n\
+\n\
+The bottom of the mulch layer may decompose based on the conditions\n\
+in the top of soil.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.set_strings ("cite", "findeling2007modelling");
+
+    frame.declare ("density", "kg DM/m^3", Check::positive (),
+		   Attribute::Const, "\
+Density of mulch layer.");
+    frame.declare ("decompose_height", "cm", Check::positive (),
+		   Attribute::Const, "\
+Height of muclh layer considered in contact with the soil.\n\
+Only this part of the mulch layer will decompose");
+    frame.declare ("soil_height", "cm", Check::negative (),
+		   Attribute::Const, "\
+Height of soil layer (a negative number) contributing to decay.");
+    frame.declare ("Theta_res", Attribute::None (), Check::non_negative (),
+		   Attribute::Const, "\
+Water content where biological activity stops");
+    frame.declare ("Theta_sat", Attribute::None (), Check::non_negative (),
+		   Attribute::OptionalConst, "\
+Water content where for saturation.\n\
+By default calculated from 'density' and 'water_capacity'.");
+    frame.declare ("h_min", "cm", Check::negative (),
+		   Attribute::Const, "\
+Water pressure where biological activity stops.");
+    frame.set ("h_min", pF2h (6.5));
+
+    // Log variables.
+    frame.declare ("height", "cm", Attribute::LogOnly, "\
+Total height of mulch layer.");
+    frame.declare ("decompose_mass", "kg DM/m^2", Attribute::LogOnly, "\
+Mass of mulch layer that has contact with soil layer.");
+    frame.declare ("N_avail", "g/cm^2", Attribute::LogOnly, "\
+Nitrogen available for mulch turnover\n\
+This includes NO3 and NH4 from litter, surface, and top soil ('soil_height').");
+    frame.declare ("water", "cm", Attribute::LogOnly, "\
+Total water in mulch.");
+    frame.declare ("Theta", Attribute::None (), Attribute::LogOnly, "\
+Relative water content.");
+    frame.declare ("h", "cm", Attribute::LogOnly, "\
+Mulch water potential.");
+    frame.declare ("h_factor", Attribute::None (), Attribute::LogOnly, "\
+Water potential effect on turnover.");
+    frame.declare ("T", "dg C", Attribute::LogOnly, "\
+Temperature of water in mulch.");
+    frame.declare ("T_factor", Attribute::None (), Attribute::LogOnly, "\
+Temperature effect on turnover.");
+  }
+} LitterMulch_syntax;
 
 // litter.C ends here.

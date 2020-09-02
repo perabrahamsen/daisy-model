@@ -279,6 +279,9 @@ struct OrganicStandard : public OrganicMatter
   void store_SOM ();
   void restore_SOM ();
 
+  const std::vector <AM*> get_am () const
+  { return am; }
+
   // Communication with external model.
   double get_smb_c_at (size_t i) const; // [g C/cm³]
 

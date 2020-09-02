@@ -26,6 +26,14 @@
 #include "symbol.h"
 
 class BlockModel;
+class Geometry;
+class Soil;
+class SoilWater;
+class SoilHeat;
+class OrganicMatter;
+class Chemistry;
+class Treelog;
+class Bioclimate;
 
 class Litter : public ModelDerived
 {
@@ -38,15 +46,16 @@ public:
 public:
   void output (Log& log) const;
   
-  virtual void update (double top_DM /* [kg DM/m^2] */) = 0;
+  virtual void tick (const Bioclimate&, const Geometry& geo, const Soil& soil,
+		     const SoilWater& soil_water, const SoilHeat& soil_heat,
+		     OrganicMatter& organic, Chemistry& chemistry,
+		     Treelog& msg) = 0;
   virtual double cover () const = 0; // Fraction of surface covered [0-1]
   virtual double vapor_flux_factor () const = 0; // Affect on soil evap. []
   virtual double water_capacity () const = 0;    // Max water content [mm]
   virtual double albedo () const = 0;  // Light reflection factor []
 
   // Create and Destroy.
-public:
-  virtual void initialize (double top_DM /* [kg DM/m^2] */) = 0;
 protected:
   Litter (const BlockModel&);
 public:

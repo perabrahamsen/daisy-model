@@ -92,26 +92,6 @@ struct Bioincorporation::Implementation
   Implementation (const FrameSubmodel& al);
 };
 
-bool 
-Bioincorporation::Implementation::am_compare (const AM* a, const AM* b)
-{
-  const double a_top_C = a->top_C ();
-  daisy_assert (a_top_C >= 0);
-  if (iszero (a_top_C))
-    return false;
-
-  const double b_top_C = b->top_C ();
-  daisy_assert (b_top_C >= 0);
-  if (iszero (b_top_C))
-    return true;
-      
-  const double a_top_N = a->top_N ();
-  daisy_assert (a_top_N > 0.0);
-  const double b_top_N = b->top_N ();
-  daisy_assert (b_top_N > 0.0);
-  return a_top_C / a_top_N < b_top_C / b_top_N;
-}
-
 static const double DM_to_C = 0.420; // C fraction of DM.
 static const double C_to_DM = 1.0 / DM_to_C;
 static const double m2_per_cm2 = 0.0001;
@@ -143,7 +123,7 @@ Bioincorporation::Implementation::tick (const Geometry& geo,
 
   // Eat from each AM, lowest C/N first.
   const unsigned int am_size = am.size ();
-  sort (am.begin (), am.end (), am_compare);
+  sort (am.begin (), am.end (), AM::compare_CN);
   double available = R_total * dt;	// [g C/cm^2]
   double last_C_per_N = 0.0;
 
