@@ -49,6 +49,7 @@ public:
   virtual void tick (const Bioclimate&, const Geometry& geo, const Soil& soil,
 		     const SoilWater& soil_water, const SoilHeat& soil_heat,
 		     OrganicMatter& organic, Chemistry& chemistry,
+		     const double dt,
 		     Treelog& msg) = 0;
   virtual double cover () const = 0; // Fraction of surface covered [0-1]
   virtual double vapor_flux_factor () const = 0; // Affect on soil evap. []

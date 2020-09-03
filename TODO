@@ -1,65 +1,24 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* GMSR
+* Mulch
 
-** move am_compare from bioincorporation to am.C
+** AOM top turnover
 
-* GMSR: Mulch layer assumptions
+*** "To SMBX" will be DOC and DON in mulch layer
 
-** Works like 'residue' for water and radiation
+*** "To SOM2" will go to SOM in top soil
 
-** Is basically one layer, not two.
-*** No internal gradients of solutes in mulch layer
+** DOC/DON top turnover
 
-** The bottom of the mulch layer degrade (into SOL)
-*** based on conditions in the top of the soil
+*** Will go to SMB2 in top soil
 
-** SOL is a "chemical" that in generated in the mulch layer
-*** SOL enters the soil with water leaking from the mulch layer
+*** May immobilise/mineralise N from/to top soil
 
-** SOL "degrades" into SMB2
+*** max soil immobilization time [h]
 
-* GMSR: Mulch layer
+Limit immobilization
 
-
-
-** LitterMulch model
-
-** Litter::turnover virtual function, default noop
-
-** LitterMulch::turnover
-
-*** First step
-
-Find C in top and bottom layer
-
-Find abiotic factors
-
-calculate turnover C_to_CO2 and C_to_SOL/N_to_SOL and N_from_soil
-
-Make them logable
-
-*** Later
-
-Update NO3, NH4, and SOL
-
-** SOL
-
-*** ChemicalUnified (copy of ChemicalStandard)
-
-*** Turnover component
-
-*** TurnoverClassic and TurnoverFOCUS (and TurnoverMaja?)
-
-*** Test same results as "Standard"
-
-*** TurnoverAOM
-
-*** Composition (C 27) (N 1) ???
-
-
-
-
+Maybe divide by NH4 and NO3?
 
 * cloudiness
 

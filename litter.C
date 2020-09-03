@@ -37,6 +37,7 @@
 #include "am.h"
 #include "bioclimate.h"
 #include "abiotic.h"
+#include "aom.h"
 #include <sstream>
 
 // The 'litter' component.
@@ -85,6 +86,7 @@ struct LitterNone : public Litter
   void tick (const Bioclimate&, const Geometry& geo, const Soil& soil,
 	     const SoilWater& soil_water, const SoilHeat& soil_heat,
 	     OrganicMatter& organic, Chemistry& chemistry,
+	     const double dt,
 	     Treelog& msg)
   { }
   double cover () const
@@ -127,8 +129,9 @@ struct LitterPermanent : public Litter
 
   // Simulation.
   void tick (const Bioclimate&, const Geometry& geo, const Soil& soil,
-	     const SoilWater& soil_water, const SoilHeat& soil_heat,
+	     const SoilWater& soil_water, const SoilHeat& soil_heat,	    
 	     OrganicMatter& organic, Chemistry& chemistry,
+	     const double dt,
 	     Treelog& msg)
   { }
   double cover () const
@@ -197,6 +200,7 @@ struct LitterResidue : public Litter
 	     const Geometry& geo, const Soil& soil,
 	     const SoilWater& soil_water, const SoilHeat& soil_heat,
 	     OrganicMatter& organic, Chemistry& chemistry,
+	     const double dt,
 	     Treelog& msg)
   {
     mass = organic.top_DM ();
@@ -324,18 +328,21 @@ struct LitterMulch : public LitterResidue
   double h_factor;		// Water potential effect []
   double T;			// Temeprature of mulch.
   double T_factor;		// Temperature factor []
+  double SOL_C_gen;		// Disolved organic C generation [g C/cm^2/h]
+  double SOL_N_gen;		// Disolved organic N generation [g N/cm^2/h]
   
   // Simulation.
   void tick (const Bioclimate& bioclimate,
 	     const Geometry& geo, const Soil& soil,
 	     const SoilWater& soil_water, const SoilHeat& soil_heat,
 	     OrganicMatter& organic, Chemistry& chemistry,
+	     const double dt,
 	     Treelog& msg)
   {
     // Find mass and cover.
     LitterResidue::tick (bioclimate,
 			 geo, soil, soil_water, soil_heat, organic, chemistry,
-			 msg);
+			 dt, msg);
 
     // Find height of mulch layer.
     static const double cm_per_m = 100.0;
@@ -389,13 +396,37 @@ struct LitterMulch : public LitterResidue
       }
     else
       N_avail = NAN;
-    
 
-      // Soil
+    // Combined
+    const double factor = T_factor * h_factor;
+
+    // Turnover
     std::vector <AM*> am = organic.get_am ();
-    std::sort (am.begin (), am.end (), AM::compare_CN);
+    std::vector<AOM*> added;
+
+    for (auto pool: am)
+      pool->append_to (added);
+
+    sort (added.begin (), added.end (), AOM::compare_CN);
     
-    
+    SOL_C_gen = 0.0;		// [g C/cm^2/h]
+    SOL_N_gen = 0.0;		// [g N/cm^2/h]
+    for (auto pool: added)
+      {
+	const double rate = factor * pool->turnover_rate; // [h^-1]
+
+	const double top_C = pool->top_C; // [g C/cm^2]
+	double new_C = NAN; // [g C/cm^2]
+	double loss_C = NAN; // [g C/cm^2]
+	first_order_change (top_C, 0, rate, dt, new_C, loss_C);
+	SOL_C_gen += loss_C;
+	
+	const double top_N = pool->top_N; // [g N/cm^2]
+	double new_N = NAN; // [g N/cm^2]
+	double loss_N = NAN; // [g N/cm^2]
+	first_order_change (top_N, 0, rate, dt, new_N, loss_N);
+	SOL_N_gen += loss_N;
+      }
   }
   void output (Log& log) const
   {
@@ -410,6 +441,8 @@ struct LitterMulch : public LitterResidue
     output_variable (h_factor, log);
     output_variable (T, log);
     output_variable (T_factor, log);
+    output_variable (SOL_C_gen, log);
+    output_variable (SOL_N_gen, log);
   }
 
   static double find_Theta_sat (const BlockModel& al)
@@ -509,6 +542,10 @@ Water potential effect on turnover.");
 Temperature of water in mulch.");
     frame.declare ("T_factor", Attribute::None (), Attribute::LogOnly, "\
 Temperature effect on turnover.");
+    frame.declare ("SOL_C_gen", "g/cm^2/h", Attribute::LogOnly, "\
+Solute organic carbon generated from turnover.");
+    frame.declare ("SOL_N_gen", "g/cm^2/h", Attribute::LogOnly, "\
+Solute organic nitrogen generated from turnover.");
   }
 } LitterMulch_syntax;
 

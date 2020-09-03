@@ -41,6 +41,22 @@ AOM::library_id () const
   return id;
 }
 
+bool 
+AOM::compare_CN (const AOM* a, const AOM* b)
+{
+  double A = a->initial_C_per_N;
+  if (approximate (A, OM::Unspecified)
+      && a->N.size () > 0 && a->C.size () > 0 && a->N[0] > 0)
+    A = a->C[0] / a->N[0];
+  double B = b->initial_C_per_N;
+  if (approximate (B, OM::Unspecified)
+      && b->N.size () > 0 && b->C.size () > 0 && b->N[0] > 0)
+    B = b->C[0] / b->N[0];
+
+  return A < B;
+}
+
+
 void
 AOM::output (Log& log) const
 {

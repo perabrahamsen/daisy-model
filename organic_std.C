@@ -182,7 +182,6 @@ struct OrganicStandard : public OrganicMatter
   std::vector<double> tillage_C_soil;
 
   // Utilities.
-  static bool aom_compare (const AOM* a, const AOM* b);
   double total_N (const Geometry& ) const;
   double total_C (const Geometry& ) const;
   template<class DAOM>
@@ -696,21 +695,6 @@ OrganicStandard::Initialization::
 OrganicStandard::Initialization::~Initialization ()
 { }
 
-bool 
-OrganicStandard::aom_compare (const AOM* a, const AOM* b)
-{
-  double A = a->initial_C_per_N;
-  if (approximate (A, OM::Unspecified)
-      && a->N.size () > 0 && a->C.size () > 0 && a->N[0] > 0)
-    A = a->C[0] / a->N[0];
-  double B = b->initial_C_per_N;
-  if (approximate (B, OM::Unspecified)
-      && b->N.size () > 0 && b->C.size () > 0 && b->N[0] > 0)
-    B = b->C[0] / b->N[0];
-
-  return A < B;
-}
-
 double 
 OrganicStandard::total_N (const Geometry& geo) const
 {
@@ -1186,7 +1170,7 @@ OrganicStandard::tick (const Geometry& geo,
   std::vector<AOM*> added;
   for (int i = 0; i < all_am_size; i++)
     am[i]->append_to (added);
-  sort (added.begin (), added.end (), aom_compare);
+  sort (added.begin (), added.end (), AOM::compare_CN);
   validate_am (am);
   
   // Clear logs.

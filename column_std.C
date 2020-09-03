@@ -757,7 +757,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
 
   // Early calculation.
   litter->tick (*bioclimate, geometry, *soil, *soil_water, *soil_heat,
-		*organic_matter, *chemistry, msg);
+		*organic_matter, *chemistry, dt, msg);
   const double old_pond 
     = bioclimate->get_snow_storage () + surface.ponding_average ();
   bioclimate->tick (time, surface, my_weather,
@@ -1164,7 +1164,7 @@ ColumnStandard::initialize (const Metalib& metalib,
 
   // Litter layer.
   litter->tick (*bioclimate, geometry, *soil, *soil_water, *soil_heat,
-		*organic_matter, *chemistry, msg);
+		*organic_matter, *chemistry, 0.0, msg);
 
   return ok;
 }

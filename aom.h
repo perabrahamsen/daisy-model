@@ -34,6 +34,8 @@ public:
   static const char *const component;
   symbol library_id () const;
 
+  static bool compare_CN (const AOM* a, const AOM* b);
+  
   // Parameters.
 public:
   const double initial_fraction; // Relative fraction for this om.
