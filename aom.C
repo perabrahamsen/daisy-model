@@ -57,6 +57,13 @@ AOM::compare_CN (const AOM* a, const AOM* b)
 }
 
 
+double
+AOM::SOM_fraction () const
+{
+  // Assume no DOM...
+  daisy_assert (fractions.size () > 0);
+  return fractions.back ();
+}
 void
 AOM::output (Log& log) const
 {

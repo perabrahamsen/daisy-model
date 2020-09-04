@@ -43,8 +43,9 @@ public:
   // Content.
 public:
   double top_C;			// Carbon on the ground.
-  double top_N;			// Nitrogen on the ground;
-
+  double top_N;			// Nitrogen on the ground.
+  double SOM_fraction () const;	// Fraction of SOM generated from turnover.
+  
   // Simulation.
 public:
   void output (Log&) const;

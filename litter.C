@@ -321,15 +321,16 @@ struct LitterMulch : public LitterResidue
   // Log variables.
   double height;		// Height of mulch layer [cm]
   double decompose_mass;	// In contact with soil [kg/m^2]
-  double N_avail;		// Available nitrogen [g/cm^2]
   double water;			// Total water in mulch [cm]
   double Theta;			// Relative water content []
   double h;			// Mulch water potential [cm]
   double h_factor;		// Water potential effect []
   double T;			// Temeprature of mulch.
   double T_factor;		// Temperature factor []
-  double SOL_C_gen;		// Disolved organic C generation [g C/cm^2/h]
-  double SOL_N_gen;		// Disolved organic N generation [g N/cm^2/h]
+  double DOC_gen;		// Disolved organic C generation [g C/cm^2/h]
+  double DON_gen;		// Disolved organic N generation [g N/cm^2/h]
+  double SOC_gen;		// Stationary C generation [g C/cm^2/h]
+  double SON_gen;		// Stationary N generation [g N/cm^2/h]
   
   // Simulation.
   void tick (const Bioclimate& bioclimate,
@@ -378,25 +379,6 @@ struct LitterMulch : public LitterResidue
     T = bioclimate.get_litter_temperature (); // [dg C]
     T_factor = Abiotic::f_T0 (T);
 
-    // Nitrogen.
-    const bool has_N = chemistry.know (Chemical::NO3 ())
-      && chemistry.know (Chemical::NH4 ());
-    if (has_N)
-      {
-	Chemical& NO3 = chemistry.find (Chemical::NO3 ());
-	Chemical& NH4 = chemistry.find (Chemical::NH4 ());
-	N_avail		// [g/cm^2]
-	  = NO3.surface_storage_amount () // [g/cm^2]
-	  + NO3.litter_storage_amount () // [g/cm^2]
-	  + NH4.surface_storage_amount () // [g/cm^2]
-	  + NH4.litter_storage_amount () // [g/cm^2]
-	  + ((geo.content_interval (NO3, &Chemical::M_total, 0, soil_height)
-	     + geo.content_interval (NH4, &Chemical::M_total, 0, soil_height))
-	     * std::fabs (soil_height));	// [g/cm^3] * [cm]
-      }
-    else
-      N_avail = NAN;
-
     // Combined
     const double factor = T_factor * h_factor;
 
@@ -409,47 +391,54 @@ struct LitterMulch : public LitterResidue
 
     sort (added.begin (), added.end (), AOM::compare_CN);
     
-    SOL_C_gen = 0.0;		// [g C/cm^2/h]
-    SOL_N_gen = 0.0;		// [g N/cm^2/h]
+    DOC_gen = 0.0;		// [g C/cm^2/h]
+    DON_gen = 0.0;		// [g N/cm^2/h]
+    SOC_gen = 0.0;		// [g C/cm^2/h]
+    SON_gen = 0.0;		// [g N/cm^2/h]
     for (auto pool: added)
       {
 	const double rate = factor * pool->turnover_rate; // [h^-1]
-
+	const double stationary = pool->SOM_fraction ();  // []
+	const double dissolved = 1.0 - stationary;	  // []
 	const double top_C = pool->top_C; // [g C/cm^2]
+
 	double new_C = NAN; // [g C/cm^2]
-	double loss_C = NAN; // [g C/cm^2]
+	double loss_C = NAN; // [g C/cm^2/h]
 	first_order_change (top_C, 0, rate, dt, new_C, loss_C);
-	SOL_C_gen += loss_C;
+	DOC_gen += loss_C * dissolved;
+	SOC_gen += loss_C * stationary;
+	pool->top_C = new_C;
 	
 	const double top_N = pool->top_N; // [g N/cm^2]
 	double new_N = NAN; // [g N/cm^2]
-	double loss_N = NAN; // [g N/cm^2]
+	double loss_N = NAN; // [g N/cm^2/h]
 	first_order_change (top_N, 0, rate, dt, new_N, loss_N);
-	SOL_N_gen += loss_N;
+	DON_gen += loss_N * dissolved;
+	SON_gen += loss_N * stationary;
+	pool->top_N = new_N;
       }
+
+    
   }
   void output (Log& log) const
   {
     LitterResidue::output (log);
     output_variable (height, log);
     output_variable (decompose_mass, log);
-    if (std::isfinite (N_avail))
-      output_variable (N_avail, log);
     output_variable (water, log);
     output_variable (Theta, log);
     output_variable (h, log);
     output_variable (h_factor, log);
     output_variable (T, log);
     output_variable (T_factor, log);
-    output_variable (SOL_C_gen, log);
-    output_variable (SOL_N_gen, log);
+    output_variable (DOC_gen, log);
+    output_variable (DON_gen, log);
+    output_variable (SOC_gen, log);
+    output_variable (SON_gen, log);
   }
 
   static double find_Theta_sat (const BlockModel& al)
   {
-    if (al.check ("Theta_sat"))
-      return al.number ("Theta_sat");
-
     const double density = al.number ("density"); // [kg/m^3]
     const double water_capacity = al.number ("water_capacity"); // [L/kg]
     const double L_per_m3 = 1000.0; // [L/m^3]
@@ -459,7 +448,7 @@ struct LitterMulch : public LitterResidue
     Treelog& msg = al.msg ();
     Treelog::Open nest (msg, "mulch layer");
     std::ostringstream tmp;
-    tmp << "(Theta_sat " << Theta_sat << " [])";
+    tmp << "Theta_sat = " << Theta_sat << " [])";
     msg.debug (tmp.str ());
 
     return Theta_sat;
@@ -472,11 +461,20 @@ struct LitterMulch : public LitterResidue
       decompose_height (al.number ("decompose_height")),
       soil_height (al.number ("soil_height")),
       Theta_res (al.number ("Theta_res")),
-      Theta_sat (al.number ("Theta_sat", find_Theta_sat (al))),
+      Theta_sat (find_Theta_sat (al)),
       h_min (al.number ("h_min")),
       height (NAN),
       decompose_mass (NAN),
-      N_avail (NAN) 
+      water (NAN),
+      Theta (NAN),
+      h (NAN),
+      h_factor (NAN),
+      T (NAN),
+      T_factor (NAN),
+      DOC_gen (NAN),
+      DON_gen (NAN),
+      SOC_gen (NAN),
+      SON_gen (NAN)
   {
     if (Theta_res > Theta_sat)
       al.msg ().error ("Theta_res > Theta_sat");
@@ -513,10 +511,6 @@ Height of soil layer (a negative number) contributing to decay.");
     frame.declare ("Theta_res", Attribute::None (), Check::non_negative (),
 		   Attribute::Const, "\
 Water content where biological activity stops");
-    frame.declare ("Theta_sat", Attribute::None (), Check::non_negative (),
-		   Attribute::OptionalConst, "\
-Water content where for saturation.\n\
-By default calculated from 'density' and 'water_capacity'.");
     frame.declare ("h_min", "cm", Check::negative (),
 		   Attribute::Const, "\
 Water pressure where biological activity stops.");
@@ -527,9 +521,6 @@ Water pressure where biological activity stops.");
 Total height of mulch layer.");
     frame.declare ("decompose_mass", "kg DM/m^2", Attribute::LogOnly, "\
 Mass of mulch layer that has contact with soil layer.");
-    frame.declare ("N_avail", "g/cm^2", Attribute::LogOnly, "\
-Nitrogen available for mulch turnover\n\
-This includes NO3 and NH4 from litter, surface, and top soil ('soil_height').");
     frame.declare ("water", "cm", Attribute::LogOnly, "\
 Total water in mulch.");
     frame.declare ("Theta", Attribute::None (), Attribute::LogOnly, "\
@@ -542,10 +533,14 @@ Water potential effect on turnover.");
 Temperature of water in mulch.");
     frame.declare ("T_factor", Attribute::None (), Attribute::LogOnly, "\
 Temperature effect on turnover.");
-    frame.declare ("SOL_C_gen", "g/cm^2/h", Attribute::LogOnly, "\
-Solute organic carbon generated from turnover.");
-    frame.declare ("SOL_N_gen", "g/cm^2/h", Attribute::LogOnly, "\
-Solute organic nitrogen generated from turnover.");
+    frame.declare ("DOC_gen", "g/cm^2/h", Attribute::LogOnly, "\
+Dissolved organic carbon generated from turnover.");
+    frame.declare ("DON_gen", "g/cm^2/h", Attribute::LogOnly, "\
+Dissolved organic nitrogen generated from turnover.");
+    frame.declare ("SOC_gen", "g/cm^2/h", Attribute::LogOnly, "\
+Stationary organic carbon generated from turnover.");
+    frame.declare ("SON_gen", "g/cm^2/h", Attribute::LogOnly, "\
+Stationary organic nitrogen generated from turnover.");
   }
 } LitterMulch_syntax;
 
