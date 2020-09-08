@@ -874,9 +874,8 @@ Nitrogen content of the crop, excluding dead leaves.")
   (output "NH4-Mineralization")
   (content "AOM" "SOM" "SMB" "Buffer"))
 
-(defsummary "Soil N balance" balance
+(defsummary "Soil N balance" N_balance
   "Nitrogen balance for a soil interval."
-  (precision 3)
   (input "NO3-Matrix-In" "NH4-Matrix-In" "NO3-Biopore-In" "NH4-Biopore-In" 
 	 "NO3-Incorp" "NH4-Incorp"
          "NO3-Tillage" "NH4-Tillage"
@@ -1260,7 +1259,8 @@ This is usually zero.")
   (unit "g/ha")
   (where "${colfid}field_${chemfid}.dlf")
   (summary (balance (precision 3)
-                    (input "Spray" "Deposit" "External" "Surface Transform" 
+                    (input "Spray" "Deposit" "External"
+			   "Litter Transform" "Surface Transform" 
                            "Soil Transform")
                     (output "Harvest" "Dissipate" "Litter Decompose"
                             "Surface Decompose" "Runoff"
@@ -1327,6 +1327,14 @@ Decomposed while stored in the litter pack.")
                    (handle sum)
                    (dimension "${unit}")
                    (spec chemical default litter_decompose))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         litter_transform)
+                   (documentation "\
+Added from chemical transformation in the litter pack.")
+                   (tag "Litter Transform")
+                   (handle sum)
+                   (dimension "${unit}")
+                   (spec chemical default litter_transform))
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
                          surface_decompose)
                    (documentation "\

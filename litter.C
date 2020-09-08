@@ -417,8 +417,26 @@ struct LitterMulch : public LitterResidue
 	SON_gen += loss_N * stationary;
 	pool->top_N = new_N;
       }
+    double buffer_C = SOC_gen * dt;
+    double buffer_N = SON_gen * dt;
 
+    if (chemistry.know (Chemical::DOC ()))
+      {
+	Chemical& DOC = chemistry.find (Chemical::DOC ());
+	DOC.add_to_litter_transform_source (DOC_gen);
+      }
+    else
+      buffer_C += DOC_gen * dt;
+
+    if (chemistry.know (Chemical::DON ()))
+      {
+	Chemical& DON = chemistry.find (Chemical::DON ());
+	DON.add_to_litter_transform_source (DON_gen);
+      }
+    else
+      buffer_C += DON_gen * dt;
     
+    organic.add_to_buffer (geo, 0, soil_height, buffer_C, buffer_N);
   }
   void output (Log& log) const
   {

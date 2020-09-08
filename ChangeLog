@@ -1,3 +1,12 @@
+2020-09-07  Per Abrahamsen  <pa@plen.ku.com>
+
+	* chemical_std.C, chemical.h (add_to_litter_transform_source): New
+	function.
+	* chemical_std.C (litter_transform): New log variable.
+	* chemistry_std.C (DOM): New parameterization.
+	* chemical.C, chemical_std.C (DON, DOC): New parameterizations.
+	* lib/log-std.dai ("Field chemical"): Addet it.
+
 2020-09-02  Per Abrahamsen  <pa@plen.ku.com>
 
 	* lib/log.dai ("Crop uptake"): New log parameterization.

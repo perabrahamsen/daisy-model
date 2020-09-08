@@ -103,6 +103,12 @@ struct OrganicNone : public OrganicMatter
   { }
   AM* find_am (symbol, symbol) const
   { return NULL; }
+  void add_to_buffer (const Geometry& geo,
+		      const double from /* [cm] */,
+		      const double to /* [cm] */,
+		      const double C /* [g/cm^2] */,
+		      const double N /* [g/cm^2] */)
+  { }
   void initialize (const Metalib&, 
                    const Units&, const Frame&, const Geometry& geo,
                    const Soil&, const SoilpH&, 

@@ -53,6 +53,20 @@ Chemical::NH4 ()
 }
 
 const symbol
+Chemical::DON ()
+{
+  static const symbol unit ("DON");
+  return unit;
+}
+
+const symbol
+Chemical::DOC ()
+{
+  static const symbol unit ("DOC");
+  return unit;
+}
+
+const symbol
 Chemical::surface_storage_unit ()
 {
   static const symbol unit ("g/m^2");

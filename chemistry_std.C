@@ -552,4 +552,16 @@ Inorganic nitrogen.")
   }
 } ChemistryNitrogen_syntax;
 
+static struct ChemistryDOMSyntax : public DeclareParam
+{
+  ChemistryDOMSyntax ()
+    : DeclareParam (Chemistry::component, "DOM", "default", "\
+Disolved organic matter.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set_strings ("trace", "DON", "DOC");
+  }
+} ChemistryDOM_syntax;
+
 // chemistry_std.C ends her.

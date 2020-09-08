@@ -114,6 +114,7 @@ struct ChemicalStandard : public Chemical
   double litter_storage;
   double litter_in;
   double litter_decompose;
+  double litter_transform;
   double litter_out;
 
   double surface_storage;
@@ -235,6 +236,7 @@ struct ChemicalStandard : public Chemical
   void add_to_transform_source_secondary (const std::vector<double>&);
   void add_to_transform_sink_secondary (const std::vector<double>&);
   void add_to_surface_transform_source (double amount  /* [g/cm^2/h] */);
+  void add_to_litter_transform_source (double amount  /* [g/cm^2/h] */);
   void add_to_canopy_transform_source (double amount  /* [g/cm^2/h] */);
   void release_surface_colloids (double surface_release);
 
@@ -612,6 +614,7 @@ ChemicalStandard::clear ()
   surface_tillage = 0.0;
   litter_tillage = 0.0;
   canopy_transform = 0.0;
+  litter_transform = 0.0;
   surface_transform = 0.0;
   surface_release = 0.0;
   // Don't clear M_tertiary here, it may be needed for initial log content.
@@ -748,6 +751,13 @@ ChemicalStandard::add_to_transform_source_secondary (const std::vector<double>& 
   for (unsigned i = 0; i < v.size (); i++)
     S_transform[i] += v[i];
   add_to_source_secondary (v);
+}
+
+void 
+ChemicalStandard::add_to_litter_transform_source (const double amount /* [g/cm^2/h] */)
+{
+  const double m2_per_cm2 = 0.01 * 0.01;
+  litter_transform += amount / m2_per_cm2;
 }
 
 void 
@@ -1078,7 +1088,7 @@ ChemicalStandard::tick_top (const Vegetation& vegetation,
   const double litter_washoff_rate 
     = litter_washoff_coefficient * litter_leak_rate;
   double litter_absolute_loss_rate;
-  first_order_change (old_litter_storage, litter_in,
+  first_order_change (old_litter_storage, litter_in + litter_transform,
 		      litter_decompose_rate + litter_washoff_rate, dt,
                       litter_storage, litter_absolute_loss_rate);
   divide_loss (litter_absolute_loss_rate, 
@@ -1143,7 +1153,8 @@ ChemicalStandard::tick_top (const Vegetation& vegetation,
   // Mass balance.
   const double new_storage = snow_storage + canopy_storage + litter_storage;
   const double input
-    = spray_overhead_ + spray_surface_ + deposit_ + canopy_transform;
+    = spray_overhead_ + spray_surface_ + deposit_
+    + canopy_transform + litter_transform;
   const double output = surface_in + canopy_harvest + canopy_dissipate 
     + litter_decompose;
   if (!approximate (new_storage, old_storage + (input - output) * dt)
@@ -1628,6 +1639,7 @@ ChemicalStandard::output (Log& log) const
   output_variable (litter_storage, log);
   output_variable (litter_in, log);
   output_variable (litter_decompose, log);
+  output_variable (litter_transform, log);
   output_variable (litter_out, log);
   output_variable (surface_storage, log);
   output_variable (surface_solute, log);
@@ -1642,8 +1654,9 @@ ChemicalStandard::output (Log& log) const
   output_value (snow_storage + canopy_storage 
                 + litter_storage + surface_storage,
                 "top_storage", log);
-  output_value (canopy_dissipate + canopy_harvest + litter_decompose
-                + surface_runoff + surface_decompose - surface_transform - canopy_transform,
+  output_value (canopy_dissipate + canopy_harvest - canopy_transform
+		+ litter_decompose - litter_transform
+                + surface_runoff + surface_decompose - surface_transform,
                 "top_loss", log);
   output_value (C_avg_, "C", log);
   output_value (C_secondary_, "C_secondary", log);
@@ -2115,6 +2128,7 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
     litter_storage (al.number ("litter_storage")),
     litter_in (0.0),
     litter_decompose (0.0),
+    litter_transform (0.0),
     litter_out (0.0),
     surface_storage (al.number ("surface_storage")),
     surface_solute (0.0),
@@ -2508,6 +2522,8 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
                    "Entering litter .");
     frame.declare ("litter_decompose", "g/m^2/h", Attribute::LogOnly, 
                    "Decomposed from the litter.");
+    frame.declare ("litter_transform", "g/m^2/h", Attribute::LogOnly, 
+                   "Added through transformation in litter layer.");
     frame.declare ("litter_out", "g/m^2/h", Attribute::LogOnly, 
                    "Leaking from litter.");
 
@@ -2657,11 +2673,21 @@ static struct ChemicalNitrogenSyntax : public DeclareParam
 {
   ChemicalNitrogenSyntax ()
     : DeclareParam (Chemical::component, "N", "nutrient", "\
-Non-organic nitrogen.")
+Nitrogen.")
   { }
   void load_frame (Frame&) const
   { }
 } ChemicalNitrogen_syntax;
+
+static struct ChemicalMINSyntax : public DeclareParam
+{
+  ChemicalMINSyntax ()
+    : DeclareParam (Chemical::component, "MIN", "N", "\
+Non-organic nitrogen.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ChemicalMIN_syntax;
 
 static struct InitialNO3Syntax : public DeclareParam
 { 
@@ -2680,7 +2706,7 @@ Initial NO3 concentration in soil water.")
 static struct ChemicalNO3Syntax : public DeclareParam
 { 
   ChemicalNO3Syntax ()
-    : DeclareParam (Chemical::component, "NO3", "N", "\
+    : DeclareParam (Chemical::component, "NO3", "MIN", "\
 Nitrate-N.")
   { }
   void load_frame (Frame& frame) const
@@ -2721,7 +2747,7 @@ Initial NH4 concentration in soil water.")
 static struct ChemicalNH4Syntax : public DeclareParam
 { 
   ChemicalNH4Syntax ()
-    : DeclareParam (Chemical::component, "NH4", "N", "\
+    : DeclareParam (Chemical::component, "NH4", "MIN", "\
 Ammonium-N.")
   { }
   void load_frame (Frame& frame) const
@@ -2731,5 +2757,31 @@ Ammonium-N.")
     frame.set ("initial", "initial_NH4");
   }
 } ChemicalNH4_syntax;
+
+static struct ChemicalDONSyntax : public DeclareParam
+{ 
+  ChemicalDONSyntax ()
+    : DeclareParam (Chemical::component, "DON", "N", "\
+Nitrate-N.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set_cited ("diffusion_coefficient", 1.9e-6, "900 Da, 2.5 nm",
+		     "hendry2003geochemical");
+  }
+} ChemicalDON_syntax;
+
+static struct ChemicalDOCSyntax : public DeclareParam
+{ 
+  ChemicalDOCSyntax ()
+    : DeclareParam (Chemical::component, "DOC", "nutrient", "\
+Nitrate-N.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set_cited ("diffusion_coefficient", 1.9e-6, "900 Da, 2.5 nm",
+		     "hendry2003geochemical");
+  }
+} ChemicalDOC_syntax;
 
 // chemical_std.C ends here.

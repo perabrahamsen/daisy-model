@@ -727,8 +727,8 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   // First we calculate the external water sources (precipitation,
   // irrigation) and sinks (potential evapotranspiration).  Then we
   // update the sources, sinks and storage for each of the following
-  // four "containers": The snow pack, water intercepted on the canopy, 
-  // pond, and soil surface.  It is assumed that each the flows for
+  // five "containers": The snow pack, water intercepted on the canopy,
+  // litter, pond, and soil surface.  It is assumed that each the flows for
   // each container only depends on the container above, so we
   // calculate the changes from the top and downwards.
   //

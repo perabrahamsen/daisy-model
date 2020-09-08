@@ -280,6 +280,15 @@ struct OrganicStandard : public OrganicMatter
 
   const std::vector <AM*> get_am () const
   { return am; }
+  void add_to_buffer (const Geometry& geo,
+		      const double from /* [cm] */,
+		      const double to /* [cm] */,
+		      const double C /* [g/cm^2] */,
+		      const double N /* [g/cm^2] */)
+  {
+    geo.add_surface (buffer.C, from, to, C);
+    geo.add_surface (buffer.N, from, to, N);
+  }
 
   // Communication with external model.
   double get_smb_c_at (size_t i) const; // [g C/cm³]

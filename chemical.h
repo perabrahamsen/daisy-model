@@ -56,6 +56,8 @@ public:
 public:
   static const symbol NO3 ();
   static const symbol NH4 ();
+  static const symbol DON ();
+  static const symbol DOC ();
 
   // And standard units.
 public:
@@ -123,6 +125,7 @@ public:
   virtual void add_to_transform_source_secondary (const std::vector<double>&) = 0;
   virtual void add_to_transform_sink_secondary (const std::vector<double>&) = 0;
   virtual void add_to_surface_transform_source (double amount  /* [g/cm^2/h] */) = 0;
+  virtual void add_to_litter_transform_source (double amount  /* [g/cm^2/h] */) = 0;
   virtual void add_to_canopy_transform_source (double amount  /* [g/cm^2/h] */) = 0;
   virtual void release_surface_colloids (double surface_release) = 0;
 

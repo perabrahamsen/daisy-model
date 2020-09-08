@@ -79,6 +79,11 @@ public:
 
   // Communication with external model.
   virtual double get_smb_c_at (size_t i) const = 0; // [g C/cm³]
+  virtual void add_to_buffer (const Geometry& geo,
+			      const double from /* [cm] */,
+			      const double to /* [cm] */,
+			      const double C /* [g C/cm^2] */,
+			      const double N /* [g N/cm^2] */) = 0;
 
   // Create and Destroy.
   virtual int som_pools () const = 0;

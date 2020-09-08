@@ -2,10 +2,6 @@ TODO ---things that needs to be done with Daisy -*- outline -*-
 
 * Mulch
 
-** OrganicMatter
-
-OrganicMatter::add_to_buffer (geo, from, to, C, N);
-
 ** Chemical
 
 *** Pars
