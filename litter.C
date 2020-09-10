@@ -196,6 +196,7 @@ struct LitterResidue : public Litter
     Litter::output (log);
     output_variable (mass, log);
   }
+  
   void tick (const Bioclimate& bioclimate,
 	     const Geometry& geo, const Soil& soil,
 	     const SoilWater& soil_water, const SoilHeat& soil_heat,
@@ -320,7 +321,7 @@ struct LitterMulch : public LitterResidue
   
   // Log variables.
   double height;		// Height of mulch layer [cm]
-  double decompose_mass;	// In contact with soil [kg/m^2]
+  double contact;		// Fraction in contact with soil []
   double water;			// Total water in mulch [cm]
   double Theta;			// Relative water content []
   double h;			// Mulch water potential [cm]
@@ -354,9 +355,9 @@ struct LitterMulch : public LitterResidue
 
     // Find mass of active part of mulch layer.
     if (decompose_height >= height)
-      decompose_mass = mass;
+      contact = 1.0;
     else
-      decompose_mass = mass * decompose_height / height;
+      contact = decompose_height / height;
 
     // Water
     water = bioclimate.get_litter_water () * 0.1; // [mm] -> [cm]
@@ -442,7 +443,7 @@ struct LitterMulch : public LitterResidue
   {
     LitterResidue::output (log);
     output_variable (height, log);
-    output_variable (decompose_mass, log);
+    output_variable (contact, log);
     output_variable (water, log);
     output_variable (Theta, log);
     output_variable (h, log);
@@ -482,7 +483,7 @@ struct LitterMulch : public LitterResidue
       Theta_sat (find_Theta_sat (al)),
       h_min (al.number ("h_min")),
       height (NAN),
-      decompose_mass (NAN),
+      contact (NAN),
       water (NAN),
       Theta (NAN),
       h (NAN),
@@ -537,8 +538,9 @@ Water pressure where biological activity stops.");
     // Log variables.
     frame.declare ("height", "cm", Attribute::LogOnly, "\
 Total height of mulch layer.");
-    frame.declare ("decompose_mass", "kg DM/m^2", Attribute::LogOnly, "\
-Mass of mulch layer that has contact with soil layer.");
+    frame.declare_fraction ("contact", Attribute::LogOnly, "\
+Fraction of mulch layer in contact with soil.\n\
+DOM in this part of the mulch is degraded.");
     frame.declare ("water", "cm", Attribute::LogOnly, "\
 Total water in mulch.");
     frame.declare ("Theta", Attribute::None (), Attribute::LogOnly, "\
