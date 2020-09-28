@@ -61,9 +61,10 @@ ReactionColgen::output_colgen (Log& log) const
 }
 
 bool 
-ReactionColgen::check (const Units&, const Geometry& geo,
+ReactionColgen::check (const Geometry& geo,
                        const Soil&, const SoilWater&, const SoilHeat&,
-                       const Chemistry& chemistry, Treelog& msg) const
+                       const OrganicMatter&,
+		       const Chemistry& chemistry, Treelog& msg) const
 { 
   bool ok = true;
   if (!chemistry.know (colloid_name))

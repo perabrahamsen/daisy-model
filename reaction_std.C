@@ -35,6 +35,7 @@
 
 struct ReactionStandard : public Reaction
 {
+  const Units& units;
   // Parameters.
   const symbol name_A;
   const symbol name_B;
@@ -46,10 +47,9 @@ struct ReactionStandard : public Reaction
   { output_variable (S_AB, log); }
 
   // Simulation.
-  void tick_soil (const Units& units,
-                  const Geometry& geo,
+  void tick_soil (const Geometry& geo,
                   const Soil& soil, const SoilWater& soil_water, 
-                  const SoilHeat& soil_heat, const OrganicMatter&,
+                  const SoilHeat& soil_heat, OrganicMatter&,
                   Chemistry& chemistry, const double dt, Treelog& msg)
   {
     TREELOG_MODEL (msg);
@@ -70,10 +70,11 @@ struct ReactionStandard : public Reaction
   }
 
   // Create.
-  bool check (const Units& units, const Geometry& geo, 
+  bool check (const Geometry& geo, 
               const Soil& soil, const SoilWater& soil_water,
 	      const SoilHeat& soil_heat,
-	      const Chemistry& chemistry, Treelog& msg) const
+	      const OrganicMatter&, const Chemistry& chemistry,
+	      Treelog& msg) const
   { 
     bool ok = true;
     if (!chemistry.know (name_A))
@@ -91,9 +92,10 @@ struct ReactionStandard : public Reaction
 
     return ok;
   }
-  void initialize (const Units& units, const Geometry& geo, 
+  void initialize (const Geometry& geo, 
                    const Soil& soil, const SoilWater& soil_water,
-                   const SoilHeat& soil_heat, const Surface&, Treelog& msg)
+                   const SoilHeat& soil_heat, const OrganicMatter&,
+		   const Surface&, Treelog& msg)
   { 
     transform->initialize (units, geo, soil, soil_water, soil_heat, msg); 
     S_AB.insert (S_AB.begin (), soil.size (), 0.0);
@@ -101,6 +103,7 @@ struct ReactionStandard : public Reaction
   }
   explicit ReactionStandard (const BlockModel& al)
     : Reaction (al),
+      units (al.units ()),
       name_A (al.name ("A")),
       name_B (al.name ("B")),
       transform (Librarian::build_item<Transform> (al, "transform"))

@@ -60,14 +60,15 @@ struct ReactionMorgan98 : public ReactionColgen
 		  const double tillage_age /* [d] */,
                   const double total_rain,  
                   const double h_pond,
-                  Chemistry& chemistry, const double dt, Treelog&);
+                  OrganicMatter&, Chemistry& chemistry,
+		  const double dt, Treelog&);
                            
   void output (Log& log) const;
 
   // Create and Destroy.
-  void initialize (const Units&, const Geometry& geo,
+  void initialize (const Geometry& geo,
                    const Soil& soil, const SoilWater&, const SoilHeat&, 
-                   const Surface&, Treelog&);
+                   const OrganicMatter&, const Surface&, Treelog&);
   ReactionMorgan98 (const BlockModel& al);
 };
 
@@ -97,7 +98,8 @@ ReactionMorgan98::tick_top (const Vegetation& vegetation,
 			    const double /* tillage_age */,
                             const double total_rain, 
                             const double h_pond,
-                            Chemistry& chemistry, const double dt, Treelog&)
+                            OrganicMatter&,
+			    Chemistry& chemistry, const double dt, Treelog&)
 {
   const double direct_rain = bioclimate.direct_rain (); // [mm/h]
   const double canopy_drip = bioclimate.canopy_leak (); // [mm/h]
@@ -124,10 +126,11 @@ ReactionMorgan98::output (Log& log) const
 
 
 void 
-ReactionMorgan98::initialize (const Units&, const Geometry& geo, 
+ReactionMorgan98::initialize (const Geometry& geo, 
                               const Soil& soil,
                               const SoilWater&, const SoilHeat&, 
-                              const Surface& surface, Treelog&)
+                              const OrganicMatter&,
+			      const Surface& surface, Treelog&)
 { surface_soil = find_surface_soil (geo, soil, surface); }
 
 ReactionMorgan98::ReactionMorgan98 (const BlockModel& al)

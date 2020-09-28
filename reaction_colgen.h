@@ -49,9 +49,8 @@ protected:
 
   // Create and Destroy.
 protected:
-  bool check (const Units&, const Geometry&,
-              const Soil&, const SoilWater&, const SoilHeat&,
-	      const Chemistry&, Treelog&) const;
+  bool check (const Geometry&, const Soil&, const SoilWater&, const SoilHeat&,
+	      const OrganicMatter&, const Chemistry&, Treelog&) const;
   ReactionColgen (const BlockModel&);
   ~ReactionColgen ();
 };

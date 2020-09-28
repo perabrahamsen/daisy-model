@@ -1,47 +1,20 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* MST regning
+
 * Mulch
 
-** Chemical
+** Mass balance...
 
-*** Pars
+** reaction DOM: log abiotic factors (especially N)
 
-Chemical N: NO3 NH4 DON 
+** DOM decay in litter layer
 
-Chemical C: DOC
+** log: Add reaction_DOM to N balance
 
-*** Add to litter_storage function
+** log: Add all reaction_DOM output to mulch 
 
-** Chemistry
-
-Chemistry OM par = NO3 + NH4 + DON + DOC
-
-** Mulch
-
-Add SOC/SON to OrganicMatter::add_to_buffer 
-Add DOC/DON to Chemical::litter_storage
-
-** AOM top turnover
-
-*** "To SMBX" will be DOC and DON in mulch layer
-
-No CO2 or MinN interaction
-
-*** "To SOM2" will go to SOM in top soil
-
-No CO2 but Min N
-
-** DOC/DON top turnover
-
-*** Will go to SMB2 in top soil
-
-*** May immobilise/mineralise N from/to top soil
-
-*** max soil immobilization time [h]
-
-Limit immobilization
-
-Maybe divide by NH4 and NO3?
+** write more documentation
 
 * cloudiness
 

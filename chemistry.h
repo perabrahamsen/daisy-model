@@ -113,7 +113,7 @@ public:
                           double M_secondary, double M_solute, 
                           double M_total) const = 0;
   virtual double suggest_dt () const = 0;
-  virtual void tick_top (const Units&, const Geometry&, const Soil&, 
+  virtual void tick_top (const Geometry&, const Soil&, 
                          const SoilWater&, const SoilHeat&, 
                          const double tillage_age /* [d] */,
                          const Surface&,
@@ -123,14 +123,14 @@ public:
 			 const double surface_runoff_rate, // [h^-1]
 			 const double surface_water /* [mm] */,
 			 const double total_rain /* [mm/h] */,
-                         Chemistry& chemistry, 
+                         OrganicMatter&, Chemistry& chemistry, 
                          double dt /* [h] */,
 			 Treelog&) = 0;
   virtual void tick_soil (const Scope&, 
                           const Geometry& geo, double ponding /* [mm] */,
                           double R_mixing /* [h/mm] */,
                           const Soil&, const SoilWater&, const SoilHeat&, 
-			  Movement&, const OrganicMatter&, Chemistry&, 
+			  Movement&, OrganicMatter&, Chemistry&, 
 			  double dt, Treelog&) = 0;
   virtual void clear () = 0;
   virtual void output (Log&) const;
@@ -139,10 +139,11 @@ public:
 public:
   virtual void initialize (const Scope&, const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&,
-			   const Surface&, Treelog&) = 0;
+			   const OrganicMatter&, const Surface&, Treelog&) = 0;
   virtual bool check (const Scope&, const Geometry&,
 		      const Soil&, const SoilWater&, const SoilHeat&,
-		      const Chemistry&, Treelog&) const = 0;
+		      const OrganicMatter&, const Chemistry&,
+		      Treelog&) const = 0;
 protected:
   explicit Chemistry (const BlockModel& al);
 public:

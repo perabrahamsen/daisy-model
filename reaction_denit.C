@@ -63,20 +63,21 @@ struct ReactionDenit : public Reaction
   void output (Log& log) const;
 
   // Simulation.
-  void tick_soil (const Units&, const Geometry& geo,
+  void tick_soil (const Geometry& geo,
                   const Soil& soil, const SoilWater& soil_water, 
                   const SoilHeat& soil_heat,
-                  const OrganicMatter& organic_matter, 
+                  OrganicMatter& organic_matter, 
                   Chemistry& chemistry, const double dt, Treelog& msg);
 
   // Create.
-  bool check (const Units&, const Geometry&, 
+  bool check (const Geometry&, 
               const Soil& soil, const SoilWater& soil_water, 
               const SoilHeat& soil_heat,
-              const Chemistry& chemistry, Treelog& msg) const;
-  void initialize (const Units&, const Geometry&, 
+	      const OrganicMatter&, const Chemistry& chemistry,
+	      Treelog& msg) const;
+  void initialize (const Geometry&, 
                    const Soil&, const SoilWater&, const SoilHeat&,
-                   const Surface&, Treelog&);
+                   const OrganicMatter&, const Surface&, Treelog&);
   explicit ReactionDenit (const BlockModel& al);
 };
 
@@ -91,11 +92,10 @@ ReactionDenit::output (Log& log) const
 }
 
 void 
-ReactionDenit::tick_soil (const Units&, const Geometry& geo,
+ReactionDenit::tick_soil (const Geometry& geo,
                           const Soil& soil, const SoilWater& soil_water,
                           const SoilHeat& soil_heat,
-                          const OrganicMatter& organic_matter, 
-                          Chemistry& chemistry, 
+                          OrganicMatter& organic_matter, Chemistry& chemistry, 
                           const double dt, Treelog&)
 {
   const size_t cell_size = geo.cell_size ();
@@ -149,9 +149,10 @@ ReactionDenit::tick_soil (const Units&, const Geometry& geo,
 }
 
 bool 
-ReactionDenit::check (const Units&, const Geometry&,
+ReactionDenit::check (const Geometry&,
                       const Soil&, const SoilWater&, const SoilHeat&,
-                      const Chemistry& chemistry, Treelog& msg) const
+                      const OrganicMatter&, const Chemistry& chemistry,
+		      Treelog& msg) const
 { 
   bool ok = true;
   if (!chemistry.know (Chemical::NO3 ()))
@@ -163,9 +164,10 @@ ReactionDenit::check (const Units&, const Geometry&,
 }
 
 void
-ReactionDenit::initialize (const Units&, const Geometry&,
+ReactionDenit::initialize (const Geometry&,
                            const Soil& soil, const SoilWater&,
-                           const SoilHeat&, const Surface&, Treelog&)
+                           const SoilHeat&, const OrganicMatter&,
+			   const Surface&, Treelog&)
 {
   const size_t cell_size = soil.size ();
 

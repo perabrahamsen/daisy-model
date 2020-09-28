@@ -71,10 +71,11 @@ struct ReactionSorption : public Reaction
   }
 
   // Simulation.
-  void tick_soil (const Units& units, const Geometry& geo, 
+  void tick_soil (const Geometry& geo, 
                   const Soil& soil, const SoilWater& soil_water, 
-                  const SoilHeat& soil_heat, const OrganicMatter&,
-                  Chemistry& chemistry, const double /* dt */, Treelog& msg)
+                  const SoilHeat& soil_heat, 
+                  OrganicMatter&, Chemistry& chemistry,
+		  const double /* dt */, Treelog& msg)
   { 
     TREELOG_MODEL (msg);
 
@@ -138,10 +139,11 @@ struct ReactionSorption : public Reaction
     sorbed.add_to_transform_source_secondary (S_sorption_secondary);
   }
 
-  void tick_surface (const Units&, const Geometry& geo, 
+  void tick_surface (const Geometry& geo, 
                      const Soil& soil, const SoilWater& soil_water, 
                      const SoilHeat& , const Surface& surf,
-                     Chemistry& chemistry, const double /* dt */, Treelog& msg)
+                     OrganicMatter&, Chemistry& chemistry,
+		     const double /* dt */, Treelog& msg)
   { 
     TREELOG_MODEL (msg);
     const double m2_per_cm2 = 0.01 * 0.01 ; // [m^2/cm^2]
@@ -245,10 +247,11 @@ struct ReactionSorption : public Reaction
 
 
   // Create.
-  bool check (const Units&, const Geometry&, 
+  bool check (const Geometry&, 
               const Soil&, const SoilWater&, 
               const SoilHeat&,
-              const Chemistry& chemistry, Treelog& msg) const
+              const OrganicMatter&, const Chemistry& chemistry,
+	      Treelog& msg) const
   { 
     TREELOG_MODEL (msg);
     bool ok = true;
@@ -270,9 +273,9 @@ struct ReactionSorption : public Reaction
       }
     return ok;
   }
-  void initialize (const Units&, const Geometry& geo, const Soil&, 
+  void initialize (const Geometry& geo, const Soil&, 
                    const SoilWater&, const SoilHeat&,
-                   const Surface&, Treelog& msg)
+                   const OrganicMatter&, const Surface&, Treelog& msg)
   { 
     TREELOG_MODEL (msg);
     const size_t cell_size = geo.cell_size ();

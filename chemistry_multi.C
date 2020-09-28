@@ -89,7 +89,7 @@ struct ChemistryMulti : public Chemistry
   double find_dt (double S, double C, 
                   double M_secondary, double M_solute, double M_total) const;
   double suggest_dt () const;
-  void tick_top (const Units&, const Geometry&, const Soil&, 
+  void tick_top (const Geometry&, const Soil&, 
                  const SoilWater&, const SoilHeat&, 
                  const double tillage_age /* [d] */,
                  const Surface&,
@@ -99,7 +99,7 @@ struct ChemistryMulti : public Chemistry
 		 const double surface_runoff_rate, // [h^-1]
 		 const double surface_water /* [mm] */,
 		 const double total_rain /* [mm/h] */,
-                 Chemistry& chemistry, 
+                 OrganicMatter&, Chemistry& chemistry, 
                  const double dt, // [h]
 		 Treelog&);
   void infiltrate (const Geometry&, 
@@ -108,7 +108,7 @@ struct ChemistryMulti : public Chemistry
   void tick_soil (const Scope&, const Geometry& geo, double ponding /* [mm] */,
                   double R_mixing /* [h/mm] */, 
                   const Soil&, const SoilWater&, const SoilHeat&, Movement&,
-                  const OrganicMatter&, Chemistry&, 
+                  OrganicMatter&, Chemistry&, 
 		  double dt, Treelog&);
   void clear ();
   void output (Log&) const;
@@ -116,9 +116,10 @@ struct ChemistryMulti : public Chemistry
   // Create & Destroy.
   void initialize (const Scope&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, 
-                   const Surface&, Treelog&);
+                   const OrganicMatter&, const Surface&, Treelog&);
   bool check (const Scope&, const Geometry&, 
-	      const Soil&, const SoilWater&, const SoilHeat&, const Chemistry&,
+	      const Soil&, const SoilWater&, const SoilHeat&,
+	      const OrganicMatter&, const Chemistry&,
 	      Treelog&) const;
   static const std::vector<Chemical*> 
   /**/ find_chemicals (const std::vector<Chemistry*>& combine);
@@ -439,7 +440,7 @@ ChemistryMulti::suggest_dt () const
 
 
 void 
-ChemistryMulti::tick_top (const Units& units, const Geometry& geo, 
+ChemistryMulti::tick_top (const Geometry& geo, 
                           const Soil& soil, const SoilWater& soil_water, 
                           const SoilHeat& soil_heat, 
                           const double tillage_age /* [d] */,
@@ -450,16 +451,16 @@ ChemistryMulti::tick_top (const Units& units, const Geometry& geo,
 			  const double surface_runoff_rate, // [h^-1]
 			  const double surface_water /* [mm] */,
 			  const double total_rain /* [mm/h] */,
-                          Chemistry& chemistry, 
+                          OrganicMatter& organic, Chemistry& chemistry, 
                           const double dt, // [h]
                           Treelog& msg) 
 {
   for (size_t c = 0; c < combine.size (); c++)
-    combine[c]->tick_top (units, geo, soil, soil_water, soil_heat,
+    combine[c]->tick_top (geo, soil, soil_water, soil_heat,
                           tillage_age, surface, vegetation, bioclimate,
                           litter_cover, surface_runoff_rate, surface_water,
                           total_rain, 
-                          chemistry, dt, msg);
+                          organic, chemistry, dt, msg);
 }
 
 void 
@@ -468,7 +469,7 @@ ChemistryMulti::tick_soil (const Scope& scope,
 			   const double R_mixing,
 			   const Soil& soil, const SoilWater& soil_water,
 			   const SoilHeat& soil_heat, Movement& movement,
-			   const OrganicMatter& organic_matter,
+			   OrganicMatter& organic_matter,
 			   Chemistry& chemistry, 
 			   const double dt, Treelog& msg)
 { 
@@ -508,17 +509,19 @@ ChemistryMulti::initialize (const Scope& scope,
 			    const Soil& soil, 
 			    const SoilWater& soil_water,
 			    const SoilHeat& soil_heat,
+			    const OrganicMatter& organic,
 			    const Surface& surface, Treelog& msg)
 {
   for (size_t c = 0; c < combine.size (); c++)
-    combine[c]->initialize (scope, geo, soil, soil_water, soil_heat, surface, 
-                            msg);
+    combine[c]->initialize (scope, geo, soil, soil_water, soil_heat,
+			    organic, surface, msg);
 }
 
 bool 
 ChemistryMulti::check (const Scope& scope, const Geometry& geo,
 		       const Soil& soil, const SoilWater& soil_water,
-		       const SoilHeat& soil_heat, const Chemistry& chemistry,
+		       const SoilHeat& soil_heat,
+		       const OrganicMatter& organic, const Chemistry& chemistry,
 		       Treelog& msg) const
 { 
   bool ok = true; 
@@ -526,7 +529,7 @@ ChemistryMulti::check (const Scope& scope, const Geometry& geo,
     {
       Treelog::Open nest (msg, "Chemistry: '" + combine[c]->objid  + "'");
       if (!combine[c]->check (scope, geo, soil, soil_water, soil_heat,
-                              chemistry, msg))
+                              organic, chemistry, msg))
 	ok = false;
     }
 

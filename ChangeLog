@@ -1,3 +1,27 @@
+2020-09-22  Per Abrahamsen  <pa@plen.ku.com>
+
+	* reaction_dom.C: New model.
+	* Makefile (MODELS): Add it.
+
+	* all: Removed 'Units' argument and added 'OrganicMatter' to many
+	functions related with chemistry.
+
+2020-09-21  Per Abrahamsen  <pa@plen.ku.com>
+
+	* chemical_std.C (DOC, DON): New parameterization.
+	(base): New base class.
+	(default): Use it.
+	(nutrient, MIN): New base parameterizations.
+	(FOCUS): New class.
+	(default): Remove soilfac support.
+
+	* litter_residue.h: Split from litter.h
+	* litter_residue.C, litter_mulch.C: Split from litter.C.
+	* Makefile (MODELS): Removed litter, added litter_mulch.
+	(COMPONENTS): Added litter.
+	(SPECIALS): Added litter_residue.
+	(COMPONENTS): Removed soilfac.
+
 2020-09-07  Per Abrahamsen  <pa@plen.ku.com>
 
 	* chemical_std.C, chemical.h (add_to_litter_transform_source): New

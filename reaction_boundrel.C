@@ -47,7 +47,8 @@ struct ReactionBoundrel : public Reaction
 		 const double /* tillage_age */,
                  const double /* total_rain */, 
                  const double /* h_pond */,
-                 Chemistry& chemistry, const double dt, Treelog&)
+                 OrganicMatter&, Chemistry& chemistry,
+		 const double dt, Treelog&)
   { 
     // Find it.
     Chemical& imm = chemistry.find (immobile);  
@@ -70,9 +71,10 @@ struct ReactionBoundrel : public Reaction
 
 
   // Create.
-  bool check (const Units&, const Geometry&, 
+  bool check (const Geometry&, 
               const Soil&, const SoilWater&, const SoilHeat&,
-              const Chemistry& chemistry, Treelog& msg) const
+              const OrganicMatter&,
+	      const Chemistry& chemistry, Treelog& msg) const
   { 
     bool ok = true;
     if (!chemistry.know (immobile))
@@ -92,8 +94,9 @@ struct ReactionBoundrel : public Reaction
       }
     return ok;
   }
-  void initialize (const Units&, const Geometry&, const Soil&, 
-                   const SoilWater&, const SoilHeat&, const Surface&, Treelog&)
+  void initialize (const Geometry&, const Soil&, 
+                   const SoilWater&, const SoilHeat&, const OrganicMatter&,
+		   const Surface&, Treelog&)
   { }
   explicit ReactionBoundrel (const BlockModel& al)
     : Reaction (al),

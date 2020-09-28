@@ -26,24 +26,6 @@
   (diffusion_coefficient 4.6e-6 [cm^2/s]) ; Source?
   )
 
-(defchemical FOCUS default
-  "Default pesticide attributes used in EU regulation."
-  (cite focus2002)
-  ;; Use FOCUS SW for heat, water, and depth factors.
-  (decompose_soil_factor FOCUS)
-  (canopy_dissipation_halftime 10 [d]) ; Default FOCUSsw (7.4.10) value.
-  ;; Washoff in FOCUS use FEXTRC = 0.05.
-  ;; CWC = IC * FEXTRC
-  ;; CWC = canopy_washoff_coefficient in Daisy
-  ;; IC = intercepted water in Daisy
-  ;; Default interception capacity in Daisy is LAI * 0.5 mm
-  ;; The FEXTRC parameter is based on an experiment with mature cotton.
-  ;; If we assume this is LAI=3, then corresponding CWC is 0.075.
-  (canopy_washoff_coefficient 0.075 [])
-  ;; FOCUSgw recommended value.
-  (crop_uptake_reflection_factor 1.0 [])
-  (diffusion_coefficient 5e-10 [m^2/s])); Default FOCUSsw (7.3.5) value.
-
 (defchemical pesticide FOCUS
   "This stuff protects plants.")
   

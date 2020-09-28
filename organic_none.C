@@ -76,6 +76,15 @@ struct OrganicNone : public OrganicMatter
     static std::vector <AM*> am;
     return am;
   }
+  const std::vector <SMB*> get_smb () const
+  {
+    static std::vector <SMB*> smb;
+    return smb;
+  }
+  void add_stationary (const std::vector<double>& C,
+		       const std::vector<double>& N,
+		       const int where, const double dt)
+  { }
 
   // Communication with external model.
   double get_smb_c_at (size_t) const // [g C/cm³]

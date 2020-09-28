@@ -50,7 +50,8 @@ struct ReactionShoot : public Reaction
       // Simulation.
   void tick_top (const Vegetation& vegetation, const Bioclimate&,
 		 const double, const double, const double,
-		 Chemistry& chemistry, const double dt, Treelog&)
+		 OrganicMatter&, Chemistry& chemistry,
+		 const double dt, Treelog&)
   {
     const double height = 0.0;	// [cm]
     const double DM		// [g/cm^2]
@@ -94,14 +95,16 @@ struct ReactionShoot : public Reaction
   { }
 
   // Create.
-  void initialize (const Units&, const Geometry&, 
+  void initialize (const Geometry&, 
                    const Soil&, const SoilWater&,
-                   const SoilHeat&, const Surface&, Treelog&)
+                   const SoilHeat&, const OrganicMatter&,
+		   const Surface&, Treelog&)
   { }
 
-  bool check (const Units&, const Geometry&, 
+  bool check (const Geometry&, 
               const Soil& soil, const SoilWater& soil_water, 
 	      const SoilHeat& soil_heat,
+	      const OrganicMatter&,
 	      const Chemistry& chemistry, Treelog& msg) const
   { 
     bool ok = true;
@@ -173,7 +176,8 @@ struct ReactionShoot2 : public Reaction
   // Simulation.
   void tick_top (const Vegetation& vegetation, const Bioclimate&,
 		 const double, const double, const double,
-		 Chemistry& chemistry, const double dt, Treelog&)
+		 OrganicMatter&, Chemistry& chemistry,
+		 const double dt, Treelog&)
   {
     const double height = 0.0;	// [cm]
     const double DM1		// [g/cm^2]
@@ -232,15 +236,17 @@ struct ReactionShoot2 : public Reaction
   }
 
   // Create.
-  void initialize (const Units&, const Geometry&, 
+  void initialize (const Geometry&, 
                    const Soil&, const SoilWater&,
-                   const SoilHeat&, const Surface&, Treelog&)
+                   const SoilHeat&, const OrganicMatter&,
+		   const Surface&, Treelog&)
   { }
 
-  bool check (const Units&, const Geometry&, 
+  bool check (const Geometry&, 
               const Soil& soil, const SoilWater& soil_water, 
 	      const SoilHeat& soil_heat,
-	      const Chemistry& chemistry, Treelog& msg) const
+	      const OrganicMatter&, const Chemistry& chemistry,
+	      Treelog& msg) const
   { 
     bool ok = true;
     if (!chemistry.know (chemical))

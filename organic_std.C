@@ -280,6 +280,37 @@ struct OrganicStandard : public OrganicMatter
 
   const std::vector <AM*> get_am () const
   { return am; }
+  const std::vector <SMB*> get_smb () const
+  { return smb; }
+
+  void add_stationary (const std::vector<double>& C,
+		       const std::vector<double>& N,
+		       const int where,
+		       const double dt)
+  {
+    daisy_assert (where <= smb.size ());
+    if (where == smb.size ())
+      {
+	// Add to soil buffer.
+	daisy_assert (C.size () == buffer.C.size ());
+	for (size_t c = 0; c < C.size (); c++)
+	  buffer.C[c] += C[c] * dt;
+	daisy_assert (N.size () == buffer.N.size ());
+	for (size_t c = 0; c < N.size (); c++)
+	  buffer.N[c] += N[c] * dt;
+	return;
+      }
+    // Add to SMB pool buffer.
+    daisy_assert (C.size () == smb[where]->C.size ());
+    for (size_t c = 0; c < C.size (); c++)
+      smb[where]->C[c] += C[c] * dt;
+    daisy_assert (N.size () == smb[where]->N.size ());
+    for (size_t c = 0; c < N.size (); c++)
+      smb[where]->N[c] += N[c] * dt;
+  }
+
+  // Communication with external model.
+  double get_smb_c_at (size_t i) const; // [g C/cm³]
   void add_to_buffer (const Geometry& geo,
 		      const double from /* [cm] */,
 		      const double to /* [cm] */,
@@ -289,9 +320,6 @@ struct OrganicStandard : public OrganicMatter
     geo.add_surface (buffer.C, from, to, C);
     geo.add_surface (buffer.N, from, to, N);
   }
-
-  // Communication with external model.
-  double get_smb_c_at (size_t i) const; // [g C/cm³]
 
   // Create and Destroy.
   int som_pools () const;

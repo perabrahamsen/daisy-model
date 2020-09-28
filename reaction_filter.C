@@ -54,10 +54,10 @@ struct ReactionFilter : public Reaction
   }
 
   // Simulation.
-  void tick_soil (const Units&, const Geometry& geo, const Soil& soil,
-                  const SoilWater& soil_water, 
-                  const SoilHeat&, const OrganicMatter&,
-                  Chemistry& chemistry, const double dt, Treelog& msg)
+  void tick_soil (const Geometry& geo, const Soil& soil,
+                  const SoilWater& soil_water, const SoilHeat&, 
+                  OrganicMatter&, Chemistry& chemistry,
+		  const double dt, Treelog& msg)
   { 
     const size_t cell_size = soil.size ();
     Chemical& mob = chemistry.find (mobile);  
@@ -114,9 +114,10 @@ struct ReactionFilter : public Reaction
   }
 
   // Create.
-  bool check (const Units&, const Geometry&, 
+  bool check (const Geometry&, 
               const Soil& soil, const SoilWater& soil_water, const SoilHeat&,
-              const Chemistry& chemistry, Treelog& msg) const
+              const OrganicMatter&, const Chemistry& chemistry,
+	      Treelog& msg) const
   { 
     bool ok = true;
     if (!chemistry.know (immobile) && immobile != Attribute::None ())
@@ -131,8 +132,9 @@ struct ReactionFilter : public Reaction
       }
     return ok;
   }
-  void initialize (const Units&, const Geometry&, const Soil& soil, 
-                   const SoilWater&, const SoilHeat&, const Surface&, Treelog&)
+  void initialize (const Geometry&, const Soil& soil, 
+                   const SoilWater&, const SoilHeat&, const OrganicMatter&,
+		   const Surface&, Treelog&)
   { 
     F_primary.insert (F_primary.begin (), soil.size (), 0.0);
     daisy_assert (F_primary.size () == soil.size ());

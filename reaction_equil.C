@@ -45,6 +45,7 @@
 struct ReactionEquilibrium : public Reaction
 {
   static const symbol k_unit;
+  const Units& units;
 
   // Parameters.
   const symbol name_A;
@@ -67,10 +68,11 @@ struct ReactionEquilibrium : public Reaction
   }
 
   // Simulation.
-  void tick_soil (const Units& units, const Geometry& geo, 
+  void tick_soil (const Geometry& geo, 
                   const Soil& soil, const SoilWater& soil_water, 
-                  const SoilHeat& soil_heat, const OrganicMatter&,
-                  Chemistry& chemistry, const double /* dt */, Treelog& msg)
+                  const SoilHeat& soil_heat,
+                  OrganicMatter&, Chemistry& chemistry,
+		  const double /* dt */, Treelog& msg)
   { 
     TREELOG_MODEL (msg);
 
@@ -167,10 +169,11 @@ struct ReactionEquilibrium : public Reaction
     return convert;
    }
 
-  void tick_surface (const Units& units, const Geometry& geo, 
+  void tick_surface (const Geometry& geo, 
                      const Soil& soil, const SoilWater& soil_water, 
                      const SoilHeat& soil_heat, const Surface& surf,
-                     Chemistry& chemistry, const double dt, Treelog& msg)
+                     OrganicMatter&, Chemistry& chemistry,
+		     const double dt, Treelog& msg)
   { 
     if (!surface)
       // Nothing to do.
@@ -218,10 +221,11 @@ struct ReactionEquilibrium : public Reaction
   }
 
   // Create.
-  bool check (const Units& units, const Geometry& geo, 
+  bool check (const Geometry& geo, 
               const Soil& soil, const SoilWater& soil_water, 
               const SoilHeat& soil_heat,
-              const Chemistry& chemistry, Treelog& msg) const
+              const OrganicMatter&,
+	      const Chemistry& chemistry, Treelog& msg) const
   { 
     TREELOG_MODEL (msg);
     bool ok = true;
@@ -256,9 +260,9 @@ struct ReactionEquilibrium : public Reaction
       }
     return ok;
   }
-  void initialize (const Units& units, const Geometry& geo, const Soil& soil, 
+  void initialize (const Geometry& geo, const Soil& soil, 
                    const SoilWater& soil_water, const SoilHeat& soil_heat,
-                   const Surface&, Treelog& msg)
+                   const OrganicMatter&, const Surface&, Treelog& msg)
   { 
     TREELOG_MODEL (msg);
     ScopeSoil scope (geo, soil, soil_water, soil_heat);
@@ -272,6 +276,7 @@ struct ReactionEquilibrium : public Reaction
   }
   explicit ReactionEquilibrium (const BlockModel& al)
     : Reaction (al),
+      units (al.units ()),
       name_A (al.name ("A")),
       name_B (al.name ("B")),
       equilibrium (Librarian::build_item<Equilibrium> (al, "equilibrium")),

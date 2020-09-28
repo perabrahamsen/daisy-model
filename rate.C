@@ -25,6 +25,9 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "check.h"
+#include "intrinsics.h"
+#include "library.h"
+#include "frame_model.h"
 
 // The 'rate' component.
 
@@ -55,6 +58,30 @@ void
 Rate::declare (Frame& frame, const symbol name, const symbol description)
 {
   frame.declare_object (name, component, description);
+}
+
+void
+Rate::set_rate (Frame& frame, const symbol name, const double value)
+{
+  const symbol model = "rate";
+  const Intrinsics& intrinsics = Librarian::intrinsics ();
+  intrinsics.instantiate (component, model);
+  const FrameModel& old = intrinsics.library (component).model (model);
+  boost::shared_ptr<FrameModel> child (&old.clone ());
+  child->set ("rate", value);
+  frame.set (name, child);
+}
+
+void
+Rate::set_halftime (Frame& frame, const symbol name, const double value)
+{
+  const symbol model = "halftime";
+  const Intrinsics& intrinsics = Librarian::intrinsics ();
+  intrinsics.instantiate (component, model);
+  const FrameModel& old = intrinsics.library (component).model (model);
+  boost::shared_ptr<FrameModel> child (&old.clone ());
+  child->set ("halftime", value);
+  frame.set (name, child);
 }
 
 double
@@ -96,6 +123,20 @@ Rate to use.");
     frame.order ("rate");
   }
 } RateRate_syntax;
+
+// The zero paramerization.
+
+static struct RateZeroSyntax : public DeclareParam
+{ 
+  RateZeroSyntax ()
+    : DeclareParam (Rate::component, "zero", "rate", "\
+A rate of zero.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set ("rate", 0.0);
+  }
+} RateZero_syntax;
 
 
 // halftime model.

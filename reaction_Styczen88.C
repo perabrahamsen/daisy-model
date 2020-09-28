@@ -71,14 +71,15 @@ struct ReactionStyczen88 : public ReactionColgen
 		  const double tillage_age /* [d] */,
                   const double total_rain, 
                   const double h_pond,
-                  Chemistry& chemistry, const double dt, Treelog&);
+                  OrganicMatter&, Chemistry& chemistry,
+		  const double dt, Treelog&);
                            
   void output (Log& log) const;
 
   // Create and Destroy.
-  void initialize (const Units&, const Geometry& geo,
+  void initialize (const Geometry& geo,
                    const Soil& soil, const SoilWater&, const SoilHeat&, 
-                   const Surface&, Treelog&);
+                   const OrganicMatter&, const Surface&, Treelog&);
   ReactionStyczen88 (const BlockModel& al);
 };
 
@@ -227,7 +228,8 @@ ReactionStyczen88::tick_top (const Vegetation& vegetation,
 			     const double /* tillage_age */,
                              const double total_rain, 
                              const double h_pond,
-                             Chemistry& chemistry, const double dt, Treelog&)
+                             OrganicMatter&,
+			     Chemistry& chemistry, const double dt, Treelog&)
 {
   const double canopy_cover = vegetation.cover (); // [];
   const double canopy_drip = bioclimate.canopy_leak (); // [mm/h]
@@ -258,10 +260,11 @@ ReactionStyczen88::output (Log& log) const
 
 
 void 
-ReactionStyczen88::initialize (const Units&, const Geometry& geo, 
-                              const Soil& soil,
-                              const SoilWater&, const SoilHeat&, 
-                              const Surface& surface, Treelog&)
+ReactionStyczen88::initialize (const Geometry& geo, 
+			       const Soil& soil,
+			       const SoilWater&, const SoilHeat&, 
+			       const OrganicMatter&,
+			       const Surface& surface, Treelog&)
 { surface_soil = find_surface_soil (geo, soil, surface); }
 
 ReactionStyczen88::ReactionStyczen88 (const BlockModel& al)

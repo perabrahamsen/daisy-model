@@ -776,13 +776,13 @@ ColumnStandard::tick_move (const Metalib& metalib,
   const double tillage_top 
     = geometry.content_hood (tillage_age, Geometry::cell_above);
   
-  chemistry->tick_top (units, geometry, *soil, *soil_water, *soil_heat, 
+  chemistry->tick_top (geometry, *soil, *soil_water, *soil_heat, 
                        tillage_top, surface, *vegetation, *bioclimate,
                        litter->cover (),
                        surface.runoff_rate (),
                        old_pond,
                        my_weather.rain (),
-                       *chemistry,
+                       *organic_matter, *chemistry,
                        dt, msg);
   
   // Tillage time.
@@ -916,7 +916,7 @@ ColumnStandard::check (const Weather* global_weather,
   {
     Treelog::Open nest (msg, "Chemistry");
     if (!chemistry->check (scope, geometry, *soil, *soil_water, *soil_heat,
-                           *chemistry, msg))
+                           *organic_matter, *chemistry, msg))
       ok = false;
   }
   {
@@ -1138,7 +1138,7 @@ ColumnStandard::initialize (const Metalib& metalib,
   
   // Solutes depends on water and heat.
   chemistry->initialize (scope, geometry, *soil, *soil_water, *soil_heat, 
-                         surface, msg);
+                         *organic_matter, surface, msg);
 
   // Movement depends on soil, soil_water, and groundwater
   if (!movement->initialize (units, *soil, *soil_water, *groundwater,

@@ -38,20 +38,20 @@ Reaction::tick_top (const Vegetation&, const Bioclimate&,
 		    const double tillage_age /* [d] */,
                     const double total_rain, 
                     const double h_pond,
-                    Chemistry& chemistry, const double dt, Treelog&)
+                    OrganicMatter&, Chemistry& chemistry,
+		    const double dt, Treelog&)
 { }
 
 void 
-Reaction::tick_surface (const Units&, const Geometry&, 
+Reaction::tick_surface (const Geometry&, 
                         const Soil&, const SoilWater&, const SoilHeat&,
-                        const Surface&, Chemistry&, const double dt,
-                        Treelog&)
+                        const Surface&,
+			OrganicMatter&, Chemistry&, const double dt, Treelog&)
 { }
 
 void 
-Reaction::tick_soil (const Units&, 
-                     const Geometry&, const Soil&, const SoilWater&,
-                     const SoilHeat&, const OrganicMatter&, Chemistry&,
+Reaction::tick_soil (const Geometry&, const Soil&, const SoilWater&,
+                     const SoilHeat&, OrganicMatter&, Chemistry&,
                      const double, Treelog&)
 { }
 

@@ -42,6 +42,8 @@
 
 struct ReactionJarvis99 : public ReactionColgen
 {
+  const Units& units;
+  
   // Parameters.
   const std::unique_ptr<Rainergy> rainergy; // Energy in rain [J/cm^2/h]
   const bool tillage_replenish_all;       // Ms = Mmax after tillage.
@@ -75,17 +77,19 @@ struct ReactionJarvis99 : public ReactionColgen
 		 const double tillage_age /* [d] */,
                  const double total_rain, 
                  const double h_pond,
-                 Chemistry& chemistry, const double dt, Treelog&);
+                 OrganicMatter&,
+		 Chemistry& chemistry, const double dt, Treelog&);
                            
   void output (Log& log) const;
 
   // Create and Destroy.
-  void initialize (const Units&, const Geometry& geo,
+  void initialize (const Geometry& geo,
                    const Soil& soil, const SoilWater&, const SoilHeat&, 
-                   const Surface&, Treelog&);
-  bool check (const Units&, const Geometry& geo,
+                   const OrganicMatter&, const Surface&, Treelog&);
+  bool check (const Geometry& geo,
               const Soil&, const SoilWater&, const SoilHeat&,
-	      const Chemistry& chemistry, Treelog& msg) const;
+	      const OrganicMatter&, const Chemistry& chemistry,
+	      Treelog& msg) const;
   ReactionJarvis99 (const BlockModel& al);
 };
 
@@ -138,7 +142,8 @@ ReactionJarvis99::tick_top (const Vegetation& vegetation,
 			    const double tillage_age /* [d] */,
                             const double total_rain, 
                             const double h_pond,
-                            Chemistry& chemistry, const double dt, Treelog&)
+                            OrganicMatter&, Chemistry& chemistry,
+			    const double dt, Treelog&)
 {
   const double direct_rain = bioclimate.direct_rain (); // [mm/h]
   const double canopy_drip = bioclimate.canopy_leak (); // [mm/h]
@@ -169,9 +174,10 @@ ReactionJarvis99::output (Log& log) const
 
 
 void 
-ReactionJarvis99::initialize (const Units&, const Geometry& geo,
+ReactionJarvis99::initialize (const Geometry& geo,
                               const Soil& soil, const SoilWater&, 
-                              const SoilHeat&, const Surface& surface, 
+                              const SoilHeat&, const OrganicMatter&,
+			      const Surface& surface, 
                               Treelog& msg)
 {  
   TREELOG_MODEL (msg);
@@ -210,10 +216,11 @@ ReactionJarvis99::initialize (const Units&, const Geometry& geo,
 }
 
 bool 
-ReactionJarvis99::check (const Units& units, const Geometry& geo,
+ReactionJarvis99::check (const Geometry& geo,
                          const Soil& soil, const SoilWater& soil_water,
                          const SoilHeat& soil_heat,
-                         const Chemistry& chemistry, Treelog& msg) const
+                         const OrganicMatter& organic,
+			 const Chemistry& chemistry, Treelog& msg) const
 { 
   bool ok = true;
   if (geo.bottom () > -zi)
@@ -221,8 +228,8 @@ ReactionJarvis99::check (const Units& units, const Geometry& geo,
       ok = false;
       msg.error ("'zi' should be wholy within the soil");
     }
-  if (!ReactionColgen::check (units, geo, soil, soil_water, soil_heat, 
-                              chemistry, msg))
+  if (!ReactionColgen::check (geo, soil, soil_water, soil_heat, 
+                              organic, chemistry, msg))
     {
       ok = false;
     }
@@ -231,6 +238,7 @@ ReactionJarvis99::check (const Units& units, const Geometry& geo,
 
 ReactionJarvis99::ReactionJarvis99 (const BlockModel& al)
   : ReactionColgen (al),
+    units (al.units ()),
     rainergy (Librarian::build_item<Rainergy> (al, "rainergy")),
     tillage_replenish_all (al.flag ("tillage_replenish_all")),
     Mmax (al.number ("Mmax", -42.42e42)),

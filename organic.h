@@ -31,6 +31,7 @@ class FrameModel;
 class Log;
 class AM;
 class DOM;
+class SMB;
 class Geometry;
 class Soil;
 class SoilpH;
@@ -76,6 +77,11 @@ public:
   virtual void store_SOM () = 0;
   virtual void restore_SOM () = 0;
   virtual const std::vector <AM*> get_am () const = 0;
+  virtual const std::vector <SMB*> get_smb () const = 0;
+  virtual void add_stationary (const std::vector<double>& C,
+			       const std::vector<double>& N,
+			       const int where,
+			       const double dt) = 0;
 
   // Communication with external model.
   virtual double get_smb_c_at (size_t i) const = 0; // [g C/cm³]

@@ -41,6 +41,8 @@
 
 struct ReactionAdsorption : public Reaction
 {
+  const Units& units;
+  
   // Parameters.
   const symbol name_solute;
   const symbol name_sorbed;
@@ -54,9 +56,9 @@ struct ReactionAdsorption : public Reaction
   { output_variable (adsorption_source, log); }
 
   // Simulation.
-  void tick_soil (const Units& units, const Geometry& geo, const Soil& soil,
+  void tick_soil (const Geometry& geo, const Soil& soil,
                   const SoilWater& soil_water, const SoilHeat& soil_heat, 
-                  const OrganicMatter&, Chemistry& chemistry,
+		  OrganicMatter&, Chemistry& chemistry,
                   const double dt, Treelog& msg)
   { 
     const size_t cell_size = geo.cell_size ();
@@ -114,10 +116,11 @@ struct ReactionAdsorption : public Reaction
   }
 
   // Create.
-  bool check (const Units& units, const Geometry& geo, 
+  bool check (const Geometry& geo, 
               const Soil& soil, const SoilWater& soil_water, 
 	      const SoilHeat& soil_heat,
-	      const Chemistry& chemistry, Treelog& msg) const
+	      const OrganicMatter&, const Chemistry& chemistry,
+	      Treelog& msg) const
   { 
     bool ok = true;
     if (!chemistry.know (name_solute))
@@ -138,9 +141,10 @@ struct ReactionAdsorption : public Reaction
 
     return ok;
   }
-  void initialize (const Units& units, const Geometry& geo, 
+  void initialize (const Geometry& geo, 
                    const Soil& soil, const SoilWater& soil_water, 
-                   const SoilHeat& soil_heat, const Surface&, Treelog& msg)
+                   const SoilHeat& soil_heat,
+		   const OrganicMatter&, const Surface&, Treelog& msg)
   { 
     adsorption_source.insert (adsorption_source.begin (), soil.size (), 0.0);
     daisy_assert (adsorption_source.size () == soil.size ());
@@ -150,6 +154,7 @@ struct ReactionAdsorption : public Reaction
   }
   explicit ReactionAdsorption (const BlockModel& al)
     : Reaction (al),
+      units (al.units ()),
       name_solute (al.name ("solute")),
       name_sorbed (al.name ("sorbed")),
       equilibrium (Librarian::build_item<Adsorption> (al, "equilibrium")),

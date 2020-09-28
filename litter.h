@@ -1,4 +1,4 @@
-// litter.h -- Litter lay below permanent vegetation.
+// litter.h -- Litter layer below vegetation.
 // 
 // Copyright 2003 Per Abrahamsen and KVL.
 //

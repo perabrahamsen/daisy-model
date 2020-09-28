@@ -41,7 +41,6 @@ class Treelog;
 class Log;
 class BlockModel;
 class Scope;
-class Units;
 class Bioclimate;
 class Vegetation;
 
@@ -165,8 +164,7 @@ public:
                              const Soil& soil, const SoilWater& soil_water, 
                              const double z_mixing /* [cm] */,
                              Treelog& msg) = 0;
-  virtual void tick_soil (const Units&,
-                          const Geometry&, const Soil&, const SoilWater&,
+  virtual void tick_soil (const Geometry&, const Soil&, const SoilWater&,
                           double dt, const Scope&, Treelog&) = 0;
   virtual void tick_after (const Geometry&, Treelog&) = 0;
   virtual void mixture (const Geometry& geo,
@@ -182,16 +180,20 @@ public:
                           const Soil&, const SoilWater&, const SoilHeat&, 
                           const OrganicMatter&, Chemistry&, double dt,
 			  Treelog& msg) = 0;
+  virtual double decompose_soil_factor (size_t c,
+					const Geometry&, const Soil&, 
+					const SoilWater&, const SoilHeat&, 
+					const OrganicMatter&) const = 0;
   virtual void output (Log&) const = 0;
   virtual void debug_cell (std::ostream&, const size_t c) const = 0;
 
   // Create and Destroy.
 public:
   static const VCheck& check_buildable ();
-  virtual bool check (const Units&, const Scope&, 
+  virtual bool check (const Scope&, 
                       const Geometry&, const Soil&, const SoilWater&,
 		      const Chemistry&, Treelog&) const = 0;
-  virtual void initialize (const Units&, const Scope&, const Geometry&,
+  virtual void initialize (const Scope&, const Geometry&,
                            const Soil&, const SoilWater&, const SoilHeat&,
 			   Treelog&) = 0;
 private:

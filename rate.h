@@ -43,6 +43,8 @@ private:
   // Public interface.
 public:
   static void declare (Frame&, const symbol name, const symbol description);
+  static void set_rate (Frame&, const symbol name, const double value);
+  static void set_halftime (Frame&, const symbol name, const double value);
   static double value (const BlockModel&, const symbol name);
   
   // Create and Destroy.

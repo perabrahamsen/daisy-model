@@ -34,7 +34,6 @@ class OrganicMatter;
 class Chemistry;
 class Treelog;
 class BlockModel;
-class Units;
 class Vegetation;
 class Bioclimate;
 
@@ -50,25 +49,27 @@ public:
   virtual void tick_top (const Vegetation&, const Bioclimate&,
 			 const double tillage_age /* [d] */,
                          const double total_rain, const double h_pond,
-                          Chemistry& chemistry, const double dt, Treelog&);
-  virtual void tick_surface (const Units&, const Geometry&, 
+			 OrganicMatter& organic, Chemistry& chemistry,
+			 const double dt, Treelog&);
+  virtual void tick_surface (const Geometry&, 
                              const Soil&, const SoilWater&, const SoilHeat&,
-                             const Surface&, Chemistry&, const double dt,
+                             const Surface&,
+			     OrganicMatter&, Chemistry&, const double dt,
                              Treelog& msg);
-  virtual void tick_soil (const Units& units, 
-                          const Geometry&, const Soil&, const SoilWater&,
-                          const SoilHeat&, const OrganicMatter&, Chemistry&,
+  virtual void tick_soil (const Geometry&, const Soil&, const SoilWater&,
+                          const SoilHeat&, OrganicMatter&, Chemistry&,
                           const double dt, Treelog&);
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Units& units, const Geometry& geo,
+  virtual void initialize (const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&, 
-                           const Surface&, Treelog&) = 0;
-  virtual bool check (const Units& units, const Geometry& geo,
+                           const OrganicMatter&, const Surface&, Treelog&) = 0;
+  virtual bool check (const Geometry& geo,
                       const Soil&, const SoilWater&, const SoilHeat&,
-		      const Chemistry&, Treelog&) const = 0;
+		      const OrganicMatter&, const Chemistry&,
+		      Treelog&) const = 0;
 protected:
   Reaction (const BlockModel& al);
 public:
