@@ -139,38 +139,45 @@ ReactionDOM::tick_soil (const Geometry& geo,
       const double NO3_avail	// [g N/cm^3/h]
 	= soil_NO3.M_primary (i) * max_N_depletion_rate;
       const double N_avail = NH4_avail + NO3_avail; // [g N/cm^3/h]
+      daisy_assert (N_avail >= 0.0);
       const double N_need // [g N/cm^3/h]
 	// = [g C/cm^3/h] * [] / [g C/g N]
 	= (C_per_N_goal > 0.0)
-	? (C_gen_pot * efficiency / C_per_N_goal - N_gen_pot)
+	? std::max (0.0, (C_gen_pot * efficiency / C_per_N_goal - N_gen_pot))
 	: 0.0;
+      daisy_assert (N_need >= 0.0);
       const double N_factor
 	= (N_need > N_avail)
 	? (N_avail / N_need )
 	: 1.0;
+      daisy_assert (N_factor >= 0.0);
 
       // N limited turnover.
       const double rate = rate_pot * N_factor; // [h^-1]
+      daisy_assert (rate >= 0.0);
       const double C_gen = DON_C * rate;       // [g C/cm^3/h]
       const double N_gen =  DON_N * rate;      // [g N/cm^3/h]
       const double SOC_gen = C_gen * efficiency; // [g C/cm^3/h]
       const double SON_gen =			 // [g N/cm^3/h]
 	(C_per_N_goal > 0.0)
-	? (C_gen / C_per_N_goal)
+	? (SOC_gen / C_per_N_goal)
 	: N_gen; 
-      const double N_consume = SON_gen - N_gen;	 // [g N/cm^3/h]
-
+      daisy_assert (SON_gen >= 0.0);
+      const double N_consume = N_gen - SON_gen;	 // [g N/cm^3/h]
+	
       // Update source/sink.
       if (N_consume > NH4_avail)
 	{ 
 	  NH4[i] = -NH4_avail;		 // [g N/cm^3/h]
-	  NO3[i] = NH4_avail - N_consume; // [g N/cm^3/h]
+	  NO3[i] = N_consume + NH4_avail; // [g N/cm^3/h]
 	}
       else
 	{
-	  NH4[i] = -N_consume;	// [g N/cm^3/h]
+	  NH4[i] = N_consume;	// [g N/cm^3/h]
 	  NO3[i] = 0.0;		// [g N/cm^3/h]
 	}
+      daisy_approximate (N_consume,  NH4[i] + NO3[i]);
+      
       CO2[i] = C_gen - SOC_gen;	// [g C/cm^3/h]
       DOC[i] = C_gen;		// [g C/cm^3/h]
       DON[i] = N_gen;		// [g N/cm^3/h]
@@ -268,6 +275,7 @@ Turnover of dissolved organic matter.")
   {
     Rate::declare (frame, "turnover", "Turnover of DOM.");
     Rate::set_halftime (frame, "turnover", 24.0 /* [h] */);
+    // Rate::set_rate (frame, "turnover", 0.0 /* [h] */);
     Rate::declare (frame, "max_N_depletion", "Max depeletion of N.");
     Rate::set_rate (frame, "max_N_depletion", 0.1 /* [h^-1] */);
     frame.declare_integer ("where", Attribute::Const, "\
