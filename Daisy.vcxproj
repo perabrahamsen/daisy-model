@@ -209,6 +209,7 @@
     <ClCompile Include="clayom_old.C" />
     <ClCompile Include="column.C" />
     <ClCompile Include="column_std.C" />
+    <ClCompile Include="complex_functions.C" />
     <ClCompile Include="condedge.C" />
     <ClCompile Include="condition.C" />
     <ClCompile Include="condition_BBCH.C" />
@@ -313,6 +314,7 @@
     <ClCompile Include="hydraulic_table.C" />
     <ClCompile Include="hydraulic_wepp.C" />
     <ClCompile Include="hydraulic_yolo.C" />
+    <ClCompile Include="hyp_2F1.C" />
     <ClCompile Include="im.C" />
     <ClCompile Include="imvec.C" />
     <ClCompile Include="integer.C" />
@@ -622,6 +624,7 @@
     <ClInclude Include="chemistry.h" />
     <ClInclude Include="clayom.h" />
     <ClInclude Include="column.h" />
+    <ClInclude Include="complex_functions.h" />
     <ClInclude Include="condedge.h" />
     <ClInclude Include="condition.h" />
     <ClInclude Include="convert.h" />
@@ -670,6 +673,7 @@
     <ClInclude Include="horheat.h" />
     <ClInclude Include="horizon.h" />
     <ClInclude Include="hydraulic.h" />
+    <ClInclude Include="hyp_2F1.h" />
     <ClInclude Include="im.h" />
     <ClInclude Include="imvec.h" />
     <ClInclude Include="integer.h" />

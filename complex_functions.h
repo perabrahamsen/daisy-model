@@ -1,5 +1,6 @@
 #include "mathlib.h"
 #include <complex>
+#include <algorithm>
 using std::complex;
 using std::max;
 

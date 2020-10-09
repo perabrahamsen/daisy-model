@@ -46,6 +46,10 @@ inline bool isequal (const double a, const double b)
 #define	M_PI_2		1.57079632679489661923
 #endif
 
+#ifndef M_1_PI
+#define M_1_PI     0.318309886183790671538
+#endif
+
 #ifndef NAN
 #define NAN	(nan (""))
 #endif
