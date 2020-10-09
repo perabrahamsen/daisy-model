@@ -300,6 +300,7 @@
     <ClCompile Include="hydraulic_B_vG.C" />
     <ClCompile Include="hydraulic_Cosby.C" />
     <ClCompile Include="hydraulic_hypres.C" />
+    <ClCompile Include="hydraulic_linear.C" />
     <ClCompile Include="hydraulic_MACRO.C" />
     <ClCompile Include="hydraulic_mod_C.C" />
     <ClCompile Include="hydraulic_M_BaC.C" />
@@ -309,6 +310,7 @@
     <ClCompile Include="hydraulic_M_vGip.C" />
     <ClCompile Include="hydraulic_M_vGp.C" />
     <ClCompile Include="hydraulic_M_vG_compact.C" />
+    <ClCompile Include="hydraulic_table.C" />
     <ClCompile Include="hydraulic_wepp.C" />
     <ClCompile Include="hydraulic_yolo.C" />
     <ClCompile Include="im.C" />
@@ -326,6 +328,8 @@
     <ClCompile Include="librarian.C" />
     <ClCompile Include="library.C" />
     <ClCompile Include="litter.C" />
+    <ClCompile Include="litter_mulch.C" />
+    <ClCompile Include="litter_residue.C" />
     <ClCompile Include="log.C" />
     <ClCompile Include="log_alist.C" />
     <ClCompile Include="log_all.C" />
@@ -419,6 +423,7 @@
     <ClCompile Include="reaction_boundrel.C" />
     <ClCompile Include="reaction_colgen.C" />
     <ClCompile Include="reaction_denit.C" />
+    <ClCompile Include="reaction_dom.C" />
     <ClCompile Include="reaction_equil.C" />
     <ClCompile Include="reaction_filter.C" />
     <ClCompile Include="reaction_Jarvis99.C" />
@@ -679,6 +684,7 @@
     <ClInclude Include="librarian.h" />
     <ClInclude Include="library.h" />
     <ClInclude Include="litter.h" />
+    <ClInclude Include="litter_residue.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="log_alist.h" />
     <ClInclude Include="log_all.h" />
