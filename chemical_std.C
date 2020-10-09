@@ -2935,10 +2935,20 @@ Nitrate-N.")
   }
 } ChemicalDON_syntax;
 
+static struct ChemicalCarbonSyntax : public DeclareParam
+{
+  ChemicalCarbonSyntax ()
+    : DeclareParam (Chemical::component, "C", "nutrient", "\
+Carbon.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ChemicalCarbon_syntax;
+
 static struct ChemicalDOCSyntax : public DeclareParam
 { 
   ChemicalDOCSyntax ()
-    : DeclareParam (Chemical::component, "DOC", "nutrient", "\
+    : DeclareParam (Chemical::component, "DOC", "C", "\
 Nitrate-N.")
   { }
   void load_frame (Frame& frame) const

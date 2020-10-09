@@ -39,6 +39,8 @@
 struct LitterMulch : public LitterResidue 
 {
   // Parameters.
+  const symbol DOC_name;	// Name of chemical representing DOC.
+  const symbol DON_name;	// Name of chemical representing DON.
   const double density;		 // Density of mulch [kg DM/m^3]
   const double decompose_height; // Max height of active mulch layer [cm]
   const double soil_height;	 // Heigh of soil layer providing N [cm]
@@ -148,9 +150,9 @@ struct LitterMulch : public LitterResidue
     double buffer_C = SOC_gen * dt;
     double buffer_N = SON_gen * dt;
 
-    if (chemistry.know (Chemical::DOC ()))
+    if (chemistry.know (DOC_name))
       {
-	Chemical& DOC = chemistry.find (Chemical::DOC ());
+	Chemical& DOC = chemistry.find (DOC_name);
 	DOC.add_to_litter_transform_source (DOC_gen);
       }
     else
@@ -203,6 +205,8 @@ struct LitterMulch : public LitterResidue
   // Create and Destroy.
   LitterMulch (const BlockModel& al)
     : LitterResidue (al),
+      DOC_name (al.name ("DOC_name")),
+      DON_name (al.name ("DON_name")),
       density (al.number ("density")),
       decompose_height (al.number ("decompose_height")),
       soil_height (al.number ("soil_height")),
@@ -243,7 +247,12 @@ in the top of soil.")
   void load_frame (Frame& frame) const
   { 
     frame.set_strings ("cite", "findeling2007modelling");
-
+    frame.declare_string ("DOC_name", Attribute::Const, "\
+Name of compound representing dissolved organic carbon.");
+    frame.set ("DOC_name", Chemical::DOC ());
+    frame.declare_string ("DON_name", Attribute::Const, "\
+Name of compound representing dissolved organic nitrogen.");
+    frame.set ("DON_name", Chemical::DON ());
     frame.declare ("density", "kg DM/m^3", Check::positive (),
 		   Attribute::Const, "\
 Density of mulch layer.");

@@ -1,26 +1,12 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* MST regning
+* MST ny arbejdsgruppe
 
 * Mulch
 
-** Begrænser vi N tilførsel? Check
-
-** Hvorfor får vi solute transport problem?
-
-Vi skal nok ikke tage alt NH4 med det samme.
-
-** Mass balance...
-
-** reaction DOM: log abiotic factors (especially N)
-
 ** DOM decay in litter layer
 
-** log: Add reaction_DOM to N balance
-
-** log: Add all reaction_DOM output to mulch 
-
-** write more documentation
+** Write more documentation
 
 * cloudiness
 

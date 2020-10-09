@@ -37,10 +37,13 @@
 #include "abiotic.h"
 #include "block_model.h"
 #include "check.h"
+#include <sstream>
 
 struct ReactionDOM : public Reaction
 {
   // Parameters.
+  const symbol DOC_name;	// Name of chemical representing DOC.
+  const symbol DON_name;	// Name of chemical representing DON.
   const double turnover_rate; // [h^-1]
   const double max_N_depletion_rate; // [h^-1]
   const int where;
@@ -55,6 +58,9 @@ struct ReactionDOM : public Reaction
   std::vector<double> DON;
   std::vector<double> SOC;
   std::vector<double> SON;
+  std::vector<double> h_factor_;
+  std::vector<double> T_factor_;
+  std::vector<double> N_factor_;
 
   // Output.
   void output (Log& log) const;
@@ -87,6 +93,9 @@ ReactionDOM::output (Log& log) const
   output_variable (DON, log);
   output_variable (SOC, log);
   output_variable (SON, log);
+  output_value (h_factor_, "h_factor", log);
+  output_value (T_factor_, "T_factor", log);
+  output_value (N_factor_, "N_factor", log);
 }
 
 void 
@@ -95,15 +104,15 @@ ReactionDOM::tick_soil (const Geometry& geo,
 			const SoilHeat& soil_heat,
 			OrganicMatter& organic, 
 			Chemistry& chemistry, 
-			const double dt, Treelog&)
+			const double dt, Treelog& msg)
 {
   // Code.
   const size_t cell_size = geo.cell_size ();
   const std::vector<bool> active = organic.active (); 
   Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
   Chemical& soil_NH4 = chemistry.find (Chemical::NH4 ());
-  Chemical& soil_DOC = chemistry.find (Chemical::DOC ());
-  Chemical& soil_DON = chemistry.find (Chemical::DON ());
+  Chemical& soil_DOC = chemistry.find (DOC_name);
+  Chemical& soil_DON = chemistry.find (DON_name);
 
   daisy_assert (NH4.size () == cell_size);
   daisy_assert (NO3.size () == cell_size);
@@ -151,6 +160,7 @@ ReactionDOM::tick_soil (const Geometry& geo,
 	? (N_avail / N_need )
 	: 1.0;
       daisy_assert (N_factor >= 0.0);
+      daisy_assert (N_factor <= 1.0);
 
       // N limited turnover.
       const double rate = rate_pot * N_factor; // [h^-1]
@@ -163,20 +173,23 @@ ReactionDOM::tick_soil (const Geometry& geo,
 	? (SOC_gen / C_per_N_goal)
 	: N_gen; 
       daisy_assert (SON_gen >= 0.0);
-      const double N_consume = N_gen - SON_gen;	 // [g N/cm^3/h]
-	
+      const double N_consume = SON_gen - N_gen;	 // [g N/cm^3/h]
+      
       // Update source/sink.
       if (N_consume > NH4_avail)
 	{ 
 	  NH4[i] = -NH4_avail;		 // [g N/cm^3/h]
-	  NO3[i] = N_consume + NH4_avail; // [g N/cm^3/h]
+	  NO3[i] = -N_consume + NH4_avail; // [g N/cm^3/h]
 	}
       else
 	{
-	  NH4[i] = N_consume;	// [g N/cm^3/h]
+	  NH4[i] = -N_consume;	// [g N/cm^3/h]
 	  NO3[i] = 0.0;		// [g N/cm^3/h]
 	}
-      daisy_approximate (N_consume,  NH4[i] + NO3[i]);
+
+      daisy_assert (-NH4[i] <= 1.01 * NH4_avail);
+      daisy_assert (-NO3[i] <= 1.01 * NO3_avail);
+      daisy_approximate (-N_consume,  NH4[i] + NO3[i]);
       
       CO2[i] = C_gen - SOC_gen;	// [g C/cm^3/h]
       DOC[i] = C_gen;		// [g C/cm^3/h]
@@ -190,6 +203,10 @@ ReactionDOM::tick_soil (const Geometry& geo,
       daisy_assert (SON[i] >= 0.0);
       daisy_assert (DOC[i] >= 0.0);
       daisy_assert (DON[i] >= 0.0);
+
+      h_factor_[i] = h_factor;
+      T_factor_[i] = T_factor;
+      N_factor_[i] = N_factor;
     }
   
   // Make it official.
@@ -217,12 +234,12 @@ ReactionDOM::check (const Geometry&,
       msg.error ("DOM requires NH4 to be tracked");
       ok = false;
     }
-  if (!chemistry.know (Chemical::DOC ()))
+  if (!chemistry.know (DOC_name))
     {
       msg.error ("DOM requires DOC to be tracked");
       ok = false;
     }
-  if (!chemistry.know (Chemical::DON ()))
+  if (!chemistry.know (DON_name))
     {
       msg.error ("DOM requires DON to be tracked");
       ok = false;
@@ -252,10 +269,15 @@ ReactionDOM::initialize (const Geometry& geo,
   DON = std::vector<double> (cell_size, 0.0);
   SOC = std::vector<double> (cell_size, 0.0);
   SON = std::vector<double> (cell_size, 0.0);
+  h_factor_ = std::vector<double> (cell_size, 1.0);
+  T_factor_ = std::vector<double> (cell_size, 1.0);
+  N_factor_ = std::vector<double> (cell_size, 1.0);
 }
 
 ReactionDOM::ReactionDOM (const BlockModel& al)
   : Reaction (al),
+    DOC_name (al.name ("DOC_name")),
+    DON_name (al.name ("DON_name")),
     turnover_rate (Rate::value (al, "turnover")),
     max_N_depletion_rate (Rate::value (al, "max_N_depletion")),
     where (al.integer ("where")),
@@ -273,6 +295,12 @@ Turnover of dissolved organic matter.")
   { }
   void load_frame (Frame& frame) const
   {
+    frame.declare_string ("DOC_name", Attribute::Const, "\
+Name of compound representing dissolved organic carbon.");
+    frame.set ("DOC_name", Chemical::DOC ());
+    frame.declare_string ("DON_name", Attribute::Const, "\
+Name of compound representing dissolved organic nitrogen.");
+    frame.set ("DON_name", Chemical::DON ());
     Rate::declare (frame, "turnover", "Turnover of DOM.");
     Rate::set_halftime (frame, "turnover", 24.0 /* [h] */);
     // Rate::set_rate (frame, "turnover", 0.0 /* [h] */);
@@ -314,6 +342,15 @@ If non-negative, mineral N will be added or removed to achieve the goal.");
     frame.declare ("SON", "g N/cm^3/h",
 		   Attribute::LogOnly, Attribute::SoilCells, 
 		   "Rate of dissolved organic N immobilized.");
+    frame.declare ("h_factor", Attribute::None (),
+		   Attribute::LogOnly, Attribute::SoilCells, 
+		   "Soil water potential effect on turnover rate.");
+    frame.declare ("T_factor", Attribute::None (),
+		   Attribute::LogOnly, Attribute::SoilCells, 
+		   "Soil temperature effect on turnover rate.");
+    frame.declare ("N_factor", Attribute::None (),
+		   Attribute::LogOnly, Attribute::SoilCells, 
+		   "Soil nitrogen effect on turnover rate.");
   }
 } ReactionDOM_syntax;
 

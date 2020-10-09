@@ -329,7 +329,8 @@ SPECIALS = litter_residue.C wsource_weather.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = treelog_child.C GP2D.C weather.C astronomy.C weatherdata.C \
+OTHER = complex_functions.C hyp_2F1.C \
+	treelog_child.C GP2D.C weather.C astronomy.C weatherdata.C \
 	scope_xysources.C lexer_flux.C lexer_soil.C iterative.C \
 	water.C block_nested.C block_submodel.C block_top.C block_model.C \
 	value.C type.C model_derived.C model_logable.C model_framed.C \
@@ -559,9 +560,10 @@ dos2unix:
 # Various test targets.
 #
 
-GTESTHOME = ../gtest
-GTESTINC = -isystem $(GTESTHOME)/include
-GTESTLIB = -L$(GTESTHOME)/lib -lgtest -lgtest_main
+#GTESTHOME = ../gtest
+#GTESTINC = -isystem $(GTESTHOME)/include
+#GTESTLIB = -L$(GTESTHOME)/lib -lgtest -lgtest_main
+#GTESTLIB = #-lgtest -lgtest_main
 
 UTESTSRC = ut_iterative.C ut_units.C ut_scope_exchange.C
 UTESTOBJ = $(UTESTSRC:.C=${OBJ})
