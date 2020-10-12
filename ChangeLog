@@ -1,6 +1,5 @@
 2020-10-12  Per Abrahamsen  <pa@plen.ku.com>
 
-
 	* hydraulic_M_vGBS.C, hydraulic_hypWeb.C: New files.
 	* Makefile (MODELS): Added them.
 	* hydraulic_hypWeb.C: Fix warning.
