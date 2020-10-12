@@ -301,6 +301,7 @@
     <ClCompile Include="hydraulic_B_vG.C" />
     <ClCompile Include="hydraulic_Cosby.C" />
     <ClCompile Include="hydraulic_hypres.C" />
+    <ClCompile Include="hydraulic_hypWeb.C" />
     <ClCompile Include="hydraulic_linear.C" />
     <ClCompile Include="hydraulic_MACRO.C" />
     <ClCompile Include="hydraulic_mod_C.C" />
@@ -308,6 +309,7 @@
     <ClCompile Include="hydraulic_M_BaC_Bimodal.C" />
     <ClCompile Include="hydraulic_M_C.C" />
     <ClCompile Include="hydraulic_M_vG.C" />
+    <ClCompile Include="hydraulic_M_vGBS.C" />
     <ClCompile Include="hydraulic_M_vGip.C" />
     <ClCompile Include="hydraulic_M_vGp.C" />
     <ClCompile Include="hydraulic_M_vG_compact.C" />
