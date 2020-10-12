@@ -19,8 +19,8 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// 2step pedotransfer model for the Brunschwick-VGM model.\n\
-//           VGM Parameters specified by the HYPRES transfer function.\n\
+// 2step pedotransfer model for the Brunschwick-VGM model.
+//           VGM Parameters specified by the HYPRES transfer function.
 //           Brunschwick-VGM parameters accoring to Weber.et.al.2020 WRR"
 
 #define BUILD_DLL
@@ -39,6 +39,10 @@ using namespace std;
 #include <complex>
 #include "hyp_2F1.h"
 
+#ifndef M_LN10
+const double M_LN10 = 2.302585092994046;
+#endif
+
 class HydraulicHypweb : public Hydraulic
 {
   // Content.
@@ -49,7 +53,6 @@ class HydraulicHypweb : public Hydraulic
   /* const */ double m;		// 1 - 1/n
   /* const */ double l;         // tortuosity parameter
   const double pf0;
-  const double M_LN10 = 2.302585092994046;
   const double afilm;
   /* const */  double Theta_cap;
   const double Theta_nc;
@@ -360,11 +363,11 @@ HydraulicHypweb::HydraulicHypweb (const BlockModel& al)
     n (-42.42e42),
     m (-42.42e42),
     l (-42.42e42),
-	Ks_cap(-42.42e42),
 	pf0(al.number("pf0")),
 	afilm(al.number("afilm")),
-	Ks_nc(al.number("Ks_nc")),
 	Theta_nc(al.number("Theta_nc")),
+	Ks_cap(-42.42e42),
+	Ks_nc(al.number("Ks_nc")),
     M_ ()
 {
 	

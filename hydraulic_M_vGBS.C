@@ -45,6 +45,9 @@ using namespace std;
 //#define min(a,b)            (((a) < (b)) ? (a) : (b))
 //#define max(a,b)            (((a) > (b)) ? (a) : (b))
 
+#ifndef M_LN10
+const double M_LN10 = 2.302585092994046;
+#endif
 
 class HydraulicM_vGBS : public Hydraulic
 {
@@ -56,7 +59,6 @@ class HydraulicM_vGBS : public Hydraulic
 	const double l;		// tortuosity parameter   
 	const double pf0;
 	const double afilm;
-	const double M_LN10 = 2.302585092994046;
 	const double Theta_cap;
 	const double Theta_nc;
 	const double Ks_cap;
