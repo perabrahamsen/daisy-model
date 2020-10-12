@@ -1,3 +1,7 @@
+2020-10-12  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.94 released.
+
 2020-10-12  Per Abrahamsen  <pa@plen.ku.com>
 
 	* hydraulic_M_vGBS.C, hydraulic_hypWeb.C: New files.
