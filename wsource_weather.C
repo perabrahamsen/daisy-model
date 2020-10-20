@@ -653,9 +653,9 @@ WSourceWeather::Implementation::name_first (const symbol key) const
 double
 WSourceWeather::Implementation::T_normal (const Time& time, double delay) const
 {
-  if (!std::isnormal (my_Taverage) || !std::isnormal (my_Tamplitude))
+  if (!std::isfinite (my_Taverage) || !std::isfinite (my_Tamplitude))
     // used by initialization.
-    return 10.0;
+    return NAN;
 
   const double displacement = time.year_fraction () - my_maxTday / 365.0;
   

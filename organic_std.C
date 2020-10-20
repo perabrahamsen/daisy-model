@@ -1,4 +1,4 @@
-// organic_std.C -- The default model for sil organic matter.
+// organic_std.C -- The default model for soil organic matter.
 // 
 // Copyright 1996-2002 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2002 KVL.
@@ -1368,7 +1368,7 @@ OrganicStandard::tick (const Geometry& geo,
           << " + " << geo.total_soil (NH4_source) * dt;
       if (std::isnormal (N_source))
 	tmp << " (error " 
-            << fabs (delta_N / (N_source) - 1.0) * 100.0 << "%)";
+            << fabs (delta_N / (N_source * dt) - 1.0) * 100.0 << "%)";
       msg.error (tmp.str ());
     }
   double C_to_DOM = 0.0;

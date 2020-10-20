@@ -125,6 +125,10 @@ struct LitterMulch : public LitterResidue
     DON_gen = 0.0;		// [g N/cm^2/h]
     SOC_gen = 0.0;		// [g C/cm^2/h]
     SON_gen = 0.0;		// [g N/cm^2/h]
+
+    if (!std::isnormal (dt))	// Initialization.
+      return;
+    
     for (auto pool: added)
       {
 	const double rate = factor * pool->turnover_rate; // [h^-1]
@@ -135,6 +139,8 @@ struct LitterMulch : public LitterResidue
 	double new_C = NAN; // [g C/cm^2]
 	double loss_C = NAN; // [g C/cm^2/h]
 	first_order_change (top_C, 0, rate, dt, new_C, loss_C);
+	daisy_assert (loss_C >= 0.0);
+	daisy_assert (new_C >= 0.0);
 	DOC_gen += loss_C * dissolved;
 	SOC_gen += loss_C * stationary;
 	pool->top_C = new_C;
@@ -143,6 +149,8 @@ struct LitterMulch : public LitterResidue
 	double new_N = NAN; // [g N/cm^2]
 	double loss_N = NAN; // [g N/cm^2/h]
 	first_order_change (top_N, 0, rate, dt, new_N, loss_N);
+	daisy_assert (loss_N >= 0.0);
+	daisy_assert (new_N >= 0.0);
 	DON_gen += loss_N * dissolved;
 	SON_gen += loss_N * stationary;
 	pool->top_N = new_N;
@@ -164,8 +172,11 @@ struct LitterMulch : public LitterResidue
 	DON.add_to_litter_transform_source (DON_gen);
       }
     else
-      buffer_C += DON_gen * dt;
-    
+      buffer_N += DON_gen * dt;
+
+    daisy_assert (buffer_C >= 0.0);
+    daisy_assert (buffer_N >= 0.0);
+    daisy_assert (dt > 0.0);
     organic.add_to_buffer (geo, 0, soil_height, buffer_C, buffer_N);
   }
   void output (Log& log) const

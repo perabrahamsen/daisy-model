@@ -1022,6 +1022,7 @@ ColumnStandard::output (Log& log) const
                "residuals_C_root", log);
   output_lazy (bioclimate->get_intercepted_water ()
                + bioclimate->get_snow_storage ()
+	       + bioclimate->get_litter_water ()
                + surface.ponding_average (),
                "surface_water", log);
   output_derived (movement, "Movement", log);
