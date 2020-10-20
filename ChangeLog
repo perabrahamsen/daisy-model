@@ -1,3 +1,7 @@
+2020-10-20  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.95 released.
+
 2020-10-15  Per Abrahamsen  <pa@plen.ku.com>
 
 	* column_std.C (output): Include litter in surface water.
