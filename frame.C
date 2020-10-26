@@ -1707,6 +1707,14 @@ Frame::set_described (const symbol key, const double value, const symbol desc)
 }
 
 void 
+Frame::set_described (const symbol key, const PLF& value, const symbol desc)
+{ 
+  verify (key, Attribute::PLF);
+  boost::shared_ptr<const PLF> child (new PLF (value));
+  impl->set_value (key, new ValuePLFDescription (child, desc));
+}
+
+void 
 Frame::set_cited (const symbol key, double const value, const symbol desc,
                   const std::vector<symbol>& citations)
 {
@@ -1715,7 +1723,25 @@ Frame::set_cited (const symbol key, double const value, const symbol desc,
 }
 
 void 
+Frame::set_cited (const symbol key, const PLF& value, const symbol desc,
+                  const std::vector<symbol>& citations)
+{
+  verify (key, Attribute::PLF);
+  boost::shared_ptr<const PLF> child (new PLF (value));
+  impl->set_value (key, new ValuePLFCite (child, desc, citations));
+}
+
+void 
 Frame::set_cited (symbol key, double value, symbol desc,
+                  symbol citation)
+{
+  std::vector<symbol> citations;
+  citations.push_back (citation);
+  set_cited (key, value, desc, citations);
+}
+
+void 
+Frame::set_cited (symbol key, const PLF& value, symbol desc,
                   symbol citation)
 {
   std::vector<symbol> citations;

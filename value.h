@@ -127,6 +127,23 @@ public:
   ValuePLF (boost::shared_ptr<const PLF> v);
 };
 
+class ValuePLFDescription : public ValuePLF
+{
+  const symbol desc;
+  symbol description () const;
+public:
+  ValuePLFDescription (boost::shared_ptr<const PLF> v, const symbol description);
+};
+
+class ValuePLFCite : public ValuePLFDescription
+{
+  const std::vector<symbol> citations;
+  const std::vector<symbol>& cite () const;
+public:
+  ValuePLFCite (boost::shared_ptr<const PLF> v, const symbol d, 
+		const std::vector<symbol>& c);
+};
+
 class ValueModel : public Value
 {
   boost::shared_ptr<const FrameModel> value;

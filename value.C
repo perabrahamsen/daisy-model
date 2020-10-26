@@ -192,6 +192,26 @@ ValuePLF::ValuePLF (boost::shared_ptr<const PLF> v)
   : value (v)
 { }
 
+symbol
+ValuePLFDescription::description () const
+{ return desc; }
+
+ValuePLFDescription::ValuePLFDescription (boost::shared_ptr<const PLF> v, 
+					  const symbol description)
+  : ValuePLF (v),
+    desc (description)
+{ }
+
+const std::vector<symbol>& 
+ValuePLFCite::cite () const
+{ return citations; }
+
+ValuePLFCite::ValuePLFCite (boost::shared_ptr<const PLF> v, const symbol d, 
+			    const std::vector<symbol>& c)
+  : ValuePLFDescription (v, d),
+    citations (c)
+{ }
+
 boost::shared_ptr<const FrameModel>
 ValueModel::model () const
 { return value; }

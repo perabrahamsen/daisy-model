@@ -338,9 +338,14 @@ class EXPORT Frame : public WScope
   void set (symbol, const std::vector<boost::shared_ptr<const PLF>/**/>&);
   void set_empty (symbol);
   void set_described (symbol key, double value, symbol desc);
+  void set_described (symbol key, const PLF& value, symbol desc);
   void set_cited (symbol key, double value, symbol desc,
                   const std::vector<symbol>& citations);
+  void set_cited (symbol key, const PLF& value, symbol desc,
+                  const std::vector<symbol>& citations);
   void set_cited (symbol key, double value, symbol desc,
+                  symbol citation);
+  void set_cited (symbol key, const PLF& value, symbol desc,
                   symbol citation);
 
   // Create and Destroy.
