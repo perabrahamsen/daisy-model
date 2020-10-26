@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 2020-10-23  Per Abrahamsen  <pa@plen.ku.com>
 
 	* organic_std.C (heat_factor, water_factor): Cite default value.
+=======
+2020-10-20  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.95 released.
+>>>>>>> c5a50bb8ea305026fe353c9345e859c5ad846d07
 
 2020-10-15  Per Abrahamsen  <pa@plen.ku.com>
 
