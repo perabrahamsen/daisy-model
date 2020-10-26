@@ -478,7 +478,6 @@
     <ClCompile Include="smb.C" />
     <ClCompile Include="snow.C" />
     <ClCompile Include="soil.C" />
-    <ClCompile Include="soilfac.C" />
     <ClCompile Include="soilph.C" />
     <ClCompile Include="soil_heat.C" />
     <ClCompile Include="soil_water.C" />
@@ -767,7 +766,6 @@
     <ClInclude Include="smb.h" />
     <ClInclude Include="snow.h" />
     <ClInclude Include="soil.h" />
-    <ClInclude Include="soilfac.h" />
     <ClInclude Include="soilph.h" />
     <ClInclude Include="soil_heat.h" />
     <ClInclude Include="soil_water.h" />
