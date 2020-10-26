@@ -3217,7 +3217,7 @@ By default, this is equivalent to the initial N content of the SOM pools.");
 
     frame.declare ("heat_factor", "dg C", Attribute::None (), Check::non_negative (),
                Attribute::Const,
-               "Default heat factor, used if not specified by OM pool.
+               "Default heat factor, used if not specified by OM pool.\n\
 If the PLF is empty, a built-in function will be used instead.");
     frame.set_cited ("heat_factor", PLF::empty (),
 		     "Equation 6-13", "daisy-def");
