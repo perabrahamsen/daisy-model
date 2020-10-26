@@ -3217,14 +3217,17 @@ By default, this is equivalent to the initial N content of the SOM pools.");
 
     frame.declare ("heat_factor", "dg C", Attribute::None (), Check::non_negative (),
                Attribute::Const,
-               "Default heat factor, used if not specified by OM pool.");
-    frame.set ("heat_factor", PLF::empty ());
+               "Default heat factor, used if not specified by OM pool.
+If the PLF is empty, a built-in function will be used instead.");
+    frame.set_cited ("heat_factor", PLF::empty (),
+		     "Equation 6-13", "daisy-def");
     frame.declare ("water_factor", "cm", Attribute::None (), Check::non_negative (),
                Attribute::Const, "\
 Default water potential factor, used if not specified by OM pool.\n\
-If the PLF is empty, a build-in PLF of pF will be used instead.\n\
-It is 0.6 at pF < 0, 1.0 at 1.5 < pF < 2.5, and 0 at pF > 6.5.");
-    frame.set ("water_factor", PLF::empty ());
+If the PLF is empty, a build-in function  will be used instead.");
+    frame.set_cited ("water_factor", PLF::empty (),
+		     "Equation 6-16",
+		     "daisy-def");
     frame.declare ("pH_factor", "pH", Attribute::None (), 
                    Check::non_negative (), Attribute::Const, "\
 Soil pH influence on organic matter turnover. By default, pH is ignored.");
