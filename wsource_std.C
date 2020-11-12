@@ -86,7 +86,10 @@ struct WSourceStandard : public WSourceTable
   bool top_level;
   void weather_initialize (const Time& simulation_time, Treelog& msg)
   {
-    TREELOG_MODEL (msg);
+    std::ostringstream tmp;
+    tmp << title () << ": initializing weather at "
+	<< simulation_time.print ();
+    Treelog::Open nest (msg, tmp.str ());
     top_level = true;
     initialize_one (msg);
     if (initialized_ok ())

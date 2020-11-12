@@ -2816,14 +2816,24 @@ Depth factor is specified by 'z' and 'z_factor'.")
   { }
 } ChemicalFOCUS_syntax;
 
-// The 'nutrient' chemical parameterization.
+// The 'nutrient' chemical model.
 
-static struct ChemicalNutrientSyntax : public DeclareParam
+struct ChemicalNutrient : public ChemicalBase 
 {
-  ChemicalNutrientSyntax ()
-    : DeclareParam (Chemical::component, "nutrient", "default", "\
-Plants eat this stuff.")
+  double decompose_soil_factor (size_t c,
+				const Geometry&, const Soil&, 
+				const SoilWater&, const SoilHeat&, 
+				const OrganicMatter&) const
+  { return 1.0; }
+  ChemicalNutrient (const BlockModel& al)
+    : ChemicalBase (al)
   { }
+};
+
+static struct ChemicalNutrientSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ChemicalNutrient (al); }
   void load_frame (Frame& frame) const
   {
     frame.set ("crop_uptake_reflection_factor", 1.0); // Specific uptake code.
@@ -2831,6 +2841,10 @@ Plants eat this stuff.")
     frame.set ("canopy_washoff_coefficient", 1.0);
     frame.set ("decompose_rate", 0.0);
   }
+  ChemicalNutrientSyntax ()
+    : DeclareModel (Chemical::component, "nutrient", "base", "\
+Plants eat this stuff.")
+  { }
 } ChemicalNutrient_syntax;
 
 static struct ChemicalNitrogenSyntax : public DeclareParam

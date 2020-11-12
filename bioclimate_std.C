@@ -937,6 +937,15 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   
   litter_water_capacity = litter.water_capacity ();
   litter_water_storage += (litter_water_in - litter_ea) * dt;
+  const double litter_potential_exfiltration = litter.potential_exfiltration ();
+  const double litter_overflow
+    = (litter_water_storage - litter_water_capacity) / dt;
+  const double litter_evacuation
+    = litter_water_storage / dt;
+  const double litter_potential_down =
+    std::min (litter_evacuation,
+	      std::max (litter_potential_exfiltration, litter_overflow));
+  
   if (litter_water_storage < 0.0)
     {
       if (litter_water_storage < -1e-8)
@@ -953,10 +962,10 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
       litter_water_out = litter_water_storage / dt;
       litter_water_storage = 0.0;
     }
-  else if (litter_water_storage > litter_water_capacity + 1e-8)
+  else if (litter_potential_down > 0.0)
     {
-      litter_water_out = (litter_water_storage - litter_water_capacity) / dt;
-      litter_water_storage = litter_water_capacity;
+      litter_water_out = litter_potential_down;
+      litter_water_storage -= litter_water_out * dt;
     }
   else
     litter_water_out = 0.0;

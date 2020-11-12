@@ -34,6 +34,9 @@
 #include "bioclimate.h"
 #include "abiotic.h"
 #include "aom.h"
+#include "geometry.h"
+#include "soil_water.h"
+#include "iterative.h"
 #include <sstream>
 
 struct LitterMulch : public LitterResidue 
@@ -47,13 +50,18 @@ struct LitterMulch : public LitterResidue
   const double Theta_res;	 // Residual water content []
   const double Theta_sat;	 // Saturated water content []
   const double h_min;		 // Min. pressure for biological activity [cm]
+  const double factor_exch;	 // Water connectivity with soil []
   
   // Log variables.
   double height;		// Height of mulch layer [cm]
   double contact;		// Fraction in contact with soil []
   double water;			// Total water in mulch [cm]
   double Theta;			// Relative water content []
-  double h;			// Mulch water potential [cm]
+  double h;			// Mulch water potential at start of tstep [cm]
+  double h1;			// estimated mulch water potential at end [cm]
+  double h_soil;		// Soil water potential at soil_height [cm]
+  double K_soil;		// Soil water conductivity at soil_height [cm/h]
+  double E_darcy;		// Potential exchnage with soil water [cm/h]
   double h_factor;		// Water potential effect []
   double T;			// Temeprature of mulch.
   double T_factor;		// Temperature factor []
@@ -61,7 +69,36 @@ struct LitterMulch : public LitterResidue
   double DON_gen;		// Disolved organic N generation [g N/cm^2/h]
   double SOC_gen;		// Stationary C generation [g C/cm^2/h]
   double SON_gen;		// Stationary N generation [g N/cm^2/h]
-  
+
+
+  double find_E_darcy (const double h) const // [cm/h]
+  { return cover () * factor_exch * ((h - h_soil) / -soil_height) * K_soil; }
+
+  double find_h (const double Theta) const // []->[cm]
+  {
+    if (Theta < Theta_res)
+      return h_min;
+    if (Theta > Theta_sat)
+      return 0.0;
+
+    return -std::pow (-h_min,
+		      1.0-((Theta - Theta_res)
+			   / (2.0 * Theta_sat / 3.0 - Theta_res)));
+  }
+
+  double find_h1 (const double h0, const double dt) const
+  {
+    // No litter.
+    if (!std::isnormal (height))
+      return h_min;
+
+    const double E_darcy = find_E_darcy (h0); // [cm/h]
+    const double new_water = water - E_darcy * dt;
+    const double new_Theta
+      = Theta_sat * 10 /* [mm/cm] */ * new_water / water_capacity (); // []
+    return find_h (new_Theta);
+  }
+
   // Simulation.
   void tick (const Bioclimate& bioclimate,
 	     const Geometry& geo, const Soil& soil,
@@ -91,20 +128,30 @@ struct LitterMulch : public LitterResidue
     // Water
     water = bioclimate.get_litter_water () * 0.1; // [mm] -> [cm]
     if (height > 0.0)
-      Theta = water / height;			  // []
+      Theta = Theta_sat * 10 /* [mm/cm] */ * water / water_capacity (); // []
     else
       Theta = 0.0;
 
-    if (Theta < Theta_res)
-      h = h_min;
-    else if (Theta > Theta_sat)
-      h = 0.0;
-    else
-      h = -std::pow (-h_min,
-		     1.0-((Theta - Theta_res)
-			  / (2.0 * Theta_sat / 3.0 - Theta_res)));
+    h = find_h (Theta);
     h_factor = Abiotic::f_h (h);
 
+    h_soil = geo.content_height (soil_water, &SoilWater::h, soil_height);
+    K_soil = geo.content_height (soil_water, &SoilWater::K_cell, soil_height);
+
+    struct h_diff_c
+    {
+      const LitterMulch& m;
+      const double dt;
+      double operator()(const double h0) const
+      { return h0 - m.find_h1 (h0, dt); }
+      h_diff_c (const LitterMulch& m_, const double dt_)
+	: m (m_),
+	  dt (dt_)
+      { }
+    } h_diff (*this, dt);
+    h1 = bisection (h_min, 0, h_diff);
+    E_darcy = find_E_darcy (h1);
+    
     // Temperature
     T = bioclimate.get_litter_temperature (); // [dg C]
     T_factor = Abiotic::f_T0 (T);
@@ -179,6 +226,10 @@ struct LitterMulch : public LitterResidue
     daisy_assert (dt > 0.0);
     organic.add_to_buffer (geo, 0, soil_height, buffer_C, buffer_N);
   }
+
+  double potential_exfiltration () const // Water exchange with soil [mm/h]
+  { return E_darcy * 10.0 /* [mm/cm] */; }
+  
   void output (Log& log) const
   {
     LitterResidue::output (log);
@@ -187,6 +238,10 @@ struct LitterMulch : public LitterResidue
     output_variable (water, log);
     output_variable (Theta, log);
     output_variable (h, log);
+    output_variable (h1, log);
+    output_variable (h_soil, log);
+    output_variable (K_soil, log);
+    output_variable (E_darcy, log);
     output_variable (h_factor, log);
     output_variable (T, log);
     output_variable (T_factor, log);
@@ -224,11 +279,16 @@ struct LitterMulch : public LitterResidue
       Theta_res (al.number ("Theta_res")),
       Theta_sat (find_Theta_sat (al)),
       h_min (al.number ("h_min")),
+      factor_exch (al.number ("factor_exch")),
       height (NAN),
       contact (NAN),
       water (NAN),
       Theta (NAN),
       h (NAN),
+      h1 (NAN),
+      h_soil (NAN),
+      K_soil (NAN),
+      E_darcy (NAN),
       h_factor (NAN),
       T (NAN),
       T_factor (NAN),
@@ -281,6 +341,10 @@ Water content where biological activity stops");
 		   Attribute::Const, "\
 Water pressure where biological activity stops.");
     frame.set ("h_min", pF2h (6.5));
+    frame.declare ("factor_exch", Attribute::None (), Check::non_negative (),
+		   Attribute::Const, "\
+Limiting factor when calculating Darcy exchange between mulch and soil.\n\
+It is intended to emulate poor contact between the two media.");
 
     // Log variables.
     frame.declare ("height", "cm", Attribute::LogOnly, "\
@@ -293,7 +357,16 @@ Total water in mulch.");
     frame.declare ("Theta", Attribute::None (), Attribute::LogOnly, "\
 Relative water content.");
     frame.declare ("h", "cm", Attribute::LogOnly, "\
-Mulch water potential.");
+Mulch water potential at stat of timestep.");
+    frame.declare ("h1", "cm", Attribute::LogOnly, "\
+Estimated mulch water potential at end of timestep.");
+    frame.declare ("h_soil", "cm", Attribute::LogOnly, "\
+Soil water potential.");
+    frame.declare ("K_soil", "cm/h", Attribute::LogOnly, "\
+Soil water conductivity.");
+    frame.declare ("E_darcy", "cm/h", Attribute::LogOnly, "\
+Potential mulch-soil water exchange as calculated by modified Darcy.\n\
+Positive down.");
     frame.declare ("h_factor", Attribute::None (), Attribute::LogOnly, "\
 Water potential effect on turnover.");
     frame.declare ("T", "dg C", Attribute::LogOnly, "\

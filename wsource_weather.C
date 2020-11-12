@@ -1564,7 +1564,9 @@ WSourceWeather::initialize_two (const Time& time, Treelog& msg)
 void
 WSourceWeather::weather_initialize (const Time& time, Treelog& msg)
 {
-  TREELOG_MODEL (msg);
+  std::ostringstream tmp;
+  tmp << title () << ": initializing at " << time.print ();
+  Treelog::Open nest (msg, tmp.str ());
   initialize_one (msg);
   initialize_two (time, msg);
 }

@@ -6,6 +6,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.96
+
+** The Millet and Maize parameterization had a too high specific_LAI.
+
 * 5.94
 
 ** Reorganization of chemicals.
