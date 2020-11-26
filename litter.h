@@ -51,12 +51,15 @@ public:
 		     OrganicMatter& organic, Chemistry& chemistry,
 		     const double dt,
 		     Treelog& msg) = 0;
+
   virtual double cover () const = 0; // Fraction of surface covered [0-1]
+  virtual double intercept () const; // Multiply with cover for rain int. [0-1]
+  virtual double diffusion_rate () const; // Diffusion to non-int. water [h^-1]
   virtual double vapor_flux_factor () const = 0; // Affect on soil evap. []
   virtual double water_capacity () const = 0;    // Max water content [mm]
   virtual double albedo () const = 0;  // Light reflection factor []
   virtual double potential_exfiltration () const; // Water exchange with soil [mm/h]
-  
+
   // Create and Destroy.
 protected:
   Litter (const BlockModel&);

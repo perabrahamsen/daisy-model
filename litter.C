@@ -38,6 +38,14 @@ Litter::library_id () const
 }
 
 double
+Litter::intercept () const
+{ return 1.0; }
+
+double
+Litter::diffusion_rate () const // [h^-1]
+{ return 0.0; }
+
+double
 Litter::potential_exfiltration () const // Water exchange with soil [mm/h]
 { return 0.0; }
 

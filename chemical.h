@@ -28,6 +28,7 @@
 #include <vector>
 #include <iosfwd>
 
+class Litter;
 class Geometry;
 class Soil;
 class SoilWater;
@@ -154,8 +155,8 @@ public:
                             const SoilHeat&, const OrganicMatter&, 
                             const Chemistry&, Treelog&) = 0;
   virtual double suggest_dt () const = 0;
-  virtual void tick_top (const Vegetation&, const Bioclimate&, Chemistry&,
-                         double litter_cover /* [] */,
+  virtual void tick_top (const Vegetation&, const Bioclimate&, const Litter&,
+			 Chemistry&,
                          double surface_runoff_rate /* [h^-1] */,
                          double dt /* [h] */,
                          Treelog&) = 0;

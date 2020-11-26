@@ -45,6 +45,7 @@
 #include "treelog.h"
 #include "vegetation.h"
 #include "bioclimate.h"
+#include "litter.h"
 #include <sstream>
 
 struct ChemicalBase : public Chemical
@@ -263,8 +264,8 @@ struct ChemicalBase : public Chemical
                            double& first, double& second);
   void tick_top (const Vegetation&,
 		 const Bioclimate&,
+		 const Litter&, 
 		 Chemistry&,
-                 const double litter_cover, // [],
                  const double surface_runoff_rate, // [h^-1]
                  const double dt, // [h]
                  Treelog& msg);
@@ -995,8 +996,8 @@ ChemicalBase::divide_loss (const double absolute_loss_rate,
 void 
 ChemicalBase::tick_top (const Vegetation& vegetation,
 			const Bioclimate& bioclimate,
+			const Litter& litter,
 			Chemistry& chemistry,
-			const double litter_cover, // [],
 			const double surface_runoff_rate, // [h^-1]
 			const double dt, // [h]
 			Treelog& msg)
@@ -1009,7 +1010,10 @@ ChemicalBase::tick_top (const Vegetation& vegetation,
   const double snow_leak_rate = bioclimate.snow_leak_rate (dt); // [h^-1]
   const double canopy_cover = vegetation.cover (); // [];
   const double canopy_leak_rate = bioclimate.canopy_leak_rate (dt); // [h^-1]
+  const double litter_cover = litter.cover (); // []
   const double litter_leak_rate = bioclimate.litter_leak_rate (dt); // [h^-1]
+  const double litter_surface_wash_off_rate
+    = bioclimate.litter_wash_off_rate (dt); // [h^-1]
 
   // Fluxify management operations.
   spray_overhead_ /= dt;
@@ -1081,14 +1085,23 @@ ChemicalBase::tick_top (const Vegetation& vegetation,
   const double litter_bypass = below_canopy - litter_in;
 
   const double old_litter_storage = litter_storage;
+
+  // Water stored in the litter leaking.
   const double litter_washoff_rate 
     = litter_washoff_coefficient * litter_leak_rate;
+
+  // Diffusion from litter to water dripping past it on the surface.
+  const double litter_diffuse_rate
+    = std::min (litter.diffusion_rate (), litter_surface_wash_off_rate);
+  
   double litter_absolute_loss_rate;
   first_order_change (old_litter_storage, litter_in + litter_transform,
-		      litter_decompose_rate + litter_washoff_rate, dt,
+		      litter_decompose_rate
+		      + litter_washoff_rate
+		      + litter_diffuse_rate, dt,
                       litter_storage, litter_absolute_loss_rate);
   divide_loss (litter_absolute_loss_rate, 
-               litter_decompose_rate, litter_leak_rate,
+               litter_decompose_rate, litter_leak_rate + litter_diffuse_rate,
                litter_decompose, litter_out);
  
   // Surface

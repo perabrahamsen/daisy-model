@@ -1,3 +1,30 @@
+2020-11-26  Per Abrahamsen  <pa@plen.ku.com>
+
+	* chemistry.h, chemistry_std.C, chemistry_multi.C (tick_top):
+	* chemical.h, chemical_std.C (tick_top):  Take
+	'Litter' argument.
+	* column_std.C (tick_move): Update caller.
+	* chemical.h (tick_top): 
+
+2020-11-24  Per Abrahamsen  <pa@plen.ku.com>
+
+	* litter.h, litter.C, litter_mulch.C (wash_off_rate): New
+	function.
+
+	* litter.h, litter.C, litter_mulch.C (intercept): New function.
+	* bioclimate_std.C (WaterDistribution): Use it.
+	(litter_wash_off): New log variable.
+
+2020-11-23  Per Abrahamsen  <pa@plen.ku.com>
+
+	* wsource_weather.C (daily_extraterrastial_radiation): Remove
+	unused declaration.
+	(relative_extraterrestial_radiation): Fix spelling.
+
+2020-11-16  Per Abrahamsen  <pa@plen.ku.com>
+
+	* litter_mulch.C (water): Changed unit from [cm] to [mm].
+
 2020-11-12  Per Abrahamsen  <pa@plen.ku.com>
 
 	* litter.C, litter.h, litter_mulch (potential_exfiltration): New

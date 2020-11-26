@@ -26,6 +26,7 @@
 #include "symbol.h"
 #include <vector>
 
+class Litter;
 class Log;
 class Geometry;
 class Soil;
@@ -119,7 +120,7 @@ public:
                          const Surface&,
 			 const Vegetation& vegetation,
 			 const Bioclimate& bioclimate,
-			 const double litter_cover, // [],
+			 const Litter& litter,
 			 const double surface_runoff_rate, // [h^-1]
 			 const double surface_water /* [mm] */,
 			 const double total_rain /* [mm/h] */,

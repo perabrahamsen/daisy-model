@@ -95,7 +95,7 @@ struct ChemistryMulti : public Chemistry
                  const Surface&,
 		 const Vegetation& vegetation,
 		 const Bioclimate& bioclimate,
-		 const double litter_cover, // [],
+		 const Litter& litter, 
 		 const double surface_runoff_rate, // [h^-1]
 		 const double surface_water /* [mm] */,
 		 const double total_rain /* [mm/h] */,
@@ -447,7 +447,7 @@ ChemistryMulti::tick_top (const Geometry& geo,
                           const Surface& surface,
 			  const Vegetation& vegetation,
 			  const Bioclimate& bioclimate,
-			  const double litter_cover, // [],
+			  const Litter& litter, 
 			  const double surface_runoff_rate, // [h^-1]
 			  const double surface_water /* [mm] */,
 			  const double total_rain /* [mm/h] */,
@@ -458,7 +458,7 @@ ChemistryMulti::tick_top (const Geometry& geo,
   for (size_t c = 0; c < combine.size (); c++)
     combine[c]->tick_top (geo, soil, soil_water, soil_heat,
                           tillage_age, surface, vegetation, bioclimate,
-                          litter_cover, surface_runoff_rate, surface_water,
+                          litter, surface_runoff_rate, surface_water,
                           total_rain, 
                           organic, chemistry, dt, msg);
 }

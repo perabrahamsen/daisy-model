@@ -21,6 +21,7 @@
 #define BUILD_DLL
 
 #include "litter_residue.h"
+#include "rate.h"
 #include "block_model.h"
 #include "mathlib.h"
 #include "librarian.h"
@@ -51,11 +52,14 @@ struct LitterMulch : public LitterResidue
   const double Theta_sat;	 // Saturated water content []
   const double h_min;		 // Min. pressure for biological activity [cm]
   const double factor_exch;	 // Water connectivity with soil []
+  const double alpha;		 // Interception parameter []
+  const double Dp;		 // Diffusion rate [h^-1]
+  const double Si;		 // Saturation index []
   
   // Log variables.
   double height;		// Height of mulch layer [cm]
   double contact;		// Fraction in contact with soil []
-  double water;			// Total water in mulch [cm]
+  double water;			// Total water in mulch [mm]
   double Theta;			// Relative water content []
   double h;			// Mulch water potential at start of tstep [cm]
   double h1;			// estimated mulch water potential at end [cm]
@@ -93,9 +97,9 @@ struct LitterMulch : public LitterResidue
       return h_min;
 
     const double E_darcy = find_E_darcy (h0); // [cm/h]
-    const double new_water = water - E_darcy * dt;
+    const double new_water = water - E_darcy * dt * 10.0 /* [mm/cm] */;
     const double new_Theta
-      = Theta_sat * 10 /* [mm/cm] */ * new_water / water_capacity (); // []
+      = Theta_sat * new_water / water_capacity (); // []
     return find_h (new_Theta);
   }
 
@@ -115,7 +119,7 @@ struct LitterMulch : public LitterResidue
     // Find height of mulch layer.
     static const double cm_per_m = 100.0;
     if (cover () > 0.0)
-      height = cm_per_m * mass / cover () / density;
+      height = cm_per_m * mass / density;
     else
       height = 0.0;
 
@@ -126,9 +130,9 @@ struct LitterMulch : public LitterResidue
       contact = decompose_height / height;
 
     // Water
-    water = bioclimate.get_litter_water () * 0.1; // [mm] -> [cm]
+    water = bioclimate.get_litter_water (); // [mm]
     if (height > 0.0)
-      Theta = Theta_sat * 10 /* [mm/cm] */ * water / water_capacity (); // []
+      Theta = Theta_sat * water / water_capacity (); // [mm/mm]
     else
       Theta = 0.0;
 
@@ -227,6 +231,19 @@ struct LitterMulch : public LitterResidue
     organic.add_to_buffer (geo, 0, soil_height, buffer_C, buffer_N);
   }
 
+  double intercept () const	// [0-1]
+  // Fraction of rain hitting the litter layer that actually enter the
+  // litter layer.
+  {
+    if (Theta >= Theta_sat)
+      return 0.0;
+
+    return std::exp (-alpha * (Theta_sat - Theta_res) / (Theta_sat - Theta));
+  }
+
+  double diffusion_rate () const // [h^-1]
+  { return (Theta < Si) ? 0.0 : Dp; }
+  
   double potential_exfiltration () const // Water exchange with soil [mm/h]
   { return E_darcy * 10.0 /* [mm/cm] */; }
   
@@ -280,6 +297,9 @@ struct LitterMulch : public LitterResidue
       Theta_sat (find_Theta_sat (al)),
       h_min (al.number ("h_min")),
       factor_exch (al.number ("factor_exch")),
+      alpha (al.number ("alpha")),
+      Dp (Rate::value (al, "Dp")),
+      Si (Theta_sat * al.number ("Si")),
       height (NAN),
       contact (NAN),
       water (NAN),
@@ -299,6 +319,10 @@ struct LitterMulch : public LitterResidue
   {
     if (Theta_res > Theta_sat)
       al.msg ().error ("Theta_res > Theta_sat");
+    if (Theta_res > Si)
+      al.msg ().error ("Theta_res > Si");
+    if (Si > Theta_sat)
+      al.msg ().error ("Si > Theta_sat");
   }
   ~LitterMulch ()
   { }
@@ -345,14 +369,28 @@ Water pressure where biological activity stops.");
 		   Attribute::Const, "\
 Limiting factor when calculating Darcy exchange between mulch and soil.\n\
 It is intended to emulate poor contact between the two media.");
+    frame.declare ("alpha", Attribute::None (), Check::non_negative (),
+		   Attribute::Const, "Interception parameter.\n\
+The fraction of water hitting the litter will be determined by:\n\
+\n\
+  exp (-alpha (Theta_sat - Theta_res) / (Theta_sat - Theta))\n\
+\n\
+If alpha is 0 (default), all water hitting the canopy will be intercepted.");
+    frame.set ("alpha", 0.0);
 
+    Rate::declare (frame, "Dp", "Diffusion rate to wash off water.\n\
+The wash off water is water that hit the mulch cover, but is not intercepted.");
+    frame.declare_fraction ("Si", Attribute::Const, "\
+Water content where diffusion to wash off begins relative to Theta_sat.\n\
+Theta_sat = 100 %");
+    
     // Log variables.
     frame.declare ("height", "cm", Attribute::LogOnly, "\
 Total height of mulch layer.");
     frame.declare_fraction ("contact", Attribute::LogOnly, "\
 Fraction of mulch layer in contact with soil.\n\
 DOM in this part of the mulch is degraded.");
-    frame.declare ("water", "cm", Attribute::LogOnly, "\
+    frame.declare ("water", "mm", Attribute::LogOnly, "\
 Total water in mulch.");
     frame.declare ("Theta", Attribute::None (), Attribute::LogOnly, "\
 Relative water content.");
