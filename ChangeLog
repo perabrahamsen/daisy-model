@@ -4,7 +4,6 @@
 	* chemical.h, chemical_std.C (tick_top):  Take
 	'Litter' argument.
 	* column_std.C (tick_move): Update caller.
-	* chemical.h (tick_top): 
 
 2020-11-24  Per Abrahamsen  <pa@plen.ku.com>
 

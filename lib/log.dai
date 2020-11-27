@@ -713,8 +713,9 @@ sum of all chemicals will be logged."
                     (output canopy_harvest canopy_dissipate canopy_out)
                     (content canopy_storage))
 	   (balance (precision 3)
-                    (input litter_in)
-                    (output litter_decompose litter_out litter_tillage)
+                    (input litter_in litter_transform)
+                    (output litter_decompose
+			    litter_leak litter_diffuse litter_tillage)
                     (content litter_storage))
 	   (balance (precision 3)
                     (input surface_in surface_transform)
@@ -725,6 +726,7 @@ sum of all chemicals will be logged."
 	   (balance (precision 3)
                     (input spray deposit surface_transform)
                     (output canopy_harvest canopy_dissipate
+			    litter_transform
 			    litter_decompose surface_decompose 
                             surface_runoff surface_out surface_mixture 
                             litter_tillage surface_tillage)
@@ -792,6 +794,11 @@ sum of all chemicals will be logged."
                    (dimension "${unit}")
                    (spec chemical default litter_in))
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         litter_transform)
+                   (handle sum)
+                   (dimension "${unit}")
+                   (spec chemical default litter_transform))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
                          litter_storage)
                    (handle current)
                    (dimension "${unit}")
@@ -801,6 +808,16 @@ sum of all chemicals will be logged."
                    (handle sum)
                    (dimension "${unit}")
                    (spec chemical default litter_out))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         litter_leak)
+                   (handle sum)
+                   (dimension "${unit}")
+                   (spec chemical default litter_leak))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         litter_diffuse)
+                   (handle sum)
+                   (dimension "${unit}")
+                   (spec chemical default litter_diffuse))
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
                          surface_in)
                    (handle sum)

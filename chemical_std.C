@@ -113,7 +113,9 @@ struct ChemicalBase : public Chemical
   double litter_decompose;
   double litter_transform;
   double litter_out;
-
+  double litter_leak;
+  double litter_diffuse;
+  
   double surface_storage;
   double surface_solute;
   double surface_immobile;
@@ -1103,6 +1105,8 @@ ChemicalBase::tick_top (const Vegetation& vegetation,
   divide_loss (litter_absolute_loss_rate, 
                litter_decompose_rate, litter_leak_rate + litter_diffuse_rate,
                litter_decompose, litter_out);
+  divide_loss (litter_out, litter_leak_rate, litter_diffuse_rate,
+	       litter_leak, litter_diffuse);
  
   // Surface
   surface_in = litter_out + litter_bypass;
@@ -1625,6 +1629,8 @@ ChemicalBase::output (Log& log) const
   output_variable (litter_decompose, log);
   output_variable (litter_transform, log);
   output_variable (litter_out, log);
+  output_variable (litter_leak, log);
+  output_variable (litter_diffuse, log);
   output_variable (surface_storage, log);
   output_variable (surface_solute, log);
   output_variable (surface_immobile, log);
@@ -2109,6 +2115,8 @@ ChemicalBase::ChemicalBase (const BlockModel& al)
     litter_decompose (0.0),
     litter_transform (0.0),
     litter_out (0.0),
+    litter_leak (0.0),
+    litter_diffuse (0.0),
     surface_storage (al.number ("surface_storage")),
     surface_solute (0.0),
     surface_immobile (surface_storage),
@@ -2482,6 +2490,10 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
                    "Added through transformation in litter layer.");
     frame.declare ("litter_out", "g/m^2/h", Attribute::LogOnly, 
                    "Leaking from litter.");
+    frame.declare ("litter_leak", "g/m^2/h", Attribute::LogOnly, 
+                   "Leaking from bottom litter.");
+    frame.declare ("litter_diffuse", "g/m^2/h", Attribute::LogOnly, 
+                   "Diffusing from litter to water passing on surface.");
 
     frame.declare ("surface_storage", "g/m^2", Attribute::State, 
                    "Stored on the soil surface.\n\
