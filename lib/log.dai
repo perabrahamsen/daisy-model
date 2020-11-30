@@ -704,29 +704,33 @@ sum of all chemicals will be logged."
   (where "${colfid}surface_chemicals.dlf")
   (declare unit String "Base unit.")
   (unit "g/ha")
-  (summary (balance (precision 3)
+  (summary (balance (description "Snow")
+		    (precision 3)
                     (input snow_in)
                     (output snow_out)
                     (content snow_storage ))
-	   (balance (precision 3)
+	   (balance (description "Canopy")
+		    (precision 3)
                     (input canopy_in canopy_transform)
                     (output canopy_harvest canopy_dissipate canopy_out)
                     (content canopy_storage))
-	   (balance (precision 3)
+	   (balance (description "Litter")
+		    (precision 3)
                     (input litter_in litter_transform)
                     (output litter_decompose
 			    litter_leak litter_diffuse litter_tillage)
                     (content litter_storage))
-	   (balance (precision 3)
+	   (balance (description "Surface")
+		    (precision 3)
                     (input surface_in surface_transform)
                     (output surface_decompose 
                             surface_runoff surface_out surface_mixture 
                             surface_tillage)
                     (content surface_solute surface_immobile))
-	   (balance (precision 3)
-                    (input spray deposit surface_transform)
+	   (balance (description "All")
+		    (precision 3)
+                    (input spray deposit surface_transform litter_transform)
                     (output canopy_harvest canopy_dissipate
-			    litter_transform
 			    litter_decompose surface_decompose 
                             surface_runoff surface_out surface_mixture 
                             litter_tillage surface_tillage)

@@ -161,7 +161,7 @@ struct LitterMulch : public LitterResidue
     T_factor = Abiotic::f_T0 (T);
 
     // Combined
-    const double factor = T_factor * h_factor;
+    const double factor = T_factor * h_factor * contact;
 
     // Turnover
     std::vector <AM*> am = organic.get_am ();

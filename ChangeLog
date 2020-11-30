@@ -1,8 +1,11 @@
+2020-11-27  Per Abrahamsen  <pa@plen.ku.com>
+
+	* chemical_std.C (litter_leak, litter_diffuse): New log variables.
+	* lib/log.dai ("Surface Chemicals"): Handle them.
+
 2020-11-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.97 released.
-
-2020-11-26  Per Abrahamsen  <pa@plen.ku.com>
 
 	* chemistry.h, chemistry_std.C, chemistry_multi.C (tick_top):
 	* chemical.h, chemical_std.C (tick_top):  Take
