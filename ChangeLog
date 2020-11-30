@@ -1,3 +1,7 @@
+2020-11-30  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.98 released.
+
 2020-11-27  Per Abrahamsen  <pa@plen.ku.com>
 
 	* chemical_std.C (litter_leak, litter_diffuse): New log variables.
