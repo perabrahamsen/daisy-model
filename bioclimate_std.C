@@ -1192,7 +1192,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   daisy_assert (approximate (total_ea_,
                              snow_ea_ + canopy_ea_ + litter_ea
                              + pond_ea_ + soil_ea_ + crop_ea_));
-}  
+}
 
 void 
 BioclimateStandard::tick (const Time& time, 

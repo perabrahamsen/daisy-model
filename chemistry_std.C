@@ -501,7 +501,8 @@ ChemistryStandard::check (const Scope& scope,
     {
       Treelog::Open nest (msg, "Chemical: '" + chemicals[c]->objid  + "'");
       if (!chemicals[c]->check ( scope, 
-                                geo, soil, soil_water, chemistry, msg))
+				 geo, soil, soil_water, organic,
+				 chemistry, msg))
 	ok = false;
     }
 

@@ -46,6 +46,7 @@
 #include "vegetation.h"
 #include "bioclimate.h"
 #include "litter.h"
+#include "smb.h"
 #include <sstream>
 
 struct ChemicalBase : public Chemical
@@ -293,8 +294,8 @@ struct ChemicalBase : public Chemical
 
   // Create.
   bool check (const Scope&, 
-              const Geometry&, const Soil&, const SoilWater&, 
-              const Chemistry&, Treelog&) const;
+              const Geometry&, const Soil&, const SoilWater&,
+	      const OrganicMatter&, const Chemistry&, Treelog&) const;
   static void fillup (std::vector<double>& v, const size_t size);
   void initialize (const Scope&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
@@ -1723,7 +1724,7 @@ bool
 ChemicalBase::check (const Scope& scope, 
 		     const Geometry& geo, 
 		     const Soil& soil, const SoilWater& soil_water,
-		     const Chemistry& chemistry,
+		     const OrganicMatter&, const Chemistry& chemistry, 
 		     Treelog& msg) const
 {
   TREELOG_MODEL (msg);
@@ -2630,17 +2631,38 @@ struct ChemicalStandard : public ChemicalBase
   const PLF decompose_water_factor;
   const PLF decompose_CO2_factor;
   const PLF decompose_depth_factor;
+  const int decompose_SMB_pool;
+  const double decompose_SMB_KM;
   
   double decompose_soil_factor (size_t c,
 				const Geometry&, const Soil&, 
 				const SoilWater&, const SoilHeat&, 
 				const OrganicMatter&) const;
+
+  bool check (const Scope& scope, const Geometry& geo, 
+	      const Soil& soil, const SoilWater& soil_water,
+	      const OrganicMatter& organic_matter, const Chemistry& chemistry, 
+	      Treelog& msg) const
+  {
+    bool ok = ChemicalBase::check (scope, geo, soil, soil_water,
+				   organic_matter, chemistry, msg);
+    if (decompose_SMB_KM > 0.0
+	&& decompose_SMB_pool >= organic_matter.get_smb ().size ())
+      {
+	msg.error ("'decompose_smb_pool' too high");
+	ok = false;
+      }
+    return ok;
+  }
+
   ChemicalStandard (const BlockModel& al)
     : ChemicalBase (al),
       decompose_heat_factor (al.plf ("decompose_heat_factor")),
       decompose_water_factor (al.plf ("decompose_water_factor")),
       decompose_CO2_factor (al.plf ("decompose_CO2_factor")),
-      decompose_depth_factor (al.plf ("decompose_depth_factor"))
+      decompose_depth_factor (al.plf ("decompose_depth_factor")),
+      decompose_SMB_pool (al.integer ("decompose_SMB_pool")),
+      decompose_SMB_KM (al.number ("decompose_SMB_KM"))
   { }
 };
 
@@ -2671,6 +2693,19 @@ ChemicalStandard::decompose_soil_factor
   if (decompose_CO2_factor.size () > 0)
     factor *= decompose_CO2_factor (organic_matter.CO2 (c));
 
+  if (decompose_SMB_KM > 0.0)
+    {
+      // MichaelisMenten kineticsa
+      const std::vector <SMB*>& smb = organic_matter.get_smb ();
+      daisy_assert (decompose_SMB_pool >= 0);
+      if (decompose_SMB_pool >= smb.size ())
+	throw "Unknown SMB pool";
+      const SMB& pool = *smb[decompose_SMB_pool];
+      daisy_assert (pool.C.size () > c);
+      const double C = pool.C[c];
+      const double f_N = C / (decompose_SMB_KM + C);
+      factor *= f_N;
+    }
   return factor;
 }
 
@@ -2695,6 +2730,16 @@ static struct ChemicalStandardSyntax : public DeclareModel
                    Attribute::Const,
                    "Depth influence on decomposition.");
     frame.set ("decompose_depth_factor", PLF::always_1 ());
+    frame.declare_integer ("decompose_SMB_pool", Attribute::Const, "\
+SMB pool for Michaelis-Menten kinetics.");
+    frame.set ("decompose_SMB_pool", 1);
+    frame.set_check ("decompose_SMB_pool", VCheck::non_negative ());
+    frame.declare ("decompose_SMB_KM", "g C/cm^3", Check::non_negative (),
+                   Attribute::Const, "\
+Michaelis-Menten kinetics parameter.\n\
+Decompose rate is modified by C / (KM + C), where C is the carbon content\n\
+in the pool specified by 'decompose_SMB_pool'.");
+    frame.set ("decompose_SMB_KM", 0.0);
   }
   ChemicalStandardSyntax ()
     : DeclareModel (Chemical::component, "default", "base", "\

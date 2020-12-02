@@ -1,35 +1,22 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* Jeanne
 
-* Oplæg til mfs projekt
+** mulch rentention curve
 
-** Projekter
+** upward water from soil to mulch
 
-*** Daisy "live" 3 km grid
+** DOM?
 
-*** Daisy "statisk" 3 km grid
+* MST/MFS
 
-** Data
+** Gennemgå stof sider
 
-*** Jordtyper
+* Styczen
 
-*** Nedre rand
+** Læs chap 2
 
-*** Arealanvendelse
-
-*** Klima
-
-*** Vejr
-
-**** Grid / Station / Spildevandskommiteen
-
-* Mulch
-
-** new code to make some rain ignore mulch layer
-
-** DOM decay in litter layer
-
-** Write more documentation
+** Ret fejl i extrater rad.
 
 * cloudiness
 

@@ -1,3 +1,12 @@
+2020-12-02  Per Abrahamsen  <pa@plen.ku.com>
+
+	* retention.C, reaction.h: New component.
+	* Makefile (COMPONENTS): Added it.
+
+2020-11-30  Per Abrahamsen  <pa@plen.ku.com>
+
+	* chemical_std.C (decompose_SMB_pool, decompose_SMB_KM): New parameters.
+
 2020-11-27  Per Abrahamsen  <pa@plen.ku.com>
 
 	* chemical_std.C (litter_leak, litter_diffuse): New log variables.

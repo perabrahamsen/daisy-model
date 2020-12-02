@@ -38,6 +38,7 @@
 #include "geometry.h"
 #include "soil_water.h"
 #include "iterative.h"
+#include "retention.h"
 #include <sstream>
 
 struct LitterMulch : public LitterResidue 
@@ -48,14 +49,15 @@ struct LitterMulch : public LitterResidue
   const double density;		 // Density of mulch [kg DM/m^3]
   const double decompose_height; // Max height of active mulch layer [cm]
   const double soil_height;	 // Heigh of soil layer providing N [cm]
-  const double Theta_res;	 // Residual water content []
+    const double Theta_res;	 // Residual water content []
   const double Theta_sat;	 // Saturated water content []
   const double h_min;		 // Min. pressure for biological activity [cm]
   const double factor_exch;	 // Water connectivity with soil []
   const double alpha;		 // Interception parameter []
   const double Dp;		 // Diffusion rate [h^-1]
   const double Si;		 // Saturation index []
-  
+  std::unique_ptr<Retention> retention; // Retension curve.
+
   // Log variables.
   double height;		// Height of mulch layer [cm]
   double contact;		// Fraction in contact with soil []
@@ -78,18 +80,6 @@ struct LitterMulch : public LitterResidue
   double find_E_darcy (const double h) const // [cm/h]
   { return cover () * factor_exch * ((h - h_soil) / -soil_height) * K_soil; }
 
-  double find_h (const double Theta) const // []->[cm]
-  {
-    if (Theta < Theta_res)
-      return h_min;
-    if (Theta > Theta_sat)
-      return 0.0;
-
-    return -std::pow (-h_min,
-		      1.0-((Theta - Theta_res)
-			   / (2.0 * Theta_sat / 3.0 - Theta_res)));
-  }
-
   double find_h1 (const double h0, const double dt) const
   {
     // No litter.
@@ -100,7 +90,7 @@ struct LitterMulch : public LitterResidue
     const double new_water = water - E_darcy * dt * 10.0 /* [mm/cm] */;
     const double new_Theta
       = Theta_sat * new_water / water_capacity (); // []
-    return find_h (new_Theta);
+    return retention->h (new_Theta);
   }
 
   // Simulation.
@@ -136,7 +126,7 @@ struct LitterMulch : public LitterResidue
     else
       Theta = 0.0;
 
-    h = find_h (Theta);
+    h = retention->h (Theta);
     h_factor = Abiotic::f_h (h);
 
     h_soil = geo.content_height (soil_water, &SoilWater::h, soil_height);
@@ -284,7 +274,6 @@ struct LitterMulch : public LitterResidue
 
     return Theta_sat;
   }
-  
   // Create and Destroy.
   LitterMulch (const BlockModel& al)
     : LitterResidue (al),
@@ -300,6 +289,7 @@ struct LitterMulch : public LitterResidue
       alpha (al.number ("alpha")),
       Dp (Rate::value (al, "Dp")),
       Si (Theta_sat * al.number ("Si")),
+      retention (Librarian::build_item<Retention> (al, "retention")),
       height (NAN),
       contact (NAN),
       water (NAN),
@@ -323,6 +313,7 @@ struct LitterMulch : public LitterResidue
       al.msg ().error ("Theta_res > Si");
     if (Si > Theta_sat)
       al.msg ().error ("Si > Theta_sat");
+    retention->initialize (Theta_res, h_min, Theta_sat, al.msg ());
   }
   ~LitterMulch ()
   { }
@@ -383,6 +374,9 @@ The wash off water is water that hit the mulch cover, but is not intercepted.");
     frame.declare_fraction ("Si", Attribute::Const, "\
 Water content where diffusion to wash off begins relative to Theta_sat.\n\
 Theta_sat = 100 %");
+    frame.declare_object ("retention", Retention::component,
+                          "The retention curve to use.");
+    frame.set ("retention", "PASTIS");
     
     // Log variables.
     frame.declare ("height", "cm", Attribute::LogOnly, "\

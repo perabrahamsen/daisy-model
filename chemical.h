@@ -193,7 +193,8 @@ public:
   static const VCheck& check_buildable ();
   virtual bool check (const Scope&, 
                       const Geometry&, const Soil&, const SoilWater&,
-		      const Chemistry&, Treelog&) const = 0;
+		      const OrganicMatter&, const Chemistry&,
+		      Treelog&) const = 0;
   virtual void initialize (const Scope&, const Geometry&,
                            const Soil&, const SoilWater&, const SoilHeat&,
 			   Treelog&) = 0;
