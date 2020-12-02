@@ -1,3 +1,7 @@
+2020-12-02  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.99 released.
+
 2020-12-02  Per Abrahamsen  <pa@plen.ku.com>
 
 	* retention.C, reaction.h: New component.
