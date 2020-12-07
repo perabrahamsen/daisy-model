@@ -592,6 +592,8 @@ Connvert to SI base units by multiplying with a factor.")
          "Concentration.");
     add ("g/L", u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
          "Concentration.");
+    add ("g C/L", u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
+         "Concentration.");
     add ("mg/l", p_m * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
          "Concentration.");
     add ("mg/L", p_m * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,

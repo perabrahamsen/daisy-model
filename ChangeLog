@@ -1,3 +1,8 @@
+2020-12-07  Per Abrahamsen  <pa@plen.ku.com>
+
+	* litter_mulch.C (decompose_heat_factor, decompose_water_factor):
+	(decompose_SMB_pool, decompose_SMB_KM): New parameters.
+
 2020-12-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.99 released.
@@ -75,6 +80,7 @@
 2020-10-23  Per Abrahamsen  <pa@plen.ku.com>
 
 	* organic_std.C (heat_factor, water_factor): Cite default value.
+
 2020-10-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.95 released.

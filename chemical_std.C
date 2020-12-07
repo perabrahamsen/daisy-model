@@ -2632,7 +2632,7 @@ struct ChemicalStandard : public ChemicalBase
   const PLF decompose_CO2_factor;
   const PLF decompose_depth_factor;
   const int decompose_SMB_pool;
-  const double decompose_SMB_KM;
+  const double decompose_SMB_KM; // [g C/cm^3]
   
   double decompose_soil_factor (size_t c,
 				const Geometry&, const Soil&, 
