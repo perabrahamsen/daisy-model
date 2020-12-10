@@ -50,7 +50,7 @@ Litter::potential_exfiltration () const // Water exchange with soil [mm/h]
 { return 0.0; }
 
 double
-Litter::factor () const
+Litter::decompose_factor () const
 { return 1.0; }
 
 void

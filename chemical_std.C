@@ -1101,7 +1101,7 @@ ChemicalBase::tick_top (const Vegetation& vegetation,
   const double litter_decompose_rate_adjusted
     = litter_decompose_rate * litter.decompose_factor ();
   
-  const double litter_absolute_loss_rate;
+  double litter_absolute_loss_rate;
   first_order_change (old_litter_storage, litter_in + litter_transform,
 		      litter_decompose_rate_adjusted
 		      + litter_washoff_rate
