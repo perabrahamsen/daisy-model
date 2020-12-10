@@ -1,3 +1,13 @@
+2020-12-10  Per Abrahamsen  <pa@plen.ku.com>
+
+	* litter_mulch.C (factor): New log variable.
+	* litter.h, litter.C, litter_mulch.C (decompose_factor): New function.
+	* chemical_std.C (tick_top): Use it.
+
+2020-12-07  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.00 released.
+
 2020-12-07  Per Abrahamsen  <pa@plen.ku.com>
 
 	* litter_mulch.C (decompose_heat_factor, decompose_water_factor):
