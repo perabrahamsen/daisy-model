@@ -59,7 +59,8 @@ public:
   virtual double water_capacity () const = 0;    // Max water content [mm]
   virtual double albedo () const = 0;  // Light reflection factor []
   virtual double potential_exfiltration () const; // Water exchange with soil [mm/h]
-
+  virtual double decompose_factor () const;	  // Effect on chemicals []
+  
   // Create and Destroy.
 protected:
   Litter (const BlockModel&);

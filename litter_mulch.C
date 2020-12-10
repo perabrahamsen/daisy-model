@@ -79,6 +79,7 @@ struct LitterMulch : public LitterResidue
   double T_factor;		// Temperature factor []
   double SMB_C;			// Microbes in soil [g C/cm^3]
   double SMB_factor;		// Microbial acivity factor []
+  double factor;		// contact * h * T * SMB factors []
   double DOC_gen;		// Disolved organic C generation [g C/cm^2/h]
   double DON_gen;		// Disolved organic N generation [g N/cm^2/h]
   double SOC_gen;		// Stationary C generation [g C/cm^2/h]
@@ -178,7 +179,7 @@ struct LitterMulch : public LitterResidue
       SMB_factor = 1.0;
 
     // Combined
-    const double factor = T_factor * h_factor * SMB_factor * contact;
+    factor = T_factor * h_factor * SMB_factor * contact;
 
     // Turnover
     std::vector<AOM*> added;
@@ -263,6 +264,9 @@ struct LitterMulch : public LitterResidue
   double potential_exfiltration () const // Water exchange with soil [mm/h]
   { return E_darcy * 10.0 /* [mm/cm] */; }
   
+  double decompose_factor () const // Effect on chemical decomposition []
+  { return factor; }
+
   void output (Log& log) const
   {
     LitterResidue::output (log);
@@ -280,6 +284,7 @@ struct LitterMulch : public LitterResidue
     output_variable (T_factor, log);
     output_variable (SMB_C, log);
     output_variable (SMB_factor, log);
+    output_variable (factor, log);
     output_variable (DOC_gen, log);
     output_variable (DON_gen, log);
     output_variable (SOC_gen, log);
@@ -336,6 +341,7 @@ struct LitterMulch : public LitterResidue
       T_factor (NAN),
       SMB_C (NAN),
       SMB_factor (NAN),
+      factor (NAN),
       DOC_gen (NAN),
       DON_gen (NAN),
       SOC_gen (NAN),
@@ -460,6 +466,9 @@ Temperature effect on turnover.");
 Microbical C in top soil.");
     frame.declare ("SMB_factor", Attribute::None (), Attribute::LogOnly, "\
 Microbical effect on turnover.");
+    frame.declare ("factor", Attribute::None (), Attribute::LogOnly, "\
+The combined effect of SMB, T, h, and contact.\n\
+This affects both turnover and chemical decomposition in litter.");
     frame.declare ("DOC_gen", "g/cm^2/h", Attribute::LogOnly, "\
 Dissolved organic carbon generated from turnover.");
     frame.declare ("DON_gen", "g/cm^2/h", Attribute::LogOnly, "\

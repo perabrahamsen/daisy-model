@@ -1096,15 +1096,20 @@ ChemicalBase::tick_top (const Vegetation& vegetation,
   // Diffusion from litter to water dripping past it on the surface.
   const double litter_diffuse_rate
     = std::min (litter.diffusion_rate (), litter_surface_wash_off_rate);
+
+  // Decompose rate adjusted by litter conditions.
+  const double litter_decompose_rate_adjusted
+    = litter_decompose_rate * litter.decompose_factor ();
   
-  double litter_absolute_loss_rate;
+  const double litter_absolute_loss_rate;
   first_order_change (old_litter_storage, litter_in + litter_transform,
-		      litter_decompose_rate
+		      litter_decompose_rate_adjusted
 		      + litter_washoff_rate
 		      + litter_diffuse_rate, dt,
                       litter_storage, litter_absolute_loss_rate);
   divide_loss (litter_absolute_loss_rate, 
-               litter_decompose_rate, litter_leak_rate + litter_diffuse_rate,
+               litter_decompose_rate_adjusted,
+	       litter_leak_rate + litter_diffuse_rate,
                litter_decompose, litter_out);
   divide_loss (litter_out, litter_leak_rate, litter_diffuse_rate,
 	       litter_leak, litter_diffuse);
