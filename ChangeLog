@@ -1,3 +1,7 @@
+2020-12-10  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.01 released.
+
 2020-12-10  Per Abrahamsen  <pa@plen.ku.com>
 
 	* litter_mulch.C (factor): New log variable.
