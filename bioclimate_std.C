@@ -1017,13 +1017,8 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
                 pond_in, pond_in_temperature, 
                 geo, soil, soil_water, soil_T, dt);
   pond_ea_ = surface.evap_pond (dt, msg);
-#ifdef NO_NEGATIVE_POND
-  daisy_assert (pond_ea_ >= 0.0);
-#endif
   total_ea_ += pond_ea_;
-#ifdef NO_NEGATIVE_POND
-  daisy_assert (total_ea_ >= 0.0);
-#endif
+
   // 6 Soil
 
   soil_ep = bound (0.0, pond_ep - pond_ea_, 

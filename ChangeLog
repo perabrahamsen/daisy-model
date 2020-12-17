@@ -1,3 +1,8 @@
+2020-12-17  Per Abrahamsen  <pa@plen.ku.com>
+
+	* litter_mulch.C (T_soil): New log variable.
+	(use_soil_decompose): New parameter.
+
 2020-12-10  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.01 released.

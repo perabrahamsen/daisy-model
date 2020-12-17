@@ -1,34 +1,20 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* MST/MFS
-
-** Rettet stof afsnit
-
-** Mit forslag (max 1 år)
-
-*** Mekanistisk model til generering af data til statistik
-
-*** Risikokort vurdering for DK
-
-*** Statistisk analyse
-
-*** Gis data
-
-*** Succesrate?
-
 * Jeanne
 
-** upward water from soil to mulch
+** Use soil h / T for DOM gen and pesticide decompose. Put DOM in soil.
 
-** litter sorption coefficient?
+** Move DOM code out of mulch module.
 
-** DOM?
+* COMMIT
+
+** Lars rettelser
 
 * Styczen
 
 ** Læs chap 2
 
-** Ret fejl i extrater rad.
+** Ret fejl i extraterrestrial rad.
 
 * cloudiness
 

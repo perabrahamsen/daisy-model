@@ -21,6 +21,7 @@
 #define BUILD_DLL
 
 #include "litter_residue.h"
+#include "soil_heat.h"
 #include "rate.h"
 #include "block_model.h"
 #include "mathlib.h"
@@ -45,8 +46,8 @@
 struct LitterMulch : public LitterResidue 
 {
   // Parameters.
-  const symbol DOC_name;	// Name of chemical representing DOC.
-  const symbol DON_name;	// Name of chemical representing DON.
+  const symbol DOC_name;	// Name of chemical representing DOC
+  const symbol DON_name;	// Name of chemical representing DON
   const double density;		 // Density of mulch [kg DM/m^3]
   const double decompose_height; // Max height of active mulch layer [cm]
   const double soil_height;	 // Heigh of soil layer providing N [cm]
@@ -62,7 +63,7 @@ struct LitterMulch : public LitterResidue
   const PLF decompose_water_factor;	      // [cm] -> []
   const int decompose_SMB_pool;		      // 0 = SMB1, 1 = SMB2, -1 = all
   const double decompose_SMB_KM;
-
+  const bool use_soil_decompose; // True iff T and h of top soil should be used
   
   // Log variables.
   double height;		// Height of mulch layer [cm]
@@ -76,6 +77,7 @@ struct LitterMulch : public LitterResidue
   double E_darcy;		// Potential exchnage with soil water [cm/h]
   double h_factor;		// Water potential effect []
   double T;			// Temperature of mulch [dg C]
+  double T_soil;		// Temperature of top soil [dg C]
   double T_factor;		// Temperature factor []
   double SMB_C;			// Microbes in soil [g C/cm^3]
   double SMB_factor;		// Microbial acivity factor []
@@ -136,13 +138,15 @@ struct LitterMulch : public LitterResidue
       Theta = 0.0;
 
     h = retention->h (Theta);
-    if (decompose_water_factor.size () < 1)
-      h_factor = Abiotic::f_h (h);
-    else
-      h_factor = decompose_water_factor (h);
 
     h_soil = geo.content_height (soil_water, &SoilWater::h, soil_height);
     K_soil = geo.content_height (soil_water, &SoilWater::K_cell, soil_height);
+
+    const double h_decompose = use_soil_decompose ? h_soil : h;
+    if (decompose_water_factor.size () < 1)
+      h_factor = Abiotic::f_h (h_decompose);
+    else
+      h_factor = decompose_water_factor (h_decompose);
 
     struct h_diff_c
     {
@@ -161,11 +165,15 @@ struct LitterMulch : public LitterResidue
     
 
     // Temperature
+
+
+    T_soil = geo.content_height (soil_heat, &SoilHeat::T, soil_height);
     T = bioclimate.get_litter_temperature (); // [dg C]
+    const double T_decompose = use_soil_decompose ? T_soil : T; 
     if (decompose_heat_factor.size () < 1)
-      T_factor = Abiotic::f_T0 (T);
+      T_factor = Abiotic::f_T0 (T_decompose);
     else
-      T_factor = decompose_heat_factor (T);
+      T_factor = decompose_heat_factor (T_decompose);
 
  
     const std::vector <SMB*>& smb = organic.get_smb ();
@@ -281,6 +289,7 @@ struct LitterMulch : public LitterResidue
     output_variable (E_darcy, log);
     output_variable (h_factor, log);
     output_variable (T, log);
+    output_variable (T_soil, log);
     output_variable (T_factor, log);
     output_variable (SMB_C, log);
     output_variable (SMB_factor, log);
@@ -327,6 +336,7 @@ struct LitterMulch : public LitterResidue
       decompose_water_factor (al.plf ("decompose_water_factor")),
       decompose_SMB_pool (al.integer ("decompose_SMB_pool")),
       decompose_SMB_KM (al.number ("decompose_SMB_KM")),
+      use_soil_decompose (al.flag ("use_soil_decompose")),
       height (NAN),
       contact (NAN),
       water (NAN),
@@ -338,6 +348,7 @@ struct LitterMulch : public LitterResidue
       E_darcy (NAN),
       h_factor (NAN),
       T (NAN),
+      T_soil (NAN),
       T_factor (NAN),
       SMB_C (NAN),
       SMB_factor (NAN),
@@ -434,6 +445,10 @@ Michaelis-Menten kinetics parameter.\n\
 Decompose rate is modified by C / (KM + C), where C is the carbon content\n\
 in the pool specified by 'decompose_SMB_pool'.");
     frame.set ("decompose_SMB_KM", 0.0);
+    frame.declare_boolean ("use_soil_decompose", Attribute::Const, "\
+Use temperature and moisture of top soil for turnover and decomposition.\n\
+The depth of the top soil is determined by 'soil_height'.");
+    frame.set ("use_soil_decompose", true);
     
     // Log variables.
     frame.declare ("height", "cm", Attribute::LogOnly, "\
@@ -460,6 +475,8 @@ Positive down.");
 Water potential effect on turnover.");
     frame.declare ("T", "dg C", Attribute::LogOnly, "\
 Temperature of water in mulch.");
+    frame.declare ("T_soil", "dg C", Attribute::LogOnly, "\
+Temperature of top soil.");
     frame.declare ("T_factor", Attribute::None (), Attribute::LogOnly, "\
 Temperature effect on turnover.");
     frame.declare ("SMB_C", "g C/cm^3", Attribute::LogOnly, "\
