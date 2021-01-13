@@ -4,7 +4,9 @@ TODO ---things that needs to be done with Daisy -*- outline -*-
 
 ** Use soil h / T for DOM gen and pesticide decompose. Put DOM in soil.
 
-** Move DOM code out of mulch module.
+** Move DOM code out of mulch module? 
+
+** Test mulch decompose og tidsskridt
 
 * COMMIT
 
