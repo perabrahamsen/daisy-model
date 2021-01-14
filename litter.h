@@ -54,7 +54,7 @@ public:
 
   virtual double cover () const = 0; // Fraction of surface covered [0-1]
   virtual double intercept () const; // Multiply with cover for rain int. [0-1]
-  virtual double diffusion_rate () const; // Diffusion to non-int. water [h^-1]
+  virtual bool diffuse () const; // True iff water can diffuse to surface.
   virtual double vapor_flux_factor () const = 0; // Affect on soil evap. []
   virtual double water_capacity () const = 0;    // Max water content [mm]
   virtual double albedo () const = 0;  // Light reflection factor []

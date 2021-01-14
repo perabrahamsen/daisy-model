@@ -66,6 +66,7 @@ struct ChemicalBase : public Chemical
   const double surface_decompose_rate;
   const double litter_decompose_rate;
   const double litter_washoff_coefficient;
+  const double litter_diffusion_rate;
   const double diffusion_coefficient_; 
   const double decompose_rate;
   const PLF decompose_conc_factor;
@@ -1095,7 +1096,9 @@ ChemicalBase::tick_top (const Vegetation& vegetation,
 
   // Diffusion from litter to water dripping past it on the surface.
   const double litter_diffuse_rate
-    = std::min (litter.diffusion_rate (), litter_surface_wash_off_rate);
+    = litter.diffuse ()
+    ? std::min (litter_diffusion_rate, litter_surface_wash_off_rate)
+    : 0.0;
 
   // Decompose rate adjusted by litter conditions.
   const double litter_decompose_rate_adjusted
@@ -2085,6 +2088,7 @@ ChemicalBase::ChemicalBase (const BlockModel& al)
 			      ? halftime_to_rate (al.number ("litter_decompose_halftime"))
 			      : canopy_dissipation_rate)),
     litter_washoff_coefficient (al.number ("litter_washoff_coefficient")),
+    litter_diffusion_rate (al.number ("litter_diffusion_rate")),
     diffusion_coefficient_ (al.number ("diffusion_coefficient") * 3600.0),
     decompose_rate (al.check ("decompose_rate")
                     ? al.number ("decompose_rate")
@@ -2373,13 +2377,16 @@ You must specify it with either 'surface_decompose_halftime' or\n\
 'canopy_dissipation_rate' is used.");
     frame.declare ("litter_decompose_rate", "h^-1", 
                    Check::fraction (), Attribute::OptionalConst,
-                   "How fast does the chemical decomposee on litter.\n\
+                   "How fast does the chemical decompose on litter.\n\
 You must specify it with either 'litter_decompose_halftime' or\n\
 'litter_decompose_rate'.  If neither is specified,\n\
 'canopy_dissipation_rate' is used.");
     frame.declare_fraction ("litter_washoff_coefficient", Attribute::Const, "\
 Fraction of the chemical that follows the water off the litter.");
     frame.set ("litter_washoff_coefficient", 1.0);
+    frame.declare ("litter_diffusion_rate", "h^-1", Attribute::Const, "\
+How fast chemical diffuse to water passing on surface.");
+    frame.set ("litter_diffusion_rate", 0.0);
     frame.declare ("litter_decompose_halftime", "h", 
                    Check::positive (), Attribute::OptionalConst,
                    "How fast does the chemical decompose on litter.\n\

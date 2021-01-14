@@ -48,7 +48,8 @@ struct LitterMulch : public LitterResidue
   // Parameters.
   const symbol DOC_name;	// Name of chemical representing DOC
   const symbol DON_name;	// Name of chemical representing DON
-  const double density;		 // Density of mulch [kg DM/m^3]
+  const double density;		 // Bulk density of mulch [kg DM/m^3]
+  const double particle_density; // Particle density of mulch [kg DM/m^3]
   const double decompose_height; // Max height of active mulch layer [cm]
   const double soil_height;	 // Heigh of soil layer providing N [cm]
   const double Theta_res;	 // Residual water content []
@@ -56,7 +57,6 @@ struct LitterMulch : public LitterResidue
   const double h_min;		 // Min. pressure for biological activity [cm]
   const double factor_exch;	 // Water connectivity with soil []
   const double alpha;		 // Interception parameter []
-  const double Dp;		 // Diffusion rate [h^-1]
   const double Si;		 // Saturation index []
   const std::unique_ptr<Retention> retention; // Retension curve.
   const PLF decompose_heat_factor;	      // [dg C] -> []
@@ -266,8 +266,8 @@ struct LitterMulch : public LitterResidue
     return std::exp (-alpha * (Theta_sat - Theta_res) / (Theta_sat - Theta));
   }
 
-  double diffusion_rate () const // [h^-1]
-  { return (Theta < Si) ? 0.0 : Dp; }
+  bool diffuse () const 
+  { return Theta >= Si; }
   
   double potential_exfiltration () const // Water exchange with soil [mm/h]
   { return E_darcy * 10.0 /* [mm/cm] */; }
@@ -302,7 +302,8 @@ struct LitterMulch : public LitterResidue
 
   static double find_Theta_sat (const BlockModel& al)
   {
-    const double density = al.number ("density"); // [kg/m^3]
+    const double bulk_density = al.number ("density"); // [kg/m^3]
+    const double density = al.number ("particle_density", bulk_density); // [kg/m^3]
     const double water_capacity = al.number ("water_capacity"); // [L/kg]
     const double L_per_m3 = 1000.0; // [L/m^3]
     // [m^3/m^3] = [kg/m^3] * [L/kg] / [L/m^3]
@@ -322,6 +323,7 @@ struct LitterMulch : public LitterResidue
       DOC_name (al.name ("DOC_name")),
       DON_name (al.name ("DON_name")),
       density (al.number ("density")),
+      particle_density (al.number ("particle_density", density)),
       decompose_height (al.number ("decompose_height")),
       soil_height (al.number ("soil_height")),
       Theta_res (al.number ("Theta_res")),
@@ -329,7 +331,6 @@ struct LitterMulch : public LitterResidue
       h_min (al.number ("h_min")),
       factor_exch (al.number ("factor_exch")),
       alpha (al.number ("alpha")),
-      Dp (Rate::value (al, "Dp")),
       Si (Theta_sat * al.number ("Si")),
       retention (Librarian::build_item<Retention> (al, "retention")),
       decompose_heat_factor (al.plf ("decompose_heat_factor")),
@@ -392,7 +393,11 @@ Name of compound representing dissolved organic nitrogen.");
     frame.set ("DON_name", Chemical::DON ());
     frame.declare ("density", "kg DM/m^3", Check::positive (),
 		   Attribute::Const, "\
-Density of mulch layer.");
+Bulk density of mulch layer.");
+    frame.declare ("particle_density", "kg DM/m^3", Check::positive (),
+		   Attribute::OptionalConst, "\
+Particle density of mulch layer.\n\
+If unspecified, use bulk density instead.");
     frame.declare ("decompose_height", "cm", Check::positive (),
 		   Attribute::Const, "\
 Height of muclh layer considered in contact with the soil.\n\
@@ -420,8 +425,6 @@ The fraction of water hitting the litter will be determined by:\n\
 If alpha is 0 (default), all water hitting the canopy will be intercepted.");
     frame.set ("alpha", 0.0);
 
-    Rate::declare (frame, "Dp", "Diffusion rate to wash off water.\n\
-The wash off water is water that hit the mulch cover, but is not intercepted.");
     frame.declare_fraction ("Si", Attribute::Const, "\
 Water content where diffusion to wash off begins relative to Theta_sat.\n\
 Theta_sat = 100 %");
