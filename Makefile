@@ -677,6 +677,11 @@ setupcommon:
 	(cd OpenMI && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	$(MAKENSIS) /V2 /DVERSION=$(TAG) $(NSISFILE)
 
+build:
+	$(MAKE) make-win32-portable
+	$(MAKE) make-win64-portable
+	$(MAKE) docs OBJHOME=win32-portable
+
 setup:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	rm -f version.C

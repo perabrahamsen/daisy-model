@@ -1,3 +1,7 @@
+2020-11-12  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.96 released.
+
 2020-11-12  Per Abrahamsen  <pa@plen.ku.com>
 
 	* litter.C, litter.h, litter_mulch (potential_exfiltration): New
