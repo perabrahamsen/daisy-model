@@ -778,7 +778,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
   
   chemistry->tick_top (geometry, *soil, *soil_water, *soil_heat, 
                        tillage_top, surface, *vegetation, *bioclimate,
-                       litter->cover (),
+		       *litter,
                        surface.runoff_rate (),
                        old_pond,
                        my_weather.rain (),

@@ -115,6 +115,7 @@ struct BioclimateStandard : public Bioclimate
   double litter_water_temperature; // Temperature of water in litter [dg C]
   double litter_water_in;       // Water entering litter [mm/h]
   double litter_water_out;      // Water leaving litter [mm/h]
+  double litter_wash_off; 	// Water hitting but not entering litter [mm/h]
 
   // Water in pond.
   double pond_ep;               // Potential evaporation from pond [mm/h]
@@ -385,6 +386,17 @@ struct BioclimateStandard : public Bioclimate
     
     return litter_water_out / litter_water_old;
   }
+  double litter_wash_off_rate (const double dt) const
+  {
+    if (litter_wash_off < 1e-8)
+      return 0.0;
+    if (litter_water_storage < 0.01 * litter_wash_off * dt)
+      return 1.0 / dt;
+    const double litter_water_old
+      = litter_water_storage + litter_wash_off * dt;
+    
+    return litter_wash_off / litter_water_old;
+  }
   const IM& deposit () const
   { return deposition->deposit (); }
 
@@ -534,6 +546,7 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     litter_water_temperature (0.0),
     litter_water_in (0.0),
     litter_water_out (0.0),
+    litter_wash_off (0.0),
     pond_ep (0.0),
     pond_ea_ (0.0),
     soil_ep (0.0),
@@ -917,7 +930,13 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
         + tillage_water * rain_temperature)
        / canopy_water_below)
     : air_temperature;
-  litter_water_in = canopy_water_below * litter_cover;
+
+  // Fraction of water that hits the litter that is intercepted by it.
+  const double litter_water_hit = canopy_water_below * litter_cover;
+  const double litter_intercept = litter.intercept ();
+  litter_water_in = litter_water_hit * litter_intercept;
+  litter_wash_off = litter_water_hit - litter_water_in;
+  
   const double litter_water_bypass = canopy_water_below - litter_water_in;
   
   if (litter_water_in > 0.01)
@@ -998,13 +1017,8 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
                 pond_in, pond_in_temperature, 
                 geo, soil, soil_water, soil_T, dt);
   pond_ea_ = surface.evap_pond (dt, msg);
-#ifdef NO_NEGATIVE_POND
-  daisy_assert (pond_ea_ >= 0.0);
-#endif
   total_ea_ += pond_ea_;
-#ifdef NO_NEGATIVE_POND
-  daisy_assert (total_ea_ >= 0.0);
-#endif
+
   // 6 Soil
 
   soil_ep = bound (0.0, pond_ep - pond_ea_, 
@@ -1173,7 +1187,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   daisy_assert (approximate (total_ea_,
                              snow_ea_ + canopy_ea_ + litter_ea
                              + pond_ea_ + soil_ea_ + crop_ea_));
-}  
+}
 
 void 
 BioclimateStandard::tick (const Time& time, 
@@ -1316,6 +1330,7 @@ BioclimateStandard::output (Log& log) const
   output_variable (litter_water_temperature, log);
   output_variable (litter_water_in, log);
   output_variable (litter_water_out, log);
+  output_variable (litter_wash_off, log);
   output_variable (pond_ep, log);
   output_value (pond_ea_, "pond_ea", log);
   output_variable (soil_ep, log);
@@ -1533,6 +1548,8 @@ The intended use is colloid generation.");
                    "Water entering litter.");
     frame.declare ("litter_water_out", "mm/h", Attribute::LogOnly,
                    "Litter drip throughfall.");
+    frame.declare ("litter_wash_off", "mm/h", Attribute::LogOnly,
+                   "Water hitting but not entering litter.");
 
     // Water in pond.
     frame.declare ("pond_ep", "mm/h", Attribute::LogOnly,

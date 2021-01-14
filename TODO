@@ -1,34 +1,22 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Oplæg til mfs projekt
+* Jeanne
 
-** Projekter
+** Use soil h / T for DOM gen and pesticide decompose. Put DOM in soil.
 
-*** Daisy "live" 3 km grid
+** Move DOM code out of mulch module? 
 
-*** Daisy "statisk" 3 km grid
+** Test mulch decompose og tidsskridt
 
-** Data
+* COMMIT
 
-*** Jordtyper
+** Lars rettelser
 
-*** Nedre rand
+* Styczen
 
-*** Arealanvendelse
+** Læs chap 2
 
-*** Klima
-
-*** Vejr
-
-**** Grid / Station / Spildevandskommiteen
-
-* Mulch
-
-** 
-
-** DOM decay in litter layer
-
-** Write more documentation
+** Ret fejl i extraterrestrial rad.
 
 * cloudiness
 

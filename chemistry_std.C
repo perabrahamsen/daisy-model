@@ -90,7 +90,7 @@ struct ChemistryStandard : public Chemistry
 		 const Surface&,
 		 const Vegetation& vegetation,
 		 const Bioclimate& bioclimate,
-		 const double litter_cover, // [],
+		 const Litter& litter, 
 		 const double surface_runoff_rate, // [h^-1]
 		 const double surface_water /* [mm] */,
 		 const double total_rain /* [mm/h] */,
@@ -358,7 +358,7 @@ ChemistryStandard::tick_top (const Geometry& geo,
                              const Surface& surface,
 			     const Vegetation& vegetation,
 			     const Bioclimate& bioclimate,
-                             const double litter_cover, // [],
+                             const Litter& litter,
                              const double surface_runoff_rate, // [h^-1]
                              const double surface_water /* [mm] */,
                              const double total_rain /* [mm/h] */,
@@ -381,8 +381,8 @@ ChemistryStandard::tick_top (const Geometry& geo,
   const double pond_rain = std::max (surface.ponding_average (), 0.0);
   for (size_t c = 0; c < chemicals.size (); c++)
     {
-      chemicals[c]->tick_top (vegetation, bioclimate, chemistry,
-                              litter_cover, surface_runoff_rate, dt, msg);
+      chemicals[c]->tick_top (vegetation, bioclimate, litter,
+                              chemistry, surface_runoff_rate, dt, msg);
       chemicals[c]->tick_surface (pond_rain,
                                   geo, soil, soil_water, z_mixing, msg);
     }
@@ -501,7 +501,8 @@ ChemistryStandard::check (const Scope& scope,
     {
       Treelog::Open nest (msg, "Chemical: '" + chemicals[c]->objid  + "'");
       if (!chemicals[c]->check ( scope, 
-                                geo, soil, soil_water, chemistry, msg))
+				 geo, soil, soil_water, organic,
+				 chemistry, msg))
 	ok = false;
     }
 

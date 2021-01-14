@@ -1,3 +1,81 @@
+2020-12-17  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.02 released.
+
+2020-12-17  Per Abrahamsen  <pa@plen.ku.com>
+
+	* litter_mulch.C (T_soil): New log variable.
+	(use_soil_decompose): New parameter.
+
+2020-12-10  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.01 released.
+
+2020-12-10  Per Abrahamsen  <pa@plen.ku.com>
+
+	* litter_mulch.C (factor): New log variable.
+	* litter.h, litter.C, litter_mulch.C (decompose_factor): New function.
+	* chemical_std.C (tick_top): Use it.
+
+2020-12-07  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.00 released.
+
+2020-12-07  Per Abrahamsen  <pa@plen.ku.com>
+
+	* litter_mulch.C (decompose_heat_factor, decompose_water_factor):
+	(decompose_SMB_pool, decompose_SMB_KM): New parameters.
+
+2020-12-02  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.99 released.
+
+2020-12-02  Per Abrahamsen  <pa@plen.ku.com>
+
+	* retention.C, reaction.h: New component.
+	* Makefile (COMPONENTS): Added it.
+
+2020-11-30  Per Abrahamsen  <pa@plen.ku.com>
+
+	* chemical_std.C (decompose_SMB_pool, decompose_SMB_KM): New parameters.
+
+2020-11-30  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.98 released.
+
+2020-11-27  Per Abrahamsen  <pa@plen.ku.com>
+
+	* chemical_std.C (litter_leak, litter_diffuse): New log variables.
+	* lib/log.dai ("Surface Chemicals"): Handle them.
+
+2020-11-26  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 5.97 released.
+
+	* chemistry.h, chemistry_std.C, chemistry_multi.C (tick_top):
+	* chemical.h, chemical_std.C (tick_top):  Take
+	'Litter' argument.
+	* column_std.C (tick_move): Update caller.
+
+2020-11-24  Per Abrahamsen  <pa@plen.ku.com>
+
+	* litter.h, litter.C, litter_mulch.C (wash_off_rate): New
+	function.
+
+	* litter.h, litter.C, litter_mulch.C (intercept): New function.
+	* bioclimate_std.C (WaterDistribution): Use it.
+	(litter_wash_off): New log variable.
+
+2020-11-23  Per Abrahamsen  <pa@plen.ku.com>
+
+	* wsource_weather.C (daily_extraterrastial_radiation): Remove
+	unused declaration.
+	(relative_extraterrestial_radiation): Fix spelling.
+
+2020-11-16  Per Abrahamsen  <pa@plen.ku.com>
+
+	* litter_mulch.C (water): Changed unit from [cm] to [mm].
+
 2020-11-12  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.96 released.
@@ -25,6 +103,7 @@
 2020-10-23  Per Abrahamsen  <pa@plen.ku.com>
 
 	* organic_std.C (heat_factor, water_factor): Cite default value.
+
 2020-10-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.95 released.
