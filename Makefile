@@ -725,7 +725,13 @@ setup2:
 	-git add $(TEXT)
 	-rm -f $(REMOVE) 
 	-git rm -f --ignore-unmatch $(REMOVE) 
-	git commit -a -m "Version $(TAG)"
+	-git commit -a -m "Version $(TAG)"
+	git tag -a release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
+	git push origin --tags
+	git push
+
+setup3:
+	-git commit -a -m "Version $(TAG)"
 	git tag -a release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
 	git push origin --tags
 	git push
