@@ -195,7 +195,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = hydraulic_M_vGBS.C hydraulic_hypWeb.C \
+MODELS = hydraulic_M_BivG.C hydraulic_M_vGBS.C hydraulic_hypWeb.C \
 	reaction_dom.C litter_mulch.C hydraulic_linear.C hydraulic_table.C \
 	program_weather.C uzrichard2.C hydraulic_M_vGip.C reaction_shoot.C \
 	condition_walltime.C  action_BBCH.C condition_BBCH.C  \

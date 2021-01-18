@@ -1,4 +1,4 @@
-// hydraulic_M_vG.C
+// hydraulic_M_BivG.C
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -223,3 +223,5 @@ static struct HydraulicM_BivGSyntax : public DeclareModel
 
   }
 } hydraulicM_BivG_syntax;
+
+// hydraulic_M_BivG.C ends here.
