@@ -441,6 +441,7 @@
     <ClCompile Include="reaction_std.C" />
     <ClCompile Include="reaction_Styczen88.C" />
     <ClCompile Include="resistance.C" />
+    <ClCompile Include="retention.C" />
     <ClCompile Include="rootdens.C" />
     <ClCompile Include="rootdens_AP.C" />
     <ClCompile Include="rootdens_GP1D.C" />
