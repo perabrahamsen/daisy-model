@@ -1,10 +1,22 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Mulch
+* Jeanne
 
-** DOM decay in litter layer
+** Use soil h / T for DOM gen and pesticide decompose. Put DOM in soil.
 
-** Write more documentation
+** Move DOM code out of mulch module? 
+
+** Test mulch decompose og tidsskridt
+
+* COMMIT
+
+** Lars rettelser
+
+* Styczen
+
+** Læs chap 2
+
+** Ret fejl i extraterrestrial rad.
 
 * cloudiness
 

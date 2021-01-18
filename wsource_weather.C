@@ -54,7 +54,7 @@ public:
     return unit;
   }
 
-  double relative_extraterestial_radiation (const Time& time) const
+  double relative_extraterrestial_radiation (const Time& time) const
   {
     const double average 
       = Astronomy::DailyExtraterrestrialRadiation (time, weather.latitude ());
@@ -730,8 +730,8 @@ WSourceWeather::Implementation::tick_weather (const Time& time, Treelog& msg)
   // Day cycle.
   static const double long_timestep = 12.0; // [h]
   const double day_cycle 
-    = 0.5 * (relative_extraterestial_radiation (previous)
-             + relative_extraterestial_radiation (next));
+    = 0.5 * (relative_extraterrestial_radiation (previous)
+             + relative_extraterrestial_radiation (next));
   daisy_assert (std::isfinite (day_cycle));
 
   // Push back.
@@ -1564,7 +1564,9 @@ WSourceWeather::initialize_two (const Time& time, Treelog& msg)
 void
 WSourceWeather::weather_initialize (const Time& time, Treelog& msg)
 {
-  TREELOG_MODEL (msg);
+  std::ostringstream tmp;
+  tmp << title () << ": initializing at " << time.print ();
+  Treelog::Open nest (msg, tmp.str ());
   initialize_one (msg);
   initialize_two (time, msg);
 }
@@ -1624,8 +1626,6 @@ By default, no limit on rain.");
                    "Diffuse radiation this hour.");
     frame.declare ("reference_evapotranspiration", "mm/h", Attribute::LogOnly,
                    "Reference evapotranspiration this hour");
-    frame.declare ("daily_extraterrastial_radiation", "W/m^2", Attribute::LogOnly,
-                   "Extraterrestrial radiation this day.");
     frame.declare ("rain", "mm/h", Attribute::LogOnly, "Rain this hour.");
     frame.declare ("snow", "mm/h", Attribute::LogOnly, "Snow this hour.");
     frame.declare ("precipitation", "mm/h", Attribute::LogOnly, 

@@ -116,7 +116,7 @@ Millet crop residues in Planaltina.")
     frame.set_strings ("cite", "macena2003");
 
     frame.set ("water_capacity", 3.2);
-    frame.set ("specific_AI", 39.);
+    frame.set ("specific_AI", 3.9);
     frame.set ("extinction_coefficent", 0.45);
   }
 } LitterMillet_syntax;
@@ -134,7 +134,7 @@ Maize crop residues in La Tinaja.")
     frame.set_strings ("cite", "scopel1998");
 
     frame.set ("water_capacity", 3.8);
-    frame.set ("specific_AI", 37.);
+    frame.set ("specific_AI", 3.7);
     frame.set ("extinction_coefficent", 0.80);
   }
 } LitterMaize_syntax;

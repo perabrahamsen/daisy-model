@@ -37,6 +37,22 @@ Litter::library_id () const
   return id;
 }
 
+double
+Litter::intercept () const
+{ return 1.0; }
+
+bool
+Litter::diffuse () const 
+{ return false; }
+
+double
+Litter::potential_exfiltration () const // Water exchange with soil [mm/h]
+{ return 0.0; }
+
+double
+Litter::decompose_factor () const
+{ return 1.0; }
+
 void
 Litter::output (Log& log) const
 {

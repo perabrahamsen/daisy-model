@@ -6,12 +6,16 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 5.96
+
+** The Millet and Maize parameterization had a too high specific_LAI.
+
 * 5.94
 
 ** Reorganization of chemicals.
 
 'base' is new base class for chemicals.
-  'FOCUS' model decompose mostly follows FOCUS reciommendations.
+  'FOCUS' model decompose mostly follows FOCUS recommendations.
   'default' model still exists, and use traditional PLF for abiotic factors.
     'nutrient' base class for C and N.
     'C' base classes for carbon.

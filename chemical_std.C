@@ -45,6 +45,8 @@
 #include "treelog.h"
 #include "vegetation.h"
 #include "bioclimate.h"
+#include "litter.h"
+#include "smb.h"
 #include <sstream>
 
 struct ChemicalBase : public Chemical
@@ -64,6 +66,7 @@ struct ChemicalBase : public Chemical
   const double surface_decompose_rate;
   const double litter_decompose_rate;
   const double litter_washoff_coefficient;
+  const double litter_diffusion_rate;
   const double diffusion_coefficient_; 
   const double decompose_rate;
   const PLF decompose_conc_factor;
@@ -112,7 +115,9 @@ struct ChemicalBase : public Chemical
   double litter_decompose;
   double litter_transform;
   double litter_out;
-
+  double litter_leak;
+  double litter_diffuse;
+  
   double surface_storage;
   double surface_solute;
   double surface_immobile;
@@ -263,8 +268,8 @@ struct ChemicalBase : public Chemical
                            double& first, double& second);
   void tick_top (const Vegetation&,
 		 const Bioclimate&,
+		 const Litter&, 
 		 Chemistry&,
-                 const double litter_cover, // [],
                  const double surface_runoff_rate, // [h^-1]
                  const double dt, // [h]
                  Treelog& msg);
@@ -290,8 +295,8 @@ struct ChemicalBase : public Chemical
 
   // Create.
   bool check (const Scope&, 
-              const Geometry&, const Soil&, const SoilWater&, 
-              const Chemistry&, Treelog&) const;
+              const Geometry&, const Soil&, const SoilWater&,
+	      const OrganicMatter&, const Chemistry&, Treelog&) const;
   static void fillup (std::vector<double>& v, const size_t size);
   void initialize (const Scope&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
@@ -995,8 +1000,8 @@ ChemicalBase::divide_loss (const double absolute_loss_rate,
 void 
 ChemicalBase::tick_top (const Vegetation& vegetation,
 			const Bioclimate& bioclimate,
+			const Litter& litter,
 			Chemistry& chemistry,
-			const double litter_cover, // [],
 			const double surface_runoff_rate, // [h^-1]
 			const double dt, // [h]
 			Treelog& msg)
@@ -1009,7 +1014,10 @@ ChemicalBase::tick_top (const Vegetation& vegetation,
   const double snow_leak_rate = bioclimate.snow_leak_rate (dt); // [h^-1]
   const double canopy_cover = vegetation.cover (); // [];
   const double canopy_leak_rate = bioclimate.canopy_leak_rate (dt); // [h^-1]
+  const double litter_cover = litter.cover (); // []
   const double litter_leak_rate = bioclimate.litter_leak_rate (dt); // [h^-1]
+  const double litter_surface_wash_off_rate
+    = bioclimate.litter_wash_off_rate (dt); // [h^-1]
 
   // Fluxify management operations.
   spray_overhead_ /= dt;
@@ -1081,15 +1089,33 @@ ChemicalBase::tick_top (const Vegetation& vegetation,
   const double litter_bypass = below_canopy - litter_in;
 
   const double old_litter_storage = litter_storage;
+
+  // Water stored in the litter leaking.
   const double litter_washoff_rate 
     = litter_washoff_coefficient * litter_leak_rate;
+
+  // Diffusion from litter to water dripping past it on the surface.
+  const double litter_diffuse_rate
+    = litter.diffuse ()
+    ? std::min (litter_diffusion_rate, litter_surface_wash_off_rate)
+    : 0.0;
+
+  // Decompose rate adjusted by litter conditions.
+  const double litter_decompose_rate_adjusted
+    = litter_decompose_rate * litter.decompose_factor ();
+  
   double litter_absolute_loss_rate;
   first_order_change (old_litter_storage, litter_in + litter_transform,
-		      litter_decompose_rate + litter_washoff_rate, dt,
+		      litter_decompose_rate_adjusted
+		      + litter_washoff_rate
+		      + litter_diffuse_rate, dt,
                       litter_storage, litter_absolute_loss_rate);
   divide_loss (litter_absolute_loss_rate, 
-               litter_decompose_rate, litter_leak_rate,
+               litter_decompose_rate_adjusted,
+	       litter_leak_rate + litter_diffuse_rate,
                litter_decompose, litter_out);
+  divide_loss (litter_out, litter_leak_rate, litter_diffuse_rate,
+	       litter_leak, litter_diffuse);
  
   // Surface
   surface_in = litter_out + litter_bypass;
@@ -1612,6 +1638,8 @@ ChemicalBase::output (Log& log) const
   output_variable (litter_decompose, log);
   output_variable (litter_transform, log);
   output_variable (litter_out, log);
+  output_variable (litter_leak, log);
+  output_variable (litter_diffuse, log);
   output_variable (surface_storage, log);
   output_variable (surface_solute, log);
   output_variable (surface_immobile, log);
@@ -1704,7 +1732,7 @@ bool
 ChemicalBase::check (const Scope& scope, 
 		     const Geometry& geo, 
 		     const Soil& soil, const SoilWater& soil_water,
-		     const Chemistry& chemistry,
+		     const OrganicMatter&, const Chemistry& chemistry, 
 		     Treelog& msg) const
 {
   TREELOG_MODEL (msg);
@@ -2060,6 +2088,7 @@ ChemicalBase::ChemicalBase (const BlockModel& al)
 			      ? halftime_to_rate (al.number ("litter_decompose_halftime"))
 			      : canopy_dissipation_rate)),
     litter_washoff_coefficient (al.number ("litter_washoff_coefficient")),
+    litter_diffusion_rate (al.number ("litter_diffusion_rate")),
     diffusion_coefficient_ (al.number ("diffusion_coefficient") * 3600.0),
     decompose_rate (al.check ("decompose_rate")
                     ? al.number ("decompose_rate")
@@ -2096,6 +2125,8 @@ ChemicalBase::ChemicalBase (const BlockModel& al)
     litter_decompose (0.0),
     litter_transform (0.0),
     litter_out (0.0),
+    litter_leak (0.0),
+    litter_diffuse (0.0),
     surface_storage (al.number ("surface_storage")),
     surface_solute (0.0),
     surface_immobile (surface_storage),
@@ -2346,13 +2377,16 @@ You must specify it with either 'surface_decompose_halftime' or\n\
 'canopy_dissipation_rate' is used.");
     frame.declare ("litter_decompose_rate", "h^-1", 
                    Check::fraction (), Attribute::OptionalConst,
-                   "How fast does the chemical decomposee on litter.\n\
+                   "How fast does the chemical decompose on litter.\n\
 You must specify it with either 'litter_decompose_halftime' or\n\
 'litter_decompose_rate'.  If neither is specified,\n\
 'canopy_dissipation_rate' is used.");
     frame.declare_fraction ("litter_washoff_coefficient", Attribute::Const, "\
 Fraction of the chemical that follows the water off the litter.");
     frame.set ("litter_washoff_coefficient", 1.0);
+    frame.declare ("litter_diffusion_rate", "h^-1", Attribute::Const, "\
+How fast chemical diffuse to water passing on surface.");
+    frame.set ("litter_diffusion_rate", 0.0);
     frame.declare ("litter_decompose_halftime", "h", 
                    Check::positive (), Attribute::OptionalConst,
                    "How fast does the chemical decompose on litter.\n\
@@ -2469,6 +2503,10 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
                    "Added through transformation in litter layer.");
     frame.declare ("litter_out", "g/m^2/h", Attribute::LogOnly, 
                    "Leaking from litter.");
+    frame.declare ("litter_leak", "g/m^2/h", Attribute::LogOnly, 
+                   "Leaking from bottom litter.");
+    frame.declare ("litter_diffuse", "g/m^2/h", Attribute::LogOnly, 
+                   "Diffusing from litter to water passing on surface.");
 
     frame.declare ("surface_storage", "g/m^2", Attribute::State, 
                    "Stored on the soil surface.\n\
@@ -2605,17 +2643,38 @@ struct ChemicalStandard : public ChemicalBase
   const PLF decompose_water_factor;
   const PLF decompose_CO2_factor;
   const PLF decompose_depth_factor;
+  const int decompose_SMB_pool;
+  const double decompose_SMB_KM; // [g C/cm^3]
   
   double decompose_soil_factor (size_t c,
 				const Geometry&, const Soil&, 
 				const SoilWater&, const SoilHeat&, 
 				const OrganicMatter&) const;
+
+  bool check (const Scope& scope, const Geometry& geo, 
+	      const Soil& soil, const SoilWater& soil_water,
+	      const OrganicMatter& organic_matter, const Chemistry& chemistry, 
+	      Treelog& msg) const
+  {
+    bool ok = ChemicalBase::check (scope, geo, soil, soil_water,
+				   organic_matter, chemistry, msg);
+    if (decompose_SMB_KM > 0.0
+	&& decompose_SMB_pool >= organic_matter.get_smb ().size ())
+      {
+	msg.error ("'decompose_smb_pool' too high");
+	ok = false;
+      }
+    return ok;
+  }
+
   ChemicalStandard (const BlockModel& al)
     : ChemicalBase (al),
       decompose_heat_factor (al.plf ("decompose_heat_factor")),
       decompose_water_factor (al.plf ("decompose_water_factor")),
       decompose_CO2_factor (al.plf ("decompose_CO2_factor")),
-      decompose_depth_factor (al.plf ("decompose_depth_factor"))
+      decompose_depth_factor (al.plf ("decompose_depth_factor")),
+      decompose_SMB_pool (al.integer ("decompose_SMB_pool")),
+      decompose_SMB_KM (al.number ("decompose_SMB_KM"))
   { }
 };
 
@@ -2646,6 +2705,19 @@ ChemicalStandard::decompose_soil_factor
   if (decompose_CO2_factor.size () > 0)
     factor *= decompose_CO2_factor (organic_matter.CO2 (c));
 
+  if (decompose_SMB_KM > 0.0)
+    {
+      // MichaelisMenten kineticsa
+      const std::vector <SMB*>& smb = organic_matter.get_smb ();
+      daisy_assert (decompose_SMB_pool >= 0);
+      if (decompose_SMB_pool >= smb.size ())
+	throw "Unknown SMB pool";
+      const SMB& pool = *smb[decompose_SMB_pool];
+      daisy_assert (pool.C.size () > c);
+      const double C = pool.C[c];
+      const double f_N = C / (decompose_SMB_KM + C);
+      factor *= f_N;
+    }
   return factor;
 }
 
@@ -2670,6 +2742,16 @@ static struct ChemicalStandardSyntax : public DeclareModel
                    Attribute::Const,
                    "Depth influence on decomposition.");
     frame.set ("decompose_depth_factor", PLF::always_1 ());
+    frame.declare_integer ("decompose_SMB_pool", Attribute::Const, "\
+SMB pool for Michaelis-Menten kinetics.");
+    frame.set ("decompose_SMB_pool", 1);
+    frame.set_check ("decompose_SMB_pool", VCheck::non_negative ());
+    frame.declare ("decompose_SMB_KM", "g C/cm^3", Check::non_negative (),
+                   Attribute::Const, "\
+Michaelis-Menten kinetics parameter.\n\
+Decompose rate is modified by C / (KM + C), where C is the carbon content\n\
+in the pool specified by 'decompose_SMB_pool'.");
+    frame.set ("decompose_SMB_KM", 0.0);
   }
   ChemicalStandardSyntax ()
     : DeclareModel (Chemical::component, "default", "base", "\
@@ -2816,14 +2898,24 @@ Depth factor is specified by 'z' and 'z_factor'.")
   { }
 } ChemicalFOCUS_syntax;
 
-// The 'nutrient' chemical parameterization.
+// The 'nutrient' chemical model.
 
-static struct ChemicalNutrientSyntax : public DeclareParam
+struct ChemicalNutrient : public ChemicalBase 
 {
-  ChemicalNutrientSyntax ()
-    : DeclareParam (Chemical::component, "nutrient", "default", "\
-Plants eat this stuff.")
+  double decompose_soil_factor (size_t c,
+				const Geometry&, const Soil&, 
+				const SoilWater&, const SoilHeat&, 
+				const OrganicMatter&) const
+  { return 1.0; }
+  ChemicalNutrient (const BlockModel& al)
+    : ChemicalBase (al)
   { }
+};
+
+static struct ChemicalNutrientSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ChemicalNutrient (al); }
   void load_frame (Frame& frame) const
   {
     frame.set ("crop_uptake_reflection_factor", 1.0); // Specific uptake code.
@@ -2831,6 +2923,10 @@ Plants eat this stuff.")
     frame.set ("canopy_washoff_coefficient", 1.0);
     frame.set ("decompose_rate", 0.0);
   }
+  ChemicalNutrientSyntax ()
+    : DeclareModel (Chemical::component, "nutrient", "base", "\
+Plants eat this stuff.")
+  { }
 } ChemicalNutrient_syntax;
 
 static struct ChemicalNitrogenSyntax : public DeclareParam

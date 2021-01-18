@@ -161,27 +161,6 @@ Surface::Implementation::exfiltrate (const Geometry& geo, const size_t edge,
     return;
 
   const size_t c = pond_edge[edge];
-#ifdef NO_NEGATIVE_POND
-  if (pond_section[c] + water < 0.0)
-    // - std::max (fabs (pond_edge[edge]), fabs (water)) / 100.0)
-    {
-      if (!approximate (fabs (pond_section[c]), fabs (water), 0.001))
-      {
-        Treelog::Open nest (msg, 
-                            "Surface exfiltration for edge " 
-                            + geo.edge_name (edge));
-        
-        std::ostringstream tmp;
-        tmp << "edge " << geo.edge_name (edge) << ": pond (" << pond_section[c]
-            << ") + exfiltration (" << water << ") in dt (" << dt << ") = " 
-            << pond_section[c] + water << ", should be non-negative";
-        msg.warning (tmp.str ());
-      }
-      pond_section[c] = 0.0;
-      return;
-    }
-#endif
-  
   daisy_assert (pond_section[c] < std::max(1000.0, 10.0 * DetentionCapacity));
   daisy_assert (pond_section[c] > -1000.0);
   pond_section[c] += water;
@@ -389,14 +368,6 @@ Surface::Implementation::tick (Treelog& msg,
 
       const double epond = pond_section[c]; // [mm]
 
-#ifdef NO_NEGATIVE_POND
-      if (epond < 0.0)
-        {
-          std::ostringstream tmp;
-          tmp << "pond_edge[" << edge << "] = "<< pond_section[c];
-          msg.warning (tmp.str ());
-        }
-#endif
       double evap;              // [mm/h]
       if (epond + flux_in * dt + MaxExfiltration * dt < Eps * dt)
         evap = epond / dt + flux_in + MaxExfiltration;

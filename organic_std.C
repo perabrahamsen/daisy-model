@@ -484,6 +484,7 @@ OrganicStandard::Initialization::
 void
 OrganicStandard::Initialization::load_syntax (Frame& frame)
 {
+  frame.add_check (check_alist);
   frame.declare ("input", "kg C/ha/y", Check::non_negative (),
 	      Attribute::OptionalConst, "\
 Amount of carbon added to the organic matter system.\n\

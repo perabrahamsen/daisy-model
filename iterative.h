@@ -34,7 +34,9 @@ bisection (double min_x, double max_x, T& f, std::ostream *const dbg = NULL)
 {
   // Initial range.
   double min_y = f (min_x);
+#if 0
   double max_y = f (max_x);
+#endif
 
   // Iteration loop.
   double old_width = max_x - min_x;
@@ -60,7 +62,9 @@ bisection (double min_x, double max_x, T& f, std::ostream *const dbg = NULL)
         {
           // Otherwise, we use it as upper border.
           max_x = x;
+#if 0
           max_y = y;
+#endif
         }
 
       // Check it interval became more narrow.

@@ -21,6 +21,8 @@
 #define BUILD_DLL
 
 #include "litter_residue.h"
+#include "soil_heat.h"
+#include "rate.h"
 #include "block_model.h"
 #include "mathlib.h"
 #include "librarian.h"
@@ -34,34 +36,74 @@
 #include "bioclimate.h"
 #include "abiotic.h"
 #include "aom.h"
+#include "geometry.h"
+#include "soil_water.h"
+#include "iterative.h"
+#include "retention.h"
+#include "smb.h"
 #include <sstream>
 
 struct LitterMulch : public LitterResidue 
 {
   // Parameters.
-  const symbol DOC_name;	// Name of chemical representing DOC.
-  const symbol DON_name;	// Name of chemical representing DON.
-  const double density;		 // Density of mulch [kg DM/m^3]
+  const symbol DOC_name;	// Name of chemical representing DOC
+  const symbol DON_name;	// Name of chemical representing DON
+  const double density;		 // Bulk density of mulch [kg DM/m^3]
+  const double particle_density; // Particle density of mulch [kg DM/m^3]
   const double decompose_height; // Max height of active mulch layer [cm]
   const double soil_height;	 // Heigh of soil layer providing N [cm]
   const double Theta_res;	 // Residual water content []
   const double Theta_sat;	 // Saturated water content []
   const double h_min;		 // Min. pressure for biological activity [cm]
+  const double factor_exch;	 // Water connectivity with soil []
+  const double alpha;		 // Interception parameter []
+  const double Si;		 // Saturation index []
+  const std::unique_ptr<Retention> retention; // Retension curve.
+  const PLF decompose_heat_factor;	      // [dg C] -> []
+  const PLF decompose_water_factor;	      // [cm] -> []
+  const int decompose_SMB_pool;		      // 0 = SMB1, 1 = SMB2, -1 = all
+  const double decompose_SMB_KM;
+  const bool use_soil_decompose; // True iff T and h of top soil should be used
   
   // Log variables.
   double height;		// Height of mulch layer [cm]
   double contact;		// Fraction in contact with soil []
-  double water;			// Total water in mulch [cm]
+  double water;			// Total water in mulch [mm]
   double Theta;			// Relative water content []
-  double h;			// Mulch water potential [cm]
+  double h;			// Mulch water potential at start of tstep [cm]
+  double h1;			// estimated mulch water potential at end [cm]
+  double h_soil;		// Soil water potential at soil_height [cm]
+  double K_soil;		// Soil water conductivity at soil_height [cm/h]
+  double E_darcy;		// Potential exchnage with soil water [cm/h]
   double h_factor;		// Water potential effect []
-  double T;			// Temeprature of mulch.
+  double T;			// Temperature of mulch [dg C]
+  double T_soil;		// Temperature of top soil [dg C]
   double T_factor;		// Temperature factor []
+  double SMB_C;			// Microbes in soil [g C/cm^3]
+  double SMB_factor;		// Microbial acivity factor []
+  double factor;		// contact * h * T * SMB factors []
   double DOC_gen;		// Disolved organic C generation [g C/cm^2/h]
   double DON_gen;		// Disolved organic N generation [g N/cm^2/h]
   double SOC_gen;		// Stationary C generation [g C/cm^2/h]
   double SON_gen;		// Stationary N generation [g N/cm^2/h]
-  
+
+
+  double find_E_darcy (const double h) const // [cm/h]
+  { return cover () * factor_exch * ((h - h_soil) / -soil_height) * K_soil; }
+
+  double find_h1 (const double h0, const double dt) const
+  {
+    // No litter.
+    if (!std::isnormal (height))
+      return h_min;
+
+    const double E_darcy = find_E_darcy (h0); // [cm/h]
+    const double new_water = water - E_darcy * dt * 10.0 /* [mm/cm] */;
+    const double new_Theta
+      = Theta_sat * new_water / water_capacity (); // []
+    return retention->h (new_Theta);
+  }
+
   // Simulation.
   void tick (const Bioclimate& bioclimate,
 	     const Geometry& geo, const Soil& soil,
@@ -78,7 +120,7 @@ struct LitterMulch : public LitterResidue
     // Find height of mulch layer.
     static const double cm_per_m = 100.0;
     if (cover () > 0.0)
-      height = cm_per_m * mass / cover () / density;
+      height = cm_per_m * mass / density;
     else
       height = 0.0;
 
@@ -89,34 +131,68 @@ struct LitterMulch : public LitterResidue
       contact = decompose_height / height;
 
     // Water
-    water = bioclimate.get_litter_water () * 0.1; // [mm] -> [cm]
+    water = bioclimate.get_litter_water (); // [mm]
     if (height > 0.0)
-      Theta = water / height;			  // []
+      Theta = Theta_sat * water / water_capacity (); // [mm/mm]
     else
       Theta = 0.0;
 
-    if (Theta < Theta_res)
-      h = h_min;
-    else if (Theta > Theta_sat)
-      h = 0.0;
+    h = retention->h (Theta);
+
+    h_soil = geo.content_height (soil_water, &SoilWater::h, soil_height);
+    K_soil = geo.content_height (soil_water, &SoilWater::K_cell, soil_height);
+
+    const double h_decompose = use_soil_decompose ? h_soil : h;
+    if (decompose_water_factor.size () < 1)
+      h_factor = Abiotic::f_h (h_decompose);
     else
-      h = -std::pow (-h_min,
-		     1.0-((Theta - Theta_res)
-			  / (2.0 * Theta_sat / 3.0 - Theta_res)));
-    h_factor = Abiotic::f_h (h);
+      h_factor = decompose_water_factor (h_decompose);
+
+    struct h_diff_c
+    {
+      const LitterMulch& m;
+      const double dt;
+      double operator()(const double h0) const
+      { return h0 - m.find_h1 (h0, dt); }
+      h_diff_c (const LitterMulch& m_, const double dt_)
+	: m (m_),
+	  dt (dt_)
+      { }
+    } h_diff (*this, dt);
+    h1 = bisection (h_min, 0, h_diff);
+    E_darcy = find_E_darcy (h1);
+    
+    
 
     // Temperature
+
+
+    T_soil = geo.content_height (soil_heat, &SoilHeat::T, soil_height);
     T = bioclimate.get_litter_temperature (); // [dg C]
-    T_factor = Abiotic::f_T0 (T);
+    const double T_decompose = use_soil_decompose ? T_soil : T; 
+    if (decompose_heat_factor.size () < 1)
+      T_factor = Abiotic::f_T0 (T_decompose);
+    else
+      T_factor = decompose_heat_factor (T_decompose);
+
+ 
+    const std::vector <SMB*>& smb = organic.get_smb ();
+    SMB_C = 0;
+    for (int i = 0; i < smb.size (); i++)
+      if (i == decompose_SMB_pool || decompose_SMB_pool < 0)
+	SMB_C += geo.total_surface (smb[i]->C, 0, soil_height) / -soil_height;
+    if (decompose_SMB_KM > 0.0)
+      SMB_factor = SMB_C / (decompose_SMB_KM + SMB_C);
+    else
+      SMB_factor = 1.0;
 
     // Combined
-    const double factor = T_factor * h_factor;
+    factor = T_factor * h_factor * SMB_factor * contact;
 
     // Turnover
-    std::vector <AM*> am = organic.get_am ();
     std::vector<AOM*> added;
 
-    for (auto pool: am)
+    for (auto pool: organic.get_am ())
       pool->append_to (added);
 
     sort (added.begin (), added.end (), AOM::compare_CN);
@@ -179,6 +255,26 @@ struct LitterMulch : public LitterResidue
     daisy_assert (dt > 0.0);
     organic.add_to_buffer (geo, 0, soil_height, buffer_C, buffer_N);
   }
+
+  double intercept () const	// [0-1]
+  // Fraction of rain hitting the litter layer that actually enter the
+  // litter layer.
+  {
+    if (Theta >= Theta_sat)
+      return 0.0;
+
+    return std::exp (-alpha * (Theta_sat - Theta_res) / (Theta_sat - Theta));
+  }
+
+  bool diffuse () const 
+  { return Theta >= Si; }
+  
+  double potential_exfiltration () const // Water exchange with soil [mm/h]
+  { return E_darcy * 10.0 /* [mm/cm] */; }
+  
+  double decompose_factor () const // Effect on chemical decomposition []
+  { return factor; }
+
   void output (Log& log) const
   {
     LitterResidue::output (log);
@@ -187,9 +283,17 @@ struct LitterMulch : public LitterResidue
     output_variable (water, log);
     output_variable (Theta, log);
     output_variable (h, log);
+    output_variable (h1, log);
+    output_variable (h_soil, log);
+    output_variable (K_soil, log);
+    output_variable (E_darcy, log);
     output_variable (h_factor, log);
     output_variable (T, log);
+    output_variable (T_soil, log);
     output_variable (T_factor, log);
+    output_variable (SMB_C, log);
+    output_variable (SMB_factor, log);
+    output_variable (factor, log);
     output_variable (DOC_gen, log);
     output_variable (DON_gen, log);
     output_variable (SOC_gen, log);
@@ -198,7 +302,8 @@ struct LitterMulch : public LitterResidue
 
   static double find_Theta_sat (const BlockModel& al)
   {
-    const double density = al.number ("density"); // [kg/m^3]
+    const double bulk_density = al.number ("density"); // [kg/m^3]
+    const double density = al.number ("particle_density", bulk_density); // [kg/m^3]
     const double water_capacity = al.number ("water_capacity"); // [L/kg]
     const double L_per_m3 = 1000.0; // [L/m^3]
     // [m^3/m^3] = [kg/m^3] * [L/kg] / [L/m^3]
@@ -212,26 +317,43 @@ struct LitterMulch : public LitterResidue
 
     return Theta_sat;
   }
-  
   // Create and Destroy.
   LitterMulch (const BlockModel& al)
     : LitterResidue (al),
       DOC_name (al.name ("DOC_name")),
       DON_name (al.name ("DON_name")),
       density (al.number ("density")),
+      particle_density (al.number ("particle_density", density)),
       decompose_height (al.number ("decompose_height")),
       soil_height (al.number ("soil_height")),
       Theta_res (al.number ("Theta_res")),
       Theta_sat (find_Theta_sat (al)),
       h_min (al.number ("h_min")),
+      factor_exch (al.number ("factor_exch")),
+      alpha (al.number ("alpha")),
+      Si (Theta_sat * al.number ("Si")),
+      retention (Librarian::build_item<Retention> (al, "retention")),
+      decompose_heat_factor (al.plf ("decompose_heat_factor")),
+      decompose_water_factor (al.plf ("decompose_water_factor")),
+      decompose_SMB_pool (al.integer ("decompose_SMB_pool")),
+      decompose_SMB_KM (al.number ("decompose_SMB_KM")),
+      use_soil_decompose (al.flag ("use_soil_decompose")),
       height (NAN),
       contact (NAN),
       water (NAN),
       Theta (NAN),
       h (NAN),
+      h1 (NAN),
+      h_soil (NAN),
+      K_soil (NAN),
+      E_darcy (NAN),
       h_factor (NAN),
       T (NAN),
+      T_soil (NAN),
       T_factor (NAN),
+      SMB_C (NAN),
+      SMB_factor (NAN),
+      factor (NAN),
       DOC_gen (NAN),
       DON_gen (NAN),
       SOC_gen (NAN),
@@ -239,6 +361,11 @@ struct LitterMulch : public LitterResidue
   {
     if (Theta_res > Theta_sat)
       al.msg ().error ("Theta_res > Theta_sat");
+    if (Theta_res > Si)
+      al.msg ().error ("Theta_res > Si");
+    if (Si > Theta_sat)
+      al.msg ().error ("Si > Theta_sat");
+    retention->initialize (Theta_res, h_min, Theta_sat, al.msg ());
   }
   ~LitterMulch ()
   { }
@@ -266,7 +393,11 @@ Name of compound representing dissolved organic nitrogen.");
     frame.set ("DON_name", Chemical::DON ());
     frame.declare ("density", "kg DM/m^3", Check::positive (),
 		   Attribute::Const, "\
-Density of mulch layer.");
+Bulk density of mulch layer.");
+    frame.declare ("particle_density", "kg DM/m^3", Check::positive (),
+		   Attribute::OptionalConst, "\
+Particle density of mulch layer.\n\
+If unspecified, use bulk density instead.");
     frame.declare ("decompose_height", "cm", Check::positive (),
 		   Attribute::Const, "\
 Height of muclh layer considered in contact with the soil.\n\
@@ -281,25 +412,83 @@ Water content where biological activity stops");
 		   Attribute::Const, "\
 Water pressure where biological activity stops.");
     frame.set ("h_min", pF2h (6.5));
+    frame.declare ("factor_exch", Attribute::None (), Check::non_negative (),
+		   Attribute::Const, "\
+Limiting factor when calculating Darcy exchange between mulch and soil.\n\
+It is intended to emulate poor contact between the two media.");
+    frame.declare ("alpha", Attribute::None (), Check::non_negative (),
+		   Attribute::Const, "Interception parameter.\n\
+The fraction of water hitting the litter will be determined by:\n\
+\n\
+  exp (-alpha (Theta_sat - Theta_res) / (Theta_sat - Theta))\n\
+\n\
+If alpha is 0 (default), all water hitting the canopy will be intercepted.");
+    frame.set ("alpha", 0.0);
 
+    frame.declare_fraction ("Si", Attribute::Const, "\
+Water content where diffusion to wash off begins relative to Theta_sat.\n\
+Theta_sat = 100 %");
+    frame.declare_object ("retention", Retention::component,
+                          "The retention curve to use.");
+    frame.set ("retention", "PASTIS");
+    frame.declare ("decompose_heat_factor", "dg C", Attribute::None (),
+                   Attribute::Const, "Heat factor on decomposition.");
+    frame.set ("decompose_heat_factor", PLF::empty ());
+    frame.declare ("decompose_water_factor", "cm", Attribute::None (),
+                   Attribute::Const,
+                   "Water potential factor on decomposition.");
+    frame.set ("decompose_water_factor", PLF::empty ());
+    frame.declare_integer ("decompose_SMB_pool", Attribute::Const, "\
+SMB pool for Michaelis-Menten kinetics.\n\
+Use 0 for SMB1, 1 for SMB2, or -1 for all SMB pools.");
+    frame.set ("decompose_SMB_pool", 1);
+    frame.declare ("decompose_SMB_KM", "g C/cm^3", Check::non_negative (),
+                   Attribute::Const, "\
+Michaelis-Menten kinetics parameter.\n\
+Decompose rate is modified by C / (KM + C), where C is the carbon content\n\
+in the pool specified by 'decompose_SMB_pool'.");
+    frame.set ("decompose_SMB_KM", 0.0);
+    frame.declare_boolean ("use_soil_decompose", Attribute::Const, "\
+Use temperature and moisture of top soil for turnover and decomposition.\n\
+The depth of the top soil is determined by 'soil_height'.");
+    frame.set ("use_soil_decompose", true);
+    
     // Log variables.
     frame.declare ("height", "cm", Attribute::LogOnly, "\
 Total height of mulch layer.");
     frame.declare_fraction ("contact", Attribute::LogOnly, "\
 Fraction of mulch layer in contact with soil.\n\
 DOM in this part of the mulch is degraded.");
-    frame.declare ("water", "cm", Attribute::LogOnly, "\
+    frame.declare ("water", "mm", Attribute::LogOnly, "\
 Total water in mulch.");
     frame.declare ("Theta", Attribute::None (), Attribute::LogOnly, "\
 Relative water content.");
     frame.declare ("h", "cm", Attribute::LogOnly, "\
-Mulch water potential.");
+Mulch water potential at stat of timestep.");
+    frame.declare ("h1", "cm", Attribute::LogOnly, "\
+Estimated mulch water potential at end of timestep.");
+    frame.declare ("h_soil", "cm", Attribute::LogOnly, "\
+Soil water potential.");
+    frame.declare ("K_soil", "cm/h", Attribute::LogOnly, "\
+Soil water conductivity.");
+    frame.declare ("E_darcy", "cm/h", Attribute::LogOnly, "\
+Potential mulch-soil water exchange as calculated by modified Darcy.\n\
+Positive down.");
     frame.declare ("h_factor", Attribute::None (), Attribute::LogOnly, "\
 Water potential effect on turnover.");
     frame.declare ("T", "dg C", Attribute::LogOnly, "\
 Temperature of water in mulch.");
+    frame.declare ("T_soil", "dg C", Attribute::LogOnly, "\
+Temperature of top soil.");
     frame.declare ("T_factor", Attribute::None (), Attribute::LogOnly, "\
 Temperature effect on turnover.");
+    frame.declare ("SMB_C", "g C/cm^3", Attribute::LogOnly, "\
+Microbical C in top soil.");
+    frame.declare ("SMB_factor", Attribute::None (), Attribute::LogOnly, "\
+Microbical effect on turnover.");
+    frame.declare ("factor", Attribute::None (), Attribute::LogOnly, "\
+The combined effect of SMB, T, h, and contact.\n\
+This affects both turnover and chemical decomposition in litter.");
     frame.declare ("DOC_gen", "g/cm^2/h", Attribute::LogOnly, "\
 Dissolved organic carbon generated from turnover.");
     frame.declare ("DON_gen", "g/cm^2/h", Attribute::LogOnly, "\

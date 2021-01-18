@@ -65,6 +65,7 @@ public:
   virtual double canopy_leak_rate (double dt) const = 0; // [h^-1]
   virtual double canopy_leak () const = 0;               // [mm/h]
   virtual double litter_leak_rate (double dt) const = 0; // [h^-1]
+  virtual double litter_wash_off_rate (double dt) const = 0; // [h^-1]
   virtual const IM& deposit () const = 0; // [g [stuff] /cm²/h]
 
   // Canopy.

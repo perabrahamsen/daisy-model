@@ -98,7 +98,7 @@ public:
   double extraterrestrial_radiation (const Time&) const; // [W/m2]
   double sin_solar_elevation_angle (const Time&) const; // []
 protected:
-  double relative_extraterestial_radiation (const Time&) const; // []
+  double relative_extraterrestial_radiation (const Time&) const; // []
   double day_length (const Time&) const; // [h]
 
   // Create and Destroy.
