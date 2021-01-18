@@ -307,6 +307,9 @@
     <ClCompile Include="hydraulic_mod_C.C" />
     <ClCompile Include="hydraulic_M_BaC.C" />
     <ClCompile Include="hydraulic_M_BaC_Bimodal.C" />
+    <ClCompile Include="hydraulic_M_BivG.C">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="hydraulic_M_C.C" />
     <ClCompile Include="hydraulic_M_vG.C" />
     <ClCompile Include="hydraulic_M_vGBS.C" />

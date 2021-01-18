@@ -64,7 +64,8 @@ class HydraulicM_vGBS : public Hydraulic
 	const double Ks_cap;
 	const double Ks_nc;
 	const double Gama_h_cap0 = pow(1.0 / (1.0 + pow(alpha * pow(10.0,pf0), n)), m);
-	const double Gama_h_nc0 = (1.0 / n/M_LN10)*(Beta_inc(1.0+pow(alpha*pow(10.0,pf0),n),1.0)- Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0/n)+n-1.0/n+(1.0/n-1.0)*0.226844544838515);
+	double sumk;
+	double Gama_h_nc0;
 	mutable PLF M_;
 	PLF pF_Theta;
 
@@ -167,7 +168,7 @@ HydraulicM_vGBS::Se_h_cap(double h) const
 double
 HydraulicM_vGBS::Se_h_nc(double h) const
 {
-	const double Gama_h_nc = (1.0 / n / M_LN10)*(Beta_inc(1.0 + pow(alpha*pow(10.0, log10(abs(h))), n), 1.0) - Beta_inc(1.0 + pow(alpha*pow(10.0, log10(abs(h))), n), 1.0 / n) + n - 1.0 / n + (1.0 / n - 1.0)*0.226844544838515);
+	const double Gama_h_nc = (1.0 / n / M_LN10)*(Beta_inc(1.0 + pow(alpha*pow(10.0, log10(abs(h))), n), 1.0) - Beta_inc(1.0 + pow(alpha*pow(10.0, log10(abs(h))), n), 1.0 / n) + n - 1.0 / n + (1.0 / n - 1.0)*sumk);
 	if(h<0.0)
 	return 1.0-Gama_h_nc / Gama_h_nc0;
 	else
@@ -202,6 +203,14 @@ HydraulicM_vGBS::HydraulicM_vGBS(const BlockModel& al)
 	Ks_cap(al.number("Ks_cap")),
 	M_()
 {
+	//sumk = [this] {double res = 0; for (int k = 0.0; k < 19.5; k++) res += 1.0 / k / (k + 1.0) / (n*k + 1.0); return res; }();
+	
+	sumk = 0.0;
+	for (double k = 1.0; k < 20.5; k++)
+	{
+		sumk = sumk + 1.0 / k / (k + 1.0) / (n*k + 1.0);
+	}
+	Gama_h_nc0 = (1.0 / n / M_LN10)*(Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0) - Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0 / n) + n - 1.0 / n + (1.0 / n - 1.0)*sumk);
 	Theta_sat = Theta_cap + Theta_nc;
 	const double pf_min = -6.0;
 	const double pf_max = pf0;

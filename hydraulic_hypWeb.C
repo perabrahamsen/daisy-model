@@ -58,8 +58,11 @@ class HydraulicHypweb : public Hydraulic
   const double Theta_nc;
   /* const */  double Ks_cap;
   const double Ks_nc;
-  /* const */  double Gama_h_cap0 = pow(1.0 / (1.0 + pow(a * pow(10.0, pf0), n)), m);
-  /* const */  double Gama_h_nc0 = (1.0 / n / M_LN10)*(Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0) - Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0 / n) + n - 1.0 / n + (1.0 / n - 1.0)*0.226844544838515);
+  double sumk;
+  double Gama_h_cap0 = pow(1.0 / (1.0 + pow(a * pow(10.0, pf0), n)), m);
+  double Gama_h_nc0 = (1.0 / n / M_LN10)*(Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0) - Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0 / n) + n - 1.0 / n + (1.0 / n - 1.0)*sumk); 
+  /* const   double Gama_h_cap0 = pow(1.0 / (1.0 + pow(a * pow(10.0, pf0), n)), m);
+  /* const   double Gama_h_nc0 = (1.0 / n / M_LN10)*(Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0) - Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0 / n) + n - 1.0 / n + (1.0 / n - 1.0)*sumk); */
   mutable PLF M_;
   PLF pF_Theta;
 
@@ -174,7 +177,7 @@ HydraulicHypweb::Se_h_cap(double h) const
 double
 HydraulicHypweb::Se_h_nc(double h) const
 {
-	const double Gama_h_nc = (1.0 / n / M_LN10)*(Beta_inc(1.0 + pow(alpha*pow(10.0, log10(abs(h))), n), 1.0) - Beta_inc(1.0 + pow(alpha*pow(10.0, log10(abs(h))), n), 1.0 / n) + n - 1.0 / n + (1.0 / n - 1.0)*0.226844544838515);
+	const double Gama_h_nc = (1.0 / n / M_LN10)*(Beta_inc(1.0 + pow(alpha*pow(10.0, log10(abs(h))), n), 1.0) - Beta_inc(1.0 + pow(alpha*pow(10.0, log10(abs(h))), n), 1.0 / n) + n - 1.0 / n + (1.0 / n - 1.0)*sumk);
 	if (h<0.0)
 		return 1.0 - Gama_h_nc / Gama_h_nc0;
 	else
@@ -315,7 +318,12 @@ pedotransfer function");
   Theta_sat = Theta_cap + Theta_nc;
 
   Gama_h_cap0 = pow(1.0 / (1.0 + pow(alpha * pow(10.0, pf0), n)), m);
-  Gama_h_nc0 = (1.0 / n / M_LN10)*(Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0) - Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0 / n) + n - 1.0 / n + (1.0 / n - 1.0)*0.226844544838515);
+  sumk = 0.0;
+  for (double k = 1.0; k < 20.5; k++)
+  {
+	  sumk = sumk + 1.0 / k / (k + 1.0) / (n*k + 1.0);
+  }
+  Gama_h_nc0 = (1.0 / n / M_LN10)*(Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0) - Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0 / n) + n - 1.0 / n + (1.0 / n - 1.0)*sumk);
  
   const double pf_min = -6.0;
   const double pf_max = pf0;
