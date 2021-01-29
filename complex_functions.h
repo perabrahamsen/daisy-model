@@ -19,7 +19,7 @@ inline bool isfinite (const complex<double> &z)
 {
   const double x = real (z), y = imag (z);
 
-  return (isfinite (x) && isfinite (y));
+  return (std::isfinite (x) && std::isfinite (y));
 }
 
 

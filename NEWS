@@ -6,6 +6,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.04
+
+** New '-L' switch: supress daisy.log.
+
+** New 'M_BivG' hydraulic model.
+
 * 5.96
 
 ** The Millet and Maize parameterization had a too high specific_LAI.

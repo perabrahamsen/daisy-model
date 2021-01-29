@@ -68,6 +68,7 @@ struct Toplevel::Implementation : boost::noncopyable
 
   bool has_daisy_log;
   void add_daisy_log ();
+  void no_daisy_log ();
 
   void reset ();
 
@@ -151,6 +152,15 @@ Toplevel::Implementation::add_daisy_log ()
       msg.message ("Storing 'daisy.log' in '" 
 		   + metalib.path ().get_directory () + "'");
     }
+}
+
+void 
+Toplevel::Implementation::no_daisy_log ()
+{ 
+  if (has_daisy_log)
+    msg.message ("Failed to supress 'daisy.log'");
+  else
+    has_daisy_log = true;
 }
 
 void
@@ -255,7 +265,7 @@ Toplevel::usage ()
 
   std::string s = "Usage: ";
   s += impl->program_name;
-  s += " [-v] [-d dir] [-q | -nw] file... [-p ";
+  s += " [-v] [-d dir] [-L] [-q | -nw] file... [-p ";
   const Library& library = impl->metalib.library (Program::component);
   std::vector<symbol> entries;
   library.entries (entries);
@@ -533,6 +543,9 @@ Toplevel::command_line (int& argc, char**& argv)
               break;
             case 'q':
               set_ui_none ();
+              break;
+            case 'L':
+              impl->no_daisy_log ();
               break;
             case 'v':
 	      // Print version.
