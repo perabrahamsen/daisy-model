@@ -150,8 +150,31 @@ UINone::attach (Toplevel&)
 { }
 
 void 
-UINone::run (Toplevel&)
-{ set_low_priority (); }
+UINone::run (Toplevel& toplevel)
+{
+  set_low_priority ();
+
+  switch (toplevel.state ())
+    {
+    case Toplevel::is_unloaded:
+      toplevel.usage ();
+      /* Not reached*/
+    case Toplevel::is_uninitialized:
+      toplevel.initialize ();
+      /* Fallthrough */
+    case Toplevel::is_ready:
+      toplevel.run ();
+      /* Fallthrough */
+    case Toplevel::is_done:
+      throw EXIT_SUCCESS;
+    case Toplevel::is_running:
+      toplevel.error ("Aborted while simulation was running");
+      throw EXIT_FAILURE;
+    case Toplevel::is_error:
+      throw EXIT_FAILURE;
+    }
+  daisy_notreached ();
+}
 
 void 
 UINone::failure (Toplevel&)

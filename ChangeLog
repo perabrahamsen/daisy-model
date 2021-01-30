@@ -1,8 +1,12 @@
-2021-01-29  DESKTOP-EHST1J7  <abraham@DESKTOP-EHST1J7.localdomain>
+2021-01-30  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* ui.C (run): Actually run the program.
+
+2021-01-29  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* toplevel.C (command_line): New '-L' switch, supress 'daisy.log'.
 
-2021-01-18  Per Abrahamsen  <pa@plen.ku.com>
+2021-01-18  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* hydraulic_M_BivG.C: New model.
 	* Makefile (MODELS): Added it.

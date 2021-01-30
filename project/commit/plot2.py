@@ -15,7 +15,7 @@ import datetime
 
 def plot_fig (fig):
     if suffix:
-        plt.savefig (f"fig/{fig}.{suffix}", dpi=600)
+        plt.savefig (f"fig3/{fig}.{suffix}", dpi=600)
         plt.clf ()
     else:
         plt.show ()
