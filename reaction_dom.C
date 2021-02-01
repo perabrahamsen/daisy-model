@@ -37,6 +37,7 @@
 #include "abiotic.h"
 #include "block_model.h"
 #include "check.h"
+#include "mathlib.h"
 #include <sstream>
 
 struct ReactionDOM : public Reaction
@@ -188,7 +189,8 @@ ReactionDOM::tick_soil (const Geometry& geo,
 	}
 
       daisy_assert (-NH4[i] <= 1.01 * NH4_avail);
-      daisy_assert (-NO3[i] <= 1.01 * NO3_avail);
+      daisy_assert (-NO3[i] <= 1.01 * NO3_avail
+		    || approximate (N_consume, NH4_avail));
       daisy_approximate (-N_consume,  NH4[i] + NO3[i]);
       
       CO2[i] = C_gen - SOC_gen;	// [g C/cm^3/h]

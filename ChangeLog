@@ -1,3 +1,10 @@
+2021-02-01  Per Abrahamsen  <pa@plen.ku.com>
+
+	* bioclimate_std.C (WaterDistribution): Avoid negative
+	'litter_water_storage'.
+
+	* reaction_dom.C (tick_soil): Fix assertion (numerical noise).
+
 2021-01-30  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* ui.C (run): Actually run the program.

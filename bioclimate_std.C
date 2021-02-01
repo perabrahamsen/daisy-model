@@ -983,8 +983,12 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     }
   else if (litter_potential_down > 0.0)
     {
-      litter_water_out = litter_potential_down;
-      litter_water_storage -= litter_water_out * dt;
+      litter_water_out = std::min (litter_potential_down,
+				   litter_water_storage / dt);
+      litter_water_storage
+	= std::max (litter_water_storage - litter_water_out * dt,
+		    0.0);
+      
     }
   else
     litter_water_out = 0.0;
