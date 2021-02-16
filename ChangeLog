@@ -1,3 +1,7 @@
+2021-02-16  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.06 released.
+
 2021-02-16  Per Abrahamsen  <pa@plen.ku.com>
 
 	* chemical_std.C (tick_top): Surface application should also hit litter.
