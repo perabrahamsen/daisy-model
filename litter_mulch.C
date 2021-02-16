@@ -59,10 +59,12 @@ struct LitterMulch : public LitterResidue
   const double alpha;		 // Interception parameter []
   const double Si;		 // Saturation index []
   const std::unique_ptr<Retention> retention; // Retension curve.
-  const PLF decompose_heat_factor;	      // [dg C] -> []
-  const PLF decompose_water_factor;	      // [cm] -> []
-  const int decompose_SMB_pool;		      // 0 = SMB1, 1 = SMB2, -1 = all
-  const double decompose_SMB_KM;
+  const PLF decompose_heat_factor; // [dg C] -> []
+  const double T_scale;		 // Scale to T_ref []
+  const PLF decompose_water_factor; // [cm] -> []
+  const int decompose_SMB_pool; // 0 = SMB1, 1 = SMB2, -1 = all
+  const double decompose_SMB_KM; // MM kin. par. [g C/cm^3]
+  const double SMB_scale;	// Scale to SMB_ref []
   const bool use_soil_decompose; // True iff T and h of top soil should be used
   
   // Log variables.
@@ -102,6 +104,30 @@ struct LitterMulch : public LitterResidue
     const double new_Theta
       = Theta_sat * new_water / water_capacity (); // []
     return retention->h (new_Theta);
+  }
+
+  double find_T_factor_raw (const double T) const
+  {
+    if (decompose_heat_factor.size () < 1)
+      return Abiotic::f_T0 (T);
+
+    return decompose_heat_factor (T);
+  }
+
+  double find_T_factor (const double T) const
+  { return T_scale * find_T_factor_raw (T); }
+
+  double find_SMB_factor_raw (const double SMB_C) const
+  {
+    if (decompose_SMB_KM > 0.0)
+      return SMB_C / (decompose_SMB_KM + SMB_C);
+
+    return 1.0;
+  }
+
+  double find_SMB_factor (const double SMB_C) const
+  {
+    return SMB_scale * find_SMB_factor_raw (SMB_C);
   }
 
   // Simulation.
@@ -162,29 +188,19 @@ struct LitterMulch : public LitterResidue
     h1 = bisection (h_min, 0, h_diff);
     E_darcy = find_E_darcy (h1);
     
-    
-
     // Temperature
-
-
     T_soil = geo.content_height (soil_heat, &SoilHeat::T, soil_height);
     T = bioclimate.get_litter_temperature (); // [dg C]
     const double T_decompose = use_soil_decompose ? T_soil : T; 
-    if (decompose_heat_factor.size () < 1)
-      T_factor = Abiotic::f_T0 (T_decompose);
-    else
-      T_factor = decompose_heat_factor (T_decompose);
-
+    T_factor = find_T_factor (T_decompose);
  
+    // SMB
     const std::vector <SMB*>& smb = organic.get_smb ();
     SMB_C = 0;
     for (int i = 0; i < smb.size (); i++)
       if (i == decompose_SMB_pool || decompose_SMB_pool < 0)
 	SMB_C += geo.total_surface (smb[i]->C, 0, soil_height) / -soil_height;
-    if (decompose_SMB_KM > 0.0)
-      SMB_factor = SMB_C / (decompose_SMB_KM + SMB_C);
-    else
-      SMB_factor = 1.0;
+    SMB_factor = find_SMB_factor (SMB_C);
 
     // Combined
     factor = T_factor * h_factor * SMB_factor * contact;
@@ -242,9 +258,9 @@ struct LitterMulch : public LitterResidue
     else
       buffer_C += DOC_gen * dt;
 
-    if (chemistry.know (Chemical::DON ()))
+    if (chemistry.know (DON_name))
       {
-	Chemical& DON = chemistry.find (Chemical::DON ());
+	Chemical& DON = chemistry.find (DON_name);
 	DON.add_to_litter_transform_source (DON_gen);
       }
     else
@@ -318,6 +334,51 @@ struct LitterMulch : public LitterResidue
     return Theta_sat;
   }
   // Create and Destroy.
+
+  static double find_T_scale (const BlockModel& al)
+  {
+    const double T_ref = al.number ("T_ref");
+    const PLF& decompose_heat_factor = al.plf ("decompose_heat_factor");
+    const double ref_value = (decompose_heat_factor.size () < 1)
+      ? Abiotic::f_T0 (T_ref)
+      : decompose_heat_factor (T_ref);
+
+    if (ref_value > 0.0)
+      return 1.0 / ref_value;
+
+    Treelog& msg = al.msg ();
+    Treelog::Open nest (msg, "mulch layer");
+    std::ostringstream tmp;
+    tmp << "heat_factor at " << T_ref << " dg C (T_ref) is " << ref_value
+	<< ", should be > 0";
+    msg.error (tmp.str ());
+    return -42.42e42;
+  }
+    
+  static double find_SMB_scale (const BlockModel& al)
+  {
+    const double SMB_ref = al.number ("SMB_ref", -1.0);
+    if (SMB_ref < 0.0)
+      // No scaling.
+      return 1.0;
+
+    const double decompose_SMB_KM = al.number ("decompose_SMB_KM");
+    const double ref_value = (decompose_SMB_KM > 0.0)
+      ? SMB_ref / (decompose_SMB_KM + SMB_ref)
+      : 1.0;
+
+    if (ref_value > 0.0)
+      return 1.0 / ref_value;
+
+    Treelog& msg = al.msg ();
+    Treelog::Open nest (msg, "mulch layer");
+    std::ostringstream tmp;
+    tmp << "SMB_factor at " << SMB_ref << " g C/cm^3 is " << ref_value
+	<< ", should be > 0";
+    msg.error (tmp.str ());
+    return -42.42e42;
+  }
+    
   LitterMulch (const BlockModel& al)
     : LitterResidue (al),
       DOC_name (al.name ("DOC_name")),
@@ -334,9 +395,11 @@ struct LitterMulch : public LitterResidue
       Si (Theta_sat * al.number ("Si")),
       retention (Librarian::build_item<Retention> (al, "retention")),
       decompose_heat_factor (al.plf ("decompose_heat_factor")),
+      T_scale (find_T_scale (al)), 
       decompose_water_factor (al.plf ("decompose_water_factor")),
       decompose_SMB_pool (al.integer ("decompose_SMB_pool")),
       decompose_SMB_KM (al.number ("decompose_SMB_KM")),
+      SMB_scale (find_SMB_scale (al)),
       use_soil_decompose (al.flag ("use_soil_decompose")),
       height (NAN),
       contact (NAN),
@@ -434,6 +497,11 @@ Theta_sat = 100 %");
     frame.declare ("decompose_heat_factor", "dg C", Attribute::None (),
                    Attribute::Const, "Heat factor on decomposition.");
     frame.set ("decompose_heat_factor", PLF::empty ());
+    frame.declare ("T_ref", "dg C", Attribute::Const, "\
+Reference temperature for docomposition of mulch.\n\
+The heat factor on decomposition will be scaled so it is 1 at\n\
+this temperature..");
+    frame.set ("T_ref", 10.0);
     frame.declare ("decompose_water_factor", "cm", Attribute::None (),
                    Attribute::Const,
                    "Water potential factor on decomposition.");
@@ -448,6 +516,10 @@ Michaelis-Menten kinetics parameter.\n\
 Decompose rate is modified by C / (KM + C), where C is the carbon content\n\
 in the pool specified by 'decompose_SMB_pool'.");
     frame.set ("decompose_SMB_KM", 0.0);
+    frame.declare ("SMB_ref", "g C/cm^3", Attribute::OptionalConst, "\
+Reference SMB carbon for docomposition of mulch.\n\
+The SMB factor for decomposition will be scaled so it is 1 at\n\
+this amount of SMB carbon. By default, it will not be scaled.");
     frame.declare_boolean ("use_soil_decompose", Attribute::Const, "\
 Use temperature and moisture of top soil for turnover and decomposition.\n\
 The depth of the top soil is determined by 'soil_height'.");

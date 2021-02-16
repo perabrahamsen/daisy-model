@@ -2,9 +2,13 @@ TODO ---things that needs to be done with Daisy -*- outline -*-
 
 * Jeanne
 
-** Move DOM code out of mulch module? 
+** Test Jeanne setup
 
-** Test mulch decompose og tidsskridt
+SOC gen 1m vs 1h (check email)
+
+** Optimize parameters for Jeanne setup
+
+** Does DOC2 DON2 works?
 
 * Styczen
 

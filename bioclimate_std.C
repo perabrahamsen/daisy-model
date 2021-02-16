@@ -116,6 +116,7 @@ struct BioclimateStandard : public Bioclimate
   double litter_water_in;       // Water entering litter [mm/h]
   double litter_water_out;      // Water leaving litter [mm/h]
   double litter_wash_off; 	// Water hitting but not entering litter [mm/h]
+  double litter_water_bypass; 	// Water bypassing litter [mm/h]
 
   // Water in pond.
   double pond_ep;               // Potential evaporation from pond [mm/h]
@@ -547,6 +548,7 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     litter_water_in (0.0),
     litter_water_out (0.0),
     litter_wash_off (0.0),
+    litter_water_bypass (0.0),
     pond_ep (0.0),
     pond_ea_ (0.0),
     soil_ep (0.0),
@@ -937,7 +939,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   litter_water_in = litter_water_hit * litter_intercept;
   litter_wash_off = litter_water_hit - litter_water_in;
   
-  const double litter_water_bypass = canopy_water_below - litter_water_in;
+  litter_water_bypass = canopy_water_below - litter_water_hit;
   
   if (litter_water_in > 0.01)
     litter_water_temperature 
@@ -1009,10 +1011,12 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
       pond_ep = 0.0;
     }
   
-  const double pond_in = litter_water_out + litter_water_bypass;
+  const double pond_in
+    = litter_water_out + litter_wash_off + litter_water_bypass;
   const double pond_in_temperature = (pond_in > 0.01)
     ? ((litter_water_out * litter_water_temperature
-        + litter_water_bypass * canopy_water_below_temperature) / pond_in)
+        + (litter_water_bypass + litter_wash_off)
+	* canopy_water_below_temperature) / pond_in)
     : air_temperature;
 
   const double soil_T 
@@ -1335,6 +1339,7 @@ BioclimateStandard::output (Log& log) const
   output_variable (litter_water_in, log);
   output_variable (litter_water_out, log);
   output_variable (litter_wash_off, log);
+  output_variable (litter_water_bypass, log);
   output_variable (pond_ep, log);
   output_value (pond_ea_, "pond_ea", log);
   output_variable (soil_ep, log);
@@ -1554,6 +1559,8 @@ The intended use is colloid generation.");
                    "Litter drip throughfall.");
     frame.declare ("litter_wash_off", "mm/h", Attribute::LogOnly,
                    "Water hitting but not entering litter.");
+    frame.declare ("litter_water_bypass", "mm/h", Attribute::LogOnly,
+                   "Water bypassing litter.");
 
     // Water in pond.
     frame.declare ("pond_ep", "mm/h", Attribute::LogOnly,

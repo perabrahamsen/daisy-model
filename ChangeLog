@@ -1,3 +1,16 @@
+2021-02-16  Per Abrahamsen  <pa@plen.ku.com>
+
+	* chemical_std.C (tick_top): Surface application should also hit litter.
+
+2021-02-14  Per Abrahamsen  <pa@plen.ku.com>
+
+	* lib/log.dai ("Surface water"): Added summaries of individual
+	compartments.
+
+	* bioclimate_std.C (litter_water_bypass): New log variable.
+
+	* litter_mulch.C (T_ref, SMB_ref): New parameters.
+
 2021-02-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.05 released.

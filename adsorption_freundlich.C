@@ -171,7 +171,7 @@ If not known, FOCUS recommend a value of 0.9 (page 93).",
     frame.declare_number_cited ("C_ref", "g/cm^3", Check::positive (),
 				Attribute::Const, Attribute::Singleton, "\
 Reference concentration for determining the other parameters.\n\
-Accrding to FOCUS, the usual value is 1 mg/L (page 93).",
+According to FOCUS, the usual value is 1 mg/L (page 93).",
 				"focus2000");
   }
 } AdsorptionFreundlich_syntax;

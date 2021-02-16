@@ -1084,8 +1084,7 @@ ChemicalBase::tick_top (const Vegetation& vegetation,
 
   // Litter
   const double below_canopy = canopy_out + canopy_bypass + spray_surface_;
-  litter_in = (canopy_out - residuals + canopy_bypass) * litter_cover
-    + residuals;
+  litter_in = (below_canopy - residuals) * litter_cover + residuals;
   const double litter_bypass = below_canopy - litter_in;
 
   const double old_litter_storage = litter_storage;
@@ -1112,9 +1111,9 @@ ChemicalBase::tick_top (const Vegetation& vegetation,
                       litter_storage, litter_absolute_loss_rate);
   divide_loss (litter_absolute_loss_rate, 
                litter_decompose_rate_adjusted,
-	       litter_leak_rate + litter_diffuse_rate,
+	       litter_washoff_rate + litter_diffuse_rate,
                litter_decompose, litter_out);
-  divide_loss (litter_out, litter_leak_rate, litter_diffuse_rate,
+  divide_loss (litter_out, litter_washoff_rate, litter_diffuse_rate,
 	       litter_leak, litter_diffuse);
  
   // Surface

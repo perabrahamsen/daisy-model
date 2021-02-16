@@ -2814,7 +2814,7 @@ contains no water."
                   (spec fixed SoilWater S_B2M)
                   (handle sum))))
 
-(defsummary "Surface water balance" balance
+(defsummary "Surface water" balance
   "Above ground water balance."
   (precision 1)
   (require_top true)
@@ -2824,11 +2824,45 @@ contains no water."
           "Runoff")
   (content Snow Canopy Litter Pond))
 
+(defsummary "Snow water" balance
+  "Snow water balance."
+  (precision 1)
+  (require_top true)
+  (input "Precipitation" "Overhead irrigation")
+  (output "Snow evaporation" "Snow out")
+  (content Snow))
+
+(defsummary "Canopy water" balance
+  "Canopy water balance."
+  (precision 1)
+  (require_top true)
+  (input "Snow out")
+  (output "Canopy evaporation" "Canopy bypass" "Canopy out")
+  (content "Canopy"))
+
+(defsummary "Litter water" balance
+  "Litter water balance."
+  (precision 1)
+  (require_top true)
+  (input "Canopy bypass" "Canopy out" "Surface irrigation" "Tillage")
+  (output "Litter evaporation" "Litter bypass" "Litter wash off" "Litter out")
+  (content "Litter"))
+
+(defsummary "Ponded water" balance
+  "Pond (surface) water balance."
+  (precision 1)
+  (require_top true)
+  (input "Litter bypass" "Litter wash off" "Litter out")
+  (output "Surface evaporation" "Matrix infiltration"
+	  "Tertiary infiltration" "Runoff")
+  (content "Pond"))
+
 (deflog "Surface water" column
   "Information about above ground water."
   (where "${colfid}surface_water.dlf")
   (when hourly)
-  (summary "Surface water balance")
+  (summary "Surface water" "Snow water" "Canopy water" "Litter water"
+	   "Ponded water")
   (entries (number (tag "Precipitation")
 		   (documentation "\
 Amount of water entering the system as rain and snow.")
@@ -2954,6 +2988,49 @@ nowhere go to.  For typical setups, this value will be zero.")
 		   (documentation "Total amount of ponded water.")
                    (path column "${column}" Surface pond) 
                    (spec fixed Surface pond)
+                   (dimension "mm"))
+           (number (tag "Snow out")
+		   (documentation "Water leaving snow pack")
+                   (path column "${column}"
+			 Bioclimate "*" snow_water_out) 
+                   (spec bioclimate default snow_water_out)
+		   (handle sum)
+                   (dimension "mm"))
+           (number (tag "Canopy out")
+		   (documentation "Water dripping off canopy")
+                   (path column "${column}"
+			 Bioclimate "*" canopy_water_out) 
+                   (spec bioclimate default canopy_water_out)
+		   (handle sum)
+                   (dimension "mm"))
+           (number (tag "Canopy bypass")
+		   (documentation "Water bypassing canopy")
+                   (path column "${column}"
+			 Bioclimate "*" canopy_water_bypass) 
+                   (spec bioclimate default canopy_water_bypass)
+		   (handle sum)
+                   (dimension "mm"))
+           (number (tag "Litter out")
+		   (documentation "Water leaving litter storage downwards.\n\
+This can include overflow and Darcy flow.")
+                   (path column "${column}"
+			 Bioclimate "*" litter_water_out) 
+                   (spec bioclimate default litter_water_out)
+		   (handle sum)
+                   (dimension "mm"))
+           (number (tag "Litter bypass")
+		   (documentation "Water bypassing litter")
+                   (path column "${column}"
+			 Bioclimate "*" litter_water_bypass) 
+                   (spec bioclimate default litter_water_bypass)
+		   (handle sum)
+                   (dimension "mm"))
+           (number (tag "Litter wash off")
+		   (documentation "Water hitting litter without entering.")
+                   (path column "${column}"
+			 Bioclimate "*" litter_wash_off) 
+                   (spec bioclimate default litter_wash_off)
+		   (handle sum)
                    (dimension "mm"))))
 
 (defsummary "Colloids balance" balance
