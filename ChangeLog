@@ -1,3 +1,7 @@
+2021-02-17  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.07 released.
+
 2021-02-17  Per Abrahamsen  <pa@plen.ku.com>
 
 	* abiotic.C, abiotic.h (find_T_scale, find_SMB_scale, load_frame):
