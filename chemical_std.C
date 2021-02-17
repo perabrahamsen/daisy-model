@@ -2639,12 +2639,38 @@ Cell with largest forward sink compared to available matter.");
 struct ChemicalStandard : public ChemicalBase 
 {
   const PLF decompose_heat_factor;
+  const double T_scale;		 // Scale to T_ref []
   const PLF decompose_water_factor;
   const PLF decompose_CO2_factor;
   const PLF decompose_depth_factor;
   const int decompose_SMB_pool;
   const double decompose_SMB_KM; // [g C/cm^3]
+  const double SMB_scale;	// Scale to SMB_ref []
   
+  double find_T_factor_raw (const double T) const
+  {
+    if (decompose_heat_factor.size () < 1)
+      return Abiotic::f_T0 (T);
+
+    return decompose_heat_factor (T);
+  }
+
+  double find_T_factor (const double T) const
+  { return T_scale * find_T_factor_raw (T); }
+
+  double find_SMB_factor_raw (const double SMB_C) const
+  {
+    if (decompose_SMB_KM > 0.0)
+      return SMB_C / (decompose_SMB_KM + SMB_C);
+
+    return 1.0;
+  }
+
+  double find_SMB_factor (const double SMB_C) const
+  {
+    return SMB_scale * find_SMB_factor_raw (SMB_C);
+  }
+
   double decompose_soil_factor (size_t c,
 				const Geometry&, const Soil&, 
 				const SoilWater&, const SoilHeat&, 
@@ -2669,11 +2695,13 @@ struct ChemicalStandard : public ChemicalBase
   ChemicalStandard (const BlockModel& al)
     : ChemicalBase (al),
       decompose_heat_factor (al.plf ("decompose_heat_factor")),
+      T_scale (Abiotic::find_T_scale (al)), 
       decompose_water_factor (al.plf ("decompose_water_factor")),
       decompose_CO2_factor (al.plf ("decompose_CO2_factor")),
       decompose_depth_factor (al.plf ("decompose_depth_factor")),
       decompose_SMB_pool (al.integer ("decompose_SMB_pool")),
-      decompose_SMB_KM (al.number ("decompose_SMB_KM"))
+      decompose_SMB_KM (al.number ("decompose_SMB_KM")),
+      SMB_scale (Abiotic::find_SMB_scale (al))
   { }
 };
 
@@ -2689,10 +2717,7 @@ ChemicalStandard::decompose_soil_factor
   factor *= decompose_depth_factor (geo.cell_z (c));
   
   // Adjust for heat.
-  if (decompose_heat_factor.size () < 1)
-    factor *= Abiotic::f_T0 (soil_heat.T (c));
-  else
-    factor *= decompose_heat_factor (soil_heat.T (c));
+  factor *= find_T_factor (soil_heat.T (c));
   
   // Adjust for moisture.
   if (decompose_water_factor.size () < 1)
@@ -2714,7 +2739,7 @@ ChemicalStandard::decompose_soil_factor
       const SMB& pool = *smb[decompose_SMB_pool];
       daisy_assert (pool.C.size () > c);
       const double C = pool.C[c];
-      const double f_N = C / (decompose_SMB_KM + C);
+      const double f_N = find_SMB_factor (C);
       factor *= f_N;
     }
   return factor;
@@ -2726,13 +2751,7 @@ static struct ChemicalStandardSyntax : public DeclareModel
   { return new ChemicalStandard (al); }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("decompose_heat_factor", "dg C", Attribute::None (),
-                   Attribute::Const, "Heat factor on decomposition.");
-    frame.set ("decompose_heat_factor", PLF::empty ());
-    frame.declare ("decompose_water_factor", "cm", Attribute::None (),
-                   Attribute::Const,
-                   "Water potential factor on decomposition.");
-    frame.set ("decompose_water_factor", PLF::empty ());
+    Abiotic::load_frame (frame);
     frame.declare ("decompose_CO2_factor", "g CO2-C/cm^3/h", Attribute::None (),
                    Attribute::Const,
                    "CO2 development factor on decomposition.");
@@ -2741,16 +2760,6 @@ static struct ChemicalStandardSyntax : public DeclareModel
                    Attribute::Const,
                    "Depth influence on decomposition.");
     frame.set ("decompose_depth_factor", PLF::always_1 ());
-    frame.declare_integer ("decompose_SMB_pool", Attribute::Const, "\
-SMB pool for Michaelis-Menten kinetics.");
-    frame.set ("decompose_SMB_pool", 1);
-    frame.set_check ("decompose_SMB_pool", VCheck::non_negative ());
-    frame.declare ("decompose_SMB_KM", "g C/cm^3", Check::non_negative (),
-                   Attribute::Const, "\
-Michaelis-Menten kinetics parameter.\n\
-Decompose rate is modified by C / (KM + C), where C is the carbon content\n\
-in the pool specified by 'decompose_SMB_pool'.");
-    frame.set ("decompose_SMB_KM", 0.0);
   }
   ChemicalStandardSyntax ()
     : DeclareModel (Chemical::component, "default", "base", "\
@@ -2850,7 +2859,7 @@ static struct ChemicalFOCUSSyntax : public DeclareModel
 		   Attribute::Const, "Reference temperature.");
     frame.set_cited ("T_ref", 20.0, "Section 7.4.2", "focussw2002");
     frame.declare ("alpha", "K^-1", Check::none (),
-		   Attribute::Const, "temperature effect parameter.");
+		   Attribute::Const, "Temperature effect parameter.");
     frame.set_cited ("alpha", 0.0948, "Section 7.4.4", "focussw2002");
     frame.declare ("z", "cm", Check::negative (), Attribute::Const,
 		   Attribute::Variable, "\

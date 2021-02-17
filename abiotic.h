@@ -22,11 +22,20 @@
 #ifndef ABIOTIC_H
 #define ABIOTIC_H
 
+class BlockModel;
+class Frame;
+
 namespace Abiotic
 {
   double f_h (double h);
   double f_T2 (double T);
   double f_T0 (double T);
+
+  double find_T_scale (const BlockModel& al);
+  double find_SMB_scale (const BlockModel& al);
+
+  void load_frame (Frame&);
+
 }
 
 #endif // ABIOTIC_H

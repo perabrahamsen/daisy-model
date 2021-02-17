@@ -316,7 +316,9 @@ struct LitterMulch : public LitterResidue
     output_variable (SON_gen, log);
   }
 
-  static double find_Theta_sat (const BlockModel& al)
+  // Create and Destroy.
+
+  static double find_Theta_sat (const Frame& al)
   {
     const double bulk_density = al.number ("density"); // [kg/m^3]
     const double density = al.number ("particle_density", bulk_density); // [kg/m^3]
@@ -325,58 +327,7 @@ struct LitterMulch : public LitterResidue
     // [m^3/m^3] = [kg/m^3] * [L/kg] / [L/m^3]
     const double Theta_sat = density * water_capacity / L_per_m3; 
 
-    Treelog& msg = al.msg ();
-    Treelog::Open nest (msg, "mulch layer");
-    std::ostringstream tmp;
-    tmp << "Theta_sat = " << Theta_sat << " [])";
-    msg.debug (tmp.str ());
-
     return Theta_sat;
-  }
-  // Create and Destroy.
-
-  static double find_T_scale (const BlockModel& al)
-  {
-    const double T_ref = al.number ("T_ref");
-    const PLF& decompose_heat_factor = al.plf ("decompose_heat_factor");
-    const double ref_value = (decompose_heat_factor.size () < 1)
-      ? Abiotic::f_T0 (T_ref)
-      : decompose_heat_factor (T_ref);
-
-    if (ref_value > 0.0)
-      return 1.0 / ref_value;
-
-    Treelog& msg = al.msg ();
-    Treelog::Open nest (msg, "mulch layer");
-    std::ostringstream tmp;
-    tmp << "heat_factor at " << T_ref << " dg C (T_ref) is " << ref_value
-	<< ", should be > 0";
-    msg.error (tmp.str ());
-    return -42.42e42;
-  }
-    
-  static double find_SMB_scale (const BlockModel& al)
-  {
-    const double SMB_ref = al.number ("SMB_ref", -1.0);
-    if (SMB_ref < 0.0)
-      // No scaling.
-      return 1.0;
-
-    const double decompose_SMB_KM = al.number ("decompose_SMB_KM");
-    const double ref_value = (decompose_SMB_KM > 0.0)
-      ? SMB_ref / (decompose_SMB_KM + SMB_ref)
-      : 1.0;
-
-    if (ref_value > 0.0)
-      return 1.0 / ref_value;
-
-    Treelog& msg = al.msg ();
-    Treelog::Open nest (msg, "mulch layer");
-    std::ostringstream tmp;
-    tmp << "SMB_factor at " << SMB_ref << " g C/cm^3 is " << ref_value
-	<< ", should be > 0";
-    msg.error (tmp.str ());
-    return -42.42e42;
   }
     
   LitterMulch (const BlockModel& al)
@@ -388,18 +339,18 @@ struct LitterMulch : public LitterResidue
       decompose_height (al.number ("decompose_height")),
       soil_height (al.number ("soil_height")),
       Theta_res (al.number ("Theta_res")),
-      Theta_sat (find_Theta_sat (al)),
+      Theta_sat (find_Theta_sat (al.frame ())),
       h_min (al.number ("h_min")),
       factor_exch (al.number ("factor_exch")),
       alpha (al.number ("alpha")),
       Si (Theta_sat * al.number ("Si")),
       retention (Librarian::build_item<Retention> (al, "retention")),
       decompose_heat_factor (al.plf ("decompose_heat_factor")),
-      T_scale (find_T_scale (al)), 
+      T_scale (Abiotic::find_T_scale (al)), 
       decompose_water_factor (al.plf ("decompose_water_factor")),
       decompose_SMB_pool (al.integer ("decompose_SMB_pool")),
       decompose_SMB_KM (al.number ("decompose_SMB_KM")),
-      SMB_scale (find_SMB_scale (al)),
+      SMB_scale (Abiotic::find_SMB_scale (al)),
       use_soil_decompose (al.flag ("use_soil_decompose")),
       height (NAN),
       contact (NAN),
@@ -422,13 +373,13 @@ struct LitterMulch : public LitterResidue
       SOC_gen (NAN),
       SON_gen (NAN)
   {
-    if (Theta_res > Theta_sat)
-      al.msg ().error ("Theta_res > Theta_sat");
-    if (Theta_res > Si)
-      al.msg ().error ("Theta_res > Si");
-    if (Si > Theta_sat)
-      al.msg ().error ("Si > Theta_sat");
+    TREELOG_MODEL (al.msg ());
     retention->initialize (Theta_res, h_min, Theta_sat, al.msg ());
+    std::ostringstream tmp;
+    tmp << "Theta_sat = " << Theta_sat
+	<< "\nT_scale = " << T_scale
+	<< "\nSMB_scale = " << SMB_scale;
+    al.msg ().debug (tmp.str ());
   }
   ~LitterMulch ()
   { }
@@ -445,8 +396,73 @@ A decomposing mulch layer.\n\
 The bottom of the mulch layer may decompose based on the conditions\n\
 in the top of soil.")
   { }
+  static bool check_alist (const Metalib& metalib, const Frame& al, Treelog& msg)
+  {
+    bool ok = true;
+
+    // T_ref
+    const double T_ref = al.number ("T_ref");
+    const PLF& decompose_heat_factor = al.plf ("decompose_heat_factor");
+    const double ref_value = (decompose_heat_factor.size () < 1)
+      ? Abiotic::f_T0 (T_ref)
+      : decompose_heat_factor (T_ref);
+
+    if (!(ref_value > 0.0))
+      {
+	std::ostringstream tmp;
+	tmp << "heat_factor at " << T_ref << " dg C (T_ref) is " << ref_value
+	    << ", should be > 0";
+	msg.error (tmp.str ());
+	ok = false;
+      }
+
+    // SMB_ref
+    if (al.check ("SMB_ref"))
+      {
+	const double SMB_ref = al.number ("SMB_ref");
+	const double decompose_SMB_KM = al.number ("decompose_SMB_KM");
+	const double ref_value = (decompose_SMB_KM > 0.0)
+	  ? SMB_ref / (decompose_SMB_KM + SMB_ref)
+	  : 1.0;
+
+	if (!(ref_value > 0.0))
+	  {
+	    std::ostringstream tmp;
+	    tmp << "SMB_factor at " << SMB_ref << " g C/cm^3 is " << ref_value
+		<< ", should be > 0";
+	    msg.error (tmp.str ());
+	    ok = false;
+	  }
+      }
+
+    // Theta_res / Theta_sat
+    const double Theta_res = al.number ("Theta_res");
+    const double Theta_sat = LitterMulch::find_Theta_sat (al);
+    const double Si = al.number ("Si");
+    if (!(Theta_res < Theta_sat))
+      {
+	std::ostringstream tmp;
+	tmp << "Theta_res (" << Theta_res << ") should be < Theta_sat (" << Theta_sat
+	    << ")";
+	msg.error (tmp.str ());
+	ok = false;
+      }
+    if (Theta_res > Si * Theta_sat)
+      {
+	msg.error ("Theta_res > Theta_sat * Si");
+	ok = false;
+      }
+    if (Si > 1.0)
+      {
+	msg.error ("Si > 100 %");
+	ok = false;
+      }
+    return ok;
+  }
+    
   void load_frame (Frame& frame) const
   { 
+    frame.add_check (check_alist);
     frame.set_strings ("cite", "findeling2007modelling");
     frame.declare_string ("DOC_name", Attribute::Const, "\
 Name of compound representing dissolved organic carbon.");
@@ -494,32 +510,7 @@ Theta_sat = 100 %");
     frame.declare_object ("retention", Retention::component,
                           "The retention curve to use.");
     frame.set ("retention", "PASTIS");
-    frame.declare ("decompose_heat_factor", "dg C", Attribute::None (),
-                   Attribute::Const, "Heat factor on decomposition.");
-    frame.set ("decompose_heat_factor", PLF::empty ());
-    frame.declare ("T_ref", "dg C", Attribute::Const, "\
-Reference temperature for docomposition of mulch.\n\
-The heat factor on decomposition will be scaled so it is 1 at\n\
-this temperature..");
-    frame.set ("T_ref", 10.0);
-    frame.declare ("decompose_water_factor", "cm", Attribute::None (),
-                   Attribute::Const,
-                   "Water potential factor on decomposition.");
-    frame.set ("decompose_water_factor", PLF::empty ());
-    frame.declare_integer ("decompose_SMB_pool", Attribute::Const, "\
-SMB pool for Michaelis-Menten kinetics.\n\
-Use 0 for SMB1, 1 for SMB2, or -1 for all SMB pools.");
-    frame.set ("decompose_SMB_pool", 1);
-    frame.declare ("decompose_SMB_KM", "g C/cm^3", Check::non_negative (),
-                   Attribute::Const, "\
-Michaelis-Menten kinetics parameter.\n\
-Decompose rate is modified by C / (KM + C), where C is the carbon content\n\
-in the pool specified by 'decompose_SMB_pool'.");
-    frame.set ("decompose_SMB_KM", 0.0);
-    frame.declare ("SMB_ref", "g C/cm^3", Attribute::OptionalConst, "\
-Reference SMB carbon for docomposition of mulch.\n\
-The SMB factor for decomposition will be scaled so it is 1 at\n\
-this amount of SMB carbon. By default, it will not be scaled.");
+    Abiotic::load_frame (frame);
     frame.declare_boolean ("use_soil_decompose", Attribute::Const, "\
 Use temperature and moisture of top soil for turnover and decomposition.\n\
 The depth of the top soil is determined by 'soil_height'.");
