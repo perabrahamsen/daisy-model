@@ -6,6 +6,44 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.06
+
+** New 'decompose_SMB_pool', and 'decompose_SMB_KM' chemical parameters.
+
+These allow Michaelis-Menten kinetics for biological degradation.
+
+If C is the carbon content in the specified SMB pool, and KM is
+the value of the 'decompose_SMB_KM' parameter, a SMB effect f_SMB on
+turnover is calculated as
+
+f_SMB (C) = C / (C + KM)
+
+If decompose_SMB_pool is negative, all SMB pools contribute to C.
+
+Note that (decompose_SMB_pool 0) refers to SMB1, and
+(decompose_SMB_pool 1) to SMB2.
+
+** New 'T_ref' and 'SMB_ref' chemical parameters.
+
+These scale the temperature effect (f_T) on turnover and the SMB
+effect (f_SMB) on turnover to the specified temperature ('T_ref') or
+SMB carbon content ('SMB_ref').
+
+T_scale = 1.0 / f_T (T_ref)
+SMB_scale = 1.0 / f_SMB (SMB_ref)
+
+The scaled temperature effect (f_Ts) is then
+
+f_Ts (T) = T_scale * f_T (T)
+
+similarly, the scaled SMB effect (f_SMBs) is
+
+f_SMBs (C) = SMB_scale * f_SMB (C)
+
+and it follows that
+
+f_Ts (T_ref) = f_SMBs (SMB_ref) = 1.0
+
 * 6.04
 
 ** New '-L' switch: supress daisy.log.

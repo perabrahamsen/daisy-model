@@ -1,0 +1,33 @@
+;;; test-scn.dai -- Use checkpoint for scenarios.
+
+;; Checkpoint generate by test-cp.dai.
+(input file "checkpoint-1988-4-1+1.dai")
+
+(defprogram SCN1 "RefSim Checkpoint"
+  "Simulation with spring barley"
+  ;; We don't need to define "time", value will be "stop" from test-cp.dai.
+  ;; We do need to define a new "stop" time.
+  (stop 1990 1 1)
+  ;; The output files generated was specified in "test-cp.dai".
+  ;; Use "log_prefix" to make the file name specific to this scenario.
+  (log_prefix "scn1-")
+  ;; This scenario has a spring barley with a catch crop.
+  (manager "SBarley w. catch crop"))
+
+(defprogram SCN2 "RefSim Checkpoint"
+  "Simulation with winter wheat."
+  (stop 1990 1 1)
+  (log_prefix "scn2-")
+  ;; This scenario is with winter wheat.
+  (manager "WWheat w. MF"))
+
+;; Run both scenarios sequentially. 
+(defprogram scenarios batch
+  (run SCN1 SCN2))
+
+(run scenarios)
+
+;; To run in parallel, you need multiple .dai files, each running an
+;; individual scenario, and ten start them up in parallel. 
+
+;;; test-scn.dai ends here.

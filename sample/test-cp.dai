@@ -1,0 +1,26 @@
+;;; test-cp.dai -- Generate checkpoint.
+;;
+;; See test-scn.dai for how to use it for different scenarios.
+
+(input file "dk-soil.dai")
+(input file "tillage.dai")
+(input file "fertilizer.dai")
+(input file "crop.dai")
+(input file "dk-management.dai")
+(input file "log-std.dai")
+
+(defprogram RefSim Daisy
+  "Simulation demonstrating the generation of a checkpoint."
+  (weather default "dk-taastrup.dwf")
+  (column Askov)
+  (manager "SBarley w. catch crop")
+  (time 1986 12 1 1)
+  (stop 1988 4 1 1)
+  (output "harvest" "Field water"
+	  ;; "not running" will give you a checkpoint when the
+	  ;; simulation stops. 
+	  (checkpoint (when (not running)))))
+
+(run RefSim)
+
+;;; test-cp.dai ends here.
