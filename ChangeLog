@@ -1,5 +1,7 @@
 2021-02-21  Per Abrahamsen  <pa@plen.ku.com>
 
+	* log_table.C (initialize): Special case NUL output.
+
 	* soil_water.C, soil_water.h (default_h): New parameter.
 
 2021-02-17  Per Abrahamsen  <pa@plen.ku.dk>

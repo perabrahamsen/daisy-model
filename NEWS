@@ -8,6 +8,12 @@ release.
 
 * 6.08
 
+** Log to 'NUL' to discard outut (also on UNIX).
+
+** New 'default_h' SoilWater parameter.
+
+Is used for initialization if no other value is specified.
+
 ** New 'test-cp.dai' and 'test-scn.dai' sample files.
 
 Together, these files demonstrate how to create a hotstart file, and

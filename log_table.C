@@ -284,8 +284,17 @@ DestinationTable::initialize (const symbol log_dir, const symbol suffix,
                               const std::vector<std::pair<symbol, symbol>/**/>&
                               /**/ parameters)
 {
-  const std::string fn = log_dir.name () + file.name () + suffix.name ();
-  out.open (fn.c_str ());
+  if (file == "NUL")
+#ifdef __unix
+    out.open ("/dev/null");
+#else
+    out.open ("NUL");
+#endif
+  else
+    {
+      const std::string fn = log_dir.name () + file.name () + suffix.name ();
+      out.open (fn.c_str ());
+    }
 
   print_header.start (out, objid, file, parsed_from_file);
 
