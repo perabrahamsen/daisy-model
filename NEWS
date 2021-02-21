@@ -6,6 +6,13 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.08
+
+** New 'test-cp.dai' and 'test-scn.dai' sample files.
+
+Together, these files demonstrate how to create a hotstart file, and
+run multiple scenarios based on that.
+
 * 6.06
 
 ** New 'decompose_SMB_pool', and 'decompose_SMB_KM' chemical parameters.

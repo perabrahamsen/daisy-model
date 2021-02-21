@@ -827,6 +827,12 @@ load_Theta (Frame& frame)
 void
 SoilWater::load_syntax (Frame& frame)
 {
+  frame.declare ("default_h", "cm", Check::none (), 
+                 Attribute::OptionalConst,
+                 "Default h if neither it nor Theta is specified.\n\
+By default, this will be based on either distance to groundwater\n\
+or field capacy (pF 2), whichever is lower.");
+  
   frame.declare ("max_exfiltration_gradient", "cm/cm", Check::positive (), 
                  Attribute::OptionalConst,
                  "Maximal pressure gradient for calculating exfiltration.\n\
@@ -1019,7 +1025,12 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
   h_size = h_.size ();
 
   // Groundwater based pressure.
-  if (groundwater.table () > 0.0)
+  if (std::isfinite (default_h))
+    {
+      for (size_t i = h_size; i < cell_size; i++)
+	h_.push_back (default_h);
+    }
+  else if (groundwater.table () > 0.0)
     {
       const double h_pF2 = -100.0; // pF 2.0;
       for (size_t i = h_size; i < cell_size; i++)
@@ -1079,7 +1090,8 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
 }
 
 SoilWater::SoilWater (const Block& al)
-  : max_exfiltration_gradient (al.number ("max_exfiltration_gradient", -1.0)),
+  : default_h (al.number ("default_h", NAN)),
+    max_exfiltration_gradient (al.number ("max_exfiltration_gradient", -1.0)),
     max_sink_change (al.number ("max_sink_change")),
     use_last (al.flag ("use_last")),
     S_permanent_ (al.number_sequence ("S_permanent")),

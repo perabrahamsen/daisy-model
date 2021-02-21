@@ -43,6 +43,7 @@ class SoilWater
 
   // Parameters.
 private:
+  const double default_h;		  // [cm] for initialization
   const double max_exfiltration_gradient; // [cm/cm]
   const double max_sink_change;           // Max change in available water [] 
   const bool use_last;			  // Use last value for init h / Theta
