@@ -248,17 +248,61 @@ Each point in the simplex must have a value for each parameter");
         ok = false;
         msg.error ("Bad limit expression");
       }
+    std::set<symbol> unique (parameter.begin (), parameter.end ());
+    if (unique.size () != parameter.size ())
+      {
+	ok = false;
+	msg.error ("parameter names should be unique");
+      }
     return ok; 
   }
 
-  static Iterative::Simplex build_simplex (const BlockModel& al,
-                                           const symbol key)
+  static std::vector<symbol> build_parameter (const BlockModel& al)
   {
-    Iterative::Simplex result;
+    if (al.check ("parameter"))
+      return al.name_sequence ("parameter");
+
+    daisy_assert (al.check ("parameters"));
     const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& p
-      = al.submodel_sequence (key);
-    for (size_t i = 0; i < p.size (); i++)
-      result.push_back (p[i]->number_sequence ("value"));
+      = al.submodel_sequence ("parameters");
+    std::vector<symbol> names;
+    for (auto i: p)
+	names.push_back (i->name ("name"));
+    return names;
+  }
+  static Iterative::Simplex build_simplex (const BlockModel& al)
+  {
+    if (al.check ("simplex"))
+      {
+	Iterative::Simplex result;
+	const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& p
+	  = al.submodel_sequence ("simplex");
+	for (size_t i = 0; i < p.size (); i++)
+	  result.push_back (p[i]->number_sequence ("value"));
+	return result;
+      }
+    daisy_assert (al.check ("parameters"));
+    const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& p
+      = al.submodel_sequence ("parameters");
+    std::vector<double> val1;
+    std::vector<double> val2;
+
+    for (auto i: p)
+      {
+	std::vector<double> vals = i->number_sequence ("value");
+	daisy_assert (vals.size () == 2);
+	daisy_assert (!isequal (vals[0], vals[1]));
+	val1.push_back (vals[0]);
+	val2.push_back (vals[1]);
+      }
+    Iterative::Simplex result;
+    result.push_back (val1);
+    for (size_t i = 0; i < val1.size (); i++)
+      {
+	std::vector<double> copy = val1;
+	copy[i] = val2[i];
+	result.push_back (copy);
+      }
     return result;
   }
 
@@ -266,12 +310,12 @@ Each point in the simplex must have a value for each parameter");
     : Program (al),
       metalib (al.metalib ()),
       units (al.units ()),
-      parameter (al.name_sequence ("parameter")),
+      parameter (build_parameter (al)),
       limit (Librarian::build_item<Boolean> (al, "limit")),
       original (al.model_ptr ("run")),
       scopesel (Librarian::build_item<Scopesel> (al, "scope")),
       expr (Librarian::build_item<Number> (al, "expr")),
-      simplex (build_simplex (al, "simplex")),
+      simplex (build_simplex (al)),
       lim_scope (*original, parameter),
       epsilon (al.number ("epsilon")),
       min_iter (al.integer ("min_iter")),
@@ -304,19 +348,42 @@ iterations exceed 'max_iter'.")
         ok = false;
         msg.error ("'min_iter' should be less than 'max_iter'");
       }
+    if (frame.check ("parameter") == frame.check ("parameters"))
+      {
+	ok = false;
+	msg.error ("Exactly one of 'parameter' or 'parameters' must be present");
+      }
+    if (frame.check ("simplex") == frame.check ("parameters"))
+      {
+	ok = false;
+	msg.error ("Exactly one of 'simplex' or 'parameters' must be present");
+      }
     return ok;
+  }
+  static void load_parameter (Frame& frame)
+  {
+    frame.declare_string ("name", Attribute::Const, "Name of parameter.");
+    frame.declare ("value", Attribute::User (), Check::none (), Attribute::Const,
+		   2,  "Two values.");
+    frame.set_check ("value", VCheck::unique ());
+    frame.order ("name", "value");
   }
   void load_frame (Frame& frame) const
   {
     frame.set_strings ("cite", "nelder1965simplex");
     frame.add_check (check_alist);
-    frame.declare_string ("parameter", Attribute::Const, Attribute::Variable, "\
+    frame.declare_submodule_sequence ("parameters", Attribute::OptionalConst, "\
+List of (NAME VAL1 VAL2).\n\
+NAME is the name of a parameter to optimize, VAL1 and VAL2 are two\n\
+different legal values for the parameter.", load_parameter);
+    frame.declare_string ("parameter", Attribute::OptionalConst,
+			  Attribute::Variable, "\
 List of parameters to optimize.");
     static VCheck::All multi (VCheck::unique (), VCheck::min_size_1 ());
     frame.set_check ("parameter", multi);
     frame.declare_object ("limit", Boolean::component, "\
 Limit parameter values so this expression is true.");
-    frame.declare_submodule_sequence ("simplex", Attribute::Const, "\
+    frame.declare_submodule_sequence ("simplex", Attribute::OptionalConst, "\
 List of points defining the initial simplex.\n\
 You must define one more point than you have parameters.", 
                                       ProgramOptimize::MyPoint::load_syntax);

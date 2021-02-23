@@ -22,3 +22,5 @@ This could be used for comparison with, say, TDR probes."
                      (spec fixed SoilWater Theta)
                      (density true)
                      (dimension "%"))))
+
+;;; log-sample.dai ends here.

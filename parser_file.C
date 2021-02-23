@@ -1338,7 +1338,8 @@ ParserFile::Implementation::load_list (Frame& frame)
                     else if (looking_at ('['))
                       {
                         const symbol read_dim = get_dimension ();
-                        if (check_dimension (syntax_dim, read_dim))
+                        if (syntax_dim != Attribute::User ()
+			    && check_dimension (syntax_dim, read_dim))
                           {
                             daisy_assert (positions.size () == array.size ());
                             for (unsigned int i = first_unchecked;
