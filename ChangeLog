@@ -1,3 +1,7 @@
+2021-03-02  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.08 released.
+
 2021-03-02  Per Abrahamsen  <pa@plen.ku.com>
 
 	* bioclimate_std.C (tick): handle saturated soil surface.
