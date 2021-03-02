@@ -1238,8 +1238,10 @@ BioclimateStandard::tick (const Time& time,
   difrad0 = difrad->value (time, weather, msg) * global_radiation_;
   //daisy_assert (difrad0 >= 0.0);
 
-  const double pF 
-    = h2pF (geo.content_hood (soil_water, &SoilWater::h, Geometry::cell_above));
+  const double h_surface = geo.content_hood (soil_water, &SoilWater::h, Geometry::cell_above);
+  const double pF = (h_surface < 0)
+    ? h2pF (h_surface)
+    : -100.0;
 
   sin_beta_ = weather.sin_solar_elevation_angle (time);
   // Calculate total canopy, divide it into intervals, and distribute PAR.

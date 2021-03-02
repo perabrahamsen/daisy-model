@@ -1,3 +1,7 @@
+2021-03-02  Per Abrahamsen  <pa@plen.ku.com>
+
+	* bioclimate_std.C (tick): handle saturated soil surface.
+
 2021-02-23  Per Abrahamsen  <pa@plen.ku.com>
 
 	* program_optimize.C (parameters): New parameter.

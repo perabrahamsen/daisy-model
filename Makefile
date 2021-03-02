@@ -62,6 +62,7 @@ DISTDIR=c:/Users/xvs108/Google\ Drive/public/
 # Set USE_OPTIMIZE to 'native', 'portable' or 'none'.
 #
 USE_OPTIMIZE = portable
+#USE_OPTIMIZE = none
 
 # Set USE_PROFILE if you want to profile the executable
 #
