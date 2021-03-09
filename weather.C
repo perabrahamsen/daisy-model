@@ -24,17 +24,6 @@
 #include "weather.h"
 #include "astronomy.h"
 
-double 
-Weather::extraterrestrial_radiation (const Time& time) const // [W/m2]
-{ return Astronomy::ExtraterrestrialRadiation (time, 
-                                               latitude (), longitude (),
-                                               timezone ()); }
-
-double 
-Weather::sin_solar_elevation_angle (const Time& time) const // []
-{ return Astronomy::SinSolarElevationAngle (time, latitude (), longitude (),
-                                            timezone ()); }
-
 Weather::Weather ()
 { }
 

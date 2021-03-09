@@ -1,5 +1,27 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* Merete og Simon
+
+** Fejl i Hargreaves.
+
+** Vi skal tage beslutning om hvad der skal kunne vælges i en PM-beregning, og så få det implementeret konsekvent. Jeg har fremsendt et par dokumenter, der beskriver det. Det er
+
+a.      Calculation of extra-terrestrial radiation at the soil surface, Sio (FAO eller Blonquist)
+
+b.     Calculation of cloudiness factor, fc ,-
+
+c.     Choice of overall net radiation term  - lige nu er der tre forskellige tilgange, hvoraf jeg ikke kan finde dokumentation for den tredje.
+
+d.      Choice of equation for calculation of εa, emissivity. = ligningerne I Kjæersgaard.
+
+** Blonquist
+
+** Sne & Regn ?
+
+* Simon: Prøv Jacobs python kode
+
+* Jeanne: de to optimerede
+
 * Jeanne
 
 ** Optimize parameters for Jeanne setup

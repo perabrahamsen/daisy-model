@@ -95,11 +95,9 @@ public:
 
   // Astronomic utilities.
 public:
-  double extraterrestrial_radiation (const Time&) const; // [W/m2]
-  double sin_solar_elevation_angle (const Time&) const; // []
+  double extraterrestrial_radiation () const; // [W/m2]
+  double sin_solar_elevation_angle () const; // []
 protected:
-  double relative_extraterrestial_radiation (const Time&) const; // []
-  double day_length (const Time&) const; // [h]
 
   // Create and Destroy.
 protected:

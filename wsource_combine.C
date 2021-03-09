@@ -329,7 +329,6 @@ WSourceCombine::entries (std::set<symbol>& result) const
 { 
   for (size_t i = 0; i < entry.size (); i++)
     {
-      Assertion::message ("hello");
       Entry& e = *(entry[i]);
 
 #if 0

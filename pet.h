@@ -53,7 +53,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Time&, const Weather&, const double Rn, const Vegetation&,
+  virtual void tick (const Weather&, const double Rn, const Vegetation&,
 		     const Surface&, const Geometry& geo,
                      const Soil&, const SoilHeat&, 
 		     const SoilWater&, Treelog&) = 0;

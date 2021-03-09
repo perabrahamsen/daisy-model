@@ -37,7 +37,7 @@ struct PetHargreaves : public Pet
   double potential_evapotranspiration_wet;
 
   // Simulation.
-  void tick (const Time& time, const Weather& weather, const double,
+  void tick (const Weather& weather, const double,
              const Vegetation& crops,
 	     const Surface& surface, const Geometry&,
              const Soil&, const SoilHeat&,
@@ -59,7 +59,7 @@ struct PetHargreaves : public Pet
       static const double W_per_m2_to_mm_per_h = s_per_h 
         / latent_heat_of_vaporation;
       // Note: Adriano uses 0.4081633.  What are his units?
-      double Ra =  weather.extraterrestrial_radiation (time)
+      double Ra =  weather.extraterrestrial_radiation ()
         * W_per_m2_to_mm_per_h; // [mm/h]
 
       reference_evapotranspiration 

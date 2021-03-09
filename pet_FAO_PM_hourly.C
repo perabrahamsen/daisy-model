@@ -56,7 +56,7 @@ public:
   double G;
 
   // Simulation.
-  void tick (const Time&, const Weather& weather, const double Rn,
+  void tick (const Weather& weather, const double Rn,
 	     const Vegetation& crops,
 	     const Surface& surface, const Geometry& geo,
              const Soil& soil,
@@ -115,7 +115,7 @@ public:
 };
 
 void
-PetFAO_PM_hourly::tick (const Time& time, const Weather& weather,
+PetFAO_PM_hourly::tick (const Weather& weather,
 			const double /* Rn */,
                         const Vegetation& crops,
                         const Surface& surface, const Geometry& geo, const Soil& soil,
@@ -141,7 +141,7 @@ PetFAO_PM_hourly::tick (const Time& time, const Weather& weather,
     G = soil_heat.top_flux (geo, soil, soil_water);
   else
     {
-      const double rad = weather.extraterrestrial_radiation (time);
+      const double rad = weather.extraterrestrial_radiation ();
       const bool is_day = rad > 25.0;
 
       if (is_day)

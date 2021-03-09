@@ -1,3 +1,21 @@
+2021-03-09  Per Abrahamsen  <pa@plen.ku.com>
+
+	* astronomy.C (ExtraterrestrialRadiation)
+	(DailyExtraterrestrialRadiation): Rewrote to follow FAO56 closer,
+	and to allow smaller timestep than 1 hour.
+	* wsource_weather.C (tick_weather): Use it.
+
+2021-03-08  Per Abrahamsen  <pa@plen.ku.com>
+
+	* pet.h, pet_weather.C, pet_makkink.C, pet_PM.C, pet_Hargreaves.C:
+	* pet_FAO_PM_hourly.C, pet_FAO_PM.C (tick): No longer take time
+	argument.
+
+	* wsource_weather.C (day_cycle, extraterrestrial_radiation):
+	(daily_extraterrastial_radiation): New log variables.
+	* wsource_weather.C, wsource_weather.h
+	(relative_extraterrestial_radiation): Removed.
+
 2021-03-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.08 released.

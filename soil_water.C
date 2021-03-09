@@ -828,8 +828,9 @@ void
 SoilWater::load_syntax (Frame& frame)
 {
   frame.declare ("default_h", "cm", Check::none (), 
-                 Attribute::OptionalConst,
-                 "Default h if neither it nor Theta is specified.\n\
+                 Attribute::OptionalConst, "\
+Default h at surface if neither it nor Theta is specified.\n\
+The depth will be added to the pressure.\n\
 By default, this will be based on either distance to groundwater\n\
 or field capacy (pF 2), whichever is lower.");
   
@@ -1028,7 +1029,7 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
   if (std::isfinite (default_h))
     {
       for (size_t i = h_size; i < cell_size; i++)
-	h_.push_back (default_h);
+	h_.push_back (default_h - geo.cell_z (i));
     }
   else if (groundwater.table () > 0.0)
     {

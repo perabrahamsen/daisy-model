@@ -41,7 +41,7 @@ struct DifradDPF : public Difrad
   double value (const Time& time, const Weather& weather, Treelog&)
   {
     // Solar elevation angle and atmospheric pressure
-    const double sin_beta = weather.sin_solar_elevation_angle (time);
+    const double sin_beta = weather.sin_solar_elevation_angle ();
 
     if (sin_beta < 0.01)
       return 1.0;
@@ -54,7 +54,7 @@ struct DifradDPF : public Difrad
     const double m = (P/P0)/sin_beta; // []
        
     // Extra-terrestrial PAR from weather.C
-    const double I_e = weather.extraterrestrial_radiation (time);//[W/m^2]
+    const double I_e = weather.extraterrestrial_radiation ();//[W/m^2]
    
     // Beam PAR calculated from extra-terrestrial PAR
     const double I_b = pow(a, m) * I_e * sin_beta;

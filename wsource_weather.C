@@ -54,17 +54,6 @@ public:
     return unit;
   }
 
-  double relative_extraterrestial_radiation (const Time& time) const
-  {
-    const double average 
-      = Astronomy::DailyExtraterrestrialRadiation (time, weather.latitude ());
-    const double current 
-      = Astronomy::ExtraterrestrialRadiation (time, weather.latitude (),
-                                              weather.longitude (), 
-                                              weather.timezone ());
-    return current / average;
-  }
-
   // Parameters.
   const PLF snow_fraction;
   const double max_rain;
@@ -102,9 +91,6 @@ public:
                         symbol, double&, Treelog&) const;
   void extract_average (symbol, double&, Treelog&) const;
   symbol name_first (symbol) const;
-  double find_cloudiness (const Time& time, const double Si) const;
-  double number_cloudiness (const Time& from, const Time& to) const;
-  void extract_cloudiness (double& variable) const;
 
   // Current values.
   double my_latitude;           // [dg North]
@@ -116,7 +102,10 @@ public:
   double my_Tamplitude;
   double my_maxTday;
   Weatherdata::surface_t my_surface;
+  double my_day_cycle;
   double my_global_radiation;
+  double my_sin_solar_elevation_angle;
+  double my_extraterrestrial_radiation;
   double my_diffuse_radiation;
   double my_reference_evapotranspiration;
   double my_wind;
@@ -139,6 +128,7 @@ public:
   double my_daily_max_air_temperature; // [dg C]
   double my_daily_air_temperature;     // [dg C]
   double my_daily_global_radiation;    // [W/m^2]
+  double my_daily_extraterrestrial_radiation;    // [W/m^2]
   double my_daily_precipitation;       // [mm/d]
 
   // Extract weather.
@@ -376,90 +366,6 @@ WSourceWeather::Implementation::extract_average (const symbol key, double& varia
     variable = value;
   else
     msg.warning ("Missing value for '" + key + "', reusing old");
-}
-
-double
-WSourceWeather::Implementation::find_cloudiness (const Time& time, const double Si) const
-{
-  const double rad = weather.extraterrestrial_radiation (time);
-  if (Si > 25.0 && rad > 25.0)
-    return FAO::CloudinessFactor_Humid (Si, rad);
-  else
-    return NAN;
-}
-
-double 
-WSourceWeather::Implementation::number_cloudiness (const Time& from, const Time& to) const
-{
-  // This function considers the source data constant within the
-  // source interval, and will give you the average cloudiness for the
-  // weather interval.
-  const symbol key = Weatherdata::GlobRad ();
-  
-  // Available data.
-  const number_map_t::const_iterator e = numbers.find (key);
-  daisy_assert (e != numbers.end ());
-  const std::deque<double>& values = e->second;
-  const size_t data_size = when.size ();
-  daisy_assert (values.size () == data_size);
-
-  switch (data_size)
-    {
-    case 0:
-      daisy_panic ("No weather data");
-    case 1:
-      return find_cloudiness (when[0], values[0]);
-    }
-
-  // Find start.
-  size_t i = 0;
-  while (i < data_size && when[i] <= from)
-    i++;
-  
-  if (i == data_size)
-    // All data is before current period.
-    return find_cloudiness (when.back (), values.back ());
-  
-  // Aggregate complete values.
-  double sum_value = 0.0;
-  double sum_hours = 0.0;
-  Time time = from;
-  
-  while (i < data_size && when[i] < to)
-    {
-      const double value = find_cloudiness (when[i], values[i]);
-      if (std::isfinite (value))
-        {
-          const double hours = Time::fraction_hours_between (time, when[i]);
-          sum_hours += hours;
-          sum_value += hours * value;
-        }
-      time = when[i];
-      i++;
-    }
-
-  // Add end interval.
-  const double hours = Time::fraction_hours_between (time, to);
-  const double value = (i < data_size 
-                        ? find_cloudiness (when[i], values[i])
-                        : find_cloudiness (when.back (), values.back ()));
-  if (std::isfinite (value))
-    {
-      sum_hours += hours;
-      sum_value += hours * value;
-    }
-  if (std::isnormal (sum_hours))
-    return sum_value / sum_hours;
-
-  return NAN;
-}
-
-void 
-WSourceWeather::Implementation::extract_cloudiness (double& variable) const
-{
-  const double value = number_cloudiness (previous, next);
-  if (std::isfinite (value))
-    variable = value;
 }
 
 bool 
@@ -727,12 +633,7 @@ WSourceWeather::Implementation::tick_weather (const Time& time, Treelog& msg)
   // Possible shorter version of same timestep.
   next = time;
 
-  // Day cycle.
   static const double long_timestep = 12.0; // [h]
-  const double day_cycle 
-    = 0.5 * (relative_extraterrestial_radiation (previous)
-             + relative_extraterrestial_radiation (next));
-  daisy_assert (std::isfinite (day_cycle));
 
   // Push back.
   Time next_day (next.year (), next.month (), next.mday (), 0);
@@ -833,6 +734,10 @@ WSourceWeather::Implementation::tick_weather (const Time& time, Treelog& msg)
       // Global radiation.
       extract_average (day_start, day_end, 
                        Weatherdata::GlobRad (), my_daily_global_radiation, msg);
+
+      // Extraterrestrial radiation.
+      my_daily_extraterrestrial_radiation
+	= Astronomy::DailyExtraterrestrialRadiation (next, weather.latitude ());
 
       // Precipitation.
       double new_daily_precipitation // [mm/h]
@@ -943,21 +848,48 @@ WSourceWeather::Implementation::tick_weather (const Time& time, Treelog& msg)
       my_surface = Weatherdata::symbol2surface (name);
   }
 
+  // Sun angle.
+  const double sin_beta_1
+    = Astronomy::SinSolarElevationAngle (previous,
+					 weather.latitude (),
+					 weather.longitude (),
+					 weather.timezone ());
+  const double sin_beta_2
+    = Astronomy::SinSolarElevationAngle (next,
+					 weather.latitude (),
+					 weather.longitude (),
+					 weather.timezone ());
+  
+  if ((sin_beta_1 > 0.0) == (sin_beta_2 > 0.0))
+    my_sin_solar_elevation_angle = 0.5 * (sin_beta_1 + sin_beta_2);
+  else
+    my_sin_solar_elevation_angle = 0.5 * (std::max (sin_beta_1, 0.0)
+					  + std::max (sin_beta_2, 0.0));
+  
+  // Day cycle.
+  my_extraterrestrial_radiation
+    = Astronomy::ExtraterrestrialRadiation (previous, next, weather.latitude (),
+					    weather.longitude (), 
+					    weather.timezone ());
+  my_day_cycle = my_extraterrestrial_radiation
+    / my_daily_extraterrestrial_radiation;
+  daisy_assert (std::isfinite (my_day_cycle));
+
   if (max_timestep (Weatherdata::GlobRad ()) < long_timestep)
     extract_average (Weatherdata::GlobRad (), my_global_radiation, msg);
   else
-    my_global_radiation = my_daily_global_radiation * day_cycle;
+    my_global_radiation = my_daily_global_radiation * my_day_cycle;
 
   // Optional values.
   my_diffuse_radiation = number_average (Weatherdata::DiffRad ());
   if (std::isfinite (my_diffuse_radiation) 
       && max_timestep (Weatherdata::DiffRad ()) >= long_timestep)
-    my_diffuse_radiation *= day_cycle;
+    my_diffuse_radiation *= my_day_cycle;
 
   my_reference_evapotranspiration = number_average (Weatherdata::RefEvap ());
   if (std::isfinite (my_reference_evapotranspiration) 
       && max_timestep (Weatherdata::RefEvap ()) >= long_timestep)
-    my_reference_evapotranspiration *= day_cycle;
+    my_reference_evapotranspiration *= my_day_cycle;
 
   my_wind = number_average (Weatherdata::Wind ());
   my_CO2 = number_average (Weatherdata::CO2 ());
@@ -1030,8 +962,13 @@ WSourceWeather::Implementation::tick_weather (const Time& time, Treelog& msg)
   my_deposit = dry + wet;
 
   // Cloudiness.
-  extract_cloudiness (my_cloudiness);
-
+  {
+    const double rad = my_extraterrestrial_radiation;
+    const double Si = my_global_radiation;
+    if (Si > 25.0 && rad > 25.0)
+      my_cloudiness = FAO::CloudinessFactor_Humid (Si, rad);
+  }
+  
   // Got everything?
   check_state (msg);
 
@@ -1322,7 +1259,10 @@ WSourceWeather::Implementation::Implementation (const Weather& w,
     my_Taverage (NAN),
     my_Tamplitude (NAN),
     my_maxTday (NAN),
+    my_day_cycle (NAN),
     my_global_radiation (NAN),
+    my_sin_solar_elevation_angle (NAN),
+    my_extraterrestrial_radiation (NAN),
     my_diffuse_radiation (NAN),
     my_reference_evapotranspiration (NAN),
     my_wind (NAN),
@@ -1341,6 +1281,7 @@ WSourceWeather::Implementation::Implementation (const Weather& w,
     my_daily_max_air_temperature (NAN),
     my_daily_air_temperature (NAN),
     my_daily_global_radiation (NAN),
+    my_daily_extraterrestrial_radiation (NAN),
     my_daily_precipitation (NAN),
     initialized_ok (false)
 { }
@@ -1482,6 +1423,14 @@ WSourceWeather::timestep () const
 { return Time::fraction_hours_between (impl->previous, impl->next); }
 
 double
+WSourceWeather::extraterrestrial_radiation () const // [W/m2]
+{ return impl->my_extraterrestrial_radiation; }
+
+double
+WSourceWeather::sin_solar_elevation_angle () const // []
+{ return impl->my_sin_solar_elevation_angle; }
+
+double
 WSourceWeather::day_length () const
 { return impl->my_day_length; }
 
@@ -1519,7 +1468,12 @@ WSourceWeather::output (Log& log) const
                 "daily_min_air_temperature", log);
   output_value (daily_max_air_temperature (), 
                 "daily_max_air_temperature", log);
+  output_value (impl->my_day_cycle, "day_cycle", log);
+  output_value (impl->my_extraterrestrial_radiation,
+		"extraterrestrial_radiation", log);
   output_value (global_radiation (), "global_radiation", log);
+  output_value (impl->my_daily_extraterrestrial_radiation,
+		"daily_extraterrestrial_radiation", log);
   output_value (daily_global_radiation (), "daily_global_radiation", log);
   if (has_reference_evapotranspiration ())
     output_value (reference_evapotranspiration (), 
@@ -1611,9 +1565,13 @@ Fraction of precipitation that falls as snow as function of air temperature.");
 By default, no limit on rain.");
     // Logs.
     frame.declare ("air_temperature", "dg C", Attribute::LogOnly,
-                   "Temperature this hour.");
+                   "Air temperature.");
+    frame.declare ("day_cycle", Attribute::None (), Attribute::LogOnly, "\
+Current level extraterrestrial radiation realtive to day average.");
+    frame.declare ("extraterrestrial_radiation", "W/m^2", Attribute::LogOnly,
+                   "Extraterrestrial radiation.");
     frame.declare ("global_radiation", "W/m^2", Attribute::LogOnly,
-                   "Global radiation this hour.");
+                   "Global radiation.");
     frame.declare ("daily_air_temperature", "dg C", Attribute::LogOnly,
                    "Average temperature this day.");
     frame.declare ("daily_min_air_temperature", "dg C", Attribute::LogOnly,
@@ -1621,15 +1579,18 @@ By default, no limit on rain.");
     frame.declare ("daily_max_air_temperature", "dg C", Attribute::LogOnly,
                    "Maximum temperature this day.");
     frame.declare ("daily_global_radiation", "W/m^2", Attribute::LogOnly,
-                   "Average radiation this day.");
+                   "Average global radiation this day.");
+    frame.declare ("daily_extraterrestrial_radiation", "W/m^2",
+		   Attribute::LogOnly,
+                   "Average extraterrestrial radiation this day.");
     frame.declare ("diffuse_radiation", "W/m^2", Attribute::LogOnly,
-                   "Diffuse radiation this hour.");
+                   "Diffuse radiation.");
     frame.declare ("reference_evapotranspiration", "mm/h", Attribute::LogOnly,
-                   "Reference evapotranspiration this hour");
-    frame.declare ("rain", "mm/h", Attribute::LogOnly, "Rain this hour.");
-    frame.declare ("snow", "mm/h", Attribute::LogOnly, "Snow this hour.");
+                   "Reference evapotranspiration");
+    frame.declare ("rain", "mm/h", Attribute::LogOnly, "Rain.");
+    frame.declare ("snow", "mm/h", Attribute::LogOnly, "Snow.");
     frame.declare ("precipitation", "mm/h", Attribute::LogOnly, 
-                   "Precipitation this hour.");
+                   "Precipitation.");
     frame.declare_fraction ("cloudiness", Attribute::LogOnly,
                             "Fraction of sky covered by clouds [0-1].");
     frame.declare ("vapor_pressure", "Pa", Attribute::LogOnly, "Humidity.");

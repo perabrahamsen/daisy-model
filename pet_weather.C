@@ -35,7 +35,7 @@ struct PetWeather : public Pet
   double potential_evapotranspiration_wet;
 
   // Simulation.
-  void tick (const Time&, const Weather& weather, const double, 
+  void tick (const Weather& weather, const double, 
 	     const Vegetation& crops,
 	     const Surface& surface, const Geometry&,
              const Soil&, const SoilHeat&,

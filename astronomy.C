@@ -23,8 +23,10 @@
 
 #include "astronomy.h"
 #include "time.h"
+#include "timestep.h"
 #include "mathlib.h"
 #include <algorithm>
+#include <sstream>
 
 double
 Astronomy::SolarDeclination (const Time& time) // [rad]
@@ -44,30 +46,68 @@ Astronomy::SunsetHourAngle (double Dec, double Lat) // [rad]
   return (acos (-tan (Dec) * tan (Lat)));
 }
 
-const double SolarConstant = 1366.7; // {W/m2]
+const double SolarConstant = 1366.7; // [W/m2]
 
 double
 Astronomy::DailyExtraterrestrialRadiation (const Time& time,
                                            const double latitude)
 // [W/m2]
 {
-  const double Dec = SolarDeclination (time);
-  const double Lat = M_PI / 180 * latitude;
-  const double x1 = SunsetHourAngle (Dec, Lat) * sin (Lat) * sin (Dec);
-  const double x2 = cos (Lat) * cos (Dec) * sin (SunsetHourAngle (Dec, Lat));
-  return (SolarConstant * RelativeSunEarthDistance (time) * (x1 + x2) / M_PI);
+  // All equations from FAO56.
+  const double dr = RelativeSunEarthDistance (time); // []
+  const double Dec = SolarDeclination (time); // [rad]
+  const double Lat = (M_PI / 180.0) * latitude; // [rad]
+  const double omega_s = SunsetHourAngle (Dec, Lat); // [rad]
+  daisy_assert (omega_s >= 0.0);
+  const double Ra				  // Eq 28 [W/m^2]
+    = (1 / M_PI) * SolarConstant * dr
+    * (omega_s * sin (Lat) * sin (Dec) + cos (Lat) * cos (Dec) * sin (omega_s));
+  return Ra;
 }
 
 double
-Astronomy::ExtraterrestrialRadiation (const Time& time,
-                                      const double latitude,
-                                      const double longitude,
-                                      const double timezone) // [W/m2]
+Astronomy::ExtraterrestrialRadiation (const Time& begin,
+				      const Time& end,
+                                      const double latitude, // [dg North]
+                                      const double longitude, // [dg East]
+                                      const double timezone   // [dg East]
+				      ) // [W/m^2]
 {
-  return std::max (SolarConstant * RelativeSunEarthDistance (time) 
-                   * SinSolarElevationAngle (time, 
-                                             latitude, longitude, timezone),
-                   0.0);
+  // All equations from FAO56.
+  const Timestep step = end - begin;
+  const double dt = step.total_hours (); // [h]
+  const Time middle = begin + step / 2;
+  const double dr = RelativeSunEarthDistance (middle); // []
+  const double Dec = SolarDeclination (middle); // [rad]
+  const double Lat = (M_PI / 180.0) * latitude; // [rad]
+  const double t = middle.day_fraction () * 24.0; // [h]
+  const double J = middle.yday (); // [d]
+  const double b = 2.0 * M_PI * (J - 81.0) / 364.0; // Eq 33 [rad]
+  const double Sc				    // Eq 32 [h]
+    = 0.1645 * sin (2.0 * b) - 0.1255 * cos (b) - 0.025 * sin (b);
+  const double Lz = -timezone;	// [dg West]
+  const double Lm = -longitude; // [dg West]
+  const double omega_s = SunsetHourAngle (Dec, Lat); // [rad]
+  const double omega		// Eq 31 [rad]
+    = (M_PI / 12.0)
+    * ((t + (24.0 / 360.0) * (Lz - Lm) + Sc) - 12.0);
+  // We only integrate over the daylight time (-omega_s:omega_s) byt divide
+  // with complete timestep (dt) to get average radiation.
+  const double omega1 = std::max (-omega_s,		     // Sunrise.
+				  omega - M_PI * dt / 24.0); // Eq 29 [rad]
+  const double omega2 = std::min (omega_s,		     // Sunset.
+				  omega + M_PI * dt / 24.0); // Eq 30 [rad]
+  
+  if (omega1 >= omega2)		//  Night
+    return 0.0;
+  
+  const double Ra				  // Eq 28 [W/m^2]
+    = (12.0 / M_PI) * SolarConstant * dr
+    * ((omega2 - omega1) * sin (Lat) * sin (Dec)
+       + cos (Lat) * cos (Dec) * (sin (omega2) - sin (omega1)))
+    / dt;
+  daisy_assert (Ra >= 0);
+  return Ra;
 }
 
 double

@@ -49,7 +49,7 @@ public:
   double potential_evapotranspiration_dry;
 
   // Simulation.
-  void tick (const Time&, const Weather& weather, const double Rn,
+  void tick (const Weather& weather, const double Rn,
 	     const Vegetation& crops,
 	     const Surface& surface, const Geometry& geo,
              const Soil& soil,
@@ -85,7 +85,7 @@ public:
 };
 
 void
-PetPM::tick (const Time&, const Weather& weather, const double Rn, 
+PetPM::tick (const Weather& weather, const double Rn, 
 	     const Vegetation& crops,
 	     const Surface& surface, const Geometry& geo,
              const Soil& soil,

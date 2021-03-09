@@ -32,10 +32,10 @@ namespace Astronomy
   double SunsetHourAngle (double Dec, double Lat); // [rad]
   double DailyExtraterrestrialRadiation (const Time&, 
                                          const double latitude); // [W/m2]
-  double ExtraterrestrialRadiation (const Time&,
-                                    const double latitude,
-                                    const double longitude,
-                                    const double timezone); // [W/m2]
+  double ExtraterrestrialRadiation (const Time& begin, const Time& end,
+				    const double latitude /* [dg N] */,
+				    const double longitude  /* [dg E] */,
+				    const double timezone); // [W/m2]
   double SinSolarElevationAngle (const Time& time,
                                  const double latitude,
                                  const double longitude,

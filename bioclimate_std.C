@@ -777,8 +777,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     + canopy_water_storage + litter_water_storage;
 
   daisy_assert (pet.get () != NULL);
-  pet->tick (time, 
-             weather, Rn, vegetation, surface, 
+  pet->tick (weather, Rn, vegetation, surface, 
              geo, soil, soil_heat, soil_water, msg);
   if (free_water > 0.01)
     total_ep_ = pet->wet ();
@@ -1243,7 +1242,7 @@ BioclimateStandard::tick (const Time& time,
     ? h2pF (h_surface)
     : -100.0;
 
-  sin_beta_ = weather.sin_solar_elevation_angle (time);
+  sin_beta_ = weather.sin_solar_elevation_angle ();
   // Calculate total canopy, divide it into intervals, and distribute PAR.
   RadiationDistribution (vegetation, pF, sin_beta_, msg);
 
