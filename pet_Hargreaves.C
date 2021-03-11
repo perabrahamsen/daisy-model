@@ -46,8 +46,7 @@ struct PetHargreaves : public Pet
       if (!weather.has_min_max_temperature ())
         throw "Min/max temperature required by Hargreaves";
 
-      // K_hs is 0.00023 in reference, but reference evapotranspiration 
-      // seems to be right (comparable with FAO_PM).  Does units match up?
+      // K_hs is 0.00023 in reference, but later corrected to 0.0023.
       const double K_hs = 0.0023; 
       const double T_avg = weather.daily_air_temperature ();
       const double T_diff = std::max (weather.daily_max_air_temperature () 
@@ -55,10 +54,9 @@ struct PetHargreaves : public Pet
                                       0.0);
       const double latent_heat_of_vaporation = 
         FAO::LatentHeatVaporization (T_avg); // [J/kg] 
-      static const double s_per_h = 60.0 * 60.0; // [W] -> [J]
+      static const double s_per_h = 60.0 * 60.0; // [W] -> [J/h]
       static const double W_per_m2_to_mm_per_h = s_per_h 
         / latent_heat_of_vaporation;
-      // Note: Adriano uses 0.4081633.  What are his units?
       double Ra =  weather.extraterrestrial_radiation ()
         * W_per_m2_to_mm_per_h; // [mm/h]
 

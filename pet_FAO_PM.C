@@ -87,7 +87,16 @@ public:
   // Create & Destroy.
   bool check (const Weather& weather, Treelog& msg) const
   {
+    TREELOG_MODEL (msg);
+    
     bool ok = true;
+    if (!weather.has_wind ())
+      {
+	msg.error ("Wind data required for this model");
+	ok = false;
+      }
+    if (!weather.has_vapor_pressure ())
+      msg.warning ("Vapor pressure required for this model");
     return ok;
   }
   void initialize (const Weather& weather)

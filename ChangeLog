@@ -1,3 +1,13 @@
+2021-03-11  Per Abrahamsen  <pa@plen.ku.com>
+
+	* wsource_weather.C (snow_fraction): Changed default temperature
+	for 100 % snow from -2 to 0 dg C.
+
+2021-03-10  Per Abrahamsen  <pa@plen.ku.com>
+
+	* pet_FAO_PM.C, pet_FAO_PM_hourly.C (check): Warn if wind or vapor
+	pressure are missing.
+
 2021-03-09  Per Abrahamsen  <pa@plen.ku.com>
 
 	* astronomy.C (ExtraterrestrialRadiation)

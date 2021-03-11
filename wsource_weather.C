@@ -1557,9 +1557,10 @@ static struct WSourceWeatherSyntax : public DeclareBase
                    Attribute::Const, "\
 Fraction of precipitation that falls as snow as function of air temperature.");
     PLF snow_fraction;
-    snow_fraction.add (-2.0, 1.0);
+    snow_fraction.add (0, 1.0);
     snow_fraction.add (2.0, 0.0);
-    frame.set ("snow_fraction", snow_fraction);
+    frame.set_cited ("snow_fraction", snow_fraction,"\
+This value is used by DMI as well as NMI.", {"forland1996manual", "dmi1413" });
     frame.declare ("max_rain", "mm", Attribute::OptionalConst,
                    "Largest amount of rain in one timestep.\n\
 By default, no limit on rain.");
