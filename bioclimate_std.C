@@ -1261,7 +1261,7 @@ BioclimateStandard::tick (const Time& time,
 
   if (weather.surface () == Weatherdata::field || h < h0)
     wind_speed_field_ = wind_speed_weather;
-  else
+  else if (weather.has_wind ())
     {
       const double u = wind_speed_weather; // wind speed at reference height [m/s]
       const double k = 0.41;  // von Karman constant
@@ -1274,9 +1274,10 @@ BioclimateStandard::tick (const Time& time,
       // Same height over vegetation.
       const double ScreenHeight1 = ScreenHeight + h - h0;
       wind_speed_field_ = (u_star / k) * log((ScreenHeight1 - d)/z);
+      daisy_assert (wind_speed_field_ >= 0.0);
     }
-  daisy_assert (wind_speed_field_ >= 0.0);
-
+  else
+    wind_speed_field_ = NAN;
   deposition->tick (vegetation, weather, msg);
 }
 

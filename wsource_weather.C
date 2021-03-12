@@ -1375,12 +1375,12 @@ WSourceWeather::vapor_pressure () const
 
 double
 WSourceWeather::wind () const
-{ return has_wind () ? impl->my_wind : 5.0; }
+{ return has_wind () ? impl->my_wind : NAN; }
 
 double
 WSourceWeather::CO2 () const
 { 
-  return has_CO2 () ? impl->my_CO2 * air_pressure () : -42.42e42; 
+  return has_CO2 () ? impl->my_CO2 * air_pressure () : NAN; 
 }
 
 double
@@ -1487,7 +1487,8 @@ WSourceWeather::output (Log& log) const
     output_value (impl->my_relative_humidity, "relative_humidity", log);
   output_value (air_pressure (), "air_pressure", log);
   output_value (diffuse_radiation (), "diffuse_radiation", log);
-  output_value (wind (), "wind", log);
+  if (has_wind ())
+    output_value (wind (), "wind", log);
   if (has_CO2 ())
     output_value (CO2 (), "co2", log);
   output_value (day_length (), "day_length", log);

@@ -3,6 +3,7 @@
 #include <algorithm>
 using std::complex;
 using std::max;
+using std::abs;
 
 inline double inf_norm (const complex<double> &z)
 {

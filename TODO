@@ -2,7 +2,25 @@ TODO ---things that needs to be done with Daisy -*- outline -*-
 
 * Merete og Simon
 
-** Fejl i Hargreaves.
+** cloudiness.C
+
+const
+
+weather
+
+clear: fc = a Si/Si0-(1-a)
+
+  Si = as * ext_rad
+  
+  simple: as = 0.75 + 2e-5 z
+
+     FAO: a = 1.35
+
+     Kjaersgaard2007: a = 1
+
+  ASCE: as = KB + KD
+
+  
 
 ** Vi skal tage beslutning om hvad der skal kunne vælges i en PM-beregning, og så få det implementeret konsekvent. Jeg har fremsendt et par dokumenter, der beskriver det. Det er
 
