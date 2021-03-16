@@ -1,3 +1,7 @@
+2021-03-16  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.10 released.
+
 2021-03-16  Per Abrahamsen  <pa@plen.ku.com>
 
 	* program_weather.C: Print estimates for solar noon.
