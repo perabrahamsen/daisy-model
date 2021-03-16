@@ -33,6 +33,7 @@
 #include "snow.h"
 #include "log.h"
 #include "mathlib.h"
+#include "cloudiness.h"
 #include "net_radiation.h"
 #include "pet.h"
 #include "difrad.h"
@@ -74,6 +75,8 @@ struct BioclimateStandard : public Bioclimate
   void CanopyStructure (const Vegetation&);
 
   // External water sinks and sources.
+  const std::unique_ptr<Cloudiness> cloudiness;
+  double cloudiness_index;	// 1 = clear day, << 1 cloudy.
   const std::unique_ptr<NetRadiation> net_radiation;
   std::unique_ptr<Pet> pet;       // Potential Evapotranspiration model.
   double total_ep_;             // Potential evapotranspiration [mm/h]
@@ -479,6 +482,8 @@ BioclimateStandard::check (const Weather& weather, Treelog& msg) const
 {
   TREELOG_MODEL (msg);
   bool ok = true;
+  if (!cloudiness->check (weather, msg))
+    ok = false;
   if (!pet->check (weather, msg))
     ok = false;
   if (!svat->check (weather, msg))
@@ -510,6 +515,8 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     sun_NIR_ (No + 1),
     sun_LAI_fraction_ (No),
     shared_light_fraction_ (1.0),
+    cloudiness (Librarian::build_item<Cloudiness> (al, "cloudiness")),
+    cloudiness_index (0.5),
     net_radiation (Librarian::build_item<NetRadiation> (al, "net_radiation")),
     pet (al.check ("pet") 
          ? Librarian::build_item<Pet> (al, "pet")
@@ -752,14 +759,34 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   // 1 External water sinks and sources. 
 
   // Net Radiation.
-  const double Cloudiness = weather.cloudiness ();
+  cloudiness->tick (weather, msg);
+  cloudiness_index = cloudiness->value ();
   const double air_temperature = weather.air_temperature ();//[dg C]
   const double VaporPressure = weather.vapor_pressure ();
   const double Si = weather.global_radiation ();
+  const bool use_ref_albedo = true;
+  const double ref_albedo = 0.23; // Reference crop for FAO_PM.
   albedo = find_albedo (vegetation, litter, surface, geo, soil, soil_water);
-  net_radiation->tick (Cloudiness, air_temperature, VaporPressure, Si, albedo,
+  net_radiation->tick (cloudiness_index, air_temperature, VaporPressure, Si,
+		       use_ref_albedo ? ref_albedo : albedo,
                        msg);
   const double Rn = net_radiation->net_radiation ();
+
+  // Ground heat flux.
+  double G = NAN;
+  const bool use_Daisy_G = true;
+  if (use_Daisy_G)
+    G = soil_heat.top_flux (geo, soil, soil_water);
+  else
+    {
+      const double rad = weather.extraterrestrial_radiation ();
+      const bool is_day = rad > 25.0;
+
+      if (is_day)
+	G = 0.1 * Rn;		// FAO56: Eq 45.
+      else
+	G = 0.5 * Rn;		// FAO56: Eq 46.
+    }
 
   // 1.1 Fluxify management operations.
 
@@ -777,7 +804,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     + canopy_water_storage + litter_water_storage;
 
   daisy_assert (pet.get () != NULL);
-  pet->tick (weather, Rn, vegetation, surface, 
+  pet->tick (weather, cloudiness_index, Rn, G, vegetation, surface, 
              geo, soil, soil_heat, soil_water, msg);
   if (free_water > 0.01)
     total_ep_ = pet->wet ();
@@ -1295,6 +1322,8 @@ BioclimateStandard::output (Log& log) const
 {
   output_variable (Height, log);
   output_variable (albedo, log);
+  output_derived (cloudiness, "cloudiness", log);
+  output_variable (cloudiness_index, log);
   output_derived (net_radiation, "net_radiation", log);
   output_derived (raddist, "raddist", log);
   daisy_assert (pet.get () != NULL);
@@ -1454,6 +1483,11 @@ Number of vertical intervals in which we partition the canopy.");
 End points of canopy layers.\n                                  \
 First entry is top of canopy, last is soil surface.");
     // External water sources and sinks.
+    frame.declare_object ("cloudiness", Cloudiness::component,
+			  "Cloudiness model.");
+    frame.set ("cloudiness", "weather");
+    frame.declare_fraction ("cloudiness_index", Attribute::LogOnly, "\
+Cloudiness index, 0 = no light, 1 = clear sky.");
     frame.declare_object ("net_radiation", NetRadiation::component,
                           "Net radiation.");
     frame.set ("net_radiation", "brunt");

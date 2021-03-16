@@ -1330,6 +1330,14 @@ WSourceWeather::daily_min_air_temperature () const
 { return impl->my_daily_min_air_temperature; }
 
 double
+WSourceWeather::ground_heat_flux () const
+{ return NAN; }
+
+double
+WSourceWeather::net_radiation () const
+{ return NAN; }
+
+double
 WSourceWeather::global_radiation () const
 { return impl->my_global_radiation; }
 
@@ -1393,6 +1401,18 @@ WSourceWeather::O2 () const
 double
 WSourceWeather::air_pressure () const
 { return FAO::AtmosphericPressure (elevation ()); }
+
+bool
+WSourceWeather::has_cloudiness () const
+{ return true; }
+
+bool
+WSourceWeather::has_ground_heat_flux () const
+{ return false; }
+
+bool
+WSourceWeather::has_net_radiation () const
+{ return false; }
 
 bool
 WSourceWeather::has_reference_evapotranspiration () const

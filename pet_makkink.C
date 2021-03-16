@@ -39,7 +39,9 @@ struct PetMakkinkOld : public Pet
   double potential_evapotranspiration_wet;
 
   // Simulation.
-  void tick (const Weather& weather, const double, const Vegetation& crops,
+  void tick (const Weather& weather,
+	     const double, const double, const double,
+	     const Vegetation& crops,
 	     const Surface& surface, const Geometry&,
              const Soil&, const SoilHeat&,
 	     const SoilWater&, Treelog&)
@@ -100,7 +102,8 @@ struct PetMakkink : public Pet
   double potential_evapotranspiration_wet;
 
   // Simulation.
-  void tick (const Weather& weather, const double, const Vegetation& crops,
+  void tick (const Weather& weather, const double, const double, const double,
+	     const Vegetation& crops,
 	     const Surface& surface, const Geometry&,
              const Soil&, const SoilHeat&,
 	     const SoilWater&, Treelog&)

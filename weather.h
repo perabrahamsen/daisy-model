@@ -46,14 +46,16 @@ public:
   virtual double daily_air_temperature () const = 0; // [dg C]
   virtual double daily_max_air_temperature () const = 0; // [dg C]
   virtual double daily_min_air_temperature () const = 0; // [dg C]
-  virtual double global_radiation () const = 0; // [W/m2]
-  virtual double daily_global_radiation () const = 0; // [W/m2]
-  virtual double diffuse_radiation () const = 0; // [W/m2]
+  virtual double ground_heat_flux () const = 0; // [W/m^2]
+  virtual double net_radiation () const = 0; // [W/m^2]
+  virtual double global_radiation () const = 0; // [W/m^2]
+  virtual double daily_global_radiation () const = 0; // [W/m^2]
+  virtual double diffuse_radiation () const = 0; // [W/m^2]
   virtual double reference_evapotranspiration () const = 0; // [mm/h]
   virtual double daily_precipitation () const = 0; // [mm/d]
   virtual double rain () const = 0;	// [mm/h]
   virtual double snow () const = 0;	// [mm/h]
-  virtual const IM& deposit () const = 0; // [g [stuff] /cm²/h]
+  virtual const IM& deposit () const = 0; // [g [stuff] /cm^2/h]
   virtual double cloudiness () const = 0; // [0-1]
   virtual double vapor_pressure () const = 0; // [Pa]
   virtual double wind () const = 0;	// [m/s]
@@ -63,6 +65,9 @@ public:
 
   // Initializing bioclimate.
 public:
+  virtual bool has_cloudiness () const = 0;
+  virtual bool has_ground_heat_flux () const = 0;
+  virtual bool has_net_radiation () const = 0;
   virtual bool has_reference_evapotranspiration () const = 0;
   virtual bool has_vapor_pressure () const = 0;
   virtual bool has_wind () const = 0;

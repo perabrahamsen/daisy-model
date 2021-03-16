@@ -31,14 +31,12 @@
 #include "log.h"
 #include "librarian.h"
 #include "frame.h"
-#include "net_radiation.h"
 #include "block_model.h"
 #include <sstream>
 #include <memory>
 
 class PetPM : public Pet
 {
-  std::unique_ptr<NetRadiation> net_radiation;
   const double rb;
 
 public:
@@ -49,7 +47,8 @@ public:
   double potential_evapotranspiration_dry;
 
   // Simulation.
-  void tick (const Weather& weather, const double Rn,
+  void tick (const Weather& weather,
+	     const double Cloudiness, const double Rn, const double G,
 	     const Vegetation& crops,
 	     const Surface& surface, const Geometry& geo,
              const Soil& soil,
@@ -75,9 +74,6 @@ public:
   // Create & Destroy.
   PetPM (const BlockModel& al)
     : Pet (al),
-      net_radiation (Librarian::build_stock<NetRadiation> (al.metalib (),
-                                                           al.msg (),
-                                                           "brunt", objid)),
       rb (al.number ("rb"))
     { }
   ~PetPM ()
@@ -85,7 +81,8 @@ public:
 };
 
 void
-PetPM::tick (const Weather& weather, const double Rn, 
+PetPM::tick (const Weather& weather,
+	     const double Cloudiness, const double Rn, const double G,
 	     const Vegetation& crops,
 	     const Surface& surface, const Geometry& geo,
              const Soil& soil,
@@ -98,10 +95,6 @@ PetPM::tick (const Weather& weather, const double Rn,
   const double VaporPressure = weather.vapor_pressure ();
   const double U2 = weather.wind ();
   const double AtmPressure = weather.air_pressure ();
-  const double Cloudiness = weather.cloudiness ();
-  
-  // Ground heat flux.
-  const double G = soil_heat.top_flux (geo, soil, soil_water);
 
   const double LAI = crops.LAI ();
   if (LAI > 0.0)
@@ -128,16 +121,8 @@ PetPM::tick (const Weather& weather, const double Rn,
     }
   else
     {
-      const double Si = weather.global_radiation ();
-
-      // Use reference crop as fallback for bare soil.
-      const double ref_albedo = 0.23;
-      net_radiation->tick (Cloudiness, Temp, VaporPressure, Si, ref_albedo, 
-                           msg);
-      const double ref_Rn = net_radiation->net_radiation ();
-      
       reference_evapotranspiration_dry
-	= FAO::RefPenmanMonteith (ref_Rn, G, Temp, VaporPressure, U2,
+	= FAO::RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2,
 				  AtmPressure)
 	* 3600;
 
@@ -146,7 +131,7 @@ PetPM::tick (const Weather& weather, const double Rn,
                                       reference_evapotranspiration_dry);
 
       reference_evapotranspiration_wet
-	= FAO::RefPenmanMonteithWet (ref_Rn, G, Temp, VaporPressure, U2,
+	= FAO::RefPenmanMonteithWet (Rn, G, Temp, VaporPressure, U2,
                                      AtmPressure, rb)
 	* 3600;
       potential_evapotranspiration_wet

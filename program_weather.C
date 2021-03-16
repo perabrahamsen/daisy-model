@@ -29,6 +29,7 @@
 #include "time.h"
 #include "assertion.h"
 #include "mathlib.h"
+#include "timestep.h"
 
 #include <fstream>
 #include <numeric>
@@ -93,39 +94,44 @@ struct ProgramWeather : public Program
     std::vector<std::vector<double>> P_all (367);
     std::vector<std::vector<double>> ET0_all (367);
     std::vector<std::vector<double>> N_all (367);
-  
+
+    std::vector<double> rad_count (24, 0.0);
+    std::vector<double> rad_sum (24, 0.0);
+    std::vector<std::vector<double>>  rad_all (24);
+    
+    
     Time time = begin;
+    while (time.hour () != 0)
+      time.tick_hour ();
+    
     while (time < end)
       {
 	double T = 0.0;
 	double P = 0.0;
 	double ET0 = 0.0;
 
-	const int old_day = time.yday ();
+	const int yday = time.yday ();
 	const int old_hour = time.hour ();
 	const int old_year = time.year ();
 	for (int i = 0; i < 24; i++)
 	  {
 	    time.tick_hour (1);
+	    const int h = time.hour ();
 	    weather->weather_tick (time, msg);
+	    
 	    T += weather->air_temperature ();
 	    P += weather->rain () + weather->snow ();
 	    ET0 += weather->reference_evapotranspiration ();
+
+	    const double rad = weather->global_radiation ();
+	    rad_count[h] += 1.0;
+	    rad_sum[h] += rad;
+	    rad_all[h].push_back (rad);
 	  }
 	T /= 24.0;
 
 	const double N = P - ET0;
 
-	const int yday = time.yday ();
-	daisy_assert (yday > 0 && yday < 367);
-	daisy_assert (yday != old_day);
-	daisy_assert (time.hour () == old_hour);
-	if (time.year () != old_year)
-	  {
-	    std::ostringstream tmp;
-	    tmp << time.year ();
-	    msg.message (tmp.str ());
-	  }
 	count[yday] += 1.0;
 	T_sum[yday] += T;
 	P_sum[yday] += P;
@@ -135,39 +141,92 @@ struct ProgramWeather : public Program
 	P_all[yday].push_back (P);
 	ET0_all[yday].push_back (ET0);
 	N_all[yday].push_back (N);
+	
+	daisy_assert (yday != time.yday ());
+	daisy_assert (yday > 0 && yday < 367);
+	daisy_assert (time.hour () == old_hour);
+	daisy_assert (old_hour == 0);
+	if (time.year () != old_year)
+	  {
+	    std::ostringstream tmp;
+	    tmp << time.year ();
+	    msg.message (tmp.str ());
+	  }
       }
-    // Temperature.
-    double a0 = 0.0;
-    double a1 = 0.0;
-    double b1 = 0.0;
-    // Precipitation.
-    double P_yearly = 0.0;
-    for (int i = 1; i < 366; i++)
-      {
-	daisy_assert (count[i] > 0.0);
-	// Temperature.
-	const double p = T_sum[i] / count[i];
-	const double t = i;
-	a0 += p * std::cos (2.0 * M_PI * 0.0 * t / 365.0);
-	a1 += p * std::cos (2.0 * M_PI * 1.0 * t / 365.0);
-	b1 += p * std::sin (2.0 * M_PI * 1.0 * t / 365.0);
-	// Precipitation.
-	P_yearly += P_sum[i] / count[i];
-      }
-    a0 *= 2.0 / 365.0;
-    a1 *= 2.0 / 365.0;
-    b1 *= 2.0 / 365.0;
 
-    const double A0 = a0;
-    const double A1 = std::sqrt (a1 * a1 + b1 * b1);
-    double phi = std::atan2 (b1, a1);
-    if (phi < 0.0)
-      phi += 2.0 * M_PI;
     std::ostringstream tmp;
-    tmp << "TAverage: " << 0.5 * A0 << " dgC\n"
-	<< "TAmplitude: " << A1 << " dgC\n"
-	<< "MaxTDay: " << std::round (phi * 365.0 / (2.0 * M_PI)) << " yday\n"
-	<< "PAverage: " << (P_yearly * 365.2425 / 365.0) << " mm";
+    // Year cycle.
+    {
+      // Temperature.
+      double a0 = 0.0;
+      double a1 = 0.0;
+      double b1 = 0.0;
+      // Precipitation.
+      double P_yearly = 0.0;
+      for (int i = 1; i < 366; i++)
+	{
+	  daisy_assert (count[i] > 0.0);
+	  // Temperature.
+	  const double p = T_sum[i] / count[i];
+	  const double t = i;
+	  a0 += p * std::cos (2.0 * M_PI * 0.0 * t / 365.0);
+	  a1 += p * std::cos (2.0 * M_PI * 1.0 * t / 365.0);
+	  b1 += p * std::sin (2.0 * M_PI * 1.0 * t / 365.0);
+	  // Precipitation.
+	  P_yearly += P_sum[i] / count[i];
+	}
+      a0 *= 2.0 / 365.0;
+      a1 *= 2.0 / 365.0;
+      b1 *= 2.0 / 365.0;
+      
+      const double A0 = a0;
+      const double A1 = std::sqrt (a1 * a1 + b1 * b1);
+      double phi = std::atan2 (b1, a1);
+      if (phi < 0.0)
+	phi += 2.0 * M_PI;
+      tmp << "TAverage: " << 0.5 * A0 << " dgC\n"
+	  << "TAmplitude: " << A1 << " dgC\n"
+	  << "MaxTDay: " << std::round (phi * 365.0 / (2.0 * M_PI)) << " yday\n"
+	  << "PAverage: " << (P_yearly * 365.2425 / 365.0) << " mm";
+    }
+    // Day cycle.
+    {
+      // Rad
+      double a0 = 0.0;
+      double a1 = 0.0;
+      double b1 = 0.0;
+      for (int i = 0; i < 25; i++)
+	{
+	  daisy_assert (rad_count[i] > 0.0);
+	  const double p = rad_sum[i] / rad_count[i];
+	  const double t = i;
+	  a0 += p * std::cos (2.0 * M_PI * 0.0 * t / 24.0);
+	  a1 += p * std::cos (2.0 * M_PI * 1.0 * t / 24.0);
+	  b1 += p * std::sin (2.0 * M_PI * 1.0 * t / 24.0);
+	}
+      a0 *= 2.0 / 24.0;
+      a1 *= 2.0 / 24.0;
+      b1 *= 2.0 / 24.0;
+      
+#if 0
+      const double A0 = a0;
+      const double A1 = std::sqrt (a1 * a1 + b1 * b1);
+#endif
+      double phi = std::atan2 (b1, a1);
+      if (phi < 0.0)
+	phi += 2.0 * M_PI;
+      const double noon = phi * 24.0 / (2.0 * M_PI);
+      const double timezone = weather->timezone ();
+      const double longitude = weather->longitude ();
+      const double timelag = (timezone - longitude) / 15.0;
+      Timestep step = Timestep::build_hours (noon - 0.5);
+      Timestep solar = Timestep::build_hours (noon - timelag - 0.5);
+      tmp << "\nSolar noon, local time: "
+	  << noon - 0.5 << " h = " << step.print ();
+      tmp << "\nSolar noon, solar time: "
+	  << (noon - timelag - 0.5) << " h = " << solar.print ();
+    }
+    
     msg.message (tmp.str ());
 
     if (file != Attribute::None ())

@@ -34,7 +34,6 @@
 #include "librarian.h"
 #include "frame.h"
 #include "block_model.h"
-#include "net_radiation.h"
 #include "mathlib.h"
 #include <sstream>
 #include <memory>
@@ -42,7 +41,6 @@
 class PetFAO_PM_hourly : public Pet
 {
   // Parameters.
-  std::unique_ptr<NetRadiation> net_radiation;
   const bool use_wet;
   const double rb;
 
@@ -52,11 +50,10 @@ public:
   double reference_evapotranspiration_dry;
   double potential_evapotranspiration_wet;
   double potential_evapotranspiration_dry;
-  double Rn;
-  double G;
 
   // Simulation.
-  void tick (const Weather& weather, const double Rn,
+  void tick (const Weather& weather, const double Cloudiness,
+	     const double Rn, const double G,
 	     const Vegetation& crops,
 	     const Surface& surface, const Geometry& geo,
              const Soil& soil,
@@ -70,9 +67,6 @@ public:
     output_variable (reference_evapotranspiration_wet, log);
     output_variable (potential_evapotranspiration_dry, log);
     output_variable (potential_evapotranspiration_wet, log);
-    if (Rn >= 0.0)
-      output_variable (Rn, log);
-    output_variable (G, log);
   }
 
   double wet () const
@@ -112,12 +106,8 @@ public:
 
   PetFAO_PM_hourly (const BlockModel& al)
     : Pet (al),
-      net_radiation (Librarian::build_stock<NetRadiation> (al.metalib (),
-                                                           al.msg (),
-                                                           "brunt", objid)),
       use_wet (al.flag ("use_wet")),
-      rb (al.number ("rb")),
-      Rn (-42.42e42)
+      rb (al.number ("rb"))
   { }
   ~PetFAO_PM_hourly ()
   { }
@@ -125,7 +115,8 @@ public:
 
 void
 PetFAO_PM_hourly::tick (const Weather& weather,
-			const double /* Rn */,
+			const double Cloudiness,
+			const double Rn, const double G, 
                         const Vegetation& crops,
                         const Surface& surface, const Geometry& geo, const Soil& soil,
                         const SoilHeat& soil_heat, const SoilWater& soil_water,
@@ -135,29 +126,7 @@ PetFAO_PM_hourly::tick (const Weather& weather,
   const double Temp = weather.air_temperature ();
   const double VaporPressure = weather.vapor_pressure ();
   const double U2 = weather.wind ();
-  double Cloudiness = weather.cloudiness ();
   const double AtmPressure = weather.air_pressure ();
-  const double Si = weather.global_radiation ();
-
-  // Reference net radiation.
-  const double ref_albedo = 0.23; // Reference crop.
-  net_radiation->tick (Cloudiness, Temp, VaporPressure, Si, ref_albedo, msg);
-  Rn = net_radiation->net_radiation ();
-
-  // Ground heat flux.
-  const bool use_Daisy_G = true;
-  if (use_Daisy_G)
-    G = soil_heat.top_flux (geo, soil, soil_water);
-  else
-    {
-      const double rad = weather.extraterrestrial_radiation ();
-      const bool is_day = rad > 25.0;
-
-      if (is_day)
-	G = 0.1 * Rn;		// FAO56: Eq 45.
-      else
-	G = 0.5 * Rn;		// FAO56: Eq 46.
-    }
 
   reference_evapotranspiration_dry
     = FAO::RefPenmanMonteithAllen2006 (Rn, G, Temp, VaporPressure, U2,
@@ -209,10 +178,6 @@ especially when feed with daily weather data.");
     frame.declare ("rb", "s/m", Attribute::Const, 
                    "Boundary layer resistance for wet surface.");
     frame.set ("rb", 20.0);
-    frame.declare ("Rn", "W/m^2", Attribute::LogOnly, 
-                   "Reference net radiation.");
-    frame.declare ("G", "W/m^2", Attribute::LogOnly, 
-                   "Soil heat flux.");
   }
 } PetFAO_PM_hourly_syntax;
 

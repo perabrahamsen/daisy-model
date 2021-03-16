@@ -1,6 +1,23 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* Spørgsmål
+
+Cloudiness factor = 1 <=> ingen skyer
+
+skal den begrænset til [0.3:1.0] ?
+
+Blonquist = ASCE tæt på FAO56 annex 3
+
+Jeg får meget højere forampning, også end i dwf filen
+
+* Når pet FAO_PM bruger sin egen brunt, er det for at få reference albedo
+
+
+
+
 * Merete og Simon
+
+** ground heat flux module
 
 ** cloudiness.C
 

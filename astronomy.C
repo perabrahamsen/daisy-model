@@ -48,11 +48,13 @@ Astronomy::SunsetHourAngle (double Dec, double Lat) // [rad]
 
 const double SolarConstant = 1366.7; // [W/m2]
 
-double
-Astronomy::DailyExtraterrestrialRadiation (const Time& time,
+double				// [W/m2]
+Astronomy::DailyExtraterrestrialRadiation (const Time& day,
                                            const double latitude)
-// [W/m2]
 {
+  // Noon.
+  const Time time = Time (day.year (), day.month (), day.mday (), 12.0);
+  
   // All equations from FAO56.
   const double dr = RelativeSunEarthDistance (time); // []
   const double Dec = SolarDeclination (time); // [rad]

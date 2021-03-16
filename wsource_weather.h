@@ -56,14 +56,16 @@ public:
   double daily_air_temperature () const; // [dg C]
   double daily_max_air_temperature () const; // [dg C]
   double daily_min_air_temperature () const; // [dg C]
-  double global_radiation () const; // [W/m2]
-  double daily_global_radiation () const; // [W/m2]
-  double diffuse_radiation () const; // [W/m2]
+  double ground_heat_flux () const; // [W/m^2]
+  double net_radiation () const; // [W/m^2]
+  double global_radiation () const; // [W/m^2]
+  double daily_global_radiation () const; // [W/m^2]
+  double diffuse_radiation () const; // [W/m^2]
   double reference_evapotranspiration () const; // [mm/h]
   double daily_precipitation () const; // [mm/d]
   double rain () const;	// [mm/h]
   double snow () const;	// [mm/h]
-  const IM& deposit () const; // [g [stuff] /cm²/h]
+  const IM& deposit () const; // [g [stuff] /cm^2/h]
   double cloudiness () const; // [0-1]
   double vapor_pressure () const; // [Pa]
   double wind () const;	// [m/s]
@@ -73,6 +75,9 @@ public:
 
   // Initializing bioclimate.
 public:
+  bool has_cloudiness () const;
+  bool has_ground_heat_flux () const;
+  bool has_net_radiation () const;
   bool has_reference_evapotranspiration () const;
   bool has_vapor_pressure () const;
   bool has_wind () const;

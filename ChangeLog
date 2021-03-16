@@ -1,3 +1,11 @@
+2021-03-16  Per Abrahamsen  <pa@plen.ku.com>
+
+	* program_weather.C: Print estimates for solar noon.
+
+	* cloudiness.C, cloudiness.h: New component.
+	* Makefile (COMPONENTS): Add it.
+	* bioclimate_std.C (cloudiness, cloudiness_index): Use it.
+
 2021-03-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.09 released.
