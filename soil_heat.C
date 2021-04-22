@@ -759,7 +759,7 @@ SoilHeat::top_flux (const Geometry& geo) const
     }
   total_q /= total_area;
   total_q *= 2.778e-7;          // [erg/cm^2/h] -> [W/m^2]
-  return total_q;
+  return -total_q;		// Positive up.
 }
 
 double 

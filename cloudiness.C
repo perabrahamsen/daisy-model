@@ -72,7 +72,7 @@ struct CloudinessConst : public Cloudiness
   // Simulation.
   void tick (const Weather&, Treelog&)
   { }
-  double value () const
+  double index () const
   { return cloudiness; }
 
   // Create.
@@ -108,7 +108,7 @@ struct CloudinessWeather : public Cloudiness
   void tick (const Weather& weather, Treelog&)
   { cloudiness = weather.cloudiness (); }
 
-  double value () const
+  double index () const
   { return cloudiness; }
 
   void output (Log& log) const
@@ -156,6 +156,8 @@ struct CloudinessClear : public Cloudiness
   const double min_rad;		// [W/m^2]
   const double min_sin_theta;	// [W/m^2]
   const double min_radiation_ratio; // []
+  const double min_time_to_sunset;  // [h]
+  const double min_time_from_sunrise;  // [h]
   
   // Log variables.
   double cloudiness;		// []
@@ -167,8 +169,14 @@ struct CloudinessClear : public Cloudiness
     const double Si = weather.global_radiation ();
     const double rad = weather.extraterrestrial_radiation ();
     const double sin_theta = weather.sin_solar_elevation_angle ();
-    
-    if (rad > min_rad && sin_theta > min_sin_theta)
+    const Time middle = weather.middle ();
+    const double now = middle.day_fraction ();
+    const double sunrise = weather.sunrise ();
+    const double sunset = sunrise + weather.day_length ();
+    const bool too_early =(now < sunrise + min_time_from_sunrise);
+    const bool too_late =(now > sunset + min_time_to_sunset);
+    if (rad > min_rad && sin_theta > min_sin_theta
+	&& !too_early && !too_late)
       {
 	const double Si0 = find_clear_sky_radiation (weather);
 	const double x = bound (min_radiation_ratio, Si / Si0, 1.0);
@@ -178,7 +186,7 @@ struct CloudinessClear : public Cloudiness
   }
   virtual double find_clear_sky_radiation (const Weather&) const = 0;
   
-  double value () const
+  double index () const
   { return cloudiness; }
 
   void output (Log& log) const
@@ -194,6 +202,9 @@ struct CloudinessClear : public Cloudiness
       min_rad (al.number ("min_extraterrestrial_radiation")),
       min_sin_theta (sin (al.number ("min_solar_elevation_angle"))),
       min_radiation_ratio (sin (al.number ("min_radiation_ratio"))),
+      min_time_to_sunset (al.number ("min_time_to_sunset")),
+      min_time_from_sunrise (al.number ("min_time_from_sunrise",
+					min_time_to_sunset)),
       cloudiness (al.number ("cloudiness", 0.5)),
       clear_sky_radiation (NAN)
   { }
@@ -229,6 +240,12 @@ FAO56 suggest 2-3 hour before sunset, ASCE suggest 20 dg solar angle.",
     frame.declare_fraction ("min_radiation_ratio", Attribute::Const, "\
 Lowest Si/Si0 ration for calculating cloudiness.");
     frame.set ("min_radiation_ratio", 0.3);
+    frame.declare ("min_time_to_sunset", "h", Attribute::Const, "\
+Don't calculate cloudiness after this time before sunset.");
+    frame.set ("min_time_to_sunset", 0.0);
+    frame.declare ("min_time_from_sunrise", "h", Attribute::OptionalConst, "\
+Don't calculate cloudiness less than this time after sunrise.\n\
+By default, equal to 'min_time_to_sunset'.");
     frame.declare_fraction ("cloudiness", Attribute::OptionalState, "\
 Cloudiness.");
     frame.declare ("clear_sky_radiation", "W/m^2", Attribute::LogOnly, "\

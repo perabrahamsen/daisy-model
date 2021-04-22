@@ -88,6 +88,7 @@ public:
 
   // Light distribution.
 public:
+  double sunrise () const;	// [h]
   double day_length () const; // [h]
 
   // Communication with SoilHeat.
@@ -100,6 +101,7 @@ public:
 
   // Astronomic utilities.
 public:
+  const Time& middle () const;
   double extraterrestrial_radiation () const; // [W/m2]
   double sin_solar_elevation_angle () const; // []
 protected:

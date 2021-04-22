@@ -36,18 +36,22 @@ public:
   static const char *const component;
   symbol library_id () const;
 
+  static const double SurEmiss;
+  static const double SB;       // Stefan-Boltzmann constant [W/m^2/K^4]
+
   // Simulation.
 public:
-  virtual void output (Log&) const = 0;
-  virtual double net_radiation () const = 0; // [W/m2] (positive downwards)
-  virtual double incoming_longwave_radiation () const = 0; // [W/m2] 
-  virtual void tick (double Cloudiness /* [0-1] */,
-		     double Temp /* [dg C] */, 
-		     double VapourPressure /* [kPa] */,
-		     double Si /* [W/m2] */, 
-		     double Albedo /* [0-1] */,
-		     Treelog&) = 0;
-
+  static double cloudiness_function (double Cloudiness,
+				     double black_body_radiation, 
+				     double epsilon_0);
+  virtual double find_epsilon_0 (double Ta /* [K] */,
+				 double ea /* [hPa] */) const = 0;
+  virtual double NetLongwaveRadiation (double Cloudiness, // 0-1 [W/m^2]
+				       double Temp /* [dg C] */,
+				       double VapourPressure /* [kPa] */,
+				       double L_ia /* [W/m^2] */) const = 0;
+  virtual void output (Log&) const;
+  
   // Create and Destroy.
 protected:
   NetRadiation (const BlockModel&);

@@ -1,5 +1,41 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* GHF module
+
+** test-ghf.dai
+
+Should have columns with all ghf models and a log with all of them.
+
+
+
+* pet_FAO_PM_daily: Use all daily data
+
+* skal vi regne både en Rn og en ref_Rn ud?
+
+Alle modeller undtagen PM skal bruge ref_Rn
+
+* clear_sky: min_time_to_sunset og min_time_from_sunrise
+
+* G: depth
+
+z
+
+init:
+
+for all edges
+  if (is_from_above != is_to_above)
+     count edge
+     weight = area
+     edge_weight = weight
+     total weight += weight
+
+for each edge
+  edge_weight /= total_weight
+  
+value:
+
+q_total = sum (q : weight)
+
 * Spørgsmål
 
 Cloudiness factor = 1 <=> ingen skyer

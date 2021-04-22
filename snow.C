@@ -50,13 +50,13 @@ struct Snow::Implementation
   // Parameters.
   const double mf;		// Snow pack depth melting factor [1/m]
   const double mtprime;		// Air temperature melting factor 
-				// [kg/m²/h C]
+				// [kg/m^2/h/dg C]
   const double mrprime;		// Radiation melting factor [kg/J]
   const double m1;		// Radiation melting linear factor [kg/J]
   const double m2;		// Radiation melting exponential factor [1/h]
-  const double rho_s;		// Density of newly fallen snow [kg/m³]
+  const double rho_s;		// Density of newly fallen snow [kg/m^3]
   const double f_c;		// Water capacity in snow factor
-  const double rho_1;		// Water collapse factor [kg/m³]
+  const double rho_1;		// Water collapse factor [kg/m^3]
   const double rho_2;		// Snow collapse factor [1/m]
   const double Psa;		// Absolute amount of snow required
 				// for snow to become new.
@@ -115,7 +115,8 @@ Snow::Implementation::tick (Treelog& msg,
 			    double Pond,
 			    double T, const double Epot,
                             const double dt)
-{ 
+{
+  // Equations from jansson1980soil.
   const double Ssnow_old = Ssnow;
   Pond = std::max (Pond, 0.0);
   Ssnow += Pond;
@@ -127,9 +128,9 @@ Snow::Implementation::tick (Treelog& msg,
   daisy_assert (Epot >= 0.0);
   daisy_assert (T > -374 && T <= 100);
 
-  static const double f = 1.0;	// Melting factor. [mm H2O / (kg H2O / m²)]
-  static const double rho_w = 1.0e3; // Density of water. [kg / m³]
-  static const double rho_i = 0.917e3; // Density of ice. [kg / m³]
+  static const double f = 1.0;	// Melting factor. [mm H2O / (kg H2O / m^2)]
+  static const double rho_w = 1.0e3; // Density of water. [kg/m^3]
+  static const double rho_i = 0.917e3; // Density of ice. [kg/m^3]
   static const double Lm = 3.34e5; // Snow melting heat factor. [J/kg]
 
   // Total precipitation. [mm/h]
@@ -162,17 +163,19 @@ Snow::Implementation::tick (Treelog& msg,
   double dZp = 0.0;
   if (Psnow > 0.0)
     {
-      // Density of snow-rain mixture. [kg/m³]
+      // Density of snow-rain mixture. [kg/m^3]
       const double rho_p = rho_w + (rho_s - rho_w) * Psnow / P;
       daisy_assert (rho_p >= 0.0);
       dZp = P * dt / (f * rho_p);
     }
   daisy_assert (dZp >= 0.0);
 
-  // Air temperature melting factor. [kg/J]
-  const double mt = mtprime * ((T < 0.0) 
-                               ? std::min (1.0, (dZs + dZp) * mf) 
-                               : 1);
+  // Air temperature melting factor. [kg/J] Eq 46.
+  const double mt = mtprime * ((T < 0.0 && (dZs + dZp) > 0.0) 
+                               ? std::min (1.0, 1.00 / ((dZs + dZp) * mf)) 
+                               : 1.0);
+  daisy_assert (std::isfinite (mt));
+  daisy_assert (mt <= mtprime);
   
   // Radiation melting factor. [kg/J]
   const double mr = mrprime * (1 + m1 * (1 - exp (-m2 * age)));
@@ -244,7 +247,7 @@ Snow::Implementation::tick (Treelog& msg,
     {
       if (dZs > 0.0)
 	{
-	  // Density of collapsing snow pack [kg/m³]
+	  // Density of collapsing snow pack [kg/m^3]
 	  daisy_assert (Scapacity > 0.0);
 	  const double rho_c
 	    = std::max (Ssnow_old / (f * dZs), 
@@ -365,7 +368,7 @@ Snow::load_syntax (Frame& frame)
 
   static const double hours_per_day = 24.0; // [h/d]
 
-  // frame.set_strings ("cite", "snow1956"); // Not implemented for submodels.
+  // frame.set_strings ("cite", "snow1956", "jansson1980soil"); // Not implemented for submodels.
   frame.declare ("EvapSnowPack", "mm/h", Attribute::LogOnly, 
 	      "Evaporation from snowpack.");
   frame.declare ("q_s", "mm/h", Attribute::LogOnly,
@@ -385,7 +388,7 @@ Snow::load_syntax (Frame& frame)
   frame.declare ("mf", "m^-1", Attribute::Const,
 	      "Snow pack depth melting factor.");
   frame.set ("mf", 10.0);
-  frame.declare ("mtprime", "kg/m^2/h C", Attribute::Const,
+  frame.declare ("mtprime", "kg/m^2/h/dg C", Attribute::Const,
 	      "Air temperature melting factor.");
   frame.set ("mtprime", 2.0 / hours_per_day);
   frame.declare ("mrprime", "kg/J", Attribute::Const,

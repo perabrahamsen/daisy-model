@@ -40,7 +40,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Weather&, Treelog&) = 0;
-  virtual double value () const = 0;		     // []
+  virtual double index () const = 0;		     // []
   virtual void output (Log&) const;
 
   // Create and Destroy.

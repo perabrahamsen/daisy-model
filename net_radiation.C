@@ -2,6 +2,7 @@
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
+// Copyright 2021 KU
 //
 // This file is part of Daisy.
 // 
@@ -29,6 +30,8 @@
 #include "librarian.h"
 #include "frame.h"
 
+// The 'net_radiation' component.
+
 const char *const NetRadiation::component = "net_radiation";
 
 symbol
@@ -38,7 +41,21 @@ NetRadiation::library_id () const
   return id;
 }
 
-// Interface class.
+const double NetRadiation::SurEmiss = 0.98;
+const double NetRadiation::SB = 5.67e-8; // [W/m^2/K^4]
+
+double
+NetRadiation::cloudiness_function (double Cloudiness,
+				   double black_body_radiation, 
+				   double epsilon_0)
+{
+  const double s = 1 - Cloudiness; // fraction of cloud sky
+  return (s + (1 - s) * epsilon_0) * black_body_radiation;   
+}
+
+void
+NetRadiation::output (Log&) const
+{ }
 
 NetRadiation::NetRadiation (const BlockModel& al)
   : ModelDerived (al.type_name ())
@@ -47,93 +64,26 @@ NetRadiation::NetRadiation (const BlockModel& al)
 NetRadiation::~NetRadiation ()
 { }
 
-// Intermediate class
-
-struct NetRadiationParent : public NetRadiation
+static struct NetRadiationInit : public DeclareComponent 
 {
-  static const double SurEmiss;
-  static const double SB;       // Stefan-Boltzmann constant [W/m^2/K^4]
-
-  // State
-  double net_radiation_;        // [W/m^2]
-  double L_n;                   // Net longwave radiation [W/m^2]
-  double L_ia;                  // incoming longwave radiation [W/m^2]
-  double L_i0;         // clear sky incoming longwave radiation [W/m^2]
-  double epsilon_0;             // [unitless]
-  double black_body_radiation;  // [W/m^2]
-  // Utilities
-  virtual double NetLongwaveRadiation (double Cloudiness, // [W/m^2]
-				       double Temp,
-				       double VapourPressure) const 
-  { return SurEmiss * black_body_radiation - L_ia; } 
-
-  virtual double find_epsilon_0 (double Ta, double ea) const = 0;
-
-  static double cloudiness_function (double Cloudiness, double black_body_radiation, 
-                                     double epsilon_0)
-  {
-    const double s = 1 - Cloudiness; // fraction of cloud sky
-    return (s + (1 - s) * epsilon_0) * black_body_radiation;   
-  }
-
-  // Simulation.
-  void output (Log&) const;
-  double net_radiation () const
-  { return net_radiation_; }
-  double incoming_longwave_radiation () const
-  { return L_ia; }
-  void tick (double Cloudiness, double Temp,
-	     double VapourPressure, double Si,
-	     double Albedo, Treelog&)
-  {
-    const double Ta = Temp + 273.15; // [K]
-    black_body_radiation = SB * pow(Ta, 4);
-    const double ea = VapourPressure / 100.; // Pa -> hPa
-    epsilon_0 = find_epsilon_0 (Ta, ea);
-    L_i0 = epsilon_0 * black_body_radiation;
-    L_ia = cloudiness_function (Cloudiness, black_body_radiation, epsilon_0);
-    VapourPressure *= 0.001;	// Pa -> kPa
-    L_n  = - NetLongwaveRadiation (Cloudiness, Temp, VapourPressure);
-    net_radiation_ = (1.0 - Albedo) * Si + L_n;
-  }
-
-  // Create & Destroy.
-  NetRadiationParent (const BlockModel& al)
-    : NetRadiation (al),
-      net_radiation_ (0.0),
-      L_n (0.0),
-      L_ia (0.0),
-      L_i0 (0.0),
-      epsilon_0 (0.0),
-      black_body_radiation (0.0)
+  NetRadiationInit ()
+    : DeclareComponent (NetRadiation::component, "\
+Calculate net radiation from meteorological data.")
   { }
-};
+  void load_frame (Frame&) const
+  { }
+} NetRadiation_init;
 
-const double NetRadiationParent::SurEmiss = 0.98;
-const double NetRadiationParent::SB = 5.67e-8; // [W/m^2/K^4]
+// The 'brunt' model.
 
-void
-NetRadiationParent::output (Log& log) const
-{
-  output_value (net_radiation (), "net_radiation", log);
-  output_variable (L_n, log);
-  output_variable (L_ia, log);
-  output_variable (L_i0, log);
-  output_variable (epsilon_0, log);
-  output_variable (black_body_radiation, log);  
-}
-
-// Model classes.
-
-
-struct NetRadiationBrunt : public NetRadiationParent
+struct NetRadiationBrunt : public NetRadiation
 {
   const double a;
   const double b;
 
   double NetLongwaveRadiation(double Cloudiness, // [W/m2]
 			      double Temp,
-			      double VapourPressure) const
+			      double VapourPressure, double) const
   {
     const double NetEmiss = a - b * sqrt (VapourPressure);
 #if 0
@@ -152,118 +102,11 @@ struct NetRadiationBrunt : public NetRadiationParent
   }
 
   NetRadiationBrunt (const BlockModel& al)
-    : NetRadiationParent (al),
+    : NetRadiation (al),
       a (al.number ("a")),
       b (al.number ("b"))
   { }
 };
-
-struct NetRadiationIdsoJackson : public NetRadiationParent
-{
-  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
-			      double Temp,
-			      double) const
-  {
-    const double NetEmiss = 0.261 * exp (-7.77e-4 * pow (Temp, 2)) - 0.02;
-    return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
-  }
-
-  double find_epsilon_0 (double Ta, double ea) const
-  {
-    const double A = 0.261;     // []
-    const double B = -0.000777; // [K^-2]
-    return (1 - A * exp(B * sqr (273.15 - Ta)));
-  }
-  
-  NetRadiationIdsoJackson (const BlockModel& al)
-    : NetRadiationParent (al)
-  { }
-};
-
-struct NetRadiationBrutsaert : public NetRadiationParent
-{
-  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
-			      double Temp,
-			      double VapourPressure) const
-  {
-    const double ea = VapourPressure / 10.0;   /*mb*/
-    const double NetEmiss
-      = SurEmiss * (1 - 1.24 * pow (ea / (Temp + 273), 1.0 / 7.0));
-    return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
-  }
-
-  double find_epsilon_0 (double Ta, double ea /*[hPa] */) const
-  {
-    const double A = 1.24;     // [K^1/7 hPa^-1/7]
-    return (A * pow(ea/Ta, 1./7.));
-  }
-
-  NetRadiationBrutsaert (const BlockModel& al)
-    : NetRadiationParent (al)
-  { }
-};
-
-struct NetRadiationSwinbank : public NetRadiationParent
-{
-  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
-			      double Temp,
-			      double) const
-  {
-    const double NetEmiss = SurEmiss * (1 - 0.92e-5 * pow (Temp + 273, 2));
-    return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
-  }
-
-  double find_epsilon_0 (double Ta, double ea /*[hPa] */) const
-  {
-    const double A = 9.2E-6;     // [K^-2]
-    return (A * sqr (Ta));
-  }
-
-  NetRadiationSwinbank (const BlockModel& al)
-    : NetRadiationParent (al)
-  { }
-};
-
-struct NetRadiationSatterlund : public NetRadiationParent
-{
-  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
-			      double Temp,
-			      double VapourPressure) const
-  {
-    const double ea = VapourPressure / 10.0;   /*mb*/
-    const double NetEmiss
-      = SurEmiss * (1 - 1.08 * (1 - exp (-pow (ea, (Temp + 273) / 2016.0))));
-    return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
-  }
-
-  double find_epsilon_0 (double Ta, double ea /*[hPa] */) const
-  {
-    const double A = 1.08;      // [?]
-    const double B = 2016.;      // [?]
-    return (A * (1 - exp(- pow(ea, Ta/B))));
-  }
-
-  NetRadiationSatterlund (const BlockModel& al)
-    : NetRadiationParent (al)
-  { }
-};
-
-struct NetRadiationPrata : public NetRadiationParent
-{
-  double find_epsilon_0 (double Ta, double ea /*[hPa] */) const
-  {
-    const double A = 1.2;      // []
-    const double B = 3.0;      // []
-    const double w = 46.5 * ea / Ta; // []
-    return (1 - (1 + w) * exp ( - sqrt( A + B * w)));
-  }
-
-  NetRadiationPrata (const BlockModel& al)
-    : NetRadiationParent (al)
-  { }
-};
-
-// Add models to library.
 
 static struct NetRadiationBruntSyntax : public DeclareModel
 {
@@ -287,6 +130,30 @@ FAO recommendation.")
   }
 } NetRadiationBrunt_syntax;
 
+// The 'idso_jackson' model.
+
+struct NetRadiationIdsoJackson : public NetRadiation
+{
+  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
+			      double Temp,
+			      double, double) const
+  {
+    const double NetEmiss = 0.261 * exp (-7.77e-4 * pow (Temp, 2)) - 0.02;
+    return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
+  }
+
+  double find_epsilon_0 (double Ta, double ea) const
+  {
+    const double A = 0.261;     // []
+    const double B = -0.000777; // [K^-2]
+    return (1 - A * exp(B * sqr (273.15 - Ta)));
+  }
+  
+  NetRadiationIdsoJackson (const BlockModel& al)
+    : NetRadiation (al)
+  { }
+};
+
 static struct NetRadiationIJSyntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
@@ -298,6 +165,31 @@ static struct NetRadiationIJSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   { }
 } NetRadiationIH_syntax;
+
+// The 'brutsaert' model.
+
+struct NetRadiationBrutsaert : public NetRadiation
+{
+  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
+			      double Temp,
+			      double VapourPressure, double) const
+  {
+    const double ea = VapourPressure / 10.0;   /*mb*/
+    const double NetEmiss
+      = SurEmiss * (1 - 1.24 * pow (ea / (Temp + 273), 1.0 / 7.0));
+    return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
+  }
+
+  double find_epsilon_0 (double Ta, double ea /*[hPa] */) const
+  {
+    const double A = 1.24;     // [K^1/7 hPa^-1/7]
+    return (A * pow(ea/Ta, 1./7.));
+  }
+
+  NetRadiationBrutsaert (const BlockModel& al)
+    : NetRadiation (al)
+  { }
+};
 
 static struct NetRadiationBrutsaertSyntax : public DeclareModel
 {
@@ -311,6 +203,29 @@ static struct NetRadiationBrutsaertSyntax : public DeclareModel
   { }
 } NetRadiationBrutsaert_syntax;
 
+// The 'swinbank' model.
+
+struct NetRadiationSwinbank : public NetRadiation
+{
+  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
+			      double Temp,
+			      double, double) const
+  {
+    const double NetEmiss = SurEmiss * (1 - 0.92e-5 * pow (Temp + 273, 2));
+    return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
+  }
+
+  double find_epsilon_0 (double Ta, double ea /*[hPa] */) const
+  {
+    const double A = 9.2E-6;     // [K^-2]
+    return (A * sqr (Ta));
+  }
+
+  NetRadiationSwinbank (const BlockModel& al)
+    : NetRadiation (al)
+  { }
+};
+
 static struct NetRadiationSwinbankSyntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
@@ -322,6 +237,32 @@ static struct NetRadiationSwinbankSyntax : public DeclareModel
   void load_frame (Frame&) const
   { }
 } NetRadiationSwinbank_syntax;
+
+// The 'satterlund' model.
+
+struct NetRadiationSatterlund : public NetRadiation
+{
+  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
+			      double Temp,
+			      double VapourPressure, double) const
+  {
+    const double ea = VapourPressure / 10.0;   /*mb*/
+    const double NetEmiss
+      = SurEmiss * (1 - 1.08 * (1 - exp (-pow (ea, (Temp + 273) / 2016.0))));
+    return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
+  }
+
+  double find_epsilon_0 (double Ta, double ea /*[hPa] */) const
+  {
+    const double A = 1.08;      // [?]
+    const double B = 2016.;      // [?]
+    return (A * (1 - exp(- pow(ea, Ta/B))));
+  }
+
+  NetRadiationSatterlund (const BlockModel& al)
+    : NetRadiation (al)
+  { }
+};
 
 static struct NetRadiationSatterlundSyntax : public DeclareModel
 {
@@ -335,6 +276,33 @@ static struct NetRadiationSatterlundSyntax : public DeclareModel
   { }
 } NetRadiationSatterlund_syntax;
 
+// The 'prata' model.
+
+struct NetRadiationPrata : public NetRadiation
+{
+  double NetLongwaveRadiation (double, 
+			       double Temp,
+			       double,
+			       double L_ia) const // [W/m^2]
+  {
+    const double Ta = Temp + 273.15; // [K]
+    const double black_body_radiation = SB * std::pow (Ta, 4.0);
+    return SurEmiss * black_body_radiation - L_ia;
+  } 
+
+  double find_epsilon_0 (double Ta, double ea /*[hPa] */) const
+  {
+    const double A = 1.2;      // []
+    const double B = 3.0;      // []
+    const double w = 46.5 * ea / Ta; // []
+    return (1 - (1 + w) * exp ( - sqrt( A + B * w)));
+  }
+
+  NetRadiationPrata (const BlockModel& al)
+    : NetRadiation (al)
+  { }
+};
+
 static struct NetRadiationPrataSyntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
@@ -346,31 +314,5 @@ static struct NetRadiationPrataSyntax : public DeclareModel
   void load_frame (Frame&) const
   { }
 } NetRadiationPrata_syntax;
-
-static struct NetRadiationInit : public DeclareComponent 
-{
-  NetRadiationInit ()
-    : DeclareComponent (NetRadiation::component, "\
-The purpose of this component is to calculate the net radiation from\n\
-other meteorological data.")
-  { }
-  void load_frame (Frame& frame) const
-  {
-    // Logs.
-    frame.declare ("net_radiation", "W/m^2", Attribute::LogOnly,
-                "The calculated net radiation (positive downwards).");
-    frame.declare ("L_n", "W/m^2", Attribute::LogOnly,
-                "The calculated net longwave radiation (positive downwards).");
-    frame.declare ("L_ia", "W/m^2", Attribute::LogOnly,
-                "The calculated incoming longwave radiation (positive downwards).");
-    frame.declare ("L_i0", "W/m^2", Attribute::LogOnly,
-                "The calculated clear sky incoming longwave radiation (positive downwards).");
-    frame.declare ("epsilon_0", Attribute::None(), Attribute::LogOnly,
-                "Atmospheric effective clearsky emmisivity (range 0-1).");
-    frame.declare ("black_body_radiation", "W/m^2", Attribute::LogOnly, "\
-Radiation emitted by black bodies at current air temperature.\n\
-Stefan-Boltzmann's law.");
-  }
-} NetRadiation_init;
 
 // net_radiation.C ends here

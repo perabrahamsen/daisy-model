@@ -6,6 +6,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.10
+
+** New cloudiness module. 
+
 * 6.09
 
 ** Changed default value for snow fraction.

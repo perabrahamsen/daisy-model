@@ -105,6 +105,7 @@ public:
   double my_day_cycle;
   double my_global_radiation;
   double my_sin_solar_elevation_angle;
+  Time my_middle;
   double my_extraterrestrial_radiation;
   double my_diffuse_radiation;
   double my_reference_evapotranspiration;
@@ -729,7 +730,10 @@ WSourceWeather::Implementation::tick_weather (const Time& time, Treelog& msg)
       day_end = day_start;
       day_end.tick_day (1);
       my_day_length = Astronomy::DayLength (next, weather.latitude ());
-      my_sunrise = 12.0 - my_day_length * 0.5; // Use astronomy.C.
+      const double timezone = weather.timezone ();
+      const double longitude = weather.longitude ();
+      const double timelag = (timezone - longitude) / 15.0;
+      my_sunrise = 12.0 + timelag - my_day_length * 0.5; // Use astronomy.C.
 
       // Global radiation.
       extract_average (day_start, day_end, 
@@ -867,6 +871,8 @@ WSourceWeather::Implementation::tick_weather (const Time& time, Treelog& msg)
 					  + std::max (sin_beta_2, 0.0));
   
   // Day cycle.
+  const Timestep step = next - previous;
+  my_middle = next + step / 2;
   my_extraterrestrial_radiation
     = Astronomy::ExtraterrestrialRadiation (previous, next, weather.latitude (),
 					    weather.longitude (), 
@@ -1262,6 +1268,7 @@ WSourceWeather::Implementation::Implementation (const Weather& w,
     my_day_cycle (NAN),
     my_global_radiation (NAN),
     my_sin_solar_elevation_angle (NAN),
+    my_middle (Time::null()),
     my_extraterrestrial_radiation (NAN),
     my_diffuse_radiation (NAN),
     my_reference_evapotranspiration (NAN),
@@ -1442,6 +1449,10 @@ double
 WSourceWeather::timestep () const
 { return Time::fraction_hours_between (impl->previous, impl->next); }
 
+const Time&
+WSourceWeather::middle () const
+{ return impl->my_middle; }
+
 double
 WSourceWeather::extraterrestrial_radiation () const // [W/m2]
 { return impl->my_extraterrestrial_radiation; }
@@ -1449,6 +1460,10 @@ WSourceWeather::extraterrestrial_radiation () const // [W/m2]
 double
 WSourceWeather::sin_solar_elevation_angle () const // []
 { return impl->my_sin_solar_elevation_angle; }
+
+double
+WSourceWeather::sunrise () const
+{ return impl->my_sunrise; }
 
 double
 WSourceWeather::day_length () const
@@ -1511,6 +1526,8 @@ WSourceWeather::output (Log& log) const
     output_value (wind (), "wind", log);
   if (has_CO2 ())
     output_value (CO2 (), "co2", log);
+  output_value (impl->my_sunrise, "sunrise", log);
+  output_value (impl->my_sunrise + impl->my_day_length, "sunset", log);
   output_value (day_length (), "day_length", log);
   output_submodule (deposit (), "deposit", log);
 }
@@ -1620,7 +1637,14 @@ Current level extraterrestrial radiation realtive to day average.");
                    Attribute::LogOnly, "Relative humidity.");
     frame.declare ("air_pressure", "Pa", Attribute::LogOnly, "Air pressure.");
     frame.declare ("wind", "m/s", Attribute::LogOnly, "Wind speed.");
-    frame.declare ("co2", "Pa", Attribute::LogOnly, "Atmospheric CO2 pressure.");
+    frame.declare ("co2", "Pa", Attribute::LogOnly,
+		   "Atmospheric CO2 pressure.");
+    frame.declare ("sunrise", "h", Attribute::LogOnly,
+                   "Time of sunrise.");
+    frame.declare ("sunrise", "h", Attribute::LogOnly,
+                   "Time of sunrise.");
+    frame.declare ("sunset", "h", Attribute::LogOnly,
+                   "Time of sunset.");
     frame.declare ("day_length", "h", Attribute::LogOnly,
                    "Number of light hours this day.");
     frame.declare_submodule_sequence ("deposit", Attribute::LogOnly, "\

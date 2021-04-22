@@ -78,6 +78,8 @@ public:
 
   // Light distribution.
 public:
+  virtual const Time& middle () const = 0; // Middle of current timestep.
+  virtual double sunrise () const = 0; // [h]
   virtual double day_length () const = 0; // [h]
 
   // Communication with SoilHeat.
@@ -90,6 +92,7 @@ public:
 
   // Astronomic utilities.
 public:
+  
   virtual double extraterrestrial_radiation () const = 0; // [W/m2]
   virtual double sin_solar_elevation_angle () const = 0; // []
 

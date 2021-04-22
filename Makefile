@@ -289,7 +289,7 @@ DISABLED = depend.C \
 
 # A component is a common interface to a number of models.
 # 
-COMPONENTS = cloudiness.C \
+COMPONENTS = ghf.C cloudiness.C \
 	retention.C litter.C cstage.C rate.C rubiscoN.C solupt.C soilph.C \
 	deposition.C uifilter.C zone.C wsource.C drain.C \
 	draineqd.C condedge.C rainergy.C ponddamp.C scope_model.C seed.C \

@@ -35,6 +35,7 @@
 #include "mathlib.h"
 #include "cloudiness.h"
 #include "net_radiation.h"
+#include "ghf.h"
 #include "pet.h"
 #include "difrad.h"
 #include "raddist.h"
@@ -77,7 +78,16 @@ struct BioclimateStandard : public Bioclimate
   // External water sinks and sources.
   const std::unique_ptr<Cloudiness> cloudiness;
   double cloudiness_index;	// 1 = clear day, << 1 cloudy.
+  double L_n;                   // Net longwave radiation [W/m^2]
+  double L_ia;                  // incoming longwave radiation [W/m^2]
+  double L_i0;	      // clear sky incoming longwave radiation [W/m^2]
+  double epsilon_0;             // [unitless]
+  double black_body_radiation;  // [W/m^2]
   const std::unique_ptr<NetRadiation> net_radiation;
+  double Rn;			// Net radiation, field conditions
+  double Rn_ref;		// Net radiation, reference surface.
+  const std::unique_ptr<GHF> ghf;
+  double G;			// Ground heat flux [?]
   std::unique_ptr<Pet> pet;       // Potential Evapotranspiration model.
   double total_ep_;             // Potential evapotranspiration [mm/h]
   double total_ea_;             // Actual evapotranspiration [mm/h]
@@ -518,6 +528,10 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     cloudiness (Librarian::build_item<Cloudiness> (al, "cloudiness")),
     cloudiness_index (0.5),
     net_radiation (Librarian::build_item<NetRadiation> (al, "net_radiation")),
+    Rn (NAN),
+    Rn_ref (NAN),
+    ghf (Librarian::build_item<GHF> (al, "ghf")),
+    G (NAN),
     pet (al.check ("pet") 
          ? Librarian::build_item<Pet> (al, "pet")
          : NULL),
@@ -704,7 +718,6 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation, const d
   absorbed_shadow_NIR_canopy = absorbed_total_NIR_canopy - absorbed_sun_NIR_canopy;
 
   //Absorbed Long wave radiation in the canopy and the soil:
-  incoming_Long_radiation = net_radiation->incoming_longwave_radiation();
 
   sun_LAI_fraction_total_ = 0.0;
   for (int i = 0; i < No; i++)
@@ -760,33 +773,33 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 
   // Net Radiation.
   cloudiness->tick (weather, msg);
-  cloudiness_index = cloudiness->value ();
+  cloudiness_index = cloudiness->index ();
   const double air_temperature = weather.air_temperature ();//[dg C]
   const double VaporPressure = weather.vapor_pressure ();
   const double Si = weather.global_radiation ();
-  const bool use_ref_albedo = true;
   const double ref_albedo = 0.23; // Reference crop for FAO_PM.
   albedo = find_albedo (vegetation, litter, surface, geo, soil, soil_water);
-  net_radiation->tick (cloudiness_index, air_temperature, VaporPressure, Si,
-		       use_ref_albedo ? ref_albedo : albedo,
-                       msg);
-  const double Rn = net_radiation->net_radiation ();
+  const double Cloudiness = cloudiness_index;
+  const double Temp = air_temperature;
+  const double Ta = Temp + 273.15; // [K]
+  black_body_radiation = NetRadiation::SB * pow(Ta, 4);
+  const double ea = VaporPressure / 100.; // Pa -> hPa
+  epsilon_0 = net_radiation->find_epsilon_0 (Ta, ea);
+  L_i0 = epsilon_0 * black_body_radiation;
+  L_ia = NetRadiation::cloudiness_function (Cloudiness,
+					    black_body_radiation, epsilon_0);
+  const double VaporPressure_kPa = VaporPressure * 0.001; // Pa -> kPa
+  L_n  = - net_radiation->NetLongwaveRadiation (Cloudiness,
+						Temp, VaporPressure_kPa,
+						L_ia);
+  Rn = (1.0 - albedo) * Si + L_n;
+  Rn_ref = (1.0 - ref_albedo) * Si + L_n;
+
+  incoming_Long_radiation = L_ia;
 
   // Ground heat flux.
-  double G = NAN;
-  const bool use_Daisy_G = true;
-  if (use_Daisy_G)
-    G = soil_heat.top_flux (geo, soil, soil_water);
-  else
-    {
-      const double rad = weather.extraterrestrial_radiation ();
-      const bool is_day = rad > 25.0;
-
-      if (is_day)
-	G = 0.1 * Rn;		// FAO56: Eq 45.
-      else
-	G = 0.5 * Rn;		// FAO56: Eq 46.
-    }
+  G = ghf->value (geo, soil, soil_water, soil_heat,
+		  weather, Rn, msg);
 
   // 1.1 Fluxify management operations.
 
@@ -1325,6 +1338,14 @@ BioclimateStandard::output (Log& log) const
   output_derived (cloudiness, "cloudiness", log);
   output_variable (cloudiness_index, log);
   output_derived (net_radiation, "net_radiation", log);
+  output_variable (L_n, log);
+  output_variable (L_ia, log);
+  output_variable (L_i0, log);
+  output_variable (epsilon_0, log);
+  output_variable (black_body_radiation, log);
+  output_variable (Rn, log);
+  output_variable (Rn_ref, log);
+  output_variable (G, log);
   output_derived (raddist, "raddist", log);
   daisy_assert (pet.get () != NULL);
   output_object (pet.get (), "pet", log);
@@ -1491,6 +1512,26 @@ Cloudiness index, 0 = no light, 1 = clear sky.");
     frame.declare_object ("net_radiation", NetRadiation::component,
                           "Net radiation.");
     frame.set ("net_radiation", "brunt");
+    frame.declare ("L_n", "W/m^2", Attribute::LogOnly,
+                "The calculated net longwave radiation (positive downwards).");
+    frame.declare ("L_ia", "W/m^2", Attribute::LogOnly,
+                "The calculated incoming longwave radiation (positive downwards).");
+    frame.declare ("L_i0", "W/m^2", Attribute::LogOnly,
+                "The calculated clear sky incoming longwave radiation (positive downwards).");
+    frame.declare ("epsilon_0", Attribute::None(), Attribute::LogOnly,
+                "Atmospheric effective clearsky emmisivity (range 0-1).");
+    frame.declare ("black_body_radiation", "W/m^2", Attribute::LogOnly, "\
+Radiation emitted by black bodies at current air temperature.\n\
+Stefan-Boltzmann's law.");
+    frame.declare ("Rn", "W/m^2", Attribute::LogOnly, "\
+Net radiation on field.");
+    frame.declare ("Rn_ref", "W/m^2", Attribute::LogOnly, "\
+Net radiation on reference surface.");
+    frame.declare_object ("ghf", GHF::component,
+                          "Ground heat flux.");
+    frame.set ("ghf", "old");
+    frame.declare ("G", "W/m^2", Attribute::LogOnly, "\
+Ground heat flux.");
     frame.declare_object ("pet", Pet::component, 
                           Attribute::OptionalState, Attribute::Singleton, 
                           "Potential Evapotranspiration component.\n\
