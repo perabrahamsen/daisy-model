@@ -45,10 +45,11 @@ namespace Weatherdata
   symbol RefEvap ();
   symbol VapPres ();
   symbol DiffRad ();
+  symbol GHF ();
   symbol RelHum ();
   symbol Wind ();
   symbol CO2 ();
-
+  
   // Stationary symbols.
   symbol Latitude ();
   symbol Longitude ();

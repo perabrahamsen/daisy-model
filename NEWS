@@ -6,6 +6,31 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.11
+
+** New ghf module for calculating ground heat flux.
+
+Supported models:
+
+const: A constant value.
+none: A contastant value of zero.
+weather: Read value from weather data (the GHF column, in W/m^2).
+old: Based on conductivity and temperature gradient between cell 0 and 1.
+surface: Based on conductivity of top soil and temperture gradient with air.
+FAO56: 10 % of Rn during day, 50 % during night.
+
+The model is chosen in the default Bioclimate model, with the ghf
+paramater.
+
+Examples: 
+
+(defcolumn "const" Askov (Bioclimate original (ghf "const" 1 [W/m^2])))
+(defcolumn "none" Askov (Bioclimate original (ghf "none")))
+(defcolumn "weather" Askov (Bioclimate original (ghf "weather")))
+(defcolumn "old" Askov (Bioclimate original (ghf "old")))
+(defcolumn "surface" Askov (Bioclimate original (ghf "surface")))
+(defcolumn "FAO56" Askov (Bioclimate original (ghf "FAO56")))
+
 * 6.10
 
 ** New cloudiness module. 

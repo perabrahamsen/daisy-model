@@ -46,11 +46,11 @@ public:
   virtual double daily_air_temperature () const = 0; // [dg C]
   virtual double daily_max_air_temperature () const = 0; // [dg C]
   virtual double daily_min_air_temperature () const = 0; // [dg C]
-  virtual double ground_heat_flux () const = 0; // [W/m^2]
   virtual double net_radiation () const = 0; // [W/m^2]
   virtual double global_radiation () const = 0; // [W/m^2]
   virtual double daily_global_radiation () const = 0; // [W/m^2]
   virtual double diffuse_radiation () const = 0; // [W/m^2]
+  virtual double ground_heat_flux () const = 0; // [W/m^2]
   virtual double reference_evapotranspiration () const = 0; // [mm/h]
   virtual double daily_precipitation () const = 0; // [mm/d]
   virtual double rain () const = 0;	// [mm/h]
@@ -66,7 +66,6 @@ public:
   // Initializing bioclimate.
 public:
   virtual bool has_cloudiness () const = 0;
-  virtual bool has_ground_heat_flux () const = 0;
   virtual bool has_net_radiation () const = 0;
   virtual bool has_reference_evapotranspiration () const = 0;
   virtual bool has_vapor_pressure () const = 0;
@@ -74,6 +73,7 @@ public:
   virtual bool has_CO2 () const = 0;
   virtual bool has_min_max_temperature () const = 0;
   virtual bool has_diffuse_radiation () const = 0;
+  virtual bool has_ground_heat_flux () const = 0;
   virtual double timestep () const = 0; // [h]
 
   // Light distribution.

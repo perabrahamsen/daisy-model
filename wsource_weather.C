@@ -108,6 +108,7 @@ public:
   Time my_middle;
   double my_extraterrestrial_radiation;
   double my_diffuse_radiation;
+  double my_ground_heat_flux;
   double my_reference_evapotranspiration;
   double my_wind;
   double my_CO2;
@@ -892,6 +893,8 @@ WSourceWeather::Implementation::tick_weather (const Time& time, Treelog& msg)
       && max_timestep (Weatherdata::DiffRad ()) >= long_timestep)
     my_diffuse_radiation *= my_day_cycle;
 
+  my_ground_heat_flux = number_average (Weatherdata::GHF ());
+
   my_reference_evapotranspiration = number_average (Weatherdata::RefEvap ());
   if (std::isfinite (my_reference_evapotranspiration) 
       && max_timestep (Weatherdata::RefEvap ()) >= long_timestep)
@@ -1271,6 +1274,7 @@ WSourceWeather::Implementation::Implementation (const Weather& w,
     my_middle (Time::null()),
     my_extraterrestrial_radiation (NAN),
     my_diffuse_radiation (NAN),
+    my_ground_heat_flux (NAN),
     my_reference_evapotranspiration (NAN),
     my_wind (NAN),
     my_CO2 (NAN),
@@ -1337,10 +1341,6 @@ WSourceWeather::daily_min_air_temperature () const
 { return impl->my_daily_min_air_temperature; }
 
 double
-WSourceWeather::ground_heat_flux () const
-{ return NAN; }
-
-double
 WSourceWeather::net_radiation () const
 { return NAN; }
 
@@ -1355,6 +1355,10 @@ WSourceWeather::daily_global_radiation () const
 double
 WSourceWeather::diffuse_radiation () const
 { return has_diffuse_radiation () ? impl->my_diffuse_radiation : 0.0; }
+
+double
+WSourceWeather::ground_heat_flux () const
+{ return has_ground_heat_flux () ? impl->my_ground_heat_flux : 0.0; }
 
 double
 WSourceWeather::reference_evapotranspiration () const
@@ -1414,10 +1418,6 @@ WSourceWeather::has_cloudiness () const
 { return true; }
 
 bool
-WSourceWeather::has_ground_heat_flux () const
-{ return false; }
-
-bool
 WSourceWeather::has_net_radiation () const
 { return false; }
 
@@ -1444,6 +1444,10 @@ WSourceWeather::has_min_max_temperature () const
 bool
 WSourceWeather::has_diffuse_radiation () const
 { return std::isfinite (impl->my_diffuse_radiation); }
+
+bool
+WSourceWeather::has_ground_heat_flux () const
+{ return std::isfinite (impl->my_ground_heat_flux); }
 
 double
 WSourceWeather::timestep () const
@@ -1522,6 +1526,7 @@ WSourceWeather::output (Log& log) const
     output_value (impl->my_relative_humidity, "relative_humidity", log);
   output_value (air_pressure (), "air_pressure", log);
   output_value (diffuse_radiation (), "diffuse_radiation", log);
+  output_value (ground_heat_flux (), "ground_heat_flux", log);
   if (has_wind ())
     output_value (wind (), "wind", log);
   if (has_CO2 ())
@@ -1624,6 +1629,8 @@ Current level extraterrestrial radiation realtive to day average.");
                    "Average extraterrestrial radiation this day.");
     frame.declare ("diffuse_radiation", "W/m^2", Attribute::LogOnly,
                    "Diffuse radiation.");
+    frame.declare ("ground_heat_flux", "W/m^2", Attribute::LogOnly,
+                   "Ground heat flux.");
     frame.declare ("reference_evapotranspiration", "mm/h", Attribute::LogOnly,
                    "Reference evapotranspiration");
     frame.declare ("rain", "mm/h", Attribute::LogOnly, "Rain.");

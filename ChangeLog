@@ -1,3 +1,9 @@
+2021-05-03  Per Abrahamsen  <pa@plen.ku.com>
+
+	* wsource_weather.C, wsource_weather.h, weather.h:
+	* weatherdata.h, weatherdata.C:
+	(ground_heat_flux, GHF): New weather data.
+
 2021-03-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.10 released.

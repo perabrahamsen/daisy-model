@@ -88,6 +88,9 @@ namespace Weatherdata
   symbol DiffRad ()
   { static const symbol name ("DiffRad"); return name; }
 
+  symbol GHF ()
+  { static const symbol name ("GHF"); return name; }
+
   symbol RelHum ()
   { static const symbol name ("RelHum"); return name; }
 
@@ -232,6 +235,7 @@ namespace Weatherdata
 Reference evapotranspiration.", "mm/h", -10, 20);
       (*this)["VapPres"] = DDT ("Vapor pressure.", "Pa", 0, 5000);
       (*this)["DiffRad"] = DDT ("Diffuse radiation.", "W/m^2", 0, 1400);
+      (*this)["GHF"] = DDT ("Ground heat flux.", "W/m^2", 0, 1400);
       (*this)["RelHum"] = DDT ("Relative humidity.", "fraction", 0, 5000);
       (*this)["Wind"] = DDT ("Wind speed.", "m/s", 0, 40);
       (*this)["CO2"] = DDT ("Atmospheric CO2 level.", Attribute::Fraction (),
