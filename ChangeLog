@@ -1,3 +1,7 @@
+2021-05-05  Per Abrahamsen  <pa@plen.ku.com>
+
+	* cloudiness.C (CloudinessClear::tick): Bug fix.
+
 2021-05-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.11 released.

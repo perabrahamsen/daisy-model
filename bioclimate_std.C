@@ -775,22 +775,22 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   cloudiness->tick (weather, msg);
   cloudiness_index = cloudiness->index ();
   const double air_temperature = weather.air_temperature ();//[dg C]
-  const double VaporPressure = weather.vapor_pressure ();
+  const double VaporPressure_Pa = weather.vapor_pressure (); // [Pa]
   const double Si = weather.global_radiation ();
   const double ref_albedo = 0.23; // Reference crop for FAO_PM.
   albedo = find_albedo (vegetation, litter, surface, geo, soil, soil_water);
-  const double Cloudiness = cloudiness_index;
-  const double Temp = air_temperature;
-  const double Ta = Temp + 273.15; // [K]
-  black_body_radiation = NetRadiation::SB * pow(Ta, 4);
-  const double ea = VaporPressure / 100.; // Pa -> hPa
-  epsilon_0 = net_radiation->find_epsilon_0 (Ta, ea);
+  const double air_temperature_K = air_temperature + 273.15; // [K]
+  black_body_radiation = NetRadiation::SB * pow(air_temperature_K, 4);
+  const double VaporPressure_hPa = VaporPressure_Pa / 100.; // Pa -> hPa
+  epsilon_0 = net_radiation->find_epsilon_0 (air_temperature_K,
+					     VaporPressure_hPa);
   L_i0 = epsilon_0 * black_body_radiation;
-  L_ia = NetRadiation::cloudiness_function (Cloudiness,
+  L_ia = NetRadiation::cloudiness_function (cloudiness_index,
 					    black_body_radiation, epsilon_0);
-  const double VaporPressure_kPa = VaporPressure * 0.001; // Pa -> kPa
-  L_n  = - net_radiation->NetLongwaveRadiation (Cloudiness,
-						Temp, VaporPressure_kPa,
+  const double VaporPressure_kPa = VaporPressure_Pa * 0.001; // Pa -> kPa
+  L_n  = - net_radiation->NetLongwaveRadiation (cloudiness_index,
+						air_temperature,
+						VaporPressure_kPa,
 						L_ia);
   Rn = (1.0 - albedo) * Si + L_n;
   Rn_ref = (1.0 - ref_albedo) * Si + L_n;

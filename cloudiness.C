@@ -26,6 +26,7 @@
 #include "weather.h"
 #include "log.h"
 #include "mathlib.h"
+#include <sstream>
 
 // The 'cloudiness' component.
 
@@ -164,17 +165,17 @@ struct CloudinessClear : public Cloudiness
   double clear_sky_radiation;	// [W/m^2]
   
   // Simulation.
-  void tick (const Weather& weather, Treelog&)
+  void tick (const Weather& weather, Treelog& msg)
   {
     const double Si = weather.global_radiation ();
     const double rad = weather.extraterrestrial_radiation ();
     const double sin_theta = weather.sin_solar_elevation_angle ();
     const Time middle = weather.middle ();
-    const double now = middle.day_fraction ();
+    const double now = middle.day_fraction () * 24.0;
     const double sunrise = weather.sunrise ();
     const double sunset = sunrise + weather.day_length ();
     const bool too_early =(now < sunrise + min_time_from_sunrise);
-    const bool too_late =(now > sunset + min_time_to_sunset);
+    const bool too_late =(now > sunset - min_time_to_sunset);
     if (rad > min_rad && sin_theta > min_sin_theta
 	&& !too_early && !too_late)
       {
@@ -182,6 +183,21 @@ struct CloudinessClear : public Cloudiness
 	const double x = bound (min_radiation_ratio, Si / Si0, 1.0);
 	cloudiness = a * x + 1 - a;
       }
+
+#if 0
+    std::ostringstream tmp;
+    tmp << "rad = " << rad
+	<< ", min_rad = " << min_rad
+	<< ", sin_theta = " << sin_theta
+	<< ", min_sin_theta = " << min_sin_theta
+	<< ", now = " << now
+	<< ", sunrise = " << sunrise
+	<< ", min_time_from_sunrise = " << min_time_from_sunrise
+	<< ", sunset = " << sunset
+	<< ", min_time_to_sunset = " << min_time_to_sunset;
+    msg.message (tmp.str ());
+#endif
+
     // Otherwise, use value from previous timestep.
   }
   virtual double find_clear_sky_radiation (const Weather&) const = 0;

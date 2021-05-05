@@ -6,6 +6,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.12
+
+** Bug fix with new cloudiness models.
+
 * 6.11
 
 ** New ghf module for calculating ground heat flux.
