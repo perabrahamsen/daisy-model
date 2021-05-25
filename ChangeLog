@@ -4,7 +4,7 @@
 
 	* root_system.C (PenDSPar, PenpFPar): New parameters.
 	* horizon.C, horizon.h, soil.h, soil.C (root_retardation): New
-	parameter
+	parameter.
 
 2021-05-05  Per Abrahamsen  <pa@plen.ku.dk>
 
