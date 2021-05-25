@@ -289,6 +289,8 @@ Connvert to SI base units by multiplying with a factor.")
          "Unitless.");
     add (Attribute::Fraction (), 1.0, 0, 0, 0, 0, 0, 0, 0,
          "Unitless.");
+    add ("fraction", 1.0, 0, 0, 0, 0, 0, 0, 0,
+         "Unitless.");
     add ("", 1.0, 0, 0, 0, 0, 0, 0, 0,
          "Unitless.");
     add ("none", 1.0, 0, 0, 0, 0, 0, 0, 0,

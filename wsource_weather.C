@@ -104,6 +104,7 @@ public:
   Weatherdata::surface_t my_surface;
   double my_day_cycle;
   double my_global_radiation;
+
   double my_sin_solar_elevation_angle;
   Time my_middle;
   double my_extraterrestrial_radiation;
@@ -118,7 +119,7 @@ public:
   double my_rain;
   double my_snow;
   IM my_deposit;
-  double my_cloudiness;
+  double my_cloudiness_index;
 
   // Daily values.
   Time day_start;
@@ -132,6 +133,9 @@ public:
   double my_daily_global_radiation;    // [W/m^2]
   double my_daily_extraterrestrial_radiation;    // [W/m^2]
   double my_daily_precipitation;       // [mm/d]
+  double my_daily_vapor_pressure; // [Pa]
+  double my_daily_wind; // [m/s]
+  double my_daily_air_pressure; // [Pa]
 
   // Extract weather.
   static double safe_value (const double value, const double reserve)
@@ -752,6 +756,12 @@ WSourceWeather::Implementation::tick_weather (const Time& time, Treelog& msg)
       else
         msg.warning ("No daily precipitation, reusing old value");
 
+      my_daily_vapor_pressure
+	= number_average (day_start, day_end, Weatherdata::VapPres ());
+      my_daily_wind
+	= number_average (day_start, day_end, Weatherdata::Wind ());
+      my_daily_air_pressure = FAO::AtmosphericPressure (weather.elevation ());
+      
       // Min/Max temperature.
       double new_max = NAN;
       double new_min = NAN;
@@ -971,12 +981,7 @@ WSourceWeather::Implementation::tick_weather (const Time& time, Treelog& msg)
   my_deposit = dry + wet;
 
   // Cloudiness.
-  {
-    const double rad = my_extraterrestrial_radiation;
-    const double Si = my_global_radiation;
-    if (Si > 25.0 && rad > 25.0)
-      my_cloudiness = FAO::CloudinessFactor_Humid (Si, rad);
-  }
+  my_cloudiness_index = number_average (Weatherdata::CloudinessIndex ());
   
   // Got everything?
   check_state (msg);
@@ -1046,8 +1051,6 @@ WSourceWeather::Implementation::check_state (Treelog& msg)
   check_state (my_rain_name, my_rain, msg);
   static const symbol my_snow_name ("Snow");
   check_state (my_snow_name, my_snow, msg);
-  static const symbol my_cloudiness_name ("Cloudiness");
-  check_state (my_cloudiness_name, my_cloudiness, msg);
   static const symbol my_day_length_name ("DayLength"); 
   check_state (my_day_length_name, my_day_length, msg);
   static const symbol my_sunrise_name ("Sunrise"); 
@@ -1284,7 +1287,7 @@ WSourceWeather::Implementation::Implementation (const Weather& w,
     my_rain (NAN),
     my_snow (NAN),
     my_deposit (al, "deposit"),    // For the units...
-    my_cloudiness (0.5),           // Wait for light.
+    my_cloudiness_index (NAN), 
     my_day_length (NAN),
     my_sunrise (NAN),
     my_has_min_max_temperature (false),
@@ -1381,8 +1384,8 @@ WSourceWeather::deposit () const
 { return impl->my_deposit; }
 
 double
-WSourceWeather::cloudiness () const
-{ return impl->my_cloudiness; }
+WSourceWeather::cloudiness_index  () const
+{ return impl->my_cloudiness_index; }
 
 double
 WSourceWeather::vapor_pressure () const
@@ -1393,8 +1396,16 @@ WSourceWeather::vapor_pressure () const
     : FAO::SaturationVapourPressure (daily_air_temperature () - 5.0); }
 
 double
+WSourceWeather::daily_vapor_pressure () const
+{ return impl->my_daily_vapor_pressure; }
+
+double
 WSourceWeather::wind () const
 { return has_wind () ? impl->my_wind : NAN; }
+
+double
+WSourceWeather::daily_wind () const
+{ return impl->my_daily_wind; }
 
 double
 WSourceWeather::CO2 () const
@@ -1413,9 +1424,13 @@ double
 WSourceWeather::air_pressure () const
 { return FAO::AtmosphericPressure (elevation ()); }
 
+double
+WSourceWeather::daily_air_pressure () const
+{ return impl->my_daily_air_pressure; }
+
 bool
 WSourceWeather::has_cloudiness () const
-{ return true; }
+{ return std::isfinite (impl->my_cloudiness_index); }
 
 bool
 WSourceWeather::has_net_radiation () const
@@ -1520,7 +1535,8 @@ WSourceWeather::output (Log& log) const
   output_value (rain (), "rain", log);
   output_value (snow (), "snow", log);
   output_value (rain () + snow (), "precipitation", log);
-  output_value (cloudiness (), "cloudiness", log);
+  if (has_cloudiness ())
+    output_value (cloudiness_index (), "cloudiness_index", log);
   output_value (vapor_pressure (), "vapor_pressure", log);
   if (std::isfinite (impl->my_relative_humidity))
     output_value (impl->my_relative_humidity, "relative_humidity", log);
@@ -1637,8 +1653,8 @@ Current level extraterrestrial radiation realtive to day average.");
     frame.declare ("snow", "mm/h", Attribute::LogOnly, "Snow.");
     frame.declare ("precipitation", "mm/h", Attribute::LogOnly, 
                    "Precipitation.");
-    frame.declare_fraction ("cloudiness", Attribute::LogOnly,
-                            "Fraction of sky covered by clouds [0-1].");
+    frame.declare_fraction ("cloudiness_index", Attribute::LogOnly, "\
+Fraction of sky covered by clouds, 1 = clear sky.");
     frame.declare ("vapor_pressure", "Pa", Attribute::LogOnly, "Humidity.");
     frame.declare ("relative_humidity", Attribute::Fraction (), 
                    Attribute::LogOnly, "Relative humidity.");

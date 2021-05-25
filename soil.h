@@ -93,6 +93,7 @@ public:
   double C_per_N (size_t i) const;
   double turnover_factor (size_t i) const;
   double root_homogeneity (size_t i) const;
+  double root_retardation (size_t i) const;
   
   // Thermic.
   double heat_conductivity (size_t i, double Theta, double Ice) const;

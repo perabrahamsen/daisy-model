@@ -53,7 +53,7 @@ public:
 
   // Simulation.
   void tick (const Weather& weather, const double Cloudiness,
-	     const double Rn, const double G,
+	     const double Rn, const double Rn_ref, const double G,
 	     const Vegetation& crops,
 	     const Surface& surface, const Geometry& geo,
              const Soil& soil,
@@ -116,12 +116,14 @@ public:
 void
 PetFAO_PM_hourly::tick (const Weather& weather,
 			const double Cloudiness,
-			const double Rn, const double G, 
+			const double, const double Rn_ref, const double G, 
                         const Vegetation& crops,
                         const Surface& surface, const Geometry& geo, const Soil& soil,
                         const SoilHeat& soil_heat, const SoilWater& soil_water,
                         Treelog& msg)
 {
+  daisy_assert (std::isfinite (Rn_ref));
+
   // Weather.
   const double Temp = weather.air_temperature ();
   const double VaporPressure = weather.vapor_pressure ();
@@ -129,7 +131,7 @@ PetFAO_PM_hourly::tick (const Weather& weather,
   const double AtmPressure = weather.air_pressure ();
 
   reference_evapotranspiration_dry
-    = FAO::RefPenmanMonteithAllen2006 (Rn, G, Temp, VaporPressure, U2,
+    = FAO::RefPenmanMonteithAllen2006 (Rn_ref, G, Temp, VaporPressure, U2,
                                        AtmPressure)
     * 3600;
   daisy_assert (std::isfinite (reference_evapotranspiration_dry));
@@ -140,7 +142,7 @@ PetFAO_PM_hourly::tick (const Weather& weather,
   daisy_assert (std::isfinite (potential_evapotranspiration_dry));
 
   reference_evapotranspiration_wet
-    = FAO::RefPenmanMonteithWet (Rn, G, Temp, VaporPressure, U2,
+    = FAO::RefPenmanMonteithWet (Rn_ref, G, Temp, VaporPressure, U2,
                                  AtmPressure, rb)
     * 3600;
   potential_evapotranspiration_wet

@@ -48,7 +48,8 @@ public:
 
   // Simulation.
   void tick (const Weather& weather,
-	     const double Cloudiness, const double Rn, const double G,
+	     const double Cloudiness, const double Rn, const double Rn_ref,
+	     const double G,
 	     const Vegetation& crops,
 	     const Surface& surface, const Geometry& geo,
              const Soil& soil,
@@ -82,7 +83,8 @@ public:
 
 void
 PetPM::tick (const Weather& weather,
-	     const double Cloudiness, const double Rn, const double G,
+	     const double Cloudiness, const double Rn, const double Rn_ref,
+	     const double G,
 	     const Vegetation& crops,
 	     const Surface& surface, const Geometry& geo,
              const Soil& soil,

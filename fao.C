@@ -222,6 +222,12 @@ FAO::RefPenmanMonteithAllen2006 (double Rn, // [W/m^2]
 				 double AtmPressure // [Pa]
 				 )
 {
+  daisy_assert (std::isfinite (Rn));
+  daisy_assert (std::isfinite (G));
+  daisy_assert (std::isfinite (Temp));
+  daisy_assert (std::isfinite (ea));
+  daisy_assert (std::isfinite (U2));
+  daisy_assert (std::isfinite (AtmPressure));
   const double s = SlopeVapourPressureCurve (Temp); // [Pa/K]
   const double gamma = PsychrometricConstant (AtmPressure, Temp); // [Pa/K]
   const double e_sat = SaturationVapourPressure (Temp);		  // [Pa]

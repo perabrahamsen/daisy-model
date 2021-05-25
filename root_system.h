@@ -54,8 +54,10 @@ private:
 private:
   const double PenPar1;		// Penetration rate parameter, coefficient
   const double PenPar2;		// Penetration rate parameter, threshold
+  const PLF PenpFFac;		// Mousture  influence on penetration, factor.
   const PLF PenClayFac;		// Clay influence on penetration, factor.
   const PLF PenWaterFac;	// Water influence on penetration, factor.
+  const PLF PenDSFac;	// Development stage influence on penetration, factor.
   const double MaxPen;		// Max penetration depth
   const double MaxWidth;        // Max horizontal distance from plant
   const double Rad;		// Root radius [cm]

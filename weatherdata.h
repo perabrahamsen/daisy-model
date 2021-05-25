@@ -46,6 +46,7 @@ namespace Weatherdata
   symbol VapPres ();
   symbol DiffRad ();
   symbol GHF ();
+  symbol CloudinessIndex ();
   symbol RelHum ();
   symbol Wind ();
   symbol CO2 ();

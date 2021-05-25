@@ -6,6 +6,18 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.13
+
+** New 'PenDSFac' and 'PenpFFac' root parameters.
+
+These allow you to change root penetration based on development stage
+or soil moisture.
+
+** New 'root_retardation' horizon parameter.
+
+This allows you to change root penetration speed for a specific
+horizon.
+
 * 6.12
 
 ** Bug fix with new cloudiness models.

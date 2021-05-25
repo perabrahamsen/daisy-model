@@ -56,12 +56,15 @@ public:
   virtual double rain () const = 0;	// [mm/h]
   virtual double snow () const = 0;	// [mm/h]
   virtual const IM& deposit () const = 0; // [g [stuff] /cm^2/h]
-  virtual double cloudiness () const = 0; // [0-1]
+  virtual double cloudiness_index () const = 0; // [0-1], 1 = clear sky
   virtual double vapor_pressure () const = 0; // [Pa]
+  virtual double daily_vapor_pressure () const = 0; // [Pa]
   virtual double wind () const = 0;	// [m/s]
+  virtual double daily_wind () const = 0;	// [m/s]
   virtual double CO2 () const = 0; //[Pa]
   virtual double O2 () const = 0; //[Pa]
   virtual double air_pressure () const = 0; //[Pa]
+  virtual double daily_air_pressure () const = 0; //[Pa]
 
   // Initializing bioclimate.
 public:

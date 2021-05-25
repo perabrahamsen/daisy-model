@@ -66,12 +66,15 @@ public:
   double rain () const;	// [mm/h]
   double snow () const;	// [mm/h]
   const IM& deposit () const; // [g [stuff] /cm^2/h]
-  double cloudiness () const; // [0-1]
+  double cloudiness_index () const; // [0-1]
   double vapor_pressure () const; // [Pa]
+  double daily_vapor_pressure () const; // [Pa]
   double wind () const;	// [m/s]
+  double daily_wind () const;	// [m/s]
   double CO2 () const; //[Pa]
   double O2 () const; //[Pa]
   double air_pressure () const; //[Pa]
+  double daily_air_pressure () const; //[Pa]
 
   // Initializing bioclimate.
 public:

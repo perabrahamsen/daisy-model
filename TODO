@@ -1,93 +1,12 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* GHF module
-
-** test-ghf.dai
-
-Should have columns with all ghf models and a log with all of them.
+* 
 
 
 
 * pet_FAO_PM_daily: Use all daily data
 
-* skal vi regne både en Rn og en ref_Rn ud?
-
-Alle modeller undtagen PM skal bruge ref_Rn
-
-* clear_sky: min_time_to_sunset og min_time_from_sunrise
-
-* G: depth
-
-z
-
-init:
-
-for all edges
-  if (is_from_above != is_to_above)
-     count edge
-     weight = area
-     edge_weight = weight
-     total weight += weight
-
-for each edge
-  edge_weight /= total_weight
-  
-value:
-
-q_total = sum (q : weight)
-
-* Spørgsmål
-
-Cloudiness factor = 1 <=> ingen skyer
-
-skal den begrænset til [0.3:1.0] ?
-
-Blonquist = ASCE tæt på FAO56 annex 3
-
-Jeg får meget højere forampning, også end i dwf filen
-
-* Når pet FAO_PM bruger sin egen brunt, er det for at få reference albedo
-
-
-
-
 * Merete og Simon
-
-** ground heat flux module
-
-** cloudiness.C
-
-const
-
-weather
-
-clear: fc = a Si/Si0-(1-a)
-
-  Si = as * ext_rad
-  
-  simple: as = 0.75 + 2e-5 z
-
-     FAO: a = 1.35
-
-     Kjaersgaard2007: a = 1
-
-  ASCE: as = KB + KD
-
-  
-
-** Vi skal tage beslutning om hvad der skal kunne vælges i en PM-beregning, og så få det implementeret konsekvent. Jeg har fremsendt et par dokumenter, der beskriver det. Det er
-
-a.      Calculation of extra-terrestrial radiation at the soil surface, Sio (FAO eller Blonquist)
-
-b.     Calculation of cloudiness factor, fc ,-
-
-c.     Choice of overall net radiation term  - lige nu er der tre forskellige tilgange, hvoraf jeg ikke kan finde dokumentation for den tredje.
-
-d.      Choice of equation for calculation of εa, emissivity. = ligningerne I Kjæersgaard.
-
-** Blonquist
-
-** Sne & Regn ?
 
 * Simon: Prøv Jacobs python kode
 

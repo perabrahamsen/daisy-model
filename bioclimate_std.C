@@ -526,7 +526,7 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     sun_LAI_fraction_ (No),
     shared_light_fraction_ (1.0),
     cloudiness (Librarian::build_item<Cloudiness> (al, "cloudiness")),
-    cloudiness_index (0.5),
+    cloudiness_index (NAN),
     net_radiation (Librarian::build_item<NetRadiation> (al, "net_radiation")),
     Rn (NAN),
     Rn_ref (NAN),
@@ -774,6 +774,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   // Net Radiation.
   cloudiness->tick (weather, msg);
   cloudiness_index = cloudiness->index ();
+  daisy_assert (std::isfinite (cloudiness_index));
   const double air_temperature = weather.air_temperature ();//[dg C]
   const double VaporPressure_Pa = weather.vapor_pressure (); // [Pa]
   const double Si = weather.global_radiation ();
@@ -792,9 +793,13 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 						air_temperature,
 						VaporPressure_kPa,
 						L_ia);
+  daisy_assert (std::isfinite (albedo));
+  daisy_assert (std::isfinite (Si));
+  daisy_assert (std::isfinite (L_n));
   Rn = (1.0 - albedo) * Si + L_n;
+  daisy_assert (std::isfinite (Rn));
   Rn_ref = (1.0 - ref_albedo) * Si + L_n;
-
+  daisy_assert (std::isfinite (Rn_ref));
   incoming_Long_radiation = L_ia;
 
   // Ground heat flux.
@@ -817,7 +822,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     + canopy_water_storage + litter_water_storage;
 
   daisy_assert (pet.get () != NULL);
-  pet->tick (weather, cloudiness_index, Rn, G, vegetation, surface, 
+  pet->tick (weather, cloudiness_index, Rn, Rn_ref, G, vegetation, surface, 
              geo, soil, soil_heat, soil_water, msg);
   if (free_water > 0.01)
     total_ep_ = pet->wet ();
@@ -1506,7 +1511,7 @@ First entry is top of canopy, last is soil surface.");
     // External water sources and sinks.
     frame.declare_object ("cloudiness", Cloudiness::component,
 			  "Cloudiness model.");
-    frame.set ("cloudiness", "weather");
+    frame.set ("cloudiness", "Kjaersgaard");
     frame.declare_fraction ("cloudiness_index", Attribute::LogOnly, "\
 Cloudiness index, 0 = no light, 1 = clear sky.");
     frame.declare_object ("net_radiation", NetRadiation::component,

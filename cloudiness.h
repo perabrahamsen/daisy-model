@@ -45,7 +45,7 @@ public:
 
   // Create and Destroy.
 public:
-  bool check (const Weather&, Treelog&) const;
+  virtual bool check (const Weather&, Treelog&) const = 0;
 protected:
   Cloudiness (const BlockModel&);
 public:

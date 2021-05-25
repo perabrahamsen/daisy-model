@@ -73,6 +73,7 @@ public:
   double C_per_N () const;
   double turnover_factor () const;
   double root_homogeneity () const;
+  double root_retardation () const;
   double K_factor () const;
 
   // Chemistry.

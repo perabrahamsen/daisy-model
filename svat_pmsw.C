@@ -1482,7 +1482,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       u_ref = weather.wind (); // u_ref from reference plane [m/s]
       daisy_assert (std::isfinite (u_ref));
       daisy_assert (u_ref >= 0.0);
-      relsun_day = weather.cloudiness ();  // [-]
+      relsun_day = weather.cloudiness_index ();  // [-]
       prec = 1.10*weather.rain(); // [mm] corrected by 10 %
 
       // cout << "past met variables\n";

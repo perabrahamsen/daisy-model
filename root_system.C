@@ -300,24 +300,60 @@ RootSystem::tick_daily (const Geometry& geo, const Soil& soil,
                         const double WRoot, const bool root_growth,
                         const double DS, Treelog& msg)
 {
-  const double SoilLimit = -soil.MaxRootingHeight ();
+  const double SoilLimit = -soil.MaxRootingHeight (); // [cm], negative
+  const double z = -Depth;	// [cm], negative
+
   // Penetration.
   if (root_growth)
     {
-      const double clay = geo.content_height (soil, &Soil::clay, -Depth);
-      double clay_fac = PenClayFac (clay);
+      // Limit by pressure (pF).
+      class pFAccess : public Geometry::Access
+      { 
+	const SoilWater& soil_water;
+	const double pF_min;
+	
+	double operator()(size_t c) const
+	{
+	  const double h = soil_water.h (c);
+	  if (h < 0.0)
+	    return std::max (h2pF (h), pF_min);
+	  return pF_min;
+	}
+      public:
+	pFAccess (const SoilWater& sw, const double pF_min_)
+	  : soil_water (sw),
+	    pF_min (pF_min_)
+	{ }
+      } pF_accessor (soil_water, 0.0);
+      const double pF = geo.access_content_height (pF_accessor, z);
+      const double pF_fac = PenpFFac (pF);
+
+      // Limit by clat content.
+      const double clay = geo.content_height (soil, &Soil::clay, z);
+      const double clay_fac = PenClayFac (clay);
+
+      // Limit by relative water content.
       const double Theta 
-        = geo.content_height (soil_water, &SoilWater::Theta, -Depth);
+        = geo.content_height (soil_water, &SoilWater::Theta, z);
       daisy_assert (Theta >= 0.0);
       const double Theta_sat 
-        = geo.content_height (soil, &Soil::Theta_sat, -Depth);
+        = geo.content_height (soil, &Soil::Theta_sat, z);
       daisy_assert (Theta_sat > 0.0);
+
       daisy_assert (Theta_sat <= 1.0);
       const double water = Theta/Theta_sat;
       daisy_assert (water >= 0.0);
       daisy_assert (water <= 1.01);
       double water_fac = PenWaterFac (water);
-      double dp = PenPar1 * clay_fac * water_fac 
+
+      // Limit by development stage (DS).
+      const double DS_fac = PenDSFac (DS);
+
+      // Limit by horizon.
+      const double soil_fac
+	= geo.content_height (soil, &Soil::root_retardation, z);
+      
+      double dp = PenPar1 * pF_fac * clay_fac * water_fac * DS_fac * soil_fac
         * std::max (0.0, soil_temperature - PenPar2);
       PotRtDpt = std::min (PotRtDpt + dp, MaxPen);
       /*max depth determined by crop*/
@@ -465,6 +501,11 @@ By default, this will be identical to the NO3 uptake model.");
   frame.declare ("PenPar2", "dg C", Check::none (), Attribute::Const,
                  "Penetration rate parameter, threshold.");
   frame.set ("PenPar2", 4.0);
+  frame.declare ("PenpFFac", "pF", Attribute::None (),
+                 Check::non_negative (), Attribute::Const, 
+                 "Moisture dependent factor to multiply 'PenPar1' with.\n\
+If pressure is less than -1 cm, pF will be assumed to be 0.");
+  frame.set ("PenpFFac", PLF::always_1 ());
   frame.declare ("PenClayFac", Attribute::Fraction (), Attribute::None (),
                  Check::non_negative (), Attribute::Const, 
                  "Clay dependent factor to multiply 'PenPar1' with.");
@@ -474,6 +515,10 @@ By default, this will be identical to the NO3 uptake model.");
                  "Water dependent factor to multiply 'PenPar1' with.\n\
 The factor is a function of relative water content (Theta/Theta_sat).");
   frame.set ("PenWaterFac", PLF::always_1 ());
+  frame.declare ("PenDSFac", "DS", Attribute::None (),
+                 Check::non_negative (), Attribute::Const, "\
+Development stage dependent factor to multiply 'PenPar1' with..");
+  frame.set ("PenDSFac", PLF::always_1 ());
   frame.declare ("MaxPen", "cm", Check::positive (), Attribute::Const,
                  "Maximum penetration depth.");
   frame.set ("MaxPen", 100.0);
@@ -577,8 +622,10 @@ RootSystem::RootSystem (const Block& al)
     NO3_uptake (Librarian::build_item<Solupt> (al, "NO3_uptake")),
     PenPar1 (al.number ("PenPar1")),
     PenPar2 (al.number ("PenPar2")),
+    PenpFFac (al.plf ("PenpFFac")),
     PenClayFac (al.plf ("PenClayFac")),
     PenWaterFac (al.plf ("PenWaterFac")),
+    PenDSFac (al.plf ("PenDSFac")),
     MaxPen (al.number ("MaxPen")),
     MaxWidth (al.number ("MaxWidth", MaxPen)),
     Rad (al.number ("Rad")),

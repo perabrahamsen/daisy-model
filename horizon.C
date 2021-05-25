@@ -58,6 +58,7 @@ struct Horizon::Implementation
   /* const */ std::vector<double> SOM_fractions;
   const double turnover_factor;
   const double root_homogeneity;
+  const double root_retardation;
   const double K_factor;
   const double anisotropy;
   typedef std::map<symbol, double> double_map;
@@ -203,6 +204,7 @@ Horizon::Implementation::Implementation (const BlockModel& al)
                    : std::vector<double> ()),
     turnover_factor (al.number ("turnover_factor")),
     root_homogeneity (al.number ("root_homogeneity")),
+    root_retardation (al.number ("root_retardation")),
     K_factor (al.number ("K_factor")),
     anisotropy (al.number ("anisotropy")),
     attributes (get_attributes (al.submodel_sequence ("attributes"))),
@@ -269,6 +271,10 @@ Horizon::turnover_factor () const
 double
 Horizon::root_homogeneity () const
 { return impl->root_homogeneity; }
+
+double
+Horizon::root_retardation () const
+{ return impl->root_retardation; }
 
 double
 Horizon::anisotropy () const
@@ -571,6 +577,11 @@ Factor multiplied to the root density of all crops in this horizon.\n\
 The idea is to emulate the effect of roots not being distributed\n\
 evenly in the soil.");
     frame.set ("root_homogeneity", 1.0);
+    frame.declare ("root_retardation",
+		   Attribute::None (), Check::non_negative (),
+		   Attribute::Const, "\
+Factor multiplied to root penetration speed.");
+    frame.set ("root_retardation", 1.0);
     frame.declare ("K_factor", Attribute::None (), Check::positive (),
                    Attribute::Const, "\
 Factor multiplied to the hydraulic conductivity.");

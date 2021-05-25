@@ -832,6 +832,9 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
  block.h scope.h attribute.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
+ghf${OBJ}: ghf.C ghf.h model.h block_model.h block_nested.h block.h scope.h \
+ attribute.h symbol.h treelog.h frame_model.h frame.h librarian.h \
+ weather.h weatherdata.h soil_heat.h
 cloudiness${OBJ}: cloudiness.C cloudiness.h model_derived.h model_logable.h \
  model.h symbol.h block_model.h block_nested.h block.h scope.h \
  attribute.h treelog.h frame_model.h frame.h librarian.h weather.h \
@@ -1554,7 +1557,7 @@ program_weather${OBJ}: program_weather.C program.h model.h symbol.h run.h \
  wsource.h weather.h weatherdata.h model_derived.h model_logable.h \
  scope.h attribute.h time.h librarian.h block_model.h block_nested.h \
  block.h treelog.h frame_model.h frame.h submodeler.h block_submodel.h \
- frame_submodel.h assertion.h mathlib.h
+ frame_submodel.h assertion.h mathlib.h timestep.h vcheck.h
 uzrichard2${OBJ}: uzrichard2.C uzmodel.h model.h symbol.h block_model.h \
  block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
  frame.h groundwater.h model_derived.h model_logable.h surface.h \
@@ -2499,7 +2502,7 @@ bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h model_framed.h \
  scope.h attribute.h treelog.h frame_model.h frame.h surface.h uzmodel.h \
  weather.h weatherdata.h plf.h geometry.h soil.h soil_heat.h snow.h log.h \
  time.h border.h mathlib.h assertion.h cloudiness.h model_derived.h \
- net_radiation.h pet.h difrad.h raddist.h deposition.h im.h svat.h \
+ net_radiation.h ghf.h pet.h difrad.h raddist.h deposition.h im.h svat.h \
  vegetation.h litter.h check.h fao.h librarian.h treelog_store.h \
  resistance.h soil_water.h
 condition_crop${OBJ}: condition_crop.C condition.h model_framed.h \

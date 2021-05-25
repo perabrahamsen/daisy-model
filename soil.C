@@ -433,6 +433,10 @@ double
 Soil::root_homogeneity (size_t i) const
 { return horizon (i).root_homogeneity (); }
 
+double
+Soil::root_retardation (size_t i) const
+{ return horizon (i).root_retardation (); }
+
 double 
 Soil::heat_conductivity (size_t i, double Theta, double Ice) const
 { return horizon (i).heat_conductivity (Theta, Ice); }

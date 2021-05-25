@@ -43,10 +43,6 @@ void
 Cloudiness::output (Log&) const
 { }
 
-bool
-Cloudiness::check (const Weather&, Treelog&) const
-{ return true; }
-
 Cloudiness::Cloudiness (const BlockModel& al)
   : ModelDerived (al.type_name ())
 { }
@@ -77,6 +73,8 @@ struct CloudinessConst : public Cloudiness
   { return cloudiness; }
 
   // Create.
+  bool check (const Weather&, Treelog& msg) const
+  { return true; }
   CloudinessConst (const BlockModel& al)
     : Cloudiness (al),
       cloudiness (al.number ("cloudiness"))
@@ -107,7 +105,7 @@ struct CloudinessWeather : public Cloudiness
   
   // Simulation.
   void tick (const Weather& weather, Treelog&)
-  { cloudiness = weather.cloudiness (); }
+  { cloudiness = weather.cloudiness_index (); }
 
   double index () const
   { return cloudiness; }
@@ -116,14 +114,13 @@ struct CloudinessWeather : public Cloudiness
   { output_variable (cloudiness, log); }
   
   // Create.
-  bool check (const Weather& weather, Treelog& msg)
+  bool check (const Weather& weather, Treelog& msg) const
   {
     TREELOG_MODEL (msg);
-    
     bool ok = true;
     if (!weather.has_cloudiness ())
       {
-	msg.error ("No cloudiness in weather file");
+	msg.error ("No CloudinessIndex in weather file");
 	ok = false;
       }
     return ok;
@@ -212,6 +209,8 @@ struct CloudinessClear : public Cloudiness
   }
 
   // Create.
+  bool check (const Weather&, Treelog& msg) const
+  { return true; }
   CloudinessClear (const BlockModel& al)
     : Cloudiness (al),
       a (al.number ("a")),

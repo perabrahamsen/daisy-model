@@ -54,8 +54,8 @@ public:
   // Simulation.
 public:
   virtual void tick (const Weather&, const double Cloudiness,
-		     const double Rn, const double G, const Vegetation&,
-		     const Surface&, const Geometry& geo,
+		     const double Rn, const double Rn_ref, const double G,
+		     const Vegetation&, const Surface&, const Geometry&,
                      const Soil&, const SoilHeat&, 
 		     const SoilWater&, Treelog&) = 0;
   virtual double wet () const = 0; // [mm/h]

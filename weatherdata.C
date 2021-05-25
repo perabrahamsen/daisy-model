@@ -91,6 +91,9 @@ namespace Weatherdata
   symbol GHF ()
   { static const symbol name ("GHF"); return name; }
 
+  symbol CloudinessIndex ()
+  { static const symbol name ("CloudinessIndex"); return name; }
+
   symbol RelHum ()
   { static const symbol name ("RelHum"); return name; }
 
@@ -236,7 +239,8 @@ Reference evapotranspiration.", "mm/h", -10, 20);
       (*this)["VapPres"] = DDT ("Vapor pressure.", "Pa", 0, 5000);
       (*this)["DiffRad"] = DDT ("Diffuse radiation.", "W/m^2", 0, 1400);
       (*this)["GHF"] = DDT ("Ground heat flux.", "W/m^2", 0, 1400);
-      (*this)["RelHum"] = DDT ("Relative humidity.", "fraction", 0, 5000);
+      (*this)["CloudinessIndex"] = DDT ("Cloudiness index, 1 = clear sky.", "fraction", 0, 1);
+      (*this)["RelHum"] = DDT ("Relative humidity.", "fraction", 0, 1);
       (*this)["Wind"] = DDT ("Wind speed.", "m/s", 0, 40);
       (*this)["CO2"] = DDT ("Atmospheric CO2 level.", Attribute::Fraction (),
                             100e-6, 2000e-6);
