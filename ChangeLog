@@ -2,6 +2,10 @@
 
 	* Version 6.13 released.
 
+	* root_system.C (PenDSPar, PenpFPar): New parameters.
+	* horizon.C, horizon.h, soil.h, soil.C (root_retardation): New
+	parameter
+
 2021-05-05  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.12 released.
