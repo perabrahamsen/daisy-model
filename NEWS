@@ -6,7 +6,7 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
-* 6.15
+* 6.14
 
 ** New 'FAO56_daily', 'FAO56_hourly', and 'SSOC' bioclimate parameterizations.
 
@@ -14,8 +14,6 @@ The two first will follow FAO56 closer than the old "default" model,
 while the later will set parameters associated with the Sun-Shade Open
 Canopy SVAT model.  We still recommend using the "default" bioclimate
 parameterization in most cases.
-
-* 6.14
 
 ** Cw2 for each horizon is now in daily.log.
 
