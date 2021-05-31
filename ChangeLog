@@ -1,3 +1,8 @@
+2021-05-31  Per Abrahamsen  <pa@plen.ku.com>
+
+	* bioclimate_std.C (base): Renamed from "default".
+	(default, FAO56_daily, FAO56_hourly, SSOC): New parameterizations. 
+
 2021-05-27  Per Abrahamsen  <pa@plen.ku.com>
 
 	* horizon.C (initialize_base): Add 'Cw2' to daily.log table.

@@ -1,40 +1,10 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* 
-
-
-
 * pet_FAO_PM_daily: Use all daily data
 
-* Merete og Simon
+* bioclimate std FAO_daily, FAO_hourly, SSOC
 
-* Simon: Prøv Jacobs python kode
-
-* Jeanne: de to optimerede
-
-* Jeanne
-
-** Optimize parameters for Jeanne setup
-
-** Does DOC2 DON2 works?
-
-* Styczen
-
-** Læs chap 2
-
-** Ret fejl i extraterrestrial rad.
-
-* cloudiness
-
-New module
-
-Selected from bioclimate
-
-weather
-
-Arid/Humid
-
-Weirdo dif/dir
+* Jeanne rap
 
 * hysteresis
 

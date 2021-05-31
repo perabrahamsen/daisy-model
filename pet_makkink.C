@@ -40,7 +40,7 @@ struct PetMakkinkOld : public Pet
 
   // Simulation.
   void tick (const Weather& weather,
-	     const double, const double, const double, const double,
+	     const double, const double, const double,
 	     const Vegetation& crops,
 	     const Surface& surface, const Geometry&,
              const Soil&, const SoilHeat&,
@@ -103,7 +103,7 @@ struct PetMakkink : public Pet
 
   // Simulation.
   void tick (const Weather& weather,
-	     const double, const double, const double, const double,
+	     const double, const double, const double,
 	     const Vegetation& crops,
 	     const Surface& surface, const Geometry&,
              const Soil&, const SoilHeat&,

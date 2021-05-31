@@ -822,7 +822,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     + canopy_water_storage + litter_water_storage;
 
   daisy_assert (pet.get () != NULL);
-  pet->tick (weather, cloudiness_index, Rn, Rn_ref, G, vegetation, surface, 
+  pet->tick (weather, Rn, Rn_ref, G, vegetation, surface, 
              geo, soil, soil_heat, soil_water, msg);
   if (free_water > 0.01)
     total_ep_ = pet->wet ();
@@ -1495,11 +1495,12 @@ static struct BioclimateStandardSyntax : DeclareModel
   { return new BioclimateStandard (al); }
   
   BioclimateStandardSyntax ()
-    : DeclareModel (Bioclimate::component, "default", "\
-The default bioclimate model.")
+    : DeclareModel (Bioclimate::component, "base", "\
+Common parameters for all bioclimate parameterizations.")
   { }
   void load_frame (Frame& frame) const
   {
+    Model::load_model (frame);
     // Canopy structure.
     frame.declare_integer ("NoOfIntervals", Attribute::Const, "\
 Number of vertical intervals in which we partition the canopy.");
@@ -1511,12 +1512,10 @@ First entry is top of canopy, last is soil surface.");
     // External water sources and sinks.
     frame.declare_object ("cloudiness", Cloudiness::component,
 			  "Cloudiness model.");
-    frame.set ("cloudiness", "Kjaersgaard");
     frame.declare_fraction ("cloudiness_index", Attribute::LogOnly, "\
 Cloudiness index, 0 = no light, 1 = clear sky.");
     frame.declare_object ("net_radiation", NetRadiation::component,
                           "Net radiation.");
-    frame.set ("net_radiation", "brunt");
     frame.declare ("L_n", "W/m^2", Attribute::LogOnly,
                 "The calculated net longwave radiation (positive downwards).");
     frame.declare ("L_ia", "W/m^2", Attribute::LogOnly,
@@ -1534,7 +1533,6 @@ Net radiation on field.");
 Net radiation on reference surface.");
     frame.declare_object ("ghf", GHF::component,
                           "Ground heat flux.");
-    frame.set ("ghf", "old");
     frame.declare ("G", "W/m^2", Attribute::LogOnly, "\
 Ground heat flux.");
     frame.declare_object ("pet", Pet::component, 
@@ -1666,7 +1664,6 @@ Largest humidity difference for convergence.");
 
     frame.declare_object ("svat", SVAT::component, 
                           "Soil Vegetation Atmosphere component.");
-    frame.set ("svat", "none");
     frame.declare ("soil_ep", "mm/h", Attribute::LogOnly,
                    "Potential exfiltration.");
     frame.declare ("soil_ea", "mm/h", Attribute::LogOnly,
@@ -1719,7 +1716,6 @@ and the 'SSOC' svat model will revert to a one leaf description.");
     frame.set ("min_sun_angle", 3.6 * M_PI / 180.0);
     frame.declare_object ("raddist", Raddist::component, 
                           "Radiation distribution model.");
-    frame.set ("raddist", "default");
     frame.declare_object ("difrad", Difrad::component, 
                           Attribute::OptionalState, Attribute::Singleton, 
                           "Diffuse radiation component.\n\
@@ -1778,8 +1774,77 @@ use these (the weather difrad model). Otherwise Daisy wil use the DPF model.");
 
     frame.declare_object ("deposition", Deposition::component, 
                           "Deposition model.");
-    frame.set ("deposition", "weather");
   }
 } BioclimateStandard_syntax;
+
+// The 'default' parametrization.
+
+static struct BioclimateDefaultSyntax : DeclareParam
+{
+  BioclimateDefaultSyntax ()
+    : DeclareParam (Bioclimate::component, "default", "base", "\
+Use best models given available data.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set ("cloudiness", "Kjaersgaard");
+    frame.set ("net_radiation", "brunt");
+    frame.set ("ghf", "surface");
+    // Choose 'pet' based on weather data.
+    frame.set ("svat", "none");
+    frame.set ("raddist", "default");
+    // Choose 'difrad' based on weather data.
+    frame.set ("deposition", "weather");
+  }
+} BioclimateDefault_syntax;
+
+// The 'FAO56_daily' parametrization.
+
+static struct BioclimateFAO56_dailySyntax : DeclareParam
+{
+  BioclimateFAO56_dailySyntax ()
+    : DeclareParam (Bioclimate::component, "FAO56_daily", "default", "\
+Follow FAO56 for daily data.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set_strings ("cite", "FAO-PM");
+    frame.set ("cloudiness", "FAO56");
+    frame.set ("ghf", "FAO56");
+    frame.set ("pet", "FAO_PM");
+  }
+} BioclimateFAO56_daily_syntax;
+
+// The 'FAO56_hourly' parametrization.
+
+static struct BioclimateFAO56_hourlySyntax : DeclareParam
+{
+  BioclimateFAO56_hourlySyntax ()
+    : DeclareParam (Bioclimate::component, "FAO56_hourly", "default", "\
+Follow FAO56 for hourly data.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set_strings ("cite", "FAO-PM", "allen2006recommendation");
+    frame.set ("cloudiness", "FAO56");
+    frame.set ("ghf", "FAO56");
+    frame.set ("pet", "FAO_PM_hourly");
+  }
+} BioclimateFAO56_hourly_syntax;
+
+// The 'SSOC' parametrization.
+
+static struct BioclimateSSOCSyntax : DeclareParam
+{
+  BioclimateSSOCSyntax ()
+    : DeclareParam (Bioclimate::component, "SSOC", "default", "\
+The SSOC SVAT model.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set ("svat", "none");
+    frame.set ("raddist", "sun-shade");
+  }
+} BioclimateSSOC_syntax;
 
 // bioclimate_std.C ends here

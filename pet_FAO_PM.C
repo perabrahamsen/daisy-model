@@ -52,7 +52,7 @@ public:
   double G;
 
   // Simulation.
-  void tick (const Weather& weather, const double Cloudiness,
+  void tick (const Weather& weather, 
 	     const double Rn, const double Rn_ref, const double G,
 	     const Vegetation& crops,
 	     const Surface& surface, const Geometry& geo,
@@ -109,7 +109,6 @@ public:
 
 void
 PetFAO_PM::tick (const Weather& weather,
-		 const double Cloudiness,
 		 const double, const double Rn_ref, const double G,
 		 const Vegetation& crops,
                  const Surface& surface, const Geometry& geo, const Soil& soil,
