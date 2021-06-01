@@ -1,3 +1,7 @@
+2021-06-01  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.15 released.
+
 2021-06-01  Per Abrahamsen  <pa@plen.ku.com>
 
 	* hydraulic.C (min_pF): New program parameter.
