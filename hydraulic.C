@@ -278,6 +278,7 @@ struct ProgramHydraulic_table : public Program
   const int intervals;
   const bool top_soil;
   const bool print_Cw2;
+  const double min_pF;
   const double max_pF;
   
   bool run (Treelog& msg)
@@ -293,7 +294,7 @@ struct ProgramHydraulic_table : public Program
     tmp << "\n";
     for (int i = 0; i <= intervals; i++)
       {
-        const double pF = (max_pF * i) / (intervals + 0.0);
+        const double pF = min_pF + ((max_pF - min_pF) * i) / (intervals + 0.0);
         const double h = pF2h (pF);
         const double Theta = horizon->hydraulic->Theta (h);
         const double K = horizon->hydraulic->K (h);
@@ -322,6 +323,7 @@ struct ProgramHydraulic_table : public Program
       intervals (al.integer ("intervals")),
       top_soil (al.flag ("top_soil")),
       print_Cw2 (al.flag ("print_Cw2")),
+      min_pF (al.number ("min_pF")),
       max_pF (al.number ("max_pF"))
   { }
   ~ProgramHydraulic_table ()
@@ -336,8 +338,23 @@ static struct ProgramHydraulic_tableSyntax : public DeclareModel
     : DeclareModel (Program::component, "hydraulic", "\
 Generate a table of the rentention curve and hydraulic conductivity.")
   { }
+  static bool check_alist (const Metalib& metalib, const Frame& al,
+			   Treelog& msg)
+  {
+    const double min_pF = al.number ("min_pF");
+    const double max_pF = al.number ("max_pF");
+
+    if (min_pF < max_pF)
+      return true;
+
+    msg.error ("min_pF should be less than max_pF");
+    return false;
+  }
+    
+
   void load_frame (Frame& frame) const
   {
+    frame.add_check (check_alist);
     frame.declare_object ("horizon", Horizon::component, 
                           Attribute::Const, Attribute::Singleton, "\
 The hydraulic model to show in the table.");
@@ -349,6 +366,9 @@ Set to true for the plowing layer.");
     frame.declare_boolean ("print_Cw2", Attribute::Const, "\
 Set to true to include Cw2 to the table.");
     frame.set ("print_Cw2", false);
+    frame.declare ("min_pF", "pF", Attribute::Const, "\
+Minimal pF in table.");
+    frame.set ("min_pF", 0.0);
     frame.declare ("max_pF", "pF", Attribute::Const, "\
 Maximal pF in table.");
     frame.set ("max_pF", 5.0);
