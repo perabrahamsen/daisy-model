@@ -207,6 +207,7 @@
     <ClCompile Include="clayom.C" />
     <ClCompile Include="clayom_biomod.C" />
     <ClCompile Include="clayom_old.C" />
+    <ClCompile Include="cloudiness.C" />
     <ClCompile Include="column.C" />
     <ClCompile Include="column_std.C" />
     <ClCompile Include="complex_functions.C" />
@@ -263,6 +264,7 @@
     <ClCompile Include="geometry1d.C" />
     <ClCompile Include="geometry_rect.C" />
     <ClCompile Include="geometry_vert.C" />
+    <ClCompile Include="ghf.C" />
     <ClCompile Include="gnuplot.C" />
     <ClCompile Include="gnuplot_base.C" />
     <ClCompile Include="gnuplot_multi.C" />
@@ -628,6 +630,7 @@
     <ClInclude Include="chemical.h" />
     <ClInclude Include="chemistry.h" />
     <ClInclude Include="clayom.h" />
+    <ClInclude Include="cloudiness.h" />
     <ClInclude Include="column.h" />
     <ClInclude Include="complex_functions.h" />
     <ClInclude Include="condedge.h" />
@@ -667,6 +670,7 @@
     <ClInclude Include="geometry1d.h" />
     <ClInclude Include="geometry_rect.h" />
     <ClInclude Include="geometry_vert.h" />
+    <ClInclude Include="ghf.h" />
     <ClInclude Include="gnuplot.h" />
     <ClInclude Include="gnuplot_base.h" />
     <ClInclude Include="gnuplot_utils.h" />
