@@ -173,10 +173,11 @@ struct CloudinessClear : public Cloudiness
     const double sunset = sunrise + weather.day_length ();
     const bool too_early =(now < sunrise + min_time_from_sunrise);
     const bool too_late =(now > sunset - min_time_to_sunset);
+    clear_sky_radiation = find_clear_sky_radiation (weather);
+    const double Si0 = clear_sky_radiation;
     if (rad > min_rad && sin_theta > min_sin_theta
 	&& !too_early && !too_late)
       {
-	const double Si0 = find_clear_sky_radiation (weather);
 	const double x = bound (min_radiation_ratio, Si / Si0, 1.0);
 	cloudiness = a * x + 1 - a;
       }
@@ -334,6 +335,8 @@ struct CloudinessASCE : public CloudinessClear
     const double ea = weather.vapor_pressure () * 0.001;      // [kPa]
     W = 0.14 * ea * P + 2.1; // Eq D.3 [mm] Precipitable water in atm.
     const double sin_theta = weather.sin_solar_elevation_angle (); // []
+    if (sin_theta < 0.0)
+      return 0.0;
     const double KB		// Eq. D.2 [] Clearness index direct beam rad. 
       = 0.98 * std::exp (-0.00146 * P / Kt / sin_theta
 			 -0.075 * std::pow (W / sin_theta, 0.4));

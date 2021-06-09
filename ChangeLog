@@ -1,3 +1,8 @@
+2021-06-09  Per Abrahamsen  <pa@plen.ku.com>
+
+	* cloudiness.C (Cloudiness::tick): Update 'clear_sky_radiation'
+	log variable.
+
 2021-06-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.15 released.
@@ -13,7 +18,7 @@
 2021-05-31  Per Abrahamsen  <pa@plen.ku.com>
 
 	* bioclimate_std.C (base): Renamed from "default".
-	(default, FAO56_daily, FAO56_hourly, SSOC): New parameterizations. 
+	(default, FAO56_daily, FAO56_hourly, SSOC): New parameterizations.
 
 2021-05-27  Per Abrahamsen  <pa@plen.ku.com>
 

@@ -160,7 +160,7 @@ static struct HydraulicM_BaCSyntax : public DeclareModel
     frame.declare ("l", Attribute::None (), Check::none (), Attribute::Const,
 		   "Burdine form parameter. Ignored if 'p' is set.");
     frame.set ("l", 0.5);
-    frame.declare ("p", Attribute::None (), Check::positive (),
+    frame.declare ("p", Attribute::None (), Check::non_negative (),
 		   Attribute::OptionalConst, "\
 Hydraulic conductivity form parameter. By default p=l+2+2/lambda.");
   }

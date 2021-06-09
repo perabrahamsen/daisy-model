@@ -6,6 +6,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.15
+
+** New 'min_pF' parameter in the 'hydraulic' program model.
+
 * 6.14
 
 ** New 'FAO56_daily', 'FAO56_hourly', and 'SSOC' bioclimate parameterizations.
