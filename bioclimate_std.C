@@ -804,7 +804,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 
   // Ground heat flux.
   G = ghf->value (geo, soil, soil_water, soil_heat,
-		  weather, Rn, msg);
+		  weather, Rn_ref, msg);
 
   // 1.1 Fluxify management operations.
 

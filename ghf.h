@@ -42,7 +42,7 @@ public:
 public:
   virtual double value (const Geometry&, const Soil&,
 			const SoilWater&, const SoilHeat&, const Weather&,
-			const double Rn, Treelog&) const = 0; // [W/m^2]
+			const double Rn_ref, Treelog&) const = 0; // [W/m^2]
 
   // Create and Destroy.
 protected:

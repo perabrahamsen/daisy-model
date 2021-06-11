@@ -708,7 +708,11 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
 	{
 	  if (!original)
 	    throw (std::string ("No original value"));
+#if 0
 	  result.reset (&original->clone ());
+#else
+	  result.reset (new FrameModel (*original, Frame::parent_link));
+#endif
 	  type = result->type_name ();
 	  daisy_assert (lib.check (type));
 	}

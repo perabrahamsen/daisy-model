@@ -189,12 +189,13 @@ struct GHFFAO56 : public GHF
   // Simulation.
   double value (const Geometry&,
 		const Soil&, const SoilWater&, const SoilHeat&,
-		const Weather& weather, const double Rn, Treelog&) const // [W/m^2]
+		const Weather& weather, const double Rn_ref,
+		Treelog&) const // [W/m^2]
   {
     const bool is_day = (weather.sin_solar_elevation_angle () > 0.0);
     return is_day
-      ? (0.1 * Rn)		// Eq 45.
-      : (0.5 * Rn);		// Eq 46.
+      ? (0.1 * Rn_ref)		// Eq 45.
+      : (0.5 * Rn_ref);		// Eq 46.
   }  
   // Create.
   GHFFAO56 (const BlockModel& al)

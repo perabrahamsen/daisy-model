@@ -1485,7 +1485,12 @@ Frame::set (const symbol key, const symbol name)
       const Intrinsics& intrinsics = Librarian::intrinsics ();
       intrinsics.instantiate (component, name);
       const FrameModel& old = intrinsics.library (component).model (name);
+#if 0
       boost::shared_ptr<const FrameModel> child (&old.clone ());
+#else
+      boost::shared_ptr<const FrameModel>
+	child (new FrameModel (old, Frame::parent_link));
+#endif
       impl->set_value (key, new ValueModel (child));
       return;
     }
