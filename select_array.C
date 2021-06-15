@@ -32,6 +32,7 @@
 #include "frame.h"
 #include "column.h"
 #include "geometry.h"
+#include <sstream>
 
 struct SelectArray : public Select
 {
@@ -309,6 +310,57 @@ The 'array' select model only handle bulk density for soil sized variables";
       }
   }
 
+  symbol raw_tag (size_t i) const
+  {
+    std::ostringstream tmp;
+    tmp << tag () << "[" << i << "]";
+    return tmp.str ();
+  }
+
+  symbol cell_tag (size_t i) const
+  {
+    const Geometry* geo = geometry ();
+    static const symbol empty_symbol ("");
+    std::ostringstream tmp;
+    if (tag () != empty_symbol)
+      tmp << tag () << " @ ";
+    tmp << geo->cell_name (i);
+    return tmp.str ();
+  }
+
+  symbol edge_tag (size_t i) const
+  {
+    const Geometry* geo = geometry ();
+    static const symbol empty_symbol ("");
+    std::ostringstream tmp;
+    if (tag () != empty_symbol)
+      tmp << tag () << " @ ";
+    tmp << geo->edge_name (i);
+    return tmp.str ();
+  }
+
+  symbol array_tag (size_t i) const
+  {
+    const Geometry* geo = geometry ();
+    if (!geo)
+      return raw_tag (i);
+
+    switch (type_size ())
+      {
+      case Attribute::SoilCells:
+	return cell_tag (i);
+      case Attribute::SoilEdges:
+	return edge_tag (i);
+      }
+    if (size () == geo->cell_size ())
+      return cell_tag (i);
+
+    if (size () == geo->edge_size ())
+      return edge_tag (i);
+
+    return raw_tag (i);
+  }
+  
   const Geometry* geometry () const
   { 
     if (last_column)

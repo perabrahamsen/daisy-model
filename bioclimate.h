@@ -75,6 +75,7 @@ public:
   virtual const std::vector<double>& sun_PAR () const = 0;
   virtual const std::vector<double>& sun_LAI_fraction () const = 0;
   virtual double cover () const = 0; 
+  virtual double litter_cover () const = 0; 
   virtual double LAI () const = 0;
   virtual double sun_LAI_fraction_total () const =0;
   virtual double wind_speed_field () const = 0;

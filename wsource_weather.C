@@ -726,6 +726,23 @@ WSourceWeather::Implementation::tick_weather (const Time& time, Treelog& msg)
       return;
     }
   
+  // Calculate values for this timestep.
+  extract_average (Weatherdata::Latitude (), my_latitude, msg);
+  extract_average (Weatherdata::Longitude (), my_longitude, msg);
+  extract_average (Weatherdata::Elevation (), my_elevation, msg);
+  extract_average (Weatherdata::TimeZone (), my_timezone, msg);
+  extract_average (Weatherdata::ScreenHeight (), my_screenheight, msg);
+  extract_average (Weatherdata::TAverage (), my_Taverage, msg);
+  extract_average (Weatherdata::TAmplitude (), my_Tamplitude, msg);
+  extract_average (Weatherdata::MaxTDay (), my_maxTday, msg);
+  {
+    const symbol name = name_first (Weatherdata::Surface ());
+    if (name == Attribute::Unknown ())
+      msg.warning ("Unknown surface, using old");
+    else
+      my_surface = Weatherdata::symbol2surface (name);
+  }
+
   if (new_day)
     // Daily values.
     {
@@ -845,23 +862,6 @@ WSourceWeather::Implementation::tick_weather (const Time& time, Treelog& msg)
       else
         msg.warning ("No daily air temperature, reusing using old value");
     }
-
-  // Calculate values for this timestep.
-  extract_average (Weatherdata::Latitude (), my_latitude, msg);
-  extract_average (Weatherdata::Longitude (), my_longitude, msg);
-  extract_average (Weatherdata::Elevation (), my_elevation, msg);
-  extract_average (Weatherdata::TimeZone (), my_timezone, msg);
-  extract_average (Weatherdata::ScreenHeight (), my_screenheight, msg);
-  extract_average (Weatherdata::TAverage (), my_Taverage, msg);
-  extract_average (Weatherdata::TAmplitude (), my_Tamplitude, msg);
-  extract_average (Weatherdata::MaxTDay (), my_maxTday, msg);
-  {
-    const symbol name = name_first (Weatherdata::Surface ());
-    if (name == Attribute::Unknown ())
-      msg.warning ("Unknown surface, using old");
-    else
-      my_surface = Weatherdata::symbol2surface (name);
-  }
 
   // Sun angle.
   const double sin_beta_1
@@ -1297,6 +1297,9 @@ WSourceWeather::Implementation::Implementation (const Weather& w,
     my_daily_global_radiation (NAN),
     my_daily_extraterrestrial_radiation (NAN),
     my_daily_precipitation (NAN),
+    my_daily_vapor_pressure (NAN),
+    my_daily_wind (NAN),
+    my_daily_air_pressure (NAN),
     initialized_ok (false)
 { }
 

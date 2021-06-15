@@ -115,6 +115,7 @@ public:
   int original_size () const;
   virtual symbol dimension () const;
   virtual symbol tag () const;
+  virtual symbol array_tag (size_t) const;
   virtual const Geometry* geometry () const; // For array tags.
   virtual int size () const;	// For array tags.
   static symbol select_get_tag (const BlockModel& al);

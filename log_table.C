@@ -148,68 +148,20 @@ DestinationTable::record_start (const std::vector<Time::component_t>& time_colum
       // Print the entry names in the first line of the log file..
       for (unsigned int i = 0; i < entries.size (); i++)
         {
+	  const Select& select = *entries[i];
+	  
           if (i != 0)
             out << field_separator;
 
-          const Geometry *const geo = entries[i]->geometry ();
-          const int value_size = entries[i]->size ();
-          int type_size = entries[i]->type_size ();
-          const symbol tag = entries[i]->tag ();
-          static const symbol empty_symbol ("");
-
-          // Missing spec. Guess from value size. TODO: Should be removed.
-          if (geo && type_size == Attribute::Unspecified)
-            {
-              // TODO: Put in warning?
-              if (geo->cell_size () == value_size)
-                type_size = Attribute::SoilCells;
-              else if (geo->edge_size () == value_size)
-                type_size = Attribute::SoilEdges;
-            }
-          if (!geo)
-            switch (type_size)
-              {
-              case Attribute::SoilCells:
-              case Attribute::SoilEdges:
-                daisy_warning (file.name ()
-			       + ": Can't log soil values without soil");
-                type_size = Attribute::Variable;
-              }
-
-          switch (type_size)
-            {
-            case Attribute::SoilCells:
-              for (unsigned j = 0; j < geo->cell_size (); j++)
-                {
-                  if (j != 0)
-                    out << array_separator;
-                  if (tag != empty_symbol)
-                    out << tag << " @ ";
-                  out << geo->cell_name (j);
-                }
-              break;
-            case Attribute::SoilEdges:
-              for (unsigned j = 0; j < geo->edge_size (); j++)
-                {
-                  if (j != 0)
-                    out << array_separator;
-                  if (tag != empty_symbol)
-                    out << tag << " @ ";
-                  out << geo->edge_name (j);
-                }
-              break;
-            case Attribute::Singleton:
-              out << entries[i]->tag ();
-              break;
-            default:
-              // Other arrays, use value size 
-              for (unsigned j = 0; j < value_size; j++)
-                {
-                  if (j != 0)
-                    out << array_separator;
-                  out << tag << "[" << j << "]";
-                }
-            }
+          const int value_size = select.size ();
+	  if (value_size == Attribute::Singleton)
+              out << select.tag ();
+	  else for (size_t j = 0; j < value_size; j++)
+		 {
+		   if (j != 0)
+		     out << array_separator;
+		   out << select.array_tag (j);
+		 }
         }
       out << record_separator;
       print_tags = false;
@@ -223,38 +175,26 @@ DestinationTable::record_start (const std::vector<Time::component_t>& time_colum
       // Print the entry names in the first line of the log file..
       for (unsigned int i = 0; i < entries.size (); i++)
         {
+	  const Select& select = *entries[i];
+	  
           if (i != 0)
             out << field_separator;
 
-          const Geometry *const geo = entries[i]->geometry ();
-          int size = entries[i]->size ();
-          const int type_size = entries[i]->type_size ();
-          switch (type_size)
-            {
-            case Attribute::SoilCells:
-              if (geo)
-                size = geo->cell_size ();
-              break;
-            case Attribute::SoilEdges:
-              if (geo)
-                size = geo->edge_size ();
-              break;
-            case Attribute::Singleton:
-              size = 1;
-            }
-          daisy_assert (size >= 0);
-          symbol dimension = entries[i]->dimension ().name ();
+          symbol dimension = select.dimension ().name ();
           if (dimension == Attribute::None () 
               || dimension == Attribute::Unknown ()
               || dimension == Attribute::Fraction ())
             dimension = "";
 
-          for (unsigned j = 0; j < size; j++)
-            {
-              if (j != 0)
-                out << array_separator;
+          const int value_size = select.size ();
+	  if (value_size == Attribute::Singleton)
               out << dimension;
-            }
+	  else for (size_t j = 0; j < value_size; j++)
+		 {
+		   if (j != 0)
+		     out << array_separator;
+		   out << dimension;
+		 }
         }
       out << record_separator;
       print_dimension = false;

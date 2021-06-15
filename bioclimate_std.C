@@ -63,6 +63,7 @@ struct BioclimateStandard : public Bioclimate
   const long No;                // No of intervals in canopy discretization.
   double LAI_;                  // Total LAI of all crops on this column. [0-]
   double cover_;                // Fraction of soil covered by vegetation.
+  double litter_cover_;                // Fraction of soil covered by litter.
   double sun_LAI_fraction_total_;// Total sun LAI fraction of all crops on this column.
   std::vector<double> Height;   // Height in cm of each endpoint in c.d.
   std::vector<double> total_PAR_;// Total PAR of each interval of c.d. [W/m2]
@@ -250,6 +251,8 @@ struct BioclimateStandard : public Bioclimate
   { return LAI_; }
   double cover () const
   { return cover_; }
+  double litter_cover () const
+  { return litter_cover_; }
   double sun_LAI_fraction_total () const
   { return sun_LAI_fraction_total_; }
   double wind_speed_field () const 
@@ -517,6 +520,7 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     No (al.integer ("NoOfIntervals")),
     LAI_ (0.0),
     cover_ (0.0),
+    litter_cover_ (0.0),
     sun_LAI_fraction_total_ (0.0),
     Height (No + 1),
     total_PAR_ (No + 1),
@@ -1276,7 +1280,8 @@ BioclimateStandard::tick (const Time& time,
 
   // Update canopy structure.
   CanopyStructure (vegetation);
- 
+  litter_cover_ = litter.cover ();
+  
   // Radiation.
   daisy_assert (difrad.get () != NULL);
   difrad0 = difrad->value (time, weather, msg) * global_radiation_;
@@ -1379,6 +1384,7 @@ BioclimateStandard::output (Log& log) const
   output_value (snow_water_out_temperature, 
                 "snow_water_out_temperature", log);
   output_value (cover_, "canopy_cover", log);
+  output_value (litter_cover_, "litter_cover", log);
   output_variable (canopy_ep, log);
   output_value (canopy_ea_, "canopy_ea", log);
   output_variable (canopy_water_capacity, log);
@@ -1622,6 +1628,8 @@ The intended use is colloid generation.");
                    "Total water input below canopy.");
 
     // Water intercepted by litter.
+    frame.declare_fraction ("litter_cover", Attribute::LogOnly,
+			    "Fraction of ground covered by litter.");
     frame.declare ("litter_ep", "mm/h", Attribute::LogOnly,
                    "Potential evaporation litter.");
     frame.declare ("litter_ea", "mm/h", Attribute::LogOnly,

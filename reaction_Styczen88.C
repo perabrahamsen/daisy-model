@@ -45,7 +45,7 @@ struct ReactionStyczen88 : public ReactionColgen
 
   // Parameters.
   const double Ae;              // Soil resitance factor [h^2/g C/cm^2 S]
-  const double MA;              // Mulch factor (protective coverage) []
+  const double fixed_MA;      // Mulch factor (protective coverage) []
   const double droplet_diameter; // Size of vegetation droplets. [mm]
 
   // Log variable.
@@ -64,6 +64,7 @@ struct ReactionStyczen88 : public ReactionColgen
   void colloid_generation (const double P /* [mm/h] */,
                            const double LD /* [mm/h] */,
                            const double f_cov /* [] */,
+                           const double litter_cover /* [] */,
                            const double h_veg /* [m] */,
                            const double h_pond /* [mm] */,
                            const double dt /* [h] */);
@@ -191,6 +192,7 @@ void
 ReactionStyczen88::colloid_generation (const double P /* [mm/h] */,
                                        const double canopy_leak /* [mm/h] */,
                                        const double f_cov /* [] */,
+				       const double litter_cover /* [] */,
                                        const double h_veg /* [m] */,
                                        const double h_pond /* [mm] */,
                                        const double dt /* [h] */)
@@ -213,6 +215,9 @@ ReactionStyczen88::colloid_generation (const double P /* [mm/h] */,
     : 1.0;
   daisy_assert (std::isfinite (CM));
 
+  const double MA = (fixed_MA < 0.0) ? litter_cover : fixed_MA;
+  daisy_assert (MA >= 0.0);
+  
   // Detachment of colloids at the surface. [g cm^-2 h^-1]
   D = Ae * (1.0 - MA) * KH * CM * MR; 
 
@@ -231,6 +236,7 @@ ReactionStyczen88::tick_top (const Vegetation& vegetation,
                              OrganicMatter&,
 			     Chemistry& chemistry, const double dt, Treelog&)
 {
+  const double litter_cover = bioclimate.litter_cover (); // [];
   const double canopy_cover = vegetation.cover (); // [];
   const double canopy_drip = bioclimate.canopy_leak (); // [mm/h]
   const double h_veg = vegetation.height () * 0.01 ;	 // [m]
@@ -243,7 +249,7 @@ ReactionStyczen88::tick_top (const Vegetation& vegetation,
   const double LD = canopy_drip; // [mm/h]
   const double f_cov = canopy_cover; // []
 
-  colloid_generation (P, LD, f_cov, h_veg, h_pond, dt);
+  colloid_generation (P, LD, f_cov, litter_cover, h_veg, h_pond, dt);
 
   colloid.add_to_surface_transform_source (D);
   colloid.release_surface_colloids (surface_release);
@@ -271,7 +277,7 @@ ReactionStyczen88::ReactionStyczen88 (const BlockModel& al)
   : ReactionColgen (al),
     surface_soil (-42.42e42),
     Ae (al.number ("Ae")),
-    MA (al.number ("MA")),
+    fixed_MA (al.number ("MA", -42.42e42)),
     droplet_diameter (al.number ("droplet_diameter")),
     DH (-42.42e42),
     CM (-42.42e42),
@@ -292,8 +298,9 @@ Colloid generation using rainfall momentum.")
 
     frame.declare ("Ae", "h^2/g/cm^2", Check::positive (), Attribute::Const, 
                "Soil resistance factor.");
-    frame.declare ("MA", Attribute::Fraction (), Attribute::Const, 
-               "Protective cover (mulch factor).");
+    frame.declare ("MA", Attribute::Fraction (), Attribute::OptionalConst, 
+               "Protective cover (mulch factor).\n\
+By default, use the cover predicted by the litter model.");
     frame.declare ("droplet_diameter", "mm", Check::positive (), Attribute::Const, 
                "Size of droplets from vegetation.");
     frame.declare ("DH", "kg^2/m/s^2", Attribute::LogOnly, 

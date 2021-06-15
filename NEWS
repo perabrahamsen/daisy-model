@@ -6,6 +6,36 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.18
+
+** You can now log 2D flow as vectors centered in each node.
+
+The vector will be an average of the flow through the edges of the
+node, and is not useful for mass balances, but can be used for
+visualization. First the z component of he flow will be listed for
+each cell, then the x component for each cell.
+
+(deflog "Matrix Water Quiver" column
+  "The matrix water flux from each node."
+  (where "${colfid}matrix_water_quiver.dlf")
+  (when hourly)
+  (entries (quiver (path column "${column}" SoilWater q)
+                  (spec fixed SoilWater q)
+                  (handle sum)
+                  (dimension "mm"))))
+
+* 6.17
+
+** Litter will now protect against colloid generation.
+
+The Styczen88 has a 'MA' parameter representing litter coverage. This
+parameter is now optional, if you leave it out the (possibly dynamic)
+value calculated by the litter model will be used instead.
+
+The Morgan98 and Jarvis99 models didn't include protection from mulch
+before. Depending on the fields they were trained on, this means they
+may now underestimate colloid generation.
+
 * 6.15
 
 ** New 'min_pF' parameter in the 'hydraulic' program model.

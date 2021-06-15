@@ -86,11 +86,17 @@ FAO::RefAerodynamicResistance (double U2)
 
 double
 FAO::LatentHeatVaporization (double Temp) // [J/kg]
-{ return ((2.501 - 2.361e-3 * Temp) * 1.0e6); }
+{
+  const double value = ((2.501 - 2.361e-3 * Temp) * 1.0e6);
+  daisy_assert (std::isfinite (value));
+  return ((2.501 - 2.361e-3 * Temp) * 1.0e6); }
 
 double
 FAO::PsychrometricConstant (double AtmPressure, double Temp) // [Pa/K]
-{ return (1.63e3 * AtmPressure / LatentHeatVaporization (Temp)); }
+{
+  daisy_assert (std::isfinite (AtmPressure));
+  return (1.63e3 * AtmPressure / LatentHeatVaporization (Temp));
+}
 
 double
 FAO::AirDensity (double AtmPressure, double Temp) // [kg/m3]
@@ -254,13 +260,19 @@ FAO::RefPenmanMonteith (double Rn, // [W/m^2]
 			)
 {
   const double s = SlopeVapourPressureCurve (Temp); // [Pa/K]
+  daisy_assert (std::isfinite (s));
   const double gamma = PsychrometricConstant (AtmPressure, Temp); // [Pa/K]
+  daisy_assert (std::isfinite (gamma));
   const double e_sat = SaturationVapourPressure (Temp);		  // [Pa]
+  daisy_assert (std::isfinite (e_sat));
   double E3 = 0.03525 * s * (Rn - G) +
     gamma * 0.9 / (Temp + 273) * U2 *
     (e_sat - ea);
+  daisy_assert (std::isfinite (E3));
   E3 /= s + gamma * (1 + 0.34 * U2);
+  daisy_assert (std::isfinite (E3));
   const double value = E3 / 86400.0; // [kg/m^2/s]
+  daisy_assert (std::isfinite (value));
 #if 0
   std::ostringstream tmp;
   tmp << "Rn = " << Rn << ", G = " << G << ", Temp = " << Temp

@@ -1,3 +1,13 @@
+2021-06-15  Per Abrahamsen  <pa@plen.ku.com>
+
+	* select_quiver.C: New model.
+
+2021-06-11  Per Abrahamsen  <pa@plen.ku.com>
+
+	* bioclimate_std.C (litter_cover): New log variable.
+	* reaction_Morgan98.C, reaction_Jarvis99.C, reaction_Styczen88.C:
+	(tick_top): Use it.
+
 2021-06-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.17 released.

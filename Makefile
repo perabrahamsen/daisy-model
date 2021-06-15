@@ -196,7 +196,8 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = hydraulic_M_BivG.C hydraulic_M_vGBS.C hydraulic_hypWeb.C \
+MODELS = select_quiver.C \
+	hydraulic_M_BivG.C hydraulic_M_vGBS.C hydraulic_hypWeb.C \
 	reaction_dom.C litter_mulch.C hydraulic_linear.C hydraulic_table.C \
 	program_weather.C uzrichard2.C hydraulic_M_vGip.C reaction_shoot.C \
 	condition_walltime.C  action_BBCH.C condition_BBCH.C  \
@@ -682,7 +683,6 @@ setupcommon:
 build:
 	$(MAKE) make-win32-portable
 	$(MAKE) make-win64-portable
-	$(MAKE) docs OBJHOME=win32-portable
 
 setup:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
@@ -1521,6 +1521,11 @@ plf${OBJ}: plf.C plf.h assertion.h mathlib.h
 mathlib${OBJ}: mathlib.C mathlib.h assertion.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+select_quiver${OBJ}: select_quiver.C select.h destination.h symbol.h model.h \
+ units.h memutils.h volume.h model_derived.h model_logable.h attribute.h \
+ soil.h bdconv.h convert.h block_model.h block_nested.h block.h scope.h \
+ treelog.h frame_model.h frame.h mathlib.h assertion.h librarian.h \
+ column.h model_framed.h irrigate.h geometry.h
 hydraulic_M_BivG${OBJ}: hydraulic_M_BivG.C hydraulic.h model_framed.h \
  model_logable.h model.h symbol.h plf.h block_model.h block_nested.h \
  block.h scope.h attribute.h treelog.h frame_model.h frame.h mathlib.h \
@@ -2218,7 +2223,7 @@ pet_FAO_PM${OBJ}: pet_FAO_PM.C pet.h model_framed.h model_logable.h model.h \
  symbol.h fao.h weather.h weatherdata.h soil.h surface.h uzmodel.h \
  soil_heat.h vegetation.h model_derived.h log.h time.h border.h \
  librarian.h frame.h scope.h attribute.h block_model.h block_nested.h \
- block.h treelog.h frame_model.h
+ block.h treelog.h frame_model.h mathlib.h assertion.h
 pet_Hargreaves${OBJ}: pet_Hargreaves.C pet.h model_framed.h model_logable.h \
  model.h symbol.h weather.h weatherdata.h fao.h log.h time.h border.h \
  mathlib.h assertion.h librarian.h frame.h scope.h attribute.h treelog.h

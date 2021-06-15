@@ -101,8 +101,9 @@ ReactionMorgan98::tick_top (const Vegetation& vegetation,
                             OrganicMatter&,
 			    Chemistry& chemistry, const double dt, Treelog&)
 {
-  const double direct_rain = bioclimate.direct_rain (); // [mm/h]
-  const double canopy_drip = bioclimate.canopy_leak (); // [mm/h]
+  const double exposed_soil = 1.0 - bioclimate.litter_cover ();
+  const double direct_rain = bioclimate.direct_rain () * exposed_soil; // [mm/h]
+  const double canopy_drip = bioclimate.canopy_leak () * exposed_soil; // [mm/h]
   const double h_veg = vegetation.height () * 0.01 ;	 // [m]
   
   ReactionColgen::tick_colgen (total_rain, h_pond);

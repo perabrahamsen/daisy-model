@@ -33,6 +33,7 @@
 #include "librarian.h"
 #include "frame.h"
 #include "block_model.h"
+#include "mathlib.h"
 #include <sstream>
 #include <memory>
 
@@ -122,19 +123,39 @@ PetFAO_PM::tick (const Weather& weather,
   const double U2 = weather.daily_wind ();
   const double AtmPressure = weather.daily_air_pressure ();
 
+  daisy_assert (std::isfinite (Rn_ref));
+  daisy_assert (std::isfinite (G));
+  daisy_assert (std::isfinite (Temp));
+  daisy_assert (std::isfinite (VaporPressure));
+  daisy_assert (std::isfinite (U2));
+  daisy_assert (std::isfinite (AtmPressure));
   reference_evapotranspiration_dry
     = FAO::RefPenmanMonteith (Rn_ref, G, Temp, VaporPressure, U2,
                               AtmPressure)
     * 3600;
-
+  if (!std::isfinite (reference_evapotranspiration_dry))
+    {
+      std::ostringstream tmp;
+      tmp
+	<< "; Rn_ref = " << Rn_ref 
+	<< "; G = " << G
+	<< "; Temp = " << Temp
+	<< "; VaporPressure = " << VaporPressure
+	<< "; U2 = " << U2 
+	<< "; reference_evapotranspiration_dry = " << reference_evapotranspiration_dry;
+      msg.error (tmp.str ());
+    }
+  daisy_assert (std::isfinite (reference_evapotranspiration_dry));
   potential_evapotranspiration_dry
     = reference_to_potential_dry (crops, surface, 
                                   reference_evapotranspiration_dry);
 
+  daisy_assert (std::isfinite (rb));
   reference_evapotranspiration_wet
     = FAO::RefPenmanMonteithWet (Rn_ref, G, Temp, VaporPressure, U2,
                                  AtmPressure, rb)
     * 3600;
+  daisy_assert (std::isfinite (reference_evapotranspiration_wet));
   potential_evapotranspiration_wet
      = reference_to_potential_wet (crops, surface,
                                    reference_evapotranspiration_wet);
