@@ -479,6 +479,7 @@
     <ClCompile Include="select_flow.C" />
     <ClCompile Include="select_index.C" />
     <ClCompile Include="select_number.C" />
+    <ClCompile Include="select_quiver.C" />
     <ClCompile Include="select_value.C" />
     <ClCompile Include="select_volume.C" />
     <ClCompile Include="smb.C" />
