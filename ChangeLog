@@ -1,3 +1,11 @@
+2021-06-16  Per Abrahamsen  <pa@plen.ku.com>
+
+	* production.C (water_log_h_limit, water_log_root_limit):
+	(RtDR_water_log_factor, RtDR_water_log_addend): New parameters.
+	(water_logged): New log variable.
+
+	* plf.C (always_0): New static member function.
+
 2021-06-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.18 released.

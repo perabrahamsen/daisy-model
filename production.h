@@ -23,6 +23,7 @@
 #define PRODUCTION_H
 
 #include "symbol.h"
+#include "soil_water.h"
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -66,8 +67,12 @@ private:
   const double ExfoliationFac;	// Exfoliation factor, 0-1
   const PLF& LfDR;		// Death rate of Leafs
   const PLF& RtDR;		// Death rate of Roots
-  const double Large_RtDR;	// Extra death rate for large root/shoot.
-  const PLF& RtDR_T_factor;	// Temperature factor for root death rate.
+  const double Large_RtDR;	// Extra death rate for large root/shoot
+  const PLF& RtDR_T_factor;	// Temperature factor for root death rate
+  const double water_log_h_limit; // Pressure for water logging [cm]
+  const double water_log_root_limit = 0.1; // Min root density for WL [cm/cm^3]
+  const PLF& RtDR_water_log_factor; // Multiply DR with this.
+  const PLF& RtDR_water_log_addend; // Add this to DR.
   const double IntDSRelRtRes;	// Initial DS for the release of root reserves
   const double EndDSRelRtRes;	// End DS for the release of root reserves
   const double RelRateRtRes;	// Release rate of root reserves
@@ -131,7 +136,8 @@ private:
   double C_Loss;		// C lost from the plant. [g/m2]
   double DailyNetRoot;          // Net root growth this day.
   double DailyNetShoot;          // Net shoot growth this day.
-
+  double water_logged;		 // Fraction of root volume water logged [0-1]
+  
   // Queries.
 private:
   double RSR () const;		// Root / Shoot ratio.
@@ -149,7 +155,7 @@ private:
 public:
   void tick (double AirT, double SoilT,
 	     const std::vector<double>& Density,
-	     const Geometry& geometry,
+	     const Geometry& geometry, const SoilWater& soil_water,
 	     double DS, double CAImRat,
 	     const CrpN& nitrogen,
              double nitrogen_stress,

@@ -71,6 +71,7 @@ public:
   // Create and Destroy.
   static const PLF& empty ();	// An empty PLF.
   static const PLF& always_1 (); // A PLF that is always 1.
+  static const PLF& always_0 (); // A PLF that is always 0.
   void clear ();
   void add (double, double);
   void operator += (const PLF&);

@@ -6,9 +6,23 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.19
+
+** Support for root death due to water logging.
+
+A fraction of root zone that is water logged is calculated based on
+the new 'water_log_h_limit' and 'water_log_root_limit' parameters, and
+can be logged with the "'water_logged' output variable.
+
+Based on this, and addend controled by 'RtDR_water_log_addend' is
+added to the root death rate, and then a factor controled by
+'RtDR_water_log_factor' is multiplied to the sum.
+
+All of these are part of the Production fixed component.
+
 * 6.18
 
-** You can now log 2D flow as vectors centered in each node.
+** You can now log estimated 2D flow as vectors centered in each node.
 
 The vector will be an average of the flow through the edges of the
 node, and is not useful for mass balances, but can be used for

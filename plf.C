@@ -456,6 +456,20 @@ PLF::always_1 ()
   return one;
 }
 
+const PLF& 
+PLF::always_0 ()
+{ 
+  static const struct PLF_zero : public PLF
+  {
+    PLF_zero ()
+    {
+      add (0.0, 0.0);
+      add (1.0, 0.0);
+    }
+  } zero;
+  return zero;
+}
+
 void
 PLF::clear ()
 { impl.clear (); }

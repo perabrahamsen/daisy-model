@@ -134,7 +134,7 @@ Production::GrowthRespCoef (double E)
 void
 Production::tick (const double AirT, const double SoilT,
 		  const std::vector<double>& Density,
-		  const Geometry& geo,
+		  const Geometry& geo, const SoilWater& soil_water,
 		  const double DS, const double CAImRat,
 		  const CrpN& nitrogen,
                   const double nitrogen_stress,
@@ -436,8 +436,38 @@ Production::tick (const double AirT, const double SoilT,
       N_AM += N_foli * dt;
     }
 
+  // Root zone watter logging.
+  const size_t cell_size = geo.cell_size ();
+  daisy_assert (Density.size () == cell_size);
+  double root_volume = 0.0; // [cm^3]
+  double water_logged_volume = 0.0; // [cm^3]
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      if (Density[c] <= water_log_root_limit)
+	continue;
+      const double vol = geo.cell_volume (c);
+      root_volume += vol;
+      if (soil_water.h (c) < water_log_h_limit)
+	continue;
+      water_logged_volume += vol;
+    }
+
+  double WL_fac = 1.0;
+  double WL_add = 0.0;
+  if (root_volume > 0.0)
+    {
+      daisy_assert (water_logged_volume <= root_volume);
+      water_logged = water_logged_volume / root_volume;
+      WL_fac = RtDR_water_log_factor (water_logged);
+      WL_add = RtDR_water_log_addend (water_logged);
+    }
+  else
+    water_logged = NAN;
+      
   // Update dead roots.
-  double root_death_rate = RtDR (DS) * RtDR_T_factor (SoilT);
+  double root_death_rate = (RtDR (DS) + WL_add)
+    * RtDR_T_factor (SoilT) * WL_fac;
+  
   if (RSR () > 1.1 * partition.RSR (DS))
     root_death_rate += Large_RtDR;
 
@@ -619,6 +649,9 @@ Production::output (Log& log) const
   output_variable (C_Loss, log);
   output_variable (DailyNetRoot, log);
   output_variable (DailyNetShoot, log);
+  if (std::isfinite (water_logged))
+    output_variable (water_logged, log);
+  
 }
 
 void 
@@ -675,10 +708,26 @@ Production::load_syntax (Frame& frame)
   frame.set ("Large_RtDR", 0.05);
   frame.declare ("RtDR_T_factor", "dg C", Attribute::None (), Attribute::Const,
 	      "Temperature dependent factor for root death rate.");
-  PLF none;
-  none.add (  0.0, 1.0);
-  none.add (100.0, 1.0);
-  frame.set ("RtDR_T_factor", none);
+  frame.set ("RtDR_T_factor", PLF::always_1 ());
+  frame.declare ("water_log_h_limit", "cm", Attribute::Const, "\
+Roots are water logged if the soil water potential exceed this threshold.");
+  frame.set ("water_log_h_limit", 0.0);
+  frame.declare ("water_log_root_limit", "cm/cm^3", Attribute::Const, "\
+Soil is part of the root zone if root density is above this threshold. \n\
+Set it to zero to use the calculated root depth instead.");
+  frame.set ("water_log_root_limit", 0.1);
+  frame.declare ("RtDR_water_log_factor",
+		 Attribute::Fraction (), Attribute::None (),
+		  Attribute::Const, "\
+Water logging dependent factor for root death rate.\n\
+This is a function of the fraction of the root zone being water logged.");
+  frame.set ("RtDR_water_log_factor", PLF::always_1 ());
+  frame.declare ("RtDR_water_log_addend",
+		 Attribute::Fraction (), "d^-1",
+		 Attribute::Const, "\
+Water logging dependent addend for root death rate.\n			\
+This is a function of the fraction of the root zone being water logged.");
+  frame.set ("RtDR_water_log_addend", PLF::always_0 ());
   frame.declare ("IntDSRelRtRes", Attribute::None (), Attribute::Const,
 	      "Initial DS for the release of root reserves.");
   frame.set ("IntDSRelRtRes", 0.80);
@@ -802,6 +851,8 @@ By default, this will start as the amount of N in the seed.");
   frame.declare ("DailyNetShoot", "g DM/m^2", Attribute::State,
 	      "Leaf growth minus leaf respiration so far this day.");
   frame.set ("DailyNetShoot", 0.0);
+  frame.declare_fraction ("water_logged", Attribute::LogOnly, "\
+Fraction of root zone water logged.");
 }
 
 void
@@ -864,6 +915,10 @@ Production::Production (const FrameSubmodel& al)
     RtDR (al.plf ("RtDR")),
     Large_RtDR (al.number ("Large_RtDR")),
     RtDR_T_factor (al.plf ("RtDR_T_factor")),
+    water_log_h_limit (al.number ("water_log_h_limit")),
+    water_log_root_limit (al.number ("water_log_root_limit")),
+    RtDR_water_log_factor (al.plf ("RtDR_water_log_factor")),
+    RtDR_water_log_addend (al.plf ("RtDR_water_log_addend")),
     IntDSRelRtRes (al.number ("IntDSRelRtRes")),
     EndDSRelRtRes (al.number ("EndDSRelRtRes")),
     RelRateRtRes (al.number ("RelRateRtRes")),
@@ -922,7 +977,8 @@ Production::Production (const FrameSubmodel& al)
     DeadNRoot (0.0),
     C_Loss (0.0),
     DailyNetRoot  (al.number ("DailyNetRoot")),
-    DailyNetShoot  (al.number ("DailyNetShoot"))
+    DailyNetShoot  (al.number ("DailyNetShoot")),
+    water_logged (NAN)
 { }
 
 Production::~Production ()
