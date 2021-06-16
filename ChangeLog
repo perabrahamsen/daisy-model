@@ -1,3 +1,7 @@
+2021-06-16  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.19 released.
+
 2021-06-16  Per Abrahamsen  <pa@plen.ku.com>
 
 	* production.C (water_log_h_limit, water_log_root_limit):
