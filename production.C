@@ -471,20 +471,33 @@ Production::tick (const double AirT, const double SoilT,
   if (RSR () > 1.1 * partition.RSR (DS))
     root_death_rate += Large_RtDR;
 
-  if (root_death_rate > 0.0)
+  if (root_death_rate > 0.0 && WRoot > 0.0)
     {
+#if 1
+      {
+	double WRoot_new_dummy = NAN;
+	first_order_change (WRoot, 0.0, root_death_rate / 24.0, dt,
+			    WRoot_new_dummy, DeadWRoot);
+      }
+#else			  
       DeadWRoot = root_death_rate / 24.0 * WRoot;
+#endif
       double DdRootCnc;
-      if (NCrop > 1.05 * nitrogen.PtNCnt)
-        DdRootCnc = NRoot/WRoot;
+      const double ActRootCnc = NRoot/WRoot;
+      if (NCrop > 1.05 * nitrogen.PtNCnt
+	  || ActRootCnc < nitrogen.NfRootCnc (DS))
+        DdRootCnc = ActRootCnc;
       else
-        DdRootCnc = (NRoot/WRoot - nitrogen.NfRootCnc (DS))
-          * ( 1.0 - nitrogen.TLRootEff (DS)) +  nitrogen.NfRootCnc (DS);
+	DdRootCnc = (ActRootCnc - nitrogen.NfRootCnc (DS))
+	  * ( 1.0 - nitrogen.TLRootEff (DS)) +  nitrogen.NfRootCnc (DS);
+      daisy_assert (DdRootCnc >= 0.0);
       DeadNRoot = DdRootCnc * DeadWRoot;
       IncWRoot -= DeadWRoot;
       const double C_Root = DM_to_C_factor (E_Root) * DeadWRoot;
       C_Loss += C_Root;
       daisy_assert (AM_root);
+      daisy_assert (CRoot >= 0.0);
+      daisy_assert (DeadNRoot >= 0.0);
       AM_root->add_surface (geo, dt * C_Root * m2_per_cm2,
                             dt * DeadNRoot * m2_per_cm2,
                             Density);

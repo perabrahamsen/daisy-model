@@ -255,7 +255,6 @@ AM::Implementation::distribute (double C, std::vector<double>& om_C,
 {
   daisy_assert (C >= 0.0);
   daisy_assert (N >= 0.0);
-  daisy_assert (!std::isnormal (C) || N > 0.0);
 
   // Fill out the blanks.
   int missing_fraction = -1;
