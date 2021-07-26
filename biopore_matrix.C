@@ -38,6 +38,8 @@
 #include "treelog.h"
 #include "frame.h"
 #include "mathlib.h"
+#include "metalib.h"
+#include "library.h"
 #include <sstream>
 #include <numeric>
 
@@ -45,6 +47,8 @@
 
 struct BioporeMatrix : public Biopore
 {
+  const Metalib& metalib;
+  
   // Parameters.
   /* const */ std::vector<double> xplus; // [cm]
   const double K_wall_relative;       // []
@@ -98,10 +102,16 @@ struct BioporeMatrix : public Biopore
   double total_solute (const Geometry& geo, 
 		       const symbol chem) const //[g/m^2]
   {
-    const std::vector<double>& solute_array 
-      = solute.get_array (chem);
-    const double total 		// [g]
-      = std::accumulate (solute_array.begin (), solute_array.end (), 0.0);
+    double total = 0.0;		// [g]
+    Library& library = metalib.library (Chemical::component);
+    std::set<symbol> found;
+    for (auto i: solute)
+      if (library.is_derived_from (i, chem))
+	{
+	  const std::vector<double>& solute_array = solute.get_array (i);
+	  total += std::accumulate (solute_array.begin (), solute_array.end (),
+				    0.0);
+	}
     return total / geo.surface_area ()
       * 10000.0; // [cm^2/m^2]
   }
@@ -400,6 +410,7 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
       daisy_assert (std::isfinite (S2));
       S = std::min (S1, S2);
 
+#if 0 // The matrix can be drier than pF 6.
       if (h < -100000)
         {
           std::ostringstream tmp;
@@ -416,6 +427,7 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
               << "\nh3_cell  = " << h3_cell;
           Assertion::message (tmp.str ());
         }
+#endif
     }
   else if ((allow_upward_flow || cell_z > z3_lowest) 
            && active && h>h3_cell + h_barrier)
@@ -889,8 +901,17 @@ BioporeMatrix::add_solute (const symbol chem,
 void 
 BioporeMatrix::remove_solute (const symbol chem)
 {
-  std::vector<double>& array = solute.get_array (chem);
-  std::fill (array.begin (), array.end (), 0.0);
+  Library& library = metalib.library (Chemical::component);
+  std::set<symbol> found;
+  for (auto i: solute)
+    if (library.is_derived_from (i, chem))
+      found.insert (i);
+  
+  for (auto i: found)
+    {
+      std::vector<double>& array = solute.get_array (i);
+      std::fill (array.begin (), array.end (), 0.0);
+    }
 }
 
 void 
@@ -1193,6 +1214,7 @@ BioporeMatrix::initialize (const Units& units,
 
 BioporeMatrix::BioporeMatrix (const BlockModel& al)
   : Biopore (al),
+    metalib (al.metalib ()),
     xplus (al.check ("xplus") 
            ? al.number_sequence ("xplus") 
            : std::vector<double> ()),

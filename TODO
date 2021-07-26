@@ -1,20 +1,16 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* water logging
+* PA1: CT  (Rørrendegård aquitard)
 
-** RtDR per day or per hour?
+* PA2: CT + 2D (Rørrendegård aquitard)
 
-* Maja
+* PA3: CT + 2D (default aquitard)
 
-** Aquitard (flux?)
+* PA4: CT + 2D (no flux)
 
-** Visual C++
+* gmsr
 
-* pet_FAO_PM_daily: Use all daily data
-
-* bioclimate std FAO_daily, FAO_hourly, SSOC
-
-* Jeanne rap
+** Prøv 1D uden drænforbundne bioporer men med default aq eller no-flux 
 
 * hysteresis
 

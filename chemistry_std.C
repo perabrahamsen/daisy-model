@@ -36,9 +36,13 @@
 #include "treelog.h"
 #include "frame.h"
 #include "mathlib.h"
+#include "metalib.h"
+#include "library.h"
 
 struct ChemistryStandard : public Chemistry
 {
+  const Metalib& metalib;
+  
   // Parameters.
   auto_vector<Chemical*> chemicals;
   auto_vector<Reaction*> reactions;
@@ -306,8 +310,9 @@ ChemistryStandard::incorporate (const Geometry& geo,
 void 
 ChemistryStandard::remove_solute (const symbol chem)
 {
+  Library& library = metalib.library (Chemical::component);
   for (auto c : chemicals)
-    if (c->objid == chem)
+    if (library.is_derived_from (c->objid, chem))
       {
 	c->remove_all ();
 	return;
@@ -317,9 +322,10 @@ ChemistryStandard::remove_solute (const symbol chem)
 double				// [g/m^2]
 ChemistryStandard::total_content (const Geometry& geo, const symbol chem) const
 {
+  Library& library = metalib.library (Chemical::component);
   double total = 0.0;
   for (auto c : chemicals)
-    if (c->objid == chem)
+    if (library.is_derived_from (c->objid, chem))
       total += c->total_content (geo);
   return total;
 }
@@ -519,6 +525,7 @@ ChemistryStandard::check (const Scope& scope,
 
 ChemistryStandard::ChemistryStandard (const BlockModel& al)
   : Chemistry (al),
+    metalib (al.metalib ()),
     chemicals (Librarian::build_vector<Chemical> (al, "trace")),
     reactions (Librarian::build_vector<Reaction> (al, "reaction"))
 { }

@@ -2290,7 +2290,7 @@ and roots that doesn't depend on the weather and soil conditions.
 
 * 4.35 
 
-** Now 'SoilWater' parameter 'max_exfiltration_gradient'.
+** New 'SoilWater' parameter 'max_exfiltration_gradient'.
 
 This allows you to limit exfiltration.  It will be multiplied to the
 hydraulic conductivity in the top node, to find the maximal
