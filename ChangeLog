@@ -1,3 +1,7 @@
+2021-07-26  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.21 released.
+
 2021-07-26  Per Abrahamsen  <pa@plen.ku.com>
 
 	* biopore_matrix.C (matrix_biopore_matrix): Don't warn about soil
