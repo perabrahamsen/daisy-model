@@ -305,7 +305,7 @@ static struct CloudinessKjaersgaardSyntax : public DeclareParam
 {
   CloudinessKjaersgaardSyntax ()
     : DeclareParam (Cloudiness::component, "Kjaersgaard", "FAO56",
-		    "Calibrated for Taastrup, Denmark.")
+		    "FAO56 calibrated for Taastrup, Denmark.")
   { }
   void load_frame (Frame& frame) const
   {
@@ -376,5 +376,24 @@ Turbidity coefficient, 1 = clean air, <= 0.5 extremely unclean.");
 Precipitable water in atmosphere.");
   }
 } CloudinessASCE_syntax;
+
+// The 'Taastrup' parameterization.
+
+static struct CloudinessTaastrupSyntax : public DeclareParam
+{
+  CloudinessTaastrupSyntax ()
+    : DeclareParam (Cloudiness::component, "Taastrup", "ASCE",
+		    "ASCE calibrated for Taastrup, Denmark.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set_strings ("cite", "kjaersgaard2007long");
+    frame.set_cited ("a", 1.00, "\
+Table 1, equation 6, calibrated value for Taastrup.",
+		     "kjaersgaard2007long");
+    frame.set ("min_solar_elevation_angle", 0.0);
+    frame.set ("min_extraterrestrial_radiation", 25.0);
+  }
+} CloudinessTaastrup_syntax;
 
 // cloudiness.C ends here.

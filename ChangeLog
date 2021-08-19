@@ -1,3 +1,8 @@
+2021-08-19  Per Abrahamsen  <pa@plen.ku.com>
+
+	* cloudiness.C ("Taastrup"): New parameterization.
+	* bioclimate_std.C ("default"): Use it.
+
 2021-07-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.21 released.

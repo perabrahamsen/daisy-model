@@ -1795,7 +1795,7 @@ Use best models given available data.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.set ("cloudiness", "Kjaersgaard");
+    frame.set ("cloudiness", "Taastrup");
     frame.set ("net_radiation", "brunt");
     frame.set ("ghf", "surface");
     // Choose 'pet' based on weather data.

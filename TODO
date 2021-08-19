@@ -1,16 +1,34 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* PA1: CT  (Rørrendegård aquitard)
+* Ny test
 
-* PA2: CT + 2D (Rørrendegård aquitard)
+** 1D vs 2C vs 2D
 
-* PA3: CT + 2D (default aquitard)
+** h_lim = pF1, pF2, pF3, pF4
 
-* PA4: CT + 2D (no flux)
+** k_frozen = 5 %
 
-* gmsr
 
-** Prøv 1D uden drænforbundne bioporer men med default aq eller no-flux 
+** PA1: CT  (Rørrendegård aquitard)
+
+** PA2: CT + 2D (Rørrendegård aquitard)
+
+** PA3: CT + 2D (default aquitard)
+
+** PA4: CT + 2D (no flux)
+
+** PA5: PA4 1D
+
+** PA6: PA5 + secondary domain pF1
+** PA7: PA5 + secondary domain pF2
+** PA8: PA5 + secondary domain pF3
+** PA9: PA5 + secondary domain pF4
+
+* New defaults for PET m.m.
+
+** Read Simon's mail 14 juni
+
+** Overview / Presentation 
 
 * hysteresis
 
