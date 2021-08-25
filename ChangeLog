@@ -1,3 +1,7 @@
+2021-08-25  Per Abrahamsen  <pa@plen.ku.com>
+
+	* bioclimate_std.C (L_i0): Removed log variable.
+
 2021-08-19  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.22 released.

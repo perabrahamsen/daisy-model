@@ -81,7 +81,6 @@ struct BioclimateStandard : public Bioclimate
   double cloudiness_index;	// 1 = clear day, << 1 cloudy.
   double L_n;                   // Net longwave radiation [W/m^2]
   double L_ia;                  // incoming longwave radiation [W/m^2]
-  double L_i0;	      // clear sky incoming longwave radiation [W/m^2]
   double epsilon_0;             // [unitless]
   double black_body_radiation;  // [W/m^2]
   const std::unique_ptr<NetRadiation> net_radiation;
@@ -785,18 +784,15 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   const double ref_albedo = 0.23; // Reference crop for FAO_PM.
   albedo = find_albedo (vegetation, litter, surface, geo, soil, soil_water);
   const double air_temperature_K = air_temperature + 273.15; // [K]
-  black_body_radiation = NetRadiation::SB * pow(air_temperature_K, 4);
+  const double SB = 5.67e-8; // [W/m^2/K^4]
+  black_body_radiation = SB * pow(air_temperature_K, 4);
   const double VaporPressure_hPa = VaporPressure_Pa / 100.; // Pa -> hPa
   epsilon_0 = net_radiation->find_epsilon_0 (air_temperature_K,
 					     VaporPressure_hPa);
-  L_i0 = epsilon_0 * black_body_radiation;
-  L_ia = NetRadiation::cloudiness_function (cloudiness_index,
-					    black_body_radiation, epsilon_0);
-  const double VaporPressure_kPa = VaporPressure_Pa * 0.001; // Pa -> kPa
-  L_n  = - net_radiation->NetLongwaveRadiation (cloudiness_index,
-						air_temperature,
-						VaporPressure_kPa,
-						L_ia);
+  const double s = 1 - cloudiness_index; // [] fraction of cloud sky
+  const double SurEmiss = 0.98;	// []
+  L_ia = (s + (1 - s) * epsilon_0) * black_body_radiation; // [W/m^2]
+  L_n = cloudiness_index * (epsilon_0 - SurEmiss) * black_body_radiation; // [W/m^2]
   daisy_assert (std::isfinite (albedo));
   daisy_assert (std::isfinite (Si));
   daisy_assert (std::isfinite (L_n));
@@ -1347,10 +1343,8 @@ BioclimateStandard::output (Log& log) const
   output_variable (albedo, log);
   output_derived (cloudiness, "cloudiness", log);
   output_variable (cloudiness_index, log);
-  output_derived (net_radiation, "net_radiation", log);
   output_variable (L_n, log);
   output_variable (L_ia, log);
-  output_variable (L_i0, log);
   output_variable (epsilon_0, log);
   output_variable (black_body_radiation, log);
   output_variable (Rn, log);
@@ -1526,8 +1520,6 @@ Cloudiness index, 0 = no light, 1 = clear sky.");
                 "The calculated net longwave radiation (positive downwards).");
     frame.declare ("L_ia", "W/m^2", Attribute::LogOnly,
                 "The calculated incoming longwave radiation (positive downwards).");
-    frame.declare ("L_i0", "W/m^2", Attribute::LogOnly,
-                "The calculated clear sky incoming longwave radiation (positive downwards).");
     frame.declare ("epsilon_0", Attribute::None(), Attribute::LogOnly,
                 "Atmospheric effective clearsky emmisivity (range 0-1).");
     frame.declare ("black_body_radiation", "W/m^2", Attribute::LogOnly, "\

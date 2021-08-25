@@ -23,34 +23,24 @@
 #ifndef NET_RADIATION_H
 #define NET_RADIATION_H
 
-#include "model_derived.h"
+#include "model.h"
+#include "symbol.h"
 
 class Weather;
 class BlockModel;
 class Treelog;
 
-class NetRadiation : public ModelDerived
+class NetRadiation : public Model
 {
   // Content.
 public:
   static const char *const component;
   symbol library_id () const;
 
-  static const double SurEmiss;
-  static const double SB;       // Stefan-Boltzmann constant [W/m^2/K^4]
-
   // Simulation.
 public:
-  static double cloudiness_function (double Cloudiness,
-				     double black_body_radiation, 
-				     double epsilon_0);
   virtual double find_epsilon_0 (double Ta /* [K] */,
-				 double ea /* [hPa] */) const = 0;
-  virtual double NetLongwaveRadiation (double Cloudiness, // 0-1 [W/m^2]
-				       double Temp /* [dg C] */,
-				       double VapourPressure /* [kPa] */,
-				       double L_ia /* [W/m^2] */) const = 0;
-  virtual void output (Log&) const;
+				 double ea /* [hPa] */) const = 0; // []
   
   // Create and Destroy.
 protected:
