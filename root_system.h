@@ -58,6 +58,7 @@ private:
   const PLF PenClayFac;		// Clay influence on penetration, factor.
   const PLF PenWaterFac;	// Water influence on penetration, factor.
   const PLF PenDSFac;	// Development stage influence on penetration, factor.
+  const PLF DensityDSFac;	// DS influence on homogeneity [DS] -> []
   const double MaxPen;		// Max penetration depth
   const double MaxWidth;        // Max horizontal distance from plant
   const double Rad;		// Root radius [cm]
@@ -145,8 +146,10 @@ public:
   // Create and Destroy
 public:
   void initialize (const Geometry& geo, const Soil& soil, 
-                   double row_width, double row_pos, Treelog& msg);
-  void initialize (const Geometry& geo, const Soil&, Treelog& msg);
+                   double row_width, double row_pos, const double DS,
+		   Treelog& msg);
+  void initialize (const Geometry& geo, const Soil&, const double DS,
+		   Treelog& msg);
   bool check (const Geometry& geo, Treelog& msg) const;
   static void load_syntax (Frame&);
   RootSystem (const Block& al);

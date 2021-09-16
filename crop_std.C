@@ -269,7 +269,7 @@ CropStandard::initialize (const Scope& scope, const Geometry& geo,
                           const Time& now, Treelog& msg)
 {
   TREELOG_MODEL (msg);
-  root_system->initialize (geo, soil, row_width, row_pos, msg);
+  root_system->initialize (geo, soil, row_width, row_pos, DS (), msg);
   seed->initialize (seed_w, msg);
   initialize_shared (scope, geo, soil, organic_matter, now, msg);
 }
@@ -281,7 +281,7 @@ CropStandard::initialize (const Scope& scope,
                           const Time& now, Treelog& msg)
 {
   TREELOG_MODEL (msg);
-  root_system->initialize (geo, soil, msg);
+  root_system->initialize (geo, soil, DS (), msg);
   seed->initialize (-42.42e42, msg);
   initialize_shared (scope, geo, soil, organic_matter, now, msg);
 }

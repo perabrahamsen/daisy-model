@@ -1,72 +1,17 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Surface chapter
+* MES root_heterogenity DS
 
-** Compartments
+* GRMS scenarios
 
-*** Atmosphere / Weather (upper boundary)
+** Isoler forskelle mellem systemer
 
-*** Snowpack
+* Mulch modul
 
-*** Canopy (Vegetation, SVAT)
+** soil to mulch?
 
-*** Litter
+*
 
-*** Surface / Pond
-
-*** Soil (lower boundary), SoilHeat, SoilWater
-
-** Shared properties, all (internal compartments)
-
-*** Water + water temperature
-
-*** Solutes
-
-** Shared property, some
-
-*** Height
-
-*** Cover
-
-*** Internal structure
-
-** Important modules
-
-*** PET
-
-*** Bioclimate: Transport between compartments
-
-*** Vegetation, SVAT
-
-*** Organic Matter
-
-*** Management
-
-*** SoilWater and SoilHeat
-
-* Ny test
-
-** 1D vs 2C vs 2D
-
-** h_lim = pF1, pF2, pF3, pF4
-
-** k_frozen = 5 %
-
-
-** PA1: CT  (Rørrendegård aquitard)
-
-** PA2: CT + 2D (Rørrendegård aquitard)
-
-** PA3: CT + 2D (default aquitard)
-
-** PA4: CT + 2D (no flux)
-
-** PA5: PA4 1D
-
-** PA6: PA5 + secondary domain pF1
-** PA7: PA5 + secondary domain pF2
-** PA8: PA5 + secondary domain pF3
-** PA9: PA5 + secondary domain pF4
 
 * New defaults for PET m.m.
 
