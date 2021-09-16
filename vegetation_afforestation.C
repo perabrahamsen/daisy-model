@@ -408,7 +408,7 @@ VegetationAfforestation::initialize (const Scope&, const Time& time,
   const double d = time.yday () + time.hour () / 24.0;
   
   reset_canopy_structure (y, d);
-  root_system->initialize (geo, soil, 0.0, 0.0, msg);
+  root_system->initialize (geo, soil, 0.0, 0.0, Crop::DSremove, msg);
   root_system->full_grown (geo, soil, WRoot, msg);
 
   static const symbol vegetation_symbol ("vegetation");

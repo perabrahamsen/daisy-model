@@ -6,6 +6,25 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.23
+
+** New 'DensityDSFac' root parameter.
+
+This allows you to modify the effective root density based on
+development stage. Normally Daisy will assume the root distribution is
+perfectly homogeneous horizontally (for 1D simulations). Right after
+emergence, this is a poor assumption, as the distance between the
+individual plants is likely larger than the diameter of the root
+zone. This parameter allows you to compensate for this by adjusting
+the effective root density, user for water and solute uptake.
+
+(defcrop SB "Spring Barley"
+  (Root (DensityDSFac (0.0 [DS] 0.01 []) (1.0 [DS] 1.0 []))))
+
+The parameter is analogous to the root_homogeneity horizon parameter,
+and the two factors are multiplied together when finding the effective
+root density.
+
 * 6.22
 
 ** New 'Taastrup' cloudiness model.
