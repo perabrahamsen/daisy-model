@@ -1448,6 +1448,10 @@ WSourceWeather::has_vapor_pressure () const
 { return std::isfinite (impl->my_vapor_pressure); }
 
 bool
+WSourceWeather::has_daily_vapor_pressure () const
+{ return std::isfinite (impl->my_daily_vapor_pressure); }
+
+bool
 WSourceWeather::has_wind () const
 { return std::isfinite (impl->my_wind); }
 

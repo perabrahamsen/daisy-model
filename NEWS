@@ -6,6 +6,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.24
+
+** The FAO_PM pet model for daily data now requires vapor pressure.
+
+It used to wrongly use RelHum if VapPres was not available.
+
 * 6.23
 
 ** New 'DensityDSFac' root parameter.

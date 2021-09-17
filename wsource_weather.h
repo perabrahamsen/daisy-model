@@ -82,6 +82,7 @@ public:
   bool has_net_radiation () const;
   bool has_reference_evapotranspiration () const;
   bool has_vapor_pressure () const;
+  bool has_daily_vapor_pressure () const;
   bool has_wind () const;
   bool has_CO2 () const;
   bool has_min_max_temperature () const;

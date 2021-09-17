@@ -219,6 +219,7 @@ struct BioclimateStandard : public Bioclimate
   const bool fixed_difrad;
   bool has_reference_evapotranspiration;
   bool has_vapor_pressure;
+  bool has_daily_vapor_pressure;
   bool has_wind;
   bool has_min_max_temperature;
   bool has_diffuse_radiation;
@@ -442,6 +443,7 @@ BioclimateStandard::reset_weather (const Weather& weather, Treelog& msg)
   has_reference_evapotranspiration 
     = weather.has_reference_evapotranspiration ();
   has_vapor_pressure = weather.has_vapor_pressure ();
+  has_daily_vapor_pressure = weather.has_daily_vapor_pressure ();
   has_wind = weather.has_wind ();
   has_min_max_temperature = weather.has_min_max_temperature ();
   has_diffuse_radiation = weather.has_diffuse_radiation ();
@@ -461,8 +463,12 @@ BioclimateStandard::reset_weather (const Weather& weather, Treelog& msg)
             type = symbol ("PM");
           else if (timestep < 4.0)
             type = symbol ("FAO_PM_hourly");    
+	  else if (has_daily_vapor_pressure)
+	    type = symbol ("FAO_PM");
+	  else if (has_min_max_temperature)
+	    type = symbol ("Hargreaves");
 	  else
-	    type = symbol ("FAO_PM");    
+	    type = symbol ("deBruin87");
         }
       else if (has_min_max_temperature)
         type = symbol ("Hargreaves");
@@ -620,6 +626,7 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     fixed_difrad (difrad.get ()),
     has_reference_evapotranspiration (false),
     has_vapor_pressure (false),
+    has_daily_vapor_pressure (false),
     has_wind (false),
     has_min_max_temperature (false),
     has_diffuse_radiation (false),
@@ -1257,6 +1264,7 @@ BioclimateStandard::tick (const Time& time,
   if (has_reference_evapotranspiration 
       != weather.has_reference_evapotranspiration ()
       || has_vapor_pressure != weather.has_vapor_pressure ()
+      || has_daily_vapor_pressure != weather.has_daily_vapor_pressure ()
       || has_wind != weather.has_wind ()
       || has_min_max_temperature != weather.has_min_max_temperature ()
       || has_diffuse_radiation != weather.has_diffuse_radiation ()
