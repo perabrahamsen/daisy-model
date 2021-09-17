@@ -5,6 +5,10 @@
 	* bioclimate_std.C: Use it.
 	* pet_FAO_PM.C (check): Ditto.
 
+2021-09-16  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.23 released.
+
 2021-09-16  Per Abrahamsen  <pa@plen.ku.com>
 
 	* root_system.C, root_system.h (DensityDSFac): New parameter.
