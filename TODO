@@ -1,5 +1,13 @@
 TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* Bioclimate Præsentarion Daisy lunch meeting
+
+** Bioclimate: the hidden parameter
+
+Setup no bioclimate
+
+** 
+
 * MES root_heterogenity DS
 
 * GRMS scenarios
@@ -8,9 +16,9 @@ TODO ---things that needs to be done with Daisy -*- outline -*-
 
 * Mulch modul
 
-** soil to mulch?
+** litter_water_protected from litter.Theta_res
 
-*
+** soil to mulch?
 
 
 * New defaults for PET m.m.

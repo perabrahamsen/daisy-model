@@ -2,6 +2,13 @@
 
 	* Version 6.24 released.
 
+2021-09-17  Per Abrahamsen  <pa@plen.ku.com>
+
+	* weather.h, wsource_weather.C, wsource_weather.h:
+	(has_daily_vapor_pressure): New member function.
+	* bioclimate_std.C: Use it.
+	* pet_FAO_PM.C (check): Ditto.
+
 2021-09-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.23 released.
