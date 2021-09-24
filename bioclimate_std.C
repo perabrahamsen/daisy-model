@@ -1034,7 +1034,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
       litter_water_out = litter_water_storage / dt;
       litter_water_storage = 0.0;
     }
-  else //if (litter_potential_down > 0.0)
+  else if (litter_potential_down > 0.0)
     {
       litter_water_out = std::min (litter_potential_down,
 				   litter_water_storage / dt);
@@ -1043,8 +1043,8 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 		    0.0);
       
     }
-  //  else
-  //  litter_water_out = 0.0;
+  else
+    litter_water_out = 0.0;
 
   // 5 Ponding
 
