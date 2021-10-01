@@ -1,3 +1,7 @@
+2021-10-01  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.25 released.
+
 2021-10-01  Per Abrahamsen  <pa@plen.ku.com>
 
 	* litter.C, litter.h (water_protected): New virtual member.
