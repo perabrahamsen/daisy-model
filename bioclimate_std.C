@@ -1001,8 +1001,11 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     litter_water_temperature = air_temperature;
 
   daisy_assert (litter_water_storage >= 0.0);
+  const double litter_water_available
+    = std::max (litter_water_storage - litter.water_protected (), 0.0);
   litter_ea = std::max (std::min (litter_ep,
-                                  litter_water_storage / dt + litter_water_in),
+                                  litter_water_available / dt
+				  + litter_water_in),
                         0.0);
   total_ea_ += litter_ea;
   daisy_assert (total_ea_ >= 0.0);
@@ -1818,7 +1821,7 @@ Follow FAO56 for daily data.")
   {
     frame.set_strings ("cite", "FAO-PM");
     frame.set ("cloudiness", "FAO56");
-    frame.set ("ghf", "FAO56");
+    frame.set ("ghf", "none");
     frame.set ("pet", "FAO_PM");
   }
 } BioclimateFAO56_daily_syntax;

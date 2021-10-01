@@ -51,6 +51,7 @@ struct LitterMulch : public LitterResidue
   const double density;		 // Bulk density of mulch [kg DM/m^3]
   const double particle_density; // Particle density of mulch [kg DM/m^3]
   const double decompose_height; // Max height of active mulch layer [cm]
+  const double evaporate_depth;	 // How fow down the litter can evap [cm]
   const double soil_height;	 // Heigh of soil layer providing N [cm]
   const double Theta_res;	 // Residual water content []
   const double Theta_sat;	 // Saturated water content []
@@ -71,6 +72,7 @@ struct LitterMulch : public LitterResidue
   double height;		// Height of mulch layer [cm]
   double contact;		// Fraction in contact with soil []
   double water;			// Total water in mulch [mm]
+  double protected_water;	// Max water protected from evaporation [mm]
   double Theta;			// Relative water content []
   double h;			// Mulch water potential at start of tstep [cm]
   double h1;			// estimated mulch water potential at end [cm]
@@ -163,6 +165,15 @@ struct LitterMulch : public LitterResidue
     else
       Theta = 0.0;
 
+    const double C = water_capacity (); // [mm]
+    const double R = C * Theta_res;	// [mm]
+    const double H = height;		// [cm]
+    const double D = evaporate_depth;	// [cm]
+    if (H > D)
+      protected_water = R + (C - R) * (H - D) / H;
+    else
+      protected_water = R;
+    
     h = retention->h (Theta);
 
     h_soil = geo.content_height (soil_water, &SoilWater::h, soil_height);
@@ -288,6 +299,9 @@ struct LitterMulch : public LitterResidue
   double potential_exfiltration () const // Water exchange with soil [mm/h]
   { return E_darcy * 10.0 /* [mm/cm] */; }
   
+  double water_protected () const    // Water not evapable [mm]
+  { return protected_water; }
+  
   double decompose_factor () const // Effect on chemical decomposition []
   { return factor; }
 
@@ -297,6 +311,7 @@ struct LitterMulch : public LitterResidue
     output_variable (height, log);
     output_variable (contact, log);
     output_variable (water, log);
+    output_variable (protected_water, log);
     output_variable (Theta, log);
     output_variable (h, log);
     output_variable (h1, log);
@@ -337,6 +352,7 @@ struct LitterMulch : public LitterResidue
       density (al.number ("density")),
       particle_density (al.number ("particle_density", density)),
       decompose_height (al.number ("decompose_height")),
+      evaporate_depth (al.number ("evaporate_depth")),
       soil_height (al.number ("soil_height")),
       Theta_res (al.number ("Theta_res")),
       Theta_sat (find_Theta_sat (al.frame ())),
@@ -481,6 +497,20 @@ If unspecified, use bulk density instead.");
 		   Attribute::Const, "\
 Height of muclh layer considered in contact with the soil.\n\
 Only this part of the mulch layer will decompose");
+    frame.declare ("evaporate_depth", "cm", Check::non_negative (),
+		   Attribute::Const, "\
+Depth into mulch layer affected by evaporation.\n\
+Only water in this part of the mulch layer will evaporate.\n\
+\n\
+The mulch layer is asumed to be filled up from the bottom.\n\
+\n\
+If W is the amount of water in the mulch, R is the residual \n\
+water (Theta_res * C), C is the water capacity, D is this parameter,\n\
+and H is the height of the mulch layer, the maximum evaporation (Ea_max)\n\
+can be found as:\n\
+\n\
+Ea_max = max (0, (W - R) - (C - R) * (H - min (D, H)) / H)");
+    frame.set ("evaporate_depth", 1000.0);
     frame.declare ("soil_height", "cm", Check::negative (),
 		   Attribute::Const, "\
 Height of soil layer (a negative number) contributing to decay.");
@@ -524,6 +554,9 @@ Fraction of mulch layer in contact with soil.\n\
 DOM in this part of the mulch is degraded.");
     frame.declare ("water", "mm", Attribute::LogOnly, "\
 Total water in mulch.");
+    frame.declare ("protected_water", "mm", Attribute::LogOnly, "\
+Amount of water potentially protected from evaporation.\n\
+Only when the water content exceeds this amount it will evaporate.");
     frame.declare ("Theta", Attribute::None (), Attribute::LogOnly, "\
 Relative water content.");
     frame.declare ("h", "cm", Attribute::LogOnly, "\

@@ -1,3 +1,11 @@
+2021-10-01  Per Abrahamsen  <pa@plen.ku.com>
+
+	* litter.C, litter.h (water_protected): New virtual member.
+	* litter_mulch.C: Implement it.
+	(evaporate_depth): New parameter.
+	(protected_water): New log variable.
+	* bioclimate_std.C (WaterDistribution): Use it.
+
 2021-09-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.24 released.
