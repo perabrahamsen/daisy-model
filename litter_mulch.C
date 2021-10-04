@@ -166,7 +166,7 @@ struct LitterMulch : public LitterResidue
       Theta = 0.0;
 
     const double C = water_capacity (); // [mm]
-    const double R = C * Theta_res;	// [mm]
+    const double R = C * Theta_res / Theta_sat;	// [mm]
     const double H = height;		// [cm]
     const double D = evaporate_depth;	// [cm]
     if (H > D)

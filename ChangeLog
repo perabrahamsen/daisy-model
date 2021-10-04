@@ -1,3 +1,7 @@
+2021-10-04  Per Abrahamsen  <pa@plen.ku.com>
+
+	* litter_mulch.C (tick): Divide by Theta_sat to find R.
+
 2021-10-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.25 released.
