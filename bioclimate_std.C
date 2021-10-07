@@ -130,7 +130,9 @@ struct BioclimateStandard : public Bioclimate
   double litter_water_out;      // Water leaving litter [mm/h]
   double litter_wash_off; 	// Water hitting but not entering litter [mm/h]
   double litter_water_bypass; 	// Water bypassing litter [mm/h]
-
+  double litter_pond_up;	// Water extracted to litter from pond [mm/h]
+  double litter_soil_up;	// Water extracted to litter from soil [mm/h]
+  
   // Water in pond.
   double pond_ep;               // Potential evaporation from pond [mm/h]
   double pond_ea_;              // Actual evaporation from pond [mm/h]
@@ -579,6 +581,8 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     litter_water_out (0.0),
     litter_wash_off (0.0),
     litter_water_bypass (0.0),
+    litter_pond_up (0.0),
+    litter_soil_up (0.0),
     pond_ep (0.0),
     pond_ea_ (0.0),
     soil_ep (0.0),
@@ -1020,7 +1024,8 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   const double litter_potential_down =
     std::min (litter_evacuation,
 	      std::max (litter_potential_exfiltration, litter_overflow));
-  
+
+  double litter_potential_up = std::max (-litter_potential_down, 0.0);
   if (litter_water_storage < 0.0)
     {
       if (litter_water_storage < -1e-8)
@@ -1036,6 +1041,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
         }
       litter_water_out = litter_water_storage / dt;
       litter_water_storage = 0.0;
+      litter_potential_up = 0.0;
     }
   else if (litter_potential_down > 0.0)
     {
@@ -1075,17 +1081,29 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 
   const double soil_T 
     = geo.content_hood (soil_heat, &SoilHeat::T, Geometry::cell_above);
-  surface.tick (msg, pond_ep, below_canopy_ep_dry, 
+  surface.tick (msg,
+		pond_ep + litter_potential_up,
+		below_canopy_ep_dry + litter_potential_up, 
                 pond_in, pond_in_temperature, 
                 geo, soil, soil_water, soil_T, dt);
-  pond_ea_ = surface.evap_pond (dt, msg);
+
+  // 5.5 Intermission: Divide upward between pond, soil, litter, and ea
+  const double pond_up = surface.evap_pond (dt, msg); // [mm/h]
+  const double soil_up = surface.exfiltration (dt);   // [mm/h]
+  litter_pond_up = std::min (pond_up, litter_potential_up);
+  litter_soil_up = std::max (0.0,
+			     std::min (soil_up,
+				       litter_potential_up - pond_up));
+  pond_ea_ = pond_up - litter_pond_up;
+  soil_ea_ = soil_up - litter_soil_up;
+  litter_water_storage += (litter_pond_up + litter_soil_up) * dt;
+
+  // 5 Back to pond
   total_ea_ += pond_ea_;
 
   // 6 Soil
-
   soil_ep = bound (0.0, pond_ep - pond_ea_, 
 		   std::max (0.0, below_canopy_ep_dry));
-  soil_ea_ = surface.exfiltration (dt);
   daisy_assert (soil_ea_ >= 0.0);
   total_ea_ += soil_ea_;
   daisy_assert (total_ea_ >= 0.0);
@@ -1408,6 +1426,8 @@ BioclimateStandard::output (Log& log) const
   output_variable (litter_water_out, log);
   output_variable (litter_wash_off, log);
   output_variable (litter_water_bypass, log);
+  output_variable (litter_pond_up, log);
+  output_variable (litter_soil_up, log);
   output_variable (pond_ep, log);
   output_value (pond_ea_, "pond_ea", log);
   output_variable (soil_ep, log);
@@ -1652,6 +1672,10 @@ The intended use is colloid generation.");
                    "Water hitting but not entering litter.");
     frame.declare ("litter_water_bypass", "mm/h", Attribute::LogOnly,
                    "Water bypassing litter.");
+    frame.declare ("litter_pond_up", "mm/h", Attribute::LogOnly,
+                   "Water extracted from pond to litter.");
+    frame.declare ("litter_soil_up", "mm/h", Attribute::LogOnly,
+                   "Water extracted from soil to litter.");
 
     // Water in pond.
     frame.declare ("pond_ep", "mm/h", Attribute::LogOnly,

@@ -2820,7 +2820,8 @@ contains no water."
   (require_top true)
   (input "Precipitation" "Overhead irrigation" "Surface irrigation" "Tillage")
   (output "Snow evaporation" "Canopy evaporation" "Litter evaporation" 
-          "Surface evaporation" "Matrix infiltration" "Tertiary infiltration"
+          "Pond evaporation" "Soil evaporation"
+	  "Matrix infiltration" "Tertiary infiltration"
           "Runoff")
   (content Snow Canopy Litter Pond))
 
@@ -2844,7 +2845,8 @@ contains no water."
   "Litter water balance."
   (precision 1)
   (require_top true)
-  (input "Canopy bypass" "Canopy out" "Surface irrigation" "Tillage")
+  (input "Canopy bypass" "Canopy out" "Surface irrigation" "Tillage"
+	 "Litter pond up" "Litter soil up")
   (output "Litter evaporation" "Litter bypass" "Litter wash off" "Litter out")
   (content "Litter"))
 
@@ -2853,8 +2855,8 @@ contains no water."
   (precision 1)
   (require_top true)
   (input "Litter bypass" "Litter wash off" "Litter out")
-  (output "Surface evaporation" "Matrix infiltration"
-	  "Tertiary infiltration" "Runoff")
+  (output "Pond evaporation" "Soil evaporation" "Matrix infiltration"
+	  "Tertiary infiltration" "Runoff" "Litter pond up" "Litter soil up")
   (content "Pond"))
 
 (deflog "Surface water" column
@@ -2914,9 +2916,24 @@ Amount of water removed from the litter by evaporation.")
                    (dimension "mm"))
            (number (tag "Surface evaporation")
 		   (documentation "\
-Amount of water removed from the pond and soil surface by evaporation.")
+Amount of water removed from the pond and soil surface by evaporation.
+Also include water entering litter from soil and pond.")
                    (path column "${column}" Surface EvapSoilSurface)
                    (spec fixed Surface EvapSoilSurface)            
+                   (handle sum)
+                   (dimension "mm"))
+           (number (tag "Pond evaporation")
+		   (documentation "\
+Amount of water removed from the pond by evaporation.")
+                   (path column "${column}" Bioclimate "*" pond_ea)
+                   (spec bioclimate default pond_ea)            
+                   (handle sum)
+                   (dimension "mm"))
+           (number (tag "Soil evaporation")
+		   (documentation "\
+Amount of water removed from the soil by evaporation.")
+                   (path column "${column}" Bioclimate "*" soil_ea)
+                   (spec bioclimate default soil_ea)            
                    (handle sum)
                    (dimension "mm"))
            (flux_top (tag "Matrix infiltration")
@@ -3030,6 +3047,20 @@ This can include overflow and Darcy flow.")
                    (path column "${column}"
 			 Bioclimate "*" litter_wash_off) 
                    (spec bioclimate default litter_wash_off)
+		   (handle sum)
+                   (dimension "mm"))
+           (number (tag "Litter pond up")
+		   (documentation "Water entering litter from pond.")
+                   (path column "${column}"
+			 Bioclimate "*" litter_pond_up) 
+                   (spec bioclimate default litter_pond_up)
+		   (handle sum)
+                   (dimension "mm"))
+           (number (tag "Litter soil up")
+		   (documentation "Water entering litter from soil.")
+                   (path column "${column}"
+			 Bioclimate "*" litter_soil_up) 
+                   (spec bioclimate default litter_soil_up)
 		   (handle sum)
                    (dimension "mm"))))
 
