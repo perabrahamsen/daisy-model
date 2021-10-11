@@ -1,3 +1,10 @@
+2021-10-11  Per Abrahamsen  <pa@plen.ku.com>
+
+	* sample/sample.dai: Excplicitly input required files.
+
+	* sample/irrigation.dai: The "description" parameter no longer
+	exist.
+
 2021-10-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.27 released.

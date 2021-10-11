@@ -15,12 +15,13 @@
 ;; The irrigate_30_content_overhead strategy is use the same way.
 
 (defaction irrigate_30_tensiometer_overhead activity
-  "An irrigation strategy based on a tensiometer.
-If the soil water pressure at 20 cm depth gets below -300 cm in the
-period between the first of May and the first of September, apply 10
-mm/h overhead irrigation for 3 hours, for a total of 30 mm.  Then wait
-two days to give the irrigated water a chance to reach the
-tensiometer."
+  ;; An irrigation strategy based on a tensiometer.
+  ;; If the soil water pressure at 20 cm depth gets below -300 cm in the
+  ;; period between the first of May and the first of September, apply 10
+  ;; mm/h overhead irrigation for 3 hours, for a total of 30 mm.  Then wait
+  ;; two days to give the irrigated water a chance to reach the
+  ;; tensiometer.
+  ;;
   ;; We wait until all these conditions are true:
   (wait (and (after_mm_dd 5 1)          ;After May the first.
              (before_mm_dd 8 1)         ;Before August the first.
@@ -42,12 +43,12 @@ tensiometer."
 ;; contuniously until the irrigation water reach the specified depth.
 
 (defaction irrigate_30_content_overhead activity
-  "An irrigation strategy based on a soil water content.
-If the soil contain less than 60 mm water from the surface down to 50
-cm deprn, in the period between the first of May and the first of
-September, apply 10 mm/h overhead irrigation for 3 hours, for a total
-of 30 mm.  Then wait one day to give the irrigated water a chance to
-enter the soil."
+  ;; An irrigation strategy based on a soil water content.
+  ;; If the soil contain less than 60 mm water from the surface down to 50
+  ;; cm deprn, in the period between the first of May and the first of
+  ;; September, apply 10 mm/h overhead irrigation for 3 hours, for a total
+  ;; of 30 mm.  Then wait one day to give the irrigated water a chance to
+  ;; enter the soil.
   ;; We wait until all these conditions are true:
   (wait (and (after_mm_dd 5 1)          ;After May the first.
              (before_mm_dd 8 1)         ;Before August the first.

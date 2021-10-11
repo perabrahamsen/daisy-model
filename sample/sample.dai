@@ -1,6 +1,9 @@
 ;;; sample.dai --- This is a small setup using the sample files.
 
 ;; Get out sample management, irrigation, and soil.
+(input file "fertilizer.dai")
+(input file "tillage.dai")
+(input file "crop.dai")
 (input file "dk-management.dai")
 (input file "irrigation.dai")
 (input file "init-soil.dai")
