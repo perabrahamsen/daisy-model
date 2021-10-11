@@ -40,8 +40,7 @@
   ;; useful if you know the total content, as neither the dry bulk
   ;; density or soil water content affect it.
   (Chemistry multi
-             ;; Here we initialise total NO3-N content relative to dry
-             ;; soil mass.
+             ;; Here we initialise total NO3-N content relative to soil volume.
              (combine (N (trace (NO3 (initial_M (-100 [cm] 50 [g/cm^3])))
                                 (NH4)))))
   ;; Finally we initialize the soil heat.  This is rarely used.
