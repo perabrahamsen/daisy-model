@@ -134,6 +134,9 @@ namespace Assertion
     if (counter == NULL)
       counter = new std::map<std::string, int>;
 
+    if (counter->find (entry) == counter->end ())
+      (*counter)[entry] = 0;
+
     // Update count.
     (*counter)[entry]++;
 
