@@ -1,3 +1,7 @@
+2021-11-22  Per Abrahamsen  <pa@plen.ku.com>
+
+	* assertion.C: Limit number of messages from same line.
+
 2021-10-11  Per Abrahamsen  <pa@plen.ku.com>
 
 	* sample/init-soil.dai (JB1_init_Cosby): Fix wrong comment.

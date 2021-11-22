@@ -3036,6 +3036,8 @@ Nitrate-N.")
   {
     frame.set_cited ("diffusion_coefficient", 1.9e-6, "900 Da, 2.5 nm",
 		     "hendry2003geochemical");
+    // Max. for Dp, optimized at 1.46 h-1 for glyphosate. JV 2021-10-27
+    frame.set ("litter_diffusion_rate", 1.5); 
   }
 } ChemicalDON_syntax;
 
@@ -3059,6 +3061,8 @@ Nitrate-N.")
   {
     frame.set_cited ("diffusion_coefficient", 1.9e-6, "900 Da, 2.5 nm",
 		     "hendry2003geochemical");
+    // Max. for Dp, optimized at 1.46 h-1 for glyphosate. JV 2021-10-27
+    frame.set ("litter_diffusion_rate", 1.5); 
   }
 } ChemicalDOC_syntax;
 

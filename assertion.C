@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <map>
 
 namespace Assertion
 {
@@ -115,10 +116,40 @@ Assertion::failure (const char* file, int line, const char* fun,
     throw 5;
 }
 
+namespace Assertion
+{
+  std::map<std::string, int>* counter = NULL;
+
+  bool full (const char* file, const int line);
+  bool full (const char* file, const int line)
+  {
+    const int max_entries = 5;
+
+    // Find entry.
+    std::ostringstream tmp;
+    tmp << file << ":" << line;
+    const std::string entry = tmp.str ();
+
+    // Prepare counter.
+    if (counter == NULL)
+      counter = new std::map<std::string, int>;
+
+    // Update count.
+    (*counter)[entry]++;
+
+    if ((*counter)[entry] == max_entries)
+      warning (entry + ": one last message from this line");
+    
+    return (*counter)[entry] > max_entries;
+  }
+}
+
 void 
 Assertion::bug (const char* file, int line, const char* fun,
 		const std::string& msg)
 {
+  if (full (file, line))
+    return;
   std::ostringstream tmp;
   tmp << file << ":" << line << ": Daisy bug: '" << msg << "'";
   if (fun)
@@ -131,6 +162,8 @@ void
 Assertion::warning (const char* file, int line, const char* fun,
 		    const std::string& msg)
 {
+  if (full (file, line))
+    return;
   std::ostringstream tmp;
   tmp << file << ":" << line << ": ";
   if (fun)
@@ -212,6 +245,19 @@ Assertion::Register::Register (Treelog& log)
 
 Assertion::Register::~Register ()
 {
+  if (counter)
+    {
+      for (auto i: *counter)
+	{
+	  const std::string entry = i.first;
+	  const int count = i.second;
+	  std::ostringstream tmp;
+	  tmp << entry << ": " << count << " total messages from this line";
+	  warning (tmp.str ());
+	}
+      delete counter;
+      counter = NULL;
+    }
   daisy_assert (find (logs ().begin (), 
                       logs ().end (),
                       &treelog)
