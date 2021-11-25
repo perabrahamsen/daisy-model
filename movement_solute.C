@@ -798,7 +798,7 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
                                transport_iteration,
                                J_primary, C_border,
                                chemical, S_extra, dt, scope, msg);
-            if (i > 0)
+            if (i > 0 && !daisy_full_debug ())
               msg.debug ("Succeeded");
             return;
           }

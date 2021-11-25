@@ -323,16 +323,20 @@ Daisy::Implementation::tick (Daisy& daisy, Treelog& msg)
 
       if (suggested_dt < min_dt)
         {
-          static const double us = 1.0 / (60.0 * 60.0 * 1000000.0);
-          std::ostringstream tmp;
-          tmp << "Suggested timestep too small: " << suggested_dt << " (" ;
-          if (suggested_dt < 1.0 * us)
-            tmp << suggested_dt / us << " [us]";
-          else
-            tmp  << Timestep::build_hours (suggested_dt).print ();
-          tmp << ") < " << min_dt << " (" << minimal_timestep.print () << ")";
+	  if (!daisy_full_debug ())
+	    {
+	      static const double us = 1.0 / (60.0 * 60.0 * 1000000.0);
+	      std::ostringstream tmp;
+	      tmp << "Suggested timestep too small: " << suggested_dt << " (" ;
+	      if (suggested_dt < 1.0 * us)
+		tmp << suggested_dt / us << " [us]";
+	      else
+		tmp  << Timestep::build_hours (suggested_dt).print ();
+	      tmp << ") < " << min_dt
+		  << " (" << minimal_timestep.print () << ")";
+	      msg.warning (tmp.str ());
+	    }
           suggested_dt = min_dt;
-          msg.warning (tmp.str ());
         }
         
 
