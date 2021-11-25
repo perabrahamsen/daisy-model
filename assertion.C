@@ -36,6 +36,40 @@ namespace Assertion
     static std::vector<Treelog*> logs;
     return logs;
   }
+
+  // full counter
+  std::map<std::string, int>* counter = NULL;
+}
+
+bool
+Assertion::full (const char* file, const int line, bool is_debug)
+{
+  const int max_entries = 5;
+
+  // Find entry.
+  std::ostringstream tmp;
+  tmp << file << ":" << line;
+  const std::string entry = tmp.str ();
+
+  // Prepare counter.
+  if (counter == NULL)
+    counter = new std::map<std::string, int>;
+
+  if (counter->find (entry) == counter->end ())
+    (*counter)[entry] = 0;
+
+  // Update count.
+  (*counter)[entry]++;
+  
+  if ((*counter)[entry] == max_entries)
+    {
+      if (is_debug)
+	debug (entry + ": last message from this line");
+      else
+	warning (entry + ": one last message from this line");
+    }
+
+  return (*counter)[entry] > max_entries;
 }
 
 void 
@@ -114,37 +148,6 @@ Assertion::failure (const char* file, int line, const char* fun,
     exit (4);
   else
     throw 5;
-}
-
-namespace Assertion
-{
-  std::map<std::string, int>* counter = NULL;
-
-  bool full (const char* file, const int line);
-  bool full (const char* file, const int line)
-  {
-    const int max_entries = 5;
-
-    // Find entry.
-    std::ostringstream tmp;
-    tmp << file << ":" << line;
-    const std::string entry = tmp.str ();
-
-    // Prepare counter.
-    if (counter == NULL)
-      counter = new std::map<std::string, int>;
-
-    if (counter->find (entry) == counter->end ())
-      (*counter)[entry] = 0;
-
-    // Update count.
-    (*counter)[entry]++;
-
-    if ((*counter)[entry] == max_entries)
-      warning (entry + ": one last message from this line");
-    
-    return (*counter)[entry] > max_entries;
-  }
 }
 
 void 
