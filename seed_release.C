@@ -26,6 +26,8 @@
 #include "check.h"
 #include "treelog.h"
 #include "frame.h"
+#include "plf.h"
+#include "mathlib.h"
 
 struct SeedRelease : public Seed
 {
@@ -35,6 +37,7 @@ struct SeedRelease : public Seed
   const double DM_fraction;      // Dry matter content in seeds. [g DM/g w.w.]
   const double C_fraction;      // Carbon content in seeds. [g C/g DM]
   const double N_fraction;    // Nitrogen content in seeds. [g N/g DM]
+  const PLF T_factor;	      // Soil temp influence on rate []
   const double rate;            // Seed carbon release rate. [h^-1]
 
   // State.
@@ -43,7 +46,7 @@ struct SeedRelease : public Seed
   // Simulation.
   double forced_CAI (const double WLeaf, const double SpLAI, const double DS)
   { return -1.0; }
-  double release_C (double dt);
+  double release_C (double T, double dt);
   void output (Log& log) const;
   
   // Create and Destroy.
@@ -55,9 +58,16 @@ struct SeedRelease : public Seed
 };
 
 double 
-SeedRelease::release_C (const double dt)
-{ 
-  const double released = std::min (C * rate * dt, C);
+SeedRelease::release_C (const double T, const double dt)
+{
+  const double factor_T
+    = (T_factor == PLF::empty ())
+    ? std::max (0.0, 
+                0.4281 * (exp (0.57 - 0.024 * T + 0.0020 * T * T)
+                          - exp (0.57 - 0.042 * T - 0.0051 * T * T)))
+    : T_factor (T);
+    
+  const double released = std::min (C * factor_T * rate * dt, C);
   C -= released;
   return released;
 }
@@ -103,6 +113,7 @@ SeedRelease::SeedRelease (const BlockModel& al)
     DM_fraction (al.number ("DM_fraction")),
     C_fraction (al.number ("C_fraction")),
     N_fraction (al.number ("N_fraction")),
+    T_factor (al.check ("T_factor") ? al.plf ("T_factor") : PLF::empty ()),
     rate (al.number ("rate")),
     C (al.number ("C", -42.42))
 { }
@@ -130,6 +141,14 @@ Dry matter content in seeds.");
 Carbon content in seeds.");
     frame.declare ("N_fraction", Attribute::Fraction (), Attribute::Const, "\
 Nitrogen content in seeds.");
+    frame.declare ("T_factor", "dg C", Attribute::Fraction (),
+		   Attribute::OptionalConst, "\
+Soil temperature effect on release rate.\n\
+By default use the same as for maintenance respiration:\
+0.4281 (exp (0.57 - 0.024 T + 0.0020 T^2) - exp (0.57 - 0.042 T - 0.0051 T^2))\
+\n\
+This will give a rate of 1 at 20 dg C, slightly above 2 at 30 dg C, and a \
+bit below 0.5 at 10 dg C.");
     frame.declare ("rate", "h^-1", Check::positive (), Attribute::Const, "\
 Release rate of seed carbon to assimilate pool.");
     frame.declare ("C", "g C/m^2", Check::non_negative (), Attribute::OptionalState, "\

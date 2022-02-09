@@ -205,6 +205,7 @@
         (DM_fraction 87 [%])
         (C_fraction 45 [%])
         (N_fraction 2 [%])
+	(T_factor (20.0 [dg C] 100 [%])) ;; No temperature effect on rate.
         (rate 0.4 [d^-1])
 )
 

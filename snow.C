@@ -58,12 +58,15 @@ struct Snow::Implementation
   const double f_c;		// Water capacity in snow factor
   const double rho_1;		// Water collapse factor [kg/m^3]
   const double rho_2;		// Snow collapse factor [1/m]
-  const double Psa;		// Absolute amount of snow required
+  const double Psa;		// Absolute amount of daily snow required
 				// for snow to become new.
   const double fsa;		// Relative amount of snow required
 				// for snow to become new.
   const double K_snow_factor;	// Factor related to thermal conductivity
 				// for snow water mix [W m^5/kg^2/dg C]
+  double partial_day; 		// Time this day [h]
+  double partial_snow; 		// Snow this day [mm]
+  double partial_precipitation;	// Precipitation this day [mm]
 
   void output (Log& log) const;
   void tick (Treelog&, const Movement&,
@@ -91,7 +94,10 @@ Snow::Implementation::Implementation (const FrameSubmodel& al)
     rho_2 (al.number ("rho_2")),
     Psa (al.number ("Psa")),
     fsa (al.number ("fsa")),
-    K_snow_factor (al.number ("K_snow_factor"))
+    K_snow_factor (al.number ("K_snow_factor")),
+    partial_day (al.number ("partial_day")),
+    partial_snow (al.number ("partial_snow")),
+    partial_precipitation (al.number ("partial_precipitation"))
 { }
 
 void 
@@ -103,6 +109,9 @@ Snow::Implementation::output (Log& log) const
   output_variable (Swater, log);
   output_variable (age, log);
   output_variable (dZs, log);
+  output_variable (partial_day, log);
+  output_variable (partial_snow, log);
+  output_variable (partial_precipitation, log);
 }
 
 void
@@ -135,24 +144,34 @@ Snow::Implementation::tick (Treelog& msg,
 
   // Total precipitation. [mm/h]
   const double P = Psnow + Prain;
+
+  // Update snow age.
+  partial_day += dt;
+  partial_snow += Psnow * dt;
+  partial_precipitation += P * dt;
   
-  // Relative amount of snow in percolation.
-  const double fs = (P > 0) ? Psnow / P : 0.0;
-  daisy_assert (fs >= 0.0);
-
-  // Check if snow has become white.
-  if (Prain > 0.0)
+  if (partial_day >= 24.0)
+    // New day.
     {
-      if (Psnow > Psa && fs > fsa) 
-	age = 0;
-    }
-  else
-    {
-      if (Psnow > Psa) 
-	age = 0;
+      // Relative amount of snow in percolation.
+      const double fs = (partial_precipitation > 0)
+	? partial_snow / partial_precipitation
+	: 1.0;
+      daisy_assert (fs >= 0.0);
+
+      if (partial_snow > Psa && fs > fsa)
+	{
+	  msg.message ("Fresh snow made snow pack white again");
+	  age = 0.0;
+	}
+      
+      // Reset.
+      partial_day -= 24.0;
+      partial_snow = 0.0;
+      partial_precipitation = 0.0;
     }
 
-  // We evaporate as much as we can.  
+  // We evaporate as much as we can.
   EvapSnowPack = std::min (Epot, Ssnow / dt + P);
 
   daisy_assert (EvapSnowPack >= 0.0);
@@ -180,8 +199,10 @@ Snow::Implementation::tick (Treelog& msg,
   // Radiation melting factor. [kg/J]
   const double mr = mrprime * (1 + m1 * (1 - exp (-m2 * age)));
 
+  const double s_per_h = 3600.0; // [s/h]
+  
   // Potential snow melting. [mm/h]
-  const double Mprime = (mt * T + mr * Si + q_h / Lm) * f;
+  const double Mprime = (mt * T + (mr * Si + q_h / Lm) * s_per_h) * f;
 
   // Minimal possible melting (all water freezes). [mm/h]
   const double M1 = - (Swater/dt + Prain);
@@ -286,9 +307,12 @@ Snow::Implementation::tick (Treelog& msg,
   Ssnow = Ssnow_new;
   Swater = Swater_new;
 
-  // Update snow age.
-  if (Ssnow > 0.0)
-    age++;
+  if (Ssnow > 0.1)
+    age += dt;
+  else
+    age = 0.0;
+  
+  
 
   // Update temperature.
   if (q_s > 1.0e-20)
@@ -323,12 +347,19 @@ Snow::tick (Treelog& msg, const Movement& movement,
 {
   if (impl.Ssnow > 0.0 || Psnow > 0.0)
     impl.tick (msg, movement, soil, soil_water, soil_heat, Si, q_h,
-	       Prain, Psnow, Pond, T, Epot, dt);
+	       Prain, Psnow,
+	       Pond,
+	       T, Epot, dt);
   else
     {
       impl.EvapSnowPack = 0.0;
       impl.q_s = Prain;
       impl.temperature = T;
+      impl.age = 0.0;
+      impl.dZs = 0.0;
+      impl.partial_day = 0.0;
+      impl.partial_snow = 0.0;
+      impl.partial_precipitation = 0.0;
     }
 }
 
@@ -394,7 +425,7 @@ Snow::load_syntax (Frame& frame)
   frame.declare ("mrprime", "kg/J", Attribute::Const,
 	      "Radiation melting factor.");
   frame.set ("mrprime", 1.5e-7);
-  frame.declare ("m1", "kg/J", Attribute::Const,
+  frame.declare ("m1", Attribute::None (), Attribute::Const,
 	      "Radiation melting linear.");
   frame.set ("m1", 2.0);
   frame.declare ("m2", "h^-1", Attribute::Const, 
@@ -412,15 +443,27 @@ Snow::load_syntax (Frame& frame)
   frame.declare ("rho_2", "m^-1", Attribute::Const, 
 	      "Snow collapse factor.");
   frame.set ("rho_2", 0.5);
-  frame.declare ("Psa", "mm", Attribute::Const, 
-	      "Absolute amount of snow required for snow to become new.");
-  frame.set ("Psa", 5.0 / hours_per_day);
-  frame.declare ("fsa", Attribute::None (), Attribute::Const, 
-	      "Relative amount of snow required for snow to become new.");
+  frame.declare ("Psa", "mm", Attribute::Const, "\
+Amount of snow in a day required for snow to become new.");
+  frame.set ("Psa", 5.0);
+  frame.declare_fraction ("fsa", Attribute::Const, "\
+Fraction of snow in precipitation required for snow to become new.");
   frame.set ("fsa", 0.9);
   frame.declare ("K_snow_factor", "W m^5/kg^2/dg C", Attribute::Const,
 	      "Factor related to thermal conductivity for snow water mix.");
   frame.set ("K_snow_factor", 2.86e-6);
+  frame.declare ("partial_day", "h", Attribute::State, "\
+Time since last day.\n\
+Snow age is reset when at least 'Psa' is receieved within a day.");
+  frame.set ("partial_day", 0.0);
+  frame.declare ("partial_snow", "mm", Attribute::State, "\
+Amount of snow received this day so far.\n\
+Snow age is reset when at least 'Psa' is receieved within a day.");
+  frame.set ("partial_snow", 0.0);
+  frame.declare ("partial_precipitation", "mm", Attribute::State, "\
+Amount of precipitation received this day so far.\n\
+At least 'fsa' of this must be snow for snow age to be reset.");
+  frame.set ("partial_precipitation", 0.0);
 }
   
 Snow::Snow (const FrameSubmodel& al)

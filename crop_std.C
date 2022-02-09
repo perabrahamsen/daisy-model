@@ -646,8 +646,7 @@ CropStandard::tick (const Scope& scope,
   const double T_soil_3 
     = geo.content_height (soil_heat, &SoilHeat::T, -root_system->Depth/3.0);
   daisy_assert (std::isfinite (T_soil_3));
-
-  const double seed_C = seed->release_C (dt);
+  const double seed_C = seed->release_C (T_soil_3, dt);
   production.tick (bioclimate.daily_air_temperature (), T_soil_3,
 		   root_system->actual_density (), geo, soil_water, DS, 
 		   canopy->CAImRat, *nitrogen, nitrogen_stress, NNI, seed_C, 

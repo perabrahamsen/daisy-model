@@ -1,3 +1,23 @@
+2022-02-09  Per Abrahamsen  <pa@plen.ku.com>
+
+	* snow.C: Bug fixes.
+
+2022-02-08  Per Abrahamsen  <pa@plen.ku.com>
+
+	* lib/wwheat.dai ("Winter Wheat JG"): Disable 'T_factor'.
+
+	* seed_release.C (T_factor): New parameter.
+
+	* seed.h, seed_LAI.C, seed_release.C (release_C): Add 'T' parameter.
+	* crop_std.C (tick): Update caller.
+
+2022-01-31  Per Abrahamsen  <pa@plen.ku.com>
+
+	* snow.C (m1): Fix unit.
+	(tick): Convert Si and q_h to J/h.
+	(tick): age should grow with dt, not 1 [h].
+	(Psa): Changed unit to [mm/h].
+
 2021-11-22  Per Abrahamsen  <pa@plen.ku.com>
 
 	* assertion.C: Limit number of messages from same line.

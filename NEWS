@@ -6,6 +6,37 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.28
+
+** Temperature now affect release of assimilate from seeds.
+
+This is for the seed release model.
+
+By default, the same function as is used for maintenance respiration
+is used:
+
+ 0.4281 * (exp (0.57 - 0.024 * T + 0.0020 * T * T)
+         - exp (0.57 - 0.042 * T - 0.0051 * T * T)))
+
+where T is the soil temperature at 1/3 of the root depth.
+
+This is 1 at 20 dg C, and less than 0.5 at 10 dg C.  For Danish
+conditions this means that release rate for spring crops is much
+lower.
+
+You can overwrite it with the T_factor parameter.  To get the old
+behaviour, specify
+
+  (T_factor (0.0 [dg C] 100 [%]) (100.0 [dg C] 100 [%]))
+
+under Seed release.
+
+** More work on the mulch module.
+
+** Bug fixes in snow module.
+
+These fixes are not expected to change results much.
+
 * 6.25
 
 ** New 'evaporate_depth' 'mulch' litter parameter.
