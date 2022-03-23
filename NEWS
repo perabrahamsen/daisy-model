@@ -6,6 +6,22 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.29
+
+** New 'minute', 'second', and 'microsecond' conditions.
+
+Use like:
+
+(defcondition every_10_minute
+  (and (or (minute 0) (minute 10) (minute 20)
+	   (minute 30) (minute 40) (minute 50))
+       (second 0)
+       (microsecond 0)))
+
+** Various fixed to Farquhar photosynthesis and related modules.
+
+Reported by Laura Delhez.
+
 * 6.28
 
 ** Temperature now affect release of assimilate from seeds.

@@ -1,3 +1,17 @@
+2022-03-23  Per Abrahamsen  <pa@plen.ku.com>
+
+	* condition_time.C ("microsecond", "second", "minute"): New
+	models.
+
+2022-03-14  Per Abrahamsen  <pa@plen.ku.com>
+
+	* crop_std.C, crop_simple.C (NIRext): Return NIRext, not PARext.
+	* crop_std.C, crop_simple.C (NIRref): Ditto.
+
+2022-03-13  Per Abrahamsen  <pa@plen.ku.com>
+
+	* photo_FCC3.C (find_we): Divide by 4 as per Eq 4.
+
 2022-02-09  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.28 released.

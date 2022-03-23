@@ -277,11 +277,89 @@ public:
   { return *new ConditionAfter (al); }
 };
 
+struct ConditionMicrosecond : public Condition
+{
+  const int at;
+  symbol timestep ()
+  { return "us"; } 
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
+  { return daisy.time ().microsecond () == at; }
+  void output (Log&) const
+  { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
+  ConditionMicrosecond (const BlockModel& al)
+    : Condition (al),
+      at (al.integer ("at"))
+  { }
+  static Model& make (const BlockModel& al)
+  { return *new ConditionMicrosecond (al); }
+};
+
+struct ConditionSecond : public Condition
+{
+  const int at;
+  symbol timestep ()
+  { return "s"; } 
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
+  { return daisy.time ().second () == at; }
+  void output (Log&) const
+  { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
+  ConditionSecond (const BlockModel& al)
+    : Condition (al),
+      at (al.integer ("at"))
+  { }
+  static Model& make (const BlockModel& al)
+  { return *new ConditionSecond (al); }
+};
+
+struct ConditionMinute : public Condition
+{
+  const int at;
+  symbol timestep ()
+  { return "min"; } 
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
+  { return daisy.time ().minute () == at; }
+  void output (Log&) const
+  { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
+  ConditionMinute (const BlockModel& al)
+    : Condition (al),
+      at (al.integer ("at"))
+  { }
+  static Model& make (const BlockModel& al)
+  { return *new ConditionMinute (al); }
+};
+
 struct ConditionHour : public Condition
 {
   const int at;
   symbol timestep ()
-  { return "d"; } 
+  { return "nh"; } 
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { return daisy.time ().hour () == at; }
   void output (Log&) const
@@ -571,6 +649,56 @@ True, iff the simulation time is after the specified time.")
   void load_frame (Frame&) const
   { }
 } ConditionAfter_syntax;
+
+static struct ConditionMicrosecondSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ConditionMicrosecond (al); }
+  ConditionMicrosecondSyntax ()
+    : DeclareModel (Condition::component, "microsecond", "\
+True, at the specified microsecond.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.declare_integer ("at", Attribute::Const,
+                "Microsecond when the condition is true [0-999999].");
+    frame.order ("at");
+  }
+} ConditionMicrosecond_syntax;
+
+static struct ConditionSecondSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ConditionSecond (al); }
+  ConditionSecondSyntax ()
+    : DeclareModel (Condition::component, "second", "\
+True, at the specified second.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.declare_integer ("at", Attribute::Const,
+                "Second when the condition is true [0-59].");
+    frame.set_check ("at", VCheck::valid_second ());
+    frame.order ("at");
+  }
+} ConditionSecond_syntax;
+
+static struct ConditionMinuteSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ConditionMinute (al); }
+  ConditionMinuteSyntax ()
+    : DeclareModel (Condition::component, "minute", "\
+True, at the specified minute.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.declare_integer ("at", Attribute::Const,
+                "Minute when the condition is true [0-59].");
+    frame.set_check ("at", VCheck::valid_minute ());
+    frame.order ("at");
+  }
+} ConditionMinute_syntax;
 
 static struct ConditionHourSyntax : public DeclareModel
 {

@@ -163,16 +163,17 @@ PhotoFCC3::CxModel (const double CO2_atm,
     const double Gamma, Vm, Jm, Ko, Kc, Kcl;
     const double gtc, rbw, rsw,Ile, beta, J, rd, CO2_atm, Ptot;
     
-    double find_wc (const double ci)
+    double find_wc (const double ci) // Eq 2
     {// Gross CO2 uptake limited by Rubisco
       daisy_assert ((ci + Kcl) > 0.0); 
       const double wc = Vm * ( ci - Gamma)/( ci + Kcl);//Rubisco limited,[mol/m²leaf/s]
      return wc;
     }
-    double find_we (const double ci)
+    double find_we (const double ci) // Eq 4
     { // Gross CO2 uptake limited by RuBP
       daisy_assert ((ci + 2.0 * Gamma) > 0.0);
-      const double we = J * (ci - Gamma)/(ci + 2. * Gamma);//[mol/m² leaf/s]
+      const double we		//[mol/m² leaf/s]
+	= J * (ci - Gamma)/(4.0*(ci + 2. * Gamma));
       return we; 
     }
     double find_p (const double ci) //[mol/m² leaf/s]
@@ -299,6 +300,7 @@ Photosynthesis for C3 crops described by Faquhar et al. (1980).")
   { }
   void load_frame (Frame& frame) const
   {
+    frame.set_strings ("cite", "pf1997simple");
     frame.declare ("TempEff", "dg C", Attribute::None (),
                Check::non_negative (), Attribute::Const,
                 "Temperature factor for assimilate production.");

@@ -1,13 +1,28 @@
 -TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Seed release T funktion
+* Surface
 
-* Snow
+** Make it a component
 
-** daily age
+** Most in component, a little in "default".
 
-** q_h Si J/h
+** move force_flux and forced_pressure to seperate models.
 
+** New "flux_source" model.
+
+** Should the "forced_" models be dummies, not keeping track of above ground stuff?
+
+* Vintersæd
+
+** Videnssyntese
+
+Betydning af dræn.  Roddybde.
+
+*** COMMIT
+
+*** NYIELD
+
+*** Kasper PhD
 
 * TODO
 
