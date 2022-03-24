@@ -6,6 +6,14 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.30
+
+** New 'surface' component.
+
+The 'default' model implements most of the old functionality.
+
+This change may affect custom log parameterizations.
+
 * 6.29
 
 ** New 'minute', 'second', and 'microsecond' conditions.

@@ -316,8 +316,8 @@ Amount of water running of the surface.
 This is intended to simulate water runoff from a surface with a slop.
 However, since Daisy is a one dimensional model, the water have
 nowhere go to.  For typical setups, this value will be zero.")
-                   (path column "${column}" Surface runoff)
-                   (spec fixed Surface runoff)
+                   (path column "${column}" Surface default runoff)
+                   (spec surface default runoff)
                    (handle sum)
                    (dimension "mm"))
            (interval (tag "Biopore water")

@@ -41,6 +41,7 @@
 #include "assertion.h"
 #include "mathlib.h"
 #include "block_model.h"
+#include "uzmodel.h"
 #include <sstream>
 
 struct Movement1D : public MovementSolute

@@ -1,3 +1,13 @@
+2022-03-24  Per Abrahamsen  <pa@plen.ku.com>
+
+	* Makefile (SUBMODELS, COMPONENTS): 
+
+	* surface.C, surface.h, surface_std.C: Made it a component.
+
+	* column_std.C: Update caller.
+
+	* lib/log-std.dai ("Field water"): Update caller.
+
 2022-03-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.29 released.
