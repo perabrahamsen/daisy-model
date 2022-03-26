@@ -1,3 +1,11 @@
+2022-03-26  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.30 released.
+
+2022-03-26  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.30 released.
+
 2022-03-25  Per Abrahamsen  <pa@plen.ku.com>
 
 	* surface_simple.C (simple, const_flux, none, const_pressure):
