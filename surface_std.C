@@ -49,10 +49,12 @@ struct SurfaceStandard : public Surface
   double EpFactor_current;	// []
   const double albedo_wet;
   const double albedo_dry;
+#ifdef FORCED_BOUNDARY
   const bool use_forced_pressure;
   const double forced_pressure_value;
   const bool use_forced_flux;
   const double forced_flux_value;
+#endif // FORCED_FLUX_VALUE
   typedef std::map<size_t, size_t> pond_map;
   pond_map pond_edge;
   double pond_average;          // [mm]
@@ -88,13 +90,14 @@ public:
   // Simulation.
   void output (Log&) const;
   void update_pond_average (const Geometry& geo);
-  void tick (Treelog&, 
+  void tick (const Time&, double dt /* [h] */, 
              double PotSoilEvaporationWet, 
              double PotSoilEvaporationDry, 
              double flux_in /* [mm/h] */,
              double temp /* [dg C] */, const Geometry& geo,
              const Soil&, const SoilWater&,
-             double soil_T /* [dg C] */, double dt /* [h] */);
+             double soil_T /* [dg C] */,
+	     Treelog&);
 
   // Communication with bioclimate.
   double ponding_average () const; // [mm]
@@ -117,12 +120,13 @@ public:
 Surface::top_t 
 SurfaceStandard::top_type (const Geometry& geo, size_t edge) const
 {
+#ifdef FORCED_BOUNDARY
   if (use_forced_flux)
     return forced_flux;
 
   if (use_forced_pressure)
     return forced_pressure;
-  
+#endif // FORCED_BOUNDARY  
   daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
   pond_map::const_iterator i = pond_edge.find (edge);
   daisy_assert (i != pond_edge.end ());
@@ -137,12 +141,14 @@ double
 SurfaceStandard::q_top (const Geometry& geo, const size_t edge,
 			const double dt) const
 {
+#ifdef FORCED_BOUNDARY
   if (use_forced_pressure)
     return -forced_pressure_value * 0.1 / 1.0; // mm -> cm/h.
 
   if (use_forced_flux)
     return forced_flux_value * 0.1; // mm/h -> cm/h.
-
+#endif // FORCED_BOUNDARY
+  
   daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
   pond_map::const_iterator i = pond_edge.find (edge);
   daisy_assert (i != pond_edge.end ());
@@ -164,8 +170,10 @@ SurfaceStandard::accept_top (double water /* [cm] */,
 			     const Geometry& geo, size_t edge,
 			     double dt, Treelog& msg)
 { 
+#ifdef FORCED_BOUNDARY
   if (use_forced_pressure)
     return;
+#endif // FORCED_BOUNDARY
 
   water *= 10.0;		// [cm] -> [mm]
 
@@ -227,14 +235,14 @@ SurfaceStandard::update_pond_average (const Geometry& geo)
 }
 
 void
-SurfaceStandard::tick (Treelog& msg,
+SurfaceStandard::tick (const Time&, const double dt,
 		       const double PotSoilEvaporationWet,
 		       const double PotSoilEvaporationDry,
 		       const double flux_in, const double temp,
 		       const Geometry& geo,
 		       const Soil& soil, const SoilWater& soil_water,
 		       const double soil_T,
-		       const double dt)
+		       Treelog& msg)
 {
   // Runoff out of field.
   const double old_pond_average = pond_average;
@@ -542,10 +550,12 @@ SurfaceStandard::SurfaceStandard (const BlockModel& al)
     EpFactor_current (EpFactor_),
     albedo_wet (al.number ("albedo_wet")),
     albedo_dry (al.number ("albedo_dry")),
+#ifdef FORCED_BOUNDARY
     use_forced_pressure (al.check ("forced_pressure")),
     forced_pressure_value (al.number ("forced_pressure", -42.42e42)),
     use_forced_flux (al.check ("forced_flux")),
     forced_flux_value (al.number ("forced_flux", -42.42e42)),
+#endif // FORCED_BOUNDARY
     pond_average (NAN),
     pond_section (al.check ("pond_section")
                   ? al.number_sequence ("pond_section")
@@ -583,12 +593,13 @@ Keep track of soil surface.")
   {
     bool ok = true;
 
+#ifdef FORCED_BOUNDARY
     if (al.check ("forced_flux") && al.check ("forced_pressure"))
       {
 	msg.error ("Can't have both 'forced_pressure' and 'forced_flux'");
 	ok = false;
       }
-
+#endif // FORCED_BOUNDARY
     return ok;
   }
 
@@ -628,10 +639,12 @@ Effect of soil water on EpFactor.");
 		   Attribute::Const,
 		   "Albedo of wet soil (pf <= 1.7)");
     frame.set ("albedo_wet", 0.08);
+#ifdef FORCED_BOUNDARY
     frame.declare ("forced_pressure", "mm", Attribute::OptionalConst, "\
 Set this to force a permanent pressure top.");
     frame.declare ("forced_flux", "mm/h", Attribute::OptionalConst, "\
 Set this to force a permanent flux top.  Positive upwards (exfiltration).");
+#endif // FORCED_BOUNDARY
     frame.declare ("pond", "mm", Attribute::LogOnly, "\
 Amount of ponding on the surface.\n\
 Negative numbers indicate soil exfiltration.");

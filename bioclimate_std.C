@@ -1081,11 +1081,11 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 
   const double soil_T 
     = geo.content_hood (soil_heat, &SoilHeat::T, Geometry::cell_above);
-  surface.tick (msg,
+  surface.tick (time, dt,
 		pond_ep + litter_potential_up,
 		below_canopy_ep_dry + litter_potential_up, 
                 pond_in, pond_in_temperature, 
-                geo, soil, soil_water, soil_T, dt);
+                geo, soil, soil_water, soil_T, msg);
 
   // 5.5 Intermission: Divide upward between pond, soil, litter, and ea
   const double pond_up = surface.evap_pond (dt, msg); // [mm/h]

@@ -10,9 +10,35 @@ release.
 
 ** New 'surface' component.
 
-The 'default' model implements most of the old functionality.
+The 'Surface' parameter of the default column model now uses this.
+The 'default' model implements most of the old functionality of the
+'Surface' parameter.
 
-This change may affect custom log parameterizations.
+The change may affect custom log parameterizations.
+
+The old surface parameters 'forced_flux' and 'forced_pressure' have
+been replaced by 'const_flux' and 'const_pressure' models.
+
+A 'none' parametization of 'cost_flux' with a flux of zero is also provided.
+
+** New 'source_flux' surface model.
+
+This reads the flux values from a file:
+
+  (Surface source_flux (source (column (file "inf.ddf") (tag "q_out"))))
+
+The file looks like this:
+
+ddf-0.0 --- inf.ddf 
+
+--------
+Date	q_out
+date	mm/d
+1000-01-01T00:00:00	0.0
+1986-12-02T00:00:00	1.0
+3000-01-01T00:00:00	1.0
+
+The last value read will be used, unless you set (interpolate true).
 
 * 6.29
 

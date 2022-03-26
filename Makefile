@@ -196,7 +196,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = surface_std.C select_quiver.C \
+MODELS = surface_source.C surface_std.C select_quiver.C \
 	hydraulic_M_BivG.C hydraulic_M_vGBS.C hydraulic_hypWeb.C \
 	reaction_dom.C litter_mulch.C hydraulic_linear.C hydraulic_table.C \
 	program_weather.C uzrichard2.C hydraulic_M_vGip.C reaction_shoot.C \
@@ -323,7 +323,7 @@ SUBMODELS = point.C irrigate.C \
 
 # Special or intermediate models with their own interface.
 # 
-SPECIALS = litter_residue.C wsource_weather.C \
+SPECIALS = surface_simple.C litter_residue.C wsource_weather.C \
 	wsource_base.C reaction_colgen.C \
 	volume_box.C movement_solute.C scope_exchange.C photo_Farquhar.C \
 	scope_multi.C scope_id.C geometry_vert.C gnuplot_base.C \
@@ -1260,6 +1260,10 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h \
  frame_submodel.h frame.h scope.h attribute.h symbol.h log.h time.h \
  border.h model_framed.h model_logable.h model.h geometry.h soil.h am.h \
  im.h librarian.h plf.h aom.h om.h check.h vcheck.h mathlib.h assertion.h
+surface_simple${OBJ}: surface_simple.C surface_simple.h surface.h \
+ model_derived.h model_logable.h model.h symbol.h librarian.h assertion.h \
+ block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
+ frame_model.h frame.h
 litter_residue${OBJ}: litter_residue.C litter_residue.h litter.h \
  model_derived.h model_logable.h model.h symbol.h block_model.h \
  block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
@@ -1519,6 +1523,11 @@ plf${OBJ}: plf.C plf.h assertion.h mathlib.h
 mathlib${OBJ}: mathlib.C mathlib.h assertion.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+surface_source${OBJ}: surface_source.C surface_simple.h surface.h \
+ model_derived.h model_logable.h model.h symbol.h source.h time.h units.h \
+ memutils.h librarian.h block_model.h block_nested.h block.h scope.h \
+ attribute.h treelog.h frame_model.h frame.h assertion.h timestep.h \
+ vcheck.h mathlib.h
 surface_std${OBJ}: surface_std.C surface.h model_derived.h model_logable.h \
  model.h symbol.h geometry1d.h geometry_vert.h geometry.h attribute.h \
  soil.h soil_water.h log.h time.h border.h model_framed.h mathlib.h \

@@ -1,9 +1,16 @@
+2022-03-25  Per Abrahamsen  <pa@plen.ku.com>
+
+	* surface_simple.C (simple, const_flux, none, const_pressure):
+	New base models and parameterizations.
+	* Makefile (MODELS): Add it.
+	* surface_std.C (forced_flux, forced_pressure): Removed parameters.
+	* surface_source.C (source_flux): New model.
+	* Makefile (MODELS): Add it.
+
 2022-03-24  Per Abrahamsen  <pa@plen.ku.com>
 
-	* Makefile (SUBMODELS, COMPONENTS): 
-
 	* surface.C, surface.h, surface_std.C: Made it a component.
-
+	* Makefile (SUBMODELS, COMPONENTS): Update.
 	* column_std.C: Update caller.
 
 	* lib/log-std.dai ("Field water"): Update caller.

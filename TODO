@@ -2,15 +2,11 @@
 
 * Surface
 
-** Make it a component
+** surface_source.C
 
-** Most in component, a little in "default".
+*** copy content of groundwater_source.C
 
-** move force_flux and forced_pressure to seperate models.
-
-** New "flux_source" model.
-
-** Should the "forced_" models be dummies, not keeping track of above ground stuff?
+*** Test
 
 * Vintersæd
 

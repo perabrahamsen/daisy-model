@@ -31,6 +31,7 @@ class Treelog;
 class Soil;
 class SoilWater;
 class BlockModel;
+class Time;
 
 class Surface : public ModelDerived
 {
@@ -58,13 +59,13 @@ public:
 
   // Simulation.
   virtual void update_pond_average (const Geometry& geo) = 0;
-  virtual void tick (Treelog&, 
+  virtual void tick (const Time&, double dt /* [h] */, 
 		     double PotSoilEvaporationWet, 
 		     double PotSoilEvaporationDry, 
 		     double flux_in /* [mm/h] */,
 		     double temp /* [dg C] */, const Geometry& geo,
 		     const Soil&, const SoilWater&,
-		     double soil_T /* [dg C] */, double dt /* [h] */) = 0;
+		     double soil_T /* [dg C] */, Treelog&) = 0;
 
   // Communication with bioclimate.
   virtual double ponding_average () const = 0; // [mm]
