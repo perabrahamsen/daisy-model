@@ -1,3 +1,7 @@
+2022-04-06  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.31 released.
+
 2022-04-06  Per Abrahamsen  <pa@plen.ku.com>
 
 	* bioclimate_std.C (pond_water_to_snow): New log variable.
