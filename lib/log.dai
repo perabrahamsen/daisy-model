@@ -2799,7 +2799,7 @@ contains no water."
   "Snow water balance."
   (precision 1)
   (require_top true)
-  (input "Precipitation" "Overhead irrigation")
+  (input "Precipitation" "Overhead irrigation" "Pond to snow")
   (output "Snow evaporation" "Snow out")
   (content Snow))
 
@@ -2826,7 +2826,8 @@ contains no water."
   (require_top true)
   (input "Litter bypass" "Litter wash off" "Litter out")
   (output "Pond evaporation" "Soil evaporation" "Matrix infiltration"
-	  "Tertiary infiltration" "Runoff" "Litter pond up" "Litter soil up")
+	  "Tertiary infiltration" "Runoff" "Litter pond up" "Litter soil up"
+	  "Pond to snow")
   (content "Pond"))
 
 (deflog "Surface water" column
@@ -2981,6 +2982,13 @@ nowhere go to.  For typical setups, this value will be zero.")
                    (path column "${column}"
 			 Bioclimate "*" snow_water_out) 
                    (spec bioclimate default snow_water_out)
+		   (handle sum)
+                   (dimension "mm"))
+           (number (tag "Pond to snow")
+		   (documentation "Water leaving pond for snow pack")
+                   (path column "${column}"
+			 Bioclimate "*" pond_water_to_snow) 
+                   (spec bioclimate default pond_water_to_snow)
 		   (handle sum)
                    (dimension "mm"))
            (number (tag "Canopy out")

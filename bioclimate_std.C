@@ -107,6 +107,7 @@ struct BioclimateStandard : public Bioclimate
   double snow_water_in;         // Water entering snow pack [mm/h]
   double snow_water_in_temperature; // Incoming water temperature [dg C]
   double snow_water_out;        // Water leaving snow pack [mm/h]
+  double pond_water_to_snow;	// Water leaving pond for snow pack [mm/h]
   double snow_water_out_temperature; // Temperature of water leaving [dg C]
 
   // Water intercepted on canopy.
@@ -562,6 +563,7 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     snow_water_in (0.0),
     snow_water_in_temperature (0.0),
     snow_water_out (0.0),
+    pond_water_to_snow (0.0),
     snow_water_out_temperature (0.0),
     canopy_ep (0.0),
     canopy_ea_ (0.0),
@@ -890,8 +892,12 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
             }
         }
       surface.put_ponding (adjusted_pond);
+      pond_water_to_snow = -snow_water_out;
       snow_water_out = 0.0;
     }
+  else
+    pond_water_to_snow = 0.0;
+  
   snow_water_out_temperature = snow.temperature ();
   const double below_snow_ep = total_ep_ - snow_ea_;
 
@@ -1404,6 +1410,7 @@ BioclimateStandard::output (Log& log) const
   output_variable (snow_water_in, log);
   output_variable (snow_water_in_temperature, log);
   output_variable (snow_water_out, log);
+  output_variable (pond_water_to_snow, log);
   output_value (snow_water_out_temperature, 
                 "snow_water_out_temperature", log);
   output_value (cover_, "canopy_cover", log);
@@ -1624,6 +1631,8 @@ The intended use is colloid generation.");
                    "Temperature of water entering snow pack.");
     frame.declare ("snow_water_out", "mm/h", Attribute::LogOnly,
                    "Water leaving snow pack");
+    frame.declare ("pond_water_to_snow", "mm/h", Attribute::LogOnly,
+                   "Water leaving pond to snow pack");
     frame.declare ("snow_water_out_temperature", "dg C", Attribute::LogOnly,
                    "Temperature of water leaving snow pack.");
 

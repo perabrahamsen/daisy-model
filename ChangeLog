@@ -1,6 +1,7 @@
-2022-03-26  Per Abrahamsen  <pa@plen.ku.dk>
+2022-04-06  Per Abrahamsen  <pa@plen.ku.com>
 
-	* Version 6.30 released.
+	* bioclimate_std.C (pond_water_to_snow): New log variable.
+	* lib/log.dai ("Surface water"): Log it.
 
 2022-03-26  Per Abrahamsen  <pa@plen.ku.dk>
 
