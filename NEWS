@@ -6,6 +6,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.31
+
+** New 'pond_water_to_snow' log variable in bioclimate.
+
+The "Surface water" log includes it.
+
 * 6.30
 
 ** New 'surface' component.
