@@ -195,7 +195,7 @@ struct ProgramWeather : public Program
       double a0 = 0.0;
       double a1 = 0.0;
       double b1 = 0.0;
-      for (int i = 0; i < 25; i++)
+      for (int i = 0; i < 24; i++)
 	{
 	  daisy_assert (rad_count[i] > 0.0);
 	  const double p = rad_sum[i] / rad_count[i];

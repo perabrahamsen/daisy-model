@@ -1,3 +1,7 @@
+2022-04-26  PA14357  <xvs108@PA14357>
+
+	* program_weather.C (run): Off by one error.
+
 2022-04-06  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.31 released.
