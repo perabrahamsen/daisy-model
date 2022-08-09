@@ -38,6 +38,7 @@ private:
   const PLF Stem;
 public:
   const PLF RSR;		// Root/Shoot ratio.
+  const PLF max_WRoot;		// [DS] -> [g DM/m^2]
 private:
   const double nitrogen_stress_limit; // Allocate all ass. to SOrg above this.
   const double NNI_crit;	// Modify Stem/Leaf below this NNI.
@@ -46,7 +47,10 @@ private:
 
   // Simulation.
 public:
-  void tick (double DS, double current_RSR, double nitrogen_stress,
+  void tick (double DS,
+	     double current_RSR,
+	     double current_WRoot, // [g DM/m^2]
+	     double nitrogen_stress,
 	     double NNI,
 	     double& f_Leaf, double& f_Stem,
 	     double& f_Root, double& f_SOrg);

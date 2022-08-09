@@ -1,4 +1,8 @@
-2022-04-26  PA14357  <xvs108@PA14357>
+2022-08-08  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* partition.C, partition.h (tick): New 'current_WRoot' argument.
+
+2022-04-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_weather.C (run): Off by one error.
 
@@ -6,7 +10,7 @@
 
 	* Version 6.31 released.
 
-2022-04-06  Per Abrahamsen  <pa@plen.ku.com>
+2022-04-06  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C (pond_water_to_snow): New log variable.
 	* lib/log.dai ("Surface water"): Log it.
@@ -15,7 +19,7 @@
 
 	* Version 6.30 released.
 
-2022-03-25  Per Abrahamsen  <pa@plen.ku.com>
+2022-03-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* surface_simple.C (simple, const_flux, none, const_pressure):
 	New base models and parameterizations.
@@ -24,7 +28,7 @@
 	* surface_source.C (source_flux): New model.
 	* Makefile (MODELS): Add it.
 
-2022-03-24  Per Abrahamsen  <pa@plen.ku.com>
+2022-03-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* surface.C, surface.h, surface_std.C: Made it a component.
 	* Makefile (SUBMODELS, COMPONENTS): Update.
@@ -36,17 +40,17 @@
 
 	* Version 6.29 released.
 
-2022-03-23  Per Abrahamsen  <pa@plen.ku.com>
+2022-03-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* condition_time.C ("microsecond", "second", "minute"): New
 	models.
 
-2022-03-14  Per Abrahamsen  <pa@plen.ku.com>
+2022-03-14  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* crop_std.C, crop_simple.C (NIRext): Return NIRext, not PARext.
 	* crop_std.C, crop_simple.C (NIRref): Ditto.
 
-2022-03-13  Per Abrahamsen  <pa@plen.ku.com>
+2022-03-13  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* photo_FCC3.C (find_we): Divide by 4 as per Eq 4.
 
@@ -54,11 +58,11 @@
 
 	* Version 6.28 released.
 
-2022-02-09  Per Abrahamsen  <pa@plen.ku.com>
+2022-02-09  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* snow.C: Bug fixes.
 
-2022-02-08  Per Abrahamsen  <pa@plen.ku.com>
+2022-02-08  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/wwheat.dai ("Winter Wheat JG"): Disable 'T_factor'.
 
@@ -67,18 +71,18 @@
 	* seed.h, seed_LAI.C, seed_release.C (release_C): Add 'T' parameter.
 	* crop_std.C (tick): Update caller.
 
-2022-01-31  Per Abrahamsen  <pa@plen.ku.com>
+2022-01-31  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* snow.C (m1): Fix unit.
 	(tick): Convert Si and q_h to J/h.
 	(tick): age should grow with dt, not 1 [h].
 	(Psa): Changed unit to [mm/h].
 
-2021-11-22  Per Abrahamsen  <pa@plen.ku.com>
+2021-11-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* assertion.C: Limit number of messages from same line.
 
-2021-10-11  Per Abrahamsen  <pa@plen.ku.com>
+2021-10-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* sample/init-soil.dai (JB1_init_Cosby): Fix wrong comment.
 
@@ -91,7 +95,7 @@
 
 	* Version 6.27 released.
 
-2021-10-07  Per Abrahamsen  <pa@plen.ku.com>
+2021-10-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C (litter_pond_up, litter_soil_up): New log variables.
 
@@ -99,7 +103,7 @@
 
 	* Version 6.26 released.
 
-2021-10-04  Per Abrahamsen  <pa@plen.ku.com>
+2021-10-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* litter_mulch.C (tick): Divide by Theta_sat to find R.
 
@@ -107,7 +111,7 @@
 
 	* Version 6.25 released.
 
-2021-10-01  Per Abrahamsen  <pa@plen.ku.com>
+2021-10-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* litter.C, litter.h (water_protected): New virtual member.
 	* litter_mulch.C: Implement it.
@@ -119,7 +123,7 @@
 
 	* Version 6.24 released.
 
-2021-09-17  Per Abrahamsen  <pa@plen.ku.com>
+2021-09-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* weather.h, wsource_weather.C, wsource_weather.h:
 	(has_daily_vapor_pressure): New member function.
@@ -130,7 +134,7 @@
 
 	* Version 6.23 released.
 
-2021-09-16  Per Abrahamsen  <pa@plen.ku.com>
+2021-09-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* root_system.C, root_system.h (DensityDSFac): New parameter.
 	(set_density): Use it.
@@ -138,7 +142,7 @@
 	* crop_std.C, crop_simple.C, vegetation_afforestation.C:
 	* vegetation_permanent.C (initialize): Adjust caller.
 
-2021-08-25  Per Abrahamsen  <pa@plen.ku.com>
+2021-08-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* net_radiation.C (brunt): Now takes 'A' and 'B' parameters from
 	the cited article.
@@ -149,7 +153,7 @@
 
 	* Version 6.22 released.
 
-2021-08-19  Per Abrahamsen  <pa@plen.ku.com>
+2021-08-19  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* cloudiness.C ("Taastrup"): New parameterization.
 	* bioclimate_std.C ("default"): Use it.
@@ -158,12 +162,12 @@
 
 	* Version 6.21 released.
 
-2021-07-26  Per Abrahamsen  <pa@plen.ku.com>
+2021-07-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* biopore_matrix.C (matrix_biopore_matrix): Don't warn about soil
 	drier than pF 6.
 
-2021-06-18  Per Abrahamsen  <pa@plen.ku.com>
+2021-06-18  Per Abrahamsen  <pa@plen.ku.dk>
 
 
 	* biopore_matrix.C, chemistry_std.C (remove_solute): Also removed
@@ -182,7 +186,7 @@
 
 	* Version 6.19 released.
 
-2021-06-16  Per Abrahamsen  <pa@plen.ku.com>
+2021-06-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* production.C (water_log_h_limit, water_log_root_limit):
 	(RtDR_water_log_factor, RtDR_water_log_addend): New parameters.
@@ -194,11 +198,11 @@
 
 	* Version 6.18 released.
 
-2021-06-15  Per Abrahamsen  <pa@plen.ku.com>
+2021-06-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* select_quiver.C: New model.
 
-2021-06-11  Per Abrahamsen  <pa@plen.ku.com>
+2021-06-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C (litter_cover): New log variable.
 	* reaction_Morgan98.C, reaction_Jarvis99.C, reaction_Styczen88.C:
@@ -208,13 +212,13 @@
 
 	* Version 6.17 released.
 
-2021-06-11  Per Abrahamsen  <pa@plen.ku.com>
+2021-06-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* ghf.C (FAO56):
 	* bioclimate_std.C (WaterDistribution):
 	* ghf.h (value): Use Rn_ref instead of Rn.
 
-2021-06-10  Per Abrahamsen  <pa@plen.ku.com>
+2021-06-10  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* frame.C (set): Link instead of clone.
 	* parser_file.C (load_object): Ditto.
@@ -223,7 +227,7 @@
 
 	* Version 6.16 released.
 
-2021-06-09  Per Abrahamsen  <pa@plen.ku.com>
+2021-06-09  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* cloudiness.C (Cloudiness::tick): Update 'clear_sky_radiation'
 	log variable.
@@ -232,7 +236,7 @@
 
 	* Version 6.15 released.
 
-2021-06-01  Per Abrahamsen  <pa@plen.ku.com>
+2021-06-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* hydraulic.C (min_pF): New program parameter.
 
@@ -240,12 +244,12 @@
 
 	* Version 6.14 released.
 
-2021-05-31  Per Abrahamsen  <pa@plen.ku.com>
+2021-05-31  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C (base): Renamed from "default".
 	(default, FAO56_daily, FAO56_hourly, SSOC): New parameterizations.
 
-2021-05-27  Per Abrahamsen  <pa@plen.ku.com>
+2021-05-27  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* horizon.C (initialize_base): Add 'Cw2' to daily.log table.
 
@@ -261,7 +265,7 @@
 
 	* Version 6.12 released.
 
-2021-05-05  Per Abrahamsen  <pa@plen.ku.com>
+2021-05-05  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* cloudiness.C (CloudinessClear::tick): Bug fix.
 
@@ -269,7 +273,7 @@
 
 	* Version 6.11 released.
 
-2021-05-03  Per Abrahamsen  <pa@plen.ku.com>
+2021-05-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* wsource_weather.C, wsource_weather.h, weather.h:
 	* weatherdata.h, weatherdata.C:
@@ -279,7 +283,7 @@
 
 	* Version 6.10 released.
 
-2021-03-16  Per Abrahamsen  <pa@plen.ku.com>
+2021-03-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_weather.C: Print estimates for solar noon.
 
@@ -291,24 +295,24 @@
 
 	* Version 6.09 released.
 
-2021-03-11  Per Abrahamsen  <pa@plen.ku.com>
+2021-03-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* wsource_weather.C (snow_fraction): Changed default temperature
 	for 100 % snow from -2 to 0 dg C.
 
-2021-03-10  Per Abrahamsen  <pa@plen.ku.com>
+2021-03-10  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* pet_FAO_PM.C, pet_FAO_PM_hourly.C (check): Warn if wind or vapor
 	pressure are missing.
 
-2021-03-09  Per Abrahamsen  <pa@plen.ku.com>
+2021-03-09  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* astronomy.C (ExtraterrestrialRadiation)
 	(DailyExtraterrestrialRadiation): Rewrote to follow FAO56 closer,
 	and to allow smaller timestep than 1 hour.
 	* wsource_weather.C (tick_weather): Use it.
 
-2021-03-08  Per Abrahamsen  <pa@plen.ku.com>
+2021-03-08  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* pet.h, pet_weather.C, pet_makkink.C, pet_PM.C, pet_Hargreaves.C:
 	* pet_FAO_PM_hourly.C, pet_FAO_PM.C (tick): No longer take time
@@ -323,15 +327,15 @@
 
 	* Version 6.08 released.
 
-2021-03-02  Per Abrahamsen  <pa@plen.ku.com>
+2021-03-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C (tick): handle saturated soil surface.
 
-2021-02-23  Per Abrahamsen  <pa@plen.ku.com>
+2021-02-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_optimize.C (parameters): New parameter.
 
-2021-02-21  Per Abrahamsen  <pa@plen.ku.com>
+2021-02-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* log_table.C (initialize): Special case NUL output.
 
@@ -341,7 +345,7 @@
 
 	* Version 6.07 released.
 
-2021-02-17  Per Abrahamsen  <pa@plen.ku.com>
+2021-02-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* abiotic.C, abiotic.h (find_T_scale, find_SMB_scale, load_frame):
 	New functions.
@@ -351,11 +355,11 @@
 
 	* Version 6.06 released.
 
-2021-02-16  Per Abrahamsen  <pa@plen.ku.com>
+2021-02-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (tick_top): Surface application should also hit litter.
 
-2021-02-14  Per Abrahamsen  <pa@plen.ku.com>
+2021-02-14  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log.dai ("Surface water"): Added summaries of individual
 	compartments.
@@ -368,7 +372,7 @@
 
 	* Version 6.05 released.
 
-2021-02-01  Per Abrahamsen  <pa@plen.ku.com>
+2021-02-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C (WaterDistribution): Avoid negative
 	'litter_water_storage'.
@@ -396,7 +400,7 @@
 
 	* Version 6.02 released.
 
-2020-12-17  Per Abrahamsen  <pa@plen.ku.com>
+2020-12-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* litter_mulch.C (T_soil): New log variable.
 	(use_soil_decompose): New parameter.
@@ -405,7 +409,7 @@
 
 	* Version 6.01 released.
 
-2020-12-10  Per Abrahamsen  <pa@plen.ku.com>
+2020-12-10  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* litter_mulch.C (factor): New log variable.
 	* litter.h, litter.C, litter_mulch.C (decompose_factor): New function.
@@ -415,7 +419,7 @@
 
 	* Version 6.00 released.
 
-2020-12-07  Per Abrahamsen  <pa@plen.ku.com>
+2020-12-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* litter_mulch.C (decompose_heat_factor, decompose_water_factor):
 	(decompose_SMB_pool, decompose_SMB_KM): New parameters.
@@ -424,12 +428,12 @@
 
 	* Version 5.99 released.
 
-2020-12-02  Per Abrahamsen  <pa@plen.ku.com>
+2020-12-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* retention.C, reaction.h: New component.
 	* Makefile (COMPONENTS): Added it.
 
-2020-11-30  Per Abrahamsen  <pa@plen.ku.com>
+2020-11-30  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (decompose_SMB_pool, decompose_SMB_KM): New parameters.
 
@@ -437,7 +441,7 @@
 
 	* Version 5.98 released.
 
-2020-11-27  Per Abrahamsen  <pa@plen.ku.com>
+2020-11-27  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (litter_leak, litter_diffuse): New log variables.
 	* lib/log.dai ("Surface Chemicals"): Handle them.
@@ -451,7 +455,7 @@
 	'Litter' argument.
 	* column_std.C (tick_move): Update caller.
 
-2020-11-24  Per Abrahamsen  <pa@plen.ku.com>
+2020-11-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* litter.h, litter.C, litter_mulch.C (wash_off_rate): New
 	function.
@@ -460,13 +464,13 @@
 	* bioclimate_std.C (WaterDistribution): Use it.
 	(litter_wash_off): New log variable.
 
-2020-11-23  Per Abrahamsen  <pa@plen.ku.com>
+2020-11-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* wsource_weather.C (daily_extraterrastial_radiation): Remove
 	unused declaration.
 	(relative_extraterrestial_radiation): Fix spelling.
 
-2020-11-16  Per Abrahamsen  <pa@plen.ku.com>
+2020-11-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* litter_mulch.C (water): Changed unit from [cm] to [mm].
 
@@ -474,27 +478,27 @@
 
 	* Version 5.96 released.
 
-2020-11-12  Per Abrahamsen  <pa@plen.ku.com>
+2020-11-12  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* litter.C, litter.h, litter_mulch (potential_exfiltration): New
 	function.
 	* bioclimate_std.C (WaterDistribution): Use it.
 
-2020-11-07  Per Abrahamsen  <pa@plen.ku.com>
+2020-11-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* wsource_weather.C, wsource_std.C (weather_initialize): Put time
 	in message.
 
-2020-11-04  Per Abrahamsen  <pa@plen.ku.com>
+2020-11-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* litter_residue.C (Millet, Maize): specific_AI was 10 times too
 	high.
 
-2020-10-26  Per Abrahamsen  <pa@plen.ku.com>
+2020-10-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* frame.h, frame.C (set_described, set_cited): Also take PLF arguments.
 
-2020-10-23  Per Abrahamsen  <pa@plen.ku.com>
+2020-10-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* organic_std.C (heat_factor, water_factor): Cite default value.
 
@@ -502,7 +506,7 @@
 
 	* Version 5.95 released.
 
-2020-10-15  Per Abrahamsen  <pa@plen.ku.com>
+2020-10-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* column_std.C (output): Include litter in surface water.
 
@@ -515,24 +519,24 @@
 
 	* Version 5.94 released.
 
-2020-10-12  Per Abrahamsen  <pa@plen.ku.com>
+2020-10-12  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* hydraulic_M_vGBS.C, hydraulic_hypWeb.C: New files.
 	* Makefile (MODELS): Added them.
 	* hydraulic_hypWeb.C: Fix warning.
 
-2020-10-09  Per Abrahamsen  <pa@plen.ku.com>
+2020-10-09  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* complex_functions.C, complex_functions.h:
 	* hyp_2F1.C, hyp_2F1.h: New utilities.
 	* Makefile (OTHER): Add them.
 
-2020-09-29  Per Abrahamsen  <pa@plen.ku.com>
+2020-09-29  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (C): New base parameterization.
 	(DOC): Use it.
 
-2020-09-22  Per Abrahamsen  <pa@plen.ku.com>
+2020-09-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* reaction_dom.C: New model.
 	* Makefile (MODELS): Add it.
@@ -540,7 +544,7 @@
 	* all: Removed 'Units' argument and added 'OrganicMatter' to many
 	functions related with chemistry.
 
-2020-09-21  Per Abrahamsen  <pa@plen.ku.com>
+2020-09-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (DOC, DON): New parameterization.
 	(base): New base class.
@@ -556,7 +560,7 @@
 	(SPECIALS): Added litter_residue.
 	(COMPONENTS): Removed soilfac.
 
-2020-09-07  Per Abrahamsen  <pa@plen.ku.com>
+2020-09-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C, chemical.h (add_to_litter_transform_source): New
 	function.
@@ -565,35 +569,35 @@
 	* chemical.C, chemical_std.C (DON, DOC): New parameterizations.
 	* lib/log-std.dai ("Field chemical"): Addet it.
 
-2020-09-02  Per Abrahamsen  <pa@plen.ku.com>
+2020-09-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log.dai ("Crop uptake"): New log parameterization.
 
-2020-09-01  Per Abrahamsen  <pa@plen.ku.com>
+2020-09-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C, bioclimate.h (get_litter_water)
 	(get_litter_temperature): New functions.
 
-2020-08-31  Per Abrahamsen  <pa@plen.ku.com>
+2020-08-31  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C, chemical.h (litter_storage_amount): New function.
 
 	* bioincorporation.C (am_compare): Move to am.C.
 	* am.C, am.h (compare_CN): New place.
 
-2020-08-27  Per Abrahamsen  <pa@plen.ku.com>
+2020-08-27  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* log_select.C (parameter_names): Fix description.
 
-2020-07-31  Per Abrahamsen  <pa@plen.ku.com>
+2020-07-31  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* unit_model.C ([kg DM/m^3]): New unit.
 
-2020-06-09  Per Abrahamsen  <pa@plen.ku.com>
+2020-06-09  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/wwheat.dai ("Winter Wheat JG"): New parameterization.
 
-2020-03-02  Per Abrahamsen  <pa@plen.ku.com>
+2020-03-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* hydraulic.h, hydraulic.C: Derived from ModelFramed so it can be
 	used in a list.
@@ -603,7 +607,7 @@
 	* horizon.h, horizon_system.C, horizon_numeric.C (texture): New
 	function.
 
-2020-02-27  Per Abrahamsen  <pa@plen.ku.com>
+2020-02-27  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* horizon.C, horizon.h (K): Removed.
 	(K_factor): Added.
@@ -614,11 +618,11 @@
 
 	* Version 5.93 released.
 
-2020-02-03  Per Abrahamsen  <pa@plen.ku.com>
+2020-02-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* geometry.C (biopore_pass_pipes): Allow non-zero bottom flux.
 
-2019-12-05  Per Abrahamsen  <pa@plen.ku.com>
+2019-12-05  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* vegetation_afforestation.C: Update caller.
 
@@ -631,7 +635,7 @@
 
 	* Version 5.92 released.
 
-2019-10-11  Per Abrahamsen  <pa@plen.ku.com>
+2019-10-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* heatrect_linear.C (top): New model.
 
@@ -639,7 +643,7 @@
 
 	* Version 5.91 released.
 
-2019-10-07  Per Abrahamsen  <pa@plen.ku.com>
+2019-10-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (litter_washoff_coefficient): New parameter.
 
@@ -647,7 +651,7 @@
 
 	* Version 5.90 released.
 
-2019-09-16  Per Abrahamsen  <pa@plen.ku.com>
+2019-09-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* action_with.C (done): Also restrict field here.
 
@@ -655,7 +659,7 @@
 
 	* Version 5.89 released.
 
-2019-09-11  Per Abrahamsen  <pa@plen.ku.com>
+2019-09-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* condition_walltime.C (walltime): New model.
 	* daisy.C (stop_when): New parameter.
@@ -664,11 +668,11 @@
 
 	* Version 5.88 released.
 
-2019-08-14  Per Abrahamsen  <pa@plen.ku.com>
+2019-08-14  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* surface.C (q_top): Fix sign error for forced_pressure.
 
-2019-08-08  Per Abrahamsen  <pa@plen.ku.com>
+2019-08-08  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* hydraulic_table.C (Cw2): Fix unit [cm^-1] instead of [h^-1].
 	* hydraulic.C (run): Ditto.
@@ -677,14 +681,14 @@
 
 	* Version 5.87 released.
 
-2019-07-10  Per Abrahamsen  <pa@plen.ku.com>
+2019-07-10  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* hydraulic_table.C: New model.
 	* Makefile (MODELS): Added it.
 
 	* hydraulic.C, hydraulic.h (check): Removed unused function.
 
-2019-07-03  Per Abrahamsen  <pa@plen.ku.com>
+2019-07-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_weather.C (run): Also print 'PAverage'.
 	(print_fractiles): New functions.
@@ -695,7 +699,7 @@
 
 	* Version 5.86 released.
 
-2019-06-11  Per Abrahamsen  <pa@plen.ku.com>
+2019-06-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* partition.C (tick): Make NNI work after DS=1 as well.
 
@@ -703,7 +707,7 @@
 
 	* Version 5.84 released.
 
-2019-06-04  Per Abrahamsen  <pa@plen.ku.com>
+2019-06-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* reaction_shoot.C (shoot2): New model.
 
@@ -721,7 +725,7 @@
 
 	* Version 5.82 released.
 
-2019-03-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2019-03-05  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* reaction_adsorption.C (tick_soil): Only use solute part of
 	'solute' chemical, and try to be smart about when to use the new
@@ -731,7 +735,7 @@
 
 	* Version 5.81 released.
 
-2019-03-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2019-03-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* reaction_sorption.C (tick_soil): Only use solute part of
 	'solute' chemical, allowing the micture of equilibrium and
@@ -741,7 +745,7 @@
 
 	* Version 5.80 released.
 
-2019-02-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2019-02-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* soilfac.C (Maja): New model.
 
@@ -749,13 +753,13 @@
 
 	* Version 5.79 released.
 
-2019-02-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2019-02-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* uzrect_2x1.C (vertical): Replace "lr" with "none".
 
 	* soil_water.C, soil_water.h (mass_balance): Made it const.
 
-2019-02-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2019-02-18  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* action_wait.C ('at'): New model.
 
@@ -763,7 +767,7 @@
 
 	* Version 5.78 released.
 
-2019-02-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2019-02-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (decompose): Also apply 'decompose_depth_factor'.
 
@@ -771,7 +775,7 @@
 
 	* Version 5.77 released.
 
-2019-02-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2019-02-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* uzrichard.C (require_positive_convergence): New parameter.
 
@@ -779,7 +783,7 @@
 
 	* Version 5.76 released.
 
-2019-02-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2019-02-05  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* assertion.C (Assertion::approximate): Made it a warning.
 
@@ -787,7 +791,7 @@
 
 	* Version 5.75 released.
 
-2019-02-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2019-02-05  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* mathlib.C (first_order_change): Find loss by mass balance.
 
@@ -795,7 +799,7 @@
 
 	* Version 5.74 released.
 
-2019-01-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2019-01-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* crop.h, crop.C, crop_std.C (stage): New function.
 	* vegetation_afforestation.C, vegetation_permanent.C:
@@ -807,7 +811,7 @@
 
 	* Version 5.73 released.
 
-2019-01-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2019-01-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Makefile (SUBMODELS): Removed ridge.C.
 	(MODELS): Removed action_ridge.C.
@@ -820,28 +824,28 @@
 	* movement.h, movement_1D.C (ridge): Removed.
 	* field.h, field.C (ridge): Removed.
 
-2019-01-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2019-01-14  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* log_bbch2.C, log_bbch.C: Removed files.
 	* Makefile (MODELS): Removed.
 
-2018-12-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-12-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* phenology_std.C (DS1_name): Parameter removed.
 
 	* lib/log-std.dai ("Crop"): Log it.
 
-2018-12-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-12-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* cstage.C, cstage.h: New component.
 	* Makefile (COMPONENTS): Added.
 	* crop_std.C: Use it.
 
-2018-12-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-12-19  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* check.C (Check::DS): New check.
 
-2018-12-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-12-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* crpn.C (fixate_rate): Changed unit to [h^-1], was "per timestep."
 
@@ -849,7 +853,7 @@
 
 	* Version 5.72 released.
 
-2018-11-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-11-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (ChemicalStandard::decompose): Bug fix.
 	(soil_affects_surface_decompose): New parameter.
@@ -860,16 +864,16 @@
 
 	* Version 5.71 released.
 
-2018-11-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-11-19  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.70 released.
 
-2018-11-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-11-05  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* geometry1d.C, geometry_rect.C (add_soil):: Make 'cell' size_t
 	instead of double.
 
-2018-11-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-11-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* hydraulic_M_vGip.C: New model.
 	* Makefile (MODELS): Add it.
@@ -878,7 +882,7 @@
 
 	* Version 5.69 released.
 
-2018-10-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-10-29  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (litter_decompose_rate): New defaults to
 	'canopy_dissipation_rate'.
@@ -889,7 +893,7 @@
 
 	* Version 5.68 released.
 
-2018-10-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-10-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C, chemical.h (tick_source): New 'Chemistry'
 	function parameter. Handle metabolites on surface.
@@ -899,7 +903,7 @@
 
 	* Version 5.67 released.
 
-2018-10-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-10-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* surface.C (Surface::Implementation::tick): Only convert h to pF
 	if h is negative.
@@ -911,11 +915,11 @@
 	* hydraulic_old2.C: Resurrected this model.
 	* Makefile (MODELS): Add it.
 
-2018-09-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-09-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log.dai ("Drain Sink"): Removed.
 
-2018-08-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-08-30  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* surface.C (EpFactor_SWE): New parameter.
 
@@ -923,26 +927,26 @@
 
 	* Version 5.65 released.
 
-2018-08-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-08-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* log_bbch2.C: New model.
 
-2018-08-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-08-09  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* surface.C (evap_pond): Increased tolerance for negative ep to
 	0.1 mm/y.
 
-2018-07-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-07-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* log_bbch.C: Read BBCH file.
 
 	* phenology_std.C (modify_DS): New parameter.
 
-2018-07-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-07-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* sample/test-minimize.dai: Update to changes in other files.
 
-2018-07-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-07-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* log_bbch.C: New model.
 	* Makefile (MODELS): Add it.
@@ -953,22 +957,22 @@
 
 	* Version 5.64 released.
 
-2018-05-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-05-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* geometry.C, geometry.h (add_layer): Take 'Check' argument.
 	* chemical_std.C, soil_water.C, soil_heat.C: Update callers.
 
-2018-05-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-05-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* rootdens_growth.C (depth_factor): New parameter.
 
-2018-04-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-04-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* reaction_std.C (tick_soil): Add TREELOG_MODEL.
 	* transform_equil.C (tick): Ditto.
 	* equil_goal.C (find): Ditto.
 
-2018-04-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-04-18  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* pet_makkink.C (AslyngHansen82): Added Hansen (1984) reference.
 
@@ -976,13 +980,13 @@
 
 	* Version 5.63 released.
 
-2018-04-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-04-18  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* adsorption.C (AdsorptionInit::load_frame): New function.
 
 	* adsorption_freundlich.C (C_ref): New parameter.
 
-2018-04-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-04-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C (reset_weather): New default Pet models.
 
@@ -998,13 +1002,13 @@
 
 	* Version 5.62 released.
 
-2018-04-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-04-12  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemistry.h, chemistry_std.C, chemistry_multi.C (tick_top): Take
 	vegetation and bioclimate arguments.
 	* reaction.C, reaction.h (tick_vegetation): New virtual function.
 
-2018-04-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-04-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* rate.C: New component.
 	* Makefile (COMPONENTS): Add it.
@@ -1015,7 +1019,7 @@
 	* chemical_std.C (canopy_transform): New log variable.
 	* chemical_std.C, chemical.h (add_to_surface_transform_source): Set it.
 
-2018-04-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-04-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (litter_decompose_rate)
 	(litter_decompose_halftime): New parameters.
@@ -1026,7 +1030,7 @@
 
 	* chemical_std.C (update_matrix): Changed error to warning.
 
-2018-03-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-03-06  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* uzrichard.C (richard): Fix iterators in call to copy.
 
@@ -1035,7 +1039,7 @@
 	* select_flow.C, select_content.C, select_volume.C (set_column):
 	Check that 'active' is set.
 
-2018-03-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-03-05  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* all: Missing includes <algortihm> and <iterator>.
 	Changed EXPORT and NORETURN to come before function, not after.
@@ -1046,16 +1050,16 @@
 	* wsource_weather.C (my_has_min_max_temperature): Initialize to
 	false, not NAN.
 
-2018-03-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-03-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* svat_ssoc.C (R_soil, R_sun, R_shadow, R_total): New log variables.
 	* bioclimate_std.C (outgoing_Short_radiation): New log variable.
 
-2018-02-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-02-28  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C (svat_failed): New variable.
 
-2018-02-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-02-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* soil_water.C (use_last): New parameter.
 	(load_syntax): Use it.
@@ -1064,14 +1068,14 @@
 
 	* Version 5.59 released.
 
-2018-02-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-02-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* output.h, output.C (log_suffix): New parameter.
 	* log.h (initialize, initialize_common): Use it.
 	* log_table.C, log_select.h, log_harvest.C, log_extern.C:
 	* log_checkpoint.C, log_all.h: Ditto.
 
-2018-02-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-02-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log.dai ("Chemical Content Secondary")
 	("Chemical Concentration Secondary"): Avoid filename conflict.
@@ -1080,7 +1084,7 @@
 
 	* Version 5.58 released.
 
-2018-01-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-01-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* condition_BBCH.C: New condition.
 	* Makefile (MODELS): Add it.
@@ -1093,7 +1097,7 @@
 
 	* Version 5.56 released.
 
-2018-01-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-01-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* tertiary_biopores.C (update_active): Added assertions.
 	* chemical_std.C (update_C): Ditto.
@@ -1102,7 +1106,7 @@
 
 	* Version 5.55 released.
 
-2018-01-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-01-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (update_C): Fix mass balance error with Freundlich.
 	(tick_surface): Enable assertion that was commented out.
@@ -1115,18 +1119,18 @@
 
 	* Version 5.53 released.
 
-2018-01-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-01-18  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* irrigate.C, irrigate.h (suggest_dt): New function.
 	* column_std.C (suggest_dt): Use it.
 
-2018-01-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-01-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* harvest.C: Accept null / missing times.
 
 	* crop_std.C (output): Don't log null times.
 
-2018-01-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-01-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* pet_FAO_PM_daily.C, pet_FAO_PM_70: Removed.
 	* Makefile (MODELS): Ditto.
@@ -1135,23 +1139,23 @@
 
 	* Version 5.51 released.
 
-2018-01-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-01-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 
 	* fao.C, fao.h (RefPenmanMonteith70): New function.
 	* pet_FAO_PM_70.C: new model.
 	* Makefile (MODELS): Add it.
 
-2018-01-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-01-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* action_BBCH.C: New model.
 	* Makefile (MODELS): Add it.
 
-2018-01-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-01-10  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_optimize.C ("cite"): Add citation.
 
-2018-01-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2018-01-09  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* pet_FAO_PM_daily.C: New model.
 	* pet_FAO_PM_hourly.C: New model.
@@ -1159,15 +1163,15 @@
 
 	* pet_FAO_PM.C ("cite"): Cite the report.
 
-2017-12-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-12-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program.C (description, cite): New shared parameters. 
 
-2017-12-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-12-18  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_optimize.C (load_frame): Add citation.
 
-2017-12-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-12-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* gnuplot_soil.C (use_log): New parameter.
 
@@ -1175,7 +1179,7 @@
 
 	* Version 5.49 released.
 
-2017-12-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-12-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* biopore_matrix.C (update_cell_solute): col_size may be smaller
 	than max_col_size right after first infiltration.
@@ -1184,7 +1188,7 @@
 
 	* Version 5.48 released.
 
-2017-12-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-12-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_gnuplot.C (run): Delete graph object after use to ensure
 	file handle is closed.
@@ -1193,7 +1197,7 @@
 
 	* Version 5.47 released.
 
-2017-12-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-12-06  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* movement.h, movement.C, column.h, column_std.C, field.h, field.C:
 	* chemistry.h, chemistry_std.C, chemistry_multi.C:
@@ -1202,7 +1206,7 @@
 	* tertiary_biopores.C (remove_solute): New function.
 	* action_spray.C (remove_solute): Use ir
 
-2017-12-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-12-05  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* movement.h, movement.C, column.h, column_std.C, field.h, field.C:
 	* chemistry.h, chemistry_std.C, chemistry_multi.C:
@@ -1214,12 +1218,12 @@
 
 	* Version 5.46 released.
 
-2017-11-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-11-29  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lexer_table.C: Reindent file.
 	* lexer_table.C, lexer_table.h (title): New member function.
 
-2017-11-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-11-28  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C, chemical.h (remove_all): New member function.
 
@@ -1230,13 +1234,13 @@
 
 	* Version 5.45 released.
 
-2017-11-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-11-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* soilfac.C: New component.
 	* Makefile (COMPONENTS): Add it.
 	* chemical_std.C: Use it.
 
-2017-11-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-11-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* svat_ssoc.C (solve): Try with both previous values and air
 	temperature.
@@ -1249,49 +1253,49 @@
 
 	* Version 5.43 released.
 
-2017-11-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-11-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* raddist_DPF.C (tick): Warn if we have significant global
 	radiation at night.
 
-2017-10-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-10-30  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* photo_Farquhar.C (PhotoFarquhar::PhotoFarquhar): Clear log
 	variables.
 
-2017-10-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-10-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* soil_water.C (output, tick_after): table_low and table_high can be 0.
 
-2017-10-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-10-19  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C, chemical.h (molar_mass): New parameter and
 	function.
 	(decompose, check): Use it.
 
-2017-09-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-09-29  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* rubiscoN.C: New component.
 	* Makefile (COMPONENTS): Add it.
 	* crop_std.C (RubiscoN): Add parameter.
 
-2017-09-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-09-27  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* svat_ssoc.C (epsilon_soil, epsilon_leaf): New parameters,
 	replace 'epsilon' constant.
 
-2017-09-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-09-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C (canopy_leak_rate): Fix rate to be base on
 	storage at end of timestep. -1 if there is no water at the end of the
 	timetep.
 	* chemical_std.C (tick_top): Update caller.
 
-2017-08-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-08-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* phenology_std.C (DS1_name): Use parameter value, not parameter name.
 
-2017-06-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-06-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* horizon.C: (quartz): New parameter.
 
@@ -1301,14 +1305,14 @@
 
 	* crop_std.C (output): "Partit", not "Partition".
 
-2017-06-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-06-19  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.39 released.
 
 	* svat_none.C (tick): Use current air temperature, not daily
 	average.
 
-2017-06-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-06-14  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.38 released.
 
@@ -1318,43 +1322,43 @@
 
 	* Version 5.37 released.
 
-2017-06-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-06-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* action_harvest.C (doIt): Seperate storage organ from total yield
 	message.
 
-2017-06-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-06-06  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* surface.C (set_svat_temperature): Set surface temperature if
 	there is no ponding.
 
 	* svat_ssoc.C (tick): T_z0 should be top soil, not previous border.
 
-2017-06-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-06-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* unit_model.C (create_convertion): Only make simple convertion
 	between compatible base types.
 
-2017-06-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-06-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* sample/test-prd.dai ("KarJyn_C"): Specify texture class.
 
-2017-05-31  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-05-31  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* svat_ssoc.C (tick): Fix unit convertion for k_h.
 
 	* soil_heat.C (top_flux): Fix unit in comment.
 
-2017-05-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-05-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* movement_1D.C (initialize_derived): Add 'delay' to daisy.log
 
-2017-05-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-05-08  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log.dai ("SSOC"): Use "handle average" for radiation instead
 	of "handle sum" to match dimension.
 
-2017-03-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-03-29  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* raddist_DPF.C (tick): Add "volatile" to avoid clang crash.
 
@@ -1362,11 +1366,11 @@
 
 	* Version 5.32 released.
 
-2017-03-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-03-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* wsource_combine.C (Entry): handle missing "begin" or "end".
 
-2017-02-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-02-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* hydraulic_M_C.C ("l"): Mualem, not burdine.
 
@@ -1375,7 +1379,7 @@
 
 	* vegetation_permanent.C (LAIvsDAY): Switched domain and range
 	dimensions.
-2017-02-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-02-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* phenology_std.C (DS1_name): New parameter.
 
@@ -1383,7 +1387,7 @@
 
 	* Version 5.31 released.
 
-2017-01-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-01-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_optimize.C (Program): Comment out unused 'dimension'.
 	* library.C (clear_parsed): Comment out unused 'key'.
@@ -1421,7 +1425,7 @@
 	* wsource_weather.C (name_first): Coverity: Don't dereference
 	unknown source.
 
-2017-01-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-01-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* crop_simple.C (~CropSimple): Coverity: Don't delete 'canopy'.
 	* program_KM2.C (run): Coverity: Check resolution == 0.
@@ -1431,21 +1435,21 @@
 
 	* svat_pmsw.C (tick): Coverity: swap tair and tcan_prev.
 
-2017-01-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2017-01-06  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* wsource_combine.C (entries): Fix check for period overlap.
 
-2016-12-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-12-08  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* harvest.h, harvest.C (harvest_index): New parameter.
 	* log_harvest.C, harvesting.C, crop_simple.C: Update caller.
 
-2016-11-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-11-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* solupt.C, solupt.h: New component.
 	* Makefile (COMPONENTS): Add it.
 
-2016-11-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-11-08  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* vegetation_afforestation.C:
 	* field.C, field.h, column.h, column_std.C:
@@ -1453,26 +1457,26 @@
 	* vegetation_crops.C (sow): Take instantiated crop object.
 	* action_sow (sow_object): New action.
 
-2016-10-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-10-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* mathlib.C: Removed old exception code.
 
-2016-09-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-09-30  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log.dai ("Surface Water Balance"): Removed. 
 	("Evapotranspiration"): Ditto.
 
-2016-09-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-09-29  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* uzrect_Mollerup.C (S_macro, S_macro_sum, S_drain, S_drain_sum):
 	Removed unused variables.
 
-2016-09-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-09-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* log.h (output_vector): Removed.
 	* action_crop.C, daisy.C (output): Update callers.
 
-2016-09-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-09-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* summary_fractiles.C (find_fractile): Allow 100 % fractile.
 
@@ -1489,7 +1493,7 @@
 
 	* Version 5.30 released.
 
-2016-09-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-09-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (clear): Don't clear 'M_tertiary' here, it is
 	needed for initial line later.
@@ -1500,7 +1504,7 @@
 
 	* Version 5.29 released.
 
-2016-08-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-08-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* biopore.C (solute_infiltrate): Positive is up (sign error).
 
@@ -1510,7 +1514,7 @@
 
 	* Version 5.28 released.
 
-2016-06-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-06-28  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log-std.dai ("Crop"): New log parameterization.
 
@@ -1520,28 +1524,28 @@
 
 	* Version 5.27 released.
 
-2016-06-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-06-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* vernalization.C, seed_LAI.C (load_frame): Fix units.
 	* canopy_std.C, crpn.C, production.C (load_syntax): Ditto.
 
-2016-06-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-06-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* harvest.C (sorg_N_per_DM): New log variable.
 
 	* block.C (expand_string): "${model}" expand into the name of the
 	model for model types other than Number and Stringer.
 
-2016-06-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-06-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log.dai ("Crop Production", "Crop Photosynthesis"): Fix "$["
 	error.
 
-2016-06-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-06-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* symbol.C: Changed <map> to <unordered_map>.
 
-2016-05-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-05-27  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* condition_crop.C (with): New condition.
 	* log_select.C (active): New parameter.
@@ -1550,46 +1554,46 @@
 
 	* Version 5.26 released.
 
-2016-05-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-05-18  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* photo_Farquhar.C (assimilate): Test CO2_atm is positive.
 	* weatherdata.C, weatherdata.h (CO2): New token.
 	* wsource.h, wsource_weather.h (CO2, has_CO2): New function.
 	* wsource_weather.C (my_CO2, tick, CO2, has_CO2, output, co2): Use is.
 
-2016-05-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-05-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* select.h, select.C (Handle::content_sum): New handle.
 	* select_array.C, select_value.C (done_small): Support it.
 
-2016-05-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-05-10  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* field.h, field.C, column.h, column_std.C, organic.h, organic_std.C: 
 	* action_tillage.C (store_SOM, restore_SOM): New actions.
 	* organic.h, organic_std.C (stored_SOM_C, stored_SOM_M): New state
 	parables.
 
-2016-05-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-05-06  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* vegetation_crops.C (my_harvest): New log variable ('harvest').
 	(harvest, pluck, output, load_frame): Support it.
 
-2016-05-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-05-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* parser_file.C (load_list, add_derived): Made duplicate
 	definitions errors instead of warnings.
 
-2016-05-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-05-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* organic_std.C (update_pools): Allow for zero N.
 
-2016-05-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-05-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* vegetation_crops.C, vegetation_permanent.C:
 	* vegetation_afforestation.C, vegetation.h (clear): New function.
 	* column_std.C (clear): Call it.
 
-2016-04-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-04-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* summary_fractiles.C: New model.
 
@@ -1597,14 +1601,14 @@
 
 	* Version 5.25 released.
 
-2016-03-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-03-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log.dai ("Soil Chemicals", "Tertiary chemical sink"): Removed.
 	("Groundwater"): Removed N.
 	("Drain Sink NO3", "Drain Sink NH4"): Matrix sink only.
 	("Colloids balance", "Colloids"): Updated.
 
-2016-03-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-03-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* select_volume.C, select_flow.C (output_array): Ignore empty arrays.
 	* chemical_std.C (M_tertiary, S_p_drain, S_soil_drain, S_B2M)
@@ -1617,7 +1621,7 @@
 	* lib/log-std.dai ("Soil chemical", "Field chemical"):
 	("Soil nitrogen", "Field nitrogen"): Use new log variables.
 
-2016-03-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-03-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C, chemical.h (set_tertiary): Merged
 	'set_tertiary_full' and 'set_tertiary_top'.
@@ -1636,19 +1640,19 @@
 	* imvec.C (output): Allow inheritance for chemicals, e.g. 'N'
 	matching both 'NO3' and 'NH4'.
 
-2016-03-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-03-18  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* im.C, im.h (soil_unit): New function.
 
 	* geometry.C (biopore_pass_pipes, biopore_pass_below): Made them
 	members of 'Geometry'.
 
-2016-03-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-03-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* imvec.C, imvec.h (clear, print, multiply): New functions.
 	* im.C, im.h (sink_unit): New function.
 
-2016-03-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-03-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* imvec.h, imvec.C (get_array): Added non-const version.
 	(clear): New function.
@@ -1656,7 +1660,7 @@
 	* im.C, im.h (add_value_raw): New function.
 	(get_value_raw, set_value_raw): Made public.
 
-2016-03-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-03-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* imvec.C, imvec.h (add_syntax): Add 'size' argument.
 	(clear): New function.
@@ -1668,7 +1672,7 @@
 
 	* Version 5.24 released.
 
-2016-03-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-03-14  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* biopore_matrix.C (update_cell_water): Add tiny number to 'top' to
 	avoid numerical noise.
@@ -1684,7 +1688,7 @@
 	* source_file.C (read_entry):
 	* xysource_flux.C (load_when, load_interval): Update caller
 
-2016-03-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-03-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* condedge.C (Condedge): Commented out set but nut used variables.
 
@@ -1696,25 +1700,25 @@
 
 	* pet_FAO_PM.C (use_wet): Changed default to 'false'.
 
-2016-03-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-03-10  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Makefile (debian-setup): Renamed from 'debian', handle
 	dependencies.
 
-2016-03-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-03-09  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Makefile (BOOSTINC, CXSPARSELIB): Use system version under Unix.
 
 	* program_post.C (run): Removed unused variable.
 
-2016-03-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-03-08  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* phenology_std.C (tick_daily): Don't clear production here.
 	* crop_std.C (tick): Clear it here instead.
 
 	* production.C ("WCrop"): New log variable.
 
-2016-03-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-03-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* toplevel.C (copyright): Make 'S{\o}ren Hansen' UTF-8.
 
@@ -1724,7 +1728,7 @@
 
 	* Version 5.23 released.
 
-2016-03-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-03-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* log_select.C (check): Make missing border an error.
 
@@ -1741,27 +1745,27 @@
 
 	* path.C (get_daisy_home): Use the right featuture test for W64.
 
-2016-03-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-03-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* geometry.C (add_layer, initialize_layer): Support specifying
 	initial values with a PLF.
 
 	* Makefile: No longer include source with binary distributions.
 
-2016-02-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-02-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_post.C (handle_x, handle_z): New parameters.
 
-2016-02-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-02-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 5.22 released.
 
-2016-01-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2016-01-27  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* uzrect_Mollerup.C (drain): Support 'pipe_outlet'.
 	(tick): Update caller.
 
-2015-12-08  Per Abrahamsen  <per.abrahamsen@gmal.com>
+2015-12-08  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log-std.dai (crop): Define 'cropfid2'.
 	* lib/log.dai ("Crop Photosynthesis", "Crop Production")
@@ -1773,13 +1777,13 @@
 
 	* Version 5.21 released.
 
-2015-12-04  Per Abrahamsen  <per.abrahamsen@gmal.com>
+2015-12-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/dk-maize.dai ("Silomajs"): Changed NfRootCnc at
 	DS=2.0 from 0.7 % to 0.4 %, mainly in order to get below the
 	CrRootCnd which is 0.5 %.
 
-2015-12-02  Per Abrahamsen  <per.abrahamsen@gmal.com>
+2015-12-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* volume_box.C (check_border): Fix logic error.
 
@@ -1795,44 +1799,44 @@
 	DS=2.0 from 0.7 % to 0.4 %, mainly in order to get below the
 	CrRootCnd which is 0.5 %.
 
-2015-11-25  Per Abrahamsen  <per.abrahamsen@gmal.com>
+2015-11-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* hydraulic_B_C.C, hydraulic_M_C.C:
 	* hydraulic_B_BaC.C, hydraulic_M_BaC.C (check_alist): Fix check for p.
 
-2015-11-19  Per Abrahamsen  <per.abrahamsen@gmal.com>
+2015-11-19  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/sugarbeet.dai, lib/sbeet.dai, lib/fodderbeet.dai (MaxPen):
 	Changed from 70 to 200.
 
-2015-11-13  Per Abrahamsen  <per.abrahamsen@gmal.com>
+2015-11-13  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* hydraulic_B_C.C, hydraulic_M_C.C, hydraulic_M_BaC.C:
 	* hydraulic_B_BaC.C (l, p): New parameters.
 
-2015-09-25  Per Abrahamsen  <per.abrahamsen@gmal.com>
+2015-09-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* intrinsics.C (instantiate): Better error message.
 
 	* program_extract.C: New model.
 	* Makefile (MODELS): Added it.
 
-2015-09-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2015-09-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C (canopy_cover): New log variable.
 	* lib/log.dai ("Surface water"): Litter cover and canopy cover now
 	also logged.
 
-2015-09-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2015-09-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* xysource_freq.C: New model.
 	* Makefile (MODELS): Add it.
 
-2015-09-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2015-09-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* adsorption_linear.C (K_d): New parameter.
 
-2015-08-31  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2015-08-31  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* wsource* (skip_ahead): Fast skipping of weather data for very
 	long weather series.
@@ -1841,28 +1845,28 @@
 
 	* vcheck.C, vcheck.h (Season): New check.
 
-2015-06-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2015-06-12  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* all (sortption_table): New action model.
 
-2015-05-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2015-05-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Makefile (MODELS): Removed 'action_heat.C'.
 
-2015-04-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2015-04-28  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* litter.h: Make 'cover' logable.
 
-2015-03-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2015-03-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_sbrdata.C: New model.
 
-2015-03-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2015-03-12  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log.dai ("Groundwater"): Fix select model for 'table_low'
 	and 'table_high'.
 
-2015-01-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2015-01-29  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* all: Make sure hydraulic models have center_z.
 
@@ -1870,22 +1874,22 @@
 	* column_std.C (initialize): Update caller.
 	* field.C (initialize): Update caller.
 
-2015-01-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2015-01-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* biopore_matrix.C (update_cell_water): Numeric bug for very small
 	amounts of water.
 
-2015-01-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2015-01-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* column_std.C (tick_move): Call it.
 	* hydraulic.h, hydraulic.C:
 	* soil.C, soil.h (tick): New function.
 
-2015-01-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2015-01-19  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* soil.C (frozen_water_K_factor): New parameter.
 
-2015-01-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2015-01-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* action_tillage (surface_loose): New parameter.
 	* field.h, field.C (mix): Ditto.
@@ -1896,12 +1900,12 @@
 	* hydraulic_wepp.C: New model.
 	* Makefile (MODELS): Enable it.
 
-2014-12-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2014-12-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* geometry_rect.h (dimensions): If you only have one row, it is
 	an 1D model.
 
-2014-12-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2014-12-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* groundwater_pipe.C, horizon_std.C: Removed.
 	* Makefile (MODELS): Removed.
@@ -1914,47 +1918,47 @@
 	* hydraulic.h, hydraulic.C, hydraulic_hypres.C: Ditto.
 	* horizon.h, horizon.C: Ditto.
 
-2014-12-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2014-12-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* texture.h, texture.C: Renamed CaCO3 to chalk.
 
 	* horizon_numeric.C, horizon_system.C ("chalk"): New parameter.
 
-2014-12-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2014-12-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/wwheat.dai ("Winter Wheat; Foulum"): Restored Leaf partitioning.
 
-2014-11-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2014-11-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/dk-maize.dai ("Silomajs; Foulum"): New crop.
 	* lib/dk-grass.dai ("Red fescue"): New crop.
 	* sample/dk-soil.dai (Taastrup): New soil.
 
-2014-11-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2014-11-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Makefile (MODELS): Removed 'horizon_std.C'.
 
-2014-11-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2014-11-12  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log.dai ("N Balance", "NH4 Soil Balance")
 	("NO3 Soil Balance", "Organic Nitrogen Balance")
 	("Crop Nitrogen Balance", "Nitrogen Balance")
 	("Root Zone Water Balance", "Total Water Balance"): Removed.
 
-2014-05-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2014-05-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log-std.dai ("Soil water", "Field water"): Include biopore
 	flow directly.
 	* soil_water.C, soil_water.h: Ditto.
 	* tertiary_biopores.C, biopore_matrix.C, biopore_drain.C: Ditto.
 
-2014-05-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2014-05-05  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log.dai ("Biopore Drain Sink Water"): New model.
 
 	* soil_water.h (S_p_drain): New log variable.
 
-2014-03-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2014-03-28  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* soil.C, soil.h (Theta_sat): New function.
 	* root_system.C, root_system.h (PenWaterFac): New parameter.
@@ -1965,7 +1969,7 @@
 
 	* Version 5.19 released.
 
-2014-03-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2014-03-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* surface.C, surface.h: Clarified units.
 	* surface.C, surface.h (runoff_rate): No 'dt' argument.
@@ -1974,11 +1978,11 @@
 	should be mm.
 	* surface.C (tick): Missing 'dt' in balance check.
 
-2014-03-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2014-03-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_KM2.C: New model.
 
-2014-01-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2014-01-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* movement.h, movement.C:
 	* tertiary.h, tertiarry.C, tertiary_biopores.C (suggest_dt): New
@@ -1988,7 +1992,7 @@
 	'weather_dt' argument.
 	* daisy.C (tick): Update caller.
 
-2013-12-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2013-12-13  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log-std.dai ("Field chemical"): Volatilization is
 	'surface_decompose'.
@@ -1996,7 +2000,7 @@
 	* chemical_std.C (canopy_dissipate): Removed log variable.
 	* chemical.h, chemistry.h, chemistry_std.C, chemistry_multi.C: Ditto.
 
-2013-10-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2013-10-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* log_table.C (record_start): Use SoilCells and SoilEdges.
 	* select_array.C (print_missing): New function.
@@ -2006,18 +2010,18 @@
 
 	* Version 5.18 released.
 
-2013-09-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2013-09-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* vegetation.C, vegetation.h (N, N_fixated): New log variables.
 	* vegetation_crops.C, vegetation_permanent.C: Support it.
 	* crop.h, crop_std.C, crop_simple.C: Ditto.
 	* lib/log-std.dai ("Field nitrogen"): Adapt.
 
-2013-09-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2013-09-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* vegetation_permanent.C (tick): Fix assumption that dt = 1h.
 
-2013-09-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2013-09-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* select.h, select.C (multi_check): New function.
 	* select_volume.C (space): New parameter.
@@ -2026,27 +2030,27 @@
 
 	* Version 5.17 released.
 
-2013-09-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2013-09-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_post.C: New model.
 	* Makefile (MODELS): Add it.
 
-2013-09-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2013-09-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* soilph.C: New component.
 	* Makefile (COMPONENTS): Add it.
 
-2013-09-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2013-09-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (tick_top): Use 'dissipate_surface' variable
 	correctly.
 
-2013-08-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2013-08-27  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* deposition.h, deposition.C: New component.
 	* Makefile (COMPONENTS): Added it.
 
-2013-07-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2013-07-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* vegetation_afforestation.C: New model.
 
@@ -2054,11 +2058,11 @@
 
 	* Version 5.16 released.
 
-2013-07-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2013-07-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* adsorption_freundlich.C (C_to_M): 'm' should be based on mg/L.
 
-2013-06-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2013-06-28  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical.h, chemical_std.C (spray, dissipate): Split into
 	'overhead' and 'surface' variants.
@@ -2072,7 +2076,7 @@
 
 	* Version 5.15 released.
 
-2013-03-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2013-03-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* organic_std.C (output): Use 'name', not 'objid'.
 
@@ -2080,7 +2084,7 @@
 
 	* Version 5.14 released.
 
-2012-12-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-12-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* surface.C: Allow 'pond_section' values up to 10 times
 	'DetentionCapacity'.
@@ -2094,7 +2098,7 @@
 
 	* attribute.h (type_name): EXPORT.
 
-2012-12-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-12-05  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* groundwater_aquitard.C, groundwater.C, groundwater_deep.C:
 	* groundwater_extern.C, groundwater_file.C, groundwater_fixed.C:
@@ -2103,26 +2107,26 @@
 	* depth.h, depth.C (tick, check, initialize): Removed 'units' parameter.
 	* column_std.C (tick_source, check, initialize): Update callers.
 
-2012-12-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-12-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* summary_RsqrW.C: New model.
 
-2012-11-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-11-30  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* summary_Rsqr.C (print_flag): New parameter.
 	(measure): Sort, check for duplicates.
 
-2012-11-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-11-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* hydraulic_B_C.C, hydraulic_M_C.C (l): New parameter.
 
-2012-10-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-10-09  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log.dai ("Vegetation"): Updated.
 
 	* vegetation.C (output): Remove duplicate entry.
 
-2012-10-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-10-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* uifilter.C: New component.
 	* Makefile (COMPONENTS): Add it.
@@ -2134,63 +2138,63 @@
 
 	* Version 5.12 released.
 
-2012-09-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-09-13  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* aom.C ("AOM-DIRECT"): New pool name.
 	* lib/log.dai ("AOM Pools"): Use named pools.
 	("Organic Matter"): Ditto.
 	* lib/fertilizer.dai (slurry): Ditto.
 
-2012-08-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-08-27  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* column.h, column_std.C (initialize): Overloaded with version
 	taking fewer arguments.
 
 	* number_soil.C (NumberByDepth): Use it.
 
-2012-08-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-08-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* gnuplot_profile.C: New model.
 	* Makefile (MODELS): Added.
 
-2012-08-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-08-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* soil.C (zones): Make it a 'Zone' sequence.
 
 	* zone_poly.C: New model.
 
-2012-08-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-08-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* zone_box.C: New model.
 	* Makefile (MODELS): Added.
 
-2012-08-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-08-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* zone.C, zone.h: New component.
 	* Makefile (COMPONENTS): Added it.
 
-2012-07-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-07-10  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lexer_table.C (read_keywords): Trim non-text strings.
 
-2012-06-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-06-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* point.C, point.h: New utility.
 	* Makefile (SUBMODELS): Added.
 	* movement_rect.C, column.h, column.C: Use it.
 	* cdaisy.C: include it.
 
-2012-06-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-06-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* volume_poly.C: New model.
 	* Makefile (MODELS): Added.
 
-2012-05-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-05-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* rootdens_growth.C: New model.
 	* Makefile (MODELS): Added.
 
-2012-05-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-05-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* root_system.h, root_system.C (Density): Made it a state variable.
 	(check): Take geometry argument to check size of Density.
@@ -2199,7 +2203,7 @@
 
 	* bioclimate_std.C (check): Check screen height.
 
-2012-05-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-05-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* solver.h (Solver::build_matrix): Use mapped vector instead of
 	coordinate vector, to circumvent ublas bug exposed by newer
@@ -2209,7 +2213,7 @@
 
 	* Version 5.11 released.
 
-2012-04-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-04-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* transport_convection.C (flow): Update C after last small timestep.
 
@@ -2217,7 +2221,7 @@
 
 	* Version 5.10 released.
 
-2012-03-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-03-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* movement_solute.C, movement_solute.h (sink_sorbed): New
 	parameter.
@@ -2230,7 +2234,7 @@
 
 	* Version 5.08 released.
 
-2012-03-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-03-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* field.h, field.C, column.h, column_std.C (tick_source)
 	(tick_move): New "end" parameter for weather.
@@ -2243,7 +2247,7 @@
 
 	* Version 5.07 released.
 
-2012-03-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-03-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* gnuplot_vector.C: New model.
 	* Makefile (MODELS): Add it.
@@ -2252,7 +2256,7 @@
 
 	* Version 5.06 released.
 
-2012-03-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-03-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* uzrichard.C (richard): Cleanup logic and bug fix.
 
@@ -2264,7 +2268,7 @@
 
 	* Version 5.05 released.
 
-2012-03-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-03-12  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* transport_Mollerup.C (stabilizing_method): New parameter.
 	* wsource_weather.C (max_rain): New parameter.
@@ -2277,7 +2281,7 @@
 
 	* Version 5.04 released.
 
-2012-03-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-03-09  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* reaction_sorption.C (tick_soil): Clear out
 	'S_sorption_secondary'.
@@ -2286,7 +2290,7 @@
 
 	* Version 5.03 released.
 
-2012-03-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-03-06  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (update_matrix): New function.
 	(set_secondary, set_primary): Use it.
@@ -2301,7 +2305,7 @@
 
 	* macro_std.C (tick): Fix spurious error message.
 
-2012-02-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-02-29  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* sample/DrainDrying.dai: Removed directory and path.
 
@@ -2311,36 +2315,36 @@
 
 	* Version 5.01 released.
 
-2012-02-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-02-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (update_C): Don't calculate C for immobile chemicals.
 
-2012-02-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-02-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* condition_weather.C (daily_air_temperature_above)
 	(daily_precipitation_above): New models.
 
-2012-02-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-02-13  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* ui_Qt_run.C, ui_Qt_run.C: Remove dead code.
 
-2012-02-10  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-02-10  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* daisy.C (duration): Fix sign.
 
-2012-01-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-01-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C: Support decompose in secondary domain.
 
-2012-01-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-01-06  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* txt/daisy.bib: Removed duplicates.
 
-2012-01-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-01-05  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* svat.C (DeclareComponent::load_frame): Added.
 
-2012-01-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2012-01-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C: Explain "initial" a little better.
 
@@ -2348,20 +2352,20 @@
 
 	* Version 5.00 released.
 
-2011-10-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-10-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (solubility, solubility_infiltration_factor):
 	New parameters.
 	* chemical.h, chemical_std.C (infiltrate): New 'water' parameter.
 	* chemistry_std.C (infiltrate): Adjust caller.
 
-2011-10-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-10-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* number_plf.C: Enable use of variables, disable check.
 
 	* biopore.C (B2M, M2B): New log variable.
 
-2011-10-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-10-14  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* horizon.C (r_pore_min): New parameter.
 	* chemical_std.C: Support adsorption in secondary domain.
@@ -2371,30 +2375,30 @@
 
 	* chemical_std.C (check): Better error message.
 
-2011-08-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-08-05  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* xysource_expr.C (valid): New parameter.
 
-2011-08-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-08-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* block.C, block.h, block_nested.C, block_nested.h (check): Handle
 	in block.C exclusively.
 
-2011-07-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-07-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* block.C (expand_reference): Use key frame.
 	(name_sequence): Remove optimization.
 
-2011-07-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-07-12  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* scopesel.C (multi): New model.
 
-2011-07-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-07-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* pet_Hargreaves.C (tick, check): Check for has_min_max_temperature.
 	* bioclimate_std.C (check): Check 'pet'.
 
-2011-06-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-06-30  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* am.C (get_volatilization): Fix unix bug with volatilization of
 	mineral fertilizer.
@@ -2404,12 +2408,12 @@
 	* wsource_weather.C (relative_humidity): New log variable.
 	(tick): Fix min/max temperature.
 
-2011-06-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-06-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* treelog_child.h, treelog_child.C: New utility.
 	* Makefile (OTHER): Add it.
 
-2011-06-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-06-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* daisy.C (find_scope, scope_size): Removed.
 	* program.h, program.C, daisy.h, daisy.C:
@@ -2434,7 +2438,7 @@
 	* summary.h, summary.C, summary_Rsqr.C (find_scopes): New function.
 	* output.C (find_extern_logs): Call it.
 
-2011-06-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-06-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* submodeler.h: Use symbol instead of key.
 
@@ -2445,14 +2449,14 @@
 	* Makefile (SPECIALS): Removed log_dlf.C.
 	(MODELS): Added log_table.C
 
-2011-06-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-06-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lib/log.dai: Removed all time entries.
 
 	* log_select.h, log_select.C, log_dlf.C, log_extern.C:
 	* select.h, select.C, select_array.C: Cleanup.
 
-2011-06-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-06-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* log_dlf.C: Cleanup.
 
@@ -2467,7 +2471,7 @@
 	* scope_block.C: Removed.
 	* Makefile (OTHER): Adjusted.
 
-2011-06-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-06-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* log_regress.C, log_dlf.h: Removed.
 	* log_table.C: Merged into log_dlf.C.
@@ -2475,7 +2479,7 @@
 
 	* chemical_std.C (tick_soil): Simplified domain exchange.
 
-2011-06-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-06-06  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* wsource_weather.C (initialize_two): Better error message.
 
@@ -2484,12 +2488,12 @@
 	* bdconv.C (BD_convert): Use it.
 	* select_volume.C, select_array.C (special_convert): Use it.
 
-2011-06-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-06-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* xysource_profile.C: New model.
 	* Makefile (MODELS): Add it.
 
-2011-05-31  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-05-31  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_document.C (ModelCompare): Fix.
 	(print_model): Print sample.
@@ -2498,7 +2502,7 @@
 
 	* Version 4.99 released.
 
-2011-04-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-04-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* uzlr.C (tick): Extra check of Theta.
 
@@ -2523,7 +2527,7 @@
 	(lookup_month): Renamed from 'precip_correct'.
 	(precip_correct): Adjusted.
 
-2011-04-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-04-19  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* weatherdata.h, weatherdata.C (TempOffset): New parameter.
 
@@ -2531,7 +2535,7 @@
 
 	* Version 4.95 released.
 
-2011-04-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-04-18  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (infiltrate): Only warn of rate * dt > 1.001.
 
@@ -2541,22 +2545,22 @@
 
 	* Version 4.94 released.
 
-2011-03-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-03-08  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_batch.C (run): Wrong name used.
 
-2011-03-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-03-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* GP2D.C: New utility.
 	* Makefile (OTHER): Add it.
 
-2011-03-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-03-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_rootmatch.C: New model.
 
 	* program_document.C (print_document): Don't sort models.
 
-2011-02-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-02-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 
 	* time.C, time.h (whole_days_between, whole_hours_between): Added
@@ -2584,7 +2588,7 @@
 
 	* Version 4.93 released.
 
-2011-02-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-02-08  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* weather_source.C, weather_extra.C, weather_std.C, weather_simple.C:
 	* weather_none.C, weather_hourly.C, weather_base.C, weather_base.h:
@@ -2593,12 +2597,12 @@
 
 	* wsowsource_weather.h, wsource_weather.C: New base model.
 
-2011-02-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-02-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_hmovie.C: New model.
 	* Makefile (MODELS): Added it.
 
-2011-02-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-02-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* wsource_std.C: New model.
 	* Makefile (MODELS): Added it.
@@ -2610,21 +2614,21 @@
 
 	* Makefile, setup.nsi: Added ShowDaisyOutput
 
-2011-01-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-01-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* all: Changed 'name' to 'objid' in all models.
 
-2011-01-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-01-19  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* wsource_combine.C: New model.
 
-2011-01-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-01-14  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* vcheck.C, vcheck.h (VCheck::MultiSize): New class.
 	* weatherdata.C: Use it.
 	* lexer_table.C, lexer_table.h: Parse keywords from frame.
 
-2011-01-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2011-01-13  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C: Dynamically match pet and difrad models to
 	weather data.
@@ -2636,27 +2640,27 @@
 
 	* Version 4.92 released.
 
-2010-12-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-12-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (infiltrate): Avoid assert if rate is too high.
 
-2010-12-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-12-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* weather_std.C, weather_old.C, weather_extra.C, weather_base.C:
 	* weather_base.h, weather_old.h:
 	* weather.h (relative_humidity, has_relative_humidity): Removed.
 	* svat_ssoc.C (tick): Update caller.
 
-2010-11-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-11-29  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* all: Optimized case with many columns.
 
-2010-11-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-11-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* weather_source.C: New model.
 	* Makefile (MODELS): Added it.
 
-2010-11-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-11-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* astronomy.C, astronomy.h: New utility.
 	* Makefile (OTHER): Added it.
@@ -2667,21 +2671,21 @@
 	(HourlyExtraterrestrialRadiation): Renamed ExtraterrestrialRadiation.
 	* pet_Hargreaves.C (Pet): Update caller.
 
-2010-11-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-11-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* wsource_table.C: New model.
 	* Makefile (MODELS): Added it.
 
-2010-11-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-11-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* wsource_base.h, wsource_base.C: New base model.
 	* Makefile (SPECIALS): Added it.
 
-2010-11-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-11-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* rootdens_PLF.C (Rootdens_PLF): Bug fix.
 
-2010-11-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-11-12  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* vegetation_crops.C (DS_by_name): Interpret "all" as oldest crop.
 
@@ -2689,31 +2693,31 @@
 
 	* Version 4.91 released.
 
-2010-11-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-11-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* daisy.C, daisy.h (start): New member function.
 	* cdaisy.C (daisy_daisy_start): Call it.
 
-2010-11-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-11-09  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* wsource_const.C: New model.
 	* Makefile (MODELS): Add it.
 
-2010-11-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-11-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* wsource.C, wsource.h: New component.
 	* Makefile (COMPONENTS): Add it.
 
-2010-10-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-10-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lexer_table.C, lexer_table.h: Use impl idiom.
 
-2010-10-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-10-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* weatherdata.C, weatherdata.h: New utility.
 	* Makefile (OTHER): Add it.
 
-2010-10-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-10-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* weather_extra.C: New model.
 	* weather.h, weather.C, weather_base.h, weather_base.C: Restructuring.
@@ -2722,7 +2726,7 @@
 
 	* Version 4.90 released.
 
-2010-10-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-10-14  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* OpenMI/daisywrapper.cs (SetValues): Don't always use the first
 	value.
@@ -2731,11 +2735,11 @@
 	* source_std.C (reset_offset): New parameter.
 
 
-2010-09-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-09-08  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* tertiary_biopores.C (tick_source): Don't ignore ice.
 
-2010-09-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-09-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* xysource_flux.C (load): Allow plot of boundaries.
 
@@ -2744,16 +2748,16 @@
 	* parser_file.C (get_dimension): Return Attribute::None () for
 	empty string.
 
-2010-09-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-09-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C (daily_rain_temperature): Rain is never below
 	0.1 degrees.
 
-2010-08-31  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-08-31  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* soil_heat.C, soil_heat.h, soil_water.C: Make ice run.
 
-2010-08-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-08-27  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* groundwater_source.C: New model.
 
@@ -2764,7 +2768,7 @@
 
 	* block.C, block.h (expand_string): Allow recursive expansion.
 
-2010-08-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-08-13  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemistry_std.C (infiltrate): Don't infiltrate chemical with
 	negligible water.
@@ -2772,7 +2776,7 @@
 	* output.C, output.h (log_prefix): New parameter.
 	* log*.C, log.h (initialize, initialize_common): Obey it.
 
-2010-08-11  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-08-11  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* number_arit.C (NumberDivide): Division by [] don't change
 	dimension.
@@ -2781,7 +2785,7 @@
 
 	* Version 4.89 released.
 
-2010-08-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-08-09  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* log_extern.C (initialize): Don't overwrite 'numbers'.
 
@@ -2789,20 +2793,20 @@
 
 	* Version 4.88 released.
 
-2010-08-05  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-08-05  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* cdaisy.C (daisy_daisy_start): Restored as dummy.
 
 	* chemical_std.C (drain_secondary): New parameter.
 
-2010-08-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-08-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* sample/dk-taastrup-hourly.dwf: Fix data for agrovand.
 	* sample/dk-taastrup.dwf: Ditto.
 
 	* biopore.C (biopore_to_primary): More robust formulation.
 
-2010-06-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-06-28  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* xysource_flux.C (load_interval): Bux fix.  Only last value in
 	interval was counted.
@@ -2811,28 +2815,28 @@
 
 	* Version 4.87 released.
 
-2010-06-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-06-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C (canopy_water_below): New log variable.
 
-2010-06-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-06-18  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C (canopy_water_capacity, litter_water_capacity):
 	New log variables.
 	* lib/log.dai ("Surface water"): Added them.
 
-2010-06-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-06-14  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* surface.C (LocalDetentionCapacity): New parameter.
 
-2010-06-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-06-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemical_std.C (pass_below): New function.
 	* chemical.h, chemical_std.C (adjust_tertiary): New function.
 
 	* chemical.h, chemical_std.C (set_macro_flux): Removed.
 
-2010-06-02  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-06-02  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* drain_lateral.C (tick): Simplify.
 
@@ -2841,48 +2845,48 @@
 	* summary.h, summary_simple.C, summary_balance.C: Adjust.
 	* fetch.h, fetch_pretty.h, fetch_pretty.C: Ditto.
 
-2010-05-28  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-05-28  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* xysource_xycombine.C: New model.
 	Makefile (MODELS): Add it.
 	* scope_xysources.h, scope_xysources.C: New utility.
 	* Makefile (OTHER): Add it.
 
-2010-05-27  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-05-27  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* xysource_flux.C: New model.
 	* Makefile (MODELS): Add it.
 
-2010-05-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-05-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lexer_soil.h, lexer_soil.C: New utility.
 	* Makefile (OTHER): Add them.
 
-2010-05-20  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-05-20  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* gnuplot_soil.C: New model.
 	* Makefile (MODELS): Add it.
 
-2010-05-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-05-19  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* surface.C (pond_section): New state variable.
 
-2010-05-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-05-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* lexer_table.C, lexer_table.h: Support arrays.
 
-2010-05-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-05-14  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* pet_FAO_PM.C (use_wet): Made default value 'true'.
 
-2010-04-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-04-29  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* oldunits.C: Fix memory leak found by valgrind.
 	* hydraulic.h, hydraulic.C (K_init): Ditto.
 	* treelog_store.C (Implementation): Eliminated memory pig found by
 	valgrind.
 
-2010-04-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-04-19  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* biopore.h, biopore.C (biopore_to_primary, biopore_to_secondary):
 	New functions.
@@ -2891,7 +2895,7 @@
 	(K_wall_relative): New parameter.
 	(R_primary, R_secondary): Removed.
 
-2010-04-15  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-04-15  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* chemistry.h, chemistry_std.C, chemistry_multi.C:
 	* chemical.h, chemical_std.C (tick_source, suggest_dt): New functions.
@@ -2900,7 +2904,7 @@
 	* chemistry_multi.C (none): New build-in parameterization.
 	* lib/chemistry.dai (none): Removed.
 
-2010-04-14  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-04-14  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* time.h, time.C (microsecond): New field.
 	* timestep.h, timestep.C: Ditto.
@@ -2911,7 +2915,7 @@
 
 	* Version 4.86 released.
 
-2010-04-13  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-04-13  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* canopy_simple.h, canopy_simple.C, canopy_std.h, canopy_std.C:
 	* vegetation_permanent.C, crop_simple.C, crop_std.C:
@@ -2932,7 +2936,7 @@
 	* biopore_drain.C, biopore_matrix.C (update_matrix_sink): Adjust.
 	* tertiary_biopores.C (tick_source): Call it.
 
-2010-04-12  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-04-12  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* soil_water.h (h_all): New function.
 	* tertiary_biopores.C (tick_source): New function.
@@ -2942,7 +2946,7 @@
 
 	* Version 4.85 released.
 
-2010-04-09  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-04-09  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* bioclimate_std.C (albedo): Made it logable.
 
@@ -2954,7 +2958,7 @@
 
 	* Version 4.84 released.
 
-2010-04-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-04-08  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* nitrinitrification.h, nitrinitrification_soil.C:
 	* nitrification_solute.C (tick): Remove dt.
@@ -2969,7 +2973,7 @@
 	* field.C, field.h (tick_all): Removed.
 	* daisy.C (tick): Update caller.
 
-2010-04-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-04-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* drain.h, drain.C, drain_lateral.C (tick): No dt.
 	* movement.C (tick_tertiary): Update caller.
@@ -2994,7 +2998,7 @@
 
 	* Version 4.83 released.
 
-2010-04-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-04-07  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* hydraulic_B_C_inverse.C (Hydraulic): Initialize K after other
 	parameters.
@@ -3006,7 +3010,7 @@
 
 	* Version 4.82 released.
 
-2010-04-06  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-04-06  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* vegetation_permanent.C (LAIfactor): New parameter.
 
@@ -3014,7 +3018,7 @@
 
 	* Version 4.81 released.
 
-2010-04-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-04-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* daisy.h, daisy.C: Moved content into 'impl'.
 	* all: Update callers.
@@ -3023,7 +3027,7 @@
 
 	* movement_solute.h: Use boost::scoped_ptr.
 
-2010-04-01  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-04-01  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* action_activity.C (doIt): Allow multiple actions per timestep.
 
@@ -3031,7 +3035,7 @@
 	* irrigate.C, irrigate.h: Ditto.
 	* column_std.C (output): Log irrigation.
 
-2010-03-31  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-31  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* field.h, field.C, column.h, column_std.C (irrigate): New function.
 	(irrigate_overhead, irrigate_surface, irrigate_sunsoil): Removed.
@@ -3040,7 +3044,7 @@
 
 	* action_irrigate.C (irrigate_top): Removed obsolete action.
 
-2010-03-30  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-30  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* irrigate.C, irrigate.h: New submodel.
 	* solute.C, solute.h: New component.
@@ -3049,7 +3053,7 @@
 	* bioclimate_std.C, bioclimate.h (tick): No chemistry.
 	* column_std.C (tick): Add deposition here.
 
-2010-03-29  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-29  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* geometry.h, geometry.C (mix, swap): Remove dt.
 	* am.C, am.h, om.C, om.h (mix, swap): Remove dt.
@@ -3105,7 +3109,7 @@
 	* column_std.C (tick): Fluxify dt.
 	* action_sow.C, action_crop.C (doIt): Update callers.
 
-2010-03-26  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-26  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* weather_std.C (minimum_precipitation): New parameter.
 
@@ -3118,13 +3122,13 @@
 	* pet_FAO_PM.C (G, N): New log variable.
 	(use_wet, initialize, check): Made default value depend on weather.
 
-2010-03-25  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-25  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* production.C, column_std.C, mactrans_std.C, macro_std.C (tick):
 	Handle dt != 1.0.
 	* reaction_denit.C (tick_soil): Ditto.
 
-2010-03-24  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* select.C, select.h (multi): New parameter.
 	* select.C, select.h, select_value.C, select_array.C (geometric):
@@ -3143,12 +3147,12 @@
 	* lib/log-std.dai ("Field chemical"): Add it.
 	* lib/log.dai ("Surface Chemicals"): Ditto.
 
-2010-03-23  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-23  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* secondary.C, secondary.h (initialize): New function.
 	* horizon.C (initialize_base): Call it. Note secondary domain water.
 
-2010-03-22  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-22  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* tertiary_biopores.C (active_msg): New parameter.
 	(update_active): Use it.
@@ -3164,7 +3168,7 @@
 	* column_std.C, column_std.h  (set_porosity, mix, flow): Use it.
 	* field.C, field.h (set_porosity): Use it.
 
-2010-03-21  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* log_dlf.C, log_dlf.h: Use char* for output symbols for speed.
 
@@ -3173,7 +3177,7 @@
 	* biopore_matrix.C (matrix_solute): Don't remove negative amounts
 	from negative storage.
 
-2010-03-19  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-19  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* all: Avoid creating symbols within inner loops.
 
@@ -3181,18 +3185,18 @@
 
 	* secondary.C (cracks::use_secondary): New parameter.
 
-2010-03-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-18  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* reaction_sorption.C: New model.
 
-2010-03-17  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* treelog_text.C, treelog_text.h, treelog_store.C, treelog_store.h:
 	* treelog.C, treelog.h: Don't create unnecessary symbols.
 
 	* oldunits.C (multiply): Speed up.
 
-2010-03-16  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* gnuplot_time.C, gnuplot_xy.C (plot): Include "ls" required by gnuplot 4.4.
 
@@ -3216,7 +3220,7 @@
 	* program_osvaldo.C: New model.
 	* Makefile (MODELS): Add it.
 
-2010-03-08  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-08  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* organic.h, organic.C: Renamed from 'organic_matter'.
 	* all: update users.
@@ -3232,11 +3236,11 @@
 	* snow.C (tick): Pond is not a flux.
 	(q_s, EvapSnowPack): Fix dimension.
 
-2010-03-04  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* solver_cxsparse.C (solve): 64bit fix.
 
-2010-03-03  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2010-03-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* mathlib.h (NAN): Renamed from NOT_A_NUMBER, use empty string
 	instead of 0.

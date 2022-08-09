@@ -32,7 +32,8 @@
 #include <sstream>
 
 void
-Partition::tick (double DS, double current_RSR, double nitrogen_stress,
+Partition::tick (double DS, double current_RSR, double current_WRoot,
+		 double nitrogen_stress,
 		 double NNI,
 		 double& f_Leaf, double& f_Stem,
 		 double& f_Root, double& f_SOrg)
@@ -44,7 +45,8 @@ Partition::tick (double DS, double current_RSR, double nitrogen_stress,
       return;
     }
 
-  if (current_RSR > RSR (DS))
+  if (current_RSR > RSR (DS)
+      || current_WRoot > max_WRoot (DS))
     f_Root = 0.0;
   else
     f_Root = Root (DS);
@@ -131,6 +133,13 @@ shoot.");
   frame.declare ("RSR", "DS", Attribute::None (), Check::positive (), Attribute::Const,
 	      "Maximal root/shoot ratio as a function of development state.\n\
 If the root/shoot ratio is above this, the roots will start dying.");
+  frame.declare ("max_WRoot", "DS", "g DM/m^2", Check::non_negative (),
+		 Attribute::Const,
+		 "Maximal root DM as a function of development state.\n\
+If the root DM is above this, no assimilate will be allocated to them.");
+  PLF max_WRoot;
+  max_WRoot.add (0.0, 1000000.0); // 1 [Mg/m^2]
+  frame.set ("max_WRoot", max_WRoot);
   frame.declare ("nitrogen_stress_limit", Attribute::None (), Check::fraction (), 
               Attribute::Const,
 	      "If nitrogen stress is above this number and DS is above 1,\n\
@@ -159,6 +168,7 @@ Partition::Partition (const FrameSubmodel& al)
     Leaf (al.plf ("Leaf")),
     Stem (al.plf ("Stem")),
     RSR (al.plf ("RSR")),
+    max_WRoot (al.plf ("max_WRoot")),
     nitrogen_stress_limit (al.number ("nitrogen_stress_limit")),
     NNI_crit (al.number ("NNI_crit")),
     NNI_inc (al.number ("NNI_inc")),

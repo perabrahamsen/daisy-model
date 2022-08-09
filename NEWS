@@ -6,6 +6,17 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.32
+
+** You can now limit allocation of assimate to roots
+
+The 'max_WRoot' parameter allows you to stop allocating assimilate to
+the roots after the total root mass exceeds some threshold, which may
+depend on development stage. E.g.
+
+(sow ("Spring Barley" (Partit (max_WRoot (0 [DS] 1 [Mg DM/ha])
+					 (2 [DS] 1 [Mg DM/ha])))))
+
 * 6.31
 
 ** New 'pond_water_to_snow' log variable in bioclimate.
