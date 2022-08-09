@@ -40,13 +40,16 @@ NATIVEHOME = $(OBJHOME)
 NATIVEEXE = daisy.exe daisyw.exe
 USE_GUI = Q4
 #BOOSTINC = -isystem $(CYGHOME)/home/xvs108/boost_1_69_0
-BOOSTINC = -isystem $(CYGHOME)/home/xvs108/boost
+#BOOSTINC = -isystem $(CYGHOME)/home/xvs108/boost
+BOOSTINC = -isystem $(CYGHOME)/usr/include/
 CXSPARSELIB = libcxsparse.a
 SETUPDIR = /home/xvs108/daisy/install
 #MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
 MAKENSIS = "/cygdrive/c/Program Files (x86)/NSIS/makensis.exe"
-MINGWHOME64 = /cygdrive/c/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64
-MINGWHOME32 = /cygdrive/c/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32
+#MINGWHOME64 = /cygdrive/c/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64
+#MINGWHOME32 = /cygdrive/c/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32
+MINGWHOME64 = /cygdrive/c/mingw-w64/
+MINGWHOME32 = /cygdrive/c/mingw-w64/x86_64-w64-mingw32/
 MINGWBIN=$(MINGWHOME)/bin
 MINGWBIN64=$(MINGWHOME64)/bin
 MINGWBIN32=$(MINGWHOME32)/bin
@@ -681,7 +684,7 @@ setupcommon:
 	$(MAKENSIS) /V2 /DVERSION=$(TAG) $(NSISFILE)
 
 build:
-	$(MAKE) make-win32-portable
+#	$(MAKE) make-win32-portable
 	$(MAKE) make-win64-portable
 
 setup:
@@ -695,13 +698,13 @@ setup:
 	echo "	* Version" $(TAG) released. >> ChangeLog
 	echo >> ChangeLog
 	cat ChangeLog.old >> ChangeLog
-	$(MAKE) make-win32-portable
+#	$(MAKE) make-win32-portable
 	$(MAKE) make-win64-portable
-	$(MAKE) docs OBJHOME=win32-portable
-	make setupcommon MINGWHOME="$(MINGWHOME32)" MINGWDLL="$(MINGWDLL32)" OBJHOME=win32-portable NSISFILE=setup-w32.nsi
+	$(MAKE) docs OBJHOME=win64-portable
+#	make setupcommon MINGWHOME="$(MINGWHOME32)" MINGWDLL="$(MINGWDLL32)" OBJHOME=win32-portable NSISFILE=setup-w32.nsi
 	make setupcommon MINGWHOME="$(MINGWHOME64)" MINGWDLL="$(MINGWDLL64)" OBJHOME=win64-portable NSISFILE=setup-w64.nsi
 #	cp -p daisy-$(TAG)-setup-w32.exe daisy-$(TAG)-setup-w64.exe $(DISTDIR)
-	(cd txt && $(MAKE) dist DISTDIR="$(DISTDIR)" TAG=$(TAG))
+#	(cd txt && $(MAKE) dist DISTDIR="$(DISTDIR)" TAG=$(TAG))
 	(cd OpenMI && $(MAKE) checkin);
 	(cd lib && $(MAKE) checkin);
 	(cd sample && $(MAKE) checkin);
@@ -716,10 +719,10 @@ setup:
 
 setup2:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	make setupcommon MINGWHOME="$(MINGWHOME32)" MINGWDLL="$(MINGWDLL32)" OBJHOME=win32-portable NSISFILE=setup-w32.nsi
+#	make setupcommon MINGWHOME="$(MINGWHOME32)" MINGWDLL="$(MINGWDLL32)" OBJHOME=win32-portable NSISFILE=setup-w32.nsi
 	make setupcommon MINGWHOME="$(MINGWHOME64)" MINGWDLL="$(MINGWDLL64)" OBJHOME=win64-portable NSISFILE=setup-w64.nsi
 #	cp -p daisy-$(TAG)-setup-w32.exe daisy-$(TAG)-setup-w64.exe $(DISTDIR)
-	(cd txt && $(MAKE) dist DISTDIR="$(DISTDIR)" TAG=$(TAG))
+#	(cd txt && $(MAKE) dist DISTDIR="$(DISTDIR)" TAG=$(TAG))
 	(cd OpenMI && $(MAKE) checkin);
 	(cd lib && $(MAKE) checkin);
 	(cd sample && $(MAKE) checkin);

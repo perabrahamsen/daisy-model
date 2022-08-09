@@ -1,3 +1,7 @@
+2022-08-09  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.32 released.
+
 2022-08-08  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* partition.C, partition.h (tick): New 'current_WRoot' argument.
