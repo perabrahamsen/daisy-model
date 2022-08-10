@@ -177,6 +177,8 @@ FormatLaTeX::version ()
   const time_t now = time (NULL);
   out () << "\
 \n\
+\\part{Appendix}\n\
+\\appendix{}\n\
 \\chapter*{Version}\n\
 \\label{version}\n\
 \\addcontentsline{toc}{chapter}{\\numberline{}Version}\n\

@@ -41,24 +41,8 @@ NetRadiation::library_id () const
   return id;
 }
 
-const double NetRadiation::SurEmiss = 0.98;
-const double NetRadiation::SB = 5.67e-8; // [W/m^2/K^4]
-
-double
-NetRadiation::cloudiness_function (double Cloudiness,
-				   double black_body_radiation, 
-				   double epsilon_0)
-{
-  const double s = 1 - Cloudiness; // fraction of cloud sky
-  return (s + (1 - s) * epsilon_0) * black_body_radiation;   
-}
-
-void
-NetRadiation::output (Log&) const
-{ }
-
 NetRadiation::NetRadiation (const BlockModel& al)
-  : ModelDerived (al.type_name ())
+  : Model ()
 { }
 
 NetRadiation::~NetRadiation ()
@@ -70,41 +54,28 @@ static struct NetRadiationInit : public DeclareComponent
     : DeclareComponent (NetRadiation::component, "\
 Calculate net radiation from meteorological data.")
   { }
-  void load_frame (Frame&) const
-  { }
+  void load_frame (Frame& frame) const
+  {
+    Model::load_model (frame);
+  }
 } NetRadiation_init;
 
 // The 'brunt' model.
 
 struct NetRadiationBrunt : public NetRadiation
 {
-  const double a;
-  const double b;
+  const double A;
+  const double B;
 
-  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
-			      double Temp,
-			      double VapourPressure, double) const
-  {
-    const double NetEmiss = a - b * sqrt (VapourPressure);
-#if 0
-    cout << "NetEmiss       " << NetEmiss << "\n";
-    cout << "VapourPressure " << VapourPressure << "\n";
-    cout << "Cloudiness     " << Cloudiness << "\n";
-#endif
-    return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
-  }
-  
   double find_epsilon_0 (double Ta, double ea) const
   {
-    const double A = SurEmiss - a;   // []
-    const double B = b / sqrt (10); // [hPa^-½]
     return A + B * sqrt (ea); 
   }
 
   NetRadiationBrunt (const BlockModel& al)
     : NetRadiation (al),
-      a (al.number ("a")),
-      b (al.number ("b"))
+      A (al.number ("A")),
+      B (al.number ("B"))
   { }
 };
 
@@ -121,12 +92,13 @@ FAO recommendation.")
   void load_frame (Frame& frame) const
   {
     // Brunt.
-  frame.declare ("a", Attribute::None (), Attribute::Const,
-              "Brunt 'a' parameter (offset).");
-  frame.set ("a", 0.34);
-  frame.declare ("b", "1/sqrt(kPa)", Attribute::Const,
-              "Brunt 'b' parameter (vapor pressure factor).");
-  frame.set ("b", 0.14);
+    frame.set_strings ("cite", "kjaersgaard2007comparison");
+    frame.declare ("A", Attribute::None (), Attribute::Const,
+		   "Brunt 'A' parameter (offset).");
+    frame.set ("A", 0.64);
+    frame.declare ("B", "1/sqrt(hPa)", Attribute::Const,
+		   "Brunt 'B' parameter (vapor pressure factor).");
+    frame.set ("B", 0.044);
   }
 } NetRadiationBrunt_syntax;
 
@@ -134,14 +106,6 @@ FAO recommendation.")
 
 struct NetRadiationIdsoJackson : public NetRadiation
 {
-  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
-			      double Temp,
-			      double, double) const
-  {
-    const double NetEmiss = 0.261 * exp (-7.77e-4 * pow (Temp, 2)) - 0.02;
-    return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
-  }
-
   double find_epsilon_0 (double Ta, double ea) const
   {
     const double A = 0.261;     // []
@@ -170,16 +134,6 @@ static struct NetRadiationIJSyntax : public DeclareModel
 
 struct NetRadiationBrutsaert : public NetRadiation
 {
-  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
-			      double Temp,
-			      double VapourPressure, double) const
-  {
-    const double ea = VapourPressure / 10.0;   /*mb*/
-    const double NetEmiss
-      = SurEmiss * (1 - 1.24 * pow (ea / (Temp + 273), 1.0 / 7.0));
-    return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
-  }
-
   double find_epsilon_0 (double Ta, double ea /*[hPa] */) const
   {
     const double A = 1.24;     // [K^1/7 hPa^-1/7]
@@ -207,14 +161,6 @@ static struct NetRadiationBrutsaertSyntax : public DeclareModel
 
 struct NetRadiationSwinbank : public NetRadiation
 {
-  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
-			      double Temp,
-			      double, double) const
-  {
-    const double NetEmiss = SurEmiss * (1 - 0.92e-5 * pow (Temp + 273, 2));
-    return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
-  }
-
   double find_epsilon_0 (double Ta, double ea /*[hPa] */) const
   {
     const double A = 9.2E-6;     // [K^-2]
@@ -242,16 +188,6 @@ static struct NetRadiationSwinbankSyntax : public DeclareModel
 
 struct NetRadiationSatterlund : public NetRadiation
 {
-  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
-			      double Temp,
-			      double VapourPressure, double) const
-  {
-    const double ea = VapourPressure / 10.0;   /*mb*/
-    const double NetEmiss
-      = SurEmiss * (1 - 1.08 * (1 - exp (-pow (ea, (Temp + 273) / 2016.0))));
-    return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
-  }
-
   double find_epsilon_0 (double Ta, double ea /*[hPa] */) const
   {
     const double A = 1.08;      // [?]
@@ -280,16 +216,6 @@ static struct NetRadiationSatterlundSyntax : public DeclareModel
 
 struct NetRadiationPrata : public NetRadiation
 {
-  double NetLongwaveRadiation (double, 
-			       double Temp,
-			       double,
-			       double L_ia) const // [W/m^2]
-  {
-    const double Ta = Temp + 273.15; // [K]
-    const double black_body_radiation = SB * std::pow (Ta, 4.0);
-    return SurEmiss * black_body_radiation - L_ia;
-  } 
-
   double find_epsilon_0 (double Ta, double ea /*[hPa] */) const
   {
     const double A = 1.2;      // []

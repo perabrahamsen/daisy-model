@@ -5,9 +5,9 @@
 %\usepackage{doublespace}
 \usepackage{hyperref}
 \usepackage[latin1]{inputenc}
-
 \usepackage{makeidx}
 \makeindex
+\usepackage[nottoc]{tocbibind}
 
 \bibliographystyle{apalike}
 \input{macro}
@@ -32,13 +32,11 @@
 
 \include{components}
 
-\appendix{}
 \include{dwf}
 
-\addcontentsline{toc}{chapter}{\numberline{}Bibliography}
-\bibliography{daisy}
 
-\addcontentsline{toc}{chapter}{\numberline{}Index}
+\bibliography{daisy}
+\phantomsection
 \printindex
 
 \end{document}

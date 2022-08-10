@@ -1,34 +1,74 @@
-TODO ---things that needs to be done with Daisy -*- outline -*-
+-TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Ny test
+* Bedrift
 
-** 1D vs 2C vs 2D
+rettet mod national regulering, ikke rådgivning
 
-** h_lim = pF1, pF2, pF3, pF4
+** både ghg og N
 
-** k_frozen = 5 %
+** Ikke nye virkemidler
 
+** tværfaglig og tværinstituionel
 
-** PA1: CT  (Rørrendegård aquitard)
+** to dele, mark og stald
 
-** PA2: CT + 2D (Rørrendegård aquitard)
+** udvikling/tilpsning/kalibrering/validering af modeller
 
-** PA3: CT + 2D (default aquitard)
+** Bedømmelse
 
-** PA4: CT + 2D (no flux)
+*** vægt 50 %
 
-** PA5: PA4 1D
+**** vægt: stor udledning og stor variation
 
-** PA6: PA5 + secondary domain pF1
-** PA7: PA5 + secondary domain pF2
-** PA8: PA5 + secondary domain pF3
-** PA9: PA5 + secondary domain pF4
+**** vægt: komplet (alle kilder)
 
-* New defaults for PET m.m.
+**** bedrift -> regulering
 
-** Read Simon's mail 14 juni
+*** vægt 20 % holisme
 
-** Overview / Presentation 
+*** 15 % samarbejde tværinsititutionel
+
+*** 15 % forskning (uddanelse, fastholdese)
+
+*** alle bedømmes 1-5
+
+** ansøgning
+
+*** fase 1: koncept 10 maj kl 12 (forskningskyndig vurdering)
+
+(midt juni svar)
+
+*** fase 2: fuld ansøgning 24 august
+
+(december svar)
+
+15 millioner, 100 % dækket, 44 % overhead
+
+universiteter og primær ansøger.
+
+løn, drift, specifikt udstyr, fuld phd
+
+dansk eller engelsk ansøgning
+
+* GMSR
+
+* Vintersæd
+
+** Videnssyntese
+
+Betydning af dræn.  Roddybde.
+
+*** COMMIT
+
+*** NYIELD
+
+*** Kasper PhD
+
+* MES DOC
+
+** Stathis noter
+
+* Check table based hydraulic curves.  Something with high groundwater and biopores?
 
 * hysteresis
 

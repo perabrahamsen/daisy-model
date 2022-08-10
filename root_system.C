@@ -373,10 +373,12 @@ RootSystem::set_density (const Geometry& geo, const Soil& soil,
   rootdens->set_density (geo, SoilLimit, PotRtDpt, 
                          PotRtDpt * (MaxWidth / MaxPen),
                          WRoot, DS, Density, msg);
+
+  const double DS_fac = DensityDSFac (DS);
   daisy_assert (EffectiveDensity.size () == Density.size ());
   daisy_assert (EffectiveDensity.size () == geo.cell_size ());
   for (size_t c = 0; c < geo.cell_size (); c++)
-    EffectiveDensity[c] = Density[c] * soil.root_homogeneity (c);
+    EffectiveDensity[c] = Density[c] * soil.root_homogeneity (c) * DS_fac;
 }
 
 void
@@ -421,7 +423,7 @@ RootSystem::output (Log& log) const
 void
 RootSystem::initialize (const Geometry& geo, const Soil& soil,
 			const double row_width, 
-                        const double row_pos, Treelog& msg)
+                        const double row_pos, const double DS, Treelog& msg)
 {
   const bool is_row_crop = row_width > 0.0;
   if (rootdens.get ())
@@ -432,11 +434,12 @@ RootSystem::initialize (const Geometry& geo, const Soil& soil,
     rootdens = Rootdens::create_uniform (metalib, msg);
 
   rootdens->initialize (geo, row_width, row_pos, msg);
-  initialize (geo, soil, msg);
+  initialize (geo, soil, DS, msg);
 }
 
 void
-RootSystem::initialize (const Geometry& geo, const Soil& soil, Treelog& msg)
+RootSystem::initialize (const Geometry& geo, const Soil& soil, const double DS,
+			Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
   ABAprod->initialize (msg);
@@ -444,10 +447,11 @@ RootSystem::initialize (const Geometry& geo, const Soil& soil, Treelog& msg)
   NO3_uptake->initialize (geo, msg);
   while (Density.size () < cell_size)
     Density.push_back (0.0);
+  const double DS_fac = DensityDSFac (DS);
   EffectiveDensity = Density;
   daisy_assert (EffectiveDensity.size () == cell_size);
   for (size_t c = 0; c < cell_size; c++)
-    EffectiveDensity[c] = Density[c] * soil.root_homogeneity (c);
+    EffectiveDensity[c] = Density[c] * soil.root_homogeneity (c) * DS_fac;
   while (H2OExtraction.size () < cell_size)
     H2OExtraction.push_back (0.0);
   while (NH4Extraction.size () < cell_size)
@@ -517,8 +521,12 @@ The factor is a function of relative water content (Theta/Theta_sat).");
   frame.set ("PenWaterFac", PLF::always_1 ());
   frame.declare ("PenDSFac", "DS", Attribute::None (),
                  Check::non_negative (), Attribute::Const, "\
-Development stage dependent factor to multiply 'PenPar1' with..");
+Development stage dependent factor to multiply 'PenPar1' with.");
   frame.set ("PenDSFac", PLF::always_1 ());
+  frame.declare ("DensityDSFac", "DS", Attribute::None (),
+                 Check::non_negative (), Attribute::Const, "\
+DS based factor for effective root density.");
+  frame.set ("DensityDSFac", PLF::always_1 ());
   frame.declare ("MaxPen", "cm", Check::positive (), Attribute::Const,
                  "Maximum penetration depth.");
   frame.set ("MaxPen", 100.0);
@@ -626,6 +634,7 @@ RootSystem::RootSystem (const Block& al)
     PenClayFac (al.plf ("PenClayFac")),
     PenWaterFac (al.plf ("PenWaterFac")),
     PenDSFac (al.plf ("PenDSFac")),
+    DensityDSFac (al.plf ("DensityDSFac")),
     MaxPen (al.number ("MaxPen")),
     MaxWidth (al.number ("MaxWidth", MaxPen)),
     Rad (al.number ("Rad")),

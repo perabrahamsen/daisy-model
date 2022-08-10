@@ -92,8 +92,8 @@ public:
 	msg.error ("Wind data required for this model");
 	ok = false;
       }
-    if (!weather.has_vapor_pressure ())
-      msg.warning ("Vapor pressure required for this model");
+    if (!weather.has_daily_vapor_pressure ())
+      msg.warning ("Vapor pressure required for this model (not RelHum)");
     return ok;
   }
   void initialize (const Weather& weather)
@@ -116,6 +116,8 @@ PetFAO_PM::tick (const Weather& weather,
                  const SoilHeat& soil_heat, const SoilWater& soil_water,
                  Treelog& msg)
 {
+  TREELOG_MODEL (msg);
+
   // Weather.
   const double Temp = (weather.daily_max_air_temperature ()
 		       + weather.daily_min_air_temperature ()) * 0.5;
@@ -126,7 +128,12 @@ PetFAO_PM::tick (const Weather& weather,
   daisy_assert (std::isfinite (Rn_ref));
   daisy_assert (std::isfinite (G));
   daisy_assert (std::isfinite (Temp));
-  daisy_assert (std::isfinite (VaporPressure));
+  if (!(std::isfinite (VaporPressure)))
+    {
+      msg.error ("No known vapour pressure, using ET0 = 0");
+      potential_evapotranspiration_dry = reference_evapotranspiration_dry = 0.0;
+      return;
+    }
   daisy_assert (std::isfinite (U2));
   daisy_assert (std::isfinite (AtmPressure));
   reference_evapotranspiration_dry

@@ -81,7 +81,6 @@ struct BioclimateStandard : public Bioclimate
   double cloudiness_index;	// 1 = clear day, << 1 cloudy.
   double L_n;                   // Net longwave radiation [W/m^2]
   double L_ia;                  // incoming longwave radiation [W/m^2]
-  double L_i0;	      // clear sky incoming longwave radiation [W/m^2]
   double epsilon_0;             // [unitless]
   double black_body_radiation;  // [W/m^2]
   const std::unique_ptr<NetRadiation> net_radiation;
@@ -108,6 +107,7 @@ struct BioclimateStandard : public Bioclimate
   double snow_water_in;         // Water entering snow pack [mm/h]
   double snow_water_in_temperature; // Incoming water temperature [dg C]
   double snow_water_out;        // Water leaving snow pack [mm/h]
+  double pond_water_to_snow;	// Water leaving pond for snow pack [mm/h]
   double snow_water_out_temperature; // Temperature of water leaving [dg C]
 
   // Water intercepted on canopy.
@@ -131,7 +131,9 @@ struct BioclimateStandard : public Bioclimate
   double litter_water_out;      // Water leaving litter [mm/h]
   double litter_wash_off; 	// Water hitting but not entering litter [mm/h]
   double litter_water_bypass; 	// Water bypassing litter [mm/h]
-
+  double litter_pond_up;	// Water extracted to litter from pond [mm/h]
+  double litter_soil_up;	// Water extracted to litter from soil [mm/h]
+  
   // Water in pond.
   double pond_ep;               // Potential evaporation from pond [mm/h]
   double pond_ea_;              // Actual evaporation from pond [mm/h]
@@ -220,6 +222,7 @@ struct BioclimateStandard : public Bioclimate
   const bool fixed_difrad;
   bool has_reference_evapotranspiration;
   bool has_vapor_pressure;
+  bool has_daily_vapor_pressure;
   bool has_wind;
   bool has_min_max_temperature;
   bool has_diffuse_radiation;
@@ -443,6 +446,7 @@ BioclimateStandard::reset_weather (const Weather& weather, Treelog& msg)
   has_reference_evapotranspiration 
     = weather.has_reference_evapotranspiration ();
   has_vapor_pressure = weather.has_vapor_pressure ();
+  has_daily_vapor_pressure = weather.has_daily_vapor_pressure ();
   has_wind = weather.has_wind ();
   has_min_max_temperature = weather.has_min_max_temperature ();
   has_diffuse_radiation = weather.has_diffuse_radiation ();
@@ -462,8 +466,12 @@ BioclimateStandard::reset_weather (const Weather& weather, Treelog& msg)
             type = symbol ("PM");
           else if (timestep < 4.0)
             type = symbol ("FAO_PM_hourly");    
+	  else if (has_daily_vapor_pressure)
+	    type = symbol ("FAO_PM");
+	  else if (has_min_max_temperature)
+	    type = symbol ("Hargreaves");
 	  else
-	    type = symbol ("FAO_PM");    
+	    type = symbol ("deBruin87");
         }
       else if (has_min_max_temperature)
         type = symbol ("Hargreaves");
@@ -555,6 +563,7 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     snow_water_in (0.0),
     snow_water_in_temperature (0.0),
     snow_water_out (0.0),
+    pond_water_to_snow (0.0),
     snow_water_out_temperature (0.0),
     canopy_ep (0.0),
     canopy_ea_ (0.0),
@@ -574,6 +583,8 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     litter_water_out (0.0),
     litter_wash_off (0.0),
     litter_water_bypass (0.0),
+    litter_pond_up (0.0),
+    litter_soil_up (0.0),
     pond_ep (0.0),
     pond_ea_ (0.0),
     soil_ep (0.0),
@@ -621,6 +632,7 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     fixed_difrad (difrad.get ()),
     has_reference_evapotranspiration (false),
     has_vapor_pressure (false),
+    has_daily_vapor_pressure (false),
     has_wind (false),
     has_min_max_temperature (false),
     has_diffuse_radiation (false),
@@ -785,18 +797,15 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   const double ref_albedo = 0.23; // Reference crop for FAO_PM.
   albedo = find_albedo (vegetation, litter, surface, geo, soil, soil_water);
   const double air_temperature_K = air_temperature + 273.15; // [K]
-  black_body_radiation = NetRadiation::SB * pow(air_temperature_K, 4);
+  const double SB = 5.67e-8; // [W/m^2/K^4]
+  black_body_radiation = SB * pow(air_temperature_K, 4);
   const double VaporPressure_hPa = VaporPressure_Pa / 100.; // Pa -> hPa
   epsilon_0 = net_radiation->find_epsilon_0 (air_temperature_K,
 					     VaporPressure_hPa);
-  L_i0 = epsilon_0 * black_body_radiation;
-  L_ia = NetRadiation::cloudiness_function (cloudiness_index,
-					    black_body_radiation, epsilon_0);
-  const double VaporPressure_kPa = VaporPressure_Pa * 0.001; // Pa -> kPa
-  L_n  = - net_radiation->NetLongwaveRadiation (cloudiness_index,
-						air_temperature,
-						VaporPressure_kPa,
-						L_ia);
+  const double s = 1 - cloudiness_index; // [] fraction of cloud sky
+  const double SurEmiss = 0.98;	// []
+  L_ia = (s + (1 - s) * epsilon_0) * black_body_radiation; // [W/m^2]
+  L_n = cloudiness_index * (epsilon_0 - SurEmiss) * black_body_radiation; // [W/m^2]
   daisy_assert (std::isfinite (albedo));
   daisy_assert (std::isfinite (Si));
   daisy_assert (std::isfinite (L_n));
@@ -883,8 +892,12 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
             }
         }
       surface.put_ponding (adjusted_pond);
+      pond_water_to_snow = -snow_water_out;
       snow_water_out = 0.0;
     }
+  else
+    pond_water_to_snow = 0.0;
+  
   snow_water_out_temperature = snow.temperature ();
   const double below_snow_ep = total_ep_ - snow_ea_;
 
@@ -998,8 +1011,11 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     litter_water_temperature = air_temperature;
 
   daisy_assert (litter_water_storage >= 0.0);
+  const double litter_water_available
+    = std::max (litter_water_storage - litter.water_protected (), 0.0);
   litter_ea = std::max (std::min (litter_ep,
-                                  litter_water_storage / dt + litter_water_in),
+                                  litter_water_available / dt
+				  + litter_water_in),
                         0.0);
   total_ea_ += litter_ea;
   daisy_assert (total_ea_ >= 0.0);
@@ -1014,7 +1030,8 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   const double litter_potential_down =
     std::min (litter_evacuation,
 	      std::max (litter_potential_exfiltration, litter_overflow));
-  
+
+  double litter_potential_up = std::max (-litter_potential_down, 0.0);
   if (litter_water_storage < 0.0)
     {
       if (litter_water_storage < -1e-8)
@@ -1030,6 +1047,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
         }
       litter_water_out = litter_water_storage / dt;
       litter_water_storage = 0.0;
+      litter_potential_up = 0.0;
     }
   else if (litter_potential_down > 0.0)
     {
@@ -1069,17 +1087,29 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 
   const double soil_T 
     = geo.content_hood (soil_heat, &SoilHeat::T, Geometry::cell_above);
-  surface.tick (msg, pond_ep, below_canopy_ep_dry, 
+  surface.tick (time, dt,
+		pond_ep + litter_potential_up,
+		below_canopy_ep_dry + litter_potential_up, 
                 pond_in, pond_in_temperature, 
-                geo, soil, soil_water, soil_T, dt);
-  pond_ea_ = surface.evap_pond (dt, msg);
+                geo, soil, soil_water, soil_T, msg);
+
+  // 5.5 Intermission: Divide upward between pond, soil, litter, and ea
+  const double pond_up = surface.evap_pond (dt, msg); // [mm/h]
+  const double soil_up = surface.exfiltration (dt);   // [mm/h]
+  litter_pond_up = std::min (pond_up, litter_potential_up);
+  litter_soil_up = std::max (0.0,
+			     std::min (soil_up,
+				       litter_potential_up - pond_up));
+  pond_ea_ = pond_up - litter_pond_up;
+  soil_ea_ = soil_up - litter_soil_up;
+  litter_water_storage += (litter_pond_up + litter_soil_up) * dt;
+
+  // 5 Back to pond
   total_ea_ += pond_ea_;
 
   // 6 Soil
-
   soil_ep = bound (0.0, pond_ep - pond_ea_, 
 		   std::max (0.0, below_canopy_ep_dry));
-  soil_ea_ = surface.exfiltration (dt);
   daisy_assert (soil_ea_ >= 0.0);
   total_ea_ += soil_ea_;
   daisy_assert (total_ea_ >= 0.0);
@@ -1261,6 +1291,7 @@ BioclimateStandard::tick (const Time& time,
   if (has_reference_evapotranspiration 
       != weather.has_reference_evapotranspiration ()
       || has_vapor_pressure != weather.has_vapor_pressure ()
+      || has_daily_vapor_pressure != weather.has_daily_vapor_pressure ()
       || has_wind != weather.has_wind ()
       || has_min_max_temperature != weather.has_min_max_temperature ()
       || has_diffuse_radiation != weather.has_diffuse_radiation ()
@@ -1347,10 +1378,8 @@ BioclimateStandard::output (Log& log) const
   output_variable (albedo, log);
   output_derived (cloudiness, "cloudiness", log);
   output_variable (cloudiness_index, log);
-  output_derived (net_radiation, "net_radiation", log);
   output_variable (L_n, log);
   output_variable (L_ia, log);
-  output_variable (L_i0, log);
   output_variable (epsilon_0, log);
   output_variable (black_body_radiation, log);
   output_variable (Rn, log);
@@ -1381,6 +1410,7 @@ BioclimateStandard::output (Log& log) const
   output_variable (snow_water_in, log);
   output_variable (snow_water_in_temperature, log);
   output_variable (snow_water_out, log);
+  output_variable (pond_water_to_snow, log);
   output_value (snow_water_out_temperature, 
                 "snow_water_out_temperature", log);
   output_value (cover_, "canopy_cover", log);
@@ -1403,6 +1433,8 @@ BioclimateStandard::output (Log& log) const
   output_variable (litter_water_out, log);
   output_variable (litter_wash_off, log);
   output_variable (litter_water_bypass, log);
+  output_variable (litter_pond_up, log);
+  output_variable (litter_soil_up, log);
   output_variable (pond_ep, log);
   output_value (pond_ea_, "pond_ea", log);
   output_variable (soil_ep, log);
@@ -1526,8 +1558,6 @@ Cloudiness index, 0 = no light, 1 = clear sky.");
                 "The calculated net longwave radiation (positive downwards).");
     frame.declare ("L_ia", "W/m^2", Attribute::LogOnly,
                 "The calculated incoming longwave radiation (positive downwards).");
-    frame.declare ("L_i0", "W/m^2", Attribute::LogOnly,
-                "The calculated clear sky incoming longwave radiation (positive downwards).");
     frame.declare ("epsilon_0", Attribute::None(), Attribute::LogOnly,
                 "Atmospheric effective clearsky emmisivity (range 0-1).");
     frame.declare ("black_body_radiation", "W/m^2", Attribute::LogOnly, "\
@@ -1601,6 +1631,8 @@ The intended use is colloid generation.");
                    "Temperature of water entering snow pack.");
     frame.declare ("snow_water_out", "mm/h", Attribute::LogOnly,
                    "Water leaving snow pack");
+    frame.declare ("pond_water_to_snow", "mm/h", Attribute::LogOnly,
+                   "Water leaving pond to snow pack");
     frame.declare ("snow_water_out_temperature", "dg C", Attribute::LogOnly,
                    "Temperature of water leaving snow pack.");
 
@@ -1649,6 +1681,10 @@ The intended use is colloid generation.");
                    "Water hitting but not entering litter.");
     frame.declare ("litter_water_bypass", "mm/h", Attribute::LogOnly,
                    "Water bypassing litter.");
+    frame.declare ("litter_pond_up", "mm/h", Attribute::LogOnly,
+                   "Water extracted from pond to litter.");
+    frame.declare ("litter_soil_up", "mm/h", Attribute::LogOnly,
+                   "Water extracted from soil to litter.");
 
     // Water in pond.
     frame.declare ("pond_ep", "mm/h", Attribute::LogOnly,
@@ -1818,7 +1854,7 @@ Follow FAO56 for daily data.")
   {
     frame.set_strings ("cite", "FAO-PM");
     frame.set ("cloudiness", "FAO56");
-    frame.set ("ghf", "FAO56");
+    frame.set ("ghf", "none");
     frame.set ("pet", "FAO_PM");
   }
 } BioclimateFAO56_daily_syntax;

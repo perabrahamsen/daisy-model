@@ -46,6 +46,10 @@ Litter::diffuse () const
 { return false; }
 
 double
+Litter::water_protected () const    // Water not evapable [mm]
+{ return 0.0; }
+
+double
 Litter::potential_exfiltration () const // Water exchange with soil [mm/h]
 { return 0.0; }
 

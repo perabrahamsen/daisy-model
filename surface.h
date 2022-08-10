@@ -19,76 +19,73 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef SURFACE_H
+#define SURFACE_H
 
-#include "uzmodel.h"
-#include <memory>
+#include "model_derived.h"
+#include <vector>
 
-class Frame;
-class FrameSubmodel;
-class Log;
-class SoilWater;
-class Soil;
 class Geometry;
 class Geometry1D;
 class Treelog;
+class Soil;
+class SoilWater;
+class BlockModel;
+class Time;
 
-class Surface
+class Surface : public ModelDerived
 {
-  struct Implementation;
-  std::unique_ptr<Implementation> impl;
-
+  // Content.
+public:
+  static const char *const component;
+  symbol library_id () const;
+  
 public:
   // Communication with soil water.
   enum top_t { forced_pressure, forced_flux, limited_water };
-  top_t top_type (const Geometry&, size_t edge) const;
-  double q_top (const Geometry&, size_t edge, const double dt) const; // [cm/h]
-  double h_top (const Geometry&, size_t edge) const; // [cm]
-  void accept_top (double amount, const Geometry&, size_t edge, 
-                   double dt, Treelog&);
-  size_t last_cell (const Geometry&, size_t edge) const;
+  virtual top_t top_type (const Geometry&, size_t edge) const = 0;
+  virtual double q_top (const Geometry&, size_t edge, const double dt) const = 0; // [cm/h]
+  virtual double h_top (const Geometry&, size_t edge) const = 0; // [cm]
+  virtual void accept_top (double amount, const Geometry&, size_t edge, 
+			   double dt, Treelog&) = 0;
 
   // Column.
-  double runoff_rate () const; // [h^-1]
-  double mixing_resistance () const; // [h/mm]
-  double mixing_depth () const; // [cm]
+  virtual double runoff_rate () const = 0; // [h^-1]
+  virtual double mixing_resistance () const = 0; // [h/mm]
+  virtual double mixing_depth () const = 0; // [cm]
   
-  // Ridge.
-  void update_water (const Geometry1D& geo,
-                     const Soil&, const std::vector<double>& S_,
-		     std::vector<double>& h_, std::vector<double>& Theta_,
-		     std::vector<double>& q, const std::vector<double>& q_p,
-                     double dt);
-
   // Manager.
-  void set_detention_capacity (double);
+  virtual void set_detention_capacity (double) = 0;
 
   // Simulation.
-  void output (Log&) const;
-  void update_pond_average (const Geometry& geo);
-  void tick (Treelog&, 
-             double PotSoilEvaporationWet, 
-             double PotSoilEvaporationDry, 
-             double flux_in /* [mm/h] */,
-             double temp /* [dg C] */, const Geometry& geo,
-             const Soil&, const SoilWater&,
-             double soil_T /* [dg C] */, double dt /* [h] */);
+  virtual void update_pond_average (const Geometry& geo) = 0;
+  virtual void tick (const Time&, double dt /* [h] */, 
+		     double PotSoilEvaporationWet, 
+		     double PotSoilEvaporationDry, 
+		     double flux_in /* [mm/h] */,
+		     double temp /* [dg C] */, const Geometry& geo,
+		     const Soil&, const SoilWater&,
+		     double soil_T /* [dg C] */, Treelog&) = 0;
 
   // Communication with bioclimate.
-  double ponding_average () const; // [mm]
-  double ponding_max () const;     // [mm]
-  double temperature () const;     // [dg C]
-  double EpFactor () const;        // []
-  double albedo (const Geometry&, const Soil&, const SoilWater&) const;
-  double exfiltration (double dt) const; // [mm/h]
-  double evap_soil_surface () const; // [mm/h]
-  double evap_pond (double dt, Treelog&) const; // [mm/h]
-  void put_ponding (double pond);	// [mm]
-  void set_svat_temperature (double T /* dg C */);
+  virtual double ponding_average () const = 0; // [mm]
+  virtual double ponding_max () const = 0;     // [mm]
+  virtual double temperature () const = 0;     // [dg C]
+  virtual double EpFactor () const = 0;        // []
+  virtual double albedo (const Geometry&, const Soil&, const SoilWater&) const = 0;
+  virtual double exfiltration (double dt) const = 0; // [mm/h]
+  virtual double evap_soil_surface () const = 0; // [mm/h]
+  virtual double evap_pond (double dt, Treelog&) const = 0; // [mm/h]
+  virtual void put_ponding (double pond) = 0;	// [mm]
+  virtual void set_svat_temperature (double T /* dg C */) = 0;
   
   // Create.
-  void initialize (const Geometry&);
-  static void load_syntax (Frame&);
-  Surface (const FrameSubmodel& par);
+  virtual void initialize (const Geometry&) = 0;
+private:
+  Surface ();
+public:
+  Surface (const BlockModel&);
   ~Surface ();
 };
 
+#endif // SURFACE_H

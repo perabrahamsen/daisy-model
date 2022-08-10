@@ -73,7 +73,7 @@ struct ColumnStandard : public Column
   std::unique_ptr<Vegetation> vegetation;
   std::unique_ptr<Litter> litter;
   std::unique_ptr<Bioclimate> bioclimate;
-  Surface surface;
+  std::unique_ptr<Surface> surface;
   Geometry& geometry;
   std::unique_ptr<Soil> soil;
   std::unique_ptr<SoilpH> soilph;
@@ -528,7 +528,7 @@ ColumnStandard::spray_surface (const symbol chemical,
 
 void 
 ColumnStandard::set_surface_detention_capacity (double height) // [mm]
-{ surface.set_detention_capacity (height); }
+{ surface->set_detention_capacity (height); }
 
 void 
 ColumnStandard::remove_solute (const symbol chemical)
@@ -655,7 +655,7 @@ ColumnStandard::tick_source (const Scope& parent_scope,
 
   // Find forward sink.
   drain->tick (time_end, scope, 
-               geometry, *soil, *soil_heat, surface, *soil_water, msg);
+               geometry, *soil, *soil_heat, *surface, *soil_water, msg);
   movement->tick_source (*soil, *soil_heat, *soil_water, msg);
 
   // Find water based limit.
@@ -705,7 +705,7 @@ ColumnStandard::suggest_dt (double weather_dt, double T_air) const
     dt = chem_dt;
 
   const double mov_dt = movement->suggest_dt (weather_dt, 
-                                              surface.ponding_max ());
+                                              surface->ponding_max ());
 
   if (std::isnormal (mov_dt) 
       && (!std::isnormal (dt) || dt > mov_dt))
@@ -753,14 +753,14 @@ ColumnStandard::tick_move (const Metalib& metalib,
 
   // Macropores before everything else.
   movement->tick_tertiary (units, geometry, *soil, *soil_heat, dt,
-                           *soil_water, surface, msg);
+                           *soil_water, *surface, msg);
 
   // Early calculation.
   litter->tick (*bioclimate, geometry, *soil, *soil_water, *soil_heat,
 		*organic_matter, *chemistry, dt, msg);
   const double old_pond 
-    = bioclimate->get_snow_storage () + surface.ponding_average ();
-  bioclimate->tick (time, surface, my_weather,
+    = bioclimate->get_snow_storage () + surface->ponding_average ();
+  bioclimate->tick (time, *surface, my_weather,
                     *vegetation, *litter, *movement,
                     geometry, *soil, *soil_water, *soil_heat, T_bottom,
                     dt, msg);
@@ -777,9 +777,9 @@ ColumnStandard::tick_move (const Metalib& metalib,
     = geometry.content_hood (tillage_age, Geometry::cell_above);
   
   chemistry->tick_top (geometry, *soil, *soil_water, *soil_heat, 
-                       tillage_top, surface, *vegetation, *bioclimate,
+                       tillage_top, *surface, *vegetation, *bioclimate,
 		       *litter,
-                       surface.runoff_rate (),
+                       surface->runoff_rate (),
                        old_pond,
                        my_weather.rain (),
                        *organic_matter, *chemistry,
@@ -801,24 +801,24 @@ ColumnStandard::tick_move (const Metalib& metalib,
   // Transport.
   chemistry->mass_balance (geometry, *soil_water);
   groundwater->tick (geometry, *soil, *soil_water, 
-                     surface.ponding_average () * 0.1, 
+                     surface->ponding_average () * 0.1, 
                      *soil_heat, time, scope, msg);
   soil_water->tick_before (geometry, *soil, dt, msg); 
   soil_heat->tick (geometry, *soil, *soil_water, T_bottom, *movement, 
-                   surface.temperature (), dt, msg);
+                   surface->temperature (), dt, msg);
   soil_water->reset_old (); // Set Theta_old to Theta here.
   chemistry->mass_balance (geometry, *soil_water);
   soil_water->tick_ice (geometry, *soil, dt, msg); 
   movement->tick (*soil, *soil_water, *soil_heat,
-                  surface, *groundwater, time, scope, my_weather, 
+                  *surface, *groundwater, time, scope, my_weather, 
                   dt, msg);
   soil_water->tick_after (geometry, *soil, *soil_heat, false, msg);
   soil_water->mass_balance (geometry, dt, msg);
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
   // Is Theta_old * C != M here?
   chemistry->tick_soil (scope, geometry, 
-                        surface.ponding_average (),
-                        surface.mixing_resistance (),
+                        surface->ponding_average (),
+                        surface->mixing_resistance (),
                         *soil, *soil_water, *soil_heat, 
                         *movement, *organic_matter, *chemistry, dt, msg);
   organic_matter->transport (units, geometry, 
@@ -988,7 +988,7 @@ ColumnStandard::output (Log& log) const
   if (weather.get ())
     output_derived (weather, "weather", log);
   output_object (bioclimate, "Bioclimate", log);
-  output_submodule (surface, "Surface", log);
+  output_derived (surface, "Surface", log);
   // output_submodule (geometry, "Geometry", log);
   output_submodule (*soil, "Soil", log);
   output_derived (soilph, "SoilpH", log);
@@ -1023,7 +1023,7 @@ ColumnStandard::output (Log& log) const
   output_lazy (bioclimate->get_intercepted_water ()
                + bioclimate->get_snow_storage ()
 	       + bioclimate->get_litter_water ()
-               + surface.ponding_average (),
+               + surface->ponding_average (),
                "surface_water", log);
   output_derived (movement, "Movement", log);
   output_derived (drain, "Drain", log);
@@ -1044,7 +1044,7 @@ ColumnStandard::ColumnStandard (const BlockModel& al)
     vegetation (Librarian::build_item<Vegetation> (al, "Vegetation")),
     litter (Librarian::build_item<Litter> (al, "Litter")),
     bioclimate (Librarian::build_item<Bioclimate> (al, "Bioclimate")),
-    surface (al.submodel ("Surface")),
+    surface (Librarian::build_item<Surface> (al, "Surface")),
     geometry (movement->geometry ()),
     soil (submodel<Soil> (al, "Soil")),
     soilph (Librarian::build_item<SoilpH> (al, "SoilpH")),
@@ -1139,14 +1139,14 @@ ColumnStandard::initialize (const Metalib& metalib,
   
   // Solutes depends on water and heat.
   chemistry->initialize (scope, geometry, *soil, *soil_water, *soil_heat, 
-                         *organic_matter, surface, msg);
+                         *organic_matter, *surface, msg);
 
   // Movement depends on soil, soil_water, and groundwater
   if (!movement->initialize (units, *soil, *soil_water, *groundwater,
                              time, scope, msg))
     return false;
 
-  surface.initialize (geometry);
+  surface->initialize (geometry);
 
   // Soil pH depends on little else.
   soilph->initialize (geometry, time, msg);
@@ -1226,9 +1226,9 @@ the simulation.  If unspecified, used global weather.");
                           Attribute::State, Attribute::Singleton,
                           "The water and energy distribution among the crops.");
     frame.set ("Bioclimate", "default");
-    frame.declare_submodule ("Surface", Attribute::State,
-                             "The upper border of the soil.",
-                             Surface::load_syntax);
+    frame.declare_object ("Surface", Surface::component,
+			  "The upper border of the soil.");
+    frame.set ("Surface", "default");
     frame.declare_object ("Drain", Drain::component, 
                           Attribute::State, Attribute::Singleton, "\
 Drainage.");

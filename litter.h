@@ -57,6 +57,7 @@ public:
   virtual bool diffuse () const; // True iff water can diffuse to surface.
   virtual double vapor_flux_factor () const = 0; // Affect on soil evap. []
   virtual double water_capacity () const = 0;    // Max water content [mm]
+  virtual double water_protected () const;    // Water not evapable [mm]
   virtual double albedo () const = 0;  // Light reflection factor []
   virtual double potential_exfiltration () const; // Water exchange with soil [mm/h]
   virtual double decompose_factor () const;	  // Effect on chemicals []

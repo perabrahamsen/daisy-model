@@ -468,7 +468,7 @@ stomataconductance model coupled as described by Collatz et al., 1991.")
     frame.declare ("Xn", "mol/mol/s", Check::positive (), Attribute::Const,
                 "Slope of relationship between leaf rubisco N and Vmax.\n\
 Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
-    frame.set ("Xn", 1.16e-3);
+    frame.set_cited ("Xn", 1.16e-3, "page 550", "pf1997simple");
 
     frame.declare ("Gamma25", "Pa", Check::positive (), Attribute::Const,
                    "CO2 compensation point of photosynthesis.\n\

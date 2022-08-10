@@ -89,7 +89,8 @@ FAO::LatentHeatVaporization (double Temp) // [J/kg]
 {
   const double value = ((2.501 - 2.361e-3 * Temp) * 1.0e6);
   daisy_assert (std::isfinite (value));
-  return ((2.501 - 2.361e-3 * Temp) * 1.0e6); }
+  return value;
+}
 
 double
 FAO::PsychrometricConstant (double AtmPressure, double Temp) // [Pa/K]
@@ -120,7 +121,7 @@ FAO::SlopeVapourPressureCurve (double Temp) // [Pa/K]
 
 double
 FAO::AtmosphericPressure (double elevation) // [Pa]
-{ return (101300. * pow ((293 - 0.0065 * elevation) / 293, 5.26)); }
+{ return (101300. * pow ((293 - 0.0065 * elevation) / 293.0, 5.26)); }
 
 double
 FAO::CloudinessFactor_Arid (double Si, double rad)

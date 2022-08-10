@@ -128,9 +128,9 @@ struct CropStandard : public Crop
   double PARref () const
   { return canopy->PARref; }
   double NIRext () const
-  { return canopy->PARext; }
+  { return canopy->NIRext; }
   double NIRref () const
-  { return canopy->PARref; }
+  { return canopy->NIRref; }
   double EPext () const
   { return canopy->EPext; }
   double IntcpCap () const	// Interception Capacity.
@@ -269,7 +269,7 @@ CropStandard::initialize (const Scope& scope, const Geometry& geo,
                           const Time& now, Treelog& msg)
 {
   TREELOG_MODEL (msg);
-  root_system->initialize (geo, soil, row_width, row_pos, msg);
+  root_system->initialize (geo, soil, row_width, row_pos, DS (), msg);
   seed->initialize (seed_w, msg);
   initialize_shared (scope, geo, soil, organic_matter, now, msg);
 }
@@ -281,7 +281,7 @@ CropStandard::initialize (const Scope& scope,
                           const Time& now, Treelog& msg)
 {
   TREELOG_MODEL (msg);
-  root_system->initialize (geo, soil, msg);
+  root_system->initialize (geo, soil, DS (), msg);
   seed->initialize (-42.42e42, msg);
   initialize_shared (scope, geo, soil, organic_matter, now, msg);
 }
@@ -646,8 +646,7 @@ CropStandard::tick (const Scope& scope,
   const double T_soil_3 
     = geo.content_height (soil_heat, &SoilHeat::T, -root_system->Depth/3.0);
   daisy_assert (std::isfinite (T_soil_3));
-
-  const double seed_C = seed->release_C (dt);
+  const double seed_C = seed->release_C (T_soil_3, dt);
   production.tick (bioclimate.daily_air_temperature (), T_soil_3,
 		   root_system->actual_density (), geo, soil_water, DS, 
 		   canopy->CAImRat, *nitrogen, nitrogen_stress, NNI, seed_C, 

@@ -392,7 +392,7 @@ VegetationPermanent::initialize (const Scope&, const Time& time,
                                  Treelog& msg)
 {
   reset_canopy_structure (time);
-  root_system->initialize (geo, soil, 0.0, 0.0, msg);
+  root_system->initialize (geo, soil, 0.0, 0.0, Crop::DSremove, msg);
   root_system->
     full_grown (geo, soil, WRoot, msg);
 

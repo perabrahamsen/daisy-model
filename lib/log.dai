@@ -409,10 +409,10 @@ flow to drain pipes, and subsoil irrigation."
                      (handle sum)
                      (dimension "mm")
                      (factor -10))      ;cm -> mm
-           (number (path column "${column}" Surface pond)
+           (number (path column "${column}" Surface default pond)
                    (tag "Surface ponding")            
                    (dimension "mm"))
-           (number (path column "${column}" Surface runoff)
+           (number (path column "${column}" Surface default runoff)
                    (tag "Surface runoff")            
                    (handle sum)
                    (dimension "mm"))
@@ -426,36 +426,6 @@ flow to drain pipes, and subsoil irrigation."
                    (tag "Litter storage")            
                    (dimension "mm"))
            (number (path column "${column}" Bioclimate "*" production_stress))))
-
-(deflog "Ridge" column
-  "All information about the Ridge subsystem."
-  (where "${colfid}ridge.dlf")
-  (when hourly)
-  (entries (number (path column "${column}" Surface ridge Theta_pre)
-                   (dimension "cm^3/cm^3"))
-           (number (path column "${column}" Surface ridge Theta)
-                   (dimension "cm^3/cm^3"))
-           (number (path column "${column}" Surface ridge h)
-                   (dimension "cm"))
-           (number (path column "${column}" Surface ridge z_pond)
-                   (dimension "cm"))
-           (number (path column "${column}" Surface ridge x_pond))
-           (number (path column "${column}" Surface ridge internal_ponding)
-                   (dimension "cm"))
-           (number (path column "${column}" Surface ridge R_bottom)
-                   (dimension "h"))
-           (number (path column "${column}" Surface ridge R_wall)
-                   (dimension "h"))
-           (number (path column "${column}" Surface ridge I_bottom)
-                   (handle sum)
-                   (dimension "cm"))
-           (number (path column "${column}" Surface ridge I_wall)
-                   (handle sum)
-                   (dimension "cm"))
-           (number (path column "${column}" Surface ridge I)
-                   (handle sum)
-                   (dimension "cm"))))
-
 
 (deflog "Denitrification" column
   "Detailed information about denitrification."
@@ -525,9 +495,9 @@ flow to drain pipes, and subsoil irrigation."
   (entries (number (path weather "*" air_temperature)
                    (tag "T_air")
                    (spec weather weather air_temperature))
-           (number (path column "${column}" Surface T)
+           (number (path column "${column}" Surface default T)
                    (tag "T_surface")
-                   (spec fixed Surface T)
+                   (spec surface default T)
                    (dimension "dg C"))
            (number (path column "${column}" SoilHeat T_limited)
                    (tag "T_limited")
@@ -1495,10 +1465,10 @@ sum of all chemicals will be logged."
            (number (path column "${column}" Bioclimate "*" pond_water_in)
                    (handle sum)
                    (dimension "mm"))
-           (number (path column "${column}" Surface pond)
+           (number (path column "${column}" Surface default pond)
                    (tag "pond_water_storage")
                    (dimension "mm"))
-           (number (path column "${column}" Surface runoff)
+           (number (path column "${column}" Surface default runoff)
                    (tag "pond_water_runoff")
                    (handle sum)
                    (dimension "mm"))
@@ -2820,7 +2790,8 @@ contains no water."
   (require_top true)
   (input "Precipitation" "Overhead irrigation" "Surface irrigation" "Tillage")
   (output "Snow evaporation" "Canopy evaporation" "Litter evaporation" 
-          "Surface evaporation" "Matrix infiltration" "Tertiary infiltration"
+          "Pond evaporation" "Soil evaporation"
+	  "Matrix infiltration" "Tertiary infiltration"
           "Runoff")
   (content Snow Canopy Litter Pond))
 
@@ -2828,7 +2799,7 @@ contains no water."
   "Snow water balance."
   (precision 1)
   (require_top true)
-  (input "Precipitation" "Overhead irrigation")
+  (input "Precipitation" "Overhead irrigation" "Pond to snow")
   (output "Snow evaporation" "Snow out")
   (content Snow))
 
@@ -2844,7 +2815,8 @@ contains no water."
   "Litter water balance."
   (precision 1)
   (require_top true)
-  (input "Canopy bypass" "Canopy out" "Surface irrigation" "Tillage")
+  (input "Canopy bypass" "Canopy out" "Surface irrigation" "Tillage"
+	 "Litter pond up" "Litter soil up")
   (output "Litter evaporation" "Litter bypass" "Litter wash off" "Litter out")
   (content "Litter"))
 
@@ -2853,8 +2825,9 @@ contains no water."
   (precision 1)
   (require_top true)
   (input "Litter bypass" "Litter wash off" "Litter out")
-  (output "Surface evaporation" "Matrix infiltration"
-	  "Tertiary infiltration" "Runoff")
+  (output "Pond evaporation" "Soil evaporation" "Matrix infiltration"
+	  "Tertiary infiltration" "Runoff" "Litter pond up" "Litter soil up"
+	  "Pond to snow")
   (content "Pond"))
 
 (deflog "Surface water" column
@@ -2914,9 +2887,24 @@ Amount of water removed from the litter by evaporation.")
                    (dimension "mm"))
            (number (tag "Surface evaporation")
 		   (documentation "\
-Amount of water removed from the pond and soil surface by evaporation.")
-                   (path column "${column}" Surface EvapSoilSurface)
-                   (spec fixed Surface EvapSoilSurface)            
+Amount of water removed from the pond and soil surface by evaporation.
+Also include water entering litter from soil and pond.")
+                   (path column "${column}" Surface default EvapSoilSurface)
+                   (spec surface default EvapSoilSurface)            
+                   (handle sum)
+                   (dimension "mm"))
+           (number (tag "Pond evaporation")
+		   (documentation "\
+Amount of water removed from the pond by evaporation.")
+                   (path column "${column}" Bioclimate "*" pond_ea)
+                   (spec bioclimate default pond_ea)            
+                   (handle sum)
+                   (dimension "mm"))
+           (number (tag "Soil evaporation")
+		   (documentation "\
+Amount of water removed from the soil by evaporation.")
+                   (path column "${column}" Bioclimate "*" soil_ea)
+                   (spec bioclimate default soil_ea)            
                    (handle sum)
                    (dimension "mm"))
            (flux_top (tag "Matrix infiltration")
@@ -2944,8 +2932,8 @@ Amount of water running of the surface.
 This is intended to simulate water runoff from a surface with a slop.
 However, since Daisy is a one dimensional model, the water have
 nowhere go to.  For typical setups, this value will be zero.")
-                   (path column "${column}" Surface runoff)
-                   (spec fixed Surface runoff)
+                   (path column "${column}" Surface default runoff)
+                   (spec surface default runoff)
                    (handle sum)
                    (dimension "mm"))
            (number (tag "Snow")
@@ -2986,14 +2974,21 @@ nowhere go to.  For typical setups, this value will be zero.")
                    (dimension "mm"))
            (number (tag "Pond")
 		   (documentation "Total amount of ponded water.")
-                   (path column "${column}" Surface pond) 
-                   (spec fixed Surface pond)
+                   (path column "${column}" Surface default pond) 
+                   (spec surface default pond)
                    (dimension "mm"))
            (number (tag "Snow out")
 		   (documentation "Water leaving snow pack")
                    (path column "${column}"
 			 Bioclimate "*" snow_water_out) 
                    (spec bioclimate default snow_water_out)
+		   (handle sum)
+                   (dimension "mm"))
+           (number (tag "Pond to snow")
+		   (documentation "Water leaving pond for snow pack")
+                   (path column "${column}"
+			 Bioclimate "*" pond_water_to_snow) 
+                   (spec bioclimate default pond_water_to_snow)
 		   (handle sum)
                    (dimension "mm"))
            (number (tag "Canopy out")
@@ -3030,6 +3025,20 @@ This can include overflow and Darcy flow.")
                    (path column "${column}"
 			 Bioclimate "*" litter_wash_off) 
                    (spec bioclimate default litter_wash_off)
+		   (handle sum)
+                   (dimension "mm"))
+           (number (tag "Litter pond up")
+		   (documentation "Water entering litter from pond.")
+                   (path column "${column}"
+			 Bioclimate "*" litter_pond_up) 
+                   (spec bioclimate default litter_pond_up)
+		   (handle sum)
+                   (dimension "mm"))
+           (number (tag "Litter soil up")
+		   (documentation "Water entering litter from soil.")
+                   (path column "${column}"
+			 Bioclimate "*" litter_soil_up) 
+                   (spec bioclimate default litter_soil_up)
 		   (handle sum)
                    (dimension "mm"))))
 

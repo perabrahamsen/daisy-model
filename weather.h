@@ -72,6 +72,7 @@ public:
   virtual bool has_net_radiation () const = 0;
   virtual bool has_reference_evapotranspiration () const = 0;
   virtual bool has_vapor_pressure () const = 0;
+  virtual bool has_daily_vapor_pressure () const = 0;
   virtual bool has_wind () const = 0;
   virtual bool has_CO2 () const = 0;
   virtual bool has_min_max_temperature () const = 0;

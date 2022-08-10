@@ -36,7 +36,7 @@ public:
   // Simulation.
 public:
   virtual double forced_CAI (double WLeaf, double SpLAI, double DS) = 0;
-  virtual double release_C (double dt) = 0; // [g C/m^2]
+  virtual double release_C (double T, double dt) = 0; // [g C/m^2]
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.

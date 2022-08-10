@@ -234,7 +234,7 @@ Production::tick (const double AirT, const double SoilT,
       // Partition growth.
       double f_Leaf, f_Stem, f_SOrg, f_Root;
 
-      partition.tick (DS, RSR (), nitrogen_stress, NNI,
+      partition.tick (DS, RSR (), WRoot, nitrogen_stress, NNI,
 		      f_Leaf, f_Stem, f_Root, f_SOrg);
       if (ReleaseOfRootReserves)
         {

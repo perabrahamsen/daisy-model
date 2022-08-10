@@ -471,6 +471,8 @@ Connvert to SI base units by multiplying with a factor.")
          "Crop scale carbon per area.");
     add ("g/ha", u_g / u_ha, -2, 1, 0, 0, 0, 0, 0,
          "Field scale pesticide mass per area.");
+    add ("g DM/ha", u_g / u_ha, -2, 1, 0, 0, 0, 0, 0,
+         "Field scale crop mass per area.");
     add ("mg/ha", p_m * u_g / u_ha, -2, 1, 0, 0, 0, 0, 0,
          "Miligram per hectare");
     add ("ug/ha", p_u * u_g / u_ha, -2, 1, 0, 0, 0, 0, 0,

@@ -309,7 +309,12 @@ BioporeMatrix::infiltration_capacity (const Geometry& geo, size_t e,
     }
 
   // Choose the lower limit;
-  return std::min (max_infiltration, max_capacity);
+#if 0
+  daisy_assert (max_infiltration >= 0); // May fail due to numerics.
+  daisy_assert (max_capacity >= 0);
+#endif
+  return std::max (std::min (max_infiltration, max_capacity),
+		   0.0);
 }
 
 void 

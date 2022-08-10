@@ -49,6 +49,7 @@ class Treelog;
 
 namespace Assertion
 {
+  EXPORT bool full (const char* file, const int line, bool is_debug = false);
   EXPORT void message (const std::string&);
   EXPORT void warning (const std::string&);
   EXPORT void error (const std::string&);
@@ -79,6 +80,7 @@ namespace Assertion
   };
 }
 
+#define daisy_full_debug() Assertion::full (__FILE__, __LINE__, true)
 #define daisy_assert(condition) \
   while (!(condition)) \
     Assertion::failure (__FILE__, __LINE__, __FUNCTION__, #condition)
