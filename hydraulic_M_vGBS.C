@@ -26,8 +26,6 @@
 
 #define BUILD_DLL
 
-using namespace std;
-
 #include "hydraulic.h"
 #include "block_model.h"
 #include "plf.h"

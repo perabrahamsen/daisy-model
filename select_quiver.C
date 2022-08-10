@@ -54,7 +54,7 @@ struct SelectQuiver : public Select
     if (last_column != &column)
       {
 	last_column = &column;
-	result = std::vector (geometry ()->cell_size () * 2, 0.0);
+	result = std::vector<double> (geometry ()->cell_size () * 2, 0.0);
       }
     
   }

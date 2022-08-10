@@ -142,7 +142,7 @@ WARNING = -Wall -Wextra -Wvariadic-macros \
 # This one doesn't work (gcc 4.4 linux/amd64):
 #   -Wunreachable-code: triggered by constructors?
 
-COMPILE = gcc -std=c++17 -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
+COMPILE = gcc -std=c++14 -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
 CCOMPILE = $(COMPILE)
 CPPLIB = -lstdc++
 
@@ -195,9 +195,9 @@ NOLINK = -c
 
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
-LATER = tertiary_instant.C  
+LATER = tertiary_instant.C   hydraulic_M_vGBS.C hydraulic_hypWeb.C
 MODELS = select_quiver.C \
-	hydraulic_M_BivG.C hydraulic_M_vGBS.C hydraulic_hypWeb.C \
+	hydraulic_M_BivG.C \
 	reaction_dom.C litter_mulch.C hydraulic_linear.C hydraulic_table.C \
 	program_weather.C uzrichard2.C hydraulic_M_vGip.C reaction_shoot.C \
 	condition_walltime.C  action_BBCH.C condition_BBCH.C  \

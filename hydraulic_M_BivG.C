@@ -30,6 +30,8 @@
 #include "librarian.h"
 #include "frame.h"
 
+using std::abs;
+
 class HydraulicM_BivG : public Hydraulic
 {
   // Content.

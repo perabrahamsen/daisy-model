@@ -61,7 +61,7 @@ class HydraulicHypweb : public Hydraulic
   double sumk;
   double Gama_h_cap0 = pow(1.0 / (1.0 + pow(a * pow(10.0, pf0), n)), m);
   double Gama_h_nc0 = (1.0 / n / M_LN10)*(Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0) - Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0 / n) + n - 1.0 / n + (1.0 / n - 1.0)*sumk); 
-  /* const   double Gama_h_cap0 = pow(1.0 / (1.0 + pow(a * pow(10.0, pf0), n)), m);
+  /* const   double Gama_h_cap0 = pow(1.0 / (1.0 + pow(a * pow(10.0, pf0), n)), m); */
   /* const   double Gama_h_nc0 = (1.0 / n / M_LN10)*(Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0) - Beta_inc(1.0 + pow(alpha*pow(10.0, pf0), n), 1.0 / n) + n - 1.0 / n + (1.0 / n - 1.0)*sumk); */
   mutable PLF M_;
   PLF pF_Theta;
