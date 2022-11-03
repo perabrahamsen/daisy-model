@@ -216,11 +216,25 @@ HydraulicM_vGBS::HydraulicM_vGBS(const BlockModel& al)
 	const double pf_max = pf0;
 	const double dpf = 0.05;
 	const int nsteps = (abs(pf_min)+pf_max)/dpf;
+	double last_Theta = -1.0;
 	for (int i = nsteps; i>=0; --i)	
 	{
 		const double x = pf_min+ dpf * i;
-		const double y = Theta(-pow(10.0, x));
-		pF_Theta.add(y,x);	// code block to be executed
+		const double h = pF2h (x);
+		const double y = Theta(h);
+		daisy_assert (y >= 0.0); // No negative water content.
+		if (y > last_Theta)
+		  {
+		    pF_Theta.add(y,x);	// code block to be executed
+		    last_Theta = y;
+		  }
+		else
+		  {
+		    std::ostringstream tmp;
+		    tmp << "Max Theta (" << y << ") found before pF = " << x;
+		    al.msg ().debug (tmp.str ());
+		    break;
+		  }
 	}
 }  //initiate the table
 
