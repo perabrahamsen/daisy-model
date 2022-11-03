@@ -1,5 +1,9 @@
 2022-11-03  Per Abrahamsen  <pa@plen.ku.dk>
 
+	* Version 6.33 released.
+
+2022-11-03  Per Abrahamsen  <pa@plen.ku.dk>
+
 	* hydraulic_M_vGBS.C: Stop adding points to pF_Theta once max
 	Theta has been reached.
 
