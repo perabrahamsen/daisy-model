@@ -1,3 +1,7 @@
+2023-04-12  U-UNICPH\xvs108  <pa@plen.ku.dk>
+
+	* mathlib.h (M_LN10): Define if undefined.
+
 2023-03-31  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_spawn.C: New model.
