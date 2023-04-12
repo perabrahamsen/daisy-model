@@ -47,11 +47,12 @@ class HydraulicLinear : public Hydraulic
 	     const double ice /* */, Treelog& msg);
   void hysteresis (const double dt /* [h] */,
 		   const double h_old /* [cm] */,
-		   const double h /* [cm] */);
+		   const double h /* [cm] */,
+		   const double T);
   void output (Log&) const;
 
   double Theta (double h) const;
-  double K (double h) const;
+  double KT (double h, double T) const;
   double Cw2 (double h) const;
   double h (double Theta) const;
   double M (double h) const;
@@ -77,7 +78,8 @@ HydraulicLinear::tick (const double dt /* [h] */,
 void
 HydraulicLinear::hysteresis (const double /* [h] */,
 			     const double h_old /* [cm] */,
-			     const double h /* [cm] */)
+			     const double h /* [cm] */,
+			     const double T /* [dg C] */)
 {
   if (is_wetting && h < h_old)
     {
@@ -87,11 +89,11 @@ HydraulicLinear::hysteresis (const double /* [h] */,
       // Find turnover point (h_tp, Theta_tp, K_tp).
       const double h_tp = h_old;
       const double Theta_tp = Theta (h_tp);
-      const double K_tp = K (h_tp);
+      const double K_tp = KT (h_tp, T);
 
       // Turnover values in dry curve (h_tp, Theta_dry, K_dry)
       const double Theta_dry = dry->Theta (h_tp);
-      const double K_dry = dry->K (h_tp);
+      const double K_dry = dry->KT (h_tp, T);
 
       // Dry extreme is (h=-inf, Theta=Theta_res, K=0).
       const double Theta_res = dry->Theta_res;
@@ -126,7 +128,7 @@ HydraulicLinear::hysteresis (const double /* [h] */,
 
       // Check turnover point unchanged.
       daisy_approximate (Theta (h_tp), Theta_tp);
-      daisy_approximate (K (h_tp), K_tp);
+      daisy_approximate (KT (h_tp, T), K_tp);
     }
   else if (!is_wetting && h > h_old && h < 0.0)
     {
@@ -136,11 +138,11 @@ HydraulicLinear::hysteresis (const double /* [h] */,
       // Find turnover point (h_tp, Theta_tp, K_tp).
       const double h_tp = h_old;
       const double Theta_tp = Theta (h_tp);
-      const double K_tp = K (h_tp);
+      const double K_tp = KT (h_tp, T);
 
       // Turnover values in wet curve (h_tp, Theta_wet, K_wet)
       const double Theta_wet = wet->Theta (h_tp);
-      const double K_wet = wet->K (h_tp);
+      const double K_wet = wet->KT (h_tp, T);
 
       // Wet extreme is (h=0, Theta=Theta_sat, K=K_sat).
       const double Theta_sat = wet->Theta_sat;
@@ -195,8 +197,8 @@ HydraulicLinear::Theta (const double h) const
 { return a * hyd->Theta (h) + b; }
 
 double 
-HydraulicLinear::K (const double h) const
-{ return c * hyd->K (h) + d; }
+HydraulicLinear::KT (const double h, const double T) const
+{ return c * hyd->KT (h, T) + d; }
 
 double 
 HydraulicLinear::Cw2 (const double h) const

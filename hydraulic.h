@@ -61,15 +61,20 @@ public:
                      const double ice /* */, Treelog& msg);
   virtual void hysteresis (const double dt /* [h] */,
 			   const double h_old /* [cm] */,
-			   const double h /* [cm] */);
+			   const double h /* [cm] */,
+			   const double T);
 			   
   // Convertion functions.
 public:
   virtual double Theta (double h) const = 0;
-  virtual double K (double h) const = 0;
+  virtual double KT (double h, double T) const;
+  double KT20 (const double h) const
+  { return KT (h, 20.0); }
   virtual double Cw2 (double h) const = 0;
   virtual double h (double Theta) const = 0;
   virtual double M (double h) const = 0;
+private:
+  virtual double K (double h) const;
 
   // Simulation.
 public:

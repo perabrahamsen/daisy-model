@@ -70,8 +70,10 @@ RootSystem::potential_water_uptake (const double h_x,
       const double h = h_x - (1 + Rxylem) * geo.cell_z (i);
       daisy_assert (soil_water.Theta_ice (soil, i, h_wp) > 0.0);
       daisy_assert (soil.Theta_res (i) >= 0.0);
+#ifdef THETA_RES
       daisy_assert (soil_water.Theta_ice (soil, i, h_wp) 
                     >= soil.Theta_res (i));
+#endif
       const double max_uptake
         = std::max (0.0, (soil_water.Theta (i) 
                           - soil_water.Theta_ice (soil, i, h_wp)) / dt);

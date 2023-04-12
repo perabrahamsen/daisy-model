@@ -75,7 +75,7 @@ Reported by Laura Delhez.
 
 * 6.28
 
-** Temperature now affect release of assimilate from seeds.
+** Temperature now affects release of assimilate from seeds.
 
 This is for the seed release model.
 

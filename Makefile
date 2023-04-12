@@ -32,7 +32,7 @@ NATIVEHOME = $(OBJHOME)
 NATIVEEXE = daisy #daisyw
 USE_GUI = Q4
 #BOOSTINC = -isystem $(HOME)/boost_1_55_0
-CXSPARSELIB = -lcxsparse
+CXSPARSELIB = -lcxsparse -ldl -lpthread -lboost_system -lboost_filesystem
 else
 SRCDIR = ..
 OBJHOME = obj
@@ -199,7 +199,8 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = surface_source.C surface_std.C select_quiver.C \
+MODELS = program_spawn.C \
+	hydraulic_hyprop.C surface_source.C surface_std.C select_quiver.C \
 	hydraulic_M_BivG.C hydraulic_M_vGBS.C hydraulic_hypWeb.C \
 	reaction_dom.C litter_mulch.C hydraulic_linear.C hydraulic_table.C \
 	program_weather.C uzrichard2.C hydraulic_M_vGip.C reaction_shoot.C \

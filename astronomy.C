@@ -118,6 +118,7 @@ Astronomy::SinSolarElevationAngle (const Time& time,
                                    const double longitude,
                                    const double timezone) // []
 {
+  // Fourier method for Equation of Time.
   static const double EQT0   = 0.002733;
   static const double EQT1[] = {-7.343,-9.470,-0.3289,-0.1955};
   static const double EQT2[] = {0.5519,-3.020,-0.07581,-0.1245};

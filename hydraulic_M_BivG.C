@@ -34,12 +34,12 @@ class HydraulicM_BivG : public Hydraulic
 {
   // Content.
   const double alpha1;
-  const double alpha2;
   const double a1;		// - alpha
-  const double a2;		// - alpha
   const double n1;
-  const double n2;
   const double m1;		// 1 - 1/n
+  const double alpha2;
+  const double a2;		// - alpha
+  const double n2;
   const double m2;		// 1 - 1/n
   const double w2;
   const double l;               // tortuosity parameter
@@ -87,13 +87,15 @@ HydraulicM_BivG::K (const double h) const
 double 
 HydraulicM_BivG::Cw2 (const double h) const
 {
-	const double temp = -(Theta_sat - Theta_res)*((1 - w2)
+#if 0
+  const double temp = -(Theta_sat - Theta_res)*((1 - w2)
 		* (m1 * (pow(1.0 / (1.0 + pow(a1 * h, n1)), m1 - 1.0)
 			* (n1 * (pow(a1 * h, n1 - 1.0) * a1))))
 		/ pow(1.0 + pow(a1 * h, n1), 2.0)
 		+ w2 * (m2 * (pow(1.0 / (1.0 + pow(a2 * h, n2)), m2 - 1.0)
 			* (n2 * (pow(a2 * h, n2 - 1.0) * a2))))
 		/ pow(1.0 + pow(a2 * h, n2), 2.0));
+#endif
   if (h < 0.0)
 	  return -(Theta_sat - Theta_res)*((1-w2)
 	      * (m1 * (  pow (1.0 / (1.0 + pow (a1 * h, n1)), m1 - 1.0)

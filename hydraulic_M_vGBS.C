@@ -197,10 +197,10 @@ HydraulicM_vGBS::HydraulicM_vGBS(const BlockModel& al)
 	l(al.number("l")),
 	pf0(al.number("pf0")),
 	afilm(al.number("afilm")),
-	Ks_nc(al.number("Ks_nc")),
-	Theta_nc(al.number("Theta_nc")),
 	Theta_cap(al.number("Theta_cap")),
+	Theta_nc(al.number("Theta_nc")),
 	Ks_cap(al.number("Ks_cap")),
+	Ks_nc(al.number("Ks_nc")),
 	M_()
 {
 	//sumk = [this] {double res = 0; for (int k = 0.0; k < 19.5; k++) res += 1.0 / k / (k + 1.0) / (n*k + 1.0); return res; }();

@@ -840,7 +840,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
 
   // Soil properties.
   chemistry->mass_balance (geometry, *soil_water);
-  soil->tick (dt, my_weather.rain (), geometry, *soil_water, msg);
+  soil->tick (dt, my_weather.rain (), geometry, *soil_water, *soil_heat, msg);
   const double extra = soil_water->overflow (geometry, *soil, *soil_heat, msg);
   if (extra > 0.0)
     {

@@ -81,6 +81,14 @@ Hydraulic::set_porosity (double Theta)
   Theta_sat = Theta; 
 }
 
+double
+Hydraulic::KT (double h, double T) const
+{ return K (h); }
+
+double
+Hydraulic::K (double) const
+{ daisy_notreached (); }
+
 void
 Hydraulic::tillage (double, double, double, double)
 { }
@@ -92,7 +100,8 @@ Hydraulic::tick (const double, const double, const double, Treelog&)
 void
 Hydraulic::hysteresis (const double /* [h] */,
 		       const double /* [cm] */,
-		       const double /* [cm] */)
+		       const double /* [cm] */,
+		       const double /* [dg C] */)
 { }
 
 void 
@@ -105,8 +114,8 @@ void
 Hydraulic::K_to_M (PLF& plf, const int intervals) const
 {
   static const double h0 = -20000.0;
-  const double Ksat = K (0.0);
-  const double max_change = pow (Ksat / K (h0), 1.0 / intervals);
+  const double Ksat = KT20 (0.0);
+  const double max_change = pow (Ksat / KT20 (h0), 1.0 / intervals);
   double step = (0 - h0) / 4.0;
 
   double h = h0;
@@ -115,7 +124,7 @@ Hydraulic::K_to_M (PLF& plf, const int intervals) const
     {
       plf.add (h, sum);
       step *= 2;
-      while (K (h + step) / K (h) > max_change)
+      while (KT20 (h + step) / KT20 (h) > max_change)
 	{
 	  if (step < 1e-15)
 	    {
@@ -124,16 +133,16 @@ Hydraulic::K_to_M (PLF& plf, const int intervals) const
 		     << objid << "\n";
 	      tmp << "h = " << h << ", step = " << step 
 		     << " and h + step = " << (h + step) << "\n";
-	      tmp << "K (h) = " << K (h) << ", K (h + step) = "
+	      tmp << "K (h) = " << KT20 (h) << ", K (h + step) = "
 		     << K (h + step) << " and K (0) = " << Ksat << "\n";
-	      tmp << "Change = " << K (h + step) / K (h) 
+	      tmp << "Change = " << KT20 (h + step) / KT20 (h) 
 		     << " > Max = " << max_change;
 	      Assertion::debug (tmp.str ());
 	      break;
 	    }
 	  step /= 2;
 	}
-      sum += step * (K (h) + K (h + step)) / 2;
+      sum += step * (KT20 (h) + KT20 (h + step)) / 2;
       h += step;
     }
   plf.add (h, sum);
@@ -220,10 +229,10 @@ Hydraulic::initialize (const Texture&,
     {
       daisy_assert (K_sat < 0.0);
       K_sat = 1.0;
-      const double K_one = K (K_init->h);
+      const double K_one = KT20 (K_init->h);
       daisy_assert (K_one > 0.0);
       K_sat = K_init->K / K_one;
-      daisy_assert (approximate (K (K_init->h), K_init->K));
+      daisy_assert (approximate (KT20 (K_init->h), K_init->K));
     }
 }
 
@@ -280,6 +289,7 @@ struct ProgramHydraulic_table : public Program
   const bool print_Cw2;
   const double min_pF;
   const double max_pF;
+  const double T;
   
   bool run (Treelog& msg)
   {
@@ -297,7 +307,7 @@ struct ProgramHydraulic_table : public Program
         const double pF = min_pF + ((max_pF - min_pF) * i) / (intervals + 0.0);
         const double h = pF2h (pF);
         const double Theta = horizon->hydraulic->Theta (h);
-        const double K = horizon->hydraulic->K (h);
+        const double K = horizon->hydraulic->KT (h, T);
 	const double Cw2 = horizon->hydraulic->Cw2 (h);
         tmp << pF << "\t" << h << "\t" << Theta * 100 << "\t" << K;
 	if (print_Cw2)
@@ -324,7 +334,8 @@ struct ProgramHydraulic_table : public Program
       top_soil (al.flag ("top_soil")),
       print_Cw2 (al.flag ("print_Cw2")),
       min_pF (al.number ("min_pF")),
-      max_pF (al.number ("max_pF"))
+      max_pF (al.number ("max_pF")),
+      T (al.number ("T"))
   { }
   ~ProgramHydraulic_table ()
   { }
@@ -372,6 +383,9 @@ Minimal pF in table.");
     frame.declare ("max_pF", "pF", Attribute::Const, "\
 Maximal pF in table.");
     frame.set ("max_pF", 5.0);
+    frame.declare ("T", "dg C", Attribute::Const, "\
+Temperature for conductivity.");
+    frame.set ("T", 20.0);
     frame.order ("horizon");
   }
 } ProgramHydraulic_table_syntax;

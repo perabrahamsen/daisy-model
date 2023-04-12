@@ -1,0 +1,68 @@
+;;; setup.dai --- Main BioAdapt setup file.
+
+(path &old "./Data/")
+
+(input file "log.dai")
+(input file "tillage.dai")
+(input file "fertilizer.dai")
+(input file "crop.dai")
+(input file "markvand.dai")
+(input file "management.dai")
+
+(input file "hydraulic-table.dai")
+;;(input file "hydraulic.dai")
+(input file "soil.dai")
+(input file "climate.dai")
+
+(defprogram common Daisy
+  (time 2998 1 1)
+  (activate_output (after 3000 1 1))
+  (stop 3010 1 1)
+  (output harvest
+	  ("Field water" (when yearly))
+	  ("Field nitrogen" (when yearly))
+	  ("Carbon Balance" (when yearly))))
+
+(defprogram PRESENT-CONTROL-SB common
+  (log_prefix "Output/PRESENT-CONTROL-SB/")
+  (weather PRESENT)
+  (column CONTROL)
+  (manager SB))
+
+(defprogram PRESENT-CONTROL-WW common
+  (log_prefix "Output/PRESENT-CONTROL-WW/")
+  (weather PRESENT)
+  (column CONTROL)
+  (manager WW))
+
+(defprogram PRESENT-CONTROL-SBI common
+  (log_prefix "Output/PRESENT-CONTROL-SBI/")
+  (weather PRESENT)
+  (column CONTROL)
+  (manager SBI))
+
+(defprogram PRESENT-CONTROL-WWI common
+  (log_prefix "Output/PRESENT-CONTROL-WWI/")
+  (weather PRESENT)
+  (column CONTROL)
+  (manager WWI))
+
+(defprogram PRESENT-BIO100-SB common
+  (log_prefix "Output/PRESENT-BIO100-SB/")
+  (weather PRESENT)
+  (column BIO100)
+  (manager SB))
+
+(defprogram PRESENT-CONTROL-all batch
+  (run PRESENT-CONTROL-SB
+       PRESENT-CONTROL-WW
+       PRESENT-CONTROL-SBI
+       PRESENT-CONTROL-WWI))
+
+(defprogram all batch
+  (run PRESENT-CONTROL-SB PRESENT-BIO100-SB))
+
+(run PRESENT-CONTROL-all)
+
+;;; setup.dai ends here.
+

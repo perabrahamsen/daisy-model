@@ -38,6 +38,7 @@ class Block;
 class Treelog;
 class Time;
 class SoilWater;
+class SoilHeat;
 class OrganicMatter;
 class Hydraulic;
 
@@ -72,7 +73,8 @@ public:
                 const double surface_loose, const double RR0, 
                 const SoilWater& soil_water, const OrganicMatter&);
   void tick (const double dt /* [h] */, const double rain /* [mm/h] */,
-             const Geometry& geo, const SoilWater& soil_water, Treelog&);
+             const Geometry& geo, const SoilWater& soil_water,
+	     const SoilHeat& soil_heat, Treelog&);
   void set_porosity (size_t i, double Theta);
   // Activation pressure for secondary domain. [cm] 
   double h_secondary (size_t i) const;

@@ -1,0 +1,42 @@
+;;; hydraulic.dai --- Soil used for BioAdapt
+
+(defhydraulic Ap hyprop
+  "Original Ap horizon."
+  (w 0.583 0.417 [])
+  (alpha 0.0207 0.0285 [cm^-1])
+  (n 1.581 8.390 [])
+  (Theta_res 0.080 [])
+  (Theta_sat 0.404 []) ; But porosity 0.44 []?
+  (h0 6.8 [pF])
+  (K_sat 198.6 [cm/d])
+  (tau 2.565 [])
+  (omega 0.000319 [])
+  (a -1.5 []))
+
+(defhydraulic CONTROL hyprop
+  "Original B horizon."
+  (w 0.745 0.255 [])
+  (alpha 0.0326 0.0311 [cm^-1])
+  (n 5.291 2.028 [])
+  (Theta_res 0.058 [])
+  (Theta_sat 0.382 []) ; But porosity 0.43 []?
+  (h0 6.8 [pF])
+  (K_sat 2100.0 [cm/d])
+  (tau 1.022 [])
+  (omega 5.85e-6 [])
+  (a -1.5 []))
+
+(defhydraulic SB3_SB15 hyprop
+  "B horizon with 3 % 15 um particles added."
+  (w 0.637 0.363 [])
+  (alpha 0.0160 0.0214 [cm^-1])
+  (n 1.748 10.668 [])
+  (Theta_res 0.062 [])
+  (Theta_sat  0.337 []) ; But porosity 0.43 []?
+  (h0 6.8 [pF])
+  (K_sat 220.2 [cm/d])
+  (tau -0.219 [])
+  (omega 1E-9 [])
+  (a -1.5 []))
+
+;;; hydraulic.dai ends here
