@@ -1,7 +1,7 @@
 ;;; dk-wwheat.dai
 
 (defcrop "Vinterhvede" default
-  "Vinterhvede med årsudbytter der svarer til gennemsnittet for dansk landbrug.
+  "Vinterhvede med aarsudbytter der svarer til gennemsnittet for dansk landbrug.
 Skabt af Christian Thirup for Daisy standardiseringsprojektet."
   
   (Devel default (EmrTSum  100)

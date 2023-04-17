@@ -4,7 +4,7 @@
   (initial_fraction 0.50)
   (C_per_N 90.0))
 		  
-(defcrop "Ryegrass" default (description "ryegrass v.27 Henning Høgh Jensen")
+(defcrop "Ryegrass" default (description "ryegrass v.27 Henning Hoegh Jensen")
 ;; This crop module is developed to be grown in association with other crops - clover in particular. 
 
   (Devel default 

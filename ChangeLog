@@ -1,4 +1,16 @@
-2023-04-12  U-UNICPH\xvs108  <pa@plen.ku.dk>
+2023-04-17  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.34 released.
+
+2023-04-17  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.34 released.
+
+2023-04-17  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.34t2 released.
+
+2023-04-12  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* mathlib.h (M_LN10): Define if undefined.
 

@@ -3,7 +3,7 @@
   (initial_fraction 0.50)
   (C_per_N 50.0))
 
-(defcrop Wclover default (description "v.30 Developed by Henning Høgh Jensen")
+(defcrop Wclover default (description "v.30 Developed by Henning Hoegh Jensen")
 ;; this crop has been develeped to be grown in mixtures with grass. It is proper validated on clayey loams but not on sandy soils
 
   (min_light_fraction 0.01) ; in agreement with a patchy environment, clover is pre-allocated a proportion of the light

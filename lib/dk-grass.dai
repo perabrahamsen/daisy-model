@@ -1,7 +1,7 @@
 ;;; grass.dai
 
 (defcrop "Froegraes" default
-  "Frøgræs med årsudbytter der svarer til gennemsnittet for dansk landbrug.
+  "Froegraes med aarsudbytter der svarer til gennemsnittet for dansk landbrug.
 Skabt af Christian Thirup for Daisy standardiseringsprojektet."
   (Devel default (EmrTSum 125)
 	 (DS_Emr 0.01)
@@ -16,13 +16,13 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."
           (DSLim 0.9)
 	  (TaLim  5.0)
 	  (TaSum  -50.0))
-  (LeafPhot original (Qeff 0.050); (g/m²/h) / (W/m²)
-            (DSEff (0.0 1.0) (0.3 1.0) (1.0 1.0)(2.0 1.0));N-udbytteniveau korrigeres ved forholdsmæssig op eller nedjustering af værdierne ved DS 1.0 og 2.0
-	    (Fm   2.5) ;oprindelig 2.16    		; g/m²/h
+  (LeafPhot original (Qeff 0.050); (g/mÂ²/h) / (W/mÂ²)
+            (DSEff (0.0 1.0) (0.3 1.0) (1.0 1.0)(2.0 1.0));N-udbytteniveau korrigeres ved forholdsmÃ¦ssig op eller nedjustering af vÃ¦rdierne ved DS 1.0 og 2.0
+	    (Fm   2.5) ;oprindelig 2.16    		; g/mÂ²/h
 	    (TempEff (-20 0.0001) (05 0.0001) (10 0.90)
-		     (25 1.00) (35 0.01) (50 0.0))) ;°C
+		     (25 1.00) (35 0.01) (50 0.0))) ;Â°C
   (Seed LAI (DSLAI05 0.2))
-  (Canopy (SpLAI 0.025)		; (m²/m²) / (g/m²)  ~0.02
+  (Canopy (SpLAI 0.025)		; (mÂ²/mÂ²) / (g/mÂ²)  ~0.02
 	  (HvsDS (0 001) (1 30) (2 30))
 	  (LeafAIMod (0.0 1.) (2.0 1.0))
 	  (SpStemAI 0.005)
@@ -106,7 +106,7 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."
 )
 
 (defcrop "Graes" "Froegraes"
-  "Græs med årsudbytter der svarer til gennemsnittet for dansk landbrug.
+  "GrÃ¦s med Ã¥rsudbytter der svarer til gennemsnittet for dansk landbrug.
 Skabt af Christian Thirup for Daisy standardiseringsprojektet."  (Devel original 
          ;; We change the parameterization to make lay work (don't
          ;; grow when shaddowed by the main crop).
@@ -114,8 +114,8 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."  (Devel original
 		   (15 1.08) (16 1.14) (17 1.18) (24 1.18)))
 		   
 (LeafPhot original 
-            (DSEff (0.0 0.68) (0.3 0.68) (1.0 0.68)(2.0 0.68));N-udbytteniveau korrigeres ved forholdsmæssig op eller nedjustering af værdierne ved DS 1.0 og 2.0
-	    (Fm   2.0))	;oprindelig 2.16      		; g/m²/h
+            (DSEff (0.0 0.68) (0.3 0.68) (1.0 0.68)(2.0 0.68));N-udbytteniveau korrigeres ved forholdsmÃ¦ssig op eller nedjustering af vÃ¦rdierne ved DS 1.0 og 2.0
+	    (Fm   2.0))	;oprindelig 2.16      		; g/mÂ²/h
 	    		   
 		   
 (Canopy     (SpLAI 0.022));oprindelig 0.025		   
@@ -124,7 +124,7 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."  (Devel original
   (Root (MxNH4Up 1.2e-7) ;oprindelig:	(MxNH4Up 2.5e-7)
 	(MxNO3Up 1.2e-8)));oprindelig:	(MxNO3Up 2.5e-8))
 
-(defcrop "Red fescue" "Froegraes"       ;Rødsvingel.
+(defcrop "Red fescue" "Froegraes"       ;RÃ¸dsvingel.
  "Red fescue based on ryegrass. Created by Kiril Manevski for his PhD project at AU Foulum.
  Based on maize experiments from Nortic field trials at Foulum & Jyndevad 2009-2011 (Ib S. Kristensen).
  The red fescue was intercropped with maize. Validation partially succsessful and care to be taken when using this parameterization."
@@ -144,7 +144,7 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."  (Devel original
 	    ;at DS=0.3/1.0 the value of DSEff may vary between 0.3-0.7 (calibration)
 	    ;At DS=2.0 he value of DSEff doesn't really matter as this crop doesn't reach DS values much higher than 1 within one study year.
 	    (TempEff (-20 0.0001) (05 0.0001) (10 0.90)
-		     (25 1.00) (35 0.01) (50 0.0))) ;°C
+		     (25 1.00) (35 0.01) (50 0.0))) ;Â°C
 
   (CrpN (PtLeafCnc (0.00 0.050) (0.60 0.050) (1.00 0.040) (2.00 0.020))
 	(CrLeafCnc (0.00 0.040) (0.60 0.030) (1.00 0.020) (2.00 0.015))

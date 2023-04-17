@@ -1,5 +1,5 @@
 (defcrop "Vinterraps" default
-  "Vinterraps med årsudbytter der svarer til gennemsnittet for dansk landbrug.
+  "Vinterraps med aarsudbytter der svarer til gennemsnittet for dansk landbrug.
 Skabt af Christian Thirup for Daisy standardiseringsprojektet"
   (Devel default
         (EmrTSum  180)

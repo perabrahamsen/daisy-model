@@ -27,44 +27,27 @@ endif
 
 ifeq ($(HOSTTYPE),unix)
 SRCDIR = $(HOME)/daisy
-OBJHOME =  $(SRCDIR)/obj
-NATIVEHOME = $(OBJHOME)
-NATIVEEXE = daisy #daisyw
+DAISYEXE = daisy #daisyw
 USE_GUI = Q4
 #BOOSTINC = -isystem $(HOME)/boost_1_55_0
 CXSPARSELIB = -lcxsparse -ldl -lpthread -lboost_system -lboost_filesystem
 else
-SRCDIR = ..
-OBJHOME = obj
-NATIVEHOME = $(OBJHOME)
-NATIVEEXE = daisy.exe daisyw.exe
-USE_GUI = Q4
-#BOOSTINC = -isystem $(CYGHOME)/home/xvs108/boost_1_69_0
-#BOOSTINC = -isystem $(CYGHOME)/home/xvs108/boost
-BOOSTINC = -isystem $(CYGHOME)/usr/include/
-CXSPARSELIB = libcxsparse.a
+SRCDIR = c:/msys64$(HOME)/daisy
+DAISYEXE = daisy.exe #daisyw.exe
+USE_GUI = none
+CXSPARSELIB = -lcxsparse -lboost_system-mt -lboost_filesystem-mt -lws2_32
 SETUPDIR = /home/xvs108/daisy/install
-#MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
-MAKENSIS = "/cygdrive/c/Program Files (x86)/NSIS/makensis.exe"
-#MINGWHOME64 = /cygdrive/c/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64
-#MINGWHOME32 = /cygdrive/c/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32
-MINGWHOME64 = /cygdrive/c/mingw-w64/
-MINGWHOME32 = /cygdrive/c/mingw-w64/x86_64-w64-mingw32/
-MINGWBIN=$(MINGWHOME)/bin
-MINGWBIN64=$(MINGWHOME64)/bin
-MINGWBIN32=$(MINGWHOME32)/bin
-MINGWDLL64 = libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll
-MINGWDLL32 = libgcc_s_dw2-1.dll libstdc++-6.dll libwinpthread-1.dll
+MAKENSIS = "c:/Program Files (x86)/NSIS/makensis.exe"
+MINGWBIN = /ucrt64/bin
+DLL = libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll libboost_filesystem-mt.dll libcxsparse.dll
 endif
-
-DISTDIR=c:/Users/xvs108/Google\ Drive/public/
 
 # Set USE_GUI to Q4 or none, depending on what GUI you want.
 #
 
 # Set USE_OPTIMIZE to 'native', 'portable' or 'none'.
 #
-USE_OPTIMIZE = portable
+#USE_OPTIMIZE = portable
 #USE_OPTIMIZE = none
 
 # Set USE_PROFILE if you want to profile the executable
@@ -105,7 +88,7 @@ ifneq ($(USE_OPTIMIZE),none)
 	OPTIMIZE = -O3 -ffast-math -fno-finite-math-only $(OPTEXTRA)
 endif
 
-STRIP = /usr/bin/strip
+STRIP = strip
 
 ifeq ($(HOSTTYPE),unix)
 	OSFLAGS = -D__unix
@@ -149,7 +132,7 @@ COMPILE = gcc -std=c++17 -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(
 CCOMPILE = $(COMPILE)
 CPPLIB = -lstdc++
 
-CSHARP = /cygdrive/C/WINDOWS/Microsoft.NET/Framework/v2.0.50727/csc.exe
+CSHARP = C:/WINDOWS/Microsoft.NET/Framework/v2.0.50727/csc.exe
 
 csdaisy.exe:	csmain.cs csdaisy.netmodule
 	$(CSHARP) /out:csdaisy.exe /addmodule:csdaisy.netmodule csmain.cs
@@ -183,12 +166,6 @@ ifeq ($(HOSTTYPE),unix)
 endif
 ifeq ($(HOSTTYPE),mingw)
 	EXE = .exe
-endif
-
-ifeq ($(HOSTTYPE),mingw)
-	DAISYEXE = daisy.exe
-else
-	DAISYEXE = $(OBJHOME)/daisy
 endif
 
 # Figure out how to link.
@@ -447,7 +424,7 @@ REMOVED = action_ridge.C ridge.C ridge.h groundwater_pipe.C horizon_std.C \
 # Create all the executables.
 #
 all:
-	@echo 'Use "make <platform>" to create a native Daisy executable.'
+	@echo 'Use "make native" og "make portable" to create an executable.'
 
 # Create a DLL.
 #
@@ -473,64 +450,25 @@ daisyw:	$(GUIOBJECTS) $(LIBOBJ)
 	$(LINK)$@ $^ $(GUILIB) $(CPPLIB)  $(CXSPARSELIB)
 
 
-linux:	
-	(mkdir -p $(NATIVEHOME) \
-	 && cd $(NATIVEHOME) \
-         && time $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile $(NATIVEEXE))
-
-make-win64-native:
-	(mkdir -p win64-native \
-	 && cd win64-native \
-         && $(MAKE) "MINGWHOME=$(MINGWHOME64)" \
-                    "PATH=$(MINGWHOME64)/bin:$(PATH)" \
-		    "CYGHOME=C:/cygwin64" Q4HOME=c:/Qt/4.5.2\
-	            VPATH=$(SRCDIR) USE_OPTIMIZE=native \
-                    -f $(SRCDIR)/Makefile daisy${EXE})
-
-make-win64-portable:
-	(mkdir -p win64-portable \
-	 && cd win64-portable \
-         && $(MAKE) "MINGWHOME=$(MINGWHOME64)" \
-                    "PATH=$(MINGWHOME64)/bin:$(PATH)" \
-		    "CYGHOME=C:/cygwin64" Q4HOME=c:/Qt/4.5.2\
-	            VPATH=$(SRCDIR) USE_OPTIMIZE=portable \
-                    -f $(SRCDIR)/Makefile daisy${EXE})
-
-make-win32-portable:
-	(mkdir -p win32-portable \
-	 && cd win32-portable \
-         && $(MAKE) "MINGWHOME=$(MINGWHOME32)" \
-                    "PATH=$(MINGWHOME32)/bin:$(PATH)" \
-		    "CYGHOME=C:/cygwin64" Q4HOME=c:/Qt/4.5.2\
-	            VPATH=$(SRCDIR) USE_OPTIMIZE=portable \
-                    -f $(SRCDIR)/Makefile daisy${EXE})
-
-native:	
-	(cd OpenMI && time $(MAKE) all ) \
-	 && mkdir -p $(NATIVEHOME) \
-	 && cd $(NATIVEHOME) \
-         && time $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile $(NATIVEEXE)
-
-cnative:
-	(mkdir -p $(NATIVEHOME) \
-	 && cd $(NATIVEHOME) \
-         && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile cdaisy.exe)
-
-# Create the C main executable.
-#
-cdaisy${EXE}:  cmain${OBJ} daisy.dll
+cdaisy.exe:  cmain${OBJ} daisy.dll
 	$(LINK)$@ $^ $(CPPLIB)
 
-# Create the C main executable for testing.
-#
-# Create a shared library.
-#
 daisy.so: $(LIBOBJ)
 	$(CC) -shared -o daisy.so $^
 
-# toplevel.o cdaisy.o:
-#	 $(CC) $(NOLINK) -DBUILD_DLL $<
+# Main targets.
 
+native:	
+	(mkdir -p objn \
+	 && cd objn \
+         && time $(MAKE) VPATH=$(SRCDIR) USE_OPTIMIZE=native \
+	                 -f $(SRCDIR)/Makefile daisy$(EXE))
+
+portable:
+	(mkdir -p  objp \
+	 && cd objp \
+         && time $(MAKE) VPATH=$(SRCDIR) USE_OPTIMIZE=portable \
+	                -f $(SRCDIR)/Makefile daisy$(EXE))
 
 # Count the size of daisy.
 #
@@ -580,8 +518,8 @@ utest${EXE}: $(UTESTOBJ) $(LIBOBJ)
 	$(CC) -o $@ $^ $(GTESTLIB) $(CPPLIB) $(CXSPARSELIB) 
 
 unittest:
-	(mkdir -p $(NATIVEHOME) \
-	 && cd $(NATIVEHOME) \
+	(mkdir -p objp \
+	 && cd objp \
          && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile utest${EXE} \
 	 && ./utest${EXE})
 
@@ -606,8 +544,10 @@ txt/reference.pdf:	txt/components.tex
 	 && makeindex reference \
 	 && pdflatex reference.tex < /dev/null )
 
-txt/components.tex: $(DAISYEXE)
-	(cd txt && $(DAISYEXE) -nw all.dai -p document )
+txt/components.tex: objp/daisy$(EXE)
+	(cd txt && ../objp/daisy$(EXE) -nw all.dai -p document )
+
+objp/daisy$(EXE): portable
 
 # Remove all the temporary files.
 #
@@ -616,11 +556,6 @@ clean:
 
 # Update the Makefile when dependencies have changed.
 #
-cygdepend:
-	$(MAKE) "MINGWHOME=$(MINGWHOME64)" \
-		"PATH=$(MINGWHOME64)/bin:$(PATH)" \
-		"CYGHOME=C:/cygwin64" Q4HOME=c:/Qt/4.5.2\
-                depend
 
 depend: $(GUISOURCES) $(SOURCES) 
 	rm -f Makefile.old
@@ -635,6 +570,16 @@ version.C:
 	echo "extern const char *const version = \"$(TAG)\";" >> version.C
 	echo "extern const char *const version_date = __DATE__;" >> version.C
 
+ChangeLog: version.C
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	cp ChangeLog ChangeLog.old
+	echo `date "+%Y-%m-%d "` \
+	     " Per Abrahamsen  <pa@plen.ku.dk>" > ChangeLog
+	echo >> ChangeLog
+	echo "	* Version" $(TAG) released. >> ChangeLog
+	echo >> ChangeLog
+	cat ChangeLog.old >> ChangeLog
+
 .IGNORE: add
 
 add:
@@ -648,18 +593,15 @@ commit:
 	git commit -a -m make
 	git push origin
 
-done:	update add commit
+done:
+	$(MAKE) update
+	$(MAKE) add
+	$(MAKE) commit
 
 
-docs: 
+docs: portable
 	(cd txt && $(MAKE) PATH="$(SETUPDIR)/bin:$(PATH)" \
-		           DAISYEXE=$(SRCDIR)/$(OBJHOME)/$(DAISYEXE) \
-			   SETUPDIR=$(SETUPDIR) \
-			   DAISYPATH=".;$(SRCDIR)/lib;$(SRCDIR)/sample" docs)
-
-setupdocs: 
-	(cd txt && $(MAKE) PATH="$(SETUPDIR)/bin:$(PATH)" \
-		           DAISYEXE=$(SRCDIR)/$(OBJHOME)/$(DAISYEXE) \
+		           DAISYEXE=$(SRCDIR)/objp/daisy$(EXE) \
 			   SETUPDIR=$(SETUPDIR) \
 			   DAISYPATH=".;$(SRCDIR)/lib;$(SRCDIR)/sample" docs)
 
@@ -668,44 +610,46 @@ setupdocs:
 #	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
 #	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
 
-setupcommon: 
+# Make a build with a new tag.
+windows:
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	rm -f version.C
+	$(MAKE) version.C
+	$(MAKE) ChangeLog
+	$(MAKE) windows-same
+
+# Make a new build with same tag.
+windows-same:
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	$(MAKE) portable
+	$(MAKE) docs
 	rm -rf $(SETUPDIR)
 	mkdir $(SETUPDIR)
 	cp ChangeLog NEWS $(SETUPDIR)
 	mkdir $(SETUPDIR)/bin
 	cp libdeps32/ShowDaisyOutput.exe $(SETUPDIR)/bin
-	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
-	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll $(OBJHOME)/daisy.dll
-	(cd "$(MINGWBIN)"; cp $(MINGWDLL) $(SETUPDIR)/bin)
+	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe objp/daisy.exe
+	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll objp/daisy.dll
+	(cd "$(MINGWBIN)"; cp $(DLL) $(SETUPDIR)/bin)
 	(cd txt && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
 	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
 	(cd OpenMI && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
-	$(MAKENSIS) /V2 /DVERSION=$(TAG) $(NSISFILE)
+	MSYS2_ARG_CONV_EXCL="*" $(MAKENSIS) /V2 /DVERSION=$(TAG) setup-w64.nsi
 
-build:
-#	$(MAKE) make-win32-portable
-	$(MAKE) make-win64-portable
-
-setup:
+release:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	rm -f version.C
-	$(MAKE) version.C
-	cp ChangeLog ChangeLog.old
-	echo `date "+%Y-%m-%d "` \
-	     " Per Abrahamsen  <pa@plen.ku.dk>" > ChangeLog
-	echo >> ChangeLog
-	echo "	* Version" $(TAG) released. >> ChangeLog
-	echo >> ChangeLog
-	cat ChangeLog.old >> ChangeLog
-#	$(MAKE) make-win32-portable
-	$(MAKE) make-win64-portable
-	$(MAKE) docs OBJHOME=win64-portable
-#	make setupcommon MINGWHOME="$(MINGWHOME32)" MINGWDLL="$(MINGWDLL32)" OBJHOME=win32-portable NSISFILE=setup-w32.nsi
-	make setupcommon MINGWHOME="$(MINGWHOME64)" MINGWDLL="$(MINGWDLL64)" OBJHOME=win64-portable NSISFILE=setup-w64.nsi
-#	cp -p daisy-$(TAG)-setup-w32.exe daisy-$(TAG)-setup-w64.exe $(DISTDIR)
-#	(cd txt && $(MAKE) dist DISTDIR="$(DISTDIR)" TAG=$(TAG))
+	$(MAKE) windows
+	$(MAKE) release-tag
+
+release-same:
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	$(MAKE) windows-same
+	$(MAKE) release-tag
+
+release-tag: windows
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	(cd OpenMI && $(MAKE) checkin);
 	(cd lib && $(MAKE) checkin);
 	(cd sample && $(MAKE) checkin);
@@ -718,33 +662,9 @@ setup:
 	git push origin --tags
 	git push
 
-setup2:
-	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-#	make setupcommon MINGWHOME="$(MINGWHOME32)" MINGWDLL="$(MINGWDLL32)" OBJHOME=win32-portable NSISFILE=setup-w32.nsi
-	make setupcommon MINGWHOME="$(MINGWHOME64)" MINGWDLL="$(MINGWDLL64)" OBJHOME=win64-portable NSISFILE=setup-w64.nsi
-#	cp -p daisy-$(TAG)-setup-w32.exe daisy-$(TAG)-setup-w64.exe $(DISTDIR)
-#	(cd txt && $(MAKE) dist DISTDIR="$(DISTDIR)" TAG=$(TAG))
-	(cd OpenMI && $(MAKE) checkin);
-	(cd lib && $(MAKE) checkin);
-	(cd sample && $(MAKE) checkin);
-	(cd txt && $(MAKE) checkin);
-	-git add $(TEXT)
-	-rm -f $(REMOVE) 
-	-git rm -f --ignore-unmatch $(REMOVE) 
-	-git commit -a -m "Version $(TAG)"
-	git tag -a release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
-	git push origin --tags
-	git push
-
-setup3:
-	-git commit -a -m "Version $(TAG)"
-	git tag -a release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
-	git push origin --tags
-	git push
-
 debian-setup: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	$(MAKE) linux
+	$(MAKE) portable
 	rm -rf debian/tmp
 	mkdir debian/tmp
 	mkdir debian/tmp/opt
@@ -755,8 +675,7 @@ debian-setup:
 #	$(MAKE) setupdocs
 #	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
 	mkdir debian/tmp/opt/daisy/bin
-	$(STRIP) -o debian/tmp/opt/daisy/bin/daisy $(OBJHOME)/daisy
-#	$(STRIP) -o debian/tmp/opt/daisy/bin/daisyw $(OBJHOME)/daisyw
+	$(STRIP) -o debian/tmp/opt/daisy/bin/daisy objp/daisy
 	mkdir debian/tmp/DEBIAN
 	dpkg-shlibdeps debian/tmp/opt/daisy/bin/daisy
 	dpkg-gencontrol -USource -UPriority -v$(TAG)
@@ -766,7 +685,7 @@ OSXDEST=osx-pkg/Library/Daisy
 
 macos:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	$(MAKE) linux
+	$(MAKE) portable
 	rm -rf $(OSXDEST)
 	mkdir -p $(OSXDEST)
 	mkdir $(OSXDEST)/bin $(OSXDEST)/doc
@@ -775,7 +694,7 @@ macos:
 	(cd sample && $(MAKE) SETUPDIR=../$(OSXDEST) TAG=$(TAG) setup)
 #	$(MAKE) setupdocs
 #	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
-	$(STRIP) -o $(OSXDEST)/bin/daisy $(OBJHOME)/daisy
+	$(STRIP) -o $(OSXDEST)/bin/daisy objp/daisy
 	rm -rf pkg1
 	mkdir pkg1
 	pkgbuild --root osx-pkg --identifier org.daisy-model.daisy \
