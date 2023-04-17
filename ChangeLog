@@ -2,6 +2,10 @@
 
 	* Version 6.34 released.
 
+	* Makefile (native, portable, windows, windows-same, release)
+	(release-same): (and others) Switch to msys2 as default build
+	environment on Windows.
+
 2023-04-12  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* mathlib.h (M_LN10): Define if undefined.
@@ -9,6 +13,7 @@
 2023-03-31  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_spawn.C: New model.
+	* Makefile (MODELS): Added it.
 
 2023-03-22  Per Abrahamsen  <pa@plen.ku.dk>
 
