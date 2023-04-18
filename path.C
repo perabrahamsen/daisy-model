@@ -196,14 +196,14 @@ Path::open_file (symbol name_s) const
     ~Message ()
     { Assertion::debug (this->str ()); }
   } tmp;
-  tmp << "In directory '" << get_directory () << "':";
+  tmp << "In directory '" << get_output_directory () << "':";
 
   std::unique_ptr<std::istream> in;
 
   // Absolute filename.
   if (name[0] == '.' || name[0] == '/'
 #ifndef __unix__
-      || name[0] == '\\' || name[1] == ':'
+      || name[0] == '\\' || (name.size () > 1 && name[1] == ':')
 #endif
       )
     {
@@ -217,7 +217,7 @@ Path::open_file (symbol name_s) const
   // Look in path.
   for (unsigned int i = 0; i < path.size (); i++)
     {
-      const symbol dir = (path[i] == "." ? current_directory : path[i]);
+      const symbol dir = (path[i] == "." ? input_directory : path[i]);
       const symbol file = dir + DIRECTORY_SEPARATOR + name;
       tmp << "\nTrying '" << file << "'";
       if (path[i] == ".")
@@ -237,6 +237,8 @@ Path::open_file (symbol name_s) const
 bool 
 Path::set_directory (symbol directory_s)
 { 
+  input_directory = directory_s;
+  
   const std::string& directory = directory_s.name ();
   const char *const dir = directory.c_str ();
   const bool result 
@@ -250,10 +252,10 @@ Path::set_directory (symbol directory_s)
 #endif
            )
     // Already absolute.
-    current_directory = directory;
+    output_directory = directory;
   else
     // Make it absolute.
-    current_directory = get_cwd ();
+    output_directory = get_cwd ();
 
   std::ostringstream tmp;
   tmp << "Changing directory to '" << directory << "' " 
@@ -263,10 +265,16 @@ Path::set_directory (symbol directory_s)
   return result;
 }
 
-symbol
-Path::get_directory () const
-{ return current_directory; }
- 
+void
+Path::set_input_directory (symbol directory_s)
+{ 
+  input_directory = directory_s;
+
+  std::ostringstream tmp;
+  tmp << "Interpreting '.' in path as " << input_directory;
+  Assertion::debug (tmp.str ());
+}
+
 void 
 Path::set_path (const std::vector<symbol>& value)
 { 
@@ -290,7 +298,7 @@ Path::set_path (const std::string& colon_path)
 
 Path::InDirectory::InDirectory (Path& p, const symbol to)
   : path (p),
-    from (path.get_directory ()),
+    from (path.get_output_directory ()),
     ok (path.set_directory (to))
 { }
 
@@ -306,10 +314,10 @@ Path::reset ()
 {
   // Find path.
   path = get_daisy_path ();
-  current_directory = get_cwd ();
+  input_directory = output_directory = get_cwd ();
 
   std::ostringstream tmp;
-  tmp << "Reseting current directory to '" << current_directory << "'";
+  tmp << "Reseting current directory to '" << output_directory << "'";
   Assertion::debug (tmp.str ());
 }
 

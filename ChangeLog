@@ -1,3 +1,8 @@
+2023-04-18  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* path.C, path.h (set_input_directory): New function.
+	* program_spawn.C: Use it.
+
 2023-04-17  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.34 released.

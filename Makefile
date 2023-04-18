@@ -1157,7 +1157,7 @@ soil${OBJ}: soil.C soil.h symbol.h horizon.h model_derived.h model_logable.h \
  frame_submodel.h mathlib.h assertion.h librarian.h submodeler.h \
  block_submodel.h block_nested.h block.h treelog.h log.h time.h border.h \
  check.h vcheck.h memutils.h secondary.h zone.h water.h soil_water.h \
- organic.h
+ soil_heat.h organic.h
 soil_water${OBJ}: soil_water.C soil_water.h geometry.h symbol.h attribute.h \
  soil.h soil_heat.h groundwater.h model_derived.h model_logable.h model.h \
  log.h time.h border.h model_framed.h librarian.h block.h scope.h check.h \
@@ -1446,6 +1446,13 @@ plf${OBJ}: plf.C plf.h assertion.h mathlib.h
 mathlib${OBJ}: mathlib.C mathlib.h assertion.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+program_spawn${OBJ}: program_spawn.C program.h model.h symbol.h run.h \
+ block_top.h block.h scope.h attribute.h block_model.h block_nested.h \
+ treelog.h frame_model.h frame.h librarian.h assertion.h metalib.h
+hydraulic_hyprop${OBJ}: hydraulic_hyprop.C hydraulic.h model_framed.h \
+ model_logable.h model.h symbol.h plf.h block_model.h block_nested.h \
+ block.h scope.h attribute.h treelog.h frame_model.h frame.h librarian.h \
+ assertion.h mathlib.h check.h vcheck.h iterative.h
 surface_source${OBJ}: surface_source.C surface_simple.h surface.h \
  model_derived.h model_logable.h model.h symbol.h source.h time.h units.h \
  memutils.h librarian.h block_model.h block_nested.h block.h scope.h \
@@ -2113,7 +2120,7 @@ action_markvand${OBJ}: action_markvand.C action.h model_framed.h \
  scope.h attribute.h treelog.h frame_model.h frame.h daisy.h program.h \
  run.h field.h irrigate.h memutils.h border.h crop.h time.h im.h fao.h \
  log.h mathlib.h assertion.h check.h vcheck.h librarian.h vegetation.h \
- model_derived.h submodeler.h block_submodel.h frame_submodel.h
+ model_derived.h submodeler.h block_submodel.h frame_submodel.h units.h
 photo_GL${OBJ}: photo_GL.C photo.h model_derived.h model_logable.h model.h \
  symbol.h block_model.h block_nested.h block.h scope.h attribute.h \
  treelog.h frame_model.h frame.h canopy_std.h canopy_simple.h plf.h \
