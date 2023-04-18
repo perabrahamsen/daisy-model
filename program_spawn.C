@@ -36,6 +36,7 @@
 #include <vector>
 #include <memory>
 #include <thread>
+#include <fstream>
 
 namespace bp = boost::process;
 
