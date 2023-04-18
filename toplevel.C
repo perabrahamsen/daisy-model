@@ -150,7 +150,7 @@ Toplevel::Implementation::add_daisy_log ()
       boost::shared_ptr<Treelog> daisy_log (new TreelogFile ("daisy.log"));
       msg.add_client (daisy_log);
       msg.message ("Storing 'daisy.log' in '" 
-		   + metalib.path ().get_directory () + "'");
+		   + metalib.path ().get_output_directory () + "'");
     }
 }
 
@@ -516,6 +516,12 @@ Toplevel::command_line (int& argc, char**& argv)
 	{                       // Parse options.
 	  switch (arg[1])
 	    {
+	    case 'D':
+	      {
+		const std::string dir = get_arg (argc, argv);
+		impl->metalib.path ().set_input_directory (dir);
+	      }
+	      break;
 	    case 'd':
 	      if (argc > 1)
 		// Change directory.

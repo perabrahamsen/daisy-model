@@ -89,7 +89,7 @@ struct ProgramHMovie : public Program
   // Use.
   bool run (Treelog& msg)
   {
-    const symbol dir = path.get_directory ();
+    const symbol dir = path.get_output_directory ();
     std::ofstream out (command_file.name ().c_str ());
     if (do_cd)
       out << "cd " << Gnuplot::quote (dir) << "\n";
