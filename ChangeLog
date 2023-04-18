@@ -1,5 +1,9 @@
 2023-04-17  Per Abrahamsen  <pa@plen.ku.dk>
 
+	* Version 6.34-nsis released.
+
+2023-04-17  Per Abrahamsen  <pa@plen.ku.dk>
+
 	* Version 6.34 released.
 
 	* Makefile (native, portable, windows, windows-same, release)

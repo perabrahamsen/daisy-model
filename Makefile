@@ -37,7 +37,7 @@ DAISYEXE = daisy.exe #daisyw.exe
 USE_GUI = none
 CXSPARSELIB = -lcxsparse -lboost_system-mt -lboost_filesystem-mt -lws2_32
 SETUPDIR = /home/xvs108/daisy/install
-MAKENSIS = "c:/Program Files (x86)/NSIS/makensis.exe"
+MAKENSIS = makensis
 MINGWBIN = /ucrt64/bin
 DLL = libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll libboost_filesystem-mt.dll libcxsparse.dll
 endif
