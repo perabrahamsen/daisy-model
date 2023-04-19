@@ -85,6 +85,7 @@ struct ProgramSpawn : public Program
 
 
   // Content.
+  const symbol input_directory;
   const symbol exe;
   const int parallel;
   const std::vector<symbol> program;
@@ -154,7 +155,7 @@ struct ProgramSpawn : public Program
 			  ios,
 			  bp::start_dir = directory_one.name (),
 			  bp::on_exit = *cleaner,
-			  "-D", "..",
+			  "-D", input_directory.name (),
 			  "-q", file_one.name ()));
 	children.push_back (c);
       }
@@ -165,7 +166,7 @@ struct ProgramSpawn : public Program
 			  ios,
 			  bp::start_dir = directory_one.name (),
 			  bp::on_exit = *cleaner,
-			  "-D", "..",
+			  "-D", input_directory.name (),
 			  "-q", file_one.name (),
 			  "-p", program_one.name()));
 	children.push_back (c);
@@ -233,6 +234,7 @@ struct ProgramSpawn : public Program
     
   ProgramSpawn (const BlockModel& al)
     : Program (al),
+      input_directory (al.name ("input_directory")),
       exe (al.name ("exe",  boost::dll::program_location().string ())),
       parallel (al.integer ("parallel", std::thread::hardware_concurrency ())),
       program (al.name_sequence ("program")),
@@ -317,6 +319,9 @@ Spawn a number of programs in parallel.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
+    frame.declare_string ("input_directory", Attribute::Const, "\
+When trying to open files from the current directory look here instead.");
+    frame.set ("input_directory", "..");
     frame.declare_string ("exe", Attribute::OptionalConst,  "\
 Name of executable to spawn. By default, the currently running executable.");
     frame.declare_integer ("parallel", Attribute::OptionalConst, "\

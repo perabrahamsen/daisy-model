@@ -6,6 +6,56 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.35
+
+** New spawn program for running multiple programs in parallel.
+
+This is intended for situations where you need to run many
+simulations, such as scenario analysis or monte-carlo simulations.
+
+- Each subprogram is run in a seperate Daisy process.
+
+This means if one program crashes, it won't stop the others.
+
+- Each subprogram is run in a seperate directory (folder), created by
+  the spawn program. If the directory already exists, the subprogram
+  will be skipped.
+
+This means that you can start the same spawn program on multiple
+computers sharing a network drive, and the computers will
+automatically distribute the work between them (only one computer will
+succesfully create the directory[1] and run the program, the rest will
+skip it).
+
+An 
+
+
+
+
+[1] In theory... some network file systems allows multiple computers
+to create the same directory at the same time, in that case output
+will be garbage.
+
+** New instruction for building from source.
+
+Now uses "msys2" on Windows.
+
+See https://daisy.ku.dk/about-daisy/code/
+
+* 6.34
+
+** The "markvand" irrigation model should work again.
+
+At least for spring crops.
+
+** New "hyprop" hydraulic model.
+
+This uses the parmaters generated from the "hyprop" equipement from METER.
+See https://www.metergroup.com/en/meter-environment/topics/hydrology
+
+It is quites slow though, you will get faster but less accurate
+results by using the generated tables.
+
 * 6.32
 
 ** You can now limit allocation of assimate to roots
