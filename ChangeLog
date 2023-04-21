@@ -1,3 +1,11 @@
+2023-04-21  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.35 released.
+
+2023-04-21  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.35 released.
+
 2023-04-18  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* path.C, path.h (set_input_directory): New function.
