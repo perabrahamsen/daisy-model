@@ -21,7 +21,6 @@
 #define BUILD_DLL
 
 #include "program.h"
-#include "block_top.h"
 #include "block_model.h"
 #include "treelog.h"
 #include "librarian.h"

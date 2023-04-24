@@ -1,6 +1,11 @@
-2023-04-21  Per Abrahamsen  <pa@plen.ku.dk>
+2023-04-24  Per Abrahamsen  <pa@plen.ku.dk>
 
-	* Version 6.35 released.
+	* Makefile (SETUPDIR): Use $(HOME).
+
+2023-04-23  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* program_nwaps.C: New model.
+	* Makefile (MODELS): Add it.
 
 2023-04-21  Per Abrahamsen  <pa@plen.ku.dk>
 

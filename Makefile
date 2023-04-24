@@ -36,7 +36,7 @@ SRCDIR = c:/msys64$(HOME)/daisy
 DAISYEXE = daisy.exe #daisyw.exe
 USE_GUI = none
 CXSPARSELIB = -lcxsparse -lboost_system-mt -lboost_filesystem-mt -lws2_32
-SETUPDIR = /home/xvs108/daisy/install
+SETUPDIR = $(HOME)/daisy/install
 MAKENSIS = makensis
 MINGWBIN = /ucrt64/bin
 DLL = libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll libboost_filesystem-mt.dll libcxsparse.dll
@@ -176,7 +176,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 LATER = tertiary_instant.C  
-MODELS = program_spawn.C \
+MODELS = program_nwaps.C program_spawn.C \
 	hydraulic_hyprop.C surface_source.C surface_std.C select_quiver.C \
 	hydraulic_M_BivG.C hydraulic_M_vGBS.C hydraulic_hypWeb.C \
 	reaction_dom.C litter_mulch.C hydraulic_linear.C hydraulic_table.C \
@@ -648,7 +648,7 @@ release-same:
 	$(MAKE) windows-same
 	$(MAKE) release-tag
 
-release-tag: windows
+release-tag:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	(cd OpenMI && $(MAKE) checkin);
 	(cd lib && $(MAKE) checkin);

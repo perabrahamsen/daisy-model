@@ -448,7 +448,9 @@ ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& msg)
     = daisy.field ().crop_dm (Vegetation::all_crops (), 0.1) > 0.0; 
   if (T_sum < 0.0)
     {
-      if (has_crop)
+      if (has_crop
+	  && daisy.time ().month () >= 3
+	  && daisy.time ().month () < 8)
         {
 	  const MV_Crop *const crop = get_crop (daisy);
           T_sum = 0.0;
