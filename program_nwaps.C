@@ -26,8 +26,11 @@
 #include "librarian.h"
 #include "symbol.h"
 #include "assertion.h"
+#include "lexer_data.h"
+#include "mathlib.h"
 
 #include <filesystem>
+#include <fstream>
 
 struct ProgramNwaps : public Program
 {
@@ -45,6 +48,9 @@ struct ProgramNwaps : public Program
   const symbol success_file;
   const symbol failure_file;
 
+  // Running.
+  bool first;
+  
   bool split (const std::string& file, const std::string& sep,
 	      std::vector<std::string>&  result)
   {
@@ -63,7 +69,41 @@ struct ProgramNwaps : public Program
       }
     return false;
   }
-  
+
+  std::string get_entry (LexerData& lex)
+  {
+    std::string result;
+    while (lex.peek () != '\t' && lex.peek () != '\n')
+      result += int2char (lex.get ());
+    return result;
+  }
+  void get_entries (LexerData& lex, std::vector<std::string>& entries)
+  {
+    while (lex.good ())
+      {
+	entries.push_back (get_entry (lex));
+	if (lex.peek () == '\n')
+	  break;
+	lex.skip ("\t");
+      }
+    lex.skip ("\n");
+  }
+
+  void put_entry (std::ostream& out, const std::string s)
+  {
+    if (first)
+      first = false;
+    else
+      out << ",";
+    out << s;
+  }
+
+  void put_line (std::ostream& out)
+  {
+    out << "\n";
+    first = true;
+  }
+
   // Use.
   bool run (Treelog& msg)
   {
@@ -150,15 +190,82 @@ struct ProgramNwaps : public Program
       }
 
     for (auto f: file)
-      for (auto d: directory)
-	{
-	  const std::string name
-	    = parent_directory + "/" + d + "/" + f + input_suffix;
-	  msg.message ("Reading " + name);
-	}
-	  
+      {
+	bool first_line = true;
+	const std::string out_name = output_prefix + f + output_suffix;
+	std::ofstream out (out_name);
 
+	if (!out.good ())
+	  {
+	    msg.error ("Write failure for '" + out_name + "', skipping");
+	    continue;
+	  }
+	for (auto d: directory)
+	  {
+	    std::vector<std::string> scn;
+	    (void) split (d.name (), scn_sep.name (), scn);
+	    const std::string name
+	      = parent_directory + "/" + d + "/" + f + input_suffix;
+	    msg.message ("Reading " + name);
+	    std::ifstream in (name.c_str ());
+	    if (!in.good ())
+	      {
+		msg.warning ("Problems opening " + name + ", skipping");
+		continue;
+	      }
+	    LexerData lex (f + input_suffix, in, msg);
+	    // Skip header.
+	    while (lex.good () && lex.peek () != '-')
+	      {
+		lex.skip_line ();
+		lex.skip ("\n");
+	      }
+	    lex.skip_hyphens ();
 
+	    // Read tags.
+	    std::vector<std::string> tags;
+	    get_entries (lex, tags);
+
+	    // Read dims.
+	    std::vector<std::string> dims;
+	    get_entries (lex, dims);
+
+	    if (tags.size () != dims.size ())
+	      {
+		msg.warning ("Mismatched tag and unit lines");
+		continue;
+	      }
+
+	    // Tag line
+	    if (first_line)
+	      {
+		first_line = false;
+		
+		for (auto s: scenario)
+		  put_entry (out, s.name ());
+	    
+		for (int i = 0; i < dims.size (); i++)
+		  if (dims[i].length () > 0)
+		    put_entry (out, tags[i] + " [" + dims[i] + "]");
+		  else
+		    put_entry (out, tags[i]);
+		put_line (out);
+	      }
+
+	    // Data.
+	    while (lex.good ())
+	      {
+		std::vector<std::string> data;
+		get_entries (lex, data);
+		for (auto s: scn)
+		  put_entry (out, s);
+		for (auto d: data)
+		  put_entry (out, d);
+		put_line (out);
+	      }
+	    lex.eof ();
+	  }
+      }
     return true;
   }
 
