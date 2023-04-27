@@ -31,6 +31,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <numeric>
 
 struct ProgramNwaps : public Program
 {
@@ -47,7 +48,9 @@ struct ProgramNwaps : public Program
   const symbol summary_prefix;
   const symbol success_file;
   const symbol failure_file;
-
+  const std::vector<symbol> missing;
+  const std::vector<double> fractiles;
+  
   // Running.
   bool first;
   
@@ -104,9 +107,86 @@ struct ProgramNwaps : public Program
     first = true;
   }
 
+  static double count (const std::vector<double>& v)
+  { return v.size (); }
+
+  static double average (const std::vector<double>& v)
+  {
+    if (v.size () < 1)
+      return NAN;
+
+    const double N = count (v);
+    const double sum = std::accumulate (v.begin (), v.end (), 0.0);
+    const double avg = sum / N;
+    return avg;
+  }
+
+  static double stdev (const std::vector<double>& v)
+  {
+    if (v.size () < 2)
+      return 0.0;
+
+    const double N = count (v);
+    const double avg = average (v);
+    const double sqrdiff = std::accumulate (v.begin (), v.end (), 0.0,
+					    [avg](double old, double val)
+					    { return old + sqr (val-avg); });
+    const double sd = std::sqrt (sqrdiff / (N - 1.0));
+    return sd;
+  }
+
+  static double sterr (const std::vector<double>& v)
+  {
+    if (v.size () < 2)
+      return 0.0;
+    const double N = count (v);
+    const double sd = stdev (v);
+    const double se = sd / std::sqrt (N);
+    return se;
+  }
+
+  typedef double (*sum_fun_t) (const std::vector<double>&);
+  void summary_line (std::ostream& sum,
+		     const std::string& what,
+		     const std::vector<std::string>& scn,
+		     const std::vector<std::vector<double>>& table,
+		     sum_fun_t fun) const
+  {
+    sum << what;
+    for (auto s: scn)
+      sum << "," << s;
+    for (auto d: table)
+      sum << "," << fun (d);
+    sum << "\n";
+  }
+  void fractile_line (std::ostream& sum,
+		      const double fractile,
+		      const std::vector<std::string>& scn,
+		      const std::vector<std::vector<double>>& table) const
+  {
+    sum << fractile * 100 << "%";
+    for (auto s: scn)
+      sum << "," << s;
+    for (auto d: table)
+      {
+	double val = NAN;
+	if (d.size () > 0)
+	  {	  
+	    std::sort (d.begin (), d.end ());
+	    const int index = 0.5 + fractile * (d.size () - 1);
+	    daisy_assert (index >= 0);
+	    daisy_assert (index < d.size ());
+	    val = d[index];
+	  }
+	sum << "," << val;
+      }
+    sum << "\n";
+  }
+
   // Use.
   bool run (Treelog& msg)
   {
+    TREELOG_MODEL (msg);
     // Fill directory.
     if (directory.size () == 0)
       {
@@ -191,22 +271,32 @@ struct ProgramNwaps : public Program
 
     for (auto f: file)
       {
-	bool first_line = true;
+	Treelog::Open nest (msg, f);
+	msg.message ("Collecting...");
 	const std::string out_name = output_prefix + f + output_suffix;
 	std::ofstream out (out_name);
-
 	if (!out.good ())
 	  {
 	    msg.error ("Write failure for '" + out_name + "', skipping");
 	    continue;
 	  }
+
+	const std::string sum_name = summary_prefix + f + output_suffix;
+	std::ofstream sum (sum_name);
+	if (!sum.good ())
+	  {
+	    msg.error ("Write failure for '" + sum_name + "', skipping");
+	    continue;
+	  }
+
+	bool first_line = true;
 	for (auto d: directory)
 	  {
+	    Treelog::Open nest (msg, d);
 	    std::vector<std::string> scn;
 	    (void) split (d.name (), scn_sep.name (), scn);
 	    const std::string name
 	      = parent_directory + "/" + d + "/" + f + input_suffix;
-	    msg.message ("Reading " + name);
 	    std::ifstream in (name.c_str ());
 	    if (!in.good ())
 	      {
@@ -232,23 +322,29 @@ struct ProgramNwaps : public Program
 
 	    if (tags.size () != dims.size ())
 	      {
-		msg.warning ("Mismatched tag and unit lines");
+		lex.warning ("Mismatched tag and unit lines");
 		continue;
 	      }
+
+	    std::vector<std::string> cols;
+	    for (int i = 0; i < dims.size (); i++)
+	      if (dims[i].length () > 0)
+		cols.push_back (tags[i] + " [" + dims[i] + "]");
+	      else
+		cols.push_back (tags[i]);
+	      
+	    
+	    std::vector<std::vector<double>> table (tags.size ());
 
 	    // Tag line
 	    if (first_line)
 	      {
-		first_line = false;
-		
 		for (auto s: scenario)
 		  put_entry (out, s.name ());
 	    
-		for (int i = 0; i < dims.size (); i++)
-		  if (dims[i].length () > 0)
-		    put_entry (out, tags[i] + " [" + dims[i] + "]");
-		  else
-		    put_entry (out, tags[i]);
+		for (auto c: cols)
+		  put_entry (out, c);
+
 		put_line (out);
 	      }
 
@@ -256,14 +352,57 @@ struct ProgramNwaps : public Program
 	    while (lex.good ())
 	      {
 		std::vector<std::string> data;
+		std::vector<double> numbers;
 		get_entries (lex, data);
 		for (auto s: scn)
 		  put_entry (out, s);
 		for (auto d: data)
-		  put_entry (out, d);
+		  {
+		    put_entry (out, d);
+
+		    double val = NAN;
+		    if (std::find (missing.begin (), missing.end (), d)
+			== missing.end ())
+		      {
+			char end;
+			std::istringstream in (d);
+			
+			in >> val >> end;
+			if (!in.eof ())
+			  val = NAN;
+		      }
+		    numbers.push_back (val);
+		  }
 		put_line (out);
+
+		if (table.size () != numbers.size ())
+		  lex.warning ("Mismatched tags and data lines");
+		else for (int i = 0; i < tags.size (); i++)
+		       if (std::isfinite (numbers[i]))
+			 table[i].push_back (numbers[i]);
 	      }
 	    lex.eof ();
+
+	    // Make summaries.
+	    if (first_line)
+	      {
+		first_line = false;
+
+		sum << "What";
+		for (auto s: scenario)
+		  sum << "," << s;
+		for (auto c: cols)
+		  sum << "," << c;
+		sum << "\n";
+	      }
+
+	    // Count.
+	    summary_line (sum, "N", scn, table, count);
+	    summary_line (sum, "Average", scn, table, average);
+	    summary_line (sum, "STDEV", scn, table, stdev);
+	    summary_line (sum, "STERR", scn, table, sterr);
+	    for (auto f: fractiles)
+	      fractile_line (sum, f, scn, table);
 	  }
       }
     return true;
@@ -288,7 +427,9 @@ struct ProgramNwaps : public Program
       output_suffix (al.name ("output_suffix")),
       summary_prefix (al.name ("summary_prefix")),
       success_file (al.name ("success_file")),
-      failure_file (al.name ("failure_file"))
+      failure_file (al.name ("failure_file")),
+      missing (al.name_sequence ("missing")),
+      fractiles (al.number_sequence ("fractiles"))
   { }
   ~ProgramNwaps ()
   {  }
@@ -300,7 +441,7 @@ static struct ProgramNwapsSyntax : public DeclareModel
   { return new ProgramNwaps (al); }
   ProgramNwapsSyntax ()
     : DeclareModel (Program::component, "nwaps", "\
-Nwaps collect results from multiple directories.")
+Nwaps collects results from multiple directories.")
   { }
 
   static bool check_alist (const Metalib& metalib, const Frame& al,
@@ -350,6 +491,14 @@ Only combine directories containing this file.");
     frame.declare_string ("failure_file", Attribute::Const, "\
 Don't combine directories containing this file.");
     frame.set ("failure_file", "FAILURE");
+    frame.declare_string ("missing", Attribute::Const, Attribute::Variable, "\
+List of strings indicating missing values.");
+    frame.set_strings ("missing", "", "00.00");
+    frame.declare_fraction ("fractiles",
+			    Attribute::Const, Attribute::Variable, "\
+Fractiles to include in summary.");
+    const std::vector<double> fractiles {0.0, 0.1, 0.5, 0.9, 1.0};
+    frame.set ("fractiles", fractiles);
   }
 } ProgramNwaps_syntax;
 

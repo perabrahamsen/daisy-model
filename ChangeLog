@@ -1,3 +1,7 @@
+2023-04-26  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* program_nwaps.C (stdev, stderr): New summary lines.
+
 2023-04-24  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Makefile (SETUPDIR): Use $(HOME).

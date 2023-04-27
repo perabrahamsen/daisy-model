@@ -9,7 +9,7 @@
 (input file "markvand.dai")
 (input file "dk-horizon.dai")
 (input file "management.dai")
-
+(input file "output.dai")
 (input file "hydraulic-table.dai")
 ;;(input file "hydraulic.dai")
 (input file "soil.dai")
@@ -19,7 +19,7 @@
   (time 2998 1 1)
   (activate_output (after 3000 1 1))
   (stop 3100 1 1)
-  (output harvest
+  (output Yield "Water usage 4-7" "Water usage 5-7"
 	  ("Field water" (when yearly))
 	  ("Field nitrogen" (when yearly))
 	  harvest
@@ -200,8 +200,14 @@
 	   WETWARM-BIO100-WW
 	   ))
 
-(run nwaps
-     (scenario Climate Soil Crop))
+(defprogram both batch
+  (run all
+       (nwaps (scenario Climate Soil Crop))))
+
+;;(run PRESENT-CONTROL-SB)
+;;;(run both)
+
+(run (nwaps (scenario Climate Soil Crop)))
 
 ;;; setup.dai ends here.
 

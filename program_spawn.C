@@ -132,6 +132,7 @@ struct ProgramSpawn : public Program
     daisy_assert (directory.size () == 0 || directory.size () > index);
     const symbol directory_one
       = (directory.size () == 0) ? program_one : directory[index];
+    Treelog::Open nest (msg, directory_one);
 
     index++;
     if (!boost::filesystem::create_directory (directory_one.name ()))
@@ -177,6 +178,7 @@ struct ProgramSpawn : public Program
   // Use.
   bool run (Treelog& msg)
   {
+    TREELOG_MODEL (msg);
     if (file.size () == 0)
       {
 	msg.warning ("No setup file");

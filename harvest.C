@@ -162,7 +162,7 @@ Harvest::Harvest (const Block& alist)
     water_stress_days (alist.number ("water_stress_days")),
     nitrogen_stress_days (alist.number ("nitrogen_stress_days")),
     water_productivity (alist.number ("water_productivity")),
-    harvest_index (alist.number ("water_productivity"))
+    harvest_index (alist.number ("harvest_index"))
 { }
   
 
