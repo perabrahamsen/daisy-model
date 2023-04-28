@@ -20,6 +20,9 @@
 (defhorizon SB3_SB15 CONTROL
   (hydraulic SB3_SB15))
 
+(defhorizon SB1_5_SB15 CONTROL
+  (hydraulic SB_3_SB15))
+
 (defcolumn CONTROL default
   (Soil (horizons (-30 [cm] Ap)
 		  (-200 [cm] CONTROL))
@@ -53,6 +56,12 @@
 (defcolumn BIO100 CONTROL
   (Soil (horizons (-30 [cm] Ap)
 		  (-100 [cm] SB3_SB15)
+		  (-200 [cm] CONTROL))
+	(MaxRootingDepth 100 [cm])))
+
+(defcolumn LESS CONTROL
+  (Soil (horizons (-30 [cm] Ap)
+		  (-100 [cm] SB1_5_SB15)
 		  (-200 [cm] CONTROL))
 	(MaxRootingDepth 100 [cm])))
 

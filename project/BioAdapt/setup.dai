@@ -22,10 +22,9 @@
   (output Yield "Water usage 4-7" "Water usage 5-7"
 	  ("Field water" (when yearly))
 	  ("Field nitrogen" (when yearly))
+	  ("Soil nitrogen" (when yearly) (to -1 [m]))
 	  harvest
 	  ("Carbon Balance" (when yearly))))
-
-(defcolumn LESS BIO100)
 
 (defprogram PRESENT-CONTROL-SB common
   "Scenario PRESENT-CONTROL-SB"
