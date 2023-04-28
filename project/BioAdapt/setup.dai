@@ -204,9 +204,9 @@
        (nwaps (scenario Climate Soil Crop))))
 
 ;;(run PRESENT-CONTROL-SB)
-;;;(run both)
+(run both)
 
-(run (nwaps (scenario Climate Soil Crop)))
+;;(run (nwaps (scenario Climate Soil Crop)))
 
 ;;; setup.dai ends here.
 

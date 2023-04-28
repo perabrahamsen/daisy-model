@@ -29,13 +29,13 @@ def read_file (tag, fil, entries, result):
     for e in entries:
         result[tag + " " + e + " AVG"] = table[(table["What"]=="Average")][e]
         result[tag + " " + e + " SD"] = table[(table["What"]=="STDEV")][e]
-        result[tag + " " + e + " SE"] = table[(table["What"]=="STERR")][e]
+#        result[tag + " " + e + " SE"] = table[(table["What"]=="STERR")][e]
         
 sum = pd.DataFrame ()
 read_file ("Yield", "sum_yield.csv",
            ["DM [Mg/ha]", "N [kg/ha]"], sum);
-read_file ("Nitrogen", "sum_field_nitrogen.csv",
-           ["Matrix-Leaching [kg N/ha]"], sum);
+read_file ("Nitrogen", "sum_soil_nitrogen.csv",
+           ["NO3-Leak-Matrix [kg N/ha]"], sum);
 read_file ("Water 4-7", "sum_water_usage_4-7.csv", ["ETa [mm]"], sum);
 read_file ("Water 5-7", "sum_water_usage_5-7.csv", ["ETa [mm]"], sum);
 

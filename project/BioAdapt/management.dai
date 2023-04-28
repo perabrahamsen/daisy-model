@@ -27,9 +27,7 @@
   (wait (or (crop_ds_after "SB" 2.0 []) (mm_dd 10 1)))
     (harvest "SB"  (stub 8 [cm]) (stem 70 [%]) (leaf 70 [%]))
   (wait_days 4)
-    (sow "CC")
-  (wait (after_mm_dd 11 1))
-    (plowing))
+    (sow "CC"))
 
 (defaction IrrigateJB1 markvand 
   (soil JB1)
