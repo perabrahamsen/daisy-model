@@ -19,10 +19,10 @@
     (harvest "WW" (stub 8 [cm]) (stem 70 [%]) (leaf 70 [%])))
 
 (defaction "SB1" activity
-  (wait_mm_dd 3 05)
+  (wait_mm_dd 3 12)
     (fertilize (N25S (weight 120 [kg N/ha])))
     (plowing)
-  (wait_mm_dd 4 15) 
+  (wait_mm_dd 3 15) 
     (seed_bed_preparation) (sow "SB" (seed 180 [kg w.w./ha]))
   (wait (or (crop_ds_after "SB" 2.0 []) (mm_dd 10 1)))
     (harvest "SB"  (stub 8 [cm]) (stem 70 [%]) (leaf 70 [%]))
