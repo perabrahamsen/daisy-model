@@ -1446,9 +1446,13 @@ plf${OBJ}: plf.C plf.h assertion.h mathlib.h
 mathlib${OBJ}: mathlib.C mathlib.h assertion.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+program_nwaps${OBJ}: program_nwaps.C program.h model.h symbol.h run.h \
+ block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
+ frame_model.h frame.h librarian.h assertion.h lexer_data.h lexer.h \
+ filepos.h mathlib.h
 program_spawn${OBJ}: program_spawn.C program.h model.h symbol.h run.h \
- block_top.h block.h scope.h attribute.h block_model.h block_nested.h \
- treelog.h frame_model.h frame.h librarian.h assertion.h metalib.h
+ block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
+ frame_model.h frame.h librarian.h assertion.h metalib.h
 hydraulic_hyprop${OBJ}: hydraulic_hyprop.C hydraulic.h model_framed.h \
  model_logable.h model.h symbol.h plf.h block_model.h block_nested.h \
  block.h scope.h attribute.h treelog.h frame_model.h frame.h librarian.h \
