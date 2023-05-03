@@ -6,6 +6,23 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.36
+
+** New nwaps program for collecting spawn program results.
+
+The nwaps program will collect dlf files with the same name in
+different subdirectories, and generate csv files with the result
+concatenated, and the subdirectory name prepended each line. Compared
+to the dlf files, the combined file will have "out_" prepended, no
+header, and the tags and unit lines combined.  The resulting csv files
+can easily be imported in e.g. Excel, R, or Python.
+
+The nwaps program is intended to be used with the output of the spawn
+program.
+
+Apart from the "out_" files, some simple statistics for each dlf files
+will bu summaries on "sum_" csv files.
+
 * 6.35
 
 ** New spawn program for running multiple programs in parallel.

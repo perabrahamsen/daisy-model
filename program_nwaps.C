@@ -196,7 +196,8 @@ struct ProgramNwaps : public Program
 	    if (!entry.is_directory ())
 	      continue;
 
-	    const std::string file = entry.path ().filename ();
+	    // const std::string file = entry.path ().filename ();
+	    const std::string file = entry.path ().filename ().string ();
 
 	    if (scenario.size () > 1)
 	      {
@@ -209,14 +210,14 @@ struct ProgramNwaps : public Program
 		  }
 	      }
 	    const std::string failure
-	      = entry.path () + "/" + failure_file.name ();
+	      = entry.path ().string () + "/" + failure_file.name ();
 	    if (std::filesystem::exists (failure))
 	      {
 		msg.message ("Ignored, '" + file + "' failed spawn");
 		continue;
 	      }
 	    const std::string success
-	      = entry.path () + "/" + success_file.name ();
+	      = entry.path ().string () + "/" + success_file.name ();
 	    if (!std::filesystem::exists (success))
 	      {
 		msg.message ("Ignored, '" + file + "' not a spawn success");
@@ -242,7 +243,7 @@ struct ProgramNwaps : public Program
 
 	for (auto& entry : std::filesystem::directory_iterator (dir))
 	  {
-	    const std::string name = entry.path ().filename ();
+	    const std::string name = entry.path ().filename ().string ();
 	    if (!entry.is_regular_file ())
 	      {
 		msg.message ("Ignoring " + name);
