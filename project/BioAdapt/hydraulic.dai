@@ -39,4 +39,17 @@
   (omega 1E-9 [])
   (a -1.5 []))
 
+(defhydraulic SB1_5_SB15 hyprop
+  "B horizon with 1.5 % 15 um particles added."
+  (w 0.535 0.465 [])
+  (alpha 0.027 0.0225 [cm^-1])
+  (n 6.629 1.771 [])
+  (Theta_res 0.054 [])
+  (Theta_sat  0.323 [])
+  (h0 6.8 [pF])
+  (K_sat 305.1 [cm/d])
+  (tau -0.145 [])
+  (omega 0.0000653 [])
+  (a -1.5 []))
+
 ;;; hydraulic.dai ends here
