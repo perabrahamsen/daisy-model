@@ -1,5 +1,9 @@
 2023-06-15  Per Abrahamsen  <pa@plen.ku.dk>
 
+	* Version 6.37 released.
+
+2023-06-15  Per Abrahamsen  <pa@plen.ku.dk>
+
 	* hydraulic_hyprop.C (Cw2): Fix sign.
 
 2023-05-28  Per Abrahamsen  <pa@plen.ku.dk>
