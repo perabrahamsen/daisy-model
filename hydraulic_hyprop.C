@@ -257,6 +257,9 @@ class HydraulicHyprop : public Hydraulic
   }
   double Cw2 (const double h) const
   {
+    if (h >= 0.0)
+      return 0;
+    
     const double x = h2pF (h);
 
     // Eq 42.
@@ -277,7 +280,7 @@ class HydraulicHyprop : public Hydraulic
 
     // Eq 38.
     const double dS_ad_dh
-      = (1.0 / (-h * M_LN10 * (xa - x0)))
+      = (1.0 / (h * M_LN10 * (xa - x0)))
       * (1.0 - (std::exp ((xa - x) / b)
 		/ (1.0 + std::exp ((xa - x) / b))));
 
@@ -334,7 +337,7 @@ class HydraulicHyprop : public Hydraulic
     std::ostringstream tmp;
     tmp << "Gamma0 = " << Gamma0 * 100.0 << " % rel, "
 	<< Gamma0 * (Theta_sat - Theta_res) * 100.0 << " % abs"
-	<< "\nha = " << ha << " << cm";
+	<< "\nha = " << ha << " cm";
     msg.debug (tmp.str ());
   }
 public:

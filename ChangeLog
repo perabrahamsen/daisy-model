@@ -1,3 +1,11 @@
+2023-06-15  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* hydraulic_hyprop.C (Cw2): Fix sign.
+
+2023-05-28  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* program_nwaps.C: Removed unused parameter 'combine_units'.
+
 2023-05-03  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.36 released.

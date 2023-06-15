@@ -41,7 +41,6 @@ struct ProgramNwaps : public Program
   std::vector<symbol> file;
   const std::vector<symbol> scenario;
   const symbol scn_sep;
-  const bool combine_units;
   const symbol input_suffix;
   const symbol output_prefix;
   const symbol output_suffix;
@@ -422,7 +421,6 @@ struct ProgramNwaps : public Program
       file (al.name_sequence ("file")),
       scenario (al.name_sequence ("scenario")),
       scn_sep (al.name ("scn_sep")),
-      combine_units (al.flag ("combine_units")),
       input_suffix (al.name ("input_suffix")),
       output_prefix (al.name ("output_prefix")),
       output_suffix (al.name ("output_suffix")),
@@ -471,9 +469,6 @@ Names of scenarios.");
     frame.declare_string ("scn_sep", Attribute::Const, "\
 String seperating scenarios in directory names.");
     frame.set ("scn_sep", "-");
-    frame.declare_boolean ("combine_units", Attribute::Const, "\
-Combine name and unit rows in Daisy log files.");
-    frame.set ("combine_units", true);
     frame.declare_string ("input_suffix", Attribute::Const, "\
 Look for files with this suffix.");
     frame.set ("input_suffix", ".dlf");
