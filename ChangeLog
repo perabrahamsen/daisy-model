@@ -1,5 +1,9 @@
 2023-06-15  Per Abrahamsen  <pa@plen.ku.dk>
 
+	* Version 6.38 released.
+
+2023-06-15  Per Abrahamsen  <pa@plen.ku.dk>
+
 	* hydraulic_hyprop.C (K_vap): Fix edge case near saturation.
 
 	* Version 6.37 released.
