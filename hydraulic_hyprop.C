@@ -201,7 +201,7 @@ class HydraulicHyprop : public Hydraulic
     // so we multiply with 0.01
     const double H_r = std::exp (0.01 * h * M * g / (R * T));
     // [] = exp ([]) = exp ([m] [kg/mol] * [m/s^2] / ([J/mol/K] [K]))
-    daisy_assert (H_r < 1);
+    daisy_assert (H_r <= 1);
 
     // Eq 34. Saturated vapor density [kg/m^3]
     const double rho_sv
