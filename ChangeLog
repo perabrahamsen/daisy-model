@@ -1,5 +1,9 @@
 2023-06-16  Per Abrahamsen  <pa@plen.ku.dk>
 
+	* Version 6.39 released.
+
+2023-06-16  Per Abrahamsen  <pa@plen.ku.dk>
+
 	* hydraulic.C (K_to_M): Avoid calling K, call K20.
 
 2023-06-15  Per Abrahamsen  <pa@plen.ku.dk>
