@@ -134,7 +134,7 @@ Hydraulic::K_to_M (PLF& plf, const int intervals) const
 	      tmp << "h = " << h << ", step = " << step 
 		     << " and h + step = " << (h + step) << "\n";
 	      tmp << "K (h) = " << KT20 (h) << ", K (h + step) = "
-		     << K (h + step) << " and K (0) = " << Ksat << "\n";
+		     << KT20 (h + step) << " and K (0) = " << Ksat << "\n";
 	      tmp << "Change = " << KT20 (h + step) / KT20 (h) 
 		     << " > Max = " << max_change;
 	      Assertion::debug (tmp.str ());

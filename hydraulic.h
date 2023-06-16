@@ -75,7 +75,7 @@ public:
   virtual double M (double h) const = 0;
 private:
   virtual double K (double h) const;
-
+  
   // Simulation.
 public:
   virtual void output (Log&) const;
