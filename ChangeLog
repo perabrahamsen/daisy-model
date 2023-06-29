@@ -1,5 +1,9 @@
 2023-06-29  Per Abrahamsen  <pa@plen.ku.dk>
 
+	* Version 6.40 released.
+
+2023-06-29  Per Abrahamsen  <pa@plen.ku.dk>
+
 	* plf.C, plf.h (integrate_stupidly_2): Slightly less stupid integration.
 	* hydraulic_table.C: Use it.
 
