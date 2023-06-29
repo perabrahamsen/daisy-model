@@ -1,69 +1,6 @@
 -TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Daisy lunch meeting
-
-** spawn/nwaps præsentation
-
-*** The world according to Daisy (WxSxGxM) -> O
-
-*** Field experiment
-
-Single experiment
-
-W1, S1, G1, M1 -> O1
-
-"On this field, in this year, with this management, we got this output"
-
-Field 1
-Year 1 W1 S1 G1 M1 -> O1 
-Year 1 W1 S1 G1 M2 -> O2
-Year 2 W2 S1 G1 M1 -> O3
-Year 2 W2 S1 G1 M2 -> O4
-
-Field 2
-Year 1 W3 S2 G2 M1 -> O5
-Year 1 W3 S2 G2 M2 -> O6
-Year 2 W4 S2 G3 M1 -> O7
-Year 2 W4 S2 G3 M2 -> O8
-
-"Output depends on W, S, G, M, but we can't really say how".
-
-
-
-
-
-
-
-
-
-W2, (SG)2, M5 -> O20
-
-All the factors matter
-
-W4, (SG)3, M5 -> O60
-
-All the factors matter
-
-W40, (SG)100, M20 -> O20000
-
-Statistical models R^2 = 0.02
-
-(all the factors matter)
-
-"On this field, in this year, with this management, we got this output"
-
-
-
-
-
-
-* BioAdapt
-
-** Læs WP5
-
-** Præsenter status
-
-* daisy.bib inkluder MES entries
+* Ny version med hyprop til Simon
 
 * GMSR
 
@@ -82,7 +19,7 @@ Statistical models R^2 = 0.02
 Theta_w (h) and Theta_d (h)
 
 *** The two curves must have identical endpoints:
-
+gr
 Theta_w (0) = Theta_d (0) = Theta_sat
 
 Theta_w (-inf) = Theta_h (-inf) = Theta_res

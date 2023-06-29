@@ -234,6 +234,9 @@ class HydraulicHyprop : public Hydraulic
   // Interface.
   double Theta (const double h) const // Eq 1.
   {
+    if (h >= 0.0)
+      return Theta_sat;
+
     const double result 	// Eq 1.
       = (Theta_sat - Theta_res) * S_cap (h) + Theta_res * S_ad (h);
     daisy_assert (result >= 0.0);
@@ -243,6 +246,9 @@ class HydraulicHyprop : public Hydraulic
 
   double KT (const double h, const double T) const
   {
+    if (h >= 0.0)
+      return K_sat;
+    
     static const symbol only_s = "only";
     if (vapor_conductivity == only_s)
       return K_vap (h, T);
@@ -294,6 +300,9 @@ class HydraulicHyprop : public Hydraulic
 
   double h (const double Theta_in) const
   {
+    if (Theta_in >= Theta_sat)
+      return 0.0;
+    
     // Bisection.
 
     const double h_fc = -100;	// [cm]

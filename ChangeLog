@@ -1,3 +1,12 @@
+2023-06-29  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* plf.C, plf.h (integrate_stupidly_2): Slightly less stupid integration.
+	* hydraulic_table.C: Use it.
+
+2023-06-28  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* hydraulic_hyprop.C (Theta, KT, h): Handle h=0, Theta=Theta_sat case.
+
 2023-06-16  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.39 released.
