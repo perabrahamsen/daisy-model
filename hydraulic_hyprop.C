@@ -183,6 +183,9 @@ class HydraulicHyprop : public Hydraulic
 
     // Volumetric air content []
     const double Theta_a = Theta_sat - Theta (h);
+
+    if (Theta_a <= 0.0)
+      return 0.0;
     
     // Universal gas constant [J/mol/K]
     const double R = 8.314;
@@ -224,7 +227,23 @@ class HydraulicHyprop : public Hydraulic
     // Eq 30.
     const double result = (rho_sv / rho_w) * D * (M * g) / (R * T) * H_r;
     // [m/s] = [m^2/s] * [kg/mol] * [m/s^2] / ([J/mol/K] K) 
-    daisy_assert (result >= 0.0);
+
+    if (!(result >= 0.0))
+      {
+	std::ostringstream tmp;
+	tmp << "h = " << h
+	    << "\nT_dgC = " << T_dgC
+	    << "\nT = " << T
+	    << "\nTheta_a = " << Theta_a
+	    << "\nH_r = " << H_r
+	    << "\nrho_sv = " << rho_sv
+	    << "\nD_a = " << D_a
+	    << "\nxi = " << xi
+	    << "\nD = " << D
+	    << "\nresult = " << result;
+	Assertion::warning (tmp.str ());
+	return 0.0;
+      }
 
     const double m_per_s_to_cm_h = 360000.0;
     return result * m_per_s_to_cm_h;
