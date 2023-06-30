@@ -1,5 +1,9 @@
 2023-06-30  Per Abrahamsen  <pa@plen.ku.dk>
 
+	* Version 6.41 released.
+
+2023-06-30  Per Abrahamsen  <pa@plen.ku.dk>
+
 	* hydraulic_hyprop.C (K_vap): Handle numerical noise near saturation.
 
 2023-06-29  Per Abrahamsen  <pa@plen.ku.dk>
