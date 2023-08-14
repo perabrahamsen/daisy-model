@@ -1,10 +1,48 @@
 -TODO ---things that needs to be done with Daisy -*- outline -*-
 
+* phishes
+
+** tasks
+
+** Daisy setup for PL case N/Pest
+
+*** Inputs
+
+**** Select subset
+
+**** Agriculture
+
+**** Select pesticides
+
+**** Homogenious
+
+**** Important contribution for N / Pest
+
+**** Crops handled by Daisy
+
+**** GWT (+ conc?) from MIKE SHE
+
+
+*** Output
+
+Flux & Conc to MIKE SHE
+
+**** Soils
+
+** 
+
+** Daist setup for CZ case N/Pest
+
+
 * local rootdens model
 
 ** rootdens_local.C
 
-** finish it
+** "emergence"
+
+** thickening
+
+** death
 
 ** document it
 

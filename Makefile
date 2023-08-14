@@ -175,8 +175,8 @@ NOLINK = -c
 
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
-LATER = tertiary_instant.C  
-MODELS = rootdens_local.C program_nwaps.C program_spawn.C \
+LATER = tertiary_instant.C  rootdens_local.C 
+MODELS = program_nwaps.C program_spawn.C \
 	hydraulic_hyprop.C surface_source.C surface_std.C select_quiver.C \
 	hydraulic_M_BivG.C hydraulic_M_vGBS.C hydraulic_hypWeb.C \
 	reaction_dom.C litter_mulch.C hydraulic_linear.C hydraulic_table.C \

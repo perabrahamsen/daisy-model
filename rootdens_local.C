@@ -51,8 +51,7 @@ struct RootdensLocal : public Rootdens
 
   // Log.
   std::vector<double> E;	  // Expansion [cm/cm^3]
-  double expansion_volume;	  // Expansion volume, new and old [cm^3]
-  double border_volume;		  // Expansion volume existing root zone [cm^3]
+  double expansion_volume;	  // Expansion volume [cm^3]
   double E_tot;			  // Total expansion root length [cm]
   double A_tot;			  // Total expansion area [cm^2]
   std::vector<double> T;	  // Thickening [cm/cm^3]
@@ -123,62 +122,57 @@ RootdensLocal::expansion (const Geometry& geo,
   daisy_assert (E.size () == cell_size);
 
   // Clear integrated values.
-  border_volume = 0.0;	// [cm^3]
   expansion_volume = 0.0;	// [cm^3]
   E_tot = 0.0;		// [cm]
   A_tot = 0.0;		// [cm^2]
     
   for (size_t c = 0; c < cell_size; ++c)
     {
-      const double V = geo.cell_volume (c); // [cm^3]
       const double fE = 1.0;		      // Expansion factor []
 	
       if (L[c] > DensRtTip)
-	// Cells already above DensRtTip get added DensRtTip.
+	// Ignore existing root zone
 	{
-	  E[c] = fE * DensRtTip; // [cm/cm^3]
-	  expansion_volume += V; // [cm^3]
+	  E[c] = 0.0; // [cm/cm^3]
+	  continue;
 	}
-      else
-	// Other cells will get expansion from their neighbors.
-	{
-	  double A_con = 0.0;	// Connecting area with RZ cells [cm^2]
-	  double V_con = 0.0;	// Connecting volume with RZ cells [cm^3]
-	  double V_int = V * L[c] / DensRtTip; // "Internal" expansion [cm^3]
+
+      // Other cells will get expansion from their neighbors.
+      const double A_con = 0.0;	// Connecting area with RZ cells [cm^2]
+      const double V = geo.cell_volume (c); // [cm^3]
+      const double V_con = 0.0;	// Connecting volume with RZ cells [cm^3]
 	  
-	  const std::vector<size_t>& edges = geo.cell_edges (c);
-	  const size_t edge_size = edges.size ();
-	  for (size_t e = 0; e < edge_size; ++e)
-	    {
-	      if (!edge_is_internal (e))
-		continue;
+      const std::vector<size_t>& edges = geo.cell_edges (c);
+      const size_t edge_size = edges.size ();
+      for (size_t e = 0; e < edge_size; ++e)
+	{
+	  if (!edge_is_internal (e))
+	    continue;
 
-	      const int o = geo.other (e, c);
-	      daisy_assert (geo.cell_is_internal (o));
-	      daisy_assert (o > 0 && o < cell_size);
+	  const int o = geo.other (e, c);
+	  daisy_assert (geo.cell_is_internal (o));
+	  daisy_assert (o > 0 && o < cell_size);
 
-	      if (L[o] < DensRtTip)
-		// Only cells above DensRtTip expand to neighbors.
-		continue;
+	  if (L[o] < DensRtTip)
+	    // Only cells above DensRtTip expand to neighbors.
+	    continue;
 
-	      const double A = geo.edge_area (e); // [cm^2]
-	      A_con += A;
-	    
-	      const double dx = delta_width * std::abs (geo.edge_cos_angle (e));
-	      const double dy = delta_depth * std::abs (geo.edge_sin_angle (e));
-	      V_con += A * (dx + dy);
-	    }
-	    
-	  // The expansion from neighbors + internal expansion
-	  // can never be larger than the cell.
-	  const double V_exp = std::min (V, V_con + V_int);
-	    
-	  E[c] = fE * DensRtTip * V_exp / V;
-	  expansion_volume += V_exp;
-	  border_volume += V_exp;
+	  const double A = geo.edge_area (e); // [cm^2]
+	  A_con += A;
+
+	  const double dx = delta_width * geo.edge_cos_angle (e);
+	  const double dy = delta_depth * geo.edge_sin_angle (e);
+	  const double dl = std::sqrt (dx*dx + dy*dy); // Pythagoras...
+	  V_con += A * dl;
 	}
-	
-      E_tot += E[c] * V;
+	    
+      // The expansion from neighbors + internal expansion
+      // can never be larger than the cell.
+      const double V_exp = std::min (V, V_con);
+      const double E_length = fE * DensRtTip * V_exp;
+      E[c] = E_length / V;
+      E_tot += E_length;
+      expansion_volume += V_exp;
     }
 
   daisy_approximate (geo.total_soil (E), E_tot);
@@ -192,6 +186,13 @@ RootdensLocal::set_density (const Geometry& geo,
 			    const double WRoot /* [g DM/m^2] */, const double,
 			    std::vector<double>& Density  /* [cm/cm^3] */,
 			    Treelog& msg)
+// Check emergence
+//   If so, put WRoot in seed cells
+// Check WRoot > LastWRoot
+//   If so, do expansion
+//   Check if expansion needs to be limited by delta WRoot
+// Do thickening
+
 {
   TREELOG_MODEL (msg);
   const size_t cell_size = geo.cell_size ();
