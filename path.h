@@ -35,13 +35,18 @@ public:
   // Content.
 private:
   std::vector<symbol> path;
-  symbol current_directory;
+  symbol input_directory;
+  symbol output_directory;
 
   // Use.
 public:
   std::unique_ptr<std::istream> open_file (symbol name) const;
   bool set_directory (symbol directory);
-  symbol get_directory () const;
+  void set_input_directory (symbol directory);
+  symbol get_input_directory () const
+  { return input_directory; }
+  symbol get_output_directory () const
+  { return output_directory; }
   void set_path (const std::vector<symbol>& path);
   void set_path (const std::string& colon_path);
 

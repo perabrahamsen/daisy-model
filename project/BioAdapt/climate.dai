@@ -1,0 +1,42 @@
+;;; climate.dai --- Weather for BioAdapt.
+
+(defunit [kWh/d/m^2] SIfactor 
+  (mass 1) (time -3) (factor 41.67))
+
+(defweather PRESENT combine
+  (entry ((use Precip)
+	  (source table (file "Control_hourly_daisy.dwf")
+		  ;; Source: DMI 1981-2010 climate normal.
+		  ;; Aabenraa mean precipitation 1981-2010: 847 mm
+		  ;; Kastrup mean precipitation 1981-2019; 601 mm
+		  ;; Factor: 847/601 = 1.41
+		  (PrecipCorrect 1.41 [])))
+         ((source table (file "Control_daily_daisy.dwf")))))
+
+(defweather WARMER combine
+  (entry ((use Precip)
+	  (source table (file "Control_hourly_daisy.dwf")
+		  ;; Source: DMI 1981-2010 climate normal.
+		  ;; Aabenraa mean precipitation 1981-2010: 847 mm
+		  ;; Kastrup mean precipitation 1981-2019; 601 mm
+		  ;; Factor: 847/601 = 1.41
+		  (PrecipCorrect 1.41 [])))
+         ((source table (file "Control_daily_daisy.dwf")
+		  ;; 2 dg C warmer.
+		  (TempOffset 2 [dg C])))))
+
+(defweather WETWARM combine
+  (entry ((use Precip)
+	  (source table (file "Control_hourly_daisy.dwf")
+		  ;; Source: DMI 1981-2010 climate normal.
+		  ;; Aabenraa mean precipitation 1981-2010: 847 mm
+		  ;; Kastrup mean precipitation 1981-2019; 601 mm
+		  ;; Factor: 847/601 = 1.41
+		  (PrecipCorrect 1.41 [])
+		  ;; 10 % more precipitation.
+		  (PrecipScale 1.1 [])))
+         ((source table (file "Control_daily_daisy.dwf")
+		  ;; 2 dg C warmer.
+		  (TempOffset 2 [dg C])))))
+
+;;; climate.dai ends here.

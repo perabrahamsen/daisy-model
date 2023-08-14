@@ -1,3 +1,122 @@
+2023-08-04  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* rootdens_local.C: New model.
+	* Makefile (MODELS): Add it.
+
+2023-06-30  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.41 released.
+
+2023-06-30  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* hydraulic_hyprop.C (K_vap): Handle numerical noise near saturation.
+
+2023-06-29  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.40 released.
+
+2023-06-29  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* plf.C, plf.h (integrate_stupidly_2): Slightly less stupid integration.
+	* hydraulic_table.C: Use it.
+
+2023-06-28  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* hydraulic_hyprop.C (Theta, KT, h): Handle h=0, Theta=Theta_sat case.
+
+2023-06-16  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.39 released.
+
+2023-06-16  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* hydraulic.C (K_to_M): Avoid calling K, call K20.
+
+2023-06-15  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.38 released.
+
+2023-06-15  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* hydraulic_hyprop.C (K_vap): Fix edge case near saturation.
+
+	* Version 6.37 released.
+
+2023-06-15  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* hydraulic_hyprop.C (Cw2): Fix sign.
+
+2023-05-28  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* program_nwaps.C: Removed unused parameter 'combine_units'.
+
+2023-05-03  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.36 released.
+
+2023-04-26  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* program_nwaps.C (stdev, stderr): New summary lines.
+
+2023-04-24  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Makefile (SETUPDIR): Use $(HOME).
+
+2023-04-23  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* program_nwaps.C: New model.
+	* Makefile (MODELS): Add it.
+
+2023-04-21  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.35 released.
+
+2023-04-18  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* path.C, path.h (set_input_directory): New function.
+	* program_spawn.C: Use it.
+
+2023-04-17  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.34 released.
+
+	* Makefile (native, portable, windows, windows-same, release)
+	(release-same): (and others) Switch to msys2 as default build
+	environment on Windows.
+
+2023-04-12  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* mathlib.h (M_LN10): Define if undefined.
+
+2023-03-31  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* program_spawn.C: New model.
+	* Makefile (MODELS): Added it.
+
+2023-03-22  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* action_markvand.C: Made it work again.
+	(solute): New parameter.
+
+2023-03-06  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* hydraulic.h, hydraulic.C (K): Made it private.
+	(KT, KT20): New public functions.
+	* all: Update callers.
+
+2023-02-27  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* hydraulic_hyprop.C: New model.
+
+2022-11-03  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Version 6.33 released.
+
+2022-11-03  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* hydraulic_M_vGBS.C: Stop adding points to pF_Theta once max
+	Theta has been reached.
+
 2022-08-09  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.32 released.

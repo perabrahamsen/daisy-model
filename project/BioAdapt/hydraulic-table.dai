@@ -1,0 +1,19 @@
+;;; hydraulic-table.dai --- Soil used for BioAdapt. "table" approximation.
+
+(defhydraulic Ap table
+  "Original Ap horizon."
+  (file "A_horizon_all_look_up.ddf"))
+
+(defhydraulic CONTROL table
+  "Original B horizon."
+  (file "control_all_look_up.ddf"))
+
+(defhydraulic SB3_SB15 table
+  "B horizon with 3 % 15 um particles added."
+  (file "SB3_SB15_all_look_up.ddf"))
+
+(defhydraulic SB1_5_SB15 table
+  "B horizon with 1.5 % 15 um particles added."
+  (file "SB1_5_SB15_all_look_up.ddf"))
+
+;;; hydraulic-table.dai ends here

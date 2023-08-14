@@ -1,0 +1,99 @@
+;;; soil.dai --- Soil used for BioAdapt
+
+(defhorizon Ap USDA3
+  "Source: DANESPO?"
+  (hydraulic Ap)
+  (dry_bulk_density 1.47 [g/cm^3])
+  (clay 3.30 [%])
+  (silt 8.23 [%])
+  (sand 86.97 [%])
+  (humus 1.5 [%]))
+
+(defhorizon CONTROL USDA3
+  (hydraulic CONTROL)
+  (dry_bulk_density 1.53 [g/cm^3])
+  (clay 1.5 [%])
+  (silt 1.6 [%])
+  (sand 96.0 [%])
+  (humus 0.9 [%]))
+
+(defhorizon SB3_SB15 CONTROL
+  (hydraulic SB3_SB15))
+
+(defhorizon SB1_5_SB15 CONTROL
+  (hydraulic SB1_5_SB15))
+
+(defcolumn CONTROL default
+  (Soil (horizons (-30 [cm] Ap)
+		  (-200 [cm] CONTROL))
+	(border -1 [m])
+	(MaxRootingDepth 50 [cm]))
+  (Groundwater deep))
+
+(defcolumn BIO60 CONTROL
+  (Soil (horizons (-30 [cm] Ap)
+		  (-60 [cm] SB3_SB15)
+		  (-200 [cm] CONTROL))
+	(border -1 [m])
+	(MaxRootingDepth 60 [cm])))
+
+(defcolumn BIO70 CONTROL
+  (Soil (horizons (-30 [cm] Ap)
+		  (-70 [cm] SB3_SB15)
+		  (-200 [cm] CONTROL))
+	(border -1 [m])
+	(MaxRootingDepth 70 [cm])))
+
+(defcolumn BIO80 CONTROL
+  (Soil (horizons (-30 [cm] Ap)
+		  (-80 [cm] SB3_SB15)
+		  (-200 [cm] CONTROL))
+	(border -1 [m])
+	(MaxRootingDepth 80 [cm])))
+
+(defcolumn BIO90 CONTROL
+  (Soil (horizons (-30 [cm] Ap)
+		  (-90 [cm] SB3_SB15)
+		  (-200 [cm] CONTROL))
+	(border -1 [m])
+	(MaxRootingDepth 90 [cm])))
+
+(defcolumn BIO100 CONTROL
+  (Soil (horizons (-30 [cm] Ap)
+		  (-100 [cm] SB3_SB15)
+		  (-200 [cm] CONTROL))
+	(border -1 [m])
+	(MaxRootingDepth 100 [cm])))
+
+(defcolumn LESS CONTROL
+  (Soil (horizons (-30 [cm] Ap)
+		  (-100 [cm] SB1_5_SB15)
+		  (-200 [cm] CONTROL))
+	(border -1 [m])
+	(MaxRootingDepth 100 [cm])))
+
+(defcolumn RZ CONTROL
+  (Soil (horizons (-30 [cm] Ap)
+		  (-100 [cm] SB3_SB15)
+		  (-200 [cm] CONTROL))
+	(border -1 [m])
+	(MaxRootingDepth 50 [cm])))
+
+(defcolumn HIGH BIO100
+  (Groundwater aquitard (pressure_table const -120 [cm]))
+  (Drain lateral)
+  (Soil (horizons (-30 [cm] Ap)
+		  (-100 [cm] SB3_SB15)
+		  (-200 [cm] CONTROL))
+	(border -1 [m])
+	(MaxRootingDepth 100 [cm])))
+
+(defcolumn JB4 BIO100
+  (Drain lateral)
+  (Soil (horizons (-30 [cm] Ap_JB4)
+		  (-100 [cm] B_JB4)
+		  (-200 [cm] C_JB4))
+	(border -1 [m])
+	(MaxRootingDepth 100 [cm])))
+
+;;; soil.dai ends here

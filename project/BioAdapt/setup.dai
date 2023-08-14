@@ -1,0 +1,212 @@
+;;; setup.dai --- Main BioAdapt setup file.
+
+(path &old "/home/xvs108/daisy/project/BioAdapt/Data/")
+
+(input file "log.dai")
+(input file "tillage.dai")
+(input file "fertilizer.dai")
+(input file "crop.dai")
+(input file "markvand.dai")
+(input file "dk-horizon.dai")
+(input file "management.dai")
+(input file "output.dai")
+(input file "hydraulic-table.dai")
+;;(input file "hydraulic.dai")
+(input file "soil.dai")
+(input file "climate.dai")
+
+(defprogram common Daisy
+  (time 2998 1 1)
+  (activate_output (after 3000 1 1))
+  (stop 3100 1 1)
+  (output Yield "Water usage 4-7" "Water usage 5-7"
+	  ("Field water" (when yearly))
+	  ("Field nitrogen" (when yearly))
+	  ("Soil nitrogen" (when yearly) (to -1 [m]))
+	  harvest
+	  ("Carbon Balance" (when yearly))))
+
+(defprogram PRESENT-CONTROL-SB common
+  "Scenario PRESENT-CONTROL-SB"
+  (weather PRESENT) (column CONTROL) (manager SB))
+
+(defprogram PRESENT-CONTROL-WW common
+  "Scenario PRESENT-CONTROL-WW"
+  (weather PRESENT) (column CONTROL) (manager WW))
+
+(defprogram PRESENT-CONTROL-SBI common
+  "Scenario PRESENT-CONTROL-SBI"
+  (weather PRESENT) (column CONTROL) (manager SBIJB1))
+
+(defprogram PRESENT-CONTROL-WWI common
+  "Scenario PRESENT-CONTROL-WWI"
+  (weather PRESENT) (column CONTROL) (manager WWIJB1))
+
+(defprogram PRESENT-BIO60-SB common
+  "Scenario PRESENT-BIO60-SB"
+  (weather PRESENT) (column BIO60) (manager SB))
+
+(defprogram PRESENT-BIO60-WW common
+  "Scenario PRESENT-BIO60-WW"
+  (weather PRESENT) (column BIO60) (manager WW))
+
+(defprogram PRESENT-BIO70-SB common
+  "Scenario PRESENT-BIO70-SB"
+  (weather PRESENT) (column BIO70) (manager SB))
+
+(defprogram PRESENT-BIO70-WW common
+  "Scenario PRESENT-BIO70-WW"
+  (weather PRESENT) (column BIO70) (manager WW))
+
+(defprogram PRESENT-BIO80-SB common
+  "Scenario PRESENT-BIO80-SB"
+  (weather PRESENT) (column BIO80) (manager SB))
+
+(defprogram PRESENT-BIO80-WW common
+  "Scenario PRESENT-BIO80-WW"
+  (weather PRESENT) (column BIO80) (manager WW))
+
+(defprogram PRESENT-BIO90-SB common
+  "Scenario PRESENT-BIO90-SB"
+  (weather PRESENT) (column BIO90) (manager SB))
+
+(defprogram PRESENT-BIO90-WW common
+  "Scenario PRESENT-BIO90-WW"
+  (weather PRESENT) (column BIO90) (manager WW))
+
+(defprogram PRESENT-BIO100-SB common
+  "Scenario PRESENT-BIO100-SB"
+  (weather PRESENT) (column BIO100) (manager SB))
+
+(defprogram PRESENT-BIO100-SBIJB1 common
+  "Scenario PRESENT-BIO100-SBIJB1"
+  (weather PRESENT) (column BIO100) (manager SBIJB1))
+
+(defprogram PRESENT-BIO100-SBIJB4 common
+  "Scenario PRESENT-BIO100-SBIJB4"
+  (weather PRESENT) (column BIO100) (manager SBIJB4))
+
+(defprogram PRESENT-BIO100-WW common
+  "Scenario PRESENT-BIO100-WW"
+  (weather PRESENT) (column BIO100) (manager WW))
+
+(defprogram PRESENT-BIO100-WWIJB1 common
+  "Scenario PRESENT-BIO100-WWIJB1"
+  (weather PRESENT) (column BIO100) (manager WWIJB1))
+
+(defprogram PRESENT-BIO100-WWIJB4 common
+  "Scenario PRESENT-BIO100-WWIJB4"
+  (weather PRESENT) (column BIO100) (manager WWIJB4))
+
+(defprogram PRESENT-RZ-SB common
+  "Scenario PRESENT-RZ-SB"
+  (weather PRESENT) (column RZ) (manager SB))
+
+(defprogram PRESENT-RZ-WW	 common
+  "Scenario PRESENT-RZ-WW	"
+  (weather PRESENT) (column RZ) (manager WW	))
+
+(defprogram PRESENT-LESS-SB common
+  "Scenario PRESENT-LESS-SB"
+  (weather PRESENT) (column LESS) (manager SB))
+
+(defprogram PRESENT-LESS-WW common
+  "Scenario PRESENT-LESS-WW"
+  (weather PRESENT) (column LESS) (manager WW))
+
+(defprogram PRESENT-HIGH-SB common
+  "Scenario PRESENT-HIGH-SB"
+  (weather PRESENT) (column HIGH) (manager SB))
+
+(defprogram PRESENT-HIGH-WW common
+  "Scenario PRESENT-HIGH-WW"
+  (weather PRESENT) (column HIGH) (manager WW))
+
+(defprogram PRESENT-JB4-SB common
+  "Scenario PRESENT-JB4-SB"
+  (weather PRESENT) (column JB4) (manager SB))
+
+(defprogram PRESENT-JB4-WW common
+  "Scenario PRESENT-JB4-WW"
+  (weather PRESENT) (column JB4) (manager WW))
+
+(defprogram WARMER-CONTROL-SB common
+  "Scenario WARMER-CONTROL-SB"
+  (weather WARMER) (column CONTROL) (manager SB))
+
+(defprogram WARMER-CONTROL-WW common
+  "Scenario WARMER-CONTROL-WW"
+  (weather WARMER) (column CONTROL) (manager WW))
+
+(defprogram WARMER-BIO100-SB common
+  "Scenario WARMER-BIO100-SB"
+  (weather WARMER) (column BIO100) (manager SB))
+
+(defprogram WARMER-BIO100-WW common
+  "Scenario WARMER-BIO100-WW"
+  (weather WARMER) (column BIO100) (manager WW))
+
+(defprogram WETWARM-CONTROL-SB common
+  "Scenario WETWARM-CONTROL-SB"
+  (weather WETWARM) (column CONTROL) (manager SB))
+
+(defprogram WETWARM-CONTROL-WW common
+  "Scenario WETWARM-CONTROL-WW"
+  (weather WETWARM) (column CONTROL) (manager WW))
+
+(defprogram WETWARM-BIO100-SB common
+  "Scenario WETWARM-BIO100-SB"
+  (weather WETWARM) (column BIO100) (manager SB))
+
+(defprogram WETWARM-BIO100-WW common
+  "Scenario WETWARM-BIO100-WW"
+  (weather WETWARM) (column BIO100) (manager WW))
+	   
+(defprogram all spawn
+  (program PRESENT-CONTROL-SB
+	   PRESENT-CONTROL-WW
+	   PRESENT-CONTROL-SBI
+	   PRESENT-CONTROL-WWI
+	   PRESENT-BIO60-SB
+	   PRESENT-BIO60-WW
+	   PRESENT-BIO70-SB
+	   PRESENT-BIO70-WW
+	   PRESENT-BIO80-SB
+	   PRESENT-BIO80-WW
+	   PRESENT-BIO90-SB
+	   PRESENT-BIO90-WW
+	   PRESENT-BIO100-SB
+	   PRESENT-BIO100-SBIJB1
+	   PRESENT-BIO100-SBIJB4
+	   PRESENT-BIO100-WW
+	   PRESENT-BIO100-WWIJB1
+	   PRESENT-BIO100-WWIJB4
+	   PRESENT-RZ-SB
+	   PRESENT-RZ-WW	
+	   PRESENT-LESS-SB
+	   PRESENT-LESS-WW
+	   PRESENT-HIGH-SB
+	   PRESENT-HIGH-WW
+	   PRESENT-JB4-SB
+	   PRESENT-JB4-WW
+	   WARMER-CONTROL-SB
+	   WARMER-CONTROL-WW
+	   WARMER-BIO100-SB
+	   WARMER-BIO100-WW
+	   WETWARM-CONTROL-SB
+	   WETWARM-CONTROL-WW
+	   WETWARM-BIO100-SB
+	   WETWARM-BIO100-WW
+	   ))
+
+(defprogram both batch
+  (run all
+       (nwaps (scenario Climate Soil Crop))))
+
+;;(run PRESENT-CONTROL-SB)
+(run both)
+
+;;(run (nwaps (scenario Climate Soil Crop)))
+
+;;; setup.dai ends here.
+

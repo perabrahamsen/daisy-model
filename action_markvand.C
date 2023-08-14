@@ -37,6 +37,7 @@
 #include "treelog.h"
 #include "submodeler.h"
 #include "frame_submodel.h"
+#include "units.h"
 #include <vector>
 #include <memory>
 #include <sstream>
@@ -247,7 +248,8 @@ struct MV_Crop : public Model
 
   // Create and Destroy.
   MV_Crop (const BlockModel& al)
-    : S_F (accumulated (al.number_sequence ("S_F"))),
+    : name (al.type_name ()),
+      S_F (accumulated (al.number_sequence ("S_F"))),
       A_F (al.number_sequence ("A_F")),
       L_gv (al.number ("L_gv")),
       L_ge (al.number ("L_ge")),
@@ -375,6 +377,9 @@ struct ActionMarkvand : public Action
   double V_u;  // Amount of available water in upper root zone. [mm]
   double V_b; // Amount of water between current and max root depth. [mm]
 
+  // Solute.
+  const IM solute;
+
   // Simulation.
   const MV_Crop* get_crop (Daisy& daisy) const;
   void doIt (Daisy& daisy, const Scope&, Treelog& out);
@@ -443,7 +448,9 @@ ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& msg)
     = daisy.field ().crop_dm (Vegetation::all_crops (), 0.1) > 0.0; 
   if (T_sum < 0.0)
     {
-      if (has_crop)
+      if (has_crop
+	  && daisy.time ().month () >= 3
+	  && daisy.time ().month () < 8)
         {
 	  const MV_Crop *const crop = get_crop (daisy);
           T_sum = 0.0;
@@ -505,9 +512,8 @@ ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& msg)
       std::ostringstream tmp;
       tmp << "MARKVAND Irrigating " << I << " mm";
       msg.message (tmp.str ());
-      IM im;
       daisy.field ().irrigate (I/flux, flux, Irrigation::at_air_temperature,
-                             Irrigation::overhead, im, 
+                             Irrigation::overhead, solute, 
                              boost::shared_ptr<Volume> (), false, msg);
     }
 
@@ -669,7 +675,8 @@ ActionMarkvand::ActionMarkvand (const BlockModel& al)
     V_e (al.number ("V_e", -42.42e42)),
     C_u (al.number ("C_u")),
     V_u (al.number ("V_u")),
-    V_b (al.number ("V_b", -42.42e42))
+    V_b (al.number ("V_b", -42.42e42)),
+    solute (al, "solute")
 { }
 
 ActionMarkvand::~ActionMarkvand ()
@@ -688,6 +695,8 @@ static struct ActionMarkvandSyntax : DeclareModel
     : DeclareModel (Action::component, "markvand", "\
 Irrigate the field according to MARKVAND scheduling.")
   { }
+  static void load_ppm (Frame& frame)
+  { IM::add_syntax (frame, Attribute::Const, Units::ppm ()); }
   void load_frame (Frame& frame) const
   { 
     frame.add_check (check_alist);	
@@ -725,6 +734,9 @@ Included in 'V_r'.");
     frame.declare ("V_b", "mm", Attribute::OptionalState, 
                 "Amount of water between current and max root depth.\n\
 By default, the reservoir will be full at plant emergence.");
+    frame.declare_submodule_sequence ("solute", Attribute::Const, "\
+Solutes in irrigation water.", load_ppm);
+    frame.set_empty ("solute");
   }
 } ActionMarkvand_syntax;
 

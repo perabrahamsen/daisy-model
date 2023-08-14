@@ -752,7 +752,7 @@ not be traced by the model.")
 	   (interval (path column "${column}" Chemistry "*"
                            combine "N" reaction denitrification converted)
                      (documentation "\
-Loss of NO3 due to denitrification.")
+Loss of NO3-N due to denitrification.")
                      (tag "Denitrification")
                      (handle sum)
                      (dimension "${unit}")

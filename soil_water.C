@@ -360,6 +360,7 @@ SoilWater::tick_ice (const Geometry& geo, const Soil& soil,
       const double total_ice = X_ice_[i] + X_ice_buffer_[i];
       if (total_ice > 0.0)
         {
+#ifdef THETA_RES
           if (Theta_[i] < Theta_res)
             {
               std::ostringstream tmp;
@@ -367,6 +368,7 @@ SoilWater::tick_ice (const Geometry& geo, const Soil& soil,
                   << ", less than Theta_res = " << Theta_res;
               daisy_warning (tmp.str ());
             }
+#endif
           const double Theta_lim = std::max (Theta_res, 
                                              Theta_[i] - S_ice_water_[i] * dt);
 

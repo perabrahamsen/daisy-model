@@ -201,6 +201,7 @@ struct VegetationCrops : public Vegetation
 		double stub_length,
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
 		std::vector<const Harvest*>& harvest, double& min_height,
+		double& yield_DM, double& yield_N,
 		double& harvest_DM, double& harvest_N, double& harvest_C, 
                 std::vector<AM*>& residuals,
 		double& residuals_DM,
@@ -216,6 +217,7 @@ struct VegetationCrops : public Vegetation
               double leaf_harvest, 
               double sorg_harvest,
               std::vector<const Harvest*>& harvest,
+	      double& yield_DM, double& yield_N,
               double& harvest_DM, 
               double& harvest_N, double& harvest_C,
               std::vector<AM*>& residuals,
@@ -738,6 +740,7 @@ VegetationCrops::harvest (const symbol column_name,
 			  double sorg_harvest, 
 			  std::vector<const Harvest*>& harvest,
                           double& min_height,
+			  double& yield_DM, double& yield_N,
 			  double& harvest_DM, 
 			  double& harvest_N, double& harvest_C,
 			  std::vector<AM*>& residuals,
@@ -771,6 +774,8 @@ VegetationCrops::harvest (const symbol column_name,
 			    root_fruit, residuals, 
 			    residuals_DM, residuals_N_top, residuals_C_top,
 			    residuals_N_soil, residuals_C_soil, combine, msg);
+	yield_DM += mine.sorg_DM;
+	yield_N += mine.sorg_N;
 	harvest_DM += mine.total_DM ();
 	harvest_N += mine.total_N ();
 	harvest_C += mine.total_C ();
@@ -818,6 +823,7 @@ VegetationCrops::pluck (symbol column_name,
                         double leaf_harvest, 
                         double sorg_harvest,
                         std::vector<const Harvest*>& harvest,
+			double& yield_DM, double& yield_N,
                         double& harvest_DM, 
                         double& harvest_N, double& harvest_C,
                         std::vector<AM*>& residuals,
@@ -847,6 +853,8 @@ VegetationCrops::pluck (symbol column_name,
                             residuals, 
                             residuals_DM, residuals_N_top, residuals_C_top,
                             residuals_N_soil, residuals_C_soil, msg);
+	yield_DM += mine.sorg_DM;
+	yield_N += mine.sorg_N;
 	harvest_DM += mine.total_DM ();
 	harvest_N += mine.total_N ();
 	harvest_C += mine.total_C ();

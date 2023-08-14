@@ -195,10 +195,10 @@ HydraulicM_vGBS::HydraulicM_vGBS(const BlockModel& al)
 	l(al.number("l")),
 	pf0(al.number("pf0")),
 	afilm(al.number("afilm")),
-	Ks_nc(al.number("Ks_nc")),
-	Theta_nc(al.number("Theta_nc")),
 	Theta_cap(al.number("Theta_cap")),
+	Theta_nc(al.number("Theta_nc")),
 	Ks_cap(al.number("Ks_cap")),
+	Ks_nc(al.number("Ks_nc")),
 	M_()
 {
 	//sumk = [this] {double res = 0; for (int k = 0.0; k < 19.5; k++) res += 1.0 / k / (k + 1.0) / (n*k + 1.0); return res; }();
@@ -214,11 +214,25 @@ HydraulicM_vGBS::HydraulicM_vGBS(const BlockModel& al)
 	const double pf_max = pf0;
 	const double dpf = 0.05;
 	const int nsteps = (abs(pf_min)+pf_max)/dpf;
+	double last_Theta = -1.0;
 	for (int i = nsteps; i>=0; --i)	
 	{
 		const double x = pf_min+ dpf * i;
-		const double y = Theta(-pow(10.0, x));
-		pF_Theta.add(y,x);	// code block to be executed
+		const double h = pF2h (x);
+		const double y = Theta(h);
+		daisy_assert (y >= 0.0); // No negative water content.
+		if (y > last_Theta)
+		  {
+		    pF_Theta.add(y,x);	// code block to be executed
+		    last_Theta = y;
+		  }
+		else
+		  {
+		    std::ostringstream tmp;
+		    tmp << "Max Theta (" << y << ") found before pF = " << x;
+		    al.msg ().debug (tmp.str ());
+		    break;
+		  }
 	}
 }  //initiate the table
 

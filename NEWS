@@ -6,6 +6,109 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.36
+
+** New nwaps program for collecting spawn program results.
+
+The nwaps program will collect dlf files with the same name in
+different subdirectories, and generate csv files with the result
+concatenated, and the subdirectory name prepended each line. Compared
+to the dlf files, the combined file will have "out_" prepended, no
+header, and the tags and unit lines combined.  The resulting csv files
+can easily be imported in e.g. Excel, R, or Python.
+
+The nwaps program is intended to be used with the output of the spawn
+program.
+
+Apart from the "out_" files, some simple statistics for each dlf files
+will bu summaries on "sum_" csv files.
+
+* 6.35
+
+** New spawn program for running multiple programs in parallel.
+
+If you want to run two simulations "p1" and "p2" defined with
+"defprogram", write:
+
+  (defprogram main spawn (program p1 p2))
+  (run main)
+
+This works for any number of programs.
+
+This is intended for situations where you need to run many
+simulations, such as scenario analysis or monte-carlo simulations.
+
+- Each subprogram is run in a seperate Daisy process.
+
+This means if one program crashes, it won't stop the others.
+
+- Only a limited number of programs will be run in parallel. Once one
+  finishes, the next is started (if any are left).
+
+- Each subprogram is run in a seperate directory (folder), created by
+  the spawn program. If the directory already exists, the subprogram
+  will be skipped.
+
+This means that you can start the same spawn program on multiple
+computers sharing a network drive, and the computers will
+automatically distribute the work between them (only one computer will
+succesfully create the directory[1] and run the program, the rest will
+skip it).
+
+An longer example is found as test-spawn.dai in the sample folder.
+
+Some more parameters you usually won't need:
+
+  (parallel 4)
+
+Max number of programs to run in parallel.  By default, this is
+equaivalent to the number of cores in your CPU.
+
+  (exe "c:/daisy/bin/daisy.exe")
+
+Daisy executable to spawn for each program.  By default, the same as
+is running the main program.
+
+  (directory p1 p2)
+
+Name of the subfolders to run the programs.  By default, the same as
+the names of the programs.
+
+  (file "setup-p1.dai" "setup-p2.dai")
+
+names of setup files where the programs are found.  By default, it
+will look in the same setup file as the main program.
+
+  (input_directory "..")
+
+Where to look for input files, instead of the current directory (".").
+The deafult value is "..", meaning the parent directory, which is where
+the main program is found.
+
+[1] In theory... some network file systems allows multiple computers
+to create the same directory at the same time, in that case output
+will be garbage.
+
+** New instruction for building daisy from source.
+
+Build system now uses "msys2" on Windows.
+
+See https://daisy.ku.dk/about-daisy/code/
+
+* 6.34
+
+** The "markvand" irrigation model should work again.
+
+At least for spring crops.
+
+** New "hyprop" hydraulic model.
+
+This uses the parmaters generated from the "hyprop" equipement from METER.
+See https://www.metergroup.com/en/meter-environment/topics/hydrology
+
+It is quites slow though, you will get faster but less accurate
+results by using the generated tables.
+
 * 6.32
 
 ** You can now limit allocation of assimate to roots
@@ -75,7 +178,7 @@ Reported by Laura Delhez.
 
 * 6.28
 
-** Temperature now affect release of assimilate from seeds.
+** Temperature now affects release of assimilate from seeds.
 
 This is for the seed release model.
 

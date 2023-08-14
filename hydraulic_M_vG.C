@@ -127,7 +127,7 @@ HydraulicM_vG::HydraulicM_vG (const BlockModel& al)
     alpha (al.number ("alpha")),
     a (-alpha),
     n (al.number ("n")),
-    m (1 - 1 / n),
+    m (1 - 1.0 / n),
     l (al.number ("l")),
     M_ ()
 { }

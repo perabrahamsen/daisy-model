@@ -1,7 +1,7 @@
 ;;; dk-wbarley.dai
 
 (defcrop "Vinterbyg" default
-  "Vinterbyg med årsudbytter der svarer til gennemsnittet for dansk landbrug.
+  "Vinterbyg med aarsudbytter der svarer til gennemsnittet for dansk landbrug.
 Skabt af Christian Thirup for Daisy standardiseringsprojektet."
 
   (Devel default

@@ -2364,10 +2364,10 @@ You must specify it with either 'canopy_dissipation_halftime' or\n\
 Fraction of the chemical that follows the water off the canopy.");
     frame.declare ("surface_decompose_rate", "h^-1", 
                    Check::fraction (), Attribute::OptionalConst,
-                   "How fast does the chemical decomposee on surface.\n\
+                   "How fast does the chemical decompose on surface.\n\
 You must specify it with either 'surface_decompose_halftime' or\n\
 'surface_decompose_rate'.  If neither is specified,\n\
-'decompose_rate' (in soil) is used.");
+'canopy_dissipation_rate' is used.");
     frame.declare ("surface_decompose_halftime", "h", 
                    Check::positive (), Attribute::OptionalConst,
                    "How fast does the chemical decompose on surface.\n\

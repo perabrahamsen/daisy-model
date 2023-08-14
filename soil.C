@@ -44,6 +44,7 @@
 #include "zone.h"
 #include "water.h"
 #include "soil_water.h"
+#include "soil_heat.h"
 #include "organic.h"
 #include <sstream>
 
@@ -200,7 +201,8 @@ struct Soil::Implementation
       }
   }
   void tick (const double dt, const double rain, const Geometry& geo,
-             const SoilWater& soil_water, Treelog& msg)
+             const SoilWater& soil_water, const SoilHeat& soil_heat,
+	     Treelog& msg)
   {
     // Ice content.
     std::map<const Horizon*, double> ice;
@@ -221,7 +223,8 @@ struct Soil::Implementation
     // Hysteresis.
     for (size_t c = 0; c < hyd_cells.size (); c++)
       {
-	hyd_cells[c]->hysteresis (dt, soil_water.h_old (c), soil_water.h (c));
+	hyd_cells[c]->hysteresis (dt, soil_water.h_old (c), soil_water.h (c),
+				  soil_heat.T (c));
       }
   }
 
@@ -296,7 +299,7 @@ Soil::K (size_t i, double h, double h_ice, double T) const
     : viscosity_factor (T);
   const double h_water = std::min (h, h_ice);
 
-  const double K_primary = hydraulic (i).K (h_water); 
+  const double K_primary = hydraulic (i).KT (h_water, T); 
   const double K_secondary = horizon (i).secondary_domain ().K (h_water);
   const double K_factor = horizon (i).K_factor ();
 
@@ -363,8 +366,9 @@ Soil::tillage (const Geometry& geo, const double from, const double to,
 
 void
 Soil::tick (const double dt, const double rain, const Geometry& geo,
-            const SoilWater& soil_water, Treelog& msg)
-{ impl->tick (dt, rain, geo, soil_water, msg); }
+            const SoilWater& soil_water, const SoilHeat& soil_heat,
+	    Treelog& msg)
+{ impl->tick (dt, rain, geo, soil_water, soil_heat, msg); }
 
 void
 Soil::set_porosity (size_t i, double Theta)

@@ -50,6 +50,7 @@ public:
   double max_at () const;
   double integrate (double from, double to) const;
   PLF integrate_stupidly () const;
+  PLF integrate_stupidly_2 (const double C = 0.0) const;
   void offset (double offset);	// Add 'offset' to all y values.
 
   // Utilities.

@@ -52,7 +52,7 @@ struct LitterMulch : public LitterResidue
   const double particle_density; // Particle density of mulch [kg DM/m^3]
   const double decompose_height; // Max height of active mulch layer [cm]
   const double evaporate_depth;	 // How fow down the litter can evap [cm]
-  const double soil_height;	 // Heigh of soil layer providing N [cm]
+  const double soil_height;	 // Heigh of soil layer affecting decay [cm]
   const double Theta_res;	 // Residual water content []
   const double Theta_sat;	 // Saturated water content []
   const double h_min;		 // Min. pressure for biological activity [cm]

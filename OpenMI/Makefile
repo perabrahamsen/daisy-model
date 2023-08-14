@@ -1,4 +1,4 @@
-CSHARP = /cygdrive/C/WINDOWS/Microsoft.NET/Framework/v2.0.50727/csc.exe
+CSHARP = C:/WINDOWS/Microsoft.NET/Framework/v2.0.50727/csc.exe
 
 OPENMISRC = daisywrapper.cs 
 DOTNETSRC = daisyAccess.cs 
@@ -40,7 +40,7 @@ daisy_dotnet.dll: $(DOTNETSRC)
 	$(CSHARP) /target:library /out:$@ $<
 
 daisy_OpenMI.dll: $(OPENMISRC) daisy_dotnet.dll
-	$(CSHARP) /target:library /out:$@ /reference:daisy_dotnet.dll \
+	MSYS2_ARG_CONV_EXCL="*" $(CSHARP) /target:library /out:$@ /reference:daisy_dotnet.dll \
 	"/reference:$(OPENMIASS)\OpenMI.Standard.dll" \
 	"/reference:$(OPENMIASS)\Oatc.OpenMI.Sdk.Backbone.dll" \
 	"/reference:$(OPENMIASS)\Oatc.OpenMI.Sdk.Wrapper.dll" \

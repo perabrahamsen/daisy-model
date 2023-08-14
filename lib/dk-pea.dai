@@ -1,5 +1,5 @@
 (defcrop "Aert" default
-  "Ært med årsudbytter der svarer til gennemsnittet for dansk landbrug.
+  "Aert med aarsudbytter der svarer til gennemsnittet for dansk landbrug.
 Skabt af Christian Thirup for Daisy standardiseringsprojektet."
   (Devel default 
       (EmrTSum  100)

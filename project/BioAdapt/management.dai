@@ -1,0 +1,60 @@
+;;; management.dai --- Crop management for BioAdapt.
+
+(input file "Sbarley_New.dai")
+
+(defcrop "WW" "Winter Wheat JG")
+(defcrop "SB" "SB_test")
+(defcrop "CC" "Winter Rape")
+
+(defaction "WW1" activity
+  (wait_mm_dd 9 8)
+    (plowing)
+  (wait_mm_dd 9 10)
+    (seed_bed_preparation) (sow "WW" (seed 180 [kg w.w./ha]))
+  (wait_mm_dd 4 5)
+    (fertilize (N25S (weight  100 [kg N/ha]))) 
+  (wait_mm_dd 5 5)
+    (fertilize (N25S (weight 100 [kg N/ha])))
+  (wait (or (crop_ds_after "WW" 2.0 []) (mm_dd 9 7)))
+    (harvest "WW" (stub 8 [cm]) (stem 70 [%]) (leaf 70 [%])))
+
+(defaction "SB1" activity
+  (wait_mm_dd 3 12)
+    (fertilize (N25S (weight 120 [kg N/ha])))
+    (plowing)
+  (wait_mm_dd 3 15) 
+    (seed_bed_preparation) (sow "SB" (seed 180 [kg w.w./ha]))
+  (wait (or (crop_ds_after "SB" 2.0 []) (mm_dd 10 1)))
+    (harvest "SB"  (stub 8 [cm]) (stem 70 [%]) (leaf 70 [%]))
+  (wait_days 4)
+    (sow "CC"))
+
+(defaction IrrigateJB1 markvand 
+  (soil JB1)
+  (map ("WW" "vinterhvede")
+       ("SB" "vaarbyg")))
+
+(defaction IrrigateJB4 markvand 
+  (soil JB4)
+  (map ("WW" "vinterhvede")
+       ("SB" "vaarbyg")))
+
+(defaction "SB" activity
+  SB1 store_SOM (repeat (activity SB1 restore_SOM)))
+
+(defaction "WW" activity
+  WW1 store_SOM (repeat (activity WW1 restore_SOM)))
+
+(defaction "SBIJB1"
+  (while SB (IrrigateJB1))) 
+  
+(defaction "WWIJB1"
+  (while WW (IrrigateJB1)))
+  
+(defaction "SBIJB4"
+  (while SB (IrrigateJB4))) 
+  
+(defaction "WWIJB4"
+  (while WW (IrrigateJB4)))
+  
+;;; management.dai ends here.

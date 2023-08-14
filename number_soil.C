@@ -177,7 +177,7 @@ struct NumberDepthK : public NumberByDepth
     const double height
       = units.convert (z->dimension (scope), Units::cm (), z->value (scope));
     const Horizon& horizon = column->horizon_at (height, 0.5, 0.5);
-    return horizon.hydraulic->K (pressure);
+    return horizon.hydraulic->KT20 (pressure);
   }
 
   symbol dimension (const Scope&) const 
@@ -307,7 +307,7 @@ struct NumberSoilK : public NumberByTension
     const double h_cm = units.convert (h->dimension (scope), 
 				       Units::cm (), 
 				       h->value (scope));
-    const double K_primary = horizon->hydraulic->K (h_cm); 
+    const double K_primary = horizon->hydraulic->KT20 (h_cm); 
     const double K_secondary = horizon->secondary_domain ().K (h_cm);
     const double K_factor = horizon->K_factor ();
     return K_factor * std::max (K_primary, K_secondary);

@@ -30,6 +30,7 @@
 #include "block_model.h"
 #include "lexer_table.h"
 #include "units.h"
+#include <sstream>
 
 class HydraulicTable : public Hydraulic
 {
@@ -38,26 +39,40 @@ class HydraulicTable : public Hydraulic
   PLF pF_Theta;
   PLF Cw2_pF;
   PLF K_pF;
-  PLF M_h;
+  PLF M_pF;
 
-  double lookup (const PLF& plf, const double h) const
-  {
-    if (h > h0)
-      return plf.y (0);
-    return plf (h2pF (h));
-  }
-  
 public:
   double Theta (double h) const
-  { return lookup (Theta_pF, h); }
+  {
+    if (h > h0)
+      return Theta_sat;
+    return Theta_pF (h2pF (h));
+  }
   double K (double h) const
-  { return lookup (K_pF, h); }
+  {
+    if (h > h0)
+      return K_sat;
+    return K_pF (h2pF (h));
+  }
+      
   double Cw2 (double h) const
-  { return lookup (Cw2_pF, h); }
+  {
+    if (h > h0)
+      return 0.0;
+    return Cw2_pF (h2pF (h));
+  }
   double h (double Theta) const
-  { return pF2h (pF_Theta (Theta)); }
+  {
+    if (Theta >= Theta_sat)
+      return 0.0;
+    return pF2h (pF_Theta (Theta));
+  }
   double M (double h) const
-  { return M_h (h); }
+  {
+    if (h > h0)
+      return M_pF (h2pF (h0));
+    return M_pF (h2pF (h));
+  }
 
 // Create and Destroy.
 private:
@@ -74,7 +89,7 @@ HydraulicTable::HydraulicTable (const BlockModel& al)
   Treelog& msg = al.msg ();
   const Units& units = al.units ();
   LexerTable lex (al);
-  const int M_intervals = al.integer ("M_intervals");
+  //  const int M_intervals = al.integer ("M_intervals");
   
   if (!lex.read_header (msg))
     throw "hyd table init err1";
@@ -182,11 +197,27 @@ HydraulicTable::HydraulicTable (const BlockModel& al)
       pF_Theta.add (Theta, pF);
     }
   daisy_assert (pF_Theta.size () == Theta_pF.size ());
-  K_to_M (M_h, M_intervals);
+  // K_to_M (M_h, M_intervals);
+  M_pF = K_pF.integrate_stupidly_2 ();
   {
     const double pF0 = Theta_pF.x (0);
     h0 = pF2h (pF0);
   }
+
+  if (K_sat < 0.0)
+    {
+      K_sat = K_pF.y (0);
+      std::ostringstream tmp;
+      tmp << "(K_sat " << K_sat << " [cm/h])";
+      msg.message (tmp.str ());
+    }
+  if (Theta_sat < 0.0)
+    {
+      Theta_sat = Theta_pF.y (0);
+      std::ostringstream tmp;
+      tmp << "(Theta_sat " << Theta_sat << " [cm/h])";
+      msg.message (tmp.str ());
+    }
   return;
 }
 

@@ -44,6 +44,7 @@ struct PLF::Implementation
   double max_at () const;
   double integrate (const double from, const double to) const;
   PLF integrate_stupidly () const;
+  PLF integrate_stupidly_2 (const double C) const;
   void clear () 
     { 
       x.erase (x.begin (), x.end ());
@@ -281,6 +282,49 @@ PLF::Implementation::integrate_stupidly () const
   return plf;
 }
 
+// Integrate a PLF by pretending that line piece is really a constant
+// with the mean value of the line piece.  That way, the result can be
+// described as a PLF itself.  
+
+PLF 
+PLF::Implementation::integrate_stupidly_2 (const double C) const
+{
+  PLF plf;
+  const unsigned int intervals = 10;
+  const unsigned int size = x.size ();
+  daisy_assert (size > 0);
+  double sum = 0.0;
+  double last_x = x[0];
+  double last_y = C;
+  
+  plf.add (last_x, last_y);
+  for (unsigned int i = 1; i < size; i++)
+    {
+      if (x[i] > last_x)
+	{
+	  // Add intervals-1 intermediate points.
+	  const double dx = (x[i] - last_x) / intervals;
+	  for (unsigned int j = 1; j < intervals; j++)
+	    {
+	      const double x = last_x + j * dx;
+	      const double y = this->operator ()(x);
+	      plf.add (x, sum + (last_y + y) * 0.5 * (x - last_x));
+	    }
+	  // Add final point.
+	  sum += (last_y + y[i]) * 0.5 * (x[i] - last_x);
+	  plf.add (x[i], sum);
+	}
+      else
+	{
+	  // The PLF is discontinues at this point.
+	  daisy_assert (iszero (x[i] - last_x));
+	}
+      last_x = x[i];
+      last_y = y[i];
+    }
+  return plf;
+}
+
 void 
 PLF::Implementation::add (double x_, double y_)
 {
@@ -337,6 +381,12 @@ PLF
 PLF::integrate_stupidly () const
 {
   return impl.integrate_stupidly ();
+}
+
+PLF 
+PLF::integrate_stupidly_2 (const double C) const
+{
+  return impl.integrate_stupidly_2 (C);
 }
 
 void

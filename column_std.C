@@ -86,6 +86,8 @@ struct ColumnStandard : public Column
   std::unique_ptr<Irrigation> irrigation;
 
   // Log variables.
+  double yield_DM;
+  double yield_N;
   double harvest_DM;
   double harvest_N;
   double harvest_C;
@@ -361,7 +363,8 @@ ColumnStandard::harvest (const Time& time,
   vegetation->harvest (objid, crop_name, time, geometry,
                        stub_length, 
                        stem_harvest, leaf_harvest, sorg_harvest,
-                       harvest, min_height, 
+                       harvest, min_height,
+		       yield_DM, yield_N,
                        harvest_DM, harvest_N, harvest_C, residuals, 
                        residuals_DM, residuals_N_top, residuals_C_top,
                        residuals_N_soil, residuals_C_soil,
@@ -395,7 +398,8 @@ ColumnStandard::pluck (const Time& time, const symbol crop_name,
   std::vector<AM*> residuals;
   vegetation->pluck (objid, crop_name, time, geometry,
                      stem_harvest, leaf_harvest, sorg_harvest,
-                     harvest, harvest_DM, harvest_N, harvest_C, 
+                     harvest,
+		     yield_DM, yield_N, harvest_DM, harvest_N, harvest_C, 
                      residuals, residuals_DM, residuals_N_top, residuals_C_top,
                      residuals_N_soil, residuals_C_soil,msg); 
   add_residuals (residuals);
@@ -624,6 +628,8 @@ ColumnStandard::clear ()
   chemistry->clear ();
   vegetation->clear ();
   
+  yield_DM = 0.0;
+  yield_N = 0.0;
   harvest_DM = 0.0;
   harvest_N = 0.0;
   harvest_C = 0.0;
@@ -736,6 +742,8 @@ ColumnStandard::tick_move (const Metalib& metalib,
   irrigation->tick (geometry, *soil_water, *chemistry, *bioclimate, dt, msg);
 
   // Put on timestep on management results for output.
+  yield_DM /= dt;
+  yield_N /= dt;
   harvest_DM /= dt;
   harvest_N /= dt;
   harvest_C /= dt;
@@ -840,7 +848,7 @@ ColumnStandard::tick_move (const Metalib& metalib,
 
   // Soil properties.
   chemistry->mass_balance (geometry, *soil_water);
-  soil->tick (dt, my_weather.rain (), geometry, *soil_water, msg);
+  soil->tick (dt, my_weather.rain (), geometry, *soil_water, *soil_heat, msg);
   const double extra = soil_water->overflow (geometry, *soil, *soil_heat, msg);
   if (extra > 0.0)
     {
@@ -1005,6 +1013,8 @@ ColumnStandard::output (Log& log) const
   output_variable (seed_C, log);
   output_variable (applied_DM, log);
   output_variable (first_year_utilization, log);
+  output_value (yield_DM, "yield_DM", log);
+  output_value (yield_N, "yield_N", log);
   output_value (harvest_DM, "harvest_DM", log);
   output_value (harvest_N, "harvest_N", log);
   output_value (harvest_C, "harvest_C", log);
@@ -1055,6 +1065,8 @@ ColumnStandard::ColumnStandard (const BlockModel& al)
                     (al, "OrganicMatter")),
     second_year_utilization_ (al.number ("second_year_utilization")),
     irrigation (submodel<Irrigation> (al, "Irrigation")),
+    yield_DM (0.0),
+    yield_N (0.0),
     harvest_DM (0.0),
     harvest_N (0.0),
     harvest_C (0.0),
@@ -1239,6 +1251,12 @@ Drainage.");
                           Attribute::State, Attribute::Singleton,
                           "Chemical compounds in the system.");
     frame.set ("Chemistry", "nutrient");
+    frame.declare ("yield_DM", "g/m^2/h", Attribute::LogOnly, 
+                   "Amount of DM removed as yield this hour.\n\
+This is the economic part of the storage organ, e.g. the grains.");
+    frame.declare ("yield_N", "g/m^2/h", Attribute::LogOnly, 
+                   "Amount of nitrogen removed as yield this hour.\n\
+This is the economic part of the storage organ, e.g. the grains.");
     frame.declare ("harvest_DM", "g/m^2/h", Attribute::LogOnly, 
                    "Amount of DM removed by harvest this hour.");
     frame.declare ("harvest_N", "g/m^2/h", Attribute::LogOnly, 

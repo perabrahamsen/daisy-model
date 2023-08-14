@@ -1,0 +1,62 @@
+;;; output.dai --- Log definitions for BioAdapt.
+
+(defselect WU number)
+
+(deflog "Yield" column
+  "Grain yield."
+  (where "${colfid}yield.dlf")
+  (when yearly)
+  (entries (number (tag "DM")
+                   (path column "${column}" yield_DM)
+                   (spec column default yield_DM)
+                   (dimension [Mg/ha])
+                   (handle sum))
+           (number (tag "N")
+                   (path column "${column}" yield_N)
+                   (spec column default yield_N)
+                   (dimension [kg/ha])
+                   (handle sum))
+           (number (tag "total DM")
+                   (path column "${column}" harvest_DM)
+                   (spec column default harvest_DM)
+                   (dimension [Mg/ha])
+                   (handle sum))
+           (number (tag "total N")
+                   (path column "${column}" harvest_N)
+                   (spec column default harvest_N)
+                   (dimension [kg/ha])
+                   (handle sum))
+           ))
+
+(deflog "Water usage" column
+  "How much water is evaporated in growing season."
+  (where "${colfid}water_usage.dlf")
+  (when yearly)
+  (entries (number (tag "ETa")
+		   (path column "${column}" Bioclimate "*" total_ea)
+		   (spec bioclimate default total_ea)            
+		   (handle sum)
+		   (dimension "mm"))
+	   (number (tag "ETc")
+		   (path column "${column}" Bioclimate "*" total_ep)
+		   (spec bioclimate default total_ep)            
+		   (handle sum)
+		   (dimension "mm"))
+	   (number (tag "ET0")
+		   (path column "${column}" Bioclimate "*"
+			 pet "*" reference_evapotranspiration)
+		   (spec pet weather reference_evapotranspiration)            
+		   (handle sum)
+		   (dimension "mm"))))
+  
+(deflog "Water usage 4-7" "Water usage"
+  "How much water is evaporated in growing season."
+  (active (and (after_mm_dd 4 1) (not (after_mm_dd 8 1))))
+  (where "${colfid}water_usage_4-7.dlf"))
+
+(deflog "Water usage 5-7" "Water usage"
+  "How much water is evaporated in growing season."
+  (active (and (after_mm_dd 5 1) (not (after_mm_dd 8 1))))
+  (where "${colfid}water_usage_5-7.dlf"))
+
+;;; output.dai ends here.

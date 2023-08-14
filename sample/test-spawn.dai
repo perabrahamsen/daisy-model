@@ -1,0 +1,96 @@
+;;; test-spawn.dai --- Test the spawn command for running scenarios.
+
+(input file "dk-soil.dai")
+(input file "tillage.dai")
+(input file "fertilizer.dai")
+(input file "crop.dai")
+(input file "dk-management.dai")
+(input file "log-std.dai")
+
+(defprogram Base Daisy
+  "This is the stuff all scenrios have in common."
+  (time 1978 1 1)
+  (stop 2000 1 1)
+  (activate_output (after 1980 1 1))
+  (output "harvest" "Field water" "Field nitrogen"))
+
+;; We test two different climates.
+
+(defweather Normal table (file "dk-taastrup.dwf"))
+(defweather Warmer Normal (TempOffset 2 [dg C]))
+
+;; We test three different soils: Askov, Jyndevad, Foulum.
+;; These are defined in dk-soil.dai.
+
+;; The Foulum column has no groundwater defined.
+(defcolumn FoulumD Foulum (Groundwater deep))
+
+;; We test three different managements:
+;; "SBarley w. catch crop", "WWheat w. MF", and "SBarley & Pea".
+;; These are all defined in dk-management.dai.
+
+;; This gives 2x3x3 = 18 combinations, defined below.
+
+(defprogram N-A-S Base "N-A-S scenarie"
+  (weather Normal) (column Askov) (manager "SBarley w. catch crop"))
+
+(defprogram N-A-W Base "N-A-W scenarie"
+  (weather Normal) (column Askov) (manager "WWheat w. MF"))
+
+(defprogram N-A-P Base "N-A-P scenarie"
+  (weather Normal) (column Askov) (manager "SBarley & Pea"))
+  
+(defprogram N-J-S Base "N-J-S scenarie"
+  (weather Normal) (column Jyndevad) (manager "SBarley w. catch crop"))
+
+(defprogram N-J-W Base "N-J-W scenarie"
+  (weather Normal) (column Jyndevad) (manager "WWheat w. MF"))
+
+(defprogram N-J-P Base "N-J-P scenarie"
+  (weather Normal) (column Jyndevad) (manager "SBarley & Pea"))
+  
+(defprogram N-F-S Base "N-F-S scenarie"
+  (weather Normal) (column FoulumD) (manager "SBarley w. catch crop"))
+
+(defprogram N-F-W Base "N-F-W scenarie"
+  (weather Normal) (column FoulumD) (manager "WWheat w. MF"))
+
+(defprogram N-F-P Base "N-F-P scenarie"
+  (weather Normal) (column FoulumD) (manager "SBarley & Pea"))
+
+(defprogram W-A-S Base "W-A-S scenarie"
+  (weather Warmer) (column Askov) (manager "SBarley w. catch crop"))
+
+(defprogram W-A-W Base "W-A-W scenarie"
+  (weather Warmer) (column Askov) (manager "WWheat w. MF"))
+
+(defprogram W-A-P Base "W-A-P scenarie"
+  (weather Warmer) (column Askov) (manager "SBarley & Pea"))
+  
+(defprogram W-J-S Base "W-J-S scenarie"
+  (weather Warmer) (column Jyndevad) (manager "SBarley w. catch crop"))
+
+(defprogram W-J-W Base "W-J-W scenarie"
+  (weather Warmer) (column Jyndevad) (manager "WWheat w. MF"))
+
+(defprogram W-J-P Base "W-J-P scenarie"
+  (weather Warmer) (column Jyndevad) (manager "SBarley & Pea"))
+  
+(defprogram W-F-S Base "W-F-S scenarie"
+  (weather Warmer) (column FoulumD) (manager "SBarley w. catch crop"))
+
+(defprogram W-F-W Base "W-F-W scenarie"
+  (weather Warmer) (column FoulumD) (manager "WWheat w. MF"))
+
+(defprogram W-F-P Base "W-F-P scenarie"
+  (weather Warmer) (column FoulumD) (manager "SBarley & Pea"))
+
+;; Now, run them all.
+
+(defprogram all spawn
+  (program N-A-S N-A-W N-A-P N-J-S N-J-W N-J-P N-F-S N-F-W N-F-P
+	   W-A-S W-A-W W-A-P W-J-S W-J-W W-J-P W-F-S W-F-W W-F-P))
+
+(run all)
+
+;;; test-spawn.dai ends her.

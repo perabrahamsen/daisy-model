@@ -1,74 +1,58 @@
 -TODO ---things that needs to be done with Daisy -*- outline -*-
 
-* Bedrift
+* phishes
 
-rettet mod national regulering, ikke rådgivning
+** tasks
 
-** både ghg og N
+** Daisy setup for PL case N/Pest
 
-** Ikke nye virkemidler
+*** Inputs
 
-** tværfaglig og tværinstituionel
+**** Select subset
 
-** to dele, mark og stald
+**** Agriculture
 
-** udvikling/tilpsning/kalibrering/validering af modeller
+**** Select pesticides
 
-** Bedømmelse
+**** Homogenious
 
-*** vægt 50 %
+**** Important contribution for N / Pest
 
-**** vægt: stor udledning og stor variation
+**** Crops handled by Daisy
 
-**** vægt: komplet (alle kilder)
+**** GWT (+ conc?) from MIKE SHE
 
-**** bedrift -> regulering
 
-*** vægt 20 % holisme
+*** Output
 
-*** 15 % samarbejde tværinsititutionel
+Flux & Conc to MIKE SHE
 
-*** 15 % forskning (uddanelse, fastholdese)
+**** Soils
 
-*** alle bedømmes 1-5
+** 
 
-** ansøgning
+** Daist setup for CZ case N/Pest
 
-*** fase 1: koncept 10 maj kl 12 (forskningskyndig vurdering)
 
-(midt juni svar)
+* local rootdens model
 
-*** fase 2: fuld ansøgning 24 august
+** rootdens_local.C
 
-(december svar)
+** "emergence"
 
-15 millioner, 100 % dækket, 44 % overhead
+** thickening
 
-universiteter og primær ansøger.
+** death
 
-løn, drift, specifikt udstyr, fuld phd
+** document it
 
-dansk eller engelsk ansøgning
+* Lav version alle platforme
 
 * GMSR
 
-* Vintersæd
+** Færdiggør rapport
 
-** Videnssyntese
-
-Betydning af dræn.  Roddybde.
-
-*** COMMIT
-
-*** NYIELD
-
-*** Kasper PhD
-
-* MES DOC
-
-** Stathis noter
-
-* Check table based hydraulic curves.  Something with high groundwater and biopores?
+ * PHISHES møde
 
 * hysteresis
 
@@ -79,7 +63,7 @@ Betydning af dræn.  Roddybde.
 Theta_w (h) and Theta_d (h)
 
 *** The two curves must have identical endpoints:
-
+gr
 Theta_w (0) = Theta_d (0) = Theta_sat
 
 Theta_w (-inf) = Theta_h (-inf) = Theta_res

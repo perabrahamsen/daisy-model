@@ -106,8 +106,10 @@ HydraulicHypweb::Beta_inc(const double x, const double barg1) const
 double 
 HydraulicHypweb::Theta (const double h) const
 {
+#if 0
 	const double temp1 = Se_h_cap(h);
 	const double 	temp2 = Se_h_nc(h);
+#endif
 	return Theta_cap * Se_h_cap(h) + Theta_nc * Se_h_nc(h);
 }
 

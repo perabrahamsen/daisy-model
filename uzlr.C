@@ -248,7 +248,9 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       daisy_assert (std::isfinite (Theta[i]));
       daisy_assert (std::isfinite (q[i+1]));
       daisy_assert (Theta[i] <= Theta_sat);
+#ifdef THETA_RES
       daisy_assert (Theta[i] > Theta_res);
+#endif
     }
 
   // Lower border.

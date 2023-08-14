@@ -3047,7 +3047,7 @@ This can include overflow and Darcy flow.")
   (precision 3)
   (require_top true)
   (input Generate)
-  (output Filter Biopiore-Drain Soil-Drain Matrix-Leak Biopores-Leak)
+  (output Filter Biopore-Drain Soil-Drain Matrix-Leak Biopore-Leak)
   (content Surface Soil Biopores Error))
 
 (defsummary "Colloids pool balance" balance
@@ -3085,7 +3085,7 @@ This can include overflow and Darcy flow.")
                      (path column "${column}" Chemistry "*" trace colloid M)
                      (dimension "${unit}")
                      (spec chemical default M))
-           (number (tag "Biopores")
+           (interval (tag "Biopores")
                      (path column "${column}" Chemistry "*"
 			   trace colloid M_tertiary)
                      (dimension "${unit}")
