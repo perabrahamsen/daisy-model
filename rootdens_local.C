@@ -1,6 +1,6 @@
 // rootdens_local.C -- Local model for root growth.
 // 
-// Copyright 2012 Per Abrahamsen and KU.
+// Copyright 2012, 2023 Per Abrahamsen and KU.
 //
 // This file is part of Daisy.
 // 
@@ -54,7 +54,7 @@ struct RootdensLocal : public Rootdens
   double expansion_volume;	  // Expansion volume [cm^3]
   double E_tot;			  // Total expansion root length [cm]
   double A_tot;			  // Total expansion area [cm^2]
-  std::vector<double> T;	  // Thickening [cm/cm^3]
+  std::vector<double> I;	  // Internal adjustment [cm/cm^3]
   std::vector<double> D;	  // Death [cm/cm^3]
   
   
@@ -117,6 +117,16 @@ RootdensLocal::expansion (const Geometry& geo,
 			  const double delta_root,  // [cm]
 			  std::vector<double>& L)   // [cm/cm^3]
 {
+  if (delta_root <= 0.0)
+    // No expansion if roots are shrinking.
+    {
+      std::fill (E.begin (), E.end (), 0.0);
+      expansion = 0.0;
+      E_tot = 0.0;
+      A_tot = 0.0;
+      return;
+    }
+  
   const size_t cell_size = geo.cell_size ();
   daisy_assert (L.size () == cell_size);
   daisy_assert (E.size () == cell_size);
@@ -151,7 +161,7 @@ RootdensLocal::expansion (const Geometry& geo,
 
 	  const int o = geo.other (e, c);
 	  daisy_assert (geo.cell_is_internal (o));
-	  daisy_assert (o > 0 && o < cell_size);
+	  daisy_assert (o >= 0 && o < cell_size);
 
 	  if (L[o] < DensRtTip)
 	    // Only cells above DensRtTip expand to neighbors.
@@ -176,6 +186,16 @@ RootdensLocal::expansion (const Geometry& geo,
     }
 
   daisy_approximate (geo.total_soil (E), E_tot);
+  counst double factor = delta_root / E_tot;
+  if (factor > 1.0)
+    // Sufficient roots to expand with with DensRtTip.
+    return;
+
+  // Shrink for available root length.
+  for (int c = 0; c < cell_size; c++)
+    E[c] *= facor;
+  daisy_approximate (geo.total_soil (E), delta_root);
+  E_tot = delta_root;
 }
 
 void
@@ -191,7 +211,7 @@ RootdensLocal::set_density (const Geometry& geo,
 // Check WRoot > LastWRoot
 //   If so, do expansion
 //   Check if expansion needs to be limited by delta WRoot
-// Do thickening
+// Do internal adjustment
 
 {
   TREELOG_MODEL (msg);

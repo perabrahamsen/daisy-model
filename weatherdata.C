@@ -170,6 +170,9 @@ namespace Weatherdata
   symbol PrecipScale ()
   { static const symbol name ("PrecipScale"); return name; }
   
+  symbol GlobRadScale ()
+  { static const symbol name ("GlobRadScale"); return name; }
+  
   symbol TempOffset ()
   { static const symbol name ("TempOffset"); return name; }
   
@@ -337,6 +340,7 @@ Average precipitation.  Used for deviding precipitation into dry and wet.",
         (*this)["Surface"] = "GlobRad"; // Used for ref.evap.
         (*this)["PrecipCorrect"] = "Precip";
         (*this)["PrecipScale"] = "Precip";
+        (*this)["GlobRadScale"] = "GlobRad";
         (*this)["TempOffset"] = "AirTemp";
       }
     } meta_map;
@@ -388,6 +392,12 @@ Scale factors for precipitation.\n\
 Can contain one or twelve numbers, in the later case the numbers\n\
 corresponds to months.");
     frame.set_check (PrecipScale (), multi);
+    frame.declare (GlobRadScale (), Attribute::None (), 
+                   Attribute::OptionalConst, Attribute::Variable, "\
+Scale factors for global radiation.\n\
+Can contain one or twelve numbers, in the later case the numbers\n\
+corresponds to months.");
+    frame.set_check (GlobRadScale (), multi);
     frame.declare (TempOffset (), "dg C", 
                    Attribute::OptionalConst, Attribute::Variable, "\
 Temperature offset.\n\

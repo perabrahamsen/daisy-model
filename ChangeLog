@@ -1,3 +1,14 @@
+2023-08-29  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* wsource_table.C, wsource_table.h, weatherdata.C, weatherdata.h
+	(GlobRadScale): New keyword.
+
+	* hydraulic.C (print_M): New parameter to the hydraulic program.
+
+2023-08-28  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* hydraulic_table.C (K_sat, Theta_sat): New optional parameters.
+
 2023-08-04  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* rootdens_local.C: New model.

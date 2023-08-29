@@ -287,6 +287,7 @@ struct ProgramHydraulic_table : public Program
   const int intervals;
   const bool top_soil;
   const bool print_Cw2;
+  const bool print_M;
   const double min_pF;
   const double max_pF;
   const double T;
@@ -297,10 +298,14 @@ struct ProgramHydraulic_table : public Program
     tmp << "pressure\tpressure\tTheta\tK";
     if (print_Cw2)
       tmp << "\tCw2";
+    if (print_M)
+      tmp << "\tM";
     tmp << "\n";
     tmp << "pF\tcm\t%\tcm/h";
     if (print_Cw2)
       tmp << "\tcm^-1";
+    if (print_M)
+      tmp << "\tcm^2/h";
     tmp << "\n";
     for (int i = 0; i <= intervals; i++)
       {
@@ -309,9 +314,12 @@ struct ProgramHydraulic_table : public Program
         const double Theta = horizon->hydraulic->Theta (h);
         const double K = horizon->hydraulic->KT (h, T);
 	const double Cw2 = horizon->hydraulic->Cw2 (h);
+	const double M = horizon->hydraulic->M (h);
         tmp << pF << "\t" << h << "\t" << Theta * 100 << "\t" << K;
 	if (print_Cw2)
 	  tmp << "\t" << Cw2;
+	if (print_M)
+	  tmp << "\t" << M;
         tmp << "\n";
       }
     msg.message (tmp.str ());
@@ -333,6 +341,7 @@ struct ProgramHydraulic_table : public Program
       intervals (al.integer ("intervals")),
       top_soil (al.flag ("top_soil")),
       print_Cw2 (al.flag ("print_Cw2")),
+      print_M (al.flag ("print_M")),
       min_pF (al.number ("min_pF")),
       max_pF (al.number ("max_pF")),
       T (al.number ("T"))
@@ -377,6 +386,9 @@ Set to true for the plowing layer.");
     frame.declare_boolean ("print_Cw2", Attribute::Const, "\
 Set to true to include Cw2 to the table.");
     frame.set ("print_Cw2", false);
+    frame.declare_boolean ("print_M", Attribute::Const, "\
+Set to true to include M to the table.");
+    frame.set ("print_M", false);
     frame.declare ("min_pF", "pF", Attribute::Const, "\
 Minimal pF in table.");
     frame.set ("min_pF", 0.0);

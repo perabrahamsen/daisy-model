@@ -70,6 +70,12 @@ WSourceTable::precip_correct (const Time& time) const
 }
 
 double 
+WSourceTable::globrad_scale (const Time& time) const
+{
+  return lookup_month (time,  Weatherdata::GlobRadScale (), 1.0);
+}
+
+double 
 WSourceTable::temp_offset (const Time& time) const
 { return lookup_month (time,  Weatherdata::TempOffset (), 0.0); }
 
@@ -123,6 +129,8 @@ WSourceTable::number (const symbol key) const
            || key == Weatherdata::T_min ()
            || key == Weatherdata::T_max ())
     return raw + temp_offset (timestep_begin);
+  else if (key == Weatherdata::GlobRad ())
+    return raw * globrad_scale (timestep_begin);
   
   return raw;
 }
@@ -196,6 +204,8 @@ WSourceTable::end_number (const symbol key) const
            || key == Weatherdata::T_min ()
            || key == Weatherdata::T_max ())
     return raw + temp_offset (timestep_begin);
+  else if (key == Weatherdata::GlobRad ())
+    return raw * globrad_scale (timestep_begin);
 
   return raw;
 }

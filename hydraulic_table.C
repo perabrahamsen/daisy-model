@@ -30,6 +30,7 @@
 #include "block_model.h"
 #include "lexer_table.h"
 #include "units.h"
+#include "check.h"
 #include <sstream>
 
 class HydraulicTable : public Hydraulic
@@ -242,7 +243,11 @@ Reads a ddf file with column pF Theta Cw2 K.")
     frame.declare_fraction ("Theta_res", Attribute::Const,
 			    "Soil residual water.");
     frame.set ("Theta_res", 0.0);
-
+    frame.declare ("K_sat", "cm/h",
+		   Check::positive (), Attribute::OptionalConst,
+		   "Water conductivity of saturated soil.");
+    frame.declare_fraction ("Theta_sat",  Attribute::OptionalState,
+			    "Saturation point.");
     LexerTable::load_syntax (frame);
     frame.declare_integer ("M_intervals", Attribute::Const,
 			   "Number of intervals for numeric integration of K.");

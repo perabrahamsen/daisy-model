@@ -6,6 +6,21 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.42
+
+** The 'table' hydraulic model.
+
+New optional 'K_sat' and 'Theta_sat' parameters.
+
+** The 'hydraulic' program.
+
+New 'print_M' parameter.
+
+** New 'GlobRadScale' weather parameter.
+
+Like PrecipScale, but for global radiation.
+
+
 * 6.36
 
 ** New nwaps program for collecting spawn program results.

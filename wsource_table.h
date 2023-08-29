@@ -52,6 +52,7 @@ private:
   double lookup_month (const Time&, const symbol, double default_value) const;
   double lookup_month (const Time&, const std::vector<double>&) const;
   double precip_correct (const Time&) const;
+  double globrad_scale (const Time&) const;
   double temp_offset (const Time&) const;
 
   // Scope.
