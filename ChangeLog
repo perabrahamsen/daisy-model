@@ -1,5 +1,9 @@
 2023-08-29  Per Abrahamsen  <pa@plen.ku.dk>
 
+	* Version 6.42 released.
+
+2023-08-29  Per Abrahamsen  <pa@plen.ku.dk>
+
 	* wsource_table.C, wsource_table.h, weatherdata.C, weatherdata.h
 	(GlobRadScale): New keyword.
 
