@@ -1,3 +1,5 @@
+// ut_iterative.C --- Unit tests for iterative methods.
+
 #define BUILD_DLL
 #include "iterative.h"
 #include "assertion.h"
@@ -36,3 +38,5 @@ TEST (Iterative, NelderMead)
   EXPECT_NEAR (x, 2.0, 0.01);
   EXPECT_NEAR (y, -1.0, 0.01);
 }
+
+// ut_iterative.C ends here.

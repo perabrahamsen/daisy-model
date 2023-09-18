@@ -40,7 +40,7 @@ class HydraulicTable : public Hydraulic
   PLF pF_Theta;
   PLF Cw2_pF;
   PLF K_pF;
-  PLF M_pF;
+  mutable PLF M_;
 
 public:
   double Theta (double h) const
@@ -70,11 +70,12 @@ public:
   }
   double M (double h) const
   {
-    if (h > h0)
-      return M_pF (h2pF (h0));
-    return M_pF (h2pF (h));
+    if (M_.size () == 0)
+      K_to_M (M_, 500);
+    
+    return M_ (h);
   }
-
+  
 // Create and Destroy.
 private:
   friend class HydraulicTableSyntax;
@@ -198,8 +199,6 @@ HydraulicTable::HydraulicTable (const BlockModel& al)
       pF_Theta.add (Theta, pF);
     }
   daisy_assert (pF_Theta.size () == Theta_pF.size ());
-  // K_to_M (M_h, M_intervals);
-  M_pF = K_pF.integrate_stupidly_2 ();
   {
     const double pF0 = Theta_pF.x (0);
     h0 = pF2h (pF0);

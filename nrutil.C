@@ -1,3 +1,5 @@
+// nrutils.C -- Numerical Receipes
+
 #if 1 || defined(__STDC__) || defined(ANSI) || defined(NRANSI) /* ANSI */
 
 #include <stdio.h>
@@ -615,3 +617,5 @@ long nch,ncl,ndh,ndl,nrh,nrl;
 }
 
 #endif /* ANSI */
+
+// nrutils.C ends here.

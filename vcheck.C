@@ -1,4 +1,4 @@
-// check.C -- Check validity of arbitrary alist members.
+// vcheck.C -- Check validity of arbitrary alist members.
 // 
 // Copyright 2001, 2003 Per Abrahamsen and KVL.
 //

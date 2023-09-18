@@ -23,8 +23,6 @@
 #ifndef FAO_H
 #define FAO_H
 
-class Treelog;
-
 namespace FAO
 { 
   // Bioclimate.

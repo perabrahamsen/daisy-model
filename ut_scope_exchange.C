@@ -1,3 +1,5 @@
+// ut_scope_exchange.C --- unit tests for ScopeExchange
+
 #define BUILD_DLL
 #include "scope_exchange.h"
 #include <gtest/gtest.h>
@@ -32,3 +34,5 @@ TEST (ScopeExchange, All)
   EXPECT_EQ (scope.lookup ("no such number"), Attribute::Error);
   EXPECT_FALSE (scope.check ("no such number"));
 }
+
+// ut_scope_exchange.C ends here.

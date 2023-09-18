@@ -1,4 +1,4 @@
-// rootdens_osvaldo.C -- Tools for Osvaldo
+// program_osvaldo.C -- Tools for Osvaldo
 // 
 // Copyright 2010 KU.
 //

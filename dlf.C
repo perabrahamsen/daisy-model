@@ -1,4 +1,4 @@
-// dlf.h -- Printing Daisy Log File headers.
+// dlf.C -- Printing Daisy Log File headers.
 // 
 // Copyright 2005 Per Abrahamsen and KVL.
 //

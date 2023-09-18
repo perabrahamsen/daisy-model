@@ -1,4 +1,4 @@
-// bdconv.C -- Bulk density convertion for select models.
+// bdconv.C -- Bulk density conversion for select models.
 // 
 // Copyright 2008 Per Abrahamsen and KVL.
 //

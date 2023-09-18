@@ -1,4 +1,4 @@
-// rootdens_rootmatch.C -- Match root data table with GP2D model.
+// program_rootmatch.C -- Match root data table with GP2D model.
 // 
 // Copyright 2011 KU.
 //

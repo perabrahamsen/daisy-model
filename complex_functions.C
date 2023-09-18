@@ -1,3 +1,5 @@
+// complex_functions.C -- weird math
+
 #include "complex_functions.h"
 #include <iostream>
 using std::cout;
@@ -469,3 +471,5 @@ complex<double> exp_I_omega_chi_calc (const int omega,const complex<double> &l,c
     return exp_I_omega_chi;
   }
 }
+
+// complex_functions.C ends here.

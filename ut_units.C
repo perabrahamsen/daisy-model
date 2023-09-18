@@ -1,3 +1,5 @@
+// ut_units.C -- units unit tests 
+
 #define BUILD_DLL
 
 #include "units.h"
@@ -70,4 +72,6 @@ TEST_F (UnitsTest, Radians2Degrees)
   EXPECT_NEAR (units.convert ("dg", "rad", 180.0), M_PI, 0.0001);
   EXPECT_NEAR (units.convert ("dg", "rad", -180.0), -M_PI, 0.0001);
 }
+
+// ut_units.C ends here.
 

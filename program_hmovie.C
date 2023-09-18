@@ -1,4 +1,4 @@
-// rootdens_hmovie.C -- Plot piezometer data.
+// program_hmovie.C -- Plot piezometer data.
 // 
 // Copyright 2011 KU.
 //

@@ -1,3 +1,5 @@
+// hyp_2F1.C --- weird math
+
 #include "hyp_2F1.h"
 #include <iostream>
 using std::cout;
@@ -1052,3 +1054,5 @@ double test_2F1 (const complex<double> &a,const complex<double> &b,const complex
     return inf_norm (d2F + ((c - (a+b+1.0)*z)*dF - a*b*F)/(z*(1.0-z)))/(inf_norm (F) + inf_norm (dF) + inf_norm (d2F));
   }
 }
+
+// hyp_2F1.C ends here.

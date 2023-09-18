@@ -1,4 +1,4 @@
-// biopore_biopores.C --- Static vertical biopores with a capacity.
+// tertiary_biopores.C --- Static vertical biopores with a capacity.
 // 
 // Copyright 2008 Per Abrahamsen and KU.
 //

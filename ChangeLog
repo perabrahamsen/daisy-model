@@ -1,3 +1,7 @@
+2023-09-18  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* hydraulic_table.C (M): Use generic code.
+
 2023-08-29  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.42 released.
