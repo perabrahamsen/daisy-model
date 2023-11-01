@@ -25,6 +25,7 @@
 #include "type.h"
 #include "assertion.h"
 #include "check.h"
+#include "function.h"
 
 Attribute::category
 Type::category () const 
@@ -225,6 +226,36 @@ TypeModel::TypeModel (const Attribute::category c, const int s, const symbol com
                         const symbol desc)
   : Type (c, s, desc),
     component_ (comp)
+{ }
+
+Attribute::type 
+TypeFunction::type () const
+{ return Attribute::Function; }
+
+symbol 
+TypeFunction::component () const
+{
+  static const symbol name = Function::component; 
+  return name;
+}
+
+symbol 
+TypeFunction::dimension () const
+{ return domain (); }
+
+symbol 
+TypeFunction::domain () const
+{ return domain_; }
+
+symbol 
+TypeFunction::range () const
+{ return range_; }
+
+TypeFunction::TypeFunction (const symbol d, const symbol r,
+			    const symbol desc)
+  : Type (Attribute::Const, Attribute::Singleton, desc),
+    domain_ (d),
+    range_ (r)
 { }
 
 // type.C ends here.

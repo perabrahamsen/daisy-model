@@ -427,6 +427,7 @@ RootSystem::initialize (const Geometry& geo, const Soil& soil,
 			const double row_width, 
                         const double row_pos, const double DS, Treelog& msg)
 {
+  msg.message ("init 2d");
   const bool is_row_crop = row_width > 0.0;
   if (rootdens.get ())
     /* We already has a root density model. */;
@@ -443,6 +444,7 @@ void
 RootSystem::initialize (const Geometry& geo, const Soil& soil, const double DS,
 			Treelog& msg)
 {
+  msg.message ("init 1d");
   const size_t cell_size = geo.cell_size ();
   ABAprod->initialize (msg);
   NH4_uptake->initialize (geo, msg);

@@ -339,28 +339,6 @@ The 'array' select model only handle bulk density for soil sized variables";
     return tmp.str ();
   }
 
-  symbol array_tag (size_t i) const
-  {
-    const Geometry* geo = geometry ();
-    if (!geo)
-      return raw_tag (i);
-
-    switch (type_size ())
-      {
-      case Attribute::SoilCells:
-	return cell_tag (i);
-      case Attribute::SoilEdges:
-	return edge_tag (i);
-      }
-    if (size () == geo->cell_size ())
-      return cell_tag (i);
-
-    if (size () == geo->edge_size ())
-      return edge_tag (i);
-
-    return raw_tag (i);
-  }
-  
   const Geometry* geometry () const
   { 
     if (last_column)

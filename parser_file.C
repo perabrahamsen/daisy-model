@@ -40,6 +40,7 @@
 #include "librarian.h"
 #include "frame_model.h"
 #include "frame_submodel.h"
+#include "function.h"
 #include <set>
 #include <memory>
 #include <sstream>
@@ -119,6 +120,11 @@ struct ParserFile::Implementation
   // Parser.
   void check_value (const Frame& syntax, const symbol name,  double value);
   void add_derived (Library&);
+  boost::shared_ptr<FrameModel> load_function (const Library& lib,
+					       bool in_sequence,
+					       const FrameModel* original,
+					       const symbol domain,
+					       const symbol range);
   boost::shared_ptr<FrameModel> load_object (const Library& lib,
                                              bool in_sequence,
                                              const FrameModel* original);
@@ -633,6 +639,121 @@ ParserFile::Implementation::add_derived (Library& lib)
 }
 
 boost::shared_ptr<FrameModel>
+ParserFile::Implementation::load_function (const Library& lib, bool in_sequence,
+					   const FrameModel *const original,
+					   const symbol domain,
+					   const symbol range)
+{
+  boost::shared_ptr<FrameModel> result;
+  bool skipped = false;
+
+  static const symbol original_symbol ("original");
+  static const symbol plf_symbol ("plf");
+
+  symbol type;
+  skip ();
+  int c = peek ();
+
+  // Handle numeric literals.
+  if (isdigit (c) || c == '.' || c == '-')
+    {                          
+      result.reset (new FrameModel (lib.model ("const"),
+				    Frame::parent_link));
+      const double value = get_number (range);
+      result->set ("value", value, range);
+      return result;
+    }
+ 
+  if (c == '(' && in_sequence)
+    {
+      skip ("(");
+      skipped = true;
+      c = peek ();
+    }
+
+  if (c == '(')
+    type = plf_symbol;
+  else
+    type = get_symbol ();
+
+  if (type == error_symbol)
+    {
+      skip_to_end ();
+      return result;
+    }
+
+  try
+    {
+      if (type == original_symbol)
+	{
+	  if (!original)
+	    throw (std::string ("No original value"));
+	  result.reset (new FrameModel (*original, Frame::parent_link));
+	  type = result->type_name ();
+	  daisy_assert (lib.check (type));
+	}
+      else if (type == plf_symbol)
+	{
+	  PLF plf;
+	  double last_x = -42;
+	  int count = 0;
+	  bool ok = true;
+	  while (!looking_at (')') && good ())
+	    {
+	      Parskip skip (*this);
+	      double x = get_number (domain);
+	      {
+		if (count > 0 && x <= last_x)
+		  {
+		    error ("Non increasing x value");
+		    ok = false;
+		  }
+		last_x = x;
+		count++;
+	      }
+	      const double y = get_number (range);
+	      if (ok)
+		plf.add (x, y);
+	    }
+	  if (count < 1)
+	    {
+	      error ("Need at least 1 point");
+	      ok = false;
+	    }
+	  if (ok)
+	    {
+	      result.reset (new FrameModel (lib.model ("plf"),
+					    Frame::parent_link));
+	      result->set ("plf", plf);
+	      result->set ("domain", domain);
+	      result->set ("range", range);
+	    }	  
+	}
+      else if (!lib.check (type))
+        {
+          throw (std::string ("Unknown function '") + type + "'");
+        }
+      else
+        {
+          result.reset (new FrameModel (lib.model (type), Frame::parent_link));
+	}
+      if (skipped || !in_sequence)
+	{
+          Treelog::Open nest (msg, "Deriving from '" + type + "'");
+	  load_list (*result);
+	}
+    }
+  catch (const std::string& wrong)
+    {
+      error (wrong);
+      skip_to_end ();
+    }
+  if (skipped)
+    skip (")");
+  return result;
+}
+
+boost::shared_ptr<FrameModel>
 ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
                                          const FrameModel *const original)
 {
@@ -1088,7 +1209,8 @@ ParserFile::Implementation::load_list (Frame& frame)
                   Treelog::Open nest (msg, "In model '" + name + "'");
                   child = load_object (lib, in_order, NULL);
                 }
-              if (!child.get ())
+
+	      if (!child.get ())
                 /* Do nothing */;
 	      else if (lib.name () == symbol (Parser::component))
 		{
@@ -1109,6 +1231,73 @@ ParserFile::Implementation::load_list (Frame& frame)
 		}
 	      else
                 frame.set (name, child);
+	    }
+	    break;
+	  case Attribute::Function:
+	    {
+              boost::shared_ptr<FrameModel> child;
+              const symbol component = frame.component (name);
+	      const Library& lib = metalib ().library (component);
+	      const symbol domain = frame.domain (name);
+	      const symbol range = frame.range (name);
+              if (frame.check (name))
+                {
+                  Treelog::Open nest (msg, "Refining function '" + name + "'");
+                  child = load_function (lib, in_order, &frame.model (name),
+					 domain, range);
+                }
+              else
+                {
+                  Treelog::Open nest (msg, "In function '" + name + "'");
+                  child = load_function (lib, in_order, NULL,
+					 domain, range);
+                }
+	      if (child.get ())
+		{
+		  std::unique_ptr<Function> function 
+                    (Librarian::build_frame<Function> (metalib (), msg, *child,
+						       name));
+                  if (!function.get ())
+                    error ("Failed to instantiate function");
+		  else
+		    {
+		      auto same_unit
+			= [this](symbol key, symbol has, symbol want)
+			  {
+			    if (has == want)
+			      return;
+
+			    if (has == Attribute::Unknown ()
+				|| want == Attribute::Unknown ())
+			      return;
+
+			    static const symbol empty ("");
+
+			    auto is_none
+			      = [](symbol dim)
+				{
+				  static const symbol empty ("");
+				  return dim == Attribute::None ()
+				    || dim  == Attribute::Fraction ()
+				    || dim == empty;
+				};
+
+			    if (is_none (has) && is_none (want))
+			      return;
+
+			    std::ostringstream tmp;
+			    tmp << key
+				<< ": got [" << has
+				<< "] want [" << want << "]";
+			    error (tmp.str ());
+			  };
+		      same_unit ("domain",
+				 child->name ("domain"), frame.domain (name));
+		      same_unit ("range",
+				 child->name ("range"), frame.range (name));
+		      frame.set (name, child);
+		    }
+		}
 	    }
 	    break;
 	  case Attribute::Scalar:

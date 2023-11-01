@@ -119,6 +119,13 @@ Units::dry_soil_fraction ()
   return unit;
 }
 
+symbol
+Units::dgC ()
+{
+  static const symbol unit ("dg C");
+  return unit;
+}
+
 Units::special_convert_type
 Units::special_convert[] = {
   // We assume length is cm H2O, and convert to hPa.

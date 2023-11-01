@@ -51,6 +51,7 @@ struct PrinterFile::Implementation
 				   const std::string& name);
 
   // Print entry 'key' in alist.
+  std::string format_dimension (const symbol dim) const;
   void print_dimension (const Frame&, const symbol key, 
                         const symbol dim);
   void print_entry (const Frame& frame, const Frame* super,
@@ -66,7 +67,8 @@ struct PrinterFile::Implementation
   void print_symbol (const symbol value)
   { print_string (value.name ()); }
   void print_bool (bool); 
-  void print_plf (const PLF&, int indent); 
+  void print_plf (const PLF&, int indent,
+		  const symbol domain, const symbol range); 
   void print_alist (const Frame& frame, const Frame* super, 
                     int indent, bool skip);
   void print_object (const FrameModel&, const Library& library,
@@ -115,6 +117,7 @@ PrinterFile::Implementation::is_complex (const Frame& frame,
     case Attribute::String:
       return false;
     case Attribute::Model:
+    case Attribute::Function:
       return frame.order_index (key) >= 0
 	|| is_complex_object (frame.model (key), 
                               metalib.library (frame.component (key)));
@@ -186,6 +189,18 @@ PrinterFile::Implementation::print_quoted_string (std::ostream& out,
   out << "\"";
 }
 
+std::string
+PrinterFile::Implementation::format_dimension (const symbol dim) const
+{
+  std::stringstream result;
+  
+  if (dim == Attribute::None () || dim == Attribute::Fraction ())
+    result << "[]";
+  else
+    result << "[" << dim << "]";
+  return result.str ();
+}
+
 void 
 PrinterFile::Implementation::print_dimension (const Frame& frame,
                                               const symbol key,
@@ -240,7 +255,8 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
                          indent, false); 
 	  break;
 	case Attribute::PLF:
-	  print_plf (frame.plf (key), indent);
+	  print_plf (frame.plf (key), indent,
+		     frame.domain (key), frame.range (key));
 	  break;
 	case Attribute::Boolean:
 	  print_bool (frame.flag (key));
@@ -250,6 +266,35 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	  break;
 	case Attribute::Integer:
 	  out << frame.integer (key);
+	  break;
+	case Attribute::Function:
+	  {
+	    static const symbol const_symbol ("const"); 
+	    static const symbol plf_symbol ("plf"); 
+	    const FrameModel& model = frame.model (key);
+	    const symbol name = model.type_name ();
+	    if (name == const_symbol)
+	      {
+		out << model.number ("value");
+		print_dimension (frame, key, frame.range (key));
+	      }
+	    else if (name == plf_symbol)
+	      {
+		print_plf (model.plf ("plf"), indent,
+			   frame.domain (key),
+			   frame.range (key));
+		
+	      }
+	    else
+	      {
+		const symbol component = frame.component (key);
+		const Library& library = metalib.library (component);
+		if (super && super->check (key))
+		  print_object (model, library, &super->model (key), indent);
+		else
+		  print_object (model, library, NULL, indent);
+	      }
+	  }
 	  break;
 	case Attribute::Model:
           {
@@ -314,7 +359,8 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 		if (i > 0) 
 		  out << "\n" << std::string (indent, ' ');
 		out << "(";
-		print_plf (*value[i], indent + 1);
+		print_plf (*value[i], indent + 1,
+			   frame.domain (key), frame.range (key));
 		out << ")";
 	      }
 	  }
@@ -357,6 +403,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	  }
 	  break;
 	case Attribute::Model:
+	case Attribute::Function:
 	  {
             const symbol component = frame.component (key);
             const Library& library = metalib.library (component);
@@ -415,13 +462,17 @@ PrinterFile::Implementation::print_bool (bool value)
 }
 
 void 
-PrinterFile::Implementation::print_plf (const PLF& plf, int indent) 
+PrinterFile::Implementation::print_plf (const PLF& plf, int indent,
+					const symbol domain,
+					const symbol range) 
 { 
   int column = indent;
   for (unsigned int i = 0; i < plf.size (); i++)
     {
       std::ostringstream tmp;
-      tmp << "(" << plf.x (i) << " " << plf.y (i) << ")";
+      tmp << "(" << plf.x (i) << " "
+	  << format_dimension (domain) << " " << plf.y (i) << " "
+	  << format_dimension (range) << ")";
       int entry = tmp.str ().length ();
       
       if (column == indent)
@@ -533,6 +584,7 @@ PrinterFile::Implementation::print_alist (const Frame& frame,
               out << "fixed " << frame.submodel_name (key);
               break;
             case Attribute::Model:
+            case Attribute::Function:
               out << frame.component (key);
               break;
             case Attribute::PLF: 

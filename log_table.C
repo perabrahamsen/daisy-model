@@ -69,6 +69,10 @@ class DestinationTable : public Destination
 public:
   // Use.
   void end_header (const Metalib& metalib, const FrameModel&);
+private:
+  void column_tag (const Select& select);
+  void column_dimension (const Select& select);
+public:
   void record_start (const std::vector<Time::component_t>&, const Time&, 
                      const std::vector<const Select*>&);
   void record_end ();
@@ -134,6 +138,199 @@ void
 DestinationTable::end_header (const Metalib& metalib, const FrameModel& frame)
 { print_header.finish (out, metalib, frame); }
 
+void
+DestinationTable::column_tag (const Select& select)
+{
+  const int type_size = select.type_size ();
+  const Geometry *const geometry = select.geometry ();
+  const symbol tag = select.tag ();
+  const bool has_tag = (tag != symbol (""));
+  switch (type_size)
+    {
+    case Attribute::Singleton:
+      out << tag;
+      return;
+    case Attribute::Variable:
+    case Attribute::CanopyCells:
+    case Attribute::CanopyEdges:
+    case Attribute::Unspecified:
+      /* defer to value */
+      break;
+    case Attribute::SoilCells:
+      {
+	if (!geometry)
+	  {
+	    daisy_warning ("Soil cells with no known geometry");
+	    /* defer to value */
+	    break;
+	  }
+	const size_t cell_size = geometry->cell_size ();
+	for (size_t c = 0; c < cell_size; ++c)
+	  {
+	    if (c > 0)
+	      out << array_separator;
+	    if (has_tag)
+	      out << tag << " @ ";
+	    out << geometry->cell_name (c);
+	  }
+      }
+      return;
+    case Attribute::SoilEdges:
+      {
+	if (!geometry)
+	  {
+	    daisy_warning ("Soil edges with no known geometry");
+	    /* defer to value */
+	    break;
+	  }
+	const size_t edge_size = geometry->edge_size ();
+	for (size_t e = 0; e < edge_size; ++e)
+	  {
+	    if (e > 0)
+	      out << array_separator;
+	    if (has_tag)
+	      out << tag << " @ ";
+	    out << geometry->edge_name (e);
+	  }
+      }
+      return;
+    default:
+      for (int i = 0; i < type_size; i++)
+	{
+	  if (i > 0)
+	    out << array_separator;
+	  if (has_tag)
+	    out << tag;
+	  out << "[" << i << "]";
+	}
+      return;
+    }
+  // Based on value instead of type.
+  const int value_size = select.size ();
+  if (value_size < 0)
+    // Singleton.
+    {
+      out << select.tag ();
+      return;
+    }
+  if (geometry)
+    {
+      const size_t cell_size = geometry->cell_size ();
+      const size_t edge_size = geometry->edge_size ();
+      if (value_size == cell_size)
+	// SoilCells.
+	{
+	  for (size_t c = 0; c < cell_size; ++c)
+	    {
+	      if (c > 0)
+		out << array_separator;
+	      if (has_tag)
+		out << tag << " @ ";
+	      out << geometry->cell_name (c);
+	    }
+	  return;
+	}
+      if (value_size == edge_size)
+	// SoilEdges.
+	{
+	  for (size_t e = 0; e < edge_size; ++e)
+	    {
+	      if (e > 0)
+		out << array_separator;
+	      if (has_tag)
+		out << tag << " @ ";
+	      out << geometry->edge_name (e);
+	    }
+	  return;
+	}
+    }
+  // Generic array value.
+  for (int i = 0; i < value_size; i++)
+    {
+      if (i > 0)
+	out << array_separator;
+      if (has_tag)
+	out << tag;
+      out << "[" << i << "]";
+    }
+}
+
+void
+DestinationTable::column_dimension (const Select& select)
+{
+  const int type_size = select.type_size ();
+  const Geometry *const geometry = select.geometry ();
+  symbol dimension = select.dimension ();
+  if (dimension == Attribute::None () 
+      || dimension == Attribute::Unknown ()
+      || dimension == Attribute::Fraction ())
+    dimension = "";
+  switch (type_size)
+    {
+    case Attribute::Singleton:
+      out << dimension;
+      return;
+    case Attribute::Variable:
+    case Attribute::CanopyCells:
+    case Attribute::CanopyEdges:
+    case Attribute::Unspecified:
+      /* defer to value */
+      break;
+    case Attribute::SoilCells:
+      {
+	if (!geometry)
+	  {
+	    daisy_warning ("Soil cells with no known geometry");
+	    /* defer to value */
+	    break;
+	  }
+	const size_t cell_size = geometry->cell_size ();
+	for (size_t c = 0; c < cell_size; ++c)
+	  {
+	    if (c > 0)
+	      out << array_separator;
+	    out << dimension;
+	  }
+      }
+      return;
+    case Attribute::SoilEdges:
+      {
+	if (!geometry)
+	  {
+	    daisy_warning ("Soil edges with no known geometry");
+	    /* defer to value */
+	    break;
+	  }
+	const size_t edge_size = geometry->edge_size ();
+	for (size_t e = 0; e < edge_size; ++e)
+	  {
+	    if (e > 0)
+	      out << array_separator;
+	    out << dimension;
+	  }
+      }
+      return;
+    default:
+      for (int i = 0; i < type_size; i++)
+	{
+	  if (i > 0)
+	    out << array_separator;
+	  out << dimension;
+	}
+      return;
+    }
+  // Based on value instead of type.
+  const int value_size = select.size ();
+  if (value_size < 0)		// Singleton
+    out << dimension;
+  else for (size_t j = 0; j < value_size; j++)
+	 {
+	   if (j != 0)
+	     out << array_separator;
+	   out << dimension;
+	 }
+}
+
 void 
 DestinationTable::record_start (const std::vector<Time::component_t>& time_columns,
                                 const Time& time,  
@@ -148,20 +345,10 @@ DestinationTable::record_start (const std::vector<Time::component_t>& time_colum
       // Print the entry names in the first line of the log file..
       for (unsigned int i = 0; i < entries.size (); i++)
         {
-	  const Select& select = *entries[i];
-	  
           if (i != 0)
             out << field_separator;
 
-          const int value_size = select.size ();
-	  if (value_size == Attribute::Singleton)
-              out << select.tag ();
-	  else for (size_t j = 0; j < value_size; j++)
-		 {
-		   if (j != 0)
-		     out << array_separator;
-		   out << select.array_tag (j);
-		 }
+	  column_tag (*entries[i]);
         }
       out << record_separator;
       print_tags = false;
@@ -175,26 +362,10 @@ DestinationTable::record_start (const std::vector<Time::component_t>& time_colum
       // Print the entry names in the first line of the log file..
       for (unsigned int i = 0; i < entries.size (); i++)
         {
-	  const Select& select = *entries[i];
-	  
           if (i != 0)
             out << field_separator;
 
-          symbol dimension = select.dimension ().name ();
-          if (dimension == Attribute::None () 
-              || dimension == Attribute::Unknown ()
-              || dimension == Attribute::Fraction ())
-            dimension = "";
-
-          const int value_size = select.size ();
-	  if (value_size == Attribute::Singleton)
-              out << dimension;
-	  else for (size_t j = 0; j < value_size; j++)
-		 {
-		   if (j != 0)
-		     out << array_separator;
-		   out << dimension;
-		 }
+	  column_dimension (*entries[i]);
         }
       out << record_separator;
       print_dimension = false;

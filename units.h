@@ -47,7 +47,8 @@ public:
   static symbol per_h ();
   static symbol ppm ();
   static symbol dry_soil_fraction ();
-
+  static symbol dgC ();
+  
   // Special conversion rules.
 private:
   static struct special_convert_type

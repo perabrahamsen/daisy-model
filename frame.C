@@ -38,6 +38,7 @@
 #include "treelog.h"
 #include "plf.h"
 #include "mathlib.h"
+#include "function.h"
 #include <vector>
 #include <set>
 #include <sstream>
@@ -71,6 +72,8 @@ struct Frame::Implementation
   const Value& get_value (symbol key) const;
   bool has_value (symbol key) const;
   const Value& find_value (const Frame&, symbol key) const;
+  void set_model (const symbol component,
+		  const symbol key, const symbol name);
 
   // Check.
   bool check (const Metalib& metalib, const Frame& frame,
@@ -167,6 +170,18 @@ Frame::Implementation::find_value (const Frame& frame, const symbol key) const
   daisy_assert (frame.parent ());
   const Frame& parent = *frame.parent ();
   return parent.impl->find_value (parent, key);
+}
+
+void
+Frame::Implementation::set_model (const symbol component,
+				  const symbol key, const symbol name)
+{
+  const Intrinsics& intrinsics = Librarian::intrinsics ();
+  intrinsics.instantiate (component, name);
+  const FrameModel& old = intrinsics.library (component).model (name);
+  boost::shared_ptr<const FrameModel>
+    child (new FrameModel (old, Frame::parent_link));
+  set_value (key, new ValueModel (child));
 }
 
 bool 
@@ -901,6 +916,15 @@ Frame::declare_object (const symbol key, const symbol lib,
 }
 
 void 
+Frame::declare_function (const symbol key,
+			 const symbol domain,
+			 const symbol range,
+			 const symbol description)
+{
+  impl->declare_type (key, new TypeFunction (domain, range, description));
+}
+
+void 
 Frame::declare_submodule (const symbol key, 
                           Attribute::category cat, const symbol description,
                           load_syntax_t load_syntax)
@@ -1098,6 +1122,7 @@ Frame::subset (const Metalib& metalib, const Frame& other,
       case Attribute::Integer:
 	return mine.integer () == his.integer ();
       case Attribute::Model:
+      case Attribute::Function:
         return mine.model ()->subset (metalib, *his.model ());
       case Attribute::Submodel:
         return mine.submodel ()->subset (metalib, *his.submodel ());
@@ -1126,6 +1151,7 @@ Frame::subset (const Metalib& metalib, const Frame& other,
       case Attribute::Integer:
 	return mine.integer_sequence () == his.integer_sequence ();
       case Attribute::Model:
+      case Attribute::Function:
 	{
 	  const std::vector<boost::shared_ptr<const FrameModel>/**/>& value 
             = mine.model_sequence ();
@@ -1448,6 +1474,8 @@ Frame::verify (const symbol key, const Attribute::type want,
                const int value_size) const
 { 
   Attribute::type has = lookup (key);
+  if (has == Attribute::Function && want == Attribute::Model)
+    has = Attribute::Model;
   if (has != want)
     daisy_panic ("'" + key + "' is " + Attribute::type_name (has) 
                  + ", should be " + Attribute::type_name (want));
@@ -1481,17 +1509,14 @@ Frame::set (const symbol key, const symbol name)
   if (lookup (key) == Attribute::Model)
     {
       verify (key, Attribute::Model);
-      const symbol component = this->component (key);
-      const Intrinsics& intrinsics = Librarian::intrinsics ();
-      intrinsics.instantiate (component, name);
-      const FrameModel& old = intrinsics.library (component).model (name);
-#if 0
-      boost::shared_ptr<const FrameModel> child (&old.clone ());
-#else
-      boost::shared_ptr<const FrameModel>
-	child (new FrameModel (old, Frame::parent_link));
-#endif
-      impl->set_value (key, new ValueModel (child));
+      impl->set_model (this->component (key), key, name);
+      return;
+    }
+  if (lookup (key) == Attribute::Function)
+    {
+      verify (key, Attribute::Function);
+      static const symbol function_name (Function::component);
+      impl->set_model (function_name, key, name);
       return;
     }
   verify (key, Attribute::String);
@@ -1534,7 +1559,7 @@ Frame::set (const symbol key, boost::shared_ptr<FrameModel> value)
 void 
 Frame::set (const symbol key, boost::shared_ptr<const FrameModel> value)
 {
-  verify (key, Attribute::Model);
+  verify (key, Attribute::Model); // TODO: Or Attribute::Function
   impl->set_value (key, new ValueModel (value));
 }
 
@@ -1679,6 +1704,7 @@ Frame::set_empty (const symbol key)
       impl->set_value (key, new ValueNumberSeq (std::vector<double> ()));
       break;
     case Attribute::Model:
+    case Attribute::Function:
       impl->set_value (key, new ValueModelSeq (std::vector<boost::shared_ptr<const FrameModel>/**/> ()));
       break;
     case Attribute::Submodel:

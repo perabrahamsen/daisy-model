@@ -515,10 +515,6 @@ symbol
 Select::tag () const
 { return impl->tag; }
 
-symbol
-Select::array_tag (size_t) const
-{ daisy_notreached (); }
-
 const Geometry* 
 Select::geometry () const
 { return NULL; }

@@ -187,7 +187,7 @@ Production::tick (const double AirT, const double SoilT,
   CH2OPool += CanopyAss * dt;
   double NetAss = CanopyAss;    // [g CH2O/m^2/h]
 
-  // Mantenance respiration.
+  // Maintenance respiration.
   double RMLeaf                 // [g CH2O/m^2/h]
     = maintenance_respiration (r_Leaf, WLeaf, AirT);
   daisy_assert (std::isfinite (RMLeaf));

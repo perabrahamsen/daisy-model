@@ -33,8 +33,12 @@
 #include "metalib.h"
 #include "library.h"
 #include "plf.h"
-
+#include "soil_water.h"
+#include "soil_heat.h"
+#include "abiotic.h"
+#include "function.h"
 #include <sstream>
+#include <algorithm>
 
 struct RootdensLocal : public Rootdens
 {
@@ -43,36 +47,58 @@ struct RootdensLocal : public Rootdens
   const double row_distance;	// Distance betweeen rows. [cm]
   const double DensRtTip;	// Root density at (pot) pen. depth. [cm/cm^3]
   const PLF depth_factor;	// Depth affect on root growth. [cm] -> []
-
+  const double neighbor_effect; // Effect on neighbor cells. [cm/d]
+  const double max_internal_growth_rate; // [d^-1]
+  const double h_threshold;     // Root drowns above this pressure [cm]
+  const PLF death_rate;		// Death rate as function of time [h] -> [h^-1]
+  const std::unique_ptr<Function> death_T_factor; // fT [dgC] -> []
+  
   // State.
-  double LastWRoot;             // [g DM/m^2]
+  bool emerging;		// True until root mass > DensRtTip * zone
   double LastDepth;		// [cm]
   double LastWidth;		// [cm]
+  std::vector<double> flooded;	  // Time flooded (temperature modified) [h]
 
   // Log.
-  std::vector<double> E;	  // Expansion [cm/cm^3]
+  std::vector<double> E;	  // Expansion [cm/cm^3/d]
   double expansion_volume;	  // Expansion volume [cm^3]
-  double E_tot;			  // Total expansion root length [cm]
+  double E_tot;			  // Total expansion root length [cm/d]
   double A_tot;			  // Total expansion area [cm^2]
-  std::vector<double> I;	  // Internal adjustment [cm/cm^3]
-  std::vector<double> D;	  // Death [cm/cm^3]
-  
-  
+  std::vector<double> I;	  // Internal adjustment [cm/cm^3/d]
+  double I_tot;			  // Total internal adj. root length [cm/d]
+  std::vector<double> D;	  // Death [cm/cm^3/h]
+  double D_tot;			  // Total death [cm/h]
+
   // Utility.
   double find_row (const double x /* [cm] */) const; // [cm]
   double find_length (const double WRoot /* [g DM/m^2] */) const; // [cm/cm^2]
 
   // Simulation.
   void expansion (const Geometry& geo,
-		  const double delta_depth, // [cm]
-		  const double delta_width, // [cm]
-		  const double delta_root,  // [cm]
+		  const double SoilDepth,   // [cm]
+		  const double delta_depth, // [cm/d]
+		  const double delta_width, // [cm/d]
+		  const double delta_root,  // [cm/d]
 		  std::vector<double>& L);
+  void internal_growth (const Geometry& geo,
+			const double SoilDepth,   // [cm]
+			const double delta_root,  // [cm/d]
+			std::vector<double>& L);   // [cm/cm^3]
+  void emergence (const Geometry& geo, 
+		  const double SoilDepth /* [cm] */, 
+		  const double CropDepth /* [cm] */,
+		  const double CropWidth /* [cm] */,
+		  std::vector<double>& Density  /* [cm/cm^3] */,
+		  Treelog& msg);
   
   void set_density (const Geometry& geo, 
 		    double SoilDepth, double CropDepth, double CropWidth,
 		    double WRoot, double DS, std::vector<double>& Density,
 		    Treelog&);
+  void tick (const Geometry& geo,
+	     const SoilWater& soil_water, const SoilHeat& soil_heat,
+	     const double dt,
+	     std::vector<double>& L, Treelog& msg);
   void output (Log& log) const;
 
   // Create.
@@ -112,54 +138,51 @@ RootdensLocal::find_row (const double x /* [cm] */) const // [cm]
 
 void
 RootdensLocal::expansion (const Geometry& geo,
-			  const double delta_depth, // [cm]
-			  const double delta_width, // [cm]
-			  const double delta_root,  // [cm]
+			  const double SoilDepth,   // [cm]
+			  const double delta_depth, // [cm/d]
+			  const double delta_width, // [cm/d]
+			  const double delta_root,  // [cm/d]
 			  std::vector<double>& L)   // [cm/cm^3]
 {
+  // Clear old values.
+  std::fill (E.begin (), E.end (), 0.0);
+  expansion_volume = 0.0;	// [cm^3]
+  E_tot = 0.0;		// [cm/d]
+  A_tot = 0.0;		// [cm^2]
+
   if (delta_root <= 0.0)
     // No expansion if roots are shrinking.
-    {
-      std::fill (E.begin (), E.end (), 0.0);
-      expansion = 0.0;
-      E_tot = 0.0;
-      A_tot = 0.0;
-      return;
-    }
+    return;
   
   const size_t cell_size = geo.cell_size ();
   daisy_assert (L.size () == cell_size);
   daisy_assert (E.size () == cell_size);
 
-  // Clear integrated values.
-  expansion_volume = 0.0;	// [cm^3]
-  E_tot = 0.0;		// [cm]
-  A_tot = 0.0;		// [cm^2]
+  const double dt = 1.0;	// Daily timestep [d] 
     
   for (size_t c = 0; c < cell_size; ++c)
     {
+      if (geo.cell_z (c) < -SoilDepth)
+	// Don't go below this depth.
+	continue;
+      
       const double fE = 1.0;		      // Expansion factor []
 	
       if (L[c] > DensRtTip)
 	// Ignore existing root zone
-	{
-	  E[c] = 0.0; // [cm/cm^3]
-	  continue;
-	}
+	continue;
 
       // Other cells will get expansion from their neighbors.
-      const double A_con = 0.0;	// Connecting area with RZ cells [cm^2]
       const double V = geo.cell_volume (c); // [cm^3]
-      const double V_con = 0.0;	// Connecting volume with RZ cells [cm^3]
+      double A_con = 0.0;	// Connecting area with RZ cells [cm^2]
+      double V_con = 0.0;	// Connecting volume with RZ cells [cm^3]
 	  
-      const std::vector<size_t>& edges = geo.cell_edges (c);
-      const size_t edge_size = edges.size ();
-      for (size_t e = 0; e < edge_size; ++e)
+      for (size_t e: geo.cell_edges (c))
 	{
-	  if (!edge_is_internal (e))
+	  if (!geo.edge_is_internal (e))
 	    continue;
 
-	  const int o = geo.other (e, c);
+	  const int o = geo.edge_other (e, c);
 	  daisy_assert (geo.cell_is_internal (o));
 	  daisy_assert (o >= 0 && o < cell_size);
 
@@ -170,32 +193,144 @@ RootdensLocal::expansion (const Geometry& geo,
 	  const double A = geo.edge_area (e); // [cm^2]
 	  A_con += A;
 
-	  const double dx = delta_width * geo.edge_cos_angle (e);
-	  const double dy = delta_depth * geo.edge_sin_angle (e);
-	  const double dl = std::sqrt (dx*dx + dy*dy); // Pythagoras...
-	  V_con += A * dl;
+	  const double dx = delta_width * geo.edge_cos_angle (e); // [cm/d]
+	  const double dz = delta_depth * geo.edge_sin_angle (e); // [cm/d]
+	  const double dl = std::sqrt (dx*dx + dz*dz); // Pythagoras [cm/d].
+	  V_con += A * dl * dt;			       // [cm^3]
 	}
-	    
+
       // The expansion from neighbors + internal expansion
       // can never be larger than the cell.
       const double V_exp = std::min (V, V_con);
       const double E_length = fE * DensRtTip * V_exp;
-      E[c] = E_length / V;
+      E[c] = E_length / V / dt;
       E_tot += E_length;
       expansion_volume += V_exp;
+      A_tot += A_con;
     }
 
   daisy_approximate (geo.total_soil (E), E_tot);
-  counst double factor = delta_root / E_tot;
+  const double factor = delta_root / E_tot;
   if (factor > 1.0)
     // Sufficient roots to expand with with DensRtTip.
     return;
 
   // Shrink for available root length.
   for (int c = 0; c < cell_size; c++)
-    E[c] *= facor;
+    E[c] *= factor;
   daisy_approximate (geo.total_soil (E), delta_root);
   E_tot = delta_root;
+}
+
+void
+RootdensLocal::internal_growth (const Geometry& geo,
+				const double SoilDepth,   // [cm]
+				const double delta_root,  // [cm/d]
+				std::vector<double>& L)   // [cm/cm^3]
+{
+  const double dt = 1.0;		  // Daisy timestep [d]
+  const double dl = neighbor_effect * dt;	  // [cm/d]
+
+  // Clear old values.
+  std::fill (I.begin (), I.end (), 0.0);
+
+  daisy_assert (delta_root > 0.0);
+  
+  const size_t cell_size = geo.cell_size ();
+  daisy_assert (L.size () == cell_size);
+  daisy_assert (I.size () == cell_size);
+
+  for (size_t c = 0; c < cell_size; ++c)
+    {
+      if (iszero (L[c]))
+	// Ignore cells outside root zone.
+	continue;
+
+      // Other cells will get expansion from their neighbors.
+      const double V = geo.cell_volume (c); // [cm^3]
+      double extended_V = V / dt;		    // [cm^3/d]
+      
+      // Ampount of roots in cell and neighbors.
+      double extended_cell_roots = V * L[c]; // [cm]
+
+	for (size_t e: geo.cell_edges (c))
+	{
+	  if (!geo.edge_is_internal (e))
+	    continue;
+
+	  const int o = geo.edge_other (e, c);
+	  daisy_assert (geo.cell_is_internal (o));
+	  daisy_assert (o >= 0 && o < cell_size);
+
+	  if (iszero (L[o]))
+	    continue;
+	  
+	  const double A = geo.edge_area (e); // [cm^2]
+	  const double V_con = A * dl * dt;   // [cm^3]
+	  
+	  extended_cell_roots += A * dl * L[o]; // [cm^3/d]
+	  extended_V += V_con;
+	}
+	// Put all the roots in the cell.
+	I[c] = extended_cell_roots / extended_V;
+    }
+
+  // Scale to available roots.
+  const double I_tot = geo.total_soil (I);
+  const double factor = delta_root / I_tot;
+  for (int c = 0; c < cell_size; c++)
+    I[c] *= factor;
+  
+  daisy_approximate (geo.total_soil (I), delta_root);
+
+  for (int c = 0; c < cell_size; c++)
+    I[c] = std::min (I[c], L[c] * max_internal_growth_rate);
+}
+
+void
+RootdensLocal::emergence (const Geometry& geo, 
+			  const double SoilDepth /* [cm] */, 
+			  const double CropDepth /* [cm] */,
+			  const double CropWidth /* [cm] */,
+			  std::vector<double>& Density  /* [cm/cm^3] */,
+			  Treelog& msg)
+{
+  TREELOG_MODEL (msg);
+  const size_t cell_size = geo.cell_size ();
+
+  // Emergence volume.
+  double volume = 0.0;	// [cm^3]
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      // Cell position relative to root.
+      const double z = -geo.cell_z (c); // [cm]
+      const double x = find_row (geo.cell_x (c)); // [cm]
+      if (x/CropWidth + z/CropDepth < 1.0
+	  && z < SoilDepth)
+	{
+	  const double V =  geo.cell_volume (c); // [cm^3]
+	  volume += V;
+	}
+    }
+  if (!(volume > 0.0))
+    {			// Poor discretization?
+      msg.error ("No root volume at emergence");
+      return;
+    }
+
+  // Fill volume
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      // Cell position relative to root.
+      const double z = -geo.cell_z (c);
+      const double x = find_row (geo.cell_x (c));
+      if (x/CropWidth + z/CropDepth < 1.0
+	  && z < SoilDepth)
+	Density[c] = DensRtTip;
+      else
+	Density[c] = 0.0;
+    }
+  return;
 }
 
 void
@@ -206,13 +341,6 @@ RootdensLocal::set_density (const Geometry& geo,
 			    const double WRoot /* [g DM/m^2] */, const double,
 			    std::vector<double>& Density  /* [cm/cm^3] */,
 			    Treelog& msg)
-// Check emergence
-//   If so, put WRoot in seed cells
-// Check WRoot > LastWRoot
-//   If so, do expansion
-//   Check if expansion needs to be limited by delta WRoot
-// Do internal adjustment
-
 {
   TREELOG_MODEL (msg);
   const size_t cell_size = geo.cell_size ();
@@ -222,94 +350,98 @@ RootdensLocal::set_density (const Geometry& geo,
   daisy_assert (CropDepth > 0);
   daisy_assert (WRoot > 0);
 
+  const double dt = 1.0;	// Daily timestep. [d]
+  
+  const double old_root = geo.total_soil (Density);
+  const double new_root		// [cm]
+    = find_length (WRoot) * geo.surface_area ();
+
+  if (emerging)
     {
-      if (WRoot <= LastWRoot)
-        // Decrease.
-        {
-          const double RelWRoot = WRoot / LastWRoot;
-          for (size_t c = 0; c < cell_size; c++)
-            Density[c] *= RelWRoot;
-        }
-      else
-        // Increase.
-        {
-          // What is available?
-          const double new_root 
-            = find_length (WRoot - LastWRoot) * geo.surface_area (); // [cm]
-
-          // What is needed to fill the root zone?
-          double missing = 0.0; // [cm]
-
-          // What is already in the root zone?
-          double total = 0.0;   // [cm]
-          double total_weight = 0.0;
-	  
-          // Find it.
-          for (size_t c = 0; c < cell_size; c++)
-            {
-              // Cell position relative to root.
-              const double z = -geo.cell_z (c);
-              const double x = find_row (geo.cell_x (c));
-              const double V =  geo.cell_volume (c); // [cm^3]
-              total += Density[c] * V;
-	      total_weight += Density[c] * V * depth_factor (-z);
-	      
-	      daisy_assert (CropWidth > 0.0);
-	      daisy_assert (CropDepth > 0.0);
-	      
-              if (x/CropWidth + z/CropDepth < 1.0
-                  && z < SoilDepth
-                  && Density[c] < DensRtTip)
-                missing += (DensRtTip - Density[c]) * V;
-            }
-          daisy_approximate (total, geo.total_soil (Density));
-
-	  // Relative to zero?
-	  if (total_weight <= 0.0 && total > 0)
-	    {
-	      msg.error ("Weighted root lenght <= 0.0");
-	      return;
-	    }
-	  
-          // To each according to need.
-          const double fill_factor = missing > new_root
-            ? new_root / missing
-            : 1.0;
-
-          // To those who have shall be given.
-          const double growth_factor = (total > 0 && missing < new_root)
-            ? (new_root - missing) / total_weight
-            : 0.0;
-
-          // Fill it.
-          for (size_t c = 0; c < cell_size; c++)
-            {
-              // Cell position relative to root.
-              const double z = -geo.cell_z (c);
-              const double x = find_row (geo.cell_x (c));
-              const double old = Density[c];
-              Density[c] += old * growth_factor * depth_factor (-z);
-
-              if (x/CropWidth + z/CropDepth < 1.0
-                  && z < SoilDepth
-                  && old < DensRtTip)
-                Density[c] += (DensRtTip - old) * fill_factor;
-              
-            }
-
-          // Check.
-          const double old_root = find_length (LastWRoot) * geo.surface_area ();
-          daisy_approximate (old_root + new_root, geo.total_soil (Density));
-        }
+      emergence (geo, SoilDepth, CropDepth, CropWidth, Density, msg);
+      LastDepth = CropDepth;
+      LastWidth = CropWidth;
+      if (geo.total_soil (Density) > new_root)
+	return;
+      msg.message ("Root system self sustained");
+      emerging = false;
     }
+
+  const double root_growth = (new_root - old_root) / dt; //  [cm/d]
+  expansion (geo,
+	     SoilDepth,
+	     (std::min (SoilDepth, CropDepth) - LastDepth) / dt,
+	     (CropWidth - LastWidth) / dt,
+	     root_growth,
+	     Density);
+
+  
+  // Adjust existing root zone.
+  I_tot = root_growth - E_tot; // [cm/d]
+  if (root_growth > E_tot)
+    internal_growth (geo, SoilDepth, I_tot, Density);
+  else
+    {
+      const double I_factor = I_tot / old_root; // [d^-1]
+      for (size_t c = 0; c < cell_size; ++c)
+	I[c] = Density[c] * I_factor;
+    }
+
+  // Calculate new density.
+  for (size_t c = 0; c < cell_size; ++c)
+    Density[c] += (E[c] + I[c]) * dt;
+  
   // Remember values.
-  LastWRoot = WRoot;
+  LastDepth = CropDepth;
+  LastWidth = CropWidth;
+}
+
+void
+RootdensLocal::tick (const Geometry& geo,
+		     const SoilWater& soil_water, const SoilHeat& soil_heat,
+		     const double dt,
+		     std::vector<double>& L,
+		     Treelog& msg)
+{
+  TREELOG_MODEL (msg);
+
+  const size_t cell_size = geo.cell_size ();
+
+  // Initialize.
+  if (flooded.size () != cell_size)
+    flooded = std::vector<double> (cell_size, 0.0);
+
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      // Update flooded
+      if (soil_water.h (c) > h_threshold)
+	// Abiotic::f_T0 ()
+	flooded[c] += death_T_factor->value (soil_heat.T (c)) * dt;
+      else
+	flooded[c] = 0.0;
+  
+      // Calculate D
+      const double L_old = L[c];
+      first_order_change (L_old, 0.0, death_rate (flooded[c]), dt, L[c], D[c]);
+      D_tot = D[c] * geo.cell_volume (c);
+    }
 }
 
 void 
 RootdensLocal::output (Log& log) const
 {
-  output_value (LastWRoot, "WRoot", log);
+  output_variable (emerging, log);
+  output_value (LastDepth, "Depth", log);
+  output_value (LastWidth, "Width", log);
+  output_variable (flooded, log);
+  output_variable (E, log);
+  output_variable (expansion_volume, log);
+  output_variable (E_tot, log);
+  output_variable (A_tot, log);
+  output_variable (I, log);
+  output_variable (I_tot, log);
+  output_variable (D, log);
+  output_variable (D_tot, log);
 }
 
 void 
@@ -317,6 +449,11 @@ RootdensLocal::initialize (const Geometry& geo,
                            const double row_width, const double row_pos,
                            Treelog& msg)
 { 
+  TREELOG_MODEL (msg);
+
+  const size_t cell_size = geo.cell_size ();
+  E = I = D = std::vector<double> (cell_size, 0.0);
+
   if (row_width <= 0)
     {
       if (row_distance >= 0)
@@ -324,8 +461,6 @@ RootdensLocal::initialize (const Geometry& geo,
       // Not a row crop.
       return;
     }
-
-  TREELOG_MODEL (msg);
 
   const double geo_width = geo.right () - geo.left ();
   daisy_assert (row_width > 0.0);
@@ -360,7 +495,22 @@ RootdensLocal::RootdensLocal (const BlockModel& al)
     row_distance (al.number ("row_distance", -1.0)),
     DensRtTip (al.number ("DensRtTip")),
     depth_factor (al.plf ("depth_factor")),
-    LastWRoot (al.number ("WRoot", 0.0))
+    neighbor_effect (al.number ("neighbor_effect")),
+    max_internal_growth_rate (al.number ("max_internal_growth_rate")),
+    h_threshold (al.number ("h_threshold")),
+    death_rate (al.plf ("death_rate")),
+    death_T_factor (Librarian::build_item<Function> (al, "death_T_factor")),
+    emerging (al.flag ("emerging")),
+    LastDepth (al.number ("Depth", 0.0)),
+    LastWidth (al.number ("Width", 0.0)),
+    flooded (al.check ("flooded")
+	   ? al.number_sequence ("flooded")
+	   : std::vector<double> ()),
+    expansion_volume (0.0),
+    E_tot (0.0),
+    A_tot (0.0),
+    I_tot (0.0),
+    D_tot (0.0)
 { }
 
 static struct RootdensLocalSyntax : public DeclareModel
@@ -374,10 +524,10 @@ Dynamic root growth model.")
   void load_frame (Frame& frame) const
   {
     frame.declare ("row_position", "cm", Check::non_negative (),
-                   Attribute::State, "\
+                   Attribute::Const, "\
 Horizontal position of row crops.");
     frame.set ("row_position", 0.0);
-    frame.declare ("row_distance", "cm", Attribute::OptionalState, 
+    frame.declare ("row_distance", "cm", Attribute::OptionalConst, 
                    "Distance between rows of crops.");
     frame.declare ("DensRtTip", "cm/cm^3", Check::positive (), Attribute::Const,
                 "Root density at (potential) penetration depth.");
@@ -388,15 +538,58 @@ Depth (negative) affect on root growth.\n\
 Specify a value less than one to decrease root growth, and larger\n\
 than one to increase root growth at the specified depth.");
     frame.set ("depth_factor", PLF::always_1 ());
+    frame.declare ("neighbor_effect", "cm/d", Check::non_negative (),
+		   Attribute::Const, "\
+How fast root density in neighbor cells affect growth.\n\
+After expansion, excess roots are distributed propertional to existing\n\
+root desinity in each cell, plus a part of the neighbor cells.");
+    frame.set ("neighbor_effect", 0.0);
+    frame.declare ("max_internal_growth_rate", "d^-1", Check::non_negative (),
+		   Attribute::Const, "\
+Root density within root zone cannot grow faster than this.");
+    frame.set ("max_internal_growth_rate", 0.1);
+    frame.declare ("h_threshold", "cm", Check::none (), Attribute::Const, "\
+Root starts dying if pressure is above this threshold.");
+    frame.set ("h_threshold", 0.0);
+    frame.declare ("death_rate", "h", "h^-1", Attribute::Const, "\
+Death rate as function of temperature modified time flooded.");
+    PLF death_rate;
+    death_rate.add (36.0, 0.0);
+    death_rate.add (60.0, 0.1);
+    frame.set ("death_rate", death_rate);
+    frame.declare_function ("death_T_factor", "dg C", Attribute::None (), "\
+Temperature effect on flooding.");
+    frame.set ("death_T_factor", "T_min_15");
+    frame.declare_boolean ("emerging", Attribute::State, "\
+True until root mass is large enough to sustain root length in RZ.\n\
+Until then, L within RZ is set to DensRtTip.");
+    frame.set ("emerging", true);
     frame.declare ("Depth", "cm",
                    Check::non_negative (), Attribute::OptionalState,
                    "Expected depth of root zone (positive).");
     frame.declare ("Width", "cm",
                    Check::non_negative (), Attribute::OptionalState,
                    "Expected width of root zone.");
-    frame.declare ("WRoot", "g DM/m^2", 
-                   Check::non_negative (), Attribute::OptionalState,
-                   "Total root mass.");
+    frame.declare ("flooded", "h",
+		   Attribute::OptionalState, Attribute::SoilCells, "\
+Time flooded, adjusted for temperature.\n\
+The temperature adjustment is the same used for mineralization.");
+    frame.declare ("E", "cm/cm^3/d", Attribute::LogOnly, Attribute::SoilCells,
+		   "Expansion");
+    frame.declare ("expansion_volume", "cm^3", Attribute::LogOnly, "\
+Expansion volume.");
+    frame.declare ("E_tot", "cm/d", Attribute::LogOnly, "\
+Total expansion root length.");
+    frame.declare ("A_tot", "cm^2", Attribute::LogOnly, "\
+Total expansion area.");
+    frame.declare ("I", "cm/cm^3/d", Attribute::LogOnly, Attribute::SoilCells,
+		   "Internal adjustment.");
+    frame.declare ("I_tot", "cm/d", Attribute::LogOnly, "\
+Total internal adjustment root length.");
+    frame.declare ("D", "cm/cm^3/d", Attribute::LogOnly, Attribute::SoilCells,
+		   "Death.");
+    frame.declare ("D_tot", "cm/d", Attribute::LogOnly, "\
+Total death root length.");
     }
 } RootdensLocal_syntax;
 

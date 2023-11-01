@@ -150,4 +150,17 @@ public:
               const symbol desc);
 };
 
+class TypeFunction : public Type
+{
+  const symbol domain_;
+  const symbol range_;
+  Attribute::type type () const;
+  symbol component () const;
+  symbol domain () const;
+  symbol range () const;
+  symbol dimension () const;
+public:
+  TypeFunction (const symbol dom, const symbol r, const symbol desc);
+};
+
 #endif // TYPE_H

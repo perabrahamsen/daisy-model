@@ -225,6 +225,8 @@ class EXPORT Frame : public WScope
   { declare_object (key, lib, Attribute::State, Attribute::Singleton, description); }
   void declare_object (symbol, symbol lib,
                        Attribute::category, int size, symbol description);
+  void declare_function (symbol, symbol domain, symbol range,
+			 symbol description);
 
   typedef void (*load_syntax_t) (Frame&);
   void declare_submodule (symbol name, 
@@ -312,7 +314,7 @@ class EXPORT Frame : public WScope
   void verify (symbol key, Attribute::type want, int size = Attribute::Singleton) const;
  public:
   void set (symbol, double);
-  void set (symbol, double, symbol);
+  void set (symbol, double, symbol); // Handle user specified dimension.
   void set (symbol, symbol);
   void set (symbol, const char*); // Avoid matching bool...
   void set (symbol, bool);

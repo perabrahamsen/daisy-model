@@ -23,6 +23,11 @@ else
 	HOSTTYPE = unix
 endif
 
+# Create all the executables.
+#
+all:
+	@echo 'Use "make native" og "make portable" to create an executable.'
+
 # Some non-local files and directories.
 
 ifeq ($(HOSTTYPE),unix)
@@ -128,7 +133,7 @@ WARNING = -Wall -Wextra -Wvariadic-macros \
 # This one doesn't work (gcc 4.4 linux/amd64):
 #   -Wunreachable-code: triggered by constructors?
 
-COMPILE = gcc -std=c++14 -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
+COMPILE = gcc -std=c++17 -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
 CCOMPILE = $(COMPILE)
 CPPLIB = -lstdc++
 
@@ -180,8 +185,8 @@ NOLINK = -c
 #GCCONLY = hydraulic_M_vGBS.C hydraulic_hypWeb.C  
 GCCONLY = 
 
-LATER = tertiary_instant.C  rootdens_local.C 
-MODELS = program_nwaps.C program_spawn.C \
+LATER = tertiary_instant.C
+MODELS = rootdens_local.C program_nwaps.C program_spawn.C \
 	hydraulic_hyprop.C surface_source.C surface_std.C select_quiver.C \
 	hydraulic_M_BivG.C $(GCCONLY) \
 	reaction_dom.C litter_mulch.C hydraulic_linear.C hydraulic_table.C \
@@ -276,7 +281,7 @@ DISABLED = depend.C \
 
 # A component is a common interface to a number of models.
 # 
-COMPONENTS = surface.C ghf.C cloudiness.C \
+COMPONENTS = function.C surface.C ghf.C cloudiness.C \
 	retention.C litter.C cstage.C rate.C rubiscoN.C solupt.C soilph.C \
 	deposition.C uifilter.C zone.C wsource.C drain.C \
 	draineqd.C condedge.C rainergy.C ponddamp.C scope_model.C seed.C \
@@ -425,11 +430,6 @@ REMOVED = action_ridge.C ridge.C ridge.h groundwater_pipe.C horizon_std.C \
 # These are the file extensions we deal with.
 # 
 .SUFFIXES:	.C ${OBJ} .h .c ${EXE} .a .cs .netmodule
-
-# Create all the executables.
-#
-all:
-	@echo 'Use "make native" og "make portable" to create an executable.'
 
 # Create a DLL.
 #
@@ -610,6 +610,12 @@ docs: portable
 			   SETUPDIR=$(SETUPDIR) \
 			   DAISYPATH=".;$(SRCDIR)/lib;$(SRCDIR)/sample" docs)
 
+docs-unix: portable
+	(cd txt && $(MAKE) PATH="$(SETUPDIR)/bin:$(PATH)" \
+		           DAISYEXE=$(SRCDIR)/objp/daisy$(EXE) \
+			   SETUPDIR=$(SETUPDIR) \
+			   DAISYPATH=".:$(SRCDIR)/lib:$(SRCDIR)/sample" docs)
+
 # GUI setup
 #	$(STRIP) -o $(SETUPDIR)/bin/daisyw.exe $(OBJHOME)/daisyw.exe
 #	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
@@ -760,6 +766,9 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
  block.h scope.h attribute.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
+function${OBJ}: function.C function.h model.h symbol.h block_model.h \
+ block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
+ frame.h librarian.h plf.h
 surface${OBJ}: surface.C surface.h model_derived.h model_logable.h model.h \
  symbol.h block_model.h block_nested.h block.h scope.h attribute.h \
  treelog.h frame_model.h frame.h librarian.h
@@ -1279,7 +1288,7 @@ parser_file${OBJ}: parser_file.C parser_file.h parser.h model.h symbol.h \
  metalib.h frame.h scope.h attribute.h library.h block_model.h \
  block_nested.h block.h treelog.h frame_model.h block_top.h lexer.h \
  filepos.h number.h integer.h plf.h time.h treelog_text.h path.h units.h \
- memutils.h mathlib.h assertion.h librarian.h frame_submodel.h
+ memutils.h mathlib.h assertion.h librarian.h frame_submodel.h function.h
 geometry${OBJ}: geometry.C geometry.h symbol.h attribute.h volume.h \
  model_derived.h model_logable.h model.h check.h vcheck.h treelog.h \
  frame_submodel.h frame.h scope.h assertion.h mathlib.h librarian.h plf.h
@@ -1320,7 +1329,7 @@ block_model${OBJ}: block_model.C block_model.h block_nested.h block.h scope.h \
  attribute.h symbol.h treelog.h frame_model.h frame.h
 value${OBJ}: value.C value.h symbol.h attribute.h assertion.h
 type${OBJ}: type.C type.h attribute.h symbol.h frame.h scope.h assertion.h \
- check.h
+ check.h function.h model.h
 model_derived${OBJ}: model_derived.C model_derived.h model_logable.h model.h \
  symbol.h log.h time.h border.h model_framed.h
 model_logable${OBJ}: model_logable.C model_logable.h model.h symbol.h
@@ -1358,13 +1367,15 @@ im${OBJ}: im.C im.h symbol.h attribute.h chemical.h model_framed.h \
 frame${OBJ}: frame.C frame.h scope.h attribute.h symbol.h frame_model.h \
  frame_submodel.h block_model.h block_nested.h block.h treelog.h \
  assertion.h librarian.h model.h intrinsics.h memutils.h library.h \
- filepos.h metalib.h type.h value.h check.h vcheck.h plf.h mathlib.h
+ filepos.h metalib.h type.h value.h check.h vcheck.h plf.h mathlib.h \
+ function.h
 bdconv${OBJ}: bdconv.C bdconv.h convert.h symbol.h geometry.h attribute.h \
  soil.h volume.h model_derived.h model_logable.h model.h units.h \
  memutils.h assertion.h mathlib.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h block_model.h \
  block_nested.h block.h scope.h attribute.h symbol.h treelog.h \
- frame_model.h frame.h plf.h check.h
+ frame_model.h frame.h plf.h check.h function.h model.h units.h \
+ memutils.h librarian.h
 scope_soil${OBJ}: scope_soil.C scope_soil.h scope.h attribute.h symbol.h \
  geometry.h soil.h soil_water.h soil_heat.h chemical.h model_framed.h \
  model_logable.h model.h units.h memutils.h assertion.h librarian.h
@@ -1451,6 +1462,11 @@ plf${OBJ}: plf.C plf.h assertion.h mathlib.h
 mathlib${OBJ}: mathlib.C mathlib.h assertion.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+rootdens_local${OBJ}: rootdens_local.C rootdens.h model_framed.h \
+ model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
+ scope.h attribute.h treelog.h frame_model.h frame.h geometry.h log.h \
+ time.h border.h check.h mathlib.h assertion.h librarian.h iterative.h \
+ metalib.h library.h plf.h soil_water.h soil_heat.h abiotic.h function.h
 program_nwaps${OBJ}: program_nwaps.C program.h model.h symbol.h run.h \
  block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
  frame_model.h frame.h librarian.h assertion.h lexer_data.h lexer.h \
@@ -1481,14 +1497,6 @@ hydraulic_M_BivG${OBJ}: hydraulic_M_BivG.C hydraulic.h model_framed.h \
  model_logable.h model.h symbol.h plf.h block_model.h block_nested.h \
  block.h scope.h attribute.h treelog.h frame_model.h frame.h mathlib.h \
  assertion.h librarian.h
-hydraulic_M_vGBS${OBJ}: hydraulic_M_vGBS.C hydraulic.h model_framed.h \
- model_logable.h model.h symbol.h plf.h block_model.h block_nested.h \
- block.h scope.h attribute.h treelog.h frame_model.h frame.h mathlib.h \
- assertion.h librarian.h hyp_2F1.h complex_functions.h
-hydraulic_hypWeb${OBJ}: hydraulic_hypWeb.C hydraulic.h model_framed.h \
- model_logable.h model.h symbol.h plf.h block_model.h block_nested.h \
- block.h scope.h attribute.h treelog.h frame_model.h frame.h texture.h \
- mathlib.h assertion.h librarian.h hyp_2F1.h complex_functions.h
 reaction_dom${OBJ}: reaction_dom.C reaction.h model_framed.h model_logable.h \
  model.h symbol.h geometry.h attribute.h soil.h soil_water.h soil_heat.h \
  chemistry.h chemical.h organic.h model_derived.h log.h time.h border.h \
@@ -1508,7 +1516,7 @@ hydraulic_linear${OBJ}: hydraulic_linear.C hydraulic.h model_framed.h \
 hydraulic_table${OBJ}: hydraulic_table.C hydraulic.h model_framed.h \
  model_logable.h model.h symbol.h plf.h mathlib.h assertion.h librarian.h \
  frame.h scope.h attribute.h block_model.h block_nested.h block.h \
- treelog.h frame_model.h lexer_table.h units.h memutils.h
+ treelog.h frame_model.h lexer_table.h units.h memutils.h check.h
 program_weather${OBJ}: program_weather.C program.h model.h symbol.h run.h \
  wsource.h weather.h weatherdata.h model_derived.h model_logable.h \
  scope.h attribute.h time.h librarian.h block_model.h block_nested.h \
@@ -2140,7 +2148,8 @@ program_gnuplot${OBJ}: program_gnuplot.C program.h model.h symbol.h run.h \
 program_document${OBJ}: program_document.C program.h model.h symbol.h run.h \
  library.h metalib.h frame.h scope.h attribute.h block_model.h \
  block_nested.h block.h treelog.h frame_model.h printer_file.h printer.h \
- xref.h plf.h format.h assertion.h librarian.h frame_submodel.h filepos.h
+ xref.h plf.h format.h assertion.h librarian.h frame_submodel.h filepos.h \
+ function.h
 program_batch${OBJ}: program_batch.C program.h model.h symbol.h run.h \
  block_top.h block.h scope.h attribute.h block_model.h block_nested.h \
  treelog.h frame_model.h frame.h path.h assertion.h memutils.h \

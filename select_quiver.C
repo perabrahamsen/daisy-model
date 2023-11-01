@@ -302,24 +302,6 @@ struct SelectQuiver : public Select
     return tmp.str ();
   }
 
-  symbol array_tag (size_t i) const
-  {
-    const Geometry* geo = geometry ();
-    if (!geo)
-      return raw_tag (i);
-    static const symbol empty_symbol ("");
-    std::ostringstream tmp;
-    if (tag () != empty_symbol)
-      tmp << tag () << " @ ";
-    const size_t cell_size = geo->cell_size ();
-    const bool is_dz = (i < cell_size);
-    const size_t c = is_dz ? i : i - cell_size;
-    if (c >= cell_size)
-      return raw_tag (i);
-    tmp << geo->cell_name (c) << " " << (is_dz ? "z" : "x");
-    return tmp.str ();
-  }
-
   const Geometry* geometry () const
   { 
     if (last_column)

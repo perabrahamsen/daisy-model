@@ -26,6 +26,9 @@
 #include "block_model.h"
 #include "plf.h"
 #include "check.h"
+#include "function.h"
+#include "units.h"
+#include "librarian.h"
 
 #include <sstream>
 
@@ -196,5 +199,126 @@ Reference SMB carbon for docomposition of mulch.\n\
 The SMB factor for decomposition will be scaled so it is 1 at\n\
 this amount of SMB carbon. By default, it will not be scaled.");
 }
+
+// The 'T_scale' base model.
+
+struct FunctionTScale : public Function
+{
+  mutable double scale;		// []
+  const double ref;		// [dg C]
+  
+  // Simulation.
+  virtual double factor (const double T) const = 0;
+  double value (const double T) const
+  {
+    if (scale < 0.0)
+      {
+	const double ref_factor = factor (ref);
+	if (!std::isnormal (ref_factor))
+	  throw "Bad reference temperature";
+	scale = 1.0 / ref_factor;
+	daisy_assert (std::isnormal (scale));
+      }
+      return factor (T) * scale;
+  }
+
+  // Create.
+  FunctionTScale (const BlockModel& al)
+    : Function (al),
+      scale (-42.42e42),
+      ref (al.number ("ref"))
+  { }
+};
+
+static struct FunctionTScaleSyntax : public DeclareBase
+{
+  FunctionTScaleSyntax ()
+    : DeclareBase (Function::component, "T_scale", 
+		   "Scale to reference temperature.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.declare ("ref", "dg C", Attribute::Const, "\
+Temperature at which the function is one.");
+    frame.set ("domain", Units::dgC ());
+    frame.set ("range", Attribute::None ());
+  }
+} FunctionTScale_syntax;
+
+// The 'T_min' model.
+
+struct FunctionTMin : public FunctionTScale
+{
+  // Simulation.
+  double factor (const double T) const
+  { return Abiotic::f_T0 (T); }
+
+  // Create.
+  FunctionTMin (const BlockModel& al)
+    : FunctionTScale (al)
+  { }
+};
+
+static struct FunctionTMinSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new FunctionTMin (al); }
+  FunctionTMinSyntax ()
+    : DeclareModel (Function::component, "T_min", "T_scale",
+		    "Default temperature function used for mineralization.\n\
+Equation (6-13) in A10, with a linear decrease beginning at 37 dg C, down\n\
+to 0 at 60 dg C, according to J.A. van Veen and M.J.Frissel.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set ("ref", 10.0);
+    frame.set_strings ("cite", "daisy-def");
+  }
+} FunctionTMin_syntax;
+
+// The 'T_min_15' parameterization.
+
+static struct FunctionTMin15Syntax : public DeclareParam
+{
+  FunctionTMin15Syntax ()
+    : DeclareParam (Function::component, "T_min_15", "T_min",
+		    "T_min normalized to 15 dg C.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set ("ref", 15.0);
+  }
+} FunctionTMin15_syntax;
+
+// The 'T_nit' model.
+
+struct FunctionTNit : public FunctionTScale
+{
+  // Simulation.
+  double factor (const double T) const
+  { return Abiotic::f_T2 (T); }
+
+  // Create.
+  FunctionTNit (const BlockModel& al)
+    : FunctionTScale (al)
+  { }
+};
+
+static struct FunctionTNitSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new FunctionTNit (al); }
+  FunctionTNitSyntax ()
+    : DeclareModel (Function::component, "T_nit", "T_scale",
+		    "Default temperature function used for nitrification.\n\
+Equation (7-3) in A10, with a linear decrease beginning at 37 dg C, down\n\
+to 0 at 60 dg C, according to J.A. van Veen and M.J.Frissel.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set ("ref", 10.0);
+    frame.set_strings ("cite", "daisy-def");
+  }
+} FunctionTNit_syntax;
 
 // abiotic.C ends here.

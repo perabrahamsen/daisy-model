@@ -32,6 +32,7 @@
 #include <filesystem>
 #include <fstream>
 #include <numeric>
+#include <sstream>
 
 struct ProgramNwaps : public Program
 {

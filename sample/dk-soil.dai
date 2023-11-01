@@ -3,9 +3,9 @@
 ;;; Askov 
 
 (defhorizon "Askov Ap" ISSS4
-  "Askov 10 & 30 cm soil. Data from O.H. Jacobsen (1989): Umættet
+  "Askov 10 & 30 cm soil. Data from O.H. Jacobsen (1989): UmÃ¦ttet
 hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
-2030. Statens Planteavlsforsøg."
+2030. Statens PlanteavlsforsÃ¸g."
   (clay 0.113)  (silt 0.277) 
     (fine_sand 0.348) (coarse_sand 0.236)
   (humus 0.026) (C_per_N 11) (dry_bulk_density 1.55 [g/cm^3])
@@ -13,18 +13,18 @@ hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
              (alpha 0.0385)(n 1.211)(K_sat 7.52 [cm/h])))
 
 (defhorizon "Askov B" ISSS4
-  "Askov 50 & 70 cm soil. Data from O.H. Jacobsen (1989): Umættet
+  "Askov 50 & 70 cm soil. Data from O.H. Jacobsen (1989): UmÃ¦ttet
 hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
-2030. Statens Planteavlsforsøg."
+2030. Statens PlanteavlsforsÃ¸g."
   (clay 0.235)  (silt 0.253) (fine_sand 0.364) (coarse_sand 0.143)
   (humus 0.005) (C_per_N 11) (dry_bulk_density 1.48 [g/cm^3])
   (hydraulic M_vG (Theta_res 0.0)(Theta_sat 0.445)
              (alpha 0.2605)(n 1.135)(K_sat 14.5[cm/h])))
 
 (defhorizon "Askov C" ISSS4
-  "Askov 90 cm soil. Data from O.H. Jacobsen (1989): Umættet
+  "Askov 90 cm soil. Data from O.H. Jacobsen (1989): UmÃ¦ttet
 hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
-2030. Statens Planteavlsforsøg."
+2030. Statens PlanteavlsforsÃ¸g."
   (clay 0.244)  (silt 0.283) (fine_sand 0.357) (coarse_sand 0.111)
   (humus 0.005) (C_per_N 11) (dry_bulk_density 1.57 [g/cm^3])
   (hydraulic M_vG (Theta_res 0.000)(Theta_sat 0.401)
@@ -42,9 +42,9 @@ hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
 ;;; Jyndevad
 
 (defhorizon "Jyndevad Ap" ISSS4
-  "Jyndevad 15 cm soil. Data from O.H. Jacobsen (1989): Umættet
+  "Jyndevad 15 cm soil. Data from O.H. Jacobsen (1989): UmÃ¦ttet
 hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
-2030. Statens Planteavlsforsøg."
+2030. Statens PlanteavlsforsÃ¸g."
   (clay 0.038)  (silt 0.072) (fine_sand 0.183) (coarse_sand 0.684)
   (humus 0.023) (C_per_N 13) (dry_bulk_density 1.472 [g/cm^3])
   (hydraulic "B_BaC"
@@ -53,9 +53,9 @@ hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
 
 
 (defhorizon "Jyndevad C" ISSS4
-  "Jyndevad 50 cm soil. Data from O.H. Jacobsen (1989): Umættet
+  "Jyndevad 50 cm soil. Data from O.H. Jacobsen (1989): UmÃ¦ttet
 hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
-2030. Statens Planteavlsforsøg."
+2030. Statens PlanteavlsforsÃ¸g."
   (clay 0.028)  (silt 0.023) (fine_sand 0.096) (coarse_sand 0.849)
   (humus 0.004) (C_per_N 13) (dry_bulk_density 1.469 [g/cm^3])
   (hydraulic "B_BaC"

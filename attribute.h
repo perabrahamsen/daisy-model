@@ -66,7 +66,7 @@ namespace Attribute
   // Each attribute entry should have an associated type.
   enum type 
   { Number, Submodel, PLF, Boolean, String,
-    Integer, Model, Scalar, Reference, Error };
+    Integer, Model, Scalar, Function, Reference, Error };
   EXPORT symbol type_name (type);
   type type_number (symbol name);
     

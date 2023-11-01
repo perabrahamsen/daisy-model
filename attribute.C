@@ -58,7 +58,7 @@ Attribute::type_name (type t)
 {
   static const symbol names[] = 
     { "Number", "Submodel", "PLF", "Boolean", "String",
-      "Integer", "Model", "Scalar", "Reference", "Error" };
+      "Integer", "Model", "Scalar", "Function", "Reference", "Error" };
   daisy_assert (t >= 0);
   daisy_assert (t < sizeof (names) / sizeof (symbol));
   return names[t];

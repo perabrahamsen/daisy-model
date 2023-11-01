@@ -1,3 +1,34 @@
+2023-10-31  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* program_document.C, printer_file.C: Support Attribute::Function.
+
+	* program_document.C (inherited_entries): Avoid erasing iterator.
+
+2023-10-30  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* abiotic.C (T_scale): New base function model.
+	(T_min, T_nit): New function models.
+	* units.C, units.h (Units::dgC): New function.
+
+2023-10-24  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* Makefile (COMPONENTS): Add it.
+
+2023-10-23  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* type.h, type.C (TypeFunction): New class.
+	* frame.h, frame.C (declare_function): New function.
+	* attribute.h, attribute.C (Function): New type.
+	* program_document.C: Update caller.
+
+2023-10-13  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* select_array.C, select_quiver.C, select.C, select.h (array_tag):
+	Removed.
+	* log_table.C (DestinationTable::column_tag): Update caller.
+
+	* time.C (operator=): Explicitly implicit.
+
 2023-09-18  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.43 released.

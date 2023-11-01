@@ -1313,10 +1313,10 @@ sum of all chemicals will be logged."
 (deflog "Root Density" crop
   (where "${colfid}${cropfid2}rootdens.dlf")
   (when daily)
-  (entries (array (path column "${column}" Vegetation crops crops "${crop}" 
+  (entries (array (tag "")
+		  (path column "${column}" Vegetation crops crops "${crop}" 
                         Root Density)
-                  (spec fixed RootSystem Density)
-                  (dimension "cm/cm^3"))))
+                  (spec fixed RootSystem Density))))
 
 (deflog "Root form parameter" crop
   (where "${colfid}${cropfid2}rootform.dlf")

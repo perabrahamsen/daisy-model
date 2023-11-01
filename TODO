@@ -2,25 +2,23 @@
 
 * local rootdens model
 
-** rootdens_local.C
+** Make checkpoint work
 
-** "emergence" /expand / extend
+** call tick
 
-uniform within root zone?
+** lav balancer (L)
 
-** thickening / adjust 
+** update dead root OM
 
-** death
+** lav balance (DM)
 
-** document it
+* Agrohydrology kursus
 
-* Lav version alle platforme
+Find materiale
 
 * GMSR
 
 ** Færdiggør rapport
-
- * PHISHES møde
 
 * hysteresis
 

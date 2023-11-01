@@ -36,6 +36,7 @@
 #include "frame_submodel.h"
 #include "frame_model.h"
 #include "filepos.h"
+#include "function.h"
 #include <sstream>
 #include <fstream>
 #include <memory>
@@ -78,7 +79,8 @@ struct ProgramDocument : public Program
                            bool last);
 
   // Print parts of it.
-  static void ignore_entries (std::set<symbol>& entries);
+  static void ignore_entries (const symbol name,
+			      std::set<symbol>& entries);
   static void own_entries (const Metalib&,
                            const Library& library, const symbol name, 
                            std::set<symbol>& entries, 
@@ -223,6 +225,23 @@ ProgramDocument::print_entry_type (const symbol name,
       break;
     case Attribute::Integer:
       format->text ("integer");
+      break;
+    case Attribute::Function:
+      {
+	format->text ("function ");
+	const symbol domain = frame.domain (name);
+	const symbol range = frame.range (name);
+	format->bold ("[" + domain);
+        format->text (" ");
+	// format->special("nbsp");
+	format->special ("->");
+        format->text (" ");
+	// format->special ("nbsp");
+	format->bold (range + "]");
+	const symbol component = frame.component (name);
+	format->text (" ");
+	format->see ("chapter", "component",  component);
+      }
       break;
     case Attribute::Model:
       {
@@ -415,6 +434,38 @@ ProgramDocument::print_entry_value (const symbol name,
 	      format->text (tmp.str ());
 	    }
 	    break;
+	  case Attribute::Function:
+	    {
+	      const FrameModel& object = frame.model (name);
+	      const symbol type = object.type_name ();
+	      static const symbol const_name ("const");
+	      if (type == const_name && object.check ("value"))
+		{
+		  std::ostringstream tmp;
+		  tmp << " (default " << object.number ("value") << ")";
+		  format->text (tmp.str ());
+		  break;
+		}
+	      static const symbol plf_name ("plf");
+	      if (type == plf_name && object.check ("plf"))
+		{
+		  const PLF& plf = object.plf ("plf");
+		  std::ostringstream tmp;
+		  tmp << " (has default value with " 
+		      << plf.size ()
+		      << " points)";
+		  format->text (tmp.str ());
+		  if (plf.size () > 0)
+		    print_default_value = true;
+		  break;
+		}
+	      format->text (" (default `" + type + "')");
+	      const Library& library = metalib.library (frame.component (name));
+	      const FrameModel& super = library.model (type);
+	      if (!object.subset (metalib, super))
+		print_default_value = true;
+	    }
+	    break;
 	  case Attribute::Model:
 	    {
 	      const FrameModel& object = frame.model (name);
@@ -441,6 +492,7 @@ ProgramDocument::print_entry_value (const symbol name,
 	  case Attribute::String:
 	  case Attribute::Integer:
 	  case Attribute::Model:
+	  case Attribute::Function:
 	    if (frame.value_size (name) == 0)
 	      format->text (" (default: an empty sequence)");
 	    else
@@ -625,6 +677,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 	      }
 	      break;
 	    case Attribute::Model:
+	    case Attribute::Function:
 	      {
 		const FrameModel& object = frame.model (name);
 		const symbol type = object.type_name ();
@@ -666,6 +719,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 	    case Attribute::String:
 	    case Attribute::Integer:
 	    case Attribute::Model:
+	    case Attribute::Function:
 	      break;
 	    case Attribute::Scalar:
             case Attribute::Reference:
@@ -713,28 +767,16 @@ ProgramDocument::print_sample_entry (const symbol name,
 }
 
 void
-ProgramDocument::ignore_entries (std::set<symbol>& entries)
+ProgramDocument::ignore_entries (const symbol name, std::set<symbol>& entries)
 {
-  static struct Ignored : public std::set<symbol>
-  {
-    Ignored ()
+  const symbol function_name (Function::component);
+  if (name == function_name)
     {
-      this->insert ("cite");
-      this->insert ("description");
+      entries.erase ("domain");
+      entries.erase ("range");
     }
-  } ignored;
-  
-  for (std::set<symbol>::const_iterator i = ignored.begin (); 
-       i != ignored.end (); 
-       i++)
-    {
-      const symbol key = *i;
-      
-      const std::set<symbol>::iterator j 
-        = find (entries.begin (), entries.end (), key);
-      if (j != entries.end ())
-        entries.erase (j);
-    }
+  entries.erase ("cite");
+  entries.erase ("description");
 }
 
 void
@@ -746,7 +788,7 @@ ProgramDocument::own_entries (const Metalib& metalib,
   const FrameModel& frame = library.model (name);
 
   frame.entries (entries);
-  ignore_entries (entries);
+  ignore_entries (library.name (), entries);
 
   // Remove base entries.
   const symbol base_model = frame.base_name ();
@@ -785,20 +827,21 @@ ProgramDocument::inherited_entries (const Metalib& metalib,
   const FrameModel& frame = library.model (name);
 
   const symbol base_model = frame.base_name ();
-          
+
   if (base_model != Attribute::None ())
     {
       const FrameModel& base_frame = library.model (base_model);
       base_frame.entries (entries);
-      ignore_entries (entries);
+      ignore_entries (library.name (), entries);
       for (std::set<symbol>::const_iterator i = entries.begin ();
-           i != entries.end (); 
-           i++)
+           i != entries.end (); )
         {
           const symbol key = *i;
           if (key != "description" 
               && !frame.subset (metalib, base_frame, key))
-            entries.erase (find (entries.begin (), entries.end (), key));
+	    i = entries.erase (find (entries.begin (), entries.end (), key));
+	  else
+	    ++i;
         }
     }
 }
@@ -1133,10 +1176,57 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       
   const symbol type = frame.base_name ();
   const Filepos& pos = frame.own_position ();
-  if (type != root_name)
+  static const symbol function_name (Function::component);
+  if (type == root_name)
+    {
+      if (library.name () == function_name)
+	{
+	  if (frame.buildable ())
+	    format->text ("A function ");
+	  else
+	    format->text ("A base function ");
+
+	  const symbol domain = frame.name ("domain");
+	  const symbol range = frame.name ("range");
+	  format->bold ("[");
+	  if (domain == Attribute::Unknown ())
+	    format->bold ("?");
+	  else
+	    format->bold (domain);
+	  format->text (" ");
+	  // format->special("nbsp");
+	  format->special ("->");
+	  format->text (" ");
+	  // format->special ("nbsp");
+	  if (range == Attribute::Unknown ())
+	    format->bold ("?");
+	  else
+	    format->bold (range);
+	  format->bold ("] ");
+	  format->text ("build into Daisy.\n");
+	}
+    }
+  else
     {
       format->text ("A `" + type + "' ");
-      if (frame.buildable ())
+      if (library.name () == function_name)
+	{
+	  if (frame.buildable ())
+	    format->text ("function ");
+	  else
+	    format->text ("base function ");
+
+	  const symbol domain = frame.name ("domain");
+	  const symbol range = frame.name ("range");
+	  format->bold ("[" + domain);
+	  format->text (" ");
+	  // format->special("nbsp");
+	  format->special ("->");
+	  format->text (" ");
+	  // format->special ("nbsp");
+	  format->bold (range + "] ");
+	}
+      else if (frame.buildable ())
         format->text ("model ");
       else
         format->text ("base model ");

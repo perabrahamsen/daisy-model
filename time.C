@@ -50,6 +50,7 @@ struct Time::Implementation
   int microsecond;              // Assume 21 bit int minimum.
   Implementation (int, int, int, int, int, int);
   Implementation (const Implementation&);
+  Implementation& operator= (const Implementation&) = default;
 };
 
 const int Time::Implementation::mlen[] =
