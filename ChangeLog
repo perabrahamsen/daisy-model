@@ -1,5 +1,9 @@
 2023-11-21  Per Abrahamsen  <pa@plen.ku.dk>
 
+	* Version 6.44 released.
+
+2023-11-21  Per Abrahamsen  <pa@plen.ku.dk>
+
 	* wsource_weather.C (tick_weather): Force new day if daily values
 	are uninitialized.
 
