@@ -32,6 +32,9 @@ class Geometry;
 class BlockModel;
 class Treelog;
 class Metalib;
+class Geometry;
+class SoilHeat;
+class SoilWater;
 
 class Rootdens : public ModelFramed
 {
@@ -51,6 +54,14 @@ public:
 			    double WRoot /* [g DM/m^2] */, double DS,
 			    std::vector<double>& Density /* [cm/cm^3] */,
 			    Treelog&) = 0;
+  virtual void tick (const Geometry& geo,
+		     const SoilHeat& soil_heat, const SoilWater& soil_water,
+		     std::vector<double>& L, const double dt,
+		     Treelog& msg);
+  virtual const std::vector<double>& dynamic_root_death () const // [cm/cm^3/h]
+  { static std::vector<double> empty; return empty; }
+  virtual double dynamic_root_death_DM () const // [g DM/h]
+  { return 0; }
 
   // Create and Destroy.
 public:

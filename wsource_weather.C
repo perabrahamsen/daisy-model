@@ -624,7 +624,7 @@ WSourceWeather::Implementation::tick_weather (const Time& time, Treelog& msg)
     return;
 
   // Update time interval
-  bool new_day = false;
+  bool new_day = !std::isfinite (my_daily_extraterrestrial_radiation);
 
   if (time > next)
     {
@@ -890,6 +890,21 @@ WSourceWeather::Implementation::tick_weather (const Time& time, Treelog& msg)
 					    weather.timezone ());
   my_day_cycle = my_extraterrestrial_radiation
     / my_daily_extraterrestrial_radiation;
+  if (!std::isfinite (my_day_cycle))
+    {
+      std::ostringstream tmp;
+      tmp << "MDC: previous = " << previous.print ()
+	  << "; time = " << time.print ()
+	  << "; next = " << next.print ()
+	  << "; weather.latitude () = " << weather.latitude ()
+	  << "; weather.longitude ()  = " << weather.longitude ()
+	  << "; weather.timezone () = " << weather.timezone ()
+	  << "; my_extraterrestrial_radiation = " << my_extraterrestrial_radiation
+	  << "; my_daily_extraterrestrial_radiation = " << my_daily_extraterrestrial_radiation
+	;
+      Assertion::message (tmp.str ());
+    }
+      
   daisy_assert (std::isfinite (my_day_cycle));
 
   if (max_timestep (Weatherdata::GlobRad ()) < long_timestep)

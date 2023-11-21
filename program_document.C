@@ -44,6 +44,53 @@
 
 struct ProgramDocument : public Program
 {
+  struct Plotter
+  {
+    std::fstream out;
+    int count;
+    int plot_plf (const PLF& plf, const symbol domain, const symbol range)
+    {
+      const int plf_size = plf.size ();
+      daisy_assert (plf_size > 1); // Plot at least 2 points.
+      
+      // Find and expand bounds.
+      double xmin = plf.x (0);
+      double xmax = plf.x (plf_size - 1);
+      double ymin = plf.min ();
+      double ymax = plf.max ();
+      const double xrange = xmax - xmin;
+      daisy_assert (xrange > 0.0);
+      const double yrange = ymax - ymin;
+      daisy_assert (yrange > 0.0);
+      
+      // Plot it.
+      out << "\
+set output 'gnufig/plf-" << count << ".tex'\n\
+set xrange [" << xmin - xrange * 0.15 << ":" << xmax + xrange * 0.15 << "]\n\
+set yrange [" << ymin - yrange * 0.1 << ":" << ymax + yrange * 0.1 << "]\n\
+set xlabel '$" << domain << "$'\n\
+set ylabel '$" << range << "$'\n\
+plot '-' with linespoints pt 2 lt 0 ps 2 pi -1 notitle\n";
+      out << xmin - xrange * 0.25 << " " << plf.y (0) << "\n";
+      for (int i = 0; i < plf.size (); ++i)
+	out << plf.x (i) << " " << plf.y (i) << "\n";
+      out << xmax + xrange * 0.25 << " " << plf.y (plf_size -1 ) << "\n";
+      out << "e\n";
+      return count++;
+    }
+    void initialize (const symbol name)
+    {
+      out.open (name.name (), std::fstream::out);
+      out << "\
+set term cairolatex pdf\n\
+set pointintervalbox 4\n";
+    }
+    Plotter ()
+      : count (0)
+    { }
+  };
+  std::unique_ptr<Plotter> plotter;
+  
   // Content.
   const Metalib& metalib;
   XRef xref;
@@ -123,6 +170,9 @@ struct ProgramDocument : public Program
   // Program.
   bool run (Treelog& msg)
   {
+    plotter.reset (new Plotter);
+    daisy_assert (plotter.get ());
+    plotter->initialize ("document.gnuplot");
     format->initialize (out);
     print_document (msg); 
     return true;
@@ -351,6 +401,18 @@ ProgramDocument::print_entry_category (const symbol name,
     }
 }
 
+static symbol pretty_unit (const symbol unit)
+{
+  static const symbol unknown ("?");
+  static const symbol none ("");
+  if (unit == Attribute::Unknown ())
+    return unknown;
+  if (unit == Attribute::Fraction ())
+    return none;
+  if (unit == Attribute::None ())
+    return none;
+  return unit;
+}
 void 
 ProgramDocument::print_entry_value (const symbol name, 
 				    const Frame& frame)
@@ -395,13 +457,28 @@ ProgramDocument::print_entry_value (const symbol name,
 	    break;
 	  case Attribute::PLF:
 	    {
+	      const PLF& plf = frame.plf (name);
+	      const symbol domain = pretty_unit (frame.domain (name));
+	      const symbol range = pretty_unit (frame.range (name));
+	      // Check for constant values.
+	      std::set<double> y_vals;
+	      for (int i = 0; i < plf.size (); ++i)
+		y_vals.insert (plf.y (i));
+
 	      std::ostringstream tmp;
-	      tmp << " (has default value with " 
-                  << frame.plf (name).size ()
-		     << " points)";
+	      if (y_vals.size () == 1)
+		tmp << " (has default const value "
+		    << plf.y (0) << " [" << range << "])";
+	      else
+		tmp << " (has default value with " << plf.size () << " points)";
 	      format->text (tmp.str ());
-	      if (frame.plf (name).size () > 0)
-		print_default_value = true;
+	      if (y_vals.size () > 1)
+		{
+		  print_default_value = true;
+		  const int count = plotter->plot_plf (plf, domain, range);
+		  format->raw ("LaTeX", "\n\n\
+\\input{gnufig/plf-" + std::to_string (count) + ".tex}\n");
+		}
 	    }
 	    break;
 	  case Attribute::Boolean:
@@ -442,7 +519,8 @@ ProgramDocument::print_entry_value (const symbol name,
 	      if (type == const_name && object.check ("value"))
 		{
 		  std::ostringstream tmp;
-		  tmp << " (default " << object.number ("value") << ")";
+		  tmp << " (default " << object.number ("value") 
+		      << " [" << pretty_unit (object.range ("value")) << "])";
 		  format->text (tmp.str ());
 		  break;
 		}

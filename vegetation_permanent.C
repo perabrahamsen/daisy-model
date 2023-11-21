@@ -304,9 +304,7 @@ VegetationPermanent::tick (const Scope&,
 
   // Root system.
   const double day_fraction = bioclimate.day_fraction (dt);
-  const double T_soil 
-    = geo.content_height (soil_heat, &SoilHeat::T, -root_system->Depth);
-  root_system->tick_dynamic (T_soil, day_fraction, soil_water, dt);
+  root_system->tick_dynamic (geo, soil_heat, soil_water, day_fraction, dt, msg);
 
   // Nitrogen uptake.
   N_demand = canopy->CAI * N_per_LAI;

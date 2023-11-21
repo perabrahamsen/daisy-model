@@ -134,6 +134,8 @@ Production::GrowthRespCoef (double E)
 void
 Production::tick (const double AirT, const double SoilT,
 		  const std::vector<double>& Density,
+		  const std::vector<double>& D,
+		  const double D_tot_DM,
 		  const Geometry& geo, const SoilWater& soil_water,
 		  const double DS, const double CAImRat,
 		  const CrpN& nitrogen,
@@ -510,6 +512,35 @@ Production::tick (const double AirT, const double SoilT,
     }
   else
     DeadWRoot = DeadNRoot = 0.0;
+
+  // Local root death.
+  if (D_tot_DM > 0.0)
+    {
+      const double ActRootCnc = NRoot / WRoot; // [g N/g DM]
+
+      const double D_tot_N = D_tot_DM * ActRootCnc; // [g N/h]
+      const double D_tot_C	       // [g C/h]
+	= DM_to_C_factor (E_Root)      // [g C/g DM]
+	* D_tot_DM;		       // [g DM/h]
+      
+      C_Loss += D_tot_C;
+      daisy_assert (AM_root);
+      daisy_assert (D_tot_C >= 0.0);
+      daisy_assert (D_tot_N >= 0.0);
+      const double surface_area = geo.surface_area ();
+      AM_root->add_surface (geo,
+			    D_tot_C * dt / surface_area,
+			    D_tot_N * dt / surface_area,
+			    D);
+      residuals_DM += D_tot_DM * dt;
+      geo.add_soil (residuals_C_soil, D, D_tot_C * dt);
+      geo.add_soil (residuals_N_soil, D, D_tot_N * dt);
+      WRoot -= D_tot_DM * dt;
+      C_AM += D_tot_C * dt;
+      N_AM += D_tot_N * dt;
+      DeadWRoot += D_tot_DM;
+      DeadNRoot += D_tot_N;
+    }
 
   // Update production.
   NCrop -= (DeadNLeaf + DeadNRoot) * dt;

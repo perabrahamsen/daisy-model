@@ -273,9 +273,13 @@ RootSystem::nitrogen_uptake (const Geometry& geo, const Soil& soil,
 }
 
 void
-RootSystem::tick_dynamic (const double T, const double day_fraction,
-                          SoilWater& soil_water, const double dt)
+RootSystem::tick_dynamic (const Geometry& geo, const SoilHeat& soil_heat,
+			  SoilWater& soil_water, const double day_fraction,
+                          const double dt, Treelog& msg)
 {
+  // Root death.
+  rootdens->tick (geo, soil_heat, soil_water, Density, dt, msg);
+
   // Update soil water sink term.
   soil_water.root_uptake (H2OExtraction);
 
@@ -283,6 +287,8 @@ RootSystem::tick_dynamic (const double T, const double day_fraction,
   water_stress_days += water_stress * day_fraction;
 
   // Keep track of daily soil temperature.
+  const double T
+    = geo.content_height (soil_heat, &SoilHeat::T, -Depth);
   partial_soil_temperature += T * dt;
   partial_day += dt;
   if (partial_day >= 24.0)
@@ -430,7 +436,7 @@ RootSystem::initialize (const Geometry& geo, const Soil& soil,
   msg.message ("init 2d");
   const bool is_row_crop = row_width > 0.0;
   if (rootdens.get ())
-    /* We already has a root density model. */;
+    /* We already have a root density model. */;
   else if (is_row_crop)
     rootdens = Rootdens::create_row (metalib, msg, row_width, row_pos);
   else

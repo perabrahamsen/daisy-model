@@ -96,10 +96,16 @@ struct RootdensLocal : public Rootdens
 		    double WRoot, double DS, std::vector<double>& Density,
 		    Treelog&);
   void tick (const Geometry& geo,
-	     const SoilWater& soil_water, const SoilHeat& soil_heat,
-	     const double dt,
-	     std::vector<double>& L, Treelog& msg);
+	     const SoilHeat& soil_heat, const SoilWater& soil_water, 
+	     std::vector<double>& L, const double dt, Treelog& msg);
   void output (Log& log) const;
+
+  const std::vector<double>& dynamic_root_death () const
+  { return D; }
+  double dynamic_root_death_DM () const 	// [g DM/h]
+  { return 0.01 /* [m/cm] */
+      * D_tot /* [cm/h] */
+      / SpRtLength /* [m/g DM] */; }
 
   // Create.
   void initialize (const Geometry&, 
@@ -144,8 +150,11 @@ RootdensLocal::expansion (const Geometry& geo,
 			  const double delta_root,  // [cm/d]
 			  std::vector<double>& L)   // [cm/cm^3]
 {
+  const size_t cell_size = geo.cell_size ();
+  daisy_assert (L.size () == cell_size);
+
   // Clear old values.
-  std::fill (E.begin (), E.end (), 0.0);
+  E = std::vector<double> (cell_size, 0.0);
   expansion_volume = 0.0;	// [cm^3]
   E_tot = 0.0;		// [cm/d]
   A_tot = 0.0;		// [cm^2]
@@ -154,10 +163,6 @@ RootdensLocal::expansion (const Geometry& geo,
     // No expansion if roots are shrinking.
     return;
   
-  const size_t cell_size = geo.cell_size ();
-  daisy_assert (L.size () == cell_size);
-  daisy_assert (E.size () == cell_size);
-
   const double dt = 1.0;	// Daily timestep [d] 
     
   for (size_t c = 0; c < cell_size; ++c)
@@ -374,7 +379,7 @@ RootdensLocal::set_density (const Geometry& geo,
 	     (CropWidth - LastWidth) / dt,
 	     root_growth,
 	     Density);
-
+  daisy_assert (E.size () == cell_size);
   
   // Adjust existing root zone.
   I_tot = root_growth - E_tot; // [cm/d]
@@ -382,6 +387,7 @@ RootdensLocal::set_density (const Geometry& geo,
     internal_growth (geo, SoilDepth, I_tot, Density);
   else
     {
+      I.resize (cell_size);
       const double I_factor = I_tot / old_root; // [d^-1]
       for (size_t c = 0; c < cell_size; ++c)
 	I[c] = Density[c] * I_factor;
@@ -398,10 +404,8 @@ RootdensLocal::set_density (const Geometry& geo,
 
 void
 RootdensLocal::tick (const Geometry& geo,
-		     const SoilWater& soil_water, const SoilHeat& soil_heat,
-		     const double dt,
-		     std::vector<double>& L,
-		     Treelog& msg)
+		     const SoilHeat& soil_heat, const SoilWater& soil_water,
+		     std::vector<double>& L, const double dt, Treelog& msg)
 {
   TREELOG_MODEL (msg);
 

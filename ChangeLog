@@ -1,7 +1,17 @@
+2023-11-21  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* wsource_weather.C (tick_weather): Force new day if daily values
+	are uninitialized.
+
+2023-11-02  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* program_document.C: Now includes graphs for build-in PLFs.
+
+	* txt/Makefile (reference.ps): No longer generate.
+
 2023-10-31  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* program_document.C, printer_file.C: Support Attribute::Function.
-
 	* program_document.C (inherited_entries): Avoid erasing iterator.
 
 2023-10-30  Per Abrahamsen  <pa@plen.ku.dk>

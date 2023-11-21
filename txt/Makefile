@@ -20,12 +20,7 @@ REMOVE = crop-lai.tex
 all:
 	echo Please be specific...
 
-ps:	reference.ps
-
 pdf:	reference.pdf
-
-reference.ps:	reference.dvi
-	dvips -f reference.dvi > reference.ps
 
 reference.dvi: reference.tex components.tex $(LIBS)
 	latex reference.tex < /dev/null
@@ -34,6 +29,7 @@ reference.dvi: reference.tex components.tex $(LIBS)
 	latex reference.tex < /dev/null
 
 reference.pdf: reference.tex components.tex $(LIBS)
+	gnuplot document.gnuplot
 	pdflatex reference.tex < /dev/null
 	makeindex reference
 	bibtex reference
@@ -42,7 +38,10 @@ reference.pdf: reference.tex components.tex $(LIBS)
 	bibtex reference
 	pdflatex reference.tex < /dev/null
 
-components.tex:	$(DAISYEXE)
+gnufig:
+	mkdir gnufig
+
+components.tex:	$(DAISYEXE) gnufig
 	$(DAISYEXE) all.dai -p document
 
 exercises.ps:	exercises.dvi 
@@ -77,16 +76,14 @@ tutorial.pdf:	reference.pdf tutorial.tex stdlog.tex $(LIBS)
 dist:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	cp -f reference.pdf $(DISTDIR)/daisy-ref-$(TAG).pdf
-	cp -f reference.ps $(DISTDIR)/daisy-ref-$(TAG).ps
 	cp -f tutorial.pdf $(DISTDIR)/daisy-tut-$(TAG).pdf
 	cp -f exercises.pdf $(DISTDIR)/exercises-$(TAG).pdf
 
-docs: reference.pdf reference.ps tutorial.pdf exercises.pdf
+docs: reference.pdf tutorial.pdf exercises.pdf
 
 setup:
 	mkdir $(SETUPDIR)/doc
 	cp -f reference.pdf $(SETUPDIR)/doc
-	cp -f reference.ps $(SETUPDIR)/doc
 	cp -f tutorial.pdf $(SETUPDIR)/doc
 	cp -f exercises.pdf $(SETUPDIR)/doc
 

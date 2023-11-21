@@ -155,6 +155,8 @@ private:
 public:
   void tick (double AirT, double SoilT,
 	     const std::vector<double>& Density,
+	     const std::vector<double>& D, // [cm/cm^3/h]
+	     const double D_tot_DM, // [g DM/h]
 	     const Geometry& geometry, const SoilWater& soil_water,
 	     double DS, double CAImRat,
 	     const CrpN& nitrogen,

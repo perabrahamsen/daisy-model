@@ -523,10 +523,8 @@ CropStandard::tick (const Scope& scope,
   harvesting->tick (time);
 
   // Update average soil temperature.
-  const double day_fraction = bioclimate.day_fraction (dt);
-  const double T_soil 
-    = geo.content_height (soil_heat, &SoilHeat::T, -root_system->Depth);
-  root_system->tick_dynamic (T_soil, day_fraction, soil_water, dt);
+  root_system->tick_dynamic (geo, soil_heat, soil_water,
+			     bioclimate.day_fraction (dt), dt, msg);
 
   // Clear nitrogen.
   nitrogen->clear ();
@@ -648,7 +646,10 @@ CropStandard::tick (const Scope& scope,
   daisy_assert (std::isfinite (T_soil_3));
   const double seed_C = seed->release_C (T_soil_3, dt);
   production.tick (bioclimate.daily_air_temperature (), T_soil_3,
-		   root_system->actual_density (), geo, soil_water, DS, 
+		   root_system->actual_density (),
+		   root_system->dynamic_root_death (),
+		   root_system->dynamic_root_death_DM (),
+		   geo, soil_water, DS, 
 		   canopy->CAImRat, *nitrogen, nitrogen_stress, NNI, seed_C, 
                    partition, 
 		   residuals_DM, residuals_N_top, residuals_C_top,

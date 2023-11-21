@@ -23,12 +23,14 @@
 #define ROOT_SYSTEM_H
 
 #include "plf.h"
+#include "rootdens.h"
 #include <vector>
 #include <memory>
 
 class Frame;
 class Geometry;
 class Soil;
+class SoilHeat;
 class SoilWater;
 class Chemistry;
 class Log;
@@ -39,7 +41,6 @@ class Rootdens;
 class ABAProd;
 class Solupt;
 class Treelog;
-
 class RootSystem
 {
   const Metalib& metalib;
@@ -80,6 +81,10 @@ public:
   { return Density; }
   const std::vector<double>& effective_density () const
   { return EffectiveDensity; }
+  const std::vector<double>& dynamic_root_death () const // [cm/cm^3/h]
+  { return rootdens->dynamic_root_death (); }
+  double dynamic_root_death_DM () const // [g DM/h]
+  { return rootdens->dynamic_root_death_DM (); }
 private:
   std::vector<double> H2OExtraction; // Extraction of H2O in soil [cm³/cm³/h]
   std::vector<double> NH4Extraction; // Extraction of NH4-N in soil [gN/cm³/h]
@@ -134,8 +139,8 @@ public:
 private:
   static double density_distribution_parameter (double a);
 public:
-  void tick_dynamic (double T, const double day_fraction, SoilWater&, 
-                     double dt);
+  void tick_dynamic (const Geometry& geo, const SoilHeat&, SoilWater&,
+		     const double day_fraction, const double dt, Treelog&);
   void tick_daily (const Geometry&, const Soil&, const SoilWater&,
 		   double WRoot, bool root_growth, double DS, Treelog&);
   void set_density (const Geometry& geometry, const Soil& soil,

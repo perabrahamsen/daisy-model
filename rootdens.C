@@ -36,6 +36,12 @@ Rootdens::library_id () const
   return id;
 }
 
+void
+Rootdens::tick (const Geometry& geo,
+		const SoilHeat& soil_heat, const SoilWater& soil_water,
+		std::vector<double>& L, const double dt, Treelog& msg)
+{ }
+
 Rootdens::Rootdens (const BlockModel& al)
   : ModelFramed (al),
     SpRtLength (al.number ("SpRtLength"))
