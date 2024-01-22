@@ -1,5 +1,9 @@
 2024-01-22  Per Abrahamsen  <pa@plen.ku.dk>
 
+	* Version 6.45 released.
+
+2024-01-22  Per Abrahamsen  <pa@plen.ku.dk>
+
 	* secondary.C (use_secondary): Now supported by the 'pressure'
 	model.
 
