@@ -1,3 +1,17 @@
+2024-01-22  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* secondary.C (use_secondary): Now supported by the 'pressure'
+	model.
+
+2024-01-19  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* lib/log.dai ("Groundwater"): Fix 'h_aquifer' path.
+
+2023-12-07  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* hydraulic_B_C_inverse.C (Theta_wp): Use 20 um instead of 50 um
+	as silt limit.
+
 2023-11-21  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* Version 6.44 released.

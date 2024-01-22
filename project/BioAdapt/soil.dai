@@ -23,6 +23,12 @@
 (defhorizon SB1_5_SB15 CONTROL
   (hydraulic SB1_5_SB15))
 
+(defhorizon SB3_SB205 CONTROL
+  (hydraulic SB3_SB205))
+
+(defhorizon SB1_5_SB205 CONTROL
+  (hydraulic SB1_5_SB205))
+
 (defcolumn CONTROL default
   (Soil (horizons (-30 [cm] Ap)
 		  (-200 [cm] CONTROL))

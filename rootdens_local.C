@@ -171,7 +171,8 @@ RootdensLocal::expansion (const Geometry& geo,
 	// Don't go below this depth.
 	continue;
       
-      const double fE = 1.0;		      // Expansion factor []
+      const double fE		// Expansion factor []
+	= (flooded[c] > 0.0) ? 0.0 : 1.0;
 	
       if (L[c] > DensRtTip)
 	// Ignore existing root zone
@@ -250,7 +251,10 @@ RootdensLocal::internal_growth (const Geometry& geo,
       if (iszero (L[c]))
 	// Ignore cells outside root zone.
 	continue;
-
+      if (flooded[c] > 0.0)
+	// No growth from flooded cells.
+	continue;
+      
       // Other cells will get expansion from their neighbors.
       const double V = geo.cell_volume (c); // [cm^3]
       double extended_V = V / dt;		    // [cm^3/d]
@@ -269,11 +273,14 @@ RootdensLocal::internal_growth (const Geometry& geo,
 
 	  if (iszero (L[o]))
 	    continue;
+	  const double fI		// Internal growth factor []
+	    = (flooded[o] > 0.0) ? 0.0 : 1.0;
 	  
 	  const double A = geo.edge_area (e); // [cm^2]
-	  const double V_con = A * dl * dt;   // [cm^3]
+	  const double G = fI * A * dl;	      // [cm^3/d]
+	  const double V_con = G * dt;	      // [cm^3]
 	  
-	  extended_cell_roots += A * dl * L[o]; // [cm^3/d]
+	  extended_cell_roots += G * L[o]; // [cm^3/d]
 	  extended_V += V_con;
 	}
 	// Put all the roots in the cell.
@@ -456,7 +463,7 @@ RootdensLocal::initialize (const Geometry& geo,
   TREELOG_MODEL (msg);
 
   const size_t cell_size = geo.cell_size ();
-  E = I = D = std::vector<double> (cell_size, 0.0);
+  flooded = E = I = D = std::vector<double> (cell_size, 0.0);
 
   if (row_width <= 0)
     {

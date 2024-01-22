@@ -6,6 +6,42 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.45
+
+** Experimental 'local' rootdens model.
+
+** New 'use_secondary' parameter in the 'pressure' secondary model.
+
+Set it to false if you want to ue the secondary domain as a way to
+make any hydraulic curve bimodal.
+
+** Bug fixes:
+
+*** 'h_aquifer' now properly defined in the 'Groundwater' log.
+
+*** 'B_C_inverse' use 20 um as silt limit.
+
+* 6.44
+
+** New 'Function' type.
+
+Values are "function" models, but the syntax includes both domain and
+range units like the PLF.
+
+** Can now generate graphs for PLF values in the reference manual.
+
+Only work on Linux, so disabled by default.
+
+** Bug fixes:
+
+*** Proper column headers for arrays in the 'table' log in more cases.
+
+*** Fix one initialization error for weather.
+
+* 6.43
+
+** Fix bug in the 'table' hydraulic model.
+
 * 6.42
 
 ** The 'table' hydraulic model.

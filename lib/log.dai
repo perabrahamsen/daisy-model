@@ -1864,7 +1864,7 @@ sum of all chemicals will be logged."
 	   (number (path column "${column}" SoilWater table_high)
                    (spec fixed SoilWater table_high)
                    (dimension "cm"))
-           (number (path column "${column}" Groundwater lateral h_aquifer)
+           (number (path column "${column}" Groundwater aquitard h_aquifer)
                    (dimension "cm"))
            (flux_bottom (tag "Percolation")
 			(documentation "\

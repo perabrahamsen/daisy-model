@@ -125,10 +125,10 @@ struct HydraulicB_C_inverse : public Hydraulic
     // Find Theta_wp.
     if (Theta_wp < 0.0)
       {
-        const double clay_lim // USDA Clay
+        const double clay_lim // Clay
           = texture.fraction_of_minerals_smaller_than ( 2.0 /* [um] */);
-        const double silt_lim // USDA Silt 
-          = texture.fraction_of_minerals_smaller_than (50.0 /* [um] */);
+        const double silt_lim // Silt 
+          = texture.fraction_of_minerals_smaller_than (20.0 /* [um] */);
         daisy_assert (clay_lim >= 0.0);
         daisy_assert (silt_lim >= clay_lim);
         daisy_assert (silt_lim <= 1.0);

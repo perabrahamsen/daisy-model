@@ -147,13 +147,15 @@ struct SecondaryPressure : public SecondaryAlpha
 {
   const double h_lim_;
   const double K_;
+  const bool use_secondary;          // Enable secondary domain.
 
   double h_lim () const
   // The value of the 'h_lim' parameter.
-  { return h_lim_; }
+  { return use_secondary ? h_lim_ : 0.0; }
+
   double K (const double h) const
   { 
-    if (h < h_lim ())
+    if (h < h_lim_)
       return 0.0;
     else
       return K_; 
@@ -163,7 +165,8 @@ struct SecondaryPressure : public SecondaryAlpha
   SecondaryPressure (const BlockModel& al)
     : SecondaryAlpha (al),
       h_lim_ (al.number ("h_lim")),
-      K_ (al.number ("K"))
+      K_ (al.number ("K")),
+      use_secondary (al.flag ("use_secondary"))
   {}
 };
 
@@ -187,6 +190,10 @@ Water conductivity when secondary domain is active.\n\
 If the secondary domain is already included in the normal conductivity\n\
 curve, specify 0.0 to use that value instead.");
     frame.set ("K", 0.0);
+    frame.declare_boolean ("use_secondary", Attribute::Const, "\
+Divide soil matrix into two domains for solute transport.\n\
+Set this to false to make h_lim affect only the conductivity curve.");
+    frame.set ("use_secondary", true);
   }
 } SecondaryPressure_syntax;
 

@@ -249,6 +249,7 @@ static struct HydraulicLinearSyntax : public DeclareModel
 		    "Hysteresis using linear transformation.\n\
 \n\
 Theta* (h) = a Theta (h) + b\n\
+\n\
 K* (h) = c K (h) + d\n\
 \n\
 where Theta and K are defined by either 'wet' or 'dry'.\n\

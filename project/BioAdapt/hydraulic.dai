@@ -52,4 +52,30 @@
   (omega 0.0000653 [])
   (a -1.5 []))
 
+(defhydraulic SB3_SB205 hyprop
+  "B horizon with 3 % 205? um particles added."
+  (w 0.36 0.64 [])
+  (alpha 0.027 0.0395 [cm^-1])
+  (n 2.507 7.357 [])
+  (Theta_res 0.068 [])
+  (Theta_sat 0.372  [])
+  (h0 6.8 [pF])
+  (K_sat 1380.9 [cm/d])
+  (tau 1.177 [])
+  (omega 0.0000193 [])
+  (a -1.5 []))
+
+(defhydraulic SB1_5_SB205 hyprop
+  "B horizon with 1.5 % 205? um particles added."
+  (w 0.587 0.413  [])
+  (alpha 0.0328 0.0329 [cm^-1])
+  (n 8.107 2.555 [])
+  (Theta_res 0.06 [])
+  (Theta_sat 0.365  [])
+  (h0 6.8 [pF])
+  (K_sat 1705.9 [cm/d])
+  (tau 1.131 [])
+  (omega 0.0000153 [])
+  (a -1.5 []))
+
 ;;; hydraulic.dai ends here
