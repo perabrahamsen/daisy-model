@@ -284,7 +284,8 @@ growth_rate = max (0.0, (M_max (t1) - M_max (t0)) / (t1 - t0))")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.set_strings ("cite", "jorgensen2020novel");
+    frame.set_strings ("cite", "jorgensen2020novel",
+		       "GARCIAJORGENSEN2024170658");
     frame.declare_string ("chemical", Attribute::Const, "\
 Chemical to generate.");
     static VCheck::InLibrary is_chemical (Chemical::component);
