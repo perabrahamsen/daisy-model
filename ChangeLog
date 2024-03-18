@@ -1,5 +1,9 @@
 2024-03-18  Per Abrahamsen  <pa@plen.ku.dk>
 
+	* Version 6.46 released.
+
+2024-03-18  Per Abrahamsen  <pa@plen.ku.dk>
+
 	* parser_file.C (erase): New top level keyword.
 
 	* clayom.C (load_frame): New function.
