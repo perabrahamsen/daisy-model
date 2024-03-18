@@ -42,8 +42,14 @@ ClayOM::~ClayOM ()
 
 static struct ClayOMInit : public DeclareComponent 
 {
+  void load_frame (Frame& frame) const
+  {
+    Model::load_model (frame);
+  }
   ClayOMInit ()
     : DeclareComponent (ClayOM::component, "\
 Find the effect of clay on organic matter processing.")
   { }
 } ClayOM_init;
+
+// clayom.C ends here.

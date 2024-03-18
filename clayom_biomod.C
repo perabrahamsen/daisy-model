@@ -255,6 +255,7 @@ ration between maintenance and turnover is also clay dependent.")
   { }
   void load_frame (Frame& frame) const
   {
+    frame.set_strings ("cite", "biomod", "biomod2", "pedersen2007model");
     frame.declare ("a", Attribute::None (), Check::positive (), Attribute::Const,
 		"Maintenance parameter.");
 #ifdef OLD_VERSION

@@ -6,6 +6,17 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.46
+
+** New 'erase' top level keyword.
+
+Lets you erase models and parameterizations.  Note, to be sure it is
+fully erased, you must also erase any parameterization that uses it.
+
+Example:
+
+(erase chemical NH4)
+
 * 6.45
 
 ** Experimental 'local' rootdens model.

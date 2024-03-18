@@ -78,7 +78,7 @@ struct LitterMulch : public LitterResidue
   double h1;			// estimated mulch water potential at end [cm]
   double h_soil;		// Soil water potential at soil_height [cm]
   double K_soil;		// Soil water conductivity at soil_height [cm/h]
-  double E_darcy;		// Potential exchnage with soil water [cm/h]
+  double E_darcy;		// Potential exchange with soil water [cm/h]
   double h_factor;		// Water potential effect []
   double T;			// Temperature of mulch [dg C]
   double T_soil;		// Temperature of top soil [dg C]

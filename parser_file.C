@@ -1052,6 +1052,34 @@ ParserFile::Implementation::load_list (Frame& frame)
           continue;
         }
 
+      if (&frame == &metalib () && name == "erase")
+	{
+	  const symbol lib_name = get_symbol ();
+	  if (!metalib ().exist (lib_name))
+	    {
+	      error ("'" + lib_name + "': unknown component");
+	      skip_to_end ();
+	      continue;
+	    }
+	  const symbol model_name = get_symbol ();
+	  if (model_name == error_symbol)
+	    {
+	      skip_to_end ();
+	      continue;
+	    }
+	  Library& lib = metalib ().library (lib_name);
+	  // Check for duplicates.
+	  if (!lib.check (model_name))
+	    {
+	      error ("'" + model_name + "': unknown model");
+	      skip_to_end ();
+	      continue;
+	    }
+
+	  lib.remove (model_name);
+	  continue;
+	}
+      
       // Duplicate warning.
       if (found.find (name) != found.end ())
 	error (name + " specified twice, last takes precedence");

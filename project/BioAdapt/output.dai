@@ -25,8 +25,7 @@
                    (path column "${column}" harvest_N)
                    (spec column default harvest_N)
                    (dimension [kg/ha])
-                   (handle sum))
-           ))
+                   (handle sum))))
 
 (deflog "Water usage" column
   "How much water is evaporated in growing season."

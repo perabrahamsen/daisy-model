@@ -1,3 +1,10 @@
+2024-03-18  Per Abrahamsen  <pa@plen.ku.dk>
+
+	* parser_file.C (erase): New top level keyword.
+
+	* clayom.C (load_frame): New function.
+	* clayom_biomod.C ("cite"): Set value.
+
 2024-02-27  Per Abrahamsen  <pa@plen.ku.dk>
 
 	* reaction_shoot.C (load_frame): Added second citation.
