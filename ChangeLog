@@ -1,5 +1,9 @@
 2024-03-20  Per Abrahamsen  <pa@plen.ku.dk>
 
+	* Version 6.47 released.
+
+2024-03-20  Per Abrahamsen  <pa@plen.ku.dk>
+
 	* adsorption_vS_S.C (vS_S_old): Renamed from "vS_S".
 	(vS_S): Made S_planar, S_edge, K_planar, K_edge parameters.
 	V_planar, V_edge: unit should per volume space, not per volume soil.
