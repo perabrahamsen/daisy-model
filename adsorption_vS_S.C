@@ -25,8 +25,158 @@
 #include "soil.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "block_model.h"
+#include "check.h"
+#include <sstream>
 
 class Adsorption_vS_S : public Adsorption
+{
+  const double S_planar;	// [g N/g clay]
+  const double S_edge;		// [g N/g clay]
+  const double K_planar;	// [g N/cm^3]
+  const double K_edge;		// [g N/cm^3]
+
+  // Simulation.
+public:
+  double C_to_A (const Soil& soil, int i, double C, double sf) const;
+  double C_to_M (const Soil&, double Theta, int, double C, double sf) const;
+  double M_to_C (const Soil&, double Theta, int, double M, double sf) const;
+
+  // Chemical soil constants.
+  double v_planar (const Soil& soil, int i, double sf) const
+    { 
+      const double clay = soil.clay (i); // []
+      const double rho_b = soil.dry_bulk_density (i); // [g N/cm^3]
+      return S_planar * clay * rho_b * sf; 
+    }
+  double v_edge (const Soil& soil, int i, double sf) const
+    {
+      const double clay = soil.clay (i); // []
+      const double rho_b = soil.dry_bulk_density (i); // [g N/cm^3]
+      return S_edge * clay * rho_b * sf; 
+    }
+
+  // Create.
+public:
+  Adsorption_vS_S (const BlockModel& al)
+    : Adsorption (al),
+      S_planar (al.number ("S_planar")),
+      S_edge (al.number ("S_edge")),
+      K_planar (al.number ("K_planar")),
+      K_edge (al.number ("K_edge"))
+  { }
+};
+
+double
+Adsorption_vS_S::C_to_A (const Soil& soil, int i, double C, double sf) const
+{
+  return (v_planar (soil, i, sf) * C) / (K_planar + C)
+    + (v_edge (soil, i, sf) * C) / (K_edge + C);
+}
+
+double 
+Adsorption_vS_S::C_to_M (const Soil& soil, double Theta, int i, double C,
+                         double sf) const
+{
+  return C_to_A (soil, i, C, sf) + Theta * C;
+}
+
+double 
+Adsorption_vS_S::M_to_C (const Soil& soil, double Theta, int i, double M,
+                         double sf) const
+{
+  const double ve = v_edge (soil, i, sf); 
+  const double Ke = K_edge;
+  const double vp = v_planar (soil, i, sf);
+  const double Kp = K_planar;
+
+  double C;
+
+  if (M < 1e-6 * std::min (Ke, Kp))
+    // There are numerical problems in the general solution for small M. 
+    C = M / (Theta + ve  / Ke + vp / Kp);
+  else
+    {
+      daisy_assert (Theta > 0.0);
+      const double a = Theta;
+      const double b = Theta * (Kp + Ke) + vp + ve - M;
+      const double c = vp * Ke + ve * Kp - M * (Kp + Ke) + Kp * Ke * Theta;
+      const double d = - M * Kp * Ke;
+    
+      C = single_positive_root_of_cubic_equation (a, b, c, d);
+      const double new_M = C_to_M (soil, Theta, i, C, sf);
+      if (!approximate (M, new_M, 0.01))
+	{
+	  std::ostringstream tmp;
+	  tmp << objid << ": M[i]: old = " << M << ", new = " << new_M
+	      << "; Theta = " << Theta << "; C = " << C;
+	  Assertion::warning (tmp.str ());
+	}
+	    
+	  
+    }
+  return C;
+}
+
+static struct Adsorption_vS_SSyntax : DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new Adsorption_vS_S (al); }
+  Adsorption_vS_SSyntax ()
+    : DeclareModel (Adsorption::component, "vS_S", "\
+Double langmuir description of NH4-N sorption to clay.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set_strings ("cite", "van1963potassium");
+    frame.declare ("S_planar", "g N/g clay", Check::non_negative (), Attribute::Const, "\
+Absorption capacity of the clay planar sites.");
+    frame.declare ("S_edge", "g N/g clay", Check::non_negative (), Attribute::Const, "\
+Absorption capacity of the clay edge sites.");
+    frame.declare ("K_planar", "g N/cm^3", Check::non_negative (), Attribute::Const, "\
+Half-saturation constant of the clay planer sites.");
+    frame.declare ("K_edge", "g N/cm^3", Check::non_negative (), Attribute::Const, "\
+Half-saturation constant of the clay edge sites.");
+  }
+} Adsorption_vS_S_syntax;
+
+// The 'vS_S_Hansen' parameterization.
+
+static struct AdsorptionvS_S_HansenSyntax : public DeclareParam
+{ 
+  AdsorptionvS_S_HansenSyntax ()
+    : DeclareParam (Adsorption::component, "vS_S_Hansen", "vS_S", "\
+.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set ("S_planar", 5.964e-3);
+    frame.set ("S_edge",  0.308e-3);
+    frame.set ("K_planar", 6.3e-5);
+    frame.set ("K_edge", 1.372e-5);
+  }
+} AdsorptionvS_S_Hansen_syntax;
+
+// The 'vS_S_Styczen' parameterization.
+
+static struct AdsorptionvS_S_StyczenSyntax : public DeclareParam
+{ 
+  AdsorptionvS_S_StyczenSyntax ()
+    : DeclareParam (Adsorption::component, "vS_S_Styczen", "vS_S", "\
+Parameter update..")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.set ("S_planar", 5.964e-3);
+    frame.set ("S_edge", 0.2801e-3);
+    frame.set ("K_planar", 6.338e-4);
+    frame.set ("K_edge", 1.369e-5);
+  }
+} AdsorptionvS_S_Styczen_syntax;
+
+// The 'vS_S_old' model.
+
+class Adsorption_vS_S_old : public Adsorption
 {
   // Simulation.
 public:
@@ -59,27 +209,27 @@ public:
 
   // Create.
 public:
-  Adsorption_vS_S (const BlockModel& al)
+  Adsorption_vS_S_old (const BlockModel& al)
     : Adsorption (al)
     { }
 };
 
 double
-Adsorption_vS_S::C_to_A (const Soil& soil, int i, double C, double sf) const
+Adsorption_vS_S_old::C_to_A (const Soil& soil, int i, double C, double sf) const
 {
   return (v_planar (soil, i, sf) * C) / (K_planar () + C)
     + (v_edge (soil, i, sf) * C) / (K_edge () + C);
 }
 
 double 
-Adsorption_vS_S::C_to_M (const Soil& soil, double Theta, int i, double C,
+Adsorption_vS_S_old::C_to_M (const Soil& soil, double Theta, int i, double C,
                          double sf) const
 {
   return C_to_A (soil, i, C, sf) + Theta * C;
 }
 
 double 
-Adsorption_vS_S::M_to_C (const Soil& soil, double Theta, int i, double M,
+Adsorption_vS_S_old::M_to_C (const Soil& soil, double Theta, int i, double M,
                          double sf) const
 {
   const double ve = v_edge (soil, i, sf); 
@@ -106,17 +256,18 @@ Adsorption_vS_S::M_to_C (const Soil& soil, double Theta, int i, double M,
   return C;
 }
 
-static struct Adsorption_vS_SSyntax : DeclareModel
+static struct Adsorption_vS_S_oldSyntax : DeclareModel
 {
   Model* make (const BlockModel& al) const
-  { return new Adsorption_vS_S (al); }
-  Adsorption_vS_SSyntax ()
-    : DeclareModel (Adsorption::component, "vS_S", "\
-Model by van Schouwenberg and Schuffelen, 1963, with\n\
-parameterization by Hansen et.al., 1990.")
+  { return new Adsorption_vS_S_old (al); }
+  Adsorption_vS_S_oldSyntax ()
+    : DeclareModel (Adsorption::component, "vS_S_old", "\
+Buggy implementation included as vS_S before Daisy 6.47.\n\
+Included here as reference.\n\
+Note, linear sorption was used as default for NH4 as slong as memeory serve.")
   { }
   void load_frame (Frame& frame) const
   { }
-} Adsorption_vS_S_syntax;
+} Adsorption_vS_S_old_syntax;
 
 // adsorption_vS_S.C ends here.
