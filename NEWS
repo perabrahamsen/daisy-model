@@ -6,6 +6,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 6.47
+
+** Split 'vS_S' adsorption model into several variants.
+
+We are testing which work and don't work, so don't use them yet.
+
 * 6.46
 
 ** New 'erase' top level keyword.
